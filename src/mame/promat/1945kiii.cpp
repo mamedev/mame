@@ -209,29 +209,29 @@ void k3_state::k3_drawgfx(bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_ele
 	int ex = sx + gfx->width();
 	int ey = sy + gfx->height();
 
-	if (sx < clip.min_x)
+	if (sx < clip.left())
 	{
 		// clip left
-		int pixels = clip.min_x - sx;
+		int pixels = clip.left() - sx;
 		sx += pixels;
 		x_index_base += xinc * pixels;
 	}
-	if (sy < clip.min_y)
+	if (sy < clip.top())
 	{
 		// clip top
-		int pixels = clip.min_y - sy;
+		int pixels = clip.top() - sy;
 		sy += pixels;
 		y_index += yinc * pixels;
 	}
-	if (ex > clip.max_x + 1)
+	if (ex > clip.right() + 1)
 	{
 		// clip right
-		ex = clip.max_x + 1;
+		ex = clip.right() + 1;
 	}
-	if (ey > clip.max_y + 1)
+	if (ey > clip.bottom() + 1)
 	{
 		// clip bottom
-		ey = clip.max_y + 1;
+		ey = clip.bottom() + 1;
 	}
 
 	// skip if inner loop doesn't draw anything
@@ -663,7 +663,7 @@ void k3_state::flagrall(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_1945kiii);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(27'000'000)/4, 432, 0, 320, 315, 0, 240); // ~49.61Hz, reference : https://www.youtube.com/watch?v=CuGrTiQs4ww
 	m_screen->set_screen_update(FUNC(k3_state::screen_update));
 	m_screen->set_palette(m_palette);

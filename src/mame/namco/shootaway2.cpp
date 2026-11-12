@@ -98,7 +98,7 @@ void m74_state::m74(machine_config &config)
 
 	EEPROM_2864(config, "eeprom"); // M28C64A-15
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(FUNC(m74_state::screen_update));

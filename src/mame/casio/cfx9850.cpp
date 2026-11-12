@@ -306,7 +306,7 @@ void cfx9850_state::cfx9850(machine_config &config)
 	m_maincpu->port_r_cb().set(FUNC(cfx9850_state::port_r));
 	m_maincpu->in0_cb().set(FUNC(cfx9850_state::in0_r));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(128, 64);
 	screen.set_visarea(0, 127, 0, 63);

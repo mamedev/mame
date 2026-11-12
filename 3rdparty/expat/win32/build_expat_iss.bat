@@ -7,7 +7,7 @@ REM                     |  __//  \| |_) | (_| | |_
 REM                      \___/_/\_\ .__/ \__,_|\__|
 REM                               |_| XML parser
 REM
-REM Copyright (c) 2019-2024 Sebastian Pipping <sebastian@pipping.org>
+REM Copyright (c) 2019-2025 Sebastian Pipping <sebastian@pipping.org>
 REM Licensed under the MIT license:
 REM
 REM Permission is  hereby granted,  free of charge,  to any  person obtaining
@@ -29,7 +29,7 @@ REM DAMAGES OR  OTHER LIABILITY, WHETHER  IN AN  ACTION OF CONTRACT,  TORT OR
 REM OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 REM USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-SET GENERATOR=Visual Studio 16 2019
+SET GENERATOR=Visual Studio 17 2022
 
 REM Read by msbuild!
 SET CONFIGURATION=RelWithDebInfo

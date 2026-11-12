@@ -42,6 +42,7 @@ private:
 	void write_fifo_process();
 	TIMER_CALLBACK_MEMBER(timer_callback);
 	void dma_stop();
+	void read_fifo_flush();
 
 	// callback objects
 	devcb_read8 m_scsi_read_callback;

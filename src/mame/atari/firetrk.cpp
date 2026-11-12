@@ -1524,7 +1524,7 @@ void firetrk_state::firetrk(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 5);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(MASTER_CLOCK / 2, 384, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(firetrk_state::screen_update));

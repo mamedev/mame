@@ -923,7 +923,13 @@ macro   irqfetch
 {
 	// fetch the IRQ vector
 	device_z80daisy_interface *intf = daisy_get_irq_device();
-	m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
+	if (intf != nullptr) {
+		m_tmp_irq_vector = intf->z80daisy_irq_ack();
+		if (debugger_enabled())
+			device_execute_interface::device().debug()->interrupt_hook(0, m_pc.w);
+	} else {
+		m_tmp_irq_vector = standard_irq_callback(0, m_pc.w);
+	}
 	LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
 }
 
@@ -932,7 +938,13 @@ macro   t6a84:irqfetch
 	// fetch the IRQ vector
 	paged_irqfetch();
 	device_z80daisy_interface *intf = daisy_get_irq_device();
-	m_tmp_irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback(0, m_pc.w);
+	if (intf != nullptr) {
+		m_tmp_irq_vector = intf->z80daisy_irq_ack();
+		if (debugger_enabled())
+			device_execute_interface::device().debug()->interrupt_hook(0, m_pc.w);
+	} else {
+		m_tmp_irq_vector = standard_irq_callback(0, m_pc.w);
+	}
 	LOGMASKED(LOG_INT, "single INT m_tmp_irq_vector $%02x\n", m_tmp_irq_vector);
 }
 

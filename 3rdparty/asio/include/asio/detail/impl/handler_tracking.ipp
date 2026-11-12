@@ -2,7 +2,7 @@
 // detail/impl/handler_tracking.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,15 +25,10 @@
 
 #include <cstdarg>
 #include <cstdio>
+#include "asio/detail/chrono.hpp"
+#include "asio/detail/chrono_time_traits.hpp"
 #include "asio/detail/handler_tracking.hpp"
-
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-# include "asio/time_traits.hpp"
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
-# include "asio/detail/chrono.hpp"
-# include "asio/detail/chrono_time_traits.hpp"
-# include "asio/wait_traits.hpp"
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
+#include "asio/wait_traits.hpp"
 
 #if defined(ASIO_WINDOWS_RUNTIME)
 # include "asio/detail/socket_types.hpp"
@@ -44,6 +39,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 struct handler_tracking_timestamp
@@ -53,16 +49,10 @@ struct handler_tracking_timestamp
 
   handler_tracking_timestamp()
   {
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-    boost::posix_time::ptime epoch(boost::gregorian::date(1970, 1, 1));
-    boost::posix_time::time_duration now =
-      boost::posix_time::microsec_clock::universal_time() - epoch;
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
     typedef chrono_time_traits<chrono::system_clock,
         asio::wait_traits<chrono::system_clock>> traits_helper;
     traits_helper::posix_time_duration now(
         chrono::system_clock::now().time_since_epoch());
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
     seconds = static_cast<uint64_t>(now.total_seconds());
     microseconds = static_cast<uint64_t>(now.total_microseconds() % 1000000);
   }
@@ -389,6 +379,7 @@ void handler_tracking::write_line(const char* format, ...)
 }
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

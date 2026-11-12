@@ -824,7 +824,7 @@ static INPUT_PORTS_START( paperboy )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("tms", FUNC(tms5220_device::readyq_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_CONDITION("IN0", 0x8000, EQUALS, 0x8000) // self-test
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
@@ -1072,9 +1072,6 @@ static INPUT_PORTS_START( apb )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 )
-
 	PORT_MODIFY("ADC0")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -1216,7 +1213,7 @@ void atarisy2_state::atarisy2(machine_config &config)
 	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, atarisy2_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_raw(VIDEO_CLOCK/2, 640, 0, 512, 416, 0, 384);
 	screen.set_screen_update(FUNC(atarisy2_state::screen_update));
@@ -1350,7 +1347,7 @@ ROM_START( paperboy ) // ALL of these roms should be 136034-xxx but the correct 
 	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(756b90cc) SHA1(b78762e354f1316087f9de4005734c343356c8ef) )
+	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(1bbf9b07) SHA1(3c4c9c8867f5d0e2d98201719c9ad45f5468c50b) )
 ROM_END
 
 
@@ -1392,7 +1389,7 @@ ROM_START( paperboyr2 )
 	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(756b90cc) SHA1(b78762e354f1316087f9de4005734c343356c8ef) )
+	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(1bbf9b07) SHA1(3c4c9c8867f5d0e2d98201719c9ad45f5468c50b) )
 ROM_END
 
 
@@ -1434,7 +1431,7 @@ ROM_START( paperboyr1 )
 	ROM_LOAD( "vid_t06.rv1", 0x000000, 0x002000, CRC(60d7aebb) SHA1(ad74221c4270496ebcfedd46ea16dca2cda1b4be) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(756b90cc) SHA1(b78762e354f1316087f9de4005734c343356c8ef) )
+	ROM_LOAD( "paperboy-eeprom.bin", 0x0000, 0x0200, CRC(1bbf9b07) SHA1(3c4c9c8867f5d0e2d98201719c9ad45f5468c50b) )
 ROM_END
 
 
@@ -1590,7 +1587,7 @@ ROM_START( 720 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 
@@ -1658,7 +1655,7 @@ ROM_START( 720r3 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 
@@ -1726,7 +1723,7 @@ ROM_START( 720r2 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 
@@ -1794,7 +1791,7 @@ ROM_START( 720r1 )
 	ROM_LOAD( "136047-1125.4t",  0x000000, 0x004000, CRC(6b7e2328) SHA1(cc9a315ccafe7228951b7c32cf3b31caa89ae7d3) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 
@@ -1862,7 +1859,7 @@ ROM_START( 720g )
 	ROM_LOAD( "136047-1225.4t",  0x000000, 0x004000, CRC(264eda88) SHA1(f0f5fe87741e0e17117085cf45f700090a02cb94) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 
@@ -1930,7 +1927,7 @@ ROM_START( 720gr1 )
 	ROM_LOAD( "136047-1225.4t",  0x000000, 0x004000, CRC(264eda88) SHA1(f0f5fe87741e0e17117085cf45f700090a02cb94) )
 
 	ROM_REGION( 0x200, "eeprom", 0 )
-	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(cfe1c24e) SHA1(5f7623b0a2ff0d99ffa8e6420a5bc03e0c55250d) )
+	ROM_LOAD( "720-eeprom.bin", 0x0000, 0x0200, CRC(5d2acf11) SHA1(824864032b947ffcf606b2363a48e1a181c6c3d2) )
 ROM_END
 
 

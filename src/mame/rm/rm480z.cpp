@@ -314,7 +314,7 @@ void rm480z_state::rm480z(machine_config &config)
 
 	/* video hardware */
 	PALETTE(config, m_palette).set_init(FUNC(rm480z_state::palette_init)).set_entries(19);
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(rm480z_state::screen_update_rm480z));
 	m_screen->set_palette(m_palette);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 240);

@@ -234,7 +234,7 @@ public:
 	const uint32_t *cidaux(int y) const { return &m_cidaux[1344 * y]; }
 	uint32_t store_shift() { return m_src_shift; }
 
-	// devcb callbacks
+	// callbacks
 	void set_write_mask(uint32_t data);
 	void set_flags(uint16_t data);
 	void set_address(uint32_t address);
@@ -299,12 +299,6 @@ public:
 
 	void vrint_w(int state);
 	void update_screen_size(int state);
-
-	auto write_mask() { return m_write_mask_w.bind(); }
-	auto draw_flags() { return m_draw_flags_w.bind(); }
-	auto pixel_address() { return m_set_address.bind(); }
-	auto pixel_write() { return m_write_pixel.bind(); }
-	auto pixel_read() { return m_read_pixel.bind(); }
 
 	void serialize(FILE *file);
 	void deserialize(FILE *file);
@@ -510,11 +504,11 @@ protected:
 	uint32_t m_global_mask;
 	emu_timer *m_dcb_timeout_timer;
 
-	devcb_write32 m_write_mask_w;
-	devcb_write16 m_draw_flags_w;
-	devcb_write32 m_set_address;
-	devcb_write32 m_write_pixel;
-	devcb_read32 m_read_pixel;
+	void write_mask_w(uint32_t data) { m_rb2->set_write_mask(data); }
+	void draw_flags_w(uint16_t data) { m_rb2->set_flags(data); }
+	void set_address(uint32_t data) { m_rb2->set_address(data); }
+	void write_pixel(uint32_t data) { m_rb2->write_pixel(data); }
+	uint32_t read_pixel() { return m_rb2->read_pixel(); }
 
 #if ENABLE_NEWVIEW_LOG
 	void start_logging();

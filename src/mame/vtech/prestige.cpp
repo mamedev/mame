@@ -805,7 +805,7 @@ void prestige_state::prestige_base(machine_config &config)
 	TIMER(config, "irq_timer").configure_periodic(FUNC(prestige_state::irq_timer), attotime::from_hz(200));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(prestige_state::screen_update_1bpp));

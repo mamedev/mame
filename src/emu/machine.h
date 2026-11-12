@@ -217,18 +217,22 @@ public:
 	std::unique_ptr<emu_file> steal_debuglogfile();
 
 private:
-	class side_effects_disabler {
+	class side_effects_disabler
+	{
+	private:
 		running_machine *m_machine;
 		bool m_disable_se;
 
 	public:
-		side_effects_disabler(running_machine *m, bool disable_se) : m_machine(m), m_disable_se(disable_se) {
-			if(m_disable_se)
+		side_effects_disabler(running_machine *m, bool disable_se) : m_machine(m), m_disable_se(disable_se)
+		{
+			if (m_disable_se)
 				m_machine->disable_side_effects_count();
 		}
 
-		~side_effects_disabler() {
-			if(m_disable_se)
+		~side_effects_disabler()
+		{
+			if (m_disable_se)
 				m_machine->enable_side_effects_count();
 		}
 
@@ -236,8 +240,11 @@ private:
 		side_effects_disabler(side_effects_disabler &&) = default;
 	};
 
+	class log_file_helper;
+	using log_file_helper_ptr = std::unique_ptr<log_file_helper>;
+
 	void disable_side_effects_count() { m_side_effects_disabled++; }
-	void enable_side_effects_count()  { m_side_effects_disabled--; }
+	void enable_side_effects_count() { m_side_effects_disabled--; }
 
 	// internal helpers
 	template <typename T> struct is_null { template <typename U> static bool value(U &&x) { return false; } };
@@ -251,9 +258,6 @@ private:
 	void nvram_save();
 	void popup_clear() const;
 	void popup_message(util::format_argument_pack<char> const &args) const;
-
-	// internal callbacks
-	void logfile_callback(const char *buffer);
 
 	// internal device helpers
 	void start_all_devices();
@@ -297,7 +301,7 @@ private:
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths
 	int                     m_sample_rate;          // the digital audio sample rate
-	std::unique_ptr<emu_file>  m_logfile;           // pointer to the active error.log file
+	log_file_helper_ptr     m_logfile;              // pointer to the active error.log file
 	std::unique_ptr<emu_file>  m_debuglogfile;      // pointer to the active debug.log file
 
 	// load/save management

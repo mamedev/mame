@@ -24,6 +24,7 @@ function autofire.startplugin()
 	--   'button' - reference to ioport_field
 	--   'counter' - position in autofire cycle
 	local buttons = {}
+	local loaded = false
 
 	local input_manager
 	local menu_handler
@@ -63,8 +64,9 @@ function autofire.startplugin()
 
 	local function load_settings()
 		local loader = require('autofire/autofire_save')
-		if loader then
+		if loader and not loaded then
 			buttons = loader:load_settings()
+			loaded = true
 		end
 
 		input_manager = manager.machine.input
@@ -79,6 +81,7 @@ function autofire.startplugin()
 		menu_handler = nil
 		input_manager = nil
 		buttons = {}
+		loaded = false
 	end
 
 	local function menu_callback(index, event)

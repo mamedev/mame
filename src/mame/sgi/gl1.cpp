@@ -161,7 +161,7 @@ GFXDECODE_END
 
 void sgi_gl1_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(1024 * 768 * 60, 1024, 0, 1024, 768, 0, 768);
 	m_screen->set_screen_update(FUNC(sgi_gl1_device::screen_update));
 
@@ -177,11 +177,12 @@ u32 sgi_gl1_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, r
 {
 	u8 const *src = m_bp.get();
 
-	for (unsigned y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+	for (unsigned y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
 	{
-		for (unsigned x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
+		auto *const dst = &bitmap.pix(screen.visible_area().bottom() - y);
+		for (unsigned x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
 		{
-			bitmap.pix(screen.visible_area().max_y - y, x) = m_cmap->pen_color(*src++);
+			dst[x] = m_cmap->pen_color(*src++);
 		}
 	}
 

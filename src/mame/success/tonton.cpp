@@ -226,7 +226,7 @@ void tonton_state::tonton(machine_config &config)
 	m_v9938->set_screen_ntsc("screen");
 	m_v9938->set_vram_size(0x20000);
 	m_v9938->int_cb().set_inputline(m_maincpu, 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(HOPPER_PULSE));
 

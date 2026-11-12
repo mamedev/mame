@@ -714,7 +714,7 @@ void svision_state::svision(machine_config &config)
 	W65C02(config, m_maincpu, 4'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &svision_state::program_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(61);
 	m_screen->set_size(3+160+3, 160);
 	m_screen->set_visarea(3+0, 3+160-1, 0, 160-1);
@@ -740,7 +740,7 @@ void svision_state::svisionp(machine_config &config)
 
 	m_maincpu->set_clock(4'430'000);
 
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(50));
+	m_screen->set_refresh_hz(50);
 
 	m_palette->set_init(FUNC(svision_state::svisionp_palette));
 }
@@ -751,7 +751,7 @@ void svision_state::svisionn(machine_config &config)
 
 	m_maincpu->set_clock(3'560'000); // ?
 
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh_hz(60);
 
 	m_palette->set_init(FUNC(svision_state::svisionn_palette));
 }

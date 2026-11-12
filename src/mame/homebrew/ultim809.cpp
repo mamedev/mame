@@ -143,7 +143,7 @@ void ultim809_state::ultim809(machine_config &config)
 	m_crtc->set_screen("screen");
 	m_crtc->set_vram_size(0x4000);    // actually 2 banks of 0x4000
 	m_crtc->int_callback().set_inputline(m_maincpu, M6809_IRQ_LINE);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// TBD: what type of VIA is this? It replaced a MC68B21P at some point in development.
 	MOS6522(config, m_via, 8000000 / 4);

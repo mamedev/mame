@@ -2,7 +2,7 @@
 // detail/service_registry.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -25,6 +25,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 
 class io_context;
 
@@ -66,6 +67,10 @@ public:
   template <typename Service>
   Service& use_service(io_context& owner);
 
+  // Create and add a service object.
+  template <typename Service, typename... Args>
+  Service& make_service(Args&&... args);
+
   // Add a service object. Throws on error, in which case ownership of the
   // object is retained by the caller.
   template <typename Service>
@@ -76,12 +81,12 @@ public:
   bool has_service() const;
 
 private:
-  // Initalise a service's key when the key_type typedef is not available.
+  // Initialise a service's key when the key_type typedef is not available.
   template <typename Service>
   static void init_key(execution_context::service::key& key, ...);
 
 #if !defined(ASIO_NO_TYPEID)
-  // Initalise a service's key when the key_type typedef is available.
+  // Initialise a service's key when the key_type typedef is available.
   template <typename Service>
   static void init_key(execution_context::service::key& key,
       enable_if_t<is_base_of<typename Service::key_type, Service>::value>*);
@@ -105,14 +110,20 @@ private:
       const execution_context::service::key& key2);
 
   // The type of a factory function used for creating a service instance.
-  typedef execution_context::service*(*factory_type)(void*);
+  typedef execution_context::service*(*factory_type)(execution_context&, void*);
 
   // Factory function for creating a service instance.
-  template <typename Service, typename Owner>
-  static execution_context::service* create(void* owner);
+  template <typename Service, typename Owner, typename... Args>
+  static execution_context::service* create(
+      execution_context& context, void* owner, Args&&... args);
 
-  // Destroy a service instance.
-  ASIO_DECL static void destroy(execution_context::service* service);
+  // Helper function to destroy an allocated service instance.
+  template <typename Service>
+  static void destroy_allocated(execution_context::service* service);
+
+  // Helper function to destroy an added service instance.
+  ASIO_DECL static void destroy_added(
+      execution_context::service* service);
 
   // Helper class to manage service pointers.
   struct auto_service_ptr;
@@ -120,7 +131,7 @@ private:
   struct auto_service_ptr
   {
     execution_context::service* ptr_;
-    ~auto_service_ptr() { destroy(ptr_); }
+    ASIO_DECL ~auto_service_ptr();
   };
 
   // Get the service object corresponding to the specified service key. Will
@@ -151,6 +162,7 @@ private:
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

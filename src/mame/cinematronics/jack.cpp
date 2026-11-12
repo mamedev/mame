@@ -1283,7 +1283,7 @@ void jack_state::jack(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &jack_state::sound_io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(jack_state::screen_update<true>));
 	m_screen->set_palette(m_palette);
@@ -1887,17 +1887,11 @@ void jack_state::init_treahunt()
 
 void joinem_state::init_loverboy()
 {
-	/* this doesn't make sense.. the startup code, and irq0 have jumps to 0..
-	   I replace the startup jump with another jump to what appears to be
-	   the start of the game code.
-
-	   ToDo: Figure out what's really going on
-	   EDIT: this is fun, it's in im0 and trips ei ... my best guess is that
-	   there's a protection device enabled at 0xf000-0xf001-0xf002-0xf008 that
-	   sends a custom irq (either ld hl,$019d or jp $019d). After the initial
-	   code, the protection device is disabled or changes behaviour via
-	   writes at 0xf000 and 0xf008. -AS
-	*/
+	// HACK: workaround protection check
+	// Game runs in im 0 at ei time. I speculate there's a protection device
+	// enabled at 0xf000-0xf001-0xf002-0xf008 that sends a custom irq (either ld hl,$019d or jp $019d).
+	// After the initial code, the protection device is disabled or changes behaviour via
+	// writes at 0xf000 and 0xf008. -AS
 	uint8_t *rom = memregion("maincpu")->base();
 	rom[0x13] = 0x01;
 	rom[0x12] = 0x9d;

@@ -19,6 +19,7 @@
 #include "mda.h"
 #include "num9rev.h"
 #include "pgc.h"
+#include "proga.h"
 #include "svga_cirrus.h"
 #include "svga_paradise.h"
 #include "svga_s3.h"
@@ -36,6 +37,7 @@
 #include "acb2072.h"
 #include "cl_sh260.h"
 #include "dsi32.h"
+#include "fddda.h"
 #include "hdc.h"
 #include "lrk330.h"
 #include "omti8621.h"
@@ -59,6 +61,7 @@
 #include "ultra24f.h"
 
 // storage (IDE/XT-IDE)
+#include "eidemax.h"
 #include "ide.h"
 #include "side116.h"
 #include "xtide.h"
@@ -66,6 +69,7 @@
 // storage (miscellaneous)
 #include "lbaenhancer.h"
 #include "mcd.h"
+#include "stda.h"
 
 // sound
 #include "adlib.h"
@@ -175,6 +179,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("ibm_speech", ISA8_IBM_SPEECH);
 	device.option_add("zxbus_adapter", ISA8_ZXBUS);
 	device.option_add("ubpnic", ISA8_UBPNIC);
+	device.option_add("proga", ISA8_PROGA);
 }
 
 void pc_isa16_cards(device_slot_interface &device)
@@ -198,6 +203,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("gus", ISA16_GUS);
 	device.option_add("pcat512me", ISA16_PCAT512ME);
 	device.option_add("sblaster_16", ISA16_SOUND_BLASTER_16);
+	device.option_add("stda", ISA16_STDA);
 	device.option_add("svga_s3", ISA16_SVGA_S3);
 	device.option_add("avga1", ISA16_AVGA1_CIRRUS_GD5401);
 	device.option_add("clgd542x", ISA16_SVGA_CIRRUS_GD542X);
@@ -240,6 +246,7 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("lrk331", LRK331);
 	device.option_add("hpblp", HPBLP);
 	device.option_add("wss", ISA16_WSS);
+	device.option_add("eidemax", ISA16_EIDEMAX);
 
 	// EISA cards
 	// TODO: move to own block

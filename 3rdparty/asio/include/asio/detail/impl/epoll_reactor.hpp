@@ -2,7 +2,7 @@
 // detail/impl/epoll_reactor.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -22,6 +22,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 inline void epoll_reactor::post_immediate_completion(
@@ -30,22 +31,25 @@ inline void epoll_reactor::post_immediate_completion(
   scheduler_.post_immediate_completion(op, is_continuation);
 }
 
-template <typename Time_Traits>
-void epoll_reactor::add_timer_queue(timer_queue<Time_Traits>& queue)
+template <typename TimeTraits, typename Allocator>
+void epoll_reactor::add_timer_queue(
+    timer_queue<TimeTraits, Allocator>& queue)
 {
   do_add_timer_queue(queue);
 }
 
-template <typename Time_Traits>
-void epoll_reactor::remove_timer_queue(timer_queue<Time_Traits>& queue)
+template <typename TimeTraits, typename Allocator>
+void epoll_reactor::remove_timer_queue(
+    timer_queue<TimeTraits, Allocator>& queue)
 {
   do_remove_timer_queue(queue);
 }
 
-template <typename Time_Traits>
-void epoll_reactor::schedule_timer(timer_queue<Time_Traits>& queue,
-    const typename Time_Traits::time_type& time,
-    typename timer_queue<Time_Traits>::per_timer_data& timer, wait_op* op)
+template <typename TimeTraits, typename Allocator>
+void epoll_reactor::schedule_timer(timer_queue<TimeTraits, Allocator>& queue,
+    const typename TimeTraits::time_type& time,
+    typename timer_queue<TimeTraits, Allocator>::per_timer_data& timer,
+    wait_op* op)
 {
   mutex::scoped_lock lock(mutex_);
 
@@ -61,9 +65,10 @@ void epoll_reactor::schedule_timer(timer_queue<Time_Traits>& queue,
     update_timeout();
 }
 
-template <typename Time_Traits>
-std::size_t epoll_reactor::cancel_timer(timer_queue<Time_Traits>& queue,
-    typename timer_queue<Time_Traits>::per_timer_data& timer,
+template <typename TimeTraits, typename Allocator>
+std::size_t epoll_reactor::cancel_timer(
+    timer_queue<TimeTraits, Allocator>& queue,
+    typename timer_queue<TimeTraits, Allocator>::per_timer_data& timer,
     std::size_t max_cancelled)
 {
   mutex::scoped_lock lock(mutex_);
@@ -74,9 +79,10 @@ std::size_t epoll_reactor::cancel_timer(timer_queue<Time_Traits>& queue,
   return n;
 }
 
-template <typename Time_Traits>
-void epoll_reactor::cancel_timer_by_key(timer_queue<Time_Traits>& queue,
-    typename timer_queue<Time_Traits>::per_timer_data* timer,
+template <typename TimeTraits, typename Allocator>
+void epoll_reactor::cancel_timer_by_key(
+    timer_queue<TimeTraits, Allocator>& queue,
+    typename timer_queue<TimeTraits, Allocator>::per_timer_data* timer,
     void* cancellation_key)
 {
   mutex::scoped_lock lock(mutex_);
@@ -86,10 +92,10 @@ void epoll_reactor::cancel_timer_by_key(timer_queue<Time_Traits>& queue,
   scheduler_.post_deferred_completions(ops);
 }
 
-template <typename Time_Traits>
-void epoll_reactor::move_timer(timer_queue<Time_Traits>& queue,
-    typename timer_queue<Time_Traits>::per_timer_data& target,
-    typename timer_queue<Time_Traits>::per_timer_data& source)
+template <typename TimeTraits, typename Allocator>
+void epoll_reactor::move_timer(timer_queue<TimeTraits, Allocator>& queue,
+    typename timer_queue<TimeTraits, Allocator>::per_timer_data& target,
+    typename timer_queue<TimeTraits, Allocator>::per_timer_data& source)
 {
   mutex::scoped_lock lock(mutex_);
   op_queue<operation> ops;
@@ -100,6 +106,7 @@ void epoll_reactor::move_timer(timer_queue<Time_Traits>& queue,
 }
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

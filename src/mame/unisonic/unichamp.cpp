@@ -247,7 +247,7 @@ void unichamp_state::unichamp(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(3'579'545),
 		gic_device::LINE_CLOCKS, gic_device::START_ACTIVE_SCAN, gic_device::END_ACTIVE_SCAN,
 		gic_device::LINES,       gic_device::START_Y,           gic_device::START_Y + gic_device::SCREEN_HEIGHT);

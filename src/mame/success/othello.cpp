@@ -405,7 +405,7 @@ void othello_state::othello(machine_config &config)
 	m_i8243->p7_out_cb().set(FUNC(othello_state::upd7751_rom_select_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*6, 64*8);

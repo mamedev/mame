@@ -102,7 +102,7 @@ void itt1700_state::itt1700(machine_config &config)
 
 	ITT1700_KEYBOARD(config, "keyboard");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16.6698_MHz_XTAL, 882, 0, 720, 315, 0, 300);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

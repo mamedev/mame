@@ -10,7 +10,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/st0016.h"
 #include "screen.h"
-
+#include "tilemap.h"
 
 class st0016_cpu_device : public z80_device, public device_gfx_interface, public device_video_interface, public device_mixer_interface
 {
@@ -78,6 +78,15 @@ private:
 
 	u8 m_vregs[0xc0];
 	u8 m_ramgfx;
+
+	struct tilemap_info
+	{
+		tilemap_t *tmap = nullptr;
+		u32 vram_base = 0;
+	};
+
+	tilemap_info m_tilemap[8];
+	TILE_GET_INFO_MEMBER(get_tile_info);
 
 	bool ismacs() const { return m_game_flag & 0x80; }
 	bool ismacs1() const { return (m_game_flag & 0x180) == 0x180; }

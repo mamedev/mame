@@ -298,7 +298,7 @@ void tvg01_state::theboat(machine_config &config)
 	ppi2.out_pb_callback().set(FUNC(tvg01_state::input_select_w<1>));
 	ppi2.in_pc_callback().set(FUNC(tvg01_state::player_inputs_r));
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	v9938_device &vdp(V9938(config, "vdp", VDP_CLOCK));  // unknown type (surface-scratched 64-pin SDIP)
 	vdp.set_screen_ntsc("screen");

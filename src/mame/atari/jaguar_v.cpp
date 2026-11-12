@@ -4,11 +4,11 @@
 
     Atari Jaguar hardware
 
-    TODO (list of exceptions):
-    jaguar_state::generic_blitter()
-    - atarikrt, bretth, brutalsp, nbajamte, spacewar, spacewarp, tempst2k
-    jaguar_state::blitter_09800009_000020_000020()
-    - ruinerp
+    TODO:
+    - split this as a proper tom_device;
+    - use a more accurate timer for object processor;
+    - fix uneven pixel width;
+    - proper screen timings, cfr. page 15 of JTRM
 
 ****************************************************************************
 
@@ -736,7 +736,7 @@ void jaguar_state::tom_regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 					if (hperiod != 0 && vperiod != 0 && hbend < hbstart && vbend < vbstart && hbstart < hperiod)
 					{
 						rectangle visarea(hbend / 2, hbstart / 2 - 1, vbend / 2, vbstart / 2 - 1);
-						m_screen->configure(hperiod / 2, vperiod / 2, visarea, HZ_TO_ATTOSECONDS(double(m_pixel_clock) * 2 / hperiod / vperiod));
+						m_screen->configure(hperiod / 2, vperiod / 2, visarea, attotime::from_ticks(hperiod * vperiod, m_pixel_clock * 2));
 					}
 				}
 				break;

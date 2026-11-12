@@ -430,7 +430,7 @@ public:
 	uint16_t m_aga_sprdatb[8][4]{};
 	int m_aga_sprite_fetched_words = 0;
 	int m_aga_sprite_dma_used_words[8]{};
-	uint16_t m_aga_clxcon2;
+	uint16_t m_aga_clxcon2 = 0;
 
 	void video_start_common();
 	DECLARE_VIDEO_START( amiga );
@@ -502,7 +502,7 @@ public:
 		// standard htotal is $e3 x 2 -> 908
 		// https://videogameperfection.com/forums/topic/advanced-timing-settings-for-amiga/
 		SCREEN_WIDTH = 908,
-		SCREEN_HEIGHT_PAL = 625,
+		SCREEN_HEIGHT_PAL = 626,
 		SCREEN_HEIGHT_NTSC = 525,
 		VBLANK_PAL = 58, // 52
 		VBLANK_NTSC = 42,

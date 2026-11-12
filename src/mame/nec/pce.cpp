@@ -188,7 +188,7 @@ void pce_state::pce_common(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(m_huc6260, FUNC(huc6260_device::screen_update));
 	screen.set_palette(m_huc6260);
@@ -255,7 +255,7 @@ void pce_state::sgx(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MAIN_CLOCK, huc6260_device::WPF, 64, 64 + 1024 + 64, huc6260_device::LPF, 18, 18 + 242);
 	screen.set_screen_update(m_huc6260, FUNC(huc6260_device::screen_update));
 	screen.set_palette(m_huc6260);

@@ -39,6 +39,8 @@ sei0210_device::sei0210_device(const machine_config &mconfig, device_type type, 
 	, m_alt_format(false)
 	, m_xoffset(0)
 	, m_yoffset(0)
+	, m_flipy_byte(0)
+	, m_flipy_bit(13)
 {
 }
 
@@ -120,6 +122,7 @@ void sei0210_device::draw(screen_device &screen, T &bitmap, const rectangle clip
 		u8 sizex, sizey;
 		u32 color, code;
 		s32 x, y;
+		// TODO: if-else in an inner loop is bad juju, for one game on top
 		if (m_alt_format)
 		{
 			if (BIT(spriteram[i], 15))
@@ -144,7 +147,9 @@ void sei0210_device::draw(screen_device &screen, T &bitmap, const rectangle clip
 				continue;
 
 			flipx = BIT(spriteram[i + 0], 14);
-			flipy = BIT(spriteram[i + 0], 13);
+			// normally +0 b13
+			// tvdenwam uses the extra bit in +3, b15 instead.
+			flipy = BIT(spriteram[i + m_flipy_byte], m_flipy_bit);
 			sizex = BIT(spriteram[i + 0], 10,  3) + 1;
 			sizey = BIT(spriteram[i + 0],  7,  3) + 1;
 			ext   = BIT(spriteram[i + 0],  6);

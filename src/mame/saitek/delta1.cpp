@@ -49,6 +49,7 @@ public:
 	delta1_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_smi(*this, "smi"),
 		m_display(*this, "display"),
 		m_inputs(*this, "IN.%u", 0)
 	{ }
@@ -65,6 +66,7 @@ protected:
 private:
 	// devices/pointers
 	required_device<f8_cpu_device> m_maincpu;
+	required_device<f3853_device> m_smi;
 	required_device<pwm_display_device> m_display;
 	required_ioport_array<5> m_inputs;
 
@@ -165,7 +167,7 @@ void delta1_state::main_io(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(delta1_state::input_r), FUNC(delta1_state::mux_w));
 	map(0x01, 0x01).w(FUNC(delta1_state::digit_w));
-	map(0x0c, 0x0f).rw("f3853", FUNC(f3853_device::read), FUNC(f3853_device::write));
+	map(0x0c, 0x0f).rw(m_smi, FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
 
@@ -219,10 +221,10 @@ void delta1_state::delta1(machine_config &config)
 	F8(config, m_maincpu, 2'000'000); // LC circuit, measured 2MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &delta1_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &delta1_state::main_io);
+	m_maincpu->int_cycle_callback().set(m_smi, FUNC(f3853_device::int_acknowledge));
 
-	f3853_device &f3853(F3853(config, "f3853", 2'000'000));
-	m_maincpu->int_cycle_callback().set(f3853, FUNC(f3853_device::int_acknowledge));
-	f3853.int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
+	F3853(config, m_smi, 2'000'000);
+	m_smi->int_req_callback().set_inputline("maincpu", F8_INPUT_LINE_INT_REQ);
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(4, 7);

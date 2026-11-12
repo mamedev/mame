@@ -1,10 +1,13 @@
 ....00                       -
+
 ....26 abs d                 - d:acc(3)
 	if($d & 0x80000000000000) {
 		$d:w((-$d) & 0xffffffffffffff);
 	}
 
 ....21 adc s,d               - s:xyr(4) d:acc(3)
+	$d:w(do_adc56(util::sext($s, 48), $d));
+
 ....10 add s,d               - s:nacc(3) d:acc(3)
 	$d:w(do_add56(util::sext($s, 56), $d));
 
@@ -15,7 +18,32 @@
 	$d:w(do_add56(util::sext(u64($s:h) << 24, 48), $d));
 
 ....12 addl s,d              - s:nacc(3) d:acc(3)
+	u64 shifted = ($d << 1) & 0xffffffffffffff;
+	u64 res = (shifted + $s) & 0xffffffffffffff;
+	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V|CCR_C);
+	update_eun56(res);
+	if(!res)
+		m_ccr |= CCR_Z;
+	if((($d ^ shifted) & (1ULL<<55)) || ((res ^ shifted) & (res ^ $s) & (1ULL<<55)))
+		m_ccr |= CCR_V|CCR_L;
+	if((shifted + $s) >> 56)
+		m_ccr |= CCR_C;
+	$d:w(res);
+
 ....02 addr s,d              - s:nacc(3) d:acc(3)
+	u64 halved = ($d >> 1) | ($d & (1ULL<<55));
+	u64 res = halved + $s;
+	u64 mres = res & 0xffffffffffffff;
+	m_ccr &= ~(CCR_Z|CCR_V|CCR_C);
+	update_eun56(mres);
+	if(!mres)
+		m_ccr |= CCR_Z;
+	if(((res >> 48) ^ (mres >> 48)) & 0xff)
+		m_ccr |= CCR_V|CCR_L;
+	if(res >> 56)
+		m_ccr |= CCR_C;
+	$d:w(mres);
+
 ....46 and s,d               - s:daos(4) d:acc(3)
 	u32 r = $d:1 & $s;
 	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
@@ -43,6 +71,15 @@
 	(void)do_sub56(util::sext(u64($s:h) << 24, 48), $d);
 
 ....07 cmpm s,d              - s:daos3(4, 3) d:acc(3)
+	s64 a = (s64)util::sext($d, 56);
+	s64 b = (s64)util::sext($s, 24) << 24;
+	u64 am = a < 0 ? (u64)(-a) : (u64)a;
+	u64 bm = b < 0 ? (u64)(-b) : (u64)b;
+	if(bm > am)
+		m_ccr |= CCR_C;
+	else
+		m_ccr &= ~CCR_C;
+
 ....43 eor s,d               - s:daos(4) d:acc(3)
 	u32 r = $d:1 ^ $s;
 	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
@@ -54,15 +91,90 @@
 	$d:w1(r);
 
 ....33 lsl d                 - d:acc(3)
+	$d:w(do_lsl56(1, $d));
+
 ....23 lsr d                 - d:acc(3)
+	$d:w(do_lsr56(1, $d));
+
 ....82 mac +s1,s2,d          - s1:damo1_a(4) s2:damo1_b(4) d:acc(3) +:sign(2)
+	s64 r = (s64)util::sext($s1, 24) * (s64)util::sext($s2, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	r += (s64)util::sext($d, 56);
+	$d:w(r);
+	do_mpy56(r);
+
 ....83 maccr +s1,s2,d        - s1:damo1_a(4) s2:damo1_b(4) d:acc(3) +:sign(2)
+	s64 r = (s64)util::sext($s1, 24) * (s64)util::sext($s2, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	r += (s64)util::sext($d, 56);
+	u64 rr = (u64)r;
+	u64 rv = do_rnd56(rr);
+	$d:w(rv);
+
 ....1d max a,b               -
+	s64 a = (s64)util::sext(get_a(), 56);
+	s64 b = (s64)util::sext(get_b(), 56);
+	if(a >= b) {
+		set_b(get_a());
+		m_ccr &= ~CCR_C;
+	} else {
+		m_ccr |= CCR_C;
+	}
+
 ....15 maxm a,b              -
+	s64 a = (s64)util::sext(get_a(), 56);
+	s64 b = (s64)util::sext(get_b(), 56);
+	u64 aa = a < 0 ? (u64)(-a) : (u64)a;
+	u64 bb = b < 0 ? (u64)(-b) : (u64)b;
+	if(aa >= bb) {
+		set_b(get_a());
+		m_ccr &= ~CCR_C;
+	} else {
+		m_ccr |= CCR_C;
+	}
+
 ....80 mpy +s1,s2,d          - s1:damo1_a(4) s2:damo1_b(4) d:acc(3) +:sign(2)
+	s64 r = (s64)util::sext($s1, 24) * (s64)util::sext($s2, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	$d:w(r);
+	do_mpy56(r);
+
 ....81 mpyr +s1,s2,d         - s1:damo1_a(4) s2:damo1_b(4) d:acc(3) +:sign(2)
+	s64 r = (s64)util::sext($s1, 24) * (s64)util::sext($s2, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	$d:w(r);
+	do_mpy56(r);
+	$d:w(do_rnd56((u64)r & 0xffffffffffffff));
+
 ....36 neg d                 - d:acc(3)
+	u64 res = (0 - $d) & 0xffffffffffffff;
+	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V|CCR_L);
+	update_eun56(res);
+	if(!res)
+		m_ccr |= CCR_Z;
+	if($d == (1ULL << 55))
+		m_ccr |= CCR_V|CCR_L;
+	$d:w(res);
+
 ....17 not d                 - d:acc(3)
+	u32 a1 = ($d >> 24) & 0xffffff;
+	u32 res1 = ~a1 & 0xffffff;
+	u64 res = ($d & 0xff000000ffffff) | ((u64)res1 << 24);
+	m_ccr &= ~(CCR_N|CCR_Z|CCR_V);
+	if(BIT(res1, 23))
+		m_ccr |= CCR_N;
+	if(!res1)
+		m_ccr |= CCR_Z;
+	$d:w(res);
+
 ....42 or s,d                - s:daos(4) d:acc(3)
 	u32 r = $d:1 | $s;
 	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
@@ -74,9 +186,17 @@
 	$d:w1(r);
 
 ....11 rnd d                 - d:acc(3)
+	$d:w(do_rnd56($d));
+
 ....37 rol d                 - d:acc(3)
+	$d:w(do_rol56($d));
+
 ....27 ror d                 - d:acc(3)
+	$d:w(do_ror56($d));
+
 ....25 sbc s,d               - s:xyr(4) d:acc(3)
+	$d:w(do_sbc56(util::sext($s, 48), $d));
+
 ....14 sub s,d               - s:nacc(3) d:acc(3)
 	$d:w(do_sub56(util::sext($s, 56), $d));
 
@@ -87,8 +207,33 @@
 	$d:w(do_sub56(util::sext(u64($s:h) << 24, 48), $d));
 
 ....16 subl s,d              - s:nacc(3) d:acc(3)
+	s64 res = (s64)util::sext($d, 56) * 2 - (s64)util::sext($s, 56);
+	u64 ures = (u64)res & 0xffffffffffffff;
+	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V|CCR_C);
+	update_eun56(ures);
+	if(!ures)
+		m_ccr |= CCR_Z;
+	if(BIT($d, 55) != BIT(ures, 55))
+		m_ccr |= CCR_V|CCR_L;
+	if(BIT($d, 55) != BIT(ures, 55))
+		m_ccr |= CCR_C;
+	$d:w(ures);
+
 ....06 subr s,d              - s:nacc(3) d:acc(3)
+	s64 res = ((s64)util::sext($d, 56) >> 1) - (s64)util::sext($s, 56);
+	u64 ures = (u64)res & 0xffffffffffffff;
+	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V|CCR_C);
+	update_eun56(ures);
+	if(!ures)
+		m_ccr |= CCR_Z;
+	if(BIT($d, 55) != BIT(ures, 55))
+		m_ccr |= CCR_V|CCR_L;
+	if(BIT($d, 55) != BIT(ures, 55))
+		m_ccr |= CCR_C;
+	$d:w(ures);
+
 ....01 tfr s,d               - s:daos3(4, 3) d:acc(3)
+	$d:w($s);
 
 ....03 tst d                 - d:acc(3)
 	do_tst56($d);
@@ -274,19 +419,19 @@
 	m_tmp1 = m_x.read_dword($ea);
 	m_tmp2 = m_y.read_dword($ea);
 	%p
-	$d:wl(m_tmp1 << 24 | m_tmp2);
+	$d:wl(u64(m_tmp1) << 24 | m_tmp2);
 
 40c0.. l:abs,d               - d:lmr(19, 16) abs:eam1a(8)
 	m_tmp1 = m_x.read_dword($abs);
 	m_tmp2 = m_y.read_dword($abs);
 	%p
-	$d:wl(m_tmp1 << 24 | m_tmp2);
+	$d:wl(u64(m_tmp1) << 24 | m_tmp2);
 
 4080.. l:aa,d                - d:lmr(19, 16) aa:asa6(8)
 	m_tmp1 = m_x.read_dword($aa);
 	m_tmp2 = m_y.read_dword($aa);
 	%p
-	$d:wl(m_tmp1 << 24 | m_tmp2);
+	$d:wl(u64(m_tmp1) << 24 | m_tmp2);
 
 4040.. s,l:ea                - s:lmr(19, 16) ea:eam1(8)
 	m_tmp1 = $s:l >> 24;
@@ -310,13 +455,122 @@
 	m_y.write_dword($aa, m_tmp2);
 
 c080.. x:eax,d1 y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) d1:tbrx(18) d2:tbry(16)
+	int _mv_xr = BIT(opcode, 8, 3);
+	u32 _mv_xea = get_r(_mv_xr);
+	{
+		int _mv_xmm = BIT(opcode, 11, 2);
+		if (_mv_xmm == 1)
+			add_r(_mv_xr, m_n[_mv_xr]);
+		else if (_mv_xmm == 2)
+			add_r(_mv_xr, -1);
+		else if (_mv_xmm == 3)
+			add_r(_mv_xr, 1);
+	}
+	int _mv_yr = _mv_xr >= 4 ? _mv_xr : _mv_xr + 4;
+	u32 _mv_yea = get_r(_mv_yr);
+	{
+		int _mv_ymm = BIT(opcode, 20, 2);
+		if (_mv_ymm == 1)
+			add_r(_mv_yr, m_n[_mv_yr]);
+		else if (_mv_ymm == 2)
+			add_r(_mv_yr, -1);
+		else if (_mv_ymm == 3)
+			add_r(_mv_yr, 1);
+	}
+	$d1:wh(m_x.read_dword(_mv_xea));
+	$d2:wh(m_y.read_dword(_mv_yea));
+
 8080.. x:eax,d1 s2,y:eay     - eax:xyeax(8) eay:xyeay(20, 13, 10) d1:tbrx(18) s2:tbry(16)
+	int _mv_xr = BIT(opcode, 8, 3);
+	u32 _mv_xea = get_r(_mv_xr);
+	{
+		int _mv_xmm = BIT(opcode, 11, 2);
+		if (_mv_xmm == 1)
+			add_r(_mv_xr, m_n[_mv_xr]);
+		else if (_mv_xmm == 2)
+			add_r(_mv_xr, -1);
+		else if (_mv_xmm == 3)
+			add_r(_mv_xr, 1);
+	}
+	int _mv_yr = _mv_xr >= 4 ? _mv_xr : _mv_xr + 4;
+	u32 _mv_yea = get_r(_mv_yr);
+	{
+		int _mv_ymm = BIT(opcode, 20, 2);
+		if (_mv_ymm == 1)
+			add_r(_mv_yr, m_n[_mv_yr]);
+		else if (_mv_ymm == 2)
+			add_r(_mv_yr, -1);
+		else if (_mv_ymm == 3)
+			add_r(_mv_yr, 1);
+	}
+	$d1:wh(m_x.read_dword(_mv_xea));
+	m_y.write_dword(_mv_yea, $s2:h);
+
 c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2:tbry(16)
+	int _mv_xr = BIT(opcode, 8, 3);
+	u32 _mv_xea = get_r(_mv_xr);
+	{
+		int _mv_xmm = BIT(opcode, 11, 2);
+		if (_mv_xmm == 1)
+			add_r(_mv_xr, m_n[_mv_xr]);
+		else if (_mv_xmm == 2)
+			add_r(_mv_xr, -1);
+		else if (_mv_xmm == 3)
+			add_r(_mv_xr, 1);
+	}
+	int _mv_yr = _mv_xr >= 4 ? _mv_xr : _mv_xr + 4;
+	u32 _mv_yea = get_r(_mv_yr);
+	{
+		int _mv_ymm = BIT(opcode, 20, 2);
+		if (_mv_ymm == 1)
+			add_r(_mv_yr, m_n[_mv_yr]);
+		else if (_mv_ymm == 2)
+			add_r(_mv_yr, -1);
+		else if (_mv_ymm == 3)
+			add_r(_mv_yr, 1);
+	}
+	m_x.write_dword(_mv_xea, $s1:h);
+	$d2:wh(m_y.read_dword(_mv_yea));
+
 8000.. s1,x:eax s2,y:eay     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) s2:tbry(16)
+	int _mv_xr = BIT(opcode, 8, 3);
+	u32 _mv_xea = get_r(_mv_xr);
+	{
+		int _mv_xmm = BIT(opcode, 11, 2);
+		if (_mv_xmm == 1)
+			add_r(_mv_xr, m_n[_mv_xr]);
+		else if (_mv_xmm == 2)
+			add_r(_mv_xr, -1);
+		else if (_mv_xmm == 3)
+			add_r(_mv_xr, 1);
+	}
+	int _mv_yr = _mv_xr >= 4 ? _mv_xr : _mv_xr + 4;
+	u32 _mv_yea = get_r(_mv_yr);
+	{
+		int _mv_ymm = BIT(opcode, 20, 2);
+		if (_mv_ymm == 1)
+			add_r(_mv_yr, m_n[_mv_yr]);
+		else if (_mv_ymm == 2)
+			add_r(_mv_yr, -1);
+		else if (_mv_ymm == 3)
+			add_r(_mv_yr, 1);
+	}
+	m_x.write_dword(_mv_xea, $s1:h);
+	m_y.write_dword(_mv_yea, $s2:h);
+
 2020.. ifcc                  - cc:cc(8)
+	m_ifcc_ccr = get_ccr();
+	if (!$cc)
+		m_skip = true;
+	%p
+	set_ccr(m_ifcc_ccr);
+
 2030.. ifcc.u                - cc:cc(8)
+	if (!$cc)
+		m_skip = true;
 
 000000                       -
+
 0a70c0 move xy:(r+o),d       - xy:xyc(16) r:ar(8) d:sbr(0) o:exoff()
 	$d:wh($xy:m.read_dword($r + $o));
 
@@ -324,10 +578,12 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	$xy:m.write_dword($r + $o, $s:h);
 
 020090 move xy:(r+o),d       - xy:xyc(5) o:sda7(11, 6) r:ar(8) d:fobr(0)
-	$d:wh($xy:m.read_dword($r + $o));
+	int mrr = BIT(opcode, 8, 3) & 7;
+	$d:wh($xy:m.read_dword(calc_add_r(mrr, $o)));
 
 020080 move s,xy:(r+o)       - xy:xyc(5) o:sda7(11, 6) r:ar(8) s:fobr(0)
-	$xy:m.write_dword($r + $o, $s:h);
+	int mrr = BIT(opcode, 8, 3) & 7;
+	$xy:m.write_dword(calc_add_r(mrr, $o), $s:h);
 
 014080 add #i,d              - i:imm6(8) d:acc(3)
 	$d:w(do_add56(u64($i) << 24, $d));
@@ -790,6 +1046,13 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	}
 
 0b0020 btst #n,xy:aa         - aa:asa6(8) xy:xyc(6) n:bit5(0)
+	u32 t = $xy:m.read_dword($aa);
+	u32 m = 1 << $n;
+	if(t & m) {
+		m_ccr |= CCR_C;
+	} else {
+		m_ccr &= ~CCR_C;
+	}
 0b8020 btst #n,xy:pp         - pp:asa6p(8) xy:xyc(6) n:bit5(0)
 	u32 t = $xy:m.read_dword($pp);
 	u32 m = 1 << $n;
@@ -817,7 +1080,20 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 		m_ccr &= ~CCR_C;
 	}
 
-00c3c0 clb s,d               - s:acc(1) d:acc(0)
+0c1e00 clb s,d              - s:acc(1) d:acc(0)
+	u64 v = $s;
+	if(v == 0) {
+		$d:w(0);
+	} else {
+		u64 shifted = v << 8;
+		u64 val = (shifted & 0x8000000000000000ULL) ? ~shifted : shifted;
+		val |= 0xff;
+		int bsr = 0;
+		for(int bit = 63; bit >= 0; --bit) if(val & (1ULL << bit)) { bsr = bit; break; }
+		int count = bsr - 54;
+		$d:w((u64)(u32)count << 24);
+	}
+
 014085 cmp #i,d              - i:imm6(8) d:acc(3)
 	(void)do_sub56(u64($i) << 24, $d);
 
@@ -825,13 +1101,85 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	(void)do_sub56(util::sext(u64($i) << 24, 48), $d);
 
 0c1ff0 cmpu s1,s2            - s1:daos3(1, 0) s2:acc(0)
+	u64 s1v = $s1 & 0xffffffffffffULL;
+	u64 s2v = $s2 & 0xffffffffffffULL;
+	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+	if(s1v == s2v)
+		m_ccr |= CCR_Z;
+	if(s1v > s2v)
+		m_ccr |= (CCR_N|CCR_C);
 000200 debug                 -
+	// TODO: DEBUG
+
 000300 debugcc               - cc:cc(0)
+	if($cc) {
+		// TODO: DEBUG
+	}
+
 00000a dec d                 - d:acc(0)
+	u64 res = ($d - 1) & 0xffffffffffffff;
+	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V|CCR_C);
+	update_eun56(res);
+	if(!res)
+		m_ccr |= CCR_Z;
+	if(res == (0x007fffffffffffff))
+		m_ccr |= CCR_V|CCR_L;
+	if($d == 0)
+		m_ccr |= CCR_C;
+	$d:w(res);
+
 018040 div s,d               - s:daos(4) d:acc(3)
+	u64 msbOld = BIT($d, 55);
+	u64 c = msbOld ^ BIT($s, 23);
+	d = ((d << 1) | (m_ccr & CCR_C)) & 0xffffffffffffff;
+	u64 msbNew = BIT(d, 55);
+	s64 se = util::sext(s, 24);
+	u64 res = c ? (d + ((u64)se << 24)) : (d - ((u64)se << 24));
+	u64 nd = ((res >> 8) & 0xffffffffffff) << 8 | (d & 0xff);
+	$d:w(nd);
+	m_ccr &= ~(CCR_C | CCR_V);
+	if(!BIT(nd, 55))
+		m_ccr |= CCR_C;
+	if(msbNew != msbOld)
+		m_ccr |= CCR_V | CCR_L;
+
 012480 dmacss +s1,s2,d       - ss:ss(8, 6) d:acc(5) +:sign(4) s1:damo4_a(0) s2:damo4_b(0)
+	s64 p;
+	int ss = (BIT(opcode, 8) << 1) | BIT(opcode, 6);
+	if(ss > 1)
+		p = (s64)$s1 * (s64)$s2;
+	else if(ss > 0)
+		p = (s64)util::sext($s1, 24) * (s64)$s2;
+	else
+		p = (s64)util::sext($s1, 24) * (s64)util::sext($s2, 24);
+	s64 r = (p << 1) + ((s64)util::sext($d, 56) >> 24);
+	if($+)
+		r = -r;
+	$d:w(r);
+	do_mpy56(r);
+
 064000 do xy:ea,expr         - ea:eam1(8) xy:xyc(6) expr:exabs()
+	inc_sp();
+	set_ssh(get_la());
+	set_ssl(get_lc());
+	set_lc($xy:m.read_dword($ea));
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	set_la($expr);
+	m_mr |= MR_LF;
+
 060000 do xy:aa,expr         - aa:asa6(8) xy:xyc(6) expr:exabs()
+	inc_sp();
+	set_ssh(get_la());
+	set_ssl(get_lc());
+	set_lc($xy:m.read_dword($aa));
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	set_la($expr);
+	m_mr |= MR_LF;
+
 060080 do #i,expr            - i:imm12(0, 8) expr:exabs()
 	inc_sp();
 	set_ssh(get_la());
@@ -866,7 +1214,27 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	m_emr |= EMR_FV;
 
 064010 dor xy:ea,expr        - ea:eam1(8) xy:xyc(6) expr:expcrel()
+	inc_sp();
+	set_ssh(get_la());
+	set_ssl(get_lc());
+	set_lc($xy:m.read_dword($ea));
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	set_la($expr);
+	m_mr |= MR_LF;
+
 060010 dor xy:aa,expr        - aa:asa6(8) xy:xyc(6) expr:expcrel()
+	inc_sp();
+	set_ssh(get_la());
+	set_ssl(get_lc());
+	set_lc($xy:m.read_dword($aa));
+	inc_sp();
+	set_ssh(m_pc+2);
+	set_ssl(get_sr());
+	set_la($expr);
+	m_mr |= MR_LF;
+
 060090 dor #i,expr           - i:imm12(0, 8) expr:expcrel()
 	inc_sp();
 	set_ssh(get_la());
@@ -901,6 +1269,14 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	m_emr |= EMR_FV;
 
 00008c enddo                 -
+	u32 saved_sr = get_ssl();
+	m_mr = (m_mr & ~MR_LF) | (BIT(saved_sr, 15) ? MR_LF : 0);
+	m_emr = (m_emr & ~EMR_FV) | (BIT(saved_sr, 16) ? EMR_FV : 0);
+	dec_sp();
+	set_la(get_ssh());
+	set_lc(get_ssl());
+	dec_sp();
+
 014083 eor #i,d              - i:imm6(8) d:acc(3)
 	u32 r = $d:1 ^ $i;
 	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
@@ -921,14 +1297,98 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	}
 	$d:w1(r);
 
-0c1a00 extract s1,s2,d       - s1:actrl(1) s2:acc(4)
+0c1a00 extract s1,s2,d       - s1:actrl(1) s2:acc(4) d:acc(0)
+	int width = ($s1 >> 12) & 0x3f;
+	int offset = $s1 & 0x3f;
+	u64 r = 0;
+	if(width) {
+		r = ($s2 >> offset) & ((1ULL << width) - 1);
+		if(r & (1ULL << (width - 1)))
+			r |= ~((1ULL << width) - 1);
+		r &= 0xffffffffffffffULL;
+	}
+	m_ccr &= ~(CCR_V|CCR_C|CCR_Z);
+	update_eun56(r);
+	if(!r)
+		m_ccr |= CCR_Z;
+	$d:w(r);
+
 0c1800 extract #co,s2,d      - s2:acc(4) d:acc(0) co:exco()
-0c1a80 extractu s1,s2,d      - s1:actrl(1) s2:acc(4)
+	int width = (exv >> 12) & 0x3f;
+	int offset = exv & 0x3f;
+	u64 r = 0;
+	if(width) {
+		r = ($s2 >> offset) & ((1ULL << width) - 1);
+		if(r & (1ULL << (width - 1)))
+			r |= ~((1ULL << width) - 1);
+		r &= 0xffffffffffffffULL;
+	}
+	m_ccr &= ~(CCR_V|CCR_C|CCR_Z);
+	update_eun56(r);
+	if(!r)
+		m_ccr |= CCR_Z;
+	$d:w(r);
+
+0c1a80 extractu s1,s2,d      - s1:actrl(1) s2:acc(4) d:acc(0)
+	int width = ($s1 >> 12) & 0x3f;
+	int offset = $s1 & 0x3f;
+	u64 r = width ? ($s2 >> offset) & ((1ULL << width) - 1) : 0;
+	m_ccr &= ~(CCR_V|CCR_C);
+	update_eun56(r);
+	if(!r)
+		m_ccr |= CCR_Z;
+	$d:w(r);
+
 0c1880 extractu #co,s2,d     - s2:acc(4) d:acc(0) co:exco()
+	int width = (exv >> 12) & 0x3f;
+	int offset = exv & 0x3f;
+	u64 r = width ? ($s2 >> offset) & ((1ULL << width) - 1) : 0;
+	m_ccr &= ~(CCR_V|CCR_C);
+	update_eun56(r);
+	if(!r)
+		m_ccr |= CCR_Z;
+	$d:w(r);
+
 000005 illegal               -
+	// TODO: ILLEGAL
+
 000008 inc d                 - d:acc(0)
-0c1b00 insert s1,s2,d        - s1:actrl(1) s2:dao3b(4)
+	u64 res = ($d + 1) & 0xffffffffffffff;
+	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V|CCR_C);
+	update_eun56(res);
+	if(!res)
+		m_ccr |= CCR_Z;
+	if(res == (1ULL << 55))
+		m_ccr |= CCR_V|CCR_L;
+	if(res == 0)
+		m_ccr |= CCR_C;
+	$d:w(res);
+
+0c1b00 insert s1,s2,d        - s1:actrl(1) s2:dao3b(4) d:acc(0)
+	u32 co = $s1;
+	int width = (co >> 12) & 0x3f;
+	int offset = co & 0x3f;
+	u64 mask = width ? ((1ULL << width) - 1) : 0;
+	u64 v = $d & ~(mask << offset);
+	v |= ((u64)$s2 & mask) << offset;
+	m_ccr &= ~(CCR_V|CCR_C);
+	update_eun56(v);
+	if(!v)
+		m_ccr |= CCR_Z;
+	$d:w(v);
+
 0c1900 insert #co,s2,d       - s2:dao3b(4) d:acc(0) co:exco()
+	int width = (exv >> 12) & 0x3f;
+	int offset = exv & 0x3f;
+	u64 mask = width ? ((1ULL << width) - 1) : 0;
+	u64 v = $d & ~(mask << offset);
+	v |= ((u64)$s2 & mask) << offset;
+	m_ccr &= ~(CCR_V|CCR_C);
+	update_eun56(v);
+	if(!v)
+		m_ccr |= CCR_Z;
+	$d:w(v);
+
 0e0000 jcc x                 - cc:cc(12) x:abs12(0) cond
 	if($cc) {
 		m_npc = $x;
@@ -1122,49 +1582,76 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	$d:w($i);
 
 0c1e80 lsl #i,d              - i:shift5(1) d:acc(0)
-	u32 r = ($d:h) << $i;
-	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
-	if(BIT(r, 24)) {
-		m_ccr |= CCR_C;
-	}
-	if(BIT(r, 23)) {
-		m_ccr |= CCR_N;
-	}
-	r &= 0xffffff;
-	if(!r) {
-		m_ccr |= CCR_Z;
-	}
-	$d:wh(r);
+	$d:w(do_lsl56($i, $d));
 
 0c1e10 lsl s,d               - s:actrl(1) d:acc(0)
-	u32 r = ($d:h) << $s;
-	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
-	if(BIT(r, 24)) {
-		m_ccr |= CCR_C;
-	}
-	if(BIT(r, 23)) {
-		m_ccr |= CCR_N;
-	}
-	r &= 0xffffff;
-	if(!r) {
-		m_ccr |= CCR_Z;
-	}
-	$d:wh(r);
+	$d:w(do_lsl56($s, $d));
 
 0c1ec0 lsr #i,d              - i:shift5(1) d:acc(0)
+	$d:w(do_lsr56($i, $d));
+
 0c1e30 lsr s,d               - s:actrl(1) d:acc(0)
+	$d:w(do_lsr56($s, $d));
+
 044000 lua ea,d              - ea:eam4(8) d:fvbr1(0)
 	$d:wh($ea);
 
 040000 lua (r+o),d           - r:ar(8) o:sda7b(11, 4) d:agu(0)
-	$d:w($r + $o);
+	u32 lra_o = util::sext((BIT(opcode, 11, 3) << 4) | BIT(opcode, 4, 4), 7);
+	$d:w(calc_add_r(BIT(opcode, 8, 3) & 7, lra_o));
 
 0100c2 mac +s,#i,d           - i:imm5m(8) s:damo2(4) d:acc(3) +:sign(2)
-0141c2 maci +#i,s,d          - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
+	s64 r = (s64)util::sext($s, 24) * (s64)util::sext($i, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	r += (s64)util::sext($d, 56);
+	$d:w(r);
+	do_mpy56(r);
+
+0141c2 maci +#i,s,d          - s:qq2(4) d:acc(3) +:sign(2) i:eximm()
+	s64 r = (s64)util::sext($s, 24) * (s64)util::sext($i, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	r += (s64)util::sext($d, 56);
+	$d:w(r);
+	do_mpy56(r);
+
 012680 macss +s1,s2,d        - ss:ss1(6) d:acc(5) +:sign(4) s1:damo4_a(0) s2:damo4_b(0)
+	int uu = BIT(opcode, 6);
+	s64 p = uu ? (s64)(u32)$s1 * (s64)(u32)$s2 : (s64)util::sext($s1, 24) * (s64)(u32)$s2;
+	s64 r = p << 1;
+	if($+)
+		r = -r;
+	r += (s64)util::sext($d, 56);
+	$d:w(r);
+	do_mpy56(r);
+
 0100c3 maccr +s,#i,d         - i:imm5m(8) s:damo2(4) d:acc(3) +:sign(2)
-0141c3 macri +#i,s,d         - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
+	s64 r = (s64)util::sext($s, 24) * (s64)util::sext($i, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	r += (s64)util::sext($d, 56);
+	$d:w(do_rnd56((u64)r & 0xffffffffffffff));
+
+0141c3 macri +#i,s,d         - s:qq2(4) d:acc(3) +:sign(2) i:eximm()
+	s64 r = (s64)util::sext($s, 24) * (s64)util::sext($i, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	r += (s64)util::sext($d, 56);
+	$d:w(do_rnd56((u64)r & 0xffffffffffffff));
+
 0c1b80 merge s,d             - s:dao3(1) d:acc(0)
+	u32 nf = (($s & 0xfff) << 12) | ((($d >> 24) & 0xfff));
+	$d:w(($d & 0xff000000ffffffULL) | ((u64)nf << 24));
+	m_ccr &= ~(CCR_N|CCR_Z|CCR_V);
+	if(BIT(nf, 23))
+		m_ccr |= CCR_N;
+	if(!nf)
+		m_ccr |= CCR_Z;
 05c020 movec xy:ea,d1        - ea:eam1(8) xy:xyc(6) d1:fvbr2(0)
 	$d1:wh($xy:m.read_dword($ea));
 
@@ -1301,12 +1788,76 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	$d:wh(m_y.read_dword($qq));
 
 0100c0 mpy +s,#i,d           - i:imm5m(8) s:damo2(4) d:acc(3) +:sign(2)
+	s64 r = (s64)util::sext($s, 24) * (s64)util::sext($i, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	$d:w(r);
+	do_mpy56(r);
+
 012780 mpyss +s1,s2,d        - ss:ss1(6) d:acc(5) +:sign(4) s1:damo4_a(0) s2:damo4_b(0)
-0141c0 mpyi +#i,s,d          - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
+	int uu = BIT(opcode, 6);
+	s64 p = uu ? (s64)(u32)$s1 * (s64)(u32)$s2 : (s64)util::sext($s1, 24) * (s64)(u32)$s2;
+	s64 r = p << 1;
+	if($+)
+		r = -r;
+	$d:w(r);
+	do_mpy56(r);
+
+0141c0 mpyi +#i,s,d          - s:qq2(4) d:acc(3) +:sign(2) i:eximm()
+	s64 r = (s64)util::sext($s, 24) * (s64)util::sext($i, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	$d:w(r);
+	do_mpy56(r);
+
 0100c1 mpyr +s,#i,d          - i:imm5m(8) s:damo2(4) d:acc(3) +:sign(2)
-0141c1 mpyri +#i,s,d         - s:damo2(4) d:acc(3) +:sign(2) i:eximm()
+	s64 r = (s64)util::sext($s, 24) * (s64)util::sext($i, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	$d:w(r);
+	do_mpy56(r);
+	$d:w(do_rnd56((u64)r & 0xffffffffffffff));
+
+0141c1 mpyri +#i,s,d         - s:qq2(4) d:acc(3) +:sign(2) i:eximm()
+	s64 r = (s64)util::sext($s, 24) * (s64)util::sext($i, 24);
+	r <<= 1;
+	if($+)
+		r = -r;
+	$d:w(r);
+	do_mpy56(r);
+	$d:w(do_rnd56((u64)r & 0xffffffffffffff));
+
 01d815 norm r,d              - r:ar(8) d:acc(3)
+	int _ri = BIT(opcode, 8, 3) & 7;
+	u32 _rm = (m_mr & MR_SC) ? 0xffff : 0xffffff;
+	u32 _c = m_ccr & CCR_C;
+	if(m_ccr & CCR_E) {
+		$d:w(do_asr56(1, $d));
+		set_r(_ri, (get_r(_ri) + 1) & _rm);
+	} else if((m_ccr & CCR_U) && !(m_ccr & CCR_Z)) {
+		$d:w(do_asl56(1, $d));
+		set_r(_ri, (get_r(_ri) - 1) & _rm);
+	}
+	m_ccr = (m_ccr & ~CCR_C) | _c;
+
 0c1e20 normf s,d             - s:actrl(1) d:acc(0)
+	bool c = BIT(m_ccr, CCR_C);
+	if(BIT($s, 23))
+		$d:w(do_asl56((u8)((u32)(-util::sext($s, 24)) & 0x3fffffff), $d));
+	else
+		$d:w(do_asr56((u8)($s & 0xff), $d));
+	if(c)
+	{
+		m_ccr |= CCR_C;
+	}
+	else
+	{
+		m_ccr &= ~CCR_C;
+	}
+
 014082 or #i,d               - i:imm6(8) d:acc(3)
 	u32 r = $d:1 | $i;
 	m_ccr = m_ccr & ~(CCR_V|CCR_Z|CCR_N);
@@ -1331,14 +1882,32 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	$ctrl:w($ctrl | $i);
 
 000003 pflush                -
+	// TODO: PFLUSH
+
 000001 pflushun              -
+	// TODO: PFLUSHUN
+
 000002 pfree                 -
+	// TODO: PFREE
+
 0bc081 plock ea              - ea:eam1(8)
+	// TODO: PLOCK
+
 0bc081 plock abs             - abs:eam1a(8)
+	// TODO: PLOCK
+
 00000f plockr x              - x:expcrel()
+	// TODO: PLOCKR
+
 0ac081 punlock ea            - ea:eam1(8)
+	// TODO: PUNLOCK
+
 0ac081 punlock abs           - abs:eam1a(8)
+	// TODO: PUNLOCK
+
 00000e punlockr x            - x:expcrel()
+	// TODO: PUNLOCKR
+
 064020 rep xy:ea             - ea:eam1(8) xy:xyc(6)
 	m_temp_lc = get_lc();
 	set_lc($xy:m.read_dword($ea));
@@ -1360,8 +1929,9 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	m_rep = true;
 
 000084 reset                 -
-	m_icount = 0;
-	m_npc --;
+	// Software reset: only the interrupt priority register and on-chip
+	// peripherals are affected. The processor state is unchanged and
+	// execution continues with the next instruction (manual 13-161).
 
 000004 rti                   - out
 	m_npc = get_ssh();
@@ -1373,6 +1943,8 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	dec_sp();
 
 000087 stop                  -
+	// TODO: STOP
+
 014084 sub #i,d              - i:imm6(8) d:acc(3)
 	$d:w(do_sub56(u64($i) << 24, $d));
 
@@ -1396,7 +1968,20 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	}
 
 000006 trap                  -
+	// TODO: TRAP
+
 000010 trapcc                - cc:cc(0) cond
+	if($cc) {
+		// TODO: TRAP
+	}
+
 0ac0c0 vsl s,i,l:ea          - s:acc(16) ea:eam1(8) i:imm1(4)
+	m_x.write_dword($ea, $s:1);
+	m_y.write_dword($ea, ((($s & 0xffffff) << 1) | $i) & 0xffffff);
+
 0ac0c0 vsl s,i,l:abs         - s:acc(16) abs:eam1a(8) i:imm1(4)
+	m_x.write_dword($abs, $s:1);
+	m_y.write_dword($abs, ((($s & 0xffffff) << 1) | $i) & 0xffffff);
+
 000086 wait                  -
+	// TODO: WAIT

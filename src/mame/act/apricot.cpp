@@ -388,7 +388,7 @@ void apricot_state::apricot(machine_config &config)
 	RAM(config, RAM_TAG).set_default_size("256K");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(15_MHz_XTAL, 950, 0, 800, 426, 0, 400); // should be interlace
 	screen.set_screen_update(FUNC(apricot_state::screen_update_apricot));

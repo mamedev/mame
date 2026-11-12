@@ -1,8 +1,10 @@
 #include <glm/glm.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/string_cast.hpp>
 #include <limits>
 
-int test_string_cast_vector()
+static int test_string_cast_vector()
 {
 	int Error = 0;
 
@@ -105,7 +107,7 @@ int test_string_cast_vector()
 	return Error;
 }
 
-int test_string_cast_matrix()
+static int test_string_cast_matrix()
 {
 	int Error = 0;
 	
@@ -116,11 +118,37 @@ int test_string_cast_matrix()
 	return Error;
 }
 
+static int test_string_cast_quaternion()
+{
+	int Error = 0;
+
+	glm::quat Q0 = glm::quat(1.0f, 2.0f, 3.0f, 4.0f);
+	std::string S0 = glm::to_string(Q0);
+	Error += S0 != std::string("quat(1.000000, {2.000000, 3.000000, 4.000000})") ? 1 : 0;
+
+	return Error;
+
+}
+
+static int test_string_cast_dual_quaternion()
+{
+	int Error = 0;
+
+	glm::dualquat Q0 = glm::dualquat(glm::quat(1.0f, 2.0f, 3.0f, 4.0f), glm::quat(5.0f, 6.0f, 7.0f, 8.0f));
+	std::string S0 = glm::to_string(Q0);
+	Error += S0 != std::string("dualquat((1.000000, {2.000000, 3.000000, 4.000000}), (5.000000, {6.000000, 7.000000, 8.000000}))") ? 1 : 0;
+
+	return Error;
+}
+
 int main()
 {
 	int Error = 0;
+
 	Error += test_string_cast_vector();
 	Error += test_string_cast_matrix();
+	Error += test_string_cast_quaternion();
+	Error += test_string_cast_dual_quaternion();
 
 	return Error;
 }

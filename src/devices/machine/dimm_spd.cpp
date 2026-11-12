@@ -21,7 +21,8 @@ DEFINE_DEVICE_TYPE(DIMM_SPD, dimm_spd_device, "dimm_spd", "DIMM Serial Presence 
 
 dimm_spd_device::dimm_spd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DIMM_SPD, tag, owner, clock),
-	i2c_hle_interface(mconfig, *this, 0)    // address will be overridden by set_address as before
+	i2c_hle_interface(mconfig, *this, 0),
+	m_size(SIZE_SLOT_EMPTY)
 {
 }
 
@@ -100,11 +101,5 @@ void dimm_spd_device::set_dimm_size(dimm_size_t size)
 
 u8 dimm_spd_device::read_data(u16 offset)
 {
-	// i2c_hle_interface auto-increments the address but doesn't wrap it around
-	if (offset >= m_size)
-	{
-		m_data_offset = 0;
-	}
-
-	return m_data[offset];
+	return m_data[offset & 0xff];
 }

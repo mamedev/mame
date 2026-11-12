@@ -1093,7 +1093,7 @@ void base_state::base(machine_config &config)
 	m_ppi[1]->out_pc_callback().set(FUNC(base_state::a006_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);

@@ -100,7 +100,7 @@ void ef9364_device::set_color_entry( int index, uint8_t r, uint8_t g, uint8_t b 
 void ef9364_device::device_start()
 {
 	// assumes it can make an address mask with m_charset.length() - 1
-	assert(!(m_charset.length() & (m_charset.length() - 1)));
+	assert(std::has_single_bit(m_charset.length()));
 
 	m_textram = &space(0);
 
@@ -155,7 +155,7 @@ void ef9364_device::set_video_mode(void)
 		rectangle visarea = screen().visible_area();
 		visarea.max_x = new_width - 1;
 
-		screen().configure(new_width, screen().height(), visarea, screen().frame_period().attoseconds());
+		screen().configure(new_width, screen().height(), visarea, screen().frame_period());
 	}
 
 	//border color

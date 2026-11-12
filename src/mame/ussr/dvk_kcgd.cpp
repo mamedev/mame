@@ -449,7 +449,7 @@ void kcgd_state::kcgd(machine_config &config)
 	scantimer.configure_periodic(FUNC(kcgd_state::scanline_callback), attotime::from_hz(50 * 28 * 11));
 	scantimer.set_start_delay(attotime::from_ticks(KCGD_HORZ_START, XTAL(30'800'000)));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(kcgd_state::screen_update));
 	m_screen->set_raw(XTAL(30'800'000), KCGD_TOTAL_HORZ, KCGD_HORZ_START,
 		KCGD_HORZ_START+KCGD_DISP_HORZ, KCGD_TOTAL_VERT, KCGD_VERT_START,

@@ -707,7 +707,7 @@ void esripsys_state::esripsys(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* Video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(ESRIPSYS_PIXEL_CLOCK, ESRIPSYS_HTOTAL, ESRIPSYS_HBLANK_END, ESRIPSYS_HBLANK_START,
 											ESRIPSYS_VTOTAL, ESRIPSYS_VBLANK_END, ESRIPSYS_VBLANK_START);
 	m_screen->set_screen_update(FUNC(esripsys_state::screen_update_esripsys));

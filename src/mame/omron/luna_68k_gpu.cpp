@@ -708,7 +708,7 @@ void luna_68k_gpu_device::device_add_mconfig(machine_config &config)
 
 	NVRAM(config, "gpu_nvram");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// VBlank may be connected to mfp interrupt 0
 
 	m_screen->set_raw(108_MHz_XTAL, 1728, 0, 1280, 1056, 0, 1024);

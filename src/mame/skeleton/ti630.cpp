@@ -151,7 +151,7 @@ void ti630_state::ti630(machine_config &config)
 	m_maincpu->port_out_cb<3>().set(FUNC(ti630_state::i80c31_p3_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(m_lcdc, FUNC(hd44780_device::screen_update));

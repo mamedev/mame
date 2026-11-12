@@ -517,7 +517,8 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	{
 		// On 5.25, check if the drive is QD or HD but we're a 40 track
 		// image.  If so, put the image on even tracks.
-		if ((has_variant(variants, floppy_image::DSQD)) ||
+		if ((has_variant(variants, floppy_image::SSQD)) ||
+			(has_variant(variants, floppy_image::DSQD)) ||
 			(has_variant(variants, floppy_image::DSHD)))
 		{
 			if (maxtrack <= 39)
@@ -531,6 +532,7 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	}
 
 	pos = savepos;
+	bool skipped_head = false;
 	while(pos < size) {
 		mode.push_back(img[pos++]);
 		track.push_back(img[pos++]);
@@ -544,11 +546,10 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			return false;
 		}
 
+		// The drive can't see sides it doesn't have, e.g. leftover data on
+		// the back of a disk used in a single-sided drive; parse and drop it.
 		if((head.back() & 0x3f) >= heads)
-		{
-			osd_printf_error("imd_format: Head %d exceeds maximum of %d\n", head.back() & 0x3f, heads);
-			return false;
-		}
+			skipped_head = true;
 
 		if(ssize.back() == 0xff)
 		{
@@ -602,7 +603,7 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 		for(int i=0; i<sector_count.back(); i++) {
 			uint8_t stype        = img[pos++];
 			sects[i].track       = tnum.back().size() ? tnum.back()[i] : track.back();
-			sects[i].head        = hnum.back().size() ? hnum.back()[i] : head.back();
+			sects[i].head        = hnum.back().size() ? hnum.back()[i] : chead;
 			sects[i].sector      = snum.back()[i];
 			sects[i].size        = ssize.back();
 			sects[i].actual_size = actual_size;
@@ -613,6 +614,7 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[i].deleted = stype == 3 || stype == 4 || stype == 7 || stype == 8;
 				sects[i].bad_data_crc = stype == 5 || stype == 6 || stype == 7 || stype == 8;
 				sects[i].bad_addr_crc = false;
+				sects[i].weak = false;
 
 				if(stype == 2 || stype == 4 || stype == 6 || stype == 8) {
 					sects[i].data = new uint8_t [actual_size];
@@ -624,7 +626,7 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			}
 		}
 
-		if(sector_count.back()) {
+		if(sector_count.back() && (chead < heads)) {
 			if(fm) {
 				build_pc_track_fm(track.back()*trackmult, chead, image, cell_count, sector_count.back(), sects, gap_3);
 			} else {
@@ -636,6 +638,9 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 			if(sects[i].data && (sects[i].data < &img[0] || sects[i].data >= (&img[0] + size)))
 				delete [] sects[i].data;
 	}
+
+	if(skipped_head)
+		osd_printf_warning("imd_format: Disk has data on more heads than this drive has; extra heads discarded (drive heads=%d)\n", heads);
 
 	// Tag the image with form-factor + variant.  Without this the floppy_image
 	// keeps FF_UNKNOWN/variant=0, which propagates to any subsequent save
@@ -669,18 +674,18 @@ bool imd_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 	uint32_t img_variant;
 	if (img_form == floppy_image::FF_8) {
 		img_variant = any_mfm ? (ds ? floppy_image::DSDD : floppy_image::SSDD)
-		                      : (ds ? floppy_image::DSSD : floppy_image::SSSD);
+							  : (ds ? floppy_image::DSSD : floppy_image::SSSD);
 	} else if (img_form == floppy_image::FF_525 || img_form == floppy_image::FF_35) {
 		if (any_500kbps && any_mfm)
 			img_variant = floppy_image::DSHD;
 		else if (any_mfm)
 			img_variant = ds ? (maxtrack > 42 ? floppy_image::DSQD : floppy_image::DSDD)
-			                 : floppy_image::SSDD;
+							 : floppy_image::SSDD;
 		else
 			img_variant = ds ? floppy_image::DSSD : floppy_image::SSSD;
 	} else {
 		img_variant = any_mfm ? (ds ? floppy_image::DSDD : floppy_image::SSDD)
-		                      : (ds ? floppy_image::DSSD : floppy_image::SSSD);
+							  : (ds ? floppy_image::DSSD : floppy_image::SSSD);
 	}
 	image.set_form_variant(img_form, img_variant);
 

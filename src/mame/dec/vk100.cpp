@@ -1033,7 +1033,7 @@ void vk100_state::vk100(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &vk100_state::vk100_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(45'619'200)/3, 882, 0, 720, 370, 0, 350 ); // fake screen timings for startup until 6845 sets real ones
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

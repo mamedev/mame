@@ -44,7 +44,7 @@ GFXDECODE_END
 
 void apricot_mono_display_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_size(800, 400);
 	screen.set_visarea(0, 800-1, 0, 400-1);

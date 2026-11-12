@@ -31,6 +31,11 @@ const char *meta_data::entry_name(meta_name name)
 	case meta_name::attributes: return "attributes";
 	case meta_name::oem_name: return "oem_name";
 	case meta_name::disk_id: return "disk_id";
+	case meta_name::protect: return "protected";
+	case meta_name::user: return "user";
+	case meta_name::system: return "system";
+	case meta_name::permissions: return "permissions";
+	case meta_name::max_blocks: return "max_blocks";
 	}
 	return "";
 }

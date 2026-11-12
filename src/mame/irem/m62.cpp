@@ -937,7 +937,7 @@ void m62_state::ldrun(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(m62_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 3, 512, 64, 448, 284, 0, 256);
 	screen.set_screen_update(FUNC(m62_state::screen_update_ldrun));
 

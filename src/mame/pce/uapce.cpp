@@ -117,6 +117,7 @@ Alien Crush & Pac_Land: dumps made from PC-Engine dumps of JP versions
 #include "sound/discrete.h"
 
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 

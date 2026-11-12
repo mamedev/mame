@@ -1129,7 +1129,7 @@ void punchout_state::punchout(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x200);
 	config.set_default_layout(layout_dualhovu);
 
-	screen_device &top(SCREEN(config, "top", SCREEN_TYPE_RASTER));
+	screen_device &top(SCREEN(config, "top"));
 	top.set_refresh_hz(60);
 	top.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	top.set_size(32*8, 32*8);
@@ -1139,7 +1139,7 @@ void punchout_state::punchout(machine_config &config)
 	top.screen_vblank().set(FUNC(punchout_state::vblank_irq));
 	top.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	screen_device &bottom(SCREEN(config, "bottom", SCREEN_TYPE_RASTER));
+	screen_device &bottom(SCREEN(config, "bottom"));
 	bottom.set_refresh_hz(60);
 	bottom.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	bottom.set_size(32*8, 32*8);

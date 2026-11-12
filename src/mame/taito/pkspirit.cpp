@@ -74,8 +74,8 @@ public:
 		, m_opto(*this, "opto%u", 1U)
 	{ }
 
-	void pkspirit(machine_config &config);
-	void shun(machine_config &config);
+	void pkspirit(machine_config &config) ATTR_COLD;
+	void shun(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -440,7 +440,7 @@ void pkspirit_state::pkspirit(machine_config &config)
 		TAITOIO_OPTO(config, opto);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: wrong
+	screen_device &screen(SCREEN(config, "screen")); // TODO: wrong
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
@@ -539,5 +539,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, pkspirit, 0, pkspirit, pkspirit, pkspirit_state, empty_init, ROT0, "Taito Corporation", "Poker Spirit", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1992, shun,     0, shun,     pkspirit, pkspirit_state, empty_init, ROT0, "Taito Corporation", "Shun",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, pkspirit, 0, pkspirit, pkspirit, pkspirit_state, empty_init, ROT0, "Taito", "Poker Spirit", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1992, shun,     0, shun,     pkspirit, pkspirit_state, empty_init, ROT0, "Taito", "Shun",         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

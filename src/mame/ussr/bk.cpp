@@ -163,7 +163,7 @@ void bk_state::bk0010(machine_config &config)
 	m_up->irq3_handler().set_inputline(m_maincpu, t11_device::CP3_LINE);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(4000000.0/81920.0);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(512, 256); // 768x320 raster, 12 mhz pixel clock
@@ -216,7 +216,7 @@ void bk_state::bk0011(machine_config &config)
 	config.device_remove("screen");
 	config.device_remove("palette");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(4000000.0/81920.0);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(4010)); /* not accurate */
 	screen.set_size(512, 256);

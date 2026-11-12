@@ -502,7 +502,8 @@ void pc98lt_state::lt_config(machine_config &config)
 	m_maincpu->tout2_cb().set(m_sio_rs, FUNC(i8251_device::write_txc));
 	m_maincpu->tout2_cb().append(m_sio_rs, FUNC(i8251_device::write_rxc));
 //  m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
-	m_maincpu->out_hreq_cb().set(m_maincpu, FUNC(v50_device::hack_w));
+	m_maincpu->out_hreq_cb().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_maincpu->out_hreq_cb().append(m_maincpu, FUNC(v50_device::hack_w));
 	m_maincpu->out_eop_cb().set(FUNC(pc98lt_state::tc_w));
 //  m_maincpu->in_ior_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_r));
 //  m_maincpu->out_iow_cb<2>().set(m_fdc, FUNC(upd765a_device::dma_w));
@@ -552,7 +553,7 @@ void pc98lt_state::lt_config(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, m_fdc_irqs).output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ6);
 
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	// TODO: copied verbatim from base PC98, verify clock et al.
 	m_screen->set_raw(21.0526_MHz_XTAL, 848, 0, 640, 440, 0, 400);
 	m_screen->set_screen_update(FUNC(pc98lt_state::screen_update));

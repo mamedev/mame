@@ -2,7 +2,7 @@
 // socket_base.hpp
 // ~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -23,6 +23,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 
 /// The socket_base class is used as a base for the basic_stream_socket and
 /// basic_datagram_socket class templates so that we have a common place to
@@ -534,17 +535,6 @@ public:
       = ASIO_OS_DEF(SOMAXCONN));
 #endif
 
-#if !defined(ASIO_NO_DEPRECATED)
-  /// (Deprecated: Use max_listen_connections.) The maximum length of the queue
-  /// of pending incoming connections.
-#if defined(GENERATING_DOCUMENTATION)
-  static const int max_connections = implementation_defined;
-#else
-  ASIO_STATIC_CONSTANT(int, max_connections
-      = ASIO_OS_DEF(SOMAXCONN));
-#endif
-#endif // !defined(ASIO_NO_DEPRECATED)
-
 protected:
   /// Protected destructor to prevent deletion through this type.
   ~socket_base()
@@ -552,6 +542,7 @@ protected:
   }
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

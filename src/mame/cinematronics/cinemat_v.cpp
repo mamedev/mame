@@ -18,7 +18,7 @@
 
 void cinemat_state::cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, int16_t ey, uint8_t shift)
 {
-	const rectangle &visarea = m_screen->visible_area();
+	const rectangle &visarea = m_vector->visible_area();
 	int intensity = 0xff;
 
 	/* adjust for slop */
@@ -138,31 +138,13 @@ void qb3_state::vector_control_w(int state)
 
 /*************************************
  *
- *  End-of-frame
+ *  Artwork update
  *
  *************************************/
 
-uint32_t cinemat_state::screen_update_cinemat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_vector->screen_update(screen, bitmap, cliprect);
-	m_vector->clear_list();
-
-	return 0;
-}
-
-
-
-/*************************************
- *
- *  Space War update
- *
- *************************************/
-
-uint32_t cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+void cinemat_state::screen_configuration()
 {
 	int sw_option = ~m_inputs->read();
-
-	screen_update_cinemat(screen, bitmap, cliprect);
 
 	/* set the state of the artwork */
 	m_pressed[3] = BIT(sw_option, 0);
@@ -175,5 +157,4 @@ uint32_t cinemat_state::screen_update_spacewar(screen_device &screen, bitmap_rgb
 	m_pressed[7] = BIT(sw_option, 7);
 	m_pressed[5] = BIT(sw_option, 10);
 	m_pressed[0] = BIT(sw_option, 11);
-	return 0;
 }

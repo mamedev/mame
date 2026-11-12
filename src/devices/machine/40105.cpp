@@ -48,11 +48,15 @@ cmos_40105_device::cmos_40105_device(const machine_config &mconfig, const char *
 	m_write_dir(*this),
 	m_write_dor(*this),
 	m_write_q(*this),
+	m_fifo{},
+	m_fifo_head(0),
+	m_fifo_count(0),
 	m_d(0),
 	m_q(0),
 	m_dir(false),
 	m_dor(false),
 	m_si(false),
+	m_input_pending(false),
 	m_so(false)
 {
 }
@@ -65,11 +69,15 @@ cmos_40105_device::cmos_40105_device(const machine_config &mconfig, const char *
 void cmos_40105_device::device_start()
 {
 	// state saving
+	save_item(NAME(m_fifo));
+	save_item(NAME(m_fifo_head));
+	save_item(NAME(m_fifo_count));
 	save_item(NAME(m_d));
 	save_item(NAME(m_q));
 	save_item(NAME(m_dir));
 	save_item(NAME(m_dor));
 	save_item(NAME(m_si));
+	save_item(NAME(m_input_pending));
 	save_item(NAME(m_so));
 }
 
@@ -81,11 +89,13 @@ void cmos_40105_device::device_start()
 void cmos_40105_device::device_reset()
 {
 	// invalidate data in queue
-	m_fifo = std::queue<u8>();
+	m_fifo_head = 0;
+	m_fifo_count = 0;
 
 	// reset control flip-flops
 	m_dir = true;
 	m_dor = false;
+	m_input_pending = false;
 	m_write_dir(1);
 	m_write_dor(0);
 }
@@ -117,17 +127,19 @@ void cmos_40105_device::write(u8 data)
 
 void cmos_40105_device::load_input()
 {
-	if (m_fifo.size() == 16)
+	if (m_fifo_count == std::size(m_fifo))
 	{
 		logerror("Attempt to load data into full FIFO\n");
 		return;
 	}
 
-	m_fifo.push(m_d);
+	m_fifo[(m_fifo_head + m_fifo_count) & 0x0f] = m_d;
+	m_fifo_count++;
+	m_input_pending = false;
 
 	// DIR remains low if FIFO is full, or else briefly pulses low
 	m_write_dir(0);
-	if (m_fifo.size() == 16)
+	if (m_fifo_count == std::size(m_fifo))
 		m_dir = false;
 	else
 		m_write_dir(1);
@@ -140,13 +152,13 @@ void cmos_40105_device::load_input()
 
 void cmos_40105_device::output_ready()
 {
-	if (m_fifo.size() == 0)
+	if (m_fifo_count == 0)
 	{
 		logerror("Attempt to output data from empty FIFO\n");
 		return;
 	}
 
-	m_q = m_fifo.front();
+	m_q = m_fifo[m_fifo_head];
 	m_write_q(m_q);
 
 	m_dor = true;
@@ -161,14 +173,17 @@ void cmos_40105_device::output_ready()
 void cmos_40105_device::si_w(int state)
 {
 	// load input on rising edge when ready
-	if (m_dir && !m_si && state)
+	if (!m_si && state)
 	{
-		load_input();
+		m_input_pending = true;
+		if (m_dir)
+			load_input();
 	}
-	else if (m_si && !state && m_fifo.size() > 0)
+	else if (m_si && !state)
 	{
 		// data propagates through FIFO when SI goes low
-		if (!m_dor)
+		m_input_pending = false;
+		if (!m_dor && m_fifo_count)
 			output_ready();
 	}
 
@@ -185,12 +200,13 @@ void cmos_40105_device::so_w(int state)
 	// shift out on falling edge when ready
 	if (m_dor && m_so && !state)
 	{
-		m_fifo.pop();
+		m_fifo_head = (m_fifo_head + 1) & 0x0f;
+		m_fifo_count--;
 		m_dor = false;
 		m_write_dor(0);
 
 		// DOR remains low if FIFO is now empty, or else briefly pulses low
-		if (m_fifo.size() > 0)
+		if (m_fifo_count)
 			output_ready();
 
 		if (!m_dir)
@@ -200,7 +216,7 @@ void cmos_40105_device::so_w(int state)
 			m_write_dir(1);
 
 			// load new input immediately if SI is held high
-			if (m_si)
+			if (m_si && m_input_pending)
 				load_input();
 		}
 	}

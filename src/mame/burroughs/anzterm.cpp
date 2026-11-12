@@ -348,6 +348,7 @@ Components:
 
 #include "cpu/m6809/m6809.h"
 #include "machine/6850acia.h"
+#include "machine/clock.h"
 #include "machine/i8214.h"
 #include "machine/mc6854.h"
 #include "emupal.h"
@@ -420,12 +421,19 @@ void anzterm_state::anzterm(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &anzterm_state::anzterm_mem);
 
 	I8214(config, "pic.ic39");
-	MC6854(config, "adlc.ic16");
-	MC6854(config, "adlc.1c19");
+	mc6854_device &adlc_ic16(MC6854(config, "adlc.ic16"));
+	mc6854_device &adlc_ic19(MC6854(config, "adlc.1c19"));
+
+	// FIXME: ADLC clock source unknown, rate of the old internal MC6854 timer used
+	clock_device &adlc_clock(CLOCK(config, "adlc_clock", 500'000));
+	adlc_clock.signal_handler().set(adlc_ic16, FUNC(mc6854_device::txc_w));
+	adlc_clock.signal_handler().append(adlc_ic16, FUNC(mc6854_device::rxc_w));
+	adlc_clock.signal_handler().append(adlc_ic19, FUNC(mc6854_device::txc_w));
+	adlc_clock.signal_handler().append(adlc_ic19, FUNC(mc6854_device::rxc_w));
 	ACIA6850(config, "acia.ic17");
 	ACIA6850(config, "acia.ic18");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_screen_update(FUNC(anzterm_state::screen_update));
 	screen.set_palette("palette");
 	screen.set_raw(15974400/4, 1024, 0, 104*8, 260, 0, 24*10); // this is totally wrong, it just stops a validation error

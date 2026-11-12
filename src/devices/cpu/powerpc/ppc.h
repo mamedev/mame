@@ -20,6 +20,7 @@
 #include "divtlb.h"
 
 #include <algorithm>
+#include <unordered_map>
 
 
 /***************************************************************************
@@ -33,6 +34,7 @@
 
 // interrupt types
 #define PPC_IRQ                 0       /* external IRQ */
+#define PPC_SMI                 1       /* (603 family) system management interrupt */
 #define PPC_IRQ_LINE_0          0       /* (4XX) external IRQ0 */
 #define PPC_IRQ_LINE_1          1       /* (4XX) external IRQ1 */
 #define PPC_IRQ_LINE_2          2       /* (4XX) external IRQ2 */
@@ -163,10 +165,14 @@ enum
 };
 
 // compiler-specific options
-#define PPCDRC_STRICT_VERIFY        0x0001          /* verify all instructions */
-#define PPCDRC_FLUSH_PC             0x0002          /* flush the PC value before each memory access */
-#define PPCDRC_ACCURATE_SINGLES     0x0004          /* do excessive rounding to make single-precision results "accurate" */
-
+#define PPCDRC_STRICT_VERIFY          0x0001        // verify all instructions
+#define PPCDRC_FLUSH_PC               0x0002        // flush the PC value before each memory access
+#define PPCDRC_ACCURATE_SINGLES       0x0004        // do excessive rounding to make single-precision results "accurate"
+#define PPCDRC_FULL_CACHE_FLUSH       0x0008        // completely flush the DRC cache on ICBI.  Should never be necessary now.
+#define PPCDRC_STRICT_601_SELF_MODIFY 0x0010        // check for self-modifying code on 601 in the write handler (fairly large performance impact & does not work with RAM bypass)
+#define PPCDRC_MACOS_CACHE_HACK       0x0020        // HACK for Mac OS relying on data cache behavior; see ppccom_dcbz_check() for details
+#define PPCDRC_BUS_RETRY              0x0040        // honor cpu_device::retry_access() on aligned I/O instructions
+#define PPCDRC_BUS_ERROR              0x0080        // take a machine check exception when an access calls bus_error()
 
 // common sets of options
 #define PPCDRC_COMPATIBLE_OPTIONS   (PPCDRC_STRICT_VERIFY | PPCDRC_FLUSH_PC | PPCDRC_ACCURATE_SINGLES)
@@ -229,13 +235,17 @@ public:
 
 	void set_serial_clock(uint32_t serial_clock) { c_serial_clock = serial_clock; }
 	void set_serial_clock(const XTAL &xtal) { set_serial_clock(xtal.value()); }
+	void set_tb_divisor(uint32_t divisor) { m_tb_divisor = divisor; }
 
 	void ppc_set_dcstore_callback(write32sm_delegate callback);
 
-	void set_drc_cache_size(size_t bytes) { m_cache.set_size(bytes); }
+	void set_drc_cache_size(size_t bytes) { m_drcuml.set_cache_size(bytes); }
 	void ppcdrc_set_options(uint32_t options);
+	void bus_error() noexcept { m_bus_error = true; }
 	void ppcdrc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 	void ppcdrc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
+
+	virtual void signal_external_write(offs_t physical_address, u32 length) override;
 
 	virtual TIMER_CALLBACK_MEMBER(decrementer_int_callback);
 	TIMER_CALLBACK_MEMBER(ppc4xx_buffered_dma_callback);
@@ -249,15 +259,32 @@ public:
 	void ppc_cfunc_unimplemented();
 	void ppc_cfunc_ppccom_mismatch();
 	void ppccom_tlb_fill();
+	int  ppccom_fetch_intention() const;
 	void ppccom_update_fprf();
 	void ppccom_dcstore_callback();
+	void ppccom_dcbz_check();
 	void ppccom_execute_tlbie();
 	void ppccom_execute_tlbia();
 	void ppccom_execute_tlbl();
 	void ppccom_execute_mfspr();
 	void ppccom_execute_mftb();
 	void ppccom_execute_mtspr();
+	void ppccom_execute_mtsr();
+	void ppccom_execute_icbi();
+	void ppccom_invalidate_codepage();
 	void ppccom_tlb_flush();
+
+	// per-block entry translation check: blocks are keyed on effective address,
+	// so on any MMU change each block re-verifies its own mapping at next entry
+	struct ppc_entry_check
+	{
+		ppc_device *ppc;                // owning device
+		uint32_t    generation;         // translation generation this block last verified against
+		offs_t      pc;                 // effective PC of the block
+		offs_t      physpc;             // physical PC it was compiled from
+	};
+	void ppc_check_translation(ppc_entry_check *chk);
+	std::vector<ppc_entry_check *> m_entry_checks;   // live per-block checks, released on cache flush
 	void ppccom_execute_mfdcr();
 	void ppccom_execute_mtdcr();
 	void ppccom_get_dsisr();
@@ -268,6 +295,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_stop() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const noexcept override { return 1; }
@@ -306,6 +334,7 @@ protected:
 		EXCEPTION_ITLBMISS      = 16,       // PPCCAP_603_MMU
 		EXCEPTION_DTLBMISSL     = 17,       // PPCCAP_603_MMU
 		EXCEPTION_DTLBMISSS     = 18,       // PPCCAP_603_MMU
+		EXCEPTION_SMI           = 20,       // 603 family
 		EXCEPTION_COUNT
 	};
 
@@ -315,6 +344,7 @@ protected:
 	memory_access<32, 3, 0, ENDIANNESS_BIG>::cache m_cache64;
 	uint32_t c_bus_frequency;
 	uint32_t c_serial_clock;
+	uint32_t c_rtc_clock;
 
 	struct internal_ppc_state
 	{
@@ -338,6 +368,7 @@ protected:
 		// PowerPC 603-specific state
 		uint32_t mmu603_cmp;
 		uint32_t mmu603_hash[2];
+		uint32_t mmu603_key;                 // SRR1[KEY] for the pending TLB miss: SR[Ks] or SR[Kp]
 		uint32_t mmu603_r[4];
 
 		// parameters for subroutines
@@ -353,6 +384,10 @@ protected:
 
 		// FP save values
 		double fpscr_op[2];
+
+		uint32_t m_codepage_any;                    // nonzero if any page bit is set (UML-readable)
+		uint32_t m_translation_generation;          // bumped whenever the MMU mapping may have changed (UML-readable)
+		uint32_t m_codewatch_ea;                    // effective address of an in-progress store (601 write-watch)
 	};
 
 	internal_ppc_state *m_core;
@@ -574,9 +609,8 @@ protected:
 	void (*m_optable[64])(uint32_t);
 
 	// core state
-	drc_cache           m_cache;                        // pointer to the DRC code cache
-	std::unique_ptr<drcuml_state>      m_drcuml;        // DRC UML generator state
-	std::unique_ptr<frontend>          m_drcfe;         // pointer to the DRC front-end state
+	drcuml_state          m_drcuml;                     // DRC code generator state
+	std::unique_ptr<frontend> m_drcfe;                  // pointer to the DRC front-end
 	uint32_t              m_drcoptions;                 // configurable DRC options
 
 	// parameters for subroutines
@@ -592,6 +626,51 @@ protected:
 	// internal stuff
 	uint8_t               m_cache_dirty;                // true if we need to flush the cache
 
+	// track what logical pages have compiled code
+	std::vector<uint8_t>  m_codepage_bits;              // 1 bit for each 4K page
+	uint32_t              m_codewrite_skip_page = ~uint32_t(0);   // 601 write-watch: page to leave unmarked for one recompile
+
+	// For signal_external_write(): which physical pages have compiled code, and the
+	// logical pages of the blocks compiled from them.  Only tracked once another
+	// bus master has reported a write.
+	bool                  m_track_physical_code;
+	std::vector<uint8_t>  m_physpage_bits;              // 1 bit for each 4K page
+	std::unordered_map<uint32_t, std::vector<uint32_t>> m_physpage_logical;
+
+	// Code reuse cache.  The PCI PowerMac 68K DRC frequently regenerates the exact
+	// same code at the exact same address, so keep a cache of translations.  Entries
+	// record the physical address and a signature over every word of the sequence, and
+	// are dropped when the cache is flushed and the code goes away.  A stale match is
+	// harmless: the reused code still begins with its own translation check and
+	// checksum, so it degrades to an ordinary recompile rather than running stale.
+	//
+	// Reuse must leave the block's entry checks in the same state as a fresh compile,
+	// so the checks are recorded in m_entry_checks and re-verified before the code is handed back.
+	struct reuse_entry
+	{
+		drcuml_state::hash_codeptr code;
+		offs_t physpc;
+		uint32_t sig;
+		uint32_t checkfirst; // first of this block's entry checks in m_entry_checks
+		uint32_t checkcount; // number of entry checks the block was generated with
+	};
+	std::unordered_map<uint64_t, reuse_entry> m_reuse_cache; // key = (mode << 32) | pc
+	uint64_t m_last_reuse = ~uint64_t(0);                    // key handed back by the last compile, if it was a reuse
+
+	bool reuse_entry_checks(uint32_t first, uint32_t count);
+
+	// After a 601 self-modifying store, we clear the page's code bit and
+	// immediately recompile the store's own block.  We leave the bit clear for
+	// that whole recompile because a block can hold several sequences that would
+	// each re-mark the page and infinite-loop the write watch mechanism).
+	// The bit is set back to normal when the modified code later runs and
+	// recompiles, so any future self-modifies are still caught.  m_codewrite_skip_page
+	// is cleared at the end of code_compile_block, so this applies to one recompile.
+	void note_code_page(uint32_t page) { if (page != m_codewrite_skip_page) { m_codepage_bits[page >> 3] |= 1 << (page & 7); m_core->m_codepage_any = 1; } }
+	bool code_page_has_code(offs_t addr) const { uint32_t const page = (addr >> 12) & 0xfffff; return BIT(m_codepage_bits[page >> 3], page & 7); }
+	bool invalidate_code_range(offs_t start, offs_t end);
+	void note_physical_code(const opcode_desc *desclist);
+
 	// reservation granularity
 	uint32_t m_reservation_mask;
 
@@ -603,6 +682,9 @@ protected:
 	uml::code_handle *   m_entry;                      // entry point
 	uml::code_handle *   m_nocode;                     // nocode exception handler
 	uml::code_handle *   m_out_of_cycles;              // out of cycles exception handler
+	uml::code_handle *   m_bus_retry;                  // unwind an I/O instruction the bus asked us to redo
+	bool                 m_bus_error = false;          // the bus ended the current access with an error
+	bool                 m_checkstop = false;
 	uml::code_handle *   m_tlb_mismatch;               // tlb mismatch handler
 	uml::code_handle *   m_swap_tgpr;                  // swap TGPR handler
 	uml::code_handle *   m_lsw[8][32];                 // lsw entries
@@ -628,6 +710,7 @@ protected:
 	uml::code_handle *   m_exception[EXCEPTION_COUNT]; // array of exception handlers
 	uml::code_handle *   m_exception_norecover[EXCEPTION_COUNT];   // array of exception handlers
 	uml::code_handle *   m_fpscr_finish;
+	uml::code_handle *   m_code_write_reset;           // 601: recompile after a write to compiled code
 
 	// fast RAM
 	// fast RAM info
@@ -661,6 +744,7 @@ protected:
 		uint32_t            cycles;                     // accumulated cycles
 		uint8_t             checkints;                  // need to check interrupts before next instruction
 		uint8_t             checksoftints;              // need to check software interrupts before next instruction
+		bool                checkbuserror;              // take a machine check if the current instruction's access bus-errored
 		uml::code_label     labelnum;                   // index for local labels
 	};
 
@@ -670,6 +754,7 @@ protected:
 	void set_xer(uint32_t value);
 	uint64_t get_timebase();
 	void set_timebase(uint64_t newtb);
+	uint64_t get_rtc();
 	virtual uint32_t get_decrementer();
 	virtual void set_decrementer(uint32_t newdec);
 	uint32_t ppccom_translate_address_internal(int intention, bool debug, offs_t &address);
@@ -683,7 +768,7 @@ protected:
 	void ppc4xx_spu_update_irq_states();
 	void ppc4xx_spu_rx_data(uint8_t data);
 	void ppc4xx_spu_timer_reset();
-	void alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name);
+	void alloc_handle(uml::code_handle **handleptr, const char *name);
 	void load_fast_iregs(drcuml_block &block);
 	void save_fast_iregs(drcuml_block &block);
 	void load_fast_fregs(drcuml_block &block);
@@ -696,16 +781,22 @@ protected:
 	void static_generate_entry_point();
 	void static_generate_nocode_handler();
 	void static_generate_out_of_cycles();
+	void static_generate_bus_retry();
 	void static_generate_tlb_mismatch();
+	void static_generate_code_write_reset();
 	void static_generate_exception(uint8_t exception, int recover, const char *name);
 	void static_generate_memory_accessor(int mode, int size, bool iswrite, bool ismasked, bool isreserve, const char *name, uml::code_handle *&handleptr, uml::code_handle *masked);
 	void static_generate_swap_tgpr();
+	void static_generate_memory_handlers();
 	void static_generate_lsw_entries(int mode);
 	void static_generate_stsw_entries(int mode);
 	void static_generate_fpscr_finish();
 	void generate_set_fmod(drcuml_block &block);
 	void generate_update_mode(drcuml_block &block);
 	void generate_update_cycles(drcuml_block &block, compiler_state *compiler, uml::parameter param, bool allow_exception);
+	void generate_bus_error_check(drcuml_block &block, compiler_state *compiler, uml::parameter param);
+	void generate_recompile_if(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc, uml::parameter flag, int exitcode);
+	void generate_translation_check(drcuml_block &block, compiler_state *compiler, const opcode_desc *seqhead, uint8_t mode);
 	void generate_checksum_block(drcuml_block &block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block &block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_compute_flags(drcuml_block &block, const opcode_desc *desc, int updatecr, uint32_t xermask, int invertcarry);
@@ -765,6 +856,9 @@ class ppc601_device : public ppc_device
 {
 public:
 	ppc601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	void set_rtc_clock(uint32_t rtc_clock) { c_rtc_clock = rtc_clock; }
+	void set_rtc_clock(const XTAL &xtal) { set_rtc_clock(xtal.value()); }
 
 protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;

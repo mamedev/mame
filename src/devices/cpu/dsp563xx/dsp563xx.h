@@ -32,8 +32,14 @@ public:
 
 	void set_hard_omr(u8 mode);
 
-	void hi08_w(offs_t offset, u8 data);
-	u8 hi08_r(offs_t offset);
+	void hi08_w(offs_t offset, u8 data) { m_hi08->write(offset, data); }
+	u8 hi08_r(offs_t offset)            { return m_hi08->read(offset); }
+
+	void ss_w(int state)   { m_shi->ss_w(state); }
+	void sck_w(int state)  { m_shi->sck_w(state); }
+	void mosi_w(int state) { m_shi->mosi_w(state); }
+	auto miso_callback()   { return m_miso_callback.bind(); }
+	auto hreq_callback()   { return m_hreq_callback.bind(); }
 
 protected:
 	enum {
@@ -64,7 +70,7 @@ protected:
 	static const u16 t_npar[0x100000];
 
 	static const u64 t_move_ex[40];
-	static const u64 t_npar_ex[72];
+	static const u64 t_npar_ex[73];
 
 	dsp563xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
 					address_map_constructor map_p, address_map_constructor map_x, address_map_constructor map_y);
@@ -90,8 +96,12 @@ protected:
 
 	void unhandled(const char *inst);
 
+	void do_miso(int state);
+	void do_hreq(int state);
+
 	optional_device<hi08_device> m_hi08;
 	optional_device<dsp5636x_shi_device> m_shi;
+	devcb_write_line m_hreq_callback, m_miso_callback;
 
 	address_space_config m_p_config, m_x_config, m_y_config;
 
@@ -111,21 +121,23 @@ protected:
 
 	u32 m_npc;
 	u8 m_sc, m_emr, m_mr, m_ccr, m_hard_omr;
+	u8 m_ifcc_ccr; // saved CCR for ifcc (restored in post-move)
 	bool m_skip;
 	bool m_rep;
 	int m_icount;
 
 	inline void set_a(u64 v) { m_a = v & 0xffffffffffffff; }
 	inline void set_ah(u32 v) { set_a(u64(util::sext(v, 24)) << 24); }
-	inline void set_af(u8 v) { m_a = u64(v) << 48; }
+	inline void set_af(u8 v) { m_a = (u64(util::sext(v, 8)) << 40) & 0xffffffffffffff; }
 	inline void set_a2(u8 v) { m_a = (m_a & 0x00ffffffffffff) | (u64(v) << 48); }
+	inline u64 tfr56(u32 v24) const { u64 se = util::sext(v24, 24); return (se << 24) & 0xffffffffffffff; } // tfr 24bit->acc (a1 field + sign byte, a0=0)
 	inline void set_a1(u32 v) { m_a = (m_a & 0xff000000ffffff) | (u64(v & 0xffffff) << 24); }
 	inline void set_a0(u32 v) { m_a = (m_a & 0xffffffff000000) | u64(v & 0xffffff); }
 	inline void set_a10(u64 v) { set_a(util::sext(v, 48)); }
 	inline void set_al(u64 v) { set_a(util::sext(v, 48)); }
 	inline void set_b(u64 v) { m_b = v & 0xffffffffffffff; }
 	inline void set_bh(u32 v) { set_b(u64(util::sext(v, 24)) << 24); }
-	inline void set_bf(u64 v) { m_b = u64(v) << 48; }
+	inline void set_bf(u64 v) { m_b = (u64(util::sext(v, 8)) << 40) & 0xffffffffffffff; }
 	inline void set_b2(u8 v) { m_b = (m_b & 0x00ffffffffffff) | (u64(v) << 48); }
 	inline void set_b1(u32 v) { m_b = (m_b & 0xff000000ffffff) | (u64(v & 0xffffff) << 24); }
 	inline void set_b0(u32 v) { m_b = (m_b & 0xffffffff000000) | u64(v & 0xffffff); }
@@ -152,13 +164,13 @@ protected:
 	inline void set_omr(u32 v) { m_omr = v; }
 	inline void set_sc(u32 v) { m_sc = v; }
 	inline void set_sp(u32 v) { m_sp = v; }
-	inline void set_sr(u32 v) { m_emr = (v >> 16) & 0xfb; m_mr = (v >> 8) & 0xef; m_ccr = v; }
+	inline void set_sr(u32 v) { m_emr = (v >> 16) & 0xff; m_mr = (v >> 8) & 0xff; m_ccr = v; }
 	inline void set_ssh(u32 v) { m_stackh[m_sp] = v; }
 	inline void set_ssl(u32 v) { m_stackl[m_sp] = v; }
 	inline void set_sz(u32 v) { m_sz = v; }
 	inline void set_vba(u32 v) { m_vba = v; }
 	inline void set_ccr(u8 v) { m_ccr = v; }
-	inline void set_mr(u8 v) { m_mr = v & 0xef; }
+	inline void set_mr(u8 v) { m_mr = v; }
 	inline void set_emr(u8 v) { m_emr = v & 0xfb; }
 	inline void set_com(u8 v) { m_omr = (m_omr & 0xffff00) | v; }
 	inline void set_eom(u8 v) { m_omr = (m_omr & 0xff00ff) | (v << 8); }
@@ -226,20 +238,80 @@ protected:
 	inline void inc_sp() { m_sp++; }
 	inline void dec_sp() { m_sp--; }
 
+	inline s32 i3224(u32 v) const { return (s32)(v & 0x7fffff) - (v & 0x800000 ? 0x1000000 : 0); }
+
+	inline u32 calc_modulo_mask(u32 m) const {
+		m |= m >> 1;
+		m |= m >> 2;
+		m |= m >> 4;
+		m |= m >> 8;
+		return m;
+	}
+
+	inline u32 bitreverse24(u32 x) const {
+		x = (((x & 0xaaaaaaaa) >> 1) | ((x & 0x55555555) << 1));
+		x = (((x & 0xcccccccc) >> 2) | ((x & 0x33333333) << 2));
+		x = (((x & 0xf0f0f0f0) >> 4) | ((x & 0x0f0f0f0f) << 4));
+		return ((x & 0xff0000) >> 16) | (x & 0x00ff00) | ((x & 0x0000ff) << 16);
+	}
+
+	// delta is the signed 24-bit offset: the generated code passes +n for
+	// (Rn)+Nn / (Rn)+ and -n for (Rn)-Nn / (Rn)-, so its sign is the direction.
 	inline u32 calc_add_r(int reg, s32 delta) {
-		u16 mode = m_m[reg];
-		if(mode == 0xffff)
-			return (m_r[reg] + delta) & 0xffffff;
-		logerror("Unhandled mode %04x\n", mode);
-		return 0;
+		u32 r = m_r[reg];
+		u32 mode = m_m[reg];
+		u32 t = mode & 0xffff;
+		bool add = delta >= 0;
+		u32 n = (add ? (u32)delta : (u32)(-delta)) & 0xffffff;
+
+		if(t == 0xffff) {
+			return (r + delta) & 0xffffff;
+		}
+		if(t == 0) {
+			// bit-reverse mode: operate in the bit-reversed domain
+			u32 br = bitreverse24(r);
+			u32 bn = bitreverse24(n);
+			u32 res = add ? br + bn : br - bn;
+			return bitreverse24(res & 0xffffff);
+		}
+		if(t <= 0x7fff) {
+			// modulo mode
+			u32 mask = calc_modulo_mask(mode);
+			u32 mod = mode + 1;
+			u32 lower = r & ~mask;
+			u32 upper = lower + mod;
+			r = (r + delta) & 0xffffff;
+			u32 mod2 = (n & mask) ? mod : 0;
+			if(i3224(r) < i3224(lower))
+				r = (r + mod2) & 0xffffff;
+			if(i3224(r) > i3224(upper))
+				r = (r - mod2) & 0xffffff;
+			return r;
+		}
+		// multiple-wrap-around mode
+		u32 mask = t & 0x3fff;
+		u32 temp = r & mask;
+		u32 fixed = r ^ temp;
+		temp = (temp + (delta & 0xffffff)) & mask;
+		return (fixed | temp) & 0xffffff;
 	}
 
 	inline void add_r(int reg, s32 delta) { m_r[reg] = calc_add_r(reg, delta); }
 
 	u64 do_add56(u64 v1, u64 v2);
+	u64 do_adc56(u64 v1, u64 v2);
 	u64 do_sub56(u64 v1, u64 v2);
+	u64 do_sbc56(u64 v1, u64 v2);
+
+	void update_eun56(u64 v);
+	void do_mpy56(s64 r);
+	u64 do_rnd56(u64 v);
 	u64 do_asl56(u8 n, u64 v);
 	u64 do_asr56(u8 n, u64 v);
+	u64 do_lsl56(u8 n, u64 v);
+	u64 do_lsr56(u8 n, u64 v);
+	u64 do_rol56(u64 v);
+	u64 do_ror56(u64 v);
 	void do_tst56(u64 v);
 };
 

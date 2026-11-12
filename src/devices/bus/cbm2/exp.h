@@ -37,6 +37,42 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> cbm2_expansion_window
+
+class cbm2_expansion_window
+{
+public:
+	cbm2_expansion_window(device_t &device, const char *name, offs_t start) : m_view(device, name), m_start(start) { }
+
+	void install_view(address_space_installer &program);
+
+	void install_rom(offs_t start, offs_t end, void *baseptr);
+	void install_ram(offs_t start, offs_t end, void *baseptr);
+
+	template <typename R> void install_read_handler(offs_t start, offs_t end, R &&rhandler)
+	{
+		m_view[0].install_read_handler(m_start + start, m_start + end, std::forward<R>(rhandler));
+		m_view.select(0);
+	}
+	template <typename W> void install_write_handler(offs_t start, offs_t end, W &&whandler)
+	{
+		m_view[0].install_write_handler(m_start + start, m_start + end, std::forward<W>(whandler));
+		m_view.select(0);
+	}
+	template <typename R, typename W> void install_readwrite_handler(offs_t start, offs_t end, R &&rhandler, W &&whandler)
+	{
+		m_view[0].install_readwrite_handler(m_start + start, m_start + end, std::forward<R>(rhandler), std::forward<W>(whandler));
+		m_view.select(0);
+	}
+
+private:
+	friend class cbm2_expansion_slot_device;
+
+	memory_view m_view;
+	offs_t const m_start;
+};
+
+
 // ======================> cbm2_expansion_slot_device
 
 class device_cbm2_expansion_card_interface;
@@ -55,11 +91,15 @@ public:
 	}
 	cbm2_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// computer interface
-	uint8_t read(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);
-	void write(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3);
+	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program.set_tag(std::forward<T>(tag), spacenum); }
+	uint8_t mirror_r(offs_t offset);
+	void mirror_w(offs_t offset, uint8_t data);
 
 	// cartridge interface
+	cbm2_expansion_window &bank1() { return m_bank1; }
+	cbm2_expansion_window &bank2() { return m_bank2; }
+	cbm2_expansion_window &bank3() { return m_bank3; }
+
 	int phi2() { return clock(); }
 
 protected:
@@ -76,7 +116,17 @@ protected:
 	// device_slot_interface implementation
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const override;
 
+	uint8_t *alloc_region(const char *tag);
+
+	optional_address_space m_program;
 	device_cbm2_expansion_card_interface *m_card;
+
+private:
+	void install_program_views(address_space_installer &program);
+
+	cbm2_expansion_window m_bank1;
+	cbm2_expansion_window m_bank2;
+	cbm2_expansion_window m_bank3;
 };
 
 
@@ -90,15 +140,8 @@ public:
 	// construction/destruction
 	virtual ~device_cbm2_expansion_card_interface();
 
-	virtual uint8_t cbm2_bd_r(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { return data; }
-	virtual void cbm2_bd_w(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3) { }
-
 protected:
 	device_cbm2_expansion_card_interface(const machine_config &mconfig, device_t &device);
-
-	std::unique_ptr<uint8_t[]> m_bank1;
-	std::unique_ptr<uint8_t[]> m_bank2;
-	std::unique_ptr<uint8_t[]> m_bank3;
 
 	cbm2_expansion_slot_device *m_slot;
 };

@@ -87,7 +87,7 @@ void winbingo_state::wbingo06(machine_config &config)
 	// SX28AC(config, "sx28ac", 32.768_kHz_XTAL); // clock for the internal RTC, chip should operate at higher frequencies
 
 	// all wrong
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

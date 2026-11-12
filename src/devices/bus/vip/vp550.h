@@ -22,8 +22,7 @@
 
 // ======================> vp550_device
 
-class vp550_device : public device_t,
-						public device_vip_expansion_card_interface
+class vp550_device : public device_t, public device_vip_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -50,7 +49,6 @@ private:
 
 	required_device_array<cdp1863_device, 2> m_pfg;
 
-	// timers
 	emu_timer *m_sync_timer;
 };
 

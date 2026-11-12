@@ -128,7 +128,7 @@ if _OPTIONS["targetos"]=="windows" then
 		defines {
 			"UNICODE",
 			"_UNICODE",
-			"_WIN32_WINNT=0x0600",
+			"_WIN32_WINNT=0x0A00",
 			"WIN32_LEAN_AND_MEAN",
 			"NOMINMAX",
 		}

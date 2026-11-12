@@ -113,7 +113,6 @@ protected:
 		u16 y;
 		u8 x_preset;
 		u8 y_preset;
-		u8 pattern_select;
 		bool side_pattern_enable;
 	} m_cursor;
 

@@ -39,6 +39,7 @@ public:
 			uint32_t modes,
 			uint8_t addrbits,
 			uint8_t ignorebits,
+			uint32_t max_sequence_length,
 			std::align_val_t modealign = std::align_val_t(alignof(drccodeptr **)),
 			std::align_val_t l1align = std::align_val_t(alignof(drccodeptr **)),
 			std::align_val_t l2align = std::align_val_t(alignof(drccodeptr *)));
@@ -67,6 +68,7 @@ public:
 	bool set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code) noexcept;
 	drccodeptr get_codeptr(uint32_t mode, uint32_t pc) const noexcept { assert(mode < m_modes); return m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]; }
 	bool code_exists(uint32_t mode, uint32_t pc) const noexcept { return get_codeptr(mode, pc) != m_nocodeptr; }
+	void invalidate_range(uint32_t pcstart, uint32_t pcend) noexcept;
 
 private:
 	static constexpr unsigned L1_ALLOCATION = 2;
@@ -86,6 +88,7 @@ private:
 	std::align_val_t const  m_l2align;              // desired alignment for L2 tables
 	drccodeptr              m_nocodeptr;            // pointer to code which will handle missing entries
 	uint32_t const          m_modes;                // number of modes supported
+	uint32_t const          m_max_sequence_length;  // maximum length in bytes of a generated sequence
 
 	uint8_t const           m_l1bits;               // bits worth of entries in L1 hash tables
 	uint8_t const           m_l2bits;               // bits worth of entries in L2 hash tables

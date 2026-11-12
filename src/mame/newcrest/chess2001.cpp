@@ -4,8 +4,8 @@
 /*******************************************************************************
 
 Newcrest CXG Chess 2001, also sold by Hanimex as Computachess (model HCG 1900),
-and by CGL as Computachess Champion.
-Newcrest CXG Chess 3000 is assumed to be on similar hardware as this.
+and by CGL as Computachess Champion. Newcrest CXG Chess 3000 is also the same
+program (ROM contents confirmed identical), though on a slightly different PCB.
 
 The chess engine is by Richard Lang, based on Cyrus.
 
@@ -177,7 +177,7 @@ INPUT_PORTS_END
 void chess2001_state::chess2001(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 8_MHz_XTAL/2);
+	Z80(config, m_maincpu, 8_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &chess2001_state::main_map);
 
 	auto &irq_clock(CLOCK(config, "irq_clock", 568)); // 555 timer (20nF, 100K+33K, 1K2), measured 568Hz

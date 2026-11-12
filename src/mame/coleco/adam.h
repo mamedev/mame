@@ -12,6 +12,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m6800/m6801.h"
 #include "coleco_m.h"
+#include "machine/input_merger.h"
 #include "machine/ram.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
@@ -34,6 +35,7 @@ public:
 		m_vdc(*this, TMS9928A_TAG),
 		m_psg(*this, SN76489A_TAG),
 		m_ram(*this, RAM_TAG),
+		m_irqs(*this, "irqs"),
 		m_adamnet(*this, "adamnet"),
 		m_slot(*this, "slot%u", 1U),
 		m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG),
@@ -60,6 +62,7 @@ private:
 	required_device<tms9928a_device> m_vdc;
 	required_device<sn76489a_device> m_psg;
 	required_device<ram_device> m_ram;
+	required_device<input_merger_device> m_irqs;
 	required_device<adamnet_device> m_adamnet;
 	required_device_array<adam_expansion_slot_device, 3> m_slot;
 	required_device<colecovision_cartridge_slot_device> m_cart;
@@ -90,8 +93,9 @@ private:
 
 	void os3_w(int state);
 
-	void joy1_irq_w(int state);
-	void joy2_irq_w(int state);
+	template <unsigned N> void spinner_w(int state);
+	template <unsigned N> TIMER_CALLBACK_MEMBER(spinner_one_shot);
+	template <unsigned N> TIMER_CALLBACK_MEMBER(spinner_int_off);
 
 	void mioc_reset(bool game);
 
@@ -111,6 +115,10 @@ private:
 
 	// paddle state
 	int m_spindis;
+	uint8_t m_spinner_a[2];
+	uint8_t m_spinner_q[2];
+	emu_timer *m_spinner_timer[2];
+	emu_timer *m_spinner_int_timer[2];
 
 	// video state
 	void adam_io(address_map &map) ATTR_COLD;

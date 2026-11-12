@@ -164,7 +164,7 @@ void qvt201_state::qvt201(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // TC5516APL-2 or uPD446C-2 + battery
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(48.654_MHz_XTAL / 3, 102 * 10, 0, 80 * 10, 265, 0, 250);
 	//screen.set_raw(48.654_MHz_XTAL / 2, 170 * 9, 0, 132 * 9, 265, 0, 250);
 	screen.set_screen_update("crtc", FUNC(scn2672_device::screen_update));

@@ -114,6 +114,8 @@ static cassette_image::error csw_cassette_load(cassette_image *cassette)
 		return cassette_image::error::INVALID_IMAGE;
 	}
 
+	cassette->image_read(&image_data[0], 0, image_size);
+
 	/* csw data */
 	switch (compression)
 	{
@@ -138,8 +140,6 @@ static cassette_image::error csw_cassette_load(cassette_image *cassette)
 
 	case 0x02:
 		/* Z-RLE (CSW v2.xx only) */
-		cassette->image_read(&image_data[0], 0, image_size);
-
 		std::vector<uint8_t> gz_ptr;
 		z_stream    d_stream;
 		int         err;

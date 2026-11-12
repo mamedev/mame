@@ -331,10 +331,10 @@ void pc080sn_device::topspeed_custom_draw(screen_device &screen, bitmap_ind16 &b
 
 	int flip = 0;
 
-	int const min_x = cliprect.min_x;
-	int const max_x = cliprect.max_x;
-	int const min_y = cliprect.min_y;
-	int const max_y = cliprect.max_y;
+	int const min_x = cliprect.left();
+	int const max_x = cliprect.right();
+	int const min_y = cliprect.top();
+	int const max_y = cliprect.bottom();
 	int const screen_width = max_x - min_x + 1;
 	int const width_mask = 0x1ff; /* underlying tilemap */
 

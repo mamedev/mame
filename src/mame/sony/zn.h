@@ -6,15 +6,18 @@
 
 #pragma once
 
+#include "znmcu.h"
+
 #include "cpu/psx/psx.h"
 #include "machine/at28c16.h"
 #include "machine/cat702.h"
 #include "machine/ram.h"
 #include "sound/spu.h"
 #include "video/psx.h"
+
 #include "screen.h"
 #include "speaker.h"
-#include "znmcu.h"
+
 
 class zn_state : public driver_device
 {
@@ -26,7 +29,7 @@ public:
 	void zn2(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void driver_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	void zn_base(machine_config &config) ATTR_COLD;
 	template<unsigned N> void cat702(machine_config &config) ATTR_COLD;
@@ -56,6 +59,8 @@ protected:
 	required_device<at28c16_device> m_at28c16;
 	optional_device_array<cat702_device, 2> m_cat702;
 	required_device<ram_device> m_ram;
+	required_device<ram_device> m_gpu_ram;
+	required_device<ram_device> m_spu_ram;
 	required_device<znmcu_device> m_znmcu;
 
 	std::array<int, 2> m_cat702_dataout;

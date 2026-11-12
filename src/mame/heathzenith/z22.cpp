@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:AJR, Mark Garlanger
 /**************************************************************************
 
-    Skeleton driver for Zenith Z-22 terminal.
+    Zenith Z-22 terminal.
 
     Despite featuring much of the same hardware as the MDT 60, with the
     CPU, CRTC and UART types and even dot clock frequency being identical,
@@ -10,16 +10,63 @@
     generates baud rates, fonts are uploaded to RAM, and the serial
     keyboard protocol is incompatible.
 
+    The keyboard link is bit-banged by the firmware: the 8254's counter 0
+    interrupts at 1200 Hz, and the keyboard runs at 300 baud, four
+    interrupts per bit. The same counter clocks the serial EEPROM.
+
+    Status port (A000h read):
+    bit 0 - EEPROM data out (inverted)
+    bit 1 - EEPROM clock (8254 counter 0 output)
+    bit 3 - computer port DCD (1 = asserted)
+    bit 4 - printer busy (0 = ready)
+    bit 5 - computer port CTS (1 = asserted)
+    bit 6 - polled before writing the CRTC; purpose unknown
+    bit 7 - keyboard data in (inverted)
+
+    Control port (A000h write):
+    bit 0 - keyboard data out
+    bit 2 - character bit 7 selects inverse video
+    bit 3 - character bit 7 selects half intensity
+    bit 4 - CPU access to font RAM (set while the firmware writes it)
+    bit 5 - 0 = buzzer on
+    bit 6 - EEPROM chip select
+    bit 7 - EEPROM data in (inverted)
+
+    The firmware blinks its own cursor by rewriting display RAM: it loads
+    character 00h with a solid block in the half intensity mode, or leaves
+    it blank and sets bit 7 in the inverse mode.
+
+    Setup is entered by holding CTRL and pressing SET-UP twice. The setup
+    screen accepts control keys: ^D/^E comm diagnostics, ^K and ^Y
+    keyboard tests, ^L and ^P comm tests, ^S display test, ^V character
+    set, RETURN memory test. Typing "(OPT)" there opens the options
+    screen. A line feed on the bottom line only scrolls with AUTO ROLL
+    set, which is off in the firmware's defaults.
+
+    TODO:
+    - keyboard: the ROM isn't dumped, so it's emulated at a high level
+      with a partly guessed key layout (see z22_kbd.cpp)
+    - status bit 6 and control bit 1
+    - whether bits 2 and 3 really select inverse and half intensity, and
+      which setup option chooses them (NORMAL / 2LEV / INVERSE)
+
 **************************************************************************/
 
 #include "emu.h"
+
+#include "z22_kbd.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/eepromser.h"
 #include "machine/i8251.h"
 #include "machine/pit8253.h"
+#include "sound/beep.h"
 #include "video/mc6845.h"
 #include "screen.h"
+#include "speaker.h"
+
+#include "z22.lh"
 
 
 namespace {
@@ -33,13 +80,19 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_uart(*this, "uart%u", 0U)
 		, m_eeprom(*this, "eeprom")
+		, m_keyboard(*this, "keyboard")
+		, m_beep(*this, "beep")
 		, m_dispram(*this, "dispram")
 		, m_fontram(*this, "fontram")
 		, m_eeprom_clk(false)
+		, m_kbd_data(true)
+		, m_comm_cts(true)
+		, m_comm_dcd(true)
+		, m_printer_busy(false)
 	{
 	}
 
-	void z22(machine_config &config);
+	void z22(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -54,22 +107,38 @@ private:
 	void control_w(u8 data);
 
 	void eeprom_clock_w(int state);
+	void kbd_data_w(int state) { m_kbd_data = state; }
+	void comm_cts_w(int state);
+	void comm_dcd_w(int state) { m_comm_dcd = state; }
+	void printer_busy_w(int state) { m_printer_busy = state; }
 
 	void mem_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<r6545_1_device> m_crtc;
-	optional_device_array<i8251_device, 2> m_uart;
+	required_device_array<i8251_device, 2> m_uart;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
+	required_device<z22_keyboard_device> m_keyboard;
+	required_device<beep_device> m_beep;
 	required_shared_ptr<u8> m_dispram;
 	required_shared_ptr<u8> m_fontram;
 
+	u8 m_control;
 	bool m_eeprom_clk;
+	bool m_kbd_data;
+	bool m_comm_cts;
+	bool m_comm_dcd;
+	bool m_printer_busy;
 };
 
 void z22_state::machine_start()
 {
+	save_item(NAME(m_control));
 	save_item(NAME(m_eeprom_clk));
+	save_item(NAME(m_kbd_data));
+	save_item(NAME(m_comm_cts));
+	save_item(NAME(m_comm_dcd));
+	save_item(NAME(m_printer_busy));
 }
 
 void z22_state::machine_reset()
@@ -82,16 +151,25 @@ MC6845_UPDATE_ROW(z22_state::update_row)
 {
 	u32 *pix = &bitmap.pix(y);
 
-	for (unsigned x = 0; x < x_count; x++)
+	for (int x = 0; x < x_count; x++)
 	{
 		u8 cdata = m_dispram[(ma + x) & 0x7ff];
 		u16 dots = m_fontram[(cdata & 0x7f) << 4 | ra] << 1;
 
+		// the firmware disables this cursor (R10 = 20h) and draws its own in display RAM
 		if (x == cursor_x)
 			dots = ~dots;
 
 		rgb_t fg = rgb_t::white();
 		rgb_t bg = rgb_t::black();
+
+		if (BIT(cdata, 7))
+		{
+			if (BIT(m_control, 2))
+				dots = ~dots;
+			else if (BIT(m_control, 3))
+				fg = rgb_t(0x80, 0x80, 0x80);
+		}
 
 		for (int n = 8; n >= 0; n--)
 			*pix++ = BIT(dots, n) ? fg : bg;
@@ -117,15 +195,24 @@ u8 z22_state::status_r()
 		result |= 0x01;
 	if (m_eeprom_clk)
 		result |= 0x02;
-	// TODO: bit 7 = received keyboard data
+	if (!m_comm_dcd)
+		result |= 0x08;
+	if (m_printer_busy)
+		result |= 0x10;
+	if (!m_comm_cts)
+		result |= 0x20;
+	if (!m_kbd_data)
+		result |= 0x80;
 	return result;
 }
 
 void z22_state::control_w(u8 data)
 {
+	m_control = data;
 	m_eeprom->di_write(!BIT(data, 7));
 	m_eeprom->cs_write(BIT(data, 6));
-	//m_keyboard->keyout_w(BIT(data, 0));
+	m_beep->set_state(!BIT(data, 5));
+	m_keyboard->rxd_w(BIT(data, 0));
 }
 
 void z22_state::eeprom_clock_w(int state)
@@ -135,12 +222,18 @@ void z22_state::eeprom_clock_w(int state)
 		m_maincpu->set_input_line(m6512_device::IRQ_LINE, ASSERT_LINE);
 }
 
+void z22_state::comm_cts_w(int state)
+{
+	m_comm_cts = state;
+	m_uart[0]->write_cts(state);
+}
+
 void z22_state::mem_map(address_map &map)
 {
-	map(0x0000, 0x07ff).ram();
-	map(0x2000, 0x27ff).ram().share("dispram");
+	map(0x0000, 0x07ff).ram();                  // U37
+	map(0x2000, 0x27ff).ram().share("dispram"); // U17
 	map(0x4000, 0x4001).rw(m_uart[1], FUNC(i8251_device::read), FUNC(i8251_device::write));
-	map(0x6000, 0x67ff).ram().share("fontram");
+	map(0x6000, 0x67ff).ram().share("fontram"); // U12
 	map(0x8000, 0x8001).rw(m_uart[0], FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0x8800, 0x8800).rw(m_crtc, FUNC(r6545_1_device::status_r), FUNC(r6545_1_device::address_w));
 	map(0x8801, 0x8801).rw(m_crtc, FUNC(r6545_1_device::register_r), FUNC(r6545_1_device::register_w));
@@ -183,9 +276,10 @@ void z22_state::z22(machine_config &config)
 	pit.out_handler<2>().set(m_uart[0], FUNC(i8251_device::write_txc)); // or the other way around?
 	pit.out_handler<2>().append(m_uart[1], FUNC(i8251_device::write_txc));
 
-	// TODO: Keyboard (asynchronous serial, like Z-49?)
+	Z22_KEYBOARD(config, m_keyboard);
+	m_keyboard->txd_handler().set(FUNC(z22_state::kbd_data_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::amber());
 	screen.set_raw(16.5888_MHz_XTAL, 873, 0, 720, 317, 0, 300);
 	screen.set_screen_update(m_crtc, FUNC(r6545_1_device::screen_update));
@@ -197,15 +291,21 @@ void z22_state::z22(machine_config &config)
 	m_crtc->set_update_row_callback(FUNC(z22_state::update_row));
 	m_crtc->set_on_update_addr_change_callback(FUNC(z22_state::update_cb));
 
-	// TODO: onboard buzzer
+	config.set_default_layout(layout_z22);
 
-	rs232_port_device &comm(RS232_PORT(config, "comm", default_rs232_devices, nullptr));
+	// BZ1 is a self-oscillating piezo buzzer; the frequency is a guess
+	SPEAKER(config, "mono").front_center();
+	BEEP(config, m_beep, 2000).add_route(ALL_OUTPUTS, "mono", 0.50);
+
+	rs232_port_device &comm(RS232_PORT(config, "comm", default_rs232_devices, "loopback"));
 	comm.rxd_handler().set(m_uart[0], FUNC(i8251_device::write_rxd));
 	comm.dsr_handler().set(m_uart[0], FUNC(i8251_device::write_dsr));
-	comm.cts_handler().set(m_uart[0], FUNC(i8251_device::write_cts));
+	comm.cts_handler().set(FUNC(z22_state::comm_cts_w));
+	comm.dcd_handler().set(FUNC(z22_state::comm_dcd_w));
 
 	rs232_port_device &printer(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	printer.dsr_handler().set(m_uart[1], FUNC(i8251_device::write_dsr));
+	printer.cts_handler().set(FUNC(z22_state::printer_busy_w));
 }
 
 
@@ -218,4 +318,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST(1984, z22, 0, 0, z22, z22, z22_state, empty_init, "Zenith Data Systems", "Z-22 Terminal", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+SYST(1984, z22, 0, 0, z22, z22, z22_state, empty_init, "Zenith Data Systems", "Z-22 Terminal", MACHINE_IMPERFECT_SOUND)

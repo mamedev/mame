@@ -153,15 +153,16 @@ void dotrikun_state::color_w(uint8_t data)
 
 uint32_t dotrikun_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			// vram fetch
 			if ((x & 7) == 0)
 				m_vram_latch = m_vram[x >> 3 | y >> 1 << 4];
 
-			bitmap.pix(y, x) = (m_vram_latch >> (~x & 7) & 1) ? m_color & 7 : m_color >> 3;
+			dst[x] = BIT(m_vram_latch, ~x & 7) ? (m_color & 7) : (m_color >> 3);
 		}
 	}
 
@@ -238,7 +239,7 @@ void dotrikun_state::dotrikun(machine_config &config)
 	TIMER(config, m_interrupt_timer).configure_generic(FUNC(dotrikun_state::interrupt));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK, 128+128, 0, 128, 192+64, 0, 192);
 	m_screen->set_physical_aspect(1, 1); // large border area
 	m_screen->set_screen_update(FUNC(dotrikun_state::screen_update));

@@ -16,7 +16,6 @@
 #define LOG_RX     (1U << 3)
 #define VERBOSE    (0)
 
-#define LOG_OUTPUT_FUNC device().logerror
 #include "logmacro.h"
 
 device_serial_interface::device_serial_interface(const machine_config &mconfig, device_t &device) :
@@ -380,6 +379,7 @@ void device_serial_interface::transmit_register_add_bit(int bit)
 void device_serial_interface::transmit_register_setup(u8 data_byte)
 {
 	u8 transmit_data;
+	u8 const framed_data = data_byte & (0xffU >> (8 - m_df_word_length));
 
 	if (m_tra_clock && !m_tra_rate.is_never())
 		m_tra_clock->adjust(m_tra_rate, 0, m_tra_rate);
@@ -414,10 +414,10 @@ void device_serial_interface::transmit_register_setup(u8 data_byte)
 			// get parity
 			// if parity[0] = 0, data has even parity - i.e. there is an even number of one bits in the data
 			// if parity[0] = 1, data has odd parity - i.e. there is an odd number of one bits in the data
-			parity = BIT(std::popcount(data_byte), 0) ^ 1;
+			parity = BIT(std::popcount(framed_data), 0) ^ 1;
 			break;
 		case PARITY_EVEN:
-			parity = BIT(std::popcount(data_byte), 0);
+			parity = BIT(std::popcount(framed_data), 0);
 			break;
 		case PARITY_MARK:
 			parity = 1;

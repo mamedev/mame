@@ -82,6 +82,8 @@ public:
 	virtual void control_write(uint8_t data) override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
+	std::tuple<bool, bool, uint8_t *, uint8_t, uint8_t, uint8_t> render();
+
 protected:
 	// device-level overrides
 	virtual void device_resolve_objects() override ATTR_COLD;

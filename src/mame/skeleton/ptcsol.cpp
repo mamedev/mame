@@ -603,7 +603,7 @@ void sol20_state::machine_reset()
 	m_rs232->write_rts(1);
 
 	int lines = BIT(m_iop_config->read(), 2) ? 260 : 312;
-	m_screen->configure(918, lines, m_screen->visible_area(), attotime::from_ticks(918 * lines, 14.318181_MHz_XTAL).as_attoseconds());
+	m_screen->configure(918, lines, m_screen->visible_area(), attotime::from_ticks(918 * lines, 14.318181_MHz_XTAL));
 
 	// set CPU speed (TODO: also present on bus pin 49)
 	double freq = (14.318181_MHz_XTAL / (4 + ((m_iop_config->read() >> 3) & 3))).dvalue();
@@ -738,7 +738,7 @@ void sol20_state::sol20(machine_config &config)
 	m_maincpu->out_inte_func().set("speaker", FUNC(speaker_sound_device::level_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL, 918, 0, 576, 260, 0, 208);
 	m_screen->set_screen_update(FUNC(sol20_state::screen_update));
 	m_screen->set_palette("palette");

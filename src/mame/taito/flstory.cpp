@@ -1148,7 +1148,7 @@ void flstory_state::common(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(8_MHz_XTAL, 510, 0, 256, 262, 2*8, 30*8); // derived from ladyfrog.cpp, guess
 	screen.set_screen_update(FUNC(flstory_state::screen_update_flstory));
 	screen.set_palette(m_palette);

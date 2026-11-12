@@ -29,11 +29,15 @@ konppc_device::konppc_device(const machine_config &mconfig, const char *tag, dev
 	: device_t(mconfig, KONPPC, tag, owner, clock)
 	, m_dsp(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 	, m_k033906(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
-	, m_voodoo(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 	, m_texture_bank(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	//, m_cgboard_id(MAX_CG_BOARDS)
+	, m_cgboard_id(0)
 	, m_cgboard_type(0)
 	, m_num_cgboards(0)
-	//, m_cgboard_id(MAX_CG_BOARDS)
+	, m_nwk_fifo_half_full_r(0)
+	, m_nwk_fifo_half_full_w(0)
+	, m_nwk_fifo_full(0)
+	, m_nwk_fifo_mask(0)
 {
 }
 
@@ -100,7 +104,7 @@ void konppc_device::set_cgboard_id(int board_id)
 	}
 }
 
-int konppc_device::get_cgboard_id(void)
+int konppc_device::get_cgboard_id()
 {
 	if (m_cgboard_id > (m_num_cgboards - 1))
 	{
@@ -361,22 +365,22 @@ void konppc_device::nwk_fifo_w(int board, uint32_t data)
 
 /* Konami K033906 PCI bridge (most emulation is now in src/devices/machine/k033906.cpp ) */
 
-uint32_t konppc_device::k033906_r(int board, offs_t offset)
+uint32_t konppc_device::k033906_r(int board, offs_t offset, uint32_t mem_mask)
 {
 	if (BIT(m_nwk_device_sel[board], 0))
 		return nwk_fifo_r(board);
 	else
-		return m_k033906[board]->read(offset);
+		return m_k033906[board]->read(offset, mem_mask);
 }
 
-void konppc_device::k033906_w(int board, offs_t offset, uint32_t data)
+void konppc_device::k033906_w(int board, offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	m_k033906[board]->write(offset, data);
+	m_k033906[board]->write(offset, data, mem_mask);
 }
 
 /*****************************************************************************/
 
-uint32_t konppc_device::voodoo_r(int board, offs_t offset)
+uint32_t konppc_device::voodoo_r(int board, offs_t offset, uint32_t mem_mask)
 {
 	if ((m_nwk_device_sel[board] == 0x4) && offset >= 0x100000 && offset < 0x200000)
 	{
@@ -384,7 +388,7 @@ uint32_t konppc_device::voodoo_r(int board, offs_t offset)
 	}
 	else
 	{
-		return m_voodoo[board]->read(offset);
+		return m_k033906[board]->memory_r(offset, mem_mask);
 	}
 }
 
@@ -401,7 +405,7 @@ void konppc_device::voodoo_w(int board, offs_t offset, uint32_t data, uint32_t m
 	}
 	else
 	{
-		m_voodoo[board]->write(offset, data, mem_mask);
+		m_k033906[board]->memory_w(offset, data, mem_mask);
 	}
 }
 
@@ -418,6 +422,6 @@ void konppc_device::voodoo_fifo_w(int board, offs_t offset, uint32_t data, uint3
 	}
 	else
 	{
-		m_voodoo[board]->write(offset ^ 0x80000, data, mem_mask);
+		m_k033906[board]->memory_w(offset ^ 0x80000, data, mem_mask);
 	}
 }

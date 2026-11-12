@@ -55,7 +55,7 @@ void rbv_device::map(address_map &map)
 
 void rbv_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(30.24_MHz_XTAL, 864, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(rbv_device::screen_update));
 	m_screen->screen_vblank().set(m_pseudovia, FUNC(pseudovia_device::slot_irq_w<0x40>));
@@ -122,14 +122,14 @@ void rbv_device::device_reset()
 			m_hres = 640;
 			m_vres = 870;
 			m_monochrome = true;
-			m_screen->configure(832, 918, rectangle(0, 639, 0, 869), HZ_TO_ATTOSECONDS(57.2832_MHz_XTAL / (832 * 918)));
+			m_screen->configure(832, 918, rectangle(0, 639, 0, 869), attotime::from_ticks(832 * 918, 57.2832_MHz_XTAL));
 			break;
 
 		case 2: // 12" RGB
 			m_hres = 512;
 			m_vres = 384;
 			m_monochrome = false;
-			m_screen->configure(640, 407, rectangle(0, 511, 0, 383), HZ_TO_ATTOSECONDS(double(clock()) / (2 * 640 * 407)));
+			m_screen->configure(640, 407, rectangle(0, 511, 0, 383), attotime::from_ticks(2 * 640 * 407, clock()));
 			break;
 
 		case 6: // 13" RGB
@@ -137,7 +137,7 @@ void rbv_device::device_reset()
 			m_hres = 640;
 			m_vres = 480;
 			m_monochrome = false;
-			m_screen->configure(864, 525, rectangle(0, 639, 0, 479), HZ_TO_ATTOSECONDS(30.24_MHz_XTAL / (864 * 525)));
+			m_screen->configure(864, 525, rectangle(0, 639, 0, 479), attotime::from_ticks(864 * 525, 30.24_MHz_XTAL));
 			break;
 		}
 		m_configured = true;
@@ -156,10 +156,10 @@ TIMER_CALLBACK_MEMBER(rbv_device::mac_6015_tick)
 	write_6015(ASSERT_LINE);
 }
 
-template <u8 mask>
+template <u8 Mask>
 void rbv_device::slot_irq_w(int state)
 {
-	m_pseudovia->slot_irq_w<mask>(state);
+	m_pseudovia->slot_irq_w<Mask>(state);
 }
 
 template void rbv_device::slot_irq_w<0x40>(int state);

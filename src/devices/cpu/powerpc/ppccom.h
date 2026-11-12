@@ -31,8 +31,9 @@
     CONSTANTS
 ***************************************************************************/
 
-// size of the execution code cache
-#define CACHE_SIZE                      (32 * 1024 * 1024)
+// Size of the DRC's code cache.  Mac OS 9's idle working set alone is
+// over 32MiB of compiled code, so at 32MiB of cache the DRC was thrashing.
+#define CACHE_SIZE                      (128 * 1024 * 1024)
 
 // compilation boundaries -- how far back/forward does the analysis extend?
 #define COMPILE_BACKWARDS_BYTES         128
@@ -45,13 +46,14 @@
 #define POWERPC_MIN_PAGE_SHIFT      12
 #define POWERPC_MIN_PAGE_SIZE       (1 << POWERPC_MIN_PAGE_SHIFT)
 #define POWERPC_MIN_PAGE_MASK       (POWERPC_MIN_PAGE_SIZE - 1)
-#define POWERPC_TLB_ENTRIES         128
+// The vTLB is a cache and misses are not free.  128 entries cover only 512K of
+// address space, which is OK for ROM-based arcade games but shows itself quickly
+// otherwise.  4096 entries was measured to reduce Mac OS 8.1 on the pwrmacg3
+// driver from ~160K mismatches/second to none, and is zero-cost otherwise.
+// Note that the vTLB is *NOT* the architectural TLB; it is a cache used by the DRC.
+// PPC603_FIXED_TLB_ENTRIES is the architectural TLB size.
+#define POWERPC_TLB_ENTRIES         4096
 #define PPC603_FIXED_TLB_ENTRIES    128
-
-
-// cycle parameters
-#define POWERPC_COUNT_READ_TBL      100
-#define POWERPC_COUNT_READ_DEC      100
 
 
 // internal capabilities flags
@@ -348,6 +350,9 @@ enum
 // Machine State Register bits - 603
 #define MSR603_TGPR         0x00020000  /* Temporary GPR Remapping */
 
+// Checkstop Sources and Enables Register bits - 601
+#define SPR601_HID0_LM      0x00000008  /* Little Endian */
+
 // ESA Save and Restore Register bits - 602
 #define SPR602_ESASRR_EE    0x00000001  /* External Interrupt Enable */
 #define SPR602_ESASRR_SA    0x00000002  /* Supervisor access mode */
@@ -364,6 +369,12 @@ enum
 #define DSISR_NO_SEGMENT    0x00200000      /* DSI: no segment match found (64-bit only) */
 #define DSISR_INVALID_ECWX  0x00100000      /* DSI: ECIWX or ECOWX used with EAR[E] = 0 */
 #define DSISR_INSTRUCTION   0x000fffff      /* align: instruction decoding bits FIXME: mask/shift depends on addressing mode */
+#define DSISR_NOEXEC        0x10000000      /* ISI only: fetch from a no-execute segment (SRR1[3]) */
+
+// extra VTLB entry bits used by the 603 software-loaded TLBs (bits 8-11 of an entry are free)
+#define VTLB_603_CHANGED    0x00000100      /* The PTE's C bit was set when the entry was loaded */
+#define VTLB_603_ITLB       0x00000200      /* The entry was loaded into the instruction TLB by tlbli */
+#define VTLB_603_DTLB       0x00000400      /* The entry was loaded into the data TLB by tlbld */
 
 
 // PowerPC 4XX IRQ bits

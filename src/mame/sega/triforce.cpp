@@ -605,7 +605,7 @@ void triforce_state::triforce_base(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);

@@ -13,20 +13,22 @@ References:
 - http://ookumaneko.s1005.xrea.com/pcibios.htm (Ra266 PCI Config Space at the end)
 
 TODO (pc9821):
-- non-fatal "cache error" at POST for all machines listed here;
-- undumped IDE ROM, kludged to work;
+- non-fatal "cache error" at POST for all machines listed here (I/O $43d bit 2 reads);
+- partial dump, has undumped IDE ROM and no setup bank, kludged to work;
 - further state machine breakdowns;
 
 TODO (pc9821ap2):
-- To enter SETUP mode, unmap F3 or move MAME soft reset out of F3 then hold HELP key.
+- To enter setup mode, unmap F3 or move MAME soft reset out of F3 then hold HELP key.
 \- alternative: bp 0xf8a32,1,{esi|=40;g} to simulate holding HELP key at power-on/reset;
 - Unimplemented 15MB memory hole mark for Windows NT
 \- cfr. io_wab.txt, interfaces with VGA core thru local bus via address-data ports at $fa2-3
 
 TODO (pc9821as):
-- unimplemented SDIP specific access;
-- "SYSTEM SHUTDOWN" while accessing above;
-- Update: it never goes into above after default of m_dma_access_ctrl changed to 0xfe?
+- keeps throwing "SET THE SOFTWARE DIP-SWITCH" at every start, discarding external SDIP contents;
+- HELP key doesn't get recognized at boot, keyboard sends an 0xff when key held PC=f8918
+  (need to mash the key until it finally kicks in, has an incredibly narrow acceptance window);
+- derive pc9821ce style sound PnP access (doesn't access the EEPROM addresses);
+- turbocpp: throws a color mess with the editor (ext SDIP setting misbehaving?)
 
 TODO (pc9821ce):
 - Throws random TIMER errors at POST (soft reset to bypass);
@@ -57,7 +59,7 @@ TODO (pc9821ra20/pc9821ra266/pc9821ra333):
 - "MICON ERROR" at POST (processor microcode detection fails, basically down to a more
   involved bankswitch with Pentium based machines);
 
-TODO: (pc9821nr15/pc9821nr166/pc9821nw150)
+TODO (pc9821nr15/pc9821nr166/pc9821nw150):
 - Keeps looping on SET THE SOFTWARE DIP (wants extended UPD4993A mode?)
 - Tests conventional RAM then keeps polling $03c4 (should be base VGA regs read);
 - Skipping that will eventually error out with a "MEMORY ERROR" (never reads extended memory);
@@ -79,7 +81,7 @@ TODO: (pc9821nr15/pc9821nr166/pc9821nw150)
 
 uint32_t pc9821_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(m_palette->black_pen(), cliprect);
+	bitmap.fill(m_palette->pen(0), cliprect);
 
 	if(m_video_ff[DISPLAY_REG] != 0)
 	{
@@ -585,6 +587,7 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 			m_pegc.regs[4 + offset] = data;
 		})
 	);
+//  map(0x120, 0x19f) pattern register (relates to bit 15 of $108)
 	map(0x120, 0x19f).lrw32(
 		NAME([this] (offs_t offset, u32 mem_mask) -> u32 {
 			u16 rop = m_pegc.regs[0x08] | (m_pegc.regs[0x09] << 8);
@@ -640,7 +643,6 @@ void pc9821_state::pegc_mmio_map(address_map &map)
 			}
 		})
 	);
-//  map(0x120, 0x19f) pattern register (image_xfer? relates to bit 15 of $108)
 }
 
 // make sure the latch read doesn't occur mid cycle, 8253 needs this?
@@ -648,7 +650,6 @@ void pc9821_state::pit_latch_delay(offs_t offset, uint8_t data)
 {
 	if((offset == 3) && !(data & 0x30))
 	{
-
 		m_pit_delay->adjust(attotime::from_hz(MAIN_CLOCK_X1/2));
 		m_maincpu->spin_until_time(attotime::from_hz(MAIN_CLOCK_X1/2));
 		m_maincpu->abort_timeslice();
@@ -677,6 +678,7 @@ void pc9821_state::pc9821_map(address_map &map)
 	map(0x000e8000, 0x000fffff).m(m_ipl, FUNC(address_map_bank_device::amap16));
 
 	map(0x00100000, 0x00efffff).rw("simm", FUNC(pc9801_61_simm_device::read_ext), FUNC(pc9801_61_simm_device::write_ext));
+	map(0x00f00000, 0x00f7ffff).rw("cbus", FUNC(pc98_cbus_root_device::mem_15m_r), FUNC(pc98_cbus_root_device::mem_15m_w));
 	map(0x00f00000, 0xffffffff).view(m_pegc_vram_view);
 	m_pegc_vram_view[0](0x00f00000, 0x00f7ffff).ram().share("ext_gvram");
 	m_pegc_vram_view[0](0xfff00000, 0xfff7ffff).ram().share("ext_gvram");
@@ -754,7 +756,7 @@ void pc9821_state::pc9821_io(address_map &map)
 //  map(0x0cc0, 0x0cc7) SCSI interface / <undefined>
 //  map(0x0cfc, 0x0cff) PCI bus
 	map(0x1e8c, 0x1e8f).noprw(); // TODO: IDE RAM switch
-	map(0x2ed0, 0x2edf).lr8(NAME([] (address_space &s, offs_t o, u8 mm) { return 0xff; })).umask32(0xffffffff); // unknown sound related
+//  map(0x2*d2, 0x2*d2) default SB16 host access
 	map(0x3fd8, 0x3fdf).r(m_pit, FUNC(pit8253_device::read)).umask16(0xff00);
 	map(0x3fd8, 0x3fdf).w(FUNC(pc9821_state::pit_latch_delay)).umask16(0xff00);
 //  map(0x7fd8, 0x7fdf).rw(m_ppi_mouse, FUNC(i8255_device::read), FUNC(i8255_device::write)).umask32(0xff00ff00);
@@ -782,33 +784,6 @@ void pc9821_state::pc9821_io(address_map &map)
 /*
  * 98MATE A overrides
  */
-// TODO: SDIP extended access for 9821Ap, As, Ae
-// Undocumented, it never r/w the conventional ports, at least on POST.
-// I also suspect a few ports here not being direct RAM r/w but actual regs instead.
-// 0xf834f: checks against aa55, throws "ROM SUM ERROR" if bypassed
-// 0xf8363: sum8 contents of [0x02], 10 times (???)
-u8 pc9821_mate_a_state::ext_sdip_data_r(offs_t offset)
-{
-	logerror("%s: EXT SDIP access read %02x %02x\n", machine().describe_context(), m_ext_sdip_addr, m_ext_sdip[m_ext_sdip_addr]);
-	return m_ext_sdip[m_ext_sdip_addr];
-}
-
-void pc9821_mate_a_state::ext_sdip_data_w(offs_t offset, u8 data)
-{
-	logerror("%s: EXT SDIP access write [%02x] -> %02x\n", machine().describe_context(), m_ext_sdip_addr, data);
-
-	m_ext_sdip[m_ext_sdip_addr] = data;
-}
-
-void pc9821_mate_a_state::ext_sdip_access_w(offs_t offset, u8 data)
-{
-	// access enable?
-}
-
-void pc9821_mate_a_state::ext_sdip_address_w(offs_t offset, uint8_t data)
-{
-	m_ext_sdip_addr = data;
-}
 
 void pc9821_mate_a_state::itf_43d_bank_w(offs_t offset, uint8_t data)
 {
@@ -838,6 +813,28 @@ void pc9821_mate_a_state::cbus_43f_bank_w(offs_t offset, uint8_t data)
 	pc9801vm_state::cbus_43f_bank_w(offset, data);
 }
 
+// pc9821ap2 (at very least) plonks in some sort of SRAM in the unused gaiji area
+uint8_t pc9821_mate_a_state::kanji_r(offs_t offset)
+{
+	if (offset >= 0xad000 && offset <= 0xadfff)
+		return m_nvram_ptr[offset - 0xad000];
+
+	if (offset >= 0xaf000 && offset <= 0xaffff)
+		return m_nvram_ptr[offset - 0xae000];
+
+	return pc9821_state::kanji_r(offset);
+}
+
+void pc9821_mate_a_state::kanji_w(offs_t offset, uint8_t data)
+{
+	if (offset >= 0xad000 && offset <= 0xadfff)
+		m_nvram_ptr[offset - 0xad000] = data;
+	else if (offset >= 0xaf000 && offset <= 0xaffff)
+		m_nvram_ptr[offset - 0xae000] = data;
+
+	pc9821_state::kanji_w(offset, data);
+}
+
 void pc9821_mate_a_state::pc9821as_map(address_map &map)
 {
 	pc9821_map(map);
@@ -852,9 +849,21 @@ void pc9821_mate_a_state::pc9821as_map(address_map &map)
 void pc9821_mate_a_state::pc9821as_io(address_map &map)
 {
 	pc9821_io(map);
-	map(0x0468, 0x0468).rw(FUNC(pc9821_mate_a_state::ext_sdip_data_r), FUNC(pc9821_mate_a_state::ext_sdip_data_w));
-	map(0x046a, 0x046a).w(FUNC(pc9821_mate_a_state::ext_sdip_access_w));
-	map(0x046c, 0x046c).w(FUNC(pc9821_mate_a_state::ext_sdip_address_w));
+	// Ap, As, Ae and Af maps CPU mode bit 7 here (1) High/Low (0) Middle
+	// Low selector is in $7fdd bit 2 (mouse PIO range) at least for As
+	map(0x00f0, 0x00f0).lr8(NAME([] () { return 0x80; }));
+	map(0x00f6, 0x00f6).lw8(NAME([this] (offs_t offset, u8 data) {
+		a20_ctrl_w(3, data);
+	}));
+
+	map(0x0468, 0x0468).rw("ext_sdip", FUNC(pc98_ext_sdip_device::data_r), FUNC(pc98_ext_sdip_device::data_w));
+	map(0x046a, 0x046a).w("ext_sdip", FUNC(pc98_ext_sdip_device::access_w));
+	map(0x046c, 0x046c).w("ext_sdip", FUNC(pc98_ext_sdip_device::address_w));
+
+	// disconnect regular SDIP access
+	// should really go through C-Bus but don't expect anything mapping there.
+	map(0x841c, 0x841f).select(0x300).unmaprw();
+	map(0x881c, 0x881f).select(0x700).unmaprw();
 	// TODO: specific MATE A local bus (overlays just like C-Bus?)
 }
 
@@ -1040,6 +1049,30 @@ static INPUT_PORTS_START( pc9821 )
 	PORT_CONFSETTING(    0x04, DEF_STR( No ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pc9821as )
+	PORT_INCLUDE( pc9821 )
+
+	PORT_MODIFY("DSW1")
+//	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )
+	PORT_BIT( 0x73, IP_ACTIVE_LOW, IPT_CUSTOM )
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM )
+
+	PORT_MODIFY("DSW3")
+	PORT_BIT( 0x23, IP_ACTIVE_LOW, IPT_CUSTOM ) //PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw3_r))
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pc9821ap2 )
+	PORT_INCLUDE( pc9821 )
+
+	PORT_MODIFY("DSW2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw2_r))
+
+//  PORT_MODIFY("DSW3")
+//  PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("sdip", FUNC(pc98_sdip_device::dsw3_r))
+INPUT_PORTS_END
+
 // works better without the SDIP hack
 static INPUT_PORTS_START( pc9821ce )
 	PORT_INCLUDE( pc9821 )
@@ -1076,10 +1109,19 @@ MACHINE_START_MEMBER(pc9821_state,pc9821)
 	// ...
 }
 
+void pc9821_mate_a_state::sram_init()
+{
+	const u32 nvram_size = 0x2000;
+
+	m_nvram_ptr = std::make_unique<uint8_t[]>(nvram_size);
+	m_nvram->set_base(m_nvram_ptr.get(), nvram_size);
+}
+
 MACHINE_START_MEMBER(pc9821_mate_a_state,pc9821ap2)
 {
 	MACHINE_START_CALL_MEMBER(pc9821);
 
+	sram_init();
 	// ...
 }
 
@@ -1131,7 +1173,7 @@ void pc9821_state::pc9821(machine_config &config)
 	m_pit->set_clk<1>(MAIN_CLOCK_X2);
 	m_pit->set_clk<2>(MAIN_CLOCK_X2);
 
-	// FIXME: set clock to SCKL1 clock frequency
+	// FIXME: set clock to SCLK1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, "pc9801_86");
 
 	MCFG_MACHINE_START_OVERRIDE(pc9821_state, pc9821)
@@ -1139,7 +1181,7 @@ void pc9821_state::pc9821(machine_config &config)
 
 	m_dmac->set_clock(xtal); // unknown clock
 
-	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::pc9801_palette), 16 + 16 + 256);
+	PALETTE(config.replace(), m_palette, FUNC(pc9821_state::palette_init), 16 + 16 + 256);
 
 	// win95 expects to be A revision, otherwise it will overlay startup text prompts over desktop GFX
 	// NOTE: possibly this bump happened around PC-9801BX series
@@ -1176,10 +1218,20 @@ void pc9821_mate_a_state::pc9821as(machine_config &config)
 	MCFG_MACHINE_START_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 	MCFG_MACHINE_RESET_OVERRIDE(pc9821_mate_a_state, pc9821ap2)
 
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+
 	// RAM 3.6 MB ~ 14.6 MB
 	PC9801_61_SIMM(config.replace(), "simm", pc9821_simm_options, "4mb");
 //  m_ram->set_default_size("4M");
 //  m_ram->set_extra_options("8M,14M,15M");
+
+	// FIXME: set clock to SCLK1 clock frequency
+	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
+	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821ce", true);
+
+	config.device_remove("sdip");
+	PC98_EXT_SDIP(config, "ext_sdip");
+
 }
 
 void pc9821_mate_a_state::pc9821ap2(machine_config &config)
@@ -1204,6 +1256,8 @@ void pc9821_mate_a_state::pc9821ap2(machine_config &config)
 //  m_ram->set_default_size("4M");
 //  m_ram->set_extra_options("8M,14M,32M,64M,72M,74M");
 
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_1);
+
 	// 340MB HD
 	// Expansion slot C-BUS4 (4)
 	// Graphics controller S3 86C928
@@ -1225,7 +1279,7 @@ void pc9821_canbe_state::pc9821ce(machine_config &config)
 //  m_ram->set_extra_options("6M,8M,14M,15M");
 
 	// pc9801-86 (built-in)
-	// FIXME: set clock to SCKL1 clock frequency
+	// FIXME: set clock to SCLK1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821ce", true);
 
@@ -1254,7 +1308,7 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	//pit_clock_config(config, xtal / 4); // unknown, fixes timer error at POST
 
 //  m_cbus[0]->set_default_option(nullptr);
-	// FIXME: set clock to SCKL1 clock frequency
+	// FIXME: set clock to SCLK1 clock frequency
 	PC98_CBUS_SLOT(config.replace(), "cbus:0", 0, "cbus", pc98_cbus_devices, nullptr);
 	PC98_CBUS_SLOT(config, "cbus:mb1", 0, "cbus", pc98_cbus_devices, "sound_pc9821cx3", true);
 
@@ -1272,11 +1326,29 @@ void pc9821_canbe_state::pc9821cx3(machine_config &config)
 	// file bay with built-in CD-Rom (4x)
 	// HDD with pre-installed software (850MB, 1.2GB)
 
-	// C-Bus x 3
+	// "general purpose slot" x 3, 1 fitted (all C-Bus apparently, so no PCI slot)
 	// PC-9821CB-B04, on dedicated bus (Fax/Modem 14'400 bps) and IrDA board (115'200 bps)
 	// Optional PC-9821C3-B02 MIDI board, on dedicated bus
+
+	// TODO: config space not really provided, assume same as 3rd gen PCI
+	// Inited with 00 -> 06 -> 07 -> 05 order, which would match this arrangement
 	PCI_ROOT(config, "pci");
-	// ...
+//  WILDCAT_HOST(config, "pci:00.0", 0, "maincpu", 128*1024*1024);
+	// set_ids_host(0x10040007, xx, 0x00000000);
+
+	// 内蔵ｱｸｾﾗﾚｰﾀﾌﾞﾘｯﾁﾞ / built-in accelerator bridge according to undocumented mem
+//  PC98_VLBRIDGE(config, "pci:05.0", 0);
+	// set_ids(0x10330016, xx, 0x068000 or 0x030002, 0x10330016);
+
+	// Cバスブリッヂ
+//  PC98_CBUS_BRIDGE(config, "pci:06.0", 0);
+	// set_ids(0x10330001, xx, 0x068000, 0x10330001);
+
+	// 98ｸﾞﾗﾌｨｯｸｽ
+//  PC98_COREGRAPH(config, "pci:07.0", 0);
+	// set_ids(0x10330009, xx, 0x038000, 0x10330009);
+
+	// PCI slot(s) starts at 0xb
 }
 
 //void pc9821_mate_x_state::pc9821xs(machine_config &config)
@@ -1338,6 +1410,7 @@ void pc9821_mate_x_state::pc9821xv13(machine_config &config)
 
 	// Xv13/W identical to Xa16/W specs with MGA-2064W as PCI GFX card
 	// PCI rev 2.0 (VLSI Supercore596 Wildcat) or 2.1 (Intel 430HX)
+	// assume same as 3rd gen PCI specs
 	PCI_ROOT(config, "pci");
 	// ...
 }
@@ -1521,7 +1594,7 @@ void pc9821_note_lavie_state::pc9821nw150(machine_config &config)
 
 TODO: should access SDIP from $00f6, most likely a partial A Mate dump instead
 
-Retire not done because we depend on this.
+Retire not yet done because we depend on this as a base for this driver.
 
 */
 
@@ -1550,15 +1623,20 @@ ROM_START( pc9821as )
 	ROM_REGION( 0x80000, "biosrom", ROMREGION_ERASEFF )
 //  ROM_LOAD( "itf.rom",     0x10000, 0x08000, BAD_DUMP CRC(dd4c7bb8) SHA1(cf3aa193df2722899066246bccbed03f2e79a74a) )
 //  ROM_LOAD( "bios_as.rom", 0x18000, 0x18000, BAD_DUMP CRC(0a682b93) SHA1(76a7360502fa0296ea93b4c537174610a834d367) )
-	ROM_LOAD( "mvs0100-1.bin", 0x00000, 0x80000, CRC(ca37b631) SHA1(8c481dd0608d6c27235bc88bd77e345628dc28a1) )
+	ROM_SYSTEM_BIOS(0, "nec", "MVS0100-1 (original)")
+	ROMX_LOAD( "mvs0100-1.bin", 0x00000, 0x80000, CRC(ca37b631) SHA1(8c481dd0608d6c27235bc88bd77e345628dc28a1), ROM_BIOS(0) )
+	// common QoL DIY patch: s1005 IDE + sampson English translated setup menu patches
+	// http://ookumaneko.s1005.xrea.com/d27c4000.htm
+	ROM_SYSTEM_BIOS(1, "diy",  "MVS0100-1 (DIY IDE & English Setup menu)")
+	ROMX_LOAD( "mvs0100-1-ide-t-en.bin", 0x00000, 0x80000, CRC(66520e3b) SHA1(fd073bd2749559d95d38539e4f9b034472bf10ae), ROM_BIOS(1) )
 
 	ROM_REGION16_LE( 0x30000, "ipl", ROMREGION_ERASEFF )
 	// 0x00000-0x04fff KBCRT X47 891105
 	// 0x0c000-0x0ffff sound BIOS
 	// 0x10000-0x13fff ^ mirror
 	// 0x14000-0x16fff <unknown>
-	// 0x17000-0x17fff SCSI disk BIOS?
-	// 0x18000-0x19fff <unknown>
+	// 0x17000-0x17fff SCSI disk BIOS? does a $dc000 copy like -55 based cards
+	// 0x18000-0x19fff IDE BIOS
 	// 0x1a000-0x1ffff setup menu
 	ROM_COPY( "biosrom", 0x20000, 0x10000, 0x08000 ) // ITF
 	ROM_COPY( "biosrom", 0x28000, 0x18000, 0x18000 ) // BIOS
@@ -1567,8 +1645,13 @@ ROM_START( pc9821as )
 	ROM_REGION( 0x80000, "chargen", 0 )
 	ROM_LOAD( "font_as.rom",     0x000000, 0x046800, BAD_DUMP CRC(456d9fc7) SHA1(78ba9960f135372825ab7244b5e4e73a810002ff) )
 
+	ROM_REGION( 0x4000, "cbus:mb1:sound_pc9821ce:bios", ROMREGION_ERASE00 )
+	ROM_COPY( "biosrom", 0x0c000, 0x00000, 0x04000 )
+
 	LOAD_KANJI_ROMS(ROMREGION_ERASEFF)
-	LOAD_IDE_ROM
+
+	ROM_REGION( 0x4000, "ide", ROMREGION_ERASEVAL(0xcb) )
+	ROM_COPY( "biosrom", 0x18000, 0x00000, 0x02000 )
 ROM_END
 
 /*
@@ -1991,8 +2074,8 @@ ROM_END
 COMP( 1992, pc9821,      0,          0, pc9821,        pc9821,    pc9821_state,        init_pc9801_kanji,   "NEC",   "PC-9821 (98MULTi)",             MACHINE_NOT_WORKING )
 
 // 98MATE [A] (i486, desktop, has 98 MATE local bus "ML", with optional RL-like high-reso)
-COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING )
-COMP( 1993, pc9821ap2,   pc9821as,   0, pc9821ap2,     pc9821,    pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     0 )
+COMP( 1993, pc9821as,    0,          0, pc9821as,      pc9821as,  pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821As (98MATE A)",          MACHINE_NOT_WORKING )
+COMP( 1993, pc9821ap2,   0,          0, pc9821ap2,     pc9821ap2, pc9821_mate_a_state, init_pc9801_kanji,   "NEC",   "PC-9821Ap2/U8W (98MATE A)",     0 )
 
 // SC-9821A (rebranded MATE A machines with minor differences such as SW power control)
 // ...

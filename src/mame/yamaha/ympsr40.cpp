@@ -2,7 +2,7 @@
 // copyright-holders:AJR
 /*******************************************************************************
 
-    Skeleton driver for Yamaha PSR-40 PortaSound keyboard.
+    Skeleton driver for Yamaha PSR-40 PortaTone keyboard.
 
 *******************************************************************************/
 
@@ -61,4 +61,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1985, psr40, 0, 0, psr40, psr40, yamaha_psr40_state, empty_init, "Yamaha", "PSR-40", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+SYST(1985, psr40, 0, 0, psr40, psr40, yamaha_psr40_state, empty_init, "Yamaha", "PortaTone PSR-40", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

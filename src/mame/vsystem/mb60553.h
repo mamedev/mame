@@ -37,9 +37,10 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	// the horizontal pixel counter runs this many pixels ahead of the first visible pixel
+	static constexpr int PIXEL_OFFSET = 21;
 
-	void draw_roz_core(screen_device &screen, bitmap_ind16 &destbitmap, const rectangle &cliprect,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, bool wraparound);
+	void draw_line(bitmap_ind16 &destbitmap, int line, int min_x, int max_x, int32_t startx, int32_t starty, int32_t incxx, int32_t incxy);
 
 	void reg_written(int num_reg);
 	TILE_GET_INFO_MEMBER(get_tile_info);

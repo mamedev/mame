@@ -88,21 +88,21 @@ BSTR SysAllocString(const OLECHAR *s)
 void SysFreeString(BSTR bstr)
 {
   if (bstr)
-    FreeForBSTR((CBstrSizeType *)bstr - 1);
+    FreeForBSTR((CBstrSizeType *)(void *)bstr - 1);
 }
 
 UINT SysStringByteLen(BSTR bstr)
 {
   if (!bstr)
     return 0;
-  return *((CBstrSizeType *)bstr - 1);
+  return *((CBstrSizeType *)(void *)bstr - 1);
 }
 
 UINT SysStringLen(BSTR bstr)
 {
   if (!bstr)
     return 0;
-  return *((CBstrSizeType *)bstr - 1) / (UINT)sizeof(OLECHAR);
+  return *((CBstrSizeType *)(void *)bstr - 1) / (UINT)sizeof(OLECHAR);
 }
 
 

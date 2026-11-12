@@ -30,11 +30,14 @@
 #include "emu.h"
 #include "k054000.h"
 
-#define LIVE_HITBOX_VIEW 0
-#include <cstring>
+#include "multibyte.h"
 
-//#define VERBOSE 0
-//#include "logmacro.h"
+#define LOG_HITBOX (1 << 1)
+
+#define VERBOSE 0
+#include "logmacro.h"
+
+#include <cstring>
 
 
 DEFINE_DEVICE_TYPE(K054000, k054000_device, "k054000", "Konami 054000 Protection")
@@ -50,18 +53,18 @@ k054000_device::k054000_device(const machine_config &mconfig, const char *tag, d
 
 void k054000_device::device_start()
 {
-	save_item(NAME(m_raw_Acx));
-	save_item(NAME(m_raw_Acy));
-	save_item(NAME(m_raw_Bcx));
-	save_item(NAME(m_raw_Bcy));
-	save_item(NAME(m_Acx));
-	save_item(NAME(m_Acy));
-	save_item(NAME(m_Aax));
-	save_item(NAME(m_Aay));
-	save_item(NAME(m_Bcx));
-	save_item(NAME(m_Bcy));
-	save_item(NAME(m_Bax));
-	save_item(NAME(m_Bay));
+	save_item(NAME(m_raw_acx));
+	save_item(NAME(m_raw_acy));
+	save_item(NAME(m_raw_bcx));
+	save_item(NAME(m_raw_bcy));
+	save_item(NAME(m_acx));
+	save_item(NAME(m_acy));
+	save_item(NAME(m_aax));
+	save_item(NAME(m_aay));
+	save_item(NAME(m_bcx));
+	save_item(NAME(m_bcy));
+	save_item(NAME(m_bax));
+	save_item(NAME(m_bay));
 }
 
 //-------------------------------------------------
@@ -71,14 +74,14 @@ void k054000_device::device_start()
 void k054000_device::device_reset()
 {
 	// TODO: verify initial state (very unlikely to be all zeroes)
-	std::fill(std::begin(m_raw_Acx), std::end(m_raw_Acx), 0);
-	std::fill(std::begin(m_raw_Acy), std::end(m_raw_Acy), 0);
-	std::fill(std::begin(m_raw_Bcx), std::end(m_raw_Bcx), 0);
-	std::fill(std::begin(m_raw_Bcy), std::end(m_raw_Bcy), 0);
-	m_Aax = 1;
-	m_Aay = 1;
-	m_Bax = 1;
-	m_Bay = 1;
+	std::fill(std::begin(m_raw_acx), std::end(m_raw_acx), 0);
+	std::fill(std::begin(m_raw_acy), std::end(m_raw_acy), 0);
+	std::fill(std::begin(m_raw_bcx), std::end(m_raw_bcx), 0);
+	std::fill(std::begin(m_raw_bcy), std::end(m_raw_bcy), 0);
+	m_aax = 1;
+	m_aay = 1;
+	m_bax = 1;
+	m_bay = 1;
 }
 
 /*****************************************************************************
@@ -109,21 +112,21 @@ void k054000_device::map(address_map &map)
 {
 	map.unmap_value_low();
 	map(0x01, 0x04).w(FUNC(k054000_device::acx_w));
-	map(0x06, 0x06).lw8(NAME([this] (u8 data) { m_Aax = data; }));
-	map(0x07, 0x07).lw8(NAME([this] (u8 data) { m_Aay = data; }));
+	map(0x06, 0x06).lw8(NAME([this] (u8 data) { m_aax = data; }));
+	map(0x07, 0x07).lw8(NAME([this] (u8 data) { m_aay = data; }));
 	map(0x09, 0x0c).w(FUNC(k054000_device::acy_w));
 
-	map(0x0e, 0x0e).lw8(NAME([this] (u8 data) { m_Bax = data; }));
-	map(0x0f, 0x0f).lw8(NAME([this] (u8 data) { m_Bay = data; }));
+	map(0x0e, 0x0e).lw8(NAME([this] (u8 data) { m_bax = data; }));
+	map(0x0f, 0x0f).lw8(NAME([this] (u8 data) { m_bay = data; }));
 	map(0x11, 0x13).w(FUNC(k054000_device::bcy_w));
 	map(0x15, 0x17).w(FUNC(k054000_device::bcx_w));
 
 	map(0x18, 0x18).r(FUNC(k054000_device::status_r));
 }
 
-inline int k054000_device::convert_raw_to_result_delta(u8 *buf)
+inline s32 k054000_device::convert_raw_to_result_delta(u8 *buf)
 {
-	int res = (buf[0] << 16) | (buf[1] << 8) | buf[2];
+	s32 res = get_u24be(buf);
 
 	// Last value in the buffer is used as OTG correction in Vendetta
 	if (buf[3] & 0x80)
@@ -134,46 +137,41 @@ inline int k054000_device::convert_raw_to_result_delta(u8 *buf)
 	return res;
 }
 
-inline int k054000_device::convert_raw_to_result(u8 *buf)
-{
-	return (buf[0] << 16) | (buf[1] << 8) | buf[2];
-}
-
 void k054000_device::acx_w(offs_t offset, u8 data)
 {
-	m_raw_Acx[offset] = data;
-	m_Acx = convert_raw_to_result_delta(m_raw_Acx);
+	m_raw_acx[offset] = data;
+	m_acx = convert_raw_to_result_delta(m_raw_acx);
 }
 
 void k054000_device::acy_w(offs_t offset, u8 data)
 {
-	m_raw_Acy[offset] = data;
-	m_Acy = convert_raw_to_result_delta(m_raw_Acy);
+	m_raw_acy[offset] = data;
+	m_acy = convert_raw_to_result_delta(m_raw_acy);
 }
 
 void k054000_device::bcx_w(offs_t offset, u8 data)
 {
-	m_raw_Bcx[offset] = data;
-	m_Bcx = convert_raw_to_result(m_raw_Bcx);
+	m_raw_bcx[offset] = data;
+	m_bcx = get_u24be(m_raw_bcx);
 }
 
 void k054000_device::bcy_w(offs_t offset, u8 data)
 {
-	m_raw_Bcy[offset] = data;
-	m_Bcy = convert_raw_to_result(m_raw_Bcy);
+	m_raw_bcy[offset] = data;
+	m_bcy = get_u24be(m_raw_bcy);
 }
 
-u8 k054000_device::axis_check(u32 m_Ac, u32 m_Bc, u32 m_Aa, u32 m_Ba)
+u8 k054000_device::axis_check(u32 ac, u32 bc, u32 aa, u32 ba)
 {
 	u8 res = 0;
-	s32 sub = m_Ac - m_Bc;
+	const s32 sub = ac - bc;
 
 	// MSB check
 	if ((sub > 511) || (sub <= -1024))
 		res |= 1;
 
 	// LSB check
-	if ((abs(sub) & 0x1ff) > ((m_Aa + m_Ba) & 0x1ff))
+	if ((abs(sub) & 0x1ff) > ((aa + ba) & 0x1ff))
 		res |= 1;
 
 	return res;
@@ -183,11 +181,11 @@ u8 k054000_device::status_r()
 {
 	u8 res;
 
-	res = axis_check(m_Acx, m_Bcx, m_Aax, m_Bax);
-	res |= axis_check(m_Acy, m_Bcy, m_Aay, m_Bay);
+	res = axis_check(m_acx, m_bcx, m_aax, m_bax);
+	res |= axis_check(m_acy, m_bcy, m_aay, m_bay);
 
-	if (LIVE_HITBOX_VIEW)
-		logerror(print_hitbox_state(res));
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_HITBOX, print_hitbox_state(res));
 
 	return res;
 }
@@ -198,12 +196,12 @@ std::string k054000_device::print_hitbox_state(bool result)
 	std::ostringstream outbuffer;
 
 	util::stream_format(outbuffer, "%s collision check:\n", machine().describe_context());
-	util::stream_format(outbuffer, "ACX %02x%02x%02x%02x|", m_raw_Acx[0], m_raw_Acx[1], m_raw_Acx[2], m_raw_Acx[3]);
-	util::stream_format(outbuffer, "ACY %02x%02x%02x%02x|", m_raw_Acy[0], m_raw_Acy[1], m_raw_Acy[2], m_raw_Acy[3]);
-	util::stream_format(outbuffer, "AAX %02x AAY %02x\n", m_Aax, m_Aay);
-	util::stream_format(outbuffer, "BCX %02x%02x%02x%02x|", m_raw_Bcx[0], m_raw_Bcx[1], m_raw_Bcx[2], m_raw_Bcx[3]);
-	util::stream_format(outbuffer, "BCY %02x%02x%02x%02x|", m_raw_Bcy[0], m_raw_Bcy[1], m_raw_Bcy[2], m_raw_Bcy[3]);
-	util::stream_format(outbuffer, "BAX %02x BAY %02x\n", m_Bax, m_Bay);
+	util::stream_format(outbuffer, "ACX %02x%02x%02x%02x|", m_raw_acx[0], m_raw_acx[1], m_raw_acx[2], m_raw_acx[3]);
+	util::stream_format(outbuffer, "ACY %02x%02x%02x%02x|", m_raw_acy[0], m_raw_acy[1], m_raw_acy[2], m_raw_acy[3]);
+	util::stream_format(outbuffer, "AAX %02x AAY %02x\n", m_aax, m_aay);
+	util::stream_format(outbuffer, "BCX %02x%02x%02x%02x|", m_raw_bcx[0], m_raw_bcx[1], m_raw_bcx[2], m_raw_bcx[3]);
+	util::stream_format(outbuffer, "BCY %02x%02x%02x%02x|", m_raw_bcy[0], m_raw_bcy[1], m_raw_bcy[2], m_raw_bcy[3]);
+	util::stream_format(outbuffer, "BAX %02x BAY %02x\n", m_bax, m_bay);
 	util::stream_format(outbuffer, "Result: %d (%s)\n", result, result ? "no" : "yes");
 	util::stream_format(outbuffer, "===\n");
 

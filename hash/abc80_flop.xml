@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -131,7 +131,6 @@ license:CC0-1.0
 	</software>
 
 	<!-- https://www.youtube.com/watch?v=uplyiXYgg6w -->
-	<!-- TODO 3:01-3:25 right half of raster bars are corrupted -->
 	<!-- TODO sound is missing PWM effects -->
 	<software name="abcbook">
 		<description>ABCBook</description>

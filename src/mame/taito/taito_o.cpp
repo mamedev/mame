@@ -438,7 +438,7 @@ void taitoo_state::taitoo(machine_config &config)
 	for (auto &opto : m_opto)
 		TAITOIO_OPTO(config, opto);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(64*16, 64*16);
@@ -509,6 +509,6 @@ ROM_END
 
 } // anonymous namespace
 
-//     YEAR  NAME      PARENT   MACHINE   INPUT     CLASS         INIT        ROT    COMPANY  FULLNAME              FLAGS                                               LAYOUT
+//     YEAR  NAME      PARENT   MACHINE   INPUT     CLASS         INIT        ROT   COMPANY  FULLNAME               FLAGS                                               LAYOUT
 GAMEL( 1989, parentj,  0,       taitoo,   parentj,  taitoo_state, empty_init, ROT0, "Taito", "Parent Jack (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_parentj )
 GAMEL( 1990, eibise,   0,       taitoo,   eibise,   taitoo_state, empty_init, ROT0, "Taito", "Eibise (Japan)",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE, layout_eibise )

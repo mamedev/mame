@@ -73,7 +73,9 @@
 
 #include "emu.h"
 #include "lux21056.h"
-#include "bus/scsi/s1410.h"
+
+#include "bus/nscsi/devices.h"
+#include "machine/nscsi_bus.h"
 
 
 
@@ -197,50 +199,41 @@ void luxor_55_21056_device::io_write_byte(offs_t offset, uint8_t data)
 	return m_maincpu->space(AS_IO).write_byte(offset, data);
 }
 
-
-void luxor_55_21056_device::write_sasi_bsy(int state)
+void luxor_55_21056_device::dma_busreq_w(int state)
 {
-	m_sasi_bsy = state;
+	// the Z80 grants the bus after the current machine cycle, which the host's unpolled INIR relies on
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_dma->bai_w(state);
+}
 
-	if (m_sasi_bsy)
+
+void luxor_55_21056_device::sasi_bsy_w(int state)
+{
+	if (state)
 	{
-		m_sasibus->write_sel(0);
+		m_sasi->sel_w(0);
 	}
 }
 
-void luxor_55_21056_device::write_sasi_io(int state)
+void luxor_55_21056_device::sasi_io_w(int state)
 {
-	m_sasi_io = state;
-
-	if (!m_sasi_io)
+	if (!state)
 	{
-		m_sasi_data_out->write(m_sasi_data);
+		m_sasi->write(m_sasi_data);
 	}
 	else
 	{
-		m_sasi_data_out->write(0);
+		m_sasi->write(0);
 	}
 }
 
-void luxor_55_21056_device::write_sasi_req(int state)
+void luxor_55_21056_device::sasi_req_w(int state)
 {
-	m_sasi_req = state;
-
-	if (m_sasi_req)
+	// a data register access acknowledges the byte, REQ going away completes the handshake
+	if (!state)
 	{
-		m_req = 0;
-		m_sasibus->write_ack(!m_req);
+		m_sasi->ack_w(0);
 	}
-}
-
-void luxor_55_21056_device::write_sasi_cd(int state)
-{
-	m_sasi_cd = state;
-}
-
-void luxor_55_21056_device::write_sasi_msg(int state)
-{
-	m_sasi_msg = state;
 }
 
 
@@ -254,29 +247,26 @@ void luxor_55_21056_device::device_add_mconfig(machine_config &config)
 	m_maincpu->set_memory_map(&luxor_55_21056_device::luxor_55_21056_mem);
 	m_maincpu->set_io_map(&luxor_55_21056_device::luxor_55_21056_io);
 	m_maincpu->set_daisy_config(daisy_chain);
-	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	Z80DMA(config, m_dma, XTAL(8'000'000)/2);
-	m_dma->out_busreq_callback().set_inputline(m_maincpu, Z80_INPUT_LINE_BUSREQ);
+	m_dma->out_busreq_callback().set(FUNC(luxor_55_21056_device::dma_busreq_w));
 	m_dma->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	m_dma->in_mreq_callback().set(FUNC(luxor_55_21056_device::memory_read_byte));
 	m_dma->out_mreq_callback().set(FUNC(luxor_55_21056_device::memory_write_byte));
 	m_dma->in_iorq_callback().set(FUNC(luxor_55_21056_device::io_read_byte));
 	m_dma->out_iorq_callback().set(FUNC(luxor_55_21056_device::io_write_byte));
 
-	SCSI_PORT(config, m_sasibus);
-	m_sasibus->set_data_input_buffer(m_sasi_data_in);
-	m_sasibus->req_handler().set(FUNC(luxor_55_21056_device::write_sasi_req));
-	m_sasibus->io_handler().set(FUNC(luxor_55_21056_device::write_sasi_io));
-	m_sasibus->cd_handler().set(FUNC(luxor_55_21056_device::write_sasi_cd));
-	m_sasibus->msg_handler().set(FUNC(luxor_55_21056_device::write_sasi_msg));
-	m_sasibus->bsy_handler().set(FUNC(luxor_55_21056_device::write_sasi_bsy));
-	m_sasibus->set_slot_device(1, "harddisk", S1410, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-
-	OUTPUT_LATCH(config, m_sasi_data_out);
-	m_sasibus->set_output_latch(*m_sasi_data_out);
-
-	INPUT_BUFFER(config, m_sasi_data_in);
+	NSCSI_BUS(config, SASIBUS_TAG);
+	NSCSI_CONNECTOR(config, SASIBUS_TAG ":0", default_scsi_devices, "s1410");
+	NSCSI_CONNECTOR(config, SASIBUS_TAG ":7", default_scsi_devices, "scsicb", true)
+		.option_add_internal("scsicb", NSCSI_CB)
+		.machine_config([this] (device_t *device)
+		{
+			nscsi_callback_device &sasi = downcast<nscsi_callback_device &>(*device);
+			sasi.req_callback().set(*this, FUNC(luxor_55_21056_device::sasi_req_w));
+			sasi.io_callback().set(*this, FUNC(luxor_55_21056_device::sasi_io_w));
+			sasi.bsy_callback().set(*this, FUNC(luxor_55_21056_device::sasi_bsy_w));
+		});
 }
 
 
@@ -340,17 +330,12 @@ luxor_55_21056_device::luxor_55_21056_device(const machine_config &mconfig, cons
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG),
 		m_dma(*this, Z80DMA_TAG),
-		m_sasibus(*this, SASIBUS_TAG),
-		m_sasi_data_out(*this, "sasi_data_out"),
-		m_sasi_data_in(*this, "sasi_data_in"),
+		m_sasi(*this, SASIBUS_TAG ":7:scsicb"),
 		m_s1(*this, "S1"),
 		m_cs(false),
 		m_rdy(0),
-		m_sasi_req(0),
-		m_sasi_io(0),
-		m_sasi_cd(0),
-		m_sasi_msg(0),
-		m_sasi_bsy(0), m_inp(0), m_out(0),
+		m_inp(0),
+		m_out(0),
 		m_stat(0),
 		m_sasi_data(0)
 {
@@ -369,11 +354,6 @@ void luxor_55_21056_device::device_start()
 	save_item(NAME(m_inp));
 	save_item(NAME(m_out));
 	save_item(NAME(m_stat));
-	save_item(NAME(m_sasi_req));
-	save_item(NAME(m_sasi_io));
-	save_item(NAME(m_sasi_cd));
-	save_item(NAME(m_sasi_msg));
-	save_item(NAME(m_sasi_bsy));
 	save_item(NAME(m_sasi_data));
 }
 
@@ -431,7 +411,7 @@ uint8_t luxor_55_21056_device::abcbus_stat()
 //  abcbus_inp -
 //-------------------------------------------------
 
-uint8_t luxor_55_21056_device::abcbus_inp()
+uint8_t luxor_55_21056_device::abcbus_inp(offs_t offset)
 {
 	uint8_t data = 0xff;
 
@@ -450,7 +430,7 @@ uint8_t luxor_55_21056_device::abcbus_inp()
 //  abcbus_out -
 //-------------------------------------------------
 
-void luxor_55_21056_device::abcbus_out(uint8_t data)
+void luxor_55_21056_device::abcbus_out(offs_t offset, uint8_t data)
 {
 	if (m_cs)
 	{
@@ -513,11 +493,11 @@ uint8_t luxor_55_21056_device::sasi_status_r()
 
 	data |= m_rdy ^ STAT_DIR;
 
-	data |= (m_req || m_sasi_req) << 1;
-	data |= m_sasi_io << 2;
-	data |= !m_sasi_cd << 3;
-	data |= !m_sasi_msg << 4;
-	data |= !m_sasi_bsy << 5;
+	data |= (m_sasi->req_r() && !m_sasi->ack_r()) ? 0x00 : 0x02;
+	data |= m_sasi->io_r() << 2;
+	data |= m_sasi->cd_r() ? 0x00 : 0x08;
+	data |= m_sasi->msg_r() ? 0x00 : 0x10;
+	data |= m_sasi->bsy_r() ? 0x00 : 0x20;
 
 	return data ^ 0xff;
 }
@@ -567,10 +547,12 @@ void luxor_55_21056_device::inp_w(uint8_t data)
 
 uint8_t luxor_55_21056_device::sasi_data_r()
 {
-	uint8_t data = m_sasi_data_in->read();
+	const uint8_t data = m_sasi->read();
 
-	m_req = !m_sasi_req;
-	m_sasibus->write_ack(!m_req);
+	if (!machine().side_effects_disabled() && m_sasi->req_r())
+	{
+		m_sasi->ack_w(1);
+	}
 
 	return data;
 }
@@ -584,13 +566,15 @@ void luxor_55_21056_device::sasi_data_w(uint8_t data)
 {
 	m_sasi_data = data;
 
-	if (!m_sasi_io)
+	if (!m_sasi->io_r())
 	{
-		m_sasi_data_out->write(m_sasi_data);
+		m_sasi->write(m_sasi_data);
 	}
 
-	m_req = !m_sasi_req;
-	m_sasibus->write_ack(!m_req);
+	if (m_sasi->req_r())
+	{
+		m_sasi->ack_w(1);
+	}
 }
 
 
@@ -636,7 +620,7 @@ uint8_t luxor_55_21056_device::sasi_sel_r()
 
 void luxor_55_21056_device::sasi_sel_w(uint8_t data)
 {
-	m_sasibus->write_sel(!m_sasi_bsy);
+	m_sasi->sel_w(!m_sasi->bsy_r());
 }
 
 
@@ -659,8 +643,8 @@ uint8_t luxor_55_21056_device::sasi_rst_r()
 
 void luxor_55_21056_device::sasi_rst_w(uint8_t data)
 {
-	m_sasibus->write_rst(1);
-	m_sasibus->write_rst(0);
+	m_sasi->rst_w(1);
+	m_sasi->rst_w(0);
 }
 
 

@@ -6,6 +6,8 @@ CFLAGS = $(CFLAGS) \
   -DZ7_EXTRACT_ONLY \
   -DZ7_NO_READ_FROM_CODER \
   -DZ7_SFX \
+  -DZ7_NO_LONG_PATH \
+  -DZ7_NO_LARGE_PAGES \
 
 CURRENT_OBJS = \
   $O\SfxCon.obj \
@@ -43,6 +45,7 @@ WIN_OBJS = \
   $O\PropVariantConv.obj \
   $O\Synchronization.obj \
   $O\System.obj \
+  $O\TimeUtils.obj \
 
 7ZIP_COMMON_OBJS = \
   $O\CreateCoder.obj \

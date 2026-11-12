@@ -294,11 +294,11 @@ void esq1_filters::recalc_filter(filter &f)
 
 	//if(f.vfc) {
 	if(0) {
-        constexpr double PI = std::numbers::pi;
-        double ff = g/(2*PI);
-        double fzc = 2*PI*ff/tan(PI*ff/44100);
-        fprintf(stderr, "%02x f=%f zc=%f zc1=%f\n", f.vfc, g/(2*PI), zc, fzc);
-    }
+		constexpr double PI = std::numbers::pi;
+		double ff = g/(2*PI);
+		double fzc = 2*PI*ff/tan(PI*ff/44100);
+		fprintf(stderr, "%02x f=%f zc=%f zc1=%f\n", f.vfc, g/(2*PI), zc, fzc);
+	}
 
 	double gzc = zc/g;
 	double gzc2 = gzc*gzc;

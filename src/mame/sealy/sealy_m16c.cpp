@@ -111,7 +111,7 @@ void sealy_m16c_state::sealy(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sealy_m16c_state::program_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
@@ -221,8 +221,8 @@ ROM_END
 
 
 // years were taken from GFX ROMs
-GAME( 2004,  crzyddz,  0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Crazy Dou Di Zhu",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004,  sandaha,  0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "San Da Ha",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004,  fkddz,    0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Fengkuang Dou Dizhu",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004,  fdjqb,    0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Fengdou Jiaqiang Ban", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2003,  gbsf,     0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Gangbao Sifang",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004,  crzyddz,  0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Crazy Dou Di Zhu",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004,  sandaha,  0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "San Da Ha",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004,  fkddz,    0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Fengkuang Dou Dizhu (M16C-based hardware)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004,  fdjqb,    0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Fengdou Jiaqiang Ban",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003,  gbsf,     0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Gangbao Sifang",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -372,7 +372,7 @@ void gyruss_state::filter_w(uint8_t data)
 void gyruss_state::sh_irqtrigger_w(uint8_t data)
 {
 	// writing to this register triggers IRQ on the sound CPU
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE); // Z80 IM1
 }
 
 void gyruss_state::i8039_irq_w(uint8_t data)
@@ -732,7 +732,7 @@ void gyruss_state::gyruss(machine_config &config)
 	mainlatch.q_out_cb<5>().set(FUNC(gyruss_state::flipscreen_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(gyruss_state::screen_update));
 	m_screen->set_palette(m_palette);

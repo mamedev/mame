@@ -322,7 +322,8 @@ extFloat80_t packToExtF80(bool sign, uint16_t exp, uint64_t sig)
 
 extFloat80_t extFloat80_68katan(extFloat80_t a)
 {
-	return extFloat80_atan(a, floatx80_one);
+	// extFloat80_atan(a, b) computes atan(b/a), so the unit goes first
+	return extFloat80_atan(floatx80_one, a);
 }
 
 int extFloat80_is_nan(extFloat80_t a)

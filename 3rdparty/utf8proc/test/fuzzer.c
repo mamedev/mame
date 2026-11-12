@@ -14,6 +14,7 @@ int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     utf8proc_int32_t c = 0, c_prev = 0, state = 0;
     utf8proc_option_t options;
     utf8proc_ssize_t ret, bytes = 0;
+    utf8proc_uint8_t *str = NULL;
     size_t len = strlen((const char*)data);
     
     while(bytes != len)
@@ -79,6 +80,21 @@ int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
     free(utf8proc_NFKD(data));
     free(utf8proc_NFKC(data));
     free(utf8proc_NFKC_Casefold(data));
+
+    utf8proc_map(data, len, &str, UTF8PROC_CHARBOUND | UTF8PROC_STRIPNA);
+    free(str);
+
+    utf8proc_map(data, len, &str, UTF8PROC_LUMP | UTF8PROC_NLF2LS | UTF8PROC_NLF2PS);
+    free(str);
+
+    utf8proc_map(data, len, &str, UTF8PROC_COMPOSE | UTF8PROC_STRIPMARK);
+    free(str);
+
+    utf8proc_map(data, len, &str, UTF8PROC_CHARBOUND | UTF8PROC_DECOMPOSE);
+    free(str);
+
+    utf8proc_map(data, len, &str, UTF8PROC_CHARBOUND | UTF8PROC_COMPOSE);
+    free(str);
 
     return 0;
 }

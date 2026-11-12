@@ -62,7 +62,7 @@ void adm23_state::adm23(machine_config &config)
 	z8_device &maincpu(Z8682(config, "maincpu", 14.7428_MHz_XTAL / 2));
 	maincpu.set_addrmap(AS_PROGRAM, &adm23_state::mem_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14.7428_MHz_XTAL, 873, 0, 720, 281, 0, 264);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

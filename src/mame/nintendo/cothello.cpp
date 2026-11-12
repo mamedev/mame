@@ -274,7 +274,7 @@ void cothello_state::cothello(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &cothello_state::main_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(64, 192);
 	m_screen->set_visarea(0, 64-1, 0, 192-1);

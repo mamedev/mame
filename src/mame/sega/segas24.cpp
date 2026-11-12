@@ -2181,7 +2181,7 @@ void segas24_state::system24(machine_config &config)
 	S24SPRITE(config, m_vsprite);
 	S24MIXER(config, m_vmixer);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_raw(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/);
 	m_screen->set_screen_update(FUNC(segas24_state::screen_update));

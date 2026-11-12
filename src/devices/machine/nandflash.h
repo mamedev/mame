@@ -24,6 +24,9 @@ public:
 
 	auto rnb_wr_callback() { return m_write_rnb.bind(); }
 
+	// Initial contents supplied by a removable image, before NVRAM is loaded.
+	void set_rom(const uint8_t *data, uint32_t size) { m_rom = data; m_rom_size = size; }
+
 	int is_present();
 	int is_protected();
 	int is_busy();
@@ -32,6 +35,12 @@ public:
 	void command_w(uint8_t data);
 	void address_w(uint8_t data);
 	void data_w(uint8_t data);
+
+	// used for bootstrap HLE where it helps to know the page sizes
+	uint32_t page_data_size() { return m_page_data_size;  }
+	uint32_t page_total_size() { return m_page_total_size; }
+	u8* nand_data() { return &m_feeprom_data[0]; }
+	uint32_t nand_size() { return m_page_total_size * m_num_pages; }
 
 protected:
 	enum sm_mode_t : uint8_t
@@ -60,7 +69,13 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	void begin_read();
+	TIMER_CALLBACK_MEMBER(read_complete);
+
 	optional_memory_region m_region;
+	const uint8_t *m_rom;
+	uint32_t m_rom_size;
+	emu_timer *m_read_timer;
 
 	uint32_t m_page_data_size;       // 256 for a 2MB card, 512 otherwise
 	uint32_t m_page_total_size;      // 264 for a 2MB card, 528 otherwise
@@ -96,6 +111,11 @@ protected:
 	uint32_t m_col_address_cycles;
 	uint32_t m_row_address_cycles;
 	uint32_t m_sequential_row_read;
+	bool m_sequential_row_read_wrap;
+
+	// timing parameters
+	attotime m_read_time;      // tR: random read access time (cell to register)
+	attotime m_busy_until;     // time when busy period ends (attotime::never = not busy)
 
 	devcb_write_line m_write_rnb;
 };
@@ -148,11 +168,70 @@ public:
 	samsung_k9f2g08u0m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class hynix_hy27uf084g2m_device : public nand_device
+{
+public:
+	hynix_hy27uf084g2m_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class hynix_h27uag8t2a_device : public nand_device
+{
+public:
+	hynix_h27uag8t2a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+
+class toshiba_tc58v64bft_device : public nand_device
+{
+public:
+	toshiba_tc58v64bft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class toshiba_tc58256aft_device : public nand_device
 {
 public:
 	toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	toshiba_tc58256aft_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 };
+
+class toshiba_tc58128ft_device : public nand_device
+{
+public:
+	toshiba_tc58128ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class toshiba_tc58256ft_device : public toshiba_tc58256aft_device
+{
+public:
+	toshiba_tc58256ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class toshiba_tc58512ft_device : public nand_device
+{
+public:
+	toshiba_tc58512ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class generalplus_gpr27p512a : public nand_device
+{
+public:
+	generalplus_gpr27p512a(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class sandisk_nand_128mb_512_device : public nand_device
+{
+public:
+	sandisk_nand_128mb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class sandisk_nand_256mb_512_device : public nand_device
+{
+public:
+	sandisk_nand_256mb_512_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(NAND, nand_device)
@@ -164,6 +243,15 @@ DECLARE_DEVICE_TYPE(SAMSUNG_K9F1G08U0B, samsung_k9f1g08u0b_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9F1G08U0M, samsung_k9f1g08u0m_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9LAG08U0M, samsung_k9lag08u0m_device)
 DECLARE_DEVICE_TYPE(SAMSUNG_K9F2G08U0M, samsung_k9f2g08u0m_device)
+DECLARE_DEVICE_TYPE(HYNIX_HY27UF084G2M, hynix_hy27uf084g2m_device)
+DECLARE_DEVICE_TYPE(HYNIX_H27UAG8T2A, hynix_h27uag8t2a_device)
+DECLARE_DEVICE_TYPE(TOSHIBA_TC58V64BFT, toshiba_tc58v64bft_device)
 DECLARE_DEVICE_TYPE(TOSHIBA_TC58256AFT, toshiba_tc58256aft_device)
+DECLARE_DEVICE_TYPE(TOSHIBA_TC58128FT, toshiba_tc58128ft_device)
+DECLARE_DEVICE_TYPE(TOSHIBA_TC58256FT, toshiba_tc58256ft_device)
+DECLARE_DEVICE_TYPE(TOSHIBA_TC58512FT, toshiba_tc58512ft_device)
+DECLARE_DEVICE_TYPE(GENERALPLUS_GPR27P512A, generalplus_gpr27p512a)
+DECLARE_DEVICE_TYPE(SANDISK_NAND_128MB_512_DEVICE, sandisk_nand_128mb_512_device)
+DECLARE_DEVICE_TYPE(SANDISK_NAND_256MB_512_DEVICE, sandisk_nand_256mb_512_device)
 
 #endif // MAME_MACHINE_NANDFLASH_H

@@ -949,7 +949,7 @@ void _4000_260_state::_4000_260(machine_config &config)
 	m_maincpu->port_in_cb<3>().set(FUNC(_4000_260_state::cpu_p3_r));
 	m_maincpu->port_out_cb<3>().set(FUNC(_4000_260_state::cpu_p3_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(44'976'000, 1056, 0, 800, 600, 0, 390); // no measurements, values guessed
 	m_screen->set_screen_update(FUNC(_4000_260_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(_4000_260_state::vblank_w));

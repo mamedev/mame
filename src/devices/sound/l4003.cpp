@@ -56,7 +56,9 @@
 
 #include "emu.h"
 #include "l4003.h"
+
 #include "debugger.h"
+
 
 #define LOG_REGISTERS           (1U << 1)
 #define LOG_REGISTERS_HIFREQ    (1U << 2)

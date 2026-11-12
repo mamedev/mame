@@ -99,21 +99,27 @@ namespace webpp {
 			std::list<SendData> send_queue;
 
 			void send_from_queue() {
-				asio::post(strand, [this]() {
-					asio::async_write(*socket, send_queue.begin()->send_stream->streambuf,
-							strand.wrap([this](const std::error_code& ec, size_t /*bytes_transferred*/) {
-						auto send_queued=send_queue.begin();
-						if(send_queued->callback)
-							send_queued->callback(ec);
-						if(!ec) {
-							send_queue.erase(send_queued);
-							if(send_queue.size()>0)
-								send_from_queue();
-						}
-						else
-							send_queue.clear();
-					}));
-				});
+				asio::post(
+						strand,
+						[this]() {
+							asio::async_write(
+									*socket,
+									send_queue.begin()->send_stream->streambuf,
+									asio::bind_executor(
+										strand,
+										[this](const std::error_code& ec, size_t /*bytes_transferred*/) {
+											auto send_queued=send_queue.begin();
+											if(send_queued->callback)
+												send_queued->callback(ec);
+											if(!ec) {
+												send_queue.erase(send_queued);
+												if(send_queue.size()>0)
+													send_from_queue();
+											}
+											else
+												send_queue.clear();
+										}));
+						});
 			}
 
 			std::atomic<bool> closed;

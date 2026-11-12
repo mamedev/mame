@@ -299,7 +299,7 @@ void tutankhm_state::tutankhm(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(GALAXIAN_PIXEL_CLOCK, GALAXIAN_HTOTAL, GALAXIAN_HBEND, GALAXIAN_HBSTART, GALAXIAN_VTOTAL, GALAXIAN_VBEND, GALAXIAN_VBSTART);
 	PALETTE(config, m_palette).set_format(1, tutankhm_state::raw_to_rgb_func, 16);
 

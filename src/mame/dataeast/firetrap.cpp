@@ -968,7 +968,7 @@ void base_state::base(machine_config &config)
 	// NMIs are caused by the main CPU
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 //  screen.set_refresh_hz(57.4034); // PCB measurement
 //  screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 //  screen.set_size(32*8, 32*8);
@@ -1292,7 +1292,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1986, firetrap,   0,        firetrap,   firetrap,   original_state, empty_init, ROT90, "Woodplace Inc. (Data East USA license)", "Fire Trap (US, rev A)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapa,  firetrap, firetrap,   firetrap,   original_state, empty_init, ROT90, "Woodplace Inc. (Data East USA license)", "Fire Trap (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj,  original_state, empty_init, ROT90, "Woodplace Inc.",                         "Fire Trap (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, bootleg_state,  empty_init, ROT90, "bootleg",                                "Fire Trap (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrap,   0,        firetrap,   firetrap,   original_state, empty_init, ROT90, "Wood Place (Data East USA license)", "Fire Trap (US, rev A)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapa,  firetrap, firetrap,   firetrap,   original_state, empty_init, ROT90, "Wood Place (Data East USA license)", "Fire Trap (US)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj,  original_state, empty_init, ROT90, "Wood Place",                         "Fire Trap (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, bootleg_state,  empty_init, ROT90, "bootleg",                            "Fire Trap (Japan bootleg)", MACHINE_SUPPORTS_SAVE )

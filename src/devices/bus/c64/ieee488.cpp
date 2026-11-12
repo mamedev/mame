@@ -185,6 +185,7 @@ c64_ieee488_device::c64_ieee488_device(const machine_config &mconfig, const char
 
 void c64_ieee488_device::device_start()
 {
+	save_item(NAME(m_roml_sel));
 }
 
 

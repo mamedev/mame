@@ -66,7 +66,7 @@ private:
 	void port92_w(offs_t offset, u8 data);
 
 	void fast_gatea20(int state);
-	int m_ext_gatea20, m_fast_gatea20;
+	u8 m_ext_gatea20, m_fast_gatea20;
 	u8 m_port92;
 };
 

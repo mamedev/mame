@@ -89,7 +89,7 @@ void robotron_k7071_device::device_add_mconfig(machine_config &config)
 	m_crtc->drq_wr_callback().set(m_dma, FUNC(i8257_device::dreq0_w));
 	m_crtc->lc_wr_callback().set([this] (int data) { m_cpu->set_input_line(INPUT_LINE_IRQ0, data == 15 ? ASSERT_LINE : CLEAR_LINE); });
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(XTAL(16'000'000), 736, 0, 640, 432, 0, 416);
 	m_screen->set_screen_update(m_crtc, FUNC(i8275_device::screen_update));

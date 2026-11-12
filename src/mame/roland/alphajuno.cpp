@@ -133,7 +133,7 @@ void alphajuno_state::ajuno1(machine_config &config)
 	UPD7001(config, "adc", RES_K(27), CAP_P(47));
 
 	// LCD: LM16155A or LM16155B
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -172,7 +172,7 @@ void alphajuno_state::mks50(machine_config &config)
 	//MB87123(config, "dco", 12_MHz_XTAL);
 
 	// LCD Unit: DM011Z-1DL3
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));

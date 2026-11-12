@@ -414,7 +414,7 @@ void ksm_state::ksm(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(ksm_state::scanline_callback), "screen", 0, 1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER, rgb_t::green());
+	SCREEN(config, m_screen).set_color(rgb_t::green());
 	m_screen->set_screen_update(FUNC(ksm_state::screen_update));
 	m_screen->set_raw(XTAL(15'400'000), KSM_TOTAL_HORZ, KSM_HORZ_START,
 		KSM_HORZ_START+KSM_DISP_HORZ, KSM_TOTAL_VERT, KSM_VERT_START,

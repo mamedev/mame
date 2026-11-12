@@ -675,7 +675,7 @@ void tecmo16_state::base(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.17);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1000)); // not accurate
 	m_screen->set_size(32*8, 32*8);

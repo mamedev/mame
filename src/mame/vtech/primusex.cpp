@@ -328,7 +328,7 @@ void primusex_state::primusex(machine_config &config)
 	ppi2.in_pb_callback().set(FUNC(primusex_state::ppi2_pb_r));
 	ppi2.out_pc_callback().set(FUNC(primusex_state::ppi2_pc_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_size(80, 48);
 	screen.set_visarea_full();

@@ -25,6 +25,19 @@ w65c02_device::w65c02_device(const machine_config &mconfig, device_type type, co
 {
 }
 
+void w65c02_device::prefetch_end()
+{
+	m_sync = false;
+	if(!m_sync_w.isunset())
+		m_sync_w(CLEAR_LINE);
+
+	if((m_nmi_pending || ((m_irq_state || m_apu_irq_state) && !(m_P & F_I))) && !m_inhibit_interrupts) {
+		m_irq_taken = true;
+		m_IR = 0x00;
+	} else
+		m_PC++;
+}
+
 void w65c02_device::do_sbc_cd(uint8_t val)
 {
 	// SBC allows interdigit carry from decimal adjustment on 65C02

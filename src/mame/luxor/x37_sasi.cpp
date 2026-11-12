@@ -17,7 +17,7 @@ DEFINE_DEVICE_TYPE(LUXOR_X37_SASI, luxor_x37_sasi_device, "luxor_x37_sasi", "Lux
 void luxor_x37_sasi_device::device_add_mconfig(machine_config &config)
 {
 	auto &sasi(NSCSI_BUS(config, "sasi"));
-	NSCSI_CONNECTOR(config, "sasi:4", default_scsi_devices, "s1410");
+	NSCSI_CONNECTOR(config, "sasi:0", default_scsi_devices, "s1410");
 	sasi.set_external_device(7, *this);
 }
 

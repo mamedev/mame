@@ -299,7 +299,7 @@ void iphone2g_state::iphone2g(machine_config &config)
 
 	PL192_VIC(config, m_vic1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(12'000'000), 320, 0, 320, 480, 0, 480); //Complete guess
 	m_screen->set_screen_update(FUNC(iphone2g_state::screen_update));
 }

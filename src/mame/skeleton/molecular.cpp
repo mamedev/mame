@@ -317,7 +317,7 @@ void molecula_state::molecula(machine_config &config)
 //  sub.set_disable();
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(FUNC(molecula_state::screen_update));

@@ -233,7 +233,7 @@ void mdt60_state::mdt60(machine_config &config)
 	m_keyboard->keyin_callback().set(FUNC(mdt60_state::keyin_w)).invert();
 	// Reset output (pin 2) is not connected
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::amber());
 	screen.set_raw(16.5888_MHz_XTAL, 918, 0, 720, 301, 0, 288);
 	screen.set_screen_update(m_crtc, FUNC(r6545_1_device::screen_update));

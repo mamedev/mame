@@ -107,7 +107,7 @@ Port B, bit 1
 #include "cpu/avr8/avr8.h"
 #include "video/pwm.h"
 #include "sound/dac.h"
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 
@@ -288,10 +288,9 @@ void pensebem2017_state::pensebem2017(machine_config &config)
 	m_maincpu->gpio_out<atmega168_device::GPIOE>().set(FUNC(pensebem2017_state::port_e_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_size(1490, 1080);
-	screen.set_visarea_full();
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	m_display->set_segmask(0xff, 0xff);
 

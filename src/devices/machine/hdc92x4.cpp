@@ -2725,6 +2725,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 
 		case WRITE_DAM_SYNC:
 			LOGMASKED(LOG_DETAIL, "Write sync zeros\n");
+			m_pll.start_writing(m_live_state.time, m_floppy);
 
 			// Clear the overrun/underrun flag
 			set_bits(m_register_r[INT_STATUS], ST_OVRUN, false);
@@ -2866,7 +2867,7 @@ void hdc92x4_device::live_run_until(attotime limit)
 		case FORMAT_TRACK:
 			LOGMASKED(LOG_LIVE, "FORMAT_TRACK\n");
 			m_live_state.state = WRITE_GAP0;
-			m_pll.start_writing(m_live_state.time);
+			m_pll.start_writing(m_live_state.time, m_floppy);
 			break;
 
 		case WRITE_GAP0:
@@ -3487,6 +3488,7 @@ void hdc92x4_device::live_run_hd_until(attotime limit)
 
 		case WRITE_DAM_SYNC:
 			LOGMASKED(LOG_DETAIL, "Write sync zeros\n");
+			m_pll.start_writing(m_live_state.time, m_floppy);
 
 			// Clear the overrun/underrun flag
 			set_bits(m_register_r[INT_STATUS], ST_OVRUN, false);

@@ -64,6 +64,13 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void zx8301(address_map &map) ATTR_COLD;
+
+	// Chunk based contention approximation constants
+	static constexpr int SCREEN_UNITS_PER_CHUNK = 24;
+	static constexpr int ULA_OWNED_CHUNKS = 32;	// of 40 chunks per line
+	static constexpr int CONTENDED_CYCLES_LOST = 8;	// flat tax. CPU gets 4 of 12 cycles in a fully ULA-owned chunk
+	static constexpr int DRAWN_LINES = 256;		// actively drawn lines
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -95,10 +102,11 @@ private:
 	int m_base;                     // video ram base address
 	int m_flash;                    // flash
 	int m_vsync;                    // vertical sync
-	int m_vda;                      // valid data address
 
 	emu_timer *m_vsync_timer = nullptr;       // vertical sync timer
 	emu_timer *m_flash_timer = nullptr;       // flash timer
+
+	bool is_owning_bus() const;
 };
 
 

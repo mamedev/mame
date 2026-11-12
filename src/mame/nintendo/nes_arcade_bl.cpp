@@ -300,7 +300,7 @@ void nes_arcade_bl_state::smb3bl(machine_config &config)
 	timercpu.set_addrmap(AS_PROGRAM, &nes_arcade_bl_state::timer_prg_map);
 	timercpu.set_addrmap(AS_IO, &nes_arcade_bl_state::timer_io_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(32*8, 262);
 	screen.set_visarea(0*8, 32*8-1, 0*8, 30*8-1);

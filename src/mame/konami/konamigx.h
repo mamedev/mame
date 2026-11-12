@@ -42,11 +42,14 @@ public:
 		, m_k054539_2(*this, "k054539_2")
 		, m_k053250_1(*this, "k053250_1")
 		, m_k053250_2(*this, "k053250_2")
+		, m_type1_roz(*this, "type1_roz")
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_screen(*this, "screen")
 		, m_palette(*this, "palette")
 		, m_workram(*this, "workram")
 		, m_psacram(*this, "psacram")
+		, m_type1_psac4_ctrl(*this, "type1_psac4_ctrl")
+		, m_type1_psac4_lram(*this, "type1_psac4_lram")
 		, m_subpaletteram32(*this, "subpaletteram")
 		, m_k053936_0_ctrl(*this, "k053936_0_ctrl")
 		, m_k053936_0_linectrl(*this, "k053936_0_line")
@@ -60,17 +63,20 @@ public:
 		, m_light1_x(*this, "LIGHT1_X")
 		, m_light1_y(*this, "LIGHT1_Y")
 		, m_eepromout(*this, "EEPROMOUT")
+		, m_gx_topmost_on(false)
 		, m_use_68020_post_clock_hack(0)
 		, m_lamp(*this, "lamp0")
 	{ }
 
-	void esc_w(address_space &space, u32 data);
 	void eeprom_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 le2_gun_H_r();
 	u32 le2_gun_V_r();
-	u32 type1_roz_r1(offs_t offset);
-	u32 type1_roz_r2(offs_t offset);
+	u8 type1_roz_r1(offs_t offset);
+	u8 type1_roz_r2(offs_t offset);
+	void type1_bank_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 type1_lookup_r(offs_t offset);
+	void type1_lookup_w(offs_t offset, u8 data);
 	u32 type3_sync_r();
 	void type4_prot_w(address_space &space, offs_t offset, u32 data);
 	void type1_cablamps_w(u32 data);
@@ -81,6 +87,8 @@ public:
 	void K053990_martchmp_word_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void fantjour_dma_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void type3_bank_w(offs_t offset, u8 data);
+	u32 konamigx_palette_r(offs_t offset);
+	void konamigx_palette_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	[[maybe_unused]] void konamigx_555_palette_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	[[maybe_unused]] void konamigx_555_palette2_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void konamigx_tilebank_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -122,8 +130,6 @@ public:
 	K056832_CB_MEMBER(alpha_tile_callback);
 	K055673_CB_MEMBER(type2_sprite_callback);
 	K055673_CB_MEMBER(dragoonj_sprite_callback);
-	K055673_CB_MEMBER(salmndr2_sprite_callback);
-	K055673_CB_MEMBER(le2_sprite_callback);
 
 	struct GX_OBJ
 	{
@@ -142,11 +148,12 @@ public:
 						);
 
 
-	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer);
+	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer, u8 pri);
+	void gx_draw_tilemap_category(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 layer, u8 category, u32 flags, int level, u8 topmost);
+	void gx_draw_deferred_shadows(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const std::vector<GX_OBJ> &shadows, u8 shdprisel);
 	void gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
 	void gx_draw_basic_extended_tilemaps_2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs);
 
-	void konamigx_esc_alert(u32 *srcbase, int srcoffs, int count, int mode);
 	void konamigx_precache_registers(void);
 
 	void wipezbuf(int noshadow);
@@ -156,20 +163,10 @@ public:
 
 	void konamigx_mixer_init(screen_device &screen, int objdma);
 	void konamigx_objdma(void);
-	void generate_sprites(address_space &space, u32 src, u32 spr, int count);
 
 	void fantjour_dma_install();
 
 	void konamigx_mixer_primode(int mode);
-
-	typedef void (konamigx_state::*esc_cb)(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-
-	void tkmmpzdm_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-	void dragoonj_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-	void sal2_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-	void sexyparo_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-	void tbyahhoo_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
-	void daiskiss_esc(address_space &space, u32 p1, u32 p2, u32 p3, u32 p4);
 
 	inline int K053247GX_combine_c18(int attrib);
 	inline int K055555GX_decode_objcolor(int c18);
@@ -189,11 +186,6 @@ public:
 	void winspike(machine_config &config) ATTR_COLD;
 	void le2(machine_config &config) ATTR_COLD;
 	void konamigx(machine_config &config) ATTR_COLD;
-	void dragoonj(machine_config &config) ATTR_COLD;
-	void salmndr2(machine_config &config) ATTR_COLD;
-	void tbyahhoo(machine_config &config) ATTR_COLD;
-	void gokuparo(machine_config &config) ATTR_COLD;
-	void sexyparo(machine_config &config) ATTR_COLD;
 	void sexyparoebl(machine_config &config) ATTR_COLD;
 	void gx_base_memmap(address_map &map) ATTR_COLD;
 	void racinfrc_map(address_map &map) ATTR_COLD;
@@ -219,12 +211,15 @@ protected:
 	optional_device<k054539_device> m_k054539_2;
 	optional_device<k053250_device> m_k053250_1;
 	optional_device<k053250_device> m_k053250_2;
+	optional_device<k053936_device> m_type1_roz;
 	optional_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	optional_shared_ptr<u32> m_workram;
 	optional_shared_ptr<u32> m_psacram;
+	optional_shared_ptr<u32> m_type1_psac4_ctrl;
+	optional_shared_ptr<u32> m_type1_psac4_lram;
 	optional_shared_ptr<u32> m_subpaletteram32;
 	optional_shared_ptr<u32> m_k053936_0_ctrl;
 	optional_shared_ptr<u32> m_k053936_0_linectrl;
@@ -248,9 +243,6 @@ protected:
 	u16 m_last_prot_param = 0;
 	u8 m_prev_pixel_clock = 0;
 
-	u8 m_esc_program[4096]{};
-	esc_cb m_esc_cb;
-
 	u16 m_prot_data[0x20]{};
 
 	u16 *m_gx_spriteram = nullptr;
@@ -258,7 +250,7 @@ protected:
 
 	u8 m_current_brightness = 0xff;
 	u8 m_brightness[3]{};
-	u8 m_last_alpha_tile_mix_code = 0;
+	bitmap_ind16 m_gx_tile_scratch;   // additive tilemap categories, gx_draw_tilemap_category
 
 	// mirrored K054338 settings
 	s32 *m_K054338_shdRGB = nullptr;
@@ -274,8 +266,9 @@ protected:
 	u16 m_gx_wrport2 = 0;
 
 	// 2nd-Tier GX/MW Graphics Variables
-	u8 *m_gx_objzbuf = nullptr;
+	std::unique_ptr<u8[]> m_gx_objzbuf;
 	std::unique_ptr<u8[]> m_gx_shdzbuf;
+	bool m_gx_topmost_on; // screen.priority() tracks the topmost screen's priority code, see gx_draw_deferred_shadows
 	s32 m_layer_colorbase[4]{};
 	s32 m_gx_tilebanks[8]{}, m_gx_oldbanks[8]{};
 	s32 m_gx_tilemode = 0, m_gx_rozenable = 0, m_psac_colorbase = 0, m_last_psac_colorbase = 0;
@@ -290,28 +283,27 @@ protected:
 	std::unique_ptr<bitmap_rgb32> m_dualscreen_left_tempbitmap;
 	std::unique_ptr<bitmap_rgb32> m_dualscreen_right_tempbitmap;
 
-	/* On Type-1 the K053936 output is rendered to these temporary bitmaps as raw data
-	the 'voxel' effect to give the pixels height is a post-process operation on the
-	output of the K053936 (this can clearly be seen in videos as large chunks of
-	scenary flicker when in the distance due to single pixels in the K053936 output
-	becoming visible / invisible due to drawing precision.
-
-	-- however, progress on this has stalled as our K053936 doesn't seem to give
-	   the right output for post processing, I suspect the game is using some
-	   unsupported flipping modes (probably due to the way it's hooked up to the
-	   rest of the chips) which is causing entirely the wrong output.
-
-	-- furthermore video\k053936.cpp contains an implementation of
-	   the K053936_zoom_draw named K053936GP_zoom_draw that's only used in konamigx ...
-
-
-	*/
+	// Type-1: the 053936 supplies coordinates to both CROM and HROM. The resulting
+	// color/height samples feed the 056540 (PSAC4), not the mixer directly.
+	// The PSAC4 software renderer approximates height projection and coverage;
+	// the DRAM pipeline and per-pixel mixer parameters remain to be emulated.
+	void type1_vblank_w(int state);
+	void type1_draw_terrain(screen_device &screen);
+	void type1_mix_terrain(bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 priority);
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap;
 	std::unique_ptr<bitmap_ind16> m_gxtype1_roz_dstbitmap2;
+	std::unique_ptr<bitmap_ind16> m_type1_terrain;
+	std::unique_ptr<bitmap_ind8> m_type1_terrain_priority;
+	std::array<bool, 256> m_type1_priority_used{};
+	u16 m_type1_bank = 0;
+	std::array<u8, 0x800> m_type1_lookup{};
+	u16 m_type1_yorigin[2]{};
+	u8 m_type1_yorigin_valid = 0;
 	rectangle m_gxtype1_roz_dstbitmapclip;
 
 	u8 m_type3_psac2_bank = 0;
 	u8 m_type3_spriteram_bank = 0;
+	bool m_type2_spritebank_enable = false;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
 	s32 m_use_68020_post_clock_hack = 0;
 	output_finder<> m_lamp;

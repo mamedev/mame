@@ -958,7 +958,7 @@ void ddragon_state::ddragon(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);
 	m_screen->set_screen_update(FUNC(ddragon_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1035,7 +1035,7 @@ void ddragon_state::ddragon6809(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);
 	m_screen->set_screen_update(FUNC(ddragon_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1082,7 +1082,7 @@ void ddragon_state::ddragon2(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_ddragon);
 	PALETTE(config, m_palette).set_format(palette_device::xBGR_444, 512);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);
 	m_screen->set_screen_update(FUNC(ddragon_state::screen_update));
 	m_screen->set_palette(m_palette);

@@ -173,8 +173,8 @@ void hd641016_device::device_start()
 	u32 *const internal_ram = static_cast<u32 *>(memshare("ram")->ptr());
 	for (int n = 0; n < 16; n++)
 	{
-		std::string rname = n == 15 ? "USP" : string_format("R%d", n);
-		state_add<u32>(H16_R0 + n, rname.c_str(),
+		std::string rname = (n == 15) ? "USP" : string_format("R%d", n);
+		state_add<u32>(H16_R0 + n, std::move(rname),
 			[this, n, internal_ram]() { return internal_ram[0xf0 - ((m_gbnr & global_bank_mask()) << 4) + n]; },
 			[this, n, internal_ram](u32 data) { internal_ram[0xf0 - ((m_gbnr & global_bank_mask()) << 4) + n] = data; }
 		);

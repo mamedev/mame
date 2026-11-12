@@ -13,6 +13,7 @@
 #include "nl_280zzzap.h"
 
 #include "mw8080bw.h"
+#include "sound.h"
 #include "speaker.h"
 
 

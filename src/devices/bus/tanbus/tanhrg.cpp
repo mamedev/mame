@@ -135,7 +135,7 @@ ioport_constructor tanbus_tanhrgc_device::device_input_ports() const
 
 void tanbus_tanhrg_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(6_MHz_XTAL, 384, 0, 256, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(tanbus_tanhrg_device::screen_update));
 
@@ -145,7 +145,7 @@ void tanbus_tanhrg_device::device_add_mconfig(machine_config &config)
 
 void tanbus_tanhrgc_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(6_MHz_XTAL, 384, 0, 256, 312, 0, 256);
 	m_screen->set_screen_update(FUNC(tanbus_tanhrgc_device::screen_update));
 

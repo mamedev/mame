@@ -57,7 +57,7 @@ void dragon_sprites_device::device_add_mconfig(machine_config &config)
 	m_vdp->set_screen("screen");
 	m_vdp->set_vram_size(0x4000);
 	m_vdp->int_callback().set(FUNC(dragon_sprites_device::nmi_w));
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 //-------------------------------------------------

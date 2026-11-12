@@ -297,7 +297,7 @@ void vsmile_base_state::vsmile_base(machine_config &config)
 {
 	config.set_default_layout(layout_vsmile);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);

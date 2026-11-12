@@ -608,69 +608,147 @@ copyright-holders:m1macrophage
 	<script><![CDATA[
 		file:set_resolve_tags_callback(
 			function()
-				local view = file.views["Default Layout"]
-				install_slider_callbacks(view)
+				local mgr = slider_manager:new(file.views["Default Layout"])
 
-				add_linndrum_knob(view, "pot_tempo", 1.5)
-				add_linndrum_knob(view, "pot_volume", 1.5)
+				add_linndrum_knob(mgr, "pot_tempo", 1.5)
+				add_linndrum_knob(mgr, "pot_volume", 1.5)
 
 				for i = 1, 6 do
-					add_linndrum_knob(view, "pot_tuning_" .. i, 3.5)
+					add_linndrum_knob(mgr, "pot_tuning_" .. i, 3.5)
 				end
-				add_linndrum_knob(view, "pot_hihat_decay", 3.5)
+				add_linndrum_knob(mgr, "pot_hihat_decay", 3.5)
 
 				for i = 1, 16 do
 					local pan_input = "pot_pan_" .. i
-					add_slider(view, "slider_" .. pan_input, "slider_knob_" .. pan_input, pan_input)
+					mgr:add_slider("slider_" .. pan_input, "slider_knob_" .. pan_input, pan_input)
 					local gain_input = "pot_gain_" .. i
-					add_slider(view, "slider_" .. gain_input, "slider_knob_" .. gain_input, gain_input)
+					mgr:add_slider("slider_" .. gain_input, "slider_knob_" .. gain_input, gain_input)
 				end
 
-				view.items["warning"]:set_state(0)
+				mgr:get_layout_item("warning"):set_state(0)
 			end)
 
-		function add_linndrum_knob(view, knob_input, scale)
+		function add_linndrum_knob(mgr, knob_input, scale)
 			-- Show interactive knob dots.
 			local knob_dot_id = "knob_dot_" .. knob_input
-			get_layout_item(view, knob_dot_id):set_state(1)
+			mgr:get_layout_item(knob_dot_id):set_state(1)
 
 			-- Hide the simplecounter element that displays the knob value. Need
 			-- to use a color_callback, instead of setting the state, since the
 			-- state is attached to the simplecounter's value.
-			get_layout_item(view, "knob_value_" .. knob_input):set_color_callback(
+			mgr:get_layout_item("knob_value_" .. knob_input):set_color_callback(
 				function()
 					return emu.render_color(0, 0, 0, 0)
 				end)
 
-			add_knob(view, "knob_" .. knob_input, knob_input, scale, VERTICAL, knob_dot_id)
+			mgr:add_knob("knob_" .. knob_input, knob_input, scale, VERTICAL, knob_dot_id)
 		end
 
 		-----------------------------------------------------------------------
 		-- Slider and knob library starts.
 		-- Can be copied as-is to other layouts.
-		-- version: 11
+		-- version: 13
 		-----------------------------------------------------------------------
-
-		-- Global configuration. Can be overwritten in the resolve_tags callback.
-		KNOB_DOT_ANGLE_SPAN = 150  -- -/+ 150 degrees from top center.
-		UPDATE_CLICK_STATE = true
 
 		-- Constants.
 		VERTICAL = 0
 		HORIZONTAL = 1
 
-		local widgets = {}   -- Stores slider and knob information.
-		local pointers = {}  -- Tracks pointer state.
+		-- slider_manager class.
+		slider_manager = {}
+
+		function slider_manager:new(view)
+			local obj = {
+				-- Configuration. Can be overwritten in the resolve_tags callback.
+				KNOB_DOT_ANGLE_SPAN = 150,  -- -/+ 150 degrees from top center.
+				UPDATE_CLICK_STATE = true,
+
+				view = view,
+				widgets = {},   -- Stores slider and knob information.
+				pointers = {},  -- Tracks pointer state.
+				frame_id = 0,   -- Current frame identifier.
+
+				-- No setmetatable in the layout plugin. Manually copy methods.
+
+				add_slider = self.add_slider,
+				add_sprung_slider = self.add_sprung_slider,
+				add_knob = self.add_knob,
+				add_encoder = self.add_encoder,
+				add_slider_internal = self.add_slider_internal,
+				add_knob_internal = self.add_knob_internal,
+
+				get_layout_item = self.get_layout_item,
+				get_port_field = self.get_port_field,
+				clamp = self.clamp,
+
+				set_click_state = self.set_click_state,
+				release_pointer = self.release_pointer,
+				pointer_updated = self.pointer_updated,
+
+				get_knob_dot_bounds = self.get_knob_dot_bounds,
+				configure_knob_dots = self.configure_knob_dots,
+
+				pointer_left = self.pointer_left,
+				pointer_aborted = self.pointer_aborted,
+				forget_pointers = self.forget_pointers,
+				track_frame_id = self.track_frame_id }
+
+			view:set_prepare_items_callback(
+				function()
+					obj:track_frame_id()
+				end)
+
+			view:set_recomputed_callback(
+				function()
+					obj:configure_knob_dots()
+				end)
+
+			view:set_pointer_updated_callback(
+				function(type, id, dev, x, y, btn, dn, up, cnt)
+					obj:pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+				end)
+
+			view:set_pointer_left_callback(
+				function(type, id, dev, x, y, up, cnt)
+					obj:pointer_left(type, id, dev, x, y, up, cnt)
+				end)
+
+			view:set_pointer_aborted_callback(
+				function(type, id, dev, x, y, up, cnt)
+					obj:pointer_aborted(type, id, dev, x, y, up, cnt)
+				end)
+
+			view:set_forget_pointers_callback(
+				function()
+					obj:forget_pointers()
+				end)
+
+			return obj
+		end
 
 		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
 		-- The click area's vertical size must exactly span the range of the
 		-- knob's movement.
-		function add_slider(view, clickarea_id, knob_id, port_name)
-			table.insert(widgets, {
-				clickarea   = get_layout_item(view, clickarea_id),
-				slider_knob = get_layout_item(view, knob_id),
-				field       = get_port_field(port_name),
-				is_knob     = false })
+		function slider_manager:add_slider(clickarea_id, knob_id, port_name)
+			local field = self:get_port_field(port_name)
+			if not field or field.is_analog or field.analog_wraps then
+				emu.print_error("Slider port '" .. port_name .. "' must be " ..
+					"an IPT_ADJUSTER. It must not use PORT_WRAPS.")
+				return
+			end
+			self:add_slider_internal(clickarea_id, knob_id, field)
+		end
+
+		-- A spring-loaded slider or wheel.
+		-- See docs for `add_slider()`.
+		function slider_manager:add_sprung_slider(clickarea_id, knob_id, port_name)
+			local field = self:get_port_field(port_name)
+			if not field or not field.is_analog or not field.centerdelta or field.centerdelta == 0 or field.analog_wraps then
+				emu.print_error("Slider port '" .. port_name .. "' must be " ..
+					"an analog port that auto-centers. It must not use PORT_WRAPS.")
+				return
+			end
+			self:add_slider_internal(clickarea_id, knob_id, field)
 		end
 
 		-- A sweep between the attached field's min and max values requires
@@ -681,49 +759,90 @@ copyright-holders:m1macrophage
 		-- element's position as the knob rotates. The distance of the dot from
 		-- the center of `clickarea` will be preserved during rotation.
 		-- It is suggested you place the dot at the top-center of the knob.
-		function add_knob(view, clickarea_id, port_name, scale, drag_direction, dot_id)
-			table.insert(widgets, {
-				clickarea     = get_layout_item(view, clickarea_id),
-				field         = get_port_field(port_name),
+		function slider_manager:add_knob(clickarea_id, port_name, scale, drag_direction, dot_id)
+			local field = self:get_port_field(port_name)
+			if not field or field.is_analog or field.analog_wraps then
+				emu.print_error("Knob port '" .. port_name .."' must be an " ..
+					"IPT_ADJUSTER and must not use PORT_WRAPS.")
+				return
+			end
+			self:add_knob_internal(clickarea_id, field, scale, drag_direction, dot_id)
+		end
+
+		-- See `add_knob()` for info on `scale` and `dot_id`.
+		-- It is assumed a full turn of the encoder changes the port value by:
+		-- (maxvalue - minvalue).
+		function slider_manager:add_encoder(clickarea_id, port_name, scale, drag_direction, dot_id)
+			local field = self:get_port_field(port_name)
+			if not field or not field.analog_wraps then
+				emu.print_error("Encoder port '" .. port_name .."' must either be " ..
+					"an IPT_ADJUSTER or IPT_POSITIONAL[_V], and it must use PORT_WRAPS.")
+				return
+			end
+			self:add_knob_internal(clickarea_id, field, scale, drag_direction, dot_id)
+		end
+
+		function slider_manager:add_slider_internal(clickarea_id, knob_id, field)
+			table.insert(self.widgets, {
+				clickarea   = self:get_layout_item(clickarea_id),
+				slider_knob = self:get_layout_item(knob_id),
+				field       = field,
+				is_knob     = false })
+		end
+
+		function slider_manager:add_knob_internal(clickarea_id, field, scale, drag_direction, dot_id)
+			table.insert(self.widgets, {
+				clickarea     = self:get_layout_item(clickarea_id),
+				field         = field,
 				is_knob       = true,
 				scale         = scale,
 				is_horizontal = (drag_direction == HORIZONTAL),
-				knob_dot      = dot_id and get_layout_item(view, dot_id) })
+				knob_dot      = dot_id and self:get_layout_item(dot_id) })
 		end
 
-		function get_layout_item(view, item_id)
-			local item = view.items[item_id]
+		function slider_manager:get_layout_item(item_id)
+			local item = self.view.items[item_id]
 			if item == nil then
 				emu.print_error("Layout element: '" .. item_id .. "' not found.")
 			end
 			return item
 		end
 
-		function get_port_field(port_name)
+		function slider_manager:get_port_field(port_name)
 			local port = file.device:ioport(port_name)
 			if port == nil then
 				emu.print_error("Port: '" .. port_name .. "' not found.")
 				return nil
 			end
 			local field = nil
+			local num_fields = 0
 			for k, val in pairs(port.fields) do
 				field = val
-				break
+				num_fields = num_fields + 1
 			end
-			local field_msg = "Needs to either be an IPT_ADJUSTER, or an analog port with auto-center."
-			if field == nil then
-				emu.print_error("Port '" .. port_name .."' " .. field_msg)
-				return nil
+			if not field then
+				emu.print_error("Port '" .. port_name .. "' does not contain a field.")
+				return null
 			end
-			if field.is_analog and (not field.centerdelta or field.centerdelta == 0) then
-				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+			if num_fields > 1 then
+				emu.print_error("Port '" .. port_name .. "' contains more than 1 field.")
 				return nil
 			end
 			return field
 		end
 
-		local function set_click_state(widget, state)
-			if UPDATE_CLICK_STATE then
+		function slider_manager:clamp(x, minval, maxval)
+			if x < minval then
+				return minval
+			elseif x > maxval then
+				return maxval
+			else
+				return x
+			end
+		end
+
+		function slider_manager:set_click_state(widget, state)
+			if self.UPDATE_CLICK_STATE then
 				if widget.is_knob then
 					widget.clickarea:set_state(state)
 				else
@@ -732,58 +851,61 @@ copyright-holders:m1macrophage
 			end
 		end
 
-		local function release_pointer(pointer_id)
-			if pointers[pointer_id] then
-				local widget = widgets[pointers[pointer_id].selected_widget]
-				set_click_state(widget, 0)
+		function slider_manager:release_pointer(pointer_id)
+			if self.pointers[pointer_id] then
+				local widget = self.widgets[self.pointers[pointer_id].selected_widget]
+				self:set_click_state(widget, 0)
 				local field = widget.field
-				if field.is_analog then
+				if field.is_analog and not field.analog_wraps then
 					field:clear_value()
 				end
 			end
-			pointers[pointer_id] = nil
+			self.pointers[pointer_id] = nil
 		end
 
-		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+		function slider_manager:pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
 			-- If a button is not pressed, reset the state of the current pointer.
 			if btn & 1 == 0 then
-				release_pointer(id)
+				self:release_pointer(id)
 				return
 			end
 
 			-- If a button was just pressed, find the affected widget, if any.
 			if dn & 1 ~= 0 then
-				for i = 1, #widgets do
+				for i = 1, #self.widgets do
 					local found, relative
-					if widgets[i].slider_knob and widgets[i].slider_knob.bounds:includes(x, y) then
+					if self.widgets[i].slider_knob and self.widgets[i].slider_knob.bounds:includes(x, y) then
 						found = true
 						relative = true
-					elseif widgets[i].clickarea.bounds:includes(x, y) then
+					elseif self.widgets[i].clickarea.bounds:includes(x, y) then
 						found = true
 						relative = false
 					end
 					if found then
-						set_click_state(widgets[i], 1)
-						pointers[id] = {
+						self:set_click_state(self.widgets[i], 1)
+						local start_value = self.widgets[i].field.port:read()
+						self.pointers[id] = {
 							selected_widget = i,
 							relative = relative,
 							start_x = x,
 							start_y = y,
-							start_value = widgets[i].field.port:read() }
+							start_value = start_value,
+							last_frame_value = start_value,
+							last_frame_id = self.frame_id }
 						break
 					end
 				end
 			end
 
 			-- If there is no widget selected by the current pointer, we are done.
-			if pointers[id] == nil then
+			if self.pointers[id] == nil then
 				return
 			end
 
 			-- A widget is selected. Update its state based on the pointer's position.
 
-			local pointer = pointers[id]
-			local widget = widgets[pointer.selected_widget]
+			local pointer = self.pointers[id]
+			local widget = self.widgets[pointer.selected_widget]
 
 			local min_value = widget.field.minvalue
 			local max_value = widget.field.maxvalue
@@ -797,6 +919,22 @@ copyright-holders:m1macrophage
 				else
 					local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
 					new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				end
+
+				-- Limit large changes for encoder inputs on a single frame, to ensure
+				-- that the direction of change is not ambiguous to the driver.
+				if widget.field.analog_wraps then
+					-- If frame tracking was perfect, the limit could be (value_range / 2 - 1).
+					-- But, occasionally, the frame boundary won't exactly match the change of
+					-- frame_id. Using the max_delta below ensures there is no ambiguity even
+					-- in those cases.
+					local max_delta = (value_range / 2.0 - 1.0) / 2.0
+					new_value = self:clamp(new_value, pointer.last_frame_value - max_delta, pointer.last_frame_value + max_delta)
+
+					if self.frame_id ~= pointer.last_frame_id then
+						pointer.last_frame_id = self.frame_id
+						pointer.last_frame_value = new_value
+					end
 				end
 			else
 				local knob_half_height = widget.slider_knob.bounds.height / 2
@@ -815,8 +953,11 @@ copyright-holders:m1macrophage
 			end
 
 			new_value = math.floor(new_value + 0.5)
-			if new_value < min_value then new_value = min_value end
-			if new_value > max_value then new_value = max_value end
+			if widget.field.analog_wraps then
+				new_value = (new_value - min_value) % (value_range + 1) + min_value
+			else
+				new_value = self:clamp(new_value, min_value, max_value)
+			end
 
 			if widget.field.is_analog then
 				widget.field:set_value(new_value)
@@ -825,7 +966,10 @@ copyright-holders:m1macrophage
 			end
 		end
 
-		local function get_knob_dot_bounds(widget)
+		-- Rotates the position of the knob indicator around the knob's center.
+		-- This will only work well for circular indicators (dots), since the
+		-- indicator itself is not being rotated.
+		function slider_manager:get_knob_dot_bounds(widget)
 			local dot = widget.knob_dot_cache
 			local value = (widget.field.port:read() - dot.value_min) / dot.value_range
 			local angle = dot.angle_min + value * dot.angle_range
@@ -836,18 +980,26 @@ copyright-holders:m1macrophage
 			return emu.render_bounds(x, y, x + dot.width, y + dot.height)
 		end
 
-		local function configure_knob_dots()
-			for i = 1, #widgets do
-				local dot = widgets[i].knob_dot
+		function slider_manager:configure_knob_dots()
+			for i = 1, #self.widgets do
+				local dot = self.widgets[i].knob_dot
 				if dot then
 					-- Remove bounds callback, since we need to access the
 					-- configured bounds.
 					dot:set_bounds_callback(nil)
 
-					local field = widgets[i].field
-					local knob_bounds = widgets[i].clickarea.bounds
+					local field = self.widgets[i].field
+					local knob_bounds = self.widgets[i].clickarea.bounds
 					local dot_bounds = dot.bounds
-					local max_angle = KNOB_DOT_ANGLE_SPAN * 2.0 * math.pi / 360.0
+
+					local angle_max, angle_min
+					if field.analog_wraps then
+						angle_max = 2.0 * math.pi
+						angle_min = 0
+					else
+						angle_max = self.KNOB_DOT_ANGLE_SPAN * 2.0 * math.pi / 360.0
+						angle_min = -angle_max
+					end
 
 					-- Compute the distance of the knob dot from the knob center.
 					local dot_x = dot_bounds.x0 + dot_bounds.width / 2.0
@@ -856,47 +1008,45 @@ copyright-holders:m1macrophage
 					local knob_y = knob_bounds.y0 + knob_bounds.height / 2.0
 					local radius = math.sqrt((dot_y - knob_y) ^ 2 + (dot_x - knob_x) ^ 2)
 
-					widgets[i].knob_dot_cache = {
+					self.widgets[i].knob_dot_cache = {
 						width       = dot_bounds.width,
 						height      = dot_bounds.height,
 						aspect      = dot_bounds.aspect,
 						value_min   = field.minvalue,
 						value_range = field.maxvalue - field.minvalue,
-						angle_min   = -max_angle,
-						angle_range = 2.0 * max_angle,
+						angle_min   = angle_min,
+						angle_range = angle_max - angle_min,
 						center_y    = -radius,
 						dx = knob_bounds.x0 + (knob_bounds.width - dot_bounds.width) / 2.0,
 						dy = knob_bounds.y0 + (knob_bounds.height - dot_bounds.height) / 2.0 }
 
 					dot:set_bounds_callback(
 						function()
-							return get_knob_dot_bounds(widgets[i])
+							return self:get_knob_dot_bounds(self.widgets[i])
 						end)
 				end
 			end
 		end
 
-		local function pointer_left(type, id, dev, x, y, up, cnt)
-			release_pointer(id)
+		function slider_manager:pointer_left(type, id, dev, x, y, up, cnt)
+			self:release_pointer(id)
 		end
 
-		local function pointer_aborted(type, id, dev, x, y, up, cnt)
-			release_pointer(id)
+		function slider_manager:pointer_aborted(type, id, dev, x, y, up, cnt)
+			self:release_pointer(id)
 		end
 
-		local function forget_pointers()
-			for id, pointer in pairs(pointers) do
-				release_pointer(id)
+		function slider_manager:forget_pointers()
+			for id, pointer in pairs(self.pointers) do
+				self:release_pointer(id)
 			end
-			pointers = {}
+			self.pointers = {}
 		end
 
-		function install_slider_callbacks(view)
-			view:set_recomputed_callback(configure_knob_dots)
-			view:set_pointer_updated_callback(pointer_updated)
-			view:set_pointer_left_callback(pointer_left)
-			view:set_pointer_aborted_callback(pointer_aborted)
-			view:set_forget_pointers_callback(forget_pointers)
+		function slider_manager:track_frame_id()
+			self.frame_id = (self.frame_id + 1) % 1000000
+			-- 1M is arbitrary. Just need to ensure the same frame ID does not
+			-- repeat between a pointer press and release.
 		end
 		-----------------------------------------------------------------------
 		-- Slider and knob library ends.

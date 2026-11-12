@@ -358,7 +358,7 @@ uint32_t metalmx_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 //  uint32_t *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
 	uint32_t const *const src_base = &m_gsp_vram[0];
 
-	for (int y = (std::max)(0, cliprect.min_y); y <= (std::min)(383, cliprect.max_y); ++y)
+	for (int y = (std::max)(0, cliprect.top()); y <= (std::min)(383, cliprect.bottom()); ++y)
 	{
 		uint16_t *pix = &bitmap.pix(y);
 		for (int x = 0; x < 256; x++)
@@ -748,7 +748,7 @@ void metalmx_state::metalmx(machine_config &config)
 	DSP32C(config, m_dsp32c[1], 40'000'000);      // Unverified
 	m_dsp32c[1]->set_addrmap(AS_PROGRAM, &metalmx_state::dsp32c_2_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 384);

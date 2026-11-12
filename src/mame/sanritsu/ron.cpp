@@ -489,7 +489,7 @@ void ron_state::ron(machine_config &config)
 	m_audiocpu->t1_in_cb().set(FUNC(ron_state::audio_t1_r));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(ron_state::screen_update));
 	screen.set_raw(VIDEO_CLOCK, 320, 0, 256, 264, 0, 240);
 	screen.set_palette("palette");

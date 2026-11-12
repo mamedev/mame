@@ -163,7 +163,7 @@ void capricorn_cpu_device::device_start()
 	state_add(CAPRICORN_E , "E" , m_reg_E).formatstr("%1X");
 	// R00 .. R77
 	for (unsigned i = 0; i < 64; i++) {
-		state_add(CAPRICORN_R00 + i , util::string_format("R%02o" , i).c_str() , m_reg[ i ]);
+		state_add(CAPRICORN_R00 + i , util::string_format("R%02o" , i) , m_reg[ i ]);
 	}
 	// PC
 	state_add(STATE_GENPC, "GENPC", m_genpc).noshow();

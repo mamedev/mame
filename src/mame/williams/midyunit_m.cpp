@@ -487,8 +487,7 @@ void midyunit_adpcm_state::init_mkyturbo()
 
 void midyunit_adpcm_state::init_mkrep()
 {
-	// patch out protection for now
-
+	// HACK: patch out protection
 	uint16_t *rom = (uint16_t *)memregion("maindata")->base();
 
 	rom[0x94234 / 2] = 0x05a0;

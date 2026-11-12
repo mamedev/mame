@@ -482,7 +482,7 @@ void targeth_state::targeth(machine_config &config)
 	m_outlatch->q_out_cb<3>().set(FUNC(targeth_state::coin_counter_w<1>));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(64*16, 16*16);

@@ -24,7 +24,7 @@ const char *s900_format::extensions() const noexcept
 
 const s900_format::format s900_format::formats[] =
 {
-	{	// 800kb 2DD (S900/S950)
+	{   // 800kb 2DD (S900/S950)
 		floppy_image::FF_35, floppy_image::DSDD, floppy_image::MFM,
 		2000,
 		5,
@@ -36,7 +36,7 @@ const s900_format::format s900_format::formats[] =
 		// (sony format has no gap 4A or IAM)
 		0, 32, 22, 116
 	},
-	{	// 1600kb 2HD (S950)
+	{   // 1600kb 2HD (S950)
 		floppy_image::FF_35, floppy_image::DSHD, floppy_image::MFM,
 		1000,
 		10,

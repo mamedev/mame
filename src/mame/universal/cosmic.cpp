@@ -795,6 +795,8 @@ void cosmic_state::machine_start()
 
 	save_item(NAME(m_background_enable));
 	save_item(NAME(m_color_registers));
+
+	save_item(NAME(m_irq_vector));
 }
 
 void cosmic_state::machine_reset()
@@ -803,6 +805,7 @@ void cosmic_state::machine_reset()
 	m_color_registers[0] = 0;
 	m_color_registers[1] = 0;
 	m_color_registers[2] = 0;
+	m_irq_vector = 0xcf; // Z80 - RST 08h
 }
 
 void cosmic_state::cosmic(machine_config &config)
@@ -811,22 +814,25 @@ void cosmic_state::cosmic(machine_config &config)
 	Z80(config, m_maincpu, 10.816_MHz_XTAL/6); // 1.8026 MHz
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(10.816_MHz_XTAL/2, 44*8, 0*8, 32*8, 32*8+6, 4*8, 28*8);
 	m_screen->set_palette(m_palette);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
 {
-	int scanline = param;
-
-	if(scanline == 224) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xd7); // Z80 - RST 10h
-
-	if(scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); // Z80 - RST 08h
+	if (param == 224 || param == 0) // vblank-out/vblank-in irqs
+	{
+		m_irq_vector = (param == 224 ? 0xd7 : 0xcf); // Z80 - RST 10h/08h
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	}
 }
 
+IRQ_CALLBACK_MEMBER(cosmic_state::cpu_acknowledge_irq)
+{
+	m_maincpu->set_input_line(0, CLEAR_LINE);
+	return m_irq_vector;
+}
 
 void cosmic_state::panic(machine_config &config)
 {
@@ -835,6 +841,7 @@ void cosmic_state::panic(machine_config &config)
 	// basic machine hardware
 	m_maincpu->set_addrmap(AS_PROGRAM, &cosmic_state::panic_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(cosmic_state::panic_scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(cosmic_state::cpu_acknowledge_irq));
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_panic);

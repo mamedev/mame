@@ -6,7 +6,7 @@
  *   by Christian Brunschen
  *
  *   TODO:
- *      gunlock and clones: Glitch sound after game over once (MT #07861)
+ *      gunlock and clones: Glitch sound after game over once (MT07861)
  *      DRAM Size isn't verified, differs per machines?
  *
  ***************************************************************************************/
@@ -459,13 +459,17 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 
 	case 0x0f:
 		dadr_latch = (dadr_latch&0x00ffff) | ((data&0xff)<<16);
-		if (ram_sel)
 		{
-			dil_latch = dram_r(dadr_latch) << 8;
-		}
-		else
-		{
-			dram_w(dadr_latch, dol_latch >> 8);
+			// DADR is left-justified like the GPR offsets, so map it through MEMSIZ the same way program accesses are
+			const int32_t address = (int32_t(dadr_latch) & memmask) >> memshift;
+			if (ram_sel)
+			{
+				dil_latch = dram_r(address) << 8;
+			}
+			else
+			{
+				dram_w(address, dol_latch >> 8);
+			}
 		}
 		break;
 
@@ -1115,13 +1119,8 @@ int8_t countLowOnes(int32_t x) {
 	return n;
 }
 
-#if VERBOSE_EXEC
-#define WRITE_REG(r, x) do { r = value; LOG_EXEC("  . writing %x (%d) to " #r "\n", r, util::sext(r, 24)); } while(0)
-#define WRITE_REG16(r, x) do { r = ((value >> 8) & 0xffff); LOG_EXEC("  . writing %x (%d) as %x (%d) to " #r "\n", value, util::sext(value, 24), r, r); } while(0)
-#else
-#define WRITE_REG(r, x) do { r = value; } while(0)
-#define WRITE_REG16(r, x) do { r = ((value >> 8) & 0xffff); } while(0)
-#endif
+#define WRITE_REG(r, x) do { r = (x); LOG_EXEC("  . writing %x (%d) to " #r "\n", r, util::sext(r, 24)); } while(0)
+#define WRITE_REG16(r, x) do { r = (((x) >> 8) & 0xffff); LOG_EXEC("  . writing %x (%d) as %x (%d) to " #r "\n", (x), util::sext((x), 24), r, r); } while(0)
 
 void es5510_device::write_reg(uint8_t reg, int32_t value)
 {

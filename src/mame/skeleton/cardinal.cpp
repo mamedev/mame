@@ -141,7 +141,7 @@ void cardinal_state::cardinal(machine_config &config)
 	m_vtlc->set_addrmap(0, &cardinal_state::ram_map);
 	m_vtlc->vsync_callback().set_inputline("maincpu", MCS51_INT0_LINE).invert();
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	SPEAKER(config, "mono").front_center();
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.05);

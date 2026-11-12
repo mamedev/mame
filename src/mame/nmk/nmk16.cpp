@@ -4353,7 +4353,7 @@ void tharrierb_state::machine_start()
 */
 void nmk16_state::set_screen_lowres(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(12'000'000)/2, 384, 92, 348, 278, 16, 240); // confirmed
 	m_screen->set_palette(m_palette);
 
@@ -4366,7 +4366,7 @@ void nmk16_state::set_screen_lowres(machine_config &config)
 // only used for powerins and (original) clones
 void nmk16_state::set_screen_midres(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'000'000)/2, 448, 60, 380, 278, 16, 240); // confirmed
 	m_screen->set_palette(m_palette);
 
@@ -4379,7 +4379,7 @@ void nmk16_state::set_screen_midres(machine_config &config)
 
 void nmk16_state::set_screen_hires(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(16'000'000)/2, 512, 28, 412, 278, 16, 240); // confirmed
 	m_screen->set_palette(m_palette);
 
@@ -5779,7 +5779,7 @@ void nmk16_state::powerinsa(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::powerinsa_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'318'181) / 2, 456, 60, 380, 262, 16, 240); // ~60hz, XTAL verified, correct params?
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 	m_screen->screen_vblank().set(FUNC(nmk16_state::screen_vblank_powerins_bootleg));
@@ -5819,7 +5819,7 @@ void nmk16_state::powerinsb(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(nmk16_state::irq0_line_hold), attotime::from_hz(120));  // YM2203 rate is at 150??
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(14'318'181) / 2, 456, 60, 380, 262, 16, 240); // ~60hz, XTAL verified, correct params?
 	m_screen->set_screen_update(FUNC(nmk16_state::screen_update_macross));
 	m_screen->screen_vblank().set(FUNC(nmk16_state::screen_vblank_powerins_bootleg));
@@ -5894,7 +5894,7 @@ void nmk16_state::manybloc(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tharrier_sound_io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(56);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	m_screen->set_size(256, 256);
@@ -6253,7 +6253,7 @@ void nmk16_state::init_acrobatmbl()
     NEW: 4eb9 0000 3510
 */
 
-	// patch PIC protection for now. TODO: remove and hook up PIC once dumped
+	// HACK: patch PIC protection for now.
 	u16 *rom = (u16 *)memregion("maincpu")->base();
 	rom[0x6c8/2] = 0x0000;
 	rom[0x6ca/2] = 0x2d84;
@@ -6263,6 +6263,7 @@ void nmk16_state::init_acrobatmbl()
 
 void nmk16_state::init_macrossbl()
 {
+	// HACK: get rid of this
 	// the protection (?) does some calculation of the data it finds in the 0x98000 - 0x9bfff range
 	// and checks the result equals a hard-coded value (0xe400). Given it isn't known what the
 	// game expects there (maybe some part of the strange extra program ROMs), for now the expected
@@ -10419,6 +10420,32 @@ ROM_START( dolmenk )
 	ROM_LOAD( "afega_3.su13", 0x040000, 0x40000, CRC(d3531018) SHA1(940067a8634339258666c89319cb0e1b43f2af56) )
 ROM_END
 
+ROM_START( puzlwrld )
+	ROM_REGION( 0x40000, "maincpu", 0 )     // 68000 code
+	ROM_LOAD16_BYTE( "afega8.uj3", 0x00000, 0x20000, CRC(be64d452) SHA1(a85df15738a03138c47c5ffca6a8255c428ee339) )
+	ROM_LOAD16_BYTE( "afega7.uj2", 0x00001, 0x20000, CRC(d812eca4) SHA1(d1b6802cf2c09f57c55464d2c41e49021f97c8fa) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )     // Z80 code
+	ROM_LOAD( "afega1.su6", 0x00000, 0x08000, CRC(17e11c06) SHA1(29d7b8b39b3a21de4740249ac45eb9832ca0475c) )
+
+	ROM_REGION( 0x80000, "sprites", 0 )   // Sprites, 16x16x4
+	ROM_LOAD16_BYTE( "afega4.ub11", 0x00000, 0x40000, CRC(ba1d2fde) SHA1(6f62b2f0956da50dabdceeceb01c29a0ce0ea874) )
+	ROM_LOAD16_BYTE( "afega5.ub13", 0x00001, 0x40000, CRC(223da2b4) SHA1(b86afb063d8461f49cb8da632570ea832919eb51) )
+
+	ROM_REGION( 0x40000, "bgtile", 0 )    // Layer 0, 16x16x8
+	ROM_LOAD( "afega9.ui20", 0x00000, 0x40000, CRC(7edd3c4e) SHA1(1321c86396c892a3a405f2f4ab7b9488f0f24188) )
+	// second empty socket
+
+	ROM_REGION( 0x20000, "fgtile", 0 )    // Layer 1, 8x8x4
+	ROM_LOAD( "afega6.uj11", 0x00000, 0x20000, CRC(8db1a7c1) SHA1(60b29e30faa7c4df07cf2d07158543b6eae42571) )
+
+	ROM_REGION( 0x80000, "oki1", 0 )   // Samples
+	ROM_LOAD( "afega2.su12", 0x000000, 0x20000, CRC(667c208a) SHA1(cc37bdbdb5fd6d09eaa517d01806775f59384758) )
+	ROM_RELOAD(              0x020000, 0x20000 )
+	ROM_LOAD( "afega3.su13", 0x040000, 0x40000, CRC(1f042b9c) SHA1(9eb5cccf072d9fa89184cbd1403f502da3eb54ae) )
+ROM_END
+
+
 /***************************************************************************
 
 Fire Hawk (ESD, 2001)
@@ -10782,6 +10809,9 @@ GAME( 1995, twinactn,   0,        twinactn,     twinactn,     nmk16_state, init_
 
 GAME( 1995, dolmen,     0,        twinactn,     dolmen,       nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Dolmen", 0 )
 GAME( 1995, dolmenk,    dolmen,   twinactn,     dolmenk,      nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Goindol (Afega)", 0 )
+
+// a Korean release of Puzzle World also exists, with different title screen
+GAME( 1996, puzlwrld,   0,        twinactn,     dolmen,       nmk16_state, init_twinactn,        ROT0,               "Afega",                             "Puzzle World", 0 )
 
 GAME( 1998, stagger1,   0,        stagger1,     stagger1,     afega_state, empty_init,           ROT270,             "Afega",                             "Stagger I (Japan)", 0 ) // flip-screen doesn't work on sprites for all sets
 GAME( 1997, redhawk,    stagger1, stagger1,     stagger1,     afega_state, init_redhawk,         ROT270,             "Afega (New Vision Ent. license)",   "Red Hawk (USA, Canada & South America)", 0 )

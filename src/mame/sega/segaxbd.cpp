@@ -277,6 +277,7 @@ ROMs:
 #include "machine/nvram.h"
 #include "sound/segapcm.h"
 #include "sound/ymopm.h"
+#include "sound.h"
 #include "speaker.h"
 
 
@@ -387,12 +388,12 @@ uint32_t segaxbd_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 			cliprect,
 			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
 					uint8_t const *const pri = &screen.priority().pix(y);
-					for (int x = rect.min_x; x <= rect.max_x; x++)
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
 						// only process written pixels
 						uint16_t const pix = src[x];
@@ -1837,7 +1838,7 @@ void segaxbd_state::xboard_base_mconfig(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaxbd);
 	PALETTE(config, m_palette).set_entries(8192*2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/8, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segaxbd_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -2253,7 +2254,9 @@ ROM_END
 //  After Burner II, Sega X-board
 //  CPU: 68000 (317-????)
 //
-// NOTE: reportedly known to exist is a French version with program ROMs EPR-11171 @ IC58 & EPR-11172 @ IC63
+// NOTE: Test menu screen shows:  DIAGNOSTIC VER. 2.00
+//       DIP switch selectable between Upright, Moving Standard, Moving Deluxe
+//       reportedly known to exist is a French version with program ROMs EPR-11171 @ IC58 & EPR-11172 @ IC63
 //
 ROM_START( aburner2 )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
@@ -2296,13 +2299,16 @@ ROM_START( aburner2 )
 	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
 	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) )
 	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
-	ROM_LOAD( "epr-11102.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
+	ROM_LOAD( "epr-11102.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) ) // == epr-10929.13? - need to verify
 ROM_END
 
 //*************************************************************************************************************************
 //  After Burner II (German), Sega X-board
 //  CPU: 68000 (317-????)
 //  Sega Game ID #: 834-6335-04 AFTER BURNER
+//
+// NOTE: Test menu screen shows:  DIAGNOSTIC VER. 2.01
+//       DIP switch selectable between Upright, Moving Standard, Moving Deluxe
 //
 ROM_START( aburner2g )
 	ROM_REGION( 0x80000, "mainpcb:maincpu", 0 ) // 68000 code
@@ -2345,7 +2351,7 @@ ROM_START( aburner2g )
 	ROM_REGION( 0x80000, "mainpcb:pcm", ROMREGION_ERASEFF ) // Sega PCM sound data
 	ROM_LOAD( "mpr-10931.11", 0x00000, 0x20000, CRC(9209068f) SHA1(01f3dda1c066d00080c55f2c86c506b6b2407f98) ) // There is known to exist German Sample ROMs
 	ROM_LOAD( "mpr-10930.12", 0x20000, 0x20000, CRC(6493368b) SHA1(328aff19ff1d1344e9115f519d3962390c4e5ba4) )
-	ROM_LOAD( "epr-11102.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) )
+	ROM_LOAD( "epr-11102.13", 0x40000, 0x20000, CRC(6c07c78d) SHA1(3868b1824f43e4f2b4fbcd9274bfb3000c889d12) ) // == epr-10929.13? - need to verify
 ROM_END
 
 
@@ -4890,8 +4896,8 @@ void segaxbd_new_state_double::init_gprider_double()
 GAME( 1987, aburner,   0,        sega_aburner2,       aburner,  segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner (VER 1.32, deluxe/upright)", 0 ) // Game ID #: 834-6335-01 AFTER BURNER
 GAME( 1987, aburner131,aburner,  sega_aburner2,       aburner,  segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner (VER 1.31, deluxe/upright)", 0 ) // Game ID #: 834-6335-02 AFTER BURNER
 
-GAME( 1987, aburner2,  0,        sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II", 0 )
-GAME( 1987, aburner2g, aburner2, sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II (German)", 0 )
+GAME( 1987, aburner2,  0,        sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II (VER 2.00, deluxe/upright)", 0 )
+GAME( 1987, aburner2g, aburner2, sega_aburner2,       aburner2, segaxbd_new_state, init_aburner2, ROT0, "Sega", "After Burner II (German, VER 2.01, deluxe/upright)", 0 )
 
 GAME( 1987, thndrbld,  0,        sega_xboard_fd1094,  thndrbld, segaxbd_new_state, empty_init,    ROT0, "Sega", "Thunder Blade (upright) (FD1094 317-0056)", 0 )
 GAME( 1987, thndrbld1, thndrbld, sega_xboard,         thndrbd1, segaxbd_new_state, empty_init,    ROT0, "Sega", "Thunder Blade (deluxe/standing) (unprotected)", 0 )

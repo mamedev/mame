@@ -206,7 +206,7 @@ void superjr_state::superjr(machine_config &config)
 	m_maincpu->input_flag_cb().set(FUNC(superjr_state::input_flag_read));
 	m_maincpu->set_addrmap(AS_PROGRAM, &superjr_state::superjr_mem);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(95, 32);
 	m_screen->set_visarea(0, 95 - 1, 0, 32 - 1);

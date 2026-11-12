@@ -232,13 +232,14 @@ uint32_t dfs500_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		double stepx = double (input_bitmap.width()) / VIDEO_WIDTH;
 		double stepy = double (input_bitmap.height()) / VIDEO_HEIGHT;
 
-		for (unsigned screen_y = screen.visible_area().min_y; screen_y <= screen.visible_area().max_y; screen_y++)
+		for (unsigned screen_y = screen.visible_area().top(); screen_y <= screen.visible_area().bottom(); screen_y++)
 		{
-			for (unsigned screen_x = screen.visible_area().min_x; screen_x <= screen.visible_area().max_x; screen_x++)
+			auto *const dst = &bitmap.pix(screen_y);
+			for (unsigned screen_x = screen.visible_area().left(); screen_x <= screen.visible_area().right(); screen_x++)
 			{
-				bitmap.pix(screen_y, screen_x) = input_bitmap.pix(
-					int(double (screen_y % VIDEO_HEIGHT) * stepy),
-					int(double (screen_x % VIDEO_WIDTH) * stepx));
+				dst[screen_x] = input_bitmap.pix(
+						int(double(screen_y % VIDEO_HEIGHT) * stepy),
+						int(double(screen_x % VIDEO_WIDTH) * stepx));
 			}
 		}
 	}
@@ -571,8 +572,6 @@ void dfs500_state::cpanel_reg1_w(offs_t offset, uint8_t data)
 			// Here "data" holds the 8-bit value of the "interrupt vector number"
 						//  to be put on the data bus when the CPU asserts /INTAK (Interrupt Acknowledge)
 			m_int_vector = data;
-			// FIXME: Is this an alternative way of doing it?
-			//        m_cpanelcpu->set_input_line_and_vector(0, HOLD_LINE, data);
 			break;
 		default:
 			break;
@@ -1010,7 +1009,7 @@ void dfs500_state::dfs500(machine_config &config)
 	IMAGE_PICTURE(config, m_input[2]);
 	IMAGE_PICTURE(config, m_input[3]);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(VIDEO_WIDTH, VIDEO_HEIGHT);
 	m_screen->set_visarea(0, VIDEO_WIDTH-1, 0, VIDEO_HEIGHT-1);

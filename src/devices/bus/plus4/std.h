@@ -31,9 +31,10 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
-	// device_plus4_expansion_card_interface overrides
-	virtual uint8_t plus4_cd_r(offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) override;
+private:
+	void install_rom(plus4_expansion_window &window, memory_region *region);
 };
 
 

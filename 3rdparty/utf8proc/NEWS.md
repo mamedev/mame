@@ -1,5 +1,41 @@
 # utf8proc release history #
 
+## Version 2.11.3 ##
+
+2025-12-30
+
+- Correct out-of-bounds memory access when calling `utf8proc_map` with both `UTF8PROC_CHARBOUND` and `UTF8PROC_COMPOSE` ([#323]).
+
+## Version 2.11.2 ##
+
+2025-11-22
+
+- Fix composition for Hangul character U+11a7 ([#317]).
+
+## Version 2.11.1 ##
+
+2025-11-13
+
+ - Correct out-of-bounds memory access when calling `utf8proc_map` with both `UTF8PROC_CHARBOUND` and `UTF8PROC_DECOMPOSE` ([#311]).
+
+## Version 2.11.0 ##
+
+2025-09-10
+
+ - Unicode 17 support ([#292], [#294]).
+
+ - Documentation improvements ([#295], [#291]).
+
+ - Build fix for C90 ([#284]), silence ASAN warning ([#240]), CMake modernization ([#260]).
+
+## Version 2.10.0 ##
+
+2024-12-31
+
+ - Unicode 16 support ([#277]).
+ - New `utf8proc_charwidth_ambiguous` function to return whether a character has
+   East Asian width class A (Ambiguous) ([#270]).
+
 ## Version 2.9.0 ##
 
 2023-10-20
@@ -441,5 +477,17 @@ Release of version 1.0.1
 [#205]: https://github.com/JuliaStrings/utf8proc/issues/205
 [#224]: https://github.com/JuliaStrings/utf8proc/issues/224
 [#233]: https://github.com/JuliaStrings/utf8proc/issues/233
+[#240]: https://github.com/JuliaStrings/utf8proc/issues/240
 [#247]: https://github.com/JuliaStrings/utf8proc/issues/247
 [#253]: https://github.com/JuliaStrings/utf8proc/issues/253
+[#260]: https://github.com/JuliaStrings/utf8proc/issues/260
+[#270]: https://github.com/JuliaStrings/utf8proc/issues/270
+[#277]: https://github.com/JuliaStrings/utf8proc/issues/277
+[#284]: https://github.com/JuliaStrings/utf8proc/issues/284
+[#291]: https://github.com/JuliaStrings/utf8proc/issues/291
+[#292]: https://github.com/JuliaStrings/utf8proc/issues/292
+[#294]: https://github.com/JuliaStrings/utf8proc/issues/294
+[#295]: https://github.com/JuliaStrings/utf8proc/issues/295
+[#311]: https://github.com/JuliaStrings/utf8proc/issues/311
+[#317]: https://github.com/JuliaStrings/utf8proc/issues/317
+[#323]: https://github.com/JuliaStrings/utf8proc/issues/323

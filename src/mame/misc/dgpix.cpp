@@ -500,7 +500,7 @@ void dgpix_state::dgpix_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &dgpix_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(512, 256);
@@ -870,6 +870,7 @@ void dgpix_typea_state::init_elfin()
 {
 	u8 *rom = memregion("flash7")->base();
 
+	// HACK: patch around undumped/unemulated PIC microcontroller
 	rom[BYTE4_XOR_LE(0x3a9e94)] = 0;
 	rom[BYTE4_XOR_LE(0x3a9e95)] = 3;
 	rom[BYTE4_XOR_LE(0x3a9e96)] = 0;
@@ -882,6 +883,7 @@ void dgpix_typea_state::init_jumpjump()
 {
 	u8 *rom = memregion("flash7")->base();
 
+	// HACK: patch around undumped/unemulated PIC microcontroller
 	rom[BYTE4_XOR_LE(0x3a829a)] = 0;
 	rom[BYTE4_XOR_LE(0x3a829b)] = 3;
 	rom[BYTE4_XOR_LE(0x3a829c)] = 0;
@@ -894,6 +896,7 @@ void dgpix_typea_state::init_xfiles()
 {
 	u8 *rom = memregion("flash7")->base();
 
+	// HACK: patch around undumped/unemulated PIC microcontroller
 	rom[BYTE4_XOR_LE(0x3a9a2a)] = 0;
 	rom[BYTE4_XOR_LE(0x3a9a2b)] = 3;
 	rom[BYTE4_XOR_LE(0x3a9a2c)] = 0;
@@ -906,6 +909,7 @@ void dgpix_typea_state::init_xfilesk()
 {
 	u8 *rom = memregion("flash7")->base();
 
+	// HACK: patch around undumped/unemulated PIC microcontroller
 	rom[BYTE4_XOR_LE(0x3aa92e)] = 0;
 	rom[BYTE4_XOR_LE(0x3aa92f)] = 3;
 	rom[BYTE4_XOR_LE(0x3aa930)] = 0;
@@ -921,6 +925,7 @@ void dgpix_typea_state::init_kdynastg()
 {
 	u8 *rom = memregion("flash7")->base();
 
+	// HACK: patch around undumped/unemulated PIC microcontroller
 	rom[BYTE4_XOR_LE(0x3aaa10)] = 0; // 129f0 - nopped call
 	rom[BYTE4_XOR_LE(0x3aaa11)] = 3;
 	rom[BYTE4_XOR_LE(0x3aaa12)] = 0;
@@ -931,14 +936,15 @@ void dgpix_typea_state::init_kdynastg()
 	rom[BYTE4_XOR_LE(0x3a45c8)] = 0; // c5a8 - added ret
 	rom[BYTE4_XOR_LE(0x3a45c9)] = 5;
 
-//  protection related ?
-//  m_maincpu->space(AS_PROGRAM).nop_read(0x12341234, 0x12341243);
+	// protection related ?
+	//m_maincpu->space(AS_PROGRAM).nop_read(0x12341234, 0x12341243);
 }
 
 void dgpix_bmkey_state::init_letsdnce()
 {
 	u8 *rom = memregion("flash7")->base();
 
+	// HACK: patch around undumped/unemulated PIC microcontroller
 	rom[BYTE4_XOR_LE(0x3a9eb2)] = 0;
 	rom[BYTE4_XOR_LE(0x3a9eb3)] = 3;
 	rom[BYTE4_XOR_LE(0x3a9eb4)] = 0;
@@ -951,6 +957,7 @@ void dgpix_bmkey_state::init_btplay2k()
 {
 	u8 *rom = memregion("flash7")->base();
 
+	// HACK: patch around undumped/unemulated PIC microcontroller
 	rom[BYTE4_XOR_LE(0x3a7914)] = 0;
 	rom[BYTE4_XOR_LE(0x3a7915)] = 3;
 	rom[BYTE4_XOR_LE(0x3a7916)] = 0;

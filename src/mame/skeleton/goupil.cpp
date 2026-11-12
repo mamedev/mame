@@ -520,7 +520,7 @@ void goupil_base_state::base(machine_config &config)
 {
 	M6808(config, m_maincpu, CPU_CLOCK);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 
 	// TODO: sound hardware

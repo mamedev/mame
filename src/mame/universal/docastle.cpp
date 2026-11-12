@@ -1107,7 +1107,7 @@ void docastle_state::docastle(machine_config &config)
 	m_crtc->set_show_border_area(false);
 	m_crtc->set_visarea_adjust(8,-8,0,0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(9.828_MHz_XTAL/2, 0x138, 8, 0x100-8, 0x108, 0, 0xc0); // from CRTC
 	screen.set_screen_update(FUNC(docastle_state::screen_update));
 

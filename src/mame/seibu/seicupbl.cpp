@@ -196,7 +196,7 @@ void seicupbl_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite wrap,
 		   this doesn't work on denjin makai as the visible area is larger */
-		if (cliprect.max_x<(320 - 1))
+		if (cliprect.right()<(320 - 1))
 		{
 			x &= 0x1ff;
 			y &= 0x1ff;
@@ -560,7 +560,7 @@ void seicupbl_state::cupsocbl(machine_config &config)
 	//m_audiocpu->set_periodic_int("screen", FUNC(seicupbl_state::nmi_line_pulse));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(42*8, 36*8);

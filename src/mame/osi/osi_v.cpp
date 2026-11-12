@@ -145,7 +145,7 @@ uint32_t uk101_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 void sb2m600_state::osi600_video(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(X1/256/256); // 60 Hz
 	screen.set_screen_update(FUNC(sb2m600_state::screen_update));
 	screen.set_size(64*8, 32*8);
@@ -157,7 +157,7 @@ void sb2m600_state::osi600_video(machine_config &config)
 
 void uk101_state::uk101_video(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(uk101_state::screen_update));
 	screen.set_size(64*8, 16*16);
@@ -169,7 +169,7 @@ void uk101_state::uk101_video(machine_config &config)
 
 void sb2m600_state::osi630_video(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(X1/256/256); // 60 Hz
 	screen.set_screen_update(FUNC(sb2m600_state::screen_update));
 	screen.set_size(64*8, 16*16);

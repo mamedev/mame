@@ -689,7 +689,7 @@ void jollyjgr_state::jollyjgr(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jollyjgr_state::jollyjgr_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240); // measured 59.1864Hz
 	screen.set_screen_update(FUNC(jollyjgr_state::screen_update_jollyjgr));
 	screen.screen_vblank().set(FUNC(jollyjgr_state::vblank_irq));
@@ -789,5 +789,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 1981, fspiderb, 0, fspider,  fspider,  jollyjgr_state, empty_init, ROT90, "Taito Corporation", "Frog & Spiders (bootleg?)", MACHINE_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
-GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, jollyjgr_state, empty_init, ROT90, "Taito Corporation", "Jolly Jogger",              MACHINE_SUPPORTS_SAVE )
+GAME( 1981, fspiderb, 0, fspider,  fspider,  jollyjgr_state, empty_init, ROT90, "Taito", "Frog & Spiders (bootleg?)", MACHINE_SUPPORTS_SAVE ) // comes from a Fawaz Group bootleg(?) board
+GAME( 1982, jollyjgr, 0, jollyjgr, jollyjgr, jollyjgr_state, empty_init, ROT90, "Taito", "Jolly Jogger",              MACHINE_SUPPORTS_SAVE )

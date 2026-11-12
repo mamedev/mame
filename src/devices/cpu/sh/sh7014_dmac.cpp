@@ -276,7 +276,9 @@ bool sh7014_dmac_channel_device::is_dma_activated(int vector)
 	if (!m_dma_timer_active)
 		return false;
 
-	m_dma_current_active_timer->adjust(attotime::from_ticks(2, clock()));
+	// The manual says "at least 2 clocks"; truckk's music streamer loses the race and
+	// plays byte-offset garbage if this isn't 4 clocks.
+	m_dma_current_active_timer->adjust(attotime::from_ticks(4, clock()));
 
 	return true;
 }
@@ -356,7 +358,9 @@ TIMER_CALLBACK_MEMBER( sh7014_dmac_channel_device::dma_timer_callback )
 
 void sh7014_dmac_channel_device::dma_check()
 {
-	if (!m_dmac->is_transfer_allowed()) {
+	// a transfer runs only while DE and DME are both set, the transfer end
+	// flag is clear and neither error flag is up
+	if (!m_dmac->is_transfer_allowed() || !is_enabled() || (m_chcr & CHCR_TE) != 0) {
 		if (m_dma_timer_active) {
 			LOG("SH7014: DMA %d cancelled in-flight\n", m_channel_id);
 			m_dma_current_active_timer->adjust(attotime::never);

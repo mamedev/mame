@@ -329,9 +329,9 @@ ROM_END
 } // anonymous namespace
 
 
-CONS( 2005, senbbs,      0,     0,        senbbs,       senbbs,    spg2xx_senario_bbs_state,   empty_init, "Senario", "Big Bonus Slots (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, senapren,    0,     0,        sencosmo,     senappren, spg2xx_senario_cosmo_state, empty_init, "Senario", "The Apprentice (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, senpmate,    0,     0,        senbbs,       senpmate,  spg2xx_senario_bbs_state,   empty_init, "Senario", "The Perfect Mate (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, sencosmo,    0,     0,        sencosmo,     sencosmo,  spg2xx_senario_cosmo_state, empty_init, "Senario", "Cosmo Girl (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005, senstriv,    0,     0,        sencosmo,     sencosmo,  spg2xx_senario_cosmo_state, empty_init, "Senario", "Sports Trivia Professional Edition (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 2005?,senmil,      0,     0,        senmil,       senmil,    spg2xx_senario_mil_state,   empty_init, "Senario", "Who Wants to Be a Millionaire? (Senario, Plug and Play, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, senbbs,   0, 0, senbbs,   senbbs,    spg2xx_senario_bbs_state,   empty_init, "Senario", "Big Bonus Slots (Senario, Plug and Play)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, senapren, 0, 0, sencosmo, senappren, spg2xx_senario_cosmo_state, empty_init, "Senario", "The Apprentice (Senario, Plug and Play)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, senpmate, 0, 0, senbbs,   senpmate,  spg2xx_senario_bbs_state,   empty_init, "Senario", "The Perfect Mate (Senario, Plug and Play)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, sencosmo, 0, 0, sencosmo, sencosmo,  spg2xx_senario_cosmo_state, empty_init, "Senario", "Cosmo Girl (Senario, Plug and Play)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005, senstriv, 0, 0, sencosmo, sencosmo,  spg2xx_senario_cosmo_state, empty_init, "Senario", "Sports Trivia Professional Edition (Senario, Plug and Play)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2005?,senmil,   0, 0, senmil,   senmil,    spg2xx_senario_mil_state,   empty_init, "Senario", "Who Wants to Be a Millionaire? (Senario, Plug and Play, US)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

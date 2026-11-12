@@ -112,7 +112,7 @@ void minivadr_state::minivadr(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(minivadr_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);
@@ -137,4 +137,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1990, minivadr, 0, minivadr, minivadr, minivadr_state, empty_init, ROT0, "Taito Corporation", "Mini Vaders", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+GAME( 1990, minivadr, 0, minivadr, minivadr, minivadr_state, empty_init, ROT0, "Taito", "Mini Vaders", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

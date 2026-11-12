@@ -62,8 +62,8 @@ private:
 	TIMER_CALLBACK_MEMBER(clear_ack);
 	void transfer();
 	void count();
-	void update_int(bool state) { if (m_int != state) { logerror("int %u\n", state); m_int = state; m_write_int(state); } }
-	void update_req0(bool state) { if (m_brq != state) { logerror("req0 %u\n", state); m_brq = state; m_write_req0(state); } }
+	void update_int(bool state) { if (m_int != state) { m_int = state; m_write_int(!state); } }
+	void update_req0(bool state) { if (m_brq != state) { m_brq = state; m_write_req0(state); } }
 
 	bool m_int = 1;
 	bool m_brq = 1;

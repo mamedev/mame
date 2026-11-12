@@ -841,7 +841,7 @@ void stactics_state::stactics(machine_config &config)
 	lamplatch.q_out_cb<6>().set(FUNC(stactics_state::barrier_lamp_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	screen.set_raw(15.46848_MHz_XTAL / 3, 328, 0, 256, 262, 0, 232);
 	screen.set_screen_update(FUNC(stactics_state::screen_update));

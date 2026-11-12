@@ -274,10 +274,10 @@ void msx_cart_base_mm_ram_device::device_start()
 	);
 
 	// The MSX system allows multiple devices to react to I/O, so we use taps.
-	io_space().install_write_tap(0xfc, 0xfc, "bank0", [this] (offs_t, u8& data, u8){ this->bank_w<0>(data); });
-	io_space().install_write_tap(0xfd, 0xfd, "bank1", [this] (offs_t, u8& data, u8){ this->bank_w<1>(data); });
-	io_space().install_write_tap(0xfe, 0xfe, "bank2", [this] (offs_t, u8& data, u8){ this->bank_w<2>(data); });
-	io_space().install_write_tap(0xff, 0xff, "bank3", [this] (offs_t, u8& data, u8){ this->bank_w<3>(data); });
+	io_space().install_write_tap(0xfc, 0xfc, "bank0", [this] (offs_t, u8 &data, u8) { this->bank_w<0>(data); });
+	io_space().install_write_tap(0xfd, 0xfd, "bank1", [this] (offs_t, u8 &data, u8) { this->bank_w<1>(data); });
+	io_space().install_write_tap(0xfe, 0xfe, "bank2", [this] (offs_t, u8 &data, u8) { this->bank_w<2>(data); });
+	io_space().install_write_tap(0xff, 0xff, "bank3", [this] (offs_t, u8 &data, u8) { this->bank_w<3>(data); });
 
 	page(0)->install_readwrite_bank(0x0000, 0x3fff, m_rambank[0]);
 	page(1)->install_readwrite_bank(0x4000, 0x7fff, m_rambank[1]);
@@ -373,18 +373,18 @@ void msx_cart_mmm_device::device_start()
 	m_access_enabled = false;
 	m_sn76489_enabled = false;
 
-	io_space().install_write_tap(0x3c, 0x3c, "ena_access", [this] (offs_t, u8& data, u8){ this->m_access_enabled = BIT(data, 7); });
-	io_space().install_write_tap(0x3f, 0x3f, "sn76489w", [this] (offs_t, u8& data, u8){ if (m_sn76489_enabled) this->m_sn76489a->write(data); });
+	io_space().install_write_tap(0x3c, 0x3c, "ena_access", [this] (offs_t, u8 &data, u8) { this->m_access_enabled = BIT(data, 7); });
+	io_space().install_write_tap(0x3f, 0x3f, "sn76489w", [this] (offs_t, u8 &data, u8) { if (m_sn76489_enabled) this->m_sn76489a->write(data); });
 
-	page(2)->install_write_tap(0x803c, 0x803c, "ena_sn76489", [this] (offs_t, u8& data, u8){ if (m_access_enabled) this->m_sn76489_enabled |= BIT(data, 6); });
-	page(2)->install_read_tap(0x80fc, 0x80fc, "map00r", [this] (offs_t, u8& data, u8){ if (m_access_enabled) data = 0xc0 | this->m_rambank[0]->entry(); });
-	page(2)->install_read_tap(0x80fd, 0x80fd, "map40r", [this] (offs_t, u8& data, u8){ if (m_access_enabled) data = 0xc0 | this->m_rambank[1]->entry(); });
-	page(2)->install_read_tap(0x80fe, 0x80fe, "map80r", [this] (offs_t, u8& data, u8){ if (m_access_enabled) data = 0xc0 | this->m_rambank[2]->entry(); });
-	page(2)->install_read_tap(0x80ff, 0x80ff, "mapc0r", [this] (offs_t, u8& data, u8){ if (m_access_enabled) data = 0xc0 | this->m_rambank[3]->entry(); });
-	page(2)->install_write_tap(0x80fc, 0x80fc, "map00w", [this] (offs_t, u8& data, u8){ if (m_access_enabled) this->bank_w<0>(data); });
-	page(2)->install_write_tap(0x80fd, 0x80fd, "map40w", [this] (offs_t, u8& data, u8){ if (m_access_enabled) this->bank_w<1>(data); });
-	page(2)->install_write_tap(0x80fe, 0x80fe, "map80w", [this] (offs_t, u8& data, u8){ if (m_access_enabled) this->bank_w<2>(data); });
-	page(2)->install_write_tap(0x80ff, 0x80ff, "mapc0w", [this] (offs_t, u8& data, u8){ if (m_access_enabled) this->bank_w<3>(data); });
+	page(2)->install_write_tap(0x803c, 0x803c, "ena_sn76489", [this] (offs_t, u8 &data, u8) { if (m_access_enabled) this->m_sn76489_enabled |= BIT(data, 6); });
+	page(2)->install_read_tap(0x80fc, 0x80fc, "map00r", [this] (offs_t, u8 &data, u8) { if (m_access_enabled) data = 0xc0 | this->m_rambank[0]->entry(); });
+	page(2)->install_read_tap(0x80fd, 0x80fd, "map40r", [this] (offs_t, u8 &data, u8) { if (m_access_enabled) data = 0xc0 | this->m_rambank[1]->entry(); });
+	page(2)->install_read_tap(0x80fe, 0x80fe, "map80r", [this] (offs_t, u8 &data, u8) { if (m_access_enabled) data = 0xc0 | this->m_rambank[2]->entry(); });
+	page(2)->install_read_tap(0x80ff, 0x80ff, "mapc0r", [this] (offs_t, u8 &data, u8) { if (m_access_enabled) data = 0xc0 | this->m_rambank[3]->entry(); });
+	page(2)->install_write_tap(0x80fc, 0x80fc, "map00w", [this] (offs_t, u8 &data, u8) { if (m_access_enabled) this->bank_w<0>(data); });
+	page(2)->install_write_tap(0x80fd, 0x80fd, "map40w", [this] (offs_t, u8 &data, u8) { if (m_access_enabled) this->bank_w<1>(data); });
+	page(2)->install_write_tap(0x80fe, 0x80fe, "map80w", [this] (offs_t, u8 &data, u8) { if (m_access_enabled) this->bank_w<2>(data); });
+	page(2)->install_write_tap(0x80ff, 0x80ff, "mapc0w", [this] (offs_t, u8 &data, u8) { if (m_access_enabled) this->bank_w<3>(data); });
 
 	save_item(NAME(m_access_enabled));
 	save_item(NAME(m_sn76489_enabled));
@@ -495,10 +495,10 @@ void msx_cart_double_ram_device::device_start()
 	io_space().install_write_tap(0x8e, 0x8e, "megaram_r", [this] (offs_t, u8&, u8) { if (m_megaram) for (int i = 0; i < 4; i++) m_mrview[i].select(MODE_RO); } );
 
 	// The MSX system allows multiple devices to react to I/O, so we use taps.
-	io_space().install_write_tap(0xfc, 0xfc, "bank0", [this] (offs_t, u8& data, u8){ if (!m_megaram) this->bank_w<0>(data); });
-	io_space().install_write_tap(0xfd, 0xfd, "bank1", [this] (offs_t, u8& data, u8){ if (!m_megaram) this->bank_w<1>(data); });
-	io_space().install_write_tap(0xfe, 0xfe, "bank2", [this] (offs_t, u8& data, u8){ if (!m_megaram) this->bank_w<2>(data); });
-	io_space().install_write_tap(0xff, 0xff, "bank3", [this] (offs_t, u8& data, u8){ if (!m_megaram) this->bank_w<3>(data); });
+	io_space().install_write_tap(0xfc, 0xfc, "bank0", [this] (offs_t, u8 &data, u8) { if (!m_megaram) this->bank_w<0>(data); });
+	io_space().install_write_tap(0xfd, 0xfd, "bank1", [this] (offs_t, u8 &data, u8) { if (!m_megaram) this->bank_w<1>(data); });
+	io_space().install_write_tap(0xfe, 0xfe, "bank2", [this] (offs_t, u8 &data, u8) { if (!m_megaram) this->bank_w<2>(data); });
+	io_space().install_write_tap(0xff, 0xff, "bank3", [this] (offs_t, u8 &data, u8) { if (!m_megaram) this->bank_w<3>(data); });
 
 	save_item(NAME(m_megaram));
 

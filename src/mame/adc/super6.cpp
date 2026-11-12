@@ -5,21 +5,17 @@
 TODO:
 - peripheral interfaces
 
-- Fix floppy. It needs to WAIT the cpu whenever port 0x14 is read, wait
-  for either DRQ or INTRQ to assert, then release the cpu and then do the
-  actual port read. But it doesn't work properly at the moment. It gets stuck
-  if you load up the cpm disk (from software list). The other disks are useless.
-
-  The schematic isn't clear, but it seems the 2 halves of U16 (as shown) have
-  a common element, so that activity on one side can affect what happens on
-  the other side.
-
 */
 
 #include "emu.h"
-#include "bus/rs232/rs232.h"
-//#include "bus/s100/s100.h"
 #include "super6.h"
+
+#include "bus/rs232/rs232.h"
+#include "bus/s100/dj2db.h"
+#include "bus/s100/djdma.h"
+#include "bus/s100/mm65k16s.h"
+#include "bus/s100/superslave.h"
+#include "bus/s100/wunderbus.h"
 #include "softlist_dev.h"
 
 //**************************************************************************
@@ -38,8 +34,8 @@ void super6_state::bankswitch()
 	// power on jump
 	if (!BIT(m_bank0, 6)) { program.install_rom(0x0000, 0x07ff, 0xf800, m_rom); return; }
 
-	// first 64KB of memory
-	program.install_ram(0x0000, 0xffff, ram);
+	// S-100 bus memory
+	program.install_readwrite_handler(0x0000, 0xffff, emu::rw_delegate(*this, FUNC(super6_state::s100_mem_r)), emu::rw_delegate(*this, FUNC(super6_state::s100_mem_w)));
 
 	// second 64KB of memory
 	int map = (m_bank1 >> 4) & 0x07;
@@ -115,6 +111,24 @@ void super6_state::s100_w(uint8_t data)
 	*/
 
 	m_s100 = data;
+}
+
+void super6_state::s100_rdy_w(int state)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, state ? CLEAR_LINE : ASSERT_LINE);
+
+	if (!state)
+		m_maincpu->retry_access();
+}
+
+uint8_t super6_state::s100_mem_r(offs_t offset)
+{
+	return m_bus->smemr_r((m_s100 << 16) | offset);
+}
+
+void super6_state::s100_mem_w(offs_t offset, uint8_t data)
+{
+	m_bus->mwrt_w((m_s100 << 16) | offset, data);
 }
 
 
@@ -198,15 +212,12 @@ uint8_t super6_state::fdc_r()
 
 	*/
 
-	if (!machine().side_effects_disabled())
+	if (!machine().side_effects_disabled() && !m_fdc->drq_r() && !m_fdc->intrq_r())
 	{
-		if (!m_z80_wait)
-		{
-			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
-			m_maincpu->retry_access();
-		}
+		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->retry_access();
 
-		m_z80_wait = !m_z80_wait;
+		return 0xff;
 	}
 
 	return m_fdc->intrq_r() ? 0x7f : 0xff;
@@ -279,6 +290,7 @@ void super6_state::super6_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
+	map(0x00, 0xff).rw(m_bus, FUNC(s100_bus_device::sinp_r), FUNC(s100_bus_device::sout_w));
 	map(0x00, 0x03).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x04, 0x07).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -382,7 +394,7 @@ void super6_state::io_write_byte(offs_t offset, uint8_t data)
 
 static void super6_floppies(device_slot_interface &device)
 {
-	device.option_add("525dd", FLOPPY_525_QD);
+	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
 void super6_state::fdc_intrq_w(int state)
@@ -401,17 +413,30 @@ void super6_state::fdc_drq_w(int state)
 
 
 //-------------------------------------------------
+//  super6_s100_cards
+//-------------------------------------------------
+
+static void super6_s100_cards(device_slot_interface &device)
+{
+	device.option_add("dj2db", S100_DJ2DB);
+	device.option_add("djdma", S100_DJDMA);
+	device.option_add("mm65k16s", S100_MM65K16S);
+	device.option_add("superslave", S100_SUPERSLAVE);
+	device.option_add("wunderbus", S100_WUNDERBUS);
+}
+
+
+//-------------------------------------------------
 //  z80_daisy_config super6_daisy_chain
 //-------------------------------------------------
 
-// no evidence of daisy chain in use - removed for now
-//static const z80_daisy_config super6_daisy_chain[] =
-//{
-//  { Z80CTC_TAG },
-//  { Z80DART_TAG },
-//  { Z80PIO_TAG },
-//  { nullptr }
-//};
+static const z80_daisy_config super6_daisy_chain[] =
+{
+	{ Z80CTC_TAG },
+	{ Z80DART_TAG },
+	{ Z80PIO_TAG },
+	{ nullptr }
+};
 
 
 //**************************************************************************
@@ -425,7 +450,6 @@ void super6_state::fdc_drq_w(int state)
 void super6_state::machine_start()
 {
 	// state saving
-	save_item(NAME(m_z80_wait));
 	save_item(NAME(m_s100));
 	save_item(NAME(m_bank0));
 	save_item(NAME(m_bank1));
@@ -434,7 +458,6 @@ void super6_state::machine_start()
 
 void super6_state::machine_reset()
 {
-	m_z80_wait = false;
 	m_bank0 = m_bank1 = 0;
 
 	bankswitch();
@@ -456,7 +479,7 @@ void super6_state::super6(machine_config &config)
 	Z80(config, m_maincpu, 24_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &super6_state::super6_mem);
 	m_maincpu->set_addrmap(AS_IO, &super6_state::super6_io);
-	//m_maincpu->set_daisy_config(super6_daisy_chain);
+	m_maincpu->set_daisy_config(super6_daisy_chain);
 	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	// devices
@@ -481,7 +504,7 @@ void super6_state::super6(machine_config &config)
 	m_fdc->intrq_wr_callback().set(FUNC(super6_state::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(super6_state::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], super6_floppies, "525dd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], super6_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], super6_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats).enable_sound(true);
 
 	Z80DART(config, m_dart, 24_MHz_XTAL / 4);
@@ -504,6 +527,19 @@ void super6_state::super6(machine_config &config)
 	m_brg->fr_handler().append(m_dart, FUNC(z80dart_device::rxca_w));
 	m_brg->fr_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
 	m_brg->ft_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+
+	// S-100 bus
+	S100_BUS(config, m_bus, 24_MHz_XTAL / 4);
+	m_bus->rdy().set(FUNC(super6_state::s100_rdy_w));
+	S100_SLOT(config, S100_TAG ":2", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":3", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":4", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":5", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":6", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":7", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":8", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":9", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":10", super6_s100_cards, nullptr);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");
@@ -542,4 +578,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                         FULLNAME     FLAGS
-COMP( 1983, super6, 0,      0,      super6,  super6, super6_state, empty_init, "Advanced Digital Corporation", "Super Six", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1983, super6, 0,      0,      super6,  super6, super6_state, empty_init, "Advanced Digital Corporation", "Super Six", MACHINE_NO_SOUND_HW )

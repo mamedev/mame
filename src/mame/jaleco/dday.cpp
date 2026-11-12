@@ -620,7 +620,7 @@ void dday_state::dday(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60000)); // for I8257
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);

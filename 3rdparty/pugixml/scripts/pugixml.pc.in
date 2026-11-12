@@ -1,11 +1,11 @@
 prefix=@CMAKE_INSTALL_PREFIX@
 exec_prefix=${prefix}
-includedir=@CMAKE_INSTALL_FULL_INCLUDEDIR@@INSTALL_SUFFIX@
-libdir=@CMAKE_INSTALL_FULL_LIBDIR@@INSTALL_SUFFIX@
+includedir=@PUGIXML_PC_INCLUDEDIR@
+libdir=@PUGIXML_PC_LIBDIR@
 
 Name: pugixml
 Description: Light-weight, simple and fast XML parser for C++ with XPath support.
 URL: https://pugixml.org/
 Version: @pugixml_VERSION@
 Cflags: -I${includedir}
-Libs: -L${libdir} -lpugixml
+Libs: -L${libdir} -lpugixml@LIB_POSTFIX@

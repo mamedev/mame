@@ -12,10 +12,16 @@ class multipcm_device : public gew_pcm_device
 public:
 	multipcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// effect DSP interface (YMW258-F): adds sound output 2 for the send
+	multipcm_device &enable_dsp_send() { m_dsp_send_enable = true; return *this; }
+	auto dsp_cd_callback() { return m_dsp_cd_cb.bind(); }
+
 	void write(offs_t offset, uint8_t data);
 	uint8_t read();
 
 private:
+	devcb_write8 m_dsp_cd_cb;
+
 	// internal state
 	uint32_t m_cur_slot;
 	uint32_t m_address;

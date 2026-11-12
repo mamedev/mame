@@ -43,27 +43,24 @@ void vic20_standard_cartridge_device::device_start()
 
 
 //-------------------------------------------------
-//  vic20_cd_r - cartridge data read
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
-uint8_t vic20_standard_cartridge_device::vic20_cd_r(offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+void vic20_standard_cartridge_device::device_reset()
 {
-	if (!blk1 && (m_blk1 != nullptr))
-	{
-		data = m_blk1[offset];
-	}
-	else if (!blk2 && (m_blk2 != nullptr))
-	{
-		data = m_blk2[offset];
-	}
-	else if (!blk3 && (m_blk3 != nullptr))
-	{
-		data = m_blk3[offset];
-	}
-	else if (!blk5 && (m_blk5 != nullptr))
-	{
-		data = m_blk5[offset];
-	}
+	install_rom(m_slot->blk1(), m_slot->memregion("blk1"));
+	install_rom(m_slot->blk2(), m_slot->memregion("blk2"));
+	install_rom(m_slot->blk3(), m_slot->memregion("blk3"));
+	install_rom(m_slot->blk5(), m_slot->memregion("blk5"));
+}
 
-	return data;
+
+//-------------------------------------------------
+//  install_rom -
+//-------------------------------------------------
+
+void vic20_standard_cartridge_device::install_rom(vic20_expansion_window &window, memory_region *region)
+{
+	if (region)
+		window.install_rom(0x0000, region->bytes() - 1, 0x1fff & ~(region->bytes() - 1), region->base());
 }

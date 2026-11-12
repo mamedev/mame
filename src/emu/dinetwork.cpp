@@ -102,6 +102,20 @@ TIMER_CALLBACK_MEMBER(device_network_interface::send_complete)
 	send_complete_cb(param);
 }
 
+// Cancel send without delivering a stale completion to a subsequently submitted packet
+void device_network_interface::cancel_send()
+{
+	m_send_timer->enable(false);
+}
+
+// Cancel receive and resume polling
+void device_network_interface::cancel_receive()
+{
+	m_recv_timer->enable(false);
+	if (m_dev && !m_loopback_control)
+		start_net_device();
+}
+
 void device_network_interface::recv_cb(u8 *buf, int len)
 {
 	if (m_recv_timer->enabled())
@@ -128,8 +142,9 @@ TIMER_CALLBACK_MEMBER(device_network_interface::recv_complete)
 {
 	recv_complete_cb(param);
 
-	// start receiving data from the network again
-	if (m_dev && !m_loopback_control)
+	// The device callback may have started another receive (e.g. the echo of
+	// a queued external-loopback transmission). Keep polling stopped for it.
+	if (m_dev && !m_loopback_control && !m_recv_timer->enabled())
 		start_net_device();
 }
 

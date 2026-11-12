@@ -272,7 +272,7 @@ void virge_pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_w
 
 void virge_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3virge_vga_device::screen_update));
 
@@ -284,7 +284,7 @@ void virge_pci_device::device_add_mconfig(machine_config &config)
 
 void virgevx_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3virge_vga_device::screen_update));
 
@@ -297,7 +297,7 @@ void virgevx_pci_device::device_add_mconfig(machine_config &config)
 
 void virgedx_pci_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(s3virge_vga_device::screen_update));
 

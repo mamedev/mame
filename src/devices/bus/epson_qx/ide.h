@@ -42,7 +42,7 @@ protected:
 	void map(address_map &map) ATTR_COLD;
 
 private:
-	// ata_hle_device_base implementation
+	// device_ata_hle_interface implementation
 	virtual void set_irq_out(int state) override { }
 	virtual void set_dmarq_out(int state) override { }
 	virtual void set_dasp_out(int state) override { }

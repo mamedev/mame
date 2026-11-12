@@ -74,6 +74,7 @@ void generalplus_gpce4_soc_device::device_start()
 	save_item(NAME(m_pwm3_ctrl));
 
 	set_vectorbase(0x4010);
+	set_bootvectorbase(0x4010);
 
 	m_spiregion = 0;
 	m_spisize = 0;

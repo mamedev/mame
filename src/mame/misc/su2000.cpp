@@ -167,7 +167,7 @@ void su2000_state::su2000(machine_config &config)
 
 	/* Video hardware */
 	// TODO: Hualon ISA custom
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update("vga", FUNC(vga_device::screen_update));
 

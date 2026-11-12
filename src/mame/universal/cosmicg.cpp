@@ -355,7 +355,7 @@ void cosmicg_state::cosmicg(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &cosmicg_state::cru_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(9.828_MHz_XTAL / 2, 312, 0, 256, 263, 0, 192);
 	screen.set_screen_update(m_crtc, FUNC(mc6845_device::screen_update));
 
@@ -418,8 +418,7 @@ void cosmicg_state::init_cosmicg()
 	offs_t len = memregion("program")->bytes();
 	u8 *rom = memregion("program")->base();
 
-	/* convert dummy instruction to meaningful one */
-
+	// HACK: convert dummy instruction to meaningful one
 	rom[0x1e9b] ^= 0x20;
 	rom[0x1e9f] ^= 0x20;
 

@@ -270,8 +270,10 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "romload.h"
 #include "mfmhd.h"
+
+#include "romload.h"
+
 #include "util/ioprocs.h"
 #include "util/ioprocsfilter.h"
 
@@ -420,7 +422,7 @@ std::pair<std::error_condition, std::string> mfm_harddisk_device::call_load()
 	/* open the CHD file */
 	if (loaded_through_softlist())
 	{
-		m_chd = machine().rom_load().get_disk_handle(device().subtag("harddriv").c_str());
+		m_chd = machine().rom_load().get_disk_handle(device().subtag("harddriv"));
 	}
 	else
 	{
@@ -455,7 +457,7 @@ std::pair<std::error_condition, std::string> mfm_harddisk_device::call_load()
 	if (state)
 		return std::make_pair(state, "Failed to read CHD metadata");
 
-	LOGMASKED(LOG_CONFIG, "CHD metadata: %s\n", metadata.c_str());
+	LOGMASKED(LOG_CONFIG, "CHD metadata: %s\n", metadata);
 
 	// Parse the metadata
 	mfmhd_layout_params param;

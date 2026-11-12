@@ -17,8 +17,10 @@
 class sonyvu0_device;
 class sonyvu1_device;
 
-#include "video/ps2gs.h"
 #include "ps2vif1.h"
+#include "ps2vupipeline.h"
+
+#include "video/ps2gs.h"
 
 enum
 {
@@ -83,13 +85,35 @@ public:
 
 	void write_vu_mem(uint32_t address, uint32_t data);
 	void write_micro_mem(uint32_t address, uint64_t data);
+	uint32_t read_data(uint32_t address);
+	void write_data(uint32_t address, uint32_t data);
+	uint64_t micro_r(offs_t offset);
+	void micro_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~uint64_t(0));
+	uint64_t data_r(offs_t offset);
+	void data_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~uint64_t(0));
+	uint32_t vf_r(unsigned reg, unsigned field) const;
+	void vf_w(unsigned reg, unsigned field, uint32_t data);
+	virtual uint32_t control_r(unsigned reg) const;
+	virtual void control_w(unsigned reg, uint32_t data);
+	void synchronize_macro(uint64_t cycle);
+	bool macro_hazard(uint32_t op) const;
+	bool execute_macro(uint32_t op);
+	virtual uint16_t vif_top(bool itop) const;
+	const ps2vu::pipeline &pipeline() const { return m_pipeline; }
+	virtual void reset_control();
+	virtual void force_break();
 	float* vector_regs() { return m_v; }
 	uint64_t *micro_mem() { return &m_micro_mem[0]; }
 	uint32_t *vu_mem() { return &m_vu_mem[0]; }
 	uint32_t mem_mask() const { return m_mem_mask; }
 
 	bool running() const { return m_running; }
+	bool vif_busy() const { return m_running || m_stop_flags; }
 	void start(uint32_t address);
+	bool write_interlocked() const { return m_running && !m_mbit; }
+	void set_debug_control(uint32_t data) { m_debug_control = data & 12; }
+	virtual uint32_t execution_status() const { return (m_running ? 1 : 0) | m_stop_flags | (m_pipeline.q_due ? 0x20 : 0); }
+	auto irq() { return m_irq.bind(); }
 
 protected:
 	enum chip_type
@@ -132,8 +156,12 @@ protected:
 
 	void execute_upper(const uint32_t op);
 	void execute_lower(const uint32_t op);
+	bool pair_hazard(uint64_t op) const;
+	void write_vi(unsigned reg, uint16_t value, bool dependent);
+	uint16_t branch_vi(unsigned reg) const;
 
 	virtual void execute_xgkick(uint32_t rs) = 0;
+	virtual bool service_xgkick() { return true; }
 
 	static int16_t immediate_s11(const uint32_t op);
 
@@ -169,6 +197,19 @@ protected:
 	uint32_t        m_start_pc;
 
 	bool            m_running;
+	ps2vu::pipeline m_pipeline;
+	uint16_t        m_vi_old[32];
+	uint64_t        m_vi_cycle[32];
+	uint8_t         m_vi_chain[32];
+	uint32_t        m_link_pc;
+	uint8_t         m_upper_dest;
+	uint8_t         m_end_delay;
+	bool            m_draining;
+	bool            m_mbit;
+	uint32_t        m_debug_control;
+	uint32_t        m_stop_flags;
+	bool            m_interrupt_pending;
+	devcb_write_line m_irq;
 
 	int             m_icount;
 };
@@ -186,9 +227,15 @@ public:
 	sonyvu1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	ps2_vif1_device* interface();
+	uint16_t vif_top(bool itop) const override;
 
 	uint64_t vif_r(offs_t offset);
 	void vif_w(offs_t offset, uint64_t data);
+	uint32_t reg_r(offs_t offset);
+	void reg_w(offs_t offset, uint32_t data);
+	uint32_t execution_status() const override { return sonyvu_device::execution_status() | (m_kick_pending ? 0x10 : 0); }
+	void reset_control() override;
+	void force_break() override;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -201,11 +248,14 @@ protected:
 	void vu_map(address_map &map) ATTR_COLD;
 
 	void execute_xgkick(uint32_t rs) override;
+	bool service_xgkick() override;
 
 	required_device<ps2_gs_device> m_gs;
 	required_device<ps2_vif1_device> m_vif;
 
 	float m_p;
+	bool m_kick_pending;
+	uint32_t m_kick_address;
 };
 
 class sonyvu0_device : public sonyvu_device
@@ -219,6 +269,11 @@ public:
 	}
 
 	sonyvu0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void debug_control_w(uint32_t data);
+	void state_export(const device_state_entry &entry) override;
+	uint32_t vpu_status() const { return execution_status() | (m_vu1->execution_status() << 8); }
+	uint32_t control_r(unsigned reg) const override;
+	void control_w(unsigned reg, uint32_t data) override;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -229,12 +284,8 @@ protected:
 
 	void execute_xgkick(uint32_t rs) override;
 
-	uint32_t vu1_reg_r(offs_t offset);
-	void vu1_reg_w(offs_t offset, uint32_t data);
-
 	required_device<sonyvu1_device> m_vu1;
 
-	float*          m_vu1_regs;
 	uint32_t        m_control;
 	uint32_t        m_vpu_stat;
 	uint32_t        m_cmsar0;

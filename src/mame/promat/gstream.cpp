@@ -603,37 +603,37 @@ void gstream_state::drawgfx_transpen_x2222(bitmap_rgb32 &dest, const rectangle &
 
 	/* compute final pixel in X and exit if we are entirely clipped */
 	destendx = destx + gfx->width() - 1;
-	if (destx > cliprect.max_x || destendx < cliprect.min_x)
+	if (!cliprect.overlapsx(destx, destendx))
 		return;
 
 	/* apply left clip */
 	srcx = 0;
-	if (destx < cliprect.min_x)
+	if (destx < cliprect.left())
 	{
-		srcx = cliprect.min_x - destx;
-		destx = cliprect.min_x;
+		srcx = cliprect.left() - destx;
+		destx = cliprect.left();
 	}
 
 	/* apply right clip */
-	if (destendx > cliprect.max_x)
-		destendx = cliprect.max_x;
+	if (destendx > cliprect.right())
+		destendx = cliprect.right();
 
 	/* compute final pixel in Y and exit if we are entirely clipped */
 	destendy = desty + gfx->height() - 1;
-	if (desty > cliprect.max_y || destendy < cliprect.min_y)
+	if (!cliprect.overlapsy(desty, destendy))
 		return;
 
 	/* apply top clip */
 	srcy = 0;
-	if (desty < cliprect.min_y)
+	if (desty < cliprect.top())
 	{
-		srcy = cliprect.min_y - desty;
-		desty = cliprect.min_y;
+		srcy = cliprect.top() - desty;
+		desty = cliprect.top();
 	}
 
 	/* apply bottom clip */
-	if (destendy > cliprect.max_y)
-		destendy = cliprect.max_y;
+	if (destendy > cliprect.bottom())
+		destendy = cliprect.bottom();
 
 	/* apply X flipping */
 	if (flipx)
@@ -840,7 +840,7 @@ void gstream_state::gstream(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 240);
@@ -869,7 +869,7 @@ void gstream_state::x2222(machine_config &config)
 //  NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(320, 240);

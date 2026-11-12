@@ -35,8 +35,8 @@ public:
 	void set_boot_mode(const sharc_boot_mode boot_mode) { m_boot_mode = boot_mode; }
 	void enable_recompiler();
 
-	void external_iop_write(uint32_t address, uint32_t data);
-	void external_dma_write(uint32_t address, uint64_t data);
+	void external_iop_write(offs_t address, uint32_t data);
+	void external_dma_write(offs_t address, uint64_t data);
 
 	void set_flag_input(int flag_num, int state);
 	void write_stall(int state);
@@ -260,7 +260,6 @@ private:
 	sharc_boot_mode m_boot_mode;
 
 	// UML stuff
-	drc_cache m_cache;
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<frontend> m_drcfe;
 	uml::parameter   m_regmap[16];

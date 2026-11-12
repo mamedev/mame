@@ -111,12 +111,12 @@ std::vector<meta_description> vtech_image::volume_meta_description() const
 std::vector<meta_description> vtech_image::file_meta_description() const
 {
 	std::vector<meta_description> res;
-	res.emplace_back(meta_description(meta_name::name, "", false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "File name, 8 chars"));
-	res.emplace_back(meta_description(meta_name::loading_address, 0x7ae9, false, [](const meta_value &m) { return m.as_number() < 0x10000; }, "Loading address of the file"));
-	res.emplace_back(meta_description(meta_name::length, 0, true, nullptr, "Size of the file in bytes"));
-	res.emplace_back(meta_description(meta_name::file_type, "T", true,
+	res.emplace_back(meta_name::name, "", false, [](const meta_value &m) { return m.as_string().size() <= 8; }, "File name, 8 chars");
+	res.emplace_back(meta_name::loading_address, 0x7ae9, false, [](const meta_value &m) { return m.as_number() < 0x10000; }, "Loading address of the file");
+	res.emplace_back(meta_name::length, 0, true, nullptr, "Size of the file in bytes");
+	res.emplace_back(meta_name::file_type, "T", true,
 		[](const meta_value &m) { return m.as_string().size() == 1 && m.as_string()[0] >= 'A' && m.as_string()[0] <= 'Z'; },
-		"File type (e.g. T = text, B = binary)"));
+		"File type (e.g. T = text, B = binary)");
 	return res;
 }
 
@@ -234,7 +234,7 @@ std::pair<std::error_condition, std::vector<dir_entry>> vtech_impl::directory_co
 			if(bdir->r8(off+1) != ':')
 				continue;
 			meta_data meta = file_metadata(*bdir, off);
-			res.second.emplace_back(dir_entry(dir_entry_type::file, meta));
+			res.second.emplace_back(dir_entry_type::file, meta);
 		}
 	}
 	return res;
@@ -391,7 +391,7 @@ std::error_condition vtech_impl::file_write(const std::vector<std::string> &path
 	u8 sector = bdir->r8(off + 0xb);
 	std::vector<std::pair<u8, u8>> tofree;
 	for(u32 i = 0; i != cur_ns; i++) {
-		tofree.emplace_back(std::make_pair(track, sector));
+		tofree.emplace_back(track, sector);
 		auto dblk = m_blockdev.get(track*16 + sector);
 		track = dblk->r8(126);
 		sector = dblk->r8(127);

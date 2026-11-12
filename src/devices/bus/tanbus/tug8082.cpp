@@ -123,7 +123,7 @@ void tanbus_tug8082_device::device_add_mconfig(machine_config &config)
 	m_iop[1]->int_wr_callback().set(FUNC(tanbus_tug8082_device::vdu_irq_w));
 	//m_iop->di_rd_callback().set(FUNC(tanbus_tug8082_device::read));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(512, 256);

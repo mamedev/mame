@@ -81,7 +81,7 @@ void fr_cpu_device::device_start()
 		[this]() { return u32(m_md & 0x00000000ffffffffULL); },
 		[this](u32 value) { m_md = (m_md & 0xffffffff00000000ULL) | value; }).noshow();
 	for (int i = 0; i < 15; i++)
-		state_add(FR_R0 + i, string_format("R%d", i).c_str(), m_regs[i]);
+		state_add(FR_R0 + i, string_format("R%d", i), m_regs[i]);
 	state_add<u32>(FR_R15, "R15",
 		[this]() { return m_regs[BIT(m_ps, 5) ? 16 : 15]; },
 		[this](u32 value) { m_regs[BIT(m_ps, 5) ? 16 : 15] = value; });

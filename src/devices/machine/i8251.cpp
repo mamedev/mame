@@ -364,7 +364,7 @@ bool i8251_device::is_tx_enabled() const
 
 void i8251_device::check_for_tx_start()
 {
-	if (is_tx_enabled() && (m_status & (I8251_STATUS_TX_EMPTY | I8251_STATUS_TX_READY)) == I8251_STATUS_TX_EMPTY)
+	if (is_tx_enabled() && is_transmit_register_empty() && (m_status & (I8251_STATUS_TX_READY)) == 0)
 		start_tx();
 }
 
@@ -399,7 +399,25 @@ void i8251_device::transmit_clock()
 		if ((m_status & I8251_STATUS_TX_READY) == 0 && (is_tx_enabled() || m_delayed_tx_en))
 			start_tx();
 		else
+		{
 			m_status |= I8251_STATUS_TX_EMPTY;
+			if (m_sync_byte_count > 0 && is_tx_enabled())
+			{
+				// In synchronous mode, transmit sync character(s) during idle instead of mark state
+				if (m_sync_byte_count == 2)
+				{
+					transmit_register_setup(uint8_t(m_sync16 >> m_tx_sync_shift));
+					m_tx_sync_shift ^= 8;  // alternate between high byte (sync1) and low byte (sync2)
+				}
+				else
+					transmit_register_setup(m_sync8);
+			}
+			else
+			{
+				// return TxD to marking state (high) if not sending break character
+				m_txd_handler(!BIT(m_command, 3));
+			}
+		}
 
 		update_tx_ready();
 		update_tx_empty();
@@ -444,27 +462,6 @@ void v5x_scu_device::update_tx_ready()
 
 void i8251_device::update_tx_empty()
 {
-	if (m_status & I8251_STATUS_TX_EMPTY)
-	{
-		if (m_sync_byte_count > 0 && is_tx_enabled())
-		{
-			// In synchronous mode, transmit sync character(s) during idle instead of mark state
-			if (m_sync_byte_count == 2)
-			{
-				transmit_register_setup(uint8_t(m_sync16 >> m_tx_sync_shift));
-				m_tx_sync_shift ^= 8;  // alternate between high byte (sync1) and low byte (sync2)
-			}
-			else
-				transmit_register_setup(m_sync8);
-			m_status &= ~I8251_STATUS_TX_EMPTY;
-		}
-		else
-		{
-			// return TxD to marking state (high) if not sending break character
-			m_txd_handler(!BIT(m_command, 3));
-		}
-	}
-
 	m_txempty_handler((m_status & I8251_STATUS_TX_EMPTY) != 0);
 }
 

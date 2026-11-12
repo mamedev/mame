@@ -21,6 +21,7 @@ public:
 	auto drq_cb() { return m_drq_cb.bind(); }
 	auto dten_cb() { return m_dten_cb.bind(); }
 	auto scor_cb() { return m_scor_cb.bind(); }
+	auto media_cb() { return m_media_cb.bind(); }
 
 	uint8_t read();
 	void write(uint8_t data);
@@ -111,6 +112,7 @@ private:
 	devcb_write_line m_drq_cb;
 	devcb_write_line m_dten_cb;
 	devcb_write_line m_scor_cb;
+	devcb_write_line m_media_cb;
 
 	emu_timer *m_frame_timer;
 	emu_timer *m_stch_timer;

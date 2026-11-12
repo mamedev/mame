@@ -81,7 +81,7 @@
 	tmp = (int)((int8_t)fetch());           \
 	if (flag)                               \
 	{                                       \
-		static const uint8_t table[3] = {3,10,10}; \
+		static const uint8_t table[4] = {3,10,10,15}; \
 		m_ip = (WORD)(m_ip + tmp);          \
 		CLK(table[m_chip_type/8]);          \
 		CHANGE_PC;                          \
@@ -176,6 +176,7 @@
 	uresult2 = uresult % tmp;                            \
 	uresult /= tmp;                                      \
 	bool overflow = uresult > 0xff;                      \
+	divu_flags(uresult2, tmp, false, overflow);          \
 	if (overflow)                                        \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
 	if (!overflow || m_chip_type == V33_TYPE) {          \
@@ -189,6 +190,7 @@
 	result2 = result % (int16_t)((int8_t)tmp);           \
 	result /= (int16_t)((int8_t)tmp);                    \
 	bool overflow = result > 0x7f || result < -0x7f;     \
+	div_flags(result, false, overflow);                  \
 	if (overflow)                                        \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
 	if (!overflow || m_chip_type == V33_TYPE) {          \
@@ -202,6 +204,7 @@
 	uresult2 = uresult % tmp;                            \
 	uresult /= tmp;                                      \
 	bool overflow = uresult > 0xffff;                    \
+	divu_flags(uresult2, tmp, true, overflow);           \
 	if (overflow)                                        \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
 	if (!overflow || m_chip_type == V33_TYPE) {          \
@@ -212,9 +215,10 @@
 
 #define DIVW {                                           \
 	result = ((uint32_t)Wreg(DW) << 16) + Wreg(AW);      \
-	result2 = result % (int32_t)((int16_t)tmp);          \
-	result /= (int32_t)((int16_t)tmp);                   \
+	result2 = int64_t(result) % int16_t(tmp);            \
+	result = int64_t(result) / int16_t(tmp);             \
 	bool overflow = result > 0x7fff || result < -0x7fff; \
+	div_flags(result, true, overflow);                   \
 	if (overflow)                                        \
 		nec_interrupt(NEC_DIVIDE_VECTOR, BRK);           \
 	if (!overflow || m_chip_type == V33_TYPE) {          \
@@ -228,7 +232,7 @@
 	int count = (Breg(CL)+1)/2;                  \
 	unsigned di = Wreg(IY);                      \
 	unsigned si = Wreg(IX);                      \
-	static const uint8_t table[3]={18,19,19};    \
+	static const uint8_t table[4]={18,19,19,27};    \
 	if (m_seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",PC()); \
 	m_ZeroVal = m_CarryVal = 0;                  \
 	for (i=0;i<count;i++) {                      \
@@ -253,7 +257,7 @@
 	int i,v1,v2,result;                          \
 	unsigned di = Wreg(IY);                      \
 	unsigned si = Wreg(IX);                      \
-	static const uint8_t table[3]={18,19,19};    \
+	static const uint8_t table[4]={18,19,19,27}; \
 	if (m_seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",PC()); \
 	m_ZeroVal = m_CarryVal = 0;                  \
 	for (i=0;i<count;i++) {                      \
@@ -283,7 +287,7 @@
 	int i,v1,v2,result;                          \
 	unsigned di = Wreg(IY);                      \
 	unsigned si = Wreg(IX);                      \
-	static const uint8_t table[3]={14,19,19};    \
+	static const uint8_t table[4]={14,19,19,23}; \
 	if (m_seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",PC()); \
 	m_ZeroVal = m_CarryVal = 0;                  \
 	for (i=0;i<count;i++) {                      \

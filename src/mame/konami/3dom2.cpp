@@ -236,6 +236,10 @@ m2_bda_device::m2_bda_device(const machine_config &mconfig, const char *tag, dev
 
 void m2_bda_device::device_start()
 {
+	// Ensure TE texture RAM exists before calling configure_ppc_address_map
+	if (!m_te->started())
+		throw device_missing_dependencies();
+
 	// Allocate RAM
 	uint32_t ram_size = (m_rambank_size[0] + m_rambank_size[1]) * 1024 * 1024;
 	m_ram = std::make_unique<uint32_t[]>(ram_size / sizeof(uint32_t));

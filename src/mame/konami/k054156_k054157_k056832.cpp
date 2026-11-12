@@ -167,6 +167,7 @@ ones.  The other 7 words are ignored.  Global scrollx is ignored.
 #include "emu.h"
 #include "k054156_k054157_k056832.h"
 #include "konami_helper.h"
+#include "screen.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -1306,7 +1307,7 @@ int k056832_device::update_linemap(int page)
 }
 
 template<class BitmapClass>
-void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority)
+void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority, u8 priority_mask)
 {
 	u32 last_dx, last_visible, new_colorbase, last_active;
 	int sx, sy, ay, tx, ty, width, height;
@@ -1423,11 +1424,18 @@ void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bit
 	last_active = m_active_layer;
 	new_colorbase = (m_k055555 != nullptr) ? m_k055555->K055555_get_palette_index(layer) : 0;
 
+	// The tilemap core flips each page around the visible area's center.  Use
+	// the same origin for page clipping and scroll-table addressing (fixes glitches
+	// in Martial Champion and Metamorphic Force).
+	const int page_scrolly = flipy
+			? (ay + screen.visible_area().top() + screen.visible_area().bottom() + 1 + height - K056832_PAGE_HEIGHT) % height
+			: ay;
+
 	for (r = 0; r < rowspan; r++)
 	{
 		if (rowspan > 1)
 		{
-			sy = ay;
+			sy = page_scrolly;
 			ty = r * K056832_PAGE_HEIGHT;
 
 			if (!flipy)
@@ -1581,7 +1589,7 @@ void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bit
 				if (last_dx == dx)
 				{
 					if (last_visible)
-						tmap->draw(screen, bitmap, drawrect, flags, priority);
+						tmap->draw(screen, bitmap, drawrect, flags, priority, priority_mask);
 					continue;
 				}
 				last_dx = dx;
@@ -1637,7 +1645,7 @@ void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bit
 					drawrect.max_x = cliprect.max_x;
 
 				tmap->set_scrollx(0, dx);
-				tmap->draw(screen, bitmap, drawrect, flags, priority);
+				tmap->draw(screen, bitmap, drawrect, flags, priority, priority_mask);
 
 			} // end of line loop
 		} // end of column loop
@@ -1646,14 +1654,14 @@ void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bit
 	m_active_layer = last_active;
 }
 
-void k056832_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority)
+void k056832_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority, u8 priority_mask)
 {
-	tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority);
+	tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority, priority_mask);
 }
 
-void k056832_device::tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority)
+void k056832_device::tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority, u8 priority_mask)
 {
-	tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority);
+	tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority, priority_mask);
 }
 
 

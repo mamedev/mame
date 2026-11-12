@@ -28,7 +28,8 @@ enum
 	FILL_MEM  = 0b0100,
 	BLT_MEM   = 0b1001,
 	RAM_CRAM  = 0b1100,
-	RAM_SFILE = 0b1101
+	RAM_SFILE = 0b1101,
+	MEM_SPI   = 0b1010
 };
 
 tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -36,6 +37,7 @@ tsconfdma_device::tsconfdma_device(const machine_config &mconfig, const char *ta
 	, m_in_mreq_cb(*this, 0)
 	, m_out_mreq_cb(*this)
 	, m_in_mspi_cb(*this, 0)
+	, m_out_mspi_cb(*this)
 	, m_out_cram_cb(*this)
 	, m_out_sfile_cb(*this)
 	, m_on_ready_cb(*this)
@@ -160,13 +162,14 @@ TIMER_CALLBACK_MEMBER(tsconfdma_device::dma_clock)
 		const u32 m_m1 = m_asz ? 0x3ffe00 : 0x3fff00;
 		const u32 m_m2 = m_asz ? 0x0001ff : 0x0000ff;
 		const u16 m_align = m_asz ? 512 : 256;
-		m_tx_s_addr = m_align_s ? ((m_tx_s_addr & m_m1) | ((m_tx_s_addr + 2) & m_m2)) : ((m_tx_s_addr + 2) & 0x3fffff);
+		if (m_task != FILL_MEM)
+			m_tx_s_addr = m_align_s ? ((m_tx_s_addr & m_m1) | ((m_tx_s_addr + 2) & m_m2)) : ((m_tx_s_addr + 2) & 0x3fffff);
 		m_tx_d_addr = m_align_d ? ((m_tx_d_addr & m_m1) | ((m_tx_d_addr + 2) & m_m2)) : ((m_tx_d_addr + 2) & 0x3fffff);
 
 		++m_tx_block;
 		if (m_tx_block > m_block_len)
 		{
-			m_address_s = m_align_s ? (m_address_s + m_align) : m_tx_s_addr;
+			m_address_s = (m_task == FILL_MEM) ? m_address_s : (m_align_s ? (m_address_s + m_align) : m_tx_s_addr);
 			m_address_d = m_align_d ? (m_address_d + m_align) : m_tx_d_addr;
 
 			m_tx_block = 0;
@@ -202,6 +205,11 @@ int tsconfdma_device::do_read()
 	case SPI_MEM:
 		len = 4;
 		m_tx_data = m_in_mspi_cb();
+		break;
+
+	case MEM_SPI:
+		len = 4;
+		m_tx_data = m_in_mreq_cb(m_tx_s_addr);
 		break;
 
 	case FILL_MEM:
@@ -253,6 +261,11 @@ int tsconfdma_device::do_write()
 	case BLT_MEM:
 		len = 4;
 		m_out_mreq_cb(m_tx_d_addr, m_tx_data);
+		break;
+
+	case MEM_SPI:
+		len = 4;
+		m_out_mspi_cb(0, m_tx_data);
 		break;
 
 	case RAM_CRAM:

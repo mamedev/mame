@@ -5,27 +5,24 @@
     P&P Marketing Police Trainer hardware
 
 **************************************************************************/
+#ifndef MAME_MISC_POLICETR_H
+#define MAME_MISC_POLICETR_H
+
+#pragma once
 
 #include "cpu/mips/mips1.h"
 #include "machine/eepromser.h"
 #include "sound/bsmt2000.h"
 #include "video/bt48x.h"
+
 #include "screen.h"
 #include "speaker.h"
+
 
 class policetr_state : public driver_device
 {
 public:
-	policetr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: policetr_state(mconfig, type, tag, 0x1fc028ac, 0x00000fc8)
-	{ }
-
-	void policetr(machine_config &config);
-
-	int bsmt_status_r();
-
-protected:
-	policetr_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t speedup_pc, uint32_t speedup_addr) :
+	policetr_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_srcbitmap(*this, "gfx"),
 		m_rambase(*this, "rambase"),
@@ -38,15 +35,26 @@ protected:
 		m_ramdac(*this, "ramdac"),
 		m_leds(*this, "leds%u", 0U),
 		m_gun_x_io(*this, "GUNX%u", 1U),
-		m_gun_y_io(*this, "GUNY%u", 1U),
-		m_speedup_pc(speedup_pc),
-		m_speedup_addr(speedup_addr) { }
+		m_gun_y_io(*this, "GUNY%u", 1U)
+	{ }
 
-	virtual void driver_start() override;
+	void policetr(machine_config &config) ATTR_COLD;
+	void policetr10(machine_config &config) ATTR_COLD;
+	void sshooter(machine_config &config) ATTR_COLD;
+	void policetr13b(machine_config &config) ATTR_COLD;
+	void sshooter17(machine_config &config) ATTR_COLD;
+	void sshooter12(machine_config &config) ATTR_COLD;
+	void sshooter11(machine_config &config) ATTR_COLD;
+
+	int bsmt_status_r();
+
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	void mem(address_map &map) ATTR_COLD;
+	void common_mem(address_map &map) ATTR_COLD;
+	void policetr_mem(address_map &map) ATTR_COLD;
+	void sshooter_mem(address_map &map) ATTR_COLD;
 
 	void control_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	void speedup_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
@@ -107,59 +115,4 @@ protected:
 	static constexpr uint32_t DSTBITMAP_HEIGHT = 256;
 };
 
-class sshooter_state : public policetr_state
-{
-public:
-	sshooter_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sshooter_state(mconfig, type, tag, 0x1fc03440, 0x00018fd8)
-	{ }
-
-	void sshooter(machine_config &config);
-
-protected:
-	sshooter_state(const machine_config &mconfig, device_type type, const char *tag, uint32_t speedup_pc, uint32_t speedup_addr)
-		: policetr_state(mconfig, type, tag, speedup_pc, speedup_addr)
-	{ }
-
-	void mem(address_map &map) ATTR_COLD;
-};
-
-class sshoot17_state : public sshooter_state
-{
-public:
-	sshoot17_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sshooter_state(mconfig, type, tag, 0x1fc03470, 0x00018fd8)
-	{ }
-};
-
-class sshoot12_state : public sshooter_state
-{
-public:
-	sshoot12_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sshooter_state(mconfig, type, tag, 0x1fc033e0, 0x00018fd8)
-	{ }
-};
-
-class sshoot11_state : public sshooter_state
-{
-public:
-	sshoot11_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sshooter_state(mconfig, type, tag, 0x1fc032f8, 0x00018fd8)
-	{ }
-};
-
-class plctr13b_state : public sshooter_state
-{
-public:
-	plctr13b_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sshooter_state(mconfig, type, tag, 0x1fc028bc, 0x00000fc8)
-	{ }
-};
-
-class polict10_state : public sshooter_state
-{
-public:
-	polict10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sshooter_state(mconfig, type, tag, 0x1fc028b4, 0x00000fc8)
-	{ }
-};
+#endif // MAME_MISC_POLICETR_H

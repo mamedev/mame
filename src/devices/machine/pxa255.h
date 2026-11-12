@@ -33,6 +33,7 @@ public:
 
 	template <int Bit> auto gpio_out() { return m_gpio_w[Bit].bind(); }
 	template <int Bit> void gpio_in(int state);
+	template <int Line> void irq_in(int state) { set_irq_line(1u << Line, state); }
 
 	void map(address_map &map) ATTR_COLD;
 
@@ -320,6 +321,10 @@ protected:
 	void lcd_irq_check();
 	void lcd_dma_kickoff(int channel);
 	void lcd_check_load_next_branch(int channel);
+	u32 lcd_clock() const;
+	u64 lcd_frame_ticks() const;
+	attotime lcd_dma_period(int channel) const;
+	void lcd_configure_screen();
 
 	template <int Which> u32 lcd_lccr_r(offs_t offset, u32 mem_mask);
 	template <int Which> void lcd_lccr_w(offs_t offset, u32 data, u32 mem_mask);
@@ -360,8 +365,17 @@ protected:
 		LCCR0_OUM    =   1u << 21,
 
 		LCCR1_PPL    = 0x000003ff,
+		LCCR1_HSW    = 0x0000fc00,
+		LCCR1_ELW    = 0x00ff0000,
+		LCCR1_BLW    = 0xff000000,
 
 		LCCR2_LPP    = 0x000003ff,
+		LCCR2_VSW    = 0x0000fc00,
+		LCCR2_EFW    = 0x00ff0000,
+		LCCR2_BFW    = 0xff000000,
+
+		LCCR3_PCD    = 0x000000ff,
+		LCCR3_BPP    = 0x07000000,
 
 		LCSR_LDD     = 1u <<  0,
 		LCSR_SOF     = 1u <<  1,

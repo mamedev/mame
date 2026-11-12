@@ -23,7 +23,7 @@ class kc82_device : public z80_device
 public:
 	enum
 	{
-		KC82_B1 = Z80_WZ + 1, KC82_B2, KC82_B3, KC82_B4,
+		KC82_B1 = Z80__LAST + 1, KC82_B2, KC82_B3, KC82_B4,
 		KC82_A1, KC82_A2, KC82_A3
 	};
 

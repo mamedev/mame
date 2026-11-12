@@ -47,7 +47,7 @@
 #undef DELETE
 #endif
 
-#if defined(OSD_WINDOWS) || defined(OSD_SDL)
+#if defined(OSD_WINDOWS) || defined(OSD_SDL) || defined(OSD_MAC)
 
 key_trans_entry keyboard_trans_table::s_default_table[] =
 {
@@ -216,7 +216,7 @@ keyboard_trans_table::keyboard_trans_table()
 	m_table_size = std::size(s_default_table);
 }
 
-#else // defined(OSD_WINDOWS) || defined(OSD_SDL)
+#else // defined(OSD_WINDOWS) || defined(OSD_SDL) || defined(OSD_MAC)
 
 keyboard_trans_table::keyboard_trans_table()
 {
@@ -224,7 +224,7 @@ keyboard_trans_table::keyboard_trans_table()
 	m_table_size = 0;
 }
 
-#endif // defined(OSD_WINDOWS) || defined(OSD_SDL)
+#endif // defined(OSD_WINDOWS) || defined(OSD_SDL) || defined(OSD_MAC)
 
 
 // public constructor to allow creation of non-default instances

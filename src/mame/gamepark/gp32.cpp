@@ -325,8 +325,8 @@ void gp32_state::s3c240x_lcd_configure()
 	framerate = vclk / (((vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1)) * ((hspw + 1) + (hbpd + 1) + (hfpd + 1) + (hozval + 1)));
 	LOGMASKED(LOG_VRAM, "LCD - framerate %f\n", framerate);
 	visarea.set(0, hozval, 0, lineval);
-	LOGMASKED(LOG_VRAM, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-	m_screen->configure(hozval + 1, lineval + 1, visarea, HZ_TO_ATTOSECONDS( framerate));
+	LOGMASKED(LOG_VRAM, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.left(), visarea.top(), visarea.right(), visarea.bottom());
+	m_screen->configure(hozval + 1, lineval + 1, visarea, attotime::from_hz(framerate));
 }
 
 void gp32_state::s3c240x_lcd_start()
@@ -1687,7 +1687,7 @@ void gp32_state::gp32(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(32768);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	// TODO: bad setup that theoretically should fail a validation check plus console doesn't have vertical screen anyway

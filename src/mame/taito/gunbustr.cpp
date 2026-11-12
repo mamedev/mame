@@ -541,7 +541,7 @@ void gunbustr_state::gunbustr(machine_config &config)
 	GUNBUSTR_LINK(config, "link");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -681,6 +681,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1992, gunbustr,  0,        gunbustr,  gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation Japan",   "Gunbuster (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gunbustru, gunbustr, gunbustr,  gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito America Corporation", "Gunbuster (US)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1992, gunbustrj, gunbustr, gunbustrj, gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito Corporation",         "Gunbuster (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gunbustr,  0,        gunbustr,  gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito",         "Gunbuster (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gunbustru, gunbustr, gunbustr,  gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito America", "Gunbuster (US)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992, gunbustrj, gunbustr, gunbustrj, gunbustr, gunbustr_state, empty_init, ORIENTATION_FLIP_X, "Taito",         "Gunbuster (Japan)", MACHINE_SUPPORTS_SAVE )

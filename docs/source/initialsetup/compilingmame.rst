@@ -78,6 +78,26 @@ sources in parallel::
     make SUBTARGET=appulator SOURCES=apple/apple2.cpp,apple/apple2e.cpp,apple/apple2gs.cpp REGENIE=1 -j6
 
 
+Compilation database
+~~~~~~~~~~~~~~~~~~~~
+
+To generate a ``compile_commands.json`` file for editors and tools such as
+clangd, add the **jcdb** target to your usual make command::
+
+    make OVERRIDE_CC=clang OVERRIDE_CXX=clang++ TOOLS=1 jcdb
+
+This runs GENie's compilation database generator without compiling MAME.
+The database is written to the MAME source root, using the selected compiler,
+architecture and debug/release configuration.  Build options such as
+**SOURCES**, **SUBTARGET**, **TOOLS**, **DEBUG**, and **PTR64** apply as usual.
+The build dependencies needed to generate project files must be installed.
+
+Run the command again after changing build options or adding or removing source
+files.  Each invocation replaces the database with the selected configuration;
+**REGENIE=1** is not required.  Generated source files and headers still need to
+be produced by a normal build before tools can analyse files that use them.
+
+
 .. _compiling-windows:
 
 Microsoft Windows
@@ -85,7 +105,7 @@ Microsoft Windows
 
 The information here is very detailed, and assumes you’re aware of the options
 available and what they mean.  As an alternative, we also provide `a tutorial
-for compiling MAME on Windows <https://https://www.mamedev.org/tools/>`_ on our
+for compiling MAME on Windows <https://www.mamedev.org/tools/>`_ on our
 web site.
 
 MAME for Windows is built using the MSYS2 environment.  You will need a 64-bit
@@ -378,10 +398,18 @@ above in All Platforms.
 Emscripten Javascript and HTML
 ------------------------------
 
-First, download and install Emscripten 3.1.35 or later by following the
+First, download and install Emscripten 6.0.2 or later by following the
 instructions at the `official site <https://emscripten.org/docs/getting_started/downloads.html>`_.
 
-Once Emscripten has been installed, it should be possible to compile MAME
+
+Once Emscripten has been installed, use **source emsdk_env.sh** or **emsdk_env.bat**
+to set environment variables. Since MAME requires SDL libraries, prepare them with
+
+.. code-block:: bash
+
+    embuilder build sdl3 sdl3_ttf
+
+After dependencies are compiled, it should be possible to compile MAME
 out-of-the-box using Emscripten’s **emmake** tool. Because a full MAME
 compile is too large to load into a web browser at once, you will want to use
 the SOURCES parameter to compile only a subset of the project, e.g. (in the
@@ -403,11 +431,6 @@ commas) if this process misses something. e.g.
 
 The value of the **SUBTARGET** parameter serves only to differentiate multiple
 builds and need not be set to any specific value.
-
-Emscripten supports compiling to WebAssembly with a JavaScript loader instead of
-all-JavaScript, and in later versions this is actually the default. To force
-WebAssembly on or off, add **WEBASSEMBLY=1** or **WEBASSEMBLY=0** to the make
-command line, respectively.
 
 Other make parameters can also be used, e.g. **-j** for multithreaded
 compilation as described earlier.

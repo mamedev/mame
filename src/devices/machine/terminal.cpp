@@ -151,8 +151,8 @@ generic_terminal_device::generic_terminal_device(const machine_config &mconfig, 
 	, m_height(h)
 	, m_buffer()
 	, m_x_pos(0)
-	, m_framecnt(0)
 	, m_y_pos(0)
+	, m_framecnt(0)
 	, m_bell_timer(nullptr)
 	, m_beeper(*this, "beeper")
 	, m_keyboard_cb(*this)
@@ -329,11 +329,11 @@ void generic_terminal_device::kbd_put(u8 data)
 
 void generic_terminal_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, TERMINAL_SCREEN_TAG, SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(50);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
-	screen.set_size(generic_terminal_device::TERMINAL_WIDTH*8, generic_terminal_device::TERMINAL_HEIGHT*10);
-	screen.set_visarea(0, generic_terminal_device::TERMINAL_WIDTH*8-1, 0, generic_terminal_device::TERMINAL_HEIGHT*10-1);
+	constexpr uint16_t width = TERMINAL_WIDTH * 8;
+	constexpr uint16_t height = TERMINAL_HEIGHT * 10;
+
+	screen_device &screen(SCREEN(config, TERMINAL_SCREEN_TAG));
+	screen.set_raw(width * height * 50, width, 0, width, height, 0, height);
 	screen.set_screen_update(FUNC(generic_terminal_device::update));
 
 	generic_keyboard_device &keyboard(GENERIC_KEYBOARD(config, KEYBOARD_TAG));

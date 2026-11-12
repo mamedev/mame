@@ -1,0 +1,47 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": {
+    "authors": [
+      {
+        "name": "@VCS_SBOM_AUTHORS@"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:github/zeux/pugixml@@VCS_TAG@",
+      "cpe": "cpe:2.3:a:pugixml_project:pugixml:@VCS_TAG@:*:*:*:*:*:*:*",
+      "name": "pugixml",
+      "version": "@VCS_VERSION@",
+      "description": "C++ XML processing library",
+      "supplier": {
+        "name": "pugixml developers"
+      },
+      "authors": [
+        {
+          "name": "@VCS_AUTHORS@"
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "externalReferences": [
+        {
+          "type": "website",
+          "url": "https://pugixml.org/"
+        },
+        {
+          "type": "vcs",
+          "url": "https://github.com/zeux/pugixml"
+        }
+      ]
+    }
+  ]
+}

@@ -74,6 +74,7 @@ bool m20_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[i].deleted = false;
 				sects[i].bad_data_crc = false;
 				sects[i].bad_addr_crc = false;
+				sects[i].weak = false;
 			}
 
 			if(mfm)

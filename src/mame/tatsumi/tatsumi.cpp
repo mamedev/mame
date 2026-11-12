@@ -28,8 +28,12 @@
 #include "machine/adc0808.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
+
 #include "screen.h"
 #include "speaker.h"
+
+#include "endianness.h"
+
 
 void tatsumi_state::hd6445_crt_w(offs_t offset, uint8_t data)
 {
@@ -78,18 +82,20 @@ void tatsumi_state::tatsumi_sprite_control_w(offs_t offset, uint16_t data, uint1
 // TODO: it might mix up with the lower palette bank instead (color bank 0x1400?)
 void tatsumi_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap, uint8_t xor_output)
 {
-	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for(int x=cliprect.min_x;x<cliprect.max_x;x++)
+		auto const *const shadow_line = &shadow_bitmap.pix(y);
+		auto *const dst = &bitmap.pix(y);
+		for(int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			uint8_t shadow = shadow_bitmap.pix(y, x);
+			uint8_t shadow = shadow_line[x];
 			// xor_output is enabled during Chen boss fight (where shadows have more brightness than everything else)
 			// TODO: transition before fighting him should also black out all the background tilemaps too!?
 			//       (more evidence that we need to mix with color bank 0x1400 instead of doing true RGB mixing).
 			if(shadow ^ xor_output)
 			{
-				rgb_t shadow_pen = bitmap.pix(y, x);
-				bitmap.pix(y, x) = rgb_t(shadow_pen.r() >> 1,shadow_pen.g() >> 1, shadow_pen.b() >> 1);
+				rgb_t shadow_pen = dst[x];
+				dst[x] = rgb_t(shadow_pen.r() >> 1, shadow_pen.g() >> 1, shadow_pen.b() >> 1);
 			}
 		}
 	}
@@ -118,9 +124,7 @@ void tatsumi_state::tatsumi_reset()
 
 uint16_t tatsumi_state::tatsumi_v30_68000_r(offs_t offset)
 {
-	const uint16_t* rom=(uint16_t*)m_subregion->base();
-
-//logerror("%s:68000_r(%04X),cw=%04X\n", m_maincpu->pc(), offset*2, m_control_word);
+	//logerror("%s:68000_r(%04X),cw=%04X\n", m_maincpu->pc(), offset*2, m_control_word);
 	/* Read from 68k RAM */
 	if ((m_control_word&0x1f)==0x18)
 	{
@@ -129,16 +133,16 @@ uint16_t tatsumi_state::tatsumi_v30_68000_r(offs_t offset)
 		// doesn't seem necessary anymore, left for reference
 		if (m_maincpu->pc()==0xec575)
 		{
-			uint8_t *dst = m_mainregion->base();
-			dst[BYTE_XOR_LE(0xec57a)]=0x46;
-			dst[BYTE_XOR_LE(0xec57b)]=0x46;
+			auto const dst = util::little_endian_cast<uint8_t>(&m_mainregion[0]);
+			dst[0xec57a]=0x46;
+			dst[0xec57b]=0x46;
 
-			dst[BYTE_XOR_LE(0xfc520)]=0x46; //code that stops cpu after coin counter goes mad..
-			dst[BYTE_XOR_LE(0xfc521)]=0x46;
-			dst[BYTE_XOR_LE(0xfc522)]=0x46;
-			dst[BYTE_XOR_LE(0xfc523)]=0x46;
-			dst[BYTE_XOR_LE(0xfc524)]=0x46;
-			dst[BYTE_XOR_LE(0xfc525)]=0x46;
+			dst[0xfc520]=0x46; //code that stops cpu after coin counter goes mad..
+			dst[0xfc521]=0x46;
+			dst[0xfc522]=0x46;
+			dst[0xfc523]=0x46;
+			dst[0xfc524]=0x46;
+			dst[0xfc525]=0x46;
 		}
 #endif
 
@@ -148,7 +152,7 @@ uint16_t tatsumi_state::tatsumi_v30_68000_r(offs_t offset)
 	/* Read from 68k ROM */
 	offset+=(m_control_word&0x7)*0x8000;
 
-	return rom[offset];
+	return m_subregion[offset];
 }
 
 void tatsumi_state::tatsumi_v30_68000_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -161,11 +165,11 @@ void tatsumi_state::tatsumi_v30_68000_w(offs_t offset, uint16_t data, uint16_t m
 
 /******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(tatsumi_state::v30_interrupt)
+// apache3 & roundup5 vblank irq vector
+IRQ_CALLBACK_MEMBER(tatsumi_state::v30_vector_r)
 {
-	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   /* V30 - VBL */
+	return 0xc8 / 4;
 }
-
 
 
 /***************************************************************************/

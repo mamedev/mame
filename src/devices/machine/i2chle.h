@@ -28,6 +28,29 @@ protected:
 	virtual u8 read_data(u16 offset);
 	virtual void write_data(u16 offset, u8 data);
 
+	// override this to return false when the device shouldn't respond
+	virtual bool is_present() const { return true; }
+
+	// override this to return false when the first byte of a write is data
+	// rather than a sub-address
+	virtual bool has_subaddress() const { return true; }
+
+	// override this to return false for devices that go on transmitting
+	// when the master does not acknowledge a byte
+	virtual bool master_nack_stops() const { return true; }
+
+	// override this for devices whose register pointer survives a STOP
+	virtual bool reset_pointer_on_stop() const;
+
+	// override these to be told about START and STOP conditions, e.g. when
+	// the device's messages are delimited rather than fixed-length
+	virtual void i2c_start() { }
+	virtual void i2c_stop() { }
+
+	virtual bool one_byte_transfers() const;
+
+	virtual bool subaddress_valid(u8 subaddress) const;
+
 	// override this to properly identify your device in logging
 	virtual const char *get_tag();
 

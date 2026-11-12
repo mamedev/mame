@@ -30,6 +30,10 @@ ct1745_mixer_device::ct1745_mixer_device(const machine_config &mconfig, const ch
 	: device_t(mconfig, CT1745, tag, owner, clock)
 	, device_memory_interface(mconfig, *this)
 	, device_mixer_interface(mconfig, *this)
+	, m_irq_select_read_cb(*this, 0)
+	, m_irq_select_write_cb(*this)
+	, m_dma_select_read_cb(*this, 0)
+	, m_dma_select_write_cb(*this)
 	, m_irq_status_cb(*this, 0)
 	, m_fm(*this, finder_base::DUMMY_TAG)
 	, m_ldac(*this, finder_base::DUMMY_TAG)
@@ -326,8 +330,14 @@ void ct1745_mixer_device::map(address_map &map)
 
 	// PnP ports
 	// IRQ/DMA select
-	map(0x80, 0x80).lr8(NAME([] () { return 0x12; }));
-	map(0x81, 0x81).lr8(NAME([] () { return 0x22; }));
+	map(0x80, 0x80).lrw8(
+		NAME([this] () { return m_irq_select_read_cb(); }),
+		NAME([this] (u8 data) { m_irq_select_write_cb(data); })
+	);
+	map(0x81, 0x81).lrw8(
+		NAME([this] () { return m_dma_select_read_cb(); }),
+		NAME([this] (u8 data) { m_dma_select_write_cb(data); })
+	);
 	// IRQ Status
 	map(0x82, 0x82).lr8(NAME([this] () { return m_irq_status_cb(); }));
 

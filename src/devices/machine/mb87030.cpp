@@ -248,6 +248,12 @@ void mb87030_device::scsi_disconnect()
 
 void mb87030_device::scsi_set_ctrl(uint32_t value, uint32_t mask)
 {
+	// The bus doesn't notify us of our own signal changes, so if BSY or SEL
+	// is asserted, we cancel the bus free timer.  Fixes a race condition on
+	// the mpc3000.
+	if (value & mask & (S_BSY | S_SEL))
+		m_bus_free_timer->adjust(attotime::never);
+
 	if (m_sctl & SCTL_DIAG_MODE) {
 		m_scsi_ctrl &= ~mask;
 		m_scsi_ctrl |= value;
@@ -302,7 +308,7 @@ void mb87030_device::step(bool timeout)
 
 	if ((ctrl & (S_BSY|S_SEL)) == 0) {
 		if ((m_ssts & SSTS_INIT_CONNECTED) && m_bus_free_timer->remaining() == attotime::never)
-			m_bus_free_timer->adjust(attotime::from_msec(10));
+			m_bus_free_timer->adjust(attotime::from_nsec(400));
 	} else
 		m_bus_free_timer->adjust(attotime::never);
 
@@ -855,7 +861,13 @@ void mb87030_device::dreg_w(uint8_t data)
 
 uint8_t mb87030_device::temp_r()
 {
+	uint8_t ctrl = m_scsi_bus->ctrl_r();
 	step(false);
+	if((m_pctl & PCTL_PHASE_MASK) == S_PHASE_STATUS && (ctrl & (S_INP | S_REQ)) == (S_INP | S_REQ))
+	{
+		m_temp = m_scsi_bus->data_r();
+		logerror("status read -> temp %02x\n", m_temp);
+	}
 	LOG("%s: %02X\n", __FUNCTION__, m_temp);
 	return m_temp;
 }

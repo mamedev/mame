@@ -223,15 +223,16 @@ bool dcp_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 				for (int i = 0; i < spt; i++)
 				{
-					sects[i].track       = track;
-					sects[i].head        = head;
-					sects[i].sector      = i + 1;
-					sects[i].size        = ssize;
-					sects[i].actual_size = bps;
-					sects[i].deleted     = false;
+					sects[i].track        = track;
+					sects[i].head         = head;
+					sects[i].sector       = i + 1;
+					sects[i].size         = ssize;
+					sects[i].actual_size  = bps;
+					sects[i].deleted      = false;
 					sects[i].bad_data_crc = false;
 					sects[i].bad_addr_crc = false;
-					sects[i].data        = sect_data + i * bps;
+					sects[i].weak         = false;
+					sects[i].data         = sect_data + i * bps;
 				}
 
 				build_pc_track_mfm(track, head, image, cell_count, spt, sects, calc_default_pc_gap3_size(form_factor, bps));
@@ -244,15 +245,16 @@ bool dcp_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 		for (int i = 0; i < spt; i++)
 		{
-			sects[i].track       = 0;
-			sects[i].head        = 0;
-			sects[i].sector      = i + 1;
-			sects[i].size        = 0;
-			sects[i].actual_size = 128;
-			sects[i].deleted     = false;
+			sects[i].track        = 0;
+			sects[i].head         = 0;
+			sects[i].sector       = i + 1;
+			sects[i].size         = 0;
+			sects[i].actual_size  = 128;
+			sects[i].deleted      = false;
 			sects[i].bad_data_crc = false;
 			sects[i].bad_addr_crc = false;
-			sects[i].data        = sect_data + i * 128;
+			sects[i].weak         = false;
+			sects[i].data         = sect_data + i * 128;
 		}
 
 		build_pc_track_fm(0, 0, image, cell_count, spt, sects, calc_default_pc_gap3_size(form_factor, 128));
@@ -262,15 +264,16 @@ bool dcp_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 		for (int i = 0; i < spt; i++)
 		{
-			sects[i].track       = 0;
-			sects[i].head        = 1;
-			sects[i].sector      = i + 1;
-			sects[i].size        = ssize;
-			sects[i].actual_size = bps;
-			sects[i].deleted     = false;
+			sects[i].track        = 0;
+			sects[i].head         = 1;
+			sects[i].sector       = i + 1;
+			sects[i].size         = ssize;
+			sects[i].actual_size  = bps;
+			sects[i].deleted      = false;
 			sects[i].bad_data_crc = false;
 			sects[i].bad_addr_crc = false;
-			sects[i].data        = sect_data + i * bps;
+			sects[i].weak         = false;
+			sects[i].data         = sect_data + i * bps;
 		}
 
 		build_pc_track_mfm(0, 1, image, cell_count, spt, sects, calc_default_pc_gap3_size(form_factor, bps));
@@ -284,15 +287,16 @@ bool dcp_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 
 				for (int i = 0; i < spt; i++)
 				{
-					sects[i].track       = track;
-					sects[i].head        = head;
-					sects[i].sector      = i + 1;
-					sects[i].size        = ssize;
-					sects[i].actual_size = bps;
-					sects[i].deleted     = false;
+					sects[i].track        = track;
+					sects[i].head         = head;
+					sects[i].sector       = i + 1;
+					sects[i].size         = ssize;
+					sects[i].actual_size  = bps;
+					sects[i].deleted      = false;
 					sects[i].bad_data_crc = false;
 					sects[i].bad_addr_crc = false;
-					sects[i].data        = sect_data + i * bps;
+					sects[i].weak         = false;
+					sects[i].data         = sect_data + i * bps;
 				}
 
 				build_pc_track_mfm(track, head, image, cell_count, spt, sects, calc_default_pc_gap3_size(form_factor, bps));

@@ -3034,47 +3034,50 @@ std::string m68k_disassembler::d68851_p000()
 		}
 	}
 
+	// The register selected by the P-REG field depends on which of the three
+	// PMOVE forms this is, so the two must be decoded together.
+	const int preg = (modes >> 10) & 7;
+	const char *regname = nullptr;
+	bool has_fd = true;
+
 	switch ((modes>>13) & 0x7)
 	{
-		case 0: // MC68030/040 form with FD bit
-		case 2: // MC68881 form, FD never set
-			if (modes & 0x0100)
+		case 0: // MC68030/040 transparent translation registers
+			if (preg == 2)
 			{
-				if (modes & 0x0200)
-				{
-					return util::string_format("pmovefd %s, %s", m_mmuregs[(modes>>10)&7], str);
-				}
-				else
-				{
-					return util::string_format("pmovefd %s, %s", str, m_mmuregs[(modes>>10)&7]);
-				}
+				regname = "tt0";
 			}
-			else
+			else if (preg == 3)
 			{
-				if (modes & 0x0200)
-				{
-					return util::string_format("pmove   %s, %s", m_mmuregs[(modes>>10)&7], str);
-				}
-				else
-				{
-					return util::string_format("pmove   %s, %s", str, m_mmuregs[(modes>>10)&7]);
-				}
+				regname = "tt1";
 			}
+			break;
+
+		case 2: // MC68851 registers (also TC/SRP/CRP on the MC68030/040)
+			regname = m_mmuregs[preg];
 			break;
 
 		case 3: // MC68030 to/from status reg
-			if (modes & 0x0200)
-			{
-				return util::string_format("pmove   mmusr, %s", str);
-			}
-			else
-			{
-				return util::string_format("pmove   %s, mmusr", str);
-			}
+			regname = "mmusr";
+			has_fd = false;
 			break;
-
 	}
-	return util::string_format("pmove [unknown form] %s", str);
+
+	if (!regname)
+	{
+		return util::string_format("pmove [unknown form] %s", str);
+	}
+
+	const char *const opname = (has_fd && (modes & 0x0100)) ? "pmovefd" : "pmove  ";
+
+	if (modes & 0x0200)
+	{
+		return util::string_format("%s %s, %s", opname, regname, str);
+	}
+	else
+	{
+		return util::string_format("%s %s, %s", opname, str, regname);
+	}
 }
 
 std::string m68k_disassembler::d68851_pbcc16()

@@ -17,7 +17,7 @@ TODO:
 #include "sound/spkrdev.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 //#include "hh_melps4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
@@ -209,10 +209,9 @@ void cfrogger_state::cfrogger(machine_config &config)
 	m_maincpu->write_t().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(500, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(12, 16);
 
@@ -331,10 +330,9 @@ void gjungler_state::gjungler(machine_config &config)
 	m_maincpu->write_t().set(m_speaker, FUNC(speaker_sound_device::level_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(481, 1080);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_display).set_size(12, 17);
 

@@ -148,7 +148,7 @@ void learnwin_state::machine_reset()
 void learnwin_state::learnwin(machine_config &config)
 {
 	/* video hardware */
-//  screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+//  screen_device &screen(SCREEN(config, "screen").set_lcd());
 //  screen.set_refresh_hz(60);
 //  screen.set_size(48, 32);
 //  screen.set_visarea(0, 47, 0, 31);

@@ -47,12 +47,6 @@
     TODO:
 
     - M6802 board
-    - crashes on boot
-
-        805A: lda  $01
-        805C: and  #$FE
-        805E: sta  $01
-        8060: m6502_brk#$00 <-- BOOM!
 
 */
 
@@ -68,9 +62,12 @@
 #define MC6802P_TAG     "m6802"
 #define MC6821P_0_TAG   "m6821_0"
 #define MC6821P_1_TAG   "m6821_1"
+#define MC6821P_2_TAG   "m6821_2"
+#define EPROM_TAG       "eprom"
 
 
 #define BANK_RAM        0x0d
+#define BANK_NONE       0x0f
 
 
 
@@ -86,6 +83,13 @@ DEFINE_DEVICE_TYPE(C64_MULTISCREEN, c64_multiscreen_cartridge_device, "c64_mscr"
 //-------------------------------------------------
 
 ROM_START( c64_multiscreen )
+	ROM_REGION( 0x20000, EPROM_TAG, 0 )
+	ROM_LOAD( "cart-1.bin", 0x00000, 0x04000, CRC(a0dc670c) SHA1(bbee117340477a7416bba2e9abc2b8debd940cd4) )
+	ROM_RELOAD(             0x04000, 0x04000 ) // 16Kx8 part in a 32Kx8 socket, A14 not connected
+	ROM_LOAD( "cart-2.bin", 0x08000, 0x08000, CRC(2abaad8e) SHA1(897f98e954418e2e9313f219cd64b100c60c68b1) )
+	ROM_LOAD( "cart-3.bin", 0x10000, 0x08000, CRC(ecddbbfc) SHA1(70c72b77dc3981be8bcbec9ba0cc38d9aa5936fd) )
+	ROM_LOAD( "cart-4.bin", 0x18000, 0x08000, CRC(042678ef) SHA1(ff2582c617f72bf57be7d76bcf8270665144f924) )
+
 	ROM_REGION( 0x2000, MC6802P_TAG, 0 )
 	ROM_LOAD( "1",    0x0000, 0x1000, CRC(35be02a8) SHA1(5912bc3d8e0c0949c1e66c19116d6b71c7574e46) )
 	ROM_LOAD( "2 cr", 0x1000, 0x1000, CRC(76a9ac6d) SHA1(87e7335e626bdb73498b46c28c7baab72df38d1f) )
@@ -104,7 +108,12 @@ const tiny_rom_entry *c64_multiscreen_cartridge_device::device_rom_region() cons
 
 void c64_multiscreen_cartridge_device::multiscreen_mem(address_map &map)
 {
-	map(0x0000, 0x1fff).rom().region(MC6802P_TAG, 0);
+	map(0x0084, 0x0087).rw(MC6821P_0_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0088, 0x008b).rw(MC6821P_1_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0090, 0x0093).rw(MC6821P_2_TAG, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0800, 0x0fff).ram();
+	map(0x1000, 0x1fff).rom().region(MC6802P_TAG, 0x1000);
+	map(0xf000, 0xffff).rom().region(MC6802P_TAG, 0);
 }
 
 
@@ -119,6 +128,7 @@ void c64_multiscreen_cartridge_device::device_add_mconfig(machine_config &config
 
 	PIA6821(config, MC6821P_0_TAG);
 	PIA6821(config, MC6821P_1_TAG);
+	PIA6821(config, MC6821P_2_TAG);
 }
 
 
@@ -132,7 +142,10 @@ void c64_multiscreen_cartridge_device::device_add_mconfig(machine_config &config
 
 c64_multiscreen_cartridge_device::c64_multiscreen_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_MULTISCREEN, tag, owner, clock),
-	device_c64_expansion_card_interface(mconfig, *this), m_bank(0)
+	device_c64_expansion_card_interface(mconfig, *this),
+	device_nvram_interface(mconfig, *this),
+	m_eprom(*this, EPROM_TAG),
+	m_bank(0)
 {
 }
 
@@ -143,6 +156,10 @@ c64_multiscreen_cartridge_device::c64_multiscreen_cartridge_device(const machine
 
 void c64_multiscreen_cartridge_device::device_start()
 {
+	// allocate memory
+	m_nvram = std::make_unique<uint8_t[]>(0x2000);
+	save_pointer(NAME(m_nvram), 0x2000);
+
 	// state saving
 	save_item(NAME(m_bank));
 }
@@ -154,7 +171,28 @@ void c64_multiscreen_cartridge_device::device_start()
 
 void c64_multiscreen_cartridge_device::device_reset()
 {
+	m_exrom = 0;
+	m_game = 1;
 	m_bank = 0;
+}
+
+
+void c64_multiscreen_cartridge_device::nvram_default()
+{
+}
+
+
+bool c64_multiscreen_cartridge_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = read(file, m_nvram.get(), 0x2000);
+	return !err && (actual == 0x2000);
+}
+
+
+bool c64_multiscreen_cartridge_device::nvram_write(util::write_stream &file)
+{
+	auto const [err, actual] = write(file, m_nvram.get(), 0x2000);
+	return !err;
 }
 
 
@@ -164,7 +202,7 @@ void c64_multiscreen_cartridge_device::device_reset()
 
 uint8_t c64_multiscreen_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
-	if (!roml)
+	if (!roml || (!m_slot->loram() && (offset & 0xe000) == 0x8000))
 	{
 		int bank = m_bank & 0x0f;
 
@@ -172,22 +210,9 @@ uint8_t c64_multiscreen_cartridge_device::c64_cd_r(offs_t offset, uint8_t data, 
 		{
 			data = m_nvram[offset & 0x1fff];
 		}
-		else
+		else if (bank != BANK_NONE)
 		{
-			data = m_roml[(bank << 14) | (offset & 0x3fff)];
-		}
-	}
-	else if (!romh)
-	{
-		int bank = m_bank & 0x0f;
-
-		if (bank == BANK_RAM)
-		{
-			data = m_roml[offset & 0x3fff];
-		}
-		else
-		{
-			data = m_roml[(bank << 14) | (offset & 0x3fff)];
+			data = m_eprom->base()[(bank << 13) | (offset & 0x1fff)];
 		}
 	}
 

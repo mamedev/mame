@@ -186,7 +186,7 @@ uint32_t f4431_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	if (m_display_enabled && BIT(m_row_attr, 6))
 	{
-		for (int i = cliprect.min_y; i <= cliprect.max_y; i++)
+		for (int i = cliprect.top(); i <= cliprect.bottom(); i++)
 		{
 			int line = i % 10;
 
@@ -374,7 +374,7 @@ void f4431_state::f4431(machine_config &config)
 	m_ctc->set_clk<2>(4_MHz_XTAL / 13);
 	m_ctc->zc_callback<2>().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(9.828_MHz_XTAL * 2, 1020, 0, 800, 268, 0, 250); // probably wrong
 	m_screen->set_screen_update(FUNC(f4431_state::screen_update));

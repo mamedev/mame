@@ -30,7 +30,7 @@ device_memory_interface::space_config_vector pc9801_96_device::memory_space_conf
 
 void pc9801_96_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(FUNC(pc9801_96_device::screen_update));
 

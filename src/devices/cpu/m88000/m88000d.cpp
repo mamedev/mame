@@ -256,8 +256,8 @@ const std::map<u32, const mc88100_disassembler::instruction> mc88100_disassemble
 	{ 0xf400c400, { 0xfc00ffe0, "jmp.n",       mc88100_disassembler::addressing::JUMP }},
 	{ 0xf400c800, { 0xfc00ffe0, "jsr",         mc88100_disassembler::addressing::JUMP }},
 	{ 0xf400cc00, { 0xfc00ffe0, "jsr.n",       mc88100_disassembler::addressing::JUMP }},
-	{ 0xf400e000, { 0xfc00ffe0, "ff1",         mc88100_disassembler::addressing::TRIADIC }}, // S1 not used
-	{ 0xf400e800, { 0xfc00ffe0, "ff0",         mc88100_disassembler::addressing::TRIADIC }}, // S1 not used
+	{ 0xf400e800, { 0xfc00ffe0, "ff1",         mc88100_disassembler::addressing::TRIADIC }}, // S1 not used
+	{ 0xf400ec00, { 0xfc00ffe0, "ff0",         mc88100_disassembler::addressing::TRIADIC }}, // S1 not used
 	{ 0xf400f800, { 0xfc00ffe0, "tbnd",        mc88100_disassembler::addressing::TRIADIC }}, // D not used
 	{ 0xf400fc00, { 0xfc00ffe0, "rte",         mc88100_disassembler::addressing::NONE }}, // privileged
 	{ 0xf8000000, { 0xfc000000, "tbnd",        mc88100_disassembler::addressing::IMM16 }} // D not used
@@ -627,8 +627,8 @@ const std::map<u32, const mc88110_disassembler::instruction> mc88110_disassemble
 	{ 0xf400c400, { 0xffffffe0, "jmp.n",       mc88110_disassembler::addressing::JUMP }},
 	{ 0xf400c800, { 0xffffffe0, "jsr",         mc88110_disassembler::addressing::JUMP }},
 	{ 0xf400cc00, { 0xffffffe0, "jsr.n",       mc88110_disassembler::addressing::JUMP }},
-	{ 0xf400e000, { 0xfc1fffe0, "ff1",         mc88110_disassembler::addressing::TRIADIC }},
-	{ 0xf400e800, { 0xfc1fffe0, "ff0",         mc88110_disassembler::addressing::TRIADIC }},
+	{ 0xf400e800, { 0xfc1fffe0, "ff1",         mc88110_disassembler::addressing::TRIADIC }},
+	{ 0xf400ec00, { 0xfc1fffe0, "ff0",         mc88110_disassembler::addressing::TRIADIC }},
 	{ 0xf400f800, { 0xffe0ffe0, "tbnd",        mc88110_disassembler::addressing::TRIADIC }},
 	{ 0xf400fc00, { 0xffffffff, "rte",         mc88110_disassembler::addressing::NONE }},
 	{ 0xf400fc01, { 0xffffffff, "illop1",      mc88110_disassembler::addressing::NONE }},

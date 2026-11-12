@@ -190,7 +190,7 @@ void asap_device::device_start()
 	state_add(ASAP_PC,         "PC",        m_pc);
 	state_add(ASAP_PS,         "PS",        m_flagsio).callimport().callexport();
 	for (int regnum = 0; regnum < 32; regnum++)
-		state_add(ASAP_R0 + regnum, string_format("R%d", regnum).c_str(), m_src2val[REGBASE + regnum]);
+		state_add(ASAP_R0 + regnum, string_format("R%d", regnum), m_src2val[REGBASE + regnum]);
 
 	// register our state for saving
 	save_item(NAME(m_pc));
@@ -1546,19 +1546,19 @@ void asap_device::ashl_c0()
 
 void asap_device::rotl()
 {
-	DSTVAL = rotl_32(SRC1VAL, SRC2VAL);
+	DSTVAL = std::rotl(SRC1VAL, SRC2VAL);
 }
 
 void asap_device::rotl_c()
 {
-	uint32_t dst = rotl_32(SRC1VAL, SRC2VAL);
+	uint32_t dst = std::rotl(SRC1VAL, SRC2VAL);
 	SET_ZN(dst);
 	DSTVAL = dst;
 }
 
 void asap_device::rotl_c0()
 {
-	uint32_t dst = rotl_32(SRC1VAL, SRC2VAL);
+	uint32_t dst = std::rotl(SRC1VAL, SRC2VAL);
 	SET_ZN(dst);
 }
 

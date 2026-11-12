@@ -7,17 +7,22 @@
     Instruction timings are undocumented, and the timings currently used
     are probably very far from accurate.
 
+    No variant-specific features are emulated yet.
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "sonix16.h"
 #include "sonix16d.h"
 
-// device type definition
-DEFINE_DEVICE_TYPE(SONIX16, sonix16_device, "sonix16", "Sonix 16-bit DSP")
+// device type definitions
+DEFINE_DEVICE_TYPE(SNL320, snl320_device, "snl320", "Sonix SNL320")
+DEFINE_DEVICE_TYPE(SNC7001A, snc7001a_device, "snc7001a", "Sonix SNC7001A")
+DEFINE_DEVICE_TYPE(SNC7648S, snc7648s_device, "snc7648s", "Sonix SNC7648S")
+DEFINE_DEVICE_TYPE(SNT110, snt110_device, "snt110", "Sonix SNT110")
 
-sonix16_device::sonix16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cpu_device(mconfig, SONIX16, tag, owner, clock)
+sonix16_device::sonix16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_rom_config("rom", ENDIANNESS_LITTLE, 16, 24, -1)
 	, m_ram_config("ram", ENDIANNESS_LITTLE, 16, 24, -1)
 	, m_io_config("io", ENDIANNESS_LITTLE, 16, 7, -1, address_map_constructor(FUNC(sonix16_device::io_map), this))
@@ -30,6 +35,26 @@ sonix16_device::sonix16_device(const machine_config &mconfig, const char *tag, d
 	std::fill(std::begin(m_ir), std::end(m_ir), 0);
 	std::fill(std::begin(m_ixbk), std::end(m_ixbk), 0);
 	std::fill(std::begin(m_ixbkram), std::end(m_ixbkram), 0);
+}
+
+snl320_device::snl320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sonix16_device(mconfig, SNL320, tag, owner, clock)
+{
+}
+
+snc7001a_device::snc7001a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sonix16_device(mconfig, SNC7001A, tag, owner, clock)
+{
+}
+
+snc7648s_device::snc7648s_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sonix16_device(mconfig, SNC7648S, tag, owner, clock)
+{
+}
+
+snt110_device::snt110_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sonix16_device(mconfig, SNT110, tag, owner, clock)
+{
 }
 
 std::unique_ptr<util::disasm_interface> sonix16_device::create_disassembler()
@@ -170,6 +195,23 @@ void sonix16_device::inten_w(u16 data)
 	m_inten = data;
 }
 
+u16 sonix16_device::wdt_r()
+{
+	return m_wdt;
+}
+
+void sonix16_device::wdt_w(u16 data)
+{
+	// Watchdog timer (TODO)
+	if (BIT(data, 14))
+		logerror("%s: WDT reset\n", machine().describe_context());
+	if (BIT(~data & m_wdt, 15))
+		logerror("%s: WDT disabled\n", machine().describe_context());
+	if (BIT(data & ~m_wdt, 15))
+		logerror("%s: WDT enabled\n", machine().describe_context());
+	m_wdt = data;
+}
+
 u16 sonix16_device::iosw_r()
 {
 	return m_iosw;
@@ -196,6 +238,7 @@ void sonix16_device::io_map(address_map &map)
 	map(0x1a, 0x1b).rw(FUNC(sonix16_device::iybk_r), FUNC(sonix16_device::iybk_w));
 	map(0x1c, 0x1d).rw(FUNC(sonix16_device::ixbkram_r), FUNC(sonix16_device::ixbkram_w));
 	map(0x20, 0x20).rw(FUNC(sonix16_device::inten_r), FUNC(sonix16_device::inten_w));
+	map(0x29, 0x29).rw(FUNC(sonix16_device::wdt_r), FUNC(sonix16_device::wdt_w));
 	map(0x3a, 0x3a).rw(FUNC(sonix16_device::iosw_r), FUNC(sonix16_device::iosw_w));
 }
 
@@ -246,6 +289,7 @@ void sonix16_device::device_start()
 	save_item(NAME(m_ixbkram));
 	save_item(NAME(m_sp));
 	save_item(NAME(m_inten));
+	save_item(NAME(m_wdt));
 	save_item(NAME(m_iosw));
 	save_item(NAME(m_pc));
 }
@@ -257,6 +301,7 @@ void sonix16_device::device_reset()
 	m_ssf = 0;
 	m_rambk = 0;
 	m_inten = 0;
+	m_wdt = 0x8000;
 }
 
 u16 sonix16_device::get_reg(unsigned r) const noexcept
@@ -458,12 +503,12 @@ void sonix16_device::execute_run()
 			u16 op = m_r[BIT(inst, 0, 2) + (BIT(inst, 1) ? 0 : 4)];
 			switch (BIT(inst, 3, 2))
 			{
-			case 0: // BSET
-				op |= 1 << bit;
+			case 0: // BCLR
+				op &= ~(1 << bit);
 				break;
 
-			case 1: // BCLR
-				op &= ~(1 << bit);
+			case 1: // BSET
+				op |= 1 << bit;
 				break;
 
 			case 2: // BTOG

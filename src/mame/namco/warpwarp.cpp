@@ -779,7 +779,7 @@ void warpwarp_state::geebee(machine_config &config)
 	m_latch->q_out_cb<7>().set(FUNC(warpwarp_state::flip_screen_set));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224);
 	screen.set_screen_update(FUNC(warpwarp_state::screen_update));
 	screen.set_palette(m_palette);
@@ -851,7 +851,7 @@ void warpwarp_state::bombbee(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MASTER_CLOCK/3, 384, 0, 272, 264, 0, 224);
 	screen.set_screen_update(FUNC(warpwarp_state::screen_update));
 	screen.set_palette(m_palette);

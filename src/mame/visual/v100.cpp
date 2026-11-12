@@ -387,7 +387,7 @@ void v100_state::v100(machine_config &config)
 	brg2.fr_handler().set(m_usart[1], FUNC(i8251_device::write_rxc));
 	brg2.ft_handler().set(m_usart[1], FUNC(i8251_device::write_txc));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	//m_screen->set_raw(47.736_MHz_XTAL / 2, 102 * V100_CH_WIDTH, 0, 80 * V100_CH_WIDTH, 260, 0, 240);
 	m_screen->set_raw(47.736_MHz_XTAL, 170 * V100_CH_WIDTH, 0, 132 * V100_CH_WIDTH, 312, 0, 240);
 	m_screen->set_screen_update(FUNC(v100_state::screen_update));

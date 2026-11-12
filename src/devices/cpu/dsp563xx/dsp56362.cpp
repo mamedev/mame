@@ -8,7 +8,7 @@
 
 ROM_START( dsp56362 )
 	ROM_REGION32_LE( 0xc0*4, "boot", 0 )
-	ROM_LOAD( "boot-362.bin", 0, 0xc0*4, CRC(fa69796b) SHA1(c18cbc0fb01ad423f99eb6421a36f3915e37e843) )
+	ROM_LOAD( "boot-362.bin", 0, 0xc0*4, CRC(8b0b6440) SHA1(e0280b84cd1bd6e6fcca567b5ec3b90e2a55ddeb) )
 ROM_END
 
 dsp56362_device::dsp56362_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
@@ -43,12 +43,14 @@ void dsp56362_device::device_add_mconfig(machine_config &config)
 {
 	HI08(config, m_hi08);
 	DSP5636X_SHI(config, m_shi);
+	m_shi->miso_callback().set(FUNC(dsp56362_device::do_miso));
+	m_shi->hreq_callback().set(FUNC(dsp56362_device::do_hreq));
 }
 
 
 void dsp56362_device::p_map(address_map &map)
 {
-	map(0x000000, 0x000bff).ram();
+	map(0x000000, 0x0015ff).ram();
 	map(0xff0000, 0xff00bf).rom().region("boot", 0);
 }
 
@@ -56,6 +58,7 @@ void dsp56362_device::x_map(address_map &map)
 {
 	map(0x000000, 0x0015ff).ram();
 	map(0xffff90, 0xffff94).m(m_shi, FUNC(dsp5636x_shi_device::map));
+	map(0xffffb3, 0xffffb3).lr32(NAME([]() -> u32 { return 0; })); // ESAI status
 	map(0xffffc2, 0xffffc7).m(m_hi08, FUNC(hi08_device::map));
 }
 

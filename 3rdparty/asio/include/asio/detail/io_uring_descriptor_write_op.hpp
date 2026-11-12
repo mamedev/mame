@@ -2,7 +2,7 @@
 // detail/io_uring_descriptor_write_op.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -30,6 +30,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 template <typename ConstBufferSequence>
@@ -63,7 +64,7 @@ public:
     {
       ::io_uring_prep_write_fixed(sqe, o->descriptor_,
           o->bufs_.buffers()->iov_base, o->bufs_.buffers()->iov_len,
-          0, o->bufs_.registered_id().native_handle());
+          -1, o->bufs_.registered_id().native_handle());
     }
     else
     {
@@ -176,6 +177,7 @@ private:
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

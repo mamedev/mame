@@ -925,7 +925,7 @@ void expro02_state::expro02(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(expro02_state::scanline), "screen", 0, 1);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(VDP_CLOCK / 3, 341, 0, 256, 262, 0, 224); // ~60 Hz
 	m_screen->set_screen_update(FUNC(expro02_state::screen_update));
 	m_screen->set_palette(m_palette);

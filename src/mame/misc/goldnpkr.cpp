@@ -597,6 +597,46 @@
   5 -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN -> CTRL -> DOWN
 
 
+  * Toukyuu System Poker
+
+  Press key 0 to enter the books/meters.
+  You can see the normal meters and the DIP switches state.
+
+  Pressing HOLD1, you can enter the "Analiz-2" screen,
+  where you can see the following meters:
+
+  GAME   IN
+  GAME   OUT
+  WUP    IN
+  WUP    TAKE
+  GAME   TAKE
+  GAME   COUNT
+  WIN    COUNT
+  WUP    COUNT
+  BET1   IN
+  BET1   OUT
+  BET2   IN
+  BET2   OUT
+  BET2   COUNT
+  WUP    WIN
+  WUP    LOSS
+  13K    COUNT
+  777    COUNT
+  FEVER  ODDS
+  TURBO1 HIT
+  TURBO2 HIT
+  TURBO  COUNT
+  DOUBLE TURBO
+  TURBO  ODDS
+  PROGR  COUNT
+  PROGR  ODDS
+ 
+  You can exit to the game pressing:
+  - HOLD2 (you will exit to the normal game)
+  - HOLD3 (you will exit to the "auto take" game)
+  - HOLD5 (you will exit to the game type you had before)
+
+
 ************************************************************************************
 
 
@@ -1069,6 +1109,9 @@
   - Missing PIA connections.
   - Final cleanup.
 
+  - dep 9801 sets:
+     - lfhouse inputs & redump GFX ROMs for missing bitplanes.
+
 
 ************************************************************************************/
 
@@ -1099,6 +1142,7 @@
 #include "lespendu.lh"
 #include "pmpoker.lh"
 #include "upndown.lh"
+#include "smb_be4k.lh"
 
 
 namespace {
@@ -1150,9 +1194,16 @@ public:
 	void kmhpan(machine_config &config) ATTR_COLD;
 	void unkicpf40(machine_config &config) ATTR_COLD;
 	void wing_w90(machine_config &config) ATTR_COLD;
-	void dep_9801(machine_config &config) ATTR_COLD;
+	void phnxjokr(machine_config &config) ATTR_COLD;
+	void dash_a37(machine_config &config) ATTR_COLD;
 	void dynplus(machine_config &config) ATTR_COLD;
 	void dynchance(machine_config &config) ATTR_COLD;
+	void lfhouse(machine_config &config) ATTR_COLD;
+	void unkdep(machine_config &config) ATTR_COLD;
+	void smb_be4k(machine_config &config) ATTR_COLD;
+	void touksysp(machine_config &config) ATTR_COLD;
+	void pk5_07sb(machine_config &config) ATTR_COLD;
+	void jokerush(machine_config &config) ATTR_COLD;
 
 	void init_vkdlswwh() ATTR_COLD;
 	void init_icp1db() ATTR_COLD;
@@ -1172,6 +1223,7 @@ public:
 	void init_vkdlswwc() ATTR_COLD;
 	void init_vkdlswwr() ATTR_COLD;
 	void init_vkdlswwv() ATTR_COLD;
+	void init_vkdlswww() ATTR_COLD;	
 	void init_bchancep() ATTR_COLD;
 	void init_bonuspkr() ATTR_COLD;
 	void init_super98() ATTR_COLD;
@@ -1180,10 +1232,15 @@ public:
 	void init_olym65() ATTR_COLD;
 	void init_glfev() ATTR_COLD;
 	void init_ped42() ATTR_COLD;
-	void init_dep9801() ATTR_COLD;
+	void init_lfhouse() ATTR_COLD;
+	void init_lfhouseb() ATTR_COLD;
 	void init_dash() ATTR_COLD;
 	void init_dynplus() ATTR_COLD;
 	void init_dynchance() ATTR_COLD;
+	void init_unkdep() ATTR_COLD;
+	void init_touk() ATTR_COLD;
+	void init_pk5sb() ATTR_COLD;
+	void init_jokerush() ATTR_COLD; 
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -1192,6 +1249,8 @@ protected:
 	void lamps_a_w(uint8_t data);
 	void sound_w(uint8_t data);
 	void mux_w(uint8_t data);
+	void phnxjokr_mux_w(uint8_t data);
+	void test_w(uint8_t data);
 
 	void goldnpkr_videoram_w(offs_t offset, uint8_t data);
 	void goldnpkr_colorram_w(offs_t offset, uint8_t data);
@@ -1201,6 +1260,7 @@ protected:
 	void witchcrd_palette(palette_device &palette) const ATTR_COLD;
 	void super21p_palette(palette_device &palette) const ATTR_COLD;
 	void wing_w90_palette(palette_device &palette) const ATTR_COLD;
+	void phnxjokr_palette(palette_device &palette) const ATTR_COLD;
 
 	void goldnpkr_base(machine_config &config) ATTR_COLD;
 
@@ -1212,7 +1272,7 @@ protected:
 	required_shared_ptr<uint8_t> m_colorram;
 
 	required_device<cpu_device> m_maincpu;
-	required_device_array<pia6821_device, 2> m_pia;
+	optional_device_array<pia6821_device, 2> m_pia;
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -1233,11 +1293,15 @@ private:
 	TILE_GET_INFO_MEMBER(super21p_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wing_w90_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(kmhpan_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(phnxjokr_get_bg_tile_info);
+	TILE_GET_INFO_MEMBER(smb_be4k_get_bg_tile_info);
 	void goldnpkr_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_VIDEO_START(wcrdxtnd);
 	DECLARE_VIDEO_START(super21p);
 	DECLARE_VIDEO_START(wing_w90);
 	DECLARE_VIDEO_START(kmhpan);
+	DECLARE_VIDEO_START(phnxjokr);
+	DECLARE_VIDEO_START(smb_be4k);
 	void wcrdxtnd_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_MACHINE_START(mondial);
 	DECLARE_MACHINE_RESET(mondial);
@@ -1258,6 +1322,7 @@ private:
 	void super21p_map(address_map &map) ATTR_COLD;
 	void op5cards_map(address_map &map) ATTR_COLD;
 	void icp_ext_map(address_map &map) ATTR_COLD;
+	void smb_be4k_map(address_map &map) ATTR_COLD;
 	void glfever_map(address_map &map) ATTR_COLD;
 	void kmhpan_map(address_map &map) ATTR_COLD;
 	void unkicpf40_map(address_map &map) ATTR_COLD;
@@ -1265,7 +1330,14 @@ private:
 	void dash_a37_map(address_map &map) ATTR_COLD;
 	void dynplus_map(address_map &map) ATTR_COLD;
 	void dynchance_map(address_map &map) ATTR_COLD;
+	void lfhouse_map(address_map &map) ATTR_COLD;
+	void unkdep_map(address_map &map) ATTR_COLD;
 	void dep_9801_opcodes_map(address_map &map) ATTR_COLD;
+	void phnxjokr_map(address_map &map) ATTR_COLD;
+	void touksysp_map(address_map &map) ATTR_COLD;
+	void touksysp_opcodes_map(address_map &map) ATTR_COLD;
+	void pk5_07sb_map(address_map &map) ATTR_COLD;
+	void jokerush_map(address_map &map) ATTR_COLD;
 
 	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device<ay8910_device> m_ay8910;
@@ -1466,6 +1538,49 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::kmhpan_get_bg_tile_info)
 	tileinfo.set(bank, code, color, 0);
 }
 
+TILE_GET_INFO_MEMBER(goldnpkr_state::smb_be4k_get_bg_tile_info)
+{
+/* 4 graphics banks system...
+
+    - bits -
+    7654 3210
+    --xx xx--   tiles color.
+    -x-- --x-   tiles bank.
+    x--- ---x   unused.
+*/
+	uint16_t const attr = m_colorram[tile_index];
+	uint16_t const code = ((attr & 0x01) << 8) | m_videoram[tile_index];
+	uint16_t const color = (attr & 0x3c) >> 2;
+
+	uint16_t const select0 = (attr & 0x02) >> 1;  // bit1 to bit0
+	uint16_t const select1 = (attr & 0x40) >> 5;  // bit6 to bit1
+	uint16_t const bank = select1 | select0;
+
+	tileinfo.set(bank, code, color, 0);
+}
+
+TILE_GET_INFO_MEMBER(goldnpkr_state::phnxjokr_get_bg_tile_info)
+{
+	/*  - bits -
+	    7654 3210
+	    -xxx -x--   tiles color.
+	    ---- --x-   tiles bank.
+	    ---- ---x   tiles extended address (MSB).
+	    xx-- ----   unused.
+	*/
+
+	uint16_t const attr = m_colorram[tile_index];
+	uint16_t const code = ((attr & 1) << 8) | m_videoram[tile_index];
+	uint16_t const bank = (attr & 0x02) >> 1;      // bit 1 switch the gfx banks
+
+	// preparing the color mask 01110100
+	uint16_t const color_high = (attr & 0x70) >> 3;
+	uint16_t const color_low = (attr & 0x04) >> 2;
+	uint16_t const color = color_high | color_low;
+
+	tileinfo.set(bank, code, color, 0);
+}
+
 
 void goldnpkr_state::video_start()
 {
@@ -1490,6 +1605,16 @@ VIDEO_START_MEMBER(goldnpkr_state, wing_w90)
 VIDEO_START_MEMBER(goldnpkr_state, kmhpan)
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::kmhpan_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+VIDEO_START_MEMBER(goldnpkr_state, smb_be4k)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::smb_be4k_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+}
+
+VIDEO_START_MEMBER(goldnpkr_state, phnxjokr)
+{
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(goldnpkr_state::phnxjokr_get_bg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -1681,6 +1806,30 @@ void goldnpkr_state::wing_w90_palette(palette_device &palette) const
 }
 
 
+void goldnpkr_state::phnxjokr_palette(palette_device &palette) const
+{
+/*  Three 82S129 bipolar PROMs (256x4), one per color channel.
+
+    7654 3210
+    ---- xxxx   color component.
+    xxxx ----   unused.
+
+*/
+	uint8_t const *const color_prom = memregion("proms")->base();
+	if (!color_prom)
+		return;
+
+	for (int i = 0; i < palette.entries(); i++)
+	{
+		int const r = pal4bit(color_prom[i]);
+		int const g = pal4bit(color_prom[i + 0x100]);
+		int const b = pal4bit(color_prom[i + 0x200]);
+
+		palette.set_pen_color(i, rgb_t(r, g, b));
+	}
+}
+
+
 /*******************************************
 *               R/W Handlers               *
 *******************************************/
@@ -1744,6 +1893,9 @@ void goldnpkr_state::mux_w(uint8_t data)
 	m_lamps[6] = !BIT(data, 1); // hopper motor 2
 	m_lamps[7] = !BIT(data, 2); // diverter
 	m_lamps[8] = !BIT(data, 3); // coin lockout
+
+//	logerror("m_mux_data:%02x\n", m_mux_data );
+
 }
 
 void lespendu_state::lespendu_mux_w(uint8_t data)
@@ -1760,6 +1912,25 @@ void lespendu_state::lespendu_mux_w(uint8_t data)
 void goldnpkr_state::mux_port_w(uint8_t data)
 {
 	m_pia0_PA_data = data;
+}
+
+void goldnpkr_state::phnxjokr_mux_w(uint8_t data)
+{
+	// bit 0 - bit 1 -> Hopper
+	m_hopper->motor_w(BIT(~data, 0) && BIT(~data, 1));
+
+	m_lamps[5] = !BIT(data, 0);  // hopper motor 1 - to be confirmed
+	m_lamps[6] = !BIT(data, 1);  // hopper motor 2 - to be confirmed
+
+	// ay-3-8910 management
+	if (BIT(data, 7))
+		m_ay8910->data_address_w(BIT(data, 6), m_ay8910_data);
+
+	m_ay8910_control = data;
+
+	m_mux_data = (data << 2) & 0xf0;  // bits 0x3c not inv. 
+
+//	logerror("m_mux_data:%02x\n", m_mux_data );
 }
 
 
@@ -1895,6 +2066,14 @@ void goldnpkr_state::sound_w(uint8_t data)
 }
 
 
+void goldnpkr_state::test_w(uint8_t data)
+{
+	// general purpose write test
+
+	logerror("written data:%02x\n", data );
+}
+
+
 /*********************************************
 *           Memory Map Information           *
 *********************************************/
@@ -2011,6 +2190,7 @@ void goldnpkr_state::wcrdxtnd_map(address_map &map)
 void goldnpkr_state::wildcrdb_map(address_map &map)
 {
 	map.global_mask(0x7fff);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
@@ -2054,6 +2234,7 @@ void goldnpkr_state::wildcrdb_mcu_io_map(address_map &map)
 void goldnpkr_state::genie_map(address_map &map)
 {
 	map.global_mask(0x3fff);
+
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
@@ -2063,7 +2244,6 @@ void goldnpkr_state::genie_map(address_map &map)
 	map(0x1800, 0x1fff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 	map(0x2000, 0x3fff).rom();
 }
-
 
 void goldnpkr_state::mondial_map(address_map &map)
 {
@@ -2098,6 +2278,31 @@ void goldnpkr_state::icp_ext_map(address_map &map)
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
 	map(0x2000, 0x3fff).rom();
 	map(0x6000, 0x7fff).rom();
+}
+
+void goldnpkr_state::pk5_07sb_map(address_map &map)
+{
+	common_io_map(map);
+
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x2000, 0x2000).portr("SW2");
+	map(0x2100, 0x2100).portr("SW3");
+	map(0x4000, 0xffff).rom();
+}
+
+void goldnpkr_state::smb_be4k_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");         // battery backed RAM
+	map(0x0800, 0x0bff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x0c00, 0x0fff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
+
+	map(0x10b0, 0x10b0).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x10b1, 0x10b1).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+
+	map(0x10f4, 0x10f7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x10f8, 0x10fb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+
+	map(0x8000, 0xffff).rom();
 }
 
 void lespendu_state::lespendu_map(address_map &map)
@@ -2176,16 +2381,22 @@ void goldnpkr_state::dash_a37_map(address_map &map)
 	map(0x0c01, 0x0c01).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
+	map(0x4000, 0x4000).portr("SW2");
+	map(0x4001, 0x4001).portr("SW3");
+	map(0x4007, 0x4007).portr("SW4");
 	map(0x8000, 0xffff).rom();
 }
 
 void goldnpkr_state::dynplus_map(address_map &map)
 {
 	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
-	map(0x3804, 0x3807).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-	map(0x3808, 0x380b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x3804, 0x3807).mirror(0x0080).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x3808, 0x380b).mirror(0x0080).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x3840, 0x3840).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x3841, 0x3841).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x4000, 0x4000).portr("SW2");
+	map(0x4001, 0x4001).portr("SW3");
+	map(0x4007, 0x4007).portr("SW4");  // 4-bits operative
 	map(0x6000, 0x63ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
 	map(0x6800, 0x6bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 	map(0x8000, 0xffff).rom();
@@ -2198,6 +2409,32 @@ void goldnpkr_state::dynchance_map(address_map &map)
 	map(0x3801, 0x3801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x3844, 0x3847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x3848, 0x384b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x4000, 0x4000).portr("SW2");
+	map(0x4001, 0x4001).portr("SW3");
+	map(0x6000, 0x63ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x6800, 0x6bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
+	map(0x8000, 0xffff).rom();
+}
+
+void goldnpkr_state::lfhouse_map(address_map &map)
+{
+	common_io_map(map);
+
+	map(0x0000, 0x7fff).rom();
+
+	map(0x0000, 0x07ff).ram().share("nvram");
+	map(0x3000, 0x3000).portr("SW1_EXT");
+
+	map(0x8000, 0xffff).rom();
+}
+
+void goldnpkr_state::unkdep_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x2800, 0x2800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x2801, 0x2801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x2844, 0x2847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x2848, 0x284b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x6000, 0x63ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
 	map(0x6800, 0x6bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 	map(0x8000, 0xffff).rom();
@@ -2208,6 +2445,49 @@ void goldnpkr_state::dep_9801_opcodes_map(address_map &map)
 	map(0x8000, 0xffff).rom().share(m_decrypted_opcodes);
 }
 
+void goldnpkr_state::phnxjokr_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+
+	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
+	map(0x2000, 0x2000).r(FUNC(goldnpkr_state::goldnpkr_mux_port_r));
+	map(0x4000, 0x7fff).rom();
+}
+
+
+void goldnpkr_state::touksysp_map(address_map &map)
+{
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share("videoram");
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share("colorram");
+	map(0x6000, 0x6000).portr("SW2");
+	map(0x6800, 0x6800).portr("SW3");
+	map(0x8000, 0xffff).rom();
+}
+
+void goldnpkr_state::touksysp_opcodes_map(address_map &map)
+{
+	map(0x8000, 0xffff).rom().share(m_decrypted_opcodes);
+}
+
+
+void goldnpkr_state::jokerush_map(address_map &map)
+{
+	common_io_map(map);
+
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM
+	map(0x8000, 0xffff).rom();
+}
+
 
 void blitz_state::megadpkr_map(address_map &map)
 {
@@ -2216,14 +2496,6 @@ void blitz_state::megadpkr_map(address_map &map)
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-
-/*  There is another set of PIAs controlled by the code.
-    Maybe they are just mirrors...
-    FIXME: this comment and commented code doesn't make sense - the video RAM is in this range
-
-    map(0x10f4, 0x10f7).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-    map(0x10f8, 0x10fb).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
-*/
 	map(0x1000, 0x13ff).ram().w(FUNC(blitz_state::goldnpkr_videoram_w)).share(m_videoram);
 	map(0x1800, 0x1bff).ram().w(FUNC(blitz_state::goldnpkr_colorram_w)).share(m_colorram);
 
@@ -2231,6 +2503,7 @@ void blitz_state::megadpkr_map(address_map &map)
 	map(0x4000, 0x7fff).view(m_overlay);
 	m_overlay[0](0x4000, 0x7fff).r(FUNC(blitz_state::cpubank_decrypt_r<0x0000>)).nopw();
 	m_overlay[1](0x4000, 0x7fff).r(FUNC(blitz_state::cpubank_decrypt_r<0x4000>)).nopw();
+
 	map(0x8000, 0xbfff).nopr().w(FUNC(blitz_state::mcu_command_w));
 	map(0xc000, 0xffff).rom();
 }
@@ -2295,8 +2568,8 @@ static INPUT_PORTS_START( goldnpkr )
 	PORT_DIPSETTING(    0x20, "50hz" )
 	PORT_DIPSETTING(    0x00, "60hz" )
 	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       PORT_DIPLOCATION("SW1:3")  // listed in the manual as "Play Mode"
-	PORT_DIPSETTING(    0x40, "Auto" )                                         //  listed in the manual as "Out Play"
-	PORT_DIPSETTING(    0x00, "Manual" )                                       //  listed in the manual as "Credit Play"
+	PORT_DIPSETTING(    0x40, "Auto" )                                         // listed in the manual as "Out Play"
+	PORT_DIPSETTING(    0x00, "Manual" )                                       // listed in the manual as "Credit Play"
 	PORT_DIPNAME( 0x80, 0x00, "Royal Flush" )       PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -2453,28 +2726,20 @@ static INPUT_PORTS_START( pottnpkr )
 
 	PORT_START("SW1")
 	// only bits 4-7 are connected here and were routed to SW1 1-4
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x00, "Jacks or Better" )   PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x00, "50hz/60hz" )         PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, "50hz" )
 	PORT_DIPSETTING(    0x00, "60hz" )
-	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       PORT_DIPLOCATION("SW1:3")  // listed in the manual as "Play Mode"
-	PORT_DIPSETTING(    0x40, "Auto" )                                         // listed in the manual as "Out Play"
-	PORT_DIPSETTING(    0x00, "Manual" )                                       // listed in the manual as "Credit Play"
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )       PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, "Auto" )
+	PORT_DIPSETTING(    0x00, "Manual" )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -5097,6 +5362,732 @@ static INPUT_PORTS_START( icp_etg )  // ICP-1 w/daughterboard
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( phnxjokr )
+/*
+  Multiplexed - 4x6bits
+
+  E1B5: AD 46 08 lda $0846
+  E1B8: 29 3F    and #$3f
+  E1BA: 09 C0    ora #$c0
+  E1BC: 8D 46 08 sta $0846
+
+  This matrix reads 6 bits per row,
+  instead of the original 5 bits from
+  Bonanza Golden Poker and others.  
+
+*/	
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-0 Bit 5") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )          PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-1 Bit 5") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-2 Bit 5") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 0") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 1") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )          PORT_IMPULSE(3) PORT_NAME("Note 1 In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )          PORT_IMPULSE(3) PORT_NAME("Note 2 In")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 5") PORT_CODE(KEYCODE_P)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")  // AY8910 portA
+	PORT_DIPNAME( 0x01, 0x01, "2-Card Open Mode" )      PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "2-Card Open Type" )      PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, "Manual (HOLD Buttons)" )
+	PORT_DIPSETTING(    0x00, "Auto Open" )
+	PORT_DIPNAME( 0x04, 0x04, "Royal Flush" )           PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "OK" )
+	PORT_DIPSETTING(    0x00, "Lose" )
+	PORT_DIPNAME( 0x08, 0x08, "Credit Limit" )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Credit Limit Value" )    PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, "200" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPNAME( 0x20, 0x20, "Straight Flush Payout" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, "100" )
+	PORT_DIPSETTING(    0x00, "150" )
+	PORT_DIPNAME( 0x40, 0x40, "Double-Up Rate" )        PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, "90%" )
+	PORT_DIPSETTING(    0x00, "80%" )
+	PORT_DIPNAME( 0x80, 0x80, "Double-Up Joker" )       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, "Few" )
+	PORT_DIPSETTING(    0x00, "Many" )
+
+	PORT_START("SW2")  // AY8910 portB
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPSETTING(    0x00, "1 Coin / 1 Credit (Note1: 2, Note2: 20)" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 1 Credit (Note1: 5, Note2: 50)" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 1 Credit (Note1: 10, Note2: 100)" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 2 Credits (Note1: 20, Note2: 200)" )
+	PORT_DIPSETTING(    0x04, "1 Coin / 3 Credits (Note1: 30, Note2: 300)" )
+	PORT_DIPSETTING(    0x05, "1 Coin / 4 Credits (Note1: 40, Note2: 400)" )
+	PORT_DIPSETTING(    0x06, "1 Coin / 5 Credits (Note1: 50, Note2: 500)" )
+	PORT_DIPSETTING(    0x07, "1 Coin / 10 Credits (Note1: 100, Note2: 1000)" )
+	PORT_DIPNAME( 0x08, 0x08, "Max Bet" )               PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, "10 (Payout Limit 10,000)" )
+	PORT_DIPSETTING(    0x00, "20 (Payout Limit 20,000)" )
+	PORT_DIPNAME( 0x10, 0x10, "Main Game Joker" )       PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, "Few" )
+	PORT_DIPSETTING(    0x00, "Many" )
+	PORT_DIPNAME( 0xe0, 0xe0, "Main Game Pay Rate" )    PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPSETTING(    0xe0, "90% (80~95%)" )
+	PORT_DIPSETTING(    0xc0, "90% (85~99%)" )
+	PORT_DIPSETTING(    0xa0, "80% (70~85%)" )
+	PORT_DIPSETTING(    0x80, "80% (75~89%)" )
+	PORT_DIPSETTING(    0x60, "70% (60~75%)" )
+	PORT_DIPSETTING(    0x40, "70% (65~79%)" )
+	PORT_DIPSETTING(    0x20, "60% (50~65%)" )
+	PORT_DIPSETTING(    0x00, "60% (55~69%)" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( dash_a37 )
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, "Odds" )              PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x00, "40/100" )
+	PORT_DIPSETTING(    0x10, "60/150" )
+	PORT_DIPNAME( 0x20, 0x20, "Out Speed" )         PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( High ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Low ) )
+	PORT_DIPNAME( 0x40, 0x40, "Card" )              PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, "Close" )
+	PORT_DIPSETTING(    0x00, "Open" )
+	PORT_DIPNAME( 0x80, 0x00, "Extra Settings" )    PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_START("SW2") // $4000
+	PORT_DIPNAME( 0x03, 0x03, "ROY Limit" )         PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPNAME( 0x0c, 0x0c, "STF Limit" )         PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x0c, "4" )
+	PORT_DIPNAME( 0x30, 0x30, "4CD Limit" )         PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPSETTING(    0x30, "4" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Medium" )            PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x00, "-5%" )
+	PORT_DIPSETTING(    0x40, "-10%" )
+	PORT_DIPSETTING(    0x80, "-15%" )
+	PORT_DIPSETTING(    0xc0, "-20%" )
+
+	PORT_START("SW3") // $4001
+	PORT_DIPNAME( 0x03, 0x03, "WUP Level" )         PORT_DIPLOCATION("SW3:1,2")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPNAME( 0x0c, 0x0c, "GRN Level" )         PORT_DIPLOCATION("SW3:3,4")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x0c, "4" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )   PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_10C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_100C ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Note/Coupon" )       PORT_DIPLOCATION("SW3:7,8")
+	PORT_DIPSETTING(    0x00, "10/5" )
+	PORT_DIPSETTING(    0x40, "20/10" )
+	PORT_DIPSETTING(    0x80, "50/25" )
+	PORT_DIPSETTING(    0xc0, "100/50" )
+
+	PORT_START("SW4") // $4007
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "NG Level" )          PORT_DIPLOCATION("SW4:3,4")
+	PORT_DIPSETTING(    0x0c, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xa0, 0xa0, "4 Card Continue" )   PORT_DIPLOCATION("SW4:6,8")
+	PORT_DIPSETTING(    0xa0, "+5%" )
+	PORT_DIPSETTING(    0x80, "+10%" )
+	PORT_DIPSETTING(    0x20, "+20%" )
+	PORT_DIPSETTING(    0x00, "+30%" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( dynchance )
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2") // $4000
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3") // $4001
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( dynplus )
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2") // $4000
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3") // $4001
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW4") // $4007 - only four bits tested in test mode
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW4:!4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW4:!3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x20, 0x00, "Demo / Play Alone" ) PORT_DIPLOCATION("SW4:!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW4:!1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( lfhouse )
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW1_EXT") // $3000
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2") // $????
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3") // $????
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( smb_be4k )
+	// Multiplexed - 4x5bits
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )     PORT_NAME("Play / Bet / Raise")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Books / Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )    PORT_NAME("Double-Up / BJ Hit")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )         PORT_NAME("Start / Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )   PORT_NAME("Cancel / Game Select")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )          PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )    PORT_NAME("Take / BJ Stand")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )    PORT_NAME("Hold 1 / Coin1 Set / Turns Set")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )    PORT_NAME("Hold 2 / Note1 Set")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )    PORT_NAME("Hold 3 / Note2 Set")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn Mode (Coin-Notes-Turns set)") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("IN0-3-02")                          PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Note 1 In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("Coin In")   PORT_IMPULSE(3)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Note 2 In")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	// only bits 4-7 are connected here and were routed to SW1 1-4
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, "Jacks or Better" )   PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x00, "Factory Set" )       PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )    // factory ON
+	PORT_DIPNAME( 0x40, 0x40, "Play Mode" )         PORT_DIPLOCATION("SW1:3")  // listed in the manual as "Play Mode"
+	PORT_DIPSETTING(    0x40, "Points" )                                       // normal game with coin-in. note1-in & note2-in
+	PORT_DIPSETTING(    0x00, "Turns" )                                        // 1-4 turns game with coin-in in thousands units
+	PORT_DIPNAME( 0x80, 0x00, "Top Hand" )          PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( touksysp )
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2") // $6000
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3") // $6800
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW3:3,4,5")
+	PORT_DIPSETTING(    0x00, "Coin: 1; Note1: 1; Note2: 1" )
+	PORT_DIPSETTING(    0x0c, "Coin: 1; Note1: 5; Note2: 10" )
+	PORT_DIPSETTING(    0x1c, "Coin: 1; Note1: 10; Note2: 5" )
+	PORT_DIPSETTING(    0x18, "Coin: 2; Note1: 20; Note2: 10" )
+	PORT_DIPSETTING(    0x08, "Coin: 5; Note1: 25; Note2: 50" )
+	PORT_DIPSETTING(    0x14, "Coin: 5; Note1: 50; Note2: 25" )
+	PORT_DIPSETTING(    0x04, "Coin: 10; Note1: 50; Note2: 100" )
+	PORT_DIPSETTING(    0x10, "Coin: 10; Note1: 100; Note2: 50" )
+
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pk5_07sb )
+/*
+  Multiplexed - 4x6bits
+
+  This matrix reads 6 bits per row,
+  instead of the original 5 bits from
+  Bonanza Golden Poker and others.  
+
+*/	
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Meters")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )    PORT_NAME("Deal / Draw")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-0 Bit 5") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )          PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )    PORT_NAME("Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )     PORT_NAME("Small")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-1 Bit 5") PORT_CODE(KEYCODE_I)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-2 Bit 5") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 0") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 1") PORT_CODE(KEYCODE_K)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )          PORT_IMPULSE(3) PORT_NAME("Note 1 In")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )          PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )          PORT_IMPULSE(3) PORT_NAME("Note 2 In")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER )          PORT_NAME("IN0-3 Bit 5") PORT_CODE(KEYCODE_P)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("SW1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW2") // $2000
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SW3") // $2100
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )  PORT_DIPLOCATION("SW3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coinage ) )  PORT_DIPLOCATION("SW3:6,7,8")
+	PORT_DIPSETTING(    0xe0, "1 Coin: 1 Credit;   1 Note: 10 Credits" )  // 1/10
+	PORT_DIPSETTING(    0xc0, "1 Coin: 2 Credits;  1 Note: 20 Credits" )  // 2/20
+	PORT_DIPSETTING(    0x60, "1 Coin: 5 Credits;  1 Note: 10 Credits" )  // 5/10
+	PORT_DIPSETTING(    0xa0, "1 Coin: 5 Credits;  1 Note: 50 Credits" )  // 5/50
+	PORT_DIPSETTING(    0x40, "1 Coin: 10 Credits; 1 Note: 20 Credits" )  // 10/20
+	PORT_DIPSETTING(    0x80, "1 Coin: 10 Credits; 1 Note: 100 Credits" ) // 10/100
+	PORT_DIPSETTING(    0x20, "1 Coin: 25 Credits; 1 Note: 50 Credits" )  // 25/50
+	PORT_DIPSETTING(    0x00, "1 Coin: 50 Credits; 1 Note: 100 Credits" ) // 50/100
+INPUT_PORTS_END
+
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -5192,6 +6183,13 @@ static GFXDECODE_START( gfx_dep_9801 )
 	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 0, 16 )
 	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 0, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( gfx_smb_be4k )
+	GFXDECODE_ENTRY( "gfx1", 0, fixedtilelayout, 0, 16 )  // chars 
+	GFXDECODE_ENTRY( "gfx2", 0, fixedtilelayout, 0, 16 )  // cards
+	GFXDECODE_ENTRY( "gfx3", 0, fixedtilelayout, 0, 16 )  // empty
+	GFXDECODE_ENTRY( "gfx4", 0, fixedtilelayout, 0, 16 )  // fruits & backcards
 GFXDECODE_END
 
 
@@ -5383,7 +6381,7 @@ void goldnpkr_state::goldnpkr_base(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::mux_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, ((31 + 1) * 8) + 4, 0, 29 * 8); // from MC6845 parameters
 	m_screen->set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
 
@@ -5686,6 +6684,24 @@ void goldnpkr_state::gldnirq0(machine_config &config)
 }
 
 
+void goldnpkr_state::smb_be4k(machine_config &config)
+{
+	goldnpkr(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::smb_be4k_map);
+
+	// basic machine hardware
+	mc6845_device &crtc(MC6845(config.replace(), "crtc", CPU_CLOCK));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, smb_be4k)
+	m_gfxdecode->set_info(gfx_smb_be4k);
+}
+
+
 void lespendu_state::lespendu(machine_config &config)
 {
 	goldnpkr(config);
@@ -5796,6 +6812,72 @@ void goldnpkr_state::wing_w90(machine_config &config)
 	SN76489A(config, m_snsnd, MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 2.0);
 }
 
+void goldnpkr_state::phnxjokr(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::phnxjokr_map);
+	
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::ay8910_data_r));
+	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::ay8910_data_w));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::phnxjokr_mux_w));
+	
+	config.device_remove("pia1");
+
+	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, phnxjokr)
+	m_palette->set_init(FUNC(goldnpkr_state::phnxjokr_palette));  // 3-PROM system
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	AY8910(config, m_ay8910, MASTER_CLOCK/4).add_route(ALL_OUTPUTS, "mono", 1.00);  // guess
+	m_ay8910->port_a_read_callback().set_ioport("SW1");
+	m_ay8910->port_b_read_callback().set_ioport("SW2");
+}
+
+void goldnpkr_state::touksysp(machine_config &config)
+{
+	goldnpkr_base(config);
+	
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::touksysp_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &goldnpkr_state::touksysp_opcodes_map);
+
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::test_w));
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}	
+
+void goldnpkr_state::pk5_07sb(machine_config &config)
+{
+	goldnpkr_base(config);
+	
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::pk5_07sb_map);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}	
+
+void goldnpkr_state::jokerush(machine_config &config)
+{
+	goldnpkr_base(config);
+
+	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::jokerush_map);
+
+	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, smb_be4k)
+	m_gfxdecode->set_info(gfx_smb_be4k);
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}	
+
 
 void blitz_state::megadpkr(machine_config &config)
 {
@@ -5819,7 +6901,7 @@ void blitz_state::megadpkr(machine_config &config)
 	m_pia[1]->writepb_handler().set(FUNC(blitz_state::mux_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, (37 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8); // from MC6845 parameters
 	m_screen->set_screen_update(FUNC(blitz_state::screen_update_goldnpkr));
 
@@ -5837,7 +6919,8 @@ void blitz_state::megadpkr(machine_config &config)
 	DISCRETE(config, m_discrete, goldnpkr_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
-void goldnpkr_state::dep_9801(machine_config &config)
+
+void goldnpkr_state::dash_a37(machine_config &config)
 {
 	goldnpkr_base(config);
 
@@ -5846,6 +6929,7 @@ void goldnpkr_state::dep_9801(machine_config &config)
 	m_maincpu->set_addrmap(AS_OPCODES, &goldnpkr_state::dep_9801_opcodes_map);
 
 	// video hardware
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, smb_be4k)
 	m_gfxdecode->set_info(gfx_dep_9801);
 
 	// sound hardware
@@ -5855,16 +6939,30 @@ void goldnpkr_state::dep_9801(machine_config &config)
 
 void goldnpkr_state::dynplus(machine_config &config)
 {
-	dep_9801(config);
+	dash_a37(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::dynplus_map);
 }
 
 void goldnpkr_state::dynchance(machine_config &config)
 {
-	dep_9801(config);
+	dash_a37(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::dynchance_map);
+}
+
+void goldnpkr_state::lfhouse(machine_config &config)
+{
+	dash_a37(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::lfhouse_map);
+}
+
+void goldnpkr_state::unkdep(machine_config &config)
+{
+	dash_a37(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::unkdep_map);
 }
 
 
@@ -6151,11 +7249,34 @@ ROM_END
    Original hardware, with tearoom*sara text hack.
 
    You can play 1-50 credits.
-   So the hackers removed the "PLAY 1 TO 50" string to put "TEAROOM*SARA" instead.
+   So the hackers removed the "PLAY 1 TO 50" string to put "TEAROOM*SARA" instead.
 */
 ROM_START( goldnpkh )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "spf.12a", 0x4000, 0x4000, CRC(22963c83) SHA1(ac9e66f0c548011aac88b9f32a924995ba3651e4) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "u38_5a.bin", 0x4000, 0x2000, CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char ROM
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "u43_2a.bin", 0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "u40_4a.bin", 0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",   0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+
+/* Bonanza Golden Poker Double Up.
+   Original software & hardware.
+
+   Alt set.
+*/
+ROM_START( goldnpki )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ups31h.002",  0x4000, 0x4000, CRC(ccad6d14) SHA1(344179584f73ddda6b0f590734c9dfb8432ccdbf) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_FILL(               0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
@@ -6602,7 +7723,7 @@ ROM_END
 
 /*
   Golden/Potten's Poker
-  1986 0415 VER 7.0 1987 06-03 BY PED.
+  1986 0415 VER 7.0 1987 06-03 BY PED.
 
   ICP-1 hardware with modifications.
   The first set has bookkeeping with DSW test.
@@ -7624,13 +8745,45 @@ ROM_START( witchgme )
 	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
 ROM_END
 
-/*  Witch Game (Video Klein)
-    Video Klein original with epoxy block module.
-    Alt set....
+/*
+  Witch Game (Video Klein)
+  Video Klein original.
+
+  Program Export, WG12T1E
+
 */
 ROM_START( witchgmea )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "wc_epoxy.bin",   0x0000, 0x8000, CRC(33f1acd9) SHA1(2facb3d807b5b2a2978e567d0c1106c0a027621a) )  // epoxy block program ROM
+	ROM_LOAD( "wg12t1e.bin",  0x0000, 0x8000, CRC(551316e1) SHA1(ba66ba0cba87f554411802aa1d011f622a6a339d) )  // epoxy block program ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "1.2a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_FILL(           0x0800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "2.4a",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_FILL(           0x1800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  // char ROM
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0x0000 )    // filling the R-G bitplanes
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    // srctag, srcoffs, offset, length
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
+ROM_END
+
+/*
+  Witch Game (Video Klein)
+  Video Klein original with epoxy block module.
+
+  Program Export, WG12T1F
+
+*/
+ROM_START( witchgmeb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wc_epoxy.bin",  0x0000, 0x8000, CRC(33f1acd9) SHA1(2facb3d807b5b2a2978e567d0c1106c0a027621a) )  // epoxy block program ROM
 
 	ROM_REGION( 0x3000, "gfx1", 0 )
 	ROM_FILL(            0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
@@ -7645,6 +8798,215 @@ ROM_START( witchgmea )
 	ROM_REGION( 0x0600, "proms", 0 )
 	ROM_LOAD( "24s10.bin",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) // original PCB PROM
 	ROM_LOAD( "82s137_epoxy.bin",   0x0100, 0x0400, CRC(4ae3ecf5) SHA1(e1e540ae13e7ce5ac6391f325160ec997ea6cc2f) ) // original epoxy block PROM
+ROM_END
+
+/*
+  Witch Game (Video Klein)
+  Video Klein original.
+
+  Program Export, WG12T1FL
+
+*/
+ROM_START( witchgmec )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wg12t1fl.bin",  0x0000, 0x8000, CRC(e051ba1f) SHA1(1b524c60fb44cfa644ba3bb8abea05b9cfcd4cbf) )  // epoxy block program ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "1.2a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_FILL(           0x0800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "2.4a",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_FILL(           0x1800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  // char ROM
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0x0000 )    // filling the R-G bitplanes
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    // srctag, srcoffs, offset, length
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
+ROM_END
+
+/*
+  Witch Game (Video Klein)
+  Video Klein original.
+
+  Program WG12T1H
+
+  At boot spit a STROM UNTERBRECHUNG message (Power interruption).
+  Surely it's a NVRAM check issue.
+
+  With F2 pressed shows the DSW mask "0000 00000000".
+  DIP switches need to be checked.
+
+*/
+ROM_START( witchgmed )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wg12t1h.bin",  0x0000, 0x8000, CRC(a98ad004) SHA1(f6744e561a58ce1623cf045962c0166c1551b94e) )  // epoxy block program ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "1.2a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_FILL(           0x0800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "2.4a",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_FILL(           0x1800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  // char ROM
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0x0000 )    // filling the R-G bitplanes
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    // srctag, srcoffs, offset, length
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
+ROM_END
+
+/*
+  Witch Game (Video Klein)
+  Video Klein original.
+
+  Program WG12T1L
+
+*/
+ROM_START( witchgmee )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wg12t1l.bin",  0x0000, 0x8000, CRC(94d9c59e) SHA1(e628f8ca951d77ad1655a928d0cd6acbe723380e) )  // epoxy block program ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "1.2a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_FILL(           0x0800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "2.4a",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_FILL(           0x1800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  // char ROM
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0x0000 )    // filling the R-G bitplanes
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    // srctag, srcoffs, offset, length
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
+ROM_END
+
+/*
+  Witch Game (Video Klein)
+  Video Klein original.
+
+  Program Export, WG6T1E
+
+*/
+ROM_START( witchgmef )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wg6t1e.bin",  0x0000, 0x8000, CRC(6e95a530) SHA1(9107cbe2ffda5e5120b1efb0e7e7be4febf5a6d8) )  // epoxy block program ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "1.2a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_FILL(           0x0800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "2.4a",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_FILL(           0x1800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  // char ROM
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0x0000 )    // filling the R-G bitplanes
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    // srctag, srcoffs, offset, length
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
+ROM_END
+
+/*
+  Witch Game (Video Klein)
+  Video Klein original.
+
+  Program Export, WG6T1F
+
+*/
+ROM_START( witchgmeg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wg6t1f.bin",  0x0000, 0x8000, CRC(08771f08) SHA1(0104d777080b1e74bd2afd9f0e96ae89df1d43e9) )  // epoxy block program ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "1.2a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_FILL(           0x0800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "2.4a",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_FILL(           0x1800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  // char ROM
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0x0000 )    // filling the R-G bitplanes
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    // srctag, srcoffs, offset, length
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
+ROM_END
+
+/*
+  Witch Game (Video Klein)
+  Video Klein original.
+
+  Program WG6T1H
+
+*/
+ROM_START( witchgmeh )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wg6t1h.bin",  0x0000, 0x8000, CRC(44399572) SHA1(7811ed81c8b016253f18e34cc1498589232b6215) )  // epoxy block program ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "1.2a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_FILL(           0x0800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "2.4a",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_FILL(           0x1800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  // char ROM
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0x0000 )    // filling the R-G bitplanes
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    // srctag, srcoffs, offset, length
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
+ROM_END
+
+/*
+  Witch Game (Video Klein)
+  Video Klein original.
+
+  Program WG6T1L
+
+*/
+ROM_START( witchgmei )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "wg6t1l.bin",  0x0000, 0x8000, CRC(c6fc4947) SHA1(d32a68c89bddfb24ea56200f4fccd033c38d6c41) )  // epoxy block program ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "1.2a",   0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )  // cards deck gfx, bitplane1
+	ROM_FILL(           0x0800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "2.4a",   0x1000, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )  // cards deck gfx, bitplane2
+	ROM_FILL(           0x1800, 0x0800, 0x0000 ) // filling the bitplane
+	ROM_LOAD( "3.5a",   0x2000, 0x1000, CRC(8a17d1a7) SHA1(488e4eae287b05923bd6b378574e91cfe49d8c24) )  // char ROM
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(           0x0000, 0x2000, 0x0000 )    // filling the R-G bitplanes
+	ROM_COPY( "gfx2",   0x2800, 0x2000, 0x0800 )    // srctag, srcoffs, offset, length
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "n82s137f.box",   0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+
+	ROM_REGION( 0x0100, "proms2", 0 )
+	ROM_LOAD( "tbp24s10n.2c",   0x0000, 0x0100, CRC(7c2aa098) SHA1(539ff9239b1b553b3883c9f0223aafcf217f9fc7) )
 ROM_END
 
 
@@ -9918,6 +11280,103 @@ ROM_END
 ROM_START( wldwitchv )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // Ver 183A, 2001-06-13
 	ROM_LOAD( "ww183a.bin", 0x8000, 0x8000, CRC(2929b9b2) SHA1(3afe58b5619e818911ee142edce6a5a1468a1f97) )
+
+	ROM_REGION( 0x18000, "temp", 0 )
+	ROM_LOAD( "03.a3",  0x00000, 0x8000, CRC(ae474414) SHA1(6dee760cee18e125791c17b562ca8aabe1f4593e) )
+	ROM_LOAD( "02.a2",  0x10000, 0x8000, CRC(f6450111) SHA1(8b44c90c62d5026ccfba88b31e1113e01c6bcf85) )
+	ROM_LOAD( "01.a1",  0x08000, 0x8000, CRC(6d644987) SHA1(26243abe051f3266e2d1743ec599d4e8bbb692e4) )
+
+	ROM_REGION( 0x1800, "gfx0", 0 )
+	ROM_FILL(           0x0000, 0x1000, 0x0000 )    // filling bitplanes
+	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    // 0000-07ff of 03.a3 - char rom, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_COPY( "temp",   0x08800, 0x0000, 0x0800 )   // 0800-0fff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x10800, 0x0800, 0x0800 )   // 0800-0fff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x01000, 0x1000, 0x0800 )   // 1000-17ff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_COPY( "temp",   0x08000, 0x0000, 0x0800 )   // 0000-07ff of 01.a1 - regular cards gfx, bitplane 1
+	ROM_COPY( "temp",   0x10000, 0x0800, 0x0800 )   // 0000-07ff of 02.a2 - regular cards gfx, bitplane 2
+	ROM_COPY( "temp",   0x00800, 0x1000, 0x0800 )   // 0800-0fff of 03.a3 - regular cards gfx, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx3", 0 )
+	ROM_COPY( "temp",   0x0c000, 0x0000, 0x0800 )   // 4000-47ff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x14000, 0x0800, 0x0800 )   // 4000-47ff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x04800, 0x1000, 0x0800 )   // 4800-4fff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx4", 0 )
+	ROM_COPY( "temp",   0x09800, 0x0000, 0x0800 )   // 1800-1fff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x11800, 0x0800, 0x0800 )   // 1800-1fff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x02000, 0x1000, 0x0800 )   // 1800-1fff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx5", 0 )
+	ROM_COPY( "temp",   0x0a800, 0x0000, 0x0800 )   // 2800-2fff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x12800, 0x0800, 0x0800 )   // 2800-2fff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x03000, 0x1000, 0x0800 )   // 3000-37ff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx6", 0 )
+	ROM_COPY( "temp",   0x0a000, 0x0000, 0x0800 )   // 2000-27ff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x12000, 0x0800, 0x0800 )   // 2000-27ff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x02800, 0x1000, 0x0800 )   // 2800-2fff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx7", 0 )
+	ROM_COPY( "temp",   0x0e800, 0x0000, 0x0800 )   // 6800-6fff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x16800, 0x0800, 0x0800 )   // 6800-6fff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x07000, 0x1000, 0x0800 )   // 7000-77ff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx8", 0 )
+	ROM_COPY( "temp",   0x0b800, 0x0000, 0x0800 )   // 3800-3fff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x13800, 0x0800, 0x0800 )   // 3800-3fff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x04000, 0x1000, 0x0800 )   // 3800-3fff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx9", 0 )
+	ROM_COPY( "temp",   0x0c800, 0x0000, 0x0800 )   // 4800-4fff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x14800, 0x0800, 0x0800 )   // 4800-4fff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x05000, 0x1000, 0x0800 )   // 4000-47ff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx10", 0 )
+	ROM_COPY( "temp",   0x09000, 0x0000, 0x0800 )   // 1000-17ff of 01.a1 - extended cards gfx, bitplane 1
+	ROM_COPY( "temp",   0x11000, 0x0800, 0x0800 )   // 1000-17ff of 02.a2 - extended cards gfx, bitplane 2
+	ROM_COPY( "temp",   0x01800, 0x1000, 0x0800 )   // 1800-1fff of 03.a3 - extended cards gfx, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx11", 0 )
+	ROM_COPY( "temp",   0x0d000, 0x0000, 0x0800 )   // 5000-57ff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x15000, 0x0800, 0x0800 )   // 5000-57ff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x05800, 0x1000, 0x0800 )   // 5800-5fff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx12", 0 )
+	ROM_COPY( "temp",   0x0d800, 0x0000, 0x0800 )   // 5800-5fff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x15800, 0x0800, 0x0800 )   // 5800-5fff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x06000, 0x1000, 0x0800 )   // 6000-67ff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx13", 0 )
+	ROM_COPY( "temp",   0x0e000, 0x0000, 0x0800 )   // 6000-67ff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x16000, 0x0800, 0x0800 )   // 6000-67ff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x06800, 0x1000, 0x0800 )   // 6800-6fff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx14", 0 )
+	ROM_COPY( "temp",   0x0b000, 0x0000, 0x0800 )   // 3000-37ff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x13000, 0x0800, 0x0800 )   // 3000-37ff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x03800, 0x1000, 0x0800 )   // 3800-3fff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x1800, "gfx15", 0 )
+	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   // 7000-77ff of 01.a1 - empty, bitplane 1
+	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   // 7000-77ff of 02.a2 - empty, bitplane 2
+	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   // 7800-7fff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "wldwitch_tbp.bin",   0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
+
+	ROM_REGION( 0x0400, "proms2", 0 )
+	ROM_LOAD( "82s137.box", 0x0000, 0x0400, CRC(4ae3ecf5) SHA1(e1e540ae13e7ce5ac6391f325160ec997ea6cc2f) )
+ROM_END
+
+
+ROM_START( wldwitchw )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // 1992 Ver. 1.0
+	ROM_LOAD( "eeww14.bin", 0x0000, 0x8000, CRC(9376d3bb) SHA1(e832b563a493078d296ae41eff7491f0bf66624f) )
+	ROM_RELOAD(             0x8000, 0x8000)
 
 	ROM_REGION( 0x18000, "temp", 0 )
 	ROM_LOAD( "03.a3",  0x00000, 0x8000, CRC(ae474414) SHA1(6dee760cee18e125791c17b562ca8aabe1f4593e) )
@@ -14131,6 +15590,51 @@ ROM_START( gp_ped42_70 )
 ROM_END
 
 /*
+  Phoenix Joker
+  STP
+
+  PCB marked UCGS-80
+
+  This hardware was figured out through reverse-engineering.
+
+  Only one PIA device, driving a AY-3-8910
+  for sounds and two DIP switches banks.
+
+  The color system has three 4-bit bipolar PROMs.
+  One for each RGB channel.
+
+*/
+ROM_START( phnxjokr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.ic4", 0x4000, 0x4000, CRC(bd889cfa) SHA1(1d62dfd66186dfc4a5d32bca99eecab10e7a5ff2) )  // duped halves
+	ROM_IGNORE(                0x4000 )
+
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "2.ic30", 0x0000, 0x4000, CRC(4cd7c987) SHA1(65dec9bab644bb8e597e8ad9d6c7d0ae2d917b9f) )  // 1st and 2nd bitplanes. duped halves
+	ROM_IGNORE(                 0x4000 )
+	ROM_LOAD( "3.ic38", 0x4000, 0x4000, CRC(d2714443) SHA1(01d812053edcc0f8612fb7e2e63bd23ed74c207e) )  // 3rd bitplane (the rest is blank)
+	ROM_IGNORE(                 0x4000 )
+
+//  Two banks of $1000 (extended gfx using bit0), 3 bitplanes each.
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_COPY( "gfxpool", 0x4000, 0x0000, 0x1000 ) // src-dest-size (data)  3.ic38, block 0
+	ROM_COPY( "gfxpool", 0x2000, 0x1000, 0x1000 ) // src-dest-size (data)  2.ic30, block 2
+	ROM_COPY( "gfxpool", 0x0000, 0x2000, 0x1000 ) // src-dest-size (data)  2.ic30, block 0
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_COPY( "gfxpool", 0x5000, 0x0000, 0x1000 ) // src-dest-size (data)  3.ic38, block 1
+	ROM_COPY( "gfxpool", 0x3000, 0x1000, 0x1000 ) // src-dest-size (data)  2.ic30, block 3
+	ROM_COPY( "gfxpool", 0x1000, 0x2000, 0x1000 ) // src-dest-size (data)  2.ic30, block 1
+
+//  Three 82S129, one per RGB channel.
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "129.ic31", 0x0000, 0x0100, CRC(c2054f92) SHA1(be6c9ca2ceef74766c8079fb5a6f6980a30ed4a8) )  // red
+	ROM_LOAD( "129.ic32", 0x0100, 0x0100, CRC(c68a7472) SHA1(e251b43617385cfe068805503b3cda34f803a673) )  // green
+	ROM_LOAD( "129.ic33", 0x0200, 0x0100, CRC(5f500adf) SHA1(25fb932a36d7751739d24324a553c3ace1013d66) )  // blue
+ROM_END
+
+
+/*
   DEP 9801 M encrypted platform.
 
   1x R6502P
@@ -14169,13 +15673,23 @@ ROM_END
 
   Sets:
 
-  dash_a37    DASH! A37             1998/10/22   VER OCT 22, 98
-  dash_a37b   DASH! A37             1996/11/18,  AVANTY  50 BET SPECIAL
-  lfhouse     Lucky Full House      1996/02/01 ver 1.16, DATA ver 1.05
-  lfhouseb    Lucky Full House      1994/08/26 ver 1.15, DATA ver 1.04
-  dynchance   Dynamic Chance        type-3.0 1992/08/29  PART 1-2
-  dynchancf   Dynamic Chance(alt)   type-3.0 1992/08/29  PART 1-2  (only 4 bytes of difference)
-  dynplus     Dynamic Plus One      1997/01/13, SP TYPE Ver 1.10
+  dash_a37    DASH! A.3.7           1998/10/22,  VER OCT 22, 98
+  dash_a37b   DASH! A.3.7           1996/11/18,  AVANTY  50 BET SPECIAL
+  dynchance   Dynamic Chance        type-3.0 1992/08/29  PART 1-2  (Final Type3 DEP ver 1.1)
+  dynchancf   Dynamic Chance(alt)   type-3.0 1992/08/29  PART 1-2  (Final Type3 DEP ver 1.1) (only 4 bytes of difference)
+
+  dynplus     Dynamic Plus One      1997/01/13, Dynamic SP, AV ver 1.00
+  lfhouse     Lucky Full House      1996/02/01, ver 1.16, DATA ver 1.05
+  lfhouseb    Lucky Full House      1994/08/26, ver 1.15, DATA ver 1.04
+
+  issues....
+
+  dynplus has wrong GFX ROMs.
+  they don't match the program so there are severe GFX fails. 
+  Will mark these as bad dumps.
+
+  lfhouse and lfhouseb have missing graphics bitplanes.
+  Graphics ROM 1.5l need to be redumped.
 
 */
 ROM_START( dash_a37 )
@@ -14252,74 +15766,6 @@ ROM_START( dash_a37b )
 	ROM_LOAD( "nvram", 0x0000, 0x0800, CRC(9c895c1d) SHA1(323a18bc671d64b408d6861e0a248f42abc2eae9) )
 ROM_END
 
-ROM_START( lfhouse )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lf2_i220.5e", 0x8000, 0x8000, CRC(ff975444) SHA1(c13042b6a90a08304e4fcb7c683926b28f14a771) )
-
-	ROM_REGION( 0x8000, "gfxpool", 0 )
-	ROM_LOAD( "1.5l", 0x0000, 0x4000, CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
-	ROM_IGNORE(               0x4000 )
-	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
-	ROM_IGNORE(               0x4000 )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
-	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
-	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
-	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
-	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
-ROM_END
-
-ROM_START( lfhouseb )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "lfh_115.5e", 0x8000, 0x8000, CRC(4c877f57) SHA1(160e2c0f5c08be05dd56787f01a5a9f8813796b1) )
-
-	ROM_REGION( 0x8000, "gfxpool", 0 )
-	ROM_LOAD( "1.5l", 0x0000, 0x4000, CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
-	ROM_IGNORE(               0x4000 )
-	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
-	ROM_IGNORE(               0x4000 )
-
-	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
-	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
-	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
-	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
-	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
-	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
-	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
-
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
-ROM_END
-
 ROM_START( dynchance )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dc1.5e", 0x8000, 0x8000, CRC(24912d1a) SHA1(7b956487b76564adb30475360ae6c27f7a4e0c9c) )
@@ -14356,7 +15802,7 @@ ROM_END
 
 ROM_START( dynchancf )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "dp1.i223.bin", 0x8000, 0x8000, CRC(ee722c55) SHA1(924444e5c07a2b521386cf36a54be31bfbfe612c) )
+	ROM_LOAD( "1.ic4", 0x8000, 0x8000, CRC(ee722c55) SHA1(924444e5c07a2b521386cf36a54be31bfbfe612c) )
 
 	ROM_REGION( 0x8000, "gfxpool", 0 )
 	ROM_LOAD( "mk2.5l", 0x0000, 0x4000, CRC(ac69168b) SHA1(cc425aea0bc7ac5337bb79c8a63176621c8606f5) )
@@ -14388,14 +15834,17 @@ ROM_START( dynchancf )
 	ROM_LOAD( "7116.2m", 0x0000, 0x0200, CRC(d85503d9) SHA1(a80dc287c05c286837938071afe35b0a6a11765f) )
 ROM_END
 
+
 ROM_START( dynplus )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "dc1.i227.bin", 0x8000, 0x8000, CRC(75b97ef9) SHA1(3a92695b8db680f0e49e3b1d6fcba1d6e1400c6b) )
 
-	ROM_REGION( 0x8000, "gfxpool", 0 )
-	ROM_LOAD( "mk2.5l", 0x0000, 0x4000, CRC(ac69168b) SHA1(cc425aea0bc7ac5337bb79c8a63176621c8606f5) )
+    // dynchance GFX set. doesn't match title and WIN graphics.
+	// need the real missing GFX ROMs
+	ROM_REGION( 0x8000, "gfxpool", 0 ) 
+	ROM_LOAD( "mk2.5l", 0x0000, 0x4000, BAD_DUMP CRC(ac69168b) SHA1(cc425aea0bc7ac5337bb79c8a63176621c8606f5) )
 	ROM_IGNORE(                 0x4000 )
-	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
+	ROM_LOAD( "mk3.5n", 0x4000, 0x4000, BAD_DUMP CRC(3f6c00cb) SHA1(fd45a515a068bf6e2dfa95d411029da0f2eb512c) )
 	ROM_IGNORE(                 0x4000 )
 
 	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
@@ -14420,6 +15869,331 @@ ROM_START( dynplus )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "7116.2m", 0x0000, 0x0200, CRC(d85503d9) SHA1(a80dc287c05c286837938071afe35b0a6a11765f) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x0000, 0x0800, CRC(5bdc6ce4) SHA1(5c47047128e8cd17da7e31cd175ae35498a868d0) )
+ROM_END
+
+ROM_START( lfhouse )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lf2_i220.5e", 0x8000, 0x8000, CRC(ff975444) SHA1(c13042b6a90a08304e4fcb7c683926b28f14a771) )
+
+	// GFX ROMs need to be redumped
+	ROM_REGION( 0x10000, "gfxpool", 0 )
+	ROM_LOAD( "1.5l", 0x0000, 0x8000, BAD_DUMP CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
+	ROM_LOAD( "2.5n", 0x8000, 0x8000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
+
+//  d000 --> lucky animation
+//  f000 --> title
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars (could have 2 missing bitplanes)
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x9000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x9800, 0x1000, 0x0800 ) // src-dest-size (data)
+/*
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+*/
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1: title (needs the 2 missing bitplanes)
+	ROM_COPY( "gfxpool", 0xf000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0xf000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0xf000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0xb800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+    // scrambled addressing
+	ROM_REGION( 0x0200, "proms", 0 )
+//	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
+	ROM_LOAD( "27s13.2m", 0x0100, 0x0080, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
+	ROM_CONTINUE(         0x0080, 0x0080)    // arrange quarters.
+	ROM_CONTINUE(         0x0180, 0x0080)    // arrange quarters.
+	ROM_CONTINUE(         0x0000, 0x0080)    // arrange quarters.
+ROM_END
+
+ROM_START( lfhouseb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "lfh_115.5e", 0x8000, 0x8000, CRC(4c877f57) SHA1(160e2c0f5c08be05dd56787f01a5a9f8813796b1) )
+
+	// GFX ROMs need to be redumped
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "1.5l", 0x0000, 0x4000, BAD_DUMP CRC(a501edc4) SHA1(95fc04c16cde89636023639db236fba261ccd21b) )
+	ROM_IGNORE(               0x4000 )
+	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(58ee8082) SHA1(2fd5b73c8fa87607ba115dc61616852e323c164d) )
+	ROM_IGNORE(               0x4000 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+    // scrambled addressing
+	ROM_REGION( 0x0200, "proms", 0 )
+//	ROM_LOAD( "27s13.2m", 0x0000, 0x0200, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
+	ROM_LOAD( "27s13.2m", 0x0100, 0x0080, CRC(b5c007e4) SHA1(d66f68ad9e637c5720e71151c360d2053090b7b8) )
+	ROM_CONTINUE(         0x0080, 0x0080)    // arrange quarters.
+	ROM_CONTINUE(         0x0180, 0x0080)    // arrange quarters.
+	ROM_CONTINUE(         0x0000, 0x0080)    // arrange quarters.
+ROM_END
+
+// this program ROM was fitted on a Boram PCB (see misc/boramz80.cpp), probably due to an error while reassembling it
+// thus, there are no GFX ROMs nor PROM available
+ROM_START( unkdep )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "223.rom", 0x8000, 0x8000, CRC(1d776d37) SHA1(6918cddb0b47d28cf8145823f869dfd2296c0eed) )
+
+	ROM_REGION( 0x8000, "gfxpool", ROMREGION_ERASE00 )
+	ROM_LOAD( "5l", 0x0000, 0x4000, NO_DUMP )
+	ROM_IGNORE(             0x4000 )
+	ROM_LOAD( "5n", 0x4000, 0x4000, NO_DUMP )
+	ROM_IGNORE(             0x4000 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // extra 1
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // extra 2
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x7800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x0200, "proms", ROMREGION_ERASE00 )
+	ROM_LOAD( "7116.2m", 0x0000, 0x0200, NO_DUMP )
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "nvram", 0x0000, 0x0800, CRC(1820ac92) SHA1(45816fa66ac5e892050eaf84557992f10aba9433) )
+ROM_END
+
+
+/*
+  Super Mini-Boy
+  Model: BE-4000/SMB
+  Bonanza Enterprises, Ltd.
+  1994
+
+  4-games multigame with two play modes (points & turns).
+  Poker, Hi-Lo, Black Jack & Golden Ftuits.
+  PCB original from Bonanza Enterprises, Ltd.
+
+  To see the game instructions / how to play, see above at Games Notes section.
+
+*/
+ROM_START( smb_be4k )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "smb1-32_2764.14a", 0x8000, 0x2000, CRC(c152a7b1) SHA1(3f99857b4f927237cb4b4406722eb704f9cfe364) )
+	ROM_LOAD( "smb2-32_2764.13a", 0xa000, 0x2000, CRC(e332b724) SHA1(0257f46f75598f7ec2fa9d9455929d9eb13d3bf1) )
+	ROM_LOAD( "smb3-32_2764.11a", 0xc000, 0x2000, CRC(5aa84150) SHA1(734e9f8a752acd730261fd030428dd53d19a37f9) )
+	ROM_LOAD( "smb4-32_2764.10a", 0xe000, 0x2000, CRC(0a1b644a) SHA1(d85d94567fe0e1e66c35ea0914c4a13f80e737a7) )
+
+	ROM_REGION( 0x4000, "gfxpool", 0 )  // all mixed
+	ROM_LOAD( "smba1_2764.4a", 0x0000, 0x2000, CRC(4de28faa) SHA1(bf0b7bd3d1549c3173d3b01fbdb1df707d00d364) )
+	ROM_LOAD( "smb2_2732.3a",  0x2000, 0x1000, CRC(881d28ec) SHA1(463c0ea17cd167402ed134a91ca0105d7a12d5f5) )
+	ROM_LOAD( "smb3_2732.1a",  0x3000, 0x1000, CRC(f64647a5) SHA1(052d876de4fb1f1a4c308fb8c407a939ce57012e) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_FILL(            0x0000, 0x1000, 0x0000 ) // filling the R-G bitplanes
+	ROM_COPY( "gfxpool", 0x0000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x3000, 0x0000, 0x0800 ) // src-dest-size (data), bitplane 1
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (data), bitplane 2
+	ROM_COPY( "gfxpool", 0x0800, 0x1000, 0x0800 ) // src-dest-size (data), bitplane 3
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // empty
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x1000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x1000, 0x1000, 0x0800 ) // src-dest-size (empty)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // backcards & fruits
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data), bitplane 1
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data), bitplane 2
+	ROM_COPY( "gfxpool", 0x1800, 0x1000, 0x0800 ) // src-dest-size (data), bitplane 3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "smb_82s129.5d", 0x0080, 0x0080, CRC(d45e50ff) SHA1(c9fa48525f042721cc5ccf030431aa1121b32f00) )
+	ROM_CONTINUE(              0x0000, 0x0080)    // switching halves.
+ROM_END
+
+
+/*
+  Falcon Potten's Poker game
+  with CPU brick.
+
+  PCB silkscreened "KPK" with Falcon sticker.
+
+  CPU brick contents:
+
+  1x unknown DIL40 IC (no marks at all).
+  1x SN74LS130N
+  1x SN74LS244N
+  1x SN74LS04N
+  1x 8 DIP switches bank.
+  
+  This DSW bank seems unimplemented.
+  There are no extra reads to support it.
+
+  The game is writting to PIA0, CA2 line constantly
+  Maybe some watchdog unimplemented circuitry?
+
+*/
+ROM_START( potnpkrq )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "7.16a", 0x2000, 0x1000, CRC(29c647e6) SHA1(1a1c672474c0d4d76728794f661a94925ab245a1) )
+	ROM_LOAD( "8.17a", 0x3000, 0x1000, CRC(3a6e8ca4) SHA1(047edcc344fe97e47d785920d1b499d92febf81f) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(          0x0000, 0x2000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "4.8a",  0x2000, 0x1000, CRC(ccca8ca7) SHA1(a969f9dad8e5c294cfc5ea65381a3b8dbb7974fb) )  // char ROM
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "1.4a",  0x0000, 0x1000, CRC(b5a1f5a3) SHA1(a34aaaab5443c6962177a5dd35002bd09d0d2772) )  // cards deck gfx, bitplane1
+	ROM_LOAD( "2.6a",  0x1000, 0x1000, CRC(40e426af) SHA1(7e7cb30dafc96bcb87a05d3e0ef5c2d426ed6a74) )  // cards deck gfx, bitplane2
+	ROM_LOAD( "3.7a",  0x2000, 0x1000, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )  // cards deck gfx, bitplane3
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "prom.bin",  0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*
+  Toukyuu System Poker
+  Encrypted system.
+
+  1986
+
+  Poker system with Fever, Turbo,
+  Autotake, and other features.
+
+  Only opcodes are encrypted.
+  Data is unencrypted.
+
+*/
+ROM_START( touksysp )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4313.sub", 0x8000, 0x8000, CRC(59588696) SHA1(88c421747e1146e0d5df21f398166eb3178c843e) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(              0x0000, 0x1000, 0x0000 )
+	ROM_LOAD( "chars.bin", 0x1000, 0x0800, BAD_DUMP CRC(2c53493f) SHA1(9e71db51499294bb4b16e7d8013e5daf6f1f9d18) )  // char ROM loaned from unkicpf80
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "pk1.4", 0x0000, 0x0800, CRC(c40dfcee) SHA1(095cf657d4ad5f39b8cc79c9aed6ac444b671b77) )
+	ROM_CONTINUE(      0x0000, 0x0800)    // using the second half
+	ROM_LOAD( "pk2.6", 0x0800, 0x0800, CRC(5d4fa4a2) SHA1(133ebc04168c724b8dbf64e77e01db10dd742905) ) 
+	ROM_CONTINUE(      0x0800, 0x0800)    // using the second half
+	ROM_LOAD( "pk4.9", 0x1000, 0x0800, CRC(0667b801) SHA1(b878c5ef792f6dada3d81787d6691d526d6a761b) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "prom.n03", 0x0000, 0x0100, CRC(fa17f40a) SHA1(fac057888c6f75415d86d93e6d0700f5b4b5d3ee) )
+ROM_END
+
+/*
+  Fever Poker?
+  pk5_07sb
+
+  Encrypted program.
+
+  Daughterboard with:
+
+  Rockwell R6502.
+  1x program ROM
+  1x SRAM.
+  2x 8-DSW banks.
+  Some TTLs
+
+*/
+ROM_START( pk5_07sb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pk5_07sb.bin",  0x0000, 0x8000, CRC(8aee7c49) SHA1(0d0a30a0ed75869ceef45d65ffa5099fbf636421) )
+	ROM_RELOAD(                0x8000, 0x8000 )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_FILL(               0x0000, 0x4000, 0x0000 ) // filling the R-G bitplanes
+	ROM_LOAD( "u38_5a.bin", 0x4000, 0x2000, CRC(32705e1d) SHA1(84f9305af38179985e0224ae2ea54c01dfef6e12) )    // char ROM
+
+	ROM_REGION( 0x6000, "gfx2", 0 )
+	ROM_LOAD( "u43_2a.bin", 0x0000, 0x2000, CRC(10b34856) SHA1(52e4cc81b36b4c807b1d4471c0f7bea66108d3fd) )    // cards deck gfx, bitplane1
+	ROM_LOAD( "u40_4a.bin", 0x2000, 0x2000, CRC(5fc965ef) SHA1(d9ecd7e9b4915750400e76ca604bec8152df1fe4) )    // cards deck gfx, bitplane2
+	ROM_COPY( "gfx1",       0x4800, 0x4000, 0x0800 )    // cards deck gfx, bitplane3. found in the 2nd quarter of the char rom
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/*
+  Joker Rush!!
+  SMH-803-J encrypted hardware.
+
+  Poker game with jokers
+  and additional features.
+
+  4 GFX banks.
+
+*/  
+ROM_START( jokerush )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "jr.sub", 0x8000, 0x8000, CRC(36b7bd79) SHA1(3c9e432ee512be6e5d329ab89e6e5d587924c53f) ) 
+
+	ROM_REGION( 0x8000, "gfxpool", 0 )
+	ROM_LOAD( "1.5l", 0x0000, 0x4000, CRC(1949c708) SHA1(f909caa7b1b6b30ca6c75ade162ae0975227f6ad) )
+	ROM_LOAD( "2.5n", 0x4000, 0x4000, CRC(dce7c83a) SHA1(8fec2fbf5dcde1c1a22952f0214e92548d97a550) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x0000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x0800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // title
+	ROM_COPY( "gfxpool", 0x0000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x0000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x6000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // jokers + numbers box
+	ROM_COPY( "gfxpool", 0x3800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x6800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "prom.2m",    0x0000, 0x0100, CRC(c4dcb312) SHA1(777c5c557a8623dd3db7dc558888f3f44ade1890) )
 ROM_END
 
 
@@ -14468,178 +16242,190 @@ ROM_END
 
 void goldnpkr_state::init_vkdlsa()
 {
-	// $e097-e098, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e097-e098, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe097] = 0xea;
 	ROM[0xe098] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlsb()
 {
-	// $e87b-e87c, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e87b-e87c, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe87b] = 0xea;
 	ROM[0xe87c] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlsc()
 {
-	// $453a-453b, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $453a-453b, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0x453a] = 0xea;
 	ROM[0x453b] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlsww()
 {
-	// $f2c9-f2ca, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $f2c9-f2ca, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xf2c9] = 0xea;
 	ROM[0xf2ca] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwa()
 {
-	// $df80-df81, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $df80-df81, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xdf80] = 0xea;
 	ROM[0xdf81] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwc()
 {
-	// $e42f-e430, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e42f-e430, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe42f] = 0xea;
 	ROM[0xe430] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwd()
 {
-	// $e442-e443, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e442-e443, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe442] = 0xea;
 	ROM[0xe443] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwh()
 {
-	// $e4d5-e4d6, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e4d5-e4d6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe4d5] = 0xea;
 	ROM[0xe4d6] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwl()
 {
-	// $e87c-e87d, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e87c-e87d, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe87c] = 0xea;
 	ROM[0xe87d] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwo()
 {
-	// $e7d5-e7d6, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e7d5-e7d6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe7d5] = 0xea;
 	ROM[0xe7d6] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwp()
 {
-	// $e7d9-e7da, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e7d9-e7da, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe7d9] = 0xea;
 	ROM[0xe7da] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwr()
 {
-	// $e7f7-e7f8, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e7f7-e7f8, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe7f7] = 0xea;
 	ROM[0xe7f8] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswws()
 {
-	// $e8a5-e8a6, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e8a5-e8a6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe8a5] = 0xea;
 	ROM[0xe8a6] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwt()
 {
-	// $e955-e956, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
 
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $e955-e956, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xe955] = 0xea;
 	ROM[0xe956] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwu()
 {
-	// $ee6b-ee6c, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $ee6b-ee6c, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xee6b] = 0xea;
 	ROM[0xee6c] = 0xea;
 }
 
 void goldnpkr_state::init_vkdlswwv()
 {
-	// $f052-f053, NOPing the BNE-->KILL
-	// after compare with Dallas TK data
-
 	uint8_t *ROM = memregion("maincpu")->base();
 
+	// HACK: get rid of this
+	// $f052-f053, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
 	ROM[0xf052] = 0xea;
 	ROM[0xf053] = 0xea;
+}
+
+void goldnpkr_state::init_vkdlswww()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	// HACK: get rid of this
+	// $fbf5-fbf6, NOPing the BNE-->KILL
+	// after compare with Dallas TK data
+	ROM[0x7bf5] = 0xea;
+	ROM[0x7bf6] = 0xea;
 }
 
 
@@ -14946,12 +16732,39 @@ void goldnpkr_state::init_ped42()
 	ROM[0x7ef6] = 0x7f;
 }
 
-void goldnpkr_state::init_dep9801() // placeholder until the decryption is done for all sets
+void goldnpkr_state::init_lfhouse()
 {
 	uint8_t *rom = memregion("maincpu")->base() + 0x8000;
 
 	for (int i = 0x0000; i < 0x8000; i++)
-		m_decrypted_opcodes[i] = rom[i];
+	{
+		// decrypt opcodes
+		switch (i & 0x41)
+		{
+			case 0x00: m_decrypted_opcodes[i] = rom[i] ^ 0xac; break;
+			case 0x01: m_decrypted_opcodes[i] = rom[i] ^ 0xa8; break;
+			case 0x40: m_decrypted_opcodes[i] = rom[i] ^ 0x2c; break;
+			case 0x41: m_decrypted_opcodes[i] = rom[i] ^ 0x28; break;
+		}
+
+		// decrypt data
+		rom[i] ^= 0x8c;
+	}
+
+	// weirdly the vectors don't decrypt correctly
+	rom[0x7ffc] = 0x8d;
+	rom[0x7ffd] = 0xcd;
+}
+
+void goldnpkr_state::init_lfhouseb()
+{
+	init_lfhouse();
+
+	uint8_t *rom = memregion("maincpu")->base() + 0x8000;
+
+	// weirdly the vectors don't decrypt correctly
+	rom[0x7ffc] = 0x7d;
+	rom[0x7ffd] = 0xcd;
 }
 
 void goldnpkr_state::init_dash()
@@ -14986,11 +16799,8 @@ void goldnpkr_state::init_dash()
 		uint8_t const row = bitswap<4>(i, 6, 2, 1, 0);
 
 		// pick the column in the table from bits 2,3,5,7 of the source data
-		uint8_t col = bitswap<3>(rom[i], 5, 3, 2);
-
 		// however the upper part is mirrored
-			if (BIT(rom[i], 7))
-				col = 7 - col;
+		uint8_t const col = bitswap<3>(BIT(rom[i], 7) ? ~rom[i] : rom[i], 5, 3, 2);
 
 		// only opcodes are encrypted
 		m_decrypted_opcodes[i] = rom[i] ^ opcode_xortable[row][col];
@@ -15030,11 +16840,8 @@ void goldnpkr_state::init_dynplus()
 		uint8_t const row = bitswap<4>(i, 6, 2, 1, 0);
 
 		// pick the column in the table from bits 2,3,5,7 of the source data
-		uint8_t col = bitswap<3>(rom[i], 5, 3, 2);
-
 		// however the upper part is mirrored
-			if (BIT(rom[i], 7))
-				col = 7 - col;
+		uint8_t const col = bitswap<3>(BIT(rom[i], 7) ? ~rom[i] : rom[i], 5, 3, 2);
 
 		// only opcodes are encrypted
 		m_decrypted_opcodes[i] = rom[i] ^ opcode_xortable[row][col];
@@ -15073,16 +16880,92 @@ void goldnpkr_state::init_dynchance()
 		uint8_t const row = bitswap<4>(i, 6, 2, 1, 0);
 
 		// pick the column in the table from bits 2,3,5,7 of the source data
-		uint8_t col = bitswap<3>(rom[i], 5, 3, 2);
-
 		// however the upper part is mirrored
-			if (BIT(rom[i], 7))
-				col = 7 - col;
+		uint8_t const col = bitswap<3>(BIT(rom[i], 7) ? ~rom[i] : rom[i], 5, 3, 2);
 
 		// only opcodes are encrypted
-		m_decrypted_opcodes[i] = (opcode_xortable[row][col] != 0) ? rom[i] ^ opcode_xortable[row][col] : opcode_xortable[row][col];
+		m_decrypted_opcodes[i] = rom[i] ^ opcode_xortable[row][col];
 	}
 }
+
+void goldnpkr_state::init_unkdep()
+{
+	static const uint8_t opcode_xortable[0x10][0x08] =
+	{ //  0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
+		{ 0xa8, 0xa4, 0x20, 0x2c, 0x8c, 0x80, 0x04, 0x08 }, // 0x00
+		{ 0xa4, 0x80, 0xa8, 0x8c, 0x04, 0x20, 0x08, 0x2c }, // 0x01
+		{ 0xa8, 0xa4, 0x20, 0x2c, 0x8c, 0x80, 0x04, 0x08 }, // 0x02
+		{ 0xa4, 0x80, 0xa8, 0x8c, 0x04, 0x20, 0x08, 0x2c }, // 0x03
+		{ 0xa8, 0xa4, 0x20, 0x2c, 0x8c, 0x80, 0x04, 0x08 }, // 0x04
+		{ 0xa4, 0x80, 0xa8, 0x8c, 0x04, 0x20, 0x08, 0x2c }, // 0x05
+		{ 0xa8, 0xa4, 0x20, 0x2c, 0x8c, 0x80, 0x04, 0x08 }, // 0x06
+		{ 0xa4, 0x80, 0xa8, 0x8c, 0x04, 0x20, 0x08, 0x2c }, // 0x07
+		{ 0x84, 0x00, 0x84, 0x00, 0x84, 0x00, 0x84, 0x00 }, // 0x40
+		{ 0x84, 0x00, 0x84, 0x00, 0x84, 0x00, 0x84, 0x00 }, // 0x41
+		{ 0x28, 0xac, 0x28, 0xac, 0x28, 0xac, 0x28, 0xac }, // 0x42
+		{ 0x28, 0xac, 0x28, 0xac, 0x28, 0xac, 0x28, 0xac }, // 0x43
+		{ 0xac, 0xa0, 0xa0, 0xac, 0xac, 0xa0, 0xa0, 0xac }, // 0x44
+		{ 0xac, 0xa0, 0xa0, 0xac, 0xac, 0xa0, 0xa0, 0xac }, // 0x45
+		{ 0xac, 0xa0, 0xa0, 0xac, 0xac, 0xa0, 0xa0, 0xac }, // 0x46
+		{ 0xac, 0xa0, 0xa0, 0xac, 0xac, 0xa0, 0xa0, 0xac }, // 0x47
+	};
+
+	uint8_t *rom = memregion("maincpu")->base() + 0x8000;
+
+	for (int i = 0x0000; i < 0x8000; i++)
+	{
+		// logic is reminiscent of machine/segacrpt_device.cpp
+
+		// pick the row in the table from bits 0, 1, 2 and 6 of the address
+		uint8_t const row = bitswap<4>(i, 6, 2, 1, 0);
+
+		// pick the column in the table from bits 2,3,5,7 of the source data
+		// however the upper part is mirrored
+		uint8_t const col = bitswap<3>(BIT(rom[i], 7) ? ~rom[i] : rom[i], 5, 3, 2);
+
+		// decrypt opcodes
+		m_decrypted_opcodes[i] = rom[i] ^ opcode_xortable[row][col];
+	}
+}
+
+
+void goldnpkr_state::init_touk()
+{
+	// the program needs the opcodes XORed by 0x02
+	uint8_t *rom = memregion("maincpu")->base() + 0x8000;
+
+	for (int i = 0x0000; i <= 0x8000; i++)
+	{
+		// only opcodes are encrypted
+		m_decrypted_opcodes[i] = rom[i] ^ 0x02;
+	}	
+}
+
+
+void goldnpkr_state::init_pk5sb()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+	uint32_t size = memregion("maincpu")->bytes();
+
+	for (uint32_t i = 0; i < size; i++)
+	{
+		uint32_t cpu_addr = i + 0x8000;
+
+		if ((cpu_addr & 0x7000) != 0x4000)
+		{
+			rom[i] = bitswap<8>(rom[i] ^ 0x41, 7, 3, 6, 2, 5, 1, 4, 0);
+		}
+	}
+}
+
+void goldnpkr_state::init_jokerush()
+{
+	uint8_t *rom = memregion("maincpu")->base();
+
+	for (offs_t i = 0x9000; i < 0x10000; i++)
+		rom[i] = bitswap<8>(rom[i], 7, 6, 0, 4, 3, 2, 1, 5) ^ 0x14;
+}
+
 
 } // anonymous namespace
 
@@ -15090,6 +16973,8 @@ void goldnpkr_state::init_dynchance()
 /*********************************************
 *                Game Drivers                *
 *********************************************/
+
+/***************************** GOLDEN POKER TYPE *****************************/
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY                     FULLNAME                                     FLAGS             LAYOUT
 GAMEL( 1981, goldnpkr,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (Big Boy)",           0,                layout_goldnpkr )
@@ -15100,6 +16985,7 @@ GAMEL( 1983, goldnpke,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 1983, goldnpkf,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Intercoast (bootleg)",     "Golden Poker Double Up (bootleg, set 4)",    0,                layout_goldnpkr )
 GAMEL( 1983, goldnpkg,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Golden Poker Double Up (bootleg, set 5)",    0,                layout_goldnpkr )
 GAMEL( 1983, goldnpkh,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (tearoom*sara hack)", 0,                layout_goldnpkr )
+GAMEL( 1981, goldnpki,  goldnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Bonanza Enterprises, Ltd", "Golden Poker Double Up (alt set)",           0,                layout_goldnpkr )
 
 GAMEL( 198?, videtron,  0,        goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 1)",    0,                layout_goldnpkr )
 GAMEL( 198?, videtron2, videtron, goldnpkr, videtron, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Videotron Poker (cards selector, set 2)",    0,                layout_goldnpkr )
@@ -15120,8 +17006,9 @@ GAMEL( 198?, potnpkrk,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 198?, potnpkrl,  pottnpkr, pottnpkr, potnpkra, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (set 13, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
 GAMEL( 1988, potnpkrm,  pottnpkr, pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "bootleg",                  "Jack Potten's Poker (set 14, ICP-1 PCB)",    0,                layout_goldnpkr )  // unencrypted IPC-1 PCB.
 GAME ( 198?, potnpkrn,  pottnpkr, glfever,  glfever,  goldnpkr_state, init_glfev,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 15, w/fever, ICP-1 PCB)", 0 )
-GAMEL( 1987, potnpkro,  pottnpkr, goldnpkr, potnpkro, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 16, ICP-1 PCB)",    0,                layout_goldnpkr ) // ICP-1 with mods, 1986 0415 VER 7.0 1987 06-03 BY PED. (wires hack)
-GAMEL( 1987, potnpkrp,  pottnpkr, goldnpkr, potnpkro, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 17, ICP-1 PCB)",    0,                layout_goldnpkr ) // ICP-1 with mods, 1986 0415 VER 7.0 1987 06-03 BY PED. (PROM mod)
+GAMEL( 1987, potnpkro,  pottnpkr, goldnpkr, potnpkro, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 16, ICP-1 PCB)",    0,                layout_goldnpkr ) // ICP-1 with mods, 1986 0415 VER 7.0 1987 06-03 BY PED. (wires hack)
+GAMEL( 1987, potnpkrp,  pottnpkr, goldnpkr, potnpkro, goldnpkr_state, empty_init,    ROT0,   "bootleg (PED)",            "Jack Potten's Poker (set 17, ICP-1 PCB)",    0,                layout_goldnpkr ) // ICP-1 with mods, 1986 0415 VER 7.0 1987 06-03 BY PED. (PROM mod)
+GAMEL( 198?, potnpkrq,  pottnpkr, pottnpkr, pottnpkr, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Jack Potten's Poker (set 18, Falcon CPU brick)", 0,            layout_goldnpkr )
 GAMEL( 198?, ngold,     pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 1)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngolda,    pottnpkr, pottnpkr, ngold,    goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 2)",         0,                layout_goldnpkr )
 GAMEL( 198?, ngoldb,    pottnpkr, pottnpkr, ngoldb,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Jack Potten's Poker (NGold, set 3)",         0,                layout_goldnpkr )
@@ -15152,121 +17039,8 @@ GAMEL( 1991, bsuerteu,  bsuerte,  witchcrd, bsuerte,  goldnpkr_state, empty_init
 GAMEL( 1991, bsuertev,  bsuerte,  witchcrd, bsuertev, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Buena Suerte (Spanish/Portuguese, set 23)",  0,                layout_goldnpkr )
 GAMEL( 1991, goodluck,  bsuerte,  witchcrd, goodluck, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Good Luck",                                  0,                layout_goldnpkr )
 
-GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",        0,                layout_goldnpkr )
-GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,      layout_goldnpkr )
-GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,      layout_goldnpkr )
-GAME(  1983, falcnwldc, falcnwld, wildcrde, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original, protected)", MACHINE_NOT_WORKING ) // MCU hook up incomplete, currently game runs only after a soft reset. Then you can coin up but bet doesn't work
-GAMEL( 1983, falcnwldd, falcnwld, wildcrdb, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)", 0,         layout_goldnpkr )
 
-GAMEL( 1991, witchcrd,  0,        witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)",    0,                   layout_goldnpkr )
-GAME(  1991, witchcrda, witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)",    0 )
-GAME(  1991, witchcrdb, witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)",    0 )
-GAME(  1991, witchcrdc, witchcrd, witchcrd, witchcdc, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (English, no witch game)",        0 )
-GAMEL( 1994, witchcrdd, witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",        0,                   layout_goldnpkr )
-GAMEL( 1991, witchcrde, witchcrd, witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)",    0,                   layout_goldnpkr )
-GAMEL( 1985, witchcrdf, witchcrd, witchcrd, witchcdf, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Witch Card (English, witch game, lamps)",    0,                   layout_goldnpkr )
-GAMEL( 199?, witchcrdg, witchcrd, wcfalcon, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",        0,                   layout_goldnpkr )
-GAMEL( 1994, witchcrdh, witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",        0,                   layout_goldnpkr )
-GAMEL( 1994, witchcrdi, witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",       0,                   layout_goldnpkr )
-GAME(  199?, witchcrdj, witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "Witch Card (ICP-1, encrypted)",              0 )
-
-GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 1)",            0,                   layout_goldnpkr )
-GAMEL( 1997, witchgmea, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Video Klein, set 2)",            MACHINE_NOT_WORKING, layout_goldnpkr )
-
-GAME(  199?, jokercar,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Card (witch game)",                    0 )
-
-GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, goldnpkr_state, init_vkdlsa,   ROT0,   "Video Klein",              "Jolli Witch (Export, 6T/12T ver 1.57D)",     0,                   layout_goldnpkr )
-
-GAMEL( 2001, wldwitch,  0,        wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlsww,  ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.84A)",       0,                   layout_goldnpkr )  // Ver 184A, 2001-09-12
-GAMEL( 1992, wldwitcha, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwa, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-SP)",     0,                   layout_goldnpkr )  // Ver 157-SP, 1992-12-25
-GAMEL( 1992, wldwitchb, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-TE)",     MACHINE_NOT_WORKING, layout_goldnpkr )  // Ver 157-TE, 1992-12-25
-GAMEL( 1994, wldwitchc, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A)",       0,                   layout_goldnpkr )  // Ver 162A, 1994-04-26
-GAMEL( 1994, wldwitchd, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B)",       0,                   layout_goldnpkr )  // Ver 162B, 1994-04-26
-GAMEL( 1994, wldwitche, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A-F)",     MACHINE_NOT_WORKING, layout_goldnpkr )  // Ver 162A-F, 1994-04-26
-GAMEL( 1994, wldwitchf, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A alt)",   0,                   layout_goldnpkr )  // Ver 162A alt, 1994-11-03
-GAMEL( 1994, wldwitchg, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B alt)",   0,                   layout_goldnpkr )  // Ver 162B alt, 1994-11-03
-GAMEL( 1995, wldwitchh, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A)",       0,                   layout_goldnpkr )  // Ver 165A, 1995-11-16
-GAMEL( 1996, wldwitchi, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S)",     0,                   layout_goldnpkr )  // Ver 165A-S (Fast Deal), 1996-03-26
-GAMEL( 1996, wldwitchj, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S alt)", 0,                   layout_goldnpkr )  // Ver 165A-S alt (Fast Deal), 1996-05-26
-GAMEL( 1996, wldwitchk, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-N)",     0,                   layout_goldnpkr )  // Ver 165A-N, 1996-05-29
-GAMEL( 1996, wldwitchl, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A beta)",  0,                   layout_goldnpkr )  // Ver 170A-beta, 1996-06-25
-GAMEL( 1996, wldwitchm, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A)",       0,                   layout_goldnpkr )  // Ver 170A, 1996-09-30
-GAMEL( 1997, wldwitchn, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A alt)",   0,                   layout_goldnpkr )  // Ver 170A alt, 1997-06-11
-GAMEL( 1998, wldwitcho, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwo, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A-SP-BELG)", 0,                 layout_goldnpkr )  // Ver 174A-SP-BELG (no D-UP, no payout), 1998-05-11
-GAMEL( 1998, wldwitchp, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwp, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A)",       0,                   layout_goldnpkr )  // Ver 174A (no D-UP, no payout), 1998-09-20
-GAMEL( 1998, wldwitchq, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlsb,   ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A alt)",   0,                   layout_goldnpkr )  // Ver 174A alt, box, 1998-09-25
-GAMEL( 1999, wldwitchr, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwr, ROT0,   "Video Klein",              "Wild Witch (Export, 6B/12B ver 1.75A-E English)", 0,               layout_goldnpkr )  // Ver 175A-E (English), 1999-01-11
-GAMEL( 1999, wldwitchs, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswws, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.76A)",       0,                   layout_goldnpkr )  // Ver 176A, 1999-??-??
-GAMEL( 1999, wldwitcht, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwt, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.77A)",       0,                   layout_goldnpkr )  // Ver 177A, 1999-??-??
-GAMEL( 2000, wldwitchu, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwu, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.79A)",       0,                   layout_goldnpkr )  // Ver 179A, 2000-05-10
-GAMEL( 2001, wldwitchv, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwv, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.83A)",       0,                   layout_goldnpkr )  // Ver 183A, 2001-06-13
-
-GAMEL( 1998, wupndown,  0,        wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 1.02)",        0,           layout_upndown )    // Ver 1.02, 1998-10-26
-GAMEL( 1998, wupndowna, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 1)", 0,           layout_upndown )    // Ver 0.99, 1998-04-09
-GAMEL( 1998, wupndownb, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 2)", 0,           layout_upndown )    // Ver 0.99, 1998-03-23
-GAMEL( 1998, wupndownc, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 3)", 0,           layout_upndown )    // Ver 0.99 alt, 1998-05-11
-GAMEL( 1998, wupndownd, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99T)",       0,           layout_upndown )    // Ver 0.99T, 1998-03-23
-
-GAMEL( 1992, wstrike,   0,        wcrdxtnd, wstrike,  goldnpkr_state, init_wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01A)",     0,                layout_goldnpkr )
-GAMEL( 1992, wstrikea,  wstrike,  wcrdxtnd, wstrike,  goldnpkr_state, init_wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01B)",     0,                layout_goldnpkr )
-
-GAMEL( 1996, wtchjack,  0,        wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-89)", 0,                          layout_goldnpkr )    // Ver 0.87-89 / 1996-10-08 GFX OK
-GAMEL( 1996, wtchjacka, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-88)", 0,                          layout_goldnpkr )    // Ver 0.87-88 / 1996-10-02, GFX OK
-GAMEL( 1996, wtchjackb, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87)",    0,                          layout_goldnpkr )    // Ver 0.87 / 1996-07-16, GFX OK
-GAMEL( 1996, wtchjackc, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70S)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.70S / 1996-03-26
-GAMEL( 1996, wtchjackd, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70P)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.70P / 1996-03-26
-GAMEL( 1995, wtchjacke, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.65)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.65 / 1995-10-19
-GAMEL( 1995, wtchjackf, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.64)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.64 / 1995-09-13
-GAMEL( 1995, wtchjackg, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.62)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.62 / 1995-08-02
-GAMEL( 1995, wtchjackh, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40T)",   MACHINE_NOT_WORKING,        layout_goldnpkr )    // Ver 0.40T / 1995-02-27
-GAMEL( 1995, wtchjacki, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.40 / 1995-02-27
-GAMEL( 1994, wtchjackj, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jackpot (Export, 6T/12T ver 0.25)", MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.25 / 1994-11-24
-
-
-/*************************************** OTHER SETS ***************************************/
-
-//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY                     FULLNAME                                  FLAGS                LAYOUT
-GAMEL( 1981, pmpoker,   0,        goldnpkr, pmpoker,  goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                   layout_pmpoker  )
-GAMEL( 1988, caspoker,  0,        caspoker, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM88-01-21, German)",   0,                   layout_pmpoker  )
-GAMEL( 1987, caspokera, caspoker, goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  0,                   layout_pmpoker  )
-GAMEL( 1986, caspokerb, caspoker, goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86-35-1, German)",    0,                   layout_pmpoker  )
-GAMEL( 198?, royale,    0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Royale (set 1)",                          0,                   layout_goldnpkr )
-GAMEL( 198?, royalea,   royale,   goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Royale (set 2)",                          0,                   layout_goldnpkr )
-GAME(  1993, sloco93,   0,        witchcrd, sloco93,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
-GAME(  1993, sloco93a,  sloco93,  witchcrd, sloco93,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 2)",          0 )
-GAME(  198?, maverik,   0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Maverik",                                 0 )
-GAMEL( 1986, brasil86,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 86",                               0,                layout_goldnpkr )
-GAMEL( 1987, brasil87,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 87",                               0,                layout_goldnpkr )
-GAMEL( 1989, brasil89,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 89 (set 1)",                       0,                layout_goldnpkr )
-GAMEL( 1989, brasil89a, brasil89, witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 89 (set 2)",                       0,                layout_goldnpkr )
-GAME(  1993, brasil93,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 93",                               0 )              // no lamps
-GAME(  1991, poker91,   0,        witchcrd, poker91,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Poker 91",                                0 )
-GAME(  198?, genie,     0,        genie,    genie,    goldnpkr_state, empty_init,    ROT0,   "Video Fun Games Ltd.",     "Genie (ICP-1, set 1)",                    0 )
-GAME(  198?, geniea,    genie,    geniea,   geniea,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Genie (ICP-1, set 2)",                    0 )
-GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
-GAMEL( 1984, bonuspkr,  0,        goldnpkr, bonuspkr, goldnpkr_state, init_bonuspkr, ROT0,   "Galanthis Inc.",           "Bonus Poker",                             0,                layout_goldnpkr )
-GAMEL( 198?, jkrbonus,  0,        goldnpkr, jkrbonus, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Bonus",                             MACHINE_NOT_WORKING, layout_goldnpkr ) // second bank of DIPs not implemented
-
-GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
-GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )                // lacks of 2nd program ROM.
-GAMEL( 198?, pokersis,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_pokersis, ROT0,   "Sisteme France",           "Good Luck! poker (Sisteme France)",       0,                layout_goldnpkr )  // fix banking (4 prgs?)...
-
-GAMEL( 1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0,                layout_goldnpkr )  // banked selectable program.
-GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, init_super98,  ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               0 )  // complex protection. see notes.
-
-GAMEL( 198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown rocket/animal-themed poker",      MACHINE_IMPERFECT_COLORS, layout_goldnswp )  // banked program. how to switch gfx?
-
-GAME(  1987, super21p,  0,        super21p, super21p, goldnpkr_state, empty_init,    ROT0,   "Public MNG",               "Super 21",                                MACHINE_IMPERFECT_COLORS )
-GAME(  1987, op5cards,  0,        op5cards, op5cards, goldnpkr_state, init_op5cards, ROT0,   "MNG",                      "Open 5 Cards",                            0 )  // initialize lamps but doesn't seems to use them
-
-GAMEL( 198?, lespendu,  0,        lespendu, lespendu, lespendu_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
-GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, lespendu_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
-
-GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Roulette (ICP-1 PCB)",                    0 )  // password protected
-
-GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kaimen Hu (PAN Electronics)",             MACHINE_IMPERFECT_COLORS )  // needs proper palette decoding
-
-GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Wing W90 poker (Wing 8510-A W90-3 PCB)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // bad gfx dump
+/**************************** ICP-1 HARDWARE TYPE ****************************/
 
 GAME(  198?, unkicpf40, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F40 poker (137 Fever, 10 bet)",       0 )
 GAME(  198?, unkicpf80, 0,        unkicpf40, unkicpf40, goldnpkr_state, empty_init,  ROT0,   "<unknown>",                "ICP F80 poker (137 Fever, 50 bet)",       0 )
@@ -15311,17 +17085,104 @@ GAME(  1987, gp_ped42_85, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_pe
 GAME(  1987, gp_ped42_80, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 80%)",          0 )  // no lamps
 GAME(  1987, gp_ped42_70, goldnpkr, goldnpkr, goldnpkr,  goldnpkr_state, init_ped42, ROT0,   "<unknown>",                "Unknown Golden Poker (PED 70%)",          0 )  // no lamps
 
-// DEP 9801 encrypted platform... (lfhouse and clone not decrypted yet)
-GAME(  1998, dash_a37,  0,         dep_9801,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! (A37, ver 1998/10/22)",                MACHINE_NOT_WORKING )
-GAME(  1996, dash_a37b, dash_a37,  dep_9801,  goldnpkr, goldnpkr_state, init_dash,   ROT0,   "<unknown>",                "Dash! (A37, ver 1996/11/18)",                MACHINE_NOT_WORKING )
-GAME(  1996, lfhouse,   0,         dep_9801,  goldnpkr, goldnpkr_state, init_dep9801,ROT0,   "<unknown>",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
-GAME(  1994, lfhouseb,  lfhouse,   dep_9801,  goldnpkr, goldnpkr_state, init_dep9801,ROT0,   "<unknown>",                "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
-GAME(  1992, dynchance, 0,         dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2)",         MACHINE_NOT_WORKING )
-GAME(  1992, dynchancf, dynchance, dynchance, goldnpkr, goldnpkr_state, init_dynchance,ROT0, "<unknown>",                "Dynamic Chance (Type-3.0 Part 1-2, alt)",    MACHINE_NOT_WORKING )
-GAME(  1997, dynplus,   dynchance, dynplus,   goldnpkr, goldnpkr_state, init_dynplus,ROT0,   "<unknown>",                "Dynamic Plus One (SP Type ver 1.10)",        MACHINE_NOT_WORKING )
+
+/*********************** WITCH CARD / VIDEO KLEIN TYPE ***********************/
+
+GAMEL( 1991, witchcrd,  0,        witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein?",             "Witch Card (Video Klein CPU box, set 1)",    0,                   layout_goldnpkr )
+GAME(  1991, witchcrda, witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 1)",    0 )
+GAME(  1991, witchcrdb, witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (Spanish, witch game, set 2)",    0 )
+GAME(  1991, witchcrdc, witchcrd, witchcrd, witchcdc, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Witch Card (English, no witch game)",        0 )
+GAMEL( 1994, witchcrdd, witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 1 )",        0,                   layout_goldnpkr )
+GAMEL( 1991, witchcrde, witchcrd, witchcrd, witchcrd, goldnpkr_state, init_vkdlsc,   ROT0,   "Video Klein",              "Witch Card (Video Klein CPU box, set 2)",    0,                   layout_goldnpkr )
+GAMEL( 1985, witchcrdf, witchcrd, witchcrd, witchcdf, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Witch Card (English, witch game, lamps)",    0,                   layout_goldnpkr )
+GAMEL( 199?, witchcrdg, witchcrd, wcfalcon, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Witch Card (Falcon, enhanced sound)",        0,                   layout_goldnpkr )
+GAMEL( 1994, witchcrdh, witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, set 2 )",        0,                   layout_goldnpkr )
+GAMEL( 1994, witchcrdi, witchcrd, witchcrd, witchcdd, goldnpkr_state, empty_init,    ROT0,   "Proma",                    "Witch Card (German, WC3050, 27-4-94)",       0,                   layout_goldnpkr )
+GAME(  199?, witchcrdj, witchcrd, witchcdj, witchcrd, goldnpkr_state, init_icp1db,   ROT0,   "<unknown>",                "Witch Card (ICP-1, encrypted)",              0 )
+
+GAMEL( 1991, witchgme,  0,        witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (WG12T1)",                        0,                   layout_goldnpkr )
+GAMEL( 1997, witchgmea, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Export, WG12T1E)",               MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 1997, witchgmeb, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Export, WG12T1F)",               MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 1997, witchgmec, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Export, WG12T1FL)",              MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 1994, witchgmed, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (WG12T1H)",                       0,                   layout_goldnpkr )
+GAMEL( 1991, witchgmee, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (WG12T1L)",                       0,                   layout_goldnpkr )
+GAMEL( 1997, witchgmef, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Export, WG6T1E)",                MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 1997, witchgmeg, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (Export, WG6T1F)",                MACHINE_NOT_WORKING, layout_goldnpkr )
+GAMEL( 1994, witchgmeh, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (WG6T1H)",                        0,                   layout_goldnpkr )
+GAMEL( 1991, witchgmei, witchgme, witchcrd, witchcrd, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Game (WG6T1L)",                        0,                   layout_goldnpkr )
 
 
-/*************************************** SETS W/IRQ0 ***************************************/
+GAME(  199?, jokercar,  witchcrd, witchcrd, witchcda, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Card (witch game)",                    0 )
+
+GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, goldnpkr_state, init_vkdlsa,   ROT0,   "Video Klein",              "Jolli Witch (Export, 6T/12T ver 1.57D)",     0,                   layout_goldnpkr )
+
+GAMEL( 2001, wldwitch,  0,        wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlsww,  ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.84A)",       0,                   layout_goldnpkr )  // Ver 184A, 2001-09-12
+GAMEL( 1992, wldwitcha, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwa, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-SP)",     0,                   layout_goldnpkr )  // Ver 157-SP, 1992-12-25
+GAMEL( 1992, wldwitchb, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-TE)",     MACHINE_NOT_WORKING, layout_goldnpkr )  // Ver 157-TE, 1992-12-25
+GAMEL( 1994, wldwitchc, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A)",       0,                   layout_goldnpkr )  // Ver 162A, 1994-04-26
+GAMEL( 1994, wldwitchd, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B)",       0,                   layout_goldnpkr )  // Ver 162B, 1994-04-26
+GAMEL( 1994, wldwitche, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A-F)",     MACHINE_NOT_WORKING, layout_goldnpkr )  // Ver 162A-F, 1994-04-26
+GAMEL( 1994, wldwitchf, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A alt)",   0,                   layout_goldnpkr )  // Ver 162A alt, 1994-11-03
+GAMEL( 1994, wldwitchg, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B alt)",   0,                   layout_goldnpkr )  // Ver 162B alt, 1994-11-03
+GAMEL( 1995, wldwitchh, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A)",       0,                   layout_goldnpkr )  // Ver 165A, 1995-11-16
+GAMEL( 1996, wldwitchi, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S)",     0,                   layout_goldnpkr )  // Ver 165A-S (Fast Deal), 1996-03-26
+GAMEL( 1996, wldwitchj, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-S alt)", 0,                   layout_goldnpkr )  // Ver 165A-S alt (Fast Deal), 1996-05-26
+GAMEL( 1996, wldwitchk, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwh, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.65A-N)",     0,                   layout_goldnpkr )  // Ver 165A-N, 1996-05-29
+GAMEL( 1996, wldwitchl, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A beta)",  0,                   layout_goldnpkr )  // Ver 170A-beta, 1996-06-25
+GAMEL( 1996, wldwitchm, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A)",       0,                   layout_goldnpkr )  // Ver 170A, 1996-09-30
+GAMEL( 1997, wldwitchn, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwl, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.70A alt)",   0,                   layout_goldnpkr )  // Ver 170A alt, 1997-06-11
+GAMEL( 1998, wldwitcho, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwo, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A-SP-BELG)", 0,                 layout_goldnpkr )  // Ver 174A-SP-BELG (no D-UP, no payout), 1998-05-11
+GAMEL( 1998, wldwitchp, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwp, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A)",       0,                   layout_goldnpkr )  // Ver 174A (no D-UP, no payout), 1998-09-20
+GAMEL( 1998, wldwitchq, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlsb,   ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.74A alt)",   0,                   layout_goldnpkr )  // Ver 174A alt, box, 1998-09-25
+GAMEL( 1999, wldwitchr, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwr, ROT0,   "Video Klein",              "Wild Witch (Export, 6B/12B ver 1.75A-E English)", 0,               layout_goldnpkr )  // Ver 175A-E (English), 1999-01-11
+GAMEL( 1999, wldwitchs, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswws, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.76A)",       0,                   layout_goldnpkr )  // Ver 176A, 1999-??-??
+GAMEL( 1999, wldwitcht, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwt, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.77A)",       0,                   layout_goldnpkr )  // Ver 177A, 1999-??-??
+GAMEL( 2000, wldwitchu, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwu, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.79A)",       0,                   layout_goldnpkr )  // Ver 179A, 2000-05-10
+GAMEL( 2001, wldwitchv, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwv, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.83A)",       0,                   layout_goldnpkr )  // Ver 183A, 2001-06-13
+GAMEL( 1992, wldwitchw, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswww, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.0)",         0,                   layout_goldnpkr )  // Ver 1.0 1992
+
+GAMEL( 1998, wupndown,  0,        wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 1.02)",        0,           layout_upndown )    // Ver 1.02, 1998-10-26
+GAMEL( 1998, wupndowna, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 1)", 0,           layout_upndown )    // Ver 0.99, 1998-04-09
+GAMEL( 1998, wupndownb, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 2)", 0,           layout_upndown )    // Ver 0.99, 1998-03-23
+GAMEL( 1998, wupndownc, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99, set 3)", 0,           layout_upndown )    // Ver 0.99 alt, 1998-05-11
+GAMEL( 1998, wupndownd, wupndown, wcrdxtnd, wupndown, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Up & Down (Export, 6T/12T ver 0.99T)",       0,           layout_upndown )    // Ver 0.99T, 1998-03-23
+
+GAMEL( 1992, wstrike,   0,        wcrdxtnd, wstrike,  goldnpkr_state, init_wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01A)",     0,                layout_goldnpkr )
+GAMEL( 1992, wstrikea,  wstrike,  wcrdxtnd, wstrike,  goldnpkr_state, init_wstrike,  ROT0,   "Video Klein",              "Witch Strike (Export, 6T/12T ver 1.01B)",     0,                layout_goldnpkr )
+
+GAMEL( 1996, wtchjack,  0,        wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-89)", 0,                          layout_goldnpkr )    // Ver 0.87-89 / 1996-10-08 GFX OK
+GAMEL( 1996, wtchjacka, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87-88)", 0,                          layout_goldnpkr )    // Ver 0.87-88 / 1996-10-02, GFX OK
+GAMEL( 1996, wtchjackb, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.87)",    0,                          layout_goldnpkr )    // Ver 0.87 / 1996-07-16, GFX OK
+GAMEL( 1996, wtchjackc, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70S)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.70S / 1996-03-26
+GAMEL( 1996, wtchjackd, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.70P)",   MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.70P / 1996-03-26
+GAMEL( 1995, wtchjacke, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.65)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.65 / 1995-10-19
+GAMEL( 1995, wtchjackf, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.64)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.64 / 1995-09-13
+GAMEL( 1995, wtchjackg, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.62)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.62 / 1995-08-02
+GAMEL( 1995, wtchjackh, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40T)",   MACHINE_NOT_WORKING,        layout_goldnpkr )    // Ver 0.40T / 1995-02-27
+GAMEL( 1995, wtchjacki, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jack (Export, 6T/12T ver 0.40)",    MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.40 / 1995-02-27
+GAMEL( 1994, wtchjackj, wtchjack, wcrdxtnd, wtchjack, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Witch Jackpot (Export, 6T/12T ver 0.25)", MACHINE_IMPERFECT_GRAPHICS, layout_goldnpkr )    // Ver 0.25 / 1994-11-24
+
+// hybrids in similar hardware with improvements
+GAMEL( 1991, falcnwld,  0,        wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "TVG",                      "Falcons Wild - Wild Card 1991 (TVG)",        0,                layout_goldnpkr )
+GAMEL( 1990, falcnwlda, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 1)", 0,      layout_goldnpkr )
+GAMEL( 1990, falcnwldb, falcnwld, wildcard, wildcard, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Falcons Wild - World Wide Poker (Video Klein, set 2)", 0,      layout_goldnpkr )
+GAME(  1983, falcnwldc, falcnwld, wildcrde, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original, protected)", MACHINE_NOT_WORKING ) // MCU hook up incomplete, currently game runs only after a soft reset. Then you can coin up but bet doesn't work
+GAMEL( 1983, falcnwldd, falcnwld, wildcrdb, wildcard, goldnpkr_state, empty_init,    ROT0,   "Falcon",                   "Falcons Wild - World Wide Poker (Falcon original)", 0,         layout_goldnpkr )
+
+
+/************************ DEP 9801 ENCRYPTED PLATFORM ************************/
+
+GAME(  1998, dash_a37,  0,         dash_a37,  dash_a37,  goldnpkr_state, init_dash,      ROT0, "<unknown>",              "Dash! A.3.7 (ver 1998/10/22)",               0 )
+GAME(  1996, dash_a37b, dash_a37,  dash_a37,  dash_a37,  goldnpkr_state, init_dash,      ROT0, "<unknown>",              "Dash! A.3.7 (ver 1996/11/18)",               0 )
+GAME(  1992, dynchance, 0,         dynchance, dynchance, goldnpkr_state, init_dynchance, ROT0, "<unknown>",              "Dynamic Chance (Final Type3 DEP ver 1.1)",      0 )
+GAME(  1992, dynchancf, dynchance, dynchance, dynchance, goldnpkr_state, init_dynchance, ROT0, "<unknown>",              "Dynamic Chance (Final Type3 DEP ver 1.1, alt)", 0 )
+GAME(  1997, dynplus,   dynchance, dynplus,   dynplus,   goldnpkr_state, init_dynplus,   ROT0, "<unknown>",              "Dynamic Plus One (Dynamic SP, AV ver 1.00)", MACHINE_IMPERFECT_GRAPHICS )  // wrong gfx roms
+GAME(  1996, lfhouse,   0,         lfhouse,   lfhouse,   goldnpkr_state, init_lfhouse,   ROT0, "R and E",                "Lucky Full House (ver 1.16, data ver 1.05)", MACHINE_NOT_WORKING )
+GAME(  1994, lfhouseb,  lfhouse,   lfhouse,   lfhouse,   goldnpkr_state, init_lfhouseb,  ROT0, "R and E",                "Lucky Full House (ver 1.15, data ver 1.04)", MACHINE_NOT_WORKING )
+GAME(  1998, unkdep,    lfhouse,   unkdep,    goldnpkr,  goldnpkr_state, init_unkdep,    ROT0, "<unknown>",              "unknown DEP 9801 poker game",                MACHINE_NOT_WORKING )
+
+
+/******************************** SETS W/IRQ0 *********************************/
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY          FULLNAME                                             FLAGS      LAYOUT
 GAMEL( 198?, bchancep,  0,        gldnirq0, goldnpkr, goldnpkr_state, init_bchancep, ROT0,   "<unknown>",     "Bonne Chance! (Golden Poker prequel HW, set 1)",     0,         layout_goldnpkr )
@@ -15329,7 +17190,7 @@ GAMEL( 198?, bchanceq,  0,        gldnirq0, goldnpkr, goldnpkr_state, empty_init
 GAMEL( 198?, boasorte,  bchanceq, gldnirq0, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",     "Boa Sorte! (Golden Poker prequel HW)",               0,         layout_goldnpkr )
 
 
-/*************************************** SETS W/MCU ***************************************/
+/********************************* SETS W/MCU *********************************/
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY          FULLNAME                                             FLAGS
 GAME(  1990, megadpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Mega Double Poker (conversion kit, version 2.3 MD)", MACHINE_NOT_WORKING )
@@ -15337,7 +17198,65 @@ GAME(  1990, megadpkrb, megadpkr, megadpkr, megadpkr, blitz_state,    empty_init
 GAME(  1990, maxidpkr,  0,        megadpkr, megadpkr, blitz_state,    empty_init,    ROT0,   "Blitz System",  "Maxi Double Poker (version 1.8)",                    MACHINE_NOT_WORKING )
 
 
-/*************************************** SETS W/R6511 ***************************************/
+/******************************** SETS W/R6511 ********************************/
 
 GAME(  1989, olym65wc,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Wild Card (Olympic Games, v2.0)",                              MACHINE_NOT_WORKING )
 GAME(  1989, olym65bj,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_olym65,   ROT0,   "Olympic Video Gaming PTY LTD", "Black Jack (Olympic Games, v5.04, upgrade kit for Wild Card)", MACHINE_NOT_WORKING )
+
+
+/********************************* MULTIGAMES *********************************/
+
+//     YEAR  NAME       PARENT    MACHINE    INPUT     STATE           INIT         ROT      COMPANY                     FULLNAME                       FLAGS  LAYOUT  
+GAMEL( 1984, smb_be4k,  0,        smb_be4k,  smb_be4k, goldnpkr_state, empty_init,  ROT0,   "Bonanza Enterprises, Ltd", "Super Mini-Boy (BE-4000/SMB)", 0,     layout_smb_be4k )
+
+
+/********************************* OTHER SETS *********************************/
+
+//     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT      COMPANY                     FULLNAME                                  FLAGS                LAYOUT
+GAMEL( 1981, pmpoker,   0,        goldnpkr, pmpoker,  goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "PlayMan Poker (German)",                  0,                   layout_pmpoker  )
+GAMEL( 1988, caspoker,  0,        caspoker, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM88-01-21, German)",   0,                   layout_pmpoker  )
+GAMEL( 1987, caspokera, caspoker, goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86LO-35-5, German)",  0,                   layout_pmpoker  )
+GAMEL( 1986, caspokerb, caspoker, goldnpkr, caspoker, goldnpkr_state, empty_init,    ROT0,   "PM / Beck Elektronik",     "Casino Poker (Ver PM86-35-1, German)",    0,                   layout_pmpoker  )
+GAMEL( 198?, royale,    0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Royale (set 1)",                          0,                   layout_goldnpkr )
+GAMEL( 198?, royalea,   royale,   goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Royale (set 2)",                          0,                   layout_goldnpkr )
+GAME(  1993, sloco93,   0,        witchcrd, sloco93,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 1)",          0 )
+GAME(  1993, sloco93a,  sloco93,  witchcrd, sloco93,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Super Loco 93 (Spanish, set 2)",          0 )
+GAME(  198?, maverik,   0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Maverik",                                 0 )
+GAMEL( 1986, brasil86,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 86",                               0,                layout_goldnpkr )
+GAMEL( 1987, brasil87,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 87",                               0,                layout_goldnpkr )
+GAMEL( 1989, brasil89,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 89 (set 1)",                       0,                layout_goldnpkr )
+GAMEL( 1989, brasil89a, brasil89, witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 89 (set 2)",                       0,                layout_goldnpkr )
+GAME(  1993, brasil93,  0,        witchcrd, bsuerte,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Brasil 93",                               0 )              // no lamps
+GAME(  1991, poker91,   0,        witchcrd, poker91,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Poker 91",                                0 )
+GAME(  198?, genie,     0,        genie,    genie,    goldnpkr_state, empty_init,    ROT0,   "Video Fun Games Ltd.",     "Genie (ICP-1, set 1)",                    0 )
+GAME(  198?, geniea,    genie,    geniea,   geniea,   goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Genie (ICP-1, set 2)",                    0 )
+GAMEL( 1983, silverga,  0,        goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
+GAMEL( 1984, bonuspkr,  0,        goldnpkr, bonuspkr, goldnpkr_state, init_bonuspkr, ROT0,   "Galanthis Inc.",           "Bonus Poker",                             0,                layout_goldnpkr )
+GAMEL( 198?, jkrbonus,  0,        goldnpkr, jkrbonus, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Joker Bonus",                             MACHINE_NOT_WORKING, layout_goldnpkr ) // second bank of DIPs not implemented
+
+GAMEL( 198?, superdbl,  pottnpkr, goldnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
+GAME(  198?, pokerdub,  0,        pottnpkr, goldnpkr, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown French poker game",               MACHINE_NOT_WORKING )                // lacks of 2nd program ROM.
+GAMEL( 198?, pokersis,  0,        goldnpkr, goldnpkr, goldnpkr_state, init_pokersis, ROT0,   "Sisteme France",           "Good Luck! poker (Sisteme France)",       0,                layout_goldnpkr )  // fix banking (4 prgs?)...
+
+GAMEL( 1987, pokermon,  0,        mondial,  mondial,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Mundial/Mondial (Italian/French)",        0,                layout_goldnpkr )  // banked selectable program.
+GAME(  1998, super98,   bsuerte,  witchcrd, super98,  goldnpkr_state, init_super98,  ROT0,   "<unknown>",                "Super 98 (3-hands, ICP-1)",               0 )  // complex protection. see notes.
+
+GAMEL( 198?, animpkr,   0,        icp_ext,  animpkr,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "unknown rocket/animal-themed poker",      MACHINE_IMPERFECT_COLORS, layout_goldnswp )  // banked program. how to switch gfx?
+
+GAME(  1987, super21p,  0,        super21p, super21p, goldnpkr_state, empty_init,    ROT0,   "Public MNG",               "Super 21",                                MACHINE_IMPERFECT_COLORS )
+GAME(  1987, op5cards,  0,        op5cards, op5cards, goldnpkr_state, init_op5cards, ROT0,   "MNG",                      "Open 5 Cards",                            0 )  // initialize lamps but doesn't seems to use them
+
+GAMEL( 198?, lespendu,  0,        lespendu, lespendu, lespendu_state, init_lespendu, ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #1)",      0,                layout_lespendu )
+GAMEL( 198?, lespenduj, 0,        lespendu, lespendu, lespendu_state, init_lespenduj,ROT0,   "Voyageur de L'Espace Inc.", "Le Super Pendu (V1, words set #2)",      0,                layout_lespendu )
+
+GAME(  198?, icproul,   0,        icproul,  icproul,  goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Roulette (ICP-1 PCB)",                    0 )  // password protected
+
+GAME(  199?, kmhpan,    0,        kmhpan,   kmhpan,   goldnpkr_state, empty_init,    ROT0,   "PAN Electronics",          "Kaimen Hu (PAN Electronics)",             MACHINE_IMPERFECT_COLORS )  // needs proper palette decoding
+
+GAME(  198?, wing90pkr, goldnpkr, wing_w90, wing_w90, goldnpkr_state, empty_init,    ROT0,   "<unknown>",                "Wing W90 poker (Wing 8510-A W90-3 PCB)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_COLORS )  // bad gfx dump
+
+GAMEL( 198?, phnxjokr,  0,        phnxjokr, phnxjokr, goldnpkr_state, empty_init,    ROT0,   "STP",                      "Phoenix Joker (STP, UCGS-80 PCB)",        0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
+GAMEL( 1986, touksysp,  0,        touksysp, touksysp, goldnpkr_state, init_touk,     ROT0,   "<unknown>",                "Toukyuu System Poker (ROM: NO4313)",      0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
+GAMEL( 198?, pk5_07sb,  goldnpkr, pk5_07sb, pk5_07sb, goldnpkr_state, init_pk5sb,    ROT0,   "<unknown>",                "Fever Poker (pk5-07sb, encrypted)",       0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
+GAMEL( 198?, jokerush,  0,        jokerush, goldnpkr, goldnpkr_state, init_jokerush, ROT0,   "<unknown>",                "Joker Rush!! (SMH-803-J)",                0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
+

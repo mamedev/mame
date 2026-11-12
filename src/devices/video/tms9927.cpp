@@ -294,7 +294,7 @@ bool tms9927_device::cursor_bounds(rectangle &bounds) const
 	bounds.min_y = cursory * SCANS_PER_DATA_ROW;
 	bounds.max_y = bounds.min_y + SCANS_PER_DATA_ROW - 1;
 
-	return (cursorx < HCOUNT && cursory <= LAST_DISP_DATA_ROW);
+	return (cursorx < HCOUNT && CURSOR_ROW_ADDRESS < DATA_ROWS_PER_FRAME);
 }
 
 
@@ -351,7 +351,7 @@ void tms9927_device::recompute_parameters(bool postload)
 			"TMS9927(%s): Total = %dx%d, Visible = %dx%d, HSync = %d-%d, VSync = %d-%d, Skew=%d, Upscroll=%d, Period=%f Hz\n",
 			tag(), m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, m_hsyn_start, m_hsyn_end, m_vsyn_start, m_vsyn_end, SKEW_BITS, m_start_datarow, refresh.as_hz());
 
-	screen().configure(m_total_hpix, m_total_vpix, visarea, refresh.as_attoseconds());
+	screen().configure(m_total_hpix, m_total_vpix, visarea, refresh);
 
 	m_hsyn = false;
 	if (!m_write_hsyn.isunset())

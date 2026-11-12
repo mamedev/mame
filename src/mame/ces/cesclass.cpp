@@ -135,9 +135,10 @@ void cesclassic_state::dma_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 
 		rectangle cliprect = m_screen[N]->visible_area();
 
-		for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			for(int x = cliprect.min_x; x <= cliprect.max_x; x+= 16)
+			auto *const dst = &m_lcd_bitmap[N].pix(y);
+			for(int x = cliprect.left(); x <= cliprect.right(); x+= 16)
 			{
 				const u32 base_offset = ((x + base_screen) >> 4) + y * 16;
 				const u16 cell_high = vram[base_offset];
@@ -146,7 +147,7 @@ void cesclassic_state::dma_trigger_w(offs_t offset, u16 data, u16 mem_mask)
 				{
 					const u8 color = BIT(cell_low, 15 - xi) | (BIT(cell_high, 15 - xi) << 1);
 
-					m_lcd_bitmap[N].pix(y, x + xi) = m_palette->pen(color);
+					dst[x + xi] = m_palette->pen(color);
 				}
 			}
 		}
@@ -369,14 +370,14 @@ void cesclassic_state::cesclassic(machine_config &config)
 	// DS1232 MicroMonitor
 
 	// LCD screen section (2bpp)
-	screen_device &l_screen(SCREEN(config, "l_lcd", SCREEN_TYPE_LCD));
+	screen_device &l_screen(SCREEN(config, "l_lcd").set_lcd());
 	l_screen.set_refresh_hz(60);
 	l_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	l_screen.set_screen_update(FUNC(cesclassic_state::screen_update<0>));
 	l_screen.set_size(256+128, 64+24);
 	l_screen.set_visarea(0, 128 - 1, 0, 64 - 1);
 
-	screen_device &r_screen(SCREEN(config, "r_lcd", SCREEN_TYPE_LCD));
+	screen_device &r_screen(SCREEN(config, "r_lcd").set_lcd());
 	r_screen.set_refresh_hz(60);
 	r_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	r_screen.set_screen_update(FUNC(cesclassic_state::screen_update<1>));

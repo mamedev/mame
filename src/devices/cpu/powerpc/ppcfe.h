@@ -63,6 +63,8 @@ public:
 	void set_fpscr_used(unsigned n)         { regin.set(REG_BIT_FPSCR0 + n); }
 	void set_fpscr_modified(unsigned n)     { regout.set(REG_BIT_FPSCR0 + n); }
 
+	bool ctr_modified() const               { return regout[REG_BIT_CTR]; }
+
 	uint32_t cr_modified() const            { return regmask_field<64, 32>(regout); }
 	uint8_t cr_modified(unsigned n) const   { return reg_cr(regout, n); }
 	uint32_t cr_required() const            { return regmask_field<64, 32>(regreq); }
@@ -153,10 +155,10 @@ public:
 	frontend(ppc_device &ppc, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
 	~frontend();
 
-	opcode_desc const *describe_code(offs_t startpc);
+	opcode_desc const *describe_code(offs_t startpc, bool little_endian);
 
 protected:
-	bool describe(opcode_desc &desc, const opcode_desc *prev);
+	bool describe(opcode_desc &desc, const opcode_desc *prev, bool little_endian);
 
 	// inlines
 	static constexpr uint32_t compute_spr(uint32_t spr) { return ((spr >> 5) | (spr << 5)) & 0x3ff; }

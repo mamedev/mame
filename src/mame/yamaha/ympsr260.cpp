@@ -35,12 +35,12 @@ public:
 		, m_buttons(*this, "BTN%u", 0U)
 	{ }
 
-	void psr260(machine_config& config);
+	void psr260(machine_config& config) ATTR_COLD;
 
 	void lcd_w(u8 data);
 
 private:
-	virtual void driver_start() override;
+	virtual void machine_start() override ATTR_COLD;
 
 	HD44780_PIXEL_UPDATE(lcd_update);
 	void palette_init(palette_device& palette);
@@ -55,7 +55,7 @@ private:
 	ioport_value m_btn_sel{};
 };
 
-void psr260_state::driver_start()
+void psr260_state::machine_start()
 {
 	save_item(NAME(m_key_sel));
 	save_item(NAME(m_btn_sel));
@@ -95,7 +95,7 @@ void psr260_state::psr260(machine_config &config)
 
 	// screen (for testing only)
 	// TODO: the actual LCD with custom segments
-	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device& screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -127,7 +127,7 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS          INIT         COMPANY   FULLNAME   FLAGS
-SYST( 1998, psr79,   0,      0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PSR-79",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-SYST( 2000, psr260,  0,      0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PSR-260", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-SYST( 2000, psr160,  psr260, 0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PSR-160", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT   CLASS          INIT         COMPANY   FULLNAME             FLAGS
+SYST( 1998, psr79,   0,      0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PortaTone PSR-79",  MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 2000, psr260,  0,      0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PortaTone PSR-260", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 2000, psr160,  psr260, 0,      psr260,  psr260, psr260_state,  empty_init,  "Yamaha", "PortaTone PSR-160", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

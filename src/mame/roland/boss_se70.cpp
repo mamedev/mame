@@ -32,7 +32,8 @@ private:
 
 void boss_se70_state::mem_map(address_map &map)
 {
-	map(0x000000, 0x07ffff).mirror(0xf00000).rom().region("program", 0);
+	map(0x00000, 0x7ffff).mirror(0xf00000).rom().region("program", 0);
+	map(0x08000, 0x0ffff).mirror(0xf00000).ram();
 }
 
 

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "tandy2k_hdc.h"
 #include "tandy2kb.h"
 
 #include "bus/centronics/ctronics.h"
@@ -12,7 +13,6 @@
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
-#include "imagedev/harddriv.h"
 #include "machine/bankdev.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
@@ -20,6 +20,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/sab3019.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
@@ -28,6 +29,7 @@
 #include "video/crt9212.h"
 
 #include "emupal.h"
+#include "screen.h"
 
 #include "formats/tandy2k_dsk.h"
 
@@ -43,8 +45,6 @@
 #define CRT9212_0_TAG   "u55"
 #define CRT9212_1_TAG   "u15"
 #define CRT9021B_TAG    "u14"
-#define WD1010_TAG      "u18"
-#define WD1100_11_TAG   "u12"
 #define CENTRONICS_TAG  "centronics"
 #define RS232_TAG       "rs232"
 
@@ -64,9 +64,9 @@ public:
 		m_drb0(*this, CRT9212_0_TAG),
 		m_drb1(*this, CRT9212_1_TAG),
 		m_vac(*this, CRT9021B_TAG),
+		m_screen(*this, SCREEN_TAG),
 		m_colpal(*this, "colpal"),
 		m_vrambank(*this, "vrambank"),
-		m_timer_vidldsh(*this, "vidldsh"),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_speaker(*this, "speaker"),
 		m_ram(*this, RAM_TAG),
@@ -77,6 +77,7 @@ public:
 		m_hires_ram(*this, "hires_ram"),
 		m_char_ram(*this, "char_ram", 0x1000, ENDIANNESS_LITTLE),
 		m_pc_keyboard(*this, "pc_keyboard"),
+		m_rtc(*this, "rtc"),
 		m_dma_mux(0),
 		m_kbdclk(0),
 		m_kbddat(0),
@@ -97,6 +98,7 @@ public:
 		m_dblank(0),
 		m_slg(0),
 		m_sld(0),
+		m_curs(0),
 		m_cgra(0),
 		m_vidla(0),
 		m_outspkr(0),
@@ -116,17 +118,14 @@ public:
 		}
 	}
 
-	void tandy2k_hd(machine_config &config);
 	void tandy2k(machine_config &config);
 	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
 
-private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	void tandy2k_mem(address_map &map) ATTR_COLD;
 	void tandy2k_io(address_map &map) ATTR_COLD;
-	void tandy2k_hd_io(address_map &map) ATTR_COLD;
 	void vpac_mem(address_map &map) ATTR_COLD;
 	void vrambank_mem(address_map &map) ATTR_COLD;
 
@@ -144,9 +143,9 @@ private:
 	required_device<crt9212_device> m_drb0;
 	required_device<crt9212_device> m_drb1;
 	required_device<crt9021_device> m_vac;
+	required_device<screen_device> m_screen;
 	required_device<palette_device> m_colpal;
 	required_device<address_map_bank_device> m_vrambank;
-	required_device<timer_device> m_timer_vidldsh;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
@@ -157,6 +156,7 @@ private:
 	required_shared_ptr<uint16_t> m_hires_ram;
 	memory_share_creator<uint8_t> m_char_ram;
 	required_device<pc_keyboard_device> m_pc_keyboard; // temporary until the tandy keyboard has a rom dump
+	required_device<sab3019_device> m_rtc;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -171,6 +171,7 @@ private:
 	void enable_w(uint8_t data);
 	void dma_mux_w(uint8_t data);
 	uint8_t kbint_clr_r();
+	void hle_keypress_w(int state);
 	uint8_t fldtc_r();
 	void fldtc_w(uint8_t data);
 	void addr_ctrl_w(uint8_t data);
@@ -185,16 +186,25 @@ private:
 	void vpac_drb_w(int state);
 	void vpac_wben_w(int state);
 	void vpac_cblank_w(int state);
+	void vpac_curs_w(int state);
+	void vpac_vs_w(int state);
 	void vpac_slg_w(int state);
 	void vpac_sld_w(int state);
 	uint8_t hires_status_r();
 	void hires_plane_w(uint8_t data);
 	void vidla_w(uint8_t data);
 	void drb_attr_w(uint8_t data);
+	int character_width() const { return m_clkcnt ? 8 : 10; }
+	void set_vidldsh_timer();
+	void vid_catch_up();
+	void colpal_w(offs_t offset, uint8_t data);
 	void kbdclk_w(int state);
 	void kbddat_w(int state);
 	uint8_t clkmouse_r(offs_t offset);
 	void clkmouse_w(offs_t offset, uint8_t data);
+	void rtc_cbus(uint16_t bits, int count);
+	uint8_t rtc_read(int addr);
+	void rtc_set(int addr, uint8_t data);
 	uint8_t irq_callback(offs_t offset);
 	void fdc_drq_w(int state);
 	void fdc_hdl_w(int state);
@@ -204,7 +214,7 @@ private:
 	void write_centronics_select(int state);
 	void write_centronics_fault(int state);
 	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
-	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
+	void vidldsh_tick();
 	static void floppy_formats(format_registration &fr);
 	static rgb_t IRGB(uint32_t raw);
 
@@ -245,9 +255,23 @@ private:
 	uint8_t m_dblank;
 	int m_slg;
 	int m_sld;
+	int m_curs;
 	uint8_t m_cgra;
 	uint8_t m_vidla;
 	uint8_t m_hires_en = 0;
+	bitmap_rgb32 m_bitmap;
+	bool m_drb = true;
+	bool m_dout = false;
+	bool m_vs = true;
+	bool m_frame = false;
+	int m_int = 0;
+	int m_col = 0;
+	uint8_t m_hchar = 0;
+	attotime m_vid_next;
+	attotime m_vid_period;
+	attotime m_vid_time;
+	int m_row = 0;
+	int m_scanline = 0;
 
 	/* sound state */
 	int m_outspkr;
@@ -276,6 +300,26 @@ private:
 	required_ioport m_buttons;
 	required_ioport m_x_axis;
 	required_ioport m_y_axis;
+};
+
+class tandy2k_hd_state : public tandy2k_state
+{
+public:
+	tandy2k_hd_state(const machine_config &mconfig, device_type type, const char *tag) :
+		tandy2k_state(mconfig, type, tag),
+		m_hdc(*this, "hdc")
+	{
+	}
+
+	void tandy2k_hd(machine_config &config);
+
+protected:
+	required_device<tandy2k_hdc_device> m_hdc;
+
+private:
+	void tandy2k_hd_io(address_map &map) ATTR_COLD;
+
+	void hdc_bdrq_w(int state);
 };
 
 #endif // MAME_TRS_TANDY2K_H

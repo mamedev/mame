@@ -438,7 +438,7 @@ void speedbsk_state::speedbsk(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom"); // Actually 93c45
 
 	// service lcd
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(6*20+1, 19);

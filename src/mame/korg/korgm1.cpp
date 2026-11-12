@@ -240,7 +240,7 @@ void korgm1_state::korgm1(machine_config &config)
 	m_adc->in_callback<6>().set_ioport("AN6"); // to internal battery
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */

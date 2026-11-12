@@ -29,14 +29,13 @@ template<typename Value = void>
 struct tracked_allocator
 {
   using value_type = Value;
-  std::vector<std::pair<void*, std::size_t>>   & allocs, &deallocs;
+  std::vector<std::pair<void*, std::size_t>> &allocs, &deallocs;
 
-  tracked_allocator(std::vector<std::pair<void*, std::size_t>>   & allocs,
-                    std::vector<std::pair<void*, std::size_t>>   & deallocs) : allocs(allocs), deallocs(deallocs) {}
-
+  tracked_allocator(std::vector<std::pair<void*, std::size_t>>& allocs,
+                    std::vector<std::pair<void*, std::size_t>>& deallocs) : allocs(allocs), deallocs(deallocs) {}
 
   template<typename T>
-  tracked_allocator(const tracked_allocator<T> & a) : allocs(a.allocs), deallocs(a.deallocs) {}
+  tracked_allocator(const tracked_allocator<T>& a) : allocs(a.allocs), deallocs(a.deallocs) {}
 
   value_type* allocate(std::size_t n)
   {
@@ -52,7 +51,7 @@ struct tracked_allocator
 //    ASIO_CHECK(allocs.back() == deallocs.back());
   }
 
-  bool operator==(const tracked_allocator & rhs) const
+  bool operator==(const tracked_allocator& rhs) const
   {
     return &allocs == &rhs.allocs
            && &deallocs == &rhs.deallocs;
@@ -60,7 +59,7 @@ struct tracked_allocator
 };
 
 exp::coro<void, void, asio::any_io_executor, tracked_allocator<void>>
-        alloc_test_impl(asio::io_context & ctx, int, std::allocator_arg_t, tracked_allocator<void> ta, double)
+        alloc_test_impl(asio::io_context& ctx, int, std::allocator_arg_t, tracked_allocator<void> ta, double)
 {
   co_return ;
 }

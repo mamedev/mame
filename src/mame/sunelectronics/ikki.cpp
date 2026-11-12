@@ -162,14 +162,15 @@ void ikki_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 
 	// copy the sprite bitmap into the main bitmap, skipping the transparent pixels
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t const pen = m_sprite_bitmap.pix(y, x);
 
 			if (m_palette->pen_indirect(pen) != 0x100)
-				bitmap.pix(y, x) = pen;
+				dst[x] = pen;
 		}
 	}
 }
@@ -514,7 +515,7 @@ void ikki_state::ikki(machine_config &config)
 	config.set_perfect_quantum(m_maincpu);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(ikki_state::screen_update));
 	m_screen->set_palette(m_palette);

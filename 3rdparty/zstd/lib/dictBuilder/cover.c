@@ -21,8 +21,17 @@
 /*-*************************************
 *  Dependencies
 ***************************************/
+/* qsort_r is an extension. */
+#if defined(__linux) || defined(__linux__) || defined(linux) || defined(__gnu_linux__) || \
+    defined(__CYGWIN__) || defined(__MSYS__)
+#if !defined(_GNU_SOURCE) && !defined(__ANDROID__) /* NDK doesn't ship qsort_r(). */
+#define _GNU_SOURCE
+#endif
+#endif
+
 #include <stdio.h>  /* fprintf */
-#include <stdlib.h> /* malloc, free, qsort */
+#include <stdlib.h> /* malloc, free, qsort_r */
+
 #include <string.h> /* memset */
 #include <time.h>   /* clock */
 
@@ -31,8 +40,8 @@
 #endif
 
 #include "../common/mem.h" /* read */
-#include "../common/pool.h"
-#include "../common/threading.h"
+#include "../common/pool.h" /* POOL_ctx */
+#include "../common/threading.h" /* ZSTD_pthread_mutex_t */
 #include "../common/zstd_internal.h" /* includes zstd.h */
 #include "../common/bits.h" /* ZSTD_highbit32 */
 #include "../zdict.h"
@@ -78,7 +87,7 @@ static clock_t g_time = 0;
 #undef  LOCALDISPLAYUPDATE
 #define LOCALDISPLAYUPDATE(displayLevel, l, ...)                               \
   if (displayLevel >= l) {                                                     \
-    if ((clock() - g_time > g_refreshRate) || (displayLevel >= 4)) {             \
+    if ((clock() - g_time > g_refreshRate) || (displayLevel >= 4)) {           \
       g_time = clock();                                                        \
       DISPLAY(__VA_ARGS__);                                                    \
     }                                                                          \
@@ -232,8 +241,10 @@ typedef struct {
   unsigned d;
 } COVER_ctx_t;
 
-/* We need a global context for qsort... */
+#if !defined(_GNU_SOURCE) && !defined(__APPLE__) && !defined(_MSC_VER)
+/* C90 only offers qsort() that needs a global context. */
 static COVER_ctx_t *g_coverCtx = NULL;
+#endif
 
 /*-*************************************
 *  Helper functions
@@ -276,11 +287,15 @@ static int COVER_cmp8(COVER_ctx_t *ctx, const void *lp, const void *rp) {
 
 /**
  * Same as COVER_cmp() except ties are broken by pointer value
- * NOTE: g_coverCtx must be set to call this function.  A global is required because
- * qsort doesn't take an opaque pointer.
  */
-static int WIN_CDECL COVER_strict_cmp(const void *lp, const void *rp) {
-  int result = COVER_cmp(g_coverCtx, lp, rp);
+#if (defined(_WIN32) && defined(_MSC_VER)) || defined(__APPLE__)
+static int WIN_CDECL COVER_strict_cmp(void* g_coverCtx, const void* lp, const void* rp) {
+#elif defined(_GNU_SOURCE)
+static int COVER_strict_cmp(const void *lp, const void *rp, void *g_coverCtx) {
+#else /* C90 fallback.*/
+static int COVER_strict_cmp(const void *lp, const void *rp) {
+#endif
+  int result = COVER_cmp((COVER_ctx_t*)g_coverCtx, lp, rp);
   if (result == 0) {
     result = lp < rp ? -1 : 1;
   }
@@ -289,8 +304,14 @@ static int WIN_CDECL COVER_strict_cmp(const void *lp, const void *rp) {
 /**
  * Faster version for d <= 8.
  */
-static int WIN_CDECL COVER_strict_cmp8(const void *lp, const void *rp) {
-  int result = COVER_cmp8(g_coverCtx, lp, rp);
+#if (defined(_WIN32) && defined(_MSC_VER)) || defined(__APPLE__)
+static int WIN_CDECL COVER_strict_cmp8(void* g_coverCtx, const void* lp, const void* rp) {
+#elif defined(_GNU_SOURCE)
+static int COVER_strict_cmp8(const void *lp, const void *rp, void *g_coverCtx) {
+#else /* C90 fallback.*/
+static int COVER_strict_cmp8(const void *lp, const void *rp) {
+#endif
+  int result = COVER_cmp8((COVER_ctx_t*)g_coverCtx, lp, rp);
   if (result == 0) {
     result = lp < rp ? -1 : 1;
   }
@@ -298,12 +319,43 @@ static int WIN_CDECL COVER_strict_cmp8(const void *lp, const void *rp) {
 }
 
 /**
+ * Abstract away divergence of qsort_r() parameters.
+ * Hopefully when C11 become the norm, we will be able
+ * to clean it up.
+ */
+static void stableSort(COVER_ctx_t *ctx) {
+#if defined(__APPLE__)
+    qsort_r(ctx->suffix, ctx->suffixSize, sizeof(U32),
+            ctx,
+            (ctx->d <= 8 ? &COVER_strict_cmp8 : &COVER_strict_cmp));
+#elif defined(_GNU_SOURCE)
+    qsort_r(ctx->suffix, ctx->suffixSize, sizeof(U32),
+            (ctx->d <= 8 ? &COVER_strict_cmp8 : &COVER_strict_cmp),
+            ctx);
+#elif defined(_WIN32) && defined(_MSC_VER)
+    qsort_s(ctx->suffix, ctx->suffixSize, sizeof(U32),
+            (ctx->d <= 8 ? &COVER_strict_cmp8 : &COVER_strict_cmp),
+            ctx);
+#elif defined(__OpenBSD__)
+    g_coverCtx = ctx;
+    mergesort(ctx->suffix, ctx->suffixSize, sizeof(U32),
+          (ctx->d <= 8 ? &COVER_strict_cmp8 : &COVER_strict_cmp));
+#else /* C90 fallback.*/
+    g_coverCtx = ctx;
+    /* TODO(cavalcanti): implement a reentrant qsort() when is not available. */
+    qsort(ctx->suffix, ctx->suffixSize, sizeof(U32),
+          (ctx->d <= 8 ? &COVER_strict_cmp8 : &COVER_strict_cmp));
+#endif
+}
+
+/**
  * Returns the first pointer in [first, last) whose element does not compare
  * less than value.  If no such element exists it returns last.
  */
-static const size_t *COVER_lower_bound(const size_t *first, const size_t *last,
+static const size_t *COVER_lower_bound(const size_t* first, const size_t* last,
                                        size_t value) {
-  size_t count = last - first;
+  size_t count = (size_t)(last - first);
+  assert(last >= first);
   while (count != 0) {
     size_t step = count / 2;
     const size_t *ptr = first;
@@ -549,7 +601,8 @@ static void COVER_ctx_destroy(COVER_ctx_t *ctx) {
  */
 static size_t COVER_ctx_init(COVER_ctx_t *ctx, const void *samplesBuffer,
                           const size_t *samplesSizes, unsigned nbSamples,
-                          unsigned d, double splitPoint) {
+                          unsigned d, double splitPoint)
+{
   const BYTE *const samples = (const BYTE *)samplesBuffer;
   const size_t totalSamplesSize = COVER_sum(samplesSizes, nbSamples);
   /* Split samples into testing and training sets */
@@ -618,17 +671,7 @@ static size_t COVER_ctx_init(COVER_ctx_t *ctx, const void *samplesBuffer,
     for (i = 0; i < ctx->suffixSize; ++i) {
       ctx->suffix[i] = i;
     }
-    /* qsort doesn't take an opaque pointer, so pass as a global.
-     * On OpenBSD qsort() is not guaranteed to be stable, their mergesort() is.
-     */
-    g_coverCtx = ctx;
-#if defined(__OpenBSD__)
-    mergesort(ctx->suffix, ctx->suffixSize, sizeof(U32),
-          (ctx->d <= 8 ? &COVER_strict_cmp8 : &COVER_strict_cmp));
-#else
-    qsort(ctx->suffix, ctx->suffixSize, sizeof(U32),
-          (ctx->d <= 8 ? &COVER_strict_cmp8 : &COVER_strict_cmp));
-#endif
+    stableSort(ctx);
   }
   DISPLAYLEVEL(2, "Computing frequencies\n");
   /* For each dmer group (group of positions with the same first d bytes):
@@ -733,7 +776,7 @@ static size_t COVER_buildDictionary(const COVER_ctx_t *ctx, U32 *freqs,
   return tail;
 }
 
-ZDICTLIB_API size_t ZDICT_trainFromBuffer_cover(
+ZDICTLIB_STATIC_API size_t ZDICT_trainFromBuffer_cover(
     void *dictBuffer, size_t dictBufferCapacity,
     const void *samplesBuffer, const size_t *samplesSizes, unsigned nbSamples,
     ZDICT_cover_params_t parameters)
@@ -907,8 +950,10 @@ void COVER_best_start(COVER_best_t *best) {
  * Decrements liveJobs and signals any waiting threads if liveJobs == 0.
  * If this dictionary is the best so far save it and its parameters.
  */
-void COVER_best_finish(COVER_best_t *best, ZDICT_cover_params_t parameters,
-                              COVER_dictSelection_t selection) {
+void COVER_best_finish(COVER_best_t* best,
+                      ZDICT_cover_params_t parameters,
+                      COVER_dictSelection_t selection)
+{
   void* dict = selection.dictContent;
   size_t compressedSize = selection.totalCompressedSize;
   size_t dictSize = selection.dictSize;
@@ -980,8 +1025,8 @@ COVER_dictSelection_t COVER_selectDict(BYTE* customDictContent, size_t dictBuffe
   size_t largestCompressed = 0;
   BYTE* customDictContentEnd = customDictContent + dictContentSize;
 
-  BYTE * largestDictbuffer = (BYTE *)malloc(dictBufferCapacity);
-  BYTE * candidateDictBuffer = (BYTE *)malloc(dictBufferCapacity);
+  BYTE* largestDictbuffer = (BYTE*)malloc(dictBufferCapacity);
+  BYTE* candidateDictBuffer = (BYTE*)malloc(dictBufferCapacity);
   double regressionTolerance = ((double)params.shrinkDictMaxRegression / 100.0) + 1.00;
 
   if (!largestDictbuffer || !candidateDictBuffer) {
@@ -1119,7 +1164,7 @@ _cleanup:
   free(freqs);
 }
 
-ZDICTLIB_API size_t ZDICT_optimizeTrainFromBuffer_cover(
+ZDICTLIB_STATIC_API size_t ZDICT_optimizeTrainFromBuffer_cover(
     void* dictBuffer, size_t dictBufferCapacity, const void* samplesBuffer,
     const size_t* samplesSizes, unsigned nbSamples,
     ZDICT_cover_params_t* parameters)

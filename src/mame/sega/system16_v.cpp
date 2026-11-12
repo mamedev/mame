@@ -448,6 +448,17 @@ VIDEO_START_MEMBER(segas1x_bootleg_state,system18old)
 	m_system18 = 1;
 }
 
+VIDEO_START_MEMBER(segas1x_bootleg_state,iqpipe)
+{
+	VIDEO_START_CALL_MEMBER(system16);
+	m_text_layer->set_scrolldx(-3, 0);
+}
+
+VIDEO_START_MEMBER(segas1x_bootleg_state,beautyb)
+{
+	VIDEO_START_CALL_MEMBER(iqpipe);
+	m_text_layer->set_scrolldy( 1, 0); // correct for beautyb (compared to hw shots) but iqpipe wraps a line of text to the top
+}
 
 /*****************************************************************************************
  System 16A bootleg video
@@ -640,12 +651,12 @@ uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg(screen_device &screen
 			cliprect,
 			[this, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
 					//uint8_t const *const pri = &screen.priority().pix(y);
-					for (int x = rect.min_x; x <= rect.max_x; x++)
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
 						// only process written pixels
 						uint16_t const pix = src[x];
@@ -713,12 +724,12 @@ uint32_t segas1x_bootleg_state::screen_update_s16a_bootleg_passht4b(screen_devic
 			cliprect,
 			[this, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
 					//uint8_t const *const pri = &screen.priority().pix(y);
-					for (int x = rect.min_x; x <= rect.max_x; x++)
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
 						// only process written pixels
 						uint16_t const pix = src[x];
@@ -799,12 +810,12 @@ uint32_t segas1x_bootleg_state::screen_update_system16(screen_device &screen, bi
 			cliprect,
 			[this, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
 					//uint8_t const *const pri = &screen.priority().pix(y);
-					for (int x = rect.min_x; x <= rect.max_x; x++)
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
 						// only process written pixels
 						uint16_t const pix = src[x];
@@ -866,12 +877,12 @@ uint32_t segas1x_bootleg_state::screen_update_system18old(screen_device &screen,
 			cliprect,
 			[this, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
 					//uint8_t const *const pri = &screen.priority().pix(y);
-					for (int x = rect.min_x; x <= rect.max_x; x++)
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
 						// only process written pixels
 						uint16_t const pix = src[x];

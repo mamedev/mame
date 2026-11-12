@@ -83,7 +83,7 @@ void lynx_state::lynx(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(XTAL(16'000'000) / 16 / (158 + 1) / (104 + 1)); // default config from machine_reset(), actually variable
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(lynx_state::screen_update));

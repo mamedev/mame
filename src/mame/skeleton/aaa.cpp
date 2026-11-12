@@ -265,7 +265,7 @@ void aaa_state::aaa(machine_config &config)
 	m_usart[1]->rts_handler().set("computer", FUNC(rs232_port_device::write_rts));
 	m_usart[1]->dtr_handler().set("computer", FUNC(rs232_port_device::write_dtr));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(18.414_MHz_XTAL, 990, 0, 800, 310, 0, 240);
 	m_screen->set_screen_update(FUNC(aaa_state::screen_update));
 

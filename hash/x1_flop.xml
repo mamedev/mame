@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -1124,7 +1124,7 @@ Garbage GFXs on [6845] rightmost column during intro
 	</software>
 
 	<software name="hfox2">
-		<description>Hurry Fox - Yuki no Maou hen</description>
+		<description>Hurry Fox: Yuki no Maou hen</description>
 		<year>1986</year>
 		<publisher>マイクロキャビン (Micro Cabin)</publisher>
 		<info name="release" value="198610xx"/>
@@ -4047,7 +4047,7 @@ omake: Broken [kanji] when booting with disk 2 in, cfr. https://tcrf.net/Zeliard
 	<software name="labyrint">
 		<description>Labyrinth</description>
 		<year>1986?</year>
-		<publisher>パックインビデオ (Pack-in Video)</publisher>
+		<publisher>パックインビデオ (Pack-in-Video)</publisher>
 		<info name="alt_title" value="ラビリンス"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
@@ -5273,7 +5273,7 @@ Not extensively tested
 	<software name="srambo">
 		<description>Super Rambo</description>
 		<year>1986</year>
-		<publisher>パックインビデオ (Pack-in Video)</publisher>
+		<publisher>パックインビデオ (Pack-in-Video)</publisher>
 		<info name="alt_title" value="スーパーランボー"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">

@@ -427,7 +427,7 @@ void _20pacgal_state::_20pacgal(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(73.728_MHz_XTAL / 4 / 3, 396, 0, 288, 256, 0, 224);
 	screen.set_screen_update(FUNC(_20pacgal_state::screen_update_20pacgal));
 	screen.set_palette(m_palette);

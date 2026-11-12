@@ -135,7 +135,7 @@ const char *const upd7810_base_disassembler::dasm_s::token_names[] =
 	"GTAX",
 	"GTI",
 	"GTIW",
-	"HALT",
+	"HLT",
 	"IN",   /* 7801 */
 	"INR",
 	"INRW",
@@ -1133,7 +1133,7 @@ const upd7810_base_disassembler::dasm_s upd7810_disassembler::d48_7810[256] =
 	{RLD,    nullptr   }, // 38: 0100 1000 0011 1000
 	{RRD,    nullptr   }, // 39: 0100 1000 0011 1001
 	{NEGA,   nullptr   }, // 3a: 0100 1000 0011 1010
-	{HALT,   nullptr   }, // 3b: 0100 1000 0011 1011
+	{HLT,    nullptr   }, // 3b: 0100 1000 0011 1011
 	{                  }, // 3c: 0100 1000 0011 1100
 	{DIV,    "A"       }, // 3d: 0100 1000 0011 1101
 	{DIV,    "B"       }, // 3e: 0100 1000 0011 1110
@@ -2517,7 +2517,7 @@ const upd7810_base_disassembler::dasm_s upd7807_disassembler::d48_7807[256] =
 	{RLD,    nullptr   }, // 38: 0100 1000 0011 1000
 	{RRD,    nullptr   }, // 39: 0100 1000 0011 1001
 	{NEGA,   nullptr   }, // 3a: 0100 1000 0011 1010
-	{HALT,   nullptr   }, // 3b: 0100 1000 0011 1011
+	{HLT,    nullptr   }, // 3b: 0100 1000 0011 1011
 	{                  }, // 3c: 0100 1000 0011 1100
 	{DIV,    "A"       }, // 3d: 0100 1000 0011 1101
 	{DIV,    "B"       }, // 3e: 0100 1000 0011 1110
@@ -4437,7 +4437,7 @@ const upd7810_base_disassembler::dasm_s upd7801_disassembler::d74_7801[256] = {
 
 const upd7810_base_disassembler::dasm_s upd7801_disassembler::XX_7801[256] = {
 	// 0x00 - 0x3F
-	{ NOP,     nullptr }, { HALT,    nullptr }, { INX,     "SP"    }, { DCX,     "SP"    },
+	{ NOP,     nullptr }, { HLT,     nullptr }, { INX,     "SP"    }, { DCX,     "SP"    },
 	{ LXI,     "SP,%w" }, { ANIW,    "%a,%b" }, {                  }, { ANI,     "A,%b"  },
 	{ RET,     nullptr }, { SIO,     nullptr }, { MOV,     "A,B"   }, { MOV,     "A,C"   },
 	{ MOV,     "A,D"   }, { MOV,     "A,E"   }, { MOV,     "A,H"   }, { MOV,     "A,L"   },
@@ -5131,7 +5131,7 @@ const upd7810_base_disassembler::dasm_s upd78c05_disassembler::d74_78c05[256] = 
 
 const upd7810_base_disassembler::dasm_s upd78c05_disassembler::XX_78c05[256] = {
 	// 0x00 - 0x3F
-	{ NOP,     nullptr }, { HALT,    nullptr }, { INX,     "SP"    }, { DCX,     "SP"    },
+	{ NOP,     nullptr }, { HLT,     nullptr }, { INX,     "SP"    }, { DCX,     "SP"    },
 	{ LXI,     "SP,%w" }, { ANIW,    "%a,%b" }, {                  }, { ANI,     "A,%b"  },
 	{ RET,     nullptr }, { SIO,     nullptr }, { MOV,     "A,B"   }, { MOV,     "A,C"   },
 	{ MOV,     "A,D"   }, { MOV,     "A,E"   }, { MOV,     "A,H"   }, { MOV,     "A,L"   },

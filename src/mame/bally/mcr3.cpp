@@ -1102,7 +1102,7 @@ void mcr3_state::mcrmono(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_refresh_hz(30);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);

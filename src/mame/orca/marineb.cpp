@@ -1100,7 +1100,7 @@ void marineb_state::marineb(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 16);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(5000)); // frames per second, vblank duration
 	screen.set_size(32*8, 32*8);

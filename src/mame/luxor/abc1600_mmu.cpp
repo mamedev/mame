@@ -156,6 +156,7 @@ void abc1600_mmu_device::mmu::reset()
 	m_boote = 0;
 	m_magic = 0;
 	m_task = 0;
+	m_cause = 0;
 }
 
 bool abc1600_mmu_device::mmu::ifc2(int intention) const

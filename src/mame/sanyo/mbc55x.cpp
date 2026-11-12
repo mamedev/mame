@@ -273,7 +273,7 @@ void mbc55x_state::mbc55x(machine_config &config)
 	keyboard.txd_callback().set(m_kb_uart, FUNC(i8251_device::write_rxd));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_raw(14.318181_MHz_XTAL, 896, 0, 640, 262, 0, 200);
 	screen.set_screen_update(VID_MC6845_NAME, FUNC(mc6845_device::screen_update));
 

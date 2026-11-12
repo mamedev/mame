@@ -23,9 +23,10 @@
 #include "dfac.h"
 #include "djmemc.h"
 #include "iosb.h"
-#include "macadb.h"
 #include "mactoolbox.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
@@ -56,7 +57,7 @@ public:
 		m_djmemc(*this, "djmemc"),
 		m_iosb(*this, "iosb"),
 		m_dfac(*this, "dfac"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_adbmodem(*this, "adbmodem"),
 		m_scc(*this, "scc"),
 		m_ram(*this, RAM_TAG),
@@ -81,15 +82,13 @@ private:
 	required_device<djmemc_device> m_djmemc;
 	required_device<iosb_device> m_iosb;
 	required_device<dfac_device> m_dfac;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<adbmodem_device> m_adbmodem;
 	required_device<z80scc_device> m_scc;
 	required_device<ram_device> m_ram;
 	required_device<nscsi_bus_device> m_scsibus;
 	required_device<ncr53c96_device> m_ncr1;
 	required_device<dp83932c_device> m_sonic;
-
-	u8 m_mac[6];
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -103,22 +102,16 @@ private:
 	void mac_scc_2_w(offs_t offset, u16 data) { m_iosb->via_sync(); m_scc->dc_ab_w(offset, data >> 8); }
 
 	u8 ethernet_mac_r(offs_t offset);
+	u8 mac_prom(offs_t index) const;
 };
 
 void quadra800_state::machine_start()
 {
 	m_djmemc->set_ram_info(m_ram->pointer<u32>(), m_ram->size());
 
-	// MAC PROM is stored with a bit swizzle and must match one of 2
-	// Apple-assigned OUI blocks 00:05:02 or 08:00:07
-	const std::array<u8, 6> &MAC = m_sonic->get_mac();
-	m_mac[0] = bitswap<8>(0x08, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[1] = bitswap<8>(0x00, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[2] = bitswap<8>(0x07, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[3] = bitswap<8>(MAC[3], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[4] = bitswap<8>(MAC[4], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[5] = bitswap<8>(MAC[5], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_sonic->set_mac(&m_mac[0]);
+	u32 const num = machine().rand();
+	u8 const mac[6] = { 0x08, 0x00, 0x07, u8(num >> 16), u8(num >> 8), u8(num) };
+	m_sonic->set_mac(mac);
 }
 
 void quadra800_state::machine_reset()
@@ -129,11 +122,19 @@ void quadra800_state::init_macqd800()
 {
 }
 
+// MAC PROM is stored with a bit swizzle and must match one of 2
+// Apple-assigned OUI blocks 00:05:02 or 08:00:07
+u8 quadra800_state::mac_prom(offs_t index) const
+{
+	static constexpr u8 OUI[3] = { 0x08, 0x00, 0x07 };
+	return bitswap<8>((index < 3) ? OUI[index] : m_sonic->get_mac()[index], 0, 1, 2, 3, 4, 5, 6, 7);
+}
+
 u8 quadra800_state::ethernet_mac_r(offs_t offset)
 {
 	if (offset < 6)
 	{
-		return m_mac[offset];
+		return mac_prom(offset);
 	}
 	else if (offset == 7)
 	{
@@ -141,7 +142,7 @@ u8 quadra800_state::ethernet_mac_r(offs_t offset)
 
 		for (int i = 0; i < 6; i++)
 		{
-			xor_total ^= (u8)m_mac[i];
+			xor_total ^= mac_prom(i);
 		}
 
 		return xor_total ^ 0xff;
@@ -254,13 +255,15 @@ void quadra800_state::macqd800(machine_config &config)
 	ADBMODEM(config, m_adbmodem, C7M);
 	m_adbmodem->via_clock_callback().set(m_iosb, FUNC(iosb_device::cb1_w));
 	m_adbmodem->via_data_callback().set(m_iosb, FUNC(iosb_device::cb2_w));
-	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_adbmodem->irq_callback().set(m_iosb, FUNC(iosb_device::pb3_w));
 	m_iosb->write_cb2().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
 	config.set_perfect_quantum(m_maincpu);
 
-	MACADB(config, m_macadb, C15M);
-	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+	ADB_BUS(config, m_adbbus);
+	m_adbbus->out_adb_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 	/* internal ram */
 	RAM(config, m_ram);

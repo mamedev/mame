@@ -82,6 +82,7 @@ bool svi_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sectors[i].deleted = false;
 				sectors[i].bad_data_crc = false;
 				sectors[i].bad_addr_crc = false;
+				sectors[i].weak = false;
 				sectors[i].data = &sector_data[sector_offset];
 
 				/*auto const [err, actual] =*/ read(io, sectors[i].data, sector_size); // FIXME: check for errors and premature EOF

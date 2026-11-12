@@ -96,10 +96,10 @@ void cpzodiac_state::palette_init(palette_device &palette) const
 // NOTE: "speed test" has two lines cutoff at bottom
 uint32_t cpzodiac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u32 base_address = y * 152;
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x+= 4)
+		for(int x = cliprect.left(); x <= cliprect.right(); x+= 4)
 		{
 			const u32 x_address = base_address + (x >> 2);
 			for(int xi = 0; xi < 4; xi++)
@@ -134,7 +134,7 @@ void cpzodiac_state::main_map(address_map &map)
 	map(0xa000, 0xbfff).ram();
 	map(0xc000, 0xdfff).ram().share("vram"); // video?
 	map(0xe000, 0xe00f).rw("io", FUNC(te7750_device::read), FUNC(te7750_device::write));
-//	map(0xe016, 0xe017).ram(); SED1351F data/address lines, r/w?
+//  map(0xe016, 0xe017).ram(); SED1351F data/address lines, r/w?
 	map(0xe020, 0xe020).w("syt", FUNC(tc0140syt_device::master_port_w));
 	map(0xe021, 0xe021).rw("syt", FUNC(tc0140syt_device::master_comm_r), FUNC(tc0140syt_device::master_comm_w));
 }
@@ -253,7 +253,7 @@ void cpzodiac_state::cpzodiac(machine_config &config)
 
 	/* video hardware */
 	// TODO
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64, 32);
@@ -319,6 +319,6 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        SCREEN  COMPANY              FULLNAME                  FLAGS
-GAME( 1993, cpzodiac,  0,        cpzodiac, cpzodiac, cpzodiac_state, empty_init, ROT0,   "Taito Corporation", "Captain Zodiac (World)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1993, cpzodiacj, cpzodiac, cpzodiac, cpzodiac, cpzodiac_state, empty_init, ROT0,   "Taito Corporation", "Captain Zodiac (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT        SCREEN  COMPANY  FULLNAME                  FLAGS
+GAME( 1993, cpzodiac,  0,        cpzodiac, cpzodiac, cpzodiac_state, empty_init, ROT0,   "Taito", "Captain Zodiac (World)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME( 1993, cpzodiacj, cpzodiac, cpzodiac, cpzodiac, cpzodiac_state, empty_init, ROT0,   "Taito", "Captain Zodiac (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

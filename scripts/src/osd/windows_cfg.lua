@@ -43,6 +43,7 @@ if _OPTIONS["USE_SDL"]=="1" then
 		"USE_XINPUT=0",
 		"USE_SDL=1",
 		"USE_SDL_SOUND",
+		"USE_SDL_JOYSTICK",
 	}
 elseif _OPTIONS["USE_SDL3"]=="1" then
 	defines {
@@ -50,6 +51,7 @@ elseif _OPTIONS["USE_SDL3"]=="1" then
 		"USE_XINPUT=0",
 		"USE_SDL3=1",
 		"USE_SDL_SOUND",
+		"USE_SDL_JOYSTICK",
 	}
 else
 	defines {

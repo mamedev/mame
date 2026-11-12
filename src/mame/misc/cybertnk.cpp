@@ -317,11 +317,10 @@ void cybertnk_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	const pen_t *paldata = m_palette->pens();
 
-	int miny = cliprect.min_y;
-	int maxy = cliprect.max_y;
-	int minx = cliprect.min_x;
-	int maxx = cliprect.max_x;
-	uint16_t* dest;
+	int miny = cliprect.top();
+	int maxy = cliprect.bottom();
+	int minx = cliprect.left();
+	int maxx = cliprect.right();
 
 	/*
 
@@ -380,7 +379,7 @@ void cybertnk_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 			if ((yy>=miny) && (yy<=maxy))
 			{
-				dest = &bitmap.pix(yy, 0);
+				uint16_t *dest = &bitmap.pix(yy, 0);
 
 				int start,end,inc;
 
@@ -837,7 +836,7 @@ void cybertnk_state::cybertnk(machine_config &config)
 	/* video hardware */
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(32*8, 32*8);
@@ -845,7 +844,7 @@ void cybertnk_state::cybertnk(machine_config &config)
 	lscreen.set_screen_update(FUNC(cybertnk_state::screen_update_cybertnk_left));
 	lscreen.set_palette(m_palette);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(32*8, 32*8);
@@ -968,7 +967,6 @@ void cybertnk_state::init_cybertnk()
 		// is along the lines of 04 15 26 37 which is awkward to use
 		m_spr_gfx[x] = bitswap<32>(m_spr_gfx[x],  27,26,25,24,   19,18,17,16,  11,10,9,8,  3,2,1,0, 31,30,29,28,   23,22,21,20,   15,14,13,12,   7,6,5,4 );
 	}
-
 }
 
 } // anonymous namespace

@@ -400,7 +400,7 @@ void segajw_state::segajw(machine_config &config)
 	io1c.out_pg_callback().set(FUNC(segajw_state::coinlockout_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update("hd63484", FUNC(hd63484_device::update_screen));
@@ -414,6 +414,7 @@ void segajw_state::segajw(machine_config &config)
 
 	hd63484_device &hd63484(HD63484(config, "hd63484", 8000000));
 	hd63484.set_addrmap(0, &segajw_state::segajw_hd63484_map); // unknown clock
+	hd63484.set_auto_configure_screen(false);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();

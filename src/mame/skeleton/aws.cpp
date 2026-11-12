@@ -192,7 +192,7 @@ void aws_state::aws_base(machine_config &config)
 	m_pit->out_handler<2>().set(FUNC(aws_state::pit_out2_w));  // Timer interrupt
 
 	// video
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_size(720, 320);
 	screen.set_visarea(0, 719, 0, 319);

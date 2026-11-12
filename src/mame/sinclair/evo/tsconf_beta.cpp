@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "tsconf_beta.h"
 
+#include "formats/scl_dsk.h"
 #include "formats/trd_dsk.h"
 
 
@@ -17,6 +18,7 @@ void floppy_formats(format_registration &fr)
 	fr.add_mfm_containers();
 	fr.add_pc_formats();
 	fr.add(FLOPPY_TRD_FORMAT);
+	fr.add(FLOPPY_SCL_FORMAT);
 }
 
 void beta_disk_floppies(device_slot_interface &device)

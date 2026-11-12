@@ -33,6 +33,7 @@ TODO:
 
 #include "emupal.h"
 #include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -135,10 +136,9 @@ void tama_state::tama(machine_config &config)
 	m_maincpu->write_segs().set(FUNC(tama_state::lcd_segment_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1119, 1080);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_hh_e0c6200_lcd);
 
@@ -213,10 +213,9 @@ void tamaang_state::tamaang(machine_config &config)
 	m_maincpu->write_segs().set(FUNC(tamaang_state::lcd_segment_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1119, 1080);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_hh_e0c6200_lcd);
 
@@ -309,10 +308,9 @@ void digimon_state::digimon(machine_config &config)
 	m_maincpu->write_segs().set(FUNC(digimon_state::lcd_segment_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1113, 1080);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_hh_e0c6200_lcd);
 
@@ -391,7 +389,7 @@ void alienfev_state::alienfev(machine_config &config)
 	m_maincpu->write_r<4>().set("speaker", FUNC(speaker_sound_device::level_w)).bit(3);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(39, 16);
@@ -461,7 +459,7 @@ void venusdm_state::venusdm(machine_config &config)
 	m_maincpu->set_pixel_callback(FUNC(venusdm_state::pixel_callback));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32, 20);
@@ -542,10 +540,9 @@ void stackch_state::stackch(machine_config &config)
 	m_maincpu->write_segs().set(FUNC(stackch_state::lcd_segment_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(856, 1080);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_hh_e0c6200_lcd);
 

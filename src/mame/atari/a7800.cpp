@@ -1407,7 +1407,7 @@ void a7800_state::a7800_common(machine_config &config, uint32_t clock)
 	TIMER(config, "scantimer").configure_scanline(FUNC(a7800_state::interrupt), "screen", 0, 1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(m_maria, FUNC(atari_maria_device::screen_update));
 	m_screen->set_palette("palette");
 

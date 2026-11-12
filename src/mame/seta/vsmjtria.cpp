@@ -463,7 +463,7 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 	GFXDECODE(config, m_gfxdecode[0], "palette0", gfx_vsmjtria_main);
 	GFXDECODE(config, m_gfxdecode[1], "palette1", gfx_vsmjtria_sub);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	lscreen.set_size(64*8, 32*8);
@@ -471,7 +471,7 @@ void vsmjtria_state::vsmjtria(machine_config &config)
 	lscreen.set_screen_update(FUNC(vsmjtria_state::screen_update<0>));
 	lscreen.set_palette("palette0");
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	rscreen.set_size(64*8, 32*8);

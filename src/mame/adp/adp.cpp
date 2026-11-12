@@ -165,8 +165,8 @@ Quick Jack administration/service mode:
 #include "machine/msm6242.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
+#include "video/bt48x.h"
 #include "video/hd63484.h"
-#include "video/ramdac.h"
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -183,6 +183,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_duart(*this, "duart"),
 		m_acrtc(*this, "acrtc"),
+		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_nvram(*this, "nvram"),
 		m_in0(*this, "IN0")
@@ -204,7 +205,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68681_device> m_duart;
 	required_device<hd63484_device> m_acrtc;
-	required_device<palette_device> m_palette;
+	required_device<screen_device> m_screen;
+	required_device<device_palette_interface> m_palette;
 	required_device<nvram_device> m_nvram;
 	required_ioport m_in0;
 
@@ -226,7 +228,6 @@ private:
 	void fstation_mem(address_map &map) ATTR_COLD;
 	void funland_mem(address_map &map) ATTR_COLD;
 	void quickjac_mem(address_map &map) ATTR_COLD;
-	void ramdac_map(address_map &map) ATTR_COLD;
 	void skattv_mem(address_map &map) ATTR_COLD;
 	void skattva_mem(address_map &map) ATTR_COLD;
 };
@@ -340,9 +341,7 @@ void adp_state::funland_mem(address_map &map)
 	map(0x000000, 0x0fffff).rom();
 	map(0x400000, 0x40001f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write)).umask16(0x00ff);
 	map(0x800080, 0x800083).rw(m_acrtc, FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
-	map(0x800089, 0x800089).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x80008b, 0x80008b).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x80008d, 0x80008d).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x800088, 0x80008f).m(m_palette, FUNC(bt481_device::map)).umask16(0x00ff);
 	map(0x800100, 0x800101).portr(m_in0);
 	map(0x800140, 0x800143).rw("aysnd", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w)).umask16(0x00ff); //18b too
 	map(0x800180, 0x80019f).rw(m_duart, FUNC(mc68681_device::read), FUNC(mc68681_device::write)).umask16(0x00ff);
@@ -560,13 +559,13 @@ void adp_state::quickjac(machine_config &config)
 	MSM6242(config, "rtc", XTAL(32'768));
 	//rtc.out_int_handler().set(FUNC(adp_state::rtc_irq));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
-	screen.set_size(384, 280);
-	screen.set_visarea_full();
-	screen.set_screen_update("acrtc", FUNC(hd63484_device::update_screen));
-	screen.set_palette(m_palette);
+	SCREEN(config, m_screen);
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
+	m_screen->set_size(384, 280);
+	m_screen->set_visarea_full();
+	m_screen->set_screen_update("acrtc", FUNC(hd63484_device::update_screen));
+	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette, FUNC(adp_state::adp_palette), 0x10);
 
@@ -597,35 +596,31 @@ void adp_state::fashiong(machine_config &config)
 	m_acrtc->set_addrmap(0, &adp_state::fashiong_hd63484_map);
 }
 
-void adp_state::ramdac_map(address_map &map)
-{
-	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
-}
-
 void adp_state::funland(machine_config &config)
 {
 	quickjac(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::funland_mem);
 
-	PALETTE(config.replace(), m_palette, palette_device::BLACK, 0x100);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
-	ramdac.set_addrmap(0, &adp_state::ramdac_map);
+	BT481(config.replace(), m_palette);
 
 	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);
+	m_acrtc->set_auto_configure_screen(false);
 }
 
 void adp_state::fstation(machine_config &config)
 {
-	funland(config);
+	quickjac(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &adp_state::fstation_mem);
 
-	screen_device &screen(*subdevice<screen_device>("screen"));
-	screen.set_size(640, 480);
-	screen.set_visarea_full();
+	m_screen->set_size(640, 480);
+	m_screen->set_visarea_full();
 
-	m_palette->set_init(FUNC(adp_state::fstation_palette));
+	PALETTE(config.replace(), m_palette, FUNC(adp_state::fstation_palette), 0x100);
+
+	m_acrtc->set_addrmap(0, &adp_state::fstation_hd63484_map);
+	m_acrtc->set_auto_configure_screen(false);
 }
 
 
@@ -667,6 +662,16 @@ ROM_START( skattva )
 	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
 	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.1.u2", 0x00000, 0x20000, CRC(de6f275b) SHA1(0c396fa4d1975c8ccc4967d330b368c0697d2124) )
 	ROM_LOAD16_BYTE( "skat_tv_videoprom_t2.2.u5", 0x00001, 0x20000, CRC(af3e60f9) SHA1(c88976ea42cf29a092fdee18377b32ffe91e9f33) )
+ROM_END
+
+ROM_START( skattvs1 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "skat_tv_code_1_s1_05.09.1995.u2", 0x00000, 0x20000, CRC(06cc0e9f) SHA1(713fc15dfde9257fbe360803bb46481bf54dc644) )
+	ROM_LOAD16_BYTE( "skat_tv_code_2_s1_05.09.1995.u6", 0x00001, 0x20000, CRC(deef7b8c) SHA1(66c706c90d5d88722250db98799b3dbf26b722be) )
+
+	ROM_REGION16_BE( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "f1_i.u2", 0x00000, 0x20000, CRC(4869a889) SHA1(ad9f3fcdfd3630f9ad5b93a9d2738de9fc3514d3) )
+	ROM_LOAD16_BYTE( "f1_ii.u5", 0x00001, 0x20000, CRC(17681537) SHA1(133685854b2080aaa3d0cced0287bc454d1f3bfc) )
 ROM_END
 
 ROM_START( fashiong )
@@ -806,6 +811,7 @@ GAME( 1993, kkornf4,   0,        skattv,   skattv,   adp_state, empty_init, ROT0
 GAME( 1994, skattv,    0,        skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat TV",                           0 )
 GAME( 1994, trumpfas,  skattv,   skattv,   skattv,   adp_state, empty_init, ROT0, "ADP",     "Trumpf As",                         MACHINE_NOT_WORKING ) // throws FOUL error on startup
 GAME( 1995, skattva,   skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (version TS3)",             0 )
+GAME( 1995, skattvs1,  skattv,   skattva,  skattva,  adp_state, empty_init, ROT0, "ADP",     "Skat TV (S1)",                      0 )
 GAME( 1997, fashiong,  0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 1)",           0 )
 GAME( 1997, fashiong2, fashiong, fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Fashion Gambler (set 2)",           0 )
 GAME( 1998, sbsoli,    0,        fashiong, skattv,   adp_state, empty_init, ROT0, "ADP",     "Skat Bierskat Solitaire (F2)",      0 )

@@ -60,7 +60,7 @@ void nios2_device::device_start()
 	state_add<u32>(NIOS2_ZERO, "zero", []() { return 0; }).noshow();
 	state_add(NIOS2_AT, "at", m_gpr[1]);
 	for (int i = 2; i < 24; i++)
-		state_add(NIOS2_R2 + i - 2, util::string_format("r%d", i).c_str(), m_gpr[i]);
+		state_add(NIOS2_R2 + i - 2, util::string_format("r%d", i), m_gpr[i]);
 	state_add(NIOS2_ET, "et", m_gpr[24]);
 	state_add(NIOS2_BT, "bt", m_gpr[25]);
 	state_add(NIOS2_GP, "gp", m_gpr[26]);
@@ -314,13 +314,13 @@ void nios2_device::execute_run()
 				break;
 
 			case 0x02: // roli
-				m_gpr[BIT(inst, 17, 5)] = rotl_32(get_reg(BIT(inst, 27, 5)), BIT(inst, 6, 5));
+				m_gpr[BIT(inst, 17, 5)] = std::rotl(get_reg(BIT(inst, 27, 5)), BIT(inst, 6, 5));
 				m_pc += 4;
 				m_icount--;
 				break;
 
 			case 0x03: // rol
-				m_gpr[BIT(inst, 17, 5)] = rotl_32(get_reg(BIT(inst, 27, 5)), get_reg(BIT(inst, 22, 5)));
+				m_gpr[BIT(inst, 17, 5)] = std::rotl(get_reg(BIT(inst, 27, 5)), get_reg(BIT(inst, 22, 5)));
 				m_pc += 4;
 				m_icount--;
 				break;
@@ -350,7 +350,7 @@ void nios2_device::execute_run()
 				break;
 
 			case 0x0b: // ror
-				m_gpr[BIT(inst, 17, 5)] = rotr_32(get_reg(BIT(inst, 27, 5)), get_reg(BIT(inst, 22, 5)));
+				m_gpr[BIT(inst, 17, 5)] = std::rotr(get_reg(BIT(inst, 27, 5)), get_reg(BIT(inst, 22, 5)));
 				m_pc += 4;
 				m_icount--;
 				break;

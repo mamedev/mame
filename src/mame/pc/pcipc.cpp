@@ -60,17 +60,17 @@ public:
 	static const boot_state_info boot_state_infos_phoenix_ver40_rev6[];
 	static const boot_state_info boot_state_infos_award[];
 
-	void pcipc(machine_config &config);
-	void pcipcs7(machine_config &config);
-	void pcipctx(machine_config &config);
-	void pcinv3(machine_config &config);
-	void pciagp(machine_config &config);
-	void se440bx2(machine_config &config);
+	void pcipc(machine_config &config) ATTR_COLD;
+	void pcipcs7(machine_config &config) ATTR_COLD;
+	void pcipctx(machine_config &config) ATTR_COLD;
+	void pcinv3(machine_config &config) ATTR_COLD;
+	void pciagp(machine_config &config) ATTR_COLD;
+	void se440bx2(machine_config &config) ATTR_COLD;
 
 	pcipc_state(const machine_config &mconfig, device_type type, const char *tag);
 
 protected:
-	void x86_softlists(machine_config &config);
+	void x86_softlists(machine_config &config) ATTR_COLD;
 
 private:
 	void pcipc_map(address_map &map) ATTR_COLD;
@@ -563,12 +563,12 @@ void pcipc_state::winbond_superio_config(device_t *device)
 	fdc.gp25_gatea20().set(":pci:07.0", FUNC(i82371eb_isa_device::a20gate_w));
 	fdc.irq1().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq1_w));
 	fdc.irq8().set(":pci:07.0", FUNC(i82371eb_isa_device::pc_irq8n_w));
-//  fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
-//  fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
-//  fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
-//  fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
-//  fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
-//  fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
 void pcipc_state::ite_superio_config(device_t *device)
@@ -759,26 +759,24 @@ void pcipc_state::pciagp(machine_config &config)
 	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa3",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-#if 0
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
-	serport0.rxd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::rxd1_w));
-	serport0.dcd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndcd1_w));
-	serport0.dsr_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndsr1_w));
-	serport0.ri_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::nri1_w));
-	serport0.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts1_w));
+	serport0.rxd_handler().set("board4:w83977tf", FUNC(w83977tf_device::rxd1_w));
+	serport0.dcd_handler().set("board4:w83977tf", FUNC(w83977tf_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:w83977tf", FUNC(w83977tf_device::ndsr1_w));
+	serport0.ri_handler().set("board4:w83977tf", FUNC(w83977tf_device::nri1_w));
+	serport0.cts_handler().set("board4:w83977tf", FUNC(w83977tf_device::ncts1_w));
 
 	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
-	serport1.rxd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::rxd2_w));
-	serport1.dcd_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndcd2_w));
-	serport1.dsr_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ndsr2_w));
-	serport1.ri_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::nri2_w));
-	serport1.cts_handler().set("board4:w83977tf", FUNC(fdc37c93x_device::ncts2_w));
-#endif
+	serport1.rxd_handler().set("board4:w83977tf", FUNC(w83977tf_device::rxd2_w));
+	serport1.dcd_handler().set("board4:w83977tf", FUNC(w83977tf_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:w83977tf", FUNC(w83977tf_device::ndsr2_w));
+	serport1.ri_handler().set("board4:w83977tf", FUNC(w83977tf_device::nri2_w));
+	serport1.cts_handler().set("board4:w83977tf", FUNC(w83977tf_device::ncts2_w));
 
 	// FIXME: int mapping is unchecked for all slots
 	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, "riva128");
 
-	PCI_SLOT(config, "pci:1", pci_cards, 9,  0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:1", pci_cards,  9, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 12, 3, 0, 1, 2, nullptr);

@@ -45,7 +45,24 @@ public:
 	auto dma0_write_cb() { return m_dma_write[0].bind(); }
 	auto dma1_write_cb() { return m_dma_write[1].bind(); }
 
+	template <unsigned N> auto txd_handler() { return m_txd_handler[N].bind(); }
+	template <unsigned N> auto tc_handler() { return m_tc_handler[N].bind(); }
+
+	template <unsigned N> void dmarq_w(int state) { dmarq_state_w(N, state); }
+	template <unsigned N> void rxd_w(int state) { serial_rxd_w(N, state); }
+	template <unsigned N> void cts_w(int state)
+	{
+		const uint8_t level = state ? 1 : 0;
+		if (m_cts_state[N] == level)
+			return;
+		m_cts_state[N] = level;
+		if (!level)
+			serial_tx_enabled(N);
+	}
+
 	TIMER_CALLBACK_MEMBER(v25_timer_callback);
+	TIMER_CALLBACK_MEMBER(serial_tx_callback);
+	TIMER_CALLBACK_MEMBER(serial_rx_callback);
 
 protected:
 	// construction/destruction
@@ -120,6 +137,9 @@ private:
 	uint8_t   m_no_interrupt;
 	uint8_t   m_halted;
 	uint32_t  m_rep_params;
+	bool      m_io_retry;
+	bool      m_io_word_pending;
+	uint8_t   m_io_word_latch;
 
 	// timer related
 	uint16_t  m_TM0, m_MD0, m_TM1, m_MD1;
@@ -131,10 +151,24 @@ private:
 	uint8_t   m_scc[2];
 	uint8_t   m_brg[2];
 	uint8_t   m_sce[2];
+	uint8_t   m_txb[2];
+	uint8_t   m_rxb[2];
+	uint16_t  m_tx_shift[2];
+	uint8_t   m_tx_count[2];
+	bool      m_tx_pending[2];
+	uint16_t  m_rx_shift[2];
+	uint8_t   m_rx_count[2];
+	bool      m_rx_full[2];
+	uint8_t   m_rxd_state[2];
+	uint8_t   m_cts_state[2];
+	emu_timer *m_tx_timer[2];
+	emu_timer *m_rx_timer[2];
 
 	// DMA related
 	uint8_t   m_dmac[2];
 	uint8_t   m_dmam[2];
+	uint8_t   m_dmarq_state[2];
+	bool      m_dmarq_edge[2];
 	int8_t    m_dma_channel;
 	int8_t    m_last_dma_channel;
 
@@ -163,12 +197,16 @@ private:
 	devcb_read16::array<2> m_dma_read;
 	devcb_write16::array<2> m_dma_write;
 
+	devcb_write_line::array<2> m_txd_handler;
+	devcb_write_line::array<2> m_tc_handler;
+
 	int32_t   m_cur_cycles;
 	uint8_t   m_prefetch_size;
 	int32_t   m_prefetch_cycles;
 	int32_t   m_prefetch_count;
 	uint8_t   m_prefetch_reset;
 	uint32_t  m_chip_type;
+	bool      m_has_div_quirk;
 
 	uint32_t  m_prefix_base;    /* base address of the latest prefix segment */
 	uint8_t   m_seg_prefix;     /* prefix segment indicator */
@@ -224,6 +262,20 @@ private:
 	void exic1_w(uint8_t d);
 	uint8_t exic2_r();
 	void exic2_w(uint8_t d);
+	void dmarq_state_w(unsigned n, int state);
+	bool dma_requested(unsigned n) const;
+	attotime serial_bit_time(unsigned n) const;
+	unsigned serial_data_bits(unsigned n) const;
+	void serial_rxd_w(unsigned n, int state);
+	void serial_load_tx(unsigned n);
+	void serial_tx_enabled(unsigned n);
+	uint8_t rxb_r(unsigned n);
+	void txb_w(unsigned n, uint8_t d);
+	void scm_w(unsigned n, uint8_t d);
+	uint8_t rxb0_r();
+	void txb0_w(uint8_t d);
+	uint8_t rxb1_r();
+	void txb1_w(uint8_t d);
 	uint8_t srms0_r();
 	void srms0_w(uint8_t d);
 	uint8_t stms0_r();
@@ -266,7 +318,9 @@ private:
 	void tm1_w(uint16_t d);
 	uint16_t md1_r();
 	void md1_w(uint16_t d);
+	uint8_t tmc0_r();
 	void tmc0_w(uint8_t d);
+	uint8_t tmc1_r();
 	void tmc1_w(uint8_t d);
 	uint8_t tmms_r(offs_t a);
 	void tmms_w(offs_t a, uint8_t d);
@@ -306,6 +360,8 @@ private:
 	uint16_t v25_read_word(unsigned a);
 	void v25_write_byte(unsigned a, uint8_t d);
 	void v25_write_word(unsigned a, uint16_t d);
+	uint16_t io_read_word(offs_t a);
+	void io_write_word(offs_t a, uint16_t v);
 
 	uint8_t start_rep();
 	void cont_rep();
@@ -313,6 +369,15 @@ private:
 	void do_repc(uint8_t next);
 	void do_repne(uint8_t next);
 	void do_repe(uint8_t next);
+	bool has_v30_quirks() const { return false; }
+	void decimal_adjust(bool subtract);
+	void ascii_adjust(bool subtract);
+	void packed_decimal(bool subtract, bool store);
+	void bitfield_flags(unsigned position, unsigned length, bool extract);
+	void mul_flags(uint32_t low, bool word);
+	void divu_flags(uint32_t remainder, uint32_t divisor, bool word, bool overflow);
+	void div_flags(int32_t quotient, bool word, bool overflow);
+	void shift_rotate(uint32_t value, uint8_t modrm, uint8_t count, bool word, bool count_one);
 
 	void i_add_br8();
 	void i_add_wr16();

@@ -1316,7 +1316,7 @@ void mindset_state::mindset(machine_config &config)
 	// Should be NTSC actually... we'll see
 	// Pretty sure the pixel clock is the 14.x one, the 12MHz one would only allow 630 pixels
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(100));
 	m_screen->set_size(751, 480);

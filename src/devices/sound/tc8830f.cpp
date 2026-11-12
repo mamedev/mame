@@ -46,7 +46,7 @@ tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, d
 void tc8830f_device::device_start()
 {
 	// assumes it can make an address mask with m_mem.length() - 1
-	assert(!(m_mem.length() & (m_mem.length() - 1)));
+	assert(std::has_single_bit(m_mem.length()));
 
 	// create the stream
 	m_stream = stream_alloc(0, 1, clock() / 0x10);

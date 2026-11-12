@@ -1180,7 +1180,7 @@ void tomy_princ_state::tomy_princ(machine_config &config)
 	m_maincpu->port<0xa>().read().set(FUNC(tomy_princ_state::pdra_r));
 	m_maincpu->reload_timer<1>().tin_hz(16_MHz_XTAL); // Guessed. Waits at startup for 0x7530 underflows with reload = 0x37f
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_screen_update(FUNC(tomy_princ_state::screen_update));

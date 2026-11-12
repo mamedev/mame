@@ -410,7 +410,7 @@ void maverick_device::compute_video_mode()
 	LOGMASKED(LOG_CRTC, "New video mode: %d x %d at %d pixel clock, rowbytes %d\n", m_hres, m_vres, m_pclock, m_rowbytes);
 
 	rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-	m_maverick_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock).as_attoseconds());
+	m_maverick_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pclock));
 }
 
 u16 maverick_device::read_external_signals()
@@ -472,7 +472,7 @@ void nubus_xceed30hr_device::card_map(address_map &map)
 // **** Color 30HR using the SE/30 internal display
 void nubus_xceed30hr_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_xceed30hr_device::screen_update));
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 
@@ -614,7 +614,7 @@ const tiny_rom_entry *nubus_xceedmc30_device::device_rom_region() const
 
 void nubus_xceedmc30_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_xceedmc30_device::screen_update));
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 

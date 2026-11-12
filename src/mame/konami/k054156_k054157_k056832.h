@@ -88,8 +88,8 @@ public:
 	void b_w(offs_t offset, u8 data);
 	void mark_plane_dirty(int num);
 	void mark_all_tilemaps_dirty();
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, u32 flags, u32 priority);
-	void tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, u32 flags, u32 priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int num, u32 flags, u32 priority, u8 priority_mask = 0xff);
+	void tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int num, u32 flags, u32 priority, u8 priority_mask = 0xff);
 	void tilemap_draw_dj(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority);
 	void set_layer_association(int status);
 	int get_layer_association() { return m_layer_association; }
@@ -191,7 +191,7 @@ private:
 	int rom_read_b(int offset, int blksize, int blksize2, int zerosec);
 
 	template<class BitmapClass>
-	void tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority);
+	void tilemap_draw_common(screen_device &screen, BitmapClass &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority, u8 priority_mask);
 	int update_linemap(int page);
 
 	void create_gfx();

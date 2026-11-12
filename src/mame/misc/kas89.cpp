@@ -760,7 +760,7 @@ void kas89_state::kas89(machine_config &config)
 	v9938.set_screen_ntsc("screen");
 	v9938.set_vram_size(VDP_MEM);
 	v9938.int_cb().set_inputline("maincpu", 0);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -489,7 +489,7 @@ void mc68000_state::mc68000(machine_config &config)
 
 	RAM(config, RAM_TAG).set_default_size("128K").set_extra_options("512K");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 250);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

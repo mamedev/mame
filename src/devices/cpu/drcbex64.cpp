@@ -377,7 +377,7 @@ class drcbe_x64 : public drcbe_interface
 
 public:
 	// construction/destruction
-	drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits);
+	drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits, uint32_t max_sequence_length);
 	virtual ~drcbe_x64();
 
 	// required overrides
@@ -385,6 +385,9 @@ public:
 	virtual int execute(uml::code_handle &entry) override;
 	virtual void generate(drcuml_block &block, const uml::instruction *instlist, u32 numinst) override;
 	virtual bool hash_exists(u32 mode, u32 pc) const noexcept override;
+	virtual void hash_invalidate_range(u32 pcstart, u32 pcend) noexcept override;
+	virtual hash_codeptr hash_get_codeptr(u32 mode, u32 pc) const noexcept override;
+	virtual bool hash_set_codeptr(u32 mode, u32 pc, hash_codeptr code) noexcept override;
 	virtual void get_info(drcbe_info &info) const noexcept override;
 	virtual bool logging() const noexcept override { return bool(m_log); }
 
@@ -1015,9 +1018,17 @@ void drcbe_x64::emit_memaccess_setup(Assembler &a, const memory_accessors &acces
 //  drcbe_x64 - constructor
 //-------------------------------------------------
 
-drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits)
+drcbe_x64::drcbe_x64(
+		drcuml_state &drcuml,
+		device_t &device,
+		drc_cache &cache,
+		u32 flags,
+		int modes,
+		int addrbits,
+		int ignorebits,
+		uint32_t max_sequence_length)
 	: drcbe_interface(drcuml, cache, device)
-	, m_hash(cache, modes, addrbits, ignorebits)
+	, m_hash(cache, modes, addrbits, ignorebits, max_sequence_length)
 	, m_map(cache, 0xaaaaaaaa5555)
 	, m_log_asmjit(nullptr)
 	, m_lzcnt(false)
@@ -1184,6 +1195,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	a.cmp(eax, gpd(REG_PARAM3));
 	a.mov(gpd(REG_PARAM3), 0xff);
 	a.cmovne(gpd(REG_PARAM1), gpd(REG_PARAM3));
+	a.mov(MABS(&m_state.fmod), gpb_lo(REG_PARAM1));
 	a.mov(MABS(&m_near.nominalfmod), gpb_lo(REG_PARAM1));
 
 	a.call(gpq(REG_PARAM2));
@@ -1426,6 +1438,50 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 n
 bool drcbe_x64::hash_exists(u32 mode, u32 pc) const noexcept
 {
 	return m_hash.code_exists(mode, pc);
+}
+
+
+//-------------------------------------------------
+//  hash_invalidate_range - invalidate all hash
+//  entries in the given PC range
+//-------------------------------------------------
+
+void drcbe_x64::hash_invalidate_range(u32 pcstart, u32 pcend) noexcept
+{
+	m_hash.invalidate_range(pcstart, pcend);
+}
+
+
+//-------------------------------------------------
+//  hash_get_codeptr/hash_set_codeptr - direct hash
+//  access, letting a front-end point an entry back
+//  at code it generated earlier
+//-------------------------------------------------
+
+drcbe_x64::hash_codeptr drcbe_x64::hash_get_codeptr(u32 mode, u32 pc) const noexcept
+{
+	if (m_hash.code_exists(mode, pc))
+		return hash_codeptr{ m_hash.get_codeptr(mode, pc), m_cache.flush_count() };
+	else
+		return hash_codeptr();
+}
+
+bool drcbe_x64::hash_set_codeptr(u32 mode, u32 pc, hash_codeptr code) noexcept
+{
+	if (UNEXPECTED((m_cache.flush_count() != code.aux) || !m_cache.contains_transient_pointer(code.ptr)))
+	{
+		if (!code.ptr)
+			osd_printf_error("drcbe_x64(%s): Attempt to connect %u:%x to null code pointer.\n", m_device.tag(), mode, pc);
+		else if (m_cache.flush_count() != code.aux)
+			osd_printf_error("drcbe_x64(%s): Attempt to connect %u:%x to code pointer from previous generation.\n", m_device.tag(), mode, pc);
+		else
+			osd_printf_error("drcbe_x64(%s): Attempt to connect %u:%x to code pointer outside transient cache.\n", m_device.tag(), mode, pc);
+		std::fflush(stdout);
+		std::fflush(stderr);
+		std::abort();
+	}
+
+	return m_hash.set_codeptr(mode, pc, code.ptr);
 }
 
 
@@ -1899,7 +1955,7 @@ void drcbe_x64::op_handle(Assembler &a, const instruction &inst)
 	assert(inst.param(0).is_code_handle());
 
 	// make a label for documentation
-	Label handle = a.new_named_label(inst.param(0).handle().string());
+	Label handle = a.new_named_label(inst.param(0).handle().string().c_str());
 	a.bind(handle);
 
 	// emit a jump around the stack adjust in case code falls through here
@@ -6579,9 +6635,10 @@ std::unique_ptr<drcbe_interface> make_drcbe_x64(
 		u32 flags,
 		int modes,
 		int addrbits,
-		int ignorebits)
+		int ignorebits,
+		uint32_t max_sequence_length)
 {
-	return std::unique_ptr<drcbe_interface>(new drcbe_x64(drcuml, device, cache, flags, modes, addrbits, ignorebits));
+	return std::unique_ptr<drcbe_interface>(new drcbe_x64(drcuml, device, cache, flags, modes, addrbits, ignorebits, max_sequence_length));
 }
 
 } // namespace drc

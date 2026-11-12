@@ -506,7 +506,7 @@ void sprint8_state::sprint8(machine_config &config)
 	TIMER(config, "input_timer").configure_periodic(FUNC(sprint8_state::input_callback), attotime::from_hz(60));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(512, 261);
 	m_screen->set_visarea(0, 495, 0, 231);

@@ -50,8 +50,8 @@ public:
 		m_blitter_command(0)
 	{ }
 
-	void glass(machine_config &config);
-	void glass_ds5002fp(machine_config &config);
+	void glass(machine_config &config) ATTR_COLD;
+	void glass_ds5002fp(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -281,13 +281,13 @@ uint32_t glass_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 void glass_state::shareram_w(offs_t offset, uint8_t data)
 {
 	// why isn't there address map functionality for this?
-	reinterpret_cast<uint8_t *>(m_shareram.target())[BYTE_XOR_BE(offset)] = data;
+	util::big_endian_cast<uint8_t>(m_shareram.target())[offset] = data;
 }
 
 uint8_t glass_state::shareram_r(offs_t offset)
 {
 	// why isn't there address map functionality for this?
-	return reinterpret_cast<uint8_t const *>(m_shareram.target())[BYTE_XOR_BE(offset)];
+	return util::big_endian_cast<uint8_t const>(m_shareram.target())[offset];
 }
 
 
@@ -525,7 +525,7 @@ void glass_state::glass(machine_config &config)
 	m_outlatch->q_out_cb<4>().set_nop(); // Sound Muting (if bit 0 == 1, sound output stream = 0)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57.42); // see note in gaelco.cpp
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*16, 32*16);

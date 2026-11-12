@@ -546,7 +546,7 @@ void skimaxx_state::skimaxx(machine_config &config)
 	m_tms->set_shiftreg_in_callback(FUNC(skimaxx_state::to_shiftreg));
 	m_tms->set_shiftreg_out_callback(FUNC(skimaxx_state::from_shiftreg));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 //  screen.set_raw(40000000/4, 156*4, 0, 100*4, 328, 0, 300); // TODO - Wrong but TMS overrides it anyway
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));

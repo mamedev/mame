@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Gaelco / Covielsa "Loto-Play" bezel plaque.
+
+The outputs are named after the physical slot, clockwise from the green one
+at twelve o'clock, because the two boards that use this artwork do not wire
+the ring the same way round.  Each driver maps its own pins onto them.
+-->
+<mamelayout version="2">
+
+	<element name="plaque">
+		<image><data><![CDATA[<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 96">
+			<rect x="2.25" y="2.25" width="95.5" height="91.5" rx="10.75" ry="10.75"
+			      fill="#0d0b0d" stroke="#d6171f" stroke-width="4.5" />
+		</svg>]]></data></image>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.22" green="0.22" blue="0.22" /></disk>
+		<disk state="1"><color red="1.00" green="1.00" blue="1.00" /></disk>
+	</element>
+
+	<element name="legend">
+		<text string="PARTIDA"><bounds x="0" y="0" width="48" height="7" /></text>
+		<text string="EXTRA"><bounds x="0" y="8" width="48" height="7" /></text>
+		<text string="CON LUZ"><bounds x="0" y="16" width="48" height="7" /></text>
+		<text string="VERDE"><bounds x="0" y="24" width="48" height="7" /></text>
+	</element>
+
+	<group name="redleds">
+		<element name="led1" ref="led"><bounds x="70.08" y="21.42" width="6.5" height="6.5" /></element>
+		<element name="led2" ref="led"><bounds x="79.75" y="44.75" width="6.5" height="6.5" /></element>
+		<element name="led3" ref="led"><bounds x="70.08" y="68.08" width="6.5" height="6.5" /></element>
+		<element name="led4" ref="led"><bounds x="46.75" y="77.75" width="6.5" height="6.5" /></element>
+		<element name="led5" ref="led"><bounds x="23.42" y="68.08" width="6.5" height="6.5" /></element>
+		<element name="led6" ref="led"><bounds x="13.75" y="44.75" width="6.5" height="6.5" /></element>
+		<element name="led7" ref="led"><bounds x="23.42" y="21.42" width="6.5" height="6.5" /></element>
+	</group>
+
+	<view name="LED Roulette">
+		<bounds left="0" top="0" right="100" bottom="96" />
+
+		<element ref="plaque"><bounds x="0" y="0" width="100" height="96" /></element>
+
+		<element ref="legend">
+			<bounds x="26" y="32" width="48" height="31" />
+			<color red="0.90" green="0.90" blue="0.88" />
+		</element>
+
+		<group ref="redleds"><color red="1.00" green="0.16" blue="0.12" /></group>
+
+		<element name="led0" ref="led">
+			<bounds x="46.75" y="11.75" width="6.5" height="6.5" />
+			<color red="0.22" green="1.00" blue="0.30" />
+		</element>
+	</view>
+
+</mamelayout>

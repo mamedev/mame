@@ -233,7 +233,7 @@ void victory_state::victory(machine_config &config)
 	pio2.in_pb_callback().set_ioport("UNUSED");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK | VIDEO_ALWAYS_UPDATE);
 	/* using the standard Exidy video parameters for now, needs to be confirmed */
 	m_screen->set_raw(VICTORY_PIXEL_CLOCK, VICTORY_HTOTAL, VICTORY_HBEND, VICTORY_HBSTART, VICTORY_VTOTAL, VICTORY_VBEND, VICTORY_VBSTART);

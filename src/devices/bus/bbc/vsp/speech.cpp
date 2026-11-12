@@ -106,7 +106,7 @@ DEVICE_IMAGE_LOAD_MEMBER(bbc_speech_device::load_phrom)
 	else
 		size = image.get_software_region_length("rom");
 
-	if (size < 0x1000 || size > 0x4000 || (size & (size - 1)) != 0)
+	if (size < 0x1000 || size > 0x4000 || !std::has_single_bit(size))
 		return std::make_pair(image_error::INVALIDLENGTH, "Invalid PHROM size");
 
 	uint8_t *vsm = memregion("vsm")->base();

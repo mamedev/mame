@@ -374,7 +374,7 @@ void hazl1420_state::hazl1420(machine_config &config)
 	m_crtc->lbre_callback().set(FUNC(hazl1420_state::crtc_lbre_w));
 	m_crtc->vblank_callback().set(FUNC(hazl1420_state::crtc_vblank_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update(FUNC(hazl1420_state::screen_update));
 
 	SPEAKER(config, "mono").front_center();

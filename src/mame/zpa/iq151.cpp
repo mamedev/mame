@@ -52,6 +52,8 @@ ToDo:
 #include "machine/timer.h"
 #include "sound/spkrdev.h"
 
+#include "formats/csw_cas.h"
+
 // cartridge slot
 #include "bus/iq151/iq151.h"
 #include "bus/iq151/rom.h"
@@ -85,7 +87,7 @@ public:
 		, m_keyboard(*this, "X%X", 0U)
 	{ }
 
-	void iq151(machine_config &config);
+	void iq151(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
 
@@ -154,7 +156,7 @@ uint8_t iq151_state::ppi_portc_r()
 	{
 		// cassette read
 		data |= ((m_cassette_clk & 1) << 5);
-		data |= (m_cassette->input() > 0.00 ? 0x80 : 0x00);
+		data |= (m_cassette->input() > 0.03 ? 0x80 : 0x00);
 	}
 	else
 	{
@@ -400,7 +402,7 @@ void iq151_state::iq151(machine_config &config)
 	m_maincpu->in_inta_func().set("pic8259", FUNC(pic8259_device::acknowledge));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(iq151_state::screen_update));
@@ -424,7 +426,8 @@ void iq151_state::iq151(machine_config &config)
 	ppi.out_pc_callback().set(FUNC(iq151_state::ppi_portc_w));
 
 	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED);
+	m_cassette->set_formats(csw_cassette_formats);
+	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 	m_cassette->set_interface("iq151_cass");
 

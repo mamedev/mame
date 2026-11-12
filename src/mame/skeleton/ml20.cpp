@@ -264,7 +264,7 @@ void ml20_state::ml20(machine_config &config)
 	MSM6242(config, "rtc", 32.768_kHz_XTAL);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(6*16+1, 18);

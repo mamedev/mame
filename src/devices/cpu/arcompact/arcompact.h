@@ -19,6 +19,9 @@ public:
 	arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_default_vector_base(uint32_t address) { m_default_vector_base = address & 0xfffffc00; }
+	void set_dsp(bool enabled) { m_has_dsp = enabled; }
+	void set_is_leapster_cpu(bool is_leapster) { m_is_leapster_cpu = is_leapster; }
+	void set_memory_access_alignment(uint32_t word, uint32_t dword) { m_word_alignment_mask = word; m_dword_alignment_mask = dword; }
 
 protected:
 	// device-level overrides
@@ -334,9 +337,9 @@ private:
 	static uint32_t handleop32_ASRS_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_ADDSDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 	static uint32_t handleop32_SUBSDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
-	static uint32_t handleop32_UNKNOWN_05_0c_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
-	static uint32_t handleop32_UNKNOWN_05_10_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
-	static uint32_t handleop32_UNKNOWN_05_14_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MULDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MACDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
+	static uint32_t handleop32_MSUBDW_do_op(arcompact_device &o, uint32_t src1, uint32_t src2, bool set_flags);
 
 	// arcompact_execute_ops_05_2f_sop.cpp
 	static uint32_t handleop32_NORM_do_op(arcompact_device &o, uint32_t src, bool set_flags);
@@ -505,32 +508,19 @@ private:
 
 	uint32_t READ32(uint32_t address)
 	{
-		if (address & 0x3)
-			fatalerror("%08x: attempted unaligned READ32 on address %08x", m_pc, address);
-
-		return m_program->read_dword(address);
+		return m_program->read_dword(address & m_dword_alignment_mask);
 	}
-
 	void WRITE32(uint32_t address, uint32_t data)
 	{
-		if (address & 0x3)
-			fatalerror("%08x: attempted unaligned WRITE32 on address %08x", m_pc, address);
-
-		m_program->write_dword(address, data);
+		m_program->write_dword(address & m_dword_alignment_mask, data);
 	}
 	uint16_t READ16(uint32_t address)
 	{
-		if (address & 0x1)
-			fatalerror("%08x: attempted unaligned READ16 on address %08x", m_pc, address);
-
-		return m_program->read_word(address);
+		return m_program->read_word(address & m_word_alignment_mask);
 	}
 	void WRITE16(uint32_t address, uint16_t data)
 	{
-		if (address & 0x1)
-			fatalerror("%08x: attempted unaligned WRITE16 on address %08x", m_pc, address);
-
-		m_program->write_word(address, data);
+		m_program->write_word(address & m_word_alignment_mask, data);
 	}
 	uint8_t READ8(uint32_t address)
 	{
@@ -546,7 +536,8 @@ private:
 
 	// arcompact_helper.ipp
 	bool check_condition(uint8_t condition);
-	void do_flags_overflow(uint32_t result, uint32_t b, uint32_t c);
+	void do_flags_overflow_add(uint32_t result, uint32_t b, uint32_t c);
+	void do_flags_overflow_sub(uint32_t result, uint32_t b, uint32_t c);
 	void do_flags_add(uint32_t result, uint32_t b, uint32_t c);
 	void do_flags_sub(uint32_t result, uint32_t b, uint32_t c);
 	void do_flags_nz(uint32_t result);
@@ -560,8 +551,19 @@ private:
 	uint32_t handleop32_general_SOP_group(uint32_t op, ophandler32_sop ophandler);
 	void arcompact_handle_ld_helper(uint32_t op, uint8_t areg, uint8_t breg, uint32_t s, uint8_t X, uint8_t Z, uint8_t a);
 
-	// config
-	uint32_t m_default_vector_base;
+	uint32_t dsp_aux_r(offs_t offset);
+	void dsp_aux_w(offs_t offset, uint32_t data);
+	uint32_t read_reg(unsigned reg);
+	void write_reg(unsigned reg, uint32_t data);
+	uint32_t xy_read(unsigned reg);
+	void xy_write(unsigned reg, uint32_t data);
+	void xy_update(unsigned index, uint32_t modifier);
+	uint32_t dsp_multiply(uint32_t src1, uint32_t src2, int operation, bool set_flags);
+
+	uint32_t m_xy_aux[0x20];
+	uint32_t m_xy_mem[2][2][0x400];
+	uint32_t m_macmode;
+	int64_t m_mac_acc[2];
 
 	// internal state
 	uint32_t m_pc;
@@ -571,7 +573,7 @@ private:
 	bool m_delaylinks;
 	uint32_t m_delayjump;
 	bool m_allow_loop_check;
-	bool m_irq_pending;
+	uint32_t m_pending_ints;
 
 //  f  e  d  c| b  a  9  8| 7  6  5  4| 3  2  1  0
 //  -  -  -  L| Z  N  C  V| U DE AE A2|A1 E2 E1  H
@@ -590,6 +592,13 @@ private:
 	uint32_t m_INTVECTORBASE;
 	uint32_t m_AUX_IRQ_LV12;
 	uint32_t m_AUX_IRQ_LEV;
+
+	// config
+	bool m_has_dsp;
+	bool m_is_leapster_cpu;
+	uint32_t m_default_vector_base;
+	uint32_t m_dword_alignment_mask;
+	uint32_t m_word_alignment_mask;
 };
 
 DECLARE_DEVICE_TYPE(ARCA5, arcompact_device)

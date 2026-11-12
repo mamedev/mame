@@ -53,7 +53,6 @@ private:
 	int32_t m_roz_rombank = 0;
 	tilemap_t *m_ult_936_tilemap = nullptr;
 	uint16_t m_clip = 0;
-	uint8_t m_last_alpha_tile_mix_code = 0;
 
 	uint8_t m_sound_ctrl = 0;
 	uint8_t m_sound_nmi_clk = 0;

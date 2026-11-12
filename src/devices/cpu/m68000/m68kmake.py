@@ -24,28 +24,60 @@ cc_table_up = [ "T", "F", "HI", "LS", "CC", "CS", "NE", "EQ", "VC", "VS", "PL", 
 cc_table_dn = [ "t", "f", "hi", "ls", "cc", "cs", "ne", "eq", "vc", "vs", "pl", "mi", "ge", "lt", "gt", "le" ]
 
 
-# Probably incorrect starting with the 030 and further
+# These 68030 values use the instruction-cache, no-overlap fetch-EA times from
+# the MC68030 User's Manual, Table 11-6.1.  Full-format extensions and the
+# non-fetch EA timing classes still need instruction-specific handling.
+#
 #
 # The C code was going out-of-bounds, or more precisely
 # out-of-initialization, on the Coldfire, explaining the
 # zeroes.
 #
-#                   000           010           020           030           040        FSCPU32      Coldfire
+#                   000           070           010           020           030           040        FSCPU32      Coldfire
 ea_cycle_table = {
     'none' : [[ 0,  0,  0], [ 0,  0,  0], [ 0,  0,  0], [ 0,  0,  0], [ 0,  0,  0], [ 0,  0,  0], [ 0,  0,  0], [ 0,  0,  0]],
-    'ai'   : [[ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  4], [ 0,  4,  4], [ 0,  4,  4], [ 0,  4,  4], [ 0,  0,  0]],
-    'pi'   : [[ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  4], [ 0,  4,  4], [ 0,  4,  4], [ 0,  4,  4], [ 0,  0,  0]],
-    'pi7'  : [[ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  4], [ 0,  4,  4], [ 0,  4,  4], [ 0,  4,  4], [ 0,  0,  0]],
-    'pd'   : [[ 0,  6, 10], [ 0,  6, 10], [ 0,  6, 10], [ 0,  5,  5], [ 0,  5,  5], [ 0,  5,  5], [ 0,  5,  5], [ 0,  0,  0]],
-    'pd7'  : [[ 0,  6, 10], [ 0,  6, 10], [ 0,  6, 10], [ 0,  5,  5], [ 0,  5,  5], [ 0,  5,  5], [ 0,  5,  5], [ 0,  0,  0]],
-    'di'   : [[ 0,  8, 12], [ 0,  8, 12], [ 0,  8, 12], [ 0,  5,  5], [ 0,  5,  5], [ 0,  5,  5], [ 0,  5,  5], [ 0,  0,  0]],
-    'ix'   : [[ 0, 10, 14], [ 0, 10, 14], [ 0, 10, 14], [ 0,  7,  7], [ 0,  7,  7], [ 0,  7,  7], [ 0,  7,  7], [ 0,  0,  0]],
+    'ai'   : [[ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  4], [ 0,  3,  3], [ 0,  4,  4], [ 0,  4,  4], [ 0,  0,  0]],
+    'pi'   : [[ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  4], [ 0,  3,  3], [ 0,  4,  4], [ 0,  4,  4], [ 0,  0,  0]],
+    'pi7'  : [[ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  4], [ 0,  3,  3], [ 0,  4,  4], [ 0,  4,  4], [ 0,  0,  0]],
+    'pd'   : [[ 0,  6, 10], [ 0,  6, 10], [ 0,  6, 10], [ 0,  5,  5], [ 0,  4,  4], [ 0,  5,  5], [ 0,  5,  5], [ 0,  0,  0]],
+    'pd7'  : [[ 0,  6, 10], [ 0,  6, 10], [ 0,  6, 10], [ 0,  5,  5], [ 0,  4,  4], [ 0,  5,  5], [ 0,  5,  5], [ 0,  0,  0]],
+    'di'   : [[ 0,  8, 12], [ 0,  8, 12], [ 0,  8, 12], [ 0,  5,  5], [ 0,  4,  4], [ 0,  5,  5], [ 0,  5,  5], [ 0,  0,  0]],
+    'ix'   : [[ 0, 10, 14], [ 0, 10, 14], [ 0, 10, 14], [ 0,  7,  7], [ 0,  6,  6], [ 0,  7,  7], [ 0,  7,  7], [ 0,  0,  0]],
     'aw'   : [[ 0,  8, 12], [ 0,  8, 12], [ 0,  8, 12], [ 0,  4,  4], [ 0,  4,  4], [ 0,  4,  4], [ 0,  4,  4], [ 0,  0,  0]],
     'al'   : [[ 0, 12, 16], [ 0, 12, 16], [ 0, 12, 16], [ 0,  4,  4], [ 0,  4,  4], [ 0,  4,  4], [ 0,  4,  4], [ 0,  0,  0]],
-    'pcdi' : [[ 0,  8, 12], [ 0,  8, 12], [ 0,  8, 12], [ 0,  5,  5], [ 0,  5,  5], [ 0,  5,  5], [ 0,  5,  5], [ 0,  0,  0]],
-    'pcix' : [[ 0, 10, 14], [ 0, 10, 14], [ 0, 10, 14], [ 0,  7,  7], [ 0,  7,  7], [ 0,  7,  7], [ 0,  7,  7], [ 0,  0,  0]],
+    'pcdi' : [[ 0,  8, 12], [ 0,  8, 12], [ 0,  8, 12], [ 0,  5,  5], [ 0,  4,  4], [ 0,  5,  5], [ 0,  5,  5], [ 0,  0,  0]],
+    'pcix' : [[ 0, 10, 14], [ 0, 10, 14], [ 0, 10, 14], [ 0,  7,  7], [ 0,  6,  6], [ 0,  7,  7], [ 0,  7,  7], [ 0,  0,  0]],
     'i'    : [[ 0,  4,  8], [ 0,  4,  8], [ 0,  4,  8], [ 0,  2,  4], [ 0,  2,  4], [ 0,  2,  4], [ 0,  2,  4], [ 0,  0,  0]],
 }
+
+
+# From MC68040 User's Manual, Table 10-6
+#
+# These timings are simplified to EA calculate + operand fetch + execute for now.
+m68040_shift_cycle_table = {
+    'asl'  : { 'direct': [4, 5], 'memory': 5, 'ix': 9 },
+    'asr'  : { 'direct': [3, 4], 'memory': 4, 'ix': 8 },
+    'lsl'  : { 'direct': [3, 4], 'memory': 4, 'ix': 8 },
+    'lsr'  : { 'direct': [3, 4], 'memory': 4, 'ix': 8 },
+    'rol'  : { 'direct': [4, 5], 'memory': 5, 'ix': 9 },
+    'ror'  : { 'direct': [4, 5], 'memory': 5, 'ix': 9 },
+    'roxl' : { 'direct': [6, 7], 'memory': 4, 'ix': 8 },
+    'roxr' : { 'direct': [6, 7], 'memory': 4, 'ix': 8 },
+}
+
+
+def m68040_integer_cycles(op, ea_mode):
+    timing = m68040_shift_cycle_table.get(op.name)
+    if timing is None:
+        return None
+
+    if ea_mode == 'none':
+        # Bit 5 selects the register count form; the other form has an
+        # immediate count.
+        return timing['direct'][1 if (op.op_value & 0x0020) else 0]
+
+    return timing['ix'] if ea_mode == 'ix' else timing['memory']
+
 
 jmp_jsr_cycle_table = { 'none': 0, 'ai': 4, 'pi': 0, 'pi7': 0, 'pd': 0, 'pd7': 0, 'di': 6, 'ix': 10, 'aw': 6, 'al': 8, 'pcdi': 6, 'pcix': 10, 'i': 0 }
 lea_cycle_table = { 'none': 0, 'ai': 4, 'pi': 0, 'pi7': 0, 'pd': 0, 'pd7': 0, 'di': 8, 'ix': 12, 'aw': 8, 'al': 12, 'pcdi': 8, 'pcix': 12, 'i': 0 }
@@ -197,6 +229,11 @@ class OpcodeHandler:
                 self.cycles[i] = op.cycles[i] + movem_cycle_table[ea_mode]
             else:
                 self.cycles[i] = op.cycles[i] + ea_cycle_table[ea_mode][i][size_order]
+
+            if i == CPU_040:
+                cycles_040 = m68040_integer_cycles(op, ea_mode)
+                if cycles_040 is not None:
+                    self.cycles[i] = cycles_040
         self.op_value = op.op_value | ea_info_table[ea_mode][2]
         self.op_mask  = op.op_mask  | ea_info_table[ea_mode][1]
         self.function_name = 'x%04x_%s%s%s_' % (self.op_value, op.name, '' if op.size == '.' else '_' + op.size, '' if ea_mode == 'none' else '_' + ea_mode)

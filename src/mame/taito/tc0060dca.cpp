@@ -24,13 +24,15 @@ tc0060dca_device::tc0060dca_device(const machine_config &mconfig, const char *ta
 void tc0060dca_device::volume1_w(u8 data)
 {
 	m_stream->update();
-	m_gain[0] = m_atten_table[data];
+	m_gain[0] = m_atten_table[m_volume[0]];
+	m_volume[0] = data;
 }
 
 void tc0060dca_device::volume2_w(u8 data)
 {
 	m_stream->update();
-	m_gain[1] = m_atten_table[data];
+	m_gain[1] = m_atten_table[m_volume[1]];
+	m_volume[1] = data;
 }
 
 void tc0060dca_device::device_start()
@@ -41,7 +43,9 @@ void tc0060dca_device::device_start()
 		m_atten_table[x] = 1.0 / (1.0 + exp(-10 * ((x / 256.0) - 0.6)));
 
 	m_gain[0] = m_gain[1] = m_atten_table[0xff];
+	m_volume[0] = m_volume[1] = 0xff;
 	save_item(NAME(m_gain));
+	save_item(NAME(m_volume));
 }
 
 void tc0060dca_device::sound_stream_update(sound_stream &stream)

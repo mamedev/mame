@@ -2,7 +2,7 @@
 // io_context.cpp
 // ~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,25 +21,15 @@
 #include "asio/bind_executor.hpp"
 #include "asio/dispatch.hpp"
 #include "asio/post.hpp"
+#include "asio/steady_timer.hpp"
 #include "asio/thread.hpp"
 #include "unit_test.hpp"
-
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-# include "asio/deadline_timer.hpp"
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
-# include "asio/steady_timer.hpp"
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
 
 using namespace asio;
 namespace bindns = std;
 
-#if defined(ASIO_HAS_BOOST_DATE_TIME)
-typedef deadline_timer timer;
-namespace chronons = boost::posix_time;
-#else // defined(ASIO_HAS_BOOST_DATE_TIME)
 typedef steady_timer timer;
 namespace chronons = asio::chrono;
-#endif // defined(ASIO_HAS_BOOST_DATE_TIME)
 
 void increment(int* count)
 {
@@ -278,13 +268,55 @@ class test_service : public asio::io_context::service
 {
 public:
   static asio::io_context::id id;
+
   test_service(asio::io_context& s)
-    : asio::io_context::service(s) {}
+    : asio::io_context::service(s)
+  {
+  }
+
 private:
-  virtual void shutdown_service() {}
+  void shutdown() override
+  {
+  }
 };
 
 asio::io_context::id test_service::id;
+
+class test_context_service : public asio::execution_context::service
+{
+public:
+  static asio::execution_context::id id;
+
+  test_context_service(asio::execution_context& c, int value = 0)
+    : asio::execution_context::service(c),
+      value_(value)
+  {
+  }
+
+  int get_value() const
+  {
+    return value_;
+  }
+
+private:
+  void shutdown() override
+  {
+  }
+
+  int value_;
+};
+
+asio::execution_context::id test_context_service::id;
+
+class test_context_service_maker :
+  public asio::execution_context::service_maker
+{
+public:
+  void make(asio::execution_context& ctx) const override
+  {
+    (void)asio::make_service<test_context_service>(ctx, 42);
+  }
+};
 
 void io_context_service_test()
 {
@@ -342,6 +374,14 @@ void io_context_service_test()
   delete svc4;
 
   ASIO_CHECK(!asio::has_service<test_service>(ioc3));
+
+  // Initial service registration.
+
+  asio::io_context ioc4{test_context_service_maker{}};
+
+  ASIO_CHECK(asio::has_service<test_context_service>(ioc4));
+  ASIO_CHECK(asio::use_service<test_context_service>(ioc4).get_value()
+      == 42);
 }
 
 void io_context_executor_query_test()
@@ -387,6 +427,11 @@ void io_context_executor_query_test()
       asio::query(ioc.get_executor(),
         asio::execution::mapping)
       == asio::execution::mapping.thread);
+
+  ASIO_CHECK(
+      asio::query(ioc.get_executor(),
+        asio::execution::inline_exception_handling)
+      == asio::execution::inline_exception_handling.capture);
 
   ASIO_CHECK(
       asio::query(ioc.get_executor(),
@@ -556,6 +601,106 @@ void io_context_executor_execute_test()
   ASIO_CHECK(count == 1);
 }
 
+template <typename T>
+class custom_allocator
+{
+public:
+  using value_type = T;
+
+  custom_allocator(int* live_count, int* total_count)
+    : live_count_(live_count),
+      total_count_(total_count)
+  {
+  }
+
+  template <typename U>
+  custom_allocator(const custom_allocator<U>& other) noexcept
+    : live_count_(other.live_count_),
+      total_count_(other.total_count_)
+  {
+  }
+
+  bool operator==(const custom_allocator& other) const noexcept
+  {
+    return &live_count_ == &other.live_count_ &&
+      &total_count_ == &other.total_count_;;
+  }
+
+  bool operator!=(const custom_allocator& other) const noexcept
+  {
+    return &live_count_ != &other.live_count_ ||
+      &total_count_ != &other.total_count_;
+  }
+
+  T* allocate(std::size_t n) const
+  {
+    ++(*live_count_);
+    ++(*total_count_);
+    return static_cast<T*>(::operator new(sizeof(T) * n));
+  }
+
+  void deallocate(T* p, std::size_t /*n*/) const
+  {
+    --(*live_count_);
+    ::operator delete(p);
+  }
+
+private:
+  template <typename> friend class custom_allocator;
+
+  int* live_count_;
+  int* total_count_;
+};
+
+void io_context_allocator_test()
+{
+  int live_count;
+  int total_count;
+
+  {
+    live_count = 0;
+    total_count = 0;
+    io_context ioc1(std::allocator_arg,
+        custom_allocator<int>(&live_count, &total_count));
+    (void)ioc1;
+
+    ASIO_CHECK(live_count > 0);
+    ASIO_CHECK(total_count > 0);
+  }
+
+  ASIO_CHECK(live_count == 0);
+  ASIO_CHECK(total_count > 0);
+
+  {
+    live_count = 0;
+    total_count = 0;
+    io_context ioc2(std::allocator_arg,
+        custom_allocator<int>(&live_count, &total_count), 1);
+    (void)ioc2;
+
+    ASIO_CHECK(live_count > 0);
+    ASIO_CHECK(total_count > 0);
+  }
+
+  ASIO_CHECK(live_count == 0);
+  ASIO_CHECK(total_count > 0);
+
+  {
+    live_count = 0;
+    total_count = 0;
+    io_context ioc3(std::allocator_arg,
+        custom_allocator<int>(&live_count, &total_count),
+        asio::config_from_string(""));
+    (void)ioc3;
+
+    ASIO_CHECK(live_count > 0);
+    ASIO_CHECK(total_count > 0);
+  }
+
+  ASIO_CHECK(live_count == 0);
+  ASIO_CHECK(total_count > 0);
+}
+
 ASIO_TEST_SUITE
 (
   "io_context",
@@ -563,4 +708,5 @@ ASIO_TEST_SUITE
   ASIO_TEST_CASE(io_context_service_test)
   ASIO_TEST_CASE(io_context_executor_query_test)
   ASIO_TEST_CASE(io_context_executor_execute_test)
+  ASIO_TEST_CASE(io_context_allocator_test)
 )

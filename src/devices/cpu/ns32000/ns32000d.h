@@ -9,7 +9,12 @@
 class ns32000_disassembler : public util::disasm_interface
 {
 public:
-	ns32000_disassembler() = default;
+	// CPU model.  ns32032 selects the external-MMU (NS32082) Format-14 register
+	// names used by the NS32008/016/032/332; ns32532 selects the NS32532's
+	// on-chip MMU register set and enables its CINV instruction.
+	enum class model { ns32032, ns32532 };
+
+	ns32000_disassembler(model variant = model::ns32032);
 	virtual ~ns32000_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override { return 1; }
@@ -47,6 +52,9 @@ protected:
 	void decode(addr_mode *mode, offs_t pc, data_buffer const &opcodes, unsigned &bytes);
 	std::string reglist(u8 imm);
 	std::string config(u8 imm);
+
+private:
+	model const m_model;
 };
 
 #endif // MAME_CPU_NS32000_NS32000D_H

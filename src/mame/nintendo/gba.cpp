@@ -14,7 +14,6 @@
 #include "gba.h"
 
 #include "bus/gba/rom.h"
-#include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/gb.h"
 
@@ -139,19 +138,28 @@ static const XTAL timer_clks[4] = { XTAL(16'777'216), XTAL(16'777'216) / 64, XTA
 
 void gba_state::request_irq(uint32_t int_type)
 {
-	// set flag for later recovery
+	// IF latches every request; IE and IME only gate the CPU's IRQ line
 	IF_SET(int_type);
+	update_irq();
+}
 
-	// is this specific interrupt enabled?
-	int_type &= IE;
-	if (int_type != 0)
+void gba_state::update_irq()
+{
+	const bool pending = (IE & IF & 0x3fff) != 0;
+
+	// HALT ends on any enabled request, whatever IME and CPSR.I say
+	if (pending && m_halted)
 	{
-		// master enable?
-		if (IME & 1)
-		{
-			m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
-			m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
-		}
+		m_halted = false;
+		m_maincpu->resume(SUSPEND_REASON_HALT);
+	}
+
+	// the IRQ line is a level: it stays asserted until the handler acknowledges IF
+	const bool irq = pending && BIT(IME, 0);
+	if (irq != m_irq_asserted)
+	{
+		m_irq_asserted = irq;
+		m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -441,7 +449,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 			if( ( m_timer_regs[1] & 0x0000ffff ) == 0 )
 			{
 				m_timer_regs[1] |= m_timer_reload[1];
-				if( ( m_timer_regs[1] & 0x400000 ) && ( IME != 0 ) )
+				if( m_timer_regs[1] & 0x400000 )
 				{
 					request_irq(tmr_ints[1]);
 				}
@@ -451,7 +459,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 					if( ( m_timer_regs[2] & 0x0000ffff ) == 0 )
 					{
 						m_timer_regs[2] |= m_timer_reload[2];
-						if( ( m_timer_regs[2] & 0x400000 ) && ( IME != 0 ) )
+						if( m_timer_regs[2] & 0x400000 )
 						{
 							request_irq(tmr_ints[2]);
 						}
@@ -461,7 +469,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 							if( ( m_timer_regs[3] & 0x0000ffff ) == 0 )
 							{
 								m_timer_regs[3] |= m_timer_reload[3];
-								if( ( m_timer_regs[3] & 0x400000 ) && ( IME != 0 ) )
+								if( m_timer_regs[3] & 0x400000 )
 								{
 									request_irq(tmr_ints[3]);
 								}
@@ -479,7 +487,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 			if( ( m_timer_regs[2] & 0x0000ffff ) == 0 )
 			{
 				m_timer_regs[2] |= m_timer_reload[2];
-				if( ( m_timer_regs[2] & 0x400000 ) && ( IME != 0 ) )
+				if( m_timer_regs[2] & 0x400000 )
 				{
 					request_irq(tmr_ints[2]);
 				}
@@ -489,7 +497,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 					if( ( m_timer_regs[3] & 0x0000ffff ) == 0 )
 					{
 						m_timer_regs[3] |= m_timer_reload[3];
-						if( ( m_timer_regs[3] & 0x400000 ) && ( IME != 0 ) )
+						if( m_timer_regs[3] & 0x400000 )
 						{
 							request_irq(tmr_ints[3]);
 						}
@@ -505,7 +513,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 			if( ( m_timer_regs[3] & 0x0000ffff ) == 0 )
 			{
 				m_timer_regs[3] |= m_timer_reload[3];
-				if( ( m_timer_regs[3] & 0x400000 ) && ( IME != 0 ) )
+				if( m_timer_regs[3] & 0x400000 )
 				{
 					request_irq(tmr_ints[3]);
 				}
@@ -515,17 +523,10 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 	}
 
 	// are we supposed to IRQ?
-	if ((m_timer_regs[tmr] & 0x400000) && (IME != 0))
+	if (m_timer_regs[tmr] & 0x400000)
 	{
 		request_irq(tmr_ints[tmr]);
 	}
-}
-
-TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
-{
-	request_irq(IF);
-
-	m_irq_timer->adjust(attotime::never);
 }
 
 static const char *const reg_names[] = {
@@ -749,6 +750,7 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	uint8_t soundcnt_x = SOUNDCNT_X;
 	uint16_t siocnt = SIOCNT;
 	uint16_t dmachcnt[4] = { DMACNT_H(0), DMACNT_H(1), DMACNT_H(2), DMACNT_H(3) };
+	const uint16_t old_if = IF;
 	static const float dac_gain_table[2] = { 0.5f, 1.0f };
 	static const float psg_gain_table[4] = { 0.25f, 0.5f, 1.0f, 1.0f/* prohibited? */ };
 
@@ -1111,40 +1113,26 @@ void gba_state::gba_io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			}
 			break;
 		case 0x0200/4:
-			if( ACCESSING_BITS_0_15 )
+			if (ACCESSING_BITS_16_31)
 			{
-#if 0
-				if (IE & IF)
-				{
-					request_irq(IF);
-				}
-#endif
+				// IF is write-1-to-acknowledge: COMBINE_DATA stored the written bits, so rebuild it from the old value
+				IF_RESET(0xffff);
+				IF_SET(old_if & ~((data & mem_mask) >> 16));
 			}
-			if( ACCESSING_BITS_16_31 )
-			{
-				IF_RESET(( data & mem_mask ) >> 16);
-
-				// if we still have interrupts, yank the IRQ line again
-				if (IF)
-				{
-					m_irq_timer->adjust(m_maincpu->clocks_to_attotime(120));
-				}
-			}
+			update_irq();
 			break;
 		case 0x0208/4:
-			if( ACCESSING_BITS_0_15 )
-			{
-				if (IF)
-				{
-					m_irq_timer->adjust(attotime::zero);
-				}
-			}
+			update_irq();
 			break;
 		case 0x0300/4:
-			if( ACCESSING_BITS_8_15 )
+			if (ACCESSING_BITS_8_15)
 			{
-				// power down commanded, halt the CPU
-				m_maincpu->spin_until_interrupt();
+				// HALT (and STOP, treated the same) waits for (IE & IF) != 0, so it is a no-op when one is already pending
+				if (!m_halted && !(IE & IF & 0x3fff))
+				{
+					m_halted = true;
+					m_maincpu->suspend(SUSPEND_REASON_HALT, true);
+				}
 			}
 			break;
 	}
@@ -1163,33 +1151,68 @@ uint32_t gba_cons_state::gba_bios_r(offs_t offset, uint32_t mem_mask)
 
 	if (m_maincpu->pc() >= 0x4000)
 	{
-		//printf("GBA protection: blocking PC=%x\n", m_maincpu->pc());
-		return 0;
+		// The BIOS can only be read while executing from it; other reads return the most recently
+		// fetched BIOS opcode as per GBATEK.
+		return m_maincpu->fetch_shadow();
 	}
 
-	return rom[offset & 0x3fff];
+	return rom[offset];
 }
 
-uint32_t gba_state::gba_10000000_r(offs_t offset, uint32_t mem_mask)
+// Reads from unused address space return the most recently prefetched opcode.
+// Justice League Chronicles and The Pinball of the Dead both do null pointer
+// reads and work by accident.
+uint32_t gba_state::gba_open_bus_r(offs_t offset, uint32_t mem_mask)
 {
 	auto &mspace = m_maincpu->space(AS_PROGRAM);
-	uint32_t data;
-	uint32_t pc = m_maincpu->state_int(arm7_cpu_device::ARM7_PC);
-	if (pc >= 0x10000000)
+	const uint32_t pc = m_maincpu->pc();
+
+	// don't recurse if we're somehow executing from unused space
+	if ((pc >= 0x10000000) || ((pc >= 0x4000) && (pc < 0x02000000)))
 	{
 		return 0;
 	}
-	uint32_t cpsr = m_maincpu->state_int(arm7_cpu_device::ARM7_CPSR);
-	if (T_IS_SET( cpsr))
+
+	uint32_t data;
+	if (T_IS_SET(m_maincpu->state_int(arm7_cpu_device::ARM7_CPSR)))
 	{
-		data = mspace.read_dword(pc + 8);
+		// Thumb: the two halves depend on where the code is and how it's aligned
+		switch (pc >> 24)
+		{
+			case 0x00: // BIOS
+			case 0x07: // OAM
+				if (pc & 2)
+				{
+					data = mspace.read_word(pc + 2) | (mspace.read_word(pc + 4) << 16);
+				}
+				else
+				{
+					data = mspace.read_word(pc + 4) | (mspace.read_word(pc + 6) << 16);
+				}
+				break;
+
+			case 0x03: // IWRAM: the other half is the previous prefetch, usually [$+2]
+				if (pc & 2)
+				{
+					data = mspace.read_word(pc + 2) | (mspace.read_word(pc + 4) << 16);
+				}
+				else
+				{
+					data = mspace.read_word(pc + 4) | (mspace.read_word(pc + 2) << 16);
+				}
+				break;
+
+			default: // EWRAM, palette, VRAM, cartridge ROM
+				data = mspace.read_word(pc + 4);
+				data |= data << 16;
+				break;
+		}
 	}
 	else
 	{
-		uint16_t insn = mspace.read_word(pc + 4);
-		data = (insn << 16) | (insn << 0);
+		data = mspace.read_dword(pc + 8);
 	}
-	logerror("%s: unmapped program memory read from %08X = %08X & %08X\n", machine().describe_context( ), 0x10000000 + (offset << 2), data, mem_mask);
+	logerror("%s: unmapped program memory read = %08X & %08X\n", machine().describe_context(), data, mem_mask);
 	return data;
 }
 
@@ -1233,8 +1256,8 @@ void gba_state::dma_vblank_callback(int state)
 void gba_state::gba_map(address_map &map)
 {
 	map.unmap_value_high(); // for "Fruit Mura no Doubutsu Tachi" and "Classic NES Series"
-	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000); // External RAM (16 bit)
-	map(0x03000000, 0x03007fff).ram().mirror(0xff8000); // Internal RAM (32 bit)
+	map(0x02000000, 0x0203ffff).ram().mirror(0xfc0000).share("ewram"); // External RAM (16 bit)
+	map(0x03000000, 0x03007fff).ram().mirror(0xff8000).share("iwram"); // Internal RAM (32 bit)
 	map(0x04000000, 0x0400005f).rw("lcd", FUNC(gba_lcd_device::video_r), FUNC(gba_lcd_device::video_w));
 	map(0x04000060, 0x040003ff).rw(FUNC(gba_state::gba_io_r), FUNC(gba_state::gba_io_w));
 	map(0x04000400, 0x04ffffff).noprw();                                         // Not used
@@ -1243,14 +1266,15 @@ void gba_state::gba_map(address_map &map)
 	map(0x06018000, 0x0601ffff).mirror(0x00fe0000).rw("lcd", FUNC(gba_lcd_device::gba_vram_r), FUNC(gba_lcd_device::gba_vram_w));  // VRAM
 	map(0x07000000, 0x070003ff).mirror(0x00fffc00).rw("lcd", FUNC(gba_lcd_device::gba_oam_r), FUNC(gba_lcd_device::gba_oam_w));    // OAM
 
-	map(0x10000000, 0xffffffff).r(FUNC(gba_state::gba_10000000_r)); // for "Justice League Chronicles" (game bug)
+	map(0x10000000, 0xffffffff).r(FUNC(gba_state::gba_open_bus_r));
 }
 
 void gba_cons_state::gba_cons_map(address_map &map)
 {
 	gba_map(map);
 
-	map(0x00000000, 0x00003fff).rom().mirror(0x01ffc000).r(FUNC(gba_cons_state::gba_bios_r));
+	map(0x00000000, 0x00003fff).rom().r(FUNC(gba_cons_state::gba_bios_r));
+	map(0x00004000, 0x01ffffff).r(FUNC(gba_cons_state::gba_open_bus_r));
 	//map(0x08000000, 0x0cffffff)  // cart ROM + mirrors, mapped here at machine_start if a cart is present
 }
 
@@ -1300,6 +1324,14 @@ void gba_state::machine_reset()
 	RCNT_SET(0x8000);
 	JOYSTAT_SET(0x0002);
 
+	if (m_halted)
+	{
+		m_halted = false;
+		m_maincpu->resume(SUSPEND_REASON_HALT);
+	}
+	m_irq_asserted = false;
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
+
 	m_dma_timer[0]->adjust(attotime::never);
 	m_dma_timer[1]->adjust(attotime::never, 1);
 	m_dma_timer[2]->adjust(attotime::never, 2);
@@ -1322,6 +1354,10 @@ void gba_state::machine_reset()
 
 void gba_state::machine_start()
 {
+	// the recompiler accesses the work RAM in place
+	m_maincpu->arm7drc_add_fastram(0x02000000, 0x0203ffff, false, memshare("ewram")->ptr());
+	m_maincpu->arm7drc_add_fastram(0x03000000, 0x03007fff, false, memshare("iwram")->ptr());
+
 	/* and one for each DMA channel */
 	m_dma_timer[0] = timer_alloc(FUNC(gba_state::dma_complete), this);
 	m_dma_timer[1] = timer_alloc(FUNC(gba_state::dma_complete), this);
@@ -1342,11 +1378,9 @@ void gba_state::machine_start()
 	m_tmr_timer[2]->adjust(attotime::never, 2);
 	m_tmr_timer[3]->adjust(attotime::never, 3);
 
-	/* and an IRQ handling timer */
-	m_irq_timer = timer_alloc(FUNC(gba_state::handle_irq), this);
-	m_irq_timer->adjust(attotime::never);
-
 	save_item(NAME(m_regs));
+	save_item(NAME(m_halted));
+	save_item(NAME(m_irq_asserted));
 	save_item(NAME(m_dma_src));
 	save_item(NAME(m_dma_dst));
 	save_item(NAME(m_dma_cnt));
@@ -1477,6 +1511,7 @@ void gba_cons_state::gbadv_cons(machine_config &config)
 	gbadv(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &gba_cons_state::gba_cons_map);
+	m_maincpu->set_fetch_shadow(0x00000000, 0x00003fff);     // the BIOS protection returns the last opcode fetched there
 
 	GBA_CART_SLOT(config, m_cart, gba_cart, nullptr);
 	SOFTWARE_LIST(config, "cart_list").set_original("gba");

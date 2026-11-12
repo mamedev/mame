@@ -151,9 +151,9 @@ u8 t250_sasi_host_device::hconfg_r()
 	// like hget does for data bytes.  Also synthesized for SWALLOW_STATUS
 	// when we're feeding back the SS_GOOD reply to a swallowed mode-set.
 	if ((m_sasi_phase == SASI_PASSTHROUGH &&
-	     (ctrl & nscsi_device_interface::S_REQ) &&
-	     (ctrl & nscsi_device_interface::S_INP)) ||
-	    (m_sasi_phase == SASI_SWALLOW_STATUS && m_sasi_synth_req))
+		 (ctrl & nscsi_device_interface::S_REQ) &&
+		 (ctrl & nscsi_device_interface::S_INP)) ||
+		(m_sasi_phase == SASI_SWALLOW_STATUS && m_sasi_synth_req))
 		d |= 0x10;
 	return d;
 }

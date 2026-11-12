@@ -515,7 +515,7 @@ void vpoker_state::vpoker(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 464-1, 0, 240-1);  // 512x256 total
@@ -543,7 +543,7 @@ void vpoker_state::fiveaces(machine_config &config)
 	vpoker(config);
 
 	// video hardware
-	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config.replace(), "screen"));
 	screen.set_refresh_hz(60);
 	screen.screen_vblank().set(FUNC(vpoker_state::firq_coin_line));
 	screen.set_size(512, 256);

@@ -448,7 +448,7 @@ void ssrj_state::ssrj(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(ssrj_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -493,4 +493,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1985, ssrj, 0, ssrj,  ssrj, ssrj_state, empty_init, ROT90, "Taito Corporation", "Super Speed Race Junior (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ssrj, 0, ssrj,  ssrj, ssrj_state, empty_init, ROT90, "Taito", "Super Speed Race Junior (Japan)", MACHINE_WRONG_COLORS | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

@@ -13,7 +13,22 @@
 #ifdef LOG_OUTPUT_STREAM
 #define LOG_OUTPUT_FUNC [] (auto &&... args) { util::stream_format((LOG_OUTPUT_STREAM), std::forward<decltype(args)>(args)...); }
 #else
-#define LOG_OUTPUT_FUNC logerror
+
+namespace emu::detail
+{
+	template <typename Self, typename Format, typename... Args>
+	inline void dispatch_logerror(Self &&self, Format &&fmt, Args &&... args)
+	{
+		if constexpr (requires { self.logerror(std::forward<Format>(fmt), std::forward<Args>(args)...); })
+			self.logerror(std::forward<Format>(fmt), std::forward<Args>(args)...);
+		else if constexpr (requires { self.device().logerror(std::forward<Format>(fmt), std::forward<Args>(args)...); })
+			self.device().logerror(std::forward<Format>(fmt), std::forward<Args>(args)...);
+		else
+			static_assert(std::is_void_v<Self>, "dispatch_logerror requires logerror() or device().logerror()");
+	}
+}
+
+#define LOG_OUTPUT_FUNC [this] (auto &&... args) { emu::detail::dispatch_logerror(*this, std::forward<decltype(args)>(args)...); }
 #endif
 #endif
 

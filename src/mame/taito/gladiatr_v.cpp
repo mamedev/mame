@@ -247,29 +247,24 @@ u32 ppking_state::screen_update_ppking(screen_device &screen, bitmap_ind16 &bitm
 
 	/* the fg layer just selects the upper palette bank on underlying pixels */
 	{
-		int sx = cliprect.min_x;
-		int sy = cliprect.min_y;
-
 		m_fg_tilemap->pixmap();
 		bitmap_ind8 &flagsbitmap = m_fg_tilemap->flagsmap();
 
-		while (sy <= cliprect.max_y)
+		int const sx = cliprect.left();
+		for (int sy = cliprect.top(); sy <= cliprect.bottom(); sy++)
 		{
-			int x = sx;
-			int y = (sy + m_fg_scrolly) & 0x1ff;
+			int const y = (sy + m_fg_scrolly) & 0x1ff;
 
-			uint16_t *dest = &bitmap.pix(sy, sx);
-			while (x <= cliprect.max_x)
+			auto const *const flags = &flagsbitmap.pix(y);
+			auto *const dest = &bitmap.pix(sy);
+			for (int x = sx; x <= cliprect.right(); x++)
 			{
-				if (flagsbitmap.pix(y, x) & TILEMAP_PIXEL_LAYER0)
+				if (flags[x] & TILEMAP_PIXEL_LAYER0)
 				{
-					*dest += 512;
+					dest[x] += 512;
 				}
-				x++;
-				dest++;
-			} /* next x */
-			sy++;
-		} /* next y */
+			}
+		}
 	}
 	return 0;
 }

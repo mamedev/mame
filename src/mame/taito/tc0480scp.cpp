@@ -633,8 +633,8 @@ void tc0480scp_device::bg01_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 		int y_index;
 
 		u16 screen_width = 512; //cliprect.width();
-		u16 min_y = cliprect.min_y;
-		u16 max_y = cliprect.max_y;
+		u16 min_y = cliprect.top();
+		u16 max_y = cliprect.bottom();
 
 		int width_mask = 0x1ff;
 		if (m_dblwidth)
@@ -750,8 +750,8 @@ void tc0480scp_device::bg23_draw(screen_device &screen, bitmap_ind16 &bitmap, co
 	int flipscreen = m_pri_reg & 0x40;
 
 	u16 screen_width = 512; //cliprect.width();
-	u16 min_y = cliprect.min_y;
-	u16 max_y = cliprect.max_y;
+	u16 min_y = cliprect.top();
+	u16 max_y = cliprect.bottom();
 
 	int width_mask = 0x1ff;
 	if (m_dblwidth)

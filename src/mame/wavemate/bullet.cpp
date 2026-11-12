@@ -50,20 +50,33 @@ Notes:
 
     TODO:
 
-    - memory banking is broken
     - z80dart wait/ready
     - IMI 7710 Winchester controller
         chdman createhd -o imi7710.chd -chs 350,3,10 -ss 1024
     - revision E model
+    - revision F boot PROM is not dumped. sr70x.u8 is the earlier part and polls
+      port 0x19 for the FDC interrupt/data request lines, which is the SCSI data
+      port on revision F, so the machine never gets past the boot loader.
+
+*/
+
+/*
+
+    Drive 0 defaults to an 80 track drive, which is what the CP/M 3.0 disks in
+    the software list need. cpm22 is a 40 track disk and has to be booted with
+    -flop1 cpm22 -u55:0 525dd, otherwise the format loader places the image on
+    the even tracks only and the BIOS fails to seek past track 0.
 
 */
 
 #include "emu.h"
 #include "bullet.h"
 
+#include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "bus/scsi/scsihd.h"
-#include "softlist.h"
+#include "machine/nscsi_bus.h"
+
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -213,33 +226,24 @@ void bullet_state::exdsk_w(uint8_t data)
 
 	if (m_exdsk_sw)
 	{
-		// drive select
-		m_floppy = nullptr;
-
-		switch (data & 0x07)
-		{
-		// 5.25"
-		case 0: m_floppy = m_floppy0->get_device(); break;
-		case 1: m_floppy = m_floppy1->get_device(); break;
-		case 2: m_floppy = m_floppy2->get_device(); break;
-		case 3: m_floppy = m_floppy3->get_device(); break;
-		// 8"
-		case 4: m_floppy = m_floppy4->get_device(); break;
-		case 5: m_floppy = m_floppy5->get_device(); break;
-		case 6: m_floppy = m_floppy6->get_device(); break;
-		case 7: m_floppy = m_floppy7->get_device(); break;
-		}
+		// drive select, 0-3 are 5.25" and 4-7 are 8"
+		m_floppy = m_floppies[data & 0x07]->get_device();
 
 		m_fdc->set_floppy(m_floppy);
 	}
 
-	if (m_floppy)
+	// side select and the spindle motor line are bussed, so they reach the drives that aren't selected too
+	for (int i = 0; i < 8; i++)
 	{
-		// side select
-		m_floppy->ss_w(BIT(data, 4));
+		floppy_image_device *floppy = m_floppies[i] ? m_floppies[i]->get_device() : nullptr;
 
-		// floppy motor
-		m_floppy->mon_w(BIT(data, 5));
+		if (floppy)
+		{
+			floppy->ss_w(BIT(data, 4));
+
+			// only the 5.25" drives have a switched spindle, the 8" ones run continuously
+			floppy->mon_w((i < 4) ? BIT(data, 5) : 0);
+		}
 	}
 }
 
@@ -463,35 +467,23 @@ void bulletf_state::xfdc_w(uint8_t data)
 
 	*/
 
-	// drive select
-	m_floppy = nullptr;
-
-	switch (data & 0x0f)
-	{
-	// 5.25"
-	case 0: m_floppy = m_floppy0->get_device(); break;
-	case 1: m_floppy = m_floppy1->get_device(); break;
-	case 2: m_floppy = m_floppy2->get_device(); break;
-	case 3: m_floppy = m_floppy3->get_device(); break;
-	// 8"
-	case 4: m_floppy = m_floppy4->get_device(); break;
-	case 5: m_floppy = m_floppy5->get_device(); break;
-	case 6: m_floppy = m_floppy6->get_device(); break;
-	case 7: m_floppy = m_floppy7->get_device(); break;
-	// 3.5"
-	case 8: m_floppy = m_floppy8->get_device(); break;
-	case 9: m_floppy = m_floppy9->get_device(); break;
-	}
+	// drive select, 0-3 are 5.25", 4-7 are 8" and 8-9 are 3.5"
+	m_floppy = ((data & 0x0f) < 10) ? m_floppies[data & 0x0f]->get_device() : nullptr;
 
 	m_fdc->set_floppy(m_floppy);
 
-	if (m_floppy)
+	// side select and the spindle motor line are bussed, so they reach the drives that aren't selected too
+	for (int i = 0; i < 10; i++)
 	{
-		// side select
-		m_floppy->ss_w(BIT(data, 4));
+		floppy_image_device *floppy = m_floppies[i] ? m_floppies[i]->get_device() : nullptr;
 
-		// floppy motor
-		m_floppy->mon_w(BIT(data, 5));
+		if (floppy)
+		{
+			floppy->ss_w(BIT(data, 4));
+
+			// only the 3.5" and 5.25" drives have a switched spindle, the 8" ones run continuously
+			floppy->mon_w((i >= 4 && i < 8) ? 0 : BIT(data, 5));
+		}
 	}
 
 	// FDC clock
@@ -533,12 +525,15 @@ void bulletf_state::mbank_w(uint8_t data)
 
 uint8_t bulletf_state::scsi_r()
 {
-	uint8_t data = m_scsi_data_in->read();
+	const uint8_t data = m_scsi->read();
 
-	m_scsibus->write_ack(1);
+	if (!machine().side_effects_disabled())
+	{
+		m_scsi->ack_w(1);
 
-	m_wack = 0;
-	update_dma_rdy();
+		m_wack = 0;
+		update_dma_rdy();
+	}
 
 	return data;
 }
@@ -550,9 +545,9 @@ uint8_t bulletf_state::scsi_r()
 
 void bulletf_state::scsi_w(uint8_t data)
 {
-	m_scsi_data_out->write(data);
+	m_scsi->write(data);
 
-	m_scsibus->write_ack(1);
+	m_scsi->ack_w(1);
 
 	m_wack = 0;
 	update_dma_rdy();
@@ -924,9 +919,22 @@ void bulletf_state::pio_pa_w(uint8_t data)
 
 	*/
 
-	m_scsibus->write_atn(BIT(data, 0));
-	m_scsibus->write_rst(BIT(data, 1));
-	m_scsibus->write_sel(BIT(data, 2));
+	m_scsi->atn_w(BIT(data, 0));
+	m_scsi->rst_w(BIT(data, 1));
+	m_scsi->sel_w(BIT(data, 2));
+}
+
+uint8_t bulletf_state::pio_pa_r()
+{
+	uint8_t data = 0;
+
+	data |= m_scsi->bsy_r() << 3;
+	data |= m_scsi->msg_r() << 4;
+	data |= m_scsi->cd_r() << 5;
+	data |= m_scsi->req_r() << 6;
+	data |= m_scsi->io_r() << 7;
+
+	return data;
 }
 
 void bulletf_state::cstrb_w(int state)
@@ -962,15 +970,13 @@ void bulletf_state::req_w(int state)
 {
 	if (!state)
 	{
-		m_scsibus->write_ack(0);
+		m_scsi->ack_w(0);
 
 		m_wack = 1;
 	}
 
 	m_wrdy = !state;
 	update_dma_rdy();
-
-	m_scsi_ctrl_in->write_bit6(state);
 }
 
 
@@ -1065,11 +1071,11 @@ void bullet_state::machine_reset()
 
 	if (mini)
 	{
-		m_floppy = m_floppy0->get_device();
+		m_floppy = m_floppies[0]->get_device();
 	}
 	else
 	{
-		m_floppy = m_floppy4->get_device();
+		m_floppy = m_floppies[4]->get_device();
 	}
 
 	m_fdc->set_floppy(m_floppy);
@@ -1226,7 +1232,7 @@ void bulletf_state::bulletf(machine_config &config)
 
 	z80pio_device& pio(Z80PIO(config, Z80PIO_TAG, 16_MHz_XTAL / 4));
 	pio.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
-	pio.in_pa_callback().set("scsi_ctrl_in", FUNC(input_buffer_device::read));
+	pio.in_pa_callback().set(FUNC(bulletf_state::pio_pa_r));
 	pio.out_pa_callback().set(FUNC(bulletf_state::pio_pa_w));
 	pio.out_ardy_callback().set("cent_data_out", FUNC(output_latch_device::write));
 	pio.out_brdy_callback().set(FUNC(bulletf_state::cstrb_w));
@@ -1258,19 +1264,14 @@ void bulletf_state::bulletf(machine_config &config)
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_dart, FUNC(z80dart_device::rxb_w));
 
-	SCSI_PORT(config, m_scsibus);
-	m_scsibus->bsy_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit3));
-	m_scsibus->msg_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit4));
-	m_scsibus->cd_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit5));
-	m_scsibus->req_handler().set(FUNC(bulletf_state::req_w));
-	m_scsibus->io_handler().set(m_scsi_ctrl_in, FUNC(input_buffer_device::write_bit7));
-	m_scsibus->set_data_input_buffer(m_scsi_data_in);
-	m_scsibus->set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-
-	OUTPUT_LATCH(config, m_scsi_data_out);
-	m_scsibus->set_output_latch(*m_scsi_data_out);
-	INPUT_BUFFER(config, m_scsi_data_in);
-	INPUT_BUFFER(config, m_scsi_ctrl_in);
+	NSCSI_BUS(config, SCSIBUS_TAG);
+	NSCSI_CONNECTOR(config, SCSIBUS_TAG ":0", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, SCSIBUS_TAG ":7", default_scsi_devices, "scsicb", true)
+		.option_add_internal("scsicb", NSCSI_CB)
+		.machine_config([this] (device_t *device)
+		{
+			downcast<nscsi_callback_device &>(*device).req_callback().set(*this, FUNC(bulletf_state::req_w));
+		});
 
 	// software lists
 	SOFTWARE_LIST(config, "flop_list").set_original("wmbullet");
@@ -1305,5 +1306,5 @@ ROM_END
 
 //    YEAR  NAME       PARENT    COMPAT  MACHINE  INPUT    CLASS          INIT        COMPANY      FULLNAME               FLAGS
 // the setname 'bullet' is used by Sega's Bullet in MAME.
-COMP( 1982, wmbullet,  0,        0,      bullet,  bullet,  bullet_state,  empty_init, "Wave Mate", "Bullet",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1982, wmbullet,  0,        0,      bullet,  bullet,  bullet_state,  empty_init, "Wave Mate", "Bullet",              MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1984, wmbulletf, wmbullet, 0,      bulletf, bulletf, bulletf_state, empty_init, "Wave Mate", "Bullet (Revision F)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

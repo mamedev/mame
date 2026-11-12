@@ -497,7 +497,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 	m_subcpu->an3_func().set(FUNC(mpc3000_state::an3_r));
 	m_subcpu->an3_func().set(FUNC(mpc3000_state::an4_r));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(80);
 	screen.set_screen_update("lcdc", FUNC(hd61830_device::screen_update));
 	screen.set_size(240, 64);   //6x20, 8x8
@@ -580,6 +580,7 @@ void mpc3000_state::mpc3000(machine_config &config)
 	TIMER(config, "dialtimer").configure_periodic(FUNC(mpc3000_state::dial_timer_tick), attotime::from_hz(60.0));
 
 	SOFTWARE_LIST(config, "flop_mpc3000").set_original("mpc3000_flop");
+	SOFTWARE_LIST(config, "flop_s1000").set_original("s1000_flop");
 
 	config.set_default_layout(layout_mpc3000);
 }

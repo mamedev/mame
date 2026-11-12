@@ -75,6 +75,7 @@ Dumped by Chack'n
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "sound/ymopn.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
@@ -116,7 +117,10 @@ public:
 	struct
 	{
 		uint8_t current_value = 0;
+		uint8_t last_value = 0;
+		int8_t delta = 0;
 		bool reverse = false;
+		uint8_t port_value = 0;
 	} m_dial_status[2];
 
 	struct
@@ -182,10 +186,9 @@ void cyclemb_state::cyclemb_palette(palette_device &palette) const
 		int const val = color_prom[i | 0x100] | (color_prom[i | 0x000] << 4);
 		int bit0, bit1, bit2;
 
-		bit0 = 0;
-		bit1 = BIT(val, 6);
-		bit2 = BIT(val, 7);
-		int const b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = BIT(val, 6);
+		bit1 = BIT(val, 7);
+		int const b = 0x52 * bit0 + 0xad * bit1;
 
 		bit0 = BIT(val, 3);
 		bit1 = BIT(val, 4);
@@ -205,18 +208,17 @@ void cyclemb_state::cyclemb_palette(palette_device &palette) const
 void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int x,y,count;
-	count = 0;
+	int count = 0;
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=0;x<64;x++)
+		for (int x = 0; x < 64; x++)
 		{
 			int attr = m_cram[count];
 			int tile = (m_vram[count]) | ((attr & 3)<<8);
 			int color = ((attr & 0xf8) >> 3) ^ 0x1f;
 			int odd_line = y & 1 ? 0x40 : 0x00;
-	//      int sx_offs = flip_screen() ? 512 : 0
+			//int sx_offs = flip_screen() ? 512 : 0
 			int scrollx = ((m_vram[(y/2)+odd_line]) + (m_cram[(y/2)+odd_line]<<8) + 48) & 0x1ff;
 
 			if(!(attr & 4))
@@ -307,11 +309,10 @@ void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	int x,y;
 
-	for (y=0;y<32;y++)
+	for (int y = 0; y < 32; y++)
 	{
-		for (x=2;x<62;x++)
+		for (int x = 2; x < 62; x++)
 		{
 			/* upper bits of the first address of cram seems to be related to colour cycling */
 
@@ -493,7 +494,10 @@ void cyclemb_state::cyclemb_dial_reset()
 	for (int i = 0; i < 2; i++)
 	{
 		m_dial_status[i].current_value = 0;
+		m_dial_status[i].last_value = 0;
+		m_dial_status[i].delta = 0;
 		m_dial_status[i].reverse = false;
+		m_dial_status[i].port_value = 0;
 	}
 }
 
@@ -677,7 +681,6 @@ void cyclemb_state::cyclemb_sound_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x6000, 0x63ff).ram();
-
 }
 
 uint8_t cyclemb_state::skydest_i8741_1_r(offs_t offset)
@@ -730,13 +733,15 @@ void cyclemb_state::machine_start()
 	for (int i = 0; i < 2; i++)
 	{
 		save_item(NAME(m_dial_status[i].current_value), i);
+		save_item(NAME(m_dial_status[i].last_value), i);
+		save_item(NAME(m_dial_status[i].delta), i);
 		save_item(NAME(m_dial_status[i].reverse), i);
+		save_item(NAME(m_dial_status[i].port_value), i);
 	}
 
 	save_item(NAME(m_screen_display));
 	save_item(NAME(m_sprite_page));
 
-	cyclemb_dial_reset();
 	m_screen_display = true;
 	m_sprite_page = 0;
 }
@@ -754,20 +759,19 @@ void cyclemb_state::update_dial(int P)
 		return;
 	}
 
-	int8_t input_value = m_dial[P]->read();
-	int delta = std::clamp((int)input_value, -0x1f, 0x1f);
-
-	if (delta != 0)
-	{
-		m_dial_status[P].reverse = (delta < 0);
-		m_dial_status[P].current_value = (m_dial_status[P].current_value + (uint8_t)abs(delta)) & 0x1f;
-	}
+	uint8_t const curr = m_dial[P]->read();
+	m_dial_status[P].last_value = m_dial_status[P].current_value;
+	m_dial_status[P].current_value = curr;
+	m_dial_status[P].delta = (int8_t)((int)m_dial_status[P].current_value - (int)m_dial_status[P].last_value);
+	m_dial_status[P].reverse = m_dial_status[P].delta < 0;
+	m_dial_status[P].port_value = (((m_dial_status[P].port_value & 0x7f) + std::abs(m_dial_status[P].delta)) & 0x1f) |
+		(m_dial_status[P].reverse ? 0x80 : 0x00);
 }
 
 template <int P>
 ioport_value cyclemb_state::dial_r()
 {
-	return m_dial_status[P].current_value | (m_dial_status[P].reverse ? 0x80 : 0x00);
+	return m_dial_status[P].port_value;
 }
 
 
@@ -787,7 +791,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(cyclemb_state::dial_r<0>))
 
 	PORT_START("DIAL_P1")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(16) PORT_PLAYER(1) PORT_RESET PORT_REVERSE
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_PLAYER(1) PORT_REVERSE
 
 	PORT_START("P2_0")
 	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -799,7 +803,7 @@ static INPUT_PORTS_START( cyclemb )
 	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DIAL_P2")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(16) PORT_PLAYER(2) PORT_RESET PORT_REVERSE PORT_COCKTAIL
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(20) PORT_KEYDELTA(8) PORT_PLAYER(2) PORT_REVERSE PORT_COCKTAIL
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x02, "Difficulty (Stage 1-3)" )
@@ -1005,7 +1009,7 @@ void cyclemb_state::cyclemb(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(cyclemb_state::irq0_line_hold), attotime::from_hz(60));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);
@@ -1130,7 +1134,7 @@ void cyclemb_state::init_cyclemb()
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x760;
 
-	// patch audio CPU crash + ROM checksum
+	// HACK: patch audio CPU crash + ROM checksum
 	rom[0x282] = 0x00;
 	rom[0x283] = 0x00;
 	rom[0x284] = 0x00;
@@ -1148,7 +1152,7 @@ void cyclemb_state::init_skydest()
 	membank("bank1")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x1000);
 	m_dsw_pc_hack = 0x554;
 
-	// patch audio CPU crash + ROM checksum
+	// HACK: patch audio CPU crash + ROM checksum
 	rom[0x286] = 0x00;
 	rom[0x287] = 0x00;
 	rom[0x288] = 0x00;
@@ -1162,6 +1166,6 @@ void cyclemb_state::init_skydest()
 } // anonymous namespace
 
 
-//    year  name      parent  machine   input    class          init          rot   company              fullname                 flags
-GAME( 1984, cyclemb,  0,      cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito Corporation", "Cycle Maabou (Japan)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1985, skydest,  0,      skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito Corporation", "Sky Destroyer (Japan)", MACHINE_SUPPORTS_SAVE )
+//    Year  Name      Parent  Machine   Input    Class          Init          ROT   Company  Fullname                 Flags
+GAME( 1984, cyclemb,  0,      cyclemb,  cyclemb, cyclemb_state, init_cyclemb, ROT0, "Taito", "Cycle Maabou (Japan)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1985, skydest,  0,      skydest,  skydest, cyclemb_state, init_skydest, ROT0, "Taito", "Sky Destroyer (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -85,7 +85,7 @@ void nbmj8891_state::init_omotesnd()
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	// Protection ROM check skip
+	// HACK: Protection ROM check skip
 	ROM[0x0106] = 0x00;
 	ROM[0x0107] = 0x00;
 	ROM[0x0108] = 0x00;
@@ -153,7 +153,7 @@ void nbmj8891_state::init_mjfocusm()
 #if 1
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	// Protection ROM check skip
+	// HACK: Protection ROM check skip
 	ROM[0x014e] = 0x00;
 	ROM[0x014f] = 0x00;
 	ROM[0x0150] = 0x00;
@@ -163,6 +163,7 @@ void nbmj8891_state::init_mjfocusm()
 void nbmj8891_state::init_scandal()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
+	// TODO: why it needs 0-fill the main program, and why ROM_FILL isn't enough?
 	for (int i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
 }
 
@@ -2215,7 +2216,7 @@ void nbmj8891_state::gionbana(machine_config &config)
 	m_nb1413m3->set_blitter_rom_tag("gfx1");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(512, 256);

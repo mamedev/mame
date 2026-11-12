@@ -25,7 +25,8 @@
 #include "machine/pc_lpt.h"
 #include "machine/ram.h"
 
-#include "softlist.h"
+// TODO: hookup SW list
+// #include "softlist_dev.h"
 
 
 namespace {
@@ -38,8 +39,8 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void iskr1030m(machine_config &config);
-	void iskr1031(machine_config &config);
+	void iskr1030m(machine_config &config) ATTR_COLD;
+	void iskr1031(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;

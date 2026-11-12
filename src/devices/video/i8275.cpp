@@ -94,6 +94,7 @@ i8275_device::i8275_device(const machine_config &mconfig, device_type type, cons
 	m_dma_idx(0),
 	m_dma_last_char(0),
 	m_buffer_dma(0),
+	m_drq_time(attotime::zero),
 	m_lpen(0),
 	m_scanline(0),
 	m_dma_stop(false),
@@ -159,6 +160,7 @@ void i8275_device::device_start()
 	save_item(NAME(m_dma_idx));
 	save_item(NAME(m_dma_last_char));
 	save_item(NAME(m_buffer_dma));
+	save_item(NAME(m_drq_time));
 	save_item(NAME(m_lpen));
 	save_item(NAME(m_scanline));
 	save_item(NAME(m_irq_scanline));
@@ -237,8 +239,9 @@ void i8275_device::dma_start()
 	m_dma_idx = 0;
 	m_dma_last_char = 0;
 
+	// the first burst of a row starts right away, the burst space only separates bursts
 	if (m_is_crtc0)
-		m_drq_on_timer->adjust(clocks_to_attotime(dma_burst_space()));
+		m_drq_on_timer->adjust(attotime::zero);
 }
 
 
@@ -253,6 +256,8 @@ TIMER_CALLBACK_MEMBER(i8275_device::hrtc_on)
 
 TIMER_CALLBACK_MEMBER(i8275_device::drq_on)
 {
+	m_drq_time = machine().time();
+
 	m_write_drq(1);
 }
 
@@ -695,7 +700,12 @@ void i8275_device::dack_w(uint8_t data)
 			}
 			else if (!(m_dma_idx % dma_burst_count()))
 			{
-				m_drq_on_timer->adjust(clocks_to_attotime(dma_burst_space()));
+				// the burst space is the number of character clocks between DMA
+				// requests, so it is counted from the request rather than from the
+				// acknowledge - however long the DMA controller took to get around to
+				// acknowledging has already been spent
+				const attotime space = clocks_to_attotime(dma_burst_space()) - (machine().time() - m_drq_time);
+				m_drq_on_timer->adjust(std::max(space, attotime::zero));
 			}
 			else
 			{
@@ -763,7 +773,7 @@ void i8275_device::recompute_parameters()
 	LOG("width %u height %u max_x %u max_y %u refresh %f\n", horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, refresh.as_hz());
 
 	rectangle visarea(0, max_visible_x, 0, max_visible_y);
-	screen().configure(horiz_pix_total, vert_pix_total, visarea, (m_refresh_hack ? screen().frame_period() : refresh).as_attoseconds());
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, (m_refresh_hack ? screen().frame_period() : refresh));
 
 	int hrtc_on_pos = characters_per_row() * m_hpixels_per_column;
 	m_hrtc_on_timer->adjust(screen().time_until_pos(y, hrtc_on_pos), 0, screen().scan_period());

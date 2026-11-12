@@ -53,7 +53,7 @@ There's also a newer version with a H8/3687 MCU.
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 #include <bit>
@@ -324,10 +324,9 @@ void emerclp_state::shared(machine_config &config)
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(4, 16);
 	m_lcd_pwm->output_x().set(FUNC(emerclp_state::lcd_pwm_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/5, 671/5);
-	screen.set_visarea_full();
 
 	PWM_DISPLAY(config, m_led_pwm).set_size(2, 8);
 

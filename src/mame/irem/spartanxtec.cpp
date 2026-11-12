@@ -377,7 +377,7 @@ void spartanxtec_state::spartanxtec(machine_config &config)
 
 	/* video hardware */
 	// todo, proper screen timings for this bootleg PCB - as visible area is less it's probably ~60hz, not 55
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(1790));
 	screen.set_size(64*8, 32*8);

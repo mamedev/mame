@@ -2020,7 +2020,9 @@ uint16_t sh4_base_device::scfsr2_r(offs_t offset, uint16_t mem_mask)
 
 void sh4_base_device::scfsr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_scfsr2 &= data | 0xff0c;
+	// ignore writes for now - this prevents software from clearing TDFE
+	// avoids issues with software that waits for TDFE to be set (MT09399)
+	// m_scfsr2 &= data | 0xff0c;
 	logerror("scfsr2_w: Unmapped write %04x @ %04x\n", data, mem_mask);
 }
 

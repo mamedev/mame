@@ -300,7 +300,7 @@ int mame_machine_manager::execute()
 			if (machine.exit_pending())
 			{
 				m_options.set_system_name("");
-				m_options.set_value(OPTION_BIOS, "", OPTION_PRIORITY_CMDLINE);
+				m_options.get_entry(OPTION_BIOS)->revert(OPTION_PRIORITY_CMDLINE, OPTION_PRIORITY_CMDLINE);
 			}
 		}
 
@@ -362,6 +362,7 @@ void mame_machine_manager::ui_initialize(running_machine& machine)
 	m_ui->initialize(machine);
 
 	// display the startup screens
+	m_lua->on_machine_before_startup_screens();
 	m_ui->display_startup_screens(m_firstrun);
 }
 

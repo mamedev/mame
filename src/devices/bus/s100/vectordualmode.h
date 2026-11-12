@@ -39,6 +39,7 @@ private:
 	uint8_t m_sector;
 	uint8_t m_fdd_sector_counter;
 	bool m_read;
+	bool m_fdd_writing;
 	bool m_busy;
 	emu_timer *m_motor_on_timer;
 	attotime m_last_sector_pulse; // fdd

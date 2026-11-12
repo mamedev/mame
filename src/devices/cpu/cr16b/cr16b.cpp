@@ -63,7 +63,7 @@ void cr16b_device::device_start()
 	state_add(CR16_INTBASE, "INTBASE", m_intbase).mask(0x1ffffe);
 	state_add(CR16_PSR, "PSR", m_psr).mask(0x0ee7).formatstr("%04X");
 	for (int i = 0; i < 13; i++)
-		state_add(CR16_R0 + i, string_format("R%d", i).c_str(), m_regs[i]);
+		state_add(CR16_R0 + i, string_format("R%d", i), m_regs[i]);
 	state_add(CR16_R13, "ERA", m_regs[13]);
 	state_add(CR16_R14, "RA", m_regs[14]);
 	state_add(CR16_R15, "SP", m_regs[15]);

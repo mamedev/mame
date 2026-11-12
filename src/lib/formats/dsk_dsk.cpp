@@ -475,12 +475,13 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				sects[j].deleted = (sector.fdc_status_reg2 & 0x40);
 				sects[j].bad_data_crc = ((sector.fdc_status_reg1 & 0x20) || (sector.fdc_status_reg2 & 0x20));
 				sects[j].bad_addr_crc = false;
+				sects[j].weak = false;
 
 				if(!(sector.fdc_status_reg1 & 0x04)) {
 					sects[j].data = sect_data + sdatapos;
 					read_at(io, pos, sects[j].data, sects[j].actual_size); // FIXME: check for errors and premature EOF
 					sdatapos += sects[j].actual_size;
-
+					sects[j].weak = sects[j].bad_data_crc && !sects[j].deleted;
 				} else
 					sects[j].data = nullptr;
 
@@ -489,8 +490,15 @@ bool dsk_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 				else
 					pos += 128 << tr.sector_size_code;
 			}
-			// larger cell count (was 100000) to allow for slightly out of spec images (theatre europe on einstein)
-			build_pc_track_mfm(track, side, image, 105000, tr.number_of_sector, sects, tr.gap3_length);
+			// A double-density track at 300 rpm holds 100000 2 us cells; padding standard
+			// tracks to more makes the disc spin faster than a real drive. Allow larger
+			// out-of-spec layouts (theatre europe on einstein) by sizing to the layout
+			// when it genuinely needs the extra cells.
+			int min_cells = 0;
+			for(int j=0;j<tr.number_of_sector;j++)
+				min_cells += sects[j].actual_size;
+			min_cells = 149*16 + (tr.number_of_sector*62 + min_cells)*16;
+			build_pc_track_mfm(track, side, image, min_cells > 100000 ? min_cells : 100000, tr.number_of_sector, sects, tr.gap3_length);
 		}
 	}
 	return true;

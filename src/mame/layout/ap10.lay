@@ -7,7 +7,7 @@ license:CC0-1.0
 	<element name="greyback">
 		<rect>
 			<bounds left="0" top="0" right="1" bottom="1" />
-			<color red="0.2" green="0.2" blue="0.2" />
+			<color red="0.1" green="0.1" blue="0.1" />
 		</rect>
 	</element>
 
@@ -34,7 +34,6 @@ license:CC0-1.0
 	<element name="start"><text string="START/" /></element>
 	<element name="stop"><text string="STOP" /></element>
 	<element name="demo"><text string="DEMO" /></element>
-	<element name="ap10"><text string="AP-10" /></element>
 
 	<!-- button primitives -->
 	<element name="button" defstate="0">
@@ -51,8 +50,9 @@ license:CC0-1.0
 
 	<!-- LED primitive -->
 	<element name="led" defstate="0">
-		<disk state="0"><color red="0.4" green="0.3" blue="0.3" /></disk>
-		<disk state="1"><color red="1.0" green="0.1" blue="0.1" /></disk>
+		<disk><color red="0" green="0" blue="0" /></disk>
+		<disk state="0"><bounds xc="0.5" yc="0.5" width="0.8" height="0.8" /><color red="0.1" green="0.0" blue="0.0" /></disk>
+		<disk state="1"><bounds xc="0.5" yc="0.5" width="0.8" height="0.8" /><color red="1.0" green="0.1" blue="0.1" /></disk>
 	</element>
 
 	<!-- keyboard primitives -->

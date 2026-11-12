@@ -353,7 +353,7 @@ void mmagic_state::mmagic(machine_config& config)
 	m_maincpu->set_addrmap(AS_IO, &mmagic_state::io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(6.144_MHz_XTAL, 384, 0, 256, 264, 0, 192);
 	m_screen->set_screen_update(FUNC(mmagic_state::screen_update));
 

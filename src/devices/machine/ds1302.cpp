@@ -74,6 +74,7 @@ ds1302_device::ds1302_device(const machine_config &mconfig, device_type type, co
 	: device_t(mconfig, type, tag, owner, clock),
 		device_rtc_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
+		m_default_data(*this, DEVICE_SELF),
 		m_ram_size(ram_size)
 {
 }
@@ -149,6 +150,9 @@ TIMER_CALLBACK_MEMBER(ds1302_device::clock_tick)
 void ds1302_device::nvram_default()
 {
 	std::fill_n(&m_ram[0], m_ram_size, 0);
+
+	if (m_default_data.found())
+		std::copy_n(&m_default_data[0], std::min<std::size_t>(m_default_data.length(), m_ram_size), &m_ram[0]);
 }
 
 

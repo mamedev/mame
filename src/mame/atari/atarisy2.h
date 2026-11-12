@@ -125,7 +125,7 @@ private:
 	uint32_t        m_playfield_tile_bank[2]{};
 
 	// 720 fake joystick
-	double          m_joy_last_angle = 0;
+	double          m_joy_last_angle = 90.0;
 	int             m_joy_rotations = 0;
 
 	// 720 fake spinner

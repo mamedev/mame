@@ -2,7 +2,7 @@
 // experimental/detail/channel_service.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,10 +18,12 @@
 #include "asio/detail/config.hpp"
 #include "asio/associated_cancellation_slot.hpp"
 #include "asio/cancellation_type.hpp"
+#include "asio/detail/completion_message.hpp"
+#include "asio/detail/completion_payload.hpp"
+#include "asio/detail/completion_payload_handler.hpp"
 #include "asio/detail/mutex.hpp"
 #include "asio/detail/op_queue.hpp"
 #include "asio/execution_context.hpp"
-#include "asio/experimental/detail/channel_message.hpp"
 #include "asio/experimental/detail/channel_receive_op.hpp"
 #include "asio/experimental/detail/channel_send_op.hpp"
 #include "asio/experimental/detail/has_signature.hpp"
@@ -29,6 +31,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 namespace detail {
 
@@ -231,7 +234,7 @@ private:
     void operator()(Args&&... args)
     {
       op_->post(
-          channel_message<Signature>(0,
+          asio::detail::completion_message<Signature>(0,
             static_cast<Args&&>(args)...));
     }
 
@@ -307,8 +310,8 @@ struct channel_service<Mutex>::implementation_type : base_implementation_type
           typename traits_type::receive_closed_signature,
           Signatures...
         >::value,
-        channel_payload<Signatures...>,
-        channel_payload<
+        asio::detail::completion_payload<Signatures...>,
+        asio::detail::completion_payload<
           Signatures...,
           typename traits_type::receive_closed_signature
         >
@@ -319,11 +322,11 @@ struct channel_service<Mutex>::implementation_type : base_implementation_type
           Signatures...,
           typename traits_type::receive_cancelled_signature
         >::value,
-        channel_payload<
+        asio::detail::completion_payload<
           Signatures...,
           typename traits_type::receive_cancelled_signature
         >,
-        channel_payload<
+        asio::detail::completion_payload<
           Signatures...,
           typename traits_type::receive_cancelled_signature,
           typename traits_type::receive_closed_signature
@@ -404,8 +407,8 @@ struct channel_service<Mutex>::implementation_type<Traits, R()>
           typename traits_type::receive_closed_signature,
           R()
         >::value,
-        channel_payload<R()>,
-        channel_payload<
+        asio::detail::completion_payload<R()>,
+        asio::detail::completion_payload<
           R(),
           typename traits_type::receive_closed_signature
         >
@@ -416,11 +419,11 @@ struct channel_service<Mutex>::implementation_type<Traits, R()>
           R(),
           typename traits_type::receive_cancelled_signature
         >::value,
-        channel_payload<
+        asio::detail::completion_payload<
           R(),
           typename traits_type::receive_cancelled_signature
         >,
-        channel_payload<
+        asio::detail::completion_payload<
           R(),
           typename traits_type::receive_cancelled_signature,
           typename traits_type::receive_closed_signature
@@ -465,7 +468,7 @@ struct channel_service<Mutex>::implementation_type<Traits, R()>
   // Get the element at the front of the buffer.
   payload_type buffer_front()
   {
-    return payload_type(channel_message<R()>(0));
+    return payload_type(asio::detail::completion_message<R()>(0));
   }
 
   // Pop a value from the front of the buffer.
@@ -507,8 +510,8 @@ struct channel_service<Mutex>::implementation_type<
           typename traits_type::receive_closed_signature,
           R(asio::error_code)
         >::value,
-        channel_payload<R(asio::error_code)>,
-        channel_payload<
+        asio::detail::completion_payload<R(asio::error_code)>,
+        asio::detail::completion_payload<
           R(asio::error_code),
           typename traits_type::receive_closed_signature
         >
@@ -519,11 +522,11 @@ struct channel_service<Mutex>::implementation_type<
           R(asio::error_code),
           typename traits_type::receive_cancelled_signature
         >::value,
-        channel_payload<
+        asio::detail::completion_payload<
           R(asio::error_code),
           typename traits_type::receive_cancelled_signature
         >,
-        channel_payload<
+        asio::detail::completion_payload<
           R(asio::error_code),
           typename traits_type::receive_cancelled_signature,
           typename traits_type::receive_closed_signature
@@ -541,10 +544,10 @@ struct channel_service<Mutex>::implementation_type<
   // Move from another buffer.
   void buffer_move_from(implementation_type& other)
   {
-    size_ = other.buffer_;
+    size_ = other.size_;
     other.size_ = 0;
     first_ = other.first_;
-    other.first.count_ = 0;
+    other.first_.count_ = 0;
     rest_ = static_cast<
         typename traits_type::template container<buffered_value>::type&&>(
           other.rest_);
@@ -628,7 +631,7 @@ struct channel_service<Mutex>::implementation_type<
   void buffer_clear()
   {
     size_ = 0;
-    first_.count_ == 0;
+    first_.count_ = 0;
     rest_.clear();
   }
 
@@ -668,6 +671,7 @@ private:
 
 } // namespace detail
 } // namespace experimental
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

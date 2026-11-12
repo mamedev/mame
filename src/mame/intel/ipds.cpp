@@ -146,7 +146,7 @@ void ipds_state::ipds(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ipds_state::ipds_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_screen_update("i8275", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */

@@ -203,6 +203,7 @@ uint8_t hitpoker_state::hitpoker_pic_r()
 {
 	// logerror("%s PIC R\n", machine().describe_context());
 
+	// HACK: protection workarounds
 	if (m_maincpu->pc() == 0x3143 ||
 		m_maincpu->pc() == 0x314e ||
 		m_maincpu->pc() == 0x3164 ||
@@ -402,7 +403,7 @@ void hitpoker_state::hitpoker(machine_config &config)
 	rtc.irq().set_inputline(m_maincpu, MC68HC11_IRQ_LINE);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(648, 480); // set by the CRTC
@@ -441,7 +442,8 @@ void hitpoker_state::init_hitpoker()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
 
-	ROM[0x1220] = 0x01; // patch EEPROM write?
+	// HACK: patch EEPROM write?
+	ROM[0x1220] = 0x01;
 	ROM[0x1221] = 0x01;
 	ROM[0x1222] = 0x01;
 

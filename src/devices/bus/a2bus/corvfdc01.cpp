@@ -14,15 +14,15 @@
 #include "emu.h"
 #include "corvfdc01.h"
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+#include "machine/wd_fdc.h"
+#include "imagedev/floppy.h"
+
+
+namespace {
 
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
-
-DEFINE_DEVICE_TYPE(A2BUS_CORVFDC01, a2bus_corvfdc01_device, "crvfdc01", "Corvus Systems Floppy Controller")
 
 #define FDC01_ROM_REGION    "fdc01_rom"
 #define FDC01_FDC_TAG       "fdc01_fdc"
@@ -71,9 +71,44 @@ enum
 	LC_FMMFM_mask   = (1 << LC_FMMFM_bit)
 };
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class a2bus_corvfdc01_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+public:
+	// construction/destruction
+	a2bus_corvfdc01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	a2bus_corvfdc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual uint8_t read_cnxx(uint8_t offset) override;
+	virtual void reset_from_bus() override;
+
+	required_region_ptr<uint8_t> m_rom;
+	required_device<fd1793_device> m_wdfdc;
+	required_device_array<floppy_connector, 4> m_con;
+
+private:
+	void intrq_w(int state);
+	void drq_w(int state);
+
+	uint8_t m_fdc_local_status, m_fdc_local_command;
+	floppy_image_device *m_curfloppy;
+};
+
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -84,10 +119,8 @@ void a2bus_corvfdc01_device::device_add_mconfig(machine_config &config)
 	FD1793(config, m_wdfdc, 16_MHz_XTAL / 8);
 	m_wdfdc->intrq_wr_callback().set(FUNC(a2bus_corvfdc01_device::intrq_w));
 	m_wdfdc->drq_wr_callback().set(FUNC(a2bus_corvfdc01_device::drq_w));
-	FLOPPY_CONNECTOR(config, m_con1, corv_floppies, "8sssd", floppy_image_device::default_fm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_con2, corv_floppies, "8sssd", floppy_image_device::default_fm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_con3, corv_floppies, "8sssd", floppy_image_device::default_fm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_con4, corv_floppies, "8sssd", floppy_image_device::default_fm_floppy_formats);
+	for (auto &con : m_con)
+		FLOPPY_CONNECTOR(config, con, corv_floppies, "8sssd", floppy_image_device::default_fm_floppy_formats);
 }
 
 //-------------------------------------------------
@@ -106,12 +139,10 @@ const tiny_rom_entry *a2bus_corvfdc01_device::device_rom_region() const
 a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_a2bus_card_interface(mconfig, *this),
+	m_rom(*this, FDC01_ROM_REGION),
 	m_wdfdc(*this, FDC01_FDC_TAG),
-	m_con1(*this, FDC01_FDC_TAG":0"),
-	m_con2(*this, FDC01_FDC_TAG":1"),
-	m_con3(*this, FDC01_FDC_TAG":2"),
-	m_con4(*this, FDC01_FDC_TAG":3"),
-	m_rom(nullptr), m_fdc_local_status(0), m_fdc_local_command(0), m_curfloppy(nullptr)
+	m_con(*this, FDC01_FDC_TAG":%u", 0U),
+	m_fdc_local_status(0), m_fdc_local_command(0), m_curfloppy(nullptr)
 {
 }
 
@@ -126,8 +157,6 @@ a2bus_corvfdc01_device::a2bus_corvfdc01_device(const machine_config &mconfig, co
 
 void a2bus_corvfdc01_device::device_start()
 {
-	m_rom = device().machine().root_device().memregion(this->subtag(FDC01_ROM_REGION).c_str())->base();
-
 	save_item(NAME(m_fdc_local_status));
 	save_item(NAME(m_fdc_local_command));
 }
@@ -191,22 +220,8 @@ void a2bus_corvfdc01_device::write_c0nx(uint8_t offset, uint8_t data)
 		case 0:     // LOCAL COMMAND REG
 			m_fdc_local_command = data;
 
-			current_drive = ((data >> LC_DE0_bit) & 1) | ((data >> (LC_DE1_bit-1)) & 2);
-			switch (current_drive)
-			{
-				case 0:
-					floppy = m_con1 ? m_con1->get_device() : nullptr;
-					break;
-				case 1:
-					floppy = m_con2 ? m_con2->get_device() : nullptr;
-					break;
-				case 2:
-					floppy = m_con3 ? m_con3->get_device() : nullptr;
-					break;
-				case 3:
-					floppy = m_con4 ? m_con4->get_device() : nullptr;
-					break;
-			}
+			current_drive = bitswap<2>(data, LC_DE1_bit, LC_DE0_bit);
+			floppy = m_con[current_drive] ? m_con[current_drive]->get_device() : nullptr;
 
 			if (floppy != m_curfloppy)
 			{
@@ -269,3 +284,7 @@ void a2bus_corvfdc01_device::drq_w(int state)
 	else
 		m_fdc_local_status &= ~LS_DRQ_mask;
 }
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_CORVFDC01, device_a2bus_card_interface, a2bus_corvfdc01_device, "crvfdc01", "Corvus Systems Floppy Controller")

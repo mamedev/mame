@@ -140,35 +140,29 @@ void taitojc_state::draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	int y2 = y + height;
 
 	// trivial rejection
-	if (x1 > cliprect.max_x || x2 < cliprect.min_x || y1 > cliprect.max_y || y2 < cliprect.min_y)
+	if (!cliprect.overlaps(rectangle(x1, x2 - 1, y1, y2 - 1)))
 	{
 		return;
 	}
 
-//  osd_printf_debug("draw_object: %08X %08X, X: %d, Y: %d, W: %d, H: %d\n", w1, w2, x, y, width, height);
+	//osd_printf_debug("draw_object: %08X %08X, X: %d, Y: %d, W: %d, H: %d\n", w1, w2, x, y, width, height);
 
 	int ix = 0;
 	int iy = 0;
 
 	// clip
-	if (x1 < cliprect.min_x)
+	if (x1 < cliprect.left())
 	{
-		ix = abs(cliprect.min_x - x1);
-		x1 = cliprect.min_x;
+		ix = abs(cliprect.left() - x1);
+		x1 = cliprect.left();
 	}
-	if (x2 > cliprect.max_x)
+	x2 = std::min<int>(x2, cliprect.right() + 1);
+	if (y1 < cliprect.top())
 	{
-		x2 = cliprect.max_x;
+		iy = abs(cliprect.top() - y1);
+		y1 = cliprect.top();
 	}
-	if (y1 < cliprect.min_y)
-	{
-		iy = abs(cliprect.min_y - y1);
-		y1 = cliprect.min_y;
-	}
-	if (y2 > cliprect.max_y)
-	{
-		y2 = cliprect.max_y;
-	}
+	y2 = std::min<int>(y2, cliprect.bottom() + 1);
 
 	/* this bit seems to set up border at left/right of screen (reads at 0xffc00) */
 	if (mask_screen)

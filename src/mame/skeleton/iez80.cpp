@@ -194,7 +194,7 @@ void iez80_state::iez80(machine_config &config)
 	Z80DART(config, "dart2", 4'000'000); // unknown clock (5.0688_MHz_XTAL near)
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(17'550'000, 816, 0, 640, 358, 0, 288); // unknown clock, hand-tuned to ~60fps
 	screen.set_screen_update(FUNC(iez80_state::screen_update));
 

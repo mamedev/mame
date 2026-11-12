@@ -409,11 +409,11 @@ void cm32p_state::machine_start()
 {
 	u8 *rom = memregion("maincpu")->base();
 
-	// TODO: The IC8 gate array has an "LCD INT" line that needs to be emulated. Then, the hack can be removed.
-	// Note: The hack is not necessary when *not* using test mode.
+	// HACK: The IC8 gate array has an "LCD INT" line that needs to be emulated.
+	// NOTE: The hack is not necessary when *not* using test mode.
 	rom[0xbb2d] = 0x03; // hack to make test mode not freeze when displaying the LCD text
 
-	// TODO: remove this hack
+	// HACK: remove this hack
 	rom[0x7d80] = 0x00; // hack to exit some loop waiting for interrupt #8
 }
 
@@ -639,7 +639,7 @@ void cm32p_state::cm32p(machine_config &config)
 
 	RAM(config, some_ram).set_default_size("8K");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_screen_update(FUNC(cm32p_state::screen_update));
 	screen.set_size(16*6-1, (16*6-1)*3/4);
@@ -698,4 +698,4 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 1989, cm32p, 0, 0, cm32p, cm32p, cm32p_state, init_cm32p, "Roland", "CM-32P", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+SYST( 1989, cm32p, 0, 0, cm32p, cm32p, cm32p_state, init_cm32p, "Roland", "CM-32P PCM Sound Module", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

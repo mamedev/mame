@@ -654,7 +654,7 @@ void nes_sh6578_state::nes_sh6578(machine_config &config)
 	m_ppu->set_addrmap(AS_PROGRAM, &nes_sh6578_state::ppu_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.0988);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));

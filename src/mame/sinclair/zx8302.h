@@ -62,15 +62,12 @@ public:
 	auto out_mdseld_callback() { return m_out_mdseld_cb.bind(); }
 	auto out_mdrdw_callback() { return m_out_mdrdw_cb.bind(); }
 	auto out_erase_callback() { return m_out_erase_cb.bind(); }
-	auto out_raw1_callback() { return m_out_raw1_cb.bind(); }
-	auto in_raw1_callback() { return m_in_raw1_cb.bind(); }
-	auto out_raw2_callback() { return m_out_raw2_cb.bind(); }
-	auto in_raw2_callback() { return m_in_raw2_cb.bind(); }
 
 	uint8_t rtc_r(offs_t offset);
 	void rtc_w(uint8_t data);
 	void control_w(uint8_t data);
-	uint8_t mdv_track_r();
+	uint8_t mdv_track_r(offs_t offset);
+	uint16_t mdv_tx_pop();
 	uint8_t status_r();
 	void ipc_command_w(uint8_t data);
 	void mdv_control_w(uint8_t data);
@@ -85,20 +82,22 @@ public:
 	void write_netin(int state);
 	void write_dtr1(int state);
 	void write_cts2(int state);
+	void raw1_w(int state);
+	void raw2_w(int state);
+	void gap_w(int state);
 
 protected:
 	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
+	void device_start() override ATTR_COLD;
 
 	// device_serial_interface overrides
-	virtual void tra_callback() override;
-	virtual void tra_complete() override;
-	virtual void rcv_callback() override;
-	virtual void rcv_complete() override;
+	void tra_callback() override;
+	void tra_complete() override;
+	void rcv_callback() override;
+	void rcv_complete() override;
 
 	TIMER_CALLBACK_MEMBER(baudx4_tick);
 	TIMER_CALLBACK_MEMBER(rtc_tick);
-	TIMER_CALLBACK_MEMBER(trigger_gap_int);
 
 	inline void trigger_interrupt(uint8_t line);
 	inline void transmit_ipc_data();
@@ -144,10 +143,24 @@ private:
 
 	enum
 	{
+		MASK_GAP                = 0x20,
+		MASK_INTERFACE          = 0x40,
+		MASK_TRANSMIT           = 0x80
+	};
+
+	enum
+	{
 		STATUS_NETWORK_PORT     = 0x01,
 		STATUS_TX_BUFFER_FULL   = 0x02,
 		STATUS_RX_BUFFER_FULL   = 0x04,
 		STATUS_MICRODRIVE_GAP   = 0x08
+	};
+
+	enum
+	{
+		MDV_SYNC_IDLE    = 0, // not looking for data
+		MDV_SYNC_SEARCH  = 1, // searching for 0xFF/0xFF preamble end
+		MDV_SYNC_DELIVER = 2  // assembling and delivering bytes
 	};
 
 	int m_rtc_clock;              // the RTC clock (pin 30) of the chip
@@ -165,10 +178,6 @@ private:
 	devcb_write_line    m_out_mdseld_cb;
 	devcb_write_line    m_out_mdrdw_cb;
 	devcb_write_line    m_out_erase_cb;
-	devcb_write_line    m_out_raw1_cb;
-	devcb_read_line     m_in_raw1_cb;
-	devcb_write_line    m_out_raw2_cb;
-	devcb_read_line     m_in_raw2_cb;
 
 	int m_rs232_rx;
 	int m_dtr1;
@@ -179,6 +188,7 @@ private:
 	uint8_t m_tcr;                    // transfer control register
 	uint8_t m_tdr;                    // transfer data register
 	uint8_t m_irq;                    // interrupt register
+	uint8_t m_irq_mask;               // interrupt mask register
 	uint32_t m_ctr;                   // counter register
 	uint8_t m_status;                 // status register
 
@@ -192,13 +202,16 @@ private:
 	int m_baudx4;                   // IPC baud x4
 
 	// microdrive state
-	uint8_t m_mdv_data[2];            // track data register
-	int m_track;                    // current track
+	uint8_t m_mdv_data[2];          // track data registers
+	uint8_t m_mdv_shift[2];         // bit shift registers for assembling bytes
+	int m_mdv_bit_count;            // bits received so far in current byte (DELIVER mode)
+	int m_mdv_sync_state;           // preamble sync state machine
+	uint8_t m_mdv_tx_buffer[2];     // microdrive transmit buffer (one byte pair)
+	int m_mdv_tx_count;             // bytes pending in the transmit buffer
 
 	// timers
 	emu_timer *m_baudx4_timer;      // baud x4 timer
 	emu_timer *m_rtc_timer;         // real time clock timer
-	emu_timer *m_gap_timer;         // microdrive gap timer
 };
 
 

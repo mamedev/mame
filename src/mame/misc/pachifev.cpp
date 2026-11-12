@@ -365,7 +365,7 @@ void pachifev_state::pachifev(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.screen_vblank().set(FUNC(pachifev_state::vblank_w));
 
 	/* sound hardware */

@@ -10,10 +10,6 @@
 
 #pragma once
 
-#ifndef __EMU_H__
-#error Dont include this file directly; include emu.h instead.
-#endif
-
 #ifndef MAME_EMU_VIDEO_H
 #define MAME_EMU_VIDEO_H
 
@@ -79,7 +75,7 @@ public:
 	// snapshots
 	bool snap_native() const { return m_snap_native; }
 	render_target &snapshot_target() { return *m_snap_target; }
-	void save_snapshot(screen_device *screen, util::core_file &file);
+	void save_snapshot(screen_device *screen, util::random_write &file);
 	void save_active_screen_snapshots();
 
 	// movies

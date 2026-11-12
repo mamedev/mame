@@ -139,8 +139,6 @@ private:
 	void format_track(const uint8_t * cdb);
 	void set_esdi_defect_list(uint8_t lun, uint8_t head);
 
-	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
-
 	void log_command(const uint8_t cdb[], const uint16_t cdb_length);
 	void log_data();
 	void do_command(const uint8_t cdb[], const uint16_t cdb_length);

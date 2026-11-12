@@ -287,7 +287,7 @@ void xds_state::xds19p(machine_config &config)
 	NVRAM(config, "nvram");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(100_MHz_XTAL, 1472, 0, 1152, 941, 0, 904);
 	m_screen->set_screen_update(FUNC(xds_state::screen_update));
 

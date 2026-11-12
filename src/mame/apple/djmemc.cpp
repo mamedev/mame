@@ -27,8 +27,28 @@ DEFINE_DEVICE_TYPE(MEMCJR, memcjr_device, "memcjr", "Apple MEMCjr memory control
 void djmemc_device::map(address_map &map)
 {
 	map(0x40000000, 0x400fffff).r(FUNC(djmemc_device::rom_switch_r)).mirror(0x0ff00000).nopw();
+	map(0x5000e000, 0x5000ffff).rw(FUNC(djmemc_device::regs_r), FUNC(djmemc_device::regs_w)).mirror(0x00fc0000);
 	map(0xf9000000, 0xf91fffff).rw(m_video, FUNC(dafb_device::vram_r), FUNC(dafb_device::vram_w));
 	map(0xf9800000, 0xf98003ff).m(m_video, FUNC(dafb_device::map));
+}
+
+// These registers must read back as written or A/UX won't start up
+u32 djmemc_device::regs_r(offs_t offset)
+{
+	if (offset < DJMEMC_NUM_REGS)
+	{
+		return m_regs[offset];
+	}
+
+	return 0;
+}
+
+void djmemc_device::regs_w(offs_t offset, u32 data)
+{
+	if (offset < DJMEMC_NUM_REGS)
+	{
+		m_regs[offset] = data;
+	}
 }
 
 //-------------------------------------------------
@@ -74,6 +94,9 @@ void djmemc_device::device_start()
 {
 	m_rom_ptr = &m_rom[0];
 	m_rom_size = m_rom.length() << 2;
+
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+	save_item(NAME(m_regs));
 }
 
 //-------------------------------------------------

@@ -603,7 +603,7 @@ void atvtrack_state::atvtrack(machine_config &config)
 	m_subcpu->set_force_no_drc(true);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  /* not accurate */
 	screen.set_size(640, 480);
@@ -660,8 +660,8 @@ ROM_START( gfootbal )
 	ROM_REGION( 0x20000, "fpga", ROMREGION_ERASEFF)
 	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga
 
-	ROM_REGION( 0x20000, "io", ROMREGION_ERASEFF)
-	ROM_LOAD("4r_pic16c710.u1", 0x0000, 0x2000, NO_DUMP ) // I/O for the ball controller
+	ROM_REGION16_LE( 0x4010, "io", ROMREGION_ERASEFF )
+	ROM_LOAD( "4r_pic16c710.u1", 0x0000, 0x4010, NO_DUMP ) // I/O for the ball controller
 ROM_END
 
 /*

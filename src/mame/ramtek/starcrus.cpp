@@ -437,7 +437,7 @@ uint32_t starcrus_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			0);
 
 	// Collision detection
-	if (cliprect.max_y == screen.visible_area().max_y)
+	if (cliprect.bottom() == screen.visible_area().bottom())
 	{
 		m_collision_reg = 0x00;
 
@@ -593,7 +593,7 @@ void starcrus_state::starcrus(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(starcrus_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);

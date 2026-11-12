@@ -20,11 +20,19 @@ public:
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
 	auto firq_cb() { return m_firq_cb.bind(); }
+	auto softreset_cb() { return m_softreset_cb.bind(); }
+	auto abort_cb() { return m_abort_cb.bind(); }
 	auto xbus_sel_cb() { return m_xbus_sel_cb.bind(); }
 	auto xbus_read_cb() { return m_xbus_read_cb.bind(); }
 	auto xbus_write_cb() { return m_xbus_write_cb.bind(); }
+	auto xbus_data_read_cb() { return m_xbus_data_read_cb.bind(); }
+	auto xbus_data_write_cb() { return m_xbus_data_write_cb.bind(); }
 	auto exp_dma_enable_cb() { return m_exp_dma_enable_cb.bind(); }
 	auto dacl_cb() { return m_dac_l.bind(); }
+	auto dma_read_cb() { return m_dma_read_cb.bind(); }
+	auto dma_write_cb() { return m_dma_write_cb.bind(); }
+	void dspp_dma_w(offs_t offset, u32 data);
+	u32 dspp_dma_r(offs_t offset);
 	auto dacr_cb() { return m_dac_r.bind(); }
 	auto hsync_cb() { return m_hsync_cb.bind(); }
 	auto vsync_cb() { return m_vsync_cb.bind(); }
@@ -32,6 +40,7 @@ public:
 
 	void xbus_int_w(int state);
 	void xbus_wr_w(int state);
+	void xbus_media_w(int state);
 
 	void dply_w(int state);
 	void arm_ctl_w(int state);
@@ -47,13 +56,19 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<dspp_device> m_dspp;
 	devcb_write_line    m_firq_cb;
+	devcb_write_line    m_softreset_cb;
+	devcb_write_line    m_abort_cb;
 	devcb_write_line    m_vsync_cb;
 	devcb_write_line    m_hsync_cb;
 	devcb_write8        m_xbus_sel_cb;
 	devcb_read8         m_xbus_read_cb;
 	devcb_write8        m_xbus_write_cb;
+	devcb_read8         m_xbus_data_read_cb;
+	devcb_write8        m_xbus_data_write_cb;
 	devcb_write_line    m_exp_dma_enable_cb;
 	devcb_write16       m_dac_l;
+	devcb_read8         m_dma_read_cb;
+	devcb_write8        m_dma_write_cb;
 	devcb_write16       m_dac_r;
 	devcb_write_line::array<4> m_adb_out_cb;
 
@@ -167,6 +182,8 @@ private:
 	};
 
 	template <unsigned N> void request_fiq(uint32_t irq_req);
+	bool xbus_unit_present() const;
+	void xbus_timeout();
 
 	TIMER_CALLBACK_MEMBER( scan_timer_cb );
 	TIMER_CALLBACK_MEMBER( system_timer_cb );

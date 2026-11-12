@@ -177,7 +177,7 @@ void drdmania_state::drdmania(machine_config &config)
 
 	//NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0); // MK48Z02B-20
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);
@@ -215,6 +215,8 @@ ROM_END
 void drdmania_state::init_drdmania()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
+
+	// HACK: smells like copy protection
 	ROM[0x8de0] ^= 0x02; // these are 0xcf in ROM so bit 0x02 got flipped? 3 calls in a row are incorrect in this way, so call addresses are suspect too
 	ROM[0x8de1] ^= 0x02; // call address
 
@@ -229,4 +231,4 @@ void drdmania_state::init_drdmania()
 } // anonymous namespace
 
 
-GAME(1994, drdmania, 0, drdmania, drdmania, drdmania_state, init_drdmania, ROT0, "Sleic", "Dardomania (v2.1)", MACHINE_NOT_WORKING | MACHINE_MECHANICAL )
+GAME(1994, drdmania, 0, drdmania, drdmania, drdmania_state, init_drdmania, ROT0, "Sleic", "Dardomania (v2.1)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_MECHANICAL )

@@ -199,10 +199,10 @@ ppc_device::frontend::~frontend()
 {
 }
 
-ppc_device::opcode_desc const *ppc_device::frontend::describe_code(offs_t startpc)
+ppc_device::opcode_desc const *ppc_device::frontend::describe_code(offs_t startpc, bool little_endian)
 {
 	return do_describe_code(
-			[this] (opcode_desc &desc, opcode_desc const *prev) { return describe(desc, prev); },
+			[this, little_endian] (opcode_desc &desc, opcode_desc const *prev) { return describe(desc, prev, little_endian); },
 			startpc);
 }
 
@@ -212,7 +212,7 @@ ppc_device::opcode_desc const *ppc_device::frontend::describe_code(offs_t startp
 //  instruction
 //-------------------------------------------------
 
-bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
+bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev, bool little_endian)
 {
 	int regnum;
 
@@ -227,6 +227,12 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 		desc.set_virtual_noop();
 		desc.set_end_sequence();
 		return true;
+	}
+
+	// swizzle the physical address if in little endian mode
+	if (little_endian)
+	{
+		desc.physpc ^= (sizeof(uint64_t) - sizeof(uint32_t));
 	}
 
 	// fetch the opcode
@@ -316,6 +322,9 @@ bool ppc_device::frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			{
 				desc.set_ctr_used();
 				desc.set_ctr_modified();
+				// branch folding
+				if ((G_BO(op) & 0x10) && (!prev || !prev->ctr_modified()) && (is_601_class() || is_603_class()))
+					desc.cycles = 0;
 			}
 			if (op & M_LK)
 				desc.set_lr_modified();
@@ -914,6 +923,7 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 			return true;
 
 		case 0x018: // SLWx
+		case 0x218: // SRWx
 		case 0x01c: // ANDx
 		case 0x03c: // ANDCx
 		case 0x07c: // NORx
@@ -932,7 +942,6 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 			}
 			return true;
 
-		case 0x218: // SRWx
 		case 0x318: // SRAWx
 			desc.set_gpr_used(G_RS(op));
 			desc.set_gpr_used(G_RB(op));
@@ -1020,12 +1029,6 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 				desc.set_can_cause_exception();
 				desc.set_privileged();
 			}
-			if ((m_ppc.m_cap & PPCCAP_4XX) && spr == SPR4XX_TBLU)
-				desc.cycles = POWERPC_COUNT_READ_TBL;
-			else if ((m_ppc.m_cap & PPCCAP_VEA) && spr == SPRVEA_TBL_R)
-				desc.cycles = POWERPC_COUNT_READ_TBL;
-			else if ((m_ppc.m_cap & PPCCAP_OEA) && spr == SPROEA_DEC)
-				desc.cycles = POWERPC_COUNT_READ_DEC;
 			return true;
 
 		case 0x053: // MFMSR
@@ -1054,9 +1057,6 @@ bool ppc_device::frontend::describe_1f(uint32_t op, opcode_desc &desc, const opc
 			if (!(m_ppc.m_cap & PPCCAP_VEA))
 				return false;
 			desc.set_gpr_modified(G_RD(op));
-			spr = compute_spr(G_SPR(op));
-			if (spr == SPRVEA_TBL_R)
-				desc.cycles = POWERPC_COUNT_READ_TBL;
 			return true;
 
 		case 0x068: // NEGx
@@ -1514,9 +1514,8 @@ bool ppc_device::frontend::describe_3b(uint32_t op, opcode_desc &desc, const opc
 			desc.set_fpscr_modified(4);
 			return true;
 
-		case 0x16:  // FSQRTSx
 		case 0x18:  // FRESx
-			if (is_601_class())     // 601 implements neither fsqrts nor fres -> illegal
+			if (is_601_class())     // 601 has no fres -> illegal
 				return false;
 			desc.set_fpr_used(G_RB(op));
 			desc.set_fpr_modified(G_RD(op));
@@ -1596,9 +1595,8 @@ bool ppc_device::frontend::describe_3f(uint32_t op, opcode_desc &desc, const opc
 				desc.set_fpscr_modified(4);
 				return true;
 
-			case 0x16:  // FSQRTx
 			case 0x1a:  // FSQRTEx
-				if (is_601_class())     // 601 implements neither fsqrt nor frsqrte -> illegal
+				if (is_601_class())     // 601 has no frsqrte -> illegal
 					return false;
 				desc.set_fpr_used(G_RB(op));
 				desc.set_fpr_modified(G_RD(op));

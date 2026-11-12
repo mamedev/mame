@@ -324,7 +324,7 @@ void stingnet_state::stingnet(machine_config &config)
 	// video hardware
 	PALETTE(config, "palette", palette_device::RGB_555);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(800, 600);
 	screen.set_visarea(0, 640-1, 0, 480-1);

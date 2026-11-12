@@ -1556,7 +1556,7 @@ void merit_state::pitboss(machine_config &config)
 	ppi1.out_pc_callback().set(FUNC(merit_state::misc_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256);   // temporary, CRTC will configure screen
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

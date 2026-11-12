@@ -390,7 +390,7 @@ invalid:
 
 extFloat80_t extFloat80_lognp1(extFloat80_t a)
 {
-	return extFloat80_fyl2x(a, floatx80_ln_2);
+	return extFloat80_fyl2xp1(a, floatx80_ln_2);
 }
 
 extFloat80_t extFloat80_logn(extFloat80_t a)

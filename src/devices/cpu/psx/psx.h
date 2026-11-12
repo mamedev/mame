@@ -120,6 +120,7 @@ class psxcpu_device : public cpu_device, psxcpu_disassembler::config
 {
 public:
 	// configuration helpers
+	template<typename T> void set_ram(T &&tag) { m_ram.set_tag(std::forward<T>(tag)); }
 	auto gpu_read() { return m_gpu_read_handler.bind(); }
 	auto gpu_write() { return m_gpu_write_handler.bind(); }
 	auto spu_read() { return m_spu_read_handler.bind(); }

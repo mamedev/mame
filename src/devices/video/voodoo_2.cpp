@@ -25,6 +25,8 @@
 #include "emu.h"
 #include "voodoo_2.h"
 
+#include <algorithm>
+#include <array>
 #include <bit>
 
 
@@ -1102,6 +1104,97 @@ u32 voodoo_2_device::reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data)
 
 
 //-------------------------------------------------
+//  reg_blt_fill_w -- direct-command SGRAM fill subset
+//-------------------------------------------------
+
+u32 voodoo_2_device::reg_blt_fill_w(u32 chipmask, u32 regnum, u32 data)
+{
+	// TODO: Other operations/modifiers and deferred launches are not implemented here.
+	if (!BIT(chipmask, 0) || data != 0x80000003U)
+		return reg_unimplemented_w(chipmask, regnum, data);
+
+	m_renderer->wait("reg_blt_fill_w");
+
+	// Alpha planes use expanded numeric values in the renderer, not raw words.
+	if (m_reg.fbz_mode().enable_alpha_planes())
+		return reg_unimplemented_w(chipmask, regnum, data);
+
+	// MAME uses logical 16-bit buffers for 24-bit video output and DRAM banking.
+	// SLI, interlacing and 24-bit DAC-data layouts remain outside this subset.
+	auto const init1 = m_reg.fbi_init1();
+	auto const init2 = m_reg.fbi_init2();
+	auto const init5 = m_reg.fbi_init5();
+	if (init1.enable_sli() ||
+		init5.enable_24bit_dacdata() || init5.enable_interlacing() ||
+		(!init2.enable_triple_buf() && init5.buffer_allocation() == 3))
+		return reg_unimplemented_w(chipmask, regnum, data);
+
+	u32 const dstxy = m_reg.read(voodoo_regs::reg_bltDstXY);
+	u32 const size = m_reg.read(voodoo_regs::reg_bltSize);
+	// SGRAM row/column fields are nine bits. Reject unsupported bits, not aliases.
+	if ((dstxy & ~0x01ff01ffU) || (size & ~0x01ff01ffU) ||
+		BIT(dstxy, 0, 9) != 0 || BIT(size, 0, 9) != 511)
+		return reg_unimplemented_w(chipmask, regnum, data);
+
+	u32 const rowpixels = m_renderer->rowpixels();
+	u32 const page = BIT(dstxy, 16, 9);
+	u32 const pages = BIT(size, 16, 9) + 1;
+	// Full 9-bit intervals within one logical buffer follow Glide's 4 MiB layout.
+	// Physical SGRAM counter carry across page 511 has not been measured.
+	u64 const capacity = u64(m_fbmask) + 1;
+	if (rowpixels == 0 || rowpixels % 64 != 0 || pages % (rowpixels / 64) != 0 ||
+		capacity % 4096 != 0 || m_frontbuf > 2 || m_backbuf > 2)
+		return reg_unimplemented_w(chipmask, regnum, data);
+
+	std::array<u32, 4> const buffers = { m_rgboffs[0], m_rgboffs[1], m_rgboffs[2], m_auxoffs };
+	for (u32 const base : buffers)
+	{
+		if (base != ~u32(0) && base > m_fbmask)
+			return reg_unimplemented_w(chipmask, regnum, data);
+	}
+
+	u64 const begin = u64(page) * 4096;
+	u64 const end = u64(page + pages) * 4096;
+	u64 const tile_bytes = u64(rowpixels) * 64;
+	unsigned matches = 0;
+	for (unsigned i = 0; i < buffers.size(); ++i)
+	{
+		u32 const base = buffers[i];
+		if (base == ~u32(0) || base == m_fbmask)
+			continue;
+
+		u64 limit = capacity;
+		for (u32 const other : buffers)
+		{
+			if (other != ~u32(0) && other > base)
+				limit = std::min<u64>(limit, other);
+		}
+
+		// Only complete tile rows contained in one non-aliased buffer are supported.
+		if (begin < base || (begin - base) % tile_bytes != 0 || end > limit)
+			continue;
+		for (unsigned j = 0; j < buffers.size(); ++j)
+		{
+			if (j != i && buffers[j] == base)
+				return reg_unimplemented_w(chipmask, regnum, data);
+		}
+		// Front-buffer writes need scanout timing that this subset does not model.
+		if (i == m_frontbuf)
+			return reg_unimplemented_w(chipmask, regnum, data);
+		++matches;
+	}
+	if (matches != 1)
+		return reg_unimplemented_w(chipmask, regnum, data);
+
+	// The renderer accesses framebuffer storage as native u16 pixels.
+	u16 *const dest = reinterpret_cast<u16 *>(m_fbram + begin);
+	std::fill_n(dest, (end - begin) / sizeof(*dest), u16(m_reg.read(voodoo_regs::reg_bltColor)));
+	m_video_changed = true;
+	return 0;
+}
+
+
+//-------------------------------------------------
 //  reg_draw_tri_w -- sDrawTri register write
 //-------------------------------------------------
 
@@ -1672,7 +1765,7 @@ static_register_table_entry<voodoo_2_device> const voodoo_2_device::s_register_t
 	REGISTER_ENTRY(bltRop,          passive,     passive,     16, FBI,      NOSYNC,   FIFO)    // 2ec
 	REGISTER_ENTRY(bltColor,        passive,     passive,     32, FBI,      NOSYNC,   FIFO)    // 2f0
 	RESERVED_ENTRY                                                                             // 2f4
-	REGISTER_ENTRY(bltCommand,      passive,     unimplemented,32,FBI,      NOSYNC,   FIFO)    // 2f8
+	REGISTER_ENTRY(bltCommand,      passive,     blt_fill,    32, FBI,      NOSYNC,   FIFO)    // 2f8
 	REGISTER_ENTRY(bltData,         invalid,     passive,     32, FBI,      NOSYNC,   FIFO)    // 2fc
 	//             name             rd handler   wr handler  bits chips     sync?     fifo?
 	REGISTER_ENTRY(textureMode,     invalid,     texture,     32, TREX,     NOSYNC,   FIFO)    // 300

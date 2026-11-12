@@ -521,7 +521,7 @@ void bw2_state::bw2(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &bw2_state::bw2_io);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, SCREEN_TAG).set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(MSM6255_TAG, FUNC(msm6255_device::screen_update));
 	screen.set_size(640, 200);

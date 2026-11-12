@@ -119,7 +119,7 @@ void concept_state::corvus_concept(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_raw(16.364_MHz_XTAL * 2, 944, 0, 720, 578, 0, 560);
 	// Horizontal sync is 34.669 kHz; refresh rate is ~50 or ~60 Hz, jumper-selectable

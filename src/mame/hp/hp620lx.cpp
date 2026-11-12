@@ -49,7 +49,7 @@ void hp620lx_state::hp620lx(machine_config &config)
 	SH7709(config, m_maincpu, 75_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp620lx_state::hp620lx_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(640, 240);
 	m_screen->set_visarea(0, 640 - 1, 0, 240 - 1);

@@ -1580,7 +1580,7 @@ void hp85_state::hp85(machine_config &config)
 
 	m_cpu->set_addrmap(AS_PROGRAM, &hp85_state::cpu_mem_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK / 2 , 312 , 0 , 256 , 256 , 0 , 192);
 	m_screen->set_screen_update(FUNC(hp85_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(hp85_state::vblank_w));
@@ -1757,7 +1757,7 @@ void hp86_state::hp86(machine_config &config)
 
 	RAM(config , m_ram).set_default_size("128K");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK , 784 , 0 , 640 , 261 , 0 , 240);
 	m_screen->set_screen_update(FUNC(hp86_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(hp86_state::vblank_w));

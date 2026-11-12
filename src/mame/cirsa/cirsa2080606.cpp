@@ -139,7 +139,7 @@ GFXDECODE_END
 void cirsa2080606_state::maquinati(machine_config &config)
 {
 	// Video hardware (probably wrong values)
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(cirsa2080606_state::screen_update));
 	screen.set_size(640, 480);

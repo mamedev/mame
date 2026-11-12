@@ -52,6 +52,7 @@ TODO (sis630):
 
 #include "logmacro.h"
 
+//#include "input.h"
 #define DEBUG_VRAM_VIEWER 0
 
 // NOTE: several of these are actually MB integrated with different names
@@ -152,7 +153,6 @@ void sis6326_vga_device::device_start()
 	save_item(STRUCT_MEMBER(m_cursor, y));
 	save_item(STRUCT_MEMBER(m_cursor, x_preset));
 	save_item(STRUCT_MEMBER(m_cursor, y_preset));
-	save_item(STRUCT_MEMBER(m_cursor, pattern_select));
 	save_item(STRUCT_MEMBER(m_cursor, side_pattern_enable));
 
 	save_item(STRUCT_MEMBER(m_overlay, h_display_start));
@@ -210,7 +210,10 @@ void sis6326_vga_device::device_reset()
 	// everything else shouldn't matter for cursor (enable disabled with RAMDAC mode above)
 	// initialize fixed part here: HW cannot set any other bit beyond 21 ~ 18.
 	// On win98se this will map at bottom of VRAM i.e. at $3f'fc00 on 4MiB cards
-	m_cursor.address_base = 0x03'fc00;
+	// Update: "pattern select" register just select the lower 4 bits
+	// 0xe: [0x3f'f800] win2k
+	// 0xf: [0x3f'fc00] win98se
+	m_cursor.address_base = 0x03'c000;
 
 	// same deal for overlay, just knock off enable bits
 	m_overlay.control_0 = 0;
@@ -959,9 +962,9 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 	);
 	// HW Cursor Vertical Start 0/1
 	map(0x1d, 0x1e).lrw8(
-		NAME([this] (offs_t offset) {
+		NAME([this] (offs_t offset) -> u8 {
 			if (offset)
-				return (m_cursor.pattern_select << 4) | (m_cursor.side_pattern_enable << 3) | ((m_cursor.y >> 8) & 7);
+				return (((m_cursor.address_base >> 10) & 0xf) << 4) | (m_cursor.side_pattern_enable << 3) | ((m_cursor.y >> 8) & 7);
 			return m_cursor.y & 0xff;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
@@ -970,7 +973,9 @@ void sis6326_vga_device::sequencer_map(address_map &map)
 				m_cursor.y &= 0x00ff;
 				m_cursor.y |= (data & 0x07) << 8;
 				m_cursor.side_pattern_enable = !!BIT(data, 3);
-				m_cursor.pattern_select = (data >> 4) & 0x0f;
+				//m_cursor.pattern_select = (data >> 4) & 0x0f;
+				m_cursor.address_base &= ~0x00'3c00;
+				m_cursor.address_base |= (data >> 4) << 10;
 			}
 			else
 			{
@@ -1620,10 +1625,10 @@ uint32_t sis6326_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &
 	// HW cursor
 	if (BIT(m_ramdac_mode, 6))
 	{
-		// TODO: preliminary, likely using pattern_select for switching modes
-		// Drawing specifics aren't really documented beyond what the register does.
+		// Drawing specifics aren't really documented beyond register namings.
+		// Is this RAMDAC really unable to swap colors or use a planar layout rather than packed?
 
-		const u32 base_offs = (m_cursor.address_base);
+		const u32 base_offs = m_cursor.address_base;
 		const u8 transparent_pen = 2;
 
 		for (int y = 0; y < 64; y ++)

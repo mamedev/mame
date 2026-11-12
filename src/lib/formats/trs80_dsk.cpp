@@ -290,6 +290,7 @@ bool jv3_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 					sectors[i].deleted = true;
 					sectors[i].bad_data_crc = false;
 					sectors[i].bad_addr_crc = false;
+					sectors[i].weak = false;
 					sectors[i].data = 0;
 				}
 
@@ -320,6 +321,7 @@ bool jv3_format::load(util::random_read &io, uint32_t form_factor, const std::ve
 						sectors[sector].deleted = ((dam == 0x60) || (dam == 0xa0)) ? true : false;
 						sectors[sector].bad_data_crc = (flags & 0x08) ? true : false;
 						sectors[sector].bad_addr_crc = false;
+						sectors[sector].weak = false;
 						sectors[sector].data = &data[data_ptr];
 						if (flags & 0x80)
 							ddensity = true;

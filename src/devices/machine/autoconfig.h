@@ -18,11 +18,12 @@ public:
 	amiga_autoconfig();
 	virtual ~amiga_autoconfig();
 
-	// read from autoconfig space
-	uint16_t autoconfig_read(address_space &space, offs_t offset, uint16_t mem_mask = ~0);
+	uint16_t autoconfig_read(address_space &space, offs_t offset, uint16_t mem_mask);
+	void autoconfig_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	// write to autoconfig space
-	void autoconfig_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	// zorro3 autoconfig
+	uint32_t autoconfig_read32(address_space &space, offs_t offset, uint32_t mem_mask);
+	void autoconfig_write32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
 
 protected:
 	enum board_type
@@ -40,12 +41,40 @@ protected:
 		BOARD_SIZE_512K = 4,
 		BOARD_SIZE_1M = 5,
 		BOARD_SIZE_2M = 6,
-		BOARD_SIZE_4M = 7
+		BOARD_SIZE_4M = 7,
+		// zorro3 additions follow
+		BOARD_SIZE_16M = 8,
+		BOARD_SIZE_32M = 9,
+		BOARD_SIZE_64M = 10,
+		BOARD_SIZE_128M = 11,
+		BOARD_SIZE_256M = 12,
+		BOARD_SIZE_512M = 13,
+		BOARD_SIZE_1G = 14
+	};
+
+	// zorro3 only
+	enum board_subsize
+	{
+		BOARD_SUBSIZE_SAME = 0,
+		BOARD_SUBSIZE_AUTOSIZE = 1,
+		BOARD_SUBSIZE_64K = 2,
+		BOARD_SUBSIZE_128K = 3,
+		BOARD_SUBSIZE_256K = 4,
+		BOARD_SUBSIZE_512K = 5,
+		BOARD_SUBSIZE_1M = 6,
+		BOARD_SUBSIZE_2M = 7,
+		BOARD_SUBSIZE_4M = 8,
+		BOARD_SUBSIZE_6M = 9,
+		BOARD_SUBSIZE_8M = 10,
+		BOARD_SUBSIZE_10M = 11,
+		BOARD_SUBSIZE_12M = 12,
+		BOARD_SUBSIZE_14M = 13
 	};
 
 	// board type & size
 	void autoconfig_board_type(board_type type);
 	void autoconfig_board_size(board_size size);
+	void autoconfig_board_subsize(board_subsize size);
 
 	// various flags
 	void autoconfig_rom_vector_valid(bool state);
@@ -66,8 +95,10 @@ protected:
 	virtual void autoconfig_base_address(offs_t address) = 0;
 
 private:
-	// configuration information about our autoconfig board, 256 nibbles
-	uint16_t m_cfg[0x40];
+	bool is_zorro3() const { return (m_cfg[0x00] >> 2) == BOARD_TYPE_ZORRO3; }
+
+	// configuration information about our autoconfig board
+	uint8_t m_cfg[0x40];
 };
 
 #endif // MAME_MACHINE_AUTOCONFIG_H

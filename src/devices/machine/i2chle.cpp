@@ -12,8 +12,9 @@
     If you want the mix-in's logging to show your device name, override
     get_tag() with something that just returns your tag().
 
-    This mix-in will auto-increment the address on repeated reads/writes,
-    it's up to your class that consumes this mix-in
+    This mix-in will auto-increment the address on repeated reads/writes.
+    It's up to your class that includes this mix-in to change that behavior
+    if necessary.
 */
 
 #include "emu.h"
@@ -23,7 +24,7 @@
 
 #define VERBOSE (0)
 
-#define LOG_OUTPUT_FUNC osd_printf_info
+#define LOG_OUTPUT_FUNC device().logerror
 
 #include "logmacro.h"
 
@@ -33,6 +34,7 @@ constexpr int STATE_GET_SUBADDRESS = 2;
 constexpr int STATE_READ_DATA = 3;
 constexpr int STATE_WAIT_ACK = 4;
 constexpr int STATE_GET_WRITE_DATA = 5;
+constexpr int STATE_GET_READ_SUBADDRESS = 6;
 
 i2c_hle_interface::i2c_hle_interface(const machine_config &mconfig, device_t &device, u16 address) :
 	device_interface(device, "i2chle"),
@@ -50,6 +52,21 @@ i2c_hle_interface::~i2c_hle_interface()
 {
 }
 
+bool i2c_hle_interface::reset_pointer_on_stop() const
+{
+	return true;
+}
+
+bool i2c_hle_interface::one_byte_transfers() const
+{
+	return false;
+}
+
+bool i2c_hle_interface::subaddress_valid(u8 subaddress) const
+{
+	return true;
+}
+
 void i2c_hle_interface::interface_post_start()
 {
 	m_latch = m_bit = 0;
@@ -64,6 +81,8 @@ void i2c_hle_interface::interface_post_start()
 	device().save_item(NAME(m_state_next));
 	device().save_item(NAME(m_data_offset));
 	device().save_item(NAME(m_just_acked));
+	device().save_item(NAME(m_sda));
+	device().save_item(NAME(m_scl));
 
 	write_sda(1);
 }
@@ -82,7 +101,9 @@ void i2c_hle_interface::sda_write(int state)
 				m_state = STATE_IDLE;
 				m_last_address = 0;
 				m_just_acked = false;
-				m_data_offset = 0;
+				if (reset_pointer_on_stop())
+					m_data_offset = 0;
+				i2c_stop();
 			}
 			else
 			{
@@ -91,6 +112,7 @@ void i2c_hle_interface::sda_write(int state)
 				m_bit = 0;
 				m_latch = 0;
 				m_just_acked = false;
+				i2c_start();
 			}
 		}
 	}
@@ -110,6 +132,7 @@ void i2c_hle_interface::scl_write(int state)
 
 			case STATE_GET_ADDRESS:
 			case STATE_GET_SUBADDRESS:
+			case STATE_GET_READ_SUBADDRESS:
 			case STATE_GET_WRITE_DATA:
 				if (m_bit < 8)
 				{
@@ -136,13 +159,13 @@ void i2c_hle_interface::scl_write(int state)
 								// check if reading
 								if (m_latch & 1)
 								{
-									if ((m_latch >> 1) == m_address)
+									if (((m_latch >> 1) == m_address) && is_present())
 									{
 										LOG("%s: address matches, ACKing\n", get_tag());
 										write_sda(0);
 										m_bit = 0;
 										m_latch = 0;
-										m_state_next = STATE_READ_DATA;
+										m_state_next = one_byte_transfers() ? STATE_GET_READ_SUBADDRESS : STATE_READ_DATA;
 										m_state = STATE_WAIT_ACK;
 									}
 									else
@@ -154,14 +177,22 @@ void i2c_hle_interface::scl_write(int state)
 								}
 								else
 								{
-									if ((m_latch >> 1) == m_address)
+									if (((m_latch >> 1) == m_address) && is_present())
 									{
-										LOGMASKED(LOG_DATAOUT, "%s: write: getting subaddress\n", get_tag());
+										LOGMASKED(LOG_DATAOUT, "%s: write: getting %s\n", get_tag(), has_subaddress() ? "subaddress" : "data");
 										m_last_address = m_latch >> 1;
 										write_sda(0);
 										m_bit = 0;
 										m_latch = 0;
-										m_state_next = STATE_GET_SUBADDRESS;
+										if (has_subaddress())
+										{
+											m_state_next = STATE_GET_SUBADDRESS;
+										}
+										else
+										{
+											m_data_offset = 0;
+											m_state_next = STATE_GET_WRITE_DATA;
+										}
 										m_state = STATE_WAIT_ACK;
 									}
 									else
@@ -172,15 +203,24 @@ void i2c_hle_interface::scl_write(int state)
 									}
 								}
 							}
-							else if (m_state == STATE_GET_SUBADDRESS)
+							else if ((m_state == STATE_GET_SUBADDRESS) || (m_state == STATE_GET_READ_SUBADDRESS))
 							{
-								LOGMASKED(LOG_DATAOUT, "%s: subaddress is %02x\n", get_tag(), m_latch);
-								m_data_offset = m_latch;
-								write_sda(0);
-								m_bit = 0;
-								m_latch = 0;
-								m_state_next = STATE_GET_WRITE_DATA;
-								m_state = STATE_WAIT_ACK;
+								if (subaddress_valid(m_latch))
+								{
+									LOGMASKED(LOG_DATAOUT, "%s: subaddress is %02x\n", get_tag(), m_latch);
+									m_data_offset = m_latch;
+									write_sda(0);
+									m_bit = 0;
+									m_latch = 0;
+									m_state_next = (m_state == STATE_GET_SUBADDRESS) ? STATE_GET_WRITE_DATA : STATE_READ_DATA;
+									m_state = STATE_WAIT_ACK;
+								}
+								else
+								{
+									LOG("%s: subaddress %02x not present, NAKing\n", get_tag(), m_latch);
+									m_state = STATE_IDLE;
+									write_sda(1);
+								}
 							}
 							else if (m_state == STATE_GET_WRITE_DATA)
 							{
@@ -190,7 +230,7 @@ void i2c_hle_interface::scl_write(int state)
 								write_sda(0);
 								m_bit = 0;
 								m_latch = 0;
-								m_state_next = STATE_GET_WRITE_DATA;
+								m_state_next = one_byte_transfers() ? STATE_IDLE : STATE_GET_WRITE_DATA;
 								m_state = STATE_WAIT_ACK;
 							}
 						}
@@ -233,7 +273,7 @@ void i2c_hle_interface::scl_write(int state)
 					if (m_scl)
 					{
 						// did the master ACK or NACK?
-						if (m_sda)
+						if (m_sda && master_nack_stops())
 						{
 							LOGMASKED(LOG_DATAOUT, "%s: master NACK\n", get_tag());
 							m_state = STATE_IDLE;
@@ -242,7 +282,11 @@ void i2c_hle_interface::scl_write(int state)
 						else
 						{
 							LOGMASKED(LOG_DATAOUT, "%s: master ACK\n", get_tag());
-							m_just_acked = true;
+							m_just_acked = !one_byte_transfers();
+							if (!m_just_acked)
+							{
+								m_state = STATE_IDLE;
+							}
 						}
 					}
 					else

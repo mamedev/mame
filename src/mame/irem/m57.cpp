@@ -279,28 +279,29 @@ void m57_state::draw_background(screen_device &screen, bitmap_ind16 &bitmap, con
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
 	// from 128 to 255: wrapped
-	for (int y = 128; y <= cliprect.max_y; y++)
+	for (int y = 128; y <= cliprect.bottom(); y++)
 	{
 		int16_t const scrolly = m_scrollram[y] + (m_scrollram[y + 0x100] << 8);
+		auto *const dst = &bitmap.pix(y);
 
 		if (scrolly >= 0)
 		{
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
-				if ((x + scrolly) <= cliprect.max_x)
-					bitmap.pix(y, x) = bitmap.pix(y, x + scrolly);
+				if ((x + scrolly) <= cliprect.right())
+					dst[x] = dst[x + scrolly];
 				else
-					bitmap.pix(y, x) = bitmap.pix(y, cliprect.max_x);
+					dst[x] = dst[cliprect.right()];
 			}
 		}
 		else
 		{
-			for (int x = cliprect.max_x; x >= cliprect.min_x; x--)
+			for (int x = cliprect.right(); x >= cliprect.left(); x--)
 			{
-				if ((x + scrolly) >= cliprect.min_x)
-					bitmap.pix(y, x) = bitmap.pix(y, x + scrolly);
+				if ((x + scrolly) >= cliprect.left())
+					dst[x] = dst[x + scrolly];
 				else
-					bitmap.pix(y, x) = bitmap.pix(y, cliprect.min_x);
+					dst[x] = dst[cliprect.left()];
 			}
 		}
 	}
@@ -539,7 +540,7 @@ void m57_state::m57(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(m57_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 8, 248, 282, 8, 248); // based on m52
 	screen.set_screen_update(FUNC(m57_state::screen_update));
 	screen.set_palette(m_palette);

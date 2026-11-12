@@ -13,11 +13,8 @@ constexpr float VT = 25.7E-3F;  // Thermal voltage constant at 25 deg C.
 
 constexpr float VCC = 15.0F;  // Positive supply voltage.
 constexpr float RS = 1.8E3F;  // Resistor between pin 18 and GND.
-constexpr float RT = 5.6E3F;  // Resistor between pin 2 and pin 3.
 
-// According to the datasheet, RZ should be trimmed so that:
-// pin 2 current = pin 1 current. Or: 22 * VT / RT = 3 / RZ
-constexpr float RZ = 3 * RT / (22 * VT);  // Total resistance between pin 1 and pin 3.
+constexpr float RT_DEFAULT = 5.6E3F;  // Resistor between pin 2 and pin 3.
 
 constexpr float PW_MAX = VCC / 3.0F;
 
@@ -45,6 +42,8 @@ cem3340_device::cem3340_device(const machine_config &mconfig, const char *tag, d
 	: va_vco_device(mconfig, CEM3340, tag, owner, 0)
 	, m_cf(cf)
 	, m_rr(rr)
+	, m_rz(rz_optimal(RT_DEFAULT))
+	, m_rt(RT_DEFAULT)
 {
 	configure_ramp_range(RAMP_MIN, RAMP_MAX);
 	configure_pulse_range(PULSE_MIN, PULSE_MAX);
@@ -57,11 +56,28 @@ cem3340_device::cem3340_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+cem3340_device &cem3340_device::set_tempco_gen_res(float rz, float rt)
+{
+	if (rz == m_rz && rt == m_rt)
+		return *this;
+	update_stream();
+	m_rz = rz;
+	m_rt = rt;
+	return *this;
+}
+
+float cem3340_device::rz_optimal(float rt)
+{
+	// According to the datasheet, RZ should be trimmed so that:
+	// pin 2 current = pin 1 current. Or: 22 * VT / RT = 3 / RZ
+	return 3.0F * rt / (22.0F * VT);
+}
+
 float cem3340_device::ctrl2freq(float freq_ctrl) const
 {
 	// Equations shown and/or described in the datasheet.
 	// freq_ctrl is the current into pin 15.
-	const float iom = (22.0F * VT / RT) * (1.0F - freq_ctrl * RZ / 3.0F);  // Output current of the multiplier.
+	const float iom = (22.0F * VT / m_rt) * (1.0F - freq_ctrl * m_rz / 3.0F);  // Output current of the multiplier.
 	const float vb = iom * RS;  // Voltage at the base of the exponential converter.
 	const float iref = VCC / m_rr;  // Reference input current at pin 13.
 	const float ieg = iref * expf(-vb / VT);  // Output current of the exponential converter.
@@ -91,6 +107,9 @@ void cem3340_device::device_start()
 		fatalerror("%s: Unsupported outputs connected. Unsupported output mask: %x\n",
 				   tag(), get_sound_requested_outputs_mask() & ~SUPPORTED_OUTPUTS);
 	}
+
+	save_item(NAME(m_rz));
+	save_item(NAME(m_rt));
 }
 
 DEFINE_DEVICE_TYPE(CEM3340, cem3340_device, "cem3340", "CEM3340 Voltage Controlled Oscillator")

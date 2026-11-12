@@ -247,7 +247,7 @@ void mikrosha_state::mikrosha(machine_config &config)
 	pit.out_handler<2>().set(FUNC(mikrosha_state::mikrosha_pit_out2));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));
 	screen.set_refresh_hz(50);
 	screen.set_size(78*6, 30*10);

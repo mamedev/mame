@@ -39,6 +39,15 @@ protected:
 	required_device<dafb_base> m_video;
 
 private:
+	// 0x00 interleave config, 0x04-0x28 bank 0-9 config, 0x2c memory top,
+	// 0x30 config, 0x34 refresh
+	static constexpr int DJMEMC_NUM_REGS = 0x38 / 4;
+
+	u32 regs_r(offs_t offset);
+	void regs_w(offs_t offset, u32 data);
+
+	u32 m_regs[DJMEMC_NUM_REGS];
+
 	required_device<cpu_device> m_maincpu;
 	required_region_ptr<u32> m_rom;
 	devcb_write_line m_irq;

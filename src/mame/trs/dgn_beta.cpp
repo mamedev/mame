@@ -314,7 +314,7 @@ void dgn_beta_state::dgnbeta(machine_config &config)
 	m_dmacpu->set_addrmap(AS_PROGRAM, &dgn_beta_state::dgnbeta_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(DGNBETA_FRAMES_PER_SECOND);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(100));
 	screen.set_size(700,550);

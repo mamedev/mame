@@ -231,7 +231,7 @@ void pc4_state::pc4(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc4_state::pc4_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(72);
 	screen.set_screen_update(FUNC(pc4_state::screen_update));
 	screen.set_size(240, 36);

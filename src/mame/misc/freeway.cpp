@@ -204,7 +204,7 @@ void freeway_state::freeway(machine_config &config)
 
 	M48T58(config, "timekpr");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10_MHz_XTAL / 2, 320, 0, 256, 312, 0, 256);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

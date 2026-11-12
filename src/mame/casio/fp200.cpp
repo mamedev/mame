@@ -101,9 +101,10 @@ void fp200_state::video_start()
 
 uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	for(int y = cliprect.min_x; y <= cliprect.max_y; y ++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x ++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const u8 which = x < 80;
 			const u8 x_tile = x >> 3;
@@ -114,7 +115,7 @@ uint32_t fp200_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap
 
 			const u8 vram = m_lcd_vram[which][(base_addr + yi * 0x10) & 0x3ff];
 			uint8_t const pix = BIT(vram, xi);
-			bitmap.pix(y, x) = pix;
+			dst[x] = pix;
 		}
 	}
 
@@ -424,7 +425,7 @@ void fp200_state::fp200(machine_config &config)
 	RP5C01(config, "rtc", XTAL(32'768));
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_screen_update(FUNC(fp200_state::screen_update));

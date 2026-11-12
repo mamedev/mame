@@ -27,7 +27,7 @@ Supported games:
     sstrikera   RA-MA7893-01  Raizing       Sorcer Striker (Unite Trading license)
     mahoudai    RA-MA7893-01  Raizing       Mahou Daisakusen (Japan)
     kingdmgp    RA-MA9402-03  Raizing/8ing  Kingdom Grandprix
-    shippumd    RA-MA9402-03  Raizing/8ing  Shippu Mahou Daisakusen (Japan)
+    shippumd    RA-MA9402-03  Raizing/8ing  Shippuu Mahou Daisakusen (Japan)
     bgaregga    RA9503        Raizing/8ing  Battle Garegga (World - Sat Feb 3 1996)
     bgareggat   RA9503        Raizing/8ing  Battle Garegga (location test - Wed Jan 17 1996)
     bgareggahk  RA9503        Raizing/8ing  Battle Garegga (Hong Kong (and Austria?) - Sat Feb 3 1996)
@@ -728,7 +728,7 @@ void sstriker_state::mahoudai(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(sstriker_state::screen_update));
@@ -775,7 +775,7 @@ void bgaregga_state::bgaregga(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(bgaregga_state::screen_update));
@@ -1273,7 +1273,7 @@ GAME( 1993, sstrikerk,   sstriker, mahoudai,   sstrikerk,  sstriker_state, empty
 GAME( 1993, mahoudai,    sstriker, mahoudai,   mahoudai,   sstriker_state, empty_init,      ROT270, "Raizing (Able license)",          "Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1994, kingdmgp,    0,        shippumd,   kingdmgp,   sstriker_state, empty_init,      ROT270, "Raizing / Eighting", "Kingdom Grandprix",               MACHINE_SUPPORTS_SAVE ) // from Korean board, missing letters on credits screen but this is correct
-GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   sstriker_state, empty_init,      ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, shippumd,    kingdmgp, shippumd,   shippumd,   sstriker_state, empty_init,      ROT270, "Raizing / Eighting", "Shippuu Mahou Daisakusen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1994, kingdmgpbl,  kingdmgp, shippumd,   kingdmgp,   sstriker_state, empty_init,      ROT270, "bootleg", "Kingdom Grandprix (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, bgaregga,    0,        bgaregga,   bgaregga,   bgaregga_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)",            MACHINE_SUPPORTS_SAVE )
@@ -1284,6 +1284,7 @@ GAME( 1996, bgareggak,   bgaregga, bgaregga,   bgareggak,  bgaregga_state, init_
 GAME( 1996, bgaregganv,  bgaregga, bgaregga,   bgareggahk, bgaregga_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)",      MACHINE_SUPPORTS_SAVE ) // displays New Version only when set to HK
 GAME( 1996, bgareggat2,  bgaregga, bgaregga,   bgaregga,   bgaregga_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)",   MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
 GAME( 1996, bgareggacn,  bgaregga, bgaregga,   bgareggacn, bgaregga_state, init_bgaregga,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)",               MACHINE_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
+
 GAME( 1998, bgareggabl,  bgaregga, bgareggabl, bgareggabl, bgaregga_bootleg_state, init_bgaregga,   ROT270, "bootleg (Melody)",   "1945 Er Dai / 1945 Part-2 (Chinese hack of Battle Garegga)",               MACHINE_SUPPORTS_SAVE ) // based on Thu Feb 1 1996 set, Region hardcoded to China
 GAME( 1997, bgareggabla, bgaregga, bgareggabl, bgareggabl, bgaregga_bootleg_state, init_bgaregga,   ROT270, "bootleg (Melody)",   "Leishen Chuan / Thunder Deity Biography (Chinese hack of Battle Garegga)", MACHINE_SUPPORTS_SAVE ) // based on Thu Feb 1 1996 set, Region hardcoded to Asia
 GAME( 1996, bgareggablj, bgaregga, bgareggabl, bgareggabl, bgaregga_bootleg_state, init_bgaregga,   ROT270, "bootleg",            "Battle Garegga (Japan, bootleg) (Sat Feb 3 1996)",                         MACHINE_SUPPORTS_SAVE )

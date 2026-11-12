@@ -156,6 +156,8 @@ public:
 		, m_qs1000(*this, "qs1000")
 		, m_in(*this, "IN%u", 0U)
 		, m_dsw(*this, "DSW")
+		, m_ram(*this, "ram")
+		, m_ram2(*this, "ram2")
 		{ }
 
 	void ssfindo(machine_config &config);
@@ -165,7 +167,7 @@ public:
 	void init_ppcar();
 
 protected:
-	required_device<cpu_device> m_maincpu;
+	required_device<arm7500_cpu_device> m_maincpu;
 	required_device<arm_vidc20_device> m_vidc;
 	required_device<arm7500fe_iomd_device> m_iomd;
 	optional_device<i2cmem_device> m_i2cmem;
@@ -173,6 +175,8 @@ protected:
 	required_device<qs1000_device> m_qs1000;
 	required_ioport_array<2> m_in;
 	required_ioport m_dsw;
+	required_shared_ptr<uint32_t> m_ram;
+	optional_shared_ptr<uint32_t> m_ram2;
 
 	void init_common();
 	virtual void machine_start() override ATTR_COLD;
@@ -401,7 +405,7 @@ void ssfindo_state::ssfindo_map(address_map &map)
 	map(0x03245002, 0x03245002).w(FUNC(ssfindo_state::sound_w));
 	map(0x0324f000, 0x0324f003).r(FUNC(ssfindo_state::SIMPLEIO_r));
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
-	map(0x10000000, 0x11ffffff).ram();
+	map(0x10000000, 0x11ffffff).ram().share("ram");
 }
 
 void ssfindo_state::ppcar_map(address_map &map)
@@ -418,8 +422,8 @@ void ssfindo_state::ppcar_map(address_map &map)
 	map(0x03341000, 0x0334101f).nopw();
 	map(0x033c0000, 0x033c0003).r(FUNC(ssfindo_state::io_r)).w(FUNC(ssfindo_state::io_w));
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
-	map(0x08000000, 0x08ffffff).ram();
-	map(0x10000000, 0x10ffffff).ram();
+	map(0x08000000, 0x08ffffff).ram().share("ram2");
+	map(0x10000000, 0x10ffffff).ram().share("ram");
 }
 
 uint32_t tetfight_state::tetfight_unk_r()
@@ -438,11 +442,18 @@ void tetfight_state::tetfight_map(address_map &map)
 	map(0x03240020, 0x03240023).r(FUNC(tetfight_state::tetfight_unk_r));
 	map(0x03240020, 0x03240020).w(FUNC(tetfight_state::sound_w));
 	map(0x03400000, 0x037fffff).w(m_vidc, FUNC(arm_vidc20_device::write));
-	map(0x10000000, 0x14ffffff).ram();
+	map(0x10000000, 0x14ffffff).ram().share("ram");
 }
 
 void ssfindo_state::machine_start()
 {
+	// the recompiler accesses RAM in place
+	m_maincpu->arm7drc_add_fastram(0x10000000, 0x10000000 + m_ram.bytes() - 1, false, &m_ram[0]);
+	if (m_ram2.found())
+	{
+		m_maincpu->arm7drc_add_fastram(0x08000000, 0x08000000 + m_ram2.bytes() - 1, false, &m_ram2[0]);
+	}
+
 	// TODO: convert to exact flash device
 	save_item(NAME(m_flashAdr));
 	save_item(NAME(m_flashOffset));
@@ -613,25 +624,28 @@ INPUT_PORTS_END
 
 void ssfindo_state::ssfindo(machine_config &config)
 {
-	ARM7(config, m_maincpu, 54_MHz_XTAL);
+	ARM7500(config, m_maincpu, 54_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ssfindo_map);
 
 	I2C_24C01(config, m_i2cmem);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
-	ARM_VIDC20(config, m_vidc, 24_MHz_XTAL);
+	SPEAKER(config, "speaker", 2).front();
+
+	ARM_VIDC20(config, m_vidc, 54_MHz_XTAL / 2);
 	m_vidc->set_screen("screen");
 	m_vidc->vblank().set(m_iomd, FUNC(arm_iomd_device::vblank_irq));
 	m_vidc->sound_drq().set(m_iomd, FUNC(arm_iomd_device::sound_drq));
+	m_vidc->add_route(0, "speaker", 1.00, 0);
+	m_vidc->add_route(1, "speaker", 1.00, 1);
 
 	ARM7500FE_IOMD(config, m_iomd, 54_MHz_XTAL);
 	m_iomd->set_host_cpu_tag(m_maincpu);
 	m_iomd->set_vidc_tag(m_vidc);
 	m_iomd->iolines_read().set(FUNC(ssfindo_state::iolines_r));
 	m_iomd->iolines_write().set(FUNC(ssfindo_state::iolines_w));
-
-	SPEAKER(config, "speaker", 2).front();
+	m_iomd->irq_cb().set_inputline(m_maincpu, arm7_cpu_device::ARM7_IRQ_LINE);
 
 	qs1000_device &qs1000(QS1000(config, "qs1000", 24_MHz_XTAL));
 	qs1000.set_external_rom(true);
@@ -646,6 +660,8 @@ void ssfindo_state::ppcar(machine_config &config)
 	ssfindo(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &ssfindo_state::ppcar_map);
+	// sets external sclk, unverified value
+	m_vidc->set_ext_sclk(XTAL(24'000'000));
 
 	subdevice<qs1000_device>("qs1000")->set_external_rom(false); // ppcar has no external ROM
 	subdevice<i8052_device>("qs1000:cpu")->set_disable(); // internal ROM hasn't been dumped yet

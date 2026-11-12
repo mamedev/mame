@@ -52,7 +52,7 @@ const tiny_rom_entry *mga2064w_device::device_rom_region() const
 
 void mga2064w_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800), 900, 0, 640, 526, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(matrox_vga_device::screen_update));
 
@@ -64,7 +64,7 @@ void mga2064w_device::device_add_mconfig(machine_config &config)
 void mga2064w_device::device_start()
 {
 	pci_card_device::device_start();
-	// NB: following is swapped on G400
+	// NOTE: following is swapped on G400
 	add_map(    16*1024, M_MEM, FUNC(mga2064w_device::mgabase1_map));
 	add_map(8*1024*1024, M_MEM, FUNC(mga2064w_device::mgabase2_map));
 	//  add_rom_from_region();

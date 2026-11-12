@@ -522,7 +522,7 @@ void undrfire_state::undrfire(machine_config &config)
 	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -583,7 +583,7 @@ void undrfire_state::cbombers(machine_config &config)
 	tc0510nio.read_7_callback().set_ioport("SYSTEM");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -941,9 +941,10 @@ ROM_START( cbombersp )
 ROM_END
 
 
-GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito Corporation Japan",   "Under Fire (World)",              0 )
-GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito America Corporation", "Under Fire (US)",                 0 )
-GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito Corporation",         "Under Fire (Japan)",              0 )
-GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito Corporation Japan",   "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
-GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito Corporation",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
-GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito Corporation",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAME( 1993, undrfire,  0,        undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito",         "Under Fire (World)",              0 )
+GAME( 1993, undrfireu, undrfire, undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito America", "Under Fire (US)",                 0 )
+GAME( 1993, undrfirej, undrfire, undrfire, undrfire, undrfire_state, empty_init, ROT0, "Taito",         "Under Fire (Japan)",              0 )
+
+GAMEL(1994, cbombers,  0,        cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito",         "Chase Bombers (World)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersj, cbombers, cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito",         "Chase Bombers (Japan)",           MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )
+GAMEL(1994, cbombersp, cbombers, cbombers, cbombers, undrfire_state, empty_init, ROT0, "Taito",         "Chase Bombers (Japan Prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NODEVICE_LAN, layout_cbombers )

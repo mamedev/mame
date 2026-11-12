@@ -224,7 +224,7 @@ void qs300_state::qs300(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(qs300_state::lcd_palette), 2);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(240, 80);
 	screen.set_visarea(0, 239, 0, 63);
@@ -379,5 +379,5 @@ ROM_END
 
 } // anonymous namespace
 
-SYST( 1999, qs300,       0, 0, qs300, qs300, qs300_state,    empty_init, "Yamaha", "QS300",    MACHINE_NOT_WORKING )
-SYST( 1999, eosb900, qs300, 0, qs300, qs300, eos_b900_state, empty_init, "Yamaha", "EOS B900", MACHINE_NOT_WORKING )
+SYST( 1999, qs300,       0, 0, qs300, qs300, qs300_state,    empty_init, "Yamaha", "QS300 Music Production Synthesizer",    MACHINE_NOT_WORKING )
+SYST( 1999, eosb900, qs300, 0, qs300, qs300, eos_b900_state, empty_init, "Yamaha", "EOS B900 Music Production Synthesizer", MACHINE_NOT_WORKING )

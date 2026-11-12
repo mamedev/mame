@@ -37,7 +37,7 @@ public:
 		m_maincpu(*this, "maincpu")
 	{ }
 
-	void vsmilpro(machine_config &config);
+	void vsmilpro(machine_config &config) ATTR_COLD;
 
 private:
 	void vsmilpro_map(address_map &map) ATTR_COLD;
@@ -58,7 +58,7 @@ INPUT_PORTS_END
 void vsmilpro_state::vsmilpro(machine_config &config)
 {
 	// basic machine hardware
-	ARM9(config, m_maincpu, 150000000);
+	ARM9(config, m_maincpu, 150'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vsmilpro_state::vsmilpro_map);
 
 	CDROM(config, "cdrom").set_interface("vsmile_vdisk");
@@ -72,10 +72,19 @@ ROM_START( vsmilpro )
 	ROM_LOAD( "70004.bin", 0x000000, 0x200000, CRC(b9161eac) SHA1(8d75fdeda8c4e228a0b1efd35011f9f667f9fb23) )
 ROM_END
 
+ROM_START( vsmilprof ) // 35-70000-131-203 707399_8 PCB
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "a29l160atv.u6", 0x000000, 0x200000, CRC(7a266f2a) SHA1(94337677b2d17eaeef53e010bbd26588f677cca4) )
+
+	ROM_REGION( 0x10000, "spi", 0 )
+	ROM_LOAD( "sst25vf512.u5", 0x00000, 0x10000, CRC(a895a5f6) SHA1(4cc246c8c753a7f11a4de76ebc221dc5fe0798c8) )
+ROM_END
+
 } // anonymous namespace
 
 
 // Driver
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME       FLAGS
-COMP( 2007, vsmilpro, 0,      0,      vsmilpro, vsmilpro, vsmilpro_state, empty_init, "VTech", "V.Smile Pro", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR  NAME       PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY  FULLNAME                 FLAGS
+COMP( 2007, vsmilpro,  0,        0,      vsmilpro, vsmilpro, vsmilpro_state, empty_init, "VTech", "V.Smile Pro (Germany)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+COMP( 2007, vsmilprof, vsmilpro, 0,      vsmilpro, vsmilpro, vsmilpro_state, empty_init, "VTech", "V.Smile Pro (France)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

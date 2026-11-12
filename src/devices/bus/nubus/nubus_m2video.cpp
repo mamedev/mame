@@ -112,7 +112,7 @@ void nubus_m2video_device::card_map(address_map &map)
 
 void nubus_m2video_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_m2video_device::screen_update));
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 
@@ -358,7 +358,7 @@ void nubus_m2video_device::calc_screen_params()
 	LOGMASKED(LOG_CRTC, "vvis = %d, vtotal = %d\n", m_vres, m_vtotal);
 
 	rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-	m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, 30.24_MHz_XTAL).as_attoseconds());
+	m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, 30.24_MHz_XTAL));
 }
 
 } // anonymous namespace

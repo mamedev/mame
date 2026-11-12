@@ -147,8 +147,8 @@ NETLIST_START(rallyx)
 	//
 	MB3730_SIL(U3730)
 	PARAM(U3730.GAIN, 29)               // ~35dB bridged (vs datasheet 281/~55dB):
-	                                    // lowers the explosion noise floor; the
-	                                    // injected WSG audio is boosted to suit.
+										// lowers the explosion noise floor; the
+										// injected WSG audio is boosted to suit.
 
 	CAP(C4, CAP_U(0.1))                 // pin1 input coupling
 	CAP(C26, CAP_U(220))                // pin2 FB cap (AC gain corner)

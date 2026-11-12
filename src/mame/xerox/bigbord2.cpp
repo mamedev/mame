@@ -223,7 +223,7 @@ u8 bigbord2_sasi_host_device::status_r()
 	if (ctrl & S_MSG) d |= 0x08;   // MSG
 	if (ctrl & S_CTL) d |= 0x20;   // C/D
 	if (ctrl & S_REQ) d |= 0x80;   // REQ -- the DMA-variant ST412 BIOS polls D9 bit7
-	                               // (REQBIT); the INIR cbios masks it off (0x2b/0x21)
+								   // (REQBIT); the INIR cbios masks it off (0x2b/0x21)
 	return d;
 }
 
@@ -845,7 +845,7 @@ void bigbord2_state::bigbord2(machine_config &config)
 	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(10.69425_MHz_XTAL, 700, 0, 560, 260, 0, 240);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_crt8002);

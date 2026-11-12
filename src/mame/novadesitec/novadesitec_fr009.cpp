@@ -95,7 +95,7 @@ void novadesitec_fr009_state::fr009(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &novadesitec_fr009_state::main_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO: all wrong
+	screen_device &screen(SCREEN(config, "screen")); // TODO: all wrong
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(640, 480);
@@ -108,7 +108,7 @@ void novadesitec_fr009_state::fr009(machine_config &config)
 }
 
 
-ROM_START( unkfr009 )
+ROM_START( supcolr2 )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "hd64f2318te25_1e4.u10", 0x00000, 0x40000, NO_DUMP ) // internal ROM
 
@@ -119,4 +119,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, unkfr009, 0, fr009, fr009, novadesitec_fr009_state, empty_init, ROT0, "Nova Desitec", "unknown game on FR009 hardware",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // possibly Super Color II (wild guesswork due to SC II barely readable on a label)
+GAME( 200?, supcolr2, 0, fr009, fr009, novadesitec_fr009_state, empty_init, ROT0, "Nova Desitec", "Super Color II",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

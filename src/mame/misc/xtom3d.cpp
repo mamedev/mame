@@ -15,10 +15,6 @@ TODO:
 - pumpit1: MSCDEX hangs often when Voodoo is disabled, related to above?
 - Voodoo Banshee doesn't handle VGA legacy modes correctly (including PCI VGA control),
   so these will currently black screen until they completes bootstrap;
-- xtom3d: regression with GCC 14+ builds causes erratic gameplay logic:
-  - shooting from right side makes bullet to go to the right instead of go straight;
-  - plane can't tilt to the left, stays still;
-  - camera eventually rotates the game orientation (???);
 - xtom3d: fog wraps around instead of being more linear;
 - pumpit1: flickers at start of any song without any feedback, abruptly throws steps with working
   playback, ends with silence and steps still going;
@@ -717,7 +713,7 @@ void xtom3d_state::xtom3d(machine_config &config)
 //  subdevice<generic_voodoo_device>(PCI_AGP_ID":voodoo")->vblank_callback().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq5_w));
 
 	// TODO: fix legacy raw setup here
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 640 - 1, 0, 480 - 1);

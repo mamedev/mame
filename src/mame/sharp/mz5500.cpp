@@ -423,7 +423,7 @@ void mz5500_state::mz5500(machine_config &config)
 	RP5C01(config, m_rtc, XTAL(32'768));
 	m_rtc->out_alarm_callback().set(m_pic[1], FUNC(pic8259_device::ir0_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));

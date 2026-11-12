@@ -235,9 +235,9 @@ void marinedt_state::init_seabitmap()
 	m_seabitmap[0]->fill(64, clip);
 	m_seabitmap[1]->fill(64 + 32, clip);
 
-	for (int y = clip.min_y; y <= clip.max_y; y++)
+	for (int y = clip.top(); y <= clip.bottom(); y++)
 	{
-		for (int x = clip.min_x; x <= clip.max_x; x++)
+		for (int x = clip.left(); x <= clip.right(); x++)
 		{
 			// TODO: exact formula (related to total h size?)
 			uint8_t blue_pen = 0x48 + ((x - 32) / 8);
@@ -653,7 +653,7 @@ void marinedt_state::marinedt(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(marinedt_state::irq0_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(marinedt_state::screen_update));
 	// TODO: unverified, template to get ~60 fps
 	m_screen->set_raw(MAIN_CLOCK / 2, 328, 0, 256, 263, 32, 256);
@@ -706,4 +706,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT90, "Taito", "Marine Date", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1981, marinedt, 0, marinedt, marinedt, marinedt_state, empty_init, ROT90, "Taito", "Marine Date", MACHINE_IMPERFECT_COLORS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

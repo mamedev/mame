@@ -733,9 +733,9 @@ void st_video_device::glue_sync()
 				logerror("Video mode: %s\n", mt[m_mode]);
 				logerror("dt=%d cps=%d / %d\n", dt, cycles_per_screen[m_mode], 2*cycles_per_screen[m_mode]);
 				switch(m_mode) {
-				case 0: screen().configure(128*8, 313, rectangle(8*(121-112), 8*(128-112 + 98-0), 223-199, 506-199-1), attotime::from_ticks(16*cycles_per_screen[m_mode], clock()).as_attoseconds()); break;
-				case 1: screen().configure(127*8, 263, rectangle(8*(121-112), 8*(128-112 + 99-1), 264-249, 506-249-1), attotime::from_ticks(16*cycles_per_screen[m_mode], clock()).as_attoseconds()); break;
-				case 2: screen().configure(56*16, 501, rectangle(0, 16*(122-72), 0, 511-11-1), attotime::from_ticks(16*cycles_per_screen[m_mode], clock()).as_attoseconds()); break;
+				case 0: screen().configure(128*8, 313, rectangle(8*(121-112), 8*(128-112 + 98-0), 223-199, 506-199-1), attotime::from_ticks(16*cycles_per_screen[m_mode], clock())); break;
+				case 1: screen().configure(127*8, 263, rectangle(8*(121-112), 8*(128-112 + 99-1), 264-249, 506-249-1), attotime::from_ticks(16*cycles_per_screen[m_mode], clock())); break;
+				case 2: screen().configure(56*16, 501, rectangle(0, 16*(122-72), 0, 511-11-1), attotime::from_ticks(16*cycles_per_screen[m_mode], clock())); break;
 				}
 			}
 			m_vsc = base_vsc[m_mode];

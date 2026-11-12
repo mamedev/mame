@@ -46,7 +46,7 @@ std::pair<std::error_condition, std::string> hp9845_optrom_device::call_load()
 		return std::make_pair(image_error::BADSOFTWARE, "Software item is missing 'base' feature");
 	}
 
-	offs_t base_addr;
+	uint32_t base_addr;
 	if (base_feature[ 0 ] != '0' || base_feature[ 1 ] != 'x' || sscanf(&base_feature[ 2 ] , "%x" , &base_addr) != 1) {
 		return std::make_pair(image_error::BADSOFTWARE, "Can't parse software item 'base' feature");
 	}
@@ -62,7 +62,7 @@ std::pair<std::error_condition, std::string> hp9845_optrom_device::call_load()
 				util::string_format("Illegal base address (%x)", base_addr));
 	}
 
-	auto length = get_software_region_length("rom") / 2;
+	uint32_t length = get_software_region_length("rom") / 2;
 
 	if (length < 0x1000 || length > 0x8000 || (length & 0xfff) != 0 || ((base_addr & 0x7000) + length) > 0x8000) {
 		return std::make_pair(

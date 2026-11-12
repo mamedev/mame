@@ -159,7 +159,6 @@ Demo tape contents:
 
     TODO:
 
-    - tape input/output
     - tmc2000: add missing keys
     - tmc2000: TOOL-2000 rom banking
     - nano: correct time constant for EF4 RC circuit
@@ -179,22 +178,245 @@ Demo tape contents:
 */
 
 #include "emu.h"
-#include "tmc1800.h"
 
+#include "cpu/cosmac/cosmac.h"
+#include "imagedev/cassette.h"
+#include "imagedev/snapquik.h"
+#include "machine/ram.h"
+#include "machine/rescap.h"
 #include "sound/beep.h"
+#include "sound/cdp1864.h"
+#include "video/cdp1861.h"
+#include "screen.h"
 #include "speaker.h"
+
+#define TMC2000_COLORRAM_SIZE   0x200
+
+#define SCREEN_TAG      "screen"
+#define CDP1802_TAG     "cdp1802"
+#define CDP1861_TAG     "cdp1861"
+#define CDP1864_TAG     "m3"
+
+namespace {
+
+
+class tmc1800_base_state : public driver_device
+{
+public:
+	tmc1800_base_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, CDP1802_TAG)
+		, m_cassette(*this, "cassette")
+		, m_rom(*this, CDP1802_TAG)
+		, m_run(*this, "RUN")
+		, m_ram(*this, RAM_TAG)
+		, m_beeper(*this, "beeper")
+	{ }
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
+
+protected:
+	required_device<cosmac_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
+	required_memory_region m_rom;
+	required_ioport m_run;
+	required_device<ram_device> m_ram;
+	optional_device<beep_device> m_beeper;
+};
+
+class tmc1800_state : public tmc1800_base_state
+{
+public:
+	tmc1800_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tmc1800_base_state(mconfig, type, tag)
+		, m_vdc(*this, CDP1861_TAG)
+		, m_key_row(*this, {"Y0", "Y1"})
+	{ }
+
+	void keylatch_w(uint8_t data);
+	uint8_t dispon_r();
+	void dispoff_w(uint8_t data);
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
+
+	void tmc1800(machine_config &config) ATTR_COLD;
+	void tmc1800_io_map(address_map &map) ATTR_COLD;
+	void tmc1800_map(address_map &map) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	required_device<cdp1861_device> m_vdc;
+	required_ioport_array<2> m_key_row;
+
+	/* keyboard state */
+	int m_keylatch = 0;
+};
+
+class osc1000b_state : public tmc1800_base_state
+{
+public:
+	osc1000b_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tmc1800_base_state(mconfig, type, tag)
+		, m_key_row(*this, {"Y0", "Y1"})
+	{ }
+
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void keylatch_w(uint8_t data);
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
+
+	void osc1000b(machine_config &config) ATTR_COLD;
+	void osc1000b_io_map(address_map &map) ATTR_COLD;
+	void osc1000b_map(address_map &map) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	required_ioport_array<2> m_key_row;
+
+	/* keyboard state */
+	int m_keylatch = 0;
+};
+
+class tmc2000_state : public tmc1800_base_state
+{
+public:
+	tmc2000_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tmc1800_base_state(mconfig, type, tag)
+		, m_cti(*this, CDP1864_TAG)
+		, m_colorram(*this, "color_ram", TMC2000_COLORRAM_SIZE, ENDIANNESS_LITTLE)
+		, m_key_row(*this, {"Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7"})
+		, m_led(*this, "led1")
+	{ }
+
+	void keylatch_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
+	void dma_w(offs_t offset, uint8_t data);
+	int rdata_r();
+	int bdata_r();
+	int gdata_r();
+	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
+
+	void bankswitch();
+
+	void tmc2000(machine_config &config) ATTR_COLD;
+	void tmc2000_io_map(address_map &map) ATTR_COLD;
+	void tmc2000_map(address_map &map) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	required_device<cdp1864_device> m_cti;
+	memory_share_creator<uint8_t> m_colorram;
+	required_ioport_array<8> m_key_row;
+	output_finder<> m_led;
+
+	// memory
+	int m_rac = 0;
+	int m_roc = 0;
+
+	/* video state */
+	uint8_t m_color = 0;
+
+	/* keyboard state */
+	int m_keylatch = 0;
+};
+
+class nano_state : public tmc1800_base_state
+{
+public:
+	nano_state(const machine_config &mconfig, device_type type, const char *tag)
+		: tmc1800_base_state(mconfig, type, tag)
+		, m_cti(*this, CDP1864_TAG)
+		, m_ny0(*this, "NY0")
+		, m_ny1(*this, "NY1")
+		, m_monitor(*this, "MONITOR")
+		, m_led(*this, "led1")
+	{ }
+
+	void keylatch_w(uint8_t data);
+	void bankswitch_w(uint8_t data);
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
+	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
+	DECLARE_INPUT_CHANGED_MEMBER( monitor_pressed );
+
+	void nano(machine_config &config) ATTR_COLD;
+	void nano_io_map(address_map &map) ATTR_COLD;
+	void nano_map(address_map &map) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	TIMER_CALLBACK_MEMBER(assert_ef4);
+
+	required_device<cdp1864_device> m_cti;
+	required_ioport m_ny0;
+	required_ioport m_ny1;
+	required_ioport m_monitor;
+	output_finder<> m_led;
+
+	emu_timer *m_ef4_timer = nullptr;
+
+	/* keyboard state */
+	int m_keylatch = 0;
+};
+
+
+/* Video Handlers */
+
+// Telmac 2000
+
+int tmc2000_state::rdata_r()
+{
+	return BIT(m_color, 2);
+}
+
+int tmc2000_state::bdata_r()
+{
+	return BIT(m_color, 1);
+}
+
+int tmc2000_state::gdata_r()
+{
+	return BIT(m_color, 0);
+}
+
+// OSM-200
+
+uint32_t osc1000b_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	return 0;
+}
 
 
 /* Read/Write Handlers */
 
 void tmc1800_state::keylatch_w(uint8_t data)
 {
-	m_keylatch = data;
+	m_keylatch = data & 0x0f;
 }
 
 void osc1000b_state::keylatch_w(uint8_t data)
 {
-	m_keylatch = data;
+	m_keylatch = data & 0x0f;
 }
 
 void tmc2000_state::keylatch_w(uint8_t data)
@@ -320,7 +542,6 @@ void tmc1800_state::dispoff_w(uint8_t data)
 
 void tmc1800_state::tmc1800_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x7800).ram();
 	map(0x8000, 0x81ff).mirror(0x7e00).rom().region(CDP1802_TAG, 0);
 }
 
@@ -334,7 +555,6 @@ void tmc1800_state::tmc1800_io_map(address_map &map)
 
 void osc1000b_state::osc1000b_map(address_map &map)
 {
-	map(0x0000, 0x07ff).mirror(0x7800).ram();
 	map(0x8000, 0x81ff).mirror(0x7e00).rom().region(CDP1802_TAG, 0);
 }
 
@@ -563,7 +783,9 @@ int tmc1800_state::ef2_r()
 
 int tmc1800_state::ef3_r()
 {
-	return CLEAR_LINE; // TODO
+	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
+
+	return BIT(data, m_keylatch % 8);
 }
 
 void tmc1800_state::q_w(int state)
@@ -585,7 +807,9 @@ int osc1000b_state::ef2_r()
 
 int osc1000b_state::ef3_r()
 {
-	return CLEAR_LINE; // TODO
+	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
+
+	return BIT(data, m_keylatch % 8);
 }
 
 void osc1000b_state::q_w(int state)
@@ -675,6 +899,8 @@ void nano_state::q_w(int state)
 
 void tmc1800_state::machine_start()
 {
+	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, m_ram->mask(), 0x7fff & ~m_ram->mask(), m_ram->pointer());
+
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
@@ -693,6 +919,8 @@ void tmc1800_state::machine_reset()
 
 void osc1000b_state::machine_start()
 {
+	m_maincpu->space(AS_PROGRAM).install_ram(0x0000, m_ram->mask(), 0x7fff & ~m_ram->mask(), m_ram->pointer());
+
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
@@ -764,13 +992,12 @@ QUICKLOAD_LOAD_MEMBER(tmc1800_base_state::quickload_cb)
 {
 	int const size = image.length();
 
-	if (size > m_ram->size()) // FIXME: comparing size to RAM size, but loading to ROM - seems incorrect
+	if (size > m_ram->size())
 	{
 		return std::make_pair(image_error::INVALIDLENGTH, std::string());
 	}
 
-	uint8_t *const ptr = m_rom->base();
-	image.fread(ptr, size);
+	image.fread(m_ram->pointer(), size);
 
 	return std::make_pair(std::error_condition(), std::string());
 }
@@ -787,9 +1014,15 @@ void tmc1800_state::tmc1800(machine_config &config)
 	m_maincpu->ef3_cb().set(FUNC(tmc1800_state::ef3_r));
 	m_maincpu->q_cb().set(FUNC(tmc1800_state::q_w));
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
+	m_maincpu->sc_cb().set(m_vdc, FUNC(cdp1861_device::sc_w));
+	m_maincpu->tpa_cb().set(m_vdc, FUNC(cdp1861_device::tpa_w));
+	m_maincpu->int_cb().set(m_vdc, FUNC(cdp1861_device::int_r));
+	m_maincpu->dma_out_cb().set(m_vdc, FUNC(cdp1861_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_vdc, FUNC(cdp1861_device::efx_r));
 
 	// video hardware
-	tmc1800_video(config);
+	CDP1861(config, m_vdc, XTAL(1'750'000)).set_screen(SCREEN_TAG);
+	SCREEN(config, SCREEN_TAG);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -824,7 +1057,11 @@ void osc1000b_state::osc1000b(machine_config &config)
 	m_maincpu->q_cb().set(FUNC(osc1000b_state::q_w));
 
 	// video hardware
-	osc1000b_video(config);
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
+	screen.set_screen_update(FUNC(osc1000b_state::screen_update));
+	screen.set_refresh_hz(50);
+	screen.set_size(320, 200);
+	screen.set_visarea(0, 319, 0, 199);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -852,9 +1089,22 @@ void tmc2000_state::tmc2000(machine_config &config)
 	m_maincpu->ef3_cb().set(FUNC(tmc2000_state::ef3_r));
 	m_maincpu->q_cb().set(FUNC(tmc2000_state::q_w));
 	m_maincpu->dma_wr_cb().set(FUNC(tmc2000_state::dma_w));
+	m_maincpu->sc_cb().set(m_cti, FUNC(cdp1864_device::sc_w));
+	m_maincpu->tpa_cb().set(m_cti, FUNC(cdp1864_device::tpa_w));
+	m_maincpu->int_cb().set(m_cti, FUNC(cdp1864_device::int_r));
+	m_maincpu->dma_out_cb().set(m_cti, FUNC(cdp1864_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_cti, FUNC(cdp1864_device::efx_r));
 
 	// video hardware
-	tmc2000_video(config);
+	SCREEN(config, SCREEN_TAG);
+	SPEAKER(config, "mono").front_center();
+	CDP1864(config, m_cti, XTAL(1'750'000)).set_screen(SCREEN_TAG);
+	m_cti->inlace_cb().set_constant(0);
+	m_cti->rdata_cb().set(FUNC(tmc2000_state::rdata_r));
+	m_cti->bdata_cb().set(FUNC(tmc2000_state::bdata_r));
+	m_cti->gdata_cb().set(FUNC(tmc2000_state::gdata_r));
+	m_cti->set_chrominance(RES_K(1.21), RES_K(2.05), RES_K(2.26), RES_K(3.92)); // RL64, RL63, RL61, RL65 (also RH62 (2K pot) in series, but ignored here)
+	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));
@@ -878,9 +1128,22 @@ void nano_state::nano(machine_config &config)
 	m_maincpu->ef3_cb().set(FUNC(nano_state::ef3_r));
 	m_maincpu->q_cb().set(FUNC(nano_state::q_w));
 	m_maincpu->dma_wr_cb().set(m_cti, FUNC(cdp1864_device::dma_w));
+	m_maincpu->sc_cb().set(m_cti, FUNC(cdp1864_device::sc_w));
+	m_maincpu->tpa_cb().set(m_cti, FUNC(cdp1864_device::tpa_w));
+	m_maincpu->int_cb().set(m_cti, FUNC(cdp1864_device::int_r));
+	m_maincpu->dma_out_cb().set(m_cti, FUNC(cdp1864_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_cti, FUNC(cdp1864_device::efx_r));
 
 	// video hardware
-	nano_video(config);
+	SCREEN(config, SCREEN_TAG);
+	SPEAKER(config, "mono").front_center();
+	CDP1864(config, m_cti, XTAL(1'750'000)).set_screen(SCREEN_TAG);
+	m_cti->inlace_cb().set_constant(0);
+	m_cti->rdata_cb().set_constant(1);
+	m_cti->bdata_cb().set_constant(1);
+	m_cti->gdata_cb().set_constant(1);
+	m_cti->set_chrominance(RES_K(1.21), RES_INF, RES_INF, 0); // R18 (unconfirmed)
+	m_cti->add_route(ALL_OUTPUTS, "mono", 0.25);
 
 	// devices
 	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(tmc1800_base_state::quickload_cb));
@@ -922,6 +1185,8 @@ ROM_START( nano )
 	ROM_REGION( 0x200, CDP1802_TAG, 0 )
 	ROM_LOAD( "mmi6349.ic", 0x000, 0x200, BAD_DUMP CRC(1ec1b432) SHA1(ac41f5e38bcd4b80bd7a5b277a2c600899fd5fb8) ) // equivalent to 82S141
 ROM_END
+
+} // anonymous namespace
 
 /* System Drivers */
 

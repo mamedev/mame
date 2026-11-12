@@ -12,8 +12,8 @@
 #pragma once
 
 #include "abcbus.h"
-#include "bus/scsi/scsi.h"
 #include "cpu/z80/z80.h"
+#include "machine/nscsi_cb.h"
 #include "machine/z80daisy.h"
 #include "machine/z80dma.h"
 
@@ -44,8 +44,8 @@ protected:
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
-	virtual uint8_t abcbus_inp() override;
-	virtual void abcbus_out(uint8_t data) override;
+	virtual uint8_t abcbus_inp(offs_t offset) override;
+	virtual void abcbus_out(offs_t offset, uint8_t data) override;
 	virtual uint8_t abcbus_stat() override;
 	virtual void abcbus_c1(uint8_t data) override;
 	virtual void abcbus_c3(uint8_t data) override;
@@ -57,12 +57,11 @@ private:
 	void memory_write_byte(offs_t offset, uint8_t data);
 	uint8_t io_read_byte(offs_t offset);
 	void io_write_byte(offs_t offset, uint8_t data);
+	void dma_busreq_w(int state);
 
-	void write_sasi_req(int state);
-	void write_sasi_io(int state);
-	void write_sasi_cd(int state);
-	void write_sasi_msg(int state);
-	void write_sasi_bsy(int state);
+	void sasi_req_w(int state);
+	void sasi_io_w(int state);
+	void sasi_bsy_w(int state);
 
 	uint8_t sasi_status_r();
 	void stat_w(uint8_t data);
@@ -82,19 +81,11 @@ private:
 
 	required_device<z80_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
-	required_device<scsi_port_device> m_sasibus;
-	required_device<output_latch_device> m_sasi_data_out;
-	required_device<input_buffer_device> m_sasi_data_in;
+	required_device<nscsi_callback_device> m_sasi;
 	required_ioport m_s1;
 
 	int m_cs;
 	int m_rdy;
-	int m_req;
-	int m_sasi_req;
-	int m_sasi_io;
-	int m_sasi_cd;
-	int m_sasi_msg;
-	int m_sasi_bsy;
 
 	uint8_t m_inp;
 	uint8_t m_out;

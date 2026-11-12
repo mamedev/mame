@@ -20,6 +20,7 @@
 #include "softlist_dev.h"
 
 #include "corestr.h"
+#include "ioprocsstream.h"
 #include "path.h"
 
 #include <algorithm>
@@ -566,32 +567,29 @@ void favorite_manager::save_favorites()
 		else
 		{
 			// generate the favorite INI
-			file.puts("[ROOT_FOLDER]\n[Favorite]\n\n");
-			util::ovectorstream buf;
+			util::owritestream str(file);
+			str.imbue(std::locale::classic());
+			str << "[ROOT_FOLDER]\n[Favorite]\n\n";
 			for (ui_software_info const &info : m_favorites)
 			{
-				buf.clear();
-				buf.rdbuf()->clear();
-
-				buf << info.shortname << '\n';
-				buf << info.longname << '\n';
-				buf << info.parentname << '\n';
-				buf << info.year << '\n';
-				buf << info.publisher << '\n';
-				util::stream_format(buf, "%d\n", int(info.supported));
-				buf << info.part << '\n';
-				util::stream_format(buf, "%s\n", info.driver->name);
-				buf << info.listname << '\n';
-				buf << info.interface << '\n';
-				buf << info.instance << '\n';
-				util::stream_format(buf, "%d\n", info.startempty);
-				buf << info.parentlongname << '\n';
-				buf << '\n'; //buf << info.usage << '\n'; TODO: store multi-line info in a recoverable format
-				buf << info.devicetype << '\n';
-				util::stream_format(buf, "%d\n", info.available);
-
-				file.puts(util::buf_to_string_view(buf));
+				str << info.shortname << '\n';
+				str << info.longname << '\n';
+				str << info.parentname << '\n';
+				str << info.year << '\n';
+				str << info.publisher << '\n';
+				util::stream_format(str, "%d\n", int(info.supported));
+				str << info.part << '\n';
+				util::stream_format(str, "%s\n", info.driver->name);
+				str << info.listname << '\n';
+				str << info.interface << '\n';
+				str << info.instance << '\n';
+				util::stream_format(str, "%d\n", info.startempty);
+				str << info.parentlongname << '\n';
+				str << '\n'; //str << info.usage << '\n'; TODO: store multi-line info in a recoverable format
+				str << info.devicetype << '\n';
+				util::stream_format(str, "%d\n", info.available);
 			}
+			str << std::flush;
 		}
 		file.close();
 	}

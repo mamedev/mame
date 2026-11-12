@@ -2,7 +2,7 @@
 // udp.cpp
 // ~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -124,7 +124,7 @@ void test()
     socket1 = ip::udp::socket(ioc);
     socket1 = std::move(socket2);
 
-    // basic_io_object functions.
+    // I/O object functions.
 
     ip::udp::socket::executor_type ex = socket1.get_executor();
     (void)ex;
@@ -574,9 +574,6 @@ void test()
     const io_context::executor_type ioc_ex = ioc.get_executor();
     archetypes::lazy_handler lazy;
     asio::error_code ec;
-#if !defined(ASIO_NO_DEPRECATED)
-    ip::udp::resolver::query q(ip::udp::v4(), "localhost", "0");
-#endif // !defined(ASIO_NO_DEPRECATED)
     ip::udp::endpoint e(ip::address_v4::loopback(), 0);
 
     // basic_resolver constructors.
@@ -591,7 +588,7 @@ void test()
     resolver = ip::udp::resolver(ioc);
     resolver = std::move(resolver3);
 
-    // basic_io_object functions.
+    // I/O object functions.
 
     ip::udp::resolver::executor_type ex = resolver.get_executor();
     (void)ex;
@@ -600,79 +597,65 @@ void test()
 
     resolver.cancel();
 
-#if !defined(ASIO_NO_DEPRECATED)
-    ip::udp::resolver::results_type results1 = resolver.resolve(q);
+    ip::udp::resolver::results_type results1 = resolver.resolve("", "");
     (void)results1;
 
-    ip::udp::resolver::results_type results2 = resolver.resolve(q, ec);
+    ip::udp::resolver::results_type results2 = resolver.resolve("", "", ec);
     (void)results2;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
-    ip::udp::resolver::results_type results3 = resolver.resolve("", "");
+    ip::udp::resolver::results_type results3 =
+      resolver.resolve("", "", ip::udp::resolver::flags());
     (void)results3;
 
-    ip::udp::resolver::results_type results4 = resolver.resolve("", "", ec);
+    ip::udp::resolver::results_type results4 =
+      resolver.resolve("", "", ip::udp::resolver::flags(), ec);
     (void)results4;
 
     ip::udp::resolver::results_type results5 =
-      resolver.resolve("", "", ip::udp::resolver::flags());
+      resolver.resolve(ip::udp::v4(), "", "");
     (void)results5;
 
     ip::udp::resolver::results_type results6 =
-      resolver.resolve("", "", ip::udp::resolver::flags(), ec);
+      resolver.resolve(ip::udp::v4(), "", "", ec);
     (void)results6;
 
     ip::udp::resolver::results_type results7 =
-      resolver.resolve(ip::udp::v4(), "", "");
+      resolver.resolve(ip::udp::v4(), "", "", ip::udp::resolver::flags());
     (void)results7;
 
     ip::udp::resolver::results_type results8 =
-      resolver.resolve(ip::udp::v4(), "", "", ec);
+      resolver.resolve(ip::udp::v4(), "", "", ip::udp::resolver::flags(), ec);
     (void)results8;
 
-    ip::udp::resolver::results_type results9 =
-      resolver.resolve(ip::udp::v4(), "", "", ip::udp::resolver::flags());
+    ip::udp::resolver::results_type results9 = resolver.resolve(e);
     (void)results9;
 
-    ip::udp::resolver::results_type results10 =
-      resolver.resolve(ip::udp::v4(), "", "", ip::udp::resolver::flags(), ec);
+    ip::udp::resolver::results_type results10 = resolver.resolve(e, ec);
     (void)results10;
 
-    ip::udp::resolver::results_type results11 = resolver.resolve(e);
-    (void)results11;
-
-    ip::udp::resolver::results_type results12 = resolver.resolve(e, ec);
-    (void)results12;
-
-#if !defined(ASIO_NO_DEPRECATED)
-    resolver.async_resolve(q, resolve_handler());
-    int i1 = resolver.async_resolve(q, lazy);
-    (void)i1;
-#endif // !defined(ASIO_NO_DEPRECATED)
-
     resolver.async_resolve("", "", resolve_handler());
-    int i2 = resolver.async_resolve("", "", lazy);
-    (void)i2;
+    int i1 = resolver.async_resolve("", "", lazy);
+    (void)i1;
 
     resolver.async_resolve("", "",
         ip::udp::resolver::flags(), resolve_handler());
-    int i3 = resolver.async_resolve("", "",
+    int i2 = resolver.async_resolve("", "",
         ip::udp::resolver::flags(), lazy);
-    (void)i3;
+    (void)i2;
 
     resolver.async_resolve(ip::udp::v4(), "", "", resolve_handler());
-    int i4 = resolver.async_resolve(ip::udp::v4(), "", "", lazy);
-    (void)i4;
+    int i3 = resolver.async_resolve(ip::udp::v4(), "", "", lazy);
+    (void)i3;
 
     resolver.async_resolve(ip::udp::v4(),
         "", "", ip::udp::resolver::flags(), resolve_handler());
-    int i5 = resolver.async_resolve(ip::udp::v4(),
+    int i4 = resolver.async_resolve(ip::udp::v4(),
         "", "", ip::udp::resolver::flags(), lazy);
-    (void)i5;
+    (void)i4;
 
     resolver.async_resolve(e, resolve_handler());
-    int i6 = resolver.async_resolve(e, lazy);
-    (void)i6;
+    int i5 = resolver.async_resolve(e, lazy);
+    (void)i5;
   }
   catch (std::exception&)
   {

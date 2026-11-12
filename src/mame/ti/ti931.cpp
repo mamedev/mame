@@ -119,7 +119,7 @@ void ti931_state::ti931(machine_config &config)
 	z80dart_device &dart(Z80DART(config, "dart", 22.1184_MHz_XTAL / 6)); // Z8370APS
 	dart.out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(22.1184_MHz_XTAL * 2, 954 * 2, 0, 720 * 2, 389, 0, 350);
 	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));
 

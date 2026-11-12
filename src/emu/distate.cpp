@@ -51,14 +51,14 @@ const u64 device_state_entry::k_decimal_divisor[] =
 //  device_state_entry - constructor
 //-------------------------------------------------
 
-device_state_entry::device_state_entry(int index, const char *symbol, u8 size, u64 sizemask, u8 flags, device_state_interface *dev)
-	: m_device_state(dev),
-		m_index(index),
-		m_datamask(sizemask),
-		m_datasize(size),
-		m_flags(flags),
-		m_symbol(symbol),
-		m_default_format(true)
+device_state_entry::device_state_entry(int index, std::string &&symbol, u8 size, u64 sizemask, u8 flags, device_state_interface *dev)
+	: m_device_state(dev)
+	, m_index(index)
+	, m_datamask(sizemask)
+	, m_datasize(size)
+	, m_flags(flags)
+	, m_symbol(std::move(symbol))
+	, m_default_format(true)
 {
 	assert(size == 1 || size == 2 || size == 4 || size == 8 || (flags & DSF_FLOATING_POINT) != 0);
 
@@ -72,13 +72,13 @@ device_state_entry::device_state_entry(int index, const char *symbol, u8 size, u
 }
 
 device_state_entry::device_state_entry(int index, device_state_interface *dev)
-	: m_device_state(dev),
-		m_index(index),
-		m_datamask(0),
-		m_datasize(0),
-		m_flags(DSF_DIVIDER | DSF_READONLY),
-		m_symbol(),
-		m_default_format(true)
+	: m_device_state(dev)
+	, m_index(index)
+	, m_datamask(0)
+	, m_datasize(0)
+	, m_flags(DSF_DIVIDER | DSF_READONLY)
+	, m_symbol()
+	, m_default_format(true)
 {
 }
 
@@ -96,9 +96,9 @@ device_state_entry::~device_state_entry()
 //  formatstr - specify a format string
 //-------------------------------------------------
 
-device_state_entry &device_state_entry::formatstr(const char *_format)
+device_state_entry &device_state_entry::formatstr(std::string &&_format)
 {
-	m_format.assign(_format);
+	m_format = std::move(_format);
 	m_default_format = false;
 
 	// set the DSF_CUSTOM_STRING flag by formatting with a nullptr string
@@ -357,7 +357,7 @@ std::string device_state_entry::format(const char *string, u64 result, bool maxo
 			case 's':
 				if (width == 0)
 					throw emu_fatalerror("Width required for %%s formats\n");
-				if (string == nullptr)
+				if (!string)
 				{
 					const_cast<device_state_entry *>(this)->m_flags |= DSF_CUSTOM_STRING;
 					return dest;
@@ -517,6 +517,12 @@ device_state_entry &device_state_interface::state_add(std::unique_ptr<device_sta
 }
 
 
+device_state_entry &device_state_interface::state_add_divider(int index)
+{
+	return state_add(std::make_unique<device_state_entry>(index, this));
+}
+
+
 //-------------------------------------------------
 //  state_import - called after new state is
 //  written to perform any post-processing
@@ -572,3 +578,21 @@ void device_state_interface::interface_post_start()
 	if (m_state_list.size() == 0)
 		throw emu_fatalerror("No state registered for device '%s' that supports it!", device().tag());
 }
+
+
+//**************************************************************************
+//  TEMPLATE INSTANTIATIONS
+//**************************************************************************
+
+template class device_state_register<u8>;
+template class device_state_register<u16>;
+template class device_state_register<u32>;
+template class device_state_register<u64>;
+template class device_latched_functional_state_register<u8>;
+template class device_latched_functional_state_register<u16>;
+template class device_latched_functional_state_register<u32>;
+template class device_latched_functional_state_register<u64>;
+template class device_functional_state_register<u8>;
+template class device_functional_state_register<u16>;
+template class device_functional_state_register<u32>;
+template class device_functional_state_register<u64>;

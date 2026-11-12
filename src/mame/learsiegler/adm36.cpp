@@ -166,7 +166,7 @@ void adm36_state::adm36(machine_config &config)
 	sio.out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	sio.out_dtrb_callback().set("printer", FUNC(rs232_port_device::write_rts));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(14.728_MHz_XTAL, 936, 0, 720, 262, 0, 240);
 	//screen.set_raw(24.3_MHz_XTAL, 1548, 0, 1188, 262, 0, 240);
 	screen.set_screen_update(FUNC(adm36_state::screen_update));

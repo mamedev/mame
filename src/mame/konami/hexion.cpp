@@ -513,7 +513,7 @@ void hexion_state::hexion(machine_config &config)
 	m_k053252->int_time().set(FUNC(hexion_state::ccu_int_time_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 36*8);

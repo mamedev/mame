@@ -2,31 +2,32 @@
 // copyright-holders:Devin Acker
 
 /***************************************************************************
-	Casiotone RC-1
+    Casiotone RC-1
 
-	This is the rhythm component of the "Symphonytron" modular organ system.
-	It contains a uPD930 and analog percussion circuits (similar to several
-	contemporary keyboard models) that are controlled by a uPD7801.
+    This is the rhythm component of the "Symphonytron" modular organ system.
+    It contains a uPD930 and analog percussion circuits (similar to several
+    contemporary keyboard models) that are controlled by a uPD7801.
 
-	In addition to that, it also handles passing messages between the other
-	modules via four DIN connectors, and generates the address/data/strobe
-	signals for the MB-1's RAM cartridge.
+    In addition to that, it also handles passing messages between the other
+    modules via four DIN connectors, and generates the address/data/strobe
+    signals for the MB-1's RAM cartridge.
 
-	See ct8000.cpp for the other modules.
+    See ct8000.cpp for the other modules.
 
-	TODO (in no particular order):
-	- all sound hardware. the uPD930 is actually a separate CPU, but in this
-	  case it may be HLE-able depending on how the main CPU talks to it
-	- add MIDI in and out (latter not implemented in the MIDI adapter yet)
-	- layout, etc
-	- some controls are supposed to behave like positional switches
-	- RAM cart - technically part of the MB-1, but it's entirely controlled
-	  by the RC-1 via one of the DIN jacks
+    TODO (in no particular order):
+    - all sound hardware. the uPD930 is actually a separate CPU, but in this
+      case it may be HLE-able depending on how the main CPU talks to it
+    - add MIDI in and out (latter not implemented in the MIDI adapter yet)
+    - layout, etc
+    - some controls are supposed to behave like positional switches
+    - RAM cart - technically part of the MB-1, but it's entirely controlled
+      by the RC-1 via one of the DIN jacks
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "ct8000_midi.h"
+
 #include "cpu/upd7810/upd7810.h"
 #include "machine/i8255.h"
 #include "machine/input_merger.h"
@@ -68,7 +69,7 @@ public:
 protected:
 	void map(address_map &map) ATTR_COLD;
 
-	virtual void driver_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 	void keys_w(u8 data) { m_key_select = data; }
 	void pll_w(offs_t offset, u8 data);
@@ -160,7 +161,7 @@ void ctrc1_state::ctrc1(machine_config &config)
 }
 
 //**************************************************************************
-void ctrc1_state::driver_start()
+void ctrc1_state::machine_start()
 {
 	m_port_in_select = 0xf;
 	m_port_in_strobe = 0;
@@ -172,7 +173,7 @@ void ctrc1_state::driver_start()
 
 	m_930_data = 0xff;
 	m_930_strobe = 1;
-	
+
 	m_pll_counter = 0;
 	m_pll_ref = 0;
 
@@ -233,7 +234,7 @@ void ctrc1_state::rhythm_strobe_w(int state)
 void ctrc1_state::pll_w(offs_t offset, u8 data)
 {
 	data &= 0xf;
-	
+
 	switch (offset)
 	{
 	case 0:

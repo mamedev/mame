@@ -25,6 +25,7 @@ class abstract_ata_interface_device : public device_t
 {
 public:
 	// static configuration helpers
+	void default_data(uint16_t default_data) { m_default_data = default_data; }
 	auto irq_handler() { return m_irq_handler.bind(); }
 	auto dmarq_handler() { return m_dmarq_handler.bind(); }
 	auto dasp_handler() { return m_dasp_handler.bind(); }
@@ -60,10 +61,10 @@ public:
 protected:
 	abstract_ata_interface_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	uint16_t internal_read_cs0(offs_t offset, uint16_t mem_mask = 0xffff);
-	uint16_t internal_read_cs1(offs_t offset, uint16_t mem_mask = 0xffff);
-	void internal_write_cs0(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	void internal_write_cs1(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
+	uint16_t internal_read_cs0(offs_t offset);
+	uint16_t internal_read_cs1(offs_t offset);
+	void internal_write_cs0(offs_t offset, uint16_t data);
+	void internal_write_cs1(offs_t offset, uint16_t data);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -98,6 +99,7 @@ private:
 	int m_dasp[SLOT_COUNT];
 	int m_pdiag[SLOT_COUNT];
 
+	uint16_t m_default_data;
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_dmarq_handler;
 	devcb_write_line m_dasp_handler;
@@ -129,15 +131,15 @@ public:
 		return *this;
 	}
 
-	uint16_t cs0_r(offs_t offset, uint16_t mem_mask = 0xffff) { return internal_read_cs0(offset, mem_mask); }
-	uint16_t cs1_r(offs_t offset, uint16_t mem_mask = 0xffff) { return internal_read_cs1(offset, mem_mask); }
-	void cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs0(offset, data, mem_mask); }
-	void cs1_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs1(offset, data, mem_mask); }
+	uint16_t cs0_r(offs_t offset) { return internal_read_cs0(offset); }
+	uint16_t cs1_r(offs_t offset) { return internal_read_cs1(offset); }
+	void cs0_w(offs_t offset, uint16_t data) { internal_write_cs0(offset, data); }
+	void cs1_w(offs_t offset, uint16_t data) { internal_write_cs1(offset, data); }
 
-	uint16_t cs0_swap_r(offs_t offset, uint16_t mem_mask = 0xffff) { return swapendian_int16(internal_read_cs0(offset, swapendian_int16(mem_mask))); }
-	uint16_t cs1_swap_r(offs_t offset, uint16_t mem_mask = 0xffff) { return swapendian_int16(internal_read_cs1(offset, swapendian_int16(mem_mask))); }
-	void cs0_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs0(offset, swapendian_int16(data), swapendian_int16(mem_mask)); }
-	void cs1_swap_w(offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { internal_write_cs1(offset, swapendian_int16(data), swapendian_int16(mem_mask)); }
+	uint16_t cs0_swap_r(offs_t offset) { return swapendian_int16(internal_read_cs0(offset)); }
+	uint16_t cs1_swap_r(offs_t offset) { return swapendian_int16(internal_read_cs1(offset)); }
+	void cs0_swap_w(offs_t offset, uint16_t data) { internal_write_cs0(offset, swapendian_int16(data)); }
+	void cs1_swap_w(offs_t offset, uint16_t data) { internal_write_cs1(offset, swapendian_int16(data)); }
 };
 
 DECLARE_DEVICE_TYPE(ATA_INTERFACE, ata_interface_device)

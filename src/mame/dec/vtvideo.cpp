@@ -147,7 +147,7 @@ void vt100_video_device::device_reset()
 	m_last_scroll = 0;
 
 	m_blink_flip_flop = 0;
-	m_reverse_field = 0;
+	m_reverse_field = 1; // off; the DC012's power-up state isn't documented
 	m_basic_attribute = 0;
 
 	m_columns = 80;
@@ -178,7 +178,7 @@ void rainbow_video_device::device_reset()
 	m_last_scroll = 0;
 
 	m_blink_flip_flop = 0;
-	m_reverse_field = 0;
+	m_reverse_field = 1; // off; the DC012's power-up state isn't documented
 	m_basic_attribute = 0;
 
 	m_columns = 80;
@@ -213,7 +213,7 @@ void vt100_video_device::recompute_parameters()
 	// dot clock is divided by 1.5 in 80 column mode
 	screen().set_unscaled_clock(m_columns == 132 ? clock() : clock() * 2 / 3);
 	rectangle visarea(0, horiz_pix_visible - 1, 0, vert_pix_visible - 1);
-	screen().configure(horiz_pix_total, vert_pix_total, visarea, frame_period.as_attoseconds());
+	screen().configure(horiz_pix_total, vert_pix_total, visarea, frame_period);
 
 	LOG("(RECOMPUTE) HPIX: %d (%d) - VPIX: %d (%d)\n", horiz_pix_visible, horiz_pix_total, vert_pix_visible, vert_pix_total);
 	LOG("(RECOMPUTE) FREQUENCY: %f\n", frame_period.as_hz());
@@ -296,13 +296,13 @@ void vt100_video_device::dc012_w(offs_t offset, uint8_t data)
 		case 0x0c:
 			// set basic attribute to underline / blink flip-flop off
 			m_blink_flip_flop = 0;
-			m_basic_attribute = 0; // (VT-100 without AVO): reverse video is interpreted as underline (basic_attribute 0)
+			m_basic_attribute = 0; // base attribute (character bit 7) shown as underline
 			break;
 
 		case 0x0d:
 			// (DEC Rainbow 100 DEFAULT) : reverse video with 24 lines / blink flip-flop off
 			m_blink_flip_flop = 0;
-			m_basic_attribute = 1; // (VT-100 without AVO): reverse video is interpreted as reverse (basic_attribute 1)
+			m_basic_attribute = 1; // base attribute (character bit 7) shown as reverse video
 
 			if (m_height_MAX == 25) break; //  Abort on VT-100 for now.
 
@@ -445,6 +445,7 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 
 // ATTRIBUTES:   No attributes = 0x0E
 // 1 = display char. in REVERSE   (encoded as 1 in attribute) HIGH ACTIVE
+//     (UNDERLINE instead when the DC012's basic attribute selects underline)
 // 0 = display char. in BOLD      (encoded as 2 in attribute) LOW ACTIVE
 // 0 = display char. w. BLINK     (encoded as 4 in attribute) LOW ACTIVE
 // 0 = display char. w. UNDERLINE (encoded as 8 in attribute) LOW ACTIVE
@@ -466,38 +467,30 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 
 	uint8_t line = 0;
 	int bit = 0, j = 0;
-	int fg_intensity;
-	int back_intensity, back_default_intensity;
 
 	display_type = display_type & 3;
 
 	// * SCREEN ATTRIBUTES (see VT-180 manual 6-30) *
 	// 'reverse field' = reverse video over entire screen
 
-	// For reference: a complete truth table can be taken from TABLE 4-6-4 / VT100 technical manual.
-	// Following IF statements implement it in full. Code segments should not be shuffled.
-	invert = invert ^ m_reverse_field ^ m_basic_attribute;
+	// VT100 technical manual (EK-VT100-TM-003) table 4-6-4: reverse =
+	// reverse field XOR reverse video.  The base attribute (character bit 7)
+	// is reverse video or underline as the basic attribute flip-flop selects
+	// (4.6.3.8).
+	bool const reverse_field = !m_reverse_field;
+	bool const reverse_video = m_basic_attribute && invert;
+	bool const underlined = underline || (!m_basic_attribute && invert);
+	bool const reversed = reverse_video != reverse_field;
 
-	fg_intensity = bold + 2;   // FOREGROUND (FG):  normal (2) or bright (3)
-
-	back_intensity = 0; // DO NOT SHUFFLE CODE AROUND !!
-	if ((blink != 0) && (m_blink_flip_flop != 0))
-		fg_intensity -= 1; // normal => dim    bright => normal (when bold)
-
-	// INVERSION: background gets foreground intensity (reduced by 1).
-	// _RELIES ON_ on_ previous evaluation of the BLINK signal (fg_intensity).
-	if (invert != 0)
-	{
-		back_intensity = fg_intensity - 1; // BG: normal => dim;  dim => OFF;   bright => normal
-
-		if (back_intensity != 0)           //  FG: avoid 'black on black'
-			fg_intensity = 0;
-		else
-			fg_intensity = fg_intensity + 1; // FG: dim => normal; normal => bright
-	}
-
-	// BG: DEFAULT for entire character (underline overrides this for 1 line) -
-	back_default_intensity = back_intensity;
+	// intensities: 0 off, 1 dim, 2 normal, 3 bright
+	// reverse: black character on dim (normal when bold) background
+	// otherwise: normal (bright when bold) on black
+	// blink lowers a non-reverse character one step, and shows a reverse one
+	// in its non-reverse form
+	bool const blink_on = blink && m_blink_flip_flop;
+	bool const reverse = reversed && !blink_on;
+	int const fg_intensity = reverse ? 0 : (bold + 2 - ((blink_on && !reversed) ? 1 : 0));
+	int const back_intensity = reverse ? (bold + 1) : 0;
 
 	bool double_width = (display_type != 3) ? true : false; // all except normal: double width
 	bool double_height = (display_type & 1) ? false : true;  // 0,2 = double height
@@ -554,27 +547,15 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 
 		line = m_char_rom[(code << 4) + j]; // code * 16
 
-		// UNDERLINED CHARACTERS (CASE 5 - different in 1 line):
-		back_intensity = back_default_intensity; // 0, 1, 2
-		if (underline != 0)
-		{
-			if (i == 8)
-			{
-				if (invert == 0)
-					line = 0xff; // CASE 5 A)
-				else
-				{
-					line = 0x00; // CASE 5 B)
-					back_intensity = 0; // OVERRIDE: BLACK BACKGROUND
-				}
-			}
-		}
+		// underline: the 9th scan takes the character intensity (black when reverse)
+		if (underlined && (i == 8))
+			line = 0xff;
 
 		for (int b = 0; b < 8; b++) // 0..7
 		{
 			if (blank)
 			{
-				bit = m_reverse_field ^ m_basic_attribute;
+				bit = reverse_field;
 			}
 			else
 			{
@@ -816,7 +797,7 @@ void rainbow_video_device::video_blanking(bitmap_ind16 &bitmap, const rectangle 
 {
 	// 'In reverse screen mode, termination forces the beam to the screen background intensity'
 	// Background intensity means 'dim' (1) according to one source.
-	bitmap.fill(((m_reverse_field ^ m_basic_attribute) ? 1 : 0), cliprect);
+	bitmap.fill(!m_reverse_field ? 1 : 0, cliprect);
 }
 
 #define MHFU_IS_ENABLED 1

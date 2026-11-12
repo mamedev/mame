@@ -380,7 +380,7 @@ void mpcb963_device::device_add_mconfig(machine_config &config)
 
 	gt_device_base::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 1504, 296 + GT_X_DELTA, 1184 + 296 + GT_X_DELTA, 920, 34, 884 + 34);
 	m_screen[0]->set_screen_update(FUNC(mpcb963_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
@@ -395,7 +395,7 @@ void mpcba79_device::device_add_mconfig(machine_config &config)
 
 	gt_device_base::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 1504, 296 + GT_X_DELTA, 1184 + 296 + GT_X_DELTA, 920, 34, 884 + 34);
 	m_screen[0]->set_screen_update(FUNC(mpcba79_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
@@ -403,7 +403,7 @@ void mpcba79_device::device_add_mconfig(machine_config &config)
 	RAM(config, m_vram[0]).set_default_size("1M");
 	RAM(config, m_mram[0]).set_default_size("128K");
 
-	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[1]);
 	m_screen[1]->set_raw(pixclock, 1504, 296 + GT_X_DELTA, 1184 + 296 + GT_X_DELTA, 920, 34, 884 + 34);
 	m_screen[1]->set_screen_update(FUNC(mpcba79_device::screen_update<1>));
 	BT459(config, m_ramdac[1], pixclock);
@@ -428,7 +428,7 @@ void msmt070_device::device_add_mconfig(machine_config &config)
 
 	gt_device_base::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57);
 	m_screen[0]->set_screen_update(FUNC(msmt070_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
@@ -443,7 +443,7 @@ void msmt071_device::device_add_mconfig(machine_config &config)
 
 	gt_device_base::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57);
 	m_screen[0]->set_screen_update(FUNC(msmt071_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
@@ -451,7 +451,7 @@ void msmt071_device::device_add_mconfig(machine_config &config)
 	RAM(config, m_vram[0]).set_default_size("2M");
 	RAM(config, m_mram[0]).set_default_size("128K");
 
-	SCREEN(config, m_screen[1], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[1]);
 	m_screen[1]->set_raw(pixclock, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57);
 	m_screen[1]->set_screen_update(FUNC(msmt071_device::screen_update<1>));
 	BT459(config, m_ramdac[1], pixclock);
@@ -476,7 +476,7 @@ void msmt081_device::device_add_mconfig(machine_config &config)
 
 	gt_device_base::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 2076, 391 + GT_X_DELTA, 1664 + 391 + GT_X_DELTA, 1324, 74, 1248 + 74);
 	m_screen[0]->set_screen_update(FUNC(msmt081_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_cbus_card_interface::irq3));
@@ -496,7 +496,7 @@ void mpcbb68_device::device_add_mconfig(machine_config &config)
 
 	gtdb_device::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 1472, 264 + GT_X_DELTA, 1184 + 264 + GT_X_DELTA, 944, 57, 884 + 57);
 	m_screen[0]->set_screen_update(FUNC(mpcbb68_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_srx_card_interface::irq3));
@@ -523,7 +523,7 @@ void mpcbb92_device::device_add_mconfig(machine_config &config)
 
 	gtdb_device::device_add_mconfig(config);
 
-	SCREEN(config, m_screen[0], SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen[0]);
 	m_screen[0]->set_raw(pixclock, 2076, 391 + GT_X_DELTA, 1664 + 391 + GT_X_DELTA, 1324, 74, 1248 + 74);
 	m_screen[0]->set_screen_update(FUNC(mpcbb92_device::screen_update<0>));
 	m_screen[0]->screen_vblank().set(FUNC(device_srx_card_interface::irq3));

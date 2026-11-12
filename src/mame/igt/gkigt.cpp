@@ -207,9 +207,10 @@ uint32_t igt_gameking_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	for(int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for(int x = cliprect.min_x; x <= cliprect.max_x; x+=4)
+		auto *const dst = &bitmap.pix(y);
+		for(int x = cliprect.left(); x <= cliprect.right(); x+=4)
 		{
 			const u32 gfx_data = m_vram[(x + y * 1024) / 4];
 
@@ -217,7 +218,7 @@ uint32_t igt_gameking_state::screen_update(screen_device &screen, bitmap_ind16 &
 			{
 				uint32_t const color = (gfx_data >> (xi*8)) & 0xff;
 				if (color)
-					bitmap.pix(y, x+xi) = m_palette->pen(color);
+					dst[x + xi] = m_palette->pen(color);
 			}
 		}
 	}
@@ -553,7 +554,7 @@ void igt_gameking_state::igt_gameking(machine_config &config)
 	I80960KA(config, m_maincpu, XTAL(24'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &igt_gameking_state::igt_gameking_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(1024, 512);

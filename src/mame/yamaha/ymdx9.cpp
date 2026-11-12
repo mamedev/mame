@@ -266,7 +266,7 @@ void yamaha_dx9_state::dx9(machine_config &config)
 	m_maincpu->out_ser_tx_cb().set(mdout, FUNC(midi_port_device::write_txd));
 
 	// Configure the LCD screen.
-	screen_device &lcd_screen(SCREEN(config, "lcd_screen", SCREEN_TYPE_LCD));
+	screen_device &lcd_screen(SCREEN(config, "lcd_screen").set_lcd());
 	lcd_screen.set_refresh_hz(60);
 	lcd_screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	lcd_screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));

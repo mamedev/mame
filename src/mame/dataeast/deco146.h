@@ -75,6 +75,7 @@ public:
 	auto soundlatch_irq_cb() { return m_soundlatch_irq_cb.bind(); }
 
 	u8 soundlatch_r();
+	int soundlatch_pending_r() { return m_soundlatch_pending ? 1 : 0; }
 
 protected:
 	deco_146_base_device(const machine_config &mconfig,
@@ -128,6 +129,7 @@ private:
 	u8 m_region_selects[6];
 
 	u8 m_soundlatch;
+	bool m_soundlatch_pending;
 
 	// callbacks
 	devcb_write_line m_soundlatch_irq_cb;

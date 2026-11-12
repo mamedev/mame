@@ -182,12 +182,22 @@ void mc_mk4_hopper_device::device_add_mconfig(machine_config &config)
 ROM_START(mc_mk4_hopper)
 
 	// LEDs PCB
-	ROM_REGION( 0x4000, "ledscpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "hop_leds_pic12c671.bin", 0x0000, 0x4000, CRC(61e31970) SHA1(70ed27a9df57bc2bf9b6cd94ca86469fe6f9d5b4) ) // Config Word: 0x3FFC. User ID: ID0=0x007F, ID1=0x007F, ID2=0x007F, ID3=0x007F
+	ROM_REGION16_LE( 0x4010, "ledscpu", 0 )
+	ROM_LOAD( "hop_leds_pic12c671.bin", 0x0000, 0x4000, CRC(61e31970) SHA1(70ed27a9df57bc2bf9b6cd94ca86469fe6f9d5b4) )
+	ROM_FILL( 0x4000, 0x01, 0x7f )
+	ROM_FILL( 0x4001, 0x01, 0x00 ) // user_id0: 0x007f
+	ROM_FILL( 0x4002, 0x01, 0x7f )
+	ROM_FILL( 0x4003, 0x01, 0x00 ) // user_id1: 0x007f
+	ROM_FILL( 0x4004, 0x01, 0x7f )
+	ROM_FILL( 0x4005, 0x01, 0x00 ) // user_id2: 0x007f
+	ROM_FILL( 0x4006, 0x01, 0x7f )
+	ROM_FILL( 0x4007, 0x01, 0x00 ) // user_id3: 0x007f
+	ROM_FILL( 0x400e, 0x01, 0xfc )
+	ROM_FILL( 0x400f, 0x01, 0x3f ) // configuration: 0x3ffc
 
 	// Main PCB
-	ROM_REGION( 0x0400, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "hop_pic16c620a.bin",     0x0000, 0x0400, NO_DUMP )
+	ROM_REGION16_LE( 0x4010, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "hop_pic16c620a.bin", 0x0000, 0x4010, NO_DUMP )
 ROM_END
 
 const tiny_rom_entry *mc_mk4_hopper_device::device_rom_region() const
@@ -253,7 +263,7 @@ void gaminator_state::gaminator(machine_config &config)
 	MCF5206E(config, m_maincpu, 33.333_MHz_XTAL); // ColdFire MCF5406ECAB40
 	m_maincpu->set_addrmap(AS_PROGRAM, &gaminator_state::gaminator_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(25'174'800),900,0,640,526,0,480);
 	screen.set_screen_update("vga", FUNC(gamtor_vga_device::screen_update));
 

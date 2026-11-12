@@ -183,7 +183,7 @@ void datacast_state::datacast(machine_config &config)
 	I80186(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &datacast_state::mem_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(6_MHz_XTAL, 768, 0, 480, 312, 0, 250);
 	m_screen->set_screen_update("saa5240", FUNC(saa5240a_device::screen_update));
 

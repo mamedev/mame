@@ -278,4 +278,4 @@ ROM_END
 
 } // anonymous namespace
 
-SYST(1993, vl1, 0, 0, vl1, vl1, vl1_state, empty_init, "Yamaha", "VL1", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+SYST(1993, vl1, 0, 0, vl1, vl1, vl1_state, empty_init, "Yamaha", "VL1 Virtual Acoustic Synthesizer", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

@@ -501,7 +501,7 @@ void informer_213_state::informer_213(machine_config &config)
 	RS232_PORT(config, "printer", in213_printer_devices, nullptr);
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_color(rgb_t::amber());
 	m_screen->set_size(480, 234);
 	m_screen->set_visarea_full();

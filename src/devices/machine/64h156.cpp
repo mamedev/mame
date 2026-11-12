@@ -6,24 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    http://personalpages.tds.net/~rcarlsen/cbm/1541/1541%20EARLY/1540-2.GIF
-
-    - write protect
-    - separate read/write methods
-    - cycle exact VIA
-    - get these running and we're golden
-        - Bounty Bob Strikes Back (aligned halftracks)
-        - Quiwi (speed change within track)
-        - Defender of the Crown (V-MAX! v2, density checks)
-        - Test Drive / Cabal (HLS, sub-cycle jitter)
-        - Galaxian (?, needs 100% accurate VIA)
-
-*/
-
 #include "emu.h"
 #include "64h156.h"
 
@@ -36,6 +18,8 @@
 //**************************************************************************
 
 #define CYCLES_UNTIL_ANALOG_DESYNC      288 // 18 us
+#define CYCLES_TIME_DOMAIN_FILTER       40 // 2.5 us
+#define FLUX_RNG_SEED                   0x1234abcd
 
 
 
@@ -60,8 +44,10 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	m_write_atn(*this),
 	m_write_sync(*this),
 	m_write_byte(*this),
+	m_write_yb(*this),
 	m_floppy(nullptr),
-	m_mtr(1),
+	m_mtr(0),
+	m_disabled(false),
 	m_accl(0),
 	m_stp(0),
 	m_ds(0),
@@ -75,7 +61,6 @@ c64h156_device::c64h156_device(const machine_config &mconfig, const char *tag, d
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.write_start_time = attotime::never;
 }
 
 
@@ -90,6 +75,7 @@ void c64h156_device::device_start()
 
 	// register for state saving
 	save_item(NAME(m_mtr));
+	save_item(NAME(m_disabled));
 	save_item(NAME(m_accl));
 	save_item(NAME(m_stp));
 	save_item(NAME(m_ds));
@@ -99,6 +85,54 @@ void c64h156_device::device_start()
 	save_item(NAME(m_yb));
 	save_item(NAME(m_atni));
 	save_item(NAME(m_atna));
+
+	save_item(NAME(cur_live.tm));
+	save_item(NAME(cur_live.state));
+	save_item(NAME(cur_live.next_state));
+	save_item(NAME(cur_live.sync));
+	save_item(NAME(cur_live.byte));
+	save_item(NAME(cur_live.byte_in));
+	save_item(NAME(cur_live.ds));
+	save_item(NAME(cur_live.oe));
+	save_item(NAME(cur_live.soe));
+	save_item(NAME(cur_live.accl));
+	save_item(NAME(cur_live.accl_yb));
+	save_item(NAME(cur_live.edge));
+	save_item(NAME(cur_live.shift_reg));
+	save_item(NAME(cur_live.cycle_counter));
+	save_item(NAME(cur_live.cell_counter));
+	save_item(NAME(cur_live.bit_counter));
+	save_item(NAME(cur_live.filter_counter));
+	save_item(NAME(cur_live.zero_counter));
+	save_item(NAME(cur_live.cycles_until_random_flux));
+	save_item(NAME(cur_live.xorshift));
+	save_item(NAME(cur_live.yb));
+	save_item(NAME(cur_live.shift_reg_write));
+	save_item(NAME(cur_live.write_transition_count));
+
+	save_item(NAME(checkpoint_live.tm));
+	save_item(NAME(checkpoint_live.state));
+	save_item(NAME(checkpoint_live.next_state));
+	save_item(NAME(checkpoint_live.sync));
+	save_item(NAME(checkpoint_live.byte));
+	save_item(NAME(checkpoint_live.byte_in));
+	save_item(NAME(checkpoint_live.ds));
+	save_item(NAME(checkpoint_live.oe));
+	save_item(NAME(checkpoint_live.soe));
+	save_item(NAME(checkpoint_live.accl));
+	save_item(NAME(checkpoint_live.accl_yb));
+	save_item(NAME(checkpoint_live.edge));
+	save_item(NAME(checkpoint_live.shift_reg));
+	save_item(NAME(checkpoint_live.cycle_counter));
+	save_item(NAME(checkpoint_live.cell_counter));
+	save_item(NAME(checkpoint_live.bit_counter));
+	save_item(NAME(checkpoint_live.filter_counter));
+	save_item(NAME(checkpoint_live.zero_counter));
+	save_item(NAME(checkpoint_live.cycles_until_random_flux));
+	save_item(NAME(checkpoint_live.xorshift));
+	save_item(NAME(checkpoint_live.yb));
+	save_item(NAME(checkpoint_live.shift_reg_write));
+	save_item(NAME(checkpoint_live.write_transition_count));
 }
 
 
@@ -119,6 +153,8 @@ void c64h156_device::device_clock_changed()
 
 void c64h156_device::device_reset()
 {
+	cur_live.xorshift = FLUX_RNG_SEED;
+
 	live_abort();
 }
 
@@ -149,7 +185,8 @@ void c64h156_device::live_start()
 	cur_live.soe = m_soe;
 	cur_live.accl = m_accl;
 	cur_live.zero_counter = 0;
-	cur_live.cycles_until_random_flux = (machine().rand() % 31) + 289;
+	cur_live.cycles_until_random_flux = (next_rand() % 31) + 289;
+	cur_live.filter_counter = CYCLES_TIME_DOMAIN_FILTER;
 
 	checkpoint_live = cur_live;
 
@@ -158,41 +195,44 @@ void c64h156_device::live_start()
 
 void c64h156_device::checkpoint()
 {
-	get_next_edge(machine().time());
+	if (cur_live.oe) {
+		get_next_edge(cur_live.tm.is_never() ? machine().time() : cur_live.tm);
+	}
 	checkpoint_live = cur_live;
 }
 
 void c64h156_device::rollback()
 {
 	cur_live = checkpoint_live;
-	get_next_edge(cur_live.tm);
+	if (cur_live.oe) {
+		get_next_edge(cur_live.tm);
+	}
 }
 
 void c64h156_device::start_writing(const attotime &tm)
 {
-	cur_live.write_start_time = tm;
-	cur_live.write_position = 0;
+	if(m_floppy)
+		m_floppy->write_start(tm);
+	cur_live.write_transition_count = 0;
 }
 
 void c64h156_device::stop_writing(const attotime &tm)
 {
-	commit(tm);
-	cur_live.write_start_time = attotime::never;
+	if(m_floppy)
+		m_floppy->write_end(tm);
+	cur_live.write_transition_count = 0;
 }
 
 bool c64h156_device::write_next_bit(bool bit, const attotime &limit)
 {
-	if(cur_live.write_start_time.is_never()) {
-		cur_live.write_start_time = cur_live.tm;
-		cur_live.write_position = 0;
-	}
-
 	attotime etime = cur_live.tm + m_period;
 	if(etime > limit)
 		return true;
 
-	if(bit && cur_live.write_position < std::size(cur_live.write_buffer))
-		cur_live.write_buffer[cur_live.write_position++] = cur_live.tm - m_period;
+	if(bit && m_floppy && !m_floppy->wpt_r()) {
+		m_floppy->write_flux_change(cur_live.tm - m_period);
+		cur_live.write_transition_count++;
+	}
 
 	LOG("%s write bit %u (%u)\n", cur_live.tm.as_string(), cur_live.bit_counter, bit);
 
@@ -201,24 +241,17 @@ bool c64h156_device::write_next_bit(bool bit, const attotime &limit)
 
 void c64h156_device::commit(const attotime &tm)
 {
-	if(cur_live.write_start_time.is_never() || tm == cur_live.write_start_time || !cur_live.write_position)
+	if(!m_floppy || cur_live.write_transition_count < WRITE_BATCH_SIZE)
 		return;
 
-	LOG("%s committing %u transitions since %s\n", tm.as_string(), cur_live.write_position, cur_live.write_start_time.as_string());
-
-	m_floppy->write_flux(cur_live.write_start_time, tm, cur_live.write_position, cur_live.write_buffer);
-
-	cur_live.write_start_time = tm;
-	cur_live.write_position = 0;
+	m_floppy->write_flush(tm);
+	cur_live.write_transition_count = 0;
 }
 
 void c64h156_device::live_delay(int state)
 {
 	cur_live.next_state = state;
-	if(cur_live.tm != machine().time())
-		t_gen->adjust(cur_live.tm - machine().time());
-	else
-		live_sync();
+	t_gen->adjust(cur_live.tm - machine().time());
 }
 
 void c64h156_device::live_sync()
@@ -256,11 +289,10 @@ void c64h156_device::live_abort()
 	cur_live.tm = attotime::never;
 	cur_live.state = IDLE;
 	cur_live.next_state = -1;
-	cur_live.write_position = 0;
-	cur_live.write_start_time = attotime::never;
 
 	cur_live.sync = 1;
 	cur_live.byte = 1;
+	cur_live.byte_in = 1;
 }
 
 void c64h156_device::live_run(const attotime &limit)
@@ -268,12 +300,20 @@ void c64h156_device::live_run(const attotime &limit)
 	if(cur_live.state == IDLE || cur_live.next_state != -1)
 		return;
 
+	bool settled = false;
+
 	for(;;) {
 		switch(cur_live.state) {
 		case RUNNING: {
 			bool syncpoint = false;
 
 			if (cur_live.tm > limit)
+				return;
+
+			if (settled)
+				skip_idle_cycles(limit);
+
+			if ((cur_live.tm + m_period) > limit)
 				return;
 
 			int bit = get_next_bit(cur_live.tm, limit);
@@ -307,7 +347,7 @@ void c64h156_device::live_run(const attotime &limit)
 					syncpoint = true;
 				}
 
-				if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && !cur_live.oe) { // TODO WPS
+				if (BIT(cell_counter, 1) && !BIT(cur_live.cell_counter, 1) && !cur_live.oe) {
 					write_next_bit(BIT(cur_live.shift_reg_write, 7), limit);
 				}
 
@@ -338,16 +378,15 @@ void c64h156_device::live_run(const attotime &limit)
 				}
 
 				// update signals
-				if (byte != cur_live.byte) {
-					if (!byte || !cur_live.accl) {
-						LOG("%s BYTE %02x\n", cur_live.tm.as_string(), cur_live.shift_reg & 0xff);
-						cur_live.byte = byte;
-						syncpoint = true;
-					}
+				if (byte != cur_live.byte && (!cur_live.accl || (!byte && cur_live.byte_in))) {
+					LOG("%s BYTE %02x\n", cur_live.tm.as_string(), cur_live.shift_reg & 0xff);
+					cur_live.byte = byte;
+					syncpoint = true;
 					if (!byte) {
 						cur_live.accl_yb = cur_live.shift_reg & 0xff;
 					}
 				}
+				cur_live.byte_in = byte;
 
 				if (sync != cur_live.sync) {
 					LOG("%s SYNC %u\n", cur_live.tm.as_string(),sync);
@@ -357,21 +396,25 @@ void c64h156_device::live_run(const attotime &limit)
 			}
 
 			if (syncpoint) {
-				commit(cur_live.tm);
-
-				cur_live.tm += m_period;
 				live_delay(RUNNING_SYNCPOINT);
 				return;
 			}
 
 			cur_live.tm += m_period;
+			settled = !bit;
 			break;
 		}
 
 		case RUNNING_SYNCPOINT: {
+			if (cur_live.accl)
+				m_write_yb(cur_live.accl_yb);
+			else
+				m_write_yb(cur_live.shift_reg & 0xff);
+
 			m_write_sync(cur_live.sync);
 			m_write_byte(cur_live.byte);
 
+			cur_live.tm += m_period;
 			cur_live.state = RUNNING;
 			checkpoint();
 			break;
@@ -380,33 +423,101 @@ void c64h156_device::live_run(const attotime &limit)
 	}
 }
 
+void c64h156_device::skip_idle_cycles(const attotime &limit)
+{
+	// cycles that neither advance the cell counter nor see a flux reversal leave every output unchanged
+	int cycles = 15 - cur_live.cycle_counter;
+	if (cur_live.oe)
+		cycles = std::min(cycles, cur_live.cycles_until_random_flux - cur_live.zero_counter - 1);
+	if (cycles <= 0)
+		return;
+
+	attotime end = cur_live.tm + m_period * cycles;
+	while (cycles > 0 && (end > limit || (cur_live.oe && end > cur_live.edge)))
+	{
+		cycles--;
+		end -= m_period;
+	}
+	if (!cycles)
+		return;
+
+	cur_live.tm = end;
+	cur_live.cycle_counter += cycles;
+	if (cur_live.oe)
+	{
+		cur_live.zero_counter += cycles;
+		cur_live.filter_counter = std::min(cur_live.filter_counter + cycles, CYCLES_TIME_DOMAIN_FILTER);
+	}
+}
+
 void c64h156_device::get_next_edge(const attotime &when)
 {
+	if (m_disabled) return;
 	cur_live.edge = m_floppy->get_next_transition(when);
+}
+
+//-------------------------------------------------
+//  next_rand - xorshift32, kept in live_info so
+//  checkpoint()/rollback() reproduce it exactly
+//-------------------------------------------------
+
+uint32_t c64h156_device::next_rand()
+{
+	// xorshift32 degenerates if it ever reaches zero
+	if (!cur_live.xorshift)
+		cur_live.xorshift = FLUX_RNG_SEED;
+
+	cur_live.xorshift ^= cur_live.xorshift << 13;
+	cur_live.xorshift ^= cur_live.xorshift >> 17;
+	cur_live.xorshift ^= cur_live.xorshift << 5;
+
+	return cur_live.xorshift;
 }
 
 int c64h156_device::get_next_bit(attotime &tm, const attotime &limit)
 {
+	if (!cur_live.oe)
+		return 0;
+
 	int bit = 0;
+
+	if (cur_live.filter_counter < CYCLES_TIME_DOMAIN_FILTER)
+		cur_live.filter_counter++;
+
 	if (!cur_live.edge.is_never())
 	{
 		attotime next = tm + m_period;
 		if (cur_live.edge < next)
 		{
-			bit = 1;
+			// the Time Domain Filter swallows reversals that arrive while it
+			// is still timing out from the previous one; the edge is consumed
+			// either way, it just never reaches the decoder
+			if (cur_live.filter_counter >= CYCLES_TIME_DOMAIN_FILTER)
+			{
+				bit = 1;
 
-			cur_live.zero_counter = 0;
-			cur_live.cycles_until_random_flux = (machine().rand() % 31) + 289;
+				cur_live.filter_counter = 0;
+				cur_live.zero_counter = 0;
+				cur_live.cycles_until_random_flux = (next_rand() % 31) + 289;
+			}
 
 			get_next_edge(next);
 		}
 	}
 
-	if (cur_live.zero_counter >= cur_live.cycles_until_random_flux) {
-		cur_live.zero_counter = 0;
-		cur_live.cycles_until_random_flux = (machine().rand() % 367) + 33;
+	if (!bit)
+	{
+		// once ~18 us have passed with no flux reversal reaching the decoder,
+		// the read amplifier's AGC has ramped far enough into the noise floor
+		// that the peak detector starts producing reversals of its own
+		cur_live.zero_counter++;
 
-		bit = 1;
+		if (cur_live.zero_counter >= cur_live.cycles_until_random_flux) {
+			cur_live.zero_counter = 0;
+			cur_live.cycles_until_random_flux = (next_rand() % 367) + 33;
+
+			bit = 1;
+		}
 	}
 
 	return bit && cur_live.oe;
@@ -507,14 +618,42 @@ void c64h156_device::mtr_w(int state)
 		checkpoint();
 
 		if (m_mtr) {
-			if(cur_live.state == IDLE) {
+			if (!m_disabled && cur_live.state == IDLE) {
 				live_start();
 			}
+
+			update_stepper(m_stp);
 		} else {
 			live_abort();
 		}
 
 		live_run();
+	}
+}
+
+
+//-------------------------------------------------
+//  disable - enable/disable access to the floppy
+//  image (used when an external FDC has taken
+//  control of the drive, e.g. WD1770 in the 1571)
+//-------------------------------------------------
+
+void c64h156_device::disable(int state)
+{
+	bool disabled = !state;
+
+	if (m_disabled != disabled)
+	{
+		live_sync();
+		LOG("%s DISABLE %u\n", machine().time().as_string(), disabled);
+
+		if (disabled) {
+			live_abort();
+			m_disabled = disabled;
+		} else if (m_mtr && cur_live.state == IDLE) {
+			m_disabled = disabled;
+			live_start();
+		}
 	}
 }
 
@@ -600,39 +739,41 @@ void c64h156_device::set_floppy(floppy_image_device *floppy)
 //  stp_w -
 //-------------------------------------------------
 
+void c64h156_device::update_stepper(int stp)
+{
+	int tracks = 0;
+
+	switch (m_floppy->get_cyl() & 3)
+	{
+	case 0: if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
+	case 1: if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
+	case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
+	case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
+	}
+
+	if (tracks == -1)
+	{
+		m_floppy->dir_w(1);
+		m_floppy->stp_w(1);
+		m_floppy->stp_w(0);
+	}
+	else if (tracks == 1)
+	{
+		m_floppy->dir_w(0);
+		m_floppy->stp_w(1);
+		m_floppy->stp_w(0);
+	}
+}
+
 void c64h156_device::stp_w(int stp)
 {
-	if (m_stp != stp)
+	m_stp = stp;
+
+	if (m_mtr)
 	{
 		live_sync();
 
-		if (m_mtr)
-		{
-			int tracks = 0;
-
-			switch (m_stp)
-			{
-			case 0: if (stp == 1) tracks++; else if (stp == 3) tracks--; break;
-			case 1: if (stp == 2) tracks++; else if (stp == 0) tracks--; break;
-			case 2: if (stp == 3) tracks++; else if (stp == 1) tracks--; break;
-			case 3: if (stp == 0) tracks++; else if (stp == 2) tracks--; break;
-			}
-
-			if (tracks == -1)
-			{
-				m_floppy->dir_w(1);
-				m_floppy->stp_w(1);
-				m_floppy->stp_w(0);
-			}
-			else if (tracks == 1)
-			{
-				m_floppy->dir_w(0);
-				m_floppy->stp_w(1);
-				m_floppy->stp_w(0);
-			}
-
-			m_stp = stp;
-		}
+		update_stepper(stp);
 
 		checkpoint();
 		live_run();

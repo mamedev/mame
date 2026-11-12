@@ -30,6 +30,7 @@ h83003_device::h83003_device(const machine_config &mconfig, const char *tag, dev
 	m_timer16_3(*this, "timer16:3"),
 	m_timer16_4(*this, "timer16:4"),
 	m_watchdog(*this, "watchdog"),
+	m_refresh(*this, "refresh"),
 	m_tend_cb(*this),
 	m_syscr(0)
 {
@@ -118,7 +119,10 @@ void h83003_device::map(address_map &map)
 
 	map(base | 0xffa8, base | 0xffa9).rw(m_watchdog, FUNC(h8_watchdog_device::wd_r), FUNC(h8_watchdog_device::wd_w));
 	map(base | 0xffaa, base | 0xffab).rw(m_watchdog, FUNC(h8_watchdog_device::rst_r), FUNC(h8_watchdog_device::rst_w));
-	map(base | 0xffad, base | 0xffad).rw(FUNC(h83003_device::rtmcsr_r), FUNC(h83003_device::rtmcsr_w));
+
+	map(base | 0xffad, base | 0xffad).rw(m_refresh, FUNC(h8_refresh_device::rtmcsr_r), FUNC(h8_refresh_device::rtmcsr_w));
+	map(base | 0xffae, base | 0xffae).rw(m_refresh, FUNC(h8_refresh_device::rtcnt_r), FUNC(h8_refresh_device::rtcnt_w));
+	map(base | 0xffaf, base | 0xffaf).rw(m_refresh, FUNC(h8_refresh_device::rtcor_r), FUNC(h8_refresh_device::rtcor_w));
 
 	map(base | 0xffb0, base | 0xffb0).rw(m_sci[0], FUNC(h8_sci_device::smr_r), FUNC(h8_sci_device::smr_w));
 	map(base | 0xffb1, base | 0xffb1).rw(m_sci[0], FUNC(h8_sci_device::brr_r), FUNC(h8_sci_device::brr_w));
@@ -189,6 +193,7 @@ void h83003_device::device_add_mconfig(machine_config &config)
 	H8_SCI(config, m_sci[0], 0, *this, m_intc, 52, 53, 54, 55);
 	H8_SCI(config, m_sci[1], 1, *this, m_intc, 56, 57, 58, 59);
 	H8_WATCHDOG(config, m_watchdog, *this, m_intc, 20, h8_watchdog_device::H);
+	H8_REFRESH(config, m_refresh, *this, m_intc, 21);
 }
 
 void h83003_device::execute_set_input(int inputnum, int state)
@@ -256,6 +261,7 @@ void h83003_device::internal_update(u64 current_time)
 	add_event(event_time, m_timer16_3->internal_update(current_time));
 	add_event(event_time, m_timer16_4->internal_update(current_time));
 	add_event(event_time, m_watchdog->internal_update(current_time));
+	add_event(event_time, m_refresh->internal_update(current_time));
 
 	recompute_bcount(event_time);
 }
@@ -271,6 +277,7 @@ void h83003_device::notify_standby(int state)
 	m_timer16_3->notify_standby(state);
 	m_timer16_4->notify_standby(state);
 	m_watchdog->notify_standby(state);
+	m_refresh->notify_standby(state);
 }
 
 void h83003_device::device_start()
@@ -279,14 +286,12 @@ void h83003_device::device_start()
 	m_dma_device = m_dma;
 
 	save_item(NAME(m_syscr));
-	save_item(NAME(m_rtmcsr));
 }
 
 void h83003_device::device_reset()
 {
 	h8h_device::device_reset();
 	m_syscr = 0x09;
-	m_rtmcsr = 0x00;
 }
 
 u8 h83003_device::syscr_r()
@@ -299,16 +304,4 @@ void h83003_device::syscr_w(u8 data)
 	m_syscr = data;
 	update_irq_filter();
 	logerror("syscr = %02x\n", data);
-}
-
-u8 h83003_device::rtmcsr_r()
-{
-	// set bit 7 -- Compare Match Flag (CMF): This status flag indicates that the RTCNT and RTCOR values have matched.
-	return m_rtmcsr | 0x80;
-}
-
-void h83003_device::rtmcsr_w(u8 data)
-{
-	m_rtmcsr = data;
-	logerror("rtmcsr = %02x\n", data);
 }

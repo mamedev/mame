@@ -17,7 +17,7 @@ public:
 	ioport_value dsw1_r();
 	ioport_value dsw2_r();
 	ioport_value auto_boot_floppy_r();
-//	ioport_value built_in_fdd_r();
+//  ioport_value built_in_fdd_r();
 	ioport_value memory_weight_r();
 };
 

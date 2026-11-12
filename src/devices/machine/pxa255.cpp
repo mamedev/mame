@@ -15,6 +15,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+
 #define LOG_UNKNOWN     (1U << 1)
 #define LOG_I2S         (1U << 2)
 #define LOG_DMA         (1U << 3)
@@ -30,6 +32,13 @@
 
 #define VERBOSE         (LOG_GPIO)
 #include "logmacro.h"
+
+namespace {
+
+// the I2S SYSCLK is this PLL divided by SADIV; one stereo frame takes 256 SYSCLK cycles
+constexpr u32 I2S_PLL_CLOCK = 147'456'000;
+
+} // anonymous namespace
 
 DEFINE_DEVICE_TYPE(PXA255_PERIPHERALS, pxa255_periphs_device, "pxa255_periphs", "Intel XScale PXA255 Peripherals")
 
@@ -227,6 +236,87 @@ void pxa255_periphs_device::device_start()
 	m_samples = make_unique_clear<s16[]>(0x1000);
 
 	m_rtc_regs.timer = timer_alloc(FUNC(pxa255_periphs_device::rtc_tick), this);
+
+	save_item(NAME(m_dma_regs.dcsr));
+	save_item(NAME(m_dma_regs.dint));
+	save_item(NAME(m_dma_regs.drcmr));
+	save_item(NAME(m_dma_regs.ddadr));
+	save_item(NAME(m_dma_regs.dsadr));
+	save_item(NAME(m_dma_regs.dtadr));
+	save_item(NAME(m_dma_regs.dcmd));
+
+	save_item(NAME(m_rtc_regs.rcnr));
+	save_item(NAME(m_rtc_regs.rtar));
+	save_item(NAME(m_rtc_regs.rtsr));
+	save_item(NAME(m_rtc_regs.rttr));
+
+	save_item(NAME(m_i2s_regs.sacr0));
+	save_item(NAME(m_i2s_regs.sacr1));
+	save_item(NAME(m_i2s_regs.sasr0));
+	save_item(NAME(m_i2s_regs.saimr));
+	save_item(NAME(m_i2s_regs.saicr));
+	save_item(NAME(m_i2s_regs.sadiv));
+	save_item(NAME(m_i2s_regs.sadr));
+
+	save_item(NAME(m_ostimer_regs.osmr));
+	save_item(NAME(m_ostimer_regs.oscr));
+	save_item(NAME(m_ostimer_regs.ossr));
+	save_item(NAME(m_ostimer_regs.ower));
+	save_item(NAME(m_ostimer_regs.oier));
+	save_item(NAME(m_ostimer_regs.last_count_sync));
+
+	save_item(NAME(m_intc_regs.icip));
+	save_item(NAME(m_intc_regs.icmr));
+	save_item(NAME(m_intc_regs.iclr));
+	save_item(NAME(m_intc_regs.icfp));
+	save_item(NAME(m_intc_regs.icpr));
+	save_item(NAME(m_intc_regs.iccr));
+
+	save_item(NAME(m_gpio_regs.gpdr));
+	save_item(NAME(m_gpio_regs.gpsr));
+	save_item(NAME(m_gpio_regs.gpcr));
+	save_item(NAME(m_gpio_regs.grer));
+	save_item(NAME(m_gpio_regs.gfer));
+	save_item(NAME(m_gpio_regs.gedr));
+	save_item(NAME(m_gpio_regs.gafrl));
+	save_item(NAME(m_gpio_regs.gafru));
+	save_item(NAME(m_gpio_regs.out_data));
+	save_item(NAME(m_gpio_regs.in_data));
+
+	save_item(NAME(m_lcd_regs.lccr));
+	save_item(NAME(m_lcd_regs.fbr));
+	save_item(NAME(m_lcd_regs.lcsr));
+	save_item(NAME(m_lcd_regs.liidr));
+	save_item(NAME(m_lcd_regs.trgbr));
+	save_item(NAME(m_lcd_regs.tcr));
+	save_item(NAME(m_lcd_regs.dma[0].fdadr));
+	save_item(NAME(m_lcd_regs.dma[0].fsadr));
+	save_item(NAME(m_lcd_regs.dma[0].fidr));
+	save_item(NAME(m_lcd_regs.dma[0].ldcmd));
+	save_item(NAME(m_lcd_regs.dma[1].fdadr));
+	save_item(NAME(m_lcd_regs.dma[1].fsadr));
+	save_item(NAME(m_lcd_regs.dma[1].fidr));
+	save_item(NAME(m_lcd_regs.dma[1].ldcmd));
+
+	save_item(NAME(m_power_regs.pmcr));
+	save_item(NAME(m_power_regs.pssr));
+	save_item(NAME(m_power_regs.pspr));
+	save_item(NAME(m_power_regs.pwer));
+	save_item(NAME(m_power_regs.prer));
+	save_item(NAME(m_power_regs.pfer));
+	save_item(NAME(m_power_regs.pedr));
+	save_item(NAME(m_power_regs.pcfr));
+	save_item(NAME(m_power_regs.pgsr));
+	save_item(NAME(m_power_regs.rcsr));
+	save_item(NAME(m_power_regs.pmfw));
+
+	save_item(NAME(m_clk_regs.cccr));
+	save_item(NAME(m_clk_regs.cken));
+	save_item(NAME(m_clk_regs.oscc));
+
+	save_pointer(NAME(m_lcd_palette), 0x100);
+	save_pointer(NAME(m_lcd_framebuffer), 0x100000);
+	save_pointer(NAME(m_samples), 0x1000);
 }
 
 void pxa255_periphs_device::device_reset()
@@ -235,6 +325,12 @@ void pxa255_periphs_device::device_reset()
 	{
 		m_dma_regs.dcsr[index] = 0x00000008;
 	}
+	m_dma_regs.dint = 0x00000000;
+	memset(m_dma_regs.drcmr, 0, sizeof(m_dma_regs.drcmr));
+	memset(m_dma_regs.ddadr, 0, sizeof(m_dma_regs.ddadr)); // Uninitialized, per manual
+	memset(m_dma_regs.dsadr, 0, sizeof(m_dma_regs.dsadr)); // Uninitialized, per manual
+	memset(m_dma_regs.dtadr, 0, sizeof(m_dma_regs.dtadr)); // Uninitialized, per manual
+	memset(m_dma_regs.dsadr, 0, sizeof(m_dma_regs.dsadr));
 
 	m_rtc_regs.rcnr = 0x00000000;
 	m_rtc_regs.rtar = 0x00000000;
@@ -242,21 +338,58 @@ void pxa255_periphs_device::device_reset()
 	m_rtc_regs.rttr = 0x00007fff;
 	m_rtc_regs.timer->adjust(attotime::from_hz(1));
 
-	memset(&m_intc_regs, 0, sizeof(m_intc_regs));
+	m_i2s_regs.sacr0 = 0x00007700;
+	m_i2s_regs.sacr1 = 0x00000000;
+	m_i2s_regs.sasr0 = 0x00000001;
+	m_i2s_regs.saimr = 0x00000000;
+	m_i2s_regs.saicr = 0x00000000; // Write-only register
+	m_i2s_regs.sadiv = 0x0000001a;
+	m_i2s_regs.sadr = 0x00000000;
 
+	memset(m_ostimer_regs.osmr, 0, sizeof(m_ostimer_regs.osmr));
+	m_ostimer_regs.oscr = 0x00000000;
+	m_ostimer_regs.ossr = 0x00000000;
+	m_ostimer_regs.ower = 0x00000000;
+	m_ostimer_regs.oier = 0x00000000;
+	m_ostimer_regs.last_count_sync = attotime::zero;
+
+	memset(&m_intc_regs, 0, sizeof(m_intc_regs));
+	memset(&m_gpio_regs, 0, sizeof(m_gpio_regs));
+
+	memset(m_lcd_regs.lccr, 0, sizeof(m_lcd_regs.lccr));
+	m_lcd_regs.dma[0].fdadr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[0].fsadr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[0].fidr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[0].ldcmd = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[1].fdadr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[1].fsadr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[1].fidr = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.dma[1].ldcmd = 0x00000000; // Unknown initialization value, per manual
+	m_lcd_regs.fbr[0] = 0x00000000;
+	m_lcd_regs.fbr[1] = 0x00000000;
+	m_lcd_regs.lcsr = 0x00000000;
+	m_lcd_regs.liidr = 0x00000000; // Unknown initialization value, per manual
 	m_lcd_regs.trgbr = 0x00aa5500;
 	m_lcd_regs.tcr = 0x0000754f;
 
-	memset(&m_gpio_regs, 0, sizeof(m_gpio_regs));
 	memset(&m_power_regs, 0, sizeof(m_power_regs));
+	m_power_regs.pssr = 0x00000020;
+	m_power_regs.pwer = 0x00000003;
+	m_power_regs.prer = 0x00000003;
+	m_power_regs.pfer = 0x00000003;
+	m_power_regs.rcsr = 0x00000001;
+
 	memset(&m_clk_regs, 0, sizeof(m_clk_regs));
+	m_clk_regs.cccr = 0x00000121;
+	m_clk_regs.cken = 0x00017def;
+	m_clk_regs.oscc = 0x00000000;
 }
 
 void pxa255_periphs_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: should be SCREEN_TYPE_LCD, but that dislikes dynamic configure
 	// will stay stuck at 296x480 aspect ratio.
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(1024, 1024);
@@ -364,7 +497,7 @@ void pxa255_periphs_device::i2s_sadiv_w(offs_t offset, u32 data, u32 mem_mask)
 	m_i2s_regs.sadiv = data & 0x0000007f;
 	for (int i = 0; i < 2; i++)
 	{
-		m_dmadac[i]->set_frequency(((double)147600000 / (double)m_i2s_regs.sadiv) / 256.0);
+		m_dmadac[i]->set_frequency(double(I2S_PLL_CLOCK) / (double(std::max<u32>(1, m_i2s_regs.sadiv)) * 256.0));
 		m_dmadac[i]->enable(1);
 	}
 }
@@ -430,10 +563,12 @@ void pxa255_periphs_device::dma_load_descriptor_and_start(int channel)
 	switch (channel)
 	{
 		case 3:
-			m_dma_regs.timer[channel]->adjust(attotime::from_hz((147600000 / m_i2s_regs.sadiv) / (4 * 64)) * (m_dma_regs.dcmd[channel] & 0x00001fff), channel);
+			// I2S transmit: each word is one 16-bit stereo frame
+			m_dma_regs.timer[channel]->adjust(attotime::from_ticks(256 * std::max<u32>(1, m_i2s_regs.sadiv), I2S_PLL_CLOCK) * std::max<u32>(1, (m_dma_regs.dcmd[channel] & 0x00001fff) / 4), channel);
 			break;
 		default:
-			m_dma_regs.timer[channel]->adjust(attotime::from_hz(100000000) * (m_dma_regs.dcmd[channel] & 0x00001fff), channel);
+			// a zero-length descriptor still costs a fetch, otherwise a chain of them would stall the scheduler
+			m_dma_regs.timer[channel]->adjust(attotime::from_hz(100000000) * std::max<u32>(1, m_dma_regs.dcmd[channel] & 0x00001fff), channel);
 			break;
 	}
 
@@ -455,15 +590,16 @@ TIMER_CALLBACK_MEMBER(pxa255_periphs_device::audio_dma_end_tick)
 	s16 *out_samples = &m_samples[0];
 	for (u32 index = 0; index < count; index += 4, sadr += 4)
 	{
+		// left sample in the low halfword, right in the high
 		const u32 word = space.read_dword(sadr);
-		*out_samples++ = (s16)(word >> 16);
-		*out_samples++ = (s16)(word & 0xffff);
+		*out_samples++ = s16(word & 0xffff);
+		*out_samples++ = s16(word >> 16);
 	}
 
 	for (int index = 0; index < 2; index++)
 	{
 		m_dmadac[index]->flush();
-		m_dmadac[index]->transfer(index, 2, 2, count/4, m_samples.get());
+		m_dmadac[index]->transfer(index, 1, 2, count / 4, m_samples.get());
 	}
 
 	dma_finish(param);
@@ -557,6 +693,17 @@ void pxa255_periphs_device::dma_dcsr_w(offs_t offset, u32 data, u32 mem_mask)
 			return;
 		}
 
+		if (m_dma_regs.ddadr[offset] & DDADR_STOP)
+		{
+			// Nothing to fetch: the channel goes straight to the stopped state. Linux parks every
+			// channel this way (DDADR = 1, then RUN) at boot, and descriptor 0 must not be fetched from address 0.
+			LOGMASKED(LOG_DMA, "%s:             Descriptor STOP bit set, channel %d stopped without a fetch.\n", machine().describe_context(), offset);
+			m_dma_regs.dcsr[offset] &= ~DCSR_RUN;
+			m_dma_regs.dcsr[offset] |= DCSR_STOPSTATE;
+			dma_irq_check();
+			return;
+		}
+
 		dma_load_descriptor_and_start(offset);
 	}
 	else if (!(data & DCSR_RUN))
@@ -605,7 +752,7 @@ template <int Which>
 void pxa255_periphs_device::dma_ddadr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_DMA, "%s: dma_ddadr_w: DMA Descriptor Address Register %d = %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
-	m_dma_regs.ddadr[offset] = data & 0xfffffff1;
+	m_dma_regs.ddadr[Which] = data & 0xfffffff1;
 }
 
 template <int Which>
@@ -620,7 +767,7 @@ template <int Which>
 void pxa255_periphs_device::dma_dsadr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_DMA, "%s: dma_dsadr_w: DMA Source Address Register %d = %08x & %08x\n", machine().describe_context(), offset, data, mem_mask);
-	m_dma_regs.dsadr[offset] = data & 0xfffffffc;
+	m_dma_regs.dsadr[Which] = data & 0xfffffffc;
 }
 
 template <int Which>
@@ -650,7 +797,7 @@ template <int Which>
 void pxa255_periphs_device::dma_dcmd_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_DMA, "%s: dma_dcmd_w: DMA Command Register %d: %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
-	m_dma_regs.dcmd[offset] = data & 0xf067dfff;
+	m_dma_regs.dcmd[Which] = data & 0xf067dfff;
 }
 
 
@@ -756,15 +903,18 @@ void pxa255_periphs_device::rtc_rttr_w(offs_t offset, u32 data, u32 mem_mask)
 void pxa255_periphs_device::ostimer_irq_check()
 {
 	set_irq_line(INT_OSTIMER0, (m_ostimer_regs.oier & OIER_E0) ? ((m_ostimer_regs.ossr & OSSR_M0) ? 1 : 0) : 0);
-	//set_irq_line(INT_OSTIMER1, (m_ostimer_regs.oier & OIER_E1) ? ((m_ostimer_regs.ossr & OSSR_M1) ? 1 : 0) : 0);
-	//set_irq_line(INT_OSTIMER2, (m_ostimer_regs.oier & OIER_E2) ? ((m_ostimer_regs.ossr & OSSR_M2) ? 1 : 0) : 0);
+	set_irq_line(INT_OSTIMER1, (m_ostimer_regs.oier & OIER_E1) ? ((m_ostimer_regs.ossr & OSSR_M1) ? 1 : 0) : 0);
+	set_irq_line(INT_OSTIMER2, (m_ostimer_regs.oier & OIER_E2) ? ((m_ostimer_regs.ossr & OSSR_M2) ? 1 : 0) : 0);
 	//set_irq_line(INT_OSTIMER3, (m_ostimer_regs.oier & OIER_E3) ? ((m_ostimer_regs.ossr & OSSR_M3) ? 1 : 0) : 0);
 }
 
 TIMER_CALLBACK_MEMBER(pxa255_periphs_device::ostimer_match_tick)
 {
-	m_ostimer_regs.ossr |= (1 << param);
+	// The count has just reached the match value, so resynchronise on it here
+	// rather than letting the next OSCR read add the elapsed time a second time.
 	m_ostimer_regs.oscr = m_ostimer_regs.osmr[param];
+	m_ostimer_regs.last_count_sync = machine().time();
+	m_ostimer_regs.ossr |= (1 << param);
 	ostimer_irq_check();
 }
 
@@ -773,7 +923,16 @@ void pxa255_periphs_device::ostimer_update_interrupts()
 {
 	if ((m_ostimer_regs.oier & (OIER_E0 << Which)) && Which != 3)
 	{
-		m_ostimer_regs.timer[Which]->adjust(attotime::from_hz(3846400) * (m_ostimer_regs.osmr[Which] - m_ostimer_regs.oscr), Which);
+		// A match happens when the count increments to equal the match register,
+		// so a register that already equals the count is a full wrap away.
+		const u32 delta = m_ostimer_regs.osmr[Which] - m_ostimer_regs.oscr;
+		const attotime match = m_ostimer_regs.last_count_sync + attotime::from_ticks(delta ? u64(delta) : 0x100000000ULL, INTERNAL_OSC);
+		const attotime now = machine().time();
+		m_ostimer_regs.timer[Which]->adjust((match > now) ? (match - now) : attotime::zero, Which);
+	}
+	else
+	{
+		m_ostimer_regs.timer[Which]->adjust(attotime::never);
 	}
 }
 
@@ -784,13 +943,9 @@ void pxa255_periphs_device::ostimer_update_count()
 	if (ticks_elapsed == 0ULL) // Accrue time until we can tick at least once
 		return;
 
-	const uint32_t wrapped_ticks = (uint32_t)ticks_elapsed;
-	m_ostimer_regs.oscr += wrapped_ticks;
-	m_ostimer_regs.last_count_sync = machine().time();
-	ostimer_update_interrupts<0>();
-	ostimer_update_interrupts<1>();
-	ostimer_update_interrupts<2>();
-	ostimer_update_interrupts<3>();
+	m_ostimer_regs.oscr += (uint32_t)ticks_elapsed;
+	// Advance the sync point by whole ticks only so the fraction is kept
+	m_ostimer_regs.last_count_sync += attotime::from_ticks(ticks_elapsed, INTERNAL_OSC);
 }
 
 template <int Which>
@@ -807,7 +962,6 @@ void pxa255_periphs_device::tmr_osmr_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_OSTIMER, "%s: pxa255_ostimer_w: OS Timer Match Register %d = %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
 	ostimer_update_count();
 	m_ostimer_regs.osmr[Which] = data;
-	ostimer_update_count();
 	ostimer_update_interrupts<Which>();
 }
 
@@ -824,6 +978,20 @@ void pxa255_periphs_device::tmr_oscr_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_OSTIMER, "%s: tmr_oscr_w: OS Timer Count Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	m_ostimer_regs.oscr = data;
 	m_ostimer_regs.last_count_sync = machine().time();
+	ostimer_update_interrupts<0>();
+	ostimer_update_interrupts<1>();
+	ostimer_update_interrupts<2>();
+	ostimer_update_interrupts<3>();
+
+	// PXA255 Developer's Manual 4.4.2.1/4.4.2.4: the counter increments on each rising edge and
+	// the match registers are compared against it after the edge, so a match register written
+	// equal to the current count is a full wrap away (handled above).  A written count is the
+	// exception: the edge on which it lands loads the counter instead of incrementing it.
+	for (int which = 0; which < 3; which++)
+	{
+		if ((m_ostimer_regs.oier & (OIER_E0 << which)) && m_ostimer_regs.osmr[which] == data)
+			m_ostimer_regs.timer[which]->adjust(attotime::from_ticks(1, INTERNAL_OSC), which);
+	}
 }
 
 u32 pxa255_periphs_device::tmr_ossr_r(offs_t offset, u32 mem_mask)
@@ -863,7 +1031,13 @@ u32 pxa255_periphs_device::tmr_oier_r(offs_t offset, u32 mem_mask)
 void pxa255_periphs_device::tmr_oier_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_OSTIMER, "%s: tmr_oier_w: OS Timer Interrupt Enable Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
+	ostimer_update_count();
 	m_ostimer_regs.oier = data & 0x0000000f;
+	ostimer_update_interrupts<0>();
+	ostimer_update_interrupts<1>();
+	ostimer_update_interrupts<2>();
+	ostimer_update_interrupts<3>();
+	ostimer_irq_check();
 }
 
 
@@ -913,6 +1087,7 @@ void pxa255_periphs_device::intc_icmr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: intc_icmr_w: Interrupt Controller Mask Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	m_intc_regs.icmr = data & 0xfffe7f00;
+	update_interrupts(); // ICIP/ICFP follow the mask immediately, so masking a pending source must drop the IRQ line
 }
 
 u32 pxa255_periphs_device::intc_iclr_r(offs_t offset, u32 mem_mask)
@@ -926,6 +1101,7 @@ void pxa255_periphs_device::intc_iclr_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	LOGMASKED(LOG_INTC, "%s: intc_iclr_w: Interrupt Controller Level Register = %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	m_intc_regs.iclr = data & 0xfffe7f00;
+	update_interrupts();
 }
 
 u32 pxa255_periphs_device::intc_icfp_r(offs_t offset, u32 mem_mask)
@@ -1336,12 +1512,34 @@ void pxa255_periphs_device::gpio_gafru_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 pxa255_periphs_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = 0; y <= (m_lcd_regs.lccr[2] & LCCR2_LPP); y++)
+	const u32 ppl = (m_lcd_regs.lccr[1] & LCCR1_PPL) + 1;
+	const u32 lpp = (m_lcd_regs.lccr[2] & LCCR2_LPP) + 1;
+
+	// LCCR3 BPP selects 1, 2, 4 or 8bpp palettised (0 through 3) or direct 16bpp RGB 5:6:5 (4).
+	// The packed sub-byte modes are not implemented and fall through to the 8bpp path.
+	if (((m_lcd_regs.lccr[3] & LCCR3_BPP) >> 24) == 4)
 	{
-		u32 *dst = &bitmap.pix(y);
-		for (int x = 0; x <= (m_lcd_regs.lccr[1] & LCCR1_PPL); x++)
+		for (u32 y = 0; y < lpp; y++)
 		{
-			*dst++ = m_lcd_palette[m_lcd_framebuffer[y * ((m_lcd_regs.lccr[1] & LCCR1_PPL) + 1) + x]];
+			const u8 *src = &m_lcd_framebuffer[y * ppl * 2];
+			u32 *dst = &bitmap.pix(y);
+			for (u32 x = 0; x < ppl; x++, src += 2)
+			{
+				const u16 color = src[0] | (src[1] << 8);
+				*dst++ = rgb_t(pal5bit(color >> 11), pal6bit(color >> 5), pal5bit(color));
+			}
+		}
+	}
+	else
+	{
+		for (u32 y = 0; y < lpp; y++)
+		{
+			const u8 *src = &m_lcd_framebuffer[y * ppl];
+			u32 *dst = &bitmap.pix(y);
+			for (u32 x = 0; x < ppl; x++)
+			{
+				*dst++ = m_lcd_palette[*src++];
+			}
 		}
 	}
 	return 0;
@@ -1387,13 +1585,71 @@ void pxa255_periphs_device::lcd_irq_check()
 	}
 }
 
+u32 pxa255_periphs_device::lcd_clock() const
+{
+	// LCLK is the memory clock, the crystal times CCCR's L multiplier (27 out of reset)
+	switch (m_clk_regs.cccr & 0x1f)
+	{
+		case 3:  return INTERNAL_OSC * 36;
+		case 5:  return INTERNAL_OSC * 45;
+		default: return INTERNAL_OSC * 27;
+	}
+}
+
+u64 pxa255_periphs_device::lcd_frame_ticks() const
+{
+	// one frame in LCLK cycles; each field is programmed minus one, except EFW and BFW,
+	// which only apply in active (TFT) mode
+	const u32 lccr1 = m_lcd_regs.lccr[1];
+	const u32 lccr2 = m_lcd_regs.lccr[2];
+	const u32 line = (lccr1 & LCCR1_PPL) + ((lccr1 & LCCR1_HSW) >> 10) + ((lccr1 & LCCR1_ELW) >> 16) + ((lccr1 & LCCR1_BLW) >> 24) + 4;
+	u32 lines = (lccr2 & LCCR2_LPP) + ((lccr2 & LCCR2_VSW) >> 10) + 2;
+	if (m_lcd_regs.lccr[0] & LCCR0_PAS)
+	{
+		lines += ((lccr2 & LCCR2_EFW) >> 16) + ((lccr2 & LCCR2_BFW) >> 24);
+	}
+
+	// TODO: passive panels shift several pixels per pixel clock
+	return u64(line) * lines * 2 * ((m_lcd_regs.lccr[3] & LCCR3_PCD) + 1);
+}
+
+attotime pxa255_periphs_device::lcd_dma_period(int channel) const
+{
+	const u32 length = m_lcd_regs.dma[channel].ldcmd & 0x000fffff;
+	const u32 bpp = 1 << std::min<u32>((m_lcd_regs.lccr[3] & LCCR3_BPP) >> 24, 4);
+	const u64 frame_bytes = u64((m_lcd_regs.lccr[1] & LCCR1_PPL) + 1) * ((m_lcd_regs.lccr[2] & LCCR2_LPP) + 1) * bpp / 8;
+
+	// pixel data drains at the panel's refresh rate, so a whole frame's worth takes one frame period;
+	// a palette load bursts in during blanking
+	if (!(m_lcd_regs.dma[channel].ldcmd & LDCMD_PAL) && frame_bytes)
+	{
+		return attotime::from_ticks(lcd_frame_ticks() * length / frame_bytes, lcd_clock());
+	}
+	return attotime::from_hz(20000000) * length;
+}
+
+void pxa255_periphs_device::lcd_configure_screen()
+{
+	const u16 lpp = (m_lcd_regs.lccr[2] & LCCR2_LPP);
+	const u16 ppl = (m_lcd_regs.lccr[1] & LCCR1_PPL);
+
+	// the timing registers must all be programmed before the controller is enabled
+	if ((m_lcd_regs.lccr[0] & LCCR0_ENB) && lpp && ppl)
+	{
+		const rectangle rect(0, ppl, 0, lpp);
+		const attotime period = attotime::from_ticks(lcd_frame_ticks(), lcd_clock());
+		if (rect != m_screen->visible_area() || period != m_screen->frame_period())
+		{
+			m_screen->configure(1024, 1024, rect, period);
+		}
+	}
+}
+
 void pxa255_periphs_device::lcd_dma_kickoff(int channel)
 {
 	if (m_lcd_regs.dma[channel].fdadr != 0)
 	{
-		attotime period = attotime::from_hz(20000000) * (m_lcd_regs.dma[channel].ldcmd & 0x000fffff);
-
-		m_lcd_regs.dma[channel].eof->adjust(period, channel);
+		m_lcd_regs.dma[channel].eof->adjust(lcd_dma_period(channel), channel);
 
 		if (m_lcd_regs.dma[channel].ldcmd & LDCMD_SOFINT)
 		{
@@ -1404,8 +1660,9 @@ void pxa255_periphs_device::lcd_dma_kickoff(int channel)
 
 		if (m_lcd_regs.dma[channel].ldcmd & LDCMD_PAL)
 		{
+			// the palette RAM holds 256 entries; a longer descriptor's excess is ignored
 			address_space &space = m_maincpu->space(AS_PROGRAM);
-			int length = m_lcd_regs.dma[channel].ldcmd & 0x000fffff;
+			int length = std::min<int>(m_lcd_regs.dma[channel].ldcmd & 0x000fffff, 0x200);
 			int index = 0;
 			for(index = 0; index < length; index += 2)
 			{
@@ -1449,6 +1706,13 @@ void pxa255_periphs_device::lcd_check_load_next_branch(int channel)
 	else
 	{
 		LOGMASKED(LOG_LCD_DMA, "lcd_check_load_next_branch: Not taking branch\n" );
+
+		// A self-linked descriptor keeps refreshing the panel from one buffer.
+		if ((m_lcd_regs.lccr[0] & LCCR0_ENB) && (m_lcd_regs.dma[channel].ldcmd & 0x000fffff))
+		{
+			lcd_load_dma_descriptor(m_lcd_regs.dma[channel].fdadr & 0xfffffff0, channel);
+			lcd_dma_kickoff(channel);
+		}
 	}
 }
 
@@ -1466,21 +1730,26 @@ void pxa255_periphs_device::lcd_lccr_w(offs_t offset, u32 data, u32 mem_mask)
 	LOGMASKED(LOG_LCD, "%s: lcd_lccr_w: LCD Control Register %d = %08x & %08x\n", machine().describe_context(), Which, data, mem_mask);
 
 	if (Which == 0)
-		m_lcd_regs.lccr[Which] = data & 0x00fffeff;
+	{
+		const u32 old = m_lcd_regs.lccr[0];
+		m_lcd_regs.lccr[0] = data & 0x00fffeff;
+
+		// enabling the controller starts fetching from the descriptor FDADR already points at
+		if ((m_lcd_regs.lccr[0] & ~old) & LCCR0_ENB)
+		{
+			for (int channel = 0; channel < 2; channel++)
+			{
+				if (!m_lcd_regs.dma[channel].eof->enabled())
+					lcd_dma_kickoff(channel);
+			}
+		}
+
+		lcd_configure_screen();
+	}
 	else
 	{
 		m_lcd_regs.lccr[Which] = data;
-		if (Which == 1 || Which == 2)
-		{
-			const u16 lpp = (m_lcd_regs.lccr[2] & LCCR2_LPP);
-			const u16 ppl = (m_lcd_regs.lccr[1] & LCCR1_PPL);
-
-			if (lpp && ppl)
-			{
-				rectangle rect(0, ppl, 0, lpp);
-				m_screen->configure(1024, 1024, rect, HZ_TO_ATTOSECONDS(60));
-			}
-		}
+		lcd_configure_screen();
 	}
 }
 
@@ -1806,7 +2075,7 @@ void pxa255_periphs_device::clk_cken_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 pxa255_periphs_device::clk_oscc_r(offs_t offset, u32 mem_mask)
 {
-	const u32 data = m_clk_regs.cccr;
+	const u32 data = m_clk_regs.oscc;
 	LOGMASKED(LOG_CLOCKS, "%s: clk_oscc_r: Oscillator Configuration Register: %08x & %08x\n", machine().describe_context(), data, mem_mask);
 	return data;
 }

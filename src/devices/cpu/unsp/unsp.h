@@ -90,6 +90,7 @@ public:
 	virtual ~unsp_device();
 
 	void set_vectorbase(uint16_t vector) { m_vectorbase = vector; }
+	void set_bootvectorbase(uint16_t vector) { m_bootvectorbase = vector; }
 
 	uint8_t get_csb();
 
@@ -293,7 +294,6 @@ private:
 	inline void trigger_irq(int line);
 	void check_irqs();
 
-	drc_cache m_drccache;
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<frontend> m_drcfe;
 	uint32_t m_drcoptions;
@@ -312,6 +312,7 @@ private:
 
 	bool m_enable_drc;
 	uint16_t m_vectorbase;
+	uint16_t m_bootvectorbase;
 	internal_unsp_state m_local_core; // for non-DRC mode
 
 	void execute_run_drc();

@@ -541,7 +541,7 @@ void atari_rle_objects_device::draw_rle(bitmap_ind16 &bitmap, const rectangle &c
 	x -= scaled_xoffs;
 	y -= scaled_yoffs;
 
-	// draw it with appropriate flipping
+	// draw it with appropriate flipping; color and pixel bits are ORed below
 	u32 const palettebase = m_palettebase + color;
 	if (!hflip)
 		draw_rle_zoom(bitmap, clip, info, palettebase, x, y, xscale << 4, yscale << 4);
@@ -632,7 +632,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 				// store copies of the value until we pass the end of this chunk
 				if (value)
 				{
-					value += palette;
+					value |= palette;
 					while (sourcex < rle_end)
 						*dest++ = value, sourcex += dx;
 				}
@@ -650,7 +650,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 				// store copies of the value until we pass the end of this chunk
 				if (value)
 				{
-					value += palette;
+					value |= palette;
 					while (sourcex < rle_end)
 						*dest++ = value, sourcex += dx;
 				}
@@ -686,7 +686,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 				}
 				if (value)
 				{
-					value += palette;
+					value |= palette;
 					while (sourcex < rle_end && dest <= end)
 						*dest++ = value, sourcex += dx;
 				}
@@ -711,7 +711,7 @@ void atari_rle_objects_device::draw_rle_zoom(bitmap_ind16 &bitmap, const rectang
 				}
 				if (value)
 				{
-					value += palette;
+					value |= palette;
 					while (sourcex < rle_end && dest <= end)
 						*dest++ = value, sourcex += dx;
 				}
@@ -811,7 +811,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 				// store copies of the value until we pass the end of this chunk
 				if (value)
 				{
-					value += palette;
+					value |= palette;
 					while (sourcex < rle_end)
 						*dest-- = value, sourcex += dx;
 				}
@@ -829,7 +829,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 				// store copies of the value until we pass the end of this chunk
 				if (value)
 				{
-					value += palette;
+					value |= palette;
 					while (sourcex < rle_end)
 						*dest-- = value, sourcex += dx;
 				}
@@ -865,7 +865,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 				}
 				if (value)
 				{
-					value += palette;
+					value |= palette;
 					while (sourcex < rle_end && dest >= start)
 						*dest-- = value, sourcex += dx;
 				}
@@ -890,7 +890,7 @@ void atari_rle_objects_device::draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const r
 				}
 				if (value)
 				{
-					value += palette;
+					value |= palette;
 					while (sourcex < rle_end && dest >= start)
 						*dest-- = value, sourcex += dx;
 				}

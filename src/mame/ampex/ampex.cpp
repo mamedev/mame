@@ -366,7 +366,7 @@ void ampex_state::ampex(machine_config &config)
 	Z80(config, m_maincpu, 23.814_MHz_XTAL / 9); // clocked by 8224?
 	m_maincpu->set_addrmap(AS_PROGRAM, &ampex_state::mem_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(23.814_MHz_XTAL / 2, 105 * AMPEX_CH_WIDTH, 0, 80 * AMPEX_CH_WIDTH, 270, 0, 250);
 	screen.set_screen_update(FUNC(ampex_state::screen_update));
 

@@ -8,17 +8,17 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "bus/centronics/ctronics.h"
-#include "bus/scsi/s1410.h"
+#include "bus/nscsi/devices.h"
 #include "imagedev/floppy.h"
 #include "machine/clock.h"
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "machine/msm58321.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cb.h"
 #include "machine/ram.h"
 #include "machine/timer.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
 #include "v1050kb.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
@@ -78,18 +78,14 @@ public:
 		m_palette(*this, "palette"),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_ram(*this, RAM_TAG),
-		m_floppy0(*this, MB8877_TAG":0"),
-		m_floppy1(*this, MB8877_TAG":1"),
-		m_floppy2(*this, MB8877_TAG":2"),
-		m_floppy3(*this, MB8877_TAG":3"),
+		m_floppy(*this, MB8877_TAG":%u", 0U),
 		m_clock_sio(*this, CLOCK_SIO_TAG),
 		m_timer_ack(*this, TIMER_ACK_TAG),
 		m_timer_rst(*this, TIMER_RST_TAG),
-		m_sasibus(*this, SASIBUS_TAG),
-		m_sasi_data_out(*this, "scsi_data_out"),
-		m_sasi_data_in(*this, "scsi_data_in"),
-		m_sasi_ctrl_in(*this, "scsi_ctrl_in"),
+		m_sasi(*this, SASIBUS_TAG ":7:scsicb"),
 		m_rom(*this, Z80_TAG),
+		m_rom_view(*this, "rom_view"),
+		m_bank_view(*this, "bank_view"),
 		m_video_ram(*this, "video_ram"),
 		m_attr_ram(*this, "attr_ram", V1050_VIDEORAM_SIZE, ENDIANNESS_LITTLE),
 		m_int_mask(0),
@@ -133,8 +129,9 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	void crtc_vs_w(int state);
 	void sasi_data_w(uint8_t data);
-	void write_sasi_io(int state);
+	uint8_t sasi_status_r();
 	void sasi_ctrl_w(uint8_t data);
+	void sasi_io_w(int state);
 
 	void rtc_ppi_pa_0_w(int state) { m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 0)) | ((state & 1) << 0); }
 	void rtc_ppi_pa_1_w(int state) { m_rtc_ppi_pa = (m_rtc_ppi_pa & ~(1 << 1)) | ((state & 1) << 1); }
@@ -150,6 +147,8 @@ private:
 	void pic_int_w(int state);
 	void disp_ppi_pc_w(uint8_t data);
 	void m6502_ppi_pc_w(uint8_t data);
+	TIMER_CALLBACK_MEMBER(disp_ppi_pc_sync);
+	TIMER_CALLBACK_MEMBER(m6502_ppi_pc_sync);
 	uint8_t misc_ppi_pc_r();
 	IRQ_CALLBACK_MEMBER(v1050_int_ack);
 
@@ -186,18 +185,14 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
-	required_device<floppy_connector> m_floppy2;
-	required_device<floppy_connector> m_floppy3;
+	required_device_array<floppy_connector, 4> m_floppy;
 	required_device<clock_device> m_clock_sio;
 	required_device<timer_device> m_timer_ack;
 	required_device<timer_device> m_timer_rst;
-	required_device<scsi_port_device> m_sasibus;
-	required_device<output_latch_device> m_sasi_data_out;
-	required_device<input_buffer_device> m_sasi_data_in;
-	required_device<input_buffer_device> m_sasi_ctrl_in;
+	required_device<nscsi_callback_device> m_sasi;
 	required_memory_region m_rom;
+	memory_view m_rom_view;
+	memory_view m_bank_view;
 	required_shared_ptr<uint8_t> m_video_ram;
 	memory_share_creator<uint8_t> m_attr_ram;
 
@@ -216,7 +211,7 @@ private:
 	// serial state
 	int m_rxrdy = 0;                // receiver ready
 	int m_txrdy = 0;                // transmitter ready
-	int m_baud_sel = 0;             // baud select
+	int m_baud_sel = -1;            // baud select
 
 	// memory state
 	uint8_t m_bank = 0;               // bank register
@@ -226,7 +221,6 @@ private:
 
 	// sasi state
 	uint8_t m_sasi_data = 0;
-	int m_sasi_data_enable = 0;
 
 	uint8_t m_rtc_ppi_pa;
 	uint8_t m_rtc_ppi_pc;

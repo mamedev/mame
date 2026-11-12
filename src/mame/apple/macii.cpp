@@ -16,11 +16,12 @@
 #include "emu.h"
 
 #include "adbmodem.h"
-#include "macadb.h"
 #include "macrtc.h"
 #include "macscsi.h"
 #include "mactoolbox.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/macpds/macpds.h"
@@ -48,6 +49,8 @@
 
 #include "formats/ap_dsk35.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -72,7 +75,7 @@ public:
 		m_via2(*this, "via6522_1"),
 		m_asc(*this, "asc"),
 		m_adbmodem(*this, "adbmodem"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_ram(*this, RAM_TAG),
 		m_scc(*this, "scc"),
 		m_ncr5380(*this, "ncr5380"),
@@ -103,14 +106,14 @@ public:
 	{
 	}
 
-	void macii(machine_config &config);
-	void maciihmu(machine_config &config);
-	void maciihd(machine_config &config);
-	void maciix(machine_config &config);
-	void maciicx(machine_config &config);
-	void macse30(machine_config &config);
+	void macii(machine_config &config) ATTR_COLD;
+	void maciihmu(machine_config &config) ATTR_COLD;
+	void maciihd(machine_config &config) ATTR_COLD;
+	void maciix(machine_config &config) ATTR_COLD;
+	void maciicx(machine_config &config) ATTR_COLD;
+	void macse30(machine_config &config) ATTR_COLD;
 
-	void macii_init();
+	void macii_init() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -173,12 +176,12 @@ private:
 	void via_irq(int state);
 	void via2_irq(int state);
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_musashi_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	required_device<via6522_device> m_via2;
 	required_device<asc_device> m_asc;
 	optional_device<adbmodem_device> m_adbmodem;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	required_device<z80scc_device> m_scc;
 	required_device<ncr53c80_device> m_ncr5380;
@@ -214,18 +217,18 @@ private:
 u32 macii_state::screen_update_macse30(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u32 const video_base = (m_screen_buffer ? 0x8000 : 0) + (MAC_H_VIS / 8);
-	u16 const *const video_ram = (const u16 *)&m_vram[video_base / 4];
+	auto const video_ram = util::big_endian_cast<const u16>(&m_vram[video_base / 4]);
 
-	for (int y = 0; y < MAC_V_VIS; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u32 *const line = &bitmap.pix(y);
 
 		for (int x = 0; x < MAC_H_VIS; x += 16)
 		{
-			u16 const word = video_ram[((y * MAC_H_VIS) / 16) + ((x / 16) ^ 1)];
+			u16 const word = video_ram[((y * MAC_H_VIS) / 16) + (x / 16)];
 			for (int b = 0; b < 16; b++)
 			{
-				line[x + b] = ((word >> (15 - b)) & 0x0001) ? 0 : 0xffffff;
+				line[x + b] = BIT(word, 15 - b) ? 0 : 0xffffff;
 			}
 		}
 	}
@@ -371,6 +374,7 @@ void macii_state::scsi_w(offs_t offset, u16 data, u16 mem_mask)
 
 void macii_state::scsi_irq(int state)
 {
+	m_via2->write_cb2(state ^ 1);
 }
 
 void macii_state::scsi_berr_w(u8 data)
@@ -799,7 +803,7 @@ void macii_state::macii_init()
 
 void macii_state::nubus_slot_interrupt(u8 slot, u32 state)
 {
-	static const u8 masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
+	constexpr u8 masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
 	u8 mask = 0x3f;
 
 	slot -= 9;
@@ -897,8 +901,8 @@ void macii_state::macii_map(address_map &map)
 	map(0x50000000, 0x50001fff).rw(FUNC(macii_state::via_r), FUNC(macii_state::via_w)).mirror(0x00f00000);
 	map(0x50002000, 0x50003fff).rw(FUNC(macii_state::via2_r), FUNC(macii_state::via2_w)).mirror(0x00f00000);
 	map(0x50004000, 0x50005fff).rw(FUNC(macii_state::scc_r), FUNC(macii_state::scc_w)).mirror(0x00f00000);
-	map(0x50006000, 0x50006003).w(FUNC(macii_state::scsi_drq_w)).mirror(0x00f00000);
-	map(0x50006060, 0x50006063).r(FUNC(macii_state::scsi_drq_r)).mirror(0x00f00000);
+	map(0x50006000, 0x50006003).rw(FUNC(macii_state::scsi_drq_r), FUNC(macii_state::scsi_drq_w)).mirror(0x00f00000);
+	map(0x50006060, 0x50006063).rw(FUNC(macii_state::scsi_drq_r), FUNC(macii_state::scsi_drq_w)).mirror(0x00f00000);
 	map(0x50010000, 0x50011fff).rw(FUNC(macii_state::scsi_r), FUNC(macii_state::scsi_w)).mirror(0x00f00000);
 	map(0x50012000, 0x50013fff).rw(FUNC(macii_state::scsi_drq_r), FUNC(macii_state::scsi_drq_w)).mirror(0x00f00000);
 	map(0x50014000, 0x50015fff).rw(m_asc, FUNC(asc_device::read), FUNC(asc_device::write)).mirror(0x00f00000);
@@ -957,7 +961,7 @@ void macii_state::macii(machine_config &config)
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	auto &scsi(NSCSI_BUS(config, "scsi"));
-	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:0", mac_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsi:1", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:3").option_set("cdrom", NSCSI_CDROM_APPLE).machine_config([](device_t *device)
@@ -966,7 +970,7 @@ void macii_state::macii(machine_config &config)
 			device->subdevice<cdda_device>("cdda")->add_route(1, "^^speaker", 1.0, 1); });
 	NSCSI_CONNECTOR(config, "scsi:4", mac_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:5", mac_scsi_devices, nullptr);
-	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:6", mac_scsi_devices, nullptr);
 	NCR53C80(config, m_ncr5380);
 	scsi.set_external_device(7, m_ncr5380);
 	m_ncr5380->irq_handler().set(DEVICE_SELF, FUNC(macii_state::scsi_irq));
@@ -1015,13 +1019,15 @@ void macii_state::macii(machine_config &config)
 	ADBMODEM(config, m_adbmodem, C7M);
 	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_adbmodem->irq_callback().set(FUNC(macii_state::adb_irq_w));
 	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
 	config.set_perfect_quantum(m_maincpu);
 
-	MACADB(config, m_macadb, C15M);
-	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+	ADB_BUS(config, m_adbbus);
+	m_adbbus->out_adb_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("2M");
@@ -1107,7 +1113,7 @@ void macii_state::macse30(machine_config &config)
 	m_via2->readpb_handler().set(FUNC(macii_state::iix_via2_in_b));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(15.6672_MHz_XTAL, MAC_H_TOTAL, 0, MAC_H_VIS, MAC_V_TOTAL, 0, MAC_V_VIS);
 	m_screen->set_screen_update(FUNC(macii_state::screen_update_macse30));
