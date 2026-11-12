@@ -70,6 +70,7 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER(timer_check);
 	TIMER_CALLBACK_MEMBER(brg_tick);
+	TIMER_CALLBACK_MEMBER(test_clock_tick);
 
 	void soft_reset();
 	void update_timer_rate();
@@ -77,6 +78,8 @@ private:
 	void write_port1(uint8_t data);
 	uint8_t port1_output_mask() const;
 	uint8_t port1_output() const;
+	bool test_clock_enabled() const;
+	void update_test_clock();
 	bool port2_handshake_mode() const;
 	void set_port2_handshake(bool state);
 	uint8_t read_port2();
@@ -113,6 +116,8 @@ private:
 
 	emu_timer *m_timer;
 	emu_timer *m_brg_timer;
+	emu_timer *m_test_clock_timer;
+	bool m_test_clock;
 
 	// registers
 	uint8_t m_command1, m_command2, m_command3;

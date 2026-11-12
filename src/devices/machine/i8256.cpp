@@ -204,6 +204,8 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 	m_out_p2_cb(*this),
 	m_timer(nullptr),
 	m_brg_timer(nullptr),
+	m_test_clock_timer(nullptr),
+	m_test_clock(false),
 	m_mode(0),
 	m_port1_control(0),
 	m_port1_input(0),
@@ -223,6 +225,7 @@ void i8256_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
 	m_brg_timer = timer_alloc(FUNC(i8256_device::brg_tick), this);
+	m_test_clock_timer = timer_alloc(FUNC(i8256_device::test_clock_tick), this);
 	m_txc_handler(m_txc_output);
 	m_rxc_handler(m_rxc_output);
 
@@ -237,6 +240,7 @@ void i8256_device::device_start()
 	m_timer4_read_latch = 0;
 	m_timer5_read_latch = 0;
 
+	save_item(NAME(m_test_clock));
 	save_item(NAME(m_command1));
 	save_item(NAME(m_command2));
 	save_item(NAME(m_command3));
@@ -311,6 +315,8 @@ void i8256_device::device_reset()
 	m_timer5_read_latched = false;
 	m_port1_control = 0;
 	m_modification = 0;
+	m_test_clock = false;
+	m_test_clock_timer->adjust(attotime::never);
 	if (port1_output)
 		m_out_p1_cb(0, 0);
 	if (port2_output)
@@ -645,6 +651,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 		}
 		case I8256_REG_CMD2:
 		{
+			const uint8_t old_p1_output = port1_output();
 			const uint8_t changed = m_command2 ^ data;
 			m_command2 = data;
 
@@ -664,6 +671,10 @@ void i8256_device::write(offs_t offset, uint8_t data)
 				update_timer_rate();
 
 			const uint8_t baud = data & 0x0f;
+			if (changed & 0x3f)
+				update_test_clock();
+			if (old_p1_output != port1_output())
+				m_out_p1_cb(0, port1_output());
 			if (BIT(changed, I8256_CMD2_B0, 4))
 			{
 				output_txc(1);
@@ -721,9 +732,12 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			const uint8_t old_mask = port2_output_mask();
 			const uint8_t old_p1_mask = port1_output_mask();
 			const uint8_t old_p1_output = port1_output();
+			const bool old_test_clock = test_clock_enabled();
 			if (!BIT(m_mode, I8256_MODE_T5C) && BIT(data, I8256_MODE_T5C))
 				m_timer5_running = false;
 			m_mode = data;
+			if (old_test_clock != test_clock_enabled())
+				update_test_clock();
 			if (old_p1_mask != port1_output_mask() || old_p1_output != port1_output())
 				m_out_p1_cb(0, port1_output());
 			const uint8_t mask = port2_output_mask();
@@ -739,8 +753,12 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			if (m_port1_control != data)
 			{
 				const uint8_t old_mask = port1_output_mask();
+				const uint8_t old_output = port1_output();
+				const bool old_test_clock = test_clock_enabled();
 				m_port1_control = data;
-				if (old_mask != port1_output_mask())
+				if (old_test_clock != test_clock_enabled())
+					update_test_clock();
+				if (old_mask != port1_output_mask() || old_output != port1_output())
 					m_out_p1_cb(0, port1_output());
 			}
 			break;
@@ -846,7 +864,9 @@ uint8_t i8256_device::read_port1()
 {
 	// control bit 1 = output (read from latch), 0 = input (read from callback)
 	const uint8_t input = m_in_p1_cb.isunset() ? m_port1_input : m_in_p1_cb(0);
-	return (input & ~port1_output_mask()) | port1_output();
+	const uint8_t output = test_clock_enabled() ?
+			(port1_output() & ~0x10) | (m_port1_int & 0x10) : port1_output();
+	return (input & ~port1_output_mask()) | output;
 }
 
 uint8_t i8256_device::port1_output_mask() const
@@ -856,9 +876,34 @@ uint8_t i8256_device::port1_output_mask() const
 
 uint8_t i8256_device::port1_output() const
 {
+	if (test_clock_enabled())
+		return (m_port1_int & m_port1_control & ~0x10) | (m_test_clock ? 0x10 : 0x00);
 	if (port2_handshake_mode())
 		return (m_port1_int & m_port1_control & ~0x03) | (m_port2_handshake ? 0x02 : 0x00);
 	return m_port1_int & m_port1_control;
+}
+
+bool i8256_device::test_clock_enabled() const
+{
+	return (m_mode & 0x07) == I8256_PORT2C_TEST && BIT(m_port1_control, 4) &&
+			(m_command2 & 0x0f) > I8256_BAUD_TXC32;
+}
+
+void i8256_device::update_test_clock()
+{
+	m_test_clock = false;
+	if (test_clock_enabled())
+	{
+		const uint8_t baud = m_command2 & 0x0f;
+		// P14 carries the raw BRG clock: 64x baud, except 32x at 19.2 kbaud.
+		const int multiplier = (baud == I8256_BAUD_19200) ? 32 : 64;
+		const int prescaler = SYS_CLOCK_DIVIDER[BIT(m_command2, I8256_CMD2_C0, 2)];
+		const attotime period = attotime::from_hz(BAUD_RATES[baud] * multiplier * 2 *
+				double(clock()) / (prescaler * 1'024'000));
+		m_test_clock_timer->adjust(period, 0, period);
+	}
+	else
+		m_test_clock_timer->adjust(attotime::never);
 }
 
 bool i8256_device::port2_handshake_mode() const
@@ -879,9 +924,9 @@ void i8256_device::set_port2_handshake(bool state)
 void i8256_device::write_port1(uint8_t data)
 {
 	// all bits are latched; input pins output the latch if the direction is changed later
-	const uint8_t changed = (m_port1_int ^ data) & m_port1_control & (port2_handshake_mode() ? 0xfc : 0xff);
+	const uint8_t old_output = port1_output();
 	m_port1_int = data;
-	if (changed)
+	if (old_output != port1_output())
 		m_out_p1_cb(0, port1_output());
 }
 
@@ -907,7 +952,6 @@ uint8_t i8256_device::read_port2()
 		case I8256_PORT2C_HO:
 			return m_port2_int;
 		case I8256_PORT2C_TEST:
-			// TODO: test mode places the baud rate generator output on port 1 P14
 			return 0;
 		case I8256_PORT2C_DNU:
 		default:
@@ -1277,6 +1321,12 @@ TIMER_CALLBACK_MEMBER(i8256_device::brg_tick)
 {
 	receiver_tick();
 	transmitter_tick();
+}
+
+TIMER_CALLBACK_MEMBER(i8256_device::test_clock_tick)
+{
+	m_test_clock = !m_test_clock;
+	m_out_p1_cb(0, port1_output());
 }
 
 void i8256_device::write_rxd(int state)
