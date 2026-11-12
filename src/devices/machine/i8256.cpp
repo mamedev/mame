@@ -102,6 +102,7 @@ enum
 };
 
 constexpr int BAUD_RATES[16] = {0, 0, 0, 19200, 9600, 4800, 2400, 1200, 600, 300, 200, 150, 110, 100, 75, 50};
+constexpr uint16_t EXTERNAL_CLOCK_DIVIDER[3] = {1, 64, 32};
 
 constexpr int SYS_CLOCK_DIVIDER[4] = {5, 3, 2, 1};
 
@@ -625,31 +626,20 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			const uint8_t baud = data & 0x0f;
 			if (!(changed & 0x3f))
 				break;
-			switch (baud)
+			if (baud <= I8256_BAUD_TXC32)
 			{
-				case I8256_BAUD_TXC:
-					m_divide = 1;
-					m_brg_timer->adjust(attotime::never);
-					break;
-				case I8256_BAUD_TXC64:
-					m_divide = 64;
-					m_brg_timer->adjust(attotime::never);
-					break;
-				case I8256_BAUD_TXC32:
-					m_divide = 32;
-					m_brg_timer->adjust(attotime::never);
-					break;
-				default:
-				{
-					// internal baud rate generator; the bit clock is emulated in
-					// 1/32 bit steps, the granularity of the modification register
-					// baud rates are nominal at a 1.024 MHz prescaled system clock
-					m_divide = 32;
-					const attotime period = attotime::from_hz(BAUD_RATES[baud] * 32 *
-							double(clock()) / (SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)] * 1'024'000));
-					m_brg_timer->adjust(period, 0, period);
-					break;
-				}
+				m_divide = EXTERNAL_CLOCK_DIVIDER[baud];
+				m_brg_timer->adjust(attotime::never);
+			}
+			else
+			{
+				// internal baud rate generator; the bit clock is emulated in
+				// 1/32 bit steps, the granularity of the modification register
+				// baud rates are nominal at a 1.024 MHz prescaled system clock
+				m_divide = 32;
+				const attotime period = attotime::from_hz(BAUD_RATES[baud] * 32 *
+						double(clock()) / (SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)] * 1'024'000));
+				m_brg_timer->adjust(period, 0, period);
 			}
 			break;
 		}
