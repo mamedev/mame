@@ -630,7 +630,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 				update_timer_rate();
 
 			const uint8_t baud = data & 0x0f;
-			if (!(changed & 0x0f))
+			if (!(changed & 0x3f))
 				break;
 			switch (baud)
 			{
@@ -650,8 +650,10 @@ void i8256_device::write(offs_t offset, uint8_t data)
 				{
 					// internal baud rate generator; the bit clock is emulated in
 					// 1/32 bit steps, the granularity of the modification register
+					// baud rates are nominal at a 1.024 MHz prescaled system clock
 					m_divide = 32;
-					const attotime period = attotime::from_hz(BAUD_RATES[baud] * 32);
+					const attotime period = attotime::from_hz(BAUD_RATES[baud] * 32 *
+							double(clock()) / (SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)] * 1'024'000));
 					m_brg_timer->adjust(period, 0, period);
 					break;
 				}
