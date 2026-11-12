@@ -199,7 +199,7 @@ void gse1_state::daten_w(uint8_t data)
 		_H = 1 << 7
 	};
 
-	static constexpr u8 cd4511[16] = {
+	static constexpr u8 CD4511[16] = {
 	_A | _B | _C | _D | _E | _F,
 	_B | _C,
 	_A | _B | _D | _E | _G,
@@ -236,22 +236,22 @@ void gse1_state::daten_w(uint8_t data)
 			break;
 		case 0x10:
 			// Münzspeicher Pfennig
-			m_digits[0] = cd4511[data & 0x0f];
-			m_digits[1] = cd4511[data >> 4];
+			m_digits[0] = CD4511[data & 0x0f];
+			m_digits[1] = CD4511[data >> 4];
 			break;
 		case 0x11:
 			// Münzspeicher DM
-			m_digits[2] = cd4511[data & 0x0f];
-			m_digits[3] = cd4511[data >> 4];
+			m_digits[2] = CD4511[data & 0x0f];
+			m_digits[3] = CD4511[data >> 4];
 			break;
 		case 0x12:
 			// Sonderspiele 10 and 1
-			m_digits[4] = cd4511[data & 0x0f];
-			m_digits[5] = cd4511[data >> 4];
+			m_digits[4] = CD4511[data & 0x0f];
+			m_digits[5] = CD4511[data >> 4];
 			break;
 		case 0x13:
 			// Sonderspiele 100
-			m_digits[6] = cd4511[data & 0x0f];
+			m_digits[6] = CD4511[data & 0x0f];
 			break;
 		case 0x14:
 			// Münzeinwurf/Sonderspiele
