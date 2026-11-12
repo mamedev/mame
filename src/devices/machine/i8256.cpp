@@ -613,11 +613,13 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			m_parity_enable = BIT(data, I8256_CMD2_PARITY_ENABLE);
 			m_parity_even = BIT(data, I8256_CMD2_EVEN_PARITY);
 
+			const int prescaler = SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)];
+			const uint32_t internal_clock = clock() / prescaler;
 			LOGSETUP("%s CR2: %s parity, system clock prescaler /%d, baud select %X\n", machine().describe_context(),
 					m_parity_enable ? (m_parity_even ? "even" : "odd") : "no",
-					SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)], data & 0x0f);
-			if ((clock() / SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)]) != 1'024'000)
-				logerror("internal clock should be 1024000, calculated: %u\n", clock() / SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)]);
+					prescaler, data & 0x0f);
+			if (internal_clock != 1'024'000)
+				logerror("internal clock should be 1024000, calculated: %u\n", internal_clock);
 
 			// the system clock prescaler also feeds the counter/timer
 			if (BIT(changed, I8256_CMD2_C0, 2))
@@ -638,7 +640,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 				// baud rates are nominal at a 1.024 MHz prescaled system clock
 				m_divide = 32;
 				const attotime period = attotime::from_hz(BAUD_RATES[baud] * 32 *
-						double(clock()) / (SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)] * 1'024'000));
+						double(clock()) / (prescaler * 1'024'000));
 				m_brg_timer->adjust(period, 0, period);
 			}
 			break;
