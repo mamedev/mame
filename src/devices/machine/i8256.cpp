@@ -587,7 +587,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 				m_cts_pending = false;
 			m_stop_sel = BIT(data, I8256_CMD1_S0, 2);
 
-			LOGSETUP("CR1: %d data bits, stop bit select %d, %s mode\n",
+			LOGSETUP("%s CR1: %d data bits, stop bit select %d, %s mode\n", machine().describe_context(),
 					m_data_bits, m_stop_sel, BIT(data, I8256_CMD1_8086) ? "8086" : "8085");
 			break;
 		}
@@ -599,7 +599,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			m_parity_enable = BIT(data, I8256_CMD2_PARITY_ENABLE);
 			m_parity_even = BIT(data, I8256_CMD2_EVEN_PARITY);
 
-			LOGSETUP("CR2: %s parity, system clock prescaler /%d, baud select %X\n",
+			LOGSETUP("%s CR2: %s parity, system clock prescaler /%d, baud select %X\n", machine().describe_context(),
 					m_parity_enable ? (m_parity_even ? "even" : "odd") : "no",
 					SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)], data & 0x0f);
 			if ((clock() / SYS_CLOCK_DIVIDER[BIT(data, I8256_CMD2_C0, 2)]) != 1'024'000)
@@ -701,7 +701,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 		case I8256_REG_STATUS: // modification register
 			m_modification = data & 0x7f;
 			m_rx_sample = (BIT(data, I8256_MOD_RS4) ? 32 : 16) - BIT(data, I8256_MOD_RS0, 4);
-			LOGSETUP("modification: sample point %d/32%s%s\n", m_rx_sample,
+			LOGSETUP("%s modification: sample point %d/32%s%s\n", machine().describe_context(), m_rx_sample,
 					BIT(data, I8256_MOD_DSC) ? ", start bit check disabled" : "",
 					BIT(data, I8256_MOD_TME) ? ", transmission mode" : "");
 			break;
