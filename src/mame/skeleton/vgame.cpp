@@ -368,28 +368,21 @@ void vgame_state::decrypt_program_to_ram()
 		return;
 
 	uint8_t *rom = memregion("mainrom")->base();
-
-	// secondary encryption, mabye done in software during copy operation
-	u8 decoded[0x10000];
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 
 	// In these four dumps, the initial key equals the filler byte at 0x80000:
 	// cjdn 0x0e, cjsjh 0x0c, mjxy2 0x35, cjlddz 0x76.
 	uint8_t key = rom[0x80000];
+	uint32_t rambase = 0x00200000;
 	for (uint32_t i = 0; i < 0x10000; ++i)
 	{
-		decoded[i] = rom[m_program_address + i] ^ key;
+		space.write_byte(i + rambase, rom[m_program_address + i] ^ key);
 		key = (85 * key + 145) & 0xff;
 	}
 	for (uint32_t i = 0; i < 0x10000; i += 4)
 	{
-		uint32_t const word = get_u32le(&decoded[i]);
-		put_u32le(&decoded[i], (word << 1) | (word >> 31));
-	}
-
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	for (uint32_t i = 0; i < 0x10000; i += 4)
-	{
-		space.write_dword(i+0x00200000, get_u32le(&decoded[i]));
+		uint32_t const word = space.read_dword(i + rambase);
+		space.write_dword(i + rambase, (word << 1) | (word >> 31));
 	}
 }
 
