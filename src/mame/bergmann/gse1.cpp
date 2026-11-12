@@ -119,6 +119,7 @@ private:
 	output_finder<8> m_digits;
 	output_finder<8, 8> m_lamps;
 	output_finder<8> m_money_led;
+	output_finder<4> m_coin_out;
 
 	required_ioport m_io_coin;
 	required_ioport m_io_payout;
@@ -291,10 +292,10 @@ void gse1_state::pio1_pb_w(uint8_t data)
 {
 	// Steckerleiste 15 - J15
 	//coins out
-	machine().bookkeeping().coin_counter_w(3, BIT(data, 0)); // PB0 0.10DM
-	machine().bookkeeping().coin_counter_w(2, BIT(data, 1)); // PB1 1DM
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 2)); // PB2 2DM
-	machine().bookkeeping().coin_counter_w(0, BIT(data, 3)); // PB3 5DM
+	m_coin_out[0] = BIT(data, 0); // PB0 0.10DM
+	m_coin_out[1] = BIT(data, 1); // PB1 1DM
+	m_coin_out[2] = BIT(data, 2); // PB2 2DM
+	m_coin_out[3] = BIT(data, 3); // PB3 5DM
 
 	machine().bookkeeping().coin_lockout_global_w(!BIT(data, 4)); // PB4 coin magnet
 }
