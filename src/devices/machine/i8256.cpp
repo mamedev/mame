@@ -196,6 +196,7 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 	m_out_p2_cb(*this),
 	m_timer(nullptr),
 	m_brg_timer(nullptr),
+	m_port1_input(0),
 	m_rxd(1),
 	m_cts(0),
 	m_extint(0),
@@ -246,6 +247,7 @@ void i8256_device::device_start()
 	save_item(NAME(m_divide));
 	save_item(NAME(m_rx_sample));
 
+	save_item(NAME(m_port1_input));
 	save_item(NAME(m_rxd));
 	save_item(NAME(m_cts));
 	save_item(NAME(m_extint));
@@ -701,29 +703,44 @@ void i8256_device::write(offs_t offset, uint8_t data)
 //  PARALLEL PORTS
 //**************************************************************************
 
+void i8256_device::write_p1(uint8_t data)
+{
+	const uint8_t rising = data & ~m_port1_input;
+	m_port1_input = data;
+	if (BIT(rising, 2) && BIT(m_mode, I8256_MODE_CT2))
+		count_timer(1);
+	if (BIT(rising, 3) && BIT(m_mode, I8256_MODE_CT3))
+		count_timer(2);
+	if (BIT(rising, 7) && BIT(m_command1, I8256_CMD1_BITI))
+		request_interrupt(I8256_INT_TIMER2);
+}
+
+void i8256_device::write_p12(int state)
+{
+	write_p1((m_port1_input & ~0x04) | (state ? 0x04 : 0x00));
+}
+
+void i8256_device::write_p13(int state)
+{
+	write_p1((m_port1_input & ~0x08) | (state ? 0x08 : 0x00));
+}
+
+void i8256_device::write_p17(int state)
+{
+	write_p1((m_port1_input & ~0x80) | (state ? 0x80 : 0x00));
+}
+
 uint8_t i8256_device::p1_r()
 {
 	// control bit 1 = output (read from latch), 0 = input (read from callback)
-	return (m_in_p1_cb(0) & ~m_port1_control) | (m_port1_int & m_port1_control);
+	const uint8_t input = m_in_p1_cb.isunset() ? m_port1_input : m_in_p1_cb(0);
+	return (input & ~m_port1_control) | (m_port1_int & m_port1_control);
 }
 
 void i8256_device::p1_w(uint8_t data)
 {
 	// all bits are latched; input pins output the latch if the direction is changed later
-	const uint8_t prev = m_port1_int;
 	m_port1_int = data;
-
-	// with BITI set, a low-to-high transition on P17 generates the
-	// level 1 interrupt in place of timer 2
-	if (BIT(m_command1, I8256_CMD1_BITI) && !BIT(prev, 7) && BIT(data, 7))
-		request_interrupt(I8256_INT_TIMER2);
-
-	// event counters 2 and 3 decrement on low-to-high transitions of P12 and P13
-	if (BIT(m_mode, I8256_MODE_CT2) && !BIT(prev, 2) && BIT(data, 2))
-		count_timer(1);
-	if (BIT(m_mode, I8256_MODE_CT3) && !BIT(prev, 3) && BIT(data, 3))
-		count_timer(2);
-
 	m_out_p1_cb(0, m_port1_int & m_port1_control);
 }
 

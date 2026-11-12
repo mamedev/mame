@@ -59,6 +59,10 @@ public:
 	void write_txc(int state);
 	void write_cts(int state);
 	void write_extint(int state);
+	void write_p1(uint8_t data);
+	void write_p12(int state);
+	void write_p13(int state);
+	void write_p17(int state);
 
 	uint8_t p1_r();
 	void    p1_w(uint8_t data);
@@ -123,6 +127,7 @@ private:
 	uint8_t m_rx_sample;
 
 	// input line states
+	uint8_t m_port1_input;
 	uint8_t m_rxd, m_cts, m_extint;
 	uint8_t m_rxc, m_txc;
 
