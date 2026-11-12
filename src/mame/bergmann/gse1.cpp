@@ -86,6 +86,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 		, m_lamps(*this, "lamp%u%u", 0U, 0U)
 		, m_money_led(*this, "money_led%u", 0U)
+		, m_coin_out(*this, "coin_out%u", 0U)
 		, m_io_coin(*this, "COIN")
 		, m_io_payout(*this, "PAYOUT")
 		, m_io_t6(*this, "T6")
