@@ -182,27 +182,27 @@ void gse1_state::daten_w(uint8_t data)
 {
 	enum : uint8_t
 	{
-		_A = 1 << 0,
-		_B = 1 << 1,
-		_C = 1 << 2,
-		_D = 1 << 3,
-		_E = 1 << 4,
-		_F = 1 << 5,
-		_G = 1 << 6,
-		_H = 1 << 7
+		SEG_A = 1 << 0,
+		SEG_B = 1 << 1,
+		SEG_C = 1 << 2,
+		SEG_D = 1 << 3,
+		SEG_E = 1 << 4,
+		SEG_F = 1 << 5,
+		SEG_G = 1 << 6,
+		SEG_H = 1 << 7
 	};
 
 	static constexpr uint8_t CD4511[16] = {
-	_A | _B | _C | _D | _E | _F,
-	_B | _C,
-	_A | _B | _D | _E | _G,
-	_A | _B | _C | _D | _G,
-	_B | _C | _F | _G,
-	_A | _C | _D | _F | _G,
-	_C | _D | _E | _F | _G,
-	_A | _B | _C,
-	_A | _B | _C | _D | _E | _F | _G,
-	_A | _B | _C | _F | _G,
+	SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F,
+	SEG_B | SEG_C,
+	SEG_A | SEG_B | SEG_D | SEG_E | SEG_G,
+	SEG_A | SEG_B | SEG_C | SEG_D | SEG_G,
+	SEG_B | SEG_C | SEG_F | SEG_G,
+	SEG_A | SEG_C | SEG_D | SEG_F | SEG_G,
+	SEG_C | SEG_D | SEG_E | SEG_F | SEG_G,
+	SEG_A | SEG_B | SEG_C,
+	SEG_A | SEG_B | SEG_C | SEG_D | SEG_E | SEG_F | SEG_G,
+	SEG_A | SEG_B | SEG_C | SEG_F | SEG_G,
 	0,
 	0,
 	0,
