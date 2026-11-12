@@ -852,7 +852,7 @@ void i8256_device::receiver_tick()
 				// the start bit is checked once at sampling time (unless disabled by DSC)
 				if (!m_rxd || BIT(m_modification, I8256_MOD_DSC))
 				{
-					LOGRX("RX start bit\n");
+					LOGRX("%s RX start bit\n", machine().describe_context());
 					m_rx_state = I8256_STATE_DATA;
 					m_rx_counter = 0;
 					m_rx_shift = 0;
@@ -861,7 +861,7 @@ void i8256_device::receiver_tick()
 				}
 				else
 				{
-					LOGRX("RX false start bit\n");
+					LOGRX("%s RX false start bit\n", machine().describe_context());
 					m_rx_counter = 0;
 				}
 			}
@@ -899,14 +899,14 @@ void i8256_device::receiver_tick()
 				{
 					// break character: BD is set even when the receiver is disabled,
 					// and the character is not transferred to the receiver buffer
-					LOGRX("RX break detected\n");
+					LOGRX("%s RX break detected\n", machine().describe_context());
 					m_status |= I8256_STATUS_BREAK;
 					request_interrupt(I8256_INT_RX);
 					m_rx_state = I8256_STATE_BREAK;
 				}
 				else if (BIT(m_command3, I8256_CMD3_RxE))
 				{
-					LOGRX("RX character %02X\n", data);
+					LOGRX("%s RX character %02X\n", machine().describe_context(), data);
 
 					// on overrun the previous character is lost
 					if (m_status & I8256_STATUS_RB_FULL)
@@ -977,7 +977,7 @@ void i8256_device::start_transmit()
 	if (BIT(m_command3, I8256_CMD3_SBRK))
 	{
 		// single character break: start, data, parity and stop bits all low
-		LOGTX("TX single character break\n");
+		LOGTX("%s TX single character break\n", machine().describe_context());
 		m_tx_break = true;
 		m_tx_bits = 0;
 		m_status &= ~I8256_STATUS_TR_EMPTY;
@@ -996,7 +996,7 @@ void i8256_device::start_transmit()
 		m_cts_pending = false;
 		m_cts_counter = 0;
 		m_tx_shift = m_tx_buffer;
-		LOGTX("TX character %02X\n", m_tx_shift);
+		LOGTX("%s TX character %02X\n", machine().describe_context(), m_tx_shift);
 		m_tx_break = false;
 		m_tx_bits = 0;
 		m_tx_parity = false;
