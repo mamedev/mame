@@ -509,7 +509,7 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL( 1983, croyal1,  0, gse1, gse1, gse1_state, empty_init, ROT0, "Bergmann Automaten", "Crown Royal No.1",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_croyal1 )
-GAMEL( 1984, corsar,   0, gse1, gse1, gse1_state, empty_init, ROT0, "Bergmann Automaten", "Crown Corsar",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_croyal1 )
-GAMEL( 1984, jubilees, 0, gse1, gse1, gse1_state, empty_init, ROT0, "Bergmann Automaten", "Crown Jubilee Super", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_croyal1 )
-GAMEL( 1984, cwinner,  0, gse1, gse1, gse1_state, empty_init, ROT0, "Bergmann Automaten", "Crown Winner",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_croyal1 )
+GAME( 1983, croyal1,  0, gse1, gse1, gse1_state, empty_init, ROT0, "Bergmann Automaten", "Crown Royal No.1",    MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1984, corsar,   0, gse1, gse1, gse1_state, empty_init, ROT0, "Bergmann Automaten", "Crown Corsar",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1984, jubilees, 0, gse1, gse1, gse1_state, empty_init, ROT0, "Bergmann Automaten", "Crown Jubilee Super", MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1984, cwinner,  0, gse1, gse1, gse1_state, empty_init, ROT0, "Bergmann Automaten", "Crown Winner",        MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
