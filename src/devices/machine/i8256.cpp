@@ -237,6 +237,7 @@ void i8256_device::device_start()
 	save_item(NAME(m_modification));
 	save_item(NAME(m_int_enable));
 	save_item(NAME(m_int_request));
+	save_item(NAME(m_int_service));
 	save_item(NAME(m_status));
 	save_item(NAME(m_rx_buffer));
 	save_item(NAME(m_tx_buffer));
@@ -321,6 +322,7 @@ void i8256_device::soft_reset()
 	m_status = I8256_STATUS_TR_EMPTY | I8256_STATUS_TB_EMPTY;
 	m_int_enable = 0;
 	m_int_request = 0;
+	m_int_service = 0;
 	update_int();
 
 	m_rx_state = I8256_STATE_START;
@@ -426,7 +428,7 @@ void i8256_device::update_int()
 	else
 		m_int_request &= ~(1 << I8256_INT_EXTINT);
 
-	const bool state = m_int_request != 0;
+	const bool state = pending_interrupt() >= 0;
 
 	if (state)
 		m_status |= I8256_STATUS_INT;
@@ -450,22 +452,31 @@ void i8256_device::request_interrupt(int level)
 	}
 }
 
-// acknowledge the highest priority pending interrupt (level 0 is highest)
-int i8256_device::acknowledge()
+int i8256_device::pending_interrupt() const
 {
 	for (int level = 0; level < 8; level++)
 	{
+		// Only requests above the highest priority in service are eligible.
+		if (BIT(m_command3, I8256_CMD3_NIE) && BIT(m_int_service, level))
+			break;
 		if (BIT(m_int_request, level))
-		{
-			if (!machine().side_effects_disabled())
-			{
-				m_int_request &= ~(1 << level);
-				update_int();
-			}
 			return level;
-		}
 	}
 	return -1;
+}
+
+// acknowledge the highest priority eligible interrupt (level 0 is highest)
+int i8256_device::acknowledge()
+{
+	const int level = pending_interrupt();
+	if (level >= 0 && !machine().side_effects_disabled())
+	{
+		m_int_request &= ~(1 << level);
+		if (BIT(m_command3, I8256_CMD3_NIE))
+			m_int_service |= 1 << level;
+		update_int();
+	}
+	return level;
 }
 
 uint8_t i8256_device::inta_r()
@@ -667,8 +678,20 @@ void i8256_device::write(offs_t offset, uint8_t data)
 				m_command3 &= ~(1 << I8256_CMD3_RST);
 			}
 
-			// TODO: nested interrupt mode is not emulated
+			if (BIT(m_command3, I8256_CMD3_NIE) && BIT(m_command3, I8256_CMD3_END))
+			{
+				// END completes the innermost (highest priority) interrupt in service.
+				for (int level = 0; level < 8; level++)
+				{
+					if (BIT(m_int_service, level))
+					{
+						m_int_service &= ~(1 << level);
+						break;
+					}
+				}
+			}
 			m_command3 &= ~(1 << I8256_CMD3_END);
+			update_int();
 			break;
 		case I8256_REG_MODE:
 		{

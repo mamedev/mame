@@ -89,6 +89,7 @@ private:
 	void output_txd(int state);
 
 	void request_interrupt(int level);
+	int pending_interrupt() const;
 	int acknowledge();
 	void update_int();
 
@@ -108,7 +109,7 @@ private:
 	uint8_t m_mode;
 	uint8_t m_port1_control;
 	uint8_t m_modification;
-	uint8_t m_int_enable, m_int_request;
+	uint8_t m_int_enable, m_int_request, m_int_service;
 	uint8_t m_status;
 	uint8_t m_rx_buffer, m_tx_buffer;
 	uint8_t m_port1_int, m_port2_int;
