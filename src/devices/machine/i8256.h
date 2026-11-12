@@ -113,6 +113,8 @@ private:
 	uint8_t m_rx_buffer, m_tx_buffer;
 	uint8_t m_port1_int, m_port2_int;
 	uint8_t m_timers[5];
+	uint8_t m_timer5_reload;
+	bool m_timer5_running;
 
 	// cascaded timer snapshots captured by reading the high byte
 	uint16_t m_timer4_read_latch, m_timer5_read_latch;

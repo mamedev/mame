@@ -243,6 +243,8 @@ void i8256_device::device_start()
 	save_item(NAME(m_port1_int));
 	save_item(NAME(m_port2_int));
 	save_item(NAME(m_timers));
+	save_item(NAME(m_timer5_reload));
+	save_item(NAME(m_timer5_running));
 	save_item(NAME(m_timer4_read_latch));
 	save_item(NAME(m_timer5_read_latch));
 	save_item(NAME(m_timer4_read_latched));
@@ -290,6 +292,8 @@ void i8256_device::device_reset()
 	m_command2 = 0;
 	m_command3 = 0;
 	m_mode = 0;
+	m_timer5_reload = 0;
+	m_timer5_running = false;
 	m_timer4_read_latched = false;
 	m_timer5_read_latched = false;
 	m_port1_control = 0;
@@ -363,6 +367,10 @@ void i8256_device::count_timer(int i)
 	const bool t24 = (i == 1) && BIT(m_mode, I8256_MODE_T24);
 	const bool t35 = (i == 2) && BIT(m_mode, I8256_MODE_T35);
 	const int high = t24 ? 3 : 4;
+
+	// Retriggerable Timer 5 (or the 3/5 pair) waits for a falling edge on P15.
+	if ((i == 4 || t35) && BIT(m_mode, I8256_MODE_T5C) && !m_timer5_running)
+		return;
 
 	if (m_timers[i]-- == 0)
 	{
@@ -665,6 +673,8 @@ void i8256_device::write(offs_t offset, uint8_t data)
 		case I8256_REG_MODE:
 		{
 			const uint8_t old_mask = port2_output_mask();
+			if (!BIT(m_mode, I8256_MODE_T5C) && BIT(data, I8256_MODE_T5C))
+				m_timer5_running = false;
 			m_mode = data;
 			const uint8_t mask = port2_output_mask();
 			if (old_mask != mask)
@@ -703,19 +713,36 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			write_port2(data);
 			break;
 		case I8256_REG_TIMER1:
+			m_timers[0] = data;
+			break;
 		case I8256_REG_TIMER2:
+			m_timers[1] = data;
+			m_timer4_read_latched = false;
+			break;
 		case I8256_REG_TIMER3:
+			m_timers[2] = data;
+			m_timer5_read_latched = false;
+			break;
 		case I8256_REG_TIMER4:
-		case I8256_REG_TIMER5:
-			m_timers[reg - I8256_REG_TIMER1] = data;
-			if (reg == I8256_REG_TIMER2 || reg == I8256_REG_TIMER4)
-				m_timer4_read_latched = false;
-			else if (reg == I8256_REG_TIMER3 || reg == I8256_REG_TIMER5)
-				m_timer5_read_latched = false;
-			if (reg == I8256_REG_TIMER4 && BIT(m_mode, I8256_MODE_T24))
+			m_timers[3] = data;
+			if (BIT(m_mode, I8256_MODE_T24))
 				m_timers[1] = 0xff;
-			else if (reg == I8256_REG_TIMER5 && BIT(m_mode, I8256_MODE_T35))
-				m_timers[2] = 0xff;
+			m_timer4_read_latched = false;
+			break;
+		case I8256_REG_TIMER5:
+			if (BIT(m_mode, I8256_MODE_T5C))
+			{
+				// In retriggerable mode a write loads only the save register and stops counting.
+				m_timer5_reload = data;
+				m_timer5_running = false;
+			}
+			else
+			{
+				m_timers[4] = data;
+				if (BIT(m_mode, I8256_MODE_T35))
+					m_timers[2] = 0xff;
+			}
+			m_timer5_read_latched = false;
 			break;
 		case I8256_REG_STATUS: // modification register
 			m_modification = data & 0x7f;
@@ -734,7 +761,15 @@ void i8256_device::write(offs_t offset, uint8_t data)
 void i8256_device::write_p1(uint8_t data)
 {
 	const uint8_t rising = data & ~m_port1_input;
+	const uint8_t falling = ~data & m_port1_input;
 	m_port1_input = data;
+	if (BIT(falling, 5) && BIT(m_mode, I8256_MODE_T5C))
+	{
+		m_timers[4] = m_timer5_reload;
+		if (BIT(m_mode, I8256_MODE_T35))
+			m_timers[2] = 0xff;
+		m_timer5_running = true;
+	}
 	if (BIT(rising, 2) && BIT(m_mode, I8256_MODE_CT2))
 		count_timer(1);
 	if (BIT(rising, 3) && BIT(m_mode, I8256_MODE_CT3))
