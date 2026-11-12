@@ -916,6 +916,10 @@ uint16_t i8256_device::stop_length() const
 
 void i8256_device::output_txd(int state)
 {
+	// Continuous break overrides the output without stopping character timing.
+	if (BIT(m_command3, I8256_CMD3_TBRK))
+		state = 0;
+
 	if (m_txd != state)
 	{
 		m_txd = state;
@@ -932,12 +936,7 @@ void i8256_device::transmitter_tick()
 		case I8256_STATE_START:
 			m_tx_counter = 0;
 
-			if (BIT(m_command3, I8256_CMD3_TBRK))
-			{
-				// continuous break, inhibits buffer transfers until cleared
-				output_txd(0);
-			}
-			else if (BIT(m_command3, I8256_CMD3_SBRK))
+			if (BIT(m_command3, I8256_CMD3_SBRK))
 			{
 				// single character break: start, data, parity and stop bits all low
 				LOGTX("TX single character break\n");
@@ -945,6 +944,11 @@ void i8256_device::transmitter_tick()
 				m_tx_bits = 0;
 				m_status &= ~I8256_STATUS_TR_EMPTY;
 				m_tx_state = I8256_STATE_DATA;
+				output_txd(0);
+			}
+			else if (BIT(m_command3, I8256_CMD3_TBRK))
+			{
+				// continuous break inhibits buffer transfers, but not SBRK timing
 				output_txd(0);
 			}
 			else if (!(m_status & I8256_STATUS_TB_EMPTY) && !m_cts)
