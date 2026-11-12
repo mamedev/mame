@@ -538,9 +538,9 @@ inline void crt9007_device::compute_geometry()
 
 
 //-------------------------------------------------
-//  recompute_parameters - recompute the geometry
-//  and restart the timers from the top of the
-//  frame
+//  recompute_parameters - recompute the beam
+//  positions and re-arm the sync, visible line,
+//  data row, frame and cursor timers
 //-------------------------------------------------
 
 inline void crt9007_device::recompute_parameters()
@@ -725,9 +725,9 @@ void crt9007_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_post_load - called after the loading a
-//  saved state, so that registered variables can
-//  be expanded as necessary
+//  device_post_load - called after loading a
+//  saved state, to rebuild the beam positions
+//  from the saved registers
 //-------------------------------------------------
 
 void crt9007_device::device_post_load()
