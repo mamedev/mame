@@ -23,7 +23,9 @@ static struct {
 	else write_mem_word(m_EA,val);        \
 }
 
-#define GetnextRMWord read_mem_word((m_EA & 0xf0000) | ((m_EA + 2) & 0xffff))
+// The second word lies at offset EO+2 within the same segment (wrapping at
+// the segment end), not within the same 64K block of the linear address.
+#define GetnextRMWord read_mem_word((m_EA - m_EO) + uint16_t(m_EO + 2))
 
 #define PutRMWord(ModRM,val)              \
 {                                         \
