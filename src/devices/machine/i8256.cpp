@@ -185,7 +185,8 @@ enum
 	I8256_STATE_START,
 	I8256_STATE_DATA,
 	I8256_STATE_STOP,
-	I8256_STATE_BREAK
+	I8256_STATE_BREAK,
+	I8256_STATE_MARK
 };
 } // anonymous namespace
 
@@ -980,6 +981,13 @@ void i8256_device::start_transmit()
 		// continuous break inhibits buffer transfers, but not SBRK timing
 		output_txd(0);
 	}
+	else if (m_tx_break)
+	{
+		// Return to marking for one bit before transferring data after a break.
+		m_tx_break = false;
+		m_tx_state = I8256_STATE_MARK;
+		output_txd(1);
+	}
 	else if (!(m_status & I8256_STATUS_TB_EMPTY) &&
 		(m_cts_pending || (m_stop_sel != I8256_STOP_075 && !m_cts && !m_cts_counter)))
 	{
@@ -1051,14 +1059,20 @@ void i8256_device::transmitter_tick()
 				m_tx_counter = 0;
 				m_tx_state = I8256_STATE_START;
 
-				m_tx_break = false;
-
 				m_status |= I8256_STATUS_TR_EMPTY;
 				// TRE generates an interrupt when the transmitter register finished
 				// transmitting and the buffer is empty
 				if (m_status & I8256_STATUS_TB_EMPTY)
 					request_interrupt(I8256_INT_TX);
 
+				start_transmit();
+			}
+			break;
+
+		case I8256_STATE_MARK:
+			if (m_tx_counter >= m_divide)
+			{
+				m_tx_state = I8256_STATE_START;
 				start_transmit();
 			}
 			break;
@@ -1098,14 +1112,14 @@ void i8256_device::write_cts(int state)
 	{
 		const uint16_t minimum_stop = (m_stop_sel == I8256_STOP_075) ? stop_length() : m_divide / 2;
 		// Pulses during data or before the permitted stop interval are ignored.
-		if (m_tx_state == I8256_STATE_START ||
+		if (m_tx_state == I8256_STATE_START || m_tx_state == I8256_STATE_MARK ||
 			(m_tx_state == I8256_STATE_STOP && m_tx_counter >= minimum_stop))
 		{
 			if (m_stop_sel == I8256_STOP_075 || (m_command2 & 0x0f) == I8256_BAUD_TXC)
 			{
 				m_cts_pending = true;
 				// In 0.75-stop mode, an eligible edge starts the next frame immediately.
-				if (m_stop_sel == I8256_STOP_075 && !m_tx_break &&
+				if (m_stop_sel == I8256_STOP_075 && m_tx_state != I8256_STATE_MARK && !m_tx_break &&
 					!BIT(m_command3, I8256_CMD3_SBRK) && !BIT(m_command3, I8256_CMD3_TBRK))
 					start_transmit();
 			}
