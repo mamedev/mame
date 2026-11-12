@@ -691,7 +691,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			update_int();
 			break;
 		case I8256_REG_BUFFER:
-			LOGTX("transmitter buffer %02X\n", data);
+			LOGTX("%s transmitter buffer %02X\n", machine().describe_context(), data);
 			m_tx_buffer = data;
 			m_status &= ~I8256_STATUS_TB_EMPTY;
 			break;
