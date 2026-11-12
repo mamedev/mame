@@ -196,6 +196,8 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 	device_t(mconfig, I8256, tag, owner, clock),
 	m_out_int_cb(*this),
 	m_txd_handler(*this),
+	m_txc_handler(*this),
+	m_rxc_handler(*this),
 	m_in_p1_cb(*this, 0),
 	m_out_p1_cb(*this),
 	m_in_p2_cb(*this, 0),
@@ -210,6 +212,8 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 	m_extint(0),
 	m_rxc(0),
 	m_txc(0),
+	m_rxc_output(1),
+	m_txc_output(1),
 	m_int_state(false),
 	m_txd(1)
 {
@@ -219,6 +223,8 @@ void i8256_device::device_start()
 {
 	m_timer = timer_alloc(FUNC(i8256_device::timer_check), this);
 	m_brg_timer = timer_alloc(FUNC(i8256_device::brg_tick), this);
+	m_txc_handler(m_txc_output);
+	m_rxc_handler(m_rxc_output);
 
 	// buffers, parallel port latches and timer counts retain their contents on reset
 	m_rx_buffer = 0;
@@ -268,6 +274,8 @@ void i8256_device::device_start()
 	save_item(NAME(m_extint));
 	save_item(NAME(m_rxc));
 	save_item(NAME(m_txc));
+	save_item(NAME(m_rxc_output));
+	save_item(NAME(m_txc_output));
 	save_item(NAME(m_int_state));
 
 	save_item(NAME(m_rx_state));
@@ -346,6 +354,8 @@ void i8256_device::soft_reset()
 	m_cts_pending = false;
 	m_cts_counter = 0;
 	output_txd(1);
+	output_txc(1);
+	output_rxc(1);
 }
 
 // reconfigure the counter/timer clock from the prescaled system clock; the
@@ -654,6 +664,11 @@ void i8256_device::write(offs_t offset, uint8_t data)
 				update_timer_rate();
 
 			const uint8_t baud = data & 0x0f;
+			if (BIT(changed, I8256_CMD2_B0, 4))
+			{
+				output_txc(1);
+				output_rxc(1);
+			}
 			if (!(changed & 0x3f))
 				break;
 			if (baud <= I8256_BAUD_TXC32)
@@ -945,6 +960,11 @@ void i8256_device::receiver_tick()
 
 	m_rx_counter++;
 
+	// RxC rises at each data sample and stays high throughout framing bits.
+	if ((m_command2 & 0x0f) != I8256_BAUD_TXC)
+		output_rxc(!(m_rx_state == I8256_STATE_DATA && m_rx_bits < m_data_bits &&
+				m_rx_counter >= m_divide / 2 && m_rx_counter < m_divide));
+
 	switch (m_rx_state)
 	{
 		case I8256_STATE_START:
@@ -1079,6 +1099,24 @@ void i8256_device::output_txd(int state)
 	}
 }
 
+void i8256_device::output_txc(int state)
+{
+	if (m_txc_output != state)
+	{
+		m_txc_output = state;
+		m_txc_handler(state);
+	}
+}
+
+void i8256_device::output_rxc(int state)
+{
+	if (m_rxc_output != state)
+	{
+		m_rxc_output = state;
+		m_rxc_handler(state);
+	}
+}
+
 void i8256_device::check_break_in()
 {
 	if (BIT(m_command1, I8256_CMD1_BRKI))
@@ -1104,6 +1142,8 @@ void i8256_device::start_transmit()
 		m_tx_bits = 0;
 		m_status &= ~I8256_STATUS_TR_EMPTY;
 		m_tx_state = I8256_STATE_DATA;
+		if ((m_command2 & 0x0f) > I8256_BAUD_TXC32)
+			output_txc(0);
 		output_txd(0);
 	}
 	else if (BIT(m_command3, I8256_CMD3_TBRK))
@@ -1133,6 +1173,8 @@ void i8256_device::start_transmit()
 		m_status &= ~I8256_STATUS_TR_EMPTY;
 		request_interrupt(I8256_INT_TX);
 		m_tx_state = I8256_STATE_DATA;
+		if ((m_command2 & 0x0f) > I8256_BAUD_TXC32)
+			output_txc(0);
 		output_txd(0); // start bit
 	}
 	else
@@ -1145,6 +1187,15 @@ void i8256_device::transmitter_tick()
 		m_cts_pending = true;
 
 	m_tx_counter++;
+
+	if ((m_command2 & 0x0f) > I8256_BAUD_TXC32)
+	{
+		// TxC falls at bit boundaries and rises at bit centres. A fractional
+		// final stop bit returns high before the next start resets the phase.
+		const bool active = m_tx_state == I8256_STATE_DATA ||
+				(m_tx_state == I8256_STATE_STOP && m_tx_counter < stop_length());
+		output_txc(!active || (m_tx_counter % m_divide) >= m_divide / 2);
+	}
 
 	switch (m_tx_state)
 	{

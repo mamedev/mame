@@ -42,6 +42,8 @@ public:
 
 	auto int_callback()     { return m_out_int_cb.bind(); }
 	auto txd_handler()      { return m_txd_handler.bind(); }
+	auto txc_handler()      { return m_txc_handler.bind(); }
+	auto rxc_handler()      { return m_rxc_handler.bind(); }
 
 	auto in_p1_callback()   { return m_in_p1_cb.bind(); }
 	auto out_p1_callback()  { return m_out_p1_cb.bind(); }
@@ -91,6 +93,8 @@ private:
 	uint16_t rx_sample_point() const;
 	uint16_t stop_length() const;
 	void output_txd(int state);
+	void output_txc(int state);
+	void output_rxc(int state);
 
 	void request_interrupt(int level);
 	int pending_interrupt() const;
@@ -99,6 +103,8 @@ private:
 
 	devcb_write_line m_out_int_cb;
 	devcb_write_line m_txd_handler;
+	devcb_write_line m_txc_handler;
+	devcb_write_line m_rxc_handler;
 
 	devcb_read8 m_in_p1_cb;
 	devcb_write8 m_out_p1_cb;
@@ -138,6 +144,9 @@ private:
 	uint8_t m_port1_input;
 	uint8_t m_rxd, m_cts, m_extint;
 	uint8_t m_rxc, m_txc;
+
+	// clock output states are independent of the external clock inputs
+	uint8_t m_rxc_output, m_txc_output;
 
 	// interrupt output
 	bool m_int_state;
