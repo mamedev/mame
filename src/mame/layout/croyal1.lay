@@ -16,19 +16,19 @@ license:CC0-1.0
 
 	<element name="button_yellow" defstate="0">
 		<rect><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0" green="0" blue="0.0" /></rect>
-		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="0.0" /></rect>
-		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.7" green="0.7" blue="0.0" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="1.0" green="1.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.7" green="0.7" blue="0.0" /></rect>
 	</element>
 
 	<element name="button_red" defstate="0">
 		<rect><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0" green="0" blue="0.0" /></rect>
-		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="0.0" blue="0.0" /></rect>
-		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.7" green="0.0" blue="0.0" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.7" green="0.0" blue="0.0" /></rect>
 	</element>
 
 	<element name="lamp" defstate="0">
-		<rect state="1"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="1.0" green="1.0" blue="0.9" /></rect>
-		<rect state="0"><bounds x="0.1" y="0.1" width="0.9" height="0.9" /><color red="0.3" green="0.3" blue="0.3" /></rect>
+		<rect state="1"><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="1.0" green="1.0" blue="0.9" /></rect>
+		<rect state="0"><bounds x="0.1" y="0.1" width="0.8" height="0.8" /><color red="0.3" green="0.3" blue="0.3" /></rect>
 	</element>
 
 	<view name="Internal Layout">
@@ -66,7 +66,7 @@ license:CC0-1.0
 		<element name="lamp07" ref="lamp"> <!-- 10 Sonderspiele -->
 			<bounds x="340" y="505" width="60" height="55" />
 		</element>
-		<element name="lamp06" ref="lamp"> <!-- 50 Sonderpsiele -->
+		<element name="lamp06" ref="lamp"> <!-- 50 Sonderspiele -->
 			<bounds x="280" y="505" width="60" height="55" />
 		</element>
 		<element name="lamp05" ref="lamp"> <!-- 12 Sonderspiele -->
@@ -82,7 +82,7 @@ license:CC0-1.0
 		<element name="lamp27" ref="lamp"> <!-- 100 Sonderspiele -->
 			<bounds x="100" y="450" width="60" height="55" />
 		</element>
-		<element name="lamp26" ref="lamp"> <!-- 6 Sonderpsiele -->
+		<element name="lamp26" ref="lamp"> <!-- 6 Sonderspiele -->
 			<bounds x="160" y="450" width="60" height="55" />
 		</element>
 		<element name="lamp25" ref="lamp"> <!-- 40 Sonderspiele -->
