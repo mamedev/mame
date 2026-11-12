@@ -74,6 +74,7 @@ private:
 
 	void soft_reset();
 	void update_timer_rate();
+	attotime baud_clock_period(int multiplier) const;
 	uint8_t read_port1();
 	void write_port1(uint8_t data);
 	uint8_t port1_input();

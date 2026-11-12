@@ -694,10 +694,8 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			{
 				// internal baud rate generator; the bit clock is emulated in
 				// 1/32 bit steps, the granularity of the modification register
-				// baud rates are nominal at a 1.024 MHz prescaled system clock
 				m_divide = 32;
-				const attotime period = attotime::from_hz(BAUD_RATES[baud] * 32 *
-						double(clock()) / (prescaler * 1'024'000));
+				const attotime period = baud_clock_period(32);
 				m_brg_timer->adjust(period, 0, period);
 			}
 			break;
@@ -927,9 +925,7 @@ void i8256_device::update_test_clock()
 		const uint8_t baud = m_command2 & 0x0f;
 		// P14 carries the raw BRG clock: 64x baud, except 32x at 19.2 kbaud.
 		const int multiplier = (baud == I8256_BAUD_19200) ? 32 : 64;
-		const int prescaler = SYS_CLOCK_DIVIDER[BIT(m_command2, I8256_CMD2_C0, 2)];
-		const attotime period = attotime::from_hz(BAUD_RATES[baud] * multiplier * 2 *
-				double(clock()) / (prescaler * 1'024'000));
+		const attotime period = baud_clock_period(multiplier * 2);
 		m_test_clock_timer->adjust(period, 0, period);
 	}
 	else
@@ -1355,6 +1351,15 @@ void i8256_device::transmitter_tick()
 //**************************************************************************
 //  SERIAL CLOCKING
 //**************************************************************************
+
+attotime i8256_device::baud_clock_period(int multiplier) const
+{
+	// Baud rates are nominal at a 1.024 MHz prescaled system clock.
+	const uint8_t baud = m_command2 & 0x0f;
+	const int prescaler = SYS_CLOCK_DIVIDER[BIT(m_command2, I8256_CMD2_C0, 2)];
+	return attotime::from_hz(BAUD_RATES[baud] * multiplier *
+			double(clock()) / (prescaler * 1'024'000));
+}
 
 TIMER_CALLBACK_MEMBER(i8256_device::brg_tick)
 {
