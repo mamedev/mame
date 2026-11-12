@@ -145,6 +145,7 @@ private:
 	uint8_t m_tx_shift;
 	bool m_tx_parity;
 	bool m_tx_break;
+	bool m_cts_pending;
 	uint8_t m_txd;
 };
 
