@@ -223,8 +223,7 @@ void gse1_state::daten_w(uint8_t data)
 		case 0x07:
 			for (int i = 0; i < 8; i++)
 			{
-				bool lamp_value = BIT(data, i);
-				m_lamps[m_adress & 0x07][i] = lamp_value;
+				m_lamps[m_adress & 0x07][i] = BIT(data, i);
 			}
 			break;
 		case 0x10:
@@ -250,8 +249,7 @@ void gse1_state::daten_w(uint8_t data)
 			// Münzeinwurf/Sonderspiele
 			for (int i = 0; i < 8; i++)
 			{
-				bool lamp_value = BIT(data, i);
-				m_money_led[i] = lamp_value;
+				m_money_led[i] = BIT(data, i);
 			}
 			break;
 		default:
