@@ -432,6 +432,9 @@ int i8256_device::acknowledge()
 
 uint8_t i8256_device::inta_r()
 {
+	if (!BIT(m_command3, I8256_CMD3_IAE))
+		return 0xff;
+
 	const int level = std::max(acknowledge(), 0);
 
 	if (BIT(m_command1, I8256_CMD1_8086))
