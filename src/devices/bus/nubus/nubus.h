@@ -67,6 +67,7 @@ private:
 	int m_slot;
 	std::vector<u8> m_declaration_rom;
 };
+
 class nubus_slot_device : public device_t, public device_single_card_slot_interface<device_nubus_card_interface>
 {
 public:

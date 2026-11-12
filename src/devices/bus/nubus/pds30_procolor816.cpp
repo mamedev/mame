@@ -27,9 +27,9 @@
 
 #include <algorithm>
 
-static constexpr u32 VRAM_SIZE  =   0x200000;
-
 namespace {
+
+static constexpr u32 VRAM_SIZE  =   0x200000;
 
 ROM_START( procolor816 )
 	ROM_REGION(0x8000, "declrom", 0)
@@ -51,15 +51,13 @@ public:
 protected:
 	nubus_procolor816_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-
-	void card_map(address_map &map);
+	void card_map(address_map &map) ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(vbl_tick);
 
@@ -84,9 +82,9 @@ private:
 void nubus_procolor816_device::card_map(address_map &map)
 {
 	map(0x00'0000, 0x1f'ffff).rw(FUNC(nubus_procolor816_device::vram_r), FUNC(nubus_procolor816_device::vram_w));
-	map(0xfd'6000, 0xfd'603f).rw(m_dac, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask32(0x00ff0000);
+	map(0xfd'6000, 0xfd'603f).umask32(0x00ff'0000).rw(m_dac, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write));
 	map(0xfd'7000, 0xfd'7fff).rw(FUNC(nubus_procolor816_device::regs_r), FUNC(nubus_procolor816_device::regs_w));
-	map(0xff'6000, 0xff'601f).rw(m_dac, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask32(0x00ff00ff);
+	map(0xff'6000, 0xff'601f).umask32(0x00ff'00ff).rw(m_dac, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write));
 	map(0xff'7000, 0xff'7fff).rw(FUNC(nubus_procolor816_device::regs_r), FUNC(nubus_procolor816_device::regs_w));
 }
 

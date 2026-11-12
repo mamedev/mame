@@ -116,7 +116,7 @@ void bbl380_state::output2_w(offs_t, u8 data, u8 mem_mask)
 {
 	if (m_radio)
 	{
-		int const cs = BIT(mem_mask, 7) ? BIT(data, 7) : 1;
+		int const cs = BIT(data | ~mem_mask, 7);
 		m_radio->cs_w(cs);
 		m_radio_selected = !cs;
 	}
@@ -127,8 +127,8 @@ void bbl380_state::output2_w(offs_t, u8 data, u8 mem_mask)
 			m_menucontrol->reset_w(1);
 	}
 
-	m_menucontrol->data_w((data & 0x08) >> 3);
-	m_menucontrol->clock_w((data & 0x04) >> 2);
+	m_menucontrol->data_w(BIT(data, 3));
+	m_menucontrol->clock_w(BIT(data, 2));
 
 	m_output2val = data;
 }
@@ -142,11 +142,11 @@ void bbl380_state::flash_portc_w(offs_t, u8 data, u8 mem_mask)
 {
 	// The factory-test helper accesses the main flash using SPI mode 0 on
 	// PC0=SCK, PC1=SO, PC2=SI and PC3=/CS rather than the SoC SPI controller.
-	m_genspi->si_w(BIT(mem_mask, 2) ? BIT(data, 2) : 1);
-	int const cs = BIT(mem_mask, 3) ? BIT(data, 3) : 1;
+	m_genspi->si_w(BIT(data | ~mem_mask, 2));
+	int const cs = BIT(data | ~mem_mask, 3);
 	m_genspi->cs_w(cs);
 	m_flash_selected = !cs;
-	m_genspi->sck_w(BIT(mem_mask, 0) ? BIT(data, 0) : 0);
+	m_genspi->sck_w(BIT(data | ~mem_mask, 0));
 }
 
 u32 bbl380_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

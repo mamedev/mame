@@ -3331,7 +3331,7 @@ uint8_t cd3poker_state::armaly_prot_r()
 	if (index < 0x0f)
 		return "ANISA_ARMALY<=>"[index];
 	else
-		return index == 0x0f ? 0xa5 : 0x5a;
+		return (index == 0x0f) ? 0xa5 : 0x5a;
 }
 
 /*
@@ -3694,7 +3694,7 @@ void wingco_state::sm7831_write(offs_t offset, uint8_t data)
 										if (sum_low > 9)
 										{
 											sum_low += 6;
-											carry = sum_low > 0x0f ? 1 : 0;
+											carry = (sum_low > 0x0f) ? 1 : 0;
 											sum_low &= 0x0f;
 										}
 
@@ -3705,7 +3705,7 @@ void wingco_state::sm7831_write(offs_t offset, uint8_t data)
 										if (sum_high > 9)
 										{
 											sum_high += 6;
-											carry = sum_high > 0x0f ? 1 : 0;
+											carry = (sum_high > 0x0f) ? 1 : 0;
 											sum_high &= 0x0f;
 										}
 
@@ -32560,8 +32560,8 @@ void cmaster_state::init_cmv823()
 		{
 			switch (i & 0x10)
 			{
-				case 0x00: BIT(rom[i], 3) ? rom[i] = bitswap<8>(rom[i] ^ 0x33, 5, 1, 2, 0, 3, 6, 7, 4) : rom[i] = bitswap<8>(rom[i] ^ 0xa6, 6, 4, 7, 2, 3, 5, 0, 1); break;
-				case 0x10: BIT(rom[i], 7) ? rom[i] = bitswap<8>(rom[i] ^ 0x2b, 7, 3, 6, 1, 2, 0, 4, 5) : rom[i] = bitswap<8>(rom[i] ^ 0x51, 7, 5, 0, 3, 4, 1, 6, 2); break;
+				case 0x00: rom[i] = BIT(rom[i], 3) ? bitswap<8>(rom[i] ^ 0x33, 5, 1, 2, 0, 3, 6, 7, 4) : bitswap<8>(rom[i] ^ 0xa6, 6, 4, 7, 2, 3, 5, 0, 1); break;
+				case 0x10: rom[i] = BIT(rom[i], 7) ? bitswap<8>(rom[i] ^ 0x2b, 7, 3, 6, 1, 2, 0, 4, 5) : bitswap<8>(rom[i] ^ 0x51, 7, 5, 0, 3, 4, 1, 6, 2); break;
 			}
 		}
 	}
@@ -32598,8 +32598,8 @@ void cmaster_state::init_cmpap()
 		{
 			switch (i & 0x20)
 			{
-				case 0x00: BIT(rom[i], 6) ? rom[i] = bitswap<8>(rom[i] ^ 0x12, 3, 6, 5, 1, 4, 2, 7, 0) : rom[i] = bitswap<8>(rom[i] ^ 0x88, 4, 6, 5, 3, 1, 2, 7, 0); break;
-				case 0x20: BIT(rom[i], 0) ? rom[i] = bitswap<8>(rom[i] ^ 0x88, 3, 6, 5, 1, 7, 2, 4, 0) : rom[i] = bitswap<8>(rom[i] ^ 0x12, 4, 6, 5, 7, 1, 2, 3, 0); break;
+				case 0x00: rom[i] = BIT(rom[i], 6) ? bitswap<8>(rom[i] ^ 0x12, 3, 6, 5, 1, 4, 2, 7, 0) : bitswap<8>(rom[i] ^ 0x88, 4, 6, 5, 3, 1, 2, 7, 0); break;
+				case 0x20: rom[i] = BIT(rom[i], 0) ? bitswap<8>(rom[i] ^ 0x88, 3, 6, 5, 1, 7, 2, 4, 0) : bitswap<8>(rom[i] ^ 0x12, 4, 6, 5, 7, 1, 2, 3, 0); break;
 			}
 		}
 	}
@@ -32656,8 +32656,8 @@ void cmaster_state::init_cmpacmanb()
 			case 0x20:
 			case 0x30:
 			case 0x40:
-			case 0x50: BIT(rom[i], 1) ?  rom[i] = bitswap<8>(rom[i] ^ 0xac, 0, 7, 6, 3, 5, 4, 1, 2) : rom[i] = bitswap<8>(rom[i] ^ 0xb8, 6, 3, 4, 0, 2, 7, 1, 5); break;
-			default: BIT(rom[i], 2) ?  rom[i] = bitswap<8>(rom[i] ^ 0xe2, 5, 4, 0, 6, 1, 2, 7, 3) : rom[i] = bitswap<8>(rom[i] ^ 0x59, 3, 0, 1, 7, 4, 2, 5, 6); break;
+			case 0x50: rom[i] = BIT(rom[i], 1) ? bitswap<8>(rom[i] ^ 0xac, 0, 7, 6, 3, 5, 4, 1, 2) : bitswap<8>(rom[i] ^ 0xb8, 6, 3, 4, 0, 2, 7, 1, 5); break;
+			default: rom[i] = BIT(rom[i], 2) ? bitswap<8>(rom[i] ^ 0xe2, 5, 4, 0, 6, 1, 2, 7, 3) : bitswap<8>(rom[i] ^ 0x59, 3, 0, 1, 7, 4, 2, 5, 6); break;
 		}
 	}
 
