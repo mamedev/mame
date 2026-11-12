@@ -75,6 +75,7 @@ private:
 	void write_port1(uint8_t data);
 	uint8_t read_port2();
 	void write_port2(uint8_t data);
+	uint8_t port2_output_mask() const;
 
 	void count_timer(int i);
 	void request_timer_interrupt(int level);

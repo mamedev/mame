@@ -199,6 +199,8 @@ i8256_device::i8256_device(const machine_config &mconfig, const char *tag, devic
 	m_out_p2_cb(*this),
 	m_timer(nullptr),
 	m_brg_timer(nullptr),
+	m_mode(0),
+	m_port1_control(0),
 	m_port1_input(0),
 	m_rxd(1),
 	m_cts(0),
@@ -277,6 +279,9 @@ void i8256_device::device_start()
 
 void i8256_device::device_reset()
 {
+	const bool port1_output = m_port1_control != 0;
+	const bool port2_output = port2_output_mask() != 0;
+
 	m_command1 = 0;
 	m_command2 = 0;
 	m_command3 = 0;
@@ -285,6 +290,10 @@ void i8256_device::device_reset()
 	m_timer5_read_latched = false;
 	m_port1_control = 0;
 	m_modification = 0;
+	if (port1_output)
+		m_out_p1_cb(0, 0);
+	if (port2_output)
+		m_out_p2_cb(0, 0);
 
 	m_data_bits = 8;
 	m_parity_enable = false;
@@ -660,14 +669,24 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			m_command3 &= ~(1 << I8256_CMD3_END);
 			break;
 		case I8256_REG_MODE:
+		{
+			const uint8_t old_mask = port2_output_mask();
 			m_mode = data;
+			const uint8_t mask = port2_output_mask();
+			if (old_mask != mask)
+				m_out_p2_cb(0, m_port2_int & mask);
 			if (!BIT(m_mode, I8256_MODE_T24))
 				m_timer4_read_latched = false;
 			if (!BIT(m_mode, I8256_MODE_T35))
 				m_timer5_read_latched = false;
 			break;
+		}
 		case I8256_REG_PORT1C:
-			m_port1_control = data;
+			if (m_port1_control != data)
+			{
+				m_port1_control = data;
+				m_out_p1_cb(0, m_port1_int & m_port1_control);
+			}
 			break;
 		case I8256_REG_INTEN: // set interrupts
 			m_int_enable |= data;
@@ -740,8 +759,10 @@ uint8_t i8256_device::read_port1()
 void i8256_device::write_port1(uint8_t data)
 {
 	// all bits are latched; input pins output the latch if the direction is changed later
+	const uint8_t changed = (m_port1_int ^ data) & m_port1_control;
 	m_port1_int = data;
-	m_out_p1_cb(0, m_port1_int & m_port1_control);
+	if (changed)
+		m_out_p1_cb(0, m_port1_int & m_port1_control);
 }
 
 uint8_t i8256_device::read_port2()
@@ -774,14 +795,22 @@ uint8_t i8256_device::read_port2()
 
 void i8256_device::write_port2(uint8_t data)
 {
+	const uint8_t mask = port2_output_mask();
+	const uint8_t changed = (m_port2_int ^ data) & mask;
 	m_port2_int = data;
+	if (changed)
+		m_out_p2_cb(0, m_port2_int & mask);
+}
+
+uint8_t i8256_device::port2_output_mask() const
+{
 	switch (m_mode & 0x07)
 	{
-		case I8256_PORT2C_IO: m_out_p2_cb(0, data & 0x0f); break;
-		case I8256_PORT2C_OI: m_out_p2_cb(0, data & 0xf0); break;
-		case I8256_PORT2C_OO: m_out_p2_cb(0, data); break;
+		case I8256_PORT2C_IO: return 0x0f;
+		case I8256_PORT2C_OI: return 0xf0;
+		case I8256_PORT2C_OO: return 0xff;
 		default: // TODO: input and handshake modes
-			break;
+			return 0;
 	}
 }
 
