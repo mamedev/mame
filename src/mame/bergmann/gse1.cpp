@@ -406,6 +406,7 @@ static INPUT_PORTS_START( gse1 )
 	PORT_DIPSETTING(    0x0f, "Regular" ) // 0 Normalstellung
 	PORT_DIPSETTING(    0x0e, "Show malfunction counter" ) // 1 Manko-Zähler anzeigen
 	PORT_DIPSETTING(    0x0c, "Erase series counters" ) // 3 Vorlage- und Serienzähler löschen
+	PORT_DIPSETTING(    0x0b, "Show game counters" ) // 4 Spielezähler, Gewinne und Sonderspiele-Gewinnklassen auslesen
 	PORT_DIPSETTING(    0x0a, "Game simulation" ) // 5 Spielsimulation
 	PORT_DIPSETTING(    0x08, "Show error counter" ) // 7 Fehlerzähler anzeigen
 	PORT_DIPSETTING(    0x07, "Test input/output" ) // 8 Ein- und Ausgänge testen
