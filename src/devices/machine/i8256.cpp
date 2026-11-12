@@ -958,10 +958,6 @@ uint16_t i8256_device::stop_length() const
 
 void i8256_device::output_txd(int state)
 {
-	// Continuous break overrides the output without stopping character timing.
-	if (BIT(m_command3, I8256_CMD3_TBRK))
-		state = 0;
-
 	if (m_txd != state)
 	{
 		m_txd = state;
@@ -1051,8 +1047,10 @@ void i8256_device::transmitter_tick()
 					// SBRK is automatically cleared after one character time of break
 					m_command3 &= ~(1 << I8256_CMD3_SBRK);
 					m_tx_break = false;
-					output_txd(1);
 				}
+
+				// Continuous break starts only after the current character, including stop bits.
+				output_txd(BIT(m_command3, I8256_CMD3_TBRK) ? 0 : 1);
 
 				m_status |= I8256_STATUS_TR_EMPTY;
 				// TRE generates an interrupt when the transmitter register finished
