@@ -636,8 +636,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			const uint8_t old_output = port1_output();
 			const bool frq_changed = BIT(m_command1 ^ data, I8256_CMD1_FRQ);
 			m_command1 = data;
-			if (old_mask != port1_output_mask() || old_output != port1_output())
-				m_out_p1_cb(0, port1_output());
+			update_port1_output(old_mask, old_output);
 			if (frq_changed)
 				update_timer_rate();
 
@@ -742,8 +741,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 			m_mode = data;
 			if (old_test_clock != test_clock_enabled())
 				update_test_clock();
-			if (old_p1_mask != port1_output_mask() || old_p1_output != port1_output())
-				m_out_p1_cb(0, port1_output());
+			update_port1_output(old_p1_mask, old_p1_output);
 			const uint8_t mask = port2_output_mask();
 			if (old_mask != mask)
 				m_out_p2_cb(0, m_port2_int & mask);
@@ -762,8 +760,7 @@ void i8256_device::write(offs_t offset, uint8_t data)
 				m_port1_control = data;
 				if (old_test_clock != test_clock_enabled())
 					update_test_clock();
-				if (old_mask != port1_output_mask() || old_output != port1_output())
-					m_out_p1_cb(0, port1_output());
+				update_port1_output(old_mask, old_output);
 			}
 			break;
 		case I8256_REG_INTEN: // set interrupts
@@ -867,9 +864,14 @@ void i8256_device::write_p1(uint8_t data)
 uint8_t i8256_device::read_port1()
 {
 	// Output and control pins read the saved output latch, not the pin.
-	const uint8_t input = m_in_p1_cb.isunset() ? m_port1_input : m_in_p1_cb(0);
+	const uint8_t input = port1_input();
 	const uint8_t latch_mask = m_port1_control | port1_special_input_mask() | (port2_handshake_mode() ? 0x03 : 0x00);
 	return (input & ~latch_mask) | (m_port1_int & latch_mask);
+}
+
+uint8_t i8256_device::port1_input()
+{
+	return m_in_p1_cb.isunset() ? m_port1_input : m_in_p1_cb(0);
 }
 
 uint8_t i8256_device::port1_special_input_mask() const
@@ -902,6 +904,13 @@ uint8_t i8256_device::port1_output() const
 	if (port2_handshake_mode())
 		return (output & ~0x03) | (m_port2_handshake ? 0x02 : 0x00);
 	return output;
+}
+
+void i8256_device::update_port1_output(uint8_t old_mask, uint8_t old_output)
+{
+	const uint8_t output = port1_output();
+	if (old_mask != port1_output_mask() || old_output != output)
+		m_out_p1_cb(0, output);
 }
 
 bool i8256_device::test_clock_enabled() const
@@ -956,13 +965,15 @@ uint8_t i8256_device::read_port2()
 	switch (m_mode & 0x07)
 	{
 		case I8256_PORT2C_II:
-			return m_in_p2_cb(0);
 		case I8256_PORT2C_IO:
-			return (m_in_p2_cb(0) & 0xf0) | (m_port2_int & 0x0f);
 		case I8256_PORT2C_OI:
-			return (m_in_p2_cb(0) & 0x0f) | (m_port2_int & 0xf0);
 		case I8256_PORT2C_OO:
-			return m_port2_int;
+		case I8256_PORT2C_HO:
+		{
+			const uint8_t mask = port2_output_mask();
+			const uint8_t input = (mask == 0xff) ? 0 : m_in_p2_cb(0);
+			return (input & ~mask) | (m_port2_int & mask);
+		}
 		case I8256_PORT2C_HI:
 		{
 			const uint8_t data = m_port2_input_latch;
@@ -970,8 +981,6 @@ uint8_t i8256_device::read_port2()
 				set_port2_handshake(true);
 			return data;
 		}
-		case I8256_PORT2C_HO:
-			return m_port2_int;
 		case I8256_PORT2C_TEST:
 			return 0;
 		case I8256_PORT2C_DNU:
@@ -1197,7 +1206,7 @@ void i8256_device::check_break_in()
 {
 	if (BIT(m_command1, I8256_CMD1_BRKI) && (m_command2 & 0x0f) > I8256_BAUD_TXC32)
 	{
-		const uint8_t input = m_in_p1_cb.isunset() ? m_port1_input : m_in_p1_cb(0);
+		const uint8_t input = port1_input();
 		if (!BIT(input, 6))
 		{
 			m_status |= I8256_STATUS_BREAK;

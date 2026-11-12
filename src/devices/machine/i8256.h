@@ -76,9 +76,11 @@ private:
 	void update_timer_rate();
 	uint8_t read_port1();
 	void write_port1(uint8_t data);
+	uint8_t port1_input();
 	uint8_t port1_special_input_mask() const;
 	uint8_t port1_output_mask() const;
 	uint8_t port1_output() const;
+	void update_port1_output(uint8_t old_mask, uint8_t old_output);
 	bool test_clock_enabled() const;
 	void update_test_clock();
 	bool port2_handshake_mode() const;
