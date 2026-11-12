@@ -72,6 +72,9 @@ code handle
 C function
     A pointer to a function using the standard C calling convention for
     the host system.
+string
+    A pointer to a NUL-terminated ``char`` string.  The string must
+    remain valid until code is generated for the block.
 
 
 .. _umlinst-special:
@@ -309,9 +312,9 @@ HANDLE
 
 Mark a location as an entry point of a subroutine.  Subroutines may be
 called using the :ref:`CALLH <umlinst-callh>` and :ref:`EXH
-<umlinst-exh>` instructions, and also by the `HASHJMP <umlinst-hashjmp>`
-if no location is associated with the specified mode and emulated
-program counter.
+<umlinst-exh>` instructions, and also by the :ref:`HASHJMP
+<umlinst-hashjmp>` if no location is associated with the specified mode
+and emulated program counter.
 
 +--------------------+--------------------------------+
 | Disassembly        | Usage                          |

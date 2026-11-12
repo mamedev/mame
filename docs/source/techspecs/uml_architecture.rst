@@ -44,9 +44,9 @@ flushed very frequently, and performance will suffer due to the need to
 constantly regenerate code.
 
 With the exception of a few UML instructions specifically for loading
-and storing data (:ref:`LOAD <umlinst-load>`,
-:ref:`LOADS <umlinst-loads>`, :ref:`STORE <umlinst-store>`,
-:ref:`RESTORE <umlinst-store>` and :ref:`SAVE <umlinst-save>`),
+and storing data (:ref:`LOAD <umlinst-load>`, :ref:`LOADS
+<umlinst-loads>`, :ref:`STORE <umlinst-store>`, :ref:`RESTORE
+<umlinst-restore>` and :ref:`SAVE <umlinst-save>`),
 generated code can only access data located within the recompiler cache.
 
 The recompiler cache is divided into multiple areas, which are used to
@@ -302,11 +302,11 @@ of the map variable is extended to 64 bits with zeroes.
 The :ref:`MAPVAR <umlinst-mapvar>` instruction is used to assign a new
 value to a map variable.  The values of map variables depend on *the
 location in the code block*.  An instruction will always see the value
-of the map variable set by the nearest preceding
-:ref:`MAPVAR <umlinst-mapvar>` instruction in the block (or zero if
-there is no such instruction), even if the instruction was reached by
-jumping forward over the :ref:`MAPVAR <umlinst-mapvar>` instruction in
-question, or jumping backwards to a location following it.
+of the map variable set by the nearest preceding :ref:`MAPVAR
+<umlinst-mapvar>` instruction in the block (or zero if there is no such
+instruction), even if the instruction was reached by jumping forward
+over the :ref:`MAPVAR <umlinst-mapvar>` instruction in question, or
+jumping backwards to a location following it.
 
 It is also possible to use the :ref:`RECOVER <umlinst-recover>`
 instruction from within a subroutine to retrieve the value of a map
@@ -338,11 +338,11 @@ Labels
 
 Labels are identified using 32-bit unsigned integer values.  Label
 numbers must be unique within a generated code block.  Locations are
-marked as potential targets for intra-block jumps using the
-:ref:`LABEL <umlinst-label>` instruction.  The :ref:`JMP <umlinst-jmp>`
-instruction is used to transfer control to the location associated with
-a label within the same generated code block.  It is not possible to
-jump to a location in a different code block in this way.
+marked as potential targets for intra-block jumps using the :ref:`LABEL
+<umlinst-label>` instruction.  The :ref:`JMP <umlinst-jmp>` instruction
+is used to transfer control to the location associated with a label
+within the same generated code block.  It is not possible to jump to a
+location in a different code block in this way.
 
 Subroutines
 ~~~~~~~~~~~
@@ -363,11 +363,11 @@ subroutine entry point cannot be associated with a different subroutine
 entry point.
 
 Subroutines are called using the :ref:`CALLH <umlinst-callh>` and
-:ref:`EXH <umlinst-exh>` instructions.  The
-:ref:`HASHJMP <umlinst-hashjmp>` instruction will also call a subroutine
-if no location is associated with the specified mode and emulated
-program pointer value.  The :ref:`RET <umlinst-ret>` instruction returns
-from a subroutine.
+:ref:`EXH <umlinst-exh>` instructions.  The :ref:`HASHJMP
+<umlinst-hashjmp>` instruction will also call a subroutine if no
+location is associated with the specified mode and emulated program
+pointer value.  The :ref:`RET <umlinst-ret>` instruction returns from a
+subroutine.
 
 Subroutines may be called from within the same code block of from a
 different code block.  A handle must be allocated before code to call it
