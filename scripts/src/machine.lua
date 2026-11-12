@@ -5776,6 +5776,25 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/cgp220.h,MACHINES["CGP220"] = true
+---------------------------------------------------
+if MACHINES["CGP220"] then
+	files {
+		MAME_DIR .. "src/devices/machine/cgp220.cpp",
+		MAME_DIR .. "src/devices/machine/cgp220.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/machine/cgp220.cpp", GEN_DIR .. "emu/layout/cgp220.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "cgp220"),
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/citizen120d.h,MACHINES["CITIZEN120D"] = true
 ---------------------------------------------------
 if MACHINES["CITIZEN120D"] then
