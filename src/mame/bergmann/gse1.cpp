@@ -252,7 +252,7 @@ void gse1_state::daten_w(uint8_t data)
 			}
 			break;
 		default:
-			logerror("Unhandled write %02x to address %02x\n", data, m_adress);
+			logerror("%s Unhandled write %02x to address %02x\n", machine().describe_context(), data, m_adress);
 			break;
 	}
 }
@@ -271,7 +271,7 @@ uint8_t gse1_state::daten_r()
 			break;
 		default:
 			if (!machine().side_effects_disabled())
-				logerror("Unhandled read from address %02x\n", m_adress);
+				logerror("%s Unhandled read from address %02x\n", machine().describe_context(), m_adress);
 			break;
 	}
 
