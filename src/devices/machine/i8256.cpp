@@ -1132,12 +1132,18 @@ void i8256_device::receiver_tick()
 						// TME reports transmitter activity during the received parity
 						// bit, or the last data bit when parity is disabled.
 						if (m_rx_tx_active)
+						{
 							m_status |= I8256_STATUS_FRAMING_ERROR;
+						}
 						else
+						{
 							m_status &= ~I8256_STATUS_FRAMING_ERROR;
+						}
 					}
 					else if (fe)
+					{
 						m_status |= I8256_STATUS_FRAMING_ERROR;
+					}
 
 					request_interrupt(I8256_INT_RX);
 				}
@@ -1389,9 +1395,10 @@ void i8256_device::write_cts(int state)
 	const bool falling = m_cts && !state;
 	m_cts = state;
 	if (state)
+	{
 		m_cts_counter = 0;
-	else if (falling &&
-		!(m_status & I8256_STATUS_TB_EMPTY))
+	}
+	else if (falling && !(m_status & I8256_STATUS_TB_EMPTY))
 	{
 		const uint16_t minimum_stop = (m_stop_sel == I8256_STOP_075) ? stop_length() : m_divide / 2;
 		// Pulses during data or before the permitted stop interval are ignored.
