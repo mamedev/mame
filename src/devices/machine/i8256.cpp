@@ -1015,15 +1015,26 @@ uint16_t i8256_device::rx_sample_point() const
 	return std::max<uint16_t>(1, (m_rx_sample * m_divide) / 32);
 }
 
+bool i8256_device::rx_transmission_mode_window() const
+{
+	if (m_rx_state != I8256_STATE_DATA && m_rx_state != I8256_STATE_STOP)
+		return false;
+
+	// Counters are relative to sample points; the final bit begins before its
+	// sample and ends before the stop sample by the selected sample offset.
+	const uint32_t position = m_rx_bits * m_divide + m_rx_counter;
+	const uint32_t start = (m_data_bits + (m_parity_enable ? 1 : 0)) * m_divide - rx_sample_point();
+	return position >= start && position < start + m_divide;
+}
+
 void i8256_device::receiver_tick()
 {
-	// Track transmitter activity from start bit detection to the stop bit sample.
 	if (m_rx_state == I8256_STATE_START && !m_rx_counter)
 		m_rx_tx_active = false;
-	if (!(m_status & I8256_STATUS_TR_EMPTY))
-		m_rx_tx_active = true;
 
 	m_rx_counter++;
+	if (rx_transmission_mode_window() && !(m_status & I8256_STATUS_TR_EMPTY))
+		m_rx_tx_active = true;
 
 	// RxC rises at each data sample and stays high throughout framing bits.
 	if ((m_command2 & 0x0f) != I8256_BAUD_TXC)
@@ -1113,8 +1124,8 @@ void i8256_device::receiver_tick()
 
 					if (BIT(m_modification, I8256_MOD_TME))
 					{
-						// in transmission mode FE indicates that the transmitter
-						// was active during the reception of a character
+						// TME reports transmitter activity during the received parity
+						// bit, or the last data bit when parity is disabled.
 						if (m_rx_tx_active)
 							m_status |= I8256_STATUS_FRAMING_ERROR;
 						else
@@ -1328,9 +1339,7 @@ void i8256_device::transmitter_tick()
 	}
 
 	// TxC may run independently of RxC, so latch activity between receiver ticks.
-	if (!(m_status & I8256_STATUS_TR_EMPTY) &&
-		(m_rx_state == I8256_STATE_DATA || m_rx_state == I8256_STATE_STOP ||
-			(m_rx_state == I8256_STATE_START && m_rx_counter)))
+	if (rx_transmission_mode_window() && !(m_status & I8256_STATUS_TR_EMPTY))
 		m_rx_tx_active = true;
 }
 

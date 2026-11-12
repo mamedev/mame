@@ -95,6 +95,7 @@ private:
 	void start_transmit();
 	void check_break_in();
 	uint16_t rx_sample_point() const;
+	bool rx_transmission_mode_window() const;
 	uint16_t stop_length() const;
 	void output_txd(int state);
 	void output_txc(int state);
