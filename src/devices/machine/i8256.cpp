@@ -900,7 +900,8 @@ void i8256_device::receiver_tick()
 				const bool fe = !m_rxd;
 				const uint8_t data = m_rx_shift & util::make_bitmask<uint16_t>(m_data_bits);
 
-				if (fe && data == 0)
+				// A break requires all data bits and the optional parity bit to be low.
+				if (fe && m_rx_shift == 0)
 				{
 					// break character: BD is set even when the receiver is disabled,
 					// and the character is not transferred to the receiver buffer
