@@ -362,22 +362,15 @@ void i8256_device::count_timer(int i)
 	const bool t35 = (i == 2) && BIT(m_mode, I8256_MODE_T35);
 	const int high = t24 ? 3 : 4;
 
-	if (m_timers[i] == 0)
+	if (m_timers[i]-- == 0)
 	{
 		// timers count down continuously and wrap around past zero; the low
 		// byte of a cascaded pair borrows from the upper byte (FFFFH on wrap)
 		if (t24 || t35)
-		{
-			if (m_timers[high] == 0)
-				m_timers[high] = 255;
-			else
-				m_timers[high]--;
-		}
-		m_timers[i] = 255;
+			m_timers[high]--;
 		return;
 	}
 
-	m_timers[i]--;
 	if (m_timers[i] != 0)
 		return;
 
