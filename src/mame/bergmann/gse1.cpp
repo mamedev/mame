@@ -282,7 +282,7 @@ uint8_t gse1_state::daten_r()
 //PIO1
 uint8_t gse1_state::pio1_pa_r()
 {
-	// Steckerleiste 15
+	// Steckerleiste 15 - J15
 	// TODO: The coin sequencing is missing
 	// Specifically PA2 and/or PA3 have to be triggered shortly after a coin passes PA5-7
 	return m_io_coin->read();
@@ -290,14 +290,14 @@ uint8_t gse1_state::pio1_pa_r()
 
 uint8_t gse1_state::pio1_pb_r()
 {
-	// Steckerleiste 15
+	// Steckerleiste 15 - J15
 	// PB5-7
 	return m_io_payout->read();
 }
 
 void gse1_state::pio1_pb_w(uint8_t data)
 {
-	// Steckerleiste 15
+	// Steckerleiste 15 - J15
 	//coins out
 	machine().bookkeeping().coin_counter_w(3, BIT(data, 0)); // PB0 0.10DM
 	machine().bookkeeping().coin_counter_w(2, BIT(data, 1)); // PB1 1DM
@@ -310,14 +310,14 @@ void gse1_state::pio1_pb_w(uint8_t data)
 //PIO2
 uint8_t gse1_state::pio2_pa_r()
 {
-	// Steckerleiste 17
+	// Steckerleiste 17 - J17
 	// The only input here is the battery status
 	return m_battery ? 0xff : 0x7f;
 }
 
 void gse1_state::pio2_pa_w(uint8_t data)
 {
-	// Steckerleiste 17
+	// Steckerleiste 17 - J17
 	m_led = BIT(data, 0);
 	// 1 NC
 	m_dac_alarm_l->write(BIT(data, 2));
@@ -329,7 +329,7 @@ void gse1_state::pio2_pa_w(uint8_t data)
 
 uint8_t gse1_state::pio2_pb_r()
 {
-	// Steckerleiste 16
+	// Steckerleiste 16 - J16
 	uint8_t data = 0xff;
 	// Motor sync
 	// TODO: get these from the reels/discs
@@ -346,7 +346,7 @@ uint8_t gse1_state::pio2_pb_r()
 
 void gse1_state::pio2_pb_w(uint8_t data)
 {
-	// Steckerleiste 16
+	// Steckerleiste 16 - J16
 	bool motor_reset = BIT(data, 6);
 	bool motor_switch = BIT(data, 7);
 	LOG("MOTOR reset: %02x, switch: %02x\n", motor_reset, motor_switch);
