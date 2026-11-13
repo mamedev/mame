@@ -62,7 +62,7 @@ public:
 		, m_buzzer(*this, "buzzer")
 	{ }
 
-	void dp3000(machine_config &config);
+	void dp3000(machine_config &config) ATTR_COLD;
 
 private:
 	void mem_map(address_map &map) ATTR_COLD;
