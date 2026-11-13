@@ -112,17 +112,17 @@ void dataprint_state::dp3000(machine_config &config)
 	config.set_default_layout(layout_dataprint);
 }
 
-ROM_START( dp407 )
+ROM_START( dp3_407 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("nsm_118_576__firmware_4.07.bin", 0x00000, 0x10000, CRC(fa87ccb3) SHA1(55e9b845c10e1c4e8a524057c10fb2c3abf0b515))
 ROM_END
 
-ROM_START( dp411 )
+ROM_START( dp3_411 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("nsm_118_576__firmware_4.11.bin", 0x00000, 0x10000, CRC(ee11ea18) SHA1(7a402e7a5c1ea92af28d667fc8bc57a3359346f3))
 ROM_END
 
-ROM_START( dp412 )
+ROM_START( dp3_412 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("nsm_118_576__firmware_4.12.bin", 0x00000, 0x10000, CRC(264aa7c8) SHA1(72e49328eb44d2696ff68167a33ee7712663361f))
 ROM_END
@@ -130,6 +130,6 @@ ROM_END
 } // anonymous namespace
 
 
-SYST( 199?, dp407, dp412, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.07)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-SYST( 199?, dp411, dp412, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.11)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-SYST( 199?, dp412,     0, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.12)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 199?, dp3_407, dp3_412, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.07)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 199?, dp3_411, dp3_412, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.11)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 199?, dp3_412,       0, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.12)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
