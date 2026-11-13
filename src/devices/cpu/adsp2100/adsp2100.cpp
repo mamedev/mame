@@ -1431,8 +1431,9 @@ void adsp21xx_device::execute_run()
 				break;
 			case 0x10:
 				// 00010000 0xxxxxxx xxxxxxxx  shift with internal data register move
-				shift_op(op);
 				temp = read_reg0(BIT(op, 0, 4));
+				// the move reads its source before the shift, as the ALU/MAC forms do
+				shift_op(op);
 				write_reg0(BIT(op, 4, 4), temp);
 				break;
 			case 0x11:
