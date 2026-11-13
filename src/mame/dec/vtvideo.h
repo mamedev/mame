@@ -49,6 +49,7 @@ protected:
 	void recompute_parameters();
 	void vblank_callback(screen_device &screen, bool state);
 	void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type, bool invert, bool bold, bool blink, bool underline, bool blank);
+	void draw_scan(bitmap_ind16 &bitmap, int y_preset, int x, uint8_t code, int i, uint8_t display_type, bool invert, bool bold, bool blink, bool underline, bool blank, bool also_next_row);
 	TIMER_CALLBACK_MEMBER(lba3_change);
 	TIMER_CALLBACK_MEMBER(lba7_change);
 	virtual void notify_vblank(bool choice) { }
