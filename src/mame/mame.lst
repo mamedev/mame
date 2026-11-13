@@ -36774,6 +36774,11 @@ sbasssta
 @source:novation/drumsta.cpp
 drumsta
 
+@source:nsm/dataprint.cpp
+dp3_407
+dp3_411
+dp3_412
+
 @source:oberheim/dmx.cpp
 obdmx
 
@@ -44080,11 +44085,6 @@ dash4
 
 @source:skeleton/datacast.cpp
 datacast
-
-@source:skeleton/dataprint.cpp
-dp3_407
-dp3_411
-dp3_412
 
 @source:skeleton/design.cpp
 azkoyent12
