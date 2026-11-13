@@ -492,6 +492,8 @@ public:
 	void taitowlf(machine_config &config);
 
 protected:
+	virtual void video_start() override ATTR_COLD;
+
 	required_device<voodoo_1_pci_device> m_voodoo;
 	required_device<screen_device> m_screen;
 
@@ -499,44 +501,45 @@ private:
 	static void romdisk_config(device_t *device);
 
 	u32 screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+
+	bool m_vga_pass;
+	bitmap_rgb32 m_boot_bitmap;
 };
+
+void taitowlf_state::video_start()
+{
+	m_screen->register_screen_bitmap(m_boot_bitmap);
+
+	// bits 0-2 TAITOWOLF splash screen, bits 4-6 cross hatch
+	const u8 base_pen = 0; // 4;
+	const u8 *bootscreen_rom = memregion("bootscreen")->base();
+
+	for (int y = 0; y <= 240; y++)
+	{
+		for (int x = 0; x <= 511; x++)
+		{
+			const u8 pen = bootscreen_rom[y * 512 + x];
+			// TODO: palette color routing (game barely uses red and white in both screens)
+			const u32 to_rgb = rgb_t(
+				pal1bit(BIT(pen, 0 + base_pen)),
+				pal1bit(BIT(pen, 1 + base_pen)),
+				pal1bit(BIT(pen, 2 + base_pen))
+			);
+			m_boot_bitmap.pix(y, x) = to_rgb;
+		}
+	}
+
+	save_item(NAME(m_vga_pass));
+}
 
 u32 taitowlf_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-// TODO: debug code for bootscreen, ISA card sub-device
-// Also fixed area, not worth decoding more than once (bitmap_device?)
-#if 0
-	static bool enable_switch = 1;
-	// bits 0-2 TAITOWOLF splash screen, bits 4-6 cross hatch
-	static u8 base_pen = 0;
-	const u8 *bootscreen_rom = memregion("bootscreen")->base();
-
-	if (machine().input().code_pressed_once(KEYCODE_Z))
-		enable_switch ^= 1;
-
-	if (machine().input().code_pressed_once(KEYCODE_X))
-		base_pen ^= 4;
-
-	if (enable_switch)
+	// E58 takes control of screen when VGA passthrough is off
+	if (!m_vga_pass)
 	{
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-		{
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
-			{
-				const u8 pen = bootscreen_rom[y * 512 + x];
-				// TODO: palette color routing (game barely uses red and white in both screens)
-				const u32 to_rgb = rgb_t(
-					pal1bit(BIT(pen, 0 + base_pen)),
-					pal1bit(BIT(pen, 1 + base_pen)),
-					pal1bit(BIT(pen, 2 + base_pen))
-				);
-				bitmap.pix(y, x) = to_rgb;
-			}
-		}
-
+		copybitmap(bitmap, m_boot_bitmap, 0, 0, 0, 0, cliprect);
 		return 0;
 	}
-#endif
 
 	return m_voodoo->screen_update(screen, bitmap, cliprect);
 }
@@ -666,13 +669,12 @@ void taitowlf_state::taitowlf(machine_config &config)
 	m_voodoo->set_fbmem(2);
 	m_voodoo->set_tmumem(4, 0);
 	m_voodoo->set_status_cycles(1000);
-
-	// TODO: displays bootscreen ROM contents (512x240 8bpp) while the board is in vga_pass off state
-	// This is provided by one of the CPLDs that is on the Taito PCB stack, CRTC values needs to be verified in this state
+	subdevice<generic_voodoo_device>(PCI_VIDEO_ID":voodoo")->vgapass_callback().set([this] (int state) {
+		m_vga_pass = state;
+	});
+	// TODO: actual E58 CRTC parameters, this just mimicks Voodoo setup
 	SCREEN(config, m_screen);
-	m_screen->set_refresh_hz(57);
-	m_screen->set_size(800, 262);
-	m_screen->set_visarea(0, 512 - 1, 0, 240 - 1);
+	m_screen->set_raw(15750 * 512, 512, 58, 441, 263, 15, 255);
 	m_screen->set_screen_update(FUNC(taitowlf_state::screen_update));
 }
 
