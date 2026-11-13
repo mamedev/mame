@@ -27,6 +27,25 @@ ultra14f_device::ultra14f_device(const machine_config &mconfig, const char *tag,
 
 void ultra14f_device::device_start()
 {
+	set_isa_device();
+}
+
+void ultra14f_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void ultra14f_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_rom(this, 0xc8000, 0xcbfff, "bios");
+	}
+	else if (space_id == AS_IO)
+	{
+		//m_isa->install_device(0x0330, 0x0333, *this, &ultra14f_device::host_io);
+	}
 }
 
 void ultra14f_device::uscpu_map(address_map &map)

@@ -153,7 +153,6 @@ void sis85c496_host_device::device_add_mconfig(machine_config &config)
 	IDE_CONTROLLER_32(config, m_ide[0]).options(ata_devices, "hdd", nullptr, false);
 	m_ide[0]->irq_handler().set(m_pic8259_slave, FUNC(pic8259_device::ir6_w));
 
-	// TODO: this host doesn't seem capable of mounting a cdrom thru IDE
 	IDE_CONTROLLER_32(config, m_ide[1]).options(ata_devices, "cdrom", nullptr, false);
 	m_ide[1]->irq_handler().set(m_pic8259_slave, FUNC(pic8259_device::ir7_w));
 
