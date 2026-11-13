@@ -128,6 +128,6 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 199?, dp407, dp412, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.07)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 199?, dp411, dp412, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.11)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-COMP( 199?, dp412,     0, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.12)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 199?, dp407, dp412, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.07)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 199?, dp411, dp412, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.11)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+SYST( 199?, dp412,     0, 0, dp3000, dp3000, dataprint_state, empty_init, "NSM", "Dataprint 3000 (4.12)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
