@@ -25,12 +25,12 @@ B                   |
 Q: Crystal
 
 TODO:
-	- PCMCIA SRAM
-	- Verify crystal frequency
-	- Verify LED order
-	- Hook up buzzer and sensors
-	- Printer emulation
-	- Serial port once TMS7000 has it implemented
+    - PCMCIA SRAM
+    - Verify crystal frequency
+    - Verify LED order
+    - Hook up buzzer and sensors
+    - Printer emulation
+    - Serial port once TMS7000 has it implemented
 
 ************************************************************************************************************************************/
 
