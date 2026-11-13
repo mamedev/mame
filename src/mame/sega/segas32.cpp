@@ -509,10 +509,11 @@ MIB.42
 
 Output Notes:
 All outputs are hooked up properly with the following exceptions:
-radm:  Motors aren't hooked up, as the board isn't emulated. Also the 2nd and 3rd lamps "die" when the cabinet dip is set to deluxe.
-    They probably get moved over to the motor driver board.
+radm:  The deluxe cabinet drive board is emulated with a simulated cabinet. Set the Cabinet configuration and the Cabinet type
+    game setting to Deluxe to use it. That cabinet takes the LIGHT and WIPER lamps from the drive board.
 
-radr:  See radm
+radr:  The game supports the same deluxe cabinet and drive board protocol as radm, but no drive board is hooked up. With the
+    Cabinet type game setting at Deluxe, port G drives the drive board bus and the ENTRY and WINNER lamps go to the drive board.
 
 kokoroj: This driver isn't finished enough to flesh out the outputs, but a space has been reserved in the output functions.
 
@@ -538,6 +539,7 @@ orunners:  Interleaved with the dj and << >> buttons is the data the drives the 
 #include "machine/msm6253.h"
 #include "machine/upd4701.h"
 #include "315_5296.h"
+#include "837_7753.h"
 #include "sound/cdda.h"
 #include "sound/rf5c68.h"
 #include "sound/ymopn.h"
@@ -1993,6 +1995,11 @@ static INPUT_PORTS_START( radm )
 
 	PORT_START("mainpcb:ANALOG3")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
+
+	PORT_START("CABINET")
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_CONFSETTING(    0x01, "Deluxe" )
 INPUT_PORTS_END
 
 
@@ -2770,8 +2777,10 @@ public:
 	void init_f1lapt();
 	void init_orunners();
 
-private:
+protected:
 	required_device<segas32_state> m_mainpcb;
+
+private:
 	optional_device<segas32_state> m_subpcb;
 
 	std::unique_ptr<uint16_t[]> m_dual_pcb_comms;
@@ -2779,6 +2788,29 @@ private:
 	uint16_t dual_pcb_comms_r(offs_t offset);
 	uint16_t dual_pcb_mainsub();
 	uint16_t dual_pcb_sub();
+};
+
+
+class segas32_radm_state : public segas32_new_state
+{
+public:
+	segas32_radm_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segas32_new_state(mconfig, type, tag)
+		, m_drivebd(*this, "drivebd")
+		, m_cabinet(*this, "CABINET")
+	{ }
+
+	void sega_system32_radm(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<sega_837_7753_device> m_drivebd;
+	required_ioport m_cabinet;
+
+	bool deluxe() const { return BIT(m_cabinet->read(), 0); }
+	u8 io_portc_r();
+	void io_portg_w(u8 data);
+	void drivebd_strobe_w(int state);
+	void drivebd_lamps_w(u8 data);
 };
 
 
@@ -2847,6 +2879,45 @@ void segas32_new_state::sega_multi32_analog(machine_config &config)
 void segas32_new_state::sega_multi32_6p(machine_config &config)
 {
 	SEGA_MULTI32_6PLAYER_DEVICE(config, "mainpcb");
+}
+
+void segas32_radm_state::sega_system32_radm(machine_config &config)
+{
+	sega_system32_analog(config);
+
+	SEGA_837_7753(config, m_drivebd);
+	m_drivebd->lamps_cb().set(FUNC(segas32_radm_state::drivebd_lamps_w));
+
+	sega_315_5296_device &io_chip(*subdevice<sega_315_5296_device>("mainpcb:io_chip"));
+	io_chip.in_pc_callback().set(FUNC(segas32_radm_state::io_portc_r));
+	io_chip.out_pc_callback().set(m_drivebd, FUNC(sega_837_7753_device::data_w));
+	io_chip.out_pd_callback().append(FUNC(segas32_radm_state::drivebd_strobe_w)).bit(4);
+	io_chip.out_pg_callback().set(FUNC(segas32_radm_state::io_portg_w));
+}
+
+u8 segas32_radm_state::io_portc_r()
+{
+	return deluxe() ? m_drivebd->data_r() : 0xff;
+}
+
+void segas32_radm_state::io_portg_w(u8 data)
+{
+	if (deluxe())
+		m_drivebd->addr_w(data);
+	else
+		m_mainpcb->sw2_output_0_w(data);
+}
+
+void segas32_radm_state::drivebd_strobe_w(int state)
+{
+	if (deluxe())
+		m_drivebd->strobe_w(state);
+}
+
+void segas32_radm_state::drivebd_lamps_w(u8 data)
+{
+	if (deluxe())
+		m_mainpcb->sw2_output_0_w(data);
 }
 
 
@@ -4561,9 +4632,6 @@ ROM_START( radm )
 	ROM_LOAD64_BYTE( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) )
 	ROM_LOAD64_BYTE( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) )
 
-	ROM_REGION( 0x8000, "user2", 0 ) /* unused (cabinet motor?) */
-	ROM_LOAD( "epr-13686.bin", 0x00000, 0x8000, CRC(317a2857) SHA1(e0788dc7a7d214d9c4d26b24e44c1a0dc9ae477c) ) /* cabinet movement */
-
 	ROM_REGION16_BE( 0x80, "mainpcb:eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-radm.ic76", 0x0000, 0x0080, CRC(b1737c06) SHA1(29448a6effeb53322a93158feb9a62bc6ad31f21) )
 ROM_END
@@ -4599,9 +4667,6 @@ ROM_START( radmu )
 	ROM_LOAD64_BYTE( "mpr-13516.ic6",  0x000005, 0x100000, CRC(8c4bc62d) SHA1(3206f623ec0b7558413d063404103b183f26b488) )
 	ROM_LOAD64_BYTE( "mpr-13517.ic11", 0x000006, 0x100000, CRC(1d7d84a7) SHA1(954cfccfc7250a5bead2eeba42e655d5ac82955f) )
 	ROM_LOAD64_BYTE( "mpr-13518.ic17", 0x000007, 0x100000, CRC(9ea4b15d) SHA1(7dcfd6d42bb945beca8344cf92e7bd53903a824b) )
-
-	ROM_REGION( 0x8000, "user2", 0 ) /* unused (cabinet motor?) */
-	ROM_LOAD( "epr-13686.bin", 0x00000, 0x8000, CRC(317a2857) SHA1(e0788dc7a7d214d9c4d26b24e44c1a0dc9ae477c) ) /* cabinet movement */
 
 	ROM_REGION16_BE( 0x80, "mainpcb:eeprom", 0 )
 	ROM_LOAD16_WORD( "eeprom-radm.ic76", 0x0000, 0x0080, CRC(b1737c06) SHA1(29448a6effeb53322a93158feb9a62bc6ad31f21) )
@@ -6069,8 +6134,8 @@ GAME( 1992, kokoroj,   0,        sega_system32_cd,          kokoroj2, segas32_ne
 GAME( 1992, kokoroja,  kokoroj,  sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER ) /* uses an Audio CD (undumped, incompatible with kokoroj2) */
 GAME( 1993, kokoroj2,  0,        sega_system32_cd,          kokoroj2, segas32_new_state, init_radr,     ROT0, "Sega",   "Soreike Kokology Vol. 2 - Kokoro no Tanteikyoku", MACHINE_IMPERFECT_SOUND | MACHINE_NODEVICE_PRINTER ) /* uses an Audio CD */
 
-GAME( 1990, radm,      0,        sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (World)", 0 )  /* Released in 02.1991 */
-GAME( 1990, radmu,     radm,     sega_system32_analog,      radm,     segas32_new_state, init_radm,     ROT0, "Sega",   "Rad Mobile (US)", 0 )
+GAME( 1990, radm,      0,        sega_system32_radm,        radm,     segas32_radm_state, init_radm,    ROT0, "Sega",   "Rad Mobile (World)", 0 )  /* Released in 02.1991 */
+GAME( 1990, radmu,     radm,     sega_system32_radm,        radm,     segas32_radm_state, init_radm,    ROT0, "Sega",   "Rad Mobile (US)", 0 )
 
 GAMEL(1991, radr,      0,        sega_system32_analog,      radr,     segas32_new_state, init_radr,     ROT0, "Sega",   "Rad Rally (World)", 0, layout_radr )
 GAMEL(1991, radru,     radr,     sega_system32_analog,      radr,     segas32_new_state, init_radr,     ROT0, "Sega",   "Rad Rally (US)", 0, layout_radr )
