@@ -4,7 +4,9 @@
 
 NSM Dataprint 3000
 
-A portable dot-matrix printer used to print out billing information from electronic game machines for bookkeeping and tax purposes.
+A portable dot-matrix printer used to print out billing information
+from electronic game machines for bookkeeping and tax purposes.
+Dates seen 1996-1998
 
 ________________PWR__
 D                   |
