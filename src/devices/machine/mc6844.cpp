@@ -2,7 +2,7 @@
 // copyright-holders: Joakim Larsson Edström
 /**********************************************************************
 
-  Motorola 6844 emulation. This code is not yet ready for general use, see TODO list below
+  Motorola 6844 emulation
 
  "MC6844 — Direct Memory Access Controller
 
@@ -34,9 +34,6 @@
   The base code was ripped out of swtpc09.cpp and deviceified but similar code is also to be found
   in exidy440.cpp so copyrigt is probably shared among the authors there: Robert Justice, 68bit and
   Aaron Giles.
-
-  TODO:
-  - Memory to Device transfers
 
 **********************************************************************/
 
@@ -90,6 +87,10 @@ mc6844_device::mc6844_device(const machine_config &mconfig, const char *tag, dev
 	, m_out_iow_cb(*this)
 	, m_state(STATE_S0)
 	, m_icount(0)
+	, m_current_channel(0)
+	, m_last_channel(0)
+	, m_dgrnt(false)
+	, m_dreq{ false, false, false, false }
 {
 }
 
@@ -102,6 +103,12 @@ void mc6844_device::device_start()
 	// set our instruction counter
 	set_icountptr(m_icount);
 
+	for (auto &channel : m_m6844_channel)
+	{
+		channel.address = 0;
+		channel.counter = 0;
+	}
+
 	save_item(NAME(m_m6844_priority));
 	save_item(NAME(m_m6844_interrupt));
 	save_item(NAME(m_m6844_chain));
@@ -110,6 +117,11 @@ void mc6844_device::device_start()
 	save_item(NAME(m_current_channel));
 	save_item(NAME(m_last_channel));
 	save_item(NAME(m_dgrnt));
+	save_item(NAME(m_dreq));
+	save_item(STRUCT_MEMBER(m_m6844_channel, active));
+	save_item(STRUCT_MEMBER(m_m6844_channel, address));
+	save_item(STRUCT_MEMBER(m_m6844_channel, counter));
+	save_item(STRUCT_MEMBER(m_m6844_channel, control));
 }
 
 //-------------------------------------------------
@@ -121,13 +133,17 @@ void mc6844_device::device_reset()
 	// reset the 6844
 	for (int i = 0; i < 4; i++)
 	{
-		m_m6844_channel[i].active = 0;
+		m_m6844_channel[i].active = false;
 		m_m6844_channel[i].control = 0x00;
 	}
 	m_m6844_priority = 0x00;
 	m_m6844_interrupt = 0x00;
 	m_m6844_chain = 0x00;
 	m_state = STATE_SI;
+
+	m_out_int_cb(CLEAR_LINE);
+	m_out_drq1_cb(CLEAR_LINE);
+	m_out_drq2_cb(CLEAR_LINE);
 }
 
 //-------------------------------------------------
@@ -167,7 +183,11 @@ void mc6844_device::execute_run()
 					// Rotating or static channel prioritizations
 					int current_channel = priorities[((m_m6844_priority & 0x80) ? m_last_channel : 3) & 3][prio];
 
-				if (m_m6844_channel[current_channel].active == 1 && m_dreq[current_channel] == ASSERT_LINE)
+					// Requests on channels with an exhausted byte counter are ignored,
+					// otherwise a stale request would block the lower priority channels
+					if (m_m6844_channel[current_channel].active &&
+						m_m6844_channel[current_channel].counter != 0 &&
+						m_dreq[current_channel] == ASSERT_LINE)
 					{
 						m_current_channel = m_last_channel = current_channel;
 						m_state = STATE_S0;
@@ -184,16 +204,15 @@ void mc6844_device::execute_run()
 			break;
 		case STATE_S0: // Wait for BCR != 0 and Tx EN == 1
 			LOGSTATE("DMA state S0\n");
-			if (m_m6844_channel[m_current_channel].active == 1 &&
+			if (m_m6844_channel[m_current_channel].active &&
 				m_m6844_channel[m_current_channel].counter != 0)
 			{
 				m_state = STATE_S1;
 			}
 			else
 			{
-				LOGSTATE("Suspend in S0\n");
-				suspend_until_trigger(1, true);
-				m_icount = 0;
+				// channel was disabled or exhausted meanwhile, arbitrate again
+				m_state = STATE_SI;
 			}
 			break;
 		case STATE_S1: // Wait for Tx RQ == 1
@@ -218,78 +237,84 @@ void mc6844_device::execute_run()
 			}
 			else
 			{
-				LOGSTATE("Suspend in S1\n");
-				suspend_until_trigger(1, true);
-				m_icount = 0;
+				// request went away, let another channel have the bus
+				m_state = STATE_SI;
 			}
 			break;
 		case STATE_S2: // Wait for DGRNT == 1
 			LOGSTATE("DMA state S2\n");
-			if (m_dgrnt == ASSERT_LINE && m_dreq[m_current_channel] == ASSERT_LINE)
+			if (!m_m6844_channel[m_current_channel].active ||
+				((m_m6844_channel[m_current_channel].control & 0x06) != 0x02 && m_dreq[m_current_channel] != ASSERT_LINE))
+			{
+				// channel disabled, or single-byte request withdrawn before the grant, back off
+				// (block mode keeps the bus until the byte count runs out)
+				m_out_drq1_cb(CLEAR_LINE);
+				m_out_drq2_cb(CLEAR_LINE);
+				m_state = STATE_SI;
+			}
+			else if (m_dgrnt == ASSERT_LINE && m_dreq[m_current_channel] == ASSERT_LINE)
 			{
 				m_out_txak_cb(m_current_channel);
 
-				if (m_m6844_channel[m_current_channel].active == 1)  //active dma transfer
+				if (!(m_m6844_channel[m_current_channel].control & 0x01))
 				{
-					if (!(m_m6844_channel[m_current_channel].control & 0x01))
-					{
-						//uint8_t data = 0x55;
-						uint8_t data = m_in_ior_cb[m_current_channel]();
-						LOGTFR("DMA%d from device to memory location %04x: <- %02x\n", m_current_channel, m_m6844_channel[m_current_channel].address, data );
-						m_out_memw_cb(m_m6844_channel[m_current_channel].address, data);
-					}
-					else // dma write to device from memory
-					{
-						uint8_t data = 0;
-						LOGTFR("DMA from memory location to device %04x: -> %02x\n", m_m6844_channel[m_current_channel].address, data );
-						//uint8_t data = m_in_memr_cb(m_m6844_channel[m_current_channel].address);
-						//m_out_iow_cb[m_current_channel](data);
-					}
+					uint8_t data = m_in_ior_cb[m_current_channel]();
+					LOGTFR("DMA%d from device to memory location %04x: <- %02x\n", m_current_channel, m_m6844_channel[m_current_channel].address, data );
+					m_out_memw_cb(m_m6844_channel[m_current_channel].address, data);
+				}
+				else // dma write to device from memory
+				{
+					uint8_t data = m_in_memr_cb(m_m6844_channel[m_current_channel].address);
+					LOGTFR("DMA%d from memory location to device %04x: -> %02x\n", m_current_channel, m_m6844_channel[m_current_channel].address, data );
+					m_out_iow_cb[m_current_channel](data);
+				}
 
-					if (m_m6844_channel[m_current_channel].control & 0x08)
-					{
-						m_m6844_channel[m_current_channel].address--;
-					}
-					else
-					{
-						m_m6844_channel[m_current_channel].address++;
-					}
+				if (m_m6844_channel[m_current_channel].control & 0x08)
+				{
+					m_m6844_channel[m_current_channel].address--;
+				}
+				else
+				{
+					m_m6844_channel[m_current_channel].address++;
+				}
 
-					m_m6844_channel[m_current_channel].counter--;
+				m_m6844_channel[m_current_channel].counter--;
 
-					if (m_m6844_channel[m_current_channel].counter == 0)
+				if (m_m6844_channel[m_current_channel].counter == 0)
+				{
+					m_out_drq1_cb(CLEAR_LINE);
+					m_out_drq2_cb(CLEAR_LINE);
+					// set DMA end, clear busy
+					m_m6844_channel[m_current_channel].control = (m_m6844_channel[m_current_channel].control & ~0x40) | 0x80;
+					m6844_update_interrupt();
+					m_state = STATE_SI;
+				}
+				else
+				{
+					switch(m_m6844_channel[m_current_channel].control & 0x06)
 					{
+					case 0x00:
+						LOGTFR("Mode 2 - single-byte transfer HALT steal mode\n");
+						// one byte stolen, the next one is arbitrated again
+						m_state = STATE_SI;
+						m_out_drq2_cb(CLEAR_LINE);
+						break;
+					case 0x02:
+						LOGTFR("Mode 3 - block transfer mode\n");
+						m_state = STATE_S2; // Just for clarity, we are still in STATE_S2
+						break;
+					case 0x04:
+						LOGTFR("Mode 1 - single-byte transfer TSC steal mode\n");
+						// one byte stolen, the next one is arbitrated again
+						m_state = STATE_SI;
+						m_out_drq1_cb(CLEAR_LINE);
+						break;
+					default: // Undefined - needs verification on real hardware
+						logerror("MC6844: undefined transfer mode, clearing DMA request\n");
+						m_state = STATE_SI;
 						m_out_drq1_cb(CLEAR_LINE);
 						m_out_drq2_cb(CLEAR_LINE);
-						m_m6844_channel[m_current_channel].control |= 0x80;
-						m6844_update_interrupt();
-						m_state = STATE_SI;
-					}
-					else
-					{
-						switch(m_m6844_channel[m_current_channel].control & 0x06)
-						{
-						case 0x00:
-							LOGTFR("Mode 2 - single-byte transfer HALT steal mode\n");
-							m_state = STATE_S1;
-							m_out_drq2_cb(CLEAR_LINE);
-							break;
-						case 0x02:
-							LOGTFR("Mode 3 - block transfer mode\n");
-							m_state = STATE_S2; // Just for clarity, we are still in STATE_S2
-							break;
-						case 0x04:
-							LOGTFR("Mode 1 - single-byte transfer TSC steal mode\n");
-							m_state = STATE_S1;
-							m_out_drq1_cb(CLEAR_LINE);
-							break;
-						default: // Undefined - needs verification on real hardware
-							logerror("MC6844: undefined transfer mode, clearing DMA request\n");
-							m_state = STATE_SI;
-							m_out_drq1_cb(CLEAR_LINE);
-							m_out_drq2_cb(CLEAR_LINE);
-							break;
-						}
+						break;
 					}
 				}
 			}
@@ -463,22 +488,18 @@ void mc6844_device::write(offs_t offset, uint8_t data)
 				if (!m_m6844_channel[i].active && (data & (1 << i)))
 				{
 					// mark us active
-					m_m6844_channel[i].active = 1;
+					m_m6844_channel[i].active = true;
 
 					// set the DMA busy bit and clear the DMA end bit
 					m_m6844_channel[i].control |= 0x40;
 					m_m6844_channel[i].control &= ~0x80;
-
-					// set the starting address, counter, and time
-					m_m6844_channel[i].start_address = m_m6844_channel[i].address;
-					m_m6844_channel[i].start_counter = m_m6844_channel[i].counter;
 				}
 
 				// if we're going inactive...
 				else if (m_m6844_channel[i].active && !(data & (1 << i)))
 				{
 					//mark us inactive
-					m_m6844_channel[i].active = 0;
+					m_m6844_channel[i].active = false;
 				}
 			}
 			break;
