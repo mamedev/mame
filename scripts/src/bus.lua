@@ -3322,6 +3322,8 @@ if BUSES["ISA"] then
 		MAME_DIR .. "src/devices/bus/isa/ultra14f.h",
 		MAME_DIR .. "src/devices/bus/isa/ultra24f.cpp",
 		MAME_DIR .. "src/devices/bus/isa/ultra24f.h",
+		MAME_DIR .. "src/devices/bus/isa/um487f.cpp",
+		MAME_DIR .. "src/devices/bus/isa/um487f.h",
 		MAME_DIR .. "src/devices/bus/isa/vga.cpp",
 		MAME_DIR .. "src/devices/bus/isa/vga.h",
 		MAME_DIR .. "src/devices/bus/isa/vga_ati.cpp",
