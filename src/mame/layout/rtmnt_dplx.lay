@@ -78,80 +78,132 @@
       <color red="1" green="1" blue="1" alpha="1"/>
     </disk>
   </element>
-  <element name="rect_kaos">
-    <rect>
+  <element name="rect_kaos" defstate="0">
+    <rect state="0">
+      <bounds x="0" y="0" width="120" height="39.34"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </rect>
+    <rect state="1">
       <bounds x="0" y="0" width="120" height="39.34"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </rect>
   </element>
-  <element name="rect_kvu6">
-    <rect>
+  <element name="rect_kvu6" defstate="0">
+    <rect state="0">
+      <bounds x="0" y="0" width="120" height="40.32"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </rect>
+    <rect state="1">
       <bounds x="0" y="0" width="120" height="40.32"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </rect>
   </element>
-  <element name="rect_2n6y">
-    <rect>
+  <element name="rect_2n6y" defstate="0">
+    <rect state="0">
+      <bounds x="0" y="0" width="120" height="38.71"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </rect>
+    <rect state="1">
       <bounds x="0" y="0" width="120" height="38.71"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </rect>
   </element>
-  <element name="rect_p8jc">
-    <rect>
+  <element name="rect_p8jc" defstate="0">
+    <rect state="0">
+      <bounds x="0" y="0" width="120" height="38.13"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </rect>
+    <rect state="1">
       <bounds x="0" y="0" width="120" height="38.13"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </rect>
   </element>
-  <element name="rect_nm6a">
-    <rect>
+  <element name="rect_nm6a" defstate="0">
+    <rect state="0">
+      <bounds x="0" y="0" width="120" height="39.28"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </rect>
+    <rect state="1">
       <bounds x="0" y="0" width="120" height="39.28"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </rect>
   </element>
-  <element name="rect_e1i3">
-    <rect>
+  <element name="rect_e1i3" defstate="0">
+    <rect state="0">
+      <bounds x="0" y="0" width="120" height="39.32"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </rect>
+    <rect state="1">
       <bounds x="0" y="0" width="120" height="39.32"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </rect>
   </element>
-  <element name="rect_2zxq">
-    <rect>
+  <element name="rect_2zxq" defstate="0">
+    <rect state="0">
+      <bounds x="0" y="0" width="120" height="39.32"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </rect>
+    <rect state="1">
       <bounds x="0" y="0" width="120" height="39.32"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </rect>
   </element>
-  <element name="disk_riu9">
-    <disk>
+  <element name="disk_riu9" defstate="0">
+    <disk state="0">
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </disk>
+    <disk state="1">
       <bounds x="0" y="0" width="56" height="56"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </disk>
   </element>
-  <element name="disk_x934">
-    <disk>
+  <element name="disk_x934" defstate="0">
+    <disk state="0">
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </disk>
+    <disk state="1">
       <bounds x="0" y="0" width="56" height="56"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </disk>
   </element>
-  <element name="disk_eapa">
-    <disk>
+  <element name="disk_eapa" defstate="0">
+    <disk state="0">
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </disk>
+    <disk state="1">
       <bounds x="0" y="0" width="56" height="56"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </disk>
   </element>
-  <element name="disk_h6ad">
-    <disk>
+  <element name="disk_h6ad" defstate="0">
+    <disk state="0">
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </disk>
+    <disk state="1">
       <bounds x="0" y="0" width="56" height="56"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </disk>
   </element>
-  <element name="disk_fn7r">
-    <disk>
+  <element name="disk_fn7r" defstate="0">
+    <disk state="0">
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </disk>
+    <disk state="1">
       <bounds x="0" y="0" width="56" height="56"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </disk>
   </element>
-  <element name="disk_ps0c">
-    <disk>
+  <element name="disk_ps0c" defstate="0">
+    <disk state="0">
+      <bounds x="0" y="0" width="56" height="56"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
+    </disk>
+    <disk state="1">
       <bounds x="0" y="0" width="56" height="56"/>
       <color red="0.9647058823529412" green="0.3803921568627451" blue="0.3176470588235294" alpha="1"/>
     </disk>
@@ -159,17 +211,17 @@
   <element name="rect_3ttd">
     <rect>
       <bounds x="0" y="0" width="88" height="56"/>
-      <color red="0.8" green="0.8" blue="0.8" alpha="1"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
     </rect>
   </element>
   <element name="rect_80be">
     <rect>
-      <color red="0.8" green="0.8" blue="0.8" alpha="1"/>
+      <color red="0.9019607843137255" green="0.3803921568627451" blue="0" alpha="1"/>
     </rect>
   </element>
   <element name="rect_p82d">
     <rect>
-      <color red="0.8" green="0.8" blue="0.8" alpha="1"/>
+      <color red="0.6470588235294118" green="0.11372549019607843" blue="0.17647058823529413" alpha="1"/>
     </rect>
   </element>
   <element name="rect_c586">
@@ -214,22 +266,22 @@
   </element>
   <element name="rect_lbeh">
     <rect>
-      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
     </rect>
   </element>
   <element name="rect_zgp8">
     <rect>
-      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
     </rect>
   </element>
   <element name="rect_n7nj">
     <rect>
-      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
     </rect>
   </element>
   <element name="rect_9cx5">
     <rect>
-      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
+      <color red="0.8784313725490196" green="0.10588235294117647" blue="0.1411764705882353" alpha="1"/>
     </rect>
   </element>
   <element name="text_0487">
@@ -299,7 +351,7 @@
   </element>
   <element name="rect_ox5c">
     <rect>
-      <color red="0.8980392156862745" green="0.6470588235294118" blue="0.0392156862745098" alpha="1"/>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
     </rect>
   </element>
   <element name="text_uzod">
@@ -324,7 +376,7 @@
   </element>
   <element name="rect_627j">
     <rect>
-      <color red="0.8980392156862745" green="0.6470588235294118" blue="0.0392156862745098" alpha="1"/>
+      <color red="1" green="0.47058823529411764" blue="0" alpha="1"/>
     </rect>
   </element>
   <element name="rect_byee">
@@ -342,12 +394,12 @@
       <color red="0.38823529411764707" green="0.27058823529411763" blue="0.17254901960784313" alpha="1"/>
     </rect>
   </element>
-  <view name="Default">
+  <element name="text_6b8k"><text string="NICHTS" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_bjiv"><text string="-,60" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_ftg7"><text string="-,80" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_kjv0"><text string="1,20" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_rji4"><text string="1,50" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_7foe"><text string="2,40" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_zgvo"><text string="3,-" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_1vde"><text string="3" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_xswn"><text string="6" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_cdli"><text string="12" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_dqt3"><text string="25" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_hpgy"><text string="50" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_lwyk"><text string="100" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_bcfs"><text string="Münzspeicher" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_wh1j"><text string="Sonderspiele" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_wtev"><text string="CHANCEN" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="rect_jbv7"><rect><color red="0.8" green="0.8" blue="0.8" alpha="1"/></rect></element><element name="text_a1dk"><text string="ZÄHLER" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_xp4z"><text string="RISIKO" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_jijy"><text string="START" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><element name="text_bpkl"><text string="STOP" align="0"><color red="1" green="1" blue="1" alpha="1"/></text></element><view name="Default">
     <element name="bg" ref="rect_byee">
-      <bounds x="2.49" y="13.8" width="1016" height="1368"/>
+      <bounds x="2.32" y="13.8" width="1016" height="1368"/>
     </element>
     <element name="bg_l" ref="rect_ox5c">
-      <bounds x="39.9" y="160" width="136" height="1160"/>
+      <bounds x="39.5" y="168" width="136" height="1160"/>
     </element>
     <element name="bg_m" ref="rect_wt5x">
       <bounds x="200" y="64" width="608" height="1264"/>
@@ -361,31 +413,31 @@
     <element name="bg_r_b" ref="rect_5dq7">
       <bounds x="824" y="1144" width="144" height="200"/>
     </element>
-    <element name="led7seg_coin1" ref="led7seg_0xne">
+    <element name="display:digit8" ref="led7seg_0xne">
       <bounds x="736" y="664" width="35.1" height="48"/>
     </element>
-    <element name="led7seg_coin2" ref="led7seg_cbq7">
+    <element name="display:digit7" ref="led7seg_cbq7">
       <bounds x="704" y="664" width="31.59" height="48.38"/>
     </element>
-    <element name="led7seg_coin3" ref="led7seg_8k9u">
+    <element name="display:digit6" ref="led7seg_8k9u">
       <bounds x="672" y="664" width="32.17" height="48.55"/>
     </element>
-    <element name="led7seg_coin4" ref="led7seg_lp1f">
+    <element name="display:digit5" ref="led7seg_lp1f">
       <bounds x="640" y="664" width="31.58" height="48"/>
     </element>
-    <element name="led7seg_xfku" ref="led7seg_xfku">
+    <element name="display:digit2" ref="led7seg_xfku">
       <bounds x="328" y="664" width="34.52" height="49.72"/>
     </element>
-    <element name="led7seg_u5jj" ref="led7seg_u5jj">
+    <element name="display:digit1" ref="led7seg_u5jj">
       <bounds x="304" y="664" width="29.83" height="47.96"/>
     </element>
-    <element name="led7seg_fs42" ref="led7seg_fs42">
+    <element name="display:digit0" ref="led7seg_fs42">
       <bounds x="272" y="664" width="30.41" height="48"/>
     </element>
-    <element name="led7seg_chance2" ref="led7seg_fkcf">
+    <element name="display:digit3" ref="led7seg_fkcf">
       <bounds x="96" y="664" width="24.49" height="41.72"/>
     </element>
-    <element name="led7seg_chance1" ref="led7seg_sh37">
+    <element name="display:digit4" ref="led7seg_sh37">
       <bounds x="120" y="664" width="26.09" height="41.32"/>
     </element>
     <element name="disk_6ls8" ref="disk_6ls8">
@@ -413,7 +465,7 @@
       <bounds x="840" y="552" width="120" height="40.13"/>
     </element>
     <element name="lamp_risk11" ref="rect_nm6a">
-      <bounds x="840" y="504" width="120" height="39.28"/>
+      <bounds x="840" y="500" width="120" height="39.28"/>
     </element>
     <element name="lamp_risk13" ref="rect_e1i3">
       <bounds x="840" y="392" width="120" height="39.32"/>
@@ -529,5 +581,5 @@
     <element name="lamp_stop" ref="text_ist0">
       <bounds x="632" y="560" width="88" height="32"/>
     </element>
-  </view>
+  <element name="text_risk1" ref="text_6b8k"><bounds x="840" y="912" width="120" height="39.49"/></element><element name="text_risk2" ref="text_bjiv"><bounds x="840" y="864" width="56" height="32"/></element><element name="text_risk3" ref="text_ftg7"><bounds x="904" y="864" width="56" height="32"/></element><element name="text_risk4" ref="text_kjv0"><bounds x="840" y="800" width="56" height="32"/></element><element name="text_risk5" ref="text_rji4"><bounds x="904" y="800" width="56" height="32"/></element><element name="text_risk6" ref="text_7foe"><bounds x="840" y="728" width="56" height="32"/></element><element name="text_risk7" ref="text_zgvo"><bounds x="904" y="728" width="56" height="32"/></element><element name="text_risk8" ref="text_1vde"><bounds x="840" y="664" width="120" height="42.21"/></element><element name="text_risk9" ref="text_xswn"><bounds x="840" y="608" width="120" height="40.75"/></element><element name="text_risk10" ref="text_cdli"><bounds x="840" y="552" width="120" height="40.08"/></element><element name="text_risk11" ref="text_dqt3"><bounds x="840" y="500" width="120" height="39.57"/></element><element name="text_risk12" ref="text_hpgy"><bounds x="840" y="448" width="120" height="39.51"/></element><element name="text_risk13" ref="text_lwyk"><bounds x="840" y="392" width="120" height="39.26"/></element><element name="text_7seg_coin" ref="text_bcfs"><bounds x="640" y="640" width="130" height="21.85"/></element><element name="text_7seg_extra_games" ref="text_wh1j"><bounds x="272" y="640" width="90" height="21.75"/></element><element name="text_7seg_chance" ref="text_wtev"><bounds x="98" y="650" width="46.68" height="7.78"/></element><element name="text_7seg_ch_counter" ref="text_a1dk"><bounds x="98" y="657" width="46.68" height="7.39"/></element><element name="text_btn_risk" ref="text_xp4z"><bounds x="856" y="1168" width="88" height="56"/></element><element name="text_btn_start" ref="text_jijy"><bounds x="856" y="1264" width="88" height="28"/></element><element name="text_btn_stop" ref="text_bpkl"><bounds x="856" y="1292" width="88" height="28"/></element></view>
 </mamelayout>

@@ -16,8 +16,21 @@
 	<element name="separator">
 		<disk><color red="1.0" green="0.15" blue="0.05" /></disk>
 	</element>
-	<view name="Displays">
-		<bounds x="0" y="0" width="100" height="30" />
+	<element name="risk_lamp" defstate="0">
+		<disk state="0"><color red="0.12" green="0.015" blue="0.01" /></disk>
+		<disk state="1"><color red="1.0" green="0.12" blue="0.03" /></disk>
+	</element>
+	<element name="risk_title">
+		<text string="Risiko-Lampen"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<repeat count="13">
+		<param name="i" start="1" increment="1" />
+		<element name="lamp_label~i~">
+			<text string="~i~"><color red="1" green="1" blue="1" /></text>
+		</element>
+	</repeat>
+	<view name="Debug Displays">
+		<bounds x="0" y="0" width="100" height="44" />
 		<element ref="chancen"><bounds x="0" y="1" width="25" height="4" /></element>
 		<repeat count="2">
 			<param name="i" start="3" increment="1" />
@@ -37,5 +50,12 @@
 			<element name="display:digit~i~" ref="digit"><bounds x="~x~" y="9" width="9" height="16" /></element>
 		</repeat>
 		<element ref="separator"><bounds x="79" y="23" width="1" height="1" /></element>
+		<element ref="risk_title"><bounds x="0" y="29" width="100" height="4" /></element>
+		<repeat count="13">
+			<param name="i" start="1" increment="1" />
+			<param name="x" start="6" increment="7" />
+			<element name="lamp_risk~i~" ref="risk_lamp"><bounds x="~x~" y="34" width="4" height="4" /></element>
+			<element ref="lamp_label~i~"><bounds x="~x~" y="39" width="4" height="4" /></element>
+		</repeat>
 	</view>
 </mamelayout>
