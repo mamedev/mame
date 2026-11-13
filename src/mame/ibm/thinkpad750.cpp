@@ -54,7 +54,7 @@ Hardware for the 750Cs model (released November 1993):
  Intel SE82365SL (PC Card Controller)
  Dallas DS1267S-010
  Toshiba TC514260BJLL-60 DRAM
- Western Dignital WD90C24A-ZZ (VGA)
+ Western Digital WD90C24A-ZZ (VGA)
  Intel SC82360SL
  Intel KU80486SL-33 CPU
  Avasem AV9154-10CS16 clock generator
@@ -80,6 +80,35 @@ Hardware for the 750Cs model (released November 1993):
  2 x Dallas DS1669S
  2 x Motorola MC33274AD
  National Semiconductor LP339M
+
+
+ Existing BIOS versions:
+                                                            355/355C/355Cs
+                                                            360/360C/360Cs
+	    750/750C/750Cs                                        360CE/360CSE
+	    750P              750Ce             755C/755Cs        360P/360PE
+      ----------------  ----------------  ----------------  ----------------  -------------------------------------------------------
+Ver.    P/N     Date      P/N     Date      P/N     Date      P/N     Date    Feature
+----  ------- --------  ------- --------  ------- --------  ------- --------  -------------------------------------------------------
+1.00  59G3849 10-14-93    N/A     N/A       N/A     N/A       N/A     N/A     Supports 750Cs
+1.01  59G3966 11-19-93    N/A     N/A       N/A     N/A       N/A     N/A     Supports A/D Video Converter
+1.02  59G3968 11-25-93    N/A     N/A       N/A     N/A       N/A     N/A     Corrective service
+1.03  59G3970 12-20-93  89G4293 11-22-93    N/A     N/A       N/A     N/A     Supports 750Ce
+1.04  59G3980 02-28-94  89G4576 02-15-94    N/A     N/A       N/A     N/A     Supports TV Tuner
+1.04a 59G3985 03-01-94   ditto   ditto      N/A     N/A       N/A     N/A     Corrective service
+1.05  59G3983 04-04-94  59G4063 03-18-94    N/A     N/A       N/A     N/A     Supports hard disk drive more than 512MB and CDPD
+1.06  59G3987 05-25-94  40G3482 04-27-94  40G3483 04-27-94  89G5074 05-23-94  Supports 755 and 355/360 families
+1.07   ditto   ditto     ditto   ditto    89G5118 06-03-94  89G5119 06-03-94  Corrective service
+1.07a  ditto   ditto     ditto   ditto     ditto   ditto    89G5213 06-14-94  Corrective service
+1.12  89G5075 07-07-94  89G5076 07-07-94  89G5078 07-20-94  89G5077 07-20-94  Supports Docking Station II
+1.13   ditto   ditto     ditto   ditto     ditto   ditto    89G5704 09-02-94  Corrective service
+1.15  91G0362 10-12-94  91G0363 10-14-94  91G0365 10-14-94  91G0375 10-14-94  Supports 360CE and 360CSE
+1.16   ditto   ditto     ditto   ditto     ditto   ditto     ditto   ditto    Adds a PATCH diskette for Madge TRN ISA card
+1.20  91G0716 03-31-95  91G0720 04-26-95  91G0724 06-30-95  91G0723 06-30-95  Supports Windows 95 (beta) plug and play function
+1.40   ditto   ditto     ditto   ditto    91G1218 09-13-95  91G1217 09-13-95  Supports Windows 95
+1.41   ditto   ditto     ditto   ditto     ditto   ditto     ditto   ditto    Fixes installation problem of 750 family (except 750Ce)
+1.42   ditto   ditto     ditto   ditto    91G1533 02-15-96  91G1534 02-21-96  VGA chip new version support and corrective service
+1.43  91G1719 03-13-96  91G1720 03-13-96   ditto   ditto     ditto   ditto    New function support
 
 ***********************************************************************************************************/
 
@@ -110,11 +139,11 @@ private:
 
 void thinkpad750_state::main_map(address_map &map)
 {
-	map(0xc0000, 0xfffff).rom().region("maincpu", 0);
+  map(0x0000'0000, 0x0009'ffff).ram();
+  map(0x000e'0000, 0x000f'ffff).rom().region("maincpu", 0x20000);
+  map(0xfffc'0000, 0xffff'ffff).rom().region("maincpu", 0);
 }
 
-static INPUT_PORTS_START(thinkpad750)
-INPUT_PORTS_END
 
 void thinkpad750_state::thinkpad750(machine_config &config)
 {
@@ -126,38 +155,6 @@ void thinkpad750_state::thinkpad750(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 }
 
-
-/*
-
-Existing BIOS versions:
-															                              355/355C/355Cs
-															                              360/360C/360Cs
-	    750/750C/750Cs                                        360CE/360CSE
-	    750P              750Ce             755C/755Cs        360P/360PE
-      ----------------  ----------------  ----------------  ----------------  -------------------------------------------------------
-Ver.    P/N     Date      P/N     Date      P/N     Date      P/N     Date    Feature
-----  ------- --------  ------- --------  ------- --------  ------- --------  -------------------------------------------------------
-1.00  59G3849 10-14-93    N/A     N/A       N/A     N/A       N/A     N/A     Supports 750Cs
-1.01  59G3966 11-19-93    N/A     N/A       N/A     N/A       N/A     N/A     Supports A/D Video Converter
-1.02  59G3968 11-25-93    N/A     N/A       N/A     N/A       N/A     N/A     Corrective service
-1.03  59G3970 12-20-93  89G4293 11-22-93    N/A     N/A       N/A     N/A     Supports 750Ce
-1.04  59G3980 02-28-94  89G4576 02-15-94    N/A     N/A       N/A     N/A     Supports TV Tuner
-1.04a 59G3985 03-01-94   ditto   ditto      N/A     N/A       N/A     N/A     Corrective service
-1.05  59G3983 04-04-94  59G4063 03-18-94    N/A     N/A       N/A     N/A     Supports hard disk drive more than 512MB and CDPD
-1.06  59G3987 05-25-94  40G3482 04-27-94  40G3483 04-27-94  89G5074 05-23-94  Supports 755 and 355/360 families
-1.07   ditto   ditto     ditto   ditto    89G5118 06-03-94  89G5119 06-03-94  Corrective service
-1.07a  ditto   ditto     ditto   ditto     ditto   ditto    89G5213 06-14-94  Corrective service
-1.12  89G5075 07-07-94  89G5076 07-07-94  89G5078 07-20-94  89G5077 07-20-94  Supports Docking Station II
-1.13   ditto   ditto     ditto   ditto     ditto   ditto    89G5704 09-02-94  Corrective service
-1.15  91G0362 10-12-94  91G0363 10-14-94  91G0365 10-14-94  91G0375 10-14-94  Supports 360CE and 360CSE
-1.16   ditto   ditto     ditto   ditto     ditto   ditto     ditto   ditto    Adds a PATCH diskette for Madge TRN ISA card
-1.20  91G0716 03-31-95  91G0720 04-26-95  91G0724 06-30-95  91G0723 06-30-95  Supports Windows 95 (beta) plug and play function
-1.40   ditto   ditto     ditto   ditto    91G1218 09-13-95  91G1217 09-13-95  Supports Windows 95
-1.41   ditto   ditto     ditto   ditto     ditto   ditto     ditto   ditto    Fixes installation problem of 750 family (except 750Ce)
-1.42   ditto   ditto     ditto   ditto    91G1533 02-15-96  91G1534 02-21-96  VGA chip new version support and corrective service
-1.43  91G1719 03-13-96  91G1720 03-13-96   ditto   ditto     ditto   ditto    New function support
-
-*/
 
 ROM_START(tpad750cs)
 	ROM_DEFAULT_BIOS("v143")
@@ -177,5 +174,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR, NAME,      PARENT, COMPAT, MACHINE,     INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,         FLAGS
-COMP( 1993, tpad750cs, 0,      0,      thinkpad750, thinkpad750, thinkpad750_state, empty_init, "IBM",   "ThinkPad 750Cs", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR, NAME,      PARENT, COMPAT, MACHINE,     INPUT, CLASS,             INIT,       COMPANY, FULLNAME,         FLAGS
+COMP( 1993, tpad750cs, 0,      0,      thinkpad750, 0,     thinkpad750_state, empty_init, "IBM",   "ThinkPad 750Cs", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
