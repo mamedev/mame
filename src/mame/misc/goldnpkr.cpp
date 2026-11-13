@@ -3513,7 +3513,7 @@ static INPUT_PORTS_START( witchgme )
 	PORT_DIPSETTING(    0x02, "20" )
 	PORT_DIPSETTING(    0x01, "50" )
 	PORT_DIPSETTING(    0x00, "100" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "Coin Lockout" )          PORT_DIPLOCATION("SW2:3")  // coin lock function need to be connected to pia0, porta, bit1
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "NVRAM Reset" )           PORT_DIPLOCATION("SW2:4")
