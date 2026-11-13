@@ -21,8 +21,8 @@
         e100-e101: 6850 UART (for MIDI)
         e200-e2ff: 6522 VIA
         e400-e407: write to both filters
-        e408-e40f: filter cut-off frequency
-        e410-e417: filter resonance
+        e408-e40f: filter resonance
+        e410-e417: filter cut-off frequency
         e418-e41f: DAC pre-set
         e800-e803: WD1770 FDC
         ec00-ecef: ES5503 "DOC" sound chip
@@ -117,9 +117,9 @@ public:
 		, m_irq_merge(*this, "irqmerge")
 		, m_cassette(*this, "cassette")
 		, m_acia(*this, "acia6850")
+		, m_vcf(*this, "vcf%u", 1U)
 		, m_wheel(*this, {PITCH_TAG, MOD_TAG})
 		, m_key(*this, {"pb5", "pb6", "pb7"})
-		, m_vcf(*this, "vcf%u", 1U)
 		, m_kbd_velocity(*this, "kbd_velocity")
 	{
 	}
@@ -134,19 +134,17 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	void coefficients_w(offs_t offset, uint8_t data);
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	void update_keypad_matrix();
+	static constexpr unsigned NUM_VOICES = 8;
 
-	uint8_t mirage_via_read_portb();
-	void mirage_via_write_porta(uint8_t data);
-	void mirage_via_write_portb(uint8_t data);
-	uint8_t mirage_adc_read();
-
-	void mirage_map(address_map &map) ATTR_COLD;
-
-	virtual void machine_reset() override ATTR_COLD;
+	// High level emulation of the R6500/11 keyboard controller.
+	// The controller sends 3-byte messages (status $90 key down / $80 key up,
+	// key number 0-60, raw velocity 0-127) through the VIA shift register,
+	// shifted in MSB first under external clock (CB1 clock, CB2 data). The
+	// CPU acknowledges each byte by pulsing CA2 low.
+	static constexpr uint8_t KBD_QUEUE_SIZE = 64;
 
 	required_device<mc6809e_device> m_maincpu;
 	memory_share_creator<uint8_t> m_sample_ram;
@@ -158,46 +156,46 @@ private:
 	required_device<input_merger_device> m_irq_merge;
 	required_device<cassette_image_device> m_cassette;
 	required_device<acia6850_device> m_acia;
+	required_device_array<cem3328_device, NUM_VOICES> m_vcf;
 
 	required_ioport_array<2> m_wheel;
 	required_ioport_array<3> m_key;
-
-	required_device_array<cem3328_lpf4_device, 8> m_vcf;
 	required_ioport m_kbd_velocity;
 
-	// High level emulation of the R6500/11 keyboard controller.
-	// The controller sends 3-byte messages (status $90 key down / $80 key up,
-	// key number 0-60, raw velocity 0-127) through the VIA shift register,
-	// shifted in MSB first under external clock (CB1 clock, CB2 data). The
-	// CPU acknowledges each byte by pulsing CA2 low.
-	static constexpr uint8_t KBD_QUEUE_SIZE = 64;
+	emu_timer *m_kbd_shift_timer;
+
 	uint8_t m_kbd_queue[KBD_QUEUE_SIZE];
 	uint8_t m_kbd_head;
 	uint8_t m_kbd_tail;
 	uint8_t m_kbd_byte;
 	int8_t m_kbd_step;      // 0-15 while shifting, -1 when idle
 	bool m_kbd_wait_ack;
+	bool m_kbd_reset;       // controller held in reset by PB4
 	uint8_t m_ca2;
-	emu_timer *m_kbd_shift_timer;
-	emu_timer *m_kbd_ack_timer;
-
-	void kbd_queue_message(uint8_t status, uint8_t key, uint8_t velocity);
-	void kbd_start_next();
-	void via_ca2_w(int state);
-	TIMER_CALLBACK_MEMBER(kbd_shift_tick);
-	TIMER_CALLBACK_MEMBER(kbd_ack_timeout);
 
 	int m_mux_value;
 	int m_key_col_select;
 	uint8_t m_portb;
 
-	// Filter control voltages, as held by the sample-and-hold buffers.
-	uint8_t m_vf[8];
-	uint8_t m_vq[8];
-
 	// Phase of each filter's self-oscillation, as seen by the ADC.
-	double m_osc_phase[8];
+	double m_osc_phase[NUM_VOICES];
 	attotime m_osc_last_time;
+
+	void coefficients_w(offs_t offset, uint8_t data);
+	void update_keypad_matrix();
+
+	uint8_t mirage_via_read_portb();
+	void mirage_via_write_porta(uint8_t data);
+	void mirage_via_write_portb(uint8_t data);
+	uint8_t mirage_adc_read();
+
+	void mirage_map(address_map &map) ATTR_COLD;
+
+	void kbd_queue_message(uint8_t status, uint8_t key, uint8_t velocity);
+	void kbd_start_next();
+	void kbd_set_reset(bool state);
+	void via_ca2_w(int state);
+	TIMER_CALLBACK_MEMBER(kbd_shift_tick);
 
 	static float dac_volts(uint8_t data);
 	static float vf_to_pin2(float vf);
@@ -244,33 +242,43 @@ uint8_t enmirage_state::mirage_adc_read()
 
 void enmirage_state::machine_start()
 {
-	save_item(NAME(m_mux_value));
-	save_item(NAME(m_key_col_select));
-	save_item(NAME(m_portb));
-	save_item(NAME(m_vf));
-	save_item(NAME(m_vq));
-	save_item(NAME(m_osc_phase));
-	save_item(NAME(m_osc_last_time));
+	m_kbd_shift_timer = timer_alloc(FUNC(enmirage_state::kbd_shift_tick), this);
+	m_sample_bank->configure_entries(0, 4, m_sample_ram, 0x8000);
+
+	// The VIA's reset runs before machine_reset() and calls the port B and
+	// CA2 handlers, so this state needs its initial values here.
+	std::fill(std::begin(m_kbd_queue), std::end(m_kbd_queue), 0);
+	m_kbd_head = m_kbd_tail = 0;
+	m_kbd_byte = 0;
+	m_kbd_step = -1;
+	m_kbd_wait_ack = false;
+	m_kbd_reset = false;
+	m_ca2 = 1;
+	m_mux_value = 0;
+	m_key_col_select = 0;
+	m_portb = 0x10;
+
+	m_osc_last_time = machine().time();
+	for (unsigned i = 0; i < NUM_VOICES; i++)
+	{
+		m_osc_phase[i] = 0;
+		m_vcf[i]->set_fixed_freq_cv(vf_to_pin2(dac_volts(0)));
+		m_vcf[i]->set_fixed_res_cv(dac_volts(0));
+	}
+
 	save_item(NAME(m_kbd_queue));
 	save_item(NAME(m_kbd_head));
 	save_item(NAME(m_kbd_tail));
 	save_item(NAME(m_kbd_byte));
 	save_item(NAME(m_kbd_step));
 	save_item(NAME(m_kbd_wait_ack));
+	save_item(NAME(m_kbd_reset));
 	save_item(NAME(m_ca2));
-	m_kbd_shift_timer = timer_alloc(FUNC(enmirage_state::kbd_shift_tick), this);
-	m_kbd_ack_timer = timer_alloc(FUNC(enmirage_state::kbd_ack_timeout), this);
-	m_sample_bank->configure_entries(0, 4, m_sample_ram, 0x8000);
-
-	m_osc_last_time = machine().time();
-	for (int i = 0; i < 8; i++)
-	{
-		m_vf[i] = 0;
-		m_vq[i] = 0;
-		m_osc_phase[i] = 0;
-		m_vcf[i]->set_fixed_freq_cv(vf_to_pin2(dac_volts(0)));
-		m_vcf[i]->set_fixed_res_cv(dac_volts(0));
-	}
+	save_item(NAME(m_mux_value));
+	save_item(NAME(m_key_col_select));
+	save_item(NAME(m_portb));
+	save_item(NAME(m_osc_phase));
+	save_item(NAME(m_osc_last_time));
 }
 
 void enmirage_state::machine_reset()
@@ -278,14 +286,11 @@ void enmirage_state::machine_reset()
 	m_sample_bank->set_entry(0);
 	m_mux_value = 0;
 	m_portb = 0x10;
-	m_kbd_head = m_kbd_tail = 0;
-	m_kbd_byte = 0;
-	m_kbd_step = -1;
-	m_kbd_wait_ack = false;
 	m_ca2 = 1;
-	m_kbd_shift_timer->adjust(attotime::never);
-	m_kbd_ack_timer->adjust(attotime::never);
-	m_via->write_cb1(1);
+
+	// flush anything queued before the reset, then let the controller run
+	kbd_set_reset(true);
+	kbd_set_reset(false);
 }
 
 // CV DAC: AD7524 (U41), reference from the -5.1V zener rail, inverted by the
@@ -322,12 +327,12 @@ uint8_t enmirage_state::filter_output_sample()
 		m_osc_last_time = now;
 
 	double sum = 0;
-	for (int i = 0; i < 8; i++)
+	for (unsigned i = 0; i < NUM_VOICES; i++)
 	{
 		const double phase = std::fmod(m_osc_phase[i] + TWO_PI * m_vcf[i]->get_freq() * dt, TWO_PI);
 		if (update)
 			m_osc_phase[i] = phase;
-		if (dac_volts(m_vq[i]) >= cem3328_lpf4_device::RES_OSC_V)
+		if (m_vcf[i]->get_res() >= 4.0F)
 			sum += std::sin(phase);
 	}
 
@@ -362,15 +367,9 @@ void enmirage_state::coefficients_w(offs_t offset, uint8_t data)
 				(filter_input & 0x03) == 0x03 ? "preload dac" : "");
 
 	if ((filter_input & 0x01) == 0)
-	{
-		m_vf[channel] = data;
 		m_vcf[channel]->set_fixed_freq_cv(vf_to_pin2(dac_volts(data)));
-	}
 	if ((filter_input & 0x02) == 0)
-	{
-		m_vq[channel] = data;
 		m_vcf[channel]->set_fixed_res_cv(dac_volts(data));
-	}
 }
 
 INPUT_CHANGED_MEMBER(enmirage_state::key_changed)
@@ -383,6 +382,9 @@ INPUT_CHANGED_MEMBER(enmirage_state::key_changed)
 
 void enmirage_state::kbd_queue_message(uint8_t status, uint8_t key, uint8_t velocity)
 {
+	if (m_kbd_reset)
+		return;
+
 	// drop the whole message if it doesn't fit, so the stream stays in step
 	const uint8_t used = (m_kbd_tail - m_kbd_head + KBD_QUEUE_SIZE) % KBD_QUEUE_SIZE;
 	if (used + 3 >= KBD_QUEUE_SIZE)
@@ -430,16 +432,21 @@ TIMER_CALLBACK_MEMBER(enmirage_state::kbd_shift_tick)
 
 	m_kbd_step = -1;
 	m_kbd_wait_ack = true;
-	// HLE assumption: the OS sometimes defers the acknowledge, so give up
-	// waiting after 2ms rather than stall. The real controller's behavior is
-	// unknown (internal ROM not dumped).
-	m_kbd_ack_timer->adjust(attotime::from_msec(2));
 }
 
-TIMER_CALLBACK_MEMBER(enmirage_state::kbd_ack_timeout)
+// PB4 low holds the controller in reset. The OS does this whenever the disk
+// motor is on, so key events during disk access are lost.
+void enmirage_state::kbd_set_reset(bool state)
 {
+	m_kbd_reset = state;
+	if (!state)
+		return;
+
+	m_kbd_shift_timer->adjust(attotime::never);
+	m_kbd_head = m_kbd_tail = 0;
+	m_kbd_step = -1;
 	m_kbd_wait_ack = false;
-	kbd_start_next();
+	m_via->write_cb1(1);
 }
 
 void enmirage_state::via_ca2_w(int state)
@@ -447,7 +454,6 @@ void enmirage_state::via_ca2_w(int state)
 	// acknowledge is a low pulse on CA2; act on the rising edge
 	if (state && !m_ca2 && m_kbd_wait_ack)
 	{
-		m_kbd_ack_timer->adjust(attotime::never);
 		m_kbd_wait_ack = false;
 		kbd_start_next();
 	}
@@ -539,12 +545,12 @@ void enmirage_state::mirage_via_write_portb(uint8_t data)
 	bank = data & 0x03;
 	m_sample_bank->set_entry(bank);
 
-	// handle floppy motor on
+	// handle floppy motor on and 6500/11 reset (both active low)
 	floppy_image_device *floppy = m_floppy_connector->get_device();
 	if (floppy)
-		floppy->mon_w(data & 0x10 ? 1 : 0);
-
-	// handle 6500/11 reset (TODO)
+		floppy->mon_w(BIT(data, 4));
+	if (BIT(changed, 4))
+		kbd_set_reset(!BIT(data, 4));
 
 	// record audio input mixer position
 	m_mux_value = (data >> 2) & 0x03;
@@ -573,7 +579,7 @@ void enmirage_state::mirage(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	es5503_device &es5503(ES5503(config, "es5503", 8000000));
-	es5503.set_channels(8);
+	es5503.set_channels(NUM_VOICES);
 	es5503.set_addrmap(0, &enmirage_state::enmirage_es5503_map);
 	es5503.irq_func().set(m_irq_merge, FUNC(input_merger_device::in_w<2>));
 	es5503.adc_func().set(FUNC(enmirage_state::mirage_adc_read));
@@ -582,20 +588,20 @@ void enmirage_state::mirage(machine_config &config)
 	// Levels: the DOC's full-scale output current is not known, so assume a
 	// full-scale voice drives the CEM3328 to its rated 6.5V p-p output (1%
 	// THD). The ES5503 device outputs +/-0.125 for a full-scale oscillator.
-	// Each filter output goes through 15K (R119) into the U56 summer with 3.9K
+	// Each filter output goes through 10K (R119) into the U56 summer with 3.9K
 	// (R81) feedback. U56 runs from +12/-8V, so +/-7V is taken as full scale;
 	// the NE570 volume VCA (U48) is treated as unity at full volume.
 	constexpr double DOC_TO_VCF = 3.25 / 0.125;
-	constexpr double VCF_TO_OUT = (RES_K(3.9) / RES_K(15)) / 7.0;
-	for (int i = 0; i < 8; i++)
+	constexpr double VCF_TO_OUT = (RES_K(3.9) / RES_K(10)) / 7.0;
+	for (unsigned i = 0; i < NUM_VOICES; i++)
 	{
 		// Pole caps 0.033uF, R_REF 200K (R117) to -8V.
-		cem3328_lpf4_device &vcf = CEM3328_LPF4(config, m_vcf[i], CAP_U(0.033), RES_K(200), -8.0);
-		es5503.add_route(i, vcf, DOC_TO_VCF, cem3328_lpf4_device::INPUT_AUDIO);
-		vcf.add_route(cem3328_lpf4_device::OUTPUT_LPF4, "speaker", VCF_TO_OUT);
+		cem3328_device &vcf = CEM3328(config, m_vcf[i], CAP_U(0.033), RES_K(200), -8.0);
+		es5503.add_route(i, vcf, DOC_TO_VCF, cem3328_device::INPUT_AUDIO);
+		vcf.add_route(cem3328_device::OUTPUT_LPF4, "speaker", VCF_TO_OUT);
 	}
 
-	MOS6522(config, m_via, 2'000'000); // phi2 is CAS
+	MOS6522(config, m_via, 8_MHz_XTAL / 4); // phi2 is CAS
 	m_via->writepa_handler().set(FUNC(enmirage_state::mirage_via_write_porta));
 	m_via->readpb_handler().set(FUNC(enmirage_state::mirage_via_read_portb));
 	m_via->writepb_handler().set(FUNC(enmirage_state::mirage_via_write_portb));
@@ -652,79 +658,78 @@ static INPUT_PORTS_START(mirage)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cancel")     PORT_CODE(KEYCODE_K)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
 
 	PORT_START(PITCH_TAG)
-	PORT_ADJUSTER(50, "Pitch Wheel")
+	PORT_BIT(0xff, 50, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_MINMAX(0, 100)
+		PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(30)
 	PORT_START(MOD_TAG)
 	PORT_ADJUSTER(0, "Mod Wheel")
 
 	PORT_START("kbd0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key C2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 0)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key C#2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 1)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key D2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 2)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key D#2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 3)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key E2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 4)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key F2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 5)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key F#2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 6)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key G2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 7)
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 0) PORT_GM_C2
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 1) PORT_GM_CS2
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 2) PORT_GM_D2
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 3) PORT_GM_DS2
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 4) PORT_GM_E2
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 5) PORT_GM_F2
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 6) PORT_GM_FS2
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 7) PORT_GM_G2
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 8) PORT_GM_GS2
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 9) PORT_GM_A2
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 10) PORT_GM_AS2
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 11) PORT_GM_B2
 	PORT_START("kbd1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key G#2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 8)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key A2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 9)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key A#2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 10)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key B2") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 11)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key C3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 12)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key C#3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 13)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key D3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 14)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key D#3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 15)
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 12) PORT_GM_C3
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 13) PORT_GM_CS3
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 14) PORT_GM_D3
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 15) PORT_GM_DS3
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 16) PORT_GM_E3
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 17) PORT_GM_F3
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 18) PORT_GM_FS3
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 19) PORT_GM_G3
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 20) PORT_GM_GS3
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 21) PORT_GM_A3
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 22) PORT_GM_AS3
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 23) PORT_GM_B3
 	PORT_START("kbd2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key E3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 16)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key F3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 17)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key F#3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 18)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key G3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 19)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key G#3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 20)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key A3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 21)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key A#3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 22)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key B3") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 23)
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 24) PORT_GM_C4
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 25) PORT_GM_CS4
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 26) PORT_GM_D4
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 27) PORT_GM_DS4
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 28) PORT_GM_E4
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 29) PORT_GM_F4
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 30) PORT_GM_FS4
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 31) PORT_GM_G4
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 32) PORT_GM_GS4
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 33) PORT_GM_A4
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 34) PORT_GM_AS4
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 35) PORT_GM_B4
 	PORT_START("kbd3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key C4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 24)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key C#4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 25)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key D4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 26)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key D#4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 27)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key E4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 28)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key F4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 29)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key F#4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 30)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key G4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 31)
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 36) PORT_GM_C5
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 37) PORT_GM_CS5
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 38) PORT_GM_D5
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 39) PORT_GM_DS5
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 40) PORT_GM_E5
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 41) PORT_GM_F5
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 42) PORT_GM_FS5
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 43) PORT_GM_G5
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 44) PORT_GM_GS5
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 45) PORT_GM_A5
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 46) PORT_GM_AS5
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 47) PORT_GM_B5
 	PORT_START("kbd4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key G#4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 32)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key A4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 33)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key A#4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 34)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key B4") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 35)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key C5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 36)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key C#5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 37)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key D5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 38)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key D#5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 39)
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 48) PORT_GM_C6
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 49) PORT_GM_CS6
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 50) PORT_GM_D6
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 51) PORT_GM_DS6
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 52) PORT_GM_E6
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 53) PORT_GM_F6
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 54) PORT_GM_FS6
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 55) PORT_GM_G6
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 56) PORT_GM_GS6
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 57) PORT_GM_A6
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 58) PORT_GM_AS6
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 59) PORT_GM_B6
 	PORT_START("kbd5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key E5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 40)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key F5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 41)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key F#5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 42)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key G5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 43)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key G#5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 44)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key A5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 45)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key A#5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 46)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key B5") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 47)
-	PORT_START("kbd6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key C6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 48)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key C#6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 49)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key D6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 50)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key D#6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 51)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key E6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 52)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key F6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 53)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key F#6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 54)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key G6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 55)
-	PORT_START("kbd7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key G#6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 56)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key A6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 57)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key A#6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 58)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key B6") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 59)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Key C7") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 60)
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::key_changed), 60) PORT_GM_C7
 
 	PORT_START("kbd_velocity")
 	PORT_CONFNAME(0x7f, 0x68, "Keyboard Velocity")
@@ -752,4 +757,4 @@ void enmirage_state::init_mirage()
 } // anonymous namespace
 
 
-CONS(1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Mirage DMS-8", MACHINE_NOT_WORKING)
+SYST(1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Mirage DSK-8", MACHINE_NOT_WORKING)

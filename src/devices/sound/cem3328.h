@@ -8,7 +8,7 @@
 
 #include "sound/va_vcf.h"
 
-DECLARE_DEVICE_TYPE(CEM3328_LPF4, cem3328_lpf4_device)
+DECLARE_DEVICE_TYPE(CEM3328, cem3328_device)
 
 // CEM3328 four pole low-pass VCF.
 // freq CV: Voltage at pin 2 (frequency control), in volts.
@@ -29,28 +29,32 @@ DECLARE_DEVICE_TYPE(CEM3328_LPF4, cem3328_lpf4_device)
 //   frequency by about +/-1/3 octave, scale factor 18.5 to 21.5mV/octave,
 //   oscillation threshold 2.7 to 3.7V.
 // - All four poles are treated alike. The fourth pole uses a small
-//   capacitor (C_D, about 300pF) behind a 100x transconductor, which should
-//   be equivalent to the other poles' 0.03uF, but this is not verified.
+//   capacitor (C_D, about 300pF) behind a 100x transconductor, which is
+//   equivalent to the other poles' 0.03uF.
 // - Distortion is that of va_lpf4_device and may not match the real chip.
 // - Volume vs. resonance tailoring (pin 4 network) is modeled only as the
 //   uncompensated case (pin 4 grounded): configure_bass_gain_comp() is left
 //   at 0.
 // - The output DC shift is not modeled.
-class cem3328_lpf4_device : public va_lpf4_device
+class cem3328_device : public va_lpf4_device
 {
 public:
-	// c_p: pole capacitor (pins 1, 11, 12; datasheet example 0.033uF).
-	// r_ref: resistor from pin 3 (I_REF) to V_EE.
-	// v_ee: negative supply voltage (e.g. -8.0).
-	cem3328_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, double c_p, double r_ref, double v_ee) ATTR_COLD;
-	cem3328_lpf4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
-
 	// Voltage at pin 10 at which the filter self-oscillates (datasheet: 2.7 to 3.7V, typ. 3.2V).
 	static constexpr float RES_OSC_V = 3.2F;
 
+	// c_p: pole capacitor (pins 1, 11, 12). The datasheet's test conditions
+	//      use 0.03uF (350Hz at V_FREQ = 0); its application example uses
+	//      0.033uF.
+	// r_ref: resistor from pin 3 (I_REF) to V_EE.
+	// v_ee: negative supply voltage (e.g. -8.0).
+	cem3328_device(const machine_config &mconfig, const char *tag, device_t *owner, double c_p, double r_ref, double v_ee) ATTR_COLD;
+	// Defaults to the datasheet's application example (0.033uF, 100K, -12V),
+	// which gives about 318Hz at V_FREQ = 0.
+	cem3328_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
+
 protected:
-	float cv_to_freq(float freq_cv) const override;
-	float cv_to_res(float res_cv) const override;
+	virtual float cv_to_freq(float freq_cv) const override;
+	virtual float cv_to_res(float res_cv) const override;
 
 private:
 	float m_f0;  // Cutoff frequency at V_FREQ = 0.
