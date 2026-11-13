@@ -9,10 +9,6 @@ copyright-holders:stonedDiscord
 	<element name="black_arc"><disk><color red="0" green="0" blue="0"/></disk></element>
 	<element name="line"><rect><color red="0.5" green="0.5" blue="0.5"/></rect></element>
 
-	<element name="logo_data"><text string="DATA"><color red="1" green="1" blue="1"/></text></element>
-	<element name="logo_print"><text string="print"><color red="1" green="1" blue="1"/></text></element>
-	<element name="logo_3000"><text string="3000"><color red="1" green="1" blue="1"/></text></element>
-
 	<element name="label_0"><text string="GERÄT EIN"><color red="1" green="1" blue="1"/></text></element>
 	<element name="label_1"><text string="BATTERIE LEER"><color red="1" green="1" blue="1"/></text></element>
 	<element name="label_2"><text string="ZUM AUTOMAT"><color red="1" green="1" blue="1"/></text></element>
@@ -44,10 +40,6 @@ copyright-holders:stonedDiscord
 
 		<element ref="black"><bounds x="22" y="7" width="66" height="136"/></element>
 		<element ref="black_arc"><bounds x="39" y="7" width="99" height="136"/></element>
-
-		<element ref="logo_data"><bounds x="24" y="24" width="57" height="23"/></element>
-		<element ref="logo_print"><bounds x="75" y="29" width="49" height="18"/></element>
-		<element ref="logo_3000"><bounds x="90" y="42" width="43" height="16"/></element>
 
 		<element ref="line"><bounds x="23" y="58" width="114" height="1.5"/></element>
 		<element ref="line"><bounds x="23" y="70" width="115" height="1.5"/></element>
