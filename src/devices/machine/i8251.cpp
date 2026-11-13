@@ -20,6 +20,7 @@
 #include "emu.h"
 #include "i8251.h"
 
+#include <algorithm>
 #include <bit>
 
 #define LOG_STAT    (1U << 1)
@@ -521,7 +522,9 @@ void v5x_scu_device::update_tx_ready()
 
 void i8251_device::update_tx_empty()
 {
-	m_txempty_handler((m_status & I8251_STATUS_TX_EMPTY) != 0);
+	// "TxEMPTY remains low when the transmitter is disabled even if it is
+	// actually empty" (8251A data sheet, TxE pin)
+	m_txempty_handler((m_status & I8251_STATUS_TX_EMPTY) && BIT(m_command, 0));
 }
 
 
@@ -860,6 +863,11 @@ void i8251_device::data_w(uint8_t data)
 
 	/* writing clears */
 	m_status &=~I8251_STATUS_TX_READY;
+	// TxEMPTY "resets upon receiving a character from the CPU if the
+	// transmitter is enabled" (data sheet); it can already be up while the
+	// last character's stop bits go out (transmit_clock)
+	if (BIT(m_command, 0))
+		m_status &= ~I8251_STATUS_TX_EMPTY;
 	LOGSTAT("8251: status cleared TX_READY by data_w\n");
 	update_tx_ready();
 
