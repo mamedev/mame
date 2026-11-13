@@ -44612,7 +44612,7 @@ qtsbc
 rd100
 
 @source:skeleton/pre_st95.cpp
-rtmnt_dplx
+rtduplex
 
 @source:skeleton/rvoice.cpp
 rvoicepc
