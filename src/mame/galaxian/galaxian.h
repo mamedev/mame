@@ -954,7 +954,6 @@ public:
 	void staratk(machine_config &config) ATTR_COLD;
 
 private:
-
 	void staratk_map(address_map &map) ATTR_COLD;
 	void staratk_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
 	void staratk_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);

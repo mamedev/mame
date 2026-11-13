@@ -1411,7 +1411,39 @@ ROM_START( cjddzsp ) // IGS PCB-0825-02-IU-2. Uses an unemulated DigiArt AM001 A
 	ROM_LOAD( "cjddzsp_igs036.bin", 0x00000, 0x4000, CRC(1146d5f4) SHA1(910662ac3c1d3f3f94abdf0f654a2fb5d96b7b97) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "cjddzsp_s128cn.u18",  0x000000, 0x200000, CRC(0eff886e) SHA1(0cfed5cd0ea5b4c9b497d31d531d8311d804a15d) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "cjddzsp_s122cn.u27", 0x000000, 0x800000, CRC(bfd4b347) SHA1(3618793f45ae473812b421363eb30a78886c39c5) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "cjddzsp_s122cn.u28",  0x000000, 0x800000, CRC(c1dd1809) SHA1(ee542a661ae486f766f2353430dd1116dcb3c321) )
+	ROM_LOAD( "cjddzsp_s127cn.u30",  0x800000, 0x800000, CRC(cb82eaeb) SHA1(938258a8e96c0266d368dbc7c8cf6af110b1a3f1) )
+ROM_END
+
+ROM_START( cjddzsp127cn ) // IGS PCB-0825-02-IU-2. Uses an unemulated DigiArt AM001 ADPCM & MP3 sound chip
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "cjddzsp_igs036.bin", 0x00000, 0x4000, CRC(1146d5f4) SHA1(910662ac3c1d3f3f94abdf0f654a2fb5d96b7b97) )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "cjddzsp_s127cn.u18",  0x000000, 0x200000, CRC(9840aa30) SHA1(98131721981ad1e7bfa1d0da56c3c406e9de26c2) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "cjddzsp_s122cn.u27", 0x000000, 0x800000, CRC(bfd4b347) SHA1(3618793f45ae473812b421363eb30a78886c39c5) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_LOAD( "cjddzsp_s122cn.u28",  0x000000, 0x800000, CRC(c1dd1809) SHA1(ee542a661ae486f766f2353430dd1116dcb3c321) )
+	ROM_LOAD( "cjddzsp_s127cn.u30",  0x800000, 0x800000, CRC(cb82eaeb) SHA1(938258a8e96c0266d368dbc7c8cf6af110b1a3f1) )
+ROM_END
+
+ROM_START( cjddzsp126cn )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "cjddzsp_igs036.bin", 0x00000, 0x4000, CRC(1146d5f4) SHA1(910662ac3c1d3f3f94abdf0f654a2fb5d96b7b97) )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "cjddzsp_s126cn.u18",  0x000000, 0x200000, CRC(96daefd7) SHA1(f1337901fd0a3e4cc2a92458f16535416f84f0c9) )
 
 	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
 	ROM_LOAD( "cjddzsp_s122cn.u27", 0x000000, 0x800000, CRC(bfd4b347) SHA1(3618793f45ae473812b421363eb30a78886c39c5) )
@@ -2107,7 +2139,9 @@ GAME( 200?, dahuaxy,      0,       m036_boot,     hopper,   m036_oki_state,     
 
 // sets with a AM001 for sound, 512x240 resolution
 
-GAME( 200?, cjddzsp,      0,       m036_am001,    ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Super Dou Di Zhu Special (V127CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjddzsp,      0,       m036_am001,    ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Super Dou Di Zhu Special (V128CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjddzsp127cn, cjddzsp, m036_am001,    ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Super Dou Di Zhu Special (V127CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjddzsp126cn, cjddzsp, m036_am001,    ddz,      m036_tt_state,       empty_init,      ROT0, "IGS",           "Super Dou Di Zhu Special (V126CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // sets with a TT5665 for sound, 512x240 resolution
 
