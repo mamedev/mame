@@ -7,10 +7,13 @@ Janshi / Pinkiri 8 / Ron Jan
 
 
  Todo:
- - background tilemap is not fully understood, we lack evidence to support
-   it properly, all the games here just do a solid fill of one tile!
+ - background palette banking and the remaining video control bits are not understood
 
- - sprite heights?!
+ - verify ronjans background palette data at 0x12518 (differs from the other sets)
+
+ - video timing, flipped backgrounds and pixel alignment need verification
+
+ - Jan Mu / Ron Jan protection arithmetic and status protocol
 
 ============================================================================
 Janshi
@@ -41,13 +44,15 @@ Dumped by Chackn
 #include "emu.h"
 
 #include "cpu/z180/hd647180x.h"
-
+#include "machine/msm6242.h"
+#include "machine/nvram.h"
 #include "sound/okim6295.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
-#include "tilemap.h"
+
+#include <iterator>
 
 #define LOG_VRAM (1U << 1)
 
@@ -62,9 +67,6 @@ class janshi_vdp_device : public device_t, public device_memory_interface, publi
 public:
 	// constructor/destructor
 	janshi_vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	// configurations
-	void set_janshi_hack(bool janshi_hack) { m_janshi_hack = janshi_hack; }
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -84,25 +86,20 @@ private:
 
 	required_shared_ptr<uint8_t> m_back_vram;
 	required_shared_ptr<uint8_t> m_vram1;
-	required_shared_ptr<uint8_t> m_unk1;
-	required_shared_ptr<uint8_t> m_widthflags;
-	required_shared_ptr<uint8_t> m_unk2;
+	required_shared_ptr<uint8_t> m_bankctrl;
+	required_shared_ptr<uint8_t> m_spritectrl;
+	required_shared_ptr<uint8_t> m_bgctrl;
 	required_shared_ptr<uint8_t> m_vram2;
 	required_shared_ptr<uint8_t> m_crtc_regs;
 
 	// internal states
-	tilemap_t *m_tilemap = nullptr;
 	uint32_t m_vram_addr;
 	int32_t m_prev_writes;
 
-	// configurations
-	bool m_janshi_hack;
-
-	void back_vram_w(offs_t offset, uint8_t data);
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
-	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank, uint16_t control);
+	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank, uint16_t control);
 
 	void map(address_map &map) ATTR_COLD;
 };
@@ -119,7 +116,6 @@ public:
 
 	void pinkiri8(machine_config &config) ATTR_COLD;
 	void ronjan(machine_config &config) ATTR_COLD;
-	void janshi(machine_config &config) ATTR_COLD;
 	void _4jokers(machine_config &config) ATTR_COLD;
 
 	void init_dec() ATTR_COLD;
@@ -128,7 +124,10 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
+	void common(machine_config &config) ATTR_COLD;
+
 	void output_regs_w(uint8_t data);
+	void counters_w(uint8_t data);
 	void io_matrix_w(uint8_t data);
 	template <unsigned Player> uint8_t io_matrix_r();
 	uint8_t ronjan_prot_r();
@@ -137,6 +136,7 @@ private:
 	uint8_t ronjan_patched_prot_r();
 
 	void _4jokers_prg_map(address_map &map) ATTR_COLD;
+	void _4jokers_io(address_map &map) ATTR_COLD;
 	void pinkiri8_io(address_map &map) ATTR_COLD;
 	void prg_map(address_map &map) ATTR_COLD;
 	void ronjan_io(address_map &map) ATTR_COLD;
@@ -156,12 +156,12 @@ private:
 
 void janshi_vdp_device::map(address_map &map)
 {
-	map(0xfc0000, 0xfc1fff).ram().w(FUNC(janshi_vdp_device::back_vram_w)).share(m_back_vram); // bg tilemap?
+	map(0xfc0000, 0xfc1fff).ram().share(m_back_vram); // background tile rows
 	map(0xfc2000, 0xfc2fff).ram().share(m_vram1); // xpos, colour, tile number etc.
 
-	map(0xfc3700, 0xfc377f).ram().share(m_unk1); // ?? height related?
-	map(0xfc3780, 0xfc37bf).ram().share(m_widthflags);
-	map(0xfc37c0, 0xfc37ff).ram().share(m_unk2); // 2x increasing tables 00 10 20 30 etc.
+	map(0xfc3700, 0xfc377f).ram().share(m_bankctrl);
+	map(0xfc3780, 0xfc37bf).ram().share(m_spritectrl);
+	map(0xfc37c0, 0xfc37ff).ram().share(m_bgctrl); // background row positions
 
 	map(0xfc3800, 0xfc3fff).ram().share(m_vram2); // y pos + unknown
 
@@ -181,14 +181,13 @@ janshi_vdp_device::janshi_vdp_device(const machine_config &mconfig, const char *
 	, m_palette(*this, "palette")
 	, m_back_vram(*this, "back_vram")
 	, m_vram1(*this, "vram1")
-	, m_unk1(*this, "unk1")
-	, m_widthflags(*this, "widthflags")
-	, m_unk2(*this, "unk2")
+	, m_bankctrl(*this, "bankctrl")
+	, m_spritectrl(*this, "spritectrl")
+	, m_bgctrl(*this, "bgctrl")
 	, m_vram2(*this, "vram2")
 	, m_crtc_regs(*this, "crtc_regs")
 	, m_vram_addr(0)
 	, m_prev_writes(0)
-	, m_janshi_hack(false)
 {
 }
 
@@ -216,8 +215,6 @@ void janshi_vdp_device::device_validity_check(validity_checker &valid) const {}
 
 void janshi_vdp_device::device_start()
 {
-	m_tilemap = &machine().tilemap().create(*this, tilemap_get_info_delegate(*this, FUNC(janshi_vdp_device::get_tile_info)), TILEMAP_SCAN_ROWS, 16, 8, 32, 64);
-
 	save_item(NAME(m_vram_addr));
 	save_item(NAME(m_prev_writes));
 }
@@ -229,12 +226,6 @@ device_memory_interface::space_config_vector janshi_vdp_device::memory_space_con
 	return space_config_vector {
 		std::make_pair(0, &m_space_config)
 	};
-}
-
-void janshi_vdp_device::back_vram_w(offs_t offset, uint8_t data)
-{
-	m_back_vram[offset] = data;
-	m_tilemap->mark_tile_dirty(offset >> 2);
 }
 
 void janshi_vdp_device::write(offs_t offset, uint8_t data)
@@ -269,24 +260,38 @@ void janshi_vdp_device::write(offs_t offset, uint8_t data)
 	}
 }
 
-TILE_GET_INFO_MEMBER(janshi_vdp_device::get_tile_info)
+void janshi_vdp_device::draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank, uint16_t control)
 {
-	/* FIXME: color is a bit of a mystery */
-	tile_index <<= 2;
-	int const tile = m_back_vram[tile_index + 1] << 8 | m_back_vram[tile_index + 0];
-	int const attr = m_back_vram[tile_index + 2] ^ 0xf0;
-	int const col = (attr >> 4) | 0x10;
+	int const y = (m_bgctrl[bank * 2] + (control & 0x1ff)) & 0x1ff;
 
-	tileinfo.set(0, tile, col, 0);
+	// Each background bank contains two rows of 32 independently numbered cells.
+	for (int i = 0; i < 64; i++)
+	{
+		int const offset = (bank * 64 + i) * 4;
+		int const code = m_back_vram[offset] | (m_back_vram[offset + 1] << 8);
+		int const color = m_back_vram[offset + 2] >> 3;
+
+		gfx(0)->opaque(bitmap, cliprect, code, color, 0, 0, (i % 32) * 16, y + (i / 32) * 8);
+	}
 }
 
-void janshi_vdp_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+void janshi_vdp_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int bank, uint16_t control)
 {
-	//popmessage("%02x", m_crtc_regs[0x0a]);
 	int const col_bank = BIT(m_crtc_regs[0x0a], 6);
+	// The known flip routines change both bits together; independent axes are unverified.
+	bool const flipx = BIT(m_crtc_regs[0x08], 4);
+	bool const flipy = BIT(m_crtc_regs[0x08], 5);
+	int const width = BIT(m_spritectrl[bank * 2 + 1], 0) + 1;
+	int const height = BIT(control, 14) ? 2 : 4;
+	int const xoffset = m_spritectrl[bank * 2];
+	int const yoffset = control & 0x1ff;
 
-	for (int i = (0x1000 / 4) - 4; i >= 0; i--)
+	for (int i = bank * 32 + 31; i >= bank * 32; i--)
 	{
+		// The firmware preserves ff when transforming disabled objects for flipping.
+		if (m_vram2[i * 2] == 0xff)
+			continue;
+
 		/*
 		"vram1" (video map 0xfc2000)
 
@@ -295,93 +300,15 @@ void janshi_vdp_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 		"vram2" (video map 0xfc3800)
 
 		yyyy yyyy | ???? ???? |
-
-
-		widths come from "widthflags" (0xfc3780)
-		"unk1" (0xfc3700) and "unk2" (0xfc37c0) are a mystery
 		*/
 
-		int spr_offs = (m_vram1[(i * 4) + 0] | (m_vram1[(i * 4) + 1] << 8)) & 0xffff;
-		int col = (m_vram1[(i * 4) + 2] & 0xf8) >> 3;
-		int x =   m_vram1[(i * 4) + 3] * 2;
-
-		//int unk2 = m_vram2[(i * 2) + 1];
-		int y = (m_vram2[(i * 2) + 0]);
-		y = 0x100 - y;
-
-		col |= col_bank << 5;
-
-		//int width = 0, height = 0;
-
-		int width = 2;
-		int height = 2;
-
-		// this bit determines the sprite width, one bit is used in each word, each bit is used for a range of sprites
-		int const bit = m_widthflags[(i / 0x20) * 2 + 1];
-
-		if (bit)
-		{
-			//col = machine().rand();
-			width = 2;
-		}
-		else
-		{
-			width = 1;
-			height = 2;
-		}
-
-		// hacks!
-		if (m_janshi_hack) // janshi
-		{
-			if (spr_offs < 0x400)
-			{
-				height = 4;
-			}
-			else if (spr_offs < 0x580)
-			{
-			//  height = 2;
-			}
-			else if (spr_offs < 0x880)
-			{
-				height = 4;
-			}
-			else if (spr_offs < 0x1000)
-			{
-			//  height = 2;
-			}
-			else if (spr_offs < 0x1080)
-			{
-			//  height = 2;
-			}
-			else if (spr_offs < 0x1700)
-			{
-				height = 4;
-			}
-			else if (spr_offs < 0x1730)
-			{
-			//  height = 2;
-			}
-			else if (spr_offs < 0x1930)
-			{
-				height = 4;
-			}
-			else if (spr_offs < 0x19c0)
-			{
-				height = 1;
-			}
-			else
-			{
-				height = 4;
-			}
-		}
-
-		if (height == 1)
-			y += 16;
-
-		// hmm...
-		if (height == 2)
-			y += 16;
-
+		int const spr_offs = m_vram1[i * 4] | (m_vram1[i * 4 + 1] << 8);
+		int const col = (m_vram1[i * 4 + 2] >> 3) | (col_bank << 5);
+		int const x = ((m_vram1[i * 4 + 3] + xoffset) & 0xff) * 2;
+		int y = 0x100 - ((m_vram2[i * 2] + yoffset) & 0x1ff) - height * 8;
+		// The flipped coordinate tables compensate for a 32-line Y origin.
+		if (flipy)
+			y = ((y + 0x20) & 0xff) - (control & 0x100);
 		int count = 0;
 
 		for (int yy = 0; yy < height; yy++)
@@ -390,8 +317,9 @@ void janshi_vdp_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 			{
 				gfx(0)->transpen(bitmap, cliprect,
 						spr_offs + count, col,
-						0, 0,
-						(x + xx * 16) - 7, (y + yy * 8) - 33,
+						flipx, flipy,
+						(x + (flipx ? (width - 1 - xx) : xx) * 16) - 7,
+						(y + (flipy ? (height - 1 - yy) : yy) * 8) - 1,
 						0);
 				count++;
 			}
@@ -401,31 +329,20 @@ void janshi_vdp_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 uint32_t janshi_vdp_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-#if 0
-	if (machine().input().code_pressed_once(KEYCODE_W))
-	{
-		printf("-------------------------------\n");
-		int count2 = 0;
-		for (int i = 0x00; i < 0x40; i += 2)
-		{
-			printf("%02x, ", m_widthflags[i+1]);
-
-			count2++;
-
-			if (count2 == 0x10)
-			{
-				printf("\n");
-				count2 = 0;
-			}
-		}
-	}
-#endif
-
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
-	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
-
-	draw_sprites(bitmap, cliprect);
+	// Entries select a foreground bank or background row in bits 9-13.
+	// Bit 15 selects the background; the low nine bits give a vertical offset.
+	// Earlier entries have priority over later entries.
+	for (int i = 0x7e; i >= 0; i -= 2)
+	{
+		uint16_t const control = m_bankctrl[i] | (m_bankctrl[i + 1] << 8);
+		int const bank = BIT(control, 9, 5);
+		if (BIT(control, 15))
+			draw_background(bitmap, cliprect, bank, control);
+		else
+			draw_sprites(bitmap, cliprect, bank, control);
+	}
 
 	return 0;
 }
@@ -433,7 +350,7 @@ uint32_t janshi_vdp_device::screen_update(screen_device &screen, bitmap_ind16 &b
 void pinkiri8_state::prg_map(address_map &map)
 {
 	map(0x00000, 0x0bfff).rom();
-	map(0x0c000, 0x0dfff).ram();
+	map(0x0c000, 0x0dfff).ram().share("nvram");
 	map(0x0e000, 0x0ffff).rom();
 	map(0x10000, 0x1ffff).rom();
 }
@@ -454,6 +371,13 @@ void pinkiri8_state::output_regs_w(uint8_t data)
 void pinkiri8_state::io_matrix_w(uint8_t data)
 {
 	m_io_matrix = data;
+}
+
+void pinkiri8_state::counters_w(uint8_t data)
+{
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0)); // coin in
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1)); // key in
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 2)); // key out
 }
 
 template <unsigned Player>
@@ -479,7 +403,7 @@ void pinkiri8_state::pinkiri8_io(address_map &map)
 	map(0xa0, 0xa0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write)); //correct?
 	map(0xb0, 0xb0).w(FUNC(pinkiri8_state::io_matrix_w)); //mux
 	map(0xb0, 0xb0).r(FUNC(pinkiri8_state::io_matrix_r<1>)); // mux inputs
-	map(0xb1, 0xb1).r(FUNC(pinkiri8_state::io_matrix_r<0>)); // mux inputs
+	map(0xb1, 0xb1).rw(FUNC(pinkiri8_state::io_matrix_r<0>), FUNC(pinkiri8_state::counters_w)); // mux inputs / meters
 	map(0xb2, 0xb2).portr("SYSTEM");
 	map(0xf8, 0xf8).portr("DSW1");
 	map(0xf9, 0xf9).portr("DSW2");
@@ -511,6 +435,13 @@ void pinkiri8_state::ronjan_io(address_map &map)
 	pinkiri8_io(map);
 	map(0x90, 0x90).rw(FUNC(pinkiri8_state::ronjan_prot_r), FUNC(pinkiri8_state::ronjan_prot_w));
 	map(0x9f, 0x9f).r(FUNC(pinkiri8_state::ronjan_patched_prot_r));
+}
+
+void pinkiri8_state::_4jokers_io(address_map &map)
+{
+	pinkiri8_io(map);
+	map(0x90, 0x9f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
+	map(0xb1, 0xb1).unmapw();
 }
 
 static INPUT_PORTS_START( base_inputs )
@@ -867,7 +798,9 @@ static INPUT_PORTS_START( ronjan )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_25C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_50C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_100C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:8" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8") // selects alternate video register values
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW4")
 	PORT_DIPNAME( 0x01, 0x01, "Odds Type" ) PORT_DIPLOCATION("SW4:1")
@@ -1064,7 +997,9 @@ static INPUT_PORTS_START( pinkiri8 )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_25C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_50C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_100C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:8" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW3:8") // selects alternate video register values
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW4")
 	PORT_DIPNAME( 0x01, 0x01, "Pinkiri Bonus" ) PORT_DIPLOCATION("SW4:1")
@@ -1081,7 +1016,7 @@ static INPUT_PORTS_START( pinkiri8 )
 	PORT_DIPSETTING(    0x08, "180 Seconds" )
 	PORT_DIPSETTING(    0x10, "120 Seconds" )
 	PORT_DIPSETTING(    0x18, "60 Seconds" )
-	PORT_DIPNAME( 0x20, 0x20, "Panel Type" ) PORT_DIPLOCATION("SW4:6") // no real difference?
+	PORT_DIPNAME( 0x20, 0x20, "Panel Type" ) PORT_DIPLOCATION("SW4:6") // selects the button legends in prompts
 	PORT_DIPSETTING(    0x20, "Mahjong" )
 	PORT_DIPSETTING(    0x00, "Hanafuda" )
 	PORT_DIPNAME( 0x40, 0x40, "Flip Flop Button" ) PORT_DIPLOCATION("SW4:7")
@@ -1099,7 +1034,7 @@ void pinkiri8_state::machine_start()
 	save_item(NAME(m_prot_index));
 }
 
-void pinkiri8_state::pinkiri8(machine_config &config)
+void pinkiri8_state::common(machine_config &config)
 {
 	HD647180X(config, m_maincpu, XTAL(32'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pinkiri8_state::prg_map);
@@ -1123,6 +1058,13 @@ void pinkiri8_state::pinkiri8(machine_config &config)
 	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.5); // clock frequency & pin 7 not verified
 }
 
+void pinkiri8_state::pinkiri8(machine_config &config)
+{
+	common(config);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+}
+
 void pinkiri8_state::ronjan(machine_config &config)
 {
 	pinkiri8(config);
@@ -1131,18 +1073,15 @@ void pinkiri8_state::ronjan(machine_config &config)
 	m_maincpu->in_pg_callback().set(FUNC(pinkiri8_state::ronjan_prot_status_r));
 }
 
-void pinkiri8_state::janshi(machine_config &config)
-{
-	pinkiri8(config);
-
-	m_vdp->set_janshi_hack(true);
-}
-
 void pinkiri8_state::_4jokers(machine_config &config)
 {
-	pinkiri8(config);
+	common(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &pinkiri8_state::_4jokers_prg_map);
+	m_maincpu->set_addrmap(AS_IO, &pinkiri8_state::_4jokers_io);
+
+	// The date-setting and validation routines use an MSM6242-compatible register map.
+	MSM6242(config, "rtc", 32'768); // exact part and clock unverified
 }
 
 /***************************************************************************
@@ -1303,16 +1242,22 @@ ROM_END
 
 uint8_t pinkiri8_state::ronjan_prot_r()
 {
-	static const char wing_str[6] = { 'W', 'I', 'N', 'G', '8', '9' };
+	static constexpr uint8_t RESPONSE[] = { 'W', 'I', 'N', 'G', '8', '9' };
 
-	uint8_t prot_read_index = m_prot_read_index + 1;
+	// Only the six-byte identification response is understood.
+	// Jan Mu also tests arithmetic commands 02/03 at port 9f: operands go to
+	// ports 96..91, with 9e=01 between them, and results are read at 94..91.
+	if (m_prot_read_index >= 2 * std::size(RESPONSE))
+		return 0xff;
+
+	uint8_t const index = m_prot_read_index;
 	if (!machine().side_effects_disabled())
 		m_prot_read_index++;
 
-	if (BIT(prot_read_index, 0))
+	if (!BIT(index, 0))
 		return 0xff; //value is discarded
 
-	return wing_str[(prot_read_index >> 1)-1];
+	return RESPONSE[index >> 1];
 }
 
 void pinkiri8_state::ronjan_prot_w(uint8_t data)
@@ -1323,12 +1268,13 @@ void pinkiri8_state::ronjan_prot_w(uint8_t data)
 	}
 	else
 	{
-		if (m_prot_index == 5)
+		if (m_prot_index == std::size(m_prot_char))
 			return;
 
 		m_prot_char[m_prot_index++] = data;
 
-		if (m_prot_char[0] == 'E' && m_prot_char[1] == 'R' && m_prot_char[2] == 'R' && m_prot_char[3] == 'O' && m_prot_char[4] == 'R')
+		if ((m_prot_index == std::size(m_prot_char)) &&
+			(m_prot_char[0] == 'E') && (m_prot_char[1] == 'R') && (m_prot_char[2] == 'R') && (m_prot_char[3] == 'O') && (m_prot_char[4] == 'R'))
 			m_prot_read_index = 0;
 	}
 }
@@ -1359,7 +1305,7 @@ void pinkiri8_state::init_dec() // same as wing/luckglrn.cpp
 }
 
 
-GAME( 1992,  janshi,   0,       janshi,   janshi,   pinkiri8_state, empty_init, ROT0, "Eagle",         "Janshi",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1992,  janshi,   0,       pinkiri8, janshi,   pinkiri8_state, empty_init, ROT0, "Eagle",         "Janshi",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1991,  ronjan,   ronjans, ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan (set 1)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1994,  ronjana,  ronjans, ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan (set 2)",       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1994,  ronjans,  0,       ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan Super (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
