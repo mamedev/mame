@@ -72,6 +72,8 @@ public:
 		return std::error_condition();
 	}
 
+	virtual bool is_stream() const noexcept override { return true; }
+
 private:
 	HANDLE m_handle;
 };
