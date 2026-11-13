@@ -23627,12 +23627,14 @@ hotmemry11
 pairs
 pairsa
 pairsred
+pubball
 sftm
 sftm110
 sftm111
 sftmj114
 sftmj112
 sftmk112
+shoottv
 shufshot
 shufshot135
 shufshot137
@@ -23659,8 +23661,7 @@ wcbowl16
 wcbowl161
 wcbowl165
 wcbowldx
-shoottv
-pubball
+wcbowldx200
 
 @source:jaleco/acommand.cpp
 acommand

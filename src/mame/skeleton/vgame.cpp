@@ -27,7 +27,6 @@ class vgame_state : public driver_device
 public:
 	vgame_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_program_address(0),
 		m_maincpu(*this, "maincpu"),
 		m_intram(*this, "intram")
 	{ }
@@ -49,7 +48,7 @@ private:
 	void decrypt_rom() ATTR_COLD;
 	void decrypt_program_to_ram() ATTR_COLD;
 
-	u32 m_program_address;
+	u32 m_program_address = 0;
 
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<u32> m_intram;
@@ -175,7 +174,7 @@ ROM_START( hilice )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD( "internal.bin",  0x00000, 0x40000, NO_DUMP )
 
-	ROM_REGION32_LE( 0x200000, "mainrom", 0 ) 
+	ROM_REGION32_LE( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "hi_lice_v102fa.u13", 0x000000, 0x100000, BAD_DUMP CRC(4da87481) SHA1(5a20b254cfe8a2f087faa0dd17f682218a2ca1b2) ) // probably read as wrong ROM type
 	ROM_CONTINUE(                               0x000000, 0x100000 )
 
