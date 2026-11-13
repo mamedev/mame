@@ -63,7 +63,8 @@ public:
 	uint32_t dilated0[15][1024];
 	uint32_t dilated1[15][1024];
 	int dilatechose[64];
-	float wbuffer[480][640];
+	static constexpr int RENDER_HEIGHT = 480; // rows of the accumulation buffer, split between the bands
+	float wbuffer[RENDER_HEIGHT][640];
 
 
 	// the real accumulation buffer is a 32x32x8bpp buffer into which tiles get rendered before they get copied to the framebuffer
@@ -425,7 +426,16 @@ private:
 		uint64_t texture_pages[TEXTURE_PAGES / 64] = { };
 	};
 
+	// one band of rows of the frame, drawn as one work item
+	struct render_band
+	{
+		powervr2_device *device = nullptr;
+		rectangle clip;
+	};
+
 	osd_work_queue *m_render_queue;
+	osd_work_queue *m_band_queue;
+	render_band m_render_bands[WORK_MAX_THREADS];
 	osd_work_item *m_render_request;
 	render_state m_render;
 	uint32_t m_texture_page_mask;
@@ -436,6 +446,7 @@ private:
 	uint64_t m_rendered_tiles[64];
 
 	static void *render_thread_callback(void *param, int threadid);
+	static void *render_band_callback(void *param, int threadid);
 	void wait_for_render(bool discard = false);
 	void collect_texture_pages(int buffer);
 	bool render_reads_texture(uint32_t start, uint32_t end) const;
@@ -571,7 +582,7 @@ private:
 									float const offl[4], float const offr[4]);
 
 	template <pix_sample_fn sample_fn, int group_no>
-		inline void render_span(bitmap_rgb32 &bitmap, texinfo *ti,
+		inline void render_span(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti,
 								float y0, float y1,
 								float xl, float xr,
 								float ul, float ur,
@@ -587,18 +598,21 @@ private:
 								float const doldy[4], float const dordy[4]);
 
 	template <pix_sample_fn sample_fn, int group_no>
-		inline void render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti,
+		inline void render_tri_sorted(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti,
 										const vert *v0,
 										const vert *v1, const vert *v2);
 
 	template <int group_no>
-		void render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v);
+		void render_tri(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti, const vert *v);
 
 	template <int group_no>
-		void render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+		void render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bool scale_uv);
+
+	inline void scale_texture_coordinates(int rs, const strip &ts);
+	bool scale_all_texture_coordinates();
 
 	void sort_vertices(const vert *v, int *i0, int *i1, int *i2);
-	void render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bool scale_uv);
 	void pvr_accumulationbuffer_to_framebuffer(int x, int y);
 	void pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	static uint32_t dilate0(uint32_t value,int bits);

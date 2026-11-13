@@ -23,6 +23,8 @@
 #include "corefloat.h"
 #include "endianness.h"
 
+#include <bitset>
+
 #define LOG_WARN        (1U << 1) // Show warnings
 #define LOG_TA_CMD      (1U << 2) // Show TA CORE commands
 #define LOG_TA_FIFO     (1U << 3) // Show TA FIFO polygon entries
@@ -1125,7 +1127,32 @@ void *powervr2_device::render_thread_callback(void *param, int threadid)
 	// also note: it's completely ignored by render_group_to_accumulation_buffer class inside
 	const rectangle clip(0, 1023, 0, 1023);
 
-	pvr->render_to_accumulation_buffer(*pvr->fake_accumulationbuffer_bitmap, clip);
+	// one band of rows per thread, counting this one; rows share nothing, so the bands can be drawn in any order
+	const int bands = osd_work_queue_thread_count(pvr->m_band_queue) + 1;
+	if ((bands == 1) || (pvr->renderselect < 0) || !pvr->scale_all_texture_coordinates())
+	{
+		pvr->render_to_accumulation_buffer(*pvr->fake_accumulationbuffer_bitmap, clip, true);
+		return nullptr;
+	}
+
+	for (int band = 0; band < bands; band++)
+	{
+		pvr->m_render_bands[band].device = pvr;
+		pvr->m_render_bands[band].clip.set(clip.left(), clip.right(), RENDER_HEIGHT * band / bands, (band < (bands - 1)) ? (RENDER_HEIGHT * (band + 1) / bands - 1) : clip.bottom());
+	}
+	osd_work_item_queue_multiple(pvr->m_band_queue, render_band_callback, bands, &pvr->m_render_bands[0], sizeof(pvr->m_render_bands[0]), WORK_ITEM_FLAG_AUTO_RELEASE);
+	// wait until all bands are done
+	while (!osd_work_queue_wait(pvr->m_band_queue, osd_ticks_per_second()))
+	{
+	}
+	return nullptr;
+}
+
+void *powervr2_device::render_band_callback(void *param, int threadid)
+{
+	const render_band *const band = reinterpret_cast<const render_band *>(param);
+
+	band->device->render_to_accumulation_buffer(*band->device->fake_accumulationbuffer_bitmap, band->clip, false);
 	return nullptr;
 }
 
@@ -2685,7 +2712,7 @@ inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int
 }
 
 template <powervr2_device::pix_sample_fn sample_fn, int group_no>
-inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
+inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti,
 									float y0, float y1,
 									float xl, float xr,
 									float ul, float ur,
@@ -2745,6 +2772,10 @@ inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 	if((yy0 < 0 && y0 > 0) || (yy1 < 0 && y1 > 0)) //temp handling of int32 overflow, needed by hotd2/totd
 		return;
 
+	// the edges are still stepped through the rows above the clip rectangle, so they take the same values in every band
+	if(yy1 > cliprect.bottom() + 1)
+		yy1 = cliprect.bottom() + 1;
+
 	dy = yy0+0.5f-y0;
 
 	if(0)
@@ -2768,7 +2799,8 @@ inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 	}
 
 	while(yy0 < yy1) {
-		render_hline<sample_fn, group_no>(bitmap, ti, yy0, xl, xr, ul, ur, vl, vr, wl, wr, bl, br, offl, offr);
+		if(yy0 >= cliprect.top())
+			render_hline<sample_fn, group_no>(bitmap, ti, yy0, xl, xr, ul, ur, vl, vr, wl, wr, bl, br, offl, offr);
 
 		xl += dxldy;
 		xr += dxrdy;
@@ -2821,13 +2853,17 @@ void powervr2_device::sort_vertices(const vert *v, int *i0, int *i1, int *i2)
 
 
 template <powervr2_device::pix_sample_fn sample_fn, int group_no>
-inline void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
+inline void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
 {
 	float dy01, dy02, dy12;
 
 	float dx01dy, dx02dy, dx12dy, du01dy, du02dy, du12dy, dv01dy, dv02dy, dv12dy, dw01dy, dw02dy, dw12dy;
 
 	if(v0->y >= 480 || v2->y < 0)
+		return;
+
+	// rows are rounded to the nearest integer, so this can't reject a triangle that touches the clip rectangle
+	if(v0->y >= cliprect.bottom() + 2 || v2->y < cliprect.top() - 1)
 		return;
 
 	float db01[4] = {
@@ -2939,15 +2975,15 @@ inline void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti
 			return;
 
 		if(v1->x > v0->x)
-			render_span<sample_fn, group_no>(bitmap, ti, v1->y, v2->y, v0->x, v1->x, v0->u, v1->u, v0->v, v1->v, v0->w, v1->w, v0->b, v1->b, v0->o, v1->o, dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy, db02dy, db12dy, do02dy, do12dy);
+			render_span<sample_fn, group_no>(bitmap, cliprect, ti, v1->y, v2->y, v0->x, v1->x, v0->u, v1->u, v0->v, v1->v, v0->w, v1->w, v0->b, v1->b, v0->o, v1->o, dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy, db02dy, db12dy, do02dy, do12dy);
 		else
-			render_span<sample_fn, group_no>(bitmap, ti, v1->y, v2->y, v1->x, v0->x, v1->u, v0->u, v1->v, v0->v, v1->w, v0->w, v1->b, v0->b, v1->o, v0->o, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy, db12dy, db02dy, do12dy, do02dy);
+			render_span<sample_fn, group_no>(bitmap, cliprect, ti, v1->y, v2->y, v1->x, v0->x, v1->u, v0->u, v1->v, v0->v, v1->w, v0->w, v1->b, v0->b, v1->o, v0->o, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy, db12dy, db02dy, do12dy, do02dy);
 
 	} else if(!dy12) {
 		if(v2->x > v1->x)
-			render_span<sample_fn, group_no>(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy, db01dy, db02dy, do01dy, do02dy);
+			render_span<sample_fn, group_no>(bitmap, cliprect, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy, db01dy, db02dy, do01dy, do02dy);
 		else
-			render_span<sample_fn, group_no>(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy, db02dy, db01dy, do02dy, do01dy);
+			render_span<sample_fn, group_no>(bitmap, cliprect, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy, db02dy, db01dy, do02dy, do01dy);
 
 	} else {
 			float idk_b[4] = {
@@ -2963,17 +2999,17 @@ inline void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti
 				v0->o[3] + do02dy[3] * dy01
 			};
 		if(dx01dy < dx02dy) {
-			render_span<sample_fn, group_no>(bitmap, ti, v0->y, v1->y,
+			render_span<sample_fn, group_no>(bitmap, cliprect, ti, v0->y, v1->y,
 						v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o,
 						dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy, db01dy, db02dy, do01dy, do02dy);
-			render_span<sample_fn, group_no>(bitmap, ti, v1->y, v2->y,
+			render_span<sample_fn, group_no>(bitmap, cliprect, ti, v1->y, v2->y,
 						v1->x, v0->x + dx02dy*dy01, v1->u, v0->u + du02dy*dy01, v1->v, v0->v + dv02dy*dy01, v1->w, v0->w + dw02dy*dy01, v1->b, idk_b, v1->o, idk_o,
 						dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy, db12dy, db02dy, do12dy, do02dy);
 		} else {
-			render_span<sample_fn, group_no>(bitmap, ti, v0->y, v1->y,
+			render_span<sample_fn, group_no>(bitmap, cliprect, ti, v0->y, v1->y,
 						v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o,
 						dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy, db02dy, db01dy, do02dy, do01dy);
-			render_span<sample_fn, group_no>(bitmap, ti, v1->y, v2->y,
+			render_span<sample_fn, group_no>(bitmap, cliprect, ti, v1->y, v2->y,
 						v0->x + dx02dy*dy01, v1->x, v0->u + du02dy*dy01, v1->u, v0->v + dv02dy*dy01, v1->v, v0->w + dw02dy*dy01, v1->w, idk_b, v1->b, idk_o, v1->o,
 						dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy, db02dy, db12dy, do02dy, do12dy);
 		}
@@ -2981,7 +3017,7 @@ inline void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti
 }
 
 template <int group_no>
-void powervr2_device::render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v)
+void powervr2_device::render_tri(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti, const vert *v)
 {
 	int i0, i1, i2;
 
@@ -2994,16 +3030,16 @@ void powervr2_device::render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *
 		if (bilinear) {
 			switch (ti->tsinstruction) {
 			case 0:
-				render_tri_sorted<&powervr2_device::sample_textured<0,true>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<0,true>, group_no>(bitmap, cliprect, ti, v+i0, v+i1, v+i2);
 				break;
 			case 1:
-				render_tri_sorted<&powervr2_device::sample_textured<1,true>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<1,true>, group_no>(bitmap, cliprect, ti, v+i0, v+i1, v+i2);
 				break;
 			case 2:
-				render_tri_sorted<&powervr2_device::sample_textured<2,true>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<2,true>, group_no>(bitmap, cliprect, ti, v+i0, v+i1, v+i2);
 				break;
 			case 3:
-				render_tri_sorted<&powervr2_device::sample_textured<3,true>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<3,true>, group_no>(bitmap, cliprect, ti, v+i0, v+i1, v+i2);
 				break;
 			default:
 				/*
@@ -3011,21 +3047,21 @@ void powervr2_device::render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *
 				 * AND'd with 3
 				 */
 				logerror("%s - tsinstruction is 0x%08x\n", (unsigned)ti->tsinstruction);
-				render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, cliprect, ti, v+i0, v+i1, v+i2);
 			}
 		} else {
 			switch (ti->tsinstruction) {
 			case 0:
-				render_tri_sorted<&powervr2_device::sample_textured<0,false>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<0,false>, group_no>(bitmap, cliprect, ti, v+i0, v+i1, v+i2);
 				break;
 			case 1:
-				render_tri_sorted<&powervr2_device::sample_textured<1,false>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<1,false>, group_no>(bitmap, cliprect, ti, v+i0, v+i1, v+i2);
 				break;
 			case 2:
-				render_tri_sorted<&powervr2_device::sample_textured<2,false>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<2,false>, group_no>(bitmap, cliprect, ti, v+i0, v+i1, v+i2);
 				break;
 			case 3:
-				render_tri_sorted<&powervr2_device::sample_textured<3,false>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<3,false>, group_no>(bitmap, cliprect, ti, v+i0, v+i1, v+i2);
 				break;
 			default:
 				/*
@@ -3033,16 +3069,58 @@ void powervr2_device::render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *
 				 * AND'd with 3
 				 */
 				logerror("%s - tsinstruction is 0x%08x\n", (unsigned)ti->tsinstruction);
-				render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, cliprect, ti, v+i0, v+i1, v+i2);
 			}
 		}
 	} else {
-			render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+			render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, cliprect, ti, v+i0, v+i1, v+i2);
 	}
 }
 
+// texture coordinates are scaled in place, so this must happen exactly once per strip per render
+inline void powervr2_device::scale_texture_coordinates(int rs, const strip &ts)
+{
+	for(int i = ts.svert; i <= ts.evert; i++)
+	{
+		vert *tv = grab[rs].verts + i;
+		tv->u = tv->u * ts.ti.sizex * tv->w;
+		tv->v = tv->v * ts.ti.sizey * tv->w;
+	}
+}
+
+// scales the texture coordinates of every strip ahead of drawing, so the bands only read the vertices
+// returns false, doing nothing, if a vertex is in two strips: scaling ahead would change what the earlier strip draws
+bool powervr2_device::scale_all_texture_coordinates()
+{
+	static constexpr int groups[] = { DISPLAY_LIST_OPAQUE, DISPLAY_LIST_TRANS, DISPLAY_LIST_PUNCH_THROUGH };
+	const int rs = renderselect;
+
+	std::bitset<MAX_VERTS> used;
+	for (const int group_no : groups)
+	{
+		const poly_group &grp = grab[rs].groups[group_no];
+		for (int cs = 0; cs < grp.strips_size; cs++)
+		{
+			for (int i = grp.strips[cs].svert; i <= grp.strips[cs].evert; i++)
+			{
+				if (used[i])
+					return false;
+				used.set(i);
+			}
+		}
+	}
+
+	for (const int group_no : groups)
+	{
+		const poly_group &grp = grab[rs].groups[group_no];
+		for (int cs = 0; cs < grp.strips_size; cs++)
+			scale_texture_coordinates(rs, grp.strips[cs]);
+	}
+	return true;
+}
+
 template <int group_no>
-void powervr2_device::render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap,const rectangle &cliprect)
+void powervr2_device::render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bool scale_uv)
 {
 #if 0
 	int stride;
@@ -3071,33 +3149,31 @@ void powervr2_device::render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap,c
 		if(ev == -1)
 			continue;
 
-		for(i = sv; i <= ev; i++)
-		{
-			vert *tv = grab[rs].verts + i;
-			tv->u = tv->u * ts->ti.sizex * tv->w;
-			tv->v = tv->v * ts->ti.sizey * tv->w;
-		}
+		if(scale_uv)
+			scale_texture_coordinates(rs, *ts);
 
 		for(i = sv; i <= ev - 2; i++)
 		{
 			//if (!(m_render.debug_dip_status&0x2))
-			render_tri<group_no>(bitmap, &ts->ti, grab[rs].verts + i);
+			render_tri<group_no>(bitmap, cliprect, &ts->ti, grab[rs].verts + i);
 		}
 	}
 }
 
-void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect) {
+// draws the rows inside cliprect; every pixel gets the same operations in the same order however the rows are split up
+void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bool scale_uv) {
 	if (renderselect < 0)
 		return;
 
-	memset(wbuffer, 0x00, sizeof(wbuffer));
+	if (cliprect.top() < RENDER_HEIGHT)
+		memset(wbuffer[cliprect.top()], 0x00, (std::min(cliprect.bottom(), RENDER_HEIGHT - 1) - cliprect.top() + 1) * sizeof(wbuffer[0]));
 
 	bitmap.fill(m_render.background, cliprect);
 
 	// TODO: modifier volumes
-	render_group_to_accumulation_buffer<DISPLAY_LIST_OPAQUE>(bitmap, cliprect);
-	render_group_to_accumulation_buffer<DISPLAY_LIST_TRANS>(bitmap, cliprect);
-	render_group_to_accumulation_buffer<DISPLAY_LIST_PUNCH_THROUGH>(bitmap, cliprect);
+	render_group_to_accumulation_buffer<DISPLAY_LIST_OPAQUE>(bitmap, cliprect, scale_uv);
+	render_group_to_accumulation_buffer<DISPLAY_LIST_TRANS>(bitmap, cliprect, scale_uv);
+	render_group_to_accumulation_buffer<DISPLAY_LIST_PUNCH_THROUGH>(bitmap, cliprect, scale_uv);
 }
 
 // copies the accumulation buffer into the framebuffer, converting to the specified format
@@ -4133,6 +4209,7 @@ powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag,
 	, m_cpu_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_mamedebug(*this, "PVR_DEBUG")
 	, m_render_queue(nullptr)
+	, m_band_queue(nullptr)
 	, m_render_request(nullptr)
 	, m_texture_page_mask(0)
 	, m_texture_base(0x04000000)
@@ -4169,6 +4246,7 @@ void powervr2_device::device_start()
 	fake_accumulationbuffer_bitmap = std::make_unique<bitmap_rgb32>(2048,2048);
 
 	m_render_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
+	m_band_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
 	m_texture_page_mask = std::min<size_t>(dc_texture_ram.bytes() >> TEXTURE_PAGE_SHIFT, TEXTURE_PAGES) - 1;
 
 	// the SH-4 can also reach VRAM directly: accesses that would see a render in flight wait for it
@@ -4360,6 +4438,8 @@ void powervr2_device::device_stop()
 	wait_for_render(true);
 	osd_work_queue_free(m_render_queue);
 	m_render_queue = nullptr;
+	osd_work_queue_free(m_band_queue);
+	m_band_queue = nullptr;
 }
 
 void powervr2_device::device_pre_save()
