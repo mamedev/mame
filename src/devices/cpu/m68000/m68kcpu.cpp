@@ -1118,6 +1118,8 @@ void m68000_musashi_device::init_cpu_common(void)
 	save_item(NAME(m_fpu_just_reset));
 	save_item(NAME(m_fpu_pending_exception));
 	save_item(NAME(m_fpu_frame));
+	save_item(NAME(m_fpu_busy_pc));
+	save_item(NAME(m_fpu_busy_reg));
 
 	save_item(NAME(m_mmu_crp_aptr));
 	save_item(NAME(m_mmu_crp_limit));
@@ -2648,6 +2650,8 @@ void m68000_musashi_device::clear_all()
 	m_fpu_just_reset = false;
 	m_fpu_pending_exception = 0;
 	m_fpu_frame.fill(0);
+	m_fpu_busy_pc = 1; // odd, so never matches an instruction address
+	m_fpu_busy_reg = 0;
 
 	m_cyc_bcc_notake_b = 0;
 	m_cyc_bcc_notake_w = 0;

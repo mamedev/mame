@@ -53,6 +53,11 @@ static constexpr u32 EXC_ENB_INEXACT    = 0x00000001;
 static constexpr u32 EXC_ENB_UNDFLOW    = 0x00000002;
 static constexpr u32 EXC_ENB_OVRFLOW    = 0x00000004;
 
+// 68881 FSAVE frame sizes (excluding the format longword) and BIU flags
+static constexpr u32 M6888X_IDLE_SIZE   = 0x18;
+static constexpr u32 M6888X_BUSY_SIZE   = 0xb4;
+static constexpr u32 M6888X_BIU_NO_EXCEPTION = 0x0800'0000; // clear: exception pending
+
 inline extFloat80_t m68000_musashi_device::load_extended_float80(u32 ea)
 {
 	u32 d1,d2;
@@ -500,12 +505,14 @@ void m68000_musashi_device::sync_exception_flags(extFloat80_t op1, extFloat80_t 
 	}
 
 	update_accrued_exceptions();
+	fpu_post_6888x_exception();
 }
 
 // MC68040 User's Manual, sections 9.7 and 9.8.  Exceptions are posted by
 // arithmetic, not by writes to FPCR/FPSR, and reported before the next F-line
-// instruction (except FSAVE/FRESTORE).  Currently posted by FDIV/FSDIV/FDDIV;
-// other operations and the 68881/68882 exception frames remain to be implemented.
+// instruction (except FSAVE/FRESTORE).  On the 68040 they are currently posted
+// by FDIV/FSDIV/FDDIV only; on the 68881/68882 every arithmetic operation posts
+// its enabled exceptions (see fpu_post_6888x_exception).
 u8 m68000_musashi_device::fpu_exception_vector(u32 exceptions) const
 {
 	static constexpr u8 vectors[8] =
@@ -520,6 +527,25 @@ u8 m68000_musashi_device::fpu_exception_vector(u32 exceptions) const
 		}
 	}
 	return 0;
+}
+
+// MC68881/MC68882 User's Manual, section 6.  An enabled exception is
+// reported as a pre-instruction exception on the next floating-point
+// instruction other than FSAVE/FRESTORE.  The pending state stays until FSAVE
+// moves it into the state frame (perform_fsave) and FRESTORE of that frame
+// re-arms it (m68040_do_frestore).
+void m68000_musashi_device::fpu_post_6888x_exception()
+{
+	if (m_cpu_type & CPU_TYPE_040)
+	{
+		return;
+	}
+
+	const u8 vector = fpu_exception_vector(m_fpsr & m_fpcr & 0xff00);
+	if (vector)
+	{
+		m_fpu_pending_exception = vector;
+	}
 }
 
 bool m68000_musashi_device::fpu_check_pending_exception()
@@ -637,9 +663,16 @@ void m68000_musashi_device::fpu_div(u16 command, extFloat80_t source, int precis
 	sync_exception_flags(source, destination, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
 	set_condition_codes(condition_result);
 
+	if (!(m_cpu_type & CPU_TYPE_040))
+	{
+		// 68881/68882: any enabled exception was posted by sync_exception_flags
+		m_fpr[dst] = result;
+		return;
+	}
+
 	// Overflow/underflow require FPSP intervention even when masked on 040.
 	const u32 exceptions = m_fpsr & (m_fpcr | FPES_OVERFLOW | FPES_UNDERFLOW) & 0xff00;
-	m_fpu_pending_exception = (m_cpu_type & CPU_TYPE_040) ? fpu_exception_vector(exceptions) : 0;
+	m_fpu_pending_exception = fpu_exception_vector(exceptions);
 	if (!m_fpu_pending_exception || m_fpu_pending_exception == 49)
 	{
 		m_fpr[dst] = result; // INEX commits the rounded result before trapping
@@ -1675,7 +1708,26 @@ void m68000_musashi_device::WRITE_EA_PACK(int mode, int reg, int k, extFloat80_t
 	}
 }
 
+// The 68881/68882 executes concurrently with the CPU: the CPU is released as
+// soon as the operands have been transferred.  An FSAVE immediately following
+// an arithmetic instruction therefore finds the FPU still busy and receives a
+// BUSY state frame, and FRESTORE of that frame completes the instruction.
+// MAME executes the instruction atomically, so remember where it ended and
+// which register it wrote for perform_fsave.
 void m68000_musashi_device::fpgen_rm_reg(u16 w2)
+{
+	fpgen_execute(w2);
+
+	if (!(m_cpu_type & CPU_TYPE_040))
+	{
+		const bool fmovecr = BIT(w2, 14) && (BIT(w2, 10, 3) == 7);
+		const bool compare = !fmovecr && ((w2 & 0x78) == 0x38); // FCMP and FTST have no destination
+		m_fpu_busy_pc = compare ? 1 : m_pc;
+		m_fpu_busy_reg = BIT(w2, 7, 3);
+	}
+}
+
+void m68000_musashi_device::fpgen_execute(u16 w2)
 {
 	// arithmetic instructions record their address for exception handlers
 	m_fpiar = m_ppc;
@@ -1904,6 +1956,14 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		{
 			m_fpr[dst] = source;
 			set_condition_codes(m_fpr[dst]);
+			// the 68881/68882 signal underflow when the result is denormalized
+			// (the 68040 takes an unimplemented data type exception instead)
+			if (!(m_cpu_type & CPU_TYPE_040) && !(source.signExp & 0x7fff) && source.signif && !BIT(source.signif, 63))
+			{
+				m_fpsr |= FPES_UNDERFLOW;
+				update_accrued_exceptions();
+				fpu_post_6888x_exception();
+			}
 			m_icount -= 56;
 			break;
 		}
@@ -2080,7 +2140,11 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			s8 const mode = softfloat_roundingMode;
 			uint64_t quotient;
 			softfloat_roundingMode = softfloat_round_minMag;
-			extFloat80_remainder(m_fpr[dst], source, m_fpr[dst], quotient);
+			// the 68881 computes the complete remainder in one instruction;
+			// iterate past softfloat's partial (x87 FPREM style) result
+			while (extFloat80_remainder(m_fpr[dst], source, m_fpr[dst], quotient) > 0)
+			{
+			}
 			set_condition_codes(m_fpr[dst]);
 			softfloat_roundingMode = mode;
 			m_fpsr &= 0xff00ffff;
@@ -2126,7 +2190,10 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			s8 const mode = softfloat_roundingMode;
 			uint64_t quotient;
 			softfloat_roundingMode = softfloat_round_near_even;
-			extFloat80_ieee754_remainder(m_fpr[dst], source, m_fpr[dst], quotient);
+			// complete remainder, as for FMOD above
+			while (extFloat80_ieee754_remainder(m_fpr[dst], source, m_fpr[dst], quotient) > 0)
+			{
+			}
 			set_condition_codes(m_fpr[dst]);
 			sync_exception_flags(dstCopy, source, EXC_ENB_UNDFLOW);
 			softfloat_roundingMode = mode;
@@ -2907,29 +2974,34 @@ int m68000_musashi_device::perform_fsave(u32 addr, int inc)
 		}
 	}
 
-	if (inc)
+	// 68881 (version 0x1f) IDLE or BUSY frame.  The last longword holds the
+	// BIU flags; bit 27 clear means an exception is pending, and exception
+	// handlers set it to dismiss the exception before FRESTORE.
+	const bool busy = m_ppc == m_fpu_busy_pc;
+	const u32 size = busy ? M6888X_BUSY_SIZE : M6888X_IDLE_SIZE;
+	const u32 start = inc ? addr : addr - size - 4;
+	m68ki_write_32(start, 0x1f000000 | (size << 16));
+	for (u32 offset = 4; offset < size; offset += 4)
 	{
-		// 68881 IDLE, version 0x1f
-		m68ki_write_32(addr, 0x1f180000);
-		m68ki_write_32(addr+4, 0);
-		m68ki_write_32(addr+8, 0);
-		m68ki_write_32(addr+12, 0);
-		m68ki_write_32(addr+16, 0);
-		m68ki_write_32(addr+20, 0);
-		m68ki_write_32(addr+24, 0x70000000);
-		return 7*4;
+		m68ki_write_32(start + offset, 0);
 	}
-	else
+	if (busy)
 	{
-		m68ki_write_32(addr-4, 0x70000000);
-		m68ki_write_32(addr-8, 0);
-		m68ki_write_32(addr-12, 0);
-		m68ki_write_32(addr-16, 0);
-		m68ki_write_32(addr-20, 0);
-		m68ki_write_32(addr-24, 0);
-		m68ki_write_32(addr-28, 0x1f180000);
-		return -7*4;
+		// The contents of a BUSY frame are internal to the FPU; MAME keeps
+		// the destination register and the result of the interrupted
+		// instruction so that FRESTORE can complete it.
+		const extFloat80_t &result = m_fpr[m_fpu_busy_reg];
+		m68ki_write_32(start + 0x04, m_fpu_busy_reg);
+		m68ki_write_32(start + 0x08, u32(result.signExp) << 16);
+		m68ki_write_32(start + 0x0c, u32(result.signif >> 32));
+		m68ki_write_32(start + 0x10, u32(result.signif));
 	}
+	m68ki_write_32(start + size, 0x70000000 | (m_fpu_pending_exception ? 0 : M6888X_BIU_NO_EXCEPTION));
+
+	// the exceptional state now lives in the frame
+	m_fpu_pending_exception = 0;
+	m_fpu_busy_pc = 1;
+	return inc ? int(size + 4) : -int(size + 4);
 }
 
 // FRESTORE on a nullptr frame reboots the FPU - all registers to NaN, the 3 status regs to 0
@@ -2939,6 +3011,7 @@ void m68000_musashi_device::do_frestore_null()
 
 	m_fpu_pending_exception = 0;
 	m_fpu_frame.fill(0);
+	m_fpu_busy_pc = 1;
 	m_fpcr = 0;
 	m_fpsr = 0;
 	m_fpiar = 0;
@@ -3010,6 +3083,23 @@ void m68000_musashi_device::m68040_do_frestore(u32 addr, int reg)
 				m_fpu_pending_exception = fpu_exception_vector(m_fpsr & (m_fpcr | FPES_OVERFLOW | FPES_UNDERFLOW) & 0xff00);
 			}
 		}
+		else if (!m40)
+		{
+			const u32 size = BIT(temp, 16, 8);
+			if ((temp >> 24) == 0x1f && size == M6888X_BUSY_SIZE)
+			{
+				// complete the instruction saved by perform_fsave
+				extFloat80_t &result = m_fpr[m68ki_read_32(addr + 0x04) & 7];
+				result.signExp = m68ki_read_32(addr + 0x08) >> 16;
+				result.signif = (u64(m68ki_read_32(addr + 0x0c)) << 32) | m68ki_read_32(addr + 0x10);
+			}
+			if ((size == M6888X_IDLE_SIZE || size == M6888X_BUSY_SIZE) && !(m68ki_read_32(addr + size) & M6888X_BIU_NO_EXCEPTION))
+			{
+				// FPSR/FPCR are restored separately, before FRESTORE
+				m_fpu_pending_exception = fpu_exception_vector(m_fpsr & m_fpcr & 0xff00);
+			}
+		}
+		m_fpu_busy_pc = 1;
 
 		if (reg != -1)
 		{

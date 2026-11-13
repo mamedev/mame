@@ -176,6 +176,8 @@ protected:
 	bool m_fpu_just_reset; /* Indicates the FPU was just reset */
 	u8 m_fpu_pending_exception;
 	std::array<u32, 25> m_fpu_frame; // 68040 revision $41 busy FSAVE frame
+	u32 m_fpu_busy_pc;  // 6888x: address after the last FPU operation; FSAVE here finds the FPU still busy
+	u8 m_fpu_busy_reg;  // 6888x: destination register of that operation
 	bool m_restart_instruction; /* Indicates the instruction should be restarted */
 
 	// 68010 format-8 RR=1: handler already ran the faulted cycle (DIB).
@@ -368,6 +370,7 @@ protected:
 	void update_accrued_exceptions();
 	void sync_exception_flags(extFloat80_t op1, extFloat80_t op2, u32 enables);
 	u8 fpu_exception_vector(u32 exceptions) const;
+	void fpu_post_6888x_exception();
 	bool fpu_check_pending_exception();
 	void fpu_exception_frame(u16 command, extFloat80_t source, extFloat80_t destination, bool writeback);
 	void fpu_div(u16 command, extFloat80_t source, int precision);
@@ -386,6 +389,7 @@ protected:
 	void WRITE_EA_FPE(int mode, int reg, extFloat80_t fpr, u32 address);
 	void WRITE_EA_PACK(int mode, int reg, int k, extFloat80_t fpr, u32 address);
 	void fpgen_rm_reg(u16 w2);
+	void fpgen_execute(u16 w2);
 	void fmove_reg_mem(u16 w2);
 	void fmove_fpcr(u16 w2);
 	void apply_fpcr_rounding();
