@@ -395,6 +395,7 @@ public:
 class tms70c02_device : public tms7000_device
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::COMMS; }
 	tms70c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
@@ -402,6 +403,7 @@ public:
 class tms70c42_device : public tms7000_device
 {
 public:
+	static constexpr feature_type unemulated_features() { return feature::COMMS; }
 	tms70c42_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
