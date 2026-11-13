@@ -47,6 +47,7 @@
 #define LOG_REGS    (1U << 2)
 #define LOG_CONF    (1U << 3)
 #define LOG_RAW     (1U << 4) // a set_raw friendly version of CONF
+#define LOG_RESET   (1U << 5)
 
 //#define VERBOSE (LOG_SETUP|LOG_CONF|LOG_REGS)
 //#define LOG_OUTPUT_FUNC osd_printf_info
@@ -57,6 +58,7 @@
 #define LOGREGS(...)    LOGMASKED(LOG_REGS,  __VA_ARGS__)
 #define LOGCONF(...)    LOGMASKED(LOG_CONF,  __VA_ARGS__)
 #define LOGRAW(...)     LOGMASKED(LOG_RAW,  __VA_ARGS__)
+#define LOGRESET(...)   LOGMASKED(LOG_RESET,  __VA_ARGS__)
 
 DEFINE_DEVICE_TYPE(MC6845,   mc6845_device,   "mc6845",   "Motorola MC6845 CRTC")
 DEFINE_DEVICE_TYPE(MC6845_1, mc6845_1_device, "mc6845_1", "Motorola MC6845-1 CRTC")
@@ -84,9 +86,11 @@ DEFINE_DEVICE_TYPE(HD6345,   hd6345_device,   "hd6345",   "Hitachi HD6345 CRTC-I
 mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_video_interface(mconfig, *this, false)
+	, m_reset_hold_frame(false)
 	, m_line_counter_mask(0x7f)
 	, m_interlace_fields(false)
 	, m_latch_row_end(false)
+	, m_reset_held(false)
 	, m_line_timer(nullptr)
 	, m_show_border_area(true)
 	, m_noninterlace_adjust(0)
@@ -112,6 +116,10 @@ mc6845_device::mc6845_device(const machine_config &mconfig, device_type type, co
 mc6845_device::mc6845_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, MC6845, tag, owner, clock)
 {
+	// the Motorola sheet holds DE and CURSOR off for a frame after RESET.
+	// Boards with an HD46505R use this device too and get the hold, which
+	// the Hitachi sheet doesn't describe.
+	m_reset_hold_frame = true;
 }
 
 
@@ -414,7 +422,7 @@ void mc6845_device::recompute_parameters(bool postload)
 		m_hsync_off_pos = hsync_off_pos;
 		m_vsync_on_pos = vsync_on_pos;
 		m_vsync_off_pos = vsync_off_pos;
-		if (m_line_timer && !m_line_timer->enabled() && m_has_valid_parameters)
+		if (m_line_timer && !m_line_timer->enabled() && m_has_valid_parameters && !m_reset_held)
 		{
 			m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
 		}
@@ -424,6 +432,10 @@ void mc6845_device::recompute_parameters(bool postload)
 
 void mc6845_device::update_counters()
 {
+	// held in reset, the counters stay cleared
+	if (m_reset_held)
+		return;
+
 	m_character_counter = attotime_to_cclks(m_line_timer->elapsed());
 
 	if (m_hsync_off_timer->enabled())
@@ -655,21 +667,10 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		/* Check if we have reached the end of a full cycle */
 		if (m_adjust_counter == m_vert_total_adj)
 		{
-			m_adjust_active = 0;
 			m_field = field_raster ? (m_field ^ 1) : 0;
-			m_raster_counter = m_field;
-			m_line_counter = 0;
-			m_line_address = m_disp_start_addr;
-			m_line_enable_ff = true;
-
-			if (m_supports_vert_sync_width)
-			{
-				if (match_line())
-					new_vsync = true;
-			}
-
-			/* also update the cursor state now */
-			update_cursor_state();
+			m_reset_hold_active = false;
+			if (reload_frame_counters())
+				new_vsync = true;
 
 			frame_start();
 		}
@@ -679,7 +680,33 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 		}
 	}
 
-	if (m_line_enable_ff)
+	start_line(new_vsync);
+}
+
+
+// the first line of a frame, at the end of the last one or on RESET release:
+// reload the start address and update the cursor; true if VSYNC begins here
+bool mc6845_device::reload_frame_counters()
+{
+	m_adjust_active = 0;
+	m_raster_counter = m_field;
+	m_line_counter = 0;
+	m_line_address = m_disp_start_addr;
+	m_line_enable_ff = true;
+
+	update_cursor_state();
+
+	return m_supports_vert_sync_width && match_line();
+}
+
+
+// begin the line the counters now describe: schedule its DE, cursor and
+// HSYNC edges and the end-of-line callback
+void mc6845_device::start_line(bool new_vsync)
+{
+	bool const display = m_line_enable_ff && !m_reset_hold_active;
+
+	if (display)
 	{
 		/* Schedule DE off signal change */
 		m_de_off_timer->adjust(cclks_to_attotime(m_horiz_disp));
@@ -704,7 +731,9 @@ TIMER_CALLBACK_MEMBER(mc6845_device::handle_line_timer)
 
 	/* Set VSYNC and DE signals */
 	set_vsync(new_vsync);
-	set_de(m_line_enable_ff ? true : false);
+	if (m_reset_held) // the VSYNC callback asserted RESET
+		return;
+	set_de(display);
 }
 
 
@@ -715,10 +744,10 @@ TIMER_CALLBACK_MEMBER(mc6845_device::de_off_tick)
 
 TIMER_CALLBACK_MEMBER(mc6845_device::cursor_on)
 {
-	set_cur(true);
-
-	/* Schedule CURSOR off signal */
+	// schedule CURSOR off before the callback, which may assert RESET
 	m_cursor_off_timer->adjust(cclks_to_attotime(1));
+
+	set_cur(true);
 }
 
 TIMER_CALLBACK_MEMBER(mc6845_device::cursor_off)
@@ -731,10 +760,11 @@ TIMER_CALLBACK_MEMBER(mc6845_device::hsync_on)
 	uint8_t hsync_width = (m_sync_width & 0x0f) ? (m_sync_width & 0x0f) : 0x10;
 
 	m_hsync_width_counter = 0;
-	set_hsync(true);
 
-	/* Schedule HSYNC off signal */
+	// schedule HSYNC off before the callback, which may assert RESET
 	m_hsync_off_timer->adjust(cclks_to_attotime(hsync_width));
+
+	set_hsync(true);
 }
 
 TIMER_CALLBACK_MEMBER(mc6845_device::hsync_off)
@@ -782,6 +812,85 @@ uint16_t mc6845_device::get_ma()
 uint8_t mc6845_device::get_ra()
 {
 	return m_raster_counter;
+}
+
+
+void mc6845_device::reset_w(int state)
+{
+	bool const held = !state;
+	if (held == m_reset_held)
+		return;
+	m_reset_held = held;
+	LOGRESET("%s: RESET %s\n", machine().describe_context(), held ? "held" : "released");
+
+	if (!started())
+		return;
+
+	if (held)
+	{
+		// every counter stops and clears and every output goes low; the
+		// registers are kept.  Clearing the cursor blink counter too is
+		// inferred: no sheet names it.  Not modelled: the minimum hold of
+		// one CCLK; RESET with LPSTB high, which is a test mode on the
+		// MC6845 and ignored by the HD46505R (there is no LPSTB level input
+		// here, so it reads low); HSYNC being undefined until R2 is written
+		// (MC6845).  Not reset: the MOS 8563's own draw counters.
+
+		// disabled, not rescheduled: the restart paths test enabled()
+		m_line_timer->enable(false);
+		m_de_off_timer->enable(false);
+		m_cursor_on_timer->enable(false);
+		m_cursor_off_timer->enable(false);
+		m_hsync_on_timer->enable(false);
+		m_hsync_off_timer->enable(false);
+		m_character_counter = 0;
+		m_hsync_width_counter = 0;
+		m_raster_counter = 0;
+		m_line_counter = 0;
+		m_line_address = 0;
+		m_adjust_counter = 0;
+		m_adjust_active = 0;
+		m_vsync_width_counter = 0;
+		m_vsync_ff = 0;
+		m_field = 0;
+		m_cursor_blink_count = 0;
+		m_cursor_state = false;
+		m_cursor_x = -1;
+		m_line_enable_ff = true;    // line counter 0 is in the display area
+		m_row_end = false;
+		m_reset_hold_active = false;
+
+		// state first, then the callbacks, which may act on it; stop if one
+		// releases RESET, which has then started a line
+		set_cur(false);
+		if (!m_reset_held)
+			return;
+		set_hsync(false);
+		if (!m_reset_held)
+			return;
+		if (m_vsync) // the MOS 8563's set_vsync counts every call
+			set_vsync(false);
+		if (!m_reset_held)
+			return;
+		set_de(false);
+	}
+	else if (m_has_valid_parameters || m_display_off)
+	{
+		// scan timing starts at release (R6545-1, SY6545); starting at the
+		// first line of a frame, at R12/R13, is inferred.  The MC6845 holds
+		// DE and CURSOR off until a frame has been displayed; the 6545 sheets
+		// describe no such hold.  With R1 or R6 at 0 the sync timing still
+		// runs, so it restarts too.  frame_start() is skipped: it moves the
+		// screen origin, which a CRTC reset every row would do every row.
+		m_reset_hold_active = m_reset_hold_frame;
+		start_line(reload_frame_counters());
+	}
+	else
+	{
+		// nothing to scan yet: recompute_parameters() starts the line timer
+		// once the registers are valid, so leave the power-up state for it
+		m_line_enable_ff = false;
+	}
 }
 
 
@@ -1004,9 +1113,14 @@ void mc6845_device::device_start()
 	m_display_disabled_msg_shown = false;
 	m_line_enable_ff = false;
 	m_vsync_ff = 0;
+	m_character_counter = 0;
+	m_hsync_width_counter = 0;
 	m_raster_counter = 0;
 	m_field = 0;
 	m_row_end = false;
+	m_adjust_counter = 0;
+	m_vsync_width_counter = 0;
+	m_reset_hold_active = false;
 	m_adjust_active = 0;
 	m_horiz_sync_pos = 1;
 	m_vert_sync_pos = 1;
@@ -1076,6 +1190,8 @@ void mc6845_device::device_start()
 	save_item(NAME(m_adjust_active));
 	save_item(NAME(m_line_address));
 	save_item(NAME(m_cursor_x));
+	save_item(NAME(m_reset_held));
+	save_item(NAME(m_reset_hold_active));
 	save_item(NAME(m_has_valid_parameters));
 	save_item(NAME(m_display_off));
 	save_item(NAME(m_display_off_columns));
@@ -1091,7 +1207,9 @@ void mc6845_device::device_reset()
 
 	m_out_vsync_cb(false);
 
-	if (!m_line_timer->enabled() && m_has_valid_parameters)
+	m_reset_hold_active = false;
+
+	if (!m_line_timer->enabled() && m_has_valid_parameters && !m_reset_held)
 	{
 		m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
 	}
@@ -1124,6 +1242,8 @@ void mc6845_device::device_validity_check(validity_checker &valid) const
 mc6845_1_device::mc6845_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: mc6845_device(mconfig, MC6845_1, tag, owner, clock)
 {
+	// inferred from the MC6845 sheet; no MC6845-1 sheet checked
+	m_reset_hold_frame = true;
 }
 
 void mc6845_1_device::device_start()
