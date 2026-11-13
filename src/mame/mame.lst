@@ -48062,7 +48062,12 @@ trs80l2
 trs80dt1
 
 @source:trs/trs80m2.cpp
+tandy6k
+tandy6khd
+trs80m12
 trs80m16
+trs80m16b
+trs80m16bhd
 trs80m2
 
 @source:trs/trs80m3.cpp

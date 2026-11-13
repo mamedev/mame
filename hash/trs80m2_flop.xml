@@ -18,14 +18,26 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="lsdos631" supported="no">
+	<software name="lsdos631">
 		<description>LS-DOS v6.3.1A</description>
 		<year>1990</year>
 		<publisher>Misosys</publisher>
 
 		<part name="flop1" interface="floppy_8">
-			<dataarea name="flop" size="813136">
-				<rom name="l2-631a.dmk" size="813136" crc="1e17cd43" sha1="58369a29043513e62098ee1a8bdfd820ebf8a95b"/>
+			<dataarea name="flop" size="589943">
+				<rom name="l2-631a.imd" size="589943" crc="462ff45d" sha1="2b8d587885685082fd7c60392d80cdb21f9f1c9e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsdos631ds" cloneof="lsdos631">
+		<description>LS-DOS v6.3.1A (double sided, with extras)</description>
+		<year>1990</year>
+		<publisher>Misosys</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="1177086">
+				<rom name="lsd631ds.imd" size="1177086" crc="669f18b2" sha1="706a6ce2b7c6e35a94840b5fd93c4da92bbb8ae0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -66,14 +78,15 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="tdos42" cloneof="tdos12" supported="no">
+	<software name="tdos42" cloneof="tdos12">
 		<description>TRSDOS II v4.2 &amp; TRSDOS16 v4.1</description>
-		<year>1979</year>
+		<year>1983</year>
 		<publisher>Tandy</publisher>
+		<info name="usage" value="Requires 16K of Z80 RAM at pages 14/15, e.g. a second 64K memory board set to bank 7" />
 
 		<part name="flop1" interface="floppy_8">
-			<dataarea name="flop" size="157160">
-				<rom name="tr16sys.td0" size="157160" crc="aba110be" sha1="ed2346fa642079040803513a216a7f4cacf87048"/>
+			<dataarea name="flop" size="294318">
+				<rom name="tr16sys.imd" size="294318" crc="f6215c22" sha1="81cd33628e34f976b64c46a4650415c2b7002344"/>
 			</dataarea>
 		</part>
 	</software>

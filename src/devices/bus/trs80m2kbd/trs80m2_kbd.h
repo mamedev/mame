@@ -6,21 +6,15 @@
 
 **********************************************************************/
 
-#ifndef MAME_TRS_TRS80M2KB_H
-#define MAME_TRS_TRS80M2KB_H
+#ifndef MAME_BUS_TRS80M2KBD_TRS80M2_KBD_H
+#define MAME_BUS_TRS80M2KBD_TRS80M2_KBD_H
 
 #pragma once
 
+#include "kbd.h"
+
 #include "cpu/mcs48/mcs48.h"
-#include "sound/discrete.h"
 
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define TRS80M2_KEYBOARD_TAG    "trs80m2kb"
 
 
 //**************************************************************************
@@ -29,22 +23,21 @@
 
 // ======================> trs80m2_keyboard_device
 
-class trs80m2_keyboard_device :  public device_t
+class trs80m2_keyboard_device : public device_t, public device_trs80m2_keyboard_interface
 {
 public:
 	// construction/destruction
 	trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	auto clock_wr_callback() { return m_write_clock.bind(); }
-
-	void busy_w(int state);
-	int data_r();
+	// device_trs80m2_keyboard_interface implementation
+	virtual int data_r() override;
+	virtual void busy_w(int state) override;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	
+
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -60,8 +53,6 @@ private:
 	required_device<i8021_device> m_maincpu;
 	required_ioport_array<12> m_y;
 	output_finder<2> m_leds;
-
-	devcb_write_line   m_write_clock;
 
 	int m_busy;
 	int m_data;
@@ -81,4 +72,4 @@ DECLARE_DEVICE_TYPE(TRS80M2_KEYBOARD, trs80m2_keyboard_device)
 
 
 
-#endif // MAME_TRS_TRS80M2KB_H
+#endif // MAME_BUS_TRS80M2KBD_TRS80M2_KBD_H

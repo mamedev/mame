@@ -6360,10 +6360,41 @@ end
 
 if BUSES["TRS80M2"] then
 	files {
+		MAME_DIR .. "src/devices/bus/trs80m2/cage.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/cage.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/fdc.h",
 		MAME_DIR .. "src/devices/bus/trs80m2/hdc.cpp",
 		MAME_DIR .. "src/devices/bus/trs80m2/hdc.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/hdi.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/hdi.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/m68k.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/m68k.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/mem68k.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/mem68k.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/ram.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/ram.h",
 		MAME_DIR .. "src/devices/bus/trs80m2/slot.cpp",
 		MAME_DIR .. "src/devices/bus/trs80m2/slot.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/vidkb.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/vidkb.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/trs80m2kbd/kbd.h,BUSES["TRS80M2KBD"] = true
+---------------------------------------------------
+
+if BUSES["TRS80M2KBD"] then
+	files {
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/kbd.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/kbd.h",
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/tandy6k_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/tandy6k_kbd.h",
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/trs80m2_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/trs80m2_kbd.h",
 	}
 end
 
