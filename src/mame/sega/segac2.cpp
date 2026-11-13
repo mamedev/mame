@@ -211,7 +211,6 @@ public:
 
 	void tfrceacjpb(machine_config &config);
 	void ribbit(machine_config &config);
-	void c2m50dass(machine_config &config);
 
 	void init_noprot();
 	void init_columns();
@@ -327,6 +326,35 @@ public:
 
 private:
 	required_ioport m_wheel;
+};
+
+
+class megalo50_state : public segac2_state
+{
+public:
+	megalo50_state(const machine_config &mconfig, device_type type, const char *tag)
+		: segac2_state(mconfig, type, tag)
+		, m_dass(*this, "m50dass")
+		, m_service(*this, "SERVICE")
+		, m_cabinet(*this, "CABINET")
+	{ }
+
+	void c2m50dass(machine_config &config) ATTR_COLD;
+
+	DECLARE_INPUT_CHANGED_MEMBER(cabinet_changed);
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<m50dass_device> m_dass;
+	required_ioport m_service;
+	required_ioport m_cabinet;
+
+	bool megalo50() const { return BIT(m_cabinet->read(), 0); }
+
+	uint8_t io_porte_r();
+	void io_portd_w(uint8_t data);
 };
 
 
@@ -1001,8 +1029,18 @@ static INPUT_PORTS_START( tfrceac )
 INPUT_PORTS_END
 
 
+// the seats also need the DASS "Board A Moving Seats" switch and the game's moving seat setting
+static INPUT_PORTS_START( megalo50 )
+	PORT_START("CABINET")
+	PORT_CONFNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(megalo50_state::cabinet_changed), 0)
+	PORT_CONFSETTING(    0x00, DEF_STR( Standard ) )
+	PORT_CONFSETTING(    0x01, "Megalo 50" )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( twinsqua )
 	PORT_INCLUDE( systemc_generic )
+	PORT_INCLUDE( megalo50 )
 
 	PORT_MODIFY("P1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -1387,6 +1425,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( puyo )
 	PORT_INCLUDE( systemc_generic )
+	PORT_INCLUDE( megalo50 )
 
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
@@ -1447,6 +1486,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( potopoto )
 	PORT_INCLUDE( systemc_generic )
+	PORT_INCLUDE( megalo50 )
 
 	PORT_MODIFY("P1")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
@@ -2019,12 +2059,48 @@ void segac2_state::ribbit(machine_config &config)
 	m_upd7759->set_start_delay(250);
 }
 
-// Games supporting Megalo 50 moving seats (DASS)
-void segac2_state::c2m50dass(machine_config &config)
+void megalo50_state::c2m50dass(machine_config &config)
 {
 	segac2(config);
 
-	MEGALO50_DASS(config, "m50dass");
+	m_io->out_pd_callback().set(FUNC(megalo50_state::io_portd_w));
+	m_io->in_pe_callback().set(FUNC(megalo50_state::io_porte_r));
+
+	MEGALO50_DASS(config, m_dass);
+	m_dass->p1_in_cb().set_ioport("P1");
+	m_dass->p2_in_cb().set_ioport("P2");
+	m_dass->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void megalo50_state::machine_reset()
+{
+	segac2_state::machine_reset();
+
+	m_dass->reset_w(!megalo50());
+}
+
+INPUT_CHANGED_MEMBER(megalo50_state::cabinet_changed)
+{
+	m_dass->reset_w(!newval);
+}
+
+uint8_t megalo50_state::io_porte_r()
+{
+	uint8_t data = m_service->read();
+	if (megalo50())
+		data = (data & 0xc0) | bitswap<6>(m_dass->board_inputs_r(), 1, 0, 4, 5, 3, 2);
+
+	return data;
+}
+
+void megalo50_state::io_portd_w(uint8_t data)
+{
+	// the DASS board drives the coin meters
+	if (!megalo50())
+		segac2_state::io_portd_w(data);
+
+	m_dass->seat_w<0>(BIT(data, 2));
+	m_dass->seat_w<1>(BIT(data, 3));
 }
 
 void pclub_state::pclub(machine_config &config)
@@ -3158,7 +3234,7 @@ GAME( 1990, borenchj,   borench,  segac2,     borench,  segac2_state,    init_bo
 GAME( 1991, ribbit,     0,        ribbit,     ribbit,   segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit!", 0 )
 GAME( 1991, ribbitj,    ribbit,   ribbit,     ribbitj,  segac2_state,    init_ribbit,   ROT0,   "Sega", "Ribbit! (Japan)", 0 )
 
-GAME( 1991, twinsqua,   0,        c2m50dass,  twinsqua, segac2_state,    init_twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
+GAME( 1991, twinsqua,   0,        c2m50dass,  twinsqua, megalo50_state,  init_twinsqua, ROT0,   "Sega", "Twin Squash", 0 )
 
 GAME( 1991, soniccar,   0,        segac2,     soniccar, segac2_state,    init_noprot,   ROT0,   "Sega", "Waku Waku Sonic Patrol Car", 0 )
 
@@ -3166,10 +3242,10 @@ GAME( 1992, ssonicbr,   0,        segac2,     ssonicbr, segac2_state,    init_no
 
 GAME( 1992, ooparts,    0,        segac2,     ooparts,  segac2_state,    init_noprot,   ROT270, "hack", "OOPArts (prototype, joystick hack)", 0 )
 
-GAME( 1992, puyo,       0,        c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (World)", 0 )
-GAME( 1992, puyobl,     puyo,     c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "bootleg",        "Puyo Puyo (World, bootleg)", 0 )
-GAME( 1992, puyoj,      puyo,     c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev B)", 0 )
-GAME( 1992, puyoja,     puyo,     c2m50dass,  puyo,     segac2_state,    init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev A)", 0 )
+GAME( 1992, puyo,       0,        c2m50dass,  puyo,     megalo50_state,  init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (World)", 0 )
+GAME( 1992, puyobl,     puyo,     c2m50dass,  puyo,     megalo50_state,  init_puyo,     ROT0,   "bootleg",        "Puyo Puyo (World, bootleg)", 0 )
+GAME( 1992, puyoj,      puyo,     c2m50dass,  puyo,     megalo50_state,  init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev B)", 0 )
+GAME( 1992, puyoja,     puyo,     c2m50dass,  puyo,     megalo50_state,  init_puyo,     ROT0,   "Compile / Sega", "Puyo Puyo (Japan, Rev A)", 0 )
 
 GAME( 1992, tantr,      0,        segac2,     ichir,    segac2_state,    init_tantr,    ROT0,   "Sega",    "Puzzle & Action: Tant-R (Japan)", 0 )
 GAME( 1993, tantrkor,   tantr,    segac2,     ichir,    segac2_state,    init_tantrkor, ROT0,   "Sega",    "Puzzle & Action: Tant-R (Korea)", 0 )
@@ -3192,7 +3268,7 @@ GAME( 1993, sonicpop,   0,        segac2,     sonicpop, segac2_state,    init_no
 GAME( 1993, sonicfgt,   0,        segac2,     sonicfgt, segac2_state,    init_noprot,   ROT0,   "Sega", "SegaSonic Cosmo Fighter (World)", 0 )
 GAME( 1993, sonicfgtj,  sonicfgt, segac2,     sonicfgt, segac2_state,    init_noprot,   ROT0,   "Sega", "SegaSonic Cosmo Fighter (Japan)", 0 )
 
-GAME( 1994, potopoto,   0,        c2m50dass,  potopoto, segac2_state,    init_potopoto, ROT0,   "Sega", "Poto Poto (Japan, Rev A)", 0 )
+GAME( 1994, potopoto,   0,        c2m50dass,  potopoto, megalo50_state,  init_potopoto, ROT0,   "Sega", "Poto Poto (Japan, Rev A)", 0 )
 
 GAME( 1994, stkclmns,   0,        segac2,     stkclmns, segac2_state,    init_stkclmns, ROT0,   "Sega", "Stack Columns (World)", 0 )
 GAME( 1994, stkclmnsj,  stkclmns, segac2,     stkclmns, segac2_state,    init_stkclmnj, ROT0,   "Sega", "Stack Columns (Japan)", 0 )
