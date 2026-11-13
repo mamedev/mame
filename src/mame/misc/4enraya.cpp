@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina, Roberto Fresca
+// copyright-holders:Tomasz Slanina, Roberto Fresca, Tomás García-Merás Capote
 /***************************************************************************
 
   IDSA 4 En Raya.
@@ -12,6 +12,7 @@
 
   4 En Raya (set 1),                              1990, IDSA.
   4 En Raya (set 2),                              1990, IDSA.
+  Spanish Darts,                                  1991, IDSA.
   unknown bowling themed 'gum' poker machine      1992?,Paradise Automatique / TourVision
   unknown 'Pac-Man' gambling game,                1990, Unknown.
   unknown 'Space Invaders' gambling game (set 1), 1990, Unknown (made in France).
@@ -65,6 +66,25 @@
   bit 2 - BDIR
 
   bits 3-7 - not connected
+
+***************************************************************************
+
+  Spanish Darts.
+
+  Same video, sound and memory mapping as 4 En Raya, with an MK48Z02
+  zeropower RAM instead of the 6116 and different I/O, worked out from the
+  program. The DIP switch numbers are a guess. Port 0x33 bit 3 seems to be
+  the AY-3-8910 reset: it's pulsed low before the sound chip is initialised.
+
+  The program clocks the coin and buttons shift register before each read,
+  so it never sees input 7. The test mode calls the buttons PULSADOR 1 and
+  PULSADOR 2, and names lamps 0-2 as the dart board spotlight and the lights
+  of both buttons.
+
+  The service mode DIP switch runs a RAM test, which clears the NVRAM,
+  followed by screen, button, lamp, dart board and sound tests (button 1
+  steps through them). The price setup DIP switch shows the credits needed
+  by each game at boot: button 1 changes the value, button 2 accepts it.
 
 ***************************************************************************
 
@@ -160,6 +180,8 @@
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "dartboard.lh"
+
 
 namespace {
 
@@ -171,9 +193,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_ay(*this, "aysnd")
 		, m_palette(*this, "palette")
+		, m_workram(*this, "workram", 0x1000, ENDIANNESS_LITTLE)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_videoram(*this, "videoram", 0x1000, ENDIANNESS_LITTLE)
-		, m_workram(*this, "workram", 0x1000, ENDIANNESS_LITTLE)
 		, m_prom(*this, "pal_prom")
 		, m_rom(*this, "maincpu")
 	{
@@ -187,6 +209,8 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	void videoram_w(offs_t offset, uint8_t data);
+	void sound_data_w(uint8_t data);
+	void sound_control_w(uint8_t data);
 
 	void video(machine_config &config) ATTR_COLD;
 
@@ -194,12 +218,13 @@ protected:
 	required_device<ay8910_device> m_ay;
 	required_device<palette_device> m_palette;
 
+	memory_share_creator<uint8_t> m_workram;
+
 private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	// memory pointers
 	memory_share_creator<uint8_t> m_videoram;
-	memory_share_creator<uint8_t> m_workram;
 
 	optional_region_ptr<uint8_t> m_prom;
 	optional_region_ptr<uint8_t> m_rom;
@@ -210,15 +235,49 @@ private:
 	// sound-related
 	uint8_t m_soundlatch = 0U;
 
-	void sound_data_w(uint8_t data);
 	uint8_t fenraya_custom_map_r(offs_t offset);
 	void fenraya_custom_map_w(offs_t offset, uint8_t data);
-	void sound_control_w(uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void main_map(address_map &map) ATTR_COLD;
 	void main_portmap(address_map &map) ATTR_COLD;
+};
+
+class spadarts_state : public _4enraya_state
+{
+public:
+	spadarts_state(const machine_config &mconfig, device_type type, const char *tag)
+		: _4enraya_state(mconfig, type, tag)
+		, m_nvram(*this, "nvram")
+		, m_matrix(*this, "MATRIX%u", 0U)
+		, m_buttons(*this, "BUTTONS")
+		, m_lamps(*this, "lamp%u", 0U)
+	{
+	}
+
+	void spadarts(machine_config &config) ATTR_COLD;
+
+	ioport_value buttons_serial_r() { return BIT(m_buttons_shift, 7); }
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<nvram_device> m_nvram;
+	required_ioport_array<4> m_matrix;
+	required_ioport m_buttons;
+	output_finder<3> m_lamps;
+
+	uint8_t m_control = 0U;
+	uint8_t m_buttons_shift = 0U;
+	uint8_t m_lamps_shift = 0U;
+
+	uint8_t matrix_r(offs_t offset);
+	void control_w(uint8_t data);
+
+	void spadarts_portmap(address_map &map) ATTR_COLD;
 };
 
 class unk_gambl_state : public _4enraya_state
@@ -363,6 +422,47 @@ void _4enraya_state::fenraya_custom_map_w(offs_t offset, uint8_t data)
 
 
 /***********************************
+*      Spanish Darts Handlers      *
+***********************************/
+
+uint8_t spadarts_state::matrix_r(offs_t offset)
+{
+	if (!BIT(m_control, 6))
+		return 0xff;
+
+	return m_matrix[(BIT(m_control, 7) << 1) | BIT(m_control, 5)]->read() >> (offset * 8);
+}
+
+void spadarts_state::control_w(uint8_t data)
+{
+	uint8_t const old = m_control;
+	m_control = data;
+
+	if (!BIT(data, 3))
+		m_ay->reset_w();
+	else
+		sound_control_w(data);
+
+	if (BIT(data, 6))
+		return;
+
+	if (BIT(data, 7))
+	{
+		if (BIT(data, 5))
+			m_buttons_shift = m_buttons->read();
+		else if (!BIT(old, 7))
+			m_buttons_shift <<= 1;
+	}
+	else if (BIT(data, 5) && !BIT(old, 5))
+	{
+		m_lamps_shift = (m_lamps_shift << 1) | BIT(data, 4);
+		for (int i = 0; i < 3; i++)
+			m_lamps[i] = BIT(~m_lamps_shift, i);
+	}
+}
+
+
+/***********************************
 *      Memory Map Information      *
 ***********************************/
 
@@ -379,6 +479,15 @@ void _4enraya_state::main_portmap(address_map &map)
 	map(0x02, 0x02).portr("SYSTEM");
 	map(0x23, 0x23).w(FUNC(_4enraya_state::sound_data_w));
 	map(0x33, 0x33).w(FUNC(_4enraya_state::sound_control_w));
+}
+
+void spadarts_state::spadarts_portmap(address_map &map)
+{
+	map.global_mask(0xff);
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x02).r(FUNC(spadarts_state::matrix_r));
+	map(0x23, 0x23).w(FUNC(spadarts_state::sound_data_w));
+	map(0x33, 0x33).w(FUNC(spadarts_state::control_w));
 }
 
 
@@ -475,20 +584,103 @@ static INPUT_PORTS_START( 4enraya )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START(spadarts)
-	PORT_START("DSW")
-	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "SW1:1")
-	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "SW1:2")
-	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "SW1:3")
-	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "SW1:4")
-	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "SW1:5")
-	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "SW1:6")
-	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "SW1:7")
-	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "SW1:8")
+// the dartboard layout finds the targets by these names
+static INPUT_PORTS_START( spadarts )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(spadarts_state::buttons_serial_r))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Missed Dart Sensor") PORT_CODE(KEYCODE_D)
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPNAME( 0x08, 0x00, "Single Hit Sound" )      PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Collect Darts Sound" )   PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, "Missed Dart Detection" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Price Setup" )           PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
 
-	PORT_START("INPUTS")
+	PORT_START("BUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button 1 (Select / Instructions)")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Button 2 (Start / Next Player)")
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("SYSTEM")
+	PORT_START("MATRIX0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 7")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 19")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 3")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 19")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 3")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 19")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 3")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 17")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 16")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 16")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 7")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 7")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 17")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 16")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 17")
+
+	PORT_START("MATRIX1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 15")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 10")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 6")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 10")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 6")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 10")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 6")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 13")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double Bull")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 2")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 2")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 15")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 15")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 13")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 2")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 13")
+
+	PORT_START("MATRIX2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 18")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 1")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 20")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 20")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 1")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 20")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 5")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single Bull")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 4")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 4")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 18")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 18")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 5")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 4")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 5")
+
+	PORT_START("MATRIX3")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 9")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 14")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 11")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 14")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 11")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 14")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 11")
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 8")
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 12")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Triple 12")
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 9")
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 9")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 8")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Single 12")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Dart Double 8")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( unkpacg )
@@ -677,6 +869,24 @@ void _4enraya_state::machine_reset()
 	m_soundlatch = 0;
 }
 
+void spadarts_state::machine_start()
+{
+	_4enraya_state::machine_start();
+
+	m_nvram->set_base(&m_workram[0], 0x800);
+
+	save_item(NAME(m_control));
+	save_item(NAME(m_buttons_shift));
+	save_item(NAME(m_lamps_shift));
+}
+
+void spadarts_state::machine_reset()
+{
+	_4enraya_state::machine_reset();
+
+	m_control = 0;
+}
+
 
 /***********************************
 *         Machine Drivers          *
@@ -714,6 +924,18 @@ void _4enraya_state::_4enraya(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	AY8910(config, m_ay, MAIN_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.3); // guess
+}
+
+void spadarts_state::spadarts(machine_config &config)
+{
+	_4enraya(config);
+
+	m_maincpu->set_clock(8.412_MHz_XTAL / 2);
+	m_maincpu->set_addrmap(AS_IO, &spadarts_state::spadarts_portmap);
+
+	NVRAM(config, m_nvram, nvram_device::DEFAULT_ALL_0);
+
+	m_ay->set_clock(8.412_MHz_XTAL / 4);
 }
 
 
@@ -754,7 +976,7 @@ void unk_gambl_state::tourpgum(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	AY8910(config, m_ay, XTAL(18'000'000) / 4 / 4).add_route(ALL_OUTPUTS, "mono", 1.0); // guess
+	AY8910(config, m_ay, XTAL(18'000'000) / 4 / 4); // guess
 	m_ay->port_a_read_callback().set_ioport("DSW2");
 	m_ay->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -1146,23 +1368,22 @@ void unk_gambl_state::init_unk_gamble_enc()
 *           Game Drivers           *
 ***********************************/
 
-//    YEAR  NAME       PARENT   MACHINE   INPUT      CLASS            INIT        ROT   COMPANY          FULLNAME             FLAGS
-GAME( 1990, 4enraya,   0,       _4enraya, 4enraya,   _4enraya_state,  empty_init, ROT0, "IDSA",          "4 En Raya (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, 4enrayaa,  4enraya, _4enraya, 4enraya,   _4enraya_state,  empty_init, ROT0, "IDSA",          "4 En Raya (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, spadarts,  0,       _4enraya, spadarts,  _4enraya_state,  empty_init, ROT0, "IDSA",          "Spanish Darts",     MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 1990, 4enraya,   0,       _4enraya, 4enraya,  _4enraya_state,  empty_init, ROT0, "IDSA", "4 En Raya (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, 4enrayaa,  4enraya, _4enraya, 4enraya,  _4enraya_state,  empty_init, ROT0, "IDSA", "4 En Raya (set 2)", MACHINE_SUPPORTS_SAVE )
+GAMEL(1991, spadarts,  0,       spadarts, spadarts, spadarts_state,  empty_init, ROT0, "IDSA", "Spanish Darts",     MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_dartboard )
 
-GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum,  unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
-GAME( 1992?, chicgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Chic Gum Video", MACHINE_SUPPORTS_SAVE )
-GAME( 1992?, strker,   0,       strker,   strker,    unk_gambl_state, empty_init, ROT0, "<unknown>",     "Striker",        MACHINE_SUPPORTS_SAVE )
-GAME( 1992?, bowlgum,  0,       chicgum,  tourpgum,  unk_gambl_state, empty_init, ROT0, "<unknown>",     "Bowling Gum",    MACHINE_SUPPORTS_SAVE )
+GAME( 1992?, tourpgum, 0,       tourpgum, tourpgum, unk_gambl_state, empty_init, ROT0, u8"Paradise Automatique / TourVisión", u8"unknown Paradise Automatique / TourVisión bowling themed poker game with gum prizes (France)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992?, chicgum,  0,       chicgum,  tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Chic Gum Video", MACHINE_SUPPORTS_SAVE )
+GAME( 1992?, strker,   0,       strker,   strker,   unk_gambl_state, empty_init, ROT0, "<unknown>", "Striker",        MACHINE_SUPPORTS_SAVE )
+GAME( 1992?, bowlgum,  0,       chicgum,  tourpgum, unk_gambl_state, empty_init, ROT0, "<unknown>", "Bowling Gum",    MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,   unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacgb,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1988, unkpacgc,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state, empty_init,          ROT0, "<unknown>", "Coco Louco",                                MACHINE_SUPPORTS_SAVE )
-GAME( 1988, unkpacgd,  unkpacg, unkpacg,  unkpacg,   unk_gambl_state, empty_init,          ROT0, "<unknown>", "unknown 'Pac Man with cars' gambling game", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unkpacga,  unkpacg, unkpacga, unkpacg,   unk_gambl_state, init_unk_gamble_enc, ROT0, "IDI SRL",   "Pucman",                                    MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacg,   0,       unkpacg,  unkpacg,  unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 1)",   MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacgb,  unkpacg, unkpacg,  unkpacg,  unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Pac-Man' gambling game (set 2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1988, unkpacgc,  unkpacg, unkpacg,  unkpacg,  unk_gambl_state, empty_init,          ROT0, "<unknown>", "Coco Louco",                                MACHINE_SUPPORTS_SAVE )
+GAME( 1988, unkpacgd,  unkpacg, unkpacg,  unkpacg,  unk_gambl_state, empty_init,          ROT0, "<unknown>", "unknown 'Pac Man with cars' gambling game", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unkpacga,  unkpacg, unkpacga, unkpacg,  unk_gambl_state, init_unk_gamble_enc, ROT0, "IDI SRL",   "Pucman",                                    MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, unksig,    0,       unkpacg,  unkfr,     unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,     unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksigb,   unksig,  unkpacg,  unkfr,     unk_gambl_state, empty_init,          ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (unencrypted)",      MACHINE_SUPPORTS_SAVE )
-GAME( 199?, unksigc,   unksig,  unkpacg,  unkfr,     unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksig,    0,       unkpacg,  unkfr,    unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksiga,   unksig,  unkpacg,  unkfr,    unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksigb,   unksig,  unkpacg,  unkfr,    unk_gambl_state, empty_init,          ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (unencrypted)",      MACHINE_SUPPORTS_SAVE )
+GAME( 199?, unksigc,   unksig,  unkpacg,  unkfr,    unk_gambl_state, init_unk_gamble_enc, ROT0, "<unknown>", "unknown 'Space Invaders' gambling game (encrypted, set 3)", MACHINE_SUPPORTS_SAVE )
