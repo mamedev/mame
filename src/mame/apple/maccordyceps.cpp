@@ -276,7 +276,11 @@ void pmac6200_state::pmac6200_map(address_map &map)
 	map(0x00000000, 0xffffffff).m(m_capella, FUNC(capella_device::map));
 }
 
-static INPUT_PORTS_START( macadb )
+static INPUT_PORTS_START( pmac6200 )
+	// IPT_OTHER because the default IPT_VOLUME_DOWN and IPT_VOLUME_UP keys are ADB keyboard keys too
+	PORT_START("BUTTONS")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Volume Down") PORT_WRITE_LINE_DEVICE_MEMBER("primetimeiii", FUNC(primetimeiii_device::button_w<0>))
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Volume Up") PORT_WRITE_LINE_DEVICE_MEMBER("primetimeiii", FUNC(primetimeiii_device::button_w<1>))
 INPUT_PORTS_END
 
 void pmac6200_state::pmac6200(machine_config &config)
@@ -415,6 +419,6 @@ ROM_END
 
 #define rom_pmac5200 rom_pmac6200
 
-//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT   CLASS           INIT            COMPANY           FULLNAME                   FLAGS
-COMP( 1995, pmac6200, 0,        0,      pmac6200, macadb, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 6200/75", MACHINE_NOT_WORKING)
-COMP( 1995, pmac5200, pmac6200, 0,      pmac5200, macadb, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 5200/75", MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     CLASS           INIT            COMPANY           FULLNAME                   FLAGS
+COMP( 1995, pmac6200, 0,        0,      pmac6200, pmac6200, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 6200/75", MACHINE_NOT_WORKING)
+COMP( 1995, pmac5200, pmac6200, 0,      pmac5200, pmac6200, pmac6200_state, init_pmac6200,  "Apple Computer", "Power Macintosh 5200/75", MACHINE_NOT_WORKING)

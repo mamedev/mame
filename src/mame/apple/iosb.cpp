@@ -125,6 +125,8 @@ void primetimeiii_device::device_add_mconfig(machine_config &config)
 	m_asc->add_route(0, "speaker", 1.0, 0);
 	m_asc->add_route(1, "speaker", 1.0, 1);
 	m_asc->irqf_callback().set(FUNC(primetimeiii_device::asc_irq));
+
+	m_via2->set_button_reset_state(0x01); // volume down
 }
 
 //-------------------------------------------------
