@@ -305,7 +305,7 @@ void pwrmacg3_state::pwrmacg3(machine_config &config)
 	m_cuda->iic_sda_callback().append(m_tda7433, FUNC(tda7433_device::sda_write));
 	m_tda7433->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<4>));
 
-	// TDA7433 channels are: 0 = left front, 2 = right front, 1 = left read, 3 = right rear.
+	// TDA7433 channels are: 0 = left front, 2 = right front, 1 = left rear, 3 = right rear.
 	SPEAKER(config, "speaker", 2).front();
 	screamer.add_route(0, m_tda7433, 1.0, 0); // left -> TDA LF
 	screamer.add_route(1, m_tda7433, 1.0, 2); // right -> TDA RF
