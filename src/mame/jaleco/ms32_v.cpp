@@ -73,10 +73,8 @@ void ms32_state::video_start()
 
 	/* set up tile layers */
 	m_screen->register_screen_bitmap(m_temp_bitmap_sprites);
-	m_screen->register_screen_bitmap(m_temp_bitmap_sprites_pri); // sprite coverage bitmap
 
 	m_temp_bitmap_sprites.fill(0);
-	m_temp_bitmap_sprites_pri.fill(0);
 
 	m_tx_tilemap->set_transparent_pen(0);
 	m_bg_tilemap->set_transparent_pen(0);
@@ -502,8 +500,6 @@ u32 ms32_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 
 	mix_layers(screen, bitmap, cliprect);
 
-	apply_sprite_effects(screen, bitmap, cliprect);
-
 	return 0;
 }
 
@@ -537,9 +533,6 @@ void ms32_state::draw_tile_layers(screen_device &screen, const rectangle &clipre
     bit 2      effect disable (1 = normal, 0 = half-brightness for selected non-sprite layers)
     bits 1-0   brightness bank select (0 = none, 1/3 = bank 0, 2 = bank 1)
 
-    When the sprite input is selected, the coverage pass applies the bit-2-clear
-    effect to the composited pixel beneath transparent sprite pixels. The exact
-    hardware effect still needs verification.
 */
 void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -591,68 +584,6 @@ void ms32_state::mix_layers(screen_device &screen, bitmap_rgb32 &bitmap, const r
 	}
 }
 
-void ms32_state::apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	m_temp_bitmap_sprites_pri.fill(0, cliprect);
-	screen.priority().fill(0, cliprect);
-
-	const size_t sprite_tail = m_objectram_size - 8;
-	const u16 *source = m_sprram_buffer.get();
-	const u16 *finish = m_sprram_buffer.get() + sprite_tail;
-	const bool reverseorder = (m_sprite_ctrl[0x10/4] & 0x8000) == 0x0000;
-	if (reverseorder) { source = m_sprram_buffer.get() + sprite_tail; finish = m_sprram_buffer.get(); }
-	for (;reverseorder ? (source>=finish) : (source<finish); reverseorder ? (source-=8) : (source+=8))
-	{
-		bool disable; u8 pri; bool flipx, flipy; u32 code, color;
-		u8 tx, ty; u16 xsize, ysize; s32 sx, sy; u16 xzoom, yzoom;
-		m_sprite->extract_parameters(source, disable, pri, flipx, flipy, code, color, tx, ty, xsize, ysize, sx, sy, xzoom, yzoom);
-		if (disable || !xzoom || !yzoom) continue;
-		m_sprite->prio_zoom_transpen_raw(m_temp_bitmap_sprites_pri,cliprect,
-				code, (1 + pri) << 8, flipx, flipy, sx, sy,
-				tx, ty, xsize, ysize, xzoom, yzoom,
-				screen.priority(), 0, 0xffff);
-	}
-
-	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
-	{
-		u16 const *const spr = &m_temp_bitmap_sprites.pix(y);
-		u16 const *const cov = &m_temp_bitmap_sprites_pri.pix(y);
-		u16 const *const tx_row = &m_layer_tx.pix(y);
-		u16 const *const bg_row = &m_layer_bg.pix(y);
-		u16 const *const roz_row = &m_layer_roz.pix(y);
-		u16 const *const road_row = &m_layer_road.pix(y);
-		u8 const *const depth_row = &m_layer_depth.pix(y);
-		u32 *const dst = &bitmap.pix(y);
-
-		for (int x = cliprect.left(); x <= cliprect.right(); x++)
-		{
-			if (cov[x] == 0)
-				continue;
-			if (spr[x] & 0xff)
-				continue;
-
-			u16 const cov_pri = cov[x] >> 12;
-			u16 const idx_with = priority_index(false, tx_row[x] == 0xffff, roz_row[x] == 0xffff, road_row[x] == 0xffff, bg_row[x] == 0xffff, cov_pri, depth_row[x]);
-			u8 const code_with = m_priram[idx_with];
-
-			if (code_with == 0x00 || BIT(code_with, 6) || BIT(code_with, 2))
-				continue;
-
-			// Coverage can act as an effect mask when the sprite input is selected.
-			// A selected tile layer must not turn transparent sprite padding into a shadow.
-			if (code_with & 0x38)
-				continue;
-
-			{
-				rgb_t c(dst[x]);
-				if ((code_with & 3) == 2)
-					c = rgb_t(c.r() * m_brt1_r / 0x100, c.g() * m_brt1_g / 0x100, c.b() * m_brt1_b / 0x100);
-				c = rgb_t(c.r() >> 1, c.g() >> 1, c.b() >> 1);
-				dst[x] = c;
-			}
-		}
-	}
-}
 
 void ms32_state::screen_vblank(int state)
 {

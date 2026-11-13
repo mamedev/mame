@@ -171,7 +171,6 @@ private:
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_alt;
 	u32 m_tilemaplayoutcontrol = 0;
-	bitmap_ind16 m_temp_bitmap_sprites_pri;
 
 	u8 ms32_nvram_r8(offs_t offset);
 	void ms32_nvram_w8(offs_t offset, u8 data);
@@ -203,7 +202,6 @@ private:
 	void screen_vblank(int state);
 	void update_color(int color);
 	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_pri, const rectangle &cliprect, u16 *sprram_top);
-	void apply_sprite_effects(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
