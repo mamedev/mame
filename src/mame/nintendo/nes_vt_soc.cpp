@@ -1248,7 +1248,7 @@ void nes_vt02_vt03_soc_device::device_add_mconfig(machine_config &config)
 	RP2A03_CORE(config, m_maincpu, NTSC_APU_CLOCK); // Butterfly Catch in vgpocket confirms RP2A03 core type, not 6502
 	m_maincpu->set_addrmap(AS_PROGRAM, &nes_vt02_vt03_soc_device::nes_vt_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.0988);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
 							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));

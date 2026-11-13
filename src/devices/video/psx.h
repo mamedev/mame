@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include "machine/ram.h"
+
 #define PSXGPU_DEBUG_VIEWER ( 0 )
 
 DECLARE_DEVICE_TYPE(CXD8514Q,  cxd8514q_device)
@@ -27,8 +29,11 @@ class psxgpu_device : public device_t, public device_video_interface, public dev
 {
 public:
 	// configuration helpers
+	void set_cpu(psxcpu_device* cpu);
+	template<typename T> void set_ram(T &&tag) { m_ram.set_tag(std::forward<T>(tag)); }
+	void set_vclkn(XTAL clock) { m_vclk[0] = clock.value(); } // pin 192 on SGRAM GPU
+	void set_vclkp(XTAL clock) { m_vclk[1] = clock.value(); } // pin 196 on SGRAM GPU
 	auto vblank_callback() { return m_vblank_handler.bind(); }
-	int vram_size() { return vramSize; }
 
 	void write(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t read(offs_t offset, uint32_t mem_mask = ~0);
@@ -45,7 +50,6 @@ protected:
 	static constexpr unsigned MID_SHADE = 0x80;
 
 	// construction/destruction
-	psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu_tag);
 	psxgpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_start() override ATTR_COLD;
@@ -56,7 +60,7 @@ protected:
 	// device_palette_interface overrides
 	virtual uint32_t palette_entries() const noexcept override { return 32*32*32*2; }
 
-	int vramSize;
+	required_device<ram_device> m_ram;
 
 private:
 	static constexpr unsigned DEBUG_COORDS = 10;
@@ -227,7 +231,6 @@ private:
 	int32_t n_iy;
 	int32_t n_ti;
 
-	std::unique_ptr<uint16_t[]> p_vram;
 	uint32_t n_vramx;
 	uint32_t n_vramy;
 	uint32_t n_twy;
@@ -291,6 +294,7 @@ private:
 	uint32_t p_n_b1g1[ 0x10000 ];
 
 	devcb_write_line m_vblank_handler;
+	uint32_t m_vclk[2];
 
 	void vblank(screen_device &screen, bool vblank_state);
 	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -311,7 +315,7 @@ class cxd8514q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu);
 	cxd8514q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
@@ -319,7 +323,7 @@ class cxd8538q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu);
 	cxd8538q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
@@ -327,7 +331,7 @@ class cxd8561q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu);
 	cxd8561q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
@@ -335,7 +339,7 @@ class cxd8561bq_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu);
 	cxd8561bq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
@@ -343,7 +347,7 @@ class cxd8561cq_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu);
 	cxd8561cq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
@@ -351,7 +355,7 @@ class cxd8654q_device : public psxgpu_device
 {
 public:
 	// construction/destruction
-	cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, uint32_t vram_size, psxcpu_device *cpu);
+	cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, psxcpu_device *cpu);
 	cxd8654q_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 

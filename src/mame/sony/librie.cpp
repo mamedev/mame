@@ -88,7 +88,7 @@ void librie_state::ebx5003(machine_config &config)
 {
 	ARM920T(config, m_maincpu, 66'000'000); // ARM920T core, unknown clock
 
-	screen_device&screen(SCREEN(config, "screen", SCREEN_TYPE_LCD)); // Not LCD, but e-Ink, 800×600, 167 PPI, four-level greyscale
+	screen_device&screen(SCREEN(config, "screen").set_lcd()); // Not LCD, but e-Ink, 800×600, 167 PPI, four-level greyscale
 	screen.set_refresh_hz(60);
 	screen.set_size(600, 800);
 	screen.set_visarea(0, 600 - 1, 0, 800 - 1);

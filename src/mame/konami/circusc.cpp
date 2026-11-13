@@ -631,7 +631,7 @@ void circusc_state::circusc(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM8(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(circusc_state::screen_update));
 	screen.set_palette(m_palette);

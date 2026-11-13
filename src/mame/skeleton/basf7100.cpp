@@ -668,7 +668,7 @@ void basf7100_state::basf7100(machine_config &config)
 	m_ppi[4]->out_pc_callback().set(FUNC(basf7100_state::sod_low_w));
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_size(640, 288); // wrong because of wrong charrom
 	m_screen->set_visarea_full();

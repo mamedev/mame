@@ -12,13 +12,13 @@
 
     TODO:
     - MK1: Unimplemented (ROM: 0xf00000-0xf0ffff, RAM: 0x9fc000-0x9fffff)
-    - MK2: Partially works, but entering/exiting from cartridge isn't stable
+    - MK2: Needs better Copper emulation to have a chance at working
     - MK3: Not working (needs different reset handling)
-    - Unmapping ROM/RAM
     - Reset behaviour: Real cartridge measures reset pulse length to
       differentiate between keyboard reset and CPU RESET instruction
     - Breakpoints
     - A2000 version
+    - Slowmo
 
 ***************************************************************************/
 
@@ -30,41 +30,128 @@
 #include "logmacro.h"
 
 
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(AMIGA_CPUSLOT_ACTION_REPLAY_MK1, bus::amiga::cpuslot::action_replay_mk1_device, "amiga_ar1", "Action Replay")
-DEFINE_DEVICE_TYPE(AMIGA_CPUSLOT_ACTION_REPLAY_MK2, bus::amiga::cpuslot::action_replay_mk2_device, "amiga_ar2", "Action Replay MK II")
-DEFINE_DEVICE_TYPE(AMIGA_CPUSLOT_ACTION_REPLAY_MK3, bus::amiga::cpuslot::action_replay_mk3_device, "amiga_ar3", "Action Replay MK III")
-
 namespace bus::amiga::cpuslot {
 
-action_replay_device_base::action_replay_device_base(const machine_config &mconfig, device_type type, size_t ram_size, const char *tag, device_t *owner, uint32_t clock) :
+class action_replay_device_base : public device_t, public device_amiga_cpuslot_interface
+{
+public:
+	DECLARE_INPUT_CHANGED_MEMBER(freeze) { freeze_w(newval); }
+
+protected:
+	action_replay_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual void freeze_w(int state) = 0;
+
+	required_region_ptr<uint16_t> m_rom;
+};
+
+class action_replay_mk1_device : public action_replay_device_base
+{
+public:
+	action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	// action_replay_device_base overrides
+	virtual void freeze_w(int state) override;
+};
+
+class action_replay_mk2_device : public action_replay_device_base
+{
+public:
+	action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	action_replay_mk2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	// device_amiga_cpuslot_interface overrides
+	virtual void rst_w(int state) override;
+
+	// action_replay_device_base overrides
+	virtual void freeze_w(int state) override;
+
+private:
+	// memory is asymmetric: only the upper region 0xc000 to 0xffff is full 16-bit
+	static constexpr offs_t RAM_LOW_MASK = 0x1fff;
+
+	static constexpr uint8_t STATUS_BUTTON = 0x00;
+	static constexpr uint8_t STATUS_READ = 0x01; // 0xbfe001
+	static constexpr uint8_t STATUS_WRITE = 0x02; // 0xbfd100
+	static constexpr uint8_t STATUS_RESET = 0x03;
+
+	void regs_map(address_map &map) ATTR_COLD;
+	void install_visibility_tap();
+	void install_chipmem_taps();
+	void trigger_nmi();
+
+	uint16_t ram_r(offs_t offset, uint16_t mem_mask);
+	void ram_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t status_r(offs_t offset, uint16_t mem_mask);
+	void mode_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void restore_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	memory_share_creator<uint8_t> m_ram_high;
+	memory_share_creator<uint8_t> m_ram_low;
+
+	memory_passthrough_handler m_custom_chip_tap;
+	memory_passthrough_handler m_chipmem_read_tap;
+	memory_passthrough_handler m_chipmem_write_tap;
+	memory_passthrough_handler m_visibility_tap;
+
+	uint8_t m_status = STATUS_RESET;
+	uint8_t m_mode = 0;
+
+	bool m_visible = false;
+	bool m_nmi_pending = false;
+	bool m_reset = true;
+};
+
+class action_replay_mk3_device : public action_replay_mk2_device
+{
+public:
+	action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// device_t overrides
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
+action_replay_device_base::action_replay_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
 	device_amiga_cpuslot_interface(mconfig, *this),
-	m_rom(*this, "rom"),
-	m_ram(*this, "ram", ram_size, ENDIANNESS_BIG)
+	m_rom(*this, "rom")
 {
 }
 
 action_replay_mk1_device::action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_device_base(mconfig, AMIGA_CPUSLOT_ACTION_REPLAY_MK1, 0x4000, tag, owner, clock)
+	action_replay_device_base(mconfig, AMIGA_CPUSLOT_ACTION_REPLAY_MK1, tag, owner, clock)
 {
 }
 
 action_replay_mk2_device::action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_device_base(mconfig, AMIGA_CPUSLOT_ACTION_REPLAY_MK2, 0x10000, tag, owner, clock)
+	action_replay_mk2_device(mconfig, AMIGA_CPUSLOT_ACTION_REPLAY_MK2, tag, owner, clock)
 {
 }
 
-action_replay_mk2_device::action_replay_mk2_device(const machine_config &mconfig, device_type type, size_t ram_size, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_device_base(mconfig, type, ram_size, tag, owner, clock)
+action_replay_mk2_device::action_replay_mk2_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	action_replay_device_base(mconfig, type, tag, owner, clock),
+	m_ram_high(*this, "ram_high", 0x8000, ENDIANNESS_BIG),
+	m_ram_low(*this, "ram_low", 0x2000, ENDIANNESS_BIG)
 {
 }
 
 action_replay_mk3_device::action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	action_replay_mk2_device(mconfig, AMIGA_CPUSLOT_ACTION_REPLAY_MK3, 0x10000, tag, owner, clock)
+	action_replay_mk2_device(mconfig, AMIGA_CPUSLOT_ACTION_REPLAY_MK3, tag, owner, clock)
 {
 }
 
@@ -80,7 +167,7 @@ void action_replay_mk2_device::regs_map(address_map &map)
 	map(0x000000, 0x000001).w(FUNC(action_replay_mk2_device::mode_w));
 	map(0x000000, 0x000001).mirror(0x02).r(FUNC(action_replay_mk2_device::status_r));
 	map(0x000006, 0x000007).w(FUNC(action_replay_mk2_device::restore_w));
-	map(0x040000, 0x04ffff).mirror(0x30000).ram().share(m_ram);
+	map(0x040000, 0x04ffff).mirror(0x30000).rw(FUNC(action_replay_mk2_device::ram_r), FUNC(action_replay_mk2_device::ram_w));
 }
 
 
@@ -90,12 +177,215 @@ void action_replay_mk2_device::regs_map(address_map &map)
 
 static INPUT_PORTS_START( action_replay )
 	PORT_START("button")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(action_replay_device_base::freeze), 0)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Freeze") PORT_CODE(KEYCODE_F12) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(action_replay_device_base::freeze), 0)
 INPUT_PORTS_END
 
 ioport_constructor action_replay_device_base::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( action_replay );
+}
+
+
+//**************************************************************************
+//  MACHINE EMULATION
+//**************************************************************************
+
+void action_replay_mk1_device::freeze_w(int state)
+{
+	LOG("freeze_w: %d\n", state);
+}
+
+void action_replay_mk2_device::install_visibility_tap()
+{
+	m_visibility_tap.remove();
+	m_visibility_tap = m_host->space().install_read_tap
+	(
+		0x000000, 0xffffff,
+		"visibility_r",
+		[this] (offs_t offset, uint16_t &, uint16_t)
+		{
+			if (machine().side_effects_disabled())
+				return;
+
+			if (m_visible)
+			{
+				uint8_t const fc = m_host->fc_r();
+				if (BIT(fc, 1) && !BIT(fc, 0) && !(offset >= 0x400000 && offset <= 0x43ffff))
+				{
+					LOG("Hiding Action Replay\n");
+
+					m_host->space().unmap_readwrite(0x400000, 0x47ffff);
+					m_visible = false;
+					m_visibility_tap.remove();
+				}
+			}
+		},
+		&m_visibility_tap
+	);
+}
+
+void action_replay_mk2_device::install_chipmem_taps()
+{
+	// chipmem read: map action replay on nmi vector fetch
+	m_chipmem_read_tap = m_host->space().install_read_tap
+	(
+		0x000000, 0x1fffff,
+		"chipmem_r",
+		[this] (offs_t offset, uint16_t &data, uint16_t)
+		{
+			if (machine().side_effects_disabled())
+				return;
+
+			if (m_nmi_pending)
+			{
+				if (offset == 0x00007c && m_host->fc_r() == 5)
+				{
+					LOG("Mapping Action Replay\n");
+
+					// disable chip memory
+					m_host->ovr_w(0);
+
+					// map action replay
+					m_host->space().install_rom(0x000000, 0x03ffff, 0x040000, m_rom);
+					m_host->space().install_device(0x400000, 0x47ffff, *this, &action_replay_mk2_device::regs_map);
+
+					// create our visibility tap to catch the moment we need to hide again
+					m_visible = true;
+					install_visibility_tap();
+
+					// the rom is mapped too late for this read, so adjust it with the data that would have been read
+					data = m_rom[offset >> 1];
+
+					m_nmi_pending = false;
+				}
+			}
+		},
+		&m_chipmem_read_tap
+	);
+
+	// chipmem write: start action replay after reset
+	m_chipmem_write_tap = m_host->space().install_write_tap
+	(
+		0x000000, 0x1fffff,
+		"chipmem_w",
+		[this] (offs_t, uint16_t &, uint16_t)
+		{
+			if (m_reset)
+			{
+				trigger_nmi();
+				m_reset = false;
+			}
+		},
+		&m_chipmem_write_tap
+	);
+}
+
+void action_replay_mk2_device::trigger_nmi()
+{
+	LOG("Trigger NMI\n");
+
+	m_nmi_pending = true;
+
+	m_host->ipl7_w(1);
+	m_host->ipl7_w(0);
+}
+
+void action_replay_mk2_device::freeze_w(int state)
+{
+	LOG("freeze_w: %d\n", state);
+
+	if (state)
+	{
+		m_status = STATUS_BUTTON;
+		trigger_nmi();
+	}
+}
+
+void action_replay_mk2_device::rst_w(int state)
+{
+	LOG("rst_w: %d\n", state);
+
+	if (state == 0)
+	{
+		m_status = STATUS_RESET;
+		m_visible = false;
+		m_nmi_pending = false;
+		m_reset = true;
+	}
+}
+
+uint16_t action_replay_mk2_device::ram_r(offs_t offset, uint16_t mem_mask)
+{
+	return (m_ram_high[offset] << 8) | m_ram_low[offset & RAM_LOW_MASK];
+}
+
+void action_replay_mk2_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	if (ACCESSING_BITS_8_15)
+		m_ram_high[offset] = data >> 8;
+
+	if (ACCESSING_BITS_0_7)
+		m_ram_low[offset & RAM_LOW_MASK] = data;
+}
+
+uint16_t action_replay_mk2_device::status_r(offs_t offset, uint16_t mem_mask)
+{
+	if (!machine().side_effects_disabled())
+		LOG("status_r: %04x & %04x\n", m_status, mem_mask);
+
+	return m_status;
+}
+
+void action_replay_mk2_device::mode_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	// 1-  enable freeze on read of 0xbfe001
+	// -0  enable freeze on write of 0xbfd100
+
+	LOG("mode_w: %04x & %04x\n", data, mem_mask);
+
+	m_mode = data & 0x03;
+}
+
+void action_replay_mk2_device::restore_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	LOG("restore_w: %04x & %04x\n", data, mem_mask);
+
+	// map chip memory again
+	m_host->ovr_w(1);
+
+	// remapping chip memory has wiped out our tap, reinstall it
+	install_chipmem_taps();
+}
+
+void action_replay_mk1_device::device_start()
+{
+}
+
+void action_replay_mk2_device::device_start()
+{
+	install_chipmem_taps();
+
+	// custom chip writes (by the CPU) are captured directly in
+	// cartridge RAM - but only while the cartridge is inactive
+	// TODO: exact range (probably supports mirrors)
+	m_custom_chip_tap = m_host->space().install_write_tap
+	(
+		0xdff000, 0xdff1ff,
+		"custom_chip",
+		[this] (offs_t offset, uint16_t &data, uint16_t mem_mask)
+		{
+			if (!m_visible)
+				ram_w((0xf000 | (offset & 0x1ff)) >> 1, data, mem_mask);
+		},
+		&m_custom_chip_tap
+	);
+
+	// register for save states
+	save_item(NAME(m_status));
+	save_item(NAME(m_mode));
+	save_item(NAME(m_visible));
+	save_item(NAME(m_nmi_pending));
+	save_item(NAME(m_reset));
 }
 
 
@@ -152,142 +442,13 @@ const tiny_rom_entry *action_replay_mk3_device::device_rom_region() const
 	return ROM_NAME( rom_mk3 );
 }
 
+} // bus::amiga::cpuslot
+
 
 //**************************************************************************
-//  MACHINE EMULATION
+//  DEVICE DEFINITIONS
 //**************************************************************************
 
-void action_replay_mk1_device::device_start()
-{
-}
-
-void action_replay_mk1_device::freeze_w(int state)
-{
-	LOG("freeze_w: %d\n", state);
-}
-
-void action_replay_mk2_device::install_chipmem_taps()
-{
-	m_chipmem_read_tap = m_host->space().install_read_tap
-	(
-		0x000000, 0x1fffff,
-		"chipmem_r",
-		[this] (offs_t offset, uint16_t &data, uint16_t mem_mask)
-		{
-			if (m_nmi_active)
-			{
-				// disable chip memory
-				m_host->ovr_w(0);
-
-				// map action replay
-				m_host->space().install_rom(0x000000, 0x03ffff, 0x040000, m_rom);
-				m_host->space().install_device(0x400000, 0x47ffff, *this, &action_replay_mk2_device::regs_map);
-
-				// the rom is mapped too late for this read, so adjust it with the data that would have been read
-				data = m_rom[offset >> 1];
-
-				m_nmi_active = false;
-			}
-		},
-		&m_chipmem_read_tap
-	);
-
-	m_chipmem_write_tap = m_host->space().install_write_tap
-	(
-		0x000000, 0x1fffff,
-		"chipmem_w",
-		[this] (offs_t offset, uint16_t &data, uint16_t mem_mask)
-		{
-			if (m_reset)
-			{
-				// trigger nmi
-				LOG("trigger nmi\n");
-
-				m_nmi_active = true;
-				m_host->ipl7_w(1);
-				m_host->ipl7_w(0);
-
-				m_reset = false;
-			}
-		},
-		&m_chipmem_write_tap
-	);
-}
-
-void action_replay_mk2_device::device_start()
-{
-	m_status = STATUS_RESET;
-	m_reset = true;
-
-	install_chipmem_taps();
-
-	// custom chip writes (by the cpu) get mirrored to internal ram
-	// TODO: exact range (probably supports mirrors)
-	m_custom_chip_tap = m_host->space().install_write_tap
-	(
-		0xdff000, 0xdff1ff,
-		"custom_chip_w",
-		[this] (offs_t offset, uint16_t &data, uint16_t mem_mask)
-		{
-			m_ram[(0xf000 | (offset & 0x1ff)) >> 1] = data;
-		},
-		&m_custom_chip_tap
-	);
-
-}
-
-void action_replay_mk2_device::freeze_w(int state)
-{
-	LOG("freeze_w: %d\n", state);
-
-	if (state)
-	{
-		m_status = STATUS_BUTTON;
-
-		m_nmi_active = true;
-		m_host->ipl7_w(1);
-		m_host->ipl7_w(0);
-	}
-}
-
-void action_replay_mk2_device::rst_w(int state)
-{
-	LOG("rst_w: %d\n", state);
-
-	if (state == 0)
-	{
-		m_status = STATUS_RESET;
-		m_reset = true;
-	}
-}
-
-uint16_t action_replay_mk2_device::status_r(offs_t offset, uint16_t mem_mask)
-{
-	if (!machine().side_effects_disabled())
-		LOG("status_r: %04x & %04x\n", m_status, mem_mask);
-
-	return m_status;
-}
-
-void action_replay_mk2_device::mode_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	// 1-  enable freeze on read of 0xbfe001
-	// -0  enable freeze on write of 0xbfd100
-
-	LOG("mode_w: %04x & %04x\n", data, mem_mask);
-
-	m_mode = data & 0x03;
-}
-
-void action_replay_mk2_device::restore_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	LOG("restore_w: %04x & %04x\n", data, mem_mask);
-
-	// map chip memory again
-	m_host->ovr_w(1);
-
-	// remapping chip memory has wiped out our tap, reinstall it
-	install_chipmem_taps();
-}
-
-} // namespace bus::amiga::cpuslot
+DEFINE_DEVICE_TYPE_PRIVATE(AMIGA_CPUSLOT_ACTION_REPLAY_MK1, device_amiga_cpuslot_interface, bus::amiga::cpuslot::action_replay_mk1_device, "amiga_ar1", "Action Replay")
+DEFINE_DEVICE_TYPE_PRIVATE(AMIGA_CPUSLOT_ACTION_REPLAY_MK2, device_amiga_cpuslot_interface, bus::amiga::cpuslot::action_replay_mk2_device, "amiga_ar2", "Action Replay MK II")
+DEFINE_DEVICE_TYPE_PRIVATE(AMIGA_CPUSLOT_ACTION_REPLAY_MK3, device_amiga_cpuslot_interface, bus::amiga::cpuslot::action_replay_mk3_device, "amiga_ar3", "Action Replay MK III")

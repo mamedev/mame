@@ -613,57 +613,57 @@ void coolridr_state::video_start()
     (everything else is unknown at current time)
 */
 
-#define COOLRIDERS_DRAWGFX_CORE(PIXEL_TYPE, COOL_PIXEL_OP)                               \
+#define COOLRIDERS_DRAWGFX_CORE(PIXEL_TYPE, COOL_PIXEL_OP)                              \
 do {                                                                                    \
 	do {                                                                                \
-		const uint8_t *srcdata;                                                           \
-		int32_t destendx, destendy;                                                       \
-		int32_t srcx, srcy;                                                               \
-		int32_t curx, cury;                                                               \
-		int32_t dy;                                                                       \
+		const uint8_t *srcdata;                                                         \
+		int32_t destendx, destendy;                                                     \
+		int32_t srcx, srcy;                                                             \
+		int32_t curx, cury;                                                             \
+		int32_t dy;                                                                     \
 																						\
 		assert(dest.valid());                                                           \
-		assert(gfx != nullptr);                                                            \
+		assert(gfx != nullptr);                                                         \
 		assert(dest.cliprect().contains(cliprect));                                     \
-		assert(code < gfx->elements());                                             \
+		assert(code < gfx->elements());                                                 \
 																						\
 		/* ignore empty/invalid cliprects */                                            \
 		if (cliprect.empty())                                                           \
 			break;                                                                      \
 																						\
 		/* compute final pixel in X and exit if we are entirely clipped */              \
-		destendx = destx + gfx->width() - 1;                                                \
-		if (destx > cliprect.max_x || destendx < cliprect.min_x)                        \
+		destendx = destx + gfx->width() - 1;                                            \
+		if (!cliprect.overlapsx(destx, destendx))                                       \
 			break;                                                                      \
 																						\
 		/* apply left clip */                                                           \
 		srcx = 0;                                                                       \
-		if (destx < cliprect.min_x)                                                     \
+		if (destx < cliprect.left())                                                    \
 		{                                                                               \
-			srcx = cliprect.min_x - destx;                                              \
-			destx = cliprect.min_x;                                                     \
+			srcx = cliprect.left() - destx;                                             \
+			destx = cliprect.left();                                                    \
 		}                                                                               \
 																						\
 		/* apply right clip */                                                          \
-		if (destendx > cliprect.max_x)                                                  \
-			destendx = cliprect.max_x;                                                  \
+		if (destendx > cliprect.right())                                                \
+			destendx = cliprect.right();                                                \
 																						\
 		/* compute final pixel in Y and exit if we are entirely clipped */              \
-		destendy = desty + gfx->height() - 1;                                               \
-		if (desty > cliprect.max_y || destendy < cliprect.min_y)                        \
+		destendy = desty + gfx->height() - 1;                                           \
+		if (!cliprect.overlapsy(desty, destendy))                                       \
 			break;                                                                      \
 																						\
 		/* apply top clip */                                                            \
 		srcy = 0;                                                                       \
-		if (desty < cliprect.min_y)                                                     \
+		if (desty < cliprect.top())                                                     \
 		{                                                                               \
-			srcy = cliprect.min_y - desty;                                              \
-			desty = cliprect.min_y;                                                     \
+			srcy = cliprect.top() - desty;                                              \
+			desty = cliprect.top();                                                     \
 		}                                                                               \
 																						\
 		/* apply bottom clip */                                                         \
-		if (destendy > cliprect.max_y)                                                  \
-			destendy = cliprect.max_y;                                                  \
+		if (destendy > cliprect.bottom())                                               \
+			destendy = cliprect.bottom();                                               \
 																						\
 		/* apply X flipping */                                                          \
 		if (flipx)                                                                      \
@@ -673,12 +673,12 @@ do {                                                                            
 		dy = gfx->rowbytes();                                                           \
 		if (flipy)                                                                      \
 		{                                                                               \
-			srcy = gfx->height() - 1 - srcy;                                                \
+			srcy = gfx->height() - 1 - srcy;                                            \
 			dy = -dy;                                                                   \
 		}                                                                               \
 																						\
 		/* fetch the source data */                                                     \
-		srcdata = gfx->get_data(code);                                      \
+		srcdata = gfx->get_data(code);                                                  \
 																						\
 		/* compute how many blocks of 4 pixels we have */                           \
 		uint32_t numblocks = (destendx + 1 - destx) / 4;                              \
@@ -3305,14 +3305,14 @@ void coolridr_state::coolridr(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfxdecode_device::empty);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57); // measured at 57.0426Hz
 	m_screen->set_size(640, 512);
 	m_screen->set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);
 	m_screen->set_screen_update(FUNC(coolridr_state::screen_update<0>));
 	m_screen->set_palette(m_palette);
 
-	screen_device &screen2(SCREEN(config, "screen2", SCREEN_TYPE_RASTER));
+	screen_device &screen2(SCREEN(config, "screen2"));
 	screen2.set_refresh_hz(57); // measured at 57.0426Hz
 	screen2.set_size(640, 512);
 	screen2.set_visarea(CLIPMINX_FULL,CLIPMAXX_FULL, CLIPMINY_FULL, CLIPMAXY_FULL);

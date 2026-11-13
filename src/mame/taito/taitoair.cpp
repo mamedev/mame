@@ -700,7 +700,7 @@ void taitoair_state::airsys(machine_config &config)
 	TAITOIO_YOKE(config, m_yoke);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 //  m_screen->set_refresh_hz(60);
 //  m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 //  m_screen->set_size(64*16, 32*16);

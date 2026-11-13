@@ -813,7 +813,7 @@ void zerohour_state::base(machine_config &config)
 	m_outlatch[1]->q_out_cb<7>().set(FUNC(zerohour_state::flip_screen_set));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(9.828_MHz_XTAL / 2, 312, 8, 248, 262, 32, 224);
 	screen.set_screen_update(FUNC(zerohour_state::screen_update));
 	screen.screen_vblank().set(m_stars, FUNC(zerohour_stars_device::update_state));

@@ -672,7 +672,7 @@ void thayers_state::thayers(machine_config &config)
 	PIONEER_LDV1000HLE(config, m_player);
 	m_player->set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_SELF_RENDER);
 	screen.set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	screen.set_screen_update(m_player, FUNC(pioneer_ldv1000hle_device::screen_update));

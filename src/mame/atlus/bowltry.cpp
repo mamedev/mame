@@ -157,7 +157,7 @@ void bowltry_state::bowltry(machine_config &config)
 	// TODO: serial hookup, comms with a LED type ring display?
 	// it sometimes feeds with "P1" and four zeroes
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);

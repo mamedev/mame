@@ -2,7 +2,7 @@
 // copyright-holders:Vas Crabb
 /***************************************************************************
 
-    msdib.h
+    msdib.cpp
 
     Microsoft Device-Independent Bitmap file loading.
 
@@ -14,7 +14,6 @@
 #include "ioprocs.h"
 #include "multibyte.h"
 
-#include "eminline.h"
 #include "osdcore.h"
 
 #include <bit>

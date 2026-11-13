@@ -19,9 +19,7 @@
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "sound/tms5110.h"
-#include "video/vector.h"
-
-#include "screen.h"
+#include "vector.h"
 
 #define CPU_CLOCK           8000000     /* not used when video boards are connected */
 #define VIDEO_CLOCK         15468480
@@ -41,7 +39,6 @@ public:
 		m_g80_audio(*this, "g80sound"),
 		m_aysnd(*this, "aysnd"),
 		m_vector(*this, "vector"),
-		m_screen(*this, "screen"),
 		m_d7d6(*this, "D7D6"),
 		m_d5d4(*this, "D5D4"),
 		m_d3d2(*this, "D3D2"),
@@ -116,7 +113,6 @@ private:
 	optional_device<segag80_audio_device_base> m_g80_audio;
 	optional_device<ay8912_device> m_aysnd;
 	required_device<vector_device> m_vector;
-	required_device<screen_device> m_screen;
 
 	required_ioport m_d7d6;
 	required_ioport m_d5d4;
@@ -153,13 +149,12 @@ private:
 	void coin_count_w(u8 data);
 	void unknown_w(u8 data);
 	void update_int();
-	void vblank_callback(screen_device &screen, bool state);
 
 	void usb_ram_w(offs_t offset, u8 data);
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
-	uint32_t screen_update_segag80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void vector_update_segag80v(vector_device &vector);
 	inline bool adjust_xy(int rawx, int rawy, int &outx, int &outy);
 	void sega_generate_vector_list();
 	offs_t decrypt_offset(offs_t offset);

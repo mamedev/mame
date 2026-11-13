@@ -267,7 +267,7 @@ void plan80_state::plan80(machine_config &config)
 	pio.out_pc_callback().set(FUNC(plan80_state::pio_pc_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 48*6, 320, 0, 32*8);
 	screen.set_screen_update(FUNC(plan80_state::screen_update));
 	screen.set_palette("palette");

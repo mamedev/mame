@@ -34,12 +34,13 @@ public:
 	u8 get_via_data() { return m_via_data; }
 	void set_via_data(u8 dat) { m_via_data = dat; }
 	void set_adb_line(int linestate) { m_adb_in = (linestate == ASSERT_LINE); }
-	void set_adb_power(int linestate) { m_adb_power = (linestate == ASSERT_LINE); }
+	void set_adb_power(int linestate) { m_adb_power = (linestate == CLEAR_LINE); }
 	void set_iic_sda(u8 data) { m_iic_sda = (data & 1); }
 	int get_adb_dtime() { return m_adb_dtime; }
 
 	int rom_offset;
 
+	auto poweroff_callback() { return write_poweroff.bind(); }
 	auto reset_callback() { return write_reset.bind(); }
 	auto nmi_callback() { return write_nmi.bind(); }
 	auto linechange_callback() { return write_linechange.bind(); }
@@ -49,7 +50,7 @@ public:
 	auto iic_sda_callback() { return write_iic_sda.bind(); }
 	auto dfac_latch_callback() { return write_dfac_latch.bind(); }
 
-	devcb_write_line write_reset, write_nmi, write_linechange, write_via_clock, write_via_data;
+	devcb_write_line write_poweroff, write_reset, write_nmi, write_linechange, write_via_clock, write_via_data;
 	devcb_write_line write_iic_scl, write_iic_sda, write_dfac_latch;
 
 protected:
@@ -70,6 +71,11 @@ protected:
 	void pc_w(u8 data);
 
 private:
+	void update_power_request();
+	bool m_power_data = false;
+	bool m_power_direction = false;
+	bool m_power_request = false;
+	bool m_host_running = false;
 	u8 m_treq, m_byteack, m_tip, m_via_data, m_last_adb;
 	u8 m_iic_sda;
 	u64 m_last_adb_time;

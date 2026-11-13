@@ -77,17 +77,6 @@
 
 */
 
-/*
-
-    TODO:
-
-    - keyboard ROM is not dumped
-    - MPSC (DMA and interrupts)
-    - CRTC186 video using CRT9007
-    - IOE186 card
-
-*/
-
 #include "emu.h"
 #include "bus/mm2/exp.h"
 #include "bus/rs232/rs232.h"
@@ -165,8 +154,8 @@ private:
 	void mpsc_txdb_w(int state) { if (m_llbb) m_mpsc->rxb_w(state); else m_rs232b->write_txd(state); }
 	void mpsc_rtsa_w(int state) { if (m_llba) m_mpsc->ctsa_w(state); else m_rs232a->write_rts(state); }
 	void mpsc_rtsb_w(int state) { if (m_llbb) m_mpsc->ctsb_w(state); else m_rs232b->write_rts(state); }
-	void tmrout0_w(int state) { if (!m_cls1 && !m_cls0) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
-	void tmrout1_w(int state) { if (!m_cls1 && m_cls0) { m_mpsc->rxca_w(state); m_mpsc->txca_w(state); } };
+	void tmrout0_w(int state) { if (!m_cls1) { m_mpsc->txca_w(state); if (!m_cls0) m_mpsc->rxca_w(state); } };
+	void tmrout1_w(int state) { if (!m_cls1 && m_cls0) m_mpsc->rxca_w(state); };
 	void latch_hold(int state, int bit);
 	void update_bhlda();
 	void hold1_w(int state) { latch_hold(state, 0); }
@@ -265,22 +254,6 @@ void mm2_state::machine_start()
 {
 	m_mpsc->synca_w(1);
 
-	u8 *rom = memregion(I80186_TAG)->base();
-
-	// patch out ROM checksum validation
-	rom[0x051c] = 0x90;
-	rom[0x051d] = 0x90;
-
-	// patch out MPSC test which fails due to missing DMA and interrupts
-	rom[0x1cf8] = 0x90;
-	rom[0x1cf9] = 0x90;
-	rom[0x1cfa] = 0x90;
-
-	// patch out CRTC186 test which fails due to missing keyboard emulation
-	rom[0x1d00] = 0x90;
-	rom[0x1d01] = 0x90;
-	rom[0x1d02] = 0x90;
-
 	// state saving
 	save_item(NAME(m_cls0));
 	save_item(NAME(m_cls1));
@@ -288,6 +261,12 @@ void mm2_state::machine_start()
 	save_item(NAME(m_llbb));
 	save_item(NAME(m_hold_latch));
 }
+
+static DEVICE_INPUT_DEFAULTS_START(ioe2)
+	DEVICE_INPUT_DEFAULTS("SID", 0x03, 0x00)
+	DEVICE_INPUT_DEFAULTS("SIC", 0x07, 0x01)
+	DEVICE_INPUT_DEFAULTS("S1", 0x07, 0x00)
+DEVICE_INPUT_DEFAULTS_END
 
 void mm2_state::mm2(machine_config &config)
 {
@@ -316,8 +295,8 @@ void mm2_state::mm2(machine_config &config)
 
 	I8274(config, m_mpsc, XTAL(16'000'000)/4);
 	m_mpsc->out_int_callback().set(m_pic, FUNC(pic8259_device::ir1_w));
-	m_mpsc->out_txdrqa_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
-	m_mpsc->out_rxdrqa_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
+	m_mpsc->out_txdrqa_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
+	m_mpsc->out_rxdrqa_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq0_w));
 	m_mpsc->out_txda_callback().set(FUNC(mm2_state::mpsc_txda_w));
 	m_mpsc->out_rtsa_callback().set(FUNC(mm2_state::mpsc_rtsa_w));
 	m_mpsc->out_txdb_callback().set(FUNC(mm2_state::mpsc_txdb_w));
@@ -369,8 +348,8 @@ void mm2_state::mm2(machine_config &config)
 
 	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp1", m_exp, mikromikko2_expansion_bus_cards, "mmc186", false);
 	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp2", m_exp, mikromikko2_expansion_bus_cards, "crtc186", false);
-	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp3", m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
-	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp4", m_exp, mikromikko2_expansion_bus_cards, nullptr, false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp3", m_exp, mikromikko2_expansion_bus_cards, "ioe186", false);
+	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp4", m_exp, mikromikko2_expansion_bus_cards, "ioe186", false).set_option_device_input_defaults("ioe186", DEVICE_INPUT_DEFAULTS_NAME(ioe2));
 	MIKROMIKKO2_EXPANSION_BUS_SLOT(config, "exp5", m_exp, mikromikko2_expansion_bus_cards, "meme186", false);
 }
 
@@ -389,9 +368,9 @@ ROM_START( mm2m35d )
 	ROMX_LOAD( "9491c.ic58", 0x8001, 0x4000, CRC(32047735) SHA1(408f03bc2d89257488e4b3336500681bb168cdec), ROM_SKIP(1) | ROM_BIOS(1) )
 
 	ROM_REGION( 0x100, "x2212", 0 )
-	ROM_LOAD( "x2212", 0x000, 0x100, CRC(1b9f1518) SHA1(57928b28f654be84a00797ab5b5fa0389ae36016) )
+	ROM_LOAD( "x2212", 0x000, 0x100, CRC(ba945d01) SHA1(1c0bab62f5279b3333f19351f7d7114c0ad50e88) )
 ROM_END
 
 } // anonymous namespace
 
-COMP( 1983, mm2m35d,  0,     0,      mm2,   mm2,   mm2_state, empty_init, "Nokia Data", "MikroMikko 2 M35D", MACHINE_IMPERFECT_GRAPHICS )
+COMP( 1983, mm2m35d,  0,     0,      mm2,   mm2,   mm2_state, empty_init, "Nokia Data", "MikroMikko 2 M35D", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )

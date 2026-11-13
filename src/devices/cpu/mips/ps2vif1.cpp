@@ -274,10 +274,10 @@ void ps2_vif1_device::mmio_w(offs_t offset, uint64_t data)
 void ps2_vif1_device::dma_write(const uint64_t hi, const uint64_t lo)
 {
 	//logerror("%s: dma_write: %08x%08x%08x%08x\n", machine().describe_context(), (uint32_t)(hi >> 32), (uint32_t)hi, (uint32_t)(lo >> 32), (uint32_t)lo);
-	fifo_push((uint32_t)(lo >> 32));
 	fifo_push((uint32_t)lo);
-	fifo_push((uint32_t)(hi >> 32));
+	fifo_push((uint32_t)(lo >> 32));
 	fifo_push((uint32_t)hi);
+	fifo_push((uint32_t)(hi >> 32));
 }
 
 void ps2_vif1_device::tag_write(uint32_t *data)
@@ -329,6 +329,8 @@ void ps2_vif1_device::execute_run()
 {
 	while (m_icount > 0)
 	{
+		if ((m_status & STAT_E_WAIT) && !m_vu1->vif_busy())
+			m_status &= ~STAT_E_WAIT;
 		if (m_status & (STAT_E_WAIT | STAT_GS_WAIT | STAT_STALL_STOP | STAT_STALL_FBRK | STAT_STALL_INT))
 		{
 			m_icount = 0;
@@ -475,8 +477,8 @@ void ps2_vif1_device::transfer_mpg()
 		m_data_needed--;
 	}
 
-	m_mpg_insn = (uint64_t)fifo_pop() << 32;
-	m_mpg_insn |= fifo_pop();
+	m_mpg_insn = fifo_pop();
+	m_mpg_insn |= uint64_t(fifo_pop()) << 32;
 	m_mpg_count--;
 
 	m_vu1->write_micro_mem(m_mpg_addr, m_mpg_insn);
@@ -503,6 +505,8 @@ void ps2_vif1_device::decode_vifcode()
 			break;
 		case 0x02: /* OFFSET */
 			m_offset = m_code & 0x3ff;
+			m_status &= ~STAT_DBUF;
+			m_tops = m_base;
 			logerror("%s: OFFSET: %03x\n", machine().describe_context(), m_offset);
 			break;
 		case 0x03: /* BASE */
@@ -527,14 +531,20 @@ void ps2_vif1_device::decode_vifcode()
 			break;
 		case 0x14: /* MSCAL */
 			logerror("%s: MSCAL %04x\n", machine().describe_context(), (uint16_t)m_code);
-			if (m_vu1->running())
+			if (m_vu1->vif_busy())
 			{
+				m_status |= STAT_MODE_DECODE | STAT_E_WAIT;
 				m_icount--;
 				return;
 			}
 			else
 			{
-				m_vu1->start((uint16_t)m_code);
+				m_status &= ~STAT_E_WAIT;
+				m_top = m_tops;
+				m_itop = m_itops;
+				m_status ^= STAT_DBUF;
+				m_tops = (m_base + ((m_status & STAT_DBUF) ? m_offset : 0)) & 0x3ff;
+				m_vu1->start(uint32_t(uint16_t(m_code)) << 3);
 			}
 			break;
 		case 0x20: /* STMASK */
@@ -558,7 +568,7 @@ void ps2_vif1_device::decode_vifcode()
 			m_mpg_count = (m_code >> 16) & 0xff;
 			if (!m_mpg_count)
 				m_mpg_count = 0x100;
-			m_mpg_addr = m_code & 0xffff;
+			m_mpg_addr = (m_code & 0xffff) << 3;
 			logerror("%s: MPG\n", machine().describe_context());
 			break;
 		default:
@@ -567,6 +577,7 @@ void ps2_vif1_device::decode_vifcode()
 				m_unpack_count = calculate_unpack_count();
 				m_unpack_signed = BIT(m_code, 14);
 				m_unpack_add_tops = BIT(m_code, 15);
+				m_unpack_addr = (((m_code & 0x3ff) + (m_unpack_add_tops ? m_tops : 0)) & 0x3ff) << 4;
 				m_unpack_format = (uint8_t)(m_command & 0xf);
 				m_data_needed = FORMAT_SIZE[m_unpack_format];
 				logerror("%s: UNPACK (%08x), count %d\n", machine().describe_context(), m_code, m_unpack_count);
@@ -611,12 +622,14 @@ void ps2_vif1_device::decode_vifcode()
 
 uint32_t ps2_vif1_device::calculate_unpack_count()
 {
-	const uint32_t wl = (m_cycle >> 8) & 0xff;
-	const uint32_t cl = m_cycle & 0xff;
+	const uint32_t wl = ((m_cycle >> 8) & 0xff) ? ((m_cycle >> 8) & 0xff) : 256;
+	const uint32_t cl = (m_cycle & 0xff) ? (m_cycle & 0xff) : 256;
 	const uint32_t vl = m_command & 3;
 	const uint32_t vn = (m_command >> 2) & 3;
 
 	uint32_t num = (m_code >> 16) & 0xff;
+	if (!num)
+		num = 256;
 	if (wl > cl)
 	{
 		const uint32_t mod = num % wl;

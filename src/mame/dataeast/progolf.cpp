@@ -525,7 +525,7 @@ void progolf_state::progolf(machine_config &config)
 	soundlatch.data_pending_callback().set_inputline(m_audiocpu, 0);
 	soundlatch.set_separate_acknowledge(true);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(3072));
 	screen.set_size(256, 256);

@@ -570,7 +570,7 @@ void svi3x8_state::svi318p(machine_config &config)
 	TMS9929A(config, m_vdp, XTAL(10'738'635)).set_screen("screen");
 	m_vdp->set_vram_size(0x4000);
 	m_vdp->int_callback().set(FUNC(svi3x8_state::intvdp_w));
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 void svi3x8_state::svi318n(machine_config &config)
@@ -579,7 +579,7 @@ void svi3x8_state::svi318n(machine_config &config)
 	TMS9928A(config, m_vdp, XTAL(10'738'635)).set_screen("screen");
 	m_vdp->set_vram_size(0x4000);
 	m_vdp->int_callback().set(FUNC(svi3x8_state::intvdp_w));
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 void svi3x8_state::svi328p(machine_config &config)

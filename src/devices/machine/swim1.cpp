@@ -17,7 +17,23 @@ DEFINE_DEVICE_TYPE(SWIM1, swim1_device, "swim1", "Apple SWIM1 (Sander/Wozniak In
 swim1_device::swim1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	applefdintf_device(mconfig, SWIM1, tag, owner, clock),
 	m_floppy(nullptr),
-	m_timer(nullptr)
+	m_timer(nullptr),
+	m_last_sync(0),
+	m_ism_error(0),
+	m_ism_fifo_pos(0),
+	m_ism_tss_sr(0), m_ism_tss_output(0), m_ism_current_bit(0xff),
+	m_ism_fifo{},
+	m_ism_sr(0),
+	m_ism_crc(0xcdb4),
+	m_ism_half_cycles_before_change(0),
+	m_ism_correction_factor{},
+	m_ism_latest_edge(0),
+	m_ism_prev_ls((1 << 2) | 1),
+	m_ism_csm_state(CSM_INIT),
+	m_ism_csm_error_counter{},
+	m_ism_csm_pair_side(0), m_ism_csm_min_count(0),
+	m_ism_tsm_out(0), m_ism_tsm_bits(0),
+	m_ism_tsm_mark(false)
 {
 }
 
@@ -29,9 +45,6 @@ void swim1_device::device_start()
 	m_sync_timer = timer_alloc(FUNC(swim1_device::ism_periodic_sync), this);
 
 	save_item(NAME(m_last_sync));
-	save_item(NAME(m_flux_write_start));
-	save_item(NAME(m_flux_write));
-	save_item(NAME(m_flux_write_count));
 
 	save_item(NAME(m_ism_param));
 	save_item(NAME(m_ism_mode));
@@ -85,8 +98,6 @@ void swim1_device::device_reset()
 	m_floppy = nullptr;
 
 	m_last_sync = machine().time().as_ticks(clock());
-	m_flux_write_start = 0;
-	m_flux_write_count = 0;
 
 	m_iwm_next_state_change = 0;
 	m_iwm_active = MODE_IDLE;
@@ -115,7 +126,8 @@ void swim1_device::set_floppy(floppy_image_device *floppy)
 		return;
 
 	sync();
-	flush_write();
+	if(m_floppy)
+		m_floppy->write_end(machine().time());
 
 	LOG("floppy %s\n", floppy ? floppy->tag() : "-");
 
@@ -356,13 +368,13 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 		// Entering write mode
 		m_ism_current_bit = 0;
 		LOG("%s write start %s %s floppy=%p\n", machine().time().to_string(), m_ism_setup & 0x40 ? "gcr" : "mfm", m_ism_setup & 0x08 ? "fclk/2" : "fclk", m_floppy);
-		m_flux_write_start = m_last_sync;
-		m_flux_write_count = 0;
+		if(m_floppy)
+			m_floppy->write_start(cycles_to_time(m_last_sync));
 
 	} else if((prev_mode & 0x18) == 0x18 && (m_ism_mode & 0x18) != 0x18) {
 		// Exiting write mode
-		flush_write();
-		m_flux_write_start = 0;
+		if(m_floppy)
+			m_floppy->write_end(cycles_to_time(m_last_sync));
 		m_ism_current_bit = 0xff;
 		m_ism_half_cycles_before_change = 0;
 		LOG("%s write end\n", machine().time().to_string());
@@ -384,7 +396,8 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 
 	} else if((prev_mode & 0x18) == 0x08 && (m_ism_mode & 0x18) != 0x08) {
 		// Exiting read mode
-		flush_write();
+		if(m_floppy)
+			m_floppy->write_flush(cycles_to_time(m_last_sync));
 		m_ism_current_bit = 0xff;
 		m_ism_half_cycles_before_change = 0;
 		LOG("%s read end\n", machine().time().to_string());
@@ -394,7 +407,8 @@ void swim1_device::ism_write(offs_t offset, u8 data)
 TIMER_CALLBACK_MEMBER(swim1_device::update)
 {
 	if(m_iwm_active == MODE_DELAY) {
-		flush_write();
+		if(m_floppy)
+			m_floppy->write_end(machine().time());
 		m_iwm_active = MODE_IDLE;
 		m_iwm_rw = MODE_IDLE;
 		m_iwm_rw_state = S_IDLE;
@@ -404,37 +418,6 @@ TIMER_CALLBACK_MEMBER(swim1_device::update)
 		m_iwm_status &= ~0x20;
 		m_iwm_whd &= ~0x40;
 	}
-}
-
-void swim1_device::flush_write(u64 when)
-{
-	if(!m_flux_write_start)
-		return;
-
-	if(!when)
-		when = m_last_sync;
-
-	if(when > m_flux_write_start) {
-		bool last_on_edge = m_flux_write_count && m_flux_write[m_flux_write_count-1] == when;
-		if(last_on_edge)
-			m_flux_write_count--;
-
-		attotime start = cycles_to_time(m_flux_write_start);
-		attotime end = cycles_to_time(when);
-		std::vector<attotime> fluxes(m_flux_write_count);
-		for(u32 i=0; i != m_flux_write_count; i++)
-			fluxes[i] = cycles_to_time(m_flux_write[i]);
-
-		if(m_floppy)
-			m_floppy->write_flux(start, end, m_flux_write_count, m_flux_write_count ? &fluxes[0] : nullptr);
-
-		m_flux_write_count = 0;
-		if(last_on_edge)
-			m_flux_write[m_flux_write_count++] = when;
-		m_flux_write_start = when;
-
-	} else
-		m_flux_write_count = 0;
 }
 
 void swim1_device::iwm_control(int offset, u8 data)
@@ -467,8 +450,8 @@ void swim1_device::iwm_control(int offset, u8 data)
 		if((m_iwm_control & 0x80) == 0x00) {
 			if(m_iwm_rw != MODE_READ) {
 				if(m_iwm_rw == MODE_WRITE) {
-					flush_write();
-					m_flux_write_start = 0;
+					if(m_floppy)
+						m_floppy->write_end(cycles_to_time(m_last_sync));
 				}
 				m_iwm_rw = MODE_READ;
 				m_iwm_rw_state = S_IDLE;
@@ -484,17 +467,17 @@ void swim1_device::iwm_control(int offset, u8 data)
 				m_iwm_rw_state = S_IDLE;
 				m_iwm_whd |= 0x40;
 				m_iwm_next_state_change = 0;
-				m_flux_write_start = m_last_sync;
-				m_flux_write_count = 0;
-				if(m_floppy)
-					m_floppy->set_write_splice(cycles_to_time(m_flux_write_start));
+				if(m_floppy) {
+					m_floppy->write_start(cycles_to_time(m_last_sync));
+					m_floppy->set_write_splice(cycles_to_time(m_last_sync));
+				}
 			}
 		}
 	} else {
 		if(m_iwm_active == MODE_ACTIVE) {
-			flush_write();
+			if(m_floppy)
+				m_floppy->write_end(cycles_to_time(m_last_sync));
 			if(m_iwm_mode & 0x04) {
-				m_flux_write_start = 0;
 				m_iwm_active = MODE_IDLE;
 				m_iwm_rw = MODE_IDLE;
 				m_iwm_rw_state = S_IDLE;
@@ -623,7 +606,7 @@ void swim1_device::ism_fifo_clear()
 
 bool swim1_device::ism_fifo_push(u16 data)
 {
-	if(m_ism_fifo_pos == 2)
+	if(m_ism_fifo_pos >= 2)
 	{
 		return true;
 	}
@@ -791,7 +774,6 @@ void swim1_device::iwm_sync()
 				m_last_sync = m_iwm_next_state_change;
 			switch(m_iwm_rw_state) {
 			case S_IDLE:
-				m_flux_write_count = 0;
 				if(m_iwm_mode & 0x02) {
 					m_iwm_rw_state = SW_WINDOW_LOAD;
 					m_iwm_rw_bit_count = 8;
@@ -806,8 +788,8 @@ void swim1_device::iwm_sync()
 			case SW_WINDOW_LOAD:
 				if(m_iwm_whd & 0x80) {
 					LOG("underrun\n");
-					flush_write();
-					m_flux_write_start = 0;
+					if(m_floppy)
+						m_floppy->write_end(cycles_to_time(m_last_sync));
 					m_iwm_whd &= ~0x40;
 					m_last_sync = next_sync;
 					m_iwm_rw_state = SW_UNDERRUN;
@@ -822,15 +804,14 @@ void swim1_device::iwm_sync()
 
 			case SW_WINDOW_MIDDLE:
 				if(m_iwm_wsh & 0x80)
-					m_flux_write[m_flux_write_count++] = m_last_sync;
+					if(m_floppy)
+						m_floppy->write_flux_change(cycles_to_time(m_last_sync));
 				m_iwm_wsh <<= 1;
 				m_iwm_rw_state = SW_WINDOW_END;
 				m_iwm_next_state_change = m_last_sync + iwm_half_window_size();
 				break;
 
 			case SW_WINDOW_END:
-				if(m_flux_write_count == m_flux_write.size())
-					flush_write();
 				if(m_iwm_mode & 0x02) {
 					m_iwm_rw_bit_count --;
 					if(m_iwm_rw_bit_count == 0) {
@@ -907,9 +888,8 @@ void swim1_device::ism_sync()
 					m_ism_tss_output = 0;
 				}
 				if(bit) {
-					if(m_flux_write_count == m_flux_write.size())
-						flush_write(next_sync - cycles);
-					m_flux_write[m_flux_write_count ++] = next_sync - cycles;
+					if(m_floppy)
+						m_floppy->write_flux_change(cycles_to_time(next_sync - cycles));
 					m_ism_half_cycles_before_change = m_ism_param[P_TIME1] + 2*2;
 				} else
 					m_ism_half_cycles_before_change = m_ism_param[P_TIME0] + 2*2;
@@ -927,7 +907,8 @@ void swim1_device::ism_sync()
 					u16 r = ism_fifo_pop();
 					if(r == 0xffff && !m_ism_error) {
 						m_ism_error |= 0x01;
-						flush_write();
+						if(m_floppy)
+							m_floppy->write_end(cycles_to_time(m_last_sync));
 						m_ism_current_bit = 0xff;
 						m_ism_half_cycles_before_change = 0;
 						m_ism_mode &= ~8;

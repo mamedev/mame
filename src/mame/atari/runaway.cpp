@@ -563,7 +563,7 @@ void qwak_state::qwak(machine_config &config)
 	mainlatch.q_out_cb<5>().set_nop();
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(256, 263);
 	m_screen->set_visarea(0, 255, 0, 239);

@@ -1674,7 +1674,7 @@ void taitosj_state::nomcu(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(taitosj_state::irq0_line_hold), attotime::from_hz(12_MHz_XTAL / (2*4*16*16*10*16)));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 256, 264, 16, 240); // verified from schematics
 	m_screen->set_screen_update(FUNC(taitosj_state::screen_update));
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE); // collision detection

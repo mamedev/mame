@@ -96,7 +96,6 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual void sound_reset() override;
 	virtual void video_start() override ATTR_COLD;
 
 private:
@@ -430,6 +429,9 @@ void berzerk_state::machine_reset()
 
 	start_irq_timer();
 	start_nmi_timer();
+
+	// clears the flip-flop controlling the volume and freq on the speech chip
+	audio_w(4, 0x40);
 }
 
 
@@ -647,13 +649,6 @@ uint8_t berzerk_state::audio_r(offs_t offset)
 	default:
 		return m_custom->sh6840_r(offset);
 	}
-}
-
-
-void berzerk_state::sound_reset()
-{
-	/* clears the flip-flop controlling the volume and freq on the speech chip */
-	audio_w(4, 0x40);
 }
 
 
@@ -1185,7 +1180,7 @@ void berzerk_state::berzerk(machine_config &config)
 	TTL74181(config, m_ls181_12c);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(berzerk_state::screen_update));
 

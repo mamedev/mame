@@ -96,10 +96,10 @@ int taitoair_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void taitoair_state::fill_slope(bitmap_ind16 &bitmap, const rectangle &cliprect, u16 header, s32 x1, s32 x2, s32 sl1, s32 sl2, s32 y1, s32 y2, s32 *nx1, s32 *nx2)
 {
-	if (y1 > cliprect.max_y)
+	if (y1 > cliprect.bottom())
 		return;
 
-	if (y2 <= cliprect.min_y)
+	if (y2 <= cliprect.top())
 	{
 		int delta = y2 - y1;
 		*nx1 = x1 + delta * sl1;
@@ -110,15 +110,15 @@ void taitoair_state::fill_slope(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	if (y1 < -1000000 || y1 > 1000000)
 		return;
 
-	if (y2 > cliprect.max_y)
-		y2 = cliprect.max_y + 1;
+	if (y2 > cliprect.bottom())
+		y2 = cliprect.bottom() + 1;
 
-	if (y1 < cliprect.min_y)
+	if (y1 < cliprect.top())
 	{
-		int delta = cliprect.min_y - y1;
+		int delta = cliprect.top() - y1;
 		x1 += delta * sl1;
 		x2 += delta * sl2;
-		y1 = cliprect.min_y;
+		y1 = cliprect.top();
 	}
 
 	if (x1 > x2 || (x1==x2 && sl1 > sl2))
@@ -137,19 +137,19 @@ void taitoair_state::fill_slope(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 	while (y1 < y2)
 	{
-		if (y1 >= cliprect.min_y)
+		if (y1 >= cliprect.top())
 		{
 			int xx1 = x1 >> TAITOAIR_FRAC_SHIFT;
 			int xx2 = x2 >> TAITOAIR_FRAC_SHIFT;
 			int grad_col;
 			int base_color;
 
-			if (xx1 <= cliprect.max_x || xx2 >= cliprect.min_x)
+			if (xx1 <= cliprect.right() || xx2 >= cliprect.left())
 			{
-				if (xx1 < cliprect.min_x)
-					xx1 = cliprect.min_x;
-				if (xx2 > cliprect.max_x)
-					xx2 = cliprect.max_x;
+				if (xx1 < cliprect.left())
+					xx1 = cliprect.left();
+				if (xx2 > cliprect.right())
+					xx2 = cliprect.right();
 
 				if (header & 0x4000 && machine().input().code_pressed(KEYCODE_Q))
 				{
@@ -216,13 +216,13 @@ void taitoair_state::fill_poly(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	if (cury == limy)
 		return;
 
-	if (cury > cliprect.max_y)
+	if (cury > cliprect.bottom())
 		return;
-	if (limy <= cliprect.min_y)
+	if (limy <= cliprect.top())
 		return;
 
-	if (limy > cliprect.max_y)
-		limy = cliprect.max_y;
+	if (limy > cliprect.bottom())
+		limy = cliprect.bottom();
 
 	int ps1 = pmin + pcount;
 	int ps2 = pmin;
@@ -283,15 +283,9 @@ void taitoair_state::fill_poly(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 
 void taitoair_state::fb_copy_op()
 {
-	/*! @todo declare once */
-	rectangle cliprect;
-
 	/* printf("%04x -> %d\n",data,offset); */
 
-	cliprect.min_x = 0;
-	cliprect.min_y = 3*16;
-	cliprect.max_x = m_screen->width() - 1;
-	cliprect.max_y = m_screen->height() - 1;
+	rectangle const cliprect(0, m_screen->width() - 1, 3*16, m_screen->height() - 1);
 
 	/* clear screen fb */
 	m_framebuffer[1]->fill(0, cliprect);
@@ -303,15 +297,9 @@ void taitoair_state::fb_copy_op()
 
 void taitoair_state::fb_erase_op()
 {
-	/*! @todo declare once */
-	rectangle cliprect;
-
 	/* printf("%04x -> %d\n",data,offset); */
 
-	cliprect.min_x = 0;
-	cliprect.min_y = 3*16;
-	cliprect.max_x = m_screen->width() - 1;
-	cliprect.max_y = m_screen->height() - 1;
+	rectangle const cliprect(0, m_screen->width() - 1, 3*16, m_screen->height() - 1);
 
 	m_framebuffer[0]->fill(0, cliprect);
 	//m_framebuffer[1]->fill(0, cliprect);
@@ -319,15 +307,9 @@ void taitoair_state::fb_erase_op()
 
 void taitoair_state::fb_fill_op()
 {
-	/*! @todo declare once */
-	rectangle cliprect;
-
 	/* printf("%04x -> %d\n",data,offset); */
 
-	cliprect.min_x = 0;
-	cliprect.min_y = 3*16;
-	cliprect.max_x = m_screen->width() - 1;
-	cliprect.max_y = m_screen->height() - 1;
+	rectangle const cliprect(0, m_screen->width() - 1, 3*16, m_screen->height() - 1);
 
 	if (m_line_ram[0x3fff])
 	{
@@ -363,14 +345,9 @@ void taitoair_state::fb_fill_op()
 */
 void taitoair_state::dsp_flags_w(offs_t offset, u16 data)
 {
-	rectangle cliprect;
-
 	/* printf("%04x -> %d\n",data,offset); */
 
-	cliprect.min_x = 0;
-	cliprect.min_y = 3*16;
-	cliprect.max_x = m_screen->width() - 1;
-	cliprect.max_y = m_screen->height() - 1;
+	rectangle const cliprect(0, m_screen->width() - 1, 3*16, m_screen->height() - 1);
 
 	/* clear and copy operation if offset is 0x3001 */
 	if (offset == 1)
@@ -407,18 +384,18 @@ u32 taitoair_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	u32 inc2y    = s16(m_tc0430grw[7]);
 
 	// Deltas are 118/31
-	int dx = cliprect.min_x      + 118;
-	int dy = cliprect.min_y - 48 + 31;
+	int dx = cliprect.left()     + 118;
+	int dy = cliprect.top() - 48 + 31;
 
 	counter1 += dx * inc1x + dy * inc1y;
 	counter2 += dx * inc2x + dy * inc2y;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u32 c1b = counter1;
 		u32 c2b = counter2;
-		u16 *dest = &bitmap.pix(y, cliprect.min_x);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		u16 *dest = &bitmap.pix(y, cliprect.left());
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			u16 base = 0;
 			u32 cntr = 0;

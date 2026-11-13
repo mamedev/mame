@@ -1075,7 +1075,7 @@ void fantland_state::fantland(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(8000));  // sound irq must feed the DAC at 8kHz
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(352,256);
@@ -1110,7 +1110,7 @@ void fantland_state::galaxygn(machine_config &config)
 	m_audiocpu->set_irq_acknowledge_callback(FUNC(fantland_state::audio_vector_r));
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(352,256);
@@ -1186,7 +1186,7 @@ void borntofi_state::borntofi(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &borntofi_state::sound_map);
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(54);    // 54 Hz
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(352,256);
@@ -1236,7 +1236,7 @@ void fantland_state::wheelrun(machine_config &config)
 	// IRQ by YM3526, NMI when soundlatch is written
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256,224);

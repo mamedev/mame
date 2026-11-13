@@ -50,7 +50,7 @@ INPUT_PORTS_END
 
 void amlogic_aml7212_popstarz_state::popstarz(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 256); // unknown resolution
 	m_screen->set_visarea(0, 320-1, 0, 255-1);

@@ -140,10 +140,10 @@ void jaleco_road_device::device_reset()
 
 void jaleco_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority1, int priority2, bool transparency)
 {
-	const int min_y = cliprect.min_y;
-	const int max_y = cliprect.max_y;
+	const int min_y = cliprect.top();
+	const int max_y = cliprect.bottom();
 
-	const int max_x = cliprect.max_x;
+	const int max_x = cliprect.right();
 
 	int min_priority, max_priority;
 
@@ -224,10 +224,10 @@ void jaleco_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, i
 
 void jaleco_zoom_road_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority1, int priority2, bool transparency)
 {
-	const int min_y = cliprect.min_y;
-	const int max_y = cliprect.max_y;
+	const int min_y = cliprect.top();
+	const int max_y = cliprect.bottom();
 
-	const int max_x = cliprect.max_x << 16;   // use fixed point values (16.16), for accuracy
+	const int max_x = cliprect.right() << 16;   // use fixed point values (16.16), for accuracy
 
 	int min_priority, max_priority;
 

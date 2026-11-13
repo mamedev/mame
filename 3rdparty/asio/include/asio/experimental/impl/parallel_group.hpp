@@ -2,7 +2,7 @@
 // experimental/impl/parallel_group.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,6 +29,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 namespace detail {
 
@@ -78,7 +79,7 @@ private:
   bool has_value_;
 };
 
-// Proxy completion handler for the group of parallel operatations. Unpacks and
+// Proxy completion handler for the group of parallel operations. Unpacks and
 // concatenates the individual operations' results, and invokes the user's
 // completion handler.
 template <typename Handler, typename... Ops>
@@ -343,12 +344,13 @@ struct parallel_group_cancellation_handler
 
   void operator()(cancellation_type_t cancel_type)
   {
-    // If we are the first place to request cancellation, i.e. no operation has
-    // yet completed and requested cancellation, emit a signal for each
-    // operation in the group.
+    // If we are the first place to request terminal cancellation, i.e. no
+    // operation has yet completed and requested cancellation, emit a signal for
+    // each operation in the group.
     if (cancel_type != cancellation_type::none)
       if (auto state = state_.lock())
-        if (state->cancellations_requested_++ == 0)
+        if (!(cancel_type & cancellation_type::terminal)
+            || state->cancellations_requested_++ == 0)
           for (std::size_t i = 0; i < sizeof...(Ops); ++i)
             state->cancellation_signals_[i].emit(cancel_type);
   }
@@ -393,7 +395,7 @@ void parallel_group_launch(Condition cancellation_condition, Handler handler,
         Condition, Handler, Ops...>>(state);
 }
 
-// Proxy completion handler for the ranged group of parallel operatations.
+// Proxy completion handler for the ranged group of parallel operations.
 // Unpacks and recombines the individual operations' results, and invokes the
 // user's completion handler.
 template <typename Handler, typename Op, typename Allocator>
@@ -669,12 +671,13 @@ struct ranged_parallel_group_cancellation_handler
 
   void operator()(cancellation_type_t cancel_type)
   {
-    // If we are the first place to request cancellation, i.e. no operation has
-    // yet completed and requested cancellation, emit a signal for each
-    // operation in the group.
+    // If we are the first place to request terminal cancellation, i.e. no
+    // operation has yet completed and requested cancellation, emit a signal for
+    // each operation in the group.
     if (cancel_type != cancellation_type::none)
       if (auto state = state_.lock())
-        if (state->cancellations_requested_++ == 0)
+        if (!(cancel_type & cancellation_type::terminal)
+            || state->cancellations_requested_++ == 0)
           for (std::size_t i = 0; i < state->cancellation_signals_.size(); ++i)
             state->cancellation_signals_[i].emit(cancel_type);
   }
@@ -706,6 +709,7 @@ void ranged_parallel_group_launch(Condition cancellation_condition,
       std::move(handler), range.size(), allocator);
 
   std::size_t idx = 0;
+  std::size_t range_size = range.size();
   for (auto&& op : std::forward<Range>(range))
   {
     typedef associated_executor_t<op_type> ex_type;
@@ -718,7 +722,7 @@ void ranged_parallel_group_launch(Condition cancellation_condition,
 
   // Check if any of the operations has already requested cancellation, and if
   // so, emit a signal for each operation in the group.
-  if ((state->cancellations_requested_ -= range.size()) > 0)
+  if ((state->cancellations_requested_ -= range_size) > 0)
     for (auto& signal : state->cancellation_signals_)
       signal.emit(state->cancel_type_);
 
@@ -781,6 +785,7 @@ struct associator<Associator,
   }
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

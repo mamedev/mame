@@ -587,7 +587,7 @@ void capbowl_base_state::base(machine_config &config)
 	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_size(360, 256);
 	m_screen->set_refresh_hz(57);
 	m_screen->set_screen_update(FUNC(capbowl_base_state::screen_update));

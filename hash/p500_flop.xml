@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -25,6 +25,18 @@ license:CC0-1.0
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="533248">
 				<rom name="p500demos.d80" size="533248" crc="676451dd" sha1="4d66ec01c46030ad671bea6b44bcf4c8fe563ea2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="p500demo">
+		<description>Commodore P500 Sales/Demo disk</description>
+		<year>198?</year>
+		<publisher>Commodore</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1066496">
+				<rom name="p500demo.d82" size="1066496" crc="da69d8a3" sha1="8f2ad132a5247f48958070434c5956e73de758b4"/>
 			</dataarea>
 		</part>
 	</software>

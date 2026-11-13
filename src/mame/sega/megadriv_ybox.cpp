@@ -127,6 +127,11 @@ ROM sockets U63 & U64 empty
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
 
+#define LOG_PROT (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
+
 namespace {
 
 class puckpkmn_state : public md_ctrl_state
@@ -179,7 +184,9 @@ class songjang_state : public puckpkmn_state
 {
 public:
 	songjang_state(const machine_config &mconfig, device_type type, const char *tag) :
-		puckpkmn_state(mconfig, type, tag)
+		puckpkmn_state(mconfig, type, tag),
+		m_rom(*this, "maincpu"),
+		m_rom_view(*this, "rom_view")
 	{
 	}
 
@@ -187,19 +194,27 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	uint16_t unhandled_protval_r();
-	void unhandled_protval_w(offs_t offset, uint16_t data);
+	required_region_ptr<uint16_t> m_rom;
+	memory_view m_rom_view;
 
-	uint16_t protval_r();
-	void protval_w(uint16_t data);
+	uint16_t prot_r(offs_t offset);
+	void prot_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+
+	uint16_t rom_ovl_r(offs_t offset);
+	void rom_ovl_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void rom_ovl_select();
+	virtual uint32_t rom_ovl_xor(uint8_t value) { return 0; }
 
 	virtual uint16_t sj_70001c_r();
 
 	void songjang_map(address_map &map) ATTR_COLD;
 
-	uint16_t m_protval;
+	uint8_t m_prot_latch[2]{};
+	uint8_t m_rom_ovl = 0;
+	uint32_t m_rom_ovl_xor = 0;
 };
 
 class shuifeng_state : public songjang_state
@@ -212,6 +227,20 @@ public:
 
 private:
 	virtual uint16_t sj_70001c_r() override;
+	virtual uint32_t rom_ovl_xor(uint8_t value) override;
+};
+
+class xmvsfmb_state : public songjang_state
+{
+public:
+	xmvsfmb_state(const machine_config &mconfig, device_type type, const char *tag) :
+		songjang_state(mconfig, type, tag)
+	{
+	}
+
+private:
+	virtual uint16_t sj_70001c_r() override;
+	virtual uint32_t rom_ovl_xor(uint8_t value) override;
 };
 
 /************************************ Mega Drive Bootlegs *************************************/
@@ -274,26 +303,19 @@ void songjang_state::songjang_map(address_map &map)
 {
 	puckpkmn_base_map(map);
 
-	map(0x01c000, 0x01cfff).nopw(); // writes to ROM area, buggy code?
+	// ROM, see rom_ovl_w
+	map(0x000000, 0x3fffff).view(m_rom_view);
+	m_rom_view[0](0x000000, 0x3fffff).rom().region("maincpu", 0);
+	m_rom_view[0](0x01c000, 0x01cfff).nopw(); // writes to ROM area, buggy code?
+	m_rom_view[1](0x000000, 0x3fffff).r(FUNC(songjang_state::rom_ovl_r));
+	m_rom_view[1](0x01c000, 0x01cfff).nopw();
 
-	// fallthrough for unhandled cases, as the protection in this area just seems to expect readbacks of data written
-	// but at a different address, maybe hardcoded per game in one of the custom programmed chips?
-	map(0x400000, 0x4fffff).rw(FUNC(songjang_state::unhandled_protval_r), FUNC(songjang_state::unhandled_protval_w));
+	// read back of written values, see prot_r / prot_w
+	map(0x400000, 0x4fffff).rw(FUNC(songjang_state::prot_r), FUNC(songjang_state::prot_w));
 
-	// songjang
-	map(0x412302, 0x412303).w(FUNC(songjang_state::protval_w)); // used with 0x432100 read
-	map(0x426800, 0x426801).r(FUNC(songjang_state::protval_r)); // used with 0x468202 write
-	map(0x432100, 0x432101).r(FUNC(songjang_state::protval_r)); // used with 0x412302 write
-	map(0x468202, 0x468203).w(FUNC(songjang_state::protval_w)); // used with 0x426800 read
+	map(0x600000, 0x6fffff).w(FUNC(songjang_state::rom_ovl_w));
 
-	// shuifeng
-	map(0x45bdb2, 0x45bdb3).w(FUNC(songjang_state::protval_w)); // used with 0x465461 read
-	map(0x45bdf2, 0x45bdf3).w(FUNC(songjang_state::protval_w)); // used with 0x465461 read, when exiting service mode, but colours go bad anyway?
-
-	map(0x465460, 0x465461).r(FUNC(songjang_state::protval_r)); // used with 0x45bdb3 write
-	map(0x467470, 0x467471).r(FUNC(songjang_state::protval_r)); // used with 0x45bdb3 write
-
-	// both
+	map(0x70001a, 0x70001d).nopw(); // written once at boot right before the 0x70001c read, no effect visible from the code
 	map(0x70001c, 0x70001d).r(FUNC(songjang_state::sj_70001c_r));
 }
 
@@ -375,28 +397,80 @@ uint16_t jzth_state::bl_710000_r()
 	return ret;
 }
 
-uint16_t songjang_state::unhandled_protval_r()
+// Protection read back.
+// The games only use byte accesses on D8-D15, writing with A1 = 1 and reading with A1 = 0.
+// xmvsfmb builds the addresses from the VDP H/V counter and RAM variables, so most address
+// bits are don't care: A2 selects one of two latches, which is consistent with every
+// write / read back pair used by songjang, shuifeng and xmvsfmb.
+uint16_t songjang_state::prot_r(offs_t offset)
 {
-	popmessage("%s: unhandled protval_r\n", machine().describe_context());
-	return m_protval;
+	uint16_t const data = m_prot_latch[BIT(offset, 1)] << 8;
+
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_PROT, "%s: prot_r %06x = %04x\n", machine().describe_context(), 0x400000 | (offset << 1), data);
+
+	return data;
 }
 
-void songjang_state::unhandled_protval_w(offs_t offset, uint16_t data)
+void songjang_state::prot_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	popmessage("%s: unhandled protval_w %08x %04x\n", machine().describe_context(), 0x400000 + (offset * 2) , data);
-	m_protval = data & 0xff00;
+	LOGMASKED(LOG_PROT, "%s: prot_w %06x = %04x & %04x\n", machine().describe_context(), 0x400000 | (offset << 1), data, mem_mask);
+
+	if (ACCESSING_BITS_8_15)
+		m_prot_latch[BIT(offset, 1)] = data >> 8;
 }
 
-uint16_t songjang_state::protval_r()
+// ROM address remapping.
+// shuifeng and xmvsfmb copy a routine to RAM, mask interrupts, write a byte to 0x6xxxxx (address randomised with
+// the H/V counter), jsr into ROM and then write 0 to 0x6xxxxx. The call targets hold sample or graphics data,
+// or code that runs into a pointer table. The code actually needed is elsewhere in ROM, in blocks nothing else
+// references, at the call target with some address lines changed: shuifeng 0xfc: 0x25000 -> 0x65000 (move.w d0,d1
+// / addq.w #8,d1 / rts, the same as the identical code at 0x151c), xmvsfmb 0xf2: 0x2000 -> 0x12000, 0xce:
+// 0x65000 -> 0x75000, 0x9b: 0x31000 -> 0x59000.
+// Only the called blocks are read while a value is latched, so it isn't known how the other addresses are
+// affected or how the value selects the mapping; it's modeled as an address XOR per value.
+void songjang_state::rom_ovl_select()
 {
-	logerror("%s: protval_r\n", machine().describe_context());
-	return m_protval;
+	m_rom_view.select(m_rom_ovl ? 1 : 0);
 }
 
-void songjang_state::protval_w(uint16_t data)
+void songjang_state::rom_ovl_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	logerror("%s: protval_w %04x\n", machine().describe_context(), data);
-	m_protval = data & 0xff00;
+	LOGMASKED(LOG_PROT, "%s: rom_ovl_w %06x = %04x & %04x\n", machine().describe_context(), 0x600000 | (offset << 1), data, mem_mask);
+
+	if (ACCESSING_BITS_8_15)
+	{
+		m_rom_ovl = data >> 8;
+		m_rom_ovl_xor = m_rom_ovl ? rom_ovl_xor(m_rom_ovl) : 0;
+		if (m_rom_ovl && !m_rom_ovl_xor)
+			logerror("%s: unknown ROM remapping value %02x\n", machine().describe_context(), m_rom_ovl);
+		rom_ovl_select();
+	}
+}
+
+uint16_t songjang_state::rom_ovl_r(offs_t offset)
+{
+	return m_rom[(offset ^ (m_rom_ovl_xor >> 1)) & (m_rom.length() - 1)];
+}
+
+uint32_t shuifeng_state::rom_ovl_xor(uint8_t value)
+{
+	switch (value)
+	{
+		case 0xfc: return 0x40000; // 0x12b2 -> jsr 0x25000
+		default: return 0;
+	}
+}
+
+uint32_t xmvsfmb_state::rom_ovl_xor(uint8_t value)
+{
+	switch (value)
+	{
+		case 0x9b: return 0x68000; // 0x27e2 -> jsr 0x31000
+		case 0xce: return 0x10000; // 0x4f2a -> jsr 0x65000
+		case 0xf2: return 0x10000; // 0x55ee -> jsr 0x2000
+		default: return 0;
+	}
 }
 
 uint16_t songjang_state::sj_70001c_r()
@@ -409,6 +483,12 @@ uint16_t shuifeng_state::sj_70001c_r()
 {
 	logerror("%s: reading from sj_70001c_r\n", machine().describe_context());
 	return 0x0031;
+}
+
+uint16_t xmvsfmb_state::sj_70001c_r()
+{
+	logerror("%s: reading from sj_70001c_r\n", machine().describe_context());
+	return 0x0032;
 }
 
 /*************************************
@@ -597,8 +677,21 @@ void jzth_state::machine_start()
 void songjang_state::machine_start()
 {
 	puckpkmn_state::machine_start();
-	m_protval = 0;
-	save_item(NAME(m_protval));
+
+	save_item(NAME(m_prot_latch));
+	save_item(NAME(m_rom_ovl));
+	save_item(NAME(m_rom_ovl_xor));
+
+	machine().save().register_postload(save_prepost_delegate(FUNC(songjang_state::rom_ovl_select), this));
+}
+
+void songjang_state::machine_reset()
+{
+	puckpkmn_state::machine_reset();
+
+	m_rom_ovl = 0;
+	m_rom_ovl_xor = 0;
+	rom_ovl_select();
 }
 
 void puckpkmn_state::puckpkmn(machine_config &config)
@@ -802,6 +895,17 @@ ROM_START( shuifeng )
 	ROM_LOAD( "shuihufengyunzhuan-oki.u3", 0x00000, 0x80000, CRC(44287ab4) SHA1(42de2010e73c036a2a0e01c9dd3c1c8aef1a54a1) )
 ROM_END
 
+ROM_START( xmvsfmb )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "u26", 0x000000, 0x080000, CRC(6af064cd) SHA1(5498b27953bcd84656746cb731ddfcefbf814be3) )
+	ROM_LOAD16_BYTE( "u29", 0x000001, 0x080000, CRC(33edaa56) SHA1(8b88aa4995b71a405af83763119acfcede6012ab) )
+	ROM_LOAD16_BYTE( "u27", 0x100000, 0x080000, CRC(0270099d) SHA1(ec696312a5d17b4820e6c280ffe9b455d15cb7cc) )
+	ROM_LOAD16_BYTE( "u28", 0x100001, 0x080000, CRC(8a0af7b9) SHA1(b89b8bb03e5959615405d2ade3b9ea510cbf75cc) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "u3", 0x00000, 0x80000, CRC(6a941c30) SHA1(decb028f7e14662cd6c1cb2486a5d46a74af850f) )
+ROM_END
+
 } // anonymous namespace
 
 /*************************************
@@ -812,11 +916,13 @@ ROM_END
 
 // Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile RAM
 // Is 'Genie 2000' part of the title, and the parent set a bootleg?
-GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Sun Mixing",  "Puckman Pockimon Genie 2000",           0 )
-GAME( 2000, jingling,  puckpkmn, jingling,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "IBS Co. Ltd", "Jingling Jiazu Genie 2000",             0 )
-GAME( 2000, puckpkmnb, puckpkmn, puckpkmnb, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "bootleg",     "Puckman Pockimon Genie 2000 (bootleg)", 0 )
-GAME( 2000, jzth,      0,        jzth,      jzth,     jzth_state,     init_puckpkmn, ROT0, "<unknown>",   "Juezhan Tianhuang",                     MACHINE_IMPERFECT_SOUND )
+GAME( 2000, puckpkmn,  0,        puckpkmn,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "Sun Mixing",          "Puckman Pockimon Genie 2000",                              0 )
+GAME( 2000, jingling,  puckpkmn, jingling,  puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "IBS Co. Ltd",         "Jingling Jiazu Genie 2000",                                0 )
+GAME( 2000, puckpkmnb, puckpkmn, puckpkmnb, puckpkmn, puckpkmn_state, init_puckpkmn, ROT0, "bootleg",             "Puckman Pockimon Genie 2000 (bootleg)",                    0 )
+GAME( 2000, jzth,      0,        jzth,      jzth,     jzth_state,     init_puckpkmn, ROT0, "<unknown>",           "Juezhan Tianhuang",                                        MACHINE_IMPERFECT_SOUND )
 
 // some corruption on cutscenes between levels, emulation bug or glitch in the original conversion?
-GAME( 200?, songjang,  0,        songjang,  songjang, songjang_state, init_puckpkmn, ROT0, "WAH LAP",     "Songjiangyanyi Final",                  MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1999, shuifeng,  0,        songjang,  jzth,     shuifeng_state, init_puckpkmn, ROT0, "WAH LAP",     "Shuihu Feng Yun Zhuan",                 MACHINE_IMPERFECT_GRAPHICS )
+GAME( 200?, songjang,  0,        songjang,  songjang, songjang_state, init_puckpkmn, ROT0, "WAH LAP",             "Songjiangyanyi Final",                                     MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1999, shuifeng,  0,        songjang,  jzth,     shuifeng_state, init_puckpkmn, ROT0, "WAH LAP",             "Shuihu Feng Yun Zhuan",                                    MACHINE_IMPERFECT_GRAPHICS )
+
+GAME( 1999, xmvsfmb,   0,        songjang,  jzth,     xmvsfmb_state,  init_puckpkmn, ROT0, "bootleg (Puir Star)", "X-Men vs. Street Fighter (bootleg of Mega Drive version)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )

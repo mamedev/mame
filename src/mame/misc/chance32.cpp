@@ -479,7 +479,7 @@ void chance32_state::chance32(machine_config &config)
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(52.786);
 //  screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));

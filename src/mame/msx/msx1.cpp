@@ -3134,7 +3134,7 @@ void msx1_state::hx20(machine_config &config)
 /* MSX - Toshiba HX-20AR */
 // TMS9128
 
-/* MSX - Toahiba HX-20E */
+/* MSX - Toshiba HX-20E */
 
 ROM_START(hx20e)
 	ROM_REGION(0x8000, "mainrom", 0)

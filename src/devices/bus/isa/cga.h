@@ -60,7 +60,7 @@ protected:
 
 public:
 	void mode_control_w(uint8_t data);
-	void set_palette_luts();
+	virtual void set_palette_luts();
 	void plantronics_w(uint8_t data);
 	virtual uint8_t io_read(offs_t offset);
 	virtual void io_write(offs_t offset, uint8_t data);
@@ -316,5 +316,52 @@ protected:
 };
 
 DECLARE_DEVICE_TYPE(ISA8_CGA_CPORTIII, isa8_cga_cportiii_device)
+
+
+class isa8_cga_chameleon_device : public isa8_cga_device
+{
+public:
+	// construction/destruction
+	isa8_cga_chameleon_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
+protected:
+	virtual void device_start() override ATTR_COLD;
+private:
+	std::vector<uint8_t> m_charram;
+	uint8_t chr_read(offs_t offset);
+	void chr_write(offs_t offset, uint8_t data);
+	virtual void set_palette_luts() override;
+	uint8_t m_color_lut[2][4];
+};
+
+DECLARE_DEVICE_TYPE(ISA8_CGA_CHAMELEON, isa8_cga_chameleon_device)
+
+
+// ======================> isa8_cga_pcxport_device
+
+// The PC Transporter's CGA needs to share the system with another screen, which stock CGA struggles with,
+// and it also programs non-standard CRTC setups that stock CGA doesn't handle properly (but probably should).
+// In the interests of containing the blast radius, we're splitting out this subclass.
+
+class isa8_cga_pcxport_device : public isa8_cga_device
+{
+public:
+	// construction/destruction
+	isa8_cga_pcxport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// the character generator is stock CGA's, so look for it under that device's name
+	static auto parent_rom_device_type() { return &ISA8_CGA; }
+
+	virtual MC6845_UPDATE_ROW( crtc_update_row ) override;
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	MC6845_RECONFIGURE(reconfigure);
+};
+
+DECLARE_DEVICE_TYPE(ISA8_CGA_PCXPORT, isa8_cga_pcxport_device)
 
 #endif  // MAME_BUS_ISA_CGA_H

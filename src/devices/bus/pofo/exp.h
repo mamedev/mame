@@ -65,13 +65,11 @@ public:
 	virtual uint8_t iack_r() { return 0xff; }
 	virtual uint8_t eack_r() { return 0xff; }
 
-	virtual uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return data; }
-	virtual void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { }
-
+	virtual void ncc1_w(int state) { }
 	virtual void iint_w(int state) { }
+	virtual void nmio_w(int state) { }
 
 	void eint_w(int state);
-	void nmio_w(int state);
 	void wake_w(int state);
 
 protected:
@@ -97,35 +95,47 @@ public:
 
 	portfolio_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	auto eint_wr_callback() { return m_write_eint.bind(); }
-	auto nmio_wr_callback() { return m_write_nmio.bind(); }
-	auto wake_wr_callback() { return m_write_wake.bind(); }
+	template <typename T> void set_memspace(T &&tag, int spacenum) { m_memspace.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_iospace(T &&tag, int spacenum) { m_iospace.set_tag(std::forward<T>(tag), spacenum); }
+
+	void set_memspace(address_space &space) { m_memspace_ptr = &space; }
+	void set_iospace(address_space &space) { m_iospace_ptr = &space; }
+
+	auto eint_wr_cb() { return m_write_eint.bind(); }
+	auto wake_wr_cb() { return m_write_wake.bind(); }
 
 	// computer interface
-	bool nmd1_r() { return (m_card != nullptr) ? m_card->nmd1() : 1; }
-	bool pdet_r() { return (m_card != nullptr) ? m_card->pdet() : 0; }
-	bool cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }
+	int nmd1_r() { return (m_card != nullptr) ? m_card->nmd1() : 1; }
+	int pdet_r() { return (m_card != nullptr) ? m_card->pdet() : 0; }
+	int cdet_r() { return (m_card != nullptr) ? m_card->cdet() : 1; }
 
 	uint8_t iack_r() { return (m_card != nullptr) ? m_card->iack_r() : 0xff; }
 	uint8_t eack_r() { return (m_card != nullptr) ? m_card->eack_r() : 0xff; }
 
-	uint8_t nrdi_r(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return (m_card != nullptr) ? m_card->nrdi_r(offset, data, iom, bcom, ncc1) : data; }
-	void nwri_w(offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { if (m_card != nullptr) m_card->nwri_w(offset, data, iom, bcom, ncc1); }
+	void ncc1_w(int state) { if (m_card != nullptr) m_card->ncc1_w(state); }
 
 	void iint_w(int state) { if (m_card != nullptr) m_card->iint_w(state); }
+	void nmio_w(int state) { if (m_card != nullptr) m_card->nmio_w(state); }
 
 	// peripheral interface
 	void eint_w(int state) { m_write_eint(state); }
-	void nmio_w(int state) { m_write_nmio(state); }
 	void wake_w(int state) { m_write_wake(state); }
+
+	// card interface
+	address_space &memspace() { return m_memspace_ptr ? *m_memspace_ptr : *m_memspace; }
+	address_space &iospace() { return m_iospace_ptr ? *m_iospace_ptr : *m_iospace; }
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	optional_address_space m_memspace;
+	optional_address_space m_iospace;
+	address_space *m_memspace_ptr = nullptr;
+	address_space *m_iospace_ptr = nullptr;
+
 	devcb_write_line   m_write_eint;
-	devcb_write_line   m_write_nmio;
 	devcb_write_line   m_write_wake;
 
 	device_portfolio_expansion_slot_interface *m_card;

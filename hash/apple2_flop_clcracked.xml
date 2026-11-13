@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -1066,7 +1066,8 @@ license:CC0-1.0
 	<software name="agendafl">
 		<description>Agenda Files (cleanly cracked)</description>
 		<year>1981</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
+		<info name="partno" value="C2H0006"/>
 		<info name="release" value="2018-06-09"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -1588,7 +1589,8 @@ license:CC0-1.0
 	<software name="applwrt2">
 		<description>AppleWriter ][ (cleanly cracked)</description>
 		<year>1981</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
+		<info name="partno" value="C2B0010" />
 		<info name="release" value="2017-01-17"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -3684,6 +3686,8 @@ license:CC0-1.0
 		<description>Ernie's Quiz (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
+		<info name="developer" value="Children's Computer Workshop"/>
+		<info name="partno" value="C2E0013"/>
 		<info name="release" value="2016-12-31"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -5190,7 +5194,9 @@ license:CC0-1.0
 	<software name="instzoo">
 		<description>Instant Zoo (cleanly cracked)</description>
 		<year>1981</year>
-		<publisher>Apple ("Special Delivery"</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
+		<info name="developer" value="Children's Computer Workshop"/>
+		<info name="partno" value="C2E0016"/>
 		<info name="release" value="2016-12-31"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -6285,7 +6291,9 @@ license:CC0-1.0
 	<software name="mixnmtch">
 		<description>Mix and Match (cleanly cracked)</description>
 		<year>1981</year>
-		<publisher>Apple</publisher>
+		<publisher>Apple Computer</publisher>
+		<info name="developer" value="Children's Computer Workshop"/>
+		<info name="partno" value="C2E0015"/>
 		<info name="release" value="2016-12-31"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -6648,7 +6656,8 @@ license:CC0-1.0
 	<software name="musicomp">
 		<description>MusiComp (cleanly cracked)</description>
 		<year>1980</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
+		<info name="partno" value="C2H0002" />
 		<info name="release" value="2018-06-09"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -6971,7 +6980,8 @@ license:CC0-1.0
 	<software name="perfinmg">
 		<description>Personal Finance Manager (cleanly cracked)</description>
 		<year>1980</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
+		<info name="partno" value="C2H0001" />
 		<info name="release" value="2018-06-09"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -10776,6 +10786,8 @@ license:CC0-1.0
 		<description>Spotlight (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
+		<info name="developer" value="Children's Computer Workshop"/>
+		<info name="partno" value="C2E0014"/>
 		<info name="release" value="2016-12-31"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -11713,9 +11725,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="adventur">
-		<description>Adventure (cleanly cracked)</description>
+		<description>Apple Adventure (cleanly cracked)</description>
 		<year>1980</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="A2D0034" />
 		<info name="release" value="2017-09-09"/>
 
 		<part name="flop1" interface="floppy_5_25">
@@ -15448,9 +15461,10 @@ license:CC0-1.0
 	</software>
 
 	<software name="ahtlicac">
-		<description>Apple How To: Lessons in Computing and Calculating (cleanly cracked)</description>
+		<description>Apple How To: Lessons in Computing and Calculating (Education Series III) (cleanly cracked)</description>
 		<year>1980</year>
 		<publisher>Apple Computer</publisher>
+		<info name="partno" value="A2D0016"/>
 		<info name="release" value="2021-04-10"/>
 		<info name="usage" value="Will only run on 2, 2+, and unenhanced 2E models" />
 		<!-- "Apple How To: Lessons in Computing and Calculating" is a 1980 educational program developed by Bruce Tognazzini and distributed by Apple Computer. This is version 1.0. It is preserved here for the first time. Due to compatibility issues unrelated to copy protection, it only runs on an original Apple ][, ][+, or unenhanced //e. -->
@@ -15613,7 +15627,8 @@ license:CC0-1.0
 	<software name="hhbasic">
 		<description>Hand Holding BASIC (cleanly cracked)</description>
 		<year>1980</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
+		<info name="partno" value="C2E0001"/>
 		<info name="release" value="2021-05-18"/>
 		<!-- "Hand Holding BASIC" is a 1980 educational program developed by Neil Bennett and distributed by Apple Computer. It is preserved here for the first time. -->
 
@@ -16087,6 +16102,7 @@ license:CC0-1.0
 		<description>Apple Project Manager (cleanly cracked)</description>
 		<year>1981</year>
 		<publisher>Apple Computer</publisher>
+		<info name="developer" value="Construction Programming Services"/>
 		<info name="release" value="2021-11-27"/>
 		<!-- "Apple Project Manager" is a 1981 productivity program developed by Construction Programming Services and distributed by Apple Computer. It is preserved here for the first time. -->
 
@@ -16114,7 +16130,8 @@ license:CC0-1.0
 	<software name="galwars">
 		<description>Galactic Wars (cleanly cracked)</description>
 		<year>1980</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
+		<info name="partno" value="C2H0003"/>
 		<info name="release" value="2021-12-10"/>
 		<!-- "Galactic Wars" is a 1980 strategy game developed by Thomas M. Malinowski and distributed by Apple Computer. It is preserved here for the first time. -->
 
@@ -16128,7 +16145,8 @@ license:CC0-1.0
 	<software name="circanal">
 		<description>Circuit Analysis (cleanly cracked)</description>
 		<year>1981</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
+		<info name="partno" value="C2S0003"/>
 		<info name="release" value="2021-12-15"/>
 		<!-- "Circuit Analysis" is a 1981 educational program developed by A. F. Petrie and distributed by Apple Computer. It is preserved here for the first time. -->
 
@@ -16217,7 +16235,8 @@ license:CC0-1.0
 	<software name="bridpasb">
 		<description>Bridge Tutor with Precision and Scientific Bidding (cleanly cracked)</description>
 		<year>1980</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
+		<info name="partno" value="C2E0007"/>
 		<info name="release" value="2021-12-27"/>
 		<!-- "Bridge Tutor with Precision and Scientific Bidding" is a 1980 educational program developed by Alex Hanuse and distributed by Apple Computer. It is preserved here for the first time. -->
 
@@ -16637,7 +16656,8 @@ license:CC0-1.0
 	<software name="vt100emu">
 		<description>VT-100 Emulator (cleanly cracked)</description>
 		<year>1980</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
+		<info name="partno" value="C2B0002"/>
 		<info name="release" value="2022-06-10"/>
 		<!-- "VT-100 Emulator" is a 1980 communications program developed and distributed by Apple Computer. It is preserved here for the first time. -->
 
@@ -16651,7 +16671,9 @@ license:CC0-1.0
 	<software name="ortrk13a">
 		<description>Order Tracking System (version 1.3a) (cleanly cracked)</description>
 		<year>1981</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
+		<info name="developer" value="Loggins"/>
+		<info name="partno" value="C2B0008"/>
 		<info name="release" value="2022-06-10"/>
 		<!-- "Order Tracking System" is a 1981 productivity program developed by Loggins and distributed by Apple Computer. This is version 1.3a. It is preserved here for the first time. -->
 
@@ -22110,13 +22132,12 @@ license:CC0-1.0
 	<software name="bmblplot10a" cloneof="bmblplot">
 		<description>Bumble Plot (Apple Computer) (version 1.0) (4am crack)</description>
 		<year>1982</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
 		<info name="original_publisher" value="The Learning Company" />
 		<info name="programmer" value="Leslie Grimm" />
 		<info name="programmer" value="Corinne Grimm" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
 		<info name="version" value="1.0" />
-		<!-- Apple Computer "Special Delivery" label -->
 		<sharedfeat name="compatibility" value="A2P,A2E,A2EE,A2C,A2GS" />
 		<!-- Dump released: 2016-12-31 -->
 		<!-- educational program -->
@@ -37008,8 +37029,9 @@ license:CC0-1.0
 	<software name="mspells81" cloneof="mspells21">
 		<description>Magic Spells (version 1981) (Apple) (4am crack)</description>
 		<year>1981</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
 		<info name="original_publisher" value="Advanced Learning Technology" />
+		<info name="partno" value="C2E0012" />
 		<info name="programmer" value="Leslie Grimm" />
 		<info name="programmer" value="Corrine Grimm" />
 		<info name="usage" value="Requires an Apple ][+ or later." />
@@ -43335,8 +43357,9 @@ license:CC0-1.0
 	<software name="moptown">
 		<description>Moptown (version 1981) (Apple) (4am crack)</description>
 		<year>1981</year>
-		<publisher>Apple Computer</publisher>
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
 		<info name="original_publisher" value="Advanced Learning Technology"/>
+		<info name="partno" value="C2E0011" />
 		<info name="programmer" value="Leslie Grimm" />
 		<info name="programmer" value="Corinne Grimm" />
 		<info name="usage" value="Requires a 48K Apple ][+ or later." />
@@ -58986,10 +59009,10 @@ license:CC0-1.0
 	<software name="spdreadr">
 		<description>The Speed Reader (4am crack)</description>
 		<year>1981</year>
-		<publisher>Apple Computer</publisher>
-		<!-- "Special Delivery" label -->
+		<publisher>Apple Computer (Special Delivery Software)</publisher>
 		<info name="developer" value="Davidson &amp; Associates" />
 		<info name="original_publisher" value="Davidson &amp; Associates" />
+		<info name="partno" value="C2E0008" />
 		<info name="programmer" value="Richard Eckert" />
 		<info name="programmer" value="Janice Davidson, Ph.D." />
 		<info name="usage" value="Requires an Apple ][+ or later." />

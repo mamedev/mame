@@ -1035,7 +1035,7 @@ void decocass_state::decocass(machine_config &config)
 	DECOCASS_TAPE(config, m_cassette);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(HCLK, 384, 0*8, 256, 272, 1*8, 248);
 	m_screen->set_screen_update(FUNC(decocass_state::screen_update_decocass));
 	m_screen->set_palette(m_palette);

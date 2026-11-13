@@ -377,7 +377,7 @@ void bestleag_state::bestleag(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &bestleag_state::main_map);
 	m_maincpu->set_vblank_int("screen", FUNC(bestleag_state::irq6_line_hold));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(32*8, 32*8);

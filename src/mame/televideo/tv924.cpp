@@ -74,7 +74,7 @@ void tv924_state::tv924(machine_config &config)
 	scn2681_device &duart(SCN2681(config, "duart", 3.6864_MHz_XTAL)); // SCN2681A
 	duart.irq_cb().set_inputline(m_maincpu, m6502_device::IRQ_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(27'576'960, 848 * 2, 0, 640 * 2, 271, 0, 250);
 	screen.set_screen_update("pvtc", FUNC(scn2672_device::screen_update));
 

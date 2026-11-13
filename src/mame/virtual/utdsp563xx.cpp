@@ -10,6 +10,7 @@
 #include "screen.h"
 #include "speaker.h"
 
+
 extern const uint8_t font_uismall[];
 
 class ut_debug_buffer : public util::disasm_interface::data_buffer
@@ -58,7 +59,7 @@ public:
 	void utdsp563xx(machine_config &config);
 
 private:
-	enum { TESTS_PER_COLUMN = 28 };
+	enum { TESTS_PER_COLUMN = 30 };
 	enum { PRE_PER_COLUMN = 6, CODE_PER_COLUMN=9, POST_PER_COLUMN = 5 };
 
 	enum {
@@ -229,7 +230,7 @@ u32 utdsp563xx_state::jmp0_r()
 			area[regs[i].m_value >> 24] = val;
 
 		} else if(regs[i].m_reg >= F_CCR_C) {
-			u32 sr = m_cpu->state_int(DSP563XX_CCR);
+			u32 sr = m_cpu->state_int(DSP563XX_SR);
 			if(val)
 				sr |= 1 << (regs[i].m_reg & 15);
 			else
@@ -672,7 +673,7 @@ void utdsp563xx_state::utdsp563xx(machine_config &config)
 	DSP56311(config, m_cpu, 66_MHz_XTAL);
 	m_cpu->set_hard_omr(0);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_native_aspect();
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(0);

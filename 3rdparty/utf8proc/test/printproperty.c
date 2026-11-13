@@ -34,6 +34,8 @@ int main(int argc, char **argv)
             "  titlecase_mapping = %04x (seqindex %04x)\n"
             "  casefold = %s\n"
             "  comb_index = %d\n"
+            "  comb_length = %d\n"
+            "  comb_issecond = %d\n"
             "  bidi_mirrored = %d\n"
             "  comp_exclusion = %d\n"
             "  ignorable = %d\n"
@@ -51,6 +53,8 @@ int main(int argc, char **argv)
         utf8proc_totitle(c), p->titlecase_seqindex,
         (char *) map,
         p->comb_index,
+        p->comb_length,
+        p->comb_issecond,
         p->bidi_mirrored,
         p->comp_exclusion,
         p->ignorable,

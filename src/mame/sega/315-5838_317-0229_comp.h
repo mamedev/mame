@@ -5,77 +5,60 @@
 
 #pragma once
 
-#include "dirom.h"
-
-// #define SEGA315_DUMP_DEBUG // dump stuff to files to help with decryption efforts
+#include "devcb.h"
 
 DECLARE_DEVICE_TYPE(SEGA315_5838_COMP, sega_315_5838_comp_device)
 
-class sega_315_5838_comp_device :  public device_t,
-								   public device_rom_interface<23>
+class sega_315_5838_comp_device : public device_t
 {
 public:
-	// construction/destruction
-	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	uint16_t data_r();
-
-	void data_w_doa(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void data_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void srcaddr_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
-	void debug_helper(int id);
-
-	enum
+	enum class variant : u8
 	{
-		HACK_MODE_NONE = 0,
-		HACK_MODE_NO_KEY,
-		HACK_MODE_DOA
+		SEGA_315_5838,
+		SEGA_317_0229,
+		SEGA_317_0230,
+		SEGA_317_0231
 	};
 
-	void set_hack_mode(int mode) { m_hackmode = mode; }
+	sega_315_5838_comp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	// The callback takes a word address and returns a logical encrypted word.
+	void set_variant(variant type) { m_variant = type; }
+	auto source_callback() { return m_source_cb.bind(); }
+
+	void source_w(u32 data, u32 mem_mask = ~0U);
+	void table_w(offs_t offset, u16 data);
+	u16 data_r();
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	uint16_t source_word_r();
+	struct cipher_parameters
+	{
+		u8 routing[4];
+		u8 sboxes[4][8];
+		u8 affine[4];
+	};
 
-	void write_prot_data(uint32_t data, uint32_t mem_mask, int rev_words);
-	void set_prot_addr(uint32_t data, uint32_t mem_mask);
+	variant m_variant = variant::SEGA_315_5838;
+	devcb_read16 m_source_cb;
 
-	uint32_t m_srcoffset = 0;
-	uint32_t m_srcstart = 0; // failsafe
-	bool m_abort = false;
+	u16 m_tree[24];
+	u8 m_dictionary[256];
+	u8 m_tree_words;
+	u16 m_dictionary_bytes;
+	bool m_upload_dictionary;
 
-	struct {
-		uint16_t mode = 0;
-		struct {
-			uint8_t len = 0;       /* in bits */
-			uint8_t idx = 0;       /* in the dictionary */
-			uint16_t pattern = 0;  /* of the first node */
-		} tree[13];
-		int it2 = 0;
-		uint8_t dictionary[256]{};
-		int id = 0;
-	} m_compstate;
+	u32 m_source;
+	u16 m_word;
+	u8 m_bits;
+	u16 m_output;
+	bool m_abort;
 
-	void set_table_upload_mode_w(uint16_t val);
-	void upload_table_data_w(uint16_t val);
-
-	uint8_t get_decompressed_byte(void);
-	uint16_t decipher(uint16_t c);
-
-	int m_num_bits_compressed = 0;
-	uint16_t m_val_compressed = 0;
-	int m_num_bits = 0;
-	uint16_t m_val = 0;
-
-	int m_hackmode;
-#ifdef SEGA315_DUMP_DEBUG
-	FILE* m_fp;
-#endif
+	u16 decipher(u16 ciphertext) const;
+	u8 decompress_byte();
 };
 
 #endif // MAME_SEGA_315_5838_317_0229_COMP_H

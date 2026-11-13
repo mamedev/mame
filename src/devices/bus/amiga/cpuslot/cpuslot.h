@@ -92,6 +92,7 @@ public:
 	auto int2_cb() { return m_int2_cb.bind(); }
 	auto int6_cb() { return m_int6_cb.bind(); }
 	auto ipl7_cb() { return m_ipl7_cb.bind(); }
+	auto fc_cb() { return m_fc_cb.bind(); }
 
 	// from host
 	void cfgin_w(int state);
@@ -103,6 +104,7 @@ public:
 	void ovr_w(int state) { m_ovr_cb(state); }
 	void cfgout_w(int state) { m_cfgout_cb(state); }
 	void ipl7_w(int state) { m_ipl7_cb(state); }
+	uint8_t fc_r() { return m_fc_cb(); }
 
 	address_space &space() const { return *m_space; }
 
@@ -119,6 +121,7 @@ private:
 	devcb_write_line m_int2_cb;
 	devcb_write_line m_int6_cb;
 	devcb_write_line m_ipl7_cb;
+	devcb_read8 m_fc_cb;
 };
 
 

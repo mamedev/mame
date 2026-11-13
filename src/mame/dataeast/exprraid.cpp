@@ -713,7 +713,7 @@ void exprraid_state::exprraid(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(12'000'000) / 2, 384, 0, 256, 262, 8, 256-8); // not accurate
 	screen.set_screen_update(FUNC(exprraid_state::screen_update));
 	screen.set_palette(m_palette);

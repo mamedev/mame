@@ -362,7 +362,6 @@ void pv2000_state::machine_reset()
 	m_key_pressed = 0;
 	m_keyb_column = 0;
 
-	m_maincpu->set_input_line_vector(INPUT_LINE_IRQ0, 0xff); // Z80
 	memset(&memregion("maincpu")->base()[0x7000], 0xff, 0x1000);    // initialize RAM
 }
 
@@ -392,7 +391,7 @@ void pv2000_state::pv2000(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set(FUNC(pv2000_state::pv2000_vdp_interrupt));
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

@@ -317,7 +317,7 @@ void hds200_state::hds200(machine_config &config)
 	m_dma->in_mreq_callback().set(FUNC(hds200_state::dma_mreq_r));
 	m_dma->out_mreq_callback().set(FUNC(hds200_state::dma_mreq_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::amber());
 	m_screen->set_raw(22.680_MHz_XTAL, 1008, 0, 720, 375, 0, 350); // 80-column mode
 	m_screen->set_screen_update(m_avdc, FUNC(scn2674_device::screen_update));

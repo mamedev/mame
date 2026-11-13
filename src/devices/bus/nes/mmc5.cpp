@@ -249,17 +249,30 @@ void nes_exrom_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
 	m_vcount = scanline;
 
-	if (scanline == m_irq_count)
-	{
-		m_irq_status = 0xff;
-		update_irq();
-	}
-
 	// "In Frame" flag
 	if (scanline == 0)
 		m_irq_status |= 0x40;
 	else if (scanline > ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 		m_irq_status &= ~0x40;
+}
+
+
+// The MMC5 detects a new scanline at its start, not at hblank like the MMC3 and the scanline
+// IRQ must fire there, otherwise Castlevania III intro has glitched graphics and then same
+// corruption appears during gameplay if you pause. shin4num & msladerg are affected too.
+void nes_exrom_device::scanline_irq(int scanline, bool vblank, bool blanked)
+{
+	const int line = scanline + 1;
+
+	// if rendering is disabled, no IRQ update, or Laser Invasion HUD would be messed up.
+	if (blanked)
+		return;
+
+	if (line == m_irq_count && line != 0 && line <= ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
+	{
+		m_irq_status = 0xff;
+		update_irq();
+	}
 }
 
 

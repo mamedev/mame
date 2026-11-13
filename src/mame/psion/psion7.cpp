@@ -409,7 +409,7 @@ void psion7_state::psion7(machine_config &config)
 
 	PCCARD_SLOT(config, m_pccard[1], pcmcia_devices, nullptr);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_screen_update(m_sa1100, FUNC(sa1110_periphs_device::screen_update));

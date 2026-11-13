@@ -589,29 +589,30 @@ std::string machine_info::game_info_string() const
 
 	// display screen information
 	buf << _("\nVideo:\n");
-	screen_device_enumerator scriter(m_machine.root_device());
+	video_output_interface_enumerator scriter(m_machine.root_device());
 	int scrcount = scriter.count();
 	if (scrcount == 0)
 		buf << _("None\n");
 	else
 	{
-		for (screen_device &screen : scriter)
+		for (device_video_output_interface &screen : scriter)
 		{
+			const u32 rate = u32(screen.frame_period().as_hz() * 1'000'000 + 0.5);
+			const bool valid = rate >= 1'000'000;
+			std::string hz(valid ? std::to_string(rate) : "?");
+			if (valid)
+			{
+				size_t dpos = hz.length() - 6;
+				hz.insert(dpos, point);
+				size_t last = hz.find_last_not_of('0');
+				hz = hz.substr(0, last + (last != dpos ? 1 : 0));
+			}
+
 			std::string detail;
-			if (screen.screen_type() == SCREEN_TYPE_VECTOR)
-				detail = _("Vector");
+			if (screen.is_vector())
+				detail = _("Vector") + string_format(u8" %s\u00a0Hz", hz);
 			else
 			{
-				const u32 rate = u32(screen.frame_period().as_hz() * 1'000'000 + 0.5);
-				const bool valid = rate >= 1'000'000;
-				std::string hz(valid ? std::to_string(rate) : "?");
-				if (valid)
-				{
-					size_t dpos = hz.length() - 6;
-					hz.insert(dpos, point);
-					size_t last = hz.find_last_not_of('0');
-					hz = hz.substr(0, last + (last != dpos ? 1 : 0));
-				}
 
 				const rectangle &visarea = screen.visible_area();
 				detail = string_format(u8"%d × %d (%s) %s\u00a0Hz",
@@ -622,28 +623,12 @@ std::string machine_info::game_info_string() const
 
 			util::stream_format(buf,
 					(scrcount > 1) ? _("%1$s: %2$s\n") : _("%2$s\n"),
-					get_screen_desc(screen), detail);
+					string_format(_("Screen '%1$s'"), screen.device().tag()), detail);
 		}
 	}
 
 	return buf.str();
 }
-
-
-//-------------------------------------------------
-//  get_screen_desc - returns the description for
-//  a given screen
-//-------------------------------------------------
-
-std::string machine_info::get_screen_desc(screen_device &screen) const
-{
-	if (screen_device_enumerator(m_machine.root_device()).count() > 1)
-		return string_format(_("Screen '%1$s'"), screen.tag());
-	else
-		return _("Screen");
-}
-
-
 
 /*-------------------------------------------------
   menu_game_info - handle the game information menu

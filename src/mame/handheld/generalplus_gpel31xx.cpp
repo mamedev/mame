@@ -63,7 +63,7 @@ void generalplus_gpel31xx_game_state::gpel31xx(machine_config &config)
 	ARM7(config, m_maincpu, 96'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &generalplus_gpel31xx_game_state::arm_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);

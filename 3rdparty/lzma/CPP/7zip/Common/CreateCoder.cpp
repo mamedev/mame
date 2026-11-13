@@ -2,7 +2,7 @@
 
 #include "StdAfx.h"
 
-#include "../../Windows/Defs.h"
+#include "../../Windows/WinDefs.h"
 #include "../../Windows/PropVariant.h"
 
 #include "CreateCoder.h"
@@ -35,7 +35,7 @@ void RegisterCodec(const CCodecInfo *codecInfo) throw()
     g_Codecs[g_NumCodecs++] = codecInfo;
 }
 
-static const unsigned kNumHashersMax = 16;
+static const unsigned kNumHashersMax = 32;
 extern
 unsigned g_NumHashers;
 unsigned g_NumHashers = 0;

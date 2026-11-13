@@ -473,7 +473,7 @@ void pg1000_state::pg1000(machine_config &config)
 		return (unsigned int) 0xff; // std::unreachable();
 	});
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
 	screen.set_size(6*16, 8*2+1);

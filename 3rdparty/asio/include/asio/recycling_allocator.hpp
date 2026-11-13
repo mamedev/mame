@@ -2,7 +2,7 @@
 // recycling_allocator.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,10 +21,11 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 
 /// An allocator that caches memory blocks in thread-local storage for reuse.
 /**
- * The @recycling_allocator uses a simple strategy where a limited number of
+ * The @c recycling_allocator uses a simple strategy where a limited number of
  * small memory blocks are cached in thread-local storage, if the current
  * thread is running an @c io_context or is part of a @c thread_pool.
  */
@@ -85,7 +86,7 @@ public:
 /// A proto-allocator that caches memory blocks in thread-local storage for
 /// reuse.
 /**
- * The @recycling_allocator uses a simple strategy where a limited number of
+ * The @c recycling_allocator uses a simple strategy where a limited number of
  * small memory blocks are cached in thread-local storage, if the current
  * thread is running an @c io_context or is part of a @c thread_pool.
  */
@@ -131,6 +132,7 @@ public:
   }
 };
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

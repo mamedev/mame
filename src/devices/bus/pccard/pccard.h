@@ -39,6 +39,38 @@ public:
 protected:
 	device_pccard_interface(const machine_config &mconfig, device_t &device);
 
+	enum
+	{
+		CISTPL_NULL = 0x00,
+		CISTPL_DEVICE = 0x01,
+		CISTPL_LONGLINK_CB = 0x02,
+		CISTPL_CONFIG_CB = 0x04,
+		CISTPL_CFTABLE_ENTRY_CB = 0x05,
+		CISTPL_LONGLINK_MFC = 0x06,
+		CISTPL_BAR = 0x07,
+		CISTPL_CHECKSUM = 0x10,
+		CISTPL_LONGLINK_A = 0x11,
+		CISTPL_LONGLINK_C = 0x12,
+		CISTPL_LINKTARGET = 0x13,
+		CISTPL_NO_LINK = 0x14,
+		CISTPL_VERS_1 = 0x15,
+		CISTPL_ALTSTR = 0x16,
+		CISTPL_DEVICE_A = 0x17,
+		CISTPL_JEDEC_C = 0x18,
+		CISTPL_JEDEC_A = 0x19,
+		CISTPL_CONFIG = 0x1a,
+		CISTPL_CFTABLE_ENTRY = 0x1b,
+		CISTPL_DEVICE_OC = 0x1c,
+		CISTPL_DEVICE_OA = 0x1d,
+		CISTPL_DEVICE_GEO = 0x1e,
+		CISTPL_DEVICE_GEO_A = 0x1f,
+		CISTPL_MANFID = 0x20,
+		CISTPL_FUNCID = 0x21,
+		CISTPL_FUNCE = 0x22,
+		CISTPL_SWIL = 0x23,
+		CISTPL_END = 0xff,
+	};
+
 	devcb_write_line m_cd1_cb;
 	devcb_write_line m_cd2_cb;
 	devcb_write_line m_bvd1_cb;

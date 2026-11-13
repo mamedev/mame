@@ -52,7 +52,7 @@ const tiny_rom_entry *isa16_svga_et4k_device::device_rom_region() const
 
 void isa16_svga_et4k_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(tseng_vga_device::screen_update));
 
@@ -174,7 +174,7 @@ const tiny_rom_entry *isa16_svga_et4k_w32i_device::device_rom_region() const
 
 void isa16_svga_et4k_w32i_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(et4kw32i_vga_device::screen_update));
 

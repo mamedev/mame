@@ -316,7 +316,7 @@ void pc1500_state::pc1500(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &pc1500_state::pc1500_mem_io);
 	m_maincpu->in_func().set(FUNC(pc1500_state::pc1500_kb_r));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));  // not accurate
 	screen.set_screen_update(FUNC(pc1500_state::screen_update));

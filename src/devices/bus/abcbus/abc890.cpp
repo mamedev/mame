@@ -201,12 +201,12 @@ void abc890_device::abcbus_cs(uint8_t data)
 //  abcbus_inp - input
 //-------------------------------------------------
 
-uint8_t abc890_device::abcbus_inp()
+uint8_t abc890_device::abcbus_inp(offs_t offset)
 {
 	uint8_t data = 0xff;
 
 	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
-		data &= slot.read_inp();
+		data &= slot.read_inp(offset);
 
 	return data;
 }
@@ -216,10 +216,10 @@ uint8_t abc890_device::abcbus_inp()
 //  abcbus_out - output
 //-------------------------------------------------
 
-void abc890_device::abcbus_out(uint8_t data)
+void abc890_device::abcbus_out(offs_t offset, uint8_t data)
 {
 	for (abcbus_slot_device &slot : abcbus_slot_device_enumerator(*this))
-		slot.write_out(data);
+		slot.write_out(offset, data);
 }
 
 

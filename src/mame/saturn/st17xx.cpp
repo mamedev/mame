@@ -99,7 +99,7 @@ void st17xx_state::st17xx(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &st17xx_state::cpu_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(st17xx_state::screen_update));

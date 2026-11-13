@@ -403,12 +403,12 @@ uint32_t ringking_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void kingofb_state::video_interrupt_w(uint8_t data)
 {
-	m_video_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_video_cpu->set_input_line(0, HOLD_LINE);
 }
 
 void kingofb_state::sprite_interrupt_w(uint8_t data)
 {
-	m_sprite_cpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_sprite_cpu->set_input_line(0, HOLD_LINE);
 }
 
 void kingofb_state::scroll_interrupt_w(uint8_t data)
@@ -420,7 +420,7 @@ void kingofb_state::scroll_interrupt_w(uint8_t data)
 void kingofb_state::sound_command_w(uint8_t data)
 {
 	m_soundlatch->write(data);
-	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff); // Z80
+	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 
@@ -861,7 +861,7 @@ void kingofb_state::kingofb(machine_config &config)
 
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
@@ -1201,9 +1201,9 @@ void kingofb_state::init_ringkingw()
 } // anonymous namespace
 
 
-GAME( 1985, kingofb,   0,       kingofb,  kingofb,  kingofb_state,  empty_init,     ROT90, "Wood Place",                         "King of Boxer (World)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  kingofb_state,  empty_init,     ROT90, "Wood Place",                         "King of Boxer (Japan)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  kingofb_state,  init_ringkingw, ROT90, "Wood Place",                         "Ring King (US, Woodplace Inc.)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking,  kingofb, ringking, ringking, ringking_state, empty_init,     ROT90, "Wood Place (Data East USA license)", "Ring King (US set 1)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking2, kingofb, ringking, ringking, ringking_state, empty_init,     ROT90, "Wood Place (Data East USA license)", "Ring King (US set 2)",           MACHINE_SUPPORTS_SAVE )
-GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  kingofb_state,  init_ringking3, ROT90, "Wood Place (Data East USA license)", "Ring King (US set 3)",           MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofb,   0,       kingofb,  kingofb,  kingofb_state,  empty_init,     ROT90, "Wood Place",                         "King of Boxer (World)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, kingofbj,  kingofb, kingofb,  kingofb,  kingofb_state,  empty_init,     ROT90, "Wood Place",                         "King of Boxer (Japan)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringkingw, kingofb, kingofb,  kingofb,  kingofb_state,  init_ringkingw, ROT90, "Wood Place",                         "Ring King (US, Wood Place)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking,  kingofb, ringking, ringking, ringking_state, empty_init,     ROT90, "Wood Place (Data East USA license)", "Ring King (US set 1)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking2, kingofb, ringking, ringking, ringking_state, empty_init,     ROT90, "Wood Place (Data East USA license)", "Ring King (US set 2)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1985, ringking3, kingofb, kingofb,  kingofb,  kingofb_state,  init_ringking3, ROT90, "Wood Place (Data East USA license)", "Ring King (US set 3)",       MACHINE_SUPPORTS_SAVE )

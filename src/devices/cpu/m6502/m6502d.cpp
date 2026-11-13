@@ -132,7 +132,8 @@ offs_t m6502_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 		break;
 
 	case DASM_rel:
-		util::stream_format(stream, " $%04x", (pc & 0xf0000) | uint16_t(pc + 2 + int8_t(params.r8(pc+1))));
+		// mask keeps the full bank for the 65816; no other family member has a PC above 20 bits
+		util::stream_format(stream, " $%04x", (pc & 0xff0000) | uint16_t(pc + 2 + int8_t(params.r8(pc+1))));
 		flags |= 2;
 		break;
 
@@ -204,6 +205,52 @@ offs_t m6502_base_disassembler::disassemble(std::ostream &stream, offs_t pc, con
 	case DASM_xa3:
 		util::stream_format(stream, " #$%02x%02x%02x", params.r8(pc+1), params.r8(pc+3), params.r8(pc+2));
 		flags |= 4;
+		break;
+
+	case DASM_imm16:
+		util::stream_format(stream, " #$%02x%02x", params.r8(pc+2), params.r8(pc+1));
+		flags |= 3;
+		break;
+
+	case DASM_abl:
+		util::stream_format(stream, " $%02x%02x%02x", params.r8(pc+3), params.r8(pc+2), params.r8(pc+1));
+		flags |= 4;
+		break;
+
+	case DASM_alx:
+		util::stream_format(stream, " $%02x%02x%02x, x", params.r8(pc+3), params.r8(pc+2), params.r8(pc+1));
+		flags |= 4;
+		break;
+
+	case DASM_ds:
+		util::stream_format(stream, " $%02x, s", params.r8(pc+1));
+		flags |= 2;
+		break;
+
+	case DASM_dsy:
+		util::stream_format(stream, " ($%02x, s), y", params.r8(pc+1));
+		flags |= 2;
+		break;
+
+	case DASM_zil:
+		util::stream_format(stream, " [$%02x]", params.r8(pc+1));
+		flags |= 2;
+		break;
+
+	case DASM_ziy:
+		util::stream_format(stream, " [$%02x], y", params.r8(pc+1));
+		flags |= 2;
+		break;
+
+	case DASM_dbf:
+		// object code is MVN dest, source; assembler syntax is MVN source, dest
+		util::stream_format(stream, " $%02x, $%02x", params.r8(pc+2), params.r8(pc+1));
+		flags |= 3;
+		break;
+
+	case DASM_rell:
+		util::stream_format(stream, " $%06x", (pc & 0xff0000) | uint16_t(pc + 3 + int16_t((params.r8(pc+2) << 8) | params.r8(pc+1))));
+		flags |= 3;
 		break;
 
 	default:

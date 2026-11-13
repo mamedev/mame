@@ -4030,7 +4030,7 @@ void marvins_state::marvins(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(36*8, 28*8);
 	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
@@ -4090,7 +4090,7 @@ void snk_state::jcross(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(36*8, 28*8);
 	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
@@ -4161,7 +4161,7 @@ void snk_state::tnk3(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(36*8, 28*8);
 	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
@@ -4254,7 +4254,7 @@ void ikari_state::ikari(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(36*8, 28*8);
 	m_screen->set_visarea(0*8, 36*8-1, 1*8, 28*8-1);
@@ -4309,7 +4309,7 @@ void bermudat_state::bermudat(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(24000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	// this visible area matches the psychos pcb
 	m_screen->set_size(50*8, 28*8);
@@ -4392,7 +4392,7 @@ void bermudat_state::tdfever(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(50*8, 28*8);
 	m_screen->set_visarea(0*8, 50*8-1, 0*8, 28*8-1);

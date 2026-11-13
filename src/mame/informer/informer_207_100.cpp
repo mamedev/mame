@@ -226,7 +226,7 @@ void informer_207_100_state::informer_207_100(machine_config &config)
 	MSM58321(config, m_rtc, 32.768_kHz_XTAL);
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_color(rgb_t::green());
 	m_screen->set_raw(19.7184_MHz_XTAL, 1040, 0, 800, 316, 0, 300);
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));

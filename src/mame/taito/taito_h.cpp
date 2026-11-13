@@ -638,7 +638,7 @@ void syvalion_state::syvalion(machine_config &config)
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*16, 64*16);
@@ -664,7 +664,7 @@ void taitoh_state::recordbr(machine_config &config)
 	m_tc0040ioc->read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*16, 64*16);
@@ -702,7 +702,7 @@ void taitoh_state::dleague(machine_config &config)
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*16, 64*16);

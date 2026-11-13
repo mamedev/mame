@@ -440,7 +440,7 @@ void prehisle_state::prehisle(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &prehisle_state::sound_io_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// the screen parameters are guessed but should be accurate. They
 	// give a theoretical refresh rate of 59.1856Hz while the measured
 	// rate on a snk68.c with very similar hardware board is 59.16Hz.

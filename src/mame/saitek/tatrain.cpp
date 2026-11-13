@@ -208,10 +208,10 @@ static INPUT_PORTS_START( tatraina )
 
 	PORT_MODIFY("FREQ")
 	PORT_CONFNAME( 0x03, 0x00, "CPU Frequency" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tatrain_state::tatraina_change_cpu_freq), 0) // factory set
-	PORT_CONFSETTING(    0x02, "14Mhz (Champion Advanced Trainer)" )
-	PORT_CONFSETTING(    0x01, "16MHz (unofficial)" )
-	PORT_CONFSETTING(    0x00, "20Mhz (Turbo Advanced Trainer, Virtuoso)" )
-	PORT_CONFSETTING(    0x03, "24MHz (unofficial)" )
+	PORT_CONFSETTING(    0x02, "14 MHz (Champion Advanced Trainer)" )
+	PORT_CONFSETTING(    0x01, "16 MHz (unofficial)" )
+	PORT_CONFSETTING(    0x00, "20 MHz (Turbo Advanced Trainer, Virtuoso)" )
+	PORT_CONFSETTING(    0x03, "24 MHz (unofficial)" )
 INPUT_PORTS_END
 
 

@@ -79,7 +79,7 @@ Known official Novag Super System (or compatible) peripherals:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -321,10 +321,9 @@ void vip_state::vip(machine_config &config)
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(4, 10);
 	m_lcd_pwm->output_x().set(FUNC(vip_state::lcd_pwm_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/3, 606/3);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_novag_vip);
 

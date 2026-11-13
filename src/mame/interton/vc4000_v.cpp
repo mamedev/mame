@@ -598,7 +598,7 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 		vc4000_draw_grid(collision);
 
 		/* init object colours */
-		for (int i=visarea.min_x; i<visarea.max_x; i++) m_objects[i]=8;
+		for (int i=visarea.left(); i<visarea.right(); i++) m_objects[i]=8;
 
 		/* calculate object colours and OR overlapping object colours */
 		vc4000_sprite_update(m_bitmap, collision, &m_video.sprites[0]);
@@ -606,7 +606,7 @@ INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
 		vc4000_sprite_update(m_bitmap, collision, &m_video.sprites[2]);
 		vc4000_sprite_update(m_bitmap, collision, &m_video.sprites[3]);
 
-		for (int i=visarea.min_x; i<visarea.max_x; i++)
+		for (int i=visarea.left(); i<visarea.right(); i++)
 		{
 			m_video.sprite_collision|=m_sprite_collision[collision[i]];
 			m_video.background_collision|=m_background_collision[collision[i]];

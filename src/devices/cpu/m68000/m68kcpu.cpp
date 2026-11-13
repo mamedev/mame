@@ -922,6 +922,7 @@ void m68000_musashi_device::execute_run()
 
 			/* Record previous program counter */
 			m_ppc = m_pc;
+			m68ki_rerun_expire();
 
 			/* Call external hook to peek at CPU */
 			debugger_instruction_hook(m_pc);
@@ -1102,6 +1103,12 @@ void m68000_musashi_device::init_cpu_common(void)
 	save_item(NAME(m_emmu_enabled));
 	save_item(NAME(m_can_instruction_restart));
 	save_item(NAME(m_restart_instruction));
+	save_item(NAME(m_rerun_pc));
+	save_item(NAME(m_rerun_count));
+	save_item(STRUCT_MEMBER(m_rerun, address));
+	save_item(STRUCT_MEMBER(m_rerun, size));
+	save_item(STRUCT_MEMBER(m_rerun, data));
+	save_item(STRUCT_MEMBER(m_rerun, write));
 
 	save_item(STRUCT_MEMBER(m_fpr, signExp));
 	save_item(STRUCT_MEMBER(m_fpr, signif));
@@ -1109,6 +1116,8 @@ void m68000_musashi_device::init_cpu_common(void)
 	save_item(NAME(m_fpsr));
 	save_item(NAME(m_fpiar));
 	save_item(NAME(m_fpu_just_reset));
+	save_item(NAME(m_fpu_pending_exception));
+	save_item(NAME(m_fpu_frame));
 
 	save_item(NAME(m_mmu_crp_aptr));
 	save_item(NAME(m_mmu_crp_limit));
@@ -1142,11 +1151,12 @@ void m68000_musashi_device::init_cpu_common(void)
 
 void m68000_musashi_device::device_reset()
 {
-	/* Disable the PMMU/HMMU on reset, if any */
+	/* Disable the on-chip PMMU/HMMU on reset. External MMU (emmu) is
+	 * board glue, not a CPU reset bit; keep it and recompute restart. */
 	m_pmmu_enabled = false;
 	m_hmmu_enabled = 0;
-	m_emmu_enabled = false;
-	m_can_instruction_restart = false;
+	m_can_instruction_restart = m_pmmu_enabled || m_emmu_enabled;
+	m_rerun_count = 0;
 
 	if (m_has_fpu)
 	{
@@ -1470,7 +1480,7 @@ void m68000_musashi_device::init32(address_space &space, address_space &ospace)
 
 		case 3:
 			m_program32.write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_program32.write_dword(address + 1, rotl_32(data, 8), 0xffffff00U);
+			m_program32.write_dword(address + 1, std::rotl(data, 8), 0xffffff00U);
 			break;
 		}
 	};
@@ -1640,7 +1650,7 @@ void m68000_musashi_device::init32mmu(address_space &space, address_space &ospac
 					return;
 			}
 			m_program32.write_dword(address0 - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_program32.write_dword(address1, rotl_32(data, 8), 0xffffff00U);
+			m_program32.write_dword(address1, std::rotl(data, 8), 0xffffff00U);
 			break;
 		}
 		}
@@ -1698,7 +1708,7 @@ void m68000_musashi_device::init32_no_smear(address_space &space, address_space 
 
 		case 3:
 			m_program32.write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_program32.write_dword(address + 1, rotl_32(data, 8), 0xffffff00U);
+			m_program32.write_dword(address + 1, std::rotl(data, 8), 0xffffff00U);
 			break;
 		}
 	};
@@ -1872,7 +1882,7 @@ void m68000_musashi_device::init32mmu_no_smear(address_space &space, address_spa
 					return;
 			}
 			m_program32.write_dword(address0 - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_program32.write_dword(address1, rotl_32(data, 8), 0xffffff00U);
+			m_program32.write_dword(address1, std::rotl(data, 8), 0xffffff00U);
 			break;
 		}
 		}
@@ -2017,10 +2027,10 @@ void m68000_musashi_device::define_state(void)
 		state_add(M68K_ISP,    "SSP",       m_iotemp).callimport().callexport();
 
 	for (int regnum = 0; regnum < 8; regnum++) {
-		state_add(M68K_D0 + regnum, string_format("D%d", regnum).c_str(), m_dar[regnum]);
+		state_add(M68K_D0 + regnum, string_format("D%d", regnum), m_dar[regnum]);
 	}
 	for (int regnum = 0; regnum < 8; regnum++) {
-		state_add(M68K_A0 + regnum, string_format("A%d", regnum).c_str(), m_dar[8 + regnum]);
+		state_add(M68K_A0 + regnum, string_format("A%d", regnum), m_dar[8 + regnum]);
 	}
 
 	state_add(M68K_IR,         "IR",        m_ir);
@@ -2043,7 +2053,7 @@ void m68000_musashi_device::define_state(void)
 	if (m_cpu_type & MASK_020_OR_LATER)
 	{
 		for (int regnum = 0; regnum < 8; regnum++) {
-			state_add(M68K_FP0 + regnum, string_format("FP%d", regnum).c_str(), m_iotemp).callimport().callexport().formatstr("%10s");
+			state_add(M68K_FP0 + regnum, string_format("FP%d", regnum), m_iotemp).callimport().callexport().formatstr("%10s");
 		}
 		state_add(M68K_FPSR, "FPSR", m_fpsr);
 		state_add(M68K_FPCR, "FPCR", m_fpcr);
@@ -2086,6 +2096,7 @@ void m68000_musashi_device::define_state(void)
 
 	if (m_cpu_type == CPU_TYPE_COLDFIRE)
 	{
+		state_add(M68K_VBR, "VBR", m_vbr);
 		state_add(COLDFIRE_ROMBAR0, "ROMBAR0", m_rombar[0]);
 		state_add(COLDFIRE_ROMBAR1, "ROMBAR1", m_rombar[1]);
 		state_add(COLDFIRE_RAMBAR0, "RAMBAR0", m_rambar[0]);
@@ -2597,49 +2608,46 @@ m68000_musashi_device::m68000_musashi_device(const machine_config &mconfig, cons
 void m68000_musashi_device::clear_all()
 {
 	m_cpu_type= 0;
-//
-	for (auto & elem : m_dar)
-		elem= 0;
-	m_ppc= 0;
-	m_pc= 0;
-	for (auto & elem : m_sp)
-		elem= 0;
-	m_vbr= 0;
-	m_sfc= 0;
-	m_dfc= 0;
-	m_cacr= 0;
-	m_caar= 0;
-	m_ir= 0;
-//  for (int i=0;i<8;i++)
-//      m_fpr[i]= 0;
-	m_fpiar= 0;
-	m_fpsr= 0;
-	m_fpcr= 0;
-	m_t1_flag= 0;
-	m_t0_flag= 0;
-	m_s_flag= 0;
-	m_m_flag= 0;
-	m_x_flag= 0;
-	m_n_flag= 0;
-	m_not_z_flag= 0;
-	m_v_flag= 0;
-	m_c_flag= 0;
-	m_int_mask= 0;
-	m_int_level= 0;
-	m_stopped= 0;
-	m_pref_addr= 0;
-	m_pref_data= 0;
-	m_sr_mask= 0;
-	m_instr_mode= 0;
-	m_run_mode= 0;
-	m_has_pmmu= false;
-	m_has_hmmu= false;
-	m_pmmu_enabled= false;
-	m_hmmu_enabled= 0;
-	m_emmu_enabled= false;
-	m_can_instruction_restart= false;
-	m_has_fpu= 0;
-	m_fpu_just_reset= 0;
+	std::fill(std::begin(m_dar), std::end(m_dar), 0);
+	m_ppc = 0;
+	m_pc = 0;
+	std::fill(std::begin(m_sp), std::end(m_sp), 0);
+	m_vbr = 0;
+	m_sfc = 0;
+	m_dfc = 0;
+	m_cacr = 0;
+	m_caar = 0;
+	m_ir = 0;
+	m_fpiar = 0;
+	m_fpsr = 0;
+	m_fpcr = 0;
+	m_t1_flag = 0;
+	m_t0_flag = 0;
+	m_s_flag = 0;
+	m_m_flag = 0;
+	m_x_flag = 0;
+	m_n_flag = 0;
+	m_not_z_flag = 0;
+	m_v_flag = 0;
+	m_c_flag = 0;
+	m_int_mask = 0;
+	m_int_level = 0;
+	m_stopped = 0;
+	m_pref_addr = 0;
+	m_pref_data = 0;
+	m_sr_mask = 0;
+	m_instr_mode = 0;
+	m_run_mode = 0;
+	m_has_pmmu = false;
+	m_has_hmmu = false;
+	m_pmmu_enabled = false;
+	m_hmmu_enabled = 0;
+	m_emmu_enabled = false;
+	m_can_instruction_restart = false;
+	m_has_fpu = false;
+	m_fpu_just_reset = false;
+	m_fpu_pending_exception = 0;
+	m_fpu_frame.fill(0);
 
 	m_cyc_bcc_notake_b = 0;
 	m_cyc_bcc_notake_w = 0;
@@ -2702,6 +2710,8 @@ void m68000_musashi_device::clear_all()
 	m_mmu_tmp_buserror_address = 0;
 	m_mmu_tmp_buserror_occurred = false;
 	m_restart_instruction = false;
+	m_rerun_pc = 0;
+	m_rerun_count = 0;
 	m_mmu_tmp_buserror_fc = 0;
 	m_mmu_tmp_buserror_rw = 0;
 

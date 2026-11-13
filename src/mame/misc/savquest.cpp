@@ -499,7 +499,7 @@ void savquest_state::savquest(machine_config &config)
 
 //  m_voodoo2->vblank_callback().set(FUNC(savquest_state::vblank_assert));
 
-	screen_device &screen(SCREEN(config, "voodoo_screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "voodoo_screen"));
 	screen.set_refresh_hz(57);
 	screen.set_size(800, 262);
 	screen.set_visarea(0, 512 - 1, 0, 240 - 1);
@@ -507,7 +507,7 @@ void savquest_state::savquest(machine_config &config)
 
 	PCI_SLOT(config, "pci:01.0:0", agp_cards, 0, 0, 1, 2, 3, nullptr);
 
-	PCI_SLOT(config, "pci:1", pci_cards, 9, 0, 1, 2, 3, "trio64dx").set_fixed(true);
+	PCI_SLOT(config, "pci:1", pci_cards,  9, 0, 1, 2, 3, "trio64dx").set_fixed(true);
 	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
 //  PCI_SLOT(config, "pci:4", pci_cards, 12, 3, 0, 1, 2, "voodoo2");

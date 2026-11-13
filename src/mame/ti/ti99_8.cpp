@@ -225,13 +225,15 @@ public:
 	{
 	}
 
-	void ti99_8(machine_config &config);
-	void ti99_8_60hz(machine_config &config);
-	void ti99_8_50hz(machine_config &config);
+	void ti99_8_60hz(machine_config &config) ATTR_COLD;
+	void ti99_8_50hz(machine_config &config) ATTR_COLD;
 
+protected:
 	// Lifecycle
-	void driver_start() override;
-	void driver_reset() override;
+	void machine_start() override;
+	void machine_reset() override;
+
+	void ti99_8(machine_config &config) ATTR_COLD;
 
 private:
 	// Processor connections with the main board
@@ -650,7 +652,7 @@ void ti99_8_state::clock_out(int state)
 	m_mainboard->clock_in(state);
 }
 
-void ti99_8_state::driver_start()
+void ti99_8_state::machine_start()
 {
 	save_item(NAME(m_keyboard_column));
 	save_item(NAME(m_ready_old));
@@ -658,7 +660,7 @@ void ti99_8_state::driver_start()
 	save_item(NAME(m_int2));
 }
 
-void ti99_8_state::driver_reset()
+void ti99_8_state::machine_reset()
 {
 	m_cpu->hold_line(CLEAR_LINE);
 
@@ -800,7 +802,7 @@ void ti99_8_state::ti99_8_60hz(machine_config &config)
 	video.int_callback().set(FUNC(ti99_8_state::video_interrupt));
 	video.set_screen("screen");
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 /*
@@ -815,7 +817,7 @@ void ti99_8_state::ti99_8_50hz(machine_config &config)
 	video.int_callback().set(FUNC(ti99_8_state::video_interrupt));
 	video.set_screen("screen");
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 /*

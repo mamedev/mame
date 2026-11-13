@@ -101,7 +101,17 @@ public:
 	void wait_w(int state);
 	void stop_w(int state);
 	void reti_w(uint8_t data)
-		{ if (data == 0x4d) daisy_call_reti_device(); }
+	{
+		if (data == 0x4d)
+		{
+			// System 8000 CPU Hardware Reference Manual section 6.5.1:
+			// writes of BD,4D to FFE1 emulate Z80 RETI.  RETI changes the
+			// daisy-chain IEO state, potentially exposing a lower-priority
+			// request, so update the shared VI line after completing it.
+			daisy_call_reti_device();
+			vi_w(CLEAR_LINE);
+		}
+	}
 
 	uint16_t viack_r();
 	uint16_t nviack_r();

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -55,7 +55,22 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="dorafr" supported="no">
+	<software name="dora" supported="no">
+		<description>Dora the Explorer - To the Rescue (UK)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10301"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7223"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="Oki 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="UBL 500-10301 - Dora the Explorer - To the Rescue.bin" size="0x400000" crc="f54026a8" sha1="b8eae12f6b4800e58b97527571a5353955ddc2ad" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dorafr" cloneof="dora" supported="no">
 		<description>Dora the Explorer - À la rescousse (France)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
@@ -85,9 +100,39 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carss" supported="no">
-		<description>Disney/Pixar Cars (Spain)</description>
+	<software name="wiggles" supported="no">
+		<description>The Wiggles - Learn, Dance and Sing with The Wiggles! (UK)</description>
+		<year>2004</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12288"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7223"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x400000">
+				<rom name="500-12288 - The Wiggles - Learn, Dance and Sing with The Wiggles.bin" size="0x400000" crc="febe7467" sha1="e35c7e3a1093e6e5b90f836acde4c39ad00addf0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cars" supported="no">
+		<description>Disney/Pixar Cars (UK)</description>
 		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-11460"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7211"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKI 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-11460 - Cars.bin" size="0x200000" crc="833797c7" sha1="96a8c5aea32bbd9a2242a6f4757c56b7bf7059e2" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carss" cloneof="cars" supported="no">
+		<description>Disney/Pixar Cars (Spain)</description>
+		<year>2006</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-12148"/>
 		<part name="cart" interface="leapfrog_mfleappad_cart">
@@ -100,7 +145,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="carsfr" cloneof="carss" supported="no">
+	<software name="carsfr" cloneof="cars" supported="no">
 		<description>Disney/Pixar Cars (France)</description>
 		<year>2005</year>
 		<publisher>LeapFrog</publisher>
@@ -172,8 +217,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="joyjetplane" supported="no">
-		<description>Joy Joy - The Jet Plane - High-Flying Adventures (UK)</description>
+	<software name="jayjetplane" supported="no">
+		<description>Jay Jay the Jet Plane: High-Flying Adventures (UK)</description>
 		<year>2003</year>
 		<publisher>LeapFrog</publisher>
 		<info name="serial" value="500-01121"/>
@@ -258,6 +303,51 @@ license:CC0-1.0
 			<feature name="u1" value="OKI 32(J)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
 			<dataarea name="rom" size="0x400000">
 				<rom name="500-12049 - Mi Primer Dia de Escuela (SP).bin" size="0x400000" crc="878e3d34" sha1="b5893b2c852e472312a3f49320cec765fd1e4045" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ratfr" supported="no">
+		<description>Ratatouille (France)</description>
+		<year>2007</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12687"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7011"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12687 - Ratatouille (France).bin" size="0x200000" crc="1b7e2854" sha1="3ac217e514ad3df79c42ffad5bc85d723e716cdb" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="royaume" supported="no">
+		<description>Le royaume des nombres enchantes (France)</description>
+		<year>2005</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-12271"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7211"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="OKi 16M(F)"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="500-12271 - Le royaume des nombres enchantes (France).bin" size="0x200000" crc="7036402b" sha1="5acc930b97af7b7a0f2a0c1f39eb1d83badd33ed" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dispri2" supported="no">
+		<description>Disney Princesse -  Deux histoires de princesses (France)</description>
+		<year>2003</year>
+		<publisher>LeapFrog</publisher>
+		<info name="serial" value="500-10340"/>
+		<part name="cart" interface="leapfrog_mfleappad_cart">
+			<feature name="pcb" value="57000+003+7011"/>
+			<feature name="pcb_rev" value="REV:00"/>
+			<feature name="u1" value="Matronix 16M"/> <!-- ROM on epoxy blob, but type silkscreened on the PCB -->
+			<dataarea name="rom" size="0x200000">
+				<rom name="UBL 500-10340 - Deux histoires de princesses (France).bin" size="0x200000" crc="e381cc05" sha1="067ba0b584ca62eafa106d87950cdc887fa14d8a" />
 			</dataarea>
 		</part>
 	</software>

@@ -241,7 +241,7 @@ void mpu4dealem_state::dealem(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MPU4_MASTER_CLOCK, 440, 0, 320, 279, 0, 248); // 6.88 MHz
 	screen.set_screen_update(FUNC(mpu4dealem_state::screen_update_dealem));
 

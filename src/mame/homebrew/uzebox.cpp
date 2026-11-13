@@ -316,7 +316,7 @@ void uzebox_state::uzebox(machine_config &config)
 	m_maincpu->gpio_out<atmega644_device::GPIOD>().set(FUNC(uzebox_state::port_d_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.99);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1395));
 	m_screen->set_size(870, 525);

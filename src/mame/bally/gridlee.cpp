@@ -411,7 +411,7 @@ void gridlee_state::gridlee(machine_config &config)
 	m_latch->q_out_cb<7>().set(FUNC(gridlee_state::cocktail_flip_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(GRIDLEE_PIXEL_CLOCK, GRIDLEE_HTOTAL, GRIDLEE_HBEND, GRIDLEE_HBSTART, GRIDLEE_VTOTAL, GRIDLEE_VBEND, GRIDLEE_VBSTART);
 	m_screen->set_screen_update(FUNC(gridlee_state::screen_update_gridlee));
 	m_screen->set_palette(m_palette);

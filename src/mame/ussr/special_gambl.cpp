@@ -242,7 +242,7 @@ void dinaris_state::dice(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(dinaris_state::irq0_line_hold));
 
 	// Video
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(8'000'000), 512, 0, 384, 312, 0, 256);
 	screen.set_screen_update(FUNC(dinaris_state::screen_update));
 	screen.set_palette(m_palette);

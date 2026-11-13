@@ -212,7 +212,7 @@ void lft_phasor_state::phasor(machine_config &config)
 	m_maincpu->gpio_out<atmega88_device::GPIOD>().set([this](uint8_t data) { m_latched_sample = data; });
 
 	PALETTE(config, m_palette, FUNC(lft_phasor_state::init_palette), 0x10);
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK, 1135, 0, 1064, 313, 6, 310);
 	m_screen->set_screen_update(FUNC(lft_phasor_state::screen_update));
 

@@ -572,7 +572,7 @@ void b2m_state::b2m(machine_config &config)
 	maincpu.in_inta_func().set("pic", FUNC(pic8259_device::acknowledge));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(384, 256);

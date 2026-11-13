@@ -727,7 +727,7 @@ void pocketc_state::pocketc_base(machine_config &config)
 	NVRAM(config, "ram_nvram", nvram_device::DEFAULT_ALL_0);
 
 	// TODO: Convert to an SVG
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(20);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(594, 273);

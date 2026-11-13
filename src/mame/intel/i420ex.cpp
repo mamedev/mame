@@ -52,7 +52,6 @@ TODO:
 #include "machine/pci.h"
 #include "sound/spkrdev.h"
 
-#include "softlist.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -216,9 +215,9 @@ void i420ex_state::a486ap4(machine_config &config)
 {
 	i420ex(config);
 
-	PCI_SLOT(config, "pci:1", pci_cards, 7,  0, 1, 2, 3, nullptr);
-	PCI_SLOT(config, "pci:2", pci_cards, 8,  1, 2, 3, 0, nullptr);
-	PCI_SLOT(config, "pci:3", pci_cards, 9,  2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:1", pci_cards,  7, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards,  8, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards,  9, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci:4", pci_cards, 10, 3, 0, 1, 2, nullptr);
 
 	// FIXME: determine ISA bus clock

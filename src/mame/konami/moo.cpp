@@ -287,6 +287,7 @@ K053246_CB_MEMBER(moo_base_state::sprite_callback)
 
 K056832_CB_MEMBER(moo_base_state::tile_callback)
 {
+	priority = color & 1; // alpha flag, as in xexex
 	color = m_layer_colorbase[layer] | (color >> 2 & 0x0f);
 }
 
@@ -370,22 +371,33 @@ uint32_t moo_base_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	screen.priority().fill(0, cliprect);
 
 	if (m_layerpri[0] < m_k053251->get_priority(k053251_device::CI1))   /* bucky hides back layer behind background */
-		m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 1);
+		m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_ALL_CATEGORIES, 1);
 
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 2);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[1], TILEMAP_DRAW_ALL_CATEGORIES, 2);
 
-	// Enabling alpha improves fog and fading in Moo but causes other things to disappear.
+	// Alpha improves fog and fading in Moo. Only tiles with the alpha flag blend (category 1):
+	// the others stay opaque, like the ground in front of the mesa in the intro.
 	// There is probably a control bit somewhere to turn off alpha blending.
 	m_alpha_enabled = m_k054338->register_r(K338_REG_CONTROL) & K338_CTL_MIXPRI; // DUMMY
 
 	const int alpha = (m_alpha_enabled) ? m_k054338->set_alpha_level(1) & 0xff : 255;
 
-	if (alpha > 0)
-		m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[2], TILEMAP_DRAW_ALPHA(alpha), 4);
+	if (alpha == 255)
+	{
+		m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[2], TILEMAP_DRAW_ALL_CATEGORIES, 4);
+	}
+	else
+	{
+		m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[2], TILEMAP_DRAW_CATEGORY(0), 4);
+		if (alpha > 0)
+		{
+			m_k056832->tilemap_draw(screen, bitmap, cliprect, layer[2], TILEMAP_DRAW_CATEGORY(1) | TILEMAP_DRAW_ALPHA(alpha), 4);
+		}
+	}
 
 	m_k053246->k053247_sprites_draw( bitmap, cliprect);
 
-	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, 0, 0);
+	m_k056832->tilemap_draw(screen, bitmap, cliprect, 0, TILEMAP_DRAW_ALL_CATEGORIES, 0);
 	return 0;
 }
 
@@ -770,7 +782,7 @@ void moo_prot_state::moo(machine_config &config)
 	m_k053252->set_offsets(40, 16);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200)); // should give IRQ4 sufficient time to update scroll registers
@@ -822,7 +834,7 @@ void moobl_state::moobl(machine_config &config)
 	EEPROM_ER5911_8BIT(config, "eeprom");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(1200)); // should give IRQ4 sufficient time to update scroll registers

@@ -291,7 +291,7 @@ u8 a2bus_grappler_device::read_c0nx(u8 offset)
 	if (BIT(offset, 0)) // A0 - printer status
 	{
 		return
-				0xf0U | // TODO: actually open bus
+				(get_open_bus() & 0xf0U) |
 				(busy_in() << 3) |
 				(pe_in() << 2) |
 				(slct_in() << 1) |
@@ -299,7 +299,7 @@ u8 a2bus_grappler_device::read_c0nx(u8 offset)
 	}
 	else
 	{
-		return 0xffU; // TODO: actually open bus
+		return get_open_bus();
 	}
 }
 

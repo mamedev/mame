@@ -916,7 +916,7 @@ void t250_state::common(machine_config &config)
 	// for inter-character spacing.  Boot ROM programs the 6845 for:
 	//   102 char x 26 row total, 80 x 24 displayed, 10 scanlines/cell
 	//   -> 1020 x 262 raw, 800 x 240 visible, ~60 Hz vertical refresh.
-	screen_device &screen(SCREEN(config, m_screen, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, m_screen));
 	screen.set_raw(16_MHz_XTAL, 1020, 0, 800, 262, 0, 240);
 	screen.set_screen_update(m_crtc, FUNC(hd6845s_device::screen_update));
 

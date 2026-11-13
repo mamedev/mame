@@ -80,11 +80,14 @@ protected:
 
 	enum : uint8_t
 	{
+		// Bit order verified against the UC3003 TRAP REQUEST TEST, which provokes
+		// each violation type in turn and validates the VTR value: read-only=0x01,
+		// system=0x02, LENGTH=0x04, cpu-inhibit=0x08, execute-only=0x10.
 		VTYPE_RDV       = 0x01, /* read-only violation */
 		VTYPE_SYSV      = 0x02, /* system violation */
-		VTYPE_CPUIV     = 0x04, /* cpu-inhibit violation */
-		VTYPE_EXCV      = 0x08, /* execute-only violation */
-		VTYPE_SLV       = 0x10, /* segment length violation */
+		VTYPE_SLV       = 0x04, /* segment length violation */
+		VTYPE_CPUIV     = 0x08, /* cpu-inhibit violation */
+		VTYPE_EXCV      = 0x10, /* execute-only violation */
 		VTYPE_PWW       = 0x20, /* primary write warning */
 		VTYPE_SWW       = 0x40, /* secondary write warning */
 		VTYPE_FATL      = 0x80, /* fatal condition */
@@ -98,6 +101,13 @@ protected:
 	};
 
 public:
+	struct memory_result
+	{
+		offs_t address;       // valid only when address_driven is true
+		bool address_driven;  // false when the address outputs are high impedance
+		bool suppress;        // SUP asserted for this memory cycle
+	};
+
 	z8010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	auto out_segt_cb() { return m_out_segt.bind(); }
@@ -106,7 +116,14 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
-	bool translate(offs_t &offset, bool write, bool sys, bool dma, int st);
+	memory_result translate(offs_t offset, bool write, bool sys, bool dma, int st);
+
+	void ifetch1_observed(offs_t offset);
+	// Acknowledge cycles end the current instruction before trap-entry memory
+	// accesses.  A genuine IFETCH1 also ends it; DMA must not call this hook.
+	void instruction_end() { m_cpu_suppress = false; }
+	// CPU SUP contribution, for boards combining outputs from several MMUs.
+	bool cpu_suppressed() const { return m_cpu_suppress; }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -144,6 +161,11 @@ protected:
 	uint8_t m_bcs;      /* bus cycle status */
 	uint8_t m_iseg;     /* instruction segment number */
 	uint8_t m_ihoffs;   /* instruction offset (high byte) */
+
+	/* running latch of the last IFETCH1 cycle observed on the bus */
+	uint8_t m_if1_seg;
+	uint8_t m_if1_hoffs;
+	bool m_cpu_suppress;
 };
 
 // device type definition

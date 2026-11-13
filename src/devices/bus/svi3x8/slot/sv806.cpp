@@ -41,7 +41,7 @@ const tiny_rom_entry *sv806_device::device_rom_region() const
 
 void sv806_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "80col", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "80col"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw((XTAL(12'000'000) / 6) * 8, 864, 0, 640, 317, 0, 192);
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));

@@ -24,6 +24,17 @@ function addlibfromstring(str)
 	end
 end
 
+function addincludesfromstring(str)
+	if (str==nil) then return  end
+	for w in str:gmatch("%S+") do
+		if string.starts(w,"-I") then
+			includedirs {
+				string.sub(w,3)
+			}
+		end
+	end
+end
+
 function addoptionsfromstring(str)
 	if (str==nil) then return  end
 	for w in str:gmatch("%S+") do
@@ -281,6 +292,8 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniform.h",
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniformreader.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/valueuniformreader.h",
+		MAME_DIR .. "src/osd/modules/render/bgfx/vectorrenderer.cpp",
+		MAME_DIR .. "src/osd/modules/render/bgfx/vectorrenderer.h",
 		MAME_DIR .. "src/osd/modules/render/bgfx/view.cpp",
 		MAME_DIR .. "src/osd/modules/render/bgfx/view.h",
 		MAME_DIR .. "src/osd/modules/render/bgfx/writereader.cpp",
@@ -358,7 +371,7 @@ function qtdebuggerbuild()
 	}
 	local version = str_to_version(_OPTIONS["gcc_version"])
 	if _OPTIONS["gcc"]~=nil and (string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs")) then
-		configuration { "gmake or ninja" }
+		configuration { "gmake or ninja or jcdb" }
 			buildoptions {
 				"-Wno-error=inconsistent-missing-override",
 			}
@@ -470,7 +483,7 @@ function qtdebuggerbuild()
 		if _OPTIONS["targetos"]=="windows" then
 			configuration { "mingw*" }
 				buildoptions {
-					"-I$(shell qmake6 -query QT_INSTALL_HEADERS)",
+					'-I"' .. backtick("qmake6 -query QT_INSTALL_HEADERS") .. '"',
 				}
 			configuration { }
 		elseif _OPTIONS["targetos"]=="macosx" then
@@ -484,7 +497,7 @@ function qtdebuggerbuild()
 				}
 			else
 				buildoptions {
-					"-I$(shell qmake6 -query QT_INSTALL_HEADERS)",
+					'-I"' .. backtick("qmake6 -query QT_INSTALL_HEADERS") .. '"',
 				}
 			end
 		end

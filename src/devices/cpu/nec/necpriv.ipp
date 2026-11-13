@@ -9,6 +9,7 @@ namespace {
 #define V33_TYPE 0
 #define V30_TYPE 8
 #define V20_TYPE 16
+#define V25_TYPE 24
 
 /* interrupt vectors */
 enum
@@ -109,10 +110,10 @@ enum BREGS {
 */
 
 #define CLK(all) do { int cc = all; m_cur_cycles+=cc; m_icount-=cc; } while(0)
-#define CLKS(v20,v30,v33) do { const uint32_t ccount=(v20<<16)|(v30<<8)|v33; CLK((ccount>>m_chip_type)&0x7f); } while(0)
-#define CLKW(v20o,v30o,v33o,v20e,v30e,v33e,addr) do { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; CLK((addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f)); } while(0)
-#define CLKM(v20,v30,v33,v20m,v30m,v33m) do { const uint32_t ccount=(v20<<16)|(v30<<8)|v33, mcount=(v20m<<16)|(v30m<<8)|v33m; CLK(( ModRM >=0xc0 )?((ccount>>m_chip_type)&0x7f):((mcount>>m_chip_type)&0x7f)); } while(0)
-#define CLKR(v20o,v30o,v33o,v20e,v30e,v33e,vall,addr) do { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) CLK(vall); else CLK((addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f)); } while(0)
+#define CLKS(v20,v30,v33,v25) do { const uint32_t ccount=(v20<<16)|(v30<<8)|v33; CLK((ccount>>m_chip_type)&0x7f); } while(0)
+#define CLKW(v20o,v30o,v33o,v25o,v20e,v30e,v33e,v25e,addr) do { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; CLK((addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f)); } while(0)
+#define CLKM(v20,v30,v33,v25,v20m,v30m,v33m,v25m) do { const uint32_t ccount=(v20<<16)|(v30<<8)|v33, mcount=(v20m<<16)|(v30m<<8)|v33m; CLK(( ModRM >=0xc0 )?((ccount>>m_chip_type)&0x7f):((mcount>>m_chip_type)&0x7f)); } while(0)
+#define CLKR(v20o,v30o,v33o,v25o,v20e,v30e,v33e,v25e,vall,v25all,addr) do { const uint32_t ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) CLK(vall); else CLK((addr&1)?((ocount>>m_chip_type)&0x7f):((ecount>>m_chip_type)&0x7f)); } while(0)
 
 /************************************************************************/
 #define CompressFlags() (WORD)(int(CF) | 0x02 | (int(PF) << 2) | (int(AF) << 4) | (int(ZF) << 6) \

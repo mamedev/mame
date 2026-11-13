@@ -610,7 +610,7 @@ void othunder_state::othunder(machine_config &config)
 	m_tc0220ioc->read_7_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(26'686'000) / 4, 424, 0, 320, 262, 16, 256); // same as taito_z.cpp
 	screen.set_screen_update(FUNC(othunder_state::screen_update));
 	screen.set_palette(m_tc0110pcr);

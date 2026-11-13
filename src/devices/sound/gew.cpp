@@ -43,7 +43,7 @@ void gew_pcm_device::retrigger_sample(slot_t &slot)
 
 	envelope_generator_calc(slot);
 	slot.m_envelope_gen.m_state = state_t::ATTACK;
-	slot.m_envelope_gen.m_volume = 0;
+	slot.m_envelope_gen.m_volume = (0x3ff - 0x2a0) << EG_SHIFT;
 
 #if MULTIPCM_LOG_SAMPLES
 	dump_sample(slot);
@@ -83,7 +83,7 @@ int32_t gew_pcm_device::envelope_generator_update(slot_t &slot)
 	switch (slot.m_envelope_gen.m_state)
 	{
 	case state_t::ATTACK:
-		slot.m_envelope_gen.m_volume += slot.m_envelope_gen.m_attack_rate;
+		slot.m_envelope_gen.m_volume += (int64_t((0x817 << (EG_SHIFT - 1)) - slot.m_envelope_gen.m_volume) * slot.m_envelope_gen.m_attack_rate) >> 24;
 		if (slot.m_envelope_gen.m_volume >= (0x3ff << EG_SHIFT))
 		{
 			slot.m_envelope_gen.m_state = state_t::DECAY1;
@@ -218,6 +218,12 @@ const float gew_pcm_device::AMPLITUDE_SCALE_LIMIT[8] = // In Decibels
 	24.0f
 };
 
+// effect send level, 32 = unity. Steps of 3dB like the pan levels. (values above 8 not verified)
+const uint8_t gew_pcm_device::DSP_SEND_LEVEL[16] =
+{
+	0, 3, 4, 6, 8, 12, 16, 24, 32, 32, 32, 32, 32, 32, 32, 32
+};
+
 void gew_pcm_device::lfo_init()
 {
 	m_pitch_table = make_unique_clear<int32_t[]>(256);
@@ -323,6 +329,7 @@ gew_pcm_device::gew_pcm_device(const machine_config &mconfig, device_type type, 
 	m_rate(0),
 	m_voices(voices),
 	m_clock_divider(clock_divider),
+	m_dsp_send_enable(false),
 	m_attack_step(nullptr),
 	m_decay_release_step(nullptr),
 	m_freq_step_table(nullptr),
@@ -342,7 +349,8 @@ void gew_pcm_device::device_start()
 {
 	m_rate = (float)clock() / m_clock_divider;
 
-	m_stream = stream_alloc(0, 2, m_rate);
+	// output 2 is the (mono) send to an external effect DSP
+	m_stream = stream_alloc(0, m_dsp_send_enable ? 3 : 2, m_rate);
 
 	// Volume + pan table
 	m_left_pan_table = make_unique_clear<int32_t[]>(0x800);
@@ -436,6 +444,7 @@ void gew_pcm_device::device_start()
 	save_pointer(STRUCT_MEMBER(m_slots, m_step), m_voices);
 	save_pointer(STRUCT_MEMBER(m_slots, m_reverse), m_voices);
 	save_pointer(STRUCT_MEMBER(m_slots, m_pan), m_voices);
+	save_pointer(STRUCT_MEMBER(m_slots, m_dsp_send), m_voices);
 	save_pointer(STRUCT_MEMBER(m_slots, m_total_level), m_voices);
 	save_pointer(STRUCT_MEMBER(m_slots, m_dest_total_level), m_voices);
 	save_pointer(STRUCT_MEMBER(m_slots, m_total_level_step), m_voices);
@@ -549,6 +558,7 @@ void gew_pcm_device::sound_stream_update(sound_stream &stream)
 	{
 		int32_t smpl = 0;
 		int32_t smpr = 0;
+		int32_t send = 0;
 		for (int32_t sl = 0; sl < m_voices; ++sl)
 		{
 			slot_t& slot = m_slots[sl];
@@ -621,11 +631,17 @@ void gew_pcm_device::sound_stream_update(sound_stream &stream)
 
 				smpl += (m_left_pan_table[vol] * sample) >> TL_SHIFT;
 				smpr += (m_right_pan_table[vol] * sample) >> TL_SHIFT;
+
+				// the effect send is mono and taken before the pan
+				if (slot.m_dsp_send)
+					send += (((m_left_pan_table[vol & 0x7f] * sample) >> TL_SHIFT) * DSP_SEND_LEVEL[slot.m_dsp_send]) >> 5;
 			}
 		}
 
 		stream.put_int_clamp(0, i, smpl, 32768);
 		stream.put_int_clamp(1, i, smpr, 32768);
+		if (m_dsp_send_enable)
+			stream.put_int_clamp(2, i, send, 32768);
 	}
 }
 

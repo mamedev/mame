@@ -99,8 +99,8 @@ ROM_START( m68hc705c8a )
 ROM_END
 
 
-//constexpr u16 M68HC05_VECTOR_SPI        = 0xfff4;
-//constexpr u16 M68HC05_VECTOR_SCI        = 0xfff6;
+constexpr u16 M68HC05_VECTOR_F4         = 0xfff4;
+constexpr u16 M68HC05_VECTOR_F6         = 0xfff6;
 constexpr u16 M68HC05_VECTOR_TIMER      = 0xfff8;
 constexpr u16 M68HC05_VECTOR_IRQ        = 0xfffa;
 constexpr u16 M68HC05_VECTOR_SWI        = 0xfffc;
@@ -108,8 +108,10 @@ constexpr u16 M68HC05_VECTOR_SWI        = 0xfffc;
 
 constexpr u16 M68HC05_INT_IRQ           = u16(1) << 0;
 constexpr u16 M68HC05_INT_TIMER         = u16(1) << 1;
+constexpr u16 M68HC05_INT_F4            = u16(1) << 2;
+constexpr u16 M68HC05_INT_F6            = u16(1) << 3;
 
-constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER;
+constexpr u16 M68HC05_INT_MASK          = M68HC05_INT_IRQ | M68HC05_INT_TIMER | M68HC05_INT_F4 | M68HC05_INT_F6;
 
 } // anonymous namespace
 
@@ -150,6 +152,8 @@ m68hc05_device::m68hc05_device(
 			type,
 			{ addr_width > 13 ? s_hc_b_ops : s_hc_s_ops, s_hc_cycles, addr_width, 0x00ff, 0x00c0, vector_mask, M68HC05_VECTOR_SWI },
 			internal_map)
+	, m_spi(*this, "spi")
+	, m_sci(*this, "sci")
 	, m_port_cb_r(*this, 0xff)
 	, m_port_cb_w(*this)
 	, m_port_bits{ 0xff, 0xff, 0xff, 0xff }
@@ -160,6 +164,8 @@ m68hc05_device::m68hc05_device(
 	, m_port_irq_state(false)
 	, m_irq_line_state(false)
 	, m_irq_latch(0)
+	, m_has_spi(false)
+	, m_has_sci(false)
 	, m_tcmp_cb(*this)
 	, m_tcap_state(false)
 	, m_tcr(0x00)
@@ -450,6 +456,26 @@ void m68hc05_device::copr_w(u8 data)
 }
 
 
+void m68hc05_device::device_add_mconfig(machine_config &config)
+{
+	if (m_has_spi)
+	{
+		// the SPI runs from the internal processor clock, half the oscillator frequency
+		M68HC05_SPI(config, m_spi, DERIVED_CLOCK(1, 2));
+		// MISO is PD2 (2.2.3), sampled through portd_r
+		m_spi->miso_cb().set([this] () { return BIT(m_port_cb_r[3](0, 0x04), 2); });
+		m_spi->irq_cb().set(*this, FUNC(m68hc05_device::spi_irq_w));
+	}
+
+	if (m_has_sci)
+	{
+		// the SCI rates are divisions of the internal processor clock (5.7.5)
+		M68HC05_SCI(config, m_sci, DERIVED_CLOCK(1, 2));
+		m_sci->irq_cb().set(*this, FUNC(m68hc05_device::sci_irq_w));
+	}
+}
+
+
 void m68hc05_device::device_start()
 {
 	m6805_base_device::device_start();
@@ -620,6 +646,24 @@ void m68hc05_device::interrupt()
 			else
 				rm16<false>(M68HC05_VECTOR_TIMER & m_params.m_vector_mask, m_pc);
 		}
+		else if (m_pending_interrupts & M68HC05_INT_F6)
+		{
+			LOGINT("servicing SCI interrupt\n");
+			standard_irq_callback(2, m_pc.w.l);
+			if (m_params.m_addr_width > 13)
+				rm16<true>(M68HC05_VECTOR_F6 & m_params.m_vector_mask, m_pc);
+			else
+				rm16<false>(M68HC05_VECTOR_F6 & m_params.m_vector_mask, m_pc);
+		}
+		else if (m_pending_interrupts & M68HC05_INT_F4)
+		{
+			LOGINT("servicing SPI interrupt\n");
+			standard_irq_callback(3, m_pc.w.l);
+			if (m_params.m_addr_width > 13)
+				rm16<true>(M68HC05_VECTOR_F4 & m_params.m_vector_mask, m_pc);
+			else
+				rm16<false>(M68HC05_VECTOR_F4 & m_params.m_vector_mask, m_pc);
+		}
 		else
 		{
 			fatalerror("m68hc05[%s]: unknown pending interrupt(s) %x", tag(), m_pending_interrupts);
@@ -637,12 +681,14 @@ bool m68hc05_device::test_il()
 void m68hc05_device::burn_cycles(unsigned count)
 {
 	// calculate new timer values (fixed prescaler of four)
-	unsigned const ps_opt(4);
+	unsigned const ps_opt(2);
 	unsigned const ps_mask((1 << ps_opt) - 1);
 	unsigned const increments((count + (m_prescaler & ps_mask)) >> ps_opt);
 	u32 const new_counter(u32(m_counter) + increments);
 	bool const timer_rollover(0x010000 <= new_counter);
-	bool const output_compare_match((m_ocr > m_counter) && (m_ocr <= new_counter));
+	// compare modulo 2^16 so a match at or just past rollover (including OCR = 0) isn't missed
+	u16 const ocr_delta(m_ocr - m_counter);
+	bool const output_compare_match(ocr_delta && (ocr_delta <= increments));
 	m_prescaler = (count + m_prescaler) & ps_mask;
 	m_counter = u16(new_counter);
 	if (timer_rollover)
@@ -687,13 +733,29 @@ void m68hc05_device::add_port_state(std::array<bool, PORT_COUNT> const &ddr)
 	for (unsigned i = 0; PORT_COUNT > i; ++i)
 	{
 		if (m_port_bits[i])
-			state_add(M68HC05_LATCHA + i, util::string_format("LATCH%c", 'A' + i).c_str(), m_port_latch[i]).mask(m_port_bits[i]);
+			state_add(M68HC05_LATCHA + i, util::string_format("LATCH%c", 'A' + i), m_port_latch[i]).mask(m_port_bits[i]);
 	}
 	for (unsigned i = 0; PORT_COUNT > i; ++i)
 	{
 		if (ddr[i] && m_port_bits[i])
-			state_add(M68HC05_DDRA + i, util::string_format("DDR%c", 'A' + i).c_str(), m_port_ddr[i]).mask(m_port_bits[i]);
+			state_add(M68HC05_DDRA + i, util::string_format("DDR%c", 'A' + i), m_port_ddr[i]).mask(m_port_bits[i]);
 	}
+}
+
+void m68hc05_device::add_spi_state()
+{
+	state_add<u8>(M68HC05_SPCR, "SPCR", [this] () { return m_spi->spcr(); }, [this] (u8 data) { m_spi->set_spcr(data); }).mask(m68hc05_spi_device::SPCR_MASK);
+	state_add<u8>(M68HC05_SPSR, "SPSR", [this] () { return m_spi->spsr(); }, [this] (u8 data) { m_spi->set_spsr(data); }).mask(m68hc05_spi_device::SPSR_MASK);
+	state_add<u8>(M68HC05_SPDR, "SPDR", [this] () { return m_spi->spdr(); }, [this] (u8 data) { m_spi->set_spdr(data); }).mask(0xff);
+}
+
+void m68hc05_device::add_sci_state()
+{
+	state_add<u8>(M68HC05_BAUD, "BAUD", [this] () { return m_sci->baud(); }, [this] (u8 data) { m_sci->set_baud(data); }).mask(m68hc05_sci_device::BAUD_MASK);
+	state_add<u8>(M68HC05_SCCR1, "SCCR1", [this] () { return m_sci->sccr1(); }, [this] (u8 data) { m_sci->set_sccr1(data); }).mask(m68hc05_sci_device::SCCR1_MASK);
+	state_add<u8>(M68HC05_SCCR2, "SCCR2", [this] () { return m_sci->sccr2(); }, [this] (u8 data) { m_sci->set_sccr2(data); }).mask(0xff);
+	state_add<u8>(M68HC05_SCSR, "SCSR", [this] () { return m_sci->scsr(); }, [this] (u8 data) { m_sci->set_scsr(data); }).mask(m68hc05_sci_device::SCSR_MASK);
+	state_add<u8>(M68HC05_SCDR, "SCDR", [this] () { return m_sci->scdr(); }, [this] (u8 data) { m_sci->set_scdr(data); }).mask(0xff);
 }
 
 void m68hc05_device::add_timer_state()
@@ -723,6 +785,22 @@ void m68hc05_device::add_ncop_state()
 u8 m68hc05_device::port_value(unsigned offset) const
 {
 	return (m_port_latch[offset] & m_port_ddr[offset]) | (m_port_input[offset] & ~m_port_ddr[offset]);
+}
+
+void m68hc05_device::spi_irq_w(int state)
+{
+	if (state)
+		m_pending_interrupts |= M68HC05_INT_F4;
+	else
+		m_pending_interrupts &= ~M68HC05_INT_F4;
+}
+
+void m68hc05_device::sci_irq_w(int state)
+{
+	if (state)
+		m_pending_interrupts |= M68HC05_INT_F6;
+	else
+		m_pending_interrupts &= ~M68HC05_INT_F6;
 }
 
 void m68hc05_device::update_port_irq()
@@ -776,14 +854,8 @@ void m68hc05c4_device::c4_map(address_map &map)
 	map(0x0000, 0x0003).rw(FUNC(m68hc05c4_device::port_read), FUNC(m68hc05c4_device::port_latch_w));
 	map(0x0004, 0x0006).rw(FUNC(m68hc05c4_device::port_ddr_r), FUNC(m68hc05c4_device::port_ddr_w));
 	// 0x0007-0x0009 unused
-	// 0x000a SPCR
-	// 0x000b SPSR
-	// 0x000c SPDR
-	// 0x000d BAUD
-	// 0x000e SCCR1
-	// 0x000f SCCR2
-	// 0x0010 SCSR
-	// 0x0011 SCDR
+	map(0x000a, 0x000c).m(m_spi, FUNC(m68hc05_spi_device::map));
+	map(0x000d, 0x0011).m(m_sci, FUNC(m68hc05_sci_device::map));
 	map(0x0012, 0x0012).rw(FUNC(m68hc05c4_device::tcr_r), FUNC(m68hc05c4_device::tcr_w));
 	map(0x0013, 0x0013).r(FUNC(m68hc05c4_device::tsr_r));
 	map(0x0014, 0x0015).r(FUNC(m68hc05c4_device::icr_r));
@@ -795,8 +867,7 @@ void m68hc05c4_device::c4_map(address_map &map)
 	map(0x0100, 0x10ff).rom(); // user ROM
 	// 0x1100-0x1eff unused
 	map(0x1f00, 0x1fef).rom(); // self-check
-	// 0x1ff0-0x1ff3 unused
-	map(0x1ff4, 0x1fff).rom(); // user vectors
+	map(0x1ff0, 0x1fff).rom(); // user vectors
 }
 
 
@@ -811,6 +882,8 @@ m68hc05c4_device::m68hc05c4_device(machine_config const &mconfig, char const *ta
 			0x1fff,
 			address_map_constructor(FUNC(m68hc05c4_device::c4_map), this))
 {
+	enable_spi();
+	enable_sci();
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
 
@@ -822,6 +895,8 @@ void m68hc05c4_device::device_start()
 
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
+	add_spi_state();
+	add_sci_state();
 }
 
 
@@ -844,14 +919,8 @@ void m68hc05c8_device::c8_map(address_map &map)
 	map(0x0000, 0x0003).rw(FUNC(m68hc05c8_device::port_read), FUNC(m68hc05c8_device::port_latch_w));
 	map(0x0004, 0x0006).rw(FUNC(m68hc05c8_device::port_ddr_r), FUNC(m68hc05c8_device::port_ddr_w));
 	// 0x0007-0x0009 unused
-	// 0x000a SPCR
-	// 0x000b SPSR
-	// 0x000c SPDR
-	// 0x000d BAUD
-	// 0x000e SCCR1
-	// 0x000f SCCR2
-	// 0x0010 SCSR
-	// 0x0011 SCDR
+	map(0x000a, 0x000c).m(m_spi, FUNC(m68hc05_spi_device::map));
+	map(0x000d, 0x0011).m(m_sci, FUNC(m68hc05_sci_device::map));
 	map(0x0012, 0x0012).rw(FUNC(m68hc05c8_device::tcr_r), FUNC(m68hc05c8_device::tcr_w));
 	map(0x0013, 0x0013).r(FUNC(m68hc05c8_device::tsr_r));
 	map(0x0014, 0x0015).r(FUNC(m68hc05c8_device::icr_r));
@@ -862,8 +931,7 @@ void m68hc05c8_device::c8_map(address_map &map)
 	map(0x0050, 0x00ff).ram(); // RAM/stack
 	map(0x0100, 0x1eff).rom(); // user ROM
 	map(0x1f00, 0x1fef).rom(); // self-check
-	// 0x1ff0-0x1ff3 unused
-	map(0x1ff4, 0x1fff).rom(); // user vectors
+	map(0x1ff0, 0x1fff).rom(); // user vectors
 }
 
 
@@ -878,6 +946,8 @@ m68hc05c8_device::m68hc05c8_device(machine_config const &mconfig, char const *ta
 			0x1fff,
 			address_map_constructor(FUNC(m68hc05c8_device::c8_map), this))
 {
+	enable_spi();
+	enable_sci();
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
 
@@ -888,6 +958,8 @@ void m68hc05c8_device::device_start()
 
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
+	add_spi_state();
+	add_sci_state();
 }
 
 
@@ -911,14 +983,8 @@ void m68hc705c4a_device::c4a_map(address_map &map)
 	map(0x0000, 0x0003).rw(FUNC(m68hc705c4a_device::port_read), FUNC(m68hc705c4a_device::port_latch_w));
 	map(0x0004, 0x0006).rw(FUNC(m68hc705c4a_device::port_ddr_r), FUNC(m68hc705c4a_device::port_ddr_w));
 	// 0x0007-0x0009 unused
-	// 0x000a SPCR
-	// 0x000b SPSR
-	// 0x000c SPDR
-	// 0x000d BAUD
-	// 0x000e SCCR1
-	// 0x000f SCCR2
-	// 0x0010 SCSR
-	// 0x0011 SCDR
+	map(0x000a, 0x000c).m(m_spi, FUNC(m68hc05_spi_device::map));
+	map(0x000d, 0x0011).m(m_sci, FUNC(m68hc05_sci_device::map));
 	map(0x0012, 0x0012).rw(FUNC(m68hc705c4a_device::tcr_r), FUNC(m68hc705c4a_device::tcr_w));
 	map(0x0013, 0x0013).r(FUNC(m68hc705c4a_device::tsr_r));
 	map(0x0014, 0x0015).r(FUNC(m68hc705c4a_device::icr_r));
@@ -949,6 +1015,8 @@ m68hc705c4a_device::m68hc705c4a_device(machine_config const &mconfig, char const
 			address_map_constructor(FUNC(m68hc705c4a_device::c4a_map), this))
 	, m_rom(*this, DEVICE_SELF)
 {
+	enable_spi();
+	enable_sci();
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
 
@@ -965,6 +1033,8 @@ void m68hc705c4a_device::device_start()
 
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
+	add_spi_state();
+	add_sci_state();
 	add_ncop_state();
 
 	state_add(M68HC705C8A_OPTION, "OPTION", m_option).mask(0xff);
@@ -1005,14 +1075,8 @@ void m68hc705c8a_device::c8a_map(address_map &map)
 	map(0x0000, 0x0003).rw(FUNC(m68hc705c8a_device::port_read), FUNC(m68hc705c8a_device::port_latch_w));
 	map(0x0004, 0x0006).rw(FUNC(m68hc705c8a_device::port_ddr_r), FUNC(m68hc705c8a_device::port_ddr_w));
 	// 0x0007-0x0009 unused
-	// 0x000a SPCR
-	// 0x000b SPSR
-	// 0x000c SPDR
-	// 0x000d BAUD
-	// 0x000e SCCR1
-	// 0x000f SCCR2
-	// 0x0010 SCSR
-	// 0x0011 SCDR
+	map(0x000a, 0x000c).m(m_spi, FUNC(m68hc05_spi_device::map));
+	map(0x000d, 0x0011).m(m_sci, FUNC(m68hc05_sci_device::map));
 	map(0x0012, 0x0012).rw(FUNC(m68hc705c8a_device::tcr_r), FUNC(m68hc705c8a_device::tcr_w));
 	map(0x0013, 0x0013).r(FUNC(m68hc705c8a_device::tsr_r));
 	map(0x0014, 0x0015).r(FUNC(m68hc705c8a_device::icr_r));
@@ -1045,6 +1109,8 @@ m68hc705c8a_device::m68hc705c8a_device(machine_config const &mconfig, char const
 			address_map_constructor(FUNC(m68hc705c8a_device::c8a_map), this))
 	, m_rom(*this, DEVICE_SELF)
 {
+	enable_spi();
+	enable_sci();
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xbf }});
 }
 
@@ -1061,6 +1127,8 @@ void m68hc705c8a_device::device_start()
 
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
+	add_spi_state();
+	add_sci_state();
 	add_pcop_state();
 	add_ncop_state();
 
@@ -1203,11 +1271,7 @@ void m68hc05l9_device::l9_map(address_map &map)
 	// 0x0009-0x000a configuration
 	// 0x000b minute alarm
 	// 0x000c hour alarm
-	// 0x000d BAUD
-	// 0x000e SCCR1
-	// 0x000f SCCR2
-	// 0x0010 SCSR
-	// 0x0011 SCDR
+	map(0x000d, 0x0011).m(m_sci, FUNC(m68hc05_sci_device::map));
 	map(0x0012, 0x0012).rw(FUNC(m68hc05l9_device::tcr_r), FUNC(m68hc05l9_device::tcr_w));
 	map(0x0013, 0x0013).r(FUNC(m68hc05l9_device::tsr_r));
 	map(0x0014, 0x0015).r(FUNC(m68hc05l9_device::icr_r));
@@ -1241,6 +1305,7 @@ m68hc05l9_device::m68hc05l9_device(machine_config const &mconfig, char const *ta
 			0x1fff,
 			address_map_constructor(FUNC(m68hc05l9_device::l9_map), this))
 {
+	enable_sci();
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0x1f }});
 }
 
@@ -1252,6 +1317,7 @@ void m68hc05l9_device::device_start()
 
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
+	add_sci_state();
 }
 
 
@@ -1276,11 +1342,7 @@ void m68hc05l11_device::l11_map(address_map &map)
 	// 0x000a port F direction
 	// 0x000b minute alarm
 	// 0x000c hour alarm
-	// 0x000d BAUD
-	// 0x000e SCCR1
-	// 0x000f SCCR2
-	// 0x0010 SCSR
-	// 0x0011 SCDR
+	map(0x000d, 0x0011).m(m_sci, FUNC(m68hc05_sci_device::map));
 	map(0x0012, 0x0012).rw(FUNC(m68hc05l11_device::tcr_r), FUNC(m68hc05l11_device::tcr_w));
 	map(0x0013, 0x0013).r(FUNC(m68hc05l11_device::tsr_r));
 	map(0x0014, 0x0015).r(FUNC(m68hc05l11_device::icr_r));
@@ -1324,6 +1386,7 @@ m68hc05l11_device::m68hc05l11_device(machine_config const &mconfig, char const *
 			0x7fff,
 			address_map_constructor(FUNC(m68hc05l11_device::l11_map), this))
 {
+	enable_sci();
 	set_port_bits(std::array<u8, PORT_COUNT>{{ 0xff, 0xff, 0xff, 0xff }});
 }
 
@@ -1335,6 +1398,7 @@ void m68hc05l11_device::device_start()
 
 	add_port_state(std::array<bool, PORT_COUNT>{{ true, true, true, false }});
 	add_timer_state();
+	add_sci_state();
 }
 
 

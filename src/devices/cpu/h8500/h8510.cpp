@@ -51,7 +51,7 @@ void h8510_device::device_add_mconfig(machine_config &config)
 	H8_PORT(config, m_port5, *this, h8500_device::PORT_5, 0xff, 0x00);
 	H8_PORT(config, m_port6, *this, h8500_device::PORT_6, 0xff, 0x00);
 	H8_PORT(config, m_port7, *this, h8500_device::PORT_7, 0xff, 0xf0);
-	H8_PORT(config, m_port8, *this, h8500_device::PORT_8, 0xff, 0x00);
+	H8_PORT(config, m_port8, *this, h8500_device::PORT_8, 0x00, 0x00); // reset to inputs: the IRQ pins are read back through it
 	H8_SCI(config, m_sci[0], 0, *this, m_intc, 52, 53, 54, 55);
 	H8_SCI(config, m_sci[1], 1, *this, m_intc, 56, 57, 58, 59);
 	// the interval interrupt shares the IRQ0 priority level in IPRA but has its own vector
@@ -121,6 +121,8 @@ void h8510_device::internal_map(address_map &map)
 	map(0xff0b, 0xff0b).rw(m_intc, FUNC(h8500_intc_device::dted_r), FUNC(h8500_intc_device::dted_w));
 	map(0xff1c, 0xff1c).rw(m_intc, FUNC(h8500_intc_device::nmicr_r), FUNC(h8500_intc_device::nmicr_w));
 	map(0xff1d, 0xff1d).rw(m_intc, FUNC(h8500_intc_device::irqcr_r), FUNC(h8500_intc_device::irqcr_w));
+
+	map(0xff10, 0xff11).rw(m_watchdog, FUNC(h8_watchdog_device::wd_r), FUNC(h8_watchdog_device::wd_w));
 
 #if 0
 	map(0xfed8, 0xfed8).rw(FUNC(h8510_device::rfshcr_r), FUNC(h8510_device::rfshcr_w));

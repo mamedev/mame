@@ -36,7 +36,7 @@ mephisto_display2_device::mephisto_display2_device(const machine_config &mconfig
 void mephisto_display2_device::device_add_mconfig(machine_config &config)
 {
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60); // arbitrary
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(6*16+1, 9*2+1);

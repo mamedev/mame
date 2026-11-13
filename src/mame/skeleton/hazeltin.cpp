@@ -700,7 +700,7 @@ void hazl1500_state::hazl1500(machine_config &config)
 	INPUT_MERGER_ANY_HIGH(config, "mainint").output_handler().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(hazl1500_state::screen_update_hazl1500));
 	//m_screen->set_raw(XTAL(33'264'000) / 2,
 	//    SCREEN_HTOTAL, SCREEN_HSTART, SCREEN_HSTART + SCREEN_HDISP,

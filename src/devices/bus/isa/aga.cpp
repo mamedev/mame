@@ -261,7 +261,7 @@ MC6845_UPDATE_ROW( isa8_aga_device::aga_update_row )
 
 void isa8_aga_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, AGA_SCREEN_NAME, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, AGA_SCREEN_NAME));
 	screen.set_raw(XTAL(14'318'181), 912, 0, 640, 262, 0, 200);
 	screen.set_screen_update(AGA_MC6845_NAME, FUNC(mc6845_device::screen_update));
 

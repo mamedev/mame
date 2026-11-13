@@ -43,36 +43,14 @@ void vic10_standard_cartridge_device::device_start()
 
 
 //-------------------------------------------------
-//  vic10_cd_r - cartridge data read
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
-uint8_t vic10_standard_cartridge_device::vic10_cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram)
+void vic10_standard_cartridge_device::device_reset()
 {
-	if (!lorom && m_lorom)
-	{
-		data = m_lorom[offset & 0x1fff];
-	}
-	else if (!exram && m_exram)
-	{
-		data = m_exram[offset & 0x7ff];
-	}
-	else if (!uprom && m_uprom)
-	{
-		data = m_uprom[offset & 0x1fff];
-	}
+	if (memory_region *const lorom = m_slot->memregion("lorom"))
+		m_slot->lorom().install_rom(0x0000, 0x1fff, lorom->base());
 
-	return data;
-}
-
-
-//-------------------------------------------------
-//  vic10_cd_w - cartridge data write
-//-------------------------------------------------
-
-void vic10_standard_cartridge_device::vic10_cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram)
-{
-	if (!exram && m_exram)
-	{
-		m_exram[offset & 0x7ff] = data;
-	}
+	if (memory_region *const uprom = m_slot->memregion("uprom"))
+		m_slot->uprom().install_rom(0x0000, 0x1fff, uprom->base());
 }

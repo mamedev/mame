@@ -828,7 +828,7 @@ void tmnt_state::cuebrick(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
@@ -875,7 +875,7 @@ void tmnt_state::mia(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0+8, 320-8, 264, 16, 240);
 	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
@@ -937,7 +937,7 @@ void tmnt_state::tmnt(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 4, 384, 0, 320, 264, 16, 240); // verified against real hardware
 	screen.set_screen_update(FUNC(tmnt_state::screen_update));
 	screen.set_palette(m_palette);
@@ -1606,11 +1606,11 @@ ROM_START( tmnt2po )
 ROM_END
 
 
+// TODO: emulate this properly
 // MIA and TMNT have their graphics data (both tiles and sprites) stored in the ROMs in
 // the packed pixel format used by older Konami hardware such as Twin16. The data lines
 // from the ROMs to the custom chips are swapped so that the chips receive the data in
 // the planar format they expect.
-
 static void chunky_to_planar(memory_region *rgn)
 {
 	uint32_t *ROM = reinterpret_cast<uint32_t *>(rgn->base());

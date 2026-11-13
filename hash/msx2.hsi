@@ -519,7 +519,7 @@ license:CC0-1.0
 	</hash>
 	<hash crc32="ebccb796" name="Mon Mon Monstar">
 		<year>1989</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 		<extrainfo>4</extrainfo>
 	</hash>
 	<hash crc32="53c25b6b" name="MSX-FAN Fandom Library 2">
@@ -1943,7 +1943,7 @@ license:CC0-1.0
 	</hash>
 	<hash crc32="f61d7dbd" name="Chuka Taisen [a]">
 		<year>1988</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 	</hash>
 	<hash crc32="830e876c" name="Cita Con Rama (Sp)(Disk 1 of 2)">
 		<year>1986</year>
@@ -2662,7 +2662,7 @@ license:CC0-1.0
 	</hash>
 	<hash crc32="9b447e70" name="Dragons Eye Super Shangai (Jp)">
 		<year>1991</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 	</hash>
 	<hash crc32="9946634d" name="Dream Program System (Jp)">
 		<year>19??</year>
@@ -2854,11 +2854,11 @@ license:CC0-1.0
 	</hash>
 	<hash crc32="1763b947" name="Fairyland Story, The">
 		<year>1987</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 	</hash>
 	<hash crc32="ab3404ea" name="Fairyland Story, The [a]">
 		<year>1987</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 	</hash>
 	<hash crc32="3401d6e1" name="Famicle Parodic">
 		<year>1989</year>
@@ -4343,11 +4343,11 @@ license:CC0-1.0
 	</hash>
 	<hash crc32="476b8a6e" name="Mon Mon Monster">
 		<year>1989</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 	</hash>
 	<hash crc32="303118ed" name="Mon Mon Monster [a]">
 		<year>1989</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 	</hash>
 	<hash crc32="856efbcb" name="Monoghatai. Binbin">
 		<year>1987</year>
@@ -4650,11 +4650,11 @@ license:CC0-1.0
 	</hash>
 	<hash crc32="de16094b" name="Palamede">
 		<year>1990</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 	</hash>
 	<hash crc32="34af7220" name="Palamede [a]">
 		<year>1990</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 	</hash>
 	<hash crc32="ac4e7ea9" name="Pallmith">
 		<year>1991</year>
@@ -8433,7 +8433,7 @@ license:CC0-1.0
 	</hash>
 	<hash crc32="ebccb796" md5="924f7eb26bcdf28047ec4211eec5f8b7" name="Mon Mon Monster (Jp-En)">
 		<year>1989</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 	</hash>
 	<hash crc32="2ef2a90a" md5="219b1de65f8c4215134d75a66eed059b" name="Mon Mon Monster (Jp-En)">
 		<status>KNOWN BAD DUMP</status>

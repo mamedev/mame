@@ -171,7 +171,7 @@ void qy70_state::qy70(machine_config &config)
 	m_lcdc->set_fs(2);
 	m_lcdc->set_md(8);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(128, 64);
 	screen.set_visarea_full();

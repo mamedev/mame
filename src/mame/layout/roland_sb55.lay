@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:superctr
+
+Roland Sound Brush SB-55 front panel.  Three seven-segment digits and seven indicators
+share one scanned matrix with the sixteen buttons; the STANDBY switch and its lamp are
+the fifth return and the eighth segment of the same matrix, and the DISK lamp is lit while
+the drive's head is loaded.  The display is mounted upside down on the real panel,
+with its points above the digits, so the three digits are turned over here to match.
+Seven of the buttons carry an indicator of their own.  Units are 0.1 mm.
+-->
+<mamelayout version="2">
+
+	<element name="panel"><rect><color red="0.22" green="0.22" blue="0.23"/></rect></element>
+	<element name="bezel"><rect><color red="0.02" green="0.02" blue="0.02"/></rect></element>
+	<element name="trim"><rect><color red="0.30" green="0.30" blue="0.32"/></rect></element>
+	<element name="slot"><rect><color red="0.10" green="0.10" blue="0.11"/></rect></element>
+
+	<element name="button" defstate="0">
+		<rect state="0"><color red="0.07" green="0.07" blue="0.07"/></rect>
+		<rect state="1"><color red="0.32" green="0.32" blue="0.32"/></rect>
+	</element>
+	<element name="button_round" defstate="0">
+		<disk state="0"><color red="0.07" green="0.07" blue="0.07"/></disk>
+		<disk state="1"><color red="0.32" green="0.32" blue="0.32"/></disk>
+	</element>
+
+	<!-- D401 beside the STANDBY switch and D24 over the drive are amber in the service
+	     notes' part list.  The seven built into the buttons are not listed there: PLAY is
+	     green, REC red, and the other five amber. -->
+	<element name="led_amber" defstate="0">
+		<disk state="0"><color red="0.24" green="0.13" blue="0.02"/></disk>
+		<disk state="1"><color red="1.0" green="0.62" blue="0.10"/></disk>
+	</element>
+	<element name="led_red" defstate="0">
+		<disk state="0"><color red="0.26" green="0.04" blue="0.03"/></disk>
+		<disk state="1"><color red="1.0" green="0.18" blue="0.12"/></disk>
+	</element>
+	<element name="led_green" defstate="0">
+		<disk state="0"><color red="0.04" green="0.20" blue="0.06"/></disk>
+		<disk state="1"><color red="0.20" green="1.0" blue="0.35"/></disk>
+	</element>
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.18" blue="0.12"/></led7seg>
+	</element>
+
+	<element name="midi_jack">
+		<disk><color red="0.12" green="0.12" blue="0.13"/></disk>
+		<disk><bounds x="0.12" y="0.12" width="0.76" height="0.76"/><color red="0.04" green="0.04" blue="0.04"/></disk>
+	</element>
+
+	<element name="label_power"><text string="POWER"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_standby"><text string="STANDBY"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_midiin2"><text string="MIDI IN 2"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_brand"><text string="Roland"><color red="0.90" green="0.90" blue="0.90"/></text></element>
+	<element name="label_brush"><text string="SOUND Brush"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_eject"><text string="EJECT"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_disk"><text string="DISK"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+
+	<element name="label_song"><text string="SONG"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_prog"><text string="PROG"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_set"><text string="SET"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_tempo"><text string="TEMPO"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_rnd"><text string="RND"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_clear"><text string="CLEAR"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_pause"><text string="PAUSE"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_rec"><text string="REC"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_single"><text string="SINGLE"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_rept"><text string="REPT"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_stop"><text string="STOP"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_play"><text string="PLAY"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_rew"><text string="REW"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="label_ff"><text string="FF"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+
+	<element name="arrow_l"><text string="&lt;"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="arrow_r"><text string="&gt;"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="arrow_ll"><text string="&lt;&lt;"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+	<element name="arrow_rr"><text string="&gt;&gt;"><color red="0.85" green="0.85" blue="0.85"/></text></element>
+
+	<view name="Front Panel">
+		<bounds x="0" y="0" width="2180" height="500"/>
+		<element ref="panel"><bounds x="0" y="0" width="2180" height="500"/></element>
+
+		<!-- power and the front MIDI jack -->
+		<element ref="label_power"><bounds x="40" y="40" width="180" height="26"/></element>
+		<element ref="button" inputtag="KEY3" inputmask="0x10"><bounds x="45" y="75" width="150" height="50"/></element>
+		<element name="led7" ref="led_amber"><bounds x="205" y="92" width="18" height="18"/></element>
+		<element ref="label_standby"><bounds x="35" y="133" width="200" height="24"/></element>
+		<element ref="midi_jack"><bounds x="60" y="290" width="120" height="120"/></element>
+		<element ref="label_midiin2"><bounds x="30" y="418" width="180" height="24"/></element>
+
+		<!-- disk slot -->
+		<element ref="trim"><bounds x="280" y="150" width="900" height="160"/></element>
+		<element ref="slot"><bounds x="295" y="165" width="870" height="90"/></element>
+		<element ref="button"><bounds x="980" y="270" width="170" height="55"/></element>
+		<element ref="label_eject"><bounds x="985" y="332" width="160" height="24"/></element>
+		<element ref="label_brand"><bounds x="600" y="55" width="260" height="50"/></element>
+		<element ref="label_brush"><bounds x="290" y="345" width="330" height="36"/></element>
+
+		<!-- the display, turned over as the panel has it -->
+		<element ref="bezel"><bounds x="1230" y="80" width="290" height="150"/></element>
+		<element name="digit2" ref="digit"><bounds x="1255" y="100" width="70" height="110"/><orientation rotate="180"/></element>
+		<element name="digit1" ref="digit"><bounds x="1340" y="100" width="70" height="110"/><orientation rotate="180"/></element>
+		<element name="digit0" ref="digit"><bounds x="1425" y="100" width="70" height="110"/><orientation rotate="180"/></element>
+		<element ref="label_disk"><bounds x="1230" y="290" width="130" height="26"/></element>
+		<element name="led_disk" ref="led_amber"><bounds x="1275" y="330" width="20" height="20"/></element>
+
+		<!-- the sixteen buttons, four panel rows of four.  The scan lines are the columns
+		     taken right to left, so the leftmost button of each row is KEY3.  SONG and
+		     TEMPO name the pair of arrows beneath them. -->
+		<element ref="label_song"><bounds x="1570" y="40" width="265" height="24"/></element>
+		<element ref="label_prog"><bounds x="1860" y="40" width="120" height="24"/></element>
+		<element ref="label_set"><bounds x="2005" y="40" width="120" height="24"/></element>
+		<element ref="button" inputtag="KEY3" inputmask="0x08"><bounds x="1570" y="70" width="120" height="50"/></element>
+		<element ref="arrow_l"><bounds x="1605" y="82" width="50" height="26"/></element>
+		<element ref="button" inputtag="KEY2" inputmask="0x08"><bounds x="1715" y="70" width="120" height="50"/></element>
+		<element ref="arrow_r"><bounds x="1750" y="82" width="50" height="26"/></element>
+		<element ref="button" inputtag="KEY1" inputmask="0x08"><bounds x="1860" y="70" width="120" height="50"/></element>
+		<element name="led3" ref="led_amber"><bounds x="1910" y="85" width="20" height="20"/></element>
+		<element ref="button" inputtag="KEY0" inputmask="0x08"><bounds x="2005" y="70" width="120" height="50"/></element>
+
+		<element ref="label_tempo"><bounds x="1570" y="140" width="265" height="24"/></element>
+		<element ref="label_rnd"><bounds x="1860" y="140" width="120" height="24"/></element>
+		<element ref="label_clear"><bounds x="2005" y="140" width="120" height="24"/></element>
+		<element ref="button" inputtag="KEY3" inputmask="0x04"><bounds x="1570" y="170" width="120" height="50"/></element>
+		<element ref="arrow_l"><bounds x="1605" y="182" width="50" height="26"/></element>
+		<element ref="button" inputtag="KEY2" inputmask="0x04"><bounds x="1715" y="170" width="120" height="50"/></element>
+		<element ref="arrow_r"><bounds x="1750" y="182" width="50" height="26"/></element>
+		<element ref="button" inputtag="KEY1" inputmask="0x04"><bounds x="1860" y="170" width="120" height="50"/></element>
+		<element name="led4" ref="led_amber"><bounds x="1910" y="185" width="20" height="20"/></element>
+		<element ref="button" inputtag="KEY0" inputmask="0x04"><bounds x="2005" y="170" width="120" height="50"/></element>
+
+		<element ref="label_pause"><bounds x="1570" y="240" width="120" height="24"/></element>
+		<element ref="label_rec"><bounds x="1715" y="240" width="120" height="24"/></element>
+		<element ref="label_single"><bounds x="1860" y="240" width="120" height="24"/></element>
+		<element ref="label_rept"><bounds x="2005" y="240" width="120" height="24"/></element>
+		<element ref="button_round" inputtag="KEY3" inputmask="0x02"><bounds x="1595" y="272" width="70" height="70"/></element>
+		<element name="led0" ref="led_amber"><bounds x="1620" y="297" width="20" height="20"/></element>
+		<element ref="button_round" inputtag="KEY2" inputmask="0x02"><bounds x="1740" y="272" width="70" height="70"/></element>
+		<element name="led1" ref="led_red"><bounds x="1765" y="297" width="20" height="20"/></element>
+		<element ref="button" inputtag="KEY1" inputmask="0x02"><bounds x="1860" y="282" width="120" height="50"/></element>
+		<element name="led5" ref="led_amber"><bounds x="1910" y="297" width="20" height="20"/></element>
+		<element ref="button" inputtag="KEY0" inputmask="0x02"><bounds x="2005" y="282" width="120" height="50"/></element>
+		<element name="led6" ref="led_amber"><bounds x="2055" y="297" width="20" height="20"/></element>
+
+		<element ref="label_stop"><bounds x="1570" y="360" width="120" height="24"/></element>
+		<element ref="label_play"><bounds x="1715" y="360" width="120" height="24"/></element>
+		<element ref="label_rew"><bounds x="1860" y="360" width="120" height="24"/></element>
+		<element ref="label_ff"><bounds x="2005" y="360" width="120" height="24"/></element>
+		<element ref="button" inputtag="KEY3" inputmask="0x01"><bounds x="1570" y="390" width="120" height="50"/></element>
+		<element ref="button" inputtag="KEY2" inputmask="0x01"><bounds x="1715" y="390" width="120" height="50"/></element>
+		<element name="led2" ref="led_green"><bounds x="1765" y="405" width="20" height="20"/></element>
+		<element ref="button" inputtag="KEY1" inputmask="0x01"><bounds x="1860" y="390" width="120" height="50"/></element>
+		<element ref="arrow_ll"><bounds x="1895" y="402" width="50" height="26"/></element>
+		<element ref="button" inputtag="KEY0" inputmask="0x01"><bounds x="2005" y="390" width="120" height="50"/></element>
+		<element ref="arrow_rr"><bounds x="2040" y="402" width="50" height="26"/></element>
+	</view>
+</mamelayout>

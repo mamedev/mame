@@ -104,8 +104,10 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	m_x_fine(0),
 	m_toggle(false),
 	m_tilecount(0),
+	m_render_at_hblank(false),
 	m_latch(*this),
 	m_spriteramsize(0x100),
+	m_oamaddr_render_reset(true),
 	m_scanline_callback_proc(*this),
 	m_hblank_callback_proc(*this),
 	m_int_callback(*this),
@@ -116,7 +118,7 @@ ppu2c0x_device::ppu2c0x_device(const machine_config &mconfig, device_type type, 
 	m_buffered_data(0),
 	m_sprite_page(0),
 	m_scan_scale(1), // set the scan scale (this is for dual monitor vertical setups)
-	m_draw_phase(0)
+	m_draw_phase(PPU_DRAW_NONE)
 {
 	for (auto &elem : m_regs)
 		elem = 0;
@@ -207,6 +209,9 @@ ppu2c04_clone_device::ppu2c04_clone_device(const machine_config &mconfig, const 
 	m_scanlines_per_frame = VS_CLONE_SCANLINES_PER_FRAME;
 	m_vblank_first_scanline = VBLANK_FIRST_SCANLINE_VS_CLONE;
 
+	// this clone PPU does not writes to $2003, so we assume that OAMADDR is not being reset
+	m_oamaddr_render_reset = false;
+
 	// background and sprites are always enabled; monochrome and color emphasis aren't supported
 	m_regs[PPU_CONTROL1] = u8(~(PPU_CONTROL1_COLOR_EMPHASIS | PPU_CONTROL1_DISPLAY_MONO));
 }
@@ -252,6 +257,7 @@ void ppu2c0x_device::start_nopalram()
 	save_item(NAME(m_regs));
 	save_item(NAME(m_draw_phase));
 	save_item(NAME(m_tilecount));
+	save_item(NAME(m_render_at_hblank));
 	save_pointer(NAME(m_spriteram), m_spriteramsize);
 
 	save_item(NAME(m_bitmap));
@@ -509,6 +515,27 @@ TIMER_CALLBACK_MEMBER(ppu2c0x_device::hblank_tick)
 	const bool vblank = (m_scanline >= m_vblank_first_scanline - 1) && (m_scanline < m_scanlines_per_frame - 1);
 
 	//update_scanline();
+
+	// 2C02 OAM row copy: if OAMADDR is not less than 8 when rendering starts, the eight bytes at OAMADDR & $F8
+	// are copied over OAM bytes 0-7 (NESdev wiki: PPU registers/OAMADDR and Errata). Not present in other PPU types.
+	// This makes pirate Huge Insect work (by chance?) in NES, while it works anyway in Dendy due to different timings.
+	if ((type() == PPU_2C02) && !blanked && (m_scanline == m_scanlines_per_frame - 1) && (m_regs[PPU_SPRITE_ADDRESS] >= 8))
+	{
+		const int src = m_regs[PPU_SPRITE_ADDRESS] & 0xf8;
+		for (int i = 0; i < 8; i++)
+			m_spriteram[i] = m_spriteram[src + i];
+	}
+
+	// Many games (e.g., equipped with MMC3 mapper or its Chinese clones) rely in OAMADDR
+	// being reset to 0 during dots 257-320 (sprite tile loading) at every visible scanline
+	// while rendering is enabled, otherwise wrong sprite data is used.
+	// Hudson Hawk relies on this as well.
+	if (m_oamaddr_render_reset && !blanked && ((m_scanline <= BOTTOM_VISIBLE_SCANLINE) || (m_scanline == m_scanlines_per_frame - 1)))
+		m_regs[PPU_SPRITE_ADDRESS] = 0;
+
+	// keep track of whether the PPU was rendering at HBLANK time (dot 256) so to decide if
+	// the line is drawn and if v is incremented (see update_visible_scanline below)
+	m_render_at_hblank = !blanked;
 
 	if (!m_hblank_callback_proc.isnull())
 		m_hblank_callback_proc(m_scanline, vblank, blanked);
@@ -866,8 +893,9 @@ void ppu2c0x_device::draw_sprites(u8 *line_priority)
 		if ((sprite_index == 0) && (sprite_xpos == 254))
 		{
 			sprite_ypos--;
-			/* set the "sprite 0 hit" flag if appropriate */
-			if (line_priority[sprite_xpos] & 0x02)
+			// set the "sprite 0 hit" flag if appropriate, but only on a line covered by the (shifted) sprite
+			// moejudo otherwise has garbled screen during fights and backtf23 as well as soon as the gameplay starts
+			if ((sprite_ypos <= m_scanline) && (m_scanline < sprite_ypos + size) && (line_priority[sprite_xpos] & 0x02))
 				m_regs[PPU_STATUS] |= PPU_STATUS_SPRITE0_HIT;
 		}
 
@@ -1004,7 +1032,10 @@ void ppu2c0x_device::render_scanline()
 	// if sprites are on, draw them, but we call always to process them
 	draw_sprites(line_priority);
 
-	m_draw_phase = PPU_DRAW_BG;
+	// outside line rendering we reset draw phase to NONE so that
+	// fetches through PPUDATA does not think these are BG
+	// (m_draw_phase is only used by MMC5, this is needed by uchuksdf)
+	m_draw_phase = PPU_DRAW_NONE;
 }
 
 void ppu2c0x_device::scanline_increment_fine_ycounter()
@@ -1067,7 +1098,23 @@ void ppu2c0x_device::update_visible_disabled_scanline()
 
 void ppu2c0x_device::update_visible_scanline()
 {
-	/* Render this scanline if appropriate */
+	// PPU only increments v while rendering is enabled, so a line counts as rendered
+	// if rendering was on at dot 256, not at the end of the line.
+	// Among others, Jordan vs. Bird relies on this: playground has garbled graphics
+	// if v is incremented when rendering got on after that time.
+	if (m_scanline_timer->remaining() == attotime::zero)
+	{
+		if (m_render_at_hblank)
+		{
+			update_visible_enabled_scanline();
+			scanline_increment_fine_ycounter();
+		}
+		else
+			update_visible_disabled_scanline();
+		return;
+	}
+
+	// Render this scanline if appropriate
 	if (m_regs[PPU_CONTROL1] & (PPU_CONTROL1_BACKGROUND | PPU_CONTROL1_SPRITES))
 	{
 		update_visible_enabled_scanline();
@@ -1075,11 +1122,6 @@ void ppu2c0x_device::update_visible_scanline()
 	else
 	{
 		update_visible_disabled_scanline();
-	}
-
-	if (m_scanline_timer->remaining() == attotime::zero)
-	{
-		scanline_increment_fine_ycounter();
 	}
 }
 

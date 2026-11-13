@@ -417,7 +417,7 @@ void laserbas_state::laserbas(machine_config &config)
 	pit1.out_handler<2>().set(FUNC(laserbas_state::pit_out_w<5>));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(PIXEL_CLOCK, 360, 0, 256, 274, 0, 224);
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

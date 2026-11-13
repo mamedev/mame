@@ -1456,7 +1456,7 @@ void c65_state::c65(machine_config &config)
 //  m_cia[1]->pa_rd_callback().set(FUNC(c65_state::c65_cia1_port_a_r));
 	m_cia[1]->pa_wr_callback().set(FUNC(c65_state::cia1_porta_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(c65_state::screen_update));
 	// TODO: stub parameters
 	// C=64 / width 40 modes should actually be running in 320x200

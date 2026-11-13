@@ -126,7 +126,7 @@ void vgame_state::vgame(machine_config &config)
 
 	EEPROM_93C66_16BIT(config, "eeprom");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

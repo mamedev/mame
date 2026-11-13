@@ -292,7 +292,7 @@ void cchance_state::cchance(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57.5);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(32*8, 32*8);

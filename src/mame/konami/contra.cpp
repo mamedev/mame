@@ -602,7 +602,7 @@ void contra_state::contra(machine_config &config)
 	KONAMI_007452_MATH(config, "k007452");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(24_MHz_XTAL / 4, 384, 0, 280, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(contra_state::screen_update));
 	m_screen->set_palette(m_palette);

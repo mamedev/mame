@@ -16,8 +16,9 @@
 
 #include "emu.h"
 
+#include "kabuki.h" // needed for decoding functions only
+
 #include "cpu/z80/z80.h"
-#include "kabuki.h"  // needed for decoding functions only
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ymopl.h"
@@ -355,7 +356,7 @@ static INPUT_PORTS_START( cbasebal )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
@@ -459,16 +460,16 @@ void cbasebal_state::machine_reset()
 void cbasebal_state::cbasebal(machine_config &config)
 {
 	// basic machine hardware
-	Z80(config, m_maincpu, 6000000);   // ???
+	Z80(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cbasebal_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &cbasebal_state::port_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &cbasebal_state::decrypted_opcodes_map);
-	m_maincpu->set_vblank_int("screen", FUNC(cbasebal_state::irq0_line_hold));   // ???
+	m_maincpu->set_vblank_int("screen", FUNC(cbasebal_state::irq0_line_hold)); // ?
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
@@ -484,9 +485,10 @@ void cbasebal_state::cbasebal(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, "oki", 1056000, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "mono", 0.50); // clock frequency & pin 7 not verified
+	okim6295_device &oki(OKIM6295(config, "oki", 16_MHz_XTAL / 16, okim6295_device::PIN7_HIGH)); // no separate OSC, assume same as mitchell hw
+	oki.add_route(ALL_OUTPUTS, "mono", 0.5);
 
-	YM2413(config, "ymsnd", 3579545).add_route(ALL_OUTPUTS, "mono", 1.0);
+	YM2413(config, "ymsnd", 16_MHz_XTAL / 4).add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -499,29 +501,29 @@ void cbasebal_state::cbasebal(machine_config &config)
 
 ROM_START( cbasebal )
 	ROM_REGION( 0x90000, "maincpu", 0 )
-	ROM_LOAD( "cbj10.11j",    0x00000, 0x08000, CRC(bbff0acc) SHA1(db9e2c89e030255851789caaf85f24dc73609d9b) )
-	ROM_LOAD( "cbj07.16f",    0x10000, 0x20000, CRC(8111d13f) SHA1(264e21e824c87f55da326440c6ed71e1c287a63e) )
-	ROM_LOAD( "cbj06.14f",    0x30000, 0x20000, CRC(9aaa0e37) SHA1(1a7b96b44c66b58f06707aafb1806520747b8c76) )
-	ROM_LOAD( "cbj05.13f",    0x50000, 0x20000, CRC(d0089f37) SHA1(32354c3f4693a65e297791c4d8faac3aa9cff5a1) )
+	ROM_LOAD( "cbj_10.11j",    0x00000, 0x08000, CRC(bbff0acc) SHA1(db9e2c89e030255851789caaf85f24dc73609d9b) )
+	ROM_LOAD( "cbj_07.16f",    0x10000, 0x20000, CRC(8111d13f) SHA1(264e21e824c87f55da326440c6ed71e1c287a63e) )
+	ROM_LOAD( "cbj_06.14f",    0x30000, 0x20000, CRC(9aaa0e37) SHA1(1a7b96b44c66b58f06707aafb1806520747b8c76) )
+	ROM_LOAD( "cbj_05.13f",    0x50000, 0x20000, CRC(d0089f37) SHA1(32354c3f4693a65e297791c4d8faac3aa9cff5a1) )
 	// 0x70000-0x8ffff empty (space for 04)
 
 	ROM_REGION( 0x10000, "text", 0 )
-	ROM_LOAD( "cbj13.16m",    0x00000, 0x10000, CRC(2359fa0a) SHA1(3a37532ea43dd4b150c53a240d35a57a9b76d23d) )
+	ROM_LOAD( "cbj_13.16m",    0x00000, 0x10000, CRC(2359fa0a) SHA1(3a37532ea43dd4b150c53a240d35a57a9b76d23d) )
 
 	ROM_REGION( 0x80000, "tiles", 0 )
-	ROM_LOAD( "cbj02.1f",     0x00000, 0x20000, CRC(d6740535) SHA1(2ece885525718fd5fe52b8fa4c07930695b89659) )
-	ROM_LOAD( "cbj03.2f",     0x20000, 0x20000, CRC(88098dcd) SHA1(caddebeea581129d6a62fc9f7f354d61eef175c7) )
-	ROM_LOAD( "cbj08.1j",     0x40000, 0x20000, CRC(5f3344bf) SHA1(1d3193078108e86e31bbfce15a8d2443cfbf2ff6) )
-	ROM_LOAD( "cbj09.2j",     0x60000, 0x20000, CRC(aafffdae) SHA1(26e76b55fff49811df8e5b1f165be20ec8dd196a) )
+	ROM_LOAD( "cbj_02.1f",     0x00000, 0x20000, CRC(d6740535) SHA1(2ece885525718fd5fe52b8fa4c07930695b89659) )
+	ROM_LOAD( "cbj_03.2f",     0x20000, 0x20000, CRC(88098dcd) SHA1(caddebeea581129d6a62fc9f7f354d61eef175c7) )
+	ROM_LOAD( "cbj_08.1j",     0x40000, 0x20000, CRC(5f3344bf) SHA1(1d3193078108e86e31bbfce15a8d2443cfbf2ff6) )
+	ROM_LOAD( "cbj_09.2j",     0x60000, 0x20000, CRC(aafffdae) SHA1(26e76b55fff49811df8e5b1f165be20ec8dd196a) )
 
 	ROM_REGION( 0x80000, "sprites", 0 )
-	ROM_LOAD( "cbj11.1m",     0x00000, 0x20000, CRC(bdc1507d) SHA1(efeaf3066acfb7186d73ad8e5b291d6e61965de2) )
-	ROM_LOAD( "cbj12.2m",     0x20000, 0x20000, CRC(973f3efe) SHA1(d776499d5ac4bc23eb5d1f28b88447cc07d8ac99) )
-	ROM_LOAD( "cbj14.1n",     0x40000, 0x20000, CRC(765dabaa) SHA1(742d1c50b65f649f23eac7976fe26c2d7400e4e1) )
-	ROM_LOAD( "cbj15.2n",     0x60000, 0x20000, CRC(74756de5) SHA1(791d6620cdb563f0b3a717432aa4647981b0a10e) )
+	ROM_LOAD( "cbj_11.1m",     0x00000, 0x20000, CRC(bdc1507d) SHA1(efeaf3066acfb7186d73ad8e5b291d6e61965de2) )
+	ROM_LOAD( "cbj_12.2m",     0x20000, 0x20000, CRC(973f3efe) SHA1(d776499d5ac4bc23eb5d1f28b88447cc07d8ac99) )
+	ROM_LOAD( "cbj_14.1n",     0x40000, 0x20000, CRC(765dabaa) SHA1(742d1c50b65f649f23eac7976fe26c2d7400e4e1) )
+	ROM_LOAD( "cbj_15.2n",     0x60000, 0x20000, CRC(74756de5) SHA1(791d6620cdb563f0b3a717432aa4647981b0a10e) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "cbj01.1e",     0x00000, 0x20000, CRC(1d8968bd) SHA1(813e475d1d0c343e7dad516f1fe564d00c9c27fb) )
+	ROM_LOAD( "cbj_01.1e",     0x00000, 0x20000, CRC(1d8968bd) SHA1(813e475d1d0c343e7dad516f1fe564d00c9c27fb) )
 ROM_END
 
 

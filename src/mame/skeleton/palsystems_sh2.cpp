@@ -200,7 +200,7 @@ void palsystems_sh2_state::palsystems_sh2(machine_config &config)
 	SH7042(config, m_maincpu, 12'000'000); // TODO: wrong, actually SH7044. Also wrong clock.
 	m_maincpu->set_addrmap(AS_PROGRAM, &palsystems_sh2_state::program_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

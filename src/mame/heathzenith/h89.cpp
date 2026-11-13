@@ -48,6 +48,7 @@
 #include "bus/heathzenith/h89/cdr_fdc_880h.h"
 #include "bus/heathzenith/h89/h_88_3.h"
 #include "bus/heathzenith/h89/h_88_5.h"
+#include "bus/heathzenith/h89/h17_fdc.h"
 #include "bus/heathzenith/h89/mms77316_fdc.h"
 #include "bus/heathzenith/h89/sigmasoft_parallel_port.h"
 #include "bus/heathzenith/h89/sigmasoft_sound.h"
@@ -973,6 +974,7 @@ void h89_base_state::h89_right_cards_mms(device_slot_interface &device)
 
 void h89_base_state::h89_right_p506_cards(device_slot_interface &device)
 {
+	device.option_add("h17fdc",    H89BUS_H_17_FDC);
 	device.option_add("h_88_3",    H89BUS_H_88_3);
 	device.option_add("ha_88_3",   H89BUS_HA_88_3);
 	device.option_add("ss_snd",    H89BUS_SIGMASOFT_SND);

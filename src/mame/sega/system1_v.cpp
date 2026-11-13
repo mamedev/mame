@@ -425,7 +425,7 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 			srcaddr += stride;
 
 			// skip if outside of our clipping area
-			if (y < cliprect.min_y || y > cliprect.max_y)
+			if (!cliprect.containsy(y))
 				continue;
 
 			// iterate over X
@@ -457,8 +457,8 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 				{
 					for (int i = 0; i < 2; i++)
 					{
-						const int effx = flipscreen ? 0x1fe - (x + i) : (x + i);
-						if (effx >= cliprect.min_x && effx <= cliprect.max_x)
+						const int effx = flipscreen ? (0x1fe - (x + i)) : (x + i);
+						if (cliprect.containsx(effx))
 						{
 							const int prevpix = destbase[effx];
 
@@ -478,8 +478,8 @@ void system1_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 				{
 					for (int i = 0; i < 2; i++)
 					{
-						const int effx = flipscreen ? 0x1fe - (x + 2 + i) : (x + 2 + i);
-						if (effx >= cliprect.min_x && effx <= cliprect.max_x)
+						const int effx = flipscreen ? (0x1fe - (x + 2 + i)) : (x + 2 + i);
+						if (cliprect.containsx(effx))
 						{
 							const int prevpix = destbase[effx];
 
@@ -513,7 +513,7 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 	draw_sprites(m_sprite_bitmap, cliprect, spritexoffs);
 
 	// iterate over rows
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u16 *const fgbase = &fgpixmap.pix(y & 0xff);
 		const u16 *const sprbase = &m_sprite_bitmap.pix(y & 0xff);
@@ -525,7 +525,7 @@ void system1_state::video_update_common(screen_device &screen, bitmap_ind16 &bit
 		const u16 *const bgbase[2] = { &bgpixmaps[(bgy >> 8) * 2 + 0]->pix(bgy & 0xff), &bgpixmaps[(bgy >> 8) * 2 + 1]->pix(bgy & 0xff) };
 
 		// iterate over pixels
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const int bgx = ((x - bgxscroll) / 2) & 0x1ff;
 			const u16 fgpix = fgbase[(x / 2) & 0xff];

@@ -271,11 +271,11 @@ void mechatt_state::video_start()
 template <typename Proc>
 void mechatt_state::mix_sprites(bitmap_ind16 &bitmap, bitmap_ind16 &srcbitmap, const rectangle &cliprect, Proc MIX)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t const *const srcbuf = &srcbitmap.pix(y);
 		uint16_t *const dstbuf = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t const srcdat = srcbuf[x];
 			if ((srcdat & 0xf) != 0xf)
@@ -491,7 +491,7 @@ void mechatt_state::mechatt(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &mechatt_state::sounda_portmap);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);

@@ -182,7 +182,7 @@ void vector06_state::ppi1_portb_w(uint8_t data)
 		m_video_mode = BIT(data, 4);
 		u16 width = m_video_mode ? 512 : 256;
 		rectangle visarea(0, width+64-1, 0, 256+64-1);
-		m_screen->configure(width+64, 256+64, visarea, m_screen->frame_period().attoseconds());
+		m_screen->configure(width+64, 256+64, visarea, m_screen->frame_period());
 	}
 }
 
@@ -526,7 +526,7 @@ void vector06_state::vector06(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback(FUNC(vector06_state::irq_callback));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	m_screen->set_size(256+64, 256+64);

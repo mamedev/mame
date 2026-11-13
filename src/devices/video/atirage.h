@@ -20,8 +20,12 @@ public:
 
 	auto gpio_get_cb() { return read_gpio.bind(); }
 	auto gpio_set_cb() { return write_gpio.bind(); }
+	auto irq_cb() { return write_irq.bind(); }
 
 	void set_gpio_pullups(u16 pullups) { m_gpio_pullups = pullups; }
+
+	// level of the VSYNC pin, for boards that loop it back into a GPIO
+	int vsync_r();
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -34,14 +38,22 @@ protected:
 	required_device<mach64_device> m_mach64;
 	required_device<screen_device> m_screen;
 
-	u8 m_regs0[0x400];
-	u8 m_regs1[0x400];
+	// the register blocks are dword-addressed; indices are byte offset / 4
+	u32 m_regs0[0x100];
+	u32 m_regs1[0x100];
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	virtual u32 regs_0_read(offs_t offset, u32 mem_mask);
+	virtual void regs_0_write(offs_t offset, u32 data, u32 mem_mask);
+
+	u16 gpio_sample();
 
 private:
 	devcb_read16 read_gpio;
 	devcb_write16 write_gpio;
+	devcb_write_line write_irq;
+	bool m_irq_active;
 
 	u32 m_user_cfg;
 	u32 m_hres, m_vres, m_htotal, m_vtotal, m_format, m_pixel_clock;
@@ -50,15 +62,62 @@ private:
 	u8 m_pll_regs[16];
 	u16 m_gpio_pullups;
 
-	u8 regs_0_read(offs_t offset);
-	void regs_0_write(offs_t offset, u8 data);
-	u8 regs_1_read(offs_t offset);
-	void regs_1_write(offs_t offset, u8 data);
+	u32 regs_1_read(offs_t offset, u32 mem_mask);
+	void regs_1_write(offs_t offset, u32 data, u32 mem_mask);
+
+	u8 dac_read(int index);
+	void dac_write(int index, u8 data);
+
+	u32 pll_addr() const;
+
+	void vblank_w(int state);
+	void update_irq();
+
+	void draw_cursor(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void draw_rectangle();
+	bool dst_pixel(int x, int y, u32 src, u32 mix);
+	u32 src_pixel(int x, int y);
+	bool pattern_bit(int x, int y) const;
+	void host_data_w(u32 data);
+
+	// destination walker for a host data transfer that is waiting to be fed
+	bool m_host_active;
+	bool m_host_mono;
+	int m_host_x, m_host_y;
+	int m_host_start_x, m_host_col;
+	int m_host_width, m_host_lines;
+	int m_host_x_step, m_host_y_step;
 
 	u32 user_cfg_r();
 	void user_cfg_w(u32 data);
 
 	void update_mode();
+};
+
+class atimach64vt_device : public atirage_device
+{
+public:
+	atimach64vt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// general purpose pins of the integrated DAC: bit 0 = GIO0, bit 1 = GIO1, bit 4 = GIO4
+	auto dac_gio_get_cb() { return read_dac_gio.bind(); }
+	auto dac_gio_set_cb() { return write_dac_gio.bind(); }
+
+	void set_dac_gio_pullups(u8 pullups) { m_dac_gio_pullups = pullups; }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+	virtual u32 regs_0_read(offs_t offset, u32 mem_mask) override;
+	virtual void regs_0_write(offs_t offset, u32 data, u32 mem_mask) override;
+
+private:
+	devcb_read8 read_dac_gio;
+	devcb_write8 write_dac_gio;
+	u8 m_dac_gio_pullups;
+
+	u8 dac_gio_dir() const;
 };
 
 class atirageii_device : public atirage_device
@@ -109,6 +168,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 };
 
+DECLARE_DEVICE_TYPE(ATI_MACH64VT, atimach64vt_device)
 DECLARE_DEVICE_TYPE(ATI_RAGEII, atirageii_device)
 DECLARE_DEVICE_TYPE(ATI_RAGEIIC, atirageiic_device)
 DECLARE_DEVICE_TYPE(ATI_RAGEIIDVD, atirageiidvd_device)

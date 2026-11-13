@@ -813,7 +813,7 @@ void skns_state::skns(machine_config &config)
 	int9_timer.configure_periodic(FUNC(skns_state::interrupt_callback), attotime::from_hz(XTAL(28'636'000)/1824));
 	int9_timer.config_param(9);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_refresh_hz(59.5971); // measured by Guru
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));

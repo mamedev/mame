@@ -931,7 +931,7 @@ void equites_state::equites(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 3*8, 29*8-1);

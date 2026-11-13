@@ -687,7 +687,7 @@ void super80_state::super80(machine_config &config)
 	m_pio->out_pa_callback().set([this](u8 data){ super80_state::pio_port_a_w(data); });
 	m_pio->in_pb_callback().set([this](){ return super80_state::pio_port_b_r(); });
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(48.8);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(super80_state::screen_update_super80));
@@ -787,7 +787,7 @@ void super80v_state::super80v(machine_config &config)
 	m_pio->out_pa_callback().set([this](u8 data){ super80v_state::pio_port_a_w(data); });
 	m_pio->in_pb_callback().set([this](){ return super80v_state::pio_port_b_r(); });
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(50);
 	m_screen->set_size(SUPER80V_SCREEN_WIDTH, SUPER80V_SCREEN_HEIGHT);
 	m_screen->set_visarea(0, SUPER80V_SCREEN_WIDTH-1, 0, SUPER80V_SCREEN_HEIGHT-1);

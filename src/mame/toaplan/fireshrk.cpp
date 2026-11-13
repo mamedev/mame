@@ -547,7 +547,7 @@ void fireshrk_state::fireshrk(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(600));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// Parameter uploaded to CRTC
 	m_screen->set_raw(XTAL(28'000'000) / 4, (224+1)*2, 0, 320, (134+1)*2, 0, 240);

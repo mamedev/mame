@@ -105,8 +105,6 @@ Variants: T denotes an active 8.4" display, C a passive 9.5" color display. 3560
 #include "emu.h"
 
 #include "bus/isa/isa_cards.h"
-#include "bus/lpci/pci.h"
-#include "bus/lpci/vt82c505.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i386/i386.h"
@@ -118,6 +116,7 @@ Variants: T denotes an active 8.4" display, C a passive 9.5" color display. 3560
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/vt82c496.h"
+#include "machine/vt82c505.h"
 
 #include "emupal.h"
 #include "softlist_dev.h"
@@ -136,42 +135,42 @@ public:
 		m_ram(*this, RAM_TAG)
 	{ }
 
-	void pc30iii(machine_config &config);
-	void k286i(machine_config &config);
-	void ibm5170(machine_config &config);
-	void ct386sx(machine_config &config);
-	void xb42639(machine_config &config);
-	void at486l(machine_config &config);
-	void comportii(machine_config &config);
-	void comportiii(machine_config &config);
-	void comslt286(machine_config &config);
-	void dsys200(machine_config &config);
-	void ibm5162(machine_config &config);
-	void neat(machine_config &config);
-	void at386l(machine_config &config);
-	void ibm5170a(machine_config &config);
-	void ec1842(machine_config &config);
-	void at486(machine_config &config);
-	void ficpio2(machine_config &config);
-	void at386sx(machine_config &config);
-	void pc40iii(machine_config &config);
-	void pc45iii(machine_config &config);
-	void c286lt(machine_config &config);
-	void csl286(machine_config &config);
-	void c386sx16(machine_config &config);
-	void atturbo(machine_config &config);
-	void at386(machine_config &config);
-	void ncrpc8(machine_config &config);
-	void n8810m15(machine_config &config);
-	void n8810m55(machine_config &config);
-	void ews286(machine_config &config);
-	void olyport40(machine_config &config);
-	void micral45(machine_config &config);
-	void euroat(machine_config &config);
-	void pg750(machine_config &config);
+	void pc30iii(machine_config &config) ATTR_COLD;
+	void k286i(machine_config &config) ATTR_COLD;
+	void ibm5170(machine_config &config) ATTR_COLD;
+	void ct386sx(machine_config &config) ATTR_COLD;
+	void xb42639(machine_config &config) ATTR_COLD;
+	void at486l(machine_config &config) ATTR_COLD;
+	void comportii(machine_config &config) ATTR_COLD;
+	void comportiii(machine_config &config) ATTR_COLD;
+	void comslt286(machine_config &config) ATTR_COLD;
+	void dsys200(machine_config &config) ATTR_COLD;
+	void ibm5162(machine_config &config) ATTR_COLD;
+	void neat(machine_config &config) ATTR_COLD;
+	void at386l(machine_config &config) ATTR_COLD;
+	void ibm5170a(machine_config &config) ATTR_COLD;
+	void ec1842(machine_config &config) ATTR_COLD;
+	void at486(machine_config &config) ATTR_COLD;
+	void ficpio2(machine_config &config) ATTR_COLD;
+	void at386sx(machine_config &config) ATTR_COLD;
+	void pc40iii(machine_config &config) ATTR_COLD;
+	void pc45iii(machine_config &config) ATTR_COLD;
+	void c286lt(machine_config &config) ATTR_COLD;
+	void csl286(machine_config &config) ATTR_COLD;
+	void c386sx16(machine_config &config) ATTR_COLD;
+	void atturbo(machine_config &config) ATTR_COLD;
+	void at386(machine_config &config) ATTR_COLD;
+	void ncrpc8(machine_config &config) ATTR_COLD;
+	void n8810m15(machine_config &config) ATTR_COLD;
+	void n8810m55(machine_config &config) ATTR_COLD;
+	void ews286(machine_config &config) ATTR_COLD;
+	void olyport40(machine_config &config) ATTR_COLD;
+	void micral45(machine_config &config) ATTR_COLD;
+	void euroat(machine_config &config) ATTR_COLD;
+	void pg750(machine_config &config) ATTR_COLD;
 
-	void init_at();
-	void init_atpci();
+	void init_at() ATTR_COLD;
+	void init_atpci() ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -205,10 +204,10 @@ class at_vrom_fix_state : public at_state
 public:
 	using at_state::at_state;
 
-	void init_megapcpla();
+	void init_megapcpla() ATTR_COLD;
 
-	void ibmps1(machine_config &config);
-	void megapcpla(machine_config &config);
+	void ibmps1(machine_config &config) ATTR_COLD;
+	void megapcpla(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -314,7 +313,6 @@ void at_state::ficpio_io(address_map &map)
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
-	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
 // TODO: verify and remove this hack
@@ -393,11 +391,6 @@ void at_state::cfg_dual_1440K(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35hd");
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("35hd");
-}
-
-static void pci_devices(device_slot_interface &device)
-{
-	device.option_add_internal("vt82c505", VT82C505);
 }
 
 void at_state::ibm5170(machine_config &config)
@@ -695,8 +688,8 @@ void at_state::ficpio2(machine_config &config)
 	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, "cdrom", nullptr, true));
 	ide2.irq_handler().set("mb:pic8259_slave", FUNC(pic8259_device::ir7_w));
 
-	PCI_BUS(config, "pcibus").set_busnum(0);
-	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "vt82c505", true);
+	PCI_ROOT(config, "pci");
+	VT82C505(config, "pci:00.0", m_maincpu);
 	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_et4k", false);
 	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, nullptr, false);

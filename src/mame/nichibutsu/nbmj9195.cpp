@@ -1690,7 +1690,7 @@ void nbmj9195_state::nbmjtype1(machine_config &config)
 	m_dsw_shifter[1]->qh_callback().set([this](int state) { m_dsw_data = state; });
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(1024, 512);     /* no way this is correct */
@@ -1722,7 +1722,7 @@ void nbmj9195_state::nbmjtype2(machine_config &config)
 	m_maincpu->out_pe_callback().set(FUNC(nbmj9195_state::gfxflag2_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_AFTER_VBLANK);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(1024, 512);     /* no way this is correct */

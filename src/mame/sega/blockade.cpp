@@ -476,7 +476,7 @@ void blockade_state::blockade(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &blockade_state::main_io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(20'790'000) / 4, 330, 0, 256, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(blockade_state::screen_update));
 	m_screen->set_palette("palette");

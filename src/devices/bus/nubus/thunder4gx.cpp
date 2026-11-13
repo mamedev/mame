@@ -67,14 +67,12 @@ protected:
 	required_device<palette_device> m_palette;
 	required_ioport m_monitor_config;
 
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-	// optional information overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u32 registers_r(offs_t offset, u32 mem_mask);
 	void registers_w(offs_t offset, u32 data, u32 mem_mask);
@@ -90,7 +88,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
 
-	void card_map(address_map &map);
+	void card_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<u32[]> m_vram;
 	u32 m_mode, m_irq_control;
@@ -140,7 +138,7 @@ INPUT_PORTS_END
 
 void nubus_thunder4gx_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_thunder4gx_device::screen_update));
 	m_screen->set_size(1600, 1200);
 	m_screen->set_visarea(0, 1152 - 1, 0, 870 - 1);
@@ -876,7 +874,7 @@ void nubus_thunder4gx_device::clockgen_w(offs_t offset, u32 data, u32 mem_mask)
 		LOGMASKED(LOG_CLOCKGEN, "hres %d vres %d htotal %d vtotal %d refresh %f stride %d mode %d\n", m_hres, m_vres, m_htotal, m_vtotal, refresh, m_stride, m_mode);
 
 		rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-		m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock).as_attoseconds());
+		m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock));
 	}
 }
 
@@ -888,7 +886,8 @@ public:
 	{
 	}
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 ROM_START( thundergx1600 )

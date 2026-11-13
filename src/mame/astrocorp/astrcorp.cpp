@@ -200,6 +200,17 @@ winbingo: Win Win Bingo
 | 6          | 5693  | 7          | 2110  |            |       |
 +------------+-------+------------+-------+------------+-------+
 
+***List of some CGA missing games***
+HOT RUNNER      - Car racing game for single player
+JOKER FIRE      - 5 cards poker game with 2 Jokers
+MAGIC HAMMER    - 4 reels slot game
+ONE TOUCH       - 8in1 Multigame includes: Openseason, Sleepy Monk, Wrestling, Funny Hammer, Merry Christmas,go! Fishing, Air Heroes, Gogonight.
+POKER & LINER   - 2in1 combination with multi-liner Dino-Dino and poker game
+POKER 106       - 5 cards poker game
+POKER MATCH     - Lamp game with poker card GFX
+SMART HOLDER    - Poker game with fruits GFX
+TEXAS CHAMPION  - Texas Hold'em poker game
+UR DEALER       - Three traditional poker games. The player plays the role of Dealer
 *************************************************************************************************************/
 
 #include "emu.h"
@@ -1698,7 +1709,7 @@ void astrocorp_state::showhand(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(26.601712_MHz_XTAL / 4, 433, 0, 320, 261, 0, 240); // ~15.354kHz Hsync, ~58.846Hz Vsync
 	m_screen->set_screen_update(FUNC(astrocorp_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1728,7 +1739,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::irq_2_4_scanline_cb)
 {
 	int scanline = param;
 
-	if (scanline == m_screen->visible_area().max_y + 1) // vblank-in?
+	if (scanline == m_screen->visible_area().bottom() + 1) // vblank-in?
 		m_maincpu->set_input_line(4, HOLD_LINE); // sprites, sound, i/o
 
 	if (scanline == 0) // vblank-out?
@@ -1749,7 +1760,7 @@ void astrocorp_state::skilldrp(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(200));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// TODO: verify H/VSync & pixel clock for this type of HW
 	// (most likely different to compensate for the higher HRes)
 	m_screen->set_raw(24_MHz_XTAL / 2, 781, 0, 512, 261, 0, 240); // double horizontal resolution
@@ -1806,7 +1817,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zoo_state::irq_1_2_scanline_cb)
 	// NOTE: in astoneag title screen, if the IRQ levels are swapped, a timing issue causes the SP to overwrite the palette data
 	//       before it's written to the RAMDAC, causing corrupt colors
 
-	if (scanline == m_screen->visible_area().max_y + 1) // vblank-in?
+	if (scanline == m_screen->visible_area().bottom() + 1) // vblank-in?
 		m_maincpu->set_input_line(1, HOLD_LINE); // palette
 
 	if (scanline == 0) // vblank-out?

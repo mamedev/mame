@@ -53,7 +53,7 @@ private:
 			s32 left;
 			u32 acc, start, end; // address counters (20.9 fixed point)
 			u16 fc;              // frequency (6.9 fixed point)
-			u8 ctl, saddr;
+			u8 saddr;
 		} osc;
 
 		struct {
@@ -68,9 +68,19 @@ private:
 
 		union {
 			struct {
+				u8 done       : 1;   // done flag
+				u8 stop       : 1;   // stop flag
+				u8            : 6;   // padding
+				// IRQ on variable?
+			} bitflags;
+			u8 value;
+		} osc_ctrl;
+
+		union {
+			struct {
 				u8 ulaw       : 1;   // compressed sample format
-				u8 stop       : 1;   // stops wave + vol envelope
-				u8 eightbit   : 1;   // 8 bit sample format
+				u8 sixteenbit : 1;   // 16-bit sample format (ignored for u-law)
+				u8            : 1;   // unused
 				u8 loop       : 1;   // loop enable
 				u8 loop_bidir : 1;   // bi-directional loop enable
 				u8 irq        : 1;   // enable IRQ generation
@@ -95,12 +105,6 @@ private:
 			} bitflags;
 			u8 value;
 		} vol_ctrl;
-
-		// Possibly redundant state. => improvements of wavetable logic
-		// may lead to its elimination.
-		struct {
-			bool on;
-		} state;
 
 		u16 regs[0x20]; // channel registers
 		bool playing();

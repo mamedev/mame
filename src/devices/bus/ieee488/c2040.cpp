@@ -14,7 +14,7 @@
     or you will get a DISK ID MISMATCH error upon disk commands.
     On the 4040 this is done automatically by the DOS.
 
-    open 15,8,15:print 15,"i":close 15
+    open 15,8,15:print #15,"i":close 15
 
     List directory
     --------------
@@ -31,19 +31,6 @@
     Save file
     ---------
     dsave "name" / dS"name
-
-*/
-
-/*
-
-    TODO:
-
-    - 2040/3040/4040 have a Shugart SA390 drive (FLOPPY_525_SSSD_35T)
-
-    - 2040 DOS 1 FDC rom (jumps to 104d while getting block header)
-
-        FE70: jsr  $104D
-        104D: m6502_brk#$00
 
 */
 
@@ -115,7 +102,7 @@ protected:
 	void add_common_devices(machine_config &config);
 	inline void update_ieee_signals();
 
-	uint8_t dio_r() { return m_bus->dio_r(); };
+	uint8_t dio_r();
 	void dio_w(uint8_t data) { m_bus->dio_w(this, data); };
 	uint8_t riot1_pa_r();
 	void riot1_pa_w(uint8_t data);
@@ -306,11 +293,27 @@ void c2040_device::c2040_fdc_mem(address_map &map)
 
 
 //-------------------------------------------------
+//  riot6532 uc1
+//-------------------------------------------------
+
+uint8_t c2040_device::dio_r()
+{
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_bus->dio_r();
+}
+
+
+//-------------------------------------------------
 //  riot6532 ue1
 //-------------------------------------------------
 
 uint8_t c2040_device::riot1_pa_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -377,6 +380,9 @@ void c2040_device::riot1_pa_w(uint8_t data)
 
 uint8_t c2040_device::riot1_pb_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -471,7 +477,7 @@ void c2040_device::via_pb_w(uint8_t data)
 
 static void c2040_floppies(device_slot_interface &device)
 {
-	device.option_add("525ssqd", FLOPPY_525_SSQD);
+	device.option_add("525ssqd", FLOPPY_525_SSQD); // Shugart SA390
 }
 
 

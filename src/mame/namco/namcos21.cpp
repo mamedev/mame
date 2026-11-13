@@ -48,7 +48,7 @@ reference videos:
 
 *****************************
 
-Winning Run / Winning Run Suzuka GP/ Winning Run 91
+Winning Run / Winning Run Suzuka GP / Winning Run 91
 Namco 1988-91
 
 These games run on Namco System 21 hardware. Note each set of PCBs for System 21 games are slightly different,
@@ -542,7 +542,7 @@ u32 namcos21_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	// entries 0 and 1 unused parts controls priority mixing
 	const u16 pri = (m_palette->read16_ext(1) >> 8) & 7;
 
-	switch(pri)
+	switch (pri)
 	{
 		case 5: // title screen for all games here
 			bitmap_draw(bitmap,cliprect);
@@ -886,7 +886,7 @@ void namcos21_state::winrun(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(38.808_MHz_XTAL / 4 * 2, 616, 0, 496, 262 + 263, 0, 480); // x2 is for interlace
 	m_screen->set_screen_update(FUNC(namcos21_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1007,8 +1007,8 @@ ROM_START( winrungp )
 	ROM_LOAD( "sys2c65c.bin", 0x000000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x80000, "gpu", 0 ) /* 68k code */
-	ROM_LOAD16_BYTE( "sg1-gp0-u.1j", 0x00000, 0x20000, BAD_DUMP CRC(475da78a) SHA1(6e69bcc6caf2e3cd28fed75796c8992e754f9323) )
-	ROM_LOAD16_BYTE( "sg1-gp0-l.3j", 0x00001, 0x20000, BAD_DUMP CRC(580479bf) SHA1(ba682190cba0d3cdc49aa4937c898ba7ed2a25f5) )
+	ROM_LOAD16_BYTE( "sg1-gp0-u.1j", 0x00000, 0x20000, BAD_DUMP CRC(475da78a) SHA1(6e69bcc6caf2e3cd28fed75796c8992e754f9323) ) // Photos show these 4 are Toshiba TC571001D non JEDEC 128K EPROMs
+	ROM_LOAD16_BYTE( "sg1-gp0-l.3j", 0x00001, 0x20000, BAD_DUMP CRC(580479bf) SHA1(ba682190cba0d3cdc49aa4937c898ba7ed2a25f5) ) // Likely, incorrectly dumped as standard 27C010 and data was lost
 	ROM_LOAD16_BYTE( "sg1-gp1-u.1l", 0x40000, 0x20000, BAD_DUMP CRC(f5f2e927) SHA1(ebf709f16f01f1a634de9121454537cda74e891b) )
 	ROM_LOAD16_BYTE( "sg1-gp1-l.3l", 0x40001, 0x20000, BAD_DUMP CRC(17ed90a5) SHA1(386bdcb11dcbe400f5be1fe4a7418158b46e50ef) )
 
@@ -1088,6 +1088,7 @@ ROM_END
 } // Anonymous namespace
 
 
+// HACK: work around this race condition for winrungp/winrun91 service mode
 /*
 
 Both winrungp and winrun91 have a bug in service mode, which will cause the GPU to lock

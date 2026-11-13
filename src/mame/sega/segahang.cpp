@@ -37,6 +37,7 @@
 #include "sound/ymopn.h"
 
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #define LOG_MCU (1U << 1)
@@ -234,7 +235,7 @@ uint32_t segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			cliprect,
 			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
@@ -243,7 +244,7 @@ uint32_t segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					if (!m_sharrier_video)
 					{
 						// hangon mixing
-						for (int x = rect.min_x; x <= rect.max_x; x++)
+						for (int x = rect.left(); x <= rect.right(); x++)
 						{
 							// only process written pixels
 							uint16_t const pix = src[x];
@@ -267,7 +268,7 @@ uint32_t segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					else
 					{
 						// sharrier mixing
-						for (int x = rect.min_x; x <= rect.max_x; x++)
+						for (int x = rect.left(); x <= rect.right(); x++)
 						{
 							// only process written pixels
 							uint16_t const pix = src[x];
@@ -1019,7 +1020,7 @@ void segahang_state::shared_base(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segahang);
 	PALETTE(config, m_palette).set_entries(2048*3);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(25.1748_MHz_XTAL / 4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segahang_state::screen_update));
 	m_screen->set_palette(m_palette);

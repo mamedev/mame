@@ -420,9 +420,9 @@ uint32_t centiped_state::screen_update_centiped(screen_device &screen, bitmap_in
 
 	/* apply the sprite clip */
 	if (m_flipscreen)
-		spriteclip.min_x += 8;
+		spriteclip.insetx(8, 0);
 	else
-		spriteclip.max_x -= 8;
+		spriteclip.insetx(0, 8);
 
 	/* draw the sprites */
 	for (int offs = 0; offs < 0x10; offs++)
@@ -492,9 +492,9 @@ uint32_t centiped_state::screen_update_bullsdrt(screen_device &screen, bitmap_in
 
 	/* apply the sprite clip */
 	if (m_flipscreen)
-		spriteclip.min_x += 8;
+		spriteclip.insetx(8, 0);
 	else
-		spriteclip.max_x -= 8;
+		spriteclip.insetx(0, 8);
 
 	/* draw the sprites */
 	for (int offs = 0; offs < 0x10; offs++)
@@ -523,9 +523,9 @@ uint32_t centiped_state::screen_update_milliped(screen_device &screen, bitmap_in
 
 	/* apply the sprite clip */
 	if (m_flipscreen)
-		spriteclip.min_x += 8;
+		spriteclip.insetx(8, 0);
 	else
-		spriteclip.max_x -= 8;
+		spriteclip.insetx(0, 8);
 
 	/* draw the sprites */
 	for (int offs = 0; offs < 0x10; offs++)

@@ -616,6 +616,21 @@ void segas1x_bootleg_state::s16bl_bgscrolly_w(uint16_t data)
 }
 
 
+void segas1x_bootleg_state::beautyb_fgscrollx_w(uint16_t data)
+{
+	int scroll = data & 0x1ff;
+	scroll -= 1;
+	m_fg_scrollx = -scroll;
+}
+
+void segas1x_bootleg_state::beautyb_bgscrollx_w(uint16_t data)
+{
+	int scroll = data & 0x1ff;
+	scroll += 1;
+	m_bg_scrollx = -scroll;
+}
+
+
 void segas1x_bootleg_state::goldnaxeb1_map(address_map &map)
 {
 	map(0x000000, 0x0bffff).rom();
@@ -939,20 +954,103 @@ void segas1x_bootleg_state::tetrisbl_map(address_map &map)
 }
 
 
-uint16_t segas1x_bootleg_state::beautyb_unkx_r()
+/*
+    Beauty Block / IQ Pipe protection
+
+    The 68000, its two program ROMs and a PAL16L8 (u4, undumped) are on a small
+    daughterboard.  The PAL unscrambles data bits 13 and 10 of the ROMs (the
+    'xor 0x2400 + conditional swap on A4' already handled by init_beautyb) but it
+    also implements a small state machine which is only visible on *data*
+    accesses to two 32 byte windows inside the program ROM:
+
+      $xx80-$xx8F   a read clocks an 8 bit up/down counter, the direction being
+                    given by A2 (0 = up, 1 = down); the value read is discarded
+      $xx90-$xx9F   a read returns the ROM word with bits 13 and 10 replaced by
+                    two sums of products of the counter
+
+    with xx = $68 or $90.  Opcode fetches are not affected - $9090-$909F is
+    ordinary executable code - hence the separate AS_OPCODES map.
+
+    The game holds five identical copies of the check ($860C, $9874, $A80A,
+    $C1A2, $D150).  When one of them fails the code silences the sound, blanks
+    the screen and tries to wipe the program ROM ($EF3C): that was the black
+    screen.  The 68000 code computes the expected value itself, so the equations
+    below are taken verbatim from it ($8698-$8724 and its four clones).
+*/
+template <unsigned Base>
+uint16_t segas1x_bootleg_state::beautyb_prot_r(offs_t offset)
 {
-	m_beautyb_unkx++;
-	m_beautyb_unkx &= 0x7f;
-	return m_beautyb_unkx;
+	uint16_t const data = m_maincpu_rom[Base + offset];
+
+	if (!BIT(offset, 3)) // $xx80-$xx8F - only clocks the counter
+	{
+		if (!machine().side_effects_disabled())
+		{
+			if (BIT(offset, 1))
+				m_beautyb_prot_ctr--;
+			else
+				m_beautyb_prot_ctr++;
+		}
+
+		return data;
+	}
+
+	// $xx90-$xx9F - the PAL drives D13 and D10 instead of the ROM
+	uint8_t const v = (m_beautyb_prot_ctr >> 3) & 0x1f;
+	bool const b0 = BIT(v, 0), b1 = BIT(v, 1), b2 = BIT(v, 2), b3 = BIT(v, 3), b4 = BIT(v, 4);
+
+	uint16_t res = data & ~0x2400;
+	if ((b0 && b3) || (b4 && !b2)) res |= 0x2000;
+	if ((b1 && !b3) || (b2 && !b0)) res |= 0x0400;
+
+	return res;
+}
+
+/*
+    IQ Pipe uses the same scheme but a different PAL: the counter direction is
+    inverted (A2 = 1 counts up) and the two equations are different.  Both
+    windows are executable code here, so AS_OPCODES is mandatory.
+*/
+template <unsigned Base>
+uint16_t segas1x_bootleg_state::iqpipe_prot_r(offs_t offset)
+{
+	uint16_t const data = m_maincpu_rom[Base + offset];
+
+	if (!BIT(offset, 3)) // $xx80-$xx8F - only clocks the counter
+	{
+		if (!machine().side_effects_disabled())
+		{
+			if (BIT(offset, 1))
+				m_beautyb_prot_ctr++;
+			else
+				m_beautyb_prot_ctr--;
+		}
+
+		return data;
+	}
+
+	// $xx90-$xx9F - the PAL drives D13 and D10 instead of the ROM
+	uint8_t const v = (m_beautyb_prot_ctr >> 3) & 0x1f;
+	bool const b0 = BIT(v, 0), b1 = BIT(v, 1), b2 = BIT(v, 2), b3 = BIT(v, 3), b4 = BIT(v, 4);
+
+	uint16_t res = data & ~0x2400;
+	if ((b0 && !b3) || (b2 && !b4)) res |= 0x2000;
+	if ((b1 && b3) || (b0 && b2)) res |= 0x0400;
+
+	return res;
+}
+
+void segas1x_bootleg_state::beautyb_opcodes_map(address_map &map)
+{
+	map(0x000000, 0x00ffff).rom().region("maincpu", 0);
 }
 
 void segas1x_bootleg_state::beautyb_map(address_map &map)
 {
 	map(0x000000, 0x00ffff).rom().nopw();
+	map(0x006880, 0x00689f).r(FUNC(segas1x_bootleg_state::beautyb_prot_r<0x6880 / 2>));
+	map(0x009080, 0x00909f).r(FUNC(segas1x_bootleg_state::beautyb_prot_r<0x9080 / 2>));
 	map(0x010000, 0x03ffff).nopw();
-
-	map(0x0280D6, 0x0280D7).r(FUNC(segas1x_bootleg_state::beautyb_unkx_r));
-	map(0x0280D8, 0x0280D9).r(FUNC(segas1x_bootleg_state::beautyb_unkx_r));
 
 	map(0x3f0000, 0x3fffff).w(FUNC(segas1x_bootleg_state::sys16_tilebank_w));
 
@@ -960,23 +1058,37 @@ void segas1x_bootleg_state::beautyb_map(address_map &map)
 	map(0x410000, 0x413fff).ram().w(FUNC(segas1x_bootleg_state::sys16_textram_w)).share("textram");
 
 	map(0x418000, 0x418001).w(FUNC(segas1x_bootleg_state::s16bl_bgscrolly_w));
-	map(0x418008, 0x418009).w(FUNC(segas1x_bootleg_state::s16bl_bgscrollx_w));
+	map(0x418008, 0x418009).w(FUNC(segas1x_bootleg_state::beautyb_bgscrollx_w));
 	map(0x418010, 0x418011).w(FUNC(segas1x_bootleg_state::s16bl_fgscrolly_w));
-	map(0x418018, 0x418019).w(FUNC(segas1x_bootleg_state::s16bl_fgscrollx_w));
-	map(0x418020, 0x418021).w(FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
-	map(0x418028, 0x418029).w(FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
+	map(0x418018, 0x418019).w(FUNC(segas1x_bootleg_state::beautyb_fgscrollx_w));
+	map(0x418020, 0x418021).w(FUNC(segas1x_bootleg_state::s16bl_fgpage_w));
+	map(0x418028, 0x418029).w(FUNC(segas1x_bootleg_state::s16bl_bgpage_w));
 
 	map(0x840000, 0x840fff).ram().w(FUNC(segas1x_bootleg_state::paletteram_w)).share("paletteram");
 
 	map(0xc41000, 0xc41001).portr("SERVICE");
 	map(0xc41002, 0xc41003).portr("P1");
-	map(0xc41004, 0xc41005).portr("P2");
+	map(0xc41006, 0xc41007).portr("P2");   // the 68000 reads $c41007, not $c41005
+	map(0xc42000, 0xc42001).portr("DSW2"); // both read through the I/O pointer table at $813A
+	map(0xc42002, 0xc42003).portr("DSW1");
 	map(0xc42006, 0xc42007).w(FUNC(segas1x_bootleg_state::sound_command_irq_w));
+	map(0xc43034, 0xc43035).nopw();
 
 	map(0xc40000, 0xc40001).nopw();
 	map(0xc80000, 0xc80001).noprw(); // vblank irq ack
 
 	map(0xffc000, 0xffffff).ram(); // work ram
+}
+
+/***************************************************************************/
+
+void segas1x_bootleg_state::iqpipe_map(address_map &map)
+{
+	beautyb_map(map);
+
+	// same protection scheme, different PAL equations
+	map(0x006880, 0x00689f).r(FUNC(segas1x_bootleg_state::iqpipe_prot_r<0x6880 / 2>));
+	map(0x009080, 0x00909f).r(FUNC(segas1x_bootleg_state::iqpipe_prot_r<0x9080 / 2>));
 }
 
 /***************************************************************************/
@@ -1820,6 +1932,98 @@ static INPUT_PORTS_START( tetris )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" ) /* Listed as "Unused" */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( iqpipe )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+
+	PORT_START("SERVICE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
+	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_8C ))
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_9C ))
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_10C ))
+	PORT_DIPSETTING(    0x05, "1 Coin/11 Credits")
+	PORT_DIPSETTING(    0x04, "1 Coin/12 Credits")
+	PORT_DIPSETTING(    0x03, "1 Coin/13 Credits")
+	PORT_DIPSETTING(    0x02, "1 Coin/14 Credits")
+	PORT_DIPSETTING(    0x01, "1 Coin/15 Credits")
+	PORT_DIPSETTING(    0x00, DEF_STR(Free_Play))
+	// the coinage code seems buggy, the coinage will never be
+	// any less than value set in this dip, lower values default to this
+	PORT_DIPNAME( 0xf0, 0xf0, "Minimum Coinage" ) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ))
+	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_8C ))
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_9C ))
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_10C ))
+	PORT_DIPSETTING(    0x50, "1 Coin/11 Credits")
+	PORT_DIPSETTING(    0x40, "1 Coin/12 Credits")
+	PORT_DIPSETTING(    0x30, "1 Coin/13 Credits")
+	PORT_DIPSETTING(    0x20, "1 Coin/14 Credits")
+	PORT_DIPSETTING(    0x10, "1 Coin/15 Credits")
+	PORT_DIPSETTING(    0x00, DEF_STR(Free_Play))
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1" )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( beautyb )
+	PORT_INCLUDE( iqpipe )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x80, 0x00, "Non-Standard Pieces" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 /* System 18 Bootlegs */
 static INPUT_PORTS_START( base18 )
 	PORT_START("P1")
@@ -2173,7 +2377,7 @@ void segas1x_bootleg_state::system16_base(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 36*8);
@@ -2272,7 +2476,7 @@ void segas1x_bootleg_state::goldnaxeb_base(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 28*8);
@@ -2414,16 +2618,41 @@ void segas1x_bootleg_state::altbeastbl(machine_config &config)
 	m_msm->set_prescaler_selector(msm5205_device::S96_4B);
 }
 
+/*
+    The 68000 /RESET line clears the protection counter on the daughterboard,
+    while the game clears its own software copy of it ($FFE2C4 in Beauty Block,
+    $FFE484 in IQ Pipe) every time it boots.  Without this the two get out of
+    step after a soft reset and the protection check fails.
+*/
+MACHINE_RESET_MEMBER(segas1x_bootleg_state,beautyb)
+{
+	m_beautyb_prot_ctr = 0;
+}
+
 void segas1x_bootleg_state::beautyb(machine_config &config)
 {
 	system16_base(config);
 
+	MCFG_MACHINE_RESET_OVERRIDE(segas1x_bootleg_state,beautyb)
+
 	/* basic machine hardware */
 	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::beautyb_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &segas1x_bootleg_state::beautyb_opcodes_map);
+
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,beautyb)
 
 	// no sprites
 
 	z80_ym2151(config);
+}
+
+void segas1x_bootleg_state::iqpipe(machine_config &config)
+{
+	beautyb(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::iqpipe_map);
+
+	MCFG_VIDEO_START_OVERRIDE(segas1x_bootleg_state,iqpipe)
 }
 
 /* System 18 Bootlegs */
@@ -2438,7 +2667,7 @@ void segas1x_bootleg_state::system18(machine_config &config)
 	m_soundcpu->set_addrmap(AS_IO, &segas1x_bootleg_state::sound_18_io_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 28*8);
@@ -2484,7 +2713,7 @@ void segas1x_bootleg_state::mwalkbl(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::sys18bl_sound_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.271); /* V-Sync is 58.271Hz & H-Sync is ~ 14.48KHz measured */
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 28*8);
@@ -2570,7 +2799,7 @@ void segas1x_bootleg_state::ddcrewbl(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(segas1x_bootleg_state::irq4_line_hold));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 28*8);
@@ -2606,7 +2835,7 @@ void segas1x_bootleg_state::bloxeedbl(machine_config &config)
 	m_soundcpu->set_addrmap(AS_PROGRAM, &segas1x_bootleg_state::sys18bl_sound_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.271); // V-Sync is 58.271Hz & H-Sync is ~ 14.48KHz measured
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(40*8, 28*8);
@@ -2773,6 +3002,14 @@ ROM_START( passht4b )
 	ROM_REGION( 0x20000, "soundcpu", 0 )
 	ROM_LOAD( "pas4p.1",  0x00000, 0x08000, CRC(e60fb017) SHA1(21298036eab55c74427f1c2e3a9623d41bca4849) )
 	ROM_LOAD( "pas4p.2",  0x10000, 0x10000, CRC(092e016e) SHA1(713638749efa9dce19c547b84308236110bc85fe) )
+
+	ROM_REGION( 0x120, "proms", 0 )
+	ROM_LOAD( "n82s129n.bin", 0x000, 0x100, CRC(88962e80) SHA1(ebf3d57d53fcba727cf20e4bb26f12934f7d1bc7) )
+	ROM_LOAD( "n82s123n.bin", 0x100, 0x020, CRC(280981db) SHA1(796507f073a629632c2f65fc2ac2cdf0efc4b6a7) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "pal20l8acns.ic13",     0x000, 0x144, CRC(c15cb017) SHA1(b0b5d7a5edf01386f05bd76dc887599683e221c7) )
+	ROM_LOAD( "tibpal16l8-25cn.ic51", 0x200, 0x104, CRC(a633aa10) SHA1(9026ae337274626e41c42fc3175c5c8f9258ebc6) )
 ROM_END
 
 ROM_START( wb3bbl )
@@ -3896,8 +4133,6 @@ void segas1x_bootleg_state::init_common()
 
 	m_soundbank_ptr = nullptr;
 
-	m_beautyb_unkx = 0;
-
 	if (m_soundbank.found())
 	{
 		m_soundbank->configure_entries(0, 8, m_soundcpu_region->base(), 0x4000);
@@ -4009,11 +4244,11 @@ void segas1x_bootleg_state::init_bayrouteb1()
 
 	uint16_t *ROM = &memregion("maincpu")->as_u16();
 
-	// patch interrupt vector
+	// HACK: patch interrupt vector
 	ROM[0x0070/2] = 0x000b;
 	ROM[0x0072/2] = 0xf000;
 
-	// patch check for code in RAM
+	// HACK: patch check for code in RAM
 	m_decrypted_opcodes[0x107e/2] = 0x48e7;
 	m_decrypted_opcodes[0x1080/2] = 0x000b;
 	m_decrypted_opcodes[0x1082/2] = 0xf000;
@@ -4145,6 +4380,8 @@ void segas1x_bootleg_state::init_beautyb()
 									7,6,5,4,   3,2,1,0 );
 	}
 
+	save_item(NAME(m_beautyb_prot_ctr));
+
 	init_common();
 }
 
@@ -4207,9 +4444,9 @@ GAME( 1989, eswatbl3,    eswat,     eswatbl,       eswat,    segas1x_bootleg_sta
 GAME( 1988, tetrisbl,    tetris,    tetrisbl,      tetris,   segas1x_bootleg_state,  init_dduxbl,     ROT0,   "bootleg", "Tetris (bootleg)", 0 )
 GAME( 1987, timescanbl,  timescan,  tetrisbl,      tetris,   segas1x_bootleg_state,  empty_init,      ROT0,   "bootleg", "Time Scanner (bootleg)", MACHINE_NOT_WORKING ) // encrypted
 
-/* Tetris-based hardware */
-GAME( 1991, beautyb,     0,         beautyb,       tetris,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "Beauty Block", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1991, iqpipe,      0,         beautyb,       tetris,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "IQ Pipe", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+/* Tetris-derived hardware - unknown if these really have the System16 paging or just write the registers anyway */
+GAME( 1991, beautyb,     0,         beautyb,       beautyb,  segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "Beauty Block", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, iqpipe,      0,         iqpipe,        iqpipe,   segas1x_bootleg_state,  init_beautyb,    ROT0,   "AMT", "IQ Pipe", MACHINE_IMPERFECT_GRAPHICS ) // ranking graphics may be incorrect when scrolling?
 
 /* System 18 bootlegs */
 GAME( 1990, mwalkbl,     mwalk,     mwalkbl,       mwalkbl,  segas1x_bootleg_state,  init_sys18bl_oki,ROT0,   "bootleg", "Michael Jackson's Moonwalker (bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

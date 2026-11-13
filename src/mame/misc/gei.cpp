@@ -1036,7 +1036,7 @@ void gei_state::getrivia(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(gei_state::vblank_irq));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_screen_update(FUNC(gei_state::screen_update));
@@ -1534,6 +1534,9 @@ ROM_START( gepoker3 ) // v50.02 with control dated 9-30-84
 	ROM_LOAD( "bone_8-16_m105_pts.3",   0x14000, 0x2000, CRC(52d66cb6) SHA1(57db34906fcafd37f3a361df209dafe080aeac16) )
 	ROM_LOAD( "slot_9-30_m105_pts.4",   0x16000, 0x2000, CRC(713c3963) SHA1(a9297c04fc44522ca6891516a2c744712132896a) )
 	ROM_LOAD( "bingo_8-16_m105.5",      0x18000, 0x2000, CRC(de87ed0a) SHA1(4a26d93368c1a39dd38aabe450c34203101f0ef7) ) //not original sticker selftest report 10-7-86 date!!
+
+	ROM_REGION( 0x2c, "pld", 0 )
+	ROM_LOAD( "pal10l8cn", 0x00, 0x2c, CRC(64b9594e) SHA1(a94cf1119d868c75d9c2e9b9e0244f40b18e74b9) )
 ROM_END
 
 ROM_START( amuse ) // v50.08 with most ROMs for IAM dated 8-16-84

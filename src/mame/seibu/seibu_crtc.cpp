@@ -1,10 +1,8 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
 Seibu Custom "CRT Controller" emulation
-
-written by Angelo Salese
 
 used by several Seibu games:
 Raiden later rev (probably the first game to use it)
@@ -15,14 +13,17 @@ Raiden later rev (probably the first game to use it)
 *Sky Smasher
 *D-Con
 *SD Gundam Psycho Salamander no Kyoui
+(all games in banprestoms.cpp)
 (all games in legionna.cpp)
 (all games in raiden2.cpp)
 (all games in seibuspi.cpp)
 
 TODO:
 - Most registers are still a mystery;
-- Get the proper Seibu chip ID number.
-  Kold found that a Raiden alt set has irq request pin from a chip named SEI0160, which might be our man.
+- Get the proper Seibu chip ID number;
+  Kold found that a Raiden alt set has irq request pin from a chip named SEI0160,
+  which might be the device in question;
+- Get rid of device_memory_interface;
 
 preliminary memory map:
 (screen 0 -> Background)
@@ -33,7 +34,7 @@ preliminary memory map:
 [0x02]: Single cell H size +1?
 [0x1a]: --x- Layer Dynamic Size?
         ---x Flip Screen
-[0x1c]: Layer Enable
+[0x1c]: Layer Enable, active low
 ---x ---- sprite enable
 ---- x--- tilemap screen 3 enable
 ---- -x-- tilemap screen 1 enable
@@ -53,20 +54,27 @@ preliminary memory map:
 [0x36]: Tilemap Screen 1 base scroll Y
 [0x38]: Tilemap Screen 3 base scroll X
 [0x3a]: Tilemap Screen 3 base scroll Y
-[0x3e]: OBJ Y base
-[0x40]: Semaphore for 0x4e register
+[0x3e]: <unknown>, 0x3f normally, 0x33 for banprestoms.cpp (layer enable master switch?)
+[0x40]: Semaphore for 0x4e register (?)
+[0x42]: <unknown>, 0xa8a8 in all games minus banprestoms.cpp (0x8a8a)
+[0x44]: OBJ Y base (banprestoms.cpp: 0x13 for tvdenwam, 0x04 for everything else)
+[0x46]: <unknown>, either 0x1c37 or 0x1830
+[0x48]: OBJ related?
+---x ---- sprite global flip
+---- x--x <unknown>
 
 In later games using the SEI251, SEI252 and RISE sprite chips, registers
 0x40 through 0x4e appear to be either nonexistent or overridden. The aberrant
 mapping of these registers in some games is not unusual for Seibu customs,
-but it should be noted that SD Gundam Psycho Salamander relegates the
-initialization of these registers to a separate routine.
+but it should be noted that sdgndmps relegates the initialization of these registers
+to a separate routine.
 
 ===========================================================================================
 
 List of default vregs (title screen):
+TODO: move these as a separate markdown
 
-*Sengoku Mahjong:
+*sengokmj
 8000:  000F 0013 009F 00BF 00FA 000F 00FA 00FF (320 x 240 -> 16 - 256 V res)
 8010:  007D 0006 0000 0002 0000 0000 0000 0000
 8020:  0000 0000 0004 0000 0000 0000 0040 01FF
@@ -78,21 +86,21 @@ List of default vregs (title screen):
 0x1ff - 0xfa = 261
 0x1ff - 0xff = 256
 
-*Tottemo E Jong
+*totmejan
 8000:  000F 000F 009F 00BF 00FA 000F 00FA 00FF (256 x 224 -> 16 - 240 V res)
 8010:  0076 0006 0000 0002 0000 0002 0006 0000
 8020:  0000 0000 0000 0000 0000 0000 01C0 01FF
 8030:  003E 01FF 003F 01FF 00C0 01FF 0034 003F
 8040:  0000 A8A8 0003 1830 0001 0000 0000 0000
 
-*Good E Jong
+*goodejan
 8040:  000F 000F 009F 00BF 00FA 000F 00FA 00FF (256 x 224 -> 16 - 240 v res)
 8050:  0076 0006 0000 0002 0000 0002 0006 0000
 8060:  0000 00FA 0000 0000 0000 0000 01C0 01FF
 8070:  003E 01FF 003F 01FF 00C0 01FF 0034 003F
 8000:  0000 A8A8 0003 1830 0001 0000 0000 0000
 
-*Raiden (256 x 224 -> 16 - 240 V res)
+*raiden (256 x 224 -> 16 - 240 V res)
 0D040:  000F 000F 00B2 00D7 00FB 000F 00FC 00FF
 0D050:  0076 0006 0000 0002 0000 0002 0000 0000
 0D060:  0000 0000 0000 0000 0000 0000 01D8 0000
@@ -104,6 +112,7 @@ List of default vregs (title screen):
 0x1ff - 0xfc = 259
 0x1ff - 0xff = 256
 
+TODO: convert these to romset ID, figure out what is now "set 1/2/3"
 *Blood Bros. (sets 1 and 2, init routine at $620)
 0C0000:  000F 000F 00B2 00D7 00F9 000F 00F9 00FF
 0C0010:  0076 0006 0001 0002 0000 0000 0004 ****
@@ -118,35 +127,35 @@ List of default vregs (title screen):
 0C0030:  01C2 01FF **** **** 00C0 01FF 0034 003F
 0C0040:  0000 A8A8 0004 1830 0009 **** **** ****
 
-*Sky Smasher (init routine at $1f5d0)
+*skysmash (init routine at $1f5d0)
 0C0000:  000F 000F 00B2 00D7 00F9 000F 00F9 00FF
 0C0020:  0076 0006 0000 0002 0000 0000 0004 ****
 0C0010:  **** **** **** **** **** **** 01D9 01FF
 0C0030:  01DB 01FF **** **** 01D8 01FF 0034 003F
 0C0040:  0000 A8A8 0005 1830 0009 **** **** ****
 
-*Sky Smasher (unused init routine at $1f4ee)
+*skysmash (unused init routine at $1f4ee)
 0C0000:  000F 000F 00AF 00BF 00F8 000F 00F8 00FF
 0C0020:  0076 0006 0000 0002 0000 0000 0004 ****
 0C0010:  **** **** **** **** **** **** 01C0 01FF
 0C0030:  01C2 01FF **** **** 00C0 01FF 0034 003F
 0C0040:  0000 A8A8 0006 1830 0009 **** **** ****
 
-*SD Gundam Psycho Salamander no Kyoui (init routines at $4b56 and $13fc; 320 x 224 -> 0 - 224 v res)
+*sdgndmps (init routines at $4b56 and $13fc; 320 x 224 -> 0 - 224 v res)
 0C0000:  000F 0013 009F 00BF 00FA 000F 00FA 00FF
 0C0010:  0076 0006 0000 0002 0000 0000 0000 0000
 0C0020:  0000 0000 0000 0000 0000 0000 0040 01FF
 0C0030:  0040 01FF 0040 01FF 0040 01FF 0034 003F
 0C0040:  **** A8A8 0003 1C37 0009 **** **** ****
 
-*D-Con (320 x 224 -> 0 - 224 v res)
+*dcon (320 x 224 -> 0 - 224 v res)
 0C0000:  000F 0013 009F 00BF 00FA 000F 00FA 00FF
 0C0010:  0076 0006 0000 0002 0000 0000 0000 0000
 0C0020:  0000 0000 0000 0000 0000 0000 FFC0 FFEF
 0C0030:  FFC2 FFEF FFC1 FFEF FFC0 FFEF 0034 003F
 0C0040:  0000 A8A8 0013 1C37 0009 0000 0000 0000
 
-*SD Gundam Sangokushi Rainbow Tairiku Senki (320 x 224; Incorrect resolution between service mode and actual in-game value)
+*grainbow (320 x 224; Incorrect resolution between service mode and actual in-game value)
 (320 x 224 at service mode = 320 x 256 actually)
 (320 x 256 at service mode = 320 x 240 actually)
 (320 x 240 at service mode = 320 x 224 actually)
@@ -163,7 +172,7 @@ List of default vregs (title screen):
 100630:  0185 0300 0186 0300 0185 0300 0034 003F
 100640:  0000 A8A8 00FB 1C37 0018 0000 013F FFFF
 
-*Seibu Cup Soccer (320 x 240 normal -> 0 - 240 v res, @ service mode; Undefined registers only)
+*cupsoc (320 x 240 normal -> 0 - 240 v res, @ service mode; defined registers only)
 100600:  000F 0013 00A7 00C7 00E0 000F 00E1 00E9
 100610:  0076 01FE 0000 0002 0000 0000 **** 0000
 100620:  **** **** **** **** **** **** **** ****
@@ -200,7 +209,7 @@ List of default vregs (title screen):
 100630:  **** **** **** **** **** **** 0034 003F
 100640:  0000 A8A8 00E1 1C37 0019 0000 013F FFFF
 
-*Legionnaire (attract mode, that definitely runs with an horizontal res of 256)
+*legionna (attract mode, that definitely runs with an horizontal res of 256)
 100600:  000F 000F 00B0 00D7 00FA 000F 00FA 00FF
 100610:  0076 0006 0000 0002 0000 0000 0000 0000
 100620:  0000 0000 0000 0000 0000 0000 01D8 01FF
@@ -224,14 +233,42 @@ List of default vregs (title screen):
 #include "emu.h"
 #include "seibu_crtc.h"
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
 // device type definition
 DEFINE_DEVICE_TYPE(SEIBU_CRTC, seibu_crtc_device, "seibu_crtc", "Seibu CRT Controller")
+
+seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SEIBU_CRTC, tag, owner, clock),
+		device_memory_interface(mconfig, *this),
+		device_video_interface(mconfig, *this),
+		m_decrypt_key_cb(*this),
+		m_layer_en_cb(*this),
+		m_layer_scroll_cb(*this),
+		m_reg_1a_cb(*this),
+		m_layer_scroll_base_cb(*this),
+		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 7, 0, address_map_constructor(FUNC(seibu_crtc_device::seibu_crtc_vregs), this))
+{
+}
+
+void seibu_crtc_device::device_validity_check(validity_checker &valid) const
+{
+}
+
+void seibu_crtc_device::device_start()
+{
+	save_item(NAME(m_reg_1a));
+}
+
+void seibu_crtc_device::device_reset()
+{
+	m_reg_1a = 0;
+}
+
+device_memory_interface::space_config_vector seibu_crtc_device::memory_space_config() const
+{
+	return space_config_vector {
+		std::make_pair(0, &m_space_config)
+	};
+}
 
 void seibu_crtc_device::seibu_crtc_vregs(address_map &map)
 {
@@ -250,12 +287,12 @@ void seibu_crtc_device::decrypt_key_w(offs_t offset, uint16_t data, uint16_t mem
 
 void seibu_crtc_device::layer_en_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_layer_en_cb(0,data,mem_mask);
+	m_layer_en_cb(0, data, mem_mask);
 }
 
 void seibu_crtc_device::layer_scroll_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_layer_scroll_cb(offset,data,mem_mask);
+	m_layer_scroll_cb(offset, data, mem_mask);
 }
 
 uint16_t seibu_crtc_device::reg_1a_r()
@@ -267,103 +304,23 @@ uint16_t seibu_crtc_device::reg_1a_r()
 void seibu_crtc_device::reg_1a_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_reg_1a);
-	m_reg_1a_cb(offset,data,mem_mask);
+	m_reg_1a_cb(offset, data, mem_mask);
 }
 
 void seibu_crtc_device::layer_scroll_base_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_layer_scroll_base_cb(offset,data,mem_mask);
+	m_layer_scroll_base_cb(offset, data, mem_mask);
 }
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  seibu_crtc_device - constructor
-//-------------------------------------------------
-
-seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, SEIBU_CRTC, tag, owner, clock),
-		device_memory_interface(mconfig, *this),
-		device_video_interface(mconfig, *this),
-		m_decrypt_key_cb(*this),
-		m_layer_en_cb(*this),
-		m_layer_scroll_cb(*this),
-		m_reg_1a_cb(*this),
-		m_layer_scroll_base_cb(*this),
-		m_space_config("vregs", ENDIANNESS_LITTLE, 16, 7, 0, address_map_constructor(FUNC(seibu_crtc_device::seibu_crtc_vregs), this))
-{
-}
-
-
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void seibu_crtc_device::device_validity_check(validity_checker &valid) const
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void seibu_crtc_device::device_start()
-{
-	save_item(NAME(m_reg_1a));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void seibu_crtc_device::device_reset()
-{
-	m_reg_1a = 0;
-}
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-device_memory_interface::space_config_vector seibu_crtc_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
-}
-
-
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  read_word - read a word at the given address
-//-------------------------------------------------
 
 inline uint16_t seibu_crtc_device::read_word(offs_t address)
 {
 	return space().read_word(address << 1);
 }
 
-//-------------------------------------------------
-//  write_word - write a word at the given address
-//-------------------------------------------------
-
 inline void seibu_crtc_device::write_word(offs_t address, uint16_t data)
 {
 	space().write_word(address << 1, data);
 }
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
 
 uint16_t seibu_crtc_device::read(offs_t offset)
 {

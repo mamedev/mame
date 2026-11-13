@@ -236,8 +236,8 @@ opcode_info const instruction::s_opcode_info_table[OP_MAX] =
 //  code_handle - constructor
 //-------------------------------------------------
 
-uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
-	: m_code(drcuml.cache().alloc_near<drccodeptr>())
+uml::code_handle::code_handle(drcuml_state &drcuml, std::string_view name)
+	: m_code(drcuml.cache_alloc_near<drccodeptr>())
 	, m_string(name)
 	, m_drcuml(drcuml)
 {
@@ -255,7 +255,7 @@ uml::code_handle::code_handle(drcuml_state &drcuml, const char *name)
 void uml::code_handle::set_codeptr(drccodeptr code)
 {
 	assert(*m_code == nullptr);
-	assert_in_cache(m_drcuml.cache(), code);
+	assert(m_drcuml.cache_contains_pointer(code));
 	*m_code = code;
 }
 
@@ -474,9 +474,9 @@ public:
 				auto const rot = inst.param(2).immediate();
 
 				if (size == 4)
-					convert_to_mov_immediate(inst, rotr_32(inst.param(1).immediate(), rot) & field);
+					convert_to_mov_immediate(inst, std::rotr<u32>(inst.param(1).immediate(), rot) & field);
 				else
-					convert_to_mov_immediate(inst, rotr_64(inst.param(1).immediate(), rot) & field);
+					convert_to_mov_immediate(inst, std::rotr<u64>(inst.param(1).immediate(), rot) & field);
 			}
 			else if (inst.param(2).is_immediate_value(0))
 			{
@@ -520,9 +520,9 @@ public:
 				auto const shift = -s64(inst.param(3).immediate()) & (bits - 1);
 
 				if (size == 4)
-					convert_to_mov_immediate(inst, u32(s32(rotr_32(inst.param(1).immediate(), rot)) >> shift));
+					convert_to_mov_immediate(inst, u32(s32(std::rotr<u32>(inst.param(1).immediate(), rot)) >> shift));
 				else
-					convert_to_mov_immediate(inst, u64(s64(rotr_64(inst.param(1).immediate(), rot)) >> shift));
+					convert_to_mov_immediate(inst, u64(s64(std::rotr<u64>(inst.param(1).immediate(), rot)) >> shift));
 			}
 			else if (inst.param(2).is_immediate_value(0))
 			{
@@ -576,18 +576,18 @@ public:
 		{
 			// constant result, convert to MOV or a logic operation
 			if (size == 4)
-				convert_to_mov_immediate(inst, rotl_32(inst.param(1).immediate(), inst.param(2).immediate()) & inst.param(3).immediate());
+				convert_to_mov_immediate(inst, std::rotl<u32>(inst.param(1).immediate(), inst.param(2).immediate()) & inst.param(3).immediate());
 			else
-				convert_to_mov_immediate(inst, rotl_64(inst.param(1).immediate(), inst.param(2).immediate()) & inst.param(3).immediate());
+				convert_to_mov_immediate(inst, std::rotl<u64>(inst.param(1).immediate(), inst.param(2).immediate()) & inst.param(3).immediate());
 		}
 		else if (inst.param(1).is_immediate() && inst.param(2).is_immediate())
 		{
 			// only mask is variable, convert to AND
 			inst.m_opcode = OP_AND;
 			if (size == 4)
-				inst.m_param[1] = rotl_32(inst.param(1).immediate(), inst.param(2).immediate());
+				inst.m_param[1] = std::rotl<u32>(inst.param(1).immediate(), inst.param(2).immediate());
 			else
-				inst.m_param[1] = rotl_64(inst.param(1).immediate(), inst.param(2).immediate());
+				inst.m_param[1] = std::rotl<u64>(inst.param(1).immediate(), inst.param(2).immediate());
 			inst.m_param[2] = inst.param(3);
 			inst.m_numparams = 3;
 		}
@@ -1183,9 +1183,9 @@ public:
 		{
 			// constant result, convert to MOV or a logic operation
 			if (size == 4)
-				convert_to_mov_immediate(inst, rotl_32(inst.param(1).immediate(), inst.param(2).immediate()));
+				convert_to_mov_immediate(inst, std::rotl<u32>(inst.param(1).immediate(), inst.param(2).immediate()));
 			else
-				convert_to_mov_immediate(inst, rotl_64(inst.param(1).immediate(), inst.param(2).immediate()));
+				convert_to_mov_immediate(inst, std::rotl<u64>(inst.param(1).immediate(), inst.param(2).immediate()));
 		}
 		else if (inst.param(2).is_immediate_value(0))
 		{
@@ -1214,9 +1214,9 @@ public:
 		{
 			// constant result, convert to MOV or a logic operation
 			if (size == 4)
-				convert_to_mov_immediate(inst, rotr_32(inst.param(1).immediate(), inst.param(2).immediate()));
+				convert_to_mov_immediate(inst, std::rotr<u32>(inst.param(1).immediate(), inst.param(2).immediate()));
 			else
-				convert_to_mov_immediate(inst, rotr_64(inst.param(1).immediate(), inst.param(2).immediate()));
+				convert_to_mov_immediate(inst, std::rotr<u64>(inst.param(1).immediate(), inst.param(2).immediate()));
 		}
 		else if (inst.param(2).is_immediate_value(0))
 		{
@@ -1713,10 +1713,10 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 					else
 						util::stream_format(buffer, "[%s+$%X]", symbol, symoffset);
 				}
-				else if (drcuml != nullptr && drcuml->cache().contains_pointer(param.memory()))
+				else if (drcuml && drcuml->cache_contains_pointer(param.memory()))
 				{
 					// cache memory
-					util::stream_format(buffer, "[+$%X]", u32(uintptr_t(drccodeptr(param.memory()) - drcuml->cache().near())));
+					util::stream_format(buffer, "[+$%X]", uintptr_t(drcuml->cache_pointer_offset(param.memory())));
 				}
 				else
 				{

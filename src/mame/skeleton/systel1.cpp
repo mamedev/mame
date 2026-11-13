@@ -198,7 +198,7 @@ void systel1_state::systel1(machine_config &config)
 	baudclock.signal_handler().set("usart", FUNC(i8251_device::write_rxc));
 	baudclock.signal_handler().append("usart", FUNC(i8251_device::write_txc));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::green());
 	screen.set_raw(10.8864_MHz_XTAL, 672, 0, 560, 270, 0, 250);
 	screen.set_screen_update("crtc", FUNC(i8276_device::screen_update));

@@ -173,7 +173,7 @@ Notes on possible shutms11 BIOS bugs:
 **************************************************************************************************/
 
 #include "emu.h"
-#include "cpu/i386/i386.h"
+
 #include "bus/isa/isa_cards.h"
 #include "bus/pci/pci_slot.h"
 #include "bus/pc_kbd/keyboards.h"
@@ -182,6 +182,7 @@ Notes on possible shutms11 BIOS bugs:
 #include "bus/rs232/rs232.h"
 #include "bus/rs232/sun_kbd.h"
 #include "bus/rs232/terminal.h"
+#include "cpu/i386/i386.h"
 #include "machine/intelfsh.h"
 #include "machine/it8705f.h"
 #include "machine/pci.h"
@@ -195,6 +196,7 @@ Notes on possible shutms11 BIOS bugs:
 #include "machine/sis950_lpc.h"
 #include "machine/sis950_smbus.h"
 
+#include "softlist_dev.h"
 
 namespace {
 
@@ -206,12 +208,12 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void sis630(machine_config &config);
+	void sis630(machine_config &config) ATTR_COLD;
 
-	void asuspolo(machine_config &config);
-	void asuscusc(machine_config &config);
-	void gamecstl(machine_config &config);
-	void zidav630e(machine_config &config);
+	void asuspolo(machine_config &config) ATTR_COLD;
+	void asuscusc(machine_config &config) ATTR_COLD;
+	void gamecstl(machine_config &config) ATTR_COLD;
+	void zidav630e(machine_config &config) ATTR_COLD;
 
 private:
 
@@ -307,7 +309,7 @@ void sis630_state::sis630(machine_config &config)
 
 	// 3 expansion PCI slots (PC104+)
 	// "pci:09.x" to "pci:12.x"?
-	PCI_SLOT(config, "pci:1", pci_cards, 9,  0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:1", pci_cards,  9, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
 
@@ -339,6 +341,14 @@ void sis630_state::sis630(machine_config &config)
 	// FIXME: determine ISA bus clock
 //  ISA16_SLOT(config, "isa1", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
 //  ISA16_SLOT(config, "isa2", 0, "pci:01.0:isabus", pc_isa16_cards, nullptr, false);
+
+	SOFTWARE_LIST(config, "pc_disk_list").set_original("ibm5150");
+	SOFTWARE_LIST(config, "at_disk_list").set_original("ibm5170");
+	SOFTWARE_LIST(config, "at_cdrom_list").set_original("ibm5170_cdrom");
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("ibmpc");
+	SOFTWARE_LIST(config, "at_hdd_list").set_original("ibm5170_hdd");
+	SOFTWARE_LIST(config, "midi_disk_list").set_compatible("midi_flop");
+	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
 void sis630_state::asuspolo(machine_config &config)

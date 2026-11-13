@@ -412,7 +412,7 @@ void naughtyb_state::naughtyb_base(machine_config &config)
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // 12 MHz clock, divided by 4. CPU is a Z80A
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12_MHz_XTAL / 2, 384, 0, 288, 256, 0, 224);
 	m_screen->set_screen_update(FUNC(naughtyb_state::screen_update));
 	m_screen->set_palette(m_palette);

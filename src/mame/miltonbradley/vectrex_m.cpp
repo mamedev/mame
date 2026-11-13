@@ -291,7 +291,7 @@ void vectrex_base_state::psg_port_w(uint8_t data)
 	}
 }
 
-void vectrex_base_state::driver_start()
+void vectrex_base_state::machine_start()
 {
 	m_imager_angles = unknown_game_angles;
 	m_beam_color = rgb_t::white();
@@ -310,6 +310,8 @@ void vectrex_base_state::driver_start()
 
 void vectrex_state::machine_start()
 {
+	vectrex_base_state::machine_start();
+
 	if (m_cart->exists())
 	{
 		// install cart accesses

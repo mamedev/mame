@@ -95,7 +95,10 @@ u8 ibsap2_device::read_cnxx(u8 offset)
 
 u8 ibsap2_device::read_c800(u16 offset)
 {
-	return m_eprom[offset];
+	if (offset >= 0x700)
+		return get_open_bus(); // TODO: deselect card
+	else
+		return m_eprom[offset];
 }
 
 bool ibsap2_device::take_c800() const

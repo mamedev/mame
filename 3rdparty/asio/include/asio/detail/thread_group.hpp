@@ -2,7 +2,7 @@
 // detail/thread_group.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,20 +16,23 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include "asio/detail/config.hpp"
-#include "asio/detail/scoped_ptr.hpp"
+#include "asio/detail/memory.hpp"
 #include "asio/detail/thread.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
+template <typename Allocator>
 class thread_group
 {
 public:
   // Constructor initialises an empty thread group.
-  thread_group()
-    : first_(0)
+  explicit thread_group(const Allocator& a)
+    : allocator_(a),
+      first_(0)
   {
   }
 
@@ -43,7 +46,7 @@ public:
   template <typename Function>
   void create_thread(Function f)
   {
-    first_ = new item(f, first_);
+    first_ = allocate_object<item>(allocator_, allocator_, f, first_);
   }
 
   // Create new threads in the group.
@@ -62,7 +65,7 @@ public:
       first_->thread_.join();
       item* tmp = first_;
       first_ = first_->next_;
-      delete tmp;
+      deallocate_object(allocator_, tmp);
     }
   }
 
@@ -77,8 +80,8 @@ private:
   struct item
   {
     template <typename Function>
-    explicit item(Function f, item* next)
-      : thread_(f),
+    explicit item(const Allocator& a, Function f, item* next)
+      : thread_(std::allocator_arg, a, f),
         next_(next)
     {
     }
@@ -87,11 +90,15 @@ private:
     item* next_;
   };
 
+  // The allocator to be used to create items in the group.
+  Allocator allocator_;
+
   // The first thread in the group.
   item* first_;
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

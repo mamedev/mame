@@ -117,7 +117,7 @@ TIMER_CALLBACK_MEMBER(specnext_dma_device::clock_w)
 		if (m_dma_seq == SEQ_TRANS1_WRITE_DEST)
 		{
 			z80dma_device::clock_w(param);
-			if (m_dma_seq == SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS)
+			if (m_dma_seq == SEQ_TRANS1_SAMPLE_READY)
 			{
 				set_busrq(CLEAR_LINE);
 				m_dma_seq = SEQ_WAIT_READY;
@@ -126,7 +126,8 @@ TIMER_CALLBACK_MEMBER(specnext_dma_device::clock_w)
 		}
 	}
 
-	if (m_dma_seq == SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS)
+	// the second and later bytes of a burst or block enter the transfer through SEQ_TRANS1_SAMPLE_READY
+	if (m_dma_seq == SEQ_TRANS1_INC_DEC_SOURCE_ADDRESS || m_dma_seq == SEQ_TRANS1_SAMPLE_READY)
 	{
 		m_dma_timer_0 = machine().time().as_ticks(unscaled_clock()) * 8;
 	}

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="trs80m16_hdd" description="Tandy TRS-80 Model 16 hard disk images">
+
+	<software name="xenix32">
+		<description>XENIX v3.2</description>
+		<year>1987</year>
+		<publisher>Tandy</publisher>
+
+		<part name="hdd" interface="st506_hdd">
+			<diskarea name="harddriv">
+				<disk name="xenix32" sha1="df8abaf6dfd858bcb3f14bdc541c1a7e9c6cd81f" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

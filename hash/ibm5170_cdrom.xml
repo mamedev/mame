@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -483,12 +483,19 @@ CD-ROM includes: "Boxing", "Chopper Command", "Cosmic Commuter", "Crackpots", "F
 	</software>
 
 	<!-- Pentium II class 233 MHz -->
+	<!-- TODO: eventually move to generic_cdrom when we have a good PCI era PC-98 target -->
 	<software name="akimboj" supported="no">
 		<description>Kung-Fu Hero Akimbo Lee (Japan)</description>
 		<year>2001</year>
-		<publisher>Iridon / MSD-JAPAN / Salva Corporation</publisher>
+		<publisher>MSD-JAPAN</publisher>
+		<info name="alt_title" value="アキンボリー功夫英雄"/>
+		<info name="barcode" value="4 947632 010723"/>
+		<info name="developer" value="Iridon Interactive"/>
+		<info name="developer" value="Salva Corporation"/>
+		<info name="serial" value="MSDJ-01072"/>
 		<info name="required_os" value="Windows 95 / 98 / ME / 2000" />
 		<part name="cdrom" interface="cdrom">
+			<!-- origin: SpinalFeyd -->
 			<diskarea name="cdrom">
 				<disk name="akimbo" sha1="08e03c5abce6f95582368d1d6734f6f1b323b823" />
 			</diskarea>
@@ -1463,12 +1470,17 @@ Runs in 16-bit High Color, has [8514] bugs
 	BB2KLEJP-50008573
 	2640849512
 	-->
+	<!-- Windows 95/98/2000, possibly Direct X -->
 	<software name="batlbeatle" supported="no">
 		<description>Battle BEAT 2000 L.E (Japan)</description>
 		<year>2000</year>
 		<publisher>NEC Interchannel</publisher>
-
+		<info name="alt_title" value="バトルビート LE"/>
+		<info name="barcode" value="T4513244005206"/>
+		<info name="developer" value="XeNN"/>
+		<info name="serial" value="506-9940"/>
 		<part name="cdrom" interface="cdrom">
+			<!-- origin: SpinalFeyd -->
 			<diskarea name="cdrom">
 				<disk name="bb2kle" sha1="a31e35f15dda264e88ff5457d1b620c6fad4a15c" />
 			</diskarea>
@@ -1828,13 +1840,18 @@ Has [SB16] lip-sync issues with ct486, may go down in requiring 75 MHz instead
 	<!-- Direct X 7.0 -->
 	<!-- Pentium class 200 MHz -->
 	<!-- TODO: invalid opcode exception after install -->
+	<!-- TODO: eventually move to generic_cdrom when we have a good PCI era PC-98 target -->
 	<software name="boorball" supported="no">
-		<description>Boorp's Balls</description>
+		<description>Boorp's Balls (Japan)</description>
 		<year>2001</year>
-		<publisher>Xpiral / TSY</publisher>
-		<info name="alt_title" value="ブーアプス　ボール" />
+		<publisher>Tsukuda Synergy</publisher>
+		<info name="alt_title" value="ブーアプス ボール" />
+		<info name="barcode" value="4 975433 281127" />
+		<info name="developer" value="Xpiral" />
+		<info name="serial" value="TSYC-W1009E1" />
 		<info name="required_os" value="Windows 95" />
 		<part name="cdrom" interface="cdrom">
+			<!-- origin: SpinalFeyd -->
 			<diskarea name="cdrom">
 				<disk name="booaps" sha1="58d2602ca37c40041a6b504857d4c3057e52e94d" />
 			</diskarea>
@@ -3087,14 +3104,22 @@ Crash after the copy protection screen (tried with "at486" machine)
 	</software>
 
 	<!-- Pentium class 166 MHz / Direct X 7.0 -->
-	<!-- TODO: some transparency issues -->
+	<!-- TODO: eventually move to generic_cdrom when we have a good PCI era PC-98 target -->
 	<software name="dobupanic" supported="partial">
 		<description>Doka-chan no Building Panic (Japan)</description>
 		<year>2001</year>
-		<publisher>MSD-JAPAN / Salva Corporation / D-YAMA</publisher>
+		<publisher>MSD-JAPAN</publisher>
+		<notes><![CDATA[
+Transparency issues (TODO: old note, retest me again)
+]]></notes>
 		<info name="alt_title" value="どかちゃんのビルパニック" />
+		<info name="barcode" value="4 947632 010716"/>
+		<info name="developer" value="Salva Corporation"/>
+		<info name="developer" value="D-YAMA"/>
+		<info name="serial" value="MSDJ-01071"/>
 		<info name="required_os" value="Windows 95/98/ME" />
 		<part name="cdrom" interface="cdrom">
+			<!-- origin: SpinalFeyd -->
 			<diskarea name="cdrom">
 				<disk name="bpanic" sha1="141b67f93b4d96be7c064d3603a5b961ed56f23b" />
 			</diskarea>
@@ -4772,12 +4797,18 @@ Untested multiplayer options
 	<!-- Intel Celeron 266 MHz class minimum / DirectX 7.0 -->
 	<!-- Korean game, published in Japan by Media Kite -->
 	<!-- ID code: MKW-239 -->
+	<!-- TODO: eventually move to generic_cdrom when we have a good PCI era PC-98 target -->
 	<software name="jaxis" supported="no">
 		<description>Jaxis (Japan)</description>
 		<year>2002</year>
-		<publisher>Jamie System Development</publisher>
+		<publisher>Media Kite</publisher>
+		<info name="alt_title" value="ジャクシス"/>
+		<info name="barcode" value="T4516647003732"/>
+		<info name="developer" value="Jamie System Development"/>
+		<info name="serial" value="MKW-239"/>
 		<info name="required_os" value="Windows 98" />
 		<part name="cdrom" interface="cdrom">
+			<!-- origin: SpinalFeyd -->
 			<diskarea name="cdrom">
 				<disk name="jaxis" sha1="749981bb810b64df141c752daf5b47a64ec0acc9" />
 			</diskarea>
@@ -5503,24 +5534,6 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		</part>
 	</software>
 
-	<!-- Windows 3.1 / Mac LCIII -->
-	<software name="orgaslave">
-		<description>Orgaslave (Japan)</description>
-		<year>1996</year>
-		<publisher>Kuki</publisher>
-		<info name="alt_title" value="オルガスレイブ" />
-		<part name="cdrom1" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="cd1" sha1="60c4be022959c6b108c096780451ba102b488b00" />
-			</diskarea>
-		</part>
-		<part name="cdrom2" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="cd2" sha1="11e9986c9b33aeee9cc42fc623f2909f9883ae49" />
-			</diskarea>
-		</part>
-	</software>
-
 	<software name="orpheocr">
 		<description>Are You Afraid of the Dark - The Tale of Orpheo's Curse</description>
 		<year>1994</year>
@@ -5530,18 +5543,6 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="are you afraid of the dark - the tale of orpheo's curse (1994)(viacom new media)" sha1="487f7f1fc8a30507f1ec990bf7ccfc102657a123" />
-			</diskarea>
-		</part>
-	</software>
-
-	<software name="paulymou" supported="partial">
-		<description>Pauly Mouse (Japan)</description>
-		<year>1995</year>
-		<publisher>CDWare / Fuji International Enterprises</publisher>
-		<info name="required_os" value="Windows 3.1" />
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="pmouse" sha1="c135e153fc7f9accfa4d1c2fa9213e8587af24fc" />
 			</diskarea>
 		</part>
 	</software>
@@ -5632,21 +5633,6 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 		</part>
 	</software>
 
-	<!-- TODO: checkout full name -->
-	<!-- Should be Yuugen Gaisha Poipon Kensetsu (有)ポイポン建設 -->
-	<software name="poipon">
-		<description>PoiPon (Japan)</description>
-		<year>1997</year>
-		<publisher>Witty Wolf</publisher>
-		<info name="alt_title" value="ポイポン" />
-		<info name="required_os" value="Windows 95" />
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="poipon" sha1="91c230bd6e14551794a1c28fd65c901187ce7786" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Can't install to hard disk, can't save game, default text speed is very slow on 486 -->
 	<!-- (set option 5 from 100 to 0 to make text and voices to sync) -->
 	<software name="pompei" supported="partial">
@@ -5667,7 +5653,7 @@ Edition: Les Grands Jeux: Collection "10 ans de jeux vidéo"
 	<software name="ppersia2">
 		<description>Prince of Persia 2 - The Shadow and the Flame (USA)</description>
 		<year>1998</year>
-		<publisher>Red Orb Entertainment</publisher>
+		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
 Prince of Persia 2 - The Shadow and the Flame
 Playable demos:
@@ -5762,7 +5748,7 @@ Prince of Persia 2 - The Shadow and the Flame (v1.0)
 	<software name="ppersiale">
 		<description>Prince of Persia Collection: Limited Edition (Europe)</description>
 		<year>1999</year>
-		<publisher>Red Orb Entertainment</publisher>
+		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
 Prince of Persia (v1.4)
 Prince of Persia 2 - The Shadow and the Flame (v1.1)
@@ -5792,7 +5778,7 @@ Warlords III: Darklords Rising
 	<software name="ppersialea" cloneof="ppersiale">
 		<description>Prince of Persia Collection: Limited Edition (Europe, alt)</description>
 		<year>1999</year>
-		<publisher>Red Orb Entertainment</publisher>
+		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
 Prince of Persia (v1.4)
 Prince of Persia 2 - The Shadow and the Flame (v1.1)
@@ -5822,7 +5808,7 @@ Warlords III: Darklords Rising
 	<software name="ppersiale_us" cloneof="ppersiale">
 		<description>Prince of Persia Collection: Limited Edition (USA)</description>
 		<year>1999</year>
-		<publisher>Red Orb Entertainment</publisher>
+		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
 Prince of Persia (v1.4)
 Prince of Persia 2 - The Shadow and the Flame (v1.1)
@@ -5851,7 +5837,7 @@ The Making of Prince of Persia 3D
 	<software name="ppersiale_nl" cloneof="ppersiale">
 		<description>Prince of Persia Collection: Limited Edition (Netherlands)</description>
 		<year>1999</year>
-		<publisher>Red Orb Entertainment</publisher>
+		<publisher>Red Orb Entertainment</publisher>
 		<notes><![CDATA[
 Prince of Persia (v1.4)
 Prince of Persia 2 - The Shadow and the Flame (v1.1)
@@ -6281,28 +6267,20 @@ https://www.pcgamingwiki.com/wiki/Road_Rash
 		</part>
 	</software>
 
-	<software name="sasuberi">
-		<description>Saru Suberi (Japan)</description>
-		<year>1997</year>
-		<publisher>Witty Wolf</publisher>
-		<part name="cdrom" interface="cdrom">
-			<diskarea name="cdrom">
-				<disk name="sarusuberi" sha1="44b9dac3e60169b45a774a2e3f1986275309c4df" />
-			</diskarea>
-		</part>
-	</software>
-
 	<!-- Windows 95 / Mac OS Japan AppleTalk 7.5 -->
 	<!-- Requires 16-bit True Color and 800x600 screen resolution -->
+	<!-- TODO: move in generic_cdrom.xml, verify pc98 compatibility -->
 	<software name="segata" supported="partial">
 		<description>Segata Sanshirou Choujin Densetsu (Japan)</description>
 		<year>1998</year>
 		<publisher>Sega</publisher>
 		<info name="alt_title" value="せがた三四郎超人伝説" />
-
+		<info name="barcode" value="4 974365 201487"/>
+		<info name="serial" value="HCJ-0346"/>
 		<part name="cdrom" interface="cdrom">
+			<!-- origin: SpinalFeyd -->
 			<diskarea name="cdrom">
-				<disk name="segata" sha1="0d7a6d9a7143d0309d44c1356f68c15a05949257" />
+				<disk name="segata" sha1="e558203ac86924a09ab505b12f5c4a6d6286bef1" />
 			</diskarea>
 		</part>
 	</software>
@@ -8337,6 +8315,29 @@ Ends with “Workspace Manager Error” and cannot login.
 			<dataarea name="flop" size="1474560">
 				<rom name="rhapsody dr1 device drivers.img" size="1474560" crc="b174ae3d" sha1="b80fb03e131bb22ba10d8bd38af00be31b2bb593" />
 			</dataarea>
+		</part>
+	</software>
+
+	<software name="theos50182" supported="no">
+		<description>THEOS Corona Operating System Release 6 PL 50182</description>
+		<year>2008</year>
+		<publisher>THEOS Software Corporation</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corona50182" sha1="bcd996cae4dba7e9158277fe3f506612ba2b26cd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="theos50209" supported="no">
+		<description>THEOS Corona Operating System PL 50209 (Beta)</description>
+		<year>2013</year>
+		<publisher>THEOS Software Corporation</publisher>
+		<info name="usage" value="Attach eeprom_dongle to the LPT port and use BCPP-M962-PPH2-MMMM-VSMM-MM as code" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corona50209" sha1="28aca5192d0ff37587a76c0f9b9ab5c44177a117" />
+			</diskarea>
 		</part>
 	</software>
 

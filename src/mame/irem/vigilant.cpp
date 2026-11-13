@@ -1270,7 +1270,7 @@ void vigilant_state::vigilant(machine_config &config)
 	TIMER(config, "v1").configure_scanline(FUNC(vigilant_state::sound_nmi), "screen", 1, 2);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// Measured on PCB:
 	screen.set_raw(18.432_MHz_XTAL / 3 /* pixel clock*/, 384 /* total H */, 128, 384, 256+28 /* total V */, 0, 256);
 	screen.set_screen_update(FUNC(vigilant_state::screen_update_vigilant));
@@ -1318,7 +1318,7 @@ void vigilant_state::buccanrs(machine_config &config)
 	TIMER(config, "v1").configure_scanline(FUNC(vigilant_state::sound_nmi), "screen", 1, 2);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 128, 384, 284, 0, 256); // sync rates not verified
 	screen.set_screen_update(FUNC(vigilant_state::screen_update_vigilant));
 	screen.set_palette(m_palette);
@@ -1394,7 +1394,7 @@ void vigilant_state::kikcubic(machine_config &config)
 	TIMER(config, "v1").configure_scanline(FUNC(vigilant_state::sound_nmi), "screen", 1, 2);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(24_MHz_XTAL / 3, 64*8, 8*8, (64-8)*8, 284, 0, 256); // sync rates not verified
 	screen.set_screen_update(FUNC(vigilant_state::screen_update_kikcubic));
 	screen.set_palette(m_palette);
@@ -1442,7 +1442,7 @@ void vigilant_state::bowmen(machine_config &config)
 	TIMER(config, "v1").configure_scanline(FUNC(vigilant_state::sound_nmi), "screen", 1, 2); // 7.80650 kHz measured
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18_MHz_XTAL / 3, 384, 128, 384, 284, 0, 256);  // 54.9752 Hz verified
 	screen.set_screen_update(FUNC(vigilant_state::screen_update_bowmen));
 	screen.set_palette(m_palette);

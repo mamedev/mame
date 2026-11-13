@@ -689,7 +689,7 @@ void jackhouse_state::jackhouse(machine_config &config)
 	ppi1.in_pb_callback().set_ioport("DSW5");
 	ppi1.in_pc_callback().set_ioport("DSW3");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(512, 256);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);

@@ -16,7 +16,6 @@
 
 #include "emu.h"
 #include "dragon_jcbspch.h"
-#include "speaker.h"
 
 
 ROM_START(dragon_jcbspch)
@@ -88,10 +87,18 @@ void dragon_jcbspch_device::device_add_mconfig(machine_config &config)
 	m_pia->cb2_handler().set(FUNC(dragon_jcbspch_device::pia_cb2_w));
 	m_pia->irqb_handler().set(FUNC(dragon_jcbspch_device::nmi_w));
 
-	SPEAKER(config, "mono").front_center();
 	SP0256(config, m_nsp, 3.2768_MHz_XTAL);
 	m_nsp->standby_callback().set(m_pia, FUNC(pia6821_device::cb1_w));
-	m_nsp->add_route(ALL_OUTPUTS, "mono", 1.00);
+}
+
+//-------------------------------------------------
+//  device_resolve_objects
+//-------------------------------------------------
+
+void dragon_jcbspch_device::device_resolve_objects()
+{
+	// mono back to the Dragon system cartridge audio input line
+	add_sound_route(*m_nsp, ALL_OUTPUTS, 1.0);
 }
 
 //-------------------------------------------------

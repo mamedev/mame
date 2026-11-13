@@ -1,21 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:Curt Coder
-/*
-
-    TODO:
-
-    - tape input/output
-    - PL-80 plotter
-    - serial printer
-    - thermal printer
-
-
-    Cassette: PSAVE works, and the result can be loaded into Emma02 emulator.
-              PLOAD works, but it may be necessary to unplug all slots to get
-              a reliable load. This is the same as real hardware.
-
-*/
-
 #include "emu.h"
 
 #include "bus/comx35/exp.h"
@@ -51,18 +35,18 @@ namespace {
 class comx35_state : public driver_device
 {
 public:
-	comx35_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_vis(*this, CDP1869_TAG),
-			m_kbe(*this, CDP1871_TAG),
-			m_cassette(*this, "cassette"),
-			m_ram(*this, RAM_TAG),
-			m_exp(*this, EXPANSION_TAG),
-			m_rom(*this, CDP1802_TAG),
-			m_char_ram(*this, "char_ram", COMX35_CHARRAM_SIZE, ENDIANNESS_LITTLE),
-			m_d6(*this, "D6"),
-			m_modifiers(*this, "MODIFIERS")
+	comx35_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, CDP1802_TAG),
+		m_vis(*this, CDP1869_TAG),
+		m_kbe(*this, CDP1871_TAG),
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG),
+		m_exp(*this, EXPANSION_TAG),
+		m_rom(*this, CDP1802_TAG),
+		m_char_ram(*this, "char_ram", COMX35_CHARRAM_SIZE, ENDIANNESS_LITTLE),
+		m_d6(*this, "D6"),
+		m_modifiers(*this, "MODIFIERS")
 	{ }
 
 	void pal(machine_config &config) ATTR_COLD;
@@ -698,15 +682,13 @@ CDP1869_PCB_READ_MEMBER( comx35_state::comx35_pcb_r )
 
 void comx35_state::prd_w(int state)
 {
-	if ((m_prd == CLEAR_LINE) && (state == ASSERT_LINE))
+	if ((m_prd == ASSERT_LINE) && (state == CLEAR_LINE))
 	{
 		m_cr1 = m_iden ? CLEAR_LINE : ASSERT_LINE;
 		check_interrupt();
 	}
 
 	m_prd = state;
-
-	m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF1, state);
 }
 
 
@@ -781,6 +763,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	m_maincpu->set_addrmap(AS_IO, &comx35_state::comx35_io);
 	m_maincpu->wait_cb().set_constant(1);
 	m_maincpu->clear_cb().set(FUNC(comx35_state::clear_r));
+	m_maincpu->ef1_cb().set(m_vis, FUNC(cdp1869_device::predisplay_r));
 	m_maincpu->ef2_cb().set(FUNC(comx35_state::ef2_r));
 	m_maincpu->ef4_cb().set(FUNC(comx35_state::ef4_r));
 	m_maincpu->q_cb().set(FUNC(comx35_state::q_w));
@@ -811,8 +794,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// expansion bus
-	// FIXME: determine expansion bus clock frequency
-	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, "eb").irq_callback().set(FUNC(comx35_state::irq_w));
+	COMX_EXPANSION_SLOT(config, m_exp, clock, comx_expansion_cards, nullptr).irq_callback().set(FUNC(comx35_state::irq_w));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("32K");
@@ -873,7 +855,7 @@ void comx35_state::ntsc(machine_config &config)
 
 ROM_START( comx35p )
 	ROM_REGION( 0x4000, CDP1802_TAG, 0 )
-	ROM_DEFAULT_BIOS( "basic100" )
+	ROM_DEFAULT_BIOS( "basic101" )
 	ROM_SYSTEM_BIOS( 0, "basic100", "COMX BASIC V1.00" )
 	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "basic101", "COMX BASIC V1.01" )
@@ -894,5 +876,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT   COMPAT  MACHINE  INPUT   CLASS         INIT        COMPANY                      FULLNAME          FLAGS
-COMP( 1983, comx35p, 0,       0,      pal,     comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (PAL)",  MACHINE_IMPERFECT_SOUND )
-COMP( 1983, comx35n, comx35p, 0,      ntsc,    comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (NTSC)", MACHINE_IMPERFECT_SOUND )
+COMP( 1983, comx35p, 0,       0,      pal,     comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (PAL)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1983, comx35n, comx35p, 0,      ntsc,    comx35, comx35_state, empty_init, "Comx World Operations Ltd", "COMX 35 (NTSC)", MACHINE_SUPPORTS_SAVE )

@@ -210,7 +210,7 @@ uint32_t teleprinter_device::tp_update(screen_device &device, bitmap_rgb32 &bitm
 ***************************************************************************/
 void teleprinter_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, TELEPRINTER_SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, TELEPRINTER_SCREEN_TAG));
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(teleprinter_device::WIDTH*8, teleprinter_device::HEIGHT*8);

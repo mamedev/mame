@@ -138,6 +138,17 @@ public:
 	uint64_t image_size();
 	util::random_read_write::ptr &get_raw_cassette_image() { return m_io; }
 
+	struct Pulse
+	{
+		uint64_t end;
+		int32_t value;
+	};
+
+	void set_pulses(std::vector<Pulse> &&pulses);
+	bool has_pulses() const { return !m_pulses.empty(); }
+	double next_transition(double time, int direction) const;
+	int32_t pulse_sample(double time, int direction) const;
+
 	// waveform accesses
 	error get_samples(int channel,
 		double time_index, double sample_period, size_t sample_count, size_t sample_spacing,
@@ -208,6 +219,7 @@ private:
 	error perform_save();
 	error compute_manipulation_ranges(int channel, double time_index, double sample_period, manipulation_ranges &ranges) const;
 	error lookup_sample(int channel, size_t sample, int32_t *&ptr);
+	error pulses_to_samples();
 
 	const Format *m_format;
 	util::random_read_write::ptr m_io;
@@ -218,6 +230,7 @@ private:
 
 	std::vector<std::unique_ptr<int32_t []> > m_blocks;
 	size_t m_sample_count;
+	std::vector<Pulse> m_pulses;
 };
 
 /* macros for specifying format lists */

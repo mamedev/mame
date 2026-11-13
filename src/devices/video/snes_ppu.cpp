@@ -1248,7 +1248,10 @@ void snes_ppu_device::update_color_windowmasks( uint8_t mask, uint8_t *output )
  * the optimized averaging algorithm.
  *********************************************/
 
-void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
+// TODO: use a back buffer bitmap and compose honoring MAME screen_device timings
+// - this pretends to expose a single scanline and copy from clients
+// - dstline is an optional parameter dictated by snesb51.cpp overlay requirements, it's normally 0
+void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline, uint16_t dstline )
 {
 	bool blurring = m_options.read_safe(0) & 0x01;
 
@@ -1258,7 +1261,7 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 
 	if (m_screen_disabled) /* screen is forced blank */
 		for (int x = 0; x < SNES_SCR_WIDTH * 2; x++)
-			bitmap.pix(0, x) = rgb_t::black();
+			bitmap.pix(dstline, x) = rgb_t::black();
 	else
 	{
 		uint8_t window_above[256];
@@ -1324,29 +1327,29 @@ void snes_ppu_device::refresh_scanline( bitmap_rgb32 &bitmap, uint16_t curline )
 			{
 				const uint16_t c = luma[pixel(x, above, below, window_above, window_below)];
 
-				bitmap.pix(0, x * 2 + 0) = indirect_color(c & 0x7fff);
-				bitmap.pix(0, x * 2 + 1) = indirect_color(c & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 0) = indirect_color(c & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 1) = indirect_color(c & 0x7fff);
 			}
 			else if (!blurring)
 			{
 				const uint16_t c0 = luma[pixel(x, below, above, window_above, window_below)];
 				const uint16_t c1 = luma[pixel(x, above, below, window_above, window_below)];
 
-				bitmap.pix(0, x * 2 + 0) = indirect_color(c0 & 0x7fff);
-				bitmap.pix(0, x * 2 + 1) = indirect_color(c1 & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 0) = indirect_color(c0 & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 1) = indirect_color(c1 & 0x7fff);
 			}
 			else
 			{
 				uint16_t curr = luma[pixel(x, below, above, window_above, window_below)];
 
 				uint16_t c0 = (prev + curr - ((prev ^ curr) & 0x0421)) >> 1;
-				bitmap.pix(0, x * 2 + 0) = indirect_color(c0 & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 0) = indirect_color(c0 & 0x7fff);
 
 				prev = curr;
 				curr = luma[pixel(x, above, below, window_above, window_below)];
 
 				uint16_t c1 = (prev + curr - ((prev ^ curr) & 0x0421)) >> 1;
-				bitmap.pix(0, x * 2 + 1) = indirect_color(c1 & 0x7fff);
+				bitmap.pix(dstline, x * 2 + 1) = indirect_color(c1 & 0x7fff);
 
 				prev = curr;
 			}
@@ -1412,12 +1415,9 @@ void snes_ppu_device::set_latch_hv(int16_t x, int16_t y)
 
 void snes_ppu_device::dynamic_res_change()
 {
-	rectangle visarea = screen().visible_area();
-	attoseconds_t refresh;
-
-	visarea.min_x = visarea.min_y = 0;
-	visarea.max_y = m_beam.last_visible_line * m_interlace - 1;
-	visarea.max_x = (SNES_SCR_WIDTH * 2) - 1;
+	rectangle visarea(
+			0, (SNES_SCR_WIDTH * 2) - 1,
+			0, m_beam.last_visible_line * m_interlace - 1);
 
 	// fixme: should compensate for SNES_DBG_VIDEO
 	if (m_mode == 5 || m_mode == 6 || m_pseudo_hires)
@@ -1428,12 +1428,12 @@ void snes_ppu_device::dynamic_res_change()
 	/* FIXME: does the timing changes when the gfx mode is equal to 5 or 6? */
 	if ((m_stat78 & 0x10) == SNES_NTSC)
 	{
-		refresh = HZ_TO_ATTOSECONDS(DOTCLK_NTSC) * SNES_HTOTAL * SNES_VTOTAL_NTSC;
+		attotime refresh = attotime::from_ticks(SNES_HTOTAL * SNES_VTOTAL_NTSC, DOTCLK_NTSC);
 		screen().configure(SNES_HTOTAL * m_htmult, SNES_VTOTAL_NTSC * m_interlace, visarea, refresh);
 	}
 	else
 	{
-		refresh = HZ_TO_ATTOSECONDS(DOTCLK_PAL) * SNES_HTOTAL * SNES_VTOTAL_PAL;
+		attotime refresh = attotime::from_ticks(SNES_HTOTAL * SNES_VTOTAL_PAL, DOTCLK_PAL);
 		screen().configure(SNES_HTOTAL * m_htmult, SNES_VTOTAL_PAL * m_interlace, visarea, refresh);
 	}
 }

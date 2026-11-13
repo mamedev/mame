@@ -24,8 +24,9 @@ TODO:
 - Subscribe to I/O $43f handling, add a category subscription for specific cards (SASI and SCSI);
 - Support for PCI bridging on later machines (cfr. pc9821cx3)
 \- "local bus bridge", handles RAM stuff on its own, definitely not a pure southbridge.
-\- set_ids_bridge(0x10330001, <rev>, 0x068000, 0x10330001) should be for 486 targets
-\- set_ids_bridge(0x10330002, <rev>, 0x068000, 0x10330002) for Pentium
+\- set_ids(0x10330001, <rev>, 0x068000, 0x10330001) should be C-Bus to PCI bridge (Cバスブリッヂ)
+\- set_ids(0x10330002, <rev>, 0x068000, 0x10330002) should be C-Bus slots bridge (ﾛｰｶﾙﾊﾞｽﾌﾞﾘｯﾁﾞ,
+   1st gen PCI/486 targets only)
 
 **************************************************************************************************/
 
@@ -131,6 +132,17 @@ u16 pc98_cbus_root_device::mem_slot_r(offs_t offset, u16 mem_mask)
 void pc98_cbus_root_device::mem_slot_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	space(AS_PROGRAM).write_word((offset << 1) + 0xc'0000, data, mem_mask);
+}
+
+// 15 MiB hole on 24-bit C-Bus hosts.
+u16 pc98_cbus_root_device::mem_15m_r(offs_t offset, u16 mem_mask)
+{
+	return space(AS_PROGRAM).read_word((offset << 1) + 0xf0'0000, mem_mask);
+}
+
+void pc98_cbus_root_device::mem_15m_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	space(AS_PROGRAM).write_word((offset << 1) + 0xf0'0000, data, mem_mask);
 }
 
 u16 pc98_cbus_root_device::io_r(offs_t offset, u16 mem_mask)

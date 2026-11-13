@@ -836,7 +836,7 @@ void pitnrun_state::pitnrun(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.432_MHz_XTAL / 3, 384, 0, 256, 264, 16, 240);
 	screen.set_screen_update(FUNC(pitnrun_state::screen_update));
 	screen.set_palette(m_palette);

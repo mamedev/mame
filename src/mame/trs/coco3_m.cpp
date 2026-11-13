@@ -20,7 +20,7 @@
        |
        |
        |
-       |
+       | FIRQ
        |-<----------- PIA1
   -----
 
@@ -41,6 +41,23 @@
   enabled, this actually does not prevent PIA interrupts.  Apparently JeffV's
   CoCo 3 emulator did not handle this properly.
 
+  It is worth noting that the CoCo 3 had two sets of VSync interrupts.
+  To quote John Kowalski:
+
+  One other thing to mention is that the old vertical interrupt and the new
+  vertical interrupt are not the same..  The old one is triggered by the
+  video's vertical sync pulse, but the new one is triggered on the next scan
+  line *after* the last scan line of the active video display.  That is : new
+  vertical interrupt triggers somewheres around scan line 230 of the 262 line
+  screen (if a 200 line graphics mode is used, a bit earlier if a 192 line
+  mode is used and a bit later if a 225 line mode is used).  The old vsync
+  interrupt triggers on scanline zero.
+
+  230 is just an estimate [(262-200)/2+200].  I don't think the active part
+  of the screen is exactly centered within the 262 line total.  I can
+  research that for you if you want an exact number for scanlines before the
+  screen starts and the scanline that the v-interrupt triggers..etc.
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -57,8 +74,13 @@ void coco3_state::machine_start()
 	// save state support
 	save_item(NAME(m_prev_keyboard_pressed));
 	save_item(NAME(m_pia1b_control_register));
-}
 
+	// right joystick
+	m_joy_handlers[0] = std::make_unique<coco_joy_standard>(*this, 0, ioport(JOYSTICK_BUTTONS_TAG));
+	// left joystick
+	m_joy_handlers[1] = std::make_unique<coco_joy_standard>(*this, 2, ioport(JOYSTICK_BUTTONS_TAG));
+
+}
 
 
 //-------------------------------------------------
@@ -102,29 +124,20 @@ void coco3_state::ff40_write(offs_t offset, uint8_t data)
 
 
 //-------------------------------------------------
-//  keyboard_changed
+//  on_keyboard_state_changed
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER(coco3_state::keyboard_changed)
+void coco3_state::on_keyboard_state_changed(bool any_pressed)
 {
-	coco_state::keyboard_changed(field, param, oldval, newval);
-
-	/* Support for CoCo 3 keyboard GIME interrupt */
-	uint8_t any_pressed = 0;
-	for (unsigned i = 0; i < m_keyboard.size(); i++)
-	{
-		any_pressed |= (~(m_keyboard[i]->read()) | poll_joystick_buttons()) & 0xff;
-	}
-
-	bool pressed = any_pressed != 0;
-	if (pressed != m_prev_keyboard_pressed)
+	if (any_pressed != m_prev_keyboard_pressed)
 	{
 		m_gime->set_il1(true);
 		m_gime->set_il1(false);
+		m_prev_keyboard_pressed = any_pressed;
 	}
-
-	m_prev_keyboard_pressed = pressed;
 }
+
+
 
 //-------------------------------------------------
 //  cart_w
@@ -157,3 +170,73 @@ uint32_t coco3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 {
 	return (m_screen_config->read() & 1) ? m_gime->update_rgb(bitmap, cliprect) : m_gime->update_composite(bitmap, cliprect);
 }
+
+
+
+/***************************************************************************
+  Color Computer Joystick Abstraction
+ ***************************************************************************/
+
+//-------------------------------------------------
+//  make_joy_handler
+//-------------------------------------------------
+
+std::unique_ptr<coco_joy_handler> coco3_state::make_joy_handler(uint8_t selection, int port)
+{
+	switch (selection)
+	{
+		case JOY_DEVICE_RAT_MOUSE: return std::make_unique<coco_rat_mouse>(*this, port, ioport(RAT_MOUSE_BUTTONS_TAG));
+		default:                   return coco_state::make_joy_handler(selection, port);
+	}
+}
+
+
+const std::type_info& coco3_state::get_type_info_for_selection(uint8_t selection)
+{
+	switch (selection)
+	{
+		case JOY_DEVICE_RAT_MOUSE:   return typeid(coco_rat_mouse);
+		default:                     return coco_state::get_type_info_for_selection(selection);
+	}
+}
+
+//**************************************************************************
+//  coco_joy_handler - Classes for things that plug into the joystick port
+//**************************************************************************
+
+//-------------------------------------------------
+//  coco_rat_mouse
+//-------------------------------------------------
+
+void coco3_state::bind_rat_mouse(quadmouse_device &quad, int port_index)
+{
+	auto route = [this, port_index](auto member_func, int state) {
+		if (auto *rat = dynamic_cast<coco_rat_mouse *>(m_joy_handlers[port_index].get()))
+			(rat->*member_func)(state);
+	};
+
+	quad.write_up().set([route](int state) { route(&coco_rat_mouse::up_w, state); });
+	quad.write_down().set([route](int state) { route(&coco_rat_mouse::down_w, state); });
+	quad.write_left().set([route](int state) { route(&coco_rat_mouse::left_w, state); });
+	quad.write_right().set([route](int state) { route(&coco_rat_mouse::right_w, state); });
+}
+
+coco_rat_mouse::coco_rat_mouse(coco_state &host, int base_slot, ioport_port *buttons)
+	: coco_joy_handler(host, base_slot, buttons)
+	, joy_rat_table{ 15, 33, 24, 42 }
+{
+	m_left = m_right = m_up = m_down = 0;
+}
+
+void coco_rat_mouse::update_axis(int axis)
+{
+	bool mn = (axis == 0) ? m_left : m_up;
+	bool pl = (axis == 0) ? m_right : m_down;
+	m_host.write_joystick_mux(m_base_slot + axis, joy_rat_table[(mn << 1) | pl]);
+}
+
+void coco_rat_mouse::left_w(int state)  { m_left  = state; update_axis(0); }
+void coco_rat_mouse::right_w(int state) { m_right = state; update_axis(0); }
+void coco_rat_mouse::up_w(int state)    { m_up    = state; update_axis(1); }
+void coco_rat_mouse::down_w(int state)  { m_down  = state; update_axis(1); }
+

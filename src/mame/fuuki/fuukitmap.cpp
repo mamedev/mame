@@ -90,7 +90,7 @@ void fuukitmap_device::device_reset()
 
 	m_level_1_interrupt_timer->adjust(screen().time_until_pos(248));
 	m_vblank_interrupt_timer->adjust(screen().time_until_vblank_start());
-	m_raster_interrupt_timer->adjust(screen().time_until_pos(0, visarea.max_x + 1));
+	m_raster_interrupt_timer->adjust(screen().time_until_pos(0, visarea.right() + 1));
 }
 
 
@@ -141,7 +141,7 @@ void fuukitmap_device::vregs_w(offs_t offset, u16 data, u16 mem_mask)
 		{
 			const rectangle &visarea = screen().visible_area();
 			attotime period = screen().frame_period();
-			m_raster_interrupt_timer->adjust(screen().time_until_pos(data, visarea.max_x + 1), 0, period);
+			m_raster_interrupt_timer->adjust(screen().time_until_pos(data, visarea.right() + 1), 0, period);
 		}
 		if (offset == 0x1e / 2)
 		{

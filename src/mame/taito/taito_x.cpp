@@ -3,7 +3,6 @@
 // thanks-to:Richard Bush
 /***************************************************************************
 
-
 Taito X-system
 
 driver by Richard Bush, Howie Cohen and Yochizo
@@ -1038,7 +1037,7 @@ void taitox_cchip_state::superman(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(57.43);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);
@@ -1081,7 +1080,7 @@ void taitox_state::daisenpu(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);
@@ -1121,7 +1120,7 @@ void taitox_state::gigandes(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);
@@ -1164,7 +1163,7 @@ void taitox_state::ballbros(machine_config &config)
 	m_spritegen->set_bg_yoffsets(0x1, -0x1);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(52*8, 32*8);

@@ -30,6 +30,7 @@ class bgfx_texture;
 class bgfx_effect;
 class bgfx_target;
 class bgfx_view;
+class bgfx_vector_renderer;
 class osd_options;
 class avi_write;
 
@@ -71,6 +72,7 @@ private:
 		BUFFER_FLUSH,
 		BUFFER_SCREEN,
 		BUFFER_EMPTY,
+		BUFFER_DONE_EMPTY,
 		BUFFER_DONE
 	};
 
@@ -128,6 +130,7 @@ private:
 	std::unique_ptr<shader_manager> m_shaders;
 	std::unique_ptr<effect_manager> m_effects;
 	std::unique_ptr<chain_manager> m_chains;
+	std::unique_ptr<bgfx_vector_renderer> m_vector_renderer;
 
 	bgfx_effect *m_gui_effect[4];
 	bgfx_effect *m_screen_effect[4];
@@ -140,6 +143,9 @@ private:
 	uint32_t m_white[16*16];
 	std::unique_ptr<bgfx_view> m_ortho_view;
 	uint32_t m_max_view;
+	bool m_vector_present;
+	bool m_vector_composited;
+	bool m_vector_composite_pending;
 
 	std::unique_ptr<bgfx_view> m_avi_view;
 	std::unique_ptr<avi_write> m_avi_writer;

@@ -233,7 +233,7 @@ void kn02ba_state::kn02ba(machine_config &config, u32 clock)
 	m_cpu->in_brcond<0>().set_constant(1);
 	m_cpu->set_addrmap(AS_PROGRAM, &kn02ba_state::map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(130000000, 1704, 32, (1280+32), 1064, 3, (1024+3));
 	m_screen->set_screen_update(FUNC(kn02ba_state::screen_update));
 

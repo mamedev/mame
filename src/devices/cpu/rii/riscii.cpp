@@ -230,16 +230,16 @@ void riscii_series_device::device_start()
 	state_add(RII_PAWAKE, "PAWAKE", m_pawake);
 	for (int i = 0; i < 2; i++)
 	{
-		state_add(RII_PORTB + i, string_format("PORT%c", i + 'B').c_str(), m_port_data[i]);
-		state_add(RII_DCRB + i, string_format("DCR%c", i + 'B').c_str(), m_port_dcr[i]);
-		state_add(RII_PBCON + i, string_format("P%cCON", i + 'B').c_str(), m_port_control[i]);
+		state_add(RII_PORTB + i, string_format("PORT%c", i + 'B'), m_port_data[i]);
+		state_add(RII_DCRB + i, string_format("DCR%c", i + 'B'), m_port_dcr[i]);
+		state_add(RII_PBCON + i, string_format("P%cCON", i + 'B'), m_port_control[i]);
 	}
 	for (int i = 2; i < 6; i++)
 	{
 		int p = i * 2 - 2;
-		state_add(RII_PORTB + p, string_format("PORT%c", p + 'B').c_str(), m_port_data[p]);
-		state_add(RII_PORTB + p + 1, string_format("PORT%c", p + 'C').c_str(), m_port_data[p + 1]);
-		state_add(RII_DCRB + i, string_format("DCR%c%c", p + 'B', p + 'C').c_str(), m_port_dcr[i]);
+		state_add(RII_PORTB + p, string_format("PORT%c", p + 'B'), m_port_data[p]);
+		state_add(RII_PORTB + p + 1, string_format("PORT%c", p + 'C'), m_port_data[p + 1]);
+		state_add(RII_DCRB + i, string_format("DCR%c%c", p + 'B', p + 'C'), m_port_dcr[i]);
 	}
 	state_add(RII_UARTCON, "UARTCON", m_uartcon);
 	state_add(RII_UARTSTA, "UARTSTA", m_uartsta);
@@ -254,10 +254,10 @@ void riscii_series_device::device_start()
 	state_add(RII_SFCR, "SFCR", m_sfcr);
 	for (int i = 0; i < 4; i++)
 	{
-		state_add(RII_ADD1 + i, string_format("ADD%d", i + 1).c_str(), m_add[i]).mask(0xffffff);
-		state_add(RII_ENV1 + i, string_format("ENV%d", i + 1).c_str(), m_env[i]);
-		state_add(RII_MTCON1 + i, string_format("MTCON%d", i + 1).c_str(), m_mtcon[i]);
-		state_add(RII_MTRL1 + i, string_format("MTRL%d", i + 1).c_str(), m_mtrl[i]);
+		state_add(RII_ADD1 + i, string_format("ADD%d", i + 1), m_add[i]).mask(0xffffff);
+		state_add(RII_ENV1 + i, string_format("ENV%d", i + 1), m_env[i]);
+		state_add(RII_MTCON1 + i, string_format("MTCON%d", i + 1), m_mtcon[i]);
+		state_add(RII_MTRL1 + i, string_format("MTRL%d", i + 1), m_mtrl[i]);
 	}
 	state_add(RII_SPHDR, "SPHDR", m_sphdr);
 	state_add(RII_SPHTCON, "SPHTCON", m_sphtcon);

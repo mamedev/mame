@@ -35,8 +35,6 @@
 #define LOG_IRQ         (1U << 2)
 #define LOG_PWM         (1U << 3)
 #define LOG_PLM         (1U << 4)
-#define LOG_SPI         (1U << 5)
-#define LOG_SPI_VERBOSE (1U << 6)
 #define LOG_ADC         (1U << 7)
 #define LOG_KEYSCAN     (1U << 8)
 
@@ -61,14 +59,6 @@ static constexpr u8  OPTION_EXTBUS      = 6;                            // tri-s
 static constexpr u8  OPTION_IRQSENSE    = 1;                            // IRQ is edge-triggered, else level triggered
 static constexpr u8  OPTION_RESET       = (1<<OPTION_INTROM);
 
-static constexpr u8  SPCR_IRQ_ENABLE    = 7;                            // IRQ enabled
-static constexpr u8  SPCR_ENABLE        = 6;                            // SPI mode enabled
-static constexpr u8  SPCR_MASTER        = 4;                            // SPI master mode if set, slave otherwise
-static constexpr u8  SPCR_POLARITY      = 3;                            // SPI clock polarity: 0 = clock starts low, 1 = clock starts high
-static constexpr u8  SPCR_PHASE         = 2;                            // SPI phase: 0 = sampled on the rising edge, 1 = sampled on the falling edge
-
-static constexpr u8  SPSR_IRQ_FLAG      = 7;                            // SPI interrupt flag: 1 = interrupt would occur if IRQ_ENABLE in SPCR is set
-
 static constexpr u8  CPICSR_586_IRQ_FLAG        = 7;                    // 5.86ms interrupt flag
 static constexpr u8  CPICSR_ONESEC_IRQ_FLAG     = 6;                    // 1 second interrupt flag
 static constexpr u8  CPICSR_586_IRQ_ENABLE      = 5;                    // 5.86ms interrupt enable
@@ -79,11 +69,12 @@ static constexpr u8  ADCSR_START_CONV           = 5;                    // ADC s
 static constexpr u8  ADCSR_CHANNEL_MASK         = 0x0f;                 // ADC channel mask for ADCSR
 
 static constexpr u8  ADBXR_TDRE                 = 7;                    // ADB transmitter empty
-static constexpr u8  ADBXR_TC                   = 6;                    // ADB transmit complete
-static constexpr u8  ADBXR_SRQ                  = 5;                    // ADB got a Service ReQuest
+static constexpr u8  ADBXR_TC                   = 6;                    // ADB transaction complete
+static constexpr u8  ADBXR_OVFL                 = 5;                    // ADB receive overflow or malformed data
+static constexpr u8  ADBXR_SRQ                  = 4;                    // ADB got a Service ReQuest
 static constexpr u8  ADBXR_RDRF                 = 3;                    // ADB receiver full
 static constexpr u8  ADBXR_BRST                 = 0;                    // ADB send reset
-static constexpr u8  ADBXR_IRQS = ((1 << ADBXR_TDRE) | (1 << ADBXR_TC) | (1 << ADBXR_SRQ) | (1 << ADBXR_RDRF));
+static constexpr u8  ADBXR_IRQS = ((1 << ADBXR_TDRE) | (1 << ADBXR_TC) | (1 << ADBXR_OVFL) | (1 << ADBXR_SRQ) | (1 << ADBXR_RDRF));
 
 static constexpr u8  KCSR_SR0                   = 0;                    // Scan rate bits
 static constexpr u8  KCSR_SR1                   = 1;                    // %010 = 4 uSec, assume (1 << rate) microseconds.
@@ -95,8 +86,6 @@ static constexpr u8  KCSR_SIF                   = 6;                    // Scan 
 static constexpr u8  KCSR_KIF                   = 7;                    // Keyboard interrupt flag
 static constexpr u8  KCSR_RATE_MASK = ((1 << KCSR_SR0) | (1 << KCSR_SR1) | (1 << KCSR_SR2));
 
-static constexpr int s_spi_divisors[4] = {2, 4, 16, 32};
-
 ROM_START( m68hc05pge )
 	ROM_REGION(0x200, "pge", 0)
 	ROM_LOAD( "pge_boot.bin", 0x000000, 0x000200, CRC(62d4dfed) SHA1(79dc721651bf47aec53f57885779c84c4781761d) )
@@ -106,9 +95,11 @@ m68hc05pge_device::m68hc05pge_device(const machine_config &mconfig, device_type 
 	m6805_base_device(mconfig, tag, owner, clock, type, {s_hc_b_ops, s_hc_cycles, 16, 0x00ff, 0x0040, 0xfffc}),
 	device_nvram_interface(mconfig, *this),
 	macseconds_interface(),
+	adb_hle_host_interface(mconfig, *this),
 	m_program_config("program", ENDIANNESS_BIG, 8, addrbits, 0, internal_map),
 	m_internal_ram(*this, "internal_ram"),
 	m_introm(*this, "bankfe00"),
+	m_spi(*this, "spi"),
 	m_read_tbX(*this, 0),
 	m_read_tbY(*this, 0),
 	m_read_tbB(*this, 0),
@@ -116,14 +107,11 @@ m68hc05pge_device::m68hc05pge_device(const machine_config &mconfig, device_type 
 	m_write_p(*this),
 	m_ad_in(*this, 0),
 	m_pwm_out(*this),
-	write_spi_mosi(*this),
-	write_spi_clock(*this),
+	m_adb_linechange(*this),
 	m_pll_ctrl(0), m_timer_ctrl(0), m_onesec(0),
 	m_option(OPTION_RESET),
 	m_cscr(CSCR_RESET),
-	m_spi_in(0), m_spi_out(0),
-	m_spi_bit(0), m_spi_clock(0), m_spi_miso(0),
-	m_spcr(0), m_spsr(0),
+	m_spi_miso(0),
 	m_cpicsr(0),
 	m_adcsr(0),
 	m_adbcr(0), m_adbsr(1 << ADBXR_TDRE), m_adbdr(0),
@@ -152,13 +140,7 @@ void m68hc05pge_device::device_start()
 	save_item(NAME(m_onesec));
 	save_item(NAME(m_option));
 	save_item(NAME(m_cscr));
-	save_item(NAME(m_spi_in));
-	save_item(NAME(m_spi_out));
-	save_item(NAME(m_spi_bit));
-	save_item(NAME(m_spi_clock));
 	save_item(NAME(m_spi_miso));
-	save_item(NAME(m_spcr));
-	save_item(NAME(m_spsr));
 	save_item(NAME(m_cpicsr));
 	save_item(NAME(m_adcsr));
 	save_item(NAME(m_adbcr));
@@ -178,8 +160,6 @@ void m68hc05pge_device::device_start()
 
 	m_seconds_timer = timer_alloc(FUNC(m68hc05pge_device::seconds_tick), this);
 	m_cpi_timer = timer_alloc(FUNC(m68hc05pge_device::cpi_tick), this);
-	m_spi_timer = timer_alloc(FUNC(m68hc05pge_device::spi_tick), this);
-	m_adb_timer = timer_alloc(FUNC(m68hc05pge_device::adb_tick), this);
 	m_keyscan_timer = timer_alloc(FUNC(m68hc05pge_device::keyscan_tick), this);
 
 	system_time systime;
@@ -198,13 +178,23 @@ void m68hc05pge_device::device_reset()
 	memset(m_ports, 0, sizeof(m_ports));
 	memset(m_ddrs, 0, sizeof(m_ddrs));
 
-	// on reset the transmitter is empty
+	m_adbcr = 0;
 	m_adbsr = (1 << ADBXR_TDRE);
+	m_adbdr = 0;
+	adb_update_irq();
 
 	// start the 1 second timer
 	m_seconds_timer->adjust(attotime::from_hz(1), 0, attotime::from_hz(1));
 	// and the 5.86ms timer (5.86ms = 5860 uSec)
 	m_cpi_timer->adjust(attotime::from_usec(5860), 0, attotime::from_usec(5860));
+}
+
+void m68hc05pge_device::device_add_mconfig(machine_config &config)
+{
+	// the SPI runs from the internal processor clock, half the oscillator frequency
+	M68HC05_SPI(config, m_spi, DERIVED_CLOCK(1, 2));
+	m_spi->miso_cb().set([this] () { return m_spi_miso; });
+	m_spi->irq_cb().set_inputline(*this, M68HC05PGE_INT_SPI);
 }
 
 device_memory_interface::space_config_vector m68hc05pge_device::memory_space_config() const
@@ -341,7 +331,7 @@ void m68hc05pge_device::m68hc05pge_map(address_map &map)
 	map(0x0000, 0x0003).rw(FUNC(m68hc05pge_device::ports_r), FUNC(m68hc05pge_device::ports_w));
 	map(0x0004, 0x0006).rw(FUNC(m68hc05pge_device::ddrs_r), FUNC(m68hc05pge_device::ddrs_w));
 	map(0x0007, 0x0007).rw(FUNC(m68hc05pge_device::pll_r), FUNC(m68hc05pge_device::pll_w));
-	map(0x000a, 0x000c).rw(FUNC(m68hc05pge_device::spi_r), FUNC(m68hc05pge_device::spi_w));
+	map(0x000a, 0x000c).m(m_spi, FUNC(m68hc05_spi_device::map));
 	map(0x000d, 0x000d).rw(FUNC(m68hc05pge_device::cpicsr_r), FUNC(m68hc05pge_device::cpicsr_w));
 	map(0x000e, 0x000e).rw(FUNC(m68hc05pge_device::cscr_r), FUNC(m68hc05pge_device::cscr_w));
 	map(0x000f, 0x000f).rw(FUNC(m68hc05pge_device::kcsr_r), FUNC(m68hc05pge_device::kcsr_w));
@@ -377,124 +367,6 @@ void m68hc05pge_device::sram_w(offs_t offset, u8 data)
 	if (BIT(m_cscr, CSCR_SRAM_CS) && !BIT(m_option, OPTION_EXTBUS))
 	{
 		m_sram[offset] = data;
-	}
-}
-
-u8 m68hc05pge_device::spi_r(offs_t offset)
-{
-	switch (offset)
-	{
-		case 0:
-			return m_spcr;
-
-		case 1:
-			return m_spsr;
-
-		case 2:
-			if (!machine().side_effects_disabled())
-			{
-				LOGMASKED(LOG_SPI, "SPI got %02x\n", m_spi_in);
-				if (BIT(m_spsr, SPSR_IRQ_FLAG))
-				{
-					set_input_line(M68HC05PGE_INT_SPI, CLEAR_LINE);
-				}
-			}
-			return m_spi_in;
-	}
-
-	return 0;
-}
-
-void m68hc05pge_device::spi_w(offs_t offset, u8 data)
-{
-	switch (offset)
-	{
-		case 0:
-			m_spcr = data;
-			m_spi_clock = BIT(m_spcr, SPCR_POLARITY);
-			write_spi_clock(m_spi_clock);
-			break;
-
-		case 2:
-			if (!BIT(m_spcr, SPCR_MASTER))
-			{
-				logerror("68HC05PGE: SPI slave mode not implemented\n");
-			}
-
-			if (BIT(m_spsr, SPSR_IRQ_FLAG))
-			{
-				set_input_line(M68HC05PGE_INT_SPI, CLEAR_LINE);
-			}
-			m_spsr &= ~(1 << SPSR_IRQ_FLAG);
-
-			m_spi_clock = BIT(m_spcr, SPCR_POLARITY);
-			write_spi_clock(m_spi_clock);
-
-			m_spi_out = data;
-			m_spi_in = 0;
-			LOGMASKED(LOG_SPI, "SPI: sending %02x, clock rate %d\n", data, clock() / s_spi_divisors[m_spcr & 3]);
-			m_spi_bit = 16;
-			m_spi_timer->adjust(attotime::from_hz(clock() / s_spi_divisors[m_spcr & 3]));
-			break;
-	}
-}
-
-TIMER_CALLBACK_MEMBER(m68hc05pge_device::spi_tick)
-{
-	LOGMASKED(LOG_SPI_VERBOSE, "spi_tick: bit %d\n", m_spi_bit);
-
-	// first clock edge of a bit
-	if (!(m_spi_bit & 1))
-	{
-		// phase = 0, set up the output data before sending the first clock edge of the bit
-		if (!BIT(m_spcr, SPCR_PHASE))
-		{
-			write_spi_mosi(BIT(m_spi_out, 7));
-			m_spi_out <<= 1;
-		}
-
-		write_spi_clock(m_spi_clock ^ 1);
-
-		// phase = 0, input bit became valid on that first edge
-		if (!BIT(m_spcr, SPCR_PHASE))
-		{
-			m_spi_in <<= 1;
-			m_spi_in |= m_spi_miso;
-			LOGMASKED(LOG_SPI_VERBOSE, "PGE: MISO %d, shift %02x (PH0 POL%d)\n", m_spi_miso, m_spi_in, BIT(m_spcr, SPCR_POLARITY));
-		}
-	}
-	else    // second clock edge of the bit
-	{
-		// phase = 1, the output bit must be valid before this clock edge
-		if (BIT(m_spcr, SPCR_PHASE))
-		{
-			write_spi_mosi(BIT(m_spi_out, 7));
-			m_spi_out <<= 1;
-		}
-
-		write_spi_clock(m_spi_clock);
-
-		// phase = 1, input bit became valid on this second edge
-		if (BIT(m_spcr, SPCR_PHASE))
-		{
-			m_spi_in <<= 1;
-			m_spi_in |= m_spi_miso;
-			LOGMASKED(LOG_SPI_VERBOSE, "PGE: MISO %d, shift %02x (PH1 POL%d)\n", m_spi_miso, m_spi_in, BIT(m_spcr, SPCR_POLARITY));
-		}
-	}
-
-	m_spi_bit--;
-	if (m_spi_bit > 0)
-	{
-		m_spi_timer->adjust(attotime::from_hz(clock() / s_spi_divisors[m_spcr & 3]));
-	}
-	else
-	{
-		m_spsr |= (1 << SPSR_IRQ_FLAG);
-		if (BIT(m_spcr, SPCR_IRQ_ENABLE))
-		{
-			set_input_line(M68HC05PGE_INT_SPI, ASSERT_LINE);
-		}
 	}
 }
 
@@ -621,7 +493,11 @@ u8 m68hc05pge_device::adb_r(offs_t offset)
 			return m_adbsr;
 
 		case 2:
-			return m_adbdr;
+		{
+			const u8 data = m_adbdr;
+			adb_clear_status(1 << ADBXR_RDRF);
+			return data;
+		}
 	}
 
 	return 0;
@@ -629,74 +505,108 @@ u8 m68hc05pge_device::adb_r(offs_t offset)
 
 void m68hc05pge_device::adb_w(offs_t offset, u8 data)
 {
-	//printf("%02x to ADB @ %d\n", data, offset);
 	switch (offset)
 	{
 		case 0:
-			//printf("%02x to ADBCR, previous %02x\n", data, m_adbcr);
-			// if we're clearing transmit complete, set transmitter empty
-			if (BIT(m_adbcr, ADBXR_TC) && !BIT(data, ADBXR_TC))
-			{
-				//printf("ADB enabling transmitter empty\n");
-				m_adbsr |= (1 << ADBXR_TDRE);
-			}
-
-			// if we're clearing transmitter empty, kick the timer for transmitter complete
-			if (BIT(m_adbcr, ADBXR_TDRE) && !BIT(data, ADBXR_TDRE))
-			{
-				//printf("ADB setting completion timer\n");
-				m_adb_timer->adjust(attotime::from_usec(50), 1);
-			}
-
+		{
+			bool const start_reset = BIT(data, ADBXR_BRST) && !BIT(m_adbcr, ADBXR_BRST);
 			m_adbcr = data;
-			if (m_adbsr & m_adbcr & ADBXR_IRQS)
+			if (start_reset)
 			{
-				set_input_line(M68HC05PGE_INT_ADB, ASSERT_LINE);
+				adb_host_reset();
 			}
 			else
 			{
-				set_input_line(M68HC05PGE_INT_ADB, CLEAR_LINE);
+				adb_update_irq();
 			}
 			break;
+		}
 
 		case 1:
-			m_adbsr = data;
-			if (m_adbsr & m_adbcr & ADBXR_IRQS)
-			{
-				set_input_line(M68HC05PGE_INT_ADB, ASSERT_LINE);
-			}
-			else
-			{
-				set_input_line(M68HC05PGE_INT_ADB, CLEAR_LINE);
-			}
+			m_adbsr &= data;
+			adb_update_irq();
 			break;
 
 		case 2:
 			m_adbdr = data;
-			LOGMASKED(LOG_ADB, "ADB sending %02x\n", data);
-			m_adbsr &= ~((1 << ADBXR_TDRE) | (1 << ADBXR_TC));
-			m_adb_timer->adjust(attotime::from_usec(1200), 0);
+			adb_clear_status((1 << ADBXR_TDRE) | (1 << ADBXR_TC));
+			if (adb_host_idle())
+			{
+				adb_host_command(data);
+			}
+			else if (!adb_host_listen_data_w(data))
+			{
+				LOGMASKED(LOG_ADB, "ADB transmit data overrun writing %02x\n", data);
+				adb_set_status(1 << ADBXR_OVFL);
+			}
 			break;
 	}
 }
 
-TIMER_CALLBACK_MEMBER(m68hc05pge_device::adb_tick)
+void m68hc05pge_device::adb_update_irq()
 {
-	switch (param)
-	{
-		case 0:         // byte transmitted, trigger transmitter empty
-			m_adbsr |= (1 << ADBXR_TDRE);
-			break;
+	set_input_line(M68HC05PGE_INT_ADB, (m_adbsr & m_adbcr & ADBXR_IRQS) ? ASSERT_LINE : CLEAR_LINE);
+}
 
-		case 1:
-			m_adbsr |= (1 << ADBXR_TC);
-			break;
+void m68hc05pge_device::adb_set_status(u8 mask)
+{
+	m_adbsr |= mask;
+	adb_update_irq();
+}
+
+void m68hc05pge_device::adb_clear_status(u8 mask)
+{
+	m_adbsr &= ~mask;
+	adb_update_irq();
+}
+
+void m68hc05pge_device::adb_host_drive_line(int state)
+{
+	m_adb_linechange(state);
+}
+
+void m68hc05pge_device::adb_host_tx_empty()
+{
+	adb_set_status(1 << ADBXR_TDRE);
+}
+
+bool m68hc05pge_device::adb_host_listen_more() const
+{
+	// the firmware clears the TDRE interrupt enable once the last data byte is in the shifter
+	return BIT(m_adbcr, ADBXR_TDRE);
+}
+
+void m68hc05pge_device::adb_host_command_sent(bool srq)
+{
+	if (srq)
+	{
+		adb_set_status(1 << ADBXR_SRQ);
+	}
+}
+
+bool m68hc05pge_device::adb_host_rx_byte(u8 data)
+{
+	if (BIT(m_adbsr, ADBXR_RDRF))
+	{
+		LOGMASKED(LOG_ADB, "ADB receive data overrun\n");
+		return false;
 	}
 
-	if (m_adbsr & m_adbcr & ADBXR_IRQS)
-	{
-		set_input_line(M68HC05PGE_INT_ADB, ASSERT_LINE);
-	}
+	m_adbdr = data;
+	adb_set_status(1 << ADBXR_RDRF);
+	return true;
+}
+
+void m68hc05pge_device::adb_host_transaction_done(adb_host_status status)
+{
+	// no response and bad data are both OVFL to the firmware
+	adb_set_status((status == adb_host_status::OK) ? (1 << ADBXR_TC) : (1 << ADBXR_OVFL));
+}
+
+void m68hc05pge_device::adb_host_reset_done()
+{
+	m_adbcr &= ~(1 << ADBXR_BRST);
+	adb_update_irq();
 }
 
 u8 m68hc05pge_device::option_r()

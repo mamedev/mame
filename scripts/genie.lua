@@ -11,6 +11,20 @@ newoption {
 	description = 'Build directory name',
 }
 
+newoption {
+	trigger = "jcdb-config",
+	value = "CONFIG",
+	description = "Build configuration for the compilation database",
+	allowed = {
+		{ "debug",     "Debug, native architecture" },
+		{ "debug32",   "Debug, 32-bit" },
+		{ "debug64",   "Debug, 64-bit" },
+		{ "release",   "Release, native architecture" },
+		{ "release32", "Release, 32-bit" },
+		{ "release64", "Release, 64-bit" },
+	},
+}
+
 premake.check_paths = true
 premake.make.override = { "TARGET" }
 
@@ -459,16 +473,22 @@ else
 end
 
 
-configurations {
-	"Debug",
-	"Release",
-}
+if _ACTION == "jcdb" and _OPTIONS["jcdb-config"] then
+	local config = _OPTIONS["jcdb-config"]
+	configurations { config:match("^debug") and "Debug" or "Release" }
+	platforms { config:match("32$") and "x32" or (config:match("64$") and "x64" or "Native") }
+else
+	configurations {
+		"Debug",
+		"Release",
+	}
 
-platforms {
-	"x32",
-	"x64",
-	"Native", -- for targets where bitness is not specified
-}
+	platforms {
+		"x32",
+		"x64",
+		"Native", -- for targets where bitness is not specified
+	}
+end
 
 language "C++"
 
@@ -546,7 +566,7 @@ if _OPTIONS["with-emulator"] then
 	end
 end
 
-configuration { "gmake or ninja" }
+configuration { "gmake or ninja or jcdb" }
 	flags {
 		"SingleOutputDir",
 	}
@@ -695,7 +715,7 @@ elseif (_OPTIONS["PLATFORM"] == "x86") or (_OPTIONS["PLATFORM"] == "arm64") then
 		}
 end
 
-	if _ACTION == "gmake" or _ACTION == "ninja" then
+	if _ACTION == "gmake" or _ACTION == "ninja" or _ACTION == "jcdb" then
 
 	--we compile C-only to C99 standard with GNU extensions
 

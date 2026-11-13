@@ -10,7 +10,7 @@
 #pragma once
 
 #include "video/hd44780.h"
-#include "screen.h"
+#include "screen_svg.h"
 
 DECLARE_DEVICE_TYPE(MULCD, mulcd_device)
 
@@ -33,7 +33,7 @@ private:
 	output_finder<> m_contrast;
 	output_finder<10> m_led_outputs;
 
-	u32 mu_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void mu_screen_update(screen_svg_device &screen);
 };
 
 #endif // MAME_YAMAHA_MULCD_H

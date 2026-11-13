@@ -243,7 +243,7 @@ void jackpool_state::jackpool(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackpool);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(64*8, 64*8);
@@ -303,7 +303,7 @@ void jackpool_state::init_jackpool()
 {
 	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
-	/* patch NVRAM routine */
+	// HACK: patch NVRAM routine
 	rom[0x9040/2] = 0x6602;
 }
 

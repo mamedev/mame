@@ -444,7 +444,7 @@ void taito_f3_state::f3(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// from taito z system and crystal on board
 	// and measurements from https://www.arcade-projects.com/threads/the-taito-f3-sync.12343/
 	m_screen->set_raw(
@@ -532,7 +532,7 @@ void taito_f3_state::bubsympb(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58.97);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(624)); /* 58.97 Hz, 624us vblank time */
 	m_screen->set_size(40*8+48*2, 32*8);
@@ -4527,10 +4527,11 @@ void taito_f3_state::init_landmkrp()
 {
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
+	// TODO: move to handler in address_map
 	/* For some reason the least significant byte in the last 2 long words of
-	ROM is swapped.  As the roms have been verified ok, I assume this is some
+	ROMs are swapped.  As the ROMs have been verified ok, I assume this is some
 	kind of basic security on the prototype development board to prevent 'release'
-	roms running on it.  Easiest thing to do is switch the data around here */
+	ROMs running on it.  Easiest thing to do is switch the data around here */
 	ROM[0x1ffff8/4]=0xffffffff; /* From 0xffffff03 */
 	ROM[0x1ffffc/4]=0xffff0003; /* From 0xffff00ff */
 
@@ -4570,7 +4571,7 @@ void taito_f3_state::init_pbobbl2p()
 
 	u32 *ROM = (u32 *)memregion("maincpu")->base();
 
-	/* protection? */
+	// HACK: protection?
 	ROM[0x40090/4]=0x00004e71|(ROM[0x40090/4]&0xffff0000);
 	ROM[0x40094/4]=0x4e714e71;
 

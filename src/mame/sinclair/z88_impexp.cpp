@@ -177,7 +177,7 @@ std::pair<std::error_condition, std::string> z88_impexp_device::call_load()
 	m_queue.push(0x1b);
 	m_queue.push('F');
 
-	util::core_file &file = image_core_file();
+	util::read_stream &file = image_core_file();
 	std::error_condition err;
 	while (true)
 	{

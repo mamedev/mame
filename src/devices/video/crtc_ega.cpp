@@ -24,6 +24,7 @@ crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, CRTC_EGA, tag, owner, clock), device_video_interface(mconfig, *this, false)
 	, m_res_out_de_cb(*this), m_res_out_hsync_cb(*this), m_res_out_vsync_cb(*this), m_res_out_vblank_cb(*this)
 	, m_res_out_irq_cb(*this), m_begin_update_cb(*this), m_row_update_cb(*this), m_end_update_cb(*this)
+	, m_reconfigure_cb(*this)
 	, m_horiz_char_total(0), m_horiz_disp(0), m_horiz_blank_start(0), m_horiz_blank_end(0)
 	, m_ena_vert_access(0), m_de_skew(0)
 	, m_horiz_retr_start(0), m_horiz_retr_end(0), m_horiz_retr_skew(0)
@@ -31,11 +32,11 @@ crtc_ega_device::crtc_ega_device(const machine_config &mconfig, const char *tag,
 	, m_cursor_start_ras(0), m_cursor_disable(0), m_cursor_end_ras(0), m_cursor_skew(0)
 	, m_disp_start_addr(0), m_cursor_addr(0), m_light_pen_addr(0)
 	, m_vert_retr_start(0), m_vert_retr_end(0)
-	, m_irq_enable(0), m_vert_disp_end(0), m_offset(0), m_underline_loc(0)
+	, m_irq_disable(0), m_vert_disp_end(0), m_offset(0), m_underline_loc(0)
 	, m_vert_blank_start(0), m_vert_blank_end(0)
 	, m_mode_control(0), m_line_compare(0), m_register_address_latch(0)
 	, m_start_addr_latch(0), m_cursor_state(false), m_cursor_blink_count(0)
-	, m_hpixels_per_column(0), m_cur(0), m_hsync(0), m_vsync(0), m_vblank(0), m_de(0)
+	, m_hpixels_per_column(0), m_cur(0), m_hsync(0), m_vsync(0), m_vblank(0), m_vert_int(0), m_de(0)
 	, m_character_counter(0), m_hsync_width_counter(0), m_line_counter(0), m_raster_counter(0), m_vsync_width_counter(0)
 	, m_line_enable_ff(false), m_vsync_ff(0), m_adjust_active(0), m_line_address(0), m_cursor_x(0)
 	, m_line_timer(nullptr), m_de_off_timer(nullptr), m_cursor_on_timer(nullptr), m_cursor_off_timer(nullptr)
@@ -121,11 +122,12 @@ void crtc_ega_device::register_w(uint8_t data)
 		case 0x0f:  m_cursor_addr       = ((data & 0xff) << 0) | (m_cursor_addr & 0xff00); break;
 		case 0x10:  m_vert_retr_start   = ((data & 0xff) << 0) | (m_vert_retr_start & 0x0100); break;
 		case 0x11:  m_vert_retr_end     =   data & 0x0f;
-					m_irq_enable        =   data & 0x20;
-					if (data & 0x10)
+					m_irq_disable       =   data & 0x20;
+					if (!(data & 0x10))
 					{
-						m_res_out_irq_cb(0);
+						m_vert_int = 0;
 					}
+					update_irq();
 					break;
 		case 0x12:  m_vert_disp_end     = ((data & 0xff) << 0) | (m_vert_disp_end & 0x0100); break;
 		case 0x13:  m_offset            =  data & 0xff; break;
@@ -190,15 +192,19 @@ void crtc_ega_device::recompute_parameters(bool postload)
 		if ((horiz_pix_total > 0) && (max_visible_x < horiz_pix_total) &&
 			(vert_pix_total > 0) && (max_visible_y < vert_pix_total))
 		{
-			attoseconds_t refresh = HZ_TO_ATTOSECONDS(m_clock) * (m_horiz_char_total + 2) * vert_pix_total;
+			attotime refresh = attotime::from_ticks((m_horiz_char_total + 2) * vert_pix_total, m_clock);
 
 			rectangle visarea(0, max_visible_x, 0, max_visible_y);
 
 			LOG("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
-								horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+				horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, refresh.as_hz());
 
 			if (has_screen())
 				screen().configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+
+			if (!m_reconfigure_cb.isnull())
+				m_reconfigure_cb(horiz_pix_total, vert_pix_total, visarea, refresh,
+						hsync_on_pos, hsync_off_pos, vsync_on_pos, vsync_off_pos);
 
 			m_has_valid_parameters = true;
 		}
@@ -218,6 +224,9 @@ void crtc_ega_device::recompute_parameters(bool postload)
 		m_hsync_off_pos = hsync_off_pos;
 		m_vsync_on_pos = vsync_on_pos;
 		m_vsync_off_pos = vsync_off_pos;
+
+		if (m_line_timer && !m_line_timer->enabled() && m_has_valid_parameters)
+			m_line_timer->adjust( attotime::from_ticks( m_horiz_char_total + 2, m_clock ) );
 	}
 }
 
@@ -269,14 +278,21 @@ void crtc_ega_device::set_vblank(int state)
 	{
 		m_vblank = state;
 		m_res_out_vblank_cb(m_vblank);
-		if (!m_irq_enable)
-			m_res_out_irq_cb(m_vblank);
+		if (state)
+			m_vert_int = 1;
+		update_irq();
 		if (state)
 		{
 			m_disp_start_addr = m_start_addr_latch;
 			m_preset_row_scan = m_preset_row_latch;
 		}
 	}
+}
+
+
+void crtc_ega_device::update_irq()
+{
+	m_res_out_irq_cb((m_vert_int && !m_irq_disable) ? 1 : 0);
 }
 
 
@@ -381,7 +397,8 @@ TIMER_CALLBACK_MEMBER(crtc_ega_device::handle_line_timer)
 	}
 
 	/* Schedule our next callback */
-	m_line_timer->adjust( attotime::from_ticks( m_horiz_char_total + 2, m_clock ) );
+	if (m_has_valid_parameters)
+		m_line_timer->adjust( attotime::from_ticks( m_horiz_char_total + 2, m_clock ) );
 
 	/* Set VSYNC and DE signals */
 	set_vsync( new_vsync );
@@ -593,6 +610,7 @@ void crtc_ega_device::device_start()
 	m_begin_update_cb.resolve();
 	m_row_update_cb.resolve();
 	m_end_update_cb.resolve();
+	m_reconfigure_cb.resolve();
 
 	/* create the timers */
 	m_line_timer = timer_alloc(FUNC(crtc_ega_device::handle_line_timer), this);
@@ -680,7 +698,8 @@ void crtc_ega_device::device_start()
 	save_item(NAME(m_vert_blank_start));
 	save_item(NAME(m_vert_blank_end));
 	save_item(NAME(m_line_compare));
-	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_disable));
+	save_item(NAME(m_vert_int));
 }
 
 
@@ -691,9 +710,11 @@ void crtc_ega_device::device_reset()
 	m_res_out_hsync_cb(false);
 	m_res_out_vsync_cb(false);
 	m_res_out_vblank_cb(false);
+	m_irq_disable = 0x20;
+	m_vert_int = 0;
 	m_res_out_irq_cb(false);
 
-	if (!m_line_timer->enabled())
+	if (!m_line_timer->enabled() && m_has_valid_parameters)
 	{
 		m_line_timer->adjust( attotime::from_ticks( m_horiz_char_total + 2, m_clock ) );
 	}

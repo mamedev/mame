@@ -91,11 +91,11 @@ const char *d81_format::description() const noexcept
 
 const char *d81_format::extensions() const noexcept
 {
-	return "d81";
+	return "d81,dsk,ima,img";
 }
 
 const d81_format::format d81_format::formats[] = {
-	// track description
+	// CBM DOS 800KB
 	// 32x4e 12x00 3xf5 fe 2x00 01 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
 	// 35x4e 12x00 3xf5 fe 2x00 02 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
 	// 35x4e 12x00 3xf5 fe 2x00 03 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
@@ -112,14 +112,30 @@ const d81_format::format d81_format::formats[] = {
 		2000, 10, 80, 2, 512, {}, 1, {}, 32, 22, 35
 	},
 
+	// MS-DOS 720KB
+	// 32x4e 12x00 3xf5 fe 2x00 01 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 50x4e 12x00 3xf5 fe 2x00 02 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 50x4e 12x00 3xf5 fe 2x00 03 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 50x4e 12x00 3xf5 fe 2x00 04 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 50x4e 12x00 3xf5 fe 2x00 05 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 50x4e 12x00 3xf5 fe 2x00 06 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 50x4e 12x00 3xf5 fe 2x00 07 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 50x4e 12x00 3xf5 fe 2x00 08 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 50x4e 12x00 3xf5 fe 2x00 09 02 f7 22x4e 12x00 3xf5 fb 512x00 f7
+	// 653x4e
+	{
+		floppy_image::FF_35, floppy_image::DSDD, floppy_image::MFM,
+		2000, 9, 80, 2, 512, {}, 1, {}, 32, 22, 50
+	},
+
 	{}
 };
 
 floppy_image_format_t::desc_e* d81_format::get_desc_mfm(const format &f, int &current_size, int &end_gap_index) const
 {
 	static floppy_image_format_t::desc_e desc[25] = {
-	/* 00 */ { MFM, 0x4e, f.gap_1 },
-	/* 01 */ { SECTOR_LOOP_START, 0, f.sector_count-1 },
+	/* 00 */ { MFM, 0x4e, 0 },
+	/* 01 */ { SECTOR_LOOP_START, 0, 0 },
 	/* 02 */ {   MFM, 0x00, 12 },
 	/* 03 */ {   CRC_CCITT_START, 1 },
 	/* 04 */ {     RAW, 0x4489, 3 },
@@ -130,7 +146,7 @@ floppy_image_format_t::desc_e* d81_format::get_desc_mfm(const format &f, int &cu
 	/* 09 */ {     SIZE_ID },
 	/* 10 */ {   CRC_END, 1 },
 	/* 11 */ {   CRC, 1 },
-	/* 12 */ {   MFM, 0x4e, f.gap_2 },
+	/* 12 */ {   MFM, 0x4e, 0 },
 	/* 13 */ {   MFM, 0x00, 12 },
 	/* 14 */ {   CRC_CCITT_START, 2 },
 	/* 15 */ {     RAW, 0x4489, 3 },
@@ -138,12 +154,17 @@ floppy_image_format_t::desc_e* d81_format::get_desc_mfm(const format &f, int &cu
 	/* 17 */ {     SECTOR_DATA, -1 },
 	/* 18 */ {   CRC_END, 2 },
 	/* 19 */ {   CRC, 2 },
-	/* 20 */ {   MFM, 0x4e, f.gap_3 },
+	/* 20 */ {   MFM, 0x4e, 0 },
 	/* 21 */ { SECTOR_LOOP_END },
 	/* 22 */ { MFM, 0x4e, 0 },
 	/* 23 */ { RAWBITS, 0x9254, 0 },
 	/* 24 */ { END }
 	};
+
+	desc[0].p2 = f.gap_1;
+	desc[1].p2 = f.sector_count - 1;
+	desc[12].p2 = f.gap_2;
+	desc[20].p2 = f.gap_3;
 
 	current_size = f.gap_1*16;
 	if(f.sector_base_size)
@@ -157,6 +178,12 @@ floppy_image_format_t::desc_e* d81_format::get_desc_mfm(const format &f, int &cu
 	end_gap_index = 22;
 
 	return desc;
+}
+
+int d81_format::get_image_offset(const format &f, int head, int track) const
+{
+	// the 1581 stores logical side 0 on physical side 1 (with side 0 in its ID fields)
+	return wd177x_format::get_image_offset(f, (f.sector_count == 10) ? (head ^ 1) : head, track);
 }
 
 const d81_format FLOPPY_D81_FORMAT;

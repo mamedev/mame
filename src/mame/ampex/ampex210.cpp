@@ -180,7 +180,7 @@ void ampex210_state::ampex210p(machine_config &config)
 	pvtc.set_addrmap(0, &ampex210_state::vram_map);
 	pvtc.set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::amber());
 	screen.set_raw(19.602_MHz_XTAL, 900, 0, 720, 363, 0, 300);
 	//screen.set_raw(32.147_MHz_XTAL, 1476, 0, 1188, 363, 0, 300);
@@ -216,7 +216,7 @@ void ampex210_state::ampex230p(machine_config &config)
 	pvtc.set_addrmap(1, &ampex210_state::vram2_map);
 	pvtc.set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_color(rgb_t::amber());
 	screen.set_raw(19.602_MHz_XTAL, 900, 0, 720, 363, 0, 312);
 	//screen.set_raw(32.147_MHz_XTAL, 1476, 0, 1188, 363, 0, 312);

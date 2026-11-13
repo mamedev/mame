@@ -15,8 +15,7 @@ public:
 
 	void set_raster_offset(u16 offset_h,  u16 offset_v) { m_offset_h = offset_h - (OVER_BORDER << 1); m_offset_v = offset_v - OVER_BORDER; update_config(); }
 
-	bool is_dirty() { return m_cache_dirty; }
-	void update_cache_if_dirty() { if (m_cache_dirty) { update_sprites_cache(); m_cache_dirty = false; } }
+	void update_sprites_cache();
 	void draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 pmask);
 
 	void sprite_palette_select_w(bool sprite_palette_select) { m_sprite_palette_select = sprite_palette_select; update_config(); }
@@ -70,10 +69,7 @@ private:
 		u8 yscale; // u2
 	};
 
-	void update_sprites_cache();
-
 	std::vector<sprite_data> m_sprites_cache;
-	bool m_cache_dirty = false;
 	u16 m_offset_h, m_offset_v;
 	rectangle m_clip_window;
 	u16 m_palette_base_offset;

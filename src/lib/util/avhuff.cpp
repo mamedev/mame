@@ -212,6 +212,8 @@ avhuff_error avhuff_encoder::encode_data(const uint8_t *source, uint8_t *dest, u
 	// extract info from the header
 	uint32_t metasize = source[4];
 	uint32_t channels = source[5];
+	if (channels > AVHUFF_MAX_CHANNELS)
+		return AVHERR_TOO_MANY_CHANNELS;
 	uint32_t samples = get_u16be(&source[6]);
 	uint32_t width = get_u16be(&source[8]);
 	uint32_t height = get_u16be(&source[10]);
@@ -328,6 +330,8 @@ avhuff_error avhuff_encoder::assemble_data(std::vector<uint8_t> &buffer, bitmap_
 	// sanity check the inputs
 	if (metadatasize > 255)
 		return AVHERR_METADATA_TOO_LARGE;
+	if (channels > AVHUFF_MAX_CHANNELS)
+		return AVHERR_TOO_MANY_CHANNELS;
 	if (numsamples > 65535)
 		return AVHERR_AUDIO_TOO_LARGE;
 	if (bitmap.width() > 65535 || bitmap.height() > 65535)
@@ -719,6 +723,8 @@ avhuff_error avhuff_decoder::decode_data(const uint8_t *source, uint32_t complen
 		return AVHERR_INVALID_DATA;
 	uint32_t metasize = source[0];
 	uint32_t channels = source[1];
+	if (channels > AVHUFF_MAX_CHANNELS)
+		return AVHERR_TOO_MANY_CHANNELS;
 	uint32_t samples = get_u16be(&source[2]);
 	uint32_t width = get_u16be(&source[4]);
 	uint32_t height = get_u16be(&source[6]);
@@ -739,7 +745,7 @@ avhuff_error avhuff_decoder::decode_data(const uint8_t *source, uint32_t complen
 	uint32_t srcoffs = 10 + 2 * channels;
 
 	// if we are decoding raw, set up the output parameters
-	uint8_t *metastart, *videostart, *audiostart[16];
+	uint8_t *metastart, *videostart, *audiostart[AVHUFF_MAX_CHANNELS];
 	uint32_t audioxor, videoxor, videostride;
 	if (dest != nullptr)
 	{

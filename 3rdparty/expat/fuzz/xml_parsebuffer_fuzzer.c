@@ -15,6 +15,7 @@
  */
 
 #include <assert.h>
+#include <limits.h> // for INT_MAX
 #include <stdint.h>
 #include <string.h>
 
@@ -66,16 +67,17 @@ ParseOneInput(XML_Parser p, const uint8_t *data, size_t size) {
   XML_SetUserData(p, p);
   XML_SetElementHandler(p, start, end);
   XML_SetCharacterDataHandler(p, may_stop_character_handler);
-  void *buf = XML_GetBuffer(p, size);
+  assert(size <= INT_MAX);
+  void *buf = XML_GetBuffer(p, (int)size);
   assert(buf);
   memcpy(buf, data, size);
-  XML_ParseBuffer(p, size, 0);
-  buf = XML_GetBuffer(p, size);
+  XML_ParseBuffer(p, (int)size, 0);
+  buf = XML_GetBuffer(p, (int)size);
   if (buf == NULL) {
     return;
   }
   memcpy(buf, data, size);
-  if (XML_ParseBuffer(p, size, 1) == XML_STATUS_ERROR) {
+  if (XML_ParseBuffer(p, (int)size, 1) == XML_STATUS_ERROR) {
     XML_ErrorString(XML_GetErrorCode(p));
   }
   XML_GetCurrentLineNumber(p);
@@ -101,15 +103,17 @@ LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
 
   XML_Parser externalEntityParser
       = XML_ExternalEntityParserCreate(parentParser, "e1", NULL);
-  assert(externalEntityParser);
-  ParseOneInput(externalEntityParser, data, size);
-  XML_ParserFree(externalEntityParser);
+  if (externalEntityParser != NULL) {
+    ParseOneInput(externalEntityParser, data, size);
+    XML_ParserFree(externalEntityParser);
+  }
 
   XML_Parser externalDtdParser
       = XML_ExternalEntityParserCreate(parentParser, NULL, NULL);
-  assert(externalDtdParser);
-  ParseOneInput(externalDtdParser, data, size);
-  XML_ParserFree(externalDtdParser);
+  if (externalDtdParser != NULL) {
+    ParseOneInput(externalDtdParser, data, size);
+    XML_ParserFree(externalDtdParser);
+  }
 
   // finally frees this parser which served as parent
   XML_ParserFree(parentParser);

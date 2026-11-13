@@ -45,10 +45,6 @@
  29: Light 4 lamp
  30: Light 5 lamp
 
- TODO: royalpk2 is marked non-working, as the machine will soft-lock
- when attempting to use either settings-save options in the service
- menu.
-
 *********************************************************************/
 
 #include "emu.h"
@@ -251,7 +247,7 @@ void mosaicf2_state::mosaicf2(machine_config &config)
 	m_eeprom->write_time(attotime::from_usec(1));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(512, 512);
@@ -470,7 +466,7 @@ void royalpk2_state::royalpk2(machine_config &config)
 	HOPPER(config, m_hopper, attotime::from_msec(100));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500) /* not accurate */);
 	screen.set_size(512, 512);
@@ -592,4 +588,4 @@ ROM_END
 } // anonymous namespace
 
 GAME( 1999, mosaicf2, 0, mosaicf2, mosaicf2, mosaicf2_state, empty_init, ROT0, "F2 System", "Mosaic (F2 System)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, royalpk2, 0, royalpk2, royalpk2, royalpk2_state, empty_init, ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", MACHINE_NOT_WORKING )
+GAME( 1999, royalpk2, 0, royalpk2, royalpk2, royalpk2_state, empty_init, ROT0, "F2 System", "Royal Poker 2 (Network version 3.12)", 0 )

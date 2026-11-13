@@ -2494,7 +2494,7 @@ void cclimber_state::root(machine_config &config)
 	m_mainlatch->q_out_cb<2>().set(FUNC(cclimber_state::flip_screen_y_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -2676,7 +2676,7 @@ void swimmer_state::swimmer(machine_config &config)
 	m_audiocpu->set_periodic_int(FUNC(swimmer_state::nmi_line_assert), attotime::from_ticks(0x4000, 4_MHz_XTAL));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.57); // verified on pcb
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);
@@ -4113,17 +4113,17 @@ ROM_END
 
 void cclimber_state::init_cclimber()
 {
-	u8 *rom = memregion("maincpu")->base();
-	u8 *prom = memregion("decryption_prom")->base();
+	u8 const *const rom = memregion("maincpu")->base();
+	u8 const *const prom = memregion("decryption_prom")->base();
 
 	for (int A = 0x0000; A < 0x6000; A++)
 	{
-		unsigned char src = rom[A];
+		u8 const src = rom[A];
 
 		// pick the offset in the table from bit 0 of the address and bits 0 1 2 4 6 7 of the source data
-		int j = (src & 0x01) | ((src & 0x04) >> 1) | ((src & 0x10) >> 1) | ((src & 0x40) >> 4) | ((A & 1) << 6) | ((src & 0x02) << 3) | ((src & 0x80) >> 2);
+		int j = (BIT(A, 0) << 6) | bitswap<6>(src, 7, 1, 4, 6, 2, 0);
 
-		unsigned char prm = prom[j];
+		u8 const prm = prom[j];
 
 		// decode the opcodes
 		m_decrypted_opcodes[A] = (src & 0xaa) | (prm & 0x01) | ((prm & 0x02) << 1) | ((prm & 0x04) << 4) | ((prm & 0x08) << 1);

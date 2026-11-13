@@ -2,7 +2,7 @@
 // icmp_header.hpp
 // ~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -18,7 +18,7 @@
 // ICMP header for both IPv4 and IPv6.
 //
 // The wire format of an ICMP header is:
-// 
+//
 // 0               8               16                             31
 // +---------------+---------------+------------------------------+      ---
 // |               |               |                              |       ^

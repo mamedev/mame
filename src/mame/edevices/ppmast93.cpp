@@ -392,7 +392,7 @@ void ppmast93_state::ppmast93(machine_config &config)
 	sub.set_periodic_int(FUNC(ppmast93_state::irq0_line_hold), attotime::from_hz(8000));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(55);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256);

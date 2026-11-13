@@ -25,6 +25,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace experimental {
 
 template <typename Yield, typename Return,
@@ -600,7 +601,7 @@ struct coro_promise final :
 
   cancellation_slot_type get_cancellation_slot() const noexcept
   {
-    return cancel ? cancel->slot : cancellation_slot_type{};
+    return cancel ? cancel->state.slot() : cancellation_slot_type{};
   }
 
   using allocator_type =
@@ -1215,6 +1216,7 @@ private:
 };
 
 } // namespace experimental
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

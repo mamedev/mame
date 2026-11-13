@@ -867,7 +867,7 @@ void bublbobl_state::tokio(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, tokio)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(bublbobl_state::screen_update_bublbobl));
 	m_screen->set_palette(m_palette);
@@ -962,7 +962,7 @@ void bublbobl_state::bublbobl_nomcu(machine_config &config)
 	MCFG_MACHINE_RESET_OVERRIDE(bublbobl_state, bublbobl)
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(bublbobl_state::screen_update_bublbobl));
 	m_screen->set_palette(m_palette);

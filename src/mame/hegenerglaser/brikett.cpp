@@ -12,7 +12,7 @@ in 1981, and in 1982 they released ESB 3000 and ESB 6000 for use with ESB II/III
 
 Hardware notes:
 
-1st model (Mephisto, early Mephisto II):
+1st model (Mephisto):
 - 2 PCBs: DH 4001-C(computer), DH 4002-C(LCD/keypad)
 - CDP1802CE @ 3.579MHz
 - CDP1852CE (I/O port chip), external port
@@ -21,7 +21,7 @@ Hardware notes:
 - piezo, TTL, 16-button keypad
 - module slot
 
-2nd model (later Mephisto II): (listed differences)
+2nd model (later Mephisto, Mephisto II): (listed differences)
 - PCB label: DH 4005-101 00
 - CDP1802ACE @ 3.579MHz or 4.194MHz (chess clock runs faster on 4.194MHz)
 - 2*MWS5114E or 2*TC5514P (1KBx4 RAM)

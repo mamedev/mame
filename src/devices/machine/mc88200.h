@@ -12,13 +12,15 @@ class mc88200_device
 public:
 	mc88200_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock, u8 id = 0);
 
-	template <typename T> void set_mbus(T &&tag, int spacenum) { m_mbus.set_tag(std::forward<T>(tag), spacenum); }
+	template <typename T> void set_mbus(T &&tag, int spacenum) { m_mbus_space.set_tag(std::forward<T>(tag), spacenum); }
+	auto global() { return m_global.bind(); }
 
-	bool translate(int intention, u32 &address, bool supervisor);
+	bool translate(int intention, offs_t &address, bool supervisor);
+	template <typename T> std::optional<T> read(offs_t virtual_address, bool supervisor, bool lock = false);
+	template <typename T> bool write(offs_t virtual_address, T data, bool supervisor, bool lock = false);
 
-	template <typename T> std::optional<T> read(u32 virtual_address, bool supervisor);
-	template <typename T> bool write(u32 virtual_address, T data, bool supervisor);
-	void bus_error_w(int state) { if (!machine().side_effects_disabled()) m_bus_error = true; }
+	void snoop_w(offs_t offset, u8 data);
+	void bus_error_w(int state);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -71,7 +73,7 @@ protected:
 		bool const g;  // global
 		bool const wt; // writethrough
 	};
-	std::optional<translate_result> translate(u32 virtual_address, bool supervisor, bool write);
+	std::optional<translate_result> translate(offs_t virtual_address, bool supervisor, bool write);
 
 	struct cache_set
 	{
@@ -103,7 +105,7 @@ protected:
 		}
 		line[4];
 	};
-	typedef bool (mc88200_device::cache_set::cache_line::* match_function)(u32 const) const;
+	typedef bool (cache_set::cache_line::* match_function)(u32 const) const;
 
 	std::optional<unsigned> cache_replace(cache_set const &cs);
 	void cache_flush(unsigned const start, unsigned const limit, match_function match, bool const copyback, bool const invalidate);
@@ -112,7 +114,10 @@ protected:
 	template <typename T> bool mbus_write(u32 address, T data, bool flush = false);
 
 private:
-	required_address_space m_mbus;
+	required_address_space m_mbus_space;
+	memory_access<32, 2, 0, ENDIANNESS_BIG>::specific m_mbus;
+
+	devcb_write8 m_global; // global transaction notification callback
 
 	u32 m_idr;  // identification register
 	u32 m_scr;  // system command register

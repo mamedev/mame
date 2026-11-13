@@ -237,7 +237,7 @@ void mcf5206e_device::device_start()
 
 				case 3:
 					space(AS_IO).write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-					space(AS_IO).write_dword(address + 1, rotl_32(data, 8), 0xffffff00U);
+					space(AS_IO).write_dword(address + 1, std::rotl(data, 8), 0xffffff00U);
 					break;
 			}
 			return;
@@ -260,7 +260,7 @@ void mcf5206e_device::device_start()
 
 		case 3:
 			m_program32.write_dword(address - 3, dword_from_unaligned_word((data & 0xffff0000U) >> 16), 0x000000ff);
-			m_program32.write_dword(address + 1, rotl_32(data, 8), 0xffffff00U);
+			m_program32.write_dword(address + 1, std::rotl(data, 8), 0xffffff00U);
 			break;
 		}
 	};

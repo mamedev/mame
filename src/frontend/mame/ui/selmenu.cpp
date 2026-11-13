@@ -1435,7 +1435,7 @@ bool menu_select_launch::select_part(mame_ui_manager &mui, render_target &target
 void menu_select_launch::draw_toolbar(u32 flags, float x1, float y1, float x2, float y2)
 {
 	// work out which buttons we're going to draw
-	bool const have_parent(m_is_swlist || !stack_has_special_main_menu());
+	bool const have_parent(!is_special_main_menu());
 	auto const *const toolbar_bitmaps(m_is_swlist ? SW_TOOLBAR_BITMAPS : SYS_TOOLBAR_BITMAPS);
 	unsigned const toolbar_count(m_is_swlist ? std::size(SW_TOOLBAR_BITMAPS) : std::size(SYS_TOOLBAR_BITMAPS));
 

@@ -43,6 +43,14 @@ protected:
 
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
+	enum
+	{
+		IRQS_IRQ8,
+		IRQS_IRQ16/*,
+		IRQS_IRQ_MIDI
+		*/
+	};
+
 	void io_map(address_map &map) ATTR_COLD;
 
 	required_device<ymf262_device> m_opl3;
@@ -54,7 +62,6 @@ private:
 	required_device<input_merger_device> m_dmas;
 	required_device<pc_joy_device> m_joy;
 
-	bool m_irq8, m_irq16;
 	u8 m_irq_sel, m_dma_sel;
 };
 

@@ -269,6 +269,7 @@ void fortyl_state::driver_init()
 	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x2000);
 
+	// TODO: belongs to video_start
 	m_pix_color[0] = 0x000;
 	m_pix_color[1] = 0x1e3;
 	m_pix_color[2] = 0x16c;
@@ -655,7 +656,7 @@ void fortyl_state::common(machine_config &config)
 	MB14241(config, "mb14241");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(64*8, 32*8);

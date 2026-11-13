@@ -41,6 +41,13 @@ protected:
 
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
+	enum
+	{
+		IRQS_IRQ8,
+		IRQS_IRQ16,
+		IRQS_IRQ_MIDI
+	};
+
 	uint8_t mpu401_r(offs_t offset);
 	void mpu401_w(offs_t offset, uint8_t data);
 
@@ -56,7 +63,6 @@ private:
 
 	// internal state
 	uint8_t m_mpu_byte;
-	bool m_irq8, m_irq16, m_irq_midi;
 	uint8_t m_irq_sel, m_dma_sel;
 };
 

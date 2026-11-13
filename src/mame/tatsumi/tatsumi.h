@@ -32,7 +32,7 @@ public:
 		, m_subregion(*this, "slave_rom")
 	{ }
 
-	void init_tatsumi();
+	void init_tatsumi() ATTR_COLD;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -47,8 +47,8 @@ protected:
 	optional_shared_ptr<uint16_t> m_sharedram;
 	required_shared_ptr<uint16_t> m_sprite_control_ram;
 	required_shared_ptr<uint16_t> m_spriteram;
-	required_memory_region m_mainregion;
-	required_memory_region m_subregion;
+	required_region_ptr<uint16_t> m_mainregion;
+	required_region_ptr<uint16_t> m_subregion;
 
 	static constexpr int CLOCK_1 = 16'000'000;
 	static constexpr int CLOCK_2 = 50'000'000;

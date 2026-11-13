@@ -44,16 +44,67 @@
 #include "cpu/m68000/m68008.h"
 
 
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+namespace {
+
+class a2bus_68k_device:
+	public device_t,
+	public device_a2bus_card_interface
+{
+protected:
+	a2bus_68k_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	// overrides of standard a2bus slot functions
+	virtual uint8_t read_c0nx(uint8_t offset) override;
+	virtual void write_c0nx(uint8_t offset, uint8_t data) override;
+	virtual void reset_from_bus() override;
+
+	uint8_t dma_r(offs_t offset);
+	void dma_w(offs_t offset, uint8_t data);
+
+	required_device<cpu_device> m_m68008;
+
+private:
+	bool m_bEnabled;
+};
+
+class a2bus_q68_device : public a2bus_68k_device
+{
+public:
+	a2bus_q68_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	void m68008_mem(address_map &map) ATTR_COLD;
+};
+
+class a2bus_q68plus_device : public a2bus_68k_device
+{
+public:
+	a2bus_q68plus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static auto parent_rom_device_type() { return &A2BUS_Q68; }
+
+protected:
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+private:
+	void m68008_mem(address_map &map) ATTR_COLD;
+};
+
+
 /***************************************************************************
     PARAMETERS
 ***************************************************************************/
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-DEFINE_DEVICE_TYPE(A2BUS_Q68, a2bus_q68_device, "a2q68", "Stellation Two Q-68")
-DEFINE_DEVICE_TYPE(A2BUS_Q68PLUS, a2bus_q68plus_device, "a2q68plus", "Stellation Two Q-68 Plus")
 
 void a2bus_q68_device::m68008_mem(address_map &map)
 {
@@ -84,13 +135,13 @@ ROM_END
 
 void a2bus_q68_device::device_add_mconfig(machine_config &config)
 {
-	M68008(config, m_m68008, 1021800*7); // M68008 runs at 7.16 MHz
+	M68008(config, m_m68008, A2BUS_1M_CLOCK*7); // M68008 runs at 7.16 MHz
 	m_m68008->set_addrmap(AS_PROGRAM, &a2bus_q68_device::m68008_mem);
 }
 
 void a2bus_q68plus_device::device_add_mconfig(machine_config &config)
 {
-	M68008(config, m_m68008, 1021800*7); // M68008 runs at 7.16 MHz
+	M68008(config, m_m68008, A2BUS_1M_CLOCK*7); // M68008 runs at 7.16 MHz
 	m_m68008->set_addrmap(AS_PROGRAM, &a2bus_q68plus_device::m68008_mem);
 }
 
@@ -250,3 +301,12 @@ void a2bus_68k_device::dma_w(offs_t offset, uint8_t data)
 		}
 	}
 }
+
+} // anonymous namespace
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_Q68, device_a2bus_card_interface, a2bus_q68_device, "a2q68", "Stellation Two Q-68")
+DEFINE_DEVICE_TYPE_PRIVATE(A2BUS_Q68PLUS, device_a2bus_card_interface, a2bus_q68plus_device, "a2q68plus", "Stellation Two Q-68 Plus")

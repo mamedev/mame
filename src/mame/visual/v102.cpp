@@ -115,7 +115,7 @@ void v102_state::v102(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &v102_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &v102_state::io_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(18.575_MHz_XTAL, 970, 0, 800, 319, 0, 300);
 	//screen.set_raw(18.575_MHz_XTAL, 948, 0, 792, 319, 0, 300);
 	screen.set_screen_update(FUNC(v102_state::screen_update));

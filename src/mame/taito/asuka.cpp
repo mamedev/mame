@@ -1116,7 +1116,7 @@ void bonzeadv_state::bonzeadv(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -1172,7 +1172,7 @@ void msm_state::asuka(machine_config &config)
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -1241,7 +1241,7 @@ void cadash_state::cadash(machine_config &config)
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -1299,7 +1299,7 @@ void msm_state::mofflott(machine_config &config)
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -1364,7 +1364,7 @@ void base_state::eto(machine_config &config)
 	tc0220ioc.read_7_callback().set_ioport("IN2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(40*8, 32*8);
@@ -2254,6 +2254,7 @@ ROM_END
 void base_state::init_earthjkr()
 {
 	u16 *rom = (u16 *)memregion("maincpu")->base();
+	// HACK: get rid of this
 	// 357c -> 317c, I think this is bitrot, see ROM loading for which ROM needs redumping, causes rowscroll to be broken on final stage (writes to ROM area instead)
 	// code is correct in the 'prototype?' set
 	rom[0x7aaa/2] = 0x317c;

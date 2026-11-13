@@ -192,7 +192,7 @@ license:CC0-1.0
 	</hash>
 	<hash crc32="7dc880eb" name="Anaza">
 		<year>1987</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="c6f74489" name="Andorogynus">
@@ -2686,7 +2686,7 @@ license:CC0-1.0
 		<extrainfo>0</extrainfo>
 	</hash>
 	<hash crc32="ebccb796" name="Mon Mon Monster">
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 		<year>1989</year>
 		<status>needs msx2</status>
 		<extrainfo>4</extrainfo>
@@ -4077,7 +4077,7 @@ license:CC0-1.0
 	</hash>
 	<hash crc32="26e34f05" name="The Fairy Land Story">
 		<year>1987</year>
-		<manufacturer>Hot-B</manufacturer>
+		<manufacturer>Hot-B Co.</manufacturer>
 		<extrainfo>4</extrainfo>
 	</hash>
 	<hash crc32="ed74f436" name="The Fairyland Story (hacked)">

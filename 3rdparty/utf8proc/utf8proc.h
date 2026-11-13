@@ -36,16 +36,16 @@
  *
  * The features of utf8proc include:
  *
- * - Transformation of strings (@ref utf8proc_map) to:
+ * - Transformation of strings (utf8proc_map()) to:
  *    - decompose (@ref UTF8PROC_DECOMPOSE) or compose (@ref UTF8PROC_COMPOSE) Unicode combining characters (http://en.wikipedia.org/wiki/Combining_character)
  *    - canonicalize Unicode compatibility characters (@ref UTF8PROC_COMPAT)
  *    - strip "ignorable" (@ref UTF8PROC_IGNORE) characters, control characters (@ref UTF8PROC_STRIPCC), or combining characters such as accents (@ref UTF8PROC_STRIPMARK)
  *    - case-folding (@ref UTF8PROC_CASEFOLD)
- * - Unicode normalization: @ref utf8proc_NFD, @ref utf8proc_NFC, @ref utf8proc_NFKD, @ref utf8proc_NFKC
- * - Detecting grapheme boundaries (@ref utf8proc_grapheme_break and @ref UTF8PROC_CHARBOUND)
- * - Character-width computation: @ref utf8proc_charwidth
- * - Classification of characters by Unicode category: @ref utf8proc_category and @ref utf8proc_category_string
- * - Encode (@ref utf8proc_encode_char) and decode (@ref utf8proc_iterate) Unicode codepoints to/from UTF-8.
+ * - Unicode normalization: utf8proc_NFD(), utf8proc_NFC(), utf8proc_NFKD(), utf8proc_NFKC()
+ * - Detecting grapheme boundaries (utf8proc_grapheme_break() and @ref UTF8PROC_CHARBOUND)
+ * - Character-width computation: utf8proc_charwidth()
+ * - Classification of characters by Unicode category: utf8proc_category() and utf8proc_category_string()
+ * - Encode (utf8proc_encode_char()) and decode (utf8proc_iterate()) Unicode codepoints to/from UTF-8.
  */
 
 /** @file */
@@ -59,7 +59,7 @@
  * semantic-versioning rules (http://semver.org) based on API
  * compatibility.
  *
- * This is also returned at runtime by @ref utf8proc_version; however, the
+ * This is also returned at runtime by utf8proc_version(); however, the
  * runtime version may append a string like "-dev" to the version number
  * for prerelease versions.
  *
@@ -71,15 +71,15 @@
 /** The MAJOR version number (increased when backwards API compatibility is broken). */
 #define UTF8PROC_VERSION_MAJOR 2
 /** The MINOR version number (increased when new functionality is added in a backwards-compatible manner). */
-#define UTF8PROC_VERSION_MINOR 9
+#define UTF8PROC_VERSION_MINOR 11
 /** The PATCH version (increased for fixes that do not change the API). */
-#define UTF8PROC_VERSION_PATCH 0
+#define UTF8PROC_VERSION_PATCH 3
 /** @} */
 
 #include <stdlib.h>
 
 #if defined(_MSC_VER) && _MSC_VER < 1800
-// MSVC prior to 2013 lacked stdbool.h and inttypes.h
+// MSVC prior to 2013 lacked stdbool.h and stdint.h
 typedef signed char utf8proc_int8_t;
 typedef unsigned char utf8proc_uint8_t;
 typedef short utf8proc_int16_t;
@@ -107,7 +107,7 @@ typedef bool utf8proc_bool;
 #else
 #  include <stddef.h>
 #  include <stdbool.h>
-#  include <inttypes.h>
+#  include <stdint.h>
 typedef int8_t utf8proc_int8_t;
 typedef uint8_t utf8proc_uint8_t;
 typedef int16_t utf8proc_int16_t;
@@ -121,7 +121,9 @@ typedef bool utf8proc_bool;
 #include <limits.h>
 
 #ifdef UTF8PROC_STATIC
-#  define UTF8PROC_DLLEXPORT
+#  ifndef UTF8PROC_DLLEXPORT
+#    define UTF8PROC_DLLEXPORT
+#  endif
 #else
 #  ifdef _WIN32
 #    ifdef UTF8PROC_EXPORTS
@@ -150,7 +152,7 @@ typedef enum {
   UTF8PROC_STABLE    = (1<<1),
   /** Compatibility decomposition (i.e. formatting information is lost). */
   UTF8PROC_COMPAT    = (1<<2),
-  /** Return a result with decomposed characters. */
+  /** Return a result with composed characters. */
   UTF8PROC_COMPOSE   = (1<<3),
   /** Return a result with decomposed characters. */
   UTF8PROC_DECOMPOSE = (1<<4),
@@ -255,20 +257,58 @@ typedef struct utf8proc_property_struct {
   utf8proc_uint16_t uppercase_seqindex;
   utf8proc_uint16_t lowercase_seqindex;
   utf8proc_uint16_t titlecase_seqindex;
-  utf8proc_uint16_t comb_index;
+  /**
+   * Character combining table.
+   *
+   * The character combining table is formally indexed by two
+   * characters, the first and second character that might form a
+   * combining pair. The table entry then contains the combined
+   * character. Most character pairs cannot be combined. There are
+   * about 1,000 characters that can be the first character in a
+   * combining pair, and for most, there are only a handful for
+   * possible second characters.
+   *
+   * The combining table is stored as sparse matrix in the CSR
+   * (compressed sparse row) format. That is, it is stored as two
+   * arrays, `utf8proc_uint32_t utf8proc_combinations_second[]` and
+   * `utf8proc_uint32_t utf8proc_combinations_combined[]`. These
+   * contain the second combining characters and the combined
+   * character of every combining pair.
+   *
+   * - `comb_index`: Index into the combining table if this character
+   *   is the first character in a combining pair, else 0x3ff
+   *
+   * - `comb_length`: Number of table entries for this first character
+   *
+   * - `comb_is_second`: As optimization we also record whether this
+   *   character is the second combining character in any pair. If
+   *   not, we can skip the table lookup.
+   *
+   * A table lookup starts from a given character pair. It first
+   * checks whether the first character is stored in the table
+   * (checking whether the index is 0x3ff) and whether the second
+   * index is stored in the table (looking at `comb_is_second`). If
+   * so, the `comb_length` table entries will be checked sequentially
+   * for a match.
+   */
+  utf8proc_uint16_t comb_index:10;
+  utf8proc_uint16_t comb_length:5;
+  utf8proc_uint16_t comb_issecond:1;
   unsigned bidi_mirrored:1;
   unsigned comp_exclusion:1;
   /**
    * Can this codepoint be ignored?
    *
-   * Used by @ref utf8proc_decompose_char when @ref UTF8PROC_IGNORE is
+   * Used by utf8proc_decompose_char() when @ref UTF8PROC_IGNORE is
    * passed as an option.
    */
   unsigned ignorable:1;
   unsigned control_boundary:1;
   /** The width of the codepoint. */
   unsigned charwidth:2;
-  unsigned pad:2;
+  /** East Asian width class A */
+  unsigned ambiguous_width:1;
+  unsigned pad:1;
   /**
    * Boundclass.
    * @see utf8proc_boundclass_t.
@@ -398,8 +438,8 @@ typedef enum {
 } utf8proc_indic_conjunct_break_t;
 
 /**
- * Function pointer type passed to @ref utf8proc_map_custom and
- * @ref utf8proc_decompose_custom, which is used to specify a user-defined
+ * Function pointer type passed to utf8proc_map_custom() and
+ * utf8proc_decompose_custom(), which is used to specify a user-defined
  * mapping of codepoints to be applied in conjunction with other mappings.
  */
 typedef utf8proc_int32_t (*utf8proc_custom_func)(utf8proc_int32_t codepoint, void *data);
@@ -424,7 +464,7 @@ UTF8PROC_DLLEXPORT const char *utf8proc_unicode_version(void);
 
 /**
  * Returns an informative error string for the given utf8proc error code
- * (e.g. the error codes returned by @ref utf8proc_map).
+ * (e.g. the error codes returned by utf8proc_map()).
  */
 UTF8PROC_DLLEXPORT const char *utf8proc_errmsg(utf8proc_ssize_t errcode);
 
@@ -479,7 +519,7 @@ UTF8PROC_DLLEXPORT const utf8proc_property_t *utf8proc_get_property(utf8proc_int
  * @param dst the destination buffer.
  * @param bufsize the size of the destination buffer.
  * @param options one or more of the following flags:
- * - @ref UTF8PROC_REJECTNA  - return an error `codepoint` is unassigned
+ * - @ref UTF8PROC_REJECTNA  - return an error if `codepoint` is unassigned
  * - @ref UTF8PROC_IGNORE    - strip "default ignorable" codepoints
  * - @ref UTF8PROC_CASEFOLD  - apply Unicode casefolding
  * - @ref UTF8PROC_COMPAT    - replace certain codepoints with their
@@ -494,9 +534,14 @@ UTF8PROC_DLLEXPORT const utf8proc_property_t *utf8proc_get_property(utf8proc_int
  * option is used.  If the string is being processed in order, this can be initialized to 0 for
  * the beginning of the string, and is thereafter updated automatically.  Otherwise, this parameter is ignored.
  *
+ * In the current version of utf8proc, the maximum destination buffer with the @ref UTF8PROC_DECOMPOSE
+ * option is 4 elements (or double that with @ref UTF8PROC_CHARBOUND), so this is a good default size.
+ * However, this may increase in future Unicode versions, so you should always check the return value
+ * as described below.
+ *
  * @return
  * In case of success, the number of codepoints written is returned; in case
- * of an error, a negative error code is returned (@ref utf8proc_errmsg).
+ * of an error, a negative error code is returned (utf8proc_errmsg()).
  * @par
  * If the number of written codepoints would be bigger than `bufsize`, the
  * required buffer size is returned, while the buffer will be overwritten with
@@ -508,7 +553,7 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose_char(
 );
 
 /**
- * The same as @ref utf8proc_decompose_char, but acts on a whole UTF-8
+ * The same as utf8proc_decompose_char(), but acts on a whole UTF-8
  * string and orders the decomposed sequences correctly.
  *
  * If the @ref UTF8PROC_NULLTERM flag in `options` is set, processing
@@ -517,8 +562,8 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose_char(
  * codepoints) is written into the buffer being pointed to by
  * `buffer` (which must contain at least `bufsize` entries).  In case of
  * success, the number of codepoints written is returned; in case of an
- * error, a negative error code is returned (@ref utf8proc_errmsg).
- * See @ref utf8proc_decompose_custom to supply additional transformations.
+ * error, a negative error code is returned (utf8proc_errmsg()).
+ * See utf8proc_decompose_custom() to supply additional transformations.
  *
  * If the number of written codepoints would be bigger than `bufsize`, the
  * required buffer size is returned, while the buffer will be overwritten with
@@ -530,10 +575,10 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose(
 );
 
 /**
- * The same as @ref utf8proc_decompose, but also takes a `custom_func` mapping function
+ * The same as utf8proc_decompose(), but also takes a `custom_func` mapping function
  * that is called on each codepoint in `str` before any other transformations
  * (along with a `custom_data` pointer that is passed through to `custom_func`).
- * The `custom_func` argument is ignored if it is `NULL`.  See also @ref utf8proc_map_custom.
+ * The `custom_func` argument is ignored if it is `NULL`.  See also utf8proc_map_custom().
  */
 UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose_custom(
   const utf8proc_uint8_t *str, utf8proc_ssize_t strlen,
@@ -559,7 +604,7 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_decompose_custom(
  *
  * @return
  * In case of success, the length (in codepoints) of the normalized UTF-32 string is
- * returned; otherwise, a negative error code is returned (@ref utf8proc_errmsg).
+ * returned; otherwise, a negative error code is returned (utf8proc_errmsg()).
  *
  * @warning The entries of the array pointed to by `str` have to be in the
  *          range `0x0000` to `0x10FFFF`. Otherwise, the program might crash!
@@ -587,7 +632,7 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_normalize_utf32(utf8proc_int32_t *b
  * @return
  * In case of success, the length (in bytes) of the resulting nul-terminated
  * UTF-8 string is returned; otherwise, a negative error code is returned
- * (@ref utf8proc_errmsg).
+ * (utf8proc_errmsg()).
  *
  * @warning The amount of free space pointed to by `buffer` must
  *          exceed the amount of the input data by one byte, and the
@@ -617,7 +662,7 @@ UTF8PROC_DLLEXPORT utf8proc_bool utf8proc_grapheme_break_stateful(
     utf8proc_int32_t codepoint1, utf8proc_int32_t codepoint2, utf8proc_int32_t *state);
 
 /**
- * Same as @ref utf8proc_grapheme_break_stateful, except without support for the
+ * Same as utf8proc_grapheme_break_stateful(), except without support for the
  * Unicode 9 additions to the algorithm. Supported for legacy reasons.
  */
 UTF8PROC_DLLEXPORT utf8proc_bool utf8proc_grapheme_break(
@@ -664,8 +709,16 @@ UTF8PROC_DLLEXPORT int utf8proc_isupper(utf8proc_int32_t c);
  *
  * @note
  * If you want to check for particular types of non-printable characters,
- * (analogous to `isprint` or `iscntrl`), use @ref utf8proc_category. */
+ * (analogous to `isprint` or `iscntrl`), use utf8proc_category(). */
 UTF8PROC_DLLEXPORT int utf8proc_charwidth(utf8proc_int32_t codepoint);
+
+/**
+ * Given a codepoint, return whether it has East Asian width class A (Ambiguous)
+ *
+ * Codepoints with this property are considered to have charwidth 1 (if they are printable)
+ * but some East Asian fonts render them as double width.
+ */
+UTF8PROC_DLLEXPORT utf8proc_bool utf8proc_charwidth_ambiguous(utf8proc_int32_t codepoint);
 
 /**
  * Return the Unicode category for the codepoint (one of the
@@ -690,20 +743,24 @@ UTF8PROC_DLLEXPORT const char *utf8proc_category_string(utf8proc_int32_t codepoi
  * contain NULL characters with the string if `str` contained NULL
  * characters). Other flags in the `options` field are passed to the
  * functions defined above, and regarded as described.  See also
- * @ref utf8proc_map_custom to supply a custom codepoint transformation.
+ * utf8proc_map_custom() to supply a custom codepoint transformation.
  *
  * In case of success the length of the new string is returned,
  * otherwise a negative error code is returned.
  *
  * @note The memory of the new UTF-8 string will have been allocated
  * with `malloc`, and should therefore be deallocated with `free`.
+ *
+ * @note `utf8proc_map` simply calls `utf8proc_decompose` followed by `utf8proc_reencode`,
+ * and applications requiring greater control over memory allocation should instead call
+ * those two functions directly.
  */
 UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_map(
   const utf8proc_uint8_t *str, utf8proc_ssize_t strlen, utf8proc_uint8_t **dstptr, utf8proc_option_t options
 );
 
 /**
- * Like @ref utf8proc_map, but also takes a `custom_func` mapping function
+ * Like utf8proc_map(), but also takes a `custom_func` mapping function
  * that is called on each codepoint in `str` before any other transformations
  * (along with a `custom_data` pointer that is passed through to `custom_func`).
  * The `custom_func` argument is ignored if it is `NULL`.
@@ -717,7 +774,7 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_map_custom(
  *
  * Returns a pointer to newly allocated memory of a NFD, NFC, NFKD, NFKC or
  * NFKC_Casefold normalized version of the null-terminated string `str`.  These
- * are shortcuts to calling @ref utf8proc_map with @ref UTF8PROC_NULLTERM
+ * are shortcuts to calling utf8proc_map() with @ref UTF8PROC_NULLTERM
  * combined with @ref UTF8PROC_STABLE and flags indicating the normalization.
  */
 /** @{ */

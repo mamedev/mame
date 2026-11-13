@@ -1541,8 +1541,8 @@ void lynx_state::update_screen_timing()
 			m_pixclock = time_factor(m_timer[0].timer_clock());
 			m_hcount = m_timer[0].bakup; // TODO: multiplied internally?
 			m_vcount = m_timer[2].bakup;
-			attotime framerate = attotime::from_hz(m_pixclock) * (m_hcount + 1) * (m_vcount + 1);
-			m_screen->configure(m_screen->width(), m_screen->height(), m_screen->visible_area(), framerate.attoseconds());
+			attotime framerate = attotime::from_ticks((m_hcount + 1) * (m_vcount + 1), m_pixclock);
+			m_screen->configure(m_screen->width(), m_screen->height(), m_screen->visible_area(), framerate);
 		}
 	}
 }

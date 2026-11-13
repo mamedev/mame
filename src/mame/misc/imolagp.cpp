@@ -206,7 +206,7 @@ uint32_t imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind1
 	// draw solid background layer first, then sprites on top
 	for (int layer = 0; layer < 2; layer++)
 	{
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			uint8_t const *const source = &m_videoram[layer][(y & 0xff) * 0x40];
 			uint16_t *const dest = &bitmap.pix(y & 0xff);
@@ -221,7 +221,7 @@ uint32_t imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind1
 					for (int x2 = 0; x2 < 4; x2++)
 					{
 						uint8_t const offset = x + x2;
-						if (offset >= cliprect.min_x && offset <= cliprect.max_x)
+						if (cliprect.containsx(offset))
 							dest[offset] = color | (data >> x2 & 1);
 					}
 				}
@@ -560,7 +560,7 @@ void imolagp_state::imolagp(machine_config &config)
 	/* video hardware */
 	// Part of the screen is obscured by the cabinet - this is handled by the visible area and physical aspect ratio here
 	// It would be better to move this into the layout so that the video output can be used with a restored cabinet.
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256,256);

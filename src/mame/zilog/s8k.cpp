@@ -302,6 +302,6 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS      INIT        COMPANY  FULLNAME                   FLAGS
-COMP( 1982, s8000,   0,      0,      s8k,     s8k,   s8k_state, empty_init, "Zilog", "System 8000",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1982, s8000,   0,      0,      s8k,     s8k,   s8k_state, empty_init, "Zilog", "System 8000",             MACHINE_NO_SOUND_HW )
 COMP( 1982, s8000v1, s8000,  0,      s8k_v1,  s8k,   s8k_state, empty_init, "Zilog", "System 8000 Model 20/30", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
-COMP( 1984, s8000s2, s8000,  0,      s8k_s2,  s8k,   s8k_state, empty_init, "Zilog", "System 8000 Series Two",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW )
+COMP( 1984, s8000s2, s8000,  0,      s8k_s2,  s8k,   s8k_state, empty_init, "Zilog", "System 8000 Series Two",  MACHINE_NO_SOUND_HW )

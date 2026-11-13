@@ -666,7 +666,7 @@ void xavix_state::update_pen(int pen, uint8_t shval, uint8_t lval)
 
 void xavix_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		draw_tilemap_line(screen, bitmap, cliprect, which, y);
 	}
@@ -1030,7 +1030,7 @@ void xavix_state::draw_tilemap_line(screen_device &screen, bitmap_rgb32 &bitmap,
 
 void xavix_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		draw_sprites_line(screen, bitmap, cliprect, y);
 	}
@@ -1274,71 +1274,68 @@ void superxavix_state::get_tile_pixel_dat(uint8_t &dat, int bpp)
 
 void xavix_state::draw_tile_line(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int tile, int bpp, int xpos, int ypos, int drawheight, int drawwidth, int flipx, int flipy, int pal, int zval, int line)
 {
+	if (!cliprect.containsy(ypos))
+		return;
+
+	if (!cliprect.overlapsx(xpos * m_video_hres_multiplier, ((xpos + drawwidth) * m_video_hres_multiplier) - 1))
+		return;
+
 	const pen_t *paldata = m_palette->pens();
-	if (ypos > cliprect.max_y || ypos < cliprect.min_y)
-		return;
 
-	if (((xpos * m_video_hres_multiplier) > cliprect.max_x) || (((xpos * m_video_hres_multiplier) + drawwidth * m_video_hres_multiplier) < cliprect.min_x))
-		return;
+	// if bpp>4 then ignore unaligned palette selects bits based on bpp
+	// ttv_lotr uses 5bpp graphics (so 32 colour alignment) but sets palette 0xf (a 16 colour boundary) when it expects palette 0xe
+	if (bpp>4)
+		pal &= (0xf<<(bpp-4));
 
-	if ((ypos >= cliprect.min_y && ypos <= cliprect.max_y))
+	int bits_per_tileline = drawwidth * bpp;
+
+	// set the address here so we can increment in bits in the draw function
+	set_data_address(tile, 0);
+
+	if (flipy)
+		line = (drawheight - 1) - line;
+
+	m_tmp_dataaddress = m_tmp_dataaddress + ((line * bits_per_tileline) / 8);
+	m_tmp_databit = (line * bits_per_tileline) % 8;
+
+	for (int x = 0; x < drawwidth; x++)
 	{
-		// if bpp>4 then ignore unaligned palette selects bits based on bpp
-		// ttv_lotr uses 5bpp graphics (so 32 colour alignment) but sets palette 0xf (a 16 colour boundary) when it expects palette 0xe
-		if (bpp>4)
-			pal &= (0xf<<(bpp-4));
-
-		int bits_per_tileline = drawwidth * bpp;
-
-		// set the address here so we can increment in bits in the draw function
-		set_data_address(tile, 0);
-
-		if (flipy)
-			line = (drawheight - 1) - line;
-
-		m_tmp_dataaddress = m_tmp_dataaddress + ((line * bits_per_tileline) / 8);
-		m_tmp_databit = (line * bits_per_tileline) % 8;
-
-		for (int x = 0; x < drawwidth; x++)
+		int col;
+		if (flipx)
 		{
-			int col;
+			col = xpos + (drawwidth - 1) - x;
+		}
+		else
+		{
+			col = xpos + x;
+		}
 
-			if (flipx)
+		uint8_t dat = 0;
+
+		get_tile_pixel_dat(dat, bpp);
+
+		col = col * m_video_hres_multiplier;
+
+		if (cliprect.containsx(col))
+		{
+			uint16_t *const zyposptr = &m_zbuffer.pix(ypos);
+
+			if (zval >= zyposptr[col])
 			{
-				col = xpos + (drawwidth - 1) - x;
-			}
-			else
-			{
-				col = xpos + x;
-			}
+				int pen = (dat + (pal << 4)) & 0xff;
 
-			uint8_t dat = 0;
-
-			get_tile_pixel_dat(dat, bpp);
-
-			col = col * m_video_hres_multiplier;
-
-			if ((col >= cliprect.min_x && col <= cliprect.max_x))
-			{
-				uint16_t *const zyposptr = &m_zbuffer.pix(ypos);
-
-				if (zval >= zyposptr[col])
+				if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
 				{
-					int pen = (dat + (pal << 4)) & 0xff;
+					uint32_t *const yposptr = &bitmap.pix(ypos);
+					yposptr[col] = paldata[pen];
+					if (m_video_hres_multiplier == 2)
+						yposptr[col+1] = paldata[pen];
 
-					if ((m_palram_sh[pen] & 0x1f) < 24) // hue values 24-31 are transparent
-					{
-						uint32_t *const yposptr = &bitmap.pix(ypos);
-						yposptr[col] = paldata[pen];
-						if (m_video_hres_multiplier == 2)
-							yposptr[col+1] = paldata[pen];
+					zyposptr[col] = zval;
 
-						zyposptr[col] = zval;
+					if (m_video_hres_multiplier == 2)
+						zyposptr[col+1] = zval;
 
-						if (m_video_hres_multiplier == 2)
-							zyposptr[col+1] = zval;
-
-					}
 				}
 			}
 		}
@@ -1351,11 +1348,6 @@ rectangle xavix_state::do_arena(screen_device &screen, bitmap_rgb32 &bitmap, con
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
 	rectangle clip = cliprect;
-
-	clip.min_y = cliprect.min_y;
-	clip.max_y = cliprect.max_y;
-	clip.min_x = cliprect.min_x;
-	clip.max_x = cliprect.max_x;
 
 	if (m_arena_control & 0x01)
 	{
@@ -1370,14 +1362,11 @@ rectangle xavix_state::do_arena(screen_device &screen, bitmap_rgb32 &bitmap, con
 		*/
 		if (((m_arena_start != 0x00) && (m_arena_end != 0x00)) && ((m_arena_start != 0xff) && (m_arena_end != 0xff)))
 		{
-			clip.max_x = (m_arena_start - 3) * m_video_hres_multiplier; // must be -3 to hide garbage on the right hand side of snowboarder
-			clip.min_x = (m_arena_end - 2) * m_video_hres_multiplier; // must be -2 to render a single pixel line of the left border on Mappy remix (verified to render), although this creates a single pixel gap on the left of snowboarder status bar (need to verify)
+			clip.setx(
+					(m_arena_end - 2) * m_video_hres_multiplier, // must be -2 to render a single pixel line of the left border on Mappy remix (verified to render), although this creates a single pixel gap on the left of snowboarder status bar (need to verify)
+					(m_arena_start - 3) * m_video_hres_multiplier); // must be -3 to hide garbage on the right hand side of snowboarder
 
-			if (clip.min_x < cliprect.min_x)
-				clip.min_x = cliprect.min_x;
-
-			if (clip.max_x > cliprect.max_x)
-				clip.max_x = cliprect.max_x;
+			clip &= cliprect;
 		}
 	}
 
@@ -1491,7 +1480,7 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 			top += vpostadjust;
 			bot += vpostadjust;
 
-			for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+			for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 			{
 				int line = y - top;
 
@@ -1529,7 +1518,7 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 						if (!is_highres)
 							realx *= 2;
 
-						if (((realx <= cliprect.max_x) && (realx >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+						if (cliprect.contains(realx, y))
 						{
 							if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
 							{
@@ -1545,7 +1534,7 @@ void superxavix_state::draw_bitmap_layer(screen_device &screen, bitmap_rgb32 &bi
 						if (!is_highres)
 							realx += 1;
 
-						if (((realx <= cliprect.max_x) && (realx >= cliprect.min_x)) && ((y <= cliprect.max_y) && (y >= cliprect.min_y)))
+						if (cliprect.contains(realx, y))
 						{
 							if ((m_bmp_palram_sh[dat] & 0x1f) < 24) // same transparency logic as everything else? (baseball title)
 							{

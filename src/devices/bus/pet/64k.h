@@ -31,15 +31,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-
-	// device_pet_expansion_card_interface overrides
-	virtual int pet_norom_r(offs_t offset, int sel) override;
-	virtual uint8_t pet_bd_r(offs_t offset, uint8_t data, int &sel) override;
-	virtual void pet_bd_w(offs_t offset, uint8_t data, int &sel) override;
+	virtual void device_post_load() override;
 
 private:
-	inline uint8_t read_ram(offs_t offset);
-	inline void write_ram(offs_t offset, uint8_t data);
+	void update_window();
+	void ctrl_w(uint8_t data);
 
 	memory_share_creator<uint8_t> m_ram;
 

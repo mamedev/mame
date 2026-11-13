@@ -41,11 +41,11 @@ uint16_t ide_controller_device::read_cs0(offs_t offset, uint16_t mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		if (ACCESSING_BITS_8_15 && offset == 1) { offset = 0; popmessage("requires ide_controller_32_device"); }
-		return internal_read_cs0(offset * 2, mem_mask);
+		return internal_read_cs0(offset * 2);
 	}
 	else
 	{
-		return internal_read_cs0((offset * 2) + 1, 0xff) << 8;
+		return internal_read_cs0((offset * 2) + 1) << 8;
 	}
 }
 
@@ -53,11 +53,11 @@ uint16_t ide_controller_device::read_cs1(offs_t offset, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return internal_read_cs1(offset * 2, mem_mask);
+		return internal_read_cs1(offset * 2);
 	}
 	else
 	{
-		return internal_read_cs1((offset * 2) + 1, mem_mask >> 8) << 8;
+		return internal_read_cs1((offset * 2) + 1) << 8;
 	}
 }
 
@@ -66,11 +66,11 @@ void ide_controller_device::write_cs0(offs_t offset, uint16_t data, uint16_t mem
 	if (ACCESSING_BITS_0_7)
 	{
 		if (ACCESSING_BITS_8_15 && offset == 1) { offset = 0; popmessage("requires ide_controller_32_device"); }
-		return internal_write_cs0(offset * 2, data, mem_mask);
+		return internal_write_cs0(offset * 2, data);
 	}
 	else
 	{
-		return internal_write_cs0((offset * 2) + 1, data >> 8, mem_mask >> 8);
+		return internal_write_cs0((offset * 2) + 1, data >> 8);
 	}
 }
 
@@ -78,11 +78,11 @@ void ide_controller_device::write_cs1(offs_t offset, uint16_t data, uint16_t mem
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return internal_write_cs1(offset * 2, data, mem_mask);
+		return internal_write_cs1(offset * 2, data);
 	}
 	else
 	{
-		return internal_write_cs1((offset * 2) + 1, data >> 8, mem_mask >> 8);
+		return internal_write_cs1((offset * 2) + 1, data >> 8);
 	}
 }
 
@@ -104,27 +104,27 @@ uint32_t ide_controller_32_device::read_cs0(offs_t offset, uint32_t mem_mask)
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			uint32_t data = internal_read_cs0((offset * 4), mem_mask);
+			uint32_t data = internal_read_cs0(offset * 4);
 
 			if (offset == 0 && ACCESSING_BITS_16_31)
-				data |= internal_read_cs0((offset * 4), mem_mask >> 16) << 16;
+				data |= internal_read_cs0(offset * 4) << 16;
 
 			return data;
 		}
 		else
 		{
-			return internal_read_cs0((offset * 4) + 1, mem_mask >> 8) << 8;
+			return internal_read_cs0((offset * 4) + 1) << 8;
 		}
 	}
 	else if (ACCESSING_BITS_16_31)
 	{
 		if (ACCESSING_BITS_16_23)
 		{
-			return internal_read_cs0((offset * 4) + 2, mem_mask >> 16) << 16;
+			return internal_read_cs0((offset * 4) + 2) << 16;
 		}
 		else
 		{
-			return internal_read_cs0((offset * 4) + 3, mem_mask >> 24) << 24;
+			return internal_read_cs0((offset * 4) + 3) << 24;
 		}
 	}
 
@@ -137,22 +137,22 @@ uint32_t ide_controller_32_device::read_cs1(offs_t offset, uint32_t mem_mask)
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			return internal_read_cs1((offset * 4), mem_mask);
+			return internal_read_cs1(offset * 4);
 		}
 		else
 		{
-			return internal_read_cs1((offset * 4) + 1, mem_mask >> 8) << 8;
+			return internal_read_cs1((offset * 4) + 1) << 8;
 		}
 	}
 	else if (ACCESSING_BITS_16_31)
 	{
 		if (ACCESSING_BITS_16_23)
 		{
-			return internal_read_cs1((offset * 4) + 2, mem_mask >> 16) << 16;
+			return internal_read_cs1((offset * 4) + 2) << 16;
 		}
 		else
 		{
-			return internal_read_cs1((offset * 4) + 3, mem_mask >> 24) << 24;
+			return internal_read_cs1((offset * 4) + 3) << 24;
 		}
 	}
 
@@ -165,25 +165,25 @@ void ide_controller_32_device::write_cs0(offs_t offset, uint32_t data, uint32_t 
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			internal_write_cs0((offset * 4), data, mem_mask);
+			internal_write_cs0((offset * 4), data);
 
 			if (offset == 0 && ACCESSING_BITS_16_31)
-				internal_write_cs0((offset * 4), data >> 16, mem_mask >> 16);
+				internal_write_cs0((offset * 4), data >> 16);
 		}
 		else
 		{
-			internal_write_cs0((offset * 4) + 1, data >> 8, mem_mask >> 8);
+			internal_write_cs0((offset * 4) + 1, data >> 8);
 		}
 	}
 	else if (ACCESSING_BITS_16_31)
 	{
 		if (ACCESSING_BITS_16_23)
 		{
-			internal_write_cs0((offset * 4) + 2, data >> 16, mem_mask >> 16);
+			internal_write_cs0((offset * 4) + 2, data >> 16);
 		}
 		else
 		{
-			internal_write_cs0((offset * 4) + 3, data >> 24, mem_mask >> 24);
+			internal_write_cs0((offset * 4) + 3, data >> 24);
 		}
 	}
 }
@@ -194,22 +194,22 @@ void ide_controller_32_device::write_cs1(offs_t offset, uint32_t data, uint32_t 
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			internal_write_cs1((offset * 4), data, mem_mask);
+			internal_write_cs1((offset * 4), data);
 		}
 		else
 		{
-			internal_write_cs1((offset * 4) + 1, data >> 8, mem_mask >> 8);
+			internal_write_cs1((offset * 4) + 1, data >> 8);
 		}
 	}
 	else if (ACCESSING_BITS_16_31)
 	{
 		if (ACCESSING_BITS_16_23)
 		{
-			internal_write_cs1((offset * 4) + 2, data >> 16, mem_mask >> 16);
+			internal_write_cs1((offset * 4) + 2, data >> 16);
 		}
 		else
 		{
-			internal_write_cs1((offset * 4) + 3, data >> 24, mem_mask >> 24);
+			internal_write_cs1((offset * 4) + 3, data >> 24);
 		}
 	}
 }

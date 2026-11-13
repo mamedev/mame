@@ -17,7 +17,7 @@
 #include "decocrpt.h"
 #include "decospr.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
@@ -64,7 +64,7 @@ protected:
 	void wcvol95_map(address_map &map) ATTR_COLD;
 
 	/* devices */
-	required_device<arm_cpu_device> m_maincpu;
+	required_device<de156_cpu_device> m_maincpu;
 	required_device<deco16ic_device> m_tilegen;
 	required_device<decospr_device> m_sprgen;
 	required_device<palette_device> m_palette;
@@ -317,7 +317,7 @@ GFXDECODE_END
 
 void wcvol95_state::vblank_interrupt(int state)
 {
-	m_maincpu->set_input_line(ARM_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 int wcvol95_state::bank_callback(int bank)
@@ -341,12 +341,12 @@ DECOSPR_PRIORITY_CB_MEMBER(wcvol95_state::pri_callback)
 void hvysmsh_state::hvysmsh(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM(config, m_maincpu, 28000000); /* Unconfirmed */
+	DE156(config, m_maincpu, 28000000); /* Unconfirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &hvysmsh_state::hvysmsh_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(40*8, 32*8);
@@ -386,12 +386,12 @@ void hvysmsh_state::hvysmsh(machine_config &config)
 void wcvol95_state::wcvol95(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM(config, m_maincpu, 28000000); /* Unconfirmed */
+	DE156(config, m_maincpu, 28000000); /* Unconfirmed */
 	m_maincpu->set_addrmap(AS_PROGRAM, &wcvol95_state::wcvol95_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(40*8, 32*8);

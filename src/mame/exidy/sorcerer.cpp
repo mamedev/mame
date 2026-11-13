@@ -440,7 +440,7 @@ void sorcerer_state::sorcerer(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &sorcerer_state::sorcerer_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(ES_VIDEO_CLOCK, 806, 0, 512, 261, 0, 240); // TODO: 313 lines in 50 Hz mode
 	screen.set_screen_update(FUNC(sorcerer_state::screen_update));
 	screen.set_palette("palette");

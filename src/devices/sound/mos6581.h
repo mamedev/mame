@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nathan Woods, Curt Coder
+// copyright-holders:Curt Coder
 /**********************************************************************
 
     MOS 6581/8580 Sound Interface Device emulation
@@ -28,6 +28,12 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+
+
+namespace reSIDfp { class residfp; }
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -35,18 +41,9 @@
 
 // ======================> mos6581_device
 
-struct SID6581_t;
-
 class mos6581_device : public device_t, public device_sound_interface
 {
 public:
-	// used by the actual SID emulator
-	enum
-	{
-		TYPE_6581,
-		TYPE_8580
-	};
-
 	mos6581_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~mos6581_device();
 
@@ -57,26 +54,30 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 protected:
-	mos6581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint32_t variant);
+	mos6581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_post_load() override;
+	virtual void device_clock_changed() override;
+	virtual void device_pre_save() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
-	// device_sound_interface overrides
+	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream) override;
 
-	void save_state(SID6581_t *token);
 private:
-	devcb_read8  m_read_potx;
-	devcb_read8  m_read_poty;
+	void configure_sampling();
+
+	devcb_read8 m_read_potx;
+	devcb_read8 m_read_poty;
 
 	sound_stream *m_stream;
 
-	int const m_variant;
-
-	std::unique_ptr<SID6581_t> m_token;
+	std::unique_ptr<reSIDfp::residfp> m_sid;
+	std::unique_ptr<uint8_t []> m_sid_state;
+	int m_sid_state_size;
+	std::vector<int16_t> m_buffer;
 };
 
 

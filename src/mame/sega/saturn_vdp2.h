@@ -14,9 +14,10 @@ public:
 	// construction/destruction
 	saturn_vdp2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void regs_map(address_map &map);
+	void regs_map(address_map &map) ATTR_COLD;
 
 	void set_is_pal(bool is_pal) { m_is_pal = is_pal; }
+	void set_dotsel(bool is_352_mode) { m_dotsel_352 = is_352_mode; }
 
 	template <typename T> void set_screen_tag(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
 
@@ -37,6 +38,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
+
 private:
 	required_device<screen_device> m_screen;
 	devcb_write_line m_vint_cb;
@@ -46,6 +48,8 @@ private:
 	emu_timer *m_video_sync_timer;
 
 	bool m_is_pal;
+	bool m_dotsel_352;
+
 	u16 m_tvmd, m_old_tvmd;
 	u8 m_disp, m_bdclmd, m_lsmd, m_vreso, m_hreso;
 	bool m_odd_bit;
@@ -60,6 +64,8 @@ private:
 	// size = 313 for PAL
 	u16 true_vcount[313][4];
 
+	bool m_vramsz;
+
 	TIMER_CALLBACK_MEMBER( sync_timer_cb );
 
 	void init_vcounter_table();
@@ -72,8 +78,6 @@ private:
 	int get_vblank_duration();
 	int get_hblank_duration();
 	int get_pixel_clock();
-
-	bool m_vramsz;
 };
 
 DECLARE_DEVICE_TYPE(SATURN_VDP2, saturn_vdp2_device)

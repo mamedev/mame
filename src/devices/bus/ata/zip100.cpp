@@ -27,30 +27,27 @@ void zip100_ide_device::device_start()
 }
 
 
-u16 zip100_ide_device::read_dma()
+void zip100_ide_device::read_dma(PAIR16 &data)
 {
-	return 0;
 }
 
-u16 zip100_ide_device::read_cs0(offs_t offset, u16 mem_mask)
+void zip100_ide_device::read_cs0(offs_t offset, PAIR16 &data)
 {
-	return 0;
 }
 
-u16 zip100_ide_device::read_cs1(offs_t offset, u16 mem_mask)
+void zip100_ide_device::read_cs1(offs_t offset, PAIR16 &data)
 {
-	return 0;
 }
 
 void zip100_ide_device::write_dma(u16 data)
 {
 }
 
-void zip100_ide_device::write_cs0(offs_t offset, u16 data, u16 mem_mask)
+void zip100_ide_device::write_cs0(offs_t offset, u16 data)
 {
 }
 
-void zip100_ide_device::write_cs1(offs_t offset, u16 data, u16 mem_mask)
+void zip100_ide_device::write_cs1(offs_t offset, u16 data)
 {
 }
 

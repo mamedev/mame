@@ -2,7 +2,7 @@
 // impl/error_code.ipp
 // ~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -16,7 +16,7 @@
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
 #include "asio/detail/config.hpp"
-#if defined(ASIO_WINDOWS) || defined(__CYGWIN__)
+#if defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
 # include <winerror.h>
 #elif defined(ASIO_WINDOWS_RUNTIME)
 # include <windows.h>
@@ -32,6 +32,14 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
+namespace error {
+namespace detail {
+
+ASIO_DECL std::error_condition error_number_to_condition(int ev);
+
+} // namespace detail
+} // namespace error
 namespace detail {
 
 class system_category : public error_category
@@ -75,7 +83,7 @@ public:
       else
         return "asio.system error";
     }
-#elif defined(ASIO_WINDOWS) || defined(__CYGWIN__)
+#elif defined(ASIO_WINDOWS) || defined(ASIO_CYGWIN_W32_SOCKETS)
     char* msg = 0;
     DWORD length = ::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER
         | FORMAT_MESSAGE_FROM_SYSTEM
@@ -90,7 +98,8 @@ public:
       return msg;
     else
       return "asio.system error";
-#else // defined(ASIO_WINDOWS_DESKTOP) || defined(__CYGWIN__)
+#else // defined(ASIO_WINDOWS_DESKTOP)
+      //   || defined(ASIO_CYGWIN_W32_SOCKETS)
 #if !defined(__sun)
     if (value == ECANCELED)
       return "Operation aborted.";
@@ -103,87 +112,14 @@ public:
     using namespace std;
     return strerror_result(strerror_r(value, buf, sizeof(buf)), buf);
 #endif
-#endif // defined(ASIO_WINDOWS_DESKTOP) || defined(__CYGWIN__)
+#endif // defined(ASIO_WINDOWS_DESKTOP)
+       //   || defined(ASIO_CYGWIN_W32_SOCKETS)
   }
 
-#if defined(ASIO_HAS_STD_ERROR_CODE)
-  std::error_condition default_error_condition(
-      int ev) const noexcept
+  std::error_condition default_error_condition(int ev) const noexcept
   {
-    switch (ev)
-    {
-    case access_denied:
-      return std::errc::permission_denied;
-    case address_family_not_supported:
-      return std::errc::address_family_not_supported;
-    case address_in_use:
-      return std::errc::address_in_use;
-    case already_connected:
-      return std::errc::already_connected;
-    case already_started:
-      return std::errc::connection_already_in_progress;
-    case broken_pipe:
-      return std::errc::broken_pipe;
-    case connection_aborted:
-      return std::errc::connection_aborted;
-    case connection_refused:
-      return std::errc::connection_refused;
-    case connection_reset:
-      return std::errc::connection_reset;
-    case bad_descriptor:
-      return std::errc::bad_file_descriptor;
-    case fault:
-      return std::errc::bad_address;
-    case host_unreachable:
-      return std::errc::host_unreachable;
-    case in_progress:
-      return std::errc::operation_in_progress;
-    case interrupted:
-      return std::errc::interrupted;
-    case invalid_argument:
-      return std::errc::invalid_argument;
-    case message_size:
-      return std::errc::message_size;
-    case name_too_long:
-      return std::errc::filename_too_long;
-    case network_down:
-      return std::errc::network_down;
-    case network_reset:
-      return std::errc::network_reset;
-    case network_unreachable:
-      return std::errc::network_unreachable;
-    case no_descriptors:
-      return std::errc::too_many_files_open;
-    case no_buffer_space:
-      return std::errc::no_buffer_space;
-    case no_memory:
-      return std::errc::not_enough_memory;
-    case no_permission:
-      return std::errc::operation_not_permitted;
-    case no_protocol_option:
-      return std::errc::no_protocol_option;
-    case no_such_device:
-      return std::errc::no_such_device;
-    case not_connected:
-      return std::errc::not_connected;
-    case not_socket:
-      return std::errc::not_a_socket;
-    case operation_aborted:
-      return std::errc::operation_canceled;
-    case operation_not_supported:
-      return std::errc::operation_not_supported;
-    case shut_down:
-      return std::make_error_condition(ev, *this);
-    case timed_out:
-      return std::errc::timed_out;
-    case try_again:
-      return std::errc::resource_unavailable_try_again;
-    case would_block:
-      return std::errc::operation_would_block;
-    default:
-      return std::make_error_condition(ev, *this);
+    return error::detail::error_number_to_condition(ev);
   }
-#endif // defined(ASIO_HAS_STD_ERROR_CODE)
 
 private:
   // Helper function to adapt the result from glibc's variant of strerror_r.
@@ -199,8 +135,12 @@ const error_category& system_category()
   return instance;
 }
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"
+
+// For implementation of asio::error::detail::error_number_to_condition.
+#include "asio/error.hpp"
 
 #endif // ASIO_IMPL_ERROR_CODE_IPP

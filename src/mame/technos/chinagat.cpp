@@ -774,7 +774,7 @@ void chinagat_state::chinagat(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000)); // heavy interleaving to sync up sprite<->main CPUs
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);   // based on ddragon driver
 	m_screen->set_screen_update(FUNC(chinagat_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -821,7 +821,7 @@ void chinagat_state::saiyugoub1(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000));  // heavy interleaving to sync up sprite<->main CPU's
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);   // based on ddragon driver
 	m_screen->set_screen_update(FUNC(chinagat_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -862,7 +862,7 @@ void chinagat_state::saiyugoub2(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(6000)); // heavy interleaving to sync up sprite<->main CPU's
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240);   // based on ddragon driver
 	m_screen->set_screen_update(FUNC(chinagat_state::screen_update));
 	m_screen->set_palette(m_palette);

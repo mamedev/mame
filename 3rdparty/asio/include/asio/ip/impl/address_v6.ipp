@@ -2,7 +2,7 @@
 // ip/impl/address_v6.ipp
 // ~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -29,6 +29,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ip {
 
 address_v6::address_v6() noexcept
@@ -103,33 +104,6 @@ std::string address_v6::to_string() const
   return addr;
 }
 
-#if !defined(ASIO_NO_DEPRECATED)
-std::string address_v6::to_string(asio::error_code& ec) const
-{
-  char addr_str[asio::detail::max_addr_v6_str_len];
-  const char* addr =
-    asio::detail::socket_ops::inet_ntop(
-        ASIO_OS_DEF(AF_INET6), &addr_, addr_str,
-        asio::detail::max_addr_v6_str_len, scope_id_, ec);
-  if (addr == 0)
-    return std::string();
-  return addr;
-}
-
-address_v4 address_v6::to_v4() const
-{
-  if (!is_v4_mapped() && !is_v4_compatible())
-  {
-    bad_address_cast ex;
-    asio::detail::throw_exception(ex);
-  }
-
-  address_v4::bytes_type v4_bytes = { { addr_.s6_addr[12],
-    addr_.s6_addr[13], addr_.s6_addr[14], addr_.s6_addr[15] } };
-  return address_v4(v4_bytes);
-}
-#endif // !defined(ASIO_NO_DEPRECATED)
-
 bool address_v6::is_loopback() const noexcept
 {
   return ((addr_.s6_addr[0] == 0) && (addr_.s6_addr[1] == 0)
@@ -173,22 +147,6 @@ bool address_v6::is_v4_mapped() const noexcept
       && (addr_.s6_addr[8] == 0) && (addr_.s6_addr[9] == 0)
       && (addr_.s6_addr[10] == 0xff) && (addr_.s6_addr[11] == 0xff));
 }
-
-#if !defined(ASIO_NO_DEPRECATED)
-bool address_v6::is_v4_compatible() const
-{
-  return ((addr_.s6_addr[0] == 0) && (addr_.s6_addr[1] == 0)
-      && (addr_.s6_addr[2] == 0) && (addr_.s6_addr[3] == 0)
-      && (addr_.s6_addr[4] == 0) && (addr_.s6_addr[5] == 0)
-      && (addr_.s6_addr[6] == 0) && (addr_.s6_addr[7] == 0)
-      && (addr_.s6_addr[8] == 0) && (addr_.s6_addr[9] == 0)
-      && (addr_.s6_addr[10] == 0) && (addr_.s6_addr[11] == 0)
-      && !((addr_.s6_addr[12] == 0)
-        && (addr_.s6_addr[13] == 0)
-        && (addr_.s6_addr[14] == 0)
-        && ((addr_.s6_addr[15] == 0) || (addr_.s6_addr[15] == 1))));
-}
-#endif // !defined(ASIO_NO_DEPRECATED)
 
 bool address_v6::is_multicast() const noexcept
 {
@@ -247,24 +205,6 @@ address_v6 address_v6::loopback() noexcept
   return tmp;
 }
 
-#if !defined(ASIO_NO_DEPRECATED)
-address_v6 address_v6::v4_mapped(const address_v4& addr)
-{
-  address_v4::bytes_type v4_bytes = addr.to_bytes();
-  bytes_type v6_bytes = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xFF, 0xFF,
-    v4_bytes[0], v4_bytes[1], v4_bytes[2], v4_bytes[3] } };
-  return address_v6(v6_bytes);
-}
-
-address_v6 address_v6::v4_compatible(const address_v4& addr)
-{
-  address_v4::bytes_type v4_bytes = addr.to_bytes();
-  bytes_type v6_bytes = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    v4_bytes[0], v4_bytes[1], v4_bytes[2], v4_bytes[3] } };
-  return address_v6(v6_bytes);
-}
-#endif // !defined(ASIO_NO_DEPRECATED)
-
 address_v6 make_address_v6(const char* str)
 {
   asio::error_code ec;
@@ -281,7 +221,7 @@ address_v6 make_address_v6(const char* str,
   if (asio::detail::socket_ops::inet_pton(
         ASIO_OS_DEF(AF_INET6), str, &bytes[0], &scope_id, ec) <= 0)
     return address_v6();
-  return address_v6(bytes, scope_id);
+  return address_v6(bytes, static_cast<scope_id_type>(scope_id));
 }
 
 address_v6 make_address_v6(const std::string& str)
@@ -335,6 +275,7 @@ address_v6 make_address_v6(
 }
 
 } // namespace ip
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

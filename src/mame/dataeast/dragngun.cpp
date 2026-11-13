@@ -21,7 +21,7 @@
 
     TODO:
 
-    Video backgrounds(intel DVI) in dragngun*?
+    i750: confirm video genlock alignment, board controls and processor clocks.
     reference video(dragngunj): https://youtu.be/TVc0SsTVJ94
 
     lockload, gunhard is a slightly different hardware
@@ -109,8 +109,9 @@ from Dragon Gun.
 #include "decocrpt.h"
 #include "namco_c355spr.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "cpu/h6280/h6280.h"
+#include "cpu/i750/i750.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/input_merger.h"
@@ -118,6 +119,7 @@ from Dragon Gun.
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
 #include "video/bufsprite.h"
+#include "video/i82750db.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -128,6 +130,47 @@ from Dragon Gun.
 
 
 namespace {
+
+/***************************************************************************
+
+    Dragon Gun video ROM scrambling
+
+    The twelve video ROMs (MAR-17 to MAR-28 on the DE-0360-4 ROM board) hold
+    five DVI/AVSS containers of PLV2 compressed video for the i750.  The
+    container and frame headers, the directory and the sequence tables are
+    stored in the clear (the ARM reads those directly), but the PLV2 plane
+    packets, which only the i750 ever reads, are scrambled by a fixed
+    transform of each little-endian 32-bit ROM word:
+
+    - Each of the four plaintext bytes of a word is passed through its own
+      8-bit substitution table.
+    - The eight output bits of the table for byte n are wired to fixed,
+      non-contiguous bit positions of the stored word (dvi_lane_bits[n]).
+    - Nothing depends on the address: the stored word 0x4d970254 decrypts
+      to the plaintext word 0x0 everywhere.
+
+    The "dvi_decrypt" region holds the inverse direction: gather the eight
+    bits listed in dvi_lane_bits[n] from the stored word (bit k of the index
+    comes from bit dvi_lane_bits[n][k]) and look the index up in table n to
+    get plaintext byte n.  The file is a reconstruction, but it seems
+    probable that the chip contains a mask ROM with similar tables.
+
+    The transform is presumably done by one of the custom chips between the
+    ROMs and the i750 on the ROM board.  Importantly, the ARM should not
+    see the decrypted view of these ROMs because the DVI headers are not
+    encrypted, just the actual frame data.
+
+***************************************************************************/
+
+// bit position within the stored 32-bit word of output bit k of the substitution for byte lane n
+static const u8 dvi_lane_bits[4][8] =
+{
+	{  1,  3, 11, 12, 16, 19, 27, 28 },
+	{  4, 13, 14, 17, 18, 23, 30, 31 },
+	{  0,  5,  6, 15, 21, 22, 24, 25 },
+	{  2,  7,  8,  9, 10, 20, 26, 29 }
+};
+
 
 class dragngun_state : public driver_device
 {
@@ -158,6 +201,10 @@ public:
 		, m_io_inputs(*this, "INPUTS")
 		, m_io_light_x(*this, "LIGHT%u_X", 0U)
 		, m_io_light_y(*this, "LIGHT%u_Y", 0U)
+		, m_i750(*this, "i750")
+		, m_i750_display(*this, "i750_display")
+		, m_dvi_rom(*this, "dvi")
+		, m_dvi_decrypt(*this, "dvi_decrypt")
 	{ }
 
 	void dragngun(machine_config &config) ATTR_COLD;
@@ -172,6 +219,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	void sound_bankswitch_w(u8 data);
@@ -189,8 +237,19 @@ protected:
 	void sprite_control_w(u32 data);
 	void spriteram_dma_w(u32 data);
 	void gun_irq_ack_w(u32 data);
-	u32 unk_video_r();
+	u32 i750_r(offs_t offset);
+	void i750_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	TIMER_CALLBACK_MEMBER(i750_sync_w);
+	u32 i750_rom_r(offs_t offset);
+	u32 dvi_control_r() { return m_dvi_control; }
+	void dvi_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void dvi_vblank(int state);
 	u32 lockload_gun_mirror_r(offs_t offset);
+
+	void unk150000_w(offs_t offset, u32 data, u32 mem_mask = ~0) { logerror("%s: unk150000_w %08x %08x\n", machine().describe_context(), data, mem_mask); }
+	void mixctrl_w(offs_t offset, u32 data, u32 mem_mask = ~0) { COMBINE_DATA(&m_mixctrl); }
+
+	u8 read_dvi_byte(offs_t offset);
 
 	template<int Chip> void rowscroll_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -219,7 +278,9 @@ protected:
 	void common_map(address_map &map) ATTR_COLD;
 	void dragngun_map(address_map &map) ATTR_COLD;
 	void h6280_sound_map(address_map &map) ATTR_COLD;
+	void i750_map(address_map &map) ATTR_COLD;
 	void lockload_map(address_map &map) ATTR_COLD;
+	void lockloadu_i750_map(address_map &map) ATTR_COLD;
 	void lockloadu_map(address_map &map) ATTR_COLD;
 	void lockloadu_sound_map(address_map &map) ATTR_COLD;
 	void z80_sound_io(address_map &map) ATTR_COLD;
@@ -254,12 +315,19 @@ protected:
 	optional_ioport_array<2> m_io_light_x;
 	optional_ioport_array<2> m_io_light_y;
 
-	std::unique_ptr<u8[]> m_dirty_palette{};
-	std::unique_ptr<u16[]> m_rowscroll[4]{};
+	optional_device<i82750pb_device> m_i750;
+	optional_device<i82750db_device> m_i750_display;
+	optional_region_ptr<u32> m_dvi_rom;
+	optional_region_ptr<u8> m_dvi_decrypt;
 
-	u32 m_sprite_ctrl = 0U;
-	u32 m_lightgun_port = 0;
-	u32 m_oki2_bank = 0; // lockload
+	std::unique_ptr<u8[]> m_dirty_palette;
+	std::unique_ptr<u16[]> m_rowscroll[4];
+
+	u32 m_sprite_ctrl;
+	u32 m_lightgun_port;
+	u32 m_oki2_bank; // lockload
+	u32 m_dvi_control;
+	u32 m_mixctrl;
 };
 
 
@@ -413,9 +481,60 @@ void dragngun_state::spriteram_dma_w(u32 data)
 // tattass tests these as 32-bit ram, even if only 16-bits are hooked up to the tilemap chip - does it mirror parts of the dword?
 template <int TileMap> void dragngun_state::rowscroll_w(offs_t offset, u32 data, u32 mem_mask) { COMBINE_DATA(&m_rowscroll32[TileMap][offset]); data &= 0x0000ffff; mem_mask &= 0x0000ffff; COMBINE_DATA(&m_rowscroll[TileMap][offset]); }
 
-u32 dragngun_state::unk_video_r()
+// The host's A9 selects the upper halfword latch, while register address A1
+// is supplied by that selection. Reads drive the same halfword on both lanes.
+u32 dragngun_state::i750_r(offs_t offset)
 {
-	return machine().rand();
+	const u16 value = m_i750->host_r(((offset & 0x7f) << 1) | BIT(offset, 7));
+	return u32(value) * 0x10001;
+}
+
+void dragngun_state::i750_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	const unsigned shift = BIT(offset, 7) ? 16 : 0;
+	if (mem_mask & (0xffffU << shift))
+	{
+		const unsigned reg = ((offset & 0x7f) << 1) | BIT(offset, 7);
+		machine().scheduler().synchronize(timer_expired_delegate(FUNC(dragngun_state::i750_sync_w), this), (reg << 16) | u16(data >> shift));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(dragngun_state::i750_sync_w)
+{
+	m_i750->host_w(param >> 16, u16(param));
+}
+
+u32 dragngun_state::i750_rom_r(offs_t offset)
+{
+	u32 value = 0;
+	for (unsigned lane = 0; lane < 4; lane++)
+		value |= u32(read_dvi_byte(offset * 4 + lane)) << (lane * 8);
+	return value;
+}
+
+void dragngun_state::dvi_control_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_dvi_control);
+	if (ACCESSING_BITS_0_7)
+		m_i750_display->reset_w(BIT(data, 0));
+}
+
+void dragngun_state::dvi_vblank(int state)
+{
+	m_i750->vblank_w(state);
+	m_i750_display->vblank_w(state);
+}
+
+void dragngun_state::i750_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("dviram");
+	map(0x400000, 0xffffff).r(FUNC(dragngun_state::i750_rom_r));
+}
+
+// lockloadu's video ROMs aren't dumped
+void dragngun_state::lockloadu_i750_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).ram().share("dviram");
 }
 
 int dragngun_state::bank_1_callback(int bank)
@@ -534,6 +653,11 @@ u32 dragngun_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 {
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0x400), cliprect); // Palette index not confirmed
+	if (m_i750_display)
+	{
+		if (BIT(m_mixctrl, 1))
+			m_i750_display->draw(bitmap, cliprect, screen.visible_area());
+	}
 
 	m_tilegen[0]->update(m_rowscroll[0].get(), m_rowscroll[1].get());
 	m_tilegen[1]->update(m_rowscroll[2].get(), m_rowscroll[3].get());
@@ -692,21 +816,17 @@ void dragngun_state::dragngun_map(address_map &map)
 //  map(0x01204c0, 0x01204c3).w(FUNC(dragngun_state::sound_w));
 
 	map(0x0138000, 0x0138003).noprw(); // Palette dma complete in bit 0x8? ack?  return 0 else tight loop
-//  map(0x0150000, 0x0150003).nopw(); // Unknown; Masking related?
-//  map(0x0160000, 0x0160003).w(FUNC(dragngun_state::pri_w)); // priority
-	map(0x0170100, 0x0170103).nopw();
-	map(0x0170038, 0x017003b).nopw();
-	map(0x017002C, 0x017002f).nopw();
-	map(0x0170224, 0x0170227).nopw();
+	map(0x0150000, 0x0150003).w(FUNC(dragngun_state::unk150000_w)); // cabinet related?
+	map(0x0160000, 0x0160003).w(FUNC(dragngun_state::mixctrl_w)); // priority / layer enable?
+	map(0x0170000, 0x01703ff).rw(FUNC(dragngun_state::i750_r), FUNC(dragngun_state::i750_w));
+	map(0x0178000, 0x0178003).rw(FUNC(dragngun_state::dvi_control_r), FUNC(dragngun_state::dvi_control_w));
 	map(0x0400000, 0x0400000).rw("oki3", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x0410000, 0x0410000).w(FUNC(dragngun_state::lc7535_volume_w));
 	map(0x0418000, 0x0418003).w(FUNC(dragngun_state::speaker_switch_w));
 	map(0x0430000, 0x043001f).w(FUNC(dragngun_state::lightgun_w));
 	map(0x0438000, 0x0438003).r(FUNC(dragngun_state::lightgun_r));
-	// this is clearly the dvi video related area
-	map(0x1000000, 0x1000007).r(FUNC(dragngun_state::unk_video_r));
-	map(0x1000100, 0x1007fff).ram();
-	map(0x10b0000, 0x10b01ff).ram();
+	// i750 VRAM
+	map(0x1000000, 0x10fffff).ram().share("dviram");
 
 	// reads from here during boss battles when the videos should be displayed at the offsets where the DVI headers are
 	// as a result it ends up writing what looks like pointers to the frame data in the ram area above
@@ -962,15 +1082,62 @@ GFXDECODE_END
 
 
 //**************************************************************************
+//  VIDEO ROM
+//**************************************************************************
+
+// Read one unscrambled byte of the i750 video ROM (see the description above dvi_lane_bits)
+u8 dragngun_state::read_dvi_byte(offs_t offset)
+{
+	const u32 word = m_dvi_rom[(offset >> 2) & (m_dvi_rom.length() - 1)];
+	const u8 lane = offset & 3;
+	u8 index = 0;
+	for (int bit = 0; bit < 8; bit++)
+	{
+		index |= BIT(word, dvi_lane_bits[lane][bit]) << bit;
+	}
+	return m_dvi_decrypt[(lane << 8) | index];
+}
+
+
+//**************************************************************************
 //  MACHINE DEFINITIONS
 //**************************************************************************
 
 void dragngun_state::machine_start()
 {
+	save_item(NAME(m_dvi_control));
 	save_item(NAME(m_lightgun_port));
 	save_item(NAME(m_oki2_bank));
+	save_item(NAME(m_mixctrl));
+
+	// Perform a validation test of the video ROM decryption if valid video ROMs exist
+	if (m_dvi_rom.found() && m_dvi_decrypt.found() && (m_dvi_rom.bytes() >= 0xc00000) && (m_dvi_rom[0] == 0x56445649))
+	{
+		u32 sum = 0;
+		for (offs_t offset = 0; offset < 0xc00000; offset++)
+		{
+			sum += read_dvi_byte(offset);
+		}
+		const u16 codec = read_dvi_byte(0x000450) | (read_dvi_byte(0x000451) << 8);
+		if ((sum != 0x507451fa) || (codec != 0x0014))
+		{
+			osd_printf_error("dragngun: video ROM decryption self-test FAILED (byte sum %08x, expected 0x507451fa; codec ID %04x, expected 0x0014)\n", sum, codec);
+		}
+		else
+		{
+			logerror("dragngun: video ROM decryption self-test passed\n");
+		}
+	}
 }
 
+void dragngun_state::machine_reset()
+{
+	m_sprite_ctrl = 0;
+	m_lightgun_port = 0;
+	m_oki2_bank = 0;
+	m_dvi_control = 0;
+	m_mixctrl = 0;
+}
 
 void dragngun_state::namco_sprites(machine_config &config)
 {
@@ -995,15 +1162,22 @@ void dragngun_state::namco_sprites(machine_config &config)
 void dragngun_state::dragngun(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
+	DE101(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::dragngun_map);
+
+	I82750PB(config, m_i750, 25_MHz_XTAL); // Clock routing needs confirmation.
+	m_i750->set_addrmap(AS_DATA, &dragngun_state::i750_map);
+
+	I82750DB(config, m_i750_display);
+	m_i750_display->set_pixel_processor(m_i750);
+	m_i750_display->shutdown_callback().set(m_i750, FUNC(i82750pb_device::db_shutdown_w));
 
 	h6280_device &audiocpu(H6280(config, m_audiocpu, 32.22_MHz_XTAL / 4 / 3)); // assume same as captaven
 	audiocpu.set_addrmap(AS_PROGRAM, &dragngun_state::h6280_sound_map);
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 0); // internal sound unused
 	audiocpu.add_route(ALL_OUTPUTS, "speaker", 0, 1);
 
-	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", arm7_cpu_device::ARM7_IRQ_LINE);
 
 	DECO_IRQ(config, m_deco_irq);
 	m_deco_irq->set_screen_tag(m_screen);
@@ -1013,9 +1187,10 @@ void dragngun_state::dragngun(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(dragngun_state::screen_update));
+	m_screen->screen_vblank().set(FUNC(dragngun_state::dvi_vblank));
 	//m_screen->set_palette(m_palette);
 
 	BUFFERED_SPRITERAM32(config, m_spriteram);
@@ -1047,10 +1222,6 @@ void dragngun_state::dragngun(machine_config &config)
 	m_tilegen[1]->set_gfxdecode_tag(m_gfxdecode);
 
 	namco_sprites(config);
-
-	// I750, these aren't emulated
-	//I82750PB(config, m_i82750pb, XTAL(25'000'000));
-	//I82750DB(config, m_i82750db, XTAL(25'000'000));
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_dragngun);
 	PALETTE(config, m_palette).set_entries(2048);
@@ -1100,6 +1271,7 @@ void dragngun_state::lockloadu(machine_config &config)
 {
 	dragngun(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockloadu_map);
+	m_i750->set_addrmap(AS_DATA, &dragngun_state::lockloadu_i750_map);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockloadu_sound_map);
 
 	m_deco_irq->lightgun_irq_callback().set("irq_merger", FUNC(input_merger_any_high_device::in_w<2>));
@@ -1114,10 +1286,10 @@ void dragngun_state::lockloadu(machine_config &config)
 void dragngun_state::lockload(machine_config &config)
 {
 	// basic machine hardware
-	ARM(config, m_maincpu, 28_MHz_XTAL / 4);
+	DE156(config, m_maincpu, 28_MHz_XTAL / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dragngun_state::lockload_map);
 
-	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", ARM_IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, "irq_merger").output_handler().set_inputline("maincpu", arm7_cpu_device::ARM7_IRQ_LINE);
 
 	Z80(config, m_audiocpu, 32.22_MHz_XTAL / 9);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dragngun_state::z80_sound_map);
@@ -1138,7 +1310,7 @@ void dragngun_state::lockload(machine_config &config)
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(28_MHz_XTAL / 4, 442, 0, 320, 274, 8, 248);
 	m_screen->set_screen_update(FUNC(dragngun_state::screen_update));
 
@@ -1257,7 +1429,7 @@ ROM_START( dragngun )
 
 	// this is standard DVI data, see http://www.fileformat.info/format/dvi/egff.htm
 	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
-	ROM_REGION32_LE( 0x1000000, "dvi", 0 ) // Video data - unused for now
+	ROM_REGION32_LE( 0x1000000, "dvi", 0 ) // i750 video data
 	ROM_LOAD32_BYTE( "mar-17.bin",  0x000003,  0x100000,  CRC(7799ed23) SHA1(ae28ad4fa6033a3695fa83356701b3774b26e6b0) ) // 56 V / 41 A
 	ROM_LOAD32_BYTE( "mar-20.bin",  0x000002,  0x100000,  CRC(fa0462f0) SHA1(1a52617ad4d7abebc0f273dd979f4cf2d6a0306b) ) // 44 D / 56 V
 	ROM_LOAD32_BYTE( "mar-28.bin",  0x000001,  0x100000,  CRC(5a2ec71d) SHA1(447c404e6bb696f7eb7c61992a99b9be56f5d6b0) ) // 56 V / 53 S
@@ -1270,6 +1442,9 @@ ROM_START( dragngun )
 	ROM_LOAD32_BYTE( "mar-22.bin",  0x800002,  0x100000,  CRC(c85f3559) SHA1(a5d5cf9b18c9ef6a92d7643ca1ec9052de0d4a01) ) // 44 D / 56 V
 	ROM_LOAD32_BYTE( "mar-26.bin",  0x800001,  0x100000,  CRC(246a06c5) SHA1(447252be976a5059925f4ad98df8564b70198f62) ) // 56 V / 53 S
 	ROM_LOAD32_BYTE( "mar-23.bin",  0x800000,  0x100000,  CRC(ba907d6a) SHA1(1fd99b66e6297c8d927c1cf723a613b4ee2e2f90) ) // 49 I / 53 S
+
+	ROM_REGION( 0x400, "dvi_decrypt", 0 ) // video ROM byte-lane substitution tables, reconstructed (see read_dvi_byte)
+	ROM_LOAD( "dvi_decrypt.bin", 0x000, 0x400, CRC(2d049a30) SHA1(2257038d11b20b0a175ebba9530325e600756b9d) )
 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "mar-06.n17", 0x000000, 0x80000,  CRC(3e006c6e) SHA1(55786e0fde2bf6ba9802f3f4fa8d4c21625b976a) )
@@ -1335,7 +1510,7 @@ ROM_START( dragngunj )
 	ROM_LOAD32_BYTE( "mar-12.bin", 0x400002, 0x100000,  CRC(4c412512) SHA1(ccd5014bc9f9648cf5fa56bb8d54fc72a7099ca3) )
 	ROM_LOAD32_BYTE( "mar-10.bin", 0x400003, 0x100000,  CRC(73126fbc) SHA1(9b9c31335e4db726863b219072c83810008f88f9) )
 
-	ROM_REGION32_LE( 0x1000000, "dvi", 0 ) // Video data - unused for now
+	ROM_REGION32_LE( 0x1000000, "dvi", 0 ) // i750 video data
 	ROM_LOAD32_BYTE( "mar-17.bin",  0x000003,  0x100000,  CRC(7799ed23) SHA1(ae28ad4fa6033a3695fa83356701b3774b26e6b0) ) // 56 V / 41 A
 	ROM_LOAD32_BYTE( "mar-20.bin",  0x000002,  0x100000,  CRC(fa0462f0) SHA1(1a52617ad4d7abebc0f273dd979f4cf2d6a0306b) ) // 44 D / 56 V
 	ROM_LOAD32_BYTE( "mar-28.bin",  0x000001,  0x100000,  CRC(5a2ec71d) SHA1(447c404e6bb696f7eb7c61992a99b9be56f5d6b0) ) // 56 V / 53 S
@@ -1348,6 +1523,9 @@ ROM_START( dragngunj )
 	ROM_LOAD32_BYTE( "mar-22.bin",  0x800002,  0x100000,  CRC(c85f3559) SHA1(a5d5cf9b18c9ef6a92d7643ca1ec9052de0d4a01) ) // 44 D / 56 V
 	ROM_LOAD32_BYTE( "mar-26.bin",  0x800001,  0x100000,  CRC(246a06c5) SHA1(447252be976a5059925f4ad98df8564b70198f62) ) // 56 V / 53 S
 	ROM_LOAD32_BYTE( "mar-23.bin",  0x800000,  0x100000,  CRC(ba907d6a) SHA1(1fd99b66e6297c8d927c1cf723a613b4ee2e2f90) ) // 49 I / 53 S
+
+	ROM_REGION( 0x400, "dvi_decrypt", 0 ) // video ROM byte-lane substitution tables, reconstructed (see read_dvi_byte)
+	ROM_LOAD( "dvi_decrypt.bin", 0x000, 0x400, CRC(2d049a30) SHA1(2257038d11b20b0a175ebba9530325e600756b9d) )
 
 	ROM_REGION(0x80000, "oki1", 0 )
 	ROM_LOAD( "mar-06.n17", 0x000000, 0x80000,  CRC(3e006c6e) SHA1(55786e0fde2bf6ba9802f3f4fa8d4c21625b976a) )
@@ -1589,8 +1767,6 @@ ROM_END
 //  INITIALIZER
 //**************************************************************************
 
-//extern void process_dvi_data(device_t *device,u8* dvi_data, int offset, int regionsize);
-
 void dragngun_state::expand_sprite_data()
 {
 	u8 *rom = memregion("c355spr")->base();
@@ -1617,42 +1793,16 @@ void dragngun_state::dragngun_init_common()
 	std::copy(&SRC_RAM[0x10000], &SRC_RAM[0x20000], &DST_RAM[0x110000]);
 
 	expand_sprite_data();
-
-#if 0
-	{
-		u8 *ROM = memregion("dvi")->base();
-
-		auto fp = fopen("video.dvi", "w+b");
-		if (fp)
-		{
-			fwrite(ROM, 0xc00000, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
-
-	// there are DVI headers at 0x000000, 0x580000, 0x800000, 0xB10000, 0xB80000
-//  process_dvi_data(this,memregion("dvi")->base(),0x000000, 0x1000000);
-//  process_dvi_data(this,memregion("dvi")->base(),0x580000, 0x1000000);
-//  process_dvi_data(this,memregion("dvi")->base(),0x800000, 0x1000000);
-//  process_dvi_data(this,memregion("dvi")->base(),0xB10000, 0x1000000);
-//  process_dvi_data(this,memregion("dvi")->base(),0xB80000, 0x1000000);
 }
 
 void dragngun_state::init_dragngun()
 {
 	dragngun_init_common();
-
-	u32 *ROM = (u32 *)memregion("maincpu")->base();
-	ROM[0x01b32c/4] = 0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
 void dragngun_state::init_dragngunj()
 {
 	dragngun_init_common();
-
-	u32 *ROM = (u32 *)memregion("maincpu")->base();
-	ROM[0x01a1b4/4] = 0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
 void dragngun_state::init_lockload()

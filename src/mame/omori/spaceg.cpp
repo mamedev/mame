@@ -337,9 +337,10 @@ void spaceg_state::output_w(uint8_t data)
 
 uint32_t spaceg_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint8_t sx = x;
 			uint8_t sy = y;
@@ -354,7 +355,7 @@ uint32_t spaceg_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			const uint8_t pixel = BIT(m_videoram[offset], ~sx & 7);
 			const uint8_t color = (m_colorram[offset] & 0x1f) | pixel << 5;
 
-			bitmap.pix(y, x) = color;
+			dst[x] = color;
 		}
 	}
 
@@ -522,7 +523,7 @@ void spaceg_state::spaceg(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &spaceg_state::spaceg_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256, 256);

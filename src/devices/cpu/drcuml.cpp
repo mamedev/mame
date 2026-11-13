@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    drcuml.c
+    drcuml.cpp
 
     Universal machine language for dynamic recompiling CPU cores.
 
@@ -142,31 +142,78 @@ drcbe_interface::~drcbe_interface()
 }
 
 
+//-------------------------------------------------
+//  hash_get_codeptr
+//-------------------------------------------------
+
+drcbe_interface::hash_codeptr drcbe_interface::hash_get_codeptr(u32 mode, u32 pc) const noexcept
+{
+	return hash_codeptr();
+}
+
+
+//-------------------------------------------------
+//  hash_set_codeptr
+//-------------------------------------------------
+
+bool drcbe_interface::hash_set_codeptr(u32 mode, u32 pc, hash_codeptr code) noexcept
+{
+	return false;
+}
+
+
 
 //**************************************************************************
 //  DRCUML STATE
 //**************************************************************************
 
+// symbol class
+class drcuml_state::symbol
+{
+public:
+	// construction/destruction
+	symbol(void *base, u32 length, std::string &&name)
+		: m_base(reinterpret_cast<drccodeptr>(base))
+		, m_length(length)
+		, m_name(std::move(name))
+	{ }
+
+	// getters
+	bool includes(drccodeptr search) const { return (m_base <= search) && ((m_base + m_length) > search); }
+	drccodeptr base() const { return m_base; }
+	std::string const &name() const { return m_name; }
+
+private:
+	// internal state
+	drccodeptr  m_base;     // base of the symbol
+	u32         m_length;   // length of the region covered
+	std::string m_name;     // name of the symbol
+};
+
+class drcuml_state::block_impl : public drcuml_block
+{
+public:
+	block_impl(drcuml_state &drcuml, u32 maxinst) : drcuml_block(drcuml, *drcuml.m_beintf, maxinst)
+	{ }
+	~block_impl() = default;
+
+	using drcuml_block::begin;
+};
+
+
 //-------------------------------------------------
 //  drcuml_state - constructor
 //-------------------------------------------------
 
-drcuml_state::drcuml_state(device_t &device, drc_cache &cache, u32 flags, int modes, int addrbits, int ignorebits, u32 max_sequence_length)
+drcuml_state::drcuml_state(device_t &device, std::size_t cache_bytes)
 	: m_device(device)
-	, m_cache(cache)
-	, m_max_sequence_length(max_sequence_length)
-	, m_beintf(device.machine().options().drc_use_c()
-			? drc::make_drcbe_c(*this, device, cache, flags, modes, addrbits, ignorebits)
-			: drc::make_drcbe_native(*this, device, cache, flags, modes, addrbits, ignorebits))
-	, m_umllog(device.machine().options().drc_log_uml()
-			? new std::ofstream(uml_log_name(device))
-			: nullptr)
+	, m_cache(cache_bytes)
+	, m_beintf()
+	, m_umllog()
 	, m_blocklist()
 	, m_handlelist()
 	, m_symlist()
 {
-	if (m_umllog)
-		m_umllog->imbue(std::locale::classic());
 }
 
 
@@ -176,6 +223,31 @@ drcuml_state::drcuml_state(device_t &device, drc_cache &cache, u32 flags, int mo
 
 drcuml_state::~drcuml_state()
 {
+}
+
+
+//-------------------------------------------------
+//  initialize - allocate the cache and create the
+//  back-end
+//-------------------------------------------------
+
+void drcuml_state::initialize(u32 flags, int modes, int addrbits, int ignorebits, u32 max_sequence_length)
+{
+	assert(!m_beintf);
+	assert(!m_umllog);
+
+	m_cache.allocate_cache(device().machine().options().drc_rwx());
+
+	if (device().machine().options().drc_use_c())
+		m_beintf = drc::make_drcbe_c(*this, device(), m_cache, flags, modes, addrbits, ignorebits, max_sequence_length);
+	else
+		m_beintf = drc::make_drcbe_native(*this, device(), m_cache, flags, modes, addrbits, ignorebits, max_sequence_length);
+
+	if (device().machine().options().drc_log_uml())
+	{
+		m_umllog.reset(new std::ofstream(uml_log_name(device())));
+		m_umllog->imbue(std::locale::classic());
+	}
 }
 
 
@@ -310,8 +382,9 @@ void drcuml_state::log_vprintf(util::format_argument_pack<char> const &args)
 //  drcuml_block - constructor
 //-------------------------------------------------
 
-drcuml_block::drcuml_block(drcuml_state &drcuml, u32 maxinst)
+drcuml_block::drcuml_block(drcuml_state &drcuml, drcbe_interface &backend, u32 maxinst)
 	: m_drcuml(drcuml)
+	, m_backend(backend)
 	, m_maxinst(maxinst)
 	, m_nextinst(0)
 	, m_inst(new uml::instruction[m_maxinst])
@@ -360,7 +433,7 @@ void drcuml_block::end()
 		disassemble();
 
 	// generate the code via the back-end
-	m_drcuml.generate(*this, &m_inst[0], m_nextinst);
+	m_backend.generate(*this, &m_inst[0], m_nextinst);
 
 	// block is no longer in use
 	m_inuse = false;

@@ -1074,7 +1074,7 @@ void isbc202_device::set_rd_wr(bool new_rd , bool new_wr)
 		// Start writing
 		LOG_WR("Start WR\n");
 		m_pll.set_clock(attotime::from_usec(HALF_BIT_CELL_US));
-		m_pll.start_writing(machine().time());
+		m_pll.start_writing(machine().time(), m_current_drive);
 		m_pll.ctime = machine().time();
 		m_last_data_bit = false;
 		m_byte_timer->adjust(attotime::from_usec(HALF_BIT_CELL_US * 14));

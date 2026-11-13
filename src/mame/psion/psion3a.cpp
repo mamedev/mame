@@ -479,7 +479,7 @@ void psion3a_base_state::psion_asic9(machine_config &config)
 	m_asic9->data_r<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_r));      // SSD Pack 1
 	m_asic9->data_w<1>().set(m_ssd[0], FUNC(psion_ssd_device::data_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_size(480, 160);
 	screen.set_visarea_full();
 	screen.set_refresh_hz(66);
@@ -603,14 +603,14 @@ void psion3mx_state::psion3mx(machine_config &config)
 
 
 ROM_START(psion3a)
-	// Known versions: English, Belgian, Dutch, German
+	// Known versions: English, French, Dutch/Belgian, German
 	ROM_REGION16_LE(0x100000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "322f", "V3.22F/ENG")
 	ROMX_LOAD("s3a_v3.22f_eng.bin", 0x000000, 0x100000, CRC(fafa3820) SHA1(c1a320b43280cfdb74fc1cb1363fca88dd187487), ROM_BIOS(0))
 ROM_END
 
 ROM_START(psion3a2)
-	// Known versions: English, Dutch, French, German, Italian, Russian
+	// Known versions: English, USA, French, German, Dutch/Belgium, Italian, Russian
 	ROM_REGION16_LE(0x200000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "340f", "V3.40F/ENG")
 	ROMX_LOAD("s3a_v3.40f_eng.bin", 0x000000, 0x200000, CRC(f0adf12c) SHA1(3eb4e7f1fc5611a4d6e65d27d336969ebae94395), ROM_BIOS(0))
@@ -654,7 +654,7 @@ ROM_START(psion3c_de)
 ROM_END
 
 ROM_START(psion3mx)
-	// Known versions: English, Dutch, French, German, Italian
+	// Known versions: English, USA, Dutch, French, German, Italian, Nordic
 	ROM_REGION16_LE(0x200000, "rom", 0)
 	ROM_SYSTEM_BIOS(0, "616f", "V6.16F/ENG")
 	ROMX_LOAD("maple_v6.16f_uk.bin", 0x000000, 0x200000, CRC(10011d9d) SHA1(8c657414513ed57ccf6beddc65dca1fe5ab600fb), ROM_BIOS(0))

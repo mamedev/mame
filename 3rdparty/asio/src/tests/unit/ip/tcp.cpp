@@ -2,7 +2,7 @@
 // tcp.cpp
 // ~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -255,7 +255,7 @@ void test()
     socket1 = ip::tcp::socket(ioc);
     socket1 = std::move(socket2);
 
-    // basic_io_object functions.
+    // I/O object functions.
 
     ip::tcp::socket::executor_type ex = socket1.get_executor();
     (void)ex;
@@ -797,7 +797,7 @@ void test()
     acceptor1 = ip::tcp::acceptor(ioc);
     acceptor1 = std::move(acceptor2);
 
-    // basic_io_object functions.
+    // I/O object functions.
 
     ip::tcp::acceptor::executor_type ex = acceptor1.get_executor();
     (void)ex;
@@ -1041,18 +1041,6 @@ private:
   resolve_handler(const resolve_handler&);
 };
 
-#if !defined(ASIO_NO_DEPRECATED)
-struct legacy_resolve_handler
-{
-  legacy_resolve_handler() {}
-  void operator()(const asio::error_code&,
-      asio::ip::tcp::resolver::iterator) {}
-  legacy_resolve_handler(legacy_resolve_handler&&) {}
-private:
-  legacy_resolve_handler(const legacy_resolve_handler&);
-};
-#endif // !defined(ASIO_NO_DEPRECATED)
-
 void test()
 {
   using namespace asio;
@@ -1064,9 +1052,6 @@ void test()
     const io_context::executor_type ioc_ex = ioc.get_executor();
     archetypes::lazy_handler lazy;
     asio::error_code ec;
-#if !defined(ASIO_NO_DEPRECATED)
-    ip::tcp::resolver::query q(ip::tcp::v4(), "localhost", "0");
-#endif // !defined(ASIO_NO_DEPRECATED)
     ip::tcp::endpoint e(ip::address_v4::loopback(), 0);
 
     // basic_resolver constructors.
@@ -1081,7 +1066,7 @@ void test()
     resolver = ip::tcp::resolver(ioc);
     resolver = std::move(resolver3);
 
-    // basic_io_object functions.
+    // I/O object functions.
 
     ip::tcp::resolver::executor_type ex = resolver.get_executor();
     (void)ex;
@@ -1090,97 +1075,65 @@ void test()
 
     resolver.cancel();
 
-#if !defined(ASIO_NO_DEPRECATED)
-    ip::tcp::resolver::results_type results1 = resolver.resolve(q);
+    ip::tcp::resolver::results_type results1 = resolver.resolve("", "");
     (void)results1;
 
-    ip::tcp::resolver::results_type results2 = resolver.resolve(q, ec);
+    ip::tcp::resolver::results_type results2 = resolver.resolve("", "", ec);
     (void)results2;
-#endif // !defined(ASIO_NO_DEPRECATED)
 
-    ip::tcp::resolver::results_type results3 = resolver.resolve("", "");
+    ip::tcp::resolver::results_type results3 =
+      resolver.resolve("", "", ip::tcp::resolver::flags());
     (void)results3;
 
-    ip::tcp::resolver::results_type results4 = resolver.resolve("", "", ec);
+    ip::tcp::resolver::results_type results4 =
+      resolver.resolve("", "", ip::tcp::resolver::flags(), ec);
     (void)results4;
 
     ip::tcp::resolver::results_type results5 =
-      resolver.resolve("", "", ip::tcp::resolver::flags());
+      resolver.resolve(ip::tcp::v4(), "", "");
     (void)results5;
 
     ip::tcp::resolver::results_type results6 =
-      resolver.resolve("", "", ip::tcp::resolver::flags(), ec);
+      resolver.resolve(ip::tcp::v4(), "", "", ec);
     (void)results6;
 
     ip::tcp::resolver::results_type results7 =
-      resolver.resolve(ip::tcp::v4(), "", "");
+      resolver.resolve(ip::tcp::v4(), "", "", ip::tcp::resolver::flags());
     (void)results7;
 
     ip::tcp::resolver::results_type results8 =
-      resolver.resolve(ip::tcp::v4(), "", "", ec);
+      resolver.resolve(ip::tcp::v4(), "", "", ip::tcp::resolver::flags(), ec);
     (void)results8;
 
-    ip::tcp::resolver::results_type results9 =
-      resolver.resolve(ip::tcp::v4(), "", "", ip::tcp::resolver::flags());
+    ip::tcp::resolver::results_type results9 = resolver.resolve(e);
     (void)results9;
 
-    ip::tcp::resolver::results_type results10 =
-      resolver.resolve(ip::tcp::v4(), "", "", ip::tcp::resolver::flags(), ec);
+    ip::tcp::resolver::results_type results10 = resolver.resolve(e, ec);
     (void)results10;
 
-    ip::tcp::resolver::results_type results11 = resolver.resolve(e);
-    (void)results11;
-
-    ip::tcp::resolver::results_type results12 = resolver.resolve(e, ec);
-    (void)results12;
-
-#if !defined(ASIO_NO_DEPRECATED)
-    resolver.async_resolve(q, resolve_handler());
-    resolver.async_resolve(q, legacy_resolve_handler());
-    int i1 = resolver.async_resolve(q, lazy);
-    (void)i1;
-#endif // !defined(ASIO_NO_DEPRECATED)
-
     resolver.async_resolve("", "", resolve_handler());
-#if !defined(ASIO_NO_DEPRECATED)
-    resolver.async_resolve("", "", legacy_resolve_handler());
-#endif // !defined(ASIO_NO_DEPRECATED)
-    int i2 = resolver.async_resolve("", "", lazy);
-    (void)i2;
+    int i1 = resolver.async_resolve("", "", lazy);
+    (void)i1;
 
     resolver.async_resolve("", "",
         ip::tcp::resolver::flags(), resolve_handler());
-#if !defined(ASIO_NO_DEPRECATED)
-    resolver.async_resolve("", "",
-        ip::tcp::resolver::flags(), legacy_resolve_handler());
-#endif // !defined(ASIO_NO_DEPRECATED)
-    int i3 = resolver.async_resolve("", "",
+    int i2 = resolver.async_resolve("", "",
         ip::tcp::resolver::flags(), lazy);
-    (void)i3;
+    (void)i2;
 
     resolver.async_resolve(ip::tcp::v4(), "", "", resolve_handler());
-#if !defined(ASIO_NO_DEPRECATED)
-    resolver.async_resolve(ip::tcp::v4(), "", "", legacy_resolve_handler());
-#endif // !defined(ASIO_NO_DEPRECATED)
-    int i4 = resolver.async_resolve(ip::tcp::v4(), "", "", lazy);
-    (void)i4;
+    int i3 = resolver.async_resolve(ip::tcp::v4(), "", "", lazy);
+    (void)i3;
 
     resolver.async_resolve(ip::tcp::v4(),
         "", "", ip::tcp::resolver::flags(), resolve_handler());
-#if !defined(ASIO_NO_DEPRECATED)
-    resolver.async_resolve(ip::tcp::v4(),
-        "", "", ip::tcp::resolver::flags(), legacy_resolve_handler());
-#endif // !defined(ASIO_NO_DEPRECATED)
-    int i5 = resolver.async_resolve(ip::tcp::v4(),
+    int i4 = resolver.async_resolve(ip::tcp::v4(),
         "", "", ip::tcp::resolver::flags(), lazy);
-    (void)i5;
+    (void)i4;
 
     resolver.async_resolve(e, resolve_handler());
-#if !defined(ASIO_NO_DEPRECATED)
-    resolver.async_resolve(e, legacy_resolve_handler());
-#endif // !defined(ASIO_NO_DEPRECATED)
-    int i6 = resolver.async_resolve(e, lazy);
-    (void)i6;
+    int i5 = resolver.async_resolve(e, lazy);
+    (void)i5;
   }
   catch (std::exception&)
   {

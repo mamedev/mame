@@ -111,14 +111,18 @@ nick_device::nick_device(const machine_config &mconfig, const char *tag, device_
 	device_video_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(nick_device::nick_map), this)),
 	m_write_virq(*this),
-	m_scanline_count(0),
+	m_lines_remaining(0),
+	m_render_line(0),
+	m_vsync(false),
 	m_FIXBIAS(0),
 	m_BORDER(0),
 	m_LPL(0),
-	m_LPH(0),
+	m_LPH(0xf0),
+	m_lpt_flags(0),
+	m_lpt_addr(0),
 	m_LD1(0),
 	m_LD2(0),
-	m_virq(CLEAR_LINE)
+	m_frame(0)
 {
 	memset(&m_LPT, 0x00, sizeof(m_LPT));
 }
@@ -130,7 +134,8 @@ nick_device::nick_device(const machine_config &mconfig, const char *tag, device_
 
 void nick_device::device_start()
 {
-	screen().register_screen_bitmap(m_bitmap);
+	screen().register_screen_bitmap(m_bitmap[0]);
+	screen().register_screen_bitmap(m_bitmap[1]);
 	calc_visible_clocks(ENTERPRISE_SCREEN_WIDTH);
 
 	// initialize palette
@@ -141,11 +146,15 @@ void nick_device::device_start()
 	m_timer_scanline->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
 
 	// state saving
-	save_item(NAME(m_scanline_count));
+	save_item(NAME(m_lines_remaining));
+	save_item(NAME(m_render_line));
+	save_item(NAME(m_vsync));
 	save_item(NAME(m_FIXBIAS));
 	save_item(NAME(m_BORDER));
 	save_item(NAME(m_LPL));
 	save_item(NAME(m_LPH));
+	save_item(NAME(m_lpt_flags));
+	save_item(NAME(m_lpt_addr));
 	save_item(NAME(m_LD1));
 	save_item(NAME(m_LD2));
 	save_item(NAME(m_LPT.SC));
@@ -159,9 +168,9 @@ void nick_device::device_start()
 	save_item(NAME(m_LPT.COL));
 	save_item(NAME(m_dest_pos));
 	save_item(NAME(m_dest_max_pos));
-	save_item(NAME(m_reg));
 	save_item(NAME(m_first_visible_clock));
 	save_item(NAME(m_last_visible_clock));
+	save_item(NAME(m_frame));
 }
 
 
@@ -172,9 +181,12 @@ void nick_device::device_start()
 void nick_device::device_reset()
 {
 	m_write_virq(CLEAR_LINE);
-	m_virq = 0;
 
-	m_scanline_count = 0;
+	m_lines_remaining = 0;
+	m_lpt_flags = 0;
+	m_lpt_addr = 0;
+	m_render_line = 0;
+	m_vsync = false;
 }
 
 
@@ -184,18 +196,7 @@ void nick_device::device_reset()
 
 TIMER_CALLBACK_MEMBER(nick_device::scanline_tick)
 {
-	int scanline = screen().vpos();
-
-	if (scanline < ENTERPRISE_SCREEN_HEIGHT)
-	{
-		/* set write address for line */
-		m_dest = &m_bitmap.pix(scanline);
-		m_dest_pos = 0;
-		m_dest_max_pos = m_bitmap.width();
-
-		/* write line */
-		do_line();
-	}
+	do_line();
 }
 
 
@@ -218,7 +219,7 @@ device_memory_interface::space_config_vector nick_device::memory_space_config() 
 
 uint32_t nick_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
+	copybitmap(bitmap, m_bitmap[m_frame ^ 1], 0, 0, 0, 0, cliprect);
 
 	return 0;
 }
@@ -270,9 +271,7 @@ void nick_device::border_w(uint8_t data)
 
 void nick_device::lpl_w(uint8_t data)
 {
-	m_LPL = m_reg[2] = data;
-
-	update_lpt();
+	m_LPL = data;
 }
 
 
@@ -282,9 +281,27 @@ void nick_device::lpl_w(uint8_t data)
 
 void nick_device::lph_w(uint8_t data)
 {
-	m_LPH = m_reg[3] = data;
+	uint8_t changed = (data ^ m_LPH) & 0xc0;
 
-	update_lpt();
+	m_LPH = data;
+
+	if (changed)
+	{
+		if (!NICK_CLOCK_LPT(data))
+		{
+			m_lpt_flags = 0;
+		}
+		else
+		{
+			// enabling the LPT clock restarts the display list on the next scanline
+			if (NICK_CLOCK_LPT(changed))
+				m_lpt_flags |= 0x80;
+
+			// RELOAD LPT is active low
+			if (!NICK_RELOAD_LPT(data))
+				m_lpt_flags |= 0x40;
+		}
+	}
 }
 
 
@@ -452,7 +469,7 @@ void nick_device::write_pixels2color_lpixel(uint8_t pen0, uint8_t pen1, uint8_t 
 }
 
 
-void nick_device::write_pixels(uint8_t data_byte, uint8_t char_idx)
+void nick_device::write_pixels(uint8_t data_byte)
 {
 	/* pen index colour 2-C (0,1), 4-C (0..3) 16-C (0..16) */
 	int pen_idx;
@@ -489,24 +506,6 @@ void nick_device::write_pixels(uint8_t data_byte, uint8_t char_idx)
 
 				data &=~0x01;
 			}
-
-			if (m_LPT.RM & NICK_RM_ALTIND1)
-			{
-				if (char_idx & 0x080)
-				{
-					pen_offs |= 0x02;
-				}
-			}
-
-#if 0
-			if (m_LPT.RM & NICK_RM_ALTIND0)
-			{
-				if (data & 0x040)
-				{
-					pen_offs |= 0x04;
-				}
-			}
-#endif
 
 			write_pixels2color(pen_offs, (pen_offs | 0x01), data);
 		}
@@ -640,23 +639,23 @@ void nick_device::write_pixels_lpixel(uint8_t data_byte, uint8_t char_idx)
 				data &=~0x01;
 			}
 
-			if (m_LPT.RM & NICK_RM_ALTIND1)
+			/* character code attributes, character modes only */
+			switch (NICK_GET_DISPLAY_MODE(m_LPT.MB))
 			{
-				if (char_idx & 0x080)
+			case NICK_CH256_MODE:
+			case NICK_CH128_MODE:
+			case NICK_CH64_MODE:
+				if ((m_LPT.RM & NICK_RM_ALTIND0) && BIT(char_idx, 7))
 				{
 					pen_offs |= 0x02;
 				}
-			}
 
-#if 0
-			if (m_LPT.RM & NICK_RM_ALTIND0)
-			{
-				if (data & 0x040)
+				if ((m_LPT.RM & NICK_RM_ALTIND1) && BIT(char_idx, 6))
 				{
 					pen_offs |= 0x04;
 				}
+				break;
 			}
-#endif
 
 			write_pixels2color_lpixel(pen_offs, (pen_offs | 0x01), data);
 		}
@@ -779,8 +778,8 @@ void nick_device::do_pixel(int clocks_visible)
 		buf2 = space().read_byte(m_LD1);
 		m_LD1++;
 
-		write_pixels(buf1, buf1);
-		write_pixels(buf2, buf1);
+		write_pixels(buf1);
+		write_pixels(buf2);
 	}
 }
 
@@ -864,118 +863,48 @@ void nick_device::do_ch64(int clocks_visible)
 
 void nick_device::do_display()
 {
-	LPT_ENTRY *pLPT = &m_LPT;
-	uint8_t clocks_visible;
-	uint8_t right_margin = NICK_GET_RIGHT_MARGIN(pLPT->RM);
-	uint8_t left_margin = NICK_GET_LEFT_MARGIN(pLPT->LM);
+	int left_margin = NICK_GET_LEFT_MARGIN(m_LPT.LM);
+	int right_margin = NICK_GET_RIGHT_MARGIN(m_LPT.RM);
+	int clocks_visible = right_margin - left_margin;
 
-	clocks_visible = right_margin - left_margin;
+	if (clocks_visible <= 0)
+		return;
 
-	if (clocks_visible)
+	switch (NICK_GET_DISPLAY_MODE(m_LPT.MB))
 	{
-		/* get display mode */
-		uint8_t display_mode = NICK_GET_DISPLAY_MODE(pLPT->MB);
-
-		if (m_scanline_count == 0)   // ||
-			//((pLPT->MB & NICK_MB_VRES)==0))
-		{
-			/* doing first line */
-			/* reload LD1, and LD2 (if necessary) regardless of display mode */
-			m_LD1 = (pLPT->LD1L & 0xff) | ((pLPT->LD1H & 0xff) << 8);
-
-			if ((display_mode != NICK_LPIXEL_MODE) && (display_mode != NICK_PIXEL_MODE))
-			{
-				/* lpixel and pixel modes don't use LD2 */
-				m_LD2 = (pLPT->LD2L & 0xff) | ((pLPT->LD2H & 0xff) << 8);
-			}
-		}
-		else
-		{
-			/* not first line */
-			switch (display_mode)
-			{
-				case NICK_ATTR_MODE:
-				{
-					/* reload LD1 */
-					m_LD1 = (pLPT->LD1L & 0xff) | ((pLPT->LD1H & 0xff) << 8);
-				}
-				break;
-
-				case NICK_CH256_MODE:
-				case NICK_CH128_MODE:
-				case NICK_CH64_MODE:
-				{
-					/* reload LD1 */
-					m_LD1 = (pLPT->LD1L & 0xff) | ((pLPT->LD1H & 0xff) << 8);
-					m_LD2++;
-				}
-				break;
-
-				default:
-					break;
-			}
-		}
-
-		switch (display_mode)
-		{
-			case NICK_PIXEL_MODE:
-			{
-				do_pixel(clocks_visible);
-			}
+		case NICK_PIXEL_MODE:
+			do_pixel(clocks_visible);
 			break;
 
-			case NICK_ATTR_MODE:
-			{
-				//osd_printf_info("attr mode\r\n");
-				do_attr(clocks_visible);
-			}
+		case NICK_ATTR_MODE:
+			do_attr(clocks_visible);
 			break;
 
-			case NICK_CH256_MODE:
-			{
-				//osd_printf_info("ch256 mode\r\n");
-				do_ch256(clocks_visible);
-			}
+		case NICK_CH256_MODE:
+			do_ch256(clocks_visible);
 			break;
 
-			case NICK_CH128_MODE:
-			{
-				do_ch128(clocks_visible);
-			}
+		case NICK_CH128_MODE:
+			do_ch128(clocks_visible);
 			break;
 
-			case NICK_CH64_MODE:
-			{
-				//osd_printf_info("ch64 mode\r\n");
-				do_ch64(clocks_visible);
-			}
+		case NICK_CH64_MODE:
+			do_ch64(clocks_visible);
 			break;
 
-			case NICK_LPIXEL_MODE:
-			{
-				do_lpixel(clocks_visible);
-			}
+		case NICK_LPIXEL_MODE:
+			do_lpixel(clocks_visible);
 			break;
 
-			default:
-				break;
-		}
+		default:
+			break;
 	}
-}
-
-void nick_device::update_lpt()
-{
-	uint16_t CurLPT = (m_LPL & 0x0ff) | ((m_LPH & 0x0f) << 8);
-	CurLPT++;
-	m_LPL = CurLPT & 0x0ff;
-	m_LPH = (m_LPH & 0x0f0) | ((CurLPT >> 8) & 0x0f);
 }
 
 
 void nick_device::reload_lpt()
 {
-	/* get addr of LPT */
-	uint32_t LPT_Addr = ((m_LPL & 0x0ff) << 4) | ((m_LPH & 0x0f) << (8+4));
+	uint16_t LPT_Addr = m_lpt_addr;
 
 	/* update internal LPT state */
 	m_LPT.SC = space().read_byte(LPT_Addr);
@@ -999,52 +928,88 @@ void nick_device::reload_lpt()
 /* call here to render a line of graphics */
 void nick_device::do_line()
 {
-	uint8_t scanline;
+	// NICK re-reads the line parameter block on every scanline
+	reload_lpt();
 
 	m_write_virq((m_LPT.MB & NICK_MB_VIRQ) ? ASSERT_LINE : CLEAR_LINE);
 
-	if (m_virq && !(m_LPT.MB & NICK_MB_VIRQ))
+	uint8_t display_mode = NICK_GET_DISPLAY_MODE(m_LPT.MB);
+	bool vsync = (display_mode == NICK_VSYNC_MODE);
+
+	// NICK derives vertical sync from the display list, so the position of the
+	// picture within the frame is set by the VSYNC entries, not by the raster
+	if (vsync && !m_vsync)
 	{
-		m_timer_scanline->adjust(screen().time_until_pos(0, 0), 0, screen().scan_period());
+		m_frame ^= 1;
+		m_render_line = 0;
+	}
+	else if (m_render_line < ENTERPRISE_SCREEN_HEIGHT)
+	{
+		m_render_line++;
 	}
 
-	m_virq = (m_LPT.MB & NICK_MB_VIRQ) ? 1 : 0;
+	m_vsync = vsync;
 
-	if ((m_LPT.MB & NICK_MB_LPT_RELOAD)!=0)
+	if (m_render_line < ENTERPRISE_SCREEN_HEIGHT)
 	{
-		/* reload LPT */
-
-		m_LPL = m_reg[2];
-		m_LPH = m_reg[3];
-
-		reload_lpt();
+		/* set write address for line */
+		m_dest = &m_bitmap[m_frame].pix(m_render_line);
+		m_dest_pos = 0;
+		m_dest_max_pos = m_bitmap[m_frame].width();
+	}
+	else
+	{
+		m_dest_pos = 0;
+		m_dest_max_pos = 0;
 	}
 
-	/* left border */
-	do_left_margin();
+	/* LD1 is only reloaded on the first scanline of an LPT entry, unless VRES
+	   is clear, in which case every scanline of the entry shows the same data */
+	if ((m_lines_remaining <= 0) || !(m_LPT.MB & NICK_MB_VRES))
+		m_LD1 = m_LPT.LD1L | (m_LPT.LD1H << 8);
 
-	/* do visible part */
-	do_display();
+	if ((display_mode >= NICK_CH256_MODE) && (display_mode <= NICK_CH64_MODE))
+		m_LD2++;
 
-	/* right border */
-	do_right_margin();
+	if (m_lines_remaining <= 0)
+	{
+		m_LD2 = m_LPT.LD2L | (m_LPT.LD2H << 8);
 
-	// 0x0f7 is first!
-	/* scan line count for this LPT */
-	scanline = ((~m_LPT.SC) + 1) & 0x0ff;
+		/* scan line count for this LPT */
+		m_lines_remaining = 0x100 - m_LPT.SC;
+	}
 
-	//printf("scanline %02x\r\n", scanline);
+	if (vsync)
+	{
+		/* the whole line is blanked during vertical sync */
+		while (m_dest_pos < m_dest_max_pos)
+			write_pixel(0);
+	}
+	else
+	{
+		/* left border */
+		do_left_margin();
 
-	/* update count of scanlines done so far */
-	m_scanline_count++;
+		/* do visible part */
+		do_display();
 
-	if (m_scanline_count == scanline)
+		/* right border */
+		do_right_margin();
+	}
+
+	m_lines_remaining--;
+
+	if ((m_lines_remaining == 0) || BIT(m_lpt_flags, 7))
 	{
 		/* done all scanlines of this Line Parameter Table, get next */
-
-		m_scanline_count = 0;
-
-		update_lpt();
-		reload_lpt();
+		if (NICK_CLOCK_LPT(m_LPH))
+		{
+			if (!((m_LPT.MB & NICK_MB_LPT_RELOAD) || BIT(m_lpt_flags, 6)))
+				m_lpt_addr = (m_lpt_addr + 0x10) & 0xfff0;
+			else
+				m_lpt_addr = (m_LPL << 4) | ((m_LPH & 0x0f) << 12);
+		}
 	}
+
+	m_lpt_flags = (m_LPH & ((~m_LPH) >> 1)) & 0x40;
 }

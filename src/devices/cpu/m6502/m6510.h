@@ -21,6 +21,7 @@ public:
 
 	uint8_t get_port();
 	void set_pulls(uint8_t pullup, uint8_t pulldown);
+	void set_floating_falloff(uint8_t mask, uint32_t cycles);
 
 	auto read_callback() { return m_read_port.bind(); }
 	auto write_callback() { return m_write_port.bind(); }
@@ -48,6 +49,9 @@ protected:
 	devcb_write8 m_write_port;
 
 	uint8_t m_pullup, m_floating, m_dir, m_port, m_drive;
+	uint8_t m_falloff_mask;
+	uint32_t m_falloff_cycles[8];
+	uint64_t m_falloff_deadline[8];
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -98,7 +102,8 @@ protected:
 
 enum {
 	M6510_IRQ_LINE = m6502_device::IRQ_LINE,
-	M6510_NMI_LINE = m6502_device::NMI_LINE
+	M6510_NMI_LINE = m6502_device::NMI_LINE,
+	M6510_RDY_LINE = m6502_device::RDY_LINE
 };
 
 DECLARE_DEVICE_TYPE(M6510, m6510_device)

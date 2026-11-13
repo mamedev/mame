@@ -1042,7 +1042,7 @@ void majorpkr_state::majorpkr(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(CRTC_CLOCK*16, (47+1)*16, 0, (36*16)-16, (36+1)*8, 0, (28*8));  // from CRTC registers.
 	screen.set_screen_update(FUNC(majorpkr_state::screen_update));
 

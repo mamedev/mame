@@ -456,7 +456,7 @@ void korg_dss1_state::klm780(machine_config &config)
 	GENERIC_LATCH_8(config, m_latch[1]);
 	m_latch[1]->data_pending_callback().set_inputline(m_cpu1, I8085_RST55_LINE);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));

@@ -1254,14 +1254,14 @@ void z8_device::device_start()
 
 		for (int regnum = 0; regnum < 16; regnum++)
 		{
-			state_add<uint8_t>(Z8_R0 + regnum, string_format("R%d", regnum).c_str(),
+			state_add<uint8_t>(Z8_R0 + regnum, string_format("R%d", regnum),
 				[this, regnum]() { auto dis = machine().disable_side_effects(); return register_read((m_rp & 0xf0) | regnum); },
 				[this, regnum](uint8_t val) { auto dis = machine().disable_side_effects(); register_write((m_rp & 0xf0) | regnum, val); });
 		}
 
 		for (int regnum = 0; regnum < 16; regnum += 2)
 		{
-			state_add<uint16_t>(Z8_RR0 + (regnum / 2), string_format("RR%d", regnum).c_str(),
+			state_add<uint16_t>(Z8_RR0 + (regnum / 2), string_format("RR%d", regnum),
 				[this, regnum]() { auto dis = machine().disable_side_effects(); return register_pair_read((m_rp & 0xf0) | regnum); },
 				[this, regnum](uint16_t val) { auto dis = machine().disable_side_effects(); register_pair_write((m_rp & 0xf0) | regnum, val); }).noshow();
 		}

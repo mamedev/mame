@@ -126,6 +126,7 @@ void abc80_cards(device_slot_interface &device)
 	device.option_add("slow", LUXOR_55_10828);
 	device.option_add("ssa", ABC_SUPER_SMARTAID);
 	device.option_add("unidisk", ABC_UNIDISK);
+	device.option_add("sio", ABC_SIO);
 }
 
 
@@ -148,7 +149,6 @@ void abcbus_cards(device_slot_interface &device)
 	device.option_add("db4106", DATABOARD_4106);
 	device.option_add("db4107", DATABOARD_4107);
 	device.option_add("db4112", DATABOARD_4112);
-	device.option_add("sio", ABC_SIO);
 	device.option_add("slow", LUXOR_55_10828);
 	device.option_add("slutprov", ABC_SLUTPROV);
 	device.option_add("uni800", ABC_UNI800);

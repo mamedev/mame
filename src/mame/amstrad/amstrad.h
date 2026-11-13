@@ -110,6 +110,7 @@ private:
 	int m_plus_irq_cause = 0;
 
 	emu_timer *m_pc2_low_timer = nullptr;
+	bool m_in_pc2_strobe = false;
 	emu_timer *m_video_update_timer = nullptr;
 	emu_timer *m_set_resolution_timer = nullptr;
 

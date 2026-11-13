@@ -910,7 +910,7 @@ void perfrman_state::perfrman(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// pure guesswork, hopefully we can get real values
 	m_screen->set_raw(16_MHz_XTAL/3, 344, 0, 256, 270, 0, 240);
 	m_screen->set_screen_update(FUNC(perfrman_state::screen_update_perfrman));
@@ -959,7 +959,7 @@ void tigerh_state::tigerh(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(36_MHz_XTAL/6, 388, 0, 296, 270, 0, 240);
 	m_screen->set_screen_update(FUNC(tigerh_state::screen_update_slapfight));
 	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_falling));
@@ -1041,7 +1041,7 @@ void slapfght_state::slapfigh(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(m_maincpu->clock() / 4));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(36_MHz_XTAL/6, 388, 0, 296, 270, 0, 240);
 	m_screen->set_screen_update(FUNC(slapfght_state::screen_update_slapfight));
 	m_screen->screen_vblank().set(m_spriteram, FUNC(buffered_spriteram8_device::vblank_copy_falling));

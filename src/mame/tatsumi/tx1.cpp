@@ -184,17 +184,17 @@ void tx1_state::tx1(machine_config &config)
 
 	config.set_default_layout(layout_triphsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_raw(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART);
 	lscreen.set_screen_update(FUNC(tx1_state::screen_update_tx1_left));
 	lscreen.set_palette("palette");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART);
 	m_screen->set_screen_update(FUNC(tx1_state::screen_update_tx1_middle));
 	m_screen->set_palette("palette");
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_raw(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART);
 	rscreen.set_screen_update(FUNC(tx1_state::screen_update_tx1_right));
 	rscreen.screen_vblank().set(FUNC(tx1_state::screen_vblank_tx1));
@@ -227,17 +227,17 @@ void tx1_state::buggyboy(machine_config &config)
 
 	config.set_default_layout(layout_triphsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_raw(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART);
 	lscreen.set_screen_update(FUNC(tx1_state::screen_update_buggyboy_left));
 	lscreen.set_palette("palette");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART);
 	m_screen->set_screen_update(FUNC(tx1_state::screen_update_buggyboy_middle));
 	m_screen->set_palette("palette");
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_raw(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART);
 	rscreen.set_screen_update(FUNC(tx1_state::screen_update_buggyboy_right));
 	rscreen.screen_vblank().set(FUNC(tx1_state::screen_vblank_buggyboy));
@@ -262,7 +262,7 @@ void tx1_state::buggybjr(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART);
 	m_screen->set_screen_update(FUNC(tx1_state::screen_update_buggybjr));
 	m_screen->screen_vblank().set(FUNC(tx1_state::screen_vblank_buggyboy));

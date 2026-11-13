@@ -24,9 +24,10 @@ public:
 	void sprite_port84_w(u8 data);
 	void sprite_port88_w(u8 data);
 	void sprite_port8c_w(u8 data);
-	void sprite_port9c_w(u8 data);
+	void irq_ack_w(u8 data);
 
-	u8 exzisus_hack_r(offs_t offset);
+	virtual u8 read_cpu_bus(int offset) override;
+	virtual void write_cpu_bus(int offset, u8 data) override;
 
 	INTERRUPT_GEN_MEMBER(irq);
 
@@ -53,6 +54,8 @@ private:
 
 	u8 m_spritesize = 0;
 	u8 m_pio0_pb_data = 0;
+	u8 m_scrollx = 0;
+	u8 m_scrolly = 0;
 	u8 m_spritecodelow = 0;
 	u8 m_spritecodehigh = 0;
 

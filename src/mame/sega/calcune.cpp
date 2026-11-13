@@ -148,12 +148,12 @@ uint32_t calcune_state::screen_update_calcune(screen_device &screen, bitmap_rgb3
 	const pen_t *paldata2_s = m_vdp[1]->gfx_palette_shadow()->pens();
 	const pen_t *paldata2_h = m_vdp[1]->gfx_palette_hilight()->pens();
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const unsigned palette_per_scanline = 64 * y;
 
 		uint32_t *const dst = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int pix;
 
@@ -255,7 +255,7 @@ void calcune_state::calcune(machine_config &config)
 
 	Z80(config, "z80", OSC1_CLOCK / 15).set_disable(); /* 3.58 MHz, no code is ever uploaded for the Z80, so it's unused here even if it is present on the PCB */
 
-	screen_device &screen(SCREEN(config, "megadriv", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "megadriv"));
 	screen.set_refresh_hz(double(OSC1_CLOCK) / 10.0 / 262.0 / 342.0); // same as SMS?
 //  screen.set_refresh_hz(double(OSC1_CLOCK) / 8.0 / 262.0 / 427.0); // or 427 Htotal?
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0)); // Vblank handled manually.

@@ -11,16 +11,16 @@ CFLAGS_WARN_GCC_4_8 = \
   -Wunused \
   -Wunused-macros \
 
-CFLAGS_WARN_GCC_6 = $(CFLAGS_WARN_GCC_4_8)\
+CFLAGS_WARN_GCC_5 = $(CFLAGS_WARN_GCC_4_8)\
   -Wbool-compare \
+
+CFLAGS_WARN_GCC_6 = $(CFLAGS_WARN_GCC_5)\
   -Wduplicated-cond \
 
 #  -Wno-strict-aliasing
 
-CFLAGS_WARN_GCC_9 = $(CFLAGS_WARN_GCC_6)\
-  -Waddress-of-packed-member \
+CFLAGS_WARN_GCC_7 = $(CFLAGS_WARN_GCC_6)\
   -Wbool-operation \
-  -Wcast-align=strict \
   -Wconversion \
   -Wdangling-else \
   -Wduplicated-branches \
@@ -28,7 +28,13 @@ CFLAGS_WARN_GCC_9 = $(CFLAGS_WARN_GCC_6)\
   -Wint-in-bool-context \
   -Wmaybe-uninitialized \
   -Wmisleading-indentation \
+
+CFLAGS_WARN_GCC_8 = $(CFLAGS_WARN_GCC_7)\
+  -Wcast-align=strict \
   -Wmissing-attributes
+
+CFLAGS_WARN_GCC_9 = $(CFLAGS_WARN_GCC_8)\
+  -Waddress-of-packed-member \
 
 # In C: -Wsign-conversion enabled also by -Wconversion
 #  -Wno-sign-conversion \
@@ -38,7 +44,11 @@ CFLAGS_WARN_GCC_PPMD_UNALIGNED = \
   -Wno-strict-aliasing \
 
 
-# CFLAGS_WARN = $(CFLAGS_WARN_GCC_4_8)
+CFLAGS_WARN = $(CFLAGS_WARN_GCC_4_8)
+CFLAGS_WARN = $(CFLAGS_WARN_GCC_5)
+CFLAGS_WARN = $(CFLAGS_WARN_GCC_6)
+CFLAGS_WARN = $(CFLAGS_WARN_GCC_7)
+CFLAGS_WARN = $(CFLAGS_WARN_GCC_8)
 CFLAGS_WARN = $(CFLAGS_WARN_GCC_9)
 
 # CXX_STD_FLAGS = -std=c++11

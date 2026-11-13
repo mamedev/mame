@@ -27,17 +27,20 @@ public:
 		m_spriteram(*this, "spriteram")
 	{ }
 
-	void liberate_base(machine_config &config);
-	void liberate(machine_config &config);
-	void liberatb(machine_config &config);
-	void boomrang(machine_config &config);
-	void kamikcab(machine_config &config);
-	void prosoccr(machine_config &config);
-	void prosport(machine_config &config);
+	void liberate(machine_config &config) ATTR_COLD;
+	void liberatb(machine_config &config) ATTR_COLD;
+	void boomrang(machine_config &config) ATTR_COLD;
+	void kamikcab(machine_config &config) ATTR_COLD;
+	void prosoccr(machine_config &config) ATTR_COLD;
+	void prosport(machine_config &config) ATTR_COLD;
 
-	void init_yellowcb();
-	void init_liberate();
-	void init_prosport();
+	void init_yellowcb() ATTR_COLD;
+	void init_liberate() ATTR_COLD;
+	void init_prosport() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -54,7 +57,7 @@ private:
 	required_shared_ptr<uint8_t> m_spriteram;
 
 	uint8_t *m_fg_gfx = nullptr;   /* prosoccr */
-	std::unique_ptr<uint8_t[]> m_charram{};   /* prosoccr */
+	std::unique_ptr<uint8_t[]> m_charram;   /* prosoccr */
 	uint8_t m_io_ram[16]{};
 
 	int m_latch = 0;
@@ -64,6 +67,8 @@ private:
 
 	tilemap_t *m_back_tilemap = nullptr;
 	tilemap_t *m_fix_tilemap = nullptr;
+
+	void liberate_base(machine_config &config) ATTR_COLD;
 
 	uint8_t deco16_io_r(offs_t offset);
 	template<int Bit> void deco16_bank_w(uint8_t data);
@@ -83,8 +88,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_back_tile_info);
 	TILE_GET_INFO_MEMBER(get_fix_tile_info);
 	TILE_GET_INFO_MEMBER(prosport_get_back_tile_info);
-	DECLARE_MACHINE_START(liberate);
-	DECLARE_MACHINE_RESET(liberate);
 	DECLARE_VIDEO_START(liberate);
 	void liberate_palette(palette_device &palette) const;
 	DECLARE_VIDEO_START(prosport);

@@ -207,14 +207,14 @@ OP80( 0xcf, i_rst1  ) { PUSH80(m_ip); m_ip = 8; CHANGE_PC; CLK(1); }
 OP80( 0xd0, i_rnc   ) { if (!CF) { POP80(m_ip); CHANGE_PC; } CLK(1); }
 OP80( 0xd1, i_popd  ) { POP80(Wreg(DW)); }
 OP80( 0xd2, i_jnc   ) { uint32_t addr = fetchword(); if (!CF) { m_ip = addr; CHANGE_PC; } CLK(1); }
-OP80( 0xd3, i_out   ) { uint8_t port = fetch(); write_port_byte(port, Breg(AL)); CLK(1); }
+OP80( 0xd3, i_out   ) { uint8_t port = fetch(); write_port_byte(port, Breg(AL)); if (access_to_be_redone_noclear()) return; CLK(1); }
 OP80( 0xd4, i_cnc   ) { uint32_t addr = fetchword(); if (!CF) { PUSH80(m_ip); m_ip = addr; CHANGE_PC; } CLK(1); }
 OP80( 0xd5, i_pushd ) { PUSH80(Wreg(DW)); }
 OP80( 0xd6, i_sui   ) { uint32_t src = fetch(), dst = Breg(AL); SUBB; Breg(AL) = dst; CLK(1); }
 OP80( 0xd7, i_rst2  ) { PUSH80(m_ip); m_ip = 0x10; CHANGE_PC; CLK(1); }
 OP80( 0xd8, i_rc    ) { if (CF) { POP80(m_ip); CHANGE_PC; } CLK(1); }
 OP80( 0xda, i_jc    ) { uint32_t addr = fetchword(); if (CF) { m_ip = addr; CHANGE_PC; } CLK(1); }
-OP80( 0xdb, i_in    ) { uint8_t port = fetch(); Breg(AL) = read_port_byte(port); CLK(1); }
+OP80( 0xdb, i_in    ) { uint8_t port = fetch(); const uint8_t v = read_port_byte(port); if (access_to_be_redone_noclear()) return; Breg(AL) = v; CLK(1); }
 OP80( 0xdc, i_cc    ) { uint32_t addr = fetchword(); if (CF) { PUSH80(m_ip); m_ip = addr; CHANGE_PC; } CLK(1); }
 OP80( 0xde, i_sbi   ) { uint32_t src = fetch(), dst = Breg(AL); SUBCB; Breg(AL) = dst; CLK(1); }
 OP80( 0xdf, i_rst3  ) { PUSH80(m_ip); m_ip = 0x18; CHANGE_PC; CLK(1); }

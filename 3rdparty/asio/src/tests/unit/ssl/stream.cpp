@@ -2,7 +2,7 @@
 // stream.cpp
 // ~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -83,7 +83,7 @@ void test()
 
     stream3 = std::move(stream4);
 
-    // basic_io_object functions.
+    // I/O object functions.
 
     ssl::stream<ip::tcp::socket>::executor_type ex = stream1.get_executor();
     (void)ex;

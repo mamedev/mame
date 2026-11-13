@@ -47,9 +47,9 @@ u8 irobot_state::sharedmem_r(offs_t offset)
 	switch (m_outx)
 	{
 		case 0:
-			return ((u8 *)m_mathboxrom.target())[((m_mpage & 1) << 13) + BYTE_XOR_BE(offset)];
+			return util::big_endian_cast<u8 const>(m_mathboxrom.target())[((m_mpage & 1) << 13) + offset];
 		case 1:
-			return ((u8 *)m_mathboxrom.target())[0x4000 + ((m_mpage & 3) << 13) + BYTE_XOR_BE(offset)];
+			return util::big_endian_cast<u8 const>(m_mathboxrom.target())[0x4000 + ((m_mpage & 3) << 13) + offset];
 		case 2:
 			return m_commram[m_commbank][BYTE_XOR_BE(offset & 0xfff)];
 		case 3:

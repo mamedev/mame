@@ -545,7 +545,7 @@ inline void pc6001mk2_state::refresh_crtc_params()
 	const int vtotal = 262;
 	const XTAL pclock = XTAL(28'636'363) / 4;
 
-	m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, pclock).as_attoseconds());
+	m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, pclock));
 
 }
 
@@ -894,7 +894,7 @@ inline void pc6001mk2sr_state::refresh_crtc_params()
 	const int vtotal = 262;
 	const XTAL pclock = XTAL(28'636'363) / (4 >> m_width80);
 
-	m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, pclock).as_attoseconds());
+	m_screen->configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, pclock));
 }
 
 void pc6001mk2sr_state::pc6001mk2sr_map(address_map &map)
@@ -1515,7 +1515,7 @@ void pc6001_state::pc6001(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_pc6001m2);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(pc6001_state::screen_update));
 	// allegedly NTSC clock, PC8801FH_OSC1 equivalent
 	m_screen->set_raw(XTAL(28'636'363) / 4, 456, 0, 320, 262, 0, 240);

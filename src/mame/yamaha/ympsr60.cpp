@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont,Aaron Giles
 /*
-    Yamaha PSR-60/PSR-70 PortaSound keyboards
+    Yamaha PSR-60/PSR-70 PortaTone keyboards
     Preliminary driver by R. Belmont, major thanks to reverse-engineering work by JKN0
 
     Note: PSR-50 is likely the same hardware.
@@ -746,5 +746,5 @@ ROM_END
 
 } // namespace
 
-CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PSR-60 PortaSound", MACHINE_IMPERFECT_SOUND)
-CONS(1985, psr70, psr60, 0, psr70, psr70, psr60_state, empty_init, "Yamaha", "PSR-70 PortaSound", MACHINE_IMPERFECT_SOUND)
+CONS(1985, psr60, 0,     0, psr60, psr60, psr60_state, empty_init, "Yamaha", "PortaTone PSR-60", MACHINE_IMPERFECT_SOUND)
+CONS(1985, psr70, psr60, 0, psr70, psr70, psr60_state, empty_init, "Yamaha", "PortaTone PSR-70", MACHINE_IMPERFECT_SOUND)

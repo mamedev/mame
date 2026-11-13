@@ -611,7 +611,7 @@ void m3_state::m3(machine_config &config)
 	rs232.cts_handler().set("usart", FUNC(i8251_device::write_cts));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(21'840'000 / 2, 707, 0, 560, 309, 0, 240); // unknown clock, hand-tuned to ~50 fps
 	screen.set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

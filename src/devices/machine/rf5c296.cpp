@@ -5,6 +5,10 @@
 
 // rf5c296 is very inaccurate at that point, it hardcodes the gnet config
 
+//#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+#include "logmacro.h"
+
 DEFINE_DEVICE_TYPE(RF5C296, rf5c296_device, "rf5c296", "RF5C296 PC Card controller")
 
 rf5c296_device::rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -54,6 +58,8 @@ void rf5c296_device::io_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		offset++;
 	}
 
+	LOGMASKED(LOG_GENERAL, "%s rf5c296_io_w %04x, %04x = %04x\n", machine().describe_context().c_str(), offset, mem_mask, data);
+
 	switch(offset)
 	{
 	case 0x3e0:
@@ -99,6 +105,7 @@ uint16_t rf5c296_device::io_r(offs_t offset, uint16_t mem_mask)
 		break;
 	}
 
+	LOGMASKED(LOG_GENERAL, "%s rf5c296_io_r %04x, %04x = %04x\n", machine().describe_context().c_str(), offset, mem_mask, data << shift);
 	return data << shift;
 }
 
@@ -106,10 +113,13 @@ uint16_t rf5c296_device::io_r(offs_t offset, uint16_t mem_mask)
 
 uint16_t rf5c296_device::mem_r(offs_t offset, uint16_t mem_mask)
 {
-	return m_pccard->read_reg(offset, mem_mask);
+	uint16_t data = m_pccard->read_reg(offset, mem_mask);
+	LOGMASKED(LOG_GENERAL, "%s rf5c296_mem_r %04x, %04x = %04x\n", machine().describe_context().c_str(), offset, mem_mask, data);
+	return data;
 }
 
 void rf5c296_device::mem_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
+	LOGMASKED(LOG_GENERAL, "%s rf5c296_mem_w %04x, %04x = %04x\n", machine().describe_context().c_str(), offset, mem_mask, data);
 	m_pccard->write_reg(offset, data, mem_mask);
 }

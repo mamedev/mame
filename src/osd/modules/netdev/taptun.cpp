@@ -11,7 +11,6 @@
 #include "osdcore.h" // osd_printf_verbose
 #include "osdfile.h" // PATH_SEPARATOR
 
-#include "util/hashing.h" // crc32_creator
 #include "util/unicode.h"
 
 #include <memory>
@@ -43,9 +42,6 @@
 namespace osd {
 
 namespace {
-
-// Ethernet minimum frame length
-static constexpr int ETHERNET_MIN_FRAME = 64;
 
 class taptun_module : public osd_module, public netdev_module
 {
@@ -156,36 +152,6 @@ netdev_tap::~netdev_tap()
 #else
 	close(m_fd);
 #endif
-}
-
-static u32 finalise_frame(u8 buf[], u32 length)
-{
-	/*
-	 * The taptun driver receives frames which are shorter than the Ethernet
-	 * minimum. Partly this is because it can't see the frame check sequence
-	 * bytes, but mainly it's because the OS expects the lower level device
-	 * to add the required padding.
-	 *
-	 * We do the equivalent padding here (i.e. pad with zeroes to the
-	 * minimum Ethernet length minus FCS), so that devices which check
-	 * for this will not reject these packets.
-	 */
-	if (length < ETHERNET_MIN_FRAME - 4)
-	{
-		std::fill_n(&buf[length], ETHERNET_MIN_FRAME - length - 4, 0);
-
-		length = ETHERNET_MIN_FRAME - 4;
-	}
-
-	// compute and append the frame check sequence
-	const u32 fcs = util::crc32_creator::simple(buf, length);
-
-	buf[length++] = (fcs >> 0) & 0xff;
-	buf[length++] = (fcs >> 8) & 0xff;
-	buf[length++] = (fcs >> 16) & 0xff;
-	buf[length++] = (fcs >> 24) & 0xff;
-
-	return length;
 }
 
 #if defined(_WIN32)

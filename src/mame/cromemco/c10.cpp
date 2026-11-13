@@ -177,7 +177,7 @@ void c10_state::c10(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &c10_state::io_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(c10_state::screen_update));

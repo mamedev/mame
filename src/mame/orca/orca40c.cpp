@@ -277,7 +277,7 @@ void orca_ovg_40c_device::device_config_complete()
 	if (!has_screen())
 		return;
 
-	if (!screen().refresh_attoseconds())
+	if (!screen().has_been_setup())
 		screen().set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 
 	if (!screen().has_screen_update())

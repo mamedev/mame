@@ -97,7 +97,7 @@ void paipaile_state::paipaile(machine_config &config)
 	ARM7(config, m_maincpu, 100_MHz_XTAL); // TODO: CPU core unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &paipaile_state::program_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER)); // TODO
+	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);

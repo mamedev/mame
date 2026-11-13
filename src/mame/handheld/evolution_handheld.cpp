@@ -164,7 +164,7 @@ void evolution_handheldgame_state::evolhh(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &evolution_handheldgame_state::evolution_map);
 	m_maincpu->set_addrmap(AS_DATA, &evolution_handheldgame_state::evolution_ram_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(256, 256); // resolution not confirmed
@@ -294,10 +294,10 @@ CONS( 2018, smkatsum,    0,       0,      smkatsum, evolhh, evolution_handheldga
 // おしりたんてい ププッとかいけつゲーム
 CONS( 2020, buttdtct,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Tomy", "Oshiri Tantei - Puputto Kaiketsu Game (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2015, pokexyqz,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pokemon Encyclopedia Z Pokemon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2015, pokexyqz,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", u8"Pokémon Encyclopedia Z Pokémon XY Quiz Game Rotom (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ロトム図鑑 サン＆ムーン ポケモン クイズ
-CONS( 2015, pokesmqz,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Rotom Zukan Sun & Moon Pokemon Quiz (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2015, pokesmqz,    0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", u8"Rotom Zukan Sun & Moon Pokémon Quiz (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 CONS( 201?, tomyspt,     0,       0,      smkatsum, evolhh, evolution_handheldgame_state, empty_init, "Takara Tomy", "Pretty Rhythm Smart Pod Touch (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 

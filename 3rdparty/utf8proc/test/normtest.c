@@ -27,11 +27,12 @@ int main(int argc, char **argv)
 
           if (buf[0] == '#') continue;
 
-          offset = encode(source, buf);
-          offset += encode(NFC, buf + offset);
-          offset += encode(NFD, buf + offset);
-          offset += encode(NFKC, buf + offset);
-          offset += encode(NFKD, buf + offset);
+          size_t len;
+          offset = encode(source, &len, buf);
+          offset += encode(NFC, &len, buf + offset);
+          offset += encode(NFD, &len, buf + offset);
+          offset += encode(NFKC, &len, buf + offset);
+          offset += encode(NFKD, &len, buf + offset);
 
           CHECK_NORM(NFC, NFC, source);
           CHECK_NORM(NFC, NFC, NFC);

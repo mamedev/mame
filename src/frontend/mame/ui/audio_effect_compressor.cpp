@@ -16,6 +16,7 @@
 #include "audio_effects/aeffect.h"
 #include "audio_effects/compressor.h"
 #include "input.h"
+#include "sound.h"
 
 
 namespace ui {

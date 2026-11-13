@@ -501,7 +501,15 @@ std::pair<std::error_condition, std::vector<u8>> prodos_impl::any_read(u8 type, 
 		auto mblk = m_blockdev.get(block);
 		for(u32 j=0; dst != end; j += 256) {
 			u32 idx = j/256;
-			auto iblk = m_blockdev.get(mblk->r8(idx) | (mblk->r8(idx | 0x100) << 8));
+			u16 iblkno = mblk->r8(idx) | (mblk->r8(idx | 0x100) << 8);
+			if(!iblkno) {
+				// Sparse tree files may omit a whole index block
+				u32 size = std::min<u32>(end - dst, 256*512);
+				std::fill_n(dst, size, 0);
+				dst += size;
+				continue;
+			}
+			auto iblk = m_blockdev.get(iblkno);
 			for(u32 i=0; i != 256 && dst != end; i++) {
 				u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
 				if(blk)
@@ -585,8 +593,14 @@ std::error_condition prodos_impl::any_blocks(std::vector<u32> &alloc_blocks, std
 		auto mblk = m_blockdev.get(block);
 		for(u32 j=0; nb != 0; j += 256) {
 			u32 idx = j/256;
-			alloc_blocks.push_back(mblk->r8(idx) | (mblk->r8(idx | 0x100) << 8));
-			auto iblk = m_blockdev.get(alloc_blocks.back());
+			u16 iblkno = mblk->r8(idx) | (mblk->r8(idx | 0x100) << 8);
+			if(!iblkno) {
+				// Sparse tree files may omit a whole index block
+				nb -= std::min<u32>(nb, 256);
+				continue;
+			}
+			alloc_blocks.push_back(iblkno);
+			auto iblk = m_blockdev.get(iblkno);
 			for(u32 i=0; i != 256 && nb != 0; i++, nb--) {
 				u16 blk = iblk->r8(i) | (iblk->r8(i | 0x100) << 8);
 				if(blk)

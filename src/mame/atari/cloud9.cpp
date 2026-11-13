@@ -536,7 +536,7 @@ void cloud9_state::machine_start()
 
 	// reconfigure the visible area to match
 	visarea.set(0, 255, m_vblank_end + 1, m_vblank_start);
-	m_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
+	m_screen->configure(320, 256, visarea, attotime::from_ticks(VTOTAL * HTOTAL, PIXEL_CLOCK));
 
 	// create a timer for IRQs and set up the first callback
 	m_irq_timer = timer_alloc(FUNC(cloud9_state::clock_irq), this);
@@ -768,7 +768,7 @@ void cloud9_state::cloud9(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_cloud9);
 	PALETTE(config, m_palette).set_entries(64);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz((double)PIXEL_CLOCK / (double)VTOTAL / (double)HTOTAL);
 	m_screen->set_size(HTOTAL, VTOTAL);
 	m_screen->set_vblank_time(0);          // VBLANK is handled manually

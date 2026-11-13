@@ -1360,7 +1360,7 @@ void rohga_state::rohga_base(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram[0]);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(40*8, 32*8);
@@ -2288,5 +2288,5 @@ GAME( 1992, nitrobala, nitrobal, nitrobal, nitrobal, rohga_state, init_nitrobal,
 GAME( 1992, nitrobalb, nitrobal, nitrobal, nitrobal, rohga_state, init_nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 3)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, rohga_state, init_nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)",          MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, init_schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, hangzo,    0,        hangzo,   hangzo,   rohga_state, init_hangzo,   ROT0,   "Hot-B",                 "Hangzo (Japan, prototype)", MACHINE_SUPPORTS_SAVE ) // ROM contains a '(c)1992 Data East Corporation' string, but other sources indicate the game is by Hot-B
+GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, init_schmeisr, ROT0,   "Hot-B Co.",             "Schmeiser Robo (Japan)",    MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1992, hangzo,    0,        hangzo,   hangzo,   rohga_state, init_hangzo,   ROT0,   "Hot-B Co.",             "Hangzo (Japan, prototype)", MACHINE_SUPPORTS_SAVE ) // ROM contains a '(c)1992 Data East Corporation' string, but other sources indicate the game is by Hot-B

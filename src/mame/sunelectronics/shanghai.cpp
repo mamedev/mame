@@ -419,7 +419,7 @@ void shanghai_state::shanghai(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(384, 280);
@@ -454,7 +454,7 @@ void shanghai_state::shangha2(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(384, 280);
@@ -494,7 +494,7 @@ void shanghai_state::kothello(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(384, 280);

@@ -64,7 +64,7 @@ void a1supply_state::a1supply(machine_config &config)
 	cpu.set_rom_map(&a1supply_state::rom_map);
 
 	// video hardware
-	// SCREEN(config, "screen", SCREEN_TYPE_RASTER); // TODO
+	// SCREEN(config, "screen"); // TODO
 
 	// sound hardware
 	// TODO: netlist

@@ -172,6 +172,26 @@ void output_manager::register_save()
 
 
 /*-------------------------------------------------
+    device_outputs - get outputs for device
+-------------------------------------------------*/
+
+std::pair<output_manager::output_iterator, output_manager::output_iterator> output_manager::device_outputs(device_t &device)
+{
+	auto const l = std::lower_bound(
+			m_save_order.begin(),
+			m_save_order.end(),
+			device,
+			[] (item_impl const &i, device_t const &d) { return i.device_tag() < d.tag(); });
+	auto const u = std::upper_bound(
+			l,
+			m_save_order.end(),
+			device,
+			[] (device_t const &d, item_impl const &i) { return d.tag() < i.device_tag(); });
+	return std::make_pair(output_iterator(&*l), output_iterator(&*u));
+}
+
+
+/*-------------------------------------------------
     validate_name - check for illegal names
 -------------------------------------------------*/
 

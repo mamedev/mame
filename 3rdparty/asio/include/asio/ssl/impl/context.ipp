@@ -3,7 +3,7 @@
 // ~~~~~~~~~~~~~~~~~~~~
 //
 // Copyright (c) 2005 Voipster / Indrek dot Juhani at voipster dot com
-// Copyright (c) 2005-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2005-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -27,6 +27,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace ssl {
 
 struct context::bio_cleanup
@@ -269,8 +270,10 @@ context::context(context::method m)
 #endif // defined(SSL_TXT_TLSV1_2)
 
     // TLS v1.3.
-#if (OPENSSL_VERSION_NUMBER >= 0x10101000L) \
-    && !defined(LIBRESSL_VERSION_NUMBER)
+#if ((OPENSSL_VERSION_NUMBER >= 0x10101000L) \
+      && (!defined(LIBRESSL_VERSION_NUMBER) || \
+        LIBRESSL_VERSION_NUMBER >= 0x3020000fL)) \
+    || defined(ASIO_USE_WOLFSSL)
   case context::tlsv13:
     handle_ = ::SSL_CTX_new(::TLS_method());
     if (handle_)
@@ -295,16 +298,18 @@ context::context(context::method m)
       SSL_CTX_set_max_proto_version(handle_, TLS1_3_VERSION);
     }
     break;
-#else // (OPENSSL_VERSION_NUMBER >= 0x10101000L)
-      //   && !defined(LIBRESSL_VERSION_NUMBER)
+#else // ((OPENSSL_VERSION_NUMBER >= 0x10101000L)
+      //     && !defined(LIBRESSL_VERSION_NUMBER))
+      //   || defined(ASIO_USE_WOLFSSL)
   case context::tlsv13:
   case context::tlsv13_client:
   case context::tlsv13_server:
     asio::detail::throw_error(
         asio::error::invalid_argument, "context");
     break;
-#endif // (OPENSSL_VERSION_NUMBER >= 0x10101000L)
-       //   && !defined(LIBRESSL_VERSION_NUMBER)
+#endif // ((OPENSSL_VERSION_NUMBER >= 0x10101000L)
+       //     && !defined(LIBRESSL_VERSION_NUMBER))
+       //   || defined(ASIO_USE_WOLFSSL)
 
     // Any supported SSL/TLS version.
   case context::sslv23:
@@ -794,7 +799,7 @@ ASIO_SYNC_OP_VOID context::use_certificate_chain(
         ASIO_SYNC_OP_VOID_RETURN(ec);
       }
     }
-  
+
     result = ::ERR_peek_last_error();
     if ((ERR_GET_LIB(result) == ERR_LIB_PEM)
         && (ERR_GET_REASON(result) == PEM_R_NO_START_LINE))
@@ -1312,6 +1317,7 @@ asio::error_code context::translate_error(long error)
 }
 
 } // namespace ssl
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

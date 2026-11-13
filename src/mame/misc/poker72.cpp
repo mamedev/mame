@@ -361,7 +361,7 @@ void poker72_state::poker72(machine_config &config)
 	I80C51(config, "subcpu", 8000000); // actually 89C51, ? MHz
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -404,6 +404,7 @@ void poker72_state::init_poker72()
 	m_rombank->configure_entries(0, 4, memregion("maincpu")->base(), 0x8000);
 	m_rombank->set_entry(0);
 
+	// HACK: what is this for?
 	//rom[0x4a9] = 0x28;
 	rom[0x4aa] = 0x00;
 }

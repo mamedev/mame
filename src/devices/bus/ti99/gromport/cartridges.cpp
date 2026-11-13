@@ -338,10 +338,7 @@ std::pair<std::error_condition, std::string> ti99_cartridge_device::call_load()
 	}
 	else
 	{
-		util::core_file::ptr proxy;
-		std::error_condition err = util::core_file::open_proxy(image_core_file(), proxy);
-		if (!err)
-			err = rpk_open(machine().options(), std::move(proxy), machine().system().name, m_rpk);
+		std::error_condition const err = rpk_open(machine().options(), image_core_file(), machine().system().name, m_rpk);
 		if (err)
 		{
 			LOGMASKED(LOG_WARN, "Failed to load cartridge '%s': %s\n", basename(), err.message().c_str());
@@ -1673,7 +1670,7 @@ std::unique_ptr<ti99_cartridge_device::ti99_rpk_socket> ti99_cartridge_device::r
     system_name - name of the driver (also just for NVRAM handling)
 -------------------------------------------------*/
 
-std::error_condition ti99_cartridge_device::rpk_open(emu_options &options, std::unique_ptr<util::random_read> &&stream, const char *system_name, std::unique_ptr<rpk> &result)
+std::error_condition ti99_cartridge_device::rpk_open(emu_options &options, util::random_read &stream, const char *system_name, std::unique_ptr<rpk> &result)
 {
 	std::unique_ptr<rpk> newrpk = std::make_unique<rpk>(options, system_name);
 
@@ -1681,7 +1678,7 @@ std::error_condition ti99_cartridge_device::rpk_open(emu_options &options, std::
 
 	// open the RPK
 	rpk_file::ptr file;
-	std::error_condition err = reader.read(std::move(stream), file);
+	std::error_condition err = reader.read(stream, file);
 	if (err)
 		return err;
 

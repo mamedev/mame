@@ -10,8 +10,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "speaker.h"
+
+#include "emuopts.h"
+#include "sound.h"
 
 
 

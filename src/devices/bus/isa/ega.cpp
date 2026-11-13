@@ -537,7 +537,7 @@ DEFINE_DEVICE_TYPE(ISA8_EGA, isa8_ega_device, "ega", "IBM Enhanced Graphics Adap
 
 void isa8_ega_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16.257_MHz_XTAL, 912, 0, 640, 262, 0, 200);
 	m_screen->set_screen_update(EGA_CRTC_NAME, FUNC(crtc_ega_device::screen_update));
 	m_screen->set_palette(m_palette);
@@ -587,8 +587,14 @@ isa8_ega_device::isa8_ega_device(const machine_config &mconfig, device_type type
 	device_isa8_card_interface(mconfig, *this),
 	m_crtc_ega(*this, EGA_CRTC_NAME), m_videoram(nullptr), m_charA(nullptr), m_charB(nullptr),
 	m_misc_output(0), m_feature_control(0), m_frame_cnt(0), m_hsync(0), m_vsync(0), m_vblank(0), m_display_enable(0), m_irq(0), m_video_mode(0),
-	m_palette(*this, "palette"), m_screen(*this, EGA_SCREEN_NAME)
+	m_last_pixel_value(0), m_palette(*this, "palette"), m_screen(*this, EGA_SCREEN_NAME)
 {
+	std::fill(std::begin(m_plane), std::end(m_plane), nullptr);
+	std::fill(std::begin(m_read_latch), std::end(m_read_latch), 0);
+
+	m_attribute = { };
+	m_sequencer = { };
+	m_graphics_controller = { };
 }
 
 //-------------------------------------------------
@@ -604,21 +610,20 @@ void isa8_ega_device::device_start()
 
 	for (int i = 0; i < 64; i++ )
 	{
-		uint8_t r = ( ( i & 0x04 ) ? 0xAA : 0x00 ) + ( ( i & 0x20 ) ? 0x55 : 0x00 );
-		uint8_t g = ( ( i & 0x02 ) ? 0xAA : 0x00 ) + ( ( i & 0x10 ) ? 0x55 : 0x00 );
-		uint8_t b = ( ( i & 0x01 ) ? 0xAA : 0x00 ) + ( ( i & 0x08 ) ? 0x55 : 0x00 );
+		uint8_t r = ( ( i & 0x04 ) ? 0xaa : 0x00 ) + ( ( i & 0x20 ) ? 0x55 : 0x00 );
+		uint8_t g = ( ( i & 0x02 ) ? 0xaa : 0x00 ) + ( ( i & 0x10 ) ? 0x55 : 0x00 );
+		uint8_t b = ( ( i & 0x01 ) ? 0xaa : 0x00 ) + ( ( i & 0x08 ) ? 0x55 : 0x00 );
 
 		m_palette->set_pen_color( i, r, g, b );
 	}
 
-	if(m_default_bios_tag != "iskr3104")
+	if (m_default_bios_tag != "iskr3104")
 	{
 		uint8_t   *dst = memregion(subtag("user2").c_str())->base() + 0x0000;
 		uint8_t   *src = memregion(subtag("user1").c_str())->base() + 0x3fff;
-		int     i;
 
 		/* Perform the EGA bios address line swaps */
-		for( i = 0; i < 0x4000; i++ )
+		for (int i = 0; i < 0x4000; i++)
 		{
 			*dst++ = *src--;
 		}
@@ -635,6 +640,26 @@ void isa8_ega_device::device_start()
 	m_plane[2] = m_videoram + 0x20000;
 	m_plane[3] = m_videoram + 0x30000;
 
+	ega_save_state();
+
+	m_isa->install_rom(this, 0xc0000, 0xc3fff, "user2");
+	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_w)));
+	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_w)));
+	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_w)));
+}
+
+//-------------------------------------------------
+//  ega_save_state - register the core state, for a
+//  subclass that replaces device_start()
+//-------------------------------------------------
+
+void isa8_ega_device::ega_save_state()
+{
+	save_pointer(NAME(m_vram), 256 * 1024);
+	save_item(NAME(m_read_latch));
+	save_item(NAME(m_misc_output));
+	save_item(NAME(m_feature_control));
+
 	save_item(STRUCT_MEMBER(m_graphics_controller, index));
 	save_item(STRUCT_MEMBER(m_graphics_controller, data));
 	save_item(STRUCT_MEMBER(m_sequencer, index));
@@ -642,12 +667,15 @@ void isa8_ega_device::device_start()
 	save_item(STRUCT_MEMBER(m_attribute, index));
 	save_item(STRUCT_MEMBER(m_attribute, data));
 	save_item(STRUCT_MEMBER(m_attribute, index_write));
-	save_pointer(NAME(m_vram), 256 * 1024);
 
-	m_isa->install_rom(this, 0xc0000, 0xc3fff, "user2");
-	m_isa->install_device(0x3b0, 0x3bf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3b0_w)));
-	m_isa->install_device(0x3c0, 0x3cf, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3c0_w)));
-	m_isa->install_device(0x3d0, 0x3df, read8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_r)), write8sm_delegate(*this, FUNC(isa8_ega_device::pc_ega8_3d0_w)));
+	save_item(NAME(m_frame_cnt));
+	save_item(NAME(m_hsync));
+	save_item(NAME(m_vsync));
+	save_item(NAME(m_vblank));
+	save_item(NAME(m_display_enable));
+	save_item(NAME(m_irq));
+	save_item(NAME(m_video_mode));
+	save_item(NAME(m_last_pixel_value));
 }
 
 //-------------------------------------------------
@@ -658,9 +686,9 @@ void isa8_ega_device::device_reset()
 {
 	m_feature_control = 0;
 
-	memset(&m_attribute,0,sizeof(m_attribute));
-	memset(&m_sequencer,0,sizeof(m_sequencer));
-	memset(&m_graphics_controller,0,sizeof(m_graphics_controller));
+	m_attribute = { };
+	m_sequencer = { };
+	m_graphics_controller = { };
 
 	m_frame_cnt = 0;
 	m_hsync = 0;
@@ -685,12 +713,12 @@ void isa8_ega_device::device_reset()
 	m_attribute.data[7] = 7;
 	m_attribute.data[8] = 0x38;
 	m_attribute.data[9] = 0x39;
-	m_attribute.data[10] = 0x3A;
-	m_attribute.data[11] = 0x3B;
-	m_attribute.data[12] = 0x3C;
-	m_attribute.data[13] = 0x3D;
-	m_attribute.data[14] = 0x3E;
-	m_attribute.data[15] = 0x3F;
+	m_attribute.data[10] = 0x3a;
+	m_attribute.data[11] = 0x3b;
+	m_attribute.data[12] = 0x3c;
+	m_attribute.data[13] = 0x3d;
+	m_attribute.data[14] = 0x3e;
+	m_attribute.data[15] = 0x3f;
 
 	m_video_mode = 0;
 }
@@ -800,20 +828,21 @@ CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_graphics )
 	{
 		// Odd/Even mode (CGA compatible)
 
-		uint16_t offset = ( ma & 0x1fff ) | ( ( y & 1 ) << 12 );
-		uint8_t data = m_plane[BIT(m_misc_output, 5) ? 2 : 0][offset];
+		uint8_t data = m_plane[0][ma];
 
 		*p = m_attribute.data[ ( data >> 6 )        ]; p++;
 		*p = m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
 		*p = m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
 		*p = m_attribute.data[   data        & 0x03 ]; p++;
 
-		data = m_plane[BIT(m_misc_output, 5) ? 3 : 1][offset];
+		data = m_plane[1][ma];
 
 		*p = m_attribute.data[ ( data >> 6 )        ]; p++;
 		*p = m_attribute.data[ ( data >> 4 ) & 0x03 ]; p++;
 		*p = m_attribute.data[ ( data >> 2 ) & 0x03 ]; p++;
 		*p = m_attribute.data[   data        & 0x03 ]; p++;
+
+		m_last_pixel_value = *(p - 1);
 	}
 	else
 	{
@@ -847,6 +876,8 @@ CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_graphics )
 			data2 >>= 1;
 			data3 >>= 1;
 		}
+
+		m_last_pixel_value = p[0];
 	}
 }
 
@@ -874,7 +905,7 @@ CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_text )
 		fg &= 0x07;
 	}
 
-	if(m_screen->visible_area().height() == 200) // the ibm 5154 forces cga compatibility in 200 line modes
+	if (m_screen->visible_area().height() == 200) // the ibm 5154 forces cga compatibility in 200 line modes
 	{
 		fg = fg | (BIT(fg, 4) ? 0x38 : 0);
 		if ( fg == 6 )
@@ -909,7 +940,12 @@ CRTC_EGA_PIXEL_UPDATE( isa8_ega_device::pc_ega_text )
 	*p = ( data & 0x02 ) ? fg : bg; p++;
 	*p = ( data & 0x01 ) ? fg : bg; p++;
 	if ( !( m_sequencer.data[0x01] & 0x01 ) )
+	{
 		*p = ( m_attribute.data[0x10] & 0x04 ) ? *(p - 1) : bg;
+		m_last_pixel_value = *p;
+	}
+	else
+		m_last_pixel_value = *(p - 1);
 }
 
 
@@ -939,13 +975,13 @@ void isa8_ega_device::change_mode()
 		/* Set character maps */
 		if ( m_sequencer.data[0x04] & 0x01 )
 		{
-			m_charA = m_plane[2] + ( ( m_sequencer.data[0x03] & 0x0c ) >> 2 ) * 0x4000;
-			m_charB = m_plane[2] + ( m_sequencer.data[0x03] & 0x03 ) * 0x4000;
+			m_charA = font_base() + ( ( m_sequencer.data[0x03] & 0x0c ) >> 2 ) * 0x4000;
+			m_charB = font_base() + ( m_sequencer.data[0x03] & 0x03 ) * 0x4000;
 		}
 		else
 		{
-			m_charA = m_plane[2];
-			m_charB = m_plane[2];
+			m_charA = font_base();
+			m_charB = font_base();
 		}
 	}
 
@@ -967,7 +1003,7 @@ void isa8_ega_device::change_mode()
 
 uint8_t isa8_ega_device::read(offs_t offset)
 {
-	uint8_t data = 0xFF;
+	uint8_t data = 0xff;
 
 	if ( !machine().side_effects_disabled() )
 	{
@@ -1025,10 +1061,8 @@ uint8_t isa8_ega_device::read(offs_t offset)
 }
 
 
-uint8_t isa8_ega_device::alu_op( uint8_t data, uint8_t latch_data )
+uint8_t isa8_ega_device::alu_op( uint8_t data, uint8_t latch_data, uint8_t mask )
 {
-	uint8_t mask = m_graphics_controller.data[8];
-
 	switch( m_graphics_controller.data[3] & 0x18 )
 	{
 	case 0x00:      // Unmodified
@@ -1058,7 +1092,7 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 	{
 	case 0:     // Write mode 0
 		// Pass through barrel shifter
-		data = ( ( ( data << 8 ) | data ) >> ( m_graphics_controller.data[3] & 0x07 ) ) & 0xFF;
+		data = ( ( ( data << 8 ) | data ) >> ( m_graphics_controller.data[3] & 0x07 ) ) & 0xff;
 
 		d[0] = d[1] = d[2] = d[3] = data;
 
@@ -1081,10 +1115,10 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 		}
 
 		// Pass through ALUs
-		alu[0] = alu_op( d[0], m_read_latch[0] );
-		alu[1] = alu_op( d[1], m_read_latch[1] );
-		alu[2] = alu_op( d[2], m_read_latch[2] );
-		alu[3] = alu_op( d[3], m_read_latch[3] );
+		alu[0] = alu_op( d[0], m_read_latch[0], m_graphics_controller.data[8] );
+		alu[1] = alu_op( d[1], m_read_latch[1], m_graphics_controller.data[8] );
+		alu[2] = alu_op( d[2], m_read_latch[2], m_graphics_controller.data[8] );
+		alu[3] = alu_op( d[3], m_read_latch[3], m_graphics_controller.data[8] );
 
 		break;
 
@@ -1101,15 +1135,22 @@ void isa8_ega_device::write(offs_t offset, uint8_t data)
 		d[2] = ( data & 0x04 ) ? 0xff : 0x00;
 		d[3] = ( data & 0x08 ) ? 0xff : 0x00;
 
-		alu[0] = alu_op( d[0], m_read_latch[0] );
-		alu[1] = alu_op( d[1], m_read_latch[1] );
-		alu[2] = alu_op( d[2], m_read_latch[2] );
-		alu[3] = alu_op( d[3], m_read_latch[3] );
+		alu[0] = alu_op( d[0], m_read_latch[0], m_graphics_controller.data[8] );
+		alu[1] = alu_op( d[1], m_read_latch[1], m_graphics_controller.data[8] );
+		alu[2] = alu_op( d[2], m_read_latch[2], m_graphics_controller.data[8] );
+		alu[3] = alu_op( d[3], m_read_latch[3], m_graphics_controller.data[8] );
 		break;
 
 	case 3:     // Write mode 3
-		popmessage("EGA: Write mode 3 not supported!");
-		return;
+		{
+			data = ( ( ( data << 8 ) | data ) >> ( m_graphics_controller.data[3] & 0x07 ) ) & 0xff;
+
+			const uint8_t mask = data & m_graphics_controller.data[8];
+
+			for ( int i = 0; i < 4; i++ )
+				alu[i] = alu_op( BIT( m_graphics_controller.data[0], i ) ? 0xff : 0x00, m_read_latch[i], mask );
+		}
+		break;
 	}
 
 	offset &= 0xffff;
@@ -1210,11 +1251,17 @@ uint8_t isa8_ega_device::pc_ega8_3X0_r(offs_t offset)
 
 		if ( m_display_enable )
 		{
-			/* For the moment i'm putting in some bogus data */
-			static int pixel_data;
-
-			pixel_data = ( pixel_data + 1 ) & 0x03;
-			data |= ( pixel_data << 4 );
+			/* Diagnostic bits 4-5 feed back 2 of the attribute controller's 6
+			   P0-P5 color outputs, selected by the Video Status Mux Field in
+			   AR12 bits 5-4, from whichever pixel was drawn last. */
+			uint8_t pins = m_last_pixel_value;
+			switch ( ( m_attribute.data[0x12] >> 4 ) & 0x03 )
+			{
+			case 0: data |= ( BIT(pins, 0) << 4 ) | ( BIT(pins, 2) << 5 ); break;
+			case 1: data |= ( BIT(pins, 4) << 4 ) | ( BIT(pins, 5) << 5 ); break;
+			case 2: data |= ( BIT(pins, 1) << 4 ) | ( BIT(pins, 3) << 5 ); break;
+			case 3: data |= ( BIT(pins, 5) << 4 ) | ( BIT(pins, 3) << 5 ); break;
+			}
 		}
 
 		/* Reset the attirubte writing flip flop to let the next write go to the index reigster */
@@ -1260,13 +1307,13 @@ void isa8_ega_device::pc_ega8_3X0_w(offs_t offset, uint8_t data)
 
 uint8_t isa8_ega_device::pc_ega8_3b0_r(offs_t offset)
 {
-	return ( m_misc_output & 0x01 ) ? 0xFF : pc_ega8_3X0_r(offset);
+	return ( m_misc_output & 0x01 ) ? 0xff : pc_ega8_3X0_r(offset);
 }
 
 
 uint8_t isa8_ega_device::pc_ega8_3d0_r(offs_t offset)
 {
-	return ( m_misc_output & 0x01 ) ? pc_ega8_3X0_r(offset) : 0xFF;
+	return ( m_misc_output & 0x01 ) ? pc_ega8_3X0_r(offset) : 0xff;
 }
 
 
@@ -1303,7 +1350,8 @@ uint8_t isa8_ega_device::pc_ega8_3c0_r(offs_t offset)
 	/* Feature Read */
 	case 2:
 		{
-			uint8_t dips = ioport("config")->read();
+			ioport_port *const config = ioport("config");
+			uint8_t dips = config ? config->read() : 0xff;
 
 			data = ( data & 0x0f );
 			data |= ( ( m_feature_control & 0x03 ) << 5 );
@@ -1332,19 +1380,19 @@ void isa8_ega_device::pc_ega8_3c0_w(offs_t offset, uint8_t data)
 {
 	static const uint8_t ar_reg_mask[0x20] =
 		{
-			0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-			0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F, 0x3F,
-			0x7F, 0x3F, 0x3F, 0x0F, 0x00, 0x00, 0x00, 0x00,
+			0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f,
+			0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f, 0x3f,
+			0x7f, 0x3f, 0x3f, 0x0f, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		};
 	static const uint8_t sr_reg_mask[0x08] =
 		{
-			0x03, 0x0F, 0x0F, 0x0F, 0x07, 0x00, 0x00, 0x00
+			0x03, 0x0f, 0x0f, 0x0f, 0x07, 0x00, 0x00, 0x00
 		};
 	static const uint8_t gr_reg_mask[0x10] =
 		{
-			0x0F, 0x0F, 0x0F, 0x1F, 0x07, 0x3F, 0x0F, 0x0F,
-			0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+			0x0f, 0x0f, 0x0f, 0x1f, 0x07, 0x3f, 0x0f, 0x0f,
+			0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		};
 	int index;
 
@@ -1360,7 +1408,7 @@ void isa8_ega_device::pc_ega8_3c0_w(offs_t offset, uint8_t data)
 		}
 		else
 		{
-			index = m_attribute.index & 0x1F;
+			index = m_attribute.index & 0x1f;
 
 			LOGSETUP(" - AR%02X = 0x%02x\n", index, data );
 
@@ -1411,7 +1459,7 @@ void isa8_ega_device::pc_ega8_3c0_w(offs_t offset, uint8_t data)
 		m_graphics_controller.index = data;
 		break;
 	case 15:
-		index = m_graphics_controller.index & 0x0F;
+		index = m_graphics_controller.index & 0x0f;
 
 		LOGSETUP(" - GR%02X = 0x%02x\n", index, data );
 

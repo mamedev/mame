@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include "cpu/g65816/g65816.h"
+#include "cpu/m6502/w65816.h"
 
 // ======================> apple2_common_device
 
@@ -33,7 +33,7 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
-	optional_device<g65816_device> m_GScpu;
+	optional_device<w65816_device> m_GScpu;
 
 	double m_x_calibration = 0, m_y_calibration = 0;
 	double m_joystick_x1_time = 0;

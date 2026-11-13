@@ -2,7 +2,7 @@
 // experimental/concurrent_channel.cpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -157,9 +157,24 @@ void buffered_concurrent_channel_test()
   ASIO_CHECK(!ec2);
 };
 
+void concurrent_channel_move_test()
+{
+  io_context ctx;
+
+  concurrent_channel<void(asio::error_code)> ch1(ctx);
+  concurrent_channel<void(asio::error_code)> ch2 = std::move(ch1);
+  (void)ch2;
+
+  concurrent_channel<void(asio::error_code, std::string)> ch3(ctx);
+  concurrent_channel<void(asio::error_code, std::string)> ch4 =
+    std::move(ch3);
+  (void)ch4;
+}
+
 ASIO_TEST_SUITE
 (
   "experimental/concurrent_channel",
   ASIO_TEST_CASE(unbuffered_concurrent_channel_test)
   ASIO_TEST_CASE(buffered_concurrent_channel_test)
+  ASIO_COMPILE_TEST_CASE(concurrent_channel_move_test)
 )

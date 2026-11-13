@@ -410,7 +410,7 @@ void nes_state::nes(machine_config &config)
 	rp2a03_device &maincpu(RP2A03G(config, m_maincpu, NTSC_APU_CLOCK));
 	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60.0988);
 	// This isn't used so much to calulate the vblank duration (the PPU code tracks that manually) but to determine
 	// the number of cycles in each scanline for the PPU scanline timer. Since the PPU has 20 vblank scanlines + 2

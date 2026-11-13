@@ -130,14 +130,14 @@ uint8_t galaxold_state::scramblb_protection_2_r()
 }
 
 
-void galaxold_state::_4in1_bank_w(uint8_t data)
+void galaxold_state::_4funin1_bank_w(uint8_t data)
 {
-	m_4in1_bank = data & 0x03;
-	galaxold_gfxbank_w(0, m_4in1_bank);
-	membank("bank1")->set_entry(m_4in1_bank);
+	m_4funin1_bank = data & 0x03;
+	galaxold_gfxbank_w(0, m_4funin1_bank);
+	membank("bank1")->set_entry(m_4funin1_bank);
 }
 
-void galaxold_state::init_4in1()
+void galaxold_state::init_4funin1()
 {
 	const offs_t len = memregion("maincpu")->bytes();
 	uint8_t *RAM = memregion("maincpu")->base();
@@ -151,9 +151,9 @@ void galaxold_state::init_4in1()
 
 	std::fill(std::begin(m_gfxbank), std::end(m_gfxbank), 0);
 
-	_4in1_bank_w(0); /* set the initial CPU bank */
+	_4funin1_bank_w(0); /* set the initial CPU bank */
 
-	save_item(NAME(m_4in1_bank));
+	save_item(NAME(m_4funin1_bank));
 }
 
 void galaxold_state::init_bullsdrtg()

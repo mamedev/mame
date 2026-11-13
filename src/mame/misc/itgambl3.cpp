@@ -276,7 +276,7 @@ void itgambl3_state::itgambl3(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &itgambl3_state::itgambl3_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);

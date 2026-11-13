@@ -1107,7 +1107,7 @@ void gigas_state::omega(machine_config &config)
 	m_outlatch->q_out_cb<5>().set_nop(); // ???
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(18'432'000) / 3, 768 / 2, 0, 512 / 2, 263, 0 + 16, 224 + 16); // unknown divisor
 	screen.set_screen_update(FUNC(gigas_state::screen_update));
 	screen.set_palette(m_palette);
@@ -1140,7 +1140,7 @@ void base_state::base(machine_config &config)
 	m_outlatch->q_out_cb<4>().set(FUNC(base_state::nmi_enable_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(12'000'000) / 2, 768 / 2, 0, 512 / 2, 263, 0 + 16, 224 + 16);
 	screen.set_palette(m_palette);
 	screen.screen_vblank().set(FUNC(base_state::vblank_irq));

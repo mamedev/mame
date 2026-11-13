@@ -1250,7 +1250,7 @@ void trackfld_state::trackfld(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(trackfld_state::screen_update_trackfld));
 	m_screen->set_palette(m_palette);
@@ -1315,7 +1315,7 @@ void trackfld_state::yieartf(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(MASTER_CLOCK/3, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(trackfld_state::screen_update_trackfld));
 	m_screen->set_palette(m_palette);

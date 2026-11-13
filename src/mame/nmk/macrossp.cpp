@@ -704,9 +704,9 @@ uint32_t macrossp_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 		if (!backgrounds)
 			continue;
 
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			clip.min_y = clip.max_y = y;
+			clip.sety(y, y);
 
 			// quizmoon map requires that layer 2 be drawn over layer 3 when same pri
 			for (int layer = 2; layer >= 0; layer--)
@@ -1004,7 +1004,7 @@ void macrossp_state::macrossp(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &macrossp_state::sound_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*16, 16*16);

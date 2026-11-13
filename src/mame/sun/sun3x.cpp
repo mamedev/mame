@@ -146,8 +146,6 @@
 
 #include "screen.h"
 
-#include "formats/flopimg.h"
-
 #include "util/endianness.h"
 
 
@@ -297,19 +295,12 @@ uint32_t sun3x_state::fdc_control_r()
 	{
 		floppy_image_device *fdev = m_floppy_connector->get_device();
 		if(fdev->exists()) {
-			uint32_t variant = fdev->get_variant();
-			switch(variant) {
-			case floppy_image::SSSD:
-			case floppy_image::SSDD:
-			case floppy_image::DSDD:
-				return 3 << 24;
-
-			case floppy_image::DSHD:
-				return 2 << 24;
-
-			case floppy_image::DSED:
+			if(fdev->floppy_is_ed())
 				return 1 << 24;
-			}
+			else if(fdev->floppy_is_hd())
+				return 2 << 24;
+			else
+				return 3 << 24;
 		}
 	}
 
@@ -646,7 +637,7 @@ void sun3x_state::sun3_80(machine_config &config)
 	// the timekeeper has no interrupt output, so 3/80 includes a dedicated timer circuit
 	TIMER(config, "timer").configure_periodic(FUNC(sun3x_state::sun380_timer), attotime::from_hz(100));
 
-	screen_device &bwtwo(SCREEN(config, "bwtwo", SCREEN_TYPE_RASTER));
+	screen_device &bwtwo(SCREEN(config, "bwtwo"));
 	bwtwo.set_screen_update(FUNC(sun3x_state::bw2_update));
 	bwtwo.set_size(1152,900);
 	bwtwo.set_visarea(0, 1152-1, 0, 900-1);

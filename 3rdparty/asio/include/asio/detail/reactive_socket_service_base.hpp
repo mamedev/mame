@@ -2,7 +2,7 @@
 // detail/reactive_socket_service_base.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -43,6 +43,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 class reactive_socket_service_base
@@ -200,7 +201,7 @@ public:
       socket_base::wait_type w, Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -229,7 +230,7 @@ public:
     default:
       p.p->ec_ = asio::error::invalid_argument;
       start_op(impl, reactor::read_op, p.p,
-          is_continuation, false, true, &io_ex, 0);
+          is_continuation, false, true, false, &io_ex, 0);
       p.v = p.p = 0;
       return;
     }
@@ -242,7 +243,8 @@ public:
             &reactor_, &impl.reactor_data_, impl.socket_, op_type);
     }
 
-    start_op(impl, op_type, p.p, is_continuation, false, false, &io_ex, 0);
+    start_op(impl, op_type, p.p, is_continuation,
+        false, false, false, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -287,7 +289,7 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -314,7 +316,8 @@ public:
     start_op(impl, reactor::write_op, p.p, is_continuation, true,
         ((impl.state_ & socket_ops::stream_oriented)
           && buffer_sequence_adapter<asio::const_buffer,
-            ConstBufferSequence>::all_empty(buffers)), &io_ex, 0);
+            ConstBufferSequence>::all_empty(buffers)),
+        ASIO_OS_DEF(MSG_DONTWAIT) == 0, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -324,7 +327,7 @@ public:
       socket_base::message_flags, Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -347,7 +350,7 @@ public:
           &impl, impl.socket_, "async_send(null_buffers)"));
 
     start_op(impl, reactor::write_op, p.p,
-        is_continuation, false, false, &io_ex, 0);
+        is_continuation, false, false, false, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -393,7 +396,7 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -424,7 +427,8 @@ public:
         (flags & socket_base::message_out_of_band) == 0,
         ((impl.state_ & socket_ops::stream_oriented)
           && buffer_sequence_adapter<asio::mutable_buffer,
-            MutableBufferSequence>::all_empty(buffers)), &io_ex, 0);
+            MutableBufferSequence>::all_empty(buffers)),
+        ASIO_OS_DEF(MSG_DONTWAIT) == 0, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -435,7 +439,7 @@ public:
       Handler& handler, const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -460,7 +464,7 @@ public:
     start_op(impl,
         (flags & socket_base::message_out_of_band)
           ? reactor::except_op : reactor::read_op,
-        p.p, is_continuation, false, false, &io_ex, 0);
+        p.p, is_continuation, false, false, false, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -504,7 +508,7 @@ public:
       const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -532,7 +536,8 @@ public:
         (in_flags & socket_base::message_out_of_band)
           ? reactor::except_op : reactor::read_op,
         p.p, is_continuation,
-        (in_flags & socket_base::message_out_of_band) == 0, false, &io_ex, 0);
+        (in_flags & socket_base::message_out_of_band) == 0,
+        false, ASIO_OS_DEF(MSG_DONTWAIT) == 0, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -544,7 +549,7 @@ public:
       const IoExecutor& io_ex)
   {
     bool is_continuation =
-      asio_handler_cont_helpers::is_continuation(handler);
+      ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(handler);
 
     associated_cancellation_slot_t<Handler> slot
       = asio::get_associated_cancellation_slot(handler);
@@ -573,7 +578,7 @@ public:
     start_op(impl,
         (in_flags & socket_base::message_out_of_band)
           ? reactor::except_op : reactor::read_op,
-        p.p, is_continuation, false, false, &io_ex, 0);
+        p.p, is_continuation, false, false, false, &io_ex, 0);
     p.v = p.p = 0;
   }
 
@@ -589,8 +594,9 @@ protected:
       const native_handle_type& native_socket, asio::error_code& ec);
 
   // Start the asynchronous read or write operation.
-  ASIO_DECL void do_start_op(base_implementation_type& impl, int op_type,
-      reactor_op* op, bool is_continuation, bool is_non_blocking, bool noop,
+  ASIO_DECL void do_start_op(base_implementation_type& impl,
+      int op_type, reactor_op* op, bool is_continuation,
+      bool allow_speculative, bool noop, bool needs_non_blocking,
       void (*on_immediate)(operation* op, bool, const void*),
       const void* immediate_arg);
 
@@ -598,18 +604,19 @@ protected:
   // immediate completion.
   template <typename Op>
   void start_op(base_implementation_type& impl, int op_type, Op* op,
-      bool is_continuation, bool is_non_blocking, bool noop,
-      const void* io_ex, ...)
+      bool is_continuation, bool allow_speculative, bool noop,
+      bool needs_non_blocking, const void* io_ex, ...)
   {
-    return do_start_op(impl, op_type, op, is_continuation,
-        is_non_blocking, noop, &Op::do_immediate, io_ex);
+    return do_start_op(impl, op_type, op, is_continuation, allow_speculative,
+        noop, needs_non_blocking, &Op::do_immediate, io_ex);
   }
 
   // Start the asynchronous operation for handlers that are not specialised for
   // immediate completion.
   template <typename Op>
-  void start_op(base_implementation_type& impl, int op_type, Op* op,
-      bool is_continuation, bool is_non_blocking, bool noop, const void*,
+  void start_op(base_implementation_type& impl, int op_type,
+      Op* op, bool is_continuation, bool allow_speculative,
+      bool noop, bool needs_non_blocking, const void*,
       enable_if_t<
         is_same<
           typename associated_immediate_executor<
@@ -620,8 +627,9 @@ protected:
         >::value
       >*)
   {
-    return do_start_op(impl, op_type, op, is_continuation, is_non_blocking,
-        noop, &reactor::call_post_immediate_completion, &reactor_);
+    return do_start_op(impl, op_type, op, is_continuation,
+        allow_speculative, noop, needs_non_blocking,
+        &reactor::call_post_immediate_completion, &reactor_);
   }
 
   // Start the asynchronous accept operation.
@@ -732,9 +740,13 @@ protected:
 
   // Cached success value to avoid accessing category singleton.
   const asio::error_code success_ec_;
+
+  // Extra state flags to be applied to newly opened sockets.
+  socket_ops::state_type extra_state_;
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

@@ -161,7 +161,7 @@ void s97801_device::device_add_mconfig(machine_config &config)
 	SIEMENS_97801_KBD(config, m_kbd);
 	m_kbd->txd_handler().set(FUNC(s97801_device::kbd_txd_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER); // white-phosphor tube
+	SCREEN(config, m_screen); // white-phosphor tube
 	m_screen->set_raw(22.1184_MHz_XTAL, 912, 0, 640, 423, 0, 400); // ~57.3 Hz on the D253 clocking
 	m_screen->set_screen_update(m_avdc, FUNC(scn2672_device::screen_update));
 

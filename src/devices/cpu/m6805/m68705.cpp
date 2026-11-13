@@ -124,6 +124,7 @@ DEFINE_DEVICE_TYPE(HD6805S1, hd6805s1_device, "hd6805s1", "Hitachi HD6805S1")
 DEFINE_DEVICE_TYPE(HD6805U1, hd6805u1_device, "hd6805u1", "Hitachi HD6805U1")
 
 DEFINE_DEVICE_TYPE(M146805E2, m146805e2_device, "m146805e2", "Motorola MC146805E2")
+DEFINE_DEVICE_TYPE(M146805F2, m146805f2_device, "m146805f2", "Motorola MC146805F2")
 
 /****************************************************************************
  * M68705 base device
@@ -633,13 +634,13 @@ void m6805_hmos_device::burn_cycles(unsigned count)
 template <std::size_t N> void m6805_hmos_device::add_port_latch_state()
 {
 	if (m_port_mask[N] != 0xff)
-		state_add(M68705_LATCHA + N, util::string_format("LATCH%c", 'A' + N).c_str(), m_port_latch[N]).mask(~m_port_mask[N] & 0xff).formatstr("%02X");
+		state_add(M68705_LATCHA + N, util::string_format("LATCH%c", 'A' + N), m_port_latch[N]).mask(~m_port_mask[N] & 0xff).formatstr("%02X");
 }
 
 template <std::size_t N> void m6805_hmos_device::add_port_ddr_state()
 {
 	if (m_port_mask[N] != 0xff)
-		state_add(M68705_DDRA + N, util::string_format("DDR%c", 'A' + N).c_str(), m_port_ddr[N]).mask(~m_port_mask[N] & 0xff).formatstr("%02X");
+		state_add(M68705_DDRA + N, util::string_format("DDR%c", 'A' + N), m_port_ddr[N]).mask(~m_port_mask[N] & 0xff).formatstr("%02X");
 }
 
 void m68705_device::internal_map(address_map &map)
@@ -900,6 +901,15 @@ m146805e2_device::m146805e2_device(machine_config const &mconfig, char const *ta
 	m_timer.set_options(m6805_timer::TIMER_PGM);
 
 	set_port_mask<2>(0xff); // Port C isn't present
+	set_port_mask<3>(0xff); // Port D isn't present
+}
+
+m146805f2_device::m146805f2_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
+	: m146805_device(mconfig, tag, owner, clock, M146805F2, 12, 64)
+{
+	m_timer.set_options(m6805_timer::TIMER_PGM);
+
+	set_port_mask<2>(0xf0); // Port C is four bits wide
 	set_port_mask<3>(0xff); // Port D isn't present
 }
 

@@ -18,7 +18,10 @@
 
 #include "bus/bbc/modem/modem.h"
 #include "cpu/m6502/g65sc02.h"
+#include "machine/74123.h"
+#include "machine/input_merger.h"
 #include "machine/mc146818.h"
+#include "machine/rescap.h"
 #include "machine/wd_fdc.h"
 
 #include "formats/uef_cas.h"
@@ -692,7 +695,7 @@ void bbcm_state::bbcmet(machine_config &config)
 
 	RAM(config, m_ram).set_default_size("128K");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
 	m_screen->set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 
@@ -737,14 +740,29 @@ void bbcm_state::bbcmet(machine_config &config)
 	MC146818(config, m_rtc, 32.768_kHz_XTAL);
 	m_rtc->irq().set(m_irqs, FUNC(input_merger_device::in_w<7>));
 
+	ttl74123_device &txen(TTL74123(config, "txen", RES_K(220), CAP_U(47)));
+	txen.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	txen.set_a_pin_value(0);
+	txen.set_b_pin_value(1);
+	txen.set_clear_pin_value(0);
+	txen.out_cb().set("network", FUNC(econet_device::host_rts_w));
+
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set("network", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbcm_state::adlc_irq_w));
+	m_adlc->out_rts_cb().set(txen, FUNC(ttl74123_device::clear_w));
+	m_adlc->out_rts_cb().append(m_adlc, FUNC(mc6854_device::set_cts)).invert();
+
+	ttl74123_device &clkdet(TTL74123(config, "clkdet", RES_K(39), CAP_N(2.2)));
+	clkdet.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	clkdet.set_b_pin_value(1);
+	clkdet.set_clear_pin_value(1);
+	clkdet.out_cb().set(m_adlc, FUNC(mc6854_device::set_dcd)).invert();
 
 	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
-	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::set_cts)).invert();
+	econet.clk_wr_callback().append(clkdet, FUNC(ttl74123_device::a_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 	ECONET_SLOT(config, "econet", "network", econet_devices);
 

@@ -247,12 +247,12 @@ u32 mlanding_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 {
 	pen_t const *const pens = m_palette->pens();
 
-	for (u32 y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (u32 y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
-		u16 const *src = &m_g_ram[(112 + y) * 512 + cliprect.min_x];
-		u16 *dst = &bitmap.pix(y, cliprect.min_x);
+		u16 const *src = &m_g_ram[(112 + y) * 512 + cliprect.left()];
+		u16 *dst = &bitmap.pix(y, cliprect.left());
 
-		for (u32 x = cliprect.min_x; x <= cliprect.max_x; ++x)
+		for (u32 x = cliprect.left(); x <= cliprect.right(); ++x)
 		{
 			*dst++ = pens[*src++ & 0x3fff];
 		}
@@ -974,7 +974,7 @@ void mlanding_state::mlanding(machine_config &config)
 	TAITOIO_YOKE(config, m_yoke);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 640, 0, 512, 462, 0, 400); // Estimated
 	screen.set_screen_update(FUNC(mlanding_state::screen_update));
 	screen.set_palette(m_palette);

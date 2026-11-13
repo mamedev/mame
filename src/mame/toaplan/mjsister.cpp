@@ -401,7 +401,7 @@ void mjsister_state::mjsister(machine_config &config)
 	m_mainlatch[1]->q_out_cb<6>().set(FUNC(mjsister_state::rombank_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(MCLK / 2, 384, 0, 256, 268, 0, 240); // 6 MHz?
 	screen.set_screen_update(FUNC(mjsister_state::screen_update));
 

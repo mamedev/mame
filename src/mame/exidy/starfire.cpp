@@ -403,7 +403,7 @@ void starfire_base_state::base_config(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &starfire_base_state::main_map);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(STARFIRE_PIXEL_CLOCK, STARFIRE_HTOTAL, STARFIRE_HBEND, STARFIRE_HBSTART, STARFIRE_VTOTAL, STARFIRE_VBEND, STARFIRE_VBSTART);
 	m_screen->set_screen_update(FUNC(starfire_base_state::screen_update));
 }

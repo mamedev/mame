@@ -31,12 +31,14 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-
-	// device_vic10_expansion_card_interface overrides
-	virtual uint8_t vic10_cd_r(offs_t offset, uint8_t data, int lorom, int uprom, int exram) override;
-	virtual void vic10_cd_w(offs_t offset, uint8_t data, int lorom, int uprom, int exram) override;
+	virtual void device_post_load() override;
 
 private:
+	void latch_w(uint8_t data);
+	void update_banks();
+
+	memory_share_creator<uint8_t> m_exram;
+
 	uint8_t m_latch;
 };
 

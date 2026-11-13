@@ -345,14 +345,14 @@ static const gfx_layout tilelayout =
 };
 
 static GFXDECODE_START( gfx_vaportra )
-	GFXDECODE_ENTRY( "tiles1",  0, charlayout, 0x000, 0x500 )    // Characters 8x8
-	GFXDECODE_ENTRY( "tiles1",  0, tilelayout, 0x000, 0x500 )    // Tiles 16x16
-	GFXDECODE_ENTRY( "tiles2",  0, charlayout, 0x000, 0x500 )    // Characters 8x8
-	GFXDECODE_ENTRY( "tiles2",  0, tilelayout, 0x000, 0x500 )    // Tiles 16x16 // ok
+	GFXDECODE_ENTRY( "tiles1",  0, charlayout, 0, 0x50 ) // Characters 8x8
+	GFXDECODE_ENTRY( "tiles1",  0, tilelayout, 0, 0x50 ) // Tiles 16x16
+	GFXDECODE_ENTRY( "tiles2",  0, charlayout, 0, 0x50 ) // Characters 8x8
+	GFXDECODE_ENTRY( "tiles2",  0, tilelayout, 0, 0x50 ) // Tiles 16x16 // ok
 GFXDECODE_END
 
 static GFXDECODE_START( gfx_vaportra_spr )
-	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 )       // 16x16
+	GFXDECODE_ENTRY( "sprites", 0, tilelayout, 0x100, 16 ) // 16x16
 GFXDECODE_END
 
 /******************************************************************************/
@@ -388,7 +388,7 @@ void vaportra_state::vaportra(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(32*8, 32*8);

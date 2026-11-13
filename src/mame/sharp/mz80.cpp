@@ -285,7 +285,7 @@ void mz80_state::mz80k(machine_config &config)
 
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(320, 200);
 	screen.set_visarea(0, 319, 0, 199);

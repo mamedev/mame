@@ -44,6 +44,7 @@ void saturn_vdp2_device::device_start()
 	save_item(NAME(m_odd_bit));
 	save_item(NAME(m_hdisplay));
 	save_item(NAME(m_vdisplay));
+	save_item(NAME(m_dotsel_352));
 
 	save_item(NAME(m_exten));
 	save_item(NAME(m_exlten));
@@ -56,6 +57,11 @@ void saturn_vdp2_device::device_start()
 
 	save_item(NAME(m_hcounter_latch));
 	save_item(NAME(m_vcounter_latch));
+
+	m_hreso = 0;
+	m_vreso = 0;
+	m_dotsel_352 = false;
+
 }
 
 void saturn_vdp2_device::device_reset()
@@ -65,17 +71,17 @@ void saturn_vdp2_device::device_reset()
 	m_odd_bit = 1;
 	// shouldn't really matter
 	m_old_tvmd = 0xffff;
-	m_hreso = 0;
-	m_vreso = 0;
+//	m_hreso = 0;
+//	m_vreso = 0;
+//	m_dotsel_352 = true;
 	reconfigure_crtc();
 }
 
 void saturn_vdp2_device::init_vcounter_table()
 {
-	u16 i;
 	// put vcounter inside a table
 	// 224 mode
-	for(i = 0; i < 263; i++)
+	for(u16 i = 0; i < 263; i++)
 	{
 		true_vcount[i][0] = i;
 		if(i > 0xec)
@@ -83,7 +89,7 @@ void saturn_vdp2_device::init_vcounter_table()
 	}
 
 	// 240 mode
-	for(i = 0; i < 263; i++)
+	for(u16 i = 0; i < 263; i++)
 	{
 		true_vcount[i][1] = i;
 		if(i > 0xf5)
@@ -91,7 +97,7 @@ void saturn_vdp2_device::init_vcounter_table()
 	}
 
 	// TODO: PAL only 256 mode
-	for(i = 0; i < 313; i++)
+	for(u16 i = 0; i < 313; i++)
 	{
 		true_vcount[i][2] = i;
 		true_vcount[i][3] = i;
@@ -123,7 +129,7 @@ void saturn_vdp2_device::regs_map(address_map &map)
 			m_lsmd = (m_tvmd >> 6) & 3;
 			m_vreso = (m_tvmd >> 4) & 3;
 			m_hreso = (m_tvmd >> 0) & 7;
-			if (ACCESSING_BITS_0_7 && m_tvmd != m_old_tvmd)
+			if (ACCESSING_BITS_0_7 && (m_tvmd & 0xff) != (m_old_tvmd & 0xff))
 				reconfigure_crtc();
 			m_old_tvmd = m_tvmd;
 		})
@@ -281,6 +287,12 @@ void saturn_vdp2_device::reconfigure_crtc()
 	const int d_hres[4] = { 320, 352, 640, 704 };
 	int horz_res, vert_res;
 
+	// TODO: guard against the wrong DOTSEL being configured from SMPC.
+	// on real HW this causes monitor instability and unusable vblank IRQs.
+	// astrass will throw a fuss if we do this in scan timer, also hot path ...
+	//if (BIT(m_hreso, 0) != m_dotsel_352)
+	//	return;
+
 	// reset odd bit if a dynamic resolution change occurs, stv:seabass cares
 	m_odd_bit = 1;
 	// NTSC can't set 256 modes
@@ -302,19 +314,18 @@ void saturn_vdp2_device::reconfigure_crtc()
 		vert_res = 480;
 
 	int vblank_period, hblank_period;
-	attoseconds_t refresh;
 	rectangle visarea(0, horz_res - 1, 0, vert_res - 1);
 
 	vblank_period = get_vblank_duration();
 	hblank_period = get_hblank_duration();
-	refresh  = HZ_TO_ATTOSECONDS(get_pixel_clock()) * (hblank_period) * vblank_period;
+	attotime refresh  = attotime::from_ticks(hblank_period * vblank_period, get_pixel_clock());
 	//printf("%d %d %d %d\n",horz_res,vert_res,horz_res+hblank_period,vblank_period);
 
 	// save these to reuse them in scan timer
 	m_hdisplay = horz_res;
 	m_vdisplay = vert_res;
 
-	m_screen->configure(hblank_period, vblank_period, visarea, refresh );
+	m_screen->configure(hblank_period, vblank_period, visarea, refresh);
 }
 
 int saturn_vdp2_device::get_hcounter()
@@ -433,6 +444,7 @@ TIMER_CALLBACK_MEMBER(saturn_vdp2_device::sync_timer_cb)
 	{
 		// flip odd bit here
 		m_odd_bit ^= 1;
+		// TODO: T0C in SCU seems to run even after this point
 		m_video_sync_timer->adjust(m_screen->time_until_pos(0, 0));
 	}
 	else

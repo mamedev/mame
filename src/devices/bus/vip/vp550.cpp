@@ -4,8 +4,6 @@
 
     RCA VIP Super Sound System VP550 emulation
 
-    TODO: Implement VP551 variant
-
 **********************************************************************/
 
 #include "emu.h"

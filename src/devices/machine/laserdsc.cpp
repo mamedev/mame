@@ -1213,7 +1213,7 @@ void laserdisc_device::config_save(config_type cfg_type, util::xml::data_node *p
 void laserdisc_device::add_ntsc_screen(machine_config &config, const char *_tag)
 {
 	set_screen(_tag);
-	screen_device &screen(SCREEN(config, _tag, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, _tag));
 	screen.set_video_attributes(VIDEO_SELF_RENDER);
 	screen.set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	screen.set_screen_update(tag(), FUNC(laserdisc_device::screen_update));
@@ -1222,7 +1222,7 @@ void laserdisc_device::add_ntsc_screen(machine_config &config, const char *_tag)
 void laserdisc_device::add_pal_screen(machine_config &config, const char *_tag)
 {
 	set_screen(_tag);
-	screen_device &screen(SCREEN(config, _tag, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, _tag));
 	screen.set_video_attributes(VIDEO_SELF_RENDER);
 	screen.set_raw(XTAL(17'734'470)*2, 1135, 0, 768, 625, 48, 624);
 	screen.set_screen_update(tag(), FUNC(laserdisc_device::screen_update));

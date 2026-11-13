@@ -486,6 +486,7 @@ void istellar_state::init_istellar()
 {
 	//m_z80_2_nmi_enable = 0;
 
+	// TODO: what's this for, a way to skip no LD available?
 	#if 0
 	{
 		uint8_t *ROM = memregion("maincpu")->base();

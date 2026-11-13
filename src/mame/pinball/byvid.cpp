@@ -830,7 +830,7 @@ void by133_state::by133(machine_config &config)
 	TMS9928A(config, m_crtc, XTAL(10'738'635)).set_screen("screen");
 	m_crtc->set_vram_size(0x4000);
 	m_crtc->int_callback().set_inputline(m_videocpu, M6809_IRQ_LINE);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	/* sound hardware */
 	genpin_audio(config);

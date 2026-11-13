@@ -6,6 +6,8 @@
 #pragma once
 
 #include "m6805.h"
+#include "m68hc05_sci.h"
+#include "m68hc05_spi.h"
 
 #include <array>
 
@@ -42,6 +44,18 @@ public:
 	auto portc_w() { return m_port_cb_w[2].bind(); }
 	auto portd_w() { return m_port_cb_w[3].bind(); }
 	auto tcmp() { return m_tcmp_cb.bind(); }
+	// SPI SCK and MOSI pins (PD4, PD3); only on variants with an SPI
+	auto spi_sck() { return m_spi.lookup()->sck_cb(); }
+	auto spi_mosi() { return m_spi.lookup()->mosi_cb(); }
+
+	// SS pin of the SPI (PD5, active low; variants without an SPI ignore it).  Pushed
+	// rather than read through portd_r: the master acts on SS low at once (6.2.3).
+	// Report the same level for PD5 from portd_r.
+	void spi_ss_w(int state) { if (m_spi) m_spi->ss_w(state); }
+
+	// SCI TDO and RDI pins (PD1, PD0); only on variants with an SCI
+	auto sci_tdo() { return m_sci.lookup()->tdo_cb(); }
+	void sci_rdi_w(int state) { if (m_sci) m_sci->rdi_w(state); }
 
 protected:
 	// state index constants
@@ -71,6 +85,16 @@ protected:
 		M68HC05_OCR,
 		M68HC05_PS,
 		M68HC05_TR,
+
+		M68HC05_SPCR,
+		M68HC05_SPSR,
+		M68HC05_SPDR,
+
+		M68HC05_BAUD,
+		M68HC05_SCCR1,
+		M68HC05_SCCR2,
+		M68HC05_SCSR,
+		M68HC05_SCDR,
 
 		M68HC05_COPRST,
 		M68HC05_COPCR,
@@ -114,6 +138,13 @@ protected:
 	void copcr_w(u8 data);
 	void copr_w(u8 data);
 
+	// variants with an SPI at $0A-$0C call this from their constructor and map m_spi there
+	void enable_spi() { m_has_spi = true; }
+
+	// variants with an SCI at $0D-$11 call this from their constructor and map m_sci there
+	void enable_sci() { m_has_sci = true; }
+
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -129,12 +160,19 @@ protected:
 
 	void add_port_state(std::array<bool, PORT_COUNT> const &ddr);
 	void add_timer_state();
+	void add_spi_state();
+	void add_sci_state();
 	void add_pcop_state();
 	void add_ncop_state();
+
+	optional_device<m68hc05_spi_device> m_spi;
+	optional_device<m68hc05_sci_device> m_sci;
 
 private:
 	u8 port_value(unsigned offset) const;
 	void update_port_irq();
+	void spi_irq_w(int state);
+	void sci_irq_w(int state);
 
 	bool    tcr_icie() const    { return BIT(m_tcr, 7); }
 	bool    tcr_ocie() const    { return BIT(m_tcr, 6); }
@@ -161,6 +199,12 @@ private:
 	u8                  m_port_ddr[PORT_COUNT];
 	bool                m_port_irq_state, m_irq_line_state;
 	u8                  m_irq_latch;
+
+	// serial peripheral interface
+	bool                m_has_spi;
+
+	// serial communications interface
+	bool                m_has_sci;
 
 	// timer/counter
 	devcb_write_line    m_tcmp_cb;

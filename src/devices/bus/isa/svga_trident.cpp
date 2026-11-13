@@ -31,7 +31,7 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_TVGA9000, isa16_svga_tvga9000_device, "tvga9000", 
 
 void isa16_svga_tvga9000_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(trident_vga_device::screen_update));
 
@@ -105,7 +105,7 @@ DEFINE_DEVICE_TYPE(ISA16_SVGA_TGUI9680, isa16_svga_tgui9680_device, "tgui9680", 
 
 void isa16_svga_tgui9680_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(trident_vga_device::screen_update));
 

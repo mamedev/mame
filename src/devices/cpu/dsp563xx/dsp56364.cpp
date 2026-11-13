@@ -43,6 +43,8 @@ const tiny_rom_entry *dsp56364_device::device_rom_region() const
 void dsp56364_device::device_add_mconfig(machine_config &config)
 {
 	DSP5636X_SHI(config, m_shi);
+	m_shi->miso_callback().set(FUNC(dsp56364_device::do_miso));
+	m_shi->hreq_callback().set(FUNC(dsp56364_device::do_hreq));
 }
 
 

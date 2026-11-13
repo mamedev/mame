@@ -630,6 +630,16 @@ uint8_t crvision_state::pia_pb_r()
 	return data;
 }
 
+void crvision_state::pia_pb_w(uint8_t data)
+{
+	m_psg_latch = data;
+}
+
+void crvision_state::pia_cb2_w(int state)
+{
+	if (!state) m_psg->write(m_psg_latch);
+}
+
 uint8_t laser2001_state::pia_pa_r()
 {
 	/*
@@ -752,7 +762,9 @@ void crvision_state::machine_start()
 {
 	// zerofill/state saving
 	m_keylatch = 0;
+	m_psg_latch = 0;
 	save_item(NAME(m_keylatch));
+	save_item(NAME(m_psg_latch));
 
 	if (m_cart->exists())
 	{
@@ -806,7 +818,8 @@ void crvision_state::creativision(machine_config &config)
 	m_pia->readpa_handler().set(FUNC(crvision_state::pia_pa_r));
 	m_pia->readpb_handler().set(FUNC(crvision_state::pia_pb_r));
 	m_pia->writepa_handler().set(FUNC(crvision_state::pia_pa_w));
-	m_pia->writepb_handler().set(SN76489_TAG, FUNC(sn76496_base_device::write));
+	m_pia->writepb_handler().set(FUNC(crvision_state::pia_pb_w));
+	m_pia->cb2_handler().set(FUNC(crvision_state::pia_cb2_w));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -852,7 +865,7 @@ void crvision_state::ntsc(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 /*-------------------------------------------------
@@ -867,7 +880,7 @@ void crvision_pal_state::pal(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 }
 
 /*-------------------------------------------------
@@ -911,7 +924,7 @@ void laser2001_state::lasr2001(machine_config &config)
 	vdp.set_screen("screen");
 	vdp.set_vram_size(0x4000);
 	vdp.int_callback().set_inputline(M6502_TAG, m6502_device::IRQ_LINE);
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	// cartridge
 	CRVISION_CART_SLOT(config, m_cart, crvision_cart, nullptr);

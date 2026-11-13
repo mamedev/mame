@@ -1324,7 +1324,7 @@ void ampoker2_state::ampoker2(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	/*  if VBLANK is used, the watchdog timer stop to work.
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
@@ -1608,9 +1608,8 @@ ROM_START( rabbitpk )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "poldi_ren.u6", 0x0000, 0x10000, CRC(ef0d5b47) SHA1(5d209c803ab8ced08953d24202a364ce1aa677c2) )
 
-	ROM_REGION( 0x880, "pic", 0 )
-	ROM_LOAD( "pic16f84_code.u6", 0x000, 0x800, NO_DUMP )
-	ROM_LOAD( "pic16f84_data.u6", 0x800, 0x080, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "pic", 0 )
+	ROM_LOAD( "pic16f84.u6", 0x0000, 0x4280, NO_DUMP )
 
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "poldi_graf.u47", 0x0000, 0x4000, CRC(f1807f39) SHA1(631645272c7508104749e0ff1357bd74098851d5) )
@@ -1661,9 +1660,8 @@ ROM_START( arizna10 )
 	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "2.u47", 0x0000, 0x8000, CRC(eb71182a) SHA1(e138a6fdf9f11df5bd992f3ecf0e8c52abde4106) )  // 1ST AND 2ND HALF IDENTICAL
 
-	ROM_REGION( 0x880, "pic", 0 ) // on small piggyback at u6
-	ROM_LOAD( "pic16f84_code.u6", 0x000, 0x800, NO_DUMP )
-	ROM_LOAD( "pic16f84_data.u6", 0x800, 0x080, NO_DUMP )
+	ROM_REGION16_LE( 0x4280, "pic", 0 ) // on small piggyback at u6
+	ROM_LOAD( "pic16f84.u6", 0x0000, 0x4280, NO_DUMP )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "am27s29apc.u48", 0x0000, 0x0200, CRC(c4b59342) SHA1(df52b41c9aa99ddc8ae94ac55978f2e80ca4cba9) )

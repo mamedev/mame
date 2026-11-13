@@ -800,7 +800,7 @@ void ppu_vt3xx_device::lcdc_regs_w(offs_t offset, u8 data)
 		int new_max_y = 239;
 
 		rectangle curvisarea = screen().visible_area();
-		logerror("current screen dimensions are %d %d %d %d\n", curvisarea.min_x, curvisarea.max_x, curvisarea.min_y, curvisarea.max_y);
+		logerror("current screen dimensions are %d %d %d %d\n", curvisarea.left(), curvisarea.right(), curvisarea.top(), curvisarea.bottom());
 
 		int tablenum = 0;
 		do

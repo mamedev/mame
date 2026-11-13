@@ -275,7 +275,7 @@ void ssingles_state::ssingles(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ssingles_state::ssingles_io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14_MHz_XTAL / 2, 424, 0, 288, 256, 0, 224); // from CRTC
 	m_screen->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
 

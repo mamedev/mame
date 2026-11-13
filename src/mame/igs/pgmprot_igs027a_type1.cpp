@@ -2130,7 +2130,6 @@ void pgm_arm_type1_state::init_puzzli2()
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_puzzli2;
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
-	m_irq4_disabled = 1; // // doesn't like this irq?? - seems to be RTC related
 
 	hackcount = 0;
 	hackcount2 = 0;
@@ -2275,7 +2274,6 @@ void pgm_arm_type1_state::init_pgm3in1()
 	arm_sim_handler = &pgm_arm_type1_state::command_handler_py2k2;
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x500000, 0x500005,read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_r)), write16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_w)));
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x4f0000, 0x4f003f, read16sm_delegate(*this, FUNC(pgm_arm_type1_state::arm7_type1_sim_protram_r)));
-	m_irq4_disabled = 1; // // doesn't like this irq??
 }
 
 void pgm_arm_type1_state::init_pstar()

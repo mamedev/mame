@@ -68,9 +68,9 @@ public:
 		m_rombank(*this, "rombank")
 	{ }
 
-	void darkmist(machine_config &config);
+	void darkmist(machine_config &config) ATTR_COLD;
 
-	void init_darkmist();
+	void init_darkmist() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -95,6 +95,7 @@ private:
 	void decrypt_snd();
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 	void memmap(address_map &map) ATTR_COLD;
 
@@ -121,6 +122,8 @@ private:
 	tilemap_t *m_bgtilemap = nullptr;
 	tilemap_t *m_fgtilemap = nullptr;
 	tilemap_t *m_txtilemap = nullptr;
+
+	uint8_t m_irq_vector = 0;
 };
 
 
@@ -197,11 +200,11 @@ void darkmist_state::video_start()
 // TODO: move this code into framework or substitute with a valid alternative
 void darkmist_state::mix_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *clut)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint16_t *const dest = &bitmap.pix(y);
 		uint16_t const *const src = &m_temp_bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t const pix = (src[x] & 0xff);
 			uint16_t const real = clut[pix];
@@ -306,6 +309,7 @@ void darkmist_state::tx_vram_w(offs_t offset, uint8_t data)
 void darkmist_state::machine_start()
 {
 	m_rombank->configure_entries(0, 2, memregion("maincpu")->base() + 0x10000, 0x4000);
+	save_item(NAME(m_irq_vector));
 }
 
 void darkmist_state::hw_w(uint8_t data)
@@ -496,13 +500,23 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
 {
-	int const scanline = param;
+	if (param == 240) // vblank-out irq
+	{
+		// RST 10h
+		m_irq_vector = 0xd7;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 0) // vblank-in irq
+	{
+		// RST 08h
+		m_irq_vector = 0xcf;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
 
-	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7); // Z80 - RST 10h
-
-	if (scanline == 0) // vblank-in irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08h
+IRQ_CALLBACK_MEMBER(darkmist_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 
@@ -513,13 +527,14 @@ void darkmist_state::darkmist(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &darkmist_state::memmap);
 	m_maincpu->set_addrmap(AS_OPCODES, &darkmist_state::decrypted_opcodes_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(darkmist_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(darkmist_state::cpu_acknowledge_irq));
 
 	T5182(config, m_t5182, 14'318'180 / 4);
 	m_t5182->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));
 	m_t5182->ym_write_callback().set("ymsnd", FUNC(ym2151_device::write));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(256, 256);

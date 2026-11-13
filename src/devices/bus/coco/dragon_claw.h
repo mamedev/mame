@@ -37,12 +37,13 @@ protected:
 	virtual void cts_write(offs_t offset, u8 data) override;
 	virtual u8 scs_read(offs_t offset) override;
 	virtual void scs_write(offs_t offset, u8 data) override;
-	virtual void set_sound_enable(bool sound_enable) override;
 
 	virtual u8 *get_cart_base() override;
 	virtual u32 get_cart_size() override;
 
 	virtual address_space &cartridge_space() override;
+	virtual void add_sound_route(device_sound_interface &sound_device, int output_index, double gain) override;
+	virtual void set_sound_gain(device_sound_interface &sound_device, int output_index, double gain) override;
 
 private:
 	void irq_w(int state);

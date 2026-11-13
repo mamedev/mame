@@ -46,7 +46,7 @@ HD614140HA27 MCU is used in:
 #include "sound/dac.h"
 #include "video/pwm.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -214,10 +214,9 @@ void junior_state::junior(machine_config &config)
 
 	config.set_default_layout(layout_cxg_junior);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/5, 914/5);
-	screen.set_visarea_full();
 
 	// sound hardware
 	SPEAKER(config, "speaker").front_center();

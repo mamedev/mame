@@ -61,7 +61,7 @@ void bk139in1_state::bk139in1(machine_config &config)
 {
 	SCORE7(config, "maincpu", 27'000'000).set_addrmap(AS_PROGRAM, &bk139in1_state::mem_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(320, 262);
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
@@ -129,12 +129,12 @@ void bk139in1_state::init_bk139in1()
 // While those are GeneralPlus based platforms, it's possible the games were ported to something else, the SPI
 // appears to contain a filesystem, but data looks to be compressed / encrypted with no obvious code.
 // There is no GPspi header in the SPI ROM.
-CONS(202?, bk139in1,  0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "<unknown>", "BornKid 32 Bit Preloaded 139-in-1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 202?, bk139in1, 0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "<unknown>", "BornKid 32 Bit Preloaded 139-in-1 Handheld Game Console", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // same unknown hardware as above, fewer games
-CONS(2021, lxcyrace,  0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "Lexibook", "Cyber Arcade Racing (JL3150)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, lxcymsm,   0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "Lexibook", "Cyber Arcade Motion - Superman (JL3180SU)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, lxcympp,   0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "Lexibook", "Cyber Arcade Motion - Paw Patrol (JL3180PA)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, lxcymls,   0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "Lexibook", "Cyber Arcade Motion - Lilo & Stitch (JL3180D_01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-CONS(2021, dgun3944,  0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "dreamGEAR", "My Arcade All Star Sports (Pixel Pocket, DGUNL3944)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2021, lxcyrace, 0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "Lexibook",  "Cyber Arcade Racing (JL3150)",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2021, lxcymsm,  0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "Lexibook",  "Cyber Arcade Motion - Superman (JL3180SU)",               MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2021, lxcympp,  0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "Lexibook",  "Cyber Arcade Motion - Paw Patrol (JL3180PA)",             MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2021, lxcymls,  0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "Lexibook",  "Cyber Arcade Motion - Lilo & Stitch (JL3180D_01)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+CONS( 2021, dgun3944, 0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "dreamGEAR", "My Arcade All Star Sports (Pixel Pocket, DGUNL3944)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 // sold by Starbucks China, contains a bunch of NES hacks (including a version of Super Mario Bros) probably running on an emulator
-CONS(2022, starbuck,  0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "Subor",     "Starbucks x Subor (OEM Q2, China)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+CONS( 2022, starbuck, 0, 0, bk139in1, bk139in1, bk139in1_state, init_bk139in1, "Subor",     "Starbucks x Subor (OEM Q2, China)",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )

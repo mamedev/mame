@@ -75,7 +75,7 @@ private:
 
 void a2bus_grafex_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_screen_update("upd7220", FUNC(upd7220_device::screen_update));
 	screen.set_raw(16_MHz_XTAL, 1024, 384, 640, 262, 62, 200);
 

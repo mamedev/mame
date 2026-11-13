@@ -1000,7 +1000,7 @@ void octopus_state::octopus(machine_config &config)
 	// TODO: Winchester HD controller (Xebec/SASI compatible? uses TTL logic)
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(16_MHz_XTAL, 918, 0, 729, 350, 0, 325);
 	//screen.set_raw(17.6_MHz_XTAL, 1008, 0, 792, 348, 0, 319);
 	screen.set_screen_update("crtc", FUNC(scn2674_device::screen_update));

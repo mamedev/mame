@@ -427,7 +427,7 @@ void toratora_state::toratora(machine_config &config)
 	m_pia[2]->ca2_handler().set(m_sn[1], FUNC(sn76477_device::vco_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_ALWAYS_UPDATE);
 	m_screen->set_raw(5.185_MHz_XTAL, 256+40, 0, 256, 256+31+4, 8, 248);
 	m_screen->set_screen_update(FUNC(toratora_state::screen_update));

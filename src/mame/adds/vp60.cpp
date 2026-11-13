@@ -82,7 +82,7 @@ void vp60_state::vp60(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &vp60_state::mem_map);
 	m_maincpu->set_addrmap(AS_DATA, &vp60_state::data_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.92_MHz_XTAL, 1600, 0, 1280, 270, 0, 250);
 	//screen.set_raw(25.92_MHz_XTAL, 1632, 0, 1280, 319, 0, 275);
 	screen.set_screen_update("crtc", FUNC(i8275_device::screen_update));

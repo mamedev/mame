@@ -1315,6 +1315,9 @@ void m68851_mmu_ops()
 				}
 				else if (modes == 0xa000)   // PFLUSHR
 				{
+					// the operand is a 64-bit root pointer; the RPT isn't modeled,
+					// so fetch it (consuming any extension words) and flush everything
+					READ_EA_64(ea);
 					pmmu_atc_flush();
 					return;
 				}

@@ -461,10 +461,10 @@ ROM_END
 
 
 // Original release, with 24MB ROM package, Unit has Black surround to power button
-CONS( 200?, mysprtch,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprt_orig_state, init_mysprtcp, "Senario / V-Tac Technology Co Ltd.",                "My Sports Challenge (5-in-1 version)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mysprtch, 0, 0, mysprtch, mysprtch, spg2xx_game_mysprt_orig_state, init_mysprtcp, "Senario / V-Tac Technology Co Ltd.",               "My Sports Challenge (5-in-1 version)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // from a QVC licensed unit with a different physical shape etc. uses a 32MByte rom with only 24MByte used
-CONS( 200?, mysptqvc,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprt_orig_state, init_mysprtcp, "Senario / V-Tac Technology Co Ltd. (QVC license)",  "My Sports Challenge (6-in-1 version, QVC license)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mysptqvc, 0, 0, mysprtch, mysprtch, spg2xx_game_mysprt_orig_state, init_mysprtcp, "Senario / V-Tac Technology Co Ltd. (QVC license)", "My Sports Challenge (6-in-1 version, QVC license)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // Unit is same shape as regular (non-QVC release) but with Blue surround to power button. Box shows 'Wireless Sports Plus' but title screen shots "My Sports Challenge Plus"  Appears to be V-Tac developed as it has the common V-Tac test mode.
-CONS( 200?, mysprtcp,  0, 0, mysprtch, mysprtch, spg2xx_game_mysprt_plus_state, init_mysprtcp, "Senario / V-Tac Technology Co Ltd.",                "My Sports Challenge Plus / Wireless Sports Plus",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, mysprtcp, 0, 0, mysprtch, mysprtch, spg2xx_game_mysprt_plus_state, init_mysprtcp, "Senario / V-Tac Technology Co Ltd.",               "My Sports Challenge Plus / Wireless Sports Plus", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 // 2009 date on PCB, not actually in German, so maybe sold under different brands?
-CONS( 2009, mgt20in1,  0, 0, mgt20in1, mgt20in1, spg2xx_game_mysprt_plus_state, init_mgt20in1, "MGT",                                               "MGT 20-in-1 TV-Spielekonsole (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, mgt20in1, 0, 0, mgt20in1, mgt20in1, spg2xx_game_mysprt_plus_state, init_mgt20in1, "MGT",                                              "MGT 20-in-1 TV-Spielekonsole (Germany)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

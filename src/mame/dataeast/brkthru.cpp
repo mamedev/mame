@@ -798,7 +798,7 @@ void brkthru_state::brkthru(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_brkthru);
 	PALETTE(config, m_palette, FUNC(brkthru_state::palette), 256);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12_MHz_XTAL / 2, 384, 0, 256, 272, 8, 248);
 	screen.set_screen_update(FUNC(brkthru_state::screen_update));
 	screen.set_palette(m_palette);

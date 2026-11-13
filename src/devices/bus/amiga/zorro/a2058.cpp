@@ -75,13 +75,13 @@ void a2058_device::autoconfig_base_address(offs_t address)
 	LOG("-> installing a2058\n");
 
 	// stop responding to default autoconfig
-	m_zorro->space().unmap_readwrite(0xe80000, 0xe8007f);
+	zorro_space().unmap_readwrite(0xe80000, 0xe8007f);
 
 	// install access to the rom space
-	m_zorro->space().install_ram(address, address + (m_ram_size << 20) - 1, m_ram.get());
+	zorro_space().install_ram(address, address + (m_ram_size << 20) - 1, m_ram.get());
 
 	// we're done
-	m_zorro->cfgout_w(0);
+	cfgout_w(0);
 }
 
 void a2058_device::cfgin_w(int state)
@@ -125,7 +125,7 @@ void a2058_device::cfgin_w(int state)
 		autoconfig_can_shutup(true); // ?
 
 		// install autoconfig handler
-		m_zorro->space().install_readwrite_handler(0xe80000, 0xe8007f,
+		zorro_space().install_readwrite_handler(0xe80000, 0xe8007f,
 			read16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_read)),
 			write16_delegate(*this, FUNC(amiga_autoconfig::autoconfig_write)), 0xffff);
 	}

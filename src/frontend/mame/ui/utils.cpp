@@ -30,6 +30,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iterator>
+#include <ostream>
 #include <unordered_set>
 #include <utility>
 
@@ -170,9 +171,9 @@ public:
 	virtual bool adjust_left() override { return false; }
 	virtual bool adjust_right() override { return false; }
 
-	virtual void save_ini(util::core_file &file, unsigned indent) const override
+	virtual void save_ini(std::ostream &file, unsigned indent) const override
 	{
-		file.puts(util::string_format("%2$*1$s%3$s = 1\n", 2 * indent, "", config_name()));
+		util::stream_format(file, "%2$*1$s%3$s = 1\n", 2 * indent, "", config_name());
 	}
 
 	virtual typename Base::type get_type() const override { return Type; }
@@ -242,10 +243,10 @@ public:
 		return true;
 	}
 
-	virtual void save_ini(util::core_file &file, unsigned indent) const override
+	virtual void save_ini(std::ostream &file, unsigned indent) const override
 	{
 		char const *const text(filter_text());
-		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : ""));
+		util::stream_format(file, "%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : "");
 	}
 
 protected:
@@ -289,10 +290,10 @@ public:
 	virtual bool wants_adjuster() const override { return true; }
 	virtual char const *adjust_text() const override { return _("<set up filters>"); }
 
-	virtual void save_ini(util::core_file &file, unsigned indent) const override
+	virtual void save_ini(std::ostream &file, unsigned indent) const override
 	{
 		auto const tail(std::find_if(std::begin(m_filters), std::end(m_filters), [] (typename Base::ptr const &flt) { return !flt; }));
-		file.puts(util::string_format("%2$*1$s%3$s = %4$d\n", 2 * indent, "", this->config_name(), std::distance(std::begin(m_filters), tail)));
+		util::stream_format(file, "%2$*1$s%3$s = %4$d\n", 2 * indent, "", this->config_name(), std::distance(std::begin(m_filters), tail));
 		for (auto it = std::begin(m_filters); tail != it; ++it)
 			(*it)->save_ini(file, indent + 1);
 	}
@@ -926,10 +927,10 @@ public:
 	virtual bool wants_adjuster() const override { return mame_machine_manager::instance()->inifile().get_file_count(); }
 	virtual char const *adjust_text() const override { return m_adjust_text.c_str(); }
 
-	virtual void save_ini(util::core_file &file, unsigned indent) const override
+	virtual void save_ini(std::ostream &file, unsigned indent) const override
 	{
 		char const *const text(filter_text());
-		file.puts(util::string_format("%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : ""));
+		util::stream_format(file, "%2$*1$s%3$s = %4$s\n", 2 * indent, "", this->config_name(), text ? text : "");
 	}
 
 	virtual bool apply(ui_system_info const &system) const override

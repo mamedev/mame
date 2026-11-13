@@ -10,15 +10,6 @@
 
 */
 
-/*
-
-    TODO:
-
-    - with quantum perfect cpu gets stuck @ 49c3 mov ss,cs:[52ah]
-    - hard disk
-
-*/
-
 #include "emu.h"
 #include "softlist_dev.h"
 #include "bus/centronics/ctronics.h"
@@ -724,7 +715,8 @@ void wangpc_state::wangpc_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x00000, 0x1ffff).ram();
-	map(0x40000, 0xf3fff).rw(m_bus, FUNC(wangpcbus_device::mrdc_r), FUNC(wangpcbus_device::amwc_w));
+	// the IBM PC emulation option answers up to 0xfbfff, just below the BIOS
+	map(0x20000, 0xfbfff).rw(m_bus, FUNC(wangpcbus_device::mrdc_r), FUNC(wangpcbus_device::amwc_w));
 	map(0xfc000, 0xfffff).rom().region(I8086_TAG, 0);
 }
 

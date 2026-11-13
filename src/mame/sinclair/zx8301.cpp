@@ -10,7 +10,6 @@
 
     TODO:
 
-    - wait state on memory access during video update
     - proper video timing
     - get rid of flash timer
 
@@ -125,7 +124,6 @@ zx8301_device::zx8301_device(const machine_config &mconfig, const char *tag, dev
 	, m_base(0)
 	, m_flash(1)
 	, m_vsync(1)
-	, m_vda(0)
 {
 }
 
@@ -150,7 +148,6 @@ void zx8301_device::device_start()
 	save_item(NAME(m_base));
 	save_item(NAME(m_flash));
 	save_item(NAME(m_vsync));
-	save_item(NAME(m_vda));
 }
 
 
@@ -203,6 +200,10 @@ void zx8301_device::control_w(uint8_t data)
 	m_base = BIT(data, 7);
 }
 
+bool zx8301_device::is_owning_bus() const
+{
+	return screen().vpos() < DRAWN_LINES && screen().hpos() / SCREEN_UNITS_PER_CHUNK < ULA_OWNED_CHUNKS;
+}
 
 //-------------------------------------------------
 //  data_r - RAM read
@@ -212,9 +213,9 @@ uint8_t zx8301_device::data_r(offs_t offset)
 {
 	LOGMASKED(LOG_RAM, "RAM Read: %06x\n", offset);
 
-	if (m_vda)
+	if (!machine().side_effects_disabled() && is_owning_bus())
 	{
-		m_cpu->spin_until_time(screen().time_until_pos(256, 0));
+		m_cpu->adjust_icount(-CONTENDED_CYCLES_LOST);
 	}
 
 	return readbyte(offset);
@@ -229,9 +230,9 @@ void zx8301_device::data_w(offs_t offset, uint8_t data)
 {
 	LOGMASKED(LOG_RAM, "RAM Write: %06x = %02x\n", offset, data);
 
-	if (m_vda)
+	if (!machine().side_effects_disabled() && is_owning_bus())
 	{
-		m_cpu->spin_until_time(screen().time_until_pos(256, 0));
+		m_cpu->adjust_icount(-CONTENDED_CYCLES_LOST);
 	}
 
 	writebyte(offset, data);
@@ -322,7 +323,7 @@ uint32_t zx8301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		uint32_t da = m_base << 15;
 
-		for (int y = 0; y < 256; y++)
+		for (int y = 0; y < DRAWN_LINES; y++)
 		{
 			if (m_mode8)
 			{

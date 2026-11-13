@@ -45,7 +45,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_a2bus_card_interface implementation
-	virtual u8 read_c0nx(u8 offset) override { return 0xff; }
+	virtual u8 read_c0nx(u8 offset) override { return get_open_bus(); }
 	virtual void write_c0nx(u8 offset, u8 data) override { }
 	virtual u8 read_cnxx(u8 offset) override;
 	virtual void write_cnxx(u8 offset, u8 data) override;
@@ -568,9 +568,12 @@ void a2bus_phasor_device::set_clocks()
 
 u8 a2bus_phasor_device::read_c0nx(u8 offset)
 {
-	m_native = BIT(offset, 0);
-	set_clocks();
-	return 0xff;
+	if (!machine().side_effects_disabled())
+	{
+		m_native = BIT(offset, 0);
+		set_clocks();
+	}
+	return get_open_bus();
 }
 
 void a2bus_phasor_device::write_c0nx(u8 offset, u8 data)

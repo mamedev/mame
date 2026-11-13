@@ -476,7 +476,7 @@ void gsword_state::init_gsword()
 	ROM2[0x71f] = 0;
 #endif
 #if 1
-	// hack for sound protection or time out function
+	// HACK: sound protection or time out function
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8sm_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
@@ -491,7 +491,7 @@ void gsword_state::init_gsword2()
 	ROM2[0x727] = 0;
 #endif
 #if 1
-	// hack for sound protection or time out function
+	// HACK: for sound protection or time out function
 	m_subcpu->space(AS_PROGRAM).install_read_handler(0x4004, 0x4005, read8sm_delegate(*this, FUNC(gsword_state::hack_r)));
 #endif
 }
@@ -1000,7 +1000,7 @@ void gsword_state::gsword(machine_config &config)
 	config.set_perfect_quantum("mcu1");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
@@ -1064,7 +1064,7 @@ void josvolly_state::josvolly(machine_config &config)
 	config.set_perfect_quantum("mcu2");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);

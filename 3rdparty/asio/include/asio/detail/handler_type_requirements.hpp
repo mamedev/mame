@@ -2,7 +2,7 @@
 // detail/handler_type_requirements.hpp
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -54,6 +54,7 @@
 #endif // defined(ASIO_ENABLE_HANDLER_TYPE_REQUIREMENTS)
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 #if defined(ASIO_ENABLE_HANDLER_TYPE_REQUIREMENTS)
@@ -123,28 +124,6 @@ template <int>
 struct handler_type_requirements
 {
 };
-
-#define ASIO_LEGACY_COMPLETION_HANDLER_CHECK( \
-    handler_type, handler) \
-  \
-  typedef ASIO_HANDLER_TYPE(handler_type, \
-      void()) asio_true_handler_type; \
-  \
-  ASIO_HANDLER_TYPE_REQUIREMENTS_ASSERT( \
-      sizeof(asio::detail::zero_arg_copyable_handler_test( \
-          asio::detail::clvref< \
-            asio_true_handler_type>(), 0)) == 1, \
-      "CompletionHandler type requirements not met") \
-  \
-  typedef asio::detail::handler_type_requirements< \
-      sizeof( \
-        asio::detail::argbyv( \
-          asio::detail::clvref< \
-            asio_true_handler_type>())) + \
-      sizeof( \
-        asio::detail::rorlvref< \
-          asio_true_handler_type>()(), \
-        char(0))> ASIO_UNUSED_TYPEDEF
 
 #define ASIO_READ_HANDLER_CHECK( \
     handler_type, handler) \
@@ -548,6 +527,7 @@ struct handler_type_requirements
 #endif // !defined(ASIO_ENABLE_HANDLER_TYPE_REQUIREMENTS)
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #endif // ASIO_DETAIL_HANDLER_TYPE_REQUIREMENTS_HPP

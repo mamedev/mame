@@ -588,7 +588,7 @@ void sg_vga_state::sg_vga(machine_config &config)
 
 	HOPPER(config, m_hopper, attotime::from_msec(100));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	screen.set_size(0x25a, 0x1b6); // 0x2c 0x58 0x22a 0x25a / 0x06 0x21 0x191 0x1b6

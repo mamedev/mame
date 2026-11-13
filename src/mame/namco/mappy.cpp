@@ -1342,7 +1342,7 @@ void mappy_state::superpac_common(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_superpac);
 	PALETTE(config, m_palette, FUNC(mappy_state::superpac_palette), 64*4+64*4, 32);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(mappy_state::screen_update_superpac));
 	m_screen->set_palette(m_palette);
@@ -1459,7 +1459,7 @@ void phozon_state::phozon(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_phozon);
 	PALETTE(config, m_palette, FUNC(phozon_state::palette), 64*4+64*4, 32);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(phozon_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1502,7 +1502,7 @@ void mappy_state::mappy_common(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_mappy);
 	PALETTE(config, m_palette, FUNC(mappy_state::mappy_palette), 64*4+16*16, 32);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART);
 	m_screen->set_screen_update(FUNC(mappy_state::screen_update_mappy));
 	m_screen->set_palette(m_palette);

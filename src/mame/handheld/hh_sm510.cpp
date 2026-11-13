@@ -27,13 +27,13 @@ TODO:
   per segment, adding pwm_display_device right now has no added value
 - add nstarfox sound effect chip emulation
 - naltair IPT_DIAL should be 1-way, it's not supposed to rotate left
-- Currently there is no accurate way to dump the SM511/SM512 melody ROM
-  electronically. For the ones that weren't decapped, they were read by
+- An accurate way to dump the SM511/SM512 melody ROM electronically now exists.
+  For the ones that weren't decapped or re-dumped with it, they were read by
   playing back all melody data and reconstructing it to ROM. Visual(decap)
-  verification is wanted for: bassmate, gnw_bfightn, gnw_bjack, gnw_bsweep,
-  gnw_climbern, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp, gnw_dkong3, gnw_gcliff,
-  gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway, gnw_mmousep,
-  gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, gnw_zelda, trtreisl,
+  verification, or a re-dump with the new method, is wanted for: bassmate,
+  gnw_bfightn, gnw_bjack, gnw_bsweep, gnw_dkcirc, gnw_dkhockey, gnw_dkjrp,
+  gnw_dkong3, gnw_gcliff, gnw_mariocmt, gnw_mariocmta, gnw_mariotj, gnw_mbaway,
+  gnw_mmousep, gnw_pinball, gnw_popeyep, gnw_sbuster, gnw_snoopyp, trtreisl,
   trspacadv, vesarif, uchitari
 
 ================================================================================
@@ -148,7 +148,7 @@ The MCUs used were not imported from Sharp, but cloned by USSR, renamed to
 
 #include "sound/samples.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 // internal artwork
@@ -417,10 +417,9 @@ void hh_sm510_state::mcfg_svg_screen(machine_config &config, u16 width, u16 heig
 	if (width == 0 || height == 0)
 		return;
 
-	screen_device &screen(SCREEN(config, tag, SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, tag));
 	screen.set_refresh_hz(60);
 	screen.set_size(width, height);
-	screen.set_visarea_full();
 
 	config.set_default_layout(layout_hh_sm510_single);
 }
@@ -2936,7 +2935,7 @@ ROM_START( gnw_zelda )
 	ROM_LOAD( "zl-65.program", 0x0000, 0x1000, CRC(b96aa64e) SHA1(d1f0c64104eb3ecbf370674d5078a3a85b2b7227) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "zl-65.melody", 0x000, 0x100, BAD_DUMP CRC(3a281b0f) SHA1(7a236775557939050bbcd6f9d0a598d219a032f2) ) // decap needed for verification
+	ROM_LOAD( "zl-65.melody", 0x000, 0x100, CRC(5e8abd36) SHA1(44899ff1c31cf69b105ed83a8bb6576551649379) )
 
 	ROM_REGION( 283029, "screen_top", 0)
 	ROM_LOAD( "gnw_zelda_top.svg", 0, 283029, CRC(aaab1d7e) SHA1(fe01e8a92e6dcf457da87afe6bf39fcf511da9db) )
@@ -3920,7 +3919,7 @@ ROM_START( gnw_climber )
 	ROM_LOAD( "dr-802.program", 0x0000, 0x1000, BAD_DUMP CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) ) // dumped from NWS version
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "dr-802.melody", 0x000, 0x100, BAD_DUMP CRC(7c49a3a3) SHA1(fad00d650b4864135c7d50f6fae735b7fffe720f) ) // dumped from NWS version
+	ROM_LOAD( "dr-802.melody", 0x000, 0x100, BAD_DUMP CRC(cb6a873c) SHA1(62c05338f42e283030c2d847384037817398890b) ) // dumped from NWS version
 
 	ROM_REGION( 564868, "screen", 0)
 	ROM_LOAD( "gnw_climber.svg", 0, 564868, CRC(a50ebd1c) SHA1(51047db960c8f110c1b681347cf8efd1d6263b85) )
@@ -3931,7 +3930,7 @@ ROM_START( gnw_climbern )
 	ROM_LOAD( "dr-106.program", 0x0000, 0x1000, CRC(2adcbd6d) SHA1(110dc08c65120ab2c76ee647e89aa2726e24ac1a) )
 
 	ROM_REGION( 0x100, "maincpu:melody", 0 )
-	ROM_LOAD( "dr-106.melody", 0x000, 0x100, BAD_DUMP CRC(7c49a3a3) SHA1(fad00d650b4864135c7d50f6fae735b7fffe720f) ) // decap needed for verification
+	ROM_LOAD( "dr-106.melody", 0x000, 0x100, CRC(cb6a873c) SHA1(62c05338f42e283030c2d847384037817398890b) )
 
 	ROM_REGION( 542453, "screen", 0)
 	ROM_LOAD( "gnw_climbern.svg", 0, 542453, CRC(2ded966e) SHA1(7e9c99d372b6e547b9b3e789dca9dee60455a427) )
@@ -4877,7 +4876,7 @@ ROM_END
 
   Elektronika Баскетбол (Basketbol) (model ИМ-55)
   * PCB label: ЕНСК.758726.002/3
-  * KB1013VK1-2 MCU
+  * КБ1013ВЕ1-2 93 (KB1013VE1-2 93) MCU
   * 26 LEDs + 4 7seg LEDs, 1-bit sound
 
   It's a LED game with an LCD driver MCU, that's unconventional.
@@ -4964,6 +4963,65 @@ void elbaskb_state::elbaskb(machine_config &config)
 ROM_START( elbaskb )
 	ROM_REGION( 0x800, "maincpu", 0 )
 	ROM_LOAD( "im-55.bin", 0x0000, 0x0740, CRC(006f82d0) SHA1(aca582dcb387345cd09a08e42a954c43430772fc) )
+ROM_END
+
+
+
+
+
+/*******************************************************************************
+
+  Elektronika Суперкубики (Superkubiki) (model ИМ-20)
+  * unmarked MCU (no decap); seems to be compatible with КБ1013ВК4-2
+    which in turn is compatible with Sharp SM510
+  * lcd screen with custom segments, 1-bit sound
+
+*******************************************************************************/
+
+class supkubik_state : public hh_sm510_state
+{
+public:
+	supkubik_state(const machine_config &mconfig, device_type type, const char *tag) :
+		hh_sm510_state(mconfig, type, tag)
+	{ }
+
+	void supkubik(machine_config &config);
+};
+
+// inputs
+
+static INPUT_PORTS_START( supkubik )
+	PORT_START("IN.0") // S1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Режим (Mode)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Пауза (Pause)")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CHANGED_CB(input_changed) PORT_NAME("Slow down")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // S2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Вниз (Drop)")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_CHANGED_CB(input_changed) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_CB(input_changed) PORT_NAME(u8"Поворот (Rotate)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_CB(input_changed) PORT_2WAY
+
+	PORT_START("ACL")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_CB(acl_button) PORT_NAME("ACL")
+INPUT_PORTS_END
+
+// config
+
+void supkubik_state::supkubik(machine_config &config)
+{
+	sm510_common(config, 609, 1080); // 2084 x 3696
+}
+
+// roms
+
+ROM_START( supkubik )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD( "im-20", 0x0000, 0x1000, CRC(a490a1e9) SHA1(3815b52ff69891d9a4915e4ad396114404cb608c) )
+
+	ROM_REGION( 115698, "screen", 0)
+	ROM_LOAD( "supkubik.svg", 0, 115698, BAD_DUMP CRC(6f5840be) SHA1(2ac980f6b0c01bbada162c4f826684a932532c61) ) // original LCD scan needed
 ROM_END
 
 
@@ -12377,6 +12435,7 @@ SYST( 199?, vinnpukh,     gnw_dkjrp,   0,      vinnpukh,     gnw_dkjrp,    gnw_d
 // Elektronika (original)
 SYST( 1990, auslalom,     0,           0,      auslalom,     auslalom,     auslalom_state,     empty_init, "Elektronika", "Autoslalom", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 199?, elbaskb,      0,           0,      elbaskb,      elbaskb,      elbaskb_state,      empty_init, "Elektronika", "Basketbol (Elektronika)", MACHINE_SUPPORTS_SAVE )
+SYST( 199?, supkubik,     0,           0,      supkubik,     supkubik,     supkubik_state,     empty_init, "Elektronika", "Superkubiki", MACHINE_SUPPORTS_SAVE )
 SYST( 1992, vesarif,      0,           0,      vesarif,      vesarif,      vesarif_state,      empty_init, "Elektronika", "Vesolaya arifmetika", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 SYST( 1991, uchitari,     0,           0,      uchitari,     uchitari,     uchitari_state,     empty_init, "Elektronika", "Uchitel' arifmetiki (prototype?)", MACHINE_SUPPORTS_SAVE )
 

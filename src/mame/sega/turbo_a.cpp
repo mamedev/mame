@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "turbo.h"
+#include "sound.h"
 #include "speaker.h"
 
 

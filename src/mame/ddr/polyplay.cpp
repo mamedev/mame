@@ -300,7 +300,7 @@ void polyplay_state::polyplay_zre(machine_config &config)
 	m_z80pio->out_pb_callback().set(FUNC(polyplay_state::pio_portb_w));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 0*8, 32*8-1);

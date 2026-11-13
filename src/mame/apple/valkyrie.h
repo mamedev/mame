@@ -19,6 +19,7 @@ public:
 	virtual ~valkyrie_device() = default;
 
 	void map(address_map &map) ATTR_COLD;
+	void valkyriear_map(address_map &map) ATTR_COLD;
 
 	auto write_irq() { return m_irq.bind(); }
 
@@ -53,16 +54,29 @@ private:
 	u32 m_base, m_stride, m_video_timing;
 	s32 m_int_status;
 	u32 m_hres, m_vres, m_htotal, m_vtotal, m_config;
+	bool m_vbl_enabled;
 	u8 m_M, m_N, m_P;
+	u8 m_video_in_control, m_color_key;
+	u16 m_window_x, m_window_y, m_window_width, m_window_height, m_field_x, m_field_y;
+	u8 m_video_clut[256][3];
+
+	void draw_video_window(bitmap_rgb32 &bitmap, rectangle const &cliprect, u32 stride);
+	static offs_t video_buffer_offset(offs_t offset);
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	u8 regs_r(offs_t offset);
 	void regs_w(offs_t offset, u8 data);
+
+	u8 regs64_r(offs_t offset);
+	void regs64_w(offs_t offset, u8 data);
+
 	u32 ramdac_r(offs_t offset);
 	void ramdac_w(offs_t offset, u32 data);
 	u32 vram_r(offs_t offset);
 	void vram_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 video_buffer_r(offs_t offset);
+	void video_buffer_w(offs_t offset, u32 data, u32 mem_mask);
 
 	TIMER_CALLBACK_MEMBER(vbl_tick);
 };

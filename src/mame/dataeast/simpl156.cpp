@@ -100,7 +100,7 @@ even be configurable.
 #include "decocrpt.h"
 #include "decospr.h"
 
-#include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 #include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "emupal.h"
@@ -393,7 +393,7 @@ GFXDECODE_END
 
 void simpl156_state::vblank_interrupt(int state)
 {
-	m_maincpu->set_input_line(ARM_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, state ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -443,13 +443,13 @@ u32 simpl156_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 void simpl156_state::chainrec(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM(config, m_maincpu, 28_MHz_XTAL /* /4 */); /*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
+	DE156(config, m_maincpu, 28_MHz_XTAL /* /4 */); /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
 	m_maincpu->set_addrmap(AS_PROGRAM, &simpl156_state::chainrec_map);
 
 	EEPROM_93C46_16BIT(config, "eeprom");  // 93C45
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(800));
 	screen.set_size(64*8, 32*8);

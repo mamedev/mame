@@ -12,7 +12,7 @@
  *  Created on: 2/08/2014
  *
  *  TODO:
- *    - expansion RAM (for now handled by -ramsize)
+ *    - expansion RAM (for now handled by -ram)
  *    - rewritable ROM
  *    - mouse controls still need some work
  */

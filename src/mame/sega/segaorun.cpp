@@ -297,6 +297,7 @@ Notes:
 #include "sound/ymopm.h"
 
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 #include "outrun.lh"
@@ -525,12 +526,12 @@ uint32_t segaorun_state::screen_update_shangon(screen_device &screen, bitmap_ind
 			cliprect,
 			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
 					uint8_t const *const pri = &screen.priority().pix(y);
-					for (int x = rect.min_x; x <= rect.max_x; x++)
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
 						// only process written pixels
 						uint16_t const pix = src[x];
@@ -595,12 +596,12 @@ uint32_t segaorun_state::screen_update_outrun(screen_device &screen, bitmap_ind1
 			cliprect,
 			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
 					uint8_t *const pri = &screen.priority().pix(y);
-					for (int x = rect.min_x; x <= rect.max_x; x++)
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
 						// only process written pixels
 						uint16_t const pix = src[x];
@@ -905,7 +906,7 @@ TIMER_CALLBACK_MEMBER(segaorun_state::scanline_tick)
 		case 65:
 		case 129:
 		case 193:
-			m_irq2_gen_timer->adjust(m_screen->time_until_pos(scanline, m_screen->visible_area().max_x + 1));
+			m_irq2_gen_timer->adjust(m_screen->time_until_pos(scanline, m_screen->visible_area().right() + 1));
 			next_scanline = scanline + 1;
 			break;
 
@@ -1522,7 +1523,7 @@ void segaorun_state::outrun_base(machine_config &config)
 	GFXDECODE(config, "gfxdecode", m_palette, gfx_segaorun);
 	PALETTE(config, m_palette).set_entries(4096*2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(25.1748_MHz_XTAL / 4, 400, 0, 320, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(segaorun_state::screen_update_outrun));
 	m_screen->set_palette(m_palette);

@@ -25,10 +25,11 @@
 #include "dafb.h"
 #include "dfac.h"
 #include "egret.h"
-#include "macadb.h"
 #include "macrtc.h"
 #include "mactoolbox.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/cards.h"
@@ -65,7 +66,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_via1(*this, "via1"),
 		m_via2(*this, "via2"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_ram(*this, RAM_TAG),
 		m_swim(*this, "fdc"),
 		m_floppy(*this, "fdc:%d", 0U),
@@ -111,7 +112,7 @@ protected:
 
 	required_device<m68040_device> m_maincpu;
 	required_device<via6522_device> m_via1, m_via2;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	required_device<applefdintf_device> m_swim;
 	required_device_array<floppy_connector, 2> m_floppy;
@@ -151,8 +152,8 @@ private:
 	void via2_irq(int state);
 	void phases_w(u8 phases);
 	void devsel_w(u8 devsel);
+	u8 mac_prom(offs_t index) const;
 
-	u8 m_mac[6];
 	int m_via2_ca1_hack, m_nubus_irq_state;
 	int m_via_interrupt, m_via2_interrupt, m_scc_interrupt, m_last_taken_interrupt;
 };
@@ -189,8 +190,7 @@ public:
 		m_swimpic(*this, "swimpic"),
 		m_egret(*this, "egret"),
 		m_scsibus2(*this, "scsi2"),
-		m_ncr2(*this, "ncr53c96_2"),
-		m_adb_in(0)
+		m_ncr2(*this, "ncr53c96_2")
 	{
 	}
 
@@ -205,15 +205,15 @@ protected:
 	void egret_reset_w(int state);
 	void fdc_hdsel(int state);
 
-	void set_adb_line(int linestate) { m_adb_in = (linestate == ASSERT_LINE) ? true : false; }
-	int adbin_r() { return m_adb_in; }
+	int adbin_r()
+	{
+		return m_adbbus->adb_line_r();
+	}
 
 	required_device<applepic_device> m_sccpic, m_swimpic;
 	required_device<egret_device> m_egret;
 	required_device<nscsi_bus_device> m_scsibus2;
 	required_device<ncr53c96_device> m_ncr2;
-
-	int m_adb_in;
 
 private:
 	u8 via_in_a();
@@ -259,16 +259,9 @@ void quadrax00_state::machine_start()
 	m_dafb->set_turboscsi1_device(m_ncr1);
 	m_dafb->set_turboscsi2_device(nullptr);
 
-	// MAC PROM is stored with a bit swizzle and must match one of 2
-	// Apple-assigned OUI blocks 00:05:02 or 08:00:07
-	const std::array<u8, 6> &MAC = m_sonic->get_mac();
-	m_mac[0] = bitswap<8>(0x00, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[1] = bitswap<8>(0x05, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[2] = bitswap<8>(0x02, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[3] = bitswap<8>(MAC[3], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[4] = bitswap<8>(MAC[4], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[5] = bitswap<8>(MAC[5], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_sonic->set_mac(&m_mac[0]);
+	u32 const num = machine().rand();
+	u8 const mac[6] = { 0x00, 0x05, 0x02, u8(num >> 16), u8(num >> 8), u8(num) };
+	m_sonic->set_mac(mac);
 
 	m_ram_ptr = m_ram->pointer<u32>();
 	m_ram_size = m_ram->size()>>1;
@@ -315,7 +308,6 @@ void eclipse_state::machine_start()
 
 	m_dafb->set_turboscsi2_device(m_ncr2);
 
-	save_item(NAME(m_adb_in));
 }
 
 void eclipse_state::machine_reset()
@@ -528,11 +520,19 @@ u32 quadrax00_state::rom_switch_r(offs_t offset)
 	return m_rom_ptr[offset & ((m_rom_size - 1)>>2)];
 }
 
+// MAC PROM is stored with a bit swizzle and must match one of 2
+// Apple-assigned OUI blocks 00:05:02 or 08:00:07
+u8 quadrax00_state::mac_prom(offs_t index) const
+{
+	static constexpr u8 OUI[3] = { 0x00, 0x05, 0x02 };
+	return bitswap<8>((index < 3) ? OUI[index] : m_sonic->get_mac()[index], 0, 1, 2, 3, 4, 5, 6, 7);
+}
+
 u8 quadrax00_state::ethernet_mac_r(offs_t offset)
 {
 	if (offset < 6)
 	{
-		return m_mac[offset];
+		return mac_prom(offset);
 	}
 	else if (offset == 7)
 	{
@@ -540,7 +540,7 @@ u8 quadrax00_state::ethernet_mac_r(offs_t offset)
 
 		for (int i = 0; i < 6; i++)
 		{
-			xor_total ^= (u8)m_mac[i];
+			xor_total ^= mac_prom(i);
 		}
 
 		return xor_total ^ 0xff;
@@ -799,7 +799,9 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		m_via2->writepb_handler().set(FUNC(quadrax00_state::via2_out_b));
 		m_via2->irq_handler().set(FUNC(quadrax00_state::via2_irq));
 
-		MACADB(config, m_macadb, C15M);
+		ADB_BUS(config, m_adbbus);
+		ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+		ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
 		SPEAKER(config, "speaker", 2).front();
 		ASC_EASC(config, m_easc, 22.5792_MHz_XTAL);
@@ -836,10 +838,10 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		ADBMODEM(config, m_adbmodem, C7M);
 		m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 		m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-		m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+		m_adbmodem->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 		m_adbmodem->irq_callback().set(FUNC(spike_state::adb_irq_w));
 		m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
-		m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+		m_adbbus->out_adb_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
 		config.set_perfect_quantum(m_maincpu);
 
 		m_via1->readpa_handler().set(FUNC(spike_state::via_in_a));
@@ -873,7 +875,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		m_swimpic->prd_callback().set(m_swim, FUNC(applefdintf_device::read));
 		m_swimpic->pwr_callback().set(m_swim, FUNC(applefdintf_device::write));
 		m_swimpic->hint_callback().set(m_via2, FUNC(via6522_device::write_ca2)).invert();
-		m_swimpic->gpout0_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w)).invert();
+		m_swimpic->gpout0_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w)).invert();
 		m_swimpic->gpin_callback().set(FUNC(eclipse_state::adbin_r));
 
 		m_swim->dat1byte_cb().set(m_swimpic, FUNC(applepic_device::reqa_w));
@@ -914,8 +916,7 @@ void eclipse_state::via2_out_b_q900(u8 data)
 		NUBUS_SLOT(config, "nbb", "nubus", mac_nubus_cards, nullptr);
 		NUBUS_SLOT(config, "nbc", "nubus", mac_nubus_cards, nullptr);
 
-		m_macadb->adb_data_callback().set(FUNC(eclipse_state::set_adb_line));
-		m_macadb->adb_data_callback().append(m_egret, FUNC(egret_device::set_adb_line));
+		m_adbbus->out_adb_callback().set(m_egret, FUNC(egret_device::set_adb_line));
 
 		m_via1->readpa_handler().set(FUNC(eclipse_state::via_in_a));
 		m_via1->readpb_handler().set(FUNC(eclipse_state::via_in_b));

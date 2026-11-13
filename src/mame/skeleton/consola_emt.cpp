@@ -269,7 +269,7 @@ void consoemt_state::consoemt(machine_config &config)
 	uart2.out_int_callback().set(m_maincpu, FUNC(i80188_cpu_device::int3_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*20+1, 19);

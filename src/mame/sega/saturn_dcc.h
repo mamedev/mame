@@ -23,7 +23,7 @@ public:
 	IRQ_CALLBACK_MEMBER(irq_ack_cb);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -35,7 +35,9 @@ private:
 	void handle_frt_cb(s32 param);
 
 	// amount of slices vs. SH-2 reference clock
-	static constexpr int INTERLEAVE_DIV = 128;
+	// - 6inchmyd wants at least 64 at startup
+	// - stv:sandor wants 32
+	static constexpr int INTERLEAVE_DIV = 32;
 	// quantum interleave duration, in usec
 	static constexpr int INTERLEAVE_DURATION = 1666;
 };

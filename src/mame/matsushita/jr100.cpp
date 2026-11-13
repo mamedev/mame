@@ -64,6 +64,7 @@ TODO:
 
 #include "emupal.h"
 #include "screen.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "multibyte.h"
@@ -381,7 +382,7 @@ void jr100_state::jr100(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jr100_state::mem_map);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(256, 192); /* border size not accurate */
@@ -405,6 +406,9 @@ void jr100_state::jr100(machine_config &config)
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED);
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->set_interface("jr100_cass");
+
+	SOFTWARE_LIST(config, "cass_list").set_original("jr100_cass");
 
 	/* quickload */
 	QUICKLOAD(config, "quickload", "prg", attotime::from_seconds(2)).set_load_callback(FUNC(jr100_state::quickload_cb));

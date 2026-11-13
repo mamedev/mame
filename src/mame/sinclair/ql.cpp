@@ -10,7 +10,7 @@
 
     TODO:
 
-    - ZX8301 memory access slowdown
+    - More accurate ZX8301 memory contention
     - use resnet.h to create palette
     - Tyche bios is broken
     - several disk interfaces (720K/1.44MB/3.2MB)
@@ -890,7 +890,7 @@ void ql_state::ql(machine_config &config)
 	m_ipc->bus_in_cb().set(FUNC(ql_state::ipc_bus_r));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, SCREEN_TAG, SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, SCREEN_TAG));
 	screen.set_refresh_hz(50.08);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_screen_update(ZX8301_TAG, FUNC(zx8301_device::screen_update));

@@ -16,6 +16,7 @@
 #include "machine/timer.h"
 #include "machine/x2212.h"
 #include "machine/74259.h"
+
 #include "emupal.h"
 #include "screen.h"
 
@@ -155,7 +156,6 @@ private:
 	void shrike68k_map(address_map &map) ATTR_COLD;
 
 	required_device<timer_device> m_scanline_timer;
-
 
 	/* global data */
 	uint8_t m_shooter = 0;

@@ -150,6 +150,7 @@ bool sap_dsk_format::load(util::random_read &io, uint32_t form_factor, const std
 				sectors[sector_count].deleted = bool(sector_header[0] & 0x04);
 				sectors[sector_count].bad_data_crc = crc != get_u16be(sector_crc);
 				sectors[sector_count].bad_addr_crc = false;
+				sectors[sector_count].weak = false;
 
 				read_offset += sector_octets + 6;
 				bufptr += sector_octets;

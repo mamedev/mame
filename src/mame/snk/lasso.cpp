@@ -82,11 +82,11 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void base(machine_config &config);
-	void wwjgtin(machine_config &config);
-	void lasso(machine_config &config);
-	void chameleo(machine_config &config);
-	void pinbo(machine_config &config);
+	void base(machine_config &config) ATTR_COLD;
+	void wwjgtin(machine_config &config) ATTR_COLD;
+	void lasso(machine_config &config) ATTR_COLD;
+	void chameleo(machine_config &config) ATTR_COLD;
+	void pinbo(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -131,9 +131,9 @@ private:
 	TILE_GET_INFO_MEMBER(lasso_get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wwjgtin_get_track_tile_info);
 	TILE_GET_INFO_MEMBER(pinbo_get_bg_tile_info);
-	void lasso_palette(palette_device &palette) const;
+	void lasso_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_VIDEO_START(wwjgtin);
-	void wwjgtin_palette(palette_device &palette) const;
+	void wwjgtin_palette(palette_device &palette) const ATTR_COLD;
 	DECLARE_VIDEO_START(pinbo);
 	uint32_t screen_update_lasso(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_chameleo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -344,19 +344,20 @@ void lasso_state::draw_lasso(bitmap_ind16 &bitmap, const rectangle &cliprect)
 		if (flip_screen_y())
 			y = ~y;
 
-		if ((y < cliprect.min_y) || (y > cliprect.max_y))
+		if (!cliprect.containsy(y))
 			continue;
 
 		uint8_t x = (offs & 0x1f) << 3;
 		uint8_t data = m_bitmap_ram[offs];
+		auto *const dst = &bitmap.pix(y);
 
 		if (flip_screen_x())
 			x = ~x;
 
 		for (int bit = 0; bit < 8; bit++)
 		{
-			if ((data & 0x80) && (x >= cliprect.min_x) && (x <= cliprect.max_x))
-				bitmap.pix(y, x) = 0x3f;
+			if ((data & 0x80) && cliprect.containsx(x))
+				dst[x] = 0x3f;
 
 			if (flip_screen_x())
 				x--;
@@ -940,7 +941,7 @@ void lasso_state::base(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &lasso_state::lasso_audio_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(61); // guess based on intro song finish time compared to PCB
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(32*8, 32*8);

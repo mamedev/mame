@@ -51,8 +51,8 @@ void ibm_pc_at_101_keyboard_device::device_add_mconfig(machine_config &config)
 	M6805U3(config, m_mcu, 4_MHz_XTAL);
 
 	// ports A and C control the matrix column select
-	m_mcu->porta_w().set([this](u8 data) { m_porta = data; });
-	m_mcu->portc_w().set([this](u8 data) { m_portc = data; });
+	m_mcu->porta_w().set([this](offs_t offset, u8 data, u8 mask) { m_porta = (data & mask) | ~mask; });
+	m_mcu->portc_w().set([this](offs_t offset, u8 data, u8 mask) { m_portc = (data & mask) | ~mask; });
 
 	// port D reads the matrix row output
 	m_mcu->portd_r().set(FUNC(ibm_pc_at_101_keyboard_device::portd_r));
@@ -87,8 +87,8 @@ INPUT_PORTS_START(ibm_pc_at_101_keyboard)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("col.2")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)         PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)         PORT_CHAR(UCHAR_MAMEKEY(TAB))
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ESC)         PORT_CHAR(27) PORT_CHAR(UCHAR_MAMEKEY(ESC))
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)         PORT_CHAR(9)  PORT_CHAR(UCHAR_MAMEKEY(TAB))
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE)       PORT_CHAR('`') PORT_CHAR('~')
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)           PORT_CHAR('1') PORT_CHAR('!')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q)           PORT_CHAR('q') PORT_CHAR('Q')
@@ -238,6 +238,8 @@ ibm_pc_at_101_keyboard_device::ibm_pc_at_101_keyboard_device(const machine_confi
 	, m_mcu(*this, "mcu")
 	, m_matrix(*this, "col.%x", 0U)
 	, m_leds(*this, "led%u", 0U)
+	, m_porta(0xff)
+	, m_portc(0xff)
 {
 }
 

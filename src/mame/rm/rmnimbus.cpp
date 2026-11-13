@@ -11,18 +11,18 @@
 
 #include "emu.h"
 #include "rmnimbus.h"
+#include "rmnimbus_hd.h"
 #include "rmnkbd.h"
 
 #include "cpu/mcs51/i8051.h"
 #include "imagedev/floppy.h"
 
 #include "bus/isa/fdc.h"
+#include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "bus/scsi/acb4070.h"
-#include "bus/scsi/s1410.h"
-#include "bus/scsi/scsihd.h"
+#include "machine/nscsi_bus.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -34,6 +34,12 @@ static void rmnimbus_floppies(device_slot_interface &device)
 static void keyboard(device_slot_interface &device)
 {
 	device.option_add("rmnkbd", RMNIMBUS_KEYBOARD);
+}
+
+static void rmnimbus_scsi_devices(device_slot_interface &device)
+{
+	default_scsi_devices(device);
+	device.option_replace("harddisk", RMNIMBUS_HD);
 }
 
 void rmnimbus_state::nimbus_mem(address_map &map)
@@ -130,7 +136,7 @@ void rmnimbus_state::nimbus(machine_config &config)
 	m_iocpu->port_out_cb<3>().set(FUNC(rmnimbus_state::nimbus_pc8031_port3_w));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(4.433619_MHz_XTAL * 2, 650, 0, 640, 260, 0, 250);
 	m_screen->set_screen_update(FUNC(rmnimbus_state::screen_update_nimbus));
 	//m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);
@@ -147,28 +153,20 @@ void rmnimbus_state::nimbus(machine_config &config)
 	FLOPPY_CONNECTOR(config, FDC_TAG":0", rmnimbus_floppies, "35dd", isa8_fdc_device::floppy_formats);
 	FLOPPY_CONNECTOR(config, FDC_TAG":1", rmnimbus_floppies, "35dd", isa8_fdc_device::floppy_formats);
 
-	SCSI_PORT(config, m_scsibus);
-	m_scsibus->set_data_input_buffer("scsi_data_in");
-	m_scsibus->msg_handler().set(FUNC(rmnimbus_state::write_scsi_msg));
-	m_scsibus->bsy_handler().set(FUNC(rmnimbus_state::write_scsi_bsy));
-	m_scsibus->io_handler().set(FUNC(rmnimbus_state::write_scsi_io));
-	m_scsibus->cd_handler().set(FUNC(rmnimbus_state::write_scsi_cd));
-	m_scsibus->req_handler().set(FUNC(rmnimbus_state::write_scsi_req));
-
-	m_scsibus->set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	m_scsibus->set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	m_scsibus->set_slot_device(3, "harddisk", ACB4070, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
-	m_scsibus->set_slot_device(4, "harddisk", S1410, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
-
-	OUTPUT_LATCH(config, m_scsi_data_out);
-	m_scsibus->set_output_latch(*m_scsi_data_out);
-
-	INPUT_BUFFER(config, m_scsi_data_in);
-
-	OUTPUT_LATCH(config, m_scsi_ctrl_out);
-	m_scsi_ctrl_out->bit_handler<0>().set(m_scsibus, FUNC(scsi_port_device::write_rst));
-	m_scsi_ctrl_out->bit_handler<1>().set(m_scsibus, FUNC(scsi_port_device::write_sel));
-	m_scsi_ctrl_out->bit_handler<2>().set(FUNC(rmnimbus_state::write_scsi_iena));
+	NSCSI_BUS(config, SCSIBUS_TAG);
+	NSCSI_CONNECTOR(config, SCSIBUS_TAG ":0", rmnimbus_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, SCSIBUS_TAG ":1", rmnimbus_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, SCSIBUS_TAG ":2", rmnimbus_scsi_devices, "acb4070");
+	NSCSI_CONNECTOR(config, SCSIBUS_TAG ":3", rmnimbus_scsi_devices, "s1410");
+	NSCSI_CONNECTOR(config, SCSIBUS_TAG ":7", default_scsi_devices, "scsicb", true)
+		.option_add_internal("scsicb", NSCSI_CB)
+		.machine_config([this] (device_t *device)
+		{
+			nscsi_callback_device &scsicb = downcast<nscsi_callback_device &>(*device);
+			scsicb.req_callback().set(*this, FUNC(rmnimbus_state::write_scsi_req));
+			scsicb.io_callback().set(*this, FUNC(rmnimbus_state::write_scsi_io));
+			scsicb.cd_callback().set(*this, FUNC(rmnimbus_state::write_scsi_cd));
+		});
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("1536K");

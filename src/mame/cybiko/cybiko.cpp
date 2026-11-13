@@ -370,7 +370,7 @@ void cybiko_state::cybikov1_debug_serial(machine_config &config)
 void cybiko_state::cybikov1_base(machine_config &config)
 {
 	// screen
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_size(hd66421_device::WIDTH, hd66421_device::HEIGHT);
 	screen.set_visarea(0, hd66421_device::WIDTH - 1, 0, hd66421_device::HEIGHT - 1);

@@ -2,7 +2,7 @@
 // detail/scheduler.hpp
 // ~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -31,6 +31,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 struct scheduler_thread_info;
@@ -42,15 +43,20 @@ class scheduler
 public:
   typedef scheduler_operation operation;
 
+  // Tag type used for constructing as an internal scheduler.
+  struct internal {};
+
   // The type of a function used to obtain a task instance.
   typedef scheduler_task* (*get_task_func_type)(
       asio::execution_context&);
 
-  // Constructor. Specifies the number of concurrent threads that are likely to
-  // run the scheduler. If set to 1 certain optimisation are performed.
+  // Constructor.
   ASIO_DECL scheduler(asio::execution_context& ctx,
-      int concurrency_hint = 0, bool own_thread = true,
+      bool own_thread = true,
       get_task_func_type get_task = &scheduler::get_default_task);
+
+  // Construct as an internal scheduler.
+  ASIO_DECL scheduler(internal, asio::execution_context& ctx);
 
   // Destructor.
   ASIO_DECL ~scheduler();
@@ -135,15 +141,9 @@ public:
   // work_started() was previously called for the operations.
   ASIO_DECL void abandon_operations(op_queue<operation>& ops);
 
-  // Get the concurrency hint that was used to initialise the scheduler.
-  int concurrency_hint() const
-  {
-    return concurrency_hint_;
-  }
-
 private:
   // The mutex type used by this scheduler.
-  typedef conditionally_enabled_mutex mutex;
+  typedef conditionally_enabled_mutex<asio::detail::mutex> mutex;
 
   // The event type used by this scheduler.
   typedef conditionally_enabled_event event;
@@ -189,6 +189,9 @@ private:
   // Whether to optimise for single-threaded use cases.
   const bool one_thread_;
 
+  // Whether to treat all posted handlers as continuations.
+  const bool assume_continuation_;
+
   // Mutex to protect access to internal data.
   mutable mutex mutex_;
 
@@ -210,26 +213,30 @@ private:
   // Whether the task has been interrupted.
   bool task_interrupted_;
 
-  // The count of unfinished work.
-  atomic_count outstanding_work_;
-
-  // The queue of handlers that are ready to be delivered.
-  op_queue<operation> op_queue_;
-
   // Flag to indicate that the dispatcher has been stopped.
   bool stopped_;
 
   // Flag to indicate that the dispatcher has been shut down.
   bool shutdown_;
 
-  // The concurrency hint used to initialise the scheduler.
-  const int concurrency_hint_;
+  // The count of unfinished work.
+  atomic_count outstanding_work_;
+
+  // The queue of handlers that are ready to be delivered.
+  op_queue<operation> op_queue_;
+
+  // The time limit on running the scheduler task, in microseconds.
+  const long task_usec_;
+
+  // The time limit on waiting when the queue is empty, in microseconds.
+  const long wait_usec_;
 
   // The thread that is running the scheduler.
-  asio::detail::thread* thread_;
+  asio::detail::thread thread_;
 };
 
 } // namespace detail
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

@@ -170,7 +170,7 @@ void fb01_state::fb01(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &fb01_state::fb01_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*16, 9);
@@ -216,7 +216,11 @@ void fb01_state::fb01(machine_config &config)
 /* ROM definition */
 ROM_START( fb01 )
 	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD("nec__-011_xb712c0__8709ex700__d27c256c-15.ic11", 0, 0x8000, CRC(7357e9a4) SHA1(049c482d6c91b7e2846757dd0f5138e0d8b687f0)) // OTP 27c256 windowless eprom?
+	ROM_DEFAULT_BIOS("209")
+	ROM_SYSTEM_BIOS(0, "209", "M002.00.009")
+	ROMX_LOAD("nec__-011_xb712c0__8709ex700__d27c256c-15.ic11", 0, 0x8000, CRC(7357e9a4) SHA1(049c482d6c91b7e2846757dd0f5138e0d8b687f0), ROM_BIOS(0)) // OTP 27c256 windowless eprom?
+	ROM_SYSTEM_BIOS(1, "206", "M002.00.006")
+	ROMX_LOAD("8623p9__xb712a0_505.ic11", 0, 0x8000, CRC(4264c353) SHA1(4916469e1d40692c0a1de09fed0b95e2ceccc01e), ROM_BIOS(1))	// from FB-01 with serial no. 18656
 ROM_END
 
 } // anonymous namespace

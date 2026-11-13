@@ -23,7 +23,6 @@ TODO:
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 
-#include "softlist.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -40,11 +39,11 @@ public:
 		, m_speaker(*this, "speaker")
 	{ }
 
-	void mb1320(machine_config &config);
-	void scsxaio(machine_config &config);
+	void mb1320(machine_config &config) ATTR_COLD;
+	void scsxaio(machine_config &config) ATTR_COLD;
 
 protected:
-	void base_config(machine_config &config);
+	void base_config(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<i386sx_device> m_maincpu;

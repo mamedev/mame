@@ -370,11 +370,11 @@ uint32_t kangaroo_base_state::screen_update(screen_device &screen, bitmap_rgb32 
 	uint8_t prib = (~m_video_control[9] & 0x01);
 
 	// iterate over pixels
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint32_t *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x < cliprect.max_x; x += 2) // <, not <=
+		for (int x = cliprect.left(); x < cliprect.right(); x += 2) // <, not <=
 		{
 			uint8_t effxa = scrollx + ((x / 2) ^ xora);
 			uint8_t effya = scrolly + (y ^ xora);
@@ -717,7 +717,7 @@ void kangaroo_base_state::fnkyfish(machine_config &config)
 	m_audiocpu->set_vblank_int("screen", FUNC(kangaroo_base_state::irq0_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_UPDATE_SCANLINE);
 	screen.set_raw(10_MHz_XTAL, 320*2, 0*2, 256*2, 260, 8, 248);
 	screen.set_screen_update(FUNC(kangaroo_base_state::screen_update));

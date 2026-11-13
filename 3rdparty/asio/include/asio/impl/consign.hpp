@@ -2,7 +2,7 @@
 // impl/consign.hpp
 // ~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -19,12 +19,14 @@
 #include "asio/associator.hpp"
 #include "asio/async_result.hpp"
 #include "asio/detail/handler_cont_helpers.hpp"
+#include "asio/detail/initiation_base.hpp"
 #include "asio/detail/type_traits.hpp"
 #include "asio/detail/utility.hpp"
 
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 // Class to adapt a consign_t as a completion handler.
@@ -56,7 +58,7 @@ template <typename Handler>
 inline bool asio_handler_is_continuation(
     consign_handler<Handler>* this_handler)
 {
-  return asio_handler_cont_helpers::is_continuation(
+  return ASIO_VERSIONED_NAME(handler_cont_helpers)::is_continuation(
       this_handler->handler_);
 }
 
@@ -69,25 +71,31 @@ struct async_result<consign_t<CompletionToken, Values...>, Signatures...>
   : async_result<CompletionToken, Signatures...>
 {
   template <typename Initiation>
-  struct init_wrapper
+  struct init_wrapper : detail::initiation_base<Initiation>
   {
-    init_wrapper(Initiation init)
-      : initiation_(static_cast<Initiation&&>(init))
-    {
-    }
+    using detail::initiation_base<Initiation>::initiation_base;
 
     template <typename Handler, typename... Args>
     void operator()(Handler&& handler,
-        std::tuple<Values...> values, Args&&... args)
+        std::tuple<Values...> values, Args&&... args) &&
     {
-      static_cast<Initiation&&>(initiation_)(
+      static_cast<Initiation&&>(*this)(
           detail::consign_handler<decay_t<Handler>, Values...>(
             static_cast<Handler&&>(handler),
             static_cast<std::tuple<Values...>&&>(values)),
           static_cast<Args&&>(args)...);
     }
 
-    Initiation initiation_;
+    template <typename Handler, typename... Args>
+    void operator()(Handler&& handler,
+        std::tuple<Values...> values, Args&&... args) const &
+    {
+      static_cast<const Initiation&>(*this)(
+          detail::consign_handler<decay_t<Handler>, Values...>(
+            static_cast<Handler&&>(handler),
+            static_cast<std::tuple<Values...>&&>(values)),
+          static_cast<Args&&>(args)...);
+    }
   };
 
   template <typename Initiation, typename RawCompletionToken, typename... Args>
@@ -130,6 +138,7 @@ struct associator<Associator,
 
 #endif // !defined(GENERATING_DOCUMENTATION)
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

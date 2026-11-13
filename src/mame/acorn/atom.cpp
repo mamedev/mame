@@ -93,7 +93,6 @@ Hardware:   PPIA 8255
     - mouse
     - color card
     - CP/M card
-    - econet
     - Busicomputers Prophet 2
         * The Shift and Return keys are orange and the Return key is large,
         * There is a MODE switch to the top right of the keyboard,
@@ -467,7 +466,7 @@ void atomrr_state::extram_w(offs_t offset, uint8_t data)
 uint8_t atomrr_state::extram1_r(offs_t offset)
 {
 	if (BIT(m_switch_latch, 0))
-		return m_ram [offset | 0x6000];
+		return m_ram[offset | 0x6000];
 	else
 		return m_flash[offset | (m_rom_latch << 12)];
 }
@@ -1142,7 +1141,9 @@ void atom_state::atom_base(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &atom_state::atom_mem);
 	config.set_perfect_quantum(m_maincpu); // required for Tube interface
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_raw(XTAL(3'579'545) * 2, 456, 0, 372, 262, 0, 243);
+	screen.set_screen_update("vdg", FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, 3.579545_MHz_XTAL);
 	m_vdg->input_callback().set(FUNC(atom_state::vdg_videoram_r));

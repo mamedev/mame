@@ -1053,7 +1053,7 @@ void aleck64_state::aleck64(machine_config &config)
 	m_rsp->set_addrmap(AS_DATA, &aleck64_state::rsp_dmem_map);
 	m_rsp->set_force_no_drc(false);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(DACRATE_NTSC*2,3093,0,3093,525,0,525);
 	m_screen->set_screen_update(FUNC(n64_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(n64_state::screen_vblank));
@@ -1151,6 +1151,7 @@ void aleck64_state::init_aleck64()
 {
 	uint8_t *rom = memregion("user2")->base();
 
+	// HACK: what is this for?
 	rom[0x67c] = 0;
 	rom[0x67d] = 0;
 	rom[0x67e] = 0;

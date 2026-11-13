@@ -450,18 +450,18 @@ protected:
 		m_zoom->subdevice<zsg2_device>("zsg2")->ext_read().set(FUNC(taitogn_state::zsg2_ext_r));
 	}
 
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		zn_state::driver_start();
+		zn_state::machine_start();
 
 		save_item(NAME(m_control));
 		save_item(NAME(m_control2));
 		save_item(NAME(m_control3));
 	}
 
-	virtual void driver_reset() override ATTR_COLD
+	virtual void machine_reset() override ATTR_COLD
 	{
-		zn_state::driver_reset();
+		zn_state::machine_reset();
 
 		// halt sound CPU since it has no valid program at start
 		m_mn10200->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
@@ -652,7 +652,7 @@ class ttgnirq_state :
 public:
 	using taitogn_state::taitogn_state;
 
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
 		// HACK: IRQ still enabled when clearing bss
 		// bp 80010008,,{d@1f801074=0;g};g
@@ -671,7 +671,7 @@ public:
 			}
 		});
 
-		taitogn_state::driver_start();
+		taitogn_state::machine_start();
 	}
 
 	bool m_installing_tap = false;
@@ -735,9 +735,9 @@ public:
 	}
 
 protected:
-	virtual void driver_start() override ATTR_COLD
+	virtual void machine_start() override ATTR_COLD
 	{
-		taitogn_state::driver_start();
+		taitogn_state::machine_start();
 
 		save_item(NAME(m_trackball));
 		save_item(NAME(m_weight));
@@ -1390,6 +1390,6 @@ GAME( 2011, brvbladeg, coh3002t, coh3002t_bl, taitogn_jp1, taitogn_state,   init
 GAME( 2011, flamegung, coh3002t, coh3002t_bl, taitogn_jp1, ttgncl0_state,   init_nozoom, ROT0,    "bootleg (Arcade MOD BIOS)", "Flame Gunner (VER 1.40G)",          MACHINE_SUPPORTS_SAVE )
 GAME( 2011, ftimpactg, coh3002t, coh3002t_bl, taitogn_jp1, taitogn_state,   empty_init,  ROT0,    "bootleg (Arcade MOD BIOS)", "Fighters' Impact (VER 2.10G)",      MACHINE_SUPPORTS_SAVE )
 GAME( 2011, gdariusg,  coh3002t, coh3002t_bl, taitogn_jp1, taitogn_state,   empty_init,  ROT0,    "bootleg (Arcade MOD BIOS)", "G-Darius (VER 2.70G)",              MACHINE_SUPPORTS_SAVE )
-GAME( 2011, raystormg, coh3002t, coh3002t_bl, raystormg,   taitogn_state,   empty_init,  ROT0,    "bootleg (Arcade MOD BIOS)", "Ray Storm (VER 2.60G)",             MACHINE_SUPPORTS_SAVE )
+GAME( 2011, raystormg, coh3002t, coh3002t_bl, raystormg,   taitogn_state,   empty_init,  ROT0,    "bootleg (Arcade MOD BIOS)", "RayStorm (VER 2.60G)",              MACHINE_SUPPORTS_SAVE )
 GAME( 2011, shngmtkbg, coh3002t, coh3002t_bl, taitogn_jp1, ttgncl0_state,   init_nozoom, ROT0,    "bootleg (Arcade MOD BIOS)", "Shanghai Matekibuyuu (VER 1.20G)",  MACHINE_SUPPORTS_SAVE )
 GAME( 2011, tblkkuzug, coh3002t, coh3002t_bl, taitogn_jp1, ttgncl0_state,   init_nozoom, ROT0,    "bootleg (Arcade MOD BIOS)", "The Block Kuzushi (VER 1.10G)",     MACHINE_SUPPORTS_SAVE )

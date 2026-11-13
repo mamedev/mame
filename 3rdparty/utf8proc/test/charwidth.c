@@ -25,6 +25,7 @@ int main(int argc, char **argv)
     for (c = 0; c <= 0x110000; ++c) {
         int cat = utf8proc_get_property(c)->category;
         int w = utf8proc_charwidth(c);
+        int ambiguous = utf8proc_charwidth_ambiguous(c);
         if ((cat == UTF8PROC_CATEGORY_MN || cat == UTF8PROC_CATEGORY_ME) && w > 0) {
             fprintf(stderr, "nonzero width %d for combining char %x\n", w, c);
             error += 1;
@@ -42,6 +43,10 @@ int main(int argc, char **argv)
             isprint(c) ? "printable" : "non-printable", c);
             error += 1;
         }
+        if (c <= 127 && utf8proc_charwidth_ambiguous(c)) {
+            fprintf(stderr, "ambiwith set for ASCII %x\n", c);
+            error += 1;
+        }
         if (!my_isprint(c) && w > 0) {
             fprintf(stderr, "non-printing %x had width %d\n", c, w);
             error += 1;
@@ -50,11 +55,20 @@ int main(int argc, char **argv)
             fprintf(stderr, "unexpected width %d for unassigned char %x\n", w, c);
             error += 1;
         }
+        if (ambiguous && w >= 2) {
+            fprintf(stderr, "char %x is both doublewidth and ambiguous\n", c);
+            error += 1;
+        }
     }
     check(!error, "utf8proc_charwidth FAILED %d tests.", error);
 
     check(utf8proc_charwidth(0x00ad) == 1, "incorrect width for U+00AD (soft hyphen)");
+    check(utf8proc_charwidth_ambiguous(0x00ad) , "incorrect ambiguous width for U+00AD (soft hyphen)");
     check(utf8proc_charwidth(0xe000) == 1, "incorrect width for U+e000 (PUA)");
+    check(utf8proc_charwidth_ambiguous(0xe000), "incorrect ambiguous width for U+e000 (PUA)");
+
+    check(utf8proc_charwidth_ambiguous(0x00A1), "incorrect ambiguous width for U+00A1 (inverted exclamation mark)");
+    check(!utf8proc_charwidth_ambiguous(0x00A2), "incorrect ambiguous width for U+00A2 (cent sign)");
 
     /* print some other information by compariing with system wcwidth */
     printf("Mismatches with system wcwidth (not necessarily errors):\n");

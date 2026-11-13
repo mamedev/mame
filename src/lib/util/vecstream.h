@@ -32,18 +32,19 @@
 #include <utility>
 #include <vector>
 
+
 namespace util {
 
 template <typename CharT, typename Traits = std::char_traits<CharT>, typename Allocator = std::allocator<CharT> >
 class basic_vectorbuf : public std::basic_streambuf<CharT, Traits>
 {
 public:
-	typedef typename std::basic_streambuf<CharT, Traits>::char_type char_type;
-	typedef typename std::basic_streambuf<CharT, Traits>::int_type  int_type;
-	typedef typename std::basic_streambuf<CharT, Traits>::pos_type  pos_type;
-	typedef typename std::basic_streambuf<CharT, Traits>::off_type  off_type;
-	typedef Allocator                                               allocator_type;
-	typedef std::vector<char_type, Allocator>                       vector_type;
+	using char_type      = typename std::basic_streambuf<CharT, Traits>::char_type;
+	using int_type       = typename std::basic_streambuf<CharT, Traits>::int_type;
+	using pos_type       = typename std::basic_streambuf<CharT, Traits>::pos_type;
+	using off_type       = typename std::basic_streambuf<CharT, Traits>::off_type;
+	using allocator_type = Allocator;
+	using vector_type    = std::vector<char_type, Allocator>;
 
 	basic_vectorbuf(std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) : std::basic_streambuf<CharT, Traits>(), m_mode(mode), m_storage(), m_threshold(nullptr)
 	{
@@ -172,17 +173,22 @@ protected:
 		default:
 			return pos_type(off_type(-1));
 		}
-		if ((off_type(0) > off) || ((m_mode & std::ios_base::app) && out && (end != off))) return pos_type(off_type(-1));
-		if ((out ? off_type(this->epptr() - this->pbase()) : end) < off) return pos_type(off_type(-1));
+		if ((off_type(0) > off) || ((m_mode & std::ios_base::app) && out && (end != off)))
+			return pos_type(off_type(-1));
+		if ((out ? off_type(this->epptr() - this->pbase()) : end) < off)
+			return pos_type(off_type(-1));
 		if (out)
 		{
 			this->setp(this->pbase(), this->epptr());
 			this->pbump(off);
-			if (m_threshold < this->pptr()) m_threshold = this->pptr();
+			if (m_threshold < this->pptr())
+				m_threshold = this->pptr();
 			if (m_mode & std::ios_base::in)
 			{
-				if (in) this->setg(this->eback(), this->eback() + off, m_threshold);
-				else if (this->egptr() < m_threshold) this->setg(this->eback(), this->gptr(), m_threshold);
+				if (in)
+					this->setg(this->eback(), this->eback() + off, m_threshold);
+				else if (this->egptr() < m_threshold)
+					this->setg(this->eback(), this->gptr(), m_threshold);
 			}
 		}
 		else if (in)
@@ -199,15 +205,18 @@ protected:
 
 	virtual int_type underflow() override
 	{
-		if (!this->gptr()) return Traits::eof();
+		if (!this->gptr())
+			return Traits::eof();
 		maximise_egptr();
 		return (this->gptr() < this->egptr()) ? Traits::to_int_type(*this->gptr()) : Traits::eof();
 	}
 
 	virtual int_type overflow(int_type ch = Traits::eof()) override
 	{
-		if (!(m_mode & std::ios_base::out)) return Traits::eof();
-		if (Traits::eq_int_type(ch, Traits::eof())) return Traits::not_eof(ch);
+		if (!(m_mode & std::ios_base::out))
+			return Traits::eof();
+		if (Traits::eq_int_type(ch, Traits::eof()))
+			return Traits::not_eof(ch);
 		auto const put_offset(this->pptr() - this->pbase() + 1);
 		auto const threshold_offset((std::max)(m_threshold - this->pbase(), put_offset));
 		m_storage.push_back(Traits::to_char_type(ch));
@@ -215,7 +224,8 @@ protected:
 		auto const base(&m_storage[0]);
 		this->setp(base, base + m_storage.size());
 		m_threshold = base + threshold_offset;
-		if (m_mode & std::ios_base::in) this->setg(base, base + (this->gptr() - this->eback()), m_threshold);
+		if (m_mode & std::ios_base::in)
+			this->setg(base, base + (this->gptr() - this->eback()), m_threshold);
 		this->pbump(int(put_offset));
 		return ch;
 	}
@@ -262,9 +272,11 @@ private:
 				auto const base(&m_storage[0]);
 				m_threshold = base + end;
 				this->setp(base, base + m_storage.size());
-				if (m_mode & std::ios_base::in) this->setg(base, base, m_threshold);
+				if (m_mode & std::ios_base::in)
+					this->setg(base, base, m_threshold);
 			}
-			if (m_mode & (std::ios_base::app | std::ios_base::ate)) this->pbump(int(unsigned(end)));
+			if (m_mode & (std::ios_base::app | std::ios_base::ate))
+				this->pbump(int(unsigned(end)));
 		}
 		else if (m_storage.empty())
 		{
@@ -302,8 +314,10 @@ private:
 	{
 		if (m_mode & std::ios_base::out)
 		{
-			if (m_threshold < this->pptr()) m_threshold = this->pptr();
-			if ((m_mode & std::ios_base::in) && (this->egptr() < m_threshold)) this->setg(this->eback(), this->gptr(), m_threshold);
+			if (m_threshold < this->pptr())
+				m_threshold = this->pptr();
+			if ((m_mode & std::ios_base::in) && (this->egptr() < m_threshold))
+				this->setg(this->eback(), this->gptr(), m_threshold);
 		}
 	}
 
@@ -316,7 +330,7 @@ template <typename CharT, typename Traits = std::char_traits<CharT>, typename Al
 class basic_ivectorstream : public std::basic_istream<CharT, Traits>
 {
 public:
-	typedef typename basic_vectorbuf<CharT, Traits, Allocator>::vector_type vector_type;
+	using vector_type = typename basic_vectorbuf<CharT, Traits, Allocator>::vector_type;
 
 	basic_ivectorstream(std::ios_base::openmode mode = std::ios_base::in) : std::basic_istream<CharT, Traits>(&m_rdbuf), m_rdbuf(mode) { }
 	basic_ivectorstream(vector_type const &content, std::ios_base::openmode mode = std::ios_base::in) : std::basic_istream<CharT, Traits>(&m_rdbuf), m_rdbuf(content, mode) { }
@@ -337,7 +351,7 @@ template <typename CharT, typename Traits = std::char_traits<CharT>, typename Al
 class basic_ovectorstream : public std::basic_ostream<CharT, Traits>
 {
 public:
-	typedef typename basic_vectorbuf<CharT, Traits, Allocator>::vector_type vector_type;
+	using vector_type = typename basic_vectorbuf<CharT, Traits, Allocator>::vector_type;
 
 	basic_ovectorstream(std::ios_base::openmode mode = std::ios_base::out) : std::basic_ostream<CharT, Traits>(&m_rdbuf), m_rdbuf(mode) { }
 	basic_ovectorstream(vector_type const &content, std::ios_base::openmode mode = std::ios_base::out) : std::basic_ostream<CharT, Traits>(&m_rdbuf), m_rdbuf(content, mode) { }
@@ -360,7 +374,7 @@ template <typename CharT, typename Traits = std::char_traits<CharT>, typename Al
 class basic_vectorstream : public std::basic_iostream<CharT, Traits>
 {
 public:
-	typedef typename basic_vectorbuf<CharT, Traits, Allocator>::vector_type vector_type;
+	using vector_type = typename basic_vectorbuf<CharT, Traits, Allocator>::vector_type;
 
 	basic_vectorstream(std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) : std::basic_iostream<CharT, Traits>(&m_rdbuf), m_rdbuf(mode) { }
 	basic_vectorstream(vector_type const &content, std::ios_base::openmode mode = std::ios_base::in | std::ios_base::out) : std::basic_iostream<CharT, Traits>(&m_rdbuf), m_rdbuf(content, mode) { }
@@ -379,12 +393,12 @@ private:
 	basic_vectorbuf<CharT, Traits, Allocator> m_rdbuf;
 };
 
-typedef basic_ivectorstream<char>       ivectorstream;
-typedef basic_ivectorstream<wchar_t>    wivectorstream;
-typedef basic_ovectorstream<char>       ovectorstream;
-typedef basic_ovectorstream<wchar_t>    wovectorstream;
-typedef basic_vectorstream<char>        vectorstream;
-typedef basic_vectorstream<wchar_t>     wvectorstream;
+using ivectorstream  = basic_ivectorstream<char>;
+using wivectorstream = basic_ivectorstream<wchar_t>;
+using ovectorstream  = basic_ovectorstream<char>;
+using wovectorstream = basic_ovectorstream<wchar_t>;
+using vectorstream   = basic_vectorstream<char>;
+using wvectorstream  = basic_vectorstream<wchar_t>;
 
 template <typename CharT, typename Traits, typename Allocator>
 void swap(basic_vectorbuf<CharT, Traits, Allocator> &a, basic_vectorbuf<CharT, Traits, Allocator> &b) { a.swap(b); }

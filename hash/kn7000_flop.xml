@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Technics SX-KN7000 floppy disks.
+
+User-data and sound/style-library disks for the KN7000, as self-extracting PC
+archives that write their payload onto a blank FAT12 HD diskette: the factory
+"Initial Data" / "Custom Data" sets the instrument installs on a front-panel data
+load (populating the custom-data flash IC21 and the battery-backed user memory),
+plus add-on sound, style and SD-converter library disks.  Physical diskettes are
+known to exist; who prepared or distributed them is unclear (not necessarily
+official releases).  No original diskette has been dumped, so these images are
+faithful reconstructions built from the archives' own files, which a dump of an
+original could supersede.
+-->
+<softwarelist name="kn7000_flop" description="Technics SX-KN7000 disks">
+
+	<software name="idd7000">
+		<description>Initial Data (factory default)</description>
+		<year>2002</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="idd7000.img" size="1474560" crc="c25cc616" sha1="141a8cdc3a6789fd7db3a48dd141d703323b34b1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="custom1">
+		<description>Custom Data 1 (Blue Bayou, Piano Player, Jazz Organ Soloist, Bob's Band)</description>
+		<year>2002</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="custom1.img" size="1474560" crc="36238e3a" sha1="030f8d7acdbfcc35ffbd30c00abad46059f1e93e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="custom2">
+		<description>Custom Data 2 (Traditional Melody, Jogeh 1, Vibraphone, Italian Accordion 7)</description>
+		<year>2002</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="custom2.img" size="1474560" crc="508a15e3" sha1="65d1bae305d2bc10b981181d9f44091a3c80bf99"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="organs">
+		<description>Organ registrations (Panel Memory 1-5) and demo songs</description>
+		<year>2002</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="organs.img" size="1474560" crc="34e06c68" sha1="a1d9dea3cd1a723c921c6c55e6114d1b1563f431"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scd7000">
+		<description>Style Convert Disk (GEM, Korg, Roland, Solton, Technics styles)</description>
+		<year>1999</year>
+		<publisher>Technics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="scd7000.img" size="1474560" crc="13a03dd1" sha1="ae04748349bc8a8c728c285a714ec94477796c88"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ca7001">
+		<description>Styles: Slow Waltz, Slow Foxtrot, Boogie, Dixie, Beguine (+ 5 demos)</description>
+		<year>2003</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1474560">
+				<rom name="ca7001.img" size="1474560" crc="c078a373" sha1="89ed606c4785ccfa09b78b525d7cb3cace0c54ee"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -390,7 +390,7 @@ void magistr16_state::magistr16(machine_config &config)
 	m_mdz80cpu->set_addrmap(AS_PROGRAM, &magistr16_state::md_z80_map);
 	m_mdz80cpu->set_addrmap(AS_IO, &magistr16_state::md_z80_io);
 
-	SCREEN(config, m_mdscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_mdscreen);
 	m_mdscreen->set_raw(md_master_xtal / 8, 423, 0, 320, 312, 0, 240);
 	m_mdscreen->set_screen_update(m_md_vdp, FUNC(ym7101_device::screen_update));
 
@@ -449,7 +449,8 @@ void magistr16_state::magistr16(machine_config &config)
 
 	SPEAKER(config, "md_speaker", 2).front();
 
-	YM2612(config, m_opn, md_master_xtal / 7);
+	// Assumed, under SM801-A1 asic
+	YM3438(config, m_opn, md_master_xtal / 7);
 	m_opn->add_route(0, "md_speaker", 0.50, 0);
 	m_opn->add_route(1, "md_speaker", 0.50, 1);
 
@@ -457,6 +458,7 @@ void magistr16_state::magistr16(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("megadriv").set_filter("PAL");
 
 	// expansion bus overlays
+	// W29C020CP90B
 	WINBOND_W29C020C(config, "flash");
 
 	// FIXME: determine ISA bus clock

@@ -61,21 +61,11 @@ void h83006_device::map(address_map &map)
 	map(base | 0xee016, base | 0xee016).rw(m_intc, FUNC(h8h_intc_device::isr_r), FUNC(h8h_intc_device::isr_w));
 	map(base | 0xee018, base | 0xee019).rw(m_intc, FUNC(h8h_intc_device::icr_r), FUNC(h8h_intc_device::icr_w));
 
-	map(base | 0xee03e, base | 0xee03e).rw(m_port4, FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
-
-	// refresh-controller compare-match timer (drives the periodic vector-21
-	// interrupt the game uses as its system tick). Real addresses per the
-	// H8/3006/3007 hardware manual sec 6.1.4/6.2.9: RTMCSR=0xee028 (a SINGLE
-	// register combining CMF/CMIE/CKS2-0, not split registers), RTCNT=0xee029,
-	// RTCOR=0xee02a. An earlier version of this map used 0xee010/12/14/28,
-	// which collided with the real SYSCR (0xee012) and ISCR (0xee014)
-	// registers and silently shadowed them -- confirmed by disassembly: the
-	// ROM's real RTMCSR/RTCOR setup is at PC 0x2b8-0x2c8 (RTCOR<-0x7d,
-	// RTMCSR<-0x2f i.e. CKS=5), and the vec21 ISR's CMF-ack idiom
-	// (@0xee028 & ~0x80) matches the real combined-register model exactly.
 	map(base | 0xee028, base | 0xee028).rw(m_refresh, FUNC(h8_refresh_device::rtmcsr_r), FUNC(h8_refresh_device::rtmcsr_w));
 	map(base | 0xee029, base | 0xee029).rw(m_refresh, FUNC(h8_refresh_device::rtcnt_r), FUNC(h8_refresh_device::rtcnt_w));
 	map(base | 0xee02a, base | 0xee02a).rw(m_refresh, FUNC(h8_refresh_device::rtcor_r), FUNC(h8_refresh_device::rtcor_w));
+
+	map(base | 0xee03e, base | 0xee03e).rw(m_port4, FUNC(h8_port_device::pcr_r), FUNC(h8_port_device::pcr_w));
 
 	map(base | m_ram_start, base | 0xfff1f).ram();
 
@@ -155,7 +145,7 @@ void h83006_device::device_add_mconfig(machine_config &config)
 	H8H_INTC(config, m_intc, *this);
 	H8_ADC_3006(config, m_adc, *this, m_intc, 23);
 	H8_PORT(config, m_port4, *this, h8_device::PORT_4, 0x00, 0x00);
-	H8_PORT(config, m_port6, *this, h8_device::PORT_6, 0x80, 0x80);
+	H8_PORT(config, m_port6, *this, h8_device::PORT_6, 0x80, 0x00, 0x80);
 	H8_PORT(config, m_port7, *this, h8_device::PORT_7, 0x00, 0x00);
 	H8_PORT(config, m_port8, *this, h8_device::PORT_8, 0xf0, 0xe0);
 	H8_PORT(config, m_port9, *this, h8_device::PORT_9, 0xc0, 0xc0);

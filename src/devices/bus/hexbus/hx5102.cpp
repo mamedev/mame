@@ -700,8 +700,8 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 	m_floppy_ctrl->intrq_wr_callback().set(FUNC(hx5102_device::fdc_irq_w));
 	m_floppy_ctrl->drq_wr_callback().set(FUNC(hx5102_device::fdc_drq_w));
 
-	FLOPPY_CONNECTOR(config, m_flopcon0, hx5102_drive, "525dd", hx5102_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_flopcon1, hx5102_drive, nullptr, hx5102_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_flopcon0, hx5102_drive, "525dd", hx5102_device::floppy_formats).enable_sound("hx5102");
+	FLOPPY_CONNECTOR(config, m_flopcon1, hx5102_drive, nullptr, hx5102_device::floppy_formats).enable_sound("hx5102e");
 
 	// Addressable latches
 	LS259(config, m_crulatch[0]); // U18

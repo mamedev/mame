@@ -489,7 +489,7 @@ INPUT_PORTS_END
 void pixter_multimedia_state::pixter_multimedia(machine_config &config)
 {
 	// User's Guide - 1.3 Clock Strategy - AHB Fast CPU Clock (FCLK)
-	ARM7(config, m_maincpu, 76'205'000);
+	ARM720T(config, m_maincpu, 76'205'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pixter_multimedia_state::arm7_map);
 
 	PL190_VIC(config, m_vic);
@@ -513,7 +513,7 @@ void pixter_multimedia_state::pixter_multimedia(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::IRGB_1555, 256);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_palette("palette");
 
 	m_screen->set_refresh_hz(60);

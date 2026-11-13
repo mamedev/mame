@@ -174,7 +174,21 @@ protected:
 	bool m_emmu_enabled; /* Indicates if external MMU is enabled */
 	bool m_can_instruction_restart; /* Save DA regs for potential instruction restart */
 	bool m_fpu_just_reset; /* Indicates the FPU was just reset */
+	u8 m_fpu_pending_exception;
+	std::array<u32, 25> m_fpu_frame; // 68040 revision $41 busy FSAVE frame
 	bool m_restart_instruction; /* Indicates the instruction should be restarted */
+
+	// 68010 format-8 RR=1: handler already ran the faulted cycle (DIB).
+	static constexpr int M68K_RERUN_ENTRIES = 2;
+	u32 m_rerun_pc;
+	u32 m_rerun_count;
+	struct
+	{
+		u32 address;
+		u32 size;
+		u32 data;
+		u32 write;
+	} m_rerun[M68K_RERUN_ENTRIES];
 
 	/* Clocks required for instructions / exceptions */
 	u32 m_cyc_bcc_notake_b;
@@ -283,7 +297,6 @@ protected:
 	address_space *m_internal;
 
 
-
 	void init_cpu_common(void);
 	void init_cpu_m68000(void);
 	void init_cpu_m68008(void);
@@ -354,6 +367,10 @@ protected:
 	void clear_exception_flags();
 	void update_accrued_exceptions();
 	void sync_exception_flags(extFloat80_t op1, extFloat80_t op2, u32 enables);
+	u8 fpu_exception_vector(u32 exceptions) const;
+	bool fpu_check_pending_exception();
+	void fpu_exception_frame(u16 command, extFloat80_t source, extFloat80_t destination, bool writeback);
+	void fpu_div(u16 command, extFloat80_t source, int precision);
 	s32 convert_to_int(extFloat80_t source, s32 lowerLimit, s32 upperLimit);
 	u8 READ_EA_8(int ea);
 	u16 READ_EA_16(int ea);

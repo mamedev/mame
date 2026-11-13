@@ -19,12 +19,13 @@
 
 #include "adbmodem.h"
 #include "egret.h"
-#include "macadb.h"
 #include "macrtc.h"
 #include "macscsi.h"
 #include "mactoolbox.h"
 #include "rbv.h"
 
+#include "bus/adb/adb.h"
+#include "bus/adb/cards.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/devices.h"
 #include "bus/nubus/nubus.h"
@@ -57,7 +58,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_via1(*this, "via1"),
 		m_rbv(*this, "rbv"),
-		m_macadb(*this, "macadb"),
+		m_adbbus(*this, "adb"),
 		m_ram(*this, RAM_TAG),
 		m_adbmodem(*this, "adbmodem"),
 		m_asc(*this, "asc"),
@@ -85,7 +86,7 @@ private:
 	required_device<m68030_device> m_maincpu;
 	required_device<via6522_device> m_via1;
 	required_device<rbv_device> m_rbv;
-	required_device<macadb_device> m_macadb;
+	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
 	optional_device<adbmodem_device> m_adbmodem;
 	required_device<asc_device> m_asc;
@@ -392,7 +393,6 @@ void maciici_state::via_out_b_iisi(uint8_t data)
 
 void maciici_state::via_out_cb2(int state)
 {
-//  m_macadb->adb_data_w(state);
 }
 
 void maciici_state::via_out_cb2_iisi(int state)
@@ -638,13 +638,15 @@ void maciici_state::maciici(machine_config &config)
 	ADBMODEM(config, m_adbmodem, C7M);
 	m_adbmodem->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_adbmodem->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_adbmodem->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_adbmodem->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_adbmodem->irq_callback().set(FUNC(maciici_state::adb_irq_w));
 	m_via1->cb2_handler().set(m_adbmodem, FUNC(adbmodem_device::set_via_data));
 	config.set_perfect_quantum(m_maincpu);
 
-	MACADB(config, m_macadb, C15M);
-	m_macadb->adb_data_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+	ADB_BUS(config, m_adbbus);
+	m_adbbus->out_adb_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 }
 
 void maciici_state::maciisi(machine_config &config)
@@ -660,15 +662,17 @@ void maciici_state::maciisi(machine_config &config)
 	m_via1->writepb_handler().set(FUNC(maciici_state::via_out_b_iisi));
 	m_via1->cb2_handler().set(FUNC(maciici_state::via_out_cb2_iisi));
 
-	MACADB(config, m_macadb, C15M);
-
 	EGRET(config, m_egret, XTAL(32'768));
 	m_egret->set_default_bios_tag("344s0100");
 	m_egret->reset_callback().set(FUNC(maciici_state::egret_reset_w));
-	m_egret->linechange_callback().set(m_macadb, FUNC(macadb_device::adb_linechange_w));
+	m_egret->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_egret->via_clock_callback().set(m_via1, FUNC(via6522_device::write_cb1));
 	m_egret->via_data_callback().set(m_via1, FUNC(via6522_device::write_cb2));
-	m_macadb->adb_data_callback().set(m_egret, FUNC(egret_device::set_adb_line));
+
+	ADB_BUS(config, m_adbbus);
+	m_adbbus->out_adb_callback().set(m_egret, FUNC(egret_device::set_adb_line));
+	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
+	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 	config.set_perfect_quantum(m_maincpu);
 
 	config.device_remove("nbc");

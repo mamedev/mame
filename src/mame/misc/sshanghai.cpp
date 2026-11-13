@@ -462,7 +462,7 @@ void ssh2000_state::ssh2000(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &ssh2000_state::ssh2000_portmap);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(64*8, 32*8);
 	screen.set_visarea(0*8, 64*8-1, 2*8, 30*8-1);
@@ -663,6 +663,7 @@ void ssh2000_state::init_2001()
 {
 	uint8_t *rom = memregion("maincpu")->base();
 
+	// HACK: get rid of these
 	rom[0x63ba] = 0xc9;
 	rom[0x0202] = 0x08;  // skip amusement game
 	rom[0x0213] = 0x00;  // signature

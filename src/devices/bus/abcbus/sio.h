@@ -6,6 +6,7 @@
 #pragma once
 
 #include "abcbus.h"
+#include "bus/rs232/rs232.h"
 #include "machine/z80ctc.h"
 #include "machine/z80sio.h"
 
@@ -27,20 +28,27 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(uint8_t data) override;
+	virtual uint8_t abcbus_inp(offs_t offset) override;
+	virtual void abcbus_out(offs_t offset, uint8_t data) override;
 	virtual uint8_t abcbus_xmemfl(offs_t offset) override;
 
 private:
 	required_device<z80ctc_device> m_ctc;
-	required_device<z80dart_device> m_sio;
+	required_device<z80sio_device> m_sio;
+	required_device<rs232_port_device> m_rs232a;
+	required_device<rs232_port_device> m_rs232b;
 	required_memory_region m_rom;
+	required_ioport m_sw1;
+
+	bool m_cs;
 };
 
 

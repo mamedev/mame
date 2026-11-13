@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="trs80m2_flop" description="Tandy TRS-80 Model II floppy disk images">
+
+	<software name="cpm22">
+		<!-- Requires 64K RAM -->
+		<description>CP/M 2.2</description>
+		<year>1983</year>
+		<publisher>Pickles &amp; Trout</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="318931">
+				<rom name="cpm22.imd" size="318931" crc="10bce6d2" sha1="8912ef448725774d8a10bfa484342a8dfa81a824"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lsdos631" supported="no">
+		<description>LS-DOS v6.3.1A</description>
+		<year>1990</year>
+		<publisher>Misosys</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="813136">
+				<rom name="l2-631a.dmk" size="813136" crc="1e17cd43" sha1="58369a29043513e62098ee1a8bdfd820ebf8a95b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdos12">
+		<description>TRSDOS v1.2</description>
+		<year>1979</year>
+		<publisher>Tandy</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="108758">
+				<rom name="trsdos12.imd" size="108758" crc="972ebc01" sha1="cd97fd0c9e1969cc917d1ed4eb573703c84cb8e7"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdos20" cloneof="tdos12">
+		<description>TRSDOS v2.0a</description>
+		<year>1980</year>
+		<publisher>Tandy</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="146181">
+				<rom name="tdos20a.imd" size="146181" crc="b6d2fa9a" sha1="a93accf032b19cdd0122ccf45ba0af90d44f0f84"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_8">
+			<dataarea name="flop" size="146079">
+				<rom name="tdos20b.imd" size="146079" crc="decce25d" sha1="97f06369d66abbd5d46cdc6f5e22c32e04a9d686"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_8">
+			<dataarea name="flop" size="131043">
+				<rom name="tdoscalc.imd" size="131043" crc="78c1666e" sha1="72e438da397aac4da099c76860426247440f07fd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tdos42" cloneof="tdos12" supported="no">
+		<description>TRSDOS II v4.2 &amp; TRSDOS16 v4.1</description>
+		<year>1979</year>
+		<publisher>Tandy</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="157160">
+				<rom name="tr16sys.td0" size="157160" crc="aba110be" sha1="ed2346fa642079040803513a216a7f4cacf87048"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="profile2">
+		<description>PROFILE II</description>
+		<year>1980</year>
+		<publisher>Tandy</publisher>
+		<info name="serial" value="26-4512" />
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="215804">
+				<rom name="profile2.imd" size="215804" crc="8997532d" sha1="b0b7c738f5e23b7631741475bec25df2451c2a63"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="script">
+		<description>SCRIPTSIT 2.0</description>
+		<year>1981</year>
+		<publisher>Tandy</publisher>
+		<info name="serial" value="26-4531" />
+
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="227787">
+				<rom name="script.imd" size="227787" crc="1cec0e85" sha1="73bfa56e2382ca04fd42f5b108699a1d9904dba2"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

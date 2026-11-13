@@ -177,7 +177,7 @@ void kc_state::kc85_base(machine_config &config, uint32_t clock)
 	m_z80ctc->zc_callback<2>().set(FUNC(kc_state::video_toggle_blink_state));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(28'375'160)/2, 908, 0, 320, 312, 0, 256);
 	m_screen->set_palette("palette");
 	TIMER(config, "scantimer").configure_scanline(FUNC(kc_state::kc_scanline), "screen", 0, 1);

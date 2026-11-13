@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Curt Coder
+CMD HD front panel layout
+-->
+<mamelayout version="2">
+
+	<element name="case">
+		<rect><color red="0.72" green="0.76" blue="0.80" /></rect>
+	</element>
+	<element name="bezel">
+		<rect><color red="0.08" green="0.08" blue="0.09" /></rect>
+	</element>
+	<element name="stripe">
+		<rect><color red="0.90" green="0.89" blue="0.85" /></rect>
+	</element>
+
+	<element name="lbl_power"><text string="POWER"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="lbl_activity"><text string="ACTIVITY"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="lbl_error"><text string="ERROR"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+	<element name="lbl_geos"><text string="GEOS&#8482;"><color red="0.85" green="0.85" blue="0.85" /></text></element>
+
+	<element name="red_led" defstate="0">
+		<rect state="1"><color red="1.0" green="0.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.20" green="0.03" blue="0.03" /></rect>
+	</element>
+	<element name="green_led" defstate="0">
+		<rect state="1"><color red="0.0" green="1.0" blue="0.0" /></rect>
+		<rect state="0"><color red="0.03" green="0.20" blue="0.03" /></rect>
+	</element>
+
+	<element name="btn_swap8">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="1"><bounds x="0.05" y="0.05" width="0.9" height="0.9" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="0.06" y="0.06" width="0.88" height="0.88" /><color red="0.08" green="0.08" blue="0.09" /></rect>
+		<text string="SWAP 8"><bounds x="0.06" y="0.40" width="0.88" height="0.2" /><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+	<element name="btn_swap9">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="1"><bounds x="0.05" y="0.05" width="0.9" height="0.9" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="0.06" y="0.06" width="0.88" height="0.88" /><color red="0.08" green="0.08" blue="0.09" /></rect>
+		<text string="SWAP 9"><bounds x="0.06" y="0.40" width="0.88" height="0.2" /><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+	<element name="btn_wrprot">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="1"><bounds x="0.05" y="0.05" width="0.9" height="0.9" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="0.06" y="0.06" width="0.88" height="0.88" /><color red="0.08" green="0.08" blue="0.09" /></rect>
+		<text string="WRITE"><bounds x="0.06" y="0.30" width="0.88" height="0.2" /><color red="0.85" green="0.85" blue="0.85" /></text>
+		<text string="PROTECT"><bounds x="0.06" y="0.50" width="0.88" height="0.2" /><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+	<element name="btn_reset">
+		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="1" green="1" blue="1" /></rect>
+		<rect state="1"><bounds x="0.05" y="0.05" width="0.9" height="0.9" /><color red="0.05" green="0.05" blue="0.05" /></rect>
+		<rect><bounds x="0.06" y="0.06" width="0.88" height="0.88" /><color red="0.08" green="0.08" blue="0.09" /></rect>
+		<text string="RESET"><bounds x="0.06" y="0.40" width="0.88" height="0.2" /><color red="0.85" green="0.85" blue="0.85" /></text>
+	</element>
+
+	<group name="panel">
+		<element ref="case"><bounds x="0" y="0" width="1020" height="438" /></element>
+		<element ref="bezel"><bounds x="10" y="10" width="1000" height="418" /></element>
+
+		<element name="led0" ref="red_led"><bounds x="76" y="303" width="27" height="9" /></element>
+		<element ref="lbl_power"><bounds x="37" y="340" width="105" height="16" /></element>
+
+		<element name="led1" ref="green_led"><bounds x="186" y="303" width="27" height="9" /></element>
+		<element ref="lbl_activity"><bounds x="147" y="340" width="105" height="16" /></element>
+		<element name="led2" ref="green_led"><bounds x="186" y="385" width="27" height="9" /></element>
+
+		<element name="led3" ref="red_led"><bounds x="296" y="303" width="27" height="9" /></element>
+		<element ref="lbl_error"><bounds x="265" y="340" width="90" height="16" /></element>
+
+		<element name="led4" ref="red_led"><bounds x="396" y="303" width="27" height="9" /></element>
+		<element ref="lbl_geos"><bounds x="365" y="340" width="90" height="16" /></element>
+
+		<element name="led5" ref="red_led"><bounds x="543" y="280" width="27" height="9" /></element>
+		<element ref="btn_swap8" inputtag="PB" inputmask="0x01"><bounds x="510" y="303" width="90" height="90" /></element>
+
+		<element name="led6" ref="red_led"><bounds x="653" y="280" width="27" height="9" /></element>
+		<element ref="btn_swap9" inputtag="PB" inputmask="0x02"><bounds x="620" y="303" width="90" height="90" /></element>
+
+		<element name="led7" ref="red_led"><bounds x="763" y="280" width="27" height="9" /></element>
+		<element ref="btn_wrprot" inputtag="PB" inputmask="0x04"><bounds x="730" y="303" width="90" height="90" /></element>
+
+		<element ref="btn_reset" inputtag="PB" inputmask="0x08"><bounds x="840" y="303" width="90" height="90" /></element>
+	</group>
+
+	<view name="Front Panel">
+		<group ref="panel"><bounds x="0" y="0" width="1020" height="438" /></group>
+	</view>
+
+</mamelayout>

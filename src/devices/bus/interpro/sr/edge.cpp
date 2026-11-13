@@ -462,7 +462,7 @@ ROM_END
  */
 void mpcb828_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34);
 	//m_screen->set_raw(83'020'800, 1184, 0, 1184, 884, 0, 884);
 	m_screen->set_screen_update(FUNC(mpcb828_device::screen_update));
@@ -495,7 +495,7 @@ void mpcb828_device::device_add_mconfig(machine_config &config)
  */
 void mpcb849_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(164'609'300, 2112, 0, 1664, 1299, 0, 1248);
 	m_screen->set_screen_update(FUNC(mpcb849_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(device_srx_card_interface::irq3));
@@ -530,7 +530,7 @@ void mpcb030_device::device_add_mconfig(machine_config &config)
 
 void mpcba63_device::device_add_mconfig(machine_config &config)
 {
-	//SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	//SCREEN(config, m_screen);
 	// screen params copied from GT
 	//m_screen->set_raw(83'020'800, 1504, 296 + 20, 1184 + 296 + 20, 920, 34, 884 + 34);
 	//m_screen->set_screen_update().set(FUNC(mpcba63_device::screen_update));
@@ -570,7 +570,7 @@ void msmt094_device::device_add_mconfig(machine_config &config)
 
 void mpcb896_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(164'609'300, 2112, 0, 1664, 1299, 0, 1248);
 	m_screen->set_screen_update(FUNC(mpcb896_device::screen_update));
 	m_screen->screen_vblank().set(FUNC(device_srx_card_interface::irq3));
@@ -733,31 +733,37 @@ void edge1_device_base::vblank(int state)
 
 u32 edge1_device_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u8 *pixel_data = m_vram->pointer();
+	u8 const *pixel_data = m_vram->pointer();
 
 	// 8bpp mode
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
-			bitmap.pix(y, x) = m_ramdac->pen_color(*pixel_data++);
+	for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
+	{
+		auto *const dst = &bitmap.pix(y);
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
+			dst[x] = m_ramdac->pen_color(*pixel_data++);
+	}
 
 	return 0;
 }
 
 u32 edge2plus_framebuffer_device_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u8 *pixel_data = m_vram->pointer();
+	u8 const *pixel_data = m_vram->pointer();
 
 	// 8bpp mode
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
+	for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
+	{
+		auto *const dst = &bitmap.pix(y);
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
 		{
 			const u8 index = *pixel_data++;
 
-			bitmap.pix(y, x) = rgb_t(
-				m_ramdac[0]->lookup(index),
-				m_ramdac[1]->lookup(index),
-				m_ramdac[2]->lookup(index));
+			dst[x] = rgb_t(
+					m_ramdac[0]->lookup(index),
+					m_ramdac[1]->lookup(index),
+					m_ramdac[2]->lookup(index));
 		}
+	}
 
 	return 0;
 }

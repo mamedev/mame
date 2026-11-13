@@ -14,7 +14,7 @@ TODO:
 #include "emu.h"
 #include "mdisplay3.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 
 #include <bit>
 
@@ -58,10 +58,9 @@ void mephisto_display3_device::device_add_mconfig(machine_config &config)
 	PWM_DISPLAY(config, m_lcd_pwm).set_size(2, 24);
 	m_lcd_pwm->output_x().set(FUNC(mephisto_display3_device::lcd_pwm_w));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device &screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1920/5, 804/5);
-	screen.set_visarea_full();
 }
 
 

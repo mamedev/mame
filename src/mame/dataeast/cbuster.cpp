@@ -418,7 +418,7 @@ void cbuster_state::twocrude(machine_config &config)
 	m_audiocpu->add_route(ALL_OUTPUTS, "mono", 0); // internal sound unused
 	m_audiocpu->set_timer_scale(2);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(58);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(529));
 	screen.set_size(32*8, 32*8);

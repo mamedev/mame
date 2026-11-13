@@ -68,7 +68,7 @@ void taos_device::device_add_mconfig(machine_config &config)
 {
 	PALETTE(config, m_palette).set_entries(256);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(25175000, 800, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(taos_device::screen_update_taos));
 }
@@ -86,7 +86,6 @@ u32 taos_device::screen_update_taos(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		auto const vram16 = util::big_endian_cast<u16 const>(&m_vram[fb_base >> 1]);
 		const u32 stride = (m_taos_regs[ROW_WORDS] >> 24) << 3;
-
 		for (int y = 0; y < 480; y++)
 		{
 			u32 *scanline = &bitmap.pix(y);
@@ -100,8 +99,9 @@ u32 taos_device::screen_update_taos(screen_device &screen, bitmap_rgb32 &bitmap,
 	else
 	{
 		auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[fb_base >> 2]);
-		const u32 stride = (m_taos_regs[ROW_WORDS] >> 24) << 3;
+		const u32 stride = (m_taos_regs[ROW_WORDS] >> 24) << 4;
 		const pen_t *pens = m_palette->pens();
+
 		for (int y = 0; y < 480; y++)
 		{
 			u32 *scanline = &bitmap.pix(y);
@@ -194,7 +194,7 @@ void taos_device::rebuild_params()
 		if ((m_hres != 0) && (m_vres != 0))
 		{
 			rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-			m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock).as_attoseconds());
+			m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock));
 		}
 	}
 }

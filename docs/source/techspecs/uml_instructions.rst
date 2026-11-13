@@ -20,10 +20,61 @@ executed or interpreted on the host system.
 
 Many UML instruction have multiple instruction sizes.  Integer
 instructions default to 32-bit size.  Adding a ``D`` or ``d`` prefix to
-the mnemonic changes to 64-bit size (double word).  Floating point
+the mnemonic selects 64-bit size (double word).  Floating point
 instructions use the mnemonic prefix/suffix ``FS`` or ``fs`` for
-IEEE 754 32-bit format (single precision) or or the prefix/suffix ``FD``
-or ``fd`` for IEEE 754 64-bit format (double precision).
+IEEE 754 32-bit format (single precision) or the prefix/suffix ``FD`` or
+``fd`` for IEEE 754 64-bit format (double precision).
+
+
+.. _umlinst-operands:
+
+Operand types
+-------------
+
+immediate
+    A binary integer value.
+map variable
+    One of the ten map variables, ``M0`` to ``M9``.
+integer register
+    One of the ten integer registers, ``I0`` to ``I9``.
+floating point register
+    One of the ten floating point registers, ``F0`` to ``F9``.
+memory
+    Address of the operand in memory, wrapped using the ``mem``
+    function.  For most instructions, operands in memory must be located
+    within the recompiler cache (exceptions are noted).
+condition
+    One of the sixteen supported conditions for testing the condition
+    code flags (:ref:`described below <umlinst-conditions>`).
+access size
+    One of the supported memory access sizes
+    (:ref:`described below <umlinst-accesssize>`).  Instructions may
+    only support a subset of the supported sizes.
+index scale
+    A power-of-two scale factor to apply to an address displacement:
+    ``SCALE_x1``, ``SCALE_x2``, ``SCALE_x4`` or ``SCALE_x8`` (multiply
+    by 1, 2, 4 or 8, or shift left by 0, 1, 2 or 3 bits, respectively).
+address space number
+    An integer identifying an address space of the associated device.
+    May be ``SPACE_PROGRAM``, ``SPACE_DATA``, ``SPACE_IO`` or
+    ``SPACE_OPCODES`` for the common address spaces that have special
+    significance for CPU devices, or a non-negative integer cast to
+    ``memory_space``.
+rounding type
+    A floating point rounding type
+    (:ref:`described below <umlinst-roundmode>`).
+label number
+    A 32-bit unsigned integer uniquely identifying a label within the
+    current block.  Represented using the ``uml::code_label`` class.
+code handle
+    A code handle for referring to a generated subroutine entry point.
+    Represented using the ``uml::code_handle`` class.
+C function
+    A pointer to a function using the standard C calling convention for
+    the host system.
+string
+    A pointer to a NUL-terminated ``char`` string.  The string must
+    remain valid until code is generated for the block.
 
 
 .. _umlinst-special:
@@ -103,6 +154,27 @@ Flag masks
 | 0x1f  | ``USZVC``   |           | ``FLAGS_ALL``  |
 +-------+-------------+-----------+----------------+
 
+.. _umlinst-accesssize:
+
+Memory access sizes
+~~~~~~~~~~~~~~~~~~~
+
++-------------+----------------+-------------+-------------+-----------------+
+| Disassembly | Type           | Size (bits) | Mnemonic    | Usage           |
++=============+================+=============+=============+=================+
+| ``byte``    | integer        | 8           | byte        | ``SIZE_BYTE``   |
++-------------+----------------+-------------+-------------+-----------------+
+| ``word``    | integer        | 16          | word        | ``SIZE_WORD``   |
++-------------+----------------+-------------+-------------+-----------------+
+| ``dword``   | integer        | 32          | double-word | ``SIZE_DWORD``  |
++-------------+----------------+-------------+-------------+-----------------+
+| ``qword``   | integer        | 64          | quad-word   | ``SIZE_QWORD``  |
++-------------+----------------+-------------+-------------+-----------------+
+| ``dword``   | floating point | 32          |             | ``SIZE_SHORT``  |
++-------------+----------------+-------------+-------------+-----------------+
+| ``qword``   | floating point | 64          |             | ``SIZE_DOUBLE`` |
++-------------+----------------+-------------+-------------+-----------------+
+
 .. _umlinst-roundmode:
 
 Floating point rounding modes
@@ -113,7 +185,7 @@ Floating point rounding modes
 +=======+=============+==========+===================+=======================================+
 | 0     | ``trunc``   | truncate | ``ROUND_TRUNC``   | Round toward zero                     |
 +-------+-------------+----------+-------------------+---------------------------------------+
-| 1     | ``round``   | round    | ``ROUND_ROUND``   | Round to nearest, round half to even  |
+| 1     | ``round``   | round    | ``ROUND_ROUND``   | Round to nearest, round ties to even  |
 +-------+-------------+----------+-------------------+---------------------------------------+
 | 2     | ``ceil``    | ceiling  | ``ROUND_CEIL``    | Round toward positive infinity        |
 +-------+-------------+----------+-------------------+---------------------------------------+
@@ -240,9 +312,9 @@ HANDLE
 
 Mark a location as an entry point of a subroutine.  Subroutines may be
 called using the :ref:`CALLH <umlinst-callh>` and :ref:`EXH
-<umlinst-exh>` instructions, and also by the `HASHJMP <umlinst-hashjmp>`
-if no location is associated with the specified mode and emulated
-program counter.
+<umlinst-exh>` instructions, and also by the :ref:`HASHJMP
+<umlinst-hashjmp>` if no location is associated with the specified mode
+and emulated program counter.
 
 +--------------------+--------------------------------+
 | Disassembly        | Usage                          |
@@ -257,9 +329,9 @@ Operands
 
 handle (code handle)
     The code handle to bind to the current location.  The handle must
-    already be allocated, and must not have been bound since the last
-    generated code reset (all handles are implicitly unbound when
-    resetting the generated code cache).
+    already be allocated, and must not currently be bound.  (All handles
+    bound to locations in transient code are implicitly unbound when
+    resetting the transient portion of the generated code cache.)
 
 Flags
 ^^^^^
@@ -371,7 +443,13 @@ unordered (U)
 CALLH
 ~~~~~
 
-Call the subroutine beginning at the specified code handle.
+Call the subroutine beginning at the specified code handle.  The handle
+must be allocated before the code to call it is generated, but does not
+need to be associated with a subroutine entry point (using the
+:ref:`HANDLE <umlinst-handle>` instruction) until the subroutine call is
+executed.  Note that it may be possible to generate more efficient
+code if the handle is associated with a subroutine entry point before
+the code calling it is generated.
 
 +-------------------------+--------------------------------------+
 | Disassembly             | Usage                                |
@@ -418,7 +496,12 @@ EXH
 Set the ``EXP`` register and call the subroutine beginning at the
 specified code handle.  The ``EXP`` register is a 32-bit special
 function register that may be retrieved with the :ref:`GETEXP
-<umlinst-getexp>` instruction.
+<umlinst-getexp>` instruction.  The handle must be allocated before the
+code to call it is generated, but does not need to be associated with a
+subroutine entry point (using the :ref:`HANDLE <umlinst-handle>`
+instruction) until the subroutine call is executed.  Note that it may be
+possible to generate more efficient code if the handle is associated
+with a subroutine entry point before the code calling it is generated.
 
 +-----------------------------+-----------------------------------------+
 | Disassembly                 | Usage                                   |
@@ -522,6 +605,13 @@ This is usually used to jump to the generated code corresponding to the
 emulated code at a particular address when it is not known to be in the
 current generated code block or when the mode changes.
 
+The handle must be allocated before the code to call it is generated,
+but does not need to be associated with a subroutine entry point (using
+the :ref:`HANDLE <umlinst-handle>` instruction) until the subroutine
+call is executed.  Note that it may be possible to generate more
+efficient code if the handle is associated with a subroutine entry point
+before the code calling it is generated.
+
 +----------------------------+-----------------------------------------+
 | Disassembly                | Usage                                   |
 +============================+=========================================+
@@ -579,7 +669,7 @@ code.
 | .. code-block::       | .. code-block:: C++              |
 |                       |                                  |
 |     exit    arg,      |     UML_EXIT(block, arg);        |
-|     exit    arg,,cond |     UML_EXITc(block, arg, cond); |
+|     exit    arg,cond  |     UML_EXITc(block, arg, cond); |
 +-----------------------+----------------------------------+
 
 Operands
@@ -963,8 +1053,8 @@ Operands
 round (32-bit – memory, integer register, immediate, map variable)
     The rounding mode to set as the default.  Only the two least
     significant bits of the value are used.  Must be 0 (``ROUND_TRUNC``)
-    to round toward zero, 1 (``ROUND_ROUND``) to round to nearest, 2
-    (``ROUND_CEIL``) to round toward positive infinity, or 3
+    to round toward zero, 1 (``ROUND_ROUND``) to round to nearest (ties
+    to even), 2 (``ROUND_CEIL``) to round toward positive infinity, or 3
     (``ROUND_FLOOR``) to round toward negative infinity.
 
 Flags
@@ -1014,9 +1104,9 @@ Operands
 dst (32-bit – memory, integer register)
     The destination where the current default rounding mode will be
     stored.  Will be set to 0 (``ROUND_TRUNC``) for round toward zero, 1
-    (``ROUND_ROUND``) for round to nearest, 2 (``ROUND_CEIL``) for round
-    toward positive infinity, or 3 (``ROUND_FLOOR``) for round toward
-    negative infinity.
+    (``ROUND_ROUND``) for round to nearest (ties to even), 2
+    (``ROUND_CEIL``) for round toward positive infinity, or 3
+    (``ROUND_FLOOR``) for round toward negative infinity.
 
 Flags
 ^^^^^
@@ -1683,6 +1773,9 @@ instruction in the outermost generated code frame.  This instruction
 should only be used from within a generated code subroutine.  Results
 are undefined if this instruction is executed from outside any
 generated code subroutines.
+
+This instruction may be very expensive to execute, and should not be
+used in frequently executed code paths.
 
 +------------------------+--------------------------------------+
 | Disassembly            | Usage                                |
@@ -4327,11 +4420,11 @@ size (access size)
     the ``src`` operand.
 round (rounding type)
     The rounding type to use.  Must be ``ROUND_ROUND`` (round to
-    nearest), ``ROUND_CEIL`` (round toward positive infinity),
-    ``ROUND_FLOOR`` (round toward negative infinity), ``ROUND_TRUNC``
-    (round toward zero) or ``ROUND_DEFAULT`` (use the current default
-    rounding type set using the :ref:`SETFMOD <umlinst-setfmod>`
-    instruction).
+    nearest, ties to even), ``ROUND_CEIL`` (round toward positive
+    infinity), ``ROUND_FLOOR`` (round toward negative infinity),
+    ``ROUND_TRUNC`` (round toward zero) or ``ROUND_DEFAULT`` (use the
+    current default rounding type set using the
+    :ref:`SETFMOD <umlinst-setfmod>` instruction).
 
 Flags
 ^^^^^

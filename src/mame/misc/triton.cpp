@@ -446,7 +446,7 @@ void triton_state::triton1(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &triton_state::io_map);
 	m_maincpu->set_irq_acknowledge_callback(FUNC(triton_state::inta_cb));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(50);
 	screen.set_screen_update("ef9364", FUNC(ef9364_device::screen_update));
 	screen.set_size(64 * 8, 16 * 12);

@@ -628,7 +628,7 @@ void wwfsstar_state::wwfsstar(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wwfsstar_state::sound_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20_MHz_XTAL / 4, 320, 0, 256, 272, 8, 248); // HTOTAL and VTOTAL are guessed
 	m_screen->set_screen_update(FUNC(wwfsstar_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -674,7 +674,7 @@ void wwfsstar_state::wwfsstarb2(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &wwfsstar_state::bootleg_sound_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(20_MHz_XTAL / 4, 320, 0, 256, 272, 8, 248);
 	m_screen->set_screen_update(FUNC(wwfsstar_state::screen_update));
 	m_screen->set_palette(m_palette);

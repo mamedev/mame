@@ -62,6 +62,8 @@ public:
 	auto cblank_callback() { return m_write_cblank.bind(); }
 	auto slg_callback() { return m_write_slg.bind(); }
 	auto sld_callback() { return m_write_sld.bind(); }
+	// SL3-SL0: single row buffer, pin configurations 0 and 2 (table 5)
+	auto sl_callback() { return m_write_sl.bind(); }
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
@@ -71,7 +73,7 @@ public:
 	void ack_w(int state);
 	void lpstb_w(int state);
 
-	// cursor location
+	// cursor location, for drivers that do not use the CURS output
 	bool cursor_active(unsigned x, unsigned y);
 
 protected:
@@ -91,6 +93,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(drb_update);
 	TIMER_CALLBACK_MEMBER(dma_update);
 	TIMER_CALLBACK_MEMBER(frame_update);
+	TIMER_CALLBACK_MEMBER(row_attr_curs_update);
 
 private:
 	void crt9007(address_map &map) ATTR_COLD;
@@ -105,7 +108,12 @@ private:
 	inline void update_curs_timer(bool state);
 	inline void update_drb_timer(bool state);
 	inline void update_dma_timer();
+	inline void start_single_row_data();
+	inline attotime frame_period() const;
+	inline void update_frame_timer();
 
+	inline void update_curs_output();
+	inline void recompute_cursor();
 	inline void recompute_parameters();
 
 	// address space configurations
@@ -122,10 +130,12 @@ private:
 	devcb_write_line   m_write_cblank;
 	devcb_write_line   m_write_slg;
 	devcb_write_line   m_write_sld;
+	devcb_write8       m_write_sl;
 
 	// registers
 	uint8_t m_reg[0x3d];
 	uint8_t m_status;
+	bool m_odd_field;
 
 	uint8_t m_hpixels_per_column;
 
@@ -135,6 +145,7 @@ private:
 	bool m_vs;
 	bool m_cblank;
 	bool m_vlt;
+	bool m_curs;
 	bool m_drb;
 	bool m_lpstb;
 
@@ -146,6 +157,10 @@ private:
 	int m_vlt_start;
 	int m_vlt_end;
 	int m_vlt_bottom;
+	int m_curs_start;
+	int m_curs_end;
+	int m_curs_top;
+	int m_curs_bottom;
 	int m_drb_bottom;
 	//int m_wben;
 	//int m_slg;
@@ -154,9 +169,22 @@ private:
 	// DMA
 	bool m_dmar;
 	bool m_ack;
+	uint16_t m_dma_addr;
+	uint16_t m_table_addr;
+	uint16_t m_row_addr;
+	uint8_t m_table_count;
 	uint16_t m_dma_count;
 	uint16_t m_dma_burst;
 	uint8_t m_dma_delay;
+	bool m_dma_first;
+
+	// double height/width attributes (row table address bits 15, 14) of the row last
+	// fetched, of the row before it, and of the row being painted
+	uint8_t m_next_attr;
+	uint8_t m_pending_attr;
+	uint8_t m_paint_attr;
+	uint8_t m_row_line;
+	bool m_row_attr_curs;
 
 	// timers
 	emu_timer *m_vsync_timer;
@@ -166,6 +194,7 @@ private:
 	emu_timer *m_drb_timer;
 	emu_timer *m_dma_timer;
 	emu_timer *m_frame_timer;
+	emu_timer *m_row_attr_curs_timer;
 };
 
 

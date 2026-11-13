@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 license:CC0-1.0
@@ -5556,6 +5556,7 @@ boot OK
 		<description>Crash Bandicoot (USA)</description>
 		<year>1996</year>
 		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="developer" value="Naughty Dog"/>
 		<info name="serial" value="SCUS-94900"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -5573,6 +5574,7 @@ boot OK
 		<description>Crash Bandicoot 2 - Cortex Strikes Back (USA)</description>
 		<year>1997</year>
 		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="developer" value="Naughty Dog"/>
 		<info name="serial" value="SCUS-94154"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -5590,6 +5592,7 @@ boot OK
 		<description>Crash Bandicoot - Warped (USA)</description>
 		<year>1998</year>
 		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="developer" value="Naughty Dog"/>
 		<info name="serial" value="SCUS-94244, SCUS-94244CE"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -5879,6 +5882,7 @@ boot OK
 		<description>CTR - Crash Team Racing (USA)</description>
 		<year>1999</year>
 		<publisher>Sony Computer Entertainment America</publisher>
+		<info name="developer" value="Naughty Dog"/>
 		<info name="serial" value="SCUS-94426"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -56251,7 +56255,7 @@ boot OK
 		<rom name="Simple Characters 2000 Series Vol.10 - Sakigake!! Otojo Juku - The Dodgeball (Japan) [SLPS-03457].bin" size="125291040" crc="6ae448b3" sha1="644e2612c1c6fbcc0b61205fd9f861cc027ab6e0"/>
 		<rom name="Simple Characters 2000 Series Vol.10 - Sakigake!! Otojo Juku - The Dodgeball (Japan) [SLPS-03457].cue" size="161" crc="a3bdc6ac" sha1="c1652807c8b2199f8e8b552d790612dd18ec51e8"/>
 		-->
-		<description>Simple Characters 2000 Series Vol.10 - Sakigake!! Otojo Juku - The Dodgeball (Japan)</description>
+		<description>Simple Characters 2000 Series Vol.10 - Sakigake!! Otokojuku: The Dodgeball (Japan)</description>
 		<year>2002</year>
 		<publisher>Bandai / D3</publisher>
 		<notes><![CDATA[

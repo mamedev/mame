@@ -28,6 +28,9 @@
 
 #include "endianness.h"
 
+#include <algorithm>
+#include <iterator>
+
 #define LOG_MODE        (1U << 1)
 #define LOG_MONSENSE    (1U << 2)
 #define LOG_RAMDAC      (1U << 3)
@@ -37,6 +40,41 @@
 #include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(VALKYRIE, valkyrie_device, "apvalkyrie", "Apple Valkyrie video")
+
+// Valkyrie aligns its (often byte-wide) registers to the left-hand side of 32-bit addresses.
+// Valkyrie-AR is aligned to 64-bit addresses and not 32-bit ones.
+enum
+{
+	VALKYRIEREG_VIDEO_TIMING        = 0x00,
+	VALKYRIEREG_VIDEO_MODE          = 0x04,
+	VALKYRIEREG_VIDEO_DEPTH         = 0x0C,
+	VALKYRIEREG_CONFIG              = 0x10,
+	VALKYRIEREG_VBLANK              = 0x14,
+	VALKYRIEREG_SCREEN_ENABLE       = 0x18,
+	VALKYRIEREG_MONITOR_SENSE       = 0x1C,
+
+	VALKYRIEREG_VIDEO_IN_CONTROL    = 0x20,
+	VALKYRIEREG_VIDEO_WINDOW_XPOS   = 0x60, // 16-bit
+	VALKYRIEREG_VIDEO_WINDOW_YPOS   = 0x64, // 16-bit
+	VALKYRIEREG_VIDEO_WINDOW_WIDTH  = 0x70, // 16-bit
+	VALKYRIEREG_VIDEO_WINDOW_HEIGHT = 0x74, // 16-bit
+	VALKYRIEREG_VIDEO_FIELD_X_PIXEL = 0x80, // 16-bit
+	VALKYRIEREG_VIDEO_FIELD_Y_PIXEL = 0x84, // 16-bit
+};
+
+enum : u8
+{
+	VIDEO_IN_PIXEL_DOUBLE   = 0x02,
+	VIDEO_IN_WINDOW_ACTIVE  = 0x20,
+	VIDEO_IN_BUFFER1        = 0x40
+};
+
+static constexpr u32 VIDEO_BUFFER0 = 0x97800;
+static constexpr u32 VIDEO_BUFFER1 = 0xc0000;
+static constexpr u32 VIDEO_BUFFER_WIDTH = 320;
+static constexpr u32 VIDEO_BUFFER_HEIGHT = 240;
+
+
 
 //-------------------------------------------------
 //  ADDRESS_MAP
@@ -48,7 +86,17 @@ void valkyrie_device::map(address_map &map)
 	map(0x50f24000, 0x50f25fff).rw(FUNC(valkyrie_device::ramdac_r), FUNC(valkyrie_device::ramdac_w));
 
 	map(0xf9000000, 0xf90fffff).rw(FUNC(valkyrie_device::vram_r), FUNC(valkyrie_device::vram_w));
+	map(0xf9300000, 0xf937ffff).rw(FUNC(valkyrie_device::video_buffer_r), FUNC(valkyrie_device::video_buffer_w));
 }
+
+void valkyrie_device::valkyriear_map(address_map &map)
+{
+	map(0xf130a000, 0xf130bfff).rw(FUNC(valkyrie_device::regs64_r), FUNC(valkyrie_device::regs64_w));
+	map(0xf1304000, 0xf1305fff).rw(FUNC(valkyrie_device::ramdac_r), FUNC(valkyrie_device::ramdac_w));
+
+	map(0xf1000000, 0xf10fffff).rw(FUNC(valkyrie_device::vram_r), FUNC(valkyrie_device::vram_w));
+}
+
 
 valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, VALKYRIE, tag, owner, clock),
@@ -62,8 +110,10 @@ valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag,
 	m_irq(*this),
 	m_vram_offset(0), m_monitor_id(0),
 	m_base(0), m_stride(1024), m_video_timing(0x80), m_int_status(0), m_hres(0), m_vres(0), m_htotal(0), m_vtotal(0),
-	m_config(0),
-	m_M(1), m_N(1), m_P(1)
+	m_config(0), m_vbl_enabled(false),
+	m_M(1), m_N(1), m_P(1),
+	m_video_in_control(0), m_color_key(0),
+	m_window_x(0), m_window_y(0), m_window_width(0), m_window_height(0), m_field_x(0), m_field_y(0)
 {
 }
 
@@ -88,10 +138,20 @@ void valkyrie_device::device_start()
 	save_item(NAME(m_vtotal));
 	save_item(NAME(m_pixel_clock));
 	save_item(NAME(m_config));
+	save_item(NAME(m_vbl_enabled));
 	save_item(NAME(m_int_status));
 	save_item(NAME(m_M));
 	save_item(NAME(m_N));
 	save_item(NAME(m_P));
+	save_item(NAME(m_video_in_control));
+	save_item(NAME(m_color_key));
+	save_item(NAME(m_window_x));
+	save_item(NAME(m_window_y));
+	save_item(NAME(m_window_width));
+	save_item(NAME(m_window_height));
+	save_item(NAME(m_field_x));
+	save_item(NAME(m_field_y));
+	save_item(NAME(m_video_clut));
 	save_pointer(NAME(m_vram), m_vram_size);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(valkyrie_device::recalc_mode), this));
@@ -100,6 +160,9 @@ void valkyrie_device::device_start()
 void valkyrie_device::device_reset()
 {
 	m_video_timing = 0x80;
+	m_video_in_control = 0;
+	for (auto &entry : m_video_clut)
+		std::fill(std::begin(entry), std::end(entry), 0);
 
 	// clear the MAME default palette so we don't get a weird red screen on initial startup
 	for (int i = 0; i < 256; i++)
@@ -112,7 +175,7 @@ void valkyrie_device::device_reset()
 
 void valkyrie_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	m_screen->set_raw(31334400, 896, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(valkyrie_device::screen_update));
@@ -220,6 +283,7 @@ u32 valkyrie_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 					*scanline++ = pens[pixels];
 				}
 			}
+			draw_video_window(bitmap, cliprect, stride);
 		}
 		break;
 
@@ -239,23 +303,57 @@ u32 valkyrie_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	return 0;
 }
 
+void valkyrie_device::draw_video_window(bitmap_rgb32 &bitmap, rectangle const &cliprect, u32 stride)
+{
+	if (!(m_video_in_control & VIDEO_IN_WINDOW_ACTIVE))
+		return;
+
+	auto const graphics = util::big_endian_cast<u8 const>(&m_vram[0]) + 0x1000;
+	auto const video = util::big_endian_cast<u16 const>(&m_vram[0]) + (((m_video_in_control & VIDEO_IN_BUFFER1) ? VIDEO_BUFFER1 : VIDEO_BUFFER0) >> 1);
+	int const shift = (m_video_in_control & VIDEO_IN_PIXEL_DOUBLE) ? 1 : 0;
+	rectangle clip(m_window_x, m_window_x + m_window_width - 1, m_window_y, m_window_y + m_window_height - 1);
+	clip &= rectangle(0, m_hres - 1, 0, m_vres - 1);
+	clip &= cliprect;
+
+	for (s32 y = clip.top(); y <= clip.bottom(); y++)
+	{
+		u32 const vy = m_field_y + ((y - m_window_y) >> shift);
+		if (vy >= VIDEO_BUFFER_HEIGHT)
+			break;
+
+		u32 *const scanline = &bitmap.pix(y);
+		for (s32 x = clip.left(); x <= clip.right(); x++)
+		{
+			u32 const vx = m_field_x + ((x - m_window_x) >> shift);
+			if (vx >= VIDEO_BUFFER_WIDTH)
+				break;
+
+			if (graphics[(y * stride) + x] == m_color_key)
+			{
+				u16 const pixel = video[(vy * VIDEO_BUFFER_WIDTH) + vx];
+				scanline[x] = rgb_t(m_video_clut[BIT(pixel, 10, 5)][0], m_video_clut[BIT(pixel, 5, 5)][1], m_video_clut[BIT(pixel, 0, 5)][2]);
+			}
+		}
+	}
+}
+
 u8 valkyrie_device::regs_r(offs_t offset)
 {
 	switch (offset)
 	{
-		case 0:
+		case VALKYRIEREG_VIDEO_TIMING:
 			return m_video_timing;
 
-		case 4:
+		case VALKYRIEREG_VIDEO_MODE:
 			return m_mode;
 
-		case 0x10: // config
-			return m_config;
+		case VALKYRIEREG_CONFIG: // config
+			return (m_config & 0x7f) | ((m_screen->hblank() || m_screen->vblank()) ? 0x80 : 0);
 
-		case 0x14:
+		case VALKYRIEREG_VBLANK:
 			return m_screen->vblank();
 
-		case 0x1c:  // monitor sense in upper nibble, write monitor sense in lower nibble
+		case VALKYRIEREG_MONITOR_SENSE:  // monitor sense in upper nibble, write monitor sense in lower nibble
 			{
 				u8 mon = m_monitor_config->read();
 				u8 res;
@@ -290,11 +388,19 @@ u8 valkyrie_device::regs_r(offs_t offset)
 	return 0;
 }
 
+static void write_half(u16 &reg, offs_t offset, u8 data)
+{
+	if (BIT(offset, 0))
+		reg = (reg & 0xff00) | data;
+	else
+		reg = (reg & 0x00ff) | (data << 8);
+}
+
 void valkyrie_device::regs_w(offs_t offset, u8 data)
 {
 	switch (offset)
 	{
-		case 0: // video mode.  hardcoded!
+		case VALKYRIEREG_VIDEO_TIMING: // video mode.  hardcoded!
 			m_video_timing = data & 0xff;
 			if (!(data & 0x80))
 			{
@@ -302,31 +408,33 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			}
 			break;
 
-		case 4: // video depth: 0=1bpp, 1=2bpp, 2=4bpp, 3=8bpp, 4=16bpp
+		case VALKYRIEREG_VIDEO_MODE: // video depth: 0=1bpp, 1=2bpp, 2=4bpp, 3=8bpp, 4=16bpp
 			LOG("Mode set to %d\n", data & 7);
 			m_mode = data & 7;
 			break;
 
-		case 0xc:   // subsystem configuration register
+		case VALKYRIEREG_VIDEO_DEPTH:   // subsystem configuration register
 			if (data == 0x1)
 			{
 				recalc_mode();
 			}
 			break;
 
-		case 0x10:
+		case VALKYRIEREG_CONFIG:
 			m_config = data;
 
 			m_int_status &= ~1;
 			recalc_ints();
 
-			m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
+			if (m_vbl_enabled)
+				m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
 			break;
 
-		case 0x18: // screen enable
+		case VALKYRIEREG_SCREEN_ENABLE: // screen enable
 			// at startup, the screen isn't wanted on until 0x81 is written.
 			// if the Video Startup extension is installed, it later sets this to 0x02.
-			if ((data & 0x80) || (data == 0x02))
+			m_vbl_enabled = ((data & 0x80) || (data == 0x02));
+			if (m_vbl_enabled)
 			{
 				m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
 			}
@@ -336,42 +444,77 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			}
 			break;
 
-		case 0x1c: // drive monitor sense lines. 1 = drive, 0 = tri-state
+		case VALKYRIEREG_MONITOR_SENSE: // drive monitor sense lines. 1 = drive, 0 = tri-state
 			m_monitor_id = (data & 0x7);
 			LOGMASKED(LOG_MONSENSE, "%x to sense drive\n", data & 0xf);
 			break;
 
-		case 0x20: // video in control
+		case VALKYRIEREG_VIDEO_IN_CONTROL:    // video in control
+			m_video_in_control = data;
 			break;
 
-		case 0x60: // video window X position
-		case 0x61:
+		case VALKYRIEREG_VIDEO_WINDOW_XPOS:   // video window X position
+		case VALKYRIEREG_VIDEO_WINDOW_XPOS+1:
+			write_half(m_window_x, offset, data);
 			break;
 
-		case 0x64: // video window Y position
-		case 0x65:
+		case VALKYRIEREG_VIDEO_WINDOW_YPOS:   // video window Y position
+		case VALKYRIEREG_VIDEO_WINDOW_YPOS+1:
+			write_half(m_window_y, offset, data);
 			break;
 
-		case 0x70: // video window width
-		case 0x71:
+		case VALKYRIEREG_VIDEO_WINDOW_WIDTH:   // video window width
+		case VALKYRIEREG_VIDEO_WINDOW_WIDTH+1:
+			write_half(m_window_width, offset, data);
 			break;
 
-		case 0x74: // video window height
-		case 0x75:
+		case VALKYRIEREG_VIDEO_WINDOW_HEIGHT:   // video window height
+		case VALKYRIEREG_VIDEO_WINDOW_HEIGHT+1:
+			write_half(m_window_height, offset, data);
 			break;
 
-		case 0x80: // video field starting X pixel
-		case 0x81:
+		case VALKYRIEREG_VIDEO_FIELD_X_PIXEL:   // video field starting X pixel
+		case VALKYRIEREG_VIDEO_FIELD_X_PIXEL+1:
+			write_half(m_field_x, offset, data);
 			break;
 
-		case 0x84: // video field starting Y pixel
-		case 0x85:
+		case VALKYRIEREG_VIDEO_FIELD_Y_PIXEL:   // video field starting Y pixel
+		case VALKYRIEREG_VIDEO_FIELD_Y_PIXEL+1:
+			write_half(m_field_y, offset, data);
 			break;
 
 		default:
 			LOG("Valkyrie: Unk write %08x @ %x\n", data, offset<<2);
 			break;
 	}
+}
+
+void valkyrie_device::regs64_w(offs_t offset, u8 data)
+{
+	// TODO: check that this 64-bit alignment really exists on real hardware.
+	// Valkyrie-AR registers are 64-bit aligned, so it makes sense that they don't
+	// get mirrored in 32-bit halves...
+	if (offset & 4)
+	{
+		logerror("%s regs64_w(): unaligned write to 0x%02x\n", tag(), offset);
+		return;
+	}
+
+	regs_w((offset >> 1) + (offset & 3), data);
+}
+
+u8 valkyrie_device::regs64_r(offs_t offset)
+{
+	// TODO: check that this 64-bit alignment really exists on real hardware
+	if (offset & 4)
+	{
+		logerror("%s regs64_r(): unaligned read from reg at 8-bit address 0x%02x\n",
+				 tag(),
+				 offset);
+		return 0;
+	}
+
+	return regs_r((offset >> 1) + (offset & 3));
 }
 
 u32 valkyrie_device::ramdac_r(offs_t offset)
@@ -441,6 +584,22 @@ void valkyrie_device::ramdac_w(offs_t offset, u32 data)
 		break;
 
 	case 2:
+		if (m_pal_idx < 3)
+			m_video_clut[m_pal_address][m_pal_idx] = data;
+
+		m_pal_idx++;
+		if (m_pal_idx == 3)
+		{
+			m_pal_idx = 0;
+			m_pal_address++;
+		}
+		break;
+
+	case 3:
+		m_color_key = data;
+		break;
+
+	default:
 		LOGMASKED(LOG_RAMDAC, "%02x to DAC @ %x\n", data, offset);
 		break;
 	}
@@ -448,10 +607,10 @@ void valkyrie_device::ramdac_w(offs_t offset, u32 data)
 
 void valkyrie_device::recalc_mode()
 {
-	// mode parameters taken from the Quadra 630 Developer Note
+	// mode parameters taken from the Quadra 630 and Power Macintosh 5200/6200 Developer Notes
 	// m_video_timing numbers:
 	//  2 =  512x384, 60 Hz ("Rubik")
-	//  6 =  640x480, 72 Hz (Mac 13")
+	//  6 =  640x480, 67 Hz (Mac 13")
 	//  9 =  832x624, 75 Hz (Mac 16")
 	// 11 =  640x480, 60 Hz (VGA)
 	// 12 =  800x600, 60 Hz (SVGA)
@@ -482,11 +641,11 @@ void valkyrie_device::recalc_mode()
 			m_stride = 80;
 			break;
 
-		case 9: // 16" RGB 832x624?
+		case 9: // 16" RGB 832x624
 			m_hres = 832;
 			m_vres = 624;
-			m_htotal = 1072;
-			m_vtotal = 690;
+			m_htotal = 1152;
+			m_vtotal = 667;
 			m_stride = 104;
 			break;
 
@@ -497,6 +656,22 @@ void valkyrie_device::recalc_mode()
 			m_vtotal = 525;
 			m_stride = 80;
 			break;
+
+		case 12: // SVGA 800x600, 60 Hz
+			m_hres = 800;
+			m_vres = 600;
+			m_htotal = 1056;
+			m_vtotal = 628;
+			m_stride = 104;
+			break;
+
+		case 13: // SVGA 800x600, 72 Hz
+			m_hres = 800;
+			m_vres = 600;
+			m_htotal = 1040;
+			m_vtotal = 666;
+			m_stride = 104;
+			break;
 	}
 
 	const double refresh = (double)m_pixel_clock / (double)(m_htotal * m_vtotal);
@@ -505,7 +680,7 @@ void valkyrie_device::recalc_mode()
 	if ((m_hres != 0) && (m_vres != 0))
 	{
 		rectangle visarea(0, m_hres - 1, 0, m_vres - 1);
-		m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock).as_attoseconds());
+		m_screen->configure(m_htotal, m_vtotal, visarea, attotime::from_ticks(m_htotal * m_vtotal, m_pixel_clock));
 	}
 }
 
@@ -517,6 +692,24 @@ u32 valkyrie_device::vram_r(offs_t offset)
 void valkyrie_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset & (m_vram_size - 1)]);
+}
+
+offs_t valkyrie_device::video_buffer_offset(offs_t offset)
+{
+	u32 const row = BIT(offset, 8, 8);
+	u32 const column = BIT(offset, 0, 8) << 2;
+
+	return ((BIT(offset, 16) ? VIDEO_BUFFER1 : VIDEO_BUFFER0) + (row * (VIDEO_BUFFER_WIDTH << 1)) + column) >> 2;
+}
+
+u32 valkyrie_device::video_buffer_r(offs_t offset)
+{
+	return m_vram[video_buffer_offset(offset)];
+}
+
+void valkyrie_device::video_buffer_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_vram[video_buffer_offset(offset)]);
 }
 
 void valkyrie_device::recalc_ints()
@@ -559,17 +752,17 @@ void valkyrie_device::write_data(u16 offset, u8 data)
 			break;
 	}
 
-	const double clock = (3986400.0f * (double)(1 << m_P) * (double)m_N) / (double)m_M;
-	m_pixel_clock = (u32)clock;
+	// Apple's driver and Linux both write P last
+	if (offset != 3)
+		return;
 
-	// TODO: Apple documents these machines as supporting the 512x384 monitor, but selecting it
-	// programs garbage to the clock generator.  Allow that configuration to work until we determine
-	// if the Apple developer note is lying.
-	if ((m_M == 0) && (m_N == 0) && (m_P = 98))
-	{
-		m_pixel_clock = 15670000;
-	}
+	// 512x384 writes M = 0, N = 0, P = 0x62 and runs at half the crystal clock
+	if ((m_M == 0) || (m_N == 0))
+		m_pixel_clock = clock() / 2;
+	else
+		m_pixel_clock = (u32)((double)clock() / 8.0 * (double)(1 << m_P) * (double)m_N / (double)m_M);
 
 	LOGMASKED(LOG_CLOCKGEN, "Valkyrie: M = %d %02x, N = %d %02x P = %d, pixel clock %d\n", m_M, m_M, m_N, m_N, m_P, m_pixel_clock);
 	recalc_mode();
 }
+

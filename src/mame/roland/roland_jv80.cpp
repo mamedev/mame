@@ -164,7 +164,7 @@ void roland_jv80_state::jv880(machine_config &config)
 	m_pcm->set_device_rom_tag("waverom");
 	m_pcm->int_callback().set(FUNC(roland_jv80_state::pcm_int_w));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(80);
 	m_screen->set_palette("palette");
 

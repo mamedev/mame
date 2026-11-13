@@ -12,11 +12,17 @@
 
 @implementation MAMEFSWindow
 
--(instancetype)init
+-(instancetype)initWithScreen:(NSScreen *)screen
 {
-	NSRect screenRect = [[NSScreen mainScreen] frame];
+	if (screen == nil)
+	{
+		screen = [NSScreen mainScreen];
+	}
+
+	// the frame rect is in screen coordinates, which puts the window on the right display
+	NSRect screenRect = [screen frame];
 	self = [super initWithContentRect:screenRect
-				styleMask:NSBorderlessWindowMask
+				styleMask:NSWindowStyleMaskBorderless
 				backing:NSBackingStoreBuffered
 				defer:YES];
 
@@ -24,8 +30,15 @@
 	[self setLevel:NSMainMenuWindowLevel+1];
 	[self setOpaque:YES];
 	[self setHidesOnDeactivate:YES];
+	[self setReleasedWhenClosed:NO];
+	[self setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces | NSWindowCollectionBehaviorFullScreenAuxiliary];
 
 	return self;
+}
+
+-(instancetype)init
+{
+	return [self initWithScreen:nil];
 }
 
 -(BOOL)canBecomeKeyWindow

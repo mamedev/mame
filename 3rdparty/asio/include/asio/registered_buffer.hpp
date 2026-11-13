@@ -2,7 +2,7 @@
 // registered_buffer.hpp
 // ~~~~~~~~~~~~~~~~~~~~~
 //
-// Copyright (c) 2003-2024 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+// Copyright (c) 2003-2026 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 //
 // Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -21,6 +21,7 @@
 #include "asio/detail/push_options.hpp"
 
 namespace asio {
+ASIO_INLINE_NAMESPACE_BEGIN
 namespace detail {
 
 class buffer_registration_base;
@@ -78,7 +79,7 @@ private:
 };
 
 /// Holds a registered buffer over modifiable data.
-/** 
+/**
  * Satisfies the @c MutableBufferSequence type requirements.
  */
 class mutable_registered_buffer
@@ -149,7 +150,7 @@ private:
 };
 
 /// Holds a registered buffer over non-modifiable data.
-/** 
+/**
  * Satisfies the @c ConstBufferSequence type requirements.
  */
 class const_registered_buffer
@@ -337,6 +338,7 @@ inline const_registered_buffer operator+(std::size_t n,
   return b + n;
 }
 
+ASIO_INLINE_NAMESPACE_END
 } // namespace asio
 
 #include "asio/detail/pop_options.hpp"

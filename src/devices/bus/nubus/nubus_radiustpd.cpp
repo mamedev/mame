@@ -32,17 +32,15 @@ public:
 protected:
 	nubus_radiustpd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-
 	TIMER_CALLBACK_MEMBER(vbl_tick);
 
-	void card_map(address_map &map);
+	void card_map(address_map &map) ATTR_COLD;
 
 private:
 	u32 radiustpd_r(offs_t offset, u32 mem_mask = ~0);
@@ -66,7 +64,7 @@ ROM_END
 
 void nubus_radiustpd_device::device_add_mconfig(machine_config &config)
 {
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(nubus_radiustpd_device::screen_update));
 	m_screen->set_raw(99.522_MHz_XTAL, 1536, 0, 1152, 900, 0, 880); // 64.79 kHz horizontal, 72 Hz refresh
 }

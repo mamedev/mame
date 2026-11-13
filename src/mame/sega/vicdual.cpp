@@ -923,7 +923,7 @@ void vicdual_state::vicdual_root(machine_config &config)
 	TIMER(config, m_coinstate_timer).configure_generic(FUNC(vicdual_state::clear_coin_status));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART);
 }
 
@@ -5318,7 +5318,7 @@ GAME( 1980, samuraij,   samurai,  samurai,   samurai,   vicdual_state,   empty_i
 GAME( 1979, invinco,    0,        invinco,   invinco,   vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco",                                                MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invcarht,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Car Hunt (Germany)",                           MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, invds,      0,        invds,     invds,     vicdual_state,   empty_init, ROT270, "Sega",                    "Invinco / Deep Scan",                                    MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1979, deepscch,    0,       carhntds,  deepscch,  vicdual_state,   empty_init, ROT270, "Sega",                    "Deep Scan / Car Hunt",                                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // missing Car Hunt portion
+GAME( 1979, deepscch,   0,        carhntds,  deepscch,  vicdual_state,   empty_init, ROT270, "Sega",                    "Deep Scan / Car Hunt",                                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // missing Car Hunt portion
 GAME( 1979, carhntds,   0,        carhntds,  carhntds,  vicdual_state,   empty_init, ROT270, "Sega",                    "Car Hunt / Deep Scan (France)",                          MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, tranqgun,   0,        tranqgun,  tranqgun,  tranqgun_state,  empty_init, ROT270, "Sega",                    "Tranquillizer Gun",                                      MACHINE_SUPPORTS_SAVE )
 GAME( 1980, spacetrk,   0,        spacetrk,  spacetrk,  vicdual_state,   empty_init, ROT270, "Sega",                    "Space Trek (upright)",                                   MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )

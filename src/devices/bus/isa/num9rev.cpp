@@ -55,7 +55,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( isa8_number_9_rev_device::hgdc_display_pixels )
 
 void isa8_number_9_rev_device::device_add_mconfig(machine_config &config)
 {
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(512, 448);
 	screen.set_visarea(0, 512-1, 0, 448-1);
 	screen.set_refresh_hz(60);

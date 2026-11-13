@@ -196,11 +196,11 @@ uint16_t eidemax_device::cs0_r(offs_t offset, uint16_t mem_mask)
 	uint16_t data = 0;
 
 	if (ACCESSING_BITS_0_7 && (offset == 0))
-		data |= m_ata->cs0_r(offset * 2 + 0, mem_mask);
+		data |= m_ata->cs0_r(offset * 2 + 0);
 	else if (ACCESSING_BITS_0_7)
-		data |= m_ata->cs0_r(offset * 2 + 0, 0x00ff) << 0;
+		data |= m_ata->cs0_r(offset * 2 + 0) << 0;
 	else if (ACCESSING_BITS_8_15)
-		data |= m_ata->cs0_r(offset * 2 + 1, 0x00ff) << 8;
+		data |= m_ata->cs0_r(offset * 2 + 1) << 8;
 
 	// clear index bit, otherwise drives aren't detected (compares status with 0x58)
 	if (ACCESSING_BITS_8_15 && offset == 3)
@@ -216,16 +216,16 @@ void eidemax_device::cs0_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	LOG("cs0_w: %04x = %04x (%04x)\n", offset, data, mem_mask);
 
 	if (ACCESSING_BITS_0_7 && (offset == 0))
-		m_ata->cs0_w(offset * 2 + 0, data, mem_mask);
+		m_ata->cs0_w(offset * 2 + 0, data);
 	else if (ACCESSING_BITS_0_7)
-		m_ata->cs0_w(offset * 2 + 0, data >> 0, 0x00ff);
+		m_ata->cs0_w(offset * 2 + 0, data >> 0);
 	else if (ACCESSING_BITS_8_15)
-		m_ata->cs0_w(offset * 2 + 1, data >> 8, 0x00ff);
+		m_ata->cs0_w(offset * 2 + 1, data >> 8);
 }
 
 uint8_t eidemax_device::cs1_r(offs_t offset)
 {
-	uint8_t data = m_ata->cs1_r(6, 0x00ff);
+	uint8_t data = m_ata->cs1_r(6);
 
 	LOG("cs1_r: %04x\n", data);
 
@@ -236,7 +236,7 @@ void eidemax_device::cs1_w(offs_t offset, uint8_t data)
 {
 	LOG("cs1_w: %02x\n", data);
 
-	m_ata->cs1_w(6, data, 0x00ff);
+	m_ata->cs1_w(6, data);
 }
 
 void eidemax_device::ide_interrupt(int state)

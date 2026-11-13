@@ -390,7 +390,7 @@ void funtech_h8_state::funtech_h8(machine_config &config)
 
 	HOPPER(config, m_hopper, attotime::from_msec(50));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
 	screen.set_refresh_hz(60);

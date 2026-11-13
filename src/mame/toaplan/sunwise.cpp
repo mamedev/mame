@@ -516,7 +516,7 @@ void sunwise_state::pwrkick(machine_config &config) // Sunwise SW931201-1 PCB (2
 	TICKET_DISPENSER(config, m_hopper, attotime::from_msec(50)); // duration is probably wrong
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(sunwise_state::screen_update));
@@ -549,7 +549,7 @@ void sunwise_state::othldrby(machine_config &config) // Sunwise S951060-VGP PCB 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(sunwise_state::screen_update));

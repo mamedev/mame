@@ -45,6 +45,8 @@ protected:
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 
 	virtual void return_no_cd();
+	virtual void return_media_changed();
+	bool check_media_change();
 	static int to_msf(int frame);
 
 	void update_directory();
@@ -52,6 +54,13 @@ protected:
 	bool m_removal_prevented;
 
 private:
+	struct toolbox_directory_entry
+	{
+		std::string name;
+		osd::directory::entry::entry_type type;
+		uint64_t size;
+	};
+
 	static constexpr uint32_t bytes_per_sector = 2048;
 
 	u32 sequence_counter;
@@ -74,7 +83,7 @@ private:
 	uint32_t m_write_offset;
 	bool m_write_is_setup;
 	std::string m_write_path;
-	std::vector<osd::directory::entry> m_directory;
+	std::vector<toolbox_directory_entry> m_directory;
 	std::vector<uint8_t> m_xfer_buffer;
 };
 

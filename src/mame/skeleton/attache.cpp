@@ -171,7 +171,6 @@ protected:
 	};
 
 	// overrides
-	virtual void driver_start() override;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -271,6 +270,7 @@ private:
 	uint8_t z80_comms_status_r();
 	void z80_comms_ctrl_w(uint8_t data);
 	void ppi_irq(int state);
+	IRQ_CALLBACK_MEMBER(extcpu_acknowledge_irq);
 	void x86_dsr(int state);
 
 	virtual void machine_reset() override ATTR_COLD;
@@ -898,7 +898,12 @@ void attache816_state::z80_comms_ctrl_w(uint8_t data)
 void attache816_state::ppi_irq(int state)
 {
 	if(m_x86_irq_enable & 0x01)
-		m_extcpu->set_input_line_and_vector(0,state,0x03); // I8086
+		m_extcpu->set_input_line(0,state);
+}
+
+IRQ_CALLBACK_MEMBER(attache816_state::extcpu_acknowledge_irq)
+{
+	return 0x03;
 }
 
 void attache816_state::x86_dsr(int state)
@@ -1059,7 +1064,7 @@ static void attache_floppies(device_slot_interface &device)
 	device.option_add("525dd", FLOPPY_525_DD);
 }
 
-void attache_state::driver_start()
+void attache_state::machine_start()
 {
 	uint8_t *RAM = m_ram->pointer();
 
@@ -1091,10 +1096,7 @@ void attache_state::driver_start()
 	save_pointer(m_attr_ram,"Attribute RAM",128*32);
 	save_pointer(m_gfx_ram,"Graphics RAM",128*32*5);
 	save_pointer(m_cmos_ram,"CMOS RAM",64);
-}
 
-void attache_state::machine_start()
-{
 	// initialise RAM
 	memset(m_cmos_ram,0,64);
 	memset(m_attr_ram,0,128*32);
@@ -1122,7 +1124,7 @@ void attache_state::attache(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240);
 	screen.set_screen_update(FUNC(attache_state::screen_update));
 
@@ -1202,9 +1204,10 @@ void attache816_state::attache816(machine_config &config)
 	I8086(config, m_extcpu, 24_MHz_XTAL / 3);
 	m_extcpu->set_addrmap(AS_PROGRAM, &attache816_state::attache_x86_map);
 	m_extcpu->set_addrmap(AS_IO, &attache816_state::attache_x86_io);
+	m_extcpu->set_irq_acknowledge_callback(FUNC(attache816_state::extcpu_acknowledge_irq));
 	config.set_perfect_quantum(m_extcpu);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER, rgb_t::green()));
+	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
 	screen.set_raw(12.324_MHz_XTAL, 784, 0, 640, 262, 0, 240);
 	screen.set_screen_update(FUNC(attache_state::screen_update));
 

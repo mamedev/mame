@@ -121,6 +121,11 @@ ROM_START( hdc )
 	ROM_LOAD("wdbios.rom",  0x00000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 ROM_END
 
+ROM_START( mc0109a )
+	ROM_REGION(0x02000,"hdc", 0)
+	ROM_LOAD("40291-1 8947 b.ic702", 0x00000, 0x02000, CRC(1f959e0b) SHA1(5a917885fc2fd2d9fecbd93ef6cdad1c851f3639)) // WDC IDE Superbios 1.1 (06/19/89)
+ROM_END
+
 static INPUT_PORTS_START( isa_hdc )
 	PORT_START("HDD")
 	PORT_BIT(     0xb0, 0xb0, IPT_UNUSED )
@@ -142,6 +147,31 @@ static INPUT_PORTS_START( isa_hdc )
 	PORT_DIPNAME( 0x01, 0x01, "Install ROM?")
 	PORT_DIPSETTING(    0x01, DEF_STR(Yes) )
 	PORT_DIPSETTING(    0x00, DEF_STR(No) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mc0109a )
+	PORT_START("HDD")
+	PORT_BIT(     0x80, 0x80, IPT_UNUSED )
+	PORT_CONFNAME( 0x40, 0x40, "IRQ level")
+	PORT_CONFSETTING(    0x40, "5" )
+	PORT_CONFSETTING(    0x00, "2" )
+	PORT_CONFNAME( 0x30, 0x30, "Drive parameter table")
+	PORT_CONFSETTING(    0x30, "Translated" )
+	PORT_CONFSETTING(    0x20, "Dynamic" )
+	PORT_CONFSETTING(    0x10, "Native" )
+	PORT_CONFNAME( 0x03, 0x01, "Type of 1st drive")
+	PORT_CONFSETTING(    0x00, "0 (612/4 or 615/4)" )
+	PORT_CONFSETTING(    0x01, "1 (615/6 or 782/3)" )
+	PORT_CONFSETTING(    0x02, "2 (977/5 or 782/4)" )
+	PORT_CONFSETTING(    0x03, "3 (615/4 or 782/2)" )
+	PORT_CONFNAME( 0x0c, 0x0c, "Type of 2nd drive")
+	PORT_CONFSETTING(    0x00, "0 (612/4 or 615/4)" )
+	PORT_CONFSETTING(    0x04, "1 (615/6 or 782/3)" )
+	PORT_CONFSETTING(    0x08, "2 (977/5 or 782/4)" )
+	PORT_CONFSETTING(    0x0c, "3 (615/4 or 782/2)" )
+
+	PORT_START("ROM")
+	PORT_BIT(     0x01, 0x01, IPT_UNUSED )
 INPUT_PORTS_END
 
 DEFINE_DEVICE_TYPE(XT_HDC,     xt_hdc_device, "xt_hdc", "Generic PC-XT Fixed Disk Controller")
@@ -908,6 +938,7 @@ void xt_hdc_device::set_ready()
 
 DEFINE_DEVICE_TYPE(ISA8_HDC,        isa8_hdc_device,        "isa_hdc",        "Fixed Disk Controller Card")
 DEFINE_DEVICE_TYPE(ISA8_HDC_EC1841, isa8_hdc_ec1841_device, "isa_hdc_ec1841", "EC1841 HDC Card")
+DEFINE_DEVICE_TYPE(ISA8_MC0109A,    isa8_mc0109a_device,    "isa_mc0109a",    "Amstrad MC0109A XTA Hard Disk Adapter")
 
 //-------------------------------------------------
 //  device_add_mconfig - add device configuration
@@ -940,6 +971,11 @@ const tiny_rom_entry *isa8_hdc_device::device_rom_region() const
 	return ROM_NAME( hdc );
 }
 
+const tiny_rom_entry *isa8_mc0109a_device::device_rom_region() const
+{
+	return ROM_NAME( mc0109a );
+}
+
 //-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
@@ -947,6 +983,11 @@ const tiny_rom_entry *isa8_hdc_device::device_rom_region() const
 ioport_constructor isa8_hdc_device::device_input_ports() const
 {
 	return INPUT_PORTS_NAME( isa_hdc );
+}
+
+ioport_constructor isa8_mc0109a_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( mc0109a );
 }
 
 //**************************************************************************
@@ -973,6 +1014,11 @@ isa8_hdc_device::isa8_hdc_device(const machine_config &mconfig, device_type type
 isa8_hdc_ec1841_device::isa8_hdc_ec1841_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	isa8_hdc_device( mconfig, ISA8_HDC_EC1841, tag, owner, clock),
 	m_hdc(*this,"hdc")
+{
+}
+
+isa8_mc0109a_device::isa8_mc0109a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	isa8_hdc_device(mconfig, ISA8_MC0109A, tag, owner, clock)
 {
 }
 

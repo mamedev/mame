@@ -50,7 +50,7 @@ void a2bus_softcard3_device::z80_io(address_map &map)
 
 void a2bus_softcard3_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_z80, 1021800*2);   // Z80 runs at 2M based on comment in the manual
+	Z80(config, m_z80, A2BUS_1M_CLOCK*2);   // Z80 runs at 2M based on comment in the manual
 	m_z80->set_addrmap(AS_PROGRAM, &a2bus_softcard3_device::z80_mem);
 	m_z80->set_addrmap(AS_IO, &a2bus_softcard3_device::z80_io);
 	TIMER(config, "timer").configure_generic(FUNC(a2bus_softcard3_device::timercallback));

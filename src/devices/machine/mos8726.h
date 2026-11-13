@@ -60,12 +60,23 @@ public:
 	// construction/destruction
 	mos8726_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto irq_wr_callback() { return m_write_irq.bind(); }
+	auto dma_wr_callback() { return m_write_dma.bind(); }
+	auto c64_rd_callback() { return m_read_c64.bind(); }
+	auto c64_wr_callback() { return m_write_c64.bind(); }
+	auto reu_rd_callback() { return m_read_reu.bind(); }
+	auto reu_wr_callback() { return m_write_reu.bind(); }
+
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
+	void ff00_w();
 	void bs_w(int state);
+	void ba_w(int state) { m_ba = bool(state); }
 
 	int romsel_r(int roml, int romh);
+
+	bool dma_active() const { return m_active; }
 
 protected:
 	// device-level overrides
@@ -73,8 +84,36 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void execute_run() override;
 
+private:
+	uint8_t reu_r(offs_t offset);
+	void reu_w(offs_t offset, uint8_t data);
+	void transfer_byte();
+	void start_transfer();
+	void end_transfer();
+	void update_irq();
+
+	devcb_write_line m_write_irq;
+	devcb_write_line m_write_dma;
+	devcb_read8 m_read_c64;
+	devcb_write8 m_write_c64;
+	devcb_read8 m_read_reu;
+	devcb_write8 m_write_reu;
+
 	int m_icount;
 	int m_bs;
+	bool m_ba;
+
+	uint8_t m_status;
+	uint8_t m_command;
+	uint16_t m_c64_addr;
+	uint16_t m_c64_addr_shadow;
+	uint32_t m_reu_addr;
+	uint32_t m_reu_addr_shadow;
+	uint16_t m_length;
+	uint16_t m_length_shadow;
+	uint8_t m_imr;
+	uint8_t m_acr;
+	bool m_active;
 };
 
 

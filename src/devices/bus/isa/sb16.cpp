@@ -31,10 +31,7 @@ sb16_lle_device::sb16_lle_device(const machine_config &mconfig, const char *tag,
 	m_rdac(*this, "rdac"),
 	m_irqs(*this, "irqs"),
 	m_joy(*this, "pc_joy"),
-	m_mpu_byte(0),
-	m_irq8(false),
-	m_irq16(false),
-	m_irq_midi(false)
+	m_mpu_byte(0)
 {
 }
 
@@ -68,20 +65,17 @@ void sb16_lle_device::device_add_mconfig(machine_config &config)
 		return m_dma_sel;
 	});
 	m_mixer->irq_status_cb().set([this] () {
-		return (m_irq8 << 0) | (m_irq16 << 1) | (m_irq_midi << 2) | (0x8 << 4);
+		return (m_irqs->in_r<IRQS_IRQ8>() << 0) |
+				(m_irqs->in_r<IRQS_IRQ16>() << 1) |
+				(m_irqs->in_r<IRQS_IRQ_MIDI>() << 2) |
+				(0x8 << 4);
 	});
 
 	CT1741(config, m_dsp, XTAL(24'000'000));
 	m_dsp->ldac_write_cb().set(m_ldac, FUNC(dac_16bit_r2r_device::write));
 	m_dsp->rdac_write_cb().set(m_rdac, FUNC(dac_16bit_r2r_device::write));
-	m_dsp->irq8_cb().set([this] (int state) {
-		m_irq8 = state;
-		m_irqs->in_w<0>(state);
-	});
-	m_dsp->irq16_cb().set([this] (int state) {
-		m_irq16 = state;
-		m_irqs->in_w<1>(state);
-	});
+	m_dsp->irq8_cb().set(m_irqs, FUNC(input_merger_device::in_w<IRQS_IRQ8>));
+	m_dsp->irq16_cb().set(m_irqs, FUNC(input_merger_device::in_w<IRQS_IRQ16>));
 	m_dsp->drq8_cb().set([this] (int state) {
 		m_isa->drq1_w(state);
 	});
@@ -89,7 +83,6 @@ void sb16_lle_device::device_add_mconfig(machine_config &config)
 		m_isa->drq5_w(state);
 	});
 	m_dsp->speaker_off_cb().set(m_mixer, FUNC(ct1745_mixer_device::dac_speaker_off_cb));
-
 
 	// TODO: PnP line
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set([this](int state) {m_isa->irq5_w(state ? ASSERT_LINE : CLEAR_LINE); });
@@ -132,10 +125,7 @@ uint8_t sb16_lle_device::mpu401_r(offs_t offset)
 	uint8_t res;
 
 	if (!machine().side_effects_disabled())
-	{
-		m_irq_midi = false;
-		m_irqs->in_w<2>(CLEAR_LINE);
-	}
+		m_irqs->in_w<IRQS_IRQ_MIDI>(CLEAR_LINE);
 	if(offset == 0) // data
 	{
 		res = m_mpu_byte;
@@ -164,8 +154,7 @@ void sb16_lle_device::mpu401_w(offs_t offset, uint8_t data)
 		switch(data)
 		{
 			case 0xff: // reset
-				m_irq_midi = true;
-				m_irqs->in_w<2>(ASSERT_LINE);
+				m_irqs->in_w<IRQS_IRQ_MIDI>(ASSERT_LINE);
 				m_mpu_byte = 0xfe;
 				break;
 		}
@@ -194,9 +183,6 @@ void sb16_lle_device::device_start()
 	m_isa->set_dma_channel(1, this, false);
 	m_isa->set_dma_channel(5, this, false);
 
-	save_item(NAME(m_irq8));
-	save_item(NAME(m_irq16));
-	save_item(NAME(m_irq_midi));
 	save_item(NAME(m_mpu_byte));
 
 	save_item(NAME(m_irq_sel));
@@ -210,10 +196,9 @@ void sb16_lle_device::device_reset()
 	m_isa->drq5_w(0);
 	m_isa->irq5_w(0);
 
-	m_irq8 = m_irq16 = m_irq_midi = false;
-	m_irqs->in_w<0>(0);
-	m_irqs->in_w<1>(0);
-	m_irqs->in_w<2>(0);
+	m_irqs->in_w<IRQS_IRQ8>(0);
+	m_irqs->in_w<IRQS_IRQ16>(0);
+	m_irqs->in_w<IRQS_IRQ_MIDI>(0);
 	remap(AS_IO, 0, 0xffff);
 }
 

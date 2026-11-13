@@ -396,7 +396,7 @@ void tmaster_state::tm(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(400, 256);
@@ -409,6 +409,7 @@ void tmaster_state::tm(machine_config &config)
 	CESBLIT(config, m_blitter, XTAL(32'000'000), m_screen);
 	m_blitter->set_compute_addr(tmaster_compute_addr);
 	m_blitter->irq_callback().set(FUNC(tmaster_state::blitter_irq_callback));
+	m_blitter->set_extended_palette(true);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

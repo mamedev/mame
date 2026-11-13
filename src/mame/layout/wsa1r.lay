@@ -1,0 +1,886 @@
+<?xml version="1.0"?>
+<!--
+	license:CC0-1.0
+
+	Technics SX-WSA1R - acoustic modeling synthesizer module.
+
+	The rack's panel is CP1/CP2, scanned by IC1 (M37471M2196S).  SEG0..SEG9 are
+	its scan columns and SW0..SW7 its return rows; SEG6 (pin 40) and SEG10
+	(pin 33) are unconnected stubs here, so segment_is_wired() in
+	wsa1r_cpanel.cpp refuses them and nothing may bind to them.
+
+	58 of the 80 matrix cells are populated: 47 on CP1 and 11 on CP2.  Not
+	fitted, so neither drawn nor bound: SEG2/SW7 (SW24), SEG7/SW4..SW7,
+	SEG8/SW2..SW7, SEG9/SW5..SW7.  Each button's comment names the source of
+	its legend.
+
+	18 lamps on the rack; 14 are named by the firmware's switch-to-LED table at
+	Panel_SwitchLedTable_V2, whose word is (LED register << 8) | bit mask.  The driver's
+	output index is register * 8 + bit, which is the led# used below.
+
+	Drawn but not bound:
+	  * the four REALTIME CREATOR ring lamps - the firmware pins the set to
+	    {led16, led17, led24, led25} but not which is which.
+	  * the floppy activity lamp - it belongs to the FDD, which exposes no
+	    output.
+	  * CONTRAST (VR2 on CP2) is an LCD bias pot wired to MAIN as VO, not a
+	    panel-MCU input; POWER, PHONES and floppy eject have no ioport either.
+	  * REALTIME CREATOR itself is board MB2's triple-gang VR2, reporting
+	    JOYX/JOYY to the MAIN TMP95C061's A/D.  Only its ring lamps are on CP2.
+
+	The prom_a addresses above refer to the OS v2.0 images; see the ROM record
+	in wsa1.cpp.
+
+	Firmware symbols used in the comments below.  Addresses are in the OS v2.0 images;
+	a v1 OS shipped and is not dumped.
+
+	    Panel_SwitchLedTable_V2 prom_a  0xF95088
+
+	For the rack only.  The SX-WSA1 keyboard's panel is a different board with
+	two extra scan columns and three extra pots.
+-->
+<mamelayout version="2">
+
+	<element name="led_green" defstate="0">
+		<disk state="0"><color red="0.00" green="0.19" blue="0.00"/></disk>
+		<disk state="1"><color red="0.15" green="1.00" blue="0.15"/></disk>
+	</element>
+
+	<element name="led_red" defstate="0">
+		<disk state="0"><color red="0.27" green="0.00" blue="0.00"/></disk>
+		<disk state="1"><color red="1.00" green="0.13" blue="0.13"/></disk>
+	</element>
+
+	<element name="indicator">
+		<disk><color red="0.4" green="0.4" blue="0.4"/></disk>
+	</element>
+
+	<element name="floppy_drive">
+		<image><data><![CDATA[
+		<svg width="327" height="84">
+			<rect fill="#2b2e2f" x="1" y="1" stroke="black" width="325" height="82"/>
+			<path stroke-width="1.1" stroke="black" fill="none" d="
+				m 109,11 c -1,0 -2,0.8 -2,1.8 v 8.2 h 109 v -8.2 c 0,-1 -0.8,-1.8 -2,-1.8 z
+				m -2,31 v 29 c 0,1 0.8,1.8 2,1.8 h 105 c 1,0 1.8,-0.8 1.8,-1.8 v -29 z
+				m 122,15 h 43 c 1,0 1.8,0.8 1.8,1.8 v 12 c 0,1 -0.8,1.8 -1.8,1.8 h -43
+				c -1,0 -1.8,-0.8 -1.8,-1.8 v -12 c 0,-1 0.8,-1.8 1.8,-1.8 z
+				m -164,1.7 h 17.4 c 1,0 1.8,0.8 1.8,1.8 v 5.9 c 0,1 -0.8,1.8 -1.8,1.8 h -17.4
+				c -1,0 -1.8,-0.8 -1.8,-1.8 v -5.9 c 0,-1 0.8,-1.8 1.8,-1.8 z
+				m 246,-47.7 c -2.2,5.3 -3.6,9.8 -7,13.7 0.4,0.3 0.7,0.9 0.7,1.4 v 8.7
+				c 0,0.7 -0.4,1.4 -1,1.7 2.8,1.8 6,3.9 7.8,7.8 0.4,-0.6 0.7,-1.3 0.7,-2 v -28.7 c 0,-1 -0.4,-2 -1.1,-2.6 z
+				m 0,0 c -0.6,-0.6 -1.5,-1 -2.5,-1 h -297.1
+				c -1.1,0 -2,0.5 -2.7,1.3 2.8,4.4 8.3,10 12.1,13.7 0.3,-0.4 0.9,-0.7 1.4,-0.7 h 52.8 v -1.8 h 31.6
+				v -9.2 c 0,-1 0.8,-1.8 1.8,-1.8 h 105.3 c 1,0 1.8,0.8 1.8,1.8 v 9.2 h 31 v 1.8 h 56.2
+				c 0.5,0 0.9,0.2 1.2,0.4 3.4,-3.9 4.8,-8.4 7,-13.7 z
+				m 0.4,33.4 c -1.8,-3.9 -4.9,-6.1 -7.8,-7.8 -0.3,0.1 -0.6,0.2 -0.9,0.2 h -56.2 v 1.8 h -31
+				v 7.4 h 92.9 c 1.2,0 2.2,-0.6 2.9,-1.6 z
+				m -302.7,-33.1 c -0.6,0.6 -0.9,1.4 -0.9,2.3 v 28.7
+				c 0,0.9 0.3,1.7 0.9,2.3 3.1,-5.1 7.8,-7.8 12,-8.8 -0.1,-0.3 -0.3,-0.6 -0.3,-1
+				v -8.7 c 0,-0.5 0.2,-0.9 0.5,-1.2 -3.8,-3.7 -9.3,-9.3 -12.1,-13.7 z
+				m 11.9,24.6 c -4.1,1 -8.8,3.7 -12,8.8 0.7,0.8 1.6,1.3 2.7,1.3 h 95.3 v -7.4 h -31.6 v -1.8 h -52.8
+				c -0.7,0 -1.3,-0.4 -1.6,-1 z
+				m 87.8,-24.4 c -1,0 -1.8,0.8 -1.8,1.8 v 9.2 h -31.6 v 1.8 h -52.8 c -1.1,0 -1.9,0.9 -1.9,1.9 v 8.7
+				c 0,1.1 0.9,1.9 1.9,1.9 h 52.8
+				v 1.8 h 31.6 v 32.7 c 0,1 0.8,1.8 1.8,1.8" />
+		</svg>
+		]]></data></image>
+	</element>
+
+	<element name="button_42x17">
+		<image state="0"><data><![CDATA[
+			<svg width="42" height="17">
+				<rect stroke="#000" stroke-width="1" fill="#232323" x="0.5" y="0.5" width="41" height="16" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="42" height="17">
+				<rect stroke="#000" stroke-width="1" fill="#1b1b1b" x="0.5" y="0.5" width="41" height="16" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="lcd_soft_key">
+		<image state="0"><data><![CDATA[
+			<svg width="36" height="32">
+				<rect stroke="#000" stroke-width="1" fill="#232323" x="0.5" y="0.5" width="35" height="31" />
+				<rect stroke="#000" stroke-width="1" fill="#232323" x="4.5" y="3.5" width="27" height="25" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="36" height="32">
+				<rect stroke="#000" stroke-width="1" fill="#232323" x="0.5" y="0.5" width="35" height="31" />
+				<rect stroke="#000" stroke-width="1" fill="#1b1b1b" x="4.5" y="3.5" width="27" height="25" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="button_42x25">
+		<image state="0"><data><![CDATA[
+			<svg width="42" height="25">
+				<rect stroke="#000" stroke-width="1" fill="#232323" x="0.5" y="0.5" width="41" height="24" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="42" height="25">
+				<rect stroke="#000" stroke-width="1" fill="#1b1b1b" x="0.5" y="0.5" width="41" height="24" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="button_55x17">
+		<image state="0"><data><![CDATA[
+			<svg width="55" height="17">
+				<rect stroke="#000" stroke-width="1" fill="#232323" x="0.5" y="0.5" width="54" height="16" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="55" height="17">
+				<rect stroke="#000" stroke-width="1" fill="#1b1b1b" x="0.5" y="0.5" width="54" height="16" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="button_35x25_light">
+		<image state="0"><data><![CDATA[
+			<svg width="35" height="25">
+				<rect stroke="#000" stroke-width="1" fill="#667786" x="0.5" y="0.5" width="34" height="24" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="35" height="25">
+				<rect stroke="#000" stroke-width="1" fill="#434f59" x="0.5" y="0.5" width="34" height="24" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="data_wheel">
+		<image><data><![CDATA[
+			<svg width="154" height="154">
+				<circle stroke="#000" stroke-width="3.5" fill="#232323" cx="77" cy="77" r="75" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="data_wheel_finger">
+		<image><data><![CDATA[
+			<svg width="45" height="45">
+				<circle stroke="#000" stroke-width="1" fill="#1b1b1b" cx="22.5" cy="22.5" r="22" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="lcd_soft_key_marker_left">
+		<image><data><![CDATA[
+			<svg width="13" height="14">
+				<g style="stroke-width:2; stroke-linejoin:round">
+					<path d="M 1,1 V 13 L 12,7 Z" stroke="#443530" fill="#443530" />
+					<path d="M 1,1 L 12,7" stroke="#6a5c59" fill="none" />
+					<path d="M 1,13 L 12,7" stroke="#3f2f27" fill="none" />
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="lcd_soft_key_marker_right">
+		<image><data><![CDATA[
+			<svg width="13" height="14">
+				<g style="stroke-width:2; stroke-linejoin:round">
+					<path d="M 12,1 V 13 L 1,7 Z" stroke="#443530" fill="#443530" />
+					<path d="M 12,1 L 1,7" stroke="#6a5c59" fill="none" />
+					<path d="M 12,13 L 1,7" stroke="#3f2f27" fill="none" />
+				</g>
+			</svg>
+		]]></data></image>
+	</element>
+
+
+	<element name="lbl_PART"><text string="PART" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_SYSTEM"><text string="SYSTEM" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_MIDI"><text string="MIDI" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_DISK"><text string="DISK" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_MENU"><text string="MENU" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_ACOUSTIC_MODELING_SYNTHESIZER_MODULE"><text string="ACOUSTIC MODELING SYNTHESIZER MODULE" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_SX"><text string="SX" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_MINUS"><text string="-" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_WSA1R"><text string="WSA1R" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_REALTIME"><text string="REALTIME" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_CREATOR"><text string="CREATOR" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_RESET"><text string="RESET" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_VOLUME"><text string="VOLUME" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_MIN"><text string="MIN" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_CONTRAST"><text string="CONTRAST" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_ON"><text string="ON" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_OFF"><text string="OFF" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_POWER"><text string="POWER" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_PHONES"><text string="PHONES" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_1_6"><text string="1-6" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_MAX"><text string="MAX" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_COMPARE"><text string="COMPARE" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_PAGE"><text string="PAGE" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_EXIT"><text string="EXIT" align="1"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_USER_1"><text string="USER 1" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_USER_2"><text string="USER 2" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_ROM_EXT"><text string="ROM/EXT" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_RE_MAP"><text string="RE-MAP" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_1"><text string="1" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_2"><text string="2" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_3_GM"><text string="3(GM)" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_COMBI"><text string="COMBI" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_SOUND"><text string="SOUND" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_ENTER"><text string="ENTER" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_PLUS_MINUS"><text string="+/-" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_0"><text string="0" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_3"><text string="3" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_6"><text string="6" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_9"><text string="9" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_8"><text string="8" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_7"><text string="7" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_4"><text string="4" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_5"><text string="5" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_PLUS_1"><text string="+1" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_MINUS_1"><text string="-1" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_MIDI_NUMBER_PAD"><text string="MIDI / NUMBER PAD" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_EDIT"><text string="EDIT" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_MODE"><text string="MODE" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_PLAY"><text string="PLAY" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_BANK"><text string="BANK" align="0"><color red="0.89" green="0.91" blue="0.96"/></text></element>
+	<element name="lbl_MAINCPU"><text string="MAINCPU" align="1"><color red="0.78" green="0.80" blue="0.85"/></text></element>
+
+	<element name="background_color">
+		<rect>
+			<color red="0.2" green="0.36" blue="0.4"/>
+		</rect>
+	</element>
+
+	<element name="panel_sheet_hole">
+		<image><data><![CDATA[
+			<svg width="38" height="24">
+				<!-- Must be the same color as "background_color" -->
+				<rect x="0.5" y="0.5" width="37" height="23" rx="10" ry="10" stroke="black" fill="#325d65" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="screen_border_1">
+		<rect>
+			<color red="0.08" green="0.06" blue="0.05"/>
+		</rect>
+	</element>
+
+	<element name="screen_border_2">
+		<rect>
+			<color red="0.28" green="0.24" blue="0.22"/>
+		</rect>
+	</element>
+
+	<element name="panel_sheet">
+		<image><data><![CDATA[
+			<svg width="1555" height="426">
+				<rect x="0.5" y="0.5" width="1554" height="425" rx="5" ry="5" stroke="black" fill="#2e3636" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="small_round_button">
+		<image state="0"><data><![CDATA[
+			<svg width="25" height="25">
+				<circle stroke="#000" stroke-width="1" fill="#232323" cx="12.5" cy="12.5" r="12" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="25" height="25">
+				<circle stroke="#000" stroke-width="1" fill="#1b1b1b" cx="12.5" cy="12.5" r="12" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="large_round_button">
+		<image state="0"><data><![CDATA[
+			<svg width="38" height="38">
+				<circle stroke="#000" stroke-width="1" fill="#232323" cx="19" cy="19" r="18.5" />
+			</svg>
+		]]></data></image>
+
+		<image state="1"><data><![CDATA[
+			<svg width="38" height="38">
+				<circle stroke="#000" stroke-width="1" fill="#1b1b1b" cx="19" cy="19" r="18.5" />
+			</svg>
+		]]></data></image>
+	</element>
+
+	<element name="menu_rule">
+		<rect>
+			<color red="0.8" green="0.86" blue="0.84"/>
+		</rect>
+	</element>
+
+	<group name="panel">
+		<bounds left="0" right="1600" top="0" bottom="500"/>
+		<element ref="background_color"><bounds x="0" y="0" width="1600" height="500"/></element>
+
+		<element ref="panel_sheet"><bounds x="22" y="37" width="1555" height="426"/></element>
+		<element ref="panel_sheet_hole"><bounds x="30" y="94" width="38" height="24"/></element>
+		<element ref="panel_sheet_hole"><bounds x="30" y="384" width="38" height="24"/></element>
+		<element ref="panel_sheet_hole"><bounds x="1530" y="94" width="38" height="24"/></element>
+		<element ref="panel_sheet_hole"><bounds x="1530" y="384" width="38" height="24"/></element>
+		<element ref="screen_border_1"><bounds x="548" y="44" width="488" height="313"/></element>
+		<element ref="screen_border_2"><bounds x="600" y="74" width="384" height="265"/></element>
+
+		<element ref="floppy_drive"><bounds x="146" y="355" width="327" height="84"/></element>
+
+		<element ref="lcd_soft_key_marker_left"><bounds x="615" y="118" width="13" height="14"/></element>
+		<element ref="lcd_soft_key_marker_left"><bounds x="615" y="155" width="13" height="14"/></element>
+		<element ref="lcd_soft_key_marker_left"><bounds x="615" y="193" width="13" height="14"/></element>
+		<element ref="lcd_soft_key_marker_left"><bounds x="615" y="230" width="13" height="14"/></element>
+		<element ref="lcd_soft_key_marker_left"><bounds x="615" y="268" width="13" height="14"/></element>
+		<element ref="lcd_soft_key_marker_right"><bounds x="958" y="118" width="13" height="14"/></element>
+		<element ref="lcd_soft_key_marker_right"><bounds x="958" y="155" width="13" height="14"/></element>
+		<element ref="lcd_soft_key_marker_right"><bounds x="958" y="193" width="13" height="14"/></element>
+		<element ref="lcd_soft_key_marker_right"><bounds x="958" y="230" width="13" height="14"/></element>
+		<element ref="lcd_soft_key_marker_right"><bounds x="958" y="268" width="13" height="14"/></element>
+
+		<!-- The SED1330 panel -->
+		<screen index="0"><bounds x="633" y="85" width="320" height="240"/></screen>
+
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG0" inputmask="0x01"><!-- PLAY MODE SOUND --><bounds x="1260" y="321" width="42" height="25"/></element>
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG0" inputmask="0x02"><!-- PLAY MODE COMBI --><bounds x="1315" y="321" width="42" height="25"/></element>
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG0" inputmask="0x04"><!-- EDIT MODE SOUND --><bounds x="1371" y="321" width="42" height="25"/></element>
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG0" inputmask="0x08"><!-- EDIT MODE COMBI --><bounds x="1427" y="321" width="42" height="25"/></element>
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG0" inputmask="0x10"><!-- BANK USER 1 --><bounds x="1260" y="389" width="42" height="25"/></element>
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG0" inputmask="0x20"><!-- BANK USER 2 --><bounds x="1315" y="389" width="42" height="25"/></element>
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG0" inputmask="0x40"><!-- BANK ROM/EXT --><bounds x="1371" y="389" width="42" height="25"/></element>
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG0" inputmask="0x80"><!-- BANK RE-MAP --><bounds x="1427" y="389" width="42" height="25"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG1" inputmask="0x01"><!-- Number 0 --><bounds x="1302" y="241" width="42" height="17"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG1" inputmask="0x02"><!-- Number 1 --><bounds x="1302" y="195" width="42" height="17"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG1" inputmask="0x04"><!-- Number 2 --><bounds x="1364" y="195" width="42" height="17"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG1" inputmask="0x08"><!-- Number 3 --><bounds x="1427" y="195" width="42" height="17"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG1" inputmask="0x10"><!-- Number 4 --><bounds x="1301" y="150" width="42" height="17"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG1" inputmask="0x20"><!-- Number 5 --><bounds x="1364" y="150" width="42" height="17"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG1" inputmask="0x40"><!-- Number 6 --><bounds x="1427" y="150" width="42" height="17"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG1" inputmask="0x80"><!-- Number 7 --><bounds x="1301" y="105" width="42" height="17"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG2" inputmask="0x01"><!-- Number 8 --><bounds x="1364" y="105" width="42" height="17"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG2" inputmask="0x02"><!-- Number 9 --><bounds x="1426" y="105" width="42" height="17"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG2" inputmask="0x04"><!-- + / - --><bounds x="1364" y="241" width="42" height="17"/></element>
+		<element ref="button_42x17" inputtag="cpanel:CP_SEG2" inputmask="0x08"><!-- ENTER --><bounds x="1427" y="241" width="42" height="17"/></element>
+
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG2" inputmask="0x10"><!-- PAGE DOWN --><bounds x="1000" y="411" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG2" inputmask="0x20"><!-- PAGE UP --><bounds x="1000" y="375" width="34" height="24"/></element>
+
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG2" inputmask="0x40"><!-- COMPARE --><bounds x="527" y="392" width="42" height="25"/></element>
+
+		<element ref="lcd_soft_key" inputtag="cpanel:CP_SEG3" inputmask="0x01"><!-- LCD RIGHT 1 (top) --><bounds x="1057" y="100" width="35" height="31"/></element>
+		<element ref="lcd_soft_key" inputtag="cpanel:CP_SEG3" inputmask="0x02"><!-- LCD RIGHT 2 --><bounds x="1057" y="142" width="35" height="31"/></element>
+		<element ref="lcd_soft_key" inputtag="cpanel:CP_SEG3" inputmask="0x04"><!-- LCD RIGHT 3 --><bounds x="1057" y="184" width="35" height="31"/></element>
+		<element ref="lcd_soft_key" inputtag="cpanel:CP_SEG3" inputmask="0x08"><!-- LCD RIGHT 4 --><bounds x="1057" y="227" width="35" height="31"/></element>
+		<element ref="lcd_soft_key" inputtag="cpanel:CP_SEG3" inputmask="0x10"><!-- LCD RIGHT 5 --><bounds x="1057" y="269" width="35" height="31"/></element>
+
+		<element ref="button_55x17" inputtag="cpanel:CP_SEG3" inputmask="0x20"><!-- -1 --><bounds x="1124" y="104" width="55" height="17"/></element>
+		<element ref="button_55x17" inputtag="cpanel:CP_SEG3" inputmask="0x40"><!-- +1 --><bounds x="1192" y="104" width="55" height="17"/></element>
+		<element ref="button_55x17" inputtag="cpanel:CP_SEG3" inputmask="0x80"><!-- EXIT --><bounds x="1158" y="353" width="55" height="17"/></element>
+
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG4" inputmask="0x01"><!-- Under-LCD 1, bottom --><bounds x="617" y="411" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG4" inputmask="0x02"><!-- Under-LCD 1, top --><bounds x="617" y="375" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG4" inputmask="0x04"><!-- Under-LCD 2, bottom --><bounds x="662" y="411" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG4" inputmask="0x08"><!-- Under-LCD 2, top --><bounds x="662" y="375" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG4" inputmask="0x10"><!-- Under-LCD 3, bottom --><bounds x="707" y="411" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG4" inputmask="0x20"><!-- Under-LCD 3, top --><bounds x="707" y="375" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG4" inputmask="0x40"><!-- Under-LCD 4, bottom --><bounds x="752" y="411" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG4" inputmask="0x80"><!-- Under-LCD 4, top --><bounds x="752" y="375" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG5" inputmask="0x01"><!-- Under-LCD 5, bottom --><bounds x="797" y="411" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG5" inputmask="0x02"><!-- Under-LCD 5, top --><bounds x="797" y="375" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG5" inputmask="0x04"><!-- Under-LCD 6, bottom --><bounds x="842" y="411" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG5" inputmask="0x08"><!-- Under-LCD 6, top --><bounds x="842" y="375" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG5" inputmask="0x10"><!-- Under-LCD 7, bottom --><bounds x="887" y="411" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG5" inputmask="0x20"><!-- Under-LCD 7, top --><bounds x="887" y="375" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG5" inputmask="0x40"><!-- Under-LCD 8, bottom --><bounds x="932" y="411" width="34" height="24"/></element>
+		<element ref="button_35x25_light" inputtag="cpanel:CP_SEG5" inputmask="0x80"><!-- Under-LCD 8, top --><bounds x="932" y="375" width="34" height="24"/></element>
+
+		<element ref="button_42x25"><!-- POWER BUTTON outer --><bounds x="133" y="77" width="59" height="43"/></element>
+		<element ref="button_42x25"><!-- POWER BUTTON inner --><bounds x="138" y="81" width="49" height="34"/></element>
+
+		<element ref="small_round_button"><!-- VOLUME knob body --><bounds x="138" y="146" width="51" height="51"/></element>
+		<element ref="indicator"><!-- VOLUME indicator (wire 0xD3) --><bounds x="170" y="180" width="6" height="6"/></element>
+
+		<element ref="small_round_button"><!-- CONTRAST knob body --><bounds x="149" y="226" width="27" height="27"/></element>
+		<element ref="indicator"><!-- CONTRAST indicator --><bounds x="164" y="232" width="6" height="6"/></element>
+
+		<element ref="small_round_button"><!-- PHONES outer --><bounds x="145" y="296" width="36" height="36"/></element>
+		<element ref="small_round_button"><!-- PHONES inner --><bounds x="152" y="304" width="22" height="22"/></element>
+
+		<element ref="menu_rule"><bounds x="367" y="67" width="84" height="1"/></element>
+		<element ref="menu_rule"><bounds x="245" y="67" width="84" height="1"/></element>
+
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG7" inputmask="0x01"><!-- MENU PART --><bounds x="244" y="101" width="42" height="25"/></element>
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG7" inputmask="0x02"><!-- MENU SYSTEM --><bounds x="299" y="101" width="42" height="25"/></element>
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG7" inputmask="0x04"><!-- MENU MIDI --><bounds x="354" y="101" width="42" height="25"/></element>
+		<element ref="button_42x25" inputtag="cpanel:CP_SEG7" inputmask="0x08"><!-- MENU DISK --><bounds x="409" y="101" width="42" height="25"/></element>
+
+		<element ref="large_round_button" inputtag="cpanel:CP_SEG8" inputmask="0x01"><!-- REALTIME CREATOR 1-6 --><bounds x="411" y="297" width="37" height="37"/></element>
+		<element ref="small_round_button" inputtag="cpanel:CP_SEG8" inputmask="0x02"><!-- REALTIME CREATOR RESET --><bounds x="417" y="160" width="24" height="24"/></element>
+		<element ref="lcd_soft_key" inputtag="cpanel:CP_SEG9" inputmask="0x01"><!-- LCD LEFT 1 (top) --><bounds x="492" y="100" width="35" height="31"/></element>
+		<element ref="lcd_soft_key" inputtag="cpanel:CP_SEG9" inputmask="0x02"><!-- LCD LEFT 2 --><bounds x="492" y="142" width="35" height="31"/></element>
+		<element ref="lcd_soft_key" inputtag="cpanel:CP_SEG9" inputmask="0x04"><!-- LCD LEFT 3 --><bounds x="492" y="184" width="35" height="31"/></element>
+		<element ref="lcd_soft_key" inputtag="cpanel:CP_SEG9" inputmask="0x08"><!-- LCD LEFT 4 --><bounds x="492" y="227" width="35" height="31"/></element>
+		<element ref="lcd_soft_key" inputtag="cpanel:CP_SEG9" inputmask="0x10"><!-- LCD LEFT 5 --><bounds x="492" y="269" width="35" height="31"/></element>
+		<element id="data_wheel" ref="data_wheel"><!-- DATA ENTRY DIAL body --><bounds x="1110" y="164" width="154" height="154"/></element>
+		<element id="data_wheel_finger" ref="data_wheel_finger"><!-- DATA ENTRY DIAL finger dimple --><bounds x="1176" y="262" width="45" height="45"/></element>
+
+		<element id="realtime_creator_wheel" ref="data_wheel"><!-- REALTIME CREATOR body --><bounds x="244" y="164" width="154" height="154"/></element>
+		<element id="realtime_creator_ball" ref="data_wheel"><!-- REALTIME CREATOR ball --><bounds x="264" y="184" width="113" height="113"/></element>
+		<element id="realtime_creator_finger" ref="data_wheel_finger"><!-- REALTIME CREATOR dimple --><bounds x="304" y="223" width="33" height="33"/></element>
+
+		<element name="led8" ref="led_green"><!-- PLAY MODE SOUND (D116) --><bounds x="1276" y="297" width="6" height="6"/></element>
+		<element name="led9" ref="led_green"><!-- PLAY MODE COMBI (D117) --><bounds x="1333" y="297" width="6" height="6"/></element>
+		<element name="led10" ref="led_green"><!-- EDIT MODE SOUND (D118) --><bounds x="1389" y="297" width="6" height="6"/></element>
+		<element name="led11" ref="led_green"><!-- EDIT MODE COMBI (D119) --><bounds x="1445" y="297" width="6" height="6"/></element>
+		<element name="led0" ref="led_red"><!-- BANK USER 1 (D120) --><bounds x="1276" y="364" width="6" height="6"/></element>
+		<element name="led1" ref="led_red"><!-- BANK USER 2 (D121) --><bounds x="1333" y="364" width="6" height="6"/></element>
+		<element name="led2" ref="led_red"><!-- BANK ROM/EXT (D122) --><bounds x="1389" y="364" width="6" height="6"/></element>
+		<element name="led3" ref="led_red"><!-- BANK RE-MAP (D123) --><bounds x="1445" y="364" width="6" height="6"/></element>
+		<element name="led32" ref="led_green"><!-- MENU PART (D160) --><bounds x="263" y="77" width="6" height="6"/></element>
+		<element name="led33" ref="led_green"><!-- MENU SYSTEM (D161) --><bounds x="318" y="77" width="6" height="6"/></element>
+		<element name="led40" ref="led_green"><!-- MENU MIDI (D162) --><bounds x="372" y="77" width="6" height="6"/></element>
+		<element name="led41" ref="led_green"><!-- MENU DISK (D163) --><bounds x="427" y="77" width="6" height="6"/></element>
+		<element name="led50" ref="led_red"><!-- COMPARE (D130) --><bounds x="545" y="367" width="6" height="6"/></element>
+		<element name="led51" ref="led_green"><!-- MIDI / NUMBER PAD (D131) --><bounds x="1124" y="68" width="6" height="6"/></element>
+		<element ref="led_red"><!-- UNBOUND: REALTIME CREATOR ring, top ; one of led16/17/24/25 - not decoded --><bounds x="318" y="143" width="6" height="6"/></element>
+		<element ref="led_red"><!-- UNBOUND: REALTIME CREATOR ring, right ; one of led16/17/24/25 - not decoded --><bounds x="410" y="236" width="6" height="6"/></element>
+		<element ref="led_red"><!-- UNBOUND: REALTIME CREATOR ring, bottom ; one of led16/17/24/25 - not decoded --><bounds x="318" y="329" width="6" height="6"/></element>
+		<element ref="led_red"><!-- UNBOUND: REALTIME CREATOR ring, left ; one of led16/17/24/25 - not decoded --><bounds x="224" y="236" width="6" height="6"/></element>
+		<element name="check_led" ref="led_red"><!-- service checking device (CN4) --><bounds x="80" y="474" width="6" height="6"/></element>
+
+		<element ref="lbl_MENU"><!-- MENU --><bounds x="331" y="61" width="34" height="13"/></element>
+		<element ref="lbl_PART"><!-- PART --><bounds x="253" y="85" width="26" height="13"/></element>
+		<element ref="lbl_SYSTEM"><!-- SYSTEM --><bounds x="299" y="85" width="43" height="13"/></element>
+		<element ref="lbl_MIDI"><!-- MIDI --><bounds x="363" y="85" width="24" height="13"/></element>
+		<element ref="lbl_DISK"><!-- DISK --><bounds x="416" y="85" width="25" height="13"/></element>
+		<element ref="lbl_ACOUSTIC_MODELING_SYNTHESIZER_MODULE"><!-- ACOUSTIC MODELING SYNTHESIZER MODULE --><bounds x="753" y="58" width="160" height="14"/></element>
+		<element ref="lbl_SX"><!-- SX --><bounds x="919" y="59" width="15" height="12"/></element>
+		<element ref="lbl_MINUS"><!--  --><bounds x="934" y="53" width="6" height="19"/></element>
+		<element ref="lbl_WSA1R"><!-- WSA1R --><bounds x="943" y="48" width="69" height="25"/></element>
+		<element ref="lbl_REALTIME"><!-- REALTIME --><bounds x="227" y="142" width="51" height="12"/></element>
+		<element ref="lbl_CREATOR"><!-- CREATOR --><bounds x="228" y="152" width="50" height="12"/></element>
+		<element ref="lbl_RESET"><!-- RESET --><bounds x="412" y="145" width="34" height="12"/></element>
+		<element ref="lbl_VOLUME"><!-- VOLUME --><bounds x="141" y="125" width="44" height="12"/></element>
+		<element ref="lbl_MIN"><!-- MIN --><bounds x="120" y="193" width="20" height="12"/></element>
+		<element ref="lbl_CONTRAST"><!-- CONTRAST --><bounds x="134" y="212" width="58" height="12"/></element>
+		<element ref="lbl_ON"><!-- ON --><bounds x="95" y="86" width="16" height="12"/></element>
+		<element ref="lbl_OFF"><!-- OFF --><bounds x="95" y="96" width="21" height="12"/></element>
+		<element ref="lbl_POWER"><!-- POWER --><bounds x="142" y="61" width="43" height="14"/></element>
+		<element ref="lbl_PHONES"><!-- PHONES --><bounds x="140" y="282" width="44" height="12"/></element>
+		<element ref="lbl_1_6"><!-- 1-6 --><bounds x="420" y="281" width="17" height="12"/></element>
+		<element ref="lbl_MAX"><!-- MAX --><bounds x="186" y="193" width="24" height="12"/></element>
+		<element ref="lbl_COMPARE"><!-- COMPARE --><bounds x="521" y="376" width="52" height="12"/></element>
+		<element ref="lbl_PAGE"><!-- PAGE --><bounds x="1040" y="398" width="28" height="12"/></element>
+		<element ref="lbl_EXIT"><!-- EXIT --><bounds x="1175" y="338" width="24" height="13"/></element>
+		<element ref="lbl_USER_1"><!-- USER 1 --><bounds x="1261" y="374" width="39" height="12"/></element>
+		<element ref="lbl_USER_2"><!-- USER 2 --><bounds x="1316" y="374" width="39" height="12"/></element>
+		<element ref="lbl_ROM_EXT"><!-- ROM/EXT --><bounds x="1367" y="374" width="49" height="11"/></element>
+		<element ref="lbl_RE_MAP"><!-- RE-MAP --><bounds x="1427" y="374" width="40" height="13"/></element>
+		<element ref="lbl_1"><!-- 1 --><bounds x="1277" y="415" width="7" height="13"/></element>
+		<element ref="lbl_2"><!-- 2 --><bounds x="1332" y="415" width="7" height="13"/></element>
+		<element ref="lbl_3_GM"><!-- 3(GM) --><bounds x="1376" y="415" width="33" height="12"/></element>
+		<element ref="lbl_COMBI"><!-- COMBI --><bounds x="1317" y="306" width="36" height="12"/></element>
+		<element ref="lbl_SOUND"><!-- SOUND --><bounds x="1260" y="306" width="39" height="12"/></element>
+		<element ref="lbl_ENTER"><!-- ENTER --><bounds x="1430" y="225" width="35" height="13"/></element>
+		<element ref="lbl_PLUS_MINUS"><!-- +/ --><bounds x="1376" y="225" width="17" height="11"/></element>
+		<element ref="lbl_0"><!-- 0 --><bounds x="1320" y="225" width="6" height="12"/></element>
+		<element ref="lbl_1"><!-- 1 --><bounds x="1320" y="180" width="7" height="13"/></element>
+		<element ref="lbl_2"><!-- 2 --><bounds x="1382" y="179" width="7" height="12"/></element>
+		<element ref="lbl_3"><!-- 3 --><bounds x="1445" y="180" width="7" height="12"/></element>
+		<element ref="lbl_6"><!-- 6 --><bounds x="1445" y="134" width="7" height="12"/></element>
+		<element ref="lbl_9"><!-- 9 --><bounds x="1445" y="89" width="6" height="12"/></element>
+		<element ref="lbl_8"><!-- 8 --><bounds x="1382" y="89" width="6" height="12"/></element>
+		<element ref="lbl_7"><!-- 7 --><bounds x="1320" y="89" width="7" height="13"/></element>
+		<element ref="lbl_4"><!-- 4 --><bounds x="1321" y="134" width="6" height="12"/></element>
+		<element ref="lbl_5"><!-- 5 --><bounds x="1382" y="134" width="7" height="12"/></element>
+		<element ref="lbl_PLUS_1"><!-- +1 --><bounds x="1211" y="88" width="16" height="13"/></element>
+		<element ref="lbl_MINUS_1"><!-- -1 --><bounds x="1149" y="88" width="10" height="13"/></element>
+		<element ref="lbl_MIDI_NUMBER_PAD"><!-- MIDI / NUMBER PAD --><bounds x="1135" y="66" width="87" height="13"/></element>
+		<element ref="lbl_COMBI"><!-- COMBI --><bounds x="1429" y="306" width="36" height="12"/></element>
+		<element ref="lbl_SOUND"><!-- SOUND --><bounds x="1372" y="306" width="39" height="12"/></element>
+		<element ref="lbl_EDIT"><!-- EDIT --><bounds x="1386" y="278" width="26" height="14"/></element>
+		<element ref="lbl_MODE"><!-- MODE --><bounds x="1418" y="278" width="34" height="14"/></element>
+		<element ref="lbl_MODE"><!-- MODE --><bounds x="1308" y="278" width="35" height="14"/></element>
+		<element ref="lbl_PLAY"><!-- PLAY --><bounds x="1274" y="278" width="27" height="14"/></element>
+		<element ref="lbl_BANK"><!-- BANK --><bounds x="1320" y="347" width="31" height="13"/></element>
+		<element ref="lbl_MAINCPU"><!-- MAINCPU --><bounds x="26" y="471" width="49" height="12"/></element>
+	</group>
+
+	<view name="Control Panel">
+		<bounds x="0" y="0" width="1600" height="500"/>
+		<group ref="panel"><bounds x="0" y="0" width="1600" height="500"/></group>
+	</view>
+
+	<view name="Screen close-up">
+		<bounds x="482" y="38" width="622" height="407"/>
+		<group ref="panel"><bounds x="0" y="0" width="1600" height="500"/></group>
+	</view>
+
+	<script><![CDATA[
+		-- Slider and knob library starts.
+		-- Can be copied as-is to other layouts.
+		-----------------------------------------------------------------------
+		-- Widgets are stored PER VIEW. A single shared list is WRONG when the same control is registered in
+		-- more than one view (e.g. a Compact view plus a single-block view): each view has its own coordinate
+		-- normalisation, so a pointer hit-test in view A against a widget's bounds registered for view B gives
+		-- false matches (symptom: clicking near one control in one view drags a slider that "lives" in another
+		-- view whose normalised bounds happen to overlap). Keying the widget list by view fixes that.
+		local view_widgets = {}   -- view (userdata) -> list of its widgets
+		local active_wl = nil     -- widget list of the view whose pointer last moved (for the frame wheel poll)
+		local pointers = {}       -- Tracks pointer state (keyed by pointer id).
+		local hover_x, hover_y = -1, -1   -- last pointer position (for wheel-over-widget hit testing)
+
+		local function widget_list(view)
+			local wl = view_widgets[view]
+			if wl == nil then wl = {}; view_widgets[view] = wl end
+			return wl
+		end
+
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_vertical_slider(view, clickarea_id, knob_id, port_name)
+			table.insert(widget_list(view), {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = get_port_field(port_name),
+				is_knob     = false })
+		end
+
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixes.
+		function add_simplecounter_knob(view, clickarea_id, port_name, scale)
+			table.insert(widget_list(view), {
+				clickarea = get_layout_item(view, clickarea_id),
+				field     = get_port_field(port_name),
+				is_knob   = true,
+				scale     = scale })
+		end
+
+		-- An INFINITE rotary knob (e.g. the TEMPO/PROGRAM wheel). A circular drag rotates the `finger_id`
+		-- element around the knob centre and steps the attached relative encoder (a wrapping IPT_POSITIONAL the
+		-- device diffs wrap-aware). `finger_id` is repositioned every frame via set_bounds_callback; the running
+		-- angle accumulates without limit, so the finger just keeps going round and round.
+		-- Every rotary knob, for the per-frame finger update. MUST be declared before
+		-- add_rotary_knob(): a Lua local is not visible to code written above it.
+		local rotary_widgets = {}
+
+		-- `drag_port_name` is written by this script; `key_port_name` is the control the KEYS and the
+		-- mouse axis drive, which the script only ever READS. They cannot be the same field: an
+		-- analog field's only Lua write path, set_value(), latches m_use_adjoverride permanently and
+		-- detaches the field from the input system, so one drag would kill the keys for the rest of
+		-- the session. An adjuster's user_value has no such side effect, and the device sums both.
+		function add_rotary_knob(view, clickarea_id, finger_id, drag_port_name, key_port_name)
+			local w = {
+				clickarea = get_layout_item(view, clickarea_id),
+				finger    = get_layout_item(view, finger_id),
+				field     = get_port_field(drag_port_name),
+				key_field = get_port_field(key_port_name),
+				is_rotary = true,
+				angle     = 0.0,   -- running GESTURE angle (radians), unbounded: pointer input
+				display   = 0.0,   -- running DISPLAY angle: follows the value, whatever moved it
+				notch     = 0 }    -- last encoder notch emitted
+			table.insert(widget_list(view), w)
+			table.insert(rotary_widgets, w)
+			-- The finger orbits the knob centre at the current angle (0 = 12 o'clock, clockwise positive).
+			-- item.bounds is normalised PER-AXIS (x by view width, y by view height), so a screen-circular
+			-- orbit needs the x offset scaled by the click area's normalised WIDTH and the y offset by its
+			-- normalised HEIGHT (the click area is square in view units, so these encode the pixel aspect).
+			-- Orbit radius 0.24 keeps the finger (half-size 0.148) fully inside the wheel (r 0.48) with an
+			-- internal margin; the wheel is square in view units so scale x by width, y by height.
+			w.finger:set_bounds_callback(function()
+				local b = w.clickarea.bounds
+				local cx = (b.x0 + b.x1) / 2
+				local cy = (b.y0 + b.y1) / 2
+				local wd = b.x1 - b.x0
+				local ht = b.y1 - b.y0
+				local fx = cx + wd * 0.24 * math.sin(w.display)
+				local fy = cy - ht * 0.24 * math.cos(w.display)
+				local fhx = wd * 0.148
+				local fhy = ht * 0.148
+				return emu.render_bounds(fx - fhx, fy - fhy, fx + fhx, fy + fhy)
+			end)
+			return w
+		end
+
+		function get_layout_item(view, item_id)
+			local item = view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function get_port_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			for k, val in pairs(port.fields) do
+				field = val
+				break
+			end
+			if field == nil then
+				emu.print_error("Port: '" .. port_name .."' does not seem to be an IPT_ADJUSTER.")
+				return nil
+			end
+			return field
+		end
+
+		-- Step the rotary encoder: map the accumulated angle to notches and nudge the control by the
+		-- notch delta (wrapping). The device diffs the position wrap-aware into [0x17] encoder steps.
+		local ROTARY_STEPS_PER_REV = 24
+		local function rotary_emit(w)
+			local target = math.floor(w.angle * ROTARY_STEPS_PER_REV / (2 * math.pi) + 0.5)
+			if target ~= w.notch then
+				-- Writes the DRAG adjuster via user_value: the one route that does not latch the
+				-- field away from MAME's input system. The device diffs it wrap-aware at 101.
+				local v = (w.field.user_value + (target - w.notch)) % 101
+				if v < 0 then v = v + 101 end
+				w.field.user_value = v
+				w.notch = target
+			end
+		end
+
+		-- Pointer angle around a widget's knob centre (0 = 12 o'clock, clockwise positive). Per-axis
+		-- normalisation (by width, by height) matches the finger's aspect-corrected orbit, so the finger
+		-- tracks the cursor faithfully all the way round instead of leading/lagging near the sides.
+		local function knob_angle(w, x, y)
+			local b = w.clickarea.bounds
+			local cx = (b.x0 + b.x1) / 2
+			local cy = (b.y0 + b.y1) / 2
+			return math.atan((x - cx) / (b.x1 - b.x0), (cy - y) / (b.y1 - b.y0))
+		end
+
+		-- Mouse-WHEEL editing for rotary knobs. MAME's layout pointer API does NOT deliver wheel events,
+		-- so we read the mouse device's relative Z axis directly each frame (the sandbox exposes `machine`,
+		-- hence machine.input). One detent = 120 * RELATIVE_PER_PIXEL(512) = 61440 accumulator units
+		-- (SDL osd: m_v += wheel.y * 120 * RELATIVE_PER_PIXEL). Each notch nudges the finger and the encoder
+		-- exactly like a click of a drag, but only while the cursor hovers over the wheel.
+		local WHEEL_PER_NOTCH = 120 * 512
+		local wheel_item, wheel_probed, wheel_accum = nil, false, 0
+		local function find_wheel_item()
+			local input = machine.input
+			if input == nil then return nil end
+			local classes = input.device_classes
+			if classes == nil then return nil end
+			local mouse = classes["mouse"]
+			if mouse == nil then return nil end
+			for _, mdev in pairs(mouse.devices) do
+				for _, it in pairs(mdev.items) do
+					if it.token == "ZAXIS" then return it end   -- first mouse's wheel axis
+				end
+			end
+			return nil
+		end
+		-- The knob graphic must turn for whatever moved the wheel -- keys, mouse axis, pointer drag or
+		-- scroll wheel -- so it is driven by the summed wrap-aware DELTA of both controls rather than
+		-- by the drag gesture. Driving it from either control's absolute value would make it jump
+		-- whenever the other one moved.
+		local function wrapped_delta(cur, prev, modulus)
+			local d = cur - prev
+			if d > modulus / 2 then d = d - modulus
+			elseif d < -modulus / 2 then d = d + modulus end
+			return d
+		end
+
+		local function follow_rotary_values()
+			local step = 2 * math.pi / ROTARY_STEPS_PER_REV
+			for i = 1, #rotary_widgets do
+				local w = rotary_widgets[i]
+				if w.field and w.key_field then
+					local kv = w.key_field.port:read() % ROTARY_STEPS_PER_REV
+					local dv = w.field.port:read() % 101
+					if not w.synced then
+						w.key_prev, w.drag_prev, w.synced = kv, dv, true
+					else
+						local d = wrapped_delta(kv, w.key_prev, ROTARY_STEPS_PER_REV)
+								+ wrapped_delta(dv, w.drag_prev, 101)
+						w.key_prev, w.drag_prev = kv, dv
+						if d ~= 0 then w.display = w.display + d * step end
+					end
+				end
+			end
+		end
+
+		function poll_rotary_wheels()
+			if not wheel_probed then wheel_item = find_wheel_item(); wheel_probed = true end
+			if wheel_item == nil or active_wl == nil then return end
+			local dv = machine.input:code_value(wheel_item.code)
+			if dv == 0 then return end
+			-- find a rotary widget (in the ACTIVE view) under the cursor's last-known position
+			local target = nil
+			for i = 1, #active_wl do
+				if active_wl[i].is_rotary and active_wl[i].clickarea.bounds:includes(hover_x, hover_y) then
+					target = active_wl[i]; break
+				end
+			end
+			if target == nil then wheel_accum = 0; return end
+			wheel_accum = wheel_accum + dv
+			local step = 2 * math.pi / ROTARY_STEPS_PER_REV
+			while wheel_accum >= WHEEL_PER_NOTCH do
+				wheel_accum = wheel_accum - WHEEL_PER_NOTCH
+				target.angle = target.angle + step   -- scroll up: turn clockwise / increase
+				rotary_emit(target)
+			end
+			while wheel_accum <= -WHEEL_PER_NOTCH do
+				wheel_accum = wheel_accum + WHEEL_PER_NOTCH
+				target.angle = target.angle - step
+				rotary_emit(target)
+			end
+		end
+
+		-- `wl` is the widget list of the view this callback was installed on (see install_slider_callbacks).
+		-- Only widgets belonging to THIS view are hit-tested, so a click never matches another view's control.
+		local function pointer_updated(wl, type, id, dev, x, y, btn, dn, up, cnt)
+			hover_x, hover_y = x, y   -- remember where the cursor is, so the wheel poll can hit-test it
+			active_wl = wl            -- this is the view the user is interacting with
+
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				pointers[id] = nil
+				return
+			end
+
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #wl do
+					local found, relative
+					if wl[i].slider_knob and wl[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif wl[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
+						pointers[id] = {
+							selected_wl = wl,
+							selected_widget = i,
+							relative = relative,
+							start_y = y,
+							start_value = wl[i].field.user_value }
+						if wl[i].is_rotary then
+							pointers[id].last_pa = knob_angle(wl[i], x, y)
+						end
+						break
+					end
+				end
+			end
+
+			-- If there is no widget selected by the current pointer, we are done.
+			if pointers[id] == nil then
+				return
+			end
+
+			-- A widget is selected. Update its state based on the pointer's Y
+			-- position. It is assumed the attached IO field is an IPT_ADJUSTER.
+
+			local pointer = pointers[id]
+			local widget = pointer.selected_wl[pointer.selected_widget]
+
+			-- Rotary knob: rotate the finger by the pointer's angular motion and step the encoder. The angle
+			-- accumulates without limit, so it can be spun round and round (24 encoder steps per revolution).
+			if widget.is_rotary then
+				local pa = knob_angle(widget, x, y)
+				local d = pa - pointer.last_pa
+				if d > math.pi then d = d - 2 * math.pi elseif d < -math.pi then d = d + 2 * math.pi end
+				widget.angle = widget.angle + d
+				pointer.last_pa = pa
+				rotary_emit(widget)
+				return
+			end
+
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
+			local new_value
+			if widget.is_knob then
+				local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+				new_value = pointer.start_value + (pointer.start_y - y) * step_y
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
+				end
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
+			widget.field.user_value = new_value
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			pointers[id] = nil
+		end
+
+		local function forget_pointers()
+			pointers = {}
+		end
+
+		function install_slider_callbacks(view)
+			local wl = widget_list(view)
+			view:set_pointer_updated_callback(function(type, id, dev, x, y, btn, dn, up, cnt)
+				pointer_updated(wl, type, id, dev, x, y, btn, dn, up, cnt)
+			end)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+
+		-- SX-WSA1R DATA ENTRY DIAL (ESW1 QSRGT002AA on CP1, wire 0xD7) and VOLUME
+		-- (VR1 5k B on CP2 -> CP1 R36 -> IC1 AD3, wire 0xD3).
+		--
+		-- The dial is an INFINITE relative encoder: only its CHANGES reach the
+		-- firmware, so the wheel is dragged in a circle and the DRAG ADJUSTER is
+		-- nudged notch by notch.  It cannot be the same field as CP_DIAL: an analog
+		-- field's only Lua write path, set_value(), latches m_use_adjoverride and
+		-- detaches the field from the input system for good.  wsa1r_cpanel.cpp sums
+		-- the wrap-aware delta of both.
+		--
+		-- VOLUME is a plain absolute pot, so a vertical drag over the knob is enough.
+		-- Felipe's drawn pointer does NOT turn with it: a MAME layout item can be
+		-- moved by a Lua bounds callback but not rotated, and inventing a second
+		-- orbiting marker would contradict the drawing.  The value is visible in the
+		-- machine's own display, and in MAME's slider menu.
+		file:set_resolve_tags_callback(function()
+			for vname, view in pairs(file.views) do
+				if view.items["data_wheel"] ~= nil and view.items["data_wheel_finger"] ~= nil then
+					add_rotary_knob(view, "data_wheel", "data_wheel_finger",
+										"cpanel:CP_DIAL_DRAG", "cpanel:CP_DIAL")
+				end
+				if view.items["volume_knob"] ~= nil then
+					add_simplecounter_knob(view, "volume_knob", "cpanel:CP_VOLUME", 1.0)
+				end
+				install_slider_callbacks(view)
+			end
+		end)
+		return { frame = function() poll_rotary_wheels(); follow_rotary_values() end }
+	]]></script>
+</mamelayout>

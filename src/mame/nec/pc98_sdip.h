@@ -10,7 +10,7 @@
 
 
 class pc98_sdip_device : public device_t,
-						  public device_nvram_interface
+						 public device_nvram_interface
 {
 public:
 	pc98_sdip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -45,8 +45,38 @@ private:
 	bool m_bank = 0;
 };
 
+class pc98_ext_sdip_device : public device_t,
+						     public device_nvram_interface
+{
+public:
+	pc98_ext_sdip_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	u8 data_r(offs_t offset);
+	void data_w(offs_t offset, u8 data);
+	void access_w(offs_t offset, u8 data);
+	void address_w(offs_t offset, u8 data);
+
+	// legacy i/f
+	// TODO: as above applied to the newer format
+//	ioport_value dsw1_r() { return m_sdip_ram[0] | 1; }
+//	ioport_value dsw2_r() { return (m_sdip_ram[1] & 0xef) | (BIT(m_sdip_ram[3], 5) << 4); }
+//	ioport_value dsw3_r() { return (fdc_setting) | (m_sdip_ram[2] & 0x7c) | (0 << 7); }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void nvram_default() override;
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
+private:
+	u8 m_sdip_ram[0x100];
+	const u16 m_sdip_size = 0x100;
+	u8 m_address;
+};
 
 // device type definition
-DECLARE_DEVICE_TYPE(PC98_SDIP, pc98_sdip_device)
+DECLARE_DEVICE_TYPE(PC98_SDIP,     pc98_sdip_device)
+DECLARE_DEVICE_TYPE(PC98_EXT_SDIP, pc98_ext_sdip_device)
 
 #endif // MAME_NEC_PC98_SDIP_H

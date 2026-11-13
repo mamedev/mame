@@ -382,7 +382,7 @@ void meritum_state::meritum1(machine_config &config)
 	PIT8253(config, "audiopit"); // optional audio interface
 
 	// video
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(10_MHz_XTAL, 107 * 6, 0, 64 * 6, 312, 0, 192);
 	m_screen->set_screen_update(FUNC(meritum_state::screen_update_meritum1));
 	m_screen->set_palette("palette");

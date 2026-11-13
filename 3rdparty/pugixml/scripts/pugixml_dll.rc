@@ -1,0 +1,45 @@
+#include <winver.h>
+
+#define PUGIXML_VERSION_MAJOR 1
+#define PUGIXML_VERSION_MINOR 16
+#define PUGIXML_VERSION_PATCH 0
+#define PUGIXML_VERSION_NUMBER "1.16.0\0"
+
+#if defined(GCC_WINDRES) || defined(__MINGW32__) || defined(__CYGWIN__)
+VS_VERSION_INFO		VERSIONINFO
+#else
+VS_VERSION_INFO		VERSIONINFO	MOVEABLE IMPURE LOADONCALL DISCARDABLE
+#endif
+  FILEVERSION		PUGIXML_VERSION_MAJOR,PUGIXML_VERSION_MINOR,PUGIXML_VERSION_PATCH,0
+  PRODUCTVERSION	PUGIXML_VERSION_MAJOR,PUGIXML_VERSION_MINOR,PUGIXML_VERSION_PATCH,0
+  FILEFLAGSMASK		VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+  FILEFLAGS		1
+#else
+  FILEFLAGS		0
+#endif
+  FILEOS		VOS__WINDOWS32
+  FILETYPE		VFT_DLL
+  FILESUBTYPE		0	// not used
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    //language ID = U.S. English, char set = Windows, Multilingual
+    BEGIN
+      VALUE "CompanyName",	"zeux/pugixml\0"
+      VALUE "FileDescription",	"pugixml library\0"
+      VALUE "FileVersion",	PUGIXML_VERSION_NUMBER
+      VALUE "InternalName",	"pugixml.dll\0"
+      VALUE "LegalCopyright",	"Copyright (C) 2006-2026, by Arseny Kapoulkine\0"
+      VALUE "OriginalFilename",	"pugixml.dll\0"
+      VALUE "ProductName",	"pugixml\0"
+      VALUE "ProductVersion",	PUGIXML_VERSION_NUMBER
+      VALUE "Comments",		"For more information visit https://github.com/zeux/pugixml/\0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x0409, 1252
+  END
+END

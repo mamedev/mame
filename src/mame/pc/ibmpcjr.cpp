@@ -20,6 +20,7 @@ TODO:
 #include "imagedev/cassette.h"
 #include "machine/i8255.h"
 #include "machine/ins8250.h"
+#include "machine/mc14529.h"
 #include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "machine/pic8259.h"
@@ -55,7 +56,7 @@ public:
 		m_pit8253(*this, "pit8253"),
 		m_speaker(*this, "speaker"),
 		m_cassette(*this, "cassette"),
-		m_sn76496(*this, "sn76496"),
+		m_audiomux(*this, "audiomux"),
 		m_cart1(*this, "cartslot1"),
 		m_cart2(*this, "cartslot2"),
 		m_ram(*this, RAM_TAG),
@@ -85,7 +86,7 @@ private:
 	required_device<pit8253_device> m_pit8253;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cassette;
-	required_device<sn76496_device> m_sn76496;
+	required_device<mc14529_device> m_audiomux;
 	required_device<generic_slot_device> m_cart1;
 	required_device<generic_slot_device> m_cart2;
 	required_device<ram_device> m_ram;
@@ -372,9 +373,8 @@ void pcjr_state::pcjr_ppi_portb_w(uint8_t data)
 	// X1 - CASS AUDIO TO MUX
 	// X2 - AUDIO INPUT
 	// X3 - SN76496N AUDIO
-	m_speaker->set_output_gain(0, (data & 0x60) == 0x00 ? 1.0 : 0.0);
-	m_cassette->set_output_gain(0, (data & 0x60) == 0x20 ? 1.0 : 0.0);
-	m_sn76496->set_output_gain(0, (data & 0x60) == 0x60 ? 1.0 : 0.0);
+	m_audiomux->a0_w(BIT(data, 5));
+	m_audiomux->a1_w(BIT(data, 6));
 }
 
 /*
@@ -618,7 +618,7 @@ void pcjr_state::ibmpcjr_io(address_map &map)
 	map(0x0040, 0x0043).rw(m_pit8253, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
 	map(0x0060, 0x0063).rw("ppi8255", FUNC(i8255_device::read), FUNC(i8255_device::write));
 	map(0x00a0, 0x00a0).rw(FUNC(pcjr_state::pcjr_nmi_enable_r), FUNC(pcjr_state::pc_nmi_enable_w));
-	map(0x00c0, 0x00c0).w(m_sn76496, FUNC(sn76496_device::write));
+	map(0x00c0, 0x00c0).w("sn76496", FUNC(sn76496_device::write));
 	map(0x00f2, 0x00f2).w(FUNC(pcjr_state::pcjr_fdc_dor_w));
 	map(0x00f4, 0x00f5).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x0200, 0x0207).rw("pc_joy", FUNC(pc_joy_device::joy_port_r), FUNC(pc_joy_device::joy_port_w));
@@ -692,8 +692,12 @@ void pcjr_state::ibmpcjr(machine_config &config)
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.80);
-	SN76496(config, m_sn76496, XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, "mono", 0.80);
+	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, m_audiomux, 0.80, 0);
+	SN76496(config, "sn76496", XTAL(14'318'181)/4).add_route(ALL_OUTPUTS, m_audiomux, 0.80, 3);
+
+	MC14529(config, m_audiomux);
+	m_audiomux->set_mode(0, mc14529_device::MODE_SOUND); // second channel is unused
+	m_audiomux->add_route(0, "mono", 1.0);
 
 	/* printer */
 	pc_lpt_device &lpt0(PC_LPT(config, "lpt_0"));
@@ -704,7 +708,7 @@ void pcjr_state::ibmpcjr(machine_config &config)
 	/* cassette */
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	m_cassette->add_route(ALL_OUTPUTS, m_audiomux, 0.05, 1);
 
 	UPD765A(config, m_fdc, 16_MHz_XTAL / 4, false, false); // clocked through SED9420C
 

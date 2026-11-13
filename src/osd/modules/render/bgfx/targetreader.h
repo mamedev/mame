@@ -28,6 +28,9 @@ private:
 
 	static const int STYLE_COUNT = 3;
 	static const string_to_enum STYLE_NAMES[STYLE_COUNT];
+
+	static const int FORMAT_COUNT = 4;
+	static const string_to_enum FORMAT_NAMES[FORMAT_COUNT];
 };
 
 #endif // MAME_RENDER_BGFX_TARGETREADER_H

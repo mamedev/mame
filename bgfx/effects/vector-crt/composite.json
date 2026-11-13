@@ -1,0 +1,13 @@
+{
+	"blend": { "equation": "add", "srcColor": "1", "dstColor": "1", "srcAlpha": "1", "dstAlpha": "1" },
+	"depth": { "function": "always", "writeenable": false },
+	"cull": { "mode": "none" },
+	"write": { "rgb": true, "alpha": false },
+	"vertex": "chains/vector-crt/vs_post",
+	"fragment": "chains/vector-crt/fs_composite",
+	"uniforms": [
+		{ "name": "s_accum", "type": "int", "values": [ 0 ] },
+		{ "name": "s_bloom", "type": "int", "values": [ 1 ] },
+		{ "name": "u_composite", "type": "vec4", "values": [ 0.8, 1.0, 2.2, 0.1 ] }
+	]
+}

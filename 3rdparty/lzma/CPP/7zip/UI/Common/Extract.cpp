@@ -2,8 +2,6 @@
 
 #include "StdAfx.h"
 
-#include "../../../../C/Sort.h"
-
 #include "../../../Common/StringConvert.h"
 
 #include "../../../Windows/FileDir.h"
@@ -56,19 +54,27 @@ static HRESULT DecompressArchive(
   UStringVector removePathParts;
 
   FString outDir = options.OutputDir;
-  UString replaceName = arc.DefaultName;
-  
-  if (arcLink.Arcs.Size() > 1)
+  if (options.OutDirMode != NExtractOutDirMode::k_Direct)
   {
-    // Most "pe" archives have same name of archive subfile "[0]" or ".rsrc_1".
-    // So it extracts different archives to one folder.
-    // We will use top level archive name
-    const CArc &arc0 = arcLink.Arcs[0];
-    if (arc0.FormatIndex >= 0 && StringsAreEqualNoCase_Ascii(codecs->Formats[(unsigned)arc0.FormatIndex].Name, "pe"))
-      replaceName = arc0.DefaultName;
+    UString replaceName = arc.DefaultName;
+    if (arcLink.Arcs.Size() > 1)
+    {
+      // Most "pe" archives have same name of archive subfile "[0]" or ".rsrc_1".
+      // So it extracts different archives to one folder.
+      // We will use top level archive name
+      const CArc &arc0 = arcLink.Arcs[0];
+      if (arc0.FormatIndex >= 0 && StringsAreEqualNoCase_Ascii(codecs->Formats[(unsigned)arc0.FormatIndex].Name, "pe"))
+        replaceName = arc0.DefaultName;
+    }
+    const FString correctedName = us2fs(Get_Correct_FsFile_Name(replaceName));
+    if (options.OutDirMode == NExtractOutDirMode::k_AddArcName)
+    {
+      outDir += correctedName;
+      NFile::NName::NormalizeDirPathPrefix(outDir);
+    }
+    else // eo.OutDirMode == NExtractOutDirMode::k_ReplaceAsterisk;
+      outDir.Replace(FString("*"), correctedName);
   }
-
-  outDir.Replace(FString("*"), us2fs(Get_Correct_FsFile_Name(replaceName)));
 
   bool elimIsPossible = false;
   UString elimPrefix; // only pure name without dir delimiter
@@ -201,6 +207,8 @@ static HRESULT DecompressArchive(
       removePathParts, false,
       packSize);
 
+  ecs->Is_elimPrefix_Mode = elimIsPossible;
+
   
   #ifdef SUPPORT_LINKS
   
@@ -227,7 +235,13 @@ static HRESULT DecompressArchive(
       ConvertPropVariantToUInt64(prop, stdInProcessed);
   }
   else
-    result = archive->Extract(&realIndices.Front(), realIndices.Size(), testMode, ecs);
+  {
+    // v23.02: we reset completed value that could be set by Open() operation
+    IArchiveExtractCallback *aec = ecs;
+    const UInt64 val = 0;
+    RINOK(aec->SetCompleted(&val))
+    result = archive->Extract(realIndices.ConstData(), realIndices.Size(), testMode, aec);
+  }
   
   const HRESULT res2 = ecsCloser.Close();
   if (result == S_OK)
@@ -349,11 +363,10 @@ HRESULT Extract(
     if (options.StdInMode)
     {
       // do we need ctime and mtime?
-      fi.ClearBase();
-      fi.Size = 0; // (UInt64)(Int64)-1;
-      fi.SetAsFile();
-      // NTime::GetCurUtc_FiTime(fi.MTime);
-      // fi.CTime = fi.ATime = fi.MTime;
+      // fi.ClearBase();
+      // fi.Size = 0; // (UInt64)(Int64)-1;
+      if (!fi.SetAs_StdInFile())
+        return GetLastError_noZero_HRESULT();
     }
     else
     {
@@ -384,7 +397,7 @@ HRESULT Extract(
       {
         UString s = arcPath.Ptr(pos + 1);
         int index = codecs->FindFormatForExtension(s);
-        if (index >= 0 && s == L"001")
+        if (index >= 0 && s.IsEqualTo("001"))
         {
           s = arcPath.Left(pos);
           pos = s.ReverseFind(L'.');

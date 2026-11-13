@@ -14,6 +14,8 @@
 #include "ui/selector.h"
 #include "ui/ui.h"
 
+#include "sound.h"
+
 #include "../osd/modules/lib/osdobj_common.h" // TODO: remove
 
 

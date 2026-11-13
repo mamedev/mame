@@ -722,7 +722,7 @@ void mtech_state::megatech(machine_config &config)
 
 	m_vdp->n_int().set_inputline(m_z80snd, 0);
 
-	screen_device &menu(SCREEN(config, "menu", SCREEN_TYPE_RASTER));
+	screen_device &menu(SCREEN(config, "menu"));
 	// check frq
 	menu.set_raw(XTAL(10'738'635)/2,
 			sega315_5124_device::WIDTH , sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH, sega315_5124_device::LBORDER_START + sega315_5124_device::LBORDER_WIDTH + 256,

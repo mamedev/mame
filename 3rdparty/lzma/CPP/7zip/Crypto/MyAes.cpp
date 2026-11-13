@@ -153,36 +153,67 @@ Z7_COM7F_IMF2(UInt32, CAesCtrCoder::Filter(Byte *data, UInt32 size))
 #ifndef Z7_EXTRACT_ONLY
 
 #ifdef MY_CPU_X86_OR_AMD64
-  #define USE_HW_AES
-#elif defined(MY_CPU_ARM_OR_ARM64) && defined(MY_CPU_LE)
-  #if defined(__clang__)
-    #if (__clang_major__ >= 8) // fix that check
+
+  #if defined(__INTEL_COMPILER)
+    #if (__INTEL_COMPILER >= 1110)
       #define USE_HW_AES
+      #if (__INTEL_COMPILER >= 1900)
+        #define USE_HW_VAES
+      #endif
     #endif
-  #elif defined(__GNUC__)
-    #if (__GNUC__ >= 6) // fix that check
-      #define USE_HW_AES
-    #endif
+  #elif defined(Z7_CLANG_VERSION) && (Z7_CLANG_VERSION >= 30800) \
+     || defined(Z7_GCC_VERSION)   && (Z7_GCC_VERSION   >= 40400)
+    #define USE_HW_AES
+      #if defined(__clang__) && (__clang_major__ >= 8) \
+          || defined(__GNUC__) && (__GNUC__ >= 8)
+        #define USE_HW_VAES
+      #endif
   #elif defined(_MSC_VER)
-    #if _MSC_VER >= 1910
+    #define USE_HW_AES
+    #define USE_HW_VAES
+  #endif
+
+#elif defined(MY_CPU_ARM_OR_ARM64) && defined(MY_CPU_LE)
+  
+  #if   defined(__ARM_FEATURE_AES) \
+     || defined(__ARM_FEATURE_CRYPTO)
+    #define USE_HW_AES
+  #else
+    #if  defined(MY_CPU_ARM64) \
+      || defined(__ARM_ARCH) && (__ARM_ARCH >= 4) \
+      || defined(Z7_MSC_VER_ORIGINAL)
+    #if  defined(__ARM_FP) && \
+          (   defined(Z7_CLANG_VERSION) && (Z7_CLANG_VERSION >= 30800) \
+           || defined(__GNUC__) && (__GNUC__ >= 6) \
+          ) \
+      || defined(Z7_MSC_VER_ORIGINAL) && (_MSC_VER >= 1910)
+    #if  defined(MY_CPU_ARM64) \
+      || !defined(Z7_CLANG_VERSION) \
+      || defined(__ARM_NEON) && \
+          (Z7_CLANG_VERSION < 170000 || \
+           Z7_CLANG_VERSION > 170001)
       #define USE_HW_AES
+    #endif
+    #endif
     #endif
   #endif
 #endif
 
 #ifdef USE_HW_AES
+// #pragma message("=== MyAES.c USE_HW_AES === ")
+
     #define SET_AES_FUNC_2(f2) \
       if (algo == 2) if (g_Aes_SupportedFunctions_Flags & k_Aes_SupportedFunctions_HW) \
       { f = f2; }
-  #ifdef MY_CPU_X86_OR_AMD64
+  #ifdef USE_HW_VAES
     #define SET_AES_FUNC_23(f2, f3) \
       SET_AES_FUNC_2(f2) \
       if (algo == 3) if (g_Aes_SupportedFunctions_Flags & k_Aes_SupportedFunctions_HW_256) \
       { f = f3; }
-  #else  // MY_CPU_X86_OR_AMD64
+  #else  // USE_HW_VAES
     #define SET_AES_FUNC_23(f2, f3) \
       SET_AES_FUNC_2(f2)
-  #endif // MY_CPU_X86_OR_AMD64
+  #endif // USE_HW_VAES
 #else  // USE_HW_AES
     #define SET_AES_FUNC_23(f2, f3)
 #endif // USE_HW_AES
