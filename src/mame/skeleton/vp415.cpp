@@ -728,7 +728,10 @@ void vp415_state::vp415(machine_config &config)
 	m_datamcu->p2_out_cb().set(FUNC(vp415_state::data_mcu_port2_w));
 	m_datamcu->set_addrmap(AS_PROGRAM, &vp415_state::datamcu_program_map);
 
+	auto &scsi(NSCSI_BUS(config, "scsi"));
+
 	NCR5385(config, m_scsi, XTAL(8'000'000)/2); // Same clock signal as above, per schematic
+	scsi.set_external_device(7, m_scsi);
 	m_scsi->irq().set(FUNC(vp415_state::cpu_int1_w));
 
 	// Module S: Control
