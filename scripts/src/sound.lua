@@ -272,6 +272,18 @@ if SOUNDS["CEM3372"] then
 end
 
 ---------------------------------------------------
+-- CEM 3374 dual voltage-controlled oscillator
+--@src/devices/sound/cem3374.h,SOUNDS["CEM3374"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3374"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3374.cpp",
+		MAME_DIR .. "src/devices/sound/cem3374.h",
+	}
+end
+
+---------------------------------------------------
 -- CEM 3394 analog synthesizer chip
 --@src/devices/sound/cem3394.h,SOUNDS["CEM3394"] = true
 ---------------------------------------------------
