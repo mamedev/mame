@@ -100,7 +100,7 @@ void dataprint_state::dp3000(machine_config &config)
 	m_maincpu->in_porta().set_ioport("PORTA");
 	m_maincpu->out_portb().set(FUNC(dataprint_state::leds_w));
 
-	M48T58(config, "nvram"); // ST M48T18
+	M48T58(config, m_nvram); // ST M48T18
 
 	PRINTER(config, m_printer);
 
