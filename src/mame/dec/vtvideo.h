@@ -52,6 +52,7 @@ protected:
 	TIMER_CALLBACK_MEMBER(lba3_change);
 	TIMER_CALLBACK_MEMBER(lba7_change);
 	virtual void notify_vblank(bool choice) { }
+	virtual void vertical_reset();
 
 	devcb_read8        m_read_ram;
 	devcb_write_line   m_write_vert_freq_intr;
@@ -102,6 +103,7 @@ public:
 
 protected:
 	virtual void notify_vblank(bool choice) override;
+	virtual void vertical_reset() override { } // loads it on the interrupt acknowledge instead (notify_vblank)
 	virtual void device_reset() override ATTR_COLD;
 };
 

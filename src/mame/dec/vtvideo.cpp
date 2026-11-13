@@ -115,6 +115,7 @@ void vt100_video_device::device_start()
 
 	save_item(NAME(m_lba7));
 	save_item(NAME(m_scroll_latch));
+	save_item(NAME(m_last_scroll));
 	save_item(NAME(m_blink_flip_flop));
 	save_item(NAME(m_reverse_field));
 	save_item(NAME(m_basic_attribute));
@@ -232,9 +233,21 @@ void vt100_video_device::vblank_callback(screen_device &screen, bool state)
 {
 	if (state)
 	{
+		vertical_reset();
 		m_write_vert_freq_intr(ASSERT_LINE);
 		notify_vblank(true);
 	}
+}
+
+// The DC012 presets its offset counter from the scroll latch at VERTICAL
+// RESET, so the firmware loads the latch during one frame for the next
+// (TM-003 4.6.3.3).  Taken here ahead of the vertical frequency interrupt:
+// the VT100 firmware writes the first offset of a scroll mid-frame and
+// each later one from that interrupt, so the reset must come between them
+// for the first to be shown (inferred from the firmware's writes).
+void vt100_video_device::vertical_reset()
+{
+	m_last_scroll = m_scroll_latch;
 }
 
 // Also used by Rainbow-100 ************
