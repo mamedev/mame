@@ -67,6 +67,8 @@ public:
 	void tms7040_mem(address_map &map) ATTR_COLD;
 	void tms7041_mem(address_map &map) ATTR_COLD;
 	void tms7042_mem(address_map &map) ATTR_COLD;
+	void tms70c02_mem(address_map &map) ATTR_COLD;
+	void tms70c42_mem(address_map &map) ATTR_COLD;
 protected:
 	// chip info flags
 	static constexpr uint32_t CHIP_IS_CMOS        = 0x01;
@@ -130,6 +132,10 @@ protected:
 	int m_timer_decrementer[2];
 	int m_timer_prescaler[2];
 	uint16_t m_timer_capture_latch[2];
+	uint16_t m_timer16_data[2];
+	uint8_t m_timer16_control[2];
+	uint8_t m_timer16_readout[2];
+	uint8_t m_timer16_clocks[2];
 
 	uint8_t m_port_latch[4];
 	uint8_t m_port_ddr[4];
@@ -143,6 +149,17 @@ protected:
 	void timer_reload(int tmr);
 	void timer_tick_pre(int tmr);
 	void timer_tick_low(int tmr);
+	uint8_t iocnt0_r();
+	uint8_t iocnt1_r();
+	uint8_t iocnt2_r();
+	void iocnt0_w(uint8_t data);
+	void iocnt1_w(uint8_t data);
+	void iocnt2_w(uint8_t data);
+	uint8_t timer16_r(offs_t offset);
+	void timer16_w(offs_t offset, uint8_t data);
+	void timer16_advance(unsigned clocks);
+	void timer16_tick(unsigned timer);
+	uint8_t timer16_output_mask() const;
 
 	// internal read/write
 	inline uint8_t read_r8(uint8_t address) { return m_program.read_byte(address); }
