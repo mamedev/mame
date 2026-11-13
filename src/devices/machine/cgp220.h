@@ -39,10 +39,10 @@ public:
 
 	void rxd_w(int state);
 	void strobe_w(int state);
-	void data_w(u8 data) { m_data = data; }
 	template <u32 Bit> void data_bit_w(int state) { m_data = (m_data & ~(1U << Bit)) | ((state ? 1U : 0U) << Bit); }
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -60,8 +60,9 @@ private:
 	u8 status_r();
 	void head_fire_w(u8 data);
 
+	TIMER_CALLBACK_MEMBER(rxd_sync);
+	TIMER_CALLBACK_MEMBER(strobe_sync);
 	TIMER_CALLBACK_MEMBER(carriage_tick);
-	int sensor(int pos) const;
 	void step_paper(u8 phases);
 	void update_head();
 	void update_outputs(bool force = false);

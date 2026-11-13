@@ -117,6 +117,19 @@ int dot_x(int dot)
 	return DOT_MARGIN + dot * DPI / 80;
 }
 
+// position sensor, high over the home area and the right to left start marks
+int sensor(int pos)
+{
+	if (pos < 0)
+		return 1;
+
+	for (int mark : CR_MARKS)
+		if (pos >= mark && pos < mark + CR_MARK_WIDTH)
+			return 1;
+
+	return 0;
+}
+
 } // anonymous namespace
 
 
@@ -144,11 +157,7 @@ cgp220_device::cgp220_device(const machine_config &mconfig, const char *tag, dev
 	m_strobe(1),
 	m_data(0),
 	m_latch(0),
-	m_control(0xfe),
-	m_busy_ff(false),
-	m_outputs(0),
 	m_heads(0),
-	m_motor(0xff),
 	m_paper_phase(0),
 	m_paper_steps(0),
 	m_cr_pos(CR_LEFT_STOP),
@@ -277,13 +286,11 @@ void cgp220_device::device_start()
 
 void cgp220_device::device_reset()
 {
+	// the carriage motor is released and coasts to a stop
 	m_control = 0xfe;
 	m_busy_ff = false;
-	m_heads = 0;
 	m_motor = 0xff;
-	m_cr_vel = 0.0;
 
-	m_carriage_timer->enable(false);
 	update_head();
 	update_outputs(true);
 }
@@ -291,18 +298,31 @@ void cgp220_device::device_reset()
 
 void cgp220_device::rxd_w(int state)
 {
-	m_rxd = state ? 1 : 0;
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cgp220_device::rxd_sync), this), state ? 1 : 0);
+}
+
+
+TIMER_CALLBACK_MEMBER(cgp220_device::rxd_sync)
+{
+	m_rxd = param;
 	m_pia->cb2_w(m_rxd);
 }
 
 
 void cgp220_device::strobe_w(int state)
 {
-	state = state ? 1 : 0;
+	// the data is latched by the host's strobe edge, so it travels with it
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(cgp220_device::strobe_sync), this), (m_data << 1) | (state ? 1 : 0));
+}
+
+
+TIMER_CALLBACK_MEMBER(cgp220_device::strobe_sync)
+{
+	int const state = BIT(param, 0);
 
 	if (m_strobe && !state)
 	{
-		m_latch = m_data;
+		m_latch = BIT(param, 1, 8);
 		m_busy_ff = true;
 		update_outputs();
 	}
@@ -459,24 +479,6 @@ TIMER_CALLBACK_MEMBER(cgp220_device::carriage_tick)
 		m_cr_vel = 0.0;
 		m_carriage_timer->enable(false);
 	}
-}
-
-
-//-------------------------------------------------
-//  sensor - position sensor, high over the home
-//  area and the right to left start marks
-//-------------------------------------------------
-
-int cgp220_device::sensor(int pos) const
-{
-	if (pos < 0)
-		return 1;
-
-	for (int mark : CR_MARKS)
-		if (pos >= mark && pos < mark + CR_MARK_WIDTH)
-			return 1;
-
-	return 0;
 }
 
 

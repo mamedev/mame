@@ -21,9 +21,11 @@ public:
 	centronics_cgp220_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	// device_centronics_peripheral_interface implementation
 	virtual void input_strobe(int state) override;
 	virtual void input_data0(int state) override;
 	virtual void input_data1(int state) override;

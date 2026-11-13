@@ -8,60 +8,50 @@ Radio Shack Color Graphics Printer CGP-220
 
 	<element name="panel"><rect><color red="0.82" green="0.80" blue="0.74" /></rect></element>
 
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.17" green="0.17" blue="0.17" /></disk>
+		<disk state="1" />
+	</element>
 	<element name="power_led" defstate="1">
-		<disk state="0"><color red="0.15" green="0.05" blue="0.05" /></disk>
-		<disk state="1"><color red="1.0" green="0.15" blue="0.1" /></disk>
-	</element>
-	<element name="green_led" defstate="0">
-		<disk state="0"><color red="0.05" green="0.18" blue="0.05" /></disk>
-		<disk state="1"><color red="0.15" green="1.0" blue="0.15" /></disk>
-	</element>
-	<element name="red_led" defstate="0">
-		<disk state="0"><color red="0.18" green="0.05" blue="0.05" /></disk>
-		<disk state="1"><color red="1.0" green="0.15" blue="0.1" /></disk>
+		<disk state="0"><color red="0.17" green="0.17" blue="0.17" /></disk>
+		<disk state="1" />
 	</element>
 
-	<element name="label_power"><text string="POWER"><color red="0.15" green="0.15" blue="0.15" /></text></element>
-	<element name="label_ready"><text string="READY"><color red="0.15" green="0.15" blue="0.15" /></text></element>
-	<element name="label_alert"><text string="ALERT"><color red="0.15" green="0.15" blue="0.15" /></text></element>
+	<element name="button">
+		<rect state="0"><color red="0.25" green="0.25" blue="0.25" /></rect>
+		<rect state="1"><color red="0.55" green="0.55" blue="0.55" /></rect>
+	</element>
 
-	<element name="btn_online">
-		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.55" green="0.55" blue="0.55" /></rect>
-		<text string="ON LINE"><bounds x="0.05" y="0.3" width="0.9" height="0.4" /><color red="0.95" green="0.95" blue="0.95" /></text>
-	</element>
-	<element name="btn_feed">
-		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.55" green="0.55" blue="0.55" /></rect>
-		<text string="FEED"><bounds x="0.05" y="0.3" width="0.9" height="0.4" /><color red="0.95" green="0.95" blue="0.95" /></text>
-	</element>
-	<element name="btn_reset">
-		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.55" green="0.55" blue="0.55" /></rect>
-		<text string="RESET"><bounds x="0.05" y="0.3" width="0.9" height="0.4" /><color red="0.95" green="0.95" blue="0.95" /></text>
-	</element>
-	<element name="btn_pump">
-		<rect state="0"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.25" green="0.25" blue="0.25" /></rect>
-		<rect state="1"><bounds x="0.0" y="0.0" width="1.0" height="1.0" /><color red="0.55" green="0.55" blue="0.55" /></rect>
-		<text string="PUMP"><bounds x="0.05" y="0.3" width="0.9" height="0.4" /><color red="0.95" green="0.95" blue="0.95" /></text>
-	</element>
+	<element name="label_power"><text string="POWER" /></element>
+	<element name="label_ready"><text string="READY" /></element>
+	<element name="label_alert"><text string="ALERT" /></element>
+	<element name="label_online"><text string="ON LINE" /></element>
+	<element name="label_feed"><text string="FEED" /></element>
+	<element name="label_reset"><text string="RESET" /></element>
+	<element name="label_pump"><text string="PUMP" /></element>
 
 	<view name="Paper and Control Panel">
 		<screen tag="bitmap:screen"><bounds x="0" y="0" width="2142" height="384" /></screen>
 
 		<element ref="panel"><bounds x="0" y="384" width="2142" height="160" /></element>
 
-		<element ref="power_led"><bounds x="120" y="420" width="36" height="36" /></element>
-		<element ref="label_power"><bounds x="78" y="466" width="120" height="36" /></element>
-		<element name="cgp220_ready_led" ref="green_led"><bounds x="300" y="420" width="36" height="36" /></element>
-		<element ref="label_ready"><bounds x="258" y="466" width="120" height="36" /></element>
-		<element name="cgp220_alert_led" ref="red_led"><bounds x="480" y="420" width="36" height="36" /></element>
-		<element ref="label_alert"><bounds x="438" y="466" width="120" height="36" /></element>
+		<element ref="power_led"><bounds x="120" y="420" width="36" height="36" /><color red="1.0" green="0.15" blue="0.1" /></element>
+		<element name="cgp220_ready_led" ref="led"><bounds x="300" y="420" width="36" height="36" /><color red="0.15" green="1.0" blue="0.15" /></element>
+		<element name="cgp220_alert_led" ref="led"><bounds x="480" y="420" width="36" height="36" /><color red="1.0" green="0.15" blue="0.1" /></element>
 
-		<element ref="btn_online" inputtag="BUTTONS" inputmask="0x20"><bounds x="1260" y="414" width="180" height="100" /></element>
-		<element ref="btn_feed" inputtag="BUTTONS" inputmask="0x10"><bounds x="1470" y="414" width="180" height="100" /></element>
-		<element ref="btn_reset" inputtag="BUTTONS" inputmask="0x40"><bounds x="1680" y="414" width="180" height="100" /></element>
-		<element ref="btn_pump" inputtag="SWITCHES" inputmask="0x40"><bounds x="1890" y="414" width="180" height="100" /></element>
+		<element ref="label_power"><bounds x="78" y="466" width="120" height="36" /><color red="0.15" green="0.15" blue="0.15" /></element>
+		<element ref="label_ready"><bounds x="258" y="466" width="120" height="36" /><color red="0.15" green="0.15" blue="0.15" /></element>
+		<element ref="label_alert"><bounds x="438" y="466" width="120" height="36" /><color red="0.15" green="0.15" blue="0.15" /></element>
+
+		<element ref="button" inputtag="BUTTONS" inputmask="0x20"><bounds x="1260" y="414" width="180" height="100" /></element>
+		<element ref="button" inputtag="BUTTONS" inputmask="0x10"><bounds x="1470" y="414" width="180" height="100" /></element>
+		<element ref="button" inputtag="BUTTONS" inputmask="0x40"><bounds x="1680" y="414" width="180" height="100" /></element>
+		<element ref="button" inputtag="SWITCHES" inputmask="0x40"><bounds x="1890" y="414" width="180" height="100" /></element>
+
+		<element ref="label_online"><bounds x="1269" y="444" width="162" height="40" /><color red="0.95" green="0.95" blue="0.95" /></element>
+		<element ref="label_feed"><bounds x="1479" y="444" width="162" height="40" /><color red="0.95" green="0.95" blue="0.95" /></element>
+		<element ref="label_reset"><bounds x="1689" y="444" width="162" height="40" /><color red="0.95" green="0.95" blue="0.95" /></element>
+		<element ref="label_pump"><bounds x="1899" y="444" width="162" height="40" /><color red="0.95" green="0.95" blue="0.95" /></element>
 	</view>
 
 	<view name="Paper">
