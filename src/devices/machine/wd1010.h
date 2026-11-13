@@ -26,6 +26,8 @@ public:
 	// construction/destruction
 	wd1010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_rotational_latency(const attotime &latency) { m_latency = latency; }
+
 	auto out_intrq_callback() { return m_out_intrq_cb.bind(); }
 	auto out_bdrq_callback() { return m_out_bdrq_cb.bind(); }
 	auto out_bcs_callback() { return m_out_bcs_cb.bind(); }
@@ -96,6 +98,7 @@ private:
 	};
 
 	void set_error(int error);
+	bool single_read_done() const;
 	void set_intrq(int state);
 	void set_bdrq(int state);
 	attotime get_stepping_rate();
@@ -140,6 +143,7 @@ private:
 	emu_timer *m_read_timer;
 	emu_timer *m_write_timer;
 
+	attotime m_latency;
 	int m_intrq;
 	//int m_bdrq;
 	int m_brdy;

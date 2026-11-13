@@ -52,6 +52,7 @@ wd1010_device::wd1010_device(const machine_config &mconfig, const char *tag, dev
 	m_out_wg_cb(*this),
 	m_in_data_cb(*this, 0),
 	m_out_data_cb(*this),
+	m_latency(attotime::zero),
 	m_intrq(0),
 	m_brdy(0),
 	m_stepping_rate(0x00),
@@ -136,10 +137,19 @@ TIMER_CALLBACK_MEMBER(wd1010_device::update_seek)
 		break;
 
 	case CMD_READ_SECTOR:
-		cmd_read_sector();
+		if (m_latency.is_zero())
+			cmd_read_sector();
+		else
+			m_read_timer->adjust(m_latency);
 		break;
 
 	case CMD_WRITE_SECTOR:
+		if (m_latency.is_zero())
+			cmd_write_sector();
+		else
+			m_write_timer->adjust(m_latency);
+		break;
+
 	case CMD_WRITE_FORMAT:
 		cmd_write_sector();
 		break;
@@ -184,6 +194,11 @@ void wd1010_device::set_error(int error)
 		m_error = 0;
 		m_status &= ~STATUS_ERR;
 	}
+}
+
+bool wd1010_device::single_read_done() const
+{
+	return (m_command >> 4) == CMD_READ_SECTOR && !BIT(m_command, 3) && !BIT(m_command, 2) && (m_status & STATUS_DRQ) && !(m_status & STATUS_BSY);
 }
 
 //-------------------------------------------------
@@ -297,7 +312,7 @@ bool wd1010_device::id_found()
 {
 	const auto &info = m_drives[drive()].drive->get_info();
 
-	return m_cylinder < info.cylinders && head() < info.heads;
+	return m_cylinder < info.cylinders && head() < info.heads && info.sectorbytes <= 1024;
 }
 
 //-------------------------------------------------
@@ -341,11 +356,6 @@ void wd1010_device::mr_w(int state)
 	m_status &= (STATUS_RDY | STATUS_SC | STATUS_WF);
 	m_command = 0x00;
 	m_error = 0x00;
-	m_precomp = 0x00;
-	m_sector_count = 0x00;
-	m_sector_number = 0x00;
-	m_cylinder = 0x0000;
-	m_sdh = 0x00;
 }
 
 void wd1010_device::drdy_w(int state)
@@ -476,9 +486,16 @@ void wd1010_device::write(offs_t offset, uint8_t data)
 		break;
 
 	case 7:
-		// writes to the command register are ignored when a command is in progress
+		// writes to the command register are ignored when a command is in progress, except
+		// after a single sector read with I = 0 has put its sector in the buffer
 		if (m_status & STATUS_CIP)
-			return;
+		{
+			if (!single_read_done())
+				return;
+
+			m_read_timer->adjust(attotime::never);
+			set_bdrq(0);
+		}
 
 		// writing the command register clears the interrupt
 		set_intrq(0);
@@ -604,7 +621,8 @@ void wd1010_device::cmd_read_sector()
 		return;
 	}
 
-	uint8_t buffer[512];
+	uint8_t buffer[1024];
+	uint32_t const size = file->get_info().sectorbytes;
 
 	m_out_bcr_cb(1);
 	m_out_bcr_cb(0);
@@ -625,7 +643,7 @@ void wd1010_device::cmd_read_sector()
 		return;
 	}
 
-	for (int i = 0; i < 512; i++)
+	for (uint32_t i = 0; i < size; i++)
 		m_out_data_cb(buffer[i]);
 
 	// multi-sector read
@@ -649,8 +667,9 @@ void wd1010_device::cmd_read_sector()
 
 	set_bdrq(1);
 
-	// the sector is in the buffer, so the host is free to empty it; the command
-	// itself only completes once the buffer manager returns brdy, so cip stays set
+	// the sector is in the buffer, so the host is free to empty it; cip stays set
+	// until the buffer manager returns brdy, but a single sector read with I = 0
+	// accepts a new command from here on
 	m_status &= ~STATUS_BSY;
 
 	// interrupt at bdrq time?
@@ -684,7 +703,10 @@ void wd1010_device::cmd_write_sector()
 		return;
 	}
 
-	if ((m_command >> 4) != CMD_WRITE_FORMAT && !id_found())
+	uint8_t buffer[1024];
+	uint32_t const size = file->get_info().sectorbytes;
+
+	if (size > sizeof(buffer) || ((m_command >> 4) != CMD_WRITE_FORMAT && !id_found()))
 	{
 		LOG("--> ID not found\n");
 
@@ -693,8 +715,6 @@ void wd1010_device::cmd_write_sector()
 		end_command();
 		return;
 	}
-
-	uint8_t buffer[512];
 
 	set_bdrq(0);
 
@@ -730,7 +750,7 @@ void wd1010_device::cmd_write_sector()
 	}
 
 	// get data for sector from buffer chip
-	for (int i = 0; i < 512; i++)
+	for (uint32_t i = 0; i < size; i++)
 		buffer[i] = m_in_data_cb();
 
 	if (!file->write(get_lbasector(m_sector_number), buffer))
