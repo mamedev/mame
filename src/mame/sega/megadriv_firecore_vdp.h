@@ -3,8 +3,8 @@
 /* */
 
 
-#ifndef MAME_MISC_INDER_SB_H
-#define MAME_VIDEO_MEGADRIV_FIRECORE_H
+#ifndef MAME_SEGA_MEGADRIV_FIRECORE_VDP_H
+#define MAME_SEGA_MEGADRIV_FIRECORE_VDP_H
 
 #pragma once
 
@@ -49,4 +49,4 @@ private:
 	uint8_t xvdp_tile_pixel(uint32_t tile, int x, int y);
 };
 
-#endif // MAME_VIDEO_MEGADRIV_FIRECORE_H
+#endif // MAME_SEGA_MEGADRIV_FIRECORE_VDP_H
