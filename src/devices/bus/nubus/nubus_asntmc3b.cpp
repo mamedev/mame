@@ -133,6 +133,16 @@ protected:
 	virtual void install_map() override ATTR_COLD;
 
 private:
+	u16 ram_r(offs_t offset)
+	{
+		return (asntm3b_ram_r(offset * 2) << 8) | asntm3b_ram_r(offset * 2 + 1);
+	}
+	void ram_w(offs_t offset, u16 data, u16 mem_mask)
+	{
+		// a host byte store is written to both bytes of its halfword
+		asntm3b_ram_w(offset * 2, ACCESSING_BITS_8_15 ? (data >> 8) : data);
+		asntm3b_ram_w(offset * 2 + 1, ACCESSING_BITS_0_7 ? data : (data >> 8));
+	}
 	u32 regs_r(offs_t offset)
 	{
 		u32 const data = m_dp83902->cs_read(~offset & 0xf);
@@ -267,7 +277,7 @@ void pdslc_ethermaclc_device::install_map()
 	for (u32 const base : { slotspace, get_super_slotspace() })
 	{
 		offs_t const mirror = (base == slotspace) ? 0x00fc'0000 : 0x0ffc'0000;
-		nubus().install_mirrored_device(base + 0x10000, base + 0x1ffff, mirror, read8sm_delegate(*this, FUNC(pdslc_ethermaclc_device::asntm3b_ram_r)), write8sm_delegate(*this, FUNC(pdslc_ethermaclc_device::asntm3b_ram_w)));
+		nubus().install_mirrored_device(base + 0x10000, base + 0x1ffff, mirror, read16sm_delegate(*this, FUNC(pdslc_ethermaclc_device::ram_r)), write16s_delegate(*this, FUNC(pdslc_ethermaclc_device::ram_w)));
 		nubus().install_mirrored_device(base + 0x20000, base + 0x2ffff, mirror, read32sm_delegate(*this, FUNC(pdslc_ethermaclc_device::regs_r)), write32s_delegate(*this, FUNC(pdslc_ethermaclc_device::regs_w)));
 		install_declaration_rom_copy(base + 0x30000, base + 0x37fff, mirror | 0x8000);
 	}
