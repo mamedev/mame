@@ -2233,7 +2233,7 @@ void s3c24xx_device::lcd_configure_tft()
 
 	const u32 framerate_ticks = vclk_ticks * (((vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1)) * ((hspw + 1) + (hbpd + 1) + (hozval + 1) + (hfpd + 1)));
 	LOGMASKED(LOG_LCD_TFT, "LCD - framerate %f\n", full_clock / framerate_ticks);
-	m_lcd_framerate = attotime::from_ticks(framerate_ticks, full_clock);
+	m_lcd_framerate = attotime::from_double(double(framerate_ticks) / full_clock);
 
 	u32 width = (hspw + 1) + (hbpd + 1) + (hozval + 1) + (hfpd + 1);
 	u32 height = (vspw + 1) + (vbpd + 1) + (lineval + 1) + (vfpd + 1);
@@ -2278,7 +2278,7 @@ bool s3c24xx_device::lcd_configure_stn()
 
 	const u32 framerate_ticks = (vclk_ticks * (hozval + 1) + hclk_ticks * ((1 << (4 + wlh)) + (1 << (4 + wdly)) + (lineblank * 8))) * (lineval + 1);
 	LOGMASKED(LOG_LCD_STN, "LCD - framerate %f\n", full_clock / framerate_ticks);
-	m_lcd_framerate = attotime::from_ticks(framerate_ticks, full_clock);
+	m_lcd_framerate = attotime::from_double(double(framerate_ticks) / full_clock);
 
 	u32 width = 0;
 	switch (pnrmode)
@@ -2765,8 +2765,9 @@ u32 s3c2440_device::get_clk_mult() const
 
 u64 s3c24xx_device::get_full_clock() const
 {
+	// This PLL numerator can exceed 32 bits, unlike the frequency argument to attotime::from_ticks.
 	const u64 mdiv = (m_clkpow_mpllcon >> 12) & 0xff;
-	return get_clk_mult() * (mdiv + 8) * 12000000;
+	return get_clk_mult() * (mdiv + 8) * clock();
 }
 
 u64 s3c24xx_device::get_fclk_ticks() const
@@ -2789,7 +2790,7 @@ u64 s3c24xx_device::get_fclk_ticks() const
 attotime s3c24xx_device::get_fclk() const
 {
 	LOGMASKED(LOG_CLKPOW, "%s: get_fclk(): %d ticks, %d clock\n", machine().describe_context(), (u32)get_fclk_ticks(), (u32)get_full_clock());
-	return attotime::from_ticks(get_fclk_ticks(), get_full_clock());
+	return attotime::from_double(double(get_fclk_ticks()) / get_full_clock());
 }
 
 u64 s3c24xx_device::get_hclk_ticks() const
@@ -2805,7 +2806,7 @@ u64 s3c2440_device::get_hclk_ticks() const
 
 attotime s3c24xx_device::get_hclk() const
 {
-	return attotime::from_ticks(get_hclk_ticks(), get_full_clock());
+	return attotime::from_double(double(get_hclk_ticks()) / get_full_clock());
 }
 
 u64 s3c24xx_device::get_pclk_ticks() const
@@ -2815,7 +2816,7 @@ u64 s3c24xx_device::get_pclk_ticks() const
 
 attotime s3c24xx_device::get_pclk() const
 {
-	return attotime::from_ticks(get_pclk_ticks(), get_full_clock());
+	return attotime::from_double(double(get_pclk_ticks()) / get_full_clock());
 }
 
 u32 s3c24xx_device::clkpow_locktime_r(offs_t offset, u32 mem_mask)
@@ -3602,7 +3603,7 @@ void s3c24xx_device::pwm_start(int timer)
 		freq *= cnt;
 	}
 
-	attotime period = attotime::from_ticks(freq, full_clock);
+	attotime period = attotime::from_double(double(freq) / full_clock);
 	LOGMASKED(LOG_PWM, "PWM %d - pclk=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, pclk_ticks, prescaler, MUX_TABLE[mux], freq, cnt, cmp, auto_reload, period.as_hz());
 
 	m_pwm_cnt[timer] = cnt;
@@ -6214,7 +6215,7 @@ void s3c24xx_device::wdt_start()
 	const u32 prescaler = BIT(m_wdt_wtcon, 8, 8);
 	const u32 clock = 16 << BIT(m_wdt_wtcon, 3, 2);
 	const u32 freq_ticks = pclk_ticks * (prescaler + 1) * clock * m_wdt_wtcnt;
-	attotime period = attotime::from_ticks(freq_ticks, full_clock);
+	attotime period = attotime::from_double(double(freq_ticks) / full_clock);
 	m_wdt_freq = period.as_double();
 	LOGMASKED(LOG_WDT, "watchdog start: pclk %d prescaler %d clock %d hz %f\n", pclk_ticks, prescaler, clock, period.as_hz());
 	m_wdt_timer->adjust(period, 0, period);

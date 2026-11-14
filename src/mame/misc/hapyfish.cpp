@@ -328,7 +328,9 @@ void hapyfish_state::hapyfish(machine_config &config)
 	UDA1341TS(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // uda1341ts.u12
 	UDA1341TS(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // uda1341ts.u12
 
-	S3C2440(config, m_s3c2440, 12000000);
+	// Clock inferred from the kernel's smdk2440_map_io().  Also this gives a 60.2 Hz refresh rate
+	// in-emulation and the games play correctly.
+	S3C2440(config, m_s3c2440, 16.9344_MHz_XTAL);
 	m_s3c2440->set_palette_tag("palette");
 	m_s3c2440->set_screen_tag("screen");
 
@@ -417,4 +419,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 201?, hapyfsh2, 0, hapyfish, hapyfish, hapyfish_state, empty_init, ROT0, "bootleg", "Happy Fish (V2 PCB, 302-in-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 201?, hapyfsh2, 0, hapyfish, hapyfish, hapyfish_state, empty_init, ROT0, "bootleg", "Happy Fish (V2 PCB, 302-in-1)", 0 )

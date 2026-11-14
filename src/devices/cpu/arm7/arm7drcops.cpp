@@ -1459,9 +1459,10 @@ bool arm7_cpu_device::generate_mem_block(drcuml_block &block, compiler_state &co
 	// a store with the base in the list after another register stores the written-back base (ARMv5: the old one)
 	const bool base_late = (m_archRev < 5) && !load && writeback && BIT(rlist, rb) && (rlist & util::make_bitmask<uint32_t>(rb));
 
-	// an abort: ARMv3 writes the base back in full, ARMv4+ restores an early-written one; both need the original
+	// an abort: ARMv3 writes the base back in full, ARMv4+ restores an early-written one.
+	// A load may also overwrite the base before a later transfer aborts, even without writeback.
 	const bool abort_v3 = writeback && m_archRev < 4;
-	const bool abort_restore = base_late && m_archRev >= 4;
+	const bool abort_restore = (base_late && m_archRev >= 4) || (load && ldm_loads_base(op, rb));
 	const uint32_t stride = count << 2;
 
 	const uml::code_label skip = generate_condition(block, compiler, op >> INSN_COND_SHIFT);
