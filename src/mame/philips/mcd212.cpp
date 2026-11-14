@@ -303,17 +303,12 @@ int mcd212_device::get_border_width()
 	return width;
 }
 
-uint32_t mcd212_device::get_backdrop_plane(int x, int y)
+int mcd212_device::get_border_height()
 {
-	if (BIT(m_image_coding_method, ICM_EV_BIT))
-	{
-		uint32_t argb = 0;
-		if (m_ext_video && m_ext_video->ext_video_pixel(x, y, argb))
-			return argb;
-		return s_4bpp_display_color[0];
-	}
-	else
-		return s_4bpp_display_color[m_backdrop_color];
+	int height = 0;
+	if (!BIT(m_dcr[0], DCR_FD_BIT) && BIT(m_csrw[0], CSR1W_ST_BIT))
+		height = 20;
+	return height;
 }
 
 void mcd212_device::process_ica()
@@ -526,13 +521,6 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 	uint32_t vsr = get_vsr<Path>();
 	uint32_t vsr2 = get_vsr<!Path>();
 
-	if (!icm || !vsr)
-	{
-		std::fill_n(pixels, get_screen_width(), s_4bpp_color[0]);
-		std::fill_n(transparent, get_screen_width(), (tp_ctrl == TCR_ALWAYS));
-		return;
-	}
-
 	const uint32_t decodingMode = m_ddr[Path] & DDR_FT;
 
 	const uint8_t mosaic_enable = get_mosaic_enable<Path>();
@@ -555,6 +543,21 @@ void mcd212_device::process_vsr(uint32_t *pixels, bool *transparent)
 	const bool use_matte_flag = (tp_ctrl_type >= TCR_MF0 && tp_ctrl_type <= TCR_MF1_KEY1);
 	const bool is_dyuv_rgb = (icm == ICM_DYUV) || ((icm == ICM_RGB555) && (Path == 1)); // DYUV and RGB do not have access to color key.
 	const bool use_color_key = !is_dyuv_rgb && ((tp_ctrl_type == TCR_KEY) || (tp_ctrl_type == TCR_MF0_KEY1) || (tp_ctrl_type == TCR_MF1_KEY1));
+
+	if (!icm || !vsr)
+	{
+		std::fill_n(pixels, width, s_4bpp_color[0]);
+		if (icm && use_matte_flag && !tp_always)
+		{
+			for (int x = 0; x < width; x++)
+				transparent[x] = (matte_flags[x] == tp_check_parity);
+		}
+		else
+		{
+			std::fill_n(transparent, width, (tp_ctrl == TCR_ALWAYS));
+		}
+		return;
+	}
 
 	LOGMASKED(LOG_VSR, "Scanline %d: VSR Path %d, ICM (%02x), VSR (%08x)\n", screen().vpos(), Path, icm, vsr);
 
@@ -710,12 +713,21 @@ void mcd212_device::mix_lines(uint32_t *plane_a, bool *transparent_a, uint32_t *
 	}
 
 	const uint32_t *limit = m_dyuv_limit_lut + 0x100;
+	// the backdrop is the external video where it has a picture, the backdrop colour elsewhere
+	const bool external = BIT(m_image_coding_method, ICM_EV_BIT);
+	const uint32_t backdrop = s_4bpp_display_color[external ? 0 : m_backdrop_color];
+	const uint32_t *ext_video = nullptr;
+	if (external && m_ext_video)
+	{
+		m_ext_video->ext_video_line(m_display_line, m_ext_video_line, width + border_width * 2);
+		ext_video = m_ext_video_line + border_width;
+	}
 
 	for (int x = 0; x < width; x++)
 	{
 		if (transparent_a[x] && transparent_b[x])
 		{
-			out[x] = get_backdrop_plane(x + border_width, m_display_line);
+			out[x] = (ext_video && (ext_video[x] >> 24)) ? ext_video[x] : backdrop;
 			continue;
 		}
 		uint32_t plane_a_cur = MosaicA ? plane_a[x - (x % mosaic_count_a)] : plane_a[x];
@@ -785,10 +797,11 @@ void mcd212_device::draw_cursor(uint32_t *scanline)
 			color_index = color_index ^ 0x7; // Inverted Color Blink. MCD212 Section 7.5
 	}
 
-	const uint16_t cursor_x = m_cursor_position & 0x3ff;
-	const uint16_t cursor_y = ((m_cursor_position >> 12) & 0x3ff) + m_ica_height;
+	const int border_width = get_border_width();
+	const uint16_t cursor_x = (m_cursor_position & 0x3ff) + border_width;
+	const uint16_t cursor_y = ((m_cursor_position >> 12) & 0x3ff) + m_ica_height + get_border_height();
 	const int32_t y = screen().vpos() / 2 - cursor_y;
-	const int width = get_screen_width();
+	const int width = get_screen_width() + border_width;
 
 	if ((0 <= y) && (y < 16))
 	{
@@ -1012,15 +1025,21 @@ TIMER_CALLBACK_MEMBER(mcd212_device::ica_tick)
 
 TIMER_CALLBACK_MEMBER(mcd212_device::dca_tick)
 {
-	// Process DCA
-	if (dca_enabled(1))
-		process_dca<1>();
-	if (dca_enabled(0))
-		process_dca<0>();
+	const int first_line = m_ica_height + get_border_height();
+	const int last_line = m_total_height - get_border_height() - 1;
+	const int scanline = screen().vpos() / 2;
 
-	int scanline = screen().vpos() / 2;
-	if (scanline == m_total_height - 1)
-		m_dca_timer->adjust(screen().time_until_pos(m_ica_height * 2, 784));
+	// Process DCA
+	if (scanline >= first_line && scanline <= last_line)
+	{
+		if (dca_enabled(1))
+			process_dca<1>();
+		if (dca_enabled(0))
+			process_dca<0>();
+	}
+
+	if (scanline >= last_line)
+		m_dca_timer->adjust(screen().time_until_pos(first_line * 2, 784));
 	else
 		m_dca_timer->adjust(screen().time_until_pos((scanline + 1) * 2, 784));
 }
@@ -1049,13 +1068,10 @@ uint32_t mcd212_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		uint32_t *const out2 = &bitmap.pix(scanline * 2 + BIT(m_csrr[0], CSR1R_PA_BIT));
 
 		bool draw_line = true;
-		if (!BIT(m_dcr[0], DCR_FD_BIT) && BIT(m_csrw[0], CSR1W_ST_BIT))
+		const int border_height = get_border_height();
+		if ((scanline - m_ica_height < border_height) || (scanline >= (m_total_height - border_height)))
 		{
-			// If PAL and 'Standard' bit set, insert a 20-line border on the top/bottom
-			if ((scanline - m_ica_height < 20) || (scanline >= (m_total_height - 20)))
-			{
-				draw_line = false;
-			}
+			draw_line = false;
 		}
 
 		m_csrr[0] |= CSR1R_DA;

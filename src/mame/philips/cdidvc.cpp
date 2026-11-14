@@ -28,6 +28,8 @@
 #include "emu.h"
 #include "cdidvc.h"
 
+#include <algorithm>
+
 #define LOG_REGS_R    (1U << 1)
 #define LOG_REGS_W    (1U << 2)
 #define LOG_DMA       (1U << 3)
@@ -124,11 +126,6 @@ void cdi_dvc_vmpeg_device::device_reset()
 	m_slot->intreq_w(0);
 }
 
-void cdi_dvc_vmpeg_device::device_post_load()
-{
-	m_slot->intreq_w(m_intreq_state ? 1 : 0);
-}
-
 //**************************************************************************
 //  TRANSFERS
 //**************************************************************************
@@ -212,12 +209,11 @@ uint8_t cdi_dvc_vmpeg_device::intack_r()
 //  VIDEO OUTPUT
 //**************************************************************************
 
-// x is a column of the 768 pixel MCD212 line buffer, y is a display line
-// counted from the start of active video.  The decoder works in CD-i pixels,
-// of which there are 384 across the active line.
-bool cdi_dvc_vmpeg_device::ext_video_pixel(int x, int y, uint32_t &argb) const
+// y is a display line counted from the start of active video.  The decoder
+// works in CD-i pixels, of which there are 384 across the active line.
+void cdi_dvc_vmpeg_device::ext_video_line(int y, uint32_t *line, int count) const
 {
-	return m_fmv->video_pixel(x / 2, y, argb);
+	m_fmv->video_line(y, line, count);
 }
 
 void cdi_dvc_vmpeg_device::screen_vblank(int state)
@@ -377,26 +373,29 @@ cdi_dvc_slot_device::cdi_dvc_slot_device(const machine_config &mconfig, const ch
 
 void cdi_dvc_slot_device::device_start()
 {
+	m_card = get_card_device();
+
 	if (m_screen)
 		m_screen->register_vblank_callback(vblank_state_delegate(&cdi_dvc_slot_device::vblank_callback, this));
 }
 
 uint8_t cdi_dvc_slot_device::intack_r()
 {
-	device_cdi_dvc_interface *const card = get_card_device();
-	return card ? card->intack_r() : 0;
+	return m_card ? m_card->intack_r() : 0;
 }
 
 void cdi_dvc_slot_device::screen_vblank(int state)
 {
-	if (device_cdi_dvc_interface *const card = get_card_device())
-		card->screen_vblank(state);
+	if (m_card)
+		m_card->screen_vblank(state);
 }
 
-bool cdi_dvc_slot_device::ext_video_pixel(int x, int y, uint32_t &argb) const
+void cdi_dvc_slot_device::ext_video_line(int y, uint32_t *line, int count) const
 {
-	device_cdi_dvc_interface *const card = const_cast<cdi_dvc_slot_device *>(this)->get_card_device();
-	return card && card->ext_video_pixel(x, y, argb);
+	if (m_card)
+		m_card->ext_video_line(y, line, count);
+	else
+		std::fill_n(line, count, 0);
 }
 
 void cdi_dvc_cards(device_slot_interface &device)

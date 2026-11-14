@@ -104,6 +104,10 @@ public:
 	// Clear persistent decoding state.
 	void clear() ATTR_COLD;
 
+	// Sequence parameters a host supplies in place of a sequence header.
+	// Ignored inside a picture or when out of range.
+	void set_sequence(int width, int height, unsigned picture_rate);
+
 	// Discard buffered input and any partial picture, but keep the sequence
 	// parameters, so a stream can resume without a new sequence header.
 	void reset_input();

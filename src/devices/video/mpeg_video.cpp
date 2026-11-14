@@ -449,6 +449,23 @@ void mpeg_video::reset_input()
 	m_macroblock_address = -1;
 }
 
+void mpeg_video::set_sequence(int width, int height, unsigned picture_rate)
+{
+	if (m_in_picture || !width || !height ||
+		(width > m_maximum_width) || (height > m_maximum_height) ||
+		(picture_rate >= std::size(s_picture_rates)) || !s_picture_rates[picture_rate])
+		return;
+
+	m_horizontal_size = width;
+	m_vertical_size = height;
+	m_frame_rate = s_picture_rates[picture_rate];
+	m_picture_rate_code = picture_rate;
+	m_mb_width = (m_horizontal_size + 15) / 16;
+	m_mb_height = (m_vertical_size + 15) / 16;
+	m_luma_pitch = m_mb_width * 16;
+	m_chroma_pitch = m_mb_width * 8;
+}
+
 void mpeg_video::clear()
 {
 	reset_input();

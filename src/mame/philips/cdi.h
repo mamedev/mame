@@ -138,7 +138,7 @@ private:
 
 	bool m_boot_press = false;
 	emu_timer *m_boot_timer = nullptr;
-	int m_mcu_rxd;
+	bool m_mcu_rxd;
 };
 
 // Quizard 2 language values:
