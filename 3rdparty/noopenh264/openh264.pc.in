@@ -1,0 +1,10 @@
+prefix=@prefix@
+libdir=@libdir@
+includedir=${prefix}/include
+
+Name: OpenH264
+Description: Dummy implementation of the OpenH264 library from Cisco.
+Version: @VERSION@
+Libs: -L${libdir} -lopenh264 @LIBS@
+Libs.private: @LIBS_PRIVATE@
+Cflags: -I${includedir}

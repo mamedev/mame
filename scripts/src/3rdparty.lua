@@ -2188,17 +2188,13 @@ if VIDEOS["HANTRO_G1"] then
 	kind "StaticLib"
 	defines { "MAME_H264_DECODE_ORDER" }
 	includedirs {
-		MAME_DIR .. "3rdparty/openh264/codec/api/wels",
-		MAME_DIR .. "3rdparty/openh264/codec/common/inc",
-		MAME_DIR .. "3rdparty/openh264/codec/decoder/core/inc",
-		MAME_DIR .. "3rdparty/openh264/codec/decoder/plus/inc",
+		MAME_DIR .. "3rdparty/noopenh264/codec/api/wels",
+		MAME_DIR .. "3rdparty/noopenh264/codec/decoder/plus/inc",
 	}
 	configuration { "gmake or ninja or jcdb" }
 	buildoptions { "-Wno-error=implicit-fallthrough" }
 	configuration { }
 	files {
-		MAME_DIR .. "3rdparty/openh264/codec/common/src/*.cpp",
-		MAME_DIR .. "3rdparty/openh264/codec/decoder/core/src/*.cpp",
-		MAME_DIR .. "3rdparty/openh264/codec/decoder/plus/src/*.cpp",
+		MAME_DIR .. "3rdparty/noopenh264/codec/decoder/plus/src/*.cpp",
 	}
 end
