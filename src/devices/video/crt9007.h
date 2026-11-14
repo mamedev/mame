@@ -113,6 +113,8 @@ private:
 	inline void update_frame_timer();
 
 	inline void update_curs_output();
+	inline void compute_cursor_position();
+	inline void compute_geometry();
 	inline void recompute_cursor();
 	inline void recompute_parameters();
 

@@ -444,14 +444,12 @@ inline void crt9007_device::update_curs_output()
 
 
 //-------------------------------------------------
-//  recompute_cursor -
+//  compute_cursor_position - work out the beam
+//  positions of the cursor from the registers
 //-------------------------------------------------
 
-inline void crt9007_device::recompute_cursor()
+inline void crt9007_device::compute_cursor_position()
 {
-	// check that necessary registers have been loaded
-	if (!HAS_VALID_PARAMETERS) return;
-
 	// the cursor is displayed for 1 character time on every scan line of the data
 	// row it is located on
 	// TODO cursor skew, double height cursor
@@ -460,6 +458,20 @@ inline void crt9007_device::recompute_cursor()
 
 	m_curs_top = VERTICAL_DELAY + (VERTICAL_CURSOR * SCAN_LINES_PER_DATA_ROW);
 	m_curs_bottom = m_curs_top + SCAN_LINES_PER_DATA_ROW - 1;
+}
+
+
+//-------------------------------------------------
+//  recompute_cursor - recompute the cursor
+//  position and restart the cursor timer
+//-------------------------------------------------
+
+inline void crt9007_device::recompute_cursor()
+{
+	// check that necessary registers have been loaded
+	if (!HAS_VALID_PARAMETERS) return;
+
+	compute_cursor_position();
 
 	// the cursor registers may have been changed while the cursor was displayed
 	if (m_curs)
@@ -499,21 +511,14 @@ inline void crt9007_device::update_frame_timer()
 
 
 //-------------------------------------------------
-//  recompute_parameters -
+//  compute_geometry - work out the beam positions
+//  of the sync, visible line time and data row
+//  edges from the registers, without touching any
+//  timer or output
 //-------------------------------------------------
 
-inline void crt9007_device::recompute_parameters()
+inline void crt9007_device::compute_geometry()
 {
-	// check that necessary registers have been loaded
-	if (!HAS_VALID_PARAMETERS) return;
-
-	// screen dimensions
-	int horiz_pix_total = CHARACTERS_PER_HORIZONTAL_PERIOD * m_hpixels_per_column;
-	int vert_pix_total = SCAN_LINES_PER_FRAME;
-
-	// refresh rate
-	attotime refresh = frame_period();
-
 	// horizontal sync
 	m_hsync_start = 0;
 	m_hsync_end = HORIZONTAL_SYNC_WIDTH * m_hpixels_per_column;
@@ -529,6 +534,28 @@ inline void crt9007_device::recompute_parameters()
 	// vertical sync
 	m_vsync_start = 0;
 	m_vsync_end = VERTICAL_SYNC_WIDTH;
+}
+
+
+//-------------------------------------------------
+//  recompute_parameters - recompute the beam
+//  positions and re-arm the sync, visible line,
+//  data row, frame and cursor timers
+//-------------------------------------------------
+
+inline void crt9007_device::recompute_parameters()
+{
+	// check that necessary registers have been loaded
+	if (!HAS_VALID_PARAMETERS) return;
+
+	compute_geometry();
+
+	// screen dimensions
+	int horiz_pix_total = CHARACTERS_PER_HORIZONTAL_PERIOD * m_hpixels_per_column;
+	int vert_pix_total = SCAN_LINES_PER_FRAME;
+
+	// refresh rate
+	attotime refresh = frame_period();
 
 	// visible area
 	rectangle visarea(m_hsync_end, horiz_pix_total - 1, m_vsync_end, vert_pix_total - 1);
@@ -698,14 +725,18 @@ void crt9007_device::device_reset()
 
 
 //-------------------------------------------------
-//  device_post_load - called after the loading a
-//  saved state, so that registered variables can
-//  be expanded as necessary
+//  device_post_load - called after loading a
+//  saved state, to rebuild the beam positions
+//  from the saved registers
 //-------------------------------------------------
 
 void crt9007_device::device_post_load()
 {
-	recompute_parameters();
+	// The timers and output levels are saved and restored with the rest of the
+	// state.  Only the beam positions, which are worked out from the registers
+	// and not saved, are rebuilt here.
+	compute_geometry();
+	compute_cursor_position();
 }
 
 
