@@ -49,6 +49,8 @@ private:
 	void set_cr(uint8_t newcr);
 	void check_dma_complete();
 	void do_tx();
+	void do_loopback();
+	bool address_match(uint8_t const *buf) const;
 	void check_irq() { m_irq_cb((m_regs.imr & m_regs.isr & 0x7f)?ASSERT_LINE:CLEAR_LINE); }
 	void recv_overflow();
 	void stop();
@@ -56,6 +58,8 @@ private:
 
 	int m_reset;
 	int m_rdma_active;
+	uint8_t m_loopback_fifo[8];
+	uint8_t m_loopback_fifo_index;
 
 	struct {
 		uint8_t cr;
