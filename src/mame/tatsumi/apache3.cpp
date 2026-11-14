@@ -24,7 +24,6 @@
 #include "speaker.h"
 
 #include <algorithm>
-#include <iterator>
 
 namespace {
 
@@ -63,7 +62,6 @@ private:
 	void apache3_road_z_w(uint16_t data);
 	void apache3_road_x_w(offs_t offset, uint8_t data);
 
-	void screen_vblank(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void apache3_68000_reset(int state);
 
@@ -87,9 +85,6 @@ private:
 	int m_apache3_rot_idx;
 	int16_t m_apache3_road_x_ram[256]{};
 	uint8_t m_apache3_road_z = 0;
-	uint16_t m_sprite_buffer[0x2000]{};
-	uint16_t m_sprite_bank = 0;
-	bool m_sprite_buffer_valid = false;
 };
 
 
@@ -180,26 +175,11 @@ void apache3_state::video_start()
 	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(apache3_state::get_text_tile_info)), TILEMAP_SCAN_ROWS, 8,8, 64,64);
 
 	m_tx_layer->set_transparent_pen(0);
-
-	save_item(NAME(m_sprite_buffer));
-	save_item(NAME(m_sprite_bank));
-	save_item(NAME(m_sprite_buffer_valid));
-}
-
-void apache3_state::screen_vblank(int state)
-{
-	if (state)
-	{
-		std::copy_n(&m_spriteram[0], std::size(m_sprite_buffer), m_sprite_buffer);
-		m_sprite_bank = m_sprite_control_ram[0x20] & 0x1000;
-		m_sprite_buffer_valid = true;
-	}
 }
 
 uint32_t apache3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint16_t const *const sprite_ram = m_sprite_buffer_valid ? m_sprite_buffer : &m_spriteram[0];
-	int const sprite_bank = m_sprite_buffer_valid ? m_sprite_bank : (m_sprite_control_ram[0x20] & 0x1000);
+	int const sprite_bank = m_sprite_control_ram[0x20] & 0x1000;
 
 	m_sprites->update_cluts();
 
@@ -207,10 +187,10 @@ uint32_t apache3_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	bitmap.fill(m_palette->pen(0), cliprect);
 	screen.priority().fill(0, cliprect);
-	m_sprites->draw_sprites(screen.priority(), cliprect, 1, sprite_bank, sprite_ram); // Alpha pass only
+	m_sprites->draw_sprites(screen.priority(), cliprect, 1, sprite_bank); // Alpha pass only
 	draw_ground(bitmap, cliprect);
 	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
-	m_sprites->draw_sprites(bitmap, cliprect, 0, sprite_bank, sprite_ram);
+	m_sprites->draw_sprites(bitmap, cliprect, 0, sprite_bank);
 	m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
 	return 0;
 }
@@ -446,8 +426,6 @@ void apache3_state::apache3_68000_reset(int state)
 void apache3_state::machine_reset()
 {
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, ASSERT_LINE); // TODO
-	m_sprite_bank = 0;
-	m_sprite_buffer_valid = false;
 }
 
 
@@ -490,7 +468,6 @@ void apache3_state::apache3(machine_config &config)
 	screen.set_raw(apache3_state::CLOCK_2 / 8, 400, 0, 320, 280, 0, 240); // TODO: Hook up CRTC
 	screen.set_screen_update(FUNC(apache3_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, 0);
-	screen.screen_vblank().append(FUNC(apache3_state::screen_vblank));
 
 	TZB215_SPRITES(config, m_sprites, 0, 0x800);
 	m_sprites->set_sprite_palette_base(0);
