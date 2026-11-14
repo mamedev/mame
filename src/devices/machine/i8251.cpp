@@ -103,6 +103,7 @@ void i8251_device::device_start()
 	m_rxc_count = 0;
 	m_txc_count = 0;
 	m_br_factor = 0;
+	m_rx_start_check = false;
 
 	m_rx_data = 0;
 	m_tx_data = 0;
@@ -133,6 +134,7 @@ void i8251_device::device_start()
 	save_item(NAME(m_rxc_count));
 	save_item(NAME(m_txc_count));
 	save_item(NAME(m_br_factor));
+	save_item(NAME(m_rx_start_check));
 
 	save_item(NAME(m_rx_data));
 	save_item(NAME(m_tx_data));
@@ -179,6 +181,26 @@ void i8251_device::receive_clock()
 			--m_rxc_count;
 			if (m_rxc_count)
 				return;
+
+			// false start bit detection: a start bit must still be low at its
+			// centre, or it was a glitch and the search for one resumes
+			// (8251A data sheet, Receiver Control and Asynchronous Mode (Receive))
+			if (m_rx_start_check)
+			{
+				m_rx_start_check = false;
+				if (m_rxd)
+				{
+					receive_register_reset();
+					// the register still holds the low start bit; shift the
+					// high line in so the next falling edge is a transition
+					receive_register_update_bit(m_rxd);
+				}
+				else
+				{
+					m_rxc_count = m_br_factor;
+				}
+				return;
+			}
 		}
 
 		//logerror("I8251\n");
@@ -186,7 +208,23 @@ void i8251_device::receive_clock()
 		//LOGBITS("8251: Rx Sampled %d\n", m_rxd);
 		receive_register_update_bit(m_rxd);
 		if (is_receive_register_synchronized())
-			m_rxc_count = sync ? m_br_factor : (3 * m_br_factor / 2);
+		{
+			if (sync)
+			{
+				m_rxc_count = m_br_factor;
+			}
+			else if (m_br_factor > 1)
+			{
+				// check the start bit again half a bit from now
+				m_rx_start_check = true;
+				m_rxc_count = m_br_factor / 2;
+			}
+			else
+			{
+				m_rx_start_check = false;
+				m_rxc_count = 3 * m_br_factor / 2;
+			}
+		}
 
 		if (is_receive_register_full())
 		{
@@ -526,6 +564,7 @@ void i8251_device::device_reset()
 	m_tx_data = 0;
 	m_rxc_count = m_txc_count = 0;
 	m_br_factor = 1;
+	m_rx_start_check = false;
 
 	/* update tx empty pin output */
 	update_tx_empty();
@@ -735,6 +774,7 @@ void i8251_device::mode_w(uint8_t data)
 	}
 
 	receive_register_reset();
+	m_rx_start_check = false;
 	m_txc_count = 0;
 }
 
