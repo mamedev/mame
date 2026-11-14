@@ -21521,6 +21521,9 @@ tpad600x
 tpad760xd
 tpad770z
 
+@source:ibm/thinkpad750.cpp
+tpad750cs
+
 @source:ibm/thinkpad8xx.cpp
 tpad850
 
