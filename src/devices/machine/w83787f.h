@@ -100,7 +100,7 @@ private:
 	bool m_locked_state = true;
 	u8 m_cr0 = 0;
 	u8 m_cr1 = 0;
-	u8 m_cr4 = 0;
+	//u8 m_cr4 = 0;
 };
 
 DECLARE_DEVICE_TYPE(W83787F, w83787f_device);
