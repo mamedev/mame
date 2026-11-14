@@ -410,6 +410,7 @@ const double XTAL::known_xtals[] = {
 	 27'164'000, // 27.164_MHz_XTAL        Typically used on 90's Taito PCBs to drive the custom chips
 	 27'210'900, // 27.2109_MHz_XTAL       LA Girl
 	 27'562'000, // 27.562_MHz_XTAL        Visual 220
+	 27'648'000, // 27.648_MHz_XTAL        NCR 9010 Common Control Module
 	 27'720'000, // 27.72_MHz_XTAL         AT&T 610 132-column display clock
 	 27'956'000, // 27.956_MHz_XTAL        CIT-101e 132-column display clock
 	 28'000'000, // 28_MHz_XTAL            Sega System H1 SH2 clock, Kyukyoku Tiger / Twin Cobra
