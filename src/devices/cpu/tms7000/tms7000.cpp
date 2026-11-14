@@ -819,7 +819,7 @@ void tms7000_device::execute_run()
 
 	do
 	{
-		int const cycles = m_icount;
+		uint64_t const cycles = total_cycles();
 		if (chip_is_family_70cx2())
 			check_interrupts();
 		debugger_instruction_hook(m_pc);
@@ -827,7 +827,8 @@ void tms7000_device::execute_run()
 		m_op = m_cache.read_byte(m_pc++);
 		execute_one(m_op);
 		if (chip_is_family_70cx2())
-			timer16_advance((cycles - m_icount) * m_divider);
+			// Exclude remaining timeslice cycles discarded by callbacks.
+			timer16_advance((total_cycles() - cycles) * m_divider);
 	} while (m_icount > 0);
 }
 
