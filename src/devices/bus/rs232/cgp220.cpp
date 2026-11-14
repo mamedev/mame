@@ -5,7 +5,8 @@
     Radio Shack Color Graphics Printer CGP-220, serial interface
 
     Like other Radio Shack serial printers the busy signal is returned
-    on RX. 600 or 2400 baud, 8 data bits, no parity, set by a switch.
+    on RX (DIN pin 2, STATUS); pin 1 is not connected. 600 or 2400 baud,
+    8 data bits, no parity, set by a switch.
 
 **********************************************************************/
 
@@ -28,7 +29,7 @@ void rs232_cgp220_device::device_add_mconfig(machine_config &config)
 {
 	CGP220(config, m_printer);
 	m_printer->set_serial_interface(true);
-	m_printer->busy_handler().set(FUNC(rs232_cgp220_device::busy_w));
+	m_printer->busy_handler().set(FUNC(rs232_cgp220_device::output_rxd));
 }
 
 
@@ -37,10 +38,7 @@ void rs232_cgp220_device::device_start()
 }
 
 
-void rs232_cgp220_device::busy_w(int state)
+void rs232_cgp220_device::input_txd(int state)
 {
-	output_rxd(state);
-	output_dcd(state);
-	output_dsr(state);
-	output_cts(state);
+	m_printer->rxd_w(state);
 }
