@@ -79,6 +79,7 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #include <algorithm>
 #include <bit>
 #include <iterator>
+#include <utility>
 
 #define LOG_SCALE (1U << 1)
 
@@ -91,7 +92,7 @@ constexpr int RLT_REFRESH_RATE   = 60;
 constexpr int RLT_TIMER_FREQ     = RLT_REFRESH_RATE * 256;
 
 constexpr XTAL RLT_MAIN_CLOCK = 32_MHz_XTAL; // the board's only crystal
-constexpr unsigned BLIT_CLOCKS_PER_PIXEL = 5; // a guess, see the TODO
+constexpr uint32_t BLIT_CLOCKS_PER_PIXEL = 5; // a guess, see the TODO
 
 constexpr uint16_t BLTFLAG_DST_X_DIR   = 1 << 0;
 constexpr uint16_t BLTFLAG_DST_Y_DIR   = 1 << 1;
@@ -171,18 +172,17 @@ private:
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[RLT_NUM_BITMAPS];
 	emu_timer *m_timer = nullptr;
 	emu_timer *m_blit_done_timer;
-	bool m_blit_busy;
 	bool m_blit_deferred;
 	bool m_flip_pending;
-	uint16_t m_flip_display;
+	bool m_flip_display;
 
 	uint16_t io_r();
 	void snd1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void snd2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void decode_scale(uint16_t scale, int &dst_steps, int &src_steps) const;
+	std::pair<int, int> decode_scale(uint16_t scale) const;
 	void do_blit();
-	void flip_display(uint16_t display);
+	void flip_display(bool display);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
@@ -268,17 +268,19 @@ Blitter registers description (reg/bit names selected arbitrary ) :
 
 // The two counters of 70000a as destination and source steps, a+1 and b+1 from the high
 // nibbles; 0x0000 is 1/1, and a value whose nibbles differ is decoded the same way.
-void rltennis_state::decode_scale(uint16_t scale, int &dst_steps, int &src_steps) const
+std::pair<int, int> rltennis_state::decode_scale(uint16_t scale) const
 {
 	const auto counter = [scale] (int shift) { return BIT(scale, shift, 4) + 1; };
 
-	dst_steps = counter(12);
-	src_steps = counter(4);
+	const int dst_steps = counter(12);
+	const int src_steps = counter(4);
 
 	if (counter(8) != dst_steps || counter(0) != src_steps)
 		LOGMASKED(LOG_SCALE, "%s: scale register %04x does not repeat its nibbles; using the high ones\n", machine().describe_context(), scale);
 	if (dst_steps > src_steps)
 		LOGMASKED(LOG_SCALE, "%s: scale register %04x enlarges, which the game was never seen to ask for\n", machine().describe_context(), scale);
+
+	return { dst_steps, src_steps };
 }
 
 void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -292,10 +294,10 @@ void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	if(offset==BLT_FLAGS && ((new_data^old_data) & BLTFLAG_DISPLAY_UD) )
 	{
 		m_flip_pending = true;
-		m_flip_display = new_data & BLTFLAG_DISPLAY_UD;
+		m_flip_display = BIT(new_data, 5);
 	}
 
-	// IRQ1 is a level held while the blitter is idle; the game clears the strobe before each blit
+	// IRQ1 is raised when a blit completes (and at reset) and cleared by writing the strobe low
 	if(offset == BLT_START && !(new_data & BLTSTRT_TRIGGER))
 		m_maincpu->set_input_line(1, CLEAR_LINE);
 
@@ -340,9 +342,7 @@ void rltennis_state::do_blit()
 
 	// a scaled blit reads source step d*(b+1)/(a+1) at destination step d; which steps
 	// repeat or skip a pixel (the phase) is a model choice
-	const uint16_t scale = m_blitter[BLT_SCALE];
-	int scale_dst, scale_src;
-	decode_scale(scale, scale_dst, scale_src);
+	auto const [scale_dst, scale_src] = decode_scale(m_blitter[BLT_SCALE]);
 
 	int layer=(m_blitter[BLT_START] & BLTSTRT_LAYER )?BITMAP_BG:BITMAP_FG_1;
 
@@ -361,24 +361,23 @@ void rltennis_state::do_blit()
 		force_blit=true;
 	}
 
-	// held inside the source span, whatever encodes the ratio: a destination can be longer than
-	// the ratio gives (one step on a scaled blit, a few columns on set 2's 1/1 ball animation,
-	// where the ROM's next columns are not part of the picture)
-	const auto src_idx = [scale_src, scale_dst] (int d, int limit) { return std::min(d * scale_src / scale_dst, limit); };
+	// a destination longer than its source repeats the source's last pixel
+	const auto src_idx = [src = scale_src, dst = scale_dst] (int d, int limit) { return std::min(d * src / dst, limit); };
 
-	// the source row of each destination row is the same in every column
-	int src_row[256];
-	for( int idx_y=0 ; idx_y<=blit_h1; idx_y++ )
-		src_row[idx_y]=src_y0+(y_src_step*src_idx(idx_y, blit_h));
+	// the source column of each destination column is the same in every row
+	int src_col[256];
+	for( int idx_x=0 ; idx_x<=blit_w1; idx_x++ )
+		src_col[idx_x]=src_x0+(x_src_step*src_idx(idx_x, blit_w));
 
-	for( int x=dst_x0, idx_x=0 ; idx_x<=blit_w1; x+=x_dst_step, idx_x++ )
+	for( int y=dst_y0, idx_y=0 ; idx_y<=blit_h1; y+=y_dst_step, idx_y++ )
 	{
-		const int col_xx=src_x0+(x_src_step*src_idx(idx_x, blit_w));
+		const int row_yy=src_y0+(y_src_step*src_idx(idx_y, blit_h));
+		uint16_t *const dst_row = &m_tmp_bitmap[layer]->pix(y & 0xff);
 
-		for( int y=dst_y0, idx_y=0 ; idx_y<=blit_h1;y+=y_dst_step, idx_y++)
+		for( int x=dst_x0, idx_x=0 ; idx_x<=blit_w1; x+=x_dst_step, idx_x++ )
 		{
-			int xx=col_xx;
-			int yy=src_row[idx_y];
+			int xx=src_col[idx_x];
+			int yy=row_yy;
 
 			if(force_blit)
 			{
@@ -393,24 +392,22 @@ void rltennis_state::do_blit()
 
 			if(pix || force_blit)
 			{
-				m_tmp_bitmap[layer]->pix(y & 0xff, screen_x ) = pix;
+				dst_row[screen_x] = pix;
 			}
 		}
 	}
 
 	// the blit takes a time per pixel walked, the longer of the source and destination walks
-	const unsigned walked = (std::max(blit_w, blit_w1) + 1) * (std::max(blit_h, blit_h1) + 1);
-	m_blit_busy = true;
+	const uint32_t walked = (std::max(blit_w, blit_w1) + 1) * (std::max(blit_h, blit_h1) + 1);
 	m_blit_done_timer->adjust(attotime::from_ticks(walked * BLIT_CLOCKS_PER_PIXEL, RLT_MAIN_CLOCK));
 }
 
 TIMER_CALLBACK_MEMBER(rltennis_state::blit_done)
 {
-	m_blit_busy = false;
 	m_maincpu->set_input_line(1, ASSERT_LINE);
 }
 
-void rltennis_state::flip_display(uint16_t display)
+void rltennis_state::flip_display(bool display)
 {
 	// the plane that was drawn becomes the visible one, and is cleared for the next list
 	bitmap_ind16 &drawn = *m_tmp_bitmap[display ? BITMAP_FG_1 : BITMAP_FG_2];
@@ -420,7 +417,7 @@ void rltennis_state::flip_display(uint16_t display)
 
 void rltennis_state::screen_vblank(int state)
 {
-	if (state && m_flip_pending && !m_blit_busy)
+	if (state && m_flip_pending && !m_blit_done_timer->enabled())
 	{
 		flip_display(m_flip_display);
 		m_flip_pending = false;
@@ -443,7 +440,7 @@ void rltennis_state::video_start()
 	m_tmp_bitmap[BITMAP_FG_DISPLAY] = std::make_unique<bitmap_ind16>(512, 256);
 
 	save_item(NAME(m_blitter));
-	// the planes persist between frames and are painted blit by blit, so they are state
+	// the planes persist between frames
 	for (int i = BITMAP_BG; i <= BITMAP_FG_DISPLAY; i++)
 		save_item(NAME(*m_tmp_bitmap[i]), i);
 }
@@ -542,7 +539,7 @@ void rltennis_state::machine_start()
 	m_timer = timer_alloc(FUNC(rltennis_state::sample_player), this);
 	m_blit_done_timer = timer_alloc(FUNC(rltennis_state::blit_done), this);
 
-	m_flip_display = 0;
+	m_flip_display = false;
 
 	save_item(NAME(m_data760000));
 	save_item(NAME(m_data740000));
@@ -550,7 +547,6 @@ void rltennis_state::machine_start()
 	save_item(NAME(m_sample_rom_offset));
 	save_item(NAME(m_offset_shift));
 	save_item(NAME(m_unk_counter));
-	save_item(NAME(m_blit_busy));
 	save_item(NAME(m_blit_deferred));
 	save_item(NAME(m_flip_pending));
 	save_item(NAME(m_flip_display));
@@ -560,11 +556,9 @@ void rltennis_state::machine_reset()
 {
 	m_timer->adjust(attotime::from_hz(RLT_TIMER_FREQ));
 
-	// the blitter comes out of reset idle; the driver also clears its registers, against which
-	// each write finds the flip and strobe edges
+	// the driver clears the blitter's registers and leaves it idle
 	std::fill(std::begin(m_blitter), std::end(m_blitter), 0);
-	m_blit_done_timer->adjust(attotime::never);
-	m_blit_busy = false;
+	m_blit_done_timer->enable(false);
 	m_blit_deferred = false;
 	m_flip_pending = false;
 	m_maincpu->set_input_line(1, ASSERT_LINE);
