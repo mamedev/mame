@@ -3074,6 +3074,7 @@ if CPUS["TMS320C82"] then
 		MAME_DIR .. "src/devices/cpu/tms320c82/tms320c82.cpp",
 		MAME_DIR .. "src/devices/cpu/tms320c82/tms320c82.h",
 		MAME_DIR .. "src/devices/cpu/tms320c82/mp_ops.cpp",
+		MAME_DIR .. "src/devices/cpu/tms320c82/pp_ops.cpp",
 	}
 end
 
