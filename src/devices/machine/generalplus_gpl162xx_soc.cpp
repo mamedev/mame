@@ -443,12 +443,13 @@ void generalplus_gpl162xx_base_device::iod_data_w(u16 data)
 u16 generalplus_gpl162xx_base_device::iod_buffer_r()
 {
 	LOGMASKED(LOG_GPL162XX_IO, "%s:generalplus_gpl162xx_base_device::iod_buffer_r\n", machine().describe_context());
-	return 0xffff;
+	return m_iod_buffer;
 }
 
 void generalplus_gpl162xx_base_device::iod_buffer_w(u16 data)
 {
 	LOGMASKED(LOG_GPL162XX_IO, "%s:generalplus_gpl162xx_base_device::iod_buffer_w %04x\n", machine().describe_context(), data);
+	m_iod_buffer = data;
 	m_portd_out(data); // buffer writes must update output state too, beijuehh requires it for banking
 }
 

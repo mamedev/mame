@@ -11,6 +11,7 @@
 #include "bus/generic/slot.h"
 #include "machine/generalplus_gpl162xx_b_soc.h"
 #include "machine/nandflash.h"
+#include "machine/i2cmem.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -97,5 +98,23 @@ protected:
 };
 
 
-#endif // MAME_TVGAMES_GENERALPLUS_GPL16250_NAND_H
+class generalplus_gpac800_behero_game_state : public generalplus_gpac800_game_state
+{
+public:
+	generalplus_gpac800_behero_game_state(const machine_config &mconfig, device_type type, const char *tag) :
+		generalplus_gpac800_game_state(mconfig, type, tag),
+		m_eeprom(*this, "eeprom")
+	{
+	}
 
+	void behero_init(machine_config &config);
+	void portd_update();
+	void portd_w(u16 data);
+	u16 portd_r();
+	u16 m_portd_latch;
+
+protected:
+	required_device<i2c_24c08_device> m_eeprom;
+};
+
+#endif // MAME_TVGAMES_GENERALPLUS_GPL16250_NAND_H
