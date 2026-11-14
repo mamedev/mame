@@ -375,7 +375,7 @@ private:
 	TIMER_CALLBACK_MEMBER(fishing_cart_mcu_sync);
 
 	required_device<nrf24e1_device> m_fishing_cart_mcu;
-	required_device<eeprom_spi_25320_device> m_fishing_cart_eeprom;
+	required_device<eeprom_spi_m95320_device> m_fishing_cart_eeprom;
 	required_device<xavix_bassfishing_device> m_fishing_tackle;
 	u8 m_fishing_host_data = 0;
 	u8 m_fishing_host_direction = 0;

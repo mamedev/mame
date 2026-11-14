@@ -7,53 +7,11 @@
 
 #include "md_slot.h"
 
+#include "machine/eepromspi.h"
+
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
-
-/* ST M95320 32Kbit serial EEPROM implementation */
-// TO DO: STM95 should be made a separate EEPROM device and this should be merged with md_eeprom.c!
-
-class stm95_eeprom_device
-{
-public:
-	static constexpr unsigned M95320_SIZE = 0x1000;
-
-	stm95_eeprom_device(running_machine &machine, uint8_t *eeprom);
-	running_machine &machine() const { return m_machine; }
-
-	uint8_t   *eeprom_data;
-	void    set_cs_line(int);
-	void    set_halt_line(int state) {}; // not implemented
-	void    set_si_line(int);
-	void    set_sck_line(int state);
-	int     get_so_line(void);
-
-protected:
-	enum STMSTATE
-	{
-		IDLE = 0,
-		CMD_WRSR,
-		CMD_RDSR,
-		M95320_CMD_READ,
-		CMD_WRITE,
-		READING,
-		WRITING
-	};
-
-	int     latch;
-	int     reset_line;
-	int     sck_line;
-	int     WEL;
-
-	STMSTATE    stm_state;
-	int     stream_pos;
-	int     stream_data;
-	int     eeprom_addr;
-
-	running_machine& m_machine;
-};
-
 
 // ======================> md_eeprom_stm95_device
 
@@ -72,14 +30,15 @@ protected:
 	md_eeprom_stm95_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	required_device<eeprom_spi_m95320_device> m_stm95;
+
 	uint8_t m_bank[3];
 	int m_rdcnt;
-
-	std::unique_ptr<stm95_eeprom_device> m_stm95;
 };
 
 

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:MagikalUnicorn
+// copyright-holders:Fabio Priuli, MetalliC, Ryan Holtz, MagikalUnicorn
 /***************************************************************************
 
     SPI EEPROM devices with byte-oriented commands and addresses, page writes,
@@ -7,10 +7,13 @@
     Serial input is sampled on rising edges and output changes on falling edges.
 
     The shared protocol accepts one to three address bytes independently of
-    array capacity. Devices that encode address bits in the command need a
-    separate decoder. Deselected and held outputs read as pulled high.
-    The 25320 model has 4 KiB, two address bytes and 32-byte pages. Its default
-    write time is the 25LC320A's 5 ms maximum; board configuration can override it.
+    array capacity, with an optional address bit in the command byte.
+    Deselected and held outputs read as pulled high.
+    M95320 has 4 KiB, two address bytes and 32-byte pages.
+    M95010/20/40 have 128/256/512 bytes and 16-byte pages; M95040 encodes its
+    ninth address bit in the command. Write time defaults to the 5 ms maximum.
+
+    TODO: Identification pages on ST -DF variants.
 
 ***************************************************************************/
 
@@ -20,15 +23,31 @@
 #include <algorithm>
 #include <bit>
 
+#define LOG_COMMAND (1U << 1)
+#define LOG_ADDRESS (1U << 2)
+#define LOG_STATUS  (1U << 3)
 
-DEFINE_DEVICE_TYPE(EEPROM_25320, eeprom_spi_25320_device, "eeprom_25320", "25320 SPI EEPROM")
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
-eeprom_spi_base_device::eeprom_spi_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 page_bytes, u8 address_bytes) :
+DEFINE_DEVICE_TYPE(SPI_EEPROM_M95010, eeprom_spi_m95010_device, "m95010", "SPI EEPROM M95010 (128x8)")
+DEFINE_DEVICE_TYPE(SPI_EEPROM_M95020, eeprom_spi_m95020_device, "m95020", "SPI EEPROM M95020 (256x8)")
+DEFINE_DEVICE_TYPE(SPI_EEPROM_M95040, eeprom_spi_m95040_device, "m95040", "SPI EEPROM M95040 (512x8)")
+DEFINE_DEVICE_TYPE(SPI_EEPROM_M95320, eeprom_spi_m95320_device, "m95320", "SPI EEPROM M95320 (4096x8)")
+
+
+eeprom_spi_base_device::eeprom_spi_base_device(
+		const machine_config &mconfig, device_type type, const char *tag, device_t *owner,
+		u32 capacity, u32 page_bytes, u8 address_bytes, u8 command_address_mask,
+		u8 status_mask, u8 status_fixed, write_protect_mode wp_mode) :
 	eeprom_base_device(mconfig, type, tag, owner),
 	m_page_bytes(page_bytes),
 	m_address_bytes(address_bytes),
-	m_write_timer(nullptr),
+	m_command_address_mask(command_address_mask),
+	m_status_mask(status_mask),
+	m_status_fixed(status_fixed),
+	m_wp_mode(wp_mode),
 	m_cs(true),
 	m_sck(false),
 	m_si(false),
@@ -36,14 +55,34 @@ eeprom_spi_base_device::eeprom_spi_base_device(const machine_config &mconfig, de
 	m_hold(true),
 	m_status(0)
 {
+	size(capacity, 8);
+	write_time(attotime::from_msec(5));
 }
 
 
-eeprom_spi_25320_device::eeprom_spi_25320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	eeprom_spi_base_device(mconfig, EEPROM_25320, tag, owner, 32, 2)
+eeprom_spi_m950x0_device::eeprom_spi_m950x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 capacity) :
+	eeprom_spi_base_device(mconfig, type, tag, owner, capacity, 16, 1, 0x08, 0x0c, 0xf0, write_protect_mode::WRITE_ENABLE)
 {
-	size(0x1000, 8);
-	write_time(attotime::from_msec(5));
+}
+
+eeprom_spi_m95010_device::eeprom_spi_m95010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	eeprom_spi_m950x0_device(mconfig, SPI_EEPROM_M95010, tag, owner, 0x80)
+{
+}
+
+eeprom_spi_m95020_device::eeprom_spi_m95020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	eeprom_spi_m950x0_device(mconfig, SPI_EEPROM_M95020, tag, owner, 0x100)
+{
+}
+
+eeprom_spi_m95040_device::eeprom_spi_m95040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	eeprom_spi_m950x0_device(mconfig, SPI_EEPROM_M95040, tag, owner, 0x200)
+{
+}
+
+eeprom_spi_m95320_device::eeprom_spi_m95320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	eeprom_spi_base_device(mconfig, SPI_EEPROM_M95320, tag, owner, 0x1000, 32, 2, 0, 0x8c, 0, write_protect_mode::STATUS_REGISTER)
+{
 }
 
 
@@ -53,7 +92,8 @@ bool eeprom_spi_base_device::valid_geometry() const
 	return (m_data_bits == 8) && std::has_single_bit(m_cells)
 			&& std::has_single_bit(m_page_bytes) && (m_page_bytes <= m_cells / 4)
 			&& (m_address_bytes >= 1) && (m_address_bytes <= 3)
-			&& (m_cells <= (u32(1) << (8 * m_address_bytes)));
+			&& (!m_command_address_mask || std::has_single_bit(m_command_address_mask))
+			&& (m_cells <= (u32(1) << (8 * m_address_bytes + (m_command_address_mask ? 1 : 0))));
 }
 
 
@@ -71,8 +111,25 @@ void eeprom_spi_base_device::device_start()
 		throw emu_fatalerror("%s: Invalid SPI EEPROM geometry", tag());
 
 	eeprom_base_device::device_start();
-	m_page = std::make_unique<u8[]>(m_page_bytes);
+	m_page = std::make_unique<u8 []>(m_page_bytes);
 	m_write_timer = timer_alloc(FUNC(eeprom_spi_base_device::write_complete), this);
+
+	m_so = true;
+	m_held = !m_hold && !m_sck;
+	m_write_enable = false;
+	m_state = STATE_COMMAND;
+	m_command = 0;
+	m_shift = 0;
+	m_bits = 0;
+	m_address_count = 0;
+	m_address = 0;
+	m_read_status = 0;
+	m_pending_status = 0;
+	m_pending_command = 0;
+	m_page_base = 0;
+	m_page_start = 0;
+	m_page_count = 0;
+	std::fill_n(m_page.get(), m_page_bytes, 0);
 
 	save_item(NAME(m_cs));
 	save_item(NAME(m_sck));
@@ -89,6 +146,7 @@ void eeprom_spi_base_device::device_start()
 	save_item(NAME(m_address_count));
 	save_item(NAME(m_address));
 	save_item(NAME(m_status));
+	save_item(NAME(m_read_status));
 	save_item(NAME(m_pending_status));
 	save_item(NAME(m_pending_command));
 	save_item(NAME(m_page_base));
@@ -100,23 +158,7 @@ void eeprom_spi_base_device::device_start()
 
 void eeprom_spi_base_device::device_reset()
 {
-	eeprom_base_device::device_reset();
-	m_write_timer->adjust(attotime::never);
-	m_so = true;
-	m_held = !m_hold;
-	m_write_enable = false;
-	m_state = STATE_COMMAND;
-	m_command = 0;
-	m_shift = 0;
-	m_bits = 0;
-	m_address_count = 0;
-	m_address = 0;
-	m_pending_status = 0;
-	m_pending_command = 0;
-	m_page_base = 0;
-	m_page_start = 0;
-	m_page_count = 0;
-	std::fill_n(m_page.get(), m_page_bytes, 0);
+	// No reset pin: preserve the serial state and inherited programming deadline.
 }
 
 
@@ -132,10 +174,11 @@ bool eeprom_spi_base_device::nvram_read(util::read_stream &file)
 	if (!eeprom_base_device::nvram_read(file))
 		return false;
 
-	// The final NVRAM byte holds protection bits, not an extra array location.
+	// Older images contain only the array, without the nonvolatile protection bits.
+	m_status = 0;
 	auto const [err, actual] = util::read(file, &m_status, 1);
-	m_status &= STATUS_NONVOLATILE;
-	return !err && (actual == 1);
+	m_status &= m_status_mask;
+	return !err;
 }
 
 
@@ -167,7 +210,7 @@ void eeprom_spi_base_device::cs_w(int state)
 		m_command = 0;
 		m_shift = 0;
 		m_bits = 0;
-		m_held = !m_hold;
+		m_held = !m_hold && !m_sck;
 	}
 }
 
@@ -208,7 +251,11 @@ void eeprom_spi_base_device::sck_w(int state)
 	else if ((m_state == STATE_READ) || (m_state == STATE_READ_STATUS))
 	{
 		if (!m_bits)
+		{
 			m_shift = (m_state == STATE_READ) ? internal_read(m_address) : status_r();
+			if (m_state == STATE_READ_STATUS)
+				LOGMASKED(LOG_STATUS, "%s: RDSR %02x\n", machine().describe_context(), m_shift);
+		}
 		m_so = BIT(m_shift, 7);
 		m_shift <<= 1;
 		if (++m_bits == 8)
@@ -218,6 +265,14 @@ void eeprom_spi_base_device::sck_w(int state)
 				m_address = (m_address + 1) & (m_cells - 1);
 		}
 	}
+}
+
+
+void eeprom_spi_base_device::wp_w(int state)
+{
+	m_wp = bool(state);
+	if (!m_wp && (m_wp_mode == write_protect_mode::WRITE_ENABLE))
+		m_write_enable = false;
 }
 
 
@@ -234,6 +289,9 @@ void eeprom_spi_base_device::receive_byte(u8 data)
 	switch (m_state)
 	{
 	case STATE_COMMAND:
+		LOGMASKED(LOG_COMMAND, "%s: Instruction %02x\n", machine().describe_context(), data);
+		m_address = (data & m_command_address_mask) ? 1 : 0;
+		data &= ~m_command_address_mask;
 		m_command = data;
 		if ((m_pending_command || !ready()) && (data != COMMAND_RDSR))
 		{
@@ -244,11 +302,11 @@ void eeprom_spi_base_device::receive_byte(u8 data)
 		{
 		case COMMAND_READ:
 		case COMMAND_WRITE:
-			m_address = 0;
 			m_address_count = 0;
 			m_state = STATE_ADDRESS;
 			break;
 		case COMMAND_RDSR:
+			m_read_status = m_status;
 			m_state = STATE_READ_STATUS;
 			break;
 		case COMMAND_WRSR:
@@ -259,6 +317,7 @@ void eeprom_spi_base_device::receive_byte(u8 data)
 			m_state = STATE_DONE;
 			break;
 		default:
+			logerror("Unknown instruction %02x\n", data);
 			m_state = STATE_IGNORE;
 			break;
 		}
@@ -269,6 +328,7 @@ void eeprom_spi_base_device::receive_byte(u8 data)
 		if (++m_address_count != m_address_bytes)
 			break;
 		m_address &= m_cells - 1;
+		LOGMASKED(LOG_ADDRESS, "%s: %s address %06x\n", machine().describe_context(), (m_command == COMMAND_READ) ? "READ" : "WRITE", m_address);
 		if (m_command == COMMAND_READ)
 		{
 			m_state = STATE_READ;
@@ -289,7 +349,8 @@ void eeprom_spi_base_device::receive_byte(u8 data)
 		break;
 
 	case STATE_WRITE_STATUS:
-		m_pending_status = data & STATUS_NONVOLATILE;
+		LOGMASKED(LOG_STATUS, "%s: WRSR received %02x\n", machine().describe_context(), data);
+		m_pending_status = data & m_status_mask;
 		m_state = STATE_DONE;
 		break;
 	}
@@ -305,7 +366,7 @@ void eeprom_spi_base_device::finish_command()
 	{
 	case COMMAND_WREN:
 		if (m_state == STATE_DONE)
-			m_write_enable = true;
+			m_write_enable = m_wp || (m_wp_mode == write_protect_mode::STATUS_REGISTER);
 		break;
 	case COMMAND_WRDI:
 		if (m_state == STATE_DONE)
@@ -333,7 +394,7 @@ void eeprom_spi_base_device::start_write(u8 command)
 
 u8 eeprom_spi_base_device::status_r() const
 {
-	return m_status | (u8(m_write_enable) << 1) | u8(m_pending_command || !ready());
+	return m_status_fixed | m_read_status | (u8(m_write_enable) << 1) | u8(m_pending_command || !ready());
 }
 
 
@@ -362,8 +423,23 @@ TIMER_CALLBACK_MEMBER(eeprom_spi_base_device::write_complete)
 	else if (m_pending_command == COMMAND_WRSR)
 	{
 		m_status = m_pending_status;
+		LOGMASKED(LOG_STATUS, "%s: WRSR completed %02x\n", machine().describe_context(), m_status);
 	}
 
 	m_pending_command = 0;
 	m_write_enable = false;
+}
+
+
+u8 eeprom_spi_base_device::access(u8 data)
+{
+	u8 response = 0;
+	for (int bit = 7; bit >= 0; --bit)
+	{
+		si_w(BIT(data, bit));
+		sck_w(1);
+		response = (response << 1) | so_r();
+		sck_w(0);
+	}
+	return response;
 }

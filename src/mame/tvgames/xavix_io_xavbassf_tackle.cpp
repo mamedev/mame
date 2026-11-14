@@ -69,7 +69,7 @@ ioport_constructor xavix_bassfishing_device::device_input_ports() const
 void xavix_bassfishing_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: Identify the fitted EEPROM; the dump and SPI protocol are 25320-compatible.
-	EEPROM_25320(config, m_eeprom);
+	SPI_EEPROM_M95320(config, m_eeprom);
 
 	NRF24E1(config, m_mcu, 16_MHz_XTAL);
 	m_mcu->set_eeprom_region("^eeprom");

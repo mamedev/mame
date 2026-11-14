@@ -31,7 +31,7 @@ private:
 	TIMER_CALLBACK_MEMBER(sample_inputs);
 
 	required_device<nrf24e1_device> m_mcu;
-	required_device<eeprom_spi_25320_device> m_eeprom;
+	required_device<eeprom_spi_m95320_device> m_eeprom;
 	required_ioport m_controls;
 	required_ioport m_rod;
 	required_ioport m_reel;

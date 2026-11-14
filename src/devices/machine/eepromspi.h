@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:MagikalUnicorn
+// copyright-holders:Fabio Priuli, MetalliC, Ryan Holtz, MagikalUnicorn
 #ifndef MAME_MACHINE_EEPROMSPI_H
 #define MAME_MACHINE_EEPROMSPI_H
 
@@ -16,12 +16,22 @@ public:
 	void cs_w(int state);
 	void sck_w(int state);
 	void si_w(int state) { m_si = bool(state); }
-	int so_r() const { return (m_cs || !m_hold) ? 1 : m_so; }
-	void wp_w(int state) { m_wp = bool(state); }
+	int so_r() const { return (m_cs || m_held) ? 1 : m_so; }
+	void wp_w(int state);
 	void hold_w(int state);
+	u8 access(u8 data);
 
 protected:
-	eeprom_spi_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 page_bytes, u8 address_bytes);
+	enum class write_protect_mode : u8
+	{
+		STATUS_REGISTER,
+		WRITE_ENABLE
+	};
+
+	eeprom_spi_base_device(
+			const machine_config &mconfig, device_type type, const char *tag, device_t *owner,
+			u32 capacity, u32 page_bytes, u8 address_bytes, u8 command_address_mask,
+			u8 status_mask, u8 status_fixed, write_protect_mode wp_mode);
 
 	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
@@ -56,8 +66,6 @@ private:
 		STATE_IGNORE
 	};
 
-	static constexpr u8 STATUS_NONVOLATILE = 0x8c;
-
 	bool valid_geometry() const ATTR_COLD;
 	void receive_byte(u8 data);
 	void finish_command();
@@ -68,7 +76,11 @@ private:
 
 	u32 const m_page_bytes;
 	u8 const m_address_bytes;
-	std::unique_ptr<u8[]> m_page;
+	u8 const m_command_address_mask;
+	u8 const m_status_mask;
+	u8 const m_status_fixed;
+	write_protect_mode const m_wp_mode;
+	std::unique_ptr<u8 []> m_page;
 	emu_timer *m_write_timer;
 	bool m_cs;
 	bool m_sck;
@@ -85,6 +97,7 @@ private:
 	u8 m_address_count;
 	u32 m_address;
 	u8 m_status;
+	u8 m_read_status;
 	u8 m_pending_status;
 	u8 m_pending_command;
 	u32 m_page_base;
@@ -93,12 +106,40 @@ private:
 };
 
 
-class eeprom_spi_25320_device : public eeprom_spi_base_device
+class eeprom_spi_m950x0_device : public eeprom_spi_base_device
 {
-public:
-	eeprom_spi_25320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+protected:
+	eeprom_spi_m950x0_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 capacity);
 };
 
-DECLARE_DEVICE_TYPE(EEPROM_25320, eeprom_spi_25320_device)
+class eeprom_spi_m95010_device : public eeprom_spi_m950x0_device
+{
+public:
+	eeprom_spi_m95010_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+class eeprom_spi_m95020_device : public eeprom_spi_m950x0_device
+{
+public:
+	eeprom_spi_m95020_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+class eeprom_spi_m95040_device : public eeprom_spi_m950x0_device
+{
+public:
+	eeprom_spi_m95040_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+
+class eeprom_spi_m95320_device : public eeprom_spi_base_device
+{
+public:
+	eeprom_spi_m95320_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+};
+
+DECLARE_DEVICE_TYPE(SPI_EEPROM_M95010, eeprom_spi_m95010_device)
+DECLARE_DEVICE_TYPE(SPI_EEPROM_M95020, eeprom_spi_m95020_device)
+DECLARE_DEVICE_TYPE(SPI_EEPROM_M95040, eeprom_spi_m95040_device)
+DECLARE_DEVICE_TYPE(SPI_EEPROM_M95320, eeprom_spi_m95320_device)
 
 #endif // MAME_MACHINE_EEPROMSPI_H

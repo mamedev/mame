@@ -736,7 +736,7 @@ void superxavix_xavbassf_state::superxavix_xavbassf(machine_config &config)
 	configure_xavixport_io(config);
 
 	// TODO: Identify the fitted EEPROM; the dump and SPI protocol are 25320-compatible.
-	EEPROM_25320(config, m_fishing_cart_eeprom);
+	SPI_EEPROM_M95320(config, m_fishing_cart_eeprom);
 	NRF24E1(config, m_fishing_cart_mcu, 16_MHz_XTAL);
 	m_fishing_cart_mcu->set_eeprom_region("^fishing_cart_eeprom");
 	m_fishing_cart_mcu->eeprom_read_cb().set([this] (offs_t offset) -> u8 { return m_fishing_cart_eeprom->internal_read(offset); });
