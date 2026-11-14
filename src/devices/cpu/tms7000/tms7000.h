@@ -110,7 +110,7 @@ protected:
 	devcb_write8::array<5> m_port_out_cb;
 
 	const uint32_t m_info_flags;
-	unsigned m_divider;
+	uint8_t m_divider;
 
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
@@ -129,8 +129,8 @@ protected:
 	emu_timer *m_timer_handle[2];
 	uint8_t m_timer_data[2];
 	uint8_t m_timer_control[2];
-	int m_timer_decrementer[2];
-	int m_timer_prescaler[2];
+	uint16_t m_timer_decrementer[2]; // 8-bit, or 16-bit on TMS70Cx2
+	uint8_t m_timer_prescaler[2]; // 5-bit
 	uint16_t m_timer_capture_latch[2];
 	uint16_t m_timer16_data[2];
 	uint8_t m_timer16_control[2];
@@ -157,8 +157,8 @@ protected:
 	void iocnt2_w(uint8_t data);
 	uint8_t timer16_r(offs_t offset);
 	void timer16_w(offs_t offset, uint8_t data);
-	void timer16_advance(unsigned clocks);
-	void timer16_tick(unsigned timer);
+	void timer16_advance(uint64_t clocks);
+	void timer16_tick(uint8_t timer);
 	uint8_t timer16_output_mask() const;
 
 	// internal read/write

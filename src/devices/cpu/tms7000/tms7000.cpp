@@ -395,7 +395,7 @@ void tms7000_device::execute_set_input(int extline, int state)
 		if (irqstate != bool(BIT(m_io_control[2], 4 * extline)))
 		{
 			m_io_control[0] |= 0x02 << (4 * extline);
-			unsigned const timer = extline ^ 1;
+			uint8_t const timer = extline ^ 1;
 			if (!m_idle_state || !BIT(m_timer_control[timer], 5))
 				m_timer_capture_latch[timer] = m_timer_decrementer[timer];
 			check_interrupts();
@@ -513,7 +513,7 @@ void tms7000_device::timer_reload(int tmr)
 void tms7000_device::timer_tick_pre(int tmr)
 {
 	// timer prescaler underflow
-	if (--m_timer_prescaler[tmr] < 0)
+	if (m_timer_prescaler[tmr]-- == 0)
 	{
 		m_timer_prescaler[tmr] = m_timer_control[tmr] & 0x1f;
 		timer_tick_low(tmr);
@@ -523,7 +523,7 @@ void tms7000_device::timer_tick_pre(int tmr)
 void tms7000_device::timer_tick_low(int tmr)
 {
 	// timer decrementer underflow
-	if (--m_timer_decrementer[tmr] < 0)
+	if (m_timer_decrementer[tmr]-- == 0)
 	{
 		timer_reload(tmr);
 
@@ -557,7 +557,7 @@ uint8_t tms7000_device::iocnt0_r()
 	if (chip_is_family_70cx2())
 	{
 		// Level-sensitive pins are ORed with the interrupt pulse latches.
-		for (unsigned line = 0; line < 2; line++)
+		for (uint8_t line = 0; line < 2; line++)
 		{
 			if (!BIT(m_io_control[2], 4 * line + 1) &&
 				(m_irq_state[line] != bool(BIT(m_io_control[2], 4 * line))))
@@ -605,7 +605,7 @@ void tms7000_device::iocnt2_w(uint8_t data)
 // TMS70Cx2 timers: SPND001C, sections 3.7.2-3.7.9.
 uint8_t tms7000_device::timer16_r(offs_t offset)
 {
-	unsigned const timer = offset / 4;
+	uint8_t const timer = offset / 4;
 	offset &= 3;
 
 	if (!(offset & 1))
@@ -619,7 +619,7 @@ uint8_t tms7000_device::timer16_r(offs_t offset)
 
 void tms7000_device::timer16_w(offs_t offset, uint8_t data)
 {
-	unsigned const timer = offset / 4;
+	uint8_t const timer = offset / 4;
 	offset &= 3;
 
 	switch (offset)
@@ -653,14 +653,14 @@ uint8_t tms7000_device::timer16_output_mask() const
 		(((m_timer16_control[1] & 0xc0) == 0x40) ? 0x01 : 0x00);
 }
 
-void tms7000_device::timer16_tick(unsigned timer)
+void tms7000_device::timer16_tick(uint8_t timer)
 {
 	if (!BIT(m_timer_control[timer], 7) || (m_idle_state && BIT(m_timer_control[timer], 5)))
 		return;
-	if (--m_timer_prescaler[timer] >= 0)
+	if (m_timer_prescaler[timer]-- != 0)
 		return;
 	m_timer_prescaler[timer] = m_timer_control[timer] & 0x1f;
-	if (--m_timer_decrementer[timer] >= 0)
+	if (m_timer_decrementer[timer]-- != 0)
 		return;
 
 	m_timer_decrementer[timer] = m_timer16_data[timer];
@@ -675,11 +675,11 @@ void tms7000_device::timer16_tick(unsigned timer)
 		timer16_tick(1);
 }
 
-void tms7000_device::timer16_advance(unsigned clocks)
+void tms7000_device::timer16_advance(uint64_t clocks)
 {
 	while (clocks--)
 	{
-		for (unsigned timer = 0; timer < 2; timer++)
+		for (uint8_t timer = 0; timer < 2; timer++)
 		{
 			if (!BIT(m_timer_control[timer], 7) || BIT(m_timer_control[timer], 6) ||
 				(m_idle_state && BIT(m_timer_control[timer], 5)) || (timer == 1 && BIT(m_timer16_control[1], 7)))
