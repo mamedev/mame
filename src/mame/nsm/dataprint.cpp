@@ -65,15 +65,15 @@ public:
 	void dp3000(machine_config &config) ATTR_COLD;
 
 private:
-	void mem_map(address_map &map) ATTR_COLD;
-	void leds_w(u8 data);
-
 	required_device<tms7000_device> m_maincpu;
 	required_device<timekeeper_device> m_nvram;
 	required_device<printer_image_device> m_printer;
 	required_device<rs232_port_device> m_rs232;
 	output_finder<8> m_leds;
 	required_device<beep_device> m_buzzer;
+
+	void mem_map(address_map &map) ATTR_COLD;
+	void leds_w(u8 data);
 };
 
 void dataprint_state::leds_w(u8 data)
