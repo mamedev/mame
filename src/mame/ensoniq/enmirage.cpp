@@ -635,11 +635,15 @@ void enmirage_state::dms8(machine_config &config)
 	// Levels: the DOC's full-scale output current is not known, so assume a
 	// full-scale voice drives the CEM3328 to its rated 6.5V p-p output (1%
 	// THD). The ES5503 device outputs +/-0.125 for a full-scale oscillator.
-	// Each filter output goes through 10K (R119) into the U56 summer with 3.9K
+	// Each filter output goes through 15K (R119) into the U56 summer with 3.9K
 	// (R81) feedback. U56 runs from +12/-8V, so +/-7V is taken as full scale;
 	// the NE570 volume VCA (U48) is treated as unity at full volume.
+	//
+	// Component values here and in vf_to_pin2() are from the 1985 DSK-8+
+	// schematic. The 1984 sheet has R119 at 10K and sets R118 by U21 date code
+	// and supply (150K for -12V, 110K for -8V).
 	constexpr double DOC_TO_VCF = 3.25 / 0.125;
-	constexpr double VCF_TO_OUT = (RES_K(3.9) / RES_K(10)) / 7.0;
+	constexpr double VCF_TO_OUT = (RES_K(3.9) / RES_K(15)) / 7.0;
 	for (unsigned i = 0; i < NUM_VOICES; i++)
 	{
 		// Pole caps 0.033uF, R_REF 200K (R117) to -8V.
