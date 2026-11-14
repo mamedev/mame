@@ -439,7 +439,7 @@ static INPUT_PORTS_START( sttakkyu )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSWB:1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, "Character Display Test" )    PORT_DIPLOCATION("DSWB:2")
@@ -1764,7 +1764,7 @@ ROM_START( ntopstar )
 	ROM_LOAD( "ntsr_21.bin", 0x130000, 0x10000, CRC(133183db) SHA1(9c01c8c4f3dd2eaaa93cad78387d478529494f21) )
 ROM_END
 
-ROM_START( sttakkyu ) // Medal Series No. 126N, according to dip sheet. Nichibutsu 1413M3 8922 Z20 custom
+ROM_START( sttakkyu ) // スター宅急便. Medal Series No. 126N, according to dip sheet. Nichibutsu 1413M3 8922 Z20 custom
 	ROM_REGION( 0x10000, "maincpu", 0 ) // main program
 	ROM_LOAD( "1.bin",  0x00000,  0x10000, CRC(114ce70c) SHA1(f0dc447872bf878e2957dd1a58119db56c1cfc1a) )
 
