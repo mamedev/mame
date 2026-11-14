@@ -4913,6 +4913,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/pci9054.h,MACHINES["PCI9054"] = true
+---------------------------------------------------
+
+if MACHINES["PCI9054"] then
+	files {
+		MAME_DIR .. "src/devices/machine/pci9054.cpp",
+		MAME_DIR .. "src/devices/machine/pci9054.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/netlist.h,MACHINES["NETLIST"] = true
 ---------------------------------------------------
 
