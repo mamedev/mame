@@ -21,8 +21,8 @@
         e100-e101: 6850 UART (for MIDI)
         e200-e2ff: 6522 VIA
         e400-e407: write to both filters
-        e408-e40f: filter cut-off frequency
-        e410-e417: filter resonance
+        e408-e40f: filter resonance
+        e410-e417: filter cut-off frequency
         e418-e41f: DAC pre-set
         e800-e803: WD1770 FDC
         ec00-ecef: ES5503 "DOC" sound chip
@@ -50,12 +50,12 @@
     CB2 is shift data.
     This is unconnected on the rackmount version.
 
+    The R6500/11 keyboard controller is high level emulated; its internal
+    ROM is not dumped.
+
     Unimplemented:
-        * Four Pole Low-Pass Voltage Controlled Filter section
         * External sync signal
         * Foot pedal
-        * ADC feedback
-        * Piano keyboard controller
         * Expansion connector
         * Stereo output
 
@@ -72,12 +72,19 @@
 #include "machine/6850acia.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
+#include "machine/rescap.h"
 #include "machine/wd_fdc.h"
+#include "sound/cem3328.h"
 #include "sound/es5503.h"
 #include "speaker.h"
 #include "video/pwm.h"
 
+#include <algorithm>
+#include <cmath>
+#include <numbers>
+
 #include "enmirage.lh"
+#include "enmirdms.lh"
 
 #define LOG_ADC_READ        (1U << 1)
 #define LOG_FILTER_WRITE    (1U << 2)
@@ -101,22 +108,23 @@ class enmirage_state : public driver_device
 public:
 	enmirage_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag)
+		, m_via(*this, "via6522")
 		, m_maincpu(*this, "maincpu")
 		, m_sample_ram(*this, "sampleram", 1024 * 128, ENDIANNESS_BIG)
 		, m_sample_bank(*this, "samplebank")
 		, m_display(*this, "display")
 		, m_fdc(*this, "wd1772")
 		, m_floppy_connector(*this, "wd1772:0")
-		, m_via(*this, "via6522")
 		, m_irq_merge(*this, "irqmerge")
 		, m_cassette(*this, "cassette")
 		, m_acia(*this, "acia6850")
+		, m_vcf(*this, "vcf%u", 1U)
 		, m_wheel(*this, {PITCH_TAG, MOD_TAG})
 		, m_key(*this, {"pb5", "pb6", "pb7"})
 	{
 	}
 
-	void mirage(machine_config &config);
+	void dms8(machine_config &config);
 	void enmirage_es5503_map(address_map &map) ATTR_COLD;
 
 	void init_mirage();
@@ -125,9 +133,39 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	void coefficients_w(offs_t offset, uint8_t data);
+	virtual void machine_reset() override ATTR_COLD;
+
+	// PB4 (active low) also resets the keyboard controller, if fitted
+	virtual void kbd_reset_w(int state) { }
+
+	required_device<via6522_device> m_via;
 
 private:
+	static constexpr unsigned NUM_VOICES = 8;
+
+	required_device<mc6809e_device> m_maincpu;
+	memory_share_creator<uint8_t> m_sample_ram;
+	required_memory_bank m_sample_bank;
+	required_device<pwm_display_device> m_display;
+	required_device<wd1772_device> m_fdc;
+	required_device<floppy_connector> m_floppy_connector;
+	required_device<input_merger_device> m_irq_merge;
+	required_device<cassette_image_device> m_cassette;
+	required_device<acia6850_device> m_acia;
+	required_device_array<cem3328_device, NUM_VOICES> m_vcf;
+
+	optional_ioport_array<2> m_wheel;
+	required_ioport_array<3> m_key;
+
+	int m_mux_value;
+	int m_key_col_select;
+	uint8_t m_portb;
+
+	// Phase of each filter's self-oscillation, as seen by the ADC.
+	double m_osc_phase[NUM_VOICES];
+	attotime m_osc_last_time;
+
+	void coefficients_w(offs_t offset, uint8_t data);
 	void update_keypad_matrix();
 
 	uint8_t mirage_via_read_portb();
@@ -137,28 +175,57 @@ private:
 
 	void mirage_map(address_map &map) ATTR_COLD;
 
+	static float dac_volts(uint8_t data);
+	static float vf_to_pin2(float vf);
+	uint8_t filter_output_sample();
+};
+
+// DSK-8: adds the 61-key keyboard, its R6500/11 controller, and the wheels.
+class enmirage_dsk8_state : public enmirage_state
+{
+public:
+	enmirage_dsk8_state(const machine_config &mconfig, device_type type, const char *tag) :
+		enmirage_state(mconfig, type, tag)
+		, m_kbd_velocity(*this, "kbd_velocity")
+	{
+	}
+
+	void dsk8(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(key_changed);
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	required_device<mc6809e_device> m_maincpu;
-	memory_share_creator<uint8_t> m_sample_ram;
-	required_memory_bank m_sample_bank;
-	required_device<pwm_display_device> m_display;
-	required_device<wd1772_device> m_fdc;
-	required_device<floppy_connector> m_floppy_connector;
-	required_device<via6522_device> m_via;
-	required_device<input_merger_device> m_irq_merge;
-	required_device<cassette_image_device> m_cassette;
-	required_device<acia6850_device> m_acia;
+	virtual void kbd_reset_w(int state) override;
 
-	required_ioport_array<2> m_wheel;
-	required_ioport_array<3> m_key;
+private:
+	// High level emulation of the R6500/11 keyboard controller.
+	// The controller sends 3-byte messages (status $90 key down / $80 key up,
+	// key number 0-60, raw velocity 0-127) through the VIA shift register,
+	// shifted in MSB first under external clock (CB1 clock, CB2 data). The
+	// CPU acknowledges each byte by pulsing CA2 low.
+	static constexpr uint8_t KBD_QUEUE_SIZE = 64;
 
-	int m_mux_value;
-	int m_key_col_select;
+	required_ioport m_kbd_velocity;
 
-	/* temporary audio data -- used to get past startup filter calibration -- remove when filters are implemented */
-	const uint8_t m_wave[34] = {0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x91, 0x69};
-	int m_wave_index;
+	emu_timer *m_kbd_shift_timer;
+
+	uint8_t m_kbd_queue[KBD_QUEUE_SIZE];
+	uint8_t m_kbd_head;
+	uint8_t m_kbd_tail;
+	uint8_t m_kbd_byte;
+	int8_t m_kbd_step;      // 0-15 while shifting, -1 when idle
+	bool m_kbd_wait_ack;
+	bool m_kbd_reset;       // controller held in reset by PB4
+	uint8_t m_ca2;
+
+	void kbd_queue_message(uint8_t status, uint8_t key, uint8_t velocity);
+	void kbd_start_next();
+	void kbd_set_reset(bool state);
+	void via_ca2_w(int state);
+	TIMER_CALLBACK_MEMBER(kbd_shift_tick);
 };
 
 void enmirage_state::floppy_formats(format_registration &fr)
@@ -179,20 +246,20 @@ uint8_t enmirage_state::mirage_adc_read()
 	{
 		case 0:
 //          value = m_cassette->input(); /* compressed and mixed input: audio in and ES 5503 (TODO) */
-			value = m_wave[m_wave_index]; /* fake data to get past filter calibration (remove when filter implemented) */
+			value = filter_output_sample(); /* compressed summer output (VCF outputs) */
 			LOGADCREAD("%s, 5503 sample: channel: compressed input, data: $%02x\n", machine().describe_context(), value);
-			if(++m_wave_index == 34) m_wave_index = 0;
 			break;
 		case 1:
 			value = m_cassette->input(); /* line level and mixed input: audio in and ES 5503 (TODO) */
 			LOGADCREAD("%s, 5503 sample: channel: line input, data: $%02x\n", machine().describe_context(), value);
 			break;
+		// The DMS-8 has no wheels; read them as centred pitch and zero mod.
 		case 2:
-			value = m_wheel[0]->read(); /* pitch wheel */
+			value = m_wheel[0].read_safe(50) * 255 / 100; /* pitch wheel */
 			LOGADCREAD("%s, 5503 sample: channel: pitch wheel, data: $%02x\n", machine().describe_context(), value);
 			break;
 		case 3:
-			value = m_wheel[1]->read(); /* mod wheel */
+			value = m_wheel[1].read_safe(0) * 255 / 100; /* mod wheel */
 			LOGADCREAD("%s, 5503 sample: channel: mod wheel, data: $%02x\n", machine().describe_context(), value);
 			break;
 	}
@@ -202,17 +269,116 @@ uint8_t enmirage_state::mirage_adc_read()
 
 void enmirage_state::machine_start()
 {
+	m_sample_bank->configure_entries(0, 4, m_sample_ram, 0x8000);
+
+	// The VIA's reset runs before machine_reset() and calls the port B
+	// handler, so this state needs its initial values here.
+	m_mux_value = 0;
+	m_key_col_select = 0;
+	m_portb = 0x10;
+
+	m_osc_last_time = machine().time();
+	for (unsigned i = 0; i < NUM_VOICES; i++)
+	{
+		m_osc_phase[i] = 0;
+		m_vcf[i]->set_fixed_freq_cv(vf_to_pin2(dac_volts(0)));
+		m_vcf[i]->set_fixed_res_cv(dac_volts(0));
+	}
+
 	save_item(NAME(m_mux_value));
 	save_item(NAME(m_key_col_select));
-	save_item(NAME(m_wave_index));
-	m_sample_bank->configure_entries(0, 4, m_sample_ram, 0x8000);
+	save_item(NAME(m_portb));
+	save_item(NAME(m_osc_phase));
+	save_item(NAME(m_osc_last_time));
 }
 
 void enmirage_state::machine_reset()
 {
 	m_sample_bank->set_entry(0);
 	m_mux_value = 0;
-	m_wave_index = 0;
+	m_portb = 0x10;
+}
+
+void enmirage_dsk8_state::machine_start()
+{
+	enmirage_state::machine_start();
+
+	m_kbd_shift_timer = timer_alloc(FUNC(enmirage_dsk8_state::kbd_shift_tick), this);
+
+	// The VIA's reset runs before machine_reset() and calls the port B and
+	// CA2 handlers, so this state needs its initial values here.
+	std::fill(std::begin(m_kbd_queue), std::end(m_kbd_queue), 0);
+	m_kbd_head = m_kbd_tail = 0;
+	m_kbd_byte = 0;
+	m_kbd_step = -1;
+	m_kbd_wait_ack = false;
+	m_kbd_reset = false;
+	m_ca2 = 1;
+
+	save_item(NAME(m_kbd_queue));
+	save_item(NAME(m_kbd_head));
+	save_item(NAME(m_kbd_tail));
+	save_item(NAME(m_kbd_byte));
+	save_item(NAME(m_kbd_step));
+	save_item(NAME(m_kbd_wait_ack));
+	save_item(NAME(m_kbd_reset));
+	save_item(NAME(m_ca2));
+}
+
+void enmirage_dsk8_state::machine_reset()
+{
+	enmirage_state::machine_reset();
+	m_ca2 = 1;
+
+	// flush anything queued before the reset, then let the controller run
+	kbd_set_reset(true);
+	kbd_set_reset(false);
+}
+
+// CV DAC: AD7524 (U41), reference from the -5.1V zener rail, inverted by the
+// I/V converter (U56), giving 0 to +5.08V. Held per voice by CD4051/TL084
+// sample-and-hold buffers (U59 frequency, U64 resonance).
+float enmirage_state::dac_volts(uint8_t data)
+{
+	return 5.1F * data / 256.0F;
+}
+
+// Frequency CV network at CEM3328 pin 2: VF via 27K (R121), 160K to -8V (R118),
+// 1K to ground (R120).
+float enmirage_state::vf_to_pin2(float vf)
+{
+	constexpr float G1 = 1.0F / RES_K(27);
+	constexpr float G2 = 1.0F / RES_K(160);
+	constexpr float G3 = 1.0F / RES_K(1);
+	return (vf * G1 + -8.0F * G2) / (G1 + G2 + G3);
+}
+
+// The ADC reads the summed filter outputs through the NE570 compressor. Sound
+// streams can't be sampled synchronously from a CPU read, so this models the
+// part the firmware relies on during calibration: filters with resonance at
+// or above the oscillation threshold produce a sine at their cutoff frequency.
+uint8_t enmirage_state::filter_output_sample()
+{
+	constexpr double TWO_PI = 2.0 * std::numbers::pi;
+	constexpr double AMPLITUDE = 48.0; // ADC counts per oscillating voice (estimated)
+
+	const attotime now = machine().time();
+	const double dt = (now - m_osc_last_time).as_double();
+	const bool update = !machine().side_effects_disabled();
+	if (update)
+		m_osc_last_time = now;
+
+	double sum = 0;
+	for (unsigned i = 0; i < NUM_VOICES; i++)
+	{
+		const double phase = std::fmod(m_osc_phase[i] + TWO_PI * m_vcf[i]->get_freq() * dt, TWO_PI);
+		if (update)
+			m_osc_phase[i] = phase;
+		if (m_vcf[i]->get_res() >= 4.0F)
+			sum += std::sin(phase);
+	}
+
+	return uint8_t(std::clamp(128.0 + AMPLITUDE * sum, 0.0, 255.0));
 }
 
 void enmirage_state::mirage_map(address_map &map)
@@ -241,6 +407,104 @@ void enmirage_state::coefficients_w(offs_t offset, uint8_t data)
 				(filter_input & 0x03) == 0 ? " and " : "",
 				(filter_input & 0x02) == 0 ? "VQ" : "", /* filter resonance */
 				(filter_input & 0x03) == 0x03 ? "preload dac" : "");
+
+	if ((filter_input & 0x01) == 0)
+		m_vcf[channel]->set_fixed_freq_cv(vf_to_pin2(dac_volts(data)));
+	if ((filter_input & 0x02) == 0)
+		m_vcf[channel]->set_fixed_res_cv(dac_volts(data));
+}
+
+INPUT_CHANGED_MEMBER(enmirage_dsk8_state::key_changed)
+{
+	// Raw velocity byte; the OS maps it through a table at $FBF8 (key down)
+	// or $FBFE (key up). Larger values are louder.
+	const uint8_t velocity = m_kbd_velocity->read();
+	kbd_queue_message(newval ? 0x90 : 0x80, uint8_t(param), velocity);
+}
+
+void enmirage_dsk8_state::kbd_queue_message(uint8_t status, uint8_t key, uint8_t velocity)
+{
+	if (m_kbd_reset)
+		return;
+
+	// drop the whole message if it doesn't fit, so the stream stays in step
+	const uint8_t used = (m_kbd_tail - m_kbd_head + KBD_QUEUE_SIZE) % KBD_QUEUE_SIZE;
+	if (used + 3 >= KBD_QUEUE_SIZE)
+		return;
+
+	for (uint8_t b : { status, key, velocity })
+	{
+		m_kbd_queue[m_kbd_tail] = b;
+		m_kbd_tail = (m_kbd_tail + 1) % KBD_QUEUE_SIZE;
+	}
+	kbd_start_next();
+}
+
+void enmirage_dsk8_state::kbd_start_next()
+{
+	if (m_kbd_step >= 0 || m_kbd_wait_ack || m_kbd_head == m_kbd_tail)
+		return;
+
+	m_kbd_byte = m_kbd_queue[m_kbd_head];
+	m_kbd_head = (m_kbd_head + 1) % KBD_QUEUE_SIZE;
+	m_kbd_step = 0;
+	m_kbd_shift_timer->adjust(attotime::from_usec(4));
+}
+
+TIMER_CALLBACK_MEMBER(enmirage_dsk8_state::kbd_shift_tick)
+{
+	const int bit = m_kbd_step >> 1;
+	if (!(m_kbd_step & 1))
+	{
+		// clock low, present data bit (MSB first)
+		m_via->write_cb2(BIT(m_kbd_byte, 7 - bit));
+		m_via->write_cb1(0);
+	}
+	else
+	{
+		// rising edge shifts the bit in
+		m_via->write_cb1(1);
+	}
+
+	if (++m_kbd_step < 16)
+	{
+		m_kbd_shift_timer->adjust(attotime::from_usec(4));
+		return;
+	}
+
+	m_kbd_step = -1;
+	m_kbd_wait_ack = true;
+}
+
+// PB4 low holds the controller in reset. The OS does this whenever the disk
+// motor is on, so key events during disk access are lost.
+void enmirage_dsk8_state::kbd_set_reset(bool state)
+{
+	m_kbd_reset = state;
+	if (!state)
+		return;
+
+	m_kbd_shift_timer->adjust(attotime::never);
+	m_kbd_head = m_kbd_tail = 0;
+	m_kbd_step = -1;
+	m_kbd_wait_ack = false;
+	m_via->write_cb1(1);
+}
+
+void enmirage_dsk8_state::kbd_reset_w(int state)
+{
+	kbd_set_reset(!state);
+}
+
+void enmirage_dsk8_state::via_ca2_w(int state)
+{
+	// acknowledge is a low pulse on CA2; act on the rising edge
+	if (state && !m_ca2 && m_kbd_wait_ack)
+	{
+		m_kbd_wait_ack = false;
+		kbd_start_next();
+	}
+	m_ca2 = state;
 }
 
 // port A:
@@ -310,27 +574,33 @@ void enmirage_state::mirage_via_write_porta(uint8_t data)
 
 void enmirage_state::mirage_via_write_portb(uint8_t data)
 {
+	// handle ACIA clock: PB7 is the VIA T1 square wave. The firmware runs T1
+	// free-running with a latch of 0, giving 2MHz / 4 = 500kHz, 16x the MIDI rate.
+	int clock = BIT(data, 7);
+	m_acia->write_txc(clock);
+	m_acia->write_rxc(clock);
+
+	// PB7 toggles at 1MHz, so only act on the other bits when they change
+	const uint8_t changed = data ^ m_portb;
+	m_portb = data;
+	if (!(changed & 0x7f))
+		return;
+
 	int bank = 0;
 
 	// handle sound RAM bank switching
 	bank = data & 0x03;
 	m_sample_bank->set_entry(bank);
 
-	// handle floppy motor on
+	// handle floppy motor on and 6500/11 reset (both active low)
 	floppy_image_device *floppy = m_floppy_connector->get_device();
 	if (floppy)
-		floppy->mon_w(data & 0x10 ? 1 : 0);
-
-	// handle 6500/11 reset (TODO)
+		floppy->mon_w(BIT(data, 4));
+	if (BIT(changed, 4))
+		kbd_reset_w(BIT(data, 4));
 
 	// record audio input mixer position
 	m_mux_value = (data >> 2) & 0x03;
-
-	// handle acia clock
-	// this bit is set by the internal via timer
-	int clock = (data >> 7) & 0x01;
-	m_acia->write_txc(clock);
-	m_acia->write_rxc(clock);
 }
 
 void enmirage_state::enmirage_es5503_map(address_map &map)
@@ -338,7 +608,7 @@ void enmirage_state::enmirage_es5503_map(address_map &map)
 	map(0x00000, 0x1ffff).ram().share("sampleram");
 }
 
-void enmirage_state::mirage(machine_config &config)
+void enmirage_state::dms8(machine_config &config)
 {
 	MC6809E(config, m_maincpu, 2000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &enmirage_state::mirage_map);
@@ -356,23 +626,44 @@ void enmirage_state::mirage(machine_config &config)
 	m_cassette->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	es5503_device &es5503(ES5503(config, "es5503", 8000000));
-	es5503.set_channels(8);
+	es5503.set_channels(NUM_VOICES);
 	es5503.set_addrmap(0, &enmirage_state::enmirage_es5503_map);
 	es5503.irq_func().set(m_irq_merge, FUNC(input_merger_device::in_w<2>));
 	es5503.adc_func().set(FUNC(enmirage_state::mirage_adc_read));
-	es5503.add_route(ALL_OUTPUTS, "speaker", 1.0);
+	// Each DOC channel feeds its own CEM3328 (VCF1-8), summed by U56.
+	//
+	// Levels: the DOC's full-scale output current is not known, so assume a
+	// full-scale voice drives the CEM3328 to its rated 6.5V p-p output (1%
+	// THD). The ES5503 device outputs +/-0.125 for a full-scale oscillator.
+	// Each filter output goes through 15K (R119) into the U56 summer with 3.9K
+	// (R81) feedback. U56 runs from +12/-8V, so +/-7V is taken as full scale;
+	// the NE570 volume VCA (U48) is treated as unity at full volume.
+	//
+	// Component values here and in vf_to_pin2() are from the 1985 DSK-8+
+	// schematic. The 1984 sheet has R119 at 10K and sets R118 by U21 date code
+	// and supply (150K for -12V, 110K for -8V).
+	constexpr double DOC_TO_VCF = 3.25 / 0.125;
+	constexpr double VCF_TO_OUT = (RES_K(3.9) / RES_K(15)) / 7.0;
+	for (unsigned i = 0; i < NUM_VOICES; i++)
+	{
+		// Pole caps 0.033uF, R_REF 200K (R117) to -8V.
+		cem3328_device &vcf = CEM3328(config, m_vcf[i], CAP_U(0.033), RES_K(200), -8.0);
+		es5503.add_route(i, vcf, DOC_TO_VCF, cem3328_device::INPUT_AUDIO);
+		vcf.add_route(cem3328_device::OUTPUT_LPF4, "speaker", VCF_TO_OUT);
+	}
 
-	MOS6522(config, m_via, 3000000);
+	MOS6522(config, m_via, 8_MHz_XTAL / 4); // phi2 is CAS
 	m_via->writepa_handler().set(FUNC(enmirage_state::mirage_via_write_porta));
 	m_via->readpb_handler().set(FUNC(enmirage_state::mirage_via_read_portb));
 	m_via->writepb_handler().set(FUNC(enmirage_state::mirage_via_write_portb));
 	m_via->irq_handler().set(m_irq_merge, FUNC(input_merger_device::in_w<0>));
 
 	PWM_DISPLAY(config, m_display).set_size(2, 8);
-	config.set_default_layout(layout_enmirage);
+	config.set_default_layout(layout_enmirdms);
 
 	ACIA6850(config, m_acia).txd_handler().set("mdout", FUNC(midi_port_device::write_txd));
 	m_acia->irq_handler().set_inputline(m_maincpu, M6809_FIRQ_LINE);
+
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set(m_acia, FUNC(acia6850_device::write_rxd));
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
@@ -385,6 +676,15 @@ void enmirage_state::mirage(machine_config &config)
 	// This clock allows the CPU to keep in sync with the sound chip - may not be used in the firmware
 	clock_device &es5503_ca3_clock(CLOCK(config, "ca3_clock", XTAL(8'000'000) / 16));
 	es5503_ca3_clock.signal_handler().set(m_via, FUNC(via6522_device::write_pb5));
+}
+
+void enmirage_dsk8_state::dsk8(machine_config &config)
+{
+	dms8(config);
+
+	m_via->ca2_handler().set(FUNC(enmirage_dsk8_state::via_ca2_w));
+
+	config.set_default_layout(layout_enmirage);
 }
 
 static INPUT_PORTS_START(mirage)
@@ -415,16 +715,106 @@ static INPUT_PORTS_START(mirage)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Off/Down")   PORT_CODE(KEYCODE_DOWN) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Value")      PORT_CODE(KEYCODE_J)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Cancel")     PORT_CODE(KEYCODE_K)    PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_state::input_changed), 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(mirage_dsk8)
+	PORT_INCLUDE(mirage)
 
 	PORT_START(PITCH_TAG)
-	PORT_BIT(0xff, 0x7f, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0xff) PORT_CODE_INC(KEYCODE_4_PAD) PORT_CODE_DEC(KEYCODE_1_PAD) PORT_PLAYER(1)
+	PORT_BIT(0xff, 50, IPT_PADDLE) PORT_NAME("Pitch Wheel") PORT_MINMAX(0, 100)
+		PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CENTERDELTA(30)
 	PORT_START(MOD_TAG)
-	PORT_BIT(0xff, 0x7f, IPT_PADDLE) PORT_NAME("Mod Wheel") PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_MINMAX(0x00,0xff) PORT_CODE_INC(KEYCODE_6_PAD) PORT_CODE_DEC(KEYCODE_3_PAD) PORT_PLAYER(1)
+	PORT_ADJUSTER(0, "Mod Wheel")
+
+	PORT_START("kbd0")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 0) PORT_GM_C2
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 1) PORT_GM_CS2
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 2) PORT_GM_D2
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 3) PORT_GM_DS2
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 4) PORT_GM_E2
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 5) PORT_GM_F2
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 6) PORT_GM_FS2
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 7) PORT_GM_G2
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 8) PORT_GM_GS2
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 9) PORT_GM_A2
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 10) PORT_GM_AS2
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 11) PORT_GM_B2
+	PORT_START("kbd1")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 12) PORT_GM_C3
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 13) PORT_GM_CS3
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 14) PORT_GM_D3
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 15) PORT_GM_DS3
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 16) PORT_GM_E3
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 17) PORT_GM_F3
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 18) PORT_GM_FS3
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 19) PORT_GM_G3
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 20) PORT_GM_GS3
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 21) PORT_GM_A3
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 22) PORT_GM_AS3
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 23) PORT_GM_B3
+	PORT_START("kbd2")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 24) PORT_GM_C4
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 25) PORT_GM_CS4
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 26) PORT_GM_D4
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 27) PORT_GM_DS4
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 28) PORT_GM_E4
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 29) PORT_GM_F4
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 30) PORT_GM_FS4
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 31) PORT_GM_G4
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 32) PORT_GM_GS4
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 33) PORT_GM_A4
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 34) PORT_GM_AS4
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 35) PORT_GM_B4
+	PORT_START("kbd3")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 36) PORT_GM_C5
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 37) PORT_GM_CS5
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 38) PORT_GM_D5
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 39) PORT_GM_DS5
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 40) PORT_GM_E5
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 41) PORT_GM_F5
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 42) PORT_GM_FS5
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 43) PORT_GM_G5
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 44) PORT_GM_GS5
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 45) PORT_GM_A5
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 46) PORT_GM_AS5
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 47) PORT_GM_B5
+	PORT_START("kbd4")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 48) PORT_GM_C6
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 49) PORT_GM_CS6
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 50) PORT_GM_D6
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 51) PORT_GM_DS6
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 52) PORT_GM_E6
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 53) PORT_GM_F6
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 54) PORT_GM_FS6
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 55) PORT_GM_G6
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 56) PORT_GM_GS6
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 57) PORT_GM_A6
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 58) PORT_GM_AS6
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 59) PORT_GM_B6
+	PORT_START("kbd5")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(enmirage_dsk8_state::key_changed), 60) PORT_GM_C7
+
+	PORT_START("kbd_velocity")
+	PORT_CONFNAME(0x7f, 0x68, "Keyboard Velocity")
+	PORT_CONFSETTING(0x30, "Soft")
+	PORT_CONFSETTING(0x68, "Medium")
+	PORT_CONFSETTING(0x78, "Hard")
 INPUT_PORTS_END
 
 ROM_START(enmirage)
 	ROM_REGION(0x1000, "osrom", 0)
-	ROM_LOAD("mirage.bin", 0x0000, 0x1000, CRC(9fc7553c) SHA1(ec6ea5613eeafd21d8f3a7431a35a6ff16eed56d))
+	// Labelled "DSK/8 /14 2.0 EURO"; chips labelled USA+ are reported to hold the same data.
+	// An earlier version exists but is undumped.
+	ROM_LOAD("dsk-8_2.0_usa+_euro.u14", 0x0000, 0x1000, CRC(9fc7553c) SHA1(ec6ea5613eeafd21d8f3a7431a35a6ff16eed56d))
+
+	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
+ROM_END
+
+ROM_START(enmirdms)
+	ROM_REGION(0x1000, "osrom", 0)
+	// Labelled "DSK/8 /14 2.0 EURO"; chips labelled USA+ are reported to hold the same data.
+	// An earlier version exists but is undumped.
+	ROM_LOAD("dsk-8_2.0_usa+_euro.u14", 0x0000, 0x1000, CRC(9fc7553c) SHA1(ec6ea5613eeafd21d8f3a7431a35a6ff16eed56d))
 
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
 ROM_END
@@ -441,4 +831,6 @@ void enmirage_state::init_mirage()
 } // anonymous namespace
 
 
-CONS(1984, enmirage, 0, 0, mirage, mirage, enmirage_state, init_mirage, "Ensoniq", "Mirage DMS-8", MACHINE_NOT_WORKING)
+//    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT        CLASS                INIT         COMPANY    FULLNAME        FLAGS
+SYST(1984, enmirage, 0,        0,      dsk8,    mirage_dsk8, enmirage_dsk8_state, init_mirage, "Ensoniq", "Mirage DSK-8", MACHINE_NOT_WORKING)
+SYST(1985, enmirdms, enmirage, 0,      dms8,    mirage,      enmirage_state,      init_mirage, "Ensoniq", "Mirage DMS-8", MACHINE_NOT_WORKING)
