@@ -258,6 +258,17 @@ void ins8250_uart_device::update_baud_rate()
 		tra_complete();
 }
 
+void ins8250_uart_device::set_divisor(u16 dl)
+{
+	// an unchanged divisor only restarts the baud counter (phase not
+	// modelled); retuning would cut off the character in progress
+	if (dl != m_regs.dl)
+	{
+		m_regs.dl = dl;
+		update_baud_rate();
+	}
+}
+
 void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 {
 	int tmp;
@@ -267,15 +278,7 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 		case 0:
 			if (m_regs.lcr & INS8250_LCR_DLAB)
 			{
-				// rewriting the divisor it already holds changes nothing on the
-				// chip, but update_baud_rate would cut off the character being
-				// sent (the VT102 rewrites it before every printer byte)
-				u16 const dl = (m_regs.dl & 0xff00) | data;
-				if (dl != m_regs.dl)
-				{
-					m_regs.dl = dl;
-					update_baud_rate();
-				}
+				set_divisor((m_regs.dl & 0xff00) | data);
 			}
 			else
 			{
@@ -291,12 +294,7 @@ void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 		case 1:
 			if (m_regs.lcr & INS8250_LCR_DLAB)
 			{
-				u16 const dl = (m_regs.dl & 0xff) | (data << 8);
-				if (dl != m_regs.dl)
-				{
-					m_regs.dl = dl;
-					update_baud_rate();
-				}
+				set_divisor((m_regs.dl & 0x00ff) | (data << 8));
 			}
 			else
 			{

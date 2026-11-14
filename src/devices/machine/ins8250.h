@@ -62,6 +62,7 @@ protected:
 	void clear_int(int flag);
 
 	void update_baud_rate();
+	void set_divisor(u16 dl);
 
 	const dev_type m_device_type;
 	struct {
