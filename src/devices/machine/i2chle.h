@@ -61,7 +61,7 @@ private:
 	u8 m_bit;
 	u16 m_address;
 	u16 m_last_address;
-	u8 m_sda, m_scl;
+	int m_sda, m_scl;
 	u32 m_state, m_state_next;
 	bool m_just_acked;
 };
