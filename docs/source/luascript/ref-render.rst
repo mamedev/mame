@@ -19,6 +19,16 @@ Render bounds
 Wraps MAME’s ``render_bounds`` class, which represents a rectangle using
 floating-point coordinates.
 
+Render target coordinates are used for :ref:`layout item
+<luascript-ref-renderlayitem>` bounds and the pointer positions supplied to
+:ref:`layout view <luascript-ref-renderlayview>` pointer callbacks.  In render
+target coordinates, (0, 0) is the top left corner and (1, 1) is the bottom right
+corner of the visible area of the current view (when zoom to screen area is
+enabled, this is the area covered by the view’s screens, and other items may lie
+outside it), so the X and Y scales are not necessarily equal.  These are not the
+same as the view units used in layout files, or the output pixels used by
+:ref:`render targets <luascript-ref-rendertarget>`.
+
 Instantiation
 ~~~~~~~~~~~~~
 
@@ -751,6 +761,53 @@ manager.machine.render.ui_target
 manager.machine.video.snapshot_target
     Gets the render target used to produce snapshots and video recordings.
 
+Methods
+~~~~~~~
+
+target:push_pointer_update(type, id, device, x, y, buttons, pressed, released, clicks)
+    Queue a pointer update event for the render target, as if it had been
+    received from the host system.  Queued events are processed once per
+    emulated frame, before clickable artwork inputs are updated.  Clickable
+    artwork inputs only see the pointer state at the end of each frame, so a
+    press and release queued in the same frame will not register as a click.
+    The arguments are:
+
+    * The pointer type (``mouse``, ``pen``, ``touch`` or ``unknown``).
+    * The pointer ID (a non-negative integer that must not change for the
+      lifetime of a pointer).
+    * The device ID for grouping pointers to recognise multi-touch gestures
+      (non-negative integer).
+    * Horizontal position in output pixels (the same units as ``target.width``).
+    * Vertical position in output pixels (the same units as ``target.height``).
+    * A bit mask representing the currently pressed buttons.
+    * A bit mask representing the buttons that were pressed in this update.
+    * A bit mask representing the buttons that were released in this update.
+    * The click count (positive for multi-click actions, or negative if a click
+      is turned into a hold or drag).
+
+    The primary button is bit 0 (0x01).  Raises an error if the pointer type is
+    not valid or the render target is hidden.
+target:push_pointer_leave(type, id, device, x, y, released, clicks)
+    Queue an event indicating that a pointer left the render target normally.
+    The arguments have the same meanings as the corresponding arguments to
+    ``push_pointer_update``.  The pointer ID may be reused for a new pointer
+    after this event.
+target:push_pointer_abort(type, id, device, x, y, released, clicks)
+    Queue an event indicating that a pointer left the render target abnormally
+    (for example a touch that was cancelled by the host system).  The arguments
+    have the same meanings as the corresponding arguments to
+    ``push_pointer_update``.  The pointer ID may be reused for a new pointer
+    after this event.
+
+For example, running this in a coroutine clicks the primary button at the centre
+of the user interface render target::
+
+    local target = manager.machine.render.ui_target
+    local x, y = target.width // 2, target.height // 2
+    target:push_pointer_update('mouse', 0, 0, x, y, 0x01, 0x01, 0x00, 1)
+    emu.wait_next_frame()
+    target:push_pointer_update('mouse', 0, 0, x, y, 0x00, 0x00, 0x01, 1)
+
 Properties
 ~~~~~~~~~~
 
@@ -1074,8 +1131,8 @@ view:set_pointer_updated_callback(cb)
       lifetime of a pointer).
     * The device ID for grouping pointers to recognise multi-touch gestures
       (non-negative integer).
-    * Horizontal position in layout coordinates.
-    * Vertical position in layout coordinates.
+    * Horizontal position in render target coordinates.
+    * Vertical position in render target coordinates.
     * A bit mask representing the currently pressed buttons.
     * A bit mask representing the buttons that were pressed in this update.
     * A bit mask representing the buttons that were released in this update.
@@ -1093,8 +1150,8 @@ view:set_pointer_left_callback(cb)
       receiving this notification.
     * The device ID for grouping pointers to recognise multi-touch gestures
       (non-negative integer).
-    * Horizontal position in layout coordinates.
-    * Vertical position in layout coordinates.
+    * Horizontal position in render target coordinates.
+    * Vertical position in render target coordinates.
     * A bit mask representing the buttons that were released in this update.
     * The click count (positive for multi-click actions, or negative if a click
       is turned into a hold or drag).
@@ -1110,8 +1167,8 @@ view:set_pointer_aborted_callback(cb)
       receiving this notification.
     * The device ID for grouping pointers to recognise multi-touch gestures
       (non-negative integer).
-    * Horizontal position in layout coordinates.
-    * Vertical position in layout coordinates.
+    * Horizontal position in render target coordinates.
+    * Vertical position in render target coordinates.
     * A bit mask representing the buttons that were released in this update.
     * The click count (positive for multi-click actions, or negative if a click
       is turned into a hold or drag).

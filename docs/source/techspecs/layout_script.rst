@@ -332,7 +332,7 @@ Here’s our layout file:
                         -- variables for keeping state across callbacks
                         local outline_bounds    -- bounds of the outlined square
                         local width, height     -- width and height for animated items
-                        local x_scale, y_scale  -- ratios of axis units to render coordinates
+                        local x_scale, y_scale  -- ratios of axis units to render target coordinates
                         local x_pos, y_pos      -- display positions for the animated items
 
                         -- set a function to call when view dimensions have been recalculated
@@ -344,7 +344,7 @@ Here’s our layout file:
                                     -- animated items use 10% of the width/height of the square
                                     width = outline_bounds.width * 0.1
                                     height = outline_bounds.height * 0.1
-                                    -- calculate ratios of axis units to render coordinates
+                                    -- calculate ratios of axis units to render target coordinates
                                     -- animated items leave 90% of the width/height for the movement range
                                     -- the end of the range of each axis is at 0xff
                                     x_scale = outline_bounds.width * 0.9 / 0xff
@@ -357,7 +357,7 @@ Here’s our layout file:
                                     -- read analog axes, reverse Y axis as zero is at the bottom
                                     local x = x_input:read() & 0xff
                                     local y = 0xff - (y_input:read() & 0xff)
-                                    -- convert the input values to layout coordinates
+                                    -- convert the input values to render target coordinates
                                     -- use the top left corner of the outlined square as the origin
                                     x_pos = outline_bounds.x0 + (x * x_scale)
                                     y_pos = outline_bounds.y0 + (y * y_scale)
@@ -577,8 +577,8 @@ Pointer updated
       aggressively.
     * The device ID.  This will be a non-negative integer that can be used to
       group pointers for recognising multi-touch gestures.
-    * The horizontal position of the pointer in layout coordinates.
-    * The vertical position of the pointer in layout coordinates.
+    * The horizontal position of the pointer in render target coordinates.
+    * The vertical position of the pointer in render target coordinates.
     * A bit mask representing the currently pressed buttons.  The primary button
       is the least significant bit.
     * A bit mask representing the buttons that were pressed in this update.  The
@@ -606,8 +606,8 @@ Pointer left
       aggressively.
     * The device ID.  This will be a non-negative integer that can be used to
       group pointers for recognising multi-touch gestures.
-    * The horizontal position of the pointer in layout coordinates.
-    * The vertical position of the pointer in layout coordinates.
+    * The horizontal position of the pointer in render target coordinates.
+    * The vertical position of the pointer in render target coordinates.
     * A bit mask representing the buttons that were released in this update.
       The primary button is the least significant bit.
     * The click count.  This is positive for multi-click actions, or negative if
@@ -631,8 +631,8 @@ Pointer aborted
       aggressively.
     * The device ID.  This will be a non-negative integer that can be used to
       group pointers for recognising multi-touch gestures.
-    * The horizontal position of the pointer in layout coordinates.
-    * The vertical position of the pointer in layout coordinates.
+    * The horizontal position of the pointer in render target coordinates.
+    * The vertical position of the pointer in render target coordinates.
     * A bit mask representing the buttons that were released in this update.
       The primary button is the least significant bit.
     * The click count.  This is positive for multi-click actions, or negative if
