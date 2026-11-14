@@ -69,6 +69,13 @@ void h8_adc_device::adcsr_w(u8 data)
 
 	if(!(prev & F_ADST) && (m_adcsr & F_ADST))
 		start_conversion();
+	else if((prev & F_ADST) && !(m_adcsr & F_ADST) && m_mode != IDLE) {
+		// software clearing ADST halts the conversion in progress (used to stop scan mode)
+		m_mode = IDLE;
+		m_next_event = 0;
+		if(m_analog_power_control)
+			m_analog_powered = false;
+	}
 }
 
 void h8_adc_device::adcr_w(u8 data)
