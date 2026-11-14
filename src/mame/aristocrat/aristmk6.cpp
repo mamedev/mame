@@ -157,6 +157,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 	void aristmk6_map(address_map &map) ATTR_COLD;
 	void aristmk6_port(address_map &map) ATTR_COLD;
@@ -179,6 +180,20 @@ private:
 void aristmk6_state::video_start()
 {
 }
+void aristmk6_state::machine_start()
+{
+	save_item(NAME(irl0pend));
+	save_item(NAME(irl0en));
+	save_item(NAME(irl1pend));
+	save_item(NAME(irl1en));
+	save_item(NAME(irl2pend));
+	save_item(NAME(irl2en));
+	save_item(NAME(irl3pend0));
+	save_item(NAME(irl3en0));
+	save_item(NAME(irl3pend1));
+	save_item(NAME(irl3en1));
+}
+
 void aristmk6_state::machine_reset()
 {
 	irl0pend = irl0en = irl1pend = irl1en = irl2pend = irl2en = irl3pend0 = irl3en0 = irl3pend1 = irl3en1 = 0;
