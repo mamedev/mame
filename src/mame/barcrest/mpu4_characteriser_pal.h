@@ -18,6 +18,8 @@ public:
 	// construction/destruction
 	mpu4_characteriser_pal(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
+	using nextprot_delegate = device_delegate<u8 (u8 state, u8 col)>;
+
 	template <typename T> void set_cpu_tag(T &&tag)
 	{
 		m_cpu.set_tag(std::forward<T>(tag));
@@ -48,10 +50,7 @@ public:
 		m_allow_68k_cheat = allow;
 	}
 
-	void set_use_4k_table_sim(bool largetable)
-	{
-		m_is_4ksim = largetable;
-	}
+	template <typename... T> void set_protnext_cb(T &&... args) { m_nextprotcb.set(std::forward<T>(args)...); }
 
 	virtual uint8_t read(offs_t offset);
 	virtual void write(offs_t offset, uint8_t data);
@@ -1407,7 +1406,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	uint8_t* m_current_chr_table;
-	int m_prot_col;
+	u8 m_prot_col;
 
 private:
 
@@ -1423,11 +1422,9 @@ private:
 	bool m_allow_68k_cheat;
 
 	const uint8_t* m_current_lamp_table;
-	int m_lamp_col;
-	int m_4krow;
-	bool m_is_4ksim;
-
-	optional_region_ptr<uint8_t> m_protregion; // some of the simulations have a fake ROM to assist them
+	u8 m_lamp_col;
+	u8 m_4krow;
+	nextprot_delegate m_nextprotcb;
 
 	// debugging only!
 	static constexpr bool IDENTIFICATION_HELPER = false;

@@ -51,8 +51,7 @@ mpu4_characteriser_pal::mpu4_characteriser_pal(const machine_config &mconfig, de
 	m_current_lamp_table(nullptr),
 	m_lamp_col(0),
 	m_4krow(0),
-	m_is_4ksim(false),
-	m_protregion(*this, "fakechr")
+	m_nextprotcb(*this)
 {
 }
 
@@ -62,6 +61,11 @@ void mpu4_characteriser_pal::device_start()
 		m_temp_debug_table[i] = 0x00;
 
 	m_temp_debug_write_count = 0;
+	m_nextprotcb.resolve();
+
+	save_item(NAME(m_prot_col));
+	save_item(NAME(m_4krow));
+	save_item(NAME(m_lamp_col));
 }
 
 void mpu4_characteriser_pal::device_reset()
@@ -95,7 +99,7 @@ void mpu4_characteriser_pal::protection_w(uint8_t data)
 	}
 	else
 	{
-		if (m_is_4ksim)
+		if (!m_nextprotcb.isnull())
 		{
 			m_prot_col = data & 0x3f; // 6-bit writes (upper 2 bits unused)
 		}
@@ -178,6 +182,17 @@ void mpu4_characteriser_pal::write(offs_t offset, uint8_t data)
 
 uint8_t mpu4_characteriser_pal::protection_r()
 {
+	if (!m_nextprotcb.isnull())
+	{
+		// for paths where the PAL equations are used (currently the quiz games)
+		uint8_t ns = m_nextprotcb(m_4krow, m_prot_col);
+
+		if (!machine().side_effects_disabled())
+			m_4krow = ns;
+
+		return ns << 2;
+	}
+
 	if (m_allow_6800_cheat || m_allow_6809_cheat || m_allow_68k_cheat)
 	{
 		uint8_t ret = 0x00;
@@ -229,7 +244,7 @@ uint8_t mpu4_characteriser_pal::protection_r()
 	}
 
 	// not cheating, but no table set
-	if (!m_current_chr_table && !m_protregion)
+	if (!m_current_chr_table)
 	{
 		logerror("%s: Characteriser protection_r WITH NO TABLE\n", machine().describe_context());
 		return 0x00;
@@ -243,49 +258,26 @@ uint8_t mpu4_characteriser_pal::protection_r()
 		ret = m_current_chr_table[m_prot_col];
 		logerror("%s: Characteriser protection_r WITH PASSED TABLE (returning %02x)\n", machine().describe_context(), ret);
 	}
-	else if (m_protregion)
-	{
-		ret = m_protregion[m_4krow * 64 + m_prot_col];
-
-		// if we're simulating with a 4k table, the previous write selects
-		// the next set of 64 values to use.
-		if (m_is_4ksim)
-		{
-			m_4krow = ret;
-			ret <<= 2;
-		}
-
-		logerror("%s: Characteriser protection_r WITH FAKE ROM (returning %02x)\n", machine().describe_context(), ret);
-	}
 
 	return ret;
 }
 
 uint8_t mpu4_characteriser_pal::lamp_scramble_r()
 {
-	if (!m_current_lamp_table && !m_protregion)
+	uint8_t ret = 0x00;
+	if (!m_current_lamp_table)
 	{
-		uint8_t ret = machine().rand();
+		ret = machine().rand();
 		logerror("%s: Characteriser lamp_scramble_r WITH NO TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
 		return ret;
 	}
 	else
 	{
-		uint8_t ret = 0x00;
-
-		if (m_current_lamp_table)
-		{
-			ret = m_current_lamp_table[m_lamp_col];
-			logerror("%s: Characteriser lamp_scramble_r WITH PASSED TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
-		}
-		else if (m_protregion)
-		{
-			ret = m_protregion[m_lamp_col + 64];
-			logerror("%s: Characteriser lamp_scramble_r WITH FAKE ROM (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
-		}
-
-		return ret;
+		ret = m_current_lamp_table[m_lamp_col];
+		logerror("%s: Characteriser lamp_scramble_r WITH PASSED TABLE (table offset %02x, returning %02x)\n", machine().describe_context(), m_lamp_col, ret);
 	}
+
+	return ret;
 }
 
 uint8_t mpu4_characteriser_pal::read(offs_t offset)
