@@ -62,9 +62,7 @@
 
 #include "emuopts.h"
 
-#include "asio.h"
 
-#include <iostream>
 
 //DO NOT MERGE ME - need to do it properly
 #define GALAXIAN3HACK
@@ -102,15 +100,11 @@ namco_c139_local_device::namco_c139_local_device(const machine_config& mconfig, 
 	: device_t(mconfig, NAMCO_C139_LOCAL, tag, owner, clock),
 	m_irq_cb(*this)
 {
-//	auto const& opts = mconfig.options();
 
-	
-	// come up with some magic number for identification
+	// todo?   come up with some magic number for identification
 	m_linkid = 0;
 	
-	LOG("C139: ID byte = %02d\n", m_linkid);
-
-	std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
+	//std::fill(std::begin(m_buffer), std::end(m_buffer), 0);
 }
 
 
@@ -128,7 +122,6 @@ void namco_c139_local_device::device_start()
 	save_item(NAME(m_ram));
 	save_item(NAME(m_reg));
 
-	save_item(NAME(m_linktimer));
 	save_item(NAME(m_linkid));
 
 	save_item(NAME(m_txsize));
@@ -148,19 +141,17 @@ void namco_c139_local_device::device_reset()
 
 	//m_context->reset(m_localhost, m_localport, m_remotehost, m_remoteport);
 
-	m_linktimer = 0x0200;
-
 	m_txsize = 0x00;
 	m_txblock = 0x00;
 	m_reg_f3 = 0x00;
 
-	m_rx_bytes = 0;
-	m_empty = 0;
-	m_comms_counter = 0;
+	//m_rx_bytes = 0;
+	//m_empty = 0;
+	//m_comms_counter = 0;
 
 
-//	m_tick_timer->adjust(attotime::from_hz(60*4), 0, attotime::from_hz(60*4));
-	m_tick_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
+	m_tick_timer->adjust(attotime::from_hz(60*8), 0, attotime::from_hz(60*8));
+//m_tick_timer->adjust(attotime::from_hz(1000), 0, attotime::from_hz(1000));
 
 
 }
@@ -230,30 +221,6 @@ void namco_c139_local_device::reg_w(offs_t offset, uint16_t data, uint16_t mem_m
 }
 
 
-/*
-   Set up a point to point internal link
-   For games consisting of multiple PCB sets that don't require actual networking
-   Specify the device this PCB will receive from
-   This can allow multiple PCBs to receive from a single transmitter
-
-*/
-void namco_c139_local_device::set_rx_ptr(uint8_t* buffer_ptr, uint16_t* count_ptr)
-{
-	m_rx_buffer_ptr = buffer_ptr;
-
-	m_rx_bytes_ptr = count_ptr;
-
-	*m_rx_bytes_ptr = 0;
-
-}
-
-void namco_c139_local_device::get_rx_buffer(uint8_t** buffer_ptr, uint16_t** count_ptr)
-{
-	*buffer_ptr = &m_buffer[0];
-
-	*count_ptr = &m_rx_bytes;
-}
-
 
 
 TIMER_CALLBACK_MEMBER(namco_c139_local_device::tick_timer_callback)
@@ -264,10 +231,7 @@ TIMER_CALLBACK_MEMBER(namco_c139_local_device::tick_timer_callback)
 void namco_c139_local_device::comm_tick()
 {
 
-
-	unsigned data_size = 0x100;
-
-
+	
 	switch (m_reg[REG_1_MODE])
 	{
 
@@ -276,40 +240,40 @@ void namco_c139_local_device::comm_tick()
 		// 0b1000
 		// reg2 - 1 > write mem > 3 > 1 > write mem > 3 etc.
 		// txcount NOT cleared on send
-		read_data(data_size);
+		read_data();
 		if (m_reg[REG_2_CONTROL] == 0x03 && m_reg[REG_5_TXSIZE] > 0x00)
 		{
-			send_data(data_size);
+			send_data();
 		}
 		break;
 
 	case 0x04: //JB HACK
-		read_data(data_size);
-		send_data(data_size);
+		read_data();
+		send_data();
 		m_reg[REG_1_MODE] = 0;
 		break;
 	case 0x09:
 		// suzuka8h, acedrive, winrungp, cybrcycc, driveyes (center)
 		// 0b1001 - auto-send via sync bit (and auto offset)
-		read_data(data_size);
-		send_data(data_size);
+		read_data();
+		send_data();
 		break;
 	case 0x0c:
 		// ridgeracf
 		// 0b1100 - send by register / txwords
 		// txcount IS cleared on send
-		read_data(data_size);
+		read_data();
 		if (m_reg[REG_2_CONTROL] == 0x03 && m_reg[REG_3_START] == 0x00)
-			send_data(data_size);
+			send_data();
 		break;
 
 	case 0x0d:
 		// final lap, driveyes (left & right)
 		// 0b1101 - auto-send via register?
-		read_data(data_size);
+		read_data();
 		if (m_reg[REG_3_START] == 0x00 && m_reg[REG_5_TXSIZE] > 0x00)
 		{
-			send_data(data_size);
+			send_data();
 		}
 		break;
 
@@ -319,7 +283,7 @@ void namco_c139_local_device::comm_tick()
 
 	default:
 		// unknown mode
-		read_data(data_size); // Should this be here?
+		read_data(); // Should this be here?
 
 		break;
 	}
@@ -327,19 +291,21 @@ void namco_c139_local_device::comm_tick()
 }
 
 
-void namco_c139_local_device::read_data(unsigned data_size)
+void namco_c139_local_device::read_data()
 {
 	if (m_reg[REG_0_STATUS] != 0x06)
 	{
 
 		// try to read a message
-		unsigned recv = read_frame(data_size);
+	//	uint8_t rx_buffer[512];
+	
+		unsigned recv = read_frame(255);
 
 
 		if (recv > 0)
 		{
 			// save message to "rx buffer"
-			unsigned rx_size = (m_buffer[2] << 8) | m_buffer[1];
+			unsigned rx_size = (m_rx_buffer->buffer[2] << 8) | m_rx_buffer->buffer[1];
 			unsigned rx_offset = m_reg[REG_6_RXOFFSET]; // rx offset in words
 
 			if (m_linkid < 4)
@@ -350,7 +316,7 @@ void namco_c139_local_device::read_data(unsigned data_size)
 			unsigned buf_offset = 3;
 			for (unsigned j = 0x00; j < rx_size; j++)
 			{
-				uint16_t data = (m_buffer[buf_offset + 1] << 8) | m_buffer[buf_offset];
+				uint16_t data = (m_rx_buffer->buffer[buf_offset + 1] << 8) | m_rx_buffer->buffer[buf_offset];
 				m_ram[0x1000 + (rx_offset & 0x0fff)] = data;
 				rx_offset++;
 				buf_offset += 2;
@@ -424,7 +390,7 @@ void namco_c139_local_device::read_data(unsigned data_size)
 	}
 }
 
-void namco_c139_local_device::send_data(unsigned data_size)
+void namco_c139_local_device::send_data()
 {
 	int tx_size = 0;
 	unsigned tx_mask = 0x0fff;
@@ -444,27 +410,33 @@ void namco_c139_local_device::send_data(unsigned data_size)
 	}
 
 
-
 	if (tx_size == 0)
 		return;
 
-	m_buffer[0] = m_linkid;
-	m_buffer[1] = tx_size & 0xff;
-	m_buffer[2] = (tx_size & 0xff00) >> 8;
-	m_buffer[0x1ff] = 1;
-
+	m_tx_buffer->buffer[0] = m_linkid;
+	m_tx_buffer->buffer[1] = tx_size & 0xff;
+	m_tx_buffer->buffer[2] = (tx_size & 0xff00) >> 8;
+//	m_buffer[511] = 1; //TODO - magic number and why the 1? 
 	unsigned buf_offset = 3;
+
+	if (tx_size >= sizeof(m_tx_buffer->buffer) / 2)
+	{
+		tx_size = tx_size >= sizeof(m_tx_buffer->buffer) / 2;
+		//Overflow
+	}
+
 	for (unsigned j = 0x00; j < tx_size; j++)
 	{
-		m_buffer[buf_offset] = m_ram[tx_offset & tx_mask] & 0xff;
-		m_buffer[buf_offset + 1] = 0;
+		m_tx_buffer->buffer[buf_offset] = m_ram[tx_offset & tx_mask] & 0xff;
+		m_tx_buffer->buffer[buf_offset + 1] = 0; // upper byte is usually zero
 
 		tx_offset++;
 		buf_offset += 2;
 	}
 
-	// set bit-8 on last byte
-	m_buffer[buf_offset - 1] |= 0x01;
+	// set bit8 on last byte
+	m_tx_buffer->buffer[buf_offset - 1] |= 0x01;
+
 
 	// based on mode, reset tx counter
 	switch (m_reg[REG_1_MODE])
@@ -487,44 +459,48 @@ void namco_c139_local_device::send_data(unsigned data_size)
 	}
 
 	m_txsize = 0;
-	send_frame(data_size);
+	send_frame(buf_offset);
 
 }
 
 
 void namco_c139_local_device::send_data_autotransmit(void )
 {
-	for (int y = 0; y < 40; y++)
-	{
-		m_buffer[y] = y;
-	}
 	unsigned tx_mask = 0x0fff;
-	
 	unsigned tx_offset = 0;
-
 	unsigned buf_offset = 3;
 
 	m_txsize++;//Didn't we add one earler?
 
-	m_buffer[0] = m_linkid;
-	m_buffer[1] = m_txsize & 0xff;
-	m_buffer[2] = (m_txsize & 0xff00) >> 8;
-	m_buffer[0x1ff] = 1;
+	m_tx_buffer->buffer[0] = m_linkid;
+	m_tx_buffer->buffer[1] = m_txsize & 0xff;
+	m_tx_buffer->buffer[2] = (m_txsize & 0xff00) >> 8;
+//	m_buffer[0x1ff] = 1;
+
+	/*
+	if (m_txsize >= sizeof(m_buffer) / 2)
+	{
+		osd_printf_verbose("Overflow. bytes_read = %04x, id %04x \n", m_txsize, m_linkid);
+		//Overflow
+	}
+	*/
 
 	for (unsigned j = 0x00; j < m_txsize; j++)
 	{
-		m_buffer[buf_offset] = m_ram[tx_offset & tx_mask] & 0xff;
-		m_buffer[buf_offset + 1] = 0;//77;
+		m_tx_buffer->buffer[buf_offset] = m_ram[tx_offset & tx_mask] & 0xff; //lower byte is data
+		m_tx_buffer->buffer[buf_offset + 1] = 0; // upper byte is zero
+
+		if (j == m_txsize - 1)
+		{
+			m_tx_buffer->buffer[buf_offset + 1] = 1; // End marker, often required
+	
+		}
 
 		tx_offset++;
 		buf_offset += 2;
 	}
 
-
-	
-
-	//TODO = silly big - send what you need instead
-	send_frame(0x100);
+	send_frame(buf_offset);
 
 }
 
@@ -532,27 +508,29 @@ void namco_c139_local_device::send_data_autotransmit(void )
 void namco_c139_local_device::send_frame(unsigned data_size)
 {
 
-		m_comms_counter++;
-		m_rx_bytes = (data_size << 4) | m_comms_counter;
+	m_tx_buffer->bytes_transmitted = data_size;
+	m_tx_buffer->byte_counter++;
 
 }
 
 
-unsigned namco_c139_local_device::read_frame(unsigned data_size)
+unsigned namco_c139_local_device::read_frame( unsigned max_size)
 {
 	
 		unsigned bytes_read = 0;
-		uint16_t rx_bytes = *m_rx_bytes_ptr;
-		uint16_t comms_counter = rx_bytes & 0xF;
+//		uint16_t rx_bytes = *m_rx_bytes_ptr;
+		uint16_t rx_bytes = m_rx_buffer->bytes_transmitted;
+//		uint16_t comms_counter = rx_bytes & 0xF;
+		uint16_t comms_counter = m_rx_buffer->byte_counter;
 
-		rx_bytes = rx_bytes >> 4;
+//		rx_bytes = rx_bytes >> 4;
 
 		if ((rx_bytes) && (comms_counter != m_rx_comms_counter))
 		{
 			bytes_read = rx_bytes;
-			if (bytes_read > 511)
+			if (bytes_read > max_size)
 			{
-				bytes_read = 511;
+				bytes_read = max_size;
 				osd_printf_verbose("Overflow. bytes_read = %04x \n", bytes_read );
 
 			//	return (0);
@@ -560,8 +538,7 @@ unsigned namco_c139_local_device::read_frame(unsigned data_size)
 			for (unsigned x = 0; x < bytes_read; x++)
 			{
 				//Copy data across
-				m_buffer[x] = m_rx_buffer_ptr[x];
-
+			//	rx_buffer[x] = m_rx_buffer->buffer[x];
 			}
 
 			m_rx_comms_counter = comms_counter;
