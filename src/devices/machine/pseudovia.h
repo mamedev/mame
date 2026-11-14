@@ -111,6 +111,7 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void pseudovia_recalc_irqs() override;
 
 private:

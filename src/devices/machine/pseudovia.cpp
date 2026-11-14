@@ -710,6 +710,14 @@ void quadra_pseudovia_device::device_start()
 	save_item(NAME(m_pcr));
 }
 
+void quadra_pseudovia_device::device_reset()
+{
+	pseudovia_device::device_reset();
+
+	m_pseudovia_regs[0x13] = 0;
+	pseudovia_recalc_irqs();
+}
+
 void quadra_pseudovia_device::scsi_irq_w(int state)
 {
 	const int irq = (state == ASSERT_LINE) ? 1 : 0;
