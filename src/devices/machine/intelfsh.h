@@ -51,9 +51,10 @@ protected:
 	bool                     m_sector_is_4k;
 	bool                     m_sector_is_16k;
 	bool                     m_top_boot_sector;
-	bool                     m_top_boot_sector_is_8k;
 	bool                     m_bot_boot_sector;
-	bool                     m_sector_erase_selection; // M29W640FT multi-sector erase with eight 8 KiB top sectors
+	bool                     m_sector_erase_selection; // multi-sector erase with eight 8 KiB top sectors
+	uint32_t                 m_erase_bank_boundary; // byte offset; zero for a single bank
+	bool                     m_erase_time_per_sector;
 	uint16_t                 m_page_size;
 	uint32_t                 m_page_timeout_usec;
 
@@ -85,6 +86,7 @@ private:
 	void select_erase_sector(uint32_t address);
 
 	std::unique_ptr<bool[]>    m_erase_selected;
+	uint8_t                  m_erase_banks;
 };
 
 
