@@ -250,7 +250,8 @@ int ins8250_uart_device::intrpt_r()
 void ins8250_uart_device::update_baud_rate()
 {
 	LOG("%.1f baud selected (divisor = %d)\n", double(clock()) / (m_regs.dl * 16), m_regs.dl);
-	set_rate(clock(), m_regs.dl * 16);
+	m_baud_clock = clock();
+	set_rate(m_baud_clock, m_regs.dl * 16);
 
 	// FIXME: Baud rate generator should not affect transmitter or receiver, but device_serial_interface resets them regardless.
 	// If the transmitter is still running at this time and we don't flush it, the shift register will never be emptied!
@@ -271,7 +272,8 @@ void ins8250_uart_device::set_divisor(u16 dl)
 
 void ins8250_uart_device::device_clock_changed()
 {
-	if (started())
+	// a state load restores the rate along with the clock: leave it alone
+	if (started() && clock() != m_baud_clock)
 		update_baud_rate();
 }
 
@@ -692,6 +694,7 @@ void ins8250_uart_device::device_start()
 {
 	set_tra_rate(0);
 	set_rcv_rate(0);
+	m_baud_clock = clock();
 
 	save_item(NAME(m_regs.thr));
 	save_item(NAME(m_regs.rbr));
@@ -705,6 +708,7 @@ void ins8250_uart_device::device_start()
 	save_item(NAME(m_regs.msr));
 	save_item(NAME(m_regs.scr));
 	save_item(NAME(m_int_pending));
+	save_item(NAME(m_baud_clock));
 	save_item(NAME(m_txd));
 	save_item(NAME(m_rxd));
 	save_item(NAME(m_dcd));

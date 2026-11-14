@@ -81,6 +81,7 @@ protected:
 	} m_regs;
 private:
 	u8 m_int_pending;
+	u32 m_baud_clock; // input clock the current rate was set from
 
 	devcb_write_line    m_out_tx_cb;
 	devcb_write_line    m_out_dtr_cb;
