@@ -339,7 +339,8 @@ void vga_device::io_3bx_3dx_map(address_map &map)
 void vga_device::io_3cx_map(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(vga_device::atc_address_r), FUNC(vga_device::atc_address_data_w));
-	map(0x01, 0x01).r(FUNC(vga_device::atc_data_r));
+	// NOTE: netbsd VESAFindIsaDevice test ask for write to 0x3c1 to act as write to 0x3c0
+	map(0x01, 0x01).rw(FUNC(vga_device::atc_data_r), FUNC(vga_device::atc_address_data_w));
 	map(0x02, 0x02).rw(FUNC(vga_device::input_status_0_r), FUNC(vga_device::miscellaneous_output_w));
 //  map(0x03, 0x03).w(FUNC(vga_device::wakeup_w));
 	map(0x04, 0x04).rw(FUNC(vga_device::sequencer_address_r), FUNC(vga_device::sequencer_address_w));
