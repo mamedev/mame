@@ -104,7 +104,6 @@ TODO:
 - Find source of level 2 interrupt (sprite DMA end?).
 - magibomb_br44: needs a redump of one of the program ROMs.
 - hacher, winbingo_gm051: need a redump of the sprite ROMs.
-- gostopac: needs verifying of outputs and layout. Sound doesn't seem 100% correct (Oki banking problem?)
 - monkeyl and clones: need verifying of inputs, outputs and layout.
 - speedmst and clones: need verifying of inputs, outputs and layout.
 - cptshark: needs verifying of inputs and layout
@@ -112,7 +111,6 @@ TODO:
 - hapfarm and clones: need verifying of inputs, outputs and layout.
 - zulu: needs verifying of inputs, outputs and layout.
 - westvent and clones: needs verifying of inputs, outputs and layout.
-- keno21: doesn't manage to read the CPU code. bp 1160,1,{D5=0x2188;g} for now to go further.
 - crzcircus: needs verifying of inputs, outputs and layout.
 - foxyruby: needs verifying of inputs, outputs and layout.
 - luckys99: needs verifying of inputs, outputs and layout creation.
@@ -215,6 +213,8 @@ UR DEALER       - Three traditional poker games. The player plays the role of De
 
 #include "emu.h"
 
+#include "astro_cpucode.h"
+
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
@@ -236,87 +236,6 @@ UR DEALER       - Three traditional poker games. The player plays the role of De
 #include "skilldrp.lh"
 #include "winbingo.lh"
 #include "zoo.lh"
-
-/***************************************************************************
-
-    CPU Code (Protection)
-
-***************************************************************************/
-
-class astro_cpucode_device : public device_t
-{
-public:
-	astro_cpucode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
-	// read handlers
-	int do_read();              // DO
-
-	// write handlers
-	void cs_write(int state);   // CS signal (active high)
-	void clk_write(int state);  // CLK signal (active high)
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-private:
-	required_region_ptr<u16> m_region_key;
-
-	u8 m_cs_state = CLEAR_LINE;
-	attotime m_last_cs_rising_edge_time = attotime::zero;
-	u8 m_clk_state = CLEAR_LINE;
-	u16 m_shift_register = 0;
-};
-
-DEFINE_DEVICE_TYPE(ASTRO_CPUCODE, astro_cpucode_device, "astro_cpucode", "Astro CPU Code")
-
-astro_cpucode_device::astro_cpucode_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, ASTRO_CPUCODE, tag, owner, clock)
-	, m_region_key(*this, DEVICE_SELF)
-{ }
-
-void astro_cpucode_device::device_start()
-{
-	save_item(NAME(m_cs_state));
-	save_item(NAME(m_last_cs_rising_edge_time));
-	save_item(NAME(m_clk_state));
-	save_item(NAME(m_shift_register));
-}
-
-void astro_cpucode_device::device_reset()
-{
-	m_shift_register = 0;
-}
-
-int astro_cpucode_device::do_read()
-{
-	return BIT(m_shift_register, 15);
-}
-
-void astro_cpucode_device::cs_write(int state)
-{
-	if (state != m_cs_state)
-	{
-		m_cs_state = state;
-		if (state == ASSERT_LINE)
-		{
-			m_last_cs_rising_edge_time = machine().time();
-			constexpr int shift = 11; // 0 1 10AAAAAA R
-			const u16 cpucode = *m_region_key;
-			m_shift_register = BIT(cpucode, shift, 16 - shift) | (BIT(cpucode, 0, shift) << (16 - shift));
-		}
-	}
-}
-
-void astro_cpucode_device::clk_write(int state)
-{
-	if (m_cs_state == ASSERT_LINE && state != m_clk_state)
-	{
-		m_clk_state = state;
-		if (state == ASSERT_LINE && machine().time() > m_last_cs_rising_edge_time)
-			m_shift_register = BIT(m_shift_register, 15) | (BIT(m_shift_register, 0, 15) << 1);
-	}
-}
 
 namespace {
 
@@ -432,6 +351,7 @@ public:
 	zoo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		astrocorp_state(mconfig, type, tag),
 		m_cpucode(*this, "astro_cpucode"),
+		m_cpucode_in(*this, "CPUCODE_IN"),
 		m_cpucode_out(*this, "CPUCODE_OUT")
 	{ }
 
@@ -477,9 +397,12 @@ protected:
 
 	virtual void eeprom_w(u8 data) override;
 
+	u16 cpucode_r();
+
 private:
 	required_device<astro_cpucode_device> m_cpucode;
 
+	required_ioport m_cpucode_in;
 	required_ioport m_cpucode_out;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_1_2_scanline_cb);
@@ -1005,6 +928,14 @@ void zoo_state::eeprom_w(u8 data)
 	m_cpucode_out->write(data, 0xff);
 }
 
+u16 zoo_state::cpucode_r()
+{
+	// the bit position of DO depends on the PCB
+	const u16 data = m_cpucode_in->read();
+	m_cpucode->next_bit();
+	return data;
+}
+
 void zoo_state::dinodino_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
@@ -1016,7 +947,7 @@ void zoo_state::dinodino_map(address_map &map)
 	map(0xb08001, 0xb08001).w(FUNC(zoo_state::eeprom_w));
 	map(0xb0a000, 0xb0a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0xb0e000, 0xb0e001).portr("EEPROM_IN");
-	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
+	map(0xb80000, 0xb80001).r(FUNC(zoo_state::cpucode_r));
 	map(0xc80000, 0xc801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd00001, 0xd00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0xd80000, 0xd80000).w(FUNC(zoo_state::oki_bank_w));
@@ -1034,9 +965,10 @@ void zoo_state::keno21_map(address_map &map)
 	map(0xa08001, 0xa08001).w(FUNC(zoo_state::eeprom_w));
 	map(0xa0a000, 0xa0a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0xa0e000, 0xa0e001).portr("EEPROM_IN");
-	map(0xb00000, 0xb00000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
-	//map(0xc80000, 0xc80000).w(FUNC(zoo_state::oki_bank_w));
+	map(0xa80001, 0xa80001).w(FUNC(zoo_state::oki_bank_w));
+	map(0xb00000, 0xb00000).w(m_oki, FUNC(okim6295_device::write));
+	map(0xb00001, 0xb00001).r(m_oki, FUNC(okim6295_device::read));
+	map(0xb80000, 0xb80001).r(FUNC(zoo_state::cpucode_r));
 	map(0xe00000, 0xe001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
@@ -1051,7 +983,7 @@ void zoo_state::magibomb_aa72d_map(address_map &map)
 	map(0xa88001, 0xa88001).w(FUNC(zoo_state::eeprom_w));
 	map(0xa8a000, 0xa8a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0xa8e000, 0xa8e001).portr("EEPROM_IN");
-	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
+	map(0xb80000, 0xb80001).r(FUNC(zoo_state::cpucode_r));
 	map(0xc80000, 0xc83fff).ram().share("nvram"); // battery
 	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd80000, 0xd80000).w(FUNC(zoo_state::oki_bank_w));
@@ -1069,7 +1001,7 @@ void zoo_state::magibomb_nb61_map(address_map &map)
 	map(0xa08001, 0xa08001).w(FUNC(zoo_state::eeprom_w));
 	map(0xa0a000, 0xa0a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0xa0e000, 0xa0e001).portr("EEPROM_IN");
-	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
+	map(0xb80000, 0xb80001).r(FUNC(zoo_state::cpucode_r));
 	map(0xc00000, 0xc03fff).ram().share("nvram"); // battery
 	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd80000, 0xd80000).w(FUNC(zoo_state::oki_bank_w));
@@ -1089,7 +1021,7 @@ void zoo_state::magibomb_ab53_map(address_map &map)
 	map(0x888001, 0x888001).w(FUNC(zoo_state::eeprom_w));
 	map(0x88a000, 0x88a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0x890000, 0x890001).portr("EEPROM_IN");
-	map(0x8a0000, 0x8a0001).portr("CPUCODE_IN");
+	map(0x8a0000, 0x8a0001).r(FUNC(zoo_state::cpucode_r));
 	map(0x8b0000, 0x8b0000).w(FUNC(zoo_state::oki_bank_w));
 	map(0x8c0001, 0x8c0001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
@@ -1107,7 +1039,7 @@ void zoo_state::magibomb_br71a_map(address_map &map)
 	map(0xc0a000, 0xc0a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0xc0e000, 0xc0e001).portr("EEPROM_IN");
 	map(0xc80000, 0xc801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xd00000, 0xd00001).portr("CPUCODE_IN");
+	map(0xd00000, 0xd00001).r(FUNC(zoo_state::cpucode_r));
 	map(0xd80000, 0xd80000).w(FUNC(zoo_state::oki_bank_w));
 	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
@@ -1125,7 +1057,7 @@ void zoo_state::magibomb_lb51_map(address_map &map)
 	map(0x888001, 0x888001).w(FUNC(zoo_state::eeprom_w));
 	map(0x88a000, 0x88a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0x890000, 0x890001).portr("EEPROM_IN");
-	map(0x8a0000, 0x8a0001).portr("CPUCODE_IN");
+	map(0x8a0000, 0x8a0001).r(FUNC(zoo_state::cpucode_r));
 	map(0x8b0000, 0x8b0000).w(FUNC(zoo_state::oki_bank_w));
 	map(0x8c0001, 0x8c0001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
@@ -1146,7 +1078,7 @@ void zoo_state::winbingo_map(address_map &map)
 	map(0xa8e000, 0xa8e001).portr("EEPROM_IN");
 	map(0xb00000, 0xb00001).nopr().w(FUNC(zoo_state::screen_enable_w)).umask16(0x00ff);
 	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xd80000, 0xd80001).portr("CPUCODE_IN");
+	map(0xd80000, 0xd80001).r(FUNC(zoo_state::cpucode_r));
 }
 
 void zoo_state::hacher_map(address_map &map)
@@ -1164,7 +1096,7 @@ void zoo_state::hacher_map(address_map &map)
 //  map(0xc00001, 0xc00001).w(FUNC(zoo_state::screen_enable_w)); // also used as screen enable! But 0/1 are no-ops for the OKI, so maybe an innocuous bug of this hacked game?
 	map(0xc80000, 0xc83fff).ram().share("nvram"); // battery
 	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xd80000, 0xd80001).portr("CPUCODE_IN");
+	map(0xd80000, 0xd80001).r(FUNC(zoo_state::cpucode_r));
 }
 
 void zoo_state::zoo_map(address_map &map)
@@ -1182,7 +1114,7 @@ void zoo_state::zoo_map(address_map &map)
 	map(0xc80000, 0xc801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd00001, 0xd00001).w(FUNC(zoo_state::oki_bank_w));
 	map(0xd80001, 0xd80001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xe00000, 0xe00001).portr("CPUCODE_IN");
+	map(0xe00000, 0xe00001).r(FUNC(zoo_state::cpucode_r));
 }
 
 void zoo_state::zulu_map(address_map &map)
@@ -1198,7 +1130,7 @@ void zoo_state::zulu_map(address_map &map)
 	map(0xc0a000, 0xc0a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0xc0e000, 0xc0e001).portr("EEPROM_IN");
 	map(0xc80000, 0xc80001).nopr().w(FUNC(zoo_state::screen_enable_w)).umask16(0x00ff);
-	map(0xd00000, 0xd00001).portr("CPUCODE_IN");
+	map(0xd00000, 0xd00001).r(FUNC(zoo_state::cpucode_r));
 	map(0xd80001, 0xd80001).w(FUNC(zoo_state::oki_bank_w));
 	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -1207,8 +1139,9 @@ void zoo_state::gostopac_map(address_map &map)
 {
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
-	map(0xb00000, 0xb00000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
+	map(0xb00000, 0xb00000).w(m_oki, FUNC(okim6295_device::write));
+	map(0xb00001, 0xb00001).r(m_oki, FUNC(okim6295_device::read));
+	map(0xb80000, 0xb80001).r(FUNC(zoo_state::cpucode_r));
 	map(0xc00000, 0xc00fff).ram().share(m_spriteram);
 	map(0xc02000, 0xc02001).nopr().w(FUNC(zoo_state::draw_sprites_w));
 	map(0xc04000, 0xc04001).portr("INPUTS");
@@ -1231,7 +1164,7 @@ void zoo_state::monkeyl_map(address_map &map)
 	map(0xa0a000, 0xa0a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0xa0e000, 0xa0e001).portr("EEPROM_IN");
 	map(0xa80000, 0xa83fff).ram().share("nvram"); // battery
-	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
+	map(0xb80000, 0xb80001).r(FUNC(zoo_state::cpucode_r));
 	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd80001, 0xd80001).w(FUNC(zoo_state::oki_bank_w));
 	map(0xe80001, 0xe80001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -1248,7 +1181,7 @@ void zoo_state::monkeyl_en20b_map(address_map &map)
 	map(0xa88001, 0xa88001).w(FUNC(zoo_state::eeprom_w));
 	map(0xa8a000, 0xa8a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0xa8e000, 0xa8e001).portr("EEPROM_IN");
-	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
+	map(0xb80000, 0xb80001).r(FUNC(zoo_state::cpucode_r));
 	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd80001, 0xd80001).w(FUNC(zoo_state::oki_bank_w));
 	map(0xe00001, 0xe00001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -1267,7 +1200,7 @@ void zoo_state::speedmst_map(address_map &map)
 	map(0x888001, 0x888001).w(FUNC(zoo_state::eeprom_w));
 	map(0x88a000, 0x88a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0x890000, 0x890001).portr("EEPROM_IN");
-	map(0x8a0000, 0x8a0001).portr("CPUCODE_IN");
+	map(0x8a0000, 0x8a0001).r(FUNC(zoo_state::cpucode_r));
 	map(0x8b0001, 0x8b0001).w(FUNC(zoo_state::oki_bank_w));
 	map(0x8c0001, 0x8c0001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
@@ -1285,7 +1218,7 @@ void zoo_state::wwitch_map(address_map &map)
 	map(0xa8e000, 0xa8e001).portr("EEPROM_IN");
 	map(0xb00000, 0xb00000).w(FUNC(zoo_state::oki_bank_w));
 	map(0xb80000, 0xb83fff).ram().share("nvram"); // battery
-	map(0xc00000, 0xc00001).portr("CPUCODE_IN");
+	map(0xc00000, 0xc00001).r(FUNC(zoo_state::cpucode_r));
 	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
@@ -1302,7 +1235,7 @@ void zoo_state::lwitch_map(address_map &map)
 	map(0xa8a000, 0xa8a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0xa8e000, 0xa8e001).portr("EEPROM_IN");
 	map(0xb00000, 0xb00000).w(FUNC(zoo_state::oki_bank_w));
-	map(0xc00000, 0xc00001).portr("CPUCODE_IN");
+	map(0xc00000, 0xc00001).r(FUNC(zoo_state::cpucode_r));
 	map(0xd00000, 0xd001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xd80000, 0xd83fff).ram().share("nvram"); // battery
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
@@ -1313,7 +1246,7 @@ void zoo_state::hapfarm_map(address_map &map)
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x480000, 0x483fff).ram().share("nvram"); // battery
 	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
-	map(0xb00000, 0xb00001).portr("CPUCODE_IN");
+	map(0xb00000, 0xb00001).r(FUNC(zoo_state::cpucode_r));
 	map(0xb80000, 0xb80fff).ram().share(m_spriteram);
 	map(0xb82000, 0xb82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
 	map(0xb84000, 0xb84001).portr("INPUTS");
@@ -1331,7 +1264,7 @@ void zoo_state::hapfarm_in0102b_map(address_map &map)
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x300000, 0x303fff).ram().share("nvram"); // battery
 	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
-	map(0xa80000, 0xa80001).portr("CPUCODE_IN");
+	map(0xa80000, 0xa80001).r(FUNC(zoo_state::cpucode_r));
 	map(0xb80000, 0xb80fff).ram().share(m_spriteram);
 	map(0xb82000, 0xb82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
 	map(0xb84000, 0xb84001).portr("INPUTS");
@@ -1357,7 +1290,7 @@ void zoo_state::westvent_map(address_map &map)
 	map(0xb88001, 0xb88001).w(FUNC(zoo_state::eeprom_w));
 	map(0xb8a000, 0xb8a001).w(FUNC(zoo_state::magibomb_outputs_w));
 	map(0xb8e000, 0xb8e001).portr("EEPROM_IN");
-	map(0xc00000, 0xc00001).portr("CPUCODE_IN");
+	map(0xc00000, 0xc00001).r(FUNC(zoo_state::cpucode_r));
 	map(0xd80000, 0xd801ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 //  map(0x??0001, 0x??0001).w(FUNC(zoo_state::screen_enable_w)); // unknown location
 }
@@ -1368,7 +1301,7 @@ void zoo_state::crzcircus_map(address_map &map)
 	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xa00001, 0xa00001).w(FUNC(zoo_state::oki_bank_w));
 	map(0xa80001, 0xa80001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0xb00000, 0xb00001).portr("CPUCODE_IN");
+	map(0xb00000, 0xb00001).r(FUNC(zoo_state::cpucode_r));
 	map(0xb80000, 0xb80fff).ram().share(m_spriteram);
 	map(0xb82000, 0xb82001).nopr().w(FUNC(zoo_state::draw_sprites_w));
 	map(0xb84000, 0xb84001).portr("INPUTS");
@@ -1385,7 +1318,7 @@ void zoo_state::foxyruby_map(address_map &map)
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x500000, 0x503fff).ram().share("nvram"); // battery
 	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
-	map(0x980000, 0x980001).portr("CPUCODE_IN");
+	map(0x980000, 0x980001).r(FUNC(zoo_state::cpucode_r));
 	map(0xb00000, 0xb001ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0xc80000, 0xc80000).w(FUNC(zoo_state::oki_bank_w));
 	map(0xd80001, 0xd80001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -1403,7 +1336,7 @@ void astoneag_state::astoneag_map(address_map &map)
 	map(0x000000, 0x03ffff).rom().region("maincpu", 0);
 	map(0x800000, 0x83ffff).rom().region("encrypted_rom", 0); // POST checks for encrypted ROM checksum here
 	map(0xb00000, 0xb03fff).ram().share("nvram"); // battery
-	map(0xb80000, 0xb80001).portr("CPUCODE_IN");
+	map(0xb80000, 0xb80001).r(FUNC(astoneag_state::cpucode_r));
 	map(0xc00000, 0xc00fff).ram().share(m_spriteram);
 	map(0xc02000, 0xc02001).nopr().w(FUNC(astoneag_state::draw_sprites_w));
 	map(0xc04000, 0xc04001).portr("INPUTS");
@@ -1548,7 +1481,6 @@ static INPUT_PORTS_START( magibomb_aa72d )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", FUNC(eeprom_serial_93cxx_device::cs_write))
 
 	PORT_START( "CPUCODE_OUT" )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::clk_write))
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::cs_write))
 INPUT_PORTS_END
 
@@ -1578,7 +1510,6 @@ static INPUT_PORTS_START( dinodino )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_READ_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::do_read))
 
 	PORT_START( "CPUCODE_OUT" )
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::clk_write))
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("astro_cpucode", FUNC(astro_cpucode_device::cs_write))
 INPUT_PORTS_END
 
@@ -3591,7 +3522,7 @@ ROM_START( gostopac )
 	ROM_LOAD( "93c46.u10", 0x0000, 0x0080, CRC(db769f17) SHA1(19f1481c41f0e35d2379fddabf28e3a8e5c7624e) ) // factory default
 
 	ROM_REGION16_LE( 0x02, "astro_cpucode", 0 )
-	ROM_LOAD( "gostopac_cpucode.key", 0x00, 0x02, CRC(e14ff981) SHA1(322130632f4a29531f53755594f19876b371a223) )
+	ROM_LOAD( "gostopac_cpucode.key", 0x00, 0x02, CRC(11926740) SHA1(5fbee924dea603083cdf8c4588809c182b543608) )
 ROM_END
 
 /***************************************************************************
