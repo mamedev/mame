@@ -269,6 +269,12 @@ void ins8250_uart_device::set_divisor(u16 dl)
 	}
 }
 
+void ins8250_uart_device::device_clock_changed()
+{
+	if (started())
+		update_baud_rate();
+}
+
 void ins8250_uart_device::ins8250_w(offs_t offset, u8 data)
 {
 	int tmp;

@@ -50,6 +50,7 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_clock_changed() override;
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
