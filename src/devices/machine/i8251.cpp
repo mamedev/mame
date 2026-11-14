@@ -543,9 +543,6 @@ void i8251_device::device_reset()
 
 void i8251_device::command_w(uint8_t data)
 {
-	/* command */
-	m_command = data;
-
 	LOG("I8251: Command byte: %02x\n", data);
 	LOGCOM(" Tx enable: %d\n", data & 0x01 ? 1 : 0); // bit 0: 0 = transmit disable 1 = transmit enable
 	LOGCOM(" DTR      : %d\n", data & 0x02 ? 1 : 0); // bit 1: 0 = /DTR set to 1    1 = /DTR set to 0
@@ -556,9 +553,6 @@ void i8251_device::command_w(uint8_t data)
 	LOGCOM(" Reset    : %d\n", data & 0x40 ? 1 : 0); // bit 6: 0 = normal operation 1 = internal reset
 	LOGCOM(" Hunt mode: %d\n", data & 0x80 ? 1 : 0); // bit 7: 0 = normal operation 1 = hunt mode
 
-	m_rts_handler(!BIT(data, 5));
-	m_dtr_handler(!BIT(data, 1));
-
 	if (BIT(data, 4))
 	{
 		LOGSTAT("status errors are reset\n");
@@ -567,11 +561,20 @@ void i8251_device::command_w(uint8_t data)
 
 	if (BIT(data, 6))
 	{
-		// datasheet says "returns to mode format", not
-		// completely resets the chip.  behavior of DEC Rainbow
-		// backs this up.
+		// Internal reset returns the device to the mode format and, per the
+		// 8251A data sheet (RESET pin), to the "Idle" state.  It stops short
+		// of a full reset (device_reset), as the DEC Rainbow's behaviour backs
+		// up.  Treating the rest of the command as 0 is inferred: the data
+		// sheet only shows a bare 0x40.
 		m_flags = I8251_NEXT_MODE;
+		data = 0x40;
 	}
+
+	// command
+	m_command = data;
+
+	m_rts_handler(!BIT(data, 5));
+	m_dtr_handler(!BIT(data, 1));
 
 	// Hunt mode
 	m_hunt_on = false;

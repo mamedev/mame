@@ -47,10 +47,11 @@ enum
 {
 	VALKYRIEREG_VIDEO_TIMING        = 0x00,
 	VALKYRIEREG_VIDEO_MODE          = 0x04,
+	VALKYRIEREG_STATUS              = 0x08,
 	VALKYRIEREG_VIDEO_DEPTH         = 0x0C,
 	VALKYRIEREG_CONFIG              = 0x10,
-	VALKYRIEREG_VBLANK              = 0x14,
-	VALKYRIEREG_SCREEN_ENABLE       = 0x18,
+	VALKYRIEREG_INT_STATUS          = 0x14,
+	VALKYRIEREG_INT_ENABLE          = 0x18,
 	VALKYRIEREG_MONITOR_SENSE       = 0x1C,
 
 	VALKYRIEREG_VIDEO_IN_CONTROL    = 0x20,
@@ -110,7 +111,7 @@ valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag,
 	m_irq(*this),
 	m_vram_offset(0), m_monitor_id(0),
 	m_base(0), m_stride(1024), m_video_timing(0x80), m_int_status(0), m_hres(0), m_vres(0), m_htotal(0), m_vtotal(0),
-	m_config(0), m_vbl_enabled(false),
+	m_config(0), m_int_enable(0),
 	m_M(1), m_N(1), m_P(1),
 	m_video_in_control(0), m_color_key(0),
 	m_window_x(0), m_window_y(0), m_window_width(0), m_window_height(0), m_field_x(0), m_field_y(0)
@@ -120,9 +121,6 @@ valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag,
 void valkyrie_device::device_start()
 {
 	m_vram = std::make_unique<u32[]>(m_vram_size);
-
-	m_vbl_timer = timer_alloc(FUNC(valkyrie_device::vbl_tick), this);
-	m_vbl_timer->adjust(attotime::never);
 
 	save_item(NAME(m_video_timing));
 	save_item(NAME(m_vram_offset));
@@ -138,7 +136,7 @@ void valkyrie_device::device_start()
 	save_item(NAME(m_vtotal));
 	save_item(NAME(m_pixel_clock));
 	save_item(NAME(m_config));
-	save_item(NAME(m_vbl_enabled));
+	save_item(NAME(m_int_enable));
 	save_item(NAME(m_int_status));
 	save_item(NAME(m_M));
 	save_item(NAME(m_N));
@@ -179,6 +177,7 @@ void valkyrie_device::device_add_mconfig(machine_config &config)
 	// dot clock, htotal, hstart, hend, vtotal, vstart, vend
 	m_screen->set_raw(31334400, 896, 0, 640, 525, 0, 480);
 	m_screen->set_screen_update(FUNC(valkyrie_device::screen_update));
+	m_screen->screen_vblank().set(FUNC(valkyrie_device::vblank_w));
 
 	PALETTE(config, m_palette).set_entries(256);
 }
@@ -347,11 +346,14 @@ u8 valkyrie_device::regs_r(offs_t offset)
 		case VALKYRIEREG_VIDEO_MODE:
 			return m_mode;
 
-		case VALKYRIEREG_CONFIG: // config
-			return (m_config & 0x7f) | ((m_screen->hblank() || m_screen->vblank()) ? 0x80 : 0);
+		case VALKYRIEREG_CONFIG: // bit 7: blanking, bit 0: vertical blanking interrupt latch
+			return (m_config & 0x7e) | ((m_screen->hblank() || m_screen->vblank() || timing_stopped()) ? 0x80 : 0) | BIT(m_int_status, 0);
 
-		case VALKYRIEREG_VBLANK:
-			return m_screen->vblank();
+		case VALKYRIEREG_INT_STATUS: // 0x81 while the enabled vertical blanking interrupt is pending
+			return (BIT(m_int_status, 0) && BIT(m_int_enable, 0)) ? 0x81 : 0;
+
+		case VALKYRIEREG_INT_ENABLE:
+			return m_int_enable;
 
 		case VALKYRIEREG_MONITOR_SENSE:  // monitor sense in upper nibble, write monitor sense in lower nibble
 			{
@@ -413,6 +415,13 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 			m_mode = data & 7;
 			break;
 
+		case VALKYRIEREG_STATUS: // the chip is reset by any write
+			m_video_timing = 0x9f;
+			m_mode = 0;
+			m_int_enable = 0;
+			recalc_ints();
+			break;
+
 		case VALKYRIEREG_VIDEO_DEPTH:   // subsystem configuration register
 			if (data == 0x1)
 			{
@@ -423,25 +432,26 @@ void valkyrie_device::regs_w(offs_t offset, u8 data)
 		case VALKYRIEREG_CONFIG:
 			m_config = data;
 
-			m_int_status &= ~1;
-			recalc_ints();
-
-			if (m_vbl_enabled)
-				m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
+			// the vertical blanking interrupt latch is cleared when bit 0 is written as 1
+			if (BIT(data, 0))
+			{
+				m_int_status &= ~1;
+				recalc_ints();
+			}
 			break;
 
-		case VALKYRIEREG_SCREEN_ENABLE: // screen enable
-			// at startup, the screen isn't wanted on until 0x81 is written.
-			// if the Video Startup extension is installed, it later sets this to 0x02.
-			m_vbl_enabled = ((data & 0x80) || (data == 0x02));
-			if (m_vbl_enabled)
+		case VALKYRIEREG_INT_ENABLE:
+			// the bits written as 1 are set when bit 7 is 1 and cleared when it is 0
+			// bit 0: vertical blanking interrupt enable, set by the ROM at startup with a write of 0x81
+			if (BIT(data, 7))
 			{
-				m_vbl_timer->adjust(m_screen->time_until_pos(m_vres, 0), 0);
+				m_int_enable |= data & 0x03;
 			}
 			else
 			{
-				m_vbl_timer->adjust(attotime::never);
+				m_int_enable &= ~data;
 			}
+			recalc_ints();
 			break;
 
 		case VALKYRIEREG_MONITOR_SENSE: // drive monitor sense lines. 1 = drive, 0 = tri-state
@@ -714,7 +724,7 @@ void valkyrie_device::video_buffer_w(offs_t offset, u32 data, u32 mem_mask)
 
 void valkyrie_device::recalc_ints()
 {
-	if (m_int_status != 0)
+	if (BIT(m_int_status, 0) && BIT(m_int_enable, 0))
 	{
 		m_irq(ASSERT_LINE);
 	}
@@ -724,12 +734,13 @@ void valkyrie_device::recalc_ints()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(valkyrie_device::vbl_tick)
+void valkyrie_device::vblank_w(int state)
 {
-	m_int_status |= 1;
-	recalc_ints();
-
-	m_vbl_timer->adjust(m_screen->time_until_pos(480, 0), 0);
+	if (state && !timing_stopped())
+	{
+		m_int_status |= 1;
+		recalc_ints();
+	}
 }
 
 void valkyrie_device::write_data(u16 offset, u8 data)
