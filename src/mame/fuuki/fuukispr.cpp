@@ -110,8 +110,11 @@ void fuukispr_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 		const int xnum = ((data0 >> 12) & 0xf) + 1;
 		const int ynum = ((data1 >> 12) & 0xf) + 1;
 
+		// zoomed tile size in 1/8 pixels
 		const int xzoom = 16 * 8 - (8 * ((attr >> 12) & 0xf)) / 2;
 		const int yzoom = 16 * 8 - (8 * ((attr >>  8) & 0xf)) / 2;
+		const u32 xstep = gfx_element::subpixel_zoom_step(xzoom << 9);
+		const u32 ystep = gfx_element::subpixel_zoom_step(yzoom << 9);
 
 		u32 pri_mask = 0;
 		u32 colour = attr & 0xff;
@@ -139,41 +142,21 @@ void fuukispr_device::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, 
 			for (int x = xstart; x != xend; x += xinc)
 			{
 				if (priority)
-				{
-					if (xzoom == (16*8) && yzoom == (16*8))
-						gfx(0)->prio_transpen(bitmap, spriteclip,
-										code++,
-										colour,
-										flipx, flipy,
-										sx + x * 16, sy + y * 16,
-										screen.priority(), pri_mask, 15);
-					else
-						gfx(0)->prio_zoom_transpen(bitmap, spriteclip,
-										code++,
-										colour,
-										flipx, flipy,
-										sx + (x * xzoom) / 8, sy + (y * yzoom) / 8,
-										(0x10000/0x10/8) * (xzoom + 8), (0x10000/0x10/8) * (yzoom + 8),// nearest greater integer value to avoid holes
-										screen.priority(), pri_mask, 15);
-				}
+					gfx(0)->prio_zoom_subpixel_transpen(bitmap, spriteclip,
+									code++,
+									colour,
+									flipx, flipy,
+									sx << 16, sy << 16, x, y,
+									xstep, ystep,
+									screen.priority(), pri_mask, 15);
 				else
-				{
-					if (xzoom == (16*8) && yzoom == (16*8))
-						gfx(0)->transpen(bitmap, spriteclip,
-										code++,
-										colour,
-										flipx, flipy,
-										sx + x * 16, sy + y * 16,
-										15);
-					else
-						gfx(0)->zoom_transpen(bitmap, spriteclip,
-										code++,
-										colour,
-										flipx, flipy,
-										sx + (x * xzoom) / 8, sy + (y * yzoom) / 8,
-										(0x10000/0x10/8) * (xzoom + 8), (0x10000/0x10/8) * (yzoom + 8),// nearest greater integer value to avoid holes
-										15);
-				}
+					gfx(0)->zoom_subpixel_transpen(bitmap, spriteclip,
+									code++,
+									colour,
+									flipx, flipy,
+									sx << 16, sy << 16, x, y,
+									xstep, ystep,
+									15);
 			}
 		}
 	}

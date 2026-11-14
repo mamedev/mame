@@ -84,7 +84,6 @@ private:
 		s16 alpha = 0;
 	};
 
-	bitmap_ind8                 m_zoom_bitmap;
 	bitmap_ind16                m_z_bitmap;
 	std::unique_ptr<u16[]>      m_bg_zoom;
 	std::unique_ptr<u8[]>       m_alphatable;
