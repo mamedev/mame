@@ -49543,6 +49543,7 @@ pc1000
 
 @source:vtech/pc2000.cpp
 gbs5505x
+genio2000
 gl2000
 gl2000c
 gl2000p
