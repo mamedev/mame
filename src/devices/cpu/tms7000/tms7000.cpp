@@ -628,26 +628,26 @@ void tms7000_device::timer16_w(offs_t offset, uint8_t data)
 
 	switch (offset)
 	{
-	case 0:
-		m_timer16_data[timer] = (m_timer16_data[timer] & 0x00ff) | (uint16_t(data) << 8);
-		break;
-	case 1:
-		m_timer16_data[timer] = (m_timer16_data[timer] & 0xff00) | data;
-		break;
-	case 2:
-		m_timer16_control[timer] = data & ((timer == 0) ? 0x40 : 0xc0);
-		break;
-	case 3:
-		m_timer_control[timer] = data;
-		if (BIT(data, 7))
-		{
-			m_timer_decrementer[timer] = m_timer16_data[timer];
-			m_timer_prescaler[timer] = data & 0x1f;
-			m_timer16_clocks[timer] = 0;
-		}
-		else
-			m_io_control[timer] &= ~0x08;
-		break;
+		case 0:
+			m_timer16_data[timer] = (m_timer16_data[timer] & 0x00ff) | (uint16_t(data) << 8);
+			break;
+		case 1:
+			m_timer16_data[timer] = (m_timer16_data[timer] & 0xff00) | data;
+			break;
+		case 2:
+			m_timer16_control[timer] = data & ((timer == 0) ? 0x40 : 0xc0);
+			break;
+		case 3:
+			m_timer_control[timer] = data;
+			if (BIT(data, 7))
+			{
+				m_timer_decrementer[timer] = m_timer16_data[timer];
+				m_timer_prescaler[timer] = data & 0x1f;
+				m_timer16_clocks[timer] = 0;
+			}
+			else
+				m_io_control[timer] &= ~0x08;
+			break;
 	}
 }
 
