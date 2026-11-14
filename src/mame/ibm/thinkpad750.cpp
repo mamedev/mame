@@ -85,8 +85,8 @@ Hardware for the 750Cs model (released November 1993):
  Existing BIOS versions:
                                                             355/355C/355Cs
                                                             360/360C/360Cs
-	    750/750C/750Cs                                        360CE/360CSE
-	    750P              750Ce             755C/755Cs        360P/360PE
+        750/750C/750Cs                                        360CE/360CSE
+        750P              750Ce             755C/755Cs        360P/360PE
       ----------------  ----------------  ----------------  ----------------  -------------------------------------------------------
 Ver.    P/N     Date      P/N     Date      P/N     Date      P/N     Date    Feature
 ----  ------- --------  ------- --------  ------- --------  ------- --------  -------------------------------------------------------
@@ -113,8 +113,10 @@ Ver.    P/N     Date      P/N     Date      P/N     Date      P/N     Date    Fe
 ***********************************************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/h8/h8325.h"
 #include "cpu/i386/i386.h"
+
 #include "speaker.h"
 
 
@@ -128,7 +130,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	void thinkpad750(machine_config &config);
+	void thinkpad750(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -139,9 +141,9 @@ private:
 
 void thinkpad750_state::main_map(address_map &map)
 {
-  map(0x0000'0000, 0x0009'ffff).ram();
-  map(0x000e'0000, 0x000f'ffff).rom().region("maincpu", 0x20000);
-  map(0xfffc'0000, 0xffff'ffff).rom().region("maincpu", 0);
+	map(0x0000'0000, 0x0009'ffff).ram();
+	map(0x000e'0000, 0x000f'ffff).rom().region("maincpu", 0x20000);
+	map(0xfffc'0000, 0xffff'ffff).rom().region("maincpu", 0);
 }
 
 
@@ -150,7 +152,7 @@ void thinkpad750_state::thinkpad750(machine_config &config)
 	I486(config, m_maincpu, 33.333_MHz_XTAL); // Intel i486SL-33
 	m_maincpu->set_addrmap(AS_PROGRAM, &thinkpad750_state::main_map);
 
-	H8325(config, "mcu", XTAL(10'000'000)); // Actually an H8/338 (HD6473378), unknown clock
+	H8325(config, "mcu", 10'000'000); // Actually an H8/337 (HD6473378), unknown clock
 
 	SPEAKER(config, "speaker", 2).front();
 }
