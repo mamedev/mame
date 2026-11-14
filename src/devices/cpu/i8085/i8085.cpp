@@ -525,9 +525,8 @@ void i8085a_cpu_device::break_halt_for_interrupt()
 	m_in_acknowledge = true;
 }
 
-// TRAP and RST n.5 are taken as an internal RST: a 6-state bus idle M1 and
-// two memory writes, 12 states (MCS-80/85 Family User's Manual, fig 2-19
-// and table 5-1, where RST is 12 states on the 8085A, 11 on the 8080A)
+// TRAP and RST 5.5/6.5/7.5 take 12 states: a 6-state bus idle M1 and two
+// memory writes (MCS-80/85 Family User's Manual, fig 2-19)
 void i8085a_cpu_device::check_for_interrupts()
 {
 	// TRAP is the highest priority
