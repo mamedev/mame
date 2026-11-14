@@ -159,6 +159,7 @@ if VIDEOS["HANTRO_G1"] then
 end
 	links {
 		"utils",
+		"mame_srcdbg_static",
 		ext_lib("expat"),
 		"softfloat3",
 		"wdlfft",

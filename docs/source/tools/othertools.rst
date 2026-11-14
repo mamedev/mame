@@ -58,6 +58,22 @@ romcmp
 This tool is used to perform basic data comparisons and integrity checks on binary dumps. With the -h switch, it can also be used to calculate hash functions.
 
 
+.. _othertools_srcdbgdump:
+
+srcdbgdump
+----------
+
+This tool may be used to view the contents of
+:ref:`MAME Debugging Information Files <srcdbg_mdi>`.  The only command-line
+parameter it accepts is the name of the MAME Debugging Information file to
+dump.  For example:
+
+``srcdbgdump c:\path\to\mysymbols.mdi``
+    Prints the contents of the specified MDI file as ASCII text to the console.
+``srcdbgdump c:\path\to\mysymbols.mdi > c:\path\to\mysymbols.txt``
+	Dump the contents into a text file.
+
+
 unidasm
 -------
 

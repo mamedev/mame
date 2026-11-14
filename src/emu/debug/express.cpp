@@ -30,7 +30,10 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "express.h"
+#include "debugger.h"
+#include "srcdbg_info.h"
 
 #include "corestr.h"
 #include "endianness.h"
@@ -261,6 +264,72 @@ u64 function_symbol_entry::execute(int numparams, const u64 *paramlist)
 }
 
 
+//**************************************************************************
+//  SOURCE-DEBUGGING SYMBOL ENTRY
+//**************************************************************************
+
+// a symbol entry representing a symbol obtained from
+// source-debugging info.
+class srcdbg_symbol_entry : public symbol_entry
+{
+public:
+	// construction/destruction
+	srcdbg_symbol_entry(symbol_table &table, const char *name, std::function<bool()> is_in_scope_fcn, std::function<u64(symbol_table &)> value_fcn);
+
+	// symbol access
+	virtual bool is_lval() const override { return false; }
+	virtual u64 value() const override;
+	virtual void set_value(u64 newvalue) override;
+	virtual bool is_in_scope() const override;
+
+private:
+	// internal state
+	std::function<bool()> m_is_in_scope_fcn;
+	std::function<u64(symbol_table &)> m_value_fcn;
+};
+
+//-------------------------------------------------
+//  srcdbg_symbol_entry - constructor
+//-------------------------------------------------
+
+srcdbg_symbol_entry::srcdbg_symbol_entry(symbol_table &table, const char *name, std::function<bool()> is_in_scope_fcn, std::function<u64(symbol_table &)> value_fcn)
+	: symbol_entry(table, SMT_INTEGER, name, "")
+	, m_is_in_scope_fcn(is_in_scope_fcn)
+	, m_value_fcn(value_fcn)
+{
+}
+
+
+//-------------------------------------------------
+//  is_in_scope - calls into srcdbg_info to determine
+//  if the symbol is currently in scope
+//-------------------------------------------------
+
+bool srcdbg_symbol_entry::is_in_scope() const
+{
+	return m_is_in_scope_fcn();
+}
+
+
+//-------------------------------------------------
+//  value - calls into srcdbg_info to get value
+//-------------------------------------------------
+
+u64 srcdbg_symbol_entry::value() const
+{
+	return m_value_fcn(m_table);
+}
+
+
+//-------------------------------------------------
+//  set_value - Disallowed, read-only
+//-------------------------------------------------
+
+void srcdbg_symbol_entry::set_value(u64 newvalue)
+{
+	throw emu_fatalerror("Symbol '%s' is the location of a local variable, and is read-only", m_name);
+}
+
 
 /***************************************************************************
     INLINE FUNCTIONS
@@ -304,28 +373,32 @@ std::string expression_error::code_string() const
 {
 	switch (m_code)
 	{
-		case NOT_LVAL:              return "not an lvalue";
-		case NOT_RVAL:              return "not an rvalue";
-		case SYNTAX:                return "syntax error";
-		case UNKNOWN_SYMBOL:        return "unknown symbol";
-		case INVALID_NUMBER:        return "invalid number";
-		case INVALID_TOKEN:         return "invalid token";
-		case STACK_OVERFLOW:        return "stack overflow";
-		case STACK_UNDERFLOW:       return "stack underflow";
-		case UNBALANCED_PARENS:     return "unbalanced parentheses";
-		case DIVIDE_BY_ZERO:        return "divide by zero";
-		case OUT_OF_MEMORY:         return "out of memory";
-		case INVALID_PARAM_COUNT:   return "invalid number of parameters";
-		case TOO_FEW_PARAMS:        return util::string_format(std::locale::classic(), "too few parameters (at least %d required)", m_num);
-		case TOO_MANY_PARAMS:       return util::string_format(std::locale::classic(), "too many parameters (no more than %d accepted)", m_num);
-		case UNBALANCED_QUOTES:     return "unbalanced quotes";
-		case TOO_MANY_STRINGS:      return "too many strings";
-		case INVALID_MEMORY_SIZE:   return "invalid memory size (b/w/d/q expected)";
-		case NO_SUCH_MEMORY_SPACE:  return "non-existent memory space";
-		case INVALID_MEMORY_SPACE:  return "invalid memory space (p/d/i/o/r/m/s expected)";
-		case INVALID_MEMORY_NAME:   return "invalid memory name";
-		case MISSING_MEMORY_NAME:   return "missing memory name";
-		default:                    return "unknown error";
+		case NOT_LVAL:                      return "not an lvalue";
+		case NOT_RVAL:                      return "not an rvalue";
+		case SYNTAX:                        return "syntax error";
+		case UNKNOWN_SYMBOL:                return "unknown symbol";
+		case INVALID_NUMBER:                return "invalid number";
+		case INVALID_TOKEN:                 return "invalid token";
+		case STACK_OVERFLOW:                return "stack overflow";
+		case STACK_UNDERFLOW:               return "stack underflow";
+		case UNBALANCED_PARENS:             return "unbalanced parentheses";
+		case DIVIDE_BY_ZERO:                return "divide by zero";
+		case OUT_OF_MEMORY:                 return "out of memory";
+		case INVALID_PARAM_COUNT:           return "invalid number of parameters";
+		case TOO_FEW_PARAMS:                return util::string_format(std::locale::classic(), "too few parameters (at least %d required)", m_num);
+		case TOO_MANY_PARAMS:               return util::string_format(std::locale::classic(), "too many parameters (no more than %d accepted)", m_num);
+		case UNBALANCED_QUOTES:             return "unbalanced quotes";
+		case TOO_MANY_STRINGS:              return "too many strings";
+		case INVALID_MEMORY_SIZE:           return "invalid memory size (b/w/d/q expected)";
+		case NO_SUCH_MEMORY_SPACE:          return "non-existent memory space";
+		case INVALID_MEMORY_SPACE:          return "invalid memory space (p/d/i/o/r/m/s expected)";
+		case INVALID_MEMORY_NAME:           return "invalid memory name";
+		case MISSING_MEMORY_NAME:           return "missing memory name";
+		case SRCDBG_UNAVAILABLE:            return "source-level debugging information is unavailable; '" OPTION_SRCDBGINFO "' option required";
+		case SRCDBG_FILE_UNAVAILABLE:       return "specified file path does not uniquely identify a source path from the source-level debugging information";
+		case SRCDBG_FILE_LINE_UNAVAILABLE:  return "specified file path was found, but no address is attributed to specified line number";
+		case SRCDBG_VAR_UNAVAILABLE:        return "specified source-level variable is out of scope or its debugging information is disabled";
+		default:                            return "unknown error";
 	}
 }
 
@@ -434,17 +507,30 @@ symbol_entry &symbol_table::add(const char *name, int minparams, int maxparams, 
 
 
 //-------------------------------------------------
+//  add - add a new srcdbg symbol
+//-------------------------------------------------
+
+symbol_entry &symbol_table::add(const char *name, std::function<bool()> is_in_scope_fcn, std::function<u64(symbol_table &)> value_fcn)
+{
+	m_symlist.erase(name);
+	return *m_symlist.emplace(name, std::make_unique<srcdbg_symbol_entry>(*this, name, is_in_scope_fcn, value_fcn)).first->second;
+}
+
+
+//-------------------------------------------------
 //  find_deep - do a deep search for a symbol,
 //  looking in the parent if needed
 //-------------------------------------------------
 
-symbol_entry *symbol_table::find_deep(const char *symbol)
+symbol_entry *symbol_table::find_deep(const char *symbol, bool skip_srcdbg /* = false */)
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
 	{
+		if (skip_srcdbg && (symtable->type() == SRCDBG_LOCALS || symtable->type() == SRCDBG_GLOBALS))
+			continue;
 		symbol_entry *entry = symtable->find(symbol);
-		if (entry != nullptr)
+		if (entry != nullptr && entry->is_in_scope())
 			return entry;
 	}
 	return nullptr;
@@ -1381,6 +1467,10 @@ void parsed_expression::parse_string_into_tokens()
 				parse_quoted_char(token, string);
 				break;
 
+			case '`':
+				parse_source_file_position(token, string);
+				break;
+
 			default:
 				parse_symbol_or_number(token, string);
 				break;
@@ -1400,13 +1490,15 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	// accumulate a lower-case version of the symbol
 	const char *stringstart = string;
 	std::string buffer;
+	std::string original_symbol_name;
 	while (1)
 	{
-		static const char valid[] = "abcdefghijklmnopqrstuvwxyz0123456789_$#.:";
+		static const char valid[] = "abcdefghijklmnopqrstuvwxyz0123456789_$#.:\\";
 		char val = tolower(u8(string[0]));
 		if (val == 0 || strchr(valid, val) == nullptr)
 			break;
 		buffer.append(&val, 1);
+		original_symbol_name.append(string, 1);
 		string++;
 	}
 
@@ -1518,7 +1610,26 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 
 	default:
 		// check for a symbol match
-		symbol_entry *symbol = m_symtable.get().find_deep(buffer.c_str());
+		//
+		// If the symbol starts with the disambiguation prefix, user explicitly
+		// wants a built-in or device symbol, and not a source-level debugging symbol
+		bool skip_srcdbg = false;
+		u32 symbol_start_offset = 0;
+		constexpr char skip_srcdbg_prefix[] = "ns\\";
+		if (buffer.compare(0, sizeof(skip_srcdbg_prefix) - 1, skip_srcdbg_prefix) == 0)
+		{
+			skip_srcdbg = true;
+			symbol_start_offset = sizeof(skip_srcdbg_prefix) - 1;
+		}
+
+		// Symbols loaded via source-debugging info are case-sensitive, so first try
+		// with the original case specified by user
+		symbol_entry *symbol = m_symtable.get().find_deep(original_symbol_name.c_str() + symbol_start_offset, skip_srcdbg);
+		if (symbol == nullptr)
+		{
+			// Not found, try again with lower case
+			symbol = m_symtable.get().find_deep(buffer.c_str() + symbol_start_offset, skip_srcdbg);
+		}
 		if (symbol != nullptr)
 		{
 			token.configure_symbol(*symbol);
@@ -1635,6 +1746,63 @@ void parsed_expression::parse_quoted_string(parse_token &token, const char *&str
 
 	// make the token
 	token.configure_string(m_stringlist.emplace(m_stringlist.end(), buffer.c_str())->c_str());
+}
+
+
+//-------------------------------------------------
+//  parse_source_file_position - parse source
+//  file + line number pair into address
+//-------------------------------------------------
+
+void parsed_expression::parse_source_file_position(parse_token &token, const char *&string)
+{
+	// accumulate a copy of the back-quoted source file path
+	string++;
+	std::string file_path;
+	while (string[0] != 0 && string[0] != '`')
+	{
+		file_path.append(string++, 1);
+	}
+
+	// if we didn't find the ending back-quote, report an error
+	if (string[0] != '`')
+		throw expression_error(expression_error::UNBALANCED_QUOTES, token.offset());
+	string++;
+
+	// The rest of the token should be the base 10 line number
+	std::string linenum_buffer;
+	while (1)
+	{
+		static const char valid[] = "0123456789";
+		char val = u8(string[0]);
+		if (val == 0 || strchr(valid, val) == nullptr)
+			break;
+		linenum_buffer.append(&val, 1);
+		string++;
+	}
+	parse_token linenum_token;
+	parse_number(linenum_token, linenum_buffer.c_str(), 10, expression_error::INVALID_NUMBER);
+
+	// Convert file path and line number to an address
+	if (symbols().machine().debugger().get_srcdbg_info() == nullptr)
+	{
+		throw expression_error(expression_error::SRCDBG_UNAVAILABLE, token.offset());
+	}
+	const srcdbg_info & debug_info = *symbols().machine().debugger().get_srcdbg_info();
+	std::optional<u32> file_index = debug_info.file_path_to_index(file_path.c_str());
+	if (!file_index.has_value())
+	{
+		throw expression_error(expression_error::SRCDBG_FILE_UNAVAILABLE, token.offset());
+	}
+	std::vector<srcdbg_provider_base::address_range> ranges;
+	debug_info.file_line_to_address_ranges(file_index.value(), linenum_token.value(), ranges);
+	if (ranges.size() == 0)
+	{
+		throw expression_error(expression_error::SRCDBG_FILE_LINE_UNAVAILABLE, token.offset());
+	}
+
+	// make the token
+	token.configure_number(ranges[0].first);
 }
 
 
