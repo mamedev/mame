@@ -602,6 +602,8 @@
   - Color decode routines.
   - Remaining sound devices.
   - Hopper as device... ;)
+  - starline and clone: verify colour DAC weights, clock dividers, EPLD logic, remaining outputs
+    and DIP switch functions against the hardware.
 
 
 ***********************************************************************************/
@@ -612,6 +614,8 @@
 #include "cpu/z80/z80.h"
 #include "machine/ds1994.h"
 #include "machine/i8255.h"
+#include "machine/nvram.h"
+#include "machine/ticket.h"
 //#include "sound/dac.h"
 #include "sound/ymopl.h"
 #include "video/mc6845.h"
@@ -619,6 +623,10 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "multibyte.h"
+
+#include <array>
 
 #include "suprstar.lh"
 
@@ -651,28 +659,33 @@ public:
 	{
 	}
 
-	void amaticmg2(machine_config &config);
-	void amaticmg(machine_config &config);
-	void amaticmg4(machine_config &config);
+	void amaticmg2(machine_config &config) ATTR_COLD;
+	void amaticmg(machine_config &config) ATTR_COLD;
+	void amaticmg4(machine_config &config) ATTR_COLD;
 
-	void init_ama8000_3_o();
-	void init_ama8000_2_i();
-	void init_ama8000_2_v();
-	void init_ama8000_1_x();
-	void init_am_mg5hu();
+	void init_ama8000_3_o() ATTR_COLD;
+	void init_ama8000_2_i() ATTR_COLD;
+	void init_ama8000_2_v() ATTR_COLD;
+	void init_ama8000_1_x() ATTR_COLD;
+	void init_am_mg5hu() ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-
-private:
 	required_shared_ptr<uint8_t> m_attr;
 	required_shared_ptr<uint8_t> m_vram;
 	required_memory_bank m_rombank;
-
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+	void amaticmg_map(address_map &map) ATTR_COLD;
+	void amaticmg2_portmap(address_map &map) ATTR_COLD;
+	void decrypt(int key1, int key2) ATTR_COLD;
+	void out_c_w(uint8_t data);
+
+private:
 	optional_device<ds1994_device> m_tch;
 	output_finder<7> m_lamps;
 
@@ -686,19 +699,46 @@ private:
 	void unk80_w(uint8_t data);
 
 	void out_a_w(uint8_t data);
-	void out_c_w(uint8_t data);
-	void amaticmg_palette(palette_device &palette) const;
-	void amaticmg2_palette(palette_device &palette) const;
+	void amaticmg_palette(palette_device &palette) const ATTR_COLD;
+	void amaticmg2_palette(palette_device &palette) const ATTR_COLD;
 	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void amaticmg2_irq(int state);
-	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
-	void decrypt(int key1, int key2);
+	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress) ATTR_COLD;
 
-	void amaticmg2_portmap(address_map &map) ATTR_COLD;
 	void amaticmg4_portmap(address_map &map) ATTR_COLD;
-	void amaticmg_map(address_map &map) ATTR_COLD;
 	void amaticmg_portmap(address_map &map) ATTR_COLD;
+};
+
+class starline_state : public amaticmg_state
+{
+public:
+	starline_state(const machine_config &mconfig, device_type type, const char *tag) :
+		amaticmg_state(mconfig, type, tag),
+		m_hopper(*this, "hopper"),
+		m_color_prom(*this, "proms")
+	{
+	}
+
+	void starline(machine_config &config) ATTR_COLD;
+	void init_starline() ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
+private:
+	required_device<hopper_device> m_hopper;
+	required_region_ptr<uint8_t> m_color_prom;
+
+	std::array<uint8_t, 2> m_challenge {};
+
+	void program_map(address_map &map) ATTR_COLD;
+	void io_map(address_map &map) ATTR_COLD;
+	void palette(palette_device &palette) const ATTR_COLD;
+	uint8_t response_r();
+	void out_c_w(uint8_t data);
+	MC6845_UPDATE_ROW(update_row);
 };
 
 
@@ -751,6 +791,31 @@ uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_r
 	return 0;
 }
 
+MC6845_UPDATE_ROW(starline_state::update_row)
+{
+	if (!de || y < cliprect.top() || y > cliprect.bottom())
+		return;
+
+	gfx_element *const gfx = m_gfxdecode->gfx(0);
+	pen_t const *const pens = m_palette->pens();
+	uint32_t *const dest = &bitmap.pix(y);
+	for (int column = 0; column < x_count; column++)
+	{
+		// Screen layouts imply a one-character offset.
+		uint16_t const address = (ma + column + 1) & 0xfff;
+		uint16_t const tile = m_vram[address] | (m_attr[address] << 8);
+		// The upper three tile address lines also select one of eight colour banks.
+		uint16_t const color = (tile >> 13) * 64;
+		uint8_t const *const src = gfx->get_data(tile) + (ra & 7) * gfx->rowbytes();
+		for (int pixel = 0; pixel < 4; pixel++)
+		{
+			int const x = column * 4 + pixel;
+			if (x >= cliprect.left() && x <= cliprect.right())
+				dest[x] = pens[color + src[pixel]];
+		}
+	}
+}
+
 void amaticmg_state::amaticmg_palette(palette_device &palette) const
 {
 	uint8_t const *const color_prom = memregion("proms")->base();
@@ -791,6 +856,16 @@ void amaticmg_state::amaticmg2_palette(palette_device &palette) const
 
 		palette.set_pen_color(i >> 1, pal5bit(r), pal5bit(g), pal5bit(b));
 		color_prom += 2;
+	}
+}
+
+void starline_state::palette(palette_device &palette) const
+{
+	for (uint32_t i = 0; i < 0x200; i++)
+	{
+		uint16_t const data = get_u16le(&m_color_prom[i * 2]);
+		// Starline's green and blue outputs are exchanged relative to amaticmg2.
+		palette.set_pen_color(i, pal5bit(data >> 1), pal5bit(data >> 11), pal5bit(data >> 6));
 	}
 }
 
@@ -865,6 +940,12 @@ void amaticmg_state::out_c_w(uint8_t data)
 	LOGPPIOUT("port C: %2X\n", data);
 }
 
+void starline_state::out_c_w(uint8_t data)
+{
+	amaticmg_state::out_c_w(data);
+	m_hopper->motor_w(BIT(data, 7));
+}
+
 void amaticmg_state::unk80_w(uint8_t data)
 {
 //  m_dac->write(BIT(data, 0));       // Sound DAC
@@ -913,6 +994,31 @@ void amaticmg_state::amaticmg2_portmap(address_map &map)
 	map(0xe4, 0xe4).r(FUNC(amaticmg_state::epm_code_r));                                          // Input(0x00E4)  must give back 0x65  in case of  EPM Code 8201
 	map(0xe6, 0xe6).w(FUNC(amaticmg_state::nmi_mask_w));
 	map(0xe8, 0xeb).rw("ppi8255_2", FUNC(i8255_device::read), FUNC(i8255_device::write));
+}
+
+// The two-input logic response is inferred from Starline's EPLD self-test.
+// The programmable logic itself has not been dumped.
+uint8_t starline_state::response_r()
+{
+	uint8_t const a = m_challenge[0];
+	uint8_t const b = bitswap<8>(m_challenge[1], 0, 1, 2, 3, 4, 5, 6, 7);
+	return ((a & b) & 0x55) | ((a | b) & 0xaa);
+}
+
+void starline_state::io_map(address_map &map)
+{
+	amaticmg2_portmap(map);
+	map(0x80, 0x80).lw8(NAME([this] (uint8_t data) { m_challenge[0] = data; }));
+	// TODO: identify the hardware driving this port; the startup test expects 0x5f.
+	map(0x82, 0x82).lr8(NAME([] () -> uint8_t { return 0x5f; })); // HACK: undumped EPLD identification response
+	map(0xa0, 0xa0).lw8(NAME([this] (uint8_t data) { m_challenge[1] = data; }));
+	map(0xa1, 0xa1).r(FUNC(starline_state::response_r));
+}
+
+void starline_state::program_map(address_map &map)
+{
+	amaticmg_map(map);
+	map(0x8000, 0x9fff).ram().share("nvram");
 }
 
 void amaticmg_state::amaticmg4_portmap(address_map &map)
@@ -1002,6 +1108,39 @@ static INPUT_PORTS_START( amaticmg )
 	PORT_DIPSETTING(    0x00, "BH Normal")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( starline )
+	PORT_INCLUDE(amaticmg)
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Service B") PORT_TOGGLE
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Service A") PORT_TOGGLE
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Auto Start")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Service C") PORT_TOGGLE
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+
+	PORT_MODIFY("SW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DIP:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DIP:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DIP:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DIP:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DIP:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DIP:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DIP:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DIP:8" )
+INPUT_PORTS_END
+
 
 /************************************
 *         Graphics Layouts          *
@@ -1042,6 +1181,10 @@ static GFXDECODE_START( gfx_amaticmg2 )
 	GFXDECODE_ENTRY( "chars", 0x0000, charlayout_6bpp, 0, 0x10000/0x40 )
 GFXDECODE_END
 
+static GFXDECODE_START( gfx_starline )
+	GFXDECODE_ENTRY( "chars", 0x0000, charlayout_6bpp, 0, 8 )
+GFXDECODE_END
+
 
 /************************************
 *       Machine Start & Reset       *
@@ -1060,6 +1203,19 @@ void amaticmg_state::machine_reset()
 {
 	m_rombank->set_entry(0);
 	m_nmi_mask = 0;
+}
+
+
+void starline_state::machine_start()
+{
+	amaticmg_state::machine_start();
+	save_item(NAME(m_challenge));
+}
+
+void starline_state::machine_reset()
+{
+	amaticmg_state::machine_reset();
+	m_challenge.fill(0);
 }
 
 
@@ -1140,6 +1296,30 @@ void amaticmg_state::amaticmg2(machine_config &config)
 	m_palette->set_entries(0x10000);
 
 	DS1994(config, "touch_m");
+}
+
+void starline_state::starline(machine_config &config)
+{
+	amaticmg2(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &starline_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &starline_state::io_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	HOPPER(config, m_hopper, attotime::from_msec(100)); // dispensing period unmeasured
+
+	// No external attendant touch key is inserted (active-low presence input).
+	subdevice<i8255_device>("ppi8255_2")->in_pc_callback().set_constant(0xff);
+	subdevice<i8255_device>("ppi8255_1")->out_pc_callback().set(FUNC(starline_state::out_c_w));
+
+	m_gfxdecode->set_info(gfx_starline);
+
+	m_palette->set_init(FUNC(starline_state::palette));
+	m_palette->set_entries(0x200);
+
+	subdevice<screen_device>("screen")->set_screen_update("crtc", FUNC(mc6845_device::screen_update));
+
+	subdevice<mc6845_device>("crtc")->set_update_row_callback(FUNC(starline_state::update_row));
 }
 
 void amaticmg_state::amaticmg4(machine_config &config)
@@ -1510,6 +1690,64 @@ ROM_START( am_mg5hu )
 ROM_END
 
 
+//******** Starline ********
+
+/*
+  Compu-Game Starline, AMA-8000-2 hardware with Amatic Type 80/B CPU modules.
+  Boards, photographs and ROM dumps provided by Peter Wilhelmsen.
+  Board 1 uses three TMS27C040 graphics EPROMs and two N82S147N colour PROMs.
+  Board 2 uses more surface-mounted logic and a single AT27C1024 colour EPROM.
+
+  Internal versions at decrypted offset 0x1803f: "VDK  0.9" and "VDK  1.4".
+  DS1994 IDs read from the boards, in 1-Wire transmission order:
+    Board 1 (VDK 0.9): 04 50 47 11 00 00 00 d5
+    Board 2 (VDK 1.4): 04 c1 4b 15 00 00 00 7c
+*/
+
+ROM_START( starlinea ) // Board 1: internal version VDK 0.9
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
+	ROM_LOAD( "starline_1.0.9_dk_cb_209.bin", 0x00000, 0x40000, CRC(ef327f49) SHA1(fedac48eb7717d149e977630ae39ee912af86fbe) )
+
+	ROM_REGION( 0x180000, "chars", 0 )
+	ROM_LOAD( "starline_zg1.bin", 0x100000, 0x80000, CRC(dd4c9352) SHA1(3c0c8dd7a5e58e036e6ce74935b7d98b5544b4c8) )
+	ROM_LOAD( "starline_zg2.bin", 0x080000, 0x80000, CRC(3e218717) SHA1(e4a6af3baa9c279ddf218d220df5be69af41db58) )
+	ROM_LOAD( "starline_zg3.bin", 0x000000, 0x80000, CRC(09d9c293) SHA1(f3504d3db48dfcc472081fef9ac93cd59538cf71) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD16_BYTE( "starline_n82s147_2.bin", 0x0000, 0x0200, CRC(08e304e3) SHA1(e6f7cda9a626bb4b123889446dac9807983fa8c1) ) // right, low byte
+	ROM_LOAD16_BYTE( "starline_n82s147_1.bin", 0x0001, 0x0200, CRC(880f7ca0) SHA1(17f44f8f2fc963d991ddb5d03647b3ecafcdc5cb) ) // left, high byte
+
+	ROM_REGION( 0x0248, "touch_m", 0 )
+	ROM_LOAD( "starline_1.0.9_ibutton.bin", 0x0000, 0x0248, CRC(63358f5b) SHA1(140de864a2150f0d81b0508dad67e296a795c327) ) // re-initialized from test mode
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "starline_1.0.9_nvram.bin", 0x0000, 0x2000, CRC(c6846e5f) SHA1(813d16b226e8b190802e693c0756d3d3e89b71eb) ) // re-initialized from test mode
+ROM_END
+
+ROM_START( starline ) // Board 2: internal version VDK 1.4
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x40000, "mainprg", 0 ) // encrypted program ROM
+	ROM_LOAD( "starline_u14b.101.801.bin", 0x00000, 0x40000, CRC(926a2b31) SHA1(32c9a5003f9f0bb430b9e502a1365ae5edaaf2f9) )
+
+	ROM_REGION( 0x180000, "chars", 0 )
+	ROM_LOAD( "starline_zg1.bin", 0x100000, 0x80000, CRC(dd4c9352) SHA1(3c0c8dd7a5e58e036e6ce74935b7d98b5544b4c8) )
+	ROM_LOAD( "starline_zg2.bin", 0x080000, 0x80000, CRC(3e218717) SHA1(e4a6af3baa9c279ddf218d220df5be69af41db58) )
+	ROM_LOAD( "starline_zg3.bin", 0x000000, 0x80000, CRC(09d9c293) SHA1(f3504d3db48dfcc472081fef9ac93cd59538cf71) )
+
+	ROM_REGION( 0x20000, "proms", 0 )
+	ROM_LOAD( "starline_at27c1024.bin", 0x00000, 0x20000, CRC(01208844) SHA1(e400721b57784c062f46d82bb0a0f77ad48712f5) )
+
+	ROM_REGION( 0x0248, "touch_m", 0 )
+	ROM_LOAD( "starline_1.4_ibutton.bin", 0x0000, 0x0248, CRC(12e3dae4) SHA1(7fc41dd1ff49c9334302dcd07639da8aa7314a48) ) // re-initialized from test mode
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "starline_1.4_nvram.bin", 0x0000, 0x2000, CRC(c5940670) SHA1(734576a5811fcfe44e0a75c633f99fc6477c4b5d) ) // re-initialized from test mode
+ROM_END
+
+
 /************************************
 *       Driver Initialization       *
 ************************************/
@@ -1569,6 +1807,12 @@ void amaticmg_state::init_am_mg5hu()
 	decrypt(0x540, 0xa6);
 }
 
+void starline_state::init_starline()
+{
+	// Both VDK 0.9 and VDK 1.4 use this key pair; effective address XOR is 0x706.
+	decrypt(0x71a, 0xdd);
+}
+
 } // anonymous namespace
 
 
@@ -1591,3 +1835,5 @@ GAME(  2000, am_mg31i, am_mg35i, amaticmg2, amaticmg, amaticmg_state, init_ama80
 GAME(  2000, am_mg4v,  0,        amaticmg4, amaticmg, amaticmg_state, init_ama8000_2_v, ROT0,  "Amatic Trading GmbH", "Multi Game IV (V.Ger 3.44)",   MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2003, am_mg4sk, 0,        amaticmg2, amaticmg, amaticmg_state, init_ama8000_3_o, ROT0,  "Amatic Trading GmbH", "Multi Game IV (AMGSK_VA3.85)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME(  2001, am_mg5hu, 0,        amaticmg4, amaticmg, amaticmg_state, init_am_mg5hu,    ROT0,  "Amatic Trading GmbH", "Multi Game V (AMGHU_VB3.65)",  MACHINE_IMPERFECT_GRAPHICS | MACHINE_WRONG_COLORS | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME(  199?, starline,  0,        starline, starline, starline_state, init_starline,    ROT0,  "Compu-Game",          "Starline (VDK 1.4)",           0 )
+GAME(  199?, starlinea, starline, starline, starline, starline_state, init_starline,    ROT0,  "Compu-Game",          "Starline (VDK 0.9)",           0 )
