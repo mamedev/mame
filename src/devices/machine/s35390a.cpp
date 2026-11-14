@@ -1,8 +1,24 @@
 // license:BSD-3-Clause
-// copyright-holders:Peter Wilhelmsen
-// Seiko Instruments S-35390A RTC, byte-level I2C interface at 0x30-0x37.
-// Time, status and free-register subset.
-// TODO: Alarm outputs, frequency output and oscillator correction.
+// copyright-holders:Peter Wilhelmsen, MagikalUnicorn
+/***************************************************************************
+
+    Seiko Instruments S-35390A real-time clock (now supplied by ABLIC).
+    Serial clock/calendar and control-register interface, using a command
+    byte immediately after the start condition with no following
+    register-address byte. Byte-level I2C addresses are 0x30-0x37.
+
+    Implements the time, status and free-register subset. Clock, calendar
+    and alarm fields use a least-significant-value-first bit layout while
+    bytes are transferred most significant bit first.
+
+    Command Byte:
+        0 1 1 0 C2 C1 C0 R/W
+
+    TODO:
+    - Implement INT1/INT2 output modes, alarm matching and frequency output.
+    - Implement oscillator correction.
+
+***************************************************************************/
 
 #include "emu.h"
 #include "s35390a.h"
@@ -32,6 +48,9 @@ void s35390a_device::device_start()
 	m_selected = m_read = false;
 	m_timer = timer_alloc(FUNC(s35390a_device::tick), this);
 	m_timer->adjust(attotime::from_ticks(32'768, clock()), 0, attotime::from_ticks(32'768, clock()));
+	m_state = STATE_IDLE;
+	m_shift = m_bits = 0;
+	m_scl = m_sda_in = m_sda_out = 1;
 	save_item(NAME(m_regs));
 	save_item(NAME(m_time));
 	save_item(NAME(m_transfer));
@@ -41,6 +60,12 @@ void s35390a_device::device_start()
 	save_item(NAME(m_length));
 	save_item(NAME(m_selected));
 	save_item(NAME(m_read));
+	save_item(NAME(m_state));
+	save_item(NAME(m_shift));
+	save_item(NAME(m_bits));
+	save_item(NAME(m_scl));
+	save_item(NAME(m_sda_in));
+	save_item(NAME(m_sda_out));
 }
 
 void s35390a_device::acknowledge(int state)
@@ -185,4 +210,91 @@ u8 s35390a_device::receive()
 			m_regs[0][0] &= ~0x0d; // POC and alarm flags clear on read.
 	}
 	return result;
+}
+
+void s35390a_device::prepare_read()
+{
+	// Consume the byte only after all eight bits have been clocked out.
+	auto const dis = machine().disable_side_effects();
+	m_shift = receive();
+	m_bits = 0;
+	m_state = STATE_READ;
+	m_sda_out = BIT(m_shift, 7);
+}
+
+void s35390a_device::scl_w(int state)
+{
+	state = bool(state);
+	if (m_scl == state)
+		return;
+	m_scl = state;
+	switch (m_state)
+	{
+	case STATE_ADDRESS:
+	case STATE_WRITE:
+		if (m_scl)
+		{
+			if (m_bits < 8)
+				m_shift = (m_shift << 1) | m_sda_in;
+			++m_bits;
+		}
+		else if (m_bits == 8)
+		{
+			m_sda_out = transmit(m_shift | (m_state == STATE_ADDRESS ? 0x100 : 0));
+		}
+		else if (m_bits == 9)
+		{
+			m_shift = m_bits = 0;
+			m_sda_out = 1;
+			if (!m_selected)
+				m_state = STATE_IDLE;
+			else if (m_read)
+				prepare_read();
+			else
+				m_state = STATE_WRITE;
+		}
+		break;
+	case STATE_READ:
+		if (m_scl)
+		{
+			if (++m_bits == 8)
+				receive();
+		}
+		else if (m_bits == 8)
+		{
+			m_sda_out = 1;
+			m_state = STATE_READ_ACK;
+		}
+		else
+		{
+			m_shift <<= 1;
+			m_sda_out = BIT(m_shift, 7);
+		}
+		break;
+	case STATE_READ_ACK:
+		if (m_scl)
+			acknowledge(!m_sda_in);
+		else if (m_selected)
+			prepare_read();
+		else
+			m_state = STATE_IDLE;
+		break;
+	case STATE_IDLE:
+		break;
+	}
+}
+
+void s35390a_device::sda_w(int state)
+{
+	state = bool(state);
+	if (m_sda_in == state)
+		return;
+	m_sda_in = state;
+	if (m_scl && m_sda_out)
+	{
+		stop(1);
+		m_state = state ? STATE_IDLE : STATE_ADDRESS;
+		m_shift = m_bits = 0;
+		m_sda_out = 1;
+	}
 }
