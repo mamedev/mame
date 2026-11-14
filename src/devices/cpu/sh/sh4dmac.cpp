@@ -8,6 +8,8 @@
 #include "sh3comn.h"
 #include "sh4dmac.h"
 
+#include <algorithm>
+
 static const int dmasize[8] = { 8, 1, 2, 4, 32, 0, 0, 0 };
 
 static const int sh3_dmasize[4] = { 1, 2, 4, 16 };
@@ -468,15 +470,23 @@ uint32_t sh34_base_device::sh4_dma_external_read(int channel, uint64_t *buffer, 
 		return 0;
 	}
 
+	uint32_t src = *sar & SH34_AM;
+	if (src & (size - 1))
+	{
+		// a source address off the transfer size boundary is an address error: the DMAC halts on all channels
+		logerror("SH4: DMA %d: address error, source %08x not aligned to %d bytes\n", channel, src, size);
+		m_dmaor |= DMAOR_AE;
+		sh4_exception_request(SH4_INTC_DMAE);
+		return 0;
+	}
+
 	uint32_t remaining = *dmatcr ? *dmatcr : 0x1000000;
 	count = std::min(count, remaining);
 
-	uint32_t src = *sar & SH34_AM;
+	// SAR holds the next source address: read from it, then step
 	for (uint32_t pos = 0; pos < count; pos++)
 	{
-		if (incs == 2)
-			src -= size;
-		const uint32_t address = src & SH34_AM & ~(size - 1);
+		const uint32_t address = src & SH34_AM;
 		switch (size)
 		{
 		case 1:
@@ -498,6 +508,8 @@ uint32_t sh34_base_device::sh4_dma_external_read(int channel, uint64_t *buffer, 
 		}
 		if (incs == 1)
 			src += size;
+		else if (incs == 2)
+			src -= size;
 	}
 	*sar = (*sar & ~SH34_AM) | (src & SH34_AM);
 
