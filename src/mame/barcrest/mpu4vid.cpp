@@ -261,23 +261,10 @@ public:
 	void mating(machine_config &config) ATTR_COLD;
 	void vid_oki(machine_config &config) ATTR_COLD;
 
-	void init_v4barqst2() ATTR_COLD;
-	void init_quidgrid() ATTR_COLD;
-	void init_v4barqst() ATTR_COLD;
-	void init_timemchn() ATTR_COLD;
-	void init_v4opt3() ATTR_COLD;
-	void init_eyesdown() ATTR_COLD;
-
 	void init_crmaze() ATTR_COLD;
 	void init_crmaze_flutter() ATTR_COLD;
-
-
 	void init_prizeinv() ATTR_COLD;
 	void init_strikeit() ATTR_COLD;
-	void init_v4wize() ATTR_COLD;
-	void init_turnover() ATTR_COLD;
-	void init_mating()  ATTR_COLD;
-	void init_skiltrek()  ATTR_COLD;
 	void init_cybcas() ATTR_COLD;
 	void init_bwbhack() ATTR_COLD;
 
@@ -2169,9 +2156,9 @@ uint8_t mpu4vid_state::strike_chr_next(uint8_t state, uint8_t col)
 
 	const bool NZ  = (col & 0x3f) != 0;      // any non-reset write
 	const bool g0  = !C3 && !C4;             // column group (C4,C3) = 00
-	const bool g1  =  C3 && !C4;             //                        01
-	const bool g2  = !C3 &&  C4;             //                        10
-	const bool g3  =  C3 &&  C4;             //                        11
+	const bool g1  = C3 && !C4;              //                        01
+	const bool g2  = !C3 && C4;              //                        10
+	const bool g3  = C3 && C4;               //                        11
 	const bool ACT = C0 || C1 || C2 || C5;   // non-reset write bits inside group g0
 
 	// The dumped PAL accepts issue 1, but the supplied questions are issue 3.
@@ -2199,9 +2186,9 @@ void mpu4vid_state::mpu4_vid_strike(machine_config& config)
 
 uint8_t mpu4vid_state::turnover_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1=(state>>1)&1, R2=(state>>2)&1, R3=(state>>3)&1, R4=(state>>4)&1, R5=(state>>5)&1;
-	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
-	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
+	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1, R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
+	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1, C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool NZ = (col & 0x3f) != 0, g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4, ACT = C0 || C1 || C2 || C5;
 
 	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
 	const bool O1 = (R1 == R2) && NZ;  // latch (R1==R2)
@@ -2210,7 +2197,7 @@ uint8_t mpu4vid_state::turnover_chr_next(uint8_t state, uint8_t col)
 	const bool O4 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1);  // mix-C
 	const bool O5 = (C1 && g0) || (R1 && g2 && !C5) || (R2 && C0 && g3) || (!R3 && !C1 && g1);  // mix-A
 
-	return uint8_t((O0<<0)|(O1<<1)|(O2<<2)|(O3<<3)|(O4<<4)|(O5<<5));
+	return uint8_t((O0 << 0) | (O1 << 1) | (O2 << 2) | (O3 << 3) | (O4 << 4) | (O5 << 5));
 }
 
 void mpu4vid_state::mpu4_vid_turnov(machine_config& config)
@@ -2223,9 +2210,9 @@ void mpu4vid_state::mpu4_vid_turnov(machine_config& config)
 
 uint8_t mpu4vid_state::timemchn_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1=(state>>1)&1, R2=(state>>2)&1, R3=(state>>3)&1, R4=(state>>4)&1, R5=(state>>5)&1;
-	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
-	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
+	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1, R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
+	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1, C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool NZ = (col & 0x3f) != 0, g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4, ACT = C0 || C1 || C2 || C5;
 
 	// Inferred issue-select output: accept the supplied question issues 1-3.
 	// The boot test masks off this bit, and there is no PAL dump to establish it.
@@ -2238,7 +2225,7 @@ uint8_t mpu4vid_state::timemchn_chr_next(uint8_t state, uint8_t col)
 	const bool O4 = (C1 && g0) || (R1 && g2 && !C5) || (R2 && C0 && g3) || (!R3 && !C1 && g1);  // mix-A
 	const bool O5 = R1 && NZ;  // latch R1
 
-	return uint8_t((O0<<0)|(O1<<1)|(O2<<2)|(O3<<3)|(O4<<4)|(O5<<5));
+	return uint8_t((O0 << 0) | (O1 << 1) | (O2 << 2) | (O3 << 3) | (O4 << 4) | (O5 << 5));
 }
 
 void mpu4vid_state::mpu4_vid_tmach(machine_config& config)
@@ -2251,10 +2238,10 @@ void mpu4vid_state::mpu4_vid_tmach(machine_config& config)
 
 uint8_t mpu4vid_state::barquest_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1=(state>>1)&1, R2=(state>>2)&1, R3=(state>>3)&1, R4=(state>>4)&1, R5=(state>>5)&1;
+	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1, R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
 	// R0 (bit 0 of the previous state) is not used by the PAL.
-	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
-	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
+	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1, C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool NZ = (col & 0x3f) != 0, g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4, ACT = C0 || C1 || C2 || C5;
 
 	// Response bit 2 checks the question issue, independently of the text decoder.
 	// The boot PAL test masks it off, so its stored responses cannot determine O0.
@@ -2266,7 +2253,7 @@ uint8_t mpu4vid_state::barquest_chr_next(uint8_t state, uint8_t col)
 	const bool O4 = R1 && NZ;  // latch R1
 	const bool O5 = (C1 && g0) || (R1 && g2 && !C5) || (R2 && C0 && g3) || (!R3 && !C1 && g1);  // mix-A
 
-	return uint8_t((O0<<0)|(O1<<1)|(O2<<2)|(O3<<3)|(O4<<4)|(O5<<5));
+	return uint8_t((O0 << 0) | (O1 << 1) | (O2 << 2) | (O3 << 3) | (O4 << 4) | (O5 << 5));
 }
 
 void mpu4vid_state::mpu4_vid_barquest(machine_config& config)
@@ -2279,9 +2266,9 @@ void mpu4vid_state::mpu4_vid_barquest(machine_config& config)
 
 uint8_t mpu4vid_state::skiltrek_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1=(state>>1)&1, R2=(state>>2)&1, R3=(state>>3)&1, R4=(state>>4)&1, R5=(state>>5)&1;
-	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
-	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
+	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1, R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
+	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1, C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool NZ = (col & 0x3f) != 0, g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4, ACT = C0 || C1 || C2 || C5;
 
 	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
 	const bool O1 = (R1 == R2) && NZ;  // latch (R1==R2)
@@ -2290,7 +2277,7 @@ uint8_t mpu4vid_state::skiltrek_chr_next(uint8_t state, uint8_t col)
 	const bool O4 = R1 && NZ;  // latch R1
 	const bool O5 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1);  // mix-C
 
-	return uint8_t((O0<<0)|(O1<<1)|(O2<<2)|(O3<<3)|(O4<<4)|(O5<<5));
+	return uint8_t((O0 << 0) | (O1 << 1) | (O2 << 2) | (O3 << 3) | (O4 << 4) | (O5 << 5));
 }
 
 void mpu4vid_state::mpu4_vid_skilltrk(machine_config& config)
@@ -2303,10 +2290,10 @@ void mpu4vid_state::mpu4_vid_skilltrk(machine_config& config)
 
 uint8_t mpu4vid_state::addlad_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1=(state>>1)&1, R2=(state>>2)&1, R3=(state>>3)&1, R4=(state>>4)&1, R5=(state>>5)&1;
+	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1, R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
 	// R0 (bit 0 of the previous state) is not used by the PAL.
-	const bool C0=(col>>0)&1, C1=(col>>1)&1, C2=(col>>2)&1, C3=(col>>3)&1, C4=(col>>4)&1, C5=(col>>5)&1;
-	const bool NZ=(col&0x3f)!=0, g0=!C3&&!C4, g1=C3&&!C4, g2=!C3&&C4, g3=C3&&C4, ACT=C0||C1||C2||C5;
+	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1, C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool NZ = (col & 0x3f) != 0, g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4, ACT = C0 || C1 || C2 || C5;
 
 	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
 	const bool O1 = (!R1 && g0 && ACT) || (R3 && C1 && g1) || (!R2 && !R5 && g3);  // mix-B
@@ -2315,7 +2302,7 @@ uint8_t mpu4vid_state::addlad_chr_next(uint8_t state, uint8_t col)
 	const bool O4 = (R1 && g0 && ACT) || (R2 && !R3 && g2) || (C0 && !C1 && g3) || (!R4 && R5 && g1);  // mix-C
 	const bool O5 = (R1 == R2) && NZ;  // latch (R1==R2)
 
-	return uint8_t((O0<<0)|(O1<<1)|(O2<<2)|(O3<<3)|(O4<<4)|(O5<<5));
+	return uint8_t((O0 << 0) | (O1 << 1) | (O2 << 2) | (O3 << 3) | (O4 << 4) | (O5 << 5));
 }
 
 void mpu4vid_state::mpu4_vid_addlad(machine_config& config)
@@ -2442,15 +2429,6 @@ uint8_t mpu4vid_state::vidcharacteriser_r(offs_t offset)
 }
 
 
-
-/*
-void mpu4vid_state::init_adders()
-{
-    m_reels = 0;//currently no hybrid games
-    m_current_chr_table = adders_data;
-}
-*/
-
 void mpu4vid_state::init_crmaze()
 {
 	m_reels = 0;//currently no hybrid games
@@ -2462,47 +2440,11 @@ void mpu4vid_state::init_crmaze_flutter()
 	m_reel_mux = FLUTTERBOX;
 }
 
-void mpu4vid_state::init_mating()
-{
-	m_reels = 0;//currently no hybrid games
-}
-
-void mpu4vid_state::init_skiltrek()
-{
-	m_reels = 0;//currently no hybrid games
-	// TODOxx: m_current_chr_table = skiltrek_data;
-}
-
-void mpu4vid_state::init_timemchn()
-{
-	m_reels = 0;//currently no hybrid games
-	// TODOxx: m_current_chr_table = timemchn_data;
-}
-
 void mpu4vid_state::init_strikeit()
 {
 	m_led_extender = SIMPLE_CARD;
 	m_reels = 0;//currently no hybrid games
 }
-
-void mpu4vid_state::init_turnover()
-{
-	m_reels = 0;//currently no hybrid games
-	// TODOxx: m_current_chr_table = turnover_data;
-}
-
-void mpu4vid_state::init_eyesdown()
-{
-	m_reels = 0;//currently no hybrid games
-	// TODOxx: m_current_chr_table = eyesdown_data;
-}
-
-void mpu4vid_state::init_quidgrid()
-{
-	m_reels = 0;//currently no hybrid games
-	// TODOxx: m_current_chr_table = quidgrid_data;
-}
-
 
 void mpu4vid_state::hack_bwb_startup_protection()
 {
@@ -2639,26 +2581,6 @@ void mpu4vid_state::init_cybcas()
 	for (int i = 0x1e42; i < 0x1e74; i += 2)
 		rom[i / 2] = 0x4e71;
 }
-
-
-
-
-void mpu4vid_state::init_v4barqst()
-{
-}
-
-void mpu4vid_state::init_v4barqst2()
-{
-}
-
-void mpu4vid_state::init_v4wize()
-{
-}
-
-void mpu4vid_state::init_v4opt3()
-{
-}
-
 
 #define VID_BIOS \
 	ROM_LOAD("vid.p1",  0x00000, 0x10000,  CRC(e996bc18) SHA1(49798165640627eb31024319353da04380787b10))
@@ -8838,8 +8760,8 @@ GAMEL( 1994, v4cmaze3c,  v4cmaze3, crmaze,    crmaze,   mpu4vid_state, init_crma
 GAMEL( 1994, v4cmaze3_amld,  v4cmaze3, crmaze,     crmaze,   mpu4vid_state, init_crmaze_flutter,  ROT0, "Barcrest","The Crystal Maze Team Challenge (v1.2, AMLD) (MPU4 Video)",GAME_FLAGS_OK,layout_crmaze4p )//SWP 0.7
 
 //Year is a guess, based on the use of the 'Coin Man' logo
-GAME(  1996?,v4mate,     v4bios,   mating,     mating,   mpu4vid_state, init_mating,    ROT0, "Barcrest","The Mating Game (v0.4) (MPU4 Video)",GAME_FLAGS_OK )//SWP 0.2
-GAME(  1996?,v4mated,    v4mate,   mating,     mating,   mpu4vid_state, init_mating,    ROT0, "Barcrest","The Mating Game (v0.4, Datapak) (MPU4 Video)",GAME_FLAGS_OK )//SWP 0.2D
+GAME(  1996?,v4mate,     v4bios,   mating,     mating,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Mating Game (v0.4) (MPU4 Video)",GAME_FLAGS_OK )//SWP 0.2
+GAME(  1996?,v4mated,    v4mate,   mating,     mating,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","The Mating Game (v0.4, Datapak) (MPU4 Video)",GAME_FLAGS_OK )//SWP 0.2D
 
 /* Quiz games - Questions decoded */
 
@@ -8861,57 +8783,57 @@ GAMEL(  199?, v4barqst,   v4bios,   mpu4_vid_barquest,   barquest,  mpu4vid_stat
 GAMEL(  199?, v4barqstd,  v4barqst, mpu4_vid_barquest,   barquest,  mpu4vid_state, init_strikeit,  ROT0, "Barcrest","Barquest (v2.6d) (MPU4 Video)",GAME_FLAGS_OK,layout_v4barqst )
 
 // 00 1c 6c a4 0c 24 0c 34 94 94 44 5c 6c 24 1c ac 64 1c ec 64 0c a4 0c 24 1c ac e4 1c 2c a4 0c a4 0c 24 5c ec e4 1c ac 24 1c 6c 60 0c 34 04 0c 24 9c ec a4 4c 24 9c ec 24 0c 34 04 1c ec 24 9c 00
-GAME(  199?, v4turnov,   v4bios,    mpu4_vid_turnov,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4turnova,  v4turnov,  mpu4_vid_turnov,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 is likely be a machine type, because much like Strike It Lucky and Wize Move the pairing 68k ROM doesn't change
-GAME(  199?, v4turnovc,  v4turnov,  mpu4_vid_turnov,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v2.3O) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4turnovd,  v4turnov,  mpu4_vid_turnov,   turnover, mpu4vid_state, init_turnover,  ROT0, "Barcrest","Turnover (v?.?) (MPU4 Video)",GAME_FLAGS ) // only have a single program ROM
+GAME(  199?, v4turnov,   v4bios,    mpu4_vid_turnov,   turnover, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Turnover (v2.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnova,  v4turnov,  mpu4_vid_turnov,   turnover, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Turnover (v2.33) (MPU4 Video)",GAME_FLAGS ) // the 2nd 3 is likely be a machine type, because much like Strike It Lucky and Wize Move the pairing 68k ROM doesn't change
+GAME(  199?, v4turnovc,  v4turnov,  mpu4_vid_turnov,   turnover, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Turnover (v2.3O) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4turnovd,  v4turnov,  mpu4_vid_turnov,   turnover, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Turnover (v?.?) (MPU4 Video)",GAME_FLAGS ) // only have a single program ROM
 
 // 00 1c cc 64 1c 4c 64 1c ec e4 0c d4 84 0c 44 2c d4 14 34 14 24 0c 44 0c 44 1c ec 54 04 0c 54 24 0c 44 9c ec e4 1c 6c 54 04 1c c8 64 1c 4c 64 1c ec 64 0c d4 04 3c 6c 44 2c 54 84 1c ec 44 3c 00
-GAME(  1990, v4skltrk,   v4bios,    mpu4_vid_skilltrk,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
-GAME(  1990, v4skltrka,  v4skltrk,  mpu4_vid_skilltrk,   skiltrek, mpu4vid_state, init_skiltrek,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
+GAME(  1990, v4skltrk,   v4bios,    mpu4_vid_skilltrk,   skiltrek, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 1)",GAME_FLAGS ) // 10 pound max
+GAME(  1990, v4skltrka,  v4skltrk,  mpu4_vid_skilltrk,   skiltrek, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Skill Trek (v1.1) (MPU4 Video, set 2)",GAME_FLAGS ) // 12 pound max
 
 // 00 2c 94 14 04 0c c4 0c d4 64 0c b4 04 0c 84 5c dc 9c dc 9c dc cc 84 0c 84 0c d4 04 2c c4 0c c4 0c 84 1c dc dc 8c d4 44 2c 94 20 0c a4 0c c4 0c d4 14 14 54 04 6c c4 4c c4 0c c4 2c c4 0c d4 00
-GAME(  1989, v4tmach,    v4bios,    mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmachd,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach2,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach2d,  v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach1,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (MPU4 Video)",GAME_FLAGS )
-GAME(  1989, v4tmach1d,  v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_timemchn,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach,    v4bios,    mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmachd,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 3 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach2,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach2d,  v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 2 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach1,   v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (MPU4 Video)",GAME_FLAGS )
+GAME(  1989, v4tmach1d,  v4tmach,   mpu4_vid_tmach,   skiltrek, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Time Machine (v2.0) (Issue 1 Questions) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
 /* Quiz games - Games below are missing question ROMs */
 
 // winner takes all sequence?
 // 00 64 64 24 64 64 24 64 6c 9c bc bc a4 24 64 24 74 44 6c 94 1c ac 84 24 64 64 6c c4 24 24 64 24 24 64 74 04 6c c4 2c c4 24 64 60 24 64 64 24 64 6c 8c 8c 94 14 4c 8c 9c bc ac 8c 94 14 04 6c 00
-GAME(  1990, v4sklcsh,   v4bios,   mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_v4barqst,  ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
+GAME(  1990, v4sklcsh,   v4bios,   mpu4_vid_cheatchr,   skiltrek, mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Skill Cash (v1.1) (MPU4 Video)",GAME_FLAGS )
 
 // 00 8c 64 0c c4 0c 54 14 94 94 24 ac 44 0c 44 1c 7c 6c 74 84 3c 4c 44 0c 44 8c 74 84 0c 54 04 1c 7c cc 64 0c 74 84 3c 5c 4c 64 88 74 04 8c 54 04 9c 7c 5c 7c cc 74 04 1c 5c 5c 7c 6c 54 04 9c 00
-GAME(  199?, v4eyedwn,   v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4eyedwnd,  v4eyedwn, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_eyesdown,  ROT0, "Barcrest","Eyes Down (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4eyedwn,   v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Eyes Down (v1.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4eyedwnd,  v4eyedwn, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Eyes Down (v1.3, Datapak) (MPU4 Video)",GAME_FLAGS )
 
 // similar to the 'Winner Takes All' sequence but not the same
 // 00 64 64 24 64 64 24 64 74 54 84 a4 24 24 64 24 e4 64 74 44 34 04 24 24 64 64 74 44 64 24 64 24 24 64 e4 24 74 44 34 14 04 64 60 24 64 64 24 64 74 04 24 e4 64 74 04 34 04 64 24 64 24 64 74 00
-GAME(  199?, v4quidgr,   v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4quidgrd,  v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v1.2, Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4quidgr2,  v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4quidgr2d, v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_quidgrid,  ROT0, "Barcrest","Ten Quid Grid (v2.4, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgr,   v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Ten Quid Grid (v1.2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgrd,  v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Ten Quid Grid (v1.2, Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgr2,  v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Ten Quid Grid (v2.4) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4quidgr2d, v4quidgr, mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,  ROT0, "Barcrest","Ten Quid Grid (v2.4, Datapak) (MPU4 Video)",GAME_FLAGS )
 
 // 00 34 14 0c 54 04 24 34 94 94 0c 5c 6c 44 24 24 3c 6c cc 4c c4 a4 24 24 34 84 b4 1c 64 24 34 04 24 34 8c c4 b4 1c e4 24 34 14 10 84 24 34 04 24 b4 04 24 3c 74 94 0c c4 a4 24 24 34 04 34 94 00
-GAMEL( 199?, v4barqs2,   v4bios,   mpu4_vid_cheatchr,   barquest,   mpu4vid_state, init_v4barqst2, ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_FLAGS,layout_v4barqst )
+GAMEL( 199?, v4barqs2,   v4bios,   mpu4_vid_cheatchr,   barquest,   mpu4vid_state, init_crmaze, ROT0, "Barcrest","Barquest 2 (v0.3) (MPU4 Video)",GAME_FLAGS,layout_v4barqst )
 
 // 00 34 14 84 24 34 04 34 54 54 84 a4 24 24 34 04 b4 14 54 14 44 64 24 24 34 44 74 14 04 24 34 04 24 34 c4 24 74 14 44 34 04 34 10 44 34 04 24 34 54 84 24 b4 94 54 84 e4 24 34 04 34 04 34 54 00
 // again the 2nd '3' seems to indicate a machine type, not a version
-GAME(  199?, v4wize,     v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4wized,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d) (Datapak) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4wizeb,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.33) (MPU4 Video)",GAME_FLAGS )
-GAME(  199?, v4wizec,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.3d3) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wize,     v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","Wize Move (v1.3) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wized,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","Wize Move (v1.3d) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizeb,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","Wize Move (v1.33) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizec,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","Wize Move (v1.3d3) (Datapak) (MPU4 Video)",GAME_FLAGS )
 // older code, 1x 68k ROM is missing in addition to questions being missing
-GAME(  199?, v4wizeo,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizeo,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","Wize Move (v1.2) (MPU4 Video)",GAME_FLAGS )
 // newer? code, only 1x 68k ROM is dumped (and it appears to be slightly corrupt)
-GAME(  199?, v4wizen,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4wize,    ROT0, "Barcrest","Wize Move (v?.?) (MPU4 Video)",GAME_FLAGS )
+GAME(  199?, v4wizen,    v4wize,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","Wize Move (v?.?) (MPU4 Video)",GAME_FLAGS )
 
 // 00 34 14 0c 54 04 24 34 94 94 0c 5c 6c 44 24 24 3c 6c cc 4c c4 a4 24 24 34 84 b4 1c 64 24 34 04 24 34 8c c4 b4 1c e4 24 34 14 10 84 24 34 04 24 b4 04 24 3c 74 94 0c c4 a4 24 24 34 04 34 94 00
-GAME(  1991, v4opt3,     v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
-GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_v4opt3,    ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4opt3,     v4bios,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","Option 3 (v1.0) (MPU4 Video)",GAME_FLAGS )
+GAME(  1991, v4opt3d,    v4opt3,   mpu4_vid_cheatchr,   mpu4vid,   mpu4vid_state, init_crmaze,    ROT0, "Barcrest","Option 3 (v1.0) (Datapak) (MPU4 Video)",GAME_FLAGS )
 
 /* ----------------------------------------------------------------  */
 /* Games below are newer BWB games and use their own game and revision specific MPU4 base ROMs (which must be correctly paired with video ROMs of the same revision) and sometimes differing hardware setups */
