@@ -605,6 +605,8 @@ void tms7000_device::iocnt2_w(uint8_t data)
 // TMS70Cx2 timers: SPND001C, sections 3.7.2-3.7.9.
 uint8_t tms7000_device::timer16_r(offs_t offset)
 {
+	timer16_update();
+
 	uint8_t const timer = offset / 4;
 	offset &= 3;
 
@@ -619,6 +621,8 @@ uint8_t tms7000_device::timer16_r(offs_t offset)
 
 void tms7000_device::timer16_w(offs_t offset, uint8_t data)
 {
+	timer16_update();
+
 	uint8_t const timer = offset / 4;
 	offset &= 3;
 
@@ -675,8 +679,15 @@ void tms7000_device::timer16_tick(uint8_t timer)
 		timer16_tick(1);
 }
 
-void tms7000_device::timer16_advance(uint64_t clocks)
+void tms7000_device::timer16_update()
 {
+	if (!chip_is_family_70cx2() || !executing() || machine().side_effects_disabled())
+		return;
+
+	uint64_t const cycles = total_cycles();
+	uint64_t const elapsed = cycles - m_timer16_cycles;
+	m_timer16_cycles = cycles;
+	uint64_t clocks = elapsed * m_divider;
 	while (clocks--)
 	{
 		for (uint8_t timer = 0; timer < 2; timer++)
@@ -814,21 +825,19 @@ void tms7000_device::tms7000_pf_w(offs_t offset, uint8_t data)
 
 void tms7000_device::execute_run()
 {
+	m_timer16_cycles = total_cycles();
 	if (!chip_is_family_70cx2())
 		check_interrupts();
 
 	do
 	{
-		uint64_t const cycles = total_cycles();
 		if (chip_is_family_70cx2())
 			check_interrupts();
 		debugger_instruction_hook(m_pc);
 
 		m_op = m_cache.read_byte(m_pc++);
 		execute_one(m_op);
-		if (chip_is_family_70cx2())
-			// Exclude remaining timeslice cycles discarded by callbacks.
-			timer16_advance((total_cycles() - cycles) * m_divider);
+		timer16_update();
 	} while (m_icount > 0);
 }
 

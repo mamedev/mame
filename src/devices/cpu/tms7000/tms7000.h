@@ -136,6 +136,7 @@ protected:
 	uint8_t m_timer16_control[2];
 	uint8_t m_timer16_readout[2];
 	uint8_t m_timer16_clocks[2];
+	uint64_t m_timer16_cycles;
 
 	uint8_t m_port_latch[4];
 	uint8_t m_port_ddr[4];
@@ -157,7 +158,7 @@ protected:
 	void iocnt2_w(uint8_t data);
 	uint8_t timer16_r(offs_t offset);
 	void timer16_w(offs_t offset, uint8_t data);
-	void timer16_advance(uint64_t clocks);
+	void timer16_update();
 	void timer16_tick(uint8_t timer);
 	uint8_t timer16_output_mask() const;
 
