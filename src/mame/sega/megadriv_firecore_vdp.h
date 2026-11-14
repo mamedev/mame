@@ -1,7 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
-/* */
-
 
 #ifndef MAME_SEGA_MEGADRIV_FIRECORE_VDP_H
 #define MAME_SEGA_MEGADRIV_FIRECORE_VDP_H
