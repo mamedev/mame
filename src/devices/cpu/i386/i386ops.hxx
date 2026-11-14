@@ -1278,6 +1278,13 @@ void i386_device::i386_repeat(int invert_flag)
 			count = --REG32(ECX);
 		else
 			count = --REG16(CX);
+		if (count && m_TF && (!flag || (invert_flag ? !*flag : *flag)))
+		{
+			// single-step trap after each iteration, return to the string instruction
+			m_eip = m_prev_eip;
+			CHANGE_PC(m_eip);
+			return;
+		}
 		if (count && (m_cycles <= 0))
 			goto outofcycles;
 	}
