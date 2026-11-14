@@ -13436,6 +13436,22 @@ ROM_START( mjkokryu )
 	ROM_LOAD( "nvram", 0x0000, 0x8000,CRC(c2590a33) SHA1(1af61af7200fa84cc96131fb83c9f44aea4c3d01) )
 ROM_END
 
+ROM_START( mjstama )
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "r0422-4.6e", 0x00000, 0x80000, CRC(2f5cc188) SHA1(9b67cb089c23836fcbcbf436d1fe2fbb070ef71f) )
+
+	ROM_REGION( 0x800000, "blitter", 0 )
+	ROM_LOAD( "t0423.7b",  0x000000, 0x200000, CRC(cf69b2d8) SHA1(445ca25be036ed50e14c2f034e23649dc8a8c207) )
+	ROM_LOAD( "t0424.8b",  0x200000, 0x200000, CRC(3f7767b8) SHA1(9d31c08b64b644f09af80f24d1c72963a712bb65) )
+	ROM_LOAD( "t0425.9b",  0x400000, 0x200000, CRC(d3042be3) SHA1(7d3de0e08d10554136737738323eb170d81e9d93) )
+	ROM_LOAD( "t0426.11b", 0x600000, 0x200000, CRC(1fb03f69) SHA1(652ada2bb4ad271a6acaae2c510703ffb3437b4a) )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
+	ROM_LOAD( "t0421.2b", 0x00000, 0x80000, CRC(f45457c4) SHA1(fab8911032809fcf506f4a9a63fc4193c53c7e1d) )
+
+	ROM_REGION( 0x8000, "nvram", 0 ) // pre-initialized with 36 months to next inspection (0 by default, so it wouldn't boot past test mode)
+	ROM_LOAD( "nvram", 0x0000, 0x8000,CRC(7629be5e) SHA1(bacd550a929a9693d2e9c20f7b30ec11a999c6b3) )
+ROM_END
 
 /***************************************************************************
 
@@ -13861,3 +13877,5 @@ GAME( 2004, momotaro,    0,        momotaro,  daimyojn,   hanakanz_state, empty_
 GAME( 2007, mjnigiri,    0,        mjnigiri,  mjnigiri,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Nigiri Itcho!! (Japan, T038-PB-002)",                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 GAME( 2008, mjkokryu,    0,        momotaro,  mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Kokuryu (Japan, T040-RB-03)",                            MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
+GAME( 2009, mjstama,     0,        momotaro,  mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Sengoku Tamashii (Japan, T042-RB-04)",                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
