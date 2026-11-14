@@ -108,6 +108,7 @@ Variants: T denotes an active 8.4" display, C a passive 9.5" color display. 3560
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i386/i386.h"
+#include "cpu/i386/x87slot.h"
 #include "cpu/i86/i286.h"
 #include "machine/at.h"
 #include "machine/cs8221.h"
@@ -509,6 +510,9 @@ void at_state::at386(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &at_state::at32_map);
 	maincpu.set_addrmap(AS_IO, &at_state::at32_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.ferr().set(m_mb, FUNC(at_mb_device::fpu_error_w));
+
+	I387_SLOT(config, "fpu", m_maincpu);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 

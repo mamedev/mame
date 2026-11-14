@@ -1408,6 +1408,8 @@ if CPUS["I386"] then
 		MAME_DIR .. "src/devices/cpu/i386/pentops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87ops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87priv.h",
+		MAME_DIR .. "src/devices/cpu/i386/x87slot.cpp",
+		MAME_DIR .. "src/devices/cpu/i386/x87slot.h",
 		MAME_DIR .. "src/devices/cpu/i386/cpuidmsrs.hxx",
 	}
 end

@@ -51,6 +51,7 @@
 DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "Intel I386")
 DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "Intel I386SX")
 DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "Intel I486")
+DEFINE_DEVICE_TYPE(I486SX,      i486sx_device,      "i486sx",      "Intel I486SX")
 DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "Intel I486DX4")
 DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Intel Pentium")
 DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
@@ -74,6 +75,7 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
 	, m_smiact(*this)
 	, m_ferr_handler(*this)
+	, m_x87_present(false)
 {
 	// 32 unified
 	set_vtlb_dynamic_entries(32);
@@ -92,6 +94,13 @@ i486_device::i486_device(const machine_config &mconfig, const char *tag, device_
 i486_device::i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: i386_device(mconfig, type, tag, owner, clock, 32, 32, 32)
 {
+	m_x87_present = true;
+}
+
+i486sx_device::i486sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i486_device(mconfig, I486SX, tag, owner, clock)
+{
+	m_x87_present = false;
 }
 
 i486dx4_device::i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -2071,11 +2080,19 @@ void i386_device::device_start()
 {
 	i386_common_init();
 
-	build_opcode_table(OP_I386);
+	build_opcode_table(OP_I386 | (m_x87_present ? OP_FPU : 0));
 	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I386].get();
 	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_I386].get();
 
-	register_state_i386();
+	if (m_x87_present)
+	{
+		build_x87_opcode_table();
+		register_state_i386_x87();
+	}
+	else
+	{
+		register_state_i386();
+	}
 }
 
 void i386_device::register_state_i386()
@@ -2537,6 +2554,12 @@ void i386_device::device_reset()
 	m_a20_mask = ~0;
 
 	m_cr[0] = 0x7fffffe0; // reserved bits set to 1
+	if (m_x87_present)
+	{
+		// ET comes up set when the 80387 is sensed at reset
+		m_cr[0] |= CR0_ET;
+		x87_reset();
+	}
 	m_eflags = 0;
 	m_eflags_mask = 0x00037fd7;
 	m_eip = 0xfff0;
@@ -2943,7 +2966,7 @@ void i486_device::device_start()
 {
 	i386_common_init();
 
-	build_opcode_table(OP_I386 | OP_FPU | OP_I486);
+	build_opcode_table(OP_I386 | (m_x87_present ? OP_FPU : 0) | OP_I486);
 	build_x87_opcode_table();
 	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I486].get();
 	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_I486].get();
@@ -2989,6 +3012,17 @@ void i486_device::device_reset()
 	m_cpu_version = REG32(EDX);
 
 	CHANGE_PC(m_eip);
+}
+
+// No FPU: ESC opcodes fault with #NM under CR0.EM/TS, otherwise do nothing.
+// A 487SX in the I487SX_SLOT upgrade socket provides the x87.
+void i486sx_device::device_reset()
+{
+	i486_device::device_reset();
+
+	// Family 4 (486), Model 2 (SX), Stepping 7 (cC0)
+	REG32(EDX) = (4 << 8) | (2 << 4) | 7;
+	m_cpu_version = REG32(EDX);
 }
 
 void i486dx4_device::device_reset()
