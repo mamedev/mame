@@ -459,13 +459,17 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 
 	case 0x0f:
 		dadr_latch = (dadr_latch&0x00ffff) | ((data&0xff)<<16);
-		if (ram_sel)
 		{
-			dil_latch = dram_r(dadr_latch) << 8;
-		}
-		else
-		{
-			dram_w(dadr_latch, dol_latch >> 8);
+			// DADR is left-justified like the GPR offsets, so map it through MEMSIZ the same way program accesses are
+			const int32_t address = (int32_t(dadr_latch) & memmask) >> memshift;
+			if (ram_sel)
+			{
+				dil_latch = dram_r(address) << 8;
+			}
+			else
+			{
+				dram_w(address, dol_latch >> 8);
+			}
 		}
 		break;
 

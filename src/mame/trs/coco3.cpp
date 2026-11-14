@@ -319,19 +319,19 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( coco_lightgun )
 	PORT_START(DIECOM_LIGHTGUN_RX_TAG)
-		PORT_BIT(0xfff, 266, IPT_LIGHTGUN_X)
+		PORT_BIT(0xfff, gime_device::SCREEN_WIDTH / 2, IPT_LIGHTGUN_X)
 			PORT_NAME("Lightgun X (Right Port)")
 			PORT_CROSSHAIR(X, 1.0, 0.0, 0)
-			PORT_MINMAX(105,420)
+			PORT_MINMAX(0, gime_device::SCREEN_WIDTH - 1)
 			PORT_SENSITIVITY(100)
 			PORT_KEYDELTA(1)
 			PORT_PLAYER(1)
 			PORT_CONDITION(CTRL_SEL_RIGHT, 0x0f, EQUALS, coco_state::JOY_DEVICE_DIECOM_LG)
 	PORT_START(DIECOM_LIGHTGUN_RY_TAG)
-		PORT_BIT(0xff, 121, IPT_LIGHTGUN_Y)
+		PORT_BIT(0xff, 119, IPT_LIGHTGUN_Y)
 			PORT_NAME("Lightgun Y (Right Port)")
 			PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
-			PORT_MINMAX(0,242)
+			PORT_MINMAX(0, 238)
 			PORT_SENSITIVITY(100)
 			PORT_KEYDELTA(1)
 			PORT_PLAYER(1)
@@ -454,7 +454,7 @@ void coco3_state::coco3(machine_config &config)
 
 	// monitor
 	SCREEN(config, m_screen);
-	m_screen->set_raw(28.636363_MHz_XTAL/2, 912, 0, 640, 262, 1, 240);
+	m_screen->set_raw(28.636363_MHz_XTAL/2, 912, 0, gime_device::SCREEN_WIDTH, 263, 1, 240);
 	m_screen->set_screen_update(FUNC(coco3_state::screen_update));
 
 	// internal ram

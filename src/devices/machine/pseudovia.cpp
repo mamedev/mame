@@ -690,8 +690,76 @@ void pb030_pseudovia_device::write(offs_t offset, uint8_t data)
 
 // Most VIA-like pseudo-VIA found in PowerBook 140/160/170/180
 quadra_pseudovia_device::quadra_pseudovia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	pseudovia_device(mconfig, APPLE_QUADRA_PSEUDOVIA, tag, owner, clock)
+	pseudovia_device(mconfig, APPLE_QUADRA_PSEUDOVIA, tag, owner, clock),
+	m_scsi_irq(0),
+	m_slot_irq(0),
+	m_orb(0), m_ddrb(0), m_ddra(0), m_acr(0), m_pcr(0),
+	m_button_reset(0), m_buttons(0), m_button_latch(0)
 {
+}
+
+void quadra_pseudovia_device::device_start()
+{
+	pseudovia_device::device_start();
+
+	save_item(NAME(m_scsi_irq));
+	save_item(NAME(m_slot_irq));
+	save_item(NAME(m_orb));
+	save_item(NAME(m_ddrb));
+	save_item(NAME(m_ddra));
+	save_item(NAME(m_acr));
+	save_item(NAME(m_pcr));
+	save_item(NAME(m_buttons));
+	save_item(NAME(m_button_latch));
+}
+
+void quadra_pseudovia_device::device_reset()
+{
+	pseudovia_device::device_reset();
+
+	m_button_latch = m_button_reset | m_buttons;
+	m_pseudovia_regs[0x13] = 0;
+	pseudovia_recalc_irqs();
+}
+
+// Front panel push buttons: a press sets its bit in register 8.  Writing 1 to a bit clears it unless the button is
+// still held.  IFR bit 5 is set while any bit of register 8 is.
+void quadra_pseudovia_device::set_button(u8 bit, int state)
+{
+	if (state)
+	{
+		m_buttons |= 1 << bit;
+		m_button_latch |= 1 << bit;
+		pseudovia_recalc_irqs();
+	}
+	else
+	{
+		m_buttons &= ~(1 << bit);
+	}
+}
+
+void quadra_pseudovia_device::scsi_irq_w(int state)
+{
+	const int irq = (state == ASSERT_LINE) ? 1 : 0;
+
+	if (irq && !m_scsi_irq)
+	{
+		m_pseudovia_regs[3] |= 0x08;
+		pseudovia_recalc_irqs();
+	}
+	m_scsi_irq = irq;
+}
+
+void quadra_pseudovia_device::slot_irq_w(int state)
+{
+	const int irq = (state == CLEAR_LINE) ? 1 : 0;
+
+	if (irq && !m_slot_irq)
+	{
+		m_pseudovia_regs[3] |= 0x02;
+		pseudovia_recalc_irqs();
+	}
+	m_slot_irq = irq;
 }
 
 uint8_t quadra_pseudovia_device::read(offs_t offset)
@@ -701,7 +769,7 @@ uint8_t quadra_pseudovia_device::read(offs_t offset)
 	switch (offset)
 	{
 	case 0:
-		data = m_in_b_handler();
+		data = (m_orb & m_ddrb) | (m_in_b_handler() & ~m_ddrb);
 		break;
 
 	case 1: // Port A
@@ -709,12 +777,32 @@ uint8_t quadra_pseudovia_device::read(offs_t offset)
 		data = m_in_a_handler();
 		break;
 
+	case 2: // DDRB
+		data = m_ddrb;
+		break;
+
+	case 3: // DDRA
+		data = m_ddra;
+		break;
+
+	case 8: // push button latch
+		data = m_button_latch;
+		break;
+
+	case 11: // ACR
+		data = m_acr;
+		break;
+
+	case 12: // PCR
+		data = m_pcr;
+		break;
+
 	case 13: // IFR
-		data = m_pseudovia_regs[0x03];
+		data = m_pseudovia_regs[0x03] | (m_button_latch ? 0x20 : 0);
 		break;
 
 	case 14: // IER
-		data = m_pseudovia_regs[0x13];
+		data = m_pseudovia_regs[0x13] | 0x80;
 		break;
 
 	default:
@@ -731,11 +819,33 @@ void quadra_pseudovia_device::write(offs_t offset, uint8_t data)
 	switch (offset)
 	{
 	case 0:
+		m_orb = data;
 		m_out_b_handler(data);
 		break;
 
 	case 1: // Port A
 		m_out_a_handler(data);
+		break;
+
+	case 2: // DDRB
+		m_ddrb = data;
+		break;
+
+	case 3: // DDRA
+		m_ddra = data;
+		break;
+
+	case 8: // push button latch
+		m_button_latch &= ~data | m_buttons;
+		pseudovia_recalc_irqs();
+		break;
+
+	case 11: // ACR
+		m_acr = data;
+		break;
+
+	case 12: // PCR
+		m_pcr = data;
 		break;
 
 	case 13: // IFR
@@ -749,11 +859,11 @@ void quadra_pseudovia_device::write(offs_t offset, uint8_t data)
 	case 14:             // IER
 		if (data & 0x80) // 1 bits write 1s
 		{
-			m_pseudovia_regs[0x13] |= data & 0x1b;
+			m_pseudovia_regs[0x13] |= data & 0x3b;
 		}
 		else // 1 bits write 0s
 		{
-			m_pseudovia_regs[0x13] &= ~(data & 0x1b);
+			m_pseudovia_regs[0x13] &= ~(data & 0x3b);
 		}
 		pseudovia_recalc_irqs();
 		break;
@@ -766,7 +876,7 @@ void quadra_pseudovia_device::write(offs_t offset, uint8_t data)
 
 void quadra_pseudovia_device::pseudovia_recalc_irqs()
 {
-	const uint8_t ifr = m_pseudovia_regs[3] & m_pseudovia_regs[0x13] & 0x1b;
+	const uint8_t ifr = (m_pseudovia_regs[3] | (m_button_latch ? 0x20 : 0)) & m_pseudovia_regs[0x13] & 0x3b;
 	if (ifr != 0)
 	{
 		m_pseudovia_regs[3] |= 0x80;

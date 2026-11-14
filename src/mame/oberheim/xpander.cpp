@@ -551,9 +551,10 @@ void xpander_state_base::xpander_common(machine_config &config)
 
 	for (int i = 0; i < m_encoder.size(); ++i)
 	{
-		QUADENCODER(config, m_encoder[i]);
+		QUADENCODER(config, m_encoder[i]).configure_clustered();
 		m_encoder[i]->write_mn().set([this, i] (int state) { encoder_moved(i); });
 		m_encoder[i]->write_pl().set([this, i] (int state) { encoder_moved(i); });
+
 		TTL7474(config, m_encoder_dir_ff[i]);
 		TTL7474(config, m_encoder_changed_ff[i]).d_w(1);  // D tied to +5V.
 	}
@@ -1387,47 +1388,47 @@ INPUT_PORTS_START(xpander_base)
 
 	// All rotary encoders are LA226.
 
-	// 30 teeth (according to the service manual) x 4 events per tooth.
-	constexpr int NUM_ENCODER_POSITIONS = 30 * 4;
+	// 30 teeth, according to the service manual.
+	constexpr int NUM_ENCODER_POSITIONS = 30;
 
 	PORT_START("encoder_knob_1")
 	PORT_BIT(0xff, 0x00, IPT_POSITIONAL) PORT_POSITIONS(NUM_ENCODER_POSITIONS - 1)
-		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(1)
 		PORT_CODE_DEC(KEYCODE_Q) PORT_CODE_INC(KEYCODE_W)
 		PORT_FULL_TURN_COUNT(NUM_ENCODER_POSITIONS)
 		PORT_CHANGED_MEMBER("encoder_1", FUNC(quadencoder_device::changed), 0)
 
 	PORT_START("encoder_knob_2")
 	PORT_BIT(0xff, 0x00, IPT_POSITIONAL) PORT_POSITIONS(NUM_ENCODER_POSITIONS - 1)
-		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(1)
 		PORT_CODE_DEC(KEYCODE_E) PORT_CODE_INC(KEYCODE_R)
 		PORT_FULL_TURN_COUNT(NUM_ENCODER_POSITIONS)
 		PORT_CHANGED_MEMBER("encoder_2", FUNC(quadencoder_device::changed), 0)
 
 	PORT_START("encoder_knob_3")
 	PORT_BIT(0xff, 0x00, IPT_POSITIONAL) PORT_POSITIONS(NUM_ENCODER_POSITIONS - 1)
-		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(1)
 		PORT_CODE_DEC(KEYCODE_A) PORT_CODE_INC(KEYCODE_S)
 		PORT_FULL_TURN_COUNT(NUM_ENCODER_POSITIONS)
 		PORT_CHANGED_MEMBER("encoder_3", FUNC(quadencoder_device::changed), 0)
 
 	PORT_START("encoder_knob_4")
 	PORT_BIT(0xff, 0x00, IPT_POSITIONAL) PORT_POSITIONS(NUM_ENCODER_POSITIONS - 1)
-		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(1)
 		PORT_CODE_DEC(KEYCODE_D) PORT_CODE_INC(KEYCODE_F)
 		PORT_FULL_TURN_COUNT(NUM_ENCODER_POSITIONS)
 		PORT_CHANGED_MEMBER("encoder_4", FUNC(quadencoder_device::changed), 0)
 
 	PORT_START("encoder_knob_5")
 	PORT_BIT(0xff, 0x00, IPT_POSITIONAL) PORT_POSITIONS(NUM_ENCODER_POSITIONS - 1)
-		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(1)
 		PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
 		PORT_FULL_TURN_COUNT(NUM_ENCODER_POSITIONS)
 		PORT_CHANGED_MEMBER("encoder_5", FUNC(quadencoder_device::changed), 0)
 
 	PORT_START("encoder_knob_6")
 	PORT_BIT(0xff, 0x00, IPT_POSITIONAL) PORT_POSITIONS(NUM_ENCODER_POSITIONS - 1)
-		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(4)
+		PORT_WRAPS PORT_SENSITIVITY(50) PORT_KEYDELTA(1)
 		PORT_CODE_DEC(KEYCODE_C) PORT_CODE_INC(KEYCODE_V)
 		PORT_FULL_TURN_COUNT(NUM_ENCODER_POSITIONS)
 		PORT_CHANGED_MEMBER("encoder_6", FUNC(quadencoder_device::changed), 0)

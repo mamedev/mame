@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="trs80m16b_hdd" description="Tandy TRS-80 Model 16B hard disk images">
+
+	<software name="tdos42">
+		<description>TRSDOS II v4.2</description>
+		<year>1983</year>
+		<publisher>Tandy</publisher>
+		<info name="usage" value="Requires the second RAM bank set to 16K, pages 14/15 (E38-E39)" />
+
+		<!-- Tandon TM503 -->
+		<part name="hdd" interface="st506_hdd">
+			<diskarea name="harddriv">
+				<disk name="tdos42" sha1="0c9bb736dd8aaa6149131b4ecdba355b8261dce3" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="xenix32">
+		<description>XENIX v3.2</description>
+		<year>1987</year>
+		<publisher>Tandy</publisher>
+		<sharedfeat name="j0:cage:j7_default" value="512k"/>
+
+		<!-- Tandon TM503 -->
+		<part name="hdd" interface="st506_hdd">
+			<diskarea name="harddriv">
+				<disk name="xenix32" sha1="df8abaf6dfd858bcb3f14bdc541c1a7e9c6cd81f" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="xenix33">
+		<description>XENIX v3.3 with Development System v3.2</description>
+		<year>1989</year>
+		<publisher>Tandy</publisher>
+		<sharedfeat name="j0:cage:j7_default" value="512k"/>
+
+		<!-- Tandon TM503 -->
+		<part name="hdd" interface="st506_hdd">
+			<diskarea name="harddriv">
+				<disk name="xenix33" sha1="f4c5e5cbde7e50f435de75602446773fb777b216" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

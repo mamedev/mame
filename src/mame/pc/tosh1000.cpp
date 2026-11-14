@@ -49,7 +49,8 @@
 #include "machine/ram.h"
 #include "machine/rp5c01.h"
 
-#include "softlist.h"
+// TODO: hookup SW list
+//#include "softlist_dev.h"
 
 
 #define LOG_KEYBOARD  (1U << 1)

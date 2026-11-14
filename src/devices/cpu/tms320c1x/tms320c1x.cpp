@@ -371,7 +371,7 @@ void tms320c1x_device_base<HighBits>::addh()
 	m_oldacc.d = m_ACC.d;
 	getdata(0,0);
 	m_ACC.w.h += m_ALU.w.l;
-	if (int16_t(~(m_oldacc.w.h ^ m_ALU.w.h) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
+	if (int16_t(~(m_oldacc.w.h ^ m_ALU.w.l) & (m_oldacc.w.h ^ m_ACC.w.h)) < 0) {
 		SET_FLAG(OV_FLAG);
 		if (OVM)
 			m_ACC.w.h = ((int16_t)m_oldacc.w.h < 0) ? 0x8000 : 0x7fff;

@@ -83,7 +83,6 @@
  TODO:
  * Communication for games that support linked mode
  * IGS025 protection for Chess Challenge II
- * Extra Draw and Xingyun Xiaochou hang cause of IRQ problems
  * Emulate necessary peripherals for Extra Draw
  * I/O for remaining games
  * tshs101 has IGS3590 + NT3570F instead of Oki
@@ -458,7 +457,7 @@ void igs_m027_state::oki_128k_map(address_map &map)
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )         PORT_CONDITION(port, mask, EQUALS, mask)    /* 下   */ \
 		PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )               PORT_CONDITION(port, mask, EQUALS, 0x00) \
 		PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                          /* 测试 */ \
-		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                       /* 査帐 */ \
+		PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                       /* 查帐 */ \
 		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )                 PORT_CONDITION(port, mask, EQUALS, mask)    /* 投币 */ \
 		PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )               PORT_CONDITION(port, mask, EQUALS, 0x00) \
 		PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
@@ -2193,6 +2192,168 @@ INPUT_PORTS_START( cjsxp )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
 INPUT_PORTS_END
 
+INPUT_PORTS_START( xyxcxysj )
+	PORT_START("PORTB")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )          // 洗分
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )             // 小
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )            // 大
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET )             // 押注
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )                 // 开始
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )            // 得分
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )            // 续玩
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )          // 退币
+
+	PORT_START("PORTC")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)  // 投币
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )            // 保四
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           // 开分
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )            // 保三
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )            // 保五
+	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )               // 测试
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )            // 保一
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )            // 保二
+
+	PORT_START("PLAYER")
+	PORT_BIT( 0x00002, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
+	PORT_BIT( 0x00008, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )         // 查帐
+	PORT_BIT( 0xffff5, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("CLEARMEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, "Minimum Bet" )              PORT_DIPLOCATION("SW1:1,2,3")      // 最小押注
+	PORT_DIPSETTING(    0x07, "1" )
+	PORT_DIPSETTING(    0x06, "20" )
+	PORT_DIPSETTING(    0x05, "50" )
+	PORT_DIPSETTING(    0x04, "100" )
+	PORT_DIPSETTING(    0x03, "200" )
+	PORT_DIPSETTING(    0x02, "250" )
+	PORT_DIPSETTING(    0x01, "500" )
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPNAME( 0x38, 0x38, "Key-In Rate" )              PORT_DIPLOCATION("SW1:4,5,6")      // 开分比例
+	PORT_DIPSETTING(    0x38, "50" )
+	PORT_DIPSETTING(    0x30, "100" )
+	PORT_DIPSETTING(    0x28, "200" )
+	PORT_DIPSETTING(    0x20, "250" )
+	PORT_DIPSETTING(    0x18, "500" )
+	PORT_DIPSETTING(    0x10, "1000" )
+	PORT_DIPSETTING(    0x08, "2000" )
+	PORT_DIPSETTING(    0x00, "5000" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Key-Out Rate" )             PORT_DIPLOCATION("SW1:7,8")        // 洗分比率
+	PORT_DIPSETTING(    0xc0, "100" )
+	PORT_DIPSETTING(    0x80, "200" )
+	PORT_DIPSETTING(    0x40, "500" )
+	PORT_DIPSETTING(    0x00, "1000" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Coinage) )           PORT_DIPLOCATION("SW2:1,2")        // 投市比例
+	PORT_DIPSETTING(    0x03, "50" )
+	PORT_DIPSETTING(    0x02, "100" )
+	PORT_DIPSETTING(    0x01, "200" )
+	PORT_DIPSETTING(    0x00, "500" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Bonus Reference" )          PORT_DIPLOCATION("SW2:3,4")        // 赠奖参考    TODO: what does this actually do?
+	PORT_DIPSETTING(    0x0c, "100" )
+	PORT_DIPSETTING(    0x08, "200" )
+	PORT_DIPSETTING(    0x04, "500" )
+	PORT_DIPSETTING(    0x00, "1000" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, "Double Up Game Jackpot" )   PORT_DIPLOCATION("SW3:1")          // 续玩过关
+	PORT_DIPSETTING(    0x01, "10,000" )
+	PORT_DIPSETTING(    0x00, "12,500" )
+	PORT_DIPNAME( 0x02, 0x02, "Auto Hold" )                PORT_DIPLOCATION("SW3:2")          // 自动保留
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
+	PORT_DIPSETTING(    0x02, DEF_STR(On) )                                                   // 有
+	PORT_DIPNAME( 0x04, 0x04, "Winning Voice Message" )    PORT_DIPLOCATION("SW3:3")          // 中奖语音
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
+	PORT_DIPSETTING(    0x04, DEF_STR(On) )                                                   // 有
+	PORT_DIPNAME( 0x08, 0x08, "Playing Card Display" )     PORT_DIPLOCATION("SW3:4")          // 显示模式
+	PORT_DIPSETTING(    0x08, "Poker" )                                                       // 朴克        standard playing cards
+	PORT_DIPSETTING(    0x00, "Variation" )                                                   // 变异        mobile phones showing card values on screens
+	PORT_DIPNAME( 0x10, 0x10, "Dealing Speed" )            PORT_DIPLOCATION("SW3:5")          // 开牌速度
+	PORT_DIPSETTING(    0x10, "Slow" )                                                        // 慢
+	PORT_DIPSETTING(    0x00, "Fast" )                                                        // 快
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR(Demo_Sounds) )       PORT_DIPLOCATION("SW3:6")          // 示范音乐
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )                                                  // 无
+	PORT_DIPSETTING(    0x20, DEF_STR(On) )                                                   // 有
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_END
+
+INPUT_PORTS_START( extradrw )
+	PORT_START("PPI1A")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("PPI1B")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) // Big
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  // Small
+
+	// TODO: alternate panel inputs on PPI2 port C and GPIO bits 0-6.
+	PORT_START("PPI2C")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("PLAYER")
+	PORT_BIT( 0x4ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10000, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x20000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
+	PORT_SERVICE_NO_TOGGLE( 0x80000, IP_ACTIVE_LOW )
+
+	PORT_START("CLEARMEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR(Demo_Sounds) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x01, DEF_STR(On) )
+	PORT_DIPNAME( 0x02, 0x02, "Password" )          PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x00, DEF_STR(Off) )
+	PORT_DIPSETTING(    0x02, DEF_STR(On) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW3:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW3:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW3:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW3:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW3:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW3:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW3:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW3:8" )
+INPUT_PORTS_END
+
 INPUT_PORTS_START( gonefsh )
 	// preliminary - games seems to lack an input test and settings are locked out with password
 
@@ -2865,13 +3026,18 @@ void igs_m027_state::extradrw(machine_config &config)
 {
 	m027_2ppis<false>(config);
 
-	//m_ppi[0]->in_pa_callback().set(...);
-	//m_ppi[0]->in_pb_callback().set(...);
-	//m_ppi[0]->out_pc_callback().set(...);
+	m_maincpu->in_port().set_ioport("PLAYER");
 
-	//m_ppi[1]->out_pa_callback().set(...);
-	//m_ppi[1]->out_pb_callback().set(...);
-	//m_ppi[1]->in_pc_callback().set(...);
+	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
+	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
+	m_igs017_igs031->in_pc_callback().set_ioport("DSW3");
+
+	m_ppi[0]->in_pa_callback().set_ioport("PPI1A");
+	m_ppi[0]->in_pb_callback().set_ioport("PPI1B");
+	m_ppi[0]->out_pc_callback().set(m_hopper, FUNC(hopper_device::motor_w)).bit(4);
+	m_ppi[1]->in_pc_callback().set_ioport("PPI2C");
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 }
 
 void igs_m027_state::chessc2(machine_config &config)
@@ -2886,6 +3052,11 @@ void igs_m027_state::xyxcxysj(machine_config &config)
 	m027_1ppi<true>(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &igs_m027_state::xyxcxysj_map);
+	m_maincpu->in_port().set_ioport("PLAYER");
+
+	m_ppi[0]->out_pa_callback().set(m_hopper, FUNC(hopper_device::motor_w)).bit(4);
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
 
 	DS1643(config, "rtc"); // should be fully compatible with M48T18
 }
@@ -3974,6 +4145,26 @@ ROM_START( cjddz217cn ) // PCB-0489-05-FM-1
 	ROM_LOAD( "igs_w05004b16m_8fa9_427d.u5", 0x000000, 0x200000, CRC(64fbba95) SHA1(1aecb1b8426939262688e4dbed09d6a56e71b8d5) )
 ROM_END
 
+ROM_START( cjddz216cn ) // only the program ROM was dumped for this revision
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS027A ARM based MCU
+	ROM_LOAD( "igs027a", 0x00000, 0x4000, CRC(124f4bee) SHA1(bf9785516ef36290c2a7bac307bb2d849f2045ae) )
+
+	ROM_REGION32_LE( 0x80000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-216cn.u17", 0x000000, 0x80000, CRC(6cb6c57b) SHA1(4a7933ba1a3786709600802b81caeafa3de6e026) )
+
+	ROM_REGION( 0x80000, "igs017_igs031:tilemaps", 0 )
+	ROM_LOAD16_WORD_SWAP( "text.u27", 0x000000, 0x80000, CRC(520dc392) SHA1(0ab2620f20af8253806b6ff4e1d9d77a694da17c) )
+
+	ROM_REGION( 0x400000, "igs017_igs031:sprites", 0 )
+	ROM_LOAD( "igs_w05005w32m_f9ce_1d10.u28", 0x000000, 0x400000, CRC(72487508) SHA1(9f4bbc858960ddaae403e4a3330b2345f6fd6cb3) )
+
+	// OKI, sample tables are every 0x20000 starting at 0x40000
+	// 00000-1ffff and 20000-3ffff are likely music, always mapped at 20000 for any of the above banks
+	ROM_REGION( 0x200000, "oki", 0 )
+	ROM_LOAD( "igs_w05004b16m_8fa9_427d.u5", 0x000000, 0x200000, CRC(64fbba95) SHA1(1aecb1b8426939262688e4dbed09d6a56e71b8d5) )
+ROM_END
+
 ROM_START( cjddz215cn )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS027A ARM based MCU
@@ -4973,6 +5164,7 @@ GAMEL( 1999, fruitpar206us, fruitpar, oceanpar,     fruitpar206us, igs_m027_stat
 GAME(  2002, gonefsh,       0,        oceanpar,     gonefsh,       igs_m027_state, init_gonefsh,  ROT0, "IGS", "Gone Fishing (V602US)", MACHINE_NOT_WORKING ) // input, outputs, Oki bank
 GAME(  2004, cjddz,         0,        cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V219CN)", 0 ) // 2004 date in internal ROM
 GAME(  2004, cjddz217cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V217CN)", 0 ) // 2004 date in internal ROM
+GAME(  2004, cjddz216cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V216CN)", 0 ) // 2004 date in internal ROM
 GAME(  2004, cjddz215cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V215CN)", 0 ) // 2004 date in internal ROM
 GAME(  2004, cjddz213cn,    cjddz,    cjddz,        cjddz,         igs_m027_state, init_cjddz,    ROT0, "IGS", "Chaoji Dou Dizhu (V213CN)", MACHINE_NOT_WORKING ) // missing external program ROM. 2004 date in internal ROM
 GAME(  2004, cjddzp,        0,        cjddz,        cjddzp,        igs_m027_state, init_cjddzp,   ROT0, "IGS", "Chaoji Dou Dizhu Jiaqiang Ban (S300CN)", MACHINE_NODEVICE_LAN ) // 2004 date in internal ROM
@@ -4990,9 +5182,9 @@ GAME(  2000, tshs101,       tshs,     tshs101,      tshs101,       igs_m027_stat
 GAME(  2004, tswx,          0,        tct2p,        tswxp,         igs_m027_state, init_tswx,     ROT0, "IGS", "Taishan Wuxian (V309CN)", MACHINE_NOT_WORKING )
 GAME(  2006, tswxp,         0,        tct2p,        tswxp,         igs_m027_state, init_tswxp,    ROT0, "IGS", "Taishan Wuxian Jiaqiang Ban (V101CN)", 0 )
 GAME(  2000, mgfx,          0,        mgzz,         mgfx,          igs_m027_state, init_mgfx,     ROT0, "IGS", "Manguan Fuxing (V104T)", 0 )
-GAME(  2004, xyxcxysj,      0,        xyxcxysj,     base,          igs_m027_state, init_xyxcxysj, ROT0, "IGS", "Xingyun Xiaochou / Xingyun Shouji (V233CN)", MACHINE_NOT_WORKING ) // IRQ problems
+GAME(  2004, xyxcxysj,      0,        xyxcxysj,     xyxcxysj,      igs_m027_state, init_xyxcxysj, ROT0, "IGS", "Xingyun Xiaochou / Xingyun Shouji (V233CN)", MACHINE_NOT_WORKING ) // interrupt acknowledgement and peripherals
 // this has a 2nd 8255
-GAME(  2001, extradrw,      0,        extradrw,     base,          igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING ) // IRQ problems
+GAME(  2001, extradrw,      0,        extradrw,     extradrw,      igs_m027_state, init_extradrw, ROT0, "IGS", "Extra Draw (V100VE)", MACHINE_NOT_WORKING ) // interrupt acknowledgement and peripherals
 // these have an IGS025 protection device instead of the 8255
 GAME(  2002, chessc2,       0,        chessc2,      gonefsh,       igs_m027_state, init_chessc2,  ROT0, "IGS", "Chess Challenge II (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
 GAME(  2002, gonefsh2,      0,        chessc2,      gonefsh,       igs_m027_state, init_gonefsh2, ROT0, "IGS", "Gone Fishing 2 (ver. 1445A)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

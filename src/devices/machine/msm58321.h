@@ -94,6 +94,7 @@ private:
 	void update_standard();
 	inline int read_counter(int counter);
 	inline void write_counter(int counter, int value);
+	void registers_updated();
 
 	int m_year0;
 	bool m_default_24h;

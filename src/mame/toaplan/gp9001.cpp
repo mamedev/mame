@@ -323,8 +323,6 @@ void gp9001vdp_device::device_start()
 	m_sp.extra_xoffset.flipped = -0x17b;
 	m_sp.extra_yoffset.normal  = -0x1ef;
 	m_sp.extra_yoffset.flipped = -0x108;
-
-	m_sp.use_sprite_buffer = 1;
 }
 
 void gp9001vdp_device::device_reset()
@@ -672,7 +670,7 @@ void gp9001vdp_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 {
 	int clk = 0;
 	int clk_max = 432 * 262; // TODO : related to size of whole screen?
-	const u16 *source = (m_sp.use_sprite_buffer) ? m_spriteram->buffer() : m_spriteram->live();
+	const u16 *source = m_spriteram->buffer();
 
 	const u32 total_elements = gfx(1)->elements();
 	const u32 total_colors = gfx(1)->colors();
@@ -910,7 +908,7 @@ void gp9001vdp_device::render_vdp(bitmap_ind16 &bitmap, const rectangle &cliprec
 void gp9001vdp_device::screen_eof(void)
 {
 	/** Shift sprite RAM buffers  ***  Used to fix sprite lag **/
-	if (m_sp.use_sprite_buffer) m_spriteram->copy();
+	m_spriteram->copy();
 
 	// the IRQ appears to fire at line 0xe6
 	if (!m_vint_out_cb.isunset())

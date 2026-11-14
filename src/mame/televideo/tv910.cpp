@@ -15,11 +15,8 @@
     Esc-V (with a capital V) brings up the self-test screen.
 
     TODO:
-        - Reverse attribute handling on the self-test screen doesn't seem
-          to match the picture shown in the Operator's Manual
         - Make 910 keyboard into a device since the similar Model 925 uses
           a 950-compatible serial keyboard instead (with a second ACIA)
-        - Add printer port and remaining DIP switches
 
 ****************************************************************************/
 
@@ -42,9 +39,18 @@ namespace {
 #define ACIA_TAG    "acia"
 #define CRTC_TAG    "crtc"
 #define RS232_TAG   "rs232"
+#define PRINTER_TAG "printer"
 #define KBDC_TAG    "ay3600"
 
 #define MASTER_CLOCK 13.608_MHz_XTAL
+
+// host port handshake: DSW1 bits only the hardware sees
+enum : ioport_value
+{
+	DSW1_DSR_OPEN = 0x200,      // S2-8
+	DSW1_DCD_OPEN = 0x400,      // S2-9
+	DSW1_DTR_OPEN = 0x800       // S2-10, DTR EN
+};
 
 class tv910_state : public driver_device
 {
@@ -54,6 +60,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_mainirq(*this, "mainirq")
 		, m_crtc(*this, CRTC_TAG)
+		, m_acia(*this, ACIA_TAG)
+		, m_rs232(*this, RS232_TAG)
+		, m_printer(*this, PRINTER_TAG)
 		, m_vram(*this, "vram")
 		, m_chrrom(*this, "graphics")
 		, m_ay3600(*this, KBDC_TAG)
@@ -66,9 +75,12 @@ public:
 
 	void tv910(machine_config &config);
 
+	DECLARE_INPUT_CHANGED_MEMBER(handshake_changed);
+
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
@@ -82,6 +94,11 @@ private:
 	void control_w(uint8_t data);
 
 	void vbl_w(int state);
+	void host_cts_w(int state);
+	bool ports_readable() const;
+	void update_printer_txd();
+	void update_acia_dcd();
+	void update_host_dtr();
 
 	int ay3600_shift_r();
 	int ay3600_control_r();
@@ -93,6 +110,9 @@ private:
 	required_device<m6502_device> m_maincpu;
 	required_device<input_merger_device> m_mainirq;
 	required_device<r6545_1_device> m_crtc;
+	required_device<mos6551_device> m_acia;
+	required_device<rs232_port_device> m_rs232;
+	required_device<rs232_port_device> m_printer;
 	required_shared_ptr<uint8_t> m_vram;
 	required_region_ptr<uint8_t> m_chrrom;
 	required_device<ay3600_device> m_ay3600;
@@ -143,6 +163,57 @@ void tv910_state::control_w(uint8_t data)
 	#endif
 
 	m_beep->set_state(BIT(data, 0));
+	update_printer_txd();
+	update_host_dtr();
+}
+
+void tv910_state::update_printer_txd()
+{
+	// extension mode (PRINT, ESC @, ^R) copies the host data to the printer
+	m_printer->write_txd(BIT(m_control, 2) ? m_rs232->rxd_r() : 1);
+}
+
+bool tv910_state::ports_readable() const
+{
+	// RS-232 cards drive their lines from device start, before input ports
+	// can be read; machine_reset brings the outputs up to date
+	return machine().phase() >= machine_phase::RESET;
+}
+
+void tv910_state::host_cts_w(int state)
+{
+	// with nothing on the host port, CTS and DCD read as asserted, or the
+	// terminal hangs and complains
+	m_acia->write_cts(m_rs232->get_card_device() ? state : 0);
+}
+
+void tv910_state::update_acia_dcd()
+{
+	// the 6551's DCD comes from pin 8 through S2-9 (E14-E15); an open switch
+	// reads as deasserted, and an empty host port as asserted (see host_cts_w)
+	if (!ports_readable())
+		return;
+	int const line = m_rs232->get_card_device() ? m_rs232->dcd_r() : 0;
+	m_acia->write_dcd((m_dsw1->read() & DSW1_DCD_OPEN) ? 1 : line);
+}
+
+void tv910_state::update_host_dtr()
+{
+	// pin 20 through S2-10 (DTR EN) from 75188 gate 2 (A10, sheet 4, via
+	// E18-E19), which NANDs printer ready from P4-20 (via the 75189) with
+	// extension mode: printer ready while extending, else asserted
+	if (!ports_readable())
+		return;
+	if (m_dsw1->read() & DSW1_DTR_OPEN)
+		m_rs232->write_dtr(1);
+	else
+		m_rs232->write_dtr(BIT(m_control, 2) ? m_printer->dsr_r() : 0);
+}
+
+INPUT_CHANGED_MEMBER(tv910_state::handshake_changed)
+{
+	update_acia_dcd();
+	update_host_dtr();
 }
 
 uint8_t tv910_state::charset_r()
@@ -170,7 +241,9 @@ uint8_t tv910_state::kbd_flags_r()
 	if (m_anykeydown)
 		rv |= 0x01;
 
-	// D1: Printer DTR (pin 20)
+	// D1: Printer DTR (P4 pin 20)
+	if (m_printer->dsr_r())
+		rv |= 0x02;
 
 	// D6: FUNC key (not ALPHA LOCK as indicated in memory map)
 	if (BIT(kbspecial, 4))
@@ -417,11 +490,17 @@ static INPUT_PORTS_START( tv910 )
 	PORT_DIPSETTING( 0x00, "Black characters on green screen" )
 	PORT_DIPSETTING( 0x100, "Green characters on black screen" )
 
-#if 0
-	PORT_DIPNAME( 0x200, 0x200, "Data Set Ready" )
-	PORT_DIPSETTING( 0x00, "DSR connected" )
-	PORT_DIPSETTING( 0x200, "DSR disconnected" )
-#endif
+	PORT_DIPNAME( DSW1_DSR_OPEN, DSW1_DSR_OPEN, "Data Set Ready" ) PORT_DIPLOCATION("S2:8") // to E16, unused without the E15-E16 mod
+	PORT_DIPSETTING( 0, "Connected" )
+	PORT_DIPSETTING( DSW1_DSR_OPEN, "Disconnected" )
+
+	PORT_DIPNAME( DSW1_DCD_OPEN, 0, "Data Carrier Detect" ) PORT_DIPLOCATION("S2:9") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_DIPSETTING( 0, "Connected" )
+	PORT_DIPSETTING( DSW1_DCD_OPEN, "Disconnected" )
+
+	PORT_DIPNAME( DSW1_DTR_OPEN, 0, "Data Terminal Ready" ) PORT_DIPLOCATION("S2:10") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tv910_state::handshake_changed), 0)
+	PORT_DIPSETTING( 0, "Connected" )
+	PORT_DIPSETTING( DSW1_DTR_OPEN, "Disconnected" )
 
 	PORT_START("CHARSET") // actually a pair of jumpers: E4-E5 (bit 1), E6-E7 (bit 0)
 	PORT_DIPNAME( 0x03, 0x00, "Character Set" )
@@ -433,23 +512,23 @@ INPUT_PORTS_END
 
 void tv910_state::machine_start()
 {
-	// DCD needs to be driven somehow, or else the terminal will complain
-	// CTS also needs to be driven to prevent hanging caused by buffer overflow
-	auto *acia = subdevice<mos6551_device>(ACIA_TAG);
-	auto *rs232 = subdevice<rs232_port_device>(RS232_TAG);
-	if (rs232->get_card_device() == nullptr)
-	{
-		acia->write_dcd(0);
-		acia->write_cts(0);
-	}
-
 	// DSR is tied to GND
-	acia->write_dsr(0);
+	m_acia->write_dsr(0);
+
+	m_control = 0;
+	save_item(NAME(m_control));
 }
 
 void tv910_state::machine_reset()
 {
 	control_w(0);
+}
+
+void tv910_state::device_post_load()
+{
+	update_printer_txd();
+	update_acia_dcd();
+	update_host_dtr();
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED( tv910_state::crtc_update_addr )
@@ -549,16 +628,20 @@ void tv910_state::tv910(machine_config &config)
 	m_ay3600->data_ready().set(FUNC(tv910_state::ay3600_data_ready_w));
 	m_ay3600->ako().set(FUNC(tv910_state::ay3600_ako_w));
 
-	mos6551_device &acia(MOS6551(config, ACIA_TAG));
-	acia.set_xtal(1.8432_MHz_XTAL);
-	acia.irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
-	acia.txd_handler().set(RS232_TAG, FUNC(rs232_port_device::write_txd));
-	acia.rts_handler().set(RS232_TAG, FUNC(rs232_port_device::write_rts));
+	MOS6551(config, m_acia);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
+	m_acia->irq_handler().set("mainirq", FUNC(input_merger_device::in_w<1>));
+	m_acia->txd_handler().set(m_rs232, FUNC(rs232_port_device::write_txd));
+	m_acia->rts_handler().set(m_rs232, FUNC(rs232_port_device::write_rts));
 
-	rs232_port_device &rs232(RS232_PORT(config, RS232_TAG, default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(ACIA_TAG, FUNC(mos6551_device::write_rxd));
-	rs232.dcd_handler().set(ACIA_TAG, FUNC(mos6551_device::write_dcd));
-	rs232.cts_handler().set(ACIA_TAG, FUNC(mos6551_device::write_cts));
+	RS232_PORT(config, m_rs232, default_rs232_devices, nullptr);
+	m_rs232->rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	m_rs232->rxd_handler().append([this] (int) { update_printer_txd(); });
+	m_rs232->dcd_handler().set([this] (int) { update_acia_dcd(); });
+	m_rs232->cts_handler().set(FUNC(tv910_state::host_cts_w));
+
+	RS232_PORT(config, m_printer, default_rs232_devices, nullptr); // P4
+	m_printer->dsr_handler().set([this] (int) { update_host_dtr(); }); // from pin 20 (DTR)
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_beep, MASTER_CLOCK / 8400); // 1620 Hz (Row 10 signal)

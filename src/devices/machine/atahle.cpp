@@ -332,6 +332,7 @@ bool device_ata_hle_interface::set_features()
 
 	case IDE_SET_FEATURES_ENABLE_ECC:
 	case IDE_SET_FEATURES_ENABLE_RETRIES:
+	case IDE_SET_FEATURES_DISABLE_READ_LOOK_AHEAD:
 	case IDE_SET_FEATURES_ENABLE_READ_LOOK_AHEAD:
 		// not actually handled, but reply as if we did
 		return true;

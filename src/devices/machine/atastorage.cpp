@@ -370,7 +370,7 @@ attotime device_ata_mass_storage_device_interface::seek_time()
 	uint64_t new_lba = lba_address();
 	int64_t old_cylinder = m_cur_lba / sectors_per_cylinder;
 	int64_t new_cylinder = new_lba / sectors_per_cylinder;
-	int64_t diff = abs(old_cylinder - new_cylinder);
+	int64_t diff = std::abs(old_cylinder - new_cylinder);
 
 	m_cur_lba = new_lba;
 

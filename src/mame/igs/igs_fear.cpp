@@ -453,7 +453,7 @@ static INPUT_PORTS_START( mjzb )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // 右
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN1 )                                                      // 投币
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )                                               // 开分
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                // 査帐
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                // 查帐
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )        PORT_CONDITION("DSW2", 0x40, EQUALS, 0x00)  // A键

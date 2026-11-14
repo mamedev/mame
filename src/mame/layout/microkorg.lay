@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+-->
+<mamelayout version="2">
+	<element name="background">
+		<rect><color red="0.10" green="0.10" blue="0.12" /></rect>
+	</element>
+
+	<!-- one 7-seg digit with decimal point: 8-bit mask, bits 0-6 = a..g, bit 7 = dot -->
+	<element name="digit" defstate="0">
+		<led7seg><color red="0.15" green="0.85" blue="0.30" /></led7seg>
+	</element>
+
+	<!-- single-color indicator LEDs (state 0 = off, 1 = on) -->
+	<element name="led_red" defstate="0">
+		<disk><color red="0.00" green="0.00" blue="0.00" /></disk>
+		<disk state="0"><bounds xc="0.5" yc="0.5" width="0.85" height="0.85"/><color red="0.10" green="0.10" blue="0.12" /></disk>
+		<disk state="1"><bounds xc="0.5" yc="0.5" width="0.85" height="0.85"/><color red="1.00" green="0.20" blue="0.15" /></disk>
+	</element>
+	<element name="led_green" defstate="0">
+		<disk><color red="0.00" green="0.00" blue="0.00" /></disk>
+		<disk state="0"><bounds xc="0.5" yc="0.5" width="0.85" height="0.85"/><color red="0.10" green="0.10" blue="0.12" /></disk>
+		<disk state="1"><bounds xc="0.5" yc="0.5" width="0.85" height="0.85"/><color red="0.15" green="1.00" blue="0.20" /></disk>
+	</element>
+
+	<!-- MSGB39W bicolor LED (3-pin common cathode: 1=+green, 2=-cathode, 3=+red/orange).
+	     Each die is a separate output; both on -> additive blend to yellow/orange. -->
+	<element name="led_bezel">
+		<disk><color red="0.10" green="0.10" blue="0.12" /></disk>
+	</element>
+	<element name="die_red" defstate="0">
+		<disk state="1"><bounds xc="0.5" yc="0.5" width="0.85" height="0.85"/><color red="1.00" green="0.20" blue="0.15" /></disk>
+	</element>
+	<element name="die_green" defstate="0">
+		<disk state="1"><bounds xc="0.5" yc="0.5" width="0.85" height="0.85"/><color red="0.15" green="1.00" blue="0.20" /></disk>
+	</element>
+
+	<!-- labels -->
+	<element name="txt_timbre_1"><text align="1" string="Timbre 1"/></element>
+	<element name="txt_timbre_2"><text align="1" string="Timbre 2"/></element>
+	<element name="txt_edit_1_synth"><text align="1" string="Edit 1 synth"/></element>
+	<element name="txt_edit_2_synth"><text align="1" string="Edit 2 synth"/></element>
+	<element name="txt_edit_1_vocoder"><text align="1" string="Edit 1 vocoder"/></element>
+	<element name="txt_edit_2_vocoder"><text align="1" string="Edit 2 vocoder"/></element>
+	<element name="txt_tempo"><text align="1" string="Tempo"/></element>
+	<element name="txt_arpeggiator"><text align="1" string="Arpeggiator"/></element>
+	<element name="txt_side"><text align="1" string="Side"/></element>
+	<element name="txt_write"><text align="1" string="Write"/></element>
+	<element name="txt_shift"><text align="1" string="Shift"/></element>
+	<element name="txt_original_value"><text align="1" string="Original value"/></element>
+	<element name="txt_octave_up"><text align="1" string="Octave up"/></element>
+	<element name="txt_octave_down"><text align="1" string="Octave down"/></element>
+	<element name="txt_digit_1"><text align="1" string="1"/></element>
+	<element name="txt_digit_2"><text align="1" string="2"/></element>
+	<element name="txt_digit_3"><text align="1" string="3"/></element>
+	<element name="txt_digit_4"><text align="1" string="4"/></element>
+	<element name="txt_digit_5"><text align="1" string="5"/></element>
+	<element name="txt_digit_6"><text align="1" string="6"/></element>
+	<element name="txt_digit_7"><text align="1" string="7"/></element>
+	<element name="txt_digit_8"><text align="1" string="8"/></element>
+
+	<!-- 3-digit+dot display -->
+	<group name="display">
+		<repeat count="3">
+			<param name="i" start="0" increment="1"/>
+			<param name="x" start="0" increment="24"/>
+			<element ref="digit" name="disp_~i~"><bounds x="~x~" y="0" width="20" height="32"/></element>
+		</repeat>
+	</group>
+
+	<!-- button LEDs (20 single-color) -->
+	<group name="leds">
+		<element ref="led_red" name="led_timbre_1"><bounds x="0"   y="0"  width="14" height="14"/></element>
+		<element ref="txt_timbre_1"><bounds x="16" y="0"  width="60" height="14"/></element>
+		<element ref="led_red" name="led_timbre_2"><bounds x="90"  y="0"  width="14" height="14"/></element>
+		<element ref="txt_timbre_2"><bounds x="106" y="0"  width="60" height="14"/></element>
+
+		<element ref="led_red" name="led_edit_1_synth"><bounds x="0"  y="24"  width="14" height="14"/></element>
+		<element ref="txt_edit_1_synth"><bounds x="16" y="24"  width="90" height="14"/></element>
+		<element ref="led_red" name="led_edit_2_synth"><bounds x="120" y="24"  width="14" height="14"/></element>
+		<element ref="txt_edit_2_synth"><bounds x="136" y="24"  width="90" height="14"/></element>
+
+		<element ref="led_green" name="led_edit_1_vocoder"><bounds x="0"  y="48"  width="14" height="14"/></element>
+		<element ref="txt_edit_1_vocoder"><bounds x="16" y="48"  width="100" height="14"/></element>
+		<element ref="led_green" name="led_edit_2_vocoder"><bounds x="120" y="48"  width="14" height="14"/></element>
+		<element ref="txt_edit_2_vocoder"><bounds x="136" y="48"  width="100" height="14"/></element>
+
+		<element ref="led_red" name="led_tempo"><bounds x="0"  y="72"  width="14" height="14"/></element>
+		<element ref="txt_tempo"><bounds x="16" y="72"  width="60" height="14"/></element>
+		<element ref="led_red" name="led_arpeggiator"><bounds x="100" y="72"  width="14" height="14"/></element>
+		<element ref="txt_arpeggiator"><bounds x="116" y="72"  width="80" height="14"/></element>
+
+		<element ref="led_red" name="led_side"><bounds x="0"  y="96"  width="14" height="14"/></element>
+		<element ref="txt_side"><bounds x="16" y="96"  width="40" height="14"/></element>
+		<element ref="led_red" name="led_write"><bounds x="100" y="96"  width="14" height="14"/></element>
+		<element ref="txt_write"><bounds x="116" y="96"  width="50" height="14"/></element>
+
+		<element ref="led_red" name="led_shift"><bounds x="0" y="120"  width="14" height="14"/></element>
+		<element ref="txt_shift"><bounds x="16" y="120"  width="50" height="14"/></element>
+		<element ref="led_red" name="led_original_value"><bounds x="100" y="120"  width="14" height="14"/></element>
+		<element ref="txt_original_value"><bounds x="116" y="120"  width="100" height="14"/></element>
+
+		<repeat count="8">
+			<param name="i" start="1" increment="1"/>
+			<param name="x" start="0" increment="32"/>
+			<element ref="led_red" name="led_digit_~i~"><bounds x="~x~" y="152" width="14" height="14"/></element>
+			<element ref="txt_digit_~i~"><bounds x="~x~" y="168" width="24" height="14"/></element>
+		</repeat>
+	</group>
+
+	<!-- bicolor octave up/down: separate red/green die outputs, additively blended -->
+	<group name="octaves">
+		<element ref="led_bezel"><bounds x="0"  y="0"  width="14" height="14"/></element>
+		<element ref="die_red" name="led_octave_up_red" blend="add"><bounds x="0"  y="0"  width="14" height="14"/></element>
+		<element ref="die_green" name="led_octave_up_green" blend="add"><bounds x="0"  y="0"  width="14" height="14"/></element>
+		<element ref="txt_octave_up"><bounds x="16" y="0"  width="80" height="14"/></element>
+		<element ref="led_bezel"><bounds x="120" y="0"  width="14" height="14"/></element>
+		<element ref="die_red" name="led_octave_down_red" blend="add"><bounds x="120" y="0"  width="14" height="14"/></element>
+		<element ref="die_green" name="led_octave_down_green" blend="add"><bounds x="120" y="0"  width="14" height="14"/></element>
+		<element ref="txt_octave_down"><bounds x="136" y="0"  width="90" height="14"/></element>
+	</group>
+
+	<view name="Standard">
+		<element ref="background"><bounds x="0" y="0" width="880" height="420"/></element>
+
+		<group ref="display"><bounds x="20" y="20" width="80" height="32"/></group>
+
+		<group ref="leds"><bounds x="20" y="80" width="240" height="182"/></group>
+		<group ref="octaves"><bounds x="280" y="80" width="240" height="32"/></group>
+	</view>
+</mamelayout>

@@ -23,7 +23,6 @@ TODO:
 #include "machine/ram.h"
 #include "sound/spkrdev.h"
 
-#include "softlist.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 

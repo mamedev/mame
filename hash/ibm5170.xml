@@ -6718,9 +6718,9 @@ External [SCSI] CD-R driver
 	</software>
 
 	<software name="magnum6">
-		<description>Interact Magnum 6 Game Controller Driver for Windows 95</description>
+		<description>InterAct Magnum 6 Game Controller Driver for Windows 95</description>
 		<year>1996</year>
-		<publisher>Interact Multimedia Products</publisher>
+		<publisher>InterAct Multimedia Products</publisher>
 		<notes><![CDATA[
 Driver for [pc_joy:magnum6_pad]
 ]]></notes>

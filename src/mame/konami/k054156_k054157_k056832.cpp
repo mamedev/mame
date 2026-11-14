@@ -1401,25 +1401,25 @@ void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bit
 	if (flipy)
 		sdat_adv = -sdat_adv;
 
-	/*
+#if 0
 	if (scrollmode == 2)
 	{
-	    printf("%08x    %08x    %08x\n",layer,scrollbank<<12,m_lsram_page[layer][1]>>1);
-	    printf("\n000-100:\n");
-	    for (int zz=0x000; zz<0x100; zz++)
-	        printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-	    printf("\n100-200:\n");
-	    for (int zz=0x100; zz<0x200; zz++)
-	        printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-	    printf("\n200-300:\n");
-	    for (int zz=0x200; zz<0x300; zz++)
-	        printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-	    printf("\n300-400:\n");
-	    for (int zz=0x300; zz<0x400; zz++)
-	        printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-	    printf("\nend\n");
+		printf("%08x    %08x    %08x\n", layer, scrollbank << 12, m_lsram_page[layer][1] >> 1);
+		printf("\n000-100:\n");
+		for (int zz = 0x000; zz < 0x100; zz++)
+			printf("%04x    ", m_videoram[(scrollbank << 12) + (m_lsram_page[layer][1] >> 1) + zz]);
+		printf("\n100-200:\n");
+		for (int zz = 0x100; zz < 0x200; zz++)
+			printf("%04x    ", m_videoram[(scrollbank << 12) + (m_lsram_page[layer][1] >> 1) + zz]);
+		printf("\n200-300:\n");
+		for (int zz = 0x200; zz < 0x300; zz++)
+			printf("%04x    ", m_videoram[(scrollbank << 12) + (m_lsram_page[layer][1] >> 1) + zz]);
+		printf("\n300-400:\n");
+		for (int zz = 0x300; zz < 0x400; zz++)
+			printf("%04x    ", m_videoram[(scrollbank << 12) + (m_lsram_page[layer][1] >> 1) + zz]);
+		printf("\nend\n");
 	}
-	*/
+#endif
 
 	last_active = m_active_layer;
 	new_colorbase = (m_k055555 != nullptr) ? m_k055555->K055555_get_palette_index(layer) : 0;

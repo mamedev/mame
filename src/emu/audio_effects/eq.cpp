@@ -243,7 +243,7 @@ void audio_effect_eq::build_low_shelf(u32 band)
 	float sr = m_sample_rate;
 	float f = std::clamp(float(m_f[band]), 1.0f, sr/2.0f - 1.0f);
 
-	float V = pow(10, abs(m_db[band])/20);
+	float V = pow(10, std::abs(m_db[band])/20);
 	float K = tan(std::numbers::pi * f / sr);
 	float K2 = K*K;
 

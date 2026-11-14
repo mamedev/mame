@@ -4,6 +4,7 @@
 #ifndef MAME_NINTENDO_GBA_H
 #define MAME_NINTENDO_GBA_H
 
+#include "cpu/arm7/arm7.h"
 #include "sound/gb.h"
 #include "machine/intelfsh.h"
 #include "bus/gba/gba_slot.h"
@@ -20,7 +21,9 @@ public:
 		m_ldac(*this, "ldac%c", 'a'),
 		m_rdac(*this, "rdac%c", 'a'),
 		m_gbsound(*this, "gbsound"),
-		m_io_inputs(*this, "INPUTS")
+		m_io_inputs(*this, "INPUTS"),
+		m_halted(false),
+		m_irq_asserted(false)
 	{ }
 
 	void gbadv(machine_config &config);
@@ -29,7 +32,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	required_device<cpu_device> m_maincpu;
+	required_device<arm7_cpu_device> m_maincpu;
 
 	void gba_map(address_map &map) ATTR_COLD;
 
@@ -39,8 +42,10 @@ private:
 	required_device_array<dac_8bit_r2r_twos_complement_device, 2> m_ldac;
 	required_device_array<dac_8bit_r2r_twos_complement_device, 2> m_rdac;
 	required_device<gameboy_sound_device> m_gbsound;
+	required_ioport m_io_inputs;
 
 	void request_irq(uint32_t int_type);
+	void update_irq();
 
 	void dma_exec(int ch);
 	void audio_tick(int ref);
@@ -56,9 +61,11 @@ private:
 	uint16_t m_timer_reload[4]{};
 	uint8_t m_timer_recalc[4]{};
 
-	emu_timer *m_tmr_timer[4]{}, *m_irq_timer = nullptr;
+	emu_timer *m_tmr_timer[4]{};
 
 	double m_timer_hz[4]{};
+
+	bool m_halted, m_irq_asserted;
 
 	struct fifo_t
 	{
@@ -81,9 +88,6 @@ private:
 	void dma_vblank_callback(int state);
 	TIMER_CALLBACK_MEMBER(dma_complete);
 	TIMER_CALLBACK_MEMBER(timer_expire);
-	TIMER_CALLBACK_MEMBER(handle_irq);
-
-	required_ioport m_io_inputs;
 };
 
 class gba_cons_state : public gba_state
@@ -108,8 +112,6 @@ protected:
 	required_region_ptr<uint32_t> m_region_maincpu;
 	required_device<gba_cart_slot_device> m_cart;
 	required_ioport m_bios_hack;
-
-	uint32_t m_bios_prefetch = 0;
 };
 
 

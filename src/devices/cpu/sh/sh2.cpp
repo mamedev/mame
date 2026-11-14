@@ -78,8 +78,6 @@ void sh2_device::device_start()
 	state_add(STATE_GENPCBASE, "CURPC", m_sh2_state->pc).callimport().noshow();
 
 	m_nmi_line_state = 0;
-
-	drc_start();
 }
 
 void sh2_device::device_reset()

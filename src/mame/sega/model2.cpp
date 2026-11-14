@@ -23,6 +23,8 @@
              yet it should appear underneath tilemap A ("shoot to select") which does not;
     - srallyc: initial enemy car placement seems to be slightly incorrect for a few cars,
                seems to be affected by i960 clock speed, may need wait state emulation to fix
+    - rchase2: doesn't playback F_00 / F_01 samples when entering sound test the first time around
+	           (verify), they do after triggering some samples first;
 
     Notes:
     - some analog games can be calibrated in service mode via volume control item ...
@@ -5523,10 +5525,11 @@ ROM_START( rchase2 ) /* Rail Chase 2 Revision A, Model 2B. Sega game ID# 833-118
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	// 16Mbit ROMs in 32Mbit sockets: A21 is not decoded, so each ROM is mirrored
+	// 27C160 x2 ROMs
 	ROM_LOAD16_WORD_SWAP("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
-	ROM_RELOAD(                          0x0200000, 0x200000 )
-	ROM_LOAD16_WORD_SWAP("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
-	ROM_RELOAD(                          0x0600000, 0x200000 )
+	ROM_RELOAD( 0x400000, 0x200000 )
+	ROM_LOAD16_WORD_SWAP("mpr-18030.33", 0x0200000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
+	ROM_RELOAD( 0x600000, 0x200000 )
 
 	/* Z80 code located on the I/O board type 837-11694. Z80 @ 4Mhz with 8-way DSW & SONY CXD1095Q QFP64 chip */
 	ROM_REGION( 0x8000, "iocpu", 0 )
@@ -5568,10 +5571,11 @@ ROM_START( rchase2a ) /* Rail Chase 2, Model 2B */
 
 	ROM_REGION16_BE( 0x800000, "samples", 0 ) // Samples
 	// 16Mbit ROMs in 32Mbit sockets: A21 is not decoded, so each ROM is mirrored
+	// 27C160 x2 ROMs
 	ROM_LOAD16_WORD_SWAP("mpr-18029.32", 0x0000000, 0x200000, CRC(f6804150) SHA1(ef40c11008c75d04159772ad30f02cdb8c5464f3) )
-	ROM_RELOAD(                          0x0200000, 0x200000 )
-	ROM_LOAD16_WORD_SWAP("mpr-18030.34", 0x0400000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
-	ROM_RELOAD(                          0x0600000, 0x200000 )
+	ROM_RELOAD( 0x400000, 0x200000 )
+	ROM_LOAD16_WORD_SWAP("mpr-18030.33", 0x0200000, 0x200000, CRC(1167615d) SHA1(bae0060aec3c15f08342f11df665c05c5703523d) )
+	ROM_RELOAD( 0x600000, 0x200000 )
 
 	/* Z80 code located on the I/O board type 837-11694. Z80 @ 4Mhz with 8-way DSW & SONY CXD1095Q QFP64 chip */
 	ROM_REGION( 0x8000, "iocpu", 0 )

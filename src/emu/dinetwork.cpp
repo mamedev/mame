@@ -190,15 +190,21 @@ void device_network_interface::set_loopback(bool loopback)
 
 void device_network_interface::log_bytes(const u8 *buf, int len)
 {
-	static const char *const frame_fmt = "%02x %02x %02x %02x %02x %02x %02x %02x\n";
+	static char const frame_fmt[] = "%02x %02x %02x %02x %02x %02x %02x %02x\n";
 
 	for (int i = 0; i < len / 8; i++)
+	{
 		device().logerror(frame_fmt,
-			buf[i * 8 + 0], buf[i * 8 + 1], buf[i * 8 + 2], buf[i * 8 + 3],
-			buf[i * 8 + 4], buf[i * 8 + 5], buf[i * 8 + 6], buf[i * 8 + 7]);
+				buf[i * 8 + 0], buf[i * 8 + 1], buf[i * 8 + 2], buf[i * 8 + 3],
+				buf[i * 8 + 4], buf[i * 8 + 5], buf[i * 8 + 6], buf[i * 8 + 7]);
+	}
 
 	if (int const tail = len % 8)
+	{
+		u8 tmp[8];
+		std::copy_n(&buf[len - tail], tail, tmp);
 		device().logerror(&frame_fmt[tail * 5],
-			buf[len - tail + 0], buf[len - tail + 1], buf[len - tail + 2], buf[len - tail + 3],
-			buf[len - tail + 4], buf[len - tail + 5], buf[len - tail + 6], buf[len - tail + 7]);
+				tmp[0], tmp[1], tmp[2], tmp[3],
+				tmp[4], tmp[5], tmp[6], tmp[7]);
+	}
 }

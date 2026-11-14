@@ -17,6 +17,8 @@ Video slots / mahjongs by VGame.
 #include "speaker.h"
 #include "tilemap.h"
 
+#include "util/multibyte.h"
+
 
 namespace {
 
@@ -25,22 +27,31 @@ class vgame_state : public driver_device
 public:
 	vgame_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		m_maincpu(*this, "maincpu"),
+		m_intram(*this, "intram")
 	{ }
 
 	void vgame(machine_config &config) ATTR_COLD;
 
-	void init_vgame() ATTR_COLD;
+	void init_program() ATTR_COLD;
+	void init_cjlddz() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
-
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void program_map(address_map &map) ATTR_COLD;
+
+	void decrypt_rom() ATTR_COLD;
+	void decrypt_program_to_ram() ATTR_COLD;
+
+	u32 m_program_address = 0;
+
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<u32> m_intram;
 };
 
 
@@ -54,10 +65,25 @@ void vgame_state::video_start()
 {
 }
 
+void vgame_state::machine_reset()
+{
+	decrypt_program_to_ram();
 
+	// decrypted code is in THUMB mode, jump to to it
+	uint32_t *rom = (uint32_t*)memregion("maincpu")->base();
+	rom[0] = 0xe59f0000;
+	rom[1] = 0xe12fff10;
+	rom[2] = 0x00200001;
+}
+
+
+// The external ROM executes at 0x20000000.  The missing internal loader
+// also decodes an executable block into RAM at 0x00200000.
 void vgame_state::program_map(address_map &map)
 {
-	map(0x000000, 0x1fffff).rom();
+	map(0x00000000, 0x0003ffff).rom(); // 256KB (or maybe 512KB) internal ROM
+	map(0x00200000, 0x0020ffff).ram().share(m_intram); // internal RAM area
+	map(0x20000000, 0x201fffff).rom().region("mainrom", 0);
 }
 
 
@@ -120,7 +146,7 @@ GFXDECODE_END
 
 void vgame_state::vgame(machine_config &config)
 {
-	ARM7(config, m_maincpu, 44_MHz_XTAL); // CPU core unknown (possibly AT91SAM7SE256 or similar); ROMs seem to contain at least some ARM or Thumb code
+	ARM7(config, m_maincpu, 44_MHz_XTAL); // likely AT91SAM7SE256/512; see board notes below
 	m_maincpu->set_addrmap(AS_PROGRAM, &vgame_state::program_map);
 	// m_maincpu->set_vblank_int("screen", FUNC(vgame_state::irq0_line_hold));
 
@@ -143,8 +169,12 @@ void vgame_state::vgame(machine_config &config)
 }
 
 // VGAME-0030-02-AI PCB
+// Hi Lice has bad program and graphics dumps; these ROMs need redumping.
 ROM_START( hilice )
-	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "internal.bin",  0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "hi_lice_v102fa.u13", 0x000000, 0x100000, BAD_DUMP CRC(4da87481) SHA1(5a20b254cfe8a2f087faa0dd17f682218a2ca1b2) ) // probably read as wrong ROM type
 	ROM_CONTINUE(                               0x000000, 0x100000 )
 
@@ -159,7 +189,10 @@ ROM_END
 // VGAME-0030-02-AG PCB, almost identical to the hilice one.
 // while all labels have 麻將學園 (Mahjong School) prepended to what's below, title screen shows 麻將學園 2 - Mahjong School 2
 ROM_START( mjxy2 )
-	ROM_REGION( 0x200000, "maincpu", 0 ) // dumped as EV29LV160 (same rare ROM as some IGS titles)
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "internal.bin",  0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "mainrom", 0 ) // dumped as EV29LV160 (same rare ROM as some IGS titles)
 	ROM_LOAD( "u12_v108tw.u12", 0x000000, 0x200000, CRC(a6d99849) SHA1(c280635517d5ffded524e15048568817bd927bf9) )
 
 	ROM_REGION( 0x400000, "gfx", 0 ) // dumped as EV29LV160 (same rare ROM as some IGS titles)
@@ -220,7 +253,10 @@ VGAME-0023-00-AE-1
         |----------------------------|
 Notes:
       VGAME-00x - CPU. Clock Input 44.000MHz on Pin 125.
-                  This seems to be an IGS027A-like chip with internal ROM in a QFP128 package.
+                  Likely a rebadged Atmel AT91SAM7SE256/512, with at least 256 KiB of internal flash.
+                  The QFP128 package, clock input on pin 125 and ROM/RAM address ranges match this family.
+                  The recovered 28-31 KiB RAM code at 0x00200000 fits the 32 KiB SRAM of these variants.
+                  Exact chip identification and internal flash capacity remain unconfirmed.
                   Each chip is printed with a game-specific code.
                   "VGAME-002" - Chao Ji Sai Jin Hua
                   "VGAME-007" - Chao Ji Dou Niu
@@ -259,7 +295,10 @@ Notes:
 */
 
 ROM_START( cjdn ) // Oct  1 2008 15:58:54 string in ROM
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "internal.bin",  0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "v305cn.u8", 0x000000, 0x200000, CRC(bffb20c0) SHA1(bf2293bfc4711d0b930c491f579418d5e7c0800f) )
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -272,7 +311,10 @@ ROM_START( cjdn ) // Oct  1 2008 15:58:54 string in ROM
 ROM_END
 
 ROM_START( cjsjh ) // Nov  2 2007 16:05:26 string in ROM
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "internal.bin",  0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "vxxxcn.u8", 0x000000, 0x200000, CRC(911d8dce) SHA1(1d9386c4a9e118d02b5b29f9e9ce90ef1d6f419f) ) // label not readable
 
 	ROM_REGION( 0x400000, "gfx", 0 )
@@ -286,7 +328,10 @@ ROM_START( cjsjh ) // Nov  2 2007 16:05:26 string in ROM
 ROM_END
 
 ROM_START( cjlddz )
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "internal.bin",  0x00000, 0x40000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x200000, "mainrom", 0 )
 	ROM_LOAD( "u12.u12", 0x000000, 0x200000, CRC(b35ff3cb) SHA1(fe1fa4448153a449f28b776ef452be860d119e7b) )
 
 	ROM_REGION( 0x800000, "gfx", 0 )
@@ -300,42 +345,63 @@ ROM_START( cjlddz )
 	ROM_LOAD16_WORD_SWAP( "cjlddz_93c66a.u13", 0x000, 0x200, CRC(3930b2ff) SHA1(69e1e7b8654ff3696ab7f210fa69a5aed9cb59fb) )
 ROM_END
 
-
-// TODO: very incomplete, just enough to show some strings
-void vgame_state::init_vgame()
+void vgame_state::decrypt_rom()
 {
-	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("mainrom")->base();
 
-	for (int i = 0; i < 0x200000; i += 2)
+	// Byte addresses.  Unused space follows p[n+1] = (253*p[n] + 41) & 0xff,
+	// providing known plaintext for both XOR bits over the entire address range.
+	for (uint32_t i = 0; i < memregion("mainrom")->bytes(); i += 2)
 	{
-		switch (i & 0x6232)
-		{
-			case 0x0000: rom[i] ^= 0x00; break;
-			case 0x0002: rom[i] ^= 0x20; break;
-			case 0x0010: rom[i] ^= 0x02; break;
-			case 0x0012: rom[i] ^= 0x22; break;
-			case 0x0020: rom[i] ^= 0x20; break;
-			case 0x0022: rom[i] ^= 0x20; break;
-			case 0x0030: rom[i] ^= 0x22; break;
-			case 0x0032: rom[i] ^= 0x22; break;
-			case 0x0200: rom[i] ^= 0x00; break;
-			case 0x0202: rom[i] ^= 0x00; break;
-			case 0x0210: rom[i] ^= 0x02; break;
-			case 0x0212: rom[i] ^= 0x02; break;
-			case 0x0220: rom[i] ^= 0x20; break;
-			case 0x0222: rom[i] ^= 0x20; break;
-			case 0x0230: rom[i] ^= 0x22; break;
-			case 0x0232: rom[i] ^= 0x22; break;
-			default: rom[i] ^= 0x22;
-		}
+		if (i & 0x2010)
+			rom[i] ^= 0x02;
+		if ((i & 0x2020) || ((i & 0x0202) == 0x0002))
+			rom[i] ^= 0x20;
 	}
+
+}
+
+void vgame_state::decrypt_program_to_ram()
+{
+	if (!m_program_address)
+		return;
+
+	uint8_t *rom = memregion("mainrom")->base();
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	// In these four dumps, the initial key equals the filler byte at 0x80000:
+	// cjdn 0x0e, cjsjh 0x0c, mjxy2 0x35, cjlddz 0x76.
+	uint8_t key = rom[0x80000];
+	uint32_t rambase = 0x00200000;
+	for (uint32_t i = 0; i < 0x10000; ++i)
+	{
+		space.write_byte(i + rambase, rom[m_program_address + i] ^ key);
+		key = (85 * key + 145) & 0xff;
+	}
+	for (uint32_t i = 0; i < 0x10000; i += 4)
+	{
+		uint32_t const word = space.read_dword(i + rambase);
+		space.write_dword(i + rambase, (word << 1) | (word >> 31));
+	}
+}
+
+void vgame_state::init_program()
+{
+	decrypt_rom();
+	m_program_address = 0x30000;
+}
+
+void vgame_state::init_cjlddz()
+{
+	decrypt_rom();
+	m_program_address = 0x70000;
 }
 
 } // anonymous namespace
 
 
-GAME( 200?, hilice,  0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Hi Lice (V102FA)",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, mjxy2,   0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Majiang Xueyuan 2 - Mahjong School (V108TW)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2008, cjdn,    0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Chao Ji Dou Niu (V305CN)",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2007, cjsjh,   0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Chao Ji Sai Jin Hua (V201CN)",                  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, cjlddz,  0, vgame, hilice, vgame_state, init_vgame, ROT0, "VGame", "Chao Ji Laizi Dou Dizhu (V109CN)",              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, hilice,  0, vgame, hilice, vgame_state, empty_init,   ROT0, "VGame", "Hi Lice (V102FA)",                              MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, mjxy2,   0, vgame, hilice, vgame_state, init_program, ROT0, "VGame", "Majiang Xueyuan 2 - Mahjong School (V108TW)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2008, cjdn,    0, vgame, hilice, vgame_state, init_program, ROT0, "VGame", "Chao Ji Dou Niu (V305CN)",                    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2007, cjsjh,   0, vgame, hilice, vgame_state, init_program, ROT0, "VGame", "Chao Ji Sai Jin Hua (V201CN)",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, cjlddz,  0, vgame, hilice, vgame_state, init_cjlddz,  ROT0, "VGame", "Chao Ji Laizi Dou Dizhu (V109CN)",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

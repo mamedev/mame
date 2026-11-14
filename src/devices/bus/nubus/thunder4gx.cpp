@@ -67,14 +67,12 @@ protected:
 	required_device<palette_device> m_palette;
 	required_ioport m_monitor_config;
 
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-	// optional information overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	u32 registers_r(offs_t offset, u32 mem_mask);
 	void registers_w(offs_t offset, u32 data, u32 mem_mask);
@@ -90,7 +88,7 @@ private:
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_w(int state);
 
-	void card_map(address_map &map);
+	void card_map(address_map &map) ATTR_COLD;
 
 	std::unique_ptr<u32[]> m_vram;
 	u32 m_mode, m_irq_control;
@@ -888,7 +886,8 @@ public:
 	{
 	}
 
-	virtual const tiny_rom_entry *device_rom_region() const override;
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 ROM_START( thundergx1600 )

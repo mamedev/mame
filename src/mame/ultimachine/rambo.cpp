@@ -86,8 +86,8 @@ void rambo_state::rambo(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &rambo_state::rambo_data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->set_low_fuses(0xff);
-	m_maincpu->set_high_fuses(0xda);
-	m_maincpu->set_extended_fuses(0xf4);
+	m_maincpu->set_high_fuses(0xd0);
+	m_maincpu->set_extended_fuses(0xfd);
 	m_maincpu->set_lock_bits(0x0f);
 	m_maincpu->gpio_in<atmega2560_device::GPIOA>().set([this]() { return m_port_a; });
 	m_maincpu->gpio_out<atmega2560_device::GPIOA>().set([this](uint8_t data) { m_port_a = data; });
@@ -152,13 +152,9 @@ ROM_START( metamaq2 )
 	/* SOURCE(https://github.com/Metamaquina/Repetier-Firmware/tree/MM2_2013_10_15) */
 	ROMX_LOAD("repetier-fw-metamaquina2-2013-10-15.bin", 0x0000, 0x102c8, CRC(520134bd) SHA1(dfe2251aad06972f237eb4920ce14ccb32da5af0), ROM_BIOS(11))
 
-	/*Arduino MEGA bootloader */
-	/* This is marked as a BAD_DUMP because we're not sure this is the bootloader we're actually using.
-	   This is inherited from the Replicator 1 driver.
-	   A proper dump would be good.
-	   Also, it is not clear whether there's any difference in the bootloader
-	   between the ATMEGA1280 and the ATMEGA2560 MCUs */
-	ROM_LOAD( "atmegaboot_168_atmega1280.bin", 0x3f000, 0x0f16, BAD_DUMP CRC(c041f8db) SHA1(d995ebf360a264cccacec65f6dc0c2257a3a9224) )
+	// Bootloader is stk500boot, as described on https://reprap.org/wiki/Rambo_development
+	// Marked BAD_DUMP because it's not from real hardware; a real dump should replace this.
+	ROM_LOAD( "stk500boot_v2_mega2560.bin", 0x3e000, 0x1d1e, BAD_DUMP CRC(14a27e35) SHA1(01d7e1e143286f23f7bc9c1d7eec1acf69fa0c45) )
 
 	/* on-die 4kbyte eeprom */
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )

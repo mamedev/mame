@@ -1652,7 +1652,7 @@ void zaurus_mie_state::mie21(machine_config &config)
 	SH7709(config, m_maincpu, 167'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zaurus_mie_state::mie_map);
 
-	TOSHIBA_TC58256AFT(config, m_nand); // actually TC58128FT
+	TOSHIBA_TC58128FT(config, m_nand);
 }
 
 void zaurus_sa_state::zaurus_sa1110(machine_config &config)

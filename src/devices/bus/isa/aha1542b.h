@@ -24,6 +24,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
+
 	void i8085_base_map(address_map &map) ATTR_COLD;
 	void scsi_add(machine_config &config);
 

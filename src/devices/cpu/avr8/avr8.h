@@ -704,7 +704,7 @@ protected:
 
 	struct interrupt_condition
 	{
-		uint8_t  m_intidx; 	     // one of the INTIDX_x universal interrupt mappings
+		uint8_t  m_intidx;       // one of the INTIDX_x universal interrupt mappings
 		uint8_t  m_intvector;    // interrupt vector number
 		uint8_t  m_intreg;       // register containing interrupt enable flag
 		uint8_t  m_intmask;      // bitmask for the interrupt enable flag itself
@@ -784,12 +784,13 @@ protected:
 	int m_icount;
 
 	// Interrupt handling tables
-	uint8_t m_int_statuses[INTIDX_COUNT];   // persistent, must be savestate-able
+	uint64_t m_int_pending[2];              // interrupt pending flags as bitmask ordered by vector ids (some AVRs use more than 64 vectors); MUST BE SAVESTATE-ABLE
+	uint8_t m_vector_to_intidx[128];        // vector number -> INTIDX_x (INTIDX_COUNT = unmapped); rebuilt at device_start
 	std::unique_ptr<interrupt_condition[]> m_int_conditions_table; // rebuilt at device_start
 
 	// Interrupt handling size for the AVR8s is usually 2; some devices will only use 1
 	virtual uint8_t vector_size_in_words() const { return 2; }
-	
+
 	// memory access
 	inline void push(uint8_t val);
 	inline uint8_t pop();
@@ -802,14 +803,15 @@ protected:
 	void fire_interrupts();
 	inline bool interrupt_condition_entry_is_terminator(interrupt_condition condition);
 	void populate_interrupt_condition_table();
+	void set_interrupt_flag(uint8_t intidx, bool state);
 	void update_interrupt(uint8_t intidx);
-	
+
 	/**
 	 * Set interrupt flag for the given intidx. If the interrupt is also enabled,
 	 * set it to fire.
 	 */
 	void set_interrupt(uint8_t intidx);
-	
+
 	/**
 	 * Clear interrupt flag for the given intidx. If the interrupt was pending,
 	 * then disable it.

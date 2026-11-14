@@ -69,17 +69,15 @@ public:
 protected:
 	nubus_m2hires_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-
 	TIMER_CALLBACK_MEMBER(vbl_tick);
 
-	void card_map(address_map &map);
+	void card_map(address_map &map) ATTR_COLD;
 
 	virtual u32 vblank_r(offs_t offset, u32 mem_mask = ~0);
 	virtual void ramdac_w(offs_t offset, u32 data);
@@ -107,10 +105,10 @@ private:
 
 void nubus_m2hires_device::card_map(address_map &map)
 {
-	map(0x00'0000, 0x07'ffff).rw(FUNC(nubus_m2hires_device::vram_r), FUNC(nubus_m2hires_device::vram_w)).mirror(0xf00000);
-	map(0x08'0000, 0x08'ffff).w(FUNC(nubus_m2hires_device::registers_w)).mirror(0xf00000);
-	map(0x09'0000, 0x09'ffff).rw(FUNC(nubus_m2hires_device::vblank_r), FUNC(nubus_m2hires_device::ramdac_w)).mirror(0xf00000);
-	map(0x0a'0000, 0x0a'ffff).w(FUNC(nubus_m2hires_device::vbl_w)).umask32(0xffffffff).mirror(0xf00000);
+	map(0x00'0000, 0x07'ffff).mirror(0xf0'0000).rw(FUNC(nubus_m2hires_device::vram_r), FUNC(nubus_m2hires_device::vram_w));
+	map(0x08'0000, 0x08'ffff).mirror(0xf0'0000).w(FUNC(nubus_m2hires_device::registers_w));
+	map(0x09'0000, 0x09'ffff).mirror(0xf0'0000).rw(FUNC(nubus_m2hires_device::vblank_r), FUNC(nubus_m2hires_device::ramdac_w));
+	map(0x0a'0000, 0x0a'ffff).mirror(0xf0'0000).umask32(0xffff'ffff).w(FUNC(nubus_m2hires_device::vbl_w));
 }
 
 ROM_START( m2hires )

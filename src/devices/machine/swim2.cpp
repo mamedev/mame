@@ -138,7 +138,7 @@ u8 swim2_device::read(offs_t offset)
 	}
 
 	case 0x3: { // param
-		u8 r = m_param[m_param_idx];
+		const u8 r = (m_param_idx & 1) ? 0 : (m_param[m_param_idx] & 0xf0);
 		m_param_idx = (m_param_idx + 1) & 3;
 		return r;
 	}
@@ -396,9 +396,9 @@ void swim2_device::sync()
 				if(bit) {
 					if(m_floppy)
 						m_floppy->write_flux_change(cycles_to_time(next_sync - (cycles >> 1)));
-					m_half_cycles_before_change = 63;
+					m_half_cycles_before_change = m_setup & 0x40 ? 64 : 62;
 				} else
-					m_half_cycles_before_change = m_setup & 0x40 ? 63 : 31;
+					m_half_cycles_before_change = m_setup & 0x40 ? 64 : 32;
 				if(m_setup & 8)
 					m_half_cycles_before_change <<= 1;
 				continue;

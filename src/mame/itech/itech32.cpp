@@ -2777,12 +2777,12 @@ ROM_START( wcbowl15 )   // Version 1.5 (3-tier board set: P/N 1059 Rev 3, P/N 10
 
 	ROM_REGION( 0x880000, "grom", 0 )
 	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg ROMs:
-	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
 	*/
-	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3.grm0_3", 0x000003, 0x080000, CRC(019d0ab8) SHA1(3281eada296ad746da80ef6e5909c50b03b90d08) )
@@ -2811,12 +2811,12 @@ ROM_START( wcbowl14 )   // Version 1.4 (3-tier board set: P/N 1059 Rev 3, P/N 10
 
 	ROM_REGION( 0x880000, "grom", 0 )
 	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg ROMs:
-	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
 	*/
-	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3.grm0_3", 0x000003, 0x080000, CRC(019d0ab8) SHA1(3281eada296ad746da80ef6e5909c50b03b90d08) )
@@ -2845,12 +2845,12 @@ ROM_START( wcbowl13 )   // Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 10
 
 	ROM_REGION( 0x880000, "grom", 0 )
 	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg ROMs:
-	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
 	*/
-	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3.grm0_3", 0x000003, 0x080000, CRC(019d0ab8) SHA1(3281eada296ad746da80ef6e5909c50b03b90d08) )
@@ -2879,12 +2879,12 @@ ROM_START( wcbowl13j )  // Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 10
 
 	ROM_REGION( 0x880000, "grom", 0 )
 	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg roms:
-	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
 	*/
-	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3.grm0_3", 0x000003, 0x080000, CRC(019d0ab8) SHA1(3281eada296ad746da80ef6e5909c50b03b90d08) )
@@ -2913,12 +2913,12 @@ ROM_START( wcbowl12 )   // Version 1.2 (3-tier board set: P/N 1059 Rev 3, P/N 10
 
 	ROM_REGION( 0x880000, "grom", 0 )
 	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg ROMs:
-	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
 	*/
-	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3.grm0_3", 0x000003, 0x080000, CRC(019d0ab8) SHA1(3281eada296ad746da80ef6e5909c50b03b90d08) )
@@ -2947,12 +2947,12 @@ ROM_START( wcbowl11 )   // Version 1.1 (3-tier board set: P/N 1059 Rev 3, P/N 10
 
 	ROM_REGION( 0x880000, "grom", 0 )
 	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg ROMs:
-	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
 	*/
-	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3.grm0_3", 0x000003, 0x080000, CRC(019d0ab8) SHA1(3281eada296ad746da80ef6e5909c50b03b90d08) )
@@ -2981,12 +2981,12 @@ ROM_START( wcbowl10 )   // Version 1.0 (3-tier board set: P/N 1059 Rev 3, P/N 10
 
 	ROM_REGION( 0x880000, "grom", 0 )
 	/* No known set specifically checks for this, however the GROM data may be in the form of four 8 Meg ROMs:
-	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0_+.grm0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1_+.grm0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2_+.grm0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3_+.grm0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
 	*/
-	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" ect
+	ROM_LOAD32_BYTE( "wcb_grom0_0.grm0_0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) ) // May also be labeled as "WCB GRM0_0" etc.
 	ROM_LOAD32_BYTE( "wcb_grom0_1.grm0_1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
 	ROM_LOAD32_BYTE( "wcb_grom0_2.grm0_2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
 	ROM_LOAD32_BYTE( "wcb_grom0_3.grm0_3", 0x000003, 0x080000, CRC(019d0ab8) SHA1(3281eada296ad746da80ef6e5909c50b03b90d08) )
@@ -3004,7 +3004,42 @@ ROM_START( wcbowl10 )   // Version 1.0 (3-tier board set: P/N 1059 Rev 3, P/N 10
 	ROM_LOAD16_BYTE( "wcb__srom1.srom1",  0x100000, 0x080000, CRC(87a4a4d8) SHA1(60db2f466686481857eb39b90ac7a19d0a96adac) )
 ROM_END
 
-ROM_START( wcbowldx )   // Deluxe version 2.00 (PCB P/N 1083 Rev 2), This version is derived from the Tournament v1.40 set, but tournament features have be removed/disabled
+ROM_START( wcbowldx )   // Deluxe version 2.01 (PCB P/N 1083 Rev 2), This version is derived from the Tournament v1.40 set, but tournament features have been removed/disabled
+	ROM_REGION32_BE( CODE_SIZE, "maindata", 0 )
+	ROM_LOAD32_BYTE( "wcbd_prom0_v2.01.prom0", 0x00000, 0x20000, CRC(36f8a66c) SHA1(997a8df19584cb95987d71066bb21a1516011ac5) )
+	ROM_LOAD32_BYTE( "wcbd_prom1_v2.01.prom1", 0x00001, 0x20000, CRC(307f31cf) SHA1(7d041d26a9f8fdf350e8422c65ba49e7e304e571) )
+	ROM_LOAD32_BYTE( "wcbd_prom2_v2.01.prom2", 0x00002, 0x20000, CRC(ac076838) SHA1(514990004616087bb3533c53958d61dda67f4c94) )
+	ROM_LOAD32_BYTE( "wcbd_prom3_v2.01.prom3", 0x00003, 0x20000, CRC(6e76e159) SHA1(c23edad7274eaed37e9b76f62f21833bd26c1092) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) // actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0 or v4.0T
+	ROM_CONTINUE(                    0x08000, 0x08000 )
+
+	ROM_REGION( 0x880000, "grom", 0 )
+	ROM_LOAD32_BYTE( "wcbd_grom0_0_s.grm0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) ) // may be labeled "WCB GROM0_0 S" etc.
+	ROM_LOAD32_BYTE( "wcbd_grom0_1_s.grm0_1", 0x000001, 0x080000, CRC(2ae31f45) SHA1(85218aa9a7ca7c6870427ffbd08b78255813ff90) )
+	ROM_LOAD32_BYTE( "wcbd_grom0_2_s.grm0_2", 0x000002, 0x080000, CRC(bccc0f35) SHA1(2389662e881e86f8cdb36eb2a082923d976676c8) )
+	ROM_LOAD32_BYTE( "wcbd_grom0_3_s.grm0_3", 0x000003, 0x080000, CRC(ab1da462) SHA1(3f3a4a083483d2d95d5ef540eea077cad799fcb7) )
+	ROM_LOAD32_BYTE( "wcbd_grom1_0_s.grm1_0", 0x200000, 0x080000, CRC(bdfafd1f) SHA1(bc0e6fe83d3f8e88c2e55ba3a436875d5470de5b) )
+	ROM_LOAD32_BYTE( "wcbd_grom1_1_s.grm1_1", 0x200001, 0x080000, CRC(7d6baa2e) SHA1(c47854b064aa96d2581c23afe13cd05a36f9dae3) )
+	ROM_LOAD32_BYTE( "wcbd_grom1_2_s.grm1_2", 0x200002, 0x080000, CRC(7513d3de) SHA1(b17650ed5210860c3bde53647a30f8fce67aaa38) )
+	ROM_LOAD32_BYTE( "wcbd_grom1_3_s.grm1_3", 0x200003, 0x080000, CRC(e46877e6) SHA1(f50c904ec5b2b8cbc92f2b28641433c91ee17af5) )
+	ROM_LOAD32_BYTE( "wcbd_grom2_0_s.grm2_0", 0x400000, 0x040000, CRC(3b4c5a5c) SHA1(152cbc5d1aa84012f49fa13d91fd89a10f874508) )
+	ROM_LOAD32_BYTE( "wcbd_grom2_1_s.grm2_1", 0x400001, 0x040000, CRC(ed0b9b26) SHA1(5173e3936cae419255b3034e2b8a69f6bd136b93) )
+	ROM_LOAD32_BYTE( "wcbd_grom2_2_s.grm2_2", 0x400002, 0x040000, CRC(4b9e345e) SHA1(6842a8a6690db8478bdbb8e8119d3eef5e77439b) )
+	ROM_LOAD32_BYTE( "wcbd_grom2_3_s.grm2_3", 0x400003, 0x040000, CRC(4e13ee7a) SHA1(245ce87cd6839119a9a976b9a90cd1028aa3e291) )
+	ROM_FILL(                      0x500000, 0x380000, 0xff )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "wcb_srom0_s.srom0",  0x000000, 0x080000, CRC(d42dd283) SHA1(8ef75c398d1c51d2d7d299ac309a2352179864d9) ) // Newer sound sample ROMs
+	ROM_LOAD16_BYTE( "wcb_srom1_s.srom1",  0x200000, 0x080000, CRC(7a69ab54) SHA1(d1f9194446e235af69c6ff28af0dccc44ab9b5d3) ) // Newer sound sample ROMs
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.1", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "wcb_srom2_s.srom2",  0x000000, 0x080000, CRC(346530a2) SHA1(9951971ad6d368fb718027e18331d12f0a72970c) ) // Newer sound sample ROMs
+	ROM_LOAD16_BYTE( "wcb_srom3_s.srom3",  0x200000, 0x040000, CRC(1dfe3a31) SHA1(94947f495692288fbf14fc7796a84c5548a2e8a8) ) // Newer sound sample ROMs, ROM is a 27C020 in this set
+ROM_END
+
+ROM_START( wcbowldx200 )   // Deluxe version 2.00 (PCB P/N 1083 Rev 2), This version is derived from the Tournament v1.40 set, but tournament features have been removed/disabled
 	ROM_REGION32_BE( CODE_SIZE, "maindata", 0 )
 	ROM_LOAD32_BYTE( "wcbd_prom0_2.00.prom0", 0x00000, 0x20000, CRC(280df7f0) SHA1(dacffe8fc21263093b0f4a4fbf444abd49afbff1) )
 	ROM_LOAD32_BYTE( "wcbd_prom1_2.00.prom1", 0x00001, 0x20000, CRC(526eded0) SHA1(106d5503ed4db2411e1f3446d613eac525a8a9cc) )
@@ -3012,11 +3047,11 @@ ROM_START( wcbowldx )   // Deluxe version 2.00 (PCB P/N 1083 Rev 2), This versio
 	ROM_LOAD32_BYTE( "wcbd_prom3_2.00.prom3", 0x00003, 0x20000, CRC(43ecad0b) SHA1(890a843c162c052a790e432db10f968875be835c) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) // actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0
+	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) // actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0 or v4.0T
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "grom", 0 )
-	ROM_LOAD32_BYTE( "wcbd_grom0_0_s.grm0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) )
+	ROM_LOAD32_BYTE( "wcbd_grom0_0_s.grm0_0", 0x000000, 0x080000, CRC(6fcb4246) SHA1(91fb5d18ea9494b08251d1e611c80414df3aad66) ) // may be labeled "WCB GROM0_0 S" etc.
 	ROM_LOAD32_BYTE( "wcbd_grom0_1_s.grm0_1", 0x000001, 0x080000, CRC(2ae31f45) SHA1(85218aa9a7ca7c6870427ffbd08b78255813ff90) )
 	ROM_LOAD32_BYTE( "wcbd_grom0_2_s.grm0_2", 0x000002, 0x080000, CRC(bccc0f35) SHA1(2389662e881e86f8cdb36eb2a082923d976676c8) )
 	ROM_LOAD32_BYTE( "wcbd_grom0_3_s.grm0_3", 0x000003, 0x080000, CRC(ab1da462) SHA1(3f3a4a083483d2d95d5ef540eea077cad799fcb7) )
@@ -3047,7 +3082,7 @@ ROM_START( wcbowl140 )  // Version 1.40 Tournament (PCB P/N 1083 Rev 2)
 	ROM_LOAD32_BYTE( "wcbf_prom3_1.40.prom3", 0x00003, 0x20000, CRC(c41258a4) SHA1(182e8a25bdb126a4de8a44a1c26fd8b66f06d66e) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) // actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0
+	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) // actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0 or v4.0T
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C54
@@ -3085,7 +3120,7 @@ ROM_START( wcbowl130 )  // Version 1.30 Tournament (PCB P/N 1083 Rev 2)
 	ROM_LOAD32_BYTE( "wcb_prom3_v1.30t.prom3", 0x00003, 0x20000, CRC(47e26d4b) SHA1(44459daef1ffe19640b26adcf122dfcd4a327a68) )
 
 	ROM_REGION( 0x28000, "soundcpu", 0 )
-	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) // actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0
+	ROM_LOAD( "wcbsnd_u88_4.01.u88", 0x10000, 0x18000, CRC(e97a6d28) SHA1(96d7b7856918abcc460083f2a46582ba2a689288) ) // actually labeled as "WCBSND(U88)4.01" but may be labeled v4.0 or v4.0T
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x2000, "pic", 0 ) // PIC16C54
@@ -3562,7 +3597,7 @@ ROM_START( gt3d )   // Version 1.93N for the single large type PCB P/N 1083 Rev 
 	ROM_LOAD32_BYTE( "gtg3_grom1_1.grm1_1",   0x200001, 0x80000, CRC(0aadfad2) SHA1(56a283b30a13b77ec53b7ae2b4129d44b7fa25d4) )
 	ROM_LOAD32_BYTE( "gtg3_grom1_2.grm1_2",   0x200002, 0x80000, CRC(27871980) SHA1(fe473d12cb4805e25dcac8f9ae187891936b961b) )
 	ROM_LOAD32_BYTE( "gtg3_grom1_3.grm1_3",   0x200003, 0x80000, CRC(7dbc242b) SHA1(9aa5074cad633446e0110a1a3d9c6e1f2158070a) )
-	ROM_LOAD32_BYTE( "gtg3_grom2_0_t.grm2_0", 0x400000, 0x80000, CRC(80ae7148) SHA1(e19d3390a2a0dad260d770fdbbb64d1f8e43d53f) ) // actually labeled as "GTG3 GROM2_0 T" ect
+	ROM_LOAD32_BYTE( "gtg3_grom2_0_t.grm2_0", 0x400000, 0x80000, CRC(80ae7148) SHA1(e19d3390a2a0dad260d770fdbbb64d1f8e43d53f) ) // actually labeled as "GTG3 GROM2_0 T" etc.
 	ROM_LOAD32_BYTE( "gtg3_grom2_1_t.grm2_1", 0x400001, 0x80000, CRC(0f85a618) SHA1(d9ced21c20f9ed6b7f19e7645d75b239ea709b79) )
 	ROM_LOAD32_BYTE( "gtg3_grom2_2_t.grm2_2", 0x400002, 0x80000, CRC(09ca5fbf) SHA1(6a6ed4d5d76035d8acc33c6494fba6012194362e) )
 	ROM_LOAD32_BYTE( "gtg3_grom2_3_t.grm2_3", 0x400003, 0x80000, CRC(d136853a) SHA1(0777d6bfab9e3d57c2a61d058fd185fc1f547698) )
@@ -3916,7 +3951,7 @@ ROM_START( gt3dt231 ) // Version 2.31 Tournament Edition (PCB P/N 1083 Rev 2)
 	ROM_LOAD32_BYTE( "gtg3_grom1_1.grm1_1",   0x200001, 0x80000, CRC(0aadfad2) SHA1(56a283b30a13b77ec53b7ae2b4129d44b7fa25d4) )
 	ROM_LOAD32_BYTE( "gtg3_grom1_2.grm1_2",   0x200002, 0x80000, CRC(27871980) SHA1(fe473d12cb4805e25dcac8f9ae187891936b961b) )
 	ROM_LOAD32_BYTE( "gtg3_grom1_3.grm1_3",   0x200003, 0x80000, CRC(7dbc242b) SHA1(9aa5074cad633446e0110a1a3d9c6e1f2158070a) )
-	ROM_LOAD32_BYTE( "gtg3_grom2_0_t.grm2_0", 0x400000, 0x80000, CRC(80ae7148) SHA1(e19d3390a2a0dad260d770fdbbb64d1f8e43d53f) ) // actually labeled as "GTG3 GROM2_0 T" ect
+	ROM_LOAD32_BYTE( "gtg3_grom2_0_t.grm2_0", 0x400000, 0x80000, CRC(80ae7148) SHA1(e19d3390a2a0dad260d770fdbbb64d1f8e43d53f) ) // actually labeled as "GTG3 GROM2_0 T" etc.
 	ROM_LOAD32_BYTE( "gtg3_grom2_1_t.grm2_1", 0x400001, 0x80000, CRC(0f85a618) SHA1(d9ced21c20f9ed6b7f19e7645d75b239ea709b79) )
 	ROM_LOAD32_BYTE( "gtg3_grom2_2_t.grm2_2", 0x400002, 0x80000, CRC(09ca5fbf) SHA1(6a6ed4d5d76035d8acc33c6494fba6012194362e) )
 	ROM_LOAD32_BYTE( "gtg3_grom2_3_t.grm2_3", 0x400003, 0x80000, CRC(d136853a) SHA1(0777d6bfab9e3d57c2a61d058fd185fc1f547698) )
@@ -3946,7 +3981,7 @@ ROM_START( gt3dt230 ) // Version 2.30 Tournament Edition (PCB P/N 1083 Rev 2)
 	ROM_LOAD32_BYTE( "gtg3_grom1_1.grm1_1",   0x200001, 0x80000, CRC(0aadfad2) SHA1(56a283b30a13b77ec53b7ae2b4129d44b7fa25d4) )
 	ROM_LOAD32_BYTE( "gtg3_grom1_2.grm1_2",   0x200002, 0x80000, CRC(27871980) SHA1(fe473d12cb4805e25dcac8f9ae187891936b961b) )
 	ROM_LOAD32_BYTE( "gtg3_grom1_3.grm1_3",   0x200003, 0x80000, CRC(7dbc242b) SHA1(9aa5074cad633446e0110a1a3d9c6e1f2158070a) )
-	ROM_LOAD32_BYTE( "gtg3_grom2_0_t.grm2_0", 0x400000, 0x80000, CRC(80ae7148) SHA1(e19d3390a2a0dad260d770fdbbb64d1f8e43d53f) ) // actually labeled as "GTG3 GROM2_0 T" ect
+	ROM_LOAD32_BYTE( "gtg3_grom2_0_t.grm2_0", 0x400000, 0x80000, CRC(80ae7148) SHA1(e19d3390a2a0dad260d770fdbbb64d1f8e43d53f) ) // actually labeled as "GTG3 GROM2_0 T" etc.
 	ROM_LOAD32_BYTE( "gtg3_grom2_1_t.grm2_1", 0x400001, 0x80000, CRC(0f85a618) SHA1(d9ced21c20f9ed6b7f19e7645d75b239ea709b79) )
 	ROM_LOAD32_BYTE( "gtg3_grom2_2_t.grm2_2", 0x400002, 0x80000, CRC(09ca5fbf) SHA1(6a6ed4d5d76035d8acc33c6494fba6012194362e) )
 	ROM_LOAD32_BYTE( "gtg3_grom2_3_t.grm2_3", 0x400003, 0x80000, CRC(d136853a) SHA1(0777d6bfab9e3d57c2a61d058fd185fc1f547698) )
@@ -3968,7 +4003,7 @@ ROM_START( gt3dt211 ) // Version 2.11 Tournament Edition (PCB P/N 1083 Rev 2)
 	ROM_CONTINUE(                    0x08000, 0x08000 )
 
 	ROM_REGION( 0x600000, "grom", 0 )
-	ROM_LOAD32_BYTE( "gtg3_grom0_0++.grm0_0", 0x000000, 0x100000, CRC(22c481b7) SHA1(399bffec5e3b27aec2ebd8d7d49689b92f453e39) ) // actually labeled "GTG3 GROM0_0**" ect
+	ROM_LOAD32_BYTE( "gtg3_grom0_0++.grm0_0", 0x000000, 0x100000, CRC(22c481b7) SHA1(399bffec5e3b27aec2ebd8d7d49689b92f453e39) ) // actually labeled "GTG3 GROM0_0**" etc.
 	ROM_LOAD32_BYTE( "gtg3_grom0_1++.grm0_1", 0x000001, 0x100000, CRC(40e4032b) SHA1(e8a39ce415cf2326464efc5af23e9b7921621932) )
 	ROM_LOAD32_BYTE( "gtg3_grom0_2++.grm0_2", 0x000002, 0x100000, CRC(67a02ef9) SHA1(4f9e5217eeaf68fc72af1dc9e3a16d876de8d11d) )
 	ROM_LOAD32_BYTE( "gtg3_grom0_3++.grm0_3", 0x000003, 0x100000, CRC(1173a710) SHA1(1f612c1efbf38796707f5b5fecf9d4044691f031) )
@@ -3976,7 +4011,7 @@ ROM_START( gt3dt211 ) // Version 2.11 Tournament Edition (PCB P/N 1083 Rev 2)
 	The above 4 ROMs have the same exact data as the other sets, but in 8 meg ROMs instead of 4 meg ROMs.
 	This is the only set that specifically checks for these ROMs in this format
 	*/
-	ROM_LOAD32_BYTE( "gtg3_grom1_0+.grm1_0", 0x400000, 0x080000, CRC(80ae7148) SHA1(e19d3390a2a0dad260d770fdbbb64d1f8e43d53f) ) // actually labeled "GTG3 GROM1_0*" ect
+	ROM_LOAD32_BYTE( "gtg3_grom1_0+.grm1_0", 0x400000, 0x080000, CRC(80ae7148) SHA1(e19d3390a2a0dad260d770fdbbb64d1f8e43d53f) ) // actually labeled "GTG3 GROM1_0*" etc.
 	ROM_LOAD32_BYTE( "gtg3_grom1_1+.grm1_1", 0x400001, 0x080000, CRC(0f85a618) SHA1(d9ced21c20f9ed6b7f19e7645d75b239ea709b79) )
 	ROM_LOAD32_BYTE( "gtg3_grom1_2+.grm1_2", 0x400002, 0x080000, CRC(09ca5fbf) SHA1(6a6ed4d5d76035d8acc33c6494fba6012194362e) )
 	ROM_LOAD32_BYTE( "gtg3_grom1_3+.grm1_3", 0x400003, 0x080000, CRC(d136853a) SHA1(0777d6bfab9e3d57c2a61d058fd185fc1f547698) )
@@ -4404,7 +4439,7 @@ ROM_START( gtdiamond )  // Version 3.05TL Tournament Edition (PCB P/N 1083 Rev 2
 
 	// The Euro version has different GROM2_x compared to the standard US versions.
 
-	ROM_LOAD32_BYTE( "gt98_grome2_0.grm2_0", 0x400000, 0x80000, CRC(0c898920) SHA1(9e656f94e79fd16a51706559fbe66fd0df1e670c) ) // actually labeled "GT98 GROME2_0" ect..
+	ROM_LOAD32_BYTE( "gt98_grome2_0.grm2_0", 0x400000, 0x80000, CRC(0c898920) SHA1(9e656f94e79fd16a51706559fbe66fd0df1e670c) ) // actually labeled "GT98 GROME2_0" etc.
 	ROM_LOAD32_BYTE( "gt98_grome2_1.grm2_1", 0x400001, 0x80000, CRC(cbe5b2b2) SHA1(f661dbd472775c99a5a4b35965c992b3de6e0984) )
 	ROM_LOAD32_BYTE( "gt98_grome2_2.grm2_2", 0x400002, 0x80000, CRC(71bd4441) SHA1(6cb36aafb50ec0a9193a1a885f31a02d1fdd059d) )
 	ROM_LOAD32_BYTE( "gt98_grome2_3.grm2_3", 0x400003, 0x80000, CRC(86149804) SHA1(32fcde6061c9cea991c8d1d96e32b99a5ef2e825) )
@@ -5230,7 +5265,8 @@ GAME( 1995, wcbowl13j,    wcbowl,   bloodstm, wcbowlj,  itech32_state,  init_wcb
 GAME( 1995, wcbowl12,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",                                 "World Class Bowling (v1.2)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITBWL-1
 GAME( 1995, wcbowl11,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",                                 "World Class Bowling (v1.1)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITBWL-1
 GAME( 1995, wcbowl10,     wcbowl,   bloodstm, wcbowl,   itech32_state,  init_wcbowl,   ROT0, "Incredible Technologies",                                 "World Class Bowling (v1.0)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITBWL-1
-GAME( 1999, wcbowldx,     wcbowl,   sftm,     wcbowldx, itech32_state,  init_shufshot, ROT0, "Incredible Technologies",                                 "World Class Bowling Deluxe (v2.00)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITBWL-4
+GAME( 1999, wcbowldx,     wcbowl,   sftm,     wcbowldx, itech32_state,  init_shufshot, ROT0, "Incredible Technologies",                                 "World Class Bowling Deluxe (v2.01)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITBWL-4
+GAME( 1999, wcbowldx200,  wcbowl,   sftm,     wcbowldx, itech32_state,  init_shufshot, ROT0, "Incredible Technologies",                                 "World Class Bowling Deluxe (v2.00)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITBWL-4
 GAME( 1997, wcbowl140,    wcbowl,   tourny,   wcbowldx, itech32_state,  init_wcbowlt,  ROT0, "Incredible Technologies",                                 "World Class Bowling Tournament (v1.40)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITBWL-3
 GAME( 1997, wcbowl130,    wcbowl,   tourny,   wcbowlo,  itech32_state,  init_wcbowlt,  ROT0, "Incredible Technologies",                                 "World Class Bowling Tournament (v1.30)" , MACHINE_SUPPORTS_SAVE ) // PIC 16C54 labeled as ITBWL-3
 

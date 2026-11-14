@@ -46,7 +46,7 @@ void lpc210x_device::lpc2103_map(address_map &map)
 
 lpc210x_device::lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, LPC2103, tag, owner, clock, 4, ARCHFLAG_T, ENDIANNESS_LITTLE)
-	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, address_map_constructor(FUNC(lpc210x_device::lpc2103_map), this))
+	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0, 32, 12, address_map_constructor(FUNC(lpc210x_device::lpc2103_map), this))
 	, m_vic(*this, "vic")
 {
 }

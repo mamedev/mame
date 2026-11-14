@@ -120,12 +120,10 @@ void m50734_device::step_motor(int which)
 void m50734_device::clock_motor(int which)
 {
 	// Timer underflow (while linked) and single shot share one clock for HC/VC and HPHC/VPHC
-	if (--m_step_counter[which] == 0 && !BIT(m_interrupt_control[0], which * 2 + 5))
+	if (--m_step_counter[which] == 0)
 	{
 		LOGMASKED(LOG_TIMER, "%s counter empty at %s\n", which ? "Vertical" : "Horizontal", machine().time().to_string());
-		m_interrupt_control[0] |= 0x20 << (which * 2);
-		if (BIT(m_interrupt_control[0], which * 2 + 4))
-			set_input_line(M740_INT3_LINE, ASSERT_LINE);
+		request_interrupt(0, 0x20 << (which * 2));
 	}
 
 	// Increment or decrement HPHC/VPHC
@@ -136,15 +134,8 @@ void m50734_device::clock_motor(int which)
 template <int N>
 TIMER_CALLBACK_MEMBER(m50734_device::timer_interrupt)
 {
-	if (!BIT(m_interrupt_control[1], N * 2 + 1))
-	{
-		m_interrupt_control[1] |= 1 << (N * 2 + 1);
-		if (BIT(m_interrupt_control[1], N * 2))
-		{
-			LOGMASKED(LOG_TIMER, "Timer %d interrupt asserted at %s\n", N + 1, machine().time().to_string());
-			set_input_line(M740_INT2_LINE, ASSERT_LINE);
-		}
-	}
+	LOGMASKED(LOG_TIMER, "Timer %d underflow at %s\n", N + 1, machine().time().to_string());
+	request_interrupt(1, 1 << (N * 2 + 1));
 
 	if (N == 2)
 		step_motor(0); // Timer 3 steps HC
@@ -192,6 +183,7 @@ void m50734_device::device_start()
 	save_item(NAME(m_int_state));
 	save_item(NAME(m_cntr_state));
 	save_item(NAME(m_interrupt_control));
+	save_item(NAME(m_ic_pending));
 }
 
 void m50734_device::device_reset()
@@ -217,6 +209,7 @@ void m50734_device::device_reset()
 
 	// Reset interrupts
 	std::fill(std::begin(m_interrupt_control), std::end(m_interrupt_control), 0x00);
+	std::fill(std::begin(m_ic_pending), std::end(m_ic_pending), 0x00);
 	m_int_state[0] = m_int_state[1] = false;
 	m_cntr_state = false;
 	set_input_line(M740_INT0_LINE, CLEAR_LINE);
@@ -276,13 +269,8 @@ void m50734_device::execute_set_input(int inputnum, int state)
 
 		if (level != BIT(m_interrupt_control[2], 3))
 			return;
-		if (!BIT(m_interrupt_control[2], 7))
-		{
-			LOGMASKED(LOG_INT, "CNTR interrupt requested at %s\n", machine().time().to_string());
-			m_interrupt_control[2] |= 0x80;
-			if (BIT(m_interrupt_control[2], 6))
-				m740_device::execute_set_input(M740_INT4_LINE, ASSERT_LINE);
-		}
+		LOGMASKED(LOG_INT, "CNTR interrupt requested at %s\n", machine().time().to_string());
+		request_interrupt(2, 0x80);
 		return;
 	}
 
@@ -303,13 +291,60 @@ void m50734_device::execute_set_input(int inputnum, int state)
 	if (n == 0)
 		m_p1_latch = m_port_in_cb[1]();
 
-	if (!BIT(m_interrupt_control[0], n * 2 + 1))
+	LOGMASKED(LOG_INT, "_INT%d interrupt requested at %s\n", n + 1, machine().time().to_string());
+	request_interrupt(0, 1 << (n * 2 + 1));
+}
+
+// Request bits are set by hardware and cleared by software.  The 740 family writes a
+// hardware request into the register at the end of the instruction during which it
+// was raised (3804 Group datasheet Fig. 24, timing point IR1; Renesas TN-740-A111),
+// so the write-back of a SEB/CLB on the same register cannot discard it.  The
+// interrupt line is driven at once; only the bit's visibility to software waits.
+void m50734_device::request_interrupt(int reg, u8 mask)
+{
+	const u8 old_effective = m_interrupt_control[reg] | m_ic_pending[reg];
+	m_ic_pending[reg] |= mask;
+	update_interrupt_lines(reg, old_effective, m_interrupt_control[reg] | m_ic_pending[reg]);
+}
+
+// Each request bit is paired with the enable bit below it
+void m50734_device::update_interrupt_lines(int reg, u8 old_effective, u8 new_effective)
+{
+	const u8 old_active = old_effective & (old_effective >> 1);
+	const u8 new_active = new_effective & (new_effective >> 1);
+	if (old_active == new_active)
+		return;
+
+	LOGMASKED(LOG_INT, "%s: Interrupt control register %d active requests $%02X -> $%02X\n", machine().describe_context(), reg + 1, old_active, new_active);
+	switch (reg)
 	{
-		LOGMASKED(LOG_INT, "_INT%d interrupt requested at %s\n", n + 1, machine().time().to_string());
-		m_interrupt_control[0] |= 1 << (n * 2 + 1);
-		if (BIT(m_interrupt_control[0], n * 2))
-			m740_device::execute_set_input(n == 0 ? M740_INT1_LINE : M740_INT0_LINE, ASSERT_LINE);
+	case 0:
+		if ((old_active ^ new_active) & 0x01)
+			m740_device::execute_set_input(M740_INT1_LINE, BIT(new_active, 0) ? ASSERT_LINE : CLEAR_LINE);
+		if ((old_active ^ new_active) & 0x04)
+			m740_device::execute_set_input(M740_INT0_LINE, BIT(new_active, 2) ? ASSERT_LINE : CLEAR_LINE);
+		if (bool(old_active & 0x50) != bool(new_active & 0x50))
+			set_input_line(M740_INT3_LINE, (new_active & 0x50) ? ASSERT_LINE : CLEAR_LINE);
+		break;
+
+	case 1:
+		if (bool(old_active & 0x15) != bool(new_active & 0x15))
+			set_input_line(M740_INT2_LINE, (new_active & 0x15) ? ASSERT_LINE : CLEAR_LINE);
+		break;
+
+	case 2:
+		if (bool(old_active & 0x50) != bool(new_active & 0x50))
+			set_input_line(M740_INT4_LINE, (new_active & 0x50) ? ASSERT_LINE : CLEAR_LINE);
+		break;
 	}
+}
+
+void m50734_device::prefetch_end()
+{
+	for (int reg = 0; reg < 3; reg++)
+		m_interrupt_control[reg] |= std::exchange(m_ic_pending[reg], 0);
+
+	m740_device::prefetch_end();
 }
 
 u8 m50734_device::interrupt_control_r(offs_t offset)
@@ -330,38 +365,16 @@ void m50734_device::interrupt_control_w(offs_t offset, u8 data)
 {
 	if (offset == 1)
 		data &= 0x3f;
-	u8 old_control = std::exchange(m_interrupt_control[2 - offset], data);
-	if (offset == 2)
-	{
-		for (int n = 0; n < 2; n++)
-		{
-			bool int_interrupt = (data & (data >> 1) & (1 << (n * 2))) != 0;
-			bool old_int_interrupt = (old_control & (old_control >> 1) & (1 << (n * 2))) != 0;
-			if (int_interrupt != old_int_interrupt)
-			{
-				LOGMASKED(LOG_INT, "%s: _INT%d interrupt %sactivated by write to interrupt control register 1 ($%02X -> $%02X)\n", machine().describe_context(), n + 1, int_interrupt ? "": "de", old_control, data);
-				m740_device::execute_set_input(n == 0 ? M740_INT1_LINE : M740_INT0_LINE, int_interrupt ? ASSERT_LINE : CLEAR_LINE);
-			}
-		}
-		bool he_ve_interrupt = (data & (data >> 1) & 0x50) != 0;
-		bool old_interrupt = (old_control & (old_control >> 1) & 0x50) != 0;
-		if (he_ve_interrupt != old_interrupt)
-		{
-			LOGMASKED(LOG_TIMER, "%s: HE/VE interrupt %sactivated by write to interrupt control register 1 ($%02X -> $%02X)\n", machine().describe_context(), he_ve_interrupt ? "": "de", old_control, data);
-			set_input_line(M740_INT3_LINE, he_ve_interrupt ? ASSERT_LINE : CLEAR_LINE);
-		}
-	}
-	else if (offset == 1)
-	{
-		bool timer_interrupt = (data & (data >> 1) & 0x15) != 0;
-		bool old_interrupt = (old_control & (old_control >> 1) & 0x15) != 0;
-		if (timer_interrupt != old_interrupt)
-		{
-			LOGMASKED(LOG_TIMER, "%s: Timer interrupt %sactivated by write to interrupt control register 2 ($%02X -> $%02X)\n", machine().describe_context(), timer_interrupt ? "": "de", old_control, data);
-			set_input_line(M740_INT2_LINE, timer_interrupt ? ASSERT_LINE : CLEAR_LINE);
-		}
-	}
-	else
+
+	// Request bits (ICON1 7,5,3,1; ICON2 5,3,1; ICON3 7,5) can be cleared but not set by software
+	static constexpr u8 REQUEST_BITS[3] = { 0xaa, 0x2a, 0xa0 };
+	const int reg = 2 - offset;
+	const u8 req = REQUEST_BITS[reg];
+	data = (data & ~req) | (data & m_interrupt_control[reg] & req);
+
+	const u8 old_effective = m_interrupt_control[reg] | m_ic_pending[reg];
+	u8 old_control = std::exchange(m_interrupt_control[reg], data);
+	if (offset == 0)
 	{
 		bool tx_run = BIT(data, 0, 2) != 2 && !BIT(data, 2);
 		if (!tx_run && m_timer_x->enabled())
@@ -378,14 +391,9 @@ void m50734_device::interrupt_control_w(offs_t offset, u8 data)
 			m_timer_x->adjust(clocks_to_attotime(16 * (m_tx_count != 0 ? m_tx_count : m_tx_reload + 1)));
 			m_timer_x->enable(true);
 		}
-		bool tx_interrupt = (data & (data >> 1) & 0x50) != 0;
-		bool old_interrupt = (old_control & (old_control >> 1) & 0x50) != 0;
-		if (tx_interrupt != old_interrupt)
-		{
-			LOGMASKED(LOG_TIMER_X, "%s: Timer X/CNTR interrupt %sactivated by write to interrupt control register 3 ($%02X -> $%02X)\n", machine().describe_context(), tx_interrupt ? "": "de", old_control, data);
-			set_input_line(M740_INT4_LINE, tx_interrupt ? ASSERT_LINE : CLEAR_LINE);
-		}
 	}
+
+	update_interrupt_lines(reg, old_effective, data | m_ic_pending[reg]);
 }
 
 template <int N>
@@ -630,15 +638,8 @@ void m50734_device::smcon_w(offs_t offset, u8 data)
 
 TIMER_CALLBACK_MEMBER(m50734_device::timer_x_interrupt)
 {
-	if (!BIT(m_interrupt_control[2], 5))
-	{
-		m_interrupt_control[2] |= 0x20;
-		if (BIT(m_interrupt_control[2], 4))
-		{
-			LOGMASKED(LOG_TIMER_X, "Timer X interrupt asserted at %s\n", machine().time().to_string());
-			set_input_line(M740_INT4_LINE, ASSERT_LINE);
-		}
-	}
+	LOGMASKED(LOG_TIMER_X, "Timer X underflow at %s\n", machine().time().to_string());
+	request_interrupt(2, 0x20);
 
 	if (m_tx_reload != 0)
 		m_timer_x->adjust(clocks_to_attotime(16 * (m_tx_reload + 1)));

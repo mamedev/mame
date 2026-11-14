@@ -51,6 +51,23 @@ bt545s_device::bt545s_device(const machine_config &mconfig, const char *tag, dev
 
 void bt54x_device::device_start()
 {
+	set_isa_device();
+}
+
+void bt54x_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void bt54x_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_rom(this, 0xdc000, 0xdffff, "bios");
+	}
+//	else if (space_id == AS_IO)
+//		m_isa->install_device(0x0330, 0x0333, *this, ...
 }
 
 u8 bt54x_device::local_status_r()
@@ -59,6 +76,15 @@ u8 bt54x_device::local_status_r()
 }
 
 void bt54x_device::local_map(address_map &map)
+{
+	map(0x00000, 0x01fff).ram();
+	//map(0x02000, 0x0201f).rw("busintf", FUNC(ncr86c05_device::local_read), FUNC(ncr86c05_device::local_write));
+	map(0x02080, 0x0208f).m("scsic", FUNC(ncr53c94_device::map));
+	map(0x02180, 0x02180).r(FUNC(bt54x_device::local_status_r));
+	map(0xf8000, 0xfffff).rom().region("mpu", 0);
+}
+
+void bt54x_device::fsc_local_map(address_map &map)
 {
 	map(0x00000, 0x01fff).ram();
 	//map(0x02000, 0x0201f).rw("busintf", FUNC(ncr86c05_device::local_read), FUNC(ncr86c05_device::local_write));
@@ -116,7 +142,7 @@ void bt542b_device::device_add_mconfig(machine_config &config)
 void bt542bh_device::device_add_mconfig(machine_config &config)
 {
 	I80188(config, m_mpu, 40_MHz_XTAL / 2); // clock guessed
-	m_mpu->set_addrmap(AS_PROGRAM, &bt542bh_device::local_map);
+	m_mpu->set_addrmap(AS_PROGRAM, &bt542bh_device::fsc_local_map);
 
 	fsc_base(config);
 
@@ -126,7 +152,7 @@ void bt542bh_device::device_add_mconfig(machine_config &config)
 void bt545s_device::device_add_mconfig(machine_config &config)
 {
 	I80188(config, m_mpu, 40_MHz_XTAL / 2); // SAB80188-1-N; clock guessed
-	m_mpu->set_addrmap(AS_PROGRAM, &bt545s_device::local_map);
+	m_mpu->set_addrmap(AS_PROGRAM, &bt545s_device::fsc_local_map);
 
 	fsc_base(config);
 

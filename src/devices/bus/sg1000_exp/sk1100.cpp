@@ -15,10 +15,6 @@ letters with diacritics replacing katakana), and functional differences
 are all handled by software.
 
 
-TODO:
-- SP-400 serial printer (custom 7-pin TTL-level connector)
-
-
 **********************************************************************/
 
 #include "emu.h"

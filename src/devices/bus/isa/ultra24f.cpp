@@ -22,12 +22,14 @@ ultra24f_device::ultra24f_device(const machine_config &mconfig, const char *tag,
 	, m_uscpu(*this, "uscpu")
 	, m_bmic(*this, "bmic")
 	, m_fdc(*this, "fdc")
-	, m_bios16(*this, "bios16")
+	, m_bios(*this, "bios")
 {
 }
 
 void ultra24f_device::device_start()
 {
+	set_isa_device();
+
 	// Firmware EPROMs have a couple of lines scrambled
 	u16 *firmware = &memregion("firmware")->as_u16();
 	for (offs_t b = 0; b < 0x8000; b += 0x100)
@@ -36,6 +38,25 @@ void ultra24f_device::device_start()
 		std::swap_ranges(&firmware[b | 0x30], &firmware[b | 0x40], &firmware[b | 0xa0]);
 		std::swap_ranges(&firmware[b | 0x50], &firmware[b | 0x60], &firmware[b | 0xc0]);
 		std::swap_ranges(&firmware[b | 0x70], &firmware[b | 0x80], &firmware[b | 0xe0]);
+	}
+}
+
+void ultra24f_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void ultra24f_device::remap(int space_id, offs_t start, offs_t end)
+{
+	// TODO: unknown host config
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_rom(this, 0xc8000, 0xcbfff, "bios");
+	}
+	else if (space_id == AS_IO)
+	{
+		//m_isa->install_device(0x0330, 0x0333, *this, &ultra14f_device::host_io);
 	}
 }
 
@@ -93,7 +114,8 @@ ROM_START(ultra24f)
 	ROM_LOAD16_BYTE("28110008.bin", 0x00001, 0x08000, CRC(3f26d927) SHA1(4ab98840e3af72bf08adfcf478e708fad309f4b7))
 	//ROM_LOAD16_BYTE("28110.008", 0x00001, 0x08000, CRC(1d24cf9e) SHA1(6120af5308ed1cb0e5c3d14a4b436edb6559f8a5)) // identical except for last byte being 0xff instead of 0x49
 
-	ROM_REGION16_LE(0x8000, "bios16", 0) // "Date : 06/24/92 Version 2.00"
+	// second half is empty
+	ROM_REGION16_LE(0x8000, "bios", 0) // "Date : 06/24/92 Version 2.00"
 	ROM_LOAD16_BYTE("38110005.bin", 0x0000, 0x4000, CRC(498f2aa5) SHA1(8405a91bb445cb99059c65a2e711d425fc69f5d6))
 	ROM_LOAD16_BYTE("38111005.bin", 0x0001, 0x4000, CRC(826d5ad1) SHA1(052602e4788b7364670f7c0b5fe0bb0eacc4d9ac))
 	// UltraStor also offered double-size binaries for programming onto 27C256 ROMs, with identical data in both halves of each file

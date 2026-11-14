@@ -76,7 +76,7 @@ protected:
 	void shared_ram_w(offs_t offset, u8 data) { m_shared_ram[offset] = data; }
 
 	u32 screen_update_base(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void screen_vblank(int state);
+	virtual void screen_vblank(int state);
 
 	void coin_w(u8 data);
 	void reset_audiocpu(int state);

@@ -108,10 +108,10 @@
     already allocated
 -------------------------------------------------*/
 
-inline void ppc_device::alloc_handle(drcuml_state *drcuml, uml::code_handle **handleptr, const char *name)
+inline void ppc_device::alloc_handle(uml::code_handle **handleptr, const char *name)
 {
 	if (*handleptr == nullptr)
-		*handleptr = drcuml->handle_alloc(name);
+		*handleptr = m_drcuml.handle_alloc(name);
 }
 
 
@@ -243,7 +243,7 @@ void ppc_device::execute_run()
 	do
 	{
 		// run as much as we can
-		execute_result = m_drcuml->execute(*m_entry);
+		execute_result = m_drcuml.execute(*m_entry);
 
 		// if we need to recompile, do it
 		if (execute_result == EXECUTE_MISSING_CODE)
@@ -314,11 +314,13 @@ void ppc_device::ppcdrc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles)
 void ppc_device::code_flush_cache()
 {
 	// empty the transient cache contents
-	m_drcuml->reset();
+	m_drcuml.reset();
 
 	// no compiled code remains, so forget which pages held it
 	std::fill(m_codepage_bits.begin(), m_codepage_bits.end(), 0);
 	m_core->m_codepage_any = false;
+	std::fill(m_physpage_bits.begin(), m_physpage_bits.end(), 0);
+	m_physpage_logical.clear();
 
 	// the generated code is gone, so the reuse entries pointing to it can be flushed
 	m_reuse_cache.clear();
@@ -327,9 +329,110 @@ void ppc_device::code_flush_cache()
 	// also release the per-block translation checks
 	for (ppc_entry_check *chk : m_entry_checks)
 	{
-		m_cache.dealloc(chk, sizeof(*chk));
+		m_drcuml.cache_dealloc(chk, sizeof(*chk));
 	}
 	m_entry_checks.clear();
+}
+
+
+/*-------------------------------------------------
+    signal_external_write - another bus master
+    wrote this physical range
+-------------------------------------------------*/
+
+void ppc_device::signal_external_write(offs_t physical_address, u32 length)
+{
+	if (!length)
+	{
+		return;
+	}
+
+	// a write anywhere in the reservation granule cancels the reservation
+	const offs_t last = physical_address + std::min<offs_t>(length - 1, ~physical_address);
+	if (m_core->reserve && ((physical_address & m_reservation_mask) <= m_core->reserve_address) && ((last & m_reservation_mask) >= m_core->reserve_address))
+	{
+		m_core->reserve = 0;
+	}
+
+	// Physical pages are only tracked from the first report on, so drop everything
+	// compiled before then.
+	if (!m_track_physical_code)
+	{
+		m_track_physical_code = true;
+		m_cache_dirty = true;
+		return;
+	}
+
+	// recompile every block that was compiled from a written page
+	for (uint32_t page = physical_address >> 12; page <= (last >> 12); page++)
+	{
+		if (BIT(m_physpage_bits[page >> 3], page & 7))
+		{
+			m_physpage_bits[page >> 3] &= ~(1 << (page & 7));
+			const auto found = m_physpage_logical.find(page);
+			if (found != m_physpage_logical.end())
+			{
+				for (const uint32_t logical : found->second)
+				{
+					m_drcuml.hash_invalidate_range(logical << 12, (logical << 12) | 0xfff);
+				}
+				m_physpage_logical.erase(found);
+			}
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    note_physical_code - record the physical pages
+    a block was compiled from against every logical
+    page it can be entered at
+-------------------------------------------------*/
+
+void ppc_device::note_physical_code(const opcode_desc *desclist)
+{
+	if (!m_track_physical_code)
+	{
+		return;
+	}
+
+	// the compile window can only span two pages
+	static_assert((COMPILE_BACKWARDS_BYTES + COMPILE_FORWARDS_BYTES) <= 4096);
+	uint32_t logical[2];
+	uint32_t physical[2];
+	uint32_t logcount = 0;
+	uint32_t physcount = 0;
+	for (const opcode_desc *desc = desclist; desc != nullptr; desc = desc->next())
+	{
+		if (desc->compiler_page_fault())
+		{
+			continue;
+		}
+
+		const uint32_t logpage = desc->pc >> 12;
+		const uint32_t physpage = desc->physpc >> 12;
+		if ((std::find(logical, logical + logcount, logpage) == (logical + logcount)) && (logcount < std::size(logical)))
+		{
+			logical[logcount++] = logpage;
+		}
+		if ((std::find(physical, physical + physcount, physpage) == (physical + physcount)) && (physcount < std::size(physical)))
+		{
+			physical[physcount++] = physpage;
+		}
+	}
+
+	for (uint32_t p = 0; p < physcount; p++)
+	{
+		m_physpage_bits[physical[p] >> 3] |= 1 << (physical[p] & 7);
+		std::vector<uint32_t> &pages = m_physpage_logical[physical[p]];
+		for (uint32_t l = 0; l < logcount; l++)
+		{
+			if (std::find(pages.begin(), pages.end(), logical[l]) == pages.end())
+			{
+				pages.push_back(logical[l]);
+			}
+		}
+	}
 }
 
 
@@ -376,7 +479,7 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 
 	// get a description of this sequence
 	desclist = m_drcfe->describe_code(pc, (mode & MODE_LITTLE_ENDIAN) != 0);
-	if (m_drcuml->logging() || m_drcuml->logging_native())
+	if (m_drcuml.logging() || m_drcuml.logging_native())
 		log_opcode_desc(desclist, 0);
 
 	// Do a signature over every word of the sequence, so the reuse check below is exact.
@@ -405,7 +508,7 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 				&& (reuse->second.sig == seqsig)
 				&& (reuse->second.physpc == desclist->physpc)
 				&& reuse_entry_checks(reuse->second.checkfirst, reuse->second.checkcount)
-				&& m_drcuml->hash_set_codeptr(mode, pc, reuse->second.code))
+				&& m_drcuml.hash_set_codeptr(mode, pc, reuse->second.code))
 		{
 			// mark the pages this sequence covers as having valid code again
 			const opcode_desc *seqend = desclist;
@@ -423,6 +526,7 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 			{
 				note_code_page(pg);
 			}
+			note_physical_code(desclist);
 			m_codewrite_skip_page = ~uint32_t(0);
 			m_last_reuse = reusekey;
 			return;
@@ -439,7 +543,7 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 			checkbase = m_entry_checks.size();
 
 			// start the block
-			drcuml_block &block(m_drcuml->begin_block(4096));
+			drcuml_block &block(m_drcuml.begin_block(4096));
 
 			// loop until we get through all instruction sequences
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
@@ -448,7 +552,7 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 				uint32_t nextpc;
 
 				// add a code log entry
-				if (m_drcuml->logging())
+				if (m_drcuml.logging())
 					block.append_comment("-------------------------");                         // comment
 
 				// determine the last instruction in this sequence
@@ -465,7 +569,7 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 					note_code_page(pg);
 
 				// if we don't have a hash for this mode/pc, or if we are overriding all, add one
-				if (override || !m_drcuml->hash_exists(mode, seqhead->pc))
+				if (override || !m_drcuml.hash_exists(mode, seqhead->pc))
 					UML_HASH(block, mode, seqhead->pc);                                             // hash    mode,pc
 
 				// if we already have a hash, and this is the first sequence, assume that we
@@ -543,8 +647,10 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 	// remember what was generated so an identical recompile can reuse it
 	if (desclist != nullptr)
 	{
-		drccodeptr const code = m_drcuml->hash_get_codeptr(mode, pc);
-		if (code != nullptr)
+		note_physical_code(desclist);
+
+		auto const code = m_drcuml.hash_get_codeptr(mode, pc);
+		if (code)
 		{
 			m_reuse_cache[reusekey] = reuse_entry{
 					code, desclist->physpc, seqsig,
@@ -785,13 +891,13 @@ void ppc_device::static_generate_entry_point()
 	uml::code_label skip = 1;
 
 	// begin generating
-	drcuml_block &block(m_drcuml->begin_invariant_block(32));
+	drcuml_block &block(m_drcuml.begin_invariant_block(32));
 
 	// forward references
-	alloc_handle(m_drcuml.get(), &m_nocode, "nocode");
-	alloc_handle(m_drcuml.get(), &m_exception_norecover[EXCEPTION_EI], "exception_ei_norecover");
+	alloc_handle(&m_nocode, "nocode");
+	alloc_handle(&m_exception_norecover[EXCEPTION_EI], "exception_ei_norecover");
 
-	alloc_handle(m_drcuml.get(), &m_entry, "entry");
+	alloc_handle(&m_entry, "entry");
 	UML_HANDLE(block, *m_entry);                                                // handle  entry
 
 	// reset the FPU mode
@@ -823,6 +929,17 @@ void ppc_device::static_generate_entry_point()
 		UML_LABEL(block, awake);
 	}
 
+	if (m_drcoptions & PPCDRC_BUS_ERROR)
+	{
+		uml::code_label const running = 3;
+		UML_LOAD(block, I0, &m_checkstop, 0, SIZE_BYTE, SCALE_x1);
+		UML_TEST(block, I0, 1);
+		UML_JMPc(block, COND_Z, running);
+		UML_MOV(block, mem(&m_core->icount), 0);
+		UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
+		UML_LABEL(block, running);
+	}
+
 	// generate a hash jump via the current mode and PC
 	UML_HASHJMP(block, mem(&m_core->mode), mem(&m_core->pc), *m_nocode);        // hashjmp <mode>,<pc>,nocode
 
@@ -838,16 +955,16 @@ void ppc_device::static_generate_entry_point()
 void ppc_device::static_generate_nocode_handler()
 {
 	// begin generating
-	drcuml_block &block(m_drcuml->begin_invariant_block(10));
+	drcuml_block &block(m_drcuml.begin_invariant_block(10));
 
 	// generate a hash jump via the current mode and PC
-	alloc_handle(m_drcuml.get(), &m_nocode, "nocode");
-	UML_HANDLE(block, *m_nocode);                                              // handle  nocode
-	UML_GETEXP(block, I0);                                                              // getexp  i0
-	UML_MOV(block, mem(&m_core->pc), I0);                                                  // mov     [pc],i0
-	save_fast_iregs(block);                                                            // <save fastregs>
+	alloc_handle(&m_nocode, "nocode");
+	UML_HANDLE(block, *m_nocode);                                          // handle  nocode
+	UML_GETEXP(block, I0);                                                 // getexp  i0
+	UML_MOV(block, mem(&m_core->pc), I0);                                  // mov     [pc],i0
+	save_fast_iregs(block);                                                // <save fastregs>
 	save_fast_fregs(block);
-	UML_EXIT(block, EXECUTE_MISSING_CODE);                                              // exit    EXECUTE_MISSING_CODE
+	UML_EXIT(block, EXECUTE_MISSING_CODE);                                 // exit    EXECUTE_MISSING_CODE
 
 	block.end();
 }
@@ -866,9 +983,9 @@ void ppc_device::static_generate_nocode_handler()
 
 void ppc_device::static_generate_code_write_reset()
 {
-	drcuml_block &block(m_drcuml->begin_invariant_block(20));
+	drcuml_block &block(m_drcuml.begin_invariant_block(20));
 
-	alloc_handle(m_drcuml.get(), &m_code_write_reset, "code_write_reset");
+	alloc_handle(&m_code_write_reset, "code_write_reset");
 	UML_HANDLE(block, *m_code_write_reset);                                // handle  code_write_reset
 	UML_GETEXP(block, I0);                                                 // getexp  i0 (effective store address)
 	UML_MOV(block, mem(&m_core->param0), I0);                              // mov     [param0],i0
@@ -897,10 +1014,10 @@ void ppc_device::static_generate_code_write_reset()
 void ppc_device::static_generate_out_of_cycles()
 {
 	// begin generating
-	drcuml_block &block(m_drcuml->begin_invariant_block(10));
+	drcuml_block &block(m_drcuml.begin_invariant_block(10));
 
 	// generate a hash jump via the current mode and PC
-	alloc_handle(m_drcuml.get(), &m_out_of_cycles, "out_of_cycles");
+	alloc_handle(&m_out_of_cycles, "out_of_cycles");
 	UML_HANDLE(block, *m_out_of_cycles);                                       // handle  out_of_cycles
 	UML_GETEXP(block, I0);                                                              // getexp  i0
 	UML_MOV(block, mem(&m_core->pc), I0);                                                  // mov     <pc>,i0
@@ -919,8 +1036,8 @@ void ppc_device::static_generate_out_of_cycles()
 
 void ppc_device::static_generate_bus_retry()
 {
-	drcuml_block &block(m_drcuml->begin_invariant_block(16));
-	alloc_handle(m_drcuml.get(), &m_bus_retry, "bus_retry");
+	drcuml_block &block(m_drcuml.begin_invariant_block(16));
+	alloc_handle(&m_bus_retry, "bus_retry");
 	UML_HANDLE(block, *m_bus_retry);
 	UML_RECOVER(block, I0, MAPVAR_PC);
 	UML_RECOVER(block, I1, MAPVAR_CYCLES);
@@ -945,15 +1062,15 @@ void ppc_device::static_generate_tlb_mismatch()
 	uml::code_label label = 1;
 
 	// forward references
-	alloc_handle(m_drcuml.get(), &m_exception[EXCEPTION_ISI], "exception_isi");
+	alloc_handle(&m_exception[EXCEPTION_ISI], "exception_isi");
 	if (m_cap & PPCCAP_603_MMU)
-		alloc_handle(m_drcuml.get(), &m_exception[EXCEPTION_ITLBMISS], "exception_itlb_miss");
+		alloc_handle(&m_exception[EXCEPTION_ITLBMISS], "exception_itlb_miss");
 
 	// begin generating
-	drcuml_block &block(m_drcuml->begin_invariant_block(20));
+	drcuml_block &block(m_drcuml.begin_invariant_block(20));
 
 	// generate a hash jump via the current mode and PC
-	alloc_handle(m_drcuml.get(), &m_tlb_mismatch, "tlb_mismatch");
+	alloc_handle(&m_tlb_mismatch, "tlb_mismatch");
 	UML_HANDLE(block, *m_tlb_mismatch);                                     // handle  tlb_mismatch
 	UML_RECOVER(block, I0, MAPVAR_PC);                                      // recover i0,PC
 	UML_SHR(block, I1, I0, 12);                                             // shr     i1,i0,12
@@ -1023,11 +1140,11 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 	uml::code_label label = 1;
 
 	// begin generating
-	drcuml_block &block(m_drcuml->begin_invariant_block(1024));
+	drcuml_block &block(m_drcuml.begin_invariant_block(1024));
 
 	// add a global entry for this
-	alloc_handle(m_drcuml.get(), &exception_handle, name);
-	UML_HANDLE(block, *exception_handle);                                                   // handle  name
+	alloc_handle(&exception_handle, name);
+	UML_HANDLE(block, *exception_handle);                                               // handle  name
 
 	// DSIs and alignment exceptions report the faulting data address in DAR (ISIs uses SRR0/SRR1 instead)
 	if (exception == EXCEPTION_DSI || exception == EXCEPTION_ALIGN)
@@ -1054,12 +1171,26 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 		if (exception == EXCEPTION_EI)
 		{
 			uml::code_label not_decrementer;
+			uml::code_label const selected = label++;
+
+			// 603-family SMI is level-sensitive and takes priority over INT
+			// and the decrementer. The common entry already tests MSR[EE].
+			if (m_cap & PPCCAP_603_MMU)
+			{
+				uml::code_label const not_smi = label++;
+				UML_TEST(block, mem(&m_core->irq_pending), 0x04);
+				UML_JMPc(block, COND_Z, not_smi);
+				UML_MOV(block, I3, EXCEPTION_SMI << 8);
+				UML_JMP(block, selected);
+				UML_LABEL(block, not_smi);
+			}
 
 			UML_TEST(block, mem(&m_core->irq_pending), 0x01);                              // test    [irq_pending],0x01
 			UML_JMPc(block, COND_NZ, not_decrementer = label++);                                // jmp     not_decrementer,nz
 			UML_MOV(block, I3, EXCEPTION_DECREMENT << 8);                           // mov     i3,EXCEPTION_DECREMENT << 8
 			UML_AND(block, mem(&m_core->irq_pending), mem(&m_core->irq_pending), ~0x02);      // and     [irq_pending],[irq_pending],~0x02
 			UML_LABEL(block, not_decrementer);                                          // not_decrementer:
+			UML_LABEL(block, selected);
 		}
 
 		// exception PC goes into SRR0
@@ -1067,6 +1198,20 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 
 		// MSR bits go into SRR1, along with some exception-specific data
 		UML_AND(block, SPR32(SPROEA_SRR1), MSR32, 0x87c0ffff);                          // and     [srr1],[msr],0x87c0ffff
+		if (exception == EXCEPTION_EI && (m_cap & PPCCAP_603_MMU))
+		{
+			uml::code_label const not_smi = label++;
+			UML_CMP(block, I3, EXCEPTION_SMI << 8);
+			UML_JMPc(block, COND_NE, not_smi);
+			UML_AND(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x0000ffff);
+			UML_LABEL(block, not_smi);
+		}
+
+		if (exception == EXCEPTION_MACHCHECK)
+		{
+			UML_AND(block, SPR32(SPROEA_SRR1), MSR32, 0x0000fffd);
+			UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x00040000);
+		}
 
 		// an ISI (reason flags) and a PROGRAM exception both carry their SRR1 status in the exception parameter
 		if (exception == EXCEPTION_ISI || exception == EXCEPTION_PROGRAM)
@@ -1224,10 +1369,10 @@ void ppc_device::static_generate_memory_accessor(
 		translate_type = iswrite ? TR_WRITE : TR_READ;
 
 	// begin generating
-	drcuml_block &block(m_drcuml->begin_invariant_block(1024));
+	drcuml_block &block(m_drcuml.begin_invariant_block(1024));
 
 	// add a global entry for this
-	alloc_handle(m_drcuml.get(), &handleptr, name);
+	alloc_handle(&handleptr, name);
 	UML_HANDLE(block, *handleptr);                                                          // handle  *handleptr
 
 	// The 601 has a unified I+D cache, so self-modifying code can omit
@@ -1696,10 +1841,10 @@ void ppc_device::static_generate_swap_tgpr()
 	int regnum;
 
 	// begin generating
-	drcuml_block &block(m_drcuml->begin_invariant_block(30));
+	drcuml_block &block(m_drcuml.begin_invariant_block(30));
 
 	// generate a hash jump via the current mode and PC
-	alloc_handle(m_drcuml.get(), &m_swap_tgpr, "swap_tgpr");
+	alloc_handle(&m_swap_tgpr, "swap_tgpr");
 	UML_HANDLE(block, *m_swap_tgpr);                                           // handle  swap_tgpr
 	for (regnum = 0; regnum < 4; regnum++)
 	{
@@ -1724,7 +1869,7 @@ void ppc_device::static_generate_lsw_entries(int mode)
 	int regnum;
 
 	// begin generating
-	drcuml_block &block(m_drcuml->begin_invariant_block(32 * 30));
+	drcuml_block &block(m_drcuml.begin_invariant_block(32 * 30));
 
 	// iterate over all possible registers
 	for (regnum = 0; regnum < 32; regnum++)
@@ -1733,7 +1878,7 @@ void ppc_device::static_generate_lsw_entries(int mode)
 
 		// allocate a handle
 		snprintf(temp, 20, "lsw%d", regnum);
-		alloc_handle(m_drcuml.get(), &m_lsw[mode][regnum], temp);
+		alloc_handle(&m_lsw[mode][regnum], temp);
 		UML_HANDLE(block, *m_lsw[mode][regnum]);                               // handle  lsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:
 		UML_ADD(block, I0, mem(&m_core->updateaddr), 0);                 // add     i0,[updateaddr],0
@@ -1776,7 +1921,7 @@ void ppc_device::static_generate_lsw_entries(int mode)
 void ppc_device::static_generate_stsw_entries(int mode)
 {
 	// begin generating
-	drcuml_block &block(m_drcuml->begin_invariant_block(32 * 30));
+	drcuml_block &block(m_drcuml.begin_invariant_block(32 * 30));
 
 	// iterate over all possible registers
 	for (int regnum = 0; regnum < 32; regnum++)
@@ -1785,7 +1930,7 @@ void ppc_device::static_generate_stsw_entries(int mode)
 
 		// allocate a handle
 		snprintf(temp, 20, "stsw%d", regnum);
-		alloc_handle(m_drcuml.get(), &m_stsw[mode][regnum], temp);
+		alloc_handle(&m_stsw[mode][regnum], temp);
 		UML_HANDLE(block, *m_stsw[mode][regnum]);                              // handle  stsw<regnum>
 		UML_LABEL(block, regnum);                                                       // regnum:
 		UML_ADD(block, I0, mem(&m_core->updateaddr), 0);                 // add     i0,[updateaddr],0
@@ -1866,6 +2011,9 @@ void ppc_device::generate_update_mode(drcuml_block &block)
 
 void ppc_device::generate_update_cycles(drcuml_block &block, compiler_state *compiler, uml::parameter param, bool allow_exception)
 {
+	if (compiler->checkbuserror)
+		generate_bus_error_check(block, compiler, param);
+
 	// check full interrupts if pending
 	if (compiler->checkints)
 	{
@@ -1891,6 +2039,31 @@ void ppc_device::generate_update_cycles(drcuml_block &block, compiler_state *com
 			UML_EXHc(block, COND_S, *m_out_of_cycles, param);      // exh     out_of_cycles,nextpc
 	}
 	compiler->cycles = 0;
+}
+
+
+void ppc_device::generate_bus_error_check(drcuml_block &block, compiler_state *compiler, uml::parameter param)
+{
+	uml::code_label skip, machcheck;
+
+	compiler->checkbuserror = false;
+	UML_LOAD(block, I3, &m_bus_error, 0, SIZE_BYTE, SCALE_x1);
+	UML_TEST(block, I3, 1);
+	UML_JMPc(block, COND_Z, skip = compiler->labelnum++);
+	UML_STORE(block, &m_bus_error, 0, 0, SIZE_BYTE, SCALE_x1);
+	UML_TEST(block, MSR32, MSR_ME);
+	UML_JMPc(block, COND_NZ, machcheck = compiler->labelnum++);
+	UML_STORE(block, &m_checkstop, 0, 1, SIZE_BYTE, SCALE_x1);
+	UML_MOV(block, mem(&m_core->pc), param);
+	save_fast_iregs(block);
+	save_fast_fregs(block);
+	UML_MOV(block, mem(&m_core->icount), 0);
+	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
+	UML_LABEL(block, machcheck);
+	UML_MOV(block, I0, param);
+	UML_MOV(block, I1, compiler->cycles);
+	UML_CALLH(block, *m_exception_norecover[EXCEPTION_MACHCHECK]);
+	UML_LABEL(block, skip);
 }
 
 
@@ -1928,7 +2101,7 @@ void ppc_device::generate_translation_check(drcuml_block &block, compiler_state 
 	}
 	// Allocate from the permanent cache region (the code region is not
 	// writable during execution); released again on cache flush
-	auto *chk = reinterpret_cast<ppc_entry_check *>(m_cache.alloc(sizeof(ppc_entry_check), std::align_val_t(alignof(ppc_entry_check))));
+	auto *const chk = m_drcuml.cache_alloc<ppc_entry_check>();
 	if (chk == nullptr)
 	{
 		// Allocation failed, out of cache
@@ -1964,7 +2137,7 @@ void ppc_device::generate_translation_check(drcuml_block &block, compiler_state 
 void ppc_device::generate_checksum_block(drcuml_block &block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast)
 {
 	const opcode_desc *curdesc;
-	if (m_drcuml->logging())
+	if (m_drcuml.logging())
 		block.append_comment("[Validation for %08X]", seqhead->pc);                        // comment
 
 	// loose verify or single instruction: just compare and fail
@@ -2014,7 +2187,7 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 	int hotnum;
 
 	// add an entry for the log
-	if (m_drcuml->logging() && !desc->virtual_noop())
+	if (m_drcuml.logging() && !desc->virtual_noop())
 		log_add_disasm_comment(block, desc->pc, desc->opptr);
 
 	// set the PC map variable
@@ -2137,6 +2310,12 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_NOFPU], 0);      // exh     nofpu,0,z
 		}
 
+		if ((m_drcoptions & PPCDRC_BUS_ERROR) && (desc->reads_memory() || desc->writes_memory()))
+		{
+			UML_STORE(block, &m_bus_error, 0, 0, SIZE_BYTE, SCALE_x1);
+			compiler->checkbuserror = true;
+		}
+
 		// otherwise, unless this is a virtual no-op, it's a regular instruction
 		// compile the instruction
 		if (!generate_opcode(block, compiler, desc))
@@ -2145,6 +2324,8 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 			UML_MOV(block, mem(&m_core->arg0), desc->opptr);
 			UML_CALLC(block, cfunc_unimplemented, this);
 		}
+		if (compiler->checkbuserror)
+			generate_bus_error_check(block, compiler, desc->pc + 4);
 	}
 }
 
@@ -2306,7 +2487,7 @@ static void generate_d_is_snan(drcuml_block &block, const uml::parameter &dst, c
 
 void ppc_device::static_generate_fpscr_finish()
 {
-	drcuml_block &block(m_drcuml->begin_invariant_block(100));
+	drcuml_block &block(m_drcuml.begin_invariant_block(100));
 	uml::code_label label = 1;
 	uml::code_label const lab_nan = label++;
 	uml::code_label const lab_inf = label++;
@@ -2314,7 +2495,7 @@ void ppc_device::static_generate_fpscr_finish()
 	uml::code_label const lab_denorm = label++;
 	uml::code_label const lab_done = label++;
 
-	alloc_handle(m_drcuml.get(), &m_fpscr_finish, "fpscr_finish");
+	alloc_handle(&m_fpscr_finish, "fpscr_finish");
 	UML_HANDLE(block, *m_fpscr_finish);
 
 	// OR in the new exception bits; latch FX on a 0->1 transition
@@ -4580,21 +4761,6 @@ bool ppc_device::generate_instruction_3b(drcuml_block &block, compiler_state *co
 			generate_fp_flags(block, desc);
 			return true;
 
-		case 0x16:  // FSQRTSx
-			if (m_flavor == PPC_MODEL_601)                                              // 601 has no fsqrts
-			{
-				return false;
-			}
-			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
-			{
-				return generate_instruction_3f(block, compiler, desc);
-			}
-			generate_fp_invalid_sqrt(block, F64(G_RB(op)), false);
-			UML_FDSQRT(block, F0, F64(G_RB(op)));                                       // fdsqrt  f0,rb
-			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(block, desc);
-			return true;
-
 		case 0x18:  // FRESx
 			if (m_flavor == PPC_MODEL_601)                                          // 601 has no fres
 			{
@@ -4690,16 +4856,6 @@ bool ppc_device::generate_instruction_3f(drcuml_block &block, compiler_state *co
 			case 0x12:  // FDIVx
 				generate_fp_invalid_div(block, F64(G_RA(op)), F64(G_RB(op)));
 				UML_FDDIV(block, F64(G_RD(op)), F64(G_RA(op)), F64(G_RB(op)));              // fddiv   rd,ra,rb
-				generate_fp_flags(block, desc);
-				return true;
-
-			case 0x16:  // FSQRTx
-				if (m_flavor == PPC_MODEL_601)                                          // 601 has no fsqrt
-				{
-					return false;
-				}
-				generate_fp_invalid_sqrt(block, F64(G_RB(op)), false);
-				UML_FDSQRT(block, F64(G_RD(op)), F64(G_RB(op)));                            // fdsqrt  rd,rb
 				generate_fp_flags(block, desc);
 				return true;
 
@@ -4869,7 +5025,7 @@ bool ppc_device::generate_instruction_3f(drcuml_block &block, compiler_state *co
 
 void ppc_device::log_add_disasm_comment(drcuml_block &block, uint32_t pc, uint32_t op)
 {
-	if (m_drcuml->logging())
+	if (m_drcuml.logging())
 	{
 		std::ostringstream stream;
 		stream.imbue(std::locale::classic());
@@ -4890,7 +5046,7 @@ void ppc_device::log_opcode_desc(const opcode_desc *desclist, int indent)
 
 	// assume no indent is the start of a sequence and needs a heading
 	if (indent == 0)
-		m_drcuml->log_printf("\nDescriptor list @ %08X\n", desclist->pc);
+		m_drcuml.log_printf("\nDescriptor list @ %08X\n", desclist->pc);
 
 	// output each description
 	for ( ; desclist != nullptr; desclist = desclist->next())
@@ -4899,7 +5055,7 @@ void ppc_device::log_opcode_desc(const opcode_desc *desclist, int indent)
 		buffer.seekp(0);
 		desclist->log_flags(buffer);
 		buffer.put('\0');
-		m_drcuml->log_printf("%08X [%08X] t:%08X f:%s: ", desclist->pc, desclist->physpc, desclist->targetpc, &buffer.vec()[0]);
+		m_drcuml.log_printf("%08X [%08X] t:%08X f:%s: ", desclist->pc, desclist->physpc, desclist->targetpc, &buffer.vec()[0]);
 
 		// disassemble the current instruction and output it to the log
 		buffer.clear();
@@ -4909,7 +5065,7 @@ void ppc_device::log_opcode_desc(const opcode_desc *desclist, int indent)
 		else
 			m_dasm.dasm_one(buffer, desclist->pc, desclist->opptr);
 		buffer.put('\0');
-		m_drcuml->log_printf(
+		m_drcuml.log_printf(
 				(desclist->regin.any() || desclist->regout.any()) ? "%-30s" : "%s",
 				&buffer.vec()[0]);
 
@@ -4925,7 +5081,7 @@ void ppc_device::log_opcode_desc(const opcode_desc *desclist, int indent)
 		if (desclist->regout.any())
 			desclist->log_registers_modified(buffer);
 		buffer.put('\0');
-		m_drcuml->log_printf("%s\n", &buffer.vec()[0]);
+		m_drcuml.log_printf("%s\n", &buffer.vec()[0]);
 
 		// if we have a delay slot, output it recursively
 		if (desclist->delay.first() != nullptr)
@@ -4933,6 +5089,6 @@ void ppc_device::log_opcode_desc(const opcode_desc *desclist, int indent)
 
 		// at the end of a sequence add a dividing line
 		if (desclist->end_sequence())
-			m_drcuml->log_printf("-----\n");
+			m_drcuml.log_printf("-----\n");
 	}
 }
