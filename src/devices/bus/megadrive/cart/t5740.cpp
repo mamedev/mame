@@ -28,7 +28,7 @@ megadrive_hb_psolar_device::megadrive_hb_psolar_device(const machine_config &mco
 
 void megadrive_hb_psolar_device::device_add_mconfig(machine_config &config)
 {
-	M95320_EEPROM(config, m_spi_eeprom);
+	SPI_EEPROM_M95320(config, m_spi_eeprom);
 }
 
 void megadrive_hb_psolar_device::device_start()
@@ -88,15 +88,15 @@ void megadrive_hb_psolar_device::time_io_map(address_map &map)
 	map(0x07, 0x07).lw8(NAME([this] (offs_t offset, u8 data) { m_rom_bank[7]->set_entry(data & 0xf); }));
 	map(0x09, 0x09).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			m_spi_eeprom->set_si_line(BIT(data, 0));
-			m_spi_eeprom->set_sck_line(BIT(data, 1));
-			m_spi_eeprom->set_halt_line(BIT(data, 2));
-			m_spi_eeprom->set_cs_line(BIT(data, 3));
+			m_spi_eeprom->si_w(BIT(data, 0));
+			m_spi_eeprom->sck_w(BIT(data, 1));
+			m_spi_eeprom->hold_w(BIT(data, 2));
+			m_spi_eeprom->cs_w(BIT(data, 3));
 		})
 	);
 	map(0x0b, 0x0b).lr8(
 		NAME([this] (offs_t offset) {
-			return m_spi_eeprom->get_so_line() & 1;
+			return m_spi_eeprom->so_r() & 1;
 		})
 	);
 }
