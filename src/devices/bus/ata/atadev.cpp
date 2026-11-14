@@ -74,6 +74,7 @@ void ata_devices(device_slot_interface &device)
 {
 	device.option_add("hdd", IDE_HARDDISK);
 	device.option_add("cdrom", ATAPI_CDROM);
+	device.option_add("dvdrom", ATAPI_DVDROM);
 
 	device.option_add("cf", ATA_CF);
 	device.option_add("cp2024", CP2024);

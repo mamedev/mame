@@ -234,11 +234,6 @@ void ppc_device::execute_run()
 {
 	int execute_result;
 
-	// Other CPUs or DMA may have written the reserved granule while we
-	// yielded to the scheduler.  Without bus snooping, conservatively lose
-	// the reservation across a timeslice (including same-value writes).
-	m_core->reserve = 0;
-
 	// reset the cache if dirty
 	if (m_cache_dirty)
 		code_flush_cache();
@@ -324,6 +319,8 @@ void ppc_device::code_flush_cache()
 	// no compiled code remains, so forget which pages held it
 	std::fill(m_codepage_bits.begin(), m_codepage_bits.end(), 0);
 	m_core->m_codepage_any = false;
+	std::fill(m_physpage_bits.begin(), m_physpage_bits.end(), 0);
+	m_physpage_logical.clear();
 
 	// the generated code is gone, so the reuse entries pointing to it can be flushed
 	m_reuse_cache.clear();
@@ -335,6 +332,107 @@ void ppc_device::code_flush_cache()
 		m_drcuml.cache_dealloc(chk, sizeof(*chk));
 	}
 	m_entry_checks.clear();
+}
+
+
+/*-------------------------------------------------
+    signal_external_write - another bus master
+    wrote this physical range
+-------------------------------------------------*/
+
+void ppc_device::signal_external_write(offs_t physical_address, u32 length)
+{
+	if (!length)
+	{
+		return;
+	}
+
+	// a write anywhere in the reservation granule cancels the reservation
+	const offs_t last = physical_address + std::min<offs_t>(length - 1, ~physical_address);
+	if (m_core->reserve && ((physical_address & m_reservation_mask) <= m_core->reserve_address) && ((last & m_reservation_mask) >= m_core->reserve_address))
+	{
+		m_core->reserve = 0;
+	}
+
+	// Physical pages are only tracked from the first report on, so drop everything
+	// compiled before then.
+	if (!m_track_physical_code)
+	{
+		m_track_physical_code = true;
+		m_cache_dirty = true;
+		return;
+	}
+
+	// recompile every block that was compiled from a written page
+	for (uint32_t page = physical_address >> 12; page <= (last >> 12); page++)
+	{
+		if (BIT(m_physpage_bits[page >> 3], page & 7))
+		{
+			m_physpage_bits[page >> 3] &= ~(1 << (page & 7));
+			const auto found = m_physpage_logical.find(page);
+			if (found != m_physpage_logical.end())
+			{
+				for (const uint32_t logical : found->second)
+				{
+					m_drcuml.hash_invalidate_range(logical << 12, (logical << 12) | 0xfff);
+				}
+				m_physpage_logical.erase(found);
+			}
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    note_physical_code - record the physical pages
+    a block was compiled from against every logical
+    page it can be entered at
+-------------------------------------------------*/
+
+void ppc_device::note_physical_code(const opcode_desc *desclist)
+{
+	if (!m_track_physical_code)
+	{
+		return;
+	}
+
+	// the compile window can only span two pages
+	static_assert((COMPILE_BACKWARDS_BYTES + COMPILE_FORWARDS_BYTES) <= 4096);
+	uint32_t logical[2];
+	uint32_t physical[2];
+	uint32_t logcount = 0;
+	uint32_t physcount = 0;
+	for (const opcode_desc *desc = desclist; desc != nullptr; desc = desc->next())
+	{
+		if (desc->compiler_page_fault())
+		{
+			continue;
+		}
+
+		const uint32_t logpage = desc->pc >> 12;
+		const uint32_t physpage = desc->physpc >> 12;
+		if ((std::find(logical, logical + logcount, logpage) == (logical + logcount)) && (logcount < std::size(logical)))
+		{
+			logical[logcount++] = logpage;
+		}
+		if ((std::find(physical, physical + physcount, physpage) == (physical + physcount)) && (physcount < std::size(physical)))
+		{
+			physical[physcount++] = physpage;
+		}
+	}
+
+	for (uint32_t p = 0; p < physcount; p++)
+	{
+		m_physpage_bits[physical[p] >> 3] |= 1 << (physical[p] & 7);
+		std::vector<uint32_t> &pages = m_physpage_logical[physical[p]];
+		for (uint32_t l = 0; l < logcount; l++)
+		{
+			if (std::find(pages.begin(), pages.end(), logical[l]) == pages.end())
+			{
+				pages.push_back(logical[l]);
+			}
+		}
+	}
 }
 
 
@@ -428,6 +526,7 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 			{
 				note_code_page(pg);
 			}
+			note_physical_code(desclist);
 			m_codewrite_skip_page = ~uint32_t(0);
 			m_last_reuse = reusekey;
 			return;
@@ -548,6 +647,8 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 	// remember what was generated so an identical recompile can reuse it
 	if (desclist != nullptr)
 	{
+		note_physical_code(desclist);
+
 		auto const code = m_drcuml.hash_get_codeptr(mode, pc);
 		if (code)
 		{
@@ -828,6 +929,17 @@ void ppc_device::static_generate_entry_point()
 		UML_LABEL(block, awake);
 	}
 
+	if (m_drcoptions & PPCDRC_BUS_ERROR)
+	{
+		uml::code_label const running = 3;
+		UML_LOAD(block, I0, &m_checkstop, 0, SIZE_BYTE, SCALE_x1);
+		UML_TEST(block, I0, 1);
+		UML_JMPc(block, COND_Z, running);
+		UML_MOV(block, mem(&m_core->icount), 0);
+		UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
+		UML_LABEL(block, running);
+	}
+
 	// generate a hash jump via the current mode and PC
 	UML_HASHJMP(block, mem(&m_core->mode), mem(&m_core->pc), *m_nocode);        // hashjmp <mode>,<pc>,nocode
 
@@ -1093,6 +1205,12 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 			UML_JMPc(block, COND_NE, not_smi);
 			UML_AND(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x0000ffff);
 			UML_LABEL(block, not_smi);
+		}
+
+		if (exception == EXCEPTION_MACHCHECK)
+		{
+			UML_AND(block, SPR32(SPROEA_SRR1), MSR32, 0x0000fffd);
+			UML_OR(block, SPR32(SPROEA_SRR1), SPR32(SPROEA_SRR1), 0x00040000);
 		}
 
 		// an ISI (reason flags) and a PROGRAM exception both carry their SRR1 status in the exception parameter
@@ -1893,6 +2011,9 @@ void ppc_device::generate_update_mode(drcuml_block &block)
 
 void ppc_device::generate_update_cycles(drcuml_block &block, compiler_state *compiler, uml::parameter param, bool allow_exception)
 {
+	if (compiler->checkbuserror)
+		generate_bus_error_check(block, compiler, param);
+
 	// check full interrupts if pending
 	if (compiler->checkints)
 	{
@@ -1918,6 +2039,31 @@ void ppc_device::generate_update_cycles(drcuml_block &block, compiler_state *com
 			UML_EXHc(block, COND_S, *m_out_of_cycles, param);      // exh     out_of_cycles,nextpc
 	}
 	compiler->cycles = 0;
+}
+
+
+void ppc_device::generate_bus_error_check(drcuml_block &block, compiler_state *compiler, uml::parameter param)
+{
+	uml::code_label skip, machcheck;
+
+	compiler->checkbuserror = false;
+	UML_LOAD(block, I3, &m_bus_error, 0, SIZE_BYTE, SCALE_x1);
+	UML_TEST(block, I3, 1);
+	UML_JMPc(block, COND_Z, skip = compiler->labelnum++);
+	UML_STORE(block, &m_bus_error, 0, 0, SIZE_BYTE, SCALE_x1);
+	UML_TEST(block, MSR32, MSR_ME);
+	UML_JMPc(block, COND_NZ, machcheck = compiler->labelnum++);
+	UML_STORE(block, &m_checkstop, 0, 1, SIZE_BYTE, SCALE_x1);
+	UML_MOV(block, mem(&m_core->pc), param);
+	save_fast_iregs(block);
+	save_fast_fregs(block);
+	UML_MOV(block, mem(&m_core->icount), 0);
+	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);
+	UML_LABEL(block, machcheck);
+	UML_MOV(block, I0, param);
+	UML_MOV(block, I1, compiler->cycles);
+	UML_CALLH(block, *m_exception_norecover[EXCEPTION_MACHCHECK]);
+	UML_LABEL(block, skip);
 }
 
 
@@ -2164,6 +2310,12 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 			UML_EXHc(block, COND_Z, *m_exception[EXCEPTION_NOFPU], 0);      // exh     nofpu,0,z
 		}
 
+		if ((m_drcoptions & PPCDRC_BUS_ERROR) && (desc->reads_memory() || desc->writes_memory()))
+		{
+			UML_STORE(block, &m_bus_error, 0, 0, SIZE_BYTE, SCALE_x1);
+			compiler->checkbuserror = true;
+		}
+
 		// otherwise, unless this is a virtual no-op, it's a regular instruction
 		// compile the instruction
 		if (!generate_opcode(block, compiler, desc))
@@ -2172,6 +2324,8 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 			UML_MOV(block, mem(&m_core->arg0), desc->opptr);
 			UML_CALLC(block, cfunc_unimplemented, this);
 		}
+		if (compiler->checkbuserror)
+			generate_bus_error_check(block, compiler, desc->pc + 4);
 	}
 }
 
@@ -4607,21 +4761,6 @@ bool ppc_device::generate_instruction_3b(drcuml_block &block, compiler_state *co
 			generate_fp_flags(block, desc);
 			return true;
 
-		case 0x16:  // FSQRTSx
-			if (m_flavor == PPC_MODEL_601)                                              // 601 has no fsqrts
-			{
-				return false;
-			}
-			if (!(m_drcoptions & PPCDRC_ACCURATE_SINGLES))
-			{
-				return generate_instruction_3f(block, compiler, desc);
-			}
-			generate_fp_invalid_sqrt(block, F64(G_RB(op)), false);
-			UML_FDSQRT(block, F0, F64(G_RB(op)));                                       // fdsqrt  f0,rb
-			UML_FDRNDS(block, F64(G_RD(op)), F0);                                       // fdrnds  rd,f0
-			generate_fp_flags(block, desc);
-			return true;
-
 		case 0x18:  // FRESx
 			if (m_flavor == PPC_MODEL_601)                                          // 601 has no fres
 			{
@@ -4717,16 +4856,6 @@ bool ppc_device::generate_instruction_3f(drcuml_block &block, compiler_state *co
 			case 0x12:  // FDIVx
 				generate_fp_invalid_div(block, F64(G_RA(op)), F64(G_RB(op)));
 				UML_FDDIV(block, F64(G_RD(op)), F64(G_RA(op)), F64(G_RB(op)));              // fddiv   rd,ra,rb
-				generate_fp_flags(block, desc);
-				return true;
-
-			case 0x16:  // FSQRTx
-				if (m_flavor == PPC_MODEL_601)                                          // 601 has no fsqrt
-				{
-					return false;
-				}
-				generate_fp_invalid_sqrt(block, F64(G_RB(op)), false);
-				UML_FDSQRT(block, F64(G_RD(op)), F64(G_RB(op)));                            // fdsqrt  rd,rb
 				generate_fp_flags(block, desc);
 				return true;
 

@@ -1395,6 +1395,28 @@ void galaxian_state::jumpbug_extend_sprite_info(const uint8_t *base, uint8_t *sx
 	}
 }
 
+/*** Star Attack ***/
+void staratk_state::staratk_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color)
+{
+	if (m_gfxbank[0] & 0x08)
+		*code += 0x40;
+}
+
+void staratk_state::staratk_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)
+{
+	// for the 3rd scene the part of the tilemap not containing the lives / scores uses
+	// extended tiles, with hardcoded tile numbers. scroll/palette are used as normal
+	if ((x >= 2) && (x <= 30) && (m_gfxbank[0] & 0x04))
+	{
+		*code = x | (y << 5);
+		*code += 0x200;
+	}
+	else
+	{
+		if (m_gfxbank[0] & 0x08)
+			*code += 0x100;
+	}
+}
 
 /*** Namennayo ***/
 void namenayo_state::namenayo_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y)

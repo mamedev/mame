@@ -8,6 +8,9 @@
 
 #include "spectrum_ula.h"
 
+#include <algorithm>
+
+
 DEFINE_DEVICE_TYPE(SPECTRUM_ULA_UNCONTENDED, spectrum_ula_device, "ula", "Spectrum ULA Contention :: Uncontended")
 
 spectrum_ula_device::spectrum_ula_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
@@ -180,7 +183,7 @@ spectrum_ula_48k_device::spectrum_ula_48k_device(const machine_config &mconfig, 
 	: spectrum_ula_contended_device(mconfig, SPECTRUM_ULA_48K, tag, owner, clock)
 {
 	const u8 pattern[] = {6, 5, 4, 3, 2, 1, 0, 0};
-	memcpy(m_pattern, pattern, 8);
+	std::copy(std::begin(pattern), std::end(pattern), m_pattern);
 	m_btime = 2;
 	m_atime_left = 4;
 	m_atime_right = 0;
@@ -199,7 +202,7 @@ spectrum_ula_128k_device::spectrum_ula_128k_device(const machine_config &mconfig
 	: spectrum_ula_contended_device(mconfig, SPECTRUM_ULA_128K, tag, owner, clock)
 {
 	const u8 pattern[] = {6, 5, 4, 3, 2, 1, 0, 0};
-	memcpy(m_pattern, pattern, 8);
+	std::copy(std::begin(pattern), std::end(pattern), m_pattern);
 	m_btime = 3;
 	m_atime_left = 4;
 	m_atime_right = 0;
@@ -219,7 +222,7 @@ spectrum_ula_plus2a_device::spectrum_ula_plus2a_device(const machine_config &mco
 	: spectrum_ula_contended_device(mconfig, SPECTRUM_ULA_PLUS2A, tag, owner, clock)
 {
 	const u8 pattern[] = {1, 0, 7, 6, 5, 4, 3, 2};
-	memcpy(m_pattern, pattern, 8);
+	std::copy(std::begin(pattern), std::end(pattern), m_pattern);
 	m_btime = 5;
 	m_atime_left = 4;
 	m_atime_right = 0;

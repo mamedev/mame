@@ -85,12 +85,16 @@ private:
 	u32 memory_end_r(offs_t offset);
 	u8 memory_enable_r();
 	void memory_enable_w(u8 data);
+	void install_snoop_tap(u32 origin, offs_t start, offs_t end);
+	void snoop_write(u32 origin, offs_t address, u32 length);
 
 	address_space_config m_mem_config, m_io_config;
 	required_device<device_memory_interface> m_cpu;
 	optional_device<device_memory_interface> m_secondary_cpu;
 	optional_memory_region m_rom;
 	u8 *m_ram;
+	std::vector<device_execute_interface *> m_bus_cpus;     // same order as m_cpu_spaces
+	std::vector<memory_passthrough_handler> m_snoop_taps;
 };
 
 #endif // MAME_MACHINE_MPC10X_H

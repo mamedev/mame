@@ -38,6 +38,7 @@ public:
 		set_pcihost_tag(0, std::forward<U>(pcihost0_tag));
 		set_pcihost_tag(1, std::forward<V>(pcihost1_tag));
 	}
+
 	template <typename T, typename U, typename V>
 	mv64361_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&cpu_tag, U &&pcihost0_tag, V &&pcihost1_tag):
 		mv64361_device(mconfig, tag, owner)
@@ -45,6 +46,13 @@ public:
 		set_cpu_tag(std::forward<T>(cpu_tag));
 		set_pcihost_tag(0, std::forward<U>(pcihost0_tag));
 		set_pcihost_tag(1, std::forward<V>(pcihost1_tag));
+	}
+
+	template <typename T>
+	mv64361_device &set_cs_tag(int cs, T &&tag)
+	{
+		m_cs_tag[cs] = std::forward<T>(tag);
+		return *this;
 	}
 
 	mv64361_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
@@ -62,6 +70,22 @@ private:
 	// internal register cpu interface
 	uint32_t cpu_config_r(offs_t offset, uint32_t mem_mask);
 	void cpu_config_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t cs0_base_r(offs_t offset, uint32_t mem_mask);
+	void cs0_base_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t cs0_size_r(offs_t offset, uint32_t mem_mask);
+	void cs0_size_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t cs1_base_r(offs_t offset, uint32_t mem_mask);
+	void cs1_base_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t cs1_size_r(offs_t offset, uint32_t mem_mask);
+	void cs1_size_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t cs2_base_r(offs_t offset, uint32_t mem_mask);
+	void cs2_base_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t cs2_size_r(offs_t offset, uint32_t mem_mask);
+	void cs2_size_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t cs3_base_r(offs_t offset, uint32_t mem_mask);
+	void cs3_base_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	uint32_t cs3_size_r(offs_t offset, uint32_t mem_mask);
+	void cs3_size_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	uint32_t pci0_io_base_r(offs_t offset, uint32_t mem_mask);
 	void pci0_io_base_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	uint32_t pci0_io_size_r(offs_t offset, uint32_t mem_mask);
@@ -149,9 +173,13 @@ private:
 	uint32_t pci1_mem3_remap_high_r(offs_t offset, uint32_t mem_mask);
 	void pci1_mem3_remap_high_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 
-	void map_windows();
+	void map_window(int window);
+	void unmap_window(int window);
+	void update_window(int window);
+	void update_windows();
 
 	uint32_t remap_offset(offs_t offset, uint16_t size, uint16_t remap);
+	void pci_io_delay(int bus, uint32_t pci_cycles);
 
 	// pci windows installed into cpu memory space
 	uint32_t pci0_io_r(offs_t offset, uint32_t mem_mask);
@@ -184,6 +212,14 @@ private:
 	enum
 	{
 		REG_CPU_CONFIG = 0,
+		REG_CS0_BASE,
+		REG_CS0_SIZE,
+		REG_CS1_BASE,
+		REG_CS1_SIZE,
+		REG_CS2_BASE,
+		REG_CS2_SIZE,
+		REG_CS3_BASE,
+		REG_CS3_SIZE,
 		REG_PCI0_IO_BASE,
 		REG_PCI0_IO_SIZE,
 		REG_PCI0_IO_REMAP,
@@ -232,6 +268,8 @@ private:
 	uint32_t m_regs[REG_BASE_ADDRESS_ENABLE + 1];
 
 	std::unique_ptr<uint8_t[]> m_sram;
+	std::string m_cs_tag[4];
+	memory_share *m_cs_share[4];
 
 	// helper to keep track of what we installed into cpu space
 	struct decode_range

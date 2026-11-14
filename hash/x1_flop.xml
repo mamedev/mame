@@ -1364,13 +1364,12 @@ Doesn't really seem an auto demo?
 		</part>
 	</software>
 
-	<software name="legkage" supported="no">
+	<software name="legkage">
 		<description>Kage no Densetsu - The Legend of Kage</description>
 		<year>1987</year>
 		<publisher>ニデコム (Nidecom)</publisher>
 		<notes><![CDATA[
 Uses [z80dma] during gameplay
-Throws "FILE NOT FOUND" during boot (regression)
 ]]></notes>
 
 		<info name="release" value="198702xx"/>

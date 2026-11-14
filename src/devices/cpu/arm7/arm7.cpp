@@ -99,7 +99,6 @@ DEFINE_DEVICE_TYPE(SA1100,       sa1100_cpu_device,       "sa1100",       "Intel
 DEFINE_DEVICE_TYPE(SA1110,       sa1110_cpu_device,       "sa1110",       "Intel StrongARM SA-1110")
 DEFINE_DEVICE_TYPE(DE156,        de156_cpu_device,        "de156",        "Data East 156")
 DEFINE_DEVICE_TYPE(DE101,        de101_cpu_device,        "de101",        "Data East 101")
-DEFINE_DEVICE_TYPE(IGS036,       igs036_cpu_device,       "igs036",       "IGS036")
 
 arm7_cpu_device::arm7_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, ARM7, tag, owner, clock, 4, ARCHFLAG_T | ARCHFLAG_NOCOPRO, ENDIANNESS_LITTLE)
@@ -285,9 +284,8 @@ arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-
-arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness)
-	: arm7_cpu_device(mconfig, type, tag, owner, clock, archRev, archFlags, endianness)
+arm9_cpu_device::arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness, address_map_constructor internal_map)
+	: arm7_cpu_device(mconfig, type, tag, owner, clock, archRev, archFlags, endianness, internal_map)
 {
 	uint32_t arch = ARM9_COPRO_ID_ARCH_V4;
 	switch (archRev)
@@ -324,8 +322,8 @@ arm920t_cpu_device::arm920t_cpu_device(const machine_config &mconfig, const char
 			   | 0; // Stepping
 }
 
-arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: arm9_cpu_device(mconfig, type, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE),
+arm946es_cpu_device::arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map)
+	: arm9_cpu_device(mconfig, type, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E, ENDIANNESS_LITTLE, internal_map),
 	cp15_control(0x78)
 {
 	m_copro_id = ARM9_COPRO_ID_MFR_ARM
@@ -378,11 +376,7 @@ arm1176jzf_s_cpu_device::arm1176jzf_s_cpu_device(const machine_config &mconfig, 
 			   | ARM9_COPRO_ID_STEP_ARM1176JZF_S_R0P7;
 }
 
-// unknown configuration, but uses MPU not MMU, so closer to ARM946ES
-igs036_cpu_device::igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: arm946es_cpu_device(mconfig, IGS036, tag, owner, clock)
-{
-}
+
 
 pxa250_cpu_device::pxa250_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: arm7_cpu_device(mconfig, PXA250, tag, owner, clock, 5, ARCHFLAG_T | ARCHFLAG_E | ARCHFLAG_XSCALE, ENDIANNESS_LITTLE)

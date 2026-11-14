@@ -7,6 +7,7 @@
 
 #include "endianness.h"
 
+#include <algorithm>
 /*
 
 Name        Board No      Maker         Game name
@@ -164,6 +165,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
+	virtual void screen_vblank(int state) override;
+
 	void batrider_68k_mem(address_map &map) ATTR_COLD;
 	void batrider_dma_mem(address_map &map) ATTR_COLD;
 	void batrider_sound_z80_mem(address_map &map) ATTR_COLD;
@@ -188,7 +191,8 @@ protected:
 	required_shared_ptr<u16> m_mainram;
 	optional_region_ptr<u8> m_z80_rom;
 
-	u16 m_gfxrom_bank[8] = { }; // Batrider object bank
+	u16 m_gfxrom_bank[2][8] = { }; // Batrider object bank
+	bool m_sprbank_dirty = false;
 };
 
 
@@ -271,16 +275,17 @@ void batrider_state::batrider_pal_text_dma_w(u16 data)
 void batrider_state::batrider_objectbank_w(offs_t offset, u8 data)
 {
 	data &= 0xf;
-	if (m_gfxrom_bank[offset] != data)
+	if (m_gfxrom_bank[0][offset] != data)
 	{
-		m_gfxrom_bank[offset] = data;
+		m_gfxrom_bank[0][offset] = data;
 		m_vdp->set_dirty();
+		m_sprbank_dirty = true;
 	}
 }
 
 void batrider_state::batrider_bank_cb(u8 layer, u32 &code)
 {
-	code = (m_gfxrom_bank[code >> 15] << 15) | (code & 0x7fff);
+	code = (m_gfxrom_bank[(layer == 3) ? 1 : 0][code >> 15] << 15) | (code & 0x7fff);
 }
 
 
@@ -288,15 +293,29 @@ void batrider_state::video_start()
 {
 	raizing_base_state::video_start();
 
-	m_vdp->disable_sprite_buffer(); // disable buffering on this game
-
 	// Create the Text tilemap for this game
 	m_tx_tilemap->gfx(0)->set_source(reinterpret_cast<u8 *>(m_tx_gfxram.target()));
 
 	// Has special banking
 	save_item(NAME(m_gfxrom_bank));
+	save_item(NAME(m_sprbank_dirty));
 }
 
+
+void batrider_state::screen_vblank(int state)
+{
+	// rising edge
+	if (state)
+	{
+		raizing_base_state::screen_vblank(state);
+
+		if (m_sprbank_dirty)
+		{
+			std::copy(std::begin(m_gfxrom_bank[0]), std::end(m_gfxrom_bank[0]), std::begin(m_gfxrom_bank[1]));
+			m_sprbank_dirty = false;
+		}
+	}
+}
 
 u16 batrider_state::batrider_z80_busack_r()
 {
@@ -793,7 +812,6 @@ void batrider_state::batrider(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(batrider_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(batrider_state::screen_vblank));
@@ -859,7 +877,6 @@ void bbakraid_state::bbakraid(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(bbakraid_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(bbakraid_state::screen_vblank));
@@ -907,7 +924,6 @@ void nprobowl_state::nprobowl(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen);
-	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	m_screen->set_raw(27_MHz_XTAL/4, 432, 0, 320, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(nprobowl_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(nprobowl_state::screen_vblank));

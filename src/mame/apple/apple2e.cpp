@@ -399,6 +399,7 @@ public:
 	u8 c300_cec_r(offs_t offset);
 	u8 c300_cec_bank_r(offs_t offset);
 	void c300_w(offs_t offset, u8 data);
+	void c300_int_w(offs_t offset, u8 data);
 	u8 c400_r(offs_t offset);
 	u8 c400_int_r(offs_t offset);
 	u8 c400_int_bank_r(offs_t offset);
@@ -1660,7 +1661,7 @@ void apple2e_state::update_slotrom_banks()
 		m_c100bank.select(cxswitch);
 		m_c400bank.select(cxswitch);
 
-		//printf("intcxrom %d intc8rom %d cnxx_slot %d isiic %d romswitch %d\n", m_intcxrom, m_intc8rom, m_cnxx_slot, m_isiic, m_romswitch);
+		//printf("intcxrom %d intc8rom %d isiic %d romswitch %d\n", m_intcxrom, m_intc8rom, m_isiic, m_romswitch);
 		if (m_intcxrom || m_intc8rom || m_isiic)
 		{
 			if (m_romswitch)
@@ -2977,7 +2978,6 @@ u8 apple2e_state::read_slot_rom(int slotbias, int offset)
 		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
-			update_slotrom_banks();
 		}
 
 		return m_slotdevice[slotnum]->read_cnxx(offset&0xff);
@@ -3016,7 +3016,6 @@ void apple2e_state::write_slot_rom(int slotbias, int offset, u8 data)
 		if ((m_cnxx_slot == CNXX_UNCLAIMED) && (m_slotdevice[slotnum]->take_c800()) && (!machine().side_effects_disabled()))
 		{
 			m_cnxx_slot = slotnum;
-			update_slotrom_banks();
 		}
 
 		m_slotdevice[slotnum]->write_cnxx(offset&0xff, data);
@@ -3076,15 +3075,14 @@ u8 apple2e_state::c300_int_bank_r(offs_t offset)
 	return read_int_rom(0x4300, offset);
 }
 
-void apple2e_state::c300_w(offs_t offset, u8 data)
+void apple2e_state::c300_w(offs_t offset, u8 data) { write_slot_rom(3, offset, data); }
+void apple2e_state::c300_int_w(offs_t offset, u8 data)
 {
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
 	{
 		m_intc8rom = true;
 		update_slotrom_banks();
 	}
-
-	write_slot_rom(3, offset, data);
 }
 
 u8 apple2e_state::c300_cec_r(offs_t offset)  { return m_rom_ptr[0xc300 + offset]; }
@@ -3120,7 +3118,8 @@ void apple2e_state::c400_w(offs_t offset, u8 data)
 		m_mockingboard4c = true;
 	}
 
-	write_slot_rom(4, offset, data);
+	if (!m_intcxrom)
+		write_slot_rom(4, offset, data);
 }
 
 u8 apple2e_state::c400_cec_r(offs_t offset)  { return m_rom_ptr[0xc400 + offset]; }
@@ -3224,7 +3223,8 @@ u8 apple2e_state::c800_int_r(offs_t offset)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
+		if (!m_intcxrom)
+			m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
 		update_slotrom_banks();
 	}
@@ -3253,7 +3253,8 @@ u8 apple2e_state::c800_b2_int_r(offs_t offset)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
+		if (!m_intcxrom)
+			m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
 		update_slotrom_banks();
 	}
@@ -3290,7 +3291,9 @@ void apple2e_state::c800_w(offs_t offset, u8 data)
 		return;
 	}
 
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	const int internal = (m_intcxrom) || (m_intc8rom);
+
+	if ((!internal) && (m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		laser_slot(m_cnxx_slot);
 		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
@@ -3298,7 +3301,8 @@ void apple2e_state::c800_w(offs_t offset, u8 data)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
+		if (!m_intcxrom)
+			m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
 		update_slotrom_banks();
 	}
@@ -3541,15 +3545,15 @@ void apple2e_state::base_map(address_map &map)
 
 	map(0xc100, 0xc2ff).view(m_c100bank);
 	m_c100bank[0](0xc100, 0xc2ff).rw(FUNC(apple2e_state::c100_r), FUNC(apple2e_state::c100_w));
-	m_c100bank[1](0xc100, 0xc2ff).rw(FUNC(apple2e_state::c100_int_r), FUNC(apple2e_state::c100_w));
-	m_c100bank[2](0xc100, 0xc2ff).rw(FUNC(apple2e_state::c100_int_bank_r), FUNC(apple2e_state::c100_w));
+	m_c100bank[1](0xc100, 0xc2ff).r(FUNC(apple2e_state::c100_int_r)).nopw();
+	m_c100bank[2](0xc100, 0xc2ff).r(FUNC(apple2e_state::c100_int_bank_r)).nopw();
 	m_c100bank[3](0xc100, 0xc2ff).r(FUNC(apple2e_state::c100_cec_r)).nopw();
 	m_c100bank[4](0xc100, 0xc2ff).r(FUNC(apple2e_state::c100_cec_bank_r)).nopw();
 
 	map(0xc300, 0xc3ff).view(m_c300bank);
 	m_c300bank[0](0xc300, 0xc3ff).rw(FUNC(apple2e_state::c300_r), FUNC(apple2e_state::c300_w));
-	m_c300bank[1](0xc300, 0xc3ff).rw(FUNC(apple2e_state::c300_int_r), FUNC(apple2e_state::c300_w));
-	m_c300bank[2](0xc300, 0xc3ff).rw(FUNC(apple2e_state::c300_int_bank_r), FUNC(apple2e_state::c300_w));
+	m_c300bank[1](0xc300, 0xc3ff).rw(FUNC(apple2e_state::c300_int_r), FUNC(apple2e_state::c300_int_w));
+	m_c300bank[2](0xc300, 0xc3ff).rw(FUNC(apple2e_state::c300_int_bank_r), FUNC(apple2e_state::c300_int_w));
 	m_c300bank[3](0xc300, 0xc3ff).r(FUNC(apple2e_state::c300_cec_r)).nopw();
 	m_c300bank[4](0xc300, 0xc3ff).r(FUNC(apple2e_state::c300_cec_bank_r)).nopw();
 
@@ -4628,16 +4632,16 @@ INPUT_PORTS_END
 // French, Italian, German layouts are also documented
 static INPUT_PORTS_START( laser128_us_kbd )
 	PORT_START("X0")
-	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1) 	  PORT_CHAR(UCHAR_MAMEKEY(F1))
-	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2) 	  PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3) 	  PORT_CHAR(UCHAR_MAMEKEY(F3))
-	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4) 	  PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5) 	  PORT_CHAR(UCHAR_MAMEKEY(F5))
-	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6) 	  PORT_CHAR(UCHAR_MAMEKEY(F6))
-	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7) 	  PORT_CHAR(UCHAR_MAMEKEY(F7))
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F1)       PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F2)       PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F3)       PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F4)       PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F5)       PORT_CHAR(UCHAR_MAMEKEY(F5))
+	PORT_BIT(0x020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F6)       PORT_CHAR(UCHAR_MAMEKEY(F6))
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F7)       PORT_CHAR(UCHAR_MAMEKEY(F7))
 	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F8)       PORT_CHAR(UCHAR_MAMEKEY(F8))
 	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F9)       PORT_CHAR(UCHAR_MAMEKEY(F9))
-	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)	  PORT_CHAR(UCHAR_MAMEKEY(F10))
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F10)      PORT_CHAR(UCHAR_MAMEKEY(F10))
 
 	PORT_START("X1")
 	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1)  PORT_CHAR('1') PORT_CHAR('!')

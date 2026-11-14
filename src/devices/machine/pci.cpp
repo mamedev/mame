@@ -17,6 +17,39 @@ DEFINE_DEVICE_TYPE(PCI_ROOT,   pci_root_device,   "pci_root",   "PCI virtual roo
 DEFINE_DEVICE_TYPE(PCI_BRIDGE, pci_bridge_device, "pci_bridge", "PCI-PCI Bridge")
 
 
+// the functions on a bus, indexed by (device << 3) | function: cards in the PCI slots under bus_root,
+// and its children tagged "dd.f"
+static void find_functions(device_t &requester, device_t &bus_root, pci_device *(&functions)[32*8])
+{
+	for(auto & elem : functions)
+		elem = nullptr;
+
+	for (device_t &d : bus_root.subdevices())
+	{
+		if(d.type() == PCI_SLOT) {
+			pci_slot_device &slot = downcast<pci_slot_device &>(d);
+			pci_device *card = slot.get_card();
+			if(card) {
+				int id = slot.get_slot();
+				functions[id << 3] = card;
+			}
+
+		} else {
+			const char *t = d.tag();
+			int l = strlen(t);
+			if(l <= 4 || t[l-5] != ':' || t[l-2] != '.') {
+				requester.logerror("Device %s unhandled\n", t);
+				continue;
+			}
+			int id = strtol(t+l-4, nullptr, 16);
+			int fct = t[l-1] - '0';
+			functions[(id << 3) | fct] = downcast<pci_device *>(&d);
+		}
+	}
+}
+
+
+
 void pci_device::config_map(address_map &map)
 {
 	map(0x00, 0x01).r(FUNC(pci_device::vendor_r));
@@ -513,6 +546,11 @@ uint8_t pci_bridge_device::header_type_r()
 	return 0x01;
 }
 
+uint8_t pci_host_device::header_type_r()
+{
+	return pci_device::header_type_r();
+}
+
 device_memory_interface::space_config_vector pci_bridge_device::memory_space_config() const
 {
 	return space_config_vector {
@@ -537,31 +575,7 @@ void pci_bridge_device::device_start()
 {
 	pci_device::device_start();
 
-	for(auto & elem : sub_devices)
-		elem = nullptr;
-
-	for (device_t &d : bus_root()->subdevices())
-	{
-		if(d.type() == PCI_SLOT) {
-			pci_slot_device &slot = downcast<pci_slot_device &>(d);
-			pci_device *card = slot.get_card();
-			if(card) {
-				int id = slot.get_slot();
-				sub_devices[id << 3] = card;
-			}
-
-		} else {
-			const char *t = d.tag();
-			int l = strlen(t);
-			if(l <= 4 || t[l-5] != ':' || t[l-2] != '.') {
-				logerror("Device %s unhandled\n", t);
-				continue;
-			}
-			int id = strtol(t+l-4, nullptr, 16);
-			int fct = t[l-1] - '0';
-			sub_devices[(id << 3) | fct] = downcast<pci_device *>(&d);
-		}
-	}
+	find_functions(*this, *bus_root(), sub_devices);
 
 	mapper_cb cf_cb(&pci_bridge_device::regenerate_config_mapping, this);
 
@@ -701,7 +715,7 @@ void pci_bridge_device::config_write(uint8_t bus, uint8_t device, uint16_t reg, 
 uint32_t pci_bridge_device::b_address_base_r(offs_t offset)
 {
 	logerror("b_address_base_r %d\n", offset);
-	return 0xffffffff;
+	return 0;
 }
 
 void pci_bridge_device::b_address_base_w(offs_t offset, uint32_t data)
@@ -1042,19 +1056,134 @@ void pci_host_device::root_config_write(uint8_t bus, uint8_t device, uint16_t re
 
 
 pci_root_device::pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, PCI_ROOT, tag, owner, clock),
-	  m_pin_mapper(*this),
-	  m_irq_handler(*this),
-	  m_pci_busmaster_space(nullptr)
+	: device_t(mconfig, PCI_ROOT, tag, owner, clock)
+	, device_memory_interface(mconfig, *this)
+	, m_pin_mapper(*this)
+	, m_irq_handler(*this)
+	, m_pci_busmaster_space(nullptr)
+	, m_pci_busmaster_io_space(nullptr)
+	, m_hostless(false)
+	, m_config_config("configuration_space", ENDIANNESS_LITTLE, 32, 20)
+	, m_memory_config("memory_space", ENDIANNESS_LITTLE, 32, 32)
+	, m_io_config("io_space", ENDIANNESS_LITTLE, 32, 32)
+	, m_sub_devices()
 {
+}
+
+device_memory_interface::space_config_vector pci_root_device::memory_space_config() const
+{
+	// with a host bridge, the bridge owns the bus spaces
+	if(!m_hostless)
+		return space_config_vector();
+
+	return space_config_vector {
+		std::make_pair(AS_PCI_CONFIG, &m_config_config),
+		std::make_pair(AS_PCI_MEMORY, &m_memory_config),
+		std::make_pair(AS_PCI_IO, &m_io_config)
+	};
+}
+
+void pci_root_device::device_validity_check(validity_checker &valid) const
+{
+	if(!m_hostless)
+		return;
+
+	for(const device_t &d : subdevices())
+		if(dynamic_cast<const pci_host_device *>(&d))
+			osd_printf_error("Host bridge %s on a hostless PCI bus\n", d.tag());
 }
 
 void pci_root_device::device_start()
 {
+	if(!m_hostless)
+		return;
+
+	m_pci_busmaster_space = &space(AS_PCI_MEMORY);
+	m_pci_busmaster_io_space = &space(AS_PCI_IO);
+
+	find_functions(*this, *this, m_sub_devices);
+
+	const pci_device::mapper_cb cf_cb(&pci_root_device::regenerate_config_mapping, this);
+	const pci_device::mapper_cb map_cb(&pci_root_device::regenerate_mapping, this);
+	for(int i=0; i<32*8; i++)
+		if(m_sub_devices[i]) {
+			if((i & 7) && m_sub_devices[i & ~7])
+				m_sub_devices[i & ~7]->set_multifunction_device(true);
+
+			m_all_devices.push_back(m_sub_devices[i]);
+			m_sub_devices[i]->remap_config_cb = cf_cb;
+			m_sub_devices[i]->set_remap_cb(map_cb);
+		}
+
+	for(pci_device *d : m_all_devices)
+		d->reset_all_mappings();
+
+	// the BARs come back from a saved state, the address maps built from them don't
+	machine().save().register_postload(save_prepost_delegate(FUNC(pci_root_device::regenerate_mapping), this));
 }
 
 void pci_root_device::device_reset()
 {
+	for(pci_device *d : m_all_devices)
+		d->reset_all_mappings();
+}
+
+void pci_root_device::interface_post_reset()
+{
+	if(!m_hostless)
+		return;
+
+	regenerate_config_mapping();
+	regenerate_mapping();
+}
+
+void pci_root_device::regenerate_config_mapping()
+{
+	address_space &config_space = space(AS_PCI_CONFIG);
+	config_space.unmap_readwrite(0x00000, 0xfffff);
+	for(int i=0; i<32*8; i++)
+		if(m_sub_devices[i])
+			m_sub_devices[i]->map_config(i, &config_space);
+}
+
+void pci_root_device::regenerate_mapping()
+{
+	address_space &memory_space = space(AS_PCI_MEMORY);
+	address_space &io_space = space(AS_PCI_IO);
+	memory_space.unmap_readwrite(0x00000000, 0xffffffff);
+	io_space.unmap_readwrite(0x00000000, 0xffffffff);
+
+	// same order as pci_bridge_device::map_device
+	for(bool first : { true, false })
+		for(auto it = m_all_devices.rbegin(); it != m_all_devices.rend(); ++it)
+			if((*it)->map_first() == first)
+				(*it)->map_device(0x00000000, 0xffffffff, 0, &memory_space, 0x00000000, 0xffffffff, 0, &io_space);
+}
+
+// TODO: type 1 cycles (bus != 0) to the buses behind PCI-PCI bridges
+bool pci_root_device::config_claimed(uint8_t bus, uint8_t device) const
+{
+	return m_hostless && bus == 0x00 && m_sub_devices[device];
+}
+
+uint32_t pci_root_device::config_read(uint8_t bus, uint8_t device, uint16_t reg, uint32_t mem_mask)
+{
+	if(!config_claimed(bus, device))
+		return 0xffffffff;
+
+	uint32_t data = space(AS_PCI_CONFIG).read_dword((device << 12) | reg, mem_mask);
+	if(!machine().side_effects_disabled())
+		logerror("config_read %02x:%02x.%x:%02x %08x @ %08x\n", bus, device >> 3, device & 7, reg, data, mem_mask);
+	return data;
+}
+
+void pci_root_device::config_write(uint8_t bus, uint8_t device, uint16_t reg, uint32_t data, uint32_t mem_mask)
+{
+	if(!config_claimed(bus, device))
+		return;
+
+	space(AS_PCI_CONFIG).write_dword((device << 12) | reg, data, mem_mask);
+	logerror("config_write %02x:%02x.%x:%02x %08x @ %08x\n", bus, device >> 3, device & 7, reg, data, mem_mask);
 }
 
 void pci_root_device::irq_pin_w(int pin, int state)

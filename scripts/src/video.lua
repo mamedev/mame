@@ -211,6 +211,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/cat6613.h,VIDEOS["CAT6613"] = true
+--------------------------------------------------
+
+if VIDEOS["CAT6613"] then
+	files {
+		MAME_DIR .. "src/devices/video/cat6613.cpp",
+		MAME_DIR .. "src/devices/video/cat6613.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/cdp1861.h,VIDEOS["CDP1861"] = true
 --------------------------------------------------
 
@@ -482,6 +494,18 @@ if VIDEOS["GF7600GS"] then
 	files {
 		MAME_DIR .. "src/devices/video/gf7600gs.cpp",
 		MAME_DIR .. "src/devices/video/gf7600gs.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/hantro_g1.h,VIDEOS["HANTRO_G1"] = true
+--------------------------------------------------
+
+if VIDEOS["HANTRO_G1"] then
+	files {
+		MAME_DIR .. "src/devices/video/hantro_g1.cpp",
+		MAME_DIR .. "src/devices/video/hantro_g1.h",
 	}
 end
 
@@ -878,6 +902,23 @@ if VIDEOS["M50458"] then
 	files {
 		MAME_DIR .. "src/devices/video/m50458.cpp",
 		MAME_DIR .. "src/devices/video/m50458.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/mali200.h,VIDEOS["MALI200"] = true
+--------------------------------------------------
+
+if VIDEOS["MALI200"] then
+	files {
+		MAME_DIR .. "src/devices/video/mali200.cpp",
+		MAME_DIR .. "src/devices/video/mali200_gp.hxx",
+		MAME_DIR .. "src/devices/video/mali200_plb.hxx",
+		MAME_DIR .. "src/devices/video/mali200_pp.hxx",
+		MAME_DIR .. "src/devices/video/mali200_texture.hxx",
+		MAME_DIR .. "src/devices/video/mali200_render.hxx",
+		MAME_DIR .. "src/devices/video/mali200.h",
 	}
 end
 

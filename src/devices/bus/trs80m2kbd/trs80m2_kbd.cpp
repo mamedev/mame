@@ -7,7 +7,7 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "trs80m2kb.h"
+#include "trs80m2_kbd.h"
 
 #include "utf8.h"
 
@@ -211,10 +211,10 @@ ioport_constructor trs80m2_keyboard_device::device_input_ports() const
 
 trs80m2_keyboard_device::trs80m2_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TRS80M2_KEYBOARD, tag, owner, clock),
+	device_trs80m2_keyboard_interface(mconfig, *this),
 	m_maincpu(*this, I8021_TAG),
 	m_y(*this, "Y%u", 0),
 	m_leds(*this, "led%u", 0U),
-	m_write_clock(*this),
 	m_busy(1),
 	m_data(0),
 	m_clk(1),
@@ -321,7 +321,7 @@ void trs80m2_keyboard_device::kb_p1_w(uint8_t data)
 		m_data = data_bit;
 		m_clk = clk;
 
-		m_write_clock(clk);
+		m_port->clock_w(clk);
 	}
 
 	m_leds[LED_0] = BIT(data, 2);

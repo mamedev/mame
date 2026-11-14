@@ -106,8 +106,10 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 
 #include "emu.h"
 #include "lk201.h"
-#include "cpu/m6805/m6805.h"
 #include "speaker.h"
+
+#include <algorithm>
+#include <iterator>
 
 //**************************************************************************
 //  MACROS / CONSTANTS
@@ -115,63 +117,6 @@ ________|D7  |D6  |D5  |D4 |D3 |D2 |D1 |D0
 
 #define LK201_CPU_TAG   "lk201_cpu"
 #define LK201_SPK_TAG   "beeper"
-
-//-------------------------------------------------
-//  SERIAL COMMUNICATIONS INTERFACE
-//-------------------------------------------------
-
-#define SCI_BAUD        0                               // Baud rate register
-#define BAUD_SCR        0x07                            // SCI baud rate select
-#define BAUD_SCP        0x30                            // SCI prescaler select
-
-#define SCI_SCCR1       1                               // Control register 1
-#define SCCR1_WAKE      0x08                            // Wakeup method
-#define SCCR1_M         0x10                            // Character length
-#define SCCR1_T8        0x40                            // Transmit bit 8
-#define SCCR1_R8        0x80                            // Receive bit 8
-
-#define SCI_SCCR2       2                               // Control register 2
-#define SCCR2_SBK       0x01                            // Send break
-#define SCCR2_RWU       0x02                            // Receiver wakeup enable
-#define SCCR2_RE        0x04                            // Receiver enable
-#define SCCR2_TE        0x08                            // Transmitter enable
-#define SCCR2_ILIE      0x10                            // Idle line interrupt enable
-#define SCCR2_RIE       0x20                            // Receiver interrupt enable
-#define SCCR2_TCIE      0x40                            // Transmit complete interrupt enable
-#define SCCR2_TIE       0x80                            // Transmit interrupt enable
-
-#define SCI_SCSR        3                               // Status register
-#define SCSR_FE         0x02                            // Receiver framing error
-#define SCSR_NF         0x04                            // Receiver noise
-#define SCSR_OR         0x08                            // Receiver overrun
-#define SCSR_IDLE       0x10                            // Receiver idle
-#define SCSR_RDRF       0x20                            // Receive data register full
-#define SCSR_TC         0x40                            // Transmit complete
-#define SCSR_TDRE       0x80                            // Transmit data register empty
-#define SCSR_INT        (SCSR_IDLE | SCSR_RDRF| \
-							SCSR_TC | SCSR_TDRE)        // Interrupt sources
-
-#define SCI_SCDR        4                               // Data register
-
-//-------------------------------------------------
-//  SERIAL PERIPHERAL INTERFACE
-//-------------------------------------------------
-
-#define SPI_SPCR        0                               // Control register
-#define SPCR_SPR        0x03                            // SPI clock rate select
-#define SPCR_CPHA       0x04                            // Clock phase
-#define SPCR_CPOL       0x08                            // Clock polarity
-#define SPCR_MSTR       0x10                            // Master mode select
-#define SPCR_DWOM       0x20                            // Port D wire-or mode option
-#define SPCR_SPE        0x40                            // Serial peripheral system enable
-#define SPCR_SPIE       0x80                            // Serial peripheral interrupt enable
-
-#define SPI_SPSR        1                               // Status register
-#define SPSR_MODF       0x10                            // Mode fault flag
-#define SPSR_WCOL       0x40                            // Write collision
-#define SPSR_SPIF       0x80                            // SPI transfer complete
-
-#define SPI_SPDR        2                               // Data I/O Register
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -192,29 +137,27 @@ ROM_START( lk201 )
 ROM_END
 
 //-------------------------------------------------
-//  ADDRESS_MAP
-//-------------------------------------------------
-
-void lk201_device::lk201_map(address_map &map)
-{
-	map(0x0000, 0x0002).rw(FUNC(lk201_device::ports_r), FUNC(lk201_device::ports_w));
-	map(0x0004, 0x0006).rw(FUNC(lk201_device::ddr_r), FUNC(lk201_device::ddr_w));
-	map(0x000a, 0x000c).rw(FUNC(lk201_device::spi_r), FUNC(lk201_device::spi_w));
-	map(0x000d, 0x0011).rw(FUNC(lk201_device::sci_r), FUNC(lk201_device::sci_w));
-	map(0x0012, 0x001b).rw(FUNC(lk201_device::timer_r), FUNC(lk201_device::timer_w));
-	map(0x0050, 0x00ff).ram();
-	map(0x0100, 0x1fff).rom().region(LK201_CPU_TAG, 0x100);
-}
-
-
-//-------------------------------------------------
 //  device_add_mconfig - add device configuration
 //-------------------------------------------------
 
 void lk201_device::device_add_mconfig(machine_config &config)
 {
-	M68HC05EG(config, m_maincpu, XTAL(4'000'000)); // actually 68HC05C4, clock verified by Lord_Nightmare
-	m_maincpu->set_addrmap(AS_PROGRAM, &lk201_device::lk201_map);
+	M68HC05C4(config, m_maincpu, 4_MHz_XTAL); // clock verified by Lord_Nightmare
+
+	// key matrix rows are driven from ports A and B and PC0-PC1, PC6 loads the matrix columns
+	// into a shift register and PC7 strobes the LED and bell volume latch
+	m_maincpu->porta_w().set(FUNC(lk201_device::rows_w<0>));
+	m_maincpu->portb_w().set(FUNC(lk201_device::rows_w<1>));
+	// The firmware reads PC4-PC5 back against strobes on PC0, PC1, PC6 and PC7 to form the
+	// keyboard variant code that follows the power-up ID byte.  Inferred: the board's pull-ups
+	// on PC2-PC5 aren't known, so all inputs read low, which gives variant code 0.
+	m_maincpu->portc_r().set_constant(0x00);
+	m_maincpu->portc_w().set(FUNC(lk201_device::portc_w));
+
+	// the SPI shifts those registers; MISO is PD2, which the SPI samples through the port D read
+	m_maincpu->spi_sck().set(FUNC(lk201_device::sck_w));
+	m_maincpu->spi_mosi().set(FUNC(lk201_device::mosi_w));
+	m_maincpu->portd_r().set(FUNC(lk201_device::portd_r));
 
 	SPEAKER(config, "mono").front_center();
 	BEEP(config, m_speaker, 2000); // clocked by a 555 timer at E8, the volume of the beep is controllable by: (8051 model) P2.0 thru P2.3, or (6805 model) the upper 4 bits of the LED data latch
@@ -505,15 +448,13 @@ ioport_constructor lk201_device::device_input_ports() const
 
 lk201_device::lk201_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, LK201, tag, owner, clock),
-	device_serial_interface(mconfig, *this),
 	m_maincpu(*this, LK201_CPU_TAG),
 	m_speaker(*this, LK201_SPK_TAG),
 	m_kbd(*this, "KBD%u", 0U),
 	m_led_wait(*this, "led_wait"),
 	m_led_compose(*this, "led_compose"),
 	m_led_lock(*this, "led_lock"),
-	m_led_hold(*this, "led_hold"),
-	m_tx_handler(*this)
+	m_led_hold(*this, "led_hold")
 {
 }
 
@@ -523,9 +464,13 @@ lk201_device::lk201_device(const machine_config &mconfig, const char *tag, devic
 
 void lk201_device::device_start()
 {
-	m_count = timer_alloc(FUNC(lk201_device::timer_irq), this);
-
-	m_beeper = timer_alloc(FUNC(lk201_device::beeper_off), this);
+	save_item(NAME(m_rows));
+	save_item(NAME(m_pc6));
+	save_item(NAME(m_pc7));
+	save_item(NAME(m_sck));
+	save_item(NAME(m_mosi));
+	save_item(NAME(m_kbd_sr));
+	save_item(NAME(m_led_sr));
 }
 
 
@@ -535,413 +480,115 @@ void lk201_device::device_start()
 
 void lk201_device::device_reset()
 {
-	m_beeper->adjust(attotime::never);
+	// the pins are inputs until the firmware configures them; the load and strobe inputs
+	// are assumed to read high then (the board isn't known)
+	std::fill(std::begin(m_rows), std::end(m_rows), 0);
+	m_pc6 = true;
+	m_pc7 = true;
+	m_sck = true; // the firmware's SPI mode idles SCK high
+	m_mosi = 0;
+	m_kbd_sr = 0;
+	m_led_sr = 0;
 
-	m_speaker->set_state(0);
-	m_speaker->set_output_gain(0, 0);
-
-	ddrs[0] = ddrs[1] = ddrs[2] = 0;
-	ports[0] = ports[1] = ports[2] = 0;
-
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
-	set_rate(4800);
-	m_count->adjust(attotime::from_hz(1200), 0, attotime::from_hz(1200));
-	memset(m_timer.regs, 0, sizeof(m_timer.regs));
-
-	sci_ctl2 = 0;
-	sci_status = (SCSR_TC | SCSR_TDRE);
-	sci_tdr = 0;
-	sci_tdr_full = false;
-
-	spi_status = 0;
-	spi_data = 0;
-
-	kbd_data = 0;
-	led_data = 0;
-
-	transmit_register_reset();
-	receive_register_reset();
-
-	// GREEN KEYBOARD LEDs (1 = on, 0 = off):
-	m_led_wait = 0;    // led8
-	m_led_compose = 0; // led9
-	m_led_lock = 0;    // led10
-	m_led_hold = 0;    // led11
-
-	update_interrupts();
-	update_timer_interrupt();
+	update_latch();
 }
 
-TIMER_CALLBACK_MEMBER(lk201_device::timer_irq)
-{
-	m_timer.tsr |= TSR_OCFL;
-	update_timer_interrupt();
-}
 
-void lk201_device::update_timer_interrupt()
-{
-	// the output compare interrupt is requested while OCFL is set and enabled
-	m_maincpu->set_input_line(M68HC05EG_INT_TIMER, ((m_timer.tcr & TCR_OCIE) && (m_timer.tsr & TSR_OCFL)) ? ASSERT_LINE : CLEAR_LINE);
-}
+//-------------------------------------------------
+//  key matrix and the SPI shift registers
+//-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(lk201_device::beeper_off)
+// A row is driven while its pin is an output set high; the columns of all driven rows
+// with a key down in them read high.
+u8 lk201_device::scan_matrix()
 {
-	m_speaker->set_output_gain(0, 0);
-	m_speaker->set_state(0);
-}
-
-void lk201_device::rcv_complete()
-{
-	sci_status |= SCSR_RDRF;
-	update_interrupts();
-	receive_register_extract();
-
-	int data = get_received_char();
-	m_kbd_state = data;
-//  printf("\nlk201 got %02x\n", m_kbd_state);
-}
-
-void lk201_device::tra_complete()
-{
-	// a byte waiting in the transmit data register follows at once; transmit
-	// complete only when there is none
-	if (sci_tdr_full)
+	u32 const rows(u32(m_rows[0]) | (u32(m_rows[1]) << 8) | (u32(m_rows[2]) << 16));
+	u8 columns = 0;
+	for (u32 i = 0; i < m_kbd.size(); i++)
 	{
-		sci_tdr_full = false;
-		transmit_register_setup(sci_tdr);
-		sci_status |= SCSR_TDRE;
+		if (BIT(rows, i))
+			columns |= m_kbd[i]->read();
+	}
+	return columns;
+}
+
+// The matrix columns go to a parallel-in shift register that loads while PC6 is low
+// (inferred: no schematic of the 6805 board).
+void lk201_device::update_matrix_load()
+{
+	if (!m_pc6)
+		m_kbd_sr = scan_matrix();
+}
+
+template <u32 N> void lk201_device::rows_w(offs_t offset, u8 data, u8 mask)
+{
+	m_rows[N] = data & mask;
+	update_matrix_load();
+}
+
+void lk201_device::portc_w(offs_t offset, u8 data, u8 mask)
+{
+	m_rows[2] = data & mask & 0x03;
+
+	// PC6 and PC7 are taken as high while they're inputs (see device_reset), though portc_r
+	// reports every input low
+	bool const load(BIT(data | ~mask, 6));
+	bool const strobe(BIT(data | ~mask, 7));
+	m_pc6 = load;
+	update_matrix_load();
+
+	// PC7 falling latches the output shift register (the edge is inferred: the firmware only
+	// pulses it low then high)
+	bool const latch(m_pc7 && !strobe);
+	m_pc7 = strobe;
+	if (latch)
+		update_latch();
+}
+
+// SCK is common to both shift registers: they shift on the rising edge, the input one
+// only when not loading (inferred too).
+void lk201_device::sck_w(int state)
+{
+	bool const rising(state && !m_sck);
+	m_sck = state;
+	if (rising)
+	{
+		if (m_pc6)
+			m_kbd_sr <<= 1;
+		m_led_sr = (m_led_sr << 1) | m_mosi;
+	}
+}
+
+// Lower nibble of the latch is the LEDs (1 = on).  The upper nibble sets the volume of the
+// beeper, 0 being off (see TABLE 4 in the ROM).
+void lk201_device::update_latch()
+{
+	m_led_wait = BIT(m_led_sr, 0);
+	m_led_compose = BIT(m_led_sr, 1);
+	m_led_lock = BIT(m_led_sr, 2);
+	m_led_hold = BIT(m_led_sr, 3);
+
+	int level;
+	switch (m_led_sr & 0xf0)
+	{
+	case 0xf0: level = 0; break; // 8
+	case 0xd0: level = 1; break; // 7
+	case 0xc0: level = 2; break; // 6
+	case 0x60: level = 3; break; // 5
+	case 0xb0: level = 4; break; // 4
+	case 0xa0: level = 5; break; // 3
+	case 0x30: level = 6; break; // 2
+	case 0x90: level = 7; break; // 1
+	default: level = -1; break;
+	}
+	if (level >= 0)
+	{
+		m_speaker->set_state(1);
+		// 12% per level is unsourced; the real taper hasn't been measured
+		m_speaker->set_output_gain(0, (100 - (12 * level)) / 100.0f);
 	}
 	else
 	{
-		sci_status |= (SCSR_TC | SCSR_TDRE);
+		m_speaker->set_state(0);
 	}
-	update_interrupts();
-}
-
-void lk201_device::tra_callback()
-{
-	m_tx_handler(transmit_register_get_data_bit());
-}
-
-void lk201_device::update_interrupts()
-{
-	if (sci_ctl2 & sci_status & SCSR_INT)
-	{
-		m_maincpu->set_input_line(M68HC05EG_INT_CPI, 1);
-	}
-	else
-	{
-		m_maincpu->set_input_line(M68HC05EG_INT_CPI, 0);
-	}
-}
-
-uint8_t lk201_device::timer_r(offs_t offset)
-{
-	static uint16_t count;
-
-	uint8_t ret = m_timer.regs[offset];
-
-	switch (offset)
-	{
-	case 8:  // ACRH (high value is stored and reused when reading low)
-		count = (m_maincpu->total_cycles() / 4) & 0x0000ffff;
-		ret = count >> 8;
-		break;
-	case 9:  // ACRL
-		ret = count & 0x00ff;
-		break;
-	}
-
-	if(m_timer.tsr)
-	{
-		m_timer.tsr = 0;
-		update_timer_interrupt();
-	}
-	return ret;
-}
-
-void lk201_device::timer_w(offs_t offset, uint8_t data)
-{
-	static uint16_t count;
-	static int save_tsr;
-
-	m_timer.regs[offset] = data;
-
-	switch (offset)
-	{
-	case 0: // TCR: OCIE enables or withdraws a pending request
-		update_timer_interrupt();
-		break;
-	case 4: // OCRH
-		save_tsr = m_timer.tsr; //  prevent crashes in between OCRH / OCRL loads
-		m_timer.tsr &= (255-TSR_OCFL); // OCFL flag tested for zero in TIMER routine
-
-		count = m_timer.ocrh << 8; // store for later (when LOW is written).
-		break;
-	case 5 : // OCRL
-		count |= m_timer.ocrl;
-		m_timer.ocrh = count >> 8;
-
-		m_timer.tsr = save_tsr; // restore flags
-		break;
-	}
-}
-
-uint8_t lk201_device::ddr_r(offs_t offset)
-{
-	return ddrs[offset];
-}
-
-void lk201_device::ddr_w(offs_t offset, uint8_t data)
-{
-//  printf("%02x to PORT %c DDR (PC=%x)\n", data, 'A' + offset, m_maincpu->pc());
-
-	uint8_t olddata = ddrs[offset];
-	ddrs[offset] = data;
-	send_port(offset, ports[offset] & olddata);
-}
-
-uint8_t lk201_device::ports_r(offs_t offset)
-{
-	uint8_t incoming = 0;
-
-	// apply data direction registers
-	incoming &= (ddrs[offset] ^ 0xff);
-	// add in ddr-masked version of port writes
-	incoming |= (ports[offset] & ddrs[offset]);
-
-//  printf("PORT %c read = %02x (DDR = %02x latch = %02x) (PC=%x)\n", 'A' + offset, ports[offset], ddrs[offset], ports[offset], m_maincpu->pc());
-
-	return incoming;
-}
-
-void lk201_device::ports_w(offs_t offset, uint8_t data)
-{
-	uint8_t olddata = ports[offset];
-	ports[offset] = data;            //   "port writes are independent of DDRC"
-	send_port(offset, olddata & ddrs[offset]);
-//  printf("\nPORT %c write %02x (OLD = %02x) (DDR = %02x) (PC=%x)\n", 'A' + offset, data, olddata, ddrs[offset], m_maincpu->pc());
-}
-
-void lk201_device::send_port(uint8_t offset, uint8_t olddata)
-{
-	uint8_t porta = ports[0] & ddrs[0];
-	uint8_t portb = ports[1] & ddrs[1];
-	uint8_t portc = ports[2] & ddrs[2];
-
-	switch (offset)
-	{
-		case 0: // port A
-			break;
-
-		case 1: // port B
-			break;
-
-		case 2: // port C
-			// Check for keyboard read strobe
-			if (((portc & 0x40) == 0) && (olddata & 0x40))
-			{
-				if (porta & 0x1) kbd_data = m_kbd[0]->read();
-				if (porta & 0x2) kbd_data = m_kbd[1]->read();
-				if (porta & 0x4) kbd_data = m_kbd[2]->read();
-				if (porta & 0x8) kbd_data = m_kbd[3]->read();
-				if (porta & 0x10) kbd_data = m_kbd[4]->read();
-				if (porta & 0x20) kbd_data = m_kbd[5]->read();
-				if (porta & 0x40) kbd_data = m_kbd[6]->read();
-				if (porta & 0x80) kbd_data = m_kbd[7]->read();
-				if (portb & 0x1) kbd_data = m_kbd[8]->read();
-				if (portb & 0x2) kbd_data = m_kbd[9]->read();
-				if (portb & 0x4) kbd_data = m_kbd[10]->read();
-				if (portb & 0x8) kbd_data = m_kbd[11]->read();
-				if (portb & 0x10) kbd_data = m_kbd[12]->read();
-				if (portb & 0x20) kbd_data = m_kbd[13]->read();
-				if (portb & 0x40) kbd_data = m_kbd[14]->read();
-				if (portb & 0x80) kbd_data = m_kbd[15]->read();
-				if (portc & 0x1) kbd_data = m_kbd[16]->read();
-				if (portc & 0x2) kbd_data = m_kbd[17]->read();
-			}
-
-			// Check for LED update strobe
-			if (((portc & 0x80) == 0) && (olddata & 0x80))
-			{
-			if(ddrs[2] != 0x00)
-			{   // Lower nibble contains the LED values (1 = on, 0 = off)
-				m_led_wait   = (led_data & 0x1) == 1;
-				m_led_compose= (led_data & 0x2) == 2;
-				m_led_lock   = (led_data & 0x4) == 4;
-				m_led_hold   = (led_data & 0x8) == 8;
-			}
-			if (led_data & 0xf0)
-			{
-				m_speaker->set_state(1);
-				// Beeps < 20 ms are clipped. A key click on a LK201 lasts 2 ms...
-				if(m_kbd_state == LK_CMD_BELL)
-					m_beeper->adjust(attotime::from_msec(125));
-				else
-					m_beeper->adjust(attotime::from_msec(25)); // see note
-	}
-			// Upper 4 bits of LED_DATA contain encoded volume info
-			switch (led_data & 0xf0)
-			{
-				case 0xf0: // 8  - (see TABLE 4 in 68HC05xx ROM)
-					m_speaker->set_output_gain(0, 100.0f);
-					break;
-				case 0xd0: // 7
-					m_speaker->set_output_gain(0, (100 - (12 * 1)) / 100.0f);
-					break;
-				case 0xc0: // 6
-					m_speaker->set_output_gain(0, (100 - (12 * 2)) / 100.0f);
-					break;
-				case 0x60: // 5
-					m_speaker->set_output_gain(0, (100 - (12 * 3)) / 100.0f);
-					break;
-				case 0xb0: // 4
-					m_speaker->set_output_gain(0, (100 - (12 * 4)) / 100.0f);
-					break;
-				case 0xa0: // 3
-					m_speaker->set_output_gain(0, (100 - (12 * 5)) / 100.0f);
-					break;
-				case 0x30: // 2
-					m_speaker->set_output_gain(0, (100 - (12 * 6)) / 100.0f);
-					break;
-				case 0x90: // 1
-					m_speaker->set_output_gain(0, (100 - (12 * 7)) / 100.0f);
-					break;
-				default:
-					;
-			} // switch (volume)
-
-		} // if (update_strobe)
-
-		} // outer switch
-}
-
-uint8_t lk201_device::sci_r(offs_t offset)
-{
-	uint8_t incoming = 0;
-
-	switch (offset)
-	{
-		case SCI_BAUD:  // Baud rate
-			break;
-
-		case SCI_SCCR1: // Control 1
-			break;
-
-		case SCI_SCCR2: // Control 2
-			incoming = sci_ctl2;
-			break;
-
-		case SCI_SCSR:  // Status
-			incoming = sci_status;
-			break;
-
-		case SCI_SCDR:  // Data
-			incoming = get_received_char();
-			sci_status &= ~SCSR_RDRF;
-			update_interrupts();
-			break;
-	}
-
-//  printf("SCI read @ %x = %02x (PC=%x)\n", offset, incoming, m_maincpu->pc());
-
-	return incoming;
-}
-
-void lk201_device::sci_w(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case SCI_BAUD:  // Baud rate
-			break;
-
-		case SCI_SCCR1: // Control 1
-			break;
-
-		case SCI_SCCR2: // Control 2
-			sci_ctl2 = data;
-			update_interrupts();
-			break;
-
-		case SCI_SCSR:  // Status
-			break;
-
-		case SCI_SCDR:  // Data
-//          printf("LK201: sending %02x\n", data);
-			// the transmit data register is double buffered: it moves to the shift
-			// register when that is idle, emptying again, or waits for the byte
-			// being sent (a write while it is still full replaces it); TDRE is set
-			// at once here, where the chip sets it as the byte moves (not modelled)
-			sci_status &= ~SCSR_TC;
-			if (is_transmit_register_empty())
-			{
-				transmit_register_setup(data);
-				sci_status |= SCSR_TDRE;
-			}
-			else
-			{
-				sci_tdr = data;
-				sci_tdr_full = true;
-				sci_status &= ~SCSR_TDRE;
-			}
-			update_interrupts();
-			break;
-	}
-
-//  printf("SCI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
-}
-
-uint8_t lk201_device::spi_r(offs_t offset)
-{
-	uint8_t incoming = 0;
-
-	switch (offset)
-	{
-		case SPI_SPCR:  // Control
-			break;
-
-		case SPI_SPSR:  // Status
-			incoming = spi_status;
-			spi_status &= ~SPSR_SPIF;
-			break;
-
-		case SPI_SPDR:  // Data I/O
-			incoming = spi_data;
-			break;
-	}
-
-//  printf("SPI read @ %x = %02x (PC=%x)\n", offset, incoming, m_maincpu->pc());
-
-	return incoming;
-}
-
-void lk201_device::spi_w(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case SPI_SPCR:  // Control
-			break;
-
-		case SPI_SPSR:  // Status (read only)
-			break;
-
-		case SPI_SPDR:  // Data I/O
-			spi_data = data;
-
-			// Transfer only allowed if transfer complete flag has been acknowleged
-			if ((spi_status & SPSR_SPIF) == 0)
-			{
-				// Data out
-				led_data = data;
-
-				// Data in
-				spi_data = kbd_data;
-
-				// Indicate transfer complete
-				spi_status |= SPSR_SPIF;
-			}
-			break;
-	}
-
-//  printf("SPI %02x to %x (PC=%x)\n", data, offset, m_maincpu->pc());
 }

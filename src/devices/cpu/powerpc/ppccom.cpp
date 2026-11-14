@@ -250,6 +250,7 @@ ppc_device::ppc_device(
 	, m_drcuml(*this, CACHE_SIZE + sizeof(internal_ppc_state))
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
+	, m_track_physical_code(false)
 	, m_reservation_mask(~uint32_t(reservation_size - 1))
 	, m_dasm(powerpc_disassembler())
 {
@@ -583,6 +584,7 @@ void ppc_device::device_start()
 
 	// init bitmap of which logical pages have compiled code
 	m_codepage_bits.assign(CODEPAGE_SIZE, 0);    // 0x1'0000'0000 / 4096 = 0x10'0000
+	m_physpage_bits.assign(CODEPAGE_SIZE, 0);
 
 	m_entry = nullptr;
 	m_nocode = nullptr;
@@ -796,6 +798,7 @@ void ppc_device::device_start()
 
 	/* register for save states */
 	save_item(NAME(m_core->pc));
+	save_item(NAME(m_checkstop));
 	save_item(NAME(m_core->r));
 	save_item(NAME(m_core->f));
 	save_item(NAME(m_core->cr));
@@ -975,6 +978,7 @@ void ppc_device::device_start()
 		/* append exception handlers for various types */
 		static_generate_exception(EXCEPTION_RESET,     true,  "exception_reset");
 		static_generate_exception(EXCEPTION_MACHCHECK, true,  "exception_machine_check");
+		static_generate_exception(EXCEPTION_MACHCHECK, false, "exception_machine_check_norecover");
 		static_generate_exception(EXCEPTION_DSI,       true,  "exception_dsi");
 		static_generate_exception(EXCEPTION_ISI,       true,  "exception_isi");
 		static_generate_exception(EXCEPTION_EI,        true,  "exception_ei");
@@ -1255,12 +1259,42 @@ void ppc_device::device_stop()
 
 
 /*-------------------------------------------------
+    device_post_load - rebuild the DRC mode,
+    which is only updated when the MSR changes
+-------------------------------------------------*/
+
+void ppc_device::device_post_load()
+{
+	// same as generate_update_mode()
+	const u32 msr = m_core->msr;
+	u32 mode = (m_flavor == PPC_MODEL_601) ? BIT(m_core->spr[SPR603_HID0], 3) : (msr & MSR_LE);
+
+	if ((m_cap & PPCCAP_OEA) || (m_flavor == PPC_MODEL_403GCX))
+	{
+		mode |= (msr & MSROEA_DR) ? 0x02 : 0;
+	}
+
+	if (m_cap & PPCCAP_4XX)
+	{
+		mode |= (msr & MSR4XX_PE) ? 0x02 : 0;
+	}
+	mode |= (msr & MSR_PR) ? 0x04 : 0;
+	m_core->mode = mode;
+
+	// the compiled code may be for different memory contents
+	m_cache_dirty = true;
+}
+
+
+/*-------------------------------------------------
     ppccom_reset - reset the state of all the
     registers
 -------------------------------------------------*/
 
 void ppc_device::device_reset()
 {
+	m_checkstop = false;
+
 	// the memory accessors are generated once, after the driver has added its fast RAM regions
 	if (!m_read8[0])
 	{
@@ -1313,6 +1347,14 @@ void ppc_device::device_reset()
 		// initialize the 603e HID1 register; PC0-PC3 are a read-only view of the PLL_CFG pins
 		// PLL_CFG0-3 encodings indexed by twice the CPU:bus ratio (0 = no such setting)
 		static constexpr uint8_t pll_cfg[13] = {0, 0, 0x1, 0xc, 0x4, 0x6, 0x8, 0xe, 0xa, 0x7, 0xb, 0x9, 0xd};
+		uint32_t const ratio = m_system_clock ? ((uint64_t(clock()) * 4 + m_system_clock) / (uint64_t(m_system_clock) * 2)) : 0;
+		m_core->spr[SPR603_HID1] = (ratio < std::size(pll_cfg)) ? (uint32_t(pll_cfg[ratio]) << 28) : 0;
+	}
+	else if (m_flavor == PPC_MODEL_750)
+	{
+		// The 740/750 HID1 register is different from the 603e
+		// Source: MPC750 hardware specifications, table 17 (indexed by twice the CPU:bus ratio)
+		static constexpr uint8_t pll_cfg[17] = {0, 0, 0x3, 0, 0, 0, 0x8, 0xe, 0xa, 0x7, 0xb, 0x9, 0xd, 0x5, 0x2, 0x1, 0xc};
 		uint32_t const ratio = m_system_clock ? ((uint64_t(clock()) * 4 + m_system_clock) / (uint64_t(m_system_clock) * 2)) : 0;
 		m_core->spr[SPR603_HID1] = (ratio < std::size(pll_cfg)) ? (uint32_t(pll_cfg[ratio]) << 28) : 0;
 	}
@@ -2402,6 +2444,16 @@ void ppc_device::ppccom_execute_mtspr()
 				return;
 			case SPR4XX_TBHI:
 				set_timebase((get_timebase() & ~u64(0x00000000ffffffffU)) | ((uint64_t)(m_core->param1 & 0x00ffffff) << 32));
+				return;
+		}
+	}
+
+	if (m_flavor == PPC_MODEL_750)
+	{
+		switch (m_core->param0)
+		{
+			/* read-only */
+			case SPR603_HID1:
 				return;
 		}
 	}

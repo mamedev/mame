@@ -3133,6 +3133,8 @@ if MACHINES["PCI"] then
 		MAME_DIR .. "src/devices/machine/sis950_smbus.h",
 		MAME_DIR .. "src/devices/machine/sis85c496.cpp",
 		MAME_DIR .. "src/devices/machine/sis85c496.h",
+		MAME_DIR .. "src/devices/machine/vt8231_acpi.cpp",
+		MAME_DIR .. "src/devices/machine/vt8231_acpi.h",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.cpp",
 		MAME_DIR .. "src/devices/machine/vt8231_isa.h",
 		MAME_DIR .. "src/devices/machine/vt82c585vp.cpp",
@@ -3217,6 +3219,18 @@ if MACHINES["PIT8253"] then
 	files {
 		MAME_DIR .. "src/devices/machine/pit8253.cpp",
 		MAME_DIR .. "src/devices/machine/pit8253.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/pl080.h,MACHINES["PL080"] = true
+---------------------------------------------------
+
+if MACHINES["PL080"] then
+	files {
+		MAME_DIR .. "src/devices/machine/pl080.cpp",
+		MAME_DIR .. "src/devices/machine/pl080.h",
 	}
 end
 
@@ -4228,6 +4242,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/upd72070.h,MACHINES["UPD72070"] = true
+---------------------------------------------------
+
+if MACHINES["UPD72070"] then
+	files {
+		MAME_DIR .. "src/devices/machine/upd72070.cpp",
+		MAME_DIR .. "src/devices/machine/upd72070.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/upd765.h,MACHINES["UPD765"] = true
 ---------------------------------------------------
 
@@ -4885,6 +4911,18 @@ if MACHINES["FDC37C665IR"] then
 	files {
 		MAME_DIR .. "src/devices/machine/fdc37c665ir.cpp",
 		MAME_DIR .. "src/devices/machine/fdc37c665ir.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/fdc37c669.h,MACHINES["FDC37C669"] = true
+---------------------------------------------------
+
+if MACHINES["FDC37C669"] then
+	files {
+		MAME_DIR .. "src/devices/machine/fdc37c669.cpp",
+		MAME_DIR .. "src/devices/machine/fdc37c669.h",
 	}
 end
 
@@ -5760,6 +5798,25 @@ if MACHINES["ALPSDPG23"] then
 	files {
 		MAME_DIR .. "src/devices/machine/alpsdpg23.cpp",
 		MAME_DIR .. "src/devices/machine/alpsdpg23.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cgp220.h,MACHINES["CGP220"] = true
+---------------------------------------------------
+if MACHINES["CGP220"] then
+	files {
+		MAME_DIR .. "src/devices/machine/cgp220.cpp",
+		MAME_DIR .. "src/devices/machine/cgp220.h",
+	}
+
+	dependency {
+		{ MAME_DIR .. "src/devices/machine/cgp220.cpp", GEN_DIR .. "emu/layout/cgp220.lh" },
+	}
+
+	custombuildtask {
+		layoutbuildtask("emu/layout", "cgp220"),
 	}
 end
 

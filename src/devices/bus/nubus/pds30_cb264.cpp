@@ -35,19 +35,17 @@ public:
 protected:
 	nubus_cb264se30_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	void card_map(address_map &map) ATTR_COLD;
 
 	required_device<screen_device> m_screen;
 	required_device<bt473_device> m_ramdac;
 	required_device<tms34061_device> m_tms34061;
-
-	void card_map(address_map &map);
 
 private:
 	u32 tms_r(offs_t offset, u32 mem_mask);
@@ -112,9 +110,9 @@ void nubus_cb264se30_device::card_map(address_map &map)
 {
 	map(0x00'0000, 0x1f'ffff).rw(FUNC(nubus_cb264se30_device::vram_r), FUNC(nubus_cb264se30_device::vram_w));
 	map(0xfb'0000, 0xfb'00ff).rw(FUNC(nubus_cb264se30_device::tms_r), FUNC(nubus_cb264se30_device::tms_w));
-	map(0xfd'0000, 0xfd'0003).r(FUNC(nubus_cb264se30_device::vbl_r)).umask32(0xff000000);
-	map(0xfe'0000, 0xfe'0007).m(m_ramdac, FUNC(bt473_device::map)).umask32(0xff00ff00);
-	map(0xfe'000c, 0xfe'000f).rw(FUNC(nubus_cb264se30_device::mode_r), FUNC(nubus_cb264se30_device::mode_w)).umask32(0xff000000);
+	map(0xfd'0000, 0xfd'0003).umask32(0xff00'0000).r(FUNC(nubus_cb264se30_device::vbl_r));
+	map(0xfe'0000, 0xfe'0007).umask32(0xff00'ff00).m(m_ramdac, FUNC(bt473_device::map));
+	map(0xfe'000c, 0xfe'000f).umask32(0xff00'0000).rw(FUNC(nubus_cb264se30_device::mode_r), FUNC(nubus_cb264se30_device::mode_w));
 }
 
 void nubus_cb264se30_device::device_start()

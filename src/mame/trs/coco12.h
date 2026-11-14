@@ -51,6 +51,8 @@ public:
 	void field_sync(int state);
 
 	void coco(machine_config &config);
+	void coco1(machine_config &config);
+	void coco2(machine_config &config);
 	void cocoh(machine_config &config);
 	void coco2b(machine_config &config);
 	void coco2bh(machine_config &config);
@@ -61,16 +63,15 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	void configure_sam();
 
 	// PIA1
+	uint8_t coco1_pia1_pa_r();
 	virtual void pia1_pb_w(uint8_t data) override;
 
 	sam6883_device &sam() { return *m_sam; }
 	required_device<sam6883_device> m_sam;
 
 	void coco_mem(address_map &map) ATTR_COLD;
-	void coco_ram(address_map &map) ATTR_COLD;
 	void coco_rom0(address_map &map) ATTR_COLD;
 	void coco_rom1(address_map &map) ATTR_COLD;
 	void coco_rom2(address_map &map) ATTR_COLD;
@@ -92,8 +93,7 @@ public:
 		, m_acia(*this, "mosacia")
 		, m_psg(*this, "psg")
 		, m_timer(*this, "timer")
-		, m_ram_view(*this, "ram_view")
-		, m_rom_view(*this, "rom_view")
+		, m_rom(*this, MAINCPU_TAG)
 	{
 	}
 
@@ -102,7 +102,7 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	void configure_sam();
+	void update_ram_bank();
 	void deluxecoco_rom2(address_map &map) ATTR_COLD;
 	void deluxecoco_io1(address_map &map) ATTR_COLD;
 
@@ -113,8 +113,9 @@ protected:
 	TIMER_DEVICE_CALLBACK_MEMBER(perodic_timer);
 
 private:
-	memory_view m_ram_view;
-	memory_view m_rom_view;
+	required_region_ptr<uint8_t> m_rom;
+	uint8_t m_ram_bank_select = 0;
+	bool m_rom_select = false;  // internal ROM over $C000-$FEFF
 };
 
 #endif // MAME_TRS_COCO12_H

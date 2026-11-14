@@ -1,123 +1,52 @@
 // license:BSD-3-Clause
-// copyright-holders:MagikalUnicorn
-/***************************************************************************
-
-    ABLIC S-35390A real-time clock. Implements its serial clock/calendar and
-    control-register interface, using a command byte immediately after the
-    start condition with no following register-address byte.
-
-    Clock, calendar and alarm fields use a least-significant-value-first bit
-    layout while bytes are transferred most significant bit first.
-
-    Command Byte:
-        0 1 1 0 C2 C1 C0 R/W
-
-    TODO:
-    - Implement INT1/INT2 output modes and alarm matching.
-    - Implement clock correction.
-
-***************************************************************************/
+// copyright-holders:Peter Wilhelmsen
+// Seiko Instruments S-35390A RTC, byte-level I2C interface at 0x30-0x37.
+// Time, status and free-register subset.
+// TODO: Alarm outputs, frequency output and oscillator correction.
 
 #include "emu.h"
 #include "s35390a.h"
 
-#include "coreutil.h"
-
 #include <algorithm>
 #include <iterator>
 
-#define LOG_PROTOCOL (1U << 1)
-
+#define LOG_RTC (1U << 1)
 #define VERBOSE (0)
 #include "logmacro.h"
 
+DEFINE_DEVICE_TYPE(S35390A, s35390a_device, "s35390a", "Seiko Instruments S-35390A RTC")
 
-DEFINE_DEVICE_TYPE(S35390A, s35390a_device, "s35390a", "ABLIC S-35390A RTC")
-
-
-s35390a_device::s35390a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+s35390a_device::s35390a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, S35390A, tag, owner, clock)
-	, device_nvram_interface(mconfig, *this)
 	, device_rtc_interface(mconfig, *this)
-	, m_data{}
-	, m_transfer{}
-	, m_scl(1)
-	, m_sda_in(1)
+	, device_nvram_interface(mconfig, *this)
 {
 }
-
 
 void s35390a_device::device_start()
 {
-	m_clock_timer = timer_alloc(FUNC(s35390a_device::clock_tick), this);
-	attotime const period = attotime::from_hz(clock() / 32'768);
-	m_clock_timer->adjust(period, 0, period);
-
-	save_item(NAME(m_data));
+	nvram_default();
+	set_time(true, 0, 1, 1, 1, 0, 0, 0);
+	std::fill(std::begin(m_transfer), std::end(m_transfer), 0);
+	m_command = m_pos = m_length = 0;
+	m_selected = m_read = false;
+	m_timer = timer_alloc(FUNC(s35390a_device::tick), this);
+	m_timer->adjust(attotime::from_ticks(32'768, clock()), 0, attotime::from_ticks(32'768, clock()));
+	save_item(NAME(m_regs));
+	save_item(NAME(m_time));
 	save_item(NAME(m_transfer));
-	save_item(NAME(m_state));
+	save_item(NAME(m_register));
 	save_item(NAME(m_command));
-	save_item(NAME(m_shift));
-	save_item(NAME(m_bit_count));
-	save_item(NAME(m_byte_count));
-	save_item(NAME(m_expected));
-	save_item(NAME(m_scl));
-	save_item(NAME(m_sda_in));
-	save_item(NAME(m_sda_out));
-	save_item(NAME(m_master_ack));
+	save_item(NAME(m_pos));
+	save_item(NAME(m_length));
+	save_item(NAME(m_selected));
+	save_item(NAME(m_read));
 }
 
-void s35390a_device::device_reset()
+void s35390a_device::acknowledge(int state)
 {
-	m_state = STATE_IDLE;
-	m_command = 0;
-	m_shift = 0;
-	m_bit_count = 0;
-	m_byte_count = 0;
-	m_expected = 0;
-	// The host retains control of SCL and SDA during a device reset.
-	m_sda_out = 1;
-	m_master_ack = 0;
-}
-
-void s35390a_device::device_post_load()
-{
-	sync_clock();
-}
-
-
-void s35390a_device::nvram_default()
-{
-	std::fill(std::begin(m_data), std::end(m_data), 0);
-	m_data[REG_MONTH] = 1;
-	m_data[REG_DAY] = 1;
-	m_data[REG_STATUS_1] = 0x01;
-	m_data[REG_STATUS_2] = 0x80;
-	m_data[REG_INT_1] = 0x80;
-	sync_clock();
-}
-
-bool s35390a_device::nvram_read(util::read_stream &file)
-{
-	auto const [err, actual] = read(file, m_data, sizeof(m_data));
-	return !err && (actual == sizeof(m_data));
-}
-
-bool s35390a_device::nvram_write(util::write_stream &file)
-{
-	auto const [err, actual] = write(file, m_data, sizeof(m_data));
-	return !err && (actual == sizeof(m_data));
-}
-
-
-TIMER_CALLBACK_MEMBER(s35390a_device::clock_tick)
-{
-	advance_seconds();
-}
-
-bool s35390a_device::rtc_feature_y2k() const
-{
-	return false;
+	if (!state && m_read)
+		m_selected = false;
 }
 
 bool s35390a_device::rtc_feature_leap_year() const
@@ -127,392 +56,133 @@ bool s35390a_device::rtc_feature_leap_year() const
 
 void s35390a_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
-	m_data[REG_YEAR] = year % 100;
-	m_data[REG_MONTH] = month;
-	m_data[REG_DAY] = day;
-	m_data[REG_DAY_OF_WEEK] = day_of_week - 1;
-	m_data[REG_HOUR] = hour;
-	m_data[REG_MINUTE] = minute;
-	m_data[REG_SECOND] = second;
+	m_time[0] = convert_to_bcd(year % 100);
+	m_time[1] = convert_to_bcd(month);
+	m_time[2] = convert_to_bcd(day);
+	m_time[3] = (day_of_week - 1) % 7;
+	m_time[4] = convert_to_bcd(hour);
+	m_time[5] = convert_to_bcd(minute);
+	m_time[6] = convert_to_bcd(second);
 }
 
-void s35390a_device::sync_clock()
+TIMER_CALLBACK_MEMBER(s35390a_device::tick)
 {
-	set_time(false,
-		m_data[REG_YEAR],
-		m_data[REG_MONTH],
-		m_data[REG_DAY],
-		m_data[REG_DAY_OF_WEEK] + 1,
-		m_data[REG_HOUR],
-		m_data[REG_MINUTE],
-		m_data[REG_SECOND]);
+	advance_seconds();
 }
 
-
-void s35390a_device::scl_w(int state)
+void s35390a_device::nvram_default()
 {
-	state = state ? 1 : 0;
-	if (m_scl == state)
+	for (auto &bank : m_regs)
+		std::fill(std::begin(bank), std::end(bank), 0);
+	m_regs[0][0] = 0x40; // Valid, battery-backed MAME base time in 24-hour mode.
+}
+
+bool s35390a_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = read(file, &m_regs[0][0], sizeof(m_regs));
+	return !err && actual == sizeof(m_regs);
+}
+
+bool s35390a_device::nvram_write(util::write_stream &file)
+{
+	auto const [err, actual] = write(file, &m_regs[0][0], sizeof(m_regs));
+	return !err;
+}
+
+void s35390a_device::reset_registers()
+{
+	u8 const status = m_regs[0][0] & 0x70;
+	nvram_default();
+	m_regs[0][0] = status;
+	set_time(true, 0, 1, 1, 1, 0, 0, 0);
+	m_timer->adjust(attotime::from_ticks(32'768, clock()), 0, attotime::from_ticks(32'768, clock()));
+}
+
+void s35390a_device::apply_time()
+{
+	u32 const base = (m_command == 3) ? 4 : 0;
+	for (u32 i = 0; i < m_length; ++i)
+		m_time[base + i] = reverse(m_transfer[i]);
+	int hour = bcd_to_integer(m_time[4] & 0x3f);
+	if (!BIT(m_regs[0][0], 6))
+		hour = hour % 12 + (BIT(m_time[4], 6) ? 12 : 0);
+	int const month = bcd_to_integer(m_time[1] & 0x1f), day = bcd_to_integer(m_time[2] & 0x3f);
+	int const minute = bcd_to_integer(m_time[5] & 0x7f), second = bcd_to_integer(m_time[6] & 0x7f);
+	// Undefined out-of-range BCD writes must not reach the generic calendar.
+	if (month < 1 || month > 12 || day < 1 || day > 31 || hour > 23 || minute > 59 || second > 59)
 		return;
-
-	m_scl = state;
-	if (m_scl)
-		rising_edge();
-	else
-		falling_edge();
+	set_time(true, bcd_to_integer(m_time[0]), month, day, (m_time[3] & 7) % 7 + 1, hour, minute, second);
+	m_timer->adjust(attotime::from_ticks(32'768, clock()), 0, attotime::from_ticks(32'768, clock()));
+	LOGMASKED(LOG_RTC, "%s: time set %02x-%02x-%02x %02x:%02x:%02x\n", machine().describe_context(), m_time[0], m_time[1], m_time[2], m_time[4], m_time[5], m_time[6]);
 }
 
-void s35390a_device::sda_w(int state)
+u8 s35390a_device::transmit(offs_t data)
 {
-	state = state ? 1 : 0;
-	if (m_sda_in == state)
-		return;
-
-	u8 const previous = m_sda_in;
-	m_sda_in = state;
-
-	if (m_scl && m_sda_out)
+	if (BIT(data, 8))
 	{
-		if (previous && !m_sda_in)
-			bus_start();
-		else if (!previous && m_sda_in)
-			bus_stop();
-	}
-}
-
-void s35390a_device::bus_start()
-{
-	LOGMASKED(LOG_PROTOCOL, "start\n");
-	m_state = STATE_COMMAND;
-	m_shift = 0;
-	m_bit_count = 0;
-	m_byte_count = 0;
-	m_expected = 0;
-	m_sda_out = 1;
-}
-
-void s35390a_device::bus_stop()
-{
-	LOGMASKED(LOG_PROTOCOL, "stop\n");
-	m_state = STATE_IDLE;
-	m_sda_out = 1;
-}
-
-void s35390a_device::rising_edge()
-{
-	switch (m_state)
-	{
-	case STATE_COMMAND:
-	case STATE_WRITE_DATA:
-		if (m_bit_count < 8)
+		m_selected = (data & 0xf0) == 0x60;
+		m_read = BIT(data, 0);
+		m_command = (data >> 1) & 7;
+		m_pos = 0;
+		m_length = (m_command == 2) ? 7 : ((m_command == 3 || m_command == 4 || m_command == 5) ? 3 : 1);
+		if (!m_selected)
+			return 1;
+		if (m_command == 2 || m_command == 3)
 		{
-			m_shift = (m_shift << 1) | m_sda_in;
-			m_bit_count++;
-		}
-		break;
-
-	case STATE_READ_DATA:
-		if (m_bit_count < 8)
-			m_bit_count++;
-		break;
-
-	case STATE_READ_ACK:
-		m_master_ack = !m_sda_in;
-		break;
-	}
-}
-
-void s35390a_device::falling_edge()
-{
-	switch (m_state)
-	{
-	case STATE_COMMAND:
-		if (m_bit_count == 8)
-		{
-			if ((m_shift & 0xf0) == 0x60)
+			u32 const base = (m_command == 3) ? 4 : 0;
+			for (u32 i = 0; i < m_length; ++i)
 			{
-				m_command = BIT(m_shift, 1, 3);
-				m_expected = command_length();
-				m_sda_out = 0;
-				m_state = STATE_COMMAND_ACK;
-				LOGMASKED(LOG_PROTOCOL, "command %u %s\n", m_command, BIT(m_shift, 0) ? "read" : "write");
-			}
-			else
-			{
-				LOGMASKED(LOG_PROTOCOL, "unknown device code %02x\n", m_shift);
-				m_state = STATE_IDLE;
-				m_sda_out = 1;
+				u8 value = m_time[base + i];
+				if (base + i == 4)
+				{
+					int const hour = bcd_to_integer(value);
+					if (!BIT(m_regs[0][0], 6))
+						value = convert_to_bcd(hour % 12);
+					if (hour >= 12)
+						value |= 0x40;
+				}
+				m_transfer[i] = reverse(value);
 			}
 		}
-		break;
-
-	case STATE_COMMAND_ACK:
-		m_sda_out = 1;
-		m_bit_count = 0;
-		m_byte_count = 0;
-		if (BIT(m_shift, 0))
-		{
-			prepare_read();
-			m_state = STATE_READ_DATA;
-			m_sda_out = BIT(m_transfer[0], 7);
-		}
 		else
 		{
-			m_state = STATE_WRITE_DATA;
+			std::copy_n(m_regs[m_command], m_length, m_transfer);
 		}
-		m_shift = 0;
-		break;
-
-	case STATE_WRITE_DATA:
-		if (m_bit_count == 8)
-		{
-			m_transfer[m_byte_count] = m_shift;
-			m_sda_out = 0;
-			m_state = STATE_WRITE_ACK;
-		}
-		break;
-
-	case STATE_WRITE_ACK:
-		m_sda_out = 1;
-		m_byte_count++;
-		if (m_byte_count >= m_expected)
-		{
-			finish_write();
-			m_state = STATE_IDLE;
-		}
-		else
-		{
-			m_shift = 0;
-			m_bit_count = 0;
-			m_state = STATE_WRITE_DATA;
-		}
-		break;
-
-	case STATE_READ_DATA:
-		if (m_bit_count == 8)
-		{
-			finish_read_byte();
-			m_sda_out = 1;
-			m_master_ack = 0;
-			m_state = STATE_READ_ACK;
-		}
-		else
-		{
-			m_sda_out = BIT(m_transfer[m_byte_count], 7 - m_bit_count);
-		}
-		break;
-
-	case STATE_READ_ACK:
-		if (m_master_ack && (m_byte_count + 1 < m_expected))
-		{
-			m_byte_count++;
-			m_bit_count = 0;
-			m_state = STATE_READ_DATA;
-			m_sda_out = BIT(m_transfer[m_byte_count], 7);
-		}
-		else
-		{
-			m_state = STATE_IDLE;
-			m_sda_out = 1;
-		}
-		break;
-	}
-}
-
-
-bool s35390a_device::alarm_mode() const
-{
-	if (m_command == 4)
-		return (m_data[REG_STATUS_2] & 0xf0) == 0x20;
-	else if (m_command == 5)
-		return (m_data[REG_STATUS_2] & 0x0e) == 0x02;
-
-	return false;
-}
-
-u8 s35390a_device::command_length() const
-{
-	switch (m_command)
-	{
-	case 2:
-		return 7;
-
-	case 3:
-		return 3;
-
-	case 4:
-	case 5:
-		return alarm_mode() ? 3 : 1;
-
-	default:
-		return 1;
-	}
-}
-
-u8 s35390a_device::encode_hour() const
-{
-	int hour = m_data[REG_HOUR];
-	bool const pm = hour >= 12;
-	if (!BIT(m_data[REG_STATUS_1], 6))
-		hour %= 12;
-
-	u8 result = bitswap<8>(convert_to_bcd(hour), 0, 1, 2, 3, 4, 5, 6, 7);
-	return (result & ~0x02) | (pm ? 0x02 : 0x00);
-}
-
-int s35390a_device::decode_hour(u8 data) const
-{
-	u8 const bcd = bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7) & 0x3f;
-	int hour = bcd_to_integer(bcd);
-	int const maximum = BIT(m_data[REG_STATUS_1], 6) ? 23 : 11;
-	if (((bcd & 0x0f) > 9) || ((bcd >> 4) > 9) || (hour > maximum))
 		return 0;
-
-	if (!BIT(m_data[REG_STATUS_1], 6))
-	{
-		if (BIT(data, 1))
-			hour += 12;
 	}
-
-	return hour;
-}
-
-void s35390a_device::prepare_read()
-{
-	std::fill(std::begin(m_transfer), std::end(m_transfer), 0);
-	m_expected = command_length();
-
-	switch (m_command)
+	if (!m_selected || m_read || m_pos >= m_length)
+		return 1;
+	m_transfer[m_pos++] = data;
+	if (m_pos == m_length)
 	{
-	case 0:
-		m_transfer[0] = m_data[REG_STATUS_1] & 0x7f;
-		break;
-
-	case 1:
-		m_transfer[0] = m_data[REG_STATUS_2];
-		break;
-
-	case 2:
-		m_transfer[0] = bitswap<8>(convert_to_bcd(m_data[REG_YEAR]), 0, 1, 2, 3, 4, 5, 6, 7);
-		m_transfer[1] = bitswap<8>(convert_to_bcd(m_data[REG_MONTH]), 0, 1, 2, 3, 4, 5, 6, 7);
-		m_transfer[2] = bitswap<8>(convert_to_bcd(m_data[REG_DAY]), 0, 1, 2, 3, 4, 5, 6, 7);
-		m_transfer[3] = bitswap<8>(m_data[REG_DAY_OF_WEEK], 0, 1, 2, 3, 4, 5, 6, 7);
-		m_transfer[4] = encode_hour();
-		m_transfer[5] = bitswap<8>(convert_to_bcd(m_data[REG_MINUTE]), 0, 1, 2, 3, 4, 5, 6, 7);
-		m_transfer[6] = bitswap<8>(convert_to_bcd(m_data[REG_SECOND]), 0, 1, 2, 3, 4, 5, 6, 7);
-		break;
-
-	case 3:
-		m_transfer[0] = encode_hour();
-		m_transfer[1] = bitswap<8>(convert_to_bcd(m_data[REG_MINUTE]), 0, 1, 2, 3, 4, 5, 6, 7);
-		m_transfer[2] = bitswap<8>(convert_to_bcd(m_data[REG_SECOND]), 0, 1, 2, 3, 4, 5, 6, 7);
-		break;
-
-	case 4:
-		std::copy_n(&m_data[REG_INT_1], m_expected, m_transfer);
-		break;
-
-	case 5:
-		std::copy_n(&m_data[REG_INT_2], m_expected, m_transfer);
-		break;
-
-	case 6:
-		m_transfer[0] = m_data[REG_CORRECTION];
-		break;
-
-	case 7:
-		m_transfer[0] = m_data[REG_FREE];
-		break;
-	}
-}
-
-void s35390a_device::finish_read_byte()
-{
-	if ((m_command == 0) && !m_byte_count)
-		m_data[REG_STATUS_1] &= ~0x0f;
-}
-
-void s35390a_device::finish_write()
-{
-	switch (m_command)
-	{
-	case 0:
-		if (BIT(m_transfer[0], 7))
-			reset_registers(m_transfer[0]);
-		else
-			m_data[REG_STATUS_1] = (m_data[REG_STATUS_1] & 0x0f) | (m_transfer[0] & 0x70);
-		break;
-
-	case 1:
-		m_data[REG_STATUS_2] = m_transfer[0] & 0xfe;
-		break;
-
-	case 2:
-		write_time(true);
-		break;
-
-	case 3:
-		write_time(false);
-		break;
-
-	case 4:
-		std::copy_n(m_transfer, m_expected, &m_data[REG_INT_1]);
-		break;
-
-	case 5:
-		std::copy_n(m_transfer, m_expected, &m_data[REG_INT_2]);
-		break;
-
-	case 6:
-		m_data[REG_CORRECTION] = m_transfer[0];
-		break;
-
-	case 7:
-		m_data[REG_FREE] = m_transfer[0];
-		break;
-	}
-}
-
-void s35390a_device::reset_registers(u8 status)
-{
-	std::fill(std::begin(m_data), std::end(m_data), 0);
-	m_data[REG_MONTH] = 1;
-	m_data[REG_DAY] = 1;
-	m_data[REG_STATUS_1] = status & 0x70;
-	sync_clock();
-}
-
-void s35390a_device::write_time(bool full)
-{
-	auto const decode_bcd = [] (u8 bcd, int minimum, int maximum, int fallback)
-	{
-		int const value = ((bcd >> 4) * 10) + (bcd & 0x0f);
-		return ((bcd & 0x0f) <= 9) && ((bcd >> 4) <= 9) &&
-			(value >= minimum) && (value <= maximum) ? value : fallback;
-	};
-
-	u8 const offset = full ? 4 : 0;
-	int year = full ? decode_bcd(bitswap<8>(m_transfer[0], 0, 1, 2, 3, 4, 5, 6, 7), 0, 99, 0) : m_data[REG_YEAR];
-	int month = full ? decode_bcd(bitswap<8>(m_transfer[1], 0, 1, 2, 3, 4, 5, 6, 7) & 0x1f, 1, 12, 1) : m_data[REG_MONTH];
-	int day = full ? decode_bcd(bitswap<8>(m_transfer[2], 0, 1, 2, 3, 4, 5, 6, 7) & 0x3f, 1, 31, 1) : m_data[REG_DAY];
-	int const day_of_week = full ? (bitswap<8>(m_transfer[3], 0, 1, 2, 3, 4, 5, 6, 7) & 0x07) % 7 : m_data[REG_DAY_OF_WEEK];
-	int const hour = decode_hour(m_transfer[offset]);
-	int const minute = decode_bcd(bitswap<8>(m_transfer[offset + 1], 0, 1, 2, 3, 4, 5, 6, 7) & 0x7f, 0, 59, 0);
-	int const second = decode_bcd(bitswap<8>(m_transfer[offset + 2], 0, 1, 2, 3, 4, 5, 6, 7) & 0x7f, 0, 59, 0);
-
-	// Nonexistent dates advance to the first of the next month without changing the weekday.
-	if (full && (day > gregorian_days_in_month(month, 2000 + year)))
-	{
-		day = 1;
-		if (++month > 12)
+		if (m_command == 2 || m_command == 3)
 		{
-			month = 1;
-			year = (year + 1) % 100;
+			apply_time();
+		}
+		else if (m_command == 0)
+		{
+			m_regs[0][0] = (m_regs[0][0] & 0x0f) | (data & 0x70);
+			if (BIT(data, 7))
+				reset_registers();
+		}
+		else
+		{
+			std::copy_n(m_transfer, m_length, m_regs[m_command]);
 		}
 	}
+	return 0;
+}
 
-	set_time(true, year, month, day, day_of_week + 1, hour, minute, second);
-	// The first seconds carry occurs one second after writing the time.
-	attotime const period = m_clock_timer->period();
-	m_clock_timer->adjust(period, 0, period);
+u8 s35390a_device::receive()
+{
+	if (!m_selected || !m_read || m_pos >= m_length)
+		return 0xff;
+	u8 const result = m_transfer[m_pos];
+	if (!machine().side_effects_disabled())
+	{
+		++m_pos;
+		if (!m_command)
+			m_regs[0][0] &= ~0x0d; // POC and alarm flags clear on read.
+	}
+	return result;
 }

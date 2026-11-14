@@ -7,8 +7,10 @@
 #pragma once
 
 #include "bus/isa/isa.h"
+#include "imagedev/floppy.h"
 #include "machine/ins8250.h"
 #include "machine/pc_lpt.h"
+#include "machine/upd765.h"
 
 class w83787f_device : public device_t,
 					   public device_isa16_card_interface,
@@ -43,6 +45,7 @@ public:
 	void nri2_w(int state);
 	void ncts2_w(int state);
 
+	static void floppy_formats(format_registration &fr);
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -50,11 +53,16 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual u8 dack_r(int line) override;
+	virtual void dack_w(int line, u8 data) override;
+	virtual void eop_w(int state) override;
+
 private:
 	const address_space_config m_space_config;
 
-	required_device_array<ns16550_device, 2> m_pc_com;
-	required_device<pc_lpt_device> m_pc_lpt;
+	required_device<smc37c78_device> m_fdc;
+	required_device_array<ns16550_device, 2> m_com;
+	required_device<pc_lpt_device> m_lpt;
 
 	devcb_write_line m_irq1_callback;
 	devcb_write_line m_irq8_callback;
@@ -73,6 +81,9 @@ private:
 
 	void config_map(address_map &map) ATTR_COLD;
 
+	void irq_floppy_w(int state);
+	void drq_floppy_w(int state);
+
 	void irq_parallel_w(int state);
 
 	void irq_serial1_w(int state);
@@ -87,7 +98,9 @@ private:
 	u8 m_index = 0;
 
 	bool m_locked_state = true;
+	u8 m_cr0 = 0;
 	u8 m_cr1 = 0;
+	//u8 m_cr4 = 0;
 };
 
 DECLARE_DEVICE_TYPE(W83787F, w83787f_device);

@@ -18517,7 +18517,10 @@ mjmywrldt
 mjnigiri
 mjreach1
 mjreach1a
+mjrking
+mjrkingl
 mjschuka
+mjstama
 mjswacad
 mjswacads
 mjtenho
@@ -20090,6 +20093,7 @@ spctrek
 spctbird
 spdcoin
 sstarcrs
+staratk
 starfght
 starfgmc
 stera
@@ -20140,7 +20144,7 @@ zigzagb2
 rockclim
 
 @source:galaxian/galaxold.cpp
-4in1
+4funin1
 bullsdrtg
 devilfshv
 dingov
@@ -21649,6 +21653,7 @@ cm1codara
 cm1codarb
 cm1spa
 cmast91
+cmast91g
 cmast97
 cmast97a
 cmast97b
@@ -22042,6 +22047,7 @@ chessc2
 cjddz
 cjddz213cn
 cjddz215cn
+cjddz216cn
 cjddz217cn
 cjddzlf
 cjddzp
@@ -22134,6 +22140,9 @@ wldfruit
 @source:igs/igs_m036.cpp
 cjbq
 cjddzsp
+cjddzsp122cn
+cjddzsp126cn
+cjddzsp127cn
 cjdh2
 cjdh2a
 cjdh2b
@@ -23147,6 +23156,7 @@ entrada
 
 @source:intel/i430lx.cpp
 ga586ip
+pcd5h
 sy029c2
 
 @source:intel/imds2.cpp
@@ -23624,12 +23634,14 @@ hotmemry11
 pairs
 pairsa
 pairsred
+pubball
 sftm
 sftm110
 sftm111
 sftmj114
 sftmj112
 sftmk112
+shoottv
 shufshot
 shufshot135
 shufshot137
@@ -23656,8 +23668,7 @@ wcbowl16
 wcbowl161
 wcbowl165
 wcbowldx
-shoottv
-pubball
+wcbowldx200
 
 @source:jaleco/acommand.cpp
 acommand
@@ -26916,7 +26927,8 @@ xmenua
 
 @source:konami/yiear.cpp
 yiear
-yiear2
+yiearg
+yieari
 
 @source:konami/zr107.cpp
 jetwave
@@ -29615,14 +29627,16 @@ rs3230
 
 @source:misc/39in1.cpp
 19in1
+19in1u
 39in1
 48in1
 48in1a
 48in1b
 48in1c
+4in1
 4in1a
-4in1b
 60in1
+60in1u
 fruitwld
 fruitwlda
 jumanji
@@ -30937,6 +30951,9 @@ diamondk
 diamondko
 goldnchp
 
+@source:misc/digiblast.cpp
+digiblst
+
 @source:misc/discoboy.cpp
 discoboy
 discoboyp
@@ -32050,6 +32067,7 @@ goldnpke
 goldnpkf
 goldnpkg
 goldnpkh
+goldnpki
 goldnpkr
 goodluck
 gp_jpn22
@@ -32090,6 +32108,7 @@ icpf80_21
 icproul
 jkrbonus
 jokercar
+jokerush
 kmhpan
 lespendu
 lespenduj
@@ -32105,6 +32124,8 @@ ngoldb
 olym65bj
 olym65wc
 op5cards
+phnxjokr
+pk5_07sb
 pmpoker
 poker91
 pokerdub
@@ -32139,6 +32160,7 @@ super98
 superdbl
 techtrna
 techtrnb
+touksysp
 unkdep
 unkicpf40
 unkicpf80
@@ -32159,6 +32181,14 @@ witchcrdi
 witchcrdj
 witchgme
 witchgmea
+witchgmeb
+witchgmec
+witchgmed
+witchgmee
+witchgmef
+witchgmeg
+witchgmeh
+witchgmei
 witchjol
 wldwitch
 wldwitcha
@@ -32183,6 +32213,7 @@ wldwitchs
 wldwitcht
 wldwitchu
 wldwitchv
+wldwitchw
 wstrike
 wstrikea
 wtchjack
@@ -32718,6 +32749,12 @@ fruitstbf
 fruitstbg
 fruitstbh
 fruitstbi
+fruitstbj
+fruitstbk
+fruitstbl
+fruitstbm
+fruitstbn
+fruitstbo
 goldnjkr
 goldnjkra
 
@@ -35602,6 +35639,7 @@ mjlstory
 ntopstar
 pstadium
 qmhayaku
+sttakkyu
 tokimbsj
 tokyogal
 triplew1
@@ -35876,18 +35914,25 @@ nespal
 smb3bl
 
 @source:nintendo/nes_clone.cpp
+2pathlet
 afbm7800
 croaky
 dancexpt
 danzkara
 digezlg
 dnce2000
+flshdnce
+glkdance
+nes9in1
+nvbaseb
 nytsudo
 papsudok
 pjoypj001
 popstar
 pv95in1
 racechl8
+rumblstn
+twindncr
 vtvppong
 vtvsocr
 
@@ -36638,7 +36683,9 @@ cexpert
 
 @source:novag/cforte.cpp
 cfortea
+cfortea1
 cforteb
+cforteb1
 
 @source:novag/cnchess.cpp
 cnchess
@@ -37791,6 +37838,7 @@ tosh1000
 bmanroul
 fishingm
 ggconnie
+junghero
 smf
 
 @source:pce/paranoia.cpp
@@ -40861,6 +40909,11 @@ bbddza
 ddz1
 ddz2
 ddz2a
+ddz2b
+ddz2c
+ddz2d
+ddz2e
+ddz2f
 djddz
 djddza
 fkddzz80
@@ -44063,9 +44116,6 @@ modulab
 digel804
 ep804
 
-@source:skeleton/digiblast.cpp
-digiblst
-
 @source:skeleton/digijet.cpp
 digijet
 
@@ -45654,6 +45704,7 @@ coolbi
 modcart
 
 @source:subsino/subsino2.cpp
+bigboss
 bishjan
 blushark
 dongshiz
@@ -45672,6 +45723,7 @@ queenbee
 queenbee107u
 queenbee117a
 queenbee123a
+queenbee124a
 queenbeeb
 queenbeei
 queenbeesa
@@ -47948,6 +48000,7 @@ trsvidtx
 @source:trs/coco12.cpp
 cd6809
 coco
+coco2
 coco2b
 coco2bh
 cocoh
@@ -48020,7 +48073,12 @@ trs80l2
 trs80dt1
 
 @source:trs/trs80m2.cpp
+tandy6k
+tandy6khd
+trs80m12
 trs80m16
+trs80m16b
+trs80m16bhd
 trs80m2
 
 @source:trs/trs80m3.cpp

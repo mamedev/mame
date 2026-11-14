@@ -80,7 +80,7 @@ private:
 	required_device<samsung_k9lag08u0m_device> m_nand, m_nand2;
 	required_device<dac_word_interface> m_ldac;
 	required_device<dac_word_interface> m_rdac;
-	required_ioport_array<6> m_inputs;
+	required_ioport_array<7> m_inputs;
 
 	uint32_t m_port[9];
 
@@ -128,6 +128,12 @@ uint32_t hapyfish_state::gpio_port_r(offs_t offset)
 			if (m_input_select < 6)
 			{
 				data = m_inputs[m_input_select]->read();
+			}
+			// GPIO bits E5-E10 select the main input rows; bit J12 selects the extra
+			// two buttons per player for CPS.
+			if (!BIT(m_port[s3c24xx_device::GPIO_PORT_J], 12))
+			{
+				data &= m_inputs[6]->read();
 			}
 			LOGMASKED(LOG_GPIO, "%s: Read GPIO F: %08x\n", machine().describe_context(), data);
 			break;
@@ -328,7 +334,9 @@ void hapyfish_state::hapyfish(machine_config &config)
 	UDA1341TS(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // uda1341ts.u12
 	UDA1341TS(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // uda1341ts.u12
 
-	S3C2440(config, m_s3c2440, 12000000);
+	// Clock inferred from the kernel's smdk2440_map_io().  Also this gives a 60.2 Hz refresh rate
+	// in-emulation and the games play correctly.
+	S3C2440(config, m_s3c2440, 16.9344_MHz_XTAL);
 	m_s3c2440->set_palette_tag("palette");
 	m_s3c2440->set_screen_tag("screen");
 
@@ -401,6 +409,13 @@ static INPUT_PORTS_START( hapyfish )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("INPUT6")
+	PORT_BIT(0x0f, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON5)          PORT_PLAYER(1)
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_BUTTON6)          PORT_PLAYER(1)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON5)          PORT_PLAYER(2)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON6)          PORT_PLAYER(2)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -417,4 +432,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 201?, hapyfsh2, 0, hapyfish, hapyfish, hapyfish_state, empty_init, ROT0, "bootleg", "Happy Fish (V2 PCB, 302-in-1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 201?, hapyfsh2, 0, hapyfish, hapyfish, hapyfish_state, empty_init, ROT0, "bootleg", "Happy Fish (V2 PCB, 302-in-1)", 0 )

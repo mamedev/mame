@@ -35,13 +35,10 @@ public:
 	hp49gp_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_s3c2410(*this, "s3c2410"),
-		m_steppingstone(*this, "steppingstone")
+		m_s3c2410(*this, "s3c2410")
 	{ }
 
 	void hp49gp(machine_config &config);
-
-	void init_hp49gp();
 
 	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
 
@@ -55,13 +52,11 @@ private:
 	uint32_t gpio_port_r(offs_t offset);
 	void gpio_port_w(offs_t offset, uint32_t data);
 	void lcd_spi_reset();
-	void lcd_spi_init();
 	void lcd_spi_line_w( int line, int data);
 	int lcd_spi_line_r(int line);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2410_device> m_s3c2410;
-	required_shared_ptr<uint32_t> m_steppingstone;
 	uint32_t m_port[9];
 	lcd_spi_t m_lcd_spi;
 };
@@ -85,12 +80,6 @@ void hp49gp_state::lcd_spi_reset()
 	m_lcd_spi.l1 = 0;
 	m_lcd_spi.data = 0;
 	m_lcd_spi.l3 = 0;
-}
-
-void hp49gp_state::lcd_spi_init()
-{
-	LOGMASKED(LOG_LCD_SPI, "lcd_spi_init\n");
-	lcd_spi_reset();
 }
 
 void hp49gp_state::lcd_spi_line_w( int line, int data)
@@ -223,6 +212,7 @@ INPUT_CHANGED_MEMBER(hp49gp_state::port_changed)
 
 void hp49gp_state::machine_start()
 {
+	lcd_spi_reset();
 }
 
 void hp49gp_state::machine_reset()
@@ -246,13 +236,6 @@ void hp49gp_state::main_map(address_map &map)
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
-
-void hp49gp_state::init_hp49gp()
-{
-	uint8_t *rom = (uint8_t *)memregion( "maincpu")->base();
-	memcpy( m_steppingstone, rom, 1024);
-	lcd_spi_init();
-}
 
 void hp49gp_state::hp49gp(machine_config &config)
 {
@@ -317,4 +300,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(2009, hp49gp, 0, 0, hp49gp, hp49gp, hp49gp_state, init_hp49gp, "Hewlett Packard", "HP49G+", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP(2009, hp49gp, 0, 0, hp49gp, hp49gp, hp49gp_state, empty_init, "Hewlett Packard", "HP49G+", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Tim Schuerewegen, Ryan Holtz
+// copyright-holders:Tim Schuerewegen, Ryan Holtz, Peter Wilhelmsen
 /*******************************************************************************
 
     Samsung S3C2400/S3C2410/S3C2440
@@ -74,9 +74,10 @@ public:
 protected:
 	s3c24xx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	void memcon_reset();
 	u32 memcon_bwscon_r(offs_t offset, u32 mem_mask = ~0);
@@ -191,7 +192,7 @@ protected:
 	};
 
 	virtual void irq_reset();
-	void check_pending_irq();
+	virtual void check_pending_irq();
 	virtual u32 get_irq_bit_for_int_type(u32 int_type) const = 0;
 	void request_irq(u32 int_type);
 	u32 irq_srcpnd_r(offs_t offset, u32 mem_mask = ~0);
@@ -221,7 +222,6 @@ protected:
 	void dma_request_pwm();
 	template <int Which> void dma_start();
 	template <int Which> void dma_stop();
-	template <int Which> void dma_recalc();
 	TIMER_CALLBACK_MEMBER(dma_timer_exp);
 	template <int Which> u32 dma_disrc_r(offs_t offset, u32 mem_mask = ~0);
 	template <int Which> void dma_disrc_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -362,6 +362,11 @@ protected:
 
 	void uart_reset();
 	virtual void uart_request_irq(int which);
+	virtual void uart_request_tx_irq(int which);
+	virtual u32 uart_fifo_depth() const;
+	void uart_update_tx_irq(int which);
+	void uart_tx_start(int which);
+	TIMER_CALLBACK_MEMBER(uart_tx_complete);
 	template <int Which> u32 uart_ulcon_r(offs_t offset, u32 mem_mask = ~0);
 	template <int Which> void uart_ulcon_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	template <int Which> u32 uart_ucon_r(offs_t offset, u32 mem_mask = ~0);
@@ -504,6 +509,8 @@ protected:
 	void iis_start();
 	void iis_stop();
 	void iis_recalc();
+	virtual u32 iis_fifo_count_bits() const;
+	void iis_fifo_push(u16 data);
 	TIMER_CALLBACK_MEMBER(iis_timer_exp);
 	u32 iis_iiscon_r(offs_t offset, u32 mem_mask = ~0);
 	void iis_iiscon_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -687,8 +694,8 @@ protected:
 	u32 m_irq_priority;
 	u32 m_irq_intpnd;
 	u32 m_irq_intoffset;
-	int m_irq_line;
-	int m_fiq_line;
+	s32 m_irq_line;
+	s32 m_fiq_line;
 
 	u32 m_dma_disrc[4];
 	u32 m_dma_didst[4];
@@ -720,7 +727,7 @@ protected:
 	u32 m_lcd_dithmode;
 	u32 m_lcd_tpal;
 	emu_timer *m_lcd_timer;
-	std::unique_ptr<bitmap_rgb32> m_lcd_bitmap[2];
+	bitmap_rgb32 m_lcd_bitmap[2];
 	u32 m_lcd_vramaddr_cur;
 	u32 m_lcd_vramaddr_max;
 	u32 m_lcd_offsize;
@@ -729,8 +736,8 @@ protected:
 	u32 m_lcd_bppmode;
 	u32 m_lcd_bswp;
 	u32 m_lcd_hwswp;
-	int m_lcd_vpos;
-	int m_lcd_hpos;
+	s32 m_lcd_vpos;
+	s32 m_lcd_hpos;
 	attotime m_lcd_framerate;
 	u32 m_lcd_hpos_min;
 	u32 m_lcd_hpos_max;
@@ -751,6 +758,13 @@ protected:
 	u32 m_uart_utxh[3];
 	u32 m_uart_urxh[3];
 	u32 m_uart_ubrdiv[3];
+	u8 m_uart_tx_fifo[3][64];
+	u8 m_uart_tx_head[3];
+	u8 m_uart_tx_count[3];
+	u8 m_uart_tx_shift[3];
+	bool m_uart_tx_busy[3];
+	bool m_uart_tx_irq[3];
+	emu_timer *m_uart_tx_timer[3];
 
 	u32 m_pwm_tcfg0;
 	u32 m_pwm_tcfg1;
@@ -803,16 +817,17 @@ protected:
 	u32 m_iic_iicadd;
 	u32 m_iic_iicds;
 	emu_timer *m_iic_timer;
-	int m_iic_count;
+	u32 m_iic_count;
 
 	u32 m_iis_iiscon;
 	u32 m_iis_iismod;
 	u32 m_iis_iispsr;
 	u32 m_iis_iisfcon;
-	u32 m_iis_iisfifo;
 	emu_timer *m_iis_timer;
-	u16 m_iis_tx_fifo[16/2];
-	int m_iis_fifo_index;
+	u16 m_iis_tx_fifo[32];
+	u8 m_iis_fifo_head;
+	u8 m_iis_fifo_count;
+	u8 m_iis_channel;
 
 	u32 m_gpio_gpacon;
 	u32 m_gpio_gpbcon;
@@ -875,6 +890,7 @@ public:
 protected:
 	s3c2400_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
+	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void clkpow_reset() override;
 	virtual void gpio_reset() override;
@@ -928,7 +944,7 @@ private:
 	u32 m_mmc_mmdat;
 };
 
-class s3c2410_device : public s3c2400_device
+class s3c2410_device : public s3c24xx_device
 {
 public:
 	s3c2410_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -940,7 +956,7 @@ public:
 	auto nand_update_ecc_r_callback() { return m_nand_update_ecc_r_cb.bind(); }
 	auto nand_data_w_callback() { return m_nand_data_w_cb.bind(); }
 
-	virtual void map(address_map &map) override;
+	virtual void map(address_map &map) ATTR_COLD;
 
 	virtual void frnb_w(int state);
 
@@ -980,7 +996,6 @@ protected:
 	virtual void irq_reset() override;
 	virtual u32 get_irq_bit_for_int_type(u32 int_type) const override;
 	virtual u32 get_int_type_for_subint(u32 subint) const;
-	void check_pending_subirq();
 	void request_subirq(u32 int_type);
 	void check_pending_eint();
 	u32 irq_subsrcpnd_r(offs_t offset, u32 mem_mask = ~0);
@@ -989,6 +1004,7 @@ protected:
 	void irq_intsubmsk_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	virtual u32 dma_dcon_get_tsz(const u32 value) override;
+	virtual u32 iis_fifo_count_bits() const override;
 	virtual u32 dma_dcon_get_hwsrcsel(const u32 value) override;
 	virtual u32 dma_dcon_get_servmode(const u32 value) override;
 	virtual u32 dma_dcon_get_int(const u32 value) override;
@@ -1039,6 +1055,8 @@ protected:
 	virtual void nand_auto_boot();
 
 	virtual void uart_request_irq(int which) override;
+	virtual void uart_request_tx_irq(int which) override;
+	virtual void check_pending_irq() override;
 
 	virtual void usb_device_reset() override;
 	u32 usbdev_ep_int_r(offs_t offset, u32 mem_mask = ~0);
@@ -1178,12 +1196,11 @@ protected:
 	u32 m_nand_nfconf;
 	u32 m_nand_nfcmd;
 	u32 m_nand_nfaddr;
-	u32 m_nand_nfdata;
 	u32 m_nand_nfstat;
 	u32 m_nand_nfecc;
 	u8 m_nand_mecc[4];
-	int m_nand_ecc_pos;
-	int m_nand_data_count;
+	u32 m_nand_ecc_pos;
+	u32 m_nand_data_count;
 
 	u32 m_gpio_dclkcon;
 	u32 m_gpio_eintflt[4];
@@ -1247,6 +1264,8 @@ public:
 	virtual void frnb_w(int state) override;
 
 protected:
+	virtual u32 uart_fifo_depth() const override;
+
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -1431,8 +1450,6 @@ private:
 	u32 m_nand_nfsblk;
 	u32 m_nand_nfeblk;
 	u8 m_nand_secc[2];
-	int m_nand_ecc_pos;
-	int m_nand_data_count;
 
 	u32 m_cam_srcfmt;
 	u32 m_cam_wdofst;

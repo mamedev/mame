@@ -106,7 +106,7 @@ there is a CD-ROM drive.
 #include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
 #include "machine/ds128x.h"
-#include "machine/fdc37c665ir.h"
+#include "machine/fdc37c669.h"
 #include "machine/idectrl.h"
 #include "machine/nvram.h"
 #include "machine/pci.h"
@@ -425,7 +425,7 @@ void calchase_isa16_cards(device_slot_interface &device)
 {
 	device.option_add("calchase_jamma_if", ISA16_CALCHASE_JAMMA_IF);
 	device.option_add("tgui9680", ISA16_SVGA_TGUI9680);
-	device.option_add_internal("superio", FDC37C665IR);
+	device.option_add_internal("superio", FDC37C669);
 }
 
 static void isa_com(device_slot_interface &device)
@@ -442,12 +442,20 @@ static void isa_com(device_slot_interface &device)
 
 void calchase_state::superio_config(device_t *device)
 {
-	// TODO: upgrade to FDC37C669
-	fdc37c665ir_device &fdc = *downcast<fdc37c665ir_device *>(device);
-	fdc.fintr().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq6_w));
-	fdc.pintr1().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq7_w));
-	fdc.irq3().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq3_w));
-	fdc.irq4().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq4_w));
+	// FD37C669QF
+	fdc37c669_device &fdc = *downcast<fdc37c669_device *>(device);
+	// CR26: 20 (FDC DRQ 2 LPT DRQ 0) DMA_B / <disabled>
+	// CR27: 65 (FDC IRQ 6 LPT IRQ 5) IRQ_F / IRQ_E
+	// CR28: 43 (COM1 IRQ 4 COM2 IRQ 3) IRQ_D / IRQ_C
+	// CR29: 30 (IRQIN f) <disabled>
+//	fdc.irq_a().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq1_w));
+//	fdc.irq_b().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq2_w));
+	fdc.irq_c().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq3_w));
+	fdc.irq_d().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq4_w));
+	fdc.irq_e().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq7_w));
+	fdc.irq_f().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq6_w));
+//	fdc.irq_h().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq8n_w));
+
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
 	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
 	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
@@ -502,18 +510,18 @@ void calchase_state::calchase(machine_config &config)
 	ISA16_SLOT(config, "isa4",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
-	serport0.rxd_handler().set("board4:superio", FUNC(fdc37c665ir_device::rxd1_w));
-	serport0.dcd_handler().set("board4:superio", FUNC(fdc37c665ir_device::ndcd1_w));
-	serport0.dsr_handler().set("board4:superio", FUNC(fdc37c665ir_device::ndsr1_w));
-	serport0.ri_handler().set("board4:superio", FUNC(fdc37c665ir_device::nri1_w));
-	serport0.cts_handler().set("board4:superio", FUNC(fdc37c665ir_device::ncts1_w));
+	serport0.rxd_handler().set("board4:superio", FUNC(fdc37c669_device::rxd1_w));
+	serport0.dcd_handler().set("board4:superio", FUNC(fdc37c669_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:superio", FUNC(fdc37c669_device::ndsr1_w));
+	serport0.ri_handler().set("board4:superio", FUNC(fdc37c669_device::nri1_w));
+	serport0.cts_handler().set("board4:superio", FUNC(fdc37c669_device::ncts1_w));
 
 	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
-	serport1.rxd_handler().set("board4:superio", FUNC(fdc37c665ir_device::rxd2_w));
-	serport1.dcd_handler().set("board4:superio", FUNC(fdc37c665ir_device::ndcd2_w));
-	serport1.dsr_handler().set("board4:superio", FUNC(fdc37c665ir_device::ndsr2_w));
-	serport1.ri_handler().set("board4:superio", FUNC(fdc37c665ir_device::nri2_w));
-	serport1.cts_handler().set("board4:superio", FUNC(fdc37c665ir_device::ncts2_w));
+	serport1.rxd_handler().set("board4:superio", FUNC(fdc37c669_device::rxd2_w));
+	serport1.dcd_handler().set("board4:superio", FUNC(fdc37c669_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:superio", FUNC(fdc37c669_device::ndsr2_w));
+	serport1.ri_handler().set("board4:superio", FUNC(fdc37c669_device::nri2_w));
+	serport1.cts_handler().set("board4:superio", FUNC(fdc37c669_device::ncts2_w));
 }
 
 void calchase_state::hostinv(machine_config &config)

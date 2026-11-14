@@ -364,6 +364,7 @@ private:
 	u8 c300_r(offs_t offset);
 	u8 c300_int_r(offs_t offset);
 	void c300_w(offs_t offset, u8 data);
+	void c300_int_w(offs_t offset, u8 data);
 	u8 c800_r(offs_t offset);
 	void c800_w(offs_t offset, u8 data);
 	u8 inh_r(offs_t offset);
@@ -1916,6 +1917,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x06:  // INTCXROMOFF
+			if (m_intcxrom)
+				m_intc8rom = false; // undocumented behavior, differs from IIe
 			m_intcxrom = false;
 			update_slotrom_banks();
 			break;
@@ -2253,6 +2256,9 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x68: // STATEREG
+			if (m_intcxrom && !(data & 0x01))
+				m_intc8rom = false; // undocumented behavior, differs from IIe
+
 			m_altzp = (data & 0x80);
 			m_video->scr_w(data & 0x40);
 			m_ramrd = (data & 0x20);
@@ -2262,11 +2268,9 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			m_rombank = (data & 0x02);
 			m_intcxrom = (data & 0x01);
 
-			// update the aux state
-			auxbank_update();
-
-			// update LC state
 			lcrom_update();
+			auxbank_update();
+			update_slotrom_banks();
 			break;
 
 		default:
@@ -2442,6 +2446,7 @@ void apple2gs_state::c100_w(offs_t offset, u8 data)
 	}
 }
 
+u8 apple2gs_state::c300_r(offs_t offset) { return read_slot_rom(3, offset); }
 u8 apple2gs_state::c300_int_r(offs_t offset)
 {
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
@@ -2452,8 +2457,14 @@ u8 apple2gs_state::c300_int_r(offs_t offset)
 	return read_int_rom(0x3c300, offset);
 }
 
-u8 apple2gs_state::c300_r(offs_t offset)  { return read_slot_rom(3, offset); }
 void apple2gs_state::c300_w(offs_t offset, u8 data) { write_slot_rom(3, offset, data); }
+void apple2gs_state::c300_int_w(offs_t offset, u8 data)
+{
+	if ((!m_slotc3rom) && !machine().side_effects_disabled())
+	{
+		m_intc8rom = true;
+	}
+}
 
 u8 apple2gs_state::c800_r(offs_t offset)
 {
@@ -2462,7 +2473,8 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
+		if (!m_intcxrom)
+			m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
 	}
 
@@ -2482,17 +2494,19 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 void apple2gs_state::c800_w(offs_t offset, u8 data)
 {
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	const int internal = (m_intcxrom) || (m_intc8rom);
+
+	if ((!internal) && (m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		slow_cycle();
 		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 
-	if (offset == 0x7ff)
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
+		if (!m_intcxrom)
+			m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
-		return;
 	}
 }
 
@@ -3352,7 +3366,7 @@ void apple2gs_state::vectors_map(address_map &map)
 void apple2gs_state::c300bank_map(address_map &map)
 {
 	map(0x0000, 0x00ff).rw(FUNC(apple2gs_state::c300_r), FUNC(apple2gs_state::c300_w));
-	map(0x0100, 0x01ff).r(FUNC(apple2gs_state::c300_int_r)).nopw();
+	map(0x0100, 0x01ff).rw(FUNC(apple2gs_state::c300_int_r), FUNC(apple2gs_state::c300_int_w));
 }
 
 void apple2gs_state::a2gs_es5503_map(address_map &map)

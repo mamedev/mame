@@ -491,12 +491,13 @@ Function("xyc", 1, ["single", ['x', 'y']])
 Function("ss", 2, ["split", 1, ['ss', None, 'su', 'uu']])
 Function("ss1", 1, ["single", ['su', 'uu']])
 Function("sign", 1, ["single", ['+', '-']])
-Function("damo4_a",  1, ["single", ['x0', 'y0', 'x1', 'y1', 'x1', 'y1', 'x0', 'y0', 'x0', 'y0', 'x1', 'y1', 'y1', 'x0', 'y0', 'x1']])
-Function("damo4_b", -1, ["single", ['x0', 'y0', 'x0', 'y0', 'x1', 'y1', 'x1', 'y1', 'y1', 'x0', 'y0', 'x1', 'x0', 'y0', 'x1', 'y1']])
+Function("damo4_a",  1, ["single", ['x0', 'y0', 'x1', 'y1', 'x0', 'y0', 'x1', 'y1', 'x1', 'y1', 'x0', 'y0', 'y1', 'x0', 'y0', 'x1']])
+Function("damo4_b", -1, ["single", ['x0', 'y0', 'x0', 'y0', 'y1', 'x0', 'y0', 'x1', 'x1', 'y1', 'x1', 'y1', 'x0', 'y0', 'x1', 'y1']])
 Function("agu", 1, ["single", ['r', 'n']])
 Function("damo1_a",  1, ["single", ['x0', 'y0', 'x1', 'y1', 'x0', 'y0', 'x1', 'y1']])
 Function("damo1_b", -1, ["single", ['x0', 'y0', 'x0', 'y0', 'y1', 'x0', 'y0', 'x1']])
 Function("damo2", 1, ["single", ['y1', 'x0', 'y0', 'x1']])
+Function("qq2", 1, ["single", ['x0', 'y0', 'x1', 'y1']])  # 24-bit-immediate mpy/mac forms: QQ field = x0,y0,x1,y1
 
 NormalRegs = ['a', 'a0', 'a1', 'a2', 'b', 'b0', 'b1', 'b2', 'x0', 'x1', 'y0', 'y1', 'a10', 'b10', 'ab', 'ba', 'x', 'y', 'ep', 'vba', 'sc', 'sz', 'sr', 'omr', 'sp', 'ssh', 'ssl', 'la', 'lc', 'mr', 'ccr', 'com', 'eom']
 ArrayRegs = ['r', 'n', 'm']
@@ -564,7 +565,7 @@ class Variant:
             if self.name != '':
                 print('\t\tunhandled("%s");' % self.name, file=f)
         else:
-            self.inst.source[SourceType.interp_post if post else SourceType.interp_pre].gen(f, self.slots, self.inst.slots)
+            self.inst.source[SourceType.interp_post if post else SourceType.interp_pre].gen(f, self.slots, self.inst.slots, self.inst.mnemonic)
 
 class Source:
     def __init__(self):
@@ -638,9 +639,11 @@ class Source:
     def add(self, line):
         self.text.append(self.parse(line))
 
-    def expand(self, line, slots, islots):
+    def expand(self, line, slots, islots, regs24=None):
         global NormalRegs
         s = ''
+        if regs24 is None:
+            regs24 = set()
         for e in line:
             if type(e) == str:
                 s += e
@@ -658,7 +661,10 @@ class Source:
                         else:
                             s += e[0]
                     else:
-                        s += e[0]
+                        if e[0] in islots and islots[e[0]].func.name == 'sign':
+                            s += 'neg'
+                        else:
+                            s += e[0]
                 else:
                     s += e[0]
             elif e[1] == SlotMode.memory:
@@ -666,7 +672,7 @@ class Source:
                     print("uninstanciated slot (memory)", e)
                 s += 'm_' + slots[e[0]]
             else:
-                sub = self.expand(e[3], slots, islots)
+                sub = self.expand(e[3], slots, islots, regs24)
                 if e[0] in slots:
                     slot = slots[e[0]]
                     if slot in NormalRegs:
@@ -680,7 +686,11 @@ class Source:
                             elif e[2] == SlotChange.bus48:
                                 s += 'set_%sl(%s)' % (slot, sub)
                             else:
-                                s += 'set_%s(%s)' % (slot, sub)
+                                # tfr 24bit-reg -> acc: sign-extend into a1/b1 field
+                                if sub in regs24:
+                                    s += 'set_%s(tfr56(%s))' % (slot, sub)
+                                else:
+                                    s += 'set_%s(%s)' % (slot, sub)
                         elif (slot == 'x0' or slot == 'x1' or slot == 'y0' or slot == 'y1') and e[2] == SlotChange.bus8:
                             s += 'set_%sf(%s)' % (slot, sub)
                         else:
@@ -713,7 +723,8 @@ class Source:
             if type(e) == list:
                 self.ab_scan_gen(f, slot, inst, e[3], changes)
 
-    def gen(self, f, slots, islots):
+    def gen(self, f, slots, islots, idstr=''):
+        regs24 = set()
         for slot, sinfo in self.slots.items():
             if sinfo[SlotMode.read]:
                 if slot in slots:
@@ -726,43 +737,66 @@ class Source:
                         elif inst == 'a10' or inst == 'b10' or inst == 'ab' or inst == 'ba' or inst == 'x' or inst == 'y':
                             print('\t\tu64 %s = get_%s();' % (slot, inst), file=f)
                         else:
-                            print('\t\tu32 %s = get_%s();' % (slot, inst), file=f)
+                            if inst in ('a2', 'b2'):
+                                print('\t\tu32 %s = (u32)util::sext(get_%s(), 8);' % (slot, inst), file=f)
+                            elif inst in ('x0', 'x1', 'y0', 'y1') and idstr == 'cmpu':
+                                print('\t\tu64 %s = (u64)util::sext(get_%s(), 24) << 24;' % (slot, inst), file=f)
+                            else:
+                                print('\t\tu32 %s = get_%s();' % (slot, inst), file=f)
+                            if inst in ('x0', 'x1', 'y0', 'y1'):
+                                regs24.add(slot)
                     elif inst in ArrayRegs:
                         si = islots[slot].get_value_expression() + ' & 7'
                         print('\t\tu32 %s = get_%s(%s & 7);' % (slot, inst, islots[slot].get_value_expression()), file=f)
                     elif inst in IndirectRegs:
                         print('\t\tint %s_r = %s & 7;' % (slot, islots[slot].get_value_expression()), file=f)
+                        is_lua = idstr == 'lua'
                         if inst == '(r)-n':
-                            print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
-                            print('\t\tadd_r(%s_r, -m_n[%s_r]);' % (slot, slot), file=f)
+                            if is_lua:
+                                print('\t\tu32 %s = calc_add_r(%s_r, -m_n[%s_r]);' % (slot, slot, slot), file=f)
+                            else:
+                                print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
+                                print('\t\tadd_r(%s_r, -m_n[%s_r]);' % (slot, slot), file=f)
                         elif inst == '(r)+n':
-                            print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
-                            print('\t\tadd_r(%s_r, m_n[%s_r]);' % (slot, slot), file=f)
+                            if is_lua:
+                                print('\t\tu32 %s = calc_add_r(%s_r, m_n[%s_r]);' % (slot, slot, slot), file=f)
+                            else:
+                                print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
+                                print('\t\tadd_r(%s_r, m_n[%s_r]);' % (slot, slot), file=f)
                         elif inst == '(r)-':
-                            print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
-                            print('\t\tadd_r(%s_r, -1);' % (slot), file=f)
+                            if is_lua:
+                                print('\t\tu32 %s = calc_add_r(%s_r, -1);' % (slot, slot), file=f)
+                            else:
+                                print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
+                                print('\t\tadd_r(%s_r, -1);' % (slot), file=f)
                         elif inst == '(r)+':
-                            print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
-                            print('\t\tadd_r(%s_r, 1);' % (slot), file=f)
+                            if is_lua:
+                                print('\t\tu32 %s = calc_add_r(%s_r, 1);' % (slot, slot), file=f)
+                            else:
+                                print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
+                                print('\t\tadd_r(%s_r, 1);' % (slot), file=f)
                         elif inst == '(r)':
                             print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
                         elif inst == '(r+n)':
                             print('\t\tu32 %s = calc_add_r(%s_r, m_n[%s_r]);' % (slot, slot, slot), file=f)
                         elif inst == '-(r)':
-                            print('\t\tadd_r(%s_r, -1);' % (slot), file=f)
+                            if not is_lua:
+                                print('\t\tadd_r(%s_r, -1);' % (slot), file=f)
                             print('\t\tu32 %s = get_r(%s_r);' % (slot, slot), file=f)
                         else:
                             print("Unimplemented IndirectRegs %s" % inst)
                             sys.exit(1)
                     elif islots[slot].func.name == 'cc':
                         print('\t\tbool %s = test_%s();' % (slot, inst), file=f)
+                    elif islots[slot].func.name == 'sign':
+                        print('\t\tbool neg = %s;' % (1 if inst == '-' else 0), file=f)
                     else:
                         print("instanciated slot (read)", slot, inst)
                 else:
                     print('\t\tu32 %s = %s;' % (slot, islots[slot].get_value_expression()), file=f)
 
         for line in self.text:
-            s = '\t\t' + self.expand(line, slots, islots)
+            s = '\t\t' + self.expand(line, slots, islots, regs24)
             print(s, file=f)
 
 class Instruction:
@@ -773,6 +807,7 @@ class Instruction:
         self.mode = mode
         sidx = self.find_separator(head)
         self.idstr = head[:sidx].rstrip(' \t')
+        self.mnemonic = self.idstr[6:].strip(' \t').split(' ')[0] if len(self.idstr) > 6 else self.idstr
         self.parse_slots(head, sidx+2)
         self.check_ex()
         self.fill_ditable(ditable, dtable, idx)
@@ -960,21 +995,25 @@ class Instruction:
         for slot, sinfo in self.slots.items():
             if sinfo.func.has_ex:
                 has_ex = True
-            slotorder.append([sinfo.get_ftype(), sinfo])
-        slotorder.sort(key=lambda s: s[0])
+            # single-alt/split-alt slots must be expanded last so their variant
+            # bit (taken from other slots, e.g. acc for daos3) is already present
+            # in idxs when get_val_idxs_slotted computes it
+            alt = 1 if sinfo.func.values[0] in ('single-alt', 'split-alt') else 0
+            slotorder.append([alt, sinfo.get_ftype(), sinfo])
+        slotorder.sort(key=lambda s: (s[0], s[1]))
 #        print("%s: %s" % (self.idstr, ' '.join([s[1].name+'.'+s[1].func.name+('.%d' % s[0]) for s in slotorder])))
         shift = 8 if self.mode == IType.move else 0
         indexes = [0]*len(slotorder)
         imax = []
         for s in slotorder:
-            imax.append(s[1].get_slot_count())
+            imax.append(s[2].get_slot_count())
         while True:
             idxs = [idx << shift]
             cid = len(ctable)
             vv = Variant(self, cid, has_ex)
             ctable.append(vv)
             for si in range(len(slotorder)):
-                s = slotorder[si][1]
+                s = slotorder[si][2]
                 entry, idxs = s.get_val_idxs_slotted(indexes[si], idxs)
                 if entry != None:
                     vv.add_slot(s, entry)
@@ -1150,7 +1189,7 @@ class ISA:
         self.gen_ex_array(f, self.dmoves)
         print(";", file=f)
         print("", file=f)
-        print("const u64 dsp563xx_disassembler::t_npar_ex[4] = {", file=f)
+        print("const u64 dsp563xx_disassembler::t_npar_ex[%d] = {" % ((len(self.dnpars)+63)//64), file=f)
         self.gen_ex_array(f, self.dnpars)
         print("};", file=f)
         print("", file=f)
@@ -1212,7 +1251,7 @@ class ISA:
         self.gen_ex_array(f, self.cmoves)
         print("};", file=f)
         print("", file=f)
-        print("const u64 dsp563xx_device::t_npar_ex[72] = {", file=f)
+        print("const u64 dsp563xx_device::t_npar_ex[%d] = {" % ((len(self.cnpars)+63)//64), file=f)
         self.gen_ex_array(f, self.cnpars)
         print("};", file=f)
 

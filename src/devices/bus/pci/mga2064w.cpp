@@ -64,7 +64,7 @@ void mga2064w_device::device_add_mconfig(machine_config &config)
 void mga2064w_device::device_start()
 {
 	pci_card_device::device_start();
-	// NB: following is swapped on G400
+	// NOTE: following is swapped on G400
 	add_map(    16*1024, M_MEM, FUNC(mga2064w_device::mgabase1_map));
 	add_map(8*1024*1024, M_MEM, FUNC(mga2064w_device::mgabase2_map));
 	//  add_rom_from_region();

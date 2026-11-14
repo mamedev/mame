@@ -47,6 +47,10 @@ protected:
 	virtual void i2c_start() { }
 	virtual void i2c_stop() { }
 
+	virtual bool one_byte_transfers() const;
+
+	virtual bool subaddress_valid(u8 subaddress) const;
+
 	// override this to properly identify your device in logging
 	virtual const char *get_tag();
 

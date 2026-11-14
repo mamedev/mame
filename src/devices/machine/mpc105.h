@@ -34,7 +34,6 @@ public:
 	mpc105_host_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	virtual void config_map(address_map &map) override ATTR_COLD;
-	virtual u8 header_type_r() override;
 	virtual void map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,
 			u64 io_window_start, u64 io_window_end, u64 io_offset, address_space *io_space) override;
 

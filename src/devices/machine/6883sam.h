@@ -13,6 +13,12 @@
 
 #pragma once
 
+#include "machine/ram.h"
+
+#include <type_traits>
+#include <utility>
+#include <vector>
+
 
 //**************************************************************************
 //  SAM6883 CORE
@@ -82,7 +88,7 @@ protected:
 	void update_cpu_clock();
 };
 
-class sam6883_device : public device_t, public device_memory_interface, public sam6883_friend_device_interface
+class sam6883_device : public device_t, public sam6883_friend_device_interface
 {
 public:
 	template <typename T>
@@ -94,9 +100,42 @@ public:
 
 	sam6883_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// CPU read/write handlers
-	uint8_t read(offs_t offset);
-	void write(offs_t offset, uint8_t data);
+	// The host maps amap() over $0000-$FFFF of the CPU's program space.  It
+	// holds the RAM views and the host's ROM and I/O maps, each relative to
+	// the start of its range:
+	//  1 ROM0  $8000-$9FFF
+	//  2 ROM1  $A000-$BFFF and the vectors at $FFE0-$FFFF
+	//  3 ROM2  $C000-$FEFF
+	//  4 IO0   $FF00-$FF1F
+	//  5 IO1   $FF20-$FF3F
+	//  6 IO2   $FF40-$FF5F
+	//  7 BOOT  $FF60-$FFDF
+	// Maps are submapped, so they can't contain views.
+	template <typename T, typename Ret, typename... Params>
+	void set_addrmap(int select, Ret (T::*func)(Params...))
+	{
+		device_t &dev(mconfig().current_device());
+		if constexpr (std::is_base_of_v<device_t, T>)
+			set_addrmap(select, address_map_constructor(func, dev.tag(), &downcast<T &>(dev)));
+		else
+			set_addrmap(select, address_map_constructor(func, dev.tag(), &dynamic_cast<T &>(dev)));
+	}
+	void set_addrmap(int select, address_map_constructor map);
+
+	void amap(address_map &map) ATTR_COLD;
+
+	// physical RAM; without a RAM device, the host maps it with map_ram()
+	template <typename T> void set_ram(T &&tag) { m_ram.set_tag(std::forward<T>(tag)); }
+
+	// point a 256 byte aligned range of physical RAM at other memory; a null
+	// read pointer reads as $00 and a null write pointer drops writes
+	void map_ram(offs_t start, offs_t end, uint8_t *read, uint8_t *write);
+
+	// configure a 256 byte aligned range of physical RAM with alternative
+	// read/write memory, installed once and switched with select_ram_bank();
+	// entry 0 is selected initially
+	void configure_ram_bank(offs_t start, offs_t end, std::vector<std::pair<uint8_t *, uint8_t *> > entries);
+	void select_ram_bank(offs_t start, int entry);
 
 	// typically called by VDG
 	ATTR_FORCE_INLINE uint8_t display_read(offs_t offset)
@@ -116,7 +155,9 @@ public:
 			if ((old_counter ^ m_counter) & 0x0008)
 				counter_update_bit3(!BIT(m_counter, 3));
 		}
-		return m_ram_space.read_byte(m_counter & m_counter_mask);
+		uint16_t const address = m_counter & m_counter_mask;
+		uint8_t const *const page = m_ram_read[address >> 8];
+		return page ? page[address & 0xff] : 0x00;
 	}
 
 	void hs_w(int state);
@@ -124,28 +165,35 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_stop() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
 
-	// device_memory_interface overrides
-	virtual space_config_vector memory_space_config() const override;
-
 private:
-	// memory space configuration
-	address_space_config        m_ram_config;
-	address_space_config        m_rom0_config;
-	address_space_config        m_rom1_config;
-	address_space_config        m_rom2_config;
-	address_space_config        m_io0_config;
-	address_space_config        m_io1_config;
-	address_space_config        m_io2_config;
-	address_space_config        m_boot_config;
+	optional_device<ram_device> m_ram;
+	memory_view                 m_low_view;     // $0000-$7FFF: 0 = page 0, 1 = page 1
+	memory_view                 m_high_view;    // $8000-$FEFF: 0 = RAM (map type 1), disabled = ROM
+	address_map_constructor     m_maps[8];
 
-	// memory spaces
-	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_ram_space;
-	memory_access<14, 0, 0, ENDIANNESS_BIG>::cache m_rom_space[3];
-	memory_access< 5, 0, 0, ENDIANNESS_BIG>::specific m_io_space[3];
-	memory_access< 7, 0, 0, ENDIANNESS_BIG>::cache m_boot_space;
+	// physical RAM, in 256 byte pages
+	uint8_t *                   m_ram_read[256] = {};
+	uint8_t *                   m_ram_write[256] = {};
+
+	// switchable ranges of physical RAM
+	struct ram_bank
+	{
+		offs_t start;
+		offs_t end;
+		memory_bank *read;
+		memory_bank *write;
+		std::vector<std::pair<uint8_t *, uint8_t *> > entries;
+	};
+	std::vector<ram_bank>       m_ram_banks;
+	int8_t                      m_ram_page_bank[256];   // index into m_ram_banks, or -1
+
+	memory_passthrough_handler  m_high_write_tap;
+	memory_passthrough_handler  m_ad_tap;
+	bool                        m_ad_tap_installed = false;
 	uint16_t                    m_counter_mask = 0;
 
 	// SAM state
@@ -170,6 +218,7 @@ private:
 			address_dependent_cycle(offset < 0x8000 || (offset & 0xffe0) == 0xff00);
 	}
 	void address_dependent_cycle(bool slow);
+	void update_ad_tap();
 
 	// Divider outputs clock B4 and B5 on falling edges, including mode writes.
 	void counter_reset(uint16_t address);
@@ -182,6 +231,10 @@ private:
 	void counter_mode_changed(uint8_t old_mode);
 
 	// other members
+	void check_ram_range(offs_t start, offs_t end);
+	void set_ram_pages(offs_t start, offs_t end, uint8_t *read, uint8_t *write);
+	void install_ram(memory_view::memory_view_entry &entry, offs_t start, offs_t end, offs_t physical, bool writable);
+	void install_ram_views();
 	void horizontal_sync();
 	void update_state();
 	void update_memory();

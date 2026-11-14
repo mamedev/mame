@@ -1420,6 +1420,8 @@ if CPUS["I386"] then
 		MAME_DIR .. "src/devices/cpu/i386/pentops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87ops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87priv.h",
+		MAME_DIR .. "src/devices/cpu/i386/x87slot.cpp",
+		MAME_DIR .. "src/devices/cpu/i386/x87slot.h",
 		MAME_DIR .. "src/devices/cpu/i386/cpuidmsrs.hxx",
 	}
 end
@@ -2172,6 +2174,10 @@ if CPUS["M6805"] then
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_sci.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_sci.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_spi.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_spi.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05pge.cpp",

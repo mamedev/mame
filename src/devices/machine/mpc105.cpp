@@ -46,11 +46,6 @@ void mpc105_host_device::device_start()
 	save_item(NAME(m_mccr));
 }
 
-u8 mpc105_host_device::header_type_r()
-{
-	return 0;
-}
-
 void mpc105_host_device::device_reset()
 {
 	mpc10x_host_device::device_reset();

@@ -2043,15 +2043,13 @@ private:
 static void tvochken_iox_devices(device_slot_interface &device)
 {
 	device.option_add("rd1831", TVOCHKEN_CARD_READER);
-	device.set_default_option("rd1831");
-	device.set_fixed(true);
 }
 
 void tvochken_state::tvochken(machine_config &config)
 {
 	sega_9h0_0008(config);
 
-	SEGA_9H0_0008_CARD(config, m_card, tvochken_iox_devices, nullptr, false);
+	SEGA_9H0_0008_CARD(config, m_card, tvochken_iox_devices, "rd1831", true);
 
 	SOFTWARE_LIST(config, "card_list").set_original("tvochken");
 

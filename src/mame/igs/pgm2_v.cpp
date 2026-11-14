@@ -336,7 +336,7 @@ void pgm2_state::screen_vblank(int state)
 	if (state)
 	{
 		draw_sprites(m_screen->visible_area());
-		m_arm_aic->set_irq(12, ASSERT_LINE);
+		m_maincpu->set_aic_irq(12, ASSERT_LINE);
 	}
 }
 

@@ -1955,7 +1955,7 @@ void drcbe_x64::op_handle(Assembler &a, const instruction &inst)
 	assert(inst.param(0).is_code_handle());
 
 	// make a label for documentation
-	Label handle = a.new_named_label(inst.param(0).handle().string());
+	Label handle = a.new_named_label(inst.param(0).handle().string().c_str());
 	a.bind(handle);
 
 	// emit a jump around the stack adjust in case code falls through here

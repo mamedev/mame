@@ -48,14 +48,22 @@ private:
 	devcb_write_line m_irq;
 
 	std::unique_ptr<u32[]> m_vram;
-	emu_timer *m_vbl_timer;
 	u32 m_vram_offset;
 	u8 m_monitor_id;
 	u32 m_base, m_stride, m_video_timing;
 	s32 m_int_status;
 	u32 m_hres, m_vres, m_htotal, m_vtotal, m_config;
-	bool m_vbl_enabled;
+	u8 m_int_enable;
 	u8 m_M, m_N, m_P;
+	u8 m_video_in_control, m_color_key;
+	u16 m_window_x, m_window_y, m_window_width, m_window_height, m_field_x, m_field_y;
+	u8 m_video_clut[256][3];
+
+	void draw_video_window(bitmap_rgb32 &bitmap, rectangle const &cliprect, u32 stride);
+	static offs_t video_buffer_offset(offs_t offset);
+
+	// in mode 0x1f, the mode after a reset, no interrupt is latched and blanking stays asserted
+	bool timing_stopped() const { return (m_video_timing & 0x7f) == 0x1f; }
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -69,8 +77,10 @@ private:
 	void ramdac_w(offs_t offset, u32 data);
 	u32 vram_r(offs_t offset);
 	void vram_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 video_buffer_r(offs_t offset);
+	void video_buffer_w(offs_t offset, u32 data, u32 mem_mask);
 
-	TIMER_CALLBACK_MEMBER(vbl_tick);
+	void vblank_w(int state);
 };
 
 DECLARE_DEVICE_TYPE(VALKYRIE, valkyrie_device)

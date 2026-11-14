@@ -703,7 +703,7 @@ uint32_t matrox_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &b
 		// mode 2: xga mode -> color 0-1/transparent/complement
 		// mode 3: x-window mode -> transparent/transparent/color 0-1
 		const u8 transparent_pen = 2;
-		for (int y = 0; y < 64; y ++)
+		for (int y = 0; y < 64; y++)
 		{
 			int res_y = y + m_cursor_y - 64;
 			for (int x = 0; x < 64; x++)

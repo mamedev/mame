@@ -3382,7 +3382,7 @@ void vamphalf_state::init_newxpang()
 
 void vamphalf_state::init_newxpanga()
 {
-	// m_maincpu->space(AS_PROGRAM).install_read_handler(0x061218, 0x061219, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<, >)))); // TODO
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0x082ad8, 0x082ad9, emu::rw_delegate(*this, NAME((&vamphalf_state::speedup_16_r<0x86ec, 0x82ad8>))));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xe0000000, 0xe0000003, emu::rw_delegate(*this, FUNC(vamphalf_state::jmpbreak_flipscreen_w)));
 
 	m_palshift = 0;
@@ -3432,7 +3432,7 @@ GAME( 1999, jmpbreaka,  jmpbreak, jmpbreak,  common,    vamphalf_state,       in
 GAME( 1999, poosho,     0,        jmpbreak,  common,    vamphalf_state,       init_poosho,    ROT0,   "F2 System",                     "Poosho Poosho", MACHINE_SUPPORTS_SAVE ) // This set is English title version, Korean title version exists? (background text in title screen is still Korean)
 
 GAME( 1999, newxpang,   0,        newxpang,  common,    vamphalf_state,       init_newxpang,  ROT0,   "F2 System",                     "New Cross Pang (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1999, newxpanga,  newxpang, jmpbreak,  common,    vamphalf_state,       init_newxpanga, ROT0,   "F2 System",                     "New Cross Pang (set 2)", MACHINE_SUPPORTS_SAVE ) // TODO: speed up for this set
+GAME( 1999, newxpanga,  newxpang, jmpbreak,  common,    vamphalf_state,       init_newxpanga, ROT0,   "F2 System",                     "New Cross Pang (set 2)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1999, worldadv,   0,        worldadv,  common,    vamphalf_state,       init_worldadv,  ROT0,   "Logic / F2 System",             "World Adventure", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // cfr. vamphalf_prot.cpp
 

@@ -2985,8 +2985,7 @@ bool mips3_device::generate_set_cop0_reg(drcuml_block &block, compiler_state &co
 			UML_DADD(block, I0, I0, I0);                                        // dadd    i0,i0,i0
 			UML_DSUB(block, mem(&m_core->count_zero_time), mem(&m_core->numcycles), I0);
 																				// dsub    [count_zero_time],[m_numcycles],i0
-			// a Count write moves the next compare as well
-			UML_MOV(block, mem(&m_core->compare_armed), 1);                     // mov     [compare_armed],1
+			// a Count write re-times a pending compare, but only a Compare write starts one
 			UML_CALLC(block, cfunc_mips3com_update_cycle_counting, this);       // callc   mips3com_update_cycle_counting,mips.core
 			compiler.cycles++;
 			return true;

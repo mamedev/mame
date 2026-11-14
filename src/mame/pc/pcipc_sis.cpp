@@ -5,6 +5,8 @@
  *
  * Notes:
  * - sis85c471 doesn't belong here, it's a full on ISA PC/AT
+ * - (Hack Inc.) to setup working CD-ROM, set any unused HDD to None (the detection is quite slow),
+ *   then in Chipset Features set Onboard 496B IDE Port to Both
  *
  * TODO:
  * - Finish porting sis85c496 from at.cpp;

@@ -9,11 +9,11 @@
 #include "emu.h"
 #include "sound/cs43l43.h"
 
-#define LOG_WRITES		(1U << 1)
-#define LOG_READS		(1U << 2)
-#define LOG_OVERRUNS	(1U << 3)
-#define LOG_SAMPLES		(1U << 4)
-#define VERBOSE			( 0 )
+#define LOG_WRITES      (1U << 1)
+#define LOG_READS       (1U << 2)
+#define LOG_OVERRUNS    (1U << 3)
+#define LOG_SAMPLES     (1U << 4)
+#define VERBOSE         ( 0 )
 #include "logmacro.h"
 
 
@@ -83,6 +83,7 @@ void cs43l43_device::device_reset()
 
 	m_volume = 1.0;
 	m_frequency = BASE_FREQUENCY;
+	m_stream->set_sample_rate(m_frequency);
 
 	memset(m_bufin, 0, sizeof(u32) * 2);
 	memset(m_bufout, 0, sizeof(u32) * 2);
@@ -105,6 +106,7 @@ void cs43l43_device::sound_stream_update(sound_stream &stream)
 
 		// save the new output pointer
 		m_bufout[channel] = curout;
+		stream.fill(channel, 0.0, sampindex);
 	}
 }
 
@@ -267,13 +269,13 @@ void cs43l43_device::write_i2s(offs_t offset, u16 data)
 	}
 	else
 	{
-		printf("write_i2s: buffer overrun (short 1 frame on buffer %d)\n", offset); fflush(stdout);
 		LOGMASKED(LOG_OVERRUNS, "write_i2s: buffer overrun (short 1 frame on buffer %d)\n", offset);
 	}
 }
 
 void cs43l43_device::set_frequency(u32 frequency)
 {
+	m_stream->update();
 	m_frequency = double(frequency);
 	m_stream->set_sample_rate(m_frequency);
 }

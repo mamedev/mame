@@ -205,7 +205,12 @@ void sis85c496_host_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffff;
 	io_offset       = 0;
-	status = 0x0010;
+	// spaces and bus master hardwired to 1
+	command = 0x0007;
+	// Parity Error, SERR#, Fast Back-to-Back Control
+	command_mask = 0x0340;
+	// Medium DEVSEL#, Fast Back-to-Back
+	status = 0x0280;
 
 	m_bios_config = 0x78;
 	m_dram_config = 0;
@@ -391,18 +396,24 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 	{
 		// TODO: doesn't seem to work right for anything after IDE[0] primary
 		// bit 9: swaps IDE channels
-		io_space->install_readwrite_handler(0x170, 0x177, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_w)));
 
-		io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_w)));
+		if (!BIT(m_ide_vesa_ctrl, 7))
+		{
+			io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_w)));
 
-		//if (!BIT(m_ide_vesa_ctrl, 6))
-		io_space->install_readwrite_handler(0x370, 0x377, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs1_w)));
+			io_space->install_readwrite_handler(0x3f6, 0x3f6, read8sm_delegate(*this, FUNC(sis85c496_host_device::ide1_read_cs1_r)), write8sm_delegate(*this, FUNC(sis85c496_host_device::ide1_write_cs1_w)));
+		}
 
-		//if (!BIT(m_ide_vesa_ctrl, 7))
-		io_space->install_readwrite_handler(0x3f0, 0x3f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs1_w)));
+		if (!BIT(m_ide_vesa_ctrl, 6))
+		{
+			io_space->install_readwrite_handler(0x170, 0x177, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_w)));
+
+			io_space->install_readwrite_handler(0x376, 0x376, read8sm_delegate(*this, FUNC(sis85c496_host_device::ide2_read_cs1_r)), write8sm_delegate(*this, FUNC(sis85c496_host_device::ide2_write_cs1_w)));
+		}
 	}
 
-	// 32 megs of RAM (todo: don't hardcode)
+	// 32 megs of RAM
+	// TODO: don't hardcode
 	memory_space->install_ram(0x00100000, 0x01ffffff, &ram[0x00100000/4]);
 }
 
@@ -559,23 +570,25 @@ void sis85c496_host_device::pc_dma8237_7_dack_w(uint8_t data) { m_isabus->dack16
 void sis85c496_host_device::at_dma8237_out_eop(int state)
 {
 	m_cur_eop = state == ASSERT_LINE;
-	//if(m_dma_channel != -1)
-//      m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
+	if(m_dma_channel != -1)
+		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
 }
 
 void sis85c496_host_device::pc_select_dma_channel(int channel, bool state)
 {
-	//m_isabus->dack_line_w(channel, state);
+	m_isabus->dack_line_w(channel, state);
 
-	if(!state) {
+	if(!state)
+	{
 		m_dma_channel = channel;
-		//if(m_cur_eop)
-//          m_isabus->eop_w(channel, ASSERT_LINE );
-
-	} else if(m_dma_channel == channel) {
+		if(m_cur_eop)
+			m_isabus->eop_w(channel, ASSERT_LINE );
+	}
+	else if(m_dma_channel == channel)
+	{
 		m_dma_channel = -1;
-		//if(m_cur_eop)
-//          m_isabus->eop_w(channel, CLEAR_LINE );
+		if(m_cur_eop)
+			m_isabus->eop_w(channel, CLEAR_LINE );
 	}
 }
 
@@ -789,6 +802,35 @@ void sis85c496_host_device::cpu_a20_w(int state)
 void sis85c496_host_device::cpu_reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
+
+// NOTE: command branch is commented out because this host cannot disable I/O space access anyway
+uint8_t sis85c496_host_device::ide1_read_cs1_r(offs_t offset)
+{
+//	if (!(command & 1))
+//		return 0xff;
+	return m_ide[0]->read_cs1(1, 0xff0000) >> 16;
+}
+
+void sis85c496_host_device::ide1_write_cs1_w(offs_t offset, uint8_t data)
+{
+//	if (!(command & 1))
+//		return;
+	m_ide[0]->write_cs1(1, data << 16, 0xff0000);
+}
+
+uint8_t sis85c496_host_device::ide2_read_cs1_r(offs_t offset)
+{
+//	if (!(command & 1))
+//		return 0xff;
+	return m_ide[1]->read_cs1(1, 0xff0000) >> 16;
+}
+
+void sis85c496_host_device::ide2_write_cs1_w(offs_t offset, uint8_t data)
+{
+//	if (!(command & 1))
+//		return;
+	m_ide[1]->write_cs1(1, data << 16, 0xff0000);
 }
 
 /*

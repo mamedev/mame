@@ -19,6 +19,8 @@
 
 #define X86_NUM_CPUS        4
 
+class x87_slot_device;
+
 class i386_device : public cpu_device, public device_vtlb_interface, public i386_disassembler::config
 {
 public:
@@ -415,6 +417,9 @@ protected:
 	uint32_t m_smbase;
 	devcb_write_line m_smiact;
 	devcb_write_line m_ferr_handler;
+	// coprocessor fitted, set by an I387_SLOT/I387SX_SLOT/I487SX_SLOT before start
+	friend class x87_slot_device;
+	bool m_x87_present;
 	bool m_lock;
 
 	// bytes in current opcode, debug only
@@ -1596,6 +1601,16 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 };
 
+class i486sx_device : public i486_device
+{
+public:
+	// construction/destruction
+	i486sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override ATTR_COLD;
+};
+
 class i486dx4_device : public i486_device
 {
 public:
@@ -1708,6 +1723,7 @@ protected:
 DECLARE_DEVICE_TYPE(I386,        i386_device)
 DECLARE_DEVICE_TYPE(I386SX,      i386sx_device)
 DECLARE_DEVICE_TYPE(I486,        i486_device)
+DECLARE_DEVICE_TYPE(I486SX,      i486sx_device)
 DECLARE_DEVICE_TYPE(I486DX4,     i486dx4_device)
 DECLARE_DEVICE_TYPE(PENTIUM,     pentium_device)
 DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
