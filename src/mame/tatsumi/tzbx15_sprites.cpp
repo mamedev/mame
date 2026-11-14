@@ -135,18 +135,15 @@ void tzbx15_device::draw_sprites_main(BitmapClass &bitmap, const rectangle &clip
 	// Sprite data is double buffered
 	for (int offs = rambank;offs < rambank + 0x800;offs += 6)
 	{
-		int y =         m_spriteram[offs+3];
-		int x =         m_spriteram[offs+2];
-		int scale =     m_spriteram[offs+4] & 0x1ff;
-		int color =     m_spriteram[offs+1] >> 3 & 0x1ff;
-		int flip_x =    m_spriteram[offs+1] & 0x8000;
-		int flip_y =    m_spriteram[offs+1] & 0x4000;
-		int rotate =    m_spriteram[offs+5] & 0x1ff;
+		int const y =         m_spriteram[offs+3];
+		int const x =         m_spriteram[offs+2];
+		int const scale =     m_spriteram[offs+4] & 0x1ff;
+		int const color =     m_spriteram[offs+1] >> 3 & 0x1ff;
+		int const flip_x =    m_spriteram[offs+1] & 0x8000;
+		int const flip_y =    m_spriteram[offs+1] & 0x4000;
+		int const rotate =    m_spriteram[offs+5] & 0x1ff;
 
-		int index = m_spriteram[offs];
-
-//      if (m_spriteram[offs+1]&0x7)
-//          color=machine().rand()%0xff;
+		int const index = m_spriteram[offs];
 
 		/* End of sprite list marker */
 		if (index == 0xffff || m_spriteram[offs + 4] == 0xffff) // todo
