@@ -12,60 +12,80 @@
 */
 
 #include "emu.h"
+
 #include "megadriv.h"
 
+#include "megadriv_firecore_vdp.h"
 
 namespace {
 
-
-class megadriv_firecore_state : public md_ctrl_state
+class md_firecore_state : public md_ctrl_state
 {
 public:
-	megadriv_firecore_state(const machine_config& mconfig, device_type type, const char* tag) :
+	md_firecore_state(const machine_config& mconfig, device_type type, const char* tag) :
 		md_ctrl_state(mconfig, type, tag),
 		m_bank(0),
 		m_externalbank(0),
 		m_romsize(0x400000),
-		m_rom(*this, "maincpu")
+		m_rom(*this, "maincpu"),
+		m_io_menu(*this, "MENU"),
+		m_chunk_mask{ 0, 0, 0, 0 }
 	{ }
 
-	void megadriv_firecore_3button_ntsc(machine_config &config) ATTR_COLD;
-	void megadriv_firecore_3button_pal(machine_config &config) ATTR_COLD;
-	void megadriv_firecore_6button_ntsc(machine_config &config) ATTR_COLD;
+	void md_firecore(machine_config &config) ATTR_COLD;
+	void md_firecore_6b(machine_config &config) ATTR_COLD;
 
 	void init_atgame40() ATTR_COLD;
-	void init_dcat() ATTR_COLD;
 	void init_mdhh100() ATTR_COLD;
 	void init_sarc110() ATTR_COLD;
 	void init_reactmd() ATTR_COLD;
+	void init_mahg156() ATTR_COLD;
+	void init_pxp3() ATTR_COLD;
+
+	DECLARE_INPUT_CHANGED_MEMBER(menu_changed);
 
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	uint16_t read(offs_t offset);
+	void md_firecore_map(address_map &map) ATTR_COLD;
 
-	void megadriv_firecore_map(address_map &map) ATTR_COLD;
+	// RedKid (DMC RK2) style boards with up to 128MiB of flash: SoC GPIOs drive the upper flash address lines
+	uint16_t redkid_rom_r(offs_t offset);
+	uint16_t redkid_gpio_r(offs_t offset);
+	void redkid_gpio_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void redkid_ssf2_w(offs_t offset, uint8_t data);
+	uint16_t redkid_portc_r();
+	uint16_t redkid_sys_r(offs_t offset);
+	void redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t redkid_xregs_r(offs_t offset);
+	void redkid_xregs_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+
+	uint32_t screen_update_redkid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t redkid_flash_chunk() const;
+	bool redkid_cart_selected() const;
 
 	void bank_high_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void bank_low_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	void bank_upper_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-
-	void b01036_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	int m_bank;
 	int m_externalbank;
 	int m_romsize;
 
 	required_region_ptr<uint16_t> m_rom;
+	optional_ioport m_io_menu;
+
+	uint16_t m_gpio[8];         // 0xa10104 - 0xa10113
+	uint8_t m_ssf2_bank[8];     // built-in Sega SSF2-style mapper (0xa130f3 - 0xa130ff)
+	uint16_t m_sysreg[0x80];    // 0xb01000 - 0xb010ff
+	uint8_t m_vdp_is_pal;
+	uint16_t m_vdpxreg[0x80];   // 0xb00000 - 0xb000ff
+
+	uint16_t m_chunk_mask[4];   // GPIO bits (in 0xa10104) driving flash A23, A24, A25, A26
 };
 
-uint16_t megadriv_firecore_state::read(offs_t offset)
-{
-	return m_rom[(((m_externalbank | m_bank) >> 1) + offset) & (m_romsize - 1)];
-}
 
-void megadriv_firecore_state::bank_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void md_firecore_state::bank_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= 0x7f;
 	mem_mask &= 0x7f;
@@ -74,49 +94,213 @@ void megadriv_firecore_state::bank_high_w(offs_t offset, uint16_t data, uint16_t
 	logerror("%s: bank_high_w bank is now %08x\n", machine().describe_context(), m_bank);
 }
 
-void megadriv_firecore_state::bank_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void md_firecore_state::bank_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_bank = (m_bank & 0xffff0000) | (data & mem_mask);
 	logerror("%s: bank_low_w bank is now %08x\n", machine().describe_context(), m_bank);
 }
 
-void megadriv_firecore_state::bank_upper_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+
+/*
+    RedKid (DMC RK2) handhelds / consoles (mahg156, pxp3, mdhh100 with 1Gbit flash, dcat16 with 8MiB)
+
+    The SoC itself only drives A1-A22 of the flash (8MiB window, selected with 0xb01028 / 0xb0102a),
+    the four upper address lines A23-A26 are driven from SoC GPIOs at 0xa10104 (data) / 0xa10106 (direction).
+    After reset the GPIOs are inputs and the lines are pulled high, so the system boots from the last 8MiB
+    (the MASTER menu).  The menu copies a small routine to RAM (at 0xff006e) which selects one of the 16
+    8MiB chunks by driving GPIO bits 0x0002 / 0x0010 / 0x0020 / 0x0400 (the bit-to-line order is board specific).
+
+    GPIO 0x0080 / 0x0800 (with 0xa1010c selecting GPIO or SoC function for those pins) switch the bus between
+    the internal flash and the cartridge slot (the menu only does this from code running in RAM).  When probing
+    the slot the menu additionally sets 0xa1010c bit 2 and 0xb01030 = 0xa130 / 0xb01032 = 0x3ffc (meaning unknown).
+
+    The 156 games are split into three menus with their own background graphics: the default one (games 1-80) and
+    two more (games 81-119 and 120-156) that are selected by pulling 0xa10006 bit 14 or bit 13 low (read inverted as
+    a 3-bit value from bits 15-13, values other than 0/1/2 hang the menu).  On the PXP3 this is done with a
+    cartridge that only contains a wire jumper, it is exposed as a configuration setting here.
+    The 2nd entry of the PXP3 MASTER (and the 'DMC-RK2-SLV' program at 0x6000000) is DMC's Angry Birds.
+*/
+
+uint32_t md_firecore_state::redkid_flash_chunk() const
 {
-	// this is handled differently to the other writes, probably some external logic
-	// rather than the same banking
-	// written before bank_high and bank_low
-	m_bank |= 0x800000;
-	logerror("%s: bank_upper_w (%04x %04x) bank is now %08x\n", machine().describe_context(), data, mem_mask, m_bank);
+	const uint16_t data = m_gpio[0];
+	const uint16_t dir = m_gpio[1];
+	uint32_t chunk = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		const uint16_t mask = m_chunk_mask[i];
+		const bool level = (dir & mask) ? bool(data & mask) : true; // inputs are pulled high
+		if (level)
+			chunk |= 1 << i;
+	}
+	return chunk;
 }
 
-void megadriv_firecore_state::b01036_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+bool md_firecore_state::redkid_cart_selected() const
 {
-	// all games in atgame40 that fail to display anything write 0x0001 here
-	// could be coincidence, but could also be enabling the alt display mode?
-	logerror("%s: b01036_w %04x %04x (for games with no display?)\n", machine().describe_context(), data, mem_mask);
+	// GPIO 0x0080 driven high = internal flash disabled -> cartridge slot
+	return !(m_gpio[4] & 0x0080) && (m_gpio[0] & 0x0080);
 }
 
-void megadriv_firecore_state::megadriv_firecore_map(address_map &map)
+uint16_t md_firecore_state::redkid_rom_r(offs_t offset)
+{
+	const uint32_t byteaddr = offset << 1;
+	uint32_t chunk = redkid_flash_chunk();
+
+	if (redkid_cart_selected())
+		return 0xffff; // empty cartridge slot
+
+	// 512KiB pages of the SSF2 mapper, relative to the bank base
+	const uint32_t page = m_ssf2_bank[(byteaddr >> 19) & 7];
+	const uint32_t offs = (page << 19) | (byteaddr & 0x7ffff);
+
+	const uint32_t addr = (chunk << 23) | ((m_bank + offs) & 0x7fffff);
+	return m_rom[(addr & (m_romsize - 1)) >> 1];
+}
+
+uint16_t md_firecore_state::redkid_sys_r(offs_t offset)
+{
+	return m_sysreg[offset];
+}
+
+void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_sysreg[offset]);
+
+	switch (offset)
+	{
+	case 0x0c / 2: // 0xb0100c bit 2: version register reports PAL (set by the menu from the game header region)
+	case 0x1e / 2: // 0xb0101e bit 2: version register reports domestic (Japan)
+	{
+		const bool pal = BIT(m_sysreg[0x0c / 2], 2);
+		const bool domestic = BIT(m_sysreg[0x1e / 2], 2);
+		m_version_hi_nibble = 0x20 | (domestic ? 0x00 : 0x80) | (pal ? 0x40 : 0x00);
+
+		// the VDP PAL flag and timing follow too (some European games check the VDP status instead of the version register)
+		// TODO: does this really change the output, or just fake the return values?
+		if (pal != bool(m_vdp_is_pal))
+		{
+			m_vdp_is_pal = pal;
+			m_vdp->set_vdp_pal(pal);
+			m_vdp->set_framerate(pal ? 50 : 60);
+			m_vdp->set_total_scanlines(pal ? 313 : 262);
+			m_screen->configure(m_screen->width(), pal ? 313 : 262, m_screen->visible_area(),
+					attotime::from_hz(pal ? (MASTER_CLOCK_PAL.dvalue() / 10 / 313 / 342) : (MASTER_CLOCK_NTSC.dvalue() / 10 / 262 / 342)));
+		}
+		break;
+	}
+
+	case 0x28 / 2:
+		bank_low_w(0, data, mem_mask);
+		break;
+
+	case 0x2a / 2:
+		bank_high_w(0, data, mem_mask);
+		break;
+
+	case 0x36 / 2:
+	{
+		// all games in atgame40 that fail to display anything write 0x0001 here
+		// could be coincidence, but could also be enabling the alt display mode?
+		logerror("%s: redkid_sys_w %02x %04x %04x (custom mode enable?)\n", machine().describe_context(), offset, data, mem_mask);
+		break;
+	}
+
+	default:
+	{
+		logerror("%s: redkid_sys_w %02x %04x %04x (unknown)\n", machine().describe_context(), offset, data, mem_mask);
+		break;
+	}
+
+	}
+}
+
+uint16_t md_firecore_state::redkid_xregs_r(offs_t offset)
+{
+	logerror("%s: redkid_xregs_r %02x (unknown)\n", machine().describe_context(), offset);
+	return m_vdpxreg[offset];
+}
+
+void md_firecore_state::redkid_xregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	COMBINE_DATA(&m_vdpxreg[offset]);
+	logerror("%s: redkid_xregs_w %02x %04x %04x (unknown)\n", machine().describe_context(), offset, data, mem_mask);
+}
+
+void md_firecore_state::redkid_ssf2_w(offs_t offset, uint8_t data)
+{
+	// 0xa130f3, f5 ... ff select the 512KiB page shown at 0x080000, 0x100000 ... 0x380000 (used by Super Street Fighter II)
+	if ((offset & 1) && (offset >= 3))
+	{
+		m_ssf2_bank[offset >> 1] = data & 0x3f;
+		logerror("%s: SSF2 mapper page %d = %02x\n", machine().describe_context(), offset >> 1, data);
+	}
+}
+
+uint16_t md_firecore_state::redkid_gpio_r(offs_t offset)
+{
+	// the data register reads back the pin levels, pins configured as inputs are pulled high
+	// (the menu relies on this: it switches A24 to output with a read-modify-write of the data register beforehand)
+	if (offset == 0)
+		return (m_gpio[0] & m_gpio[1]) | ~m_gpio[1];
+
+	return m_gpio[offset];
+}
+
+void md_firecore_state::redkid_gpio_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+{
+	const uint32_t oldchunk = redkid_flash_chunk();
+	const bool oldcart = redkid_cart_selected();
+	COMBINE_DATA(&m_gpio[offset]);
+
+	if ((oldchunk != redkid_flash_chunk()) || (oldcart != redkid_cart_selected()))
+		logerror("%s: GPIO %06x = %04x -> flash chunk %x (%08x)%s\n", machine().describe_context(), 0xa10104 + offset * 2, m_gpio[offset],
+				redkid_flash_chunk(), redkid_flash_chunk() << 23, redkid_cart_selected() ? " [cartridge slot]" : "");
+}
+
+
+uint32_t md_firecore_state::screen_update_redkid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	if (!dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).xvdp_enabled())
+		return screen_update_megadriv(screen, bitmap, cliprect);
+
+	bitmap.fill(rgb_t::black(), cliprect);
+
+	dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).draw_firecore(bitmap, cliprect);
+
+	return 0;
+}
+
+INPUT_CHANGED_MEMBER(md_firecore_state::menu_changed)
+{
+	// the jumper is only checked by the menu at startup
+	machine().schedule_soft_reset();
+}
+
+uint16_t md_firecore_state::redkid_portc_r()
+{
+	// bits 15-13 of the word read are menu select inputs (pulled high)
+	uint16_t data = m_ioports[2]->data_r();
+	data |= data << 8;
+	return (data & 0x1fff) | (m_io_menu ? (m_io_menu->read() & 0xe000) : 0xe000);
+}
+
+void md_firecore_state::md_firecore_map(address_map &map)
 {
 	megadriv_68k_base_map(map);
 
-	map(0x000000, 0x3fffff).r(FUNC(megadriv_firecore_state::read)); // Cartridge Program ROM
+	map(0x000000, 0x3fffff).r(FUNC(md_firecore_state::redkid_rom_r));
 
-	map(0xa10104, 0xa10105).w(FUNC(megadriv_firecore_state::bank_upper_w)); // read and written
+	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(megadriv_firecore_vdp_device::xvdp_r), FUNC(megadriv_firecore_vdp_device::xvdp_w));
 
-	map(0xb01028, 0xb01029).w(FUNC(megadriv_firecore_state::bank_low_w));
-	map(0xb0102a, 0xb0102b).w(FUNC(megadriv_firecore_state::bank_high_w));
+	map(0xa10006, 0xa10007).r(FUNC(md_firecore_state::redkid_portc_r));
+	map(0xa10104, 0xa10113).rw(FUNC(md_firecore_state::redkid_gpio_r), FUNC(md_firecore_state::redkid_gpio_w));
 
-	map(0xb01036, 0xb01037).w(FUNC(megadriv_firecore_state::b01036_w));
+	map(0xa130f0, 0xa130ff).w(FUNC(md_firecore_state::redkid_ssf2_w));
+
+	map(0xb00000, 0xb000ff).rw(FUNC(md_firecore_state::redkid_xregs_r), FUNC(md_firecore_state::redkid_xregs_w));
+	map(0xb01000, 0xb010ff).rw(FUNC(md_firecore_state::redkid_sys_r), FUNC(md_firecore_state::redkid_sys_w));
 }
-
-// controller is wired directly into unit, no controller slots
-static INPUT_PORTS_START( firecore_3button )
-	PORT_INCLUDE( md_common )
-
-	// TODO: how do the MENU buttons on the two controllers work?
-INPUT_PORTS_END
-
 
 INPUT_PORTS_START( mympac )
 	PORT_START("PAD1")
@@ -150,7 +334,7 @@ static INPUT_PORTS_START( firecore_6button )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SELECT )  PORT_PLAYER(2) PORT_NAME("%p Mode")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( msi_6button )
+static INPUT_PORTS_START( msi_6b )
 	PORT_INCLUDE( firecore_6button )
 
 	PORT_MODIFY("PAD2") // no 2nd pad
@@ -160,48 +344,90 @@ static INPUT_PORTS_START( msi_6button )
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1) PORT_NAME("Reset")
 INPUT_PORTS_END
 
-void megadriv_firecore_state::machine_start()
+static INPUT_PORTS_START( mahg156 )
+	PORT_INCLUDE( firecore_6button )
+
+	// read back inverted from 0xa10006 bits 15-13 by the menu at startup, selects which part of the game list is shown
+	PORT_START("MENU")
+	PORT_CONFNAME( 0xe000, 0xe000, "Menu" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md_firecore_state::menu_changed), 0)
+	PORT_CONFSETTING(      0xe000, "Games 1-156" )
+	// this doesn't actually have a cartridge slot, these are leftover menus from the PXP, all games are available in the first menu
+	//PORT_CONFSETTING(      0xa000, "Games 81-119" )
+	//PORT_CONFSETTING(      0xc000, "Games 120-156" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pxp3 )
+	PORT_INCLUDE( md_common )
+
+	// read back inverted from 0xa10006 bits 15-13 by the menu at startup, selects which part of the game list is shown
+	PORT_START("MENU")
+	PORT_CONFNAME( 0xe000, 0xe000, "Menu (cartridge jumper)" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md_firecore_state::menu_changed), 0)
+	PORT_CONFSETTING(      0xe000, "Games 1-80 (no cartridge, 999888-in-1)" )
+	PORT_CONFSETTING(      0xa000, "Games 81-119 (cartridge, 999666-in-1)" )
+	PORT_CONFSETTING(      0xc000, "Games 120-156 (cartridge, 900000-in-1)" )
+INPUT_PORTS_END
+
+
+void md_firecore_state::machine_start()
 {
 	md_ctrl_state::machine_start();
 	m_vdp->stop_timers();
 	save_item(NAME(m_bank));
 	save_item(NAME(m_externalbank));
 	save_item(NAME(m_romsize));
+	save_item(NAME(m_gpio));
+	save_item(NAME(m_ssf2_bank));
+	save_item(NAME(m_sysreg));
+	save_item(NAME(m_vdpxreg));
+	save_item(NAME(m_vdp_is_pal));
 }
 
-void megadriv_firecore_state::machine_reset()
+void md_firecore_state::machine_reset()
 {
+	m_vdp_is_pal = 0;
 	m_bank = 0;
+	std::fill(std::begin(m_gpio), std::end(m_gpio), 0);
+	for (int i = 0; i < 8; i++)
+		m_ssf2_bank[i] = i;
+	std::fill(std::begin(m_sysreg), std::end(m_sysreg), 0);
+	std::fill(std::begin(m_vdpxreg), std::end(m_vdpxreg), 0);
+
 	md_ctrl_state::machine_reset();
 }
 
-void megadriv_firecore_state::megadriv_firecore_3button_ntsc(machine_config &config)
+
+void md_firecore_state::md_firecore(machine_config &config)
 {
 	md_ntsc(config);
 
+	FIRECORE_VDP(config.replace(), m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
+	m_vdp->set_is_pal(false);
+	m_vdp->vint_cb().set(FUNC(md_firecore_state::vdp_vint_cb));
+	m_vdp->hint_cb().set(FUNC(md_firecore_state::vdp_hint_cb));
+	m_vdp->set_screen("megadriv");
+	m_vdp->snd_irq().set_inputline(m_z80snd, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
+	m_vdp->set_use_cram(1);
+	m_vdp->set_vdp_pal(false);
+	m_vdp->set_framerate(60);
+	m_vdp->set_total_scanlines(262);
+
 	ctrl1_3button(config);
 	ctrl2_3button(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_firecore_state::megadriv_firecore_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &md_firecore_state::md_firecore_map);
+	m_screen->set_screen_update(FUNC(md_firecore_state::screen_update_redkid));
 }
 
-void megadriv_firecore_state::megadriv_firecore_3button_pal(machine_config &config)
+void md_firecore_state::md_firecore_6b(machine_config &config)
 {
-	md_pal(config);
-
-	ctrl1_3button(config);
-	ctrl2_3button(config);
-
-	m_maincpu->set_addrmap(AS_PROGRAM, &megadriv_firecore_state::megadriv_firecore_map);
-}
-
-void megadriv_firecore_state::megadriv_firecore_6button_ntsc(machine_config &config)
-{
-	megadriv_firecore_3button_ntsc(config);
+	md_firecore(config);
 
 	ctrl1_6button(config);
 	ctrl2_6button(config);
 }
+
 
 
 ROM_START( matet )
@@ -250,7 +476,7 @@ ROM_START( mygalaga )
 ROM_END
 
 ROM_START( mygalagb )
-	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "s29gl032n90tfi03.u2", 0x000000, 0x400000, CRC(b59a22fb) SHA1(55abc30f1502ccdb5b2f3a85b23f7762df3f63c9) )
 
 	// has a P24C64C (for storing scores?)
@@ -325,8 +551,7 @@ on an unsupported video mode (they still play sounds and resond to inputs / do c
 
 ROM_START( atgame40 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x800000, 0x800000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
-	ROM_CONTINUE(0x000000, 0x800000)
+	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x000000, 0x1000000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
 ROM_END
 
 
@@ -372,6 +597,17 @@ ROM_START(mahg156)
 //  etc.
 ROM_END
 
+// PXP3 16-bit handhelds with cartridge slot, several revisions with different game selections (dumps named after the case colour)
+ROM_START(pxp3)
+	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "pxp3_black.bin", 0x0000,  0x8000000, CRC(5c29ad76) SHA1(a377cf704d17a084537211e22c94f086628cd642) )
+ROM_END
+
+ROM_START(pxp3a)
+	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "pxp3_blue.bin", 0x0000,  0x8000000, CRC(f5e36263) SHA1(98f551358be92591fa34304d97fbf48482801123) )
+ROM_END
+
 ROM_START(mdhh100)
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD16_WORD_SWAP( "s29gl01gp11tfir1.u13", 0x0000,  0x8000000, CRC(564ab33a) SHA1(e455aaa9ed6f302d1ebe55b5202f983af612c415) )
@@ -412,20 +648,20 @@ ROM_START( sarc110a )
 	ROM_LOAD( "ic1_ver2.prg", 0x00000, 0x400000, CRC(b97a0dc7) SHA1(bace32d73184df914113de5336e29a7a6f4c03fa) )
 ROM_END
 
-void megadriv_firecore_state::init_atgame40()
+void md_firecore_state::init_atgame40()
 {
 	m_romsize = memregion("maincpu")->bytes();
 	init_megadrie();
 }
 
-void megadriv_firecore_state::init_sarc110()
+void md_firecore_state::init_sarc110()
 {
 	m_romsize = memregion("maincpu")->bytes();
 	m_externalbank = 0x800000;
 	init_megadrie();
 }
 
-void megadriv_firecore_state::init_reactmd()
+void md_firecore_state::init_reactmd()
 {
 	m_romsize = memregion("maincpu")->bytes();
 	m_externalbank = 0x1800000;
@@ -444,19 +680,32 @@ void megadriv_firecore_state::init_reactmd()
 	}
 }
 
-void megadriv_firecore_state::init_dcat()
+void md_firecore_state::init_mahg156()
 {
 	m_romsize = memregion("maincpu")->bytes();
+	m_chunk_mask[0] = 0x0400; // A23
+	m_chunk_mask[1] = 0x0020; // A24
+	m_chunk_mask[2] = 0x0002; // A25
+	m_chunk_mask[3] = 0x0010; // A26
 	init_megadriv();
 }
 
-void megadriv_firecore_state::init_mdhh100()
+void md_firecore_state::init_pxp3() // also mdhh100, dcat16
+{
+	m_romsize = memregion("maincpu")->bytes();
+	m_chunk_mask[0] = 0x0020; // A23
+	m_chunk_mask[1] = 0x0400; // A24
+	m_chunk_mask[2] = 0x0002; // A25
+	m_chunk_mask[3] = 0x0010; // A26
+	init_megadriv();
+}
+
+void md_firecore_state::init_mdhh100()
 {
 	m_romsize = memregion("maincpu")->bytes();
 	m_externalbank = m_romsize-0x800000;
 	init_megadriv();
 }
-
 
 } // anonymous namespace
 
@@ -473,45 +722,55 @@ void megadriv_firecore_state::init_mdhh100()
 // due to differences in the SoC compared to real MD hardware (including sound + new video modes) these have been left
 // as NOT WORKING for now although some games run to a degree
 
-CONS( 2020, mypacgld,  0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Pac-Man 40th Anniversary (DGUNL-3290 / TUV-01, Micro Player)", MACHINE_NOT_WORKING )
+CONS( 2020, mypacgld,  0,        0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Pac-Man 40th Anniversary (DGUNL-3290 / TUV-01, Micro Player)", MACHINE_NOT_WORKING )
 
-CONS( 2021, mypac,     0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Pac-Man (DGUNL-4198, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
-CONS( 2021, mypaca,    mypac,    0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Pac-Man (DGUNL-4194, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mypac,     0,        0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Pac-Man (DGUNL-4198, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mypaca,    mypac,    0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Pac-Man (DGUNL-4194, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
-CONS( 2021, mympac,    0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
-CONS( 2021, mympaca,   mympac,   0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Ms. Pac-Man (DGUNL-7023, Nano Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mympac,    0,        0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mympaca,   mympac,   0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Ms. Pac-Man (DGUNL-7023, Nano Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
 // menu uses unsupported extended mode
-CONS( 2021, mygalag,   0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Galaga (DGUNL-4195, Micro Player Pro)", MACHINE_NOT_WORKING | ROT270 )
-CONS( 2021, mygalaga,  mygalag,  0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Galaga (DGUNL-4199, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
-CONS( 2021, mygalagb,  mygalag,  0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Galaga (DGUNL-7132, Pixel Pocket Pro)", MACHINE_NOT_WORKING | ROT270 )
+CONS( 2021, mygalag,   0,        0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Galaga (DGUNL-4195, Micro Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT270 )
+CONS( 2021, mygalaga,  mygalag,  0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Galaga (DGUNL-4199, Pocket Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT270 )
+CONS( 2021, mygalagb,  mygalag,  0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Galaga (DGUNL-7132, Pixel Pocket Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT270 )
 
-CONS( 2021, mysinv,    0,        0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Space Invaders (DGUNL-7006, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT90 )
-CONS( 2021, mysinva,   mysinv,   0, megadriv_firecore_3button_ntsc,  mympac, megadriv_firecore_state, init_megadriv,           "dreamGEAR", "My Arcade Space Invaders (DGUNL-7133, Pixel Pocket Pro)", MACHINE_NOT_WORKING | ROT90 )
+CONS( 2021, mysinv,    0,        0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Space Invaders (DGUNL-7006, Pocket Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT90 )
+CONS( 2021, mysinva,   mysinv,   0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Space Invaders (DGUNL-7133, Pixel Pocket Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT90 )
 
-CONS( 2021, mysf2,     0,        0, megadriv_firecore_6button_ntsc,  msi_6button, megadriv_firecore_state, init_mdhh100,       "dreamGEAR", "My Arcade Street Fighter II (DGUNL-4184, Nano Player Pro)", MACHINE_NOT_WORKING )
+CONS( 2021, mysf2,     0,        0, md_firecore_6b, msi_6b,    md_firecore_state, init_mdhh100,  "dreamGEAR", "My Arcade Street Fighter II (DGUNL-4184, Nano Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2012, atgame40,  0,        0, megadriv_firecore_3button_pal,   firecore_3button, megadriv_firecore_state, init_atgame40, "AtGames",   "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING)
+CONS( 2012, atgame40,  0,        0, md_firecore,    md_common, md_firecore_state, init_atgame40, "AtGames",   "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2021, matet,     0,        0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Tetris (DGUNL-7028, Pocket Player Pro)", MACHINE_NOT_WORKING)
-CONS( 2021, mateta,    matet,    0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Tetris (DGUNL-7025, Micro Player Pro)", MACHINE_NOT_WORKING)
+CONS( 2021, matet,     0,        0, md_firecore,    md_common, md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Tetris (DGUNL-7028, Pocket Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, mateta,    matet,    0, md_firecore,    md_common, md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Tetris (DGUNL-7025, Micro Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// has an SD card slot?
-CONS( 200?, dcat16,    0,        0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_firecore_state, init_dcat,     "Firecore",  "D-CAT16 (Mega Drive handheld)",  MACHINE_NOT_WORKING )
-// seems to be based on the AT games units, requires custom mode for menu?
-CONS( 201?, mahg156,   0,        0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_firecore_state, init_mdhh100,  "<unknown>", "Mini Arcade Handheld Game Console 2.8 Inch Screen Built in 156 Retro Games (Mega Drive handheld)",  MACHINE_NOT_WORKING )
+// has an SD card slot? (the menu has an 'SD CARTRIDGE' entry, not emulated)
+// 8MiB flash only, menu at 0 (DMC-RK2-MST), the built-in games use the Firecore extended video mode
+CONS( 200?, dcat16,    0,        0, md_firecore,    md_common, md_firecore_state, init_pxp3,     "Firecore",  "D-CAT16 (Firecore handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// RedKid (DMC RK2) based, 1Gbit flash, menu at 0x7800000
+// there are PXP3 Slim Stations on other SoCs too
+// these ones have the volume control and power switch at the bottom
+// game code is from the first menu, other menus have their own codes (which seem to be the same between units, even when the menu differs)
+CONS( 201?, pxp3,      0,        0, md_firecore,    pxp3,      md_firecore_state, init_pxp3,     "<unknown>", "PXP3 Slim Station (Firecore, NFAQ877666)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, pxp3a,     pxp3,     0, md_firecore,    pxp3,      md_firecore_state, init_pxp3,     "<unknown>", "PXP3 Slim Station (Firecore, NFS877666)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// the 156 games are split into three menus selected with a 'jumper' cartridge (see notes above)
+CONS( 201?, mahg156,   0,        0, md_firecore_6b, mahg156,   md_firecore_state, init_mahg156,  "<unknown>", "Mini Arcade Handheld Game Console 2.8 Inch Screen Built in 156 Retro Games (Firecore)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
 // game-boy like handheld, pink in colour, 6 button controller (+ home select, start, vol buttons)
-CONS( 201?, mdhh100,   0,        0, megadriv_firecore_3button_ntsc,  firecore_3button, megadriv_firecore_state, init_mdhh100,  "<unknown>", "unknown 100-in-1 handheld (Mega Drive based)",  MACHINE_NOT_WORKING )
+CONS( 201?, mdhh100,   0,        0, md_firecore_6b, msi_6b,    md_firecore_state, init_pxp3,     "<unknown>", "unknown 100-in-1 handheld (Firecore)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
-CONS( 2018, msi_sf2,   0,        0, megadriv_firecore_6button_ntsc,  msi_6button,      megadriv_firecore_state, init_megadriv, "MSI / Capcom / Sega", "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", 0)
+CONS( 2018, msi_sf2,   0,        0, md_firecore_6b, msi_6b,    md_firecore_state, init_megadriv, "MSI / Capcom / Sega", "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // the Firecore video mode part doesn't work correctly, game can boot if you skip over it
-CONS( 2019, bfmk,      0,        0, megadriv_firecore_6button_ntsc,  msi_6button,      megadriv_firecore_state, init_megadriv, "Basic Fun", "Mortal Kombat: Arcade Classics", MACHINE_NOT_WORKING)
+CONS( 2019, bfmk,      0,        0, md_firecore_6b, msi_6b,    md_firecore_state, init_megadriv, "Basic Fun", "Mortal Kombat: Arcade Classics", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Two systems in one unit - Firecore Genesis and SunPlus
-CONS( 2009, reactmd,   0,        0, megadriv_firecore_3button_pal,   firecore_3button, megadriv_firecore_state, init_reactmd,  "AtGames / Sega / Waixing", "Reactor MD (Firecore/SunPlus hybrid, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, reactmd,   0,        0, md_firecore,    md_common, md_firecore_state, init_reactmd,  "AtGames / Sega / Waixing", "Reactor MD (Firecore/SunPlus hybrid, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Two systems in one unit - Firecore Genesis and VT02/VT03
-CONS( 200?, sarc110,   0,        0, megadriv_firecore_3button_pal,   firecore_3button, megadriv_firecore_state, init_sarc110,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 1)", MACHINE_NOT_WORKING)
-CONS( 200?, sarc110a,  sarc110,  0, megadriv_firecore_3button_pal,   firecore_3button, megadriv_firecore_state, init_sarc110,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 2)", MACHINE_NOT_WORKING)
+CONS( 200?, sarc110,   0,        0, md_firecore,    md_common, md_firecore_state, init_sarc110,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, sarc110a,  sarc110,  0, md_firecore,    md_common, md_firecore_state, init_sarc110,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )

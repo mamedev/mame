@@ -117,10 +117,14 @@ public:
 	inline u16 vdp_get_word_from_68k_mem(u32 source);
 
 protected:
+	sega315_5313_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
 	virtual void device_post_load() override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+
+	void vdp_set_register(int regnum, u8 value);
 
 	// called when we hit 240 and 241 (used to control the z80 irq line on genesis, or the main irq on c2)
 	devcb_write_line m_sndirqline_callback;
@@ -130,6 +134,22 @@ protected:
 	md_32x_scanline_delegate m_32x_scanline_func;
 	md_32x_interrupt_delegate m_32x_interrupt_func;
 	md_32x_scanline_helper_delegate m_32x_scanline_helper_func;
+
+	required_device<m68000_base_device> m_cpu68k;
+	address_space *m_space68k;
+	std::unique_ptr<u16[]> m_vram;
+	std::unique_ptr<u8[]> m_regs;
+	std::unique_ptr<u16[]> m_cram;
+	std::unique_ptr<u16[]> m_vsram;
+
+	u8  m_vdp_code;
+	u32 m_vdp_address;
+	int m_command_pending; // 2nd half of command pending..
+	u8  m_vram_fill_pending;
+
+	// config
+	u32 m_vram_size;
+	u32 m_cram_size;
 
 	virtual int screen_hpos() override;
 private:
@@ -159,12 +179,8 @@ private:
 	inline void draw_tile(nametable_t tile, int start, int end, int &dpos, bool is_fg);
 
 	inline u8 get_hres();
-	int m_command_pending; // 2nd half of command pending..
 	u16 m_command_part1;
 	u16 m_command_part2;
-	u8  m_vdp_code;
-	u16 m_vdp_address;
-	u8  m_vram_fill_pending;
 	u16 m_vram_fill_length;
 	int m_irq4counter;
 	int m_imode_odd_frame;
@@ -189,10 +205,6 @@ private:
 	int m_use_cram; // c2 uses it's own palette ram, so it sets this to 0
 	int m_dma_delay;    // SVP and SegaCD have some 'lag' in DMA transfers
 
-	std::unique_ptr<u16[]> m_regs;
-	std::unique_ptr<u16[]> m_vram;
-	std::unique_ptr<u16[]> m_cram;
-	std::unique_ptr<u16[]> m_vsram;
 	/* The VDP keeps a 0x400 byte on-chip cache of the Sprite Attribute Table
 	   to speed up processing, Castlevania Bloodlines abuses this on the upside down level */
 	std::unique_ptr<u16[]> m_internal_sprite_attribute_table;
@@ -218,7 +230,6 @@ private:
 	void vdp_vsram_write(u16 data);
 
 	void vdp_address_inc();
-	void vdp_set_register(int regnum, u8 value);
 
 	void handle_dma_bits();
 
@@ -242,8 +253,6 @@ private:
 	std::unique_ptr<u32[]> m_video_renderline;
 	std::unique_ptr<u16[]> m_palette_lookup;
 
-	address_space *m_space68k;
-	required_device<m68000_base_device> m_cpu68k;
 	optional_device<palette_device> m_ext_palette;
 
 	// debug functions

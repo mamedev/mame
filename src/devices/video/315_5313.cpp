@@ -175,8 +175,13 @@ int sega315_5313_device::screen_hpos() { return screen().hpos() / (m_lcm_scaling
 DEFINE_DEVICE_TYPE(SEGA315_5313, sega315_5313_device, "sega315_5313", "Sega 315-5313 Megadrive VDP")
 
 sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: sega315_5313_device(mconfig, SEGA315_5313, tag, owner, clock)
+{
+}
+
+sega315_5313_device::sega315_5313_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	// mode 4 support, for SMS compatibility, is implemented in 315_5124.cpp
-	: sega315_5313_mode4_device(mconfig, SEGA315_5313, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0x00, 0x1f, 0, 0, line_315_5313_mode4)
+	: sega315_5313_mode4_device(mconfig, type, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0x00, 0x1f, 0, 0, line_315_5313_mode4)
 	, device_gfx_interface(mconfig, *this, nullptr, "gfx_palette")
 	, m_render_bitmap(nullptr)
 	, m_render_line(nullptr)
@@ -188,12 +193,18 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 	, m_32x_scanline_func(*this)
 	, m_32x_interrupt_func(*this)
 	, m_32x_scanline_helper_func(*this)
-	, m_command_pending(0)
-	, m_command_part1(0)
-	, m_command_part2(0)
+	, m_cpu68k(*this, finder_base::DUMMY_TAG)
+	, m_space68k(nullptr)
+	, m_vram(nullptr)
+	, m_regs(nullptr)
+	, m_cram(nullptr)
+	, m_vsram(nullptr)
 	, m_vdp_code(0)
 	, m_vdp_address(0)
+	, m_command_pending(0)
 	, m_vram_fill_pending(0)
+	, m_command_part1(0)
+	, m_command_part2(0)
 	, m_vram_fill_length(0)
 	, m_irq4counter(0)
 	, m_imode_odd_frame(0)
@@ -213,10 +224,6 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 	, m_vdp_pal(0)
 	, m_use_cram(0)
 	, m_dma_delay(0)
-	, m_regs(nullptr)
-	, m_vram(nullptr)
-	, m_cram(nullptr)
-	, m_vsram(nullptr)
 	, m_internal_sprite_attribute_table(nullptr)
 	, m_irq6_on_timer(nullptr)
 	, m_irq4_on_timer(nullptr)
@@ -225,8 +232,6 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 	, m_highpri_renderline(nullptr)
 	, m_video_renderline(nullptr)
 	, m_palette_lookup(nullptr)
-	, m_space68k(nullptr)
-	, m_cpu68k(*this, finder_base::DUMMY_TAG)
 	, m_ext_palette(*this, finder_base::DUMMY_TAG)
 	, m_gfx_palette(*this, "gfx_palette")
 	, m_gfx_palette_shadow(*this, "gfx_palette_shadow")
@@ -234,6 +239,9 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const ch
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;
+	m_vram_size = 0x10000;
+	m_cram_size = 0x80;
+
 }
 
 //-------------------------------------------------
@@ -303,22 +311,22 @@ void sega315_5313_device::device_start()
 	m_32x_interrupt_func.resolve();
 	m_32x_scanline_helper_func.resolve();
 
-	m_vram  = std::make_unique<u16[]>(0x10000 / 2);
-	m_cram  = std::make_unique<u16[]>(0x80 / 2);
+	m_vram  = std::make_unique<u16[]>(m_vram_size / 2);
+	m_cram  = std::make_unique<u16[]>(m_cram_size / 2);
 	m_vsram = std::make_unique<u16[]>(0x80 / 2);
-	m_regs  = std::make_unique<u16[]>(0x40 / 2);
+	m_regs  = std::make_unique<u8[]>(0x20);
 	m_internal_sprite_attribute_table = std::make_unique<u16[]>(0x400 / 2);
 
-	memset(m_vram.get(), 0x00, 0x10000);
-	memset(m_cram.get(), 0x00, 0x80);
+	memset(m_vram.get(), 0x00, m_vram_size);
+	memset(m_cram.get(), 0x00, m_cram_size);
 	memset(m_vsram.get(), 0x00, 0x80);
-	memset(m_regs.get(), 0x00, 0x40);
+	memset(m_regs.get(), 0x00, 0x20);
 	memset(m_internal_sprite_attribute_table.get(), 0x00, 0x400);
 
-	save_pointer(NAME(m_vram), 0x10000 / 2);
-	save_pointer(NAME(m_cram), 0x80 / 2);
+	save_pointer(NAME(m_vram), m_vram_size / 2);
+	save_pointer(NAME(m_cram), m_cram_size / 2);
 	save_pointer(NAME(m_vsram), 0x80 / 2);
-	save_pointer(NAME(m_regs), 0x40 / 2);
+	save_pointer(NAME(m_regs), 0x20);
 	save_pointer(NAME(m_internal_sprite_attribute_table), 0x400 / 2);
 
 	save_item(NAME(m_command_pending));
@@ -572,10 +580,6 @@ void sega315_5313_device::data_port_w(int data)
 
 void sega315_5313_device::vdp_set_register(int regnum, u8 value)
 {
-	// in mode 4 all writes beyond register 10 are ignored
-	// bassmpro relies on this at Sega startup logo
-	if (!BIT(m_regs[0x01], 2) && regnum > 10)
-		return;
 	m_regs[regnum] = value;
 
 //  if (regnum == 1)
@@ -877,6 +881,11 @@ void sega315_5313_device::ctrl_port_w(int data)
 			const int value  = (data & 0x00ff);
 
 			if (regnum & 0x20) osd_printf_debug("reg error\n");
+
+			// in mode 4 all writes beyond register 10 are ignored
+			// bassmpro relies on this at Sega startup logo
+			if (!BIT(m_regs[0x01], 2) && regnum > 10)
+				return;
 
 			vdp_set_register(regnum & 0x1f, value);
 			m_vdp_code = 0;

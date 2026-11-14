@@ -42,6 +42,9 @@ protected:
 
 	void megadriv_tas_callback(offs_t offset, uint8_t data);
 
+	void vdp_vint_cb(int state);
+	void vdp_hint_cb(int state);
+
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank_megadriv(int state);
 
@@ -56,8 +59,6 @@ private:
 //  IRQ_CALLBACK_MEMBER(genesis_int_callback);
 	void cpu_space_map(address_map &map);
 
-	void vdp_vint_cb(int state);
-	void vdp_hint_cb(int state);
 
 	void megadriv_timers(machine_config &config);
 };
