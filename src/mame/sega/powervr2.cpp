@@ -2303,12 +2303,13 @@ void powervr2_device::process_ta_fifo()
 						*/
 						memcpy(&base_intensity, tafifo_buff + 6, sizeof(base_intensity));
 						memcpy(&offs_intensity, tafifo_buff + 7, sizeof(offs_intensity));
-						vert_base_color[0] = poly_base_color[0] * base_intensity;
+						// the intensity scales the colour, not the alpha
+						vert_base_color[0] = poly_base_color[0];
 						vert_base_color[1] = poly_base_color[1] * base_intensity;
 						vert_base_color[2] = poly_base_color[2] * base_intensity;
 						vert_base_color[3] = poly_base_color[3] * base_intensity;
 						if (offset_color_enable) {
-							vert_offset_color[0] = poly_offs_color[0] * offs_intensity;
+							vert_offset_color[0] = poly_offs_color[0];
 							vert_offset_color[1] = poly_offs_color[1] * offs_intensity;
 							vert_offset_color[2] = poly_offs_color[2] * offs_intensity;
 							vert_offset_color[3] = poly_offs_color[3] * offs_intensity;
