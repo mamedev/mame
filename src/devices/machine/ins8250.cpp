@@ -246,7 +246,8 @@ int ins8250_uart_device::intrpt_r()
 	return !BIT(m_regs.iir, 0);
 }
 
-// Baud rate generator is reset after writing to either byte of divisor latch
+// Sets the rate from the divisor and the input clock; this also resets the
+// transmitter and receiver, cutting off any character in progress
 void ins8250_uart_device::update_baud_rate()
 {
 	LOG("%.1f baud selected (divisor = %d)\n", double(clock()) / (m_regs.dl * 16), m_regs.dl);
@@ -261,8 +262,9 @@ void ins8250_uart_device::update_baud_rate()
 
 void ins8250_uart_device::set_divisor(u16 dl)
 {
-	// an unchanged divisor only restarts the baud counter (phase not
-	// modelled); retuning would cut off the character in progress
+	// Loading a divisor latch reloads the chip's baud counter, a sub-bit
+	// shift in its timing that isn't modelled.  Retuning for an unchanged
+	// divisor would cut off a character being sent or received.
 	if (dl != m_regs.dl)
 	{
 		m_regs.dl = dl;
