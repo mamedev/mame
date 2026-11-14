@@ -397,7 +397,8 @@ void pmac6200_state::pmac6200(machine_config &config)
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("8M,16M,32M,64M"); // per service manual
+	// Two independently populated 72-pin SIMM sockets (developer note table 4-1).
+	m_ram->set_extra_options("12M,16M,20M,24M,32M,36M,40M,48M,64M");
 }
 
 
