@@ -646,7 +646,9 @@ void tms7000_device::timer16_w(offs_t offset, uint8_t data)
 				m_timer16_clocks[timer] = 0;
 			}
 			else
+			{
 				m_io_control[timer] &= ~0x08;
+			}
 			break;
 	}
 }
