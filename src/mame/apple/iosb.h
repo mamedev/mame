@@ -52,6 +52,8 @@ public:
 	template <u8 Mask>
 	void via2_irq_w(int state);
 
+	template <u8 Bit> void button_w(int state) { m_via2->button_w<Bit>(state); }
+
 	void via_sync();
 
 	void scsi_drq_w(int state);
