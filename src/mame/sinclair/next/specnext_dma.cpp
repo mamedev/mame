@@ -46,7 +46,7 @@ DEFINE_DEVICE_TYPE(SPECNEXT_DMA, specnext_dma_device, "specnext_dma", "Spectrum 
 
 
 specnext_dma_device::specnext_dma_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: z80dma_device(mconfig, SPECNEXT_DMA, tag, owner, clock)
+	: z80dma_device(mconfig, SPECNEXT_DMA, tag, owner, clock, false)
 {
 }
 

@@ -108,7 +108,7 @@ protected:
 		SEQ_FINISH
 	};
 
-	z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool dest_counter_lags = true);
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -142,6 +142,8 @@ protected:
 	u16 m_count;
 	u16 m_byte_counter;
 	int m_dma_seq;
+	bool m_dest_counter_lags;
+	bool m_dest_first;
 
 	u8  m_num_follow;
 	u8  m_cur_follow;
