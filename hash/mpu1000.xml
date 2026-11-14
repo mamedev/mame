@@ -19,4 +19,82 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="headon">
+		<description>Head On</description>
+		<year>1981</year>
+		<publisher>Radofin</publisher>
+		<info name="serial" value="20"/>
+		<part name="cart" interface="vc4000_cart">
+			<feature name="slot" value="std" />
+			<dataarea name="rom" size="2048">
+				<rom name="head on.bin" size="2048" crc="ff39521a" sha1="a985f128458a9ccaeb15894c4ad04a8634af9339"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hobbymod">
+		<description>Hobby Module</description>
+		<year>1980</year>
+		<publisher>Radofin</publisher>
+		<info name="serial" value="16"/>
+		<part name="cart" interface="vc4000_cart">
+			<feature name="slot" value="std" />
+			<dataarea name="rom" size="2048">
+				<rom name="hobby module.bin" size="2048" crc="8a33c6cc" sha1="43956f8e2a8e59238ed7a50e98aef0c7646730d9"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knockout">
+		<description>Super Knockout</description>
+		<year>1980</year>
+		<publisher>Radofin?</publisher>
+		<info name="serial" value="26"/>
+		<part name="cart" interface="vc4000_cart">
+			<feature name="slot" value="std" />
+			<dataarea name="rom" size="2048">
+				<rom name="super knockout.bin" size="2048" crc="3467cf62" sha1="2177abd604b9eb263d0fdb66f92452d2a09c1306"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="laseratk">
+		<description>Laser Attack</description>
+		<year>1981</year>
+		<publisher>Radofin</publisher>
+		<info name="serial" value="31"/>
+		<part name="cart" interface="vc4000_cart">
+			<feature name="slot" value="std" />
+			<dataarea name="rom" size="2048">
+				<rom name="laser attack.bin" size="2048" crc="c44fabb1" sha1="1e1f3f51f1245fe6e3f854c5b2a43be0e6dc4524"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="plntdfdr">
+		<description>Planet Defender</description>
+		<year>1982</year>
+		<publisher>Radofin</publisher>
+		<info name="serial" value="33"/>
+		<part name="cart" interface="vc4000_cart">
+			<feature name="slot" value="std" />
+			<dataarea name="rom" size="2048">
+				<rom name="planet defender.bin" size="2048" crc="2aeb516e" sha1="eff47857e94b0610780d5b1c4721aefb3c12cabc"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shootout">
+		<description>Shoot Out</description>
+		<year>1981</year>
+		<publisher>Radofin</publisher>
+		<info name="serial" value="29"/>
+		<part name="cart" interface="vc4000_cart">
+			<feature name="slot" value="std" />
+			<dataarea name="rom" size="2048">
+				<rom name="shoot out.bin" size="2048" crc="b589f093" sha1="01a9f080eacb0ffd73522006fba5ad2106e8183a"/>
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
