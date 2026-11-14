@@ -44,6 +44,7 @@ function devicesProject(_target, _subtarget)
 		ext_includedir("expat"),
 		ext_includedir("flac"),
 		ext_includedir("jpeg"),
+		ext_includedir("openh264dec"),
 	}
 
 	dofile(path.join("src", "cpu.lua"))

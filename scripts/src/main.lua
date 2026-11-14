@@ -155,7 +155,9 @@ if (MACHINES["NETLIST"]~=null) then
 	}
 end
 if VIDEOS["HANTRO_G1"] then
-	links { "openh264dec" }
+	links {
+		ext_lib("openh264dec")
+	}
 end
 	links {
 		"utils",

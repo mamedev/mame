@@ -2183,6 +2183,7 @@ end
 -- OpenH264 portable decoder (Hantro G1)
 --------------------------------------------------
 if VIDEOS["HANTRO_G1"] then
+if _OPTIONS["with-system-openh264dec"] ~= "1" then
 	project "openh264dec"
 	uuid "8812e9bd-a62e-49ce-a7f3-734080a2e19c"
 	kind "StaticLib"
@@ -2201,4 +2202,9 @@ if VIDEOS["HANTRO_G1"] then
 		MAME_DIR .. "3rdparty/openh264/codec/decoder/core/src/*.cpp",
 		MAME_DIR .. "3rdparty/openh264/codec/decoder/plus/src/*.cpp",
 	}
+else
+links {
+	ext_lib("openh264dec"),
+}
+end
 end
