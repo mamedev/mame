@@ -100,7 +100,7 @@ Note: ASTRO F01 is a QuickLogic pASIC 3 FPGA (die-marked as QL3161A/1999).
 TODO:
 
 - MCU on showhand/showhandc PCB, what does it do? Games run fine and there appears to be no interaction...
-- Protection in magibomb sets with simpler encryption (writes to $a0101x, $a11100, etc.). Some sets appear to work fine regardless, others freeze.
+- magibomb sets with simpler encryption: the clock of the protection Z80 is unknown, as is where it is on the PCB (inside the ASTRO V03?).
 - Find source of level 2 interrupt (sprite DMA end?).
 - magibomb_br44: needs a redump of one of the program ROMs.
 - hacher, winbingo_gm051: need a redump of the sprite ROMs.
@@ -115,41 +115,6 @@ TODO:
 - foxyruby: needs verifying of inputs, outputs and layout.
 - luckys99: needs verifying of inputs, outputs and layout creation.
 
-magibomb sets Q/A as of 18.07.2025:
-MAGIC BOMB\A3.0 (magibomb_a30 run protected)
-MAGIC BOMB\A3.1 (magibomb_a31 run protected)
-MAGIC BOMB\A3.6A (magibomb_a36a run protected)
-MAGIC BOMB\A4.0A (magibomb_a40a run protected)
-MAGIC BOMB\A4.0A 4/06/01 (magibomb_a40aa freeze)
-MAGIC BOMB\A4.1A 5/4/01 (magibomb_a41a freeze)
-MAGIC BOMB\A4.2A 7/06/01 (magibomb_a42aa freeze)
-MAGIC BOMB\A4.2A 8/09/01 (magibomb_a42a freeze)
-MAGIC BOMB\AA.71A 30/04/04 (magibomb_aa71a RUN OK)
-MAGIC BOMB\AA.72A (no dumped yet)
-MAGIC BOMB\AA.72C 25/05/05 (magibomb_aa72c RUN OK)
-MAGIC BOMB\AA.72D 14/11/05 (magibomb_aa72d RUN OK)
-MAGIC BOMB\AA.73.A 17/10/06 (magibomb_aa73a RUN OK) FIDEL CASTRO , needs dump the GFX
-MAGIC BOMB\AB4.2 11/10/01 (magibomb_ab42 freeze)
-MAGIC BOMB\AB4.3A 103001S (magibomb_ab43a freeze) WE SUPPORT USA LOGO
-MAGIC BOMB\AB4.3A 112201S (magibomb_ab43aa freeze)
-MAGIC BOMB\AB4.3A 121901S (magibomb_ab43ab freeze)
-MAGIC BOMB\AB4.5 052402S (magibomb_ab45aa freeze) WE SUPPORT USA LOGO
-MAGIC BOMB\AB4.5A 071002S (magibomb_ab45a freeze)
-MAGIC BOMB\AB5.0 092602S (magibomb_ab50 RUN OK)
-MAGIC BOMB\AB5.1 011003S (magibomb_ab51 RUN OK)
-MAGIC BOMB\AB5.3 062003S  (magibomb_ab53 RUN OK)
-MAGIC BOMB\AB6.0J 112603S (magibomb_ab60j RUN OK)
-MAGIC BOMB\BB6.0 022404S (magibomb_bb60 RUN OK 34%)
-MAGIC BOMB\BR.4.4 04/19/02 (magibomb_br44 NO WORKING) needs cpu key
-MAGIC BOMB\BR.71.A 30/05/14 (magibomb_br71a RUN OK 34%)
-MAGIC BOMB\EB4.0 5/4/01 (magibomb_eb40 freeze)
-MAGIC BOMB\EB4.3 082201 (magibomb_eb43 freeze)
-MAGIC BOMB\L3.5S (magibomb run protected)
-MAGIC BOMB\L3.7S (magibomb_l37s RUN OK)
-MAGIC BOMB\L4.0S (magibomb_l40s run protected)
-MAGIC BOMB\LB5.1 121302S (magibomb_lb51 RUN OK)
-MAGIC BOMB\NB4.5 061402S (magibomb_nb45 freeze)
-MAGIC BOMB\NB6.1 260404S (magibomb_nb61 RUN OK CGA/VGA)
 
 ***ASTRO PASSWORDS***
 
@@ -216,6 +181,7 @@ UR DEALER       - Three traditional poker games. The player plays the role of De
 #include "astro_cpucode.h"
 
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
@@ -321,12 +287,14 @@ private:
 	void speeddrp_map(address_map &map) ATTR_COLD;
 };
 
-// Simpler encryption. No IRQs.
+// Simpler encryption. No IRQs. Z80 protection.
 class magibomb_state : public astrocorp_state
 {
 public:
 	magibomb_state(const machine_config &mconfig, device_type type, const char *tag) :
-		astrocorp_state(mconfig, type, tag)
+		astrocorp_state(mconfig, type, tag),
+		m_protcpu(*this, "protcpu"),
+		m_protram(*this, "protram", 0x2000, ENDIANNESS_LITTLE)
 	{ }
 
 	void magibomb(machine_config &config) ATTR_COLD;
@@ -335,13 +303,28 @@ public:
 
 	void init_magibomb() ATTR_COLD; // simple encryption
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
+	required_device<z80_device> m_protcpu;
+	memory_share_creator<u8> m_protram;
+
+	u8 m_prot_busreq = 0;
+
 	u16 video_flags_r();
+	u8 prot_ram_r(offs_t offset);
+	void prot_ram_w(offs_t offset, u8 data);
+	u16 prot_busreq_r();
+	void prot_busreq_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void prot_reset_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	void magibomb_base_map(address_map &map, u32 base_offs) ATTR_COLD;
 	void magibomb_map(address_map &map) ATTR_COLD;
 	void magibomb_ab45a_map(address_map &map) ATTR_COLD;
 	void magibomb_nb45_map(address_map &map) ATTR_COLD;
+	void prot_map(address_map &map) ATTR_COLD;
 };
 
 // Heavier encryption. CPU Code protection.
@@ -849,8 +832,8 @@ void astrocorp_state::speeddrp_map(address_map &map)
 }
 
 // PC refers to magibomb:
-// - 0x22a4 reads from $a0101a, resets if 0
-// - 0x8ba if $a10001 & 0xf != 0 it writes "SEGA" to $a14000 (!?)
+// - 0x8ba if $a10001 & 0xf != 0 it writes "SEGA" to $a14000, then waits for bit 1 of $c00005 to clear and
+//   writes 0x8000 and 0x8100 to $c00004 (Mega Drive-like TMSS and VDP initialization, all unmapped)
 // - all irq service routines write an id number to register D1 and then reset the program flow,
 //   is it expecting to NOT use irqs at all and actually using it for remote control?
 // - tight loops at 0x1fb2, bypass by jumping to 0x1fb6, otherwise works on an initialized nvram/eeprom,
@@ -860,6 +843,59 @@ u16 magibomb_state::video_flags_r()
 {
 	// bit 0: vblank? bit 3: sprite busy flag?
 	return (m_screen->vblank() ^ 1) | ((m_screen->vblank() ^ 1) << 3);
+}
+
+/***************************************************************************
+
+  Protection: a Z80 with 8KB of shared RAM, controlled like the Mega Drive
+  sound Z80 (bus request at $a11100, reset at $a11200).
+
+  At boot the 68000 uploads a Z80 program (0x5eb bytes, the same code in all
+  sets, only some data tables differ) to $a00000 and checks that it answers.
+  The program is a random number generator: the 68000 writes a request index
+  (0-9) to $101c, three parameters (from NVRAM) to $1018-$101a and clears $101b.
+  The Z80 writes a 16-bit little endian result to $1004 + 2 * index and sets
+  $101b. Some sets also reseed the generator by writing to $1000-$1003.
+
+  The results are used as countdown counters for the prizes; later sets keep
+  requesting until they get a non-zero result.
+
+***************************************************************************/
+
+u8 magibomb_state::prot_ram_r(offs_t offset)
+{
+	return m_protram[offset];
+}
+
+void magibomb_state::prot_ram_w(offs_t offset, u8 data)
+{
+	m_protram[offset] = data;
+}
+
+u16 magibomb_state::prot_busreq_r()
+{
+	// bit 8 low = bus granted
+	return m_prot_busreq ? 0x0000 : 0x0100;
+}
+
+void magibomb_state::prot_busreq_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		m_prot_busreq = BIT(data, 8);
+		m_protcpu->set_input_line(Z80_INPUT_LINE_BUSREQ, m_prot_busreq ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
+void magibomb_state::prot_reset_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	if (ACCESSING_BITS_8_15)
+		m_protcpu->set_input_line(INPUT_LINE_RESET, BIT(data, 8) ? CLEAR_LINE : ASSERT_LINE);
+}
+
+void magibomb_state::prot_map(address_map &map)
+{
+	map(0x0000, 0x1fff).ram().share(m_protram);
 }
 
 void magibomb_state::magibomb_base_map(address_map &map, u32 base_offs)
@@ -880,16 +916,9 @@ void magibomb_state::magibomb_base_map(address_map &map, u32 base_offs)
 	map(0x0a0000, 0x0a0000).w(FUNC(magibomb_state::screen_enable_w));
 	map(0x0b0000, 0x0b01ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 
-	map(0xa00000, 0xa005ff).ram(); // unknown
-//  map(0xa01000, 0xa0101f).rw
-	map(0xa0101a, 0xa0101b).r(FUNC(magibomb_state::unk_r));
-//      0xa10001.b r (bits 0-3)
-//      0xa11100.w w (0x0000 -> 0x0100)
-//      0xa11100.b r (bit 0)
-//      0xa11200.w w (0x0000 -> 0x0100)
-//      0xa14000.l w ("SEGA" !?)
-//      0xc00004.w w (0x8000 -> 0x8100)
-//      0xc00005.b r (bit 1)
+	map(0xa00000, 0xa01fff).rw(FUNC(magibomb_state::prot_ram_r), FUNC(magibomb_state::prot_ram_w));
+	map(0xa11100, 0xa11101).rw(FUNC(magibomb_state::prot_busreq_r), FUNC(magibomb_state::prot_busreq_w));
+	map(0xa11200, 0xa11201).w(FUNC(magibomb_state::prot_reset_w));
 }
 
 void magibomb_state::magibomb_map(address_map &map)
@@ -918,8 +947,9 @@ void magibomb_state::magibomb_nb45_map(address_map &map)
 	map(0x0b0000, 0x0b0000).w(FUNC(magibomb_state::oki_bank_w));
 	map(0x0c0001, 0x0c0001).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
-	map(0xa00000, 0xa005ff).ram(); // unknown
-	map(0xa0101a, 0xa0101b).r(FUNC(magibomb_state::unk_r));
+	map(0xa00000, 0xa01fff).rw(FUNC(magibomb_state::prot_ram_r), FUNC(magibomb_state::prot_ram_w));
+	map(0xa11100, 0xa11101).rw(FUNC(magibomb_state::prot_busreq_r), FUNC(magibomb_state::prot_busreq_w));
+	map(0xa11200, 0xa11201).w(FUNC(magibomb_state::prot_reset_w));
 }
 
 void zoo_state::eeprom_w(u8 data)
@@ -1626,6 +1656,21 @@ void astrocorp_state::machine_start()
 	m_screen_enable = 0;
 }
 
+void magibomb_state::machine_start()
+{
+	astrocorp_state::machine_start();
+
+	save_item(NAME(m_prot_busreq));
+}
+
+void magibomb_state::machine_reset()
+{
+	// assume the protection Z80 is held in reset until the 68000 releases it
+	m_prot_busreq = 0;
+	m_protcpu->set_input_line(Z80_INPUT_LINE_BUSREQ, CLEAR_LINE);
+	m_protcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+}
+
 void astrocorp_state::showhand(machine_config &config)
 {
 	// basic machine hardware
@@ -1725,6 +1770,9 @@ void magibomb_state::magibomb(machine_config &config)
 	m_maincpu->set_clock(80_MHz_XTAL / 5); // ASTRO V03 (16 MHz ?)
 	m_maincpu->set_addrmap(AS_PROGRAM, &magibomb_state::magibomb_map);
 	config.device_remove("scantimer"); // irqs soft-reset the game
+
+	Z80(config, m_protcpu, 80_MHz_XTAL / 10); // clock unknown, it must be > ~4 MHz to pass the boot check in time
+	m_protcpu->set_addrmap(AS_PROGRAM, &magibomb_state::prot_map);
 
 	m_screen->set_raw(80_MHz_XTAL / 3 / 4, 433, 0, 320, 261, 0, 240); // standard horizontal res
 }
@@ -4566,9 +4614,9 @@ GAMEL( 2002,  luckycoin,       skilldrp, luckycoin,       skilldrp,       astroc
 GAMEL( 2003,  speeddrp,        0,        speeddrp,        skilldrp,       astrocorp_state, empty_init,     ROT0, "Astro Corp.",                  "Speed Drop (Ver. 1.06, Sep 3 2003)",           MACHINE_SUPPORTS_SAVE,                                                              layout_skilldrp  ) // Sep  3 2003 16:01:26
 
 // Simpler encryption
-GAMEL( 2001?, magibomb,        0,        magibomb,        magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. L3.5S)",                      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_magibomb  )
+GAMEL( 2001?, magibomb,        0,        magibomb,        magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. L3.5S)",                      MACHINE_SUPPORTS_SAVE,                                                              layout_magibomb  )
 GAMEL( 2001?, magibomb_a30,    magibomb, magibomb_nb45,   magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. A3.0)",                       MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
-GAMEL( 2001?, magibomb_a31,    magibomb, magibomb_ab45a,  magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. A3.1)",                       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_magibomb  )
+GAMEL( 2001?, magibomb_a31,    magibomb, magibomb_ab45a,  magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. A3.1)",                       MACHINE_SUPPORTS_SAVE,                                                              layout_magibomb  )
 GAMEL( 2001?, magibomb_a36a,   magibomb, magibomb_ab45a,  magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. A3.6A)",                      MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
 GAMEL( 2001?, magibomb_a40a,   magibomb, magibomb_ab45a,  magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. A4.0A)",                      MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
 GAMEL( 2001,  magibomb_a40aa,  magibomb, magibomb_ab45a,  magibomb,       magibomb_state,  init_magibomb,  ROT0, "Astro Corp.",                  "Magic Bomb (Ver. A4.0A, 4/06/01)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a )
