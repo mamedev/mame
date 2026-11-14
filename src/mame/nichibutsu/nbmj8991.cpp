@@ -416,6 +416,65 @@ static INPUT_PORTS_START( ntopstar )
 	PORT_INCLUDE( nbmjcontrols )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( sttakkyu )
+	// from DIP sheet
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x07, "Game Out" )                  PORT_DIPLOCATION("DSWA:1,2,3")
+	PORT_DIPSETTING(    0x07, "90% (Easy)" )
+	PORT_DIPSETTING(    0x06, "85%" )
+	PORT_DIPSETTING(    0x05, "80%" )
+	PORT_DIPSETTING(    0x04, "75%" )
+	PORT_DIPSETTING(    0x03, "70%" )
+	PORT_DIPSETTING(    0x02, "65%" )
+	PORT_DIPSETTING(    0x01, "60%" )
+	PORT_DIPSETTING(    0x00, "55% (Hard)" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DSWA:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSWA:5" )           // marked as always off
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "DSWA:6" )           // "
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSWA:7" )           // "
+	PORT_DIPNAME( 0x80, 0x80, "Last Chance" )               PORT_DIPLOCATION("DSWA:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSWB:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Character Display Test" )    PORT_DIPLOCATION("DSWB:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "W Bet" )                     PORT_DIPLOCATION("DSWB:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x18, 0x18, "Bet Min" )                   PORT_DIPLOCATION("DSWB:4,5")
+	PORT_DIPSETTING(    0x18, "1" )
+	PORT_DIPSETTING(    0x10, "2" )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x60, 0x60, "Bet Max" )                   PORT_DIPLOCATION("DSWB:6,7")
+	PORT_DIPSETTING(    0x60, "8" )
+	PORT_DIPSETTING(    0x40, "10" )
+	PORT_DIPSETTING(    0x20, "12" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x80, 0x80, "Score Pool" )                PORT_DIPLOCATION("DSWB:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("nb1413m3", FUNC(nb1413m3_device::busyflag_r))
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )         //
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
+
+	PORT_INCLUDE( nbmjcontrols )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( mjlstory )
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
@@ -1705,6 +1764,43 @@ ROM_START( ntopstar )
 	ROM_LOAD( "ntsr_21.bin", 0x130000, 0x10000, CRC(133183db) SHA1(9c01c8c4f3dd2eaaa93cad78387d478529494f21) )
 ROM_END
 
+ROM_START( sttakkyu ) // スター宅急便. Medal Series No. 126N, according to dip sheet. Nichibutsu 1413M3 8922 Z20 custom
+	ROM_REGION( 0x10000, "maincpu", 0 ) // main program
+	ROM_LOAD( "1.bin",  0x00000,  0x10000, CRC(114ce70c) SHA1(f0dc447872bf878e2957dd1a58119db56c1cfc1a) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // sub program
+	ROM_LOAD( "3.bin",  0x00000,  0x10000, CRC(15b41a65) SHA1(de668aa33e323b78e60b0fc5f6f29a4160fd0e77) )
+	ROM_LOAD( "2.bin",  0x10000,  0x10000, CRC(12334718) SHA1(607e4053cc76ec1b4284138959af295d982f522a) )
+
+	ROM_REGION( 0x160000, "gfx1", 0 ) // gfx
+	ROM_LOAD( "4.bin",  0x000000, 0x20000, CRC(0d67b4f6) SHA1(39e6d0a906ad07e23adbcc9212dac36ca03d6ee3) )
+	ROM_LOAD( "5.bin",  0x020000, 0x20000, CRC(fded3c57) SHA1(43c9b57b2cf4a5653000f086e6d2bff0791f44c4) )
+	ROM_LOAD( "6.bin",  0x040000, 0x10000, CRC(9333ebcb) SHA1(72a103b1991b684ea81e37da7f47668bc40df1bc) )
+	ROM_LOAD( "7.bin",  0x050000, 0x10000, CRC(db17fcaf) SHA1(fe40a0e7abdea16e83253ba87b97ff2687d76aae) )
+	ROM_LOAD( "8.bin",  0x060000, 0x10000, CRC(abbd7494) SHA1(b04e10f711c7a83b6a036a99c8e3429880c2b790) )
+	ROM_LOAD( "9.bin",  0x070000, 0x10000, CRC(dd84badd) SHA1(e023580a457822f1ca02440e5364a2a1c3e32961) )
+	ROM_LOAD( "10.bin", 0x080000, 0x10000, CRC(7083a505) SHA1(89dfc327dcf375f295ebd148dfb91cd2a3abdbe7) )
+	ROM_LOAD( "11.bin", 0x090000, 0x10000, CRC(45ed0f6d) SHA1(bbb5524f5383688f82c179e22fc837e437e06ac7) )
+	ROM_LOAD( "12.bin", 0x0a0000, 0x10000, CRC(3d51ae82) SHA1(5f81da8e6ad7f7f38ebc34724c0f470e99290d56) )
+	ROM_LOAD( "13.bin", 0x0b0000, 0x10000, CRC(eccde427) SHA1(9e4aac4832211a5d58ab3f4012da7146c8365ab4) )
+	ROM_LOAD( "14.bin", 0x0c0000, 0x10000, CRC(dd21bbfb) SHA1(91a80fa3c53f9f5b1c08b265b5752dd091c425a5) )
+	ROM_LOAD( "15.bin", 0x0d0000, 0x10000, CRC(5556024b) SHA1(b9caf22394e58215df0ff9f8a8556f6f146ddcb3) )
+	ROM_LOAD( "16.bin", 0x0e0000, 0x10000, CRC(f1273c7f) SHA1(3a97860265e856f74e2de06e2cfdb2505f04f152) )
+	ROM_LOAD( "17.bin", 0x0f0000, 0x10000, CRC(d5574307) SHA1(e502f66ddf9d77703e1978410fe9abf7ac30519f) )
+	ROM_LOAD( "18.bin", 0x100000, 0x10000, CRC(71566140) SHA1(7f1755b03e87c0030144df1a744e2a1578653c3e) )
+	ROM_LOAD( "19.bin", 0x110000, 0x10000, CRC(6c880b9d) SHA1(7915505de353c508491f9ed52b389e10467f9310) )
+	ROM_LOAD( "20.bin", 0x120000, 0x10000, CRC(4b832d37) SHA1(b86dca689aea608ebf9cd77d383db591c1b8f6ab) )
+	ROM_LOAD( "21.bin", 0x130000, 0x10000, CRC(6c5afbad) SHA1(513b0efff2c539d25dcc19c4bb8bb72db5df5cdc) )
+	ROM_LOAD( "22.bin", 0x140000, 0x10000, CRC(80017ece) SHA1(1ad5caece9fe6ccfdf5e5b54e7dd600862a3c5ff) )
+	ROM_LOAD( "23.bin", 0x150000, 0x10000, CRC(f57997d3) SHA1(7fbf3f63f0526662952faaa17e9c79f5b3908fc2) )
+
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "pal16l8acn_blue.bin",      0x000, 0x104, CRC(d119bfca) SHA1(d9d32e0eba082d57e181e4562ce35339b24513a6) )
+	ROM_LOAD( "pal16l8acn_colorless.bin", 0x200, 0x104, CRC(260057f8) SHA1(05b4d39b20dce856492c6ba2de0331d59100584d) )
+	ROM_LOAD( "pal16l8acn_green.bin",     0x400, 0x104, CRC(fba4adbe) SHA1(fe2b820fd2b75cd4361f8a0df38072a282880576) )
+	ROM_LOAD( "pal16l8acn_pink.bin",      0x600, 0x104, CRC(d973e9cd) SHA1(0ef04ec83ddb32ae7904ec3dff39f2f569f3b01b) )
+ROM_END
+
 ROM_START( mjlstory )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* main program */
 	ROM_LOAD( "mjls_01.bin", 0x00000,  0x10000, CRC(a9febe8b) SHA1(b29570434145885120304ab001e6dd15fb40d528) )
@@ -2214,6 +2310,7 @@ GAME( 1989, triplew1, 0,        triplew1, triplew1, nbmj8991_state, empty_init, 
 GAME( 1990, pstadium, 0,        pstadium, pstadium, nbmj8991_state, empty_init,    ROT180, "Nichibutsu", "Mahjong Panic Stadium (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, triplew2, 0,        triplew2, triplew1, nbmj8991_state, empty_init,    ROT180, "Nichibutsu", "Mahjong Triple Wars 2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ntopstar, 0,        ntopstar, ntopstar, nbmj8991_state, empty_init,    ROT180, "Nichibutsu", "Mahjong Nerae! Top Star (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, sttakkyu, ntopstar, ntopstar, sttakkyu, nbmj8991_state, empty_init,    ROT180, "Nichibutsu", "Star Takkyuubin (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // TODO: verify inputs / DIPs
 GAME( 1991, mjlstory, 0,        mjlstory, mjlstory, nbmj8991_state, empty_init,    ROT180, "Nichibutsu", "Mahjong Jikken Love Story (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ladymakr, mjlstory, mjlstory, finalbny, nbmj8991_state, empty_init,    ROT180, "Nichibutsu", "Lady Maker (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vanilla,  0,        vanilla,  vanilla,  nbmj8991_state, empty_init,    ROT180, "Nichibutsu", "Mahjong Vanilla Syndrome (Japan)", MACHINE_SUPPORTS_SAVE )

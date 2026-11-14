@@ -1,9 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Tomasz Slanina
+// copyright-holders:Tomasz Slanina, Marcos Hernández
 /**************************************************************************************************
 Reality Tennis - (c) 1993 TCH
 
- driver by Tomasz Slanina
+Original driver by Tomasz Slanina.
+The blitter's scaling, 8-bit spans, (1,1) origin and blit timing implemented from the game's use
+of the hardware by Marcos Hernández, in collaboration, within MS-DOS Club's TCH preservation
+project (github.com/MS-DOS-Club/tch-blitter).
 
     based on informations provided by Antonio 'Peluko' Carrillo
 
@@ -53,11 +56,12 @@ and select 2k sample to play. There's probably no way to stop the sample
 player - when there's nothing to play - first, empty 2k of ROMs are selected.
 
  TODO:
-- proper timing and interrupts (remove extra hacky blitter int generation @ vblank)
-- fix various gfx glitches here and there, mostly related to wrong size of data
-  (what's the correct size? based on src or dest rectangle ? is there some kind of zoom?
-  or just rect clipping?)
-- what the 70000a blitter reg is for ?
+- the blitter's timing is estimated, not measured on a board: a time per pixel walked
+  (BLIT_CLOCKS_PER_PIXEL), and a list held until the page flips at vblank
+- which source pixel a scaled blit drops in each period (the phase) is a model choice, see
+  do_blit; so are a destination longer than its source holding the source's last step, and a
+  walk wrapping in y as it does in x; the right and bottom edges of the visible area are not
+  established
 - awfully similar to littlerb;
 
 
@@ -73,11 +77,22 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #include "speaker.h"
 
 #include <algorithm>
+#include <bit>
+#include <iterator>
+#include <utility>
+
+#define LOG_SCALE (1U << 1)
+
+#define VERBOSE (0)
+#include "logmacro.h"
 
 namespace {
 
 constexpr int RLT_REFRESH_RATE   = 60;
 constexpr int RLT_TIMER_FREQ     = RLT_REFRESH_RATE * 256;
+
+constexpr XTAL RLT_MAIN_CLOCK = 32_MHz_XTAL; // the board's only crystal
+constexpr uint32_t BLIT_CLOCKS_PER_PIXEL = 5; // a guess, see the TODO
 
 constexpr uint16_t BLTFLAG_DST_X_DIR   = 1 << 0;
 constexpr uint16_t BLTFLAG_DST_Y_DIR   = 1 << 1;
@@ -106,7 +121,7 @@ enum
 	BLT_Y_START,
 	BLT_Y_END,
 	BLT_FLAGS,
-	BLT_UNK,
+	BLT_SCALE,
 	BLT_START,
 	BLT_UNK2
 };
@@ -156,16 +171,25 @@ private:
 	int32_t m_unk_counter = 0;
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap[RLT_NUM_BITMAPS];
 	emu_timer *m_timer = nullptr;
+	emu_timer *m_blit_done_timer;
+	bool m_blit_deferred;
+	bool m_flip_pending;
+	bool m_flip_display;
 
 	uint16_t io_r();
 	void snd1_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void snd2_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	std::pair<int, int> decode_scale(uint16_t scale) const;
+	void do_blit();
+	void flip_display(bool display);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void screen_vblank(int state);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 	TIMER_CALLBACK_MEMBER(sample_player);
+	TIMER_CALLBACK_MEMBER(blit_done);
 
 	void rltennis_main(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
@@ -175,35 +199,35 @@ private:
 Blitter registers description (reg/bit names selected arbitrary ) :
 
 700000 - BLT_X_START
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210
   -------- xxxxxxxx dst x start
   xxxxxxxx -------- src x start
 
 
 700002 - BLT_X_END
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210
   -------- xxxxxxxx dst x end
   xxxxxxxx -------- src x end
 
 
 700004 - BLT_Y_START
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210    x start
   -------- xxxxxxxx
   xxxxxxxx --------
 
 
 700006 - BLT_Y_END
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210    x start
   -------- xxxxxxxx
   xxxxxxxx --------
 
 
 700008 - BLT_FLAGS
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210
   -------- -------x BLTFLAG_DST_X_DIR    x dst direction (step inc or dec)
   -------- ------x- BLTFLAG_DST_Y_DIR    y dst direction
@@ -219,10 +243,13 @@ Blitter registers description (reg/bit names selected arbitrary ) :
   xxxx---- --------                      src ROM num
 
 
-70000a - BLT_UNK
-     JOANA  JOAQUIN
+70000a - BLT_SCALE
   fedcba98 76543210
-  ???????? ???????? unknown (used during gameplay ... zoom factors ?)
+  aaaa---- bbbb---- scale = (a+1)/(b+1), destination pixels per source pixel, on both axes
+  ----aaaa ----bbbb the high nibbles repeated, in all but 8080 and 0004 (both 1/1)
+
+  The game writes 0000 before loading each value. Most blits run at 0000; play uses
+  2233 (3/4) and 1122 (2/3). Only reductions are seen; a > b (enlarging) is unobserved.
 
 
 70000c - BLT_START
@@ -233,11 +260,28 @@ Blitter registers description (reg/bit names selected arbitrary ) :
   x------- -------- BLTSTRT_LAYER       FG or BG layer of framebuffer
 
 70000e - BLT_UNK2
-     JOANA  JOAQUIN
+     JUANA  JOAQUIN
   fedcba98 76543210
   ???????? ???????? unknown (set to 0 @ boot)
 
 ****************************************************************************************/
+
+// The two counters of 70000a as destination and source steps, a+1 and b+1 from the high
+// nibbles; 0x0000 is 1/1, and a value whose nibbles differ is decoded the same way.
+std::pair<int, int> rltennis_state::decode_scale(uint16_t scale) const
+{
+	const auto counter = [scale] (int shift) { return BIT(scale, shift, 4) + 1; };
+
+	const int dst_steps = counter(12);
+	const int src_steps = counter(4);
+
+	if (counter(8) != dst_steps || counter(0) != src_steps)
+		LOGMASKED(LOG_SCALE, "%s: scale register %04x does not repeat its nibbles; using the high ones\n", machine().describe_context(), scale);
+	if (dst_steps > src_steps)
+		LOGMASKED(LOG_SCALE, "%s: scale register %04x enlarges, which the game was never seen to ask for\n", machine().describe_context(), scale);
+
+	return { dst_steps, src_steps };
+}
 
 void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -245,100 +289,142 @@ void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&m_blitter[offset]);
 	int new_data=m_blitter[offset];
 
-	if(offset==BLT_FLAGS && ((new_data^old_data) & BLTFLAG_DISPLAY_UD) )  /* visible page flip and clear */
+	// a list's first blit carries the other display page; the page flips at the next vblank, and
+	// that blit waits for it, so nothing is drawn into a plane before it has been shown and cleared
+	if(offset==BLT_FLAGS && ((new_data^old_data) & BLTFLAG_DISPLAY_UD) )
 	{
-		if(new_data & BLTFLAG_DISPLAY_UD)
-		{
-			copybitmap(*m_tmp_bitmap[BITMAP_FG_DISPLAY], *m_tmp_bitmap[BITMAP_FG_1], 0, 0, 0, 0, m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
-			m_tmp_bitmap[BITMAP_FG_1]->fill(0);
-		}
-		else
-		{
-			copybitmap(*m_tmp_bitmap[BITMAP_FG_DISPLAY], *m_tmp_bitmap[BITMAP_FG_2], 0, 0, 0, 0, m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
-			m_tmp_bitmap[BITMAP_FG_2]->fill(0);
-		}
+		m_flip_pending = true;
+		m_flip_display = BIT(new_data, 5);
 	}
+
+	// IRQ1 is raised when a blit completes (and at reset) and cleared by writing the strobe low
+	if(offset == BLT_START && !(new_data & BLTSTRT_TRIGGER))
+		m_maincpu->set_input_line(1, CLEAR_LINE);
 
 	if(offset == BLT_START && (((new_data ^ old_data ) & new_data) & BLTSTRT_TRIGGER))  /* blit strobe 0->1 */
 	{
-		m_maincpu->set_input_line(1, HOLD_LINE);
+		if (m_flip_pending)
+			m_blit_deferred = true;
+		else
+			do_blit();
+	}
+}
 
-		int src_x0=(m_blitter[BLT_X_START]>>SRC_SHIFT)+((m_blitter[BLT_FLAGS] & BLTFLAG_SRC_LR)?256:0);
-		int src_y0=(m_blitter[BLT_Y_START]>>SRC_SHIFT)+((m_blitter[BLT_FLAGS]>>3)&0xff00)+(((m_blitter[BLT_START]) & BLTSTRT_ROM_MSB)?(1<<0xd):0);
+void rltennis_state::do_blit()
+{
+	int src_x0=(m_blitter[BLT_X_START]>>SRC_SHIFT)+((m_blitter[BLT_FLAGS] & BLTFLAG_SRC_LR)?256:0);
+	int src_y0=(m_blitter[BLT_Y_START]>>SRC_SHIFT)+((m_blitter[BLT_FLAGS]>>3)&0xff00)+(((m_blitter[BLT_START]) & BLTSTRT_ROM_MSB)?(1<<0xd):0);
 
-		int dst_x0=(m_blitter[BLT_X_START]&0xff);
-		int dst_y0=(m_blitter[BLT_Y_START]&0xff);
+	int dst_x0=(m_blitter[BLT_X_START]&0xff);
+	int dst_y0=(m_blitter[BLT_Y_START]&0xff);
 
-		int dst_x1=(m_blitter[BLT_X_END]&0xff);
-		int dst_y1=(m_blitter[BLT_Y_END]&0xff);
+	int dst_x1=(m_blitter[BLT_X_END]&0xff);
+	int dst_y1=(m_blitter[BLT_Y_END]&0xff);
 
-		int src_x1=((m_blitter[BLT_X_END]>>SRC_SHIFT)&0xff)+((m_blitter[BLT_FLAGS] & BLTFLAG_SRC_LR)?256:0);
-		int src_y1=((m_blitter[BLT_Y_END]>>SRC_SHIFT)&0xff)+((m_blitter[BLT_FLAGS]>>3)&0xff00)+(((m_blitter[BLT_START]) & BLTSTRT_ROM_MSB)?(1<<0xd):0);
+	int src_x1=((m_blitter[BLT_X_END]>>SRC_SHIFT)&0xff)+((m_blitter[BLT_FLAGS] & BLTFLAG_SRC_LR)?256:0);
+	int src_y1=((m_blitter[BLT_Y_END]>>SRC_SHIFT)&0xff)+((m_blitter[BLT_FLAGS]>>3)&0xff00)+(((m_blitter[BLT_START]) & BLTSTRT_ROM_MSB)?(1<<0xd):0);
 
-		int x_dst_step=(m_blitter[BLT_FLAGS] & BLTFLAG_DST_X_DIR)?1:-1;
-		int y_dst_step=(m_blitter[BLT_FLAGS] & BLTFLAG_DST_Y_DIR)?1:-1;
+	int x_dst_step=(m_blitter[BLT_FLAGS] & BLTFLAG_DST_X_DIR)?1:-1;
+	int y_dst_step=(m_blitter[BLT_FLAGS] & BLTFLAG_DST_Y_DIR)?1:-1;
 
-		int x_src_step=(m_blitter[BLT_FLAGS] & BLTFLAG_SRC_X_DIR)?1:-1;
-		int y_src_step=(m_blitter[BLT_FLAGS] & BLTFLAG_SRC_Y_DIR)?1:-1;
+	int x_src_step=(m_blitter[BLT_FLAGS] & BLTFLAG_SRC_X_DIR)?1:-1;
+	int y_src_step=(m_blitter[BLT_FLAGS] & BLTFLAG_SRC_Y_DIR)?1:-1;
 
-		int blit_w=src_x1-src_x0;
-		int blit_h=src_y1-src_y0;
+	// a walk ends where the low 8 bits of its counter reach the end coordinate; the source
+	// address itself runs on past the end of its quarter
+	const auto span = [] (int start, int end, int step) { return ((step > 0) ? (end - start) : (start - end)) & 0xff; };
 
-		int blit_w1=dst_x1-dst_x0;
-		int blit_h1=dst_y1-dst_y0;
+	const int blit_w=span(src_x0, src_x1, x_src_step);
+	const int blit_h=span(src_y0, src_y1, y_src_step);
 
-		if(blit_w1<0) blit_w1=(-blit_w1)^0xff; /* is it correct ? game does that when flips images */
-		if(blit_h1<0) blit_h1=-blit_h1;
+	const int blit_w1=span(dst_x0, dst_x1, x_dst_step);
+	const int blit_h1=span(dst_y0, dst_y1, y_dst_step);
 
-		if(blit_w<0) blit_w=-blit_w;
-		if(blit_h<0) blit_h=-blit_h;
+	// a scaled blit reads source step d*(b+1)/(a+1) at destination step d; which steps
+	// repeat or skip a pixel (the phase) is a model choice
+	auto const [scale_dst, scale_src] = decode_scale(m_blitter[BLT_SCALE]);
 
+	int layer=(m_blitter[BLT_START] & BLTSTRT_LAYER )?BITMAP_BG:BITMAP_FG_1;
+
+	if(layer==BITMAP_FG_1)
+	{
+		if(m_blitter[BLT_FLAGS] & BLTFLAG_DST_UD )
 		{
-			/* wrong, causes gfx glitches (wrong size , but gives (so far) the best results */
-			if(blit_w1<blit_w) blit_w1=blit_w;
-			if(blit_h1<blit_h) blit_h1=blit_h;
+			layer=BITMAP_FG_2;
 		}
+	}
 
-		int layer=(m_blitter[BLT_START] & BLTSTRT_LAYER )?BITMAP_BG:BITMAP_FG_1;
+	bool force_blit=false;
 
-		if(layer==BITMAP_FG_1)
-		{
-			if(m_blitter[BLT_FLAGS] & BLTFLAG_DST_UD )
-			{
-				layer=BITMAP_FG_2;
-			}
-		}
+	if(blit_w==1 && blit_h==1) /* seems to be bg layer color fill */
+	{
+		force_blit=true;
+	}
 
-		bool force_blit=false;
+	// a destination longer than its source repeats the source's last pixel
+	const auto src_idx = [src = scale_src, dst = scale_dst] (int d, int limit) { return std::min(d * src / dst, limit); };
 
-		if(blit_w==1 && blit_h==1) /* seems to be bg layer color fill */
-		{
-			force_blit=true;
-		}
+	// the source column of each destination column is the same in every row
+	int src_col[256];
+	for( int idx_x=0 ; idx_x<=blit_w1; idx_x++ )
+		src_col[idx_x]=src_x0+(x_src_step*src_idx(idx_x, blit_w));
+
+	for( int y=dst_y0, idx_y=0 ; idx_y<=blit_h1; y+=y_dst_step, idx_y++ )
+	{
+		const int row_yy=src_y0+(y_src_step*src_idx(idx_y, blit_h));
+		uint16_t *const dst_row = &m_tmp_bitmap[layer]->pix(y & 0xff);
 
 		for( int x=dst_x0, idx_x=0 ; idx_x<=blit_w1; x+=x_dst_step, idx_x++ )
 		{
-			for( int y=dst_y0, idx_y=0 ; idx_y<=blit_h1;y+=y_dst_step, idx_y++)
+			int xx=src_col[idx_x];
+			int yy=row_yy;
+
+			if(force_blit)
 			{
-				int xx=src_x0+(x_src_step*idx_x);
-				int yy=src_y0+(y_src_step*idx_y);
-
-				if(force_blit)
-				{
-					xx=src_x0;
-					yy=src_y0;
-				}
-
-				int address=yy*512+xx;
-
-				int pix = m_gfx[address & (m_gfx.length() - 1)];
-				int screen_x=(x&0xff)+((m_blitter[BLT_FLAGS] & BLTFLAG_DST_LR )?256:0);
-
-				if((pix || force_blit)&& screen_x >0 && y >0 && screen_x < 512 && y < 256 )
-				{
-					m_tmp_bitmap[layer]->pix(y  , screen_x ) = pix;
-				}
+				xx=src_x0;
+				yy=src_y0;
 			}
+
+			int address=yy*512+xx;
+
+			int pix = m_gfx[address & (m_gfx.length() - 1)];
+			int screen_x=(x&0xff)+((m_blitter[BLT_FLAGS] & BLTFLAG_DST_LR )?256:0);
+
+			if(pix || force_blit)
+			{
+				dst_row[screen_x] = pix;
+			}
+		}
+	}
+
+	// the blit takes a time per pixel walked, the longer of the source and destination walks
+	const uint32_t walked = (std::max(blit_w, blit_w1) + 1) * (std::max(blit_h, blit_h1) + 1);
+	m_blit_done_timer->adjust(attotime::from_ticks(walked * BLIT_CLOCKS_PER_PIXEL, RLT_MAIN_CLOCK));
+}
+
+TIMER_CALLBACK_MEMBER(rltennis_state::blit_done)
+{
+	m_maincpu->set_input_line(1, ASSERT_LINE);
+}
+
+void rltennis_state::flip_display(bool display)
+{
+	// the plane that was drawn becomes the visible one, and is cleared for the next list
+	bitmap_ind16 &drawn = *m_tmp_bitmap[display ? BITMAP_FG_1 : BITMAP_FG_2];
+	copybitmap(*m_tmp_bitmap[BITMAP_FG_DISPLAY], drawn, 0, 0, 0, 0, m_tmp_bitmap[BITMAP_FG_DISPLAY]->cliprect());
+	drawn.fill(0);
+}
+
+void rltennis_state::screen_vblank(int state)
+{
+	if (state && m_flip_pending && !m_blit_done_timer->enabled())
+	{
+		flip_display(m_flip_display);
+		m_flip_pending = false;
+		if (m_blit_deferred)
+		{
+			m_blit_deferred = false;
+			do_blit();
 		}
 	}
 }
@@ -346,7 +432,7 @@ void rltennis_state::blitter_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 void rltennis_state::video_start()
 {
 	// assumes it can make an address mask with m_gfx.length() - 1
-	assert(!(m_gfx.length() & (m_gfx.length() - 1)));
+	assert(std::has_single_bit(m_gfx.length()));
 
 	m_tmp_bitmap[BITMAP_BG] = std::make_unique<bitmap_ind16>(512, 256);
 	m_tmp_bitmap[BITMAP_FG_1] = std::make_unique<bitmap_ind16>(512, 256);
@@ -354,6 +440,9 @@ void rltennis_state::video_start()
 	m_tmp_bitmap[BITMAP_FG_DISPLAY] = std::make_unique<bitmap_ind16>(512, 256);
 
 	save_item(NAME(m_blitter));
+	// the planes persist between frames
+	for (int i = BITMAP_BG; i <= BITMAP_FG_DISPLAY; i++)
+		save_item(NAME(*m_tmp_bitmap[i]), i);
 }
 
 uint32_t rltennis_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -443,12 +532,14 @@ INTERRUPT_GEN_MEMBER(rltennis_state::interrupt)
 {
 	++m_unk_counter; // Frame counter? verify
 	device.execute().set_input_line(4, HOLD_LINE);
-	device.execute().set_input_line(1, HOLD_LINE); // Hack, to avoid dead loop
 }
 
 void rltennis_state::machine_start()
 {
 	m_timer = timer_alloc(FUNC(rltennis_state::sample_player), this);
+	m_blit_done_timer = timer_alloc(FUNC(rltennis_state::blit_done), this);
+
+	m_flip_display = false;
 
 	save_item(NAME(m_data760000));
 	save_item(NAME(m_data740000));
@@ -456,11 +547,21 @@ void rltennis_state::machine_start()
 	save_item(NAME(m_sample_rom_offset));
 	save_item(NAME(m_offset_shift));
 	save_item(NAME(m_unk_counter));
+	save_item(NAME(m_blit_deferred));
+	save_item(NAME(m_flip_pending));
+	save_item(NAME(m_flip_display));
 }
 
 void rltennis_state::machine_reset()
 {
 	m_timer->adjust(attotime::from_hz(RLT_TIMER_FREQ));
+
+	// the driver clears the blitter's registers and leaves it idle
+	std::fill(std::begin(m_blitter), std::end(m_blitter), 0);
+	m_blit_done_timer->enable(false);
+	m_blit_deferred = false;
+	m_flip_pending = false;
+	m_maincpu->set_input_line(1, ASSERT_LINE);
 }
 
 void rltennis_state::ramdac_map(address_map &map)
@@ -470,15 +571,19 @@ void rltennis_state::ramdac_map(address_map &map)
 
 void rltennis_state::rltennis(machine_config &config)
 {
-	M68000(config, m_maincpu, XTAL(32'000'000) / 4); // MC68000P8, divider is a guess
+	M68000(config, m_maincpu, RLT_MAIN_CLOCK / 4); // MC68000P8, divider is a guess
 	m_maincpu->set_addrmap(AS_PROGRAM, &rltennis_state::rltennis_main);
 	m_maincpu->set_vblank_int("screen", FUNC(rltennis_state::interrupt));
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(RLT_REFRESH_RATE);
-	screen.set_size(320, 240);
-	screen.set_visarea(0, 319, 0, 239);
+	// the game anchors its full-screen pictures at (1,1) and lets a sprite crossing x=255 spill
+	// one duplicate pixel onto column 0, so the picture starts at (1,1); the total is the planes'
+	// size and the refresh 60 Hz, both nominal, since this board's field timing is not known
+	screen.set_size(512, 256);
+	screen.set_visarea(1, 320, 1, 240);
 	screen.set_screen_update(FUNC(rltennis_state::screen_update));
+	screen.screen_vblank().set(FUNC(rltennis_state::screen_vblank));
 	screen.set_palette("palette");
 
 	PALETTE(config, "palette").set_entries(256);

@@ -127,9 +127,10 @@ z80dma_device::z80dma_device(const machine_config &mconfig, const char *tag, dev
 {
 }
 
-z80dma_device::z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+z80dma_device::z80dma_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool dest_counter_lags)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_z80daisy_interface(mconfig, *this)
+	, m_dest_counter_lags(dest_counter_lags)
 	, m_out_busreq_cb(*this)
 	, m_out_int_cb(*this)
 	, m_out_ieo_cb(*this)
@@ -165,6 +166,7 @@ void z80dma_device::device_start()
 	save_item(NAME(m_addressB));
 	save_item(NAME(m_count));
 	save_item(NAME(m_byte_counter));
+	save_item(NAME(m_dest_first));
 	save_item(NAME(m_rdy));
 	save_item(NAME(m_force_ready));
 	save_item(NAME(m_reset_pointer));
@@ -186,6 +188,7 @@ void z80dma_device::device_reset()
 
 	m_status = 0;
 	m_dma_seq = SEQ_IDLE;
+	m_dest_first = false;
 	m_rdy = 0;
 	m_force_ready = 0;
 	m_wait = 0;
@@ -436,6 +439,18 @@ void z80dma_device::do_search()
 
 void z80dma_device::do_write()
 {
+	const int stepA = PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
+	const int stepB = PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
+
+	if (m_dest_counter_lags && !m_dest_first)
+	{
+		if (PORTA_IS_SOURCE)
+			m_addressB += stepB;
+		else
+			m_addressA += stepA;
+	}
+	m_dest_first = false;
+
 	switch (TRANSFER_MODE)
 	{
 	case TM_TRANSFER:
@@ -456,8 +471,10 @@ void z80dma_device::do_write()
 		break;
 	}
 
-	m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? 1 : -1;
-	m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? 1 : -1;
+	if (!m_dest_counter_lags || PORTA_IS_SOURCE)
+		m_addressA += stepA;
+	if (!m_dest_counter_lags || !PORTA_IS_SOURCE)
+		m_addressB += stepB;
 
 	m_byte_counter++;
 }
@@ -613,6 +630,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::clock_w)
 
 			m_addressA = PORTA_ADDRESS;
 			m_addressB = PORTB_ADDRESS;
+			m_dest_first = true;
 			m_count = BLOCKLEN;
 			reset_byte_counter();
 			m_status |= 0x30;
@@ -808,6 +826,7 @@ void z80dma_device::write(u8 data)
 				m_force_ready = 0;
 				m_addressA = PORTA_ADDRESS;
 				m_addressB = PORTB_ADDRESS;
+				m_dest_first = true;
 				m_count = BLOCKLEN;
 				reset_byte_counter();
 				m_status |= 0x30;
