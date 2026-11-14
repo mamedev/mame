@@ -35,7 +35,6 @@ public:
 	void map(address_map &map) ATTR_COLD;
 
 	// game-specific hack stuff
-	void disable_sprite_buffer() { m_sp.use_sprite_buffer = 0; }
 	void set_tm_extra_offsets(int layer, int xn, int yn, int xf, int yf) { m_tm[layer].set_extra_offsets(xn, yn, xf, yf); }
 	void set_sp_extra_offsets(int xn, int yn, int xf, int yf) { m_sp.set_extra_offsets(xn, yn, xf, yf); }
 	void set_bootleg_extra_offsets(int tm0x, int tm0y, int tm1x, int tm1y, int tm2x, int tm2y, int spx, int spy) { set_bootleg_offsets(tm0x, tm0y, tm1x, tm1y, tm2x, tm2y, spx, spy); }
@@ -119,8 +118,6 @@ private:
 	{
 		void set_scrollx_and_flip_reg(u16 data, u16 mem_mask, bool f);
 		void set_scrolly_and_flip_reg(u16 data, u16 mem_mask, bool f);
-
-		bool use_sprite_buffer;
 	};
 
 	void set_bootleg_offsets(int tm0x, int tm0y, int tm1x, int tm1y, int tm2x, int tm2y, int spx, int spy)
