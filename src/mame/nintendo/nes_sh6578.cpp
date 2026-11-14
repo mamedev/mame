@@ -177,6 +177,17 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 };
 
+class nes_sh6578_tvdriv17_state : public nes_sh6578_max10in1_state
+{
+public:
+	nes_sh6578_tvdriv17_state(const machine_config &mconfig, device_type type, const char *tag) :
+		nes_sh6578_max10in1_state(mconfig, type, tag)
+	{ }
+
+protected:
+	virtual void extio_w(uint8_t data) override;
+};
+
 uint8_t nes_sh6578_state::bank_r(int bank, uint16_t offset)
 {
 	uint32_t address;
@@ -459,6 +470,11 @@ void nes_sh6578_max10in1_state::extio_w(uint8_t data)
 	m_bank->set_entry((data & 0x80) >> 7);
 }
 
+void nes_sh6578_tvdriv17_state::extio_w(uint8_t data)
+{
+	logerror("%s: extio_w : %02x (tvdriv17)\n", machine().describe_context(), data);
+	m_bank->set_entry((data & 0x10) >> 4);
+}
 
 
 
@@ -797,6 +813,11 @@ ROM_START( mousekid )
 	ROM_LOAD( "mousekid.ic2", 0x00000, 0x100000, CRC(465d5b5a) SHA1(a27f01ccc7b741b51ea4a9e4455dc4cee4420a89) )
 ROM_END
 
+ROM_START( tvdriv17 )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "sh6578_2mb.bin", 0x000000, 0x200000, CRC(0605064a) SHA1(d2e94bed4bbcdc846834a923c7d6e2d79b180ec4) )
+ROM_END
+
 } // anonymous namespace
 
 
@@ -809,9 +830,12 @@ CONS( 200?, max10in1,  0, 0,  nes_sh6578, nes_sh6578, nes_sh6578_max10in1_state,
 // titles below have various issues (DMA, split interrupt timing etc.)
 
 // aka Wik!d Joystick, sometimes also called Air Blaster like the real Air Blaster game.  Wik!d seems a rebranding (a 'gift' company) so did ABL reuse the Air Blaster name here instead?
-CONS( 200?, ablwikid,    0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_abl_wikid_state, init_nes_sh6578, "Advance Bright Ltd. / JungleTac", "Wikid Joystick 14-in-1", MACHINE_NOT_WORKING )
+CONS( 200?, ablwikid,     0,  0,  nes_sh6578_pal, nes_sh6578, nes_sh6578_abl_wikid_state, init_nes_sh6578, "Advance Bright Ltd. / JungleTac", "Wikid Joystick 14-in-1", MACHINE_NOT_WORKING )
 
 CONS( 2001?, ts_handy11,  0,  0,  nes_sh6578,     nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Techno Source / JungleTac", "Handy Boy 11-in-1 (TV Play Power)", MACHINE_NOT_WORKING ) // possibly newer than 2001
+
+// graphics in Future Soldier are broken (as they are in ablwikid)
+CONS( 200?, tvdriv17,     0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_tvdriv17_state,  init_nes_sh6578, "ABL / JungleTac", "Mega TV Drive Challenge 17-in-1", MACHINE_NOT_WORKING )
 
 // from a blue coloured unit, a yellow one exists, is it the same?
 CONS( 2004?, vsmaxx15,    0,  0,  nes_sh6578, nes_sh6578, nes_sh6578_state, init_nes_sh6578, "Senario / JungleTac", "Vs Maxx 15-in-1", MACHINE_NOT_WORKING )
