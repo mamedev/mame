@@ -584,8 +584,16 @@ void i8251_device::command_w(uint8_t data)
 	if (m_hunt_on)
 		m_ext_syn_set = false;
 
+	// TxD is held marking whenever the transmitter is empty, unless SBRK is
+	// set (8251A data sheet, Features and Asynchronous Mode (Transmission)),
+	// so a command that clears SBRK, an internal reset included, ends the
+	// break.  Async only: in sync mode the idle transmitter sends SYNC
+	// characters, and the last bit of a character, which can be 0, is still
+	// going out when the register already reads empty.
 	if (BIT(data, 3))
 		m_txd_handler(0);
+	else if (!m_sync_byte_count && is_transmit_register_empty())
+		m_txd_handler(1);
 
 	check_for_tx_start();
 	update_rx_ready();
