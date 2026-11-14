@@ -325,6 +325,12 @@ ROM_START( aim65 )
 	ROM_SYSTEM_BIOS(3, "spc100",  "Siemens PC100")
 	ROMX_LOAD("pc100.z23",    0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(3))
 	ROMX_LOAD("pc100.z22",    0xf000, 0x1000, CRC(aa07742a) SHA1(3b9bee24a00cf23b7b50cee97ccc12e3fa9da1ea), ROM_BIOS(3))
+
+	// Glitch Works RAMless diagnostic ROM and memory test:
+	// https://github.com/glitchwrks/aim65_memtest
+	ROM_SYSTEM_BIOS(4, "memtest", "Glitch Works Memory Test")
+	ROMX_LOAD("aim65mon.z23", 0xe000, 0x1000, CRC(90e44afe) SHA1(78e38601edf6bfc787b58750555a636b0cf74c5c), ROM_BIOS(4))
+	ROMX_LOAD("memtest.bin", 0xf000, 0x1000, CRC(fe046f44) SHA1(9ab15fe0400adbecd2e44f9d991ba01bd0884a95), ROM_BIOS(4))
 ROM_END
 
 
