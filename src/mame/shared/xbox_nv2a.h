@@ -717,6 +717,8 @@ public:
 	int read_vertices_0x1810(address_space &space, int destination, int offset, int limit);
 	int read_vertices_0x1818(address_space &space, int destination, uint32_t address, int limit);
 	void convert_vertices(vertex_nv *source, nv2avertex_t *destination);
+	void load_fixed_function_lighting(uint32_t chanel, uint32_t subchannel);
+	void light_vertex(const vertex_nv *source, float primary[4], float secondary[4]);
 	void assemble_primitive(int source, int count);
 	void process_persistent_vertex();
 	int clip_triangle_w(nv2avertex_t vi[3], nv2avertex_t *vo);
@@ -855,6 +857,36 @@ public:
 		float translate[4];
 		float scale[4];
 	} matrix;
+	// lighting of the fixed function pipeline, read from the methods of the 3d object when a batch begins
+	struct {
+		bool enabled;
+		bool specular_enable;
+		bool separate_specular;
+		bool local_eye;
+		bool normalize;
+		int emission_source;    // 0 material, 1 vertex diffuse colour, 2 vertex specular colour
+		int ambient_source;
+		int diffuse_source;
+		int specular_source;
+		float scene_ambient[3];
+		float material_emission[3];
+		float material_alpha;
+		float specular_params[3];
+		float eye_position[4];
+		struct {
+			int type;           // 0 off, 1 infinite, 2 local, 3 spot
+			float ambient[3];
+			float diffuse[3];
+			float specular[3];
+			float range;
+			float half_vector[3];
+			float direction[3];
+			float spot_falloff[3];
+			float spot_direction[4];
+			float position[3];
+			float attenuation[3];
+		} light[8];
+	} lighting;
 	struct {
 		vertex_program_simulator exec;
 		int instructions;

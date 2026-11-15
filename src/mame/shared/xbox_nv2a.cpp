@@ -2546,6 +2546,204 @@ void nv2a_renderer::compute_supersample_factors(float &horizontal, float &vertic
 	vertical = my;
 }
 
+void nv2a_renderer::load_fixed_function_lighting(uint32_t chanel, uint32_t subchannel)
+{
+	const uint32_t *method = channel[chanel][subchannel].object.method;
+	auto f = [method](uint32_t address) { float v; memcpy(&v, &method[address / 4], sizeof(v)); return v; };
+	auto f3 = [&f](float *destination, uint32_t address, int count) { for (int i = 0; i < count; i++) destination[i] = f(address + i * 4); };
+
+	lighting.enabled = (method[0x0314 / 4] & 1) != 0;
+	if (!lighting.enabled)
+		return;
+	const uint32_t control = method[0x0294 / 4];
+	const uint32_t color_material = method[0x0298 / 4];
+	lighting.separate_specular = (control & 1) != 0;
+	lighting.local_eye = (control & (1 << 16)) != 0;
+	lighting.specular_enable = method[0x03b8 / 4] != 0;
+	lighting.normalize = method[0x03a4 / 4] != 0;
+	lighting.emission_source = (color_material >> 0) & 3;
+	lighting.ambient_source = (color_material >> 2) & 3;
+	lighting.diffuse_source = (color_material >> 4) & 3;
+	lighting.specular_source = (color_material >> 6) & 3;
+	f3(lighting.scene_ambient, 0x0a10, 3);
+	f3(lighting.material_emission, 0x03a8, 3);
+	lighting.material_alpha = f(0x03b4);
+	f3(lighting.specular_params, 0x09e0, 3);
+	f3(lighting.eye_position, 0x0a50, 4);
+	const uint32_t mask = method[0x03bc / 4];
+	for (int n = 0; n < 8; n++)
+	{
+		auto &l = lighting.light[n];
+		const uint32_t base = 0x1000 + n * 0x80;
+		l.type = (mask >> (n * 2)) & 3;
+		if (l.type == 0)
+			continue;
+		f3(l.ambient, base + 0x00, 3);
+		f3(l.diffuse, base + 0x0c, 3);
+		f3(l.specular, base + 0x18, 3);
+		l.range = f(base + 0x24);
+		f3(l.half_vector, base + 0x28, 3);
+		f3(l.direction, base + 0x34, 3);
+		f3(l.spot_falloff, base + 0x40, 3);
+		f3(l.spot_direction, base + 0x4c, 4);
+		f3(l.position, base + 0x5c, 3);
+		f3(l.attenuation, base + 0x68, 3);
+	}
+}
+
+/* Lighting of the fixed function pipeline, done per vertex in eye space.
+   The light colours already include the material colours, multiplied in by the driver, unless
+   the colour material method says that the vertex colours take their place.
+   The specular exponent and the spot light cone are evaluated with the rational function
+   (x + L) / (M * x + N) whose coefficients the driver sends with the specular parameters and
+   the spot falloff methods (US patent 6417851). */
+void nv2a_renderer::light_vertex(const vertex_nv *source, float primary[4], float secondary[4])
+{
+	const float *position = source->attribute[(int)NV2A_VERTEX_ATTR::POS].fv;
+	const float *normal = source->attribute[(int)NV2A_VERTEX_ATTR::NORMAL].fv;
+	const float *diffuse = source->attribute[(int)NV2A_VERTEX_ATTR::COLOR0].fv;
+	const float *specular = source->attribute[(int)NV2A_VERTEX_ATTR::COLOR1].fv;
+	float eye[4], n[3];
+
+	// position and normal in eye space
+	for (int i = 0; i < 4; i++)
+		eye[i] = matrix.modelview[i][0] * position[0] + matrix.modelview[i][1] * position[1] + matrix.modelview[i][2] * position[2] + matrix.modelview[i][3] * position[3];
+	if (eye[3] != 0)
+		for (int i = 0; i < 3; i++)
+			eye[i] = eye[i] / eye[3];
+	for (int i = 0; i < 3; i++)
+		n[i] = matrix.modelview_inverse[i][0] * normal[0] + matrix.modelview_inverse[i][1] * normal[1] + matrix.modelview_inverse[i][2] * normal[2];
+	if (lighting.normalize)
+	{
+		const float l = sqrtf(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
+		if (l > 0)
+			for (int i = 0; i < 3; i++)
+				n[i] = n[i] / l;
+	}
+	auto dot = [](const float *a, const float *b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; };
+	auto normalize = [](float *a) { const float l = sqrtf(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]); if (l > 0) { a[0] /= l; a[1] /= l; a[2] /= l; } };
+	// colour taken from the vertex instead of the material, or nullptr
+	auto vertex_colour = [diffuse, specular](int source) -> const float * { return source == 1 ? diffuse : (source == 2 ? specular : nullptr); };
+	auto rational = [](float x, const float *k, float limit) {
+		if (x <= -k[0])
+			return 0.0f;
+		const float d = k[1] * x + k[2];
+		if (d == 0)
+			return limit;
+		if (d < 0)
+			return 0.0f;
+		return std::clamp((x + k[0]) / d, 0.0f, limit);
+	};
+
+	// emission and ambient light of the scene
+	const float *emission = vertex_colour(lighting.emission_source);
+	const float *ambient = vertex_colour(lighting.ambient_source);
+	for (int i = 0; i < 3; i++)
+	{
+		if (!emission || !ambient)
+		{
+			primary[i] = lighting.scene_ambient[i];
+			if (emission)
+				primary[i] += emission[i] * lighting.material_emission[i];
+			else if (ambient)
+				primary[i] += ambient[i] * lighting.material_emission[i];
+		}
+		else
+			primary[i] = emission[i] + ambient[i] * lighting.material_emission[i];
+		secondary[i] = 0;
+	}
+	const float *diffuse_colour = vertex_colour(lighting.diffuse_source);
+	const float *specular_colour = vertex_colour(lighting.specular_source);
+	primary[3] = diffuse_colour ? diffuse_colour[3] : lighting.material_alpha;
+	secondary[3] = specular[3];
+
+	float to_eye[3] = { 0, 0, 0 };
+	if (lighting.local_eye)
+	{
+		const float w = lighting.eye_position[3] != 0 ? lighting.eye_position[3] : 1.0f;
+		for (int i = 0; i < 3; i++)
+			to_eye[i] = lighting.eye_position[i] / w - eye[i];
+		normalize(to_eye);
+	}
+	for (int l = 0; l < 8; l++)
+	{
+		const auto &light = lighting.light[l];
+		float attenuation = 1, n_dot_l, n_dot_h;
+
+		if (light.type == 0)
+			continue;
+		if (light.type == 1)
+		{
+			// infinite light
+			float direction[3] = { light.direction[0], light.direction[1], light.direction[2] };
+			normalize(direction);
+			n_dot_l = std::max(0.0f, dot(n, direction));
+			if (lighting.local_eye)
+			{
+				float half[3] = { direction[0] + to_eye[0], direction[1] + to_eye[1], direction[2] + to_eye[2] };
+				normalize(half);
+				n_dot_h = std::max(0.0f, dot(n, half));
+			}
+			else
+				n_dot_h = std::max(0.0f, dot(n, light.half_vector));
+		}
+		else
+		{
+			// local and spot lights
+			float to_light[3] = { light.position[0] - eye[0], light.position[1] - eye[1], light.position[2] - eye[2] };
+			const float d = sqrtf(dot(to_light, to_light));
+			if (d > light.range)
+				continue;
+			normalize(to_light);
+			const float a = light.attenuation[0] + light.attenuation[1] * d + light.attenuation[2] * d * d;
+			attenuation = a != 0 ? 1.0f / a : 0.0f;
+			float half[3] = { to_light[0] + to_eye[0], to_light[1] + to_eye[1], to_light[2] + to_eye[2] };
+			normalize(half);
+			n_dot_l = std::max(0.0f, dot(n, to_light));
+			n_dot_h = std::max(0.0f, dot(n, half));
+			if (light.type == 3)
+			{
+				const float s = dot(light.spot_direction, to_light) + light.spot_direction[3];
+				if (s <= 0)
+					attenuation = 0;
+				else if (s < 1)
+					attenuation = attenuation * rational(s, light.spot_falloff, 1.0f);
+			}
+		}
+		const float power = n_dot_l > 0 ? rational(n_dot_h, lighting.specular_params, 10000.0f) : 0.0f;
+		for (int i = 0; i < 3; i++)
+		{
+			const float light_ambient = light.ambient[i] * attenuation;
+			const float light_diffuse = light.diffuse[i] * attenuation * n_dot_l;
+			const float light_specular = light.specular[i] * attenuation * power;
+			primary[i] += (ambient ? ambient[i] : 1.0f) * light_ambient;
+			primary[i] += (diffuse_colour ? diffuse_colour[i] : 1.0f) * light_diffuse;
+			secondary[i] += (specular_colour ? specular_colour[i] : 1.0f) * light_specular;
+		}
+	}
+
+	if (!lighting.specular_enable)
+	{
+		for (int i = 0; i < 3; i++)
+			secondary[i] = 0;
+		secondary[3] = 1;
+	}
+	else if (!lighting.separate_specular)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (i < 3)
+				primary[i] += secondary[i];
+			secondary[i] = specular[i];
+		}
+	}
+	for (int i = 0; i < 4; i++)
+	{
+		primary[i] = std::clamp(primary[i], 0.0f, 1.0f);
+		secondary[i] = std::clamp(secondary[i], 0.0f, 1.0f);
+	}
+}
+
 void nv2a_renderer::convert_vertices(vertex_nv *source, nv2avertex_t *destination)
 {
 	vertex_nv vert;
@@ -2572,14 +2770,25 @@ void nv2a_renderer::convert_vertices(vertex_nv *source, nv2avertex_t *destinatio
 		c = 1.0f / c;
 		destination->p[(int)VERTEX_PARAMETER::PARAM_1W] = c;
 		destination->p[(int)VERTEX_PARAMETER::PARAM_Z] = v[2] * c;
-		destination->p[(int)VERTEX_PARAMETER::PARAM_COLOR_R] = source->attribute[3].fv[0] * c;
-		destination->p[(int)VERTEX_PARAMETER::PARAM_COLOR_G] = source->attribute[3].fv[1] * c;
-		destination->p[(int)VERTEX_PARAMETER::PARAM_COLOR_B] = source->attribute[3].fv[2] * c;
-		destination->p[(int)VERTEX_PARAMETER::PARAM_COLOR_A] = source->attribute[3].fv[3] * c;
-		destination->p[(int)VERTEX_PARAMETER::PARAM_SECONDARY_COLOR_R] = source->attribute[4].fv[0] * c;
-		destination->p[(int)VERTEX_PARAMETER::PARAM_SECONDARY_COLOR_G] = source->attribute[4].fv[1] * c;
-		destination->p[(int)VERTEX_PARAMETER::PARAM_SECONDARY_COLOR_B] = source->attribute[4].fv[2] * c;
-		destination->p[(int)VERTEX_PARAMETER::PARAM_SECONDARY_COLOR_A] = source->attribute[4].fv[3] * c;
+		float primary[4], secondary[4];
+		if (lighting.enabled)
+			light_vertex(source, primary, secondary);
+		else
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				primary[i] = source->attribute[3].fv[i];
+				secondary[i] = source->attribute[4].fv[i];
+			}
+		}
+		destination->p[(int)VERTEX_PARAMETER::PARAM_COLOR_R] = primary[0] * c;
+		destination->p[(int)VERTEX_PARAMETER::PARAM_COLOR_G] = primary[1] * c;
+		destination->p[(int)VERTEX_PARAMETER::PARAM_COLOR_B] = primary[2] * c;
+		destination->p[(int)VERTEX_PARAMETER::PARAM_COLOR_A] = primary[3] * c;
+		destination->p[(int)VERTEX_PARAMETER::PARAM_SECONDARY_COLOR_R] = secondary[0] * c;
+		destination->p[(int)VERTEX_PARAMETER::PARAM_SECONDARY_COLOR_G] = secondary[1] * c;
+		destination->p[(int)VERTEX_PARAMETER::PARAM_SECONDARY_COLOR_B] = secondary[2] * c;
+		destination->p[(int)VERTEX_PARAMETER::PARAM_SECONDARY_COLOR_A] = secondary[3] * c;
 		for (u = 0; u < 4; u++) {
 			destination->p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_S + u * 4] = source->attribute[9 + u].fv[0] * c;
 			destination->p[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_T + u * 4] = source->attribute[9 + u].fv[1] * c;
@@ -3208,6 +3417,8 @@ int nv2a_renderer::execute_method_3d(address_space& space, uint32_t chanel, uint
 			primitives_batches_count++;
 		else
 		{
+			if (vertex_pipeline == 4)
+				load_fixed_function_lighting(chanel, subchannel);
 			if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0))
 				render_spans_callback = nv2a_rasterizer::render_delegate(&nv2a_renderer::render_register_combiners, this);
 			else if (texture[0].enabled)
