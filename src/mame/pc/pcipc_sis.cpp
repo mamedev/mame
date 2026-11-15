@@ -182,7 +182,7 @@ ROM_START( sis85c496 )
 	ROM_REGION32_LE(0x20000, "pci:05.0", 0)
 	ROM_SYSTEM_BIOS(0, "funworld", "Award 486e BIOS with W83787 (photoply)")
 	// Photoplay BIOS
-	// Lucky Star LS-486EF REV:B
+	// Lucky Star LS-486EF REV:B, essentially a clone of ls486e
 	ROMX_LOAD("funworld_award_486e_w83787.bin", 0x000000, 0x20000, BAD_DUMP CRC(af7ff1d4) SHA1(72eeecf798a03817ce7ba4d65cd4128ed3ef7e68), ROM_BIOS(0) ) // 486E 96/7/19 W83787 PLUG & PLAY BIOS, AT29C010A
 
 	// MegaTouch XL BIOSes
@@ -355,7 +355,7 @@ ROM_START( jwj446a )
 	ROMX_LOAD( "j446a.rom", 0x00000, 0x20000, CRC(3e3c6abd) SHA1(04952dc143baa7b51cb6fc5eb1961007ecf36aaf), ROM_BIOS(1))
 ROM_END
 
-// LuckyStar LS-486E  - Chipset : SiS496, SiS497, SMC FDC37C665GT - CPU: AMD 486DX4-100 (Socket 3) - RAM: 4xSIMM72, Cache: 4 sockets (UM61512AK-15)+1
+// Lucky Star LS-486E  - Chipset : SiS496, SiS497, SMC FDC37C665GT - CPU: AMD 486DX4-100 (Socket 3) - RAM: 4xSIMM72, Cache: 4 sockets (UM61512AK-15)+1
 // BIOS : AMIBIOS 486PCI ISA 393824, on a 27C010 type ROM chip - Keyboard-BIOS: AMIKEY-2 - ID string : 41-PH0D-001256-00101111-101094-SIS496AB-H
 // On board: 2xISA, Floppy, par, 2xser - ISA16: 4, PCI: 3
 ROM_START( ls486e )
@@ -499,7 +499,7 @@ COMP( 1995, ft486f55,  0, 0, sis496, 0, sis496_state, empty_init, "Freetech", "4
 COMP( 199?, jakms41,   0, 0, sis496, 0, sis496_state, empty_init, "Jamicon", "KM-S4-1 (SiS 85C496/85C497 chipset, ver 1.1)", MACHINE_NOT_WORKING )
 COMP( 199?, jwj446a,   0, 0, sis496, 0, sis496_state, empty_init, "Jetway",  "J-446A (SiS 85C496/85C497 chipset)", MACHINE_NOT_WORKING )    // BIOS 0 shows BootBlock, but hangs on beep, BIOS 1 hangs, used to show BootBlock
 
-COMP( 199?, ls486e,    0, 0, sis496, 0, sis496_state, empty_init, "LuckyStar",   "LS-486E (SiS 85C496/85C497 chipset, rev:C)", MACHINE_NOT_WORKING ) // All versions POST, except LH5 (BootBlock)
+COMP( 199?, ls486e,    0, 0, sis496, 0, sis496_state, empty_init, "Lucky Star",   "LS-486E (SiS 85C496/85C497 chipset, rev:C)", MACHINE_NOT_WORKING ) // All versions POST, except LH5 (BootBlock)
 
 COMP( 199?, ms4144,    0, 0, sis496, 0, sis496_state, empty_init, "MSI",         "MS-4144 (SiS 85C496/85C497 chipset)", MACHINE_NOT_WORKING ) // WF53 and WF54 used to show Award BootBlock, now hang
 
