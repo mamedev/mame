@@ -24,25 +24,23 @@ class md_firecore_state : public md_ctrl_state
 public:
 	md_firecore_state(const machine_config& mconfig, device_type type, const char* tag) :
 		md_ctrl_state(mconfig, type, tag),
-		m_bank(0),
-		m_externalbank(0),
 		m_romsize(0x400000),
-		m_rom(*this, "maincpu"),
-		m_io_menu(*this, "MENU"),
-		m_chunk_mask{ 0, 0, 0, 0 }
+		m_rom_extra_offset(0),
+		m_externalbank(0),
+		m_rom(*this, "maincpu")
 	{ }
 
 	void md_firecore(machine_config &config) ATTR_COLD;
 	void md_firecore_6b(machine_config &config) ATTR_COLD;
 
-	void init_atgame40() ATTR_COLD;
-	void init_mdhh100() ATTR_COLD;
 	void init_sarc110() ATTR_COLD;
 	void init_reactmd() ATTR_COLD;
-	void init_mahg156() ATTR_COLD;
-	void init_pxp3() ATTR_COLD;
 
-	DECLARE_INPUT_CHANGED_MEMBER(menu_changed);
+protected:
+	virtual uint16_t redkid_portc_r();
+
+	uint16_t m_gpio[8];         // 0xa10104 - 0xa10113
+	int m_romsize;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -55,49 +53,64 @@ private:
 	uint16_t redkid_gpio_r(offs_t offset);
 	void redkid_gpio_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void redkid_ssf2_w(offs_t offset, uint8_t data);
-	uint16_t redkid_portc_r();
 	uint16_t redkid_sys_r(offs_t offset);
 	void redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t redkid_xregs_r(offs_t offset);
 	void redkid_xregs_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	uint32_t screen_update_redkid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	uint32_t redkid_flash_chunk() const;
-	bool redkid_cart_selected() const;
+	virtual uint32_t get_external_bank_bits() { return 0; }
 
-	void bank_high_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	void bank_low_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void rom_extra_offset_high_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	void rom_extra_offset_low_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
-	int m_bank;
+	int m_rom_extra_offset;
 	int m_externalbank;
-	int m_romsize;
 
 	required_region_ptr<uint16_t> m_rom;
-	optional_ioport m_io_menu;
 
-	uint16_t m_gpio[8];         // 0xa10104 - 0xa10113
 	uint8_t m_ssf2_bank[8];     // built-in Sega SSF2-style mapper (0xa130f3 - 0xa130ff)
 	uint16_t m_sysreg[0x80];    // 0xb01000 - 0xb010ff
 	uint8_t m_vdp_is_pal;
 	uint16_t m_vdpxreg[0x80];   // 0xb00000 - 0xb000ff
+};
+
+class md_pxp3_state : public md_firecore_state
+{
+public:
+	md_pxp3_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_firecore_state(mconfig, type, tag),
+		m_io_menu(*this, "MENU"),
+		m_chunk_mask{ 0, 0, 0, 0 }
+	{ }
+
+	void init_mahg156() ATTR_COLD;
+	void init_pxp3() ATTR_COLD;
+
+	DECLARE_INPUT_CHANGED_MEMBER(menu_changed);
+
+private:
+	virtual uint32_t get_external_bank_bits() override;
+	virtual uint16_t redkid_portc_r() override;
+
+	required_ioport m_io_menu;
 
 	uint16_t m_chunk_mask[4];   // GPIO bits (in 0xa10104) driving flash A23, A24, A25, A26
 };
 
-
-void md_firecore_state::bank_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void md_firecore_state::rom_extra_offset_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	data &= 0x7f;
 	mem_mask &= 0x7f;
 
-	m_bank = (m_bank & 0xff80ffff) | (data & mem_mask) << 16;
-	logerror("%s: bank_high_w bank is now %08x\n", machine().describe_context(), m_bank);
+	m_rom_extra_offset = (m_rom_extra_offset & 0xff80ffff) | (data & mem_mask) << 16;
+	logerror("%s: rom_extra_offset_high_w bank is now %08x\n", machine().describe_context(), m_rom_extra_offset);
 }
 
-void md_firecore_state::bank_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void md_firecore_state::rom_extra_offset_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_bank = (m_bank & 0xffff0000) | (data & mem_mask);
-	logerror("%s: bank_low_w bank is now %08x\n", machine().describe_context(), m_bank);
+	m_rom_extra_offset = (m_rom_extra_offset & 0xffff0000) | (data & mem_mask);
+	logerror("%s: rom_extra_offset_low_w bank is now %08x\n", machine().describe_context(), m_rom_extra_offset);
 }
 
 
@@ -121,7 +134,7 @@ void md_firecore_state::bank_low_w(offs_t offset, uint16_t data, uint16_t mem_ma
     The 2nd entry of the PXP3 MASTER (and the 'DMC-RK2-SLV' program at 0x6000000) is DMC's Angry Birds.
 */
 
-uint32_t md_firecore_state::redkid_flash_chunk() const
+uint32_t md_pxp3_state::get_external_bank_bits()
 {
 	const uint16_t data = m_gpio[0];
 	const uint16_t dir = m_gpio[1];
@@ -136,25 +149,17 @@ uint32_t md_firecore_state::redkid_flash_chunk() const
 	return chunk;
 }
 
-bool md_firecore_state::redkid_cart_selected() const
-{
-	// GPIO 0x0080 driven high = internal flash disabled -> cartridge slot
-	return !(m_gpio[4] & 0x0080) && (m_gpio[0] & 0x0080);
-}
-
 uint16_t md_firecore_state::redkid_rom_r(offs_t offset)
 {
-	const uint32_t byteaddr = offset << 1;
-	uint32_t chunk = redkid_flash_chunk();
+	uint32_t external_bank = get_external_bank_bits();
 
-	if (redkid_cart_selected())
-		return 0xffff; // empty cartridge slot
+	const uint32_t byteaddr = offset << 1;
 
 	// 512KiB pages of the SSF2 mapper, relative to the bank base
 	const uint32_t page = m_ssf2_bank[(byteaddr >> 19) & 7];
 	const uint32_t offs = (page << 19) | (byteaddr & 0x7ffff);
 
-	const uint32_t addr = (chunk << 23) | ((m_bank + offs) & 0x7fffff);
+	const uint32_t addr = (external_bank << 23) | ((m_rom_extra_offset + offs) & 0x7fffff);
 	return m_rom[(addr & (m_romsize - 1)) >> 1];
 }
 
@@ -191,11 +196,11 @@ void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_
 	}
 
 	case 0x28 / 2:
-		bank_low_w(0, data, mem_mask);
+		rom_extra_offset_low_w(0, data, mem_mask);
 		break;
 
 	case 0x2a / 2:
-		bank_high_w(0, data, mem_mask);
+		rom_extra_offset_high_w(0, data, mem_mask);
 		break;
 
 	case 0x36 / 2:
@@ -249,15 +254,13 @@ uint16_t md_firecore_state::redkid_gpio_r(offs_t offset)
 
 void md_firecore_state::redkid_gpio_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	const uint32_t oldchunk = redkid_flash_chunk();
-	const bool oldcart = redkid_cart_selected();
+	const uint32_t old_external_bank = get_external_bank_bits();
 	COMBINE_DATA(&m_gpio[offset]);
 
-	if ((oldchunk != redkid_flash_chunk()) || (oldcart != redkid_cart_selected()))
-		logerror("%s: GPIO %06x = %04x -> flash chunk %x (%08x)%s\n", machine().describe_context(), 0xa10104 + offset * 2, m_gpio[offset],
-				redkid_flash_chunk(), redkid_flash_chunk() << 23, redkid_cart_selected() ? " [cartridge slot]" : "");
+	if (old_external_bank != get_external_bank_bits())
+		logerror("%s: GPIO %06x = %04x -> flash chunk %x (%08x)\n", machine().describe_context(), 0xa10104 + offset * 2, m_gpio[offset],
+				get_external_bank_bits(), get_external_bank_bits() << 23);
 }
-
 
 uint32_t md_firecore_state::screen_update_redkid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -271,7 +274,7 @@ uint32_t md_firecore_state::screen_update_redkid(screen_device &screen, bitmap_r
 	return 0;
 }
 
-INPUT_CHANGED_MEMBER(md_firecore_state::menu_changed)
+INPUT_CHANGED_MEMBER(md_pxp3_state::menu_changed)
 {
 	// the jumper is only checked by the menu at startup
 	machine().schedule_soft_reset();
@@ -279,10 +282,16 @@ INPUT_CHANGED_MEMBER(md_firecore_state::menu_changed)
 
 uint16_t md_firecore_state::redkid_portc_r()
 {
-	// bits 15-13 of the word read are menu select inputs (pulled high)
 	uint16_t data = m_ioports[2]->data_r();
 	data |= data << 8;
-	return (data & 0x1fff) | (m_io_menu ? (m_io_menu->read() & 0xe000) : 0xe000);
+	return data;
+}
+
+uint16_t md_pxp3_state::redkid_portc_r()
+{
+	// bits 15-13 of the word read are menu select inputs (pulled high)
+	uint16_t data = md_firecore_state::redkid_portc_r();
+	return (data & 0x1fff) | (m_io_menu->read() & 0xe000);
 }
 
 void md_firecore_state::md_firecore_map(address_map &map)
@@ -349,11 +358,19 @@ static INPUT_PORTS_START( mahg156 )
 
 	// read back inverted from 0xa10006 bits 15-13 by the menu at startup, selects which part of the game list is shown
 	PORT_START("MENU")
-	PORT_CONFNAME( 0xe000, 0xe000, "Menu" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md_firecore_state::menu_changed), 0)
+	PORT_CONFNAME( 0xe000, 0xe000, "Menu" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md_pxp3_state::menu_changed), 0)
 	PORT_CONFSETTING(      0xe000, "Games 1-156" )
 	// this doesn't actually have a cartridge slot, these are leftover menus from the PXP, all games are available in the first menu
 	//PORT_CONFSETTING(      0xa000, "Games 81-119" )
 	//PORT_CONFSETTING(      0xc000, "Games 120-156" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mdhh100 )
+	PORT_INCLUDE( firecore_6button )
+
+	// no menu selection, all 100 games displayed by default
+	PORT_START("MENU")
+	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pxp3 )
@@ -361,7 +378,7 @@ static INPUT_PORTS_START( pxp3 )
 
 	// read back inverted from 0xa10006 bits 15-13 by the menu at startup, selects which part of the game list is shown
 	PORT_START("MENU")
-	PORT_CONFNAME( 0xe000, 0xe000, "Menu (cartridge jumper)" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md_firecore_state::menu_changed), 0)
+	PORT_CONFNAME( 0xe000, 0xe000, "Menu (cartridge jumper)" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md_pxp3_state::menu_changed), 0)
 	PORT_CONFSETTING(      0xe000, "Games 1-80 (no cartridge, 999888-in-1)" )
 	PORT_CONFSETTING(      0xa000, "Games 81-119 (cartridge, 999666-in-1)" )
 	PORT_CONFSETTING(      0xc000, "Games 120-156 (cartridge, 900000-in-1)" )
@@ -372,7 +389,7 @@ void md_firecore_state::machine_start()
 {
 	md_ctrl_state::machine_start();
 	m_vdp->stop_timers();
-	save_item(NAME(m_bank));
+	save_item(NAME(m_rom_extra_offset));
 	save_item(NAME(m_externalbank));
 	save_item(NAME(m_romsize));
 	save_item(NAME(m_gpio));
@@ -385,7 +402,7 @@ void md_firecore_state::machine_start()
 void md_firecore_state::machine_reset()
 {
 	m_vdp_is_pal = 0;
-	m_bank = 0;
+	m_rom_extra_offset = 0;
 	std::fill(std::begin(m_gpio), std::end(m_gpio), 0);
 	for (int i = 0; i < 8; i++)
 		m_ssf2_bank[i] = i;
@@ -551,7 +568,7 @@ on an unsupported video mode (they still play sounds and resond to inputs / do c
 
 ROM_START( atgame40 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x000000, 0x1000000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
+	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x0000000, 0x1000000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
 ROM_END
 
 
@@ -648,12 +665,6 @@ ROM_START( sarc110a )
 	ROM_LOAD( "ic1_ver2.prg", 0x00000, 0x400000, CRC(b97a0dc7) SHA1(bace32d73184df914113de5336e29a7a6f4c03fa) )
 ROM_END
 
-void md_firecore_state::init_atgame40()
-{
-	m_romsize = memregion("maincpu")->bytes();
-	init_megadrie();
-}
-
 void md_firecore_state::init_sarc110()
 {
 	m_romsize = memregion("maincpu")->bytes();
@@ -680,7 +691,7 @@ void md_firecore_state::init_reactmd()
 	}
 }
 
-void md_firecore_state::init_mahg156()
+void md_pxp3_state::init_mahg156()
 {
 	m_romsize = memregion("maincpu")->bytes();
 	m_chunk_mask[0] = 0x0400; // A23
@@ -690,20 +701,13 @@ void md_firecore_state::init_mahg156()
 	init_megadriv();
 }
 
-void md_firecore_state::init_pxp3() // also mdhh100, dcat16
+void md_pxp3_state::init_pxp3() // also mdhh100, dcat16
 {
 	m_romsize = memregion("maincpu")->bytes();
 	m_chunk_mask[0] = 0x0020; // A23
 	m_chunk_mask[1] = 0x0400; // A24
 	m_chunk_mask[2] = 0x0002; // A25
 	m_chunk_mask[3] = 0x0010; // A26
-	init_megadriv();
-}
-
-void md_firecore_state::init_mdhh100()
-{
-	m_romsize = memregion("maincpu")->bytes();
-	m_externalbank = m_romsize-0x800000;
 	init_megadriv();
 }
 
@@ -738,29 +742,16 @@ CONS( 2021, mygalagb,  mygalag,  0, md_firecore,    mympac,    md_firecore_state
 CONS( 2021, mysinv,    0,        0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Space Invaders (DGUNL-7006, Pocket Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT90 )
 CONS( 2021, mysinva,   mysinv,   0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Space Invaders (DGUNL-7133, Pixel Pocket Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT90 )
 
-CONS( 2021, mysf2,     0,        0, md_firecore_6b, msi_6b,    md_firecore_state, init_mdhh100,  "dreamGEAR", "My Arcade Street Fighter II (DGUNL-4184, Nano Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2021, mysf2,     0,        0, md_firecore_6b, msi_6b,    md_firecore_state, init_megadriv,  "dreamGEAR", "My Arcade Street Fighter II (DGUNL-4184, Nano Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2012, atgame40,  0,        0, md_firecore,    md_common, md_firecore_state, init_atgame40, "AtGames",   "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, atgame40,  0,        0, md_firecore,    md_common, md_firecore_state, init_megadriv,     "AtGames",   "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2021, matet,     0,        0, md_firecore,    md_common, md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Tetris (DGUNL-7028, Pocket Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2021, mateta,    matet,    0, md_firecore,    md_common, md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Tetris (DGUNL-7025, Micro Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // has an SD card slot? (the menu has an 'SD CARTRIDGE' entry, not emulated)
 // 8MiB flash only, menu at 0 (DMC-RK2-MST), the built-in games use the Firecore extended video mode
-CONS( 200?, dcat16,    0,        0, md_firecore,    md_common, md_firecore_state, init_pxp3,     "Firecore",  "D-CAT16 (Firecore handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-// RedKid (DMC RK2) based, 1Gbit flash, menu at 0x7800000
-// there are PXP3 Slim Stations on other SoCs too
-// these ones have the volume control and power switch at the bottom
-// game code is from the first menu, other menus have their own codes (which seem to be the same between units, even when the menu differs)
-CONS( 201?, pxp3,      0,        0, md_firecore,    pxp3,      md_firecore_state, init_pxp3,     "<unknown>", "PXP3 Slim Station (Firecore, NFAQ877666)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 201?, pxp3a,     pxp3,     0, md_firecore,    pxp3,      md_firecore_state, init_pxp3,     "<unknown>", "PXP3 Slim Station (Firecore, NFS877666)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-// the 156 games are split into three menus selected with a 'jumper' cartridge (see notes above)
-CONS( 201?, mahg156,   0,        0, md_firecore_6b, mahg156,   md_firecore_state, init_mahg156,  "<unknown>", "Mini Arcade Handheld Game Console 2.8 Inch Screen Built in 156 Retro Games (Firecore)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-// game-boy like handheld, pink in colour, 6 button controller (+ home select, start, vol buttons)
-CONS( 201?, mdhh100,   0,        0, md_firecore_6b, msi_6b,    md_firecore_state, init_pxp3,     "<unknown>", "unknown 100-in-1 handheld (Firecore)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, dcat16,    0,        0, md_firecore,    md_common, md_firecore_state, init_megadriv,     "Firecore",  "D-CAT16 (Firecore handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
 CONS( 2018, msi_sf2,   0,        0, md_firecore_6b, msi_6b,    md_firecore_state, init_megadriv, "MSI / Capcom / Sega", "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -774,3 +765,18 @@ CONS( 2009, reactmd,   0,        0, md_firecore,    md_common, md_firecore_state
 // Two systems in one unit - Firecore Genesis and VT02/VT03
 CONS( 200?, sarc110,   0,        0, md_firecore,    md_common, md_firecore_state, init_sarc110,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 200?, sarc110a,  sarc110,  0, md_firecore,    md_common, md_firecore_state, init_sarc110,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+
+// RedKid (DMC RK2) based, 1Gbit flash, menu at 0x7800000
+// there are PXP3 Slim Stations on other SoCs too
+// these ones have the volume control and power switch at the bottom
+// game code is from the first menu, other menus have their own codes (which seem to be the same between units, even when the menu differs)
+CONS( 201?, pxp3,      0,        0, md_firecore,    pxp3,      md_pxp3_state, init_pxp3,     "<unknown>", "PXP3 Slim Station (Firecore, NFAQ877666)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 201?, pxp3a,     pxp3,     0, md_firecore,    pxp3,      md_pxp3_state, init_pxp3,     "<unknown>", "PXP3 Slim Station (Firecore, NFS877666)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// reads from jumper port, like pxp3, but all 156 games are displayed on the first menu, no physical jumper
+CONS( 201?, mahg156,   0,        0, md_firecore_6b, mahg156,   md_pxp3_state, init_mahg156,  "<unknown>", "Mini Arcade Handheld Game Console 2.8 Inch Screen Built in 156 Retro Games (Firecore)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// game-boy like handheld, pink in colour, 6 button controller (+ home select, start, vol buttons)
+CONS( 201?, mdhh100,   0,        0, md_firecore_6b, mdhh100,   md_pxp3_state, init_pxp3,     "<unknown>", "unknown 100-in-1 handheld (Firecore)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
