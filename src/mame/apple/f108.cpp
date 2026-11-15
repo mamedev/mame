@@ -21,6 +21,8 @@
 
 #include "softlist_dev.h"
 
+#include <algorithm>
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -109,6 +111,7 @@ void f108_device::device_start()
 	m_ata_recovery = 0;
 	save_item(NAME(m_ata_active));
 	save_item(NAME(m_ata_recovery));
+	save_item(NAME(m_overlay));
 }
 
 //-------------------------------------------------
@@ -118,20 +121,32 @@ void f108_device::device_start()
 void f108_device::device_reset()
 {
 	m_overlay = true;
+	update_overlay();
+}
 
+void f108_device::device_post_load()
+{
+	update_overlay();
+}
+
+void f108_device::update_overlay()
+{
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	if (!m_rom_ptr)
+	if (!m_overlay)
 	{
-		space.unmap_readwrite(0x00000000, 0x003fffff);
+		space.install_ram(0x00000000, m_ram_size - 1, m_ram_ptr);
 		return;
 	}
 
+	space.unmap_readwrite(0x00000000, std::max<u32>(m_ram_size, 0x400000) - 1);
+	if (!m_rom_ptr)
+		return;
+
 	// put ROM mirror at 0
-	const u32 memory_size = std::min((u32)0x400000, m_rom_size);
+	const u32 memory_size = std::min<u32>(0x400000, m_rom_size);
 	const u32 memory_end = memory_size - 1;
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
 
-	space.unmap_write(0x00000000, memory_end);
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
 }
 
@@ -139,13 +154,8 @@ void f108_device::overlay_off()
 {
 	if (m_overlay && !machine().side_effects_disabled())
 	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-		const u32 memory_end = m_ram_size - 1;
-		void *memory_data = m_ram_ptr;
-		offs_t memory_mirror = memory_end & ~memory_end;
-
-		space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
 		m_overlay = false;
+		update_overlay();
 	}
 }
 
