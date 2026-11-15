@@ -176,7 +176,7 @@ private:
 	void set_signal(device_t *device, int signal, u8 state);
 	u8 read_signal(int signal);
 	u8 get_signal(int signal, const attotime &time, source_lines const *own = nullptr);
-	void update_lines(source_lines &lines, daisy_entry *entry);
+	void update_lines(source_lines &lines, daisy_entry *entry, int only = -1);
 	void update_lines();
 	TIMER_CALLBACK_MEMBER(update_tick);
 

@@ -316,7 +316,7 @@ void ieee488_device::set_signal(device_t *device, int signal, u8 state)
 	{
 		// a source's own receivers see its outputs without the write delay
 		lines->m_exec = exec;
-		update_lines(*lines, entry);
+		update_lines(*lines, entry, signal);
 
 		if (!m_update_timer->enabled() || m_update_timer->expire() > time)
 			m_update_timer->adjust(time - now);
@@ -329,12 +329,15 @@ void ieee488_device::set_signal(device_t *device, int signal, u8 state)
 //  line changes up to the current time
 //-------------------------------------------------
 
-void ieee488_device::update_lines(source_lines &lines, daisy_entry *entry)
+void ieee488_device::update_lines(source_lines &lines, daisy_entry *entry, int only)
 {
 	attotime const now = machine().time();
 
 	for (int signal = 0; signal < SIGNAL_COUNT; signal++)
 	{
+		if ((only >= 0) && (signal != only))
+			continue;
+
 		u8 const state = get_signal(signal, now, &lines);
 		if (lines.m_line[signal] == state)
 			continue;
