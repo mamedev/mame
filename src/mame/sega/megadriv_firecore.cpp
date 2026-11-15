@@ -31,8 +31,7 @@ public:
 
 	void md_firecore(machine_config &config) ATTR_COLD;
 	void md_firecore_6b(machine_config &config) ATTR_COLD;
-
-	[[maybe_unused]]void init_reactmd() ATTR_COLD;
+	void md_firecore_pal(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual uint16_t redkid_portc_r();
@@ -43,6 +42,8 @@ protected:
 private:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+
+	void md_firecore_common(machine_config &config);
 
 	void md_firecore_map(address_map &map) ATTR_COLD;
 
@@ -68,7 +69,6 @@ private:
 
 	uint8_t m_ssf2_bank[8];     // built-in Sega SSF2-style mapper (0xa130f3 - 0xa130ff)
 	uint16_t m_sysreg[0x80];    // 0xb01000 - 0xb010ff
-	uint8_t m_vdp_is_pal;
 	uint16_t m_vdpxreg[0x80];   // 0xb00000 - 0xb000ff
 };
 
@@ -208,11 +208,8 @@ void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_
 		// Writes here don't actually change the timing of the unit, testing Zool on the real pxp3 which is a PAL
 		// ROM (with region lockout) it sets these flags to PAL to bypass the check, but runs too quickly.
 		m_version_hi_nibble = 0x20 | (domestic ? 0x00 : 0x80) | (pal ? 0x40 : 0x00);
-		if (pal != bool(m_vdp_is_pal))
-		{
-			m_vdp_is_pal = pal;
-			dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).set_ctrl_port_vdp_pal(pal);
-		}
+		dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).set_ctrl_port_vdp_pal(pal);
+
 		break;
 	}
 
@@ -416,12 +413,10 @@ void md_firecore_state::machine_start()
 	save_item(NAME(m_ssf2_bank));
 	save_item(NAME(m_sysreg));
 	save_item(NAME(m_vdpxreg));
-	save_item(NAME(m_vdp_is_pal));
 }
 
 void md_firecore_state::machine_reset()
 {
-	m_vdp_is_pal = 0;
 	m_rom_extra_offset = 0;
 	std::fill(std::begin(m_gpio), std::end(m_gpio), 0);
 	m_gpio[0] = 0xffff; // atgame40 and reactmd rely on these being pulled high to select the top bank by default
@@ -434,13 +429,8 @@ void md_firecore_state::machine_reset()
 	md_ctrl_state::machine_reset();
 }
 
-
-void md_firecore_state::md_firecore(machine_config &config)
+void md_firecore_state::md_firecore_common(machine_config &config)
 {
-	md_ntsc(config);
-
-	FIRECORE_VDP(config.replace(), m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
-	m_vdp->set_is_pal(false);
 	m_vdp->vint_cb().set(FUNC(md_firecore_state::vdp_vint_cb));
 	m_vdp->hint_cb().set(FUNC(md_firecore_state::vdp_hint_cb));
 	m_vdp->set_screen("megadriv");
@@ -455,6 +445,17 @@ void md_firecore_state::md_firecore(machine_config &config)
 	m_screen->set_screen_update(FUNC(md_firecore_state::screen_update_redkid));
 }
 
+
+void md_firecore_state::md_firecore(machine_config &config)
+{
+	md_ntsc(config);
+
+	FIRECORE_VDP(config.replace(), m_vdp, MASTER_CLOCK_NTSC, m_maincpu);
+	m_vdp->set_is_pal(false);
+
+	md_firecore_common(config);
+}
+
 void md_firecore_state::md_firecore_6b(machine_config &config)
 {
 	md_firecore(config);
@@ -463,7 +464,15 @@ void md_firecore_state::md_firecore_6b(machine_config &config)
 	ctrl2_6button(config);
 }
 
+void md_firecore_state::md_firecore_pal(machine_config &config)
+{
+	md_pal(config);
 
+	FIRECORE_VDP(config.replace(), m_vdp, MASTER_CLOCK_PAL, m_maincpu);
+	m_vdp->set_is_pal(true);
+
+	md_firecore_common(config);
+}
 
 ROM_START( matet )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -774,20 +783,20 @@ CONS( 2019, bfmk,      0,        0, md_firecore_6b, msi_6b,    md_firecore_state
 
 CONS( 2021, mysf2,     0,        0, md_firecore_6b, mdhh100,   md_reactor_state, init_atgame40,  "dreamGEAR", "My Arcade Street Fighter II (DGUNL-4184, Nano Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-CONS( 2012, atgame40,  0,        0, md_firecore,    md_common, md_reactor_state, init_atgame40,     "AtGames",   "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2012, atgame40,  0,        0, md_firecore_pal,    md_common, md_reactor_state, init_atgame40,     "AtGames",   "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // has an SD card slot? (the menu has an 'SD CARTRIDGE' entry, not emulated)
 // 8MiB flash only, menu at 0 (DMC-RK2-MST), the built-in games use the Firecore extended video mode
 CONS( 200?, dcat16,    0,        0, md_firecore,    mdhh100, md_reactor_state, init_atgame40,     "Firecore",  "D-CAT16 (Firecore handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Two systems in one unit - Firecore Genesis and VT02/VT03
-CONS( 200?, sarc110,   0,        0, md_firecore,    mdhh100, md_reactor_state, init_atgame40,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, sarc110a,  sarc110,  0, md_firecore,    mdhh100, md_reactor_state, init_atgame40,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, sarc110,   0,        0, md_firecore_pal,    mdhh100, md_reactor_state, init_atgame40,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, sarc110a,  sarc110,  0, md_firecore_pal,    mdhh100, md_reactor_state, init_atgame40,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // games with 4 banks (0x2000000 ROM size)
 
 // Two systems in one unit - Firecore Genesis and SunPlus
-CONS( 2009, reactmd,   0,        0, md_firecore,    mdhh100, md_reactor_state, init_reactor,  "AtGames / Sega / Waixing", "Reactor MD (Firecore/SunPlus hybrid, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 2009, reactmd,   0,        0, md_firecore_pal,    mdhh100, md_reactor_state, init_reactor,  "AtGames / Sega / Waixing", "Reactor MD (Firecore/SunPlus hybrid, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // games with 16 banks (0x8000000 ROM size)
 
