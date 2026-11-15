@@ -251,12 +251,13 @@ u32 valkyrie_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 				scanline[x] = pens[(pixels >> (8 - depth - (bit & 7))) & pixel_mask];
 			}
 		}
-		else // 16bpp x555
+		else // 16bpp x555: a separate CLUT gamma curve is applied to each component
 		{
 			for (int x = clip.left(); x <= clip.right(); x++)
 			{
 				const u16 pixels = vram16[(y * (stride >> 1)) + x];
-				scanline[x] = rgb_t(BIT(pixels, 10, 5) << 3, BIT(pixels, 5, 5) << 3, BIT(pixels, 0, 5) << 3);
+				scanline[x] = rgb_t(rgb_t(pens[BIT(pixels, 10, 5)]).r(),
+						rgb_t(pens[BIT(pixels, 5, 5)]).g(), rgb_t(pens[BIT(pixels, 0, 5)]).b());
 			}
 		}
 	}
