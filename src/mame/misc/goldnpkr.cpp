@@ -3351,65 +3351,79 @@ static INPUT_PORTS_START( witchjol )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )        PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )        PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x00, "Prozente (Payout Rate)" )  PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(    0xc0, "40%" )
+	PORT_DIPSETTING(    0x80, "50%" )
+	PORT_DIPSETTING(    0x40, "60%" )
+	PORT_DIPSETTING(    0x00, "70%" )
 
-/*  DIP Switches (as shown in the epoxy block)
+/*
+  DIP Switches (as shown in the epoxy block)
 
-    Schalter      1   2   3   4   5   6   7   8
-    --------------------------------------------
-    Bet >  10    OFF OFF
-    Bet >  20    ON  OFF
-    Bet >  50    OFF ON
-    Bet > 100    ON  ON
-    --------------------------------------------
-    Jolli-Witch          OFF
-    Witch-Card           ON
-    --------------------------------------------
-     6 Taster                ON
-    12 Taster                OFF
-    --------------------------------------------
-    Hohes Paar                   ON
-    2 Paar                       OFF
-    --------------------------------------------
-    1 DM - 1 PKT                     OFF OFF
-    1 DM - 10 PKT                    OFF ON
-    --------------------------------------------
-    RF                                       ON
-    RF NO                                    OFF
-    --------------------------------------------
+  Schalter      1   2   3   4   5   6   7   8
+  --------------------------------------------
+  Bet >  10    OFF OFF
+  Bet >  20    ON  OFF
+  Bet >  50    OFF ON
+  Bet > 100    ON  ON
+  --------------------------------------------
+  Jolli-Witch          OFF
+  Witch-Card           ON
+  --------------------------------------------
+   6 Taster                ON
+  12 Taster                OFF
+  --------------------------------------------
+  Hohes Paar                   ON
+  2 Paar                       OFF
+  --------------------------------------------
+  1 DM - 1 PKT                     OFF OFF
+  1 DM - 10 PKT                    OFF ON
+  --------------------------------------------
+  RF                                       ON
+  RF NO                                    OFF
+  --------------------------------------------
+
+  These are not accurate and confusing.
+
+  When I've seen the use of two DSW for only dual coinage, start to reverse the code.
+  Found that the missing SW2:6 (undocumented) draws on screen the complete GFX
+  bank #6 as a logo/nag for nearly one second. This function was unused in this game
+  due to the lack of logo/nag tiles.
+
+  Regarding SW2:8, it has nothing to do with Royal Flush.
+  The real behaviour is enabling/disabling the payout rate.
+
 */
 	PORT_MODIFY("SW2")
-	PORT_DIPNAME( 0x03, 0x00, "Max Bet" )           PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(    0x03, "10" )    // OFF-OFF
-	PORT_DIPSETTING(    0x02, "20" )    // ON-OFF
-	PORT_DIPSETTING(    0x01, "50" )    // OFF-ON
-	PORT_DIPSETTING(    0x00, "100" )   // ON-ON
-	PORT_DIPNAME( 0x04, 0x04, "Game Type" )         PORT_DIPLOCATION("SW2:3")
-	PORT_DIPSETTING(    0x04, "Jolli Witch" )
-	PORT_DIPSETTING(    0x00, "Witch Card" )
-	PORT_DIPNAME( 0x08, 0x08, "Control Type" )      PORT_DIPLOCATION("SW2:4")
+	PORT_DIPNAME( 0x03, 0x00, "Max Bet" )            PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(    0x03, "10" )
+	PORT_DIPSETTING(    0x02, "20" )
+	PORT_DIPSETTING(    0x01, "50" )
+	PORT_DIPSETTING(    0x00, "100" )
+	PORT_DIPNAME( 0x04, 0x04, "Jokers" )             PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, "Yes (Jolli Witch)" )
+	PORT_DIPSETTING(    0x00, "No  (Witch Card)" )
+	PORT_DIPNAME( 0x08, 0x08, "Control Type" )       PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x00, "6-Button" )
 	PORT_DIPSETTING(    0x08, "12-Button" )
-	PORT_DIPNAME( 0x10, 0x00, "Minimal Hand" )      PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x10, 0x00, "Minimal Hand" )       PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "Two Pairs" )
 	PORT_DIPSETTING(    0x00, "High Pair" )
-	PORT_DIPNAME( 0x60, 0x20, "Uncommented 1" )     PORT_DIPLOCATION("SW2:6,7")
-	PORT_DIPSETTING(    0x60, "1 DM - 1 PKT" )
-	PORT_DIPSETTING(    0x20, "1 DM - 10 PKT" )
-	PORT_DIPNAME( 0x80, 0x00, "Royal Flush" )       PORT_DIPLOCATION("SW2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Title Logo Display" ) PORT_DIPLOCATION("SW2:6") // draws from GFX bank 6 (blank in Witch Jolli)
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Initial Coinage" )    PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x00, "1 Coin = 10 Credits" )
+	PORT_DIPSETTING(    0x40, "1 Coin = 1 Credit" )
+	PORT_DIPNAME( 0x80, 0x00, "Payout Control" )     PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, "Off (Random)" )
+	PORT_DIPSETTING(    0x00, "On (Regulated)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( witchcdf )
