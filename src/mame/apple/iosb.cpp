@@ -621,10 +621,10 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 
 	if (!m_drq)
 	{
-		RESTART_INSTRUCTION(m_maincpu);
-		m_maincpu->spin_until_time(attotime::from_usec(50));
+		turboscsi_stall();
 		return;
 	}
+	m_scsi_stalled = false;
 
 	if (mem_mask == 0xffffffff)
 	{
@@ -635,10 +635,10 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 		m_scsi_second_half = true;
 		if (!m_drq)
 		{
-			RESTART_INSTRUCTION(m_maincpu);
-			m_maincpu->spin_until_time(attotime::from_usec(50));
+			turboscsi_stall();
 			return;
 		}
+		m_scsi_stalled = false;
 		m_scsi_second_half = false;
 		m_ncr->dma16_swap_w(data & 0xffff);
 	}
