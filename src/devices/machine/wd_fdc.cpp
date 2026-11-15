@@ -318,6 +318,7 @@ void wd_fdc_device_base::set_floppy(floppy_image_device *_floppy)
 		floppy->setup_ready_cb(floppy_image_device::ready_cb());
 	}
 
+	// TODO: the selected drive isn't saved; it needs reconstructing after loading a state
 	floppy = _floppy;
 
 	int next_ready = floppy ? floppy->ready_r() : 1;
