@@ -150,6 +150,9 @@ public:
 DEFINE_DEVICE_TYPE(NSCSI_ADAPTEC, nscsi_adaptec_device, "scsi_adaptec", "Adaptec 4000 5.25 Inch Winchester Disk Controller")
 
 
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
+
 namespace {
 
 class tek440x_state : public driver_device
@@ -1231,6 +1234,7 @@ void tek440x_state::physical_map(address_map &map)
 	// 786000-787fff: spare
 	map(0x788000, 0x788000).w(FUNC(tek440x_state::sound_w));
 	map(0x78a000, 0x78bfff).rw(FUNC(tek440x_state::fpu_r),FUNC(tek440x_state::fpu_w));
+	// this is the DEBUG serial port
 	map(0x78c000, 0x78c007).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	// 78e000-78ffff: spare
 
