@@ -1348,11 +1348,6 @@ void tek440x_state::tek4404(machine_config &config)
 	});
 	PALETTE(config, "palette", FUNC(tek440x_state::palette),2);
 
-	MOS6551(config, m_acia, 40_MHz_XTAL / 4 / 10);
-	m_acia->set_xtal(1.8432_MHz_XTAL);
-	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
-
 	I8255A(config, m_printer);
 	m_printer->in_pb_callback().set_constant(0x30);
 	// HACK:  vblank always checks if printer status < 0
@@ -1433,12 +1428,6 @@ void tek440x_state::tek4404(machine_config &config)
 	NCR5385(config, m_scsi, 40_MHz_XTAL / 4);
 	scsi.set_external_device(7, m_scsi);
 	m_scsi->irq().set_inputline(m_maincpu, M68K_IRQ_3);
-
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
-	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
-	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
-	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
 
 	SPEAKER(config, "mono").front_center();
 
