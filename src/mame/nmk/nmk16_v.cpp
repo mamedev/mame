@@ -292,6 +292,35 @@ void nmk16_state::tilebank_w(u8 data)
 	}
 }
 
+// Thunder Dragon 2 / Macross II PCB: U5 (74LS174, clocked by the NMK005's
+// tilebank strobe) latches D0-D1 to the BG ROM bank and D2-D3, through U4,
+// to BG RAM A13/A14 -- the page the tilemap displays. Both games' scroll
+// routine writes tilebank = bank | (scroll X high & 0x30) >> 2 (tdragon2
+// $6B5A, macross2 $6588), which is why taking the page from the scroll
+// register gave the same picture.
+void nmk16_state::macross2_tilebank_w(u8 data)
+{
+	const u8 bank = data & 0x03;
+	const u32 page = BIT(data, 2, 2);
+	if ((m_bgbank != bank) || (m_tilerambank != page))
+	{
+		m_bgbank = bank;
+		m_tilerambank = page;
+		m_bg_tilemap[0]->mark_all_dirty();
+	}
+}
+
+// scroll_w<0> without the BG RAM page select, which comes from the tilebank latch on this PCB
+void nmk16_state::macross2_scroll_w(offs_t offset, u8 data)
+{
+	m_scroll[0][offset] = data;
+
+	if (BIT(offset, 1))
+		m_bg_tilemap[0]->set_scrolly(0, (m_scroll[0][2] << 8) | m_scroll[0][3]);
+	else
+		m_bg_tilemap[0]->set_scrollx(0, (m_scroll[0][0] << 8) | m_scroll[0][1]);
+}
+
 void nmk16_state::raphero_scroll_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	COMBINE_DATA(&m_gunnail_scrollram[offset]);

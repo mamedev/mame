@@ -1088,10 +1088,10 @@ void nmk16_state::macross2_map(address_map &map)
 	map(0x10000f, 0x10000f).r("soundlatch2", FUNC(generic_latch_8_device::read));    // from Z80
 	map(0x100015, 0x100015).w(FUNC(nmk16_state::flipscreen_w));
 	map(0x100016, 0x100017).w(FUNC(nmk16_state::macross2_sound_reset_w));   // Z80 reset
-	map(0x100019, 0x100019).w(FUNC(nmk16_state::tilebank_w));
+	map(0x100019, 0x100019).w(FUNC(nmk16_state::macross2_tilebank_w));      // D0-D1 BG ROM bank, D2-D3 BG RAM page
 	map(0x10001f, 0x10001f).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // to Z80
 	map(0x120000, 0x1207ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x130000, 0x130007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x130000, 0x130007).ram().w(FUNC(nmk16_state::macross2_scroll_w)).umask16(0x00ff);
 	map(0x140000, 0x14ffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x170000, 0x170fff).mirror(0x1000).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 	map(0x1f0000, 0x1fffff).ram().share(m_mainram);
@@ -1106,6 +1106,9 @@ void nmk16_state::tdragon2_map(address_map &map)
 void nmk16_state::tdragon3h_map(address_map &map)
 { // bootleg has these 2 swapped
 	tdragon2_map(map);
+	// own PCB, not covered by the tdragon2 schematic: keep the page from the scroll register
+	map(0x100019, 0x100019).w(FUNC(nmk16_state::tilebank_w));
+	map(0x130000, 0x130007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff); // write handler only: the RAM is already mapped
 	map(0x10000e, 0x10000f).portr("DSW2");
 	map(0x10000b, 0x10000b).r("soundlatch2", FUNC(generic_latch_8_device::read));    // from Z80
 }
