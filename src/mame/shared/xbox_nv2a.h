@@ -577,7 +577,7 @@ public:
 		computedilated();
 		objectdata = &(rasterizer.object_data().next());
 		objectdata->data = this;
-		combiner.used = 0;
+		combiner.used = 1;
 		primitives_total_count = 0;
 		primitives_batches_count = 0;
 		indexesleft_count = 0;
@@ -644,7 +644,7 @@ public:
 		debug_grab_texttype = -1;
 		debug_grab_textfile = nullptr;
 		enable_waitvblank = true;
-		enable_clipping_w = false;
+		enable_clipping_w = true;
 		memset(&vertexbuffer, 0, sizeof(vertexbuffer));
 		memset(&persistvertexattr, 0, sizeof(persistvertexattr));
 		for (int n = 0; n < 16; n++)
@@ -922,7 +922,7 @@ public:
 	int debug_grab_texttype = 0;
 	char *debug_grab_textfile = nullptr;
 	bool enable_waitvblank = false;
-	bool enable_clipping_w = false;
+	bool enable_clipping_w = true;
 };
 
 #endif // MAME_SHARED_XBOX_NV2A_H
