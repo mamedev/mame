@@ -1298,7 +1298,7 @@ void mac128_state::macplus(machine_config &config)
 
 	// mini-DIN-8 serial ports add a handshake output, HSKo (pin 1), driven from
 	// the SCC's /DTR through a line driver.  GPi (pin 7) is not connected here:
-	// /DCDA and /DCDB are still the mouse.
+	// /DCDA and /DCDB are the mouse's X1 and Y1.
 	m_scc->out_dtra_callback().set("modem", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_dtrb_callback().set("printer", FUNC(rs232_port_device::write_dtr));
 
@@ -1356,8 +1356,8 @@ void mac128_state::macse(machine_config &config)
 	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
 	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
-	// with the mouse on ADB, each serial port's GPi (pin 7) reaches the SCC's
-	// /DCD input
+	// each serial port's GPi (pin 7) reaches the SCC's /DCD input; the mouse
+	// is on ADB here
 	subdevice<rs232_port_device>("modem")->dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	subdevice<rs232_port_device>("printer")->dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 
