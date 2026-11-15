@@ -1656,6 +1656,14 @@ void ppc_device::ppccom_tlb_fill()
 			vtlb_flush_address(m_core->param0);
 		return;
 	}
+
+	// Supervisor BATs and user page tables can map the same effective page
+	// to different physical pages. Retire the cached permissions along with
+	// the old physical address before caching this translation.
+	vtlb_entry const entry = vtlb_table()[m_core->param0 >> 12];
+	if ((entry & FLAG_VALID) && !(entry & FLAG_FIXED) && ((entry ^ address) & ~uint32_t(POWERPC_MIN_PAGE_MASK)))
+		vtlb_flush_address(m_core->param0);
+
 	vtlb_fill(m_core->param0, address, m_core->param1);
 }
 

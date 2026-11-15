@@ -1059,6 +1059,9 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 		UML_RECOVER(block, I1, MAPVAR_CYCLES);                                          // recover i1,CYCLES
 	}
 
+	// charge the cycles before exception setup and mode generation reuse I1
+	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I1);
+
 	// OEA handling of SRR exceptions
 	if (m_cap & PPCCAP_OEA)
 	{
@@ -1227,8 +1230,8 @@ void ppc_device::static_generate_exception(uint8_t exception, int recover, const
 		UML_CALLC(block, cfunc_printf_exception, this);                                      // callc   cfunc_printf_exception,ppc
 	}
 
-	// adjust cycles
-	UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), I1);                           // sub     icount,icount,cycles
+	// exit the timeslice after completing the exception state
+	UML_CMP(block, mem(&m_core->icount), 0);                                 // cmp     icount,0
 	UML_EXHc(block, COND_S, *m_out_of_cycles, I0);                         // exh     out_of_cycles,i0
 	UML_HASHJMP(block, mem(&m_core->mode), I0, *m_nocode);          // hashjmp <mode>,i0,nocode
 
