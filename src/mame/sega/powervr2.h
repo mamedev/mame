@@ -99,6 +99,7 @@ public:
 		uint32_t address = 0, vqbase = 0;
 
 		uint32_t tsinstruction = 0;
+		uint8_t cullmode = 0; // ISP culling mode: 0 none, 1 small, 2 negative or small, 3 positive or small
 
 		int textured = 0, sizex = 0, sizey = 0, stride = 0, sizes = 0, pf = 0, palette = 0, mode = 0, mipmapped = 0, blend_mode = 0, filter_mode = 0;
 		int coltype = 0;
@@ -235,6 +236,8 @@ public:
 	void fb_w_sof2_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t fb_x_clip_r();
 	void fb_x_clip_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t fpu_cull_val_r();
+	void fpu_cull_val_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t fb_y_clip_r();
 	void fb_y_clip_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t fpu_param_cfg_r();
@@ -371,7 +374,7 @@ private:
 	uint32_t softreset;
 	uint32_t param_base, region_base;
 	uint32_t vo_border_col;
-	uint32_t fb_r_ctrl, fb_w_ctrl, fb_w_linestride, fb_r_sof1, fb_r_sof2, fb_r_size, fb_w_sof1, fb_w_sof2, fb_x_clip, fb_y_clip;
+	uint32_t fb_r_ctrl, fb_w_ctrl, fb_w_linestride, fb_r_sof1, fb_r_sof2, fb_r_size, fb_w_sof1, fb_w_sof2, fb_x_clip, fb_y_clip, fpu_cull_val;
 	uint32_t fpu_param_cfg;
 	uint32_t isp_backgnd_t;
 	uint32_t spg_hblank_int, spg_vblank_int, spg_control, spg_hblank, spg_load, spg_vblank, spg_width;
@@ -416,6 +419,7 @@ private:
 		uint32_t fb_r_ctrl = 0;
 		uint32_t fb_w_sof1 = 0;
 		uint32_t fb_w_linestride = 0;
+		float fpu_cull_val = 0.0f;
 		uint32_t fb_start = 0; // span of the 32-bit area the tiles get written to, wrapping around like the writes
 		uint32_t fb_size = 0;
 		uint32_t background = 0;
