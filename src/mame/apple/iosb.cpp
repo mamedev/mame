@@ -562,9 +562,11 @@ void iosb_base::turboscsi_w(offs_t offset, u8 data)
 
 u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 {
-	if (mem_mask != 0xffffffff && mem_mask != 0xffff0000)
+	if (mem_mask != 0xffffffff && mem_mask != 0xffff0000 && mem_mask != 0xff000000)
 	{
-		fatalerror("IOSB: turboscsi_dma_r mem_mask not handled %08x\n", mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror("%s: unhandled TurboSCSI DMA read mem_mask %08x\n", machine().describe_context(), mem_mask);
+		return 0xffffffff;
 	}
 
 	if (!machine().side_effects_disabled() && BIT(offset << 1, 18))
@@ -607,11 +609,21 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 	{
 		m_scsi_dma_result = m_ncr->dma16_swap_r()<<16;
 	}
+	else
+	{
+		m_scsi_dma_result = u32(m_ncr->dma_r()) << 24;
+	}
 	return m_scsi_dma_result;
 }
 
 void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	if (mem_mask != 0xffffffff && mem_mask != 0xffff0000 && mem_mask != 0xff000000)
+	{
+		logerror("%s: unhandled TurboSCSI DMA write mem_mask %08x\n", machine().describe_context(), mem_mask);
+		return;
+	}
+
 	if (!machine().side_effects_disabled() && BIT(offset << 1, 18))
 	{
 		m_maincpu->adjust_icount(-m_scsi_dma_write_cycles);
@@ -646,13 +658,9 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		m_ncr->dma16_swap_w(data >> 16);
 	}
-	else if (mem_mask == 0xff000000)
-	{
-		m_ncr->dma_w(data >> 24);
-	}
 	else
 	{
-		fatalerror("IOSB: turboscsi_dma_w unhandled mask %08x\n", mem_mask);
+		m_ncr->dma_w(data >> 24);
 	}
 }
 
