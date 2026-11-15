@@ -44611,9 +44611,6 @@ qtsbc
 @source:skeleton/rd100.cpp
 rd100
 
-@source:skeleton/pre_st95.cpp
-rtduplex
-
 @source:skeleton/rvoice.cpp
 rvoicepc
 
@@ -44686,7 +44683,10 @@ sols5e
 @source:skeleton/squale.cpp
 squale
 
-@source:skeleton/st25.cpp
+@source:nsm/f8.cpp
+rtduplex
+
+@source:nsm/st25.cpp
 alphar
 amarillo
 arenau
