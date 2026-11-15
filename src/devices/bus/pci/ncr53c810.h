@@ -31,7 +31,6 @@ private:
 	void command_changed();
 	void status_w(offs_t offset, u16 data, u16 mem_mask);
 	void latency_timer_w(u8 data);
-	void bar_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 memory_r(offs_t address, u32 mem_mask);
 	void memory_w(offs_t address, u32 data, u32 mem_mask);
 	u32 io_r(offs_t address, u32 mem_mask);

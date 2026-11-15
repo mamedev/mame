@@ -213,7 +213,7 @@ uint32_t pci_device::address_base_r(offs_t offset)
 	return (bank_infos[bid].adr & ~(bank_infos[bid].size - 1)) | (flags & M_IO ? 1 : 0) | (flags & M_64A ? 4 : 0) | (flags & M_PREF ? 8 : 0);
 }
 
-void pci_device::address_base_w(offs_t offset, uint32_t data)
+void pci_device::address_base_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if(bank_reg_infos[offset].bank == -1) {
 		logerror("write to address base (%d, %08x) not linked to any bank\n", offset, data);
@@ -221,9 +221,12 @@ void pci_device::address_base_w(offs_t offset, uint32_t data)
 	}
 
 	int bid = bank_reg_infos[offset].bank;
-	if(bank_reg_infos[offset].hi)
+	if(bank_reg_infos[offset].hi) {
+		data = ((bank_infos[bid].adr >> 32) & ~mem_mask) | (data & mem_mask);
 		bank_infos[bid].adr = (bank_infos[bid].adr & 0xffffffff) | (uint64_t(data) << 32);
+	}
 	else {
+		data = (bank_infos[bid].adr & ~mem_mask) | (data & mem_mask);
 		bank_infos[bid].adr = (bank_infos[bid].adr & 0xffffffff00000000U) | data;
 	}
 	remap_cb();
@@ -386,6 +389,35 @@ void pci_device::reset_all_mappings()
 void pci_device::map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
 {
+	map_bars(memory_window_start, memory_window_end, memory_offset, memory_space,
+				io_window_start, io_window_end, io_offset, io_space);
+
+	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
+				io_window_start, io_window_end, io_offset, io_space);
+
+	if(expansion_rom_base & 1) {
+		logerror("map expansion rom at %08x-%08x\n", expansion_rom_base & ~1, (expansion_rom_base & ~1) + expansion_rom_size - 1);
+		uint32_t start = (expansion_rom_base & ~1) + memory_offset;
+		uint32_t end = start + expansion_rom_size - 1;
+		if(end > memory_window_end)
+			end = memory_window_end;
+		memory_space->install_rom(start, end, (void *)expansion_rom);
+	}
+}
+
+void pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
+}
+
+void pci_device::map_config(uint8_t device, address_space *config_space)
+{
+	config_space->install_device(device << 12, (device << 12) | 0xfff, *this, &pci_device::config_map);
+}
+
+void pci_device::map_bars(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+						  uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
+{
 	for(int i=0; i<bank_count; i++) {
 		bank_info &bi = bank_infos[i];
 		if(uint32_t(bi.adr) >= 0xfffffffc)
@@ -423,28 +455,6 @@ void pci_device::map_device(uint64_t memory_window_start, uint64_t memory_window
 		space->install_device_delegate(start, end, *bi.device, bi.map);
 		logerror("map %s at %0*x-%0*x\n", bi.map.name(), bi.flags & M_IO ? 4 : 8, uint32_t(start), bi.flags & M_IO ? 4 : 8, uint32_t(end));
 	}
-
-	map_extra(memory_window_start, memory_window_end, memory_offset, memory_space,
-				io_window_start, io_window_end, io_offset, io_space);
-
-	if(expansion_rom_base & 1) {
-		logerror("map expansion rom at %08x-%08x\n", expansion_rom_base & ~1, (expansion_rom_base & ~1) + expansion_rom_size - 1);
-		uint32_t start = (expansion_rom_base & ~1) + memory_offset;
-		uint32_t end = start + expansion_rom_size - 1;
-		if(end > memory_window_end)
-			end = memory_window_end;
-		memory_space->install_rom(start, end, (void *)expansion_rom);
-	}
-}
-
-void pci_device::map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
-							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space)
-{
-}
-
-void pci_device::map_config(uint8_t device, address_space *config_space)
-{
-	config_space->install_device(device << 12, (device << 12) | 0xfff, *this, &pci_device::config_map);
 }
 
 void pci_device::skip_map_regs(int count)
