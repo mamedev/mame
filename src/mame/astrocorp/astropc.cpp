@@ -174,7 +174,7 @@ void astropc_state::main_io(address_map &map)
 
 void astropc_state::astropc(machine_config &config)
 {
-	MEDIAGX(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
+	MEDIAGXM(config, m_maincpu, 233'000'000); // Cyrix MediaGX GXm-266GP
 	m_maincpu->set_addrmap(AS_PROGRAM, &astropc_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &astropc_state::main_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:12.0:pic8259_master", FUNC(pic8259_device::inta_cb));
