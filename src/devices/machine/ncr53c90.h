@@ -46,6 +46,7 @@ public:
 
 	uint8_t dma_r();
 	void dma_w(uint8_t val);
+	uint8_t dma_peek(uint8_t index) const;
 
 protected:
 	ncr53c90_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);

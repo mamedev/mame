@@ -569,7 +569,18 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 		return 0xffffffff;
 	}
 
-	if (!machine().side_effects_disabled() && BIT(offset << 1, 18))
+	if (machine().side_effects_disabled())
+	{
+		if (mem_mask == 0xff000000)
+			return u32(m_ncr->dma_peek(0)) << 24;
+		if (mem_mask == 0xffff0000)
+			return u32(m_ncr->dma16_swap_r()) << 16;
+		if (m_scsi_second_half)
+			return (m_scsi_dma_result & 0xffff0000) | m_ncr->dma16_swap_r();
+		return (u32(m_ncr->dma16_swap_r()) << 16) | (m_ncr->dma_peek(2) << 8) | m_ncr->dma_peek(3);
+	}
+
+	if (BIT(offset << 1, 18))
 	{
 		m_maincpu->adjust_icount(-m_scsi_dma_read_cycles);
 	}
@@ -624,7 +635,23 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 		return;
 	}
 
-	if (!machine().side_effects_disabled() && BIT(offset << 1, 18))
+	if (machine().side_effects_disabled())
+	{
+		// Debugger writes are stored while DRQ is asserted, with no wait states, retries, or timeouts
+		if (mem_mask == 0xff000000)
+		{
+			if (m_drq)
+				m_ncr->dma_w(data >> 24);
+			return;
+		}
+		if (m_drq)
+			m_ncr->dma16_swap_w(data >> 16);
+		if ((mem_mask == 0xffffffff) && m_drq)
+			m_ncr->dma16_swap_w(data & 0xffff);
+		return;
+	}
+
+	if (BIT(offset << 1, 18))
 	{
 		m_maincpu->adjust_icount(-m_scsi_dma_write_cycles);
 	}
