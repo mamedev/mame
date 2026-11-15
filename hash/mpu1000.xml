@@ -32,7 +32,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="hobbymod">
+	<software name="hobbymod" supported="no">
 		<description>Hobby Module</description>
 		<year>1980</year>
 		<publisher>Radofin</publisher>
