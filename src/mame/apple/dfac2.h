@@ -12,6 +12,8 @@
 class dfac2_device : public device_t, public device_mixer_interface, public i2c_hle_interface
 {
 public:
+	static constexpr u32 RECORD_INPUTS = 6;
+
 	dfac2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	required_device<filter_volume_device> const &dac(u32 channel) const { return m_dac[channel]; }
@@ -35,7 +37,7 @@ private:
 
 	required_device_array<filter_volume_device, 2> m_dac;
 	required_device_array<filter_biquad_device, 2> m_filter;
-	required_device_array<filter_volume_device, 4> m_rec;
+	required_device_array<filter_volume_device, RECORD_INPUTS> m_rec;
 	required_ioport m_jacks;
 	u8 m_regs[0x11];
 };

@@ -367,7 +367,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 	asc.add_route(0, m_dfac2->dac(0), 1.0);
 	asc.add_route(1, m_dfac2->dac(1), 1.0);
 	MICROPHONE(config, "sound_in", 2).front().add_route(0, m_dfac2->rec(2), 1.0).add_route(1, m_dfac2->rec(3), 1.0);
-	for (int i = 0; i < 4; i++)
+	for (u32 i = 0; i < dfac2_device::RECORD_INPUTS; i++)
 		m_dfac2->rec(i).lookup()->add_route(0, asc, 1.0);
 	// The board's reconstruction low-pass is modeled as two RC stages, with corners fitted to the line output of a Performa 6200CD
 	static constexpr const char *const LPF_TAGS[2][2] = { { "lpf1_l", "lpf_l" }, { "lpf1_r", "lpf_r" } };
