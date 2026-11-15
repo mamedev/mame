@@ -47,6 +47,45 @@ namespace netlist::devices {
 		logic_output_t m_QQ;
 	};
 
+	// same RSFF, but powered up SET (Q=1)
+	NETLIB_OBJECT(nicRSFFSet)
+	{
+		NETLIB_CONSTRUCTOR(nicRSFFSet)
+		, m_S(*this, "S", NETLIB_DELEGATE(inputs))
+		, m_R(*this, "R", NETLIB_DELEGATE(inputs))
+		, m_Q(*this, "Q")
+		, m_QQ(*this, "QQ")
+		{
+		}
+
+		NETLIB_RESETI()
+		{
+			m_Q.initial(1);
+			m_QQ.initial(0);
+		}
+
+	private:
+		NETLIB_HANDLERI(inputs)
+		{
+			if (!m_S())
+			{
+				m_Q.push(1, NLTIME_FROM_NS(20));
+				m_QQ.push(0, NLTIME_FROM_NS(20));
+			}
+			else if (!m_R())
+			{
+				m_Q.push(0, NLTIME_FROM_NS(20));
+				m_QQ.push(1, NLTIME_FROM_NS(20));
+			}
+		}
+
+		logic_input_t m_S;
+		logic_input_t m_R;
+
+		logic_output_t m_Q;
+		logic_output_t m_QQ;
+	};
+
 
 	NETLIB_OBJECT(nicDelay)
 	{
@@ -91,7 +130,8 @@ namespace netlist::devices {
 		state_var<netlist_sig_t> m_last;
 	};
 
-	NETLIB_DEVICE_IMPL(nicRSFF,  "NETDEV_RSFF",  "")
-	NETLIB_DEVICE_IMPL(nicDelay, "NETDEV_DELAY", "")
+	NETLIB_DEVICE_IMPL(nicRSFF,    "NETDEV_RSFF",     "")
+	NETLIB_DEVICE_IMPL(nicRSFFSet, "NETDEV_RSFF_SET", "")
+	NETLIB_DEVICE_IMPL(nicDelay,   "NETDEV_DELAY",    "")
 
 } // namespace netlist::devices
