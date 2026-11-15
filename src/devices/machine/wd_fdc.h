@@ -253,10 +253,10 @@ private:
 		enum { PT_NONE, PT_CRC_1, PT_CRC_2 };
 
 		attotime tm;
-		int state, next_state;
+		int32_t state, next_state;
 		uint32_t shift_reg;
 		uint16_t crc;
-		int bit_counter, byte_counter, previous_type;
+		int32_t bit_counter, byte_counter, previous_type;
 		bool data_separator_phase, data_bit_context;
 		uint8_t data_reg;
 		uint8_t idbuf[6];
@@ -299,7 +299,7 @@ private:
 	uint8_t command, track, sector, data, status, intrq_cond;
 	int last_dir;
 
-	int counter, motor_timeout, sector_size;
+	int32_t counter, motor_timeout, sector_size;
 
 	int cmd_buffer, track_buffer, sector_buffer;
 
