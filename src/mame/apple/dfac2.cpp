@@ -60,7 +60,8 @@ dfac2_device::dfac2_device(const machine_config &mconfig, const char *tag, devic
 	i2c_hle_interface(mconfig, *this, 0x6f),
 	m_dac(*this, "dac_%u", 0),
 	m_filter(*this, "filter3_%u", 0),
-	m_rec(*this, "rec_%u", 0)
+	m_rec(*this, "rec_%u", 0),
+	m_jacks(*this, "jacks")
 {
 }
 
@@ -83,6 +84,22 @@ void dfac2_device::device_add_mconfig(machine_config &config)
 
 	for (u32 i = 0; i < 4; i++)
 		FILTER_VOLUME(config, m_rec[i]);
+}
+
+static INPUT_PORTS_START(dfac2)
+	PORT_START("jacks")
+	// Only the sense bits are changed; audio routed to the jack inputs is recorded either way
+	PORT_CONFNAME(0x80, 0x00, "Sound Input Jack")
+	PORT_CONFSETTING(0x00, "Empty")
+	PORT_CONFSETTING(0x80, "Connected")
+	PORT_CONFNAME(0x20, 0x00, "Sound Output Jack")
+	PORT_CONFSETTING(0x00, "Empty")
+	PORT_CONFSETTING(0x20, "Connected")
+INPUT_PORTS_END
+
+ioport_constructor dfac2_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(dfac2);
 }
 
 void dfac2_device::device_start()
@@ -173,6 +190,8 @@ bool dfac2_device::subaddress_valid(u8 subaddress) const
 
 u8 dfac2_device::read_data(u16 offset)
 {
+	if (offset == 0x10)
+		return (m_regs[offset] & ~0xa0) | m_jacks->read();
 	return m_regs[offset];
 }
 

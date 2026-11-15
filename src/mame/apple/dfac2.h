@@ -22,6 +22,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	// i2c_hle_interface overrides
 	virtual u8 read_data(u16 offset) override;
 	virtual bool one_byte_transfers() const override;
@@ -35,6 +36,7 @@ private:
 	required_device_array<filter_volume_device, 2> m_dac;
 	required_device_array<filter_biquad_device, 2> m_filter;
 	required_device_array<filter_volume_device, 4> m_rec;
+	required_ioport m_jacks;
 	u8 m_regs[0x11];
 };
 
