@@ -221,7 +221,6 @@ void i8251_device::receive_clock()
 			}
 			else
 			{
-				m_rx_start_check = false;
 				m_rxc_count = 3 * m_br_factor / 2;
 			}
 		}
