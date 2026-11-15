@@ -29,7 +29,9 @@
 #include "endianness.h"
 
 #include <algorithm>
+#include <cmath>
 #include <iterator>
+#include <limits>
 
 #define LOG_MODE        (1U << 1)
 #define LOG_MONSENSE    (1U << 2)
@@ -700,6 +702,9 @@ void valkyrie_device::recalc_mode()
 			m_vtotal = 666;
 			m_stride = 104;
 			break;
+
+		default:
+			return;
 	}
 
 	const double refresh = (double)m_pixel_clock / (double)(m_htotal * m_vtotal);
@@ -779,9 +784,19 @@ void valkyrie_device::write_data(u16 offset, u8 data)
 
 	// 512x384 writes M = 0, N = 0, P = 0x62 and runs at half the crystal clock
 	if ((m_M == 0) || (m_N == 0))
+	{
 		m_pixel_clock = clock() / 2;
+	}
 	else
-		m_pixel_clock = (u32)((double)clock() / 8.0 * (double)(1 << m_P) * (double)m_N / (double)m_M);
+	{
+		const double pixel_clock = std::ldexp(double(clock()) / 8.0, m_P) * m_N / m_M;
+		if ((pixel_clock < 1.0) || (pixel_clock > std::numeric_limits<u32>::max()))
+		{
+			LOGMASKED(LOG_CLOCKGEN, "Valkyrie: ignoring out-of-range clock M=%u N=%u P=%u\n", m_M, m_N, m_P);
+			return;
+		}
+		m_pixel_clock = u32(pixel_clock);
+	}
 
 	LOGMASKED(LOG_CLOCKGEN, "Valkyrie: M = %d %02x, N = %d %02x P = %d, pixel clock %d\n", m_M, m_M, m_N, m_N, m_P, m_pixel_clock);
 	recalc_mode();
