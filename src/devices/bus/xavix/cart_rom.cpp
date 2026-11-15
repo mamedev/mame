@@ -1,263 +1,201 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MagikalUnicorn
+/***************************************************************************
+
+    XaviX ROM cartridges, including variants with I2C EEPROMs. ROM reads
+    mirror the installed image; EEPROM access uses cartridge bus-control
+    registers or direct SDA/SCL connections. Cartridge options select the
+    EEPROM capacity and its wiring to the console.
+
+    Documented physical EEPROMs are 24C04/24C08 for the control 1 variants,
+    24LC04/24LC02 for the control 0 variants, and 24LC02/24LC08 for the direct
+    variants, respectively. The I2C_24Cxx devices provide compatible models.
+
+***************************************************************************/
 
 #include "emu.h"
-#include "rom.h"
+#include "cart_rom.h"
 
-//-------------------------------------------------
-//  ekara_rom_device - constructor
-//-------------------------------------------------
+#define LOG_ROM (1U << 1)
+#define LOG_I2C (1U << 2)
+#define VERBOSE 0
+#include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(EKARA_ROM_PLAIN,         ekara_rom_plain_device,       "ekara_rom_plain",        "EKARA Cartridge")
-DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_BASE,      ekara_rom_i2c_base_device,    "ekara_rom_i2c_base",     "EKARA Cartridge with I2C")
-DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24C08_EPITCH,     ekara_rom_i2c_24c08_epitch_device,   "ekara_rom_i2c_24c08",    "EKARA Cartridge with I2C 24C08 (e-pitch)")
-DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC04,    ekara_rom_i2c_24lc04_device,  "ekara_rom_i2c_24lc04",   "EKARA Cartridge with I2C 24LC04 (Jumping Popira)")
-DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC02,    ekara_rom_i2c_24lc02_device,  "ekara_rom_i2c_24lc02",   "EKARA Cartridge with I2C 24LC02")
-DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC02_GC0010,    ekara_rom_i2c_24lc02_gc0010_device,  "ekara_rom_i2c_24lc02_gc0010",   "EKARA Cartridge with I2C 24LC02 (GC0010 direct access)")
-DEFINE_DEVICE_TYPE(EKARA_ROM_I2C_24LC08_EVIO,    ekara_rom_i2c_24lc08_evio_device,  "ekara_rom_i2c_24lc08_evio",   "EKARA Cartridge with I2C 24LC08 (evio direct access)")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_PLAIN,              xavix_rom_plain_device,             "xavix_rom_plain",         "XaviX ROM Cartridge")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C04_CONTROL1,     xavix_rom_24c04_control1_device,    "xavix_rom_24c04_control1", "XaviX ROM Cartridge with 24C04-Compatible I2C EEPROM (Control 1)")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C08_CONTROL1,     xavix_rom_24c08_control1_device,    "xavix_rom_24c08_control1", "XaviX ROM Cartridge with 24C08-Compatible I2C EEPROM")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C04_CONTROL0,     xavix_rom_24c04_control0_device,    "xavix_rom_24c04_control0", "XaviX ROM Cartridge with 24C04-Compatible I2C EEPROM (Control 0)")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C02_CONTROL0,     xavix_rom_24c02_control0_device,    "xavix_rom_24c02_control0", "XaviX ROM Cartridge with 24C02-Compatible I2C EEPROM")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C02_DIRECT,       xavix_rom_24c02_direct_device,      "xavix_rom_24c02_direct",  "XaviX ROM Cartridge with 24C02-Compatible I2C EEPROM (Direct I/O)")
+DEFINE_DEVICE_TYPE(XAVIX_ROM_24C08_DIRECT,       xavix_rom_24c08_direct_device,      "xavix_rom_24c08_direct",  "XaviX ROM Cartridge with 24C08-Compatible I2C EEPROM (Direct I/O)")
 
 
-ekara_rom_plain_device::ekara_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, type, tag, owner, clock), device_ekara_cart_interface(mconfig, *this)
+xavix_rom_plain_device::xavix_rom_plain_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock), device_xavix_cart_interface(mconfig, *this)
 {
 }
 
-ekara_rom_plain_device::ekara_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ekara_rom_plain_device(mconfig, EKARA_ROM_PLAIN, tag, owner, clock)
+xavix_rom_plain_device::xavix_rom_plain_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_plain_device(mconfig, XAVIX_ROM_PLAIN, tag, owner, clock)
 {
 }
 
+xavix_rom_i2c_base_device::xavix_rom_i2c_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t bus_write_control_index, uint8_t bus_write_control_mask) :
+	xavix_rom_plain_device(mconfig, type, tag, owner, clock),
+	m_i2cmem(*this, "i2cmem"),
+	m_bus_write_control_index(bus_write_control_index),
+	m_bus_write_control_mask(bus_write_control_mask)
+{
+}
 
+xavix_rom_24c04_control1_device::xavix_rom_24c04_control1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_24C04_CONTROL1, tag, owner, clock, 1, 0x04)
+{
+}
 
-ekara_rom_i2c_base_device::ekara_rom_i2c_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	ekara_rom_plain_device(mconfig, type, tag, owner, clock),
+xavix_rom_24c08_control1_device::xavix_rom_24c08_control1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_24C08_CONTROL1, tag, owner, clock, 1, 0x04)
+{
+}
+
+xavix_rom_24c04_control0_device::xavix_rom_24c04_control0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_24C04_CONTROL0, tag, owner, clock, 0, 0x04)
+{
+}
+
+xavix_rom_24c02_control0_device::xavix_rom_24c02_control0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_base_device(mconfig, XAVIX_ROM_24C02_CONTROL0, tag, owner, clock)
+{
+}
+
+xavix_rom_i2c_direct_device::xavix_rom_i2c_direct_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_plain_device(mconfig, type, tag, owner, clock),
 	m_i2cmem(*this, "i2cmem")
 {
+}
+
+xavix_rom_24c02_direct_device::xavix_rom_24c02_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_direct_device(mconfig, XAVIX_ROM_24C02_DIRECT, tag, owner, clock)
+{
+}
+
+xavix_rom_24c08_direct_device::xavix_rom_24c08_direct_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	xavix_rom_i2c_direct_device(mconfig, XAVIX_ROM_24C08_DIRECT, tag, owner, clock)
+{
+}
+
+void xavix_rom_24c04_control1_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C04(config, m_i2cmem);
+}
+
+void xavix_rom_24c08_control1_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C08(config, m_i2cmem);
+}
+
+void xavix_rom_24c04_control0_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C04(config, m_i2cmem);
+}
+
+void xavix_rom_24c02_control0_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C02(config, m_i2cmem);
+}
+
+void xavix_rom_24c02_direct_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C02(config, m_i2cmem);
+}
+
+void xavix_rom_24c08_direct_device::device_add_mconfig(machine_config &config)
+{
+	I2C_24C08(config, m_i2cmem);
+}
+
+void xavix_cart_slot_device::cart_devices(device_slot_interface &device)
+{
+	device.option_add_internal("plain",                XAVIX_ROM_PLAIN);
+	device.option_add_internal("rom_24c04_control1",   XAVIX_ROM_24C04_CONTROL1);
+	device.option_add_internal("rom_24c08_control1",   XAVIX_ROM_24C08_CONTROL1);
+	device.option_add_internal("rom_24c04_control0",   XAVIX_ROM_24C04_CONTROL0);
+	device.option_add_internal("rom_24c02_control0",   XAVIX_ROM_24C02_CONTROL0);
+	device.option_add_internal("rom_24c02_direct",     XAVIX_ROM_24C02_DIRECT);
+	device.option_add_internal("rom_24c08_direct",     XAVIX_ROM_24C08_DIRECT);
+}
+
+void xavix_rom_i2c_base_device::device_start()
+{
+	save_item(NAME(m_buscontrol));
+}
+
+void xavix_rom_i2c_base_device::device_reset()
+{
 	m_buscontrol[0] = m_buscontrol[1] = m_buscontrol[2] = 0x00;
-	m_bus_write_control_mask = 0x08;
 }
 
-ekara_rom_i2c_base_device::ekara_rom_i2c_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ekara_rom_i2c_base_device(mconfig, EKARA_ROM_I2C_BASE, tag, owner, clock)
+uint8_t xavix_rom_plain_device::read_cart(offs_t offset)
 {
+	return m_rom ? m_rom[offset & (m_rom_size - 1)] : 0xff;
 }
 
-ekara_rom_i2c_24c08_epitch_device::ekara_rom_i2c_24c08_epitch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ekara_rom_i2c_base_device(mconfig, EKARA_ROM_I2C_24C08_EPITCH, tag, owner, clock)
+void xavix_rom_plain_device::write_cart(offs_t offset, uint8_t data)
 {
+	LOGMASKED(LOG_ROM, "%s: ROM write %08x = %02x\n", machine().describe_context(), offset, data);
 }
 
-ekara_rom_i2c_24lc04_device::ekara_rom_i2c_24lc04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ekara_rom_i2c_base_device(mconfig, EKARA_ROM_I2C_24LC04, tag, owner, clock)
+void xavix_rom_i2c_base_device::write_bus_control(offs_t offset, uint8_t data)
 {
-	m_bus_write_control_mask = 0x04;
-}
-
-ekara_rom_i2c_24lc02_device::ekara_rom_i2c_24lc02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ekara_rom_i2c_base_device(mconfig, EKARA_ROM_I2C_24LC02, tag, owner, clock)
-{
-}
-
-ekara_rom_i2c_24lc02_gc0010_device::ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ekara_rom_i2c_24lc02_gc0010_device(mconfig, EKARA_ROM_I2C_24LC02_GC0010, tag, owner, clock)
-{
-}
-
-ekara_rom_i2c_24lc02_gc0010_device::ekara_rom_i2c_24lc02_gc0010_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	ekara_rom_i2c_base_device(mconfig, type, tag, owner, clock)
-{
-}
-
-ekara_rom_i2c_24lc08_evio_device::ekara_rom_i2c_24lc08_evio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	ekara_rom_i2c_24lc02_gc0010_device(mconfig, EKARA_ROM_I2C_24LC08_EVIO, tag, owner, clock)
-{
-}
-
-/*-------------------------------------------------
- mapper specific handlers
- -------------------------------------------------*/
-
-// plain
-
-uint8_t ekara_rom_plain_device::read_cart(offs_t offset)
-{
-	return read_rom(offset);
-}
-
-uint8_t ekara_rom_plain_device::read_rom(offs_t offset)
-{
-	return m_rom[offset & (m_rom_size-1)];
-}
-
-void ekara_rom_plain_device::write_cart(offs_t offset, uint8_t data)
-{
-	write_rom(offset, data);
-}
-
-void ekara_rom_plain_device::write_rom(offs_t offset, uint8_t data)
-{
-	logerror("ekara_rom_plain_device::write_rom %08x %02x\n", offset, data);
-}
-
-// i2c base
-
-bool ekara_rom_i2c_base_device::is_read_access_not_rom(void)
-{
-	return (m_buscontrol[1] & 0x08) ? true : false;
-}
-
-bool ekara_rom_i2c_base_device::is_write_access_not_rom(void)
-{
-	return (m_buscontrol[0] & m_bus_write_control_mask) ? true : false;
-}
-
-void ekara_rom_i2c_base_device::write_bus_control(offs_t offset, uint8_t data)
-{
-	logerror("ekara_rom_i2c_base_device::write_bus_control %08x %02x\n", offset, data);
+	LOGMASKED(LOG_I2C, "%s: Bus control write %08x = %02x\n", machine().describe_context(), offset, data);
 	m_buscontrol[offset] = data;
 }
 
-void ekara_rom_i2c_base_device::write_rom(offs_t offset, uint8_t data)
+void xavix_rom_i2c_base_device::write_cart(offs_t offset, uint8_t data)
 {
-	if (is_write_access_not_rom())
-	{
-		if (offset == 0x3fffff)
-			write_extra(offset,data);
-		else
-			logerror("ekara_rom_i2c_base_device::write_rom %08x %02x\n", offset, data);
-	}
+	if ((m_buscontrol[m_bus_write_control_index] & m_bus_write_control_mask) && (offset == 0x3fffff))
+		write_i2c(offset, data);
 	else
-	{
-		logerror("ekara_rom_i2c_base_device::write_rom %08x %02x\n", offset, data);
-	}
+		LOGMASKED(LOG_ROM, "%s: ROM write %08x = %02x\n", machine().describe_context(), offset, data);
 }
 
-uint8_t ekara_rom_i2c_base_device::read_rom(offs_t offset)
+uint8_t xavix_rom_i2c_base_device::read_cart(offs_t offset)
 {
-	if (is_read_access_not_rom())
-	{
-		if (offset == 0x5fffff)
-			return read_extra(offset);
-		else
-			return m_rom[offset & (m_rom_size - 1)];
-	}
-	else
-	{
-		return m_rom[offset & (m_rom_size - 1)];
-	}
+	if ((m_buscontrol[1] & 0x08) && (offset == 0x5fffff))
+		return read_i2c(offset);
+
+	return xavix_rom_plain_device::read_cart(offset);
 }
 
-uint8_t ekara_rom_i2c_base_device::read_extra(offs_t offset)
+uint8_t xavix_rom_i2c_base_device::read_i2c(offs_t offset)
 {
-	logerror("ekara_rom_i2c_base_device::read_extra %08x\n", offset);
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_I2C, "%s: I2C read %08x\n", machine().describe_context(), offset);
 
-	return (m_i2cmem->read_sda() & 1) ? 0xff : 0x00;
+	return m_i2cmem->read_sda() ? 0xff : 0x00;
 }
 
-void ekara_rom_i2c_base_device::write_extra(offs_t offset, uint8_t data)
+void xavix_rom_i2c_base_device::write_i2c(offs_t offset, uint8_t data)
 {
-	logerror("ekara_rom_i2c_base_device::write_extra %08x %02x\n", offset, data);
+	LOGMASKED(LOG_I2C, "%s: I2C write %08x = %02x\n", machine().describe_context(), offset, data);
 
-	m_i2cmem->write_sda((data & 0x01) >> 0);
-	m_i2cmem->write_scl((data & 0x02) >> 1);
+	m_i2cmem->write_sda(BIT(data, 0));
+	m_i2cmem->write_scl(BIT(data, 1));
 }
 
-// i2c 24c08 (for epitch carts)
-
-bool ekara_rom_i2c_24c08_epitch_device::is_read_access_not_rom(void)
-{
-	// write 0x08 before reading from SEEPROM
-	// reads from 005fffff, cart does no accress decoding
-	return (m_buscontrol[1] & 0x08) ? true : false;
-}
-
-bool ekara_rom_i2c_24c08_epitch_device::is_write_access_not_rom(void)
-{
-	// writes 0x05 before writing to SEEPROM
-	// actually writes to address 3fffff which is where a mirror of the base ROM sits, but clearly all signals route through the cartridge too
-	// cart does no accress decoding
-	return (m_buscontrol[1] & 0x04) ? true : false;
-}
-
-void ekara_rom_i2c_24c08_epitch_device::device_add_mconfig(machine_config &config)
-{
-	I2C_24C08(config, "i2cmem");
-}
-
-// i2c 24lc04
-
-void ekara_rom_i2c_24lc04_device::device_add_mconfig(machine_config &config)
-{
-	I2C_24C04(config, "i2cmem"); // 24LC04
-}
-
-// i2c 24lc02
-
-void ekara_rom_i2c_24lc02_device::device_add_mconfig(machine_config &config)
-{
-	I2C_24C02(config, "i2cmem"); // 24LC02
-}
-
-// i2c 24lc02 with direct IO port access
-
-bool ekara_rom_i2c_24lc02_gc0010_device::is_read_access_not_rom(void)
-{
-	return false;
-}
-
-bool ekara_rom_i2c_24lc02_gc0010_device::is_write_access_not_rom(void)
-{
-	return false;
-}
-
-uint8_t ekara_rom_i2c_24lc02_gc0010_device::read_extra(offs_t offset)
-{
-	return 0;
-}
-
-void ekara_rom_i2c_24lc02_gc0010_device::write_extra(offs_t offset, uint8_t data)
-{
-}
-
-
-void ekara_rom_i2c_24lc02_gc0010_device::write_sda(int state)
+// The cartridge bus exposes the shared I2C memory device's pins directly.
+// Super TV-PC uses a separate slot interface and EEPROM child tag.
+void xavix_rom_i2c_direct_device::write_sda(int state)
 {
 	m_i2cmem->write_sda(state);
 }
 
-void ekara_rom_i2c_24lc02_gc0010_device::write_scl(int state)
+void xavix_rom_i2c_direct_device::write_scl(int state)
 {
 	m_i2cmem->write_scl(state);
 }
 
-int ekara_rom_i2c_24lc02_gc0010_device::read_sda()
+int xavix_rom_i2c_direct_device::read_sda()
 {
 	return m_i2cmem->read_sda();
-}
-
-
-
-void ekara_rom_i2c_24lc02_gc0010_device::device_add_mconfig(machine_config &config)
-{
-	I2C_24C02(config, "i2cmem"); // 24LC02
-}
-
-
-void ekara_rom_i2c_24lc08_evio_device::device_add_mconfig(machine_config &config)
-{
-	I2C_24C08(config, "i2cmem");
-}
-
-/*-------------------------------------------------
- slot interface
- -------------------------------------------------*/
-
-void ekara_cart(device_slot_interface &device)
-{
-	device.option_add_internal("plain",       EKARA_ROM_PLAIN);
-	device.option_add_internal("rom_24c08_epitch",  EKARA_ROM_I2C_24C08_EPITCH);
-	device.option_add_internal("rom_24lc04",  EKARA_ROM_I2C_24LC04);
-	device.option_add_internal("rom_24lc02",  EKARA_ROM_I2C_24LC02);
-	device.option_add_internal("rom_24lc02_gc0010",  EKARA_ROM_I2C_24LC02_GC0010);
-	device.option_add_internal("rom_24lc08_evio",  EKARA_ROM_I2C_24LC08_EVIO);
 }

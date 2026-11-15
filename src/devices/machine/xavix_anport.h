@@ -1,41 +1,65 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MagikalUnicorn
 
-#ifndef MAME_TVGAMES_XAVIX_ANPORT_H
-#define MAME_TVGAMES_XAVIX_ANPORT_H
+#ifndef MAME_MACHINE_XAVIX_ANPORT_H
+#define MAME_MACHINE_XAVIX_ANPORT_H
+
+#pragma once
+
+#include <array>
 
 class xavix_anport_device : public device_t
 {
 public:
-	xavix_anport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	xavix_anport_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	auto read_0_callback() { return m_in0_cb.bind(); }
-	auto read_1_callback() { return m_in1_cb.bind(); }
-	auto read_2_callback() { return m_in2_cb.bind(); }
-	auto read_3_callback() { return m_in3_cb.bind(); }
+	template <unsigned Channel> auto input_callback() { return m_input_cb[Channel].bind(); }
 
-	uint8_t mouse_7b00_r();
-	uint8_t mouse_7b01_r();
-	uint8_t mouse_7b10_r();
-	uint8_t mouse_7b11_r();
+	void map(address_map &map) ATTR_COLD;
 
-	void mouse_7b00_w(uint8_t data);
-	void mouse_7b01_w(uint8_t data);
-	void mouse_7b10_w(uint8_t data);
-	void mouse_7b11_w(uint8_t data);
+	void set_counter_mode(unsigned channel)
+	{
+		assert(channel < m_counter_mode.size());
+		m_counter_mode[channel] = true;
+	}
+
+	void set_counter_saturation(unsigned channel)
+	{
+		assert(channel < m_counter_saturation.size());
+		m_counter_saturation[channel] = true;
+	}
+
+	template <unsigned Channel> u8 data_r()
+	{
+		static_assert(Channel < 4);
+		return counter_r(Channel);
+	}
+
+	template <unsigned Channel> void data_w(u8 data)
+	{
+		static_assert(Channel < 4);
+		counter_w(Channel, data);
+	}
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	devcb_read8 m_in0_cb;
-	devcb_read8 m_in1_cb;
-	devcb_read8 m_in2_cb;
-	devcb_read8 m_in3_cb;
+	u8 input_r(unsigned channel);
+	u8 counter_r(unsigned channel);
+	void counter_w(unsigned channel, u8 data);
+
+	devcb_read8::array<4> m_input_cb;
+
+	std::array<bool, 4> m_counter_mode;
+	std::array<bool, 4> m_counter_saturation;
+	std::array<u8, 4> m_counter_value;
+	std::array<u8, 4> m_counter_last_input;
+	std::array<bool, 4> m_counter_valid;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_ANPORT, xavix_anport_device)
 
-#endif // MAME_TVGAMES_XAVIX_ANPORT_H
+#endif // MAME_MACHINE_XAVIX_ANPORT_H

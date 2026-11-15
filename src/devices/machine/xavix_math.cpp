@@ -1,5 +1,18 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MagikalUnicorn
+/***************************************************************************
+
+    XaviX arithmetic unit. Provides signed or unsigned 8-bit multiplication,
+    optional accumulation into a 16-bit result, and shifts through shared
+    operand registers. Software can also write the result bytes directly.
+
+    Arithmetic completes immediately in this model; result latency is not
+    modelled.
+
+    TODO:
+    - Model result latency if it becomes observable.
+
+***************************************************************************/
 
 #include "emu.h"
 #include "xavix_math.h"
@@ -9,172 +22,131 @@
 
 DEFINE_DEVICE_TYPE(XAVIX_MATH, xavix_math_device, "xavix_math", "XaviX Math Unit")
 
-xavix_math_device::xavix_math_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+xavix_math_device::xavix_math_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, XAVIX_MATH, tag, owner, clock)
 {
 }
 
+void xavix_math_device::map(address_map &map)
+{
+	map(0x0, 0x0).rw(FUNC(xavix_math_device::shift_ctrl_r), FUNC(xavix_math_device::shift_ctrl_w));
+	map(0x1, 0x1).rw(FUNC(xavix_math_device::shift_result_r), FUNC(xavix_math_device::multiplicand_w));
+	map(0x2, 0x2).rw(FUNC(xavix_math_device::multiplier_ctrl_r), FUNC(xavix_math_device::multiplier_ctrl_w));
+	map(0x3, 0x3).rw(FUNC(xavix_math_device::multiplicand_r), FUNC(xavix_math_device::multiplicand_w));
+	map(0x4, 0x4).rw(FUNC(xavix_math_device::multiplier_r), FUNC(xavix_math_device::multiplier_w));
+	map(0x5, 0x6).rw(FUNC(xavix_math_device::product_r), FUNC(xavix_math_device::product_w));
+}
+
 void xavix_math_device::device_start()
 {
-	save_item(NAME(m_mpr));
-	save_item(NAME(m_mpd));
-	save_item(NAME(m_mad));
-	save_item(NAME(m_sgn_mpd));
-	save_item(NAME(m_sgn_mpr));
-	save_item(NAME(m_multresults));
+	save_item(NAME(m_multiplier_ctrl));
+	save_item(NAME(m_multiplicand));
+	save_item(NAME(m_multiplier));
+	save_item(NAME(m_result));
 }
 
 void xavix_math_device::device_reset()
 {
-	m_mpr = 0;
-	m_mpd = 0;
-	m_mad = 0;
-	m_sgn_mpd = 0;
-	m_sgn_mpr = 0;
-	std::fill(std::begin(m_multresults), std::end(m_multresults), 0x00);
+	m_multiplier_ctrl = 0;
+	m_multiplicand = 0;
+	m_multiplier = 0;
+	m_result = 0;
 }
 
-// epo_guru uses this for ground movement in 3d stages (and other places)
-uint8_t xavix_math_device::barrel_r(offs_t offset)
+u8 xavix_math_device::shift_ctrl_r()
 {
-	uint8_t ret = 0;
-	if (offset == 0)
-	{
-		ret = (m_sgn_mpd ? 0x80 : 0x00) | (m_mpr & 0x40) | (m_mpr & 0x07);
-	}
-	else
-	{
-		ret = (m_mpr & 0x40) ?
-			m_multresults[1] ^ m_multresults[0] : (m_mpr & 0x08) ?
-			m_multresults[1] : m_multresults[0];
-	}
-
-	LOG("%s: reading shift results/data %d %02x\n", machine().describe_context(), offset, ret);
-	return ret;
+	return (BIT(m_multiplier_ctrl, 1) << 7) | (m_multiplier & 0x4f);
 }
 
-// epo_guru 3d stages still flicker a lot with this, but it seems unrelated to the calculations here, possibly a raster timing issue
-void xavix_math_device::barrel_w(offs_t offset, uint8_t data)
+// epo_guru uses the shifter for ground movement in its 3D stages. They still
+// flicker heavily, but that seems unrelated to these calculations and may
+// instead be a raster-timing issue.
+void xavix_math_device::shift_ctrl_w(u8 data)
 {
-	LOG("%s: barrel_w %d %02x\n", machine().describe_context(), offset, data);
-
-	if (offset == 0)
-	{
-		m_mad = 0;
-		m_sgn_mpd = data & 0x80;
-		m_sgn_mpr = 0;
-		m_mpr = data;
-		do_math(true);
-	}
-	else
-	{
-		m_mpd = data;
-	}
+	// The shift count and input share the multiplier's operand registers.
+	// Starting a shift selects its input sign and disables accumulation.
+	LOG("%s: shift_ctrl_w %02x\n", machine().describe_context(), data);
+	m_multiplier_ctrl = BIT(data, 7) << 1;
+	m_multiplier = data;
+	// A signed four-bit count selects the low or high byte of this result.
+	s16 const value = BIT(m_multiplier_ctrl, 1) ? s8(m_multiplicand) : m_multiplicand;
+	m_result = u16(value * (1 << BIT(m_multiplier, 0, 3)));
 }
 
-uint8_t xavix_math_device::mult_r(offs_t offset)
+u8 xavix_math_device::shift_result_r()
 {
-	uint8_t ret = m_multresults[offset];
-	LOG("%s: mult_r %d %02x (read result)\n", machine().describe_context(), offset, ret);
-	return ret;
+	u8 const lower = m_result;
+	u8 const upper = m_result >> 8;
+	u8 const result = BIT(m_multiplier, 6) ? upper ^ lower : BIT(m_multiplier, 3) ? upper : lower;
+
+	if (!machine().side_effects_disabled())
+		LOG("%s: shift_result_r %02x\n", machine().describe_context(), result);
+	return result;
 }
 
-void xavix_math_device::mult_w(offs_t offset, uint8_t data)
+u8 xavix_math_device::multiplier_ctrl_r()
 {
-	LOG("%s: mult_w %d %02x (write result)\n", machine().describe_context(), offset, data);
+	return m_multiplier_ctrl;
+}
+
+void xavix_math_device::multiplier_ctrl_w(u8 data)
+{
+	// Bit 7 adds to the previous result; bits 1/0 select signed operands.
+	LOG("%s: multiplier_ctrl_w %02x\n", machine().describe_context(), data);
+	m_multiplier_ctrl = data & 0x83;
+}
+
+u8 xavix_math_device::multiplicand_r()
+{
+	return m_multiplicand;
+}
+
+void xavix_math_device::multiplicand_w(u8 data)
+{
+	LOG("%s: multiplicand_w %02x\n", machine().describe_context(), data);
+	m_multiplicand = data;
+}
+
+u8 xavix_math_device::multiplier_r()
+{
+	return m_multiplier;
+}
+
+void xavix_math_device::multiplier_w(u8 data)
+{
+	LOG("%s: multiplier_w %02x\n", machine().describe_context(), data);
+	m_multiplier = data;
+	// TODO: Model result latency if it becomes observable.
+	// Monster Truck's self-test inserts four NOPs before reading the product.
+	multiply();
+}
+
+u8 xavix_math_device::product_r(offs_t offset)
+{
+	u8 const result = BIT(m_result, 8 * offset, 8);
+	if (!machine().side_effects_disabled())
+		LOG("%s: product_r %d %02x\n", machine().describe_context(), offset, result);
+	return result;
+}
+
+void xavix_math_device::product_w(offs_t offset, u8 data)
+{
 	// rad_madf writes here to set the base value which the multiplication result gets added to
-	m_multresults[offset] = data;
+	LOG("%s: product_w %d %02x\n", machine().describe_context(), offset, data);
+	if (offset)
+		m_result = (m_result & 0x00ff) | (u16(data) << 8);
+	else
+		m_result = (m_result & 0xff00) | data;
 }
 
-uint8_t xavix_math_device::mult_param_r(offs_t offset)
+void xavix_math_device::multiply()
 {
-	uint8_t ret = 0;
+	s16 const multiplicand = BIT(m_multiplier_ctrl, 1) ? s8(m_multiplicand) : m_multiplicand;
+	s16 const multiplier = BIT(m_multiplier_ctrl, 0) ? s8(m_multiplier) : m_multiplier;
+	u16 const result = u16(multiplicand * multiplier);
 
-	if (offset == 0)
-	{
-		ret = m_mad | (m_sgn_mpd ? 0x02 : 0x00) | m_sgn_mpr;
-	}
-	else if (offset == 1)
-	{
-		ret = m_mpd;
-	}
+	if (BIT(m_multiplier_ctrl, 7))
+		m_result += result;
 	else
-	{
-		ret = m_mpr;
-	}
-
-	LOG("%s: mult_param_r %d %02x (read parameters)\n", machine().describe_context(), offset, ret);
-	return ret;
-}
-
-void xavix_math_device::do_math(bool mul_shf)
-{
-	uint16_t result = 0;
-	uint8_t mpd = m_mpd;
-	uint8_t mulinp;
-
-	if (!mul_shf)
-	{
-		mulinp = m_mpr;
-	}
-	else
-	{
-		mulinp = 1 << (m_mpr & 0x7);
-	}
-
-	if (m_sgn_mpd && (mpd & 0x80) && m_sgn_mpr && (mulinp & 0x80))
-	{
-		result = mpd * mulinp - (mpd << 8) - (mulinp << 8);
-	}
-	else if (m_sgn_mpd && (mpd & 0x80))
-	{
-		result = mpd * mulinp - (mulinp << 8);
-	}
-	else if (m_sgn_mpr && (mulinp & 0x80))
-	{
-		result = mpd * mulinp - (mpd << 8);
-	}
-	else
-	{
-		result = mpd * mulinp;
-	}
-
-	if (m_mad)
-	{
-		uint16_t oldresult = (m_multresults[1] << 8) | m_multresults[0];
-		result = oldresult + result;
-	}
-
-	m_multresults[1] = (result >> 8) & 0xff;
-	m_multresults[0] = result & 0xff;
-}
-
-void xavix_math_device::mult_param_w(offs_t offset, uint8_t data, uint8_t mem_mask)
-{
-	// there are NOPs after one of the writes, so presumably the operation is write triggerd and not intstant
-	// see test code at 0184a4 in monster truck
-
-	// offset0 is control
-
-	// m?-- --Ss
-	// m = mode, S = sign for param1, s = sign for param2
-	LOG("%s: mult_param_w %d %02x (write param1 and trigger)\n", machine().describe_context(), offset, data);
-
-	if (offset == 0)
-	{
-		m_mad = data & 0x80;
-		// sometimes 0x40 is set along with 0x80, sometimes only 0x80, why? is it important?
-
-		m_sgn_mpd = data & 0x02;
-		m_sgn_mpr = data & 0x01;
-	}
-	else if (offset == 1)
-	{
-		m_mpd = data;
-	}
-	else if (offset == 2)
-	{
-		m_mpr = data;
-		do_math(false);
-	}
+		m_result = result;
 }

@@ -1,116 +1,146 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MagikalUnicorn
+/***************************************************************************
 
-// has separate input / output addresses but still uses direction registers, or I've misunderstood this entirely.
+    SuperXaviX's three general-purpose I/O ports. Implements per-bit direction,
+    output latches and pull controls, with input masks selecting external pin
+    connections. The first two ports also serve the legacy GPIO register
+    layout through the shared I/O interface.
+
+***************************************************************************/
 
 #include "emu.h"
-#include "xavix2002_io.h"
+#include "xavix_pio.h"
 
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(XAVIX2002IO, xavix2002_io_device, "xavix2002io", "XaviX 2002 IO")
+DEFINE_DEVICE_TYPE(SUPERXAVIX_PIO, superxavix_pio_device, "superxavix_pio", "SuperXaviX PIO")
 
-xavix2002_io_device::xavix2002_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, XAVIX2002IO, tag, owner, clock)
-	, m_in0_cb(*this, 0xff)
-	, m_in1_cb(*this, 0xff)
-	, m_in2_cb(*this, 0xff)
-	, m_out0_cb(*this)
-	, m_out1_cb(*this)
-	, m_out2_cb(*this)
+superxavix_pio_device::superxavix_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: device_t(mconfig, SUPERXAVIX_PIO, tag, owner, clock)
+	, m_input_cb(*this, 0xff)
+	, m_input_mask_cb(*this, 0xff)
+	, m_output_cb(*this)
+	, m_legacy_input_cb(*this, 0xff)
+	, m_legacy_input_mask_cb(*this, 0)
+	, m_legacy_output_cb(*this)
+	, m_legacy_output_mask{ 0xff, 0xff }
 {
 }
 
-void xavix2002_io_device::device_start()
+void superxavix_pio_device::map(address_map &map)
 {
-	save_item(NAME(m_sx_pio_dir));
-	save_item(NAME(m_sx_pio_out));
+	map(0x00, 0x02).rw(FUNC(superxavix_pio_device::pio_direction_r), FUNC(superxavix_pio_device::pio_direction_w));
+	map(0x10, 0x12).rw(FUNC(superxavix_pio_device::pio_output_r), FUNC(superxavix_pio_device::pio_output_w));
+	map(0x20, 0x22).r(FUNC(superxavix_pio_device::pio_input_r));
+	map(0x30, 0x32).rw(FUNC(superxavix_pio_device::pio_pull_r), FUNC(superxavix_pio_device::pio_pull_w));
 }
 
-void xavix2002_io_device::device_reset()
+void superxavix_pio_device::device_start()
 {
-	for (int i = 0; i < 3; i++)
+	save_item(NAME(m_pio_direction));
+	save_item(NAME(m_pio_output));
+	save_item(NAME(m_pio_pull));
+}
+
+void superxavix_pio_device::device_reset()
+{
+	m_pio_direction.fill(0);
+	m_pio_output.fill(0);
+	m_pio_pull.fill(0xff);
+}
+
+u8 superxavix_pio_device::pio_direction_r(offs_t offset)
+{
+	assert(offset < m_pio_direction.size());
+	if (!machine().side_effects_disabled())
+		LOG("%s: pio_direction_r (port %u)\n", machine().describe_context(), unsigned(offset));
+	return m_pio_direction[offset];
+}
+
+void superxavix_pio_device::pio_direction_w(offs_t offset, u8 data)
+{
+	assert(offset < m_pio_direction.size());
+	LOG("%s: pio_direction_w (port %u) %02x\n", machine().describe_context(), unsigned(offset), data);
+	if (offset < m_pio_direction.size())
 	{
-		m_sx_pio_dir[i] = 0;
-		m_sx_pio_out[i] = 0;
+		m_pio_direction[offset] = data;
+		update_output(offset);
 	}
 }
 
-void xavix2002_io_device::pio_dir_w(offs_t offset, uint8_t data)
+u8 superxavix_pio_device::pio_output_r(offs_t offset)
 {
-	LOG("%s: superxavix pio_dir_w (port %d) %02x\n", machine().describe_context(), offset, data);
+	assert(offset < m_pio_output.size());
+	if (!machine().side_effects_disabled())
+		LOG("%s: pio_output_r (port %u)\n", machine().describe_context(), unsigned(offset));
+	// Pin levels are read through pio_input_r; this register reads back the output latch.
+	return m_pio_output[offset];
+}
 
-	if (offset < 3)
+void superxavix_pio_device::pio_output_w(offs_t offset, u8 data)
+{
+	assert(offset < m_pio_output.size());
+	LOG("%s: pio_output_w (port %u) %02x\n", machine().describe_context(), unsigned(offset), data);
+	if (offset < m_pio_output.size())
 	{
-		m_sx_pio_dir[offset] = data;
-		// update output port after direction change?
-		pio_out_w(offset, m_sx_pio_out[offset]);
+		m_pio_output[offset] = data;
+		update_output(offset);
 	}
 }
 
-uint8_t xavix2002_io_device::pio_dir_r(offs_t offset)
+u8 superxavix_pio_device::pio_input_r(offs_t offset)
 {
-	LOG("%s: superxavix pio_dir_r (port %d)\n", machine().describe_context(), offset);
-	uint8_t ret = 0x00;
-
-	if (offset < 3)
-	{
-		ret = m_sx_pio_dir[offset];
-	}
-
-	return ret;
+	assert(offset < m_pio_direction.size());
+	if (!machine().side_effects_disabled())
+		LOG("%s: pio_input_r (port %u)\n", machine().describe_context(), unsigned(offset));
+	return input_r(offset);
 }
 
-void xavix2002_io_device::pio_out_w(offs_t offset, uint8_t data)
+u8 superxavix_pio_device::input_r(unsigned port)
 {
-	LOG("%s: superxavix pio_out_w (port %d) %02x\n", machine().describe_context(), offset, data);
-
-	if (offset < 3)
+	u8 const drive = output_mask(port);
+	u8 const input_mask = m_input_mask_cb[port]();
+	u8 input = m_input_cb[port](0, drive) & input_mask;
+	u8 connected = input_mask;
+	if (port < 2)
 	{
-		m_sx_pio_out[offset] = data;
-
-		switch (offset)
-		{
-			case 0: m_out0_cb(0, m_sx_pio_out[offset], m_sx_pio_dir[offset]); break;
-			case 1: m_out1_cb(0, m_sx_pio_out[offset], m_sx_pio_dir[offset]); break;
-			case 2: m_out2_cb(0, m_sx_pio_out[offset], m_sx_pio_dir[offset]); break;
-			default: break;
-		}
+		u8 const legacy_mask = m_legacy_input_mask_cb(port) & ~input_mask;
+		input |= m_legacy_input_cb(port, drive) & legacy_mask;
+		connected |= legacy_mask;
 	}
+	// A released pin follows its pull-up, pull-down, or the floating high level.
+	u8 const released = ~m_pio_pull[port];
+	input |= released & ~connected;
+	return (input & ~drive) | (m_pio_output[port] & drive);
 }
 
-uint8_t xavix2002_io_device::pio_out_r(offs_t offset)
+void superxavix_pio_device::update_output(unsigned port)
 {
-	// what does this actually read?
-
-	LOG("%s: superxavix pio_out_r (port %d)\n", machine().describe_context(), offset);
-
-	uint8_t ret = 0x00;
-
-	if (offset<3)
-		ret = m_sx_pio_out[offset];
-
-	return ret;
+	u8 const drive = output_mask(port);
+	u8 const legacy_mask = port < 2 ? m_legacy_output_mask[port] : 0;
+	if (legacy_mask)
+		m_legacy_output_cb(port, input_r(port), drive & legacy_mask);
+	if (legacy_mask != 0xff)
+		m_output_cb[port](0, m_pio_output[port], drive & ~legacy_mask);
 }
 
-
-uint8_t xavix2002_io_device::pio_in_r(offs_t offset)
+u8 superxavix_pio_device::pio_pull_r(offs_t offset)
 {
-	LOG("%s: superxavix pio_in_r (port %d)\n", machine().describe_context(), offset);
+	assert(offset < m_pio_pull.size());
+	if (!machine().side_effects_disabled())
+		LOG("%s: pio_pull_r (port %u)\n", machine().describe_context(), unsigned(offset));
+	return m_pio_pull[offset];
+}
 
-	uint8_t ret = 0x00;
-
-	switch (offset)
+void superxavix_pio_device::pio_pull_w(offs_t offset, u8 data)
+{
+	assert(offset < m_pio_pull.size());
+	LOG("%s: pio_pull_w (port %u) %02x\n", machine().describe_context(), unsigned(offset), data);
+	if (offset < m_pio_pull.size())
 	{
-		case 0: ret = m_in0_cb(0, m_sx_pio_dir[offset]); break;
-		case 1: ret = m_in1_cb(0, m_sx_pio_dir[offset]); break;
-		case 2: ret = m_in2_cb(0, m_sx_pio_dir[offset]); break;
-		default: ret = 0x00; break;
+		m_pio_pull[offset] = data;
+		update_output(offset);
 	}
-
-	ret &= ~m_sx_pio_dir[offset];
-	ret |= m_sx_pio_out[offset] & m_sx_pio_dir[offset];
-
-	return ret;
 }

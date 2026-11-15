@@ -1,44 +1,65 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MagikalUnicorn
+/***************************************************************************
+
+    Cartridge slot and bus interface for XaviX systems. Loads cartridge ROM
+    images from files or software lists and forwards ROM accesses, bus-control
+    writes and optional I2C lines to the installed cartridge device.
+
+***************************************************************************/
 
 #include "emu.h"
-#include "slot.h"
+#include "cart.h"
 
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
+#include <algorithm>
+#include <bit>
 
-DEFINE_DEVICE_TYPE(EKARA_CART_SLOT, ekara_cart_slot_device, "ekara_cart_slot", "e-kara Cartridge Slot")
+DEFINE_DEVICE_TYPE(XAVIX_CART_SLOT, xavix_cart_slot_device, "xavix_cart_slot", "XaviX Cartridge Slot")
 
-//**************************************************************************
-//    EKARA cartridges Interface
-//**************************************************************************
-
-//-------------------------------------------------
-//  device_ekara_cart_interface - constructor
-//-------------------------------------------------
-
-device_ekara_cart_interface::device_ekara_cart_interface(const machine_config &mconfig, device_t &device) :
-	device_interface(device, "ekaracart"),
+device_xavix_cart_interface::device_xavix_cart_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "xavixcart"),
 	m_rom(nullptr),
 	m_rom_size(0)
 {
 }
 
-
-//-------------------------------------------------
-//  ~device_ekara_cart_interface - destructor
-//-------------------------------------------------
-
-device_ekara_cart_interface::~device_ekara_cart_interface()
+device_xavix_cart_interface::~device_xavix_cart_interface()
 {
 }
 
-//-------------------------------------------------
-//  rom_alloc - alloc the space for the cart
-//-------------------------------------------------
+xavix_cart_slot_device::xavix_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, XAVIX_CART_SLOT, tag, owner, clock),
+	device_cartrom_image_interface(mconfig, *this),
+	device_single_card_slot_interface<device_xavix_cart_interface>(mconfig, *this)
+{
+}
 
-void device_ekara_cart_interface::rom_alloc(uint32_t size)
+std::string xavix_cart_slot_device::get_default_card_software(get_default_card_software_hook &) const
+{
+	return software_get_default_slot("plain");
+}
+
+bool xavix_cart_slot_device::is_reset_on_load() const noexcept
+{
+	return true;
+}
+
+const char *xavix_cart_slot_device::image_interface() const noexcept
+{
+	return "xavix_cart";
+}
+
+const char *xavix_cart_slot_device::file_extensions() const noexcept
+{
+	return "bin,u1";
+}
+
+void xavix_cart_slot_device::device_start()
+{
+	m_cart = get_card_device();
+}
+
+void device_xavix_cart_interface::rom_alloc(uint32_t size)
 {
 	if (m_rom == nullptr)
 	{
@@ -47,227 +68,61 @@ void device_ekara_cart_interface::rom_alloc(uint32_t size)
 	}
 }
 
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  ekara_cart_slot_device - constructor
-//-------------------------------------------------
-ekara_cart_slot_device::ekara_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, EKARA_CART_SLOT, tag, owner, clock),
-	device_cartrom_image_interface(mconfig, *this),
-	device_single_card_slot_interface<device_ekara_cart_interface>(mconfig, *this),
-	m_type(EKARA_PLAIN),
-	m_cart(nullptr)
-{
-}
-
-//-------------------------------------------------
-//  ekara_cart_slot_device - destructor
-//-------------------------------------------------
-
-ekara_cart_slot_device::~ekara_cart_slot_device()
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void ekara_cart_slot_device::device_start()
-{
-	m_cart = get_card_device();
-}
-
-//-------------------------------------------------
-//  EKARA PCB
-//-------------------------------------------------
-
-struct ekara_slot
-{
-	int                     pcb_id;
-	const char              *slot_option;
-};
-
-// Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
-static const ekara_slot slot_list[] =
-{
-	{ EKARA_PLAIN,       "plain" },
-	{ EKARA_I2C_BASE,    "i2c_base" },
-	{ EKARA_I2C_24C08,   "rom_24c08" },
-	{ EKARA_I2C_24LC04,  "rom_24lc04" },
-	{ EKARA_I2C_24LC02,  "rom_24lc02" },
-};
-
-static int ekara_get_pcb_id(const char *slot)
-{
-	for (auto & elem : slot_list)
-	{
-		if (!strcmp(elem.slot_option, slot))
-			return elem.pcb_id;
-	}
-
-	return 0;
-}
-
-static const char *ekara_get_slot(int type)
-{
-	for (auto & elem : slot_list)
-	{
-		if (elem.pcb_id == type)
-			return elem.slot_option;
-	}
-
-	return "plain";
-}
-
-
-/*-------------------------------------------------
- call load
- -------------------------------------------------*/
-
-std::pair<std::error_condition, std::string> ekara_cart_slot_device::call_load()
+std::pair<std::error_condition, std::string> xavix_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		uint32_t const len = !loaded_through_softlist() ? length() : get_software_region_length("rom");
+		bool const softlist = loaded_through_softlist();
+		uint8_t const *const source = softlist ? get_software_region("rom") : nullptr;
+		if (softlist && !source)
+			return std::make_pair(image_error::BADSOFTWARE, "Software list item is missing 'rom' region");
 
-		m_cart->rom_alloc(len);
+		uint64_t const size = softlist ? get_software_region_length("rom") : length();
+		if (!size)
+			return std::make_pair(image_error::INVALIDLENGTH, "Cartridges must not be empty");
+		// Supported unbanked cartridges are mapped within 23 address bits.
+		if (size > 0x800000)
+			return std::make_pair(image_error::INVALIDLENGTH, "Cartridges must be no larger than 8 MiB (0x800000 bytes)");
+		if (!std::has_single_bit(size))
+			return std::make_pair(image_error::INVALIDLENGTH, "Cartridge size must be a power of two");
 
-		uint8_t *const ROM = m_cart->get_rom_base();
-
-		if (!loaded_through_softlist())
-			fread(ROM, len);
-		else
-			memcpy(ROM, get_software_region("rom"), len);
-
-		if (!loaded_through_softlist())
-		{
-			// attempt to detect cart type without softlist assistance
-			m_type = get_cart_type(ROM, len);
-		}
-		else
-		{
-			// or for softlist loading, use the type specified
-			const char *pcb_name = get_feature("slot");
-			if (pcb_name)
-				m_type = ekara_get_pcb_id(pcb_name);
-		}
+		uint32_t const size_bytes = uint32_t(size);
+		m_cart->rom_alloc(size_bytes);
+		if (softlist)
+			std::copy_n(source, size_bytes, m_cart->get_rom_base());
+		else if (fread(m_cart->get_rom_base(), size_bytes) != size_bytes)
+			return std::make_pair(std::errc::io_error, "Error reading cartridge file");
 	}
 
 	return std::make_pair(std::error_condition(), std::string());
 }
 
-
-/*-------------------------------------------------
- get_cart_type - code to detect cart type from
- fullpath
- -------------------------------------------------*/
-
-int ekara_cart_slot_device::get_cart_type(const uint8_t *ROM, uint32_t len)
-{
-	// without code analysis we have no way of knowing.
-	int type = EKARA_PLAIN;
-	return type;
-}
-
-
-/*-------------------------------------------------
- get default card software
- -------------------------------------------------*/
-
-std::string ekara_cart_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
-{
-	if (hook.image_file())
-	{
-		uint64_t len;
-		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
-		std::vector<uint8_t> rom(len);
-
-		/*auto const [err, actual] =*/ read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
-
-		int const type = get_cart_type(&rom[0], len);
-		char const *const slot_string = ekara_get_slot(type);
-
-		//printf("type: %s\n", slot_string);
-
-		return std::string(slot_string);
-	}
-
-	return software_get_default_slot("plain");
-}
-
-/*-------------------------------------------------
- read
- -------------------------------------------------*/
-
-uint8_t ekara_cart_slot_device::read_cart(offs_t offset)
+uint8_t xavix_cart_slot_device::read_cart(offs_t offset)
 {
 	return m_cart->read_cart(offset);
 }
 
-/*-------------------------------------------------
- write
- -------------------------------------------------*/
-
-void ekara_cart_slot_device::write_cart(offs_t offset, uint8_t data)
+void xavix_cart_slot_device::write_cart(offs_t offset, uint8_t data)
 {
 	m_cart->write_cart(offset, data);
 }
 
-/*-------------------------------------------------
- read extra
- -------------------------------------------------*/
-
-uint8_t ekara_cart_slot_device::read_extra(offs_t offset)
-{
-	return m_cart->read_extra(offset);
-}
-
-/*-------------------------------------------------
- write extra
- -------------------------------------------------*/
-
-void ekara_cart_slot_device::write_extra(offs_t offset, uint8_t data)
-{
-	m_cart->write_extra(offset, data);
-}
-
-/*-------------------------------------------------
- write control
- -------------------------------------------------*/
-
-void ekara_cart_slot_device::write_bus_control(offs_t offset, uint8_t data)
+void xavix_cart_slot_device::write_bus_control(offs_t offset, uint8_t data)
 {
 	m_cart->write_bus_control(offset, data);
 }
 
-bool ekara_cart_slot_device::is_read_access_not_rom(void)
-{
-	return m_cart->is_read_access_not_rom();
-}
-
-bool ekara_cart_slot_device::is_write_access_not_rom(void)
-{
-	return m_cart->is_write_access_not_rom();
-}
-
-/*-------------------------------------------------
- direct seeprom access (popira2, gc0010)
- -------------------------------------------------*/
-
-void ekara_cart_slot_device::write_sda(int state)
+void xavix_cart_slot_device::write_sda(int state)
 {
 	m_cart->write_sda(state);
 }
 
-void ekara_cart_slot_device::write_scl(int state)
+void xavix_cart_slot_device::write_scl(int state)
 {
 	m_cart->write_scl(state);
 }
 
-int ekara_cart_slot_device::read_sda()
+int xavix_cart_slot_device::read_sda()
 {
-	return  m_cart->read_sda();
+	return m_cart->read_sda();
 }
