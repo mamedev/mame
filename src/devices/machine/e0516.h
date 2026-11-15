@@ -66,6 +66,7 @@ private:
 	int m_state;
 	int m_bits_left;
 	bool m_dio;
+	bool m_dout;
 	bool m_reset;
 
 	offs_t get_address() { return (m_reg_latch >> 1) & 0x07; }
