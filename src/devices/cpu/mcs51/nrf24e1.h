@@ -14,7 +14,7 @@ public:
 	nrf24e1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	void set_eeprom_region(const char *tag) { m_eeprom.set_tag(*this, tag); }
 	auto eeprom_read_cb() { return m_eeprom_read_cb.bind(); }
-	template <unsigned Port> auto gpio_out_cb() { return m_gpio_out_cb[Port].bind(); }
+	template <u32 Port> auto gpio_out_cb() { return m_gpio_out_cb[Port].bind(); }
 	auto adc_read_cb() { return m_adc_read_cb.bind(); }
 	auto spi_clock_cb() { return m_spi_clock_cb.bind(); }
 	auto spi_mosi_cb() { return m_spi_mosi_cb.bind(); }
@@ -74,10 +74,10 @@ private:
 	void clock_control_w(u8 data);
 	u8 extra_r(offs_t offset);
 	void extra_w(offs_t offset, u8 data);
-	u8 gpio_r(unsigned port);
-	void gpio_w(unsigned port, u8 data);
-	void update_gpio(unsigned port);
-	u8 gpio_drive_mask(unsigned port) const;
+	u8 gpio_r(u32 port);
+	void gpio_w(u32 port, u8 data);
+	void update_gpio(u32 port);
+	u8 gpio_drive_mask(u32 port) const;
 	u8 radio_r();
 	void radio_w(u8 data);
 	void adc_start(bool continuous = false);

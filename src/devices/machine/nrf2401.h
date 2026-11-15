@@ -32,24 +32,24 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	static constexpr unsigned CONFIG_BYTES = 18;
-	static constexpr unsigned PACKET_BITS = 256;
+	static constexpr u32 CONFIG_BYTES = 18;
+	static constexpr u32 PACKET_BITS = 256;
 	static constexpr u8 RESET_CONFIG[CONFIG_BYTES] =
 	{
 		0x04, 0x0f, 0x21, 0xe7, 0x00, 0x00, 0x00, 0x00, 0xe7,
 		0x00, 0x00, 0x00, 0x00, 0x20, 0x20, 0x1c, 0x08, 0x8e
 	};
 
-	static unsigned crc_bits(u8 config) { return BIT(config, 0) ? (BIT(config, 1) ? 16 : 8) : 0; }
-	static int packet_bit(const u8 *data, unsigned bit) { return BIT(data[bit / 8], 7 - (bit & 7)); }
-	static void set_packet_bit(u8 *data, unsigned bit, int state);
+	static u32 crc_bits(u8 config) { return BIT(config, 0) ? (BIT(config, 1) ? 16 : 8) : 0; }
+	static int packet_bit(const u8 *data, u32 bit) { return BIT(data[bit / 8], 7 - (bit & 7)); }
+	static void set_packet_bit(u8 *data, u32 bit, int state);
 	bool receiving() const { return m_pwr_up && m_ce && !m_cs && !m_tx_busy && BIT(m_config[0], 0) && BIT(m_config[1], 6); }
-	void set_dr(unsigned channel, bool state);
+	void set_dr(u32 channel, bool state);
 	void restart_receiver();
 	void cancel_reception();
-	void clock_rx(unsigned channel, bool state);
+	void clock_rx(u32 channel, bool state);
 	void begin_transmit();
-	void receive_packet(const u8 *data, unsigned bits, const u8 *config, const attotime &duration);
+	void receive_packet(const u8 *data, u32 bits, const u8 *config, const attotime &duration);
 	TIMER_CALLBACK_MEMBER(transmit_tick);
 	TIMER_CALLBACK_MEMBER(receive_tick);
 

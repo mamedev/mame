@@ -34,7 +34,7 @@ nrf2401_device::nrf2401_device(const machine_config &mconfig, const char *tag, d
 void nrf2401_device::device_start()
 {
 	m_tx_timer = timer_alloc(FUNC(nrf2401_device::transmit_tick), this);
-	for (unsigned channel = 0; channel < 2; channel++)
+	for (u32 channel = 0; channel < 2; channel++)
 		m_rx_timer[channel] = timer_alloc(FUNC(nrf2401_device::receive_tick), this);
 
 	save_item(NAME(m_config));
@@ -74,7 +74,7 @@ void nrf2401_device::device_reset()
 	m_tx_timer->adjust(attotime::never);
 	if (m_peer)
 		m_peer->cancel_reception();
-	for (unsigned channel = 0; channel < 2; channel++)
+	for (u32 channel = 0; channel < 2; channel++)
 	{
 		std::fill(std::begin(m_rx_buffer[channel]), std::end(m_rx_buffer[channel]), 0);
 		m_rx_bits[channel] = 0;
@@ -128,12 +128,12 @@ void nrf2401_device::cs_w(int state)
 	else if (m_pwr_up && m_config_bits && (m_config_bits <= CONFIG_BYTES * 8))
 	{
 		// Only the low bits written in this transaction replace the configuration.
-		unsigned const bytes = m_config_bits / 8;
-		unsigned const remainder = m_config_bits & 7;
+		u32 const bytes = m_config_bits / 8;
+		u32 const remainder = m_config_bits & 7;
 		std::copy_n(m_config_shift.begin(), bytes, m_config.begin());
 		if (remainder)
 		{
-			u8 const mask = (1U << remainder) - 1;
+			u8 const mask = util::make_bitmask<u8>(remainder);
 			m_config[bytes] = (m_config[bytes] & ~mask) | (m_config_shift[bytes] & mask);
 		}
 		LOGMASKED(LOG_CONFIG, "Config %u bits: channel %u %s, mode %02x, address/CRC %02x, payload %u/%u bits\n",
@@ -170,7 +170,7 @@ void nrf2401_device::clock_w(int state)
 		{
 			if (m_config_bits < CONFIG_BYTES * 8)
 			{
-				for (unsigned byte = CONFIG_BYTES - 1; byte > 0; byte--)
+				for (u32 byte = CONFIG_BYTES - 1; byte > 0; byte--)
 					m_config_shift[byte] = (m_config_shift[byte] << 1) | (m_config_shift[byte - 1] >> 7);
 				m_config_shift[0] = (m_config_shift[0] << 1) | m_data;
 			}
@@ -203,13 +203,13 @@ int nrf2401_device::data2_r() const
 	return m_dr[1] ? packet_bit(m_rx_buffer[1], m_rx_position[1]) : 0;
 }
 
-void nrf2401_device::set_packet_bit(u8 *data, unsigned bit, int state)
+void nrf2401_device::set_packet_bit(u8 *data, u32 bit, int state)
 {
 	u8 const mask = 0x80 >> (bit & 7);
 	data[bit / 8] = (data[bit / 8] & ~mask) | (state ? mask : 0);
 }
 
-void nrf2401_device::set_dr(unsigned channel, bool state)
+void nrf2401_device::set_dr(u32 channel, bool state)
 {
 	if (m_dr[channel] != state)
 	{
@@ -221,20 +221,20 @@ void nrf2401_device::set_dr(unsigned channel, bool state)
 void nrf2401_device::restart_receiver()
 {
 	cancel_reception();
-	for (unsigned channel = 0; channel < 2; channel++)
+	for (u32 channel = 0; channel < 2; channel++)
 		m_rx_ready[channel] = receiving() ? std::max(m_power_ready, machine().time() + attotime::from_usec(202)) : attotime::never;
 }
 
 void nrf2401_device::cancel_reception()
 {
-	for (unsigned channel = 0; channel < 2; channel++)
+	for (u32 channel = 0; channel < 2; channel++)
 	{
 		m_rx_pending[channel] = false;
 		m_rx_timer[channel]->adjust(attotime::never);
 	}
 }
 
-void nrf2401_device::clock_rx(unsigned channel, bool state)
+void nrf2401_device::clock_rx(u32 channel, bool state)
 {
 	// DATA is valid before the first rising edge and advances on falling edges.
 	if (m_clock[channel] && !state && m_pwr_up && !m_cs && m_dr[channel])
@@ -279,27 +279,27 @@ TIMER_CALLBACK_MEMBER(nrf2401_device::transmit_tick)
 	}
 }
 
-void nrf2401_device::receive_packet(const u8 *data, unsigned bits, const u8 *config, const attotime &duration)
+void nrf2401_device::receive_packet(const u8 *data, u32 bits, const u8 *config, const attotime &duration)
 {
 	if (!receiving() || ((m_config[1] ^ config[1]) & 0x20) || (crc_bits(m_config[2]) != crc_bits(config[2])))
 		return;
 
-	unsigned const address_bits = m_config[2] >> 2;
+	u32 const address_bits = m_config[2] >> 2;
 	if ((address_bits < 8) || (address_bits > 40))
 		return;
 
-	for (unsigned channel = 0; channel < (BIT(m_config[1], 7) ? 2U : 1U); channel++)
+	for (u32 channel = 0; channel < (BIT(m_config[1], 7) ? 2U : 1U); channel++)
 	{
-		unsigned const payload_bits = m_config[13 + channel];
+		u32 const payload_bits = m_config[13 + channel];
 		if ((m_config[0] >> 1) + channel * 8 != (config[0] >> 1)
 			|| m_dr[channel] || m_rx_pending[channel] || (machine().time() < m_rx_ready[channel])
 			|| !payload_bits || (bits != address_bits + payload_bits))
 			continue;
 
 		bool match = true;
-		for (unsigned bit = 0; bit < address_bits; bit++)
+		for (u32 bit = 0; bit < address_bits; bit++)
 		{
-			unsigned const address_bit = address_bits - 1 - bit;
+			u32 const address_bit = address_bits - 1 - bit;
 			if (packet_bit(data, bit) != BIT(m_config[3 + channel * 5 + address_bit / 8], address_bit & 7))
 			{
 				match = false;
@@ -309,7 +309,7 @@ void nrf2401_device::receive_packet(const u8 *data, unsigned bits, const u8 *con
 		if (!match)
 			continue;
 
-		for (unsigned bit = 0; bit < payload_bits; bit++)
+		for (u32 bit = 0; bit < payload_bits; bit++)
 			set_packet_bit(m_rx_buffer[channel], bit, packet_bit(data, address_bits + bit));
 		m_rx_bits[channel] = payload_bits;
 		m_rx_position[channel] = 0;

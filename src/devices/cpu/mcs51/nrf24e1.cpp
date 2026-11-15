@@ -21,6 +21,7 @@
 
 #include <algorithm>
 #include <iterator>
+#include <vector>
 
 DEFINE_DEVICE_TYPE(NRF24E1, nrf24e1_device, "nrf24e1", "Nordic nRF24E1")
 
@@ -39,7 +40,7 @@ nrf24e1_device::nrf24e1_device(const machine_config &mconfig, const char *tag, d
 	m_num_interrupts = 11;
 	m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(nrf24e1_device::ram_map), this));
 	m_xdata_config = address_space_config("xdata", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(nrf24e1_device::ram_map), this));
-	for (unsigned port = 0; port != 8; ++port)
+	for (u32 port = 0; port != 8; ++port)
 	{
 		m_port_in_cb[port].bind().set_constant(0xff);
 		m_port_out_cb[port].bind().set_nop();
@@ -73,6 +74,23 @@ void nrf24e1_device::device_add_mconfig(machine_config &config)
 void nrf24e1_device::device_start()
 {
 	dw8051_device::device_start();
+	std::erase_if(m_state_list, [] (auto const &entry)
+	{
+		int const index = entry->index();
+		return index == MCS51_P0 || index == MCS51_P1
+			|| index == MCS51_P2 || index == MCS51_P3;
+	});
+	state_add<u8>(MCS51_P0, "P0",
+		[this] () -> u8 { auto dis = machine().disable_side_effects(); return gpio_r(0); },
+		[this] (u8 data) { gpio_w(0, data); }).formatstr("%02X");
+	state_add<u8>(MCS51_P1, "P1",
+		[this] () -> u8 { auto dis = machine().disable_side_effects(); return gpio_r(1); },
+		[this] (u8 data) { gpio_w(1, data); }).formatstr("%02X");
+	state_add<u8>(MCS51_P2, "P2",
+		[this] () -> u8 { auto dis = machine().disable_side_effects(); return radio_r(); },
+		[this] (u8 data) { radio_w(data); }).formatstr("%02X");
+	state_add<u8>(MCS51_P3, "P3", [] () -> u8 { return 0xff; }, [] (u8) { }).formatstr("%02X").noshow();
+
 	m_adc_timer = timer_alloc(FUNC(nrf24e1_device::adc_complete), this);
 	m_spi_timer = timer_alloc(FUNC(nrf24e1_device::spi_tick), this);
 	m_regx_timer = timer_alloc(FUNC(nrf24e1_device::regx_complete), this);
@@ -153,8 +171,8 @@ void nrf24e1_device::bootstrap()
 	m_booted = false;
 	if (m_eeprom.bytes() < 3)
 		fatalerror("%s: invalid nRF24E1 EEPROM header\n", tag());
-	auto const read_byte = [this] (unsigned address) -> u8 { return m_eeprom_read_cb.isunset() ? m_eeprom[address] : m_eeprom_read_cb(address); };
-	unsigned const offset = read_byte(1);
+	auto const read_byte = [this] (u32 address) -> u8 { return m_eeprom_read_cb.isunset() ? m_eeprom[address] : m_eeprom_read_cb(address); };
+	u32 const offset = read_byte(1);
 	if (offset < 3 || offset >= m_eeprom.bytes())
 	{
 		// The mask ROM's failure path is undumped; do not execute stale program RAM.
@@ -163,9 +181,9 @@ void nrf24e1_device::bootstrap()
 	}
 	// Existing EEPROM programs call routines in page N, so the page count is
 	// treated as inclusive. Verify this against the undumped bootstrap ROM.
-	unsigned const length = std::min<unsigned>({ 0x1000, unsigned(m_eeprom.bytes() - offset), (unsigned(read_byte(2)) + 1) * 0x100 - offset });
+	u32 const length = std::min<u32>({ 0x1000, u32(m_eeprom.bytes() - offset), (u32(read_byte(2)) + 1) * 0x100 - offset });
 	std::fill_n(&m_program_ram[0], 0x1000, 0);
-	for (unsigned address = 0; address != length; ++address)
+	for (u32 address = 0; address != length; ++address)
 		m_program_ram[address] = read_byte(address + offset);
 	m_extra[SFR_RSTREAS] = 0x01;
 	m_pc = 0;
@@ -237,7 +255,7 @@ void nrf24e1_device::sample_gpio()
 {
 	u8 const p0 = gpio_r(0);
 	u8 const p1 = gpio_r(1);
-	for (unsigned pin = 3; pin != 5; ++pin)
+	for (u32 pin = 3; pin != 5; ++pin)
 	{
 		bool const active = BIT(m_extra[SFR_P0_ALT], pin) && !BIT(p0, pin);
 		execute_set_input(pin - 3, active ? ASSERT_LINE : CLEAR_LINE);
@@ -315,7 +333,7 @@ void nrf24e1_device::clock_control_w(u8 data)
 	m_extra[SFR_CK_CTRL] = data;
 }
 
-u8 nrf24e1_device::gpio_drive_mask(unsigned port) const
+u8 nrf24e1_device::gpio_drive_mask(u32 port) const
 {
 	u8 mask = ~m_extra[SFR_P0_DIR + port * 2];
 	if (!port)
@@ -331,7 +349,7 @@ u8 nrf24e1_device::gpio_drive_mask(unsigned port) const
 	return mask;
 }
 
-u8 nrf24e1_device::gpio_r(unsigned port)
+u8 nrf24e1_device::gpio_r(u32 port)
 {
 	u8 const latch = port ? m_p1 : m_p0;
 	if (m_rwm)
@@ -340,13 +358,13 @@ u8 nrf24e1_device::gpio_r(unsigned port)
 	return (latch & mask) | (m_port_in_cb[port]() & ~mask);
 }
 
-void nrf24e1_device::gpio_w(unsigned port, u8 data)
+void nrf24e1_device::gpio_w(u32 port, u8 data)
 {
 	(port ? m_p1 : m_p0) = data;
 	update_gpio(port);
 }
 
-void nrf24e1_device::update_gpio(unsigned port)
+void nrf24e1_device::update_gpio(u32 port)
 {
 	m_gpio_out_cb[port](0, port ? m_p1 : m_p0, gpio_drive_mask(port));
 }
@@ -391,7 +409,7 @@ void nrf24e1_device::adc_start(bool continuous)
 	m_adc_sample = m_adc_read_cb(m_extra[SFR_ADCCON] & 0x0f) & 0x0fff;
 	m_adc_resolution = m_extra[SFR_ADCSTATIC] & 3;
 	u32 const divider = BIT(m_extra[SFR_ADCSTATIC], 5) ? 8 : 32;
-	unsigned const cycles = (continuous ? 4 : 6) + m_adc_resolution;
+	u32 const cycles = (continuous ? 4 : 6) + m_adc_resolution;
 	attotime const duration = clocks_to_attotime(cycles * divider);
 	m_adc_remaining = BIT(m_extra[SFR_CK_CTRL], 1) ? duration : attotime::never;
 	m_adc_timer->adjust(BIT(m_extra[SFR_CK_CTRL], 1) ? attotime::never : duration);
@@ -494,9 +512,9 @@ TIMER_CALLBACK_MEMBER(nrf24e1_device::low_power_tick)
 	if (++m_low_power_phase == 2)
 	{
 		m_low_power_phase = 0;
-		if ((m_t2con & 0x0c) == 0x0c && !BIT(m_extra[SFR_CK_CTRL], 1))
+		if (BIT(m_t2con, T2CON_TR2) && BIT(m_t2con, T2CON_EXEN2) && !BIT(m_extra[SFR_CK_CTRL], 1))
 		{
-			if (!(m_t2con & 0x30))
+			if (!BIT(m_t2con, T2CON_RCLK) && !BIT(m_t2con, T2CON_TCLK))
 			{
 				if (BIT(m_t2con, T2CON_CP))
 					m_rcap2 = m_t2;
