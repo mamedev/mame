@@ -196,6 +196,38 @@ void generalplus_gpac800_vbaby_game_state::generalplus_gpl16258vb_nand128mbyte_2
 	SOFTWARE_LIST(config, "cart_list").set_original("vbaby_cart");
 }
 
+void generalplus_gpac800_behero_game_state::behero_init(machine_config &config)
+{
+	generalplus_gpac800_nand64mbyte(config);
+
+	I2C_24C08(config, m_eeprom);
+	m_maincpu->portd_in().set(FUNC(generalplus_gpac800_behero_game_state::portd_r));
+	m_maincpu->portd_out().set(FUNC(generalplus_gpac800_behero_game_state::portd_w));
+}
+
+void generalplus_gpac800_behero_game_state::portd_update()
+{
+	const u16 dir = m_maincpu->space(AS_PROGRAM).read_word(0x787a);
+	m_eeprom->write_scl(BIT(m_portd_latch, 3));
+	m_eeprom->write_sda(BIT(dir, 4) ? BIT(m_portd_latch, 4) : 1);
+}
+
+void generalplus_gpac800_behero_game_state::portd_w(u16 data)
+{
+	portd_update();
+	m_portd_latch = data;
+}
+
+u16 generalplus_gpac800_behero_game_state::portd_r()
+{
+	portd_update();
+	u16 data = m_portd_latch;
+	if (!BIT(m_maincpu->space(AS_PROGRAM).read_word(0x787a), 4))
+		data = (data & ~0x10) | (m_eeprom->read_sda() << 4);
+
+	return data;
+}
+
 static INPUT_PORTS_START( jak_car2 )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
@@ -958,7 +990,7 @@ CONS(2014, jak_wdbg, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplu
 // - Infrared sensor
 // Button board marked "NEEPCB#2789BR1 / 2010-5-31"
 // Barcode reader board marked "NEEPCB#2789C / 20100506"
-CONS(2010?, behero, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init, "Giochi Preziosi", "Be Hero - Be your legend (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS(2010?, behero, 0, 0, behero_init, jak_car2, generalplus_gpac800_behero_game_state, nand_init, "Giochi Preziosi", "Be Hero - Be your legend (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ----------------------------------------------------
 // these all use RAM up to 2fff

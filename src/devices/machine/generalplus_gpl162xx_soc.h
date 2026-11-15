@@ -320,6 +320,8 @@ private:
 
 	u16 m_ioc_data;
 
+	u16 m_iod_buffer;
+
 	u16 m_ioe_dir;
 	u16 m_ioe_attrib;
 
