@@ -209,15 +209,16 @@ void i8251_device::receive_clock()
 		receive_register_update_bit(m_rxd);
 		if (is_receive_register_synchronized())
 		{
-			if (sync || m_br_factor == 1)
+			if (!sync && m_br_factor > 1)
 			{
-				m_rxc_count = m_br_factor;
+				// a start bit has just been seen: check it again half a bit
+				// from now
+				m_rx_start_check = true;
+				m_rxc_count = m_br_factor / 2;
 			}
 			else
 			{
-				// check the start bit again half a bit from now
-				m_rx_start_check = true;
-				m_rxc_count = m_br_factor / 2;
+				m_rxc_count = m_br_factor;
 			}
 		}
 
