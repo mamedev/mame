@@ -224,101 +224,45 @@ ioport_constructor valkyrie_device::device_input_ports() const
 
 u32 valkyrie_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]) + 0x1000;
-	const pen_t *pens = m_palette->pens();
-
-	if (m_video_timing & 0x80)
+	if ((m_video_timing & 0x80) || timing_stopped() || (m_mode > 4))
 	{
+		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
 
-	const u32 stride = (m_stride << m_mode);
-	switch (m_mode)
+	auto const vram8 = util::big_endian_cast<u8 const>(&m_vram[0]) + 0x1000;
+	auto const vram16 = util::big_endian_cast<u16 const>(&m_vram[0]) + 0x800;
+	const pen_t *const pens = m_palette->pens();
+	const u32 stride = m_stride << m_mode;
+	const u32 depth = 1U << m_mode;
+	const u32 pixel_mask = util::make_bitmask<u32>(depth);
+	rectangle clip(0, m_hres - 1, 0, m_vres - 1);
+	clip &= cliprect;
+
+	for (int y = clip.top(); y <= clip.bottom(); y++)
 	{
-		case 0: // 1bpp
+		u32 *const scanline = &bitmap.pix(y);
+		if (m_mode < 4)
 		{
-			for (int y = 0; y < m_vres; y++)
+			for (int x = clip.left(); x <= clip.right(); x++)
 			{
-				u32 *scanline = &bitmap.pix(y);
-				for (int x = 0; x < m_hres/8; x++)
-				{
-					u8 const pixels = vram8[(y * stride) + x];
-
-					*scanline++ = pens[(pixels>>7)&1];
-					*scanline++ = pens[(pixels>>6)&1];
-					*scanline++ = pens[(pixels>>5)&1];
-					*scanline++ = pens[(pixels>>4)&1];
-					*scanline++ = pens[(pixels>>3)&1];
-					*scanline++ = pens[(pixels>>2)&1];
-					*scanline++ = pens[(pixels>>1)&1];
-					*scanline++ = pens[(pixels&1)];
-				}
+				const u32 bit = x * depth;
+				const u8 pixels = vram8[(y * stride) + (bit >> 3)];
+				scanline[x] = pens[(pixels >> (8 - depth - (bit & 7))) & pixel_mask];
 			}
 		}
-		break;
-
-		case 1: // 2bpp
+		else // 16bpp x555
 		{
-			for (int y = 0; y < m_vres; y++)
+			for (int x = clip.left(); x <= clip.right(); x++)
 			{
-				u32 *scanline = &bitmap.pix(y);
-				for (int x = 0; x < m_hres/4; x++)
-				{
-					u8 const pixels = vram8[(y * stride) + x];
-
-					*scanline++ = pens[((pixels>>6)&3)];
-					*scanline++ = pens[((pixels>>4)&3)];
-					*scanline++ = pens[((pixels>>2)&3)];
-					*scanline++ = pens[(pixels&3)];
-				}
+				const u16 pixels = vram16[(y * (stride >> 1)) + x];
+				scanline[x] = rgb_t(BIT(pixels, 10, 5) << 3, BIT(pixels, 5, 5) << 3, BIT(pixels, 0, 5) << 3);
 			}
 		}
-		break;
-
-		case 2: // 4bpp
-		{
-			for (int y = 0; y < m_vres; y++)
-			{
-				u32 *scanline = &bitmap.pix(y);
-				for (int x = 0; x < m_hres/2; x++)
-				{
-					u8 const pixels = vram8[(y * stride) + x];
-
-					*scanline++ = pens[(pixels>>4)];
-					*scanline++ = pens[(pixels&0xf)];
-				}
-			}
-		}
-		break;
-
-		case 3: // 8bpp
-		{
-			for (int y = 0; y < m_vres; y++)
-			{
-				u32 *scanline = &bitmap.pix(y);
-				for (int x = 0; x < m_hres; x++)
-				{
-					u8 const pixels = vram8[(y * stride) + x];
-					*scanline++ = pens[pixels];
-				}
-			}
-			draw_video_window(bitmap, cliprect, stride);
-		}
-		break;
-
-		case 4: // 16bpp x555
-			for (int y = 0; y < m_vres; y++)
-			{
-				u32 *scanline = &bitmap.pix(y);
-				for (int x = 0; x < m_hres; x++)
-				{
-					u16 const pixels = (vram8[(y * stride) + (x<<1)] << 8) | vram8[(y * stride) + (x<<1) + 1];
-					*scanline++ = rgb_t(((pixels >> 10) & 0x1f) << 3, ((pixels >> 5) & 0x1f) << 3, (pixels & 0x1f) << 3);
-				}
-			}
-			break;
 	}
 
+	if (m_mode == 3)
+		draw_video_window(bitmap, clip, stride);
 	return 0;
 }
 
