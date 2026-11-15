@@ -512,10 +512,10 @@ void z80scc_device::device_reset_after_children()
 	m_chanB->m_wr10  = 0x00;
 	m_chanA->m_wr11  = 0x08;
 	m_chanB->m_wr11  = 0x08;
-	m_chanA->m_wr14 &= 0xf0;
-	m_chanA->m_wr14 |= 0x30;
-	m_chanB->m_wr14 &= 0xf0;
-	m_chanB->m_wr14 |= 0x30;
+	m_chanA->m_wr14 &= 0xc0;
+	m_chanA->m_wr14 |= 0x20;
+	m_chanB->m_wr14 &= 0xc0;
+	m_chanB->m_wr14 |= 0x20;
 }
 
 /*
