@@ -58,7 +58,9 @@ private:
 	u8 m_video_in_control, m_color_key;
 	u16 m_window_x, m_window_y, m_window_width, m_window_height, m_field_x, m_field_y;
 	u8 m_video_clut[256][3];
+	u8 m_pal_latch[3];
 
+	void load_pal_latch();
 	void draw_video_window(bitmap_rgb32 &bitmap, rectangle const &cliprect, u32 stride);
 
 	// in mode 0x1f, the mode after a reset, no interrupt is latched and blanking stays asserted

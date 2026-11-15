@@ -130,7 +130,8 @@ valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag,
 	m_config(0), m_int_enable(0),
 	m_M(1), m_N(1), m_P(1),
 	m_video_in_control(0), m_color_key(0),
-	m_window_x(0), m_window_y(0), m_window_width(0), m_window_height(0), m_field_x(0), m_field_y(0)
+	m_window_x(0), m_window_y(0), m_window_width(0), m_window_height(0), m_field_x(0), m_field_y(0),
+	m_pal_latch{ 0, 0, 0 }
 {
 }
 
@@ -150,6 +151,7 @@ void valkyrie_device::device_start()
 	save_item(NAME(m_stride));
 	save_item(NAME(m_pal_address));
 	save_item(NAME(m_pal_idx));
+	save_item(NAME(m_pal_latch));
 	save_item(NAME(m_hres));
 	save_item(NAME(m_vres));
 	save_item(NAME(m_htotal));
@@ -189,6 +191,7 @@ void valkyrie_device::device_reset()
 		m_palette->set_pen_green_level(i, 0);
 		m_palette->set_pen_blue_level(i, 0);
 	}
+	load_pal_latch();
 }
 
 void valkyrie_device::device_add_mconfig(machine_config &config)
@@ -547,36 +550,37 @@ u8 valkyrie_device::regs64_r(offs_t offset)
 	return regs_r((offset >> 1) + (offset & 3));
 }
 
+void valkyrie_device::load_pal_latch()
+{
+	rgb_t const entry = m_palette->pen_color(m_pal_address);
+	m_pal_latch[0] = entry.r();
+	m_pal_latch[1] = entry.g();
+	m_pal_latch[2] = entry.b();
+}
+
 u32 valkyrie_device::ramdac_r(offs_t offset)
 {
 	switch (offset)
 	{
 		case 0:
-			if (!machine().side_effects_disabled())
-			{
-				m_pal_idx = 0;
-			}
 			return m_pal_address<<24;
 
 		case 1:
 			{
-				pen_t const entry = m_palette->pen(m_pal_address);
-				u8 const idx = m_pal_idx;
+				u8 const data = m_pal_latch[m_pal_idx];
 				if (!machine().side_effects_disabled())
 				{
-					m_pal_idx++;
+					// The address is incremented after green, and the latch is reloaded from the new address after blue
+					if (m_pal_idx == 1)
+						m_pal_address++;
+					if (++m_pal_idx == 3)
+					{
+						m_pal_idx = 0;
+						load_pal_latch();
+					}
 				}
-				switch (idx)
-				{
-					case 0:
-						return ((entry >> 16) & 0xff) << 24;
-					case 1:
-						return ((entry >> 8) & 0xff) << 24;
-					case 2:
-						return (entry & 0xff) << 24;
-				}
+				return u32(data) << 24;
 			}
-			break;
 	}
 	return 0;
 }
@@ -589,26 +593,16 @@ void valkyrie_device::ramdac_w(offs_t offset, u32 data)
 	case 0:
 		m_pal_address = data & 0xff;
 		m_pal_idx = 0;
+		load_pal_latch();
 		break;
 
 	case 1:
-		switch (m_pal_idx)
-		{
-			case 0:
-				m_palette->set_pen_red_level(m_pal_address, data & 0xff);
-				break;
-			case 1:
-				m_palette->set_pen_green_level(m_pal_address, data & 0xff);
-				break;
-			case 2:
-				m_palette->set_pen_blue_level(m_pal_address, data & 0xff);
-				break;
-		}
-
-		m_pal_idx++;
-		if (m_pal_idx == 3)
+		// Components are collected in the latch shared with reads; the entry is written on blue
+		m_pal_latch[m_pal_idx] = data;
+		if (++m_pal_idx == 3)
 		{
 			m_pal_idx = 0;
+			m_palette->set_pen_color(m_pal_address, rgb_t(m_pal_latch[0], m_pal_latch[1], m_pal_latch[2]));
 			m_pal_address++;
 		}
 		break;
