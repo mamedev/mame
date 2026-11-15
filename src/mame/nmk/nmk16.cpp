@@ -5448,7 +5448,7 @@ void nmk16_state::macross2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_map);
 	set_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 4000000); // Z8400B PS 4 MHz ?
+	Z80(config, m_audiocpu, XTAL(12'000'000) / 2); // Z8400B PS; 12 MHz / 2 (U67A), the same node U48 divides by 4 for the YM2203
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::macross2_sound_io_map);
 
@@ -5494,7 +5494,7 @@ void nmk16_state::tdragon2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragon2_map);
 	set_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 4000000); // Z0840006PSC 4? MHz
+	Z80(config, m_audiocpu, XTAL(12'000'000) / 2); // Z0840006PSC; 12 MHz / 2 (U67A), the same node U48 divides by 4 for the YM2203
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::macross2_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::macross2_sound_io_map);
 
@@ -5543,7 +5543,8 @@ void nmk16_state::tdragon3h(machine_config &config)
 	// No YM2203 and only one OKI, the PCB has a space for the YM2203, populated by a 7474 and a 74367.
 	// It's been verified that by removing them and putting the YM2203 in its place, the game can make use of it.
 
-	// Z84C0006PEC 4? MHz
+	// Z84C0006PEC 4? MHz (own PCB: not covered by the tdragon2 schematic, so kept at the previous clock)
+	m_audiocpu->set_clock(4000000);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tdragon3h_sound_io_map);
 
 	config.device_remove("ymsnd");
