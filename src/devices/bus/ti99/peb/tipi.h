@@ -74,6 +74,8 @@ private:
 
 	// Websocket support
 	std::unique_ptr<webpp::ws_client> m_wsclient;
+	std::unique_ptr<asio::thread> m_listener;
+
 	std::shared_ptr<webpp::ws_client::SendStream> m_send_stream;
 	std::unique_ptr<u8[]> m_rpimessage;
 	int m_msgindex;
