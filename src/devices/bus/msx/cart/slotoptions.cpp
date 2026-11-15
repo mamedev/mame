@@ -4,6 +4,7 @@
 #include "slotoptions.h"
 
 namespace bus::msx::cart::slotoptions {
+
 char const *const ARC             = "arc";
 char const *const ASCII8          = "ascii8";
 char const *const ASCII8_SRAM     = "ascii8_sram";
@@ -90,5 +91,6 @@ char const *const SUPERLODERUNNER = "superloderunner";
 char const *const SYNTHESIZER     = "synthesizer";
 char const *const UCN01           = "ucn01";
 char const *const VIDEO80         = "video80";
+
 } // namespace bus::msx::cart::slotoptions
 

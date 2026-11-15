@@ -192,8 +192,7 @@ uint8_t mpu4_characteriser_pal::protection_r()
 
 		return ns << 2;
 	}
-
-	if (m_allow_6800_cheat || m_allow_6809_cheat || m_allow_68k_cheat)
+	else if (m_allow_6800_cheat || m_allow_6809_cheat || m_allow_68k_cheat)
 	{
 		uint8_t ret = 0x00;
 
@@ -203,7 +202,8 @@ uint8_t mpu4_characteriser_pal::protection_r()
 			// MPU3
 			int addr = m_cpu->state_int(M6800_X);
 			ret = m_cpu->space(AS_PROGRAM).read_byte(addr+1);
-			logerror("%s: Characteriser protection_r WITH 6800 CHEAT (col is %02x returning %02x from addr %04x)\n", machine().describe_context(), m_prot_col, ret, addr);
+			if (!machine().side_effects_disabled())
+				logerror("%s: Characteriser protection_r WITH 6800 CHEAT (col is %02x returning %02x from addr %04x)\n", machine().describe_context(), m_prot_col, ret, addr);
 		}
 		else if (m_allow_6809_cheat)
 		{
@@ -212,17 +212,19 @@ uint8_t mpu4_characteriser_pal::protection_r()
 			if ((addr >= 0x800) && (addr <= 0xfff)) return 0x00; // prevent recursion, only care about ram/rom areas for this cheat.
 
 			ret = m_cpu->space(AS_PROGRAM).read_byte(addr);
-			logerror("%s: Characteriser protection_r WITH 6809 CHEAT (col is %02x returning %02x from addr %04x)\n", machine().describe_context(), m_prot_col, ret, addr);
+			if (!machine().side_effects_disabled())
+				logerror("%s: Characteriser protection_r WITH 6809 CHEAT (col is %02x returning %02x from addr %04x)\n", machine().describe_context(), m_prot_col, ret, addr);
 		}
 		else if (m_allow_68k_cheat)
 		{
 			// MPU4 Video (question descrambling where used not handled)
 			ret = m_cpu->state_int(M68K_D0) & 0xff;
-			logerror("%s: Characteriser protection_r WITH 68000 CHEAT (col is %02x returning %02x)\n", machine().describe_context(), m_prot_col, ret);
+			if (!machine().side_effects_disabled())
+				logerror("%s: Characteriser protection_r WITH 68000 CHEAT (col is %02x returning %02x)\n", machine().describe_context(), m_prot_col, ret);
 		}
 
 
-		if (IDENTIFICATION_HELPER)
+		if (IDENTIFICATION_HELPER && !machine().side_effects_disabled())
 		{
 			m_temp_debug_table[m_prot_col] = ret;
 
@@ -242,24 +244,27 @@ uint8_t mpu4_characteriser_pal::protection_r()
 
 		return ret;
 	}
-
-	// not cheating, but no table set
-	if (!m_current_chr_table)
+	else if (!m_current_chr_table)
 	{
-		logerror("%s: Characteriser protection_r WITH NO TABLE\n", machine().describe_context());
+		// not cheating, but no table set
+		if (!machine().side_effects_disabled())
+			logerror("%s: Characteriser protection_r WITH NO TABLE\n", machine().describe_context());
 		return 0x00;
 	}
-
-	// use table
-	uint8_t ret = 0x00;
-
-	if (m_current_chr_table)
+	else
 	{
-		ret = m_current_chr_table[m_prot_col];
-		logerror("%s: Characteriser protection_r WITH PASSED TABLE (returning %02x)\n", machine().describe_context(), ret);
-	}
+		// use table
+		uint8_t ret = 0x00;
 
-	return ret;
+		if (m_current_chr_table)
+		{
+			ret = m_current_chr_table[m_prot_col];
+			if (!machine().side_effects_disabled())
+				logerror("%s: Characteriser protection_r WITH PASSED TABLE (returning %02x)\n", machine().describe_context(), ret);
+		}
+
+		return ret;
+	}
 }
 
 uint8_t mpu4_characteriser_pal::lamp_scramble_r()

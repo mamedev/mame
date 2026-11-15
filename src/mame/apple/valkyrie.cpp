@@ -39,7 +39,8 @@
 #define VERBOSE (0)
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VALKYRIE, valkyrie_device, "apvalkyrie", "Apple Valkyrie video")
+
+namespace {
 
 // Valkyrie aligns its (often byte-wide) registers to the left-hand side of 32-bit addresses.
 // Valkyrie-AR is aligned to 64-bit addresses and not 32-bit ones.
@@ -70,11 +71,24 @@ enum : u8
 	VIDEO_IN_BUFFER1        = 0x40
 };
 
-static constexpr u32 VIDEO_BUFFER0 = 0x97800;
-static constexpr u32 VIDEO_BUFFER1 = 0xc0000;
-static constexpr u32 VIDEO_BUFFER_WIDTH = 320;
-static constexpr u32 VIDEO_BUFFER_HEIGHT = 240;
+constexpr u32 VIDEO_BUFFER0 = 0x97800;
+constexpr u32 VIDEO_BUFFER1 = 0xc0000;
+constexpr u32 VIDEO_BUFFER_WIDTH = 320;
+constexpr u32 VIDEO_BUFFER_HEIGHT = 240;
 
+constexpr offs_t video_buffer_offset(offs_t offset)
+{
+	u32 const row = BIT(offset, 8, 8);
+	u32 const column = BIT(offset, 0, 8) << 2;
+	u32 const base = BIT(offset, 16) ? VIDEO_BUFFER1 : VIDEO_BUFFER0;
+
+	return (base + (row * (VIDEO_BUFFER_WIDTH << 1)) + column) >> 2;
+}
+
+} // anonymous namespace
+
+
+DEFINE_DEVICE_TYPE(VALKYRIE, valkyrie_device, "apvalkyrie", "Apple Valkyrie video")
 
 
 //-------------------------------------------------
@@ -115,6 +129,10 @@ valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag,
 	m_M(1), m_N(1), m_P(1),
 	m_video_in_control(0), m_color_key(0),
 	m_window_x(0), m_window_y(0), m_window_width(0), m_window_height(0), m_field_x(0), m_field_y(0)
+{
+}
+
+valkyrie_device::~valkyrie_device()
 {
 }
 
@@ -702,14 +720,6 @@ u32 valkyrie_device::vram_r(offs_t offset)
 void valkyrie_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vram[offset & (m_vram_size - 1)]);
-}
-
-offs_t valkyrie_device::video_buffer_offset(offs_t offset)
-{
-	u32 const row = BIT(offset, 8, 8);
-	u32 const column = BIT(offset, 0, 8) << 2;
-
-	return ((BIT(offset, 16) ? VIDEO_BUFFER1 : VIDEO_BUFFER0) + (row * (VIDEO_BUFFER_WIDTH << 1)) + column) >> 2;
 }
 
 u32 valkyrie_device::video_buffer_r(offs_t offset)

@@ -62,7 +62,7 @@ TODO:
 
 - In Bioship, there's an occasional flicker of one of the sprites composing big
   ships. Increasing CPU speed from 12 to 16 MHz improved it, but it's still not
-  100% fixed. (the CPU speed has been verified to be 10Mhz??)
+  100% fixed. (the CPU speed has been verified to be 10MHz??)
 
 - (PCB owners): Measure pixel clock / vblank duration for all of these games.
 
@@ -556,7 +556,7 @@ void nmk16_state::manybloc_map(address_map &map)
 	map(0x080012, 0x080013).nopw();            // See notes at the top of the driver
 	map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
 	map(0x08001c, 0x08001d).nopw();            // See notes at the top of the driver
-	map(0x08001f, 0x08001f).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write)).umask16(0x00ff);
+	map(0x08001f, 0x08001f).umask16(0x00ff).r("soundlatch2", FUNC(generic_latch_8_device::read)).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x09c000, 0x09cfff).ram().w(FUNC(nmk16_state::manybloc_scroll_w)).share(m_gunnail_scrollram);
@@ -614,7 +614,7 @@ void nmk16_state::tharrier_map(address_map &map)
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x080202, 0x080203).portr("IN2");
 	map(0x088000, 0x0883ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-//  map(0x08c000, 0x08c007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+//  map(0x08c000, 0x08c007).umask16(0x00ff).w(FUNC(nmk16_state::scroll_w<0>));
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x09c000, 0x09c7ff).ram(); // Unused txvideoram area?
 	map(0x09d000, 0x09d7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
@@ -758,7 +758,7 @@ void nmk16_state::acrobatm_map(address_map &map)
 	map(0xc0019, 0xc0019).w(FUNC(nmk16_state::tilebank_w));
 	map(0xc001f, 0xc001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0xc4000, 0xc45ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xc8000, 0xc8007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0xc8000, 0xc8007).umask16(0x00ff).ram().w(FUNC(nmk16_state::scroll_w<0>));
 	map(0xcc000, 0xcffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0xd4000, 0xd47ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 }
@@ -775,7 +775,7 @@ void nmk16_state::acrobatmbl_map(address_map &map)
 	map(0xc0019, 0xc0019).w(FUNC(nmk16_state::tilebank_w));
 	map(0xc001e, 0xc001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
 	map(0xc4000, 0xc45ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0xc8000, 0xc8007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0xc8000, 0xc8007).umask16(0x00ff).ram().w(FUNC(nmk16_state::scroll_w<0>));
 	map(0xcc000, 0xcffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0xd4000, 0xd47ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 }
@@ -791,7 +791,7 @@ void nmk16_state::hachamfb2_map(address_map &map)
 	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
 	map(0x08001e, 0x08001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x08c000, 0x08c007).umask16(0x00ff).w(FUNC(nmk16_state::scroll_w<0>));
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 	map(0x0f0000, 0x0fffff).ram().share(m_mainram);
@@ -810,8 +810,8 @@ void nmk16_state::bioship_map(address_map &map)
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x084001, 0x084001).w(FUNC(nmk16_state::bioship_bank_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c007).ram().w(FUNC(nmk16_state::scroll_w<1>)).umask16(0xff00);
-	map(0x08c010, 0x08c017).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0xff00);
+	map(0x08c000, 0x08c007).umask16(0xff00).ram().w(FUNC(nmk16_state::scroll_w<1>));
+	map(0x08c010, 0x08c017).umask16(0xff00).ram().w(FUNC(nmk16_state::scroll_w<0>));
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<1>)).share("bgvideoram1");
 	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
@@ -832,7 +832,7 @@ void nmk16_state::hachamf_map(address_map &map)
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x08c000, 0x08c007).umask16(0x00ff).w(FUNC(nmk16_state::scroll_w<0>));
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 	map(0x0f0000, 0x0fffff).ram().share(m_mainram); // Main RAM, inc sprites, shared with MCU
@@ -855,7 +855,7 @@ void nmk16_state::tdragon_map(address_map &map)
 	map(0x0c0019, 0x0c0019).mirror(0x020000).w(FUNC(nmk16_state::tilebank_w)); // Tile Bank?
 	map(0x0c001f, 0x0c001f).mirror(0x020000).w(m_nmk004, FUNC(nmk004_device::write));
 
-	map(0x0c4000, 0x0c4007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x0c4000, 0x0c4007).umask16(0x00ff).ram().w(FUNC(nmk16_state::scroll_w<0>));
 	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x0d0000, 0x0d07ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
@@ -879,7 +879,7 @@ void nmk16_state::tdragonb_map(address_map &map)
 	map(0x0c0015, 0x0c0015).w(FUNC(nmk16_state::flipscreen_w)); // Maybe
 	map(0x0c0019, 0x0c0019).w(FUNC(nmk16_state::tilebank_w)); // Tile Bank?
 	map(0x0c001e, 0x0c001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
-	map(0x0c4000, 0x0c4007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x0c4000, 0x0c4007).umask16(0x00ff).ram().w(FUNC(nmk16_state::scroll_w<0>));
 	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x0d0000, 0x0d07ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
@@ -929,7 +929,7 @@ void nmk16_state::ssmissin_map(address_map &map)
 	map(0x0c0015, 0x0c0015).w(FUNC(nmk16_state::flipscreen_w)); // Maybe
 	map(0x0c0019, 0x0c0019).w(FUNC(nmk16_state::tilebank_w)); // Tile Bank?
 	map(0x0c001f, 0x0c001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
-	map(0x0c4000, 0x0c4007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x0c4000, 0x0c4007).umask16(0x00ff).ram().w(FUNC(nmk16_state::scroll_w<0>));
 	map(0x0c8000, 0x0c87ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x0cc000, 0x0cffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x0d0000, 0x0d07ff).mirror(0x1800).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram); //mirror for airattck
@@ -955,8 +955,8 @@ void nmk16_state::strahl_map(address_map &map)
 	map(0x80015, 0x80015).w(FUNC(nmk16_state::flipscreen_w));
 	map(0x80016, 0x80017).w(FUNC(nmk16_state::nmk004_x0016_w));
 	map(0x8001f, 0x8001f).w(m_nmk004, FUNC(nmk004_device::write));
-	map(0x84000, 0x84007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
-	map(0x88000, 0x88007).ram().w(FUNC(nmk16_state::scroll_w<1>)).umask16(0x00ff);
+	map(0x84000, 0x84007).umask16(0x00ff).ram().w(FUNC(nmk16_state::scroll_w<0>));
+	map(0x88000, 0x88007).umask16(0x00ff).ram().w(FUNC(nmk16_state::scroll_w<1>));
 	map(0x8c000, 0x8c7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x90000, 0x93fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x94000, 0x97fff).ram().w(FUNC(nmk16_state::bgvideoram_w<1>)).share("bgvideoram1");
@@ -973,8 +973,8 @@ void nmk16_state::strahljbl_map(address_map &map)
 	map(0x8000a, 0x8000b).portr("DSW2");
 	map(0x80015, 0x80015).w(FUNC(nmk16_state::flipscreen_w));
 	map(0x8001e, 0x8001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
-	map(0x84000, 0x84007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
-	map(0x88000, 0x88007).ram().w(FUNC(nmk16_state::scroll_w<1>)).umask16(0x00ff);
+	map(0x84000, 0x84007).umask16(0x00ff).ram().w(FUNC(nmk16_state::scroll_w<0>));
+	map(0x88000, 0x88007).umask16(0x00ff).ram().w(FUNC(nmk16_state::scroll_w<1>));
 	map(0x8c000, 0x8c7ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x90000, 0x93fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x94000, 0x97fff).ram().w(FUNC(nmk16_state::bgvideoram_w<1>)).share("bgvideoram1");
@@ -995,7 +995,7 @@ void nmk16_state::macross_map(address_map &map)
 	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x08c000, 0x08c007).umask16(0x00ff).ram().w(FUNC(nmk16_state::scroll_w<0>));
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
@@ -1012,7 +1012,7 @@ void nmk16_state::macrossbl_map(address_map &map)
 	map(0x080019, 0x080019).w(FUNC(nmk16_state::tilebank_w));
 	map(0x08001e, 0x08001f).w("seibu_sound", FUNC(seibu_sound_device::main_mustb_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x08c000, 0x08c007).umask16(0x00ff).w(FUNC(nmk16_state::scroll_w<0>));
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x098000, 0x09bfff).ram(); // TODO: something's mapped here for protection
 	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
@@ -1091,7 +1091,7 @@ void nmk16_state::macross2_map(address_map &map)
 	map(0x100019, 0x100019).w(FUNC(nmk16_state::macross2_tilebank_w));      // D0-D1 BG ROM bank, D2-D3 BG RAM page
 	map(0x10001f, 0x10001f).w(m_soundlatch, FUNC(generic_latch_8_device::write)); // to Z80
 	map(0x120000, 0x1207ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x130000, 0x130007).ram().w(FUNC(nmk16_state::macross2_scroll_w)).umask16(0x00ff);
+	map(0x130000, 0x130007).umask16(0x00ff).ram().w(FUNC(nmk16_state::macross2_scroll_w));
 	map(0x140000, 0x14ffff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x170000, 0x170fff).mirror(0x1000).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 	map(0x1f0000, 0x1fffff).ram().share(m_mainram);
@@ -1108,7 +1108,7 @@ void nmk16_state::tdragon3h_map(address_map &map)
 	tdragon2_map(map);
 	// own PCB, not covered by the tdragon2 schematic: keep the page from the scroll register
 	map(0x100019, 0x100019).w(FUNC(nmk16_state::tilebank_w));
-	map(0x130000, 0x130007).w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff); // write handler only: the RAM is already mapped
+	map(0x130000, 0x130007).umask16(0x00ff).w(FUNC(nmk16_state::scroll_w<0>)); // write handler only: the RAM is already mapped
 	map(0x10000e, 0x10000f).portr("DSW2");
 	map(0x10000b, 0x10000b).r("soundlatch2", FUNC(generic_latch_8_device::read));    // from Z80
 }
@@ -1185,7 +1185,7 @@ void nmk16_state::bjtwin_map(address_map &map)
 	map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
 	map(0x084001, 0x084001).rw(m_oki[0], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x084011, 0x084011).rw(m_oki[1], FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x084020, 0x08402f).w("nmk112", FUNC(nmk112_device::okibank_w)).umask16(0x00ff);
+	map(0x084020, 0x08402f).umask16(0x00ff).w("nmk112", FUNC(nmk112_device::okibank_w));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x094001, 0x094001).w(FUNC(nmk16_state::tilebank_w));
 	map(0x094003, 0x094003).w(FUNC(nmk16_state::bjtwin_scroll_w));    // sabotenb specific?
@@ -1205,7 +1205,7 @@ void nmk16_state::powerins_map(address_map &map)
 	map(0x100019, 0x100019).w(FUNC(nmk16_state::tilebank_w));
 	map(0x10001f, 0x10001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x120000, 0x120fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x130000, 0x130007).ram().w(FUNC(nmk16_state::scroll_w<0>)).umask16(0x00ff);
+	map(0x130000, 0x130007).umask16(0x00ff).ram().w(FUNC(nmk16_state::scroll_w<0>));
 	map(0x140000, 0x143fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x170000, 0x170fff).mirror(0x1000).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
 	map(0x180000, 0x18ffff).ram().share(m_mainram);
@@ -4618,21 +4618,21 @@ void nmk16_state::mustang(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, 8'000'000);
 	configure_nmk004(config);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1'500'000));
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], 16'000'000/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], 16'000'000/4, okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -4644,7 +4644,7 @@ void nmk16_state::mustangb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 14318180/4);
+	Z80(config, m_audiocpu, 14'318'180/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
@@ -4660,11 +4660,11 @@ void nmk16_state::mustangb(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14318180/4));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14'318'180/4));
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
+	OKIM6295(config, "oki", 1'320'000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
@@ -4682,7 +4682,7 @@ void nmk16_state::mustangb3(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb3_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 14318180/4);
+	Z80(config, m_audiocpu, 14'318'180/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::mustangb3_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tharrier_sound_io_map);
 
@@ -4701,17 +4701,17 @@ void nmk16_state::mustangb3(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1'500'000));
 	ymsnd.irq_handler().set_inputline("audiocpu", 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], 16'000'000/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], 16'000'000/4, okim6295_device::PIN7_LOW);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
 
@@ -4737,18 +4737,18 @@ void nmk16_state::bioship(machine_config &config)
 	NMK004(config, m_nmk004, XTAL(8'000'000));
 	configure_nmk004(config);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8)); // 1.5 Mhz (verified)
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", XTAL(12'000'000) / 8)); // 1.5 MHz (verified)
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], XTAL(8'000'000) / 2, okim6295_device::PIN7_LOW); // 4.0 Mhz, Pin 7 High (verified)
+	OKIM6295(config, m_oki[0], XTAL(8'000'000) / 2, okim6295_device::PIN7_LOW); // 4.0 MHz, Pin 7 High (verified)
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], XTAL(8'000'000) / 2, okim6295_device::PIN7_LOW); // 4.0 Mhz, Pin 7 High (verified)
+	OKIM6295(config, m_oki[1], XTAL(8'000'000) / 2, okim6295_device::PIN7_LOW); // 4.0 MHz, Pin 7 High (verified)
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -4756,7 +4756,7 @@ void nmk16_state::bioship(machine_config &config)
 void nmk16_state::vandyke(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, XTAL(10'000'000)); // 68000p12 running at 10Mhz, verified on PCB
+	M68000(config, m_maincpu, XTAL(10'000'000)); // 68000p12 running at 10MHz, verified on PCB
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::vandyke_map);
 	set_interrupt_timing(config);
 
@@ -4794,11 +4794,11 @@ void nmk16_state::vandyke(machine_config &config)
 void nmk16_state::vandykeb(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10 MHz ?
+	M68000(config, m_maincpu, 10'000'000); // 10 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::vandykeb_map);
 	set_hacky_interrupt_timing(config);
 
-	PIC16C57(config, "mcu", 12000000).set_disable(); // 3MHz
+	PIC16C57(config, "mcu", 12'000'000).set_disable(); // 3MHz
 
 	// video hardware
 	set_screen_lowres(config);
@@ -4812,7 +4812,7 @@ void nmk16_state::vandykeb(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	OKIM6295(config, m_oki[0], 16000000/16, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], 16'000'000/16, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.20);
 }
@@ -4916,11 +4916,11 @@ void nmk16_state::macrossbl(machine_config &config)
 void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden sound hardware
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000);
+	M68000(config, m_maincpu, 10'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::tdragonb_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 14318180/4);
+	Z80(config, m_audiocpu, 14'318'180/4);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::seibu_sound_map);
 	m_audiocpu->set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
@@ -4936,11 +4936,11 @@ void nmk16_state::tdragonb(machine_config &config)    // bootleg using Raiden so
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14318180/4));
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 14'318'180/4));
 	ymsnd.irq_handler().set("seibu_sound", FUNC(seibu_sound_device::fm_irqhandler));
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 1.0);
 
-	OKIM6295(config, "oki", 1320000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
+	OKIM6295(config, "oki", 1'320'000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "mono", 0.40);
 
 	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
 	seibu_sound.int_callback().set_inputline(m_audiocpu, 0);
@@ -5116,7 +5116,7 @@ void tdragon_prot_state::tdragon_prot(machine_config &config)
 {
 	tdragon(config);
 
-	TMP91640(config, m_protcpu, 4000000); // Toshiba TMP91640 marked as NMK-110, with 16Kbyte internal ROM, 512bytes internal RAM
+	TMP91640(config, m_protcpu, 4'000'000); // Toshiba TMP91640 marked as NMK-110, with 16Kbyte internal ROM, 512bytes internal RAM
 	m_protcpu->set_addrmap(AS_PROGRAM, &tdragon_prot_state::tdragon_prot_map);
 	m_protcpu->port_write<6>().set(FUNC(tdragon_prot_state::mcu_port6_w));
 	m_protcpu->port_read<5>().set(FUNC(tdragon_prot_state::mcu_port5_r));
@@ -5128,11 +5128,11 @@ void tdragon_prot_state::tdragon_prot(machine_config &config)
 void nmk16_state::ssmissin(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 8000000); // 8 Mhz
+	M68000(config, m_maincpu, 8'000'000); // 8 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::ssmissin_map);
 	set_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 8000000/2); // 4 Mhz
+	Z80(config, m_audiocpu, 8'000'000/2); // 4 MHz
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::ssmissin_sound_map);
 
 	// video hardware
@@ -5150,7 +5150,7 @@ void nmk16_state::ssmissin(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, 0);
 
-	OKIM6295(config, m_oki[0], 8000000/8, okim6295_device::PIN7_HIGH); // 1 Mhz, pin 7 high
+	OKIM6295(config, m_oki[0], 8'000'000/8, okim6295_device::PIN7_HIGH); // 1 MHz, pin 7 high
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
@@ -5158,7 +5158,7 @@ void nmk16_state::ssmissin(machine_config &config)
 void nmk16_state::strahl(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 12000000); // 12 MHz ?
+	M68000(config, m_maincpu, 12'000'000); // 12 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::strahl_map);
 	set_hacky_interrupt_timing(config);
 
@@ -5174,21 +5174,21 @@ void nmk16_state::strahl(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, 8'000'000);
 	configure_nmk004(config);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1'500'000));
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], 16'000'000/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], 16'000'000/4, okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -5232,7 +5232,7 @@ void nmk16_state::strahljbl(machine_config &config)
 void nmk16_state::hachamf(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // MC68000P10, 10 MHz ?
+	M68000(config, m_maincpu, 10'000'000); // MC68000P10, 10 MHz ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::hachamf_map);
 	set_interrupt_timing(config);
 
@@ -5248,21 +5248,21 @@ void nmk16_state::hachamf(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	NMK004(config, m_nmk004, 8000000);
+	NMK004(config, m_nmk004, 8'000'000);
 	configure_nmk004(config);
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1'500'000));
 	ymsnd.irq_handler().set("nmk004", FUNC(nmk004_device::ym2203_irq_handler));
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], 16'000'000/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], 16'000'000/4, okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -5271,7 +5271,7 @@ void tdragon_prot_state::hachamf_prot(machine_config &config)
 {
 	hachamf(config);
 
-	TMP91640(config, m_protcpu, 4000000); // Toshiba TMP91640 marked as NMK-113, with 16Kbyte internal ROM, 512bytes internal RAM
+	TMP91640(config, m_protcpu, 4'000'000); // Toshiba TMP91640 marked as NMK-113, with 16Kbyte internal ROM, 512bytes internal RAM
 	m_protcpu->set_addrmap(AS_PROGRAM, &tdragon_prot_state::tdragon_prot_map);
 	m_protcpu->port_write<6>().set(FUNC(tdragon_prot_state::mcu_port6_w));
 	m_protcpu->port_read<5>().set(FUNC(tdragon_prot_state::mcu_port5_r));
@@ -5426,7 +5426,7 @@ void nmk16_state::gunnailb(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::gunnailb_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 6000000); // 6 MHz ?
+	Z80(config, m_audiocpu, 6'000'000); // 6 MHz ?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::gunnailb_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::gunnailb_sound_io_map);
 
@@ -5437,7 +5437,7 @@ void nmk16_state::gunnailb(machine_config &config)
 
 	subdevice<ym2203_device>("ymsnd")->irq_handler().set_inputline(m_audiocpu, INPUT_LINE_IRQ0);
 
-	OKIM6295(config.replace(), m_oki[0], 12000000 / 4, okim6295_device::PIN7_LOW); // no OKI banking
+	OKIM6295(config.replace(), m_oki[0], 12'000'000 / 4, okim6295_device::PIN7_LOW); // no OKI banking
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.80);
 
 	config.device_remove("nmk004");
@@ -5547,7 +5547,7 @@ void nmk16_state::tdragon3h(machine_config &config)
 	// It's been verified that by removing them and putting the YM2203 in its place, the game can make use of it.
 
 	// Z84C0006PEC 4? MHz (own PCB: not covered by the tdragon2 schematic, so kept at the previous clock)
-	m_audiocpu->set_clock(4000000);
+	m_audiocpu->set_clock(4'000'000);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tdragon3h_sound_io_map);
 
 	config.device_remove("ymsnd");
@@ -5888,12 +5888,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
 void nmk16_state::manybloc(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 10000000); // 10? MHz - check
+	M68000(config, m_maincpu, 10'000'000); // 10? MHz - check
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_state::manybloc_map);
 	m_maincpu->set_periodic_int(FUNC(nmk16_state::irq1_line_hold), attotime::from_hz(56)); // this needs to equal the framerate on this, rather than being double it...
 	TIMER(config, "scantimer").configure_scanline(FUNC(nmk16_state::manybloc_scanline), "screen", 0, 1);
 
-	Z80(config, m_audiocpu, 3000000);
+	Z80(config, m_audiocpu, 3'000'000);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_state::tharrier_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_state::tharrier_sound_io_map);
 
@@ -5922,18 +5922,18 @@ void nmk16_state::manybloc(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	GENERIC_LATCH_8(config, "soundlatch2");
 
-	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1500000));
+	ym2203_device &ymsnd(YM2203(config, "ymsnd", 1'500'000));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.50);
 	ymsnd.add_route(1, "mono", 0.50);
 	ymsnd.add_route(2, "mono", 0.50);
 	ymsnd.add_route(3, "mono", 1.20);
 
-	OKIM6295(config, m_oki[0], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], 16'000'000/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->set_addrmap(0, &nmk16_state::oki1_map);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.10);
 
-	OKIM6295(config, m_oki[1], 16000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[1], 16'000'000/4, okim6295_device::PIN7_LOW);
 	m_oki[1]->set_addrmap(0, &nmk16_state::oki2_map);
 	m_oki[1]->add_route(ALL_OUTPUTS, "mono", 0.10);
 }
@@ -5943,11 +5943,11 @@ void nmk16_state::manybloc(machine_config &config)
 void nmk16_tomagic_state::tomagic(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 12000000); // 12? MHz
+	M68000(config, m_maincpu, 12'000'000); // 12? MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &nmk16_tomagic_state::tomagic_map);
 	set_hacky_interrupt_timing(config);
 
-	Z80(config, m_audiocpu, 12000000/4); // 3 Mhz?
+	Z80(config, m_audiocpu, 12'000'000/4); // 3 MHz?
 	m_audiocpu->set_addrmap(AS_PROGRAM, &nmk16_tomagic_state::tomagic_sound_map);
 	m_audiocpu->set_addrmap(AS_IO, &nmk16_tomagic_state::tomagic_sound_io_map);
 
@@ -5966,11 +5966,11 @@ void nmk16_tomagic_state::tomagic(machine_config &config)
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
 
-	ym3812_device &ymsnd(YM3812(config, "ymsnd", 12000000/4)); // K-666 (YM3812) 3Mhz? */
+	ym3812_device &ymsnd(YM3812(config, "ymsnd", 12'000'000/4)); // K-666 (YM3812) 3MHz?
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.50);
 
-	OKIM6295(config, m_oki[0], 12000000/4, okim6295_device::PIN7_LOW);
+	OKIM6295(config, m_oki[0], 12'000'000/4, okim6295_device::PIN7_LOW);
 	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 

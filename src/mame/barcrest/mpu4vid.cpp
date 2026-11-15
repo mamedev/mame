@@ -2147,12 +2147,12 @@ void mpu4vid_state::mpu4_vid_cheatchr(machine_config &config)
 
 uint8_t mpu4vid_state::strike_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1;
-	const bool R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
+	const bool R1 = BIT(state, 1), R2 = BIT(state, 2);
+	const bool R3 = BIT(state, 3), R4 = BIT(state, 4), R5 = BIT(state, 5);
 	// R0 (bit 0 of the previous state) is not used by the PAL.
 
-	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1;
-	const bool C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool C0 = BIT(col, 0), C1 = BIT(col, 1), C2 = BIT(col, 2);
+	const bool C3 = BIT(col, 3), C4 = BIT(col, 4), C5 = BIT(col, 5);
 
 	const bool NZ  = (col & 0x3f) != 0;      // any non-reset write
 	const bool g0  = !C3 && !C4;             // column group (C4,C3) = 00
@@ -2186,8 +2186,8 @@ void mpu4vid_state::mpu4_vid_strike(machine_config& config)
 
 uint8_t mpu4vid_state::turnover_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1, R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
-	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1, C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool R1 = BIT(state, 1), R2 = BIT(state, 2), R3 = BIT(state, 3), R4 = BIT(state, 4), R5 = BIT(state, 5);
+	const bool C0 = BIT(col, 0), C1 = BIT(col, 1), C2 = BIT(col, 2), C3 = BIT(col, 3), C4 = BIT(col, 4), C5 = BIT(col, 5);
 	const bool NZ = (col & 0x3f) != 0, g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4, ACT = C0 || C1 || C2 || C5;
 
 	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
@@ -2210,8 +2210,8 @@ void mpu4vid_state::mpu4_vid_turnov(machine_config& config)
 
 uint8_t mpu4vid_state::timemchn_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1, R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
-	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1, C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool R1 = BIT(state, 1), R2 = BIT(state, 2), R3 = BIT(state, 3), R4 = BIT(state, 4), R5 = BIT(state, 5);
+	const bool C0 = BIT(col, 0), C1 = BIT(col, 1), C2 = BIT(col, 2), C3 = BIT(col, 3), C4 = BIT(col, 4), C5 = BIT(col, 5);
 	const bool NZ = (col & 0x3f) != 0, g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4, ACT = C0 || C1 || C2 || C5;
 
 	// Inferred issue-select output: accept the supplied question issues 1-3.
@@ -2238,9 +2238,9 @@ void mpu4vid_state::mpu4_vid_tmach(machine_config& config)
 
 uint8_t mpu4vid_state::barquest_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1, R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
+	const bool R1 = BIT(state, 1), R2 = BIT(state, 2), R3 = BIT(state, 3), R4 = BIT(state, 4), R5 = BIT(state, 5);
 	// R0 (bit 0 of the previous state) is not used by the PAL.
-	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1, C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool C0 = BIT(col, 0), C1 = BIT(col, 1), C2 = BIT(col, 2), C3 = BIT(col, 3), C4 = BIT(col, 4), C5 = BIT(col, 5);
 	const bool NZ = (col & 0x3f) != 0, g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4, ACT = C0 || C1 || C2 || C5;
 
 	// Response bit 2 checks the question issue, independently of the text decoder.
@@ -2266,8 +2266,8 @@ void mpu4vid_state::mpu4_vid_barquest(machine_config& config)
 
 uint8_t mpu4vid_state::skiltrek_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1, R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
-	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1, C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool R1 = BIT(state, 1), R2 = BIT(state, 2), R3 = BIT(state, 3), R4 = BIT(state, 4), R5 = BIT(state, 5);
+	const bool C0 = BIT(col, 0), C1 = BIT(col, 1), C2 = BIT(col, 2), C3 = BIT(col, 3), C4 = BIT(col, 4), C5 = BIT(col, 5);
 	const bool NZ = (col & 0x3f) != 0, g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4, ACT = C0 || C1 || C2 || C5;
 
 	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
@@ -2290,9 +2290,9 @@ void mpu4vid_state::mpu4_vid_skilltrk(machine_config& config)
 
 uint8_t mpu4vid_state::addlad_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1, R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
+	const bool R1 = BIT(state, 1), R2 = BIT(state, 2), R3 = BIT(state, 3), R4 = BIT(state, 4), R5 = BIT(state, 5);
 	// R0 (bit 0 of the previous state) is not used by the PAL.
-	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1, C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool C0 = BIT(col, 0), C1 = BIT(col, 1), C2 = BIT(col, 2), C3 = BIT(col, 3), C4 = BIT(col, 4), C5 = BIT(col, 5);
 	const bool NZ = (col & 0x3f) != 0, g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4, ACT = C0 || C1 || C2 || C5;
 
 	const bool O0 = C1 || C2 || C3 || C4 || C5;  // col
@@ -2346,11 +2346,11 @@ void mpu4vid_state::vid_oki(machine_config &config)
 
 uint8_t mpu4vid_state::mating_chr_next(uint8_t state, uint8_t col)
 {
-	const bool R1 = (state >> 1) & 1, R2 = (state >> 2) & 1;
-	const bool R3 = (state >> 3) & 1, R4 = (state >> 4) & 1, R5 = (state >> 5) & 1;
+	const bool R1 = BIT(state, 1), R2 = BIT(state, 2);
+	const bool R3 = BIT(state, 3), R4 = BIT(state, 4), R5 = BIT(state, 5);
 	// R0 does not feed back into the recovered output functions.
-	const bool C0 = (col >> 0) & 1, C1 = (col >> 1) & 1, C2 = (col >> 2) & 1;
-	const bool C3 = (col >> 3) & 1, C4 = (col >> 4) & 1, C5 = (col >> 5) & 1;
+	const bool C0 = BIT(col, 0), C1 = BIT(col, 1), C2 = BIT(col, 2);
+	const bool C3 = BIT(col, 3), C4 = BIT(col, 4), C5 = BIT(col, 5);
 	const bool NZ = (col & 0x3f) != 0;
 	const bool g0 = !C3 && !C4, g1 = C3 && !C4, g2 = !C3 && C4, g3 = C3 && C4;
 	const bool ACT = C0 || C1 || C2 || C5;
@@ -2544,21 +2544,21 @@ void mpu4vid_state::init_bwbhack()
 	uint8_t special = rom[0xc002];
 
 	logerror("option byte is %02x\n", option);
-	logerror("bit 0: Datapak     = %d\n", (option >> 0) & 1);
-	logerror("bit 1: Fixed %%    = %d\n", (option >> 1) & 1);
-	logerror("bit 2: Arcade      = %d\n", (option >> 2) & 1);
-	logerror("bit 3: Switchable  = %d\n", (option >> 3) & 1);
-	logerror("bit 4: Irish       = %d\n", (option >> 4) & 1);
-	logerror("bit 5: Special     = %d\n", (option >> 5) & 1);
-	logerror("bit 6: Token       = %d\n", (option >> 6) & 1);
-	logerror("bit 7: Percent Key = %d\n", (option >> 7) & 1);
+	logerror("bit 0: Datapak     = %d\n", BIT(option, 0));
+	logerror("bit 1: Fixed %%    = %d\n", BIT(option, 1));
+	logerror("bit 2: Arcade      = %d\n", BIT(option, 2));
+	logerror("bit 3: Switchable  = %d\n", BIT(option, 3));
+	logerror("bit 4: Irish       = %d\n", BIT(option, 4));
+	logerror("bit 5: Special     = %d\n", BIT(option, 5));
+	logerror("bit 6: Token       = %d\n", BIT(option, 6));
+	logerror("bit 7: Percent Key = %d\n", BIT(option, 7));
 
-	if (!((option >> 3) & 1))
+	if (!BIT(option, 3))
 	{
 		logerror("Switchable was not set, so use coinage setting %02x\n", price);
 	}
 
-	if ((option >> 5) & 1)
+	if (BIT(option, 5))
 	{
 		logerror("Special was set, so use special setting %02x\n", special);
 	}

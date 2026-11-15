@@ -16,7 +16,7 @@ class valkyrie_device : public device_t, public i2c_hle_interface
 {
 public:
 	valkyrie_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	virtual ~valkyrie_device() = default;
+	~valkyrie_device();
 
 	void map(address_map &map) ATTR_COLD;
 	void valkyriear_map(address_map &map) ATTR_COLD;
@@ -60,7 +60,6 @@ private:
 	u8 m_video_clut[256][3];
 
 	void draw_video_window(bitmap_rgb32 &bitmap, rectangle const &cliprect, u32 stride);
-	static offs_t video_buffer_offset(offs_t offset);
 
 	// in mode 0x1f, the mode after a reset, no interrupt is latched and blanking stays asserted
 	bool timing_stopped() const { return (m_video_timing & 0x7f) == 0x1f; }
