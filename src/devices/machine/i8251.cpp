@@ -99,6 +99,7 @@ void i8251_device::device_start()
 	m_command = 0;
 	m_mode_byte = 0;
 	m_delayed_tx_en = false;
+	m_rxrdy = -1; // not driven yet: the first update always goes out
 
 	m_rxc_count = 0;
 	m_txc_count = 0;
@@ -125,6 +126,7 @@ void i8251_device::device_start()
 	save_item(NAME(m_command));
 	save_item(NAME(m_mode_byte));
 	save_item(NAME(m_delayed_tx_en));
+	save_item(NAME(m_rxrdy));
 
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dsr));
@@ -156,7 +158,18 @@ void i8251_device::device_start()
 
 void i8251_device::update_rx_ready()
 {
-	m_rxrdy_handler(rxrdy_r());
+	// Drive the pin only when its level changes.  A CPU can finish an
+	// instruction a little past a pending event, so a command write may run
+	// before a character's arrival yet be timed after it.  Recomputing RxRDY
+	// there would send a stale 0, and a deferred consumer such as an input
+	// merger applies it last: the interrupt for that character is lost and
+	// the next one overruns it.
+	int const state = rxrdy_r();
+	if (state != m_rxrdy)
+	{
+		m_rxrdy = state;
+		m_rxrdy_handler(state);
+	}
 }
 
 void v5x_scu_device::update_rx_ready()
