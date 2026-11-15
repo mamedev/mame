@@ -165,6 +165,8 @@ protected:
 	void vandykeb_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void manybloc_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void tilebank_w(u8 data);
+	void macross2_tilebank_w(u8 data);
+	void macross2_scroll_w(offs_t offset, u8 data);
 	void bioship_bank_w(u8 data);
 	void nmk004_x0016_w(u16 data);
 	void nmk004_bioship_x0016_w(u16 data);
