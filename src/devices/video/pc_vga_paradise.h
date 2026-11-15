@@ -156,6 +156,8 @@ protected:
 
 	virtual void device_reset() override ATTR_COLD;
 	virtual u16 line_compare_mask() override;
+
+	virtual u8 id_r(offs_t offset);
 private:
 	u8 vert_timing_overflow_r(offs_t offset);
 	void vert_timing_overflow_w(offs_t offset, u8 data);
@@ -176,6 +178,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	virtual u8 id_r(offs_t offset) override;
 private:
 	address_space_config m_sysctrl_space_config;
 	address_space_config m_bitblt_space_config;
@@ -201,6 +204,8 @@ public:
 
 protected:
 	wd90c33_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual u8 id_r(offs_t offset) override;
 };
 
 DECLARE_DEVICE_TYPE(PVGA1A, pvga1a_vga_device)

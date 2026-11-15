@@ -688,6 +688,7 @@ void wd90c30_vga_device::crtc_map(address_map &map)
 {
 	wd90c11a_vga_device::crtc_map(map);
 //  map(0x20, 0x21) Signature read data
+	map(0x31, 0x37).r(FUNC(wd90c30_vga_device::id_r));
 //  map(0x3d, 0x3d) PR1A CRTC Shadow Register Control
 	map(0x3e, 0x3e).rw(FUNC(wd90c30_vga_device::vert_timing_overflow_r), FUNC(wd90c30_vga_device::vert_timing_overflow_w));
 //  map(0x3f, 0x3f) PR19 Signature Analyzer Control
@@ -704,7 +705,7 @@ void wd90c30_vga_device::sequencer_map(address_map &map)
 /*
  * [0x3e] PR18 CRTC Vertical Timing Overflow
  *
- * xxx- ---- <reserved>
+ * xxx- ---- <reserved>, actually scratchpad (bit 7 high used for 2MB detection in 'C33)
  * ---x ---- Line Compare bit 10
  * ---- x--- Start vertical blank bit 10
  * ---- -x-- Start vertical retrace bit 10
@@ -733,7 +734,7 @@ void wd90c30_vga_device::vert_timing_overflow_w(offs_t offset, u8 data)
 		//vga.crtc.vert_retrace =    (vga.crtc.vert_retrace & 0x03ff)    | ((BIT(data, 2) << 10));
 		vga.crtc.vert_total =       (vga.crtc.vert_total & 0x03ff)       | ((BIT(data, 0) << 10));
 		m_pr18 &= ~0x0d;
-		m_pr18 |= (data & 0xd);
+		m_pr18 |= (data & 0x0d);
 	}
 
 	vga.crtc.line_compare = (vga.crtc.line_compare & 0x03ff) | ((BIT(data, 4) << 10));
@@ -745,6 +746,15 @@ void wd90c30_vga_device::vert_timing_overflow_w(offs_t offset, u8 data)
 u16 wd90c30_vga_device::line_compare_mask()
 {
 	return svga.rgb8_en ? 0x7ff : 0x3ff;
+}
+
+// Undocumented, SuperProbe depends on this
+// Unlocking actually works by writing a 0x00 to CRTC $34 (TBD)
+// TODO: bunch of details not known yet
+u8 wd90c30_vga_device::id_r(offs_t offset)
+{
+	const std::string id_string = "WD90C30";
+	return id_string[offset];
 }
 
 /**************************************
@@ -793,6 +803,11 @@ device_memory_interface::space_config_vector wd90c31_vga_device::memory_space_co
 	return r;
 }
 
+u8 wd90c31_vga_device::id_r(offs_t offset)
+{
+	const std::string id_string = "WD90C31";
+	return id_string[offset];
+}
 
 // maps at $23c0 in normal conditions, 16-bit
 void wd90c31_vga_device::ext_io_map(address_map &map)
@@ -915,6 +930,12 @@ wd90c33_vga_device::wd90c33_vga_device(const machine_config &mconfig, device_typ
 wd90c33_vga_device::wd90c33_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: wd90c33_vga_device(mconfig, WD90C33, tag, owner, clock)
 {
+}
+
+u8 wd90c33_vga_device::id_r(offs_t offset)
+{
+	const std::string id_string = "WD90C33";
+	return id_string[offset];
 }
 
 void wd90c33_vga_device::ext_io_map(address_map &map)
