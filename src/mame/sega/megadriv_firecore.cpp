@@ -26,15 +26,13 @@ public:
 		md_ctrl_state(mconfig, type, tag),
 		m_romsize(0x400000),
 		m_rom_extra_offset(0),
-		m_externalbank(0),
 		m_rom(*this, "maincpu")
 	{ }
 
 	void md_firecore(machine_config &config) ATTR_COLD;
 	void md_firecore_6b(machine_config &config) ATTR_COLD;
 
-	void init_sarc110() ATTR_COLD;
-	void init_reactmd() ATTR_COLD;
+	[[maybe_unused]]void init_reactmd() ATTR_COLD;
 
 protected:
 	virtual uint16_t redkid_portc_r();
@@ -65,7 +63,6 @@ private:
 	void rom_extra_offset_low_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
 	int m_rom_extra_offset;
-	int m_externalbank;
 
 	required_region_ptr<uint16_t> m_rom;
 
@@ -73,6 +70,20 @@ private:
 	uint16_t m_sysreg[0x80];    // 0xb01000 - 0xb010ff
 	uint8_t m_vdp_is_pal;
 	uint16_t m_vdpxreg[0x80];   // 0xb00000 - 0xb000ff
+};
+
+class md_reactor_state : public md_firecore_state
+{
+public:
+	md_reactor_state(const machine_config &mconfig, device_type type, const char *tag) :
+		md_firecore_state(mconfig, type, tag)
+	{ }
+
+	void init_reactor() ATTR_COLD;
+	void init_atgame40() ATTR_COLD;
+
+private:
+	virtual uint32_t get_external_bank_bits() override;
 };
 
 class md_pxp3_state : public md_firecore_state
@@ -149,6 +160,19 @@ uint32_t md_pxp3_state::get_external_bank_bits()
 	return chunk;
 }
 
+uint32_t md_reactor_state::get_external_bank_bits()
+{
+	uint8_t bank = 0;
+
+	if (m_gpio[0] & 0x0020) // atgame40, sarc110, mysf2, dcat16
+		bank |= 1;
+
+	if (m_gpio[0] & 0x2000) // reactmd
+		bank |= 2;
+
+	return bank;
+}
+
 uint16_t md_firecore_state::redkid_rom_r(offs_t offset)
 {
 	uint32_t external_bank = get_external_bank_bits();
@@ -179,6 +203,8 @@ void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_
 	{
 		const bool pal = BIT(m_sysreg[0x0c / 2], 2);
 		const bool domestic = BIT(m_sysreg[0x1e / 2], 2);
+		logerror("setting to pal %d domestic %d\n", pal, domestic);
+
 		m_version_hi_nibble = 0x20 | (domestic ? 0x00 : 0x80) | (pal ? 0x40 : 0x00);
 
 		// the VDP PAL flag and timing follow too (some European games check the VDP status instead of the version register)
@@ -390,7 +416,6 @@ void md_firecore_state::machine_start()
 	md_ctrl_state::machine_start();
 	m_vdp->stop_timers();
 	save_item(NAME(m_rom_extra_offset));
-	save_item(NAME(m_externalbank));
 	save_item(NAME(m_romsize));
 	save_item(NAME(m_gpio));
 	save_item(NAME(m_ssf2_bank));
@@ -404,6 +429,8 @@ void md_firecore_state::machine_reset()
 	m_vdp_is_pal = 0;
 	m_rom_extra_offset = 0;
 	std::fill(std::begin(m_gpio), std::end(m_gpio), 0);
+	m_gpio[0] = 0xffff; // atgame40 and reactmd rely on these being pulled high to select the top bank by default
+
 	for (int i = 0; i < 8; i++)
 		m_ssf2_bank[i] = i;
 	std::fill(std::begin(m_sysreg), std::end(m_sysreg), 0);
@@ -425,10 +452,6 @@ void md_firecore_state::md_firecore(machine_config &config)
 	m_vdp->snd_irq().set_inputline(m_z80snd, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
-	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(false);
-	m_vdp->set_framerate(60);
-	m_vdp->set_total_scanlines(262);
 
 	ctrl1_3button(config);
 	ctrl2_3button(config);
@@ -568,7 +591,7 @@ on an unsupported video mode (they still play sounds and resond to inputs / do c
 
 ROM_START( atgame40 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x0000000, 0x1000000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
+	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x000000, 0x1000000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
 ROM_END
 
 
@@ -665,17 +688,38 @@ ROM_START( sarc110a )
 	ROM_LOAD( "ic1_ver2.prg", 0x00000, 0x400000, CRC(b97a0dc7) SHA1(bace32d73184df914113de5336e29a7a6f4c03fa) )
 ROM_END
 
-void md_firecore_state::init_sarc110()
+
+void md_pxp3_state::init_mahg156()
+{
+	// the lines might just have been swapped when dumping compared to pxp3
+	m_romsize = memregion("maincpu")->bytes();
+	m_chunk_mask[0] = 0x0400; // A23
+	m_chunk_mask[1] = 0x0020; // A24
+	m_chunk_mask[2] = 0x0002; // A25
+	m_chunk_mask[3] = 0x0010; // A26
+	init_megadriv();
+}
+
+void md_pxp3_state::init_pxp3() // also mdhh100
 {
 	m_romsize = memregion("maincpu")->bytes();
-	m_externalbank = 0x800000;
+	m_chunk_mask[0] = 0x0020; // A23
+	m_chunk_mask[1] = 0x0400; // A24
+	m_chunk_mask[2] = 0x0002; // A25
+	m_chunk_mask[3] = 0x0010; // A26
 	init_megadrie();
 }
 
-void md_firecore_state::init_reactmd()
+
+void md_reactor_state::init_atgame40()
 {
 	m_romsize = memregion("maincpu")->bytes();
-	m_externalbank = 0x1800000;
+	init_megadriv();
+}
+
+void md_reactor_state::init_reactor()
+{
+	m_romsize = memregion("maincpu")->bytes();
 	init_megadrie();
 
 	// decryption of the SunPlus part
@@ -689,26 +733,6 @@ void md_firecore_state::init_reactmd()
 
 		ROM[i] = ROM[i] ^ 0xa5a5;
 	}
-}
-
-void md_pxp3_state::init_mahg156()
-{
-	m_romsize = memregion("maincpu")->bytes();
-	m_chunk_mask[0] = 0x0400; // A23
-	m_chunk_mask[1] = 0x0020; // A24
-	m_chunk_mask[2] = 0x0002; // A25
-	m_chunk_mask[3] = 0x0010; // A26
-	init_megadriv();
-}
-
-void md_pxp3_state::init_pxp3() // also mdhh100, dcat16
-{
-	m_romsize = memregion("maincpu")->bytes();
-	m_chunk_mask[0] = 0x0020; // A23
-	m_chunk_mask[1] = 0x0400; // A24
-	m_chunk_mask[2] = 0x0002; // A25
-	m_chunk_mask[3] = 0x0010; // A26
-	init_megadriv();
 }
 
 } // anonymous namespace
@@ -726,6 +750,7 @@ void md_pxp3_state::init_pxp3() // also mdhh100, dcat16
 // due to differences in the SoC compared to real MD hardware (including sound + new video modes) these have been left
 // as NOT WORKING for now although some games run to a degree
 
+// games with no external banking
 CONS( 2020, mypacgld,  0,        0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Pac-Man 40th Anniversary (DGUNL-3290 / TUV-01, Micro Player)", MACHINE_NOT_WORKING )
 
 CONS( 2021, mypac,     0,        0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Pac-Man (DGUNL-4198, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
@@ -734,7 +759,6 @@ CONS( 2021, mypaca,    mypac,    0, md_firecore,    mympac,    md_firecore_state
 CONS( 2021, mympac,    0,        0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Ms. Pac-Man (DGUNL-7010, Pocket Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 CONS( 2021, mympaca,   mympac,   0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Ms. Pac-Man (DGUNL-7023, Nano Player Pro)", MACHINE_NOT_WORKING | ROT270 )
 
-// menu uses unsupported extended mode
 CONS( 2021, mygalag,   0,        0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Galaga (DGUNL-4195, Micro Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT270 )
 CONS( 2021, mygalaga,  mygalag,  0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Galaga (DGUNL-4199, Pocket Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT270 )
 CONS( 2021, mygalagb,  mygalag,  0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Galaga (DGUNL-7132, Pixel Pocket Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT270 )
@@ -742,16 +766,8 @@ CONS( 2021, mygalagb,  mygalag,  0, md_firecore,    mympac,    md_firecore_state
 CONS( 2021, mysinv,    0,        0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Space Invaders (DGUNL-7006, Pocket Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT90 )
 CONS( 2021, mysinva,   mysinv,   0, md_firecore,    mympac,    md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Space Invaders (DGUNL-7133, Pixel Pocket Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | ROT90 )
 
-CONS( 2021, mysf2,     0,        0, md_firecore_6b, msi_6b,    md_firecore_state, init_megadriv,  "dreamGEAR", "My Arcade Street Fighter II (DGUNL-4184, Nano Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-CONS( 2012, atgame40,  0,        0, md_firecore,    md_common, md_firecore_state, init_megadriv,     "AtGames",   "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
 CONS( 2021, matet,     0,        0, md_firecore,    md_common, md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Tetris (DGUNL-7028, Pocket Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2021, mateta,    matet,    0, md_firecore,    md_common, md_firecore_state, init_megadriv, "dreamGEAR", "My Arcade Tetris (DGUNL-7025, Micro Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
-// has an SD card slot? (the menu has an 'SD CARTRIDGE' entry, not emulated)
-// 8MiB flash only, menu at 0 (DMC-RK2-MST), the built-in games use the Firecore extended video mode
-CONS( 200?, dcat16,    0,        0, md_firecore,    md_common, md_firecore_state, init_megadriv,     "Firecore",  "D-CAT16 (Firecore handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // From a European unit but NTSC? - code is hacked from original USA Genesis game with region check still intact? (does the clone hardware always identify as such? or does the bypassed boot code skip the check?)
 CONS( 2018, msi_sf2,   0,        0, md_firecore_6b, msi_6b,    md_firecore_state, init_megadriv, "MSI / Capcom / Sega", "Street Fighter II: Special Champion Edition (MSI Plug & Play) (Europe)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -759,13 +775,26 @@ CONS( 2018, msi_sf2,   0,        0, md_firecore_6b, msi_6b,    md_firecore_state
 // the Firecore video mode part doesn't work correctly, game can boot if you skip over it
 CONS( 2019, bfmk,      0,        0, md_firecore_6b, msi_6b,    md_firecore_state, init_megadriv, "Basic Fun", "Mortal Kombat: Arcade Classics", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
-// Two systems in one unit - Firecore Genesis and SunPlus
-CONS( 2009, reactmd,   0,        0, md_firecore,    md_common, md_firecore_state, init_reactmd,  "AtGames / Sega / Waixing", "Reactor MD (Firecore/SunPlus hybrid, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+// games with 2 banks (0x1000000 ROM size)
+
+CONS( 2021, mysf2,     0,        0, md_firecore_6b, mdhh100,   md_reactor_state, init_atgame40,  "dreamGEAR", "My Arcade Street Fighter II (DGUNL-4184, Nano Player Pro)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+CONS( 2012, atgame40,  0,        0, md_firecore,    md_common, md_reactor_state, init_atgame40,     "AtGames",   "40 Bonus Games in 1 (AtGames)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// has an SD card slot? (the menu has an 'SD CARTRIDGE' entry, not emulated)
+// 8MiB flash only, menu at 0 (DMC-RK2-MST), the built-in games use the Firecore extended video mode
+CONS( 200?, dcat16,    0,        0, md_firecore,    mdhh100, md_reactor_state, init_atgame40,     "Firecore",  "D-CAT16 (Firecore handheld)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 // Two systems in one unit - Firecore Genesis and VT02/VT03
-CONS( 200?, sarc110,   0,        0, md_firecore,    md_common, md_firecore_state, init_sarc110,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-CONS( 200?, sarc110a,  sarc110,  0, md_firecore,    md_common, md_firecore_state, init_sarc110,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, sarc110,   0,        0, md_firecore,    mdhh100, md_reactor_state, init_atgame40,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+CONS( 200?, sarc110a,  sarc110,  0, md_firecore,    mdhh100, md_reactor_state, init_atgame40,  "<unknown>", "Super Arcade 101-in-1 (Firecore/VT hybrid, set 2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
+// games with 4 banks (0x2000000 ROM size)
+
+// Two systems in one unit - Firecore Genesis and SunPlus
+CONS( 2009, reactmd,   0,        0, md_firecore,    mdhh100, md_reactor_state, init_reactor,  "AtGames / Sega / Waixing", "Reactor MD (Firecore/SunPlus hybrid, PAL)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+
+// games with 16 banks (0x8000000 ROM size)
 
 // RedKid (DMC RK2) based, 1Gbit flash, menu at 0x7800000
 // there are PXP3 Slim Stations on other SoCs too
@@ -779,4 +808,3 @@ CONS( 201?, mahg156,   0,        0, md_firecore_6b, mahg156,   md_pxp3_state, in
 
 // game-boy like handheld, pink in colour, 6 button controller (+ home select, start, vol buttons)
 CONS( 201?, mdhh100,   0,        0, md_firecore_6b, mdhh100,   md_pxp3_state, init_pxp3,     "<unknown>", "unknown 100-in-1 handheld (Firecore)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-
