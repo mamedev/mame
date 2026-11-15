@@ -30,6 +30,18 @@ DEFINE_DEVICE_TYPE(FIRECORE_VDP, megadriv_firecore_vdp_device, "megadriv_firecor
 	   and "Zuma Bubbles" found in pxp3, mahg156
 */
 
+void megadriv_firecore_vdp_device::device_start()
+{
+	sega315_5313_device::device_start();
+	save_item(NAME(m_firecore_pal_flag));
+}
+
+void megadriv_firecore_vdp_device::device_reset()
+{
+	sega315_5313_device::device_reset();
+	m_firecore_pal_flag = 0;
+}
+
 uint16_t megadriv_firecore_vdp_device::xvdp_r(offs_t offset, uint16_t mem_mask)
 {
 	if (!machine().side_effects_disabled() && ((offset & 0x0e) == 0x02)) // control port read clears the pending command
@@ -37,6 +49,19 @@ uint16_t megadriv_firecore_vdp_device::xvdp_r(offs_t offset, uint16_t mem_mask)
 
 	return sega315_5313_device::vdp_r(offset, mem_mask);
 }
+
+// override the usual NTSC / PAL flag with the programmed one
+// without changing other timings
+u8 megadriv_firecore_vdp_device::ctrl_port_vdp_pal()
+{
+	return m_firecore_pal_flag;
+}
+
+void megadriv_firecore_vdp_device::set_ctrl_port_vdp_pal(u8 pal)
+{
+	m_firecore_pal_flag = pal;
+}
+
 
 void megadriv_firecore_vdp_device::xvdp_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {

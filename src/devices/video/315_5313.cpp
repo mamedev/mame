@@ -1085,7 +1085,10 @@ PAL, 256x224
 
 */
 
-
+u8 sega315_5313_device::ctrl_port_vdp_pal()
+{
+	return m_vdp_pal;
+}
 
 u16 sega315_5313_device::ctrl_port_r()
 {
@@ -1119,29 +1122,29 @@ u16 sega315_5313_device::ctrl_port_r()
 	/* extra case */
 	if (MEGADRIVE_REG01_DISP_ENABLE == 0) vblank = 1;
 
-/*
+	/*
 
-// these aren't *always* 0/1 some of them are open bus return
- d15 - Always 0
- d14 - Always 0
- d13 - Always 1
- d12 - Always 1
+	// these aren't *always* 0/1 some of them are open bus return
+	 d15 - Always 0
+	 d14 - Always 0
+	 d13 - Always 1
+	 d12 - Always 1
 
- d11 - Always 0
- d10 - Always 1
- d9  - FIFO Empty
- d8  - FIFO Full
+	 d11 - Always 0
+	 d10 - Always 1
+	 d9  - FIFO Empty
+	 d8  - FIFO Full
 
- d7  - Vertical interrupt pending
- d6  - Sprite overflow on current scan line
- d5  - Sprite collision
- d4  - Odd frame
+	 d7  - Vertical interrupt pending
+	 d6  - Sprite overflow on current scan line
+	 d5  - Sprite collision
+	 d4  - Odd frame
 
- d3  - Vertical blanking
- d2  - Horizontal blanking
- d1  - DMA in progress
- d0  - PAL mode flag
-*/
+	 d3  - Vertical blanking
+	 d2  - Horizontal blanking
+	 d1  - DMA in progress
+	 d0  - PAL mode flag
+	*/
 
 	return (1 << 13) | // ALWAYS 1
 			(1 << 12) | // ALWAYS 1
@@ -1155,7 +1158,7 @@ u16 sega315_5313_device::ctrl_port_r()
 			(vblank << 3) |
 			(hblank_flag << 2) |
 			(dma_active << 1) |
-			(m_vdp_pal << 0); // PAL MODE FLAG checked by striker for region prot..
+			(ctrl_port_vdp_pal() << 0); // PAL MODE FLAG checked by striker for region prot..
 }
 
 static const u8 vc_ntsc_224[] =

@@ -205,18 +205,13 @@ void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_
 		const bool domestic = BIT(m_sysreg[0x1e / 2], 2);
 		logerror("setting to pal %d domestic %d\n", pal, domestic);
 
+		// Writes here don't actually change the timing of the unit, testing Zool on the real pxp3 which is a PAL
+		// ROM (with region lockout) it sets these flags to PAL to bypass the check, but runs too quickly.
 		m_version_hi_nibble = 0x20 | (domestic ? 0x00 : 0x80) | (pal ? 0x40 : 0x00);
-
-		// the VDP PAL flag and timing follow too (some European games check the VDP status instead of the version register)
-		// TODO: does this really change the output, or just fake the return values?
 		if (pal != bool(m_vdp_is_pal))
 		{
 			m_vdp_is_pal = pal;
-			m_vdp->set_vdp_pal(pal);
-			m_vdp->set_framerate(pal ? 50 : 60);
-			m_vdp->set_total_scanlines(pal ? 313 : 262);
-			m_screen->configure(m_screen->width(), pal ? 313 : 262, m_screen->visible_area(),
-					attotime::from_hz(pal ? (MASTER_CLOCK_PAL.dvalue() / 10 / 313 / 342) : (MASTER_CLOCK_NTSC.dvalue() / 10 / 262 / 342)));
+			dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).set_ctrl_port_vdp_pal(pal);
 		}
 		break;
 	}
@@ -707,7 +702,7 @@ void md_pxp3_state::init_pxp3() // also mdhh100
 	m_chunk_mask[1] = 0x0400; // A24
 	m_chunk_mask[2] = 0x0002; // A25
 	m_chunk_mask[3] = 0x0010; // A26
-	init_megadrie();
+	init_megadriv();
 }
 
 

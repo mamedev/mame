@@ -37,6 +37,8 @@ public:
 	void set_pal_write_base(int palwrite_base) { m_palwrite_base = palwrite_base; }
 	template <typename T> void set_ext_palette(T &&tag) { m_ext_palette.set_tag(std::forward<T>(tag)); }
 
+	void reconfigure_video(bool pal);
+
 	// Temporary solution while 32x VDP mixing and scanline interrupting is moved outside MD VDP
 	template <typename... T> void set_md_32x_scanline(T &&... args) { m_32x_scanline_func.set(std::forward<T>(args)...); }
 	template <typename... T> void set_md_32x_interrupt(T &&... args) { m_32x_interrupt_func.set(std::forward<T>(args)...); }
@@ -236,6 +238,7 @@ private:
 	u16 get_hposition();
 	u16 megadriv_read_hv_counters();
 
+	virtual u8 ctrl_port_vdp_pal();
 	u16 ctrl_port_r();
 	u16 data_port_r();
 	void data_port_w(int data);

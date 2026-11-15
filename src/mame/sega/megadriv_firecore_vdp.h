@@ -36,6 +36,12 @@ public:
 	void xvdp_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	bool xvdp_enabled() const { return BIT(m_regs[0x18], 7); }
 
+	void set_ctrl_port_vdp_pal(u8 pal);
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
 private:
 	u8 read_vram8(u32 address);	
 	void write_vram8(u32 address, u8 data);
@@ -45,6 +51,9 @@ private:
 	void xvdp_draw_plane(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint32_t nametable, int plane);
 	void xvdp_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint8_t xvdp_tile_pixel(uint32_t tile, int x, int y);
+	virtual u8 ctrl_port_vdp_pal() override;
+
+	u8 m_firecore_pal_flag;
 };
 
 #endif // MAME_SEGA_MEGADRIV_FIRECORE_VDP_H
