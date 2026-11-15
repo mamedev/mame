@@ -215,6 +215,9 @@ void astropc_state::astropc(machine_config &config)
 	mediagx_cs5530_ide_device &ide(MEDIAGX_CS5530_IDE(config, "pci:12.2", 0, "maincpu"));
 	ide.irq_pri().set("pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq14_w));
 	ide.irq_sec().set("pci:12.0", FUNC(mediagx_cs5530_bridge_device::pc_irq15_w));
+	// Compact Flash on the secondary channel (LILO boots from /dev/hdc)
+	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option(nullptr);
+	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option("cf");
 
 	// "pci:12.3" XpressAUDIO
 	MEDIAGX_CS5530_VIDEO(config, "pci:12.4");
@@ -239,8 +242,8 @@ ROM_START( blackbd )
 	ROM_LOAD16_BYTE( "b43-chip1.512", 0x0000, 0x010000, CRC(f17e4a65) SHA1(a375715c3d2c1bee01e022eb7b39f9b08207de13) )
 	ROM_LOAD16_BYTE( "b43-chip2.512", 0x0001, 0x010000, CRC(612fffe0) SHA1(c762700bdb87c777d8ece9c11addf93850aae6db) )
 
-	ROM_REGION(0x8000000, "drive", 0) // Raw sector image, last modified date of 2005-09-22
-	ROM_LOAD( "black beard ru.04.43.a.dd", 0x0000, 0x3e20000, CRC(14430270) SHA1(1df178bf3b00a60448b82953696ff205adf3dc66) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" ) // from a raw sector image, last modified date of 2005-09-22
+	DISK_IMAGE( "black_beard_ru.04.43.a", 0, SHA1(6ace6e81a76af103afd5f59552c6a73b2d3db614) )
 
 	ROM_REGION(0x8000000, "others", 0)
 	ROM_LOAD( "93c46-2.046", 0x0000, 0x000080, CRC(08c9dea5) SHA1(647eda3f6ca8b8863417e9a64b87a99843ce3820) )
@@ -256,10 +259,10 @@ ROM_START( blackbda )
 	ROM_LOAD16_BYTE( "bbird1.512", 0x00000, 0x010000, CRC(0782cd0b) SHA1(976273880dc0357b4c9e432e44c9f82bac55f5e5) )
 	ROM_LOAD16_BYTE( "bbird2.512", 0x00001, 0x010000, CRC(9cf9f0a7) SHA1(f8a9c851ca7ea859f90f9ad6afd4cf1178eae039) )
 
-	ROM_REGION(0x8000000, "drive", 0) // "Paragon Backup File" format
-	ROM_LOAD( "img_d1.pbf", 0x0000, 0x004c45, CRC(a0dba309) SHA1(4d9dd245cc973fb70aff90cac5a94701b6b6ccd3) )
-	ROM_LOAD( "img_d100.p00", 0x0000, 0x36a50ac, CRC(e0353f4f) SHA1(a930ac9e272d5474264490dc3a3223670d00b61d) )
-	ROM_LOAD( "img_d100.pfm", 0x0000, 0x000618, CRC(b3738001) SHA1(8266fd53357779d934cd1cb1b5a27b8e9e0dcce2) )
+	// rebuilt from a "Paragon Backup File" (img_d1.pbf: sectors 0-31, img_d100.p00/.pfm: partition 1),
+	// which only stores the clusters in use: the others are filled with 0
+	DISK_REGION( "pci:12.2:ide2:0:cf" )
+	DISK_IMAGE( "img_d1", 0, BAD_DUMP SHA1(0ec48d21e177feb657ec87c5337e1a4a7c990c7a) )
 ROM_END
 
 ROM_START( blackbdb )
@@ -273,8 +276,8 @@ ROM_START( blackbdb )
 	ROM_LOAD16_BYTE( "u1_bbru44.bin", 0x00000, 0x010000, CRC(bd973bc1) SHA1(1f1997a3c1c70ccec01c1cb44c127356b6412457) )
 	ROM_LOAD16_BYTE( "u2_bbru44.bin", 0x00001, 0x010000, CRC(4a6a6a18) SHA1(959ad5a369b27e73e9e879471784ccab1001d114) )
 
-	ROM_REGION(0x8000000, "drive", 0) // Raw sector image, last modified date of 2005-12-22
-	ROM_LOAD( "blackbeard  ru_04b.img", 0x0000, 0x3e20000, CRC(cadbaa2b) SHA1(15033bffedd173622d50ac0adf99e257c207748c) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" ) // from a raw sector image, last modified date of 2005-12-22
+	DISK_IMAGE( "blackbeard_ru_04b", 0, SHA1(dce8611f53e844c9a213d78c4380bf307257ca4d) )
 ROM_END
 
 // AMD Geode CS5530A-UCE, SMC FDC37C932APM, DM9102AF, Compact Flash. Sub board with ROMs, ASTRO M and ASTRO V102PX-018 customs
@@ -289,8 +292,8 @@ ROM_START( blackbdu )
 	ROM_LOAD16_BYTE( "1_bbsh-111.rom1", 0x00000, 0x010000, CRC(4e5388a9) SHA1(929e3a03c4f94768a03f51b243d169d2991775cd) )
 	ROM_LOAD16_BYTE( "2_bbsh-111.rom2", 0x00001, 0x010000, CRC(c63e4927) SHA1(428272fd5d8eceecd878f5c82e7ce1458631c005) )
 
-	ROM_REGION(0x8000000, "drive", 0)
-	ROM_LOAD( "blackbeard_us.00.img", 0x0000, 0x3e20000, CRC(c7421ac2) SHA1(51ccafd03377e5dbdb6591292f05bc984d761d79) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" )
+	DISK_IMAGE( "blackbeard_us.00", 0, SHA1(e58e882b0d21aaa1afcd1c8e227ad6ff372d063d) )
 
 	ROM_REGION(0x100, "others", 0)
 	ROM_LOAD( "at93c46.u120", 0x00, 0x80, CRC(c9330682) SHA1(0ba0635690e413a2088421ac67ea113923e73d60) )
@@ -313,8 +316,8 @@ ROM_START( dslayrr )
 	ROM_LOAD16_BYTE( "ds ru 15.21.b-1.bin", 0x00000, 0x010000, CRC(d33fdb7b) SHA1(1bf16716dd534ca8e89063184cd7ccaed732c43b) )
 	ROM_LOAD16_BYTE( "ds ru 15.21.b-2.bin", 0x00001, 0x010000, CRC(50065dd5) SHA1(44f60467e90d0bdb82227ce25261d22f921b9903) )
 
-	ROM_REGION(0x8000000, "drive", 0) // WinHex format, last modified date of 2005-08-22
-	ROM_LOAD( "dragon slayer ru 15.21.b.whx", 0x0000, 0x7c80181, CRC(7af9ed2e) SHA1(082463eb44e8ca144e2e934ba5820ab248599033) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" ) // from a WinHex backup, last modified date of 2005-08-22
+	DISK_IMAGE( "dragon_slayer_ru_15.21.b", 0, SHA1(f5a000d076866ecff0dda831576b39371a7aa461) )
 ROM_END
 
 ROM_START( dslayrra )
@@ -333,8 +336,8 @@ ROM_START( dslayrra )
 	ROM_LOAD16_BYTE( "u1-0f0b.rf", 0x00000, 0x010000, CRC(d33fdb7b) SHA1(1bf16716dd534ca8e89063184cd7ccaed732c43b) )
 	ROM_LOAD16_BYTE( "u2-f500.rf", 0x00001, 0x010000, CRC(50065dd5) SHA1(44f60467e90d0bdb82227ce25261d22f921b9903) )
 
-	ROM_REGION(0x8000000, "drive", 0) // Raw sector image, last modified date of 2006-06-30
-	ROM_LOAD( "ds.16b", 0x0000, 0x7a80000, CRC(19b229c6) SHA1(eb419dbfdec0ad03c422fdc54e77a5df37442026) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" ) // from a raw sector image, last modified date of 2006-06-30
+	DISK_IMAGE( "ds.16b", 0, SHA1(7c02bdc8049450ecc4ab440c0080ef6dfb518e12) )
 ROM_END
 
 ROM_START( hawaii )
@@ -348,8 +351,8 @@ ROM_START( hawaii )
 	ROM_LOAD16_BYTE( "rom1.512", 0x00000, 0x010000, CRC(b963d590) SHA1(c6d38cf1865efd8619a9eec07410db1e16e7276d) )
 	ROM_LOAD16_BYTE( "rom2.512", 0x00001, 0x010000, CRC(db670705) SHA1(6a76d5114847f54cf98e4c016bb5d47a4b7e1ef8) )
 
-	ROM_REGION(0x8000000, "drive", 0) // WinHex format, last modified date of 2004-07-19
-	ROM_LOAD( "hawaii   v1.01a .whx", 0x0000, 0x3c0017b, CRC(f033f963) SHA1(5f50aaf3ddbde176388612ea1a4c0040533f2109) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" ) // from a WinHex backup, last modified date of 2004-07-19
+	DISK_IMAGE( "hawaii_v1.01a", 0, SHA1(a618fdcea7ae47f5612df655a8e3802cf63c61db) )
 ROM_END
 
 ROM_START( oligam )
@@ -363,8 +366,8 @@ ROM_START( oligam )
 	ROM_LOAD16_BYTE( "rom1.512", 0x00000, 0x010000, CRC(41cefe2a) SHA1(5f03f93e92555a76284f97366a9761106901506f) )
 	ROM_LOAD16_BYTE( "rom2.512", 0x00001, 0x010000, CRC(caa4fe49) SHA1(6b92af831a210b0c5264dde30fb13611bf2e366c) )
 
-	ROM_REGION(0x8000000, "drive", 0) // Raw sector image, last modified date of 2005-11-29
-	ROM_LOAD( "olympian games ru.04.39.a.dd", 0x0000, 0x3e90000, CRC(ba452de5) SHA1(371e6157bcd5a1ed48b4a75f4962244157610912) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" ) // from a raw sector image, last modified date of 2005-11-29
+	DISK_IMAGE( "olympian_games_ru.04.39.a", 0, SHA1(84adf40be9b1c08df742f9a76aa111ba25d6c33c) )
 ROM_END
 
 ROM_START( rasce )
@@ -378,8 +381,8 @@ ROM_START( rasce )
 	ROM_LOAD16_BYTE( "u1-49c1.rf", 0x00000, 0x010000, CRC(2da68b6a) SHA1(3ad5833841d06495bae3fcca561f23124602864e) )
 	ROM_LOAD16_BYTE( "u2-3f00.rf", 0x00001, 0x010000, CRC(b1dabdc9) SHA1(9d88be2a9851497c03143232d7c22da0ff297d05) )
 
-	ROM_REGION(0x8000000, "drive", 0) // Raw sector image, last modified date of 2005-11-29
-	ROM_LOAD( "rs.06.03r", 0x0000, 0x7a80000, CRC(66132c3d) SHA1(4a73bab9518548950e11aebc6edf67f64d0d7798) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" ) // from a raw sector image, last modified date of 2005-11-29
+	DISK_IMAGE( "rs.06.03r", 0, SHA1(005f73eac23199e5a834c1ebb1160940f5c93795) )
 ROM_END
 
  // Pallas GX1 REV:B - AMD Geode CS5530A-UCE, SMC FDC37C932APM. Sub board with ROMs, ASTRO M and ASTRO V102PX-003 customs
@@ -394,8 +397,8 @@ ROM_START( hwparty )
 	ROM_LOAD16_BYTE( "1_hwus-112.u22", 0x00000, 0x010000, CRC(5cbe992c) SHA1(e785e5863ccc52d4ca5485569244d89e226398a0) )
 	ROM_LOAD16_BYTE( "2_hwus-112.u11", 0x00001, 0x010000, CRC(7b0187ed) SHA1(7d0791990aec06d929bcb40a6d9888b3bb350071) )
 
-	ROM_REGION(0x8000000, "drive", 0)
-	ROM_LOAD( "halloween_us.23.a.img", 0x0000, 0x7a80000, CRC(65d3877f) SHA1(076035bd55189a186368ae42463ab7471be1583c) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" )
+	DISK_IMAGE( "halloween_us.23.a", 0, SHA1(4cc26ac033d3ed16f8716d6864b11786d2e9e5f5) )
 ROM_END
 
  // Pallas GX1 REV:B - AMD Geode CS5530A-UCE, SMC FDC37C932APM. Sub board with ROMs, ASTRO M and ASTRO V102PX-013 customs
@@ -410,8 +413,8 @@ ROM_START( treasurh )
 	ROM_LOAD16_BYTE( "thus-47.1", 0x00000, 0x010000, CRC(49951369) SHA1(b9362b3046f2e3f974ec1c40fb2dabd42406f359) )
 	ROM_LOAD16_BYTE( "thus-47.2", 0x00001, 0x010000, CRC(6700e29b) SHA1(97f8e1738e9257f831f11d9fb609f4fcabc0318e) )
 
-	ROM_REGION(0x8000000, "drive", 0)
-	ROM_LOAD( "halloween_us.23.a.img", 0x0000000, 0x3d20000, CRC(6ebf4568) SHA1(f0db56d8f7ba9969570a108159ec4621a57a392c) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" )
+	DISK_IMAGE( "halloween_us.23.a", 0, SHA1(0e513293e3f2c4877126eab1f2c87512aef66ee7) )
 ROM_END
 
 
@@ -432,8 +435,8 @@ ROM_START( carnivac )
 	ROM_LOAD16_BYTE( "1_caus-014.tu1", 0x00000, 0x010000, CRC(131947d1) SHA1(521751c5a8a0e6031de7998ed64a8be3d6f0a290) )
 	ROM_LOAD16_BYTE( "2_caus-014.tu3", 0x00001, 0x010000, CRC(22d6209d) SHA1(621786d49e7fd38ce1b7665664f7b97604fedbd5) )
 
-	ROM_REGION(0x10000000, "drive", 0)
-	ROM_LOAD( "carnival_us.004.d.img", 0x0000, 0xf618000, CRC(566b9fbf) SHA1(14364b05151db60b1882c2230d896ac8c632395b) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" )
+	DISK_IMAGE( "carnival_us.004.d", 0, SHA1(d9f264a8d652bbf2ab0c4e1104867e32a89b43a4) )
 ROM_END
 
 // main PCB: Astro AS-LX800 A5 with AMD Geode CS5536AD, RTL8100C ethernet controller, AMD GEODE ALXD800EEXJ2VD (heat-sinked),
@@ -446,8 +449,8 @@ ROM_START( santacl )
 	ROM_LOAD16_BYTE( "1_scin-020.tu1", 0x00000, 0x010000, CRC(b05e9c50) SHA1(2e67d144497f0b531d94e97107e8c2b238e46363) )
 	ROM_LOAD16_BYTE( "2_scin-020.tu3", 0x00001, 0x010000, CRC(97821e0d) SHA1(ec2a44916799c2f92b9c6db75cffe22cd2dd61ef) )
 
-	ROM_REGION(0x20000000, "drive", 0)
-	ROM_LOAD( "santa_claus_in.001.07.a.img", 0x0000, 0x1e6c6000, CRC(c89732de) SHA1(499f49b97baeef9681a0f9e4538e74676d4379c4) )
+	DISK_REGION( "pci:12.2:ide2:0:cf" )
+	DISK_IMAGE( "santa_claus_in.001.07.a", 0, SHA1(cb72b80d891162f7b8cc8269b5c2e6a483266082) )
 ROM_END
 
 
