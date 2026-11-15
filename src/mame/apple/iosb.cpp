@@ -352,30 +352,23 @@ void iosb_base::field_interrupts()
 		take_interrupt = 1;
 	}
 
+	// Any change of the encoded IPL is latched in Capella
+	if (m_capella)
+	{
+		m_capella->translate_ipl_state_change(take_interrupt);
+		m_last_taken_interrupt = take_interrupt;
+		return;
+	}
 
 	if (m_last_taken_interrupt > -1)
 	{
-		if (m_capella)
-		{
-			m_capella->translate_ipl_state_change(-1);
-		}
-		else
-		{
-			m_maincpu->set_input_line(m_last_taken_interrupt, CLEAR_LINE);
-		}
+		m_maincpu->set_input_line(m_last_taken_interrupt, CLEAR_LINE);
 		m_last_taken_interrupt = -1;
 	}
 
 	if (take_interrupt > -1)
 	{
-		if (m_capella)
-		{
-			m_capella->translate_ipl_state_change(take_interrupt);
-		}
-		else
-		{
-			m_maincpu->set_input_line(take_interrupt, ASSERT_LINE);
-		}
+		m_maincpu->set_input_line(take_interrupt, ASSERT_LINE);
 		m_last_taken_interrupt = take_interrupt;
 	}
 }
