@@ -1,40 +1,44 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MagikalUnicorn
 
-#ifndef MAME_TVGAMES_XAVIX_MATH_H
-#define MAME_TVGAMES_XAVIX_MATH_H
+#ifndef MAME_MACHINE_XAVIX_MATH_H
+#define MAME_MACHINE_XAVIX_MATH_H
+
+#pragma once
 
 class xavix_math_device : public device_t
 {
 public:
-	xavix_math_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	xavix_math_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	uint8_t mult_r(offs_t offset);
-	void mult_w(offs_t offset, uint8_t data);
-	uint8_t mult_param_r(offs_t offset);
-	void mult_param_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
-
-	uint8_t barrel_r(offs_t offset);
-	void barrel_w(offs_t offset, uint8_t data);
+	void map(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	void do_math(bool mul_shf);
+	u8 shift_ctrl_r();
+	void shift_ctrl_w(u8 data);
+	u8 shift_result_r();
+	u8 multiplier_ctrl_r();
+	void multiplier_ctrl_w(u8 data);
+	u8 multiplicand_r();
+	void multiplicand_w(u8 data);
+	u8 multiplier_r();
+	void multiplier_w(u8 data);
+	u8 product_r(offs_t offset);
+	void product_w(offs_t offset, u8 data);
 
-	uint8_t m_mpr;
-	uint8_t m_mpd;
+	void multiply();
 
-	uint8_t m_multresults[2];
-
-	uint8_t m_mad;
-	uint8_t m_sgn_mpd;
-	uint8_t m_sgn_mpr;
+	u8 m_multiplier_ctrl;
+	u8 m_multiplicand;
+	u8 m_multiplier;
+	u16 m_result;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_MATH, xavix_math_device)
 
-#endif // MAME_TVGAMES_XAVIX_MATH_H
+#endif // MAME_MACHINE_XAVIX_MATH_H

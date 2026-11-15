@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Peter Wilhelmsen
+// copyright-holders:Peter Wilhelmsen, MagikalUnicorn
 
 #ifndef MAME_MACHINE_S35390A_H
 #define MAME_MACHINE_S35390A_H
@@ -12,6 +12,10 @@ class s35390a_device : public device_t, public device_rtc_interface, public devi
 {
 public:
 	s35390a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+	void scl_w(int state);
+	void sda_w(int state);
+	int sda_r() const { return m_sda_out; }
 
 	// Byte-level I2C interface. Bit 8 marks an address byte.
 	u8 transmit(offs_t data);
@@ -33,9 +37,19 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override ATTR_COLD;
 
 private:
+	enum : u8
+	{
+		STATE_IDLE,
+		STATE_ADDRESS,
+		STATE_WRITE,
+		STATE_READ,
+		STATE_READ_ACK
+	};
+
 	static u8 reverse(u8 data) { return bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7); }
 	void apply_time();
 	void reset_registers();
+	void prepare_read();
 	TIMER_CALLBACK_MEMBER(tick);
 
 	u8 m_regs[8][7];
@@ -47,6 +61,13 @@ private:
 	bool m_selected;
 	bool m_read;
 	emu_timer *m_timer;
+
+	u8 m_state;
+	u8 m_shift;
+	u8 m_bits;
+	u8 m_scl;
+	u8 m_sda_in;
+	u8 m_sda_out;
 };
 
 DECLARE_DEVICE_TYPE(S35390A, s35390a_device)

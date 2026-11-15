@@ -116,6 +116,7 @@ DEFINE_DEVICE_TYPE(AMD_29LV160DB_16BIT,       amd_29lv160db_16bit_device,       
 DEFINE_DEVICE_TYPE(AMD_29LV200T,             amd_29lv200t_device,             "amd_29lv200t",             "AMD 29LV200T Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29F160TE,         fujitsu_29f160te_device,         "mbm29f160te",              "Fujitsu MBM29F160TE Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29F160TE_16BIT,   fujitsu_29f160te_16bit_device,   "mbm29f160te_16bit",        "Fujitsu MBM29F160TE Flash (16-bit)")
+DEFINE_DEVICE_TYPE(FUJITSU_29DL161TE_16BIT,  fujitsu_29dl161te_16bit_device,  "mbm29dl161te_16bit",       "Fujitsu MBM29DL161TE Flash (16-bit)")
 DEFINE_DEVICE_TYPE(FUJITSU_29F016A,          fujitsu_29f016a_device,          "mbm29f016a",               "Fujitsu MBM29F016A Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29DL164BD,        fujitsu_29dl164bd_device,        "mbm29dl164bd",             "Fujitsu MBM29DL164BD Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29LV002TC,        fujitsu_29lv002tc_device,        "mbm29lv002tc",             "Fujitsu MBM29LV002TC Flash")
@@ -188,6 +189,8 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_top_boot_sector(false),
 		m_bot_boot_sector(false),
 		m_sector_erase_selection(false),
+		m_erase_bank_boundary(0),
+		m_erase_time_per_sector(false),
 		m_page_size(0),
 		m_page_timeout_usec(0),
 		m_has_reset_pin(false),
@@ -221,6 +224,15 @@ fujitsu_29f160te_device::fujitsu_29f160te_device(const machine_config &mconfig, 
 
 fujitsu_29f160te_16bit_device::fujitsu_29f160te_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, FUJITSU_29F160TE_16BIT, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xd2) { m_top_boot_sector = true; m_has_reset_pin = true; }
+
+fujitsu_29dl161te_16bit_device::fujitsu_29dl161te_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, FUJITSU_29DL161TE_16BIT, tag, owner, clock, 0x200000, MFG_FUJITSU, 0x2236)
+{
+	m_sector_erase_selection = true;
+	m_erase_bank_boundary = 0x1f0000;
+	m_erase_time_per_sector = true;
+	m_has_reset_pin = true;
+}
 
 fujitsu_29f016a_device::fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, FUJITSU_29F016A, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xad) { m_has_reset_pin = true; }
@@ -419,6 +431,11 @@ void intelfsh_device::device_start()
 		m_erase_selected = make_unique_clear<bool []>(m_size / ERASE_BLOCK_SIZE);
 		save_pointer(NAME(m_erase_selected), m_size / ERASE_BLOCK_SIZE);
 	}
+	if (m_erase_bank_boundary)
+	{
+		m_erase_banks = 0;
+		save_item(NAME(m_erase_banks));
+	}
 
 	save_item( NAME(m_status) );
 	save_item( NAME(m_erase_sector) );
@@ -447,6 +464,8 @@ void intelfsh_device::device_reset()
 		m_timer->reset();
 		if (m_sector_erase_selection)
 			std::fill_n(m_erase_selected.get(), m_size / ERASE_BLOCK_SIZE, false);
+		if (m_erase_bank_boundary)
+			m_erase_banks = 0;
 	}
 }
 
@@ -474,23 +493,29 @@ TIMER_CALLBACK_MEMBER(intelfsh_device::delay_tick)
 
 	case FM_ERASEAMDSELECT:
 	{
+		uint32_t sectors = 0;
 		for (uint32_t base = 0; base < m_size; )
 		{
 			uint32_t const length = (base >= m_size - 64 * 1024) ? ERASE_BLOCK_SIZE : (64 * 1024);
 			if (m_erase_selected[base / ERASE_BLOCK_SIZE])
+			{
 				std::fill_n(&m_data[base], length, 0xff);
+				++sectors;
+			}
 			base += length;
 		}
 		m_status |= 1 << 3;
 		m_flash_mode = FM_ERASEAMD4;
-		// TODO: Model multi-sector erase timing.
-		m_timer->adjust(attotime::from_seconds(1));
+		// TODO: Verify absolute erase timing.
+		m_timer->adjust(attotime::from_seconds(m_erase_time_per_sector ? sectors : 1));
 		break;
 	}
 
 	case FM_ERASEAMD4:
 		m_flash_mode = FM_NORMAL;
 		m_status = 0x80;
+		if (m_erase_bank_boundary)
+			m_erase_banks = 0;
 		break;
 
 	case FM_WRITEPAGEATMEL:
@@ -698,8 +723,10 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 		bool toggle_dq2 = true;
 		if (m_sector_erase_selection)
 		{
-			// M29W640FT toggles DQ6 at every address and DQ2 only in selected sectors.
+			// DQ6 toggles in busy banks and DQ2 only in selected sectors.
 			uint32_t const byte_address = address * (m_bits / 8);
+			if (m_erase_bank_boundary)
+				read_array = !BIT(m_erase_banks, byte_address >= m_erase_bank_boundary);
 			toggle_dq2 = m_erase_sector < 0 || m_erase_selected[byte_address / ERASE_BLOCK_SIZE];
 		}
 		else
@@ -756,6 +783,8 @@ void intelfsh_device::select_erase_sector(uint32_t address)
 	uint32_t const base = byte_address & ~(length - 1);
 	std::fill_n(&m_erase_selected[base / ERASE_BLOCK_SIZE], length / ERASE_BLOCK_SIZE, true);
 	m_erase_sector = base / (m_bits / 8);
+	if (m_erase_bank_boundary)
+		m_erase_banks |= (base >= m_erase_bank_boundary) ? 2 : 1;
 	// Every additional sector selection restarts the erase timeout.
 	m_timer->adjust(attotime::from_usec(50));
 }
@@ -1036,6 +1065,8 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_flash_mode = FM_ERASEAMD4;
 			if (m_sector_erase_selection)
 				m_erase_sector = -1;
+			if (m_erase_bank_boundary)
+				m_erase_banks = 3;
 
 			if (m_sector_is_4k)
 			{
@@ -1055,6 +1086,8 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			if (m_sector_erase_selection)
 			{
 				std::fill_n(m_erase_selected.get(), m_size / ERASE_BLOCK_SIZE, false);
+				if (m_erase_bank_boundary)
+					m_erase_banks = 0;
 				m_status = 0;
 				m_flash_mode = FM_ERASEAMDSELECT;
 				select_erase_sector(address);
@@ -1176,6 +1209,8 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			m_timer->reset();
 			m_status = 0x80;
 			m_flash_mode = FM_NORMAL;
+			if (m_erase_bank_boundary)
+				m_erase_banks = 0;
 		}
 		break;
 

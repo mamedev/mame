@@ -1,49 +1,63 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MagikalUnicorn
 
-#ifndef MAME_TVGAMES_XAVIX2002_IO_H
-#define MAME_TVGAMES_XAVIX2002_IO_H
+#ifndef MAME_MACHINE_XAVIX_PIO_H
+#define MAME_MACHINE_XAVIX_PIO_H
 
+#pragma once
 
-class xavix2002_io_device : public device_t
+#include <array>
+
+class superxavix_pio_device : public device_t
 {
 public:
-	xavix2002_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	superxavix_pio_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	auto read_0_callback() { return m_in0_cb.bind(); }
-	auto read_1_callback() { return m_in1_cb.bind(); }
-	auto read_2_callback() { return m_in2_cb.bind(); }
+	// Callback masks identify pins configured as outputs.
+	template <unsigned Port> auto input_callback() { return m_input_cb[Port].bind(); }
+	template <unsigned Port> auto input_mask_callback() { return m_input_mask_cb[Port].bind(); }
 
-	auto write_0_callback() { return m_out0_cb.bind(); }
-	auto write_1_callback() { return m_out1_cb.bind(); }
-	auto write_2_callback() { return m_out2_cb.bind(); }
+	template <unsigned Port> auto output_callback() { return m_output_cb[Port].bind(); }
+	auto legacy_input_callback() { return m_legacy_input_cb.bind(); }
+	auto legacy_input_mask_callback() { return m_legacy_input_mask_cb.bind(); }
+	auto legacy_output_callback() { return m_legacy_output_cb.bind(); }
+	template <unsigned Port> void set_legacy_output_mask(u8 mask) { static_assert(Port < 2); m_legacy_output_mask[Port] = mask; }
 
-	void pio_dir_w(offs_t offset, uint8_t data);
-	uint8_t pio_dir_r(offs_t offset);
+	void map(address_map &map) ATTR_COLD;
+	u8 output_mask(unsigned port) const { return m_pio_direction[port] & m_pio_pull[port]; }
 
-	void pio_out_w(offs_t offset, uint8_t data);
-	uint8_t pio_out_r(offs_t offset);
+	u8 pio_direction_r(offs_t offset);
+	void pio_direction_w(offs_t offset, u8 data);
 
-	uint8_t pio_in_r(offs_t offset);
+	u8 pio_output_r(offs_t offset);
+	void pio_output_w(offs_t offset, u8 data);
+
+	u8 pio_input_r(offs_t offset);
+	u8 pio_pull_r(offs_t offset);
+	void pio_pull_w(offs_t offset, u8 data);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	devcb_read8 m_in0_cb;
-	devcb_read8 m_in1_cb;
-	devcb_read8 m_in2_cb;
+	void update_output(unsigned port);
+	u8 input_r(unsigned port);
 
-	devcb_write8 m_out0_cb;
-	devcb_write8 m_out1_cb;
-	devcb_write8 m_out2_cb;
+	devcb_read8::array<3> m_input_cb;
+	devcb_read8::array<3> m_input_mask_cb;
+	devcb_write8::array<3> m_output_cb;
+	devcb_read8 m_legacy_input_cb;
+	devcb_read8 m_legacy_input_mask_cb;
+	devcb_write8 m_legacy_output_cb;
+	std::array<u8, 2> m_legacy_output_mask;
 
-	uint8_t m_sx_pio_dir[3];
-	uint8_t m_sx_pio_out[3];
+	std::array<u8, 3> m_pio_direction;
+	std::array<u8, 3> m_pio_output;
+	std::array<u8, 3> m_pio_pull;
 };
 
-DECLARE_DEVICE_TYPE(XAVIX2002IO, xavix2002_io_device)
+DECLARE_DEVICE_TYPE(SUPERXAVIX_PIO, superxavix_pio_device)
 
-#endif // MAME_TVGAMES_XAVIX2002_IO_H
+#endif // MAME_MACHINE_XAVIX_PIO_H
