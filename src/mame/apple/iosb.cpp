@@ -247,6 +247,14 @@ void iosb_base::device_start()
 	save_item(NAME(m_hdsel));
 	save_item(NAME(m_nubus_irqs));
 	save_item(NAME(m_iosb_regs));
+	save_item(NAME(m_adb_interrupt));
+	save_item(NAME(m_drq));
+	save_item(NAME(m_scsi_irq));
+	save_item(NAME(m_asc_irq));
+	save_item(NAME(m_scsi_dma_read_cycles));
+	save_item(NAME(m_scsi_dma_write_cycles));
+	save_item(NAME(m_scsi_dma_result));
+	save_item(NAME(m_scsi_second_half));
 	save_item(NAME(m_scsi_stall_start));
 	save_item(NAME(m_scsi_stalled));
 }
@@ -262,6 +270,8 @@ void iosb_base::device_reset()
 
 	m_nubus_irqs = 0xff;
 	m_scsi_stalled = false;
+	m_scsi_second_half = false;
+	m_scsi_dma_result = 0;
 }
 
 TIMER_CALLBACK_MEMBER(iosb_base::mac_6015_tick)

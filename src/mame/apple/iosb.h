@@ -103,7 +103,7 @@ private:
 	bool m_via2_sync;
 	floppy_image_device *m_cur_floppy = nullptr;
 	int m_hdsel;
-	int m_adb_interrupt;
+	s32 m_adb_interrupt;
 
 	s32 m_drq, m_scsi_irq, m_asc_irq;
 	u32 m_scsi_read_cycles, m_scsi_write_cycles, m_scsi_dma_read_cycles, m_scsi_dma_write_cycles;
