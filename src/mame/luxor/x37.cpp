@@ -379,7 +379,7 @@ uint8_t x37_state::cio_pc_r()
 	uint8_t data = 0x0d;
 
 	// data in
-	data |= (m_rtc->dio_r() || m_nvram->do_read()) << 1;
+	data |= (m_rtc->dio_r() && m_nvram->do_read()) << 1;
 
 	return data;
 }
@@ -533,7 +533,7 @@ void x37_state::x37(machine_config &config)
 
 	EEPROM_93C06_16BIT(config, m_nvram);
 
-	E0516(config, m_rtc, XTAL(32'768));
+	E0516(config, m_rtc, XTAL(32'768)).set_use_utc(true);
 	m_rtc->outsel_rd_cb().set_constant(0);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq4").output_handler().set_inputline(m_cpu, M68K_IRQ_4);
