@@ -941,7 +941,7 @@ INPUT_PORTS_END
 microphone_device &superxavix_i2c_pio1_state::configure_stereo_music_input(machine_config &config)
 {
 	microphone_device &music_input(MICROPHONE(config, "music_input", 2));
-	music_input.map_on_request_only(0).map_on_request_only(1);
+	music_input.front();
 	return music_input;
 }
 

@@ -1996,7 +1996,7 @@ void xavix_tak_comt_state::xavix_tak_comt(machine_config &config)
 
 	// The station recognises TV musical cues through AN0; see Takara patent JP2003019364A.
 	m_soc->set_adc_audio_channel(0);
-	m_soc->add_adc_route(MICROPHONE(config, "station_microphone", 1).map_on_request_only(), 0, 1.0);
+	m_soc->add_adc_route(MICROPHONE(config, "station_microphone", 1).front_center(), 0, 1.0);
 
 	XAVIX_COMET_BATON(config, m_baton_controller, peripheral_clock());
 	m_baton_controller->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
@@ -2819,8 +2819,7 @@ void xavix_hikara_state::xavix_hikara(machine_config &config)
 	// JP2010019869A shows analogue dry monitoring; omit that route until its slow host playback is resolved.
 	m_soc->set_adc_audio_channel(0);
 	m_soc->add_adc_route(MICROPHONE(config, m_microphone[0], 1).front_center(), 0, 1.0);
-	// The second headset microphone only mixes after an explicit Audio Mixer channel route is selected.
-	m_soc->add_adc_route(MICROPHONE(config, m_microphone[1], 1).map_on_request_only(), 0, 1.0);
+	m_soc->add_adc_route(MICROPHONE(config, m_microphone[1], 1).front_center(), 0, 1.0);
 
 	// The serial framing and boot registers match an OTA5182-compatible LCD controller.
 	// TODO: Verify the fitted controller/panel and CT675 scaling and colour processing.
