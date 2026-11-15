@@ -36,7 +36,6 @@ protected:
 	void recalc_ints();
 	void recalc_mode();
 
-	u32 m_vram_size;
 	u32 m_pixel_clock;
 
 	u8 m_pal_address, m_pal_idx, m_mode;
@@ -45,9 +44,9 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_ioport m_monitor_config;
+	memory_share_creator<u32> m_vram;
 	devcb_write_line m_irq;
 
-	std::unique_ptr<u32[]> m_vram;
 	u32 m_vram_offset;
 	u8 m_monitor_id;
 	u32 m_base, m_stride, m_video_timing;

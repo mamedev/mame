@@ -118,12 +118,12 @@ void valkyrie_device::valkyriear_map(address_map &map)
 valkyrie_device::valkyrie_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, VALKYRIE, tag, owner, clock),
 	i2c_hle_interface(mconfig, *this, 0x28),
-	m_vram_size(0x100000),
 	m_pixel_clock(31334400),
 	m_pal_address(0), m_pal_idx(0), m_mode(0),
 	m_screen(*this, "screen"),
 	m_palette(*this, "palette"),
 	m_monitor_config(*this, "monitor"),
+	m_vram(*this, "vram", 0x100000, ENDIANNESS_BIG),
 	m_irq(*this),
 	m_vram_offset(0), m_monitor_id(0),
 	m_base(0), m_stride(1024), m_video_timing(0x80), m_int_status(0), m_hres(0), m_vres(0), m_htotal(0), m_vtotal(0),
@@ -141,8 +141,6 @@ valkyrie_device::~valkyrie_device()
 
 void valkyrie_device::device_start()
 {
-	m_vram = std::make_unique<u32[]>(m_vram_size);
-
 	save_item(NAME(m_video_timing));
 	save_item(NAME(m_vram_offset));
 	save_item(NAME(m_mode));
@@ -172,7 +170,6 @@ void valkyrie_device::device_start()
 	save_item(NAME(m_field_x));
 	save_item(NAME(m_field_y));
 	save_item(NAME(m_video_clut));
-	save_pointer(NAME(m_vram), m_vram_size);
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(valkyrie_device::recalc_mode), this));
 }
@@ -713,12 +710,12 @@ void valkyrie_device::recalc_mode()
 
 u32 valkyrie_device::vram_r(offs_t offset)
 {
-	return m_vram[offset & (m_vram_size - 1)];
+	return m_vram[offset & (m_vram.length() - 1)];
 }
 
 void valkyrie_device::vram_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	COMBINE_DATA(&m_vram[offset & (m_vram_size - 1)]);
+	COMBINE_DATA(&m_vram[offset & (m_vram.length() - 1)]);
 }
 
 u32 valkyrie_device::video_buffer_r(offs_t offset)
