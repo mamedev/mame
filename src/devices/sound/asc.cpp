@@ -73,7 +73,6 @@
       but still needs to be understood for a complete ASCTester "pass".
     - The IOSB variant has some surprising differences that aren't yet understood, including 16-bit wide FIFO ports
     - EASC doesn't implement the channel volumes yet because Mac OS doesn't use them
-    - PrimeTime III records silence from DFAC2's output loopback sources
     - PrimeTime III IRQ acknowledgement during simultaneous playback/recording is untested on hardware
     - PrimeTime III byte reads of the 16-bit window and negative-sample volume distortion haven't been investigated
     - Recording on the other variants hasn't been investigated
@@ -131,7 +130,7 @@ asc_base_device::asc_base_device(const machine_config &mconfig, device_type type
 void asc_base_device::device_start()
 {
 	// create the stream
-	m_stream = stream_alloc(get_sound_requested_inputs(), 2, m_sample_rate);
+	allocate_streams();
 
 	memset(m_regs, 0, sizeof(m_regs));
 
@@ -174,6 +173,16 @@ void asc_base_device::device_reset()
 //-------------------------------------------------
 
 TIMER_CALLBACK_MEMBER(asc_base_device::delayed_stream_update)
+{
+	update_streams();
+}
+
+void asc_base_device::allocate_streams()
+{
+	m_stream = stream_alloc(get_sound_requested_inputs(), 2, m_sample_rate);
+}
+
+void asc_base_device::update_streams()
 {
 	m_stream->update();
 }
@@ -1404,6 +1413,7 @@ u8 asc_iosb_device::get_version()
 
 asc_primetime3_device::asc_primetime3_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: asc_base_device(mconfig, ASC_PRIMETIME3, tag, owner, clock)
+	, m_record_stream(nullptr)
 {
 }
 
@@ -1422,8 +1432,23 @@ void asc_primetime3_device::device_start()
 	save_item(NAME(m_rec_last));
 }
 
+void asc_primetime3_device::allocate_streams()
+{
+	// Playback and ADC are independently clocked paths; with separate streams, the analog output on the
+	// board can be routed to the ADC without an audio routing cycle
+	m_stream = stream_alloc(0, 2, m_sample_rate);
+	m_record_stream = stream_alloc(std::max<u32>(get_sound_requested_inputs(), 1), 0, m_sample_rate);
+}
+
+void asc_primetime3_device::update_streams()
+{
+	m_stream->update();
+	m_record_stream->update();
+}
+
 void asc_primetime3_device::device_reset()
 {
+	m_record_stream->update();
 	asc_base_device::device_reset();
 
 	for (auto &fifo : m_fifo8)
@@ -1543,15 +1568,21 @@ void asc_primetime3_device::update_status16()
 
 void asc_primetime3_device::update_fifo_timer()
 {
-	u32 samples = FIFO_SAMPLES;
+	// Each FIFO count is only current up to the position of the matching stream, so each deadline is computed from that stream
+	attotime deadline = attotime::never;
 	if (recording() && !(m_regs[R_FIFOA_IRQCTRL] & 1) && !(m_irq_pending & STAT_HALF_FULL_A) && (fifo_cap(FIFO_REC) < FIFO_HALF_BYTES))
-		samples = (FIFO_HALF_BYTES - fifo_cap(FIFO_REC) + 1) / 2;
+	{
+		const u32 samples = (FIFO_HALF_BYTES - fifo_cap(FIFO_REC) + 1) / 2;
+		deadline = m_record_stream->sample_to_time(m_record_stream->end_index() + samples - 1);
+	}
 	const u16 playback = std::max(fifo_cap(FIFO_A), fifo_cap(FIFO_B));
 	if (m_regs[R_MODE] && !(m_regs[R_FIFOB_IRQCTRL] & 1) && !(m_irq_pending & STAT_HALF_FULL_B) && (playback > FIFO_HALF_BYTES))
-		samples = std::min<u32>(samples, (playback - FIFO_HALF_BYTES + 1) / 2);
+	{
+		const u32 samples = (playback - FIFO_HALF_BYTES + 1) / 2;
+		deadline = std::min(deadline, m_stream->sample_to_time(m_stream->end_index() + samples - 1));
+	}
 
-	m_timer->adjust((samples == FIFO_SAMPLES) ? attotime::never :
-		m_stream->sample_to_time(m_stream->end_index() + samples - 1) - machine().time());
+	m_timer->adjust(deadline - machine().time());
 }
 
 u16 asc_primetime3_device::read16(offs_t offset)
@@ -1583,7 +1614,7 @@ u16 asc_primetime3_device::pop_record()
 	if (machine().side_effects_disabled())
 		return (fifo_cap(FIFO_REC) >= 2) ? u16(peek_sample(FIFO_REC)) : m_rec_last;
 
-	m_stream->update();
+	update_streams();
 	if (fifo_cap(FIFO_REC) >= 2)
 	{
 		m_rec_last = u16(pop_sample(FIFO_REC));
@@ -1595,7 +1626,7 @@ u16 asc_primetime3_device::pop_record()
 
 void asc_primetime3_device::write16(offs_t offset, u16 data, u16 mem_mask)
 {
-	m_stream->update();
+	update_streams();
 	if (ACCESSING_BITS_8_15)
 		push_byte(BIT(offset, 10), data >> 8);
 	if (ACCESSING_BITS_0_7)
@@ -1605,17 +1636,17 @@ void asc_primetime3_device::write16(offs_t offset, u16 data, u16 mem_mask)
 
 void asc_primetime3_device::sound_stream_update(sound_stream &stream)
 {
+	if (&stream == m_record_stream)
+	{
+		record_stream_update(stream);
+		return;
+	}
+
 	const double volume_l = PRIMETIME3_VOLUME_TABLE[(m_regs[R_VOLUME] >> 5) & 7];
 	const double volume_r = PRIMETIME3_VOLUME_TABLE[(m_regs[R_VOLUME] >> 1) & 7];
 
 	for (int i = 0; i < stream.samples(); i++)
 	{
-		if (recording())
-		{
-			const double in = stream.input_count() ? stream.get(0, i) : 0.0;
-			push_sample(FIFO_REC, s16(u16(std::clamp(int(in * 32768.0), -32768, 32767)) ^ 0x8000));
-		}
-
 		const bool have_left = fifo_cap(FIFO_A) >= 2;
 		if (m_regs[R_MODE] != 0)
 		{
@@ -1635,6 +1666,19 @@ void asc_primetime3_device::sound_stream_update(sound_stream &stream)
 		stream.put_int(1, i, s32(m_last_right * volume_r), 32768);
 	}
 
+	update_status16();
+}
+
+void asc_primetime3_device::record_stream_update(sound_stream &stream)
+{
+	if (recording())
+	{
+		for (int i = 0; i < stream.samples(); i++)
+		{
+			const double in = stream.get(0, i);
+			push_sample(FIFO_REC, s16(u16(std::clamp(int(in * 32768.0), -32768, 32767)) ^ 0x8000));
+		}
+	}
 	update_status16();
 }
 
@@ -1660,7 +1704,7 @@ u8 asc_primetime3_device::read(offs_t offset)
 	{
 		case R_FIFOSTAT:
 			if (!machine().side_effects_disabled())
-				m_stream->update();
+				update_streams();
 			return m_regs[R_FIFOSTAT];
 
 		case R_FIFOA_IRQCTRL:
@@ -1685,7 +1729,7 @@ u8 asc_primetime3_device::read(offs_t offset)
 		case R_RDPTRPLAYA_L:
 		{
 			if (!machine().side_effects_disabled())
-				m_stream->update();
+				update_streams();
 			const u16 ptr = pointer(offset);
 			return BIT(offset, 0) ? u8(ptr) : u8(ptr >> 8);
 		}
@@ -1742,7 +1786,7 @@ void asc_primetime3_device::write(offs_t offset, u8 data)
 
 	if (offset < 0x800)
 	{
-		m_stream->update();
+		update_streams();
 		push_sample(BIT(offset, 10), s16((data ^ 0x80) << 8));
 		update_status16();
 		return;
@@ -1751,7 +1795,7 @@ void asc_primetime3_device::write(offs_t offset, u8 data)
 	switch (offset - 0x800)
 	{
 		case R_MODE:
-			m_stream->update();
+			update_streams();
 			m_regs[R_MODE] = data & 1;
 			update_fifo_timer();
 			return;
@@ -1759,7 +1803,7 @@ void asc_primetime3_device::write(offs_t offset, u8 data)
 		case R_FIFOA_IRQCTRL:
 		case R_FIFOB_IRQCTRL:
 		{
-			m_stream->update();
+			update_streams();
 			const int ch = BIT(offset, 5);
 			const u8 mask = ch ? STAT_HALF_FULL_B : STAT_HALF_FULL_A;
 			u8 pending = m_irq_pending;
@@ -1786,7 +1830,7 @@ void asc_primetime3_device::write(offs_t offset, u8 data)
 		case R_RDPTRPLAYA_H:
 		case R_RDPTRPLAYA_L:
 		{
-			m_stream->update();
+			update_streams();
 			u16 &ptr = pointer(offset);
 			if (BIT(offset, 0))
 				ptr = (ptr & 0x700) | data;
@@ -1802,7 +1846,7 @@ void asc_primetime3_device::write(offs_t offset, u8 data)
 			return;
 
 		case R_PLAYRECA:
-			m_stream->update();
+			update_streams();
 			m_regs[R_PLAYRECA] = data;
 			update_status16();
 			return;
@@ -1810,7 +1854,7 @@ void asc_primetime3_device::write(offs_t offset, u8 data)
 
 	if ((offset == (0x800 + R_FIFOMODE)) && (data & 0x80))
 	{
-		m_stream->update();
+		update_streams();
 		reset_fifos();
 		update_status16();
 	}
