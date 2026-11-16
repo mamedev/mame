@@ -266,7 +266,7 @@ u8 mcs51_cpu_device::ie_r()
 void mcs51_cpu_device::ie_w(u8 data)
 {
 	m_ie = data;
-	m_irq_delayed = 0xff;
+	m_irq_delayed = 0xffff;
 }
 
 u8 mcs51_cpu_device::ip_r()
@@ -278,7 +278,7 @@ void mcs51_cpu_device::ip_w(u8 data)
 {
 	m_ip = data;
 	update_irq_prio();
-	m_irq_delayed = 0xff;
+	m_irq_delayed = 0xffff;
 }
 
 u8 mcs51_cpu_device::p0_r()
@@ -964,16 +964,26 @@ bool mcs51_cpu_device::manage_idle_on_interrupt(u8 ints)
 	return false;
 }
 
-u8 mcs51_cpu_device::pending_irq_flags(u8 int_mask)
+u16 mcs51_cpu_device::pending_irq_flags(u16 int_mask)
 {
 	u8 ints = (BIT(m_tcon, TCON_IE0) | (BIT(m_tcon, TCON_TF0) << 1) | (BIT(m_tcon, TCON_IE1) << 2) | (BIT(m_tcon, TCON_TF1) << 3) | ((BIT(m_scon, SCON_RI) | BIT(m_scon, SCON_TI)) << 4));
-	irqs_complete_and_mask(ints, int_mask);
+	irqs_complete_and_mask(ints, u8(int_mask));
 	return ints;
 }
 
-u8 mcs51_cpu_device::interrupt_mask()
+u16 mcs51_cpu_device::interrupt_mask()
 {
 	return BIT(m_ie, IE_A) ? m_ie : 0;
+}
+
+u8 mcs51_cpu_device::interrupt_vector(u32 source) const
+{
+	return (source << 3) | 3;
+}
+
+u32 mcs51_cpu_device::interrupt_priority(u32 source) const
+{
+	return m_irq_prio[source];
 }
 
 void mcs51_cpu_device::interrupt_taken()
@@ -987,7 +997,7 @@ void mcs51_cpu_device::check_irqs()
 	int priority_request = -1;
 
 	// Abort if all interrupts disabled or none pending
-	u8 ints = pending_irq_flags(interrupt_mask());
+	u16 ints = pending_irq_flags(interrupt_mask());
 
 	// Flags are sampled in one machine cycle and polled in the next, so a flag
 	// set in the last cycle of an instruction is only seen after the next one.
@@ -1005,10 +1015,10 @@ void mcs51_cpu_device::check_irqs()
 	{
 		if (ints & (1 << i))
 		{
-			if (m_irq_prio[i] > priority_request)
+			if (int(interrupt_priority(i)) > priority_request)
 			{
-				priority_request = m_irq_prio[i];
-				int_vec = (i << 3) | 3;
+				priority_request = interrupt_priority(i);
+				int_vec = interrupt_vector(i);
 			}
 		}
 	}
@@ -1099,7 +1109,7 @@ void mcs51_cpu_device::burn_cycles(int cycles)
 {
 	while (cycles--)
 	{
-		u8 const before = cycles ? 0 : pending_irq_flags(0xff);
+		u16 const before = cycles ? 0 : pending_irq_flags(0xffff);
 
 		m_icount--;
 
@@ -1107,7 +1117,7 @@ void mcs51_cpu_device::burn_cycles(int cycles)
 
 		// remember flags raised in the instruction's last cycle
 		if (!cycles)
-			m_irq_delayed |= pending_irq_flags(0xff) & ~before;
+			m_irq_delayed |= pending_irq_flags(0xffff) & ~before;
 	}
 }
 
@@ -1196,6 +1206,11 @@ void mcs51_cpu_device::handle_ta_window()
 {
 }
 
+bool mcs51_cpu_device::execute_ready()
+{
+	return true;
+}
+
 bool mcs51_cpu_device::instruction_enabled() const
 {
 	return !(m_has_pd && BIT(m_pcon, PCON_IDL) && !BIT(m_pcon, PCON_PD));
@@ -1211,6 +1226,12 @@ void mcs51_cpu_device::execute_run()
 {
 	do
 	{
+		if (!execute_ready())
+		{
+			debugger_wait_hook();
+			m_icount = 0;
+			break;
+		}
 		// check interrupts
 		check_irqs();
 
