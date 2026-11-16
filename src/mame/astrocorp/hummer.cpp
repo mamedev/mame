@@ -73,8 +73,8 @@ pengprty memory map (deduced from disassembly + execution trace):
     B80000   .w W  External I2C EEPROM bus: bit 0 = SDA, bit 1 = SCL
     E80000   .w W  Written by the bit-bang routines, purpose unknown
 
-    B00000   .w R  Astro V102PX internal cpucode DO (bit 0)
-    F00000   .w W  Astro V102PX cpucode CS (written 0 then 1 at $19776)
+    B00000   .w R  Astro cpucode DO (bit 0)
+    F00000   .w W  Astro cpucode CS (written 0 then 1 at $19776)
 
       The I2C read loop at $19944 samples both DO lines for each data bit:
       D2 accumulates the external EEPROM bits, D4 the cpucode bits (stored
@@ -138,8 +138,8 @@ confirms the graphics descrambling. See checksum_r.
 #include "emu.h"
 
 #include "astro_cpucode.h"
+#include "astro_v102px.h"
 
-#include "cpu/m68000/m68000.h"
 #include "machine/i2cmem.h"
 #include "machine/nvram.h"
 
@@ -177,35 +177,19 @@ public:
 	void jackvent(machine_config &config) ATTR_COLD;
 	void pengprty(machine_config &config) ATTR_COLD;
 
-	void init_px004() ATTR_COLD { decrypt_rom(v102_px004_table); descramble_gfx(); }
-	void init_px013() ATTR_COLD { decrypt_rom(v102_px013_table); descramble_gfx(); }
+	void init_hummer() ATTR_COLD { descramble_gfx(); }
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<astro_v102px_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<astro_cpucode_device> m_cpucode;
 	required_device<i2cmem_device> m_eeprom;
 	required_memory_region m_gfx;
 	required_region_ptr<uint16_t> m_magic_id;
-
-	struct decryption_info {
-		struct {
-			// Address bits used for bitswap/xor selection
-			uint8_t bits[3];
-			struct {
-				// 8-8 Bitswap
-				uint8_t bits[8];
-				// Xor
-				uint8_t xor_mask;
-			} entries[8];
-		} rom[2];
-		// Global address bitswap (src -> dest, some sets use bits 12-8 only, while others 12-2)
-		uint8_t bits[11];
-	};
 
 	// Astro ROHS blitter: sprite descriptors are 4 words = 8 bytes each. The
 	// CPU streams them to $a00012 (4 word writes per sprite) and polls $a00010
@@ -233,8 +217,6 @@ private:
 	// presumably draws into a frame buffer instead.
 	static constexpr uint32_t MAX_SPRITES = 0x800;
 
-	static const decryption_info v102_px004_table;
-	static const decryption_info v102_px013_table;
 	static const uint8_t gfx_bitswap[8][16];
 
 	uint32_t m_output_latch = 0; // $906000 (low) + $908000 (high)
@@ -266,7 +248,7 @@ private:
 	void rohs_ctrl_w(uint16_t data);
 	uint16_t checksum_r();
 
-	// external I2C EEPROM and internal cpucode (pengprty addresses)
+	// external I2C EEPROM and Astro cpucode (pengprty addresses)
 	void eeprom_clk_w(uint16_t data); // $b80000 I2C SDA / SCL
 	void int_eeprom_cs_w(uint16_t data); // $f00000 cpucode CS
 	uint16_t ext_eeprom_data_r(); // $a80000 I2C SDA in (bit 0)
@@ -282,7 +264,6 @@ private:
 	void pengprty_map(address_map &map) ATTR_COLD;
 	void astro_io_map(address_map &map) ATTR_COLD;
 
-	void decrypt_rom(const decryption_info &table) ATTR_COLD;
 	void descramble_gfx() ATTR_COLD;
 
 	void hummer(machine_config &config) ATTR_COLD;
@@ -534,7 +515,7 @@ void hummer_state::rohs_ctrl_w(uint16_t data)
 
 
 // -----------------------------------------------------------------------
-// External I2C EEPROM and internal cpucode
+// External I2C EEPROM and Astro cpucode
 // -----------------------------------------------------------------------
 
 void hummer_state::eeprom_clk_w(uint16_t data)
@@ -553,7 +534,7 @@ void hummer_state::eeprom_clk_w(uint16_t data)
 
 void hummer_state::int_eeprom_cs_w(uint16_t data)
 {
-	// $f00000 — CS for the internal Astro cpucode, active low.
+	// $f00000 — CS for the Astro cpucode, active low.
 	// $19776 writes 0 then 1 here at the start of each transaction.
 	m_cpucode->cs_write(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -637,7 +618,7 @@ void hummer_state::jackvent_map(address_map &map)
 	map(0xb86000, 0xb86001).rw(FUNC(hummer_state::output_lo_r), FUNC(hummer_state::output_lo_w));
 	map(0xb88000, 0xb88001).rw(FUNC(hummer_state::output_hi_r), FUNC(hummer_state::output_hi_w));
 
-	// external I2C EEPROM and internal cpucode
+	// external I2C EEPROM and Astro cpucode
 	map(0xa80000, 0xa80001).r(FUNC(hummer_state::ext_eeprom_data_r));
 	map(0xb00000, 0xb00001).r(FUNC(hummer_state::int_eeprom_data_r));
 	map(0xc00000, 0xc00001).w(FUNC(hummer_state::eeprom_clk_w));
@@ -663,7 +644,7 @@ void hummer_state::pengprty_map(address_map &map)
 	map(0x906000, 0x906001).rw(FUNC(hummer_state::output_lo_r), FUNC(hummer_state::output_lo_w));
 	map(0x908000, 0x908001).rw(FUNC(hummer_state::output_hi_r), FUNC(hummer_state::output_hi_w));
 
-	// external I2C EEPROM and internal cpucode
+	// external I2C EEPROM and Astro cpucode
 	map(0xa80000, 0xa80001).r(FUNC(hummer_state::ext_eeprom_data_r));
 	map(0xb00000, 0xb00001).r(FUNC(hummer_state::int_eeprom_data_r));
 	map(0xb80000, 0xb80001).w(FUNC(hummer_state::eeprom_clk_w));
@@ -739,11 +720,12 @@ INPUT_PORTS_END
 void hummer_state::hummer(machine_config &config)
 {
 	// basic machine hardware
-	M68000(config, m_maincpu, 22.579_MHz_XTAL / 2);
+	ASTRO_V102PX(config, m_maincpu, 22.579_MHz_XTAL / 2);
+	m_maincpu->set_encrypted_region("encrypted_rom");
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	// Astro V102PX internal cpucode protection
+	// Astro cpucode protection
 	ASTRO_CPUCODE(config, m_cpucode);
 
 	// External serial EEPROM — an I2C 24C64 (8 Kbyte). Identified by sniffing
@@ -781,6 +763,7 @@ void hummer_state::jackvent(machine_config &config)
 	hummer(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &hummer_state::jackvent_map);
+	m_maincpu->set_decryption(astro_v102px::px004);
 
 	// game tick ($b226 → $e98e, decrements the wait counter at $c8010a)
 	// TODO: how the IRQ is acknowledged is unknown
@@ -792,6 +775,7 @@ void hummer_state::pengprty(machine_config &config)
 	hummer(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &hummer_state::pengprty_map);
+	m_maincpu->set_decryption(astro_v102px::px013);
 
 	// The program's full screen layouts are 800 pixels wide (e.g. the frame
 	// at $13e3c: 50 x 38 tiles, the last 8 lines transparent), jackvent's
@@ -867,141 +851,14 @@ ROM_START( jackvent ) // PCBHR REV:C + Flash Card V1.1 riser board for GFX ROMs 
 ROM_END
 
 
-void hummer_state::decrypt_rom(const decryption_info &table)
-{
-	const uint32_t size = memregion("maincpu")->bytes();
-	uint16_t const* const rom = &memregion("encrypted_rom")->as_u16();
-	uint16_t *const decrypted = &memregion("maincpu")->as_u16();
-	std::unique_ptr<uint16_t[]> tmp = std::make_unique<uint16_t []>(size/2);
-
-	// Pass 1: decrypt high and low byte independently.  They go
-	// through a bitswap and an xor, choosing between 8 possibilities
-	// through address bits.
-
-	for (uint32_t i = 0; i != size; i += 2) {
-		uint16_t orig = rom[i >> 1];
-		uint16_t result = 0;
-		for (uint32_t rb = 0; rb < 2; rb ++) {
-			uint8_t val = orig >> (rb ? 0 : 8);
-			uint32_t index =
-				(BIT(i, table.rom[rb].bits[0]) << 2) |
-				(BIT(i, table.rom[rb].bits[1]) << 1) |
-				BIT(i, table.rom[rb].bits[2]);
-			val = bitswap(val,
-						  table.rom[rb].entries[index].bits[0],
-						  table.rom[rb].entries[index].bits[1],
-						  table.rom[rb].entries[index].bits[2],
-						  table.rom[rb].entries[index].bits[3],
-						  table.rom[rb].entries[index].bits[4],
-						  table.rom[rb].entries[index].bits[5],
-						  table.rom[rb].entries[index].bits[6],
-						  table.rom[rb].entries[index].bits[7]);
-			val = val ^ table.rom[rb].entries[index].xor_mask;
-
-			result |= val << (rb ? 0 : 8);
-		}
-		tmp[i >> 1] = result;
-	}
-
-	// Pass 2: copy back the decrypted data following the address
-	// scrambling
-	for (uint32_t i = 0; i != size; i += 2) {
-		uint32_t dest =
-			(i & 0xffffe003) |
-			(BIT(i, table.bits[0])  << 12) |
-			(BIT(i, table.bits[1])  << 11) |
-			(BIT(i, table.bits[2])  << 10) |
-			(BIT(i, table.bits[3])  <<  9) |
-			(BIT(i, table.bits[4])  <<  8) |
-			(BIT(i, table.bits[5])  <<  7) |
-			(BIT(i, table.bits[6])  <<  6) |
-			(BIT(i, table.bits[7])  <<  5) |
-			(BIT(i, table.bits[8])  <<  4) |
-			(BIT(i, table.bits[9])  <<  3) |
-			(BIT(i, table.bits[10]) <<  2);
-		decrypted[dest >> 1] = tmp[i >> 1];
-	}
-
-	// TODO: are these overlays provided by the custom CPU? It does seem so.
-	// both the encrypted and decrypted bytes at these positions make no sense.
-	// gostopac explicitly checks that 0x4-0x7 are 0x0400'0400
-	decrypted[0x00004/2] = 0x0400;
-	decrypted[0x00006/2] = 0x0400;
-}
-
-// TODO: this is the same as v102_px001_table, shouldn't be?
-const hummer_state::decryption_info hummer_state::v102_px004_table = {
-	{
-		{
-			{ 8, 9, 10 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 9, 11 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 10, 8, 11, 9, 7, 2, 4, 6, 5, 3 }
-};
-
-const hummer_state::decryption_info hummer_state::v102_px013_table = {
-	{
-		{
-			{ 8, 9, 10 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 9, 11 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 10, 8, 11, 9, 7, 6, 5, 4, 3, 2 }
-};
-
 /*
     Graphics ROMs (pengprty, jackvent)
 
     Derived from the ROM contents alone (no PCB access), checked on both games
     by decoding the sprites listed in the program's own sprite tables:
 
-    - u1-u4 and u5-uint8_t form two banks; within a bank the four 16-bit chips are
-      read in parallel and chip n holds the pixels with x & 3 == n. u5-uint8_t
+    - u1-u4 and u5-u8 form two banks; within a bank the four 16-bit chips are
+      read in parallel and chip n holds the pixels with x & 3 == n. u5-u8
       end with the same amount of $ff (2 MB pengprty, 5 MB jackvent),
       consistent with this.
     - Graphics are 16x16 tiles of 16-bit pixels, 512 bytes per tile, one
@@ -1071,5 +928,5 @@ void hummer_state::descramble_gfx()
 } // anonymous namespace
 
 
-GAME ( 2012,  pengprty, 0, pengprty, hummer, hummer_state, init_px013, ROT0, "Astro Corp.", "Penguin Party (US-TM.01.01.B, 2012/01/16)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME ( 2010,  jackvent, 0, jackvent, hummer, hummer_state, init_px004, ROT0, "Astro Corp.", "Jack's Venture - Inca Treasure (US.02.01.A, 2010/01/21)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME ( 2012,  pengprty, 0, pengprty, hummer, hummer_state, init_hummer, ROT0, "Astro Corp.", "Penguin Party (US-TM.01.01.B, 2012/01/16)",               MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME ( 2010,  jackvent, 0, jackvent, hummer, hummer_state, init_hummer, ROT0, "Astro Corp.", "Jack's Venture - Inca Treasure (US.02.01.A, 2010/01/21)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
