@@ -577,7 +577,9 @@ void i8251_device::device_reset()
 
 	/* update tx empty pin output */
 	update_tx_empty();
-	/* update rx ready pin output */
+	/* update rx ready pin output; RESET forces it low, so send the low
+	   whatever was last driven */
+	m_rxrdy = 1;
 	update_rx_ready();
 	/* update tx ready pin output */
 	update_tx_ready();

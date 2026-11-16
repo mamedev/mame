@@ -77,7 +77,6 @@ private:
 	template<int ch> void mode_w(uint8_t data);
 	template<int ch> void tx_data_w(int state);
 	template<int ch> void rx_ready_w(int state);
-	template<int ch> void update_rx_ready(int rxrdy);
 	template<int ch> void tx_ready_w(int state);
 	template<int ch> void tx_empty_w(int state);
 	template<int ch> void syndet_w(int state);
