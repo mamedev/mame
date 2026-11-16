@@ -127,7 +127,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual space_config_vector memory_space_config() const override;
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override;
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override;
 	virtual uint32_t execute_min_cycles() const noexcept override;
@@ -173,6 +173,9 @@ private:
 
 	std::unique_ptr<uint64_t[]> instr;
 	std::unique_ptr<int16_t[]> dram;
+
+	address_space_config m_gpr_config;
+	address_space_config m_instructions_config;
 
 	// TODO : Masked address?
 	int16_t dram_r(int addr) { return dram[addr & DRAM_MASK]; }

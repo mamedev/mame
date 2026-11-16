@@ -22,6 +22,7 @@
 #include <cstdarg>
 #include <cstdio>
 #include <algorithm>
+#include <sstream>
 
 // Should writes to DOL, which is 16 bits wide, round towards zero?
 // This seems to fix a noise issue, but may not be what the hardware does.
@@ -185,6 +186,8 @@ es5510_device::es5510_device(const machine_config &mconfig, const char *tag, dev
 	, dol_count(0)
 	, instr(nullptr)
 	, dram(nullptr)
+	, m_gpr_config("gprs", ENDIANNESS_BIG, 32, 8, -2)
+	, m_instructions_config("instructions", ENDIANNESS_BIG, 64, 8, -3)
 	, dol_latch(0)
 	, dil_latch(0)
 	, dadr_latch(0)
@@ -594,6 +597,8 @@ void es5510_device::device_start() {
 	gpr = std::make_unique<int32_t[]>(0xc0);     // 24 bits, right justified
 	instr = std::make_unique<uint64_t[]>(160);    // 48 bits, right justified
 	dram = std::make_unique<int16_t[]>(DRAM_SIZE);   // there are up to 20 address bits (at least 16 expected), left justified within the 24 bits of a gpr or dadr; we preallocate all of it.
+	space(AS_PROGRAM).install_ram(0x00, 0xbf, gpr.get());
+	space(AS_OPCODES).install_rom(0x00, 0x9f, instr.get());
 	set_icountptr(icount);
 	state_add(STATE_GENPC,"GENPC", pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", pc).noshow();
@@ -688,7 +693,13 @@ void es5510_device::device_reset() {
 
 device_memory_interface::space_config_vector es5510_device::memory_space_config() const
 {
-	return space_config_vector { };
+	// AS_PROGRAM holds the GPR file because the debugger uses it as the
+	// parameter space for instruction disassembly; AS_OPCODES holds the
+	// microinstructions.
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_gpr_config),
+		std::make_pair(AS_OPCODES, &m_instructions_config)
+	};
 }
 
 uint64_t es5510_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept {
@@ -811,12 +822,13 @@ void es5510_device::execute_run() {
 			}
 		} else {
 			// currently running, execute one instruction.
+			u8 const instr_pc = pc;
 
 			if (VERBOSE & LOG_EXECUTION)
 			{
-				char buf[1024];
-				DESCRIBE_INSTR(buf, instr[pc], gpr[pc], nullptr, nullptr, nullptr, nullptr);
-				LOG_EXEC("EXECUTING %02x: %012x %06x  %s\n", pc, instr[pc], gpr[pc]&0xffffff, buf);
+				std::ostringstream stream;
+				es5510_disassembler::describe(stream, instr[instr_pc], u32(gpr[instr_pc]) & 0x00ffffff, true);
+				LOG_EXEC("EXECUTING %02x: %012x %06x  %s\n", instr_pc, instr[instr_pc], gpr[instr_pc] & 0xffffff, stream.str());
 			}
 
 			ram_pp = ram_p;
@@ -829,7 +841,7 @@ void es5510_device::execute_run() {
 
 			// *** T0, clock low
 			// --- Read instruction N
-			uint64_t instr = this->instr[pc];
+			uint64_t cur_instr = instr[instr_pc];
 
 			// --- RAM cycle N-2 (if a Read cycle): data read from bus is stored in DIL
 			if (ram_pp.cycle != RAM_CYCLE_WRITE) {
@@ -842,12 +854,12 @@ void es5510_device::execute_run() {
 			}
 
 			// --- start of RAM cycle N
-			ram_control_t ramControl = RAM_CONTROL[((instr >> 3) & 0x07)];
+			ram_control_t ramControl = RAM_CONTROL[((cur_instr >> 3) & 0x07)];
 			ram.cycle = ramControl.cycle;
 			ram.io = ramControl.access == RAM_CONTROL_IO;
 
 			// --- RAM cycle N: read offset N
-			int32_t offset = gpr[pc];
+			int32_t offset = gpr[instr_pc];
 			switch(ramControl.access) {
 			case RAM_CONTROL_DELAY:
 				ram.address = (((dbase + offset) % (dlength + memincrement)) & memmask) >> memshift;
@@ -873,10 +885,10 @@ void es5510_device::execute_run() {
 
 			LOG_EXEC("- T1.1\n");
 
-			uint8_t operandSelect = (uint8_t)((instr >> 8) & 0x0f);
+			uint8_t operandSelect = (uint8_t)((cur_instr >> 8) & 0x0f);
 			const op_select_t &opSelect = OPERAND_SELECT[operandSelect];
 			bool skip;
-			bool skippable = (instr & (0x01 << 7)) != 0; // aka the 'SKIP' bit in the instruction word
+			bool skippable = (cur_instr & (0x01 << 7)) != 0; // aka the 'SKIP' bit in the instruction word
 			if (skippable) {
 				bool skipConditionSatisfied = (ccr & cmr & FLAG_MASK) != 0;
 				if (isFlagSet(cmr, FLAG_NOT)) {
@@ -929,11 +941,11 @@ void es5510_device::execute_run() {
 
 			// --- Start of multiplier cycle N
 			LOG_EXEC(". start mulacc:\n");
-			mulacc.cReg = (uint8_t)((instr >> 32) & 0xff);
-			mulacc.dReg = (uint8_t)((instr >> 40) & 0xff);
+			mulacc.cReg = (uint8_t)((cur_instr >> 32) & 0xff);
+			mulacc.dReg = (uint8_t)((cur_instr >> 40) & 0xff);
 			mulacc.src = opSelect.mac_src;
 			mulacc.dst = opSelect.mac_dst;
-			mulacc.accumulate = ((instr >> 6) & 0x01) != 0;
+			mulacc.accumulate = ((cur_instr >> 6) & 0x01) != 0;
 			mulacc.write_result = !skip;
 
 			// --- Read Multiplier Operands N
@@ -974,9 +986,9 @@ void es5510_device::execute_run() {
 
 			// --- Start of ALU cycle N
 			LOG_EXEC(". start ALU:\n");
-			alu.aReg = (instr >> 16) & 0xff;
-			alu.bReg = (instr >> 24) & 0xff;
-			alu.op = (instr >> 12) & 0x0f;
+			alu.aReg = (cur_instr >> 16) & 0xff;
+			alu.bReg = (cur_instr >> 24) & 0xff;
+			alu.op = (cur_instr >> 12) & 0x0f;
 			alu.src = opSelect.alu_src;
 			alu.dst = opSelect.alu_dst;
 			alu.write_result = !skip || (alu.op == OP_CMP);
@@ -1003,6 +1015,20 @@ void es5510_device::execute_run() {
 					}
 					alu.bValue = read_reg(alu.bReg);
 				}
+			}
+
+			if (VERBOSE & LOG_EXECUTION)
+			{
+				es5510_disassembler::operand_values const values{
+					u32(alu.aValue) & 0x00ffffff,
+					u32(alu.bValue) & 0x00ffffff,
+					u32(mulacc.cValue) & 0x00ffffff,
+					u32(mulacc.dValue) & 0x00ffffff,
+					(u32(u16(dil)) << 8) & 0x00ffffff
+				};
+				std::ostringstream stream;
+				es5510_disassembler::describe(stream, cur_instr, u32(gpr[instr_pc]) & 0x00ffffff, true, &values);
+				LOG_EXEC("  . operands: %s\n", stream.str());
 			}
 
 			// --- RAM cycle N-1
@@ -1042,7 +1068,7 @@ void es5510_device::execute_run() {
 
 std::unique_ptr<util::disasm_interface> es5510_device::create_disassembler()
 {
-	return std::make_unique<es5510_disassembler>();
+	return std::make_unique<es5510_disassembler>(es5510_disassembler::format::PARAMS);
 }
 
 #if VERBOSE_EXEC
