@@ -268,6 +268,7 @@ private:
 	void mac_via_out_b(u8 data);
 	void mac_via_out_a_se(u8 data);
 	void mac_via_out_b_se(u8 data);
+	void cpu_reset_w(int state);
 	void mac_via_irq(int state);
 	void update_volume();
 
@@ -359,6 +360,24 @@ void mac128_state::machine_reset()
 	m_scsi_drq = false;
 
 	m_via->write_pb6(0);
+}
+
+// The RESET instruction pulls the board's /RESET line, which also resets the
+// VIA, the IWM/SWIM, the 5380 and the BBU (Guide to the Macintosh Family
+// Hardware, 2nd ed., table 14-2, p. 451).  The SCC has no reset input.
+void mac128_state::cpu_reset_w(int state)
+{
+	if (!state)
+		return;
+
+	// the SE's BBU comes out of reset with the ROM overlaid at 0 (p. 242),
+	// and the Classic is taken to do the same; on earlier models the VIA
+	// reset below does it, as PA4 goes high (p. 242)
+	m_overlay = true;
+	m_via->reset();
+	m_iwm->reset();
+	if (m_ncr5380)
+		m_ncr5380->reset();
 }
 
 u16 mac128_state::ram_r(offs_t offset)
@@ -1152,6 +1171,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::mac512ke_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 	m_maincpu->set_tas_write_callback(NAME([] (offs_t offset, u8 data) { })); // TAS read-modify-write cycles are not supported on pre-SE Macs
+	m_maincpu->reset_cb().set(FUNC(mac128_state::cpu_reset_w));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
@@ -1319,6 +1339,7 @@ void mac128_state::macse(machine_config &config)
 	M68000(config.replace(), m_maincpu, C7M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::macse_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+	m_maincpu->reset_cb().set(FUNC(mac128_state::cpu_reset_w));
 
 	config.device_remove("kbd");
 	config.device_remove("pds");
