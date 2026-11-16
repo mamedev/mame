@@ -36,7 +36,6 @@ protected:
 	void recalc_ints();
 	void recalc_mode();
 
-	u32 m_vram_size;
 	u32 m_pixel_clock;
 
 	u8 m_pal_address, m_pal_idx, m_mode;
@@ -45,9 +44,9 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_ioport m_monitor_config;
+	memory_share_creator<u32> m_vram;
 	devcb_write_line m_irq;
 
-	std::unique_ptr<u32[]> m_vram;
 	u32 m_vram_offset;
 	u8 m_monitor_id;
 	u32 m_base, m_stride, m_video_timing;
@@ -58,7 +57,9 @@ private:
 	u8 m_video_in_control, m_color_key;
 	u16 m_window_x, m_window_y, m_window_width, m_window_height, m_field_x, m_field_y;
 	u8 m_video_clut[256][3];
+	u8 m_pal_latch[3];
 
+	void load_pal_latch();
 	void draw_video_window(bitmap_rgb32 &bitmap, rectangle const &cliprect, u32 stride);
 
 	// in mode 0x1f, the mode after a reset, no interrupt is latched and blanking stays asserted
