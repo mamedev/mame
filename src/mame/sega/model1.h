@@ -96,6 +96,11 @@ public:
 	};
 
 protected:
+	// Polygon RAM, written by display list opcode 5 and drawn from when bit 23 of an object's
+	// polygon address is set. Presumed to be the 4x 32Kx8 SRAMs at IC34-IC37 on the memory
+	// board, the only RAM on the CPU, memory and video boards not used by another known block.
+	static constexpr uint32_t POLY_RAM_SIZE = 0x8000;
+
 	// Machine
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;

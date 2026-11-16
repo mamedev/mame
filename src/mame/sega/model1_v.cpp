@@ -871,7 +871,7 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 	if (poly_adr & 0x800000)
 	{
 		poly_data = (float *)m_poly_ram.get();
-		poly_limit = 0x400000;
+		poly_limit = POLY_RAM_SIZE;
 	}
 	else
 	{
@@ -1544,7 +1544,7 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, r
 				int len = readi(list_offset + 4);
 				for (int i = 0; i < len; i++)
 				{
-					m_poly_ram[adr - 0x800000 + i] = readi(list_offset + 2 * i + 6);
+					m_poly_ram[(adr - 0x800000 + i) & (POLY_RAM_SIZE - 1)] = readi(list_offset + 2 * i + 6);
 				}
 				list_offset += 6 + len * 2;
 				break;
@@ -1680,7 +1680,7 @@ void model1_state::tgp_scan()
 					int len = readi(list_offset + 4);
 					for (int i = 0; i < len; i++)
 					{
-						m_poly_ram[adr - 0x800000 + i] = readi(list_offset + 2 * i + 6);
+						m_poly_ram[(adr - 0x800000 + i) & (POLY_RAM_SIZE - 1)] = readi(list_offset + 2 * i + 6);
 					}
 					list_offset += 6 + len * 2;
 					break;
@@ -1738,7 +1738,7 @@ void model1_state::video_start()
 {
 	m_view = std::make_unique<model1_state::view_t>();
 
-	m_poly_ram = make_unique_clear<uint32_t[]>(0x400000);
+	m_poly_ram = make_unique_clear<uint32_t[]>(POLY_RAM_SIZE);
 	m_tgp_ram = make_unique_clear<uint16_t[]>(0x100000-0x40000);
 	m_pointdb = std::make_unique<point_t[]>(1000000*2);
 	m_quaddb  = std::make_unique<quad_t[]>(1000000);
@@ -1762,7 +1762,7 @@ void model1_state::video_start()
 	m_clipfn[3].m_clip = &model1_state::fclip_clip_right;
 
 	save_pointer(NAME(m_tgp_ram), 0x100000-0x40000);
-	save_pointer(NAME(m_poly_ram), 0x40000);
+	save_pointer(NAME(m_poly_ram), POLY_RAM_SIZE);
 	save_item(NAME(m_listctl));
 }
 
