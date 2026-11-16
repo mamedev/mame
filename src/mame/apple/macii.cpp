@@ -172,6 +172,7 @@ private:
 	void via2_out_a(u8 data);
 	void via2_out_b(u8 data);
 	void hmmu_via2_out_b(u8 data);
+	void cpu_reset_w(int state);
 	void state_load();
 	void via_irq(int state);
 	void via2_irq(int state);
@@ -774,6 +775,24 @@ void macii_state::machine_reset()
 	m_last_taken_interrupt = 0;
 }
 
+// The RESET instruction pulls the board's /RESET line, which brings "all of
+// the internal devices" to their initial state (Guide to the Macintosh Family
+// Hardware, 2nd ed., p. 244).  The Guide names no chips for these machines;
+// the VIAs, SWIM/IWM and 5380 are on it as on the SE (table 14-2, p. 451).
+// The SCC has no reset input.
+void macii_state::cpu_reset_w(int state)
+{
+	if (!state)
+		return;
+
+	// VIA1 first: its PA4 going high brings back the ROM overlay, so VIA2's
+	// RAM-size outputs don't remap RAM over it (p. 244)
+	m_via1->reset();
+	m_via2->reset();
+	m_fdc->reset();
+	m_ncr5380->reset();
+}
+
 void macii_state::state_load()
 {
 	int overlay = m_overlay;
@@ -926,6 +945,7 @@ void macii_state::macse30_map(address_map &map)
 void macii_state::macii(machine_config &config)
 {
 	M68020PMMU(config, m_maincpu, C15M);
+	m_maincpu->reset_cb().set(FUNC(macii_state::cpu_reset_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -1049,6 +1069,7 @@ void macii_state::maciihmu(machine_config &config)
 	macii(config);
 
 	M68020HMMU(config.replace(), m_maincpu, C15M);
+	m_maincpu->reset_cb().set(FUNC(macii_state::cpu_reset_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -1079,6 +1100,7 @@ void macii_state::maciix(machine_config &config)
 
 	// IIx = Mac II FDHD with a 68030 instead of the 020
 	M68030(config.replace(), m_maincpu, C15M);
+	m_maincpu->reset_cb().set(FUNC(macii_state::cpu_reset_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
