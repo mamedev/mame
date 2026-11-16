@@ -551,7 +551,7 @@ u8 es5503_device::read(offs_t offset)
 		}
 	}
 
-	return 0;
+	return 0xff;    // invalid registers float high
 }
 
 void es5503_device::write(offs_t offset, u8 data)
