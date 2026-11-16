@@ -64,6 +64,7 @@ public:
 	uint32_t dilated1[15][1024];
 	int dilatechose[64];
 	static constexpr int RENDER_HEIGHT = 480; // rows of the accumulation buffer, split between the bands
+	static constexpr int TILE_ROWS = RENDER_HEIGHT / 32; // rows of 32x32 tiles that get drawn
 	float wbuffer[RENDER_HEIGHT][640];
 
 
@@ -423,14 +424,25 @@ private:
 		uint32_t debug_dip_status = 0;
 		uint32_t palette[0x400] = { };
 		std::vector<uint32_t> tiles; // region array tile positions, (y << 16) | x
+		uint64_t tile_listed[64] = { }; // per tile row, bit per tile column: the tile is in the region array
 		uint64_t texture_pages[TEXTURE_PAGES / 64] = { };
 	};
 
-	// one band of rows of the frame, drawn as one work item
+	// one band of whole tile rows of the frame, drawn as one work item
 	struct render_band
 	{
 		powervr2_device *device = nullptr;
 		rectangle clip;
+		int index = 0;
+		int row0 = 0, row1 = 0; // tile rows, row1 exclusive
+	};
+
+	// a triangle binned into the tiles it covers (tile range clipped to the screen)
+	struct bin_ref
+	{
+		int32_t strip;
+		int32_t vert; // -1: only scale the strip's texture coordinates (single-threaded fallback)
+		uint8_t tx0, tx1, ty0, ty1;
 	};
 
 	osd_work_queue *m_render_queue;
@@ -447,6 +459,12 @@ private:
 
 	static void *render_thread_callback(void *param, int threadid);
 	static void *render_band_callback(void *param, int threadid);
+	void bin_triangles(int bands, bool scale_uv);
+	uint64_t tile_mask(const strip &ts, const bin_ref &r, int ty) const;
+	template <int group_no> void render_band_group(bitmap_rgb32 &bitmap, const render_band &band, const std::vector<bin_ref> &refs);
+	void render_band_tiles(const render_band &band);
+
+	std::vector<bin_ref> m_bins[WORK_MAX_THREADS][3]; // per band, per list (opaque, translucent, punch-through)
 	void wait_for_render(bool discard = false);
 	void collect_texture_pages(int buffer);
 	bool render_reads_texture(uint32_t start, uint32_t end) const;
@@ -574,7 +592,7 @@ private:
 	void tex_get_info(texinfo *t);
 
 	template <pix_sample_fn sample_fn, int group_no>
-		inline void render_hline(bitmap_rgb32 &bitmap, texinfo *ti,
+		inline void render_hline(bitmap_rgb32 &bitmap, texinfo *ti, uint64_t tilemask,
 									int y, float xl, float xr,
 									float ul, float ur, float vl, float vr,
 									float wl, float wr,
@@ -582,7 +600,7 @@ private:
 									float const offl[4], float const offr[4]);
 
 	template <pix_sample_fn sample_fn, int group_no>
-		inline void render_span(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti,
+		inline void render_span(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint64_t *rowmask, texinfo *ti,
 								float y0, float y1,
 								float xl, float xr,
 								float ul, float ur,
@@ -598,21 +616,17 @@ private:
 								float const doldy[4], float const dordy[4]);
 
 	template <pix_sample_fn sample_fn, int group_no>
-		inline void render_tri_sorted(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti,
+		inline void render_tri_sorted(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint64_t *rowmask, texinfo *ti,
 										const vert *v0,
 										const vert *v1, const vert *v2);
 
 	template <int group_no>
-		void render_tri(bitmap_rgb32 &bitmap, const rectangle &cliprect, texinfo *ti, const vert *v);
-
-	template <int group_no>
-		void render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bool scale_uv);
+		void render_tri(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint64_t *rowmask, texinfo *ti, const vert *v);
 
 	inline void scale_texture_coordinates(int rs, const strip &ts);
 	bool scale_all_texture_coordinates();
 
 	void sort_vertices(const vert *v, int *i0, int *i1, int *i2);
-	void render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect, bool scale_uv);
 	void pvr_accumulationbuffer_to_framebuffer(int x, int y);
 	void pvr_drawframebuffer(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	static uint32_t dilate0(uint32_t value,int bits);
