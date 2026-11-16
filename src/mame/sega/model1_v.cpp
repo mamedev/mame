@@ -855,8 +855,11 @@ float model1_state::compute_specular(glm::vec3& normal, glm::vec3& light, float 
 // through the wall.
 void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size, float &old_z)
 {
-	// Protect against bad data when attacking a super destroyer
-	if(tex_adr == 0xffffffff || size >= 0x1000000)
+	// swa sends objects whose color and polygon addresses are out of range: tex_adr
+	// 0xffffffff when attacking a super destroyer, and both addresses taken from the wrong
+	// halves of its reactor core explosion frame table (the table index at 0x0e6bbe is
+	// not scaled to the 8-byte entries)
+	if ((tex_adr + 1 - 0x40000) > (0x100000 - 0x40000) || size >= 0x1000000)
 		return;
 
 #if 0
@@ -864,12 +867,21 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 #endif
 
 	float *poly_data;
+	uint32_t poly_limit;
 	if (poly_adr & 0x800000)
+	{
 		poly_data = (float *)m_poly_ram.get();
+		poly_limit = 0x400000;
+	}
 	else
+	{
 		poly_data = (float *)m_poly_rom.target();
+		poly_limit = m_poly_rom.length();
+	}
 
 	poly_adr &= 0x7fffff;
+	if (poly_adr + 6 > poly_limit)
+		return;
 #if 0
 	dump = poly_adr == 0x944ea;
 	dump = 0;
@@ -937,6 +949,9 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 			poly_data[poly_adr + 4], poly_data[poly_adr + 5], poly_data[poly_adr + 6],
 			poly_data[poly_adr + 7], poly_data[poly_adr + 8], poly_data[poly_adr + 9]);
 #endif
+		if (poly_adr + 10 > poly_limit)
+			break;
+
 		uint32_t flags = *reinterpret_cast<uint32_t*>(poly_data + poly_adr);
 
 		int type = flags & 3;
@@ -1057,7 +1072,7 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 			// bits [11:10] of the tile word select a colour mode: bit 10 marks a
 			// flat UI element (radar blips, HUD text) drawn unlit, and mode 01
 			// additionally blinks by rotating the BGR channels on alternate frames.
-			uint16_t tex_data = m_tgp_ram[tex_adr - 0x40000];
+			const uint16_t tex_data = tgp_ram_entry(tex_adr);
 			int color = m_paletteram16[0x1000 | (tex_data & 0x3ff)];
 			int r = (color >> 0x0) & 0x1f;
 			int g = (color >> 0x5) & 0x1f;
@@ -1221,7 +1236,7 @@ int model1_state::push_direct(int list_offset) {
 		cquad.z = z;
 		{
 			int lumval = ((float)(lum >> 24)) * 2.0f;
-			int color = m_paletteram16[0x1000 | (m_tgp_ram[tex_adr - 0x40000] & 0x3ff)];
+			const int color = m_paletteram16[0x1000 | (tgp_ram_entry(tex_adr) & 0x3ff)];
 			int r = (color >> 0x0) & 0x1f;
 			int g = (color >> 0x5) & 0x1f;
 			int b = (color >> 0xA) & 0x1f;
@@ -1244,7 +1259,7 @@ int model1_state::push_direct(int list_offset) {
 			// gunner 2nd-viewport overlay); the arcade alternates backdrop/scene.
 			// Paint the backdrop pen (palette[0]) so the stipple reads
 			// backdrop/scene.
-			if ((m_tgp_ram[tex_adr - 0x40000] & 0x3ff) == 0)
+			if ((tgp_ram_entry(tex_adr) & 0x3ff) == 0)
 				cquad.col = MOIRE | (m_palette->pen(0) & 0xffffff);
 
 			// wingwar's display list carries a constant degenerate moiré record
