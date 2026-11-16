@@ -69,7 +69,6 @@ public:
 	struct ram_control_t {
 		ram_cycle_t cycle;
 		ram_control_access_t access;
-		const char * const description;
 	};
 
 	static const alu_op_t ALU_OPS[16];
@@ -113,7 +112,6 @@ public:
 	bool get_HALT() { return halt_asserted; }
 
 	void run_once();
-	void list_program(void(p)(const char *, ...));
 
 	// for testing purposes
 	uint64_t &_instr(int pc) { return instr[pc % 160]; }
