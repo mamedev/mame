@@ -124,6 +124,10 @@ public:
 	{
 		int svert = 0, evert = 0;
 		texinfo ti;
+		// user tile clip latched when the polygon arrived: mode (0 off, 2 inside, 3 outside) and the
+		// rectangle in tiles, inclusive
+		uint8_t clip_mode = 0;
+		uint8_t clip_x0 = 0, clip_y0 = 0, clip_x1 = 0, clip_y1 = 0;
 	};
 
 	static const unsigned MAX_VERTS = 65536;
@@ -395,6 +399,7 @@ private:
 	uint32_t palette[0x400];
 	rectangle user_tile_clip;
 	uint8_t user_tile_mode;
+	uint8_t m_utc_tiles[4] = { }; // x0, y0, x1, y1 of the latest user tile clip, in tiles
 
 	// PD DMA registers
 	uint32_t sb_pdstap, sb_pdstar, sb_pdlen, sb_pddir, sb_pdtsel, sb_pden, sb_pdst, sb_pdapro;

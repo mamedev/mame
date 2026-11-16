@@ -1180,16 +1180,24 @@ void *powervr2_device::render_band_callback(void *param, int threadid)
 }
 
 // The tiles a triangle is drawn into: the tiles of its bounding box (one pixel of margin, as pixels and rows round to the nearest
-// integer) that the region array lists. One bit per tile column of tile row ty.
+// integer) that the region array lists and that its user tile clip keeps. One bit per tile column of tile row ty.
 uint64_t powervr2_device::tile_mask(const strip &ts, const bin_ref &r, int ty) const
 {
 	uint64_t mask = m_render.tile_listed[ty];
 	mask &= (~uint64_t(0) >> (63 - (r.tx1 - r.tx0))) << r.tx0;
+	if (ts.clip_mode >= 2)
+	{
+		// the clip works on whole tiles: inside keeps the tiles in the rectangle, outside keeps the others
+		uint64_t inside = 0;
+		if ((ty >= ts.clip_y0) && (ty <= ts.clip_y1) && (ts.clip_x1 >= ts.clip_x0))
+			inside = (~uint64_t(0) >> (63 - (ts.clip_x1 - ts.clip_x0))) << ts.clip_x0;
+		mask &= (ts.clip_mode == 2) ? inside : ~inside;
+	}
 	return mask;
 }
 
-// Models what the hardware does before it draws: every triangle goes into the tiles it covers.
-// Each band then keeps the triangles that reach at least one of its tiles, in drawing order.
+// Models what the hardware does before it draws: every triangle goes into the tiles it covers, minus those its user tile clip
+// removes. Each band then keeps the triangles that reach at least one of its tiles, in drawing order.
 void powervr2_device::bin_triangles(int bands, bool scale_uv)
 {
 	for (int b = 0; b < bands; b++)
@@ -2280,6 +2288,10 @@ void powervr2_device::process_ta_fifo()
 			(tafifo_buff[5] & 0xf) * 32,
 			((tafifo_buff[7] & 0xf) + 1) * 32
 		);
+		m_utc_tiles[0] = tafifo_buff[4] & 0x3f;
+		m_utc_tiles[1] = tafifo_buff[5] & 0xf;
+		m_utc_tiles[2] = tafifo_buff[6] & 0x3f;
+		m_utc_tiles[3] = tafifo_buff[7] & 0xf;
 		// TODO: make cliprect to actually have a printable version on its own
 		LOGTATILE("(%d , %d) - (%d , %d)\n", user_tile_clip.left(), user_tile_clip.right(), user_tile_clip.top(), user_tile_clip.bottom());
 	}
@@ -2431,6 +2443,11 @@ void powervr2_device::process_ta_fifo()
 
 					strip * const ts = &grp->strips[grp->strips_size++];
 					tex_get_info(&ts->ti);
+					ts->clip_mode = (user_tile_mode >= 2) ? user_tile_mode : 0;
+					ts->clip_x0 = m_utc_tiles[0];
+					ts->clip_y0 = m_utc_tiles[1];
+					ts->clip_x1 = m_utc_tiles[2];
+					ts->clip_y1 = m_utc_tiles[3];
 					ts->svert = rd->verts_size;
 					ts->evert = rd->verts_size + 3;
 
@@ -2516,6 +2533,11 @@ void powervr2_device::process_ta_fifo()
 					{
 						strip *ts = &grp->strips[grp->strips_size++];
 						tex_get_info(&ts->ti);
+						ts->clip_mode = (user_tile_mode >= 2) ? user_tile_mode : 0;
+						ts->clip_x0 = m_utc_tiles[0];
+						ts->clip_y0 = m_utc_tiles[1];
+						ts->clip_x1 = m_utc_tiles[2];
+						ts->clip_y1 = m_utc_tiles[3];
 						ts->svert = rd->verts_size;
 						ts->evert = -1;
 					}
@@ -4438,6 +4460,8 @@ void powervr2_device::device_start()
 	save_item(NAME(param_base));
 	save_item(NAME(region_base));
 	save_item(NAME(vo_border_col));
+	save_item(NAME(user_tile_mode));
+	save_item(NAME(m_utc_tiles));
 	save_item(NAME(fb_r_ctrl));
 	save_item(NAME(fb_w_ctrl));
 	save_item(NAME(fb_w_linestride));
