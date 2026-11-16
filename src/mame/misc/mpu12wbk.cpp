@@ -1628,6 +1628,35 @@ ROM_START( goldnjkra )
 	ROM_LOAD( "am27s13.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
 ROM_END
 
+/*
+  Golden Joker
+  Version 16.2.02VIE
+  3/02 - MPU Nº 5526
+
+  Program flash ROM is inside a CPU epoxy block
+  with a M6809 CPU and a 16L8 PLD.
+
+*/
+ROM_START( goldnjkrb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p28f512.box",  0x8000, 0x8000, CRC(00637111) SHA1(2b4676bb7cc7cf0e10f61a1b3897c01c0f105294) )
+	ROM_IGNORE(                       0x8000 )  // using first half
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "golden_joker_zg3.ic39",  0x00000, 0x10000, CRC(afb7d634) SHA1(cba6fc5d582317b7c4e029839b6fd5e9aa76343c) )
+	ROM_IGNORE(                                  0x10000 )  // duplicated halves.
+	ROM_LOAD( "golden_joker_zg2.ic38",  0x10000, 0x10000, CRC(4ce27c43) SHA1(23c665cee92d00564a799651d23e09d029e420e1) )
+	ROM_IGNORE(                                  0x10000 )  // duplicated halves.
+	ROM_LOAD( "golden_joker_zg1.ic37",  0x20000, 0x10000, CRC(49b6088a) SHA1(da550eba7c412314ffa449a2cb09fb8809a29d57) )
+	ROM_IGNORE(                                  0x10000 )  // duplicated halves.
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
 
 /********************************
 *          Driver Init          *
@@ -1664,3 +1693,4 @@ GAMEL( 1997, fruitstbf, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12
 GAMEL( 1997, fruitstbg, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 2)", 0,      layout_fruitstb )
 GAMEL( 1996, goldnjkr,  0,        mpu12wbk, goldnjkr, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Golden Joker (Ver 16.06UNG-25, set 1)",               0,      layout_goldnjkr )
 GAMEL( 1996, goldnjkra, goldnjkr, mpu12wbk, goldnjkr, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Golden Joker (Ver 16.06UNG-25, set 2)",               0,      layout_goldnjkr )
+GAMEL( 1996, goldnjkrb, goldnjkr, mpu12wbk, goldnjkr, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Golden Joker (Ver 16.2.02VIE)",                       0,      layout_goldnjkr )
