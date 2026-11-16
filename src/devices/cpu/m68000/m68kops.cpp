@@ -18,11 +18,18 @@ void m68000_musashi_device::xf000_1111_071234fc()
 void m68000_musashi_device::xf200_fpgen_l_234f()
 {
 	if(m_has_fpu) {
-		if(fpu_check_pending_exception()) {
+		const bool m040 = m_cpu_type & CPU_TYPE_040;
+		if(m040 && fpu_check_pending_exception()) {
+			return;
+		}
+		const u16 w2 = OPER_I_16();
+		// 68881/68882: FMOVEM and FMOVE to/from control registers only take a
+		// pending exception while the instruction that caused it is still
+		// executing, so handlers can save and inspect the state
+		if(!m040 && (!BIT(w2, 15) || fpu_6888x_running()) && fpu_check_pending_exception()) {
 			return;
 		}
 		m_fpu_just_reset = 0;
-		const u16 w2 = OPER_I_16();
 		switch((w2 >> 13) & 0x7) {
 		case 0x0:   // FPU ALU FP, FP
 		case 0x2:   // FPU ALU ea, FP
@@ -27320,6 +27327,19 @@ void m68000_musashi_device::x4e73_rte_l_234f()
 			new_pc = m68ki_pull_32();
 			m68ki_fake_pull_16();   /* format word */
 			m68ki_fake_pull_32();   /* address */
+			m68ki_jump(new_pc);
+			m68ki_set_sr(new_sr);
+			m_instr_mode = INSTRUCTION_YES;
+			m_run_mode = RUN_MODE_NORMAL;
+			break;
+
+		case 9: /* Coprocessor mid-instruction */
+			new_sr = m68ki_pull_16();
+			new_pc = m68ki_pull_32();
+			m68ki_fake_pull_16();   /* $06: format word */
+			m68ki_fake_pull_32();   /* $08: instruction address */
+			m68ki_fake_pull_32();   /* $0c: internal registers */
+			m68ki_fake_pull_32();   /* $10: evaluated effective address */
 			m68ki_jump(new_pc);
 			m68ki_set_sr(new_sr);
 			m_instr_mode = INSTRUCTION_YES;
