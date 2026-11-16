@@ -64097,12 +64097,12 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 988: { // do a,[expr]
-		u64 s = get_a();
+		u32 s_h = get_ah();
 		u32 expr = exv;
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(s_h);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
@@ -64111,12 +64111,12 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 989: { // do b,[expr]
-		u64 s = get_b();
+		u32 s_h = get_bh();
 		u32 expr = exv;
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(s_h);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
