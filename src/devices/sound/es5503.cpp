@@ -41,10 +41,14 @@
   3.0   (RB) - Oscillators are now serviced one per 8-clock slot in scan order, with halted oscillators
                still fetching.  Swap, sync, one-shot, interrupt request and DATA register behavior
                follow what the DOCGRADE test suite measures on an Apple IIgs.
+  3.1   (RB) - The volume register follows the output level measured on an Apple IIgs instead of
+               being a straight multiply.
 */
 
 #include "emu.h"
 #include "es5503.h"
+
+#include <cmath>
 
 // device type definition
 DEFINE_DEVICE_TYPE(ES5503, es5503_device, "es5503", "Ensoniq ES5503")
@@ -52,6 +56,14 @@ DEFINE_DEVICE_TYPE(ES5503, es5503_device, "es5503", "Ensoniq ES5503")
 // useful constants
 static constexpr uint32_t wavemasks[8] = { 0x1ff00, 0x1fe00, 0x1fc00, 0x1f800, 0x1f000, 0x1e000, 0x1c000, 0x18000 };
 static constexpr uint32_t accmasks[8]  = { 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff, 0x7fff };
+
+// The volume multiply is analog.  Nothing gets through below a soft knee, the level rises a
+// little faster than the register above it, and a trace of the wave data leaks through inverted.
+static constexpr double VOL_KNEE  = 22.1;       // register value at the middle of the knee
+static constexpr double VOL_WIDTH = 2.77;       // how soft the knee is, in register steps
+static constexpr double VOL_POWER = 1.104;      // rise above the knee
+static constexpr double VOL_LEAK  = 0.0042;     // inverted leak, as a fraction of volume 255
+static constexpr int VOL_SHIFT    = 8;          // fraction bits in the level table
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -82,6 +94,7 @@ es5503_device::es5503_device(const machine_config &mconfig, const char *tag, dev
 	m_channel_strobe(0),
 	m_output_channels(1),
 	m_output_rate(0),
+	m_volume{},
 	m_timer(nullptr),
 	m_mix{},
 	m_last{},
@@ -199,7 +212,7 @@ void es5503_device::visit(int onum)
 			else
 			{
 				// the uppermost enabled oscillator is heard for three slots
-				m_mix[chan] += data * osc.vol * ((onum == (m_oscsenabled - 1)) ? 3 : 1);
+				m_mix[chan] += data * m_volume[osc.vol] * ((onum == (m_oscsenabled - 1)) ? 3 : 1);
 			}
 		}
 
@@ -354,7 +367,7 @@ void es5503_device::sound_stream_update(sound_stream &stream)
 
 		for (int chan = 0; chan < m_output_channels; chan++)
 		{
-			stream.put_int(chan, i, m_last[chan], 32768*8);
+			stream.put_int(chan, i, m_last[chan], (32768 * 8) << VOL_SHIFT);
 		}
 	}
 }
@@ -387,6 +400,20 @@ void es5503_device::device_start()
 	save_item(NAME(m_last));
 
 	m_fifo.resize(FIFO_FRAMES * m_output_channels);
+
+	// volume 255 keeps the level of a straight multiply, and volume 0 is silent with no leak
+	const auto conduct =
+			[] (double vol)
+			{
+				return std::pow(VOL_WIDTH * std::log1p(std::exp((vol - VOL_KNEE) / VOL_WIDTH)), VOL_POWER);
+			};
+	const double scale = (1.0 + VOL_LEAK) / conduct(255.0);
+
+	m_volume[0] = 0;
+	for (int vol = 1; vol < 256; vol++)
+	{
+		m_volume[vol] = std::lround(((conduct(vol) * scale) - VOL_LEAK) * (255 << VOL_SHIFT));
+	}
 
 	// the registers are dynamic and nothing has refreshed them yet, so they come up as all ones
 	for (auto &osc : m_oscillators)

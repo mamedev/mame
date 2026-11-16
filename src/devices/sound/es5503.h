@@ -97,6 +97,7 @@ private:
 
 	int m_output_channels;
 	uint32_t m_output_rate;
+	int32_t m_volume[256];      // output level for each volume register value
 
 	emu_timer *m_timer;
 
