@@ -115,7 +115,7 @@ private:
 	uint8_t m_command;
 	uint8_t m_mode_byte;       // mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous
 	bool m_delayed_tx_en;
-	int m_rxrdy;               // level last driven on RxRDY
+	uint8_t m_rxrdy;           // level last driven on RxRDY
 
 	int32_t m_cts;
 	int32_t m_dsr;

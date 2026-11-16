@@ -99,7 +99,7 @@ void i8251_device::device_start()
 	m_command = 0;
 	m_mode_byte = 0;
 	m_delayed_tx_en = false;
-	m_rxrdy = -1; // not driven yet: the first update always goes out
+	m_rxrdy = 0;
 
 	m_rxc_count = 0;
 	m_txc_count = 0;
@@ -158,14 +158,14 @@ void i8251_device::device_start()
 
 void i8251_device::update_rx_ready()
 {
-	// Drive the pin only when its level changes.  A CPU can finish an
-	// instruction a little past a pending event, so a command write may run
-	// before a character's arrival yet be timed after it.  Recomputing RxRDY
-	// there would send a stale 0, and a deferred consumer such as an input
-	// merger applies it last: the interrupt for that character is lost and
-	// the next one overruns it.
-	int const state = rxrdy_r();
-	if (state != m_rxrdy)
+	// Repeat a 1, but send a 0 only when the level falls.  A command write
+	// can run just before a character arrives yet be timed after it, and a
+	// consumer that defers its input (an input merger) would apply its
+	// repeated 0 last and lose that character's interrupt.  A repeated 1
+	// can't be out of date: only the CPU clears RxRDY, by reading the data
+	// or turning RxE off.
+	uint8_t const state = rxrdy_r();
+	if (state || m_rxrdy)
 	{
 		m_rxrdy = state;
 		m_rxrdy_handler(state);
