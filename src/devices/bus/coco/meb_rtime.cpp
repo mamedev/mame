@@ -38,6 +38,7 @@ namespace
 		protected:
 			// device-level overrides
 			virtual void device_start() override ATTR_COLD;
+			virtual void device_reset() override ATTR_COLD;
 			virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 			virtual u8 meb_read(offs_t offset) override;
 			virtual void meb_write(offs_t offset, u8 data) override;
@@ -81,6 +82,16 @@ namespace
 		// save state
 		save_item(NAME(m_rtc_data));
 		save_item(NAME(m_centronics_busy));
+	}
+
+	//-------------------------------------------------
+	//  device_reset - device-specific reset
+	//-------------------------------------------------
+
+	void disto_rtime_device::device_reset()
+	{
+		// STROBE is active low and idles high
+		m_centronics->write_strobe(1);
 	}
 
 	//-------------------------------------------------
@@ -180,8 +191,8 @@ namespace
 				break;
 
 			case 0x03: /* FF53 */
-				m_centronics->write_strobe(1);
 				m_centronics->write_strobe(0);
+				m_centronics->write_strobe(1);
 				break;
 
 			default:
