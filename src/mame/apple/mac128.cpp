@@ -1335,7 +1335,7 @@ void mac128_state::macse(machine_config &config)
 	m_scsihelp->scsi_write_callback().set(m_ncr5380, FUNC(ncr5380_device::write));
 	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr5380_device::dma_r));
 	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr5380_device::dma_w));
-	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->set_maincpu(m_maincpu);
 	m_scsihelp->timeout_error_callback().set(FUNC(mac128_state::scsi_berr_w));
 
 	// The INT pin (23) on the NCR5380 is connected to the the GLU PAL16L8 pin 3.

@@ -6,6 +6,8 @@
 
 #pragma once
 
+#include "cpu/m68000/m68kcommon.h"
+
 class mac_scsi_helper_device : public device_t
 {
 public:
@@ -17,15 +19,17 @@ public:
 	auto scsi_write_callback() { return m_scsi_write_callback.bind(); }
 	auto scsi_dma_read_callback() { return m_scsi_dma_read_callback.bind(); }
 	auto scsi_dma_write_callback() { return m_scsi_dma_write_callback.bind(); }
-	auto cpu_halt_callback() { return m_cpu_halt_callback.bind(); }
 	auto timeout_error_callback() { return m_timeout_error_callback.bind(); }
 
 	// miscellaneous configuration
+	template <typename T> void set_maincpu(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
 	void set_timeout(attotime timeout) { m_timeout = timeout; }
 
 	// read/write handlers
 	u8 read_wrapper(bool pseudo_dma, offs_t offset);
 	void write_wrapper(bool pseudo_dma, offs_t offset, u8 data);
+	u32 pseudo_dma_r(offs_t offset, u32 mem_mask = ~0);
+	void pseudo_dma_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void drq_w(int state);
 
@@ -35,33 +39,33 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	enum class mode : u8 { NON_DMA, READ_WAIT_DRQ, READ_DMA, WRITE_DMA, BAD_DMA };
-
 	// internal helpers
-	void read_fifo_process();
-	void write_fifo_process();
-	TIMER_CALLBACK_MEMBER(timer_callback);
-	void dma_stop();
-	void read_fifo_flush();
+	u32 dma_read(unsigned bytes);
+	void dma_write(u32 data, unsigned bytes);
+	bool timed_out(u8 error);
+	void wait(bool progress);
+	void done();
+	TIMER_CALLBACK_MEMBER(timeout);
+
+	required_device<m68000_base_device> m_maincpu;
 
 	// callback objects
 	devcb_read8 m_scsi_read_callback;
 	devcb_write8 m_scsi_write_callback;
 	devcb_read8 m_scsi_dma_read_callback;
 	devcb_write8 m_scsi_dma_write_callback;
-	devcb_write_line m_cpu_halt_callback;
 	devcb_write8 m_timeout_error_callback;
 
 	// misc. parameters
 	attotime m_timeout;
 
 	// internal state
-	emu_timer *m_pseudo_dma_timer;
-	mode m_mode;
-	u8 m_read_fifo_bytes;
-	u8 m_write_fifo_bytes;
-	u32 m_read_fifo_data;
-	u32 m_write_fifo_data;
+	emu_timer *m_timeout_timer;
+	bool m_drq;
+	bool m_waiting;
+	bool m_timed_out;
+	u8 m_count;
+	u32 m_data;
 };
 
 // device type declaration

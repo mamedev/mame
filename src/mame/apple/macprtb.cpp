@@ -754,7 +754,7 @@ void macportable_state::macprtb(machine_config &config)
 	m_scsihelp->scsi_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::write));
 	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_r));
 	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_w));
-	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->set_maincpu(m_maincpu);
 	m_scsihelp->timeout_error_callback().set(FUNC(macportable_state::scsi_berr_w));
 
 	SCC85C30(config, m_scc, 15.6672_MHz_XTAL /2 );
