@@ -1215,6 +1215,7 @@ public:
 	void init_vkdlswwu() ATTR_COLD;
 	void init_vkdlswwo() ATTR_COLD;
 	void init_vkdlswwa() ATTR_COLD;
+	void init_vkdlswwb() ATTR_COLD;
 	void init_vkdlsa() ATTR_COLD;
 	void init_vkdlswwt() ATTR_COLD;
 	void init_vkdlswwd() ATTR_COLD;
@@ -9424,6 +9425,12 @@ ROM_START( wldwitcha )
 ROM_END
 
 
+/*
+  This ROM was designed for test.
+  So we had to patch it and inject a default NVRAM
+  to enter the state 01 (game).
+
+*/
 ROM_START( wldwitchb )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // Ver 157-TE, 1992-12-25
 	ROM_LOAD( "ww157-te.bin",   0x8000, 0x8000, CRC(9bf25a7c) SHA1(a78f946403254a30d9afa3c43ca42dfc02edd8fb) )
@@ -9434,7 +9441,7 @@ ROM_START( wldwitchb )
 	ROM_LOAD( "01.a1",  0x08000, 0x8000, CRC(6d644987) SHA1(26243abe051f3266e2d1743ec599d4e8bbb692e4) )
 
 	ROM_REGION( 0x1800, "gfx0", 0 )
-	ROM_FILL(           0x0000, 0x1000, 0x0000 )         // filling bitplanes
+	ROM_FILL(           0x0000, 0x1000, 0x0000 )    // filling bitplanes
 	ROM_COPY( "temp",   0x0000, 0x1000, 0x0800 )    // 0000-07ff of 03.a3 - char rom, bitplane 3
 
 	ROM_REGION( 0x1800, "gfx1", 0 )
@@ -9511,6 +9518,9 @@ ROM_START( wldwitchb )
 	ROM_COPY( "temp",   0x0f000, 0x0000, 0x0800 )   // 7000-77ff of 01.a1 - empty, bitplane 1
 	ROM_COPY( "temp",   0x17000, 0x0800, 0x0800 )   // 7000-77ff of 02.a2 - empty, bitplane 2
 	ROM_COPY( "temp",   0x07800, 0x1000, 0x0800 )   // 7800-7fff of 03.a3 - empty, bitplane 3
+
+	ROM_REGION( 0x800, "nvram", 0 )  // Default clean NVRAM
+	ROM_LOAD( "wldwitchb_nvram.bin", 0x0000, 0x0800, CRC(50a16357) SHA1(688dd38b48d4ea521a89c57994b1c425b9aede93) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "wldwitch_tbp.bin",   0x0000, 0x0100, BAD_DUMP CRC(ed15125b) SHA1(56fc00f2ce4ebe9cee73a45b142c33c00432b66b) )
@@ -16362,6 +16372,20 @@ void goldnpkr_state::init_vkdlswwa()
 	ROM[0xdf81] = 0xea;
 }
 
+void goldnpkr_state::init_vkdlswwb()
+{
+	uint8_t *ROM = memregion("maincpu")->base();
+
+	ROM[0xd7e0] = 0x78; // sei - mask IRQs on reset ($FFFE vector points to $0000)
+	ROM[0xd7e1] = 0xea; // nop
+
+	// Keep game in State 0x01 ($B829) when credits = 0 instead of entering State 0x00 simulator
+	ROM[0xb95a] = 0x4c; // jmp $b8ad
+	ROM[0xb95b] = 0xad;
+	ROM[0xb95c] = 0xb8;
+	ROM[0xc2fd] = 0x01; // lda #$01
+}
+
 void goldnpkr_state::init_vkdlswwc()
 {
 	uint8_t *ROM = memregion("maincpu")->base();
@@ -17185,7 +17209,7 @@ GAMEL( 1994, witchjol,  0,        wcrdxtnd, witchjol, goldnpkr_state, init_vkdls
 
 GAMEL( 2001, wldwitch,  0,        wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlsww,  ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.84A)",       0,                   layout_goldnpkr )  // Ver 184A, 2001-09-12
 GAMEL( 1992, wldwitcha, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwa, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-SP)",     0,                   layout_goldnpkr )  // Ver 157-SP, 1992-12-25
-GAMEL( 1992, wldwitchb, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-TE)",     MACHINE_NOT_WORKING, layout_goldnpkr )  // Ver 157-TE, 1992-12-25
+GAMEL( 1992, wldwitchb, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwb, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.57-TE)",     0,                   layout_goldnpkr )  // Ver 157-TE, 1992-12-25 - testing ROM
 GAMEL( 1994, wldwitchc, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwc, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A)",       0,                   layout_goldnpkr )  // Ver 162A, 1994-04-26
 GAMEL( 1994, wldwitchd, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, init_vkdlswwd, ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62B)",       0,                   layout_goldnpkr )  // Ver 162B, 1994-04-26
 GAMEL( 1994, wldwitche, wldwitch, wcrdxtnd, wldwitch, goldnpkr_state, empty_init,    ROT0,   "Video Klein",              "Wild Witch (Export, 6T/12T ver 1.62A-F)",     MACHINE_NOT_WORKING, layout_goldnpkr )  // Ver 162A-F, 1994-04-26
