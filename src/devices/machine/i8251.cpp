@@ -162,8 +162,8 @@ void i8251_device::update_rx_ready()
 	// can run just before a character arrives yet be timed after it, and a
 	// consumer that defers its input (an input merger) would apply its
 	// repeated 0 last and lose that character's interrupt.  A repeated 1
-	// can't be out of date: only the CPU clears RxRDY, by reading the data
-	// or turning RxE off.
+	// can't be out of date: only the CPU (reading the data or turning RxE
+	// off) or a reset clears RxRDY.
 	uint8_t const state = rxrdy_r();
 	if (state || m_rxrdy)
 	{

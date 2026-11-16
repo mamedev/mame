@@ -57,7 +57,6 @@ mb89371_device::mb89371_device(const machine_config &mconfig, const char *tag, d
 	, m_syndet_w { *this, *this }
 	, m_mode { 0xf0, 0xf0 }
 	, m_baud { 0, 0 }
-	, m_rxrdy { 0, 0 }
 	, m_rxrdy_out { 0, 0 }
 {
 }
@@ -66,7 +65,6 @@ void mb89371_device::device_start()
 {
 	save_item(NAME(m_mode));
 	save_item(NAME(m_baud));
-	save_item(NAME(m_rxrdy));
 	save_item(NAME(m_rxrdy_out));
 }
 
@@ -170,6 +168,19 @@ template<int ch> uint8_t mb89371_device::mode_r()
 template uint8_t mb89371_device::mode_r<0>();
 template uint8_t mb89371_device::mode_r<1>();
 
+// Gate an 8251's RxRDY with its interrupt mask, by the 8251's own rule:
+// repeat a 1, and send a 0 only when the masked output falls (the 8251
+// doesn't repeat a 0, so a mask change has to be driven from here).
+template <int ch> void mb89371_device::update_rx_ready(int rxrdy)
+{
+	uint8_t const out = (rxrdy ? 1 : 0) & BIT(m_mode[ch], MODE_IRQMASK_RXREADY);
+	if (out || m_rxrdy_out[ch])
+	{
+		m_rxrdy_out[ch] = out;
+		m_rxready_w[ch](out);
+	}
+}
+
 template <int ch> void mb89371_device::mode_w(uint8_t data)
 {
 	LOG("%02x to mode\n", data);
@@ -181,7 +192,7 @@ template <int ch> void mb89371_device::mode_w(uint8_t data)
 
 	m_mode[ch] = data;
 	recalc_brg(ch);
-	update_rx_ready<ch>();
+	update_rx_ready<ch>(rxrdy_r<ch>());
 }
 
 template void mb89371_device::mode_w<0>(uint8_t data);
@@ -220,20 +231,7 @@ template void mb89371_device::tx_data_w<1>(int state);
 
 template <int ch> void mb89371_device::rx_ready_w(int state)
 {
-	m_rxrdy[ch] = state ? 1 : 0;
-	update_rx_ready<ch>();
-}
-
-// The 8251 doesn't repeat a 0, so the masked output is kept here and
-// driven whenever either RxRDY or the mask changes it.
-template <int ch> void mb89371_device::update_rx_ready()
-{
-	uint8_t const out = m_rxrdy[ch] & BIT(m_mode[ch], MODE_IRQMASK_RXREADY);
-	if (out != m_rxrdy_out[ch])
-	{
-		m_rxrdy_out[ch] = out;
-		m_rxready_w[ch](out);
-	}
+	update_rx_ready<ch>(state);
 }
 
 template void mb89371_device::rx_ready_w<0>(int state);
