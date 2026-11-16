@@ -58,6 +58,7 @@ mb89371_device::mb89371_device(const machine_config &mconfig, const char *tag, d
 	, m_mode { 0xf0, 0xf0 }
 	, m_baud { 0, 0 }
 	, m_rxrdy { 0, 0 }
+	, m_rxrdy_out { 0, 0 }
 {
 }
 
@@ -66,6 +67,7 @@ void mb89371_device::device_start()
 	save_item(NAME(m_mode));
 	save_item(NAME(m_baud));
 	save_item(NAME(m_rxrdy));
+	save_item(NAME(m_rxrdy_out));
 }
 
 void mb89371_device::device_post_load()
@@ -177,14 +179,9 @@ template <int ch> void mb89371_device::mode_w(uint8_t data)
 		BIT(data, MODE_USE_BRG) ? "Internal BRG" : "External TRNCLK/RVCLK",
 		BIT(data, MODE_ST1_SEL) ? "ST1" : "TRNEMP");
 
-	uint8_t const old = m_mode[ch];
 	m_mode[ch] = data;
 	recalc_brg(ch);
-
-	// The 8251 reports RxRDY only when it changes, so a level that changed
-	// while masked has to be passed on when the mask opens again.
-	if (BIT(data & ~old, MODE_IRQMASK_RXREADY))
-		m_rxready_w[ch](m_rxrdy[ch]);
+	update_rx_ready<ch>();
 }
 
 template void mb89371_device::mode_w<0>(uint8_t data);
@@ -224,9 +221,18 @@ template void mb89371_device::tx_data_w<1>(int state);
 template <int ch> void mb89371_device::rx_ready_w(int state)
 {
 	m_rxrdy[ch] = state ? 1 : 0;
-	if (BIT(m_mode[ch], MODE_IRQMASK_RXREADY))
+	update_rx_ready<ch>();
+}
+
+// The 8251 doesn't repeat a 0, so the masked output is kept here and
+// driven whenever either RxRDY or the mask changes it.
+template <int ch> void mb89371_device::update_rx_ready()
+{
+	uint8_t const out = m_rxrdy[ch] & BIT(m_mode[ch], MODE_IRQMASK_RXREADY);
+	if (out != m_rxrdy_out[ch])
 	{
-		m_rxready_w[ch](state);
+		m_rxrdy_out[ch] = out;
+		m_rxready_w[ch](out);
 	}
 }
 

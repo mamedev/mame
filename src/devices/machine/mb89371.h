@@ -67,7 +67,8 @@ private:
 	devcb_write_line m_txd_w[2], m_rxready_w[2], m_txready_w[2], m_txempty_w[2], m_syndet_w[2];
 
 	uint8_t m_mode[2], m_baud[2];
-	uint8_t m_rxrdy[2]; // each 8251's RxRDY level, forwarded when unmasked
+	uint8_t m_rxrdy[2];     // each 8251's RxRDY
+	uint8_t m_rxrdy_out[2]; // RxRDY as driven out, after the interrupt mask
 
 	template<int ch> void brg_tick(int state);
 	void recalc_brg(int channel);
@@ -77,6 +78,7 @@ private:
 	template<int ch> void mode_w(uint8_t data);
 	template<int ch> void tx_data_w(int state);
 	template<int ch> void rx_ready_w(int state);
+	template<int ch> void update_rx_ready();
 	template<int ch> void tx_ready_w(int state);
 	template<int ch> void tx_empty_w(int state);
 	template<int ch> void syndet_w(int state);
