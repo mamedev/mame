@@ -859,7 +859,7 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 	// 0xffffffff when attacking a super destroyer, and both addresses taken from the wrong
 	// halves of its reactor core explosion frame table (the table index at 0x0e6bbe is
 	// not scaled to the 8-byte entries)
-	if ((tex_adr + 1 - 0x40000) >= (0x100000 - 0x40000) || size >= 0x1000000)
+	if ((tex_adr + 1 - 0x40000) > (0x100000 - 0x40000) || size >= 0x1000000)
 		return;
 
 #if 0
@@ -1072,7 +1072,7 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 			// bits [11:10] of the tile word select a colour mode: bit 10 marks a
 			// flat UI element (radar blips, HUD text) drawn unlit, and mode 01
 			// additionally blinks by rotating the BGR channels on alternate frames.
-			uint16_t tex_data = tgp_ram_entry(tex_adr);
+			const uint16_t tex_data = tgp_ram_entry(tex_adr);
 			int color = m_paletteram16[0x1000 | (tex_data & 0x3ff)];
 			int r = (color >> 0x0) & 0x1f;
 			int g = (color >> 0x5) & 0x1f;
@@ -1236,7 +1236,7 @@ int model1_state::push_direct(int list_offset) {
 		cquad.z = z;
 		{
 			int lumval = ((float)(lum >> 24)) * 2.0f;
-			int color = m_paletteram16[0x1000 | (tgp_ram_entry(tex_adr) & 0x3ff)];
+			const int color = m_paletteram16[0x1000 | (tgp_ram_entry(tex_adr) & 0x3ff)];
 			int r = (color >> 0x0) & 0x1f;
 			int g = (color >> 0x5) & 0x1f;
 			int b = (color >> 0xA) & 0x1f;
