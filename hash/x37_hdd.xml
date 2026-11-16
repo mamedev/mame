@@ -13,7 +13,7 @@ license:CC0-1.0
 		<!-- Micropolis 1325A 69MB -->
 		<part name="hdd" interface="scsi_hdd">
 			<diskarea name="harddriv">
-				<disk name="dnix512" sha1="c20f935722aad7e94d5de28c90174d25b36dea74" writeable="yes" />
+				<disk name="dnix512" sha1="1054bc51908d2c3c3d13be856ebef0275b51f304" writeable="yes" />
 			</diskarea>
 		</part>
 	</software>
