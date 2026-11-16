@@ -47,11 +47,13 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	u32 rom_switch_r(offs_t offset);
 
 private:
+	void update_overlay();
 	void ata_irq_w(int state);
 	u8 ata_timing_r(offs_t offset);
 	void ata_timing_w(offs_t offset, u8 data);
