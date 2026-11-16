@@ -57,6 +57,7 @@ mb89371_device::mb89371_device(const machine_config &mconfig, const char *tag, d
 	, m_syndet_w { *this, *this }
 	, m_mode { 0xf0, 0xf0 }
 	, m_baud { 0, 0 }
+	, m_rxrdy { 0, 0 }
 {
 }
 
@@ -64,6 +65,7 @@ void mb89371_device::device_start()
 {
 	save_item(NAME(m_mode));
 	save_item(NAME(m_baud));
+	save_item(NAME(m_rxrdy));
 }
 
 void mb89371_device::device_post_load()
@@ -175,8 +177,14 @@ template <int ch> void mb89371_device::mode_w(uint8_t data)
 		BIT(data, MODE_USE_BRG) ? "Internal BRG" : "External TRNCLK/RVCLK",
 		BIT(data, MODE_ST1_SEL) ? "ST1" : "TRNEMP");
 
+	uint8_t const old = m_mode[ch];
 	m_mode[ch] = data;
 	recalc_brg(ch);
+
+	// The 8251 reports RxRDY only when it changes, so a level that changed
+	// while masked has to be passed on when the mask opens again.
+	if (BIT(data & ~old, MODE_IRQMASK_RXREADY))
+		m_rxready_w[ch](m_rxrdy[ch]);
 }
 
 template void mb89371_device::mode_w<0>(uint8_t data);
@@ -215,6 +223,7 @@ template void mb89371_device::tx_data_w<1>(int state);
 
 template <int ch> void mb89371_device::rx_ready_w(int state)
 {
+	m_rxrdy[ch] = state ? 1 : 0;
 	if (BIT(m_mode[ch], MODE_IRQMASK_RXREADY))
 	{
 		m_rxready_w[ch](state);
