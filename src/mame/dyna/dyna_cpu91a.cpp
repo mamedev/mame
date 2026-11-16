@@ -656,13 +656,16 @@ void dyna_plane_base::video_regs_w(offs_t offset, uint8_t data)
 		if (offset == 2)
 			m_reel_tilemap->mark_all_dirty();
 	}
-	// Register 3 selects the reel palette in its low nibble. Registers 4-6
-	// and the remaining control bits need further decoding.
+	// Register 3 selects the reel palette; register 5 positions the background
+	// vertically. Registers 4/6 and the remaining control bits need further decoding.
 	LOGVIDEOREGS("%s: plane video register %02x = %02x\n", machine().describe_context(), offset, data);
 }
 
 uint32_t dyna_plane_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// The background position also applies to the reels and their line-enable table.
+	int const bg_scroll = -int8_t(m_video_regs[5]);
+
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	if (BIT(m_video_regs[0], 1))
 	{
@@ -672,19 +675,20 @@ uint32_t dyna_plane_base::screen_update(screen_device &screen, bitmap_rgb32 &bit
 			m_reel_tilemap->set_palette_offset((m_video_regs[3] & 0x0f) << 4);
 
 			for (uint32_t col = 0; col < 64; ++col)
-				m_reel_tilemap->set_scrolly(col, vram_byte(m_vram_bg, 0x800 + col));
+				m_reel_tilemap->set_scrolly(col, vram_byte(m_vram_bg, 0x800 + col) + bg_scroll);
 
 			// D283D uploads a per-scanline reel window to the last four rows
 			// of foreground code RAM. Crazy Bell E2F0C/E4C53 does the same.
 			// Bit 7 enables a line; other bits need further verification.
 			for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 			{
-				if (BIT(vram_byte(m_vram_fg, 0x700 + (y & 0xff)), 7))
+				if (BIT(vram_byte(m_vram_fg, 0x700 + ((y + bg_scroll) & 0xff)), 7))
 					m_reel_tilemap->draw(screen, bitmap, rectangle(cliprect.left(), cliprect.right(), y, y));
 			}
 		}
 		else
 		{
+			m_layer_tilemap[1]->set_scrolly(0, bg_scroll);
 			m_layer_tilemap[1]->draw(screen, bitmap, cliprect);
 		}
 	}
@@ -3521,8 +3525,8 @@ GAME( 1993, scherrym    , 0        , scherrym  , cb2001    , cb2001_state    , i
 GAME( 1993, scherrym12  , scherrym , scherrym  , cb2001    , cb2001_state    , init_smaller_proms, ROT0, "Dyna"                 , "Super Cherry Master (V1.2)"      , MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, scherrymp   , 0        , scherrymp , scmplus   , scherrymp_state , init_smaller_proms, ROT0, "Dyna"                 , "Super Cherry Master Plus (V1.6)" , MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, scherrymp10u, scherrymp, scherrymp , scmplus   , scherrymp_state , empty_init        , ROT0, "Dyna"                 , "Super Cherry Master Plus (V1.0U)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cb4         , 0        , cb4       , cb4       , cb4_state       , empty_init        , ROT0, "Dyna"                 , "Cherry Bonus IV (V5.0)"          , MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, cb4a        , cb4      , cb4       , cb4a      , cb4_state       , empty_init        , ROT0, "Dyna"                 , "Cherry Bonus IV (V1.2)"          , MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cb4         , 0        , cb4       , cb4       , cb4_state       , empty_init        , ROT0, "Dyna"                 , "Cherry Bonus IV (V5.0)"          , MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, cb4a        , cb4      , cb4       , cb4a      , cb4_state       , empty_init        , ROT0, "Dyna"                 , "Cherry Bonus IV (V1.2)"          , MACHINE_IMPERFECT_SOUND | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cb5         , 0        , cb5       , cb5       , cb5_state       , init_smaller_proms, ROT0, "Dyna"                 , "Cherry Bonus V Five (V1.4)"      , MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cb5_13      , cb5      , cb5       , cb5       , cb5_state       , init_smaller_proms, ROT0, "Dyna"                 , "Cherry Bonus V Five (V1.3)"      , MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1997, cb5_11      , cb5      , cb5       , cb5       , cb5_state       , init_smaller_proms, ROT0, "Dyna"                 , "Cherry Bonus V Five (V1.1)"      , MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
