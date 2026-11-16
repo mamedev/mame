@@ -476,7 +476,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "e0c6200",         be, -1, []() -> util::disasm_interface * { return new e0c6200_disassembler; } },
 	{ "edsp",            le, -1, []() -> util::disasm_interface * { return new edsp_disassembler; } },
 	{ "epg3231",         le, -1, []() -> util::disasm_interface * { return new epg3231_disassembler; } },
-//  { "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } }, // Currently does nothing
+	{ "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } },
 	{ "esrip",           be,  0, []() -> util::disasm_interface * { return new esrip_disassembler; } },
 	{ "f2mc16",          le,  0, []() -> util::disasm_interface * { return new f2mc16_disassembler; } },
 	{ "f8",              be,  0, []() -> util::disasm_interface * { return new f8_disassembler; } },
@@ -675,7 +675,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "st9p",            be,  0, []() -> util::disasm_interface * { return new st9p_disassembler; } },
 	{ "superfx",         le,  0, []() -> util::disasm_interface * { return new superfx_disassembler(&superfx_unidasm); } },
 	{ "t11",             le,  0, []() -> util::disasm_interface * { return new t11_disassembler; } },
-    { "t6m53",           be,  0, []() -> util::disasm_interface * { return new t6m53_disassembler; } },
+	{ "t6m53",           be,  0, []() -> util::disasm_interface * { return new t6m53_disassembler; } },
 	{ "tlcs870",         le,  0, []() -> util::disasm_interface * { return new tlcs870_disassembler; } },
 	{ "tlcs900",         le,  0, []() -> util::disasm_interface * { return new tlcs900_disassembler; } },
 	{ "tmp90c051",       le,  0, []() -> util::disasm_interface * { return new tmp90c051_disassembler; } },

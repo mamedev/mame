@@ -2,7 +2,7 @@
 // copyright-holders:Christian Brunschen
 /***************************************************************************
  *
- *   es5510.c - Ensoniq ES5510 (ESP) emulation
+ *   es5510d.h - Ensoniq ES5510 (ESP) disassembler
  *   by Christian Brunschen
  *
  ***************************************************************************/
