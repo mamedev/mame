@@ -23,6 +23,7 @@
 #include <cstring>
 #include <sstream>
 #include <string>
+#include <utility>
 
 // Should writes to DOL, which is 16 bits wide, round towards zero?
 // This seems to fix a noise issue, but may not be what the hardware does.
@@ -441,7 +442,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 		{
 			std::ostringstream stream;
 			es5510_disassembler::describe(stream, instr_latch, gpr[data] & 0x00ffffff, true);
-			LOG("ES5510: Host Write INSTR %02x %012x: %s\n", data, instr_latch & 0xffffffffffffULL, stream.str());
+			LOG("ES5510: Host Write INSTR %02x %012x: %s\n", data, instr_latch & 0xffffffffffffULL, std::move(stream).str());
 		}
 #endif
 		if (data < 0xa0) {
@@ -454,7 +455,7 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 		{
 			std::ostringstream stream;
 			es5510_disassembler::describe(stream, instr_latch, gpr_latch & 0x00ffffff, true);
-			LOG("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, util::sext(gpr_latch, 24), stream.str());
+			LOG("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, util::sext(gpr_latch, 24), std::move(stream).str());
 		}
 #endif
 		if (data < 0xa0) {
@@ -648,7 +649,7 @@ void es5510_device::execute_run() {
 			{
 				std::ostringstream stream;
 				es5510_disassembler::describe(stream, instr[instr_pc], u32(gpr[instr_pc]) & 0x00ffffff, true);
-				LOG_EXEC("EXECUTING %02x: %012x %06x  %s\n", instr_pc, instr[instr_pc], gpr[instr_pc] & 0xffffff, stream.str());
+				LOG_EXEC("EXECUTING %02x: %012x %06x  %s\n", instr_pc, instr[instr_pc], gpr[instr_pc] & 0xffffff, std::move(stream).str());
 			}
 
 			ram_pp = ram_p;
@@ -848,7 +849,7 @@ void es5510_device::execute_run() {
 				};
 				std::ostringstream stream;
 				es5510_disassembler::describe(stream, cur_instr, u32(gpr[instr_pc]) & 0x00ffffff, true, &values);
-				LOG_EXEC("  . operands: %s\n", stream.str());
+				LOG_EXEC("  . operands: %s\n", std::move(stream).str());
 			}
 
 			// --- RAM cycle N-1
