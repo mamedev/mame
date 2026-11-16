@@ -15,9 +15,8 @@
  *     MAC              multiplier accumulates into MAC
  *     RAM control      external RAM/table/I/O access for this cycle
  *
- *   Disassembly reads six bytes per instruction, most significant first.
- *   The GPR address that accompanies each step in an ESP image is stored
- *   separately and is not part of the instruction stream.
+ *   A step in an ESP image is accompanied by a 24-bit GPR offset. When it is
+ *   available, the disassembler shows the offset supplied to the RAM cycle.
  *
  ***************************************************************************/
 
@@ -93,6 +92,23 @@ constexpr char const *const RAM_CONTROL_NAME[8] =
 	"RD tb[]", "RD dd[] (dump)", "RD io[]", "WR io[]"
 };
 
+constexpr char const *const RAM_CONTROL_FORMAT[8] =
+{
+	"RD dd[$%04x]", "WR dd[$%04x]", "RD ta[$%04x]", "WR ta[$%04x]",
+	"RD tb[$%04x]", "RD dd[$%04x] (dump)", "RD io[$%04x]", "WR io[$%04x]"
+};
+
+u64 read_instruction(util::disasm_interface::data_buffer const &opcodes, util::disasm_interface::offs_t pc)
+{
+	return
+			(u64(opcodes.r8(pc + 0)) << 40) |
+			(u64(opcodes.r8(pc + 1)) << 32) |
+			(u64(opcodes.r8(pc + 2)) << 24) |
+			(u64(opcodes.r8(pc + 3)) << 16) |
+			(u64(opcodes.r8(pc + 4)) << 8) |
+			(u64(opcodes.r8(pc + 5)) << 0);
+}
+
 void write_register(std::ostream &stream, u8 reg, bool destination)
 {
 	if (reg < 0xea)
@@ -109,6 +125,20 @@ void write_register(std::ostream &stream, u8 reg, bool destination)
 	}
 }
 
+void write_source_register(std::ostream &stream, u8 reg, u32 value, bool show_value)
+{
+	write_register(stream, reg, false);
+	if (show_value)
+		util::stream_format(stream, "(%06x)", value & 0x00ffffff);
+}
+
+void write_source_delay(std::ostream &stream, u32 value, bool show_value)
+{
+	stream << "Delay";
+	if (show_value)
+		util::stream_format(stream, "(%06x)", value & 0x00ffffff);
+}
+
 void write_path(std::ostream &stream, u8 reg, u8 path, bool destination)
 {
 	if (path & PATH_REG)
@@ -119,9 +149,10 @@ void write_path(std::ostream &stream, u8 reg, u8 path, bool destination)
 		stream << "Delay";
 }
 
-void write_alu(std::ostream &stream, u8 opcode, u8 aReg, u8 bReg, op_select_t const &select)
+void write_alu(std::ostream &stream, u8 opcode, u8 aReg, u8 bReg, op_select_t const &select, es5510_disassembler::operand_values const *values)
 {
 	u8 const operands = ALU_OPERANDS[opcode];
+	bool const show_values = values != nullptr;
 
 	if (!operands)
 	{
@@ -142,12 +173,12 @@ void write_alu(std::ostream &stream, u8 opcode, u8 aReg, u8 bReg, op_select_t co
 	// instruction names only its source operand.
 	if (operands == 2)
 	{
-		write_register(stream, bReg, false);
+		write_source_register(stream, bReg, show_values ? values->b : 0, show_values);
 		stream << ", ";
 		if (select.alu_src == PATH_REG)
-			write_register(stream, aReg, false);
+			write_source_register(stream, aReg, show_values ? values->a : 0, show_values);
 		else
-			stream << "Delay";
+			write_source_delay(stream, show_values ? values->dil : 0, show_values);
 
 		// The A register is the implied destination only when it is also
 		// named as the second source operand. Otherwise it has to be shown.
@@ -160,29 +191,31 @@ void write_alu(std::ostream &stream, u8 opcode, u8 aReg, u8 bReg, op_select_t co
 	else
 	{
 		if (select.alu_src == PATH_REG)
-			write_register(stream, bReg, false);
+			write_source_register(stream, bReg, show_values ? values->b : 0, show_values);
 		else
-			stream << "Delay";
+			write_source_delay(stream, show_values ? values->dil : 0, show_values);
 
 		stream << " > ";
 		write_path(stream, aReg, select.alu_dst, true);
 	}
 }
 
-bool write_mac(std::ostream &stream, bool accumulate, u8 cReg, u8 dReg, op_select_t const &select)
+bool write_mac(std::ostream &stream, bool accumulate, u8 cReg, u8 dReg, op_select_t const &select, es5510_disassembler::operand_values const *values)
 {
 	// "ZERO X+ ZERO > MAC" leaves the multiplier accumulator untouched.
 	if (accumulate && (cReg == REG_ZERO) && (dReg == REG_ZERO) && (select.mac_dst == PATH_REG))
 		return false;
 
-	write_register(stream, dReg, false);
+	bool const show_values = values != nullptr;
+
+	write_source_register(stream, dReg, show_values ? values->d : 0, show_values);
 
 	stream << (accumulate ? " X+ " : " X ");
 
 	if (select.mac_src == PATH_REG)
-		write_register(stream, cReg, false);
+		write_source_register(stream, cReg, show_values ? values->c : 0, show_values);
 	else
-		stream << "Delay";
+		write_source_delay(stream, show_values ? values->dil : 0, show_values);
 
 	// C is the implied destination. An explicit destination is needed when
 	// the result also goes to the delay line, or when the dummy ZERO register
@@ -203,23 +236,24 @@ bool write_mac(std::ostream &stream, bool accumulate, u8 cReg, u8 dReg, op_selec
 	return true;
 }
 
-} // anonymous namespace
-
-u32 es5510_disassembler::opcode_alignment() const
+void write_ram_control(std::ostream &stream, u8 ram_control, bool have_gpr, u32 gpr)
 {
-	return 1;
+	if (have_gpr)
+		util::stream_format(stream, RAM_CONTROL_FORMAT[ram_control], (gpr >> 8) & 0xffff);
+	else
+		stream << RAM_CONTROL_NAME[ram_control];
 }
 
-offs_t es5510_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
-{
-	u64 const instr =
-			(u64(opcodes.r8(pc + 0)) << 40) |
-			(u64(opcodes.r8(pc + 1)) << 32) |
-			(u64(opcodes.r8(pc + 2)) << 24) |
-			(u64(opcodes.r8(pc + 3)) << 16) |
-			(u64(opcodes.r8(pc + 4)) << 8) |
-			(u64(opcodes.r8(pc + 5)) << 0);
+} // anonymous namespace
 
+es5510_disassembler::es5510_disassembler(format fmt) : m_format(fmt)
+{
+}
+
+es5510_disassembler::~es5510_disassembler() = default;
+
+void es5510_disassembler::describe(std::ostream &stream, u64 instr, u32 gpr, bool have_gpr, operand_values const *values)
+{
 	u8 const dReg = u8(instr >> 40);
 	u8 const cReg = u8(instr >> 32);
 	u8 const bReg = u8(instr >> 24);
@@ -235,13 +269,54 @@ offs_t es5510_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	if (skip)
 		stream << '*';
 
-	write_alu(stream, aluOpcode, aReg, bReg, select);
+	write_alu(stream, aluOpcode, aReg, bReg, select, values);
 
 	stream << "; ";
-	if (write_mac(stream, accumulate, cReg, dReg, select))
+	if (write_mac(stream, accumulate, cReg, dReg, select, values))
 		stream << "; ";
 
-	stream << RAM_CONTROL_NAME[ramControl];
+	write_ram_control(stream, ramControl, have_gpr, gpr);
+}
 
-	return 6;
+u32 es5510_disassembler::opcode_alignment() const
+{
+	return 1;
+}
+
+offs_t es5510_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+{
+	u64 instr;
+	u32 gpr = 0;
+	bool have_gpr = false;
+	offs_t length;
+
+	switch (m_format)
+	{
+	case format::PARAMS:
+		instr = opcodes.r64(pc);
+		gpr = params.r32(pc);
+		have_gpr = true;
+		length = 1;
+		break;
+
+	case format::GPR_BYTES:
+		gpr =
+				(u32(opcodes.r8(pc + 0)) << 16) |
+				(u32(opcodes.r8(pc + 1)) << 8) |
+				(u32(opcodes.r8(pc + 2)) << 0);
+		instr = read_instruction(opcodes, pc + 3);
+		have_gpr = true;
+		length = 9;
+		break;
+
+	case format::BYTES:
+	default:
+		instr = read_instruction(opcodes, pc);
+		length = 6;
+		break;
+	}
+
+	describe(stream, instr, gpr, have_gpr);
+
+	return length;
 }

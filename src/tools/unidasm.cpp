@@ -477,6 +477,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "edsp",            le, -1, []() -> util::disasm_interface * { return new edsp_disassembler; } },
 	{ "epg3231",         le, -1, []() -> util::disasm_interface * { return new epg3231_disassembler; } },
 	{ "es5510",          be,  0, []() -> util::disasm_interface * { return new es5510_disassembler; } },
+	{ "es5510gpr",       be,  0, []() -> util::disasm_interface * { return new es5510_disassembler(es5510_disassembler::format::GPR_BYTES); } },
 	{ "esrip",           be,  0, []() -> util::disasm_interface * { return new esrip_disassembler; } },
 	{ "f2mc16",          le,  0, []() -> util::disasm_interface * { return new f2mc16_disassembler; } },
 	{ "f8",              be,  0, []() -> util::disasm_interface * { return new f8_disassembler; } },
