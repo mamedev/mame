@@ -310,9 +310,12 @@ void macvail_state::maclc3_base(machine_config &config)
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(m_sonora, FUNC(sonora_device::scc_irq_w));
 	// channel A is the modem port, B the printer port (LC 520 Developer Note;
-	// Guide to the Macintosh Family Hardware, 2nd ed., p. 361).  GPi (pin 7)
-	// reaches /DCD (LC 520 note).  HSKo (pin 1) is driven from /DTR as on the
-	// LC-family schematics; the LC III note shows the same 26LS30 drivers.
+	// Guide to the Macintosh Family Hardware, 2nd ed., p. 361).  HSKo (pin 1)
+	// is driven from /DTR as on the LC-family schematics; the LC III note's
+	// block diagram shows 26LS30 line drivers on both ports.  GPi (pin 7)
+	// reaches /DCD on the LC 520 (its developer note).
+	// TODO: GPi on the LC III is unverified: its note lists pin 7 as GPi, but
+	// the LC 520 note says the 520's ports add GPi to the LC III's
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
 	m_scc->out_dtra_callback().set("modem", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));

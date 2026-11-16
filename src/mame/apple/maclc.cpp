@@ -390,7 +390,8 @@ void maclc_state::maclc_base(machine_config &config)
 
 	// HSKi (pin 2) reaches /TRxC, which the Am85C80 Combo joins to /CTS
 	// internally.  GPi (pin 7) is not connected on the LC and LC II, whose
-	// /DCD inputs are pulled up; see scc_gpi() for the later machines.
+	// /DCD inputs are pulled up; see scc_gpi() for the Classic II,
+	// Color Classic and Mac TV.
 	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
