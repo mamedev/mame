@@ -84,7 +84,6 @@ public:
 	}
 
 	void maclc_base(machine_config &config);
-	void scc_gpi(machine_config &config);
 	void maclc(machine_config &config);
 	void maclc2(machine_config &config);
 	void macclas2(machine_config &config);
@@ -94,6 +93,8 @@ public:
 	void maccclassic_map(address_map &map) ATTR_COLD;
 
 private:
+	void scc_gpi(machine_config &config) ATTR_COLD;
+
 	required_device<m68000_musashi_device> m_maincpu;
 	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
@@ -383,12 +384,13 @@ void maclc_state::maclc_base(machine_config &config)
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 	// mini-DIN-8 serial ports: HSKo (pin 1) is driven from the SCC's /DTR
-	// through a 26LS30, and HSKi (pin 2) reaches /TRxC, which the 85C80
-	// Combo joins to /CTS internally.  The LC and LC II leave GPi (pin 7)
-	// unconnected and /DCD pulled up; later machines bind it (scc_gpi).
+	// through a 26LS30
 	m_scc->out_dtra_callback().set("modem", FUNC(rs232_port_device::write_dtr));
 	m_scc->out_dtrb_callback().set("printer", FUNC(rs232_port_device::write_dtr));
 
+	// HSKi (pin 2) reaches /TRxC, which the Am85C80 Combo joins to /CTS
+	// internally.  GPi (pin 7) is not connected on the LC and LC II, whose
+	// /DCD inputs are pulled up; see scc_gpi() for the later machines.
 	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
@@ -535,7 +537,8 @@ void maclc_state::maccclas(machine_config &config)
 void maclc_state::mactv(machine_config &config)
 {
 	maclc_base(config);
-	scc_gpi(config);    // as on the Color Classic it derives from; not checked against Mac TV documentation
+	// TODO: GPi wired as on the Color Classic; check against Mac TV documentation
+	scc_gpi(config);
 
 	M68030(config.replace(), m_maincpu, C32M);
 	m_maincpu->set_fpu_enable(false);   // this machine has no FPU and no ability to add one
