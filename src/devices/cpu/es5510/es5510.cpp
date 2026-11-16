@@ -332,24 +332,24 @@ static inline char * DESCRIBE_ALU(char *s, uint8_t opcode, uint8_t aReg, const c
 
 	case 2:
 		s += sprintf(s, "%s ", op.opcode);
-		s = DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_src);
-		s += sprintf(s, " ");
 		s = DESCRIBE_REG(s, bReg, bName);
-		s += sprintf(s, " >");
-		return DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_dst);
+		s = stpcpy_int(s, ", ");
+		s = DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_src);
+		if (opcode != OP_CMP)
+		{
+			s = stpcpy_int(s, " >");
+			s = DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_dst);
+		}
+		return s;
 	}
 	return s;
 }
 
 static inline char * DESCRIBE_MAC(char *s, uint8_t mac, uint8_t cReg, const char *cName, uint8_t dReg, const char *dName, const op_select_t &opSelect)
 {
-	if (mac)
-	{
-		s += sprintf(s, "MAC + ");
-	}
-	s = DESCRIBE_SRC_DST(s, cReg, cName, opSelect.mac_src);
-	s += sprintf(s, " * ");
 	s = DESCRIBE_REG(s, dReg, dName);
+	s = stpcpy_int(s, mac ? " X+ " : " X ");
+	s = DESCRIBE_SRC_DST(s, cReg, cName, opSelect.mac_src);
 	s += sprintf(s, " >");
 	return DESCRIBE_SRC_DST(s, cReg, cName, opSelect.mac_dst);
 }
