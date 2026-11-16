@@ -140,6 +140,7 @@ protected:
 	tilemap_t *m_bg_tilemap[2]{};
 	tilemap_t *m_tx_tilemap = nullptr;
 	s32 m_mustang_bg_xscroll = 0;
+	s32 m_mustang_bg_yscroll = 0;
 	u8 m_scroll[2][4]{};
 	u16 m_vscroll[4]{};
 	u8 m_prot_count = 0;
@@ -158,6 +159,8 @@ protected:
 	void txvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<unsigned Layer> void bgvideoram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void mustang_scroll_w(u16 data);
+	void mustangb3_scroll_w(u16 data);
+	void mustang_bgbank_w(u8 data);
 	void raphero_scroll_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	template<unsigned Layer> void scroll_w(offs_t offset, u8 data);
 	void bjtwin_scroll_w(offs_t offset, u8 data);

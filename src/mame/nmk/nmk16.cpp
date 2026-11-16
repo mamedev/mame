@@ -670,12 +670,13 @@ void nmk16_state::mustang_map(address_map &map)
 	map(0x08000e, 0x08000f).nopw();
 	map(0x080015, 0x080015).w(FUNC(nmk16_state::flipscreen_w));
 	map(0x080016, 0x080017).w(FUNC(nmk16_state::nmk004_x0016_w));    // frame number?
+	map(0x080019, 0x080019).w(FUNC(nmk16_state::mustang_bgbank_w));
 	map(0x08001f, 0x08001f).w(m_nmk004, FUNC(nmk004_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c001).w(FUNC(nmk16_state::mustang_scroll_w));
-	map(0x08c002, 0x08c087).nopw();    // ??
+	map(0x08c000, 0x08c001).mirror(0x3ffe).w(FUNC(nmk16_state::mustang_scroll_w)); // no address lines below A14 are decoded
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
-	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);
+	map(0x09c000, 0x09c7ff).mirror(0x3000).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram); // 2 x 6116 with A10 = CPU A11: 4 KB, mirrored to 0x09ffff
+	map(0x09c800, 0x09cfff).mirror(0x3000).ram();
 	map(0x0f0000, 0x0fffff).ram().w(FUNC(nmk16_state::mainram_strange_w)).share(m_mainram);
 }
 
@@ -710,7 +711,7 @@ void nmk16_state::mustangb3_map(address_map &map)
 	map(0x080016, 0x080017).noprw();
 	map(0x08001f, 0x08001f).w(m_soundlatch, FUNC(generic_latch_8_device::write));
 	map(0x088000, 0x0887ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
-	map(0x08c000, 0x08c001).w(FUNC(nmk16_state::mustang_scroll_w));
+	map(0x08c000, 0x08c001).w(FUNC(nmk16_state::mustangb3_scroll_w));
 	map(0x08c002, 0x08c087).nopw();
 	map(0x090000, 0x093fff).ram().w(FUNC(nmk16_state::bgvideoram_w<0>)).share(m_bgvideoram[0]);
 	map(0x09c000, 0x09c7ff).ram().w(FUNC(nmk16_state::txvideoram_w)).share(m_txvideoram);

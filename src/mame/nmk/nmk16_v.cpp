@@ -89,11 +89,13 @@ void nmk16_state::video_init()
 	m_tilerambank = 0;
 	m_bgbank = 0;
 	m_mustang_bg_xscroll = 0;
+	m_mustang_bg_yscroll = 0;
 
 	save_pointer(NAME(m_spriteram_old), 0x1000/2);
 	save_pointer(NAME(m_spriteram_old2), 0x1000/2);
 	save_item(NAME(m_bgbank));
 	save_item(NAME(m_mustang_bg_xscroll));
+	save_item(NAME(m_mustang_bg_yscroll));
 	save_item(NAME(m_scroll));
 	save_item(NAME(m_vscroll));
 	save_item(NAME(m_tilerambank));
@@ -209,29 +211,50 @@ VIDEO_START_MEMBER(nmk16_state, powerins)
 
 void nmk16_state::mustang_scroll_w(u16 data)
 {
-//  osd_printf_debug("mustang %04x %04x %04x\n",offset,data,mem_mask);
-
-	switch (data & 0xff00)
+	// UPL 90058 PCB: only D8-D9 are latched as the register index, D0-D7 are
+	// the data. The registers feed 74LS283 adders on the BG RAM/ROM address.
+	switch (BIT(data, 8, 2))
 	{
-		case 0x0000:
-			m_mustang_bg_xscroll = (m_mustang_bg_xscroll & 0x00ff) | ((data & 0x00ff) << 8);
+		case 0: // X bits 11-8 (a 74LS174 latches D0-D3 only: the BG is 4096 pixels wide)
+			m_mustang_bg_xscroll = (m_mustang_bg_xscroll & 0x00ff) | ((data & 0x000f) << 8);
 			break;
 
-		case 0x0100:
-			m_mustang_bg_xscroll = (m_mustang_bg_xscroll & 0xff00) | (data & 0x00ff);
+		case 1: // X bits 7-0
+			m_mustang_bg_xscroll = (m_mustang_bg_xscroll & 0x0f00) | (data & 0x00ff);
 			break;
 
-		case 0x0200:
+		case 2: // D0 reaches BG Y bit 8 only through jumper JP-A12, whose standard setting is GND
 			break;
 
-		case 0x0300:
-			break;
-
-		default:
+		case 3: // Y scroll
+			m_mustang_bg_yscroll = data & 0x00ff;
 			break;
 	}
 
 	m_bg_tilemap[0]->set_scrollx(0, m_mustang_bg_xscroll);
+	m_bg_tilemap[0]->set_scrolly(0, m_mustang_bg_yscroll);
+}
+
+void nmk16_state::mustangb3_scroll_w(u16 data)
+{
+	// The Lettering bootleg's IRQ4 handler (0x612) writes the whole X scroll
+	// once per frame as 0x9000 | X, from the variable the original splits
+	// into the index 0 / index 1 pair. The decode is inferred from the code:
+	// this board's video logic is not traced.
+	if ((data & 0xf000) == 0x9000)
+	{
+		m_mustang_bg_xscroll = data & 0x0fff;
+		m_bg_tilemap[0]->set_scrollx(0, m_mustang_bg_xscroll);
+	}
+	else
+		mustang_scroll_w(data);
+}
+
+void nmk16_state::mustang_bgbank_w(u8 data)
+{
+	// 0x080018 D0 is latched to the BG ROM's A19 (pin 1). The 4 Mbit mask ROM
+	// ignores it, so with the stock ROM bank 1 mirrors bank 0.
+	tilebank_w(data & 1);
 }
 
 void nmk16_state::bjtwin_scroll_w(offs_t offset, u8 data)
