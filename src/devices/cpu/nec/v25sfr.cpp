@@ -10,6 +10,8 @@
 #include "v25.h"
 #include "v25priv.ipp"
 
+#include <algorithm>
+
 void v25_common_device::ida_sfr_map(address_map &map)
 {
 	map(0x000, 0x0ff).ram().share("internal_ram");
@@ -470,32 +472,35 @@ void v25_common_device::md0_w(uint16_t d)
 
 uint16_t v25_common_device::tm1_r()
 {
-	if (!machine().side_effects_disabled())
-		logerror("%06x: Warning: read back TM1\n",PC());
+	if (BIT(m_TMC1, 7))
+	{
+		// MD1 + 1 ticks per interval. Derive the live count without changing
+		// timer state, so debugger reads observe the same value as the CPU.
+		const uint64_t ticks = attotime_to_clocks(m_timers[2]->elapsed()) / (m_PCK * (BIT(m_TMC1, 6) ? 128 : 6));
+		return m_TM1 - std::min<uint64_t>(m_TM1, ticks);
+	}
 	return m_TM1;
 }
 
 void v25_common_device::tm1_w(uint16_t d)
 {
 	m_TM1 = d;
+	if (BIT(m_TMC1, 7))
+	{
+		const uint32_t clocks = m_PCK * (uint32_t(d) + 1) * (BIT(m_TMC1, 6) ? 128 : 6);
+		m_timers[2]->adjust(clocks_to_attotime(clocks), INTTU2);
+	}
 }
 
 uint16_t v25_common_device::md1_r()
 {
-	if (!machine().side_effects_disabled())
-		logerror("%06x: Warning: read back MD1\n",PC());
 	return m_MD1;
 }
 
 void v25_common_device::md1_w(uint16_t d)
 {
-	if (m_MD1 == 0 && d != 0)
-	{
-		m_MD1 = d;
-		tmc1_w(m_TMC1); // HACK: start timer if necessary
-	}
-	else
-		m_MD1 = d;
+	// A new modulo takes effect at the next reload, not immediately.
+	m_MD1 = d;
 }
 
 uint8_t v25_common_device::tmc0_r()
@@ -551,14 +556,12 @@ uint8_t v25_common_device::tmc1_r()
 
 void v25_common_device::tmc1_w(uint8_t d)
 {
-	m_TMC1 = d & 0xC0;
-	if (BIT(d, 7) && m_MD1 != 0)
-	{
-		unsigned tmp = m_PCK * m_MD1 * (BIT(d, 6) ? 128 : 6);
-		attotime time = clocks_to_attotime(tmp);
-		m_timers[2]->adjust(time, INTTU1 | INTTU2, time);
-		m_TM1 = m_MD1;
-	}
+	// Stopping retains the current count; writing TS1=1 reloads MD1 even
+	// if the timer was already running (V25/V35 hardware manual, chapter 9).
+	m_TM1 = tm1_r();
+	m_TMC1 = d & 0xc0;
+	if (BIT(d, 7))
+		tm1_w(m_MD1);
 	else
 		m_timers[2]->adjust(attotime::never);
 }
