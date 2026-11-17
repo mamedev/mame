@@ -582,12 +582,13 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 	if (machine().side_effects_disabled())
 	{
 		if (mem_mask == 0xff000000)
-			return u32(m_ncr->dma_peek(0)) << 24;
+			return u32(m_ncr->dma_r()) << 24;
 		if (mem_mask == 0xffff0000)
 			return u32(m_ncr->dma16_swap_r()) << 16;
 		if (m_scsi_second_half)
 			return (m_scsi_dma_result & 0xffff0000) | m_ncr->dma16_swap_r();
-		return (u32(m_ncr->dma16_swap_r()) << 16) | (m_ncr->dma_peek(2) << 8) | m_ncr->dma_peek(3);
+		// The second halfword is presented at the DMA port only after the first is popped from the FIFO
+		return (u32(m_ncr->dma16_swap_r()) << 16) | 0xffff;
 	}
 
 	if (BIT(offset << 1, 18))

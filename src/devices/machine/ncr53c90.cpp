@@ -1210,11 +1210,6 @@ uint8_t ncr53c90_device::dma_r()
 	return r;
 }
 
-uint8_t ncr53c90_device::dma_peek(uint8_t index) const
-{
-	return (index < fifo_pos) ? fifo[index] : 0xff;
-}
-
 void ncr53c90_device::check_drq()
 {
 	bool drq_state = drq;
