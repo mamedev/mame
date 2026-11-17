@@ -24,6 +24,7 @@
 
 #include "interface/uievents.h"
 
+#include <array>
 #include <any>
 #include <cassert>
 #include <chrono>
@@ -58,11 +59,6 @@ class vector_device;
 /* width of lines drawn in the UI */
 #define UI_LINE_WIDTH           (1.0F / 500.0F)
 
-/* handy colors */
-#define UI_GREEN_COLOR          rgb_t(0xef,0x0a,0x66,0x0a)
-#define UI_YELLOW_COLOR         rgb_t(0xef,0xcc,0x7a,0x28)
-#define UI_RED_COLOR            rgb_t(0xef,0xb2,0x00,0x00)
-
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -74,42 +70,105 @@ class mame_ui_manager;
 class ui_colors
 {
 public:
-	rgb_t border_color() const { return m_border_color; }
-	rgb_t background_color() const { return m_background_color; }
-	rgb_t gfxviewer_bg_color() const { return m_gfxviewer_bg_color; }
-	rgb_t unavailable_color() const { return m_unavailable_color; }
-	rgb_t text_color() const { return m_text_color; }
-	rgb_t text_bg_color() const { return m_text_bg_color; }
-	rgb_t subitem_color() const { return m_subitem_color; }
-	rgb_t clone_color() const { return m_clone_color; }
-	rgb_t selected_color() const { return m_selected_color; }
-	rgb_t selected_bg_color() const { return m_selected_bg_color; }
-	rgb_t mouseover_color() const { return m_mouseover_color; }
-	rgb_t mouseover_bg_color() const { return m_mouseover_bg_color; }
-	rgb_t mousedown_color() const { return m_mousedown_color; }
-	rgb_t mousedown_bg_color() const { return m_mousedown_bg_color; }
-	rgb_t dipsw_color() const { return m_dipsw_color; }
-	rgb_t slider_color() const { return m_slider_color; }
+	// a themed foreground/background pair that must be selected atomically
+	struct color_pair
+	{
+		rgb_t foreground;
+		rgb_t background;
+	};
 
+	struct palette_color
+	{
+		char const *name;
+		rgb_t value;
+	};
+	// Complete semantic role values for one predefined UI palette.
+	struct semantic_colors
+	{
+		color_pair normal;
+		color_pair selected;
+		color_pair mouseover;
+		color_pair mousedown;
+		rgb_t subitem;
+		rgb_t clone;
+		rgb_t border;
+		rgb_t background;
+		rgb_t dipsw;
+		rgb_t unavailable;
+		rgb_t slider;
+		rgb_t gfxviewer_background;
+		rgb_t config_deemphasized;
+		rgb_t colored_text;
+		rgb_t accent;
+		rgb_t selection_toolbar;
+		rgb_t status_good;
+		rgb_t status_warning;
+		rgb_t status_error;
+		rgb_t focus_outline;
+		rgb_t focus_gradient_top;
+		rgb_t focus_gradient_bottom;
+		rgb_t overlay;
+	};
+
+	// everything needed to define a palette: identifier, display name,
+	// per-token display names, and the token colours
+	struct theme_palette
+	{
+		char const *id;
+		char const *name;
+		std::array<char const *, 16> color_names;
+		std::array<rgb_t, 16> colors;
+	};
+
+	static std::array<theme_palette, 5> const &predefined_palettes();
+	std::array<palette_color, 16> const &palette_colors() const { return m_palette_colors; }
+
+	// pair accessors
+	color_pair const &normal() const { return m_colors.normal; }
+	color_pair const &selected() const { return m_colors.selected; }
+	color_pair const &mouseover() const { return m_colors.mouseover; }
+	color_pair const &mousedown() const { return m_colors.mousedown; }
+	// component accessors
+	rgb_t border_color() const { return m_colors.border; }
+	rgb_t background_color() const { return m_colors.background; }
+	rgb_t gfxviewer_bg_color() const { return m_colors.gfxviewer_background; }
+	rgb_t unavailable_color() const { return m_colors.unavailable; }
+	rgb_t text_color() const { return m_colors.normal.foreground; }
+	rgb_t text_bg_color() const { return m_colors.normal.background; }
+	rgb_t subitem_color() const { return m_colors.subitem; }
+	rgb_t clone_color() const { return m_colors.clone; }
+	rgb_t selected_color() const { return m_colors.selected.foreground; }
+	rgb_t selected_bg_color() const { return m_colors.selected.background; }
+	rgb_t mouseover_color() const { return m_colors.mouseover.foreground; }
+	rgb_t mouseover_bg_color() const { return m_colors.mouseover.background; }
+	rgb_t mousedown_color() const { return m_colors.mousedown.foreground; }
+	rgb_t mousedown_bg_color() const { return m_colors.mousedown.background; }
+	rgb_t dipsw_color() const { return m_colors.dipsw; }
+	rgb_t slider_color() const { return m_colors.slider; }
+	// foreground for accent and status backgrounds
+	rgb_t colored_text_color() const { return m_colors.colored_text; }
+	rgb_t accent_color() const { return m_colors.accent; }
+	rgb_t selection_toolbar_color() const { return m_colors.selection_toolbar; }
+	rgb_t status_good_color() const { return m_colors.status_good; }
+	rgb_t status_warning_color() const { return m_colors.status_warning; }
+	rgb_t status_error_color() const { return m_colors.status_error; }
+	rgb_t config_deemphasized_color() const { return m_colors.config_deemphasized; }
+	rgb_t focus_outline_color() const { return m_colors.focus_outline; }
+	rgb_t focus_gradient_top() const { return m_colors.focus_gradient_top; }
+	rgb_t focus_gradient_bottom() const { return m_colors.focus_gradient_bottom; }
+	rgb_t overlay_color() const { return m_colors.overlay; }
+
+	// load a predefined palette by stable ID
+	bool load_palette(char const *palette);
+
+	// load the effective palette from the UI options
 	void refresh(const ui_options &options);
 
 private:
-	rgb_t m_border_color;
-	rgb_t m_background_color;
-	rgb_t m_gfxviewer_bg_color;
-	rgb_t m_unavailable_color;
-	rgb_t m_text_color;
-	rgb_t m_text_bg_color;
-	rgb_t m_subitem_color;
-	rgb_t m_clone_color;
-	rgb_t m_selected_color;
-	rgb_t m_selected_bg_color;
-	rgb_t m_mouseover_color;
-	rgb_t m_mouseover_bg_color;
-	rgb_t m_mousedown_color;
-	rgb_t m_mousedown_bg_color;
-	rgb_t m_dipsw_color;
-	rgb_t m_slider_color;
+	static semantic_colors transparent_colors();
+
+	std::array<palette_color, 16> m_palette_colors{};
+	semantic_colors m_colors = transparent_colors();
 };
 
 

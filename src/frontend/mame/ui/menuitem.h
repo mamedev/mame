@@ -33,6 +33,14 @@ enum class menu_item_type
 	SEPARATOR
 };
 
+// semantic value state for items that display an On/Off/Auto-style subitem
+enum class menu_item_color_state : uint8_t
+{
+	NORMAL,
+	ON,
+	OFF,
+	AUTO
+};
 class menu_item
 {
 public:
@@ -50,10 +58,12 @@ public:
 	uint32_t flags() const noexcept { return m_flags; }
 	unsigned generation() const noexcept { return m_generation; }
 	menu_item_type type() const noexcept { return m_type; }
+	menu_item_color_state color_state() const noexcept { return m_color_state; }
 
 	template <typename... T> void set_text(T &&... args) { m_text.assign(std::forward<T>(args)...); ++m_generation; }
 	template <typename... T> void set_subtext(T &&... args) { m_subtext.assign(std::forward<T>(args)...); ++m_generation; }
 	void set_flags(uint32_t f) noexcept { m_flags = f; ++m_generation; }
+	void set_color_state(menu_item_color_state state) noexcept { m_color_state = state; ++m_generation; }
 
 private:
 	std::string     m_text;
@@ -62,6 +72,7 @@ private:
 	uint32_t        m_flags;
 	unsigned        m_generation = 0;
 	menu_item_type  m_type;
+	menu_item_color_state m_color_state = menu_item_color_state::NORMAL;
 };
 
 } // namespace ui
