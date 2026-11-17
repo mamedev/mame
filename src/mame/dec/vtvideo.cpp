@@ -13,7 +13,7 @@ Code developed with Rainbow-100 hardware in mind (a PC-like machine with a video
 Details (termination characters, option hardware, MHFU watchdog) differ when compared to VT.
 
 As of July 2014, the Rainbow video section is more mature than the 'VT100_VIDEO' part (essentially unchanged since 2009).
-List of features not yet ported to VT: line doubler; 48 line mode; soft scroll; intensity / palette, AVO (ext.attributes)
+List of features not yet ported to VT: line doubler; 48 line mode; intensity / palette, AVO (ext.attributes)
 
 FIXME: work out the differences and identify common code between VT and Rainbow. Unify different code trees.
 
@@ -21,7 +21,8 @@ FIXME: work out the differences and identify common code between VT and Rainbow.
   * do line and character attributes (plus combinations) match real hardware?
   * how does the AVO fit in?
 
-- SCROLLING REGIONS / SPLIT SCREEN SCROLLING UNTESTED (if you open > 1 file with the VAX editor EDT)
+- SCROLLING REGIONS / SPLIT SCREEN SCROLLING UNTESTED ON THE RAINBOW (if you open > 1 file with the VAX editor EDT).
+  The VT100 runs the DC012's counters (see video_update).
   See VT100 Technical Manual: 4.7.4 Address Shuffling to 4.7.9 Split Screen Smooth Scrolling.
   More on scrolling regions: Rainbow 100 B technical documentation (QV069-GZ) April 1985 page 22
 
@@ -233,21 +234,20 @@ void vt100_video_device::vblank_callback(screen_device &screen, bool state)
 {
 	if (state)
 	{
-		vertical_reset();
 		m_write_vert_freq_intr(ASSERT_LINE);
 		notify_vblank(true);
 	}
 }
 
-// The DC012 presets its offset counter from the scroll latch at VERTICAL
-// RESET, so the firmware loads the latch during one frame for the next
-// (TM-003 4.6.3.3).  Taken here ahead of the vertical frequency interrupt:
-// the VT100 firmware writes the first offset of a scroll mid-frame and
-// each later one from that interrupt, so the reset must come between them
-// for the first to be shown (inferred from the firmware's writes).
-void vt100_video_device::vertical_reset()
+// At VERTICAL RESET the DC012 presets its Offset counter from the scroll
+// latch (TM-003 4.6.3.3) and sets the vertical frequency interrupt
+// (4.6.3.1), so the latch is taken at the start of vblank and the firmware
+// loads it from the interrupt for the next frame (4.7.8).  The Rainbow
+// overrides this.
+void vt100_video_device::notify_vblank(bool choice)
 {
-	m_last_scroll = m_scroll_latch;
+	if (choice)
+		m_last_scroll = m_scroll_latch;
 }
 
 // Also used by Rainbow-100 ************
@@ -274,7 +274,9 @@ void vt100_video_device::dc012_w(offs_t offset, uint8_t data)
 		if (!(data & 0x04))
 		{
 			m_scroll_latch_valid = false;
-			m_scroll_latch = data & 0x03; // LSB is written first.
+			// LSB is written first; the high pair keeps its value until the
+			// second write (TM-003 4.6.3.1: separate low and high loads).
+			m_scroll_latch = (m_scroll_latch & 0x0c) | (data & 0x03);
 		}
 		else // set MSB of scroll_latch
 		{
@@ -398,9 +400,13 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 	int offset_counter = m_last_scroll;
 	bool scroll_ff = false;
 
-	// the line being displayed
-	uint8_t codes[133];
-	uint8_t attrs[133];
+	// interlaced: both fields show the same scans
+	int const fields = m_linedoubler ? 2 : 1;
+
+	// the line being displayed: up to 132 characters and the terminator
+	static constexpr int MAX_LINE = 133;
+	uint8_t codes[MAX_LINE];
+	uint8_t attrs[MAX_LINE];
 	int length = 0;
 	uint8_t display_type = 3; // cleared: normal
 	bool valid = true;
@@ -426,9 +432,12 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 			uint16_t const addr = next_addr;
 			display_type = next_type;
 			length = 0;
-			while (length <= columns && m_read_ram(addr + length) != 0x7f)
+			while (length <= columns)
 			{
-				codes[length] = m_read_ram(addr + length);
+				uint8_t const code = m_read_ram(addr + length);
+				if (code == 0x7f)
+					break;
+				codes[length] = code;
 				attrs[length] = m_read_ram(0x1000 + addr + length);
 				length++;
 			}
@@ -448,11 +457,10 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 
 		if (scan >= first_scan)
 		{
-			// interlaced: both fields show the same scans
-			int const y = (scan - first_scan) * (m_linedoubler ? 2 : 1);
+			int const y = (scan - first_scan) * fields;
 			auto const draw = [&] (int x, uint8_t code, uint8_t type, bool invert, bool bold, bool blink, bool underline, bool blank)
 			{
-				for (int field = 0; field < (m_linedoubler ? 2 : 1); field++)
+				for (int field = 0; field < fields; field++)
 					draw_scan(bitmap, y + field, x, code, row, type, invert, bold, blink, underline, blank, false);
 			};
 			int const width = (display_type != 3) ? (columns / 2) : columns;
