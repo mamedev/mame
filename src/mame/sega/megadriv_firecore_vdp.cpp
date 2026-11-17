@@ -26,7 +26,7 @@ DEFINE_DEVICE_TYPE(FIRECORE_VDP, megadriv_firecore_vdp_device, "megadriv_firecor
 
 	TODO
 	 - see if we can reuse some of the base VDP handling without being too disruptive
-	 - colours are incorrect in several games (eg sprites and background fade for "Black Sheep" in atgames40)
+	 - colours are incorrect in several games (eg sprites and background fade for "Black Sheep" in atgame40)
 	   and "Zuma Bubbles" found in pxp3, mahg156
 */
 
@@ -80,7 +80,7 @@ void megadriv_firecore_vdp_device::xvdp_w(offs_t offset, uint16_t data, uint16_t
 		}
 	}
 
-	// otherwies fall through to the base VDP handling
+	// otherwise fall through to the base VDP handling
 	sega315_5313_device::vdp_w(offset, data, mem_mask);
 }
 

@@ -241,7 +241,6 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, device_t
 	m_palwrite_base = -1;
 	m_vram_size = 0x10000;
 	m_cram_size = 0x80;
-
 }
 
 //-------------------------------------------------

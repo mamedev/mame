@@ -509,12 +509,12 @@ ROM_START( mateta )
 ROM_END
 
 ROM_START( mypacgld )
-	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "am29lv160db.u2", 0x000000, 0x200000, CRC(7a01cf42) SHA1(c9fb66f1d38710aae6b94c1fbc99a8763730cfce) )
 ROM_END
 
 ROM_START( mypac )
-	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "en29lb160bb.bin", 0x000000, 0x200000, CRC(d741a601) SHA1(a8d89034458b14c5cea83980be5400b82081b274) )
 ROM_END
 
@@ -556,7 +556,7 @@ ROM_START( mysinv )
 ROM_END
 
 ROM_START( mysinva )
-	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "s29gl032n90tfi03.u2", 0x000000, 0x400000, CRC(57480d73) SHA1(743b4a56ddbf61eef46ee4b2d4581cd44a67ba9b) )
 
 	// has a P24C64C (for storing scores?)
@@ -564,7 +564,7 @@ ROM_END
 
 ROM_START( mysf2 )
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "s29gl128.u2", 0x000000, 0x1000000, CRC(7938a212) SHA1(306cffd048fb271fa26cd2f61cbd2c3a94116292) )
+	ROM_LOAD16_WORD_SWAP( "s29gl128.u2", 0x0000000, 0x1000000, CRC(7938a212) SHA1(306cffd048fb271fa26cd2f61cbd2c3a94116292) )
 ROM_END
 
 
@@ -619,20 +619,19 @@ on an unsupported video mode (they still play sounds and resond to inputs / do c
 
 ROM_START( atgame40 )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
-	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x000000, 0x1000000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
+	ROM_LOAD16_WORD_SWAP( "40bonusgamesin1.bin", 0x0000000, 0x1000000, CRC(4eba6e83) SHA1(b8edf1b6ecb70a136b551f1454ba8afa45bd8bc1) )
 ROM_END
 
 
-ROM_START(dcat16)
-	ROM_REGION(0x1000000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "mg6025.u1", 0x0000,  0x800000, CRC(5453d673) SHA1(b9f8d849cbed81fe73525229f4897ccaeeb7a833) )
-	ROM_RELOAD(0x800000,0x800000)
+ROM_START( dcat16 )
+	ROM_REGION(0x800000, "maincpu", ROMREGION_ERASEFF)
+	ROM_LOAD16_WORD_SWAP( "mg6025.u1", 0x000000,  0x800000, CRC(5453d673) SHA1(b9f8d849cbed81fe73525229f4897ccaeeb7a833) )
 ROM_END
 
 
-ROM_START(mahg156)
+ROM_START( mahg156 )
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "md156.u3", 0x0000,  0x8000000, CRC(665fc68c) SHA1(6b765f96716c4a0abf3d27252ec82be6b0d9a985) )
+	ROM_LOAD16_WORD_SWAP( "md156.u3", 0x0000000,  0x8000000, CRC(665fc68c) SHA1(6b765f96716c4a0abf3d27252ec82be6b0d9a985) )
 //  the Megadrive ROMs for the most part appear to be hacked versions of the games / old scene dumps
 //  some are region locked to differing regions (not all games present in ROM appear on the menu)
 //  ROM_COPY( "maincpu", 0x0000000, 0, 0x080000) // FORGOTTEN WORLDS
@@ -666,19 +665,19 @@ ROM_START(mahg156)
 ROM_END
 
 // PXP3 16-bit handhelds with cartridge slot, several revisions with different game selections (dumps named after the case colour)
-ROM_START(pxp3)
+ROM_START( pxp3 )
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "pxp3_black.bin", 0x0000,  0x8000000, CRC(5c29ad76) SHA1(a377cf704d17a084537211e22c94f086628cd642) ) // glob, no clear IC position
+	ROM_LOAD16_WORD_SWAP( "pxp3_black.bin", 0x0000000, 0x8000000, CRC(5c29ad76) SHA1(a377cf704d17a084537211e22c94f086628cd642) ) // glob, no clear IC position
 ROM_END
 
-ROM_START(pxp3a)
+ROM_START( pxp3a )
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "pxp3_blue.bin", 0x0000,  0x8000000, CRC(f5e36263) SHA1(98f551358be92591fa34304d97fbf48482801123) ) // glob, no clear IC position
+	ROM_LOAD16_WORD_SWAP( "pxp3_blue.bin", 0x0000000, 0x8000000, CRC(f5e36263) SHA1(98f551358be92591fa34304d97fbf48482801123) ) // glob, no clear IC position
 ROM_END
 
-ROM_START(mdhh100)
+ROM_START( mdhh100 )
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "s29gl01gp11tfir1.u13", 0x0000,  0x8000000, CRC(564ab33a) SHA1(e455aaa9ed6f302d1ebe55b5202f983af612c415) )
+	ROM_LOAD16_WORD_SWAP( "s29gl01gp11tfir1.u13", 0x0000000, 0x8000000, CRC(564ab33a) SHA1(e455aaa9ed6f302d1ebe55b5202f983af612c415) )
 ROM_END
 
 ROM_START( msi_sf2 )
@@ -693,27 +692,27 @@ ROM_END
 
 ROM_START( reactmd )
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASE00 ) // this contains the MD games and main boot menu
-	ROM_LOAD16_WORD_SWAP( "reactormd.bin", 0x0000, 0x2000000, CRC(fe9664a4) SHA1(d475b524f576c9d1d90aed20c7467cc652396baf) )
+	ROM_LOAD16_WORD_SWAP( "reactormd.bin", 0x0000000, 0x2000000, CRC(fe9664a4) SHA1(d475b524f576c9d1d90aed20c7467cc652396baf) )
 
 	ROM_REGION( 0x4000000, "sunplus", ROMREGION_ERASE00 ) // this contains the SunPlus games
-	ROM_LOAD16_WORD_SWAP( "reactor_md_sunplus-full.bin", 0x0000, 0x4000000, CRC(843aa58c) SHA1(07cdc6d4aa0057939c145ece01a9aca73c7f1f2b) )
+	ROM_LOAD16_WORD_SWAP( "reactor_md_sunplus-full.bin", 0x0000000, 0x4000000, CRC(843aa58c) SHA1(07cdc6d4aa0057939c145ece01a9aca73c7f1f2b) )
 	ROM_IGNORE(0x4000000) // the 2nd half of the ROM can't be accessed by the PCB (address line tied low) (contains garbage? data)
 ROM_END
 
 ROM_START( sarc110 )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) // Mega Drive part
-	ROM_LOAD16_WORD_SWAP( "superarcade.bin", 0x000000, 0x1000000, CRC(be732867) SHA1(3857b2fbddd6a548c81caf64122e47a0df079be5) )
+	ROM_LOAD16_WORD_SWAP( "superarcade.bin", 0x0000000, 0x1000000, CRC(be732867) SHA1(3857b2fbddd6a548c81caf64122e47a0df079be5) )
 
 	ROM_REGION( 0x400000, "mainrom", 0 ) // VT02/03 part
-	ROM_LOAD( "ic1.prg", 0x00000, 0x400000, CRC(de76f71f) SHA1(ff6b37a76c6463af7ae901918fc008b4a2863951) )
+	ROM_LOAD( "ic1.prg", 0x000000, 0x400000, CRC(de76f71f) SHA1(ff6b37a76c6463af7ae901918fc008b4a2863951) )
 ROM_END
 
 ROM_START( sarc110a )
 	ROM_REGION( 0x1000000, "maincpu", 0 ) // Mega Drive part
-	ROM_LOAD16_WORD_SWAP( "superarcade.bin", 0x000000, 0x1000000, CRC(be732867) SHA1(3857b2fbddd6a548c81caf64122e47a0df079be5) )
+	ROM_LOAD16_WORD_SWAP( "superarcade.bin", 0x0000000, 0x1000000, CRC(be732867) SHA1(3857b2fbddd6a548c81caf64122e47a0df079be5) )
 
 	ROM_REGION( 0x400000, "mainrom", 0 ) // VT02/03 part
-	ROM_LOAD( "ic1_ver2.prg", 0x00000, 0x400000, CRC(b97a0dc7) SHA1(bace32d73184df914113de5336e29a7a6f4c03fa) )
+	ROM_LOAD( "ic1_ver2.prg", 0x000000, 0x400000, CRC(b97a0dc7) SHA1(bace32d73184df914113de5336e29a7a6f4c03fa) )
 ROM_END
 
 
