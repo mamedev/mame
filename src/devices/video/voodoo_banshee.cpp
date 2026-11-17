@@ -1858,7 +1858,7 @@ static_register_table_entry<voodoo_banshee_device> const voodoo_banshee_device::
 	REGISTER_ENTRY(fogColor,        invalid,     passive,     24, FBI,        SYNC,   FIFO)    // 12c
 	REGISTER_ENTRY(zaColor,         invalid,     passive,     32, FBI,        SYNC,   FIFO)    // 130
 	REGISTER_ENTRY(chromaKey,       invalid,     passive,     24, FBI,        SYNC,   FIFO)    // 134
-	REGISTER_ENTRY(chromaRange,     invalid,     passive,     28, FBI,        SYNC,   FIFO)    // 138
+	REGISTER_ENTRY(chromaRange,     invalid,     passive,     29, FBI,        SYNC,   FIFO)    // 138
 	REGISTER_ENTRY(userIntrCMD,     invalid,     userintr,    10, FBI,        SYNC,   FIFO)    // 13c
 	//             name             rd handler   wr handler  bits chips     sync?     fifo?
 	REGISTER_ENTRY(stipple,         passive,     passive,     32, FBI,        SYNC,   FIFO)    // 140
