@@ -372,12 +372,12 @@ void mac128_state::machine_reset()
 // no reset input.  None of these devices has a reset line here, so the
 // handler resets them directly.
 //
-// The ADB modem (the 342-0440 PIC on the SE and Classic) is reset too.  The
-// SE schematic doesn't show its /MCLR pin; on the IIcx the ADB modem's reset
-// pin is on /RESET (IIcx schematic, sheet 4), and the SE is taken to match.
-// Without this, a restart while the mouse is moving leaves the PIC mid-way
-// through a transaction, it never sends the ADB reset pulse, and the mouse
-// and keyboard are dead after the restart.
+// The ADB modem (the 342S0440-B PIC) is reset too.  The SE and Classic
+// schematics don't show its reset pin; on the Mac II, IIcx and SE/30 it is on
+// /RESET (see macii.cpp), and the SE and Classic are taken to match.  Without
+// this, a restart while the mouse is moving apparently leaves the PIC part
+// way through a transaction: it never sends the ADB reset pulse, and the
+// mouse and keyboard are dead after the restart.
 void mac128_state::cpu_reset_w(int state)
 {
 	if (!state)
