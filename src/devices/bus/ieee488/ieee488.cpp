@@ -145,6 +145,7 @@ void ieee488_device::device_start()
 	save_item(NAME(m_lines.m_state));
 	save_item(NAME(m_lines.m_count));
 	save_item(NAME(m_lines.m_line));
+	save_item(NAME(m_lines.m_line_time));
 	save_item(NAME(m_lines.m_exec_index));
 }
 
@@ -210,6 +211,7 @@ void ieee488_device::add_device(ieee488_slot_device *slot, device_t *target)
 	save_item(NAME(entry->m_lines.m_state), m_device_list.count());
 	save_item(NAME(entry->m_lines.m_count), m_device_list.count());
 	save_item(NAME(entry->m_lines.m_line), m_device_list.count());
+	save_item(NAME(entry->m_lines.m_line_time), m_device_list.count());
 	save_item(NAME(entry->m_lines.m_exec_index), m_device_list.count());
 }
 
@@ -242,6 +244,7 @@ void ieee488_device::source_lines::reset()
 		m_count[signal] = 1;
 		m_line[signal] = (signal == DIO) ? 0xff : 1;
 	}
+	m_line_time = attotime::zero;
 	m_exec = nullptr;
 	m_exec_index = -1;
 }
@@ -308,19 +311,16 @@ void ieee488_device::set_signal(device_t *device, int signal, u8 state)
 		count++;
 	}
 
-	if (time <= now)
-	{
-		update_lines();
-	}
-	else
+	if (time > now)
 	{
 		// a source's own receivers see its outputs without the write delay
 		lines->m_exec = exec;
-		update_lines(*lines, entry);
 
 		if (!m_update_timer->enabled() || m_update_timer->expire() > time)
 			m_update_timer->adjust(time - now);
 	}
+
+	update_lines();
 }
 
 
@@ -331,11 +331,12 @@ void ieee488_device::set_signal(device_t *device, int signal, u8 state)
 
 void ieee488_device::update_lines(source_lines &lines, daisy_entry *entry)
 {
-	attotime const now = machine().time();
+	attotime const time = std::max(machine().time(), lines.m_line_time);
+	lines.m_line_time = time;
 
 	for (int signal = 0; signal < SIGNAL_COUNT; signal++)
 	{
-		u8 const state = get_signal(signal, now, &lines);
+		u8 const state = get_signal(signal, time, &lines);
 		if (lines.m_line[signal] == state)
 			continue;
 

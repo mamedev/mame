@@ -137,6 +137,7 @@ protected:
 		u8 m_state[SIGNAL_COUNT][EDGE_COUNT];
 		u8 m_count[SIGNAL_COUNT];
 		u8 m_line[SIGNAL_COUNT];
+		attotime m_line_time;
 		device_execute_interface *m_exec;
 		s32 m_exec_index;
 	};
