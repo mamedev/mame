@@ -371,6 +371,13 @@ void mac128_state::machine_reset()
 // models are taken to match.  The table also lists the SCC, but the Z8530 has
 // no reset input.  None of these devices has a reset line here, so the
 // handler resets them directly.
+//
+// The ADB modem (the 342-0440 PIC on the SE and Classic) is reset too.  The
+// SE schematic doesn't show its /MCLR pin; on the IIcx the ADB modem's reset
+// pin is on /RESET (IIcx schematic, sheet 4), and the SE is taken to match.
+// Without this, a restart while the mouse is moving leaves the PIC mid-way
+// through a transaction, it never sends the ADB reset pulse, and the mouse
+// and keyboard are dead after the restart.
 void mac128_state::cpu_reset_w(int state)
 {
 	if (!state)
@@ -388,6 +395,8 @@ void mac128_state::cpu_reset_w(int state)
 		m_ncr5380->reset();
 	if (m_scsihelp)
 		m_scsihelp->reset();
+	if (m_adbmodem)
+		m_adbmodem->reset();
 }
 
 u16 mac128_state::ram_r(offs_t offset)
