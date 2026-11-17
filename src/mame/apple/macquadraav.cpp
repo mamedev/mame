@@ -7,8 +7,8 @@
     Emulation by R. Belmont
 
     These machines were a substantial step forward in multimedia and a bridge
-    to the first-generation Power Macintosh.  Apple introduced the 660AV
-    under the short-lived Centris brand.
+    to the first-generation Power Macintosh.  Apple first introduced the
+    660AV under the short-lived Centris brand.
 
     Major changes from previous high-end Quadras include true DMA support for
     the 53C94 SCSI, the 85C30 ESCC, the new Singer audio CODEC, the uPD72070
@@ -28,6 +28,8 @@
 
     TODO:
     - Sound input from a real source (the PSC feeds converter noise)
+    - Video input using SAA7191 DMSD
+    - NuBus interface (840AV has 3 onboard slots; 660AV supports 1 via PDS)
     - Probably other things
 
 ****************************************************************************/
