@@ -43,6 +43,7 @@
 
 #include "emu.h"
 
+#include "bus/heathzenith/h19/cards.h"
 #include "bus/heathzenith/h19/tlb.h"
 #include "bus/heathzenith/h89/h89bus.h"
 #include "bus/heathzenith/h89/cdr_fdc_880h.h"
@@ -914,21 +915,6 @@ void h89_base_state::port_f2_w(u8 data)
 	m_intr_socket->set_irq_level(1, CLEAR_LINE);
 }
 
-static void tlb_options(device_slot_interface &device)
-{
-	device.option_add("heath",        HEATH_TLB);
-	device.option_add("gp19",         HEATH_GP19);
-	device.option_add("imaginator",   HEATH_IMAGINATOR);
-	device.option_add("super19",      HEATH_SUPER19);
-	device.option_add("superset",     HEATH_SUPERSET);
-	device.option_add("ultrarom",     HEATH_ULTRA);
-	device.option_add("watzman",      HEATH_WATZ);
-	device.option_add("igc",          HEATH_IGC);
-	device.option_add("igc_super19",  HEATH_IGC_SUPER19);
-	device.option_add("igc_ultrarom", HEATH_IGC_ULTRA);
-	device.option_add("igc_watzman",  HEATH_IGC_WATZ);
-}
-
 static void intr_ctrl_options(device_slot_interface &device)
 {
 	device.option_add("original", HEATH_INTR_CNTRL);
@@ -1008,7 +994,7 @@ void h89_base_state::h89_base(machine_config &config)
 	INS8250(config, m_console, INS8250_CLOCK);
 	m_console->out_int_callback().set(FUNC(h89_base_state::console_intr));
 
-	HEATH_TLB_CONNECTOR(config, m_tlbc, tlb_options, "heath");
+	HEATH_TLB_CONNECTOR(config, m_tlbc, h89_tlb_options, "heath");
 
 	// Connect the console port on CPU board to TLB connector
 	m_console->out_tx_callback().set(m_tlbc, FUNC(heath_tlb_connector::serial_in_w));
