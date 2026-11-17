@@ -425,6 +425,10 @@ void via6522_device::device_reset()
 	m_ddr_b = 0;
 	m_latch_b = 0;
 
+	// reset clears IFR and IER, so /IRQ is released (W65C22S data sheet 3.9)
+	if (m_ifr & INT_ANY)
+		m_irq_handler(CLEAR_LINE);
+
 	m_pcr = 0;
 	m_acr = 0;
 	m_ier = 0;
