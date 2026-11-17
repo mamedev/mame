@@ -88,6 +88,8 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(delayed_stream_update);
 
+	virtual void allocate_streams() ATTR_COLD;
+	virtual void update_streams();
 	virtual u8 get_version();
 	virtual void set_irq_line(int status);
 
@@ -233,6 +235,8 @@ public:
 
 protected:
 	virtual void sound_stream_update(sound_stream &stream) override;
+	virtual void allocate_streams() override ATTR_COLD;
+	virtual void update_streams() override;
 	virtual u8 get_version() override;
 
 	virtual void device_start() override ATTR_COLD;
@@ -256,6 +260,7 @@ private:
 		R_RDPTRPLAYA_L
 	};
 
+	void record_stream_update(sound_stream &stream);
 	void reset_fifos();
 	u16 fifo_cap(int f) const;
 	void push_byte(int f, u8 data);
@@ -271,6 +276,7 @@ private:
 	u16 &pointer(offs_t offset);
 	bool recording() const { return BIT(m_regs[R_PLAYRECA], 0); }
 
+	sound_stream *m_record_stream;
 	u8 m_fifo8[3][FIFO_BYTES];
 	u16 m_rdptr16[3], m_wrptr16[3];
 	bool m_full[3];

@@ -46,6 +46,11 @@ static constexpr uint64_t DOUBLE_ZERO = 0;
 
 static constexpr uint32_t CODEPAGE_SIZE = 0x1'0000'0000ULL / 4096 / 8;
 
+// MMU page geometry used for compiled code tracking
+static constexpr uint32_t MMU_PAGE_SHIFT = 12;
+static constexpr offs_t MMU_PAGE_BYTES = offs_t(1) << MMU_PAGE_SHIFT;
+static constexpr offs_t MMU_PAGE_OFFSET_MASK = MMU_PAGE_BYTES - 1;
+
 static constexpr uint32_t SPR60X_HID0_ICFI          = 0x0000'0800;
 
 /***************************************************************************
@@ -1686,7 +1691,46 @@ void ppc_device::ppccom_tlb_fill()
 			vtlb_flush_address(m_core->param0);
 		return;
 	}
-	vtlb_fill(m_core->param0, address, m_core->param1);
+
+	tlb_fill_translated(m_core->param0, address, m_core->param1);
+}
+
+
+/*-------------------------------------------------
+    tlb_fill_translated - cache a translation,
+    first retiring a stale entry for the same
+    effective page that maps a different physical
+    page
+-------------------------------------------------*/
+
+void ppc_device::tlb_fill_translated(offs_t pc, offs_t address, int intent)
+{
+	// Supervisor BATs and user page tables can map the same effective page
+	// to different physical pages. Retire the cached permissions along with
+	// the old physical address before caching this translation.
+	vtlb_entry const entry = vtlb_table()[pc >> 12];
+	if ((entry & FLAG_VALID) && !(entry & FLAG_FIXED) && ((entry ^ address) & ~uint32_t(POWERPC_MIN_PAGE_MASK)))
+		vtlb_flush_address(pc);
+
+	vtlb_fill(pc, address, intent);
+}
+
+
+/*-------------------------------------------------
+    compile_time_tlb_fill - fill the fetch TLB
+    entry for a page the recompiler is about to
+    validate.  The 603 miss fields the translation
+    writes are scratch values that every miss path
+    recomputes just before it uses them, as the
+    frontend's fetch translation already assumes.
+-------------------------------------------------*/
+
+void ppc_device::compile_time_tlb_fill(offs_t pc)
+{
+	int const intent = ppccom_fetch_intention();
+	offs_t address = pc;
+	if (ppccom_translate_address_internal(intent, false, address) <= 1)
+		tlb_fill_translated(pc, address, intent);
 }
 
 
@@ -1727,21 +1771,46 @@ void ppc_device::ppc_check_translation(ppc_entry_check *chk)
 
 
 /*-------------------------------------------------
-    invalidate_code_range - invalidate the hash
-    entries of every code page in an effective
-    address range whose translation changed, so
-    stale blocks are recompiled at next entry
-    instead of flushing the whole cache.  Returns
-    true if anything was invalidated.
+    invalidate_code_page - invalidate the hash
+    entries of every sequence that can share a
+    block with code from one effective page, so
+    those blocks are recompiled at next entry
+-------------------------------------------------*/
+
+void ppc_device::invalidate_code_page(uint32_t page)
+{
+	// A block holds sequences from up to COMPILE_BACKWARDS_BYTES before its
+	// entry point e to COMPILE_FORWARDS_BYTES after it, and branches between
+	// them are local jumps that skip the hash entry's checks.  A block holding
+	// code from address a therefore has e - COMPILE_BACKWARDS_BYTES <= a <=
+	// e + COMPILE_FORWARDS_BYTES, so its sequences start within
+	// COMPILE_BACKWARDS_BYTES + COMPILE_FORWARDS_BYTES of a on either side.
+	// Drop the hash entries of every sequence in that span around the page, not
+	// just those in the page itself.  Neighbouring pages keep their code page
+	// bits, as their contents didn't change.
+	constexpr offs_t BLOCK_REACH = COMPILE_BACKWARDS_BYTES + COMPILE_FORWARDS_BYTES;
+	offs_t const pagestart = offs_t(page) << MMU_PAGE_SHIFT;
+	offs_t const pageend = pagestart | MMU_PAGE_OFFSET_MASK;
+	m_drcuml.hash_invalidate_range(
+			pagestart - std::min<offs_t>(pagestart, BLOCK_REACH),
+			pageend + std::min<offs_t>(~pageend, BLOCK_REACH));
+}
+
+
+/*-------------------------------------------------
+    invalidate_code_range - invalidate the code
+    compiled from every page with compiled code in
+    an effective address range whose contents
+    changed (see invalidate_code_page), instead of
+    flushing the whole cache.  Returns true if
+    anything was invalidated.
 -------------------------------------------------*/
 
 bool ppc_device::invalidate_code_range(offs_t start, offs_t end)
 {
-	// A sequence starting on an earlier page can extend into this range, but
-	// invalidate_range() backs the start up by the maximum sequence length to
-	// catch those, so only the pages actually touched need to be considered.
-	uint32_t page = start >> 12;
-	uint32_t const lastpage = end >> 12;
+	// For a large range the widened ranges of adjacent pages simply overlap.
+	uint32_t page = start >> MMU_PAGE_SHIFT;
+	uint32_t const lastpage = end >> MMU_PAGE_SHIFT;
 	bool invalidated = false;
 
 	while (page <= lastpage)
@@ -1755,12 +1824,160 @@ bool ppc_device::invalidate_code_range(offs_t start, offs_t end)
 
 		if (BIT(m_codepage_bits[page >> 3], page & 7))
 		{
-			m_drcuml.hash_invalidate_range(page << 12, (page << 12) | 0xfff);
+			invalidate_code_page(page);
 			invalidated = true;
 		}
 		page++;
 	}
 	return invalidated;
+}
+
+
+/*-------------------------------------------------
+    has_icache_flash_invalidate - true if HID0
+    has the ICFI bit, which is the case on every
+    OEA part except the 601
+-------------------------------------------------*/
+
+bool ppc_device::has_icache_flash_invalidate() const
+{
+	return (m_cap & PPCCAP_OEA) && (m_flavor != PPC_MODEL_601);
+}
+
+
+/*-------------------------------------------------
+    code_page_memory - host memory backing a whole
+    physical code page, or nullptr if reads of the
+    page aren't one contiguous block of host memory
+-------------------------------------------------*/
+
+const uint8_t *ppc_device::code_page_memory(offs_t physbase) const
+{
+	// A missing write pointer doesn't make a page read-only: a write tap (the
+	// BeBox's MPC105 snoop, a Lua tap, a watchpoint) or a write handler leaves
+	// RAM without one.  Compare what reads return instead; ROM simply never
+	// changes.
+
+	// The pointers address the bus-width unit holding the address, so compare
+	// against the start of the page's last 64-bit unit.
+	constexpr offs_t LAST_UNIT_OFFSET = MMU_PAGE_BYTES - 8;
+	auto const *const base = static_cast<const uint8_t *>(m_program->get_read_ptr(physbase));
+	if (!base || (static_cast<const uint8_t *>(m_program->get_read_ptr(physbase | LAST_UNIT_OFFSET)) != (base + LAST_UNIT_OFFSET)))
+		return nullptr;
+	return base;
+}
+
+
+/*-------------------------------------------------
+    code_snapshot_matches - true if a code page
+    snapshot still holds what its physical page
+    contains
+-------------------------------------------------*/
+
+bool ppc_device::code_snapshot_matches(uint32_t physpage, const code_page_snapshot &snap) const
+{
+	const uint8_t *const mem = code_page_memory(offs_t(physpage) << MMU_PAGE_SHIFT);
+	return mem && snap.bytes && std::equal(mem, mem + MMU_PAGE_BYTES, snap.bytes.get());
+}
+
+
+/*-------------------------------------------------
+    snapshot_code_page - remember the contents of
+    a writable physical page the DRC is compiling
+    code from, and the effective page it is
+    compiling it at (see icache_flash_invalidate)
+-------------------------------------------------*/
+
+void ppc_device::snapshot_code_page(uint32_t page, offs_t physbase)
+{
+	// A page that can't be read as one block of host memory can't be compared,
+	// so it gets an entry without bytes, marked dirty: every ICFI discards its
+	// code, as it did before snapshots.
+	const uint8_t *const mem = code_page_memory(physbase);
+
+	uint32_t const physpage = physbase >> MMU_PAGE_SHIFT;
+	auto const [it, inserted] = m_code_snapshots.try_emplace(physpage);
+	code_page_snapshot &snap = it->second;
+	if (std::find(snap.logical.begin(), snap.logical.end(), page) == snap.logical.end())
+		snap.logical.push_back(page);
+
+	if (inserted)
+	{
+		if (mem)
+		{
+			snap.bytes = std::make_unique<uint8_t []>(MMU_PAGE_BYTES);
+			std::copy_n(mem, MMU_PAGE_BYTES, snap.bytes.get());
+		}
+		else
+		{
+			snap.dirty = true;
+		}
+		return;
+	}
+
+	// Blocks compiled from this page earlier used the snapshot's bytes, and the
+	// code being compiled uses what memory holds now.  If the two differ, the
+	// snapshot can no longer vouch for every block compiled from the page, so
+	// the next ICFI has to discard them all.
+	if (!snap.dirty && !code_snapshot_matches(physpage, snap))
+		snap.dirty = true;
+}
+
+
+/*-------------------------------------------------
+    snapshot_sequence_pages - snapshot every page
+    an instruction sequence was compiled from
+-------------------------------------------------*/
+
+void ppc_device::snapshot_sequence_pages(const opcode_desc *first, const opcode_desc *last)
+{
+	if (!has_icache_flash_invalidate())
+		return;
+
+	uint32_t lastpage = ~uint32_t(0);
+	for (const opcode_desc *desc = first; ; desc = desc->next())
+	{
+		// a descriptor that faulted has no valid physical address
+		if (!desc->compiler_page_fault() && ((desc->pc >> MMU_PAGE_SHIFT) != lastpage))
+		{
+			lastpage = desc->pc >> MMU_PAGE_SHIFT;
+			snapshot_code_page(lastpage, desc->physpc & ~MMU_PAGE_OFFSET_MASK);
+		}
+		if (desc == last)
+			break;
+	}
+}
+
+
+/*-------------------------------------------------
+    icache_flash_invalidate - HID0[ICFI] was set:
+    discard compiled code for every page whose
+    bytes changed since it was compiled.  Returns
+    true if anything was invalidated.
+-------------------------------------------------*/
+
+bool ppc_device::icache_flash_invalidate()
+{
+	bool discarded = false;
+	for (auto it = m_code_snapshots.begin(); it != m_code_snapshots.end(); )
+	{
+		code_page_snapshot const &snap = it->second;
+		if (!snap.dirty && code_snapshot_matches(it->first, snap))
+		{
+			++it;
+			continue;
+		}
+
+		// discard the code compiled from this physical page at every effective
+		// page it was compiled at, whatever that page's code page bit says;
+		// invalidate_code_page() leaves the snapshots alone, so the iterator
+		// stays valid across these calls
+		for (uint32_t const page : snap.logical)
+			invalidate_code_page(page);
+		it = m_code_snapshots.erase(it);
+		discarded = true;
+	}
+	return discarded;
 }
 
 
@@ -2239,14 +2456,16 @@ void ppc_device::ppccom_execute_mtspr()
 
 			// register that affects the instruction cache
 			case SPR603_HID0:
-				// flush the I-cache on a 0->1 transition of ICFI, konamim2 does this
-				// valid on all OEA parts except 601
-				if ((m_flavor != PPC_MODEL_601) && m_core->m_codepage_any
-						&& ((m_core->param1 & ~m_core->spr[SPR603_HID0]) & SPR60X_HID0_ICFI))
-				{
-					invalidate_code_range(0, 0xffffffff);
-				}
 				m_core->spr[m_core->param0] = m_core->param1;
+
+				// Setting ICFI invalidates the whole instruction cache on every OEA
+				// part except the 601 (konamim2 relies on it).  Tell the DRC (via
+				// param1) whether compiled code was discarded, so it can leave the
+				// current block like it does after an icbi.  The 601 has no ICFI;
+				// its HID0 holds the little-endian mode bit, which the DRC picks
+				// up itself after the write.
+				if (has_icache_flash_invalidate())
+					m_core->param1 = ((m_core->param1 & SPR60X_HID0_ICFI) && icache_flash_invalidate()) ? 1 : 0;
 				return;
 
 			// registers that affect the memory map

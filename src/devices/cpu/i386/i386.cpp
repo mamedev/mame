@@ -56,6 +56,7 @@ DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "Intel I486DX
 DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Intel Pentium")
 DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
 DEFINE_DEVICE_TYPE(MEDIAGX,     mediagx_device,     "mediagx",     "Cyrix MediaGX")
+DEFINE_DEVICE_TYPE(MEDIAGXM,    mediagxm_device,    "mediagxm",    "Cyrix MediaGX MMX-Enhanced")
 DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Intel Pentium Pro")
 DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Intel Pentium II")
 DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Intel Pentium III")
@@ -121,7 +122,17 @@ pentium_device::pentium_device(const machine_config &mconfig, device_type type, 
 }
 
 mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, MEDIAGX, tag, owner, clock, 32, 32, 32)
+	: mediagx_device(mconfig, MEDIAGX, tag, owner, clock)
+{
+}
+
+mediagx_device::mediagx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: i386_device(mconfig, type, tag, owner, clock, 32, 32, 32)
+{
+}
+
+mediagxm_device::mediagxm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mediagx_device(mconfig, MEDIAGXM, tag, owner, clock)
 {
 }
 
@@ -3170,6 +3181,37 @@ void mediagx_device::device_reset()
 	m_feature_flags = 0x00000001;
 
 	CHANGE_PC(m_eip);
+}
+
+/*****************************************************************************/
+/* Cyrix MediaGX MMX-Enhanced (GXm) */
+
+void mediagxm_device::device_start()
+{
+	i386_common_init();
+	register_state_i386_x87();
+
+	build_x87_opcode_table();
+	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_CYRIX);
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_MEDIAGX].get();
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_MEDIAGX].get();
+}
+
+void mediagxm_device::device_reset()
+{
+	mediagx_device::device_reset();
+
+	// Family 5, Model 4 (MediaGX MMX-Enhanced databook, table 9-18), stepping unknown
+	REG32(EDX) = (5 << 8) | (4 << 4) | (1);
+	m_cpu_version = REG32(EDX);
+
+	// [ 0:0] FPU on chip
+	// [ 4:4] Time Stamp Counter
+	// [ 5:5] RDMSR / WRMSR
+	// [ 8:8] CMPXCHG8B
+	// [15:15] CMOV
+	// [23:23] MMX
+	m_feature_flags = 0x00808131;
 }
 
 /*****************************************************************************/

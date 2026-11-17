@@ -60,7 +60,6 @@ void ncr53c810_pci_device::config_map(address_map &map)
 	map(0x04, 0x05).w(FUNC(ncr53c810_pci_device::command_w));
 	map(0x06, 0x07).w(FUNC(ncr53c810_pci_device::status_w));
 	map(0x0d, 0x0d).w(FUNC(ncr53c810_pci_device::latency_timer_w));
-	map(0x10, 0x17).w(FUNC(ncr53c810_pci_device::bar_w));
 	map(0x3d, 0x3d).lw8(NAME([] (u8 data) { })); // INTA is fixed
 	map(0x80, 0xff).rw(m_scripts, FUNC(ncr53c8xx_device_base::reg_r), FUNC(ncr53c8xx_device_base::reg_w));
 }
@@ -96,11 +95,6 @@ u8 ncr53c810_pci_device::latency_timer_r()
 void ncr53c810_pci_device::latency_timer_w(u8 data)
 {
 	m_latency_timer = data;
-}
-
-void ncr53c810_pci_device::bar_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	address_base_w(offset, (address_base_r(offset) & ~mem_mask) | (data & mem_mask));
 }
 
 void ncr53c810_pci_device::map_extra(u64 memory_window_start, u64 memory_window_end, u64 memory_offset, address_space *memory_space,

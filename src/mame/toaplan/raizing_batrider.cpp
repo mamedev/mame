@@ -8,6 +8,7 @@
 #include "endianness.h"
 
 #include <algorithm>
+
 /*
 
 Name        Board No      Maker         Game name

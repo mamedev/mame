@@ -81,6 +81,7 @@ private:
 	static constexpr unsigned NUM_INTC_GROUPS = 0x20;
 	static constexpr int SIO0_GROUP = 0x10;   // RX; TX is the next group, then channel 1
 	static constexpr int TM4_GROUP = 0x06;    // TM5 is the next group
+	static constexpr int TM6A_GROUP = 0x09;   // TM6 compare/capture A
 	static constexpr int DMA0_GROUP = 0x0f;   // DMA channel 0 end of transfer
 	static constexpr int IRQ0_GROUP = 0x17;
 	static constexpr unsigned TM_PRESCALE = 8;
@@ -119,6 +120,12 @@ private:
 	u8 m_tm_mode[2];
 	u16 m_tm_base[2];
 	emu_timer *m_tm_timer[2];
+
+	// TM6
+	u16 m_tm6_mode;
+	u8 m_tm6_mda;
+	u16 m_tm6_ca;
+	emu_timer *m_tm6_timer;
 
 	// DMA controller channel 0 (registers at 0x32000800)
 	devcb_write_line m_dma_tc_cb;
@@ -167,6 +174,15 @@ private:
 	template <unsigned N> u16 tm_count_r();
 	void tm_rearm(unsigned n, bool restart_phase);
 	TIMER_CALLBACK_MEMBER(tm_underflow);
+	u16 tm6_mode_r();
+	void tm6_mode_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 tm6_mda_r();
+	void tm6_mda_w(u8 data);
+	u16 tm6_ca_r();
+	void tm6_ca_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 tm6_count_r();
+	void tm6_rearm(bool restart_phase);
+	TIMER_CALLBACK_MEMBER(tm6_match);
 
 	u32 dmac_r(offs_t offset);
 	void dmac_w(offs_t offset, u32 data, u32 mem_mask = ~0);

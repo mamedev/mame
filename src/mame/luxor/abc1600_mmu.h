@@ -25,6 +25,8 @@ public:
 
 	void partst_w(int state) { m_partst = state; }
 	void rstbut_w(int state) { m_rstbut = state; }
+	void sysfs_w(int state) { m_sysfs = state; }
+	void sysscc_w(int state) { m_sysscc = state; }
 
 	void dmamap_w(offs_t offset, uint8_t data);
 
@@ -89,6 +91,8 @@ private:
 		virtual bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	private:
+		enum class bus_target : u8 { OTHER, RAM, IO };
+
 		m68008_device *m_maincpu;
 		u8 *m_segment_ram;
 		u16 *m_page_ram;
@@ -106,12 +110,19 @@ private:
 		offs_t get_physical_address(offs_t logical, int task, bool &nonx, bool &wp);
 		u8 mmu_read(offs_t logical, int intention);
 		void mmu_write(offs_t logical, u8 data);
+		static bus_target physical_target(offs_t physical);
+		void bus_cycle(bus_target target, bool write);
 
-		bool m_super = false;
-		bool m_boote = 0;
-		bool m_magic = 0;
-		int m_task = 0;
-		u8 m_cause = 0;
+		bool m_super;
+		bool m_boote;
+		bool m_magic;
+		int m_task;
+		u8 m_cause;
+
+		// bus timing in half CPU clock periods
+		u64 m_bus_end;
+		u64 m_refresh;
+		u64 m_rack_ready;
 	};
 
 	devcb_read8::array<3> m_read_tren;
@@ -145,8 +156,10 @@ private:
 	uint8_t dma_iorq_r(int dmamap, offs_t offset);
 	void dma_iorq_w(int dmamap, offs_t offset, uint8_t data);
 
-	bool m_rstbut = 0;
-	bool m_partst = 0;
+	bool m_rstbut;
+	bool m_partst;
+	bool m_sysfs;
+	bool m_sysscc;
 
 	u8 m_dmamap[8];
 };

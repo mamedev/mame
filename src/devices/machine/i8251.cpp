@@ -103,6 +103,7 @@ void i8251_device::device_start()
 	m_rxc_count = 0;
 	m_txc_count = 0;
 	m_br_factor = 0;
+	m_rx_start_check = false;
 
 	m_rx_data = 0;
 	m_tx_data = 0;
@@ -133,6 +134,7 @@ void i8251_device::device_start()
 	save_item(NAME(m_rxc_count));
 	save_item(NAME(m_txc_count));
 	save_item(NAME(m_br_factor));
+	save_item(NAME(m_rx_start_check));
 
 	save_item(NAME(m_rx_data));
 	save_item(NAME(m_tx_data));
@@ -179,6 +181,26 @@ void i8251_device::receive_clock()
 			--m_rxc_count;
 			if (m_rxc_count)
 				return;
+
+			// false start bit detection: a start bit must still be low at its
+			// centre, or it was a glitch and the search for one resumes
+			// (8251A data sheet, Receiver Control and Asynchronous Mode (Receive))
+			if (m_rx_start_check)
+			{
+				m_rx_start_check = false;
+				if (m_rxd)
+				{
+					receive_register_reset();
+					// the register still holds the low start bit; shift the
+					// high line in so the next falling edge is a transition
+					receive_register_update_bit(m_rxd);
+				}
+				else
+				{
+					m_rxc_count = m_br_factor;
+				}
+				return;
+			}
 		}
 
 		//logerror("I8251\n");
@@ -186,7 +208,19 @@ void i8251_device::receive_clock()
 		//LOGBITS("8251: Rx Sampled %d\n", m_rxd);
 		receive_register_update_bit(m_rxd);
 		if (is_receive_register_synchronized())
-			m_rxc_count = sync ? m_br_factor : (3 * m_br_factor / 2);
+		{
+			if (!sync && m_br_factor > 1)
+			{
+				// a start bit has just been seen: check it again half a bit
+				// from now
+				m_rx_start_check = true;
+				m_rxc_count = m_br_factor / 2;
+			}
+			else
+			{
+				m_rxc_count = m_br_factor;
+			}
+		}
 
 		if (is_receive_register_full())
 		{
@@ -526,6 +560,7 @@ void i8251_device::device_reset()
 	m_tx_data = 0;
 	m_rxc_count = m_txc_count = 0;
 	m_br_factor = 1;
+	m_rx_start_check = false;
 
 	/* update tx empty pin output */
 	update_tx_empty();
@@ -543,9 +578,6 @@ void i8251_device::device_reset()
 
 void i8251_device::command_w(uint8_t data)
 {
-	/* command */
-	m_command = data;
-
 	LOG("I8251: Command byte: %02x\n", data);
 	LOGCOM(" Tx enable: %d\n", data & 0x01 ? 1 : 0); // bit 0: 0 = transmit disable 1 = transmit enable
 	LOGCOM(" DTR      : %d\n", data & 0x02 ? 1 : 0); // bit 1: 0 = /DTR set to 1    1 = /DTR set to 0
@@ -556,9 +588,6 @@ void i8251_device::command_w(uint8_t data)
 	LOGCOM(" Reset    : %d\n", data & 0x40 ? 1 : 0); // bit 6: 0 = normal operation 1 = internal reset
 	LOGCOM(" Hunt mode: %d\n", data & 0x80 ? 1 : 0); // bit 7: 0 = normal operation 1 = hunt mode
 
-	m_rts_handler(!BIT(data, 5));
-	m_dtr_handler(!BIT(data, 1));
-
 	if (BIT(data, 4))
 	{
 		LOGSTAT("status errors are reset\n");
@@ -567,11 +596,21 @@ void i8251_device::command_w(uint8_t data)
 
 	if (BIT(data, 6))
 	{
-		// datasheet says "returns to mode format", not
-		// completely resets the chip.  behavior of DEC Rainbow
-		// backs this up.
+		// Internal reset returns the device to the mode format and, per the
+		// 8251A data sheet (RESET pin), to the "Idle" state.  It stops short
+		// of a full reset (device_reset), as the DEC Rainbow's behaviour backs
+		// up.  Treating the rest of the command as 0 is inferred: the data
+		// sheet only shows a bare 0x40.
 		m_flags = I8251_NEXT_MODE;
+		data = 0x40;
 	}
+
+	// command
+	bool const was_break = BIT(m_command, 3);
+	m_command = data;
+
+	m_rts_handler(!BIT(data, 5));
+	m_dtr_handler(!BIT(data, 1));
 
 	// Hunt mode
 	m_hunt_on = false;
@@ -581,8 +620,14 @@ void i8251_device::command_w(uint8_t data)
 	if (m_hunt_on)
 		m_ext_syn_set = false;
 
+	// An empty transmitter holds TxD marking unless SBRK is set (8251A data
+	// sheet, Features and Asynchronous Mode (Transmission)), so a command that
+	// clears SBRK, an internal reset included, ends the break.  Not while a
+	// sync mode transmitter idles on SYNC characters, as transmit_clock does.
 	if (BIT(data, 3))
 		m_txd_handler(0);
+	else if (was_break && is_transmit_register_empty() && !(m_sync_byte_count && is_tx_enabled()))
+		m_txd_handler(1);
 
 	check_for_tx_start();
 	update_rx_ready();
@@ -724,6 +769,7 @@ void i8251_device::mode_w(uint8_t data)
 	}
 
 	receive_register_reset();
+	m_rx_start_check = false;
 	m_txc_count = 0;
 }
 

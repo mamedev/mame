@@ -1706,19 +1706,16 @@ void spu_device::update_voice_loop(const unsigned int v)
 
 	else if ((! vi->loop) && (vi->play.cache->is_loop))
 	{
+		// The voice jumps to the repeat address whatever the flags of the
+		// block found there
+
 		ra=spureg.voice[v].repaddr<<m_counter_shift;
 
-		const adpcm_packet *ap=(adpcm_packet *)packet_read(ra);
-		if (ap->flags&adpcmflag_loop_repeat)
+		if (! vi->play.cache->get_sample_pointer(ra,&vi->loop))
 		{
-			// Repeat address points to a block with loop flag set
+			// Repeat address is in a different block
 
-			if (! vi->play.cache->get_sample_pointer(ra,&vi->loop))
-			{
-				// Repeat address is in a different block
-
-				translate_sample_addr(ra,&vi->loop);
-			}
+			translate_sample_addr(ra,&vi->loop);
 		}
 	}
 

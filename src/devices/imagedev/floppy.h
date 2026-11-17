@@ -139,7 +139,7 @@ public:
 	virtual void seek_phase_w(int phases);
 	void stp_w(int state);
 	void dir_w(int state) { m_dir = state; }
-	void ss_w(int state) { m_actual_ss = state; if (m_sides > 1) m_ss = state; }
+	void ss_w(int state);
 	void inuse_w(int state) { }
 	void dskchg_w(int state) { if (m_dskchg_writable) m_dskchg = state; }
 	void ds_w(int state) { m_ds = state; check_led(); }

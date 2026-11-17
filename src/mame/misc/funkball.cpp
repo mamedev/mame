@@ -747,7 +747,7 @@ DEVICE_INPUT_DEFAULTS_END
 
 void funkball_state::funkball(machine_config &config)
 {
-	MEDIAGX(config, m_maincpu, 66666666*3.5); // 66,6 MHz x 3.5
+	MEDIAGXM(config, m_maincpu, 66666666*3.5); // 66,6 MHz x 3.5
 	m_maincpu->set_addrmap(AS_PROGRAM, &funkball_state::funkball_map);
 	m_maincpu->set_addrmap(AS_IO, &funkball_state::funkball_io);
 	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));

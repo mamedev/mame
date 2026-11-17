@@ -26,6 +26,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_dsp(*this, "dsp")
+		, m_dsp_dram(*this, "16mdram", 0x100000 * 2, ENDIANNESS_BIG)
 		, m_ioport_p7(*this, "P7")
 		, m_ioport_p6(*this, "P6")
 		, m_ioport_p5(*this, "P5")
@@ -66,9 +67,14 @@ public:
 
 private:
 	void mem_map(address_map &map) ATTR_COLD;
+	void dsp_y_map(address_map &map) ATTR_COLD;
+
+	u32 dsp_dram_r(offs_t offset);
+	void dsp_dram_w(offs_t offset, u32 data);
 
 	required_device<h8s2320_device> m_maincpu;
 	required_device<dsp56362_device> m_dsp;
+	memory_share_creator<u16> m_dsp_dram;
 
 	required_ioport m_ioport_p7;
 	required_ioport m_ioport_p6;
@@ -230,6 +236,21 @@ u16 microkorg_state::get_input() const
 	return 0x7ff;
 }
 
+void microkorg_state::dsp_y_map(address_map &map)
+{
+	map(0x400000, 0x4fffff).rw(FUNC(microkorg_state::dsp_dram_r), FUNC(microkorg_state::dsp_dram_w));
+}
+
+u32 microkorg_state::dsp_dram_r(offs_t offset)
+{
+	return m_dsp_dram[offset] << 8;
+}
+
+void microkorg_state::dsp_dram_w(offs_t offset, u32 data)
+{
+	m_dsp_dram[offset] = data >> 8;
+}
+
 static INPUT_PORTS_START(microkorg)
 	PORT_START("P7")
 	PORT_BIT(0x001, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("1") PORT_CODE(KEYCODE_1)
@@ -317,6 +338,7 @@ void microkorg_state::microkorg(machine_config &config)
 	FUJITSU_29LV800B(config, "flash"); // MBM29LV800BA-90PFTN
 
 	dsp56362_device &dsp(DSP56362(config, "dsp", 12.288_MHz_XTAL / 4)); // DSPB56362PV100
+	dsp.set_addrmap(dsp56362_device::AS_Y, &microkorg_state::dsp_y_map);
 	dsp.set_hard_omr(0b0101); // slave SPI bootstrap
 	dsp.miso_callback().set(m_maincpu, FUNC(h8s2320_device::sci_rx_w<0>));
 	dsp.hreq_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ7);

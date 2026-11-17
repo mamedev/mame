@@ -16998,6 +16998,9 @@ sz1
 dg10
 dg20
 
+@source:casio/dh100.cpp
+dh100
+
 @source:casio/fp200.cpp
 fp200
 
@@ -18817,6 +18820,7 @@ vintkeys
 
 @source:ensoniq/enmirage.cpp
 enmirage
+enmirdms
 
 @source:ensoniq/esq1.cpp
 esq1
@@ -21004,6 +21008,9 @@ et3400a
 @source:heathzenith/h8.cpp
 h8
 
+@source:heathzenith/h9.cpp
+h9
+
 @source:heathzenith/h19.cpp
 h19
 
@@ -21521,6 +21528,9 @@ tpad600x
 tpad760xd
 tpad770z
 
+@source:ibm/thinkpad750.cpp
+tpad750cs
+
 @source:ibm/thinkpad8xx.cpp
 tpad850
 
@@ -21765,6 +21775,13 @@ fl7_50_gs37
 fl7_50_gs38
 fl7_50_gs39
 fl7_500
+fl7_500_gs01
+fl7_500_gs02
+fl7_500_gs03
+fl7_500_gs04
+fl7_500_gs05
+fl7_500_gs06
+fl7_500_gs07
 fl7_1000
 fl7_2000
 fl7_2k16
@@ -29627,6 +29644,7 @@ rs3230
 
 @source:misc/39in1.cpp
 19in1
+19in1u
 39in1
 48in1
 48in1a
@@ -29635,6 +29653,7 @@ rs3230
 4in1
 4in1a
 60in1
+60in1u
 fruitwld
 fruitwlda
 jumanji
@@ -32755,6 +32774,7 @@ fruitstbn
 fruitstbo
 goldnjkr
 goldnjkra
+goldnjkrb
 
 @source:misc/mpu2000.cpp
 gw606
@@ -40889,7 +40909,9 @@ st1714
 jinsanse
 
 @source:sealy/sealy_eagle.cpp
+abaozang
 qczl
+zduoxing
 
 @source:sealy/sealy_fr.cpp
 snowbwar

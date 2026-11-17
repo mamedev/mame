@@ -59167,9 +59167,9 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 708: { // btst #[n],a
-		u64 d = get_a();
+		u32 d_h = get_ah();
 		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
+		u32 t = d_h;
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
@@ -59179,9 +59179,9 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 709: { // btst #[n],b
-		u64 d = get_b();
+		u32 d_h = get_bh();
 		u32 n = BIT(opcode, 0, 5);
-		u32 t = d;
+		u32 t = d_h;
 		u32 m = 1 << n;
 		if(t & m) {
 		m_ccr |= CCR_C;
@@ -63699,15 +63699,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		u32 expr = exv;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 962: { // do y:(r)-n,[expr]
@@ -63715,15 +63720,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		u32 expr = exv;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 963: { // do x:(r)+n,[expr]
@@ -63731,15 +63741,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		u32 expr = exv;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 964: { // do y:(r)+n,[expr]
@@ -63747,15 +63762,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		u32 expr = exv;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 965: { // do x:(r)-,[expr]
@@ -63763,15 +63783,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		u32 expr = exv;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 966: { // do y:(r)-,[expr]
@@ -63779,15 +63804,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		u32 expr = exv;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 967: { // do x:(r)+,[expr]
@@ -63795,15 +63825,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		u32 expr = exv;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 968: { // do y:(r)+,[expr]
@@ -63811,75 +63846,100 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		u32 expr = exv;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 969: { // do x:(r),[expr]
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 expr = exv;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 970: { // do y:(r),[expr]
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 expr = exv;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 971: { // do x:(r+n),[expr]
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 expr = exv;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 972: { // do y:(r+n),[expr]
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 expr = exv;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 973: { // do x:-(r),[expr]
@@ -63887,15 +63947,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		u32 expr = exv;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 974: { // do y:-(r),[expr]
@@ -63903,48 +63968,66 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		u32 expr = exv;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 975: { // do x:[aa],[expr]
 		u32 aa = BIT(opcode, 8, 6);
 		u32 expr = exv;
+		u32 lc = m_x.read_dword(aa) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(aa));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 976: { // do y:[aa],[expr]
 		u32 aa = BIT(opcode, 8, 6);
 		u32 expr = exv;
+		u32 lc = m_y.read_dword(aa) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(aa));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 977: { // do #[i],[expr]
 		u32 i = bitswap<12>(opcode, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
 		u32 expr = exv;
+		if(i == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
@@ -63954,356 +64037,482 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 978: { // do x0,[expr]
 		u32 s = get_x0();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 979: { // do x1,[expr]
 		u32 s = get_x1();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 980: { // do y0,[expr]
 		u32 s = get_y0();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 981: { // do y1,[expr]
 		u32 s = get_y1();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 982: { // do a0,[expr]
 		u32 s = get_a0();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 983: { // do b0,[expr]
 		u32 s = get_b0();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 984: { // do a2,[expr]
 		u32 s = (u32)util::sext(get_a2(), 8);
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 985: { // do b2,[expr]
 		u32 s = (u32)util::sext(get_b2(), 8);
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 986: { // do a1,[expr]
 		u32 s = get_a1();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 987: { // do b1,[expr]
 		u32 s = get_b1();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 988: { // do a,[expr]
-		u64 s = get_a();
+		u32 s_h = get_ah();
 		u32 expr = exv;
+		u32 lc = s_h;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 989: { // do b,[expr]
-		u64 s = get_b();
+		u32 s_h = get_bh();
 		u32 expr = exv;
+		u32 lc = s_h;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 990: { // do r,[expr]
 		u32 s = get_r(BIT(opcode, 8, 6) & 7);
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 991: { // do n,[expr]
 		u32 s = get_n(BIT(opcode, 8, 6) & 7);
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 992: { // do m,[expr]
 		u32 s = get_m(BIT(opcode, 8, 6) & 7);
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 993: { // do ep,[expr]
 		u32 s = get_ep();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 994: { // do vba,[expr]
 		u32 s = get_vba();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 995: { // do sc,[expr]
 		u32 s = get_sc();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 996: { // do sz,[expr]
 		u32 s = get_sz();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 997: { // do sr,[expr]
 		u32 s = get_sr();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 998: { // do omr,[expr]
 		u32 s = get_omr();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 999: { // do sp,[expr]
 		u32 s = get_sp();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1000: { // do ssl,[expr]
 		u32 s = get_ssl();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1001: { // do la,[expr]
 		u32 s = get_la();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1002: { // do lc,[expr]
 		u32 s = get_lc();
 		u32 expr = exv;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1003: { // do forever,[expr]
@@ -64324,15 +64533,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1005: { // dor y:(r)-n,[expr]
@@ -64340,15 +64554,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -m_n[ea_r]);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1006: { // dor x:(r)+n,[expr]
@@ -64356,15 +64575,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1007: { // dor y:(r)+n,[expr]
@@ -64372,15 +64596,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, m_n[ea_r]);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1008: { // dor x:(r)-,[expr]
@@ -64388,15 +64617,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1009: { // dor y:(r)-,[expr]
@@ -64404,15 +64638,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, -1);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1010: { // dor x:(r)+,[expr]
@@ -64420,15 +64659,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1011: { // dor y:(r)+,[expr]
@@ -64436,75 +64680,100 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		u32 ea = get_r(ea_r);
 		add_r(ea_r, 1);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1012: { // dor x:(r),[expr]
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1013: { // dor y:(r),[expr]
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = get_r(ea_r);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1014: { // dor x:(r+n),[expr]
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1015: { // dor y:(r+n),[expr]
 		int ea_r = BIT(opcode, 8, 6) & 7;
 		u32 ea = calc_add_r(ea_r, m_n[ea_r]);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1016: { // dor x:-(r),[expr]
@@ -64512,15 +64781,20 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_x.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1017: { // dor y:-(r),[expr]
@@ -64528,48 +64802,66 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		add_r(ea_r, -1);
 		u32 ea = get_r(ea_r);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_y.read_dword(ea) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(ea));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1018: { // dor x:[aa],[expr]
 		u32 aa = BIT(opcode, 8, 6);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_x.read_dword(aa) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_x.read_dword(aa));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1019: { // dor y:[aa],[expr]
 		u32 aa = BIT(opcode, 8, 6);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = m_y.read_dword(aa) & 0xffffff;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(m_y.read_dword(aa));
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1020: { // dor #[i],[expr]
 		u32 i = bitswap<12>(opcode, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		if(i == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
@@ -64579,356 +64871,482 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1021: { // dor x0,[expr]
 		u32 s = get_x0();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1022: { // dor x1,[expr]
 		u32 s = get_x1();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1023: { // dor y0,[expr]
 		u32 s = get_y0();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1024: { // dor y1,[expr]
 		u32 s = get_y1();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1025: { // dor a0,[expr]
 		u32 s = get_a0();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1026: { // dor b0,[expr]
 		u32 s = get_b0();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1027: { // dor a2,[expr]
 		u32 s = (u32)util::sext(get_a2(), 8);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1028: { // dor b2,[expr]
 		u32 s = (u32)util::sext(get_b2(), 8);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1029: { // dor a1,[expr]
 		u32 s = get_a1();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1030: { // dor b1,[expr]
 		u32 s = get_b1();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1031: { // dor a,[expr]
-		u64 s = get_a();
+		u32 s_h = get_ah();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s_h;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1032: { // dor b,[expr]
-		u64 s = get_b();
+		u32 s_h = get_bh();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s_h;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1033: { // dor r,[expr]
 		u32 s = get_r(BIT(opcode, 8, 6) & 7);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1034: { // dor n,[expr]
 		u32 s = get_n(BIT(opcode, 8, 6) & 7);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1035: { // dor m,[expr]
 		u32 s = get_m(BIT(opcode, 8, 6) & 7);
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1036: { // dor ep,[expr]
 		u32 s = get_ep();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1037: { // dor vba,[expr]
 		u32 s = get_vba();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1038: { // dor sc,[expr]
 		u32 s = get_sc();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1039: { // dor sz,[expr]
 		u32 s = get_sz();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1040: { // dor sr,[expr]
 		u32 s = get_sr();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1041: { // dor omr,[expr]
 		u32 s = get_omr();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1042: { // dor sp,[expr]
 		u32 s = get_sp();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1043: { // dor ssl,[expr]
 		u32 s = get_ssl();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1044: { // dor la,[expr]
 		u32 s = get_la();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1045: { // dor lc,[expr]
 		u32 s = get_lc();
 		u32 expr = (m_pc+exv) & 0xffffff;
+		u32 lc = s;
+		if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = expr + 1;
+		else {
 		inc_sp();
 		set_ssh(get_la());
 		set_ssl(get_lc());
-		set_lc(s);
+		set_lc(lc);
 		inc_sp();
 		set_ssh(m_pc+2);
 		set_ssl(get_sr());
 		set_la(expr);
 		m_mr |= MR_LF;
+		}
 		break;
 		}
 	case 1046: { // dor forever,[expr]
@@ -79722,123 +80140,123 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 2567: { // movec a,m
-		u64 s2 = get_a();
-		set_m(BIT(opcode, 0, 5) & 7, s2);
+		u32 s2_h = get_ah();
+		set_m(BIT(opcode, 0, 5) & 7, s2_h);
 		break;
 		}
 	case 2568: { // movec a,ep
-		u64 s2 = get_a();
-		set_ep(s2);
+		u32 s2_h = get_ah();
+		set_ep(s2_h);
 		break;
 		}
 	case 2569: { // movec a,vba
-		u64 s2 = get_a();
-		set_vba(s2);
+		u32 s2_h = get_ah();
+		set_vba(s2_h);
 		break;
 		}
 	case 2570: { // movec a,sc
-		u64 s2 = get_a();
-		set_sc(s2);
+		u32 s2_h = get_ah();
+		set_sc(s2_h);
 		break;
 		}
 	case 2571: { // movec a,sz
-		u64 s2 = get_a();
-		set_sz(s2);
+		u32 s2_h = get_ah();
+		set_sz(s2_h);
 		break;
 		}
 	case 2572: { // movec a,sr
-		u64 s2 = get_a();
-		set_sr(s2);
+		u32 s2_h = get_ah();
+		set_sr(s2_h);
 		break;
 		}
 	case 2573: { // movec a,omr
-		u64 s2 = get_a();
-		set_omr(s2);
+		u32 s2_h = get_ah();
+		set_omr(s2_h);
 		break;
 		}
 	case 2574: { // movec a,sp
-		u64 s2 = get_a();
-		set_sp(s2);
+		u32 s2_h = get_ah();
+		set_sp(s2_h);
 		break;
 		}
 	case 2575: { // movec a,ssh
-		u64 s2 = get_a();
-		set_ssh(s2);
+		u32 s2_h = get_ah();
+		set_ssh(s2_h);
 		break;
 		}
 	case 2576: { // movec a,ssl
-		u64 s2 = get_a();
-		set_ssl(s2);
+		u32 s2_h = get_ah();
+		set_ssl(s2_h);
 		break;
 		}
 	case 2577: { // movec a,la
-		u64 s2 = get_a();
-		set_la(s2);
+		u32 s2_h = get_ah();
+		set_la(s2_h);
 		break;
 		}
 	case 2578: { // movec a,lc
-		u64 s2 = get_a();
-		set_lc(s2);
+		u32 s2_h = get_ah();
+		set_lc(s2_h);
 		break;
 		}
 	case 2579: { // movec b,m
-		u64 s2 = get_b();
-		set_m(BIT(opcode, 0, 5) & 7, s2);
+		u32 s2_h = get_bh();
+		set_m(BIT(opcode, 0, 5) & 7, s2_h);
 		break;
 		}
 	case 2580: { // movec b,ep
-		u64 s2 = get_b();
-		set_ep(s2);
+		u32 s2_h = get_bh();
+		set_ep(s2_h);
 		break;
 		}
 	case 2581: { // movec b,vba
-		u64 s2 = get_b();
-		set_vba(s2);
+		u32 s2_h = get_bh();
+		set_vba(s2_h);
 		break;
 		}
 	case 2582: { // movec b,sc
-		u64 s2 = get_b();
-		set_sc(s2);
+		u32 s2_h = get_bh();
+		set_sc(s2_h);
 		break;
 		}
 	case 2583: { // movec b,sz
-		u64 s2 = get_b();
-		set_sz(s2);
+		u32 s2_h = get_bh();
+		set_sz(s2_h);
 		break;
 		}
 	case 2584: { // movec b,sr
-		u64 s2 = get_b();
-		set_sr(s2);
+		u32 s2_h = get_bh();
+		set_sr(s2_h);
 		break;
 		}
 	case 2585: { // movec b,omr
-		u64 s2 = get_b();
-		set_omr(s2);
+		u32 s2_h = get_bh();
+		set_omr(s2_h);
 		break;
 		}
 	case 2586: { // movec b,sp
-		u64 s2 = get_b();
-		set_sp(s2);
+		u32 s2_h = get_bh();
+		set_sp(s2_h);
 		break;
 		}
 	case 2587: { // movec b,ssh
-		u64 s2 = get_b();
-		set_ssh(s2);
+		u32 s2_h = get_bh();
+		set_ssh(s2_h);
 		break;
 		}
 	case 2588: { // movec b,ssl
-		u64 s2 = get_b();
-		set_ssl(s2);
+		u32 s2_h = get_bh();
+		set_ssl(s2_h);
 		break;
 		}
 	case 2589: { // movec b,la
-		u64 s2 = get_b();
-		set_la(s2);
+		u32 s2_h = get_bh();
+		set_la(s2_h);
 		break;
 		}
 	case 2590: { // movec b,lc
-		u64 s2 = get_b();
-		set_lc(s2);
+		u32 s2_h = get_bh();
+		set_lc(s2_h);
 		break;
 		}
 	case 2591: { // movec r,m
@@ -81283,122 +81701,122 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 2879: { // movec m,a
 		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2880: { // movec ep,a
 		u32 s1 = get_ep();
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2881: { // movec vba,a
 		u32 s1 = get_vba();
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2882: { // movec sc,a
 		u32 s1 = get_sc();
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2883: { // movec sz,a
 		u32 s1 = get_sz();
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2884: { // movec sr,a
 		u32 s1 = get_sr();
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2885: { // movec omr,a
 		u32 s1 = get_omr();
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2886: { // movec sp,a
 		u32 s1 = get_sp();
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2887: { // movec ssh,a
 		u32 s1 = get_ssh();
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2888: { // movec ssl,a
 		u32 s1 = get_ssl();
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2889: { // movec la,a
 		u32 s1 = get_la();
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2890: { // movec lc,a
 		u32 s1 = get_lc();
-		set_a(s1);
+		set_ah(s1);
 		break;
 		}
 	case 2891: { // movec m,b
 		u32 s1 = get_m(BIT(opcode, 0, 5) & 7);
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2892: { // movec ep,b
 		u32 s1 = get_ep();
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2893: { // movec vba,b
 		u32 s1 = get_vba();
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2894: { // movec sc,b
 		u32 s1 = get_sc();
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2895: { // movec sz,b
 		u32 s1 = get_sz();
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2896: { // movec sr,b
 		u32 s1 = get_sr();
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2897: { // movec omr,b
 		u32 s1 = get_omr();
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2898: { // movec sp,b
 		u32 s1 = get_sp();
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2899: { // movec ssh,b
 		u32 s1 = get_ssh();
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2900: { // movec ssl,b
 		u32 s1 = get_ssl();
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2901: { // movec la,b
 		u32 s1 = get_la();
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2902: { // movec lc,b
 		u32 s1 = get_lc();
-		set_b(s1);
+		set_bh(s1);
 		break;
 		}
 	case 2903: { // movec m,r
@@ -87025,14 +87443,14 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 3757: { // movep a,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
-		u64 s = get_a();
-		m_x.write_dword(pp, s);
+		u32 s_h = get_ah();
+		m_x.write_dword(pp, s_h);
 		break;
 		}
 	case 3758: { // movep b,x:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
-		u64 s = get_b();
-		m_x.write_dword(pp, s);
+		u32 s_h = get_bh();
+		m_x.write_dword(pp, s_h);
 		break;
 		}
 	case 3759: { // movep r,x:[pp]
@@ -87181,14 +87599,14 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		}
 	case 3783: { // movep a,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
-		u64 s = get_a();
-		m_y.write_dword(pp, s);
+		u32 s_h = get_ah();
+		m_y.write_dword(pp, s_h);
 		break;
 		}
 	case 3784: { // movep b,y:[pp]
 		u32 pp = 0xffffc0 + BIT(opcode, 0, 6);
-		u64 s = get_b();
-		m_y.write_dword(pp, s);
+		u32 s_h = get_bh();
+		m_y.write_dword(pp, s_h);
 		break;
 		}
 	case 3785: { // movep r,y:[pp]

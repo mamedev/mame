@@ -1072,7 +1072,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	}
 
 0bc060 btst #n,d             - d:sbr(8) n:bit5(0)
-	u32 t = $d;
+	u32 t = $d:h;
 	u32 m = 1 << $n;
 	if(t & m) {
 		m_ccr |= CCR_C;
@@ -1159,48 +1159,67 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	do_mpy56(r);
 
 064000 do xy:ea,expr         - ea:eam1(8) xy:xyc(6) expr:exabs()
-	inc_sp();
-	set_ssh(get_la());
-	set_ssl(get_lc());
-	set_lc($xy:m.read_dword($ea));
-	inc_sp();
-	set_ssh(m_pc+2);
-	set_ssl(get_sr());
-	set_la($expr);
-	m_mr |= MR_LF;
+	u32 lc = $xy:m.read_dword($ea) & 0xffffff;
+	if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = $expr + 1;
+	else {
+		inc_sp();
+		set_ssh(get_la());
+		set_ssl(get_lc());
+		set_lc(lc);
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		set_la($expr);
+		m_mr |= MR_LF;
+	}
 
 060000 do xy:aa,expr         - aa:asa6(8) xy:xyc(6) expr:exabs()
-	inc_sp();
-	set_ssh(get_la());
-	set_ssl(get_lc());
-	set_lc($xy:m.read_dword($aa));
-	inc_sp();
-	set_ssh(m_pc+2);
-	set_ssl(get_sr());
-	set_la($expr);
-	m_mr |= MR_LF;
+	u32 lc = $xy:m.read_dword($aa) & 0xffffff;
+	if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = $expr + 1;
+	else {
+		inc_sp();
+		set_ssh(get_la());
+		set_ssl(get_lc());
+		set_lc(lc);
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		set_la($expr);
+		m_mr |= MR_LF;
+	}
 
 060080 do #i,expr            - i:imm12(0, 8) expr:exabs()
-	inc_sp();
-	set_ssh(get_la());
-	set_ssl(get_lc());
-	set_lc($i);
-	inc_sp();
-	set_ssh(m_pc+2);
-	set_ssl(get_sr());
-	set_la($expr);
-	m_mr |= MR_LF;
+	if($i == 0 && !(m_mr & MR_SC))
+		m_npc = $expr + 1;
+	else {
+		inc_sp();
+		set_ssh(get_la());
+		set_ssl(get_lc());
+		set_lc($i);
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		set_la($expr);
+		m_mr |= MR_LF;
+	}
 
 06c000 do s,expr             - s:sbr_nos(8) expr:exabs()
-	inc_sp();
-	set_ssh(get_la());
-	set_ssl(get_lc());
-	set_lc($s);
-	inc_sp();
-	set_ssh(m_pc+2);
-	set_ssl(get_sr());
-	set_la($expr);
-	m_mr |= MR_LF;
+	u32 lc = $s:h;
+	if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = $expr + 1;
+	else {
+		inc_sp();
+		set_ssh(get_la());
+		set_ssl(get_lc());
+		set_lc(lc);
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		set_la($expr);
+		m_mr |= MR_LF;
+	}
 
 000203 do forever,expr       - expr:exabs()
 	inc_sp();
@@ -1214,48 +1233,67 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	m_emr |= EMR_FV;
 
 064010 dor xy:ea,expr        - ea:eam1(8) xy:xyc(6) expr:expcrel()
-	inc_sp();
-	set_ssh(get_la());
-	set_ssl(get_lc());
-	set_lc($xy:m.read_dword($ea));
-	inc_sp();
-	set_ssh(m_pc+2);
-	set_ssl(get_sr());
-	set_la($expr);
-	m_mr |= MR_LF;
+	u32 lc = $xy:m.read_dword($ea) & 0xffffff;
+	if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = $expr + 1;
+	else {
+		inc_sp();
+		set_ssh(get_la());
+		set_ssl(get_lc());
+		set_lc(lc);
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		set_la($expr);
+		m_mr |= MR_LF;
+	}
 
 060010 dor xy:aa,expr        - aa:asa6(8) xy:xyc(6) expr:expcrel()
-	inc_sp();
-	set_ssh(get_la());
-	set_ssl(get_lc());
-	set_lc($xy:m.read_dword($aa));
-	inc_sp();
-	set_ssh(m_pc+2);
-	set_ssl(get_sr());
-	set_la($expr);
-	m_mr |= MR_LF;
+	u32 lc = $xy:m.read_dword($aa) & 0xffffff;
+	if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = $expr + 1;
+	else {
+		inc_sp();
+		set_ssh(get_la());
+		set_ssl(get_lc());
+		set_lc(lc);
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		set_la($expr);
+		m_mr |= MR_LF;
+	}
 
 060090 dor #i,expr           - i:imm12(0, 8) expr:expcrel()
-	inc_sp();
-	set_ssh(get_la());
-	set_ssl(get_lc());
-	set_lc($i);
-	inc_sp();
-	set_ssh(m_pc+2);
-	set_ssl(get_sr());
-	set_la($expr);
-	m_mr |= MR_LF;
+	if($i == 0 && !(m_mr & MR_SC))
+		m_npc = $expr + 1;
+	else {
+		inc_sp();
+		set_ssh(get_la());
+		set_ssl(get_lc());
+		set_lc($i);
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		set_la($expr);
+		m_mr |= MR_LF;
+	}
 
 06c010 dor s,expr            - s:sbr_nos(8) expr:expcrel()
-	inc_sp();
-	set_ssh(get_la());
-	set_ssl(get_lc());
-	set_lc($s);
-	inc_sp();
-	set_ssh(m_pc+2);
-	set_ssl(get_sr());
-	set_la($expr);
-	m_mr |= MR_LF;
+	u32 lc = $s:h;
+	if(lc == 0 && !(m_mr & MR_SC))
+		m_npc = $expr + 1;
+	else {
+		inc_sp();
+		set_ssh(get_la());
+		set_ssl(get_lc());
+		set_lc(lc);
+		inc_sp();
+		set_ssh(m_pc+2);
+		set_ssl(get_sr());
+		set_la($expr);
+		m_mr |= MR_LF;
+	}
 
 000202 dor forever,expr      - expr:expcrel()
 	inc_sp();
@@ -1652,32 +1690,33 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 		m_ccr |= CCR_N;
 	if(!nf)
 		m_ccr |= CCR_Z;
+
 05c020 movec xy:ea,d1        - ea:eam1(8) xy:xyc(6) d1:fvbr2(0)
-	$d1:wh($xy:m.read_dword($ea));
+	$d1:w($xy:m.read_dword($ea));
 
 054020 movec s1,xy:ea        - ea:eam1(8) xy:xyc(6) s1:fvbr2(0)
-	$xy:m.write_dword($ea, $s1:h);
+	$xy:m.write_dword($ea, $s1);
 
 05c020 movec xy:abs,d1       - abs:eam1a(8) xy:xyc(6) d1:fvbr2(0)
-	$d1:wh($xy:m.read_dword($abs));
+	$d1:w($xy:m.read_dword($abs));
 
 05c020 movec #i,d1           - i:eam1i(8) d1:fvbr2(0)
-	$d1:wh($i);
+	$d1:w($i);
 
 054020 movec s1,xy:abs       - abs:eam1a(8) xy:xyc(6) s1:fvbr2(0)
-	$xy:m.write_dword($abs, $s1:h);
+	$xy:m.write_dword($abs, $s1);
 
 058020 movec xy:aa,d1        - aa:asa6(8) xy:xyc(6) d1:fvbr2(0)
-	$d1:wh($xy:m.read_dword($aa));
+	$d1:w($xy:m.read_dword($aa));
 
 050020 movec s1,xy:aa        - aa:asa6(8) xy:xyc(6) s1:fvbr2(0)
-	$xy:m.write_dword($aa, $s1:h);
+	$xy:m.write_dword($aa, $s1);
 
 04c0a0 movec s2,d1           - s2:sbr(8) d1:fvbr2(0)
-	$d1:w($s2);
+	$d1:w($s2:h);
 
 0440a0 movec s1,d2           - d2:sbr(8) s1:fvbr2(0)
-	$d2:w($s1);
+	$d2:wh($s1);
 
 0500a0 movec #i,d1           - i:imm8(8) d1:fvbr2(0)
 	$d1:w($i);
@@ -1770,7 +1809,7 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	m_p.write_dword($abs, $xyp:m.read_dword($qq));
 
 08c000 movep s,xyp:pp        - xyp:xyc(16) s:sbr(8) pp:asa6p(0)
-	$xyp:m.write_dword($pp, $s);
+	$xyp:m.write_dword($pp, $s:h);
 
 084000 movep xyp:pp,d        - xyp:xyc(16) d:sbr(8) pp:asa6p(0)
 	$d:wh($xyp:m.read_dword($pp));
