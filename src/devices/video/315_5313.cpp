@@ -1323,6 +1323,9 @@ u16 sega315_5313_device::megadriv_read_hv_counters()
 
 u16 sega315_5313_device::vdp_r(offs_t offset, u16 mem_mask)
 {
+	if (!machine().side_effects_disabled() && ((offset & 0x0e) == 0x02)) // control port read clears the pending command
+		m_command_pending = 0;
+
 	u16 retvalue = 0;
 
 	switch (offset << 1)

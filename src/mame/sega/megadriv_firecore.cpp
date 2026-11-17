@@ -191,7 +191,7 @@ void md_firecore_state::set_region_override_flags()
 	const bool pal = BIT(m_sysreg[0x0c / 2], 2);
 	const bool domestic = BIT(m_sysreg[0x1e / 2], 2);
 	m_active_version_hi_nibble = 0x20 | (domestic ? 0x00 : 0x80) | (pal ? 0x40 : 0x00);
-	dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).set_ctrl_port_vdp_pal(pal);
+	dynamic_cast<megadriv_firecore_vdp&>(*m_vdp).set_ctrl_port_vdp_pal(pal);
 
 }
 void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -284,12 +284,12 @@ void md_firecore_state::redkid_gpio_w(offs_t offset, uint16_t data, uint16_t mem
 
 uint32_t md_firecore_state::screen_update_redkid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	if (!dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).xvdp_enabled())
+	if (!dynamic_cast<megadriv_firecore_vdp&>(*m_vdp).xvdp_enabled())
 		return screen_update_megadriv(screen, bitmap, cliprect);
 
 	bitmap.fill(rgb_t::black(), cliprect);
 
-	dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).draw_firecore(bitmap, cliprect);
+	dynamic_cast<megadriv_firecore_vdp&>(*m_vdp).draw_firecore(bitmap, cliprect);
 
 	return 0;
 }
@@ -320,7 +320,7 @@ void md_firecore_state::md_firecore_map(address_map &map)
 
 	map(0x000000, 0x3fffff).r(FUNC(md_firecore_state::redkid_rom_r));
 
-	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(megadriv_firecore_vdp_device::xvdp_r), FUNC(megadriv_firecore_vdp_device::xvdp_w));
+	map(0xc00000, 0xc0001f).rw(m_vdp, FUNC(megadriv_firecore_vdp::vdp_r), FUNC(megadriv_firecore_vdp::xvdp_w));
 
 	map(0xa10006, 0xa10007).r(FUNC(md_firecore_state::redkid_portc_r));
 	map(0xa10104, 0xa10113).rw(FUNC(md_firecore_state::redkid_gpio_r), FUNC(md_firecore_state::redkid_gpio_w));
@@ -447,7 +447,7 @@ void md_firecore_state::md_firecore_common(machine_config &config)
 {
 	m_vdp->vint_cb().set(FUNC(md_firecore_state::vdp_vint_cb));
 	m_vdp->hint_cb().set(FUNC(md_firecore_state::vdp_hint_cb));
-	m_vdp->set_screen("megadriv");
+	m_vdp->set_screen(m_screen);
 	m_vdp->snd_irq().set_inputline(m_z80snd, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
 	m_vdp->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
