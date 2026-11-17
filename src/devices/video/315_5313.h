@@ -119,7 +119,7 @@ public:
 	inline u16 vdp_get_word_from_68k_mem(u32 source);
 
 protected:
-	sega315_5313_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	sega315_5313_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 vram_size, u32 cram_size);
 
 	virtual void device_post_load() override;
 	virtual void device_start() override ATTR_COLD;
@@ -146,8 +146,8 @@ protected:
 
 	u8  m_vdp_code;
 	u32 m_vdp_address;
-	int m_command_pending; // 2nd half of command pending..
-	u8  m_vram_fill_pending;
+	bool m_command_pending; // 2nd half of command pending..
+	bool m_vram_fill_pending;
 
 	// config
 	u32 m_vram_size;

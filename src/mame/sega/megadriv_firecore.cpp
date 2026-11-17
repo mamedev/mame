@@ -9,6 +9,10 @@
     YM/FM core was closer, but still 'too good' in many situations.  Some
     software written for Firecore relies on these flaws to sound correct.
 
+	BTNAB (these happen on real hardware)
+	 - pxp3: some games run too quickly; the Firecore bypasses region lock
+	   but doesn't change the timings to PAL
+	 - pxp3: Sonic & Knuckles boots to the 'NO WAY' screen
 */
 
 #include "emu.h"

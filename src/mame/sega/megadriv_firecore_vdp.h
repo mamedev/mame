@@ -23,13 +23,11 @@ public:
 	}
 
 	megadriv_firecore_vdp(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-		: sega315_5313_device(mconfig, FIRECORE_VDP, tag, owner, clock)
+		: sega315_5313_device(mconfig, FIRECORE_VDP, tag, owner, clock, 0x20000, 0x800)
 	{
-		m_vram_size = 0x20000;
-		m_cram_size = 0x800;
 	}
 
-	void draw_firecore(bitmap_rgb32& bitmap, const rectangle& cliprect);
+	void draw_firecore(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// Firecore extended video mode (VDP register 0x18 bit 7)
 	void xvdp_w(offs_t offset, uint16_t data, uint16_t mem_mask);

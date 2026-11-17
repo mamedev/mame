@@ -104,11 +104,11 @@ void megadriv_firecore_vdp::write_vram8(u32 address, u8 data)
 
 void megadriv_firecore_vdp::xvdp_data_w(uint16_t data)
 {
-	m_command_pending = 0;
+	m_command_pending = false;
 
 	if (m_vram_fill_pending)
 	{
-		m_vram_fill_pending = 0;
+		m_vram_fill_pending = false;
 		uint32_t length = m_regs[0x13] | (m_regs[0x14] << 8);
 		if (!length)
 			length = 0x10000;
@@ -151,13 +151,13 @@ void megadriv_firecore_vdp::xvdp_ctrl_w(uint16_t data)
 			return;
 		}
 
-		m_command_pending = 1;
+		m_command_pending = true;
 		m_vdp_code = (m_vdp_code & 0x3c) | (data >> 14);
 		m_vdp_address = (m_vdp_address & 0x1c000) | (data & 0x3fff);
 		return;
 	}
 
-	m_command_pending = 0;
+	m_command_pending = false;
 	m_vdp_code = (m_vdp_code & 0x03) | ((data >> 2) & 0x3c);
 	m_vdp_address = (m_vdp_address & 0x03fff) | ((data & 0x03) << 14) | ((data & 0x04) << 14);
 
@@ -187,7 +187,7 @@ void megadriv_firecore_vdp::xvdp_ctrl_w(uint16_t data)
 	}
 
 	case 2: // fill, happens on the next data port write
-		m_vram_fill_pending = 1;
+		m_vram_fill_pending = true;
 		break;
 
 	case 3: // VRAM copy

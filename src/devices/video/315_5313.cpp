@@ -175,11 +175,11 @@ int sega315_5313_device::screen_hpos() { return screen().hpos() / (m_lcm_scaling
 DEFINE_DEVICE_TYPE(SEGA315_5313, sega315_5313_device, "sega315_5313", "Sega 315-5313 Megadrive VDP")
 
 sega315_5313_device::sega315_5313_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: sega315_5313_device(mconfig, SEGA315_5313, tag, owner, clock)
+	: sega315_5313_device(mconfig, SEGA315_5313, tag, owner, clock, 0x10000, 0x80)
 {
 }
 
-sega315_5313_device::sega315_5313_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+sega315_5313_device::sega315_5313_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 vram_size, u32 cram_size)
 	// mode 4 support, for SMS compatibility, is implemented in 315_5124.cpp
 	: sega315_5313_mode4_device(mconfig, type, tag, owner, clock, SEGA315_5124_CRAM_SIZE, 0x00, 0x1f, 0, 0, line_315_5313_mode4)
 	, device_gfx_interface(mconfig, *this, nullptr, "gfx_palette")
@@ -201,8 +201,10 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, device_t
 	, m_vsram(nullptr)
 	, m_vdp_code(0)
 	, m_vdp_address(0)
-	, m_command_pending(0)
-	, m_vram_fill_pending(0)
+	, m_command_pending(false)
+	, m_vram_fill_pending(false)
+	, m_vram_size(vram_size)
+	, m_cram_size(cram_size)
 	, m_command_part1(0)
 	, m_command_part2(0)
 	, m_vram_fill_length(0)
@@ -239,8 +241,6 @@ sega315_5313_device::sega315_5313_device(const machine_config &mconfig, device_t
 {
 	m_use_alt_timing = 0;
 	m_palwrite_base = -1;
-	m_vram_size = 0x10000;
-	m_cram_size = 0x80;
 }
 
 //-------------------------------------------------
@@ -391,12 +391,12 @@ void sega315_5313_device::device_start()
 
 void sega315_5313_device::device_reset()
 {
-	m_command_pending = 0;
+	m_command_pending = false;
 	m_command_part1 = 0;
 	m_command_part2 = 0;
 	m_vdp_code = 0;
 	m_vdp_address = 0;
-	m_vram_fill_pending = 0;
+	m_vram_fill_pending = false;
 	m_vram_fill_length = 0;
 	m_irq4counter = -1;
 	m_imode_odd_frame = 0;
@@ -492,7 +492,7 @@ void sega315_5313_device::vdp_cram_write(u16 data)
 
 void sega315_5313_device::data_port_w(int data)
 {
-	m_command_pending = 0;
+	m_command_pending = false;
 
 	/*
 	0000b : VRAM read
@@ -829,7 +829,7 @@ void sega315_5313_device::handle_dma_bits()
 			//osd_printf_debug("vram fill length %02x %02x other regs! %02x %02x %02x(Mode Bits %02x) Enable %02x\n", MEGADRIVE_REG13_DMALENGTH1, MEGADRIVE_REG14_DMALENGTH2, MEGADRIVE_REG15_DMASOURCE1, MEGADRIVE_REG16_DMASOURCE2, MEGADRIVE_REG17_DMASOURCE3, MEGADRIVE_REG17_DMATYPE, MEGADRIVE_REG01_DMA_ENABLE);
 			if (MEGADRIVE_REG01_DMA_ENABLE)
 			{
-				m_vram_fill_pending = 1;
+				m_vram_fill_pending = true;
 				m_vram_fill_length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2 << 8));
 			}
 		}
@@ -858,12 +858,12 @@ void sega315_5313_device::handle_dma_bits()
 void sega315_5313_device::ctrl_port_w(int data)
 {
 //  logerror("write to vdp control port %04x\n",data);
-	m_vram_fill_pending = 0; // ??
+	m_vram_fill_pending = false; // ??
 
 	if (m_command_pending)
 	{
 		/* 2nd part of 32-bit command */
-		m_command_pending = 0;
+		m_command_pending = false;
 		m_command_part2 = data;
 
 		update_code_and_address();
@@ -891,7 +891,7 @@ void sega315_5313_device::ctrl_port_w(int data)
 		}
 		else
 		{
-			m_command_pending = 1;
+			m_command_pending = true;
 			m_command_part1 = data;
 			update_code_and_address();
 			//logerror("VDP Write Part 1 setting Code %02x Address %04x\n", m_vdp_code, m_vdp_address);
@@ -967,10 +967,8 @@ u16 sega315_5313_device::data_port_r()
 {
 	u16 retdata = 0;
 
-	//return machine().rand();
-
 	if (!machine().side_effects_disabled())
-		m_command_pending = 0;
+		m_command_pending = false;
 
 	switch (m_vdp_code & 0x000f)
 	{
@@ -1324,7 +1322,7 @@ u16 sega315_5313_device::megadriv_read_hv_counters()
 u16 sega315_5313_device::vdp_r(offs_t offset, u16 mem_mask)
 {
 	if (!machine().side_effects_disabled() && ((offset & 0x0e) == 0x02)) // control port read clears the pending command
-		m_command_pending = 0;
+		m_command_pending = false;
 
 	u16 retvalue = 0;
 
