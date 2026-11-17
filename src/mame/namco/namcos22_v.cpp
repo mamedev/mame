@@ -2613,17 +2613,6 @@ void namcos22_state::init_tables()
 		save_item(NAME(m_fog_b_per_cztype));
 	}
 
-	// init pointrom
-	m_pointrom_size = memregion("pointrom")->bytes()/3;
-	m_pointrom = std::make_unique<s32[]>(m_pointrom_size);
-	u8* pointrom_low = memregion("pointrom")->base();
-	u8* pointrom_mid = pointrom_low + m_pointrom_size;
-	u8* pointrom_high = pointrom_mid + m_pointrom_size;
-	for (int i = 0; i < m_pointrom_size; i++)
-	{
-		m_pointrom[i] = signed24(pointrom_high[i] << 16 | pointrom_mid[i] << 8 | pointrom_low[i]);
-	}
-
 	m_pointram = make_unique_clear<u32[]>(0x20000);
 	save_pointer(NAME(m_pointram), 0x20000);
 

@@ -231,7 +231,8 @@ public:
 		m_opt(*this, "OPT.%u", 0),
 		m_mcu_out(*this, "mcuout%u", 0U),
 		m_cpuled_out(*this, "cpuled%u", 0U),
-		m_wheel_motor(*this, "wheel_motor")
+		m_wheel_motor(*this, "wheel_motor"),
+		m_pointrom(*this, "pointrom")
 	{ }
 
 	void cybrcomm(machine_config &config);
@@ -355,7 +356,7 @@ protected:
 	inline void pdp_polygonram_write(offs_t offs, u32 data) { m_polygonram[offs & 0x7fff] = data; }
 	void point_write(offs_t offs, u32 data);
 	s32 pointram_read(offs_t offs);
-	inline s32 point_read(offs_t offs) { offs &= 0x00ffffff; return (offs < m_pointrom_size) ? m_pointrom[offs] : pointram_read(offs); }
+	inline s32 point_read(offs_t offs) { offs &= 0x00ffffff; return (offs < memregion("pointrom")->length()) ? signed24(m_pointrom[offs]) : pointram_read(offs); }
 	void master_enable(bool enable);
 	void slave_enable(bool enable);
 
@@ -486,8 +487,7 @@ protected:
 	int m_LitSurfaceIntensity = 0;
 	bool m_LitSurfaceGouraud = false;
 	bool m_LitSurfaceTriangles = false;
-	int m_pointrom_size = 0;
-	std::unique_ptr<s32[]> m_pointrom;
+	required_region_ptr<s32> m_pointrom;
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 
