@@ -51,6 +51,8 @@
 
 #include "endianness.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 namespace {
 
@@ -775,22 +777,27 @@ void macii_state::machine_reset()
 	m_last_taken_interrupt = 0;
 }
 
-// The RESET instruction pulls the board's /RESET line, which brings "all of
-// the internal devices" to their initial state (Guide to the Macintosh Family
-// Hardware, 2nd ed., p. 244).  On the Mac II logic board (820-0228) the
-// 68020's RESET pin shares a net with both VIAs, the IWM and the 5380; the
-// later machines are assumed to match.  The SCC has no reset input.
+// The RESET instruction drives the CPU's RESET pin, which is the board's
+// /RESET: it brings "all of the internal devices" to their initial state
+// (Guide to the Macintosh Family Hardware, 2nd ed., p. 244).  On the Mac II
+// logic board (820-0228) the 68020's RESET shares a net with both VIAs, the
+// IWM and the 5380, reset here, and with the ASC, the ADB microcontroller and
+// the 68851, which are not; the later machines are assumed to match.  The SCC
+// has no reset input.
 void macii_state::cpu_reset_w(int state)
 {
 	if (!state)
 		return;
 
-	// VIA1 first: its PA4 going high brings back the ROM overlay, so VIA2's
-	// RAM-size outputs don't remap RAM over it (p. 244)
+	LOG("RESET from CPU\n");
+
+	// VIA1 first: its PA4 going high brings back the ROM overlay (p. 244), so
+	// VIA2's RAM-size outputs then leave the RAM map alone
 	m_via1->reset();
 	m_via2->reset();
 	m_fdc->reset();
 	m_ncr5380->reset();
+	m_scsihelp->reset();
 }
 
 void macii_state::state_load()

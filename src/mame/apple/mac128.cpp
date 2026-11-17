@@ -121,6 +121,9 @@ Scanline 0 is the start of vblank.
 #include "softlist.h"
 #include "speaker.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 namespace {
 
 static constexpr auto C7M   = (15.6672_MHz_XTAL / 2);
@@ -362,13 +365,18 @@ void mac128_state::machine_reset()
 	m_via->write_pb6(0);
 }
 
-// The RESET instruction pulls the board's /RESET line, which also resets the
-// VIA, the IWM/SWIM, the 5380 and the BBU (Guide to the Macintosh Family
-// Hardware, 2nd ed., table 14-2, p. 451).  The SCC has no reset input.
+// The RESET instruction drives the 68000's RESET pin.  On the SE that is the
+// board's /RESET, which goes to the VIA, the SWIM, the 5380 and the BBU (Guide
+// to the Macintosh Family Hardware, 2nd ed., table 14-2, p. 451); the other
+// models are taken to match.  The table also lists the SCC, but the Z8530 has
+// no reset input.  None of these devices has a reset line here, so the
+// handler resets them directly.
 void mac128_state::cpu_reset_w(int state)
 {
 	if (!state)
 		return;
+
+	LOG("RESET from CPU\n");
 
 	// the SE's BBU comes out of reset with the ROM overlaid at 0 (p. 242),
 	// and the Classic is taken to do the same; on earlier models the VIA
@@ -378,6 +386,8 @@ void mac128_state::cpu_reset_w(int state)
 	m_iwm->reset();
 	if (m_ncr5380)
 		m_ncr5380->reset();
+	if (m_scsihelp)
+		m_scsihelp->reset();
 }
 
 u16 mac128_state::ram_r(offs_t offset)
