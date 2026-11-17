@@ -223,6 +223,8 @@ private:
 	int32_t    m_resume_trigger = 0;
 	emu_timer  *m_dmadelay_timer = nullptr;
 	int32_t    m_frame = 0;
+	double     m_ym_pan[2] = { 1.0, 1.0 };
+	double     m_ym_aux_gain[2] = { 1.0, 1.0 };
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -257,6 +259,8 @@ private:
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
 	K054539_CB_MEMBER(ym_set_mixing);
+	K054539_AUX_GAIN_CB_MEMBER(ym_aux_gain);
+	void update_ym_mixing();
 
 	void main_map(address_map &map) ATTR_COLD;
 	void sound_map(address_map &map) ATTR_COLD;
@@ -502,10 +506,27 @@ void xexex_state::sound_bankswitch_w(uint8_t data)
 
 K054539_CB_MEMBER(xexex_state::ym_set_mixing)
 {
+	m_ym_pan[0] = (71.0 * left) / 55.0;
+	m_ym_pan[1] = (71.0 * right) / 55.0;
+	update_ym_mixing();
+}
+
+K054539_AUX_GAIN_CB_MEMBER(xexex_state::ym_aux_gain)
+{
+	m_ym_aux_gain[input] = gain;
+	update_ym_mixing();
+}
+
+void xexex_state::update_ym_mixing()
+{
+	// The YM2151's right output goes into analog input 0 of the 054539 and its left output into
+	// input 1. The game plays the FM music on the right output and fades it with the global
+	// volume that input 0 selects, together with the PCM music channels.
 	for (int out = 0; out < 2; out++)
 	{
-		m_filter_l[out]->set_gain((71.0 * left) / 55.0);
-		m_filter_r[out]->set_gain((71.0 * right) / 55.0);
+		double const gain = m_ym_aux_gain[out ^ 1];
+		m_filter_l[out]->set_gain(m_ym_pan[0] * gain);
+		m_filter_r[out]->set_gain(m_ym_pan[1] * gain);
 	}
 }
 
@@ -664,6 +685,8 @@ void xexex_state::machine_start()
 
 	save_item(NAME(m_suspension_active));
 	save_item(NAME(m_frame));
+	save_item(NAME(m_ym_pan));
+	save_item(NAME(m_ym_aux_gain));
 
 	save_item(NAME(m_cur_control2));
 
@@ -733,17 +756,20 @@ void xexex_state::xexex(machine_config &config)
 	K054321(config, m_k054321, "speaker");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32_MHz_XTAL / 8)); // 4MHz
-	ymsnd.add_route(0, "filter1_l", 0.2);
-	ymsnd.add_route(0, "filter1_r", 0.2);
-	ymsnd.add_route(1, "filter2_l", 0.2);
-	ymsnd.add_route(1, "filter2_r", 0.2);
+	// the gains include +8 dB for the global volumes, which the game keeps at around -10 dB
+	ymsnd.add_route(0, "filter1_l", 0.5);
+	ymsnd.add_route(0, "filter1_r", 0.5);
+	ymsnd.add_route(1, "filter2_l", 0.5);
+	ymsnd.add_route(1, "filter2_r", 0.5);
 
 	K054539(config, m_k054539, 18.432_MHz_XTAL);
+	m_k054539->set_global_volume(true);
 	m_k054539->set_analog_callback(FUNC(xexex_state::ym_set_mixing));
-	m_k054539->add_route(0, "speaker", 0.4, 0);
-	m_k054539->add_route(0, "speaker", 0.4, 1);
-	m_k054539->add_route(1, "speaker", 0.4, 0);
-	m_k054539->add_route(1, "speaker", 0.4, 1);
+	m_k054539->set_aux_gain_callback(FUNC(xexex_state::ym_aux_gain));
+	m_k054539->add_route(0, "speaker", 1.0, 0);
+	m_k054539->add_route(0, "speaker", 1.0, 1);
+	m_k054539->add_route(1, "speaker", 1.0, 0);
+	m_k054539->add_route(1, "speaker", 1.0, 1);
 
 	FILTER_VOLUME(config, "filter1_l").add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 	FILTER_VOLUME(config, "filter1_r").add_route(ALL_OUTPUTS, "speaker", 1.0, 1);

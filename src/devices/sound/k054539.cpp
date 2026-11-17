@@ -23,10 +23,12 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
 	, m_flags(RESET_FLAGS)
+	, m_global_volume(false)
 	, m_stream(nullptr)
 	, m_timer(nullptr)
 	, m_timer_handler(*this)
 	, m_apan_cb(*this)
+	, m_again_cb(*this)
 {
 	for(auto & elem : m_gain)
 		elem = 1.0;
@@ -47,17 +49,18 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
      13f: pan of the analog input (1-1f)
 
    200..20f: 2 bytes/channel, 8 channels
-     00: type (b2-3), reverse (b5)
+     00: global volume select (b0-1), type (b2-3), reverse (b5)
      01: loop (b0)
 
+   210: analog input 0, global volume select (b0-1)
+   211: analog input 1, global volume select (b0-1)
    214: Key on (b0-7 = channel 0-7)
    215: Key off          ""
    225: ?
    227: Timer frequency
-   228: ?
-   229: ?
-   22a: ?
-   22b: ?
+   228..22b: global volumes 0-3 (0=max, 0x40=-36dB, b7 unused). Each channel and
+             analog input selects one. It applies after the channel volume and
+             does not change the reverb send.
    22c: Channel active? (b0-7 = channel 0-7)
    22d: Data read/write port
    22e: ROM/RAM select (00..7f == ROM banks, 80 = Reverb RAM)
@@ -87,6 +90,21 @@ void k054539_device::set_gain(int channel, double gain)
 
 	if(gain >= 0)
 		m_gain[channel] = gain;
+}
+
+double k054539_device::global_volume(int sel) const
+{
+	if(!m_global_volume)
+		return 1.0;
+
+	return m_voltab[m_regs[0x228 + (sel & 3)] & 0x7f] * 4.0;
+}
+
+void k054539_device::update_aux_gain()
+{
+	if(!m_again_cb.isnull())
+		for(int input = 0; input < 2; input++)
+			m_again_cb(input, global_volume(m_regs[0x210 + input]));
 }
 
 bool k054539_device::regupdate()
@@ -152,12 +170,13 @@ void k054539_device::sound_stream_update(sound_stream &stream)
 					pan = 0x18 - 0x11;
 
 				double cur_gain = m_gain[ch];
+				double const gvol = global_volume(base2[0]);
 
-				double lvol = m_voltab[vol] * m_pantab[pan] * cur_gain;
+				double lvol = m_voltab[vol] * m_pantab[pan] * cur_gain * gvol;
 				if(lvol > VOL_CAP)
 					lvol = VOL_CAP;
 
-				double rvol = m_voltab[vol] * m_pantab[0xe - pan] * cur_gain;
+				double rvol = m_voltab[vol] * m_pantab[0xe - pan] * cur_gain * gvol;
 				if(rvol > VOL_CAP)
 					rvol = VOL_CAP;
 
@@ -468,10 +487,14 @@ void k054539_device::write(offs_t offset, u8 data)
 	}
 
 	m_regs[offset] = data;
+
+	if((offset >= 0x210 && offset <= 0x211) || (offset >= 0x228 && offset <= 0x22b))
+		update_aux_gain();
 }
 
 void k054539_device::device_post_load()
 {
+	update_aux_gain();
 }
 
 u8 k054539_device::read(offs_t offset)
@@ -504,6 +527,7 @@ void k054539_device::device_start()
 
 	// resolve delegates
 	m_apan_cb.resolve();
+	m_again_cb.resolve();
 
 	/*
 	    I've tried various equations on volume control but none worked consistently.
