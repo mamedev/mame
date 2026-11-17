@@ -26,7 +26,7 @@ FIXME: work out the differences and identify common code between VT and Rainbow.
   See VT100 Technical Manual: 4.7.4 Address Shuffling to 4.7.9 Split Screen Smooth Scrolling.
   More on scrolling regions: Rainbow 100 B technical documentation (QV069-GZ) April 1985 page 22
 
-- NEW - INTERLACED MODE (Rainbow only):
+- NEW - INTERLACED MODE:
   Vertical resolution increases from 240 to 480, while the refresh rate halves (flickers on CRTs).
   To accomplish this, the display controller repeats even lines in odd scans.
   VTVIDEO activates line doubling in 24 line, interlaced mode only.
@@ -234,8 +234,8 @@ void vt100_video_device::vblank_callback(screen_device &screen, bool state)
 {
 	if (state)
 	{
-		m_write_vert_freq_intr(ASSERT_LINE);
 		notify_vblank(true);
+		m_write_vert_freq_intr(ASSERT_LINE);
 	}
 }
 
@@ -445,8 +445,9 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 			}
 			if (length > columns)
 			{
-				// no terminator: nothing to follow, blank the rest of the frame
-				logerror("unterminated screen line at %04x\n", addr);
+				// no terminator: nothing to follow, so blank the rest of the
+				// frame (inferred: the manual only says the DMA runs to the 7F)
+				logerror("unterminated screen line at %04x\n", 0x2000 + addr);
 				valid = false;
 				length = 0;
 				display_type = 3;
@@ -562,9 +563,10 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 	} // for (scan_line)
 }
 
-// One scan of one character at scan Y_PRESET: I is the counter in use (0-9)
-// before the scan count math; also_next_row repeats the pixels on the scan
-// below (without the dot stretching)
+// One scan of one character on bitmap row y_preset.  i is the value of the
+// counter in use, Scan or Offset (0-9); the character ROM row comes from it
+// and the line's double height half.  also_next_row repeats the pixels on
+// the row below (without the dot stretching).
 void vt100_video_device::draw_scan(bitmap_ind16 &bitmap, int y_preset, int x, uint8_t code, int i, uint8_t display_type, bool invert, bool bold, bool blink, bool underline, bool blank, bool also_next_row)
 {
 	uint16_t x_preset = x << 3; // x_preset = x * 9 (= 132 column mode)
