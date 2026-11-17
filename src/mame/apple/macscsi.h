@@ -45,6 +45,7 @@ private:
 	bool timed_out(u8 error);
 	void wait(bool progress);
 	void done();
+	void wake();
 	TIMER_CALLBACK_MEMBER(timeout);
 
 	required_device<m68000_base_device> m_maincpu;
@@ -63,6 +64,7 @@ private:
 	emu_timer *m_timeout_timer;
 	bool m_drq;
 	bool m_waiting;
+	bool m_woken;
 	bool m_timed_out;
 	u8 m_count;
 	u32 m_data;

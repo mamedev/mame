@@ -64,6 +64,7 @@ mac_scsi_helper_device::mac_scsi_helper_device(const machine_config &mconfig, co
 	, m_timeout_timer(nullptr)
 	, m_drq(false)
 	, m_waiting(false)
+	, m_woken(false)
 	, m_timed_out(false)
 	, m_count(0)
 	, m_data(0)
@@ -83,6 +84,7 @@ void mac_scsi_helper_device::device_start()
 
 	save_item(NAME(m_drq));
 	save_item(NAME(m_waiting));
+	save_item(NAME(m_woken));
 	save_item(NAME(m_timed_out));
 	save_item(NAME(m_count));
 	save_item(NAME(m_data));
@@ -93,37 +95,38 @@ void mac_scsi_helper_device::device_reset()
 	m_timeout_timer->enable(false);
 	if (m_waiting)
 		m_maincpu->trigger(WAKE_TRIGGER);
-	m_waiting = false;
 	m_timed_out = false;
-	m_count = 0;
-	m_data = 0;
+	done();
 }
 
 void mac_scsi_helper_device::drq_w(int state)
 {
 	m_drq = state;
 	if (state && m_waiting)
-		m_maincpu->trigger(WAKE_TRIGGER);
+		wake();
+}
+
+void mac_scsi_helper_device::wake()
+{
+	m_woken = true;
+	m_maincpu->trigger(WAKE_TRIGGER);
 }
 
 TIMER_CALLBACK_MEMBER(mac_scsi_helper_device::timeout)
 {
-	// DRQ at the same instant: the retry finds it
-	if (m_drq)
-		return;
-
-	// the CPU alone was reset while waiting (Egret, Cuda or the PMU), which
-	// ends its suspension: the access is gone
-	if (!m_maincpu->suspended(SUSPEND_REASON_TRIGGER))
+	// the CPU alone was reset while waiting (Egret, Cuda or the PMU): it is
+	// held in reset, or the reset resumed it without a wake from here; the
+	// access is gone
+	if (m_maincpu->suspended(SUSPEND_REASON_RESET) || (!m_woken && !m_maincpu->suspended(SUSPEND_REASON_TRIGGER)))
 	{
-		m_waiting = false;
-		m_count = 0;
-		m_data = 0;
+		done();
 		return;
 	}
 
-	m_timed_out = true;
-	m_maincpu->trigger(WAKE_TRIGGER);
+	// DRQ at the same instant: the retry finds it
+	if (!m_drq)
+		m_timed_out = true;
+	wake();
 }
 
 // the retried access after a timeout ends in a bus error; bytes already
@@ -135,9 +138,7 @@ bool mac_scsi_helper_device::timed_out(u8 error)
 
 	logerror("%s: SCSI pseudo-DMA %s timed out after %d byte(s)\n", machine().describe_context(), error == READ_ERROR ? "read" : "write", m_count);
 	m_timed_out = false;
-	m_waiting = false;
-	m_count = 0;
-	m_data = 0;
+	done();
 	m_timeout_error_callback(error);
 	return true;
 }
@@ -149,6 +150,7 @@ void mac_scsi_helper_device::wait(bool progress)
 	if (!m_waiting || progress || !m_timeout_timer->enabled())
 		m_timeout_timer->adjust(m_timeout);
 	m_waiting = true;
+	m_woken = false;
 
 	if (m_maincpu->cpu_is_interruptible())
 		m_maincpu->retry_access();
@@ -162,6 +164,7 @@ void mac_scsi_helper_device::done()
 	if (m_waiting)
 		m_timeout_timer->enable(false);
 	m_waiting = false;
+	m_woken = false;
 	m_count = 0;
 	m_data = 0;
 }
