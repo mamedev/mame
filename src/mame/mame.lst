@@ -29302,6 +29302,10 @@ scrpndx
 @source:merit/mgames.cpp
 mgames
 
+@source:merit/mtouchfrc.cpp
+mtf2006
+mtfbios
+
 @source:merit/mtouchxl.cpp
 mtouchxl
 mtchxl5k
