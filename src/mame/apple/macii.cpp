@@ -781,9 +781,10 @@ void macii_state::machine_reset()
 // /RESET: it brings "all of the internal devices" to their initial state
 // (Guide to the Macintosh Family Hardware, 2nd ed., p. 244).  On the Mac II
 // logic board (820-0228) the 68020's RESET shares a net with both VIAs, the
-// IWM and the 5380, reset here, and with the ASC, the ADB microcontroller and
-// the 68851, which are not; the later machines are assumed to match.  The SCC
-// has no reset input.
+// IWM, the 5380 and the ADB microcontroller, reset here, and with the ASC and
+// the 68851, which are not; the later machines are assumed to match, and the
+// IIcx and SE/30 schematics show the ADB microcontroller on /RESET too.  The
+// SCC has no reset input.
 void macii_state::cpu_reset_w(int state)
 {
 	if (!state)
@@ -798,6 +799,8 @@ void macii_state::cpu_reset_w(int state)
 	m_fdc->reset();
 	m_ncr5380->reset();
 	m_scsihelp->reset();
+	if (m_adbmodem)
+		m_adbmodem->reset();
 }
 
 void macii_state::state_load()
