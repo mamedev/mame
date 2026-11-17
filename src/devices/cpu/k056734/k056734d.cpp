@@ -168,7 +168,7 @@ offs_t k056734_disassembler::disassemble(std::ostream &stream, offs_t pc, const 
 		case op4(3, 1, 3, 3): util::stream_format(stream, "st(l)%s %s, %s", sz, reg(ra), mem()); return 1 | SUPPORTED;
 
 		case op4(0, 1, 0, 3): util::stream_format(stream, "add(m)%s %s, %s", sz, reg(ra), mem()); return 1 | SUPPORTED;
-		case op4(0, 1, 1, 3): util::stream_format(stream, "cmp(m)%s %s, %s", sz, reg(ra), mem()); return 1 | SUPPORTED;
+		case op4(0, 1, 1, 3): util::stream_format(stream, "sub(m)%s %s, %s", sz, reg(ra), mem()); return 1 | SUPPORTED;
 		case op4(0, 1, 2, 3): util::stream_format(stream, "and(m)%s %s, %s", sz, reg(ra), mem()); return 1 | SUPPORTED;
 		case op4(0, 1, 3, 3): util::stream_format(stream, "xor(m)%s %s, %s", sz, reg(ra), mem()); return 1 | SUPPORTED;
 		case op4(2, 1, 1, 3): util::stream_format(stream, "or(m)%s %s, %s", sz, reg(ra), mem()); return 1 | SUPPORTED;

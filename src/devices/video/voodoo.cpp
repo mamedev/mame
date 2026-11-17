@@ -110,8 +110,8 @@ bits(7:4) and bit(24)), X, and Y:
 TODO:
  - look at speed on Konami games (nbapbp, racingj, etc)
  - look at timing issues on IT games
- - bad textures in some Voodoo 3 games (mocapb for example)
  - update callers to use maps
+ - POR strapping callbacks
 
 */
 
@@ -678,7 +678,8 @@ generic_voodoo_device::generic_voodoo_device(const machine_config &mconfig, devi
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_vblank_cb(*this),
 	m_stall_cb(*this),
-	m_pciint_cb(*this)
+	m_pciint_cb(*this),
+	m_vgapass_cb(*this)
 {
 }
 
@@ -1047,6 +1048,9 @@ void voodoo_1_device::device_stop()
 void voodoo_1_device::device_reset()
 {
 	soft_reset();
+	// TODO: strapped at POST thru fb_addr bit 4
+	// Voodoo 2 also straps the logic in PCI reset, Banshee and later uses vgaInit0 instead
+	m_vgapass_cb(0);
 }
 
 
@@ -2375,10 +2379,14 @@ u32 voodoo_1_device::reg_fbiinit_w(u32 chipmask, u32 regnum, u32 data)
 		m_reg.write(regnum, data);
 
 		// handle resets written to fbiInit0
-		if (regnum == voodoo_regs::reg_fbiInit0 && m_reg.fbi_init0().graphics_reset())
-			soft_reset();
-		if (regnum == voodoo_regs::reg_fbiInit0 && m_reg.fbi_init0().fifo_reset())
-			m_pci_fifo.reset();
+		if (regnum == voodoo_regs::reg_fbiInit0)
+		{
+			if (m_reg.fbi_init0().graphics_reset())
+				soft_reset();
+			if (m_reg.fbi_init0().fifo_reset())
+				m_pci_fifo.reset();
+			m_vgapass_cb(m_reg.fbi_init0().vga_passthru());
+		}
 
 		// compute FIFO layout when fbiInit0 or fbiInit4 change
 		if (regnum == voodoo_regs::reg_fbiInit0 || regnum == voodoo_regs::reg_fbiInit4)

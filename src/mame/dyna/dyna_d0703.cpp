@@ -15,6 +15,8 @@ The main components are:
 2x A625308AM-70S SRAM
 25.2000 MHz XTAL
 Epson RTC62421
+Wolfson WM8725 stereo DAC (serial input, 16-bit words, system clock 256fs or 384fs)
+LM358 dual op-amp (DAC output buffer)
 
 Notes (all deduced from the code, no documentation available):
 - the 208-pin chip is the same ARM7 SoC as on the D0404 PCB (interrupt controller at
@@ -40,7 +42,10 @@ Notes (all deduced from the code, no documentation available):
   back from 0x150048 / 0x15004c are stored back and the low 16 bits are returned to the
   game by SWI 0x21, which uses them as random numbers. The actual function is unknown.
 - sound is software mixed 8-bit PCM (samples in the h11 flash), the BIOS writes 11 16-bit
-  samples to 0x15003c at every IRQ 2, so it's probably a FIFO.
+  samples to 0x15003c at every IRQ 2, so it's probably a FIFO, which the Lattice chip
+  shifts out to the WM8725. The DAC needs a 256fs or 384fs system clock, so the sample rate
+  is probably the 25.2 MHz XTAL divided by an integer and then by 256 or 384 (e.g. /9 and
+  256fs or /6 and 384fs would give 10937.5 Hz), not verified.
 
 TODO:
 - identify SoC
@@ -615,7 +620,7 @@ void dyna_d0703_state::machine_reset()
 	m_sound_fifo_count = 0;
 	update_irq();
 
-	attotime const period = attotime::from_hz(25.2_MHz_XTAL / 2286); // TODO: actual sample rate, ~11025 Hz is a guess
+	attotime const period = attotime::from_hz(25.2_MHz_XTAL / 2286); // TODO: actual sample rate, ~11025 Hz is a guess (same rate as the D0404 games, verified on a real Super El Dorado recording)
 	m_sound_timer->adjust(period, 0, period);
 }
 
@@ -642,7 +647,7 @@ void dyna_d0703_state::dyna_d0703(machine_config &config)
 	PALETTE(config, m_palette).set_format(palette_device::GGGGGRRRRRBBBBBx, 0x200); // TODO: size
 
 	SPEAKER(config, "mono").front_center();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.5); // TODO: actual DAC type unknown
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac).add_route(ALL_OUTPUTS, "mono", 0.5); // Wolfson WM8725 serial DAC, fed by the Lattice chip
 }
 
 

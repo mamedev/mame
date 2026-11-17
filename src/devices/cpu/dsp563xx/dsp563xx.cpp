@@ -12,6 +12,8 @@ dsp563xx_device::dsp563xx_device(const machine_config &mconfig, device_type type
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_hi08(*this, "hi08"),
 	m_shi(*this, "shi"),
+	m_hreq_callback(*this),
+	m_miso_callback(*this),
 	m_p_config("p", ENDIANNESS_LITTLE, 32, 24, -2, map_p),
 	m_x_config("x", ENDIANNESS_LITTLE, 32, 24, -2, map_x),
 	m_y_config("y", ENDIANNESS_LITTLE, 32, 24, -2, map_y)
@@ -135,6 +137,16 @@ void dsp563xx_device::set_hard_omr(u8 mode)
 	m_hard_omr = mode;
 }
 
+void dsp563xx_device::do_miso(int state)
+{
+	m_miso_callback(state);
+}
+
+void dsp563xx_device::do_hreq(int state)
+{
+	m_hreq_callback(state);
+}
+
 void dsp563xx_device::device_reset()
 {
 	std::fill(m_m.begin(), m_m.end(), 0xffffff);
@@ -163,6 +175,9 @@ void dsp563xx_device::execute_run()
 		u32 opcode = m_p.read_dword(m_pc);
 		bool loop = (m_mr & MR_LF) && m_pc == m_la;
 		u16 kmove = t_move[opcode >> 8];
+		// 12-bit ALU space (0x200000-0x2000ff): ipar wins over move-nop
+		if (kmove && (opcode & 0xffff00) == 0x200000 && t_ipar[opcode & 0xff])
+			kmove = 0;
 		u16 knpar = kmove || opcode >= 0x100000 ? 0 : t_npar[opcode];
 		u16 kipar = knpar ? 0 : t_ipar[opcode & 0xff];
 		bool ex = BIT(t_move_ex[kmove >> 6], kmove & 0x3f) || BIT(t_npar_ex[knpar >> 6], knpar & 0x3f);
@@ -274,48 +289,43 @@ std::unique_ptr<util::disasm_interface> dsp563xx_device::create_disassembler()
 	return std::make_unique<dsp563xx_disassembler>();
 }
 
-void dsp563xx_device::hi08_w(offs_t offset, u8 data)
+// Compute E, U, N flags from a 56-bit result value (bits 0..55),
+// matching the reference sr_e_update / sr_u_update / sr_n_update.
+// Clears E/U/N first, then sets them.
+void dsp563xx_device::update_eun56(u64 v)
 {
-	m_hi08->write(offset, data);
-}
+	m_ccr &= ~(CCR_E|CCR_U|CCR_N);
 
-u8 dsp563xx_device::hi08_r(offs_t offset)
-{
-	return m_hi08->read(offset);
-}
+	int s0 = (m_mr & MR_S0) ? 1 : 0;
+	int s1 = (m_mr & MR_S1) ? 1 : 0;
 
+	// N: sign bit (bit 55)
+	if(BIT(v, 55))
+		m_ccr |= CCR_N;
+
+	// U: unnormalized - top two bits of the integer portion equal
+	int sOffset = s0 - s1;
+	int msb = 47 + sOffset;
+	int lsb = 46 + sOffset;
+	if(BIT(v, msb) == BIT(v, lsb))
+		m_ccr |= CCR_U;
+
+	// E: extension - integer portion neither all-0 nor all-1
+	int lowBit = 1 + s0 - s1;
+	u32 mask = 0x3ff & ~((1u << lowBit) - 1u);
+	u32 d2 = (u32)(v >> 46);
+	u32 m2 = d2 & mask;
+	if(m2 != mask && m2 != 0)
+		m_ccr |= CCR_E;
+}
 
 u64 dsp563xx_device::do_add56(u64 v1, u64 v2)
 {
 	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V|CCR_C);
 
 	s64 r = util::sext(v2, 56) + v1;
-	switch(m_mr & (MR_S0|MR_S1))
-	{
-	case 0:
-		if(BIT(r, 47, 9) != 0 && BIT(r, 47, 9) != 0x1ff)
-			m_ccr |= CCR_E;
-		if(BIT(r, 47) == BIT(r, 46))
-			m_ccr |= CCR_U;
-		break;
 
-	case MR_S0:
-		if(BIT(r, 48, 8) != 0 && BIT(r, 48, 8) != 0xff)
-			m_ccr |= CCR_E;
-		if(BIT(r, 48) == BIT(r, 47))
-			m_ccr |= CCR_U;
-		break;
-
-	case MR_S1:
-		if(BIT(r, 46, 10) != 0 && BIT(r, 46, 10) != 0x3ff)
-			m_ccr |= CCR_E;
-		if(BIT(r, 46) == BIT(r, 45))
-			m_ccr |= CCR_U;
-		break;
-	}
-
-	if(BIT(r, 55))
-		m_ccr |= CCR_N;
+	update_eun56(r);
 	if(!r)
 		m_ccr |= CCR_Z;
 	if(BIT(r, 56) != BIT(r, 55))
@@ -326,37 +336,57 @@ u64 dsp563xx_device::do_add56(u64 v1, u64 v2)
 	return r;
 }
 
+// ADC: D = D + S + C, where C is the carry flag (read before the op) added
+// at the accumulator LSB.  Same flag model as do_add56.
+u64 dsp563xx_device::do_adc56(u64 v1, u64 v2)
+{
+	u64 cin = (m_ccr & CCR_C) ? 1 : 0;
+
+	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V|CCR_C);
+
+	s64 r = ((s64)v2 - ((s64)(v2 >> 55) << 56)) + (s64)(v1 + cin);
+
+	u64 umask = (u64)r & 0xffffffffffffff;
+	update_eun56(umask);
+	if(!umask)
+		m_ccr |= CCR_Z;
+	if(BIT(r, 56) != BIT(r, 55))
+		m_ccr |= CCR_L|CCR_V;
+	if(BIT(v2 + (v1 & 0xffffffffffffff) + cin, 56))
+		m_ccr |= CCR_C;
+
+	return umask;
+}
+
+// SBC: D = D - S - !C (the carry flag is the inverse borrow).  Same flag
+// model as do_sub56.
+u64 dsp563xx_device::do_sbc56(u64 v1, u64 v2)
+{
+	u64 bin = (m_ccr & CCR_C) ? 0 : 1;
+
+	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V|CCR_C);
+
+	s64 r = ((s64)v2 - ((s64)(v2 >> 55) << 56)) - (s64)(v1 + bin);
+
+	u64 umask = (u64)r & 0xffffffffffffff;
+	update_eun56(umask);
+	if(!umask)
+		m_ccr |= CCR_Z;
+	if(BIT(r, 56) != BIT(r, 55))
+		m_ccr |= CCR_L|CCR_V;
+	if(BIT(v2 - (v1 & 0xffffffffffffff) - bin, 56))
+		m_ccr |= CCR_C;
+
+	return umask;
+}
+
 u64 dsp563xx_device::do_sub56(u64 v1, u64 v2)
 {
 	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V|CCR_C);
 
 	s64 r = util::sext(v2, 56) - v1;
-	switch(m_mr & (MR_S0|MR_S1))
-	{
-	case 0:
-		if(BIT(r, 47, 9) != 0 && BIT(r, 47, 9) != 0x1ff)
-			m_ccr |= CCR_E;
-		if(BIT(r, 47) == BIT(r, 46))
-			m_ccr |= CCR_U;
-		break;
 
-	case MR_S0:
-		if(BIT(r, 48, 8) != 0 && BIT(r, 48, 8) != 0xff)
-			m_ccr |= CCR_E;
-		if(BIT(r, 48) == BIT(r, 47))
-			m_ccr |= CCR_U;
-		break;
-
-	case MR_S1:
-		if(BIT(r, 46, 10) != 0 && BIT(r, 46, 10) != 0x3ff)
-			m_ccr |= CCR_E;
-		if(BIT(r, 46) == BIT(r, 45))
-			m_ccr |= CCR_U;
-		break;
-	}
-
-	if(BIT(r, 55))
-		m_ccr |= CCR_N;
+	update_eun56(r);
 	if(!r)
 		m_ccr |= CCR_Z;
 	if(BIT(r, 56) != BIT(r, 55))
@@ -367,41 +397,60 @@ u64 dsp563xx_device::do_sub56(u64 v1, u64 v2)
 	return r;
 }
 
+u64 dsp563xx_device::do_rnd56(u64 v)
+{
+	u64 r = 0x800000;
+	if(m_mr & MR_S1)
+		r >>= 1;
+	else if(m_mr & MR_S0)
+		r <<= 1;
+	v = (v + r) & 0xffffffffffffff;
+	u64 mask = (r << 1) - 1;
+	if(!(m_emr & EMR_RM)) {
+		if(!(v & mask))
+			v &= ~(r << 1);
+	}
+	v &= ~mask;
+	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_E|CCR_U);
+	if(BIT(v, 55))
+		m_ccr |= CCR_N;
+	if(!v)
+		m_ccr |= CCR_Z;
+	if(BIT(v, 47, 9) != 0 && BIT(v, 47, 9) != 0x1ff)
+		m_ccr |= CCR_E;
+	if(BIT(v, 47) == BIT(v, 46))
+		m_ccr |= CCR_U;
+	return v;
+}
+
+void dsp563xx_device::do_mpy56(s64 r)
+{
+	u64 res = (u64)r & 0xffffffffffffff;
+
+	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V);
+
+	update_eun56(res);
+	if(!res)
+		m_ccr |= CCR_Z;
+	if(BIT(r, 56) != BIT(res, 55))
+		m_ccr |= CCR_L|CCR_V;
+}
+
 u64 dsp563xx_device::do_asl56(u8 n, u64 v)
 {
 	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V|CCR_C);
 
 	u64 r = (v << n) & 0xffffffffffffff;
-	switch(m_mr & (MR_S0|MR_S1))
-	{
-	case 0:
-		if(BIT(r, 47, 9) != 0 && BIT(r, 47, 9) != 0x1ff)
-			m_ccr |= CCR_E;
-		if(BIT(r, 47) == BIT(r, 46))
-			m_ccr |= CCR_U;
-		break;
 
-	case MR_S0:
-		if(BIT(r, 48, 8) != 0 && BIT(r, 48, 8) != 0xff)
-			m_ccr |= CCR_E;
-		if(BIT(r, 48) == BIT(r, 47))
-			m_ccr |= CCR_U;
-		break;
-
-	case MR_S1:
-		if(BIT(r, 46, 10) != 0 && BIT(r, 46, 10) != 0x3ff)
-			m_ccr |= CCR_E;
-		if(BIT(r, 46) == BIT(r, 45))
-			m_ccr |= CCR_U;
-		break;
-	}
-
-	if(BIT(r, 55))
-		m_ccr |= CCR_N;
+	update_eun56(r);
 	if(!r)
 		m_ccr |= CCR_Z;
-	if((BIT(v, 55) ? v << 8 : ~v << 8) >> (64-n))
-		m_ccr |= CCR_L|CCR_V;
+	if(n != 0 && n < 56) {
+		u64 smask = 0xffffffffffffff ^ ((1ULL << (56-n)) - 1);
+		u64 vm = v & 0xffffffffffffff;
+		if((vm & smask) != (BIT(r, 55) ? smask : 0))
+			m_ccr |= CCR_L|CCR_V;
+	}
 	if(n != 0 && BIT(v, 56-n))
 		m_ccr |= CCR_C;
 
@@ -417,36 +466,77 @@ u64 dsp563xx_device::do_asr56(u8 n, u64 v)
 	return util::sext(v, BIT(m_emr, 1) ? 40 : 56) >> n;
 }
 
+u64 dsp563xx_device::do_lsl56(u8 n, u64 v)
+{
+	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+	u32 d = (v >> 24) & 0xffffff;
+	u32 res = (n >= 24) ? 0 : ((d << n) & 0xffffff);
+	v = (v & 0xff000000ffffff) | ((u64)res << 24);
+	if(BIT(res, 23))
+		m_ccr |= CCR_N;
+	if(!res)
+		m_ccr |= CCR_Z;
+	if(n != 0 && n < 24 && BIT(d, 24-n))
+		m_ccr |= CCR_C;
+
+	return v;
+}
+
+u64 dsp563xx_device::do_lsr56(u8 n, u64 v)
+{
+	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+	u32 d = (v >> 24) & 0xffffff;
+	u32 res = (n >= 24) ? 0 : (d >> n);
+	v = (v & 0xff000000ffffff) | ((u64)res << 24);
+	if(BIT(res, 23))
+		m_ccr |= CCR_N;
+	if(!res)
+		m_ccr |= CCR_Z;
+	if(n != 0 && n <= 24 && BIT(d, n-1))
+		m_ccr |= CCR_C;
+
+	return v;
+}
+
+u64 dsp563xx_device::do_rol56(u64 v)
+{
+	bool old_c = (m_ccr & CCR_C) != 0;
+	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+	u32 d = (v >> 24) & 0xffffff;
+	u32 res = (((u32)d << 1) | (old_c ? 1 : 0)) & 0xffffff;
+	v = (v & 0xff000000ffffff) | ((u64)res << 24);
+	if(BIT(res, 23))
+		m_ccr |= CCR_N;
+	if(!res)
+		m_ccr |= CCR_Z;
+	if(BIT(d, 23))
+		m_ccr |= CCR_C;
+
+	return v;
+}
+
+u64 dsp563xx_device::do_ror56(u64 v)
+{
+	bool old_c = (m_ccr & CCR_C) != 0;
+	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
+	u32 d = (v >> 24) & 0xffffff;
+	u32 res = (d >> 1) | ((old_c ? 1 : 0) << 23);
+	v = (v & 0xff000000ffffff) | ((u64)res << 24);
+	if(BIT(res, 23))
+		m_ccr |= CCR_N;
+	if(!res)
+		m_ccr |= CCR_Z;
+	if(BIT(d, 0))
+		m_ccr |= CCR_C;
+
+	return v;
+}
+
 void dsp563xx_device::do_tst56(u64 v)
 {
 	m_ccr &= ~(CCR_E|CCR_U|CCR_N|CCR_Z|CCR_V);
 
-	switch(m_mr & (MR_S0|MR_S1))
-	{
-	case 0:
-		if(BIT(v, 47, 9) != 0 && BIT(v, 47, 9) != 0x1ff)
-			m_ccr |= CCR_E;
-		if(BIT(v, 47) == BIT(v, 46))
-			m_ccr |= CCR_U;
-		break;
-
-	case MR_S0:
-		if(BIT(v, 48, 8) != 0 && BIT(v, 48, 8) != 0xff)
-			m_ccr |= CCR_E;
-		if(BIT(v, 48) == BIT(v, 47))
-			m_ccr |= CCR_U;
-		break;
-
-	case MR_S1:
-		if(BIT(v, 46, 10) != 0 && BIT(v, 46, 10) != 0x3ff)
-			m_ccr |= CCR_E;
-		if(BIT(v, 46) == BIT(v, 45))
-			m_ccr |= CCR_U;
-		break;
-	}
-
-	if(BIT(v, 55))
-		m_ccr |= CCR_N;
+	update_eun56(v);
 	if(!v)
 		m_ccr |= CCR_Z;
 }

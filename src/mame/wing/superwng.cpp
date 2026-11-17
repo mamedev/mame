@@ -5,6 +5,8 @@
 
 Super Wing - (c) 1985 Wing (UPL?)
 
+8320 PCB
+
 driver by Tomasz Slanina
 
 probably a sequel to flipjack

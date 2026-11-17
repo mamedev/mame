@@ -93,6 +93,8 @@ public:
 	void maccclassic_map(address_map &map) ATTR_COLD;
 
 private:
+	void scc_gpi(machine_config &config) ATTR_COLD;
+
 	required_device<m68000_musashi_device> m_maincpu;
 	required_device<adb_bus_device> m_adbbus;
 	required_device<ram_device> m_ram;
@@ -381,15 +383,21 @@ void maclc_state::maclc_base(machine_config &config)
 	m_scc->out_int_callback().set(m_v8, FUNC(v8_device::scc_irq_w));
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	// mini-DIN-8 serial ports: HSKo (pin 1) is driven from the SCC's /DTR
+	// through a 26LS30
+	m_scc->out_dtra_callback().set("modem", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_dtrb_callback().set("printer", FUNC(rs232_port_device::write_dtr));
 
+	// HSKi (pin 2) reaches /TRxC, which the Am85C80 Combo joins to /CTS
+	// internally.  GPi (pin 7) is not connected on the LC and LC II, whose
+	// /DCD inputs are pulled up; see scc_gpi() for the Classic II,
+	// Color Classic and Mac TV.
 	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
-	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
-	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	SPEAKER(config, "speaker", 2).front();
@@ -443,6 +451,13 @@ void maclc_state::maclc_base(machine_config &config)
 	applefdintf_device::add_35_nc(config, m_floppy[1]);
 }
 
+// GPi (pin 7) reaches /DCD through a 26LS32 receiver
+void maclc_state::scc_gpi(machine_config &config)
+{
+	subdevice<rs232_port_device>("modem")->dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
+	subdevice<rs232_port_device>("printer")->dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
+}
+
 void maclc_state::maclc(machine_config &config)
 {
 	maclc_base(config);
@@ -474,6 +489,7 @@ void maclc_state::maclc2(machine_config &config)
 void maclc_state::maccclas(machine_config &config)
 {
 	maclc_base(config);
+	scc_gpi(config);
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maccclassic_map);
@@ -522,6 +538,8 @@ void maclc_state::maccclas(machine_config &config)
 void maclc_state::mactv(machine_config &config)
 {
 	maclc_base(config);
+	// TODO: GPi wired as on the Color Classic; check against Mac TV documentation
+	scc_gpi(config);
 
 	M68030(config.replace(), m_maincpu, C32M);
 	m_maincpu->set_fpu_enable(false);   // this machine has no FPU and no ability to add one
@@ -568,6 +586,7 @@ void maclc_state::mactv(machine_config &config)
 void maclc_state::macclas2(machine_config &config)
 {
 	maclc_base(config);
+	scc_gpi(config);
 
 	M68030(config.replace(), m_maincpu, C15M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &maclc_state::maclc_map);

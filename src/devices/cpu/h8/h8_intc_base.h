@@ -21,6 +21,9 @@ public:
 	// Called to set an IRQ from an internal (to the MCU) source
 	virtual void internal_interrupt(int vector) = 0;
 
+	// Called to clear a pending internal (to the MCU) IRQ
+	virtual void clear_interrupt(int vector) = 0;
+
 protected:
 	h8_intc_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 		: device_t(mconfig, type, tag, owner, clock)

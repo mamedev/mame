@@ -191,7 +191,12 @@ uint8_t acclaim_pinkeye_device::guest_r(int guest, int reg)
 			if (reg == 3)
 			{
 				// flash data port
-				return m_flash[m_flash_ptr++ & 0x1ffffff];
+				const uint8_t rv = m_flash[m_flash_ptr & 0x1ffffff];
+				if (!machine().side_effects_disabled())
+				{
+					m_flash_ptr++;
+				}
+				return rv;
 			}
 			return m_fpga[1][reg];
 

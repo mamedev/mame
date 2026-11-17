@@ -233,8 +233,7 @@ Notes:
 #include "emu.h"
 #include "fmtowns.h"
 
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
+#include "bus/nscsi/devices.h"
 
 #include "screen.h"
 #include "softlist.h"
@@ -2147,7 +2146,7 @@ void towns_state::towns2_io(address_map &map)
 {
 	// For FM Towns II models with integrated SCSI controller
 	towns_io(map);
-	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask32(0x00ff00ff);
+	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::read), FUNC(fmscsi_device::write)).umask32(0x00ff00ff);
 }
 
 void towns_state::towns16_io(address_map &map)
@@ -2211,7 +2210,7 @@ void towns_state::townsux_io(address_map &map)
 {
 	// For FM Towns II UX
 	towns16_io(map);
-	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::fmscsi_r), FUNC(fmscsi_device::fmscsi_w)).umask16(0x00ff);
+	map(0x0c30, 0x0c37).rw(m_scsi, FUNC(fmscsi_device::read), FUNC(fmscsi_device::write)).umask16(0x00ff);
 }
 
 void towns_state::pcm_mem(address_map &map)
@@ -2760,6 +2759,28 @@ void towns_state::towns(machine_config &config)
 	m_dma[1]->out_iow_callback<1>().set(m_scsi_slot, FUNC(fmt_scsi_slot_device::data_write));
 }
 
+void towns_state::towns_scsi(machine_config &config)
+{
+	nscsi_bus_device &scsi(NSCSI_BUS(config, "scsi"));
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
+
+	FMSCSI(config, m_scsi);
+	scsi.set_external_device(7, m_scsi);
+	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
+	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
+
+	m_dma[0]->in_ior_callback<1>().set(m_scsi, FUNC(fmscsi_device::data_r));
+	m_dma[0]->out_iow_callback<1>().set(m_scsi, FUNC(fmscsi_device::data_w));
+	m_dma[1]->in_ior_callback<1>().set(m_scsi, FUNC(fmscsi_device::data_r));
+	m_dma[1]->out_iow_callback<1>().set(m_scsi, FUNC(fmscsi_device::data_w));
+}
+
 void towns16_state::townsux(machine_config &config)
 {
 	towns_base(config);
@@ -2770,22 +2791,7 @@ void towns16_state::townsux(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
-	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
-	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
-	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
-
-	FMSCSI(config, m_scsi);
-	m_scsi->set_scsi_port("scsi");
-	m_scsi->irq_handler().set(FUNC(towns16_state::towns_scsi_irq));
-	m_scsi->drq_handler().set(FUNC(towns16_state::towns_scsi_drq));
-
-	m_dma[0]->in_ior_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
-	m_dma[0]->out_iow_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
-	m_dma[1]->in_ior_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
-	m_dma[1]->out_iow_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	towns_scsi(config);
 
 	// 2 MB onboard, one SIMM slot with 2-8 MB
 	m_ram->set_default_size("2M").set_extra_options("4M,6M,10M");
@@ -2803,22 +2809,7 @@ void towns_state::townssj(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(towns_state::towns_vsync_irq));
 	m_maincpu->set_irq_acknowledge_callback("pic8259_master", FUNC(pic8259_device::inta_cb));
 
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
-	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
-	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
-	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
-
-	FMSCSI(config, m_scsi);
-	m_scsi->set_scsi_port("scsi");
-	m_scsi->irq_handler().set(FUNC(towns_state::towns_scsi_irq));
-	m_scsi->drq_handler().set(FUNC(towns_state::towns_scsi_drq));
-
-	m_dma[0]->in_ior_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
-	m_dma[0]->out_iow_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
-	m_dma[1]->in_ior_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_r));
-	m_dma[1]->out_iow_callback<1>().set(m_scsi, FUNC(fmscsi_device::fmscsi_data_w));
+	towns_scsi(config);
 
 	// 4 MB (SJ2/SJ2A) or 8 MB (SJ26/SJ53) onboard, 2 SIMM slots with 4-32 MB each
 	m_ram->set_default_size("8M").set_extra_options("4M,12M,16M,20M,24M,28M,32M,36M,40M,44M,48M,52M,56M,68M,72M");

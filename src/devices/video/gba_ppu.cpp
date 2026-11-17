@@ -146,6 +146,33 @@ char const *const reg_names[] =
 	"DISP_MMEM_FIFO_L", "DISP_MMEM_FIFO_H", "MASTER_BRIGHT", "Unused"
 };
 
+// a CPU byte store reaches the 32-bit bus on a single lane
+bool is_byte_store(uint32_t mem_mask)
+{
+	return (mem_mask == 0x0000'00ff) || (mem_mask == 0x0000'ff00) || (mem_mask == 0x00ff'0000) || (mem_mask == 0xff00'0000);
+}
+
+// widen a byte store to its halfword, with the byte in both halves
+void widen_byte_store(uint32_t &data, uint32_t &mem_mask)
+{
+	const uint32_t lane = data & mem_mask;
+	const uint32_t byte = (lane | (lane >> 8) | (lane >> 16) | (lane >> 24)) & 0xff;
+	data = byte * 0x0101'0101;
+	mem_mask = (mem_mask & 0x0000'ffff) ? 0x0000'ffff : 0xffff'0000;
+}
+
+// the GBA's 128K VRAM window holds 96K: 0x18000-0x1ffff mirrors the OBJ 32K at
+// 0x10000, except that the bitmap modes leave 0x18000-0x1bfff unmapped
+bool vram_unmapped(offs_t offset, bool bitmap)
+{
+	return bitmap && ((offset & (0x1c000 / 4)) == (0x18000 / 4));
+}
+
+offs_t vram_offset(offs_t offset)
+{
+	return (offset >= (0x18000 / 4)) ? (offset - (0x8000 / 4)) : offset;
+}
+
 } // anonymous namespace
 
 
@@ -384,6 +411,58 @@ void gba_ppu_device::regs_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			reload_bg_ref(1, 1);
 			break;
 	}
+}
+
+uint32_t gba_ppu_device::gba_vram_load(const uint32_t *vram, offs_t offset) const
+{
+	if (vram_unmapped(offset, (m_regs[0] & 7) >= 3))
+	{
+		return 0;
+	}
+
+	return vram[vram_offset(offset)];
+}
+
+void gba_ppu_device::gba_pram_store(uint32_t *pram, offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (is_byte_store(mem_mask))
+	{
+		widen_byte_store(data, mem_mask);
+	}
+
+	COMBINE_DATA(&pram[offset]);
+}
+
+void gba_ppu_device::gba_vram_store(uint32_t *vram, offs_t offset, uint32_t data, uint32_t mem_mask) const
+{
+	const bool bitmap = (m_regs[0] & 7) >= 3;
+
+	if (is_byte_store(mem_mask))
+	{
+		// OBJ VRAM (from 0x10000, or 0x14000 in the bitmap modes) and its mirror take no byte stores
+		if (offset >= (bitmap ? (0x14000 / 4) : (0x10000 / 4)))
+		{
+			return;
+		}
+
+		widen_byte_store(data, mem_mask);
+	}
+	else if (vram_unmapped(offset, bitmap))
+	{
+		return;
+	}
+
+	COMBINE_DATA(&vram[vram_offset(offset)]);
+}
+
+void gba_ppu_device::gba_oam_store(uint32_t *oam, offs_t offset, uint32_t data, uint32_t mem_mask)
+{
+	if (is_byte_store(mem_mask))
+	{
+		return;
+	}
+
+	COMBINE_DATA(&oam[offset]);
 }
 
 // the reference points are 28-bit signed with 8 fractional bits

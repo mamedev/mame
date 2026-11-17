@@ -50,6 +50,7 @@ protected:
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_clock_changed() override;
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
 	virtual void tra_callback() override;
@@ -62,6 +63,7 @@ protected:
 	void clear_int(int flag);
 
 	void update_baud_rate();
+	void set_divisor(u16 dl);
 
 	const dev_type m_device_type;
 	struct {
@@ -79,6 +81,7 @@ protected:
 	} m_regs;
 private:
 	u8 m_int_pending;
+	u32 m_baud_clock; // input clock the current rate was set from
 
 	devcb_write_line    m_out_tx_cb;
 	devcb_write_line    m_out_dtr_cb;

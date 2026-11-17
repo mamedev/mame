@@ -65,7 +65,26 @@ aha1742a_device::aha1742a_device(const machine_config &mconfig, const char *tag,
 
 void aha174x_device::device_start()
 {
+	set_isa_device();
 }
+
+void aha174x_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void aha174x_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_PROGRAM)
+	{
+		// TODO: unconfirmed
+		m_isa->install_rom(this, 0xdc000, 0xdffff, "bios");
+	}
+//  else if (space_id == AS_IO)
+//      m_isa->install_device(0x????, 0x????, *this, ...
+}
+
 
 
 void aha174x_device::hpc_map(address_map &map)

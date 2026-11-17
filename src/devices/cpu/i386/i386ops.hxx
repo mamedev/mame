@@ -1278,6 +1278,13 @@ void i386_device::i386_repeat(int invert_flag)
 			count = --REG32(ECX);
 		else
 			count = --REG16(CX);
+		if (count && m_TF && (!flag || (invert_flag ? !*flag : *flag)))
+		{
+			// single-step trap after each iteration, return to the string instruction
+			m_eip = m_prev_eip;
+			CHANGE_PC(m_eip);
+			return;
+		}
 		if (count && (m_cycles <= 0))
 			goto outofcycles;
 	}
@@ -2371,6 +2378,12 @@ void i386_device::i386_into()              // Opcode 0xce
 static uint32_t i386_escape_ea;   // hack around GCC 4.6 error because we need the side effects of GetEA()
 void i386_device::i386_escape()            // Opcodes 0xd8 - 0xdf
 {
+	// with no coprocessor, TS or EM set traps
+	if (m_cr[0] & (CR0_TS | CR0_EM))
+	{
+		i386_trap(FAULT_NM, 0);
+		return;
+	}
 	uint8_t modrm = FETCH();
 	if(modrm < 0xc0)
 	{

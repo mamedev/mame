@@ -3434,6 +3434,8 @@ Runs too fast, wants [V1S]
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
 		<notes><![CDATA[
 Runs too fast, requires [V1S]
+Note however that it explicitly set a dark blue BG Pal in V2 mode
+https://hachibitto.com/jvcc/articles/view_article.php?id=455&setlanguage=en
 ]]></notes>
 		<!-- PC8801 -->
 		<info name="release" value="198606xx"/>

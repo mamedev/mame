@@ -192,6 +192,7 @@ protected:
 		uint32_t literal_miss;      // a folded PC-relative word changed: that load is not folded again
 		uint32_t verify_miss;       // a word check failed: the address counts towards volatile code
 		uint32_t resync_next;       // the last resync was from the end of an ARM memory instruction, to the next one
+		uint32_t window;            // the exit is at a word the prefetch took before a store wrote (drc_prefetch_after_store())
 		uint32_t fetch_shadow;      // the word the prefetch last fetched at PC+8 inside the shadow range (set_fetch_shadow())
 		uint64_t tlb_stats[4];      // DRC_TLB_CHECK: hits checked, hits the vtlb could not check, fills, misses
 	};
@@ -322,8 +323,9 @@ protected:
 
 		uint32_t cycles = 0;            // cycles accumulated since the last update
 		uml::code_label labelnum = 1;   // the next local label
-		offs_t verified = ~offs_t(0);   // the word last verified against memory (DRC_OPT_SUMS off)
+		offs_t verified = ~offs_t(0);   // the last word verified (DRC_OPT_SUMS off): a sequence checks its words in order through it
 		const opcode_desc *verify_next = nullptr;   // the instruction whose words are verified next, after a store (DRC_OPT_SUMS)
+		const opcode_desc *store = nullptr;     // the sequence's last store so far: the words through its PC+8 were fetched before it wrote
 		bool exact = false;             // an exact copy: cycles are taken and checked after every instruction
 		const opcode_desc *seqhead = nullptr;   // the first instruction of the sequence being generated
 
@@ -351,6 +353,21 @@ protected:
 		uint32_t cycles = 0;
 	};
 
+	struct fetched_word             // a word the prefetch holds when an instruction runs (drc_fetched_words())
+	{
+		offs_t address = 0;
+		offs_t physical = 0;
+		uint32_t word = 0;
+	};
+
+	struct prefetch_window          // the words of the interpreter's prefetch buffer from an address on, as compiled
+	{
+		uint32_t word[3] = { };
+		offs_t physical[3] = { };
+		const uint32_t *host[3] = { };  // where the generated check reads them, or nullptr through the bus
+		uint32_t count = 0;
+	};
+
 	struct tcm_info                 // a tightly coupled memory (ARM946E-S), accessed in place within [*base, *end]
 	{
 		const uint32_t *base = nullptr;
@@ -367,6 +384,15 @@ protected:
 	void drc_remapped();
 	void drc_check_fastram();
 	bool drc_prefetch_after_remap();
+	bool drc_host_word(offs_t address, uint32_t &word);
+	bool drc_prefetch_after_store();
+	void drc_prefetch_fill(offs_t pc, const uint32_t *words, uint32_t count);
+	bool drc_prefetch_pending();
+	void drc_interpret_prefetched();
+	uint32_t drc_fetched_words(const opcode_desc *desc, fetched_word (&words)[3]);
+	bool drc_store_window(const compiler_state &compiler, offs_t pc, prefetch_window &window);
+	bool drc_note_window(const compiler_state &compiler, offs_t pc, prefetch_window &window);
+	bool drc_note_window(const compiler_state &compiler, offs_t pc) { prefetch_window window; return drc_note_window(compiler, pc, window); }
 	void drc_tlb_choose_base();
 	bool drc_tlb_fits(const void *host, uint32_t bytes) const;
 	uint64_t *drc_tlb_table(bool iswrite, bool user) const { return m_drc_tlb + ((iswrite ? 2 : 0) + (user ? 1 : 0)) * m_drc_tlb_size; }
@@ -389,7 +415,7 @@ protected:
 	bool code_compile_block(uint8_t mode, offs_t pc);
 	void static_generate_entry_point(drcuml_block &block);
 	void static_generate_nocode_handler(drcuml_block &block, int &label);
-	void static_generate_out_of_cycles(drcuml_block &block);
+	void static_generate_out_of_cycles(drcuml_block &block, int &label);
 	void static_generate_resync(drcuml_block &block, int &label);
 	void static_generate_slice_exact(drcuml_block &block);
 	void static_generate_shift_reg(drcuml_block &block, int &label, uint32_t type, const char *name, uml::code_handle *&handleptr);
@@ -400,11 +426,14 @@ protected:
 	uint32_t instruction_cycles_max(const opcode_desc *desc) const;
 	void generate_slice_check(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_flush_cycles(drcuml_block &block, compiler_state &compiler);
-	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param);
+	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, uml::code_handle *exit = nullptr);
 	void generate_validate_fetch(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	void generate_checksum_block(drcuml_block &block, compiler_state &compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
+	static bool fetched_before(const opcode_desc *store, offs_t address);
 	void generate_verify_chunk(drcuml_block &block, compiler_state &compiler, const opcode_desc *first, const opcode_desc *seqlast);
-	void generate_verify_word(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_verify_word(drcuml_block &block, offs_t physical, uint32_t word, uml::code_handle &miss, offs_t pc);
+	void generate_verify_fetched(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
+	void generate_window_check(drcuml_block &block, compiler_state &compiler, offs_t nextpc);
 	void drc_control_written(uint32_t data);
 	bool drc_static_control() const { return (m_drc_opt & DRC_OPT_CONTROL) && !debugger_enabled(); }
 	void generate_sequence_instruction(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
@@ -427,7 +456,7 @@ protected:
 	uml::parameter generate_operand2(drcuml_block &block, const opcode_desc *desc, uint32_t op, bool want_carry, uml::parameter &carry);
 	uml::parameter generate_shift_imm(drcuml_block &block, const opcode_desc *desc, uint32_t op, bool want_carry, uml::parameter &carry);
 	void generate_abort_check(drcuml_block &block, const opcode_desc *desc);
-	void generate_memory_end(drcuml_block &block, const opcode_desc *desc);
+	void generate_memory_end(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc);
 	bool generate_mem_address(drcuml_block &block, const opcode_desc *desc, uint32_t op, uml::parameter offset, bool load);
 	void generate_branch_end(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uml::code_label skip, uint32_t skip_cost, bool dynamic = false);
 	void generate_loaded_pc(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc, uml::code_label skip, bool interwork, bool accessed);
@@ -463,7 +492,10 @@ protected:
 	std::unordered_map<offs_t, uint32_t> m_drc_verify_misses;  // word check failures per address
 	std::unordered_set<offs_t> m_drc_volatile;  // instructions whose word keeps changing: the interpreter's, fetched as they run
 	std::unordered_map<offs_t, std::pair<uint32_t, uint32_t>> m_drc_prefetch;   // per ARM memory instruction (by the next address): the next two words as compiled
-	bool m_drc_prefetched;      // the interpreter's prefetch buffer holds words from before a change to the map
+	std::unordered_map<offs_t, prefetch_window> m_drc_window;   // per exit inside a store's prefetch window: the words fetched before it wrote
+	offs_t m_drc_control_next;  // after a control write that flushes the cache: the address after the MCR (~0 when none)
+	uint32_t m_drc_control_words[2];    // the words the prefetch had taken there, through the old translation
+	bool m_drc_prefetched;      // the interpreter's prefetch buffer holds words from before a store or a change to the map
 	bool m_drc_cache_dirty;
 	bool m_drc_fastram_stale;   // the address map changed since drc_check_fastram()
 	util::notifier_subscription m_drc_map_subscription;   // the address map changed: flush
@@ -476,12 +508,17 @@ protected:
 	uml::code_handle *m_entry_exact;
 	uml::code_handle *m_nocode;
 	uml::code_handle *m_nocode_verify;
+	uml::code_handle *m_nocode_window;          // the same, inside a store's prefetch window (core_state::window)
+	uml::code_handle *m_nocode_verify_window;
 	uml::code_handle *m_nocode_miss;
 	uml::code_handle *m_nocode_exact;
 	uml::code_handle *m_nocode_literal;
 	uml::code_handle *m_out_of_cycles;
+	uml::code_handle *m_out_of_cycles_window;
 	uml::code_handle *m_resync;
+	uml::code_handle *m_resync_window;
 	uml::code_handle *m_resync_next;
+	uml::code_handle *m_resync_next_window;
 	uml::code_handle *m_slice_exact;
 	uml::code_handle *m_shift_reg[4];   // LSL, LSR, ASR, ROR by a register
 	uml::code_handle *m_read8[2];       // [0] privileged, [1] user mode
@@ -760,7 +797,7 @@ public:
 	arm9_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness);
+	arm9_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t archRev, uint32_t archFlags, endianness_t endianness, address_map_constructor internal_map = address_map_constructor());
 };
 
 
@@ -792,7 +829,7 @@ public:
 	virtual uint32_t insn_fetch_word(offs_t addr) override;
 
 protected:
-	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+	arm946es_cpu_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map = address_map_constructor());
 
 	virtual const void *insn_fetch_ptr(offs_t addr) override;
 	virtual bool drc_memory_rotates_halfwords() const override { return false; }   // LDRH aligns the address and takes the halfword as it is
@@ -864,13 +901,6 @@ protected:
 	uint32_t m_vfp_regs[32] = {};
 	uint32_t m_fpscr = 0;
 	uint32_t m_fpexc = 0;
-};
-
-class igs036_cpu_device : public arm946es_cpu_device
-{
-public:
-	// construction/destruction
-	igs036_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class pxa250_cpu_device : public arm7_cpu_device
@@ -1056,6 +1086,5 @@ DECLARE_DEVICE_TYPE(SA110,        sa110_cpu_device)
 DECLARE_DEVICE_TYPE(SA110_BE,     sa110_be_cpu_device)
 DECLARE_DEVICE_TYPE(SA1100,       sa1100_cpu_device)
 DECLARE_DEVICE_TYPE(SA1110,       sa1110_cpu_device)
-DECLARE_DEVICE_TYPE(IGS036,       igs036_cpu_device)
 
 #endif // MAME_CPU_ARM7_ARM7_H

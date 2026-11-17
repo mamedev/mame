@@ -542,11 +542,12 @@ ROM_START( rusroul )
 	ROM_REGION( 0x10000, "oki", 0 )
 	ROM_LOAD( "3r.3r",    0x0000, 0x10000, CRC(7951189d) SHA1(82b6ab76989ed9f6cd6bc7219f3108d7d3a858f1) )
 
-	ROM_REGION( 0x800, "prom", 0 )
-	// FIXED BITS (00000xxx)
+	ROM_REGION( 0x100, "prom", 0 )
 	// BADADDR ---xxxxxxxx
-	// contains ball shaped GFXs, identical for every $100 bank
-	ROM_LOAD( "prom.6p",  0x000, 0x800, CRC(7d315248) SHA1(6834a72d45822cb2f6b801b7a4194cc262abb002) )
+	// ROM_LOAD( "prom.6p",  0x000, 0x800, CRC(7d315248) SHA1(6834a72d45822cb2f6b801b7a4194cc262abb002) )
+	// 256x4 TS (50) == 7114, trimmed manually
+	// FIXED BITS (00000xxx)
+	ROM_LOAD( "prom.6p", 0x000, 0x100, CRC(09af6a0a) SHA1(8f90d9bafe1a9e42ff6f8b00d90768a68401d523) )
 ROM_END
 
 ROM_START( vroulet )
@@ -561,8 +562,8 @@ ROM_START( vroulet )
 	ROM_REGION( 0x10000, "oki", ROMREGION_ERASEFF )
 
 	// TODO: unconfirmed for this set
-	ROM_REGION( 0x800, "prom", 0 )
-	ROM_LOAD( "prom.6p",  0x000, 0x800, BAD_DUMP CRC(7d315248) SHA1(6834a72d45822cb2f6b801b7a4194cc262abb002) )
+	ROM_REGION( 0x100, "prom", 0 )
+	ROM_LOAD( "prom.6p", 0x000, 0x100, BAD_DUMP CRC(09af6a0a) SHA1(8f90d9bafe1a9e42ff6f8b00d90768a68401d523) )
 ROM_END
 
 } // anonymous namespace

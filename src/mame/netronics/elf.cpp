@@ -6,17 +6,9 @@
 
 ****************************************************************************/
 
-/*
-
-    TODO:
-    - add cassette I/O
-
-*/
-
 #include "emu.h"
 #include "elf.h"
 #include "screen.h"
-#include "speaker.h"
 #include "elf2.lh"
 
 #define LOAD \
@@ -46,21 +38,25 @@ void elf2_state::data_w(uint8_t data)
 	m_led_h->a_w(data >> 4);
 }
 
+uint8_t elf2_state::memory_r(offs_t offset)
+{
+	return m_ram->pointer()[offset];
+}
+
 void elf2_state::memory_w(offs_t offset, uint8_t data)
 {
+	if (MEMORY_PROTECT)
+	{
+		/* latch data from memory */
+		data = m_ram->pointer()[offset];
+	}
+	else
+	{
+		m_ram->pointer()[offset] = data;
+	}
+
 	if (LOAD)
 	{
-		if (MEMORY_PROTECT)
-		{
-			/* latch data from memory */
-			data = m_ram->pointer()[offset];
-		}
-		else
-		{
-			/* write latched data to memory */
-			m_ram->pointer()[offset] = data;
-		}
-
 		/* write data to 7 segment displays */
 		m_led_l->a_w(data & 0x0f);
 		m_led_h->a_w(data >> 4);
@@ -72,8 +68,7 @@ void elf2_state::memory_w(offs_t offset, uint8_t data)
 void elf2_state::elf2_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map.global_mask(0xff);
-	// Ram is added dynamically
+	map(0x0000, 0x00ff).mirror(0xff00).rw(FUNC(elf2_state::memory_r), FUNC(elf2_state::memory_w));
 }
 
 void elf2_state::elf2_io(address_map &map)
@@ -169,12 +164,6 @@ void elf2_state::da_w(int state)
 
 void elf2_state::machine_start()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
-	/* setup memory banking */
-	program.install_rom(0x0000, 0x00ff, m_ram->pointer());
-	program.install_write_handler(0x0000, 0x00ff, write8sm_delegate(*this, FUNC(elf2_state::memory_w)));
-
 	/* register for state saving */
 	save_item(NAME(m_data));
 	save_item(NAME(m_sc));
@@ -206,8 +195,11 @@ void elf2_state::elf2(machine_config &config)
 	m_maincpu->wait_cb().set_ioport("SPECIAL").bit(1).invert();
 	m_maincpu->clear_cb().set_ioport("SPECIAL").bit(0);
 	m_maincpu->dma_in_cb().set([this]() { return m_dmain; });
-	m_maincpu->ef4_cb().set_ioport("SPECIAL").bit(3);
+	m_maincpu->ef2_cb().set(m_exp, FUNC(elf2_expansion_bus_device::ef2_r));
+	m_maincpu->ef3_cb().set(m_exp, FUNC(elf2_expansion_bus_device::ef3_r));
+	m_maincpu->ef4_cb().set([this]() { return BIT(m_special->read(), 3) | m_exp->ef4_r(); });
 	m_maincpu->q_cb().set_output("led0");
+	m_maincpu->q_cb().append(m_exp, FUNC(elf2_expansion_bus_device::q_w));
 	m_maincpu->dma_rd_cb().set(FUNC(elf2_state::data_r));
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
 	m_maincpu->sc_cb().set(FUNC(elf2_state::sc_w));
@@ -215,7 +207,7 @@ void elf2_state::elf2(machine_config &config)
 	m_maincpu->tpa_cb().set(m_vdc, FUNC(cdp1861_device::tpa_w));
 	m_maincpu->int_cb().set(m_vdc, FUNC(cdp1861_device::int_r));
 	m_maincpu->dma_out_cb().set(m_vdc, FUNC(cdp1861_device::dma_out_r));
-	m_maincpu->ef1_cb().set(m_vdc, FUNC(cdp1861_device::efx_r));
+	m_maincpu->ef1_cb().set([this]() { return m_vdc->efx_r() | m_exp->ef1_r(); });
 
 	/* video hardware */
 	config.set_default_layout(layout_elf2);
@@ -236,11 +228,14 @@ void elf2_state::elf2(machine_config &config)
 	DM9368(config, m_led_h).update_cb().set_output("digit0");
 	DM9368(config, m_led_l).update_cb().set_output("digit1");
 
-	SPEAKER(config, "mono").front_center();
-
-	CASSETTE(config, m_cassette);
-	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
-	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
+	ELF2_EXPANSION_BUS(config, m_exp);
+	m_exp->set_program_space(m_maincpu, AS_PROGRAM);
+	m_exp->set_io_space(m_maincpu, AS_IO);
+	ELF2_EXPANSION_SLOT(config, "slot1", m_exp, elf2_expansion_cards, "giant");
+	ELF2_EXPANSION_SLOT(config, "slot2", m_exp, elf2_expansion_cards, nullptr);
+	ELF2_EXPANSION_SLOT(config, "slot3", m_exp, elf2_expansion_cards, nullptr);
+	ELF2_EXPANSION_SLOT(config, "slot4", m_exp, elf2_expansion_cards, nullptr);
+	ELF2_EXPANSION_SLOT(config, "slot5", m_exp, elf2_expansion_cards, nullptr);
 
 	QUICKLOAD(config, "quickload", "bin").set_load_callback(FUNC(elf2_state::quickload_cb));
 

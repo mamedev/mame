@@ -30,6 +30,9 @@ public:
 	void portb_w(uint8_t data);
 	void rtcas_nmi_w(uint8_t data);
 	void iochck_w(int state);
+	// 80287/80387 ERROR#: latched onto IRQ13, a write to port F0h clears the latch
+	void fpu_error_w(int state);
+	void fpu_clear_w(uint8_t data);
 
 	void shutdown(int state);
 
@@ -65,6 +68,8 @@ private:
 	uint8_t m_at_speaker = 0;
 	uint8_t m_channel_check = 0;
 	uint8_t m_nmi_enabled = 0;
+	uint8_t m_fpu_error = 0;
+	uint8_t m_fpu_irq = 0;
 
 	void pit8254_out2_changed(int state);
 

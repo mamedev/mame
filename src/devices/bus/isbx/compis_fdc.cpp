@@ -79,7 +79,12 @@ void compis_fdc_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 compis_fdc_device::compis_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, COMPIS_FDC, tag, owner, clock),
+	compis_fdc_device(mconfig, COMPIS_FDC, tag, owner, clock)
+{
+}
+
+compis_fdc_device::compis_fdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_isbx_card_interface(mconfig, *this),
 	m_fdc(*this, I8272_TAG),
 	m_floppy(*this, I8272_TAG":%u", 0U)

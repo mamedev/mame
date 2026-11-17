@@ -422,6 +422,7 @@ void k056832_device::create_tilemaps()
 		m_pixmap[i] = &tmap->pixmap();
 
 		tmap->set_transparent_pen(0);
+		m_page_pen_split[i] = -1;
 	}
 }
 
@@ -1401,25 +1402,25 @@ void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bit
 	if (flipy)
 		sdat_adv = -sdat_adv;
 
-	/*
+#if 0
 	if (scrollmode == 2)
 	{
-	    printf("%08x    %08x    %08x\n",layer,scrollbank<<12,m_lsram_page[layer][1]>>1);
-	    printf("\n000-100:\n");
-	    for (int zz=0x000; zz<0x100; zz++)
-	        printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-	    printf("\n100-200:\n");
-	    for (int zz=0x100; zz<0x200; zz++)
-	        printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-	    printf("\n200-300:\n");
-	    for (int zz=0x200; zz<0x300; zz++)
-	        printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-	    printf("\n300-400:\n");
-	    for (int zz=0x300; zz<0x400; zz++)
-	        printf("%04x    ",m_videoram[(scrollbank<<12)+(m_lsram_page[layer][1]>>1)+zz]);
-	    printf("\nend\n");
+		printf("%08x    %08x    %08x\n", layer, scrollbank << 12, m_lsram_page[layer][1] >> 1);
+		printf("\n000-100:\n");
+		for (int zz = 0x000; zz < 0x100; zz++)
+			printf("%04x    ", m_videoram[(scrollbank << 12) + (m_lsram_page[layer][1] >> 1) + zz]);
+		printf("\n100-200:\n");
+		for (int zz = 0x100; zz < 0x200; zz++)
+			printf("%04x    ", m_videoram[(scrollbank << 12) + (m_lsram_page[layer][1] >> 1) + zz]);
+		printf("\n200-300:\n");
+		for (int zz = 0x200; zz < 0x300; zz++)
+			printf("%04x    ", m_videoram[(scrollbank << 12) + (m_lsram_page[layer][1] >> 1) + zz]);
+		printf("\n300-400:\n");
+		for (int zz = 0x300; zz < 0x400; zz++)
+			printf("%04x    ", m_videoram[(scrollbank << 12) + (m_lsram_page[layer][1] >> 1) + zz]);
+		printf("\nend\n");
 	}
-	*/
+#endif
 
 	last_active = m_active_layer;
 	new_colorbase = (m_k055555 != nullptr) ? m_k055555->K055555_get_palette_index(layer) : 0;
@@ -1657,6 +1658,28 @@ void k056832_device::tilemap_draw_common(screen_device &screen, BitmapClass &bit
 void k056832_device::tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority, u8 priority_mask)
 {
 	tilemap_draw_common(screen, bitmap, cliprect, layer, flags, priority, priority_mask);
+}
+
+// Split each layer's pens between tilemap layers 0 and 1 (Konami GX's K055555 COLPRI)
+u8 k056832_device::set_pen_split(const int (&threshold)[4], const u8 (&penmask)[4])
+{
+	u8 split_layers = 0;
+	for (int i = 0; i < K056832_PAGE_COUNT; i++)
+	{
+		const int layer = m_layer_association ? m_layer_assoc_with_page[i] : -1;
+		const s32 split = (layer >= 0 && threshold[layer] >= 0) ? ((penmask[layer] << 8) | threshold[layer]) : -1;
+		if (split >= 0)
+			split_layers |= 1 << layer;
+		if (split == m_page_pen_split[i])
+			continue;
+		m_page_pen_split[i] = split;
+		for (pen_t pen = 1; pen < 256; pen++)
+		{
+			const bool back = split >= 0 && int(pen & penmask[layer]) <= threshold[layer];
+			m_tilemap[i]->map_pen_to_layer(0, pen, back ? TILEMAP_PIXEL_LAYER1 : TILEMAP_PIXEL_LAYER0);
+		}
+	}
+	return split_layers;
 }
 
 void k056832_device::tilemap_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, u32 flags, u32 priority, u8 priority_mask)

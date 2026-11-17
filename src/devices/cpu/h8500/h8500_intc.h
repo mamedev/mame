@@ -59,6 +59,7 @@ public:
 
 	// h8_intc_base
 	virtual void internal_interrupt(int vector) override;
+	virtual void clear_interrupt(int vector) override;
 
 	int interrupt_taken(int vector);
 	void set_input(int inputnum, int state);

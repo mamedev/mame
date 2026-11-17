@@ -7,11 +7,26 @@ TAB Austria "Silverball" PC-based touch games
 The Hardlock ASIC keys were recovered from the protected software. No dongle was dumped, so
 the EEPROM contents are reconstructed; original serial numbers and options are unknown.
 
+Windows (95?) setup first checks I/O Controller from UPDATE1.EXE (a DOS program), then boots Windows
+and loads UPDATE2.EXE (where it checks PnP from sound card and dongle functionality from LPT3).
+
+For Bulova sets, Windows is 3.1 (so you need to mash CTRL+C at autoexec.bat time for probing the
+dumps)
+
 TODO:
 - Silverball I/O controller and sound card.
 - i440zx BIOSes crashes when writing Flash ROM sequences at PC=61C51 onward (by saving in CMOS).
 - slvrball806: crashes in vmm32.vxd loading, doesn't check the dongle, -chs mismatch with the
   comment. Commented out for now;
+- has the usual trio64 bugs once it actually enters in Windows;
+- slvrball720: will throw a Windows crash in German around update2.exe, has extra .DLLs failures
+  in Safe Mode, dump is bad (requires manually repairing them thru a Recovery disk);
+- slvrball632: throws "No Silverball soundcard", does PnP talk at $77a, afterwards will try to
+  ping dongle at LPT3 ($3bc-$3bf) failing in the process;
+- slvrballbu409: "No sound card found", does a different kind of PnP check than above, has
+  Chips & Technologies VGA driver loaded in Win 3.1;
+- slvrballbu409b: "TAB Blaster / No sound card found", uses $73xx'xxxx for some kind of data
+  (graphics or work RAM?);
 
 ===================================================================================================
 
@@ -21,9 +36,12 @@ Motherboard: Soyo 5EAS / Soyo SY-7IZB+ / Acorp 694XT-694XT1 / others
 Intel Pentium-S CPU 133 MHz (A80502133)
 
 MicroTouch (external)
-ESS AudioDrive ES1869FC ISA sound card
+ESS AudioDrive ES1869FC ISA sound card (PnP compliant)
 S3 Trio64V2/DX PCI VGA (86C775, 512KB RAM)
 I/O Controller Silverball 3 (ISA card, Actel A40MX04-F PL84, DB50 external connector)
+RTL8139D PCI card (seen on 8.xx configs)
+TODO: the VIA mobo has 1 ISA slot only
+Does it expect a PCI based sound card rather than the AudioDrive?
 
 HDD Samsung Maxtor G1021U2 or other IDE HDD with similar capacity.
 
@@ -52,6 +70,66 @@ SiS 5600/SiS 5595 is a Slot 1 Pentium II MB, the earlier version of what is in s
 #include "machine/w83977tf.h"
 
 #include <array>
+
+/*
+ * ISA8 I/O Controller Silverball 3
+ *
+ * Actmel A40MX04-F on a single DB50 connector, what's on the other end needs figuring out ...
+ *
+ */
+
+class isa8_ioc_silverball : public device_t, public device_isa8_card_interface
+{
+public:
+	// construction/destruction
+	isa8_ioc_silverball(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	void remap(int space_id, offs_t start, offs_t end) override;
+private:
+	u8 read(offs_t offset);
+	void write(offs_t offset, u8 data);
+};
+
+DEFINE_DEVICE_TYPE(ISA8_IOC_SILVERBALL, isa8_ioc_silverball, "isa8_ioc_silverball", "ISA16 Silverball I/O Controller")
+
+isa8_ioc_silverball::isa8_ioc_silverball(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, ISA8_IOC_SILVERBALL, tag, owner, clock)
+	, device_isa8_card_interface(mconfig, *this)
+{
+}
+
+void isa8_ioc_silverball::device_start()
+{
+	set_isa_device();
+}
+
+void isa8_ioc_silverball::device_reset()
+{
+}
+
+void isa8_ioc_silverball::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x0300, 0x0307, read8sm_delegate(*this, FUNC(isa8_ioc_silverball::read)), write8sm_delegate(*this, FUNC(isa8_ioc_silverball::write)));
+	}
+}
+
+// TODO: enough to make it pass the initial check and nothing else
+u8 isa8_ioc_silverball::read(offs_t offset)
+{
+	logerror("I/O Controller R %02x\n", offset + 0x300);
+	return 0;
+}
+
+void isa8_ioc_silverball::write(offs_t offset, u8 data)
+{
+	logerror("I/O Controller W %02x %02x\n", offset + 0x300, data);
+}
 
 namespace {
 
@@ -147,6 +225,7 @@ static void isa_internal_devices(device_slot_interface &device)
 {
 	// TODO: additional Winbond W83782M for HW monitoring
 	device.option_add("w83977tf", W83977TF);
+	device.option_add("ioc", ISA8_IOC_SILVERBALL);
 }
 
 void silverball_state::i440zx_superio_config(device_t *device)
@@ -192,7 +271,7 @@ void silverball_state::silverball_i440zx(machine_config &config)
 
 	PCI_ROOT(config, "pci");
 	// i440ZX (BX equivalent)
-	// TODO: unknown RAM size
+	// TODO: unknown RAM size, PCI config space is unverified
 	I82443BX_HOST(config, "pci:00.0", "maincpu", 32*1024*1024);
 	I82443BX_BRIDGE(config, "pci:01.0", 0 ); //"pci:01.0:00.0");
 	//I82443BX_AGP   (config, "pci:01.0:00.0");
@@ -218,10 +297,12 @@ void silverball_state::silverball_i440zx(machine_config &config)
 
 	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", isa_internal_devices, "w83977tf", true).set_option_machine_config("w83977tf", i440zx_superio_config);
-	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", isa_internal_devices, "ioc", true);
 	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	PCI_SLOT(config, "pci:1", pci_cards, 14, 0, 1, 2, 3, "trio64dx");
+	PCI_SLOT(config, "pci:1", pci_cards,  9, 0, 1, 2, 3, "trio64dx");
+	PCI_SLOT(config, "pci:2", pci_cards, 10, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 11, 2, 3, 0, 1, nullptr);
 }
 
 void silverball_state::silverball632_i440zx(machine_config &config)
@@ -317,7 +398,8 @@ ROM_START(slvrball720)
 	ROM_DEFAULT_BIOS("bios33")
 
 	DISK_REGION( PCI_IDE_ID":ide1:0:hdd" )
-	DISK_IMAGE("silverball_7.20", 0, BAD_DUMP SHA1(008d0146b579793f9ba2aa2e43ffa7ec1401f752)) // May contain operator data
+	// baddump: May contain operator data, check header notes
+	DISK_IMAGE("silverball_7.20", 0, BAD_DUMP SHA1(008d0146b579793f9ba2aa2e43ffa7ec1401f752))
 ROM_END
 
 ROM_START(slvrball632)
@@ -355,9 +437,10 @@ ROM_END
 
 GAME(199?, slvrball, 0, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball BIOS", MACHINE_NOT_WORKING | MACHINE_IS_BIOS_ROOT )
 
-//GAME(1997?, slvrball806,    slvrball, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
-GAME(1997?, slvrball720,    slvrball, silverball720_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_NOT_WORKING)
-GAME(1997?, slvrball632,    slvrball, silverball632_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_NOT_WORKING)
+// years from "VERSION" in HDD root filestamp
+//GAME(200?, slvrball806,    slvrball, silverball_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (8.01)",               MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING)
+GAME(2002, slvrball720,    slvrball, silverball720_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (7.20)",               MACHINE_NOT_WORKING)
+GAME(2001, slvrball632,    slvrball, silverball632_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball (6.32)",               MACHINE_NOT_WORKING)
 
-GAME(199?,  slvrballbu409,  slvrball,      silverballbu_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_NOT_WORKING)
-GAME(199?,  slvrballbu409b, slvrballbu409, silverballbu_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_NOT_WORKING) // Probably the same as set 1
+GAME(1999,  slvrballbu409,  slvrball,      silverballbu_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 1)", MACHINE_NOT_WORKING)
+GAME(1999,  slvrballbu409b, slvrballbu409, silverballbu_i440zx, 0, silverball_state, empty_init, ROT0, "TAB Austria", "Silverball Bulova (4.09, set 2)", MACHINE_NOT_WORKING) // Windows 3.1 loaded with different HW drivers

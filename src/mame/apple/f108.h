@@ -34,20 +34,26 @@ public:
 		m_ncr1.lookup()->irq_handler_cb().set(m_primetimeii, FUNC(primetime_device::scsi_irq_w));
 		m_ncr1.lookup()->drq_handler_cb().set(m_primetimeii, FUNC(primetime_device::scsi_drq_w));
 	}
+	void set_scsi_clock(const XTAL &clock) { m_ncr1.lookup()->set_clock(clock); }
 	template <typename... T> void set_rom_tag(T &&... args) { m_rom.set_tag(std::forward<T>(args)...); }
 	void set_ram_info(u32 *ram, u32 size);
+	void set_scc_sync(bool sync) { m_scc_sync = sync; }
 
 	auto write_ata_irq() { return m_ata_irq.bind(); }
+
+	void overlay_off();
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	u32 rom_switch_r(offs_t offset);
 
 private:
+	void update_overlay();
 	void ata_irq_w(int state);
 	u8 ata_timing_r(offs_t offset);
 	void ata_timing_w(offs_t offset, u8 data);
@@ -68,6 +74,7 @@ private:
 	devcb_write_line m_ata_irq;
 
 	bool m_overlay;
+	bool m_scc_sync;
 	u8 m_ata_active, m_ata_recovery;
 	u32 *m_ram_ptr, *m_rom_ptr;
 	u32 m_ram_size, m_rom_size;

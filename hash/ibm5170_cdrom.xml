@@ -4051,10 +4051,14 @@ https://mametesters.org/view.php?id=9334
 	</software>
 
 	<!-- https://redump.info/disc/114360/ -->
-	<software name="fulltilt">
+	<software name="fulltilt" supported="partial">
 		<description>Full Tilt! Pinball (version 1.1)</description>
 		<year>1996</year>
 		<publisher>Maxis</publisher>
+		<notes><![CDATA[
+[pc_joy] right trigger doesn't work regardless of where it's mapped.
+A ct486 win95 CD install went "C:" prompt failure after rebooting (retest, verify)
+]]></notes>
 		<info name="developer" value="Cinematronics" />
 		<info name="release" value="19960319" />
 		<info name="required_os" value="Windows 3.1/95" />
@@ -4987,11 +4991,15 @@ Untested multiplayer options
 		</part>
 	</software>
 
+	<!-- TODO: move this either near Duke Nukem 3D or in Collection section -->
 	<software name="killaton">
 		<description>Duke Nukem 3D: Kill-A-Ton Collection</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
-		<info name="developer" value="3D Realms / Game Wizards / Sunstorm Interactive" />
+		<!-- TODO: acknowledge who developed what thru parenthesis notes -->
+		<info name="developer" value="3D Realms" />
+		<info name="developer" value="Game Wizards" />
+		<info name="developer" value="Sunstorm Interactive" />
 		<info name="language" value="English" />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Duke Nukem 1 / Duke Nukem 2 / Duke Nukem 3D / Plutonium Pak / Level Editor" />
@@ -5966,7 +5974,7 @@ https://www.pcgamingwiki.com/wiki/Primal_Rage
 		<publisher>GT Interactive</publisher>
 		<notes><![CDATA[
 Untested multiplayer options
-Looks too dark on s3_764 (verify)
+Looks too dark, needs bumped brightness (verify)
 ]]></notes>
 		<info name="developer" value="id Software" />
 		<info name="language" value="English" />

@@ -24,6 +24,9 @@ public:
 
 	auto rnb_wr_callback() { return m_write_rnb.bind(); }
 
+	// Initial contents supplied by a removable image, before NVRAM is loaded.
+	void set_rom(const uint8_t *data, uint32_t size) { m_rom = data; m_rom_size = size; }
+
 	int is_present();
 	int is_protected();
 	int is_busy();
@@ -66,7 +69,13 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	void begin_read();
+	TIMER_CALLBACK_MEMBER(read_complete);
+
 	optional_memory_region m_region;
+	const uint8_t *m_rom;
+	uint32_t m_rom_size;
+	emu_timer *m_read_timer;
 
 	uint32_t m_page_data_size;       // 256 for a 2MB card, 512 otherwise
 	uint32_t m_page_total_size;      // 264 for a 2MB card, 528 otherwise
@@ -182,6 +191,27 @@ class toshiba_tc58256aft_device : public nand_device
 {
 public:
 	toshiba_tc58256aft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	toshiba_tc58256aft_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+};
+
+class toshiba_tc58128ft_device : public nand_device
+{
+public:
+	toshiba_tc58128ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class toshiba_tc58256ft_device : public toshiba_tc58256aft_device
+{
+public:
+	toshiba_tc58256ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class toshiba_tc58512ft_device : public nand_device
+{
+public:
+	toshiba_tc58512ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class generalplus_gpr27p512a : public nand_device
@@ -217,6 +247,9 @@ DECLARE_DEVICE_TYPE(HYNIX_HY27UF084G2M, hynix_hy27uf084g2m_device)
 DECLARE_DEVICE_TYPE(HYNIX_H27UAG8T2A, hynix_h27uag8t2a_device)
 DECLARE_DEVICE_TYPE(TOSHIBA_TC58V64BFT, toshiba_tc58v64bft_device)
 DECLARE_DEVICE_TYPE(TOSHIBA_TC58256AFT, toshiba_tc58256aft_device)
+DECLARE_DEVICE_TYPE(TOSHIBA_TC58128FT, toshiba_tc58128ft_device)
+DECLARE_DEVICE_TYPE(TOSHIBA_TC58256FT, toshiba_tc58256ft_device)
+DECLARE_DEVICE_TYPE(TOSHIBA_TC58512FT, toshiba_tc58512ft_device)
 DECLARE_DEVICE_TYPE(GENERALPLUS_GPR27P512A, generalplus_gpr27p512a)
 DECLARE_DEVICE_TYPE(SANDISK_NAND_128MB_512_DEVICE, sandisk_nand_128mb_512_device)
 DECLARE_DEVICE_TYPE(SANDISK_NAND_256MB_512_DEVICE, sandisk_nand_256mb_512_device)

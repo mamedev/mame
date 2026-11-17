@@ -676,8 +676,9 @@ template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispat
 template<int HighBits, int Width, int AddrShift> void handler_entry_write_dispatch<HighBits, Width, AddrShift>::init_handlers(offs_t start_entry, offs_t end_entry, u32 lowbits, offs_t ostart, offs_t oend, handler_entry_write<Width, AddrShift> **dispatch, handler_entry::range *ranges)
 {
 	if(lowbits < LowBits) {
-		offs_t entry = start_entry >> LowBits;
-		if(entry != (end_entry >> LowBits))
+		// The incoming indices have already been shifted by lowbits.
+		offs_t entry = start_entry >> (LowBits - lowbits);
+		if(entry != (end_entry >> (LowBits - lowbits)))
 		   fatalerror("Recursive init_handlers spanning multiple entries.\n");
 		entry &= BITMASK;
 		handler_entry_write_dispatch<LowBits, Width, AddrShift> *subdispatch;

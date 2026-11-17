@@ -33,7 +33,6 @@
     Some type of link feature?
   - Other games in jinhulu2_state have machine translated DIP definitions which
     could use improving and hopper isn't implemented yet.
-  - xjinhuang and jinhuang2 need correct GFX decode.
 
 ***************************************************************************/
 
@@ -205,6 +204,8 @@ private:
 	uint8_t igs003e_r();
 	void igs003e_w(uint8_t data);
 
+	void decrypt_gfx() ATTR_COLD;
+
 	void program_map(address_map &map) ATTR_COLD;
 	void portmap(address_map &map) ATTR_COLD;
 };
@@ -347,9 +348,10 @@ void spokeru_state::video_start()
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(spokeru_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
-void xjinhuang_state::video_start() // TODO
+void xjinhuang_state::video_start()
 {
 	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(xjinhuang_state::get_fg_tile_info)), TILEMAP_SCAN_ROWS, 8, 8, 128, 32);
+	m_fg_tilemap->set_transparent_pen(0);
 }
 
 void jinhulu2_state::video_start()
@@ -1768,6 +1770,22 @@ static GFXDECODE_START( gfx_3super8 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, layout_8x32x6,   0, 16 )
 GFXDECODE_END
 
+static const gfx_layout layout_xjinhuang_8x8x6 =
+{
+	8, 8,
+	RGN_FRAC(1, 3),
+	6,
+	{ RGN_FRAC(0,3)+8, RGN_FRAC(1,3)+8, RGN_FRAC(2,3)+8,
+		RGN_FRAC(0,3)+0, RGN_FRAC(1,3)+0, RGN_FRAC(2,3)+0 },
+	{ STEP8(0,1) },
+	{ STEP8(0,2*8) },
+	8*8*2
+};
+
+static GFXDECODE_START( gfx_xjinhuang )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, layout_xjinhuang_8x8x6, 0, 16 )
+GFXDECODE_END
+
 static const gfx_layout layout_8x8x4 =
 {
 	8, 8,
@@ -1880,6 +1898,10 @@ void xjinhuang_state::xjinhuang(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &xjinhuang_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &xjinhuang_state::portmap);
+
+	m_screen->set_visarea(0, 512-8-1, 0, 256-16-1);
+
+	m_gfxdecode->set_info(gfx_xjinhuang);
 
 	config.device_remove("ppi8255_0");
 	config.device_remove("ppi8255_1");
@@ -2511,9 +2533,6 @@ ROM_START( xjinhuang )
 	ROM_LOAD( "u45.u45", 0x40000, 0x40000, CRC(cb78683e) SHA1(6b74c36fde6f0be2c0da1861db031c0294271a42) )
 	ROM_LOAD( "u44.u44", 0x80000, 0x40000, CRC(9ea4bf06) SHA1(300c9d1b2ccfe96580d0c4015bc4c22e21f04941) )
 
-	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL( 0x0000, 0x30000, 0xff ) // filling the whole bank
-
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "u34.u34", 0x00000, 0x40000, CRC(1250998d) SHA1(57f81bc6661f1cfe94fd44ccf8b7bdd064521816) )
 ROM_END
@@ -2527,9 +2546,6 @@ ROM_START( jinhuang2 )
 	ROM_LOAD( "u46.u46", 0x00000, 0x40000, CRC(705d345e) SHA1(1073c9f0222c976f4c5b490e4cf244d4f8d59ad0) )
 	ROM_LOAD( "u45.u45", 0x40000, 0x40000, CRC(5d911ae4) SHA1(ce28cc6304cdc31a1de24e4b9f268a083a9614ef) )
 	ROM_LOAD( "u44.u44", 0x80000, 0x40000, CRC(1547e04d) SHA1(7052402e41aabc949d860791cbf95c242d1852e7) )
-
-	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_FILL( 0x0000, 0x30000, 0xff ) // filling the whole bank
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "sp.u34", 0x00000, 0x40000, CRC(1250998d) SHA1(57f81bc6661f1cfe94fd44ccf8b7bdd064521816) ) // same as xjinhuang
@@ -2753,6 +2769,29 @@ void spoker_state::init_spk120in()
 	}
 }
 
+// the GFX data lines are XORed with each other between the ROMs and the video chip
+void xjinhuang_state::decrypt_gfx()
+{
+	uint8_t *gfx = memregion("gfx1")->base();
+
+	for (int i = 0; i < 0x40000; i += 2)
+	{
+		uint8_t const a0 = gfx[0x80000 + i]; // u44
+		uint8_t const a1 = gfx[0x80001 + i];
+		uint8_t const b0 = gfx[0x40000 + i]; // u45
+		uint8_t const b1 = gfx[0x40001 + i];
+		uint8_t const c0 = gfx[0x00000 + i]; // u46
+		uint8_t const c1 = gfx[0x00001 + i];
+
+		gfx[0x80000 + i] = (a0 & 0xf0) | ((a0 ^ (a0 >> 4)) & 0x0f);
+		gfx[0x80001 + i] = ((a1 ^ a0) & 0xf0) | ((a1 ^ b0) & 0x0f);
+		gfx[0x40000 + i] = ((b0 ^ (b0 << 4)) & 0xf0) | (b0 & 0x0f);
+		gfx[0x40001 + i] = ((b1 ^ (b1 << 4) ^ c0) & 0xf0) | (b1 & 0x0f);
+		gfx[0x00000 + i] = (c0 & 0xf0) | ((c0 ^ (c0 >> 4)) & 0x0f);
+		gfx[0x00001 + i] = (c1 & 0xf0) | ((c1 ^ (c1 >> 4) ^ (c0 >> 4)) & 0x0f);
+	}
+}
+
 void xjinhuang_state::init_jinhuang2()
 {
 	uint8_t *rom = memregion("maincpu")->base();
@@ -2763,6 +2802,8 @@ void xjinhuang_state::init_jinhuang2()
 		if ((a & 0x04a0) != 0x04a0) rom[a] ^= 0x02;
 		if ((a & 0x1208) == 0x1208) rom[a] ^= 0x01;
 	}
+
+	decrypt_gfx();
 }
 
 void xjinhuang_state::init_xjinhuang()
@@ -2776,6 +2817,15 @@ void xjinhuang_state::init_xjinhuang()
 		if ((a & 0x1208) == 0x1208) rom[a] ^= 0x02;
 		if (((a & 0x0101) == 0x0101) || ((a & 0x05a1) == 0x05a0) || ((a & 0x05a0) == 0x04a0)) rom[a] ^= 0x01;
 	}
+
+	// the GFX ROMs' address lines are scrambled compared to jinhuang2
+	uint8_t *gfx = memregion("gfx1")->base();
+	std::vector<uint8_t> buffer(&gfx[0], &gfx[0xc0000]);
+
+	for (int i = 0; i < 0xc0000; i++)
+		gfx[i] = buffer[(i & 0xc0000) | bitswap<18>(i, 0, 16, 15, 14, 17, 12, 11, 13, 9, 8, 7, 10, 5, 4, 6, 3, 1, 2)];
+
+	decrypt_gfx();
 }
 
 void spoker_state::init_3super8()
@@ -2840,8 +2890,8 @@ GAME( 1996,  spk114it,      spk306us, spoker,   spk114it, spoker_state,   init_s
 GAME( 1996,  spk102ua,      spk306us, spokeru,  spk102ua, spokeru_state,  init_spokeru,       ROT0,  "IGS",       "Super Poker (v102UA)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk102u,       spk306us, spoker,   spk102ua, spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v102U)",                        MACHINE_SUPPORTS_SAVE )
 GAME( 1996,  spk100,        spk306us, spoker,   spk100,   spoker_state,   init_spk100,        ROT0,  "IGS",       "Super Poker (v100)",                         MACHINE_SUPPORTS_SAVE )
-GAME( 1997,  xjinhuang,     0,        xjinhuang,jinhulu2, xjinhuang_state,init_xjinhuang,     ROT0,  "IGS",       "Xin Jin Huangguan (V400CN)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
-GAME( 1997,  jinhuang2,     0,        xjinhuang,jinhulu2, xjinhuang_state,init_jinhuang2,     ROT0,  "IGS",       "Jin Huangguan II (V310CN)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // wrong GFX decode, memory map incomplete
+GAME( 1997,  xjinhuang,     0,        xjinhuang,jinhulu2, xjinhuang_state,init_xjinhuang,     ROT0,  "IGS",       "Xin Jin Huangguan (V400CN)",                 MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // memory map incomplete
+GAME( 1997,  jinhuang2,     0,        xjinhuang,jinhulu2, xjinhuang_state,init_jinhuang2,     ROT0,  "IGS",       "Jin Huangguan II (V310CN)",                  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // memory map incomplete
 GAME( 1993?, 3super8,       0,        _3super8, 3super8,  spoker_state,   init_3super8,       ROT0,  "<unknown>", "3 Super 8 (Italy)",                          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // ROMs are badly dumped
 GAME( 1997,  jbell,         0,        jb,       jb,       jb_state,       init_spokeru,       ROT0,  "IGS",       "Jingle Bell (v200US, alternative hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jinhulu2,      0,        jinhulu2, jinhulu2, jinhulu2_state, init_jinhulu2,      ROT0,  "IGS",       "Jin Hu Lu II (v412GS)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // tries to link to something?

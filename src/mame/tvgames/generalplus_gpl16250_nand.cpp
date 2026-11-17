@@ -947,6 +947,18 @@ CONS(2013, jak_duck, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplu
 CONS(2013, jak_swc,  0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / Merge Interactive",   "Star Wars: Clone Trooper (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS(2014, jak_wdbg, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init_32mb, "JAKKS Pacific, Inc. / Super Happy Fun Fun", "The Walking Dead: Battleground (JAKKS Pacific TV Game)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
+// Main board marked "NEEPCB#2789A"
+// - U1: ST Microelectronics N009013
+// - U2: Unknown IC (connected to U3 and U4, ROM build path strings suggest GPL16238B unSP2.0 CPU)
+// - U3: ASL(?) AVS641604L-6TE (8 MB DRAM)
+// - U4: Generalplus GPR27P512A-006A (64 MB NAND Flash)
+// - U6: FT24C08A (1 KB SEEPROM)
+// - Y1: Crystal marked "32768"
+// - Y2: Crystal marked "HDF6.000"
+// - Infrared sensor
+// Button board marked "NEEPCB#2789BR1 / 2010-5-31"
+// Barcode reader board marked "NEEPCB#2789C / 20100506"
+CONS(2010?, behero, 0, 0, generalplus_gpac800_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init, "Giochi Preziosi", "Be Hero - Be your legend (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ----------------------------------------------------
 // these all use RAM up to 2fff
@@ -963,16 +975,3 @@ CONS(200?, vbaby,   0, 0, generalplus_gpl16258vb_nand128mbyte_2048_vbaby, jak_ca
 CONS(200?, tiviboo, 0, 0, generalplus_gpl16258vb_nand128mbyte_2048,       jak_car2, generalplus_gpac800_game_state,       nand_vbaby,    "VTech", "Tivi Boo (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 CONS(200?, kiugames, 0, 0, generalplus_gpl16258vb_nand512mbyte_2048, jak_car2, generalplus_gpac800_game_state, nand_kiugames, "VideoJet", "Kiu Games", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // probably has other names in English too? menus don't appear to be in German
-
-// Main board marked "NEEPCB#2789A"
-// - U1: ST Microelectronics N009013
-// - U2: Unknown IC (connected to U3 and U4, ROM build path strings suggest GPL16238B unSP2.0 CPU)
-// - U3: ASL(?) AVS641604L-6TE (8 MB DRAM)
-// - U4: Generalplus GPR27P512A-006A (64 MB NAND Flash)
-// - U6: FT24C08A (1 KB SEEPROM)
-// - Y1: Crystal marked "32768"
-// - Y2: Crystal marked "HDF6.000"
-// - Infrared sensor
-// Button board marked "NEEPCB#2789BR1 / 2010-5-31"
-// Barcode reader board marked "NEEPCB#2789C / 20100506"
-CONS(2010?, behero, 0, 0, generalplus_gpl16238b_nand64mbyte, jak_car2, generalplus_gpac800_game_state, nand_init, "Giochi Preziosi", "Be Hero - Be your legend (Italy)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

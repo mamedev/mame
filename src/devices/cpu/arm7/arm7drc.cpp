@@ -158,11 +158,10 @@ void arm7_cpu_device::device_stop()
 
 void arm7_cpu_device::execute_run_drc()
 {
-	// the words prefetched before a change to the map run first, from the interpreter's buffer
+	// the words prefetched before a store or a change to the map run first, from the interpreter's buffer
 	if (m_drc_prefetched)
 	{
-		m_drc_prefetched = false;
-		execute_run_interpreter();
+		drc_interpret_prefetched();
 		return;
 	}
 
@@ -189,11 +188,15 @@ void arm7_cpu_device::execute_run_drc()
 		{
 			const uint8_t mode = m_core->mode | (m_core->exact_miss ? DRC_MODE_EXACT : 0);
 			m_core->exact_miss = 0;
+
+			// a store changed words the prefetch had already taken: they run as they were (before a flush forgets them)
+			const bool prefetched = drc_prefetch_after_store();
 			if (m_core->verify_miss)
 			{
-				// a word that keeps changing (BBC BASIC's SYS stub) is fetched and interpreted as it runs
+				// a word that keeps changing (BBC BASIC's SYS stub) is fetched and interpreted as it runs, but not one
+				// the prefetch took before a store wrote
 				m_core->verify_miss = 0;
-				if (++m_drc_verify_misses[m_r[eR15]] == DRC_VOLATILE_MISSES)
+				if (!prefetched && ++m_drc_verify_misses[m_r[eR15]] == DRC_VOLATILE_MISSES)
 				{
 					m_drc_volatile.insert(m_r[eR15]);
 					code_flush_cache();
@@ -205,6 +208,17 @@ void arm7_cpu_device::execute_run_drc()
 				m_core->literal_miss = 0;
 				m_drc_nofold.insert(m_r[eR15]);
 				code_flush_cache();
+			}
+			if (prefetched)
+			{
+				if (m_core->icount <= 0)
+				{
+					m_drc_prefetched = true;    // the next slice starts with them
+					break;
+				}
+				drc_r15_to_interp();
+				drc_interpret_prefetched();
+				return;
 			}
 			// nothing to compile (the last word of the address space): the interpreter takes the slice
 			if (!code_compile_block(mode, m_r[eR15]))
@@ -221,6 +235,7 @@ void arm7_cpu_device::execute_run_drc()
 		else if (result == EXECUTE_RESET_CACHE)
 		{
 			// this CPU remapped: if its prefetched words differ now, the interpreter runs the rest of the slice
+			m_core->window = 0;     // the words from before the remap cover a store's
 			const bool prefetched = drc_prefetch_after_remap();
 			code_flush_cache();
 			m_drc_cache_dirty = false;
@@ -233,7 +248,7 @@ void arm7_cpu_device::execute_run_drc()
 					break;
 				}
 				drc_r15_to_interp();
-				execute_run_interpreter();
+				drc_interpret_prefetched();
 				return;
 			}
 			if (m_core->icount <= 0)
@@ -242,6 +257,12 @@ void arm7_cpu_device::execute_run_drc()
 			}
 		}
 	} while (result != EXECUTE_OUT_OF_CYCLES);
+
+	// the slice ended right after a store that changed words the prefetch had taken: the next slice runs them
+	if (result == EXECUTE_OUT_OF_CYCLES && drc_prefetch_after_store())
+	{
+		m_drc_prefetched = true;
+	}
 
 	drc_r15_to_interp();
 	m_tlb_log = 0;
@@ -253,42 +274,224 @@ bool arm7_cpu_device::drc_prefetch_after_remap()
 {
 	const bool next = m_core->resync_next != 0;
 	m_core->resync_next = 0;
-	if (!next || m_insn_prefetch_depth != 3)
-	{
-		return false;
-	}
-	const auto found = m_drc_prefetch.find(m_r[eR15]);
-	if (found == m_drc_prefetch.end())
-	{
-		return false;
-	}
-	const offs_t pc = m_r[eR15];
-	const auto [word0, word1] = found->second;
 
-	// a word behind a handler isn't read (the read could have side effects) and counts as different
-	const auto same = [this] (offs_t address, uint32_t word)
+	// after the MCR that changed the control register, the words drc_control_written() kept (the interpreter
+	// fell through to them); after an ARM memory instruction, its next two words as compiled
+	const bool control = m_drc_control_next == m_r[eR15];
+	m_drc_control_next = ~offs_t(0);
+	if (m_insn_prefetch_depth != 3)
 	{
-		offs_t physical = address;
-		if ((m_control & COPRO_CTRL_MMU_EN) && !translate_vaddr_to_paddr(physical, 0))
+		return false;
+	}
+	uint32_t words[2];
+	if (control)
+	{
+		words[0] = m_drc_control_words[0];
+		words[1] = m_drc_control_words[1];
+	}
+	else
+	{
+		const auto found = next ? m_drc_prefetch.find(m_r[eR15]) : m_drc_prefetch.end();
+		if (found == m_drc_prefetch.end())
 		{
 			return false;
 		}
-		const void *const host = insn_fetch_ptr(physical);
-		return host && *reinterpret_cast<const uint32_t *>(host) == word;
+		words[0] = found->second.first;
+		words[1] = found->second.second;
+	}
+
+	// a word that doesn't translate or is behind a handler counts as different
+	const auto same = [this] (offs_t address, uint32_t word)
+	{
+		uint32_t now;
+		return drc_host_word(address, now) && (now == word);
 	};
-	if (same(pc, word0) && same(pc + 4, word1))
+	if (same(m_r[eR15], words[0]) && same(m_r[eR15] + 4, words[1]))
+	{
+		return false;
+	}
+	drc_prefetch_fill(m_r[eR15], words, 2);
+	return true;
+}
+
+
+// the word at address through the translation now; false when it doesn't translate or is behind a handler (the read
+// could have side effects)
+bool arm7_cpu_device::drc_host_word(offs_t address, uint32_t &word)
+{
+	offs_t physical = address;
+	if ((m_control & COPRO_CTRL_MMU_EN) && !translate_vaddr_to_paddr(physical, 0))
+	{
+		return false;
+	}
+	const void *const host = insn_fetch_ptr(physical);
+	if (!host)
+	{
+		return false;
+	}
+	word = *reinterpret_cast<const uint32_t *>(host);
+	return true;
+}
+
+
+// true when the exit was inside a store's prefetch window (core_state::window) and the store changed the words the
+// prefetch had taken before it wrote: they are queued to run, as the interpreter would have run them
+bool arm7_cpu_device::drc_prefetch_after_store()
+{
+	const bool window = m_core->window != 0;
+	m_core->window = 0;
+	if (!window || m_insn_prefetch_depth != 3)
+	{
+		return false;
+	}
+	const auto found = m_drc_window.find(m_r[eR15]);
+	if (found == m_drc_window.end())
 	{
 		return false;
 	}
 
+	// read where the check before the store read them (a remap would have flushed the cache); most slices end here
+	const prefetch_window &words = found->second;
+	for (uint32_t i = 0; i < words.count; i++)
+	{
+		if ((words.host[i] ? *words.host[i] : insn_fetch_word(words.physical[i])) != words.word[i])
+		{
+			drc_prefetch_fill(m_r[eR15], words.word, words.count);
+			return true;
+		}
+	}
+	return false;
+}
+
+
+// the words from pc's on go to the interpreter's prefetch buffer
+void arm7_cpu_device::drc_prefetch_fill(offs_t pc, const uint32_t *words, uint32_t count)
+{
+	const offs_t base = pc & ~offs_t(3);
 	m_insn_prefetch_index = 0;
-	m_insn_prefetch_count = 2;
-	m_insn_prefetch_buffer[0] = word0;
-	m_insn_prefetch_address[0] = pc;
-	m_insn_prefetch_valid[0] = true;
-	m_insn_prefetch_buffer[1] = word1;
-	m_insn_prefetch_address[1] = pc + 4;
-	m_insn_prefetch_valid[1] = true;
+	m_insn_prefetch_count = count;
+	for (uint32_t i = 0; i < count; i++)
+	{
+		m_insn_prefetch_buffer[i] = words[i];
+		m_insn_prefetch_address[i] = base + 4 * i;
+		m_insn_prefetch_valid[i] = true;
+	}
+}
+
+
+// true when the interpreter's prefetch buffer holds a word for R15 that memory no longer holds (generated code would
+// fetch it again)
+bool arm7_cpu_device::drc_prefetch_pending()
+{
+	const offs_t pc = GET_PC & ~offs_t(3);
+	if (m_insn_prefetch_count == 0 || m_insn_prefetch_address[m_insn_prefetch_index] != pc)
+	{
+		return false;   // the interpreter would fetch afresh too
+	}
+	for (uint32_t i = 0; i < m_insn_prefetch_count; i++)
+	{
+		const uint32_t index = (m_insn_prefetch_index + i) % m_insn_prefetch_depth;
+		offs_t physical = m_insn_prefetch_address[index];
+		if (!m_insn_prefetch_valid[index] || ((m_control & COPRO_CTRL_MMU_EN) && !translate_vaddr_to_paddr(physical, 0)))
+		{
+			return true;    // its prefetch abort is the interpreter's
+		}
+		if (insn_fetch_word(physical) != m_insn_prefetch_buffer[index])
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+// the interpreter runs a slice from its prefetch buffer (words from before a store or a remap), and the next one too
+// if the slice ended before it ran them all
+void arm7_cpu_device::drc_interpret_prefetched()
+{
+	m_drc_prefetched = false;
+	execute_run_interpreter();
+	m_drc_prefetched = drc_prefetch_pending();
+}
+
+
+// the words the prefetch holds when desc runs, its own through its PC+8, as compiled; past an instruction the interpreter
+// runs (the description ends there) they are read now, within a 1 KiB page
+uint32_t arm7_cpu_device::drc_fetched_words(const opcode_desc *desc, fetched_word (&words)[3])
+{
+	uint32_t count = 0;
+	offs_t want = desc->pc & ~offs_t(3);
+	const opcode_desc *last = nullptr;
+	for (const opcode_desc *next = desc; next != nullptr && count < 3; next = next->next())
+	{
+		// only the words run in sequence; one fetched as it runs ends them
+		if (last && (next->pc != last->pc + last->length || last->is_unconditional_branch()))
+		{
+			break;
+		}
+		if (next->compiler_page_fault() || m_drc_volatile.count(next->pc))
+		{
+			return count;
+		}
+		last = next;
+		if ((next->pc & ~offs_t(3)) == want)
+		{
+			words[count++] = { want, next->physpc & ~offs_t(3), next->opword };
+			want += 4;
+		}
+	}
+
+	// under the debugger the harnesses log every fetch, and nothing runs after a branch or an exception
+	if (count < 3 && last && !drc_generates(*last) && !last->is_unconditional_branch() && !last->will_cause_exception() && !debugger_enabled())
+	{
+		const offs_t lastword = last->pc & ~offs_t(3);
+		const offs_t lastphysical = last->physpc & ~offs_t(3);
+		while (count < 3 && ((want ^ last->pc) & ~offs_t(0x3ff)) == 0)
+		{
+			const offs_t physical = lastphysical + (want - lastword);
+			words[count++] = { want, physical, insn_fetch_word(physical) };
+			want += 4;
+		}
+	}
+	return count;
+}
+
+
+// the words from pc's on that the prefetch took before the sequence's last store wrote (through the store's PC+8), as
+// compiled and verified before the store ran; false when pc is past them or they are not in the block
+bool arm7_cpu_device::drc_store_window(const compiler_state &compiler, offs_t pc, prefetch_window &window)
+{
+	window.count = 0;
+	const opcode_desc *const store = compiler.store;
+	if (store == nullptr || !(m_drcoptions & DRC_STRICT_VERIFY))
+	{
+		return false;   // without STRICT_VERIFY the words after the head aren't verified, so nothing is known of them
+	}
+	fetched_word words[3];
+	const uint32_t count = drc_fetched_words(store, words);
+	const offs_t base = store->pc & ~offs_t(3);
+	for (uint32_t i = 0; i < count; i++)
+	{
+		if ((words[i].address - base) >= ((pc & ~offs_t(3)) - base))
+		{
+			window.word[window.count] = words[i].word;
+			window.physical[window.count] = words[i].physical;
+			window.host[window.count] = reinterpret_cast<const uint32_t *>(insn_fetch_ptr(words[i].physical));
+			window.count++;
+		}
+	}
+	return window.count != 0;
+}
+
+
+// the same, kept for the exit at pc (drc_prefetch_after_store()): true when the exit is inside the window
+bool arm7_cpu_device::drc_note_window(const compiler_state &compiler, offs_t pc, prefetch_window &window)
+{
+	if (!drc_store_window(compiler, pc, window))
+	{
+		return false;
+	}
+	m_drc_window[pc] = window;
 	return true;
 }
 
@@ -473,11 +676,19 @@ void arm7_cpu_device::drc_tlb_flush_mva(offs_t mva)
 }
 
 
-// the MMU, DATA32 and late-abort bits are compiled in, so a change to them flushes the cache
+// the MMU, DATA32 and late-abort bits are compiled in, so a change to them flushes the cache; the two words after the
+// MCR were prefetched through the old translation and run next if they differ (drc_prefetch_after_remap()): the
+// word after the MCR that enables the MMU is fetched flat (the Psion Series 7 boot ROM jumps to its virtual address there)
 void arm7_cpu_device::drc_control_written(uint32_t data)
 {
 	if (((data ^ m_control) & (COPRO_CTRL_MMU_EN | COPRO_CTRL_DATA32 | COPRO_CTRL_LATE_ABORT)) != 0)
 	{
+		// R15 is the MCR's address until the handler returns; m_control is still the old value
+		const offs_t next = (GET_PC & ~offs_t(3)) + 4;
+		if (m_isdrc && drc_host_word(next, m_drc_control_words[0]) && drc_host_word(next + 4, m_drc_control_words[1]))
+		{
+			m_drc_control_next = next;
+		}
 		drc_remapped();
 	}
 }
@@ -548,9 +759,17 @@ void arm7_cpu_device::interpret_slice()
 
 void arm7_cpu_device::func_check_irq()
 {
+	const offs_t pc = m_r[eR15];
 	drc_r15_to_interp();
 	arm7_check_irq_state();
 	drc_r15_from_interp();
+
+	// an exception taken refills the prefetch: nothing fetched before the access runs
+	if (m_r[eR15] != pc)
+	{
+		m_core->resync_next = 0;
+		m_core->window = 0;
+	}
 }
 
 static void cfunc_check_irq(void *param)
@@ -767,6 +986,8 @@ void arm7_cpu_device::code_flush_cache()
 {
 	m_drcuml.reset();
 	m_drc_prefetch.clear();
+	m_drc_window.clear();
+	m_drc_control_next = ~offs_t(0);   // an interpreted slice made the control write and ran the words itself
 	m_drc_verify_misses.clear();
 	drc_check_fastram();
 	drc_tlb_choose_base();
@@ -780,7 +1001,7 @@ void arm7_cpu_device::code_flush_cache()
 
 			static_generate_entry_point(block);
 			static_generate_nocode_handler(block, label);
-			static_generate_out_of_cycles(block);
+			static_generate_out_of_cycles(block, label);
 			static_generate_resync(block, label);
 			static_generate_slice_exact(block);
 			static_generate_shift_reg(block, label, 0, "shift_lsl", m_shift_reg[0]);
@@ -867,6 +1088,7 @@ bool arm7_cpu_device::code_compile_block(uint8_t mode, offs_t pc)
 			for (const opcode_desc *seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
 				compiler.seqhead = seqhead;
+				compiler.store = nullptr;   // entered from anywhere: the prefetch is filled afresh
 				if (m_drcuml.logging())
 				{
 					block.append_comment("-------------------------");
@@ -934,6 +1156,18 @@ bool arm7_cpu_device::code_compile_block(uint8_t mode, offs_t pc)
 					{
 						UML_TEST(block, mem(&m_core->stop), ~uint32_t(0));         // test    stop,~0
 						UML_EXHc(block, uml::COND_NZ, *m_resync, mem(&m_r[eR15])); // exh     resync,<r15>,nz
+
+						// going on in sequence inside a store's prefetch window
+						const offs_t nextpc = seqlast->pc + seqlast->length;
+						prefetch_window window;
+						if (drc_store_window(compiler, nextpc, window))
+						{
+							const code_label branched = compiler.labelnum++;
+							UML_CMP(block, mem(&m_r[eR15]), nextpc);                // cmp     r15,nextpc
+							UML_JMPc(block, uml::COND_NE, branched);                // jmp     branched,ne
+							generate_window_check(block, compiler, nextpc);
+							UML_LABEL(block, branched);                             // branched:
+						}
 					}
 					generate_update_cycles(block, compiler, mem(&m_r[eR15]));
 					generate_hashjmp_dynamic(block);
@@ -942,6 +1176,7 @@ bool arm7_cpu_device::code_compile_block(uint8_t mode, offs_t pc)
 				{
 					// fall through to the next instruction, through the hash table unless it follows in this block
 					const uint32_t nextpc = seqlast->return_to_start() ? pc : (seqlast->pc + seqlast->length);
+					generate_window_check(block, compiler, nextpc);
 					generate_update_cycles(block, compiler, nextpc);
 					if (seqlast->can_change_modes())
 					{
@@ -1020,11 +1255,24 @@ void arm7_cpu_device::static_generate_entry_point(drcuml_block &block)
 // RECOVER only works from a site inside a block, so only the handlers raised in a sequence recover cycles
 void arm7_cpu_device::static_generate_nocode_handler(drcuml_block &block, int &label)
 {
-	// raised within a sequence: the cycles so far are owed, and a failed word check counts towards volatile code
+	// raised within a sequence: the cycles so far are owed, and a failed word check counts towards volatile code; the
+	// _window forms are raised inside a store's prefetch window, where words fetched before the store may have to run
 	const code_label owed = label++;
+	const code_label verify = label++;
+	alloc_handle(m_drcuml, m_nocode_verify_window, "nocode_verify_window");
+	UML_HANDLE(block, *m_nocode_verify_window);                                 // handle  nocode_verify_window
+	UML_MOV(block, mem(&m_core->window), 1);                                    // mov     window,1
+	UML_JMP(block, verify);                                                     // jmp     verify
+
 	alloc_handle(m_drcuml, m_nocode_verify, "nocode_verify");
 	UML_HANDLE(block, *m_nocode_verify);                                        // handle  nocode_verify
+	UML_LABEL(block, verify);                                                   // verify:
 	UML_MOV(block, mem(&m_core->verify_miss), 1);                               // mov     verify_miss,1
+	UML_JMP(block, owed);                                                       // jmp     owed
+
+	alloc_handle(m_drcuml, m_nocode_window, "nocode_window");
+	UML_HANDLE(block, *m_nocode_window);                                        // handle  nocode_window
+	UML_MOV(block, mem(&m_core->window), 1);                                    // mov     window,1
 	UML_JMP(block, owed);                                                       // jmp     owed
 
 	alloc_handle(m_drcuml, m_nocode, "nocode");
@@ -1063,10 +1311,18 @@ void arm7_cpu_device::static_generate_nocode_handler(drcuml_block &block, int &l
 }
 
 
-void arm7_cpu_device::static_generate_out_of_cycles(drcuml_block &block)
+void arm7_cpu_device::static_generate_out_of_cycles(drcuml_block &block, int &label)
 {
+	// the _window form leaves inside a store's prefetch window (drc_prefetch_after_store())
+	const code_label common = label++;
+	alloc_handle(m_drcuml, m_out_of_cycles_window, "out_of_cycles_window");
+	UML_HANDLE(block, *m_out_of_cycles_window);                                 // handle  out_of_cycles_window
+	UML_MOV(block, mem(&m_core->window), 1);                                    // mov     window,1
+	UML_JMP(block, common);                                                     // jmp     common
+
 	alloc_handle(m_drcuml, m_out_of_cycles, "out_of_cycles");
 	UML_HANDLE(block, *m_out_of_cycles);                                        // handle  out_of_cycles
+	UML_LABEL(block, common);                                                   // common:
 	UML_GETEXP(block, I0);                                                      // getexp  i0
 	UML_MOV(block, mem(&m_r[eR15]), I0);                                        // mov     r15,i0
 	UML_EXIT(block, EXECUTE_OUT_OF_CYCLES);                                     // exit    EXECUTE_OUT_OF_CYCLES
@@ -1076,15 +1332,30 @@ void arm7_cpu_device::static_generate_out_of_cycles(drcuml_block &block)
 // leaves a sequence after a memory access: charges the cycles, takes a pending exception, handles a remap
 void arm7_cpu_device::static_generate_resync(drcuml_block &block, int &label)
 {
-	// resync_next continues in sequence, so a remap runs the words the interpreter had prefetched
+	// resync_next continues in sequence, so a remap runs the words the interpreter had prefetched; the _window forms
+	// leave inside a store's prefetch window, where the slice's end runs the words fetched before the store
 	const code_label common = label++;
+	const code_label next = label++;
+	const code_label plain = label++;
+	alloc_handle(m_drcuml, m_resync_next_window, "resync_next_window");
+	UML_HANDLE(block, *m_resync_next_window);                                   // handle  resync_next_window
+	UML_MOV(block, mem(&m_core->window), 1);                                    // mov     window,1
+	UML_JMP(block, next);                                                       // jmp     next
+
 	alloc_handle(m_drcuml, m_resync_next, "resync_next");
 	UML_HANDLE(block, *m_resync_next);                                          // handle  resync_next
+	UML_LABEL(block, next);                                                     // next:
 	UML_MOV(block, mem(&m_core->resync_next), 1);                               // mov     resync_next,1
 	UML_JMP(block, common);                                                     // jmp     common
 
+	alloc_handle(m_drcuml, m_resync_window, "resync_window");
+	UML_HANDLE(block, *m_resync_window);                                        // handle  resync_window
+	UML_MOV(block, mem(&m_core->window), 1);                                    // mov     window,1
+	UML_JMP(block, plain);                                                      // jmp     plain
+
 	alloc_handle(m_drcuml, m_resync, "resync");
 	UML_HANDLE(block, *m_resync);                                               // handle  resync
+	UML_LABEL(block, plain);                                                    // plain:
 	UML_MOV(block, mem(&m_core->resync_next), 0);                               // mov     resync_next,0
 	UML_LABEL(block, common);                                                   // common:
 	UML_GETEXP(block, I0);                                                      // getexp  i0
@@ -1107,6 +1378,10 @@ void arm7_cpu_device::static_generate_resync(drcuml_block &block, int &label)
 	UML_LABEL(block, kept);                                                     // kept:
 	UML_CMP(block, mem(&m_core->icount), 0);                                    // cmp     icount,0
 	UML_EXHc(block, uml::COND_LE, *m_out_of_cycles, mem(&m_r[eR15]));           // exh     out_of_cycles,<r15>,le
+
+	// going on in the generated code (an abort was taken): no prefetched word waits for the C++ side
+	UML_MOV(block, mem(&m_core->resync_next), 0);                               // mov     resync_next,0
+	UML_MOV(block, mem(&m_core->window), 0);                                    // mov     window,0
 	generate_hashjmp_dynamic(block);                                            // hashjmp <mode>,<r15>,nocode_miss
 }
 
@@ -1667,13 +1942,13 @@ void arm7_cpu_device::generate_flush_cycles(drcuml_block &block, compiler_state 
 }
 
 
-void arm7_cpu_device::generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param)
+void arm7_cpu_device::generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, uml::code_handle *exit)
 {
 	if (compiler.cycles > 0)
 	{
 		UML_SUB(block, mem(&m_core->icount), mem(&m_core->icount), MAPVAR_CYCLES);          // sub     icount,icount,cycles
 		UML_MAPVAR(block, MAPVAR_CYCLES, 0);                                    // mapvar  cycles,0
-		UML_EXHc(block, uml::COND_LE, *m_out_of_cycles, param);                      // exh     out_of_cycles,param,le
+		UML_EXHc(block, uml::COND_LE, exit ? *exit : *m_out_of_cycles, param);       // exh     out_of_cycles,param,le
 	}
 	compiler.cycles = 0;
 }
@@ -1773,14 +2048,32 @@ void arm7_cpu_device::generate_checksum_block(drcuml_block &block, compiler_stat
 	{
 		generate_verify_chunk(block, compiler, seqhead, seqlast);
 	}
+	else if (m_drcoptions & DRC_STRICT_VERIFY)
+	{
+		generate_verify_fetched(block, compiler, seqhead);
+	}
 	else
 	{
-		generate_verify_word(block, compiler, seqhead);
+		if (!m_drc_volatile.count(seqhead->pc))
+		{
+			generate_verify_word(block, seqhead->physpc & ~offs_t(3), seqhead->opword, *m_nocode_verify, seqhead->pc);
+		}
 	}
 }
 
 
-// checks the words up to and including the first store or loop branch; the rest are checked after it
+// The prefetch takes a word while the instruction 8 bytes before it runs, so a store can't change the words through its
+// PC+8 (the Classic NES Series test this): they are checked before the store, and the words after them once it has run.
+
+// true when the word at address was fetched before store wrote (it lies within store's PC+8)
+bool arm7_cpu_device::fetched_before(const opcode_desc *store, offs_t address)
+{
+	return store && ((address & ~offs_t(3)) - (store->pc & ~offs_t(3))) <= 8;
+}
+
+
+// checks the words up to and including the first store or loop branch, and the store's prefetch; the rest are checked
+// after it
 void arm7_cpu_device::generate_verify_chunk(drcuml_block &block, compiler_state &compiler, const opcode_desc *first, const opcode_desc *seqlast)
 {
 	// a loader writing just past itself would otherwise fail the check on every turn of its loop
@@ -1789,19 +2082,23 @@ void arm7_cpu_device::generate_verify_chunk(drcuml_block &block, compiler_state 
 		return desc->is_conditional_branch() && desc->targetpc != BRANCH_TARGET_DYNAMIC && desc->targetpc <= desc->pc;
 	};
 
-	// each word once (two Thumb instructions share one); a page that couldn't be fetched ends the sequence
+	// each word once (two Thumb instructions share one), except those fetched before the store just run
 	std::vector<std::pair<offs_t, uint32_t>> words;
+	const auto add = [&compiler, &words] (offs_t address, offs_t physical, uint32_t word)
+	{
+		if (!fetched_before(compiler.store, address) && (words.empty() || words.back().first != physical))
+		{
+			words.emplace_back(physical, word);
+		}
+	};
+
+	// a page that couldn't be fetched ends the sequence; volatile code is fetched as it runs (it ends its sequence)
 	const opcode_desc *last = first;
 	for (const opcode_desc *desc = first; desc != nullptr && !desc->compiler_page_fault(); desc = desc->next())
 	{
-		const offs_t waddr = desc->physpc & ~offs_t(3);
-		if (m_drc_volatile.count(desc->pc))
+		if (!m_drc_volatile.count(desc->pc))
 		{
-			// fetched as it runs: nothing to check (it ends its sequence)
-		}
-		else if (words.empty() || words.back().first != waddr)
-		{
-			words.emplace_back(waddr, desc->opword);
+			add(desc->pc & ~offs_t(3), desc->physpc & ~offs_t(3), desc->opword);
 		}
 		last = desc;
 		if (desc == seqlast || desc->writes_memory() || loop_end(desc))
@@ -1809,11 +2106,25 @@ void arm7_cpu_device::generate_verify_chunk(drcuml_block &block, compiler_state 
 			break;
 		}
 	}
+
+	// a store's prefetch takes the words through its PC+8 (into the next sequence too) before it writes
+	if (last->writes_memory())
+	{
+		fetched_word fetched[3];
+		const uint32_t count = drc_fetched_words(last, fetched);
+		for (uint32_t i = 0; i < count; i++)
+		{
+			add(fetched[i].address, fetched[i].physical, fetched[i].word);
+		}
+	}
 	compiler.verify_next = (last != seqlast && (last->writes_memory() || loop_end(last))) ? last->next() : nullptr;
 	if (words.empty())
 	{
 		return;
 	}
+
+	// after a store, inside its prefetch window, a failed check may still run the words it fetched (drc_note_window())
+	uml::code_handle &miss = drc_note_window(compiler, first->pc) ? *m_nocode_verify_window : *m_nocode_verify;
 
 	// read in place or through the bus; a memory_bank switch isn't notified, but no ARM driver runs code from one
 	std::vector<const uint8_t *> hosts;
@@ -1826,7 +2137,7 @@ void arm7_cpu_device::generate_verify_chunk(drcuml_block &block, compiler_state 
 		{
 			UML_READ(block, I0, waddr, SIZE_DWORD, SPACE_PROGRAM);              // read    i0,waddr,dword
 			UML_CMP(block, I0, word);                                           // cmp     i0,word
-			UML_EXHc(block, uml::COND_NE, *m_nocode_verify, first->pc);         // exh     nocode_verify,pc,ne
+			UML_EXHc(block, uml::COND_NE, miss, first->pc);                     // exh     nocode_verify,pc,ne
 		}
 	}
 
@@ -1870,32 +2181,75 @@ void arm7_cpu_device::generate_verify_chunk(drcuml_block &block, compiler_state 
 	{
 		UML_DCMP(block, I0, sum);                                               // dcmp    i0,sum
 	}
-	UML_EXHc(block, uml::COND_NE, *m_nocode_verify, first->pc);                 // exh     nocode_verify,pc,ne
+	UML_EXHc(block, uml::COND_NE, miss, first->pc);                             // exh     nocode_verify,pc,ne
 }
 
 
-void arm7_cpu_device::generate_verify_word(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
+// checks the word at physical, leaving through miss with pc
+void arm7_cpu_device::generate_verify_word(drcuml_block &block, offs_t physical, uint32_t word, uml::code_handle &miss, offs_t pc)
 {
-	// the other half of a word already verified, or volatile code, fetched as it runs
-	const offs_t waddr = desc->physpc & ~offs_t(3);
-	if (waddr == compiler.verified || m_drc_volatile.count(desc->pc))
-	{
-		return;
-	}
-	compiler.verified = waddr;
-
 	// read in place or through the bus; a memory_bank switch isn't notified, but no ARM driver runs code from one
-	const void *const host = insn_fetch_ptr(waddr);
+	const void *const host = insn_fetch_ptr(physical);
 	if (host)
 	{
 		UML_LOAD(block, I0, host, 0, SIZE_DWORD, SCALE_x4);                     // load    i0,[word],0,dword
 	}
 	else
 	{
-		UML_READ(block, I0, waddr, SIZE_DWORD, SPACE_PROGRAM);                  // read    i0,waddr,dword
+		UML_READ(block, I0, physical, SIZE_DWORD, SPACE_PROGRAM);               // read    i0,waddr,dword
 	}
-	UML_CMP(block, I0, desc->opword);                                           // cmp     i0,word
-	UML_EXHc(block, uml::COND_NE, *m_nocode_verify, desc->pc);                  // exh     nocode_verify,pc,ne
+	UML_CMP(block, I0, word);                                                   // cmp     i0,word
+	UML_EXHc(block, uml::COND_NE, miss, pc);                                    // exh     nocode_verify,pc,ne
+}
+
+
+// DRC_OPT_SUMS off: before an instruction runs, the words fetched by then (through its PC+8) are checked, each as the
+// prefetch takes it, so a store is checked against only the words fetched after it
+void arm7_cpu_device::generate_verify_fetched(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
+{
+	// the sequence's words are checked in order: those through compiler.verified are done
+	const offs_t base = compiler.seqhead->pc & ~offs_t(3);
+	const auto done = [&compiler, base] (offs_t vaddr)
+	{
+		return compiler.verified != ~offs_t(0) && (vaddr - base) <= (compiler.verified - base);
+	};
+
+	// the words through PC+8 not checked yet
+	fetched_word fetched[3];
+	const uint32_t count = drc_fetched_words(desc, fetched);
+	uint32_t first = 0;
+	while (first < count && done(fetched[first].address))
+	{
+		first++;
+	}
+	if (first == count)
+	{
+		return;
+	}
+	compiler.verified = fetched[count - 1].address;
+
+	// after a store, inside its prefetch window, a failed check may still run the words it fetched (drc_note_window())
+	uml::code_handle &miss = drc_note_window(compiler, desc->pc) ? *m_nocode_verify_window : *m_nocode_verify;
+	for (uint32_t i = first; i < count; i++)
+	{
+		generate_verify_word(block, fetched[i].physical, fetched[i].word, miss, desc->pc);
+	}
+}
+
+
+// going on in sequence at nextpc, still inside the last store's prefetch window: if the store changed a word fetched
+// before it wrote, the words run from the interpreter's prefetch buffer as compiled (drc_prefetch_after_store())
+void arm7_cpu_device::generate_window_check(drcuml_block &block, compiler_state &compiler, offs_t nextpc)
+{
+	prefetch_window window;
+	if (!drc_note_window(compiler, nextpc, window))
+	{
+		return;
+	}
+	for (uint32_t i = 0; i < window.count; i++)
+	{
+		generate_verify_word(block, window.physical[i], window.word[i], *m_nocode_window, nextpc);
+	}
 }
 
 
@@ -1916,10 +2270,16 @@ void arm7_cpu_device::generate_sequence_instruction(drcuml_block &block, compile
 		return;
 	}
 
-	// without DRC_OPT_SUMS each word is checked as it runs (the head's with the sequence)
+	// without DRC_OPT_SUMS each word is checked as the prefetch takes it (the head's with the sequence)
 	if ((m_drcoptions & DRC_STRICT_VERIFY) && !(m_drc_opt & DRC_OPT_SUMS))
 	{
-		generate_verify_word(block, compiler, desc);
+		generate_verify_fetched(block, compiler, desc);
+	}
+
+	// the words fetched so far run as they are, whatever a store writes over them
+	if (desc->writes_memory())
+	{
+		compiler.store = desc;
 	}
 
 	// memory accesses and the interpreter see the time the cycles so far make
@@ -1971,7 +2331,8 @@ void arm7_cpu_device::generate_sequence_instruction(drcuml_block &block, compile
 	// an exact copy charges after every instruction as the interpreter does (the last with the sequence)
 	if (compiler.exact && !desc->end_sequence())
 	{
-		generate_update_cycles(block, compiler, desc->pc + desc->length);
+		const offs_t nextpc = desc->pc + desc->length;
+		generate_update_cycles(block, compiler, nextpc, drc_note_window(compiler, nextpc) ? m_out_of_cycles_window : m_out_of_cycles);
 	}
 }
 

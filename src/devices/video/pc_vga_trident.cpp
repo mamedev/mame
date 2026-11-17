@@ -554,6 +554,8 @@ void trident_vga_device::sequencer_map(address_map &map)
 
 void trident_vga_device::device_start()
 {
+	// TODO: subclass from parent, don't mimic the same stuff
+	// (for starter this disallows being able to control current video mode from debugger ...)
 	zero();
 
 	for (int i = 0; i < 0x100; i++)

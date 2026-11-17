@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "bus/abckb/abckb.h"
-#include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
 #include "cpu/m68000/m68010.h"
 #include "formats/abc1600_dsk.h"
@@ -379,7 +378,7 @@ uint8_t x37_state::cio_pc_r()
 	uint8_t data = 0x0d;
 
 	// data in
-	data |= (m_rtc->dio_r() || m_nvram->do_read()) << 1;
+	data |= (m_rtc->dio_r() && m_nvram->do_read()) << 1;
 
 	return data;
 }
@@ -533,7 +532,7 @@ void x37_state::x37(machine_config &config)
 
 	EEPROM_93C06_16BIT(config, m_nvram);
 
-	E0516(config, m_rtc, XTAL(32'768));
+	E0516(config, m_rtc, XTAL(32'768)).set_use_utc(true);
 	m_rtc->outsel_rd_cb().set_constant(0);
 
 	INPUT_MERGER_ANY_HIGH(config, "irq4").output_handler().set_inputline(m_cpu, M68K_IRQ_4);
@@ -626,7 +625,7 @@ ROM_START( x37 )
 	ROM_LOAD( "x37.07o", 0x0000, 0x8000, CRC(d505e7e7) SHA1(a3ad839e47b1f71c394e5ce28bce199e5e4810d2) )
 
 	ROM_REGION16_LE( 0x20, NMC9306_TAG, 0 )
-	ROM_LOAD( "nmc9306.05k", 0x00, 0x20, CRC(2a7d409a) SHA1(1bf82daa877c65fae65ebff6181fb7ed5a874797) )
+	ROM_LOAD( "nmc9306.05k", 0x00, 0x20, CRC(45f13641) SHA1(18d313185f25b493fe8299ddbeab92533375031b) )
 
 	ROM_REGION( 0xa28, "plds", 0 )
 	//ROM_LOAD( "pat8000", 0x000, 0x104, NO_DUMP ) // Strobe decoder for X35 video adapter
@@ -645,4 +644,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP( 1985, x37, 0,      0,      x37, x37, x37_state, empty_init, "Luxor", "X37 (prototype)", MACHINE_SUPPORTS_SAVE )
+COMP( 1985, x37, 0, 0, x37, x37, x37_state, empty_init, "Luxor", "X37 (prototype)", MACHINE_SUPPORTS_SAVE )

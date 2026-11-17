@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="trs80m16_hdd" description="Tandy TRS-80 Model 16 hard disk images">
+
+	<software name="trsxenix">
+		<description>TRS-XENIX v01.03.05</description>
+		<year>1984</year>
+		<publisher>Tandy</publisher>
+		<info name="usage" value="Requires the hdi card (-slot6 hdi)" />
+		<sharedfeat name="slot5_default" value="256k"/>
+
+		<!-- Tandon TM503 -->
+		<part name="hdd" interface="st506_hdd">
+			<diskarea name="harddriv">
+				<disk name="trsxenix" sha1="ba10c3006f9c028eeedf5f364f850fbe6e362b6a" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -39,6 +39,7 @@
 #define LOG_ENET       (1U << 2)
 #define LOG_SND        (1U << 3)
 #define LOG_DSP        (1U << 4)
+#define LOG_FDC        (1U << 5)
 
 #define VERBOSE (0)
 #define LOG_OUTPUT_FUNC osd_printf_info
@@ -122,7 +123,6 @@ void psc_device::map(address_map &map)
 	map(0x00f0'0000, 0x00f0'1fff).rw(FUNC(psc_device::mac_via_r), FUNC(psc_device::mac_via_w));
 	map(0x00f0'2000, 0x00f0'3fff).rw(FUNC(psc_device::mac_via2_r), FUNC(psc_device::mac_via2_w));
 	map(0x00f2'a090, 0x00f2'a093).r(FUNC(psc_device::scc_fake_r));
-	map(0x00f2'a100, 0x00f2'a103).r(FUNC(psc_device::newage_fake_r));
 	map(0x00f3'1000, 0x00f3'2fff).rw(FUNC(psc_device::psc_regs_r), FUNC(psc_device::psc_regs_w));
 
 	map(0x00f3'1c00, 0x00f3'1c6f).rw(FUNC(psc_device::dma_ctrl_r), FUNC(psc_device::dma_ctrl_w));
@@ -203,6 +203,12 @@ psc_device::psc_device(const machine_config &mconfig, const char *tag, device_t 
 	m_enet_rx_drq(false),
 	m_enet_rx_offset(0),
 	m_enet_rx_status(0),
+	m_fdc(*this, finder_base::DUMMY_TAG),
+	m_fdc_timer(nullptr),
+	m_fdc_drq(false),
+	m_fdc_servicing(false),
+	m_fdc_fifo(0),
+	m_fdc_fifo_count(0),
 	m_space(*this, finder_base::DUMMY_TAG, -1),
 	m_ncr(nullptr),
 	m_dsp(*this, finder_base::DUMMY_TAG)
@@ -231,6 +237,7 @@ void psc_device::device_start()
 	m_singer_timer = timer_alloc(FUNC(psc_device::singer_tick), this);
 	m_frame_timer = timer_alloc(FUNC(psc_device::frame_tick), this);
 	m_enet_timer = timer_alloc(FUNC(psc_device::enet_dma_tick), this);
+	m_fdc_timer = timer_alloc(FUNC(psc_device::fdc_dma_tick), this);
 
 	save_item(NAME(m_via_interrupt));
 	save_item(NAME(m_via2_interrupt));
@@ -257,6 +264,9 @@ void psc_device::device_start()
 	save_item(NAME(m_enet_rx_drq));
 	save_item(NAME(m_enet_rx_offset));
 	save_item(NAME(m_enet_rx_status));
+	save_item(NAME(m_fdc_drq));
+	save_item(NAME(m_fdc_fifo));
+	save_item(NAME(m_fdc_fifo_count));
 	save_item(NAME(m_drq));
 	save_item(NAME(m_scsi_irq));
 	save_item(NAME(m_fdc_irq));
@@ -281,6 +291,10 @@ void psc_device::device_reset()
 	m_enet_timer->enable(false);
 	m_enet_tx_drq = m_enet_rx_drq = false;
 	m_enet_rx_offset = m_enet_rx_status = 0;
+	m_fdc_timer->enable(false);
+	m_fdc_servicing = false;
+	m_fdc_fifo = 0;
+	m_fdc_fifo_count = 0;
 	for (int channel = 0; channel < DMA_NUM_CHANNELS; ++channel)
 	{
 		m_dma_control[channel] = 0;
@@ -291,6 +305,7 @@ void psc_device::device_reset()
 		}
 	}
 	m_l3if = m_l3ier = m_l4if = m_l4ier = 0;
+	m_dma_control[DMA_FDC] = CTRL_PAUSE | CTRL_FROZEN;
 	m_l5if = m_l5ier = m_l6if = m_l6ier = 0;
 
 	m_snd_com = 0;
@@ -339,14 +354,17 @@ u16 psc_device::dma_ctrl_r(offs_t offset)
 
 void psc_device::device_post_load()
 {
+	recalc_via2_irqs();
 	recalc_dma_irqs();
 	recalc_lv3();
 	recalc_lv5();
 	recalc_lv6();
+	fdc_dma_kick();
 }
 
-void psc_device::dma_ctrl_w(offs_t offset, u16 data)
+void psc_device::dma_ctrl_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	data &= mem_mask;
 	const unsigned channel = offset >> 3;
 	const bool ethernet = channel == DMA_ETHERNET_RX || channel == DMA_ETHERNET_TX;
 	u16 &control = m_dma_control[channel];
@@ -355,12 +373,17 @@ void psc_device::dma_ctrl_w(offs_t offset, u16 data)
 		control |= data & (CTRL_CIE | CTRL_PAUSE);
 		if (data & CTRL_SWRESET)
 		{
-			// Software reset preserves programmed sets and interrupt enables,
-			// disables both sets, and selects set zero with the channel paused.
+			// Select set zero with the channel paused.  FDC reset discards the
+			// FIFO and IFs but preserves programming, including ENABLE (ERS p.18).
 			control = (control & CTRL_CIE) | CTRL_FROZEN | CTRL_PAUSE;
 			for (auto &command : m_dma_cmdstat[channel])
 			{
-				command &= ~CMD_ENABLED;
+				command &= ~(channel == DMA_FDC ? CMD_IF : CMD_ENABLED);
+			}
+			if (channel == DMA_FDC)
+			{
+				m_fdc_timer->enable(false);
+				m_fdc_fifo_count = 0;
 			}
 			if (channel == DMA_ETHERNET_RX)
 			{
@@ -382,10 +405,19 @@ void psc_device::dma_ctrl_w(offs_t offset, u16 data)
 				m_enet_rx_offset = m_enet_rx_status = 0;
 			}
 		}
+		else if ((data & CTRL_FLUSH) && channel == DMA_FDC &&
+			(m_dma_cmdstat[channel][control & 1] & CMD_DIR))
+		{
+			// A paused flush only drains the PSC FIFO; an unpaused flush ends
+			// this set.  Neither case reads additional bytes from the FDC.
+			fdc_dma_flush();
+			if (!(control & CTRL_PAUSE))
+				fdc_dma_complete();
+		}
 	}
 	else
 	{
-		control &= ~(data & (CTRL_CIE | CTRL_PAUSE | CTRL_BERR));
+		control &= ~(data & (CTRL_CIE | CTRL_PAUSE | (channel == DMA_FDC ? 0 : CTRL_BERR)));
 		if (data & CTRL_PAUSE)
 		{
 			control &= ~CTRL_FROZEN;
@@ -395,6 +427,10 @@ void psc_device::dma_ctrl_w(offs_t offset, u16 data)
 	if (ethernet)
 	{
 		enet_dma_kick();
+	}
+	else if (channel == DMA_FDC)
+	{
+		fdc_dma_kick();
 	}
 }
 
@@ -407,7 +443,8 @@ u32 psc_device::dma_set_r(offs_t offset)
 	case 0: return m_dma_addr[channel][set];
 	case 1: return m_dma_cnt[channel][set];
 	case 2:
-		return u32(m_dma_cmdstat[channel][set] | (m_dma_cnt[channel][set] ? 0 : CMD_TERMCNT)) << 16;
+		return u32(m_dma_cmdstat[channel][set] | (m_dma_cnt[channel][set] ? 0 : CMD_TERMCNT) |
+			(channel == DMA_FDC ? 0x8000 : 0)) << 16;
 	default: return 0;
 	}
 }
@@ -420,15 +457,20 @@ void psc_device::dma_set_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 	case 0:
 		COMBINE_DATA(&m_dma_addr[channel][set]);
+		if (channel == DMA_FDC)
+			m_dma_addr[channel][set] &= ~3U;
 		break;
 	case 1:
 		COMBINE_DATA(&m_dma_cnt[channel][set]);
+		if (channel == DMA_FDC)
+			m_dma_cnt[channel][set] &= 0x1ffff;
 		break;
 	case 2:
 		if (ACCESSING_BITS_16_31)
 		{
 			const u16 bits = (data & mem_mask) >> 16;
-			const u16 writable = bits & (CMD_IE | CMD_ENABLED | CMD_DIR | CMD_IF);
+			const u16 writable = bits & (CMD_IE | CMD_DIR |
+				(channel == DMA_FDC ? (BIT(bits, 15) ? CMD_ENABLED : CMD_IF) : (CMD_ENABLED | CMD_IF)));
 			if (BIT(bits, 15))
 			{
 				m_dma_cmdstat[channel][set] |= writable;
@@ -449,6 +491,105 @@ void psc_device::dma_set_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		enet_dma_kick();
 	}
+	else if (channel == DMA_FDC)
+	{
+		fdc_dma_kick();
+	}
+}
+
+void psc_device::fdc_drq_w(int state)
+{
+	m_fdc_drq = bool(state);
+	fdc_dma_kick();
+}
+
+bool psc_device::fdc_dma_ready() const
+{
+	const unsigned set = m_dma_control[DMA_FDC] & 1;
+	return !(m_dma_control[DMA_FDC] & (CTRL_PAUSE | CTRL_FROZEN | CTRL_BERR)) &&
+		(m_dma_cmdstat[DMA_FDC][set] & CMD_ENABLED);
+}
+
+void psc_device::fdc_dma_kick()
+{
+	// A FIFO access can change DRQ synchronously.  Schedule service only after
+	// NewAge has returned, and also kick when enabling an already-high request.
+	if (m_fdc_timer && !m_fdc_servicing && !m_fdc_timer->enabled() && m_fdc && fdc_dma_ready() &&
+		(m_fdc_drq || !m_dma_cnt[DMA_FDC][m_dma_control[DMA_FDC] & 1]))
+	{
+		m_fdc_timer->adjust(attotime::from_usec(1));
+	}
+}
+
+void psc_device::fdc_dma_flush()
+{
+	if (m_fdc_fifo_count)
+	{
+		u32 &address = m_dma_addr[DMA_FDC][m_dma_control[DMA_FDC] & 1];
+		// PSC ERS pp. 19, 39: even an odd-count tail writes a whole longword.
+		// Unused lanes retain old FIFO contents (unspecified on hardware).
+		m_space->write_dword(address, m_fdc_fifo);
+		address += 4;
+		m_fdc_fifo_count = 0;
+	}
+}
+
+void psc_device::fdc_dma_complete()
+{
+	const unsigned set = m_dma_control[DMA_FDC] & 1;
+	m_dma_cmdstat[DMA_FDC][set] = (m_dma_cmdstat[DMA_FDC][set] & ~CMD_ENABLED) | CMD_IF;
+	m_dma_control[DMA_FDC] ^= 1;
+	m_fdc_fifo_count = 0;
+	LOGMASKED(LOG_FDC, "FDC set %u complete: address %08x count %u\n",
+		set, m_dma_addr[DMA_FDC][set], m_dma_cnt[DMA_FDC][set]);
+	recalc_dma_irqs();
+}
+
+TIMER_CALLBACK_MEMBER(psc_device::fdc_dma_tick)
+{
+	m_fdc_servicing = true;
+	// Bounded bus service; the FDC supplies media timing and backpressure.
+	for (unsigned byte = 0; byte < 16 && fdc_dma_ready(); ++byte)
+	{
+		const unsigned set = m_dma_control[DMA_FDC] & 1;
+		u32 &address = m_dma_addr[DMA_FDC][set];
+		u32 &count = m_dma_cnt[DMA_FDC][set];
+		if (!count)
+		{
+			fdc_dma_complete();
+			continue;
+		}
+		if (!m_fdc_drq)
+			break;
+		if (m_dma_cmdstat[DMA_FDC][set] & CMD_DIR)
+		{
+			const unsigned shift = 24 - 8 * m_fdc_fifo_count;
+			m_fdc_fifo = (m_fdc_fifo & ~(0xffU << shift)) | (u32(m_fdc->dma_r()) << shift);
+			++m_fdc_fifo_count;
+			--count;
+			if (m_fdc_fifo_count == 4 || !count)
+				fdc_dma_flush();
+		}
+		else
+		{
+			if (!m_fdc_fifo_count)
+			{
+				m_fdc_fifo = m_space->read_dword(address);
+				address += 4;
+				m_fdc_fifo_count = 4;
+			}
+			m_fdc->dma_w(m_fdc_fifo >> (8 * --m_fdc_fifo_count));
+			--count;
+		}
+		if (!count)
+		{
+			// There is no PSC-to-FDC TC wire on the AV boards: TC is grounded.
+			// Count exhaustion switches DMA sets; EOT terminates the FDC command.
+			fdc_dma_complete();
+		}
+	}
+	m_fdc_servicing = false;
+	fdc_dma_kick();
 }
 
 void psc_device::enet_irq_w(int state)
@@ -574,11 +715,6 @@ TIMER_CALLBACK_MEMBER(psc_device::enet_dma_tick)
 uint32_t psc_device::scc_fake_r()
 {
 	return 0x40000000; // fake ESCC AppleTalk stuff?
-}
-
-uint32_t psc_device::newage_fake_r()
-{
-	return 0x00800000; // fake New Age status
 }
 
 uint8_t psc_device::via_in_a()
@@ -738,6 +874,7 @@ void psc_device::mac_via2_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 
 	via_sync();
+	recalc_via2_irqs();
 }
 
 void psc_device::field_interrupts()

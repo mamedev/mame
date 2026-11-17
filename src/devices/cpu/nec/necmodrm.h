@@ -23,7 +23,8 @@ static struct {
 	else write_mem_word(m_EA,val);        \
 }
 
-#define GetnextRMWord read_mem_word((m_EA & 0xf0000) | ((m_EA + 2) & 0xffff))
+// The second word of a memory pair is at offset + 2, wrapping within the segment.
+#define GetnextRMWord read_mem_word((m_EA - m_EO) + uint16_t(m_EO + 2))
 
 #define PutRMWord(ModRM,val)              \
 {                                         \

@@ -59,6 +59,8 @@ TODO:
 - pharmyst writes commands to 0x8d81 (C1 = restore settings, C2 = store settings) and waits
   for a custom to clear it; the custom is currently simulated by clearing the byte at once.
   It also needs inputs, outputs checking;
+- mx97iitb: after initializing the NVRAM the game waits in an endless loop for a reset (no
+  watchdog found), a default NVRAM is provided to avoid it
 */
 
 
@@ -68,7 +70,6 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "machine/ticket.h"
-#include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "video/ramdac.h"
 
@@ -425,7 +426,6 @@ void lgtz80_state::program_map(address_map &map)
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x7fff).bankr(m_rombank);
 	map(0x8000, 0x9fff).ram().share("nvram");
-	map(0x9081, 0x9081).w("watchdog", FUNC(watchdog_timer_device::reset_w)); // only ever written with 0x10, never read; still written to RAM?
 	map(0xc000, 0xc1ff).ram().w(FUNC(lgtz80_state::reel_attr_ram_w<0>)).share(m_reel_attr_ram[0]);
 	map(0xc200, 0xc3ff).ram().w(FUNC(lgtz80_state::reel_attr_ram_w<1>)).share(m_reel_attr_ram[1]);
 	map(0xc400, 0xc5ff).ram().w(FUNC(lgtz80_state::reel_attr_ram_w<2>)).share(m_reel_attr_ram[2]);
@@ -684,8 +684,6 @@ void lgtz80_state::mx97iitb(machine_config &config)
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4); // divider not verified
 	m_maincpu->set_addrmap(AS_PROGRAM, &lgtz80_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &lgtz80_state::io_map);
-
-	WATCHDOG_TIMER(config, "watchdog").set_time(attotime::from_seconds(1)); // TODO: actual timeout unknown
 }
 
 void lgtkl_state::fruitcat(machine_config &config)
@@ -823,6 +821,9 @@ ROM_START( mx97iitb )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "slon_king.u4", 0x00000, 0x40000, CRC(6bc004b7) SHA1(ab7588e2ab657d09e446a74450965f818d0a58e0) )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) // default, as initialized by the game itself
+	ROM_LOAD( "nvram", 0x0000, 0x2000, CRC(4418b6d7) SHA1(e14e63264ded7e3a9c7de7ec683a9cde51520e4e) )
 
 	ROM_REGION( 0x200, "plds", ROMREGION_ERASE00 )
 	ROM_LOAD( "gal16v8b.u8", 0x000, 0x117, NO_DUMP )

@@ -13,7 +13,6 @@
 #include "bus/technics/kn5000/hdae5000.h"
 #include "cpu/tlcs900/tmp94c241.h"
 #include "imagedev/floppy.h"
-#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/upd765.h"
 #include "video/pc_vga.h"
@@ -105,8 +104,6 @@ public:
 		, m_cpanel(*this, "cpanel")
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
-		, m_maincpu_latch(*this, "maincpu_latch")
-		, m_subcpu_latch(*this, "subcpu_latch")
 		, m_fdc(*this, "fdc")
 		, m_floppy(*this, "fdc:1")
 		, m_com_select(*this, "COM_SELECT")
@@ -115,6 +112,7 @@ public:
 		, m_CPR_SEG(*this, "CPR_SEG%u", 0U)
 		, m_checking_device_led_cn11(*this, "checking_device_led_cn11")
 		, m_checking_device_led_cn12(*this, "checking_device_led_cn12")
+		, m_latch{ 0, 0 }
 		, m_mstat(0)
 		, m_sstat(0)
 		, m_cpanel_inta(0)
@@ -132,8 +130,6 @@ private:
 	required_device<kn5000_cpanel_device> m_cpanel;
 	required_device<tmp94c241_device> m_maincpu;
 	required_device<tmp94c241_device> m_subcpu;
-	required_device<generic_latch_8_device> m_maincpu_latch;
-	required_device<generic_latch_8_device> m_subcpu_latch;
 	required_device<upd72067_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_ioport m_com_select;
@@ -143,13 +139,40 @@ private:
 	required_ioport_array<11> m_CPR_SEG; // buttons on "Control Panel Right" PCB
 	output_finder<> m_checking_device_led_cn11;
 	output_finder<> m_checking_device_led_cn12;
+	u8 m_latch[2]; // IC22 main CPU to sub CPU, IC23 sub CPU to main CPU
 	uint8_t m_mstat;
 	uint8_t m_sstat;
 	uint8_t m_cpanel_inta;
 
 	void maincpu_mem(address_map &map) ATTR_COLD;
 	void subcpu_mem(address_map &map) ATTR_COLD;
+
+	template <unsigned N> void latch_w(u8 data);
+	template <unsigned N> void latch_sync(s32 param);
 };
+
+// The inter-CPU latches are 74HC374s.  The writer's latch select ORed with its
+// write strobe (IC20B, IC20D) clocks the latch and is also the reader's /INT0,
+// so the pin idles high and each write pulls it low; its rising edge at the end
+// of the write latches the byte and, in the edge mode the firmware selects,
+// requests INT0.  Reading the latch only enables its outputs.  Interleaving
+// is raised for a while, so that the reader's micro-DMA can take the byte
+// before the next one is written.
+template <unsigned N>
+void kn5000_state::latch_w(u8 data)
+{
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(kn5000_state::latch_sync<N>), this), data);
+}
+
+template <unsigned N>
+void kn5000_state::latch_sync(s32 param)
+{
+	tmp94c241_device &reader = N ? *m_maincpu : *m_subcpu;
+	m_latch[N] = u8(param);
+	reader.set_input_line(TLCS900_INT0, CLEAR_LINE);
+	reader.set_input_line(TLCS900_INT0, ASSERT_LINE);
+}
 
 void kn5000_state::maincpu_mem(address_map &map)
 {
@@ -166,8 +189,8 @@ void kn5000_state::maincpu_mem(address_map &map)
 	}));
 	map(0x11000a, 0x11000a).rw(m_fdc, FUNC(upd72067_device::fifo_r), FUNC(upd72067_device::fifo_w));
 	map(0x120000, 0x12ffff).rw(m_fdc, FUNC(upd72067_device::dma_r), FUNC(upd72067_device::dma_w)); // Floppy DMA Acknowledge
-	map(0x140000, 0x14ffff).r(m_maincpu_latch, FUNC(generic_latch_8_device::read)); // @ IC23
-	map(0x140000, 0x14ffff).w(m_subcpu_latch, FUNC(generic_latch_8_device::write)); // @ IC22
+	map(0x140000, 0x14ffff).lr8(NAME([this] () -> u8 { return m_latch[1]; })); // @ IC23
+	map(0x140000, 0x14ffff).w(FUNC(kn5000_state::latch_w<0>)); // @ IC22
 	map(0x1703b0, 0x1703df).m("vga", FUNC(mn89304_vga_device::io_map)); // LCD controller @ IC206
 	map(0x1a0000, 0x1dffff).rw("vga", FUNC(mn89304_vga_device::mem_linear_r), FUNC(mn89304_vga_device::mem_linear_w));
 	map(0x1e0000, 0x1fffff).ram().share("nvram"); // 1Mbit SRAM @ IC21 (CS0)
@@ -183,8 +206,8 @@ void kn5000_state::subcpu_mem(address_map &map)
 	map(0x000000, 0x0fffff).ram(); // 1Mbyte = 2 * 4Mbit DRAMs @ IC28, IC29
 	map(0x100000, 0x100003).noprw(); // Tone generator @ IC303 (stub)
 	map(0x110000, 0x110003).noprw(); // Tone generator keybed data/status (stub)
-	map(0x120000, 0x12ffff).r(m_subcpu_latch, FUNC(generic_latch_8_device::read)); // @ IC22
-	map(0x120000, 0x12ffff).w(m_maincpu_latch, FUNC(generic_latch_8_device::write)); // @ IC23
+	map(0x120000, 0x12ffff).lr8(NAME([this] () -> u8 { return m_latch[0]; })); // @ IC22
+	map(0x120000, 0x12ffff).w(FUNC(kn5000_state::latch_w<1>)); // @ IC23
 	map(0x130000, 0x130003).noprw(); // DSP1 @ IC311 (stub)
 	map(0x1e0000, 0x1effff).noprw(); // Waveform/sample RAM (stub)
 	map(0xfe0000, 0xffffff).rom().region("subcpu", 0); // 1Mbit MASK ROM @ IC30
@@ -485,6 +508,7 @@ INPUT_PORTS_END
 
 void kn5000_state::machine_start()
 {
+	save_item(NAME(m_latch));
 	save_item(NAME(m_mstat));
 	save_item(NAME(m_sstat));
 	save_item(NAME(m_cpanel_inta));
@@ -686,13 +710,6 @@ void kn5000_state::kn5000(machine_config &config)
 			[this] (u8 data) {
 				m_sstat = data & 3;
 			});
-
-
-	GENERIC_LATCH_8(config, m_maincpu_latch); // @ IC23
-	m_maincpu_latch->data_pending_callback().set_inputline(m_maincpu, TLCS900_INT0);
-
-	GENERIC_LATCH_8(config, m_subcpu_latch); //  @ IC22
-	m_subcpu_latch->data_pending_callback().set_inputline(m_subcpu, TLCS900_INT0);
 
 	UPD72067(config, m_fdc, 32'000'000); // actual controller is UPD72068GF-3B9 at IC208
 	// RDY is taken to be tied active (the net is not traced): the firmware issues its

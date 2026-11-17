@@ -52,6 +52,7 @@ protected:
 	bool                     m_sector_is_16k;
 	bool                     m_top_boot_sector;
 	bool                     m_bot_boot_sector;
+	bool                     m_sector_erase_selection; // M29W640FT multi-sector erase with eight 8 KiB top sectors
 	uint16_t                 m_page_size;
 	uint32_t                 m_page_timeout_usec;
 
@@ -76,6 +77,13 @@ protected:
 	std::unique_ptr<uint8_t[]> m_page_buffer;
 
 	bool                     m_fast_mode;
+
+private:
+	static constexpr uint32_t ERASE_BLOCK_SIZE = 8 * 1024;
+
+	void select_erase_sector(uint32_t address);
+
+	std::unique_ptr<bool[]>    m_erase_selected;
 };
 
 
@@ -432,6 +440,12 @@ public:
 	amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class amd_29lv160db_16bit_device : public intelfsh16_device
+{
+public:
+	amd_29lv160db_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class sharp_lh28f016s_16bit_device : public intelfsh16_device
 {
 public:
@@ -465,6 +479,7 @@ DECLARE_DEVICE_TYPE(AMD_29F032,              amd_29f032_device)
 DECLARE_DEVICE_TYPE(AMD_29F400T,             amd_29f400t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800T,             amd_29f800t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800B_16BIT,       amd_29f800b_16bit_device)
+DECLARE_DEVICE_TYPE(AMD_29LV160DB_16BIT,     amd_29lv160db_16bit_device)
 DECLARE_DEVICE_TYPE(AMD_29LV160DT,           amd_29lv160dt_device)
 DECLARE_DEVICE_TYPE(AMD_29LV200T,            amd_29lv200t_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F160TE,        fujitsu_29f160te_device)

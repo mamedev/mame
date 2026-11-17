@@ -35,7 +35,7 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// opaque structure describing UML generation state
+class drcbe_interface;
 class drcuml_state;
 
 
@@ -116,7 +116,7 @@ protected:
 	// construction/destruction
 	drcuml_block(drcuml_block const &) = delete;
 	drcuml_block &operator=(drcuml_block const &) = delete;
-	drcuml_block(drcuml_state &drcuml, u32 maxinst);
+	drcuml_block(drcuml_state &drcuml, drcbe_interface &backend, u32 maxinst);
 	~drcuml_block();
 
 	void begin(bool invariant);
@@ -132,6 +132,7 @@ private:
 
 	// internal state
 	drcuml_state &          m_drcuml;       // pointer back to the owning UML
+	drcbe_interface &       m_backend;      // the target back-end
 	u32 const               m_maxinst;      // maximum number of instructions
 	u32                     m_nextinst;     // next instruction to fill in the cache
 	instruction_array_ptr   m_inst;         // pointer to the instruction list
@@ -225,7 +226,6 @@ public:
 	void hash_invalidate_range(u32 pcstart, u32 pcend) { m_beintf->hash_invalidate_range(pcstart, pcend); }
 	hash_codeptr hash_get_codeptr(u32 mode, u32 pc) const { return m_beintf->hash_get_codeptr(mode, pc); }
 	bool hash_set_codeptr(u32 mode, u32 pc, hash_codeptr code) { return m_beintf->hash_set_codeptr(mode, pc, code); }
-	void generate(drcuml_block &block, uml::instruction *instructions, u32 count) { m_beintf->generate(block, instructions, count); }
 
 	// handle management
 	uml::code_handle *handle_alloc(char const *name);
@@ -246,37 +246,8 @@ public:
 	bool logging_native() const { return m_beintf->logging(); }
 
 private:
-	// symbol class
-	class symbol
-	{
-	public:
-		// construction/destruction
-		symbol(void *base, u32 length, char const *name)
-			: m_base(reinterpret_cast<drccodeptr>(base))
-			, m_length(length)
-			, m_name(name)
-		{ }
-
-		// getters
-		bool includes(drccodeptr search) const { return (m_base <= search) && ((m_base + m_length) > search); }
-		drccodeptr base() const { return m_base; }
-		std::string const &name() const { return m_name; }
-
-	private:
-		// internal state
-		drccodeptr  m_base;     // base of the symbol
-		u32         m_length;   // length of the region covered
-		std::string m_name;     // name of the symbol
-	};
-
-	class block_impl : public drcuml_block
-	{
-	public:
-		block_impl(drcuml_state &drcuml, u32 maxinst) : drcuml_block(drcuml, maxinst) { }
-		~block_impl() = default;
-
-		using drcuml_block::begin;
-	};
+	class symbol;
+	class block_impl;
 
 	drcuml_block &begin_block(u32 maxinst, bool invariant);
 

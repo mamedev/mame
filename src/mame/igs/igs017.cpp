@@ -4391,7 +4391,7 @@ static INPUT_PORTS_START( lhzb2 )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )                                                           // 测试      (hold on start for input test)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 査帐
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 查帐
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)  PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投币
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投币
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )          PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)  // 退币
@@ -4408,7 +4408,7 @@ static INPUT_PORTS_START( lhzb2a )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )                                                           // 测试      (hold on start for input test)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 査帐
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 查帐
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)  PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投币
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投币
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )          PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)  // 退币
@@ -4814,7 +4814,7 @@ static INPUT_PORTS_START( slqz2 )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )                                                           // 测试      (hold on start for input test)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 査帐
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 查帐
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)  PORT_CONDITION("DSW1", 0x20, EQUALS, 0x20)  // 投币
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           PORT_CONDITION("DSW1", 0x20, EQUALS, 0x00)  // 投币
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )          PORT_CONDITION("DSW1", 0x40, EQUALS, 0x40)  // 退币
@@ -5093,7 +5093,7 @@ static INPUT_PORTS_START( tarzan )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r)) // 哈巴
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )                                                           // 测试      (hold on start for input test)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 査帐
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )                                                        // 查帐
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)  PORT_CONDITION("DSW2", 0x01, EQUALS, 0x01)  // 投币
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )           PORT_CONDITION("DSW2", 0x01, EQUALS, 0x00)  // 投币
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )          PORT_CONDITION("DSW3", 0x20, EQUALS, 0x20)  // 洗分

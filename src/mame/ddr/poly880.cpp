@@ -35,10 +35,9 @@ SC1-SLC1 Keypad Reference:
 
 
 TODO:
-- MCYCL (activate single stepping)
-- CYCL (single step)
-- layout LEDs (address bus, data bus, command bus, MCYCL)
-- optional 32KB RAM expansion @ 0x8000
+- STEP stays on the first user instruction: the CTC SEND pulse arrives a few
+  clocks early (no timer start latency in z80ctc, NMI sampled at instruction
+  boundary instead of the last T state)
 - who made poly880s? slc1 is very similar, it's by the same person?
 
 ****************************************************************************/
@@ -48,6 +47,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/z80daisy.h"
 #include "imagedev/cassette.h"
+#include "machine/input_merger.h"
+#include "machine/ram.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "video/pwm.h"
@@ -69,37 +70,90 @@ public:
 		, m_pio(*this, "pio%u", 0)
 		, m_ctc(*this, "ctc")
 		, m_display(*this, "display")
+		, m_busled(*this, "busled")
 		, m_cassette(*this, "cassette")
+		, m_ram(*this, RAM_TAG)
+		, m_rom(*this, "maincpu")
 		, m_inputs(*this, "IN.%u", 0U)
+		, m_special(*this, "SPECIAL")
+		, m_addr_led(*this, "a%u", 0U)
+		, m_data_led(*this, "d%u", 0U)
+		, m_ctrl_led(*this, "c%u", 0U)
 	{ }
 
 	void poly880(machine_config &config);
 	void poly880s(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+	DECLARE_INPUT_CHANGED_MEMBER(step_keys);
+	DECLARE_INPUT_CHANGED_MEMBER(cycl_pressed);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	enum : u8
+	{
+		BUS_M1 = 0x01,
+		BUS_MREQ = 0x02,
+		BUS_IORQ = 0x04,
+		BUS_RD = 0x08,
+		BUS_WR = 0x10
+	};
+
 	required_device<z80_device> m_maincpu;
 	required_device_array<z80pio_device, 2> m_pio;
 	required_device<z80ctc_device> m_ctc;
 	required_device<pwm_display_device> m_display;
+	required_device<pwm_display_device> m_busled;
 	required_device<cassette_image_device> m_cassette;
+	required_device<ram_device> m_ram;
+	required_region_ptr<u8> m_rom;
 	required_ioport_array<3> m_inputs;
+	required_ioport m_special;
+	output_finder<16> m_addr_led;
+	output_finder<8> m_data_led;
+	output_finder<10> m_ctrl_led;
+
+	emu_timer *m_cycl_timer = nullptr;
 
 	u8 m_matrix = 0;
-	bool m_nmi = false;
+	bool m_send = false;
+	bool m_scon = true;
+	bool m_send_ff = false;
+	bool m_nmi_ff = false;
+	bool m_icycl = true;
+	bool m_cycl_pulse = false;
+	bool m_wait = false;
+	bool m_halt = false;
+	bool m_int = false;
+	u16 m_bus_addr = 0;
+	u8 m_bus_data = 0;
+	u8 m_bus_ctrl = 0;
+	u16 m_bus_sample = 1;
 
 	void poly880_io(address_map &map) ATTR_COLD;
 	void poly880_mem(address_map &map) ATTR_COLD;
+	void poly880_opcodes(address_map &map) ATTR_COLD;
 	void poly880s_mem(address_map &map) ATTR_COLD;
+	void poly880s_opcodes(address_map &map) ATTR_COLD;
+
+	template <bool M1, u16 RomMask> u8 mem_r(address_space &space, offs_t offset);
+	void mem_w(offs_t offset, u8 data);
+	u8 io_read(address_space &space, offs_t offset);
+	u8 io_r(address_space &space, offs_t offset);
+	void io_w(offs_t offset, u8 data);
+	bool bus_cycle(u16 addr, u8 data, u8 ctrl);
+	void update_busleds();
+	void busled_w(offs_t offset, u8 data);
+	void update_step();
+	TIMER_CALLBACK_MEMBER(cycl_end);
 
 	void cldig_w(u8 data);
+	void int_w(int state);
+	void halt_w(int state);
 	void ctc_z0_w(int state);
-	void ctc_z1_w(int state);
 	void pio1_pa_w(u8 data);
 	u8 pio1_pb_r();
 	void pio1_pb_w(u8 data);
@@ -114,31 +168,207 @@ void poly880_state::cldig_w(u8 data)
 	m_matrix = data;
 }
 
+inline ATTR_FORCE_INLINE bool poly880_state::bus_cycle(u16 addr, u8 data, u8 ctrl)
+{
+	if (machine().side_effects_disabled() || (!m_wait && --m_bus_sample))
+		return false;
 
-// Memory Maps
+	m_bus_addr = addr;
+	m_bus_data = data;
+	m_bus_ctrl = ctrl;
+	update_busleds();
+
+	if (m_wait)
+	{
+		m_maincpu->defer_access();
+		return true;
+	}
+
+	// sample at a prime interval so program loops don't alias the averaged LED brightness
+	m_bus_sample = 509;
+
+	return false;
+}
+
+template <bool M1, u16 RomMask>
+u8 poly880_state::mem_r(address_space &space, offs_t offset)
+{
+	u8 data = space.unmap();
+
+	if (!BIT(offset, 15))
+		data = BIT(offset, 14) ? m_ram->pointer()[offset & 0x3ff] : m_rom[offset & RomMask];
+	else if (m_ram->size() > 0x400)
+		data = m_ram->pointer()[0x400 | (offset & 0x7fff)];
+
+	bus_cycle(offset, data, (M1 ? BUS_M1 : 0) | BUS_MREQ | BUS_RD);
+
+	return data;
+}
+
+void poly880_state::mem_w(offs_t offset, u8 data)
+{
+	if (bus_cycle(offset, data, BUS_MREQ | BUS_WR))
+		return;
+
+	if (!BIT(offset, 15))
+	{
+		if (BIT(offset, 14))
+			m_ram->pointer()[offset & 0x3ff] = data;
+	}
+	else if (m_ram->size() > 0x400)
+		m_ram->pointer()[0x400 | (offset & 0x7fff)] = data;
+}
 
 void poly880_state::poly880_mem(address_map &map)
 {
-	map(0x0000, 0x03ff).mirror(0x0c00).rom();
-	map(0x1000, 0x13ff).mirror(0x0c00).rom();
-	map(0x2000, 0x23ff).mirror(0x0c00).rom();
-	map(0x3000, 0x33ff).mirror(0x0c00).rom();
-	map(0x4000, 0x43ff).mirror(0x3c00).ram();
+	map(0x0000, 0xffff).rw(NAME((&poly880_state::mem_r<false, 0x33ff>)), FUNC(poly880_state::mem_w));
+}
+
+void poly880_state::poly880_opcodes(address_map &map)
+{
+	map(0x0000, 0xffff).r(NAME((&poly880_state::mem_r<true, 0x33ff>)));
 }
 
 void poly880_state::poly880s_mem(address_map &map)
 {
-	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x43ff).mirror(0x3c00).ram();
+	map(0x0000, 0xffff).rw(NAME((&poly880_state::mem_r<false, 0x3fff>)), FUNC(poly880_state::mem_w));
+}
+
+void poly880_state::poly880s_opcodes(address_map &map)
+{
+	map(0x0000, 0xffff).r(NAME((&poly880_state::mem_r<true, 0x3fff>)));
 }
 
 void poly880_state::poly880_io(address_map &map)
 {
-	map.global_mask(0xaf);
-	map(0x80, 0x83).rw(m_pio[0], FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x84, 0x87).rw(m_pio[1], FUNC(z80pio_device::read_alt), FUNC(z80pio_device::write_alt));
-	map(0x88, 0x8b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
-	map(0xa0, 0xa0).mirror(0x0f).w(FUNC(poly880_state::cldig_w));
+	map(0x0000, 0xffff).rw(FUNC(poly880_state::io_r), FUNC(poly880_state::io_w));
+}
+
+u8 poly880_state::io_read(address_space &space, offs_t offset)
+{
+	if (BIT(offset, 7))
+	{
+		switch (BIT(offset, 2, 2))
+		{
+		case 0: return m_pio[0]->read_alt(offset & 3);
+		case 1: return m_pio[1]->read_alt(offset & 3);
+		case 2: return m_ctc->read(offset & 3);
+		}
+	}
+
+	return space.unmap();
+}
+
+u8 poly880_state::io_r(address_space &space, offs_t offset)
+{
+	u8 data;
+
+	if (m_wait && !machine().side_effects_disabled())
+	{
+		auto dis = machine().disable_side_effects();
+		data = io_read(space, offset);
+	}
+	else
+		data = io_read(space, offset);
+
+	bus_cycle(offset, data, BUS_IORQ | BUS_RD);
+
+	return data;
+}
+
+void poly880_state::io_w(offs_t offset, u8 data)
+{
+	if (bus_cycle(offset, data, BUS_IORQ | BUS_WR))
+		return;
+
+	if (BIT(offset, 7))
+	{
+		switch (BIT(offset, 2, 2))
+		{
+		case 0: m_pio[0]->write_alt(offset & 3, data); break;
+		case 1: m_pio[1]->write_alt(offset & 3, data); break;
+		case 2: m_ctc->write(offset & 3, data); break;
+		}
+
+		if (BIT(offset, 5))
+			cldig_w(data);
+	}
+}
+
+void poly880_state::update_busleds()
+{
+	u16 const ctrl = m_bus_ctrl
+			| (m_halt ? 0x020 : 0)
+			| (m_int ? 0x040 : 0)
+			| (m_nmi_ff ? 0x080 : 0)
+			| (m_wait ? 0x100 : 0)
+			| (m_icycl ? 0 : 0x200);
+
+	m_busled->write_row(0, m_bus_addr | (u64(m_bus_data) << 16) | (u64(ctrl) << 24));
+}
+
+void poly880_state::busled_w(offs_t offset, u8 data)
+{
+	u8 const x = offset >> 6;
+
+	if (x < 16)
+		m_addr_led[x] = data;
+	else if (x < 24)
+		m_data_led[x - 16] = data;
+	else
+		m_ctrl_led[x - 24] = data;
+}
+
+
+// Single Step Logic
+
+void poly880_state::update_step()
+{
+	ioport_value const special = m_special->read();
+	bool const reset = BIT(special, 0);
+	bool const mon = BIT(special, 1);
+	bool const mcycl = BIT(special, 2);
+
+	if (reset)
+		m_send_ff = m_nmi_ff = false;
+
+	bool x = m_icycl;
+	bool preset = false;
+	bool y = false;
+
+	for (;;)
+	{
+		preset = mon || (m_send_ff && x);
+		y = !(x && !mcycl);
+
+		bool const next = preset || reset || !y;
+
+		if (next == x)
+			break;
+
+		x = next;
+	}
+
+	m_icycl = x;
+
+	if (preset && !reset)
+		m_nmi_ff = true;
+
+	m_maincpu->set_input_line(INPUT_LINE_NMI, m_nmi_ff ? ASSERT_LINE : CLEAR_LINE);
+
+	bool const wait = m_send_ff && y && !m_cycl_pulse;
+
+	if (wait != m_wait)
+	{
+		m_wait = wait;
+		update_busleds();
+	}
+}
+
+TIMER_CALLBACK_MEMBER(poly880_state::cycl_end)
+{
+	m_cycl_pulse = false;
+	update_step();
 }
 
 
@@ -147,11 +377,23 @@ void poly880_state::poly880_io(address_map &map)
 INPUT_CHANGED_MEMBER(poly880_state::trigger_reset)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
+	update_step();
 }
 
-INPUT_CHANGED_MEMBER(poly880_state::trigger_nmi)
+INPUT_CHANGED_MEMBER(poly880_state::step_keys)
 {
-	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	update_step();
+}
+
+INPUT_CHANGED_MEMBER(poly880_state::cycl_pressed)
+{
+	if (newval)
+	{
+		// C9 differentiates the debounced key edge; /WAIT is released until the node recharges above the TTL threshold
+		m_cycl_pulse = true;
+		m_cycl_timer->adjust(attotime::from_nsec(2700));
+		update_step();
+	}
 }
 
 static INPUT_PORTS_START( poly880 )
@@ -187,10 +429,22 @@ static INPUT_PORTS_START( poly880 )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(poly880_state::trigger_reset), 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MON") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(poly880_state::trigger_nmi), 0)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MCYCL") PORT_CODE(KEYCODE_F3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CYCL") PORT_CODE(KEYCODE_F4)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MON") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(poly880_state::step_keys), 0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MCYCL") PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(poly880_state::step_keys), 0)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CYCL") PORT_CODE(KEYCODE_F4) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(poly880_state::cycl_pressed), 0)
 INPUT_PORTS_END
+
+
+void poly880_state::int_w(int state)
+{
+	m_int = state;
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void poly880_state::halt_w(int state)
+{
+	m_halt = state;
+}
 
 
 // Z80-CTC Interface
@@ -198,15 +452,13 @@ INPUT_PORTS_END
 void poly880_state::ctc_z0_w(int state)
 {
 	// SEND
-	if (!m_nmi && state)
-	{
-		m_nmi = true;
-		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
-	}
-}
+	m_send = state;
 
-void poly880_state::ctc_z1_w(int state)
-{
+	if (state)
+	{
+		m_send_ff = true;
+		update_step();
+	}
 }
 
 
@@ -284,10 +536,21 @@ void poly880_state::pio1_pb_w(u8 data)
 	// tape output
 	m_cassette->output(BIT(data, 2) ? +1.0 : -1.0);
 
-	if (m_nmi && BIT(data, 6))
+	bool const scon = BIT(data, 6);
+
+	if (scon != m_scon)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-		m_nmi = false;
+		m_scon = scon;
+
+		if (scon)
+		{
+			if (!m_send)
+				m_send_ff = false;
+		}
+		else
+			m_nmi_ff = false;
+
+		update_step();
 	}
 }
 
@@ -307,9 +570,35 @@ static const z80_daisy_config poly880_daisy_chain[] =
 
 void poly880_state::machine_start()
 {
+
+	m_cycl_timer = timer_alloc(FUNC(poly880_state::cycl_end), this);
+
 	// register for state saving
 	save_item(NAME(m_matrix));
-	save_item(NAME(m_nmi));
+	save_item(NAME(m_send));
+	save_item(NAME(m_scon));
+	save_item(NAME(m_send_ff));
+	save_item(NAME(m_nmi_ff));
+	save_item(NAME(m_icycl));
+	save_item(NAME(m_cycl_pulse));
+	save_item(NAME(m_wait));
+	save_item(NAME(m_halt));
+	save_item(NAME(m_int));
+	save_item(NAME(m_bus_addr));
+	save_item(NAME(m_bus_data));
+	save_item(NAME(m_bus_ctrl));
+	save_item(NAME(m_bus_sample));
+}
+
+void poly880_state::machine_reset()
+{
+	m_send_ff = false;
+	m_nmi_ff = false;
+	m_icycl = true;
+	m_cycl_pulse = false;
+	m_cycl_timer->adjust(attotime::never);
+
+	update_step();
 }
 
 
@@ -320,29 +609,39 @@ void poly880_state::poly880(machine_config &config)
 	// basic machine hardware
 	Z80(config, m_maincpu, XTAL(7'372'800)/8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &poly880_state::poly880_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &poly880_state::poly880_opcodes);
 	m_maincpu->set_addrmap(AS_IO, &poly880_state::poly880_io);
 	m_maincpu->set_daisy_config(poly880_daisy_chain);
+	m_maincpu->halt_cb().set(FUNC(poly880_state::halt_w));
+
+	INPUT_MERGER_ANY_HIGH(config, "irq").output_handler().set(FUNC(poly880_state::int_w));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
 	m_display->set_segmask(0xff, 0xff);
+
+	PWM_DISPLAY(config, m_busled).set_size(1, 34);
+	m_busled->set_bri_levels(0.01, 0.1, 0.4);
+	m_busled->output_x().set(FUNC(poly880_state::busled_w));
+
 	config.set_default_layout(layout_poly880);
 
 	// devices
 	Z80CTC(config, m_ctc, XTAL(7'372'800)/8);
-	m_ctc->intr_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_ctc->intr_callback().set("irq", FUNC(input_merger_device::in_w<2>));
 	m_ctc->zc_callback<0>().set(FUNC(poly880_state::ctc_z0_w));
-	m_ctc->zc_callback<1>().set(FUNC(poly880_state::ctc_z1_w));
 	m_ctc->zc_callback<2>().set(m_ctc, FUNC(z80ctc_device::trg3));
 
 	Z80PIO(config, m_pio[0], XTAL(7'372'800)/8);
-	m_pio[0]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio[0]->out_int_callback().set("irq", FUNC(input_merger_device::in_w<0>));
 	m_pio[0]->out_pa_callback().set(FUNC(poly880_state::pio1_pa_w));
 	m_pio[0]->in_pb_callback().set(FUNC(poly880_state::pio1_pb_r));
 	m_pio[0]->out_pb_callback().set(FUNC(poly880_state::pio1_pb_w));
 
 	Z80PIO(config, m_pio[1], XTAL(7'372'800)/8);
-	m_pio[1]->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
+	m_pio[1]->out_int_callback().set("irq", FUNC(input_merger_device::in_w<1>));
+
+	RAM(config, m_ram).set_default_size("1K").set_extra_options("33K").set_default_value(0x00);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED);
@@ -354,6 +653,7 @@ void poly880_state::poly880s(machine_config &config)
 {
 	poly880(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &poly880_state::poly880s_mem);
+	m_maincpu->set_addrmap(AS_OPCODES, &poly880_state::poly880s_opcodes);
 }
 
 

@@ -184,13 +184,13 @@ void cirrus_gd5428_vga_device::ramdac_overlay_w(offs_t offset, u8 data)
 	{
 		switch (vga.dac.state++) {
 		case 0:
-			m_ext_palette[vga.dac.write_index & 0x0f].red=data;
+			m_ext_palette[vga.dac.write_index & 0x0f].red = data;
 			break;
 		case 1:
-			m_ext_palette[vga.dac.write_index & 0x0f].green=data;
+			m_ext_palette[vga.dac.write_index & 0x0f].green = data;
 			break;
 		case 2:
-			m_ext_palette[vga.dac.write_index & 0x0f].blue=data;
+			m_ext_palette[vga.dac.write_index & 0x0f].blue = data;
 			break;
 		}
 		vga.dac.dirty=1;
@@ -645,7 +645,10 @@ void cirrus_gd5428_vga_device::sequencer_map(address_map &map)
 			m_ext_palette_enabled = data & 0x02;
 		})
 	);
-	map(0x13, 0x13).lw8(
+	map(0x13, 0x13).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_cursor_addr;
+		}),
 		NAME([this] (offs_t offset, u8 data) {
 			// bits 0 and 1 are ignored if using 64x64 cursor
 			m_cursor_addr = data;
@@ -752,44 +755,51 @@ void cirrus_gd5428_vga_device::device_reset()
 
 uint32_t cirrus_gd5428_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	uint32_t ptr = (vga.svga_intf.vram_size - 0x4000);  // cursor patterns are stored in the last 16kB of VRAM
 	svga_device::screen_update(screen, bitmap, cliprect);
 
-	if(m_cursor_attr & 0x01)  // hardware cursor enabled
+	if(BIT(m_cursor_attr, 0))  // hardware cursor enabled
 	{
+		// cursor patterns are stored in the last 16kB of VRAM
+		uint32_t ptr = (vga.svga_intf.vram_size - 0x4000);
+
 		// draw hardware graphics cursor
-		if(m_cursor_attr & 0x04)  // 64x64
+		if(BIT(m_cursor_attr, 2))  // 64x64
 		{
+			// win95 gd5446
 			ptr += ((m_cursor_addr & 0x3c) * 256);
-			for(int y=0;y<64;y++)
+			for (int y = 0; y < 64; y++)
 			{
-				for(int x=0;x<64;x+=8)
+				int res_y = y + m_cursor_y;
+				for (int x = 0; x < 64; x++)
 				{
-					for(int bit=0;bit<8;bit++)
+					int res_x = x + m_cursor_x;
+					if (!cliprect.contains(res_x, res_y))
+						continue;
+					const u32 cursor_address = ptr + ((x >> 3) + y * 0x10);
+					const int xi = 7 - (x & 7);
+					u8 cursor_gfx = (vga.memory[cursor_address + 8] >> (xi) & 1) | ((vga.memory[cursor_address] >> (xi)) & 1) << 1;
+					// TODO: verify XOR thru win95 notepad caret, cache colors
+					switch(cursor_gfx)
 					{
-						uint8_t pixel1 = vga.memory[ptr % vga.svga_intf.vram_size] >> (7-bit);
-						uint8_t pixel2 = vga.memory[(ptr+512) % vga.svga_intf.vram_size] >> (7-bit);
-						uint8_t output = ((pixel1 & 0x01) << 1) | (pixel2 & 0x01);
-						switch(output)
-						{
 						case 0:  // transparent - do nothing
 							break;
 						case 1:  // background
-							bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[0].red << 16) | (m_ext_palette[0].green << 8) | (m_ext_palette[0].blue);
+							bitmap.pix(res_y, res_x) = (pal6bit(m_ext_palette[0].red) << 16) | (pal6bit(m_ext_palette[0].green) << 8) | pal6bit(m_ext_palette[0].blue);
 							break;
 						case 2:  // XOR
-							bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit) = ~bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit);
+							bitmap.pix(res_y, res_x) = ~bitmap.pix(res_y, res_x);
 							break;
 						case 3:  // foreground
-							bitmap.pix(m_cursor_y+y,m_cursor_x+x+bit) = (m_ext_palette[15].red << 16) | (m_ext_palette[15].green << 8) | (m_ext_palette[15].blue);
+							bitmap.pix(res_y, res_x) = (pal6bit(m_ext_palette[15].red) << 16) | (pal6bit(m_ext_palette[15].green) << 8) | pal6bit(m_ext_palette[15].blue);
 							break;
-						}
 					}
 				}
 			}
 		}
 		else
 		{
+			// win95 gd5434
+			// TODO: modernize, again cache colors
 			ptr += ((m_cursor_addr & 0x3f) * 256);
 			for(int y=0;y<32;y++)
 			{

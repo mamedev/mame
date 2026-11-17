@@ -1746,6 +1746,12 @@ void arm7_cpu_device::HandleMemBlock(uint32_t insn)
 		uint32_t const count = std::popcount(insn & 0xffffu);
 		SetRegister(rb, (insn & INSN_BDT_U) ? (rb_orig + (count << 2)) : (rb_orig - (count << 2)));
 	}
+	else if (m_pendingAbtD && (insn & INSN_BDT_L) && ldm_loads_base(insn, rb))
+	{
+		// A load before the abort may have overwritten the base, even without writeback.
+		// Restore it so a page fault handler can retry the instruction.
+		SetRegister(rb, rb_orig);
+	}
 
 	// We will specify the cycle count for each case, so remove the -3 that occurs at the end
 	ARM7_ICOUNT += 3;

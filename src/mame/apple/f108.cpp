@@ -21,6 +21,8 @@
 
 #include "softlist_dev.h"
 
+#include <algorithm>
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -36,10 +38,10 @@ void f108_device::map(address_map &map)
 {
 	map(0x40000000, 0x400fffff).r(FUNC(f108_device::rom_switch_r)).mirror(0x0ff00000).nopw();
 	map(0x5000c000, 0x5000dfff).rw(FUNC(f108_device::scc_r), FUNC(f108_device::scc_w)).mirror(0x00fc0000);
-	map(0x5001a000, 0x5001a01f).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
-	map(0x5001a000, 0x5001a003).rw(FUNC(f108_device::ata_data_r), FUNC(f108_device::ata_data_w)).mirror(0x00fc0000);
-	map(0x5001a020, 0x5001a03f).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w)).umask32(0xffff0000).mirror(0x00fc0000);
-	map(0x5001a040, 0x5001a04b).rw(FUNC(f108_device::ata_timing_r), FUNC(f108_device::ata_timing_w)).mirror(0x00fc0000);
+	map(0x50f1a000, 0x50f1a01f).umask32(0xffff0000).rw(m_ata, FUNC(ata_interface_device::cs0_swap_r), FUNC(ata_interface_device::cs0_swap_w));
+	map(0x50f1a000, 0x50f1a003).rw(FUNC(f108_device::ata_data_r), FUNC(f108_device::ata_data_w));
+	map(0x50f1a020, 0x50f1a03f).umask32(0xffff0000).rw(m_ata, FUNC(ata_interface_device::cs1_swap_r), FUNC(ata_interface_device::cs1_swap_w));
+	map(0x50f1a040, 0x50f1a04b).rw(FUNC(f108_device::ata_timing_r), FUNC(f108_device::ata_timing_w));
 	map(0xf9000000, 0xf90fffff).ram();  // VRAM
 }
 
@@ -60,11 +62,14 @@ void f108_device::device_add_mconfig(machine_config &config)
 	m_ncr1->set_busmd(ncr53c96_device::BUSMD_1);
 
 
-	SCC85C30(config, m_scc, 8_MHz_XTAL);
+	SCC85C30(config, m_scc, 31.3344_MHz_XTAL/4);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(FUNC(f108_device::scc_irq_w));
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	// HSKo is driven from /DTR, not /RTS (the line driver is enabled by /RTS), and is connected to RS-232 DTR
+	m_scc->out_dtra_callback().set("modem", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_dtrb_callback().set("printer", FUNC(rs232_port_device::write_dtr));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
@@ -91,7 +96,8 @@ f108_device::f108_device(const machine_config &mconfig, const char *tag, device_
 	m_scc(*this, "scc"),
 	m_rom(*this, finder_base::DUMMY_TAG),
 	m_ata_irq(*this),
-	m_overlay(false)
+	m_overlay(false),
+	m_scc_sync(true)
 {
 }
 
@@ -108,6 +114,7 @@ void f108_device::device_start()
 	m_ata_recovery = 0;
 	save_item(NAME(m_ata_active));
 	save_item(NAME(m_ata_recovery));
+	save_item(NAME(m_overlay));
 }
 
 //-------------------------------------------------
@@ -117,36 +124,48 @@ void f108_device::device_start()
 void f108_device::device_reset()
 {
 	m_overlay = true;
+	update_overlay();
+}
 
+void f108_device::device_post_load()
+{
+	update_overlay();
+}
+
+void f108_device::update_overlay()
+{
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	if (!m_rom_ptr)
+	if (!m_overlay)
 	{
-		space.unmap_readwrite(0x00000000, 0x003fffff);
+		space.install_ram(0x00000000, m_ram_size - 1, m_ram_ptr);
 		return;
 	}
 
+	space.unmap_readwrite(0x00000000, std::max<u32>(m_ram_size, 0x400000) - 1);
+	if (!m_rom_ptr)
+		return;
+
 	// put ROM mirror at 0
-	const u32 memory_size = std::min((u32)0x400000, m_rom_size);
+	const u32 memory_size = std::min<u32>(0x400000, m_rom_size);
 	const u32 memory_end = memory_size - 1;
 	offs_t memory_mirror = memory_end & ~(memory_size - 1);
 
-	space.unmap_write(0x00000000, memory_end);
 	space.install_rom(0x00000000, memory_end & ~memory_mirror, memory_mirror, m_rom_ptr);
+}
+
+void f108_device::overlay_off()
+{
+	if (m_overlay && !machine().side_effects_disabled())
+	{
+		m_overlay = false;
+		update_overlay();
+	}
 }
 
 u32 f108_device::rom_switch_r(offs_t offset)
 {
 	// disable the overlay
-	if (m_overlay && !machine().side_effects_disabled())
-	{
-		address_space &space = m_maincpu->space(AS_PROGRAM);
-		const u32 memory_end = m_ram_size - 1;
-		void *memory_data = m_ram_ptr;
-		offs_t memory_mirror = memory_end & ~memory_end;
-
-		space.install_ram(0x00000000, memory_end & ~memory_mirror, memory_mirror, memory_data);
-		m_overlay = false;
-	}
+	overlay_off();
 
 	return m_rom_ptr ? m_rom_ptr[offset & ((m_rom_size - 1) >> 2)] : 0;
 }
@@ -225,14 +244,16 @@ void f108_device::ata_data_w(offs_t offset, u32 data, u32 mem_mask)
 
 u16 f108_device::scc_r(offs_t offset)
 {
-	m_primetimeii->via_sync();
+	if (m_scc_sync && !machine().side_effects_disabled())
+		m_primetimeii->via_sync();
 	u16 result = m_scc->dc_ab_r(offset);
 	return (result << 8) | result;
 }
 
 void f108_device::scc_w(offs_t offset, u16 data)
 {
-	m_primetimeii->via_sync();
+	if (m_scc_sync)
+		m_primetimeii->via_sync();
 	m_scc->dc_ab_w(offset, data >> 8);
 }
 

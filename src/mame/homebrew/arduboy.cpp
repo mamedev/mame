@@ -98,6 +98,12 @@
 
 namespace {
 
+// 0b00 = both speaker bits inactive
+// 0b01 = speaker positive active
+// 0b10 = speaker negative active
+// 0b11 = both speaker bits active, cancelling each other out
+constexpr double SPEAKER_LEVELS[4] = { 0.0, 1.0, -1.0, 0.0 };
+
 class arduboy_state : public driver_device
 {
 public:
@@ -215,9 +221,8 @@ uint8_t arduboy_state::port_c_r()
 
 void arduboy_state::port_c_w(uint8_t data)
 {
-	int speaker_positive = BIT(data, 6);
-	int speaker_negative = BIT(data, 7);
-	m_speaker->level_w(speaker_positive ^ speaker_negative);
+	// bit 6 = speaker positive, bit 7 = speaker negative
+	m_speaker->level_w(BIT(data, 6, 2));
 }
 
 uint8_t arduboy_state::port_d_r()
@@ -308,7 +313,9 @@ void arduboy_state::arduboy_base(machine_config &config)
 	NVRAM(config, "intflash", nvram_device::DEFAULT_ALL_1);
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 1.00);
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, SPEAKER_LEVELS);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	SSD1306(config, m_ssd1306, 0);
 	m_ssd1306->set_screen("screen");

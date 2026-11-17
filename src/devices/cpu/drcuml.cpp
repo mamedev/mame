@@ -167,6 +167,40 @@ bool drcbe_interface::hash_set_codeptr(u32 mode, u32 pc, hash_codeptr code) noex
 //  DRCUML STATE
 //**************************************************************************
 
+// symbol class
+class drcuml_state::symbol
+{
+public:
+	// construction/destruction
+	symbol(void *base, u32 length, std::string &&name)
+		: m_base(reinterpret_cast<drccodeptr>(base))
+		, m_length(length)
+		, m_name(std::move(name))
+	{ }
+
+	// getters
+	bool includes(drccodeptr search) const { return (m_base <= search) && ((m_base + m_length) > search); }
+	drccodeptr base() const { return m_base; }
+	std::string const &name() const { return m_name; }
+
+private:
+	// internal state
+	drccodeptr  m_base;     // base of the symbol
+	u32         m_length;   // length of the region covered
+	std::string m_name;     // name of the symbol
+};
+
+class drcuml_state::block_impl : public drcuml_block
+{
+public:
+	block_impl(drcuml_state &drcuml, u32 maxinst) : drcuml_block(drcuml, *drcuml.m_beintf, maxinst)
+	{ }
+	~block_impl() = default;
+
+	using drcuml_block::begin;
+};
+
+
 //-------------------------------------------------
 //  drcuml_state - constructor
 //-------------------------------------------------
@@ -348,8 +382,9 @@ void drcuml_state::log_vprintf(util::format_argument_pack<char> const &args)
 //  drcuml_block - constructor
 //-------------------------------------------------
 
-drcuml_block::drcuml_block(drcuml_state &drcuml, u32 maxinst)
+drcuml_block::drcuml_block(drcuml_state &drcuml, drcbe_interface &backend, u32 maxinst)
 	: m_drcuml(drcuml)
+	, m_backend(backend)
 	, m_maxinst(maxinst)
 	, m_nextinst(0)
 	, m_inst(new uml::instruction[m_maxinst])
@@ -398,7 +433,7 @@ void drcuml_block::end()
 		disassemble();
 
 	// generate the code via the back-end
-	m_drcuml.generate(*this, &m_inst[0], m_nextinst);
+	m_backend.generate(*this, &m_inst[0], m_nextinst);
 
 	// block is no longer in use
 	m_inuse = false;

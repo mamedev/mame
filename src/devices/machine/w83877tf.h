@@ -24,7 +24,9 @@ public:
 
 	void set_por_hefras(u8 value) { m_hefras = value; }
 	void set_por_hefere(u8 value) { m_hefere = value; }
+	void set_por_pnpcvs(u8 value) { m_pnpcvs = value; }
 
+	// TODO: refactor, really akin to FDC37C669
 	auto irq1() { return m_irq1_callback.bind(); }
 	auto irq8() { return m_irq8_callback.bind(); }
 	auto irq9() { return m_irq9_callback.bind(); }
@@ -118,8 +120,7 @@ private:
 	u8 m_submidi;
 	u8 m_uratri;
 	u8 m_urbtri;
-	u8 m_urapwd;
-	u8 m_urbpwd;
+	u8 m_uart_pwd[2];
 	u8 m_rxw4c;
 	u8 m_txw4c;
 	u8 m_urirsel;

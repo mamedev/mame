@@ -72,10 +72,13 @@ void mpc10x_host_device::device_start()
 	pci_host_device::device_start();
 	m_cpu_space = &m_cpu->space(AS_PROGRAM);
 	m_cpu_spaces.push_back(m_cpu_space);
+	m_bus_cpus.push_back(&m_cpu->device().execute());
 	if (m_secondary_cpu)
 	{
 		m_cpu_spaces.push_back(&m_secondary_cpu->space(AS_PROGRAM));
+		m_bus_cpus.push_back(&m_secondary_cpu->device().execute());
 	}
+	m_snoop_taps.resize(m_cpu_spaces.size());
 	set_spaces(&space(AS_PCI_MEM), &space(AS_PCI_IO));
 	space(AS_PCI_IO).unmap_value_high();
 
@@ -170,13 +173,21 @@ u32 mpc10x_host_device::cpu_memory_r(offs_t offset, u32 mem_mask)
 template <u32 Base>
 void mpc10x_host_device::cpu_memory_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	const offs_t address = Base + ((offset * 4) ^ ((m_picr1 & PICR1_LE_MODE) ? 4 : 0));
+
+	// every CPU snoops a bus master's write; the primary CPU's tap tells the others
+	if (m_bus_cpus.size() > 1)
+	{
+		m_bus_cpus[0]->signal_external_write(address, 4);
+	}
+
 	if (m_picr1 & PICR1_LE_MODE)
 	{
-		m_cpu_space->write_dword(Base + ((offset * 4) ^ 4), data, mem_mask);
+		m_cpu_space->write_dword(address, data, mem_mask);
 	}
 	else
 	{
-		m_cpu_space->write_dword(Base + (offset * 4), swapendian_int32(data), swapendian_int32(mem_mask));
+		m_cpu_space->write_dword(address, swapendian_int32(data), swapendian_int32(mem_mask));
 	}
 }
 
@@ -320,6 +331,11 @@ void mpc10x_host_device::install_memory_banks(bool skip_ff, bool wrap_banks)
 	u32 bank_end = 0;
 	u64 install_ptr = 0;
 
+	for (memory_passthrough_handler &tap : m_snoop_taps)
+	{
+		tap.remove();
+	}
+
 	for (int bank = 0; bank < 8; bank++)
 	{
 		if ((!skip_ff || ((base & 0xff) != 0xff)) && BIT(m_memory_bank_enable, bank))
@@ -343,9 +359,10 @@ void mpc10x_host_device::install_memory_banks(bool skip_ff, bool wrap_banks)
 				while (remaining > 0)
 				{
 					const u64 chunk = std::min<u64>(remaining, u64(m_ram_size) - ptr);
-					for (address_space *space : m_cpu_spaces)
+					for (u32 i = 0; i < m_cpu_spaces.size(); i++)
 					{
-						space->install_ram(start, start + chunk - 1, &m_ram[ptr]);
+						m_cpu_spaces[i]->install_ram(start, start + chunk - 1, &m_ram[ptr]);
+						install_snoop_tap(i, start, start + chunk - 1);
 					}
 					start += chunk;
 					remaining -= chunk;
@@ -359,6 +376,41 @@ void mpc10x_host_device::install_memory_banks(bool skip_ff, bool wrap_banks)
 		base2 >>= 8;
 		end >>= 8;
 		end2 >>= 8;
+	}
+}
+
+// With more than one CPU on the 60x bus, each snoops the others' writes to RAM.
+void mpc10x_host_device::install_snoop_tap(u32 origin, offs_t start, offs_t end)
+{
+	if (m_bus_cpus.size() < 2)
+	{
+		return;
+	}
+
+	address_space &space = *m_cpu_spaces[origin];
+	if (space.data_width() == 64)
+	{
+		m_snoop_taps[origin] = space.install_write_tap(start, end, "snoop",
+				[this, origin] (offs_t offset, u64 &, u64) { snoop_write(origin, offset & ~7, 8); },
+				&m_snoop_taps[origin]);
+	}
+	else
+	{
+		m_snoop_taps[origin] = space.install_write_tap(start, end, "snoop",
+				[this, origin] (offs_t offset, u32 &, u32) { snoop_write(origin, offset & ~3, 4); },
+				&m_snoop_taps[origin]);
+	}
+}
+
+// A whole bus beat is reported; it never straddles a cache block or page.
+void mpc10x_host_device::snoop_write(u32 origin, offs_t address, u32 length)
+{
+	for (u32 i = 0; i < m_bus_cpus.size(); i++)
+	{
+		if (i != origin)
+		{
+			m_bus_cpus[i]->signal_external_write(address, length);
+		}
 	}
 }
 

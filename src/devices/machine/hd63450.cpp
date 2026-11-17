@@ -319,7 +319,8 @@ void hd63450_device::dma_transfer_start(int channel)
 	else if ((m_reg[channel].ocr & 3) == 3)
 		m_timer[channel]->adjust(attotime::from_usec(500), channel, attotime::never);
 	else if ((m_reg[channel].ocr & 3) == 2)
-		m_timer[channel]->adjust(attotime::never, channel, attotime::never);
+		// The initial request may already be asserted when the channel is started.
+		m_timer[channel]->adjust(m_drq_state[channel] ? attotime::zero : attotime::never, channel, attotime::never);
 
 	m_transfer_size[channel] = m_reg[channel].mtc;
 

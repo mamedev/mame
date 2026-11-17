@@ -124,6 +124,7 @@ private:
 	int m_rxc_count;
 	int m_txc_count;
 	int m_br_factor;
+	bool m_rx_start_check;     // async: start bit seen, check it again at mid-bit
 
 	uint8_t m_rx_data;         // data being received
 	uint8_t m_tx_data;         // tx buffer

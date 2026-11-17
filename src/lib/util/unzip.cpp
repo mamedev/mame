@@ -1460,7 +1460,7 @@ std::error_condition zip_file_impl::decompress_data_type_14(std::uint64_t offset
 				m_header.file_name, m_filename);
 		return std::errc::not_enough_memory;
 	}
-	else if (SZ_ERROR_UNSUPPORTED)
+	else if (SZ_ERROR_UNSUPPORTED == lzerr)
 	{
 		osd_printf_error(
 				"unzip: LZMA decoder does not support properties for %s in %s\n",
