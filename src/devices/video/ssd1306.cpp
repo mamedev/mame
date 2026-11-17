@@ -82,7 +82,9 @@ DEFINE_DEVICE_TYPE(SSD1306, ssd1306_device, "ssd1306", "Solomon Systech SSD1306 
 ssd1306_device::ssd1306_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SSD1306, tag, owner, clock),
 	device_video_interface(mconfig, *this),
-	device_palette_interface(mconfig, *this)
+	device_palette_interface(mconfig, *this),
+	m_base_rowscan_invert(false),
+	m_base_colscan_invert(false)
 {
 }
 
@@ -102,10 +104,23 @@ void ssd1306_device::device_reset()
 	m_inverting_pixels = false;
 	m_display_enabled = false;
 
+	// no reset values are given for the scroll setup parameters
+	m_horizontal_scrolling_left_pending = false;
+	m_horizontal_scroll_page_start_address_pending = 0;
+	m_horizontal_scroll_interval_pending = 0;
+	m_horizontal_scroll_page_end_address_pending = 0;
+	m_vertical_scroll_offset_pending = 0;
+
 	m_horizontal_scroll_pending = false;
 	m_horizontal_scroll_enabled = false;
 	m_vertical_scroll_pending = false;
 	m_vertical_scroll_enabled = false;
+
+	m_horizontal_scrolling_left = false;
+	m_horizontal_scroll_page_start_address = 0;
+	m_horizontal_scroll_interval = 0;
+	m_horizontal_scroll_page_end_address = 0;
+	m_vertical_scroll_offset = 0;
 
 	m_vertical_scroll_top_fixed_rows = 0;
 	m_vertical_scroll_bottom_scrolled_rows = 64;
@@ -116,6 +131,7 @@ void ssd1306_device::device_reset()
 	m_hvmode_column_end_address = 127;
 	m_hvmode_page_start_address = 0;
 	m_hvmode_page_end_address = 7;
+	m_pagemode_page_start_address = 0; // no reset value given
 
 	m_display_start_line = 0;
 	m_seg0_column_remapped = false;
@@ -131,6 +147,10 @@ void ssd1306_device::device_reset()
 	m_phase_2_period = 2;
 	m_vcomh_deselect_level = 0x20;
 
+	m_page_address_pointer = 0;
+	m_column_address_pointer = 0;
+
+	m_command_pointer = 0;
 	m_spi_bits_left = 0;
 	m_spi_shift = 0;
 
@@ -158,6 +178,12 @@ void ssd1306_device::set_base_rowscan_invert(bool base_rowscan_invert)
 	// this setting is here so that, if there's ever a display that isn't built like this,
 	// then inverting the row scan actually flips the display vertically.
 	m_base_rowscan_invert = base_rowscan_invert;
+}
+
+void ssd1306_device::set_base_colscan_invert(bool base_colscan_invert)
+{
+	// as with rowscan invert, the Arduboy display scans its columns in reverse
+	m_base_colscan_invert = base_colscan_invert;
 }
 
 inline bool ssd1306_device::populate_fifo_until_n_bytes(uint8_t data, int num_bytes)
@@ -326,12 +352,15 @@ void ssd1306_device::exec_command_ax(uint8_t data)
 
 		case 0xa8: // mux ratio (max lines to draw)
 			{
-				if (!populate_fifo_until_n_bytes(data, 3)) return;
+				if (!populate_fifo_until_n_bytes(data, 2)) return;
 
 				int mux_ratio = BIT(m_command_fifo[1], 0, 6);
 				if (mux_ratio < 15)
 				{
-					logerror("%s: invalid mux ratio: %02x\n", mux_ratio);
+					logerror("%s: invalid mux ratio: %02x\n",
+							 machine().describe_context(),
+							 mux_ratio
+							);
 					return;
 				}
 
@@ -393,7 +422,7 @@ void ssd1306_device::exec_command_dx(uint8_t data)
 
 			if (m_command_fifo[1] & ~0x70)
 			{
-				logerror("%s: command db, byte 1: bits other than 4-7 were set.\n",
+				logerror("%s: command db, byte 1: bits other than 4-6 were set.\n",
 						machine().describe_context());
 			}
 			m_vcomh_deselect_level = BIT(m_command_fifo[1], 4, 3);
@@ -428,10 +457,12 @@ void ssd1306_device::exec_command(uint8_t data)
 					(m_pagemode_column_start_address & keep_mask) |
 					(low4 << shift_value);
 
-				if (m_addressing_mode == SSD1306_ADDRESSING_MODE_PAGE)
-				{
-					m_column_address_pointer = m_pagemode_column_start_address;
-				}
+				// TODO: hardware allows writes beyond the end of GDDRAM space.
+				// this is here to catch misbehaving software that can cause crashes.
+				// actual hardware behavior is to be determined.
+				m_pagemode_column_start_address &= 127;
+
+				m_column_address_pointer = m_pagemode_column_start_address;
 			}
 			break;
 
@@ -472,17 +503,15 @@ void ssd1306_device::exec_command(uint8_t data)
 			break;
 
 		case 0xb0:
-			// page addressing mode: set page start address
+			// set page start address in page addressing mode,
+			// and set the page address pointer to that address.
 			if (0xb0 <= m_command_fifo[0] && m_command_fifo[0] <= 0xb7)
 			{
 				if (!populate_fifo_until_n_bytes(data, 1)) return;
 
 				m_pagemode_page_start_address = m_command_fifo[0] & 7;
 
-				if (m_addressing_mode == SSD1306_ADDRESSING_MODE_PAGE)
-				{
-					m_page_address_pointer = m_pagemode_page_start_address;
-				}
+				m_page_address_pointer = m_pagemode_page_start_address;
 				return;
 			}
 
@@ -531,7 +560,8 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 
 	if (m_horizontal_scroll_enabled || m_vertical_scroll_enabled)
 	{
-		logerror("%s: attempt to write display data while scrolling enabled\n");
+		logerror("%s: attempt to write display data while scrolling enabled\n",
+				machine().describe_context());
 		return;
 	}
 
@@ -549,8 +579,8 @@ void ssd1306_device::raw_write(int dc_line, uint8_t data)
 	// The Adafruit SSD1306 driver and most Arduboy games seem to use
 	// horizontal mode exclusively; drawing to a framebuffer on the
 	// ATMega chip, then copying it over to the display in one shot.
-	int address = (m_page_address_pointer * 128) + m_column_address_pointer;
-
+	int seg = m_seg0_column_remapped ? (127 - m_column_address_pointer) : m_column_address_pointer;
+	int address = (m_page_address_pointer * 128) + seg;
 	m_gddram[address] = data;
 
 	switch (m_addressing_mode)
@@ -694,7 +724,7 @@ void ssd1306_device::spi_sck_w(int state)
 	if (!(m_current_interface_mode == SSD1306_INTERFACE_MODE_SPI_3WIRE ||
 		  m_current_interface_mode == SSD1306_INTERFACE_MODE_SPI_4WIRE))
 	{
-		logerror("%s: spi_clk_w called when not in SPI mode\n", machine().describe_context());
+		logerror("%s: spi_sck_w called when not in SPI mode\n", machine().describe_context());
 		return;
 	}
 
@@ -785,9 +815,10 @@ uint32_t ssd1306_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	{
 		for (int x = 0; x < 128; x++)
 		{
+			int real_x = m_base_colscan_invert ? 127 - x : x;
 			int real_y = ((m_base_rowscan_invert ^ m_row_scan_direction_inverse) ? 63-y : y);
 
-			uint8_t stripe = m_gddram[(128 * (real_y >> 3)) + x];
+			uint8_t stripe = m_gddram[(128 * (real_y >> 3)) + real_x];
 
 			bitmap.pix(y, x) = (stripe & (1 << (real_y & 7))) ? on_pixel : off_pixel;
 		}
