@@ -13,7 +13,7 @@ Code developed with Rainbow-100 hardware in mind (a PC-like machine with a video
 Details (termination characters, option hardware, MHFU watchdog) differ when compared to VT.
 
 As of July 2014, the Rainbow video section is more mature than the 'VT100_VIDEO' part (essentially unchanged since 2009).
-List of features not yet ported to VT: line doubler; 48 line mode; intensity / palette, AVO (ext.attributes)
+List of features not yet ported to VT: 48 line mode; intensity / palette, AVO (ext.attributes)
 
 FIXME: work out the differences and identify common code between VT and Rainbow. Unify different code trees.
 
@@ -29,7 +29,7 @@ FIXME: work out the differences and identify common code between VT and Rainbow.
 - NEW - INTERLACED MODE:
   Vertical resolution increases from 240 to 480, while the refresh rate halves (flickers on CRTs).
   To accomplish this, the display controller repeats even lines in odd scans.
-  VTVIDEO activates line doubling in 24 line, interlaced mode only.
+  VTVIDEO activates line doubling in 24 or 25 line, interlaced mode only.
 
   Although the DC12 has the ability to display 48 lines, most units are low on screen RAM and
   won't even show 80 x 48. -> REASON: (83 x 48 = 3984 Byte) > (screen RAM) minus 'scratch area'
@@ -449,7 +449,6 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 				// frame (inferred: the manual only says the DMA runs to the 7F)
 				logerror("unterminated screen line at %04x\n", 0x2000 + addr);
 				valid = false;
-				length = 0;
 				display_type = 3;
 			}
 			else
@@ -464,28 +463,28 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 		if (scan >= first_scan)
 		{
 			int const y = (scan - first_scan) * fields;
-			auto const draw = [&] (int x, uint8_t code, uint8_t type, bool invert, bool bold, bool blink, bool underline, bool blank)
+			auto const draw = [&] (int x, uint8_t code, bool invert, bool bold, bool blink, bool underline, bool blank)
 			{
 				for (int field = 0; field < fields; field++)
-					draw_scan(bitmap, y + field, x, code, row, type, invert, bold, blink, underline, blank, false);
+					draw_scan(bitmap, y + field, x, code, row, display_type, invert, bold, blink, underline, blank, false);
 			};
 			int const width = (display_type != 3) ? (columns / 2) : columns;
 			for (int x = 0; x < width; x++)
 			{
 				if (!valid)
 				{
-					draw(x, 0, 3, false, false, false, false, true);
+					draw(x, 0, false, false, false, false, true);
 				}
 				else if (x < length)
 				{
 					// AVO attribute bits (low active): 0 blink, 1 underline, 2 bold
 					uint8_t const attr = attrs[x];
-					draw(x, codes[x] & 0x7f, display_type, BIT(codes[x], 7), !BIT(attr, 2), !BIT(attr, 0), !BIT(attr, 1), false);
+					draw(x, codes[x] & 0x7f, BIT(codes[x], 7), !BIT(attr, 2), !BIT(attr, 0), !BIT(attr, 1), false);
 				}
 				else
 				{
 					// past the terminator
-					draw(x, 0x7f, display_type, false, false, false, false, false);
+					draw(x, 0x7f, false, false, false, false, false);
 				}
 			}
 		}
