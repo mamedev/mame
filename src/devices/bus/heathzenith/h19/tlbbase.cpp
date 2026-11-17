@@ -743,7 +743,7 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	m_ace->out_rts_callback().set(FUNC(heath_tlb_device::rts_out));
 
 	// keyboard
-	MM5740(config, m_mm5740, MM5740_CLOCK);
+	MM5740AAC(config, m_mm5740, MM5740_CLOCK);
 	m_mm5740->x_cb<1>().set_ioport("X1");
 	m_mm5740->x_cb<2>().set_ioport("X2");
 	m_mm5740->x_cb<3>().set_ioport("X3");

@@ -144,7 +144,4 @@ protected:
 DECLARE_DEVICE_TYPE(MM5740AAC, mm5740aac_device)
 DECLARE_DEVICE_TYPE(MM5740AAE, mm5740aae_device)
 
-// MM5740 is an alias for MM5740AAC until the H19 switches over
-inline constexpr auto &MM5740 = MM5740AAC;
-
 #endif // MAME_MACHINE_MM5740_H
