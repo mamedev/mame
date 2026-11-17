@@ -816,6 +816,8 @@ private:
 	uint8_t i2cdr_r(offs_t offset);
 	void i2cdr_w(offs_t offset, uint8_t data);
 
+	uint16_t gun_r(int which);
+
 	required_device<ppc_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<pc16552_device> m_duart_com;
@@ -1826,6 +1828,25 @@ void viper_state::unk_serial_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 
 /*****************************************************************************/
 
+// GUN0-3 are P1 X, P1 Y, P2 X and P2 Y. A gun that sees no screen pulse is assumed to read as zero,
+// which the games take as an off-screen shot (a reload).
+uint16_t viper_state::gun_r(int which)
+{
+	const uint16_t data = m_gun_input[which]->read();
+	ioport_field *const xf = m_gun_input[which & ~1]->field(0x0001);
+	ioport_field *const yf = m_gun_input[which | 1]->field(0x0001);
+	if (!xf || !yf || xf->type() != IPT_LIGHTGUN_X || yf->type() != IPT_LIGHTGUN_Y || xf->mask() == 0xffff)
+		return data;
+
+	const uint16_t x = m_gun_input[which & ~1]->read() & xf->mask();
+	const uint16_t y = m_gun_input[which | 1]->read() & yf->mask();
+	if (x <= xf->minval() || x >= xf->maxval() || y <= yf->minval() || y >= yf->maxval())
+		return 0;
+
+	const ioport_field *const f = (which & 1) ? yf : xf;
+	return data & f->mask();
+}
+
 void viper_state::viper_map(address_map &map)
 {
 //  map.unmap_value_high();
@@ -1862,7 +1883,7 @@ void viper_state::viper_map(address_map &map)
 	map(0xffe9a000, 0xffe9bfff).rw(m_lanc, FUNC(k056230_viper_device::ram_r), FUNC(k056230_viper_device::ram_w));
 	map(0xffea0000, 0xffea0007).lr8(
 		NAME([this] (offs_t offset) {
-			const u8 res = m_gun_input[offset >> 1]->read() >> ((offset & 1) ? 0 : 8);
+			const u8 res = gun_r(offset >> 1) >> ((offset & 1) ? 0 : 8);
 			return res;
 		})
 	).nopw(); // Gun sensor? Read heavily by p9112
