@@ -71,6 +71,12 @@ void mac_scsi_helper_device::device_start()
 {
 	m_timeout_timer = timer_alloc(FUNC(mac_scsi_helper_device::timeout), this);
 
+	// wait() restarts the access on a 68020/030, which Musashi only honours
+	// with instruction restart on; that is otherwise on only while the PMMU is
+	// enabled, so not on a II with the HMMU (as scsidma.cpp does)
+	if (!m_maincpu->cpu_is_interruptible())
+		downcast<m68000_musashi_device &>(*m_maincpu).set_emmu_enable(true);
+
 	save_item(NAME(m_drq));
 	save_item(NAME(m_waiting));
 	save_item(NAME(m_timed_out));
