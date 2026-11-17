@@ -1011,6 +1011,7 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 		m_brg_counter(0),
 		m_brg_rate(0),
 		m_delayed_tx_brg_change(0),
+		m_tx_clocked(false),
 		m_rx_error(0),
 		m_rx_clock(0),
 		m_rx_first(0),
@@ -1129,6 +1130,7 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_index));
 	save_item(NAME(m_brg_rate));
 	save_item(NAME(m_delayed_tx_brg_change));
+	save_item(NAME(m_tx_clocked));
 	save_item(NAME(m_brg_counter));
 }
 
@@ -1231,8 +1233,7 @@ void z80scc_channel::tra_complete()
 	// Delayed baudrate change according to SCC specs
 	if ( m_delayed_tx_brg_change == 1)
 	{
-		m_delayed_tx_brg_change = 0;
-		set_tra_rate(m_brg_rate);
+		set_tx_brg_rate();
 		LOGTX("Delayed Init - Baud Rate Generator: %d mode: %dx\n", m_brg_rate, get_clock_mode() );
 	}
 
@@ -2037,6 +2038,7 @@ void z80scc_channel::do_sccreg_wr4(uint8_t data)
 		update_serial();
 		safe_transmit_register_reset();
 		receive_register_reset();
+		resume_transmit();
 	}
 }
 
@@ -2898,6 +2900,19 @@ void z80scc_channel::safe_transmit_register_reset()
 		logerror("Attempt to reset transmit shift register while busy detected, please report\n");
 	}
 	transmit_register_reset();
+	if (m_delayed_tx_brg_change)
+		set_tx_brg_rate();
+}
+
+//-------------------------------------------------
+//  set_tx_brg_rate - clock the transmitter from
+//  the baud rate generator
+//-------------------------------------------------
+void z80scc_channel::set_tx_brg_rate()
+{
+	m_delayed_tx_brg_change = 0;
+	set_tra_rate(m_brg_rate);
+	m_tx_clocked = m_brg_rate != 0;
 }
 
 //-------------------------------------------------
@@ -3045,11 +3060,12 @@ void z80scc_channel::update_serial()
 			set_tra_rate(0);
 			LOGTX("   - Transmit clock source RTxC is edge-driven externally\n");
 		}
+		m_tx_clocked = true;
 		break;
 	case WR11_TRACLK_SRC_BR:
-		if (is_transmit_register_empty())
+		if (is_transmit_register_empty() || !m_tx_clocked)
 		{
-			set_tra_rate(m_brg_rate);
+			set_tx_brg_rate();
 			LOGTX("   - Baud Rate Generator: %d clock mode: %dx\n", m_brg_rate, get_clock_mode());
 		}
 		else
@@ -3060,6 +3076,7 @@ void z80scc_channel::update_serial()
 		break;
 	default:
 		set_tra_rate(0);
+		m_tx_clocked = false;
 		LOGTX("   - Transmit clock source unimplemented: stopping\n");
 		break;
 	}
@@ -3074,6 +3091,7 @@ void z80scc_channel::update_serial()
 	if (m_txc > 0 && !(m_wr14 & WR14_BRG_ENABLE))
 	{
 		set_tra_rate(m_txc / clocks);
+		m_tx_clocked = true;
 		LOG("   - Transmit clock: %d mode: %d rate: %d/%xh\n", m_txc, clocks, m_txc / clocks, m_txc / clocks);
 	}
 }

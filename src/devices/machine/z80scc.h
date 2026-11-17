@@ -251,6 +251,7 @@ protected:
 	int get_rx_word_length();
 	int get_tx_word_length();
 	void safe_transmit_register_reset();
+	void set_tx_brg_rate();
 	void check_dma_request();
 	void check_receive_interrupt();
 	bool rx_special_condition(uint8_t status) const;
@@ -260,6 +261,7 @@ protected:
 	uint16_t m_brg_counter;
 	unsigned int m_brg_rate;
 	unsigned int m_delayed_tx_brg_change;
+	bool m_tx_clocked;
 
 	// receiver state
 	uint8_t m_rx_data_fifo[8 + 1];    // receive data FIFO (ring buffer, one slot is always left unused)
