@@ -883,10 +883,9 @@ void sega315_5313_device::ctrl_port_w(int data)
 
 			// in mode 4 all writes beyond register 10 are ignored
 			// bassmpro relies on this at Sega startup logo
-			if (!BIT(m_regs[0x01], 2) && regnum > 10)
-				return;
+			if (BIT(m_regs[0x01], 2) || (regnum & 0x1f) <= 10)
+				vdp_set_register(regnum & 0x1f, value);
 
-			vdp_set_register(regnum & 0x1f, value);
 			m_vdp_code = 0;
 			m_vdp_address = 0;
 		}

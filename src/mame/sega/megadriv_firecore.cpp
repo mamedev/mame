@@ -14,8 +14,9 @@
 #include "emu.h"
 
 #include "megadriv.h"
-
 #include "megadriv_firecore_vdp.h"
+
+#include <algorithm>
 
 #define LOG_SSF2_MAPPER     (1U << 1)
 #define LOG_GPIO            (1U << 2)
@@ -68,9 +69,6 @@ private:
 	uint32_t screen_update_redkid(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual uint32_t get_external_bank_bits() { return 0; }
 
-	void rom_extra_offset_high_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-	void rom_extra_offset_low_w(offs_t offset, uint16_t data, uint16_t mem_mask);
-
 	void set_region_override_flags();
 
 	int m_rom_extra_offset;
@@ -118,20 +116,6 @@ private:
 
 	uint16_t m_chunk_mask[4];   // GPIO bits (in 0xa10104) driving flash A23, A24, A25, A26
 };
-
-void md_firecore_state::rom_extra_offset_high_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	data &= 0x7f;
-	mem_mask &= 0x7f;
-
-	m_rom_extra_offset = (m_rom_extra_offset & 0xff80ffff) | (data & mem_mask) << 16;
-}
-
-void md_firecore_state::rom_extra_offset_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	m_rom_extra_offset = (m_rom_extra_offset & 0xffff0000) | (data & mem_mask);
-}
-
 
 /*
     RedKid (DMC RK2) handhelds / consoles (mahg156, pxp3, mdhh100 with 1Gbit flash, dcat16 with 8MiB)
@@ -224,11 +208,13 @@ void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_
 	}
 
 	case 0x28 / 2:
-		rom_extra_offset_low_w(0, data, mem_mask);
+		m_rom_extra_offset = (m_rom_extra_offset & 0xffff0000) | (data & mem_mask);
 		break;
 
 	case 0x2a / 2:
-		rom_extra_offset_high_w(0, data, mem_mask);
+		data &= 0x7f;
+		mem_mask &= 0x7f;
+		m_rom_extra_offset = (m_rom_extra_offset & 0xff80ffff) | (data & mem_mask) << 16;
 		break;
 
 	case 0x36 / 2:
@@ -265,10 +251,14 @@ void md_firecore_state::redkid_xregs_w(offs_t offset, uint16_t data, uint16_t me
 void md_firecore_state::redkid_ssf2_w(offs_t offset, uint8_t data)
 {
 	// 0xa130f3, f5 ... ff select the 512KiB page shown at 0x080000, 0x100000 ... 0x380000 (used by Super Street Fighter II)
-	if ((offset & 1) && (offset >= 3))
+	if (offset >= 1)
 	{
-		m_ssf2_bank[offset >> 1] = data & 0x3f;
-		LOGMASKED(LOG_SSF2_MAPPER, "%s: SSF2 mapper page %d = %02x\n", machine().describe_context(), offset >> 1, data);
+		m_ssf2_bank[offset] = data & 0x3f;
+		LOGMASKED(LOG_SSF2_MAPPER, "%s: SSF2 mapper page %d = %02x\n", machine().describe_context(), offset, data);
+	}
+	else
+	{
+		LOGMASKED(LOG_SSF2_MAPPER, "%s: SSF2 mapper page %d = %02x (unused register)\n", machine().describe_context(), offset, data);
 	}
 }
 
@@ -335,7 +325,7 @@ void md_firecore_state::md_firecore_map(address_map &map)
 	map(0xa10006, 0xa10007).r(FUNC(md_firecore_state::redkid_portc_r));
 	map(0xa10104, 0xa10113).rw(FUNC(md_firecore_state::redkid_gpio_r), FUNC(md_firecore_state::redkid_gpio_w));
 
-	map(0xa130f0, 0xa130ff).w(FUNC(md_firecore_state::redkid_ssf2_w));
+	map(0xa130f0, 0xa130ff).umask16(0x00ff).w(FUNC(md_firecore_state::redkid_ssf2_w));
 
 	map(0xb00000, 0xb000ff).rw(FUNC(md_firecore_state::redkid_xregs_r), FUNC(md_firecore_state::redkid_xregs_w));
 	map(0xb01000, 0xb010ff).rw(FUNC(md_firecore_state::redkid_sys_r), FUNC(md_firecore_state::redkid_sys_w));
