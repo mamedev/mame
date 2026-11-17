@@ -207,7 +207,7 @@ void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_
 
 		// Writes here don't actually change the timing of the unit, testing Zool on the real pxp3 which is a PAL
 		// ROM (with region lockout) it sets these flags to PAL to bypass the check, but runs too quickly.
-		m_version_hi_nibble = 0x20 | (domestic ? 0x00 : 0x80) | (pal ? 0x40 : 0x00);
+		m_active_version_hi_nibble = 0x20 | (domestic ? 0x00 : 0x80) | (pal ? 0x40 : 0x00);
 		dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).set_ctrl_port_vdp_pal(pal);
 
 		break;
