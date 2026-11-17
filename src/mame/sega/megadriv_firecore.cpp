@@ -17,6 +17,14 @@
 
 #include "megadriv_firecore_vdp.h"
 
+#define LOG_SSF2_MAPPER     (1U << 1)
+#define LOG_GPIO            (1U << 2)
+#define LOG_SYSREG          (1U << 3)
+#define LOG_XREGS           (1U << 4)
+
+#define VERBOSE             (0)
+#include "logmacro.h"
+
 namespace {
 
 class md_firecore_state : public md_ctrl_state
@@ -71,7 +79,7 @@ private:
 
 	uint8_t m_ssf2_bank[8];     // built-in Sega SSF2-style mapper (0xa130f3 - 0xa130ff)
 	uint16_t m_sysreg[0x80];    // 0xb01000 - 0xb010ff
-	uint16_t m_vdpxreg[0x80];   // 0xb00000 - 0xb000ff
+	uint16_t m_xregs[0x80];   // 0xb00000 - 0xb000ff
 };
 
 class md_reactor_state : public md_firecore_state
@@ -117,13 +125,11 @@ void md_firecore_state::rom_extra_offset_high_w(offs_t offset, uint16_t data, ui
 	mem_mask &= 0x7f;
 
 	m_rom_extra_offset = (m_rom_extra_offset & 0xff80ffff) | (data & mem_mask) << 16;
-	logerror("%s: rom_extra_offset_high_w bank is now %08x\n", machine().describe_context(), m_rom_extra_offset);
 }
 
 void md_firecore_state::rom_extra_offset_low_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_rom_extra_offset = (m_rom_extra_offset & 0xffff0000) | (data & mem_mask);
-	logerror("%s: rom_extra_offset_low_w bank is now %08x\n", machine().describe_context(), m_rom_extra_offset);
 }
 
 
@@ -200,8 +206,6 @@ void md_firecore_state::set_region_override_flags()
 	// ROM (with region lockout) it sets these flags to PAL to bypass the check, but runs too quickly.
 	const bool pal = BIT(m_sysreg[0x0c / 2], 2);
 	const bool domestic = BIT(m_sysreg[0x1e / 2], 2);
-	logerror("setting to pal %d domestic %d\n", pal, domestic);
-
 	m_active_version_hi_nibble = 0x20 | (domestic ? 0x00 : 0x80) | (pal ? 0x40 : 0x00);
 	dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).set_ctrl_port_vdp_pal(pal);
 
@@ -231,13 +235,13 @@ void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_
 	{
 		// all games in atgame40 that fail to display anything write 0x0001 here
 		// could be coincidence, but could also be enabling the alt display mode?
-		logerror("%s: redkid_sys_w %02x %04x %04x (custom mode enable?)\n", machine().describe_context(), offset, data, mem_mask);
+		LOGMASKED(LOG_SYSREG, "%s: redkid_sys_w %02x %04x %04x (custom mode enable?)\n", machine().describe_context(), offset, data, mem_mask);
 		break;
 	}
 
 	default:
 	{
-		logerror("%s: redkid_sys_w %02x %04x %04x (unknown)\n", machine().describe_context(), offset, data, mem_mask);
+		LOGMASKED(LOG_SYSREG, "%s: redkid_sys_w %02x %04x %04x (unknown)\n", machine().describe_context(), offset, data, mem_mask);
 		break;
 	}
 
@@ -246,14 +250,16 @@ void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_
 
 uint16_t md_firecore_state::redkid_xregs_r(offs_t offset)
 {
-	logerror("%s: redkid_xregs_r %02x (unknown)\n", machine().describe_context(), offset);
-	return m_vdpxreg[offset];
+	if (!machine().side_effects_disabled())
+		LOGMASKED(LOG_XREGS, "%s: redkid_xregs_r %02x (unknown)\n", machine().describe_context(), offset);
+
+	return m_xregs[offset];
 }
 
 void md_firecore_state::redkid_xregs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	COMBINE_DATA(&m_vdpxreg[offset]);
-	logerror("%s: redkid_xregs_w %02x %04x %04x (unknown)\n", machine().describe_context(), offset, data, mem_mask);
+	COMBINE_DATA(&m_xregs[offset]);
+	LOGMASKED(LOG_XREGS, "%s: redkid_xregs_w %02x %04x %04x (unknown)\n", machine().describe_context(), offset, data, mem_mask);
 }
 
 void md_firecore_state::redkid_ssf2_w(offs_t offset, uint8_t data)
@@ -262,7 +268,7 @@ void md_firecore_state::redkid_ssf2_w(offs_t offset, uint8_t data)
 	if ((offset & 1) && (offset >= 3))
 	{
 		m_ssf2_bank[offset >> 1] = data & 0x3f;
-		logerror("%s: SSF2 mapper page %d = %02x\n", machine().describe_context(), offset >> 1, data);
+		LOGMASKED(LOG_SSF2_MAPPER, "%s: SSF2 mapper page %d = %02x\n", machine().describe_context(), offset >> 1, data);
 	}
 }
 
@@ -282,7 +288,7 @@ void md_firecore_state::redkid_gpio_w(offs_t offset, uint16_t data, uint16_t mem
 	COMBINE_DATA(&m_gpio[offset]);
 
 	if (old_external_bank != get_external_bank_bits())
-		logerror("%s: GPIO %06x = %04x -> flash chunk %x (%08x)\n", machine().describe_context(), 0xa10104 + offset * 2, m_gpio[offset],
+		LOGMASKED(LOG_GPIO, "%s: GPIO %06x = %04x -> flash chunk %x (%08x)\n", machine().describe_context(), 0xa10104 + offset * 2, m_gpio[offset],
 				get_external_bank_bits(), get_external_bank_bits() << 23);
 }
 
@@ -420,7 +426,7 @@ void md_firecore_state::machine_start()
 	save_item(NAME(m_gpio));
 	save_item(NAME(m_ssf2_bank));
 	save_item(NAME(m_sysreg));
-	save_item(NAME(m_vdpxreg));
+	save_item(NAME(m_xregs));
 }
 
 void md_firecore_state::machine_reset()
@@ -432,7 +438,7 @@ void md_firecore_state::machine_reset()
 	for (int i = 0; i < 8; i++)
 		m_ssf2_bank[i] = i;
 	std::fill(std::begin(m_sysreg), std::end(m_sysreg), 0);
-	std::fill(std::begin(m_vdpxreg), std::end(m_vdpxreg), 0);
+	std::fill(std::begin(m_xregs), std::end(m_xregs), 0);
 
 	// set the default state of the extended PAL/Domestic flag override registers to whatever the machine is configured as
 	if (BIT(m_version_hi_nibble, 6))
@@ -662,12 +668,12 @@ ROM_END
 // PXP3 16-bit handhelds with cartridge slot, several revisions with different game selections (dumps named after the case colour)
 ROM_START(pxp3)
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "pxp3_black.bin", 0x0000,  0x8000000, CRC(5c29ad76) SHA1(a377cf704d17a084537211e22c94f086628cd642) )
+	ROM_LOAD16_WORD_SWAP( "pxp3_black.bin", 0x0000,  0x8000000, CRC(5c29ad76) SHA1(a377cf704d17a084537211e22c94f086628cd642) ) // glob, no clear IC position
 ROM_END
 
 ROM_START(pxp3a)
 	ROM_REGION(0x8000000, "maincpu", ROMREGION_ERASEFF)
-	ROM_LOAD16_WORD_SWAP( "pxp3_blue.bin", 0x0000,  0x8000000, CRC(f5e36263) SHA1(98f551358be92591fa34304d97fbf48482801123) )
+	ROM_LOAD16_WORD_SWAP( "pxp3_blue.bin", 0x0000,  0x8000000, CRC(f5e36263) SHA1(98f551358be92591fa34304d97fbf48482801123) ) // glob, no clear IC position
 ROM_END
 
 ROM_START(mdhh100)
@@ -736,7 +742,7 @@ void md_pxp3_state::init_pxp3() // also mdhh100
 void md_reactor_state::init_atgame40()
 {
 	m_romsize = memregion("maincpu")->bytes();
-	init_megadriv();
+	init_megadrie();
 }
 
 void md_reactor_state::init_reactor()
@@ -759,8 +765,6 @@ void md_reactor_state::init_reactor()
 
 } // anonymous namespace
 
-// Games below have a device at b0102x which appears to either be able to select ROM base on a byte boundary
-// OR maybe are running from RAM instead of ROM (with an auto-copy at the start?) with that being a DMA operation.
 
 // Technically this is a MD type cartridge, but it doesn't seem to be designed for use with a standard MD as it contains
 // nothing but the 16Mbyte ROM and a 5v to 3.3v converter yet the code clearly requires some extensive banking logic.
