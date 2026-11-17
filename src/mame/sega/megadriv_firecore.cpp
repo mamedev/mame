@@ -63,6 +63,8 @@ private:
 	void rom_extra_offset_high_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	void rom_extra_offset_low_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 
+	void set_region_override_flags();
+
 	int m_rom_extra_offset;
 
 	required_region_ptr<uint16_t> m_rom;
@@ -192,6 +194,18 @@ uint16_t md_firecore_state::redkid_sys_r(offs_t offset)
 	return m_sysreg[offset];
 }
 
+void md_firecore_state::set_region_override_flags()
+{
+	// The registers don't actually change the timing of the unit, testing Zool on the real pxp3 which is a PAL
+	// ROM (with region lockout) it sets these flags to PAL to bypass the check, but runs too quickly.
+	const bool pal = BIT(m_sysreg[0x0c / 2], 2);
+	const bool domestic = BIT(m_sysreg[0x1e / 2], 2);
+	logerror("setting to pal %d domestic %d\n", pal, domestic);
+
+	m_active_version_hi_nibble = 0x20 | (domestic ? 0x00 : 0x80) | (pal ? 0x40 : 0x00);
+	dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).set_ctrl_port_vdp_pal(pal);
+
+}
 void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_sysreg[offset]);
@@ -201,15 +215,7 @@ void md_firecore_state::redkid_sys_w(offs_t offset, uint16_t data, uint16_t mem_
 	case 0x0c / 2: // 0xb0100c bit 2: version register reports PAL (set by the menu from the game header region)
 	case 0x1e / 2: // 0xb0101e bit 2: version register reports domestic (Japan)
 	{
-		const bool pal = BIT(m_sysreg[0x0c / 2], 2);
-		const bool domestic = BIT(m_sysreg[0x1e / 2], 2);
-		logerror("setting to pal %d domestic %d\n", pal, domestic);
-
-		// Writes here don't actually change the timing of the unit, testing Zool on the real pxp3 which is a PAL
-		// ROM (with region lockout) it sets these flags to PAL to bypass the check, but runs too quickly.
-		m_active_version_hi_nibble = 0x20 | (domestic ? 0x00 : 0x80) | (pal ? 0x40 : 0x00);
-		dynamic_cast<megadriv_firecore_vdp_device&>(*m_vdp).set_ctrl_port_vdp_pal(pal);
-
+		set_region_override_flags();
 		break;
 	}
 
@@ -375,12 +381,14 @@ static INPUT_PORTS_START( mahg156 )
 	PORT_INCLUDE( firecore_6button )
 
 	// read back inverted from 0xa10006 bits 15-13 by the menu at startup, selects which part of the game list is shown
-	PORT_START("MENU")
-	PORT_CONFNAME( 0xe000, 0xe000, "Menu" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md_pxp3_state::menu_changed), 0)
-	PORT_CONFSETTING(      0xe000, "Games 1-156" )
 	// this doesn't actually have a cartridge slot, these are leftover menus from the PXP, all games are available in the first menu
-	//PORT_CONFSETTING(      0xa000, "Games 81-119" )
-	//PORT_CONFSETTING(      0xc000, "Games 120-156" )
+	PORT_START("MENU")
+	PORT_BIT( 0xe000, IP_ACTIVE_LOW, IPT_UNUSED )
+	//
+	//PORT_CONFNAME( 0xe000, 0xe000, "Menu" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(md_pxp3_state::menu_changed), 0)
+	//PORT_CONFSETTING(      0xe000, "Standard menu" )
+	//PORT_CONFSETTING(      0xa000, "Leftover 999666-in-1 menu" )
+	//PORT_CONFSETTING(      0xc000, "Leftover 900000-in-1" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mdhh100 )
@@ -425,6 +433,16 @@ void md_firecore_state::machine_reset()
 		m_ssf2_bank[i] = i;
 	std::fill(std::begin(m_sysreg), std::end(m_sysreg), 0);
 	std::fill(std::begin(m_vdpxreg), std::end(m_vdpxreg), 0);
+
+	// set the default state of the extended PAL/Domestic flag override registers to whatever the machine is configured as
+	if (BIT(m_version_hi_nibble, 6))
+		m_sysreg[0x0c / 2] |= 0x04;
+
+	if (BIT(m_version_hi_nibble, 7))
+		m_sysreg[0x1e / 2] |= 0x04;
+
+	// update the active flags to reflect that
+	set_region_override_flags();
 
 	md_ctrl_state::machine_reset();
 }
