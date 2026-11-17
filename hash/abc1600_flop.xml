@@ -179,8 +179,7 @@ license:CC0-1.0
 		<info name="usage" value="mf(2,0)&#10;mf(2,0)&#10;systest1600" />
 		<!--
 		Failing tests:
-		- CIO timer (works if CIO clock is 4219000)
-		- DMA (expects to read 0xff from 0x18000..)
+		- Keyboard (sound generator, function keys, LED keys and key test fail the ABC 99 ID/LED readback)
 		-->
 
 		<part name="flop1" interface="floppy_5_25">

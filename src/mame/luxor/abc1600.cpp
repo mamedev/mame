@@ -592,6 +592,7 @@ void abc1600_state::sysscc_w(int state)
 	LOG("%s SYSSCC %d\n", machine().describe_context(), state);
 
 	m_sysscc = state;
+	m_mac->sysscc_w(state);
 
 	m_cio->pb5_w(!state);
 
@@ -608,6 +609,7 @@ void abc1600_state::sysfs_w(int state)
 	LOG("%s SYSFS %d\n", machine().describe_context(), state);
 
 	m_sysfs = state;
+	m_mac->sysfs_w(state);
 
 	m_cio->pb6_w(!state);
 
@@ -697,13 +699,15 @@ INPUT_PORTS_END
 
 void abc1600_state::update_br()
 {
-	// _BR = !_DMADIS || (_DBRQ0 || _DBRQ1 || _DBRQ2)
+	// BR = _DMADIS && (DBRQ0 || DBRQ1 || DBRQ2)
 	// _IOC = IORQ delayed by 1 clock, or IORQ preceded by 1 clock on MINT2 or MINT5
 	// _BGACK = !_BR && !_BG && _IOC
 	// DMA0.BAI = _BGACK
 
-	// workaround for floppy DMA, this should use the 68000 BR line instead
-	m_dma0->bai_w(!m_dmadis || m_dbrq0 || m_dbrq1 || m_dbrq2);
+	bool const br = m_dmadis && (m_dbrq0 || m_dbrq1 || m_dbrq2);
+
+	m_maincpu->set_input_line(INPUT_LINE_HALT, br ? ASSERT_LINE : CLEAR_LINE);
+	m_dma0->bai_w(br);
 }
 
 void abc1600_state::update_pren0(int state)
