@@ -18,7 +18,6 @@ public:
 		virtual ~config() = default;
 		virtual int get_mode() const = 0;
 		virtual bool get_decryption_mode() const;
-		virtual bool is_decryption_unconfirmed(u8 opcode) const;
 		virtual std::optional<u32> get_cs_base() const;
 	};
 
@@ -125,7 +124,6 @@ private:
 	u32 m_segment;
 	offs_t m_dasm_flags;
 	std::string m_modrm_string;
-	bool m_unconfirmed_decryption;
 
 	inline u8 FETCH(offs_t pc_base, offs_t &pc, const data_buffer &opcodes);
 	inline u16 FETCH16(offs_t pc_base, offs_t &pc, const data_buffer &opcodes);

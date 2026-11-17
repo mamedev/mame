@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders: David Haywood, Roberto Zandona, Peter Wilhelmsen
+// copyright-holders: David Haywood, Roberto Zandona', Peter Wilhelmsen
 
 /*************************************************************************************************
 
@@ -45,8 +45,8 @@ To enter input test, keep '9' pressed and press 'F3'.
 
 TODO:
 - complete CPU decryption and verify the provisional 3b, 3c, 79, 7c and d0 mappings;
-- investigate crzybell's attendant fallback: E2593 decreases credits without
-  updating the retained copy, unlike the ordinary Key Out path at E2444;
+- investigate crzybell's attendant fallback: 0xe2593 decreases credits without
+  updating the retained copy, unlike the ordinary Key Out path;
 - the DC3001 GFX custom is suspected to have internal ROM (seems used by scherrym and clones
   and possibly by pdouble8 for the reels). nmondop also selects a reel bank beyond
   its dumped graphics ROM; determine whether this is internal ROM or different banking;
@@ -88,9 +88,9 @@ TODO:
 
 namespace {
 
-// D9902 programs 128-byte pages using AA/55/A0 software-protection commands.
-// The dump contains the initial settings at 0200 as well as the program code.
-// The exact parallel EEPROM/flash part and its timings have not been identified.
+// D9902 programs 128-byte pages using 0xaa/0x55/0xa0 software-protection commands.
+// The dump contains the initial settings at 0x0200 as well as the program code.
+// TODO: identify the parallel EEPROM/flash part (W29C020 family?) and its timings.
 class bsbonanza_eeprom_device : public eeprom28_nvram_device<18, 128, 150, 5'000>
 {
 public:
@@ -130,7 +130,7 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 	void base(machine_config &config) ATTR_COLD;
-	void cb5(machine_config &config) ATTR_COLD;
+	void cb5_base(machine_config &config) ATTR_COLD;
 	void scherrymp(machine_config &config) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 	void program_map(address_map &map) ATTR_COLD;
@@ -360,7 +360,7 @@ private:
 
 // Opcode bytes and prefixes are encrypted; operands and NEC extension bytes are not.
 // TODO: resolve unknown entries and distinguish duplicate mappings.
-// Five mappings are PROVISIONAL and UNCONFIRMED in both the CPU and debugger:
+// Five mappings are provisional:
 //   3b -> 10 (ADC r/m8,r8): Crazy Bell uses DL,DL; the opposite direction and
 //         RCL DL,1 produce the same observed result, with flags overwritten.
 //   3c -> 3e (DS0 override): the observed Triple Jack/Bonanza uses have DS0=DS1.
@@ -389,18 +389,6 @@ constexpr uint8_t CPU91A_DECRYPTION_TABLE[256] =
 	0x8a, 0xb1, 0x45, 0xc6, 0x79, 0x5a, UNKN, 0xb2, 0x9a, 0x52, UNKN, UNKN, UNKN, 0x6e, UNKN, UNKN, // E0
 	UNKN, 0xae, 0xfe, 0x6a, UNKN, UNKN, UNKN, 0x3a, UNKN, UNKN, 0x34, UNKN, 0x81, UNKN, UNKN, UNKN, // F0
 };
-
-void configure_cpu_decryption(v25_common_device &cpu) ATTR_COLD;
-
-void configure_cpu_decryption(v25_common_device &cpu)
-{
-	cpu.set_decryption_table(CPU91A_DECRYPTION_TABLE);
-	cpu.set_unconfirmed_decryption(0x3b);
-	cpu.set_unconfirmed_decryption(0x3c);
-	cpu.set_unconfirmed_decryption(0x79);
-	cpu.set_unconfirmed_decryption(0x7c);
-	cpu.set_unconfirmed_decryption(0xd0);
-}
 
 void cb2001_state::machine_start()
 {
@@ -433,9 +421,8 @@ uint32_t cb2001_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				}
 			}
 
-			// CB2001 E3167 uploads 256 scanline selectors to 21f00. Bit 7
-			// enables the line and bits 0-1 choose one of four reel maps.
-			// The normal table at E87A2 uses reels 0-2; E88A6 uses reel 3.
+			// Scanline selectors at 0x21f00: bit 7 enables the line,
+			// bits 0-1 select one of four reel maps.
 			auto const selector = [this] (int y) -> uint8_t
 			{
 				return m_vram_bg[(0xf00 + (y & 0xff)) / 2] >> ((y & 1) * 8);
@@ -484,9 +471,7 @@ void cb2001_state::vidctrl2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	bool reels_dirty = false;
 	if (ACCESSING_BITS_8_15)
 	{
-		// nmondop DDD22-DDD4A splits a reel tile attribute into a bank
-		// at OUT32 and a four-bit palette at OUT33. scherrymp's gallery
-		// likewise selects palettes 0e/0f for the artwork in banks 11-17.
+		// OUT33 bits 0-3 select the reel palette independently of the bank.
 		uint8_t const colour = BIT(data, 8, 4);
 		reels_dirty = m_reel_colour != colour;
 		m_reel_colour = colour;
@@ -508,8 +493,7 @@ void cb2001_state::vidctrl2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 
 TILE_GET_INFO_MEMBER(cb2001_state::get_bg_tile_info)
 {
-	// scherrymp C5778 changes foreground bank 31 to 0c, retaining background
-	// bank 32 = 1c for the title animation. The two tile banks are independent.
+	// Foreground and background tile banks are independent.
 	int const code = (m_vram_bg[tile_index] & 0x0fff) | ((m_other2 & 0x1c) << 10);
 	int const colour = BIT(m_vram_bg[tile_index], 12, 4);
 
@@ -534,9 +518,7 @@ TILE_GET_INFO_MEMBER(cb2001_state::get_reel_tile_info)
 
 	code &= 0xff;
 
-	// Reel maps contain eight-bit codes, so OUT32 bits 0-4 select 32 KiB
-	// banks. Unlike the 8x8 maps, they need the low two bank bits as well:
-	// mystjb uses 28 for its symbols and 29 for the Cherry Bonus numbers.
+	// Eight-bit reel codes use all five OUT32 bank bits to select 32 KiB banks.
 	int const reel_bank = (m_other2 & 0x1f) << 8;
 
 	tileinfo.set(1, code | reel_bank, m_reel_colour, 0);
@@ -671,15 +653,13 @@ uint32_t dyna_plane_base::screen_update(screen_device &screen, bitmap_rgb32 &bit
 	{
 		if (BIT(m_video_regs[0], 4))
 		{
-			// Crazy Bell E03AE selects palette 0a; Bonanza D2182 selects 05.
 			m_reel_tilemap->set_palette_offset((m_video_regs[3] & 0x0f) << 4);
 
 			for (uint32_t col = 0; col < 64; ++col)
 				m_reel_tilemap->set_scrolly(col, vram_byte(m_vram_bg, 0x800 + col) + bg_scroll);
 
-			// D283D uploads a per-scanline reel window to the last four rows
-			// of foreground code RAM. Crazy Bell E2F0C/E4C53 does the same.
-			// Bit 7 enables a line; other bits need further verification.
+			// The last four foreground rows hold the per-scanline reel window.
+			// Bit 7 enables a line; the other bits are unverified.
 			for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 			{
 				if (BIT(vram_byte(m_vram_fg, 0x700 + ((y + bg_scroll) & 0xff)), 7))
@@ -717,8 +697,7 @@ void cb2001_state::nvram_map(address_map &map)
 void pdouble8_state::io_map(address_map &map)
 {
 	scherrym_base_io_map(map);
-	// E2FD4/E4384 read inputs independently of the OUT30/31 latches;
-	// the program never sets an 8255 direction register.
+	// Input ports and output latches are independent.
 	map(0x30, 0x32).r(FUNC(pdouble8_state::input_r));
 	map(0x30, 0x30).w(FUNC(pdouble8_state::lamps_w));
 	map(0x31, 0x31).w(FUNC(pdouble8_state::output_w));
@@ -731,28 +710,23 @@ uint8_t pdouble8_state::input_r(offs_t offset)
 
 void pdouble8_state::lamps_w(uint8_t data)
 {
-	// E3049 writes the panel latch, mirrored at RAM 04B2.
 	for (uint32_t bit = 0; bit < 8; ++bit)
 		m_lamps[bit] = BIT(data, bit);
 }
 
 void pdouble8_state::output_w(uint8_t data)
 {
-	// E5B9E/E5BFB set/clear bit 7 through E30B4/E30E4.
 	m_hopper->motor_w(BIT(data, 7));
-	// E3080 queues Coin A/B/C/D pulses; E5D49, E5CEA and E6031
-	// pulse the hopper, attendant and Key Out meters respectively.
+	// Meters: Coin A-D, hopper, attendant payout, Key Out.
 	for (uint32_t counter = 0; counter < 7; ++counter)
 		machine().bookkeeping().coin_counter_w(counter, BIT(data, 6 - counter));
 }
 
 void crzybell_state::program_map(address_map &map)
 {
-	// E01D1 tests/restores 8 KiB. E0282 checks the retained signature
-	// and credit copies at 00D0/01D0; invalid contents clear 0080-1BFF.
+	// The first 8 KiB hold retained settings and accounting data.
 	cb2001_state::program_map(map);
 	map(0x00000, 0x01fff).ram().share("nvram");
-	// E32B8 writes AL at IY and AH at IY+0800, then advances IY by one.
 	map(0x20000, 0x20fff).ram().w(FUNC(crzybell_state::vram_w<0>)).share(m_vram_fg);
 	map(0x21000, 0x21fff).ram().w(FUNC(crzybell_state::vram_w<1>)).share(m_vram_bg);
 }
@@ -761,18 +735,15 @@ void crzybell_state::io_map(address_map &map)
 {
 	scherrym_io_map(map);
 	map(0x00, 0x06).w(FUNC(crzybell_state::video_regs_w));
-	// The ROM reads inputs and writes independent latches without setting
-	// an 8255 direction register (E018D/E3013/E2DDF).
+	// Input ports and output latches are independent.
 	map(0x30, 0x30).w(FUNC(crzybell_state::lamps_w));
 	map(0x31, 0x31).w(FUNC(crzybell_state::output_w));
 }
 
 void crzybell_state::output_w(uint8_t data)
 {
-	// E25F2/E2636 set/clear bit 7 through E2DDA/E2DE5.
 	m_hopper->motor_w(BIT(data, 7));
-	// E2CD6 drains the six pulse queues: Coin A/B/C, hopper units,
-	// attendant fallback (E25AC), and Key Out (E2451).
+	// Meters: Coin A-C, hopper, attendant payout, Key Out.
 	static constexpr uint8_t COUNTER_BITS[] = { 6, 5, 3, 2, 1, 0 };
 	for (uint32_t counter = 0; counter < std::size(COUNTER_BITS); ++counter)
 		machine().bookkeeping().coin_counter_w(counter, BIT(data, COUNTER_BITS[counter]));
@@ -780,13 +751,9 @@ void crzybell_state::output_w(uint8_t data)
 
 void bsbonanza_state::program_map(address_map &map)
 {
-	// D0128 tests/restores the first 8 KiB.  D01A9 checks the retained
-	// signature at 0080 and the credit/backup pair at 0254/0a30 before
-	// deciding whether to initialise bookkeeping or preserve it.
+	// The first 8 KiB hold retained settings and accounting data.
 	map(0x00000, 0x01fff).ram().share("nvram");
 	map(0x02000, 0x1ffff).ram();
-	// Both revisions copy 256 little-endian colour words from D000:D3C9
-	// to 0000:8000 in the palette upload routine at D000:D658.
 	map(0x08000, 0x081ff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 	map(0x20000, 0x20fff).ram().w(FUNC(bsbonanza_state::vram_w<0>)).share(m_vram_fg);
 	map(0x21000, 0x21fff).ram().w(FUNC(bsbonanza_state::vram_w<1>)).share(m_vram_bg);
@@ -803,10 +770,7 @@ void cb5_state::machine_start()
 
 void cb4_state::output_w(uint8_t data)
 {
-	// E5ce3/E5d40 set/clear mask 80 via E3155/E3164, which complement
-	// the latch before writing PPI2 port C (B822). Wing W-4 uses /HOPPER.
-	// V1.2 uses E5d99/E5df6 via E3234/E3243 with the same polarity.
-	// CB5 V1.1/V1.3/V1.4 use E6a0f/E6a6c via E37c0/E37cf.
+	// Wing W-4 hopper control is active low on PPI2 port C bit 7.
 	m_hopper->motor_w(!BIT(data, 7));
 	// The other bits control coin acceptance and board functions.
 }
@@ -818,9 +782,7 @@ TIMER_CALLBACK_MEMBER(cb5_state::counter_tick)
 
 void cb5_state::counters_w(uint8_t data)
 {
-	// CB5 E37da/E381d pulse and release B821 bits 6-3 for Coin A,
-	// Coin B, Coin C and Coin D. E6bba pulses bit 2 for each hopper coin.
-	// The program complements the latch before writing PPI2 port B.
+	// PPI2 port B has active-low meters on bits 6-3 (Coin A-D) and 2 (hopper).
 	data = ~data;
 	for (uint32_t counter = 0; counter < m_counter_timers.size(); ++counter)
 	{
@@ -841,8 +803,7 @@ void cb5_state::counters_w(uint8_t data)
 template <uint32_t Player>
 void cb4_state::lamps_w(uint8_t data)
 {
-	// E3107 (CB4) and E3775 (CB5) select B850/B860 by player.
-	// Bits 0-5 are Big, Double Up, Take, Bet, Info and Start respectively.
+	// Bits 0-5: Big, Double Up, Take, Bet, Info, Start.
 	for (uint32_t bit = 0; bit < 8; ++bit)
 		m_lamps[Player * 8 + bit] = BIT(data, bit);
 }
@@ -856,8 +817,7 @@ void cb4_state::io_map(address_map &map)
 
 void cherry2001_state::output_w(uint8_t data)
 {
-	// E4B42/E4BA1 set/clear bit 7 via the independent OUT01 latch at E3043.
-	// The remaining bits drive meters; their assignments need verification.
+	// The remaining meter output assignments are unknown.
 	m_hopper->motor_w(BIT(data, 7));
 }
 
@@ -869,10 +829,7 @@ void cherry2001_state::io_map(address_map &map)
 
 void scherrymp_state::output_w(uint8_t data)
 {
-	// C60b9/C612e set/clear bit 7 through the OUT01 latch at C3ca2/C3cd6.
-	// V1.0U does the same at C6000/C6075 through C3c1a/C3c4e.
-	// Mystery J & B E5840/E58b5 use E374c/E377c with the same polarity.
-	// Other bits drive counters/lamps; their physical assignments are unknown.
+	// The remaining counter/lamp output assignments are unknown.
 	m_hopper->motor_w(BIT(data, 7));
 }
 
@@ -885,20 +842,14 @@ void scherrymp_state::io_map(address_map &map)
 void mystjb_state::tripjack_io_map(address_map &map)
 {
 	io_map(map);
-	// V1.6G E0398 reads 13 date/time digits, setting HOLD at 4d and
-	// polling BUSY. E0342 writes the digits, then control E=6 and F=4
-	// (24-hour mode). This is an MSM6242-compatible interface; the exact
-	// RTC part and its external interrupt wiring have not been identified.
+	// MSM6242-compatible RTC; exact part and interrupt wiring are unknown.
 	map(0x40, 0x4f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 void mystjb_state::lamps_w(uint8_t data)
 {
-	// E36d3/E36ec update the separate OUT00 latch. The masks match IN0:
-	// Big, unknown, Stop 2, Stop 1/Double Up, Take, Bet, Small/Info, Start.
-	// Triple Jack uses the same eight-bit latch (C35d3/E30c7/E30bd).
-	// New Mondo Plus C3b51 writes the latch at 0557 to the same port.
-	// New DongmulDongmul 2 C3c45 uses the latch at 054b.
+	// Lamp bits match IN0: Big, unknown, Stop 2, Stop 1/Double Up,
+	// Take, Bet, Small/Info, Start.
 	for (uint32_t bit = 0; bit < 8; ++bit)
 		m_lamps[bit] = BIT(data, bit);
 }
@@ -906,16 +857,7 @@ void mystjb_state::lamps_w(uint8_t data)
 void mystjb_state::output_w(uint8_t data)
 {
 	scherrymp_state::output_w(data);
-	// E3718 pulses bits 6-3 for Coin A-D. E5a46 pulses bit 2 for each
-	// hopper coin, E59ca bit 1 for attendant-paid coins, E5b92 bit 0 for
-	// Key Out units. The independent latch starts at zero (E010c).
-	// Triple Jack has the same seven assignments: V1.6G C3618/C5d2a/
-	// C5ca3/C5e81; V1.1 E310c/E5398/E5338/E54b7; V0.7 E3102/E5418/
-	// E53b8/E5537. Bit 7 controls its hopper (C5af8/E51b4/E5234).
-	// New Mondo Plus: C3b88/C606e/C600e/C6199 use the same meters;
-	// C5ea0/C5f15 start/stop its hopper through the latch at 0543.
-	// New DongmulDongmul 2: C3c7c/C5ff4/C5f94/C611f use these meters;
-	// C5e26/C5e9b start/stop the hopper through the latch at 0537.
+	// Meters: Coin A-D, hopper, attendant payout, Key Out.
 	for (uint32_t counter = 0; counter < 7; ++counter)
 		machine().bookkeeping().coin_counter_w(counter, BIT(data, 6 - counter));
 }
@@ -929,12 +871,8 @@ void mystjb_state::io_map(address_map &map)
 
 void bsbonanza_state::output_w(uint8_t data)
 {
-	// D13F2 starts the hopper with mask 80; D1467/D14A2/D15C7 stop it.
 	m_hopper->motor_w(BIT(data, 7));
-	// D24f2-D2619 drains the seven pending meter counts through OUT01:
-	// bits 6-3 are Coin A, Key In, Coin C and Token In; bits 2-0 are
-	// hopper, attendant and Key Down. V1.0 uses the same code, with the
-	// shadow/counts one byte earlier (0ab8-0ad4 instead of 0ab9-0ad5).
+	// Meters: Coin A, Key In, Coin C, Token In, hopper, attendant, Key Down.
 	for (uint32_t counter = 0; counter < 7; ++counter)
 		machine().bookkeeping().coin_counter_w(counter, BIT(data, 6 - counter));
 }
@@ -942,14 +880,11 @@ void bsbonanza_state::output_w(uint8_t data)
 void bsbonanza_state::io_map(address_map &map)
 {
 	cb2001_state::io_map(map);
-	// Ports 00/01 have independent input and output latches. Neither revision
-	// programs an 8255 direction register before reading coins/driving the motor.
+	// Ports 0x00/0x01 have independent input and output latches.
 	map(0x00, 0x00).w(FUNC(bsbonanza_state::lamps_w));
 	map(0x01, 0x01).w(FUNC(bsbonanza_state::output_w));
 	map(0x30, 0x36).w(FUNC(bsbonanza_state::video_regs_w));
-	// Both revisions use HOLD/BUSY at 4d, 13 calendar digits at 40-4c,
-	// and controls E=6/F=4 (E78b8/E790e): an MSM6242-compatible RTC.
-	// The exact part and its external interrupt connection are unverified.
+	// MSM6242-compatible RTC; exact part and interrupt wiring are unknown.
 	map(0x40, 0x4f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
@@ -1000,8 +935,8 @@ void cb2001_state::cb5_io_map(address_map &map)
 static INPUT_PORTS_START( cb2001 )
 	// TODO: identify IN0 bits 0/1 on Super Cherry Master.
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown Player Input 0") PORT_CODE(KEYCODE_Y)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown Player Input 1") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Big")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / D-UP")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Stop All / Take")
@@ -1162,27 +1097,23 @@ static INPUT_PORTS_START( pdouble8 )
 	PORT_INCLUDE(cb2001)
 
 	PORT_MODIFY("IN0")
-	// E4FA4 uses bits 0/6 for Big/Small. E0C8D selects the stop
-	// button table using DSW5; these stop numbers describe the default.
+	// Reel stop numbers follow the default DSW5 button order.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Big")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	// E41B0/E426D maintain separate bets for the two sides.
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Bet B / Stop 2 / D-Up")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_NAME("Take / Stop")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet A / Stop")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Small / Info")
 
 	PORT_MODIFY("IN1")
-	// E4384 masks F8; bits 7/6/5/4 are Coin A/B/C/D, bit 3 adds
-	// one service credit (E43F9). It does not pulse a coin meter.
+	// Service Credit adds one credit without pulsing a coin meter.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Service Credit")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_MODIFY("IN2")
-	// E5B86 checks the active-high empty input. E5D57 applies the
-	// selected sensor polarity; the default waits for a low-to-high pulse.
+	// The hopper sensor polarity is selectable; the default expects a rising edge.
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Empty") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -1205,7 +1136,6 @@ static INPUT_PORTS_START( pdouble8 )
 	PORT_DIPNAME( 0x0040, 0x0000, "Hopper Sensor" ) PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(      0x0000, "Active High" )
 	PORT_DIPSETTING(      0x0040, "Active Low" )
-	// E2E7B indexes four BCD limits at E80D1; E3936 displays the value.
 	PORT_DIPNAME( 0x3000, 0x0000, "Maximum Bet" ) PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(      0x3000, "8" )
 	PORT_DIPSETTING(      0x2000, "16" )
@@ -1213,8 +1143,7 @@ static INPUT_PORTS_START( pdouble8 )
 	PORT_DIPSETTING(      0x0000, "64" )
 
 	PORT_MODIFY("DSW3")
-	// E2EA7-E2F19: the other denominations are multiples of Coin A.
-	// Coin D also supplies the hopper conversion at E5D95/E60AE.
+	// Other denominations are multiples of Coin A; Coin D sets the hopper unit.
 	PORT_DIPNAME( 0x0007, 0x0000, "Coin A" ) PORT_DIPLOCATION("DSW3:1,2,3")
 	PORT_DIPSETTING(      0x0007, "1 Coin / 1 Credit" )
 	PORT_DIPSETTING(      0x0006, "1 Coin / 2 Credits" )
@@ -1237,8 +1166,7 @@ static INPUT_PORTS_START( pdouble8 )
 	PORT_DIPSETTING(      0x0000, "2 x Coin A" )
 
 	PORT_MODIFY("DSW4")
-	// E2BBA suspends further play above this balance; E2B95 displays
-	// the limit only when bit 3 is clear. Table: E8099 (four-byte BCD).
+	// Play stops above this balance; DSW4:4 controls whether the limit is displayed.
 	PORT_DIPNAME( 0x0007, 0x0007, "Credit Limit for Play" ) PORT_DIPLOCATION("DSW4:1,2,3")
 	PORT_DIPSETTING(      0x0007, "5000" )
 	PORT_DIPSETTING(      0x0006, "10000" )
@@ -1251,13 +1179,11 @@ static INPUT_PORTS_START( pdouble8 )
 	PORT_DIPNAME( 0x0008, 0x0008, "Show Credit Limit" ) PORT_DIPLOCATION("DSW4:4")
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	// E4368 compares the balance with the BCD table selected at E2F59.
 	PORT_DIPNAME( 0x0030, 0x0030, "Coin Acceptance Limit" ) PORT_DIPLOCATION("DSW4:5,6")
 	PORT_DIPSETTING(      0x0030, "1000" )
 	PORT_DIPSETTING(      0x0020, "5000" )
 	PORT_DIPSETTING(      0x0010, "10000" )
 	PORT_DIPSETTING(      0x0000, "20000" )
-	// E5DEF compares the pending coin count, not the credit amount.
 	PORT_DIPNAME( 0x00c0, 0x00c0, "Hopper Limit (Coins)" ) PORT_DIPLOCATION("DSW4:7,8")
 	PORT_DIPSETTING(      0x00c0, "300" )
 	PORT_DIPSETTING(      0x0080, "500" )
@@ -1265,7 +1191,6 @@ static INPUT_PORTS_START( pdouble8 )
 	PORT_DIPSETTING(      0x0000, "Unlimited" )
 
 	PORT_MODIFY("DSW5")
-	// E0C64-E0CF9: three button tables and a sequential mode.
 	PORT_DIPNAME( 0x0003, 0x0003, "Reel Stop Buttons (Left to Right)" ) PORT_DIPLOCATION("DSW5:1,2")
 	PORT_DIPSETTING(      0x0003, "Small, D-Up, Big" )
 	PORT_DIPSETTING(      0x0002, "Small (Sequential)" )
@@ -1283,29 +1208,25 @@ static INPUT_PORTS_START( crzybell )
 	PORT_INCLUDE(cb2001)
 
 	PORT_MODIFY("IN0")
-	// E3D8E: D-UP selects DIPs, Take inputs, Big sound, Small lamps.
-	// E1910 maps Take/Big/Small (bits 4/0/6) to reel masks 1/2/4.
+	// Test menu: D-Up selects DIPs, Take inputs, Big sound, Small lamps.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2 / Big / Half")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Stop 1 / Take")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Stop All") // E14DE-E14E8
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet / Stop All")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Small / Info")
 
 	PORT_MODIFY("IN1")
-	// E2BAB masks D0, then handles bits 4/6/7 as Coin C/B/A.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_MODIFY("IN2")
-	// E2709 reads bit 2 and applies the software-selected polarity.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
-	// E28A8 reads five banks; E3E3C-E4240 displays their meanings.
 	PORT_MODIFY("DSW1-2")
 	PORT_DIPNAME( 0x0001, 0x0000, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
@@ -1357,7 +1278,7 @@ static INPUT_PORTS_START( crzybell )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW3")
-	// Coin C is also the hopper denomination (E272D/E269B).
+	// Coin C also sets the hopper denomination.
 	PORT_DIPNAME( 0x0007, 0x0000, "Coin A (Coin)" ) PORT_DIPLOCATION("DSW3:1,2,3")
 	PORT_DIPSETTING(      0x0000, "1 Coin / 1 Credit" )
 	PORT_DIPSETTING(      0x0001, "1 Coin / 2 Credits" )
@@ -1436,14 +1357,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( cherry2001 )
 	PORT_INCLUDE(cb2001)
 
-	PORT_MODIFY("IN0")
-	// Settings/bookkeeping are IN2 bits 6/7, not duplicate player buttons.
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
-	// E4B30 branches to HOPPER EMPTY when this input is high.
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Empty") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
@@ -1453,11 +1368,9 @@ static INPUT_PORTS_START( cherry2001 )
 	PORT_DIPSETTING(      0x0000, "16" )
 
 	PORT_MODIFY("DSW3")
-	// E5449-E5463 derives the payout unit from Coin A, in packed BCD.
 	PORT_DIPNAME( 0x0040, 0x0000, "Payout Unit" ) PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(      0x0040, "Coin A" )
 	PORT_DIPSETTING(      0x0000, "Coin A x10" )
-	// E5473 copies bit 7 to 0513; E5200/E523C use it to bypass CC == 0.
 	PORT_DIPNAME( 0x0080, 0x0000, "Payout with Credits Remaining" ) PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Yes ) )
@@ -1467,8 +1380,7 @@ static INPUT_PORTS_START( bsbonanza )
 	PORT_INCLUDE(cb2001)
 
 	PORT_MODIFY("IN0")
-	// Both revisions' input test at D3A24 labels the bits using the table at D564D.
-	// Bits 1 and 2 have no labels; settings and bookkeeping are on IN2.
+	// Input test leaves bits 1/2 unlabelled; settings/bookkeeping use IN2.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_NAME("Stop 3 / Big")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1477,24 +1389,20 @@ static INPUT_PORTS_START( bsbonanza )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP4 ) PORT_NAME("Stop 4 / Small / Info")
 
 	PORT_MODIFY("IN1")
-	// D236b masks out bits 0-2. D23ec adds one service credit; the input
-	// test calls bit 4 TOKEN IN, and bit 6 is KEY IN (not Coin B).
+	// Service Credit adds one credit; bit 4 is Token In and bit 6 is Key In.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Service Credit")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Token In") PORT_IMPULSE(2)
 
 	PORT_MODIFY("IN2")
-	// D0c0c selects the history menu (DE019; V1.0 DE012).
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("History")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
-	// D13DC treats a high empty input as HOPPER EMPTY / CALL ATTENDANT.
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Empty") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT ) PORT_NAME("Key Down / Attendant")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
-	// The D9902 dump uses the software configuration stored at C0200.
-	// Do not expose cb2001's unrelated DIP settings. A second V1.1 board
-	// with different disclaimer text was reported with two switch banks.
+	// D9902 uses software settings stored at 0xc0200. A second V1.1 board
+	// with different disclaimer text was reported with two DIP switch banks.
 	PORT_MODIFY("DSW1-2")
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_MODIFY("DSW3")
@@ -1535,7 +1443,7 @@ static INPUT_PORTS_START( scherrymp )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	 // test mode shows a 7th bank and it's read, but it wasn't populated on the dumped PCB. Leaving it here until the controls are done.
+	// The seventh DIP bank is read by the program but was not populated on the dumped PCB.
 	PORT_START("DSW7")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW7:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -1565,36 +1473,27 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( scmplus )
 	PORT_INCLUDE(scherrymp)
-	// Both Plus revisions use these selectors. V1.0U has identical tables
-	// at C7cc7/C7ccf (bet limits), C7bfb (Coin A), and C7c6b (payout unit).
 
 	PORT_MODIFY("IN0")
-	// These player bits select extra boot tests at C49de, independently of
-	// settings/bookkeeping on IN2. Avoid binding both to the same keys.
-	// D03e8 reads bit 0 for Big and bit 6 for Small during Double Up.
+	// Big selects the graphics test when Settings is held at boot.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Graphics Test")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Button 2") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2")
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
-	// C60a7/C6125 enter the empty/fault path when this input is high.
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Empty") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_MODIFY("DSW1-2")
-	// V1.6 C3956-C395c / V1.0U C38d6-C38dc: DSW1 bit 2 is reel speed.
 	PORT_DIPNAME( 0x0004, 0x0000, "Reel Speed" ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Low ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( High ) )
-	// C7da6 / C7cd7 contain 100, 10, 1 and FFFF (all credits), used by
-	// C6361 / C62a8 when Key Out is held. These bits do not set reel speed.
 	PORT_DIPNAME( 0x0060, 0x0000, "Key Out Unit" ) PORT_DIPLOCATION("DSW1:6,7")
 	PORT_DIPSETTING(      0x0040, "1" )
 	PORT_DIPSETTING(      0x0020, "10" )
 	PORT_DIPSETTING(      0x0000, "100" )
 	PORT_DIPSETTING(      0x0060, "All Credits" )
-	// C39e4-C3a1d uses two-bit selectors, unlike the older input definition.
 	PORT_DIPNAME( 0x1800, 0x0000, "Maximum Bet" ) PORT_DIPLOCATION("DSW2:4,5")
 	PORT_DIPSETTING(      0x1800, "8" )
 	PORT_DIPSETTING(      0x1000, "16" )
@@ -1605,13 +1504,11 @@ static INPUT_PORTS_START( scmplus )
 	PORT_DIPSETTING(      0x4000, "8" ) // duplicate in the ROM table
 	PORT_DIPSETTING(      0x2000, "16" )
 	PORT_DIPSETTING(      0x0000, "32" )
-	// C3a24 stores this bit at 04fd; C6350 conditionally inverts the sensor.
 	PORT_DIPNAME( 0x8000, 0x0000, "Hopper Sensor Polarity" ) PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(      0x0000, "Active Low" )
 	PORT_DIPSETTING(      0x8000, "Active High" )
 
 	PORT_MODIFY("DSW3")
-	// C3a2b-C3a48 inverts the switch bits and reads eight BCD values at 7cca.
 	PORT_DIPNAME( 0x0007, 0x0000, "Coin A Credits" ) PORT_DIPLOCATION("DSW3:1,2,3")
 	PORT_DIPSETTING(      0x0007, "1" )
 	PORT_DIPSETTING(      0x0006, "2" )
@@ -1621,13 +1518,11 @@ static INPUT_PORTS_START( scmplus )
 	PORT_DIPSETTING(      0x0002, "10" )
 	PORT_DIPSETTING(      0x0001, "20" )
 	PORT_DIPSETTING(      0x0000, "25" )
-	// C3aa0-C3abb selects the packed-BCD payout unit relative to Coin A.
 	PORT_DIPNAME( 0x0040, 0x0000, "Payout Unit" ) PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(      0x0040, "Coin A" )
 	PORT_DIPSETTING(      0x0000, "Coin A x2" )
 
 	PORT_MODIFY("DSW6")
-	// C3b7a-C3b86 reads P0 bit 0 into 04e6; C08d1 gates Double Up.
 	PORT_DIPNAME( 0x01, 0x01, "Double Up Game" ) PORT_DIPLOCATION("DSW6:1")
 	PORT_DIPSETTING(  0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
@@ -1637,22 +1532,19 @@ static INPUT_PORTS_START( tripjack )
 	PORT_INCLUDE(scherrymp)
 
 	PORT_MODIFY("IN0")
-	// C462d selects printing here; IN2.7 independently enters bookkeeping.
-	// D03f9 (V1.6G) / F03ca (V1.1/V0.7) read Big on bit 0, Small on bit 6.
+	// Big also selects printing and the graphics test.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Print / Graphics Test")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Button 2") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2")
 
 	PORT_MODIFY("IN1")
-	// C4f1c/E4705/E46fb mask F8: bit 3 is Key In, bit 6 is Coin B.
 	// Key In adds 1 credit in V1.6G, 10 in V1.1/V0.7; Coin D uses the payout unit.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_MODIFY("IN2")
-	// C5b03/E51bf/E523f wait for both sensor edges; C5ae6/E51a2/E5222
-	// test empty high. The normal sensor setting expects an active-low pulse.
+	// The default hopper sensor setting expects an active-low pulse.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Empty") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
@@ -1664,7 +1556,6 @@ static INPUT_PORTS_START( tripjack )
 	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	// C31fa-C3255: C7114 contains packed BCD, not binary bet amounts.
 	PORT_DIPNAME( 0x1800, 0x0000, "Maximum Bet" ) PORT_DIPLOCATION("DSW2:4,5")
 	PORT_DIPSETTING(      0x1800, "10" )
 	PORT_DIPSETTING(      0x1000, "16" )
@@ -1672,12 +1563,11 @@ static INPUT_PORTS_START( tripjack )
 	PORT_DIPSETTING(      0x0000, "64" )
 	PORT_DIPNAME( 0x6000, 0x0000, "Minimum Bet for Bonus" ) PORT_DIPLOCATION("DSW2:6,7")
 	PORT_DIPSETTING(      0x4000, "8" )
-	PORT_DIPSETTING(      0x6000, "8" ) // duplicate in C711c
+	PORT_DIPSETTING(      0x6000, "8" ) // duplicate in the ROM table
 	PORT_DIPSETTING(      0x2000, "16" )
 	PORT_DIPSETTING(      0x0000, "32" )
 
 	PORT_MODIFY("DSW3")
-	// C7048/C7058/C7098: inverted selectors and exact Coin A multiples.
 	PORT_DIPNAME( 0x07, 0x00, "Coin A Credits" ) PORT_DIPLOCATION("DSW3:1,2,3")
 	PORT_DIPSETTING(  0x07, "1" )
 	PORT_DIPSETTING(  0x06, "2" )
@@ -1697,7 +1587,6 @@ static INPUT_PORTS_START( tripjack )
 	PORT_DIPSETTING(  0x00, "Coin A x10" )
 
 	PORT_MODIFY("DSW4")
-	// C70fc -> 05f2; C4efa inhibits coins when the balance reaches this limit.
 	PORT_DIPNAME( 0x30, 0x30, "Coin Acceptance Limit" ) PORT_DIPLOCATION("DSW4:5,6")
 	PORT_DIPSETTING(  0x30, "1000" )
 	PORT_DIPSETTING(  0x20, "5000" )
@@ -1705,14 +1594,12 @@ static INPUT_PORTS_START( tripjack )
 	PORT_DIPSETTING(  0x00, "20000" )
 
 	PORT_MODIFY("DSW5")
-	// C3374/C337d; C5e18/C60a8 consume these independently of DSW2.
 	PORT_DIPNAME( 0x04, 0x04, "Hopper Sensor Polarity" ) PORT_DIPLOCATION("DSW5:3")
 	PORT_DIPSETTING(  0x04, "Active Low" )
 	PORT_DIPSETTING(  0x00, "Active High" )
 	PORT_DIPNAME( 0x08, 0x08, "Win Collection" ) PORT_DIPLOCATION("DSW5:4")
 	PORT_DIPSETTING(  0x08, "Credits" )
 	PORT_DIPSETTING(  0x00, "Hopper" )
-	// C7124 / E626b / E62ff; the routines recognise FFFF as all credits.
 	PORT_DIPNAME( 0x30, 0x30, "Key Out Unit" ) PORT_DIPLOCATION("DSW5:5,6")
 	PORT_DIPSETTING(  0x10, "1" )
 	PORT_DIPSETTING(  0x20, "10" )
@@ -1725,8 +1612,7 @@ static INPUT_PORTS_START( tripjack )
 	PORT_DIPSETTING(  0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW7")
-	// C7028 (V1.6G), E6203 (V0.7): the selector is inverted. V1.1
-	// replaces this with four amounts on DSW3:7,8 and does not read P2.
+	// V1.1 uses DSW3:7,8 for the payout unit and does not read P2.
 	PORT_DIPNAME( 0xf0, 0xf0, "Payout Unit / Coin D Credits" ) PORT_DIPLOCATION("DSW7:5,6,7,8")
 	PORT_DIPSETTING(  0x00, "1" )
 	PORT_DIPSETTING(  0x10, "2" )
@@ -1753,8 +1639,6 @@ static INPUT_PORTS_START( tripjack07 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Graphics Test")
 
 	PORT_MODIFY("DSW1-2")
-	// E2e01 (V0.7), E2e21 (V1.1): two pay-rate bits, followed by the
-	// bet selectors, sensor polarity, and automatic win collection.
 	PORT_DIPNAME( 0x0300, 0x0000, "Main Game Payout Rate" ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(      0x0300, "70%" )
 	PORT_DIPSETTING(      0x0200, "75%" )
@@ -1778,7 +1662,6 @@ static INPUT_PORTS_START( tripjack07 )
 	PORT_DIPSETTING(      0x8000, "Hopper" )
 
 	PORT_MODIFY("DSW4")
-	// E62d7 (V0.7), E6243 (V1.1); consumed at E46d5/E46df.
 	PORT_DIPNAME( 0x30, 0x30, "Coin Acceptance Limit" ) PORT_DIPLOCATION("DSW4:5,6")
 	PORT_DIPSETTING(  0x30, "100" )
 	PORT_DIPSETTING(  0x20, "200" )
@@ -1798,7 +1681,6 @@ static INPUT_PORTS_START( tripjack11 )
 	PORT_INCLUDE(tripjack07)
 
 	PORT_MODIFY("DSW3")
-	// E2f2d indexes the four packed-BCD words at E6187 with raw bits 6-7.
 	PORT_DIPNAME( 0xc0, 0x00, "Payout Unit / Coin D Credits" ) PORT_DIPLOCATION("DSW3:7,8")
 	PORT_DIPSETTING(  0xc0, "1" )
 	PORT_DIPSETTING(  0x80, "2" )
@@ -1820,38 +1702,34 @@ static INPUT_PORTS_START( mystjb )
 	PORT_INCLUDE(scherrymp)
 
 	PORT_MODIFY("IN0")
-	// E44c6 selects the graphics test with bit 0, or the colour test with bit 3.
+	// Hold Settings at boot with Big for the graphics test or D-Up for the colour test.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Graphics Test")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Button 2") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2")
 
 	PORT_MODIFY("IN1")
-	// E4c46 masks F8: bit 3 adds ten service credits; bit 6 uses Coin B.
+	// Key In adds ten credits.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_MODIFY("IN2")
-	// E584b/E5875 wait for a complete sensor pulse. E582e tests empty high.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Empty") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 
 	PORT_MODIFY("DSW1-2")
-	// E3372 inverts bit 1 into 0501; E5d97 selects automatic hopper collection.
 	PORT_DIPNAME( 0x0002, 0x0000, "Win Collection" ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(      0x0000, "Hopper" )
 	PORT_DIPSETTING(      0x0002, "Credits" )
 	PORT_DIPNAME( 0x0004, 0x0000, "Reel Speed" ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Low ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( High ) )
-	// E7b3e: packed BCD 100, 10, 1, then FFFF for all credits (E5b44).
 	PORT_DIPNAME( 0x0060, 0x0000, "Key Out Unit" ) PORT_DIPLOCATION("DSW1:6,7")
 	PORT_DIPSETTING(      0x0040, "1" )
 	PORT_DIPSETTING(      0x0020, "10" )
 	PORT_DIPSETTING(      0x0000, "100" )
 	PORT_DIPSETTING(      0x0060, "All Credits" )
-	// E7b2e/E7b36 are indexed by the selectors decoded at E3408/E342a.
 	PORT_DIPNAME( 0x1800, 0x0000, "Maximum Bet" ) PORT_DIPLOCATION("DSW2:4,5")
 	PORT_DIPSETTING(      0x1800, "8" )
 	PORT_DIPSETTING(      0x1000, "16" )
@@ -1867,7 +1745,6 @@ static INPUT_PORTS_START( mystjb )
 	PORT_DIPSETTING(      0x8000, "Active High" )
 
 	PORT_MODIFY("DSW3")
-	// E3450 inverts the selector; E7a62 contains eight packed-BCD amounts.
 	PORT_DIPNAME( 0x0007, 0x0000, "Coin A Credits" ) PORT_DIPLOCATION("DSW3:1,2,3")
 	PORT_DIPSETTING(      0x0007, "1" )
 	PORT_DIPSETTING(      0x0006, "2" )
@@ -1878,8 +1755,6 @@ static INPUT_PORTS_START( mystjb )
 	PORT_DIPSETTING(      0x0001, "20" )
 	PORT_DIPSETTING(      0x0000, "25" )
 
-	// E3471/E34a7 combine these selectors with Coin A's index. The ROM
-	// tables at E7a72/E7ab2 contain exact multiples for every denomination.
 	PORT_DIPNAME( 0x0018, 0x0000, "Coin B Credits" ) PORT_DIPLOCATION("DSW3:4,5")
 	PORT_DIPSETTING(      0x0018, "Coin A x5" )
 	PORT_DIPSETTING(      0x0010, "Coin A x10" )
@@ -1890,8 +1765,7 @@ static INPUT_PORTS_START( mystjb )
 	PORT_DIPSETTING(      0x0000, "Coin A x10" )
 
 	PORT_MODIFY("DSW4")
-	// E3510 selects a four-byte BCD limit from E7b16. E4c20 inhibits coin
-	// acceptance at this balance; the last accepted coin can exceed it.
+	// Coin acceptance stops at this balance; the last accepted coin can exceed it.
 	PORT_DIPNAME( 0x30, 0x30, "Coin Acceptance Limit" ) PORT_DIPLOCATION("DSW4:5,6")
 	PORT_DIPSETTING(      0x30, "1000" )
 	PORT_DIPSETTING(      0x20, "5000" )
@@ -1899,14 +1773,12 @@ static INPUT_PORTS_START( mystjb )
 	PORT_DIPSETTING(      0x00, "20000" )
 
 	PORT_MODIFY("DSW6")
-	// E358b reads P0 bit 0 into 0500; E0843 gates the gamble entry at F0000.
 	PORT_DIPNAME( 0x01, 0x01, "Double Up Game" ) PORT_DIPLOCATION("DSW6:1")
 	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW7")
-	// E3624 indexes E7ad2 directly with the upper nibble of P2. Each sensor
-	// pulse pays this many credits, independently of the Coin A denomination.
+	// Credits per hopper pulse, independent of Coin A.
 	PORT_DIPNAME( 0xf0, 0xf0, "Payout Unit" ) PORT_DIPLOCATION("DSW7:5,6,7,8")
 	PORT_DIPSETTING(      0x00, "1" )
 	PORT_DIPSETTING(      0x10, "2" )
@@ -1930,36 +1802,32 @@ static INPUT_PORTS_START( nmondop )
 	PORT_INCLUDE(scherrymp)
 
 	PORT_MODIFY("IN0")
-	// C4a07/C4a0d select the colour/graphics tests while Settings is held at boot.
+	// Hold Settings at boot with Big for the graphics test or D-Up for the colour test.
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Graphics Test")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Button 2") PORT_CODE(KEYCODE_O)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_NAME("Stop 2")
 
 	PORT_MODIFY("IN1")
-	// C5197 masks F8; C51e4 selects Coin B with bit 6, C5202 adds ten
-	// service credits with bit 3. Coin A/B/C are fixed at 10/100/10 credits.
+	// Key In adds ten credits. Coin A/B/C are fixed at 10/100/10 credits.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_MODIFY("IN2")
-	// C5eab/C5ed5 wait for both sensor edges; C5e8e tests hopper empty high.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Empty") PORT_CODE(KEYCODE_H) PORT_TOGGLE
-	// C3acd opens the points game. A successful stop at DC98e reaches the hopper.
+	// A successful stop in the Punti game starts the hopper payout.
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT ) PORT_NAME("Punti Game / Payout")
 
 	PORT_MODIFY("DSW1-2")
 	PORT_DIPNAME( 0x0004, 0x0000, "Reel Speed" ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Low ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( High ) )
-	// C3862 indexes C7c68: packed BCD 100, 10, 1, or FFFF for all credits.
 	PORT_DIPNAME( 0x0060, 0x0000, "Key Out Unit" ) PORT_DIPLOCATION("DSW1:6,7")
 	PORT_DIPSETTING(      0x0040, "1" )
 	PORT_DIPSETTING(      0x0020, "10" )
 	PORT_DIPSETTING(      0x0000, "100" )
 	PORT_DIPSETTING(      0x0060, "All Credits" )
-	// C38c9/C38eb index C7c58/C7c60. The last maximum differs from Mystery J & B.
 	PORT_DIPNAME( 0x1800, 0x0000, "Maximum Bet" ) PORT_DIPLOCATION("DSW2:4,5")
 	PORT_DIPSETTING(      0x1800, "10" )
 	PORT_DIPSETTING(      0x1000, "16" )
@@ -1975,9 +1843,8 @@ static INPUT_PORTS_START( nmondop )
 	PORT_DIPSETTING(      0x8000, "Active High" )
 
 	PORT_MODIFY("DSW3")
-	// C3928 selects credits per hopper coin; Coin D uses the same unit (C51c4).
-	// The 10-credit mode also changes collection rules (C3acd/C63d7).
-	// DC9ea pays one coin in mode 2, or all whole coins in the pool in mode 3.
+	// The 10-credit mode also changes collection rules. The 100-credit
+	// modes pay one coin or all whole coins in the pool, respectively.
 	PORT_DIPNAME( 0x03, 0x00, "Coin D / Payout Unit" ) PORT_DIPLOCATION("DSW3:1,2")
 	PORT_DIPSETTING(      0x00, "50" )
 	PORT_DIPSETTING(      0x01, "10" )
@@ -1985,13 +1852,11 @@ static INPUT_PORTS_START( nmondop )
 	PORT_DIPSETTING(      0x03, "100 (Whole Pool)" )
 
 	PORT_MODIFY("DSW4")
-	// C39bf selects C7c40; C5171 inhibits coins when the balance reaches the limit.
 	PORT_DIPNAME( 0x30, 0x30, "Coin Acceptance Limit" ) PORT_DIPLOCATION("DSW4:5,6")
 	PORT_DIPSETTING(      0x30, "1000" )
 	PORT_DIPSETTING(      0x20, "5000" )
 	PORT_DIPSETTING(      0x10, "10000" )
 	PORT_DIPSETTING(      0x00, "20000" )
-	// C39de selects C7c50. C6105 compares this limit with the coin count at 0738.
 	PORT_DIPNAME( 0xc0, 0xc0, "Maximum Hopper Coins" ) PORT_DIPLOCATION("DSW4:7,8")
 	PORT_DIPSETTING(      0xc0, "300" )
 	PORT_DIPSETTING(      0x80, "500" )
@@ -1999,16 +1864,14 @@ static INPUT_PORTS_START( nmondop )
 	PORT_DIPSETTING(      0x00, "Unlimited" )
 
 	PORT_MODIFY("DSW6")
-	// C3a33 reads P0, inverts bit 0 into 04f2; C08e2 gates the gamble game.
 	PORT_DIPNAME( 0x01, 0x01, "Double Up Game" ) PORT_DIPLOCATION("DSW6:1")
 	PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( cherry_bonus )
-	// Wing W-4 wiring: B800/B801 are separate player panels; B810 carries coin/key inputs.
-	// CB5 selects B800 + player at E4BF2/E5C25 and handles B810's F4 mask at E4DAF.
-	PORT_START("IN0") // PPI0 port A, B800
+	// Wing W-4 has separate player panels at 0xb800/0xb801 and coin/key inputs at 0xb810.
+	PORT_START("IN0") // PPI0 port A, 0xb800
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("P1 Big / Switch Controls")
@@ -2018,7 +1881,7 @@ static INPUT_PORTS_START( cherry_bonus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("P1 Small / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START("IN1") // PPI0 port B, B801
+	PORT_START("IN1") // PPI0 port B, 0xb801
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	// The standard gambling input types only define player one.
@@ -2029,7 +1892,7 @@ static INPUT_PORTS_START( cherry_bonus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_PLAYER(2) PORT_NAME("P2 Small / Info") PORT_CODE(KEYCODE_O)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN2") // PPI1 port A, B810 (also currently connected to PPI0 port C)
+	PORT_START("IN2") // PPI1 port A, 0xb810 (also currently connected to PPI0 port C)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
@@ -2039,7 +1902,7 @@ static INPUT_PORTS_START( cherry_bonus )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 
-	PORT_START("IN3") // PPI1 port B, B811
+	PORT_START("IN3") // PPI1 port B, 0xb811
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2184,22 +2047,18 @@ static INPUT_PORTS_START( cb5 )
 	PORT_INCLUDE(cherry_bonus)
 
 	PORT_MODIFY("IN2")
-	// E4e02 uses the Coin B table for bit 6; E4e24 adds ten key-in credits
-	// for bit 2. These two inputs are reversed from the inherited labels.
+	// Key In adds ten credits.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_MODIFY("IN3")
-	// E6bc8 reads bit 2, optionally inverted by DSW1:7; E69f7 tests empty.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Empty") PORT_CODE(KEYCODE_J) PORT_TOGGLE
 
 	PORT_MODIFY("DSW1")
-	// E34de -> 04d4; E0752/E07b7 gate entry to the F000 Double Up code.
 	PORT_DIPNAME( 0x01, 0x01, "Double Up Game" ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	// E3506 -> 04d8; E6fca selects hopper payout or credit collection.
 	PORT_DIPNAME( 0x10, 0x10, "Win Payout" ) PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, "Hopper" )
 	PORT_DIPSETTING(    0x00, "Credits" )
@@ -2211,7 +2070,6 @@ static INPUT_PORTS_START( cb5 )
 	PORT_DIPSETTING(    0x00, "Active High" )
 
 	PORT_MODIFY("DSW2")
-	// E3539 indexes the sixteen-byte records at E92c0 (E92b9 in V1.1).
 	PORT_DIPNAME( 0x07, 0x07, "Main Game Payout Rate" ) PORT_DIPLOCATION("DSW2:1,2,3")
 	PORT_DIPSETTING(    0x00, "55%" )
 	PORT_DIPSETTING(    0x01, "60%" )
@@ -2221,19 +2079,16 @@ static INPUT_PORTS_START( cb5 )
 	PORT_DIPSETTING(    0x05, "80%" )
 	PORT_DIPSETTING(    0x06, "85%" )
 	PORT_DIPSETTING(    0x07, "90%" )
-	// E357f indexes E943e (E9437 in V1.1), storing packed BCD in 04e5.
 	PORT_DIPNAME( 0x18, 0x18, "Maximum Bet" ) PORT_DIPLOCATION("DSW2:4,5")
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x08, "16" )
 	PORT_DIPSETTING(    0x10, "32" )
 	PORT_DIPSETTING(    0x18, "64" )
-	// E358d-E3597 -> 04e7, the minimum stake eligible for the bonus.
 	PORT_DIPNAME( 0x20, 0x20, "Minimum Bet for Bonus" ) PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x20, "16" )
 
 	PORT_MODIFY("DSW3")
-	// E35c5 indexes E938a (E9383 in V1.1): coins required, BCD credits.
 	PORT_DIPNAME( 0x07, 0x07, "Coin A Credits" ) PORT_DIPLOCATION("DSW3:1,2,3")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
@@ -2243,7 +2098,6 @@ static INPUT_PORTS_START( cb5 )
 	PORT_DIPSETTING(    0x05, "10" )
 	PORT_DIPSETTING(    0x06, "20" )
 	PORT_DIPSETTING(    0x07, "25" )
-	// E3628 -> 04f0/04f1; used by Coin D (E4de6) and payout (E6ba0).
 	PORT_DIPNAME( 0xc0, 0xc0, "Payout / Coin D Unit" ) PORT_DIPLOCATION("DSW3:7,8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
@@ -2255,25 +2109,20 @@ static INPUT_PORTS_START( cb4 )
 	PORT_INCLUDE(cherry_bonus)
 
 	PORT_MODIFY("IN3")
-	// E5e9c reads bit 2, optionally inverted by DSW1:7; E5ccf tests empty.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(ticket_dispenser_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Empty") PORT_CODE(KEYCODE_J) PORT_TOGGLE
 
 	PORT_MODIFY("DSW1")
-	// E495c reads this bit directly; low enables the other panel's Big button
-	// to switch the selected player at E4985.
+	// With two panels enabled, the other panel's Big button switches players.
 	PORT_DIPNAME( 0x01, 0x01, "Control Panels" ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	// E2e8d-E2e93 -> 0458; E06d3/E06fd gate the Double Up choice.
 	PORT_DIPNAME( 0x02, 0x02, "Double Up Game" ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	// E2eaa-E2eb0 -> 045b; E619d selects hopper payout or credit collection.
 	PORT_DIPNAME( 0x10, 0x10, "Win Payout" ) PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, "Hopper" )
 	PORT_DIPSETTING(    0x00, "Credits" )
-	// E2eb5-E2eb9 -> 045c; displayed by E39df and used by reel timing.
 	PORT_DIPNAME( 0x20, 0x20, "Reel Speed" ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
@@ -2282,19 +2131,16 @@ static INPUT_PORTS_START( cb4 )
 	PORT_DIPSETTING(    0x00, "Active High" )
 
 	PORT_MODIFY("DSW2")
-	// E2f21 indexes E81f4 (BCD 64/32/16/8) into 0467.
 	PORT_DIPNAME( 0x30, 0x30, "Maximum Bet" ) PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x10, "16" )
 	PORT_DIPSETTING(    0x20, "32" )
 	PORT_DIPSETTING(    0x30, "64" )
-	// E2f32-E2f3f -> 0468; runtime settings show 8 or 16.
 	PORT_DIPNAME( 0x40, 0x40, "Minimum Bet for Bonus" ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x40, "16" )
 
 	PORT_MODIFY("DSW3")
-	// E2f58 indexes E8140, with one coin per packed-BCD credit value.
 	PORT_DIPNAME( 0x07, 0x07, "Coin A Credits" ) PORT_DIPLOCATION("DSW3:1,2,3")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
@@ -2304,16 +2150,13 @@ static INPUT_PORTS_START( cb4 )
 	PORT_DIPSETTING(    0x05, "10" )
 	PORT_DIPSETTING(    0x06, "20" )
 	PORT_DIPSETTING(    0x07, "25" )
-	// E2fab indexes E81b0 into 0475/0476: one pulse per 1/2/5/10 credits.
-	// The same ratio is also used by the Coin D input at E44a2.
 	PORT_DIPNAME( 0xc0, 0xc0, "Payout / Coin D Unit" ) PORT_DIPLOCATION("DSW3:7,8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x40, "2" )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0xc0, "10" )
 
-	// The port test labels the V25 P2 input as DIP SW6 (E3bd1). The game
-	// does not otherwise read it; whether this bank was populated is unknown.
+	// The port test labels P2 as DIP SW6; whether the bank was populated is unknown.
 	PORT_START("DSW6")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW6:1" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW6:2" )
@@ -2329,19 +2172,16 @@ static INPUT_PORTS_START( cb4a )
 	PORT_INCLUDE(cb4)
 
 	PORT_MODIFY("IN2")
-	// V1.2 masks B810 with E4 at E454B, omitting the later versions' Coin D input.
+	// V1.2 does not use Coin D.
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW1")
-	// V1.2 omits V5.0's main-loop call to the panel-switch routine. The
-	// leftover code at E4a23 is unused; the selected player stays zero.
+	// V1.2 only uses the first player panel.
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "DSW1:1" )
-	// E2e58 forces 045a to zero; E61d2 always collects wins into credits.
+	// V1.2 always collects wins into credits.
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "DSW1:5" )
 
 	PORT_MODIFY("DSW3")
-	// E2f55-E2f6e selects a packed-BCD word from E0000 (100/200/600/1000)
-	// for 0475/0476. Unlike V5.0, this ratio is not used by a Coin D input.
 	PORT_DIPNAME( 0xc0, 0xc0, "Payout Unit" ) PORT_DIPLOCATION("DSW3:7,8")
 	PORT_DIPSETTING(    0x00, "100" )
 	PORT_DIPSETTING(    0x40, "200" )
@@ -2349,8 +2189,7 @@ static INPUT_PORTS_START( cb4a )
 	PORT_DIPSETTING(    0xc0, "1000" )
 
 	PORT_MODIFY("DSW5")
-	// E3020-E3027 -> 0477; E30ae selects sensor-driven hopper payout or
-	// a twelve-frame, active-low pulse on PPI2 port B bit 3 (E30c7-E30d6).
+	// Pulse mode drives PPI2 port B bit 3 low for twelve frames.
 	PORT_DIPNAME( 0x80, 0x80, "Payout Mode" ) PORT_DIPLOCATION("DSW5:8")
 	PORT_DIPSETTING(    0x80, "Hopper" )
 	PORT_DIPSETTING(    0x00, "Pulse" )
@@ -2358,34 +2197,26 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ndongmul2 )
 	PORT_INCLUDE(scmplus)
-	// C3950-C3bcd decodes the Plus selectors. C7b06/C7b0e/C7b16
-	// contain the same bet limits and Key Out units; C7a3a is Coin A.
-	// C49dc selects the boot tests; D03de reads Big/Small on IN0 bits 0/6.
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_NAME("Bet B / Stop 1 / D-UP")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME("Bet A")
 
 	PORT_MODIFY("IN1")
-	// C51e7 masks F8: C523e uses Coin B on bit 6, C525c adds ten
-	// service credits on bit 3. Bits 0-2 are not coin inputs.
+	// Key In adds ten credits; bits 0-2 are not coin inputs.
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_MODIFY("DSW1-2")
-	// C395c stores the inverted bit in 0528; C50ae gates the second bet.
 	PORT_DIPNAME( 0x0001, 0x0000, "Side B Betting" ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	// C3967 stores the inverted bit in 04e7; C6239 selects hopper or credit.
 	PORT_DIPNAME( 0x0002, 0x0000, "Win Collection" ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(      0x0000, "Hopper" )
 	PORT_DIPSETTING(      0x0002, "Credits" )
 
 	PORT_MODIFY("DSW3")
-	// C3a5f/C3a95 combine these selectors with Coin A's index.
-	// C7a4a/C7a8a contain exact multiples for all eight denominations.
 	PORT_DIPNAME( 0x0018, 0x0000, "Coin B Credits" ) PORT_DIPLOCATION("DSW3:4,5")
 	PORT_DIPSETTING(      0x0018, "Coin A x5" )
 	PORT_DIPSETTING(      0x0010, "Coin A x10" )
@@ -2394,14 +2225,12 @@ static INPUT_PORTS_START( ndongmul2 )
 	PORT_DIPNAME( 0x0020, 0x0000, "Coin C Credits" ) PORT_DIPLOCATION("DSW3:6")
 	PORT_DIPSETTING(      0x0020, "Coin A x5" )
 	PORT_DIPSETTING(      0x0000, "Coin A x10" )
-	// C3ab4-C3acf selects C7aaa/C7aba; 0507-050b serve Coin D and payout.
 	PORT_DIPNAME( 0x0040, 0x0000, "Coin D / Payout Unit" ) PORT_DIPLOCATION("DSW3:7")
 	PORT_DIPSETTING(      0x0040, "Coin A" )
 	PORT_DIPSETTING(      0x0000, "Coin A x2" )
 
 	PORT_MODIFY("DSW4")
-	// C3b1c indexes the four-byte BCD table C7aee; C51cf tests this limit
-	// before accepting coins (the last coin can take the balance above it).
+	// Coin acceptance stops at this balance; the last accepted coin can exceed it.
 	PORT_DIPNAME( 0x30, 0x30, "Coin Acceptance Limit" ) PORT_DIPLOCATION("DSW4:5,6")
 	PORT_DIPSETTING(      0x30, "1000" )
 	PORT_DIPSETTING(      0x20, "5000" )
@@ -2469,7 +2298,7 @@ void cb2001_state::palette_init(palette_device &palette) const
 void cb2001_state::base(machine_config &config)
 {
 	V35(config, m_maincpu, 20'000'000); // CPU91A-011-0016JK004; encrypted CPU like NEC V25/35 used in some Irem games
-	configure_cpu_decryption(*m_maincpu);
+	m_maincpu->set_decryption_table(CPU91A_DECRYPTION_TABLE);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cb2001_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &cb2001_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(cb2001_state::vblank_irq));
@@ -2558,7 +2387,7 @@ void bsbonanza_state::bsbonanza(machine_config &config)
 	PALETTE(config.replace(), m_palette).set_format(palette_device::GGGGGRRRRRBBBBBx, 0x100);
 }
 
-void cb2001_state::cb5(machine_config &config)
+void cb2001_state::cb5_base(machine_config &config)
 {
 	cb2001(config);
 
@@ -2590,7 +2419,7 @@ void cb5_state::cb5(machine_config &config)
 
 void cb4_state::cherry_bonus(machine_config &config)
 {
-	cb2001_state::cb5(config);
+	cb5_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cb4_state::nvram_map<0x1000>);
 	m_maincpu->set_addrmap(AS_IO, &cb4_state::io_map);
 	subdevice<i8255_device>("ppi8255_2")->out_pc_callback().set(FUNC(cb4_state::output_w));
@@ -2657,12 +2486,10 @@ void mystjb_state::ndongmul2(machine_config &config)
 }
 
 
-// D9203 has a different memory map and a serial FPGA bitstream with XC2018 framing.
-// The FPGA part is inferred from the stream, not a confirmed PCB marking.
-// Graphics registers are reconstructed from the program's drawing routines.
-// The register layout resembles DC4000: page/scroll pairs at 00-07, blit at 08-0f,
-// and CLUT at 10-1f. Only the first two display layers are used by this program.
-// TODO: page selection, unused scroll pairs 04-07, blitter timing/flags, FPGA mixing, I/O control 0b.
+// D9203 uses a bitmap blitter and an FPGA bitstream with XC2018 framing.
+// The register layout resembles DC4000: page/scroll pairs at 0x00-0x07,
+// blitter at 0x08-0x0f and CLUT at 0x10-0x1f. Two layers are used.
+// TODO: page selection, unused layers, blitter timing/flags and I/O control.
 class dynastye_state : public driver_device
 {
 public:
@@ -2758,12 +2585,9 @@ void dynastye_state::machine_reset()
 
 void dynastye_state::program_map(address_map &map)
 {
-	// FE0DD jumps to 0000:0104 (V5.1G) or 0000:0101 (V1.2); interrupt vectors are at 0000:0000.
+	// Program ROM is mirrored at the interrupt vectors and reset entry point.
 	map(0x00000, 0x0ffff).rom().region("boot_prg", 0x30000);
-	// Main code sets DS/ES=2000, tests 20000-20fff and sets SS:SP=21c0:0200.
-	// V5.1G checks the battery-backed signature/accounting copies at 001c5 and
-	// clears the first 4 KiB at 00207 on failure (V1.2: 001c2/00204). The stack
-	// is above the retained area.
+	// The first 4 KiB are battery-backed; the stack is in the following 4 KiB.
 	map(0x20000, 0x20fff).ram().share("nvram");
 	map(0x21000, 0x21fff).ram();
 	map(0xf0000, 0xfffff).rom().region("boot_prg", 0x30000);
@@ -2783,9 +2607,7 @@ void dynastye_state::io_map(address_map &map)
 	map(0x0c, 0x0c).lw8(NAME([this] (uint8_t data) { m_display = data; }));
 	map(0x0d, 0x0e).lw8(NAME([this] (offs_t offset, uint8_t data) { m_palette_bank[offset] = data & 0x0f; }));
 	map(0x10, 0x12).r(FUNC(dynastye_state::input_r));
-	// The independent OUT11 latch drives the hopper on bit 7; TEST bit 2
-	// supplies its sensor. V5.1G starts/stops it at 05dfd/05e58, while V1.2
-	// uses 057fe/05862 and also services automatic payout in its IRQ handler.
+	// OUT11 bit 7 drives the hopper; TEST bit 2 is the sensor input.
 	map(0x11, 0x11).lw8(NAME([this] (uint8_t data) { m_hopper->motor_w(BIT(data, 7)); }));
 }
 
@@ -2797,15 +2619,9 @@ uint8_t dynastye_state::input_r(offs_t offset)
 template <uint32_t Bank>
 uint8_t dynastye_state::dsw_r()
 {
-	// Inferred D9203 I/O protocol, not a verified chip identification. 0596b
-	// selects ff for normal DIP reads. 0080a/00816 select fc/fb and expect
-	// complementary readback at 00828 before accepting the player inputs.
-	// V1.2 uses the same sequence at 007fb/00807, comparing at 0081e.
-	// Fixed DIP reads instead produce spurious bets in the fallback path.
-	// Goldstar's cmv4 also uses nonstandard PPI modes, currently patched in
-	// init_cmv4; that workaround does not establish this controller's behavior.
-	// TODO: verify the per-bank polarity bits. The observed fc/fb writes do
-	// not distinguish bits 0 and 1 or establish the other control bits.
+	// Inferred I/O control: 0xff selects normal DIP reads; 0xfc/0xfb select
+	// complementary readback before player inputs are accepted (0x00828).
+	// TODO: verify the per-bank polarity bits and identify the controller.
 	return m_dsw[Bank]->read() ^ (BIT(m_dsw_control, Bank) ? 0x00 : 0xff);
 }
 
@@ -2824,9 +2640,8 @@ void dynastye_state::video_data_w(uint8_t data)
 
 void dynastye_state::blit()
 {
-	// 0392d constructs eight bytes: X, Y, width-1, height-1, source (24 bits),
-	// layer mask/control. 03953 writes them to 08-0f, auto-incrementing the
-	// register index. 04026's 8x8 font uses four bytes per row, high nibble first.
+	// Blit registers: X, Y, width-1, height-1, 24-bit source, layer mask/control.
+	// Source pixels are packed high nibble first; X and width count pixel pairs.
 	const uint32_t width = uint32_t(m_video_regs[0x0a]) + 1;
 	const uint32_t height = uint32_t(m_video_regs[0x0b]) + 1;
 	uint32_t source = uint32_t(m_video_regs[0x0c]) | (uint32_t(m_video_regs[0x0d]) << 8) | (uint32_t(m_video_regs[0x0e]) << 16);
@@ -2840,8 +2655,7 @@ void dynastye_state::blit()
 			for (uint32_t pixel = 0; pixel < 2; ++pixel)
 			{
 				const uint8_t source_pen = (data >> (pixel ? 0 : 4)) & 0x0f;
-				// 0300c/06bcb clear bit 4 when overlaying symbols on an existing
-				// image. Text and rectangular clears set it to replace pen zero.
+				// Bit 4 disables source pen-zero transparency.
 				if (!BIT(control, 4) && !source_pen)
 					continue;
 				const uint8_t pen = m_video_regs[0x10 + source_pen] & 0x0f;
@@ -2853,8 +2667,7 @@ void dynastye_state::blit()
 			}
 		}
 	}
-	// Writes complete synchronously for now. The inferred busy connection to
-	// POLL and its duration need evidence before adding a timing model.
+	// TODO: blitter busy timing and POLL connection.
 }
 
 void dynastye_state::palette_init(palette_device &palette) const
@@ -2893,7 +2706,6 @@ void dynastye_state::p0_w(uint8_t data)
 
 	// P0.4=RESET, P0.5=DONE/PROG, P0.6=CCLK, P0.7=DIN.
 	// RESET aborts an incomplete stream. After configuration, PROG must also be low.
-	// Bootstrap FE0E2 asserts both signals to restart configuration.
 	if (!BIT(data, 4))
 	{
 		if (!m_config_done || !BIT(data, 5))
@@ -2963,12 +2775,8 @@ void dynastye_state::p0_w(uint8_t data)
 
 uint32_t dynastye_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// 056dc uploads progressively taller portions of the temple at Y=200 to
-	// layer 1. 05738 advances register 03 once per frame (0..112), moving that
-	// image upwards under the fixed layer-0 frame. Like the DC4000 register
-	// layout, 01/03 are independent vertical offsets; destination blits remain
-	// in unscrolled coordinates. The even page selectors stay f1/f3/f5/f7 in
-	// both available revisions, and scroll registers 05/07 stay zero.
+	// Registers 0x01/0x03 scroll the two layers independently.
+	// Blit coordinates are unaffected by the display scroll.
 	bitmap.fill(rgb_t::black(), cliprect);
 	if (!BIT(m_display, 3))
 		return 0;
@@ -2993,7 +2801,7 @@ uint32_t dynastye_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 void dynastye_state::dynastye(machine_config &config)
 {
 	V35(config, m_maincpu, 20'000'000); // CPU type and clock need PCB confirmation.
-	configure_cpu_decryption(*m_maincpu);
+	m_maincpu->set_decryption_table(CPU91A_DECRYPTION_TABLE);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynastye_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &dynastye_state::io_map);
 	m_maincpu->p0_in_cb().set(FUNC(dynastye_state::p0_r));
@@ -3006,9 +2814,7 @@ void dynastye_state::dynastye(machine_config &config)
 	screen.set_size(512, 256);
 	screen.set_visarea_full();
 	screen.set_screen_update(FUNC(dynastye_state::screen_update));
-	// Vector 18h points to the frame service at 0000:0097. The program
-	// enables INTP0 and uses the handler's RAM flag to pace its display work
-	// (07fa in V5.1G, 07f3 in V1.2).
+	// INTP0 (vector 0x18) paces the frame service.
 	screen.screen_vblank().set_inputline(m_maincpu, NEC_INPUT_LINE_INTP0);
 	PALETTE(config, m_palette, FUNC(dynastye_state::palette_init), 0x100);
 
@@ -3032,33 +2838,31 @@ ROM_START( cb2001 ) // DYNA D9702 PCB; DYNA CO1 V1.1I in bookkeeping screen
 	ROM_LOAD( "am27s29.11b", 0x200, 0x200, CRC(e5aa3ec7) SHA1(675711dd6788b3d0c37573b49b6297cbcd8c8209) )
 ROM_END
 
-// D9203 port test at 046c2 labels three input bytes and six DIP banks.
-// The sixth DIP row is hardcoded to zero at 047bc; only five banks are read.
-// Individual control assignments and DIP meanings are still being traced.
+// The port test shows six DIP banks, but only five are read; the sixth row is fixed at zero.
 static INPUT_PORTS_START( dynastye )
 	PORT_START("PLAYER")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Player 0") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Player 1") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Player 2") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Player 6") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small / Info")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown Coin Input 0")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown Coin Input 1")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown Coin Input 2")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown Coin Input 3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Unknown Coin Input 5")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(3)
 
 	PORT_START("TEST")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test 0") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Test 1") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Hopper Empty") PORT_CODE(KEYCODE_H) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
@@ -3067,10 +2871,10 @@ static INPUT_PORTS_START( dynastye )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Bookkeeping" ) PORT_DIPLOCATION("SW1:1") // 047e5 entry / 04829 exit
+	PORT_DIPNAME( 0x01, 0x01, "Bookkeeping" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Double Up" ) PORT_DIPLOCATION("SW1:2") // V5.1G: 05975/00738; V1.2: 05379/00739
+	PORT_DIPNAME( 0x02, 0x02, "Double Up" ) PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:3")
@@ -3079,7 +2883,7 @@ static INPUT_PORTS_START( dynastye )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Win Payout" ) PORT_DIPLOCATION("SW1:5") // V5.1G: 05992/062b8; V1.2: 05396/05cc2
+	PORT_DIPNAME( 0x10, 0x10, "Win Payout" ) PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING( 0x00, "Hopper" )
 	PORT_DIPSETTING( 0x10, "Credits" )
 	PORT_DIPNAME( 0x20, 0x20, "Reel Speed" ) PORT_DIPLOCATION("SW1:6")
@@ -3430,17 +3234,9 @@ ROM_START( nmondop ) // DYNA D9702 PCB; DYNA NMP V0.6I in bookkeeping screen
 	ROM_REGION16_LE( 0x040000, "boot_prg", 0 )
 	ROM_LOAD16_WORD( "nmp12i.11f", 0x000000, 0x40000, CRC(a02d70f9) SHA1(26de0e09432fa5cccef502553bc6d65ec179c7a4) )
 
-	// C780A-C7828 selects OUT32=10, as does scherrymp at C78C4-C78E4.
-	// Their 14 reel-symbol maps (CA302 / CA442, 14 bytes each) are identical:
-	// ten consecutive 8x32 strips per symbol, with two blank columns at each
-	// side. In scherrymp these correctly address graphics at 80000-87fff;
-	// the supplied image ends at 7ffff and contains no equivalent native
-	// reel bank under the current decoder.
-	// The first three 8x8 pages also share much of scherrymp's graphics.
-	// The reel source/bank selection is unresolved. An incomplete external
-	// dump and an undumped internal source are both possible; this does not
-	// establish that the supplied external ROM is bad. A D3001 (and any
-	// internal ROM) on this board still needs physical-board confirmation.
+	// Reel bank 0x10 addresses 0x80000-0x87fff, beyond this dump. The source
+	// may be an internal graphics ROM, an incomplete external dump or different banking.
+	// The graphics custom and any internal ROM need board confirmation.
 	ROM_REGION( 0x080000, "gfx", 0 )
 	ROM_LOAD( "nmp1i.12a", 0x000000, 0x80000, CRC(291ca4d1) SHA1(404439c0e73098e253160af1d36f7ceb7f98f49d) )
 
@@ -3454,10 +3250,8 @@ ROM_START( pdouble8 ) // DYNA D9304 PCB; DYNA SCM V5.3FA 1993 in bookkeeping scr
 	ROM_LOAD16_WORD( "scm_53f.11b", 0x20000, 0x10000, CRC(e078c8d1) SHA1(f7fc42a495987900e1b6864e3b9a6f0dc05a3661) )
 	ROM_RELOAD(                     0x30000, 0x10000)
 
-	// This dump contains coherent foreground/title artwork. E79EF selects
-	// reel bank 04, but none of its eight 32 KiB banks supplies the symbols.
-	// Gallery banks 06-08 are also unresolved. Suspect the D3001's internal
-	// graphics (see scherrym); external/internal selection still needs evidence.
+	// Reel bank 0x04 and gallery banks 0x06-0x08 lack the expected graphics.
+	// The D3001 may have internal graphics ROM; bank selection is unverified.
 	ROM_REGION( 0x40000, "gfx", 0 )
 	ROM_LOAD( "db_1d.7c", 0x00000, 0x40000, CRC(c302a66b) SHA1(c376b9d66d0111df1647a33d488cde2097478b44) )
 

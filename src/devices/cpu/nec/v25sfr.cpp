@@ -533,10 +533,10 @@ void v25_common_device::tmc0_w(uint8_t d)
 	}
 	else    // interval mode
 	{
-		if (BIT(d, 7) && m_MD0 != 0)
+		if (BIT(d, 7))
 		{
-			unsigned tmp = m_PCK * m_MD0 * (BIT(d, 6) ? 128 : 6);
-			attotime time = clocks_to_attotime(tmp);
+			const uint32_t clocks = m_PCK * (uint32_t(m_MD0) + 1) * (BIT(d, 6) ? 128 : 6);
+			const attotime time = clocks_to_attotime(clocks);
 			m_timers[0]->adjust(time, INTTU0, time);
 			m_timers[1]->adjust(attotime::never);
 			m_TM0 = m_MD0;

@@ -1403,10 +1403,7 @@ void nec_disassembler::handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2
 u8 nec_disassembler::decrypt_opcode(u8 opcode)
 {
 	if (m_decryption_table && m_config->get_decryption_mode())
-	{
-		m_unconfirmed_decryption |= m_config->is_decryption_unconfirmed(opcode);
 		return m_decryption_table[opcode];
-	}
 	return opcode;
 }
 
@@ -1767,17 +1764,14 @@ offs_t nec_disassembler::disassemble(std::ostream &stream, offs_t eip, const dat
 	offs_t pc = eip;
 	m_dasm_flags = 0;
 	m_segment = 0;
-	m_unconfirmed_decryption = false;
 
 	op = decrypt_opcode(FETCH(eip, pc, opcodes));
 
 	decode_opcode( stream, &necv_opcode_table1[op], op, eip, pc, opcodes, params );
-	if (m_unconfirmed_decryption)
-		stream << " ; unconfirmed decryption";
 	return (pc-eip) | m_dasm_flags | SUPPORTED;
 }
 
-nec_disassembler::nec_disassembler(config *conf, const u8 *decryption_table) : m_config(conf), m_decryption_table(decryption_table), m_unconfirmed_decryption(false)
+nec_disassembler::nec_disassembler(config *conf, const u8 *decryption_table) : m_config(conf), m_decryption_table(decryption_table)
 {
 }
 
@@ -1789,11 +1783,6 @@ u32 nec_disassembler::opcode_alignment() const
 bool nec_disassembler::config::get_decryption_mode() const
 {
 	return true;
-}
-
-bool nec_disassembler::config::is_decryption_unconfirmed(u8 opcode) const
-{
-	return false;
 }
 
 std::optional<u32> nec_disassembler::config::get_cs_base() const

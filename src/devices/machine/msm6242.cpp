@@ -115,7 +115,6 @@ void msm6242_device::device_start()
 	m_reg[2] = m_default_24h ? 0x4 : 0x0;
 
 	// save states
-	save_item(NAME(m_register)); // calendar registers from device_rtc_interface
 	save_item(NAME(m_reg));
 	save_item(NAME(m_irq_flag));
 	save_item(NAME(m_irq_type));

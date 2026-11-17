@@ -8,8 +8,6 @@
 
 #include "necdasm.h"
 
-#include <bitset>
-
 #define NEC_INPUT_LINE_INTP0 10
 #define NEC_INPUT_LINE_INTP1 11
 #define NEC_INPUT_LINE_INTP2 12
@@ -31,7 +29,6 @@ class v25_common_device : public cpu_device, public nec_disassembler::config
 public:
 	// configuration helpers
 	void set_decryption_table(const uint8_t *decryption_table) { m_v25v35_decryptiontable = decryption_table; }
-	void set_unconfirmed_decryption(uint8_t opcode) { m_unconfirmed_decryption.set(opcode); }
 
 	auto pt_in_cb() { return m_pt_in.bind(); }
 	auto p0_in_cb() { return m_p0_in.bind(); }
@@ -99,7 +96,6 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual int get_mode() const override { return 1; }
 	virtual bool get_decryption_mode() const override;
-	virtual bool is_decryption_unconfirmed(u8 opcode) const override;
 	virtual std::optional<u32> get_cs_base() const override;
 
 private:
@@ -224,7 +220,6 @@ private:
 	uint32_t m_debugger_temp;
 
 	const uint8_t *m_v25v35_decryptiontable;  // internal decryption table
-	std::bitset<256> m_unconfirmed_decryption; // configuration metadata for the debugger
 
 	typedef void (v25_common_device::*nec_ophandler)();
 	typedef uint32_t (v25_common_device::*nec_eahandler)();

@@ -904,11 +904,6 @@ bool v25_common_device::get_decryption_mode() const
 	return m_MF == 0;
 }
 
-bool v25_common_device::is_decryption_unconfirmed(u8 opcode) const
-{
-	return m_unconfirmed_decryption.test(opcode);
-}
-
 std::optional<u32> v25_common_device::get_cs_base() const
 {
 	return Sreg(PS) << 4;
