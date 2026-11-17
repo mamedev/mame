@@ -2,12 +2,13 @@
 // copyright-holders:R. Belmont
 /****************************************************************************
 
-    Mac Quadra 660AV ("Tempest")
+    Mac Centris/Quadra 660AV ("Tempest")
     Mac Quadra 840AV ("Cyclone")
     Emulation by R. Belmont
 
     These machines were a substantial step forward in multimedia and a bridge
-    to the first-generation Power Macintosh.
+    to the first-generation Power Macintosh.  Apple introduced the 660AV
+    under the short-lived Centris brand.
 
     Major changes from previous high-end Quadras include true DMA support for
     the 53C94 SCSI, the 85C30 ESCC, the new Singer audio CODEC, the uPD72070
@@ -59,11 +60,12 @@
 
 #include "softlist_dev.h"
 
-constexpr auto C32M = 31.3344_MHz_XTAL;
-constexpr auto C15M = 15.6672_MHz_XTAL;
-constexpr auto C7M  = C15M / 2;
-
 namespace {
+
+constexpr auto C32M = 31.3344_MHz_XTAL;
+constexpr auto C15M = C32M / 2;
+constexpr auto C7M  = C15M / 2;
+constexpr auto C37M = C7M * 15 / 32;
 
 class quadraav_state : public driver_device
 {
@@ -268,17 +270,19 @@ INPUT_PORTS_END
 
 void quadraav_state::macqd840(machine_config &config)
 {
-	M68040(config, m_maincpu, 40_MHz_XTAL);
+	constexpr auto BCLK = 20_MHz_XTAL * 2; // MC88920 also generates PCLK at 2x this frequency
+
+	M68040(config, m_maincpu, BCLK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &quadraav_state::quadraav_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
-	YMCA(config, m_ymca, 25_MHz_XTAL);
+	YMCA(config, m_ymca, BCLK);
 	m_ymca->set_cpu_id(0xf);
 	m_ymca->set_maincpu_tag("maincpu");
 	m_ymca->set_rom_tag("bootrom");
 	m_ymca->write_ntscpalsel().set(m_civic, FUNC(civic_device::clock_select_w));
 
-	PSC(config, m_psc, 25_MHz_XTAL);
+	PSC(config, m_psc, BCLK);
 	m_psc->set_maincpu_tag("maincpu");
 	m_psc->set_space("maincpu", AS_PROGRAM);
 	m_psc->set_mace_tag("mace");
@@ -299,16 +303,16 @@ void quadraav_state::macqd840(machine_config &config)
 	m_dsp->bio_out_cb().set(m_psc, FUNC(psc_device::dsp_bio_w));
 	m_dsp->iack_cb<1>().set(m_psc, FUNC(psc_device::dsp_iack1_w));
 
-	AM79C940(config, m_mace, 0);
+	AM79C940(config, m_mace, 20_MHz_XTAL);
 	m_mace->irq_out().set(m_psc, FUNC(psc_device::enet_irq_w));
 	m_mace->tx_drq_out().set(m_psc, FUNC(psc_device::enet_tx_drq_w));
 	m_mace->rx_drq_out().set(m_psc, FUNC(psc_device::enet_rx_drq_w));
 
-	CIVIC(config, m_civic, 40_MHz_XTAL);
+	CIVIC(config, m_civic, BCLK);
 	m_civic->vblank_irq().set(m_psc, FUNC(psc_device::vbl_irq_w));
 
-	SCC85C30(config, m_scc, C7M);
-	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
+	SCC85C30(config, m_scc, C15M);
+	m_scc->configure_channels(C37M.value(), C37M.value(), C37M.value(), C37M.value());
 //  m_scc->out_int_callback().set(m_psc, FUNC(psc_device::scc_irq_w));
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
@@ -348,7 +352,7 @@ void quadraav_state::macqd840(machine_config &config)
 	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
 	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
-	CUDA_V2XX(config, m_cuda, XTAL(32'768));
+	CUDA_V2XX(config, m_cuda, 32.768_kHz_XTAL);
 	m_cuda->set_default_bios_tag("341s0788");
 	m_cuda->reset_callback().set(FUNC(quadraav_state::cuda_reset_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
@@ -383,12 +387,19 @@ void quadraav_state::macqd840(machine_config &config)
 
 void quadraav_state::macqd660(machine_config &config)
 {
+	constexpr auto BCLK = 12.5_MHz_XTAL * 2; // MC88920 also generates PCLK at 2x this frequency
+
 	macqd840(config);
+
+	m_maincpu->set_clock(BCLK);
+	m_ymca->set_clock(BCLK);
+	m_psc->set_clock(BCLK);
+	m_civic->set_clock(BCLK);
 
 	// Set the machine ID.
 	m_ymca->set_cpu_id(0xb);
 
-	m_dsp->set_clock(55'500'000);
+	m_dsp->set_clock(55.5_MHz_XTAL);
 
 	// The 660AV uses a completely different clock generator for ? reason.
 	m_civic->use_icd_clockgen();
@@ -404,4 +415,4 @@ ROM_END
 } // anonymous namespace
 
 COMP( 1993, macqd840av, 0, 0, macqd840, macqdav, quadraav_state, empty_init,  "Apple Computer", "Macintosh Quadra 840AV", MACHINE_SUPPORTS_SAVE)
-COMP( 1993, macqd660av, macqd840av, 0, macqd660, macqdav, quadraav_state, empty_init,  "Apple Computer", "Macintosh Quadra 660AV", MACHINE_SUPPORTS_SAVE)
+COMP( 1993, macqd660av, macqd840av, 0, macqd660, macqdav, quadraav_state, empty_init,  "Apple Computer", "Macintosh Centris/Quadra 660AV", MACHINE_SUPPORTS_SAVE)

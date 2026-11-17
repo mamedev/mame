@@ -270,6 +270,7 @@ const double XTAL::known_xtals[] = {
 	 14'916'000, // 14.916_MHz_XTAL        ADDS Viewpoint 122
 	 14'976'000, // 14.976_MHz_XTAL        CIT-101 80-column display clock
 	 15'000'000, // 15_MHz_XTAL            Sinclair QL, Amusco Poker
+	 15'052'800, // 15.0528_MHz_XTAL       Centris 660AV 44.1kHz audio
 	 15'148'800, // 15.1488_MHz_XTAL       Zentec 9002/9003
 	 15'206'400, // 15.2064_MHz_XTAL       Falco TS-1
 	 15'288'000, // 15.288_MHz_XTAL        DEC VT220 80-column display clock
@@ -513,6 +514,7 @@ const double XTAL::known_xtals[] = {
 	 54'000'000, // 54_MHz_XTAL            Taito JC
 	 54'285'700, // 54.2857_MHz_XTAL       Qume QVT-82
 	 55'000'000, // 55_MHz_XTAL            Eolith Vega
+	 55'500'000, // 55.5_MHz_XTAL          Centris 660AV DSP clock
 	 56'000'000, // 56_MHz_XTAL            ARM7500 based Belatra slot machines
 	 57'242'400, // 57.2424_MHz_XTAL       Gunpey
 	 57'272'727, // 57.272727_MHz_XTAL     Psikyo SH2 with /2 divider (16x NTSC subcarrier)
