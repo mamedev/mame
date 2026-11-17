@@ -1418,6 +1418,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/powervr250.h,VIDEOS["POWERVR250"] = true
+--------------------------------------------------
+
+if VIDEOS["POWERVR250"] then
+	files {
+		MAME_DIR .. "src/devices/video/powervr250.cpp",
+		MAME_DIR .. "src/devices/video/powervr250.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/ppu2c0x.h,VIDEOS["PPU2C0X"] = true
 --------------------------------------------------
 
