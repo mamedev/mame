@@ -89,13 +89,13 @@ constexpr char const *const SPECIAL_REG_NAME[22] =
 constexpr char const *const RAM_CONTROL_NAME[8] =
 {
 	"RD dd[]", "WR dd[]", "RD ta[]", "WR ta[]",
-	"RD tb[]", "RD dd[] (dump)", "RD io[]", "WR io[]"
+	"RD tb[]", "RD dd (dump)", "RD io[]", "WR io[]"
 };
 
 constexpr char const *const RAM_CONTROL_FORMAT[8] =
 {
 	"RD dd[$%04x]", "WR dd[$%04x]", "RD ta[$%04x]", "WR ta[$%04x]",
-	"RD tb[$%04x]", "RD dd[$%04x] (dump)", "RD io[$%04x]", "WR io[$%04x]"
+	"RD tb[$%04x]", "RD dd (dump)", "RD io[$%04x]", "WR io[$%04x]"
 };
 
 u64 read_instruction(util::disasm_interface::data_buffer const &opcodes, util::disasm_interface::offs_t pc)
@@ -111,6 +111,14 @@ u64 read_instruction(util::disasm_interface::data_buffer const &opcodes, util::d
 
 void write_register(std::ostream &stream, u8 reg, bool destination)
 {
+	switch (reg)
+	{
+	case 0xcc: stream << "DACL"; return;
+	case 0xcd: stream << "DACR"; return;
+	case 0xe8: stream << "PWDACR"; return;
+	case 0xe9: stream << "PWDACL"; return;
+	}
+
 	if (reg < 0xea)
 	{
 		util::stream_format(stream, "r%02x", reg);
@@ -132,24 +140,50 @@ void write_source_register(std::ostream &stream, u8 reg, u32 value, bool show_va
 		util::stream_format(stream, "(%06x)", value & 0x00ffffff);
 }
 
-void write_source_delay(std::ostream &stream, u32 value, bool show_value)
+void write_source_delay(std::ostream &stream, char const *memory_name, u32 value, bool show_value)
 {
-	stream << "Delay";
+	stream << memory_name;
 	if (show_value)
 		util::stream_format(stream, "(%06x)", value & 0x00ffffff);
 }
 
-void write_path(std::ostream &stream, u8 reg, u8 path, bool destination)
+char const *memory_path_name(u8 ram_control)
 {
-	if (path & PATH_REG)
-		write_register(stream, reg, destination);
-	if (path == PATH_BOTH)
-		stream << ", ";
-	if (path & PATH_DELAY)
-		stream << "Delay";
+	switch (ram_control)
+	{
+	case 2:
+	case 3:
+		return "Table A";
+	case 4:
+		return "Table B";
+	case 6:
+	case 7:
+		return "I/O";
+	default:
+		return "Delay";
+	}
 }
 
-void write_alu(std::ostream &stream, u8 opcode, u8 aReg, u8 bReg, op_select_t const &select, es5510_disassembler::operand_values const *values)
+bool path_has_output(u8 path)
+{
+	// Every path is an output: a register-only destination of ZERO is a real
+	// encoded destination (the result is discarded), not a placeholder.
+	return path != 0;
+}
+
+void write_destination(std::ostream &stream, u8 reg, u8 path, char const *memory_name)
+{
+	bool const zero_is_placeholder = (reg == REG_ZERO) && (path & PATH_DELAY);
+	bool const write_reg = (path & PATH_REG) && !zero_is_placeholder;
+	if (write_reg)
+		write_register(stream, reg, true);
+	if (write_reg && (path & PATH_DELAY))
+		stream << ", ";
+	if (path & PATH_DELAY)
+		stream << memory_name;
+}
+
+void write_alu(std::ostream &stream, u8 opcode, u8 aReg, u8 bReg, op_select_t const &select, es5510_disassembler::operand_values const *values, char const *memory_name)
 {
 	u8 const operands = ALU_OPERANDS[opcode];
 	bool const show_values = values != nullptr;
@@ -178,14 +212,15 @@ void write_alu(std::ostream &stream, u8 opcode, u8 aReg, u8 bReg, op_select_t co
 		if (select.alu_src == PATH_REG)
 			write_source_register(stream, aReg, show_values ? values->a : 0, show_values);
 		else
-			write_source_delay(stream, show_values ? values->dil : 0, show_values);
+			write_source_delay(stream, memory_name, show_values ? values->dil : 0, show_values);
 
 		// The A register is the implied destination only when it is also
 		// named as the second source operand. Otherwise it has to be shown.
-		if ((opcode != ALU_OP_CMP) && ((select.alu_src != PATH_REG) || (select.alu_dst != PATH_REG)))
+		if ((opcode != ALU_OP_CMP) && ((select.alu_src != PATH_REG) || (select.alu_dst != PATH_REG)) &&
+				path_has_output(select.alu_dst))
 		{
 			stream << " > ";
-			write_path(stream, aReg, select.alu_dst, true);
+			write_destination(stream, aReg, select.alu_dst, memory_name);
 		}
 	}
 	else
@@ -193,19 +228,19 @@ void write_alu(std::ostream &stream, u8 opcode, u8 aReg, u8 bReg, op_select_t co
 		if (select.alu_src == PATH_REG)
 			write_source_register(stream, bReg, show_values ? values->b : 0, show_values);
 		else
-			write_source_delay(stream, show_values ? values->dil : 0, show_values);
+			write_source_delay(stream, memory_name, show_values ? values->dil : 0, show_values);
 
-		stream << " > ";
-		write_path(stream, aReg, select.alu_dst, true);
+		bool const redundant = (select.alu_src == PATH_REG) && (select.alu_dst == PATH_REG) && (aReg == bReg);
+		if (!redundant && path_has_output(select.alu_dst))
+		{
+			stream << " > ";
+			write_destination(stream, aReg, select.alu_dst, memory_name);
+		}
 	}
 }
 
-bool write_mac(std::ostream &stream, bool accumulate, u8 cReg, u8 dReg, op_select_t const &select, es5510_disassembler::operand_values const *values)
+void write_mac(std::ostream &stream, bool accumulate, u8 cReg, u8 dReg, op_select_t const &select, es5510_disassembler::operand_values const *values, char const *memory_name)
 {
-	// "ZERO X+ ZERO > MAC" leaves the multiplier accumulator untouched.
-	if (accumulate && (cReg == REG_ZERO) && (dReg == REG_ZERO) && (select.mac_dst == PATH_REG))
-		return false;
-
 	bool const show_values = values != nullptr;
 
 	write_source_register(stream, dReg, show_values ? values->d : 0, show_values);
@@ -215,7 +250,7 @@ bool write_mac(std::ostream &stream, bool accumulate, u8 cReg, u8 dReg, op_selec
 	if (select.mac_src == PATH_REG)
 		write_source_register(stream, cReg, show_values ? values->c : 0, show_values);
 	else
-		write_source_delay(stream, show_values ? values->dil : 0, show_values);
+		write_source_delay(stream, memory_name, show_values ? values->dil : 0, show_values);
 
 	// C is the implied destination. An explicit destination is needed when
 	// the result also goes to the delay line, or when the dummy ZERO register
@@ -230,18 +265,31 @@ bool write_mac(std::ostream &stream, bool accumulate, u8 cReg, u8 dReg, op_selec
 		if (select.mac_dst == PATH_BOTH)
 			stream << ", ";
 		if (select.mac_dst & PATH_DELAY)
-			stream << "Delay";
+			stream << memory_name;
 	}
+}
 
-	return true;
+bool mac_visible(bool accumulate, u8 cReg, u8 dReg, op_select_t const &select)
+{
+	// "ZERO X+ ZERO > MAC" leaves the multiplier accumulator untouched.
+	return !(accumulate && (cReg == REG_ZERO) && (dReg == REG_ZERO) && (select.mac_dst == PATH_REG));
+}
+
+bool ram_visible(u8 ram_control, op_select_t const &select)
+{
+	return (ram_control != 0) ||
+			(select.alu_src & PATH_DELAY) || (select.alu_dst & PATH_DELAY) ||
+			(select.mac_src & PATH_DELAY) || (select.mac_dst & PATH_DELAY);
 }
 
 void write_ram_control(std::ostream &stream, u8 ram_control, bool have_gpr, u32 gpr)
 {
-	if (have_gpr)
-		util::stream_format(stream, RAM_CONTROL_FORMAT[ram_control], (gpr >> 8) & 0xffff);
-	else
+	if (!have_gpr)
 		stream << RAM_CONTROL_NAME[ram_control];
+	else if (ram_control == 5)
+		stream << RAM_CONTROL_FORMAT[ram_control];
+	else
+		util::stream_format(stream, RAM_CONTROL_FORMAT[ram_control], (gpr >> 8) & 0xffff);
 }
 
 } // anonymous namespace
@@ -265,17 +313,24 @@ void es5510_disassembler::describe(std::ostream &stream, u64 instr, u32 gpr, boo
 	u8 const ramControl = u8(instr >> 3) & 0x07;
 
 	op_select_t const &select = OPERAND_SELECT[operandSelect];
+	char const *const memory_name = memory_path_name(ramControl);
 
 	if (skip)
 		stream << '*';
 
-	write_alu(stream, aluOpcode, aReg, bReg, select, values);
+	write_alu(stream, aluOpcode, aReg, bReg, select, values, memory_name);
 
-	stream << "; ";
-	if (write_mac(stream, accumulate, cReg, dReg, select, values))
+	if (mac_visible(accumulate, cReg, dReg, select))
+	{
 		stream << "; ";
+		write_mac(stream, accumulate, cReg, dReg, select, values, memory_name);
+	}
 
-	write_ram_control(stream, ramControl, have_gpr, gpr);
+	if (ram_visible(ramControl, select))
+	{
+		stream << "; ";
+		write_ram_control(stream, ramControl, have_gpr, gpr);
+	}
 }
 
 u32 es5510_disassembler::opcode_alignment() const

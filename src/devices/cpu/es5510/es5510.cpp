@@ -200,6 +200,12 @@ typedef es5510_device::alu_op_t alu_op_t;
 typedef es5510_device::op_select_t op_select_t;
 
 static inline std::string REGNAME(uint8_t r) {
+	switch (r) {
+	case 0xcc: return "DACL";
+	case 0xcd: return "DACR";
+	case 0xe8: return "PWDACR";
+	case 0xe9: return "PWDACL";
+	}
 	if (r < 234)
 		return util::string_format("GPR_%02x", r);
 	switch(r) {
