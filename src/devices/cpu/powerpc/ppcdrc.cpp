@@ -319,6 +319,7 @@ void ppc_device::code_flush_cache()
 	// no compiled code remains, so forget which pages held it
 	std::fill(m_codepage_bits.begin(), m_codepage_bits.end(), 0);
 	m_core->m_codepage_any = false;
+	m_code_snapshots.clear();
 	std::fill(m_physpage_bits.begin(), m_physpage_bits.end(), 0);
 	m_physpage_logical.clear();
 
@@ -437,6 +438,28 @@ void ppc_device::note_physical_code(const opcode_desc *desclist)
 
 
 /*-------------------------------------------------
+    note_sequence_pages - mark every effective
+    page an instruction sequence was compiled
+    from as holding compiled code
+-------------------------------------------------*/
+
+void ppc_device::note_sequence_pages(const opcode_desc *first, const opcode_desc *last)
+{
+	uint32_t lastpage = ~uint32_t(0);
+	for (const opcode_desc *desc = first; ; desc = desc->next())
+	{
+		if ((desc->pc >> 12) != lastpage)
+		{
+			lastpage = desc->pc >> 12;
+			note_code_page(lastpage);
+		}
+		if (desc == last)
+			break;
+	}
+}
+
+
+/*-------------------------------------------------
     reuse_entry_checks - re-verify the entry checks
     a block about to be reused was generated with,
     and put them in the same state as a fresh compile
@@ -483,10 +506,13 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 		log_opcode_desc(desclist, 0);
 
 	// Do a signature over every word of the sequence, so the reuse check below is exact.
+	// Also find the last descriptor.
 	uint32_t seqsig = 0;
+	const opcode_desc *desclast = nullptr;
 	for (const opcode_desc *desc = desclist; desc != nullptr; desc = desc->next())
 	{
 		seqsig = (seqsig * 31u) ^ desc->opptr;
+		desclast = desc;
 	}
 
 	const uint64_t reusekey = (uint64_t(mode) << 32) | pc;
@@ -510,23 +536,15 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 				&& reuse_entry_checks(reuse->second.checkfirst, reuse->second.checkcount)
 				&& m_drcuml.hash_set_codeptr(mode, pc, reuse->second.code))
 		{
-			// mark the pages this sequence covers as having valid code again
-			const opcode_desc *seqend = desclist;
-			while ((seqend != nullptr) && !seqend->end_sequence())
-			{
-				seqend = seqend->next();
-			}
-
-			if (seqend == nullptr)
-			{
-				seqend = desclist;
-			}
-
-			for (uint32_t pg = desclist->pc >> 12; pg <= (seqend->pc >> 12); pg++)
-			{
-				note_code_page(pg);
-			}
+			// The reused code is the whole block generated for this window, so
+			// mark the pages of every sequence in it as having valid code again,
+			// as a fresh compile does
+			note_sequence_pages(desclist, desclast);
 			note_physical_code(desclist);
+
+			// and snapshot them, so a later icache flash invalidate still
+			// notices if any of this code is replaced
+			snapshot_sequence_pages(desclist, desclast);
 			m_codewrite_skip_page = ~uint32_t(0);
 			m_last_reuse = reusekey;
 			return;
@@ -545,6 +563,18 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 			// start the block
 			drcuml_block &block(m_drcuml.begin_block(4096));
 
+			if (desclist != nullptr)
+			{
+				// remember which effective pages hold compiled code: icbi, the 601
+				// write watch and ICFI only invalidate code on those pages, and
+				// tlbie/tlbia only bump the translation generation for them
+				note_sequence_pages(desclist, desclast);
+
+				// and what those pages held, so an icache flash invalidate can tell
+				// whether the code was replaced behind the DRC's back
+				snapshot_sequence_pages(desclist, desclast);
+			}
+
 			// loop until we get through all instruction sequences
 			for (seqhead = desclist; seqhead != nullptr; seqhead = seqlast->next())
 			{
@@ -562,11 +592,6 @@ void ppc_device::code_compile_block(uint8_t mode, offs_t pc)
 						break;
 				}
 				assert(seqlast != nullptr);
-
-				// remember that the effective pages this sequence covers now hold compiled
-				// code, so a later TLB invalidation of one of them can trigger a flush
-				for (uint32_t pg = seqhead->pc >> 12; pg <= (seqlast->pc >> 12); pg++)
-					note_code_page(pg);
 
 				// if we don't have a hash for this mode/pc, or if we are overriding all, add one
 				if (override || !m_drcuml.hash_exists(mode, seqhead->pc))
@@ -1088,7 +1113,10 @@ void ppc_device::static_generate_tlb_mismatch()
 	UML_SHL(block, I3, 1, I3);                                              // shl     i3,1,i3
 	UML_TEST(block, I1, I3);                                                // test    i1,i3   ; (USER_)FETCH_ALLOWED
 	UML_JMPc(block, COND_Z, isi = label++);                                 // jmp     isi,z
-	UML_CMP(block, I2, 0);                                                  // cmp     i2,0
+	// If the stale entry didn't allow fetches in this mode (flushed, or only filled
+	// by data accesses so far), the block itself may still be valid: re-enter it and
+	// let its TLB check decide.  Only recompile if a fetchable mapping was replaced.
+	UML_TEST(block, I2, I3);                                                // test    i2,i3   ; (USER_)FETCH_ALLOWED
 	UML_JMPc(block, COND_NZ, exit = label++);                               // jmp     exit,nz
 	UML_HASHJMP(block, mem(&m_core->mode), I0, *m_nocode);                  // hashjmp <mode>,i0,nocode
 	UML_LABEL(block, exit);                                                 // exit:
@@ -2256,6 +2284,13 @@ void ppc_device::generate_sequence_instruction(drcuml_block &block, compiler_sta
 	if (desc->validate_tlb() && (m_core->mode & MODE_DATA_TRANSLATION) && !(m_cap & PPCCAP_601BAT))
 	{
 		const vtlb_entry *tlbtable = vtlb_table();
+
+		// If the page's entry can't fetch at compile time (evicted, flushed, or only
+		// filled by data accesses so far), fill it for fetch as the TLB mismatch
+		// handler would.  Without a fetchable entry the block would get an
+		// unconditional mismatch exit, or a compare against a data-only entry.
+		if (!(tlbtable[desc->pc >> 12] & (1 << ppccom_fetch_intention())))
+			compile_time_tlb_fill(desc->pc);
 
 		if (tlbtable[desc->pc >> 12] != 0)
 		{
@@ -4600,6 +4635,13 @@ bool ppc_device::generate_instruction_1f(drcuml_block &block, compiler_state *co
 					// the little endian mode bit is in HID0 on PPC601;
 					// thus, update mode for that scenario in case HID0_LM changed
 					generate_update_mode(block);                                // <update mode>
+				}
+				else if (spr == SPR603_HID0 && has_icache_flash_invalidate())
+				{
+					// ppccom_execute_mtspr() sets param1 if an icache flash
+					// invalidate discarded compiled code, which may include this
+					// block.  Exit so execution continues with a fresh lookup.
+					generate_recompile_if(block, compiler, desc, uml::mem(&m_core->param1), EXECUTE_MISSING_CODE);
 				}
 				compiler->checkints = true;
 				generate_update_cycles(block, compiler, desc->pc + 4, true);    // <update cycles>

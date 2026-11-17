@@ -20,7 +20,9 @@
 #include "divtlb.h"
 
 #include <algorithm>
+#include <memory>
 #include <unordered_map>
+#include <vector>
 
 
 /***************************************************************************
@@ -668,8 +670,41 @@ protected:
 	// is cleared at the end of code_compile_block, so this applies to one recompile.
 	void note_code_page(uint32_t page) { if (page != m_codewrite_skip_page) { m_codepage_bits[page >> 3] |= 1 << (page & 7); m_core->m_codepage_any = 1; } }
 	bool code_page_has_code(offs_t addr) const { uint32_t const page = (addr >> 12) & 0xfffff; return BIT(m_codepage_bits[page >> 3], page & 7); }
+	void invalidate_code_page(uint32_t page);
 	bool invalidate_code_range(offs_t start, offs_t end);
 	void note_physical_code(const opcode_desc *desclist);
+	void note_sequence_pages(const opcode_desc *first, const opcode_desc *last);
+	void compile_time_tlb_fill(offs_t pc);
+	void tlb_fill_translated(offs_t pc, offs_t address, int intent);
+
+	// Instruction cache flash invalidate (HID0[ICFI], every OEA part except the
+	// 601): code can be replaced by writers the DRC never sees (DMA, another
+	// CPU), and software then invalidates the whole icache instead of issuing
+	// icbi.  Keep a copy of every physical page code was compiled from, with the
+	// effective pages the code was compiled at, so an ICFI only discards code
+	// from pages whose bytes changed, rather than flushing the entire cache each
+	// time.  A page that can't be read directly is always discarded.  Snapshots are
+	// per physical page, so code compiled under an earlier mapping of an
+	// effective page stays covered after the page is remapped.  If a page's
+	// memory no longer matches its snapshot when more code is compiled from it,
+	// the page holds blocks from two versions of its bytes, so the snapshot is
+	// marked dirty and the next ICFI discards the page regardless.  Snapshots
+	// stay across icbi and other invalidations; only an ICFI that discards the
+	// page or a full cache flush removes them.  Each snapshot is keyed by its
+	// physical page number, which gives its address.
+	struct code_page_snapshot
+	{
+		bool dirty = false;                 // code was compiled from bytes that differ from these
+		std::unique_ptr<uint8_t []> bytes;  // the page's host memory contents
+		std::vector<uint32_t> logical;      // effective pages code was compiled from this page at
+	};
+	std::unordered_map<uint32_t, code_page_snapshot> m_code_snapshots;    // keyed by physical page number
+	bool has_icache_flash_invalidate() const;
+	const uint8_t *code_page_memory(offs_t physbase) const;
+	bool code_snapshot_matches(uint32_t physpage, const code_page_snapshot &snap) const;
+	void snapshot_code_page(uint32_t page, offs_t physbase);
+	void snapshot_sequence_pages(const opcode_desc *first, const opcode_desc *last);
+	bool icache_flash_invalidate();
 
 	// reservation granularity
 	uint32_t m_reservation_mask;
