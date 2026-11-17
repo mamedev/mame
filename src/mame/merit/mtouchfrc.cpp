@@ -137,7 +137,7 @@ void mtouchfrc_state::mtouchfrc(machine_config &config)
 // TODO: there are likely several BIOS revisions with different years on them.
 #define MTOUCHFRC_BIOS \
 	ROM_REGION32_LE( 0x40000, "bios", 0 ) \
-	ROM_LOAD( "ic29.bin", 0x00000, 0x40000, NO_DUMP )
+	ROM_LOAD( "ic29.bin", 0x00000, 0x40000, NO_DUMP ) // W49V002FAP, 2 megabits
 
 ROM_START( mtfbios )
 	MTOUCHFRC_BIOS
