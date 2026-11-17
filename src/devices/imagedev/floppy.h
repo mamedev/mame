@@ -243,6 +243,7 @@ protected:
 	bool m_cache_weak;
 
 	bool m_image_dirty, m_track_dirty;
+	// TODO: the pending write state below isn't saved, so a state saved during a write won't resume it
 	bool m_writing;
 	int m_write_cyl, m_write_ss, m_write_subcyl;
 	attotime m_write_start_time;
