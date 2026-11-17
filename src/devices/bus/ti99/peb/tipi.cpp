@@ -456,9 +456,9 @@ TIMER_CALLBACK_MEMBER(tipi_card_device::open_websocket)
 	if (m_wsclient)
 	{
 		LOG("Open websocket in new thread\n");
+		m_client_started = true;
 		m_listener = std::make_unique<asio::thread>([this]() {
 				m_wsclient->start();
-				m_client_started = true;
 		});
 	}
 	// The thread will be caught in the error handler (join)
