@@ -144,13 +144,16 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 
-void init_empty_flash(nvram_device &nvram, void *base, size_t size)
-{
-	// Copy reset vectors from flash into NVRAM
-	memory_region *rom = memregion("maincpu");
-	memcpy(m_nvram_base, rom->base(), 0x400);
-	memcpy(&m_flash_base[0], rom->base(), rom->bytes());
-}
+	void init_empty_ram(nvram_device &nvram, void *base, size_t size)
+	{
+		memset(base, 0, size);
+		memcpy(base, memregion("maincpu")->base(), 0x400);
+	}
+
+	void init_empty_flash(nvram_device &nvram, void *base, size_t size)
+	{
+		memcpy(base, memregion("maincpu")->base(), size);
+	}
 
 protected:
 	required_device<mc68328_base_device> m_maincpu;
@@ -295,7 +298,9 @@ void alphasmart3k_state::machine_reset()
 void alphasmart3k_state::main_map(address_map &map)
 {
 	map(0x0000'0000, 0x0003'ffff).ram().share("nvram");
-	map(0x0040'0000, 0x004f'ffff).ram().share("flash");
+	// Flash programming is not emulated. The image loader writes directly
+	// to the backing share, while guest command writes leave it intact.
+	map(0x0040'0000, 0x004f'ffff).readonly().nopw().share("flash");
 	map(0x0060'0000, 0x0060'0000).rw(FUNC(alphasmart3k_state::kb_matrixh_r), FUNC(alphasmart3k_state::kb_matrixh_w));
 }
 
@@ -598,7 +603,7 @@ void alphasmart3k_state::alphasmart3k(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(alphasmart3k_state::alphasmart_palette), 2);
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0).set_custom_handler(FUNC(alphasmart3k_state::init_empty_ram));
 	NVRAM(config, "flash", nvram_device::DEFAULT_ALL_1).set_custom_handler(FUNC(alphasmart3k_state::init_empty_flash));
 	ALPHASMART_APPLET(config, m_applet);
 }
