@@ -30,7 +30,8 @@
     access (MC68000) or instruction (MC68020/030) retried when DRQ
     comes, keeping the bytes already transferred for the retry. The
     helper moves no byte ahead of the access that wants it; the 5380
-    itself latches and acknowledges one on REQ.
+    itself, in DMA mode, latches and acknowledges one on REQ (NCR
+    SP-1051, sec. 6.1.3 and 11.6).
 
 **********************************************************************/
 
@@ -39,9 +40,7 @@
 
 #include "cpu/m68000/m68kmusashi.h"
 
-#define VERBOSE 0
-#include "logmacro.h"
-
+static constexpr u8 BAD_BYTE = 0xbb;
 static constexpr u8 READ_ERROR = 1;
 static constexpr u8 WRITE_ERROR = 0;
 
@@ -54,13 +53,13 @@ DEFINE_DEVICE_TYPE(MAC_SCSI_HELPER, mac_scsi_helper_device, "scsipdma", "Mac 538
 mac_scsi_helper_device::mac_scsi_helper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MAC_SCSI_HELPER, tag, owner, clock)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_scsi_read_callback(*this, 0xff)
+	, m_scsi_read_callback(*this, BAD_BYTE)
 	, m_scsi_write_callback(*this)
-	, m_scsi_dma_read_callback(*this, 0xff)
+	, m_scsi_dma_read_callback(*this, BAD_BYTE)
 	, m_scsi_dma_write_callback(*this)
 	, m_timeout_error_callback(*this)
 	// the SE's BBU times out any access after 265 ms (Guide to the Macintosh
-	// Family Hardware, 2nd ed., p. 126); no figure found for other models
+	// Family Hardware, 2nd ed., p. 126); other models' figures are unknown
 	, m_timeout(attotime::from_msec(265))
 	, m_timeout_timer(nullptr)
 	, m_drq(false)
@@ -113,7 +112,16 @@ TIMER_CALLBACK_MEMBER(mac_scsi_helper_device::timeout)
 	if (m_drq)
 		return;
 
-	LOG("pseudo-DMA access timed out\n");
+	// the CPU alone was reset while waiting (Egret, Cuda or the PMU), which
+	// ends its suspension: the access is gone
+	if (!m_maincpu->suspended(SUSPEND_REASON_TRIGGER))
+	{
+		m_waiting = false;
+		m_count = 0;
+		m_data = 0;
+		return;
+	}
+
 	m_timed_out = true;
 	m_maincpu->trigger(WAKE_TRIGGER);
 }
@@ -138,7 +146,7 @@ bool mac_scsi_helper_device::timed_out(u8 error)
 // from the last byte transferred
 void mac_scsi_helper_device::wait(bool progress)
 {
-	if (!m_waiting || progress)
+	if (!m_waiting || progress || !m_timeout_timer->enabled())
 		m_timeout_timer->adjust(m_timeout);
 	m_waiting = true;
 
@@ -163,6 +171,8 @@ u32 mac_scsi_helper_device::dma_read(u8 bytes)
 {
 	if (machine().side_effects_disabled() || timed_out(READ_ERROR))
 		return ~u32(0);
+	if (m_count >= bytes)
+		done(); // left over from an access that never finished
 
 	// reading the data clears DRQ until the next byte is latched, so at most
 	// one byte per pass
@@ -188,6 +198,8 @@ void mac_scsi_helper_device::dma_write(u32 data, u8 bytes)
 {
 	if (machine().side_effects_disabled() || timed_out(WRITE_ERROR))
 		return;
+	if (m_count >= bytes)
+		done(); // left over from an access that never finished
 
 	// writing the data clears DRQ until the byte has gone out, so at most one
 	// byte per pass
