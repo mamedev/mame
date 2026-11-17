@@ -2613,6 +2613,10 @@ void namcos22_state::init_tables()
 		save_item(NAME(m_fog_b_per_cztype));
 	}
 
+	// sign-extend point rom
+	for (int i = 0; i < m_pointrom.length(); i++)
+		m_pointrom[i] = signed24(m_pointrom[i]);
+
 	m_pointram = make_unique_clear<u32[]>(0x20000);
 	save_pointer(NAME(m_pointram), 0x20000);
 
