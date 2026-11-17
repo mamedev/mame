@@ -25,14 +25,25 @@ void centronics_cgp220_device::device_add_mconfig(machine_config &config)
 {
 	CGP220(config, m_printer);
 	m_printer->set_serial_interface(false);
-	m_printer->busy_handler().set([this] (int state) { output_busy(state); });
-	m_printer->ack_handler().set([this] (int state) { output_ack(state); });
-	m_printer->perror_handler().set([this] (int state) { output_perror(state); });
-	m_printer->fault_handler().set([this] (int state) { output_fault(state); });
-	m_printer->select_handler().set([this] (int state) { output_select(state); });
+	m_printer->busy_handler().set(FUNC(centronics_cgp220_device::output_busy));
+	m_printer->ack_handler().set(FUNC(centronics_cgp220_device::output_ack));
+	m_printer->perror_handler().set(FUNC(centronics_cgp220_device::output_perror));
+	m_printer->fault_handler().set(FUNC(centronics_cgp220_device::output_fault));
+	m_printer->select_handler().set(FUNC(centronics_cgp220_device::output_select));
 }
 
 
 void centronics_cgp220_device::device_start()
 {
 }
+
+
+void centronics_cgp220_device::input_strobe(int state) { m_printer->strobe_w(state); }
+void centronics_cgp220_device::input_data0(int state) { m_printer->data_bit_w<0>(state); }
+void centronics_cgp220_device::input_data1(int state) { m_printer->data_bit_w<1>(state); }
+void centronics_cgp220_device::input_data2(int state) { m_printer->data_bit_w<2>(state); }
+void centronics_cgp220_device::input_data3(int state) { m_printer->data_bit_w<3>(state); }
+void centronics_cgp220_device::input_data4(int state) { m_printer->data_bit_w<4>(state); }
+void centronics_cgp220_device::input_data5(int state) { m_printer->data_bit_w<5>(state); }
+void centronics_cgp220_device::input_data6(int state) { m_printer->data_bit_w<6>(state); }
+void centronics_cgp220_device::input_data7(int state) { m_printer->data_bit_w<7>(state); }
