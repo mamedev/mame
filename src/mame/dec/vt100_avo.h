@@ -21,10 +21,7 @@ public:
 	vt100_avo_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt)
 		: vt100_avo_slot_device(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(false);
+		set_options(std::forward<T>(opts), dflt, false);
 	}
 
 	vt100_avo_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
@@ -34,11 +31,13 @@ public:
 
 	bool present() const { return m_card != nullptr; }
 
-	// video fetch of 2000-3FFF (offset from 2000): screen RAM 2C00-2FFF and
-	// attribute RAM 3000-3FFF are on the AVO
+	// video fetch from 2C00 up (offset from 2000, so 0C00 and up; the base
+	// board's RAM is below): screen RAM 2C00-2FFF and attribute RAM
+	// 3000-3FFF are on the AVO, anything past them reads all ones
 	u8 video_r(offs_t offset);
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:

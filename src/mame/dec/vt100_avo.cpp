@@ -6,7 +6,7 @@
 
     Plugs onto the terminal controller board's J1.  Adds 1K x 8 of screen
     RAM at 2C00-2FFF, 4K x 4 of attribute RAM at 3000-3FFF, and four 2K
-    program ROM sockets plus an 8K one.
+    program ROM sockets, E8 also taking an 8K ROM.
 
     The terminal controller decodes only A10-A13, so its ROM and RAM repeat
     every 16K.  The AVO decodes A13-A15 (E12, a 74LS138 enabled on every
@@ -14,18 +14,20 @@
     gates on its 8000-9FFF and A000-BFFF outputs), so that area is the AVO's
     whether or not its sockets are filled; the patch switches add blocks
     below 2000 only.  TM-003 6.2.5.3 reads as if MEM DISABLE depended on the
-    jumpers; the schematic doesn't.  Its RAM is selected from the terminal
-    controller's decode, so it repeats with the base RAM outside 8000-BFFF.
+    jumpers and covered all memory above 4000; the schematic does neither
+    (E12's other outputs are unconnected).  Its RAM is selected from the
+    terminal controller's decode, so it repeats with the base RAM outside
+    8000-BFFF.
 
     Jumpers W5-W7 (switch S1 on later boards) place the 8K ROM at 0000
     (overlay), 8000 or A000; the 2K sockets answer in the 8000/A000 block it
     doesn't claim (E16, E23, E24).  Only W6 is modelled, the setting the
     VT1XX-AC ROMs and the VT132's 23-099E2/23-100E2 use alone: 8K socket
-    (E8) at A000, 2K ROMs A-C at 8000-97FF.  ROM D at 9800 also needs W8.
-    No 8K ROM is dumped, so A000-BFFF is always an empty socket.  Patch
-    jumpers W1-W4/W8-W14, which put 2K ROMs over the base firmware or add
-    ROM D, and the other 8K placements aren't modelled: no ROMs that use
-    them are dumped.
+    (E8) at A000, 2K ROMs A-C at 8000-97FF.  ROM D at 9800 also needs W8,
+    W11 and W14.  No 8K ROM is dumped, so A000-BFFF is always an empty
+    socket.  Patch jumpers W1-W4/W8-W14, which put 2K ROMs over the base
+    firmware or add ROM D, and the other 8K placements aren't modelled: no
+    ROMs that use them are dumped.
 
     TM 6.2.3 names the 2K sockets E19, E17, E13 and E8; the schematic and
     its legend have E21 for ROM A (E19 is the S1 switch pack).
@@ -93,6 +95,7 @@ public:
 	{
 	}
 
+	// device_vt100_avo_interface implementation
 	virtual u8 video_r(offs_t offset) override;
 
 protected:
@@ -103,6 +106,7 @@ protected:
 	{
 	}
 
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -161,7 +165,9 @@ void vt100_avo_device::device_start()
 			read8sm_delegate(*this, FUNC(vt100_avo_device::attr_r)),
 			write8sm_delegate(*this, FUNC(vt100_avo_device::attr_w)));
 
-	// MEM DISABLE: 8000-BFFF is the AVO's, empty sockets read open bus
+	// MEM DISABLE: 8000-BFFF is the AVO's, empty sockets read open bus.
+	// Must follow the RAM installs: it removes their mirrors at AC00-BFFF.
+	// (assumed all ones, as on vt101_mem)
 	mem.nop_readwrite(0x8000, 0xbfff);
 	if (m_rom.found())
 		mem.install_rom(0x8000, 0x97ff, &m_rom[0]);

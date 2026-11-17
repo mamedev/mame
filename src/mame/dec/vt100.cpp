@@ -89,7 +89,7 @@ public:
 private:
 	// Options fitted to this model, reported to the firmware through the
 	// flag buffer (E42).  flags_r() turns them into the bus bits.
-	static constexpr u8 OPT_AVO = 0x01; // Advanced Video Option
+	static constexpr u8 OPT_AVO = 0x01; // AVO built onto the VT102/VT131 board; the VT100's is the slot
 	static constexpr u8 OPT_GRAPHICS = 0x02; // VT105 waveform graphics board
 	static constexpr u8 OPT_STP = 0x04; // option on the Standard Terminal Port
 
@@ -144,7 +144,8 @@ void vt100_state::vt100_mem(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x1fff).mirror(0xc000).rom();  // ROM ( 4 * 2K)
-	map(0x2000, 0x2bff).mirror(0xc000).ram().share("p_ram"); // Screen and scratch RAM
+	map(0x2000, 0x2bff).mirror(0xc000).ram().share(m_p_ram); // Screen and scratch RAM
+	map(0x2c00, 0x3fff).mirror(0xc000).noprw(); // AVO connector; the card installs over it
 }
 
 void vt100_state::vt180_mem(address_map &map)
@@ -374,7 +375,7 @@ u8 vt100_state::video_ram_r(offs_t offset)
 	// Past the end of the RAM a model has fitted, return all ones as for an
 	// empty bus (an assumption, see vt101_mem); the attribute bits are active
 	// low, so that means no attributes.
-	if (m_avo && (offset >= 0x0c00))
+	if (m_avo && (offset >= m_p_ram.bytes()))
 		return m_avo->video_r(offset);
 	if (m_attr_ram && (offset >= 0x1000))
 		return attr_ram_r(offset & 0x0fff);
