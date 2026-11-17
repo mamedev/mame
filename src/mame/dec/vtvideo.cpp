@@ -240,9 +240,11 @@ void vt100_video_device::vblank_callback(screen_device &screen, bool state)
 }
 
 // At VERTICAL RESET the DC012 presets its Offset counter from the scroll
-// latch (TM-003 4.6.3.3) and sets the vertical frequency interrupt
-// (4.6.3.1), so the latch is taken at the start of vblank and the firmware
-// loads it from the interrupt for the next frame (4.7.8).  The Rainbow
+// latch (TM-003 4.6.3.3), and on its falling edge sets the vertical
+// frequency interrupt (4.6.3.1), so the latch is taken at the start of
+// vblank and the firmware loads it from the interrupt for the next frame
+// (4.7.8).  The screen updates before the vblank callbacks, so the frame
+// drawn at one vblank uses the latch taken at the one before.  The Rainbow
 // overrides this.
 void vt100_video_device::notify_vblank(bool choice)
 {
@@ -443,8 +445,11 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 			}
 			if (length > columns)
 			{
-				valid = false; // no terminator: nothing to follow
+				// no terminator: nothing to follow, blank the rest of the frame
+				logerror("unterminated screen line at %04x\n", addr);
+				valid = false;
 				length = 0;
+				display_type = 3;
 			}
 			else
 			{
