@@ -40,8 +40,8 @@ protected:
 
 private:
 	// internal helpers
-	u32 dma_read(unsigned bytes);
-	void dma_write(u32 data, unsigned bytes);
+	u32 dma_read(u8 bytes);
+	void dma_write(u32 data, u8 bytes);
 	bool timed_out(u8 error);
 	void wait(bool progress);
 	void done();

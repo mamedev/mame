@@ -26,10 +26,11 @@
     transfer four bytes at a time. On the MC68020/030 a long access to
     the 8-bit port is four bus cycles, each waiting for DRQ; MAME
     performs it as a single access. A pseudo-DMA access that finds no
-    DRQ for one of its bytes therefore halts the CPU and has the access
-    (MC68000) or instruction (MC68020/030) retried when DRQ comes,
-    keeping the bytes already transferred for the retry. No byte is
-    transferred ahead of the access that wants it.
+    DRQ for one of its bytes therefore suspends the CPU and has the
+    access (MC68000) or instruction (MC68020/030) retried when DRQ
+    comes, keeping the bytes already transferred for the retry. The
+    helper moves no byte ahead of the access that wants it; the 5380
+    itself latches and acknowledges one on REQ.
 
 **********************************************************************/
 
@@ -43,6 +44,9 @@
 
 static constexpr u8 READ_ERROR = 1;
 static constexpr u8 WRITE_ERROR = 0;
+
+// resumes the CPU suspended in wait()
+static constexpr int WAKE_TRIGGER = 1;
 
 // device type definition
 DEFINE_DEVICE_TYPE(MAC_SCSI_HELPER, mac_scsi_helper_device, "scsipdma", "Mac 5380 SCSI helper")
@@ -72,8 +76,9 @@ void mac_scsi_helper_device::device_start()
 	m_timeout_timer = timer_alloc(FUNC(mac_scsi_helper_device::timeout), this);
 
 	// wait() restarts the access on a 68020/030, which Musashi only honours
-	// with instruction restart on; that is otherwise on only while the PMMU is
-	// enabled, so not on a II with the HMMU (as scsidma.cpp does)
+	// with instruction restart on; that is otherwise on only while a PMMU is
+	// enabled, so not on a 68020/030 without one, such as the HMMU II (as
+	// scsidma.cpp does)
 	if (!m_maincpu->cpu_is_interruptible())
 		downcast<m68000_musashi_device &>(*m_maincpu).set_emmu_enable(true);
 
@@ -88,7 +93,7 @@ void mac_scsi_helper_device::device_reset()
 {
 	m_timeout_timer->enable(false);
 	if (m_waiting)
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->trigger(WAKE_TRIGGER);
 	m_waiting = false;
 	m_timed_out = false;
 	m_count = 0;
@@ -99,14 +104,18 @@ void mac_scsi_helper_device::drq_w(int state)
 {
 	m_drq = state;
 	if (state && m_waiting)
-		m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+		m_maincpu->trigger(WAKE_TRIGGER);
 }
 
 TIMER_CALLBACK_MEMBER(mac_scsi_helper_device::timeout)
 {
+	// DRQ at the same instant: the retry finds it
+	if (m_drq)
+		return;
+
 	LOG("pseudo-DMA access timed out\n");
 	m_timed_out = true;
-	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
+	m_maincpu->trigger(WAKE_TRIGGER);
 }
 
 // the retried access after a timeout ends in a bus error; bytes already
@@ -125,7 +134,7 @@ bool mac_scsi_helper_device::timed_out(u8 error)
 	return true;
 }
 
-// hold the CPU until DRQ, then have it retry the access; the timeout runs
+// suspend the CPU until DRQ, then have it retry the access; the timeout runs
 // from the last byte transferred
 void mac_scsi_helper_device::wait(bool progress)
 {
@@ -136,11 +145,8 @@ void mac_scsi_helper_device::wait(bool progress)
 	if (m_maincpu->cpu_is_interruptible())
 		m_maincpu->retry_access();
 	else
-	{
 		downcast<m68000_musashi_device &>(*m_maincpu).restart_this_instruction();
-		m_maincpu->abort_timeslice();
-	}
-	m_maincpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
+	m_maincpu->suspend_until_trigger(WAKE_TRIGGER, true);
 }
 
 void mac_scsi_helper_device::done()
@@ -153,17 +159,16 @@ void mac_scsi_helper_device::done()
 }
 
 // read the given number of bytes, returned in the low bits
-u32 mac_scsi_helper_device::dma_read(unsigned bytes)
+u32 mac_scsi_helper_device::dma_read(u8 bytes)
 {
-	if (machine().side_effects_disabled())
-		return ~u32(0);
-	if (timed_out(READ_ERROR))
+	if (machine().side_effects_disabled() || timed_out(READ_ERROR))
 		return ~u32(0);
 
+	// reading the data clears DRQ until the next byte is latched, so at most
+	// one byte per pass
 	bool const progress = m_drq;
-	while (m_count < bytes && m_drq)
+	if (m_drq)
 	{
-		// reading the data clears DRQ until the next byte is latched
 		m_data = (m_data << 8) | m_scsi_dma_read_callback(6);
 		m_count++;
 	}
@@ -179,15 +184,16 @@ u32 mac_scsi_helper_device::dma_read(unsigned bytes)
 }
 
 // write the given number of bytes from the low bits
-void mac_scsi_helper_device::dma_write(u32 data, unsigned bytes)
+void mac_scsi_helper_device::dma_write(u32 data, u8 bytes)
 {
-	if (timed_out(WRITE_ERROR))
+	if (machine().side_effects_disabled() || timed_out(WRITE_ERROR))
 		return;
 
+	// writing the data clears DRQ until the byte has gone out, so at most one
+	// byte per pass
 	bool const progress = m_drq;
-	while (m_count < bytes && m_drq)
+	if (m_drq)
 	{
-		// writing the data clears DRQ until the byte has gone out
 		m_scsi_dma_write_callback(0, BIT(data, (bytes - 1 - m_count) * 8, 8));
 		m_count++;
 	}
@@ -226,7 +232,7 @@ u32 mac_scsi_helper_device::pseudo_dma_r(offs_t offset, u32 mem_mask)
 		return dma_read(4);
 
 	default:
-		logerror("pseudo_dma_r: unknown mem_mask %08x\n", mem_mask);
+		logerror("%s: pseudo_dma_r: unknown mem_mask %08x\n", machine().describe_context(), mem_mask);
 		return 0;
 	}
 }
@@ -248,7 +254,7 @@ void mac_scsi_helper_device::pseudo_dma_w(offs_t offset, u32 data, u32 mem_mask)
 		break;
 
 	default:
-		logerror("pseudo_dma_w: unknown mem_mask %08x\n", mem_mask);
+		logerror("%s: pseudo_dma_w: unknown mem_mask %08x\n", machine().describe_context(), mem_mask);
 		break;
 	}
 }
