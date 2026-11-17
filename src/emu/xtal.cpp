@@ -222,6 +222,7 @@ const double XTAL::known_xtals[] = {
 	 12'292'000, // 12.292_MHz_XTAL        Northwest Digitial Systems GP-19
 	 12'324'000, // 12.324_MHz_XTAL        Otrona Attache
 	 12'335'600, // 12.3356_MHz_XTAL       RasterOps ColorBoard 264 (~784x NTSC line rate)
+	 12'395'000, // 12.395_MHz_XTAL        Heathkit H9 video terminal
 	 12'440'000, // 12.44_MHz_XTAL         Status casino / trivia games
 	 12'472'500, // 12.4725_MHz_XTAL       Bonanza's Mini Boy 7
 	 12'480'000, // 12.48_MHz_XTAL         TRS-80 Model II

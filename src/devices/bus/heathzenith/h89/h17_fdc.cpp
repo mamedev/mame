@@ -51,6 +51,8 @@ public:
 
 	[[maybe_unused]] void side_select_w(int state);
 
+	virtual void bus_clock_changed(u32 clock) override;
+
 protected:
 	static constexpr u8 MAX_FLOPPY_DRIVES = 3;
 
@@ -85,6 +87,8 @@ protected:
 
 	bool m_installed;
 
+	u32 m_bus_clock;
+
 	attotime m_rx_cell_start;
 	attotime m_rx_scan;
 	bool     m_rx_have_clock;
@@ -108,13 +112,17 @@ protected:
 	static constexpr u8 CTRL_STEP_COMMAND     = 6; // (Active high)
 	static constexpr u8 CTRL_WRITE_ENABLE_RAM = 7; // 0 - write protected
 
-	// USRT clock
-	static constexpr XTAL USRT_BASE_CLOCK = XTAL(12'288'000) / 6 / 16;
-	static constexpr u32  USRT_TX_CLOCK   = USRT_BASE_CLOCK.value();
+	// USRT clock is the 2 MHz bus clock divided by 16, so the board only reads
+	// and writes the disk correctly with a 2.048 MHz bus clock.
+	static constexpr u32 USRT_CLOCK_DIVIDER = 16;
+
+	u32 usrt_clock() { return h89bus().clock() / USRT_CLOCK_DIVIDER; }
 
 	// A bit cell holds an FM clock half-cell followed by a data half-cell.
-	static attotime fm_cell_time() { return attotime::from_hz(USRT_TX_CLOCK * 2); }
-	static attotime fm_bit_time()  { return attotime::from_hz(USRT_TX_CLOCK); }
+	attotime fm_cell_time() { return attotime::from_hz(usrt_clock() * 2); }
+	attotime fm_bit_time()  { return attotime::from_hz(usrt_clock()); }
+
+	void start_tx_clock();
 };
 
 
@@ -424,8 +432,10 @@ void heath_h17_fdc_device::device_start()
 	m_rx_timer = timer_alloc(FUNC(heath_h17_fdc_device::rx_timer_cb), this);
 
 	m_installed = false;
+	m_bus_clock = h89bus().clock();
 
 	save_item(NAME(m_installed));
+	save_item(NAME(m_bus_clock));
 	save_item(NAME(m_motor_on));
 	save_item(NAME(m_write_gate));
 	save_item(NAME(m_sync_char_received));
@@ -458,8 +468,30 @@ void heath_h17_fdc_device::device_reset()
 	m_motor_on           = false;
 	m_write_gate         = false;
 	m_sync_char_received = false;
+	m_bus_clock          = h89bus().clock();
 
-	m_tx_timer->adjust(attotime::from_hz(USRT_TX_CLOCK), 0, attotime::from_hz(USRT_TX_CLOCK));
+	start_tx_clock();
+	reset_rx_separator();
+}
+
+void heath_h17_fdc_device::start_tx_clock()
+{
+	attotime const period = fm_bit_time();
+
+	m_tx_timer->adjust(period, 0, period);
+}
+
+void heath_h17_fdc_device::bus_clock_changed(u32 clock)
+{
+	LOGFUNC("%s: clock: %u\n", FUNCNAME, clock);
+
+	// loading a state reports the clock it restored, leave the restored timing alone
+	if (clock == m_bus_clock)
+		return;
+
+	m_bus_clock = clock;
+
+	start_tx_clock();
 	reset_rx_separator();
 }
 
