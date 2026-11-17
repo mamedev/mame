@@ -777,9 +777,9 @@ void macii_state::machine_reset()
 
 // The RESET instruction pulls the board's /RESET line, which brings "all of
 // the internal devices" to their initial state (Guide to the Macintosh Family
-// Hardware, 2nd ed., p. 244).  The Guide names no chips for these machines;
-// the VIAs, SWIM/IWM and 5380 are on it as on the SE (table 14-2, p. 451).
-// The SCC has no reset input.
+// Hardware, 2nd ed., p. 244).  On the Mac II logic board (820-0228) the
+// 68020's RESET pin shares a net with both VIAs, the IWM and the 5380; the
+// later machines are assumed to match.  The SCC has no reset input.
 void macii_state::cpu_reset_w(int state)
 {
 	if (!state)
