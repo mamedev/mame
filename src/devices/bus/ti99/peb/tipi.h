@@ -84,6 +84,7 @@ private:
 	int m_attempts;
 	bool m_connected;
 	bool m_rpiconn;
+	bool m_client_started;
 	int m_pausetime;
 
 	// Incoming queue
