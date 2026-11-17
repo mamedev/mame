@@ -221,8 +221,9 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+#if VERBOSE
 	void log_uniflex(const char *msg);
-
+#endif
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u16 memory_r(offs_t offset, u16 mem_mask);
@@ -492,10 +493,12 @@ void tek440x_state::ready_sound(int state)
  *  CPU memory handlers
  *
  *************************************/
+#if VERBOSE
 void tek440x_state::log_uniflex(const char *msg)
 {
 	osd_printf_info("\033[32m[:UNIFLEX] %s: %s \033[0m\n", machine().time().as_string(8), msg);
 }
+#endif
 
 u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 {
