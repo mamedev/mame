@@ -29,7 +29,6 @@ private:
 };
 
 extern const uint8_t m312cn_key[0x100];
-extern const uint8_t cjdh2_key[0x100];
 extern const uint8_t bubucar_key[0x100];
 extern const uint8_t lhzb3in1_key[0x100];
 extern const uint8_t lhzbgqb_key[0x100];
