@@ -116,6 +116,8 @@ public:
 	void dcd_w(int state);
 	void rxc_w(int state);
 	void txc_w(int state);
+	void rtxc_w(int state);
+	void trxc_w(int state);
 	void sync_w(int state);
 
 	TIMER_CALLBACK_MEMBER(brg_tick);
@@ -234,6 +236,8 @@ protected:
 
 	unsigned int get_brg_rate();
 	unsigned int get_rtxc_rate();
+	void rx_clock_edge(int state);
+	void tx_clock_edge(int state);
 	void update_baudtimer();
 
 	void scc_register_write(uint8_t reg, uint8_t data);
@@ -385,6 +389,10 @@ public:
 	void txca_w(int state) { m_chanA->txc_w(state); }
 	void txcb_w(int state) { m_chanB->txc_w(state); }
 	void rxtxcb_w(int state) { m_chanB->rxc_w(state); m_chanB->txc_w(state); }
+	void rtxca_w(int state) { m_chanA->rtxc_w(state); }
+	void rtxcb_w(int state) { m_chanB->rtxc_w(state); }
+	void trxca_w(int state) { m_chanA->trxc_w(state); }
+	void trxcb_w(int state) { m_chanB->trxc_w(state); }
 	void synca_w(int state) { m_chanA->sync_w(state); }
 	void syncb_w(int state) { m_chanB->sync_w(state); }
 	int update_extint(int i);
