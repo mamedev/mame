@@ -2,18 +2,11 @@
 // copyright-holders: Styne13, stonedDiscord
 /******************************************************************************
 
-NSM Rotamint Duplex - and related machines using Fairchild F8 architecture with F3853+F3850
-and 3x2KB EPROM (F3870 chip, which combines F3850 + F38T56)
-
 F8 Hardware:
-- Fairchild F3870 MCU (F3850 CPU + F38T56 PSU), label SL90594 or similar
-- 3x2KB EPROMs for program code (e.g. A111157, A111156, A111158)
+- Fairchild F3850 CPU
+- 3x2KB EPROMs for program code (A6, A7, A8)
 - Fairchild F3853 SMI for I/O and interrupt handling
-- GI ER1400 serial EAROM (100x14 bits; candidate port-1 wiring under test)
-- PWM display with 7-segment outputs for digit/segment output
-- 40-pin DIP package at 1MHz clock
-- rest of the hardware description is ongoing
-   by viewing schematics and tracking traces
+- GI ER1400 serial EAROM (100x14 bits)
 
 PCB markings: Ersatzteil-Nr. 111 147, Sach-Nr. 217 438.
 
@@ -27,7 +20,7 @@ PCB markings: Ersatzteil-Nr. 111 147, Sach-Nr. 217 438.
   | [74LS244]? [74LS245]? [74LS244]?                      [74LS374] [74LS374] [74LS374]?         |
   |=== edge connector 01 (31pin)================================edge connector 02 (49 pin)=======|
 
-TODO: Peripheral decoding is incomplete.
+TODO: Peripheral decoding is incomplete: Coin acceptor/hopper, buttons, motor control unit. Clock frequency has to be validated on the board. Identify external inerrupt source for F3853.
 
 *******************************************************************************/
 
@@ -230,7 +223,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(nsmf8_state::external_interrupt)
 void nsmf8_state::nsmf8(machine_config &config)
 {
 	// Separate 3850 CPU and 3853 SMI.
-	// TODO: verify the oscillator frequency and divider on the PCB.
 	F8(config, m_maincpu, 1'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nsmf8_state::nsmf8_mem);
 	m_maincpu->set_addrmap(AS_IO, &nsmf8_state::nsmf8_io);
@@ -239,9 +231,6 @@ void nsmf8_state::nsmf8(machine_config &config)
 	m_f3853->int_req_callback().set_inputline(m_maincpu, F8_INPUT_LINE_INT_REQ);
 	m_maincpu->int_cycle_callback().set(m_f3853, FUNC(f3853_device::int_acknowledge));
 
-	// TODO: identify the external interrupt source and frequency. Startup counts
-	// repeated external interrupts before enabling the F3853's internal timer.
-	// Use a provisional 50 Hz pulse source pending verification of the hardware.
 	TIMER(config, "external_interrupt").configure_periodic(FUNC(nsmf8_state::external_interrupt), attotime::from_hz(50));
 
 	ER1400(config, m_earom);
