@@ -430,6 +430,7 @@ void c64_expansion_slot_device::set_passthrough()
 #include "tibdd001.h"
 #include "tdos.h"
 #include "turbo232.h"
+#include "turbotrans.h"
 #include "vizastar.h"
 #include "vw64.h"
 #include "warp_speed.h"
@@ -472,6 +473,7 @@ void c64_expansion_cards(device_slot_interface &device)
 	device.option_add("swiftlink", C64_SWIFTLINK);
 	device.option_add("tibdd001", C64_TIB_DD_001);
 	device.option_add("turbo232", C64_TURBO232);
+	device.option_add("turbotrans", C64_TURBOTRANS);
 
 	// the following need ROMs from the software list
 	device.option_add_internal("standard", C64_STD);

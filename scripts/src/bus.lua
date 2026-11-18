@@ -1570,6 +1570,8 @@ if BUSES["C64"] then
 		MAME_DIR .. "src/devices/bus/c64/tdos.h",
 		MAME_DIR .. "src/devices/bus/c64/turbo232.cpp",
 		MAME_DIR .. "src/devices/bus/c64/turbo232.h",
+		MAME_DIR .. "src/devices/bus/c64/turbotrans.cpp",
+		MAME_DIR .. "src/devices/bus/c64/turbotrans.h",
 		MAME_DIR .. "src/devices/bus/c64/vizastar.cpp",
 		MAME_DIR .. "src/devices/bus/c64/vizastar.h",
 		MAME_DIR .. "src/devices/bus/c64/vw64.cpp",
