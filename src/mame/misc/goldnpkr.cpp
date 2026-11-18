@@ -2095,7 +2095,7 @@ void goldnpkr_state::goldnpkr_map(address_map &map)
 
 	common_io_map(map);
 
-	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM
 	map(0x2000, 0x7fff).rom();  // superdbl uses 0x2000..0x3fff address space
 }
 
@@ -2113,7 +2113,7 @@ void goldnpkr_state::pottnpkr_map(address_map &map)
 
 	common_io_map(map);
 
-	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM
 	map(0x2000, 0x3fff).rom();
 }
 
@@ -2123,9 +2123,9 @@ void goldnpkr_state::witchcrd_map(address_map &map)
 
 	common_io_map(map);
 
-	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM
 	map(0x2000, 0x2000).portr("SW2");
-//  map(0x2108, 0x210b).noprw(); // unknown 40-pin device
+//  map(0x2108, 0x210b).noprw();  // unknown 40-pin device
 	map(0x2800, 0x2fff).ram();
 	map(0x3000, 0x7fff).rom();
 }
@@ -2145,7 +2145,7 @@ void goldnpkr_state::witchcrd_falcon_map(address_map &map)
 {
 	map.global_mask(0x7fff);
 
-	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM
 	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
@@ -2160,7 +2160,7 @@ void goldnpkr_state::wildcard_map(address_map &map)
 {
 	common_io_map(map);
 
-	map(0x0000, 0x07ff).ram().share("nvram");   // battery backed RAM
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM
 	map(0x2000, 0x2000).portr("SW2");
 	map(0x2200, 0x27ff).rom();  // for VK set
 	map(0x2800, 0x2fff).ram();  // for VK set
@@ -2175,10 +2175,10 @@ void goldnpkr_state::wcrdxtnd_map(address_map &map)
 {
 	common_io_map(map);
 
-	map(0x0000, 0x07ff).ram(); //.share("nvram"); // battery backed RAM
+	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM
 	map(0x2000, 0x2000).portr("SW2");
 	map(0x2200, 0x27ff).rom();  // for VK hardware
-	map(0x2800, 0x2fff).ram().share("nvram");   // Dallas ds1210 + battery backed RAM
+	map(0x2800, 0x2fff).ram().share("ds1210");  // Dallas DS1210
 	map(0x3000, 0xffff).rom();  // for VK hardware. bootleg starts from 4000
 }
 
@@ -6628,6 +6628,8 @@ void goldnpkr_state::wcrdxtnd(machine_config &config)
 
 	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::pottnpkr_mux_port_r));
 	m_pia[0]->writepa_handler().set(FUNC(goldnpkr_state::mux_port_w));
+
+	NVRAM(config, "ds1210", nvram_device::DEFAULT_ALL_1);  // Dallas DS1210
 
 	// video hardware
 	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, (38 + 1) * 8, 0, 32 * 8);
