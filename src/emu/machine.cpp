@@ -1397,32 +1397,183 @@ void system_time::full_time::set(struct tm &t)
 #if defined(__EMSCRIPTEN__)
 
 running_machine * running_machine::emscripten_running_machine;
+static osd_ticks_t s_emscripten_last_realtime = 0;
+
+// wall-master clock: absolute wall time the emulator should have reached;
+// each callback timeslices toward it, so emulated time tracks wall time by
+// construction and audio production matches sink consumption
+static attotime s_emscripten_wall_target = attotime::zero;
+static bool s_emscripten_wall_target_valid = false;
+// slow rate trim absorbing guest-vs-AudioContext clock drift, from a
+// heavily smoothed ring-level error
+static double s_emscripten_rate = 1.0;
+static double s_emscripten_level_ema = -1.0;
+
+// fast forward from the web front; own flag because the UI clears video's
+// fastforward flag whenever IPT_UI_FAST_FORWARD is up
+static bool s_emscripten_ffwd = false;
+
 
 void running_machine::emscripten_main_loop()
 {
 	running_machine *machine = emscripten_running_machine;
 
-	auto profile = g_profiler.start(PROFILER_EXTRA);
+	// MAME's internal throttle is a busy-wait that can spin for hundreds
+	// of milliseconds inside one timeslice (catch-up bursts put emulated
+	// time ahead of wall time) and starves the audio sink on the shared
+	// main thread; the wall-master target below is the only pacer
+	static bool s_emscripten_throttle_off = false;
+	if (!s_emscripten_throttle_off && machine->m_video)
+	{
+		machine->m_video->set_throttled(false);
+		s_emscripten_throttle_off = true;
+	}
+
+
+	// real interval between callbacks; clamp only garbage deltas (first
+	// call, backgrounded tab), genuine gaps must credit the emulator
+	osd_ticks_t const now = osd_ticks();
+	osd_ticks_t const tps = osd_ticks_per_second();
+	osd_ticks_t delta = now - s_emscripten_last_realtime;
+	s_emscripten_last_realtime = now;
+	if (delta > tps / 4)
+		delta = tps / 60;
+
+	// slow integral trim from the ring-level error; keeps the sink from
+	// underrunning between bursty callbacks without a fast feedback loop
+	{
+		int const target_ms = EM_ASM_INT(
+			if (typeof window !== "undefined" && typeof window.jsmame_audio_target_ms == "function")
+				return window.jsmame_audio_target_ms();
+			return 85;
+		);
+		int const buffered_ms = EM_ASM_INT(
+			if (typeof window !== "undefined" && typeof window.jsmame_audio_buffered_ms == "function")
+				return window.jsmame_audio_buffered_ms();
+			return -1;
+		);
+		if (buffered_ms >= 0)
+		{
+			if (s_emscripten_level_ema < 0)
+				s_emscripten_level_ema = buffered_ms;
+			s_emscripten_level_ema += (buffered_ms - s_emscripten_level_ema) * 0.02;
+			s_emscripten_rate = std::clamp(1.0 + (double(target_ms) - s_emscripten_level_ema) * 0.003, 0.95, 1.35);
+		}
+	}
+
+	// dropping the flood of unthrottled audio when fast forward ends keeps
+	// latency from lingering after the sink was saturated
+	//
+	// while fast forwarding, the loop is re-registered on a ~16 ms timer
+	// instead of requestAnimationFrame: rAF cadence collapses under
+	// compositor load, in occluded windows and in background tabs, which
+	// caps fast forward at a fraction of the achievable speed, while a
+	// timer chain keeps running (pages playing audio are exempt from
+	// intensive timer throttling).  Normal play stays on rAF: a timer
+	// chain fights the compositor's vsync pipeline and settles at ~4x
+	// the intended interval (measured: 64 ms cadence, half realtime).
+	{
+		static bool s_was_fastforward = false;
+		static bool s_ff_timer_mode = false;
+		bool const fastforward = s_emscripten_ffwd || machine->m_video->fastforward();
+		if (s_was_fastforward != fastforward)
+			EM_ASM(
+				if (typeof window !== "undefined" && typeof window.jsmame_audio_set_ff == "function")
+					window.jsmame_audio_set_ff($0);
+			, int(fastforward));
+		if (s_was_fastforward && !fastforward)
+			EM_ASM(
+				if (typeof window !== "undefined" && typeof window.jsmame_audio_trim == "function")
+					window.jsmame_audio_trim();
+			);
+		if (fastforward != s_ff_timer_mode)
+		{
+			s_ff_timer_mode = fastforward;
+			emscripten_cancel_main_loop();
+			emscripten_set_main_loop(&(emscripten_main_loop), fastforward ? 60 : 0, 0);
+			return;
+		}
+		s_was_fastforward = fastforward;
+	}
 
 	// execute CPUs if not paused
 	if (!machine->m_paused)
 	{
-		device_scheduler * scheduler;
+		device_scheduler *scheduler;
 		scheduler = &(machine->scheduler());
 
-		// Emscripten will call this function at 60Hz, so step the simulation
-		// forward for the amount of time that has passed since the last frame
-		const attotime frametime(0,HZ_TO_ATTOSECONDS(60));
-		const attotime stoptime(scheduler->time() + frametime);
-
-		while (!machine->m_paused && !machine->scheduled_event_pending() && scheduler->time() < stoptime)
+		// a paced machine steps the real callback interval, an
+		// unthrottled one emulates until the next callback
+		if (!(s_emscripten_ffwd || machine->m_video->fastforward()))
 		{
-			scheduler->timeslice();
-			// handle save/load
-			if (machine->m_saveload_schedule != saveload_schedule::NONE)
+			// advance the wall-master target by the real interval, trimmed
+			// by the rate match above, and timeslice toward it
+			if (!s_emscripten_wall_target_valid)
 			{
-				machine->handle_saveload();
-				break;
+				s_emscripten_wall_target = scheduler->time();
+				s_emscripten_wall_target_valid = true;
+			}
+			s_emscripten_wall_target += attotime(0, u64(double(delta) * s_emscripten_rate * double(ATTOSECONDS_PER_SECOND) / double(tps)));
+			// emulated time ahead of the target (fast forward exit, timeslice
+			// overshoot, save-state load): resync instead of freezing
+			if (s_emscripten_wall_target < scheduler->time())
+				s_emscripten_wall_target = scheduler->time();
+			// backlog clamp: never chase more than the audio ring can hold
+			if ((s_emscripten_wall_target - scheduler->time()) > attotime(0, 16 * (ATTOSECONDS_PER_SECOND / 50)))
+				s_emscripten_wall_target = scheduler->time() + attotime(0, 16 * (ATTOSECONDS_PER_SECOND / 50));
+			const attotime stoptime(s_emscripten_wall_target);
+			// hard wall guard: past ~50 ms plus margin we are blocking the
+			// page and must return control; the audio worklet renders on
+			// the browser's audio thread, so playback no longer depends
+			// on main-thread gaps.  The remaining backlog stays for the
+			// next callback
+			const osd_ticks_t wall_stop(now + std::min<osd_ticks_t>(2 * delta, tps / 20) + tps / 100);
+			int slices = 0;
+
+			// no scheduled_event_pending() exit: timeslice() services pending
+			// events (keyboard input storms them at autorepeat rate)
+			while (!machine->m_paused && scheduler->time() < stoptime)
+			{
+				scheduler->timeslice();
+				// handle save/load
+				if (machine->m_saveload_schedule != saveload_schedule::NONE)
+				{
+					machine->handle_saveload();
+					break;
+				}
+				if (++slices >= 64)
+				{
+					slices = 0;
+					if (osd_ticks() > wall_stop)
+						break;
+				}
+			}
+
+			// nothing to carry over: the target is absolute and emulated time
+			// past it is covered by the resync
+		}
+		else
+		{
+			// osd_ticks() crosses into javascript: probe sparsely, timer-heavy
+			// guests run thousands of tiny timeslices per budget
+			const osd_ticks_t stop_ticks(now + delta);
+			int slices = 0;
+
+			while (!machine->m_paused)
+			{
+				scheduler->timeslice();
+				// handle save/load
+				if (machine->m_saveload_schedule != saveload_schedule::NONE)
+				{
+					machine->handle_saveload();
+					break;
+				}
+				if (++slices >= 128)
+				{
+					slices = 0;
+					if (osd_ticks() >= stop_ticks)
+						break;
+				}
 			}
 		}
 	}
@@ -1440,6 +1591,9 @@ void running_machine::emscripten_main_loop()
 void running_machine::emscripten_set_running_machine(running_machine *machine)
 {
 	emscripten_running_machine = machine;
+	s_emscripten_wall_target_valid = false;
+	s_emscripten_rate = 1.0;
+	s_emscripten_level_ema = -1.0;
 	EM_ASM (
 		JSMESS.running = true;
 	);
