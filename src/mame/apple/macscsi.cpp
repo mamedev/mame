@@ -47,6 +47,10 @@ static constexpr u8 WRITE_ERROR = 0;
 // resumes the CPU suspended in wait()
 static constexpr int WAKE_TRIGGER = 1;
 
+// the SE's BBU times out any access after 265 ms (Guide to the Macintosh
+// Family Hardware, 2nd ed., p. 126); other models' figures are unknown
+static constexpr attotime TIMEOUT = attotime::from_msec(265);
+
 // device type definition
 DEFINE_DEVICE_TYPE(MAC_SCSI_HELPER, mac_scsi_helper_device, "scsipdma", "Mac 5380 SCSI helper")
 
@@ -58,9 +62,6 @@ mac_scsi_helper_device::mac_scsi_helper_device(const machine_config &mconfig, co
 	, m_scsi_dma_read_callback(*this, BAD_BYTE)
 	, m_scsi_dma_write_callback(*this)
 	, m_timeout_error_callback(*this)
-	// the SE's BBU times out any access after 265 ms (Guide to the Macintosh
-	// Family Hardware, 2nd ed., p. 126); other models' figures are unknown
-	, m_timeout(attotime::from_msec(265))
 	, m_timeout_timer(nullptr)
 	, m_drq(false)
 	, m_waiting(false)
@@ -92,7 +93,6 @@ void mac_scsi_helper_device::device_start()
 
 void mac_scsi_helper_device::device_reset()
 {
-	m_timeout_timer->enable(false);
 	if (m_waiting)
 		m_maincpu->trigger(WAKE_TRIGGER);
 	m_timed_out = false;
@@ -119,7 +119,10 @@ TIMER_CALLBACK_MEMBER(mac_scsi_helper_device::timeout)
 {
 	// the CPU alone was reset while waiting (Egret, Cuda or the PMU): it is
 	// held in reset, or the reset resumed it without a wake from here; the
-	// access is gone
+	// access is gone.  The helper isn't told of that reset, so a reset
+	// between a wake and the retry (a 68020/030 can take an interrupt
+	// there), or a new access before this fires, can still meet the old
+	// access's state.
 	if (m_maincpu->suspended(SUSPEND_REASON_RESET) || (!m_woken && !m_maincpu->suspended(SUSPEND_REASON_TRIGGER)))
 	{
 		done();
@@ -150,8 +153,8 @@ bool mac_scsi_helper_device::timed_out(u8 error)
 // from the last byte transferred
 void mac_scsi_helper_device::wait(bool progress)
 {
-	if (!m_waiting || progress || !m_timeout_timer->enabled())
-		m_timeout_timer->adjust(m_timeout);
+	if (progress || !m_timeout_timer->enabled())
+		m_timeout_timer->adjust(TIMEOUT);
 	m_waiting = true;
 	m_woken = false;
 
@@ -164,8 +167,7 @@ void mac_scsi_helper_device::wait(bool progress)
 
 void mac_scsi_helper_device::done()
 {
-	if (m_waiting)
-		m_timeout_timer->enable(false);
+	m_timeout_timer->enable(false);
 	m_waiting = false;
 	m_woken = false;
 	m_count = 0;
@@ -175,7 +177,16 @@ void mac_scsi_helper_device::done()
 // read the given number of bytes, returned in the low bits
 u32 mac_scsi_helper_device::dma_read(u8 bytes)
 {
-	if (machine().side_effects_disabled() || timed_out(READ_ERROR))
+	// a debugger read sees the byte the 5380 has latched, in every lane
+	if (machine().side_effects_disabled())
+	{
+		u8 const latched = m_scsi_read_callback(6);
+		u32 data = 0;
+		for (u8 i = 0; i < bytes; i++)
+			data = (data << 8) | latched;
+		return data;
+	}
+	if (timed_out(READ_ERROR))
 		return ~u32(0);
 	if (m_count >= bytes)
 		done(); // left over from an access that never finished
