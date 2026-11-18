@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /**********************************************************************************************
  *
- *   Ensoniq ES5505/6 driver
+ *   Ensoniq ES5504/5505/5506 driver
  *   by Aaron Giles
  *
  **********************************************************************************************/
@@ -110,8 +110,8 @@ protected:
 	inline void apply_filters(es550x_voice *voice, s32 &sample);
 	virtual u8 filter_shift() { return 0; }
 	virtual void update_envelopes(es550x_voice *voice) = 0;
-	virtual void check_for_end_forward(es550x_voice *voice, u64 &accum) = 0;
-	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) = 0;
+	virtual void check_for_end_forward(es550x_voice *voice, u64 &accum);
+	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum);
 	void generate_ulaw(es550x_voice *voice, s32 *dest);
 	void generate_pcm(es550x_voice *voice, s32 *dest);
 	inline void generate_irq(es550x_voice *voice, int v);
@@ -244,8 +244,6 @@ protected:
 
 	virtual u8 filter_shift() override { return 0; }
 	virtual void update_envelopes(es550x_voice *voice) override;
-	virtual void check_for_end_forward(es550x_voice *voice, u64 &accum) override;
-	virtual void check_for_end_reverse(es550x_voice *voice, u64 &accum) override;
 	virtual void generate_samples(sound_stream &stream) override;
 
 	virtual inline u16 read_sample(es550x_voice *voice, offs_t addr) override { update_index(voice); return m_cache[get_bank(voice->control)].read_word(addr); }
@@ -263,6 +261,47 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(ES5505, es5505_device)
+
+
+class es5504_device : public es550x_device
+{
+public:
+	es5504_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	u16 read(offs_t offset);
+	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
+
+	// es550x_device implementation
+	virtual u32 get_lp(u32 control) override;
+	virtual u32 get_ca(u32 control) override;
+	virtual u8 filter_shift() override;
+	virtual void update_envelopes(es550x_voice *voice) override;
+	virtual void generate_samples(sound_stream &stream) override;
+	virtual u16 read_sample(es550x_voice *voice, offs_t addr) override;
+
+	address_space_config m_bank0_config;
+
+private:
+	void update_pan(int v);
+	inline void write_voice(int v, offs_t offset, u16 data, u16 mem_mask);
+	inline void write_filter(int v, offs_t offset, u16 data, u16 mem_mask);
+	inline u16 read_voice(int v, offs_t offset);
+	inline u16 read_filter(int v, offs_t offset);
+
+	memory_access<20, 1, -1, ENDIANNESS_BIG>::cache m_cache;
+	u16 m_vol[32];
+	u16 m_ad_test;
+};
+
+DECLARE_DEVICE_TYPE(ES5504, es5504_device)
 
 
 #endif // MAME_SOUND_ES5506_H
