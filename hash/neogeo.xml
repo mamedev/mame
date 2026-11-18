@@ -12339,6 +12339,94 @@ Four player adapter not supported
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="sgzero">
+		<description>Shadow Gang Zero (backers demo v1.0)</description>
+		<year>2026</year>
+		<publisher>JKM Corp</publisher>
+		<info name="developer" value="JKM Corp" />
+		<info name="version" value="backers demo v1.0" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x300000">
+				<rom loadflag="load16_word_swap" name="shadowgangs-p1.bin" offset="0x000000" size="0x100000" crc="d82b221c" sha1="dd4d1845f4c79c463a79a0f1500698479cc0f5dc" />
+				<rom loadflag="load16_word_swap" name="shadowgangs-p2.bin" offset="0x100000" size="0x200000" crc="29d808db" sha1="ae833f27c29de8d8d15c21058ecb5ed4d00495b5" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="shadowgangs-s1.bin" crc="0129953c" sha1="403e7c37ea34cc31d4195aef64b793d98cefb776" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x080000">
+				<rom offset="0x000000" size="0x080000" name="shadowgangs-m1.bin" crc="d8b119ee" sha1="6e0b15ab7f92dbc41f2ad4644829f1fa5f9d95f7" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x1000000">
+				<rom name="shadowgangs-v1.bin" offset="0x000000" size="0x1000000" crc="3feb9e9b" sha1="60ca9ca731453094ce19d6edf3860dec319b39d4" />
+			</dataarea>
+			<dataarea name="sprites" size="0x2000000">
+				<rom loadflag="load16_byte" name="shadowgangs-c1.bin" offset="0x000000" size="0x1000000" crc="389f2418" sha1="934f0334f47a75953f8359dbe242c2e2252544b6" />
+				<rom loadflag="load16_byte" name="shadowgangs-c2.bin" offset="0x000001" size="0x1000000" crc="0e80f762" sha1="795cdc6a4d1f929823e96873924b2f2c645c8bb6" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sgzero_d20" cloneof="sgzero">
+		<description>Shadow Gang Zero (kickstarter demo v2.0)</description>
+		<year>2024</year>
+		<publisher>JKM Corp</publisher>
+		<info name="developer" value="JKM Corp" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="shadowgangs-p1.bin" offset="0x000000" size="0x100000" crc="825d0989" sha1="0b58b061af47df7bfe402fd8207aa7d9f76aecda" />
+				<rom loadflag="load16_word_swap" name="shadowgangs-p2.bin" offset="0x100000" size="0x100000" crc="3d1f0314" sha1="f3699d294145910fa75a2deee822f9ecd9a53150" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="shadowgangs-s1.bin" crc="2e4238d1" sha1="f556cd9afcf53c3a1128cdaa639d49fb3abfa3ed" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="shadowgangs-m1.bin" crc="11c56b34" sha1="5c5efc07c0dea8d2d36ba449e00839379b69d889" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x400000">
+				<rom name="shadowgangs-v1.bin" offset="0x000000" size="0x200000" crc="8928bcf2" sha1="aa139c5bfa79f12188794c373fdc91d6cae972de" />
+				<rom name="shadowgangs-v2.bin" offset="0x200000" size="0x200000" crc="8d89877e" sha1="7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6" />
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<rom loadflag="load16_byte" name="shadowgangs-c1.bin" offset="0x000000" size="0x200000" crc="7679fe24" sha1="7ad065393103869c80caaac8b90ac324ef165128" />
+				<rom loadflag="load16_byte" name="shadowgangs-c2.bin" offset="0x000001" size="0x200000" crc="5374cdad" sha1="177f5a2b1e9c37b5997e7cd5175e80373a6ccdc9" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sgzero_d13" cloneof="sgzero">
+		<description>Shadow Gang Zero (kickstarter demo v1.3)</description>
+		<year>2024</year>
+		<publisher>JKM Corp</publisher>
+		<info name="developer" value="JKM Corp" />
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="shadowgangs-p1.bin" offset="0x000000" size="0x100000" crc="6d9f31c0" sha1="c50a24080fc2b2fbc2504c63da8f4679e73fc4f6" />
+				<rom loadflag="load16_word_swap" name="shadowgangs-p2.bin" offset="0x100000" size="0x100000" crc="2eec8d7a" sha1="afed7cde30c54b00d0176f777469f41ba25c3c8d" />
+			</dataarea>
+			<dataarea name="fixed" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="shadowgangs-s1.bin" crc="2e4238d1" sha1="f556cd9afcf53c3a1128cdaa639d49fb3abfa3ed" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="shadowgangs-m1.bin" crc="11c56b34" sha1="5c5efc07c0dea8d2d36ba449e00839379b69d889" />
+			</dataarea>
+			<dataarea name="ymsnd:adpcma" size="0x400000">
+				<rom name="shadowgangs-v1.bin" offset="0x000000" size="0x200000" crc="8928bcf2" sha1="aa139c5bfa79f12188794c373fdc91d6cae972de" />
+				<rom name="shadowgangs-v2.bin" offset="0x200000" size="0x200000" crc="8d89877e" sha1="7d76d48d64d7ac5411d714a4bb83f37e3e5b8df6" />
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<rom loadflag="load16_byte" name="shadowgangs-c1.bin" offset="0x000000" size="0x200000" crc="fee624e1" sha1="1d805542e15cd18ef59bad66ce7c81ba4ede8350" />
+				<rom loadflag="load16_byte" name="shadowgangs-c2.bin" offset="0x000001" size="0x200000" crc="9760db3b" sha1="00642d53ac9e6173c18ebf227b668a517166ae2a" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="violentv">
 		<description>Violent Vengeance (beta 3.28)</description>
 		<year>2026</year>
