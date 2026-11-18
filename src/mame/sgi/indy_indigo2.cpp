@@ -275,7 +275,7 @@ void ip24_state::machine_start()
 
 void ip24_state::machine_reset()
 {
-	//m_maincpu->mips3drc_set_options(MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
+	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 }
 
 static INPUT_PORTS_START( ip24 )
