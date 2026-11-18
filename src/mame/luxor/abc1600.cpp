@@ -1128,12 +1128,16 @@ void abc1600_state::abc1600(machine_config &config)
 	rs232a.cts_handler().set(m_scc, FUNC(scc8530_device::ctsa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(scc8530_device::dcda_w));
 	rs232a.ri_handler().set(m_scc, FUNC(scc8530_device::synca_w));
+	rs232a.rxc_handler().set([this](int state) { if (!m_atce) m_scc->rtxca_w(state); });
+	rs232a.txc_handler().set([this](int state) { if (!m_atce) m_scc->trxca_w(state); });
 
 	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(scc8530_device::rxb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(scc8530_device::ctsb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(scc8530_device::dcdb_w));
 	rs232b.ri_handler().set(m_scc, FUNC(scc8530_device::syncb_w));
+	rs232b.rxc_handler().set([this](int state) { if (!m_btce) m_scc->rtxcb_w(state); });
+	rs232b.txc_handler().set([this](int state) { if (!m_btce) m_scc->trxcb_w(state); });
 
 	Z8536(config, m_cio, XTAL(64'000'000)/16);
 	m_cio->irq_wr_cb().set_inputline(MC68008P8_TAG, M68K_IRQ_2);
