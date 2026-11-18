@@ -56,6 +56,7 @@
 #include "i8051.h"
 #include "mcs51dasm.h"
 
+#include <algorithm>
 #include <tuple>
 
 #define LOG_RX (1U << 1)
@@ -954,36 +955,26 @@ Note about priority & interrupting interrupts..
        f) TF2+EXF2
 */
 
-void mcs51_cpu_device::irqs_complete_and_mask(u8 &ints, u8 int_mask)
+void mcs51_cpu_device::irqs_complete_and_mask(u16 &ints, u16 int_mask)
 {
 	ints &= int_mask;
 }
 
-bool mcs51_cpu_device::manage_idle_on_interrupt(u8 ints)
+bool mcs51_cpu_device::manage_idle_on_interrupt(u16 ints)
 {
 	return false;
 }
 
 u16 mcs51_cpu_device::pending_irq_flags(u16 int_mask)
 {
-	u8 ints = (BIT(m_tcon, TCON_IE0) | (BIT(m_tcon, TCON_TF0) << 1) | (BIT(m_tcon, TCON_IE1) << 2) | (BIT(m_tcon, TCON_TF1) << 3) | ((BIT(m_scon, SCON_RI) | BIT(m_scon, SCON_TI)) << 4));
-	irqs_complete_and_mask(ints, u8(int_mask));
+	u16 ints = (BIT(m_tcon, TCON_IE0) | (BIT(m_tcon, TCON_TF0) << 1) | (BIT(m_tcon, TCON_IE1) << 2) | (BIT(m_tcon, TCON_TF1) << 3) | ((BIT(m_scon, SCON_RI) | BIT(m_scon, SCON_TI)) << 4));
+	irqs_complete_and_mask(ints, int_mask);
 	return ints;
 }
 
 u16 mcs51_cpu_device::interrupt_mask()
 {
 	return BIT(m_ie, IE_A) ? m_ie : 0;
-}
-
-u8 mcs51_cpu_device::interrupt_vector(u32 source) const
-{
-	return (source << 3) | 3;
-}
-
-u32 mcs51_cpu_device::interrupt_priority(u32 source) const
-{
-	return m_irq_prio[source];
 }
 
 void mcs51_cpu_device::interrupt_taken()
@@ -993,9 +984,6 @@ void mcs51_cpu_device::interrupt_taken()
 
 void mcs51_cpu_device::check_irqs()
 {
-	u8 int_vec = 0;
-	int priority_request = -1;
-
 	// Abort if all interrupts disabled or none pending
 	u16 ints = pending_irq_flags(interrupt_mask());
 
@@ -1011,17 +999,22 @@ void mcs51_cpu_device::check_irqs()
 	if (manage_idle_on_interrupt(ints))
 		return;
 
+	int source = 0;
+	int priority_request = -1;
 	for (int i = 0; i < m_num_interrupts; i++)
 	{
-		if (ints & (1 << i))
+		if (!BIT(ints, i))
+			continue;
+
+		int const priority = m_irq_prio[i];
+		if (priority > priority_request)
 		{
-			if (int(interrupt_priority(i)) > priority_request)
-			{
-				priority_request = interrupt_priority(i);
-				int_vec = interrupt_vector(i);
-			}
+			priority_request = priority;
+			source = i;
 		}
 	}
+	if (priority_request < 0)
+		return;
 
 	/* Skip the interrupt request if currently processing interrupt
 	 * and the new request does not have a higher priority
@@ -1032,6 +1025,8 @@ void mcs51_cpu_device::check_irqs()
 		LOG("higher or equal priority irq (%u) in progress already, skipping ...\n", m_cur_irq_prio);
 		return;
 	}
+
+	u8 const int_vec = (source << 3) | 3;
 
 	// indicate we took the external IRQ
 	if (int_vec == V_IE0)
@@ -1393,6 +1388,7 @@ void mcs51_cpu_device::device_reset()
 	m_last_op = 0;
 	m_last_bit = 0;
 	m_irq_delayed = 0;
+	std::ranges::fill(m_irq_prio, 0);
 
 	// these are all defined reset states
 	m_rwm = 0;
