@@ -26,6 +26,7 @@
 #include "svga_trident.h"
 #include "svga_tseng.h"
 #include "tiga_spea.h"
+#include "um487f.h"
 #include "vga.h"
 #include "vga_ati.h"
 
@@ -151,6 +152,7 @@ void pc_isa8_cards(device_slot_interface &device)
 	device.option_add("xtide", ISA8_XTIDE);
 	device.option_add("adlib", ISA8_ADLIB);
 	device.option_add("hercules", ISA8_HERCULES);
+	device.option_add("um487f", ISA8_UM487F);
 	device.option_add("gblaster", ISA8_GAME_BLASTER);
 	device.option_add("sblaster1_0", ISA8_SOUND_BLASTER_1_0);
 	device.option_add("sblaster1_5", ISA8_SOUND_BLASTER_1_5);
