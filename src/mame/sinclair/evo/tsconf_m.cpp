@@ -1032,11 +1032,13 @@ TIMER_CALLBACK_MEMBER(tsconf_state::irq_scanline)
 
 		case T0_G_PAGE:
 			copy_tiles_to_raw(m_ram->pointer() + PAGE4K(val & 0xf8), m_tiles_raw[0].target());
+			m_gfxdecode->gfx(TM_TILES0)->mark_all_dirty();
 			m_ts_tilemap[TM_TILES0]->mark_all_dirty();
 			break;
 
 		case T1_G_PAGE:
 			copy_tiles_to_raw(m_ram->pointer() + PAGE4K(val & 0xf8), m_tiles_raw[1].target());
+			m_gfxdecode->gfx(TM_TILES1)->mark_all_dirty();
 			m_ts_tilemap[TM_TILES1]->mark_all_dirty();
 			break;
 
