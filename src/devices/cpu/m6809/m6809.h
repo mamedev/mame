@@ -182,6 +182,17 @@ protected:
 	bool                        m_firq_line;
 	bool                        m_irq_line;
 	bool                        m_lds_encountered;
+
+	// Interrupt inputs are latched at the start of each bus cycle, and the
+	// decision to take an interrupt uses the latch from the start of the
+	// last cycle of the instruction.  Keep a short history of changes to the
+	// level triggered inputs so the state from a few cycles back is known.
+	static constexpr int INTERRUPT_LATENCY_CYCLES = 2;
+	uint64_t                    m_firq_change_cycle[2];
+	bool                        m_firq_prev[2];
+	uint64_t                    m_irq_change_cycle[2];
+	bool                        m_irq_prev[2];
+	uint64_t                    m_nmi_assert_cycle;
 	int                         m_icount;
 	int                         m_addressing_mode;
 	PAIR16                      m_ea;                 // effective address
@@ -285,6 +296,8 @@ protected:
 	bool is_register_addressing_mode();
 	bool is_ea_addressing_mode() { return m_addressing_mode == ADDRESSING_MODE_EA; }
 	uint16_t get_pending_interrupt();
+	bool interrupt_line_waiting() const { return m_nmi_asserted || m_firq_line || m_irq_line; }
+	int sync_wake_cycles();
 	void log_illegal();
 
 private:
