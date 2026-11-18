@@ -51,6 +51,8 @@
 
 #include "endianness.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
 
 namespace {
 
@@ -172,6 +174,7 @@ private:
 	void via2_out_a(u8 data);
 	void via2_out_b(u8 data);
 	void hmmu_via2_out_b(u8 data);
+	void cpu_reset_w(int state);
 	void state_load();
 	void via_irq(int state);
 	void via2_irq(int state);
@@ -774,6 +777,32 @@ void macii_state::machine_reset()
 	m_last_taken_interrupt = 0;
 }
 
+// The RESET instruction drives the CPU's RESET pin, which is the board's
+// /RESET: it brings "all of the internal devices" to their initial state
+// (Guide to the Macintosh Family Hardware, 2nd ed., p. 244).  On the Mac II
+// logic board (820-0228) the 68020's RESET shares a net with both VIAs, the
+// IWM, the 5380 and the ADB modem (sheet 3, B13 pin 4), reset here, and with
+// the ASC and the 68851, which are not; the later machines are assumed to
+// match.  The IIcx (sheet 4, UL6 pin 4) and SE/30 (050-0253 sheet 4,
+// UL11 pin 4) schematics show the ADB modem on /RESET too.  The SCC has no
+// reset input.
+void macii_state::cpu_reset_w(int state)
+{
+	if (!state)
+		return;
+
+	LOG("RESET from CPU\n");
+
+	// VIA1 first: its PA4 going high brings back the ROM overlay (p. 244), so
+	// VIA2's RAM-size outputs then leave the RAM map alone
+	m_via1->reset();
+	m_via2->reset();
+	m_fdc->reset();
+	m_ncr5380->reset();
+	m_scsihelp->reset();
+	m_adbmodem->reset();
+}
+
 void macii_state::state_load()
 {
 	int overlay = m_overlay;
@@ -926,6 +955,7 @@ void macii_state::macse30_map(address_map &map)
 void macii_state::macii(machine_config &config)
 {
 	M68020PMMU(config, m_maincpu, C15M);
+	m_maincpu->reset_cb().set(FUNC(macii_state::cpu_reset_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -1049,6 +1079,7 @@ void macii_state::maciihmu(machine_config &config)
 	macii(config);
 
 	M68020HMMU(config.replace(), m_maincpu, C15M);
+	m_maincpu->reset_cb().set(FUNC(macii_state::cpu_reset_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -1079,6 +1110,7 @@ void macii_state::maciix(machine_config &config)
 
 	// IIx = Mac II FDHD with a 68030 instead of the 020
 	M68030(config.replace(), m_maincpu, C15M);
+	m_maincpu->reset_cb().set(FUNC(macii_state::cpu_reset_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
