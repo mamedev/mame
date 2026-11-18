@@ -292,6 +292,7 @@ void rm480z_state::rm480z(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &rm480z_state::rm480z_MK2_mem);
 	m_maincpu->set_addrmap(AS_IO, &rm480z_state::rm480z_io);
 	m_maincpu->set_daisy_config(daisy_chain);
+	m_maincpu->refresh_cb().set(FUNC(rm480z_state::z80_m1_w));
 
 	Z80SIO(config, m_sio, 16_MHz_XTAL / 4);
 	m_sio->out_int_callback().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
