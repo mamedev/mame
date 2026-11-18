@@ -106,9 +106,12 @@ void mac_scsi_helper_device::drq_w(int state)
 		wake();
 }
 
+// a CPU reset meanwhile (no longer suspended here, or held in reset) isn't
+// counted as woken
 void mac_scsi_helper_device::wake()
 {
-	m_woken = true;
+	if (m_maincpu->suspended(SUSPEND_REASON_TRIGGER) && !m_maincpu->suspended(SUSPEND_REASON_RESET))
+		m_woken = true;
 	m_maincpu->trigger(WAKE_TRIGGER);
 }
 
