@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR
+// copyright-holders:AJR, Tomás García-Merás Capote
+
 /*******************************************************************************
-    Skeleton driver for Automatics Pasqual darts with CRT display.
+    Driver for Automatics Pasqual darts with CRT display.
   ________________________________________________________________________________
   |    _______                              _______  ______                       |
   |    |__CN__|                             |__CN__| |__CN_|                  ___ |
@@ -34,6 +35,13 @@
   |                                                               |CD40208E|      |
   |_______________________________________________________________________________|
 
+  The program only writes "automatics PASQUAL S.A." to the EEPROM and reads it
+  back on every boot, hanging if it doesn't match.
+
+  The cabinet has three lamps on the left of the monitor and four buttons on the
+  right. The lamps of the Up, Down and Select buttons blink while the game is
+  waiting for them.
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -44,6 +52,8 @@
 #include "video/tms9928a.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "tecnodar.lh"
 
 
 namespace {
@@ -58,13 +68,14 @@ public:
 		, m_eeprom(*this, "eeprom")
 		, m_psg(*this, "psg")
 		, m_rombank(*this, "rombank")
-		, m_coins(*this, "COINS")
-		, m_inputs(*this, "IN%u", 0U)
+		, m_in1(*this, "IN1")
+		, m_dart(*this, "DART%u", 0U)
+		, m_lamps(*this, "lamp%u", 0U)
 		, m_input_select(0xffff)
 	{
 	}
 
-	void tecnodar(machine_config &config);
+	void tecnodar(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -86,8 +97,9 @@ private:
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<ay8910_device> m_psg;
 	required_memory_bank m_rombank;
-	required_ioport m_coins;
-	required_ioport_array<16> m_inputs;
+	required_ioport m_in1;
+	required_ioport_array<16> m_dart;
+	output_finder<6> m_lamps;
 
 	u16 m_input_select;
 };
@@ -104,7 +116,7 @@ void tecnodar_state::machine_start()
 
 void tecnodar_state::bank_w(offs_t offset, u8 data)
 {
-	m_rombank->set_entry((offset & 0x0c) >> 2 | (offset & 0x01) << 2);
+	m_rombank->set_entry(BIT(offset, 2, 2) | (BIT(offset, 0) << 2));
 }
 
 u8 tecnodar_state::inputs_r()
@@ -112,9 +124,9 @@ u8 tecnodar_state::inputs_r()
 	u8 ret = 0xf;
 	for (int i = 0; i < 16; i++)
 		if (!BIT(m_input_select, i))
-			ret &= m_inputs[i]->read();
+			ret &= m_dart[i]->read();
 
-	return (ret << 4) | m_coins->read();
+	return (ret << 4) | m_in1->read();
 }
 
 u8 tecnodar_state::ppi_r(offs_t offset)
@@ -138,10 +150,16 @@ void tecnodar_state::ppi_pa_w(u8 data)
 
 void tecnodar_state::ppi_pb_w(u8 data)
 {
-	if (!BIT(data, 7))
-		m_psg->reset(); // maybe
+	// pulses once for every 100 Pts
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
 
-	logerror("%s: Writing %02X to PPI port B\n", machine().describe_context(), data);
+	// lamp0-2: FINAL PARTIDA, RETIRE DARDOS and TIRE DARDOS
+	// lamp3-5: Down, Select and Up buttons
+	for (int i = 0; i < 6; i++)
+		m_lamps[i] = BIT(data, i + 1);
+
+	if (!BIT(data, 7))
+		m_psg->reset_w(); // maybe
 }
 
 void tecnodar_state::ppi_pc_w(u8 data)
@@ -152,11 +170,11 @@ void tecnodar_state::ppi_pc_w(u8 data)
 void tecnodar_state::mem_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom().region("program", 0);
-	map(0x4000, 0x7fff).bankr("rombank");
+	map(0x4000, 0x7fff).bankr(m_rombank);
 	map(0x8002, 0x8002).select(0x60).rw(FUNC(tecnodar_state::ppi_r), FUNC(tecnodar_state::ppi_w));
-	map(0x8004, 0x8004).w("psg", FUNC(ay8910_device::data_w));
-	map(0x8008, 0x8008).r("psg", FUNC(ay8910_device::data_r));
-	map(0x800c, 0x800c).w("psg", FUNC(ay8910_device::address_w));
+	map(0x8004, 0x8004).w(m_psg, FUNC(ay8910_device::data_w));
+	map(0x8008, 0x8008).r(m_psg, FUNC(ay8910_device::data_r));
+	map(0x800c, 0x800c).w(m_psg, FUNC(ay8910_device::address_w));
 	map(0x8010, 0x8011).rw("vdp", FUNC(tms9129_device::read), FUNC(tms9129_device::write));
 	map(0xc000, 0xc7ff).ram();
 }
@@ -169,133 +187,136 @@ void tecnodar_state::io_map(address_map &map)
 
 
 static INPUT_PORTS_START(tecnodar)
-	PORT_START("DSW")
-	PORT_DIPNAME(0x01, 0x01, DEF_STR(Unknown))
+	PORT_START("IN0")
+	PORT_DIPNAME(0x01, 0x01, "Automatic Play") // throws random darts, and shows the bookkeeping instead of the records
 	PORT_DIPSETTING(0x01, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x02, 0x02, DEF_STR(Unknown))
-	PORT_DIPSETTING(0x02, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown))
+	PORT_DIPNAME(0x02, 0x02, DEF_STR(Coinage))
+	PORT_DIPSETTING(0x00, DEF_STR(1C_1C))
+	PORT_DIPSETTING(0x02, DEF_STR(1C_2C))
+	PORT_DIPNAME(0x04, 0x04, DEF_STR(Unknown)) // checked at boot: when on, RAM isn't cleared after an NMI
 	PORT_DIPSETTING(0x04, DEF_STR(Off))
 	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x08, 0x08, DEF_STR(Unknown))
-	PORT_DIPSETTING(0x08, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x10, 0x10, DEF_STR(Unknown))
-	PORT_DIPSETTING(0x10, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x20, 0x20, DEF_STR(Unknown))
-	PORT_DIPSETTING(0x20, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x40, 0x40, DEF_STR(Unknown))
-	PORT_DIPSETTING(0x40, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-	PORT_DIPNAME(0x80, 0x80, DEF_STR(Unused))
-	PORT_DIPSETTING(0x80, DEF_STR(Off))
-	PORT_DIPSETTING(0x00, DEF_STR(On))
-
-	PORT_START("COINS")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_COIN1)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_COIN2)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
-
-	PORT_START("IN0")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_DIPNAME(0x08, 0x08, "Rounds for x01 and Cricket")
+	PORT_DIPSETTING(0x00, "20")
+	PORT_DIPSETTING(0x08, "199")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Up")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1) PORT_NAME("Select")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Down")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("IN1")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_COIN1) PORT_NAME("Coin 1 (100 Pts)")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_COIN2) PORT_NAME("Coin 2 (500 Pts)")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_BUTTON3) PORT_NAME("Cancel")
 
-	PORT_START("IN2")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	// the layout finds the targets by these names
+	PORT_START("DART0")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 17")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 13")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 5")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 8")
 
-	PORT_START("IN3")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART1")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 3")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 6")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 20")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 11")
 
-	PORT_START("IN4")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART2")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 19")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 10")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 1")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 14")
 
-	PORT_START("IN5")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART3")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 7")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 15")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 18")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 9")
 
-	PORT_START("IN6")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART4")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 16")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 2")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 4")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Triple 12")
 
-	PORT_START("IN7")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART5")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN) // scored as a 0 point dart
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double Bull")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single Bull")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN) // scored as a 0 point dart
 
-	PORT_START("IN8")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART6")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 17")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 13")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 5")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 8")
 
-	PORT_START("IN9")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART7")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 17")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 13")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 5")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 8")
 
-	PORT_START("IN10")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART8")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 3")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 6")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 20")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 11")
 
-	PORT_START("IN11")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART9")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 3")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 6")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 20")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 11")
 
-	PORT_START("IN12")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART10")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 19")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 10")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 1")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 14")
 
-	PORT_START("IN13")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART11")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 19")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 10")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 1")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 14")
 
-	PORT_START("IN14")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART12")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 7")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 15")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 18")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 9")
 
-	PORT_START("IN15")
-	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_UNKNOWN)
-	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DART13")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 7")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 15")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 18")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 9")
+
+	PORT_START("DART14")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 16")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 2")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 4")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Single 12")
+
+	PORT_START("DART15")
+	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 16")
+	PORT_BIT(0x2, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 2")
+	PORT_BIT(0x4, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 4")
+	PORT_BIT(0x8, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Dart Double 12")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START(tecnodargr)
+	PORT_INCLUDE(tecnodar)
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME(0x02, 0x02, "Game Price")
+	PORT_DIPSETTING(0x02, "100 Pts, 200 Pts for x01 Double, 501 and Cricket")
+	PORT_DIPSETTING(0x00, "100 Pts")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Missed Dart Sensor") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
 
@@ -324,9 +345,9 @@ void tecnodar_state::tecnodar(machine_config &config)
 	SPEAKER(config, "mono").front_center();
 
 	AY8910(config, m_psg, 10.245_MHz_XTAL / 6); // Microchip AY38910A/P; divider not verified
-	m_psg->port_a_read_callback().set_ioport("DSW");
+	m_psg->port_a_read_callback().set_ioport("IN0");
 	m_psg->port_b_read_callback().set(FUNC(tecnodar_state::inputs_r));
-	m_psg->add_route(ALL_OUTPUTS, "mono", 1.0);
+	m_psg->add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 
@@ -359,5 +380,5 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1991, tecnodar,   0,        tecnodar, tecnodar, tecnodar_state, empty_init, ROT0, "Automatics Pasqual",                    "Tecnodarts",                            MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
-GAME(1991, tecnodargr, tecnodar, tecnodar, tecnodar, tecnodar_state, empty_init, ROT0, "Automatics Pasqual / Recreativos G.R.", "Tecnodarts (Recreativos G.R. license)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING)
+GAMEL(1991, tecnodar,   0,        tecnodar, tecnodar,   tecnodar_state, empty_init, ROT0, "Automatics Pasqual",                    "Tecnodarts",                            MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_tecnodar)
+GAMEL(1991, tecnodargr, tecnodar, tecnodar, tecnodargr, tecnodar_state, empty_init, ROT0, "Automatics Pasqual / Recreativos G.R.", "Tecnodarts (Recreativos G.R. license)", MACHINE_MECHANICAL | MACHINE_SUPPORTS_SAVE, layout_tecnodar)
