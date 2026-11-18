@@ -93,7 +93,7 @@ const tiny_rom_entry *arc_eaglem2_device::device_rom_region() const
 
 void arc_eaglem2_device::device_add_mconfig(machine_config &config)
 {
-	SAA7191(config, m_dmsd);
+	SAA7191(config, m_dmsd, 26.8_MHz_XTAL);
 
 	IDT7202(config, m_fifo_in);  // AM7202A
 	IDT7202(config, m_fifo_out); // AM7202A

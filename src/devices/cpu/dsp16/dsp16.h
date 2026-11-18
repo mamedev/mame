@@ -342,6 +342,9 @@ public:
 	dsp16_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+
 	// dsp16_device_base implementation
 	virtual void external_memory_enable(address_space &space, bool enable) override;
 
@@ -360,6 +363,9 @@ public:
 	dsp16a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+
 	// dsp16_device_base implementation
 	virtual void external_memory_enable(address_space &space, bool enable) override;
 

@@ -74,7 +74,7 @@ Note:
 
 The program flash goes through the Actel (see decrypt()). The decrypted program starts with
 the ADC USB bootloader v1.21, which checks the NAND, SRAM and texture RAM and then loads the
-game.
+game. In laiziddz the game (from 0x10000 onwards) is linked to run at 0xc0000000.
 
 TODO:
 - the decryption was worked out from the program (vector table, call targets, strings), the
@@ -112,6 +112,7 @@ public:
 	void init_qczl() ATTR_COLD;
 	void init_abaozang() ATTR_COLD;
 	void init_zduoxing() ATTR_COLD;
+	void init_laiziddz() ATTR_COLD;
 
 private:
 	struct key_range { uint32_t end; uint16_t key; };
@@ -218,6 +219,18 @@ ROM_START( zduoxing )
 	ROM_LOAD( "hy04", 0x000000, 0x4280, NO_DUMP )
 ROM_END
 
+// 癞子斗地主 / Làizi Dòu Dìzhǔ
+ROM_START( laiziddz )
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD( "laizi_dou_dizhu.u40", 0x000000, 0x200000, CRC(c265274c) SHA1(732017a6cca35bf2dd217a3e188f400f176885cb) )
+
+	ROM_REGION( 0x2100000, "nand", 0 )
+	ROM_LOAD( "nand.u43", 0x0000000, 0x2100000, CRC(26d9a2e8) SHA1(027847acbe6a78cb3dad650c3f386b53a531faed) )
+
+	ROM_REGION( 0x4280, "pic", 0 ) // HY04
+	ROM_LOAD( "hy04", 0x000000, 0x4280, NO_DUMP )
+ROM_END
+
 
 // The Actel between the flash and the SoC scrambles the address lines, XORs the data with a key
 // chosen by comparing the CPU address with a list of boundaries (different for each game, not
@@ -275,9 +288,19 @@ void sealy_eagle_state::init_zduoxing()
 			  { 0x200000, 0xa4d3 } });
 }
 
+void sealy_eagle_state::init_laiziddz()
+{
+	decrypt(
+			[] (uint32_t a) { return bitswap<21>(a, 12, 14, 3, 15, 7, 6, 17, 13, 5, 11, 20, 2, 8, 19, 16, 10, 4, 9, 18, 1, 0); },
+			[] (uint16_t x) { return bitswap<16>(x, 9, 6, 2, 10, 12, 3, 14, 1, 4, 15, 0, 5, 8, 13, 11, 7); },
+			{ { 0x01305a, 0x7453 }, { 0x057a10, 0xca8e }, { 0x07a34e, 0x7153 }, { 0x09fe00, 0xb254 }, { 0x0a4ac2, 0x1a22 },
+			  { 0x200000, 0xee07 } });
+}
+
 } // anonymous namespace
 
 
 GAME( 2011, qczl,     0, qczl, qczl, sealy_eagle_state, init_qczl,     ROT0, "Sealy", "Qing Cheng Zhi Lian", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 201?, abaozang, 0, qczl, qczl, sealy_eagle_state, init_abaozang, ROT0, "Sealy", "Aiji Baozang",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 GAME( 201?, zduoxing, 0, qczl, qczl, sealy_eagle_state, init_zduoxing, ROT0, "Sealy", "Zhi Duo Xing",        MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 201?, laiziddz, 0, qczl, qczl, sealy_eagle_state, init_laiziddz, ROT0, "Sealy", "Laizi Dou Dizhu",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
