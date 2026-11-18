@@ -7,7 +7,6 @@
 
 #include "m68kmusashi.h"
 #include "machine/mc68681.h"
-#include "machine/watchdog.h"
 
 enum {
 	EXTERNAL_IPL_1 = 1,
@@ -83,18 +82,20 @@ public:
 			m_ipr &= ~(1 << inputnum);
 		else
 			m_ipr |= (1 << inputnum);
+		update_internal_levels();
 	}
 	u16 get_par(){ return m_par; }
 
 protected:
 	void device_start() override ATTR_COLD;
 	void device_reset() override ATTR_COLD;
-	void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
 	void set_interrupt(int interrupt, int state);
+	void update_internal_levels();
 
 	TIMER_CALLBACK_MEMBER(swdt_callback);
+	void swt_restart();
 
 	void icr_info(u8 icr);
 
@@ -137,9 +138,9 @@ private:
 	u8 m_external_ipl;
 
 	emu_timer *m_timer_swdt;
+	bool m_swt_reset;
 
 	required_device<mcf5206e_device> m_maincpu;
-	required_device<watchdog_timer_device> m_swdt;
 
 };
 
@@ -198,6 +199,7 @@ class coldfire_mbus_device : public device_t
 
 		void sda_write(u8 state){ m_tx_in = state; }
 		auto sda_cb() ATTR_COLD { return write_sda.bind(); }
+		auto sda_r_cb() ATTR_COLD { return read_sda.bind(); }   // the SDA line as the slaves drive it
 		auto scl_cb() ATTR_COLD { return write_scl.bind(); }
 		auto irq_cb() ATTR_COLD { return write_irq.bind(); }
 
@@ -237,14 +239,22 @@ class coldfire_mbus_device : public device_t
 		u8 m_mfdr;
 		u8 m_mbdr;
 
-		bool m_tx_in_progress;
-		bool m_clk_state;
-		u8 m_tx_bit;
-		u8 m_tx_out;
-		u8 m_tx_in;
+		u8 m_tx_in;                         // SDA as fed back through sda_write() (1 = released)
 
 		emu_timer *m_timer_mbus;
 		devcb_write_line write_sda, write_scl, write_irq;
+		devcb_read_line read_sda;
+
+		// master transfers (UM section 13)
+		enum { MCF = 0x80, MAAS = 0x40, MBB = 0x20, MAL = 0x10, SRW = 0x04, MIF = 0x02, RXAK = 0x01 };
+		u8 m_sda_out;                       // what this module drives onto SDA (open drain: 1 = released)
+		void bus_sda(int state);
+		void bus_scl(int state);
+		int  bus_sda_in();                  // wired-AND of this module and the slaves
+		void bus_start();
+		void bus_stop();
+		void start_byte();
+		void update_irq();
 };
 
 class coldfire_timer_device : public device_t
@@ -296,6 +306,10 @@ class coldfire_timer_device : public device_t
 		void tcn_w(u16 data);
 
 		TIMER_CALLBACK_MEMBER(timer_callback);
+		u32 clocks_per_count() const;
+		u16 count_now() const;
+		void latch();
+		void schedule();
 
 		u16 m_tmr;
 		u16 m_trr;
@@ -351,6 +365,7 @@ public:
 	void sda_write(u8 state){ m_mbus->sda_write(state); }
 	auto sda_w_cb() { return write_sda.bind(); }
 	auto scl_w_cb() { return write_scl.bind(); }
+	auto sda_r_cb() { return read_sda.bind(); }   // SDA as the bus drives it (default 1: pulled up)
 
 	// IRQ/IPL - If using levels, recomended to use the 74148 device with this.
 	void write_ipl(int state){ m_sim->set_external_interrupt_level(state); }
@@ -366,6 +381,9 @@ protected:
 	//virtual void device_clock_changed() override { }
 	virtual void device_add_mconfig(machine_config &config) override;
 	void execute_set_input(int inputnum, int state) override;
+	// the levels the SIM presents to the core (UM 8.2)
+	u8 m_sim_levels;
+	void sim_set_internal_levels(u8 mask);
 
 	virtual space_config_vector memory_space_config() const override;
 	address_space_config m_mbar_config;
@@ -509,8 +527,10 @@ private:
 	void mbus_sda_w(int state){ write_sda(state); }
 	void mbus_scl_w(int state){ write_scl(state); }
 	void mbus_irq_w(int state){ m_sim->set_internal_interrupt_request(MBUS_IRQ, state); }
+	int  mbus_sda_r(){ return read_sda(); }
 	required_device<coldfire_mbus_device> m_mbus;
 	devcb_write_line write_sda, write_scl;
+	devcb_read_line read_sda;
 
 	/* DMA Modules */
 	required_device_array<coldfire_dma_device, 2> m_dma;

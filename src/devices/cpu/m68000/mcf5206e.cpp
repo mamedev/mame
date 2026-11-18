@@ -37,7 +37,7 @@
 #define LOG_DRAM        (1U << 7)
 #define LOG_SIM         (1U << 8)
 #define LOG_DMA         (1U << 9)
-#define VERBOSE         ( LOG_DEBUG | LOG_UART | LOG_SWDT | LOG_MBUS | LOG_DRAM | LOG_SIM | LOG_DMA | LOG_TIMER )
+#define VERBOSE         0
 #include "logmacro.h"
 
 #define INT_LEVEL(N)    ((N&0x1c) >> 2)
@@ -80,6 +80,7 @@ mcf5206e_device::mcf5206e_device(const machine_config &mconfig, const char *tag,
 	, m_mbus(*this, "mbus")
 	, write_sda(*this)
 	, write_scl(*this)
+	, read_sda(*this, 1)
 	, m_dma(*this, "dma%u", 0U)
 {
 }
@@ -114,6 +115,7 @@ void mcf5206e_device::device_add_mconfig(machine_config &config)
 	m_mbus->sda_cb().set(FUNC(mcf5206e_device::mbus_sda_w));
 	m_mbus->scl_cb().set(FUNC(mcf5206e_device::mbus_scl_w));
 	m_mbus->irq_cb().set(FUNC(mcf5206e_device::mbus_irq_w));
+	m_mbus->sda_r_cb().set(FUNC(mcf5206e_device::mbus_sda_r));
 
 	COLDFIRE_DMA(config, m_dma[0], this->clock());
 	COLDFIRE_DMA(config, m_dma[1], this->clock());
@@ -284,12 +286,16 @@ void mcf5206e_device::device_start()
 
 	save_item(NAME(m_ppddr));
 	save_item(NAME(m_ppdat_out));
+	save_item(NAME(m_mbar));
 
+	m_sim_levels = 0;
+	save_item(NAME(m_sim_levels));
 }
 
 void mcf5206e_device::device_reset()
 {
 	m68000_musashi_device::device_reset();
+	m_sim_levels = 0;          // the core cleared its interrupt lines
 	m_timer[0]->reset();
 	m_timer[1]->reset();
 	m_uart[0]->reset();
@@ -528,18 +534,12 @@ coldfire_sim_device::coldfire_sim_device(const machine_config &mconfig, const ch
 	device_t(mconfig, COLDFIRE_SIM, tag, owner, clock)
 	, irq_vector_cb(*this, (u8)EXCEPTION_BUS_ERROR)
 	, m_maincpu(*this, finder_base::DUMMY_TAG)
-	, m_swdt(*this, "watchdog")
 {
-}
-
-void coldfire_sim_device::device_add_mconfig(machine_config &config)
-{
-	WATCHDOG_TIMER(config, m_swdt);
 }
 
 void coldfire_sim_device::device_start()
 {
-	m_swdt->watchdog_enable(0);
+	m_swt_reset = false;
 	m_timer_swdt = timer_alloc( FUNC( coldfire_sim_device::swdt_callback ), this ); // For interrupt version
 
 	save_item(NAME(m_simr));
@@ -559,8 +559,11 @@ void coldfire_sim_device::device_start()
 
 void coldfire_sim_device::device_reset()
 {
-	if(!(m_rsr & 0x20)) m_rsr = 0x00;   // don't clear if watchdog triggered
-	else m_rsr = 0x70;
+	// RSR (UM 8.3.2.6): only one bit is set, HRST (0x80) for a hard/system reset, SWTR (0x20) when the software
+	// watchdog caused it
+	m_rsr = m_swt_reset ? 0x20 : 0x80;
+	m_swt_reset = false;
+	m_timer_swdt->adjust(attotime::never);
 
 	m_simr = 0xc0;
 	m_marb = 0x00;
@@ -657,6 +660,7 @@ void coldfire_sim_device::icr_w(offs_t offset, u8 data)
 		case 14: m_icr[offset] = (data & 0x9f); break;
 		default: logerror("%s: Implausible ICR offset received: %d", this->machine().describe_context(), offset);
 	}
+	update_internal_levels();   // a new level for a pending source
 	//printf("%d %02x -> %02x\n", offset, data, m_icr[offset]);
 	//icr_info(m_icr[offset]);
 }
@@ -666,6 +670,7 @@ void coldfire_sim_device::imr_w(u16 data)
 {
 	m_imr = (data & 0xfffe);
 	LOGMASKED(LOG_DEBUG, "%s: (Interrupt Mask Register) IMR_w %04x\n", this->machine().describe_context(), data);
+	update_internal_levels();
 }
 
 void coldfire_sim_device::icr_info(u8 icr)
@@ -703,12 +708,28 @@ void coldfire_sim_device::set_external_interrupt(int level, int state)
 	}
 }
 
+void mcf5206e_device::sim_set_internal_levels(u8 mask)
+{
+	const u8 changed = mask ^ m_sim_levels;
+	m_sim_levels = mask;
+	for (int l = 1; l <= 7; l++)
+	{
+		if (BIT(changed, l))
+			m68000_musashi_device::execute_set_input(l, BIT(m_sim_levels, l) ? ASSERT_LINE : CLEAR_LINE);
+	}
+}
+
 void mcf5206e_device::execute_set_input(int inputnum, int state)
 {
-	m68000_musashi_device::execute_set_input(inputnum, state);
-	// HACK: make it accept external interrupts
-	if (inputnum == 1 || inputnum == 4 || inputnum == 7)
-		m_sim->set_ipr(inputnum, state);
+	if (inputnum >= 1 && inputnum <= 7)
+	{
+		// IRQ1/4/7 pins (PAR in IRQ mode) hold their IPR bit while asserted; the SIM presents the ICR level to the core
+		// only while the IMR bit is clear (UM 8.2), see coldfire_sim_device::update_internal_levels
+		if (inputnum == 1 || inputnum == 4 || inputnum == 7)
+			m_sim->set_ipr(inputnum, state);
+	}
+	else
+		m68000_musashi_device::execute_set_input(inputnum, state);
 
 	if (BIT(m_sim->get_par(), 6))
 		popmessage("mcf5206e: encoded interrupt priority!");
@@ -725,13 +746,14 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 	if(!this->machine().side_effects_disabled())
 	{
 		//logerror("%s: interrupt_callback(%u), ipl: %x, m_ipr: %x, m_imr: %x\n", this->machine().describe_context(), level, ipl, m_ipr, m_imr);
-		m_maincpu->set_input_line(ipl, CLEAR_LINE);
+		// UM 8.2: all interrupt inputs are level sensitive, so the acknowledge does not clear an external request;
+		// the requesting device keeps its line asserted until it is serviced (internal levels: update_internal_levels)
 	}
 
 	for (int i = 0; i < 15; i++)
 	{
 		//if(!this->machine().side_effects_disabled()) logerror("i: %x, m_icr: %x, ipl: %x, ipr_bit: %x\n", i, INT_LEVEL(m_icr[i]), ipl, BIT(m_ipr, 1 + i));
-		if (BIT(m_ipr, 1 + i) && (INT_LEVEL(m_icr[i]) == ipl))
+		if (BIT(m_ipr, 1 + i) && !BIT(m_imr, 1 + i) && (INT_LEVEL(m_icr[i]) == ipl))
 		{
 			if (highest_priority_device == 0 || INT_PRIORITY(m_icr[i]) > INT_PRIORITY(highest_priority_icr))
 			{
@@ -746,8 +768,6 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 		if(!this->machine().side_effects_disabled()) logerror("%s: Spurious interrupt detected: %u\n", this->machine().describe_context(), ipl);
 		return EXCEPTION_SPURIOUS_INTERRUPT;
 	}
-
-	BITWRITE(m_ipr, ipl, 0);
 
 	u8 vector = 0xff;
 
@@ -805,45 +825,28 @@ u8 coldfire_sim_device::interrupt_callback(offs_t level)
 	return vector;
 }
 
-void coldfire_sim_device::set_interrupt(int interrupt, int state)
+/*  The core's level is recomputed from IPR, IMR and the ICRs whenever any of them changes (UM 8.2.5, 8.3.2.4,
+    8.3.2.5): a masked request still sets its IPR bit, and the controller outputs the highest priority unmasked
+    pending interrupt to the core. */
+void coldfire_sim_device::update_internal_levels()
 {
-	BITWRITE(m_ipr, interrupt, ((state == CLEAR_LINE) ? 0 : 1));
-
-	//LOGMASKED(LOG_DEBUG, "%s: set_interrupt(%u, %u): %x, %d, %d\n", this->machine().describe_context(), interrupt, state, m_ipr, BIT(m_imr, interrupt), m_imr & interrupt);
-
-	//printf("%d %d -> %04x %04x\n", interrupt, state, m_imr, m_ipr);
-
-	// IMR enables interrupts when bit is 0
-	if(state != CLEAR_LINE)
+	u8 mask = 0;
+	for (int i = EXTERNAL_IPL_1; i <= DMA_1_IRQ; i++)
 	{
-		if(!BIT(m_imr, interrupt))
+		if (BIT(m_ipr, i) && !BIT(m_imr, i))
 		{
-			u8 icr = 0;
-			switch (interrupt)
-			{
-				case EXTERNAL_IPL_1: icr = m_icr[ICR1]; break;
-				case EXTERNAL_IPL_2: icr = m_icr[ICR2]; break;
-				case EXTERNAL_IPL_3: icr = m_icr[ICR3]; break;
-				case EXTERNAL_IPL_4: icr = m_icr[ICR4]; break;
-				case EXTERNAL_IPL_5: icr = m_icr[ICR5]; break;
-				case EXTERNAL_IPL_6: icr = m_icr[ICR6]; break;
-				case EXTERNAL_IPL_7: icr = m_icr[ICR7]; break;
-				case WATCHDOG_IRQ:  icr = m_icr[ICR_SWDT]; break;
-				case TIMER_1_IRQ:   icr = m_icr[ICR_TMR1]; break;   // Always autovector
-				case TIMER_2_IRQ:   icr = m_icr[ICR_TMR2]; break;   // Always autovector
-				case MBUS_IRQ:      icr = m_icr[ICR_MBUS]; break;   // Always autovector
-				case UART_1_IRQ:    icr = m_icr[ICR_UART1]; break;
-				case UART_2_IRQ:    icr = m_icr[ICR_UART2]; break;
-				case DMA_0_IRQ:     icr = m_icr[ICR_DMA0];  break;
-				case DMA_1_IRQ:     icr = m_icr[ICR_DMA1];  break;
-				default:
-					logerror("%s: Unknown device trying to set interrupt level: %u\n", this->machine().describe_context(), interrupt);
-					return;
-			}
-
-			m_maincpu->set_input_line(INT_LEVEL(icr), ASSERT_LINE);
+			const u8 level = INT_LEVEL(m_icr[i - 1]);
+			if (level)
+				mask |= 1 << level;
 		}
 	}
+	m_maincpu->sim_set_internal_levels(mask);
+}
+
+void coldfire_sim_device::set_interrupt(int interrupt, int state)
+{
+	BITWRITE(m_ipr, interrupt, (state == CLEAR_LINE) ? 0 : 1);
+	update_internal_levels();
 }
 
 /* Reset status */
@@ -867,14 +870,8 @@ void coldfire_sim_device::sypcr_w(u8 data)
 
 		// Bus monitoring is not supported (nor will it be?)
 
-		if(BIT(m_sypcr, 6))
-		{
-			m_swdt->watchdog_enable(BIT(data, 7));
-		}
-		else
-		{
-			// TODO: Set timer for interrupt
-		}
+		// SWE: start the software watchdog (UM 8.3.2.7)
+		swt_restart();
 	}
 	else
 	{
@@ -897,15 +894,38 @@ void coldfire_sim_device::swsr_w(u8 data)
 		m_swdt_w_count++;
 	if(m_swdt_w_count == 2)
 	{
-		m_swdt->watchdog_reset();
+		// $55 then $AA restarts the timeout (UM 8.3.2.9)
+		swt_restart();
 		m_swdt_w_count = 0;
 	}
 }
 
+void coldfire_sim_device::swt_restart()
+{
+	if(!BIT(m_sypcr, 7))
+	{
+		m_timer_swdt->adjust(attotime::never);
+		return;
+	}
+	// Table 8-6: SWP = 0: 2^9/2^11/2^13/2^15, SWP = 1: 2^18/2^20/2^22/2^24 system clocks for SWT = 0-3
+	const int sh = (BIT(m_sypcr, 5) ? 18 : 9) + 2 * ((m_sypcr >> 3) & 3);
+	m_timer_swdt->adjust(m_maincpu->clocks_to_attotime(u64(1) << sh));
+}
+
 TIMER_CALLBACK_MEMBER(coldfire_sim_device::swdt_callback)
 {
-	// Todo
-	//set_interrupt(WDINT);
+	if(BIT(m_sypcr, 6))
+	{
+		// SWRI = 1: internal reset, RSR shows SWTR (UM 8.3.2.6/8.3.2.7)
+		LOGMASKED(LOG_SWDT, "software watchdog timeout: reset\n");
+		m_swt_reset = true;
+		m_maincpu->reset();
+	}
+	else
+	{
+		// SWRI = 0: level 7 interrupt with the SWIVR vector
+		set_interrupt(WATCHDOG_IRQ, ASSERT_LINE);
+	}
 }
 
 /*
@@ -951,66 +971,107 @@ void coldfire_timer_device::device_reset()
 	write_irq(CLEAR_LINE);
 }
 
+// Counter model (MCF5206e UM 14.4.1.1-14.4.1.4): TCN counts once every PS + 1 clocks of the selected source (system
+// clock or system clock / 16); source 00 stops it, and it is not clocked while RST is 0. m_tcn is the count at
+// m_timer_start_time. The reference is matched on the step after TCN == TRR: restart mode goes back to 0 there, free
+// run continues and wraps at $FFFF.
+u32 coldfire_timer_device::clocks_per_count() const
+{
+	if (!(m_tmr & T_RST))
+		return 0;
+	const u32 ps = ((m_tmr >> 8) & 0xff) + 1;
+	switch ((m_tmr >> 1) & 3)
+	{
+	case 1: return ps;          // system clock
+	case 2: return ps * 16;     // system clock / 16
+	default: return 0;          // 00 stops the counter; 11 = TIN pin (falling edge), not connected here
+	}
+}
+
+u16 coldfire_timer_device::count_now() const
+{
+	const u32 cpc = clocks_per_count();
+	if (!cpc)
+		return m_tcn;
+	const u64 n = attotime_to_clocks(machine().time() - m_timer_start_time) / cpc;
+	const u64 to_match = u16(m_trr - m_tcn) + 1;
+	if (!(m_tmr & T_FRR) || n < to_match)
+		return u16(m_tcn + n);
+	return u16((n - to_match) % (u32(m_trr) + 1));
+}
+
+void coldfire_timer_device::latch()
+{
+	m_tcn = count_now();
+	m_timer_start_time = machine().time();
+}
+
+void coldfire_timer_device::schedule()
+{
+	const u32 cpc = clocks_per_count();
+	if (!cpc)
+		m_timer->adjust(attotime::never);
+	else
+		m_timer->adjust(clocks_to_attotime(u64(u16(m_trr - m_tcn) + 1) * cpc));
+}
+
 TIMER_CALLBACK_MEMBER(coldfire_timer_device::timer_callback)
 {
-	if(m_tmr & T_FRR)
-	{
-		// FRR resets counter to 0
-		m_tcn = 0;
-	}
-	m_ter |= T_EREF;
+	m_tcn = (m_tmr & T_FRR) ? 0 : u16(m_trr + 1);
+	m_timer_start_time = machine().time();
+	m_ter |= T_EREF;    // set whatever ORI is (14.4.1.5)
 
 	// TODO: capture edge irq modes
-	if(BIT(m_tmr, 4))
+	if (m_tmr & T_ORI)
 		write_irq(ASSERT_LINE);
+	schedule();
 }
 
 void coldfire_timer_device::tmr_w(u16 data)
 {
-	u16 cmd = data;
-
-	if((m_tmr & T_RST) && !(cmd & T_RST))
+	if ((m_tmr & T_RST) && !(data & T_RST))
 	{
-		// T_RST high to low resets the entire timer
+		// a 1 -> 0 transition of RST resets the timer registers (14.4.1.1)
 		device_reset();
 		return;
 	}
 
-	m_tmr = cmd;
+	latch();
+	m_tmr = data;
+	schedule();
 
-	if(m_tmr & T_RST)
+	// "If ORI is set when the REF event is asserted in the TER, an immediate interrupt occurs. If ORI is cleared
+	// while an interrupt is asserted, the interrupt negates." (14.4.1.1)
+	if (m_tmr & T_ORI)
 	{
-		// TODO: add tin pin support
-		int div, start, interval;
-		start = (m_trr - m_tcn);
-		div = ((m_tmr & 0xff00) >> 8) + 1;                      // 1 -> 256 division scale
-		if ((m_tmr & T_CL1) && !(m_tmr & T_CL0)) div = div * 16;    // input clock / 16
-		if (!(m_tmr & T_FRR)) interval = (0xffff * div);            // don't reset tcn to 0
-		else interval = start;                                      // else tcn is reset to 0
-		m_timer_start_time = machine().time();
-		m_timer->adjust(clocks_to_attotime(start * div), 0, clocks_to_attotime(interval * div));
+		if (m_ter & T_EREF)
+			write_irq(ASSERT_LINE);
 	}
+	else
+		write_irq(CLEAR_LINE);
 
 	LOGMASKED(LOG_TIMER, "%s: (Timer Mode Register) TMR_w: %04x\n", this->machine().describe_context(), data);
-	//LOGMASKED(LOG_TIMER, " (Prescale) PS : %02x  (Capture Edge/Interrupt) CE : %01x (Output Mode) OM : %01x  (Output Reference Interrupt En) ORI : %01x   Free Run (FRR) : %01x  Input Clock Source (ICLK) : %01x  (Reset Timer) RST : %01x  \n", (m_TMR1 & 0xff00)>>8, (m_TMR1 & 0x00c0)>>6,  (m_TMR1 & 0x0020)>>5, (m_TMR1 & 0x0010)>>4, (m_TMR1 & 0x0008)>>3, (m_TMR1 & 0x0006)>>1, (m_TMR1 & 0x0001)>>0);
 }
 
 void coldfire_timer_device::trr_w(u16 data)
 {
+	latch();
 	m_trr = data;
+	schedule();
 	LOGMASKED(LOG_TIMER, "%s: (Timer Reference Register) TRR_w: %04x\n", this->machine().describe_context(), data);
 }
 
 u16 coldfire_timer_device::tcn_r()
 {
-	m_tcn = (attotime_to_clocks(machine().time() - m_timer_start_time) & 0xffff);
-	return m_tcn;
+	return count_now();
 }
 
 void coldfire_timer_device::tcn_w(u16 data)
 {
-	// Writing any value resets the counter
+	// "A write of any value to TCN causes it to reset to all zeros." (14.4.1.4)
 	m_tcn = 0;
+	m_timer_start_time = machine().time();
+	schedule();
 	LOGMASKED(LOG_TIMER, "%s: (Timer Counter Reset) TCN_w: %04x\n", this->machine().describe_context(), data);
 }
 
@@ -1018,7 +1079,9 @@ void coldfire_timer_device::ter_w(u8 data)
 {
 	m_ter &= ~data; // Programmer must write bit to clear it. IE write 0x80 to clear bit 7.
 	LOGMASKED(LOG_TIMER, "%s: (Timer Event) TER_w: %02x\n", this->machine().describe_context(), data);
-	write_irq(CLEAR_LINE);
+	// "the REF and CAP bits must be cleared before the timer will negate the IRQ" (MCF5206e UM 14.4.1.5)
+	if (!(m_ter & (T_EREF | T_ECAP)))
+		write_irq(CLEAR_LINE);
 }
 
 #define UNINIT 0
@@ -1071,6 +1134,7 @@ coldfire_mbus_device::coldfire_mbus_device(const machine_config &mconfig, const 
 	, write_sda(*this)
 	, write_scl(*this)
 	, write_irq(*this)
+	, read_sda(*this, 1)
 {
 }
 
@@ -1085,11 +1149,8 @@ void coldfire_mbus_device::device_start()
 	save_item(NAME(m_mfdr));
 	save_item(NAME(m_mbdr));
 
-	save_item(NAME(m_tx_in_progress));
-	save_item(NAME(m_clk_state));
-	save_item(NAME(m_tx_bit));
-	save_item(NAME(m_tx_out));
 	save_item(NAME(m_tx_in));
+	save_item(NAME(m_sda_out));
 }
 
 void coldfire_mbus_device::device_reset()
@@ -1100,13 +1161,11 @@ void coldfire_mbus_device::device_reset()
 	m_mbsr = 0x81;
 	m_mbdr = 0x00;
 
-	m_tx_in_progress = false;
-	m_clk_state = 1;
-	m_tx_bit = 0;
-	m_tx_out = 0;
-	m_tx_in = 0;
+	m_tx_in = 1;
+	m_sda_out = 1;
 
 	m_timer_mbus->adjust(attotime::never);
+	write_irq(CLEAR_LINE);
 }
 
 
@@ -1119,10 +1178,68 @@ void coldfire_mbus_device::mbus_map(address_map &map)
 	map(0x10, 0x10).rw(FUNC(coldfire_mbus_device::mbdr_r), FUNC(coldfire_mbus_device::mbdr_w));
 }
 
+/*  M-Bus, MCF5206e User's Manual section 13. Master mode only: the boards this core runs on have one bus master.
+    A byte takes nine SCL periods (eight bits and the acknowledge, figure 13-2); SCL = CPU clock / the MFDR
+    divider (table 13-2). The bits are played to the slaves at the end of that time, where MCF and MIF are set
+    "at the falling edge of the 9th clock" (13.5.4). Slave mode, the address match (MAAS/SRW) and multi-master
+    arbitration are not emulated: a START while MBB is set only reports MAL (13.5.4). */
+namespace {
+
+constexpr u16 MBUS_DIVIDER[64] = {   // table 13-2, MBC5-0 -> divider
+	  28,   30,   34,   40,   44,   48,   56,   68,   80,   88,  104,  128,  144,  160,  192,  240,
+	 288,  320,  384,  480,  576,  640,  768,  960, 1152, 1280, 1536, 1920, 2304, 2560, 3072, 3840,
+	  20,   22,   24,   26,   28,   32,   36,   40,   48,   56,   64,   72,   80,   96,  112,  128,
+	 160,  192,  224,  256,  320,  384,  448,  512,  640,  768,  896, 1024, 1280, 1536, 1792, 2048 };
+
+} // anonymous namespace
+
+void coldfire_mbus_device::bus_sda(int state) { m_sda_out = state ? 1 : 0; write_sda(m_sda_out); }
+void coldfire_mbus_device::bus_scl(int state) { write_scl(state ? 1 : 0); }
+int  coldfire_mbus_device::bus_sda_in() { return m_sda_out & (read_sda() ? 1 : 0) & (m_tx_in ? 1 : 0); }
+// START: SDA high-to-low while SCL is high (13.4.1); also the repeated START (13.4.4)
+void coldfire_mbus_device::bus_start() { bus_sda(1); bus_scl(1); bus_sda(0); bus_scl(0); }
+// STOP: SDA low-to-high while SCL is high (13.4.5)
+void coldfire_mbus_device::bus_stop()  { bus_sda(0); bus_scl(1); bus_sda(1); }
+
+void coldfire_mbus_device::update_irq()
+{
+	// MIEN: "An M-Bus interrupt occurs provided the MIF bit in the status register is also set" (13.5.3)
+	write_irq(((m_mbcr & MIEN) && (m_mbsr & MIF)) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void coldfire_mbus_device::start_byte()
+{
+	m_mbsr &= ~MCF;                                    // "While one byte of data is being transferred, this bit is cleared"
+	const u32 div = MBUS_DIVIDER[m_mfdr & 0x3f];
+	m_timer_mbus->adjust(attotime::from_ticks(9 * div, clock()));
+}
+
 TIMER_CALLBACK_MEMBER(coldfire_mbus_device::mbus_callback)
 {
-	// TODO: Do bit transfers etc
-	// gamtor wants i2c irqs, as it runs the task based EEPROM checks there.
+	if (!(m_mbcr & MEN) || !(m_mbcr & MSTA))
+		return;                                        // the module was disabled or the master stopped meanwhile
+	if (m_mbcr & MTX)
+	{
+		// master transmitter: MSB first, then the slave's acknowledge on the 9th clock (13.4.3)
+		for (int i = 7; i >= 0; i--) { bus_sda(BIT(m_mbdr, i)); bus_scl(1); bus_scl(0); }
+		bus_sda(1); bus_scl(1);
+		const int ack = bus_sda_in();
+		bus_scl(0);
+		m_mbsr = (m_mbsr & ~RXAK) | (ack ? RXAK : 0);  // RXAK: "the value of SDA during the acknowledge bit" (13.5.4)
+	}
+	else
+	{
+		// master receiver: the slave drives the 8 bits, this module the acknowledge from TXAK (13.5.3)
+		bus_sda(1);
+		u8 data = 0;
+		for (int i = 0; i < 8; i++) { bus_scl(1); data = (data << 1) | bus_sda_in(); bus_scl(0); }
+		bus_sda((m_mbcr & TXAK) ? 1 : 0); bus_scl(1); bus_scl(0);
+		bus_sda(1);
+		m_mbdr = data;
+	}
+	m_mbsr |= MCF | MIF;                               // "set by the falling edge of the 9th clock" (13.5.4)
+	update_irq();
+	LOGMASKED(LOG_MBUS, "%s: (M-Bus) byte done, MBDR=%02x MBSR=%02x\n", this->machine().describe_context(), m_mbdr, m_mbsr);
 }
 
 void coldfire_mbus_device::madr_w(u8 data)
@@ -1139,36 +1256,75 @@ void coldfire_mbus_device::mfdr_w(u8 data)
 
 void coldfire_mbus_device::mbcr_w(u8 data)
 {
-	m_mbcr = (data & 0xfc);
+	const u8 old = m_mbcr;
+	m_mbcr = data & 0xf8;                              // RSTA (bit 2) "is always read as a low"; bits 1-0 reserved
+	m_mbsr &= ~MAAS;                                   // "Writing to the M-Bus Control Register clears this bit" (13.5.4)
 	LOGMASKED(LOG_MBUS, "%s: (M-Bus Control Register) mbcr_w: %02x\n", this->machine().describe_context(), data);
+
+	if (!(m_mbcr & MEN))
+	{
+		// MEN = 0: "the interface is held in reset but registers can still be accessed" (13.5.3)
+		m_timer_mbus->adjust(attotime::never);
+		if (m_mbsr & MBB) { bus_stop(); m_mbsr &= ~MBB; }
+		update_irq();
+		return;
+	}
+	if (!(old & MSTA) && (m_mbcr & MSTA))
+	{
+		if (m_mbsr & MBB)
+		{
+			// "A start cycle is attempted when the bus is busy" -> arbitration lost (13.5.4 MAL, item 3)
+			m_mbcr &= ~MSTA;
+			m_mbsr |= MAL | MIF;
+		}
+		else
+		{
+			bus_start();                               // MSTA 0 -> 1: "a START signal is generated on the bus"
+			m_mbsr |= MBB;                             // MBB: "When a START signal is detected, the MBB is set"
+		}
+	}
+	else if ((old & MSTA) && !(m_mbcr & MSTA))
+	{
+		m_timer_mbus->adjust(attotime::never);
+		bus_stop();                                    // MSTA 1 -> 0: "a STOP signal is generated"
+		m_mbsr &= ~MBB;
+	}
+	else if ((data & RSTA) && (m_mbcr & MSTA))
+		bus_start();                                   // RSTA: "a repeated START condition ... provided it is the current bus master"
+	update_irq();
 }
 
 u8 coldfire_mbus_device::mbsr_r()
 {
-	int hack = 0x00;
-
-	hack ^= (machine().rand()&0xff);
 	LOGMASKED(LOG_MBUS, "%s: (M-Bus Status Register) mbsr_r: %02x\n", this->machine().describe_context(), m_mbsr);
-	return m_mbsr ^ hack; // will loop on this after a while
+	return m_mbsr;
 }
 
 void coldfire_mbus_device::mbsr_w(u8 data)
 {
-	m_mbsr = (data & 0x14); // MAL & MIF
+	// "read-only with the exception of bit 1 (MIF) and bit 4 (MAL), which can be cleared by software" (13.5.4)
+	m_mbsr &= ~(~data & (MIF | MAL));
+	update_irq();
 	LOGMASKED(LOG_MBUS, "%s: (M-Bus Status Register) mbsr_w: %02x\n", this->machine().describe_context(), data);
 }
 
 u8 coldfire_mbus_device::mbdr_r()
 {
-	int hack = 0x00;
-	hack ^= (machine().rand()&0xff);
-	LOGMASKED(LOG_MBUS, "%s: (M-Bus Data I/O Register) mbdr_r: %02x\n", this->machine().describe_context(), m_mbdr);
-	return m_mbdr ^ hack;
+	const u8 data = m_mbdr;
+	// "In the master receive mode, reading the MBDR allows the read to occur but also initiates next byte
+	// data receiving" (13.5.5)
+	if (!machine().side_effects_disabled() && (m_mbcr & (MEN | MSTA | MTX)) == (MEN | MSTA))
+		start_byte();
+	LOGMASKED(LOG_MBUS, "%s: (M-Bus Data I/O Register) mbdr_r: %02x\n", this->machine().describe_context(), data);
+	return data;
 }
 
 void coldfire_mbus_device::mbdr_w(u8 data)
 {
 	m_mbdr = data;
+	// "When data is written to the MBDR, a data transfer is initiated" - as master transmitter (13.5.5)
+	if ((m_mbcr & (MEN | MSTA | MTX)) == (MEN | MSTA | MTX))
+		start_byte();
 	LOGMASKED(LOG_MBUS, "%s: (M-Bus Data I/O Register) mbdr_w: %02x\n", this->machine().describe_context(), data);
 }
 
