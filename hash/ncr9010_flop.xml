@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+No original NCR 9010 boot disk is known to survive.  These system disks
+were reconstructed: the system image is taken from the SYSGEN programs
+OS1.COM / OS.COM (SYSGEN 1.2 with a built-in SB-80 2.60), the disk layout
+from the SBIOS 1.8 and NCRGEN sources and the boot ROMs 1023/1024.  They
+add the Digital Research tools PIP, STAT, ED, ASM, LOAD, DDT and DUMP
+(Lifeboat edition) and the FORMAT and COPY utilities written for this
+reconstruction (sources on the disks).
+
+Disk format: cylinder 0 side 0 FM 26 x 128 bytes with the "NCR FMT-" ID
+block (type 07 = double sided double density), all other tracks MFM
+26 x 256 bytes; the system lives on cylinders 72 and 73, side 0.
+-->
+<softwarelist name="ncr9010_flop" description="NCR 9010 8&quot; disk images">
+
+	<software name="sb80">
+		<description>SB-80 2.60 (Fix Disk Version 1.8)</description>
+		<year>1985</year>
+		<publisher>Lifeboat Associates</publisher>
+		<notes><![CDATA[
+Reconstructed system disk, see the header of this list.
+Drive E: is a 192 KB RAM disk.  Make a new system disk with FORMAT and SYSGEN, or with COPY.
+]]></notes>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="96397">
+				<rom name="sb80_260_fd18.imd" size="96397" crc="facdd03e" sha1="0525f8c2fc02f676095d7bdb2952505f1654cbf7" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb80fd17" cloneof="sb80">
+		<description>SB-80 2.60 (Fix Disk Version 1.7 with interrupt)</description>
+		<year>1984</year>
+		<publisher>Lifeboat Associates</publisher>
+		<notes><![CDATA[
+Reconstructed system disk, see the header of this list.
+This version polls a byte link to an NCR Decision Mate V on ports 01/02, which is not emulated.
+]]></notes>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="96907">
+				<rom name="sb80_260_fd17.imd" size="96907" crc="dae86318" sha1="601f237cfca4c6ea6aa41de0620f98bf422502a1" status="baddump"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
