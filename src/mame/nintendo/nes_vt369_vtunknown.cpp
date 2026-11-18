@@ -1834,7 +1834,8 @@ CONS( 2012, lexi30,    0,  0,  vt36x_8mb,  vt369_rot, vt36x_state, empty_init, "
 CONS( 2012, jl1810gr,  0,  0,  vt36x_16mb, vt369_rot, vt36x_state, empty_init, "Lexibook", "Arcade Center - 60-in-1 (JL1810GR)", MACHINE_IMPERFECT_GRAPHICS | ROT270 )
 
 CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369,     vt36x_state, empty_init, "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_IMPERFECT_GRAPHICS ) // 32MByte ROM, 2011 on case, 2012 on PCB
-CONS( 2012, jl2350,    lxccatv,  0,  vt36x_32mb, vt369,     vt36x_state, empty_init, "Lexibook", "Compact Cyber Arcade - 120 in 1 (JL2350)", MACHINE_IMPERFECT_GRAPHICS ) // 32MByte ROM, 2011 on case, 2012 on PCB
+
+CONS( 2012, jl2350,    0,  0,  vt36x_32mb, vt369,     vt36x_state, empty_init, "Lexibook", "Compact Cyber Arcade - 120 in 1 (JL2350)", MACHINE_IMPERFECT_GRAPHICS ) 
 
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
 
