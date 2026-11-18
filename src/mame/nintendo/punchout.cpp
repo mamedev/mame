@@ -8,19 +8,19 @@ Arm Wrestling runs on about the same hardware, but the video board is different.
 The most significant changes are that Punchout has a larger bottom tilemap,
 with scrolling, while Arm Wrestling has an additional FG tilemap displayed on
 the bottom screen.
+Arm Wrestling also scrolls its FG and background tilemaps per tile row, with
+the values at d800-d81f (FG) and at the even addresses of f000-f03f (BG).
 
 driver by Nicola Salmoria
 
 TODO:
 - add useless driver config to choose between pink and white color proms
-- video raw params - pixel clock is derived from 20.16mhz xtal
-- money bag placement might not be 100% correct in Arm Wrestling
 
 
 main CPU:
 
 0000-bfff ROM
-c000-c3ff NVRAM
+c000-c3ff NVRAM (1Kx4), mirrored at c400-c7ff
 d000-d7ff RAM
 d800-dfff Video RAM (info screen)
 e000-e7ff Video RAM (opponent)
@@ -28,8 +28,15 @@ e800-efff Video RAM (player)
 f000-f03f Background row scroll (low/high couples)
 f000-ffff Video RAM (background)
 
-memory mapped ports:
-write:
+Arm Wrestling instead has:
+d800-dfef Video RAM (FG)
+f000-f7ff Video RAM (background)
+f800-ffff Video RAM (info screen)
+
+d800-ffff is RAM on the CPU board. The video and BAK boards render only from their own copy,
+which a DMA updates at the start of vblank while port 0a is set, holding the Z80 off the bus.
+
+video registers (in the RAM copied by the DMA):
 dfe0-dfef ??
 
 dff0      big sprite #1 zoom low 8 bits
@@ -47,6 +54,7 @@ dffa      big sprite #2 y pos low 8 bits
 dffb      big sprite #2 y pos high bit
 dffc      big sprite #2 x flip (bit 0)
 dffd      palette bank (bit 0 = bottom monitor bit 1 = top monitor)
+          Arm Wrestling: bits 6-7 select the bottom monitor layer priority
 
 I/O
 read:
@@ -63,12 +71,12 @@ write:
 04        to VLM5030
 08        NMI enable + watchdog reset
 09        watchdog reset
-0a        ? latched into Z80 BUS RQ
+0a        vblank DMA enable (latched into Z80 BUSRQ at vblank)
 0b        to 2A03 #1 and #2 RESET
 0c        to VLM5030 RESET
 0d        to VLM5030 START
 0e        to VLM5030 VCU
-0f        enable NVRAM ?
+0f        NVRAM enable (NM)
 
 sound CPU:
 the sound CPU is a 2A03, which is a modified 6502 with built-in input ports
@@ -111,6 +119,7 @@ regardless of PCB revision which would change PROMs 6E, 6F, and 7F.
 DIP locations verified for:
     -punchout (manual)
     -spnchout (manual)
+    -armwrest (manual)
 
 ***************************************************************************/
 
@@ -123,12 +132,15 @@ DIP locations verified for:
 #include "machine/nvram.h"
 #include "machine/rp5c01.h"
 #include "machine/rp5h01.h"
+#include "sound/flt_biquad.h"
 #include "sound/vlm5030.h"
 
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+#include <numbers>
 
 #include "layout/generic.h"
 
@@ -143,39 +155,45 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_vlm(*this, "vlm"),
+		m_mainlatch(*this, "mainlatch"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_bg_top_videoram(*this, "bg_top_videoram"),
-		m_spr1_ctrlram(*this, "spr1_ctrlram"),
-		m_spr2_ctrlram(*this, "spr2_ctrlram"),
-		m_palettebank(*this, "palettebank"),
-		m_spr1_videoram(*this, "spr1_videoram"),
-		m_spr2_videoram(*this, "spr2_videoram"),
-		m_bg_bot_videoram(*this, "bg_bot_videoram"),
-		m_proms(*this, "proms")
+		m_dmaram(*this, "dmaram"),
+		m_nvram(*this, "nvram"),
+		m_proms(*this, "proms"),
+		m_vram(*this, "vram", 0x2800, ENDIANNESS_LITTLE)
 	{ }
 
 	void punchout(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<rp2a03_device> m_audiocpu;
 	required_device<vlm5030_device> m_vlm;
+	required_device<ls259_device> m_mainlatch;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<uint8_t> m_bg_top_videoram;
-	required_shared_ptr<uint8_t> m_spr1_ctrlram;
-	required_shared_ptr<uint8_t> m_spr2_ctrlram;
-	required_shared_ptr<uint8_t> m_palettebank;
-	required_shared_ptr<uint8_t> m_spr1_videoram;
-	required_shared_ptr<uint8_t> m_spr2_videoram;
-	required_shared_ptr<uint8_t> m_bg_bot_videoram;
+	required_shared_ptr<uint8_t> m_dmaram;
+	required_shared_ptr<uint8_t> m_nvram;
 
 	required_region_ptr<uint8_t> m_proms;
+
+	// the video and BAK boards' copy of d800-ffff, written by the vblank DMA
+	memory_share_creator<uint8_t> m_vram;
+	uint8_t *m_bg_top_videoram = nullptr;   // d800-dfef (Arm Wrestling's video_start moves it to f800-ffff)
+	uint8_t *m_spr1_ctrlram = nullptr;      // dff0-dff7
+	uint8_t *m_spr2_ctrlram = nullptr;      // dff8-dffc
+	uint8_t *m_palettebank = nullptr;       // dffd
+	uint8_t *m_spr1_videoram = nullptr;     // e000-e7ff
+	uint8_t *m_spr2_videoram = nullptr;     // e800-efff
+	uint8_t *m_bg_bot_videoram = nullptr;   // f000-ffff (f000-f7ff on Arm Wrestling)
+
+	emu_timer *m_dma_timer = nullptr;
 
 	tilemap_t *m_bg_top_tilemap = nullptr;
 	tilemap_t *m_bg_bot_tilemap = nullptr;
@@ -183,11 +201,19 @@ protected:
 	tilemap_t *m_spr2_tilemap = nullptr;
 
 	bool m_nmi_mask = false;
+	bool m_dma_enable = false;
+	bool m_nvram_enable = false;
+	uint8_t m_watchdog_count = 0;
 	void nmi_mask_w(int state);
+	void dma_enable_w(int state);
+	void nvram_enable_w(int state);
+	uint8_t nvram_r(offs_t offset);
+	void nvram_w(offs_t offset, uint8_t data);
 	void bg_top_videoram_w(offs_t offset, uint8_t data);
 	void bg_bot_videoram_w(offs_t offset, uint8_t data);
 	void spr1_videoram_w(offs_t offset, uint8_t data);
 	void spr2_videoram_w(offs_t offset, uint8_t data);
+	virtual void dma_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(top_get_info);
 	TILE_GET_INFO_MEMBER(bot_get_info);
 	TILE_GET_INFO_MEMBER(bs1_get_info);
@@ -195,6 +221,8 @@ protected:
 	uint32_t screen_update_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
+	TIMER_CALLBACK_MEMBER(dma_done);
+	void draw_big_sprite_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t &tilemap, uint32_t startx, int incxx, int incyy);
 	void draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
 	void drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void copy_top_palette(int bank);
@@ -235,8 +263,7 @@ class armwrest_state : public punchout_state
 {
 public:
 	armwrest_state(const machine_config &mconfig, device_type type, const char *tag) :
-		punchout_state(mconfig, type, tag),
-		m_fg_videoram(*this, "fgram")
+		punchout_state(mconfig, type, tag)
 	{ }
 
 	void armwrest(machine_config &config) ATTR_COLD;
@@ -244,11 +271,17 @@ public:
 protected:
 	virtual void video_start() override ATTR_COLD;
 
+	virtual void dma_w(offs_t offset, uint8_t data) override;
+
 private:
-	required_shared_ptr<uint8_t> m_fg_videoram;
+	uint8_t *m_fg_videoram = nullptr; // d800-dfef
 
 	tilemap_t *m_fg_tilemap = nullptr;
 	tilemap_t *m_spr1_tilemap_flipx = nullptr;
+
+	bitmap_ind16 m_spr1_bitmap;
+	bitmap_ind16 m_spr2_bitmap;
+	bitmap_ind16 m_fg_bitmap;
 
 	TILE_GET_INFO_MEMBER(top_get_info);
 	TILE_GET_INFO_MEMBER(bot_get_info);
@@ -258,11 +291,10 @@ private:
 
 	void spr1_videoram_w(offs_t offset, uint8_t data);
 	void fg_videoram_w(offs_t offset, uint8_t data);
+	void update_scroll();
 	uint32_t screen_update_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette);
-
-	void program_map(address_map &map) ATTR_COLD;
 };
 
 /***************************************************************************
@@ -328,7 +360,7 @@ TILE_GET_INFO_MEMBER(armwrest_state::fg_get_info)
 {
 	int const attr = m_fg_videoram[tile_index * 2 + 1];
 	int const code = m_fg_videoram[tile_index * 2] + 256 * (attr & 0x07);
-	int const color = ((attr & 0xf8) >> 3);
+	int const color = (attr >> 3) & 0x0f; // bit 7 only drives T-HRV (flip); the mux's fifth colour input is tied low (CL7)
 	int const flipx = attr & 0x80;
 	tileinfo.set(1, code, color, flipx ? TILE_FLIPX : 0);
 }
@@ -363,6 +395,9 @@ void punchout_state::video_start()
 
 void armwrest_state::video_start()
 {
+	m_fg_videoram = &m_vram[0x0000];
+	m_bg_top_videoram = &m_vram[0x2000]; // f800-ffff
+
 	m_bg_top_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armwrest_state::top_get_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_bot_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(*this, FUNC(armwrest_state::bot_get_info)), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
@@ -375,6 +410,15 @@ void armwrest_state::video_start()
 	m_spr1_tilemap_flipx->set_transparent_pen(0x07);
 	m_spr2_tilemap->set_transparent_pen(0x03);
 	m_fg_tilemap->set_transparent_pen(0x07);
+
+	m_bg_top_tilemap->set_scroll_rows(32);
+	m_bg_bot_tilemap->set_scroll_rows(32);
+	m_fg_tilemap->set_scroll_rows(32);
+
+	screen_device &bottom = *subdevice<screen_device>("bottom");
+	bottom.register_screen_bitmap(m_spr1_bitmap);
+	bottom.register_screen_bitmap(m_spr2_bitmap);
+	bottom.register_screen_bitmap(m_fg_bitmap);
 }
 
 
@@ -415,7 +459,65 @@ void punchout_state::spr2_videoram_w(offs_t offset, uint8_t data)
 	m_spr2_tilemap->mark_tile_dirty(offset / 4);
 }
 
+// offset is relative to d800
+void punchout_state::dma_w(offs_t offset, uint8_t data)
+{
+	if (offset < 0x0800)
+		bg_top_videoram_w(offset, data); // also the sprite control registers and palette bank at dff0-dfff
+	else if (offset < 0x1000)
+		spr1_videoram_w(offset - 0x0800, data);
+	else if (offset < 0x1800)
+		spr2_videoram_w(offset - 0x1000, data);
+	else
+		bg_bot_videoram_w(offset - 0x1800, data);
+}
 
+void armwrest_state::dma_w(offs_t offset, uint8_t data)
+{
+	if (offset < 0x0800)
+		fg_videoram_w(offset, data); // also the sprite control registers and palette bank at dff0-dfff
+	else if (offset < 0x1000)
+		spr1_videoram_w(offset - 0x0800, data);
+	else if (offset < 0x1800)
+		spr2_videoram_w(offset - 0x1000, data);
+	else if (offset < 0x2000)
+		bg_bot_videoram_w(offset - 0x1800, data);
+	else
+		bg_top_videoram_w(offset - 0x2000, data);
+}
+
+
+
+// Draws big sprite 1 from the given tilemap. The video board loads the vertical position (dff4/dff5)
+// into a 9-bit line counter (LS161s 4M/5M/3M) and clears the zoom accumulator (LS174s 3L/4L) while
+// /EC2 (from 7U) is low, until line 4. The accumulator then adds the zoom four times in each horizontal
+// blank, and its carry steps the counter, so the counter advances by zoom / 1024 per line. The counter
+// wraps modulo 512, which can bring the top of the sprite into view; counts past the end of the image
+// show nothing (V8, and V7 on Arm Wrestling, turn the sprite off through 1K).
+void punchout_state::draw_big_sprite_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, tilemap_t &tilemap, uint32_t startx, int incxx, int incyy)
+{
+	constexpr uint32_t period = 512 << 16;  // period of the 9-bit line counter, 16.16 fixed point
+
+	uint32_t const ypos = m_spr1_ctrlram[4] + 256 * (m_spr1_ctrlram[5] & 1);
+
+	// the first step comes in the horizontal blank before line 4, so bitmap line v shows the count after
+	// v - 3 steps (on every other frame the board adds up to half a step more, which isn't emulated)
+	int const offset = -3;
+
+	// source line at bitmap line 0, 16.16 fixed point
+	uint32_t const starty = ((ypos << 16) + uint32_t(offset * incyy)) & (period - 1);
+
+	// One more pass for each wrap between bitmap line 0 and the bottom of the clipping rectangle. Each
+	// pass starts a whole period earlier, so draw_roz skips lines until the count has wrapped. (draw_roz's
+	// own wraparound would repeat the image every 256 lines, 128 on Arm Wrestling, instead of every 512.)
+	int const wraps = (starty + uint32_t(cliprect.max_y) * incyy) / period;
+	for (int wrap = 0; wrap <= wraps; wrap++)
+		tilemap.draw_roz(screen, bitmap, cliprect,
+			startx, starty - wrap * period,
+			incxx, 0, 0, incyy,    // zoom, no rotation
+			0,  // no wraparound
+			0, 0);
+}
 
 void punchout_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palette)
 {
@@ -426,17 +528,14 @@ void punchout_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 		int sx = 4096 - (m_spr1_ctrlram[2] + 256 * (m_spr1_ctrlram[3] & 0x0f));
 		if (sx > 4096 - 4 * 127) sx -= 4096;
 
-		int sy = -(m_spr1_ctrlram[4] + 256 * (m_spr1_ctrlram[5] & 1));
-		if (sy <= -256 + zoom / 0x40) sy += 512;
-		sy += 12;
-
 		int incxx = zoom << 6;
 		int const incyy = zoom << 6;
 
+		// The X accumulator (F283 2J/3J/4J) starts each line at the X position's fraction, adds the zoom four
+		// times per dot, the pixel counter (F161 4F) follows its carry 16 quarter dots later, and the BAK
+		// board latches the pixel on T0, so x shows source column xpos / 4 + (x + 59.5) * zoom / 1024
 		uint32_t startx = -sx * 0x4000;
-		uint32_t starty = -sy * 0x10000;
-		startx += 3740 * zoom;  // adjustment to match the screen shots
-		starty -= 178 * zoom;   // and make the hall of fame picture nice
+		startx += 3808 * zoom;  // 59.5 * 64
 
 		if (m_spr1_ctrlram[6] & 1)   // flip x
 		{
@@ -446,11 +545,7 @@ void punchout_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 
 		m_spr1_tilemap->set_palette_offset(0x100 * palette);
 
-		m_spr1_tilemap->draw_roz(screen, bitmap, cliprect,
-			startx, starty + 0x200 * (2) * zoom,
-			incxx, 0, 0, incyy,    // zoom, no rotation
-			0,  // no wraparound
-			0, 0);
+		draw_big_sprite_roz(screen, bitmap, cliprect, *m_spr1_tilemap, startx, incxx, incyy);
 	}
 }
 
@@ -464,17 +559,11 @@ void armwrest_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 		int sx = 4096 - (m_spr1_ctrlram[2] + 256 * (m_spr1_ctrlram[3] & 0x0f));
 		if (sx > 2048) sx -= 4096;
 
-		int sy = -(m_spr1_ctrlram[4] + 256 * (m_spr1_ctrlram[5] & 1));
-		if (sy <= -256 + zoom/0x40) sy += 512;
-		sy += 12;
-
 		int incxx = zoom << 6;
 		int const incyy = zoom << 6;
 
 		uint32_t startx = -sx * 0x4000;
-		uint32_t starty = -sy * 0x10000;
-		startx += 3740 * zoom;  // adjustment to match the screen shots
-		starty -= 178 * zoom;   // and make the hall of fame picture nice
+		startx += 3808 * zoom;  // same circuit as on CHP1-VIDEO
 
 		tilemap_t *spr1_tilemap;
 
@@ -489,22 +578,22 @@ void armwrest_state::draw_big_sprite(screen_device &screen, bitmap_ind16 &bitmap
 
 		spr1_tilemap->set_palette_offset(0x100 * palette);
 
-		spr1_tilemap->draw_roz(screen, bitmap, cliprect,
-			startx, starty + 0x200 * (2) * zoom,
-			incxx, 0, 0, incyy,    // zoom, no rotation
-			0,  // no wraparound
-			0,0);
+		draw_big_sprite_roz(screen, bitmap, cliprect, *spr1_tilemap, startx, incxx, incyy);
 	}
 }
 
 void punchout_state::drawbs2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	// The X counter (LS161 8C/7C/6D) is loaded while HWD3 is low (horizontal blank counts 186-191) and the
+	// shift registers (LS299 8R/8S) and colour latch (LS377 7J) load at the end of dot 6 of each character,
+	// so x shows column xpos + 57 + x. The Y counter (LS161 8E/7E/6F) is loaded while /EC2 is low and steps
+	// once per line in the horizontal blank, as for big sprite 1, so line v shows row ypos + v - 3.
 	int sx = 512 - (m_spr2_ctrlram[0] + 256 * (m_spr2_ctrlram[1] & 1));
 	if (sx > 512 - 127) sx -= 512;
-	sx -= 55;   // adjustment to match the screen shots
+	sx -= 57;
 
 	int sy = -m_spr2_ctrlram[2] + 256 * (m_spr2_ctrlram[3] & 1);
-	sy += 3;    // adjustment to match the screen shots
+	sy += 3;
 
 	sx = -sx << 16;
 	sy = -sy << 16;
@@ -577,9 +666,10 @@ uint32_t punchout_state::screen_update_bottom(screen_device &screen, bitmap_ind1
 {
 	copy_bot_palette(BIT(*m_palettebank, 0));
 
-	// copy the character mapped graphics
+	// CHP1-BAK loads the column counter with the row's scroll value while HWD0 is low (horizontal blank
+	// counts 186-191) and the pixels come out 4 dots after they are fetched, so x shows column v + 60 + x
 	for (int offs = 0; offs < 32; offs++)
-		m_bg_bot_tilemap->set_scrollx(offs, 58 + m_bg_bot_videoram[2 * offs] + 256 * (m_bg_bot_videoram[2 * offs + 1] & 0x01));
+		m_bg_bot_tilemap->set_scrollx(offs, 60 + m_bg_bot_videoram[2 * offs] + 256 * (m_bg_bot_videoram[2 * offs + 1] & 0x01));
 
 	m_bg_bot_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -591,9 +681,26 @@ uint32_t punchout_state::screen_update_bottom(screen_device &screen, bitmap_ind1
 }
 
 
+void armwrest_state::update_scroll()
+{
+	// CHV1-BAK loads the FG column counter at the start of each line from FG RAM d800 + row,
+	// and the BG column counter from the code byte at f000 + row * 2. The BG counter is shared
+	// by both monitors. A larger value moves the layer left. The game uses 0xc8 as the neutral
+	// position, which is drawn with no scroll offset.
+	for (int row = 0; row < 32; row++)
+	{
+		m_fg_tilemap->set_scrollx(row, (m_fg_videoram[row] - 0xc8) & 0xff);
+
+		int const bgscroll = (m_bg_bot_videoram[row * 2] - 0xc8) & 0xff;
+		m_bg_top_tilemap->set_scrollx(row, bgscroll);
+		m_bg_bot_tilemap->set_scrollx(row, bgscroll);
+	}
+}
+
 uint32_t armwrest_state::screen_update_top(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copy_top_palette(BIT(*m_palettebank, 1));
+	update_scroll();
 
 	m_bg_top_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -606,14 +713,50 @@ uint32_t armwrest_state::screen_update_top(screen_device &screen, bitmap_ind16 &
 uint32_t armwrest_state::screen_update_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copy_bot_palette(BIT(*m_palettebank, 0));
+	update_scroll();
 
 	m_bg_bot_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
-	if (m_spr1_ctrlram[7] & 2)  // display in bottom monitor
-		draw_big_sprite(screen, bitmap, cliprect, 1);
-	drawbs2(screen, bitmap, cliprect);
+	// the other layers are mixed by the priority PROM (CHV1-BAK 3C), whose top two
+	// address bits are latched from dffd bits 6-7
+	m_spr1_bitmap.fill(0xffff, cliprect);
+	m_spr2_bitmap.fill(0xffff, cliprect);
+	m_fg_bitmap.fill(0xffff, cliprect);
 
-	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
+	if (m_spr1_ctrlram[7] & 2)  // display in bottom monitor
+		draw_big_sprite(screen, m_spr1_bitmap, cliprect, 1);
+	drawbs2(screen, m_spr2_bitmap, cliprect);
+	m_fg_tilemap->draw(screen, m_fg_bitmap, cliprect, 0, 0);
+
+	uint8_t const *const prio = &m_proms[0xc00 | (*m_palettebank & 0xc0)];
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint16_t *const dst = &bitmap.pix(y);
+		uint16_t const *const spr1 = &m_spr1_bitmap.pix(y);
+		uint16_t const *const spr2 = &m_spr2_bitmap.pix(y);
+		uint16_t const *const fg = &m_fg_bitmap.pix(y);
+
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			// A0 = big sprite 1 transparent, A1-A2 = big sprite 2 pixel, A3-A5 = FG pixel
+			int const addr = ((spr1[x] == 0xffff) ? 0x01 : 0x00)
+					| (((spr2[x] == 0xffff) ? 0x03 : (spr2[x] & 0x03)) << 1)
+					| (((fg[x] == 0xffff) ? 0x07 : (fg[x] & 0x07)) << 3);
+
+			// Q0-Q1 drive the LS153 selects through links CL2/CL3; Q2-Q3 go to the open links SL2/SL3
+			uint16_t pen;
+			switch (prio[addr] & 0x03)
+			{
+			case 0:  pen = fg[x];   break;
+			case 1:  pen = spr2[x]; break;
+			case 2:  pen = spr1[x]; break;
+			default: pen = 0xffff;  break; // background
+			}
+
+			if (pen != 0xffff)
+				dst[x] = pen;
+		}
+	}
 
 	return 0;
 }
@@ -634,36 +777,37 @@ void punchout_state::nmi_mask_w(int state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
+void punchout_state::dma_enable_w(int state)
+{
+	m_dma_enable = state;
+}
+
+void punchout_state::nvram_enable_w(int state)
+{
+	m_nvram_enable = state;
+}
+
+// The battery backed RAM is a 1Kx4 TC5514AP-3 (8M) on DD0-DD3, mirrored at c400-c7ff. It is
+// only selected while latch output NM (port 0f) is high; the games set NM around every access.
+// Undriven data lines (DD4-DD7 when it's read, all of them while it isn't selected) are assumed
+// to read high.
+uint8_t punchout_state::nvram_r(offs_t offset)
+{
+	return m_nvram_enable ? (m_nvram[offset] | 0xf0) : 0xff;
+}
+
+void punchout_state::nvram_w(offs_t offset, uint8_t data)
+{
+	if (m_nvram_enable)
+		m_nvram[offset] = data & 0x0f;
+}
+
 void punchout_state::program_map(address_map &map)
 {
 	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc3ff).ram().share("nvram");
+	map(0xc000, 0xc3ff).mirror(0x0400).rw(FUNC(punchout_state::nvram_r), FUNC(punchout_state::nvram_w)).share(m_nvram);
 	map(0xd000, 0xd7ff).ram();
-	map(0xd800, 0xdfef).ram().w(FUNC(punchout_state::bg_top_videoram_w)).share(m_bg_top_videoram);
-	map(0xdff0, 0xdff7).ram().share(m_spr1_ctrlram);
-	map(0xdff8, 0xdffc).ram().share(m_spr2_ctrlram);
-	map(0xdffd, 0xdffd).ram().share(m_palettebank);
-	map(0xdffe, 0xdfff).ram();
-	map(0xe000, 0xe7ff).ram().w(FUNC(punchout_state::spr1_videoram_w)).share(m_spr1_videoram);
-	map(0xe800, 0xefff).ram().w(FUNC(punchout_state::spr2_videoram_w)).share(m_spr2_videoram);
-	map(0xf000, 0xffff).ram().w(FUNC(punchout_state::bg_bot_videoram_w)).share(m_bg_bot_videoram);   // also contains scroll RAM
-}
-
-
-void armwrest_state::program_map(address_map &map)
-{
-	map(0x0000, 0xbfff).rom();
-	map(0xc000, 0xc3ff).ram().share("nvram");
-	map(0xd000, 0xd7ff).ram();
-	map(0xd800, 0xdfef).ram().w(FUNC(armwrest_state::fg_videoram_w)).share(m_fg_videoram);
-	map(0xdff0, 0xdff7).ram().share(m_spr1_ctrlram);
-	map(0xdff8, 0xdffc).ram().share(m_spr2_ctrlram);
-	map(0xdffd, 0xdffd).ram().share(m_palettebank);
-	map(0xdffe, 0xdfff).ram();
-	map(0xe000, 0xe7ff).ram().w(FUNC(armwrest_state::spr1_videoram_w)).share(m_spr1_videoram);
-	map(0xe800, 0xefff).ram().w(FUNC(armwrest_state::spr2_videoram_w)).share(m_spr2_videoram);
-	map(0xf000, 0xf7ff).ram().w(FUNC(armwrest_state::bg_bot_videoram_w)).share(m_bg_bot_videoram);
-	map(0xf800, 0xffff).ram().w(FUNC(armwrest_state::bg_top_videoram_w)).share(m_bg_top_videoram);
+	map(0xd800, 0xffff).ram().share(m_dmaram); // copied to the video and BAK boards by the vblank DMA
 }
 
 
@@ -823,8 +967,24 @@ static INPUT_PORTS_START( punchout )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", FUNC(vlm5030_device::bsy_r))
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "R18:!1" )       // Not documented, R18 resistor
-	PORT_DIPNAME( 0x80, 0x00, "Copyright" )             PORT_DIPLOCATION("R19:!1") // Not documented, R19 resistor
+	// R18 and R19 are fitted as 0 ohm links (CHP1-CPU parts list), so these bits read 1 on a stock board
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )       PORT_DIPLOCATION("R18:!1") // R18 resistor
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Copyright" )             PORT_DIPLOCATION("R19:!1") // R19 resistor
+	PORT_DIPSETTING(    0x00, "Nintendo" )
+	PORT_DIPSETTING(    0x80, "Nintendo of America Inc." )
+INPUT_PORTS_END
+
+// No parts list is known for the Japanese and bootleg boards, so R18 and R19 are left open. The
+// bootleg uses both bits for other things: bit 6 is stored at d7ce for a purpose that hasn't been
+// worked out, and bit 7 selects one of two coinage tables (b900 or bb00), not the copyright line.
+static INPUT_PORTS_START( punchoutj )
+	PORT_INCLUDE( punchout )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "R18:!1" )       // R18 resistor
+	PORT_DIPNAME( 0x80, 0x00, "Copyright" )             PORT_DIPLOCATION("R19:!1") // R19 resistor
 	PORT_DIPSETTING(    0x00, "Nintendo" )
 	PORT_DIPSETTING(    0x80, "Nintendo of America Inc." )
 INPUT_PORTS_END
@@ -857,6 +1017,23 @@ static INPUT_PORTS_START( spnchout )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x40, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") // R18 resistor
+	PORT_DIPSETTING(    0x40, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+INPUT_PORTS_END
+
+// No parts list is known for this board, so R18 and R19 are left open. This program needs R19 open:
+// the check at 0x0030 (called at startup from 0x02a4) restarts it while DSW1 bit 7 is set.
+static INPUT_PORTS_START( spnchoutj )
+	PORT_INCLUDE( spnchout )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x40, 0x00, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") // R18 resistor
+	PORT_DIPSETTING(    0x40, "1" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPNAME( 0x80, 0x00, "Copyright" )             PORT_DIPLOCATION("R19:!1") // R19 resistor
+	PORT_DIPSETTING(    0x00, "Nintendo" )
+	PORT_DIPSETTING(    0x80, "Nintendo of America Inc." )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( armwrest )
@@ -876,7 +1053,8 @@ static INPUT_PORTS_START( armwrest )
 
 	/* Coinage:
 
-	R18 (Coin Slots setting) determines which table is used.
+	R18 (Coin Slots setting) determines which table is used. The CHV1-CPU parts list
+	has R18 and R19 fitted as 0 ohm links, so stock boards use the 1 coin slot table.
 
 	L = number of credits per coin for left coin slot
 	R = number of credits per coin for right coin slot
@@ -990,7 +1168,7 @@ bit 3210 5432  L  R  C
 	1000 0xxx  1  1  6
 	1000 1xxx  10 10 3
 
-	1001 0xxx  5  1  5
+	1001 0xxx  2  2  3
 	1001 1xxx  11 11 1
 
 	1010 0xxx  5  5  1
@@ -1055,10 +1233,12 @@ bit 3210 5432  L  R  C
 	PORT_DIPSETTING(    0x0e, "1110" )
 	PORT_DIPSETTING(    0x0f, "1111" )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("vlm", FUNC(vlm5030_device::bsy_r))
-	PORT_DIPNAME( 0x40, 0x00, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") // R18 resistor
+	PORT_DIPNAME( 0x40, 0x40, "Coin Slots" )            PORT_DIPLOCATION("R18:!1") // R18 resistor
 	PORT_DIPSETTING(    0x40, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "R19:!1" )       // R19 resistor
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )       PORT_DIPLOCATION("R19:!1") // R19 resistor, not used
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1087,17 +1267,79 @@ GFXDECODE_END
 
 void punchout_state::vblank_irq(int state)
 {
-	if (state && m_nmi_mask)
+	if (!state)
+		return;
+
+	// Watchdog: LS161A 2A counts the same vblank edges while latch Q0 (NMI enable) and Q1 are both clear;
+	// otherwise its load input (the NOR of the two, 3A) loads its grounded data inputs. QD resets the Z80
+	// and clears the latch through 3A, so the count carries on through 8-15 and the reset lasts 8 vblanks.
+	bool const was_reset = BIT(m_watchdog_count, 3);
+	if (m_mainlatch->q0_r() || m_mainlatch->q1_r())
+		m_watchdog_count = 0;
+	else
+		m_watchdog_count = (m_watchdog_count + 1) & 0x0f;
+	bool const reset = BIT(m_watchdog_count, 3);
+	if (reset != was_reset)
+	{
+		m_maincpu->set_input_line(INPUT_LINE_RESET, reset ? ASSERT_LINE : CLEAR_LINE);
+		m_mainlatch->clear_w(reset ? 0 : 1);
+	}
+
+	if (m_nmi_mask)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+
+	// The same edge clocks the BUSRQ flip-flop (1D), whose D input is latch Q2. While the Z80 is off
+	// the bus, the DMA counters (5B/5A/7B/6B, starting at d800) copy d800-ffff to the video and BAK
+	// boards, one byte per 5.04 MHz period, and the end of the copy clears the flip-flop. The NMI is
+	// taken once the Z80 has the bus back. Without the copy the boards keep showing the old picture.
+	if (m_dma_enable)
+	{
+		for (offs_t offset = 0; offset < m_vram.length(); offset++)
+		{
+			if (m_vram[offset] != m_dmaram[offset])
+				dma_w(offset, m_dmaram[offset]);
+		}
+
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, ASSERT_LINE);
+		m_dma_timer->adjust(attotime::from_ticks(m_vram.length(), XTAL(20'160'000) / 4));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(punchout_state::dma_done)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSREQ, CLEAR_LINE);
 }
 
 void punchout_state::machine_start()
 {
+	m_bg_top_videoram = &m_vram[0x0000];
+	m_spr1_ctrlram = &m_vram[0x07f0];
+	m_spr2_ctrlram = &m_vram[0x07f8];
+	m_palettebank = &m_vram[0x07fd];
+	m_spr1_videoram = &m_vram[0x0800];
+	m_spr2_videoram = &m_vram[0x1000];
+	m_bg_bot_videoram = &m_vram[0x1800];
+
+	m_dma_timer = timer_alloc(FUNC(punchout_state::dma_done), this);
+
 	save_item(NAME(m_nmi_mask));
+	save_item(NAME(m_dma_enable));
+	save_item(NAME(m_nvram_enable));
+	save_item(NAME(m_watchdog_count));
+}
+
+void punchout_state::machine_reset()
+{
+	// the power-on reset clears the watchdog counter (2A /CL)
+	m_watchdog_count = 0;
+	m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+	m_mainlatch->clear_w(1);
 }
 
 void spunchout_state::machine_reset()
 {
+	punchout_state::machine_reset();
+
 	m_rp5h01->enable_w(0); // _CE -> GND
 }
 
@@ -1116,38 +1358,42 @@ void punchout_state::punchout(machine_config &config)
 
 	ls259_device &mainlatch(LS259(config, "mainlatch")); // 2B
 	mainlatch.q_out_cb<0>().set(FUNC(punchout_state::nmi_mask_w));
-	mainlatch.q_out_cb<1>().set_nop(); // watchdog reset, seldom used because 08 clears the watchdog as well
-	mainlatch.q_out_cb<2>().set_nop(); // ?
+	mainlatch.q_out_cb<1>().set_nop(); // watchdog: while this or Q0 is set, the counter (2A) stays cleared
+	mainlatch.q_out_cb<2>().set(FUNC(punchout_state::dma_enable_w)); // BUSRQ flip-flop D
 	mainlatch.q_out_cb<3>().set_inputline("audiocpu", INPUT_LINE_RESET);
 	mainlatch.q_out_cb<4>().set("vlm", FUNC(vlm5030_device::rst_w));
 	mainlatch.q_out_cb<5>().set("vlm", FUNC(vlm5030_device::st_w));
 	mainlatch.q_out_cb<6>().set("vlm", FUNC(vlm5030_device::vcu_w));
-	mainlatch.q_out_cb<7>().set_nop(); // enable NVRAM?
+	mainlatch.q_out_cb<7>().set(FUNC(punchout_state::nvram_enable_w)); // NM
 
 	// video hardware
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_punchout);
 	PALETTE(config, m_palette).set_entries(0x200);
 	config.set_default_layout(layout_dualhovu);
 
+	// CHP1-VIDEO and CHV1-VIDEO timing (shared by both monitors): 20.16 MHz / 4 dot clock; the H counter
+	// (2E/3E) reloads with 0x00 and 0xba on alternate passes, giving 326 dots per line; the V counter (8U/8T)
+	// advances on every second EQ pulse from timing PROM 2D (two per line), and its reload adds one EQ period,
+	// giving 256.5 lines per frame (rounded up here). The picture is blanked while /VB (7U) is low, from count
+	// 240 to count 15, but /VB changes mid-line and the layers use the count latched by 8V at the start of each
+	// horizontal blank, so the lines shown are 15-238 (on every other frame, line 15 only from dot 102 and
+	// line 239 only up to dot 101). It is also blanked outside H-MASK (PROM 2D through latch 2C), which passes
+	// counts 2-253 of each line
 	screen_device &top(SCREEN(config, "top"));
-	top.set_refresh_hz(60);
-	top.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	top.set_size(32*8, 32*8);
-	top.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	top.set_raw(XTAL(20'160'000) / 4, 326, 2, 254, 257, 15, 239);
 	top.set_screen_update(FUNC(punchout_state::screen_update_top));
 	top.set_palette(m_palette);
 	top.screen_vblank().set(FUNC(punchout_state::vblank_irq));
 	top.screen_vblank().append_inputline(m_audiocpu, INPUT_LINE_NMI);
 
 	screen_device &bottom(SCREEN(config, "bottom"));
-	bottom.set_refresh_hz(60);
-	bottom.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	bottom.set_size(32*8, 32*8);
-	bottom.set_visarea(0*8, 32*8-1, 2*8, 30*8-1);
+	bottom.set_raw(XTAL(20'160'000) / 4, 326, 2, 254, 257, 15, 239);
 	bottom.set_screen_update(FUNC(punchout_state::screen_update_bottom));
 	bottom.set_palette(m_palette);
 
 	// sound hardware
+	// The VLM5030 (SSOUND) goes to the upper monitor's sound board and the 2A03 (MSOUND) to the lower monitor's. Each
+	// board drives one of the cabinet's two speakers below the control panel; the manuals don't say which side is which.
 	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
@@ -1155,8 +1401,26 @@ void punchout_state::punchout(machine_config &config)
 
 	VLM5030(config, m_vlm, RP2A03_NTSC_XTAL/6);
 	m_vlm->set_addrmap(0, &punchout_state::vlm_map);
-	m_vlm->add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
-	m_audiocpu->add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
+
+	// Each output ends in an RC low-pass section driving a unity-gain Sallen-Key low-pass (LM324 2N). The Sallen-Key
+	// loads the RC section, so the filters are the poles of the whole network: one real pole and a complex pair.
+	// VLM5030: R55 10K, C39 0.01uF, R56 100K, R57 8.2K, C40 0.015uF, C41 330pF
+	filter_biquad_device &ssound_lpf1 = FILTER_BIQUAD(config, "ssound_lpf1");
+	filter_biquad_device &ssound_lpf2 = FILTER_BIQUAD(config, "ssound_lpf2");
+	ssound_lpf1.setup(filter_biquad_device::biquad_type::LOWPASS1P, 1603.6, std::numbers::sqrt2 / 2.0, 1.0);
+	ssound_lpf2.setup(filter_biquad_device::biquad_type::LOWPASS, 2488.7, 1.609, 1.0);
+	m_vlm->add_route(ALL_OUTPUTS, ssound_lpf1, 1.0);
+	ssound_lpf1.add_route(ALL_OUTPUTS, ssound_lpf2, 1.0);
+	ssound_lpf2.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+
+	// 2A03: R47 3.3K, C34 0.01uF, R48 30K, R49 2.4K, C35 0.015uF, C36 330pF
+	filter_biquad_device &msound_lpf1 = FILTER_BIQUAD(config, "msound_lpf1");
+	filter_biquad_device &msound_lpf2 = FILTER_BIQUAD(config, "msound_lpf2");
+	msound_lpf1.setup(filter_biquad_device::biquad_type::LOWPASS1P, 4837.9, std::numbers::sqrt2 / 2.0, 1.0);
+	msound_lpf2.setup(filter_biquad_device::biquad_type::LOWPASS, 8417.4, 1.591, 1.0);
+	m_audiocpu->add_route(ALL_OUTPUTS, msound_lpf1, 1.0);
+	msound_lpf1.add_route(ALL_OUTPUTS, msound_lpf2, 1.0);
+	msound_lpf2.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 }
 
 
@@ -1176,9 +1440,6 @@ void spunchout_state::spnchout(machine_config &config)
 void armwrest_state::armwrest(machine_config &config)
 {
 	punchout(config);
-
-	// basic machine hardware
-	m_maincpu->set_addrmap(AS_PROGRAM, &armwrest_state::program_map);
 
 	// video hardware
 	m_gfxdecode->set_info(gfx_armwrest);
@@ -1870,7 +2131,7 @@ ROM_START( armwrest )
 	ROM_LOAD( "chpv-b.4b",    0x0600, 0x0200, CRC(9d51416e) SHA1(ae933786c5fc19311144b2094305b4253dc8b75b) ) // R (bottom monitor)
 	ROM_LOAD( "chpv-b.4c",    0x0800, 0x0200, CRC(b8a25795) SHA1(8e41baa796fd8f00739a95b2e07066d68193bd76) ) // G
 	ROM_LOAD( "chpv-b.4d",    0x0a00, 0x0200, CRC(474fc3b1) SHA1(9cda1d1626285310524d048b60b1cf89e197a26d) ) // B
-	ROM_LOAD( "chv1-b.3c",    0x0c00, 0x0100, CRC(c3f92ea2) SHA1(1a82cca1b9a8d9bd4a1d121d8c131a7d0be554bc) ) // priority encoder - not used
+	ROM_LOAD( "chv1-b.3c",    0x0c00, 0x0100, CRC(c3f92ea2) SHA1(1a82cca1b9a8d9bd4a1d121d8c131a7d0be554bc) ) // bottom monitor layer priority
 	ROM_LOAD( "chpv-v.2d",    0x0d00, 0x0100, CRC(71dc0d48) SHA1(dd6609f547d74887f520d7e71a1a00317ff181d0) ) // timing - not used
 
 	ROM_REGION( 0x4000, "vlm", 0 )
@@ -1880,12 +2141,12 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1984, punchout,   0,        punchout, punchout, punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev B)",           0 ) // CHP1-02 boards
-GAME( 1984, punchouta,  punchout, punchout, punchout, punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev A)",           0 ) // CHP1-01 boards
-GAME( 1984, punchoutah, punchout, punchout, punchout, punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev A, harder)",   0 ) // CHP1-01 boards
-GAME( 1984, punchoutj,  punchout, punchout, punchout, punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Japan)",           0 )
-GAME( 1984, punchita,   punchout, punchout, punchout, punchout_state,  empty_init, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
-GAME( 1984, spnchout,   0,        spnchout, spnchout, spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)",     0 ) // CHP1-02 boards
-GAME( 1984, spnchouta,  spnchout, spnchout, spnchout, spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)",     0 ) // CHP1-01 boards
-GAME( 1984, spnchoutj,  spnchout, spnchout, spnchout, spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Japan)",     0 )
-GAME( 1985, armwrest,   0,        armwrest, armwrest, armwrest_state,  empty_init, ROT0, "Nintendo", "Arm Wrestling",                 0 )
+GAME( 1984, punchout,   0,        punchout, punchout,  punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev B)",           0 ) // CHP1-02 boards
+GAME( 1984, punchouta,  punchout, punchout, punchout,  punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev A)",           0 ) // CHP1-01 boards
+GAME( 1984, punchoutah, punchout, punchout, punchout,  punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Rev A, harder)",   0 ) // CHP1-01 boards
+GAME( 1984, punchoutj,  punchout, punchout, punchoutj, punchout_state,  empty_init, ROT0, "Nintendo", "Punch-Out!! (Japan)",           0 )
+GAME( 1984, punchita,   punchout, punchout, punchoutj, punchout_state,  empty_init, ROT0, "bootleg",  "Punch-Out!! (Italian bootleg)", 0 )
+GAME( 1984, spnchout,   0,        spnchout, spnchout,  spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Rev B)",     0 ) // CHP1-02 boards
+GAME( 1984, spnchouta,  spnchout, spnchout, spnchout,  spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Rev A)",     0 ) // CHP1-01 boards
+GAME( 1984, spnchoutj,  spnchout, spnchout, spnchoutj, spunchout_state, empty_init, ROT0, "Nintendo", "Super Punch-Out!! (Japan)",     0 )
+GAME( 1985, armwrest,   0,        armwrest, armwrest,  armwrest_state,  empty_init, ROT0, "Nintendo", "Arm Wrestling",                 0 )
