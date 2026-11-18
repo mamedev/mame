@@ -3767,6 +3767,12 @@ Debugging Options
         :ref:`debugger_host <mame-commandline-debuggerhost>` option to set the
         address to bind to.  Supported on all platforms with TCP socket support.
 
+        The GDB thread list includes CPUs and other devices that expose a
+        generic program counter.  GDB uses a single target description for all
+        threads, so full CPU register access is available only for CPUs with a
+        register layout compatible with the first CPU.  Non-CPU threads can be
+        selected and inspected but cannot be single-stepped.
+
     Example:
         .. code-block:: bash
 
