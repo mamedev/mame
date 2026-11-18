@@ -203,6 +203,7 @@ public:
 	core_osd_file(std::uint32_t openmode, osd_file::ptr &&file, std::uint64_t length)
 		: core_basic_file(openmode, length)
 		, m_file(std::move(file))
+		, m_stream(m_file && m_file->is_stream())
 	{
 	}
 	~core_osd_file() override;
@@ -221,10 +222,14 @@ protected:
 	bool is_buffered(std::uint64_t offset) const noexcept { return (offset >= m_bufferbase) && (offset < (m_bufferbase + m_bufferbytes)); }
 
 private:
+	std::error_condition read_stream(void *buffer, std::size_t length, std::size_t &actual) noexcept;
+
 	static constexpr std::size_t FILE_BUFFER_SIZE = 512;
 
 	osd_file::ptr   m_file;                     // OSD file handle
-	std::uint64_t   m_bufferbase = 0U;          // base offset of internal buffer
+	bool const      m_stream;                   // stream-like: no file position, reads independent of writes
+	std::uint64_t   m_bufferbase = 0U;          // base offset of internal buffer (files)
+	std::uint32_t   m_bufferpos = 0U;           // next unread byte in internal buffer (streams)
 	std::uint32_t   m_bufferbytes = 0U;         // bytes currently loaded into buffer
 	std::uint8_t    m_buffer[FILE_BUFFER_SIZE]; // buffer data
 };
@@ -623,6 +628,10 @@ std::error_condition core_osd_file::read_some_at(std::uint64_t offset, void *buf
 		return std::errc::bad_file_descriptor;
 	}
 
+	// streams have no position: data is read in the order it arrives
+	if (m_stream)
+		return read_stream(buffer, length, actual);
+
 	// flush any buffered char
 	clear_putback();
 
@@ -665,6 +674,53 @@ std::error_condition core_osd_file::read_some_at(std::uint64_t offset, void *buf
 
 
 //-------------------------------------------------
+//  read_stream - read from a stream-like file,
+//  serving buffered data first
+//-------------------------------------------------
+
+std::error_condition core_osd_file::read_stream(void *buffer, std::size_t length, std::size_t &actual) noexcept
+{
+	// flush any buffered char
+	clear_putback();
+
+	// consume buffered data first
+	actual = safe_buffer_copy(m_buffer, m_bufferpos, m_bufferbytes, buffer, 0U, length);
+	m_bufferpos += actual;
+	if (actual == length)
+		return std::error_condition();
+
+	// refill the buffer for small reads, otherwise read directly
+	std::error_condition err;
+	if ((length - actual) < (sizeof(m_buffer) / 2))
+	{
+		m_bufferpos = m_bufferbytes = 0U;
+		err = m_file->read(m_buffer, 0U, sizeof(m_buffer), m_bufferbytes);
+		if (err)
+		{
+			m_bufferbytes = 0U;
+		}
+		else
+		{
+			std::size_t const n = safe_buffer_copy(m_buffer, 0U, m_bufferbytes, buffer, actual, length);
+			m_bufferpos = n;
+			actual += n;
+		}
+	}
+	else
+	{
+		std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length - actual);
+		std::uint32_t bytes_read;
+		err = m_file->read(reinterpret_cast<std::uint8_t *>(buffer) + actual, 0U, chunk, bytes_read);
+		if (!err)
+			actual += bytes_read;
+	}
+
+	// data already copied counts as success, e.g. if no more is available yet
+	return actual ? std::error_condition() : err;
+}
+
+
+//-------------------------------------------------
 //  write - write to a file
 //-------------------------------------------------
 
@@ -682,6 +738,16 @@ std::error_condition core_osd_file::write_some_at(std::uint64_t offset, void con
 {
 	// flush any buffered char
 	clear_putback();
+
+	// writing to a stream does not affect unread data
+	if (m_stream)
+	{
+		std::uint32_t const chunk = std::min<std::common_type_t<std::uint32_t, std::size_t> >(std::numeric_limits<std::uint32_t>::max(), length);
+		std::uint32_t bytes_written;
+		std::error_condition const err = m_file->write(buffer, 0U, chunk, bytes_written);
+		actual = err ? 0U : bytes_written;
+		return err;
+	}
 
 	// invalidate any buffered data
 	m_bufferbytes = 0U;
@@ -738,8 +804,9 @@ std::error_condition core_osd_file::flush() noexcept
 	// flush any buffered char
 	clear_putback();
 
-	// invalidate any buffered data
-	m_bufferbytes = 0U;
+	// invalidate any buffered data, unless still to be read from a stream
+	if (!m_stream)
+		m_bufferbytes = 0U;
 
 	return m_file->flush();
 }

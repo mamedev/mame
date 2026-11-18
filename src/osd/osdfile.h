@@ -151,6 +151,15 @@ public:
 	/// \return Result of the operation.
 	virtual std::error_condition flush() noexcept = 0;
 
+	/// \brief Whether the file is stream-like
+	///
+	/// Stream-like objects (e.g. TCP sockets, named pipes or
+	/// pseudo-terminals) have no file position: offsets are ignored,
+	/// and reading and writing are independent, so writes do not
+	/// affect unread data.
+	/// \return True for a stream-like object, false for a file.
+	virtual bool is_stream() const noexcept { return false; }
+
 	/// \brief Delete a file
 	///
 	/// \param [in] filename Path to the file to delete.

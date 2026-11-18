@@ -129,6 +129,8 @@ public:
 		return std::error_condition();
 	}
 
+	virtual bool is_stream() const noexcept override { return true; }
+
 	static std::error_condition wsa_error_to_file_error(int err)
 	{
 		// TODO: determine if there's a better way to do this

@@ -142,6 +142,8 @@ public:
 		return std::error_condition();
 	}
 
+	virtual bool is_stream() const noexcept override { return true; }
+
 private:
 	int     m_sock;
 	bool    m_listening;
