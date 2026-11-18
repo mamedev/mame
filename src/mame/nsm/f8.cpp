@@ -27,9 +27,10 @@ TODO: Peripheral decoding is incomplete: Coin acceptor/hopper, buttons, motor co
 #include "emu.h"
 
 #include "cpu/f8/f8.h"
+#include "logmacro.h"
+#include "machine/clock.h"
 #include "machine/er1400.h"
 #include "machine/f3853.h"
-#include "machine/timer.h"
 #include "video/pwm.h"
 
 #include "nsmf8.lh"
@@ -63,30 +64,26 @@ private:
 
 	u8 m_digit_select = 7;
 	u8 m_segments[2] = { 0xff, 0xff };
-	bool m_earom_test_clock = false;
-	bool m_earom_test_data_out = false;
+
+
 	u8 m_risk_ladder_data = 0;
 
-	u16 m_ram_address = 0;
 
 	void nsmf8_mem(address_map &map) ATTR_COLD;
 	void nsmf8_io(address_map &map) ATTR_COLD;
 
 	u8 port0_r();
-	void ram_address_w(u8 data);
-	u8 port1_test_r();
-	void port1_test_w(u8 data);
+	u8 port1_r();
+	void port1_w(u8 data);
 	void digit_select_w(u8 data);
-	void segments_w(offs_t offset, u8 data);
+	template <u32 N> void segments_w(u8 data);
 	void update_display();
 	void risk_ladder_w(u8 data);
 	void update_risk_lamps();
-	TIMER_DEVICE_CALLBACK_MEMBER(external_interrupt);
 };
 
 void nsmf8_state::machine_start()
 {
-	save_item(NAME(m_ram_address));
 	save_item(NAME(m_digit_select));
 	save_item(NAME(m_segments));
 	save_item(NAME(m_risk_ladder_data));
@@ -101,19 +98,17 @@ void nsmf8_state::machine_start()
 void nsmf8_state::nsmf8_mem(address_map &map)
 {
 	map(0x0000, 0x17ff).rom().region("maincpu", 0);
-	map(0x0800, 0x0800).w(FUNC(nsmf8_state::segments_w));
-	map(0x3000, 0x3000).lw8(NAME([this](u8 data) { segments_w(1, data); }));
+	map(0x0800, 0x0800).w(FUNC(nsmf8_state::segments_w<0>));
+	map(0x3000, 0x3000).lw8(NAME([this](u8 data) { segments_w<1>(data); }));
 	map(0x5000, 0x5000).w(FUNC(nsmf8_state::digit_select_w));
 	map(0x7000, 0x7000).w(FUNC(nsmf8_state::risk_ladder_w));
 }
 
 void nsmf8_state::nsmf8_io(address_map &map)
 {
-	/* F3853 I/O ports for program/data bus access */
 	map(0x00, 0x00).r(FUNC(nsmf8_state::port0_r));
-	map(0x00, 0x00).w(FUNC(nsmf8_state::ram_address_w));
-	map(0x01, 0x01).rw(FUNC(nsmf8_state::port1_test_r), FUNC(nsmf8_state::port1_test_w));
-	map(0x02, 0x0b).w(FUNC(nsmf8_state::ram_address_w)); /* Placeholder - actual I/O wiring unknown */
+	map(0x01, 0x01).rw(FUNC(nsmf8_state::port1_r), FUNC(nsmf8_state::port1_w));
+	/* F3853 I/O ports for program/data bus access */
 	map(0x0c, 0x0f).rw(m_f3853, FUNC(f3853_device::read), FUNC(f3853_device::write));
 }
 
@@ -125,41 +120,32 @@ static INPUT_PORTS_START( nsmf8 )
 
 INPUT_PORTS_END
 
-void nsmf8_state::ram_address_w(u8 data)
+
+void nsmf8_state::port1_w(u8 data)
 {
-	m_ram_address = data; /* Handle address writing to PSU registers */
+	// BIT 6 = clock, bits 0-2 = command
+	u8 const command = BIT(~data, 0, 3);
+
+	if (BIT(data, 6))
+		LOGMASKED(LOG_GENERAL, "%s: ER1400 port-1 edge command=%u data=%u\n", machine().describe_context(), command, BIT(~data, 7));
+
+	m_earom->c1_w(BIT(~data, 2));
+	m_earom->c2_w(BIT(~data, 1));
+	m_earom->c3_w(BIT(~data, 0));
+	m_earom->data_w(BIT(~data, 7));
+	m_earom->clock_w(BIT(data, 6));
 }
 
-void nsmf8_state::port1_test_w(u8 data)
-{
-	bool const clock = BIT(data, 6);
-	u8 const command = ((!BIT(data, 2)) << 2) | ((!BIT(data, 1)) << 1) | (!BIT(data, 0));
-
-	if (clock && !m_earom_test_clock)
-		logerror("%s: ER1400 candidate port-1 edge command=%u data=%u\n", machine().describe_context(), command, !BIT(data, 7));
-	m_earom_test_clock = clock;
-
-	m_earom->c1_w(!BIT(data, 2));
-	m_earom->c2_w(!BIT(data, 1));
-	m_earom->c3_w(!BIT(data, 0));
-	m_earom->data_w(!BIT(data, 7));
-	m_earom->clock_w(clock);
-	ram_address_w(data);
-}
-
-u8 nsmf8_state::port1_test_r()
+u8 nsmf8_state::port1_r()
 {
 	u8 const data = m_earom->data_r() << 4;
-	if (BIT(data, 4) != m_earom_test_data_out)
-		logerror("%s: ER1400 candidate data output=%u\n", machine().describe_context(), BIT(data, 4));
-	m_earom_test_data_out = BIT(data, 4);
 	return data;
 }
 
 u8 nsmf8_state::port0_r()
 {
-	// Preserve the all-low unmapped read while keeping the confirmed undervoltage input low.
-	return 0x00; // only bit 3 is for under voltage probably
+	// TODO: bit 3 is the undervoltage input, other bits are unidentified.
+	return 0x00;
 }
 
 void nsmf8_state::digit_select_w(u8 data)
@@ -168,22 +154,21 @@ void nsmf8_state::digit_select_w(u8 data)
 	update_display();
 }
 
-void nsmf8_state::segments_w(offs_t offset, u8 data)
+template <u32 N> void nsmf8_state::segments_w(u8 data)
 {
-	m_segments[offset] = data;
+	m_segments[N] = data;
 	update_display();
 }
 
 void nsmf8_state::update_display()
 {
 	// The ROM scans seven positions on the first bus. Only positions 4/5
-	// on the second bus carry the two-digit Chancen counter. Physical
-	// ordering within the three displays is inferred from the BCD fields.
-	// Outputs 0-2: Serienspiele, 3-4: Chancen, 5-8: Muenzspeicher.
-	static constexpr int digit_map[7] = { 8, 7, 2, 6, 1, 5, 0 };
+	// on the second bus carry the two-digit Chancen counter.
+	// Outputs 0-2: special counter, 3-4: chance, 5-8: coins.
+	static constexpr u8 DIGIT_MAP[7] = { 8u, 7u, 2u, 6u, 1u, 5u, 0u };
 	u16 rows = 0;
 	if (m_digit_select < 7)
-		rows = 1U << digit_map[m_digit_select];
+		rows = 1U << DIGIT_MAP[m_digit_select];
 	m_display->matrix_partial(0, 3, rows, ~m_segments[0] & 0x7f);
 	m_display->matrix_partial(5, 4, rows >> 5, ~m_segments[0] & 0x7f);
 	rows = 0;
@@ -201,23 +186,15 @@ void nsmf8_state::risk_ladder_w(u8 data)
 
 void nsmf8_state::update_risk_lamps()
 {
-	// Selector order is observed; the layout's prize-label assignment is provisional.
-	static constexpr u8 selector_codes[13] =
+	static constexpr u8 SELECTOR_CODES[13] =
 	{
 		0x0f, 0x03, 0x0e, 0x02, 0x0d, 0x01, 0x06,
 		0x05, 0x04, 0x0a, 0x09, 0x08, 0x0b
 	};
 	u8 const selector = BIT(m_risk_ladder_data, 3, 4);
 
-	for (unsigned lamp = 0; lamp < std::size(selector_codes); ++lamp)
-		m_risk_lamps[lamp] = (selector == selector_codes[lamp]);
-}
-
-TIMER_DEVICE_CALLBACK_MEMBER(nsmf8_state::external_interrupt)
-{
-	// The F3853 latches the edge and holds INT REQ until acknowledged.
-	m_f3853->ext_int_w(1);
-	m_f3853->ext_int_w(0);
+	for (u32 lamp = 0; lamp < std::size(SELECTOR_CODES); ++lamp)
+		m_risk_lamps[lamp] = (selector == SELECTOR_CODES[lamp]);
 }
 
 void nsmf8_state::nsmf8(machine_config &config)
@@ -231,7 +208,7 @@ void nsmf8_state::nsmf8(machine_config &config)
 	m_f3853->int_req_callback().set_inputline(m_maincpu, F8_INPUT_LINE_INT_REQ);
 	m_maincpu->int_cycle_callback().set(m_f3853, FUNC(f3853_device::int_acknowledge));
 
-	TIMER(config, "external_interrupt").configure_periodic(FUNC(nsmf8_state::external_interrupt), attotime::from_hz(50));
+	CLOCK(config, "extint", 50).signal_handler().set(m_f3853, FUNC(f3853_device::ext_int_w));
 
 	ER1400(config, m_earom);
 
@@ -255,4 +232,4 @@ ROM_END
 *******************************************************************************/
 
 //   YEAR  NAME       PARENT  MACHINE    INPUT      CLASS           INIT        COMPANY, FULLNAME, FLAGS
-GAMEL( 1982, rtduplex, 0, nsmf8, nsmf8, nsmf8_state, empty_init, ROT0, "NSM", "Rotamint Duplex", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW, layout_rtduplex)
+GAMEL( 1981, rtduplex, 0, nsmf8, nsmf8, nsmf8_state, empty_init, ROT0, "NSM", "Rotamint Duplex", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK, layout_rtduplex)
