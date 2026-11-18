@@ -16,6 +16,11 @@
     memory reads of its own.  Every cycle of the core clock the
     highest-numbered thread that is able to run executes one instruction.
 
+    Only the core itself can set the program counters of threads 1 to 3,
+    so thread 0 gives each of them one and then enables it through the
+    chip's registers (Programming Guide, "Primary Core").  The known code
+    does that for thread 2 as well, and sends it to address zero.
+
     A kicker is a counter that the host, or a thread, adds to by writing
     one of the chip's implicit registers.  A thread that takes a kick from
     a kicker that has none sleeps until one is written, which is how the
@@ -41,8 +46,8 @@
 
     VideoLogic did not publish the instruction set.  What is known of the
     encoding was worked out from the microcode of the Neon 250 drivers and
-	the Gaelco games, so that only what this code uses is known. A thread
-	that meets anything else is stopped and the instruction is logged.
+    the Gaelco games, so that only what this code uses is known. A thread
+    that meets anything else is stopped and the instruction is logged.
 
     TODO:
     - How the processor is told the number of stores of a repeated store
@@ -51,9 +56,15 @@
       holds three less than the number.
     - What a jump does when thread 0 has not yet taken the one before is
       not known.
-    - Thread 0 should run the boot ROM from the reset vector when the chip
-      is reset.  The known boards have no such ROM, and their hosts hold
-      the core in reset until they have loaded its code.
+    - Instructions are fetched from the chip's own memory only.  A thread
+      whose program counter is outside the 64MB that the memory is in does
+      not run: neither the boot ROM, which thread 0 is sent to when the
+      chip is reset, nor memory of the host is reached.  The known boards
+      have no such ROM, and their hosts hold the core in reset until they
+      have loaded its code.
+    - The cycle counter is taken to count the cycles of the core clock
+      whether a thread runs or not.  The known code only stores it as a
+      time stamp.
 */
 
 #include "emu.h"
@@ -77,7 +88,9 @@ pmx1core_device::pmx1core_device(const machine_config &mconfig, const char *tag,
 	m_dac_feed_cb(*this),
 	m_dac_busy_cb(*this, 0),
 	m_reset_vector(0),
-	m_fb_offset(0)
+	m_fb_offset(0),
+	m_in_reset(false),
+	m_thread_enable{ false, false, false, false }
 {
 }
 
@@ -87,12 +100,12 @@ void pmx1core_device::device_start()
 	space(AS_PROGRAM).specific(m_program);
 
 	std::fill(std::begin(m_reg), std::end(m_reg), 0);
-	m_in_reset = false;
 	m_current = 0;
 
 	save_item(NAME(m_reset_vector));
 	save_item(NAME(m_fb_offset));
 	save_item(NAME(m_in_reset));
+	save_item(NAME(m_thread_enable));
 	save_item(NAME(m_reg));
 	save_item(STRUCT_MEMBER(m_thread, pc));
 	save_item(STRUCT_MEMBER(m_thread, jump_target));
@@ -106,7 +119,6 @@ void pmx1core_device::device_start()
 	save_item(STRUCT_MEMBER(m_thread, answer));
 	save_item(STRUCT_MEMBER(m_thread, flags));
 	save_item(STRUCT_MEMBER(m_thread, hold));
-	save_item(STRUCT_MEMBER(m_thread, enabled));
 	save_item(NAME(m_latch));
 	save_item(NAME(m_cycles));
 	save_item(NAME(m_current));
@@ -137,11 +149,9 @@ void pmx1core_device::device_reset()
 	for (thread_state &ts : m_thread)
 		ts = thread_state();
 
-	// there is no boot ROM for thread 0 to run: it stays where it is until the host has used the reset line
+	// thread 0 is sent to the reset vector, where the boot ROM is
 	m_thread[0].pc = m_reset_vector + 4;
-	m_thread[0].hold = HOLD_STOPPED;
 
-	m_in_reset = false;
 	m_latch = 0;
 	m_cycles = 0;
 }
@@ -215,7 +225,7 @@ void pmx1core_device::set_reset_vector(u32 vector)
 void pmx1core_device::set_thread_enable(u32 thread, bool enable)
 {
 	if (thread < THREADS)
-		m_thread[thread].enabled = enable;
+		m_thread_enable[thread] = enable;
 }
 
 void pmx1core_device::set_fb_offset(u8 offset)
@@ -374,6 +384,8 @@ bool pmx1core_device::send(u32 thread, u32 unit, u32 number, u32 value)
 			return jump(thread, value + 4);
 		m_thread[number].pc = value + 4;
 		m_thread[number].repeat = 0;
+		if (!in_memory(value + 4))
+			logerror("thread %u is sent to %08x, outside the chip's memory: it does not run from there\n", number, value + 4);
 		return true;
 	case 6:
 		return queue_read(m_thread[thread], value);
@@ -412,9 +424,11 @@ int pmx1core_device::runnable_thread() const
 {
 	if (!m_in_reset)
 	{
+		// FIXME: a thread that has its next instruction outside the 64MB of the chip's memory is passed over, as one that
+		// waits for memory which never answers.  What the chip fetches from there is not emulated.
 		for (int thread = THREADS - 1; thread >= 0; thread--)
 		{
-			if (m_thread[thread].enabled && (m_thread[thread].hold == HOLD_NONE))
+			if (m_thread_enable[thread] && (m_thread[thread].hold == HOLD_NONE) && in_memory(m_thread[thread].pc))
 				return thread;
 		}
 	}
@@ -428,7 +442,8 @@ void pmx1core_device::execute_run()
 		const int thread = runnable_thread();
 		if (thread < 0)
 		{
-			// nothing happens until the chip lets a thread run
+			// nothing happens until the chip lets a thread run, but the clock goes on
+			m_cycles += m_icount;
 			m_icount = 0;
 			break;
 		}
@@ -497,9 +512,15 @@ void pmx1core_device::step(u32 thread)
 	case outcome::DONE:
 		// a jump is taken once the instructions that it lets through are done
 		if (ts.jump_delay == 1)
+		{
 			ts.pc = ts.jump_target;
+			if (!in_memory(ts.pc))
+				logerror("thread %u jumps from %08x to %08x, outside the chip's memory: it does not run from there\n", thread, pc, ts.pc);
+		}
 		else
+		{
 			ts.pc += 4;
+		}
 		if (ts.jump_delay)
 			ts.jump_delay--;
 		break;

@@ -73,19 +73,6 @@ notes from DEMUL team
 
 Smashing Drive needs a working SH4 MMU emulation, ATV Track does not.
 
-Audio - is a simple buffered DAC.
-frequency is 32kHz
-data written by CPU to buffer have such meaning:
-offs 0 - s16 bass channel 0
-offs 2 - s16 bass channel 1
-offs 4 - s16 left channel
-offs 6 - s16 right channel
-and so on
-
-buffer is 2x32bytes
-then it becomes (I suppose half) empty - SH4 IRL5 IRQ generated
-
-
 "control registers" (Smashing Drive)
 0 - read - various statuses, returning -1 is OK
 write - enable slave CPU, gpu, etc most of bits is unclear
@@ -93,9 +80,9 @@ write - enable slave CPU, gpu, etc most of bits is unclear
 
 SH4 XTAL is 33MHz, SH4 MD0-2 pins is 001 or 011 (CPU core clk = XTAL*6, peripheral clk = XTAL, bus clk is XTAL or XTAL*2)
 
-The volume of Smashing Drive is one of the settings that it stores in the program flash, and the
-dumps have it at zero.  Nothing is heard before Volume Up is pressed, and the volume is lost
-again unless the settings are then saved, which the last screen of the test mode does.
+The volume of Smashing Drive is one of the settings that it stores in the program flash.  What
+the volume buttons change is lost again unless the settings are then saved, which the last
+screen of the test mode does.
 
 The DAC that feeds the motor boards is not identified.  The programs drive it as a TLC5620, and
 the filter boards have the four analog outputs that such a part would give.
@@ -161,23 +148,19 @@ protected:
 		, m_maincpu(*this, "maincpu")
 		, m_subcpu(*this, "subcpu")
 		, m_gpu(*this, "gpu")
-		, m_adc(*this, "adc")
-		, m_motor_dac(*this, "motordac")
 		, m_dac(*this, "dac%u", 0U)
 		, m_sharedmem(*this, "sharedmem")
 		, m_mainram(*this, "mainram")
 		, m_subram(*this, "subram")
 		, m_in(*this, "IN%u", 0U)
-		, m_analog(*this, "AN%u", 0U)
 		, m_lamps(*this, "lamp%u", 0U)
-		, m_motor(*this, "motor%u", 0U)
-		, m_motor_line(*this, "motor_line%u", 0U)
 	{ }
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void atvtrack_common(machine_config &config) ATTR_COLD;
+	template <typename T>
+	void atvtrack_common(machine_config &config, T &&cpu_type) ATTR_COLD;
 
 	void main_port(address_map &map) ATTR_COLD;
 	void sub_map(address_map &map) ATTR_COLD;
@@ -185,15 +168,12 @@ protected:
 	u32 control_r();
 	void control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void audio_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	virtual void serial_w(u8 data);
 	virtual void system_w(u8 data);
-	double adc_input_r(u8 input);
-	void motor_w(offs_t offset, u16 data);
 
-	required_device<sh7750s_device> m_maincpu;
-	required_device<sh7750s_device> m_subcpu;
+	required_device<sh4_base_device> m_maincpu;
+	required_device<sh4_base_device> m_subcpu;
 	required_device<powervr250_device> m_gpu;
-	optional_device<adc0834_device> m_adc;
-	optional_device<tlc5620_device> m_motor_dac;
 	required_device_array<dac_word_interface, 4> m_dac;
 	required_shared_ptr<u64> m_sharedmem;
 	required_shared_ptr<u64> m_mainram;
@@ -208,14 +188,19 @@ private:
 	void update_subcpu_reset();
 	void update_audio_irq();
 	TIMER_CALLBACK_MEMBER(audio_tick);
+	void gpu_irq_w(int state);
+	TIMER_CALLBACK_MEMBER(gpu_irq_taken);
+
+	// in cycles of the CPUs, six to a period of the 33MHz clock
+	static constexpr int IRL_RESPONSE_CYCLES = 5 + (7 * 3);
+	static constexpr int GPU_ACCESS_CYCLES = 6 * 6;
 
 	required_ioport_array<4> m_in;
-	required_ioport_array<4> m_analog;
 	output_finder<2> m_lamps;
-	output_finder<4> m_motor;
-	output_finder<3> m_motor_line;
 
 	emu_timer *m_audio_timer = nullptr;
+	emu_timer *m_gpu_irq_timer = nullptr;
+	memory_passthrough_handler m_gpu_access_tap;
 
 	u32 m_control = 0;
 	u16 m_porta = 0;
@@ -228,22 +213,20 @@ private:
 
 
 // REF. 020419 (ATV Track) and REF. 020201 (Gaelco Football): program in NAND flash
-class atvtrack_state : public atvtrack_base_state
+class nand_state : public atvtrack_base_state
 {
-public:
-	atvtrack_state(const machine_config &mconfig, device_type type, const char *tag)
+protected:
+	nand_state(const machine_config &mconfig, device_type type, const char *tag)
 		: atvtrack_base_state(mconfig, type, tag)
 		, m_nand(*this, "nand%u", 0U)
 		, m_fpga_config(*this, "fpga")
 	{ }
 
-	void atvtrack(machine_config &config) ATTR_COLD;
-
-protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	void nand_board(machine_config &config) ATTR_COLD;
+	template <typename T>
+	void nand_board(machine_config &config, T &&cpu_type) ATTR_COLD;
 
 private:
 	void main_map(address_map &map) ATTR_COLD;
@@ -255,12 +238,54 @@ private:
 };
 
 
-// REF. 020201 (Gaelco Football): the same board, with a filter board for two sets of controls and two ball sensor boards
-class gfootbal_state : public atvtrack_state
+// what the filter boards of ATV Track and Smashing Drive have: an ADC for the controls, and a DAC and three lines for the motor boards
+template <class Board>
+class driving_state : public Board
+{
+protected:
+	driving_state(const machine_config &mconfig, device_type type, const char *tag)
+		: Board(mconfig, type, tag)
+		, m_adc(*this, "adc")
+		, m_motor_dac(*this, "motordac")
+		, m_analog(*this, "AN%u", 0U)
+		, m_motor(*this, "motor%u", 0U)
+		, m_motor_line(*this, "motor_line%u", 0U)
+	{ }
+
+	void driving_controls(machine_config &config) ATTR_COLD;
+
+	virtual void serial_w(u8 data) override;
+
+private:
+	double adc_input_r(u8 input);
+	void motor_w(offs_t offset, u16 data);
+
+	required_device<adc0834_device> m_adc;
+	required_device<tlc5620_device> m_motor_dac;
+	required_ioport_array<4> m_analog;
+	output_finder<4> m_motor;
+	output_finder<3> m_motor_line;
+};
+
+
+// REF. 020419 (ATV Track)
+class atvtrack_state : public driving_state<nand_state>
+{
+public:
+	atvtrack_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driving_state<nand_state>(mconfig, type, tag)
+	{ }
+
+	void atvtrack(machine_config &config) ATTR_COLD;
+};
+
+
+// REF. 020201 (Gaelco Football): the same board but for the CPUs, with a filter board for two sets of controls and two ball sensor boards
+class gfootbal_state : public nand_state
 {
 public:
 	gfootbal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atvtrack_state(mconfig, type, tag)
+		: nand_state(mconfig, type, tag)
 		, m_ball_x(*this, "BALL%u_X", 1U)
 		, m_ball_y(*this, "BALL%u_Y", 1U)
 		, m_ball_z(*this, "BALL%u_Z", 1U)
@@ -295,11 +320,11 @@ private:
 
 
 // REF. 010131 (Smashing Drive): program in ROM and flash
-class smashdrv_state : public atvtrack_base_state
+class smashdrv_state : public driving_state<atvtrack_base_state>
 {
 public:
 	smashdrv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atvtrack_base_state(mconfig, type, tag)
+		: driving_state<atvtrack_base_state>(mconfig, type, tag)
 		, m_flash(*this, "prg")
 	{ }
 
@@ -360,9 +385,9 @@ void atvtrack_base_state::update_subcpu_reset()
                                            8 coin, 9 data from the ADC
     11101  e8xx  player 1 game switches
     11011  d8xx  player 2 game switches (Gaelco Football)
-    11111  f8xx  serial lines, outputs     3 data to the ADC, 4 data to the DAC, 5 clock of
-                                           the two, 6 ADC chip select, 7 DAC load, 10-8 to
-                                           the motor drivers
+    11111  f8xx  serial lines, outputs     ATV Track and Smashing Drive: 3 data to the ADC,
+                                           4 data to the DAC, 5 clock of the two, 6 ADC chip
+                                           select, 7 DAC load, 10-8 to the motor drivers
     01111  78xx  system outputs            3 coin counter, 4 first lamp, 5 second lamp,
                                            8 allows the second CPU to run
 
@@ -404,20 +429,7 @@ void atvtrack_base_state::porta_w(u32 data)
 		switch (BIT(pins, 11, 5))
 		{
 		case 0x1f:
-			if (m_adc)
-			{
-				m_adc->cs_write(BIT(pins, 6));
-				m_adc->clk_write(BIT(pins, 5));
-				m_adc->di_write(BIT(pins, 3));
-			}
-			if (m_motor_dac)
-			{
-				m_motor_dac->data_w(BIT(pins, 4));
-				m_motor_dac->clk_w(BIT(pins, 5));
-				m_motor_dac->load_w(BIT(pins, 7));
-				for (u32 i = 0; i < 3; i++)
-					m_motor_line[i] = BIT(pins, 8 + i);
-			}
+			serial_w(BIT(pins, 3, 8));
 			break;
 		case 0x0f:
 			system_w(BIT(pins, 3, 8));
@@ -440,6 +452,11 @@ void atvtrack_base_state::dma_request_w(u32 data)
 	LOGLINK("%s: DMA channel %u armed, request source %u\n", machine().describe_context(), data & 0xffff, data >> 16);
 }
 
+void atvtrack_base_state::serial_w(u8 data)
+{
+	// nothing is known to be on these lines of Gaelco Football's filter board
+}
+
 void atvtrack_base_state::system_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 0));
@@ -447,12 +464,28 @@ void atvtrack_base_state::system_w(u8 data)
 	m_lamps[1] = BIT(data, 2);
 }
 
-void atvtrack_base_state::motor_w(offs_t offset, u16 data)
+template <class Board>
+void driving_state<Board>::serial_w(u8 data)
+{
+	m_adc->cs_write(BIT(data, 3));
+	m_adc->clk_write(BIT(data, 2));
+	m_adc->di_write(BIT(data, 0));
+
+	m_motor_dac->data_w(BIT(data, 1));
+	m_motor_dac->clk_w(BIT(data, 2));
+	m_motor_dac->load_w(BIT(data, 4));
+	for (u32 i = 0; i < 3; i++)
+		m_motor_line[i] = BIT(data, 5 + i);
+}
+
+template <class Board>
+void driving_state<Board>::motor_w(offs_t offset, u16 data)
 {
 	m_motor[offset] = data;
 }
 
-double atvtrack_base_state::adc_input_r(u8 input)
+template <class Board>
+double driving_state<Board>::adc_input_r(u8 input)
 {
 	switch (input)
 	{
@@ -515,9 +548,63 @@ void atvtrack_base_state::update_audio_irq()
 }
 
 
+/*
+    The PowerVR 250 and the second CPU
+
+    The chip's interrupt goes to the IRL pins of the CPU as level 14, and its PCI bus is driven
+    by the FPGA, which makes PCI cycles of the cycles on the CPU's MPX bus.
+
+    The code that the games load into the chip starts a render and then looks for its end in
+    the interrupt status: every 600ns, or after as much as 920ns when its display thread comes
+    in between.  The CPU is interrupted by the same end and clears it in the status, and the
+    chip's code has to have looked by then.  On the board the CPU takes time over this that the
+    CPU core does not have:
+    - it responds to its IRL pins after 5 Icyc + 7 Bcyc (SH7750 hardware manual, table 19.9)
+    - its handler reads the interrupt mask and the status and writes the status, three cycles
+      on the bus
+
+    FIXME: both are made up for here, or the CPU is at the status in under 500ns.  The request
+    is held back by the response time.  For each access to the chip's registers the CPU is
+    charged six periods of the 33MHz clock: a PCI cycle with its turnaround and idle clocks
+    takes four at the least, and two are put on top for the passage through the FPGA, whose
+    timing is not known.  Accesses to the frame buffer are not charged.
+*/
+
+void atvtrack_base_state::gpu_irq_w(int state)
+{
+	if (state)
+	{
+		m_gpu_irq_timer->adjust(m_subcpu->cycles_to_attotime(IRL_RESPONSE_CYCLES));
+	}
+	else
+	{
+		m_gpu_irq_timer->adjust(attotime::never);
+		m_subcpu->sh4_set_irln_input(15);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(atvtrack_base_state::gpu_irq_taken)
+{
+	m_subcpu->sh4_set_irln_input(14);
+}
+
+
 void atvtrack_base_state::machine_start()
 {
 	m_audio_timer = timer_alloc(FUNC(atvtrack_base_state::audio_tick), this);
+	m_gpu_irq_timer = timer_alloc(FUNC(atvtrack_base_state::gpu_irq_taken), this);
+
+	m_gpu_access_tap = m_subcpu->space(AS_PROGRAM).install_readwrite_tap(
+			0x1400'0000, 0x1400'40ff, "gpu_access",
+			[this] (offs_t offset, u64 &data, u64 mem_mask)
+			{
+				if (!machine().side_effects_disabled())
+					m_subcpu->adjust_icount(-GPU_ACCESS_CYCLES);
+			},
+			[this] (offs_t offset, u64 &data, u64 mem_mask)
+			{
+				m_subcpu->adjust_icount(-GPU_ACCESS_CYCLES);
+			});
 
 	// let the recompiler get at the RAM without going through the memory system
 	m_maincpu->sh2drc_add_fastram(0x0c00'0000, 0x0c7f'ffff, false, m_mainram);
@@ -571,7 +658,7 @@ void get_altera10ke_eab(u8 *dst, u8 const *pof, int eab)
 	}
 }
 
-void atvtrack_state::machine_start()
+void nand_state::machine_start()
 {
 	atvtrack_base_state::machine_start();
 
@@ -655,7 +742,7 @@ bool gfootbal_state::ball_kicked(u32 which)
 
 void gfootbal_state::system_w(u8 data)
 {
-	atvtrack_state::system_w(data);
+	nand_state::system_w(data);
 
 	const bool clock = BIT(data, 7);
 	if (clock == m_ball_clock)
@@ -683,7 +770,7 @@ void gfootbal_state::system_w(u8 data)
 
 void gfootbal_state::machine_start()
 {
-	atvtrack_state::machine_start();
+	nand_state::machine_start();
 
 	save_item(NAME(m_ball_frame));
 	save_item(NAME(m_ball_data));
@@ -697,7 +784,7 @@ void gfootbal_state::machine_start()
 
 void gfootbal_state::machine_reset()
 {
-	atvtrack_state::machine_reset();
+	nand_state::machine_reset();
 
 	m_ball_frame[0] = m_ball_frame[1] = 0;
 	m_ball_data[0] = m_ball_data[1] = true;
@@ -709,7 +796,7 @@ void gfootbal_state::machine_reset()
 	m_ball_away[0] = m_ball_away[1] = false;
 }
 
-void atvtrack_state::machine_reset()
+void nand_state::machine_reset()
 {
 	atvtrack_base_state::machine_reset();
 
@@ -719,11 +806,11 @@ void atvtrack_state::machine_reset()
 }
 
 
-void atvtrack_state::main_map(address_map &map)
+void nand_state::main_map(address_map &map)
 {
 	map(0x0000'0000, 0x0000'03ff).ram().share(m_sharedmem);
-	map(0x0002'0000, 0x0002'0007).rw(FUNC(atvtrack_state::control_r), FUNC(atvtrack_state::control_w));
-	map(0x0002'0040, 0x0002'007f).w(FUNC(atvtrack_state::audio_w));
+	map(0x0002'0000, 0x0002'0007).rw(FUNC(nand_state::control_r), FUNC(nand_state::control_w));
+	map(0x0002'0040, 0x0002'007f).w(FUNC(nand_state::audio_w));
 	map(0x0c00'0000, 0x0c7f'ffff).mirror(0x0380'0000).ram().share(m_mainram);
 
 	// the 32 data lines are shared out among the four NAND flash chips, eight to each
@@ -765,7 +852,7 @@ void atvtrack_base_state::sub_map(address_map &map)
 {
 	map(0x0000'0000, 0x0000'03ff).ram().share(m_sharedmem);
 	map(0x0c00'0000, 0x0cff'ffff).mirror(0x0300'0000).ram().share(m_subram);
-	map(0x1400'0000, 0x1400'3fff).rw(m_gpu, FUNC(powervr250_device::register_r), FUNC(powervr250_device::register_w));
+	map(0x1400'0000, 0x1400'3fff).m(m_gpu, FUNC(powervr250_device::map));
 	map(0x1400'4000, 0x1400'40ff).rw(m_gpu, FUNC(powervr250_device::config_r), FUNC(powervr250_device::config_w));
 	map(0x1800'0000, 0x1bff'ffff).rw(m_gpu, FUNC(powervr250_device::fb_r), FUNC(powervr250_device::fb_w));
 }
@@ -779,8 +866,7 @@ static INPUT_PORTS_START( gaelco_sh4 )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc0834_device::do_read))
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -790,6 +876,13 @@ static INPUT_PORTS_START( gaelco_sh4 )
 
 	PORT_START("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( gaelco_driving )
+	PORT_INCLUDE( gaelco_sh4 )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("adc", FUNC(adc083x_device::do_read))
 
 	PORT_START("AN0")
 	PORT_BIT( 0xff, 0x80, IPT_UNUSED )
@@ -805,7 +898,7 @@ static INPUT_PORTS_START( gaelco_sh4 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( atvtrack )
-	PORT_INCLUDE( gaelco_sh4 )
+	PORT_INCLUDE( gaelco_driving )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -869,7 +962,7 @@ static INPUT_PORTS_START( gfootbal )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( smashdrv )
-	PORT_INCLUDE( gaelco_sh4 )
+	PORT_INCLUDE( gaelco_driving )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -883,11 +976,12 @@ static INPUT_PORTS_START( smashdrv )
 INPUT_PORTS_END
 
 
-void atvtrack_base_state::atvtrack_common(machine_config &config)
+template <typename T>
+void atvtrack_base_state::atvtrack_common(machine_config &config, T &&cpu_type)
 {
 	// MD2-0 put both CPUs in clock mode 3, in which they run at six times the frequency of the 33MHz crystal
 	auto const cpu_config =
-			[] (sh7750s_device &cpu)
+			[] (sh4_base_device &cpu)
 			{
 				cpu.set_md(0, 1);
 				cpu.set_md(1, 1);
@@ -901,11 +995,11 @@ void atvtrack_base_state::atvtrack_common(machine_config &config)
 				cpu.set_sh4_clock(33_MHz_XTAL * 6);
 			};
 
-	SH7750S(config, m_maincpu, 33_MHz_XTAL * 6);
+	cpu_type(config, m_maincpu, 33_MHz_XTAL * 6);
 	cpu_config(*m_maincpu);
 	m_maincpu->set_addrmap(AS_IO, &atvtrack_base_state::main_port);
 
-	SH7750S(config, m_subcpu, 33_MHz_XTAL * 6);
+	cpu_type(config, m_subcpu, 33_MHz_XTAL * 6);
 	cpu_config(*m_subcpu);
 	m_subcpu->set_addrmap(AS_PROGRAM, &atvtrack_base_state::sub_map);
 
@@ -919,7 +1013,7 @@ void atvtrack_base_state::atvtrack_common(machine_config &config)
 
 	POWERVR250(config, m_gpu, 14.318181_MHz_XTAL);
 	m_gpu->set_screen("screen");
-	m_gpu->irq_callback().set([this] (int state) { m_subcpu->sh4_set_irln_input(state ? 14 : 15); });
+	m_gpu->irq_callback().set(FUNC(atvtrack_base_state::gpu_irq_w));
 
 	// two stereo DACs; that both channels of the first go to the subwoofer is an assumption
 	SPEAKER(config, "speaker", 2).front();
@@ -930,44 +1024,47 @@ void atvtrack_base_state::atvtrack_common(machine_config &config)
 	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_dac[3]).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 }
 
-void atvtrack_state::nand_board(machine_config &config)
+template <typename T>
+void nand_state::nand_board(machine_config &config, T &&cpu_type)
 {
-	atvtrack_common(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &atvtrack_state::main_map);
+	atvtrack_common(config, cpu_type);
+	m_maincpu->set_addrmap(AS_PROGRAM, &nand_state::main_map);
 
 	for (auto &nand : m_nand)
 		SAMSUNG_K9F2808U0B(config, nand);
 }
 
+template <class Board>
+void driving_state<Board>::driving_controls(machine_config &config)
+{
+	ADC0834(config, m_adc);
+	m_adc->set_input_callback(FUNC(driving_state::adc_input_r));
+
+	TLC5620(config, m_motor_dac);
+	m_motor_dac->out_callback().set(FUNC(driving_state::motor_w));
+}
+
 void atvtrack_state::atvtrack(machine_config &config)
 {
-	nand_board(config);
+	nand_board(config, SH7750S);
 
-	ADC0834(config, m_adc);
-	m_adc->set_input_callback(FUNC(atvtrack_state::adc_input_r));
-
-	// channels 0 and 1 turn the motor of the handlebar, each in one direction; 2 is the left motor of the platform, 3 the right
-	TLC5620(config, m_motor_dac);
-	m_motor_dac->out_callback().set(FUNC(atvtrack_state::motor_w));
+	// DAC channels 0 and 1 turn the motor of the handlebar, each in one direction; 2 is the left motor of the platform, 3 the right
+	driving_controls(config);
 }
 
 void gfootbal_state::gfootbal(machine_config &config)
 {
-	nand_board(config);
+	nand_board(config, SH7750);
 }
 
 void smashdrv_state::smashdrv(machine_config &config)
 {
-	atvtrack_common(config);
+	atvtrack_common(config, SH7750S);
 	m_maincpu->set_addrmap(AS_PROGRAM, &smashdrv_state::main_map);
 	m_subcpu->set_addrmap(AS_PROGRAM, &smashdrv_state::sub_map);
 
-	ADC0834(config, m_adc);
-	m_adc->set_input_callback(FUNC(smashdrv_state::adc_input_r));
-
-	// channels 0 and 1 turn the motor of the wheel, each in one direction; 2 is the motor of the seat
-	TLC5620(config, m_motor_dac);
-	m_motor_dac->out_callback().set(FUNC(smashdrv_state::motor_w));
+	// DAC channels 0 and 1 turn the motor of the wheel, each in one direction; 2 is the motor of the seat
+	driving_controls(config);
 
 	// the program appends its settings and counters to the last two sectors with AMD's byte-wide commands; the type of the chip is not known
 	AMD_29F032(config, m_flash);
@@ -976,16 +1073,16 @@ void smashdrv_state::smashdrv(machine_config &config)
 
 ROM_START( atvtrack )
 	ROM_REGION( 0x1080000, "nand0", 0 )
-	ROM_LOAD( "15.bin", 0x0000000, 0x1080000, CRC(84eaede7) SHA1(6e6230165c3bb35e49c660dfd0d07c132ed89e6a) )
+	ROM_LOAD( "k9f2808u0b.ic15", 0x0000000, 0x1080000, CRC(84eaede7) SHA1(6e6230165c3bb35e49c660dfd0d07c132ed89e6a) )
 
 	ROM_REGION( 0x1080000, "nand1", 0 )
-	ROM_LOAD( "20.bin", 0x0000000, 0x1080000, CRC(649dc331) SHA1(0cac2d0c15dd564c7fdebdf4365422958f453d63) )
+	ROM_LOAD( "k9f2808u0b.ic20", 0x0000000, 0x1080000, CRC(649dc331) SHA1(0cac2d0c15dd564c7fdebdf4365422958f453d63) )
 
 	ROM_REGION( 0x1080000, "nand2", 0 )
-	ROM_LOAD( "14.bin", 0x0000000, 0x1080000, CRC(67983453) SHA1(05389a0ffc1a1bae9bac16a53a97d78b6eccc626) )
+	ROM_LOAD( "k9f2808u0b.ic14", 0x0000000, 0x1080000, CRC(67983453) SHA1(05389a0ffc1a1bae9bac16a53a97d78b6eccc626) )
 
 	ROM_REGION( 0x1080000, "nand3", 0 )
-	ROM_LOAD( "19.bin", 0x0000000, 0x1080000, CRC(9fc5c579) SHA1(8829329ef229564952aea2108ef1750dc226cbac) )
+	ROM_LOAD( "k9f2808u0b.ic19", 0x0000000, 0x1080000, CRC(9fc5c579) SHA1(8829329ef229564952aea2108ef1750dc226cbac) )
 
 	ROM_REGION( 0x20000, "fpga", ROMREGION_ERASEFF)
 	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga
@@ -1107,7 +1204,7 @@ ROM_START( smashdrv ) // World Version: 3.3, Version 3D: 1.9, Checksum: 707A
 	ROM_REGION( 0x0400000, "prg", 0 )
 	ROM_LOAD("prg_world.ic23", 0x0000000, 0x0400000, CRC(36d0328f) SHA1(22a8008a339168bc68e5a1cef413b8b465bb80e4) )
 
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION64_LE( 0x4000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
 	ROM_LOAD32_WORD("sdrb.ic14",    0x00000002, 0x01000000, CRC(39b76f0e) SHA1(529943b6075925e5f72c6e966796e04b2c33686c) )
 	ROM_LOAD(       "sdrc.ic20",    0x02000000, 0x01000000, CRC(c9021dd7) SHA1(1d08aab433614810af858a0fc5d7f03c7b782237) ) // in one piece, where the two above each hold one half of every 32-bit word
@@ -1118,7 +1215,7 @@ ROM_START( smashdrvs ) // Spain/Portugal Version: 3.3, Version 3D: 1.9, Checksum
 	ROM_REGION( 0x0400000, "prg", 0 )
 	ROM_LOAD("prg_spain.ic23", 0x0000000, 0x0400000, CRC(962a8055) SHA1(4f64536cb15bbfc9bc1a0d387e148b994a19f750) )
 
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION64_LE( 0x4000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
 	ROM_LOAD32_WORD("sdrb.ic14",    0x00000002, 0x01000000, CRC(39b76f0e) SHA1(529943b6075925e5f72c6e966796e04b2c33686c) )
 	ROM_LOAD(       "sdrc.ic20",    0x02000000, 0x01000000, CRC(c9021dd7) SHA1(1d08aab433614810af858a0fc5d7f03c7b782237) ) // in one piece, where the two above each hold one half of every 32-bit word
@@ -1129,7 +1226,7 @@ ROM_START( smashdrvb ) // UK Version: 3.3, Version 3D: 1.9, Checksum: 707C
 	ROM_REGION( 0x0400000, "prg", 0 )
 	ROM_LOAD("prg.ic23", 0x0000000, 0x0400000, CRC(ac54517a) SHA1(fe53aa4022fdd7f8de786c860b8e4e97e2f44378) )
 
-	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
+	ROM_REGION64_LE( 0x4000000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
 	ROM_LOAD32_WORD("sdrb.ic14",    0x00000002, 0x01000000, CRC(39b76f0e) SHA1(529943b6075925e5f72c6e966796e04b2c33686c) )
 	ROM_LOAD(       "sdrc.ic20",    0x02000000, 0x01000000, CRC(c9021dd7) SHA1(1d08aab433614810af858a0fc5d7f03c7b782237) ) // in one piece, where the two above each hold one half of every 32-bit word

@@ -5,8 +5,8 @@
 
     VideoLogic did not publish the instruction set of the primary core, and
     no assembler syntax for it is known.  The encoding is known as far as
-    it has been worked out from the microcode of the Neon 250 drivers and the 
-	Gaelco games; the syntax here is made up.
+    it has been worked out from the microcode of the Neon 250 drivers and the
+    Gaelco games; the syntax here is made up.
 
     Registers
       da0-da31, db0-db31    the two banks of data registers (units 1 and 2)

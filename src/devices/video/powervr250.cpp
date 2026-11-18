@@ -34,11 +34,10 @@
     - bus mastering: only the chip's own memory is reached
     - DAC feed: scaler, colour space conversion, lookup table, slave
       stream, cursor, line compare interrupt, sync polarities
-    - register writes from the host should be synchronised with the core
     - a render is drawn while the machine runs on, and waited for when the
       host, the primary core or the display touch the memory it uses; reads
       by the primary core of pixels that are still being drawn do not wait
-    - the 3D core is that of the CLX2, which video/powervr2.cpp emulates
+    - the 3D core is that of the CLX2, which sega/powervr2.cpp emulates
       for the Dreamcast with a renderer of its own: the two should share
       what reads the parameters and textures
 
@@ -299,7 +298,6 @@ powervr250_device::powervr250_device(const machine_config &mconfig, const char *
 	, m_index_low(0)
 	, m_index_low_held(false)
 	, m_irq_level(false)
-	, m_render_end_unseen(false)
 	, m_fb_mapped(0xff)
 	, m_ta_setup(0)
 	, m_ta_clip(0)
@@ -330,8 +328,8 @@ powervr250_device::~powervr250_device()
 void powervr250_device::device_add_mconfig(machine_config &config)
 {
 	PMX1CORE(config, m_core, DERIVED_CLOCK(1, 1));
-	m_core->implicit_read().set(FUNC(powervr250_device::core_implicit_r));
-	m_core->implicit_write().set(FUNC(powervr250_device::core_implicit_w));
+	m_core->implicit_read().set(FUNC(powervr250_device::implicit_r));
+	m_core->implicit_write().set(FUNC(powervr250_device::implicit_w));
 	m_core->ta_instruction().set(FUNC(powervr250_device::ta_instruction_w));
 	m_core->ta_status().set(FUNC(powervr250_device::ta_status_r));
 	m_core->dac_feed().set(FUNC(powervr250_device::dac_feed_w));
@@ -340,8 +338,8 @@ void powervr250_device::device_add_mconfig(machine_config &config)
 
 void powervr250_device::device_start()
 {
-	if (!m_vram_size || (m_vram_size & (m_vram_size - 1)))
-		throw emu_fatalerror("%s: memory of %u bytes, it has to be a power of two", tag(), m_vram_size);
+	if ((m_vram_size != 8 * 1024 * 1024) && (m_vram_size != 16 * 1024 * 1024) && (m_vram_size != 32 * 1024 * 1024))
+		throw emu_fatalerror("%s: memory of %u bytes, the chip takes 8, 16 or 32MB", tag(), m_vram_size);
 
 	m_vram = make_unique_clear<u32 []>(m_vram_size / 4);
 	m_page_written = make_unique_clear<u32 []>(m_vram_size >> PAGE_SHIFT);
@@ -368,7 +366,6 @@ void powervr250_device::device_start()
 	save_item(NAME(m_war));
 	save_item(NAME(m_rar));
 	save_item(NAME(m_regs3d));
-	save_item(NAME(m_render_end_unseen));
 	save_item(NAME(m_index_low));
 	save_item(NAME(m_index_low_held));
 	save_item(NAME(m_irq_level));
@@ -456,9 +453,15 @@ void powervr250_device::device_reset()
 	std::fill(std::begin(m_regs3d), std::end(m_regs3d), 0);
 	m_index_low = 0;
 	m_index_low_held = false;
-	m_render_end_unseen = false;
 	update_irq();
 	map_frame_buffer();
+
+	// what the registers tell the primary core
+	m_core->set_reset_vector((u32(m_implicit[REG_RESET_VECTOR_HI]) << 16) | m_implicit[REG_RESET_VECTOR_LO]);
+	m_core->set_fb_offset(m_implicit[REG_FB_OFFSET] & 0x3f);
+	for (u32 thread = 0; thread < pmx1core_device::THREADS; thread++)
+		m_core->set_thread_enable(thread, BIT(m_implicit[REG_THREAD_ENABLE + thread], 0));
+	m_core->core_reset_w(BIT(m_implicit[REG_SOFTWARE_RESET], 2));
 
 	std::fill(std::begin(m_ta_list_page), std::end(m_ta_list_page), 0);
 	m_ta_setup = 0;
@@ -488,15 +491,6 @@ void powervr250_device::device_reset()
 	m_dac_feeding_count = 0;
 	m_dac_showing_count = 0;
 	m_dac_timer->adjust(attotime::never);
-}
-
-void powervr250_device::device_reset_after_children()
-{
-	// what the primary core is told by registers here
-	m_core->set_reset_vector((u32(m_implicit[REG_RESET_VECTOR_HI]) << 16) | m_implicit[REG_RESET_VECTOR_LO]);
-	m_core->set_fb_offset(m_implicit[REG_FB_OFFSET] & 0x3f);
-	for (u32 thread = 0; thread < pmx1core_device::THREADS; thread++)
-		m_core->set_thread_enable(thread, BIT(m_implicit[REG_THREAD_ENABLE + thread], 0));
 }
 
 void powervr250_device::device_post_load()
@@ -574,101 +568,82 @@ void powervr250_device::config_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 }
 
-u32 powervr250_device::register_r(offs_t offset)
+void powervr250_device::map(address_map &map)
 {
-	switch (offset * 4)
+	// the immediate registers but for the access registers are implicit registers too, 16 bits in a word of 32
+	map(0x000, 0x00f).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_THREAD_ENABLE>), FUNC(powervr250_device::immediate_w<REG_THREAD_ENABLE>));
+	map(0x020, 0x02f).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_THREAD_RECOVER>), FUNC(powervr250_device::immediate_w<REG_THREAD_RECOVER>));
+	map(0x040, 0x043).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_RESET_VECTOR_LO>), FUNC(powervr250_device::immediate_w<REG_RESET_VECTOR_LO>));
+	map(0x044, 0x047).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_RESET_VECTOR_HI>), FUNC(powervr250_device::immediate_w<REG_RESET_VECTOR_HI>));
+	map(0x048, 0x04b).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_SOFT_INTERRUPT>), FUNC(powervr250_device::immediate_w<REG_SOFT_INTERRUPT>));
+	map(0x04c, 0x04f).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_VIDEO_CLOCK_DIV>), FUNC(powervr250_device::immediate_w<REG_VIDEO_CLOCK_DIV>));
+	map(0x050, 0x053).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_IIC_A>), FUNC(powervr250_device::immediate_w<REG_IIC_A>));
+	map(0x054, 0x057).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_IIC_B>), FUNC(powervr250_device::immediate_w<REG_IIC_B>));
+	map(0x060, 0x063).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_DAC_LINE_COMPARE>), FUNC(powervr250_device::immediate_w<REG_DAC_LINE_COMPARE>));
+	map(0x064, 0x067).umask32(0x0000'ffff).r(FUNC(powervr250_device::immediate_r<REG_DAC_LINE_COUNT>));
+	map(0x070, 0x073).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_INTERRUPT_STATUS>), FUNC(powervr250_device::immediate_w<REG_INTERRUPT_STATUS>));
+	map(0x074, 0x077).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_INTERRUPT_MASK>), FUNC(powervr250_device::immediate_w<REG_INTERRUPT_MASK>));
+	map(0x080, 0x083).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_DAC_PLL0>), FUNC(powervr250_device::immediate_w<REG_DAC_PLL0>));
+	map(0x084, 0x087).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_DAC_PLL1>), FUNC(powervr250_device::immediate_w<REG_DAC_PLL1>));
+	map(0x0a0, 0x0a3).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_VGA_PAGE>), FUNC(powervr250_device::immediate_w<REG_VGA_PAGE>));
+	map(0x0a4, 0x0a7).umask32(0x0000'ffff).rw(FUNC(powervr250_device::immediate_r<REG_SOFTWARE_RESET>), FUNC(powervr250_device::immediate_w<REG_SOFTWARE_RESET>));
+	map(0x0b0, 0x0bf).umask32(0x0000'ffff).w(FUNC(powervr250_device::immediate_w<REG_THREAD_KICKER>));
+
+	// the write access register and the two read access registers
+	map(0x0c0, 0x0c3).lr32(NAME([this] () -> u32 { return m_war; })).w(FUNC(powervr250_device::write_access_w));
+	map(0x0c4, 0x0c7).lr32(NAME([this] () -> u32 { return m_rar[1]; }));
+	map(0x0c8, 0x0cb).lr32(NAME([this] () -> u32 { return m_rar[0]; }));
+}
+
+template <u16 Reg>
+u16 powervr250_device::immediate_r(offs_t offset)
+{
+	return implicit_r(Reg + offset);
+}
+
+template <u16 Reg>
+void powervr250_device::immediate_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	host_implicit_w(Reg + offset, data, mem_mask);
+}
+
+void powervr250_device::write_access_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// IA_RW, bits 31-30 of the write access register, is 0 to read and 1 to write the implicit register whose address is in
+	// 25-16.  A write takes its data from 15-0; what is read turns up in the read access register that IA_ROUTE, 29-26, names
+	COMBINE_DATA(&m_war);
+	switch (BIT(m_war, 30, 2))
 	{
-	case 0x000: case 0x004: case 0x008: case 0x00c:
-		return implicit_r(REG_THREAD_ENABLE + offset);
-	case 0x020: case 0x024: case 0x028: case 0x02c:
-		return implicit_r(REG_THREAD_RECOVER + offset - (0x020 / 4));
-	case 0x040: return implicit_r(REG_RESET_VECTOR_LO);
-	case 0x044: return implicit_r(REG_RESET_VECTOR_HI);
-	case 0x048: return implicit_r(REG_SOFT_INTERRUPT);
-	case 0x04c: return implicit_r(REG_VIDEO_CLOCK_DIV);
-	case 0x050: return implicit_r(REG_IIC_A);
-	case 0x054: return implicit_r(REG_IIC_B);
-	case 0x060: return implicit_r(REG_DAC_LINE_COMPARE);
-	case 0x064: return implicit_r(REG_DAC_LINE_COUNT);
-	case 0x070: return implicit_r(REG_INTERRUPT_STATUS);
-	case 0x074: return implicit_r(REG_INTERRUPT_MASK);
-	case 0x080: return implicit_r(REG_DAC_PLL0);
-	case 0x084: return implicit_r(REG_DAC_PLL1);
-	case 0x0a0: return implicit_r(REG_VGA_PAGE);
-	case 0x0a4: return implicit_r(REG_SOFTWARE_RESET);
-	case 0x0c0: return m_war;
-	case 0x0c4: return m_rar[1];
-	case 0x0c8: return m_rar[0];
+	case 0:
+		if (BIT(m_war, 26, 4) == 0x1)
+			m_rar[0] = (m_war & 0xffff'0000) | implicit_r(BIT(m_war, 16, 10));
+		else if (BIT(m_war, 26, 4) == 0x9)
+			m_rar[1] = (m_war & 0xffff'0000) | implicit_r(BIT(m_war, 16, 10));
+		else
+			logerror("%s: write access register %08x, unknown route\n", machine().describe_context(), m_war);
+		break;
+	case 1:
+		host_implicit_w(BIT(m_war, 16, 10), m_war & 0xffff, 0xffff);
+		break;
 	default:
-		if (!machine().side_effects_disabled())
-			logerror("%s: read of immediate register %03x\n", machine().describe_context(), offset * 4);
-		return 0;
+		logerror("%s: write access register %08x, neither read nor write\n", machine().describe_context(), m_war);
+		break;
 	}
 }
 
-void powervr250_device::register_w(offs_t offset, u32 data, u32 mem_mask)
+void powervr250_device::host_implicit_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	// the registers but for the write access register are 16 bits wide
-	if ((offset * 4) != 0x0c0)
-	{
-		if (!ACCESSING_BITS_0_15)
-			return;
-		if ((mem_mask & 0xffff) != 0xffff)
-			data = (register_r(offset) & ~mem_mask) | (data & mem_mask);
-	}
+	// the primary core has a clock of its own, and reads and writes these registers too: a write by the host is made
+	// when the core has got as far in time as the host has
+	LOGMASKED(LOG_IMPLICIT, "%s: host writes implicit register %03x = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
+	machine().scheduler().synchronize(
+			timer_expired_delegate(FUNC(powervr250_device::host_implicit_sync), this),
+			(ACCESSING_BITS_8_15 ? 0x0800'0000 : 0) | (ACCESSING_BITS_0_7 ? 0x0400'0000 : 0) | ((offset & 0x3ff) << 16) | data);
+}
 
-	switch (offset * 4)
-	{
-	case 0x000: case 0x004: case 0x008: case 0x00c:
-		implicit_w(REG_THREAD_ENABLE + offset, data);
-		break;
-	case 0x020: case 0x024: case 0x028: case 0x02c:
-		implicit_w(REG_THREAD_RECOVER + offset - (0x020 / 4), data);
-		break;
-	case 0x040: implicit_w(REG_RESET_VECTOR_LO, data); break;
-	case 0x044: implicit_w(REG_RESET_VECTOR_HI, data); break;
-	case 0x048: implicit_w(REG_SOFT_INTERRUPT, data); break;
-	case 0x04c: implicit_w(REG_VIDEO_CLOCK_DIV, data); break;
-	case 0x050: implicit_w(REG_IIC_A, data); break;
-	case 0x054: implicit_w(REG_IIC_B, data); break;
-	case 0x060: implicit_w(REG_DAC_LINE_COMPARE, data); break;
-	case 0x070: implicit_w(REG_INTERRUPT_STATUS, data); break;
-	case 0x074: implicit_w(REG_INTERRUPT_MASK, data); break;
-	case 0x080: implicit_w(REG_DAC_PLL0, data); break;
-	case 0x084: implicit_w(REG_DAC_PLL1, data); break;
-	case 0x0a0: implicit_w(REG_VGA_PAGE, data); break;
-	case 0x0a4: implicit_w(REG_SOFTWARE_RESET, data); break;
-	case 0x0b0: case 0x0b4: case 0x0b8: case 0x0bc:
-		implicit_w(REG_THREAD_KICKER + offset - (0x0b0 / 4), data);
-		break;
-
-	case 0x0c0:
-		// IA_RW, bits 31-30 of the write access register, is 0 to read and 1 to write the implicit register whose address is in
-		// 25-16.  A write takes its data from 15-0; what is read turns up in the read access register that IA_ROUTE, 29-26, names
-		COMBINE_DATA(&m_war);
-		switch (BIT(m_war, 30, 2))
-		{
-		case 0:
-			if (BIT(m_war, 26, 4) == 0x1)
-				m_rar[0] = (m_war & 0xffff'0000) | implicit_r(BIT(m_war, 16, 10));
-			else if (BIT(m_war, 26, 4) == 0x9)
-				m_rar[1] = (m_war & 0xffff'0000) | implicit_r(BIT(m_war, 16, 10));
-			else
-				logerror("%s: write access register %08x, unknown route\n", machine().describe_context(), m_war);
-			break;
-		case 1:
-			implicit_w(BIT(m_war, 16, 10), m_war & 0xffff);
-			break;
-		default:
-			logerror("%s: write access register %08x, neither read nor write\n", machine().describe_context(), m_war);
-			break;
-		}
-		break;
-
-	default:
-		logerror("%s: write of immediate register %03x = %08x\n", machine().describe_context(), offset * 4, data);
-		break;
-	}
+TIMER_CALLBACK_MEMBER(powervr250_device::host_implicit_sync)
+{
+	implicit_w(BIT(param, 16, 10), param & 0xffff, (BIT(param, 27) ? 0xff00 : 0) | (BIT(param, 26) ? 0x00ff : 0));
 }
 
 u32 powervr250_device::fb_r(offs_t offset)
@@ -695,31 +670,6 @@ void powervr250_device::fb_w(offs_t offset, u32 data, u32 mem_mask)
 //**************************************************************************
 //  implicit registers
 //**************************************************************************
-
-u16 powervr250_device::core_implicit_r(offs_t offset)
-{
-	// FIXME: the end of a render is remembered a second time, for the primary core alone.  The known code for the core
-	// starts a render and then reads the interrupt status over and over until the end shows, and the host, which the same
-	// end interrupts, clears the bit in its handler.  On the chip the core has read the status long before the host gets
-	// that far.  Here the host is not kept in step with the core and can be the first of the two, so the core is given the
-	// bit on its next read of the status, once, whether the host has cleared it or not.  The host's register writes ought
-	// to go through the scheduler, which would make this unnecessary.
-	u16 data = implicit_r(offset);
-	if ((offset & 0x3ff) == REG_INTERRUPT_STATUS && !machine().side_effects_disabled())
-	{
-		if (m_render_end_unseen)
-			data |= IRQ_PVR | IRQ_MASTER;
-		m_render_end_unseen = false;
-	}
-	return data;
-}
-
-void powervr250_device::core_implicit_w(offs_t offset, u16 data)
-{
-	if ((offset & 0x3ff) == REG_INTERRUPT_STATUS && (data & IRQ_PVR))
-		m_render_end_unseen = false;
-	implicit_w(offset, data);
-}
 
 void powervr250_device::update_irq()
 {
@@ -824,33 +774,35 @@ u16 powervr250_device::implicit_r(offs_t offset)
 	}
 }
 
-void powervr250_device::implicit_w(offs_t offset, u16 data)
+void powervr250_device::implicit_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	offset &= 0x3ff;
+	LOGMASKED(LOG_IMPLICIT, "%s: implicit register %03x = %04x & %04x\n", machine().describe_context(), offset, data, mem_mask);
+
+	// a register that holds what is written keeps the half that a write leaves out
 	const u16 before = m_implicit[offset];
-	LOGMASKED(LOG_IMPLICIT, "%s: implicit register %03x = %04x\n", machine().describe_context(), offset, data);
+	const u16 after = (before & ~mem_mask) | (data & mem_mask);
+	data &= mem_mask;
 
 	switch (offset)
 	{
 	case REG_THREAD_ENABLE: case REG_THREAD_ENABLE + 1: case REG_THREAD_ENABLE + 2: case REG_THREAD_ENABLE + 3:
-		m_implicit[offset] = data & 1;
-		// FIXME: the core is not told of the enable of thread 2: the known code sets it, but nowhere gives that thread a place to start
-		if (offset != REG_THREAD_ENABLE + 2)
-			m_core->set_thread_enable(offset - REG_THREAD_ENABLE, BIT(data, 0));
+		m_implicit[offset] = after & 1;
+		m_core->set_thread_enable(offset - REG_THREAD_ENABLE, BIT(after, 0));
 		break;
 
 	case REG_RESET_VECTOR_LO:
 	case REG_RESET_VECTOR_HI:
-		m_implicit[offset] = data;
+		m_implicit[offset] = after;
 		m_core->set_reset_vector((u32(m_implicit[REG_RESET_VECTOR_HI]) << 16) | m_implicit[REG_RESET_VECTOR_LO]);
 		break;
 
 	case REG_SOFT_INTERRUPT:
 		// bits 3-0 are the sources of bits 11-8 of the interrupt status, taken as the others are on their rising edge
 		// (Programming Guide, "Primary Core Soft Interrupt")
-		m_implicit[offset] = data;
-		if (data & ~before & 0x000f)
-			set_irq((data & ~before & 0x000f) << 8);
+		m_implicit[offset] = after;
+		if (after & ~before & 0x000f)
+			set_irq((after & ~before & 0x000f) << 8);
 		break;
 
 	case REG_THREAD_KICKER: case REG_THREAD_KICKER + 1: case REG_THREAD_KICKER + 2: case REG_THREAD_KICKER + 3:
@@ -859,48 +811,49 @@ void powervr250_device::implicit_w(offs_t offset, u16 data)
 
 	case REG_INDEX_ADDRESS:
 		// the first half of a value in two packets is lost when its second half has not come
-		m_implicit[offset] = data;
+		m_implicit[offset] = after;
 		m_index_low_held = false;
 		break;
 
 	case REG_INDEX_DATA:
-		m_implicit[offset] = data;
-		index_data_w(data);
+		m_implicit[offset] = after;
+		index_data_w(after);
 		break;
 
 	case REG_DAC_PLL1:
 		// a write here gives the PLL its setting: what DAC PLL 0 holds, with DACPLL_S1 and DACPLL_MB above it
-		m_implicit[offset] = data;
-		m_dac_pll = (BIT(data, 0, 2) << 16) | m_implicit[REG_DAC_PLL0];
+		m_implicit[offset] = after;
+		m_dac_pll = (BIT(after, 0, 2) << 16) | m_implicit[REG_DAC_PLL0];
 		break;
 
 	case REG_INTERRUPT_STATUS:
+		// a bit is cleared by writing a 1 to it
 		m_implicit[offset] &= ~data;
 		update_irq();
 		break;
 
 	case REG_INTERRUPT_MASK:
-		m_implicit[offset] = data;
+		m_implicit[offset] = after;
 		update_irq();
 		break;
 
 	case REG_SOFTWARE_RESET:
 		// C1_RST, bit 2, holds the primary core in reset while it is 0.  What was clocked into the core PLL's registers has
 		// no effect until a reset from this register (Programming Guide, "CORE PLL Control"): the core takes it as it is let go
-		m_implicit[offset] = data;
-		if (BIT(data, 2) && !BIT(before, 2))
+		m_implicit[offset] = after;
+		if (BIT(after, 2) && !BIT(before, 2))
 			m_core->set_unscaled_clock(core_frequency());
-		m_core->core_reset_w(BIT(data, 2));
+		m_core->core_reset_w(BIT(after, 2));
 		break;
 
 	case REG_FB_OFFSET:
-		m_implicit[offset] = data;
-		m_core->set_fb_offset(data & 0x3f);
+		m_implicit[offset] = after;
+		m_core->set_fb_offset(after & 0x3f);
 		map_frame_buffer();
 		break;
 
 	default:
-		m_implicit[offset] = data;
+		m_implicit[offset] = after;
 		break;
 	}
 }
@@ -942,7 +895,6 @@ void powervr250_device::index_data_w(u16 data)
 
 TIMER_CALLBACK_MEMBER(powervr250_device::render_done)
 {
-	m_render_end_unseen = true;
 	set_irq(IRQ_PVR);
 }
 
@@ -1711,7 +1663,9 @@ s32 powervr250_device::renderer::find_strip(u32 pointer)
 	strip result;
 	result.surface = m_surfaces.size();
 	result.vertices = address + 4 * words;
-	result.size = BIT(pointer, 21, 3) * (two_volumes ? 2 : 1) + 3;
+
+	// the skip field leaves out the Z that goes before 1/W when the ISP sorts by Z, as the tile accelerator has it too
+	result.size = 3 + (m_zsort ? 1 : 0) + BIT(pointer, 21, 3) * (two_volumes ? 2 : 1);
 	std::fill(std::begin(result.triangle), std::end(result.triangle), -2);
 	m_surfaces.push_back(make_surface(control[0], control[1], control[2]));
 	m_strips.push_back(result);

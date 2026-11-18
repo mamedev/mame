@@ -27,11 +27,10 @@ public:
 	void set_vram_size(u32 bytes) { m_vram_size = bytes; }
 	auto irq_callback() { return m_irq_cb.bind(); }
 
-	// host bus: PCI configuration space, immediate registers and frame buffer
+	// host bus: immediate registers, PCI configuration space and frame buffer
+	void map(address_map &map) ATTR_COLD;
 	u32 config_r(offs_t offset);
 	void config_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	u32 register_r(offs_t offset);
-	void register_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 fb_r(offs_t offset);
 	void fb_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
@@ -42,7 +41,6 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_reset_after_children() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 
 private:
@@ -169,10 +167,13 @@ private:
 	static constexpr u32 MAX_SPANS = 64;
 	static constexpr u32 PAGE_SHIFT = 12;
 
+	template <u16 Reg> u16 immediate_r(offs_t offset);
+	template <u16 Reg> void immediate_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void write_access_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	void host_implicit_w(offs_t offset, u16 data, u16 mem_mask);
+	TIMER_CALLBACK_MEMBER(host_implicit_sync);
 	u16 implicit_r(offs_t offset);
-	void implicit_w(offs_t offset, u16 data);
-	u16 core_implicit_r(offs_t offset);
-	void core_implicit_w(offs_t offset, u16 data);
+	void implicit_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void index_data_w(u16 data);
 	void ta_instruction_w(u64 data);
 	u64 ta_status_r();
@@ -224,7 +225,6 @@ private:
 	u16 m_index_low;            // first half of a value that comes through the index data register in two
 	bool m_index_low_held;
 	bool m_irq_level;           // of the line to the host
-	bool m_render_end_unseen;   // by the primary core, FIXME: see core_implicit_r
 	u8 m_fb_mapped;
 
 	// tile accelerator: what the instructions gave it

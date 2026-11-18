@@ -112,7 +112,6 @@ private:
 		u32 answer = 0;                 // from the last read of an implicit register
 		u8 flags = 0;
 		u8 hold = HOLD_NONE;
-		bool enabled = false;
 	};
 
 	static bool has_register(u32 unit, u32 number) { return (unit >= 1) && (unit <= 4) && (number < UNIT_SIZE[unit]); }
@@ -123,13 +122,15 @@ private:
 	static u32 compute(u32 operation, u32 a, u32 b);
 	static u8 flags_after(u32 operation, u32 a, u32 b, u32 result, u8 flags);
 
+	static u32 fetch_address(u32 pc) { return pc & 0xffff'fffc; }
+	static u32 jump_origin(u32 thread, u32 pc) { return thread ? pc : (pc + 16); }
+	static u64 take_read(thread_state &ts);
+
 	u32 &reg(u32 unit, u32 number) { return m_reg[UNIT_FIRST[unit] + number]; }
-	u32 fetch_address(u32 pc) const { return (pc & 0x03ff'fffc) | (u32(m_fb_offset) << 26); }
-	u32 jump_origin(u32 thread, u32 pc) const { return thread ? pc : (pc + 16); }
+	bool in_memory(u32 address) const { return (address >> 26) == m_fb_offset; }
 	bool jump(u32 thread, u32 target);
 	bool send(u32 thread, u32 unit, u32 number, u32 value);
 	bool queue_read(thread_state &ts, u32 address);
-	u64 take_read(thread_state &ts);
 
 	int runnable_thread() const;
 	void step(u32 thread);
@@ -158,6 +159,7 @@ private:
 	u32 m_reset_vector;
 	u8 m_fb_offset;
 	bool m_in_reset;
+	bool m_thread_enable[THREADS];
 
 	u32 m_reg[REGISTERS];
 	thread_state m_thread[THREADS];
