@@ -110,6 +110,6 @@ ROM_END
 
 } // anonymous namespace
 
-GAME( 2002, voyager,  0,       voyager, 0, voyager_state, empty_init, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2002, voyagers, voyager, voyager, 0, voyager_state, empty_init, ROT0, "Team Play/Game Refuge/Monaco Entertainment", "Star Trek: Voyager (stand-up version 1.002)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
-GAME( 2003, policet2, 0,       voyager, 0, voyager_state, empty_init, ROT0, "Team Play/Phantom Entertainment", "Police Trainer 2", MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
+GAME( 2002, voyager,  0,       voyager, 0, voyager_state, empty_init, ROT0, "Team Play / Game Refuge / Monaco Entertainment", "Star Trek: Voyager",                          MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2002, voyagers, voyager, voyager, 0, voyager_state, empty_init, ROT0, "Team Play / Game Refuge / Monaco Entertainment", "Star Trek: Voyager (stand-up version 1.002)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 2003, policet2, 0,       voyager, 0, voyager_state, empty_init, ROT0, "Team Play / Phantom Entertainment",              "Police Trainer 2",                            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

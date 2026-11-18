@@ -127,4 +127,4 @@ void speeddrv_state::init_speeddrv()
 
 
 GAME( 2004, speeddrv, 0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "Speed Driver",          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, eztouch,  0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "EZ Touch (v116 China)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2002, eztouch,  0, speeddrv, speeddrv, speeddrv_state, init_speeddrv, ROT0, "IGS", "EZ Touch (v116 China)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
