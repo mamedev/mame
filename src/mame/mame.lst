@@ -44145,6 +44145,7 @@ ep804
 
 @source:skeleton/digijet.cpp
 digijet
+digijet90
 
 @source:skeleton/digilog320.cpp
 digilog320
