@@ -84,6 +84,9 @@
 
 #define OSDOPTION_NETWORK_PROVIDER      "networkprovider"
 
+#define OSDOPTION_OUTPUT_SERIAL_PORT    "output_serial_port"
+#define OSDOPTION_OUTPUT_SERIAL_BAUD    "output_serial_baud"
+
 #define OSDOPTION_BGFX_PATH             "bgfx_path"
 #define OSDOPTION_BGFX_BACKEND          "bgfx_backend"
 #define OSDOPTION_BGFX_DEBUG            "bgfx_debug"
