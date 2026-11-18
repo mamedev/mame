@@ -39,7 +39,7 @@ public:
 	f2mc16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	bool rmw() { return m_rmw; }
-	void set_irq_level(int level);
+	void set_irq_level(u8 level);
 
 protected:
 	f2mc16_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -71,7 +71,7 @@ private:
 	u32 m_pcbase, m_acc, m_temp, m_tmp32, m_tmpea;
 	s32 m_icount;
 	bool m_prefix_valid;
-	u16 m_irq_level;
+	u8 m_irq_level;
 	bool m_rmw;
 
 	inline u8 read_8(u32 addr)
@@ -102,12 +102,12 @@ private:
 	}
 	inline void write_8(u32 addr, u8 data)
 	{
-//      printf("write %02x to %08x\n", data, addr);
+		//printf("write %02x to %08x\n", data, addr);
 		m_program->write_byte(addr, data);
 	}
 	inline void write_16(u32 addr, u16 data)
 	{
-//      printf("write %04x to %08x\n", data, addr);
+		//printf("write %04x to %08x\n", data, addr);
 		if (addr & 1)
 		{
 			m_program->write_byte(addr, data & 0xff);
@@ -625,7 +625,7 @@ private:
 		if (read_rwX(0) > 0)
 		{
 			m_icount -= 4;
-			while (uint16_t n = read_rwX(0))
+			while (u16 n = read_rwX(0))
 			{
 				u16 al = (m_acc & 0xffff);
 				u16 ah = (m_acc >> 16) & 0xffff;
@@ -650,7 +650,7 @@ private:
 		if (read_rwX(0) > 0)
 		{
 			m_icount -= 4;
-			while (uint16_t n = read_rwX(0))
+			while (u16 n = read_rwX(0))
 			{
 				u16 al = (m_acc & 0xffff);
 				u16 ah = (m_acc >> 16) & 0xffff;
@@ -673,7 +673,7 @@ private:
 	inline void filsi(u8 dst)
 	{
 		m_icount -= 6;
-		while (uint16_t n = read_rwX(0))
+		while (u16 n = read_rwX(0))
 		{
 			u16 al = (m_acc & 0xffff);
 			u16 ah = (m_acc >> 16) & 0xffff;
@@ -690,7 +690,7 @@ private:
 	inline void filswi(u8 dst)
 	{
 		m_icount -= 6;
-		while (uint16_t n = read_rwX(0))
+		while (u16 n = read_rwX(0))
 		{
 			u16 al = (m_acc & 0xffff);
 			u16 ah = (m_acc >> 16) & 0xffff;
@@ -724,7 +724,7 @@ private:
 	void opcodes_rwiea7f(u8 operand);
 
 	void take_irq();
-	void take_irq_vector(uint8_t irq_vector);
+	void take_irq_vector(u8 irq_vector);
 };
 
 DECLARE_DEVICE_TYPE(F2MC16, f2mc16_device)
