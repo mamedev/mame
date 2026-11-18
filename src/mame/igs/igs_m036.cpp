@@ -176,7 +176,6 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	void m036_tt(machine_config &config) ATTR_COLD;
-	void m036(machine_config &config) ATTR_COLD;
 
 	void init_m036() ATTR_COLD;
 	template <const uint8_t (&Key)[0x100]> void init_key() ATTR_COLD;
@@ -1153,26 +1152,6 @@ INPUT_PORTS_END
 
 
 
-void m036_state::m036(machine_config &config)
-{
-	IGS036(config, m_maincpu, 20_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &m036_state::m036_map);
-
-	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_refresh_hz(60);
-	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
-	screen.set_size(512, 256);
-	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(m036_state::screen_update_m036));
-	screen.set_palette("palette");
-
-	PALETTE(config, "palette").set_entries(0x200);
-
-	SPEAKER(config, "speaker").front_center();
-	OKIM6295(config, "oki", 1'000'000, okim6295_device::PIN7_LOW).add_route(ALL_OUTPUTS, "speaker", 1.0); // clock and pin 7 not verified
-}
-
-
 void m036_state::m036_tt(machine_config &config)
 {
 	IGS036(config, m_maincpu, 20_MHz_XTAL);
@@ -1225,6 +1204,7 @@ void m036_oki_state::m036_boot(machine_config &config)
 	hopper_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_oki_state::m036_oki_boot_map);
 	m_maincpu->set_gpio_w().set(FUNC(m036_oki_state::gpio_hopper_w));
+
 	OKIM6295(config, m_oki, 1'000'000, okim6295_device::PIN7_LOW); // clock and pin 7 not verified
 	m_oki->set_addrmap(0, &m036_oki_state::oki_rom_map);
 	m_oki->add_route(ALL_OUTPUTS, "speaker", 1.0);

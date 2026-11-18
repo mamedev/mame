@@ -308,10 +308,10 @@ protected:
 	u64 do_rnd56(u64 v);
 	u64 do_asl56(u8 n, u64 v);
 	u64 do_asr56(u8 n, u64 v);
-	u64 do_lsl56(u8 n, u64 v);
-	u64 do_lsr56(u8 n, u64 v);
-	u64 do_rol56(u64 v);
-	u64 do_ror56(u64 v);
+	u32 do_lsl24(u8 n, u32 v);
+	u32 do_lsr24(u8 n, u32 v);
+	u32 do_rol24(u32 v);
+	u32 do_ror24(u32 v);
 	void do_tst56(u64 v);
 };
 

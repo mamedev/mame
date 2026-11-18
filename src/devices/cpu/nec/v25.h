@@ -95,6 +95,8 @@ protected:
 	// device_disasm_interface overrides
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual int get_mode() const override { return 1; }
+	virtual bool get_decryption_mode() const override;
+	virtual std::optional<u32> get_cs_base() const override;
 
 private:
 	address_space_config m_program_config;

@@ -191,7 +191,6 @@
 #include "formats/esq16_dsk.h"
 #include "formats/hxchfe_dsk.h"
 
-#include <cstdarg>
 #include <cstdio>
 
 #include "sd1.lh"
@@ -217,16 +216,6 @@ enum esq5505_system_type : int {
 
 #if KEYBOARD_HACK
 static int shift = 32;
-#endif
-
-#if 0
-static void ATTR_PRINTF(1,2) print_to_stderr(const char *format, ...)
-{
-	va_list arg;
-	va_start(arg, format);
-	vfprintf(stderr, format, arg);
-	va_end(arg);
-}
 #endif
 
 class esq5505_state : public driver_device

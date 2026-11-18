@@ -35,7 +35,6 @@ void s35390a_device::device_start()
 	save_item(NAME(m_regs));
 	save_item(NAME(m_time));
 	save_item(NAME(m_transfer));
-	save_item(NAME(m_register));
 	save_item(NAME(m_command));
 	save_item(NAME(m_pos));
 	save_item(NAME(m_length));

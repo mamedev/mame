@@ -37,7 +37,7 @@ f2mc16_device::f2mc16_device(const machine_config &mconfig, device_type type, co
 	: cpu_device(mconfig, type, tag, owner, clock)
 	, m_program_config("program", ENDIANNESS_LITTLE, 16, 24, 0)
 	, m_program(nullptr)
-	, m_irq_level((7 << 13) | 0x1fff)
+	, m_irq_level(7)
 {
 	m_tmp8 = 0;
 	m_tmp16 = 0;
@@ -241,14 +241,14 @@ void f2mc16_device::execute_run()
 {
 	while (m_icount > 0)
 	{
-		if (!m_prefix_valid && m_irq_level < m_ps && (m_ps & F_I))
+		if (!m_prefix_valid && (m_ps & F_I) && m_irq_level < (m_ps >> 13))
 		{
-			uint8_t irq_level = m_irq_level;
-			uint8_t irq_vector = standard_irq_callback(irq_level, m_pc);
+			u8 irq_level = m_irq_level;
+			u8 irq_vector = standard_irq_callback(irq_level, m_pc);
 			if (irq_vector)
 			{
 				take_irq_vector(irq_vector);
-				m_ps = (m_ps | (7 << 13)) & irq_level;
+				m_ps = (m_ps & 0x1fff) | (irq_level << 13);
 			}
 		}
 
@@ -1324,7 +1324,7 @@ void f2mc16_device::execute_run()
 			m_pcb = m_tmp8;
 			m_pc = m_tmp16;
 			m_ps &= ~F_I;
-							break;
+			break;
 
 		// RETI
 		case 0x6b:
@@ -5583,12 +5583,12 @@ void f2mc16_device::execute_set_input(int inputnum, int state)
 {
 }
 
-void f2mc16_device::set_irq_level(int irq_level)
+void f2mc16_device::set_irq_level(u8 irq_level)
 {
-	m_irq_level = (irq_level << 13) | 0x1fff;
+	m_irq_level = irq_level & 7;
 }
 
-void f2mc16_device::take_irq_vector(uint8_t irq_vector)
+void f2mc16_device::take_irq_vector(u8 irq_vector)
 {
 	take_irq();
 

@@ -632,23 +632,23 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 		break;
 		}
 	case 68: { // lsl a
-		u64 d = get_a();
-		set_a(do_lsl56(1, d));
+		u32 d_1 = get_a1();
+		set_a1(do_lsl24(1, d_1));
 		break;
 		}
 	case 69: { // lsl b
-		u64 d = get_b();
-		set_b(do_lsl56(1, d));
+		u32 d_1 = get_b1();
+		set_b1(do_lsl24(1, d_1));
 		break;
 		}
 	case 70: { // lsr a
-		u64 d = get_a();
-		set_a(do_lsr56(1, d));
+		u32 d_1 = get_a1();
+		set_a1(do_lsr24(1, d_1));
 		break;
 		}
 	case 71: { // lsr b
-		u64 d = get_b();
-		set_b(do_lsr56(1, d));
+		u32 d_1 = get_b1();
+		set_b1(do_lsr24(1, d_1));
 		break;
 		}
 	case 72: { // mac +x0,x0,a
@@ -2568,23 +2568,23 @@ void dsp563xx_device::execute_ipar(u16 kipar)
 		break;
 		}
 	case 216: { // rol a
-		u64 d = get_a();
-		set_a(do_rol56(d));
+		u32 d_1 = get_a1();
+		set_a1(do_rol24(d_1));
 		break;
 		}
 	case 217: { // rol b
-		u64 d = get_b();
-		set_b(do_rol56(d));
+		u32 d_1 = get_b1();
+		set_b1(do_rol24(d_1));
 		break;
 		}
 	case 218: { // ror a
-		u64 d = get_a();
-		set_a(do_ror56(d));
+		u32 d_1 = get_a1();
+		set_a1(do_ror24(d_1));
 		break;
 		}
 	case 219: { // ror b
-		u64 d = get_b();
-		set_b(do_ror56(d));
+		u32 d_1 = get_b1();
+		set_b1(do_ror24(d_1));
 		break;
 		}
 	case 220: { // sbc x,a
@@ -73086,171 +73086,171 @@ void dsp563xx_device::execute_npar(u16 knpar, u32 opcode, u32 exv)
 		break;
 		}
 	case 1713: { // lsl #[i],a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 i = BIT(opcode, 1, 5);
-		set_a(do_lsl56(i, d));
+		set_a1(do_lsl24(i, d_1));
 		break;
 		}
 	case 1714: { // lsl #[i],b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 i = BIT(opcode, 1, 5);
-		set_b(do_lsl56(i, d));
+		set_b1(do_lsl24(i, d_1));
 		break;
 		}
 	case 1715: { // lsl a1,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_a1();
-		set_a(do_lsl56(s, d));
+		set_a1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1716: { // lsl a1,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_a1();
-		set_b(do_lsl56(s, d));
+		set_b1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1717: { // lsl b1,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_b1();
-		set_a(do_lsl56(s, d));
+		set_a1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1718: { // lsl b1,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_b1();
-		set_b(do_lsl56(s, d));
+		set_b1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1719: { // lsl x0,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_x0();
-		set_a(do_lsl56(s, d));
+		set_a1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1720: { // lsl x0,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_x0();
-		set_b(do_lsl56(s, d));
+		set_b1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1721: { // lsl y0,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_y0();
-		set_a(do_lsl56(s, d));
+		set_a1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1722: { // lsl y0,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_y0();
-		set_b(do_lsl56(s, d));
+		set_b1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1723: { // lsl x1,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_x1();
-		set_a(do_lsl56(s, d));
+		set_a1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1724: { // lsl x1,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_x1();
-		set_b(do_lsl56(s, d));
+		set_b1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1725: { // lsl y1,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_y1();
-		set_a(do_lsl56(s, d));
+		set_a1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1726: { // lsl y1,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_y1();
-		set_b(do_lsl56(s, d));
+		set_b1(do_lsl24(s, d_1));
 		break;
 		}
 	case 1727: { // lsr #[i],a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 i = BIT(opcode, 1, 5);
-		set_a(do_lsr56(i, d));
+		set_a1(do_lsr24(i, d_1));
 		break;
 		}
 	case 1728: { // lsr #[i],b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 i = BIT(opcode, 1, 5);
-		set_b(do_lsr56(i, d));
+		set_b1(do_lsr24(i, d_1));
 		break;
 		}
 	case 1729: { // lsr a1,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_a1();
-		set_a(do_lsr56(s, d));
+		set_a1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1730: { // lsr a1,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_a1();
-		set_b(do_lsr56(s, d));
+		set_b1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1731: { // lsr b1,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_b1();
-		set_a(do_lsr56(s, d));
+		set_a1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1732: { // lsr b1,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_b1();
-		set_b(do_lsr56(s, d));
+		set_b1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1733: { // lsr x0,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_x0();
-		set_a(do_lsr56(s, d));
+		set_a1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1734: { // lsr x0,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_x0();
-		set_b(do_lsr56(s, d));
+		set_b1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1735: { // lsr y0,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_y0();
-		set_a(do_lsr56(s, d));
+		set_a1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1736: { // lsr y0,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_y0();
-		set_b(do_lsr56(s, d));
+		set_b1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1737: { // lsr x1,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_x1();
-		set_a(do_lsr56(s, d));
+		set_a1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1738: { // lsr x1,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_x1();
-		set_b(do_lsr56(s, d));
+		set_b1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1739: { // lsr y1,a
-		u64 d = get_a();
+		u32 d_1 = get_a1();
 		u32 s = get_y1();
-		set_a(do_lsr56(s, d));
+		set_a1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1740: { // lsr y1,b
-		u64 d = get_b();
+		u32 d_1 = get_b1();
 		u32 s = get_y1();
-		set_b(do_lsr56(s, d));
+		set_b1(do_lsr24(s, d_1));
 		break;
 		}
 	case 1741: { // lua (r)-n,x0
