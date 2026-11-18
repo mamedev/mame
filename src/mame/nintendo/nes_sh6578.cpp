@@ -466,14 +466,13 @@ void nes_sh6578_state::extio_w(uint8_t data)
 void nes_sh6578_max10in1_state::extio_w(uint8_t data)
 {
 	logerror("%s: extio_w : %02x (max10in1)\n", machine().describe_context(), data);
-
-	m_bank->set_entry((data & 0x80) >> 7);
+	m_bank->set_entry(BIT(data, 7));
 }
 
 void nes_sh6578_tvdriv17_state::extio_w(uint8_t data)
 {
 	logerror("%s: extio_w : %02x (tvdriv17)\n", machine().describe_context(), data);
-	m_bank->set_entry((data & 0x10) >> 4);
+	m_bank->set_entry(BIT(data, 4));
 }
 
 
