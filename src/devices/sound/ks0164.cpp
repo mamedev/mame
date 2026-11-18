@@ -240,8 +240,13 @@ u8 ks0164_device::mpu401_status_r()
 	u8 res = 0x3f;
 	if(!(m_mpu_status & MPUS_TX_FULL))
 		res |= 0x80;
-	if(m_mpu_status & MPUS_RX_FULL)
+	if(m_mpu_status & MPUS_RX_FULL) {
 		res |= 0x40;
+
+		// the host polls this until the internal CPU has taken the byte, so let that CPU catch up
+		if(!machine().side_effects_disabled())
+			machine().scheduler().synchronize();
+	}
 
 	return res;
 }
