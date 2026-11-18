@@ -2844,7 +2844,8 @@ inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, uin
 	ul += ddx * dudx;
 	vl += ddx * dvdx;
 	wl += ddx * dwdx;
-	for (idx = 0; idx < 4; idx++) {
+	for (idx = 0; idx < 4; idx++)
+	{
 		bl[idx] += ddx * dbdx[idx];
 		offl[idx] += ddx * dodx[idx];
 	}
@@ -2854,23 +2855,30 @@ inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, uin
 
 	// the line is walked in tile columns: tiles the polygon isn't binned into are stepped over, so the pixels
 	// that are drawn get exactly the values they would get with the whole line drawn
-	while(xxl < xxr) {
+	while(xxl < xxr)
+	{
 		const int tile_end = std::min(xxr, ((xxl >> 5) + 1) << 5);
 		const bool draw = BIT(tilemask, xxl >> 5);
 
-		while(xxl < tile_end) {
-			if(draw && (wl >= *wbufline)) {
+		while(xxl < tile_end)
+		{
+			if(draw && (wl >= *wbufline))
+			{
 				uint32_t c;
 				float u = ul/wl;
 				float v = vl/wl;
 				uint32_t offset_color = float_argb_to_packed_argb(offl);
 				uint32_t base_color = float_argb_to_packed_argb(bl);
 				c = (this->*sample_fn)(ti, u, v, offset_color, base_color);
-				if (group_no == DISPLAY_LIST_OPAQUE) {
+				if (group_no == DISPLAY_LIST_OPAQUE)
+				{
 					*tdata = c;
 					*wbufline = wl;
-				} else {
-					if(c & 0xff000000) {
+				}
+				else
+				{
+					if(c & 0xff000000)
+					{
 						*wbufline = wl;
 						*tdata = ti->blend(c, *tdata);
 					}
@@ -2882,7 +2890,8 @@ inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, uin
 			ul += dudx;
 			vl += dvdx;
 			wl += dwdx;
-			for (idx = 0; idx < 4; idx++) {
+			for (idx = 0; idx < 4; idx++)
+			{
 				bl[idx] += dbdx[idx];
 				offl[idx] += dodx[idx];
 			}
