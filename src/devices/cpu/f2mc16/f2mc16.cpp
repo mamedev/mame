@@ -243,11 +243,12 @@ void f2mc16_device::execute_run()
 	{
 		if (!m_prefix_valid && (m_ps & F_I) && m_irq_level < (m_ps >> 13))
 		{
-			u8 irq_vector = standard_irq_callback(0, m_pc);
+			u8 irq_level = m_irq_level;
+			u8 irq_vector = standard_irq_callback(irq_level, m_pc);
 			if (irq_vector)
 			{
 				take_irq_vector(irq_vector);
-				m_ps = (m_ps & 0x1fff) | (m_irq_level << 13);
+				m_ps = (m_ps & 0x1fff) | (irq_level << 13);
 			}
 		}
 
