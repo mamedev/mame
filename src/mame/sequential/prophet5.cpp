@@ -739,7 +739,8 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 	// osc_a_pulse_s_w()).
 	const double cf_a = jittered(CAP_P(1000), m_jitter[0], 5);  // C4119 (poly). Tolerance not documented. Assuming 5%.
 	const double rr_a = jittered(RES_M(2.21), m_jitter[1], 1);  // R4326 (1%)
-	CEM3340(config, m_osc_a, cf_a, rr_a)  // U454
+	CEM3340(config, m_osc_a, cf_a)  // U454
+		.set_freq_ref(VPLUS / rr_a)
 		.add_route(cem3340_device::OUTPUT_RAMP, m_osc_a_mix, 0.0, ca3280_vca_device::INPUT_AUDIO)
 		.add_route(cem3340_device::OUTPUT_PULSE, m_osc_a_mix, 0.0, ca3280_vca_device::INPUT_AUDIO_INV);
 
@@ -769,7 +770,8 @@ void prophet5_voice_device::device_add_mconfig(machine_config &config)
 	// computed in update_osc_b_mix().
 	const double cf_b = jittered(CAP_P(1000), m_jitter[2], 5);  // C481 (poly). Tolerance not documented. Assuming 5%.
 	const double rr_b = jittered(RES_M(2.21), m_jitter[3], 1);  // R4209 (1%)
-	CEM3340(config, m_osc_b, cf_b, rr_b)  // U441
+	CEM3340(config, m_osc_b, cf_b)  // U441
+		.set_freq_ref(VPLUS / rr_b)
 		.add_route(cem3340_device::OUTPUT_FREQ, m_osc_a, 1.0, cem3340_device::INPUT_SYNC_FREQ)
 		.add_route(cem3340_device::OUTPUT_RAMP, m_osc_b_mix, 0.0, ca3280_vca_device::INPUT_AUDIO)
 		.add_route(cem3340_device::OUTPUT_RAMP, m_pmod_osc_vca, 0.0, ca3280_vca_device::INPUT_AUDIO)
@@ -1502,12 +1504,13 @@ void prophet5_audio_device::device_add_mconfig(machine_config &config)
 	// are mixed passively and fed to a VCA, which controls the amount of
 	// modulation by the LFO. Many of the route gains, and the triangle scale
 	// and offset are computed in update_lfo_mix().
-	CEM3340(config, m_lfo, CAP_U(0.1), RES_M(2.21))  // U376 - C382 (mylar, 5%), R3138 (1%)
+	CEM3340(config, m_lfo, CAP_U(0.1))  // U376 - C382 (mylar, 5%)
 		.set_tempco_gen_res(RES_K(30.1), RES_K(5.62))  // R3107 (1%), R3108 (1%)
+		.set_freq_ref(VPLUS / RES_M(2.21))  // R3138 (1%)
+		.set_pw_ctrl(VPLUS * RES_VOLTAGE_DIVIDER(RES_K(10), RES_K(2)))  // R3110, R3111, 50% PW.
 		.add_route(cem3340_device::OUTPUT_TRIANGLE, m_lfo_tri_center, 1.0)
 		.add_route(cem3340_device::OUTPUT_RAMP, m_lfo_vca, 1.0)
 		.add_route(cem3340_device::OUTPUT_PULSE, m_lfo_vca, 1.0);
-	m_lfo->set_pw_ctrl(VPLUS * RES_VOLTAGE_DIVIDER(RES_K(10), RES_K(2)));  // R3110, R3111, 50% PW.
 	VA_SCALE_OFFSET(config, m_lfo_tri_center)  // U380B (TL082) and surrounding resistors.
 		.set_scale(0).set_offset(0)
 		.add_route(0, m_lfo_vca, 1.0);

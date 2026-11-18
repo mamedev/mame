@@ -4,6 +4,8 @@
 #include "emu.h"
 #include "cem3340.h"
 
+#include <cmath>
+
 namespace {
 
 constexpr float VT = 25.7E-3F;  // Thermal voltage constant at 25 deg C.
@@ -38,10 +40,9 @@ constexpr float PULSE_MIN = 0;
 }  // anonymous namespace
 
 
-cem3340_device::cem3340_device(const machine_config &mconfig, const char *tag, device_t *owner, float cf, float rr)
+cem3340_device::cem3340_device(const machine_config &mconfig, const char *tag, device_t *owner, double cf)
 	: va_vco_device(mconfig, CEM3340, tag, owner, 0)
 	, m_cf(cf)
-	, m_rr(rr)
 	, m_rz(rz_optimal(RT_DEFAULT))
 	, m_rt(RT_DEFAULT)
 {
@@ -52,7 +53,7 @@ cem3340_device::cem3340_device(const machine_config &mconfig, const char *tag, d
 }
 
 cem3340_device::cem3340_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: cem3340_device(mconfig, tag, owner, 1000E-12F, 1.5E6F)  // Values from the datasheet.
+	: cem3340_device(mconfig, tag, owner, 1000E-12F)  // Example value from the datasheet.
 {
 }
 
@@ -73,14 +74,14 @@ float cem3340_device::rz_optimal(float rt)
 	return 3.0F * rt / (22.0F * VT);
 }
 
-float cem3340_device::ctrl2freq(float freq_ctrl) const
+float cem3340_device::ctrl2freq(float freq_ctrl, float freq_ref) const
 {
 	// Equations shown and/or described in the datasheet.
 	// freq_ctrl is the current into pin 15.
+	// freq_ref is the reference current into pin 13.
 	const float iom = (22.0F * VT / m_rt) * (1.0F - freq_ctrl * m_rz / 3.0F);  // Output current of the multiplier.
 	const float vb = iom * RS;  // Voltage at the base of the exponential converter.
-	const float iref = VCC / m_rr;  // Reference input current at pin 13.
-	const float ieg = iref * expf(-vb / VT);  // Output current of the exponential converter.
+	const float ieg = freq_ref * expf(-vb / VT);  // Output current of the exponential converter.
 	return 3.0F * ieg / (2.0F * VCC * m_cf);  // Oscillation frequency.
 }
 
@@ -94,7 +95,7 @@ void cem3340_device::device_start()
 {
 	va_vco_device::device_start();
 
-	constexpr u64 SUPPORTED_INPUTS = (1 << INPUT_FREQ_CTRL) | (1 << INPUT_PW_CTRL) | (1 << INPUT_SYNC_FREQ);
+	constexpr u64 SUPPORTED_INPUTS = (1 << INPUT_FREQ_CTRL) | (1 << INPUT_FREQ_REF) | (1 << INPUT_PW_CTRL) | (1 << INPUT_SYNC_FREQ);
 	if (get_sound_requested_inputs_mask() & ~SUPPORTED_INPUTS)
 	{
 		fatalerror("%s: Unsupported inputs connected. Unsupported input mask: %x\n",
@@ -107,6 +108,9 @@ void cem3340_device::device_start()
 		fatalerror("%s: Unsupported outputs connected. Unsupported output mask: %x\n",
 				   tag(), get_sound_requested_outputs_mask() & ~SUPPORTED_OUTPUTS);
 	}
+
+	if (std::isnan(freq_ref()) && !BIT(get_sound_requested_inputs_mask(), INPUT_FREQ_REF))
+		fatalerror("%s: Frequency reference (freq_ref, aka Iref input) not set\n", tag());
 
 	save_item(NAME(m_rz));
 	save_item(NAME(m_rt));
