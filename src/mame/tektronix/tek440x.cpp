@@ -213,6 +213,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	void delayed_irq3(int state);
+	void raise_irq3(int state);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u16 memory_r(offs_t offset, u16 mem_mask);
@@ -338,6 +340,8 @@ private:
 	u8 m_mouse_pc;
 
 	u8 m_soundrdy;
+	
+	emu_timer *m_irq_delay_timer;
 };
 
 
@@ -400,6 +404,8 @@ void tek440x_state::machine_start()
 
 	// AB is this needed for external MMU?
 	m_maincpu->set_emmu_enable(true);
+	
+	m_irq_delay_timer = timer_alloc(FUNC(tek440x_state::raise_irq3), this);
 }
 
 
@@ -1063,13 +1069,12 @@ void tek440x_state::kb_tdata_w(int state)
 
 void tek440x_state::timer_irq(int state)
 {
-	LOGMASKED(LOG_IRQ,"%10s: irq1_raise %04x\n", machine().time().as_string(8), state);
+	LOGMASKED(LOG_IRQ,"%10s: timer IRQ_1 state(%d)\n", machine().time().as_string(8), state);
 
 	if (!machine().side_effects_disabled())
 	{
 		if (state == 0)
 		{
-			//LOG("M68K_IRQ_1 assert\n");
 			m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 
 			m_u244latch = true;
@@ -1091,7 +1096,7 @@ u16 tek440x_state::timer_r(offs_t offset)
 	{
 		if (m_u244latch)
 		{
-			LOGMASKED(LOG_IRQ,"timer_r: M68K_IRQ_1 clear\n");
+			LOGMASKED(LOG_IRQ,"timer_r: IRQ_1 clear\n");
 			m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 			m_u244latch = false;
 		}
@@ -1307,6 +1312,30 @@ static void scsi_devices(device_slot_interface &device)
 	device.option_add("tek_msu_fdc", TEK_MSU_FDC);
 }
 
+
+// ncr5385 emulation raises IRQ3 on last byte written where 68000 relies on there being time after last write to clear
+// internal flags before waiting for IRQ, so IRQ processed then CPU continues clearing flags and waits forever.
+TIMER_CALLBACK_MEMBER(tek440x_state::raise_irq3)
+{
+	m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
+}
+
+void tek440x_state::delayed_irq3(int state)
+{
+	LOGMASKED(LOG_IRQ, "%s: \033[31mdelayed_irq3 state(%d)\033[0m\n", machine().time().as_string(8), state);
+
+	if (state)
+	{
+		// give target some time
+		m_irq_delay_timer->adjust(attotime::from_usec(30));
+	}
+	else
+	{
+		m_irq_delay_timer->adjust(attotime::never);
+		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+	}
+}
+
 // interrupts
 // 7 debug
 // 6 vsync
@@ -1427,7 +1456,7 @@ void tek440x_state::tek4404(machine_config &config)
 	// clock crystal p2.2-25
 	NCR5385(config, m_scsi, 40_MHz_XTAL / 4);
 	scsi.set_external_device(7, m_scsi);
-	m_scsi->irq().set_inputline(m_maincpu, M68K_IRQ_3);
+	m_scsi->irq().set(FUNC(tek440x_state::delayed_irq3));
 
 	SPEAKER(config, "mono").front_center();
 
