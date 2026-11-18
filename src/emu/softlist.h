@@ -80,6 +80,34 @@ private:
 };
 
 
+// a single piece of a software part
+class software_piece_info
+{
+public:
+	// construction/destruction
+	software_piece_info(std::string &&index, std::string &&title, std::string &&creator, std::string &&alt_title, std::string &&alt_creator);
+	software_piece_info(software_piece_info const &) = default;
+	software_piece_info(software_piece_info &&) = default;
+	software_piece_info& operator=(software_piece_info const &) = default;
+	software_piece_info& operator=(software_piece_info &&) = default;
+
+	// getters
+	const std::string &index() const noexcept { return m_index; }
+	const std::string &title() const noexcept { return m_title; }
+	const std::string &creator() const noexcept { return m_creator; }
+	const std::string &alt_title() const noexcept { return m_alt_title; }
+	const std::string &alt_creator() const noexcept { return m_alt_creator; }
+
+private:
+	// internal state
+	std::string         m_index;
+	std::string         m_title;
+	std::string         m_creator;
+	std::string         m_alt_title;
+	std::string         m_alt_creator;
+};
+
+
 // a single part of a software item
 class software_part
 {
@@ -99,6 +127,7 @@ public:
 	const std::string &interface() const noexcept { return m_interface; }
 	const software_info_item::set &features() const noexcept { return m_features; }
 	const std::vector<rom_entry> &romdata() const noexcept { return m_romdata; }
+	const std::vector<software_piece_info> &pieces() const noexcept { return m_pieces; }
 
 	// helpers
 	bool matches_interface(const char *interface_list) const noexcept;
@@ -111,6 +140,7 @@ private:
 	std::string             m_interface;
 	software_info_item::set m_features;
 	std::vector<rom_entry>  m_romdata;
+	std::vector<software_piece_info> m_pieces;
 };
 
 
