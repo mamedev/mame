@@ -164,6 +164,7 @@ private:
 	INTERRUPT_GEN_MEMBER(tsconf_vblank_interrupt);
 	IRQ_CALLBACK_MEMBER(irq_vector);
 	u8 m_int_mask;
+	bool m_port_7ffd_locked = false;
 	bool m_update_on_m1;
 	void uart_int_w(int state);
 

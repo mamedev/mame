@@ -191,6 +191,7 @@ void tsconf_state::machine_start()
 	m_bank_ram[0]->configure_entries(0, m_ram->size() / 0x4000, m_ram->pointer(), 0x4000);
 
 	save_item(NAME(m_int_mask));
+	save_item(NAME(m_port_7ffd_locked));
 	save_item(NAME(m_update_on_m1));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_cache_line_addr));
@@ -203,6 +204,7 @@ void tsconf_state::machine_start()
 void tsconf_state::machine_reset()
 {
 	m_update_on_m1 = false;
+	m_port_7ffd_locked = false;
 
 	m_frame_irq_timer->adjust(attotime::never);
 	m_scanline_irq_timer->adjust(attotime::never);

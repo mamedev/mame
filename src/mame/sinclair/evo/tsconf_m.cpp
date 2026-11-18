@@ -561,22 +561,32 @@ void tsconf_state::bank3_set_page(u8 page)
 
 void tsconf_state::tsconf_port_7ffd_w(u8 data)
 {
-	// LOCK? BIT(data, 5);
-	u8 page3 = (m_regs[PAGE3] & ~0x07) | BIT(data, 0, 3); // 128K: 0..2 -> 0..2
-	switch (BIT(m_regs[MEM_CONFIG], 6, 2))
+	if (m_port_7ffd_locked)
+		return;
+
+	const u8 mode = BIT(m_regs[MEM_CONFIG], 6, 2);
+	u8 page3 = 0;
+	switch (mode)
 	{
-	case 4:
-		page3 = (page3 & ~0x20) | (data & 0x20); // 1024K: 5 -> 5
-		[[fallthrough]];
 	case 0:
-		page3 = (page3 & ~0x18) | (BIT(data, 6, 2) << 3); // 512K: 6..7 -> 3..4
+		page3 = (data & 0x07) | (BIT(data, 6, 2) << 3); // 512K: 6..7 -> 3..4
 		break;
-	default:
+	case 1:
+		page3 = data & 0x07; // 128K: upper bits are cleared
+		break;
+	case 2:
+		page3 = (m_regs[PAGE3] & ~0x07) | BIT(data, 0, 3); // 7FFD bits 0..2 select PAGE3 bits 0..2
+		break;
+	case 3:
+		page3 = (data & 0x27) | (BIT(data, 6, 2) << 3); // 1024K: 5 -> 5, 6..7 -> 3..4
 		break;
 	}
 	tsconf_port_xxaf_w(PAGE3 << 8, page3);
 	tsconf_port_xxaf_w(MEM_CONFIG << 8, (m_regs[MEM_CONFIG] & 0xfe) | BIT(data, 4)); // ROM128
 	tsconf_port_xxaf_w(V_PAGE << 8, BIT(data, 3) ? 7 : 5);
+
+	if (mode != 3)
+		m_port_7ffd_locked = BIT(data, 5);
 }
 
 void tsconf_state::tsconf_ula_w(offs_t offset, u8 data)
@@ -607,6 +617,9 @@ u8 tsconf_state::tsconf_port_xxaf_r(offs_t port)
 	case 0x30: // FRCnt0
 	case 0x31: // FRCnt1
 	case 0x32: // FRCnt2
+		// The FDD-ripper counter is only present in FPGA builds with FDR enabled.
+		break;
+
 	default:
 		logerror("'tsconf': unmapped reg read %02X\n", nreg);
 		break;
