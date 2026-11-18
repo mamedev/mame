@@ -1363,6 +1363,10 @@ void duart_channel::device_start()
 	m_uart = downcast<duart_base_device *>(owner());
 	m_ch = m_uart->get_ch(this);    // get our channel number
 
+	// clear to known values
+	MR1 = 0;
+	set_MR2(0);
+	
 	save_item(NAME(CR));
 	save_item(NAME(CSR));
 	save_item(NAME(MR1));
@@ -1390,8 +1394,6 @@ void duart_channel::device_reset()
 	write_CR(0x20); // reset Rx
 	write_CR(0x30); // reset Tx
 	write_CR(0x40); // reset errors
-
-	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 
 	tx_baud_rate = rx_baud_rate = 0;
 	CSR = 0;
