@@ -125,6 +125,14 @@ public:
 		LOG("m68010_tekmmu_device::device_reset: setting emmu\n");
 		set_emmu_enable(true);      // sets m_instruction_restart=true
 	}
+
+#if VERBOSE
+	void execute_set_input(int inputnum, int state) override
+	{
+		LOGMASKED(LOG_IRQ, "%s: \033[31mexecute_set_input IRQ_%d state(%d)\033[0m\n", machine().time().as_string(8), inputnum, state);
+		m68010_device::execute_set_input(inputnum, state);
+	}
+#endif
 };
 
 DEFINE_DEVICE_TYPE(M68010_TEKMMU, m68010_tekmmu_device, "mc68010_tekmmu", "MC68010 with Tek4404 custom MMU")
@@ -213,6 +221,9 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+#if VERBOSE
+	void log_uniflex(const char *msg);
+#endif
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u16 memory_r(offs_t offset, u16 mem_mask);
@@ -482,6 +493,12 @@ void tek440x_state::ready_sound(int state)
  *  CPU memory handlers
  *
  *************************************/
+#if VERBOSE
+void tek440x_state::log_uniflex(const char *msg)
+{
+	osd_printf_info("\033[32m[:UNIFLEX] %s: %s \033[0m\n", machine().time().as_string(8), msg);
+}
+#endif
 
 u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 {
@@ -557,6 +574,37 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 			m_inbuserr = false;
 		}
 	}
+
+#if VERBOSE
+	// logging key points in Uniflex kernel execution
+	// just instruction fetch
+	//if ((m_maincpu->get_fc() & 1) )
+	{
+		if (offset == OFF8_TO_OFF16(0x1330c))
+			log_uniflex("IRQ6_handler_vblank");
+		if (offset == OFF8_TO_OFF16(0x13804))
+			log_uniflex("IRQ6_handler_vblank_RTE");
+
+		if (offset == OFF8_TO_OFF16(0x1062e))
+			log_uniflex("IRQ3_handler_scsi");
+		if (offset == OFF8_TO_OFF16(0x125ea))
+			log_uniflex("SCSI last byte write");
+		if (offset == OFF8_TO_OFF16(0x127d2))
+			log_uniflex("SCSI_wait");
+		if (offset == OFF8_TO_OFF16(0x127f4))
+			log_uniflex("SCSI_wait_continue");
+		if (offset == OFF8_TO_OFF16(0x12746))
+			log_uniflex("SCSI_wait_empty");
+		if (offset == OFF8_TO_OFF16(0x12770))
+			log_uniflex("SCSI_wait_full");
+		if (offset == OFF8_TO_OFF16(0x127de))
+			log_uniflex("set_flags_handling_clear_pending");
+		if (offset == OFF8_TO_OFF16(0x1283e))
+			log_uniflex("scsi_read_ncr5385_status");
+		if (offset == OFF8_TO_OFF16(0x747794))
+			log_uniflex("scsi_set_count");
+	}
+#endif
 
 	return m_vm->read16(offset, mem_mask);
 }
