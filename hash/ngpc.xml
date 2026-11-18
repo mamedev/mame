@@ -711,6 +711,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<description>Metal Slug - 2nd Mission (World)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
+		<notes>Power down the system properly before exiting the emulation to prevent corruption of the driver's nvram.</notes>
 		<info name="serial" value="NeoP00610" />
 		<info name="release" value="20000309 (JPN)" />
 		<info name="alt_title" value="メタルスラッグ セカンドミッション" />
@@ -725,6 +726,7 @@ NEOP00220 NeoGeo Cup '98 Plus (Euro) [confirmed?]
 		<description>Metal Slug - 2nd Mission (demo)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
+		<notes>Power down the system properly before exiting the emulation to prevent corruption of the driver's nvram.</notes>
 		<part name="cart" interface="ngp_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="metal slug - 2nd mission (world) (en,ja) (demo).bin" size="2097152" crc="8b1647d4" sha1="099a835930209a6ec15b7e9092c086b6e7a4ad9e" />
