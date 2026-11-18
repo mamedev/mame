@@ -172,10 +172,12 @@ private:
 	emu_timer *duart_timer;
 
 	bool m_irq_state;
+	bool m_ip2_clock_warned;
 
 	uint32_t get_ct_rate();
 	uint16_t get_ct_count();
 	void start_ct(int count);
+	void warn_ip2_clock();
 	virtual int calc_baud(int ch, bool rx, uint8_t data);
 	void clear_ISR_bits(int mask);
 	void set_ISR_bits(int mask);
