@@ -627,6 +627,7 @@ int cbm_iec_device::get_signal(int signal, const attotime &time)
 #include "rapidos.h"
 #include "sd2iec.h"
 #include "serialbox.h"
+#include "speeddos.h"
 #include "turbotrans.h"
 #include "vic1515.h"
 #include "vic1520.h"
@@ -643,6 +644,7 @@ void cbm_iec_devices(device_slot_interface &device)
 	device.option_add("c1541pd", C1541_PROFESSIONAL_DOS_V1);
 	device.option_add("c1541pdc", C1541_PROLOGIC_DOS_CLASSIC);
 	device.option_add("c1541rp", C1541_RAPIDOS_PROFESSIONAL);
+	device.option_add("c1541sd", C1541_SPEEDDOS);
 	device.option_add("c1541tt", C1541_TURBOTRANS);
 	device.option_add("c1570", C1570);
 	device.option_add("c1571", C1571);

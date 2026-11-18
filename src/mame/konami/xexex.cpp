@@ -125,7 +125,6 @@ Unresolved Issues:
 - mono/stereo softdip has no effect (xexex057gre_3, external mixing?)
 - K053250 shows a one-frame glitch at stage 1 boss (DMA timing?)
 - stage 3 intro missing alpha effect (known K054338 deficiency)
-- the stage 4 boss(tentacles) sometimes appears darker (palette update timing?)
 - the furthest layer in stage 5 shakes when scrolling up or down (needs verification)
 - Elaine's end-game graphics has wrong masking effect (known non-zoomed pdrawgfx issue)
 - intro screen at wrong alpha effect; it has K054157 flag-per-tile for alpha blending?
@@ -288,12 +287,18 @@ K056832_CB_MEMBER(xexex_state::tile_callback)
 	/*
 	    Color format
 	    xxxx ---- Color
-	    ---- -x-- Alpha blend enable
+	    ---- -x-- Alpha blend enable, also colour bit 4 on layer 1
 	    ---- --x- Used, Unknown
 	    Everything else : unknown
 	*/
 	priority = color & 1; // alpha flag
 	color = m_layer_colorbase[layer] | (color >> 2 & 0x0f);
+
+	// Layer 1 feeds the 9-bit CI2 input of the K053251 and its 9th pixel bit is the alpha flag,
+	// so alpha tiles take their colours from the next 256 palette entries. The stage 4 boss
+	// copy relies on this: the game clears 0x010-0x0ff there but keeps the colours at 0x110-0x1ff.
+	if (layer == 1 && priority)
+		color |= 0x10;
 }
 
 void xexex_state::video_start()

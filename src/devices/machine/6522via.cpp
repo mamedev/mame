@@ -428,7 +428,12 @@ void via6522_device::device_reset()
 	m_pcr = 0;
 	m_acr = 0;
 	m_ier = 0;
-	m_ifr = 0;
+	// reset clears IFR and IER and disables interrupting from the chip (SY6522
+	// data sheet, RES pin; W65C22S data sheet 3.9): keep only INT_ANY, so that
+	// output_irq() releases /IRQ if it was asserted
+	m_ifr &= INT_ANY;
+	output_irq();
+
 	m_t1_active = 0;
 	m_t1_pb7 = 1;
 	m_t2_active = 0;

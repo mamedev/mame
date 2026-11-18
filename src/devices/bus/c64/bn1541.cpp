@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "bn1541.h"
 
+#include <algorithm>
+
 
 
 //**************************************************************************
@@ -73,7 +75,8 @@ void device_c64_floppy_parallel_interface::parallel_select_w(int state)
 c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_BN1541, tag, owner, clock),
 	device_pet_user_port_interface(mconfig, *this),
-	device_c64_floppy_parallel_interface(mconfig, *this), m_parallel_output(0)
+	m_drive{ { mconfig, *this, 0 }, { mconfig, *this, 1 } },
+	m_parallel_output(0)
 {
 }
 
@@ -84,53 +87,84 @@ c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *
 
 void c64_bn1541_device::device_start()
 {
-	save_item(NAME(m_parallel_output));
+	std::fill(std::begin(m_drive_data), std::end(m_drive_data), 0xff);
+	std::fill(std::begin(m_drive_strobe), std::end(m_drive_strobe), 1);
+
+	int drive = 0;
 
 	for (device_t &device : device_enumerator(machine().root_device()))
 	{
-		for (device_t &subdevice : device_enumerator(device))
+		if (drive < 2 && device.interface(m_drive[drive].m_other))
 		{
-			if (subdevice.interface(m_other) && &subdevice != this)
-			{
-				if (LOG) logerror("Parallel device %s\n", subdevice.tag());
+			if (LOG) logerror("Parallel device %s\n", device.tag());
 
-				// grab the first 1541/1571 and run to the hills
-				m_other->m_other = this;
-				return;
-			}
+			m_drive[drive].m_other->m_other = &m_drive[drive];
+			drive++;
 		}
 	}
+
+	save_item(NAME(m_parallel_output));
+	save_item(NAME(m_drive_data));
+	save_item(NAME(m_drive_strobe));
 }
 
 
 //-------------------------------------------------
-//  parallel_data_w -
+//  drive_port::parallel_data_w -
 //-------------------------------------------------
 
-void c64_bn1541_device::parallel_data_w(uint8_t data)
+void c64_bn1541_device::drive_port::parallel_data_w(uint8_t data)
 {
-	if (LOG) logerror("1541 parallel data %02x\n", data);
-
-	output_c((data>>0)&1);
-	output_d((data>>1)&1);
-	output_e((data>>2)&1);
-	output_f((data>>3)&1);
-	output_h((data>>4)&1);
-	output_j((data>>5)&1);
-	output_k((data>>6)&1);
-	output_l((data>>7)&1);
+	m_host.drive_data_w(m_index, data);
 }
 
 
 //-------------------------------------------------
-//  parallel_strobe_w -
+//  drive_port::parallel_strobe_w -
 //-------------------------------------------------
 
-void c64_bn1541_device::parallel_strobe_w(int state)
+void c64_bn1541_device::drive_port::parallel_strobe_w(int state)
 {
-	if (LOG) logerror("1541 parallel strobe %u\n", state);
+	m_host.drive_strobe_w(m_index, state);
+}
 
-	output_b(state);
+
+//-------------------------------------------------
+//  drive_data_w -
+//-------------------------------------------------
+
+void c64_bn1541_device::drive_data_w(int drive, uint8_t data)
+{
+	if (LOG) logerror("Drive %d parallel data %02x\n", drive, data);
+
+	m_drive_data[drive] = data;
+
+	uint8_t const bus = m_drive_data[0] & m_drive_data[1];
+
+	output_c(BIT(bus, 0));
+	output_d(BIT(bus, 1));
+	output_e(BIT(bus, 2));
+	output_f(BIT(bus, 3));
+	output_h(BIT(bus, 4));
+	output_j(BIT(bus, 5));
+	output_k(BIT(bus, 6));
+	output_l(BIT(bus, 7));
+
+	update_output();
+}
+
+
+//-------------------------------------------------
+//  drive_strobe_w -
+//-------------------------------------------------
+
+void c64_bn1541_device::drive_strobe_w(int drive, int state)
+{
+	if (LOG) logerror("Drive %d parallel strobe %u\n", drive, state);
+
+	m_drive_strobe[drive] = state;
+
+	output_b(m_drive_strobe[0] && m_drive_strobe[1]);
 }
 
 
@@ -140,9 +174,12 @@ void c64_bn1541_device::parallel_strobe_w(int state)
 
 void c64_bn1541_device::update_output()
 {
-	if (m_other != nullptr)
+	for (int drive = 0; drive < 2; drive++)
 	{
-		m_other->parallel_data_w(m_parallel_output);
+		if (m_drive[drive].m_other != nullptr)
+		{
+			m_drive[drive].m_other->parallel_data_w(m_parallel_output & m_drive_data[drive ^ 1]);
+		}
 	}
 }
 
@@ -155,8 +192,11 @@ void c64_bn1541_device::input_8(int state)
 {
 	if (LOG) logerror("C64 parallel strobe %u\n", state);
 
-	if (m_other != nullptr)
+	for (auto &drive : m_drive)
 	{
-		m_other->parallel_strobe_w(state);
+		if (drive.m_other != nullptr)
+		{
+			drive.m_other->parallel_strobe_w(state);
+		}
 	}
 }

@@ -45,7 +45,7 @@ private:
 
 void etherudock_device::ethernetmicrodock_map(address_map &map)
 {
-	map(0x0000'0300, 0x0000'030f).rw(FUNC(etherudock_device::smc_r), FUNC(etherudock_device::smc_w)).mirror(0x00f0'0000);
+	map(0x0000'0300, 0x0000'030f).mirror(0x00f0'0000).rw(FUNC(etherudock_device::smc_r), FUNC(etherudock_device::smc_w));
 }
 
 ROM_START( etherudock )
@@ -101,4 +101,3 @@ void etherudock_device::irq_w(int state)
 } // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(DUODOCK_ETHERUDOCK, device_nubus_card_interface, etherudock_device, "ethudock", "Newer Technology Ethernet MicroDock")
-

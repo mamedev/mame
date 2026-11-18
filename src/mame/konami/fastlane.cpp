@@ -44,7 +44,7 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void fastlane(machine_config &config);
+	void fastlane(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -67,7 +67,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	void palette(palette_device &palette) const;
+	void palette(palette_device &palette) const ATTR_COLD;
 
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
 	template <uint8_t Which> void vram_w(offs_t offset, uint8_t data);
@@ -107,20 +107,17 @@ void fastlane_state::palette(palette_device &palette) const
 template <uint8_t Which>
 TILE_GET_INFO_MEMBER(fastlane_state::get_tile_info)
 {
-	uint8_t ctrl_3 = m_k007121->ctrl_r(3);
-	uint8_t ctrl_4 = m_k007121->ctrl_r(4);
-	uint8_t ctrl_5 = m_k007121->ctrl_r(5);
-	int attr = m_videoram[Which][tile_index];
-	int code = m_videoram[Which][tile_index + 0x400];
-	int bit0 = (ctrl_5 >> 0) & 0x03;
-	int bit1 = (ctrl_5 >> 2) & 0x03;
-	int bit2 = (ctrl_5 >> 4) & 0x03;
-	int bit3 = (ctrl_5 >> 6) & 0x03;
-	int bank = ((attr >> (bit0 + 3)) & 0x01) |
-			((attr >> (bit1 + 2)) & 0x02) |
-			((attr >> (bit2 + 1)) & 0x04) |
-			((attr >> (bit3 + 0)) & 0x08);
-	int mask = (ctrl_4 & 0xf0) >> 4;
+	uint8_t const ctrl_3 = m_k007121->ctrl_r(3);
+	uint8_t const ctrl_4 = m_k007121->ctrl_r(4);
+	uint8_t const ctrl_5 = m_k007121->ctrl_r(5);
+	int const attr = m_videoram[Which][tile_index];
+	int const code = m_videoram[Which][tile_index + 0x400];
+	int const bit0 = (ctrl_5 >> 0) & 0x03;
+	int const bit1 = (ctrl_5 >> 2) & 0x03;
+	int const bit2 = (ctrl_5 >> 4) & 0x03;
+	int const bit3 = (ctrl_5 >> 6) & 0x03;
+	int const mask = (ctrl_4 >> 4) & 0x0f;
+	int bank = bitswap<4>(attr, bit3 + 3, bit2 + 3, bit1 + 3, bit0 + 3);
 	bank = (bank & ~mask) | (ctrl_4 & mask);
 	bank = ((attr & 0x80) >> 7) | (bank << 1) | ((ctrl_3 & 0x01) << 5);
 

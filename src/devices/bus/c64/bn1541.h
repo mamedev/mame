@@ -43,8 +43,7 @@ protected:
 // ======================> c64_bn1541_device
 
 class c64_bn1541_device : public device_t,
-		public device_pet_user_port_interface,
-		public device_c64_floppy_parallel_interface
+		public device_pet_user_port_interface
 {
 public:
 	// construction/destruction
@@ -53,10 +52,6 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
-
-	// device_c64_floppy_parallel_interface overrides
-	virtual void parallel_data_w(uint8_t data) override;
-	virtual void parallel_strobe_w(int state) override;
 
 	// device_pet_user_port_interface overrides
 	virtual void input_8(int state) override;
@@ -70,8 +65,29 @@ protected:
 	virtual void input_l(int state) override { if (state) m_parallel_output |= 128; else m_parallel_output &= ~128; update_output(); }
 
 private:
+	class drive_port : public device_c64_floppy_parallel_interface
+	{
+	public:
+		drive_port(const machine_config &mconfig, c64_bn1541_device &host, int index) :
+			device_c64_floppy_parallel_interface(mconfig, host), m_host(host), m_index(index) { }
+
+		virtual void parallel_data_w(uint8_t data) override;
+		virtual void parallel_strobe_w(int state) override;
+
+	private:
+		c64_bn1541_device &m_host;
+		int const m_index;
+	};
+
+	void drive_data_w(int drive, uint8_t data);
+	void drive_strobe_w(int drive, int state);
 	void update_output();
+
+	drive_port m_drive[2];
+
 	uint8_t m_parallel_output;
+	uint8_t m_drive_data[2];
+	uint8_t m_drive_strobe[2];
 };
 
 

@@ -360,10 +360,10 @@ authors:hap
 	<group name="lcd1">
 		<element ref="lcd_bg"><bounds x="32" y="89.5" width="20.5" height="9" /></element>
 
-		<element name="digit0" ref="digit"><bounds x="33.0" y="91" width="4" height="6" /></element>
-		<element name="digit1" ref="digit"><bounds x="37.5" y="91" width="4" height="6" /></element>
-		<element name="digit2" ref="digit"><bounds x="43.0" y="91" width="4" height="6" /></element>
-		<element name="digit3" ref="digit"><bounds x="47.5" y="91" width="4" height="6" /></element>
+		<element name="lcd:digit0" ref="digit"><bounds x="33.0" y="91" width="4" height="6" /></element>
+		<element name="lcd:digit1" ref="digit"><bounds x="37.5" y="91" width="4" height="6" /></element>
+		<element name="lcd:digit2" ref="digit"><bounds x="43.0" y="91" width="4" height="6" /></element>
+		<element name="lcd:digit3" ref="digit"><bounds x="47.5" y="91" width="4" height="6" /></element>
 
 		<element name="s0.8" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
 		<element name="s0.8" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
@@ -372,10 +372,10 @@ authors:hap
 	<group name="lcd2">
 		<element ref="lcd_bg"><bounds x="32" y="89.5" width="20.5" height="9" /></element>
 
-		<element name="digit4" ref="digit"><bounds x="33.0" y="91" width="4" height="6" /></element>
-		<element name="digit5" ref="digit"><bounds x="37.5" y="91" width="4" height="6" /></element>
-		<element name="digit6" ref="digit"><bounds x="43.0" y="91" width="4" height="6" /></element>
-		<element name="digit7" ref="digit"><bounds x="47.5" y="91" width="4" height="6" /></element>
+		<element name="lcd:digit4" ref="digit"><bounds x="33.0" y="91" width="4" height="6" /></element>
+		<element name="lcd:digit5" ref="digit"><bounds x="37.5" y="91" width="4" height="6" /></element>
+		<element name="lcd:digit6" ref="digit"><bounds x="43.0" y="91" width="4" height="6" /></element>
+		<element name="lcd:digit7" ref="digit"><bounds x="47.5" y="91" width="4" height="6" /></element>
 
 		<element name="s0.34" ref="ldot"><bounds xc="42.45" yc="92.25" width="0.6" height="0.6" /></element>
 		<element name="s0.34" ref="ldot"><bounds xc="42.15" yc="95.65" width="0.6" height="0.6" /></element>
