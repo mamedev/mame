@@ -77014,6 +77014,22 @@ Other
 		</part>
 	</software>
 
+	<!-- not the same as mc_36 -->
+	<software name="mc_36in1" supported="yes">
+		<description>36 in 1 (with Ferrari Grand Prix)</description>
+		<year>200?</year>
+		<publisher>&lt;pirate&gt;</publisher>
+		<part name="cart" interface="nes_cart">
+			<feature name="slot" value="bmc_hik8in1" />
+			<dataarea name="prg" size="1048576">
+				<rom name="prg.bin" size="1048576" crc="3e013958" sha1="75dbdb23df0f0c143b191b9d3057407d3610bdf7" />
+			</dataarea>
+			<dataarea name="chr" size="1048576">
+				<rom name="chr.bin" size="1048576" crc="47c7b72d" sha1="3219ff20ad7931091b3d2e69c088d0fe13cc9cac" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="srobhood">
 		<description>Super Robin Hood (pirate)</description>
 		<year>19??</year>
