@@ -352,10 +352,8 @@ private:
 	void mb8877a_drq_w(int state);
 	void pit_out2_changed(int state);
 
-	void towns_serial_irq(int state);
-	void towns_rxrdy_irq(int state);
-	void towns_txrdy_irq(int state);
-	void towns_syndet_irq(int state);
+	void towns_serial_irq_update();
+	template <uint8_t Source> void towns_serial_source_w(int state);
 	uint8_t towns_serial_r(offs_t offset);
 	void towns_serial_w(offs_t offset, uint8_t data);
 
