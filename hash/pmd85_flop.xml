@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+PMD 32 disk images (40 cylinders x 2 sides x 9 x 512 bytes, stored in logical
+sector order as .p32).  The PMD-85.3 boots them from drive A at power-on.
+
+The RUNNER menu on the game discs does not start the selected program yet.
+The MIF 85 sound interface and the PMD 40 EPROM programmer are not emulated.
+-->
+<softwarelist name="pmd85_flop" description="Tesla PMD 85 PMD 32 disks">
+
+	<software name="fsed">
+		<description>FSED v2.0 (full-screen text editor)</description>
+		<year>2020</year>
+		<publisher>RomBorSoft</publisher>
+		<info name="usage" value="Type FSED at the A&gt; prompt"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="fsed.p32" size="368640" crc="e40bbde9" sha1="70de98cc1c8ebd40bda604c5479fff25ff5bfdd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gm4004" supported="no">
+		<description>Games by 4004/482 ZO Svazarmu (RUNNER collection)</description>
+		<year>2022</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Type RUN at the A&gt; prompt"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="games-4004-482.p32" size="368640" crc="514da523" sha1="957efdc275f6c5afaf56d1c06c6a484f0c6e519b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gmlasota" supported="no">
+		<description>Games by Libor Lasota (RUNNER collection)</description>
+		<year>2026</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Type RUN at the A&gt; prompt"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="games-libor-lasota.p32" size="368640" crc="9bea30a4" sha1="88334f6bc49f4b4b766081d4f601bb33769f3d5c"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gmother" supported="no">
+		<description>Various games (RUNNER collection)</description>
+		<year>2022</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Type RUN at the A&gt; prompt"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="games-other.p32" size="368640" crc="76ac7134" sha1="92c10249ea4a8e51de9aea27bd7deb5f53e35beb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gmrmteam" supported="no">
+		<description>Games by RM-TEAM (RUNNER collection)</description>
+		<year>2024</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Type RUN at the A&gt; prompt"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="games-rm-team.p32" size="368640" crc="e1411110" sha1="214f23656e467a65383b827036db76e4601811bb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gmrmteam2" supported="no">
+		<description>Kubanoid (RUNNER collection)</description>
+		<year>2026</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Type RUN at the A&gt; prompt"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="games-rm-team-2.p32" size="368640" crc="59d4449d" sha1="c9764b040f0ed00f3df52bd75b17a5732975c198"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gmvbg" supported="no">
+		<description>Games by VBG Software (RUNNER collection)</description>
+		<year>2026</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Type RUN at the A&gt; prompt"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="games-vbg.p32" size="368640" crc="60bc9ec6" sha1="54788b88b539a4e0b365db98c281791ccd395844"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemmings">
+		<description>Lemmings</description>
+		<year>2014</year>
+		<publisher>Libor Lasota / Vlastimil Veselý</publisher>
+		<info name="usage" value="Type LEMMINGS at the A&gt; prompt"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="game-lemmings.p32" size="368640" crc="c92ced51" sha1="4fa501c15b15b23c602306e7d9d3cc494e61f21a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mif85dem" supported="no">
+		<description>MIF 85 demos</description>
+		<year>2019</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Requires the MIF 85 sound interface"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="mif85-demo.p32" size="368640" crc="5acd32a2" sha1="faf8d01e69a6a5aa68a17b14d4fd720782ddc5d1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mikros">
+		<description>MIKROS V2.2 (system disk)</description>
+		<year>198?</year>
+		<publisher>VÚVT Žilina</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="mikros.p32" size="368640" crc="921f987a" sha1="cbbed3e1e41f62bb9de62461814eb4bd1d476f75"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mikros32">
+		<description>MIKROS V2.2 32K (4 drives)</description>
+		<year>2020</year>
+		<publisher>RM-TEAM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="mikros32k.p32" size="368640" crc="09eb97bd" sha1="ad0fd0901841911038c5b6dafc27e1625d69b520"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mikros48">
+		<description>MIKROS V2.2 48K (4 drives)</description>
+		<year>2020</year>
+		<publisher>RM-TEAM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="mikros48k.p32" size="368640" crc="89b80089" sha1="44a62496c9d155eaf0b87248be8b6d8492bb2ec6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musica" supported="no">
+		<description>Musica+3</description>
+		<year>2011</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Type RUN at the A&gt; prompt"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="musica.p32" size="368640" crc="3e37e41a" sha1="6d39980b9871076176c974561e22e7cbd328c9cb"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmd40" supported="no">
+		<description>PMD 40 EPROM programmer software</description>
+		<year>2015</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Requires the PMD 40 EPROM programmer"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="pmd40.p32" size="368640" crc="d70cccd3" sha1="36785910bc3b0cbbe04794b592496dff11f361e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pmddos">
+		<description>DOS PMD-32 (system disk)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="pmddos.p32" size="368640" crc="be89b3b5" sha1="a2980ec477102f57f0daa88dc7c5a5af3b852d0b"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sysgen">
+		<description>MIKROS V2.2 system generation</description>
+		<year>2021</year>
+		<publisher>RM-TEAM</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="sysgen.p32" size="368640" crc="9619305c" sha1="a2ddf1c86f084478d798a51095b2d9845b7c90a6"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zork">
+		<description>Zork I, II, III</description>
+		<year>2020?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="original_publisher" value="Infocom"/>
+		<info name="usage" value="Type ZORK1, ZORK2 or ZORK3 at the A&gt; prompt"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="368640">
+				<rom name="zork.p32" size="368640" crc="6776d259" sha1="b4f047c814cc12ede9f578e062995f08fd0e18e3"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

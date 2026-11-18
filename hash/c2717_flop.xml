@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+
+Consul 2717 disks:
+- 8" single-sided discs (77 tracks of 26 x 128-byte FM sectors) for the
+  DS 2717 (c2717ds).  These are school courseware from one collection; the
+  numbers in the comments are its disc labels.  Only zlomky holds the CP/M
+  system: boot it in drive A and put the others in drive B.
+- DZ8 images, 154 logical tracks of 26 x 128-byte sectors, for the PMD 32-SD
+  with the 603.513/32 disk driver (c2717sd).
+-->
+<softwarelist name="c2717_flop" description="Consul 2717 disks">
+
+	<!-- 9302 -->
+	<software name="biologie">
+		<description>Biologie (breathing, circulation and digestion, zoology, chemistry)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In drive B: type B:, GBASIC, then LOAD &quot;HVEZDA3&quot; and RUN"/>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="259584">
+				<rom name="9302.img" size="259584" crc="2dbc6515" sha1="fae2890f57b3be5bb0073d97845fa3e77e04b545"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- the emulated SD card has no directories: CD.COM only shows and ejects the inserted images -->
+	<software name="cd" supported="partial">
+		<description>CD v2.0 / v3.0 (disk image utility)</description>
+		<year>2021</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Type CD at the A&gt; prompt"/>
+		<part name="flop1" interface="pmd32sd_disk">
+			<dataarea name="flop" size="512512">
+				<rom name="cd.dz8" size="512512" crc="afab8776" sha1="19c3d70eb4bb99d9c34622a9cddba58eb89a8c41"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 9306 -->
+	<software name="doprava">
+		<description>Dopravní výchova (traffic education)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In drive B: type B:, GBASIC, then LOAD &quot;DOPRV1&quot; and RUN"/>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="259584">
+				<rom name="9306.img" size="259584" crc="6da88372" sha1="744cbb8c4b6cc583b2dc144aa69b070630e052aa"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 9303 -->
+	<software name="fyzika">
+		<description>Fyzika a matematika (electricity, volume, mass, length, divisors)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In drive B: type B:, GBASIC, then LOAD &quot;ELEKTR1&quot; and RUN"/>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="259584">
+				<rom name="9303.img" size="259584" crc="535e6c11" sha1="abd4cd79c705d0c5c13784b2e3b7dcdd28d82162"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 9307 -->
+	<software name="geometrie">
+		<description>Geometrie (geometry)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In drive B: type B:, GBASIC, then LOAD &quot;GEOM1&quot; and RUN"/>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="259584">
+				<rom name="9307.img" size="259584" crc="4f2e5aa8" sha1="a9245bf1a5812dc58356142619df0cd1f129a93a"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- DIR stops after the first entry with this disc's 2012 BIOS -->
+	<software name="rmtgames" supported="partial">
+		<description>Spindizzy / Highway Encounter</description>
+		<year>2016</year>
+		<publisher>RM-TEAM</publisher>
+		<info name="usage" value="Type SPINDZ or HIGHENC at the A&gt; prompt"/>
+		<part name="flop1" interface="pmd32sd_disk">
+			<dataarea name="flop" size="512512">
+				<rom name="games-rm-team.dz8" size="512512" crc="dfd179af" sha1="89613eb8ca5053d073eb56fc39355c9128881db0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- 9301 -->
+	<software name="zlomky">
+		<description>Zlomky, sčítání (fractions and addition)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Boots CP/M.  With another disc in drive B, type B:GBASIC, then LOAD &quot;ZLOMKYA&quot; and RUN"/>
+		<part name="flop1" interface="floppy_8">
+			<dataarea name="flop" size="256256">
+				<rom name="9301.img" size="256256" crc="49ce3586" sha1="17f60ec8f3f4cef16cfb66758aa1309077840b5a"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
