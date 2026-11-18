@@ -359,9 +359,9 @@ void nes_lz93d50_24c01_device::write_h(offs_t offset, uint8_t data)
 	switch (offset & 0x0f)
 	{
 		case 0x0d:
-			m_i2cmem->write_scl(BIT(data, 5));
-			m_i2cmem->write_sda(BIT(data, 6));
 			m_i2c_dir = BIT(data, 7);
+			m_i2cmem->write_sda(m_i2c_dir ? 1 : BIT(data, 6));
+			m_i2cmem->write_scl(BIT(data, 5));
 			break;
 		default:
 			fcg_write(offset & 0x0f, data);

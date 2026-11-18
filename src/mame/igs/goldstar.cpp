@@ -663,6 +663,8 @@ public:
 	void lucky8(machine_config &config) ATTR_COLD;
 	void lucky8f(machine_config &config) ATTR_COLD;
 	void lucky8k(machine_config &config) ATTR_COLD;
+	void lucky8aa(machine_config &config) ATTR_COLD;
+	void mirjoker(machine_config &config) ATTR_COLD;
 	void lucky8p(machine_config &config) ATTR_COLD;
 	void lucky8t(machine_config &config) ATTR_COLD;
 	void lucky8tet(machine_config &config) ATTR_COLD;
@@ -799,6 +801,7 @@ private:
 	void flam7_w4_map(address_map &map) ATTR_COLD;
 	void flaming7_map(address_map &map) ATTR_COLD;
 	void lucky8_map(address_map &map) ATTR_COLD;
+	void mirjoker_map(address_map &map) ATTR_COLD;
 	void lucky8p_map(address_map &map) ATTR_COLD;
 	void lucky8tet_ioport(address_map &map) ATTR_COLD;
 	void luckybar_map(address_map &map) ATTR_COLD;
@@ -4719,6 +4722,17 @@ void wingco_state::lucky8_map(address_map &map)
 	map(0xb870, 0xb870).w("snsnd", FUNC(sn76489_device::write));  // sound
 	map(0xc000, 0xf7ff).rom();  // could be used by some sets like super972.
 	map(0xf800, 0xffff).ram();
+}
+
+void wingco_state::mirjoker_map(address_map &map)
+{
+	lucky8_map(map);
+
+	map(0xc000, 0xf7ff).unmaprw();
+	map(0xc000, 0xc7ff).ram().share("subnvram");  // battery backed RAM on the L8SUB2 sub board
+	map(0xd000, 0xd000).portr("DSW7");
+	map(0xd400, 0xd400).portr("DSW6");
+	map(0xd800, 0xd800).portr("DSW5");
 }
 
 void wingco_state::bingowng_map(address_map &map)
@@ -9422,6 +9436,47 @@ static INPUT_PORTS_START( lucky8 )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )  PORT_DIPLOCATION("DSW3:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mirjoker )
+	PORT_INCLUDE( lucky8 )
+
+	PORT_MODIFY("DSW2")
+	// TODO: the game requires this to be 0x05, otherwise it stops with "DIP SW 2 SET ERROR", what is this actually?
+	PORT_DIPNAME( 0x07, 0x05, "DSW2 Check" )  PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(    0x05, "OK" )
+	PORT_DIPSETTING(    0x07, "Error" )
+
+	// DSW5-7 are on the L8SUB2 sub board
+	PORT_START("DSW5")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW5:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW5:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW5:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW5:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW5:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW5:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW5:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW5:8" )
+
+	PORT_START("DSW6")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW6:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW6:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW6:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW6:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW6:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW6:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW6:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW6:8" )
+
+	PORT_START("DSW7")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW7:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW7:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW7:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW7:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW7:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW7:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW7:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW7:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lucky8a )
@@ -16619,6 +16674,24 @@ void wingco_state::lucky8k(machine_config &config)
 	maincpu.set_decrypted_tag(m_decrypted_opcodes);
 }
 
+void wingco_state::lucky8aa(machine_config &config)
+{
+	lucky8(config);
+
+	MC8123(config.replace(), m_maincpu, CPU_CLOCK);
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::lucky8_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &wingco_state::common_decrypted_opcodes_map);
+}
+
+void wingco_state::mirjoker(machine_config &config)
+{
+	lucky8(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &wingco_state::mirjoker_map);
+
+	NVRAM(config, "subnvram", nvram_device::DEFAULT_ALL_0);
+}
+
 void wingco_state::lucky8p(machine_config &config)
 {
 	lucky8(config);
@@ -23444,6 +23517,80 @@ ROM_START( lucky8z )
 
 	ROM_REGION( 0x20, "unkprom2", 0 )
 	ROM_LOAD( "prom.12d", 0x0000, 0x0020, CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+ROM_START( lucky8aa )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // MC-8123
+	ROM_LOAD( "eagle_68.12b", 0x0000, 0x4000, CRC(69b79f10) SHA1(844e87a0854431f1ff18d2514fd568c7d69c61c7) )
+	ROM_LOAD( "eagle_69.14b", 0x4000, 0x4000, CRC(8eef9996) SHA1(52f40593c6c3998c95baac13ba198e756721bf4a) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 )
+	ROM_LOAD( "key", 0x0000, 0x2000, CRC(36ac8e93) SHA1(eca67e102845639ee589516f0cc9cb96294a6c75) )
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "eagle_5.7h",  0x00000, 0x8000, CRC(59026af3) SHA1(3d7f7e78968ca26275635aeaa0e994468a3da575) )
+	ROM_LOAD( "eagle_6.8h",  0x08000, 0x8000, CRC(67a073c1) SHA1(36194d57d0dc0601fa1fdf2e6806f11b2ea6da36) )
+	ROM_LOAD( "eagle_7.10h", 0x10000, 0x8000, CRC(c415b9d0) SHA1(fd558fe8a116c33bbd712a639224d041447a45c1) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "eagle_1.1h", 0x0000, 0x2000, CRC(29d6f197) SHA1(1542ca457594f6b7fe8f28f7d78023edd7021bc8) )
+	ROM_LOAD( "eagle_2.3h", 0x2000, 0x2000, CRC(5f812e65) SHA1(70d9ea82f9337936bf21f82b6961768d436f3a6f) )
+	ROM_LOAD( "eagle_3.4h", 0x4000, 0x2000, CRC(898b9ed5) SHA1(11b7d1cfcf425d00d086c74e0dbcb72068dda9fe) )
+	ROM_LOAD( "eagle_4.5h", 0x6000, 0x2000, CRC(4f7cfb35) SHA1(0617cf4419be00d9bacc78724089cb8af4104d68) )
+
+	// PROMs not dumped for this set, taken from lucky8
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "d12",   0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )
+	ROM_LOAD( "prom4", 0x0100, 0x0100, BAD_DUMP CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "g14", 0x0000, 0x0100, BAD_DUMP CRC(bd48de71) SHA1(e4fa1e774af1499bc568be5b2deabb859d8c8172) )
+
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "g13", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
+ROM_END
+
+/*
+  Wing W-4 PCB + L8SUB2 subboard
+
+  L8SUB2 sub board:
+  - Z80
+  - 27C256 program ROM
+  - UM6116K-3 RAM, battery backed
+  - 3x bank of 8 switches
+*/
+ROM_START( mirjoker )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mj_1.ic5", 0x0000, 0x8000, CRC(463a96cf) SHA1(9ad26740962bb734c89459ffa2c6f1f645bffb7e) )  // on the L8SUB2 sub board
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "mj_5.h7",  0x00000, 0x8000, CRC(2c21d5a4) SHA1(272273099ce48941bd967e5e2332d77e2b1741c7) )
+	ROM_LOAD( "mj_6.h8",  0x08000, 0x8000, CRC(6e3da3d1) SHA1(bea614654630318f8a874a922933d15b184d3ecc) )
+	ROM_LOAD( "mj_7.h10", 0x10000, 0x8000, CRC(11aff05c) SHA1(ae6cdec4b6d4a4554d0515653de1a823c1c4c561) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "mj_1.h1", 0x0000, 0x2000, CRC(2be73ebc) SHA1(bc18767120b4ae04663da24ea48b6036f3640688) )
+	ROM_LOAD( "mj_2.h3", 0x2000, 0x2000, CRC(34ea33e8) SHA1(b15afed4ea6ccced0f7fc8a3c37cd98e5786453e) )
+	ROM_LOAD( "mj_3.h4", 0x4000, 0x2000, CRC(bee06741) SHA1(512cf404748ca85a243c46bccabc093bf255ea62) )
+	ROM_LOAD( "mj_4.h6", 0x6000, 0x2000, CRC(e82d64dc) SHA1(b284344f5119a3fde5b72333cbee5ae91387481e) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "prom.g13", 0x0000, 0x0100, BAD_DUMP CRC(23e81049) SHA1(78071dae70fad870e972d944642fb3a2374be5e4) )  // dumped as all 0x0f, taken from lucky8
+	ROM_LOAD( "prom.g14", 0x0100, 0x0100, CRC(526cf9d3) SHA1(eb779d70f2507d0f26d225ac8f5de8f2243599ca) )
+
+	// not dumped for this set, taken from lucky8
+	ROM_REGION( 0x20, "proms2", 0 )
+	ROM_LOAD( "prom.d13", 0x0000, 0x0020, BAD_DUMP CRC(c6b41352) SHA1(d7c3b5aa32e4e456c9432a13bede1db6d62eb270) )
+
+	ROM_REGION( 0x100, "unkprom", 0 )
+	ROM_LOAD( "prom.f3", 0x0000, 0x0100, CRC(fcfe6831) SHA1(e8ce4ec7a1afc3efb5012fe9e63e3a7184ab3eea) )
+
+	// not dumped for this set, taken from lucky8
+	ROM_REGION( 0x20, "unkprom2", 0 )
+	ROM_LOAD( "prom.d12", 0x0000, 0x0020, BAD_DUMP CRC(6df3f972) SHA1(0096a7f7452b70cac6c0752cb62e24b643015b5c) )
 ROM_END
 
 /*
@@ -31573,6 +31720,35 @@ ROM_START( fl7_500_gs07 )  // Serial 000000125873.
 	ROM_LOAD( "ds1994l-f5_500.bin", 0x0000, 0x0008, CRC(b34d646f) SHA1(bcd6c4475412ecb1904b6732cf44e8f6bfce9d90) )
 ROM_END
 
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Cyberdyne Systems 7V5.00 (CB500), 500 bonus.
+  Custom Hardware.
+
+  GS08: Flaming 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers.
+
+*/
+ROM_START( fl7_500_gs08 )  // Serial 000000125873.
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "500-main.u22",  0x0000, 0x8000, CRC(e2c82c67) SHA1(951b0044de9b6104f51aa5a3176d0ea475415f7c) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "fl7_gs08.u3",   0x0000, 0x8000, CRC(cfc8f3e2) SHA1(7dd72e3ffb0904776f3c07635b953e72f4c63068) )
+
+	// Proper bipolar PROM dump
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
+	ROM_LOAD( "ds1994l-f5_500.bin", 0x0000, 0x0008, CRC(b34d646f) SHA1(bcd6c4475412ecb1904b6732cf44e8f6bfce9d90) )
+ROM_END
+
 
 /*
   Flaming 7's (unknown version)
@@ -34965,6 +35141,7 @@ GAMEL( 1988, lucky8w,    lucky8,   lucky8,   lucky8d,  wingco_state,   init_luck
 GAME(  1994, lucky8x,    lucky8,   lucky8x,  lucky8,   wingco_state,   empty_init,     ROT0, "bootleg (San System)", "New Lucky 8 Lines (set 22, W-4 with MC68705 MCU)",         MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )  // mostly needs inputs checking
 GAMEL( 198?, lucky8y,    lucky8,   lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "bootleg",              "New Lucky 8 Lines (set 23, W-4)",                          MACHINE_NOT_WORKING,    layout_lucky8 )    // mostly needs inputs checking
 GAMEL( 1986, lucky8z,    lucky8,   lucky8z,  lucky8b,  wingco_state,   empty_init,     ROT0, "bootleg",              "New Lucky 8 Lines (set 24, W-6 for W-4)",                  0,                      layout_lucky8p1 )  // only 1 control set...
+GAMEL( 198?, lucky8aa,   lucky8,   lucky8aa, lucky8,   wingco_state,   init_feverchb,  ROT0, "Eagle/Wing",           "New Lucky 8 Lines (set 25, W-4, Eagle, licensed by Wing, MC-8123)", 0,             layout_lucky8 )
 GAMEL( 198?, ns8lines,   0,        lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "<unknown>",            "New Lucky 8 Lines / New Super 8 Lines (W-4)",              0,                      layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1985, ns8linesa,  ns8lines, lucky8,   lucky8b,  wingco_state,   empty_init,     ROT0, "Yamate (bootleg)",     "New Lucky 8 Lines / New Super 8 Lines (W-4, Lucky97 HW)",  0,                      layout_lucky8p1 )  // only 1 control set...
 GAMEL( 198?, ns8linew,   ns8lines, lucky8t,  ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",            "New Lucky 8 Lines / New Super 8 Lines (F-5, Witch Bonus)", 0,                      layout_lucky8 )    // 2 control sets...
@@ -34974,6 +35151,7 @@ GAMEL( 1988, ns8linewc,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_ini
 GAMEL( 1988, ns8linewd,  ns8lines, lucky8,   ns8linwa, wingco_state,   empty_init,     ROT0, "Yamate",               "New Lucky 8 Lines / New Super 8 Lines (W-4, Witch Bonus, Yamate, 1988, set 2)", 0, layout_lucky8p1 )  // only 1 control set...
 GAMEL( 1991, nd8lines,   lucky8,   nd8lines, nd8lines, wingco_state,   init_nd8lines,  ROT0, "Yamate (bootleg)",     "New Draw 8 Lines (Version 2.1)",                           0,                      layout_nd8lines )  // SN commands inverted bitorder.
 GAMEL( 1989, f16s8l,     lucky8,   lucky8t,  f16s8l,   wingco_state,   empty_init,     ROT0, "Leisure Ent",          "F-16 Super 8 Lines",                                       0,                      layout_lucky8p1 )  // only 1 control set...
+GAMEL( 199?, mirjoker,   0,        mirjoker, mirjoker, wingco_state,   empty_init,     ROT0, "PAL System",           "Miracle Joker",                                            MACHINE_NOT_WORKING,    layout_lucky8 ) // needs inputs / outputs checking
 GAMEL( 198?, super972,   ns8lines, super972, ns8linwa, wingco_state,   init_super972,  ROT0, "<unknown>",            "Super 97-2 (Witch Bonus)",                                 0,                      layout_lucky8p1 )  // only 1 control set...
 GAME(  198?, luckybar,   0,        luckybar, ns8linew, wingco_state,   empty_init,     ROT0, "<unknown>",            "Lucky Bar (W-4 with MC68705 MCU)",                         0 )  // MC68705 MCU
 GAMEL( 198?, kkotnoli,   0,        kkotnoli, kkotnoli, goldstar_state, empty_init,     ROT0, "hack",                 "Kkot No Li (Kill the Bees)",                               MACHINE_IMPERFECT_COLORS, layout_lucky8 )
@@ -35063,6 +35241,7 @@ GAME(  199?, fl7_500_gs04, fl7_50, flaming7, flaming7, wingco_state,   init_flam
 GAME(  199?, fl7_500_gs05, fl7_50, flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (500 bonus, GS05: Diamond Double, Diamonds 7's, Cherry Bonus, Nevada Numbers)",            0 )
 GAME(  199?, fl7_500_gs06, fl7_50, flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (500 bonus, GS06: Dream Catcher, Diamonds 7's, Cherry Bonus, Nevada Numbers)",             0 )
 GAME(  199?, fl7_500_gs07, fl7_50, flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (500 bonus, GS07: Egyptian Gold, Diamonds 7's, Cherry Bonus, Nevada Numbers)",             0 )
+GAME(  199?, fl7_500_gs08, fl7_50, flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (500 bonus, GS08: Flaming 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers)",               0 )
 
 // special 7 sets
 GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted, set 1)",         0 )

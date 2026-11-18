@@ -53,16 +53,9 @@
     for the DAC from the PSEL line and the SIO control lines, but it
     isn't clear exactly how this is achieved.
 
-    The DSP writes values to pdx1 every sample cycle (alternating
+    The DSP writes values to PDX1 every sample cycle (alternating
     between zero and non-zero values).  This may be for the volume
     control chip or something else.
-
-    The photographs of the DL-1425 die (WEDSP16A-M14) show 12 kilowords
-    of internal ROM compared to 4 kilowords as documented.  It's unknown
-    if/how the additional ROM is mapped in the DSP's internal ROM space.
-    The internal program only uses internal ROM from 0x0000 to 0x0fff
-    and external space from 0x8000 onwards.  The additional ROM could
-    be anywhere in between.
 
     Meanings for known command words:
     (((ch - 1) << 3) & 0x78     sample bank
@@ -119,9 +112,8 @@ DEFINE_DEVICE_TYPE(QSOUND, qsound_device, "qsound", "QSound")
 
 // DSP internal ROM region
 ROM_START( qsound )
-	ROM_REGION16_BE( 0x2000, "dsp", 0 )
-	ROM_LOAD16_WORD_SWAP( "dl-1425.bin", 0x0000, 0x2000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
-	ROM_IGNORE( 0x4000 )
+	ROM_REGION16_BE( 0x6000, "dsp", 0 )
+	ROM_LOAD16_WORD_SWAP( "dl-1425.bin", 0x0000, 0x6000, CRC(d6cf5ef5) SHA1(555f50fe5cdf127619da7d854c03f4a244a0c501) )
 ROM_END
 
 
@@ -133,6 +125,7 @@ qsound_device::qsound_device(machine_config const &mconfig, char const *tag, dev
 	: device_t(mconfig, QSOUND, tag, owner, clock)
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
+	, m_dsp_ready_cb(*this)
 	, m_dsp(*this, "dsp"), m_stream(nullptr)
 	, m_rom_bank(0U), m_rom_offset(0U), m_cmd_addr(0U), m_cmd_data(0U), m_new_data(0U), m_cmd_pending(0U), m_dsp_ready(1U)
 	, m_samples{ 0, 0 }, m_sr(0U), m_fsr(0U), m_ock(1U), m_old(1U), m_ready(0U), m_channel(0U)
@@ -161,7 +154,11 @@ void qsound_device::qsound_w(offs_t offset, u8 data)
 		m_new_data = (m_new_data & 0xff00U) | data;
 		break;
 	case 2:
-		m_dsp_ready = 0U;
+		if (m_dsp_ready)
+		{
+			m_dsp_ready = 0U;
+			m_dsp_ready_cb(0);
+		}
 		machine().scheduler().synchronize(
 				timer_expired_delegate(FUNC(qsound_device::set_cmd), this),
 				(unsigned(data) << 16) | m_new_data);
@@ -248,7 +245,11 @@ void qsound_device::device_reset()
 {
 	// TODO: does this get automatically cleared on reset or not?
 	m_cmd_pending = 0U;
-	m_dsp_ready = 1U;
+	if (!m_dsp_ready)
+	{
+		m_dsp_ready = 1U;
+		m_dsp_ready_cb(1);
+	}
 	m_dsp->set_input_line(DSP16_INT_LINE, CLEAR_LINE);
 }
 
@@ -364,7 +365,11 @@ u16 qsound_device::dsp_pio_r()
 
 void qsound_device::set_dsp_ready(s32 param)
 {
-	m_dsp_ready = 1U;
+	if (!m_dsp_ready)
+	{
+		m_dsp_ready = 1U;
+		m_dsp_ready_cb(1);
+	}
 }
 
 void qsound_device::set_cmd(s32 param)

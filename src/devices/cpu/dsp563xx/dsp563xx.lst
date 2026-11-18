@@ -91,10 +91,10 @@
 	$d:w1(r);
 
 ....33 lsl d                 - d:acc(3)
-	$d:w(do_lsl56(1, $d));
+	$d:w1(do_lsl24(1, $d:1));
 
 ....23 lsr d                 - d:acc(3)
-	$d:w(do_lsr56(1, $d));
+	$d:w1(do_lsr24(1, $d:1));
 
 ....82 mac +s1,s2,d          - s1:damo1_a(4) s2:damo1_b(4) d:acc(3) +:sign(2)
 	s64 r = (s64)util::sext($s1, 24) * (s64)util::sext($s2, 24);
@@ -189,10 +189,10 @@
 	$d:w(do_rnd56($d));
 
 ....37 rol d                 - d:acc(3)
-	$d:w(do_rol56($d));
+	$d:w1(do_rol24($d:1));
 
 ....27 ror d                 - d:acc(3)
-	$d:w(do_ror56($d));
+	$d:w1(do_ror24($d:1));
 
 ....25 sbc s,d               - s:xyr(4) d:acc(3)
 	$d:w(do_sbc56(util::sext($s, 48), $d));
@@ -1620,16 +1620,16 @@ c000.. s1,x:eax y:eay,d2     - eax:xyeax(8) eay:xyeay(20, 13, 10) s1:tbrx(18) d2
 	$d:w($i);
 
 0c1e80 lsl #i,d              - i:shift5(1) d:acc(0)
-	$d:w(do_lsl56($i, $d));
+	$d:w1(do_lsl24($i, $d:1));
 
 0c1e10 lsl s,d               - s:actrl(1) d:acc(0)
-	$d:w(do_lsl56($s, $d));
+	$d:w1(do_lsl24($s, $d:1));
 
 0c1ec0 lsr #i,d              - i:shift5(1) d:acc(0)
-	$d:w(do_lsr56($i, $d));
+	$d:w1(do_lsr24($i, $d:1));
 
 0c1e30 lsr s,d               - s:actrl(1) d:acc(0)
-	$d:w(do_lsr56($s, $d));
+	$d:w1(do_lsr24($s, $d:1));
 
 044000 lua ea,d              - ea:eam4(8) d:fvbr1(0)
 	$d:wh($ea);

@@ -24,6 +24,8 @@
 class cgp220_device : public device_t
 {
 public:
+	static constexpr feature_type imperfect_features() { return feature::PRINTER; }
+
 	cgp220_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// interface select switch: serial or parallel
@@ -37,10 +39,10 @@ public:
 
 	void rxd_w(int state);
 	void strobe_w(int state);
-	void data_w(u8 data) { m_data = data; }
-	template <unsigned Bit> void data_bit_w(int state) { m_data = (m_data & ~(1U << Bit)) | ((state ? 1U : 0U) << Bit); }
+	template <u32 Bit> void data_bit_w(int state) { m_data = (m_data & ~(1U << Bit)) | ((state ? 1U : 0U) << Bit); }
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -58,11 +60,12 @@ private:
 	u8 status_r();
 	void head_fire_w(u8 data);
 
+	TIMER_CALLBACK_MEMBER(rxd_sync);
+	TIMER_CALLBACK_MEMBER(strobe_sync);
 	TIMER_CALLBACK_MEMBER(carriage_tick);
-	int sensor(int pos) const;
 	void step_paper(u8 phases);
 	void update_head();
-	void update_outputs();
+	void update_outputs(bool force = false);
 
 	required_device<mc6809_device> m_maincpu;
 	required_device<pia6821_device> m_pia;
@@ -82,19 +85,20 @@ private:
 	emu_timer *m_carriage_timer;
 
 	bool m_serial;
-	int m_rxd;
-	int m_strobe;
+	u8 m_rxd;
+	u8 m_strobe;
 	u8 m_data;
 	u8 m_latch;
 	u8 m_control;
 	bool m_busy_ff;
+	u8 m_outputs;
 	u8 m_heads;
 	u8 m_motor;
 	u8 m_paper_phase;
-	int m_paper_steps;
+	s32 m_paper_steps;
 	double m_cr_pos;
 	double m_cr_vel;
-	int m_cr_cell;
+	s32 m_cr_cell;
 };
 
 DECLARE_DEVICE_TYPE(CGP220, cgp220_device)

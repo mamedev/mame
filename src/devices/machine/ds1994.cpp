@@ -14,7 +14,9 @@
 #include "emu.h"
 #include "ds1994.h"
 
+#include <algorithm>
 #include <ctime>
+#include <iterator>
 #include <tuple>
 
 
@@ -35,6 +37,7 @@ DEFINE_DEVICE_TYPE(DS1994, ds1994_device, "ds1994", "DS1994 iButton 4Kb Memory P
 
 ds1994_device::ds1994_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DS1994, tag, owner, clock), device_nvram_interface(mconfig, *this)
+	, m_default_data(*this, DEVICE_SELF)
 	, m_timer_main(nullptr)
 	, m_timer_reset(nullptr)
 	, m_timer_clock(nullptr)
@@ -51,6 +54,7 @@ ds1994_device::ds1994_device(const machine_config &mconfig, const char *tag, dev
 	, m_rx(false)
 	, m_tx(false)
 	, m_state_ptr(0)
+	, m_auth(false)
 	, m_offs_ro(false)
 {
 	memset(m_ram, 0, sizeof(m_ram));
@@ -105,6 +109,9 @@ void ds1994_device::device_start()
 	save_item(NAME(m_a1));
 	save_item(NAME(m_a2));
 	save_item(NAME(m_offset));
+	save_item(NAME(m_regs));
+	save_item(NAME(m_auth));
+	save_item(NAME(m_offs_ro));
 
 	// state machine
 	save_item(NAME(m_state));
@@ -130,29 +137,8 @@ void ds1994_device::device_reset()
 	m_state_ptr = 0;
 	m_state[m_state_ptr] = STATE_IDLE;
 
-	memory_region *region = memregion(DEVICE_SELF);
-	if (region != nullptr)
-	{
-		if (region->bytes() == ROM_SIZE + SPD_SIZE + DATA_SIZE + RTC_SIZE + REGS_SIZE)
-		{
-			memcpy(m_rom,  region->base(), ROM_SIZE);
-			memcpy(m_ram,  region->base() + ROM_SIZE, SPD_SIZE);
-			memcpy(m_sram, region->base() + ROM_SIZE + SPD_SIZE, DATA_SIZE);
-			memcpy(m_rtc,  region->base() + ROM_SIZE + SPD_SIZE + DATA_SIZE, RTC_SIZE);
-			memcpy(m_regs, region->base() + ROM_SIZE + SPD_SIZE + DATA_SIZE + RTC_SIZE, REGS_SIZE);
-			return;
-		}
-		LOGMASKED(LOG_ERRORS, "ds1994 %s: Wrong region length for data, expected 0x%x, got 0x%x\n", tag(), ROM_SIZE + SPD_SIZE + DATA_SIZE + RTC_SIZE + REGS_SIZE, region->bytes());
-	}
-	else
-	{
-		LOGMASKED(LOG_ERRORS, "ds1994 %s: Warning, no id provided, answer will be all zeroes.\n", tag());
-		memset(m_rom,  0, ROM_SIZE);
-		memset(m_ram,  0, SPD_SIZE);
-		memset(m_sram, 0, DATA_SIZE);
-		memset(m_rtc,  0, RTC_SIZE);
-		memset(m_regs, 0, REGS_SIZE);
-	}
+	m_timer_main->adjust(attotime::never);
+	m_timer_reset->adjust(attotime::never);
 }
 
 /********************************************/
@@ -256,6 +242,7 @@ void ds1994_device::handle_cmd(void)
 		switch (m_shift)
 		{
 			case COMMAND_READ_MEMORY:
+				m_offs_ro = false;
 				LOGMASKED(LOG_COMMANDS, "cmd read_memory\n");
 				m_bit = 0;
 				m_byte = 0;
@@ -440,7 +427,7 @@ TIMER_CALLBACK_MEMBER(ds1994_device::main_tick)
 				m_bit = 0;
 				if (m_offs_ro)
 				{
-					if (m_a2 != m_shift)
+					if (m_offset != m_shift)
 						m_auth = false;
 					LOGMASKED(LOG_STATES, "timer_main state_address1 - OFS_ES=%02x  - Auth_Code 3=%02x\n", m_offset, m_shift);
 				}
@@ -457,8 +444,13 @@ TIMER_CALLBACK_MEMBER(ds1994_device::main_tick)
 			if (one_wire_rx_bit())
 			{
 				m_bit = 0;
-				m_ram[m_offset & 0x1f] = m_shift & 0xff;
-				m_offset++;
+				if (m_address < SPD_SIZE)
+				{
+					m_ram[m_address] = m_shift;
+					m_offset = m_address++; // E/S identifies the last byte written, not the next byte.
+				}
+				else
+					m_offset |= 0x40; // overflow
 			}
 			LOGMASKED(LOG_STATES, "timer_main state_write_scratchpad %d Offs=%02x\n", m_rx, m_offset);
 			break;
@@ -506,12 +498,14 @@ TIMER_CALLBACK_MEMBER(ds1994_device::main_tick)
 				LOGMASKED(LOG_STATES, "timer_main txoffset window closed\n");
 			break;
 		case STATE_READ_MEMORY:
+			m_tx = true;
 			LOGMASKED(LOG_STATES, "timer_main state_readmemory\n");
 			break;
 		case STATE_COPY_SCRATCHPAD:
 			LOGMASKED(LOG_STATES, "timer_main state_copy_scratchpad\n");
 			break;
 		case STATE_READ_SCRATCHPAD:
+			m_tx = true;
 			LOGMASKED(LOG_STATES, "timer_main state_read_scratchpad\n");
 			break;
 		default:
@@ -536,22 +530,24 @@ TIMER_CALLBACK_MEMBER(ds1994_device::main_tick)
 			case STATE_WRITE_SCRATCHPAD:
 				LOGMASKED(LOG_STATES, "timer_main (init_cmd) -> state_write_scratchpad - set address\n");
 				m_offs_ro = false;
-				m_offset = 0;
+				m_address = m_a1 & 0x1f;
+				m_offset = m_address;
 				break;
 			case STATE_READ_SCRATCHPAD:
 				LOGMASKED(LOG_STATES, "timer_main (init_cmd) -> state_read_scratchpad - set address\n");
-				m_address = 0;
+				m_address = m_a1 & 0x1f;
 				break;
 			case STATE_COPY_SCRATCHPAD:
 				LOGMASKED(LOG_STATES, "timer_main (init_cmd) -> state_copy_scratchpad - do copy\n");
 				if (m_auth)
 				{
 					m_address = (m_a2 << 8) | m_a1;
-					for (int i = 0; i <= m_offset; i++)
+					for (int i = m_a1 & 0x1f; i <= (m_offset & 0x1f); i++)
 					{
 						writemem(m_ram[i]);
 						m_address++;
 					}
+					m_offset |= 0x80; // authorization accepted
 				}
 				else
 					LOGMASKED(LOG_STATES, "timer_main (init_cmd) -> state_copy_scratchpad - Auth-Rejected\n");
@@ -669,18 +665,8 @@ void ds1994_device::write(int state)
 				m_timer_main->adjust(t_rdv);
 				break;
 			case STATE_COPY_SCRATCHPAD:
-				if (m_auth)
-				{
-					LOGMASKED(LOG_WRITES, "state_copy_scratchpad Auth_Code Match: %d\n", m_tx);
-					m_tx = true;
-					m_auth = false;
-				}
-				else
-				{
-					m_tx = false;
-					LOGMASKED(LOG_WRITES, "state_copy_scratchpad Auth_Code No Match: %d\n", m_tx);
-				}
-				m_timer_main->adjust(t_rdv);
+				// Copy completion holds the bus low until the next reset.
+				m_tx = !m_auth;
 				break;
 			case STATE_WRITE_SCRATCHPAD:
 				LOGMASKED(LOG_WRITES, "state_write_scratchpad\n");
@@ -688,10 +674,10 @@ void ds1994_device::write(int state)
 				break;
 			case STATE_READ_SCRATCHPAD:
 				LOGMASKED(LOG_WRITES, "state_read_scratchpad\n");
-				if (one_wire_tx_bit(m_ram[m_address]))
+				if (one_wire_tx_bit(m_address < SPD_SIZE ? m_ram[m_address] : 0xff))
 				{
 					m_bit = 0;
-					if (m_address <= m_offset)
+					if (m_address < SPD_SIZE)
 						m_address++;
 					else
 						m_tx = true;
@@ -738,11 +724,27 @@ int ds1994_device::read()
 
 void ds1994_device::nvram_default()
 {
-	memset(m_rom,  0, ROM_SIZE);
-	memset(m_ram,  0, SPD_SIZE);
-	memset(m_sram, 0, DATA_SIZE);
-	memset(m_rtc,  0, RTC_SIZE);
-	memset(m_regs, 0, REGS_SIZE);
+	std::fill(std::begin(m_rom), std::end(m_rom), 0);
+	std::fill(std::begin(m_ram), std::end(m_ram), 0);
+	std::fill(std::begin(m_sram), std::end(m_sram), 0);
+	std::fill(std::begin(m_rtc), std::end(m_rtc), 0);
+	std::fill(std::begin(m_regs), std::end(m_regs), 0);
+
+	if (m_default_data)
+	{
+		if (m_default_data.bytes() != ROM_SIZE + SPD_SIZE + DATA_SIZE + RTC_SIZE + REGS_SIZE)
+			throw emu_fatalerror("%s: Wrong default data length, expected 0x%x, got 0x%x", tag(), ROM_SIZE + SPD_SIZE + DATA_SIZE + RTC_SIZE + REGS_SIZE, m_default_data.bytes());
+
+		std::copy_n(&m_default_data[0], ROM_SIZE, m_rom);
+		std::copy_n(&m_default_data[ROM_SIZE], SPD_SIZE, m_ram);
+		std::copy_n(&m_default_data[ROM_SIZE + SPD_SIZE], DATA_SIZE, m_sram);
+		std::copy_n(&m_default_data[ROM_SIZE + SPD_SIZE + DATA_SIZE], RTC_SIZE, m_rtc);
+		std::copy_n(&m_default_data[ROM_SIZE + SPD_SIZE + DATA_SIZE + RTC_SIZE], REGS_SIZE, m_regs);
+	}
+	else
+	{
+		LOGMASKED(LOG_ERRORS, "ds1994 %s: Warning, no id provided, answer will be all zeroes.\n", tag());
+	}
 }
 
 //-------------------------------------------------

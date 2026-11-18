@@ -20,15 +20,15 @@ class rs232_cgp220_device : public device_t, public device_rs232_port_interface
 public:
 	rs232_cgp220_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	virtual void input_txd(int state) override { m_printer->rxd_w(state); }
+	// device_rs232_port_interface implementation
+	virtual void input_txd(int state) override;
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
-	void busy_w(int state);
-
 	required_device<cgp220_device> m_printer;
 };
 
