@@ -33247,9 +33247,6 @@ notechan
 @source:misc/nsg6809.cpp
 pitchhit
 
-@source:misc/nsmpoker.cpp
-nsmpoker
-
 @source:misc/odyssey.cpp
 odyssey
 
@@ -36785,6 +36782,38 @@ sbasssta
 
 @source:novation/drumsta.cpp
 drumsta
+
+@source:nsm/f8.cpp
+rtduplex
+
+@source:nsm/poker.cpp
+nsmpoker
+
+@source:nsm/st25.cpp
+alphar
+amarillo
+arenau
+avanti
+ballermn
+bgaction
+bigkick
+blizzard
+boosters
+colossos
+cttower
+galaktca
+jamaica
+macaor
+majesto
+matrixx
+mtclssic
+purpurr
+robin
+spasch
+stakeoff
+tango
+tobago
+xeno
 
 @source:oberheim/dmx.cpp
 obdmx
@@ -44682,35 +44711,6 @@ sols5e
 
 @source:skeleton/squale.cpp
 squale
-
-@source:nsm/f8.cpp
-rtduplex
-
-@source:nsm/st25.cpp
-alphar
-amarillo
-arenau
-avanti
-ballermn
-bgaction
-bigkick
-blizzard
-boosters
-colossos
-cttower
-galaktca
-jamaica
-macaor
-majesto
-matrixx
-mtclssic
-purpurr
-robin
-spasch
-stakeoff
-tango
-tobago
-xeno
 
 @source:skeleton/sterz80.cpp
 tongzi
