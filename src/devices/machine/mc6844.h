@@ -85,9 +85,9 @@ protected:
 	/* channel_data structure holds info about each 6844 DMA channel */
 	struct m6844_channel_data
 	{
-		int active;
-		int address;
-		int counter;
+		bool active;
+		u16 address;
+		u16 counter;
 		// Channel control register.
 		//  bit 0: Read / Write mode
 		//  bit 1: Mode control B
@@ -103,8 +103,6 @@ protected:
 		// Mode control A,B: 0,0 Mode2; 0,1 Mode 3; 1,0 Mode 0;
 		//                   1,1 Undefined.
 		uint8_t control;
-		int start_address;
-		int start_counter;
 	};
 
 	/* 6844 description */
