@@ -67,7 +67,7 @@ private:
 	devcb_write_line m_txd_w[2], m_rxready_w[2], m_txready_w[2], m_txempty_w[2], m_syndet_w[2];
 
 	uint8_t m_mode[2], m_baud[2];
-	uint8_t m_rxrdy_out[2]; // RxRDY as driven out, after the interrupt mask
+	bool m_rxrdy_out[2];    // RxRDY as driven out, after the interrupt mask
 
 	template<int ch> void brg_tick(int state);
 	void recalc_brg(int channel);

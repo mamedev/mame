@@ -99,7 +99,7 @@ void i8251_device::device_start()
 	m_command = 0;
 	m_mode_byte = 0;
 	m_delayed_tx_en = false;
-	m_rxrdy = 0;
+	m_rxrdy = false;
 
 	m_rxc_count = 0;
 	m_txc_count = 0;
@@ -158,13 +158,12 @@ void i8251_device::device_start()
 
 void i8251_device::update_rx_ready()
 {
-	// Repeat a 1, but send a 0 only when the level falls.  A command write
-	// can run just before a character arrives yet be timed after it, and a
-	// consumer that defers its input (an input merger) would apply its
-	// repeated 0 last and lose that character's interrupt.  A repeated 1
-	// can't be out of date: only the CPU (reading the data or turning RxE
-	// off) or a reset clears RxRDY.
-	uint8_t const state = rxrdy_r();
+	// Repeat a 1, but send a 0 only when the level falls.  A consumer that
+	// defers its input (input_merger, rst_pos_buffer) applies calls in time
+	// order, and a CPU access can run before an earlier-timed receive: a
+	// repeated 0 would land after the receive's 1 and lose its interrupt.
+	// A data read's 0 can still land late; the next repeated 1 restores it.
+	bool const state = rxrdy_r();
 	if (state || m_rxrdy)
 	{
 		m_rxrdy = state;
@@ -579,7 +578,7 @@ void i8251_device::device_reset()
 	update_tx_empty();
 	/* update rx ready pin output; RESET forces it low, so send the low
 	   whatever was last driven */
-	m_rxrdy = 1;
+	m_rxrdy = true;
 	update_rx_ready();
 	/* update tx ready pin output */
 	update_tx_ready();

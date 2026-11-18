@@ -57,7 +57,7 @@ mb89371_device::mb89371_device(const machine_config &mconfig, const char *tag, d
 	, m_syndet_w { *this, *this }
 	, m_mode { 0xf0, 0xf0 }
 	, m_baud { 0, 0 }
-	, m_rxrdy_out { 0, 0 }
+	, m_rxrdy_out { false, false }
 {
 }
 
@@ -221,7 +221,7 @@ template void mb89371_device::tx_data_w<1>(int state);
 // doesn't repeat a 0, so mode_w drives a mask change through here).
 template <int ch> void mb89371_device::rx_ready_w(int state)
 {
-	uint8_t const out = (state ? 1 : 0) & BIT(m_mode[ch], MODE_IRQMASK_RXREADY);
+	bool const out = state && BIT(m_mode[ch], MODE_IRQMASK_RXREADY);
 	if (out || m_rxrdy_out[ch])
 	{
 		m_rxrdy_out[ch] = out;
