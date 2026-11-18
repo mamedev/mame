@@ -36,7 +36,21 @@ u16 sci_state::sci_spriteframe_r()
 
 void sci_state::sci_spriteframe_w(u16 data)
 {
-	m_sci_spriteframe = (data >> 8) & 0xff;
+	const int newframe = (data >> 8) & 0xff;
+
+	/* SCI and Racing Beat write opposite absolute values while building
+	   the same spriteram half, so the value cannot select the displayed
+	   half directly; treat each bit 0 edge as the buffer swap trigger and
+	   latch the half about to be rebuilt (its content from the previous
+	   period), which matches the beam-racing list updates both games
+	   perform on the displayed half. Cures sprites showing the list
+	   under construction (e.g. Racing Beat car palette flashes). */
+	if (((newframe ^ m_sci_spriteframe) & 1) && m_spritebuf_display)
+	{
+		m_sprphase ^= 1;
+		memcpy(m_spritebuf_display.get(), &m_spriteram[m_sprphase * 0x800], 0x800 * 2);
+	}
+	m_sci_spriteframe = newframe;
 }
 
 
@@ -513,32 +527,28 @@ void sci_state::sci_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitma
 	int sprites_flipscreen = 0;
 	static const u32 primasks[2] = { 0xf0, 0xfc };
 
-	/* SCI alternates between two areas of its spriteram */
+	/* SCI alternates between two areas of its spriteram; draw from the
+	   copy latched on spriteframe edges in sci_spriteframe_w */
 
-	// This gave back to front frames causing bad flicker... but
-	// reversing it now only gives us sprite updates on alternate
-	// frames. So we probably have to partly buffer spriteram?
+	const u16 *sprsrc = m_spritebuf_display.get();
 
-	int start_offs = (m_sci_spriteframe & 1) * 0x800;
-	start_offs = 0x800 - start_offs;
-
-	for (int offs = (start_offs + 0x800 - 4); offs >= start_offs; offs -= 4)
+	for (int offs = (0x800 - 4); offs >= 0; offs -= 4)
 	{
-		u16 data = m_spriteram[offs + 0];
+		u16 data = sprsrc[offs + 0];
 		int zoomy = (data & 0x7e00) >> 9;
 		int y =      data & 0x01ff;
 
-		data = m_spriteram[offs + 1];
+		data = sprsrc[offs + 1];
 		const u32 priority = (data & 0x8000) >> 15;
 		const u32 color =    (data & 0x7f80) >> 7;
 		int zoomx =          (data & 0x003f);
 
-		data = m_spriteram[offs + 2];
+		data = sprsrc[offs + 2];
 		int flipy = (data & 0x8000) >> 15;
 		int flipx = (data & 0x4000) >> 14;
 		int x =      data & 0x01ff;
 
-		data = m_spriteram[offs + 3];
+		data = sprsrc[offs + 3];
 		const u32 tilenum = data & 0x1fff;    /* $80000 spritemap rom maps up to $2000 64x64 sprites */
 
 		if (!tilenum)
