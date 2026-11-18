@@ -3,6 +3,13 @@
 <!--
 license:CC0-1.0
 
+SOFTWARE LOADING INSTRUCTIONS:
+- Where usage is "IPL", press C and start tape playback
+- Where usage is "<OS> MON", first load the specified OS version (e.g. SB-5520), insert the cassette image, then type MON, press RETURN, type L, press RETURN twice and start tape playback
+- Where usage is "<OS> LOAD", first load the specified OS version (e.g. SB-5520), insert the cassette image, then type LOAD, press RETURN and start tape playback
+
+Where an operating system needs to be loaded first, it is likely nonthing will happen when the tape completes loading. Remove the cassette image and the software should run.
+
 TODO:
 - pinpoint differences between the various SB BASIC flavours
 
@@ -24,6 +31,33 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="18923">
 				<rom name="sb5510.mzf" size="18923" crc="f9f7edb2" sha1="4436a3b73a8a6a54fe4d04f4d0d0e2adece479cd"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb5520" supported="no">
+		<description>BASIC SB-5520</description>
+		<year>1981</year>
+		<publisher>Sharp</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="usage" value="IPL" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="19054">
+				<rom name="sb5520.mzt" size="19054" crc="b74d0f9c" sha1="d85a44951289a1910cdaec65cd0b71ff0e1a6f37"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb5520a" cloneof="sb5520" supported="yes">
+		<description>BASIC SB-5520 (alt)</description>
+		<year>1981</year>
+		<publisher>Sharp</publisher>
+		<info name="usage" value="IPL" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="4484892">
+				<rom name="sb5520.wav" size="4484892" crc="50bde770" sha1="2f5932c83258e1770bab9640322f5489a68981c8"/>
 			</dataarea>
 		</part>
 	</software>
@@ -98,6 +132,111 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 
 <!-- !Games -->
 
+	<software name="donkey" supported="partial">
+		<description>Donkey Climber</description>
+		<year>1982</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
+		<info name="usage" value="SB-5520 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1798287">
+				<rom name="donkey climber.wav" size="1798287" crc="15c4b3b6" sha1="f668698abaccace3bc604c07ffacf909236245d0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxian" supported="partial">
+		<description>Galaxian</description>
+		<year>1983</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
+		<info name="usage" value="SB-5520 MON" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1101654">
+				<rom name="galaxian.wav" size="1101654" crc="e37b9f7b" sha1="fba62570405e9f4efb2439555c278f99774843d8"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="icbm" supported="partial">
+		<description>ICBM</description>
+		<year>1981</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
+		<info name="usage" value="SB-5520 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="3387809">
+				<rom name="icbm.wav" size="3387809" crc="e617fe41" sha1="e4736bc9fcb0f3225b622cb985cba986de2fc8ba"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puckpuck" supported="no">
+		<description>Puck &amp; Puck</description>
+		<year>19??</year>
+		<publisher>K. Kuromusha</publisher>
+		<notes><![CDATA[
+CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
+]]></notes>
+		<info name="usage" value="IPL" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="11296">
+				<rom name="puck &amp; puck.mzt" size="11296" crc="0674fcc2" sha1="5bf6a86d35d89a4078d1716f86f76fdd79e27a84"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puckpucka" cloneof="puckpuck" supported="yes">
+		<description>Puck &amp; Puck (alt)</description>
+		<year>19??</year>
+		<publisher>K. Kuromusha</publisher>
+		<info name="usage" value="IPL" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="2643804">
+				<rom name="puck &amp; puck.wav" size="2643804" crc="1b2a780a" sha1="cdc10af3165cd9fab9732dfbe996d020198ae0e2"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sosdonbr" supported="partial">
+		<description>SOS! Donbar</description>
+		<year>19??</year>
+		<publisher>Hudson Soft</publisher>
+		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
+		<info name="usage" value="SB-5520 MON" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="6007248">
+				<rom name="sos donbar.wav" size="6007248" crc="c0aaae32" sha1="4c728766bf1d1a9adf579ecb710da9e89e391668"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spaceinv" supported="partial">
+		<description>Space Invader</description>
+		<year>1981</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
+		<info name="usage" value="SB-5520 MON" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="921498">
+				<rom name="space invader.wav" size="921498" crc="b9dd036b" sha1="b55a76b0bec0e2c6446886d27c7aa7824de84f92"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprgmstr" supported="partial">
+		<description>Spring Monster</description>
+		<year>1982</year>
+		<publisher>Isoro Valza</publisher>
+		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
+		<info name="usage" value="SB-5520 MON" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1708198">
+				<rom name="spring monster.wav" size="1708198" crc="ded396b4" sha1="56b7c6b4b62ea466f66217963f3cd9ded8fd9761"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="vosque" supported="no">
 		<description>Vosque</description>
 		<year>19??</year>
@@ -107,10 +246,35 @@ CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 CHECK SUM ERROR, boots with Z80 clock set at 3.2 MHz (80%)
 ]]></notes>
 		<info name="usage" value="IPL" />
-
 		<part name="cass1" interface="mz_cass">
 			<dataarea name="cass" size="25472">
 				<rom name="vosque mz80b.mzt" size="25472" crc="1dc3b210" sha1="3c87d52292e356686eca927cd26614a3ffe6739e"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vosquea" cloneof="vosque" supported="yes">
+		<description>Vosque (alt)</description>
+		<year>19??</year>
+		<!-- TODO: from title, check spelling on tape cover -->
+		<publisher>d.B Soft</publisher>
+		<info name="usage" value="IPL" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="5637132">
+				<rom name="vosque mz80b.wav" size="5637132" crc="1044e236" sha1="7f29b5ce3c92b9f680cb3b2361761d28644ae19f"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="walkwan" supported="partial">
+		<description>Walk Wan</description>
+		<year>1982</year>
+		<publisher>Tecno Soft</publisher>
+		<notes><![CDATA[When loading completes remove the cassette image and the software will run]]></notes>
+		<info name="usage" value="SB-5520 LOAD" />
+		<part name="cass1" interface="mz_cass">
+			<dataarea name="cass" size="1580235">
+				<rom name="walk wan.wav" size="1580235" crc="682948d3" sha1="a25bf1c55959a6a92e7225112644a08b069ee7b5"/>
 			</dataarea>
 		</part>
 	</software>
