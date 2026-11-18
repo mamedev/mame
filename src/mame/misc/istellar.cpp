@@ -5,13 +5,13 @@ Funai / Gakken Inter Stellar Laser Fantasy laserdisc hardware
 Driver by Andrew Gardner with help from Daphne Source
 
 Notes:
-    Holding down the TEST switch while hitting reset will bring up the Self Test.
+    Holding down the TEST switch while hitting reset will bring up the Self Test. (Not on Zangus, apparently)
     Hit TEST switch again for color and monitor calibration.
     This is somewhat strange hardware : More z80's than necessary
                                         3 bpp sprites
                                         6-pin dip switches with odd handling
                                         inverted DIP logic?
-                                        CPU2 maps RAM over where its ROM lives
+                                        CPU2 has its RAM at the top 1K of its ROM's 8K space (0x1c00-0x1fff)
     To skip LD boot: bp 4458,1,{pc=0x447a;g}
     Then fill $a074 with 1 to go in attract mode
 
@@ -19,13 +19,15 @@ Todo:
     How does one best make one DIP switch bit from address 0x02 tie to two bits from address 0x03?
     Get real ROM labels!  The current labels are unfortunately a bit odd.
     Make it work - this one should be close right now :/.
-    istellar2 fails test for all the main CPU ROMs. Maybe because it's a prototype?
+    Game fails CPU ROM test because the checksum table has placeeholder 0xFFFF checksums.
+	Doesn't stop it from being playable though.
 */
 
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
+#include "sound/sn76496.h"
 #include "machine/ldv1000.h"
 
 #include "emupal.h"
@@ -54,12 +56,16 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_laserdisc(*this, "laserdisc") ,
+		m_dsw1(*this, "DSW1"),
+		m_psg_front(*this, "sn_front"),
+		m_psg_rear(*this, "sn_rear"),
 		m_tile_ram(*this, "tile_ram"),
 		m_tile_control_ram(*this, "tile_ctrl_ram"),
 		m_sprite_ram(*this, "sprite_ram") { }
 
 	void init_istellar();
 	void istellar(machine_config &config);
+	void istellar2(machine_config &config);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -73,10 +79,15 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
+	required_ioport m_dsw1;
+	required_device<sn76489_device> m_psg_front;
+	required_device<sn76489_device> m_psg_rear;
 
 	required_shared_ptr<uint8_t> m_tile_ram;
 	required_shared_ptr<uint8_t> m_tile_control_ram;
 	required_shared_ptr<uint8_t> m_sprite_ram;
+
+	bool m_irq_pulse = false;
 
 	tilemap_t *m_fg_tilemap = nullptr;
 	TILE_GET_INFO_MEMBER(get_tile_info);
@@ -86,10 +97,19 @@ private:
 	void overlay_control_w(uint8_t data);
 
 	u8 m_overlay_ctrl = 0;
+	u8 m_sound_status = 0;
+
+	uint8_t dsw1_sound_status_r();
+	// the PSG data bus is wired in reverse order (the sound program pre-reverses every byte)
+	void psg_front_w(uint8_t data) { m_psg_front->write(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7)); }
+	void psg_rear_w(uint8_t data) { m_psg_rear->write(bitswap<8>(data, 0, 1, 2, 3, 4, 5, 6, 7)); }
+	void sound_status_w(uint8_t data) { m_sound_status = data; }
 
 	uint8_t z80_2_ldp_read();
 	uint8_t z80_2_unknown_read();
 	void z80_2_ldp_write(uint8_t data);
+	void z80_2_irq_ack_w(uint8_t data);
+	void z80_2_ldp_enter_w(uint8_t data);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vblank_irq(int state);
 	void z80_0_io(address_map &map) ATTR_COLD;
@@ -98,6 +118,7 @@ private:
 	void z80_1_mem(address_map &map) ATTR_COLD;
 	void z80_2_io(address_map &map) ATTR_COLD;
 	void z80_2_mem(address_map &map) ATTR_COLD;
+	void z80_2_mem_roms(address_map &map) ATTR_COLD;
 };
 
 void istellar_state::tile_w(offs_t offset, uint8_t data)
@@ -129,9 +150,8 @@ void istellar_state::video_start()
 
 uint32_t istellar_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	// TODO: should really draw transparent when bit 7 disabled, also gradient to be verified.
-	// (May actually be an opaque flag for tilemap + pal bank?)
-	bitmap.fill(BIT(m_overlay_ctrl, 7) ? rgb_t(0x00, 0x00, 0xff) : rgb_t(0, 0, 0), cliprect);
+	// the overlay is genlocked over the laserdisc video, so only the tilemap and sprites are opaque
+	bitmap.fill(rgb_t(0, 0, 0, 0), cliprect);
 
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 
@@ -164,6 +184,8 @@ uint32_t istellar_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 void istellar_state::machine_start()
 {
+	save_item(NAME(m_overlay_ctrl));
+	save_item(NAME(m_sound_status));
 }
 
 
@@ -194,6 +216,19 @@ void istellar_state::z80_2_ldp_write(uint8_t data)
 	m_laserdisc->data_w(data);
 }
 
+// The LDP comm CPU's IRQ handler (0x0038) writes to port 0x02 before doing anything else,
+// otherwise the vblank interrupt would be retaken forever and the main loop would starve.
+void istellar_state::z80_2_irq_ack_w(uint8_t data)
+{
+	m_subcpu->set_input_line(0, CLEAR_LINE);
+}
+
+void istellar_state::z80_2_ldp_enter_w(uint8_t data)
+{
+	LOGCPU2("CPU2 : ENTER %x\n", data);
+	m_laserdisc->enter_w(BIT(data, 0));
+}
+
 void istellar_state::overlay_control_w(uint8_t data)
 {
 	m_overlay_ctrl = data;
@@ -202,6 +237,11 @@ void istellar_state::overlay_control_w(uint8_t data)
 }
 
 // PROGRAM MAPS
+uint8_t istellar_state::dsw1_sound_status_r()
+{
+	return m_dsw1->read() | (m_sound_status & 0x80);
+}
+
 void istellar_state::z80_0_mem(address_map &map)
 {
 	map(0x0000, 0x9fff).rom();
@@ -219,8 +259,10 @@ void istellar_state::z80_1_mem(address_map &map)
 
 void istellar_state::z80_2_mem(address_map &map)
 {
-	map(0x0000, 0x17ff).rom();
-	map(0x1800, 0x1fff).ram();
+	// the ROM image holds constants at 0x1800 and a version string at 0x1900; only 0x1c00-0x1fff is RAM
+	map(0x0000, 0x1bff).rom();
+	map(0x1c00, 0x1fff).ram();
+	map(0x8000, 0xffff).nopr(); // dummy reads of unpopulated ROM sockets
 	map(0xc000, 0xc000).r(FUNC(istellar_state::z80_2_unknown_read));     // Seems to be thrown away every time it's read - maybe interrupt related?
 }
 
@@ -230,18 +272,25 @@ void istellar_state::z80_0_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map(0x00, 0x00).portr("IN0");
-	map(0x02, 0x02).portr("DSW1");
+	map(0x02, 0x02).r(FUNC(istellar_state::dsw1_sound_status_r));
 	map(0x03, 0x03).portr("DSW2");
 	map(0x04, 0x04).w(FUNC(istellar_state::overlay_control_w));
+	map(0x00, 0x00).w("soundlatch", FUNC(generic_latch_8_device::write));
 	map(0x05, 0x05).r("latch1", FUNC(generic_latch_8_device::read)).w("latch2", FUNC(generic_latch_8_device::write));
 }
 
 void istellar_state::z80_1_io(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).noprw(); //.rw(FUNC(istellar_state::z80_1_slatch_read), FUNC(istellar_state::z80_1_slatch_write));
-	map(0x01, 0x01).noprw(); //.rw(FUNC(istellar_state::z80_1_nmienable), FUNC(istellar_state::z80_1_soundwrite_front));
-	map(0x02, 0x02).noprw(); //.w(FUNC(istellar_state::z80_1_soundwrite_rear));
+	map(0x00, 0x00).r("soundlatch", FUNC(generic_latch_8_device::read)).w(FUNC(istellar_state::sound_status_w)); // bit 7 = ready, polled by the main CPU before it sends a command
+	map(0x01, 0x01).r("soundlatch", FUNC(generic_latch_8_device::acknowledge_r)).w(FUNC(istellar_state::psg_front_w));
+	map(0x02, 0x02).w(FUNC(istellar_state::psg_rear_w));
+}
+
+void istellar_state::z80_2_mem_roms(address_map &map)
+{
+	z80_2_mem(map);
+	map(0x2000, 0x7fff).rom().region("unsorted_roms", 0); // ROMs 11-13, verified by the sub CPU at startup
 }
 
 void istellar_state::z80_2_io(address_map &map)
@@ -249,8 +298,8 @@ void istellar_state::z80_2_io(address_map &map)
 	map.global_mask(0xff);
 	map(0x00, 0x00).rw(FUNC(istellar_state::z80_2_ldp_read), FUNC(istellar_state::z80_2_ldp_write));
 	map(0x01, 0x01).r("latch2", FUNC(generic_latch_8_device::read)).w("latch1", FUNC(generic_latch_8_device::write));
-	map(0x02, 0x02).r("latch2", FUNC(generic_latch_8_device::acknowledge_r));
-//  map(0x03, 0x03).w(FUNC(istellar_state::z80_2_ldtrans_write));
+	map(0x02, 0x02).r("latch2", FUNC(generic_latch_8_device::acknowledge_r)).w(FUNC(istellar_state::z80_2_irq_ack_w));
+	map(0x03, 0x03).w(FUNC(istellar_state::z80_2_ldp_enter_w)); // set while a command is pending, cleared once the player acknowledges
 }
 
 INPUT_CHANGED_MEMBER(istellar_state::coin_inserted)
@@ -314,6 +363,49 @@ static INPUT_PORTS_START( istellar )
 	// SERVICE might be hanging out back here
 INPUT_PORTS_END
 
+// Inter Stellar Zangus: the DIP switch usage was determined from the main CPU program
+static INPUT_PORTS_START( istellar2 )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:!1,!2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x03, "3 Coins/1 Credit" )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:!3,!4")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x0c, "3 Coins/1 Credit" )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:!5,!6")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x30, "5" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW1:!7" )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // sound CPU ready flag
+
+	PORT_START("DSW2")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW2:!1" )
+	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:!2,!3")
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPSETTING(    0x02, "20000" )
+	PORT_DIPSETTING(    0x04, "10000" )
+	PORT_DIPSETTING(    0x06, "5000" )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(istellar_state::coin_inserted), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(istellar_state::coin_inserted), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
+INPUT_PORTS_END
+
 static const gfx_layout layout_8x8 =
 {
 	8,8,
@@ -349,7 +441,8 @@ void istellar_state::vblank_irq(int state)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 
 		// Interrupt presumably comes from the LDP's status strobe
-		m_subcpu->set_input_line(0, ASSERT_LINE);
+		// Laser Fantasy's comm CPU IRQ handler never writes port 2 to release the line
+		m_subcpu->set_input_line(0, m_irq_pulse ? HOLD_LINE : ASSERT_LINE);
 	}
 }
 
@@ -375,17 +468,26 @@ void istellar_state::istellar(machine_config &config)
 
 	GENERIC_LATCH_8(config, "latch1");
 
+	generic_latch_8_device &soundlatch(GENERIC_LATCH_8(config, "soundlatch"));
+	soundlatch.data_pending_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+	soundlatch.set_separate_acknowledge(true);
+
 	generic_latch_8_device &latch2(GENERIC_LATCH_8(config, "latch2"));
 	latch2.data_pending_callback().set_inputline(m_subcpu, INPUT_LINE_NMI);
 	latch2.set_separate_acknowledge(true);
 
-	PIONEER_LDV1000(config, m_laserdisc);
-	m_laserdisc->set_overlay(256, 256, FUNC(istellar_state::screen_update));
-	m_laserdisc->add_route(0, "speaker", 1.0, 0);
-	m_laserdisc->add_route(1, "speaker", 1.0, 1);
+	// Laser Fantasy's comm CPU never clears its IRQ, loses commands to the player, and needs a faster player servo timer
+	m_irq_pulse = true;
+
+	funai_ldv1000_device &laserdisc(downcast<funai_ldv1000_device &>(*config.device_add(m_laserdisc.finder_tag(), FUNAI_LDV1000, 0U)));
+	laserdisc.set_hold_command(true);
+	subdevice<z80ctc_device>("laserdisc:ldvctc")->set_clock(XTAL(5'000'000));
+	laserdisc.set_overlay(256, 256, FUNC(istellar_state::screen_update));
+	laserdisc.add_route(0, "speaker", 1.0, 0);
+	laserdisc.add_route(1, "speaker", 1.0, 1);
 
 	// video hardware
-	m_laserdisc->add_ntsc_screen(config, "screen");
+	laserdisc.add_ntsc_screen(config, "screen");
 	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(istellar_state::vblank_irq));
 
 	// Daphne says "TODO: get the real interstellar resistor values"
@@ -395,6 +497,21 @@ void istellar_state::istellar(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
+
+	// two PSGs, one for the front and one for the rear channels
+	SN76489(config, "sn_front", GUESSED_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
+	SN76489(config, "sn_rear", GUESSED_CLOCK).add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
+}
+
+void istellar_state::istellar2(machine_config &config)
+{
+	istellar(config);
+
+	// Zangus keeps the stock player and IRQ behaviour
+	m_irq_pulse = false;
+	downcast<funai_ldv1000_device &>(*subdevice("laserdisc")).set_hold_command(false);
+	subdevice<z80ctc_device>("laserdisc:ldvctc")->set_clock(XTAL(5'000'000) / 2);
+	m_subcpu->set_addrmap(AS_PROGRAM, &istellar_state::z80_2_mem_roms);
 }
 
 
@@ -478,7 +595,7 @@ ROM_START( istellar2 )
 	ROM_LOAD( "blue.d6",  0x200, 0x100, CRC(fd8b98d8) SHA1(a64fd145262a9f1d10945551358c79a5d2733e05) )
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "istellar2", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "istellar2", 0, SHA1(6b01fba87b55a4f7c4301cd13b7a5c024664e6a6) )
 ROM_END
 
 
@@ -508,5 +625,5 @@ void istellar_state::init_istellar()
 
 
 //    YEAR  NAME       PARENT   MACHINE    INPUT     STATE            INIT           MONITOR  COMPANY          FULLNAME                                       FLAGS)
-GAME( 1983, istellar,  0,       istellar,  istellar, istellar_state,  init_istellar, ROT0,    "Funai/Gakken",  "Inter Stellar (Laser Fantasy)",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME( 1984, istellar2, 0,       istellar,  istellar, istellar_state,  init_istellar, ROT0,    "Funai/Gakken",  "Inter Stellar Zangus (Laser Fantasy vol. 2)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME( 1983, istellar,  0,       istellar,  istellar, istellar_state,  init_istellar, ROT0,    "Funai/Gakken",  "Inter Stellar (Laser Fantasy)", 0)
+GAME( 1984, istellar2, 0,       istellar2, istellar2, istellar_state,  init_istellar, ROT0,    "Funai/Gakken",  "Inter Stellar Zangus (Laser Fantasy vol. 2)", 0)

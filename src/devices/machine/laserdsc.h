@@ -111,6 +111,7 @@ public:
 	// core control and status
 	bool video_active() { return (!m_videosquelch && current_frame().m_numfields >= 2); }
 	bitmap_yuy16 &get_video() { return (!video_active()) ? m_emptyframe : current_frame().m_visbitmap; }
+	bitmap_yuy16 &get_raw_video() { return (!video_active()) ? m_emptyframe : current_frame().m_bitmap; }
 	uint32_t get_field_code(laserdisc_field_code code, bool zero_if_squelched);
 
 	// video interface
