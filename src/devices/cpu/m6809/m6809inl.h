@@ -269,9 +269,23 @@ inline uint16_t m6809_base_device::get_pending_interrupt()
 {
 	if (m_nmi_asserted)
 		return VECTOR_NMI;
-	else if (!(m_cc & CC_F) && m_firq_line)
+
+	// FIRQ and IRQ use the line state from INTERRUPT_LATENCY_CYCLES ago
+	bool firq = m_firq_line;
+	bool irq = m_irq_line;
+	if ((firq != m_firq_prev[0]) || (firq != m_firq_prev[1]) || (irq != m_irq_prev[0]) || (irq != m_irq_prev[1]))
+	{
+		uint64_t const cycles = total_cycles();
+		uint64_t const when = (cycles >= INTERRUPT_LATENCY_CYCLES) ? (cycles - INTERRUPT_LATENCY_CYCLES) : 0;
+		if (when < m_firq_change_cycle[0])
+			firq = (when < m_firq_change_cycle[1]) ? m_firq_prev[1] : m_firq_prev[0];
+		if (when < m_irq_change_cycle[0])
+			irq = (when < m_irq_change_cycle[1]) ? m_irq_prev[1] : m_irq_prev[0];
+	}
+
+	if (!(m_cc & CC_F) && firq)
 		return VECTOR_FIRQ;
-	else if (!(m_cc & CC_I) && m_irq_line)
+	else if (!(m_cc & CC_I) && irq)
 		return VECTOR_IRQ;
 	else
 		return 0;

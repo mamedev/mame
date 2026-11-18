@@ -443,13 +443,13 @@ SYNC:
 	@dummy_read_opcode_arg(0);
 
 	m_syncack_write_func(1);
-	while(!m_nmi_asserted && !m_firq_line && !m_irq_line)
+	while(!interrupt_line_waiting())
 	{
 		@eat_remaining();
 		;
 	}
 	m_syncack_write_func(0);
-	@eat(1);
+	@eat(sync_wake_cycles());
 	return;
 
 DAA:
@@ -581,8 +581,17 @@ CWAI:
 
 	while((m_ea.w = get_pending_interrupt()) == 0)
 	{
-		@eat_remaining();
-		;
+		// step one cycle at a time while a line is waiting to be latched
+		if(interrupt_line_waiting())
+		{
+			@eat(1);
+			;
+		}
+		else
+		{
+			@eat_remaining();
+			;
+		}
 	}
 
 	if (m_nmi_asserted)
