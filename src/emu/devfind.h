@@ -257,6 +257,12 @@ public:
 	/// subsequently removes or replaces devices.
 	virtual void end_configuration() = 0;
 
+	/// \brief Whether this finder creates a memory share
+	///
+	/// Returns true for memory_share_creator finders that need to be
+	/// resolved before memory maps are prepared.
+	virtual bool is_share_creator() const { return false; }
+
 protected:
 	/// \brief Designated constructor
 	///
@@ -1401,6 +1407,7 @@ public:
 protected:
 	virtual bool findit(validity_checker *valid) override ATTR_COLD;
 	virtual void end_configuration() override ATTR_COLD;
+	virtual bool is_share_creator() const override { return true; }
 
 	/// \brief Pointer to target object
 	///
