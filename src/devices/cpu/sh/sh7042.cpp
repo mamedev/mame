@@ -1,7 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert
 
-// SH7042, sh2 variant
+// SH704x, SH-2 variants
+// TODO: SH7045F internal flash programming/erase controller and operating modes.
 
 #include "emu.h"
 #include "sh7042.h"
@@ -10,6 +11,7 @@ DEFINE_DEVICE_TYPE(SH7042,  sh7042_device,  "sh7042",  "Hitachi SH-2 (SH7042)")
 DEFINE_DEVICE_TYPE(SH7042A, sh7042a_device, "sh7042a", "Hitachi SH-2 (SH7042A)")
 DEFINE_DEVICE_TYPE(SH7043,  sh7043_device,  "sh7043",  "Hitachi SH-2 (SH7043)")
 DEFINE_DEVICE_TYPE(SH7043A, sh7043a_device, "sh7043a", "Hitachi SH-2 (SH7043A)")
+DEFINE_DEVICE_TYPE(SH7045F, sh7045f_device, "sh7045f", "Hitachi SH-2 (SH7045F)")
 
 sh7042_device::sh7042_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	sh7042_device(mconfig, SH7042, tag, owner, clock)
@@ -32,6 +34,14 @@ sh7043_device::sh7043_device(const machine_config &mconfig, const char *tag, dev
 sh7043a_device::sh7043a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	sh7042_device(mconfig, SH7043A, tag, owner, clock)
 {
+	m_die_a = true;
+}
+
+sh7045f_device::sh7045f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	sh7042_device(mconfig, SH7045F, tag, owner, clock)
+{
+	// HD64F7045F28: A-mask peripherals, 32-bit external bus and mid-speed ADC.
+	// SH7040 series hardware manual REJ09B0044-0600O, section 1.1.1.
 	m_die_a = true;
 }
 

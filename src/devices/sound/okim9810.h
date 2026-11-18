@@ -111,7 +111,7 @@ protected:
 							const uint8_t filter_type);
 
 		// computes volume scale from 3 volume numbers
-		uint8_t volume_scale(const uint8_t global_volume,
+		sound_stream::sample_t volume_scale(const uint8_t global_volume,
 							const uint8_t channel_volume,
 							const uint8_t pan_volume) const;
 
@@ -129,6 +129,8 @@ protected:
 		uint32_t  m_sample;           // current sample number
 		uint32_t  m_phrase_offset;
 		int32_t   m_phrase_count;
+		uint32_t  m_phrase_base;
+		int32_t   m_phrase_length;
 		int32_t   m_phrase_wait_cnt;
 		uint8_t   m_phrase_state;
 
@@ -139,8 +141,6 @@ protected:
 		int32_t   m_startSample;      // interpolation state - sample to interpolate from
 		int32_t   m_endSample;        // interpolation state - sample to interpolate to
 		uint32_t  m_interpSampleNum;  // interpolation state - fraction between start & end
-
-		static const uint8_t s_volume_table[16];
 	};
 
 	// internal state

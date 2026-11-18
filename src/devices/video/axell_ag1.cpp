@@ -103,11 +103,11 @@
 #include "emu.h"
 
 #include "axell_ag1.h"
+#include "axell_decomp.h"
 
 #include "screen.h"
 
 #include <algorithm>
-#include <cstring>
 
 #define LOG_BLIT    (1U << 1)
 #define LOG_REGS    (1U << 2)
@@ -139,241 +139,45 @@ u8 cgrom_read(const u8 *rom, u32 mask, u32 x, u32 y)
 }
 
 
-struct huffman_node_s;
-
-struct state_s
+// the compressed data is laid out in CG-ROM rows: the first byte gives the
+// width of the block minus one, and the source wraps to the next row at the
+// end of the block
+class cgrom_decompressor : public axell_decompressor
 {
-	const u8 *rom;
-	u32 rom_mask;
-	u8 *buf;
-	u32 xbits;
-	u32 xmask;
-	u32 ymask;
-	u8 bits;
-	int num_bits;
-	u8 colour[16];
-	int basex;
-	int ix, iy, iw;
-	int dx, dy;
-	int ow, oh;
-	int ox, oy;
-
-	u32 addr(int x, int y) const { return (x & xmask) | ((y & ymask) << xbits); }
-
-	int get_next_bit();
-	bool next_node(const huffman_node_s **res);
-
-	void set_o(u8 v);
-	u8 get_o(int x, int y) const;
-
-	static void hn_bytes_new_colour(state_s &s, u8 v, int n);
-	static void hn_bytes_prev_colour(state_s &s, u8 v, int n);
-	static void hn_copy_directly(state_s &s, u8 v, int n);
-	static void hn_copy_plus_one(state_s &s, u8 v, int n);
-	static void hn_copy_minus_one(state_s &s, u8 v, int n);
-};
-
-
-struct huffman_node_s
-{
-	const char *bits;
-	void (*func)(state_s &, u8, int);
-	int arg0_bits;
-	int arg1_val;
-};
-
-
-constexpr huffman_node_s HUFFMAN_NODES[] = {
-	{ "11",                 state_s::hn_bytes_new_colour,   8,  1 },
-	{ "10111",              state_s::hn_bytes_new_colour,   8,  2 },
-	{ "10110011",           state_s::hn_bytes_new_colour,   8,  3 },
-	{ "1010011000",         state_s::hn_bytes_new_colour,   8,  4 },
-	{ "1010101010000",      state_s::hn_bytes_new_colour,   8,  5 },
-	{ "101010001011110",    state_s::hn_bytes_new_colour,   8,  6 },
-	{ "101010010101110",    state_s::hn_bytes_new_colour,   8,  7 },
-	{ "101010010101111",    state_s::hn_bytes_new_colour,   8,  8 },
-	{ "101010010101100",    state_s::hn_bytes_new_colour,   8,  9 },
-	{ "10101000101100",     state_s::hn_bytes_new_colour,   8, 10 },
-	{ "101010010101101",    state_s::hn_bytes_new_colour,   8, 11 },
-	{ "10101000101101",     state_s::hn_bytes_new_colour,   8, 12 },
-	{ "0",                  state_s::hn_bytes_prev_colour,  4,  1 },
-	{ "100",                state_s::hn_bytes_prev_colour,  4,  2 },
-	{ "101011",             state_s::hn_bytes_prev_colour,  4,  3 },
-	{ "1010010",            state_s::hn_bytes_prev_colour,  4,  4 },
-	{ "101010100",          state_s::hn_bytes_prev_colour,  4,  5 },
-	{ "1010100100",         state_s::hn_bytes_prev_colour,  4,  6 },
-	{ "10101010110",        state_s::hn_bytes_prev_colour,  4,  7 },
-	{ "10100111000",        state_s::hn_bytes_prev_colour,  4,  8 },
-	{ "101010101001",       state_s::hn_bytes_prev_colour,  4,  9 },
-	{ "101001111000",       state_s::hn_bytes_prev_colour,  4, 10 },
-	{ "101010010100",       state_s::hn_bytes_prev_colour,  4, 11 },
-	{ "1010011001",         state_s::hn_bytes_prev_colour,  4, 12 },
-	{ "101101",             state_s::hn_copy_directly,      0,  2 },
-	{ "10101011",           state_s::hn_copy_directly,      0,  3 },
-	{ "101010011",          state_s::hn_copy_directly,      0,  4 },
-	{ "101001101",          state_s::hn_copy_directly,      0,  5 },
-	{ "1010011111",         state_s::hn_copy_directly,      0,  6 },
-	{ "1010100011",         state_s::hn_copy_directly,      0,  7 },
-	{ "10101000100",        state_s::hn_copy_directly,      0,  8 },
-	{ "101010101111",       state_s::hn_copy_directly,      0,  9 },
-	{ "101001110010",       state_s::hn_copy_directly,      0, 10 },
-	{ "1010011100111",      state_s::hn_copy_directly,      0, 11 },
-	{ "101100101",          state_s::hn_copy_directly,      0, 12 },
-	{ "1011000",            state_s::hn_copy_plus_one,      0,  2 },
-	{ "101010000",          state_s::hn_copy_plus_one,      0,  3 },
-	{ "10101001011",        state_s::hn_copy_plus_one,      0,  4 },
-	{ "101010001010",       state_s::hn_copy_plus_one,      0,  5 },
-	{ "1010101011101",      state_s::hn_copy_plus_one,      0,  6 },
-	{ "1010101011100",      state_s::hn_copy_plus_one,      0,  7 },
-	{ "1010011110010",      state_s::hn_copy_plus_one,      0,  8 },
-	{ "10101000101110",     state_s::hn_copy_plus_one,      0,  9 },
-	{ "101010001011111",    state_s::hn_copy_plus_one,      0, 10 },
-	{ "1010011110011",      state_s::hn_copy_plus_one,      0, 11 },
-	{ "101000",             state_s::hn_copy_minus_one,     0,  2 },
-	{ "101100100",          state_s::hn_copy_minus_one,     0,  3 },
-	{ "1010011101",         state_s::hn_copy_minus_one,     0,  4 },
-	{ "10101010101",        state_s::hn_copy_minus_one,     0,  5 },
-	{ "101001111011",       state_s::hn_copy_minus_one,     0,  6 },
-	{ "101001111010",       state_s::hn_copy_minus_one,     0,  7 },
-	{ "1010101010001",      state_s::hn_copy_minus_one,     0,  8 },
-	{ "1010011100110",      state_s::hn_copy_minus_one,     0,  9 },
-	{ "10101001010101",     state_s::hn_copy_minus_one,     0, 10 },
-	{ "10101001010100",     state_s::hn_copy_minus_one,     0, 11 },
-	{ nullptr,              nullptr,                        0,  0 },
-};
-
-
-inline int state_s::get_next_bit()
-{
-	if (num_bits == 0)
+public:
+	cgrom_decompressor(const u8 *rom, u32 rom_mask, int x, int y, u8 *dest, u32 x_bits, u32 x_mask, u32 y_mask) :
+		axell_decompressor(dest, x_bits, x_mask, y_mask, false),
+		m_rom(rom),
+		m_rom_mask(rom_mask),
+		m_basex(x),
+		m_x(x),
+		m_y(y)
 	{
-		if (ix >= basex + iw)
+		m_width = cgrom_read(m_rom, m_rom_mask, m_x++, m_y) + 1;
+	}
+
+	// bits 8-10 of the width, held in the first three bits of the stream
+	void extend_width(u32 high) { m_width += high << 8; }
+
+protected:
+	virtual u8 fetch_byte() override
+	{
+		if (m_x >= m_basex + m_width)
 		{
-			ix = basex;
-			iy++;
+			m_x = m_basex;
+			m_y++;
 		}
-		bits = cgrom_read(rom, rom_mask, ix, iy);
-		ix++;
-		num_bits = 8;
+		return cgrom_read(m_rom, m_rom_mask, m_x++, m_y);
 	}
 
-	const int res = 1 & bits;
-
-	bits >>= 1;
-	num_bits--;
-
-	return res;
-}
-
-
-bool state_s::next_node(const huffman_node_s **res)
-{
-	char code[128];
-
-	std::fill(std::begin(code), std::end(code), 0);
-
-	for (int i = 0; i < sizeof(code) - 1; i++)
-	{
-		code[i] = '0' + get_next_bit();
-
-		for (int j = 0;; j++)
-		{
-			if (!HUFFMAN_NODES[j].bits)
-				return true;
-
-			if (strncmp(code, HUFFMAN_NODES[j].bits, i + 1) == 0)
-			{
-				if (!HUFFMAN_NODES[j].bits[i + 1])
-				{
-					*res = &HUFFMAN_NODES[j];
-					return false;
-				}
-				break;
-			}
-		}
-	}
-
-	return true;
-}
-
-
-void state_s::set_o(u8 v)
-{
-	u8 a = v;
-	for (int i = 0; i < std::size(colour); i++)
-	{
-		u8 b = colour[i];
-		colour[i] = a;
-		a = b;
-		if (a == v)
-			break;
-	}
-
-	if (ox >= 0 && ox < ow && oy >= 0 && oy < oh)
-		buf[addr(dx + ox, dy + oy)] = v;
-	ox++;
-}
-
-
-u8 state_s::get_o(int x, int y) const
-{
-	if (x < 0 || x >= ow || y < 0 || y >= oh)
-		return 0;
-
-	return buf[addr(dx + x, dy + y)];
-}
-
-
-void state_s::hn_bytes_new_colour(state_s &s, u8 v, int n)
-{
-	for (int i = 0; i < n; i++)
-		s.set_o(v);
-}
-
-
-void state_s::hn_bytes_prev_colour(state_s &s, u8 v, int n)
-{
-	const u8 c = s.colour[v];
-
-	for (int i = 0; i < n; i++)
-		s.set_o(c);
-}
-
-
-void state_s::hn_copy_directly(state_s &s, u8 v, int n)
-{
-	for (int i = 0; i < n; i++)
-	{
-		if ((s.ox / 12) & 1)
-			s.set_o(s.get_o(s.ox, s.oy + 1));
-		else
-			s.set_o(s.get_o(s.ox, s.oy - 1));
-	}
-}
-
-
-void state_s::hn_copy_plus_one(state_s &s, u8 v, int n)
-{
-	for (int i = 0; i < n; i++)
-	{
-		if ((s.ox / 12) & 1)
-			s.set_o(s.get_o(s.ox + 1, s.oy + 1));
-		else
-			s.set_o(s.get_o(s.ox + 1, s.oy - 1));
-	}
-}
-
-
-void state_s::hn_copy_minus_one(state_s &s, u8 v, int n)
-{
-	for (int i = 0; i < n; i++)
-	{
-		if ((s.ox / 12) & 1)
-			s.set_o(s.get_o(s.ox - 1, s.oy + 1));
-		else
-			s.set_o(s.get_o(s.ox - 1, s.oy - 1));
-	}
-}
+private:
+	const u8 *const m_rom;
+	const u32 m_rom_mask;
+	const int m_basex;
+	int m_x;
+	int m_y;
+	int m_width;
+};
 
 } // anonymous namespace
 
@@ -544,93 +348,12 @@ void axell_ag1_device_base::start_blit(u16 src_x, u16 src_y, u16 dst_x, u16 dst_
 
 bool axell_ag1_device_base::decompress_sprite(int ix, int iy, int ow, int oh, int dx, int dy)
 {
-	state_s s;
+	cgrom_decompressor decompressor(&m_cgrom[0], m_cgrom.length() - 1, ix, iy, m_cgram.get(), m_cgram_x_bits, m_cgram_x_mask, m_cgram_y_mask);
 
-	s.rom = &m_cgrom[0];
-	s.rom_mask = m_cgrom.length() - 1;
-	s.buf = m_cgram.get();
-	s.xbits = m_cgram_x_bits;
-	s.xmask = m_cgram_x_mask;
-	s.ymask = m_cgram_y_mask;
-	s.num_bits = 0;
+	// large pictures in the Taito games need more than eight bits of width
+	decompressor.extend_width(decompressor.get_bits(3));
 
-	std::fill(std::begin(s.colour), std::end(s.colour), 0);
-
-	s.basex = ix;
-
-	s.ix = ix;
-	s.iy = iy;
-	s.iw = get_cgrom_byte(s.ix++, s.iy) + 1;
-	s.dx = dx;
-	s.dy = dy;
-
-	s.ow = ow;
-	s.oh = oh;
-	s.ox = 0;
-	s.oy = 0;
-
-	// the first byte of the data gives the width of the compressed block
-	// in the CG-ROM minus one, the first three bits of the bit stream hold
-	// bits 8-10 of it (large pictures in the Taito games)
-	int temp = s.get_next_bit();
-	temp |= s.get_next_bit() << 1;
-	temp |= s.get_next_bit() << 2;
-	s.iw += temp << 8;
-
-	// the output is produced in vertical strips of 12 pixels, going
-	// down in even strips and up in odd ones
-	while (s.ox < s.ow)
-	{
-		const huffman_node_s *n;
-		if (s.next_node(&n))
-			return true;
-
-		u8 v = 0;
-		for (int i = 0; i < n->arg0_bits; i++)
-			v |= s.get_next_bit() << i;
-
-		n->func(s, v, n->arg1_val);
-
-		bool eol;
-		if ((s.ox % 12) == 0)
-		{
-			s.ox -= 12;
-			if ((s.ox / 12) & 1)
-				s.oy -= 1;
-			else
-				s.oy += 1;
-
-			eol = true;
-		}
-		else if (s.ox == s.ow)
-		{
-			s.ox -= s.ow % 12;
-			if ((s.ox / 12) & 1)
-				s.oy -= 1;
-			else
-				s.oy += 1;
-
-			eol = true;
-		}
-		else
-		{
-			eol = false;
-		}
-
-		if (eol)
-		{
-			if ((s.oy == s.oh) || (s.oy == -1))
-			{
-				s.ox += 12;
-				if ((s.ox / 12) & 1)
-					s.oy -= 1;
-				else
-					s.oy += 1;
-			}
-		}
-	}
-
-	return false;
+	return decompressor.decompress(dx, dy, ow, oh);
 }
 
 
