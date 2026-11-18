@@ -882,6 +882,8 @@ void telestrat_state::telstrat(machine_config &config)
 	m_fdc->hld_wr_callback().set(FUNC(telestrat_state::fdc_hld_w));
 	m_fdc->set_force_ready(true);
 
+	SOFTWARE_LIST(config, "telstrat_flop").set_original("telstrat_flop");
+
 	FLOPPY_CONNECTOR(config, "fdc:0", telestrat_floppies, "3dsdd", telestrat_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:1", telestrat_floppies, nullptr, telestrat_state::floppy_formats);
 	FLOPPY_CONNECTOR(config, "fdc:2", telestrat_floppies, nullptr, telestrat_state::floppy_formats);
