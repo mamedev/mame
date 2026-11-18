@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:Rob Krum
+-->
+<mamelayout version="2">
+
+<!-- The terminal, with the QT960's eleven LEDs (D1-D11, left to right along the
+     board's front edge) under it, in their colours on the board. The LEDs are a
+     collection: Video Options shows or hides them -->
+	<element name="led_red">
+		<rect state="0"><color red="0.25" green="0.03" blue="0.03" /></rect>
+		<rect state="1"><color red="1.0" green="0.12" blue="0.10" /></rect>
+	</element>
+	<element name="led_yellow">
+		<rect state="0"><color red="0.25" green="0.18" blue="0.03" /></rect>
+		<rect state="1"><color red="1.0" green="0.80" blue="0.10" /></rect>
+	</element>
+	<element name="led_green">
+		<rect state="0"><color red="0.04" green="0.20" blue="0.06" /></rect>
+		<rect state="1"><color red="0.25" green="1.0" blue="0.30" /></rect>
+	</element>
+	<element name="txt_dma">
+		<text string="DMA"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+	<element name="txt_eprom">
+		<text string="EPROM"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+	<element name="txt_fail">
+		<text string="FAIL"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+	<element name="txt_flash">
+		<text string="FLASH"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+	<element name="txt_ooba">
+		<text string="OOBA"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+	<element name="txt_sio">
+		<text string="SIO"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+	<element name="txt_sram">
+		<text string="SRAM"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+	<element name="txt_usr0">
+		<text string="USR0"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+	<element name="txt_usr1">
+		<text string="USR1"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+	<element name="txt_usr2">
+		<text string="USR2"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+	<element name="txt_usr3">
+		<text string="USR3"><color red="0.75" green="0.75" blue="0.75" /></text>
+	</element>
+	<element name="board">
+		<rect><color red="0.06" green="0.18" blue="0.10" /></rect>
+	</element>
+
+	<view name="Terminal">
+		<screen tag="terminal:terminal_screen">
+			<bounds x="0" y="0" width="640" height="240" />
+		</screen>
+		<collection name="LEDs">
+			<element ref="board">
+				<bounds x="0" y="244" width="640" height="40" />
+			</element>
+			<element name="led_fail" ref="led_red">
+				<bounds x="85" y="252" width="30" height="10" />
+			</element>
+			<element ref="txt_fail">
+				<bounds x="80" y="266" width="40" height="10" />
+			</element>
+			<element name="led_ooba" ref="led_red">
+				<bounds x="125" y="252" width="30" height="10" />
+			</element>
+			<element ref="txt_ooba">
+				<bounds x="120" y="266" width="40" height="10" />
+			</element>
+			<element name="led_act0" ref="led_yellow">
+				<bounds x="165" y="252" width="30" height="10" />
+			</element>
+			<element ref="txt_sram">
+				<bounds x="160" y="266" width="40" height="10" />
+			</element>
+			<element name="led_act1" ref="led_yellow">
+				<bounds x="205" y="252" width="30" height="10" />
+			</element>
+			<element ref="txt_flash">
+				<bounds x="200" y="266" width="40" height="10" />
+			</element>
+			<element name="led_act2" ref="led_yellow">
+				<bounds x="245" y="252" width="30" height="10" />
+			</element>
+			<element ref="txt_eprom">
+				<bounds x="240" y="266" width="40" height="10" />
+			</element>
+			<element name="led_act3" ref="led_green">
+				<bounds x="285" y="252" width="30" height="10" />
+			</element>
+			<element ref="txt_sio">
+				<bounds x="280" y="266" width="40" height="10" />
+			</element>
+			<element name="led_act4" ref="led_green">
+				<bounds x="325" y="252" width="30" height="10" />
+			</element>
+			<element ref="txt_dma">
+				<bounds x="320" y="266" width="40" height="10" />
+			</element>
+			<element name="led_usr3" ref="led_green">
+				<bounds x="405" y="252" width="30" height="10" />
+			</element>
+			<element ref="txt_usr3">
+				<bounds x="400" y="266" width="40" height="10" />
+			</element>
+			<element name="led_usr2" ref="led_green">
+				<bounds x="445" y="252" width="30" height="10" />
+			</element>
+			<element ref="txt_usr2">
+				<bounds x="440" y="266" width="40" height="10" />
+			</element>
+			<element name="led_usr1" ref="led_yellow">
+				<bounds x="485" y="252" width="30" height="10" />
+			</element>
+			<element ref="txt_usr1">
+				<bounds x="480" y="266" width="40" height="10" />
+			</element>
+			<element name="led_usr0" ref="led_yellow">
+				<bounds x="525" y="252" width="30" height="10" />
+			</element>
+			<element ref="txt_usr0">
+				<bounds x="520" y="266" width="40" height="10" />
+			</element>
+		</collection>
+	</view>
+</mamelayout>
