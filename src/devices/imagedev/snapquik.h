@@ -64,6 +64,7 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual const software_list_loader &get_software_list_loader() const override;
