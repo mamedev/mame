@@ -923,7 +923,8 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 #define TEXTURESETUP \
 	int n_tx = m_n_tx; \
 	int n_ty = m_n_ty; \
-	uint16_t *p_clut = p_p_vram[ n_cluty ] + n_clutx; \
+	uint16_t *p_clut_base = p_p_vram[ n_cluty ]; \
+	int n_clut_x = n_clutx; \
 	switch( n_tp ) \
 	{ \
 	case 0: \
@@ -1007,11 +1008,11 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 
 #define TEXTURE4BIT( TXV, TXU ) \
 	TEXTURE_LOOP \
-		uint16_t n_bgr = p_clut[ ( *( p_p_vram[ n_ty + TXV ] + n_tx + ( TXU >> 2 ) ) >> ( ( TXU & 0x03 ) << 2 ) ) & 0x0f ];
+		uint16_t n_bgr = p_clut_base[ ( n_clut_x + ( ( *( p_p_vram[ n_ty + TXV ] + n_tx + ( TXU >> 2 ) ) >> ( ( TXU & 0x03 ) << 2 ) ) & 0x0f ) ) & 1023 ];
 
 #define TEXTURE8BIT( TXV, TXU ) \
 	TEXTURE_LOOP \
-		uint16_t n_bgr = p_clut[ ( *( p_p_vram[ n_ty + TXV ] + n_tx + ( TXU >> 1 ) ) >> ( ( TXU & 0x01 ) << 3 ) ) & 0xff ];
+		uint16_t n_bgr = p_clut_base[ ( n_clut_x + ( ( *( p_p_vram[ n_ty + TXV ] + n_tx + ( TXU >> 1 ) ) >> ( ( TXU & 0x01 ) << 3 ) ) & 0xff ) ) & 1023 ];
 
 #define TEXTURE15BIT( TXV, TXU ) \
 	TEXTURE_LOOP \
@@ -1025,13 +1026,13 @@ void psxgpu_device::decode_tpage( uint32_t tpage )
 	TEXTURE_LOOP \
 		int n_xi = ( ( TXU >> 2 ) & ~0x3c ) + ( ( TXV << 2 ) & 0x3c ); \
 		int n_yi = ( TXV & ~0xf ) + ( ( TXU >> 4 ) & 0xf ); \
-		uint16_t n_bgr = p_clut[ ( *( p_p_vram[ n_ty + n_yi ] + n_tx + n_xi ) >> ( ( TXU & 0x03 ) << 2 ) ) & 0x0f ];
+		uint16_t n_bgr = p_clut_base[ ( n_clut_x + ( ( *( p_p_vram[ n_ty + n_yi ] + n_tx + n_xi ) >> ( ( TXU & 0x03 ) << 2 ) ) & 0x0f ) ) & 1023 ];
 
 #define TEXTUREINTERLEAVED8BIT( TXV, TXU ) \
 	TEXTURE_LOOP \
 		int n_xi = ( ( TXU >> 1 ) & ~0x78 ) + ( ( TXU << 2 ) & 0x40 ) + ( ( TXV << 3 ) & 0x38 ); \
 		int n_yi = ( TXV & ~0x7 ) + ( ( TXU >> 5 ) & 0x7 ); \
-		uint16_t n_bgr = p_clut[ ( *( p_p_vram[ n_ty + n_yi ] + n_tx + n_xi ) >> ( ( TXU & 0x01 ) << 3 ) ) & 0xff ];
+		uint16_t n_bgr = p_clut_base[ ( n_clut_x + ( ( *( p_p_vram[ n_ty + n_yi ] + n_tx + n_xi ) >> ( ( TXU & 0x01 ) << 3 ) ) & 0xff ) ) & 1023 ];
 
 #define TEXTUREINTERLEAVED15BIT( TXV, TXU ) \
 	TEXTURE_LOOP \
