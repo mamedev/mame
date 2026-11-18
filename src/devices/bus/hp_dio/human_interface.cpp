@@ -77,6 +77,7 @@ void human_interface_device::device_add_mconfig(machine_config &config)
 	ieee488_slot_device &slot0(IEEE488_SLOT(config, "ieee0"));
 	hp_ieee488_devices(slot0);
 	slot0.set_default_option("hp9122c");
+	IEEE488_SLOT(config, "ieee_rem", 0, remote488_devices, nullptr);
 }
 
 ROM_START(human_interface)
