@@ -1077,9 +1077,35 @@ REF 010131
    0x727AC 1 - enable Develop/debug option in test mode
 */
 
+/*
+
+Settings are stored in the main program flash ROM
+
+They're stored at 3e0000 - 3e01ff then at 3f0000 - 3f01ff
+             then 3e0200 - 3e03ff then at 3f0200 - 3f03ff
+etc.
+
+3eea00 - 3febff and 3fea00 - 3febff are the final ranges
+used before it loops back to using 3e0000
+
+The game loading the most recent settings found
+
+There must be a valid settings block at 3e0000, blanking it
+to a 0xff fill prevents the game from ever saving settings
+and having invalid data there prevents the game from booting
+
+Volume is saved as part of the settings, steering calibration
+is not, so you must move the steering wheel fully to the left
+and fully to the right on boot several times to correctly
+center it.
+
+The program ROMs in the sets below have been reset to a
+single defaulted block at 3e0000 - 3e01ff
+
+*/
 ROM_START( smashdrv ) // World Version: 3.3, Version 3D: 1.9, Checksum: 707A
 	ROM_REGION( 0x0400000, "prg", 0 )
-	ROM_LOAD("prg_world.ic23", 0x0000000, 0x0400000, CRC(c642b059) SHA1(8a898f46cebc5951a6355f2b51e31ac5e17b4bca) )
+	ROM_LOAD("prg_world.ic23", 0x0000000, 0x0400000, CRC(36d0328f) SHA1(22a8008a339168bc68e5a1cef413b8b465bb80e4) )
 
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
@@ -1090,7 +1116,7 @@ ROM_END
 
 ROM_START( smashdrvs ) // Spain/Portugal Version: 3.3, Version 3D: 1.9, Checksum: 707B. There is another known (undumped) Spain/Portugal (Covielsa license) set with Version: 3.3, Version 3D: 1.9, Checksum: EDD9.
 	ROM_REGION( 0x0400000, "prg", 0 )
-	ROM_LOAD("prg_spain.ic23", 0x0000000, 0x0400000, CRC(66b80283) SHA1(7d569670fd96aaa99da24378c77a265bc2ddc91c) )
+	ROM_LOAD("prg_spain.ic23", 0x0000000, 0x0400000, CRC(962a8055) SHA1(4f64536cb15bbfc9bc1a0d387e148b994a19f750) )
 
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
@@ -1101,7 +1127,7 @@ ROM_END
 
 ROM_START( smashdrvb ) // UK Version: 3.3, Version 3D: 1.9, Checksum: 707C
 	ROM_REGION( 0x0400000, "prg", 0 )
-	ROM_LOAD("prg.ic23", 0x0000000, 0x0400000, CRC(5cc6d3ac) SHA1(0c8426774212d891796b59c95b8c70f64db5b67a) )
+	ROM_LOAD("prg.ic23", 0x0000000, 0x0400000, CRC(ac54517a) SHA1(fe53aa4022fdd7f8de786c860b8e4e97e2f44378) )
 
 	ROM_REGION( 0x4000000, "maincpu", ROMREGION_ERASEFF)
 	ROM_LOAD32_WORD("sdra.ic15",    0x00000000, 0x01000000, CRC(cf702287) SHA1(84cd83c339831deff15fe5fcc353e0b596667500) )
@@ -1118,6 +1144,7 @@ GAME( 2002, atvtracka, atvtrack, atvtrack, atvtrack, atvtrack_state, empty_init,
 GAME( 2002, gfootbal,  0,        gfootbal, gfootbal, gfootbal_state, empty_init, ROT0, "Gaelco / Zigurat", "Gaelco Football",   MACHINE_IMPERFECT_CONTROLS | MACHINE_SUPPORTS_SAVE ) // the balls
 
 // almost identical PCB, FlashROM mapping and master registers addresses different
+// these are all the same code revision, different region byte
 GAME( 2000, smashdrv,  0,        smashdrv, smashdrv, smashdrv_state, empty_init, ROT0, "Gaelco",                       "Smashing Drive (World)",           MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, smashdrvb, smashdrv, smashdrv, smashdrv, smashdrv_state, empty_init, ROT0, "Gaelco (Brent Sales license)", "Smashing Drive (UK)",              MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, smashdrvs, smashdrv, smashdrv, smashdrv, smashdrv_state, empty_init, ROT0, "Gaelco (Covielsa license)",    "Smashing Drive (Spain, Portugal)", MACHINE_NODEVICE_LAN | MACHINE_SUPPORTS_SAVE )
