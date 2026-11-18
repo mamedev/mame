@@ -198,12 +198,6 @@ ROM_START( c1541 )
 	ROMX_LOAD( "901229-06 aa.uab5", 0x2000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 6, "jiffydos", "JiffyDOS v6.01" )
 	ROMX_LOAD( "jiffydos 1541.uab5", 0x2000, 0x2000, CRC(bc7e4aeb) SHA1(db6cfaa6d9b78d58746c811de29f3b1f44d99ddf), ROM_BIOS(6) )
-	ROM_SYSTEM_BIOS( 7, "speeddos", "SpeedDOS-Plus+" )
-	ROMX_LOAD( "speed-dosplus.uab5", 0x0000, 0x4000, CRC(f9db1eac) SHA1(95407e59a9c1d26a0e4bcf2c244cfe8942576e2c), ROM_BIOS(7) )
-	ROM_SYSTEM_BIOS( 8, "rolo27", "Rolo DOS v2.7" )
-	ROMX_LOAD( "rolo27.uab5", 0x2000, 0x2000, CRC(171c7962) SHA1(04c892c4b3d7c74750576521fa081f07d8ca8557), ROM_BIOS(8) )
-	ROM_SYSTEM_BIOS( 9, "digidos", "DigiDOS" )
-	ROMX_LOAD( "digidos.uab5", 0x2000, 0x2000, CRC(b3f05ea3) SHA1(99d3d848344c68410b686cda812f3788b41fead3), ROM_BIOS(9) )
 ROM_END
 
 
