@@ -262,6 +262,29 @@ PPC750 - PowerPC 750 (G3) CPU
 		</part>
 	</software>
 
+	<software name="trekjr">
+		<description>Star Trek: Judgment Rites (Collector's Edition)</description>
+		<year>1996</year>
+		<publisher>Interplay</publisher>
+		<info name="copy_protection" value="Manual required for map" />
+		<info name="developer" value="Interplay" />
+		<info name="language" value="English" />
+		<info name="region" value="USA" />
+		<sharedfeat name="compatibility" value="MC68040" />
+		<part name="cdrom1" interface="cdrom">
+			<feature name="part_id" value="Game Disc" />
+			<diskarea name="cdrom">
+				<disk name="star trek judgment rites (game)" sha1="11276adf6ce6a7661a6bed38de5e2f6ade4cd092" />
+			</diskarea>
+		</part>
+		<part name="cdrom2" interface="cdrom">
+			<feature name="part_id" value="Collector's Disc" />
+			<diskarea name="cdrom">
+				<disk name="star trek judgment rites (collectors)" sha1="0f00971d5989f7b62527545d215bd096e276f81d" />
+			</diskarea>
+		</part>
+	</software>
+
 	<software name="ultdoom">
 		<description>The Ultimate Doom</description>
 		<year>1995</year>
