@@ -13,4 +13,4 @@
 
 void pwrbkduo_cards(device_slot_interface &device) ATTR_COLD;
 
-#endif // MAME_BUS_PWRBKDUO_CARDS_H
+#endif // MAME_BUS_NUBUS_PWRBKDUO_CARDS_H

@@ -1027,7 +1027,7 @@ void i8085a_cpu_device::execute_one(int opcode)
 			break;
 		}
 
-		case 0x18: // 8085: undocumented RDEL (Rotate D and E Left through Carry), otherwise undocumented NOP
+		case 0x18: // 8085: undocumented RDEL (Rotate DE Left through Carry), otherwise undocumented NOP
 			if (is_8085())
 			{
 				int c = m_AF.b.l & CF;                                // save old carry state

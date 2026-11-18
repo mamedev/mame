@@ -21,13 +21,15 @@ Hardware info for "Bolsa Internacional":
 ****************************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i186.h"
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 #include "sound/okim6376.h"
+
 #include "speaker.h"
 
-#include "bus/rs232/rs232.h"
 
 namespace {
 
@@ -43,7 +45,7 @@ public:
 	{
 	}
 
-	void bolsaint(machine_config &config);
+	void bolsaint(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -136,4 +138,4 @@ ROM_END
 } // anonymous namespace
 
 //   YEAR  NAME       PARENT MACHINE   INPUT     CLASS            INIT        ROT   COMPANY         FULLNAME                      FLAGS
-GAME(2000, bolsaint,  0,     bolsaint, bolsaint, bolsaint_state,  empty_init, ROT0, "Sleic/Petaco", "Bolsa Internacional (euro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK) // VER.1.0 found on ROM string, but EPROM label reads V3.22
+GAME(2000, bolsaint,  0,     bolsaint, bolsaint, bolsaint_state,  empty_init, ROT0, "Sleic/Petaco", "Bolsa Internacional (Euro)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK) // VER.1.0 found on ROM string, but EPROM label reads V3.22
