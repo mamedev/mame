@@ -6,8 +6,8 @@
 
     The printer itself is machine/hp_lj3p.cpp; select I/O SERIAL and the
     computer's baud rate in its control panel (Menu, DEVICE CONFIG).  The
-    layout puts the computer's first screen next to the paper, with the
-    control panel under the paper.
+    printer's views (paper and control panel, and with the computer's
+    screen) are added to the computer's views.
 
 **********************************************************************/
 
@@ -29,10 +29,12 @@ public:
 	{
 	}
 
-	// data from the computer arrives on the printer's RxD
+protected:
+	// device_rs232_port_interface implementation: data from the computer
+	// arrives on the printer's RxD
 	virtual void input_txd(int state) override { m_printer->rxd_w(state); }
 
-protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD { }
 
 	virtual void device_reset() override ATTR_COLD

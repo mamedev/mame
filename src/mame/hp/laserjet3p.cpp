@@ -44,7 +44,7 @@ private:
 	required_device<rs232_port_device> m_host;
 };
 
-static DEVICE_INPUT_DEFAULTS_START( null_modem )
+DEVICE_INPUT_DEFAULTS_START( null_modem )
 	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x07, 0x02 )  // DTR
 DEVICE_INPUT_DEFAULTS_END
 
@@ -68,4 +68,4 @@ ROM_END
 
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT  CLASS             INIT        COMPANY            FULLNAME            FLAGS
-COMP( 1991, laserjet3p, 0,      0,      laserjet3p, 0,     laserjet3p_state, empty_init, "Hewlett-Packard", "LaserJet IIIP",    MACHINE_NO_SOUND_HW )
+SYST( 1991, laserjet3p, 0,      0,      laserjet3p, 0,     laserjet3p_state, empty_init, "Hewlett-Packard", "LaserJet IIIP",    MACHINE_NO_SOUND_HW )

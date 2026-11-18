@@ -5,21 +5,14 @@ copyright-holders:rfka01
 HP LaserJet IIIP connected to a computer: the computer's screen, paper and control panel
 -->
 <mamelayout version="2">
-	<element name="case"><rect><color red="0.89" green="0.87" blue="0.80" /></rect></element>
-	<element name="case_dark"><rect><color red="0.80" green="0.78" blue="0.71" /></rect></element>
-	<element name="bezel"><rect><color red="0.70" green="0.69" blue="0.64" /></rect></element>
-	<element name="lcd_back"><rect><color red="0.62" green="0.74" blue="0.62" /></rect></element>
+	<element name="rect"><rect><color red="1.0" green="1.0" blue="1.0" /></rect></element>
 	<element name="key" defstate="0">
 		<rect state="0"><color red="0.95" green="0.93" blue="0.82" /></rect>
 		<rect state="1"><color red="0.80" green="0.78" blue="0.66" /></rect>
 	</element>
-	<element name="led_green" defstate="0">
-		<rect state="0"><color red="0.20" green="0.28" blue="0.20" /></rect>
-		<rect state="1"><color red="0.30" green="1.00" blue="0.30" /></rect>
-	</element>
-	<element name="led_amber" defstate="0">
-		<rect state="0"><color red="0.32" green="0.26" blue="0.16" /></rect>
-		<rect state="1"><color red="1.00" green="0.70" blue="0.15" /></rect>
+	<element name="led" defstate="0">
+		<rect state="0"><color red="0.3" green="0.3" blue="0.3" /></rect>
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
 	</element>
 	<element name="t_online"><text string="ON LINE"><color red="0.15" green="0.15" blue="0.15" /></text></element>
 	<element name="t_reset"><text string="Reset"><color red="0.15" green="0.15" blue="0.15" /></text></element>
@@ -36,12 +29,12 @@ HP LaserJet IIIP connected to a computer: the computer's screen, paper and contr
 
 	<!-- control panel, as wide as the paper view -->
 	<group name="panel">
-		<element ref="case"><bounds x="0" y="0" width="637" height="200" /></element>
-		<element ref="case_dark"><bounds x="0" y="0" width="637" height="6" /></element>
+		<element ref="rect"><bounds x="0" y="0" width="637" height="200" /><color red="0.89" green="0.87" blue="0.80" /></element>
+		<element ref="rect"><bounds x="0" y="0" width="637" height="6" /><color red="0.80" green="0.78" blue="0.71" /></element>
 
 		<!-- indicators left of the key rows -->
-		<element name="printer:hplj3p_online_led" ref="led_green"><bounds x="24" y="30" width="10" height="56" /></element>
-		<element name="printer:hplj3p_formfeed_led" ref="led_amber"><bounds x="24" y="114" width="10" height="56" /></element>
+		<element name="printer:hplj3p_online_led" ref="led"><bounds x="24" y="30" width="10" height="56" /><color red="0.30" green="1.00" blue="0.30" /></element>
+		<element name="printer:hplj3p_formfeed_led" ref="led"><bounds x="24" y="114" width="10" height="56" /><color red="1.00" green="0.70" blue="0.15" /></element>
 
 		<!-- keys: primary function above, Alt function below -->
 		<element ref="key" inputtag="printer:KEYS" inputmask="0x01"><bounds x="46" y="24" width="110" height="68" /></element>
@@ -64,16 +57,18 @@ HP LaserJet IIIP connected to a computer: the computer's screen, paper and contr
 		<element ref="t_minus"><bounds x="296" y="144" width="98" height="28" /></element>
 
 		<!-- display: two lines of eight characters -->
-		<element ref="bezel"><bounds x="420" y="30" width="196" height="82" /></element>
-		<element ref="lcd_back"><bounds x="426" y="36" width="184" height="70" /></element>
+		<element ref="rect"><bounds x="420" y="30" width="196" height="82" /><color red="0.70" green="0.69" blue="0.64" /></element>
+		<element ref="rect"><bounds x="426" y="36" width="184" height="70" /><color red="0.62" green="0.74" blue="0.62" /></element>
 		<screen tag="printer:lcd"><bounds x="430" y="40" width="176" height="62" /></screen>
 
 		<element ref="t_model"><bounds x="420" y="140" width="196" height="30" /></element>
 	</group>
 
-	<!-- the computer's first screen (index 0), assumed 4:3, left of the paper -->
+	<!-- the computer's screen (tagged "screen", assumed 4:3) on the left, the
+	     printer on the right; MAME leaves this view out for a computer whose
+	     screen has another tag -->
 	<view name="Computer, Paper and Control Panel">
-		<screen index="0"><bounds x="0" y="0" width="1449" height="1087" /></screen>
+		<screen tag=":screen"><bounds x="0" y="0" width="1449" height="1087" /></screen>
 		<screen tag="printer:paper"><bounds x="1459" y="0" width="637" height="877" /></screen>
 		<group ref="panel"><bounds x="1459" y="887" width="637" height="200" /></group>
 	</view>

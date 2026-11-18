@@ -5,8 +5,9 @@
     HP LaserJet IIIP on a Centronics port
 
     The printer itself is machine/hp_lj3p.cpp; select I/O PARALEL in its
-    control panel (the default).  The layout puts the computer's first
-    screen next to the paper, with the control panel under the paper.
+    control panel (the default).  The printer's views (paper and control
+    panel, and with the computer's screen) are added to the computer's
+    views.
 
 **********************************************************************/
 
@@ -29,6 +30,8 @@ public:
 	{
 	}
 
+protected:
+	// device_centronics_peripheral_interface implementation
 	virtual void input_strobe(int state) override { m_printer->strobe_w(state); }
 	virtual void input_init(int state) override { m_printer->init_w(state); }
 	virtual void input_data0(int state) override { data_bit(0, state); }
@@ -39,8 +42,9 @@ public:
 	virtual void input_data5(int state) override { data_bit(5, state); }
 	virtual void input_data6(int state) override { data_bit(6, state); }
 	virtual void input_data7(int state) override { data_bit(7, state); }
+	virtual bool supports_pin35_5v() override { return true; }
 
-protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD
 	{
 		save_item(NAME(m_data));
@@ -57,8 +61,6 @@ protected:
 
 		hp_lj3p_device::host_layout(config);
 	}
-
-	virtual bool supports_pin35_5v() override { return true; }
 
 private:
 	required_device<hp_lj3p_device> m_printer;
