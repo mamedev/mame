@@ -110,7 +110,7 @@ public:
 
 	// core control and status
 	bool video_active() { return (!m_videosquelch && current_frame().m_numfields >= 2); }
-	bitmap_yuy16 &get_video() { return (!video_active()) ? m_emptyframe : current_frame().m_visbitmap; }
+	bitmap_yuy16 &get_video() { return (!video_active() || m_videostale) ? m_emptyframe : current_frame().m_visbitmap; }
 	uint32_t get_field_code(laserdisc_field_code code, bool zero_if_squelched);
 
 	// video interface
@@ -299,6 +299,7 @@ private:
 	// video data
 	frame_data          m_frame[3];             // circular list of frames
 	uint8_t             m_videoindex;           // index of the current video buffer
+	bool                m_videostale;           // no frame has been read since the last video squelch
 	bitmap_yuy16        m_emptyframe;           // blank frame
 
 	// audio data
