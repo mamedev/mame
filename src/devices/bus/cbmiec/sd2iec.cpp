@@ -303,6 +303,8 @@ sd2iec_device::sd2iec_device(const machine_config &mconfig, const char *tag, dev
 void sd2iec_device::device_start()
 {
 	m_eeprom = memregion(EEPROM_TAG)->base();
+
+	save_item(NAME(m_sdcard_miso));
 }
 
 

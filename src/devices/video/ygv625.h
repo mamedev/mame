@@ -42,8 +42,7 @@ public:
 	template <typename T> void set_cg_region(T &&tag) { m_cg.set_tag(std::forward<T>(tag)); }
 
 	// 16-bit CPU bus interface, 0x2000 words
-	u16 read(offs_t offset);
-	void write(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void map(address_map &map) ATTR_COLD;
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -58,7 +57,7 @@ private:
 	struct plane_params;
 
 	required_region_ptr<u8> m_cg;
-	memory_share_creator<u16> m_ram;       // 0x2000 words: attribute table, quad table, palette RAM
+	required_shared_ptr<u16> m_ram;
 
 	u16 m_regs[0x200];
 	bitmap_rgb32 m_bitmap;
@@ -67,6 +66,16 @@ private:
 	u16 m_cg_read_data;
 	bool m_cg_read_ready;
 	u8 m_scan_tables[4][256][2];
+
+	u16 reg_r(offs_t offset);
+	void reg_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 status_r();
+	u16 control_r();
+	void control_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 busy_r();
+	u16 cg_read_addr_r();
+	void cg_read_addr_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 cg_read_data_r();
 
 	// decoding
 	u8 cg_byte(u32 addr) const { return (addr < m_cg.length()) ? m_cg[addr] : 0; }

@@ -24,6 +24,9 @@
 #include "emu.h"
 #include "mc6852.h"
 
+#include <algorithm>
+#include <iterator>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -73,6 +76,11 @@ void mc6852_device::device_start()
 	set_rcv_rate(m_rx_clock);
 	set_tra_rate(m_tx_clock);
 
+	std::fill(std::begin(m_rx_fifo), std::end(m_rx_fifo), 0);
+	std::fill(std::begin(m_tx_fifo), std::end(m_tx_fifo), 0);
+	m_rx_fifo_count = 0;
+	m_tx_fifo_count = 0;
+
 	// register for state saving
 	save_item(NAME(m_status));
 	save_item(NAME(m_cr));
@@ -81,6 +89,10 @@ void mc6852_device::device_start()
 	save_item(NAME(m_tsr));
 	save_item(NAME(m_rdr));
 	save_item(NAME(m_rsr));
+	save_item(NAME(m_rx_fifo));
+	save_item(NAME(m_rx_fifo_count));
+	save_item(NAME(m_tx_fifo));
+	save_item(NAME(m_tx_fifo_count));
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dcd));
 	save_item(NAME(m_sm_dtr));
@@ -97,8 +109,8 @@ void mc6852_device::device_start()
 
 void mc6852_device::device_reset()
 {
-	m_rx_fifo = std::queue<uint8_t>();
-	m_tx_fifo = std::queue<uint8_t>();
+	m_rx_fifo_count = 0;
+	m_tx_fifo_count = 0;
 
 	receive_register_reset();
 	transmit_register_reset();
@@ -110,6 +122,20 @@ void mc6852_device::device_reset()
 
 	/* set receiver shift register to all 1's */
 	m_rsr = 0xff;
+}
+
+
+//-------------------------------------------------
+//  fifo_pop - remove the oldest byte
+//-------------------------------------------------
+
+uint8_t mc6852_device::fifo_pop(uint8_t (&fifo)[3], uint8_t &count)
+{
+	uint8_t const data = fifo[0];
+	fifo[0] = fifo[1];
+	fifo[1] = fifo[2];
+	count--;
+	return data;
 }
 
 
@@ -130,14 +156,13 @@ void mc6852_device::tra_callback()
 void mc6852_device::tra_complete()
 {
 	int trigger = (m_cr[1] & C2_1_2_BYTE) ? 1 : 2;
-	int available = 3 - m_tx_fifo.size();
+	int available = 3 - m_tx_fifo_count;
 	uint8_t byte_to_send;
 
 	if (available < 3)
 	{
 		// FIFO not empty - send the next byte.
-		byte_to_send = m_tx_fifo.front();
-		m_tx_fifo.pop();
+		byte_to_send = fifo_pop(m_tx_fifo, m_tx_fifo_count);
 		available++;
 	}
 	else
@@ -188,11 +213,11 @@ void mc6852_device::receive_byte(uint8_t data)
 	if ((m_cr[0] & C1_STRIP_SYNC) && (data == m_scr))
 		return;
 
-	int size = m_rx_fifo.size();
+	int size = m_rx_fifo_count;
 
 	if (size < 3)
 	{
-		m_rx_fifo.push(data);
+		m_rx_fifo[m_rx_fifo_count++] = data;
 		size++;
 	}
 	else
@@ -235,13 +260,13 @@ uint8_t mc6852_device::read(offs_t offset)
 
 	if (BIT(offset, 0))
 	{
-		int size = m_rx_fifo.size();
+		int size = m_rx_fifo_count;
 		if (size > 0)
 		{
-			data = m_rx_fifo.front();
+			data = m_rx_fifo[0];
 			if (!machine().side_effects_disabled())
 			{
-				m_rx_fifo.pop();
+				fifo_pop(m_rx_fifo, m_rx_fifo_count);
 				int trigger = (m_cr[1] & C2_1_2_BYTE) ? 1 : 2;
 				if (size <= trigger)
 				{
@@ -295,7 +320,7 @@ uint8_t mc6852_device::get_tx_byte(int *tuf)
 		return 0xff;
 	}
 
-	int size = m_tx_fifo.size();
+	int size = m_tx_fifo_count;
 
 	if (size == 0)
 	{
@@ -313,8 +338,7 @@ uint8_t mc6852_device::get_tx_byte(int *tuf)
 		return 0xff;
 	}
 
-	uint8_t data = m_tx_fifo.front();
-	m_tx_fifo.pop();
+	uint8_t data = fifo_pop(m_tx_fifo, m_tx_fifo_count);
 	size--;
 
 	int trigger = (m_cr[1] & C2_1_2_BYTE) ? 1 : 2;
@@ -368,12 +392,12 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 
 			int trigger = (m_cr[1] & C2_1_2_BYTE) ? 1 : 2;
 
-			if (m_rx_fifo.size() >= trigger)
+			if (m_rx_fifo_count >= trigger)
 				m_status |= S_RDA;
 			else
 				m_status &= ~S_RDA;
 
-			int tx_fifo_available = 3 - m_tx_fifo.size();
+			int tx_fifo_available = 3 - m_tx_fifo_count;
 			if (tx_fifo_available >= trigger)
 				m_status |= S_TDRA;
 			else
@@ -406,7 +430,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 
 		case C1_AC_TX_FIFO: {
 			/* transmit data FIFO */
-			int available = 3 - m_tx_fifo.size();
+			int available = 3 - m_tx_fifo_count;
 			if (available > 0)
 			{
 				LOG("MC6852 Transmit FIFO %02x\n", data);
@@ -421,7 +445,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 				}
 				else
 				{
-					m_tx_fifo.push(data);
+					m_tx_fifo[m_tx_fifo_count++] = data;
 					available--;
 				}
 			}
@@ -455,7 +479,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 
 			m_status &= ~(S_RX_OVRN | S_PE | S_DCD | S_RDA);
 			m_rsr = 0xff;
-			m_rx_fifo = std::queue<uint8_t>();
+			m_rx_fifo_count = 0;
 
 			receive_register_reset();
 		}
@@ -473,7 +497,7 @@ void mc6852_device::write(offs_t offset, uint8_t data)
 
 			m_status &= ~(S_TUF | S_CTS);
 			m_status |= S_TDRA;
-			m_tx_fifo = std::queue<uint8_t>();
+			m_tx_fifo_count = 0;
 			m_tx_active = false;
 
 			transmit_register_reset();

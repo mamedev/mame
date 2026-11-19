@@ -82,18 +82,20 @@ void tatsumi_state::tatsumi_sprite_control_w(offs_t offset, uint16_t data, uint1
 // TODO: it might mix up with the lower palette bank instead (color bank 0x1400?)
 void tatsumi_state::apply_shadow_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, bitmap_ind8 &shadow_bitmap, uint8_t xor_output)
 {
-	for(int y=cliprect.min_y;y<cliprect.max_y;y++)
+	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for(int x=cliprect.min_x;x<cliprect.max_x;x++)
+		auto const *const shadow_line = &shadow_bitmap.pix(y);
+		auto *const dst = &bitmap.pix(y);
+		for(int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			uint8_t shadow = shadow_bitmap.pix(y, x);
+			uint8_t shadow = shadow_line[x];
 			// xor_output is enabled during Chen boss fight (where shadows have more brightness than everything else)
 			// TODO: transition before fighting him should also black out all the background tilemaps too!?
 			//       (more evidence that we need to mix with color bank 0x1400 instead of doing true RGB mixing).
 			if(shadow ^ xor_output)
 			{
-				rgb_t shadow_pen = bitmap.pix(y, x);
-				bitmap.pix(y, x) = rgb_t(shadow_pen.r() >> 1,shadow_pen.g() >> 1, shadow_pen.b() >> 1);
+				rgb_t shadow_pen = dst[x];
+				dst[x] = rgb_t(shadow_pen.r() >> 1, shadow_pen.g() >> 1, shadow_pen.b() >> 1);
 			}
 		}
 	}

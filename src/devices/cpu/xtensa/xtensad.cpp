@@ -818,15 +818,15 @@ offs_t xtensa_disassembler::disassemble(std::ostream &stream, offs_t pc, const x
 					return 3 | STEP_COND | SUPPORTED;
 
 				case 0b1000: // LOOP (with Loop Option)
-					util::stream_format(stream, "%-8sa%d, 0x%08X", "loop", BIT(inst, 8, 4), pc + 4 + s8(u8(inst >> 16)));
+					util::stream_format(stream, "%-8sa%d, 0x%08X", "loop", BIT(inst, 8, 4), pc + 4 + u8(inst >> 16));
 					break;
 
 				case 0b1001: // LOOPNEZ (with Loop Option)
-					util::stream_format(stream, "%-8sa%d, 0x%08X", "loopnez", BIT(inst, 8, 4), pc + 4 + s8(u8(inst >> 16)));
+					util::stream_format(stream, "%-8sa%d, 0x%08X", "loopnez", BIT(inst, 8, 4), pc + 4 + u8(inst >> 16));
 					return 3 | STEP_COND | SUPPORTED;
 
 				case 0b1010: // LOOPGTZ (with Loop Option)
-					util::stream_format(stream, "%-8sa%d, 0x%08X", "loopgtz", BIT(inst, 8, 4), pc + 4 + s8(u8(inst >> 16)));
+					util::stream_format(stream, "%-8sa%d, 0x%08X", "loopgtz", BIT(inst, 8, 4), pc + 4 + u8(inst >> 16));
 					return 3 | STEP_COND | SUPPORTED;
 
 				default:

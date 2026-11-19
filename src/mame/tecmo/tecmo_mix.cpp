@@ -74,7 +74,7 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	pen_t const *const paldata = palette.pens();
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint32_t *const dd = &bitmap.pix(y);
 		uint16_t *const sd2 = &bitmap_sp->pix(y);
@@ -82,7 +82,7 @@ void tecmo_mix_device::mix_bitmaps(screen_device &screen, bitmap_rgb32 &bitmap, 
 		uint16_t *const bg = &bitmap_bg->pix(y);
 		uint16_t *const tx = bitmap_tx ? &bitmap_tx->pix(y) : nullptr;
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t sprpixel = (sd2[x]);
 

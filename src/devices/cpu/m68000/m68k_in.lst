@@ -7241,12 +7241,18 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 24fc:5 3:4
 			if(format_word == 0x8) { /* 68010 - type 1000 stack frame */
 				new_sr = m68ki_pull_16();
 				new_pc = m68ki_pull_32();
+				u16 ssw;
+				u32 fault_address;
+				u16 dib;
 				m68ki_fake_pull_16();  /* format word */
-				m68ki_fake_pull_16();  /* special status word */
-				m68ki_fake_pull_32();  /* fault address */
-				m68ki_fake_pull_32();  /* reserved and data output buffer */
-				m68ki_fake_pull_32();  /* reserved and data input buffer */
-				m68ki_fake_pull_32();  /* reserved and instruction input buffer */
+				ssw = u16(m68ki_pull_16());
+				fault_address = m68ki_pull_32();
+				m68ki_fake_pull_16();  /* unused */
+				m68ki_fake_pull_16();  /* data output buffer */
+				m68ki_fake_pull_16();  /* unused */
+				dib = u16(m68ki_pull_16());
+				m68ki_fake_pull_16();  /* unused */
+				m68ki_fake_pull_16();  /* instruction input buffer */
 				m68ki_fake_pull_32();  /* 8 dwords of CPU specific undocumented data */
 				m68ki_fake_pull_32();
 				m68ki_fake_pull_32();
@@ -7255,6 +7261,8 @@ e5c0 ffc0 roxl     w A+-DXWL    01:8 7:14 24fc:5 3:4
 				m68ki_fake_pull_32();
 				m68ki_fake_pull_32();
 				m68ki_fake_pull_32();
+				if (ssw & 0x8000)
+					m68ki_rerun_supply(new_pc, ssw, fault_address, dib);
 				m68ki_jump(new_pc);
 				m68ki_set_sr(new_sr);
 				m_instr_mode = INSTRUCTION_YES;

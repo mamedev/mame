@@ -324,7 +324,11 @@ macio_device::macio_device(const machine_config &mconfig, device_type type, cons
 	m_lt_timer_count(0),
 	m_lt_timer_start(attotime::zero),
 	m_scc_rec_count(8),
-	m_ltpc_start{ 0, 0 }
+	m_ltpc_start{ 0, 0 },
+	m_via_retry(false),
+	m_via_access_cycle(0),
+	m_via_last_cycle(0),
+	m_via_last_offset(0)
 {
 	m_toggle = 0;
 }
@@ -409,6 +413,21 @@ void macio_device::common_init()
 	m_InterruptEvents2 = m_InterruptMask2 = m_InterruptLevels2 = 0;
 	recalc_irqs();
 
+	if (m_via_retry)
+	{
+		for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
+		{
+			if (&exec.device() != m_maincpu.target())
+			{
+				m_other_cpus.push_back(&exec);
+			}
+		}
+
+		save_item(NAME(m_via_access_cycle));
+		save_item(NAME(m_via_last_cycle));
+		save_item(NAME(m_via_last_offset));
+	}
+
 	save_item(NAME(m_hdsel));
 	save_item(NAME(m_lt_timer_count));
 	save_item(NAME(m_lt_timer_start));
@@ -478,6 +497,9 @@ void paddington_device::device_start()
 void macio_device::device_reset()
 {
 	m_hdsel = 0;
+	m_via_access_cycle = 0;
+	m_via_last_cycle = 0;
+	m_via_last_offset = 0;
 	m_lt_timer_count = 0;
 	m_lt_timer_start = attotime::zero;
 	m_scc_rec_count = 8;
@@ -545,11 +567,13 @@ u16 macio_device::mac_via_r(offs_t offset)
 {
 	u16 data;
 
+	if (!machine().side_effects_disabled() && via_sync(offset))
+	{
+		return 0;
+	}
+
 	offset >>= 8;
 	offset &= 0x0f;
-
-	if (!machine().side_effects_disabled())
-		via_sync();
 
 	data = m_via1->read(offset);
 
@@ -558,10 +582,13 @@ u16 macio_device::mac_via_r(offs_t offset)
 
 void macio_device::mac_via_w(offs_t offset, u16 data, u16 mem_mask)
 {
+	if (via_sync(offset))
+	{
+		return;
+	}
+
 	offset >>= 8;
 	offset &= 0x0f;
-
-	via_sync();
 
 	if (ACCESSING_BITS_0_7)
 		m_via1->write(offset, data & 0xff);
@@ -569,7 +596,8 @@ void macio_device::mac_via_w(offs_t offset, u16 data, u16 mem_mask)
 		m_via1->write(offset, (data >> 8) & 0xff);
 }
 
-void macio_device::via_sync()
+// returns true if the access must be abandoned and retried
+bool macio_device::via_sync(offs_t offset)
 {
 	// The via runs at 783.36KHz while the main cpu runs at 15MHz or
 	// more, so we need to sync the access with the via clock.  Plus
@@ -577,19 +605,65 @@ void macio_device::via_sync()
 	// with the main cpu again.
 
 	// Get the main cpu time
-	u64 cycle = m_maincpu->total_cycles();
+	const u64 cycle = m_maincpu->total_cycles();
 
+	if (m_via_retry && m_maincpu->executing())
+	{
+		// the second half of a 32-bit access arrives in the same cycle
+		if ((cycle == m_via_last_cycle) && (offset == (m_via_last_offset + 1)))
+		{
+			m_via_last_offset = offset;
+			return false;
+		}
+
+		// stall first and retry, so the access lands after anything Cuda did during the stall
+		if (!m_via_access_cycle)
+		{
+			m_via_access_cycle = via_access_cycle(cycle);
+		}
+
+		if (cycle < m_via_access_cycle)
+		{
+			m_maincpu->adjust_icount(-int(m_via_access_cycle - cycle));
+			m_maincpu->retry_access();
+			return true;
+		}
+
+		// Cuda clocks the shift register, so it must have caught up to the access too
+		const attotime now = machine().time();
+		for (device_execute_interface *exec : m_other_cpus)
+		{
+			if (!exec->suspended(SUSPEND_ANY_REASON) && (exec->local_time() < now))
+			{
+				const attotime ready = exec->local_time() + exec->cycles_to_attotime(1);
+				const u64 wait = (ready > now) ? m_maincpu->attotime_to_cycles(ready - now) : 0;
+				m_maincpu->adjust_icount(-int(wait + 2));
+				m_maincpu->retry_access();
+				return true;
+			}
+		}
+
+		m_via_access_cycle = 0;
+		m_via_last_cycle = cycle;
+		m_via_last_offset = offset;
+		return false;
+	}
+
+	// Finally adjust the main cpu icount as needed.
+	m_maincpu->adjust_icount(-int(via_access_cycle(cycle) - cycle));
+	return false;
+}
+
+u64 macio_device::via_access_cycle(u64 cycle) const
+{
 	// Get the number of the cycle the via is in at that time
-	u64 via_cycle = cycle * m_via1->clock() / m_maincpu->clock();
+	const u64 via_cycle = cycle * m_via1->clock() / m_maincpu->clock();
 
 	// The access is going to start at via_cycle+1 and end at
 	// via_cycle+1.5, compute what that means in maincpu cycles (the
 	// +1 rounds up, since the clocks are too different to ever be
 	// synced).
-	u64 main_cycle = (via_cycle * 2 + 3) * m_maincpu->clock() / (2 * m_via1->clock()) + 1;
-
-	// Finally adjust the main cpu icount as needed.
-	m_maincpu->adjust_icount(-int(main_cycle - cycle));
+	return (via_cycle * 2 + 3) * m_maincpu->clock() / (2 * m_via1->clock()) + 1;
 }
 
 void macio_device::phases_w(u8 phases)

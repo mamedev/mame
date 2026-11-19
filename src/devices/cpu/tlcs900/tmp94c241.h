@@ -32,8 +32,8 @@ class tmp94c241_device : public tlcs900h_device
 	static constexpr uint8_t PORT_6 = 6; // 8 bit I/O. Shared with a16-a23
 	static constexpr uint8_t PORT_7 = 7; // 8 bit I/O. Shared with external memory & bus signals
 	static constexpr uint8_t PORT_8 = 8; // 7 bit I/O. Shared with chip-select signals
-	static constexpr uint8_t PORT_A = 9; // 5 bit I/O. Shared with external DRAM (channel 0)
-	static constexpr uint8_t PORT_B = 10; // 5 bit I/O. Shared with external DRAM (channel 1)
+	static constexpr uint8_t PORT_A = 9; // 5 bit output. Shared with external DRAM (channel 0)
+	static constexpr uint8_t PORT_B = 10; // 5 bit output. Shared with external DRAM (channel 1)
 	static constexpr uint8_t PORT_C = 11; // 2 bit I/O. Shared with outputs for 8-bit or 16-bit timers
 	static constexpr uint8_t PORT_D = 12; // 6 bit I/O. Shared with 16-bit timer I/O and interrupt input
 	static constexpr uint8_t PORT_E = 13; // 6 bit I/O. Shared with 8-bit or 16-bit timer output and interrupt input
@@ -88,9 +88,7 @@ public:
 	auto port7_write() { return m_port_write[PORT_7].bind(); }
 	auto port8_read()  { return m_port_read[PORT_8].bind(); }
 	auto port8_write() { return m_port_write[PORT_8].bind(); }
-	auto porta_read()  { return m_port_read[PORT_A].bind(); }
 	auto porta_write() { return m_port_write[PORT_A].bind(); }
-	auto portb_read()  { return m_port_read[PORT_B].bind(); }
 	auto portb_write() { return m_port_write[PORT_B].bind(); }
 	auto portc_read()  { return m_port_read[PORT_C].bind(); }
 	auto portc_write() { return m_port_write[PORT_C].bind(); }

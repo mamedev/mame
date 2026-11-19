@@ -191,19 +191,13 @@ ROM_START( c1541 )
 	ROM_SYSTEM_BIOS( 2, "r3", "Revision 3" )
 	ROMX_LOAD( "901229-03.uab5", 0x2000, 0x2000, CRC(9126e74a) SHA1(03d17bd745066f1ead801c5183ac1d3af7809744), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 3, "r4", "Revision 4" )
-	ROMX_LOAD( "901229-04.uab5", 0x2000, 0x2000, NO_DUMP, ROM_BIOS(3) )
+	ROMX_LOAD( "901229-04.uab5", 0x2000, 0x2000, CRC(102457cd) SHA1(c67f13f13305e4e2100b7f79b6ca2089af07289f), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 4, "r5", "Revision 5" )
 	ROMX_LOAD( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b), ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS( 5, "r6", "Revision 6" )
 	ROMX_LOAD( "901229-06 aa.uab5", 0x2000, 0x2000, CRC(3a235039) SHA1(c7f94f4f51d6de4cdc21ecbb7e57bb209f0530c0), ROM_BIOS(5) )
 	ROM_SYSTEM_BIOS( 6, "jiffydos", "JiffyDOS v6.01" )
 	ROMX_LOAD( "jiffydos 1541.uab5", 0x2000, 0x2000, CRC(bc7e4aeb) SHA1(db6cfaa6d9b78d58746c811de29f3b1f44d99ddf), ROM_BIOS(6) )
-	ROM_SYSTEM_BIOS( 7, "speeddos", "SpeedDOS-Plus+" )
-	ROMX_LOAD( "speed-dosplus.uab5", 0x0000, 0x4000, CRC(f9db1eac) SHA1(95407e59a9c1d26a0e4bcf2c244cfe8942576e2c), ROM_BIOS(7) )
-	ROM_SYSTEM_BIOS( 8, "rolo27", "Rolo DOS v2.7" )
-	ROMX_LOAD( "rolo27.uab5", 0x2000, 0x2000, CRC(171c7962) SHA1(04c892c4b3d7c74750576521fa081f07d8ca8557), ROM_BIOS(8) )
-	ROM_SYSTEM_BIOS( 9, "digidos", "DigiDOS" )
-	ROMX_LOAD( "digidos.uab5", 0x2000, 0x2000, CRC(b3f05ea3) SHA1(99d3d848344c68410b686cda812f3788b41fead3), ROM_BIOS(9) )
 ROM_END
 
 
@@ -247,13 +241,13 @@ const tiny_rom_entry *c1541c_device::device_rom_region() const
 
 ROM_START( c1541ii )
 	ROM_REGION( 0x8000, M6502_TAG, 0 )
-	ROM_LOAD( "251968-03.u4", 0x0000, 0x4000, CRC(899fa3c5) SHA1(d3b78c3dbac55f5199f33f3fe0036439811f7fb3) )
-
-	ROM_DEFAULT_BIOS("r1")
-	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
-	ROMX_LOAD( "355640-01.u4", 0x0000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos 1541-ii.u4", 0x0000, 0x4000, CRC(dd409902) SHA1(b1a5b826304d3df2a27d7163c6a81a532e040d32), ROM_BIOS(1) )
+	ROM_DEFAULT_BIOS("chinon")
+	ROM_SYSTEM_BIOS( 0, "chinon", "Chinon" )
+	ROMX_LOAD( "251968-03.u4", 0x0000, 0x4000, CRC(899fa3c5) SHA1(d3b78c3dbac55f5199f33f3fe0036439811f7fb3), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "mitsumi", "Mitsumi/Newtronics" )
+	ROMX_LOAD( "355640-01.u4", 0x0000, 0x4000, CRC(57224cde) SHA1(ab16f56989b27d89babe5f89c5a8cb3da71a82f0), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
+	ROMX_LOAD( "jiffydos 1541-ii.u4", 0x0000, 0x4000, CRC(dd409902) SHA1(b1a5b826304d3df2a27d7163c6a81a532e040d32), ROM_BIOS(2) )
 ROM_END
 
 
@@ -273,15 +267,17 @@ const tiny_rom_entry *c1541ii_device::device_rom_region() const
 
 ROM_START( sx1541 )
 	ROM_REGION( 0x4000, M6502_TAG, 0 )
-	ROM_LOAD( "325302-01.uab4",    0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
+	ROM_LOAD( "325302-01.uab4", 0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
 
 	ROM_DEFAULT_BIOS("r5")
-	ROM_SYSTEM_BIOS( 0, "r5", "Revision 5" )
-	ROMX_LOAD( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos sx1541",   0x0000, 0x4000, CRC(783575f6) SHA1(36ccb9ff60328c4460b68522443ecdb7f002a234), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "flash", "1541 FLASH!" )
-	ROMX_LOAD( "1541 flash.uab5",   0x2000, 0x2000, CRC(22f7757e) SHA1(86a1e43d3d22b35677064cca400a6bd06767a3dc), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 0, "r4", "Revision 4" )
+	ROMX_LOAD( "901229-04.uab5",    0x2000, 0x2000, CRC(102457cd) SHA1(c67f13f13305e4e2100b7f79b6ca2089af07289f), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
+	ROMX_LOAD( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
+	ROMX_LOAD( "jiffydos sx1541",   0x0000, 0x4000, CRC(783575f6) SHA1(36ccb9ff60328c4460b68522443ecdb7f002a234), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "flash", "1541 FLASH!" )
+	ROMX_LOAD( "1541 flash.uab5",   0x2000, 0x2000, CRC(22f7757e) SHA1(86a1e43d3d22b35677064cca400a6bd06767a3dc), ROM_BIOS(3) )
 ROM_END
 
 
@@ -306,7 +302,6 @@ void c1541_device_base::c1541_mem(address_map &map)
 	map(0x1c00, 0x1c0f).mirror(0x63f0).m(m_via1, FUNC(via6522_device::map));
 	map(0x8000, 0xbfff).mirror(0x4000).rom().region(M6502_TAG, 0);
 }
-
 
 
 uint8_t c1541_device_base::via0_r(offs_t offset)
@@ -337,7 +332,7 @@ uint8_t c1541_device_base::via0_pb_r()
 	u8 data;
 
 	// data in
-	data = !m_bus->data_r() && !m_ga->atn_r();
+	data = !m_bus->data_r();
 
 	// clock in
 	data |= !m_bus->clk_r() << 2;
@@ -371,7 +366,7 @@ void c1541_device_base::via0_pb_w(uint8_t data)
 	m_iec_clk = !BIT(data, 3);
 	m_iec_data = !BIT(data, 1);
 
-	m_ga->atna_w(BIT(data, 4)); // triggers IEC sync
+	m_ga->atna_w(BIT(data, 4));
 }
 
 uint8_t c1541c_device::via0_pa_r()
@@ -494,7 +489,8 @@ void c1541_device_base::device_add_mconfig(machine_config &config)
 	connector.set_fixed(true);
 	connector.set_media_change_time(attotime::from_msec(100));
 	connector.set_formats(c1541_device_base::floppy_formats);
-	connector.enable_sound(true);
+
+	connector.enable_sound("c1541");
 }
 
 
@@ -639,7 +635,7 @@ TIMER_CALLBACK_MEMBER(c1541_device_base::mtr_on_tick)
 
 void c1541_device_base::cbm_iec_atn(int state)
 {
-	m_ga->atni_w(!state); // triggers IEC sync
+	m_ga->atni_w(!state);
 }
 
 

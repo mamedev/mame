@@ -313,11 +313,11 @@ void m58_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 		m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
 				code1 + 256 * bank, color,
-				flipx, flipy, sx, visarea.min_y + sy1,
+				flipx, flipy, sx, visarea.top() + sy1,
 				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512));
 		m_gfxdecode->gfx(1)->transmask(bitmap, cliprect,
 				code2 + 256 * bank, color,
-				flipx, flipy, sx, visarea.min_y + sy2,
+				flipx, flipy, sx, visarea.top() + sy2,
 				m_palette->transpen_mask(*m_gfxdecode->gfx(1), color, 512));
 	}
 }
@@ -334,18 +334,17 @@ void m58_state::draw_panel(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (!*m_score_panel_disabled)
 	{
-		const rectangle clippanel(26*8, 32*8-1, 1*8, 31*8-1);
-		const rectangle clippanelflip(0*8, 6*8-1, 1*8, 31*8-1);
+		constexpr rectangle clippanel(26*8, 32*8-1, 1*8, 31*8-1);
+		constexpr rectangle clippanelflip(0*8, 6*8-1, 1*8, 31*8-1);
 		rectangle clip = flip_screen() ? clippanelflip : clippanel;
 		const rectangle &visarea = m_screen->visible_area();
-		int const sx = flip_screen() ? cliprect.min_x - 8 : cliprect.max_x + 1 - 14*4;
+		int const sx = flip_screen() ? (cliprect.left() - 8) : (cliprect.right() + 1 - 14*4);
 		int const yoffs = flip_screen() ? -40 : -16;
 
-		clip.min_y += visarea.min_y + yoffs;
-		clip.max_y += visarea.max_y + yoffs;
+		clip.insety(visarea.top() + yoffs, -(visarea.bottom() + yoffs));
 		clip &= cliprect;
 
-		copybitmap(bitmap, m_scroll_panel_bitmap, flip_screen(), flip_screen(), sx, visarea.min_y + yoffs, clip);
+		copybitmap(bitmap, m_scroll_panel_bitmap, flip_screen(), flip_screen(), sx, visarea.top() + yoffs, clip);
 	}
 }
 

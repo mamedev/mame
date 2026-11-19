@@ -25,7 +25,7 @@ Double-Sided main PCB. Labeled "8409063M05 ISSUE A".
   |       SCS138EC10   1627T36PCH12I       |  |                CTAH828                 |
   |        AAYS9825    9810S 1193943       |  |                                        |
   | ____               (c) 95 LUCENT       |  |    ________                            |
-  ||9424           ____                    |  |   |Motorola           ___________      |
+  ||9424           ____                    |  |   |Motorola           ___________      |
   |                7W04       ____         |  |   |32D92  |          | Motorola |      |
   |                     DIALOG 9814AC5     |  |   PNHPT9819          |XC390234PU1      |
   |         _______                        |  |   |_______|          |81C06 0J95A      |

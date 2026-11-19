@@ -121,9 +121,9 @@ enum BREGS {
 #define write_mem_word(a,d)     v25_write_word((a),(d))
 
 #define read_port_byte(a)       m_io->read_byte(a)
-#define read_port_word(a)       m_io->read_word_unaligned(a)
+#define read_port_word(a)       io_read_word(a)
 #define write_port_byte(a,d)    m_io->write_byte((a),(d))
-#define write_port_word(a,d)    m_io->write_word_unaligned((a),(d))
+#define write_port_word(a,d)    io_write_word((a),(d))
 
 /************************************************************************/
 

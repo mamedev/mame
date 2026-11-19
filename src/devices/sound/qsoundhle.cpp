@@ -61,6 +61,7 @@ qsound_hle_device::qsound_hle_device(const machine_config &mconfig, const char *
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
 	, m_stream(nullptr)
+	, m_dsp_ready_cb(*this)
 	, m_dsp_rom(*this, "dsp")
 	, m_data_latch(0)
 {
@@ -169,7 +170,11 @@ void qsound_hle_device::device_start()
 
 void qsound_hle_device::device_reset()
 {
-	m_ready_flag = 0;
+	if (m_ready_flag)
+	{
+		m_ready_flag = 0;
+		m_dsp_ready_cb(0);
+	}
 	m_out[0] = m_out[1] = 0;
 	m_state = STATE_BOOT;
 	m_state_counter = 0;
@@ -227,7 +232,11 @@ void qsound_hle_device::write_data(uint8_t address, uint16_t data)
 	uint16_t *destination = m_register_map[address];
 	if (destination)
 		*destination = data;
-	m_ready_flag = 0;
+	if (m_ready_flag)
+	{
+		m_ready_flag = 0;
+		m_dsp_ready_cb(0);
+	}
 }
 
 void qsound_hle_device::init_register_map()
@@ -379,7 +388,11 @@ void qsound_hle_device::state_init()
 	m_dry[1].m_volume = 0x3fff;
 
 	m_delay_update = 1;
-	m_ready_flag = 0;
+	if (m_ready_flag)
+	{
+		m_ready_flag = 0;
+		m_dsp_ready_cb(0);
+	}
 	m_state_counter = 1;
 }
 
@@ -514,7 +527,11 @@ int16_t qsound_hle_device::qsound_echo::apply(int32_t input)
 // Process a sample update
 void qsound_hle_device::state_normal_update()
 {
-	m_ready_flag = 0x80;
+	if (!m_ready_flag)
+	{
+		m_ready_flag = 0x80;
+		m_dsp_ready_cb(1);
+	}
 
 	// recalculate echo length
 	if (m_state == STATE_NORMAL2)

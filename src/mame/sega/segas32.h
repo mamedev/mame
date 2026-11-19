@@ -190,6 +190,7 @@ protected:
 
 	void signal_sound_irq(int which);
 	void clear_sound_irq(int which);
+	IRQ_CALLBACK_MEMBER(soundcpu_acknowledge_irq);
 	void darkedge_fd1149_vblank();
 	void f1lap_fd1149_vblank();
 
@@ -241,6 +242,7 @@ protected:
 	timer_device *m_v60_irq_timer[2]{};
 	uint8_t m_sound_irq_control[4]{};
 	uint8_t m_sound_irq_input = 0;
+	uint8_t m_sound_irq_vector = 0;
 	uint8_t m_sound_dummy_value = 0;
 	uint16_t m_sound_bank = 0;
 	sys32_output_callback m_sw1_output;

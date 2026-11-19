@@ -5,6 +5,8 @@
  *
  * Notes:
  * - sis85c471 doesn't belong here, it's a full on ISA PC/AT
+ * - (Hack Inc.) to setup working CD-ROM, set any unused HDD to None (the detection is quite slow),
+ *   then in Chipset Features set Onboard 496B IDE Port to Both
  *
  * TODO:
  * - Finish porting sis85c496 from at.cpp;
@@ -27,7 +29,6 @@
 #include "machine/w83787f.h"
 #include "video/voodoo_pci.h"
 
-#include "softlist.h"
 #include "softlist_dev.h"
 
 namespace {

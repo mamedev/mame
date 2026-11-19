@@ -67,11 +67,8 @@ private:
 	u16 read_sense();
 	void write_sense(u16 data);
 
-	void cuda_reset_w(int state)
-	{
-		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
-	}
+	void cuda_reset_w(int state);
+	void cuda_power_w(int state);
 
 	void irq_w(int state)
 	{
@@ -189,6 +186,20 @@ void pwrmacg3_state::write_sense(u16 data)
 	m_sense = data;
 }
 
+void pwrmacg3_state::cuda_reset_w(int state)
+{
+	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+}
+
+void pwrmacg3_state::cuda_power_w(int state)
+{
+	if (state)
+	{
+		machine().schedule_exit();
+	}
+}
+
 void pwrmacg3_state::pwrmacg3(machine_config &config)
 {
 	PPC750(config, m_maincpu, 233'000'000);
@@ -218,6 +229,7 @@ void pwrmacg3_state::pwrmacg3(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(pwrmacg3_state::cuda_reset_w));
+	m_cuda->poweroff_callback().set(FUNC(pwrmacg3_state::cuda_power_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(heathrow, FUNC(heathrow_device::cb1_w));
 	m_cuda->via_data_callback().set(heathrow, FUNC(heathrow_device::cb2_w));
@@ -293,11 +305,12 @@ void pwrmacg3_state::pwrmacg3(machine_config &config)
 	m_cuda->iic_sda_callback().append(m_tda7433, FUNC(tda7433_device::sda_write));
 	m_tda7433->sda_callback().set(sda_merger, FUNC(input_merger_device::in_w<4>));
 
+	// TDA7433 channels are: 0 = left front, 2 = right front, 1 = left rear, 3 = right rear.
 	SPEAKER(config, "speaker", 2).front();
-	screamer.add_route(0, m_tda7433, 1.0, 0);
-	screamer.add_route(1, m_tda7433, 1.0, 1);
-	m_tda7433->add_route(0, "speaker", 1.0, 0);
-	m_tda7433->add_route(1, "speaker", 1.0, 1);
+	screamer.add_route(0, m_tda7433, 1.0, 0); // left -> TDA LF
+	screamer.add_route(1, m_tda7433, 1.0, 2); // right -> TDA RF
+	m_tda7433->add_route(0, "speaker", 1.0, 0); // TDA LF -> left speaker
+	m_tda7433->add_route(2, "speaker", 1.0, 1); // TDA RF -> right speaker
 }
 
 /*

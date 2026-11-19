@@ -98,8 +98,15 @@ public:
 	// 25-bit time_code of the last group of pictures header
 	u32 time_code() const { return m_time_code; }
 
+	// closed_gop flag of the last group of pictures header
+	bool closed_group() const { return m_closed_group; }
+
 	// Clear persistent decoding state.
 	void clear() ATTR_COLD;
+
+	// Sequence parameters a host supplies in place of a sequence header.
+	// Ignored inside a picture or when out of range.
+	void set_sequence(int width, int height, unsigned picture_rate);
 
 	// Discard buffered input and any partial picture, but keep the sequence
 	// parameters, so a stream can resume without a new sequence header.
@@ -227,6 +234,7 @@ private:
 
 	u8 m_picture_rate_code;
 	u32 m_time_code;
+	bool m_closed_group;
 	bool m_sequence_header_seen;
 	bool m_group_seen;
 

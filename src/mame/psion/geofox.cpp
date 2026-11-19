@@ -6,7 +6,7 @@
 
     TODO:
     - need board photos to identify devices
-    - fix CODEC for audio recording/playback
+    - fix volume control
     - improve EEPROM implementation
     - Compact Flash (unknown interface)
 
@@ -14,7 +14,6 @@
 
 #include "emu.h"
 #include "codec.h"
-//#include "etna.h"
 
 #include "bus/pccard/ataflash.h"
 #include "cpu/arm7/arm7.h"
@@ -39,7 +38,6 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_soc(*this, "soc")
-		//, m_etna(*this, "etna")
 		, m_pccard(*this, "pccard")
 		, m_ram(*this, "ram")
 		, m_nvram(*this, "nvram")
@@ -58,7 +56,8 @@ public:
 
 	void geofox(machine_config &config) ATTR_COLD;
 
-	void init_geofox() ATTR_COLD;
+	void init_uk() ATTR_COLD;
+	void init_us() ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(mousepad_changed);
 
@@ -71,14 +70,16 @@ private:
 
 	void geofox_map(address_map &map) ATTR_COLD;
 
+	void init_eeprom(uint8_t locale = 0x00);
+
 	template <int N> uint8_t keyboard_r();
+	void portb_w(uint8_t data);
 	uint16_t adc_r(offs_t offset);
 	void mousepad_packet();
-	//void update_amp();
+	void update_amp();
 
 	required_device<arm710a_cpu_device> m_maincpu;
 	required_device<clps7110_device> m_soc;
-	//required_device<etna_device> m_etna;
 	required_device<pccard_slot_device> m_pccard;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
@@ -95,8 +96,8 @@ private:
 	required_ioport_array<8> m_kbd_cols;
 
 	uint8_t m_kbd_scan = 0;
-	//uint8_t m_volume = 0;
-	//bool m_amp_enable = true;
+	uint8_t m_volume = 0;
+	bool m_amp_enable = true;
 
 	uint8_t  m_mouse_last_x = 0;
 	uint8_t  m_mouse_last_y = 0;
@@ -105,37 +106,35 @@ private:
 };
 
 
-void geofox_state::init_geofox()
+void geofox_state::init_eeprom(uint8_t locale)
 {
-	uint8_t *eeprom = memregion("eeprom")->base();
-	const std::string &name = machine().basename();
+	uint16_t *eeprom = &memregion("eeprom")->as_u16();
 
-	if (name == "geofox_us")
-	{
-		// language and keyboard for USA
-		eeprom[0x04] = 01;
-		eeprom[0x06] = 01;
-	}
-
-	// defaults expected by the touchscreen code
-	eeprom[0x0a] = 20;
-	eeprom[0x0b] = 20;
-	eeprom[0x0c] = 20;
-	eeprom[0x0d] = 30;
+	// locale for UK/USA
+	eeprom[0x02] = locale;
+	eeprom[0x03] = locale;
 
 	// machine unique ID
-	eeprom[0x1b] = 0xde;
-	eeprom[0x1a] = 0xad;
-	eeprom[0x19] = 0xbe;
-	eeprom[0x18] = 0xef;
+	eeprom[0x0c] = 0xbeef;
+	eeprom[0x0d] = 0xdead;
 
 	// calculate the checksum
 	uint8_t chksum = 0;
-	for (int i = 1; i < 0x20; i++)
-		chksum ^= eeprom[i];
+	for (int i = 0; i < 0x0f; i++)
+		chksum ^= (eeprom[i] & 0xff) ^ (eeprom[i] >> 8);
 
 	// EPOC is expecting 0x42
-	eeprom[0x00] = chksum ^ 0x42;
+	eeprom[0x0f] = (chksum ^ 0x42) << 8;
+}
+
+void geofox_state::init_uk()
+{
+	init_eeprom(0x00);
+}
+
+void geofox_state::init_us()
+{
+	init_eeprom(0x01);
 }
 
 
@@ -147,8 +146,8 @@ void geofox_state::machine_start()
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 
 	save_item(NAME(m_kbd_scan));
-	//save_item(NAME(m_volume));
-	//save_item(NAME(m_amp_enable));
+	save_item(NAME(m_volume));
+	save_item(NAME(m_amp_enable));
 	save_item(NAME(m_mouse_last_x));
 	save_item(NAME(m_mouse_last_y));
 	save_item(NAME(m_mouse_data));
@@ -178,6 +177,19 @@ template <int N> uint8_t geofox_state::keyboard_r()
 
 	return uint8_t(data >> (N * 8));
 }
+
+
+void geofox_state::portb_w(uint8_t data)
+{
+	m_volume = BIT(data, 4, 2);
+
+	m_codec->pdn_w(BIT(data, 5)); // CODEN
+
+	//m_amp_enable = BIT(data, 1); // AMPEN
+
+	update_amp();
+}
+
 
 uint16_t geofox_state::adc_r(offs_t offset)
 {
@@ -231,16 +243,16 @@ void geofox_state::mousepad_packet()
 	m_mouse_last_y = mousey;
 }
 
-//void geofox_state::update_amp()
-//{
-//	// TODO: MSC1192 speaker amplifier, can be put into standby to mute audio.
-//	static const float codec_volume[4] = { 1.0f, 0.75f, 0.5f, 0.25f };
-//
-//	if (m_amp_enable)
-//		m_codec->set_output_gain(ALL_OUTPUTS, codec_volume[m_volume]); // VOL
-//	else
-//		m_codec->set_output_gain(ALL_OUTPUTS, 0.0);
-//}
+void geofox_state::update_amp()
+{
+	// TODO: MSC1192 speaker amplifier, can be put into standby to mute audio.
+	static const float codec_volume[4] = { 1.0f, 0.75f, 0.5f, 0.25f };
+
+	if (m_amp_enable)
+		m_codec->set_output_gain(ALL_OUTPUTS, codec_volume[m_volume]); // VOL
+	else
+		m_codec->set_output_gain(ALL_OUTPUTS, 0.0);
+}
 
 
 void geofox_state::geofox_map(address_map &map)
@@ -248,7 +260,6 @@ void geofox_state::geofox_map(address_map &map)
 	map(0x00000000, 0x003fffff).mirror(0x0fc00000).rom().region("maincpu", 0);
 	map(0x10000000, 0x103fffff).mirror(0x0fc00000).rom().region("maincpu", 0x400000);
 	map(0x30000000, 0x30000000).lr8(NAME([]() { return 0x06; })); // power status (unknown device)
-	//map(0x40000000, 0x40000fff).rw(m_etna, FUNC(etna_device::regs_r), FUNC(etna_device::regs_w)); // not confirmed
 	map(0x80000000, 0x80001fff).rw(m_soc, FUNC(clps7110_device::periphs_r), FUNC(clps7110_device::periphs_w));
 }
 
@@ -264,9 +275,10 @@ void geofox_state::palette_init(palette_device &palette) const
 	}
 }
 
+
 INPUT_CHANGED_MEMBER(geofox_state::mousepad_changed)
 {
-	m_soc->eint2_w(newval ? ASSERT_LINE : CLEAR_LINE);
+	m_soc->eint2_w(newval != oldval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 INPUT_PORTS_START( geofox )
@@ -424,10 +436,12 @@ void geofox_state::geofox(machine_config &config)
 	m_soc->lcd_dma_cb().set(m_ram, FUNC(ram_device::read));
 	m_soc->porta_r().set(FUNC(geofox_state::keyboard_r<0>));
 	m_soc->portb_r().set(FUNC(geofox_state::keyboard_r<1>)).mask(0x0f);
+	m_soc->portb_w().set(FUNC(geofox_state::portb_w));
 	//m_soc->portc_r().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::do_read)).lshift(7);
 	//m_soc->portc_w().set(m_eeprom, FUNC(eeprom_serial_93cxx_device::cs_write)).bit(3);
 	//m_soc->portc_w().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::clk_write)).bit(2);
 	//m_soc->portc_w().append(m_eeprom, FUNC(eeprom_serial_93cxx_device::di_write)).bit(6);
+	//m_soc->portd_w().set(FUNC(psion5_state::backlight_w)).bit(1);
 	m_soc->pcm_in().set(m_codec, FUNC(psion_codec_device::pcm_out));
 	m_soc->pcm_out().set(m_codec, FUNC(psion_codec_device::pcm_in));
 	m_soc->buz_cb().set(m_buzzer, FUNC(speaker_sound_device::level_w));
@@ -440,10 +454,7 @@ void geofox_state::geofox(machine_config &config)
 	RAM(config, m_ram).set_default_size("16M").set_extra_options("4M");
 	NVRAM(config, "nvram", nvram_device::DEFAULT_NONE);
 
-	//ETNA(config, m_etna);
-	//m_etna->porta_r().set([this] () { logerror("%s: porta_r\n", machine().describe_context()); return 0; });
-
-	PCCARD_SLOT(config, m_pccard, pcmcia_devices, nullptr);
+	PCCARD_SLOT(config, m_pccard, pcmcia_devices, "cf");
 	//m_pccard->cd1().set(m_etna, FUNC(etna_device::write_pc1_cd1));
 	//m_pccard->cd2().set(m_etna, FUNC(etna_device::write_pc1_cd2));
 	//m_pccard->bvd1().set(m_etna, FUNC(etna_device::write_pc1_bvd1));
@@ -485,6 +496,6 @@ ROM_END
 } // anonymous namespace
 
 
-//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT       CLASS          INIT          COMPANY      FULLNAME            FLAGS
-COMP( 1997, geofox,    0,      0,      geofox,    geofox,     geofox_state,  init_geofox,  "Geofox",    "Geofox-One",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1997, geofox_us, geofox, 0,      geofox,    geofox_us,  geofox_state,  init_geofox,  "Geofox",    "Geofox-One (US)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME       PARENT  COMPAT  MACHINE    INPUT       CLASS          INIT         COMPANY      FULLNAME            FLAGS
+COMP( 1997, geofox,    0,      0,      geofox,    geofox,     geofox_state,  init_uk,     "Geofox",    "Geofox-One",       MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 1997, geofox_us, geofox, 0,      geofox,    geofox_us,  geofox_state,  init_us,     "Geofox",    "Geofox-One (US)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

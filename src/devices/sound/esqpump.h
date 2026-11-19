@@ -57,8 +57,6 @@ public:
 				m_esp->_instr(pc++) = 0xffffffffffff; // no-op
 			}
 #endif
-
-			// m_esp->list_program(print_to_stderr);
 		}
 	}
 	bool get_esp_halted() {

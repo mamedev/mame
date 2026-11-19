@@ -39,14 +39,13 @@ namespace {
 // The decoder clock ticks at 45 kHz.
 constexpr int DCLK_HZ = 45000;
 
-// The input FIFO.  The driver keeps it far below this.
-constexpr size_t AUDIO_BUFFER_SIZE = 64 * 1024;
-
 // A CD-i digital video stream carries MPEG-1 layer II at 224 kbit/s and
 // 44.1 kHz, so one 1152 sample frame is about 731 bytes.  Round up: below
 // this much undecoded elementary stream the decoder genuinely cannot produce
 // another frame.
 constexpr size_t MP2_FRAME_BYTES = 1024;
+
+constexpr size_t DECODE_AHEAD_SAMPLES = 2 * 1152;
 
 } // anonymous namespace
 
@@ -68,8 +67,7 @@ gsc38gg307_device::~gsc38gg307_device()
 
 void gsc38gg307_device::device_start()
 {
-	m_audio_es = std::make_unique<uint8_t []>(AUDIO_BUFFER_SIZE);
-	m_audio = std::make_unique<mpeg_audio>(m_audio_es.get(), mpeg_audio::L1 | mpeg_audio::L2, false, 0);
+	m_audio = std::make_unique<mpeg_audio>(m_audio_es, mpeg_audio::L1 | mpeg_audio::L2, false, 0);
 
 	m_stream = stream_alloc(0, 2, 44100);
 	m_audio_timer = timer_alloc(FUNC(gsc38gg307_device::audio_tick), this);
@@ -81,10 +79,24 @@ void gsc38gg307_device::device_start()
 	save_item(NAME(m_fma_ivec));
 	save_item(NAME(m_fma_stream));
 	save_item(NAME(m_fma_dspa));
+	save_item(NAME(m_fma_dsp_cvr));
+	save_item(NAME(m_fma_atten_index));
+	save_item(NAME(m_fma_atten));
 	save_item(NAME(m_fma_dsp_enable));
 	save_item(NAME(m_fma_dclkl_latch));
 	save_item(NAME(m_fma_audio_header));
+	save_item(NAME(m_pending_fma_stream_change));
 	save_item(NAME(m_dclk_origin));
+	save_item(NAME(m_fma_scr_start_valid));
+	save_item(NAME(m_fma_scr_start_time));
+	save_item(NAME(m_audio_header_shift));
+	save_item(NAME(m_audio_es));
+	save_item(NAME(m_audio_es_head));
+	save_item(NAME(m_audio_es_tail));
+	save_item(NAME(m_irq_state));
+	save_item(NAME(m_audio_samples));
+	save_item(NAME(m_audio_head));
+	save_item(NAME(m_audio_count));
 	m_demux.register_save_state(*this);
 	m_audio->register_save_state(*this);
 }
@@ -143,7 +155,7 @@ uint32_t gsc38gg307_device::fma_dclk() const
 void gsc38gg307_device::write_data(uint8_t data)
 {
 	const bool was_body = m_demux.packet_body;
-	m_demux.byte(data, m_fma_stream);
+	m_demux.byte(data, 0xc0 | m_fma_stream);
 
 	if (was_body)
 	{
@@ -200,7 +212,7 @@ void gsc38gg307_device::audio_es_write(const uint8_t *data, size_t length)
 	// an overflowing FIFO drops the newest data
 	length = std::min(length, AUDIO_BUFFER_SIZE - m_audio_es_tail);
 	std::copy_n(data, length, &m_audio_es[m_audio_es_tail]);
-	m_audio_es_tail += length;
+	m_audio_es_tail += uint32_t(length);
 }
 
 void gsc38gg307_device::audio_decode_pending()
@@ -241,18 +253,21 @@ void gsc38gg307_device::audio_decode_pending()
 		int pos = int(m_audio_es_head * 8);
 		int count = 0, rate = 0, channels = 0;
 		const bool decoded = m_audio->decode_buffer(pos, int((m_audio_es_head + frame_bytes) * 8), samples, count, rate, channels);
-		m_audio_es_head += frame_bytes;
+		m_audio_es_head += uint32_t(frame_bytes);
 		if (!decoded)
 		{
 			LOGMASKED(LOG_AUDIO, "FMA undecodable frame skipped\n");
 			continue;
 		}
 
-		m_audio_sample_rate = uint32_t(rate);
 		for (int i = 0; i < count; i++)
 		{
-			m_audio_samples[0].push_back(samples[i * channels]);
-			m_audio_samples[1].push_back(samples[i * channels + channels - 1]);
+			if (m_audio_count == AUDIO_SAMPLES_SIZE)
+				break;
+			const uint32_t tail = (m_audio_head + m_audio_count) % AUDIO_SAMPLES_SIZE;
+			m_audio_samples[0][tail] = samples[i * channels];
+			m_audio_samples[1][tail] = samples[i * channels + channels - 1];
+			m_audio_count++;
 		}
 
 		if (!(m_fma_status & FMA_DEC))
@@ -334,18 +349,11 @@ void gsc38gg307_device::sound_stream_update(sound_stream &stream)
 		{
 			l = m_audio_samples[0][m_audio_head];
 			r = m_audio_samples[1][m_audio_head];
-			m_audio_head++;
+			m_audio_head = (m_audio_head + 1) % AUDIO_SAMPLES_SIZE;
+			m_audio_count--;
 		}
 		stream.put(0, i, (l * l2l + r * r2l) / 32768.0f);
 		stream.put(1, i, (l * l2r + r * r2r) / 32768.0f);
-	}
-
-	// drop the consumed prefix now and then so the vectors do not grow forever
-	if (m_audio_head >= 44100)
-	{
-		for (auto &chan : m_audio_samples)
-			chan.erase(chan.begin(), chan.begin() + m_audio_head);
-		m_audio_head = 0;
 	}
 }
 
@@ -420,7 +428,18 @@ uint16_t gsc38gg307_device::regs_r(offs_t offset, uint16_t mem_mask)
 	switch (offset)
 	{
 	case 0x00: data = m_fma_cmd; break;
-	case 0x01: data = 0x0200 | m_fma_status; break;
+	case 0x01:
+		data = 0x0200 | m_fma_status;
+		if (!machine().side_effects_disabled())
+		{
+			m_stream->update();
+		}
+		if (audio_available() <= DECODE_AHEAD_SAMPLES && audio_es_available() < MP2_FRAME_BYTES)
+		{
+			data &= ~FMA_DEC;
+		}
+		break;
+
 	case 0x02: data = 0x0007; break;
 	case 0x03: data = 0x0900; break;
 	case 0x04: data = m_fma_stream; break;

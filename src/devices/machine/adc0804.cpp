@@ -131,7 +131,7 @@ void adc0804_device::device_start()
 //**************************************************************************
 
 // Conversion occurs over a busy period of 66–73 cycles, after 1–8 cycles of latency
-const int adc0804_device::s_conversion_cycles = 74;
+const int adc0804_device::s_conversion_cycles = 73;
 
 
 //-------------------------------------------------

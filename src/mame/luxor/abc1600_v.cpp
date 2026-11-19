@@ -11,6 +11,8 @@
 #include "abc1600_v.h"
 #include "render.h"
 
+#include <algorithm>
+
 //#define VERBOSE 1
 #include "logmacro.h"
 
@@ -73,12 +75,12 @@ void abc1600_mover_device::iowr0_map(address_map &map)
 
 void abc1600_mover_device::iowr1_map(address_map &map)
 {
-	map(0x00, 0x00).w(FUNC(abc1600_mover_device::ldfx_hb_w));
-	map(0x01, 0x01).w(FUNC(abc1600_mover_device::ldfx_lb_w));
-	map(0x02, 0x02).w(FUNC(abc1600_mover_device::ldfy_hb_w));
-	map(0x03, 0x03).w(FUNC(abc1600_mover_device::ldfy_lb_w));
-	map(0x05, 0x05).w(FUNC(abc1600_mover_device::wrml_w));
-	map(0x07, 0x07).w(FUNC(abc1600_mover_device::wrdl_w));
+	map(0x00, 0x00).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfx_hb_w));
+	map(0x01, 0x01).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfx_lb_w));
+	map(0x02, 0x02).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfy_hb_w));
+	map(0x03, 0x03).mirror(0xf8).w(FUNC(abc1600_mover_device::ldfy_lb_w));
+	map(0x05, 0x05).mirror(0x08).select(0xf0).w(FUNC(abc1600_mover_device::wrml_w));
+	map(0x07, 0x07).mirror(0x08).select(0xf0).w(FUNC(abc1600_mover_device::wrdl_w));
 }
 
 void abc1600_mover_device::iowr2_map(address_map &map)
@@ -168,28 +170,35 @@ MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 	if ((vbp + y) > cliprect.max_y)
 		return;
 
-	int x = 0;
 	const pen_t *pen = m_palette->pens();
+	const int width = std::min(((x_count + 1) / 2) * 64, cliprect.max_x - hbp + 1);
 
-	for (int column = 0; column < x_count; column += 2)
+	if (width <= 0)
+		return;
+
+	uint32_t *dest = &bitmap.pix(vbp + y, hbp);
+
+	if (!de || BLANK)
+	{
+		std::fill_n(dest, width, pen[0]);
+		return;
+	}
+
+	const uint16_t pol = PIX_POL ? 0xffff : 0;
+	int x = 0;
+
+	for (int column = 0; x < width; column += 2)
 	{
 		uint16_t dma = get_crtca(ma, ra, column);
 
 		// data is read out of video RAM in nibble mode by strobing CAS 4 times
-		for (int cas = 0; cas < 4; cas++)
+		for (int cas = 0; cas < 4 && x < width; cas++)
 		{
-			uint16_t data = read_videoram(dma + cas);
+			uint16_t data = read_videoram(dma + cas) ^ pol;
+			const int bits = std::min(16, width - x);
 
-			for (int bit = 0; bit < 16; bit++)
-			{
-				int color = ((BIT(data, 15) ^ PIX_POL) && !BLANK) && de;
-
-				if ((hbp + x) <= cliprect.max_x)
-					bitmap.pix(vbp + y, hbp + x) = pen[color];
-
-				x++;
-				data <<= 1;
-			}
+			for (int bit = 0; bit < bits; bit++, data <<= 1)
+				dest[x++] = pen[BIT(data, 15)];
 		}
 	}
 }
@@ -208,7 +217,7 @@ void abc1600_mover_device::device_add_mconfig(machine_config &config)
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG).set_color(rgb_t::green()));
 	screen.set_screen_update(FUNC(abc1600_mover_device::screen_update));
-	screen.set_raw(XTAL(64'000'000), 0x3e0, 0, 0x300, 0x433, 0, 0x400);
+	screen.set_raw(XTAL(64'000'000), HTOTAL, 0, HDISP, VTOTAL, 0, VDISP);
 
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
@@ -220,6 +229,38 @@ void abc1600_mover_device::device_add_mconfig(machine_config &config)
 	m_crtc->set_on_update_addr_change_callback(FUNC(abc1600_mover_device::crtc_update));
 
 	TIMER(config, "amm").configure_generic(FUNC(abc1600_mover_device::amm));
+}
+
+
+//-------------------------------------------------
+//  INPUT_PORTS( abc1600_mover )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( abc1600_mover )
+	PORT_START("SCREENPOS")
+	PORT_CONFNAME( 0x02, 0x00, "Monitor Orientation" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(abc1600_mover_device::screenpos_changed), 0)
+	PORT_CONFSETTING(    0x00, "Portrait" )
+	PORT_CONFSETTING(    0x02, "Landscape" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor abc1600_mover_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( abc1600_mover );
+}
+
+INPUT_CHANGED_MEMBER( abc1600_mover_device::screenpos_changed )
+{
+	select_screenpos_view();
+}
+
+void abc1600_mover_device::select_screenpos_view()
+{
+	machine().render().first_target()->set_view(BIT(m_screenpos->read(), 1));
 }
 
 
@@ -241,7 +282,8 @@ abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, const 
 	m_timer_amm(*this, "amm"),
 	m_wrmsk_rom(*this, "wrmsk"),
 	m_shinf_rom(*this, "shinf"),
-	m_drmsk_rom(*this, "drmsk")
+	m_drmsk_rom(*this, "drmsk"),
+	m_screenpos(*this, "SCREENPOS")
 {
 }
 
@@ -287,6 +329,8 @@ void abc1600_mover_device::device_start()
 
 void abc1600_mover_device::device_reset()
 {
+	select_screenpos_view();
+
 	// disable display
 	m_clocks_disabled = 1;
 	m_endisp = 0;
@@ -426,8 +470,8 @@ uint8_t abc1600_mover_device::iord0_r()
 
 	uint8_t data = 0;
 
-	// monitor orientation (portrait/landscape)
-	data |= machine().render().first_target()->view() << 1;
+	// monitor orientation
+	data |= m_screenpos->read();
 
 	// vertical sync
 	data |= m_crtc->vsync_r() << 6;
@@ -1192,6 +1236,44 @@ inline uint16_t abc1600_mover_device::word_mixer(uint16_t rot)
 	m_mdor = rot;
 
 	return gmdi;
+}
+
+
+//-------------------------------------------------
+//  dtack_clk - sequencer DTACK CLK level
+//-------------------------------------------------
+
+bool abc1600_mover_device::dtack_clk(u64 slot) const
+{
+	u64 const pos = ((slot >> 4) * 32) % (HTOTAL * VTOTAL);
+	u64 const x = pos % HTOTAL;
+	bool const de = (pos / HTOTAL < VDISP) && (x < HDISP);
+	bool const ds = de && !BIT(x, 5);
+
+	return !BIT(ds ? m_ds[~slot & 0x0f] : m_ms[~slot & 0x0f], 5);
+}
+
+
+//-------------------------------------------------
+//  cpu_pack_tick - CPU video RAM acknowledge time
+//-------------------------------------------------
+
+u64 abc1600_mover_device::cpu_pack_tick(u64 das, bool write) const
+{
+	if (m_amm)
+		das = std::max(das, m_timer_amm->expire().as_ticks(XTAL(64'000'000).value()));
+
+	int edges = write ? 1 : 2;
+
+	for (u64 slot = das >> 1; slot < (das >> 1) + 64; slot++)
+	{
+		u64 const edge = (slot << 1) + 2;
+
+		if (edge > das && dtack_clk(slot) && !dtack_clk(slot - 1) && !--edges)
+			return edge;
+	}
+
+	return das;
 }
 
 

@@ -14,8 +14,6 @@
 #pragma once
 
 
-void pc_joysticks(device_slot_interface &device);
-
 class device_pc_joy_interface : public device_interface
 {
 public:
@@ -50,32 +48,5 @@ private:
 };
 
 DECLARE_DEVICE_TYPE(PC_JOY, pc_joy_device)
-
-class pc_basic_joy_device : public device_t,
-							public device_pc_joy_interface
-{
-public:
-	pc_basic_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-
-	virtual uint8_t x1(int delta) override { return (m_x1->read() > delta); }
-	virtual uint8_t x2(int delta) override { return (m_x2->read() > delta); }
-	virtual uint8_t y1(int delta) override { return (m_y1->read() > delta); }
-	virtual uint8_t y2(int delta) override { return (m_y2->read() > delta); }
-	virtual uint8_t btn() override { return m_btn->read(); }
-
-protected:
-	pc_basic_joy_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock = 0);
-
-	virtual void device_start() override { }
-
-	required_ioport m_btn;
-
-private:
-	required_ioport m_x1;
-	required_ioport m_y1;
-	required_ioport m_x2;
-	required_ioport m_y2;
-};
 
 #endif // MAME_BUS_PC_JOY_PC_JOY_H

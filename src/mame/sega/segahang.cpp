@@ -235,7 +235,7 @@ uint32_t segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			cliprect,
 			[this, &screen, &bitmap, &sprites] (rectangle const &rect)
 			{
-				for (int y = rect.min_y; y <= rect.max_y; y++)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
 					uint16_t *const dest = &bitmap.pix(y);
 					uint16_t const *const src = &sprites.pix(y);
@@ -244,7 +244,7 @@ uint32_t segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					if (!m_sharrier_video)
 					{
 						// hangon mixing
-						for (int x = rect.min_x; x <= rect.max_x; x++)
+						for (int x = rect.left(); x <= rect.right(); x++)
 						{
 							// only process written pixels
 							uint16_t const pix = src[x];
@@ -268,7 +268,7 @@ uint32_t segahang_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 					else
 					{
 						// sharrier mixing
-						for (int x = rect.min_x; x <= rect.max_x; x++)
+						for (int x = rect.left(); x <= rect.right(); x++)
 						{
 							// only process written pixels
 							uint16_t const pix = src[x];

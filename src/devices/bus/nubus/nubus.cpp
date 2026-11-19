@@ -85,6 +85,7 @@ nubus_device::nubus_device(const machine_config &mconfig, device_type type, cons
 	m_out_irqc_cb(*this),
 	m_out_irqd_cb(*this),
 	m_out_irqe_cb(*this),
+	m_bus_error_cb(*this, 0),
 	m_bus_mode(nubus_mode_t::NORMAL),
 	m_addr_mask(0xffffffff)
 {
@@ -131,6 +132,11 @@ void nubus_device::device_start()
 
 			this->space(AS_DATA).install_read_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_r<0x00000000>)));
 			this->space(AS_DATA).install_write_handler(0x00000000, 0x3fffffff, emu::rw_delegate(*this, FUNC(nubus_device::host_memory_w<0x00000000>)));
+			if (!m_bus_error_cb.isunset())
+			{
+				this->space(AS_DATA).install_read_handler(0xa0000000, 0xefffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_error_r<0xa0000000>)));
+				this->space(AS_DATA).install_read_handler(0xfa000000, 0xfeffffff, emu::rw_delegate(*this, FUNC(nubus_device::bus_error_r<0xfa000000>)));
+			}
 			break;
 
 		// Original LC PDS omits A28, A29, and A30 so in 32-bit mode, 0xfxxxxxxx addresses appear here as 0x8xxxxxxx.
@@ -222,6 +228,12 @@ template void   nubus_device::bus_memory_w<0x80000000>(offs_t offset, u32 data, 
 template u32    nubus_device::bus_memory_r<0x80e00000>(offs_t offset, u32 mem_mask);
 template void   nubus_device::bus_memory_w<0x80e00000>(offs_t offset, u32 data, u32 mem_mask);
 
+template <u32 Base>
+u32 nubus_device::bus_error_r(offs_t offset, u32 mem_mask)
+{
+	return m_bus_error_cb((Base >> 2) + offset, mem_mask);
+}
+
 template <typename R, typename W>
 void nubus_device::install_device(offs_t start, offs_t end, R rhandler, W whandler, u32 mask)
 {
@@ -290,6 +302,15 @@ void nubus_device::install_bank(offs_t start, offs_t end, void *data)
 	start &= m_addr_mask;
 	end &= m_addr_mask;
 	space(AS_DATA).install_ram(start, end, data);
+}
+
+void nubus_device::install_rom(offs_t start, offs_t end, offs_t mirror, void *data)
+{
+	start &= m_addr_mask;
+	end &= m_addr_mask;
+	mirror &= m_addr_mask;
+	space(AS_DATA).install_rom(start, end, mirror, data);
+	space(AS_DATA).nop_write(start, end, mirror);
 }
 
 void nubus_device::install_view(offs_t start, offs_t end, memory_view &view)
@@ -386,6 +407,15 @@ void device_nubus_card_interface::interface_pre_start()
 	{
 		fatalerror("Can't find NuBus device\n");
 	}
+
+	if (!m_nubus->started())
+		throw device_missing_dependencies();
+}
+
+void device_nubus_card_interface::install_declaration_rom_copy(offs_t start, offs_t end, offs_t mirror)
+{
+	assert((end - start) < m_declaration_rom.size());
+	nubus().install_rom(start, end, mirror, &m_declaration_rom[0]);
 }
 
 void device_nubus_card_interface::install_bank(offs_t start, offs_t end, void *data)
@@ -398,7 +428,7 @@ void device_nubus_card_interface::install_view(offs_t start, offs_t end, memory_
 	nubus().install_view(start, end, view);
 }
 
-void device_nubus_card_interface::install_declaration_rom(const char *romregion, bool mirror_all_mb, bool reverse_rom)
+void device_nubus_card_interface::prepare_declaration_rom(const char *romregion, bool reverse_rom, bool undriven_lanes_high)
 {
 	bool inverted = false;
 
@@ -423,6 +453,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 		byteLanes ^= 0xff;
 		inverted = true;
 	}
+	const u8 fill = (undriven_lanes_high && !inverted) ? 0xff : 0x00;
 
 	switch (byteLanes)
 	{
@@ -436,7 +467,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 
 		case 0xe1:  // lane 0 only
 			m_declaration_rom.resize(romlen * 4);
-			std::fill_n(&m_declaration_rom[0], romlen * 4, 0);
+			std::fill_n(&m_declaration_rom[0], romlen * 4, fill);
 			for (int i = 0; i < romlen; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE(i*4)] = rom[i];
@@ -446,7 +477,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 
 		case 0xd2:  // lane 1 only
 			m_declaration_rom.resize(romlen * 4);
-			std::fill_n(&m_declaration_rom[0], romlen * 4, 0);
+			std::fill_n(&m_declaration_rom[0], romlen * 4, fill);
 			for (int i = 0; i < romlen; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+1)] = rom[i];
@@ -456,7 +487,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 
 		case 0xb4:  // lane 2 only
 			m_declaration_rom.resize(romlen * 4);
-			std::fill_n(&m_declaration_rom[0], romlen * 4, 0);
+			std::fill_n(&m_declaration_rom[0], romlen * 4, fill);
 			for (int i = 0; i < romlen; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+2)] = rom[i];
@@ -466,7 +497,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 
 		case 0x78:  // lane 3 only
 			m_declaration_rom.resize(romlen * 4);
-			std::fill_n(&m_declaration_rom[0], romlen * 4, 0);
+			std::fill_n(&m_declaration_rom[0], romlen * 4, fill);
 			for (int i = 0; i < romlen; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+3)] = rom[i];
@@ -476,7 +507,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 
 		case 0xc3:  // lanes 0, 1
 			m_declaration_rom.resize(romlen * 2);
-			std::fill_n(&m_declaration_rom[0], romlen * 2, 0);
+			std::fill_n(&m_declaration_rom[0], romlen * 2, fill);
 			for (int i = 0; i < romlen / 2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
@@ -487,7 +518,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 
 		case 0xa5:  // lanes 0, 2
 			m_declaration_rom.resize(romlen * 2);
-			std::fill_n(&m_declaration_rom[0], romlen * 2, 0);
+			std::fill_n(&m_declaration_rom[0], romlen * 2, fill);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+0)] = rom[(i*2)];
@@ -498,7 +529,7 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 
 		case 0x3c:  // lanes 2,3
 			m_declaration_rom.resize(romlen * 2);
-			std::fill_n(&m_declaration_rom[0], romlen * 2, 0);
+			std::fill_n(&m_declaration_rom[0], romlen * 2, fill);
 			for (int i = 0; i < romlen/2; i++)
 			{
 				m_declaration_rom[BYTE4_XOR_BE((i*4)+2)] = rom[(i*2)];
@@ -519,8 +550,13 @@ void device_nubus_card_interface::install_declaration_rom(const char *romregion,
 			m_declaration_rom[i] ^= 0xff;
 		}
 	}
+}
 
-	// now install the ROM
+void device_nubus_card_interface::install_declaration_rom(const char *romregion, bool mirror_all_mb, bool reverse_rom)
+{
+	prepare_declaration_rom(romregion, reverse_rom, false);
+
+	const u32 romlen = m_declaration_rom.size();
 	u32 addr = get_slotspace() + 0x01000000;
 	addr -= romlen;
 	if (mirror_all_mb)  // mirror the declaration ROM across all 16 megs of the slot space

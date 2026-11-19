@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Citizen 120D 9-pin dot matrix print mechanism (skeleton)
+    Citizen 120D 9-pin dot matrix print mechanism
 
     Used by the Commodore MPS-1200/MPS-1250 (see bus/cbmiec/mps1200.cpp).
 

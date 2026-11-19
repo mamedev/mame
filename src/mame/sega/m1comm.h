@@ -40,9 +40,11 @@ public:
 
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	void m1comm_io(address_map &map) ATTR_COLD;
 	void m1comm_mem(address_map &map) ATTR_COLD;
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -78,11 +80,12 @@ private:
 	// - share_r
 	// - share_w
 
-	uint8_t m_shared[0x1000]{}; // 2x 2k = 4k; model1 accesses this with 16bit data and 11bit address (A0 to A10)
+	uint8_t m_shared[0x1000]{};   // 2x 2k = 4k; model1 accesses this with 16bit data and 11bit address (A0 to A10)
 	uint8_t m_syn = 0;            // bit0 is used to trigger DOP line on VINT, bit1 is used to enable/disable VINT/IRQ5
 	uint8_t m_zfg = 0;            // z80 flip gate, bit0 is stored
 	uint8_t m_cn = 0;             // bit0 is used to enable/disable the comm board
 	uint8_t m_fg = 0;             // flip gate, bit0 is stored, bit7 is connected to ZFG bit 0
+	uint8_t m_irq_vector = 0;     // z80 interrupt vector
 
 #ifdef M1COMM_SIMULATION
 	osd_file::ptr m_line_rx;  // rx line - can be either differential, simple serial or toslink

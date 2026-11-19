@@ -9,9 +9,10 @@ license:CC0-1.0
 		<description>ICT Mini Chief MC-20</description>
 		<year>1987</year>
 		<publisher>InConTrol</publisher>
+		<sharedfeat name="iec8_default" value="minichief"/>
 
 		<!-- Seagate ST225 -->
-		<part name="hdd" interface="scsi_hdd">
+		<part name="hdd" interface="st_hdd">
 			<diskarea name="harddriv">
 				<disk name="minichief" sha1="3ed8b78f3dc4e52766ef4cbfa43925b926d37834" writeable="yes" />
 			</diskarea>
@@ -22,6 +23,7 @@ license:CC0-1.0
 		<description>CMD HD-20</description>
 		<year>1990</year>
 		<publisher>Creative Micro Designs</publisher>
+		<sharedfeat name="iec12_default" value="cmdhd"/>
 
 		<!-- Seagate ST-125N -->
 		<part name="hdd" interface="scsi_hdd">
@@ -35,6 +37,7 @@ license:CC0-1.0
 		<description>IDE64</description>
 		<year>2019</year>
 		<publisher>Singular Crew</publisher>
+		<sharedfeat name="exp_default" value="ide64"/>
 
 		<!-- 64MB CompactFlash -->
 		<part name="hdd" interface="ata_cf">
@@ -49,7 +52,7 @@ license:CC0-1.0
 		<description>Rush</description>
 		<year>2008</year>
 		<publisher>Singular Crew</publisher>
-		<info name="usage" value="mame c64p -cart ide64 -hard rush -cdrom rush"/>
+		<sharedfeat name="exp_default" value="ide64"/>
 
 		<!-- 64MB CompactFlash -->
 		<part name="hdd" interface="ata_cf">

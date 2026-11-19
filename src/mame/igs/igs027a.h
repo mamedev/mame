@@ -51,6 +51,7 @@ private:
 	u8 m_fiq_enable;
 	u8 m_irq_enable;
 	u8 m_irq_pending;
+	u8 m_irq_status;
 };
 
 

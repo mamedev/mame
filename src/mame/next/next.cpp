@@ -1,17 +1,12 @@
 // license:BSD-3-Clause
-// copyright-holders:Olivier Galibert
+// copyright-holders:Olivier Galibert, R. Belmont
 /***************************************************************************
 
     NeXT
 
     TODO:
 
-    - Hook up the sound output, it is shared with the keyboard port
-
-    - Implement more of the scc and its dma interactions so that the
-      start up test passes, but not before sound out is done (if the scc
-      test passes all the other test pass up to sound out which
-      infloops)
+    - Sound input and DSP
 
     - Really implement the MO, it's only faking it for the startup test right now
 
@@ -32,6 +27,7 @@
 #include "bus/nscsi/hd.h"
 #include "screen.h"
 #include "softlist.h"
+#include "speaker.h"
 
 #include "strformat.h"
 
@@ -44,10 +40,9 @@ uint32_t next_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	if(cliprect.min_x || cliprect.min_y || cliprect.max_x+1 != screen_sx || cliprect.max_y+1 != screen_sy)
 		return 0;
 
-	// 0,1,2,4=0b000000, 3=2c000000, 5,8,9=0c000000
-	// 1152x832 (0,1,2,3c,4)
-	// 1120x832 (8)
-	// 832x624 (5c,9c)
+	// 0,1,2=0b000000, 3=2c000000, 4,5,8,9=0c000000
+	// 1152x832 (0,1,2,3c)
+	// 1120x832 (4,5c,8,9c)
 	if(screen_color) {
 		const uint32_t *vr = vram;
 		for(int y=0; y<screen_sy; y++) {
@@ -167,7 +162,7 @@ uint32_t next_state::scr1_r()
 	    68040-25: 00013002 (non-turbo, color)
 	*/
 
-	return scr1;
+	return tmc_scr1 ? ((tmc_scr1 & 0xf0000000) | 0x4000) : scr1;
 }
 
 // Interrupt subsystem
@@ -314,13 +309,16 @@ void next_state::dma_drq_w(int slot, bool state)
 			while(ds.drq) {
 				dma_check_update(slot);
 				uint8_t val = space.read_byte(ds.current++);
-				bool eof = ds.current == (ds.limit & 0x7fffffff) && (ds.limit & 0x80000000);
-				bool err;
-				dma_write(slot, val, eof, err);
-				if(err) {
-					ds.state = (ds.state & ~DMA_ENABLE) | DMA_BUSEXC;
-					logerror("DMA: bus error on write slot %d\n", slot);
-					return;
+				const uint32_t end = dma_limit(slot) - dma_tx_padding(slot);
+				if(ds.current <= end) {
+					bool eof = ds.current == end && ((ds.limit & 0x80000000) || (tmc_scr1 && slot == 17));
+					bool err;
+					dma_write(slot, val, eof, err);
+					if(err) {
+						ds.state = (ds.state & ~DMA_ENABLE) | DMA_BUSEXC;
+						logerror("DMA: bus error on write slot %d\n", slot);
+						return;
+					}
 				}
 				dma_check_end(slot, false);
 				if(!(ds.state & DMA_ENABLE))
@@ -351,6 +349,10 @@ void next_state::dma_read(int slot, uint8_t &val, bool &eof, bool &err)
 			val = mo->dma_r();
 		break;
 
+	case 12:
+		val = scc->da_r(0);
+		break;
+
 	case 21:
 		net->rx_dma_r(val, eof);
 		logerror("dma read net %02x %s\n", val, eof ? "eof" : "");
@@ -379,11 +381,16 @@ void next_state::dma_write(int slot, uint8_t data, bool eof, bool &err)
 		break;
 
 	case 4:
+		keyboard->sound_dma_w(data);
 		break;
 
 	case 5:
 		if(mo)
 			mo->dma_w(data);
+		break;
+
+	case 12:
+		scc->da_w(0, data);
 		break;
 
 	case 17:
@@ -432,8 +439,20 @@ void next_state::dma_end(int slot)
 void next_state::dma_check_end(int slot, bool eof)
 {
 	dma_slot &ds = dma_slots[slot];
-	if(eof || ds.current == (ds.limit & 0x7fffffff))
+	if(eof || ds.current == dma_limit(slot))
 		dma_end(slot);
+}
+
+uint32_t next_state::dma_limit(int slot) const
+{
+	// Ethernet transmit limits also carry beginning- and end-of-packet flags
+	return dma_slots[slot].limit & ((slot == 17) ? 0x3fffffff : 0x7fffffff);
+}
+
+uint32_t next_state::dma_tx_padding(int slot) const
+{
+	// the original Ethernet transmitter drops the last 15 bytes of each packet
+	return (slot == 17 && !tmc_scr1 && (dma_slots[slot].limit & 0x80000000)) ? 15 : 0;
 }
 
 uint32_t next_state::dma_regs_r(offs_t offset)
@@ -569,6 +588,7 @@ void next_state::scsictrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 		if(scsictrl & 0x02)
 			scsi->reset();
 		scsi->set_clock(scsi_clocks[scsictrl >> 6]);
+		irq_set(12, scsi_irq_state && BIT(scsictrl, 5));
 
 		logerror("SCSIctrl %dMHz int=%s dma=%s dmadir=%s%s%s dest=%s (%08x)\n",
 				scsi_clocks[scsictrl >> 6]/1000000,
@@ -774,7 +794,8 @@ void next_state::mo_drq(int state)
 
 void next_state::scsi_irq(int state)
 {
-	irq_set(12, state);
+	scsi_irq_state = state;
+	irq_set(12, scsi_irq_state && BIT(scsictrl, 5));
 }
 
 void next_state::scsi_drq(int state)
@@ -818,17 +839,21 @@ void next_state::setup(uint32_t _scr1, int size_x, int size_y, int skip, bool co
 	screen_sy = size_y;
 	screen_skip = skip;
 	screen_color = color;
+	if((scr1 & 0xf000) >= 0x4000)
+		tmc_scr1 = (((scr1 & 0xf000) < 0x8000) ? 0xf0000000 : 0) | 0x0fff0fcf | (scr1 & 0xf000);
 }
 
 void next_state::machine_start()
 {
 	save_item(NAME(scr2));
+	save_item(NAME(tmc_video));
 	save_item(NAME(irq_status));
 	save_item(NAME(irq_mask));
 	save_item(NAME(irq_level));
 	save_item(NAME(phy));
 	save_item(NAME(scsictrl));
 	save_item(NAME(scsistat));
+	save_item(NAME(scsi_irq_state));
 	save_item(NAME(timer_tbase));
 	save_item(NAME(timer_vbase));
 	save_item(NAME(timer_data));
@@ -836,6 +861,7 @@ void next_state::machine_start()
 	save_item(NAME(timer_ctrl));
 	save_item(NAME(eventc_latch));
 	save_item(NAME(esp));
+	save_item(NAME(vbl_enabled));
 
 	for(int i=0; i<0x20; i++) {
 		save_item(NAME(dma_slots[i].start), i);
@@ -854,7 +880,8 @@ void next_state::machine_start()
 
 void next_state::machine_reset()
 {
-	scr2 = 0;
+	// Turbo boards come up in the 25 MHz video mode with "local only" set
+	scr2 = tmc_scr1 ? 0x00001080 : 0;
 	irq_status = 0;
 	irq_mask = 0;
 	irq_level = 0;
@@ -868,11 +895,18 @@ void next_state::machine_reset()
 	timer_next_data = 0;
 	timer_ctrl = 0;
 	vbl_enabled = true;
-	dma_drq_w(4, true); // soundout
+	tmc_video = 0;
 }
 
 void next_state::vblank_w(int state)
 {
+	if(tmc_scr1) {
+		if(state && (tmc_video & 2)) {
+			tmc_video |= 1;
+			irq_set(13, true);
+		}
+		return;
+	}
 	if(vbl_enabled) {
 		if(screen_color)
 			irq_set(13, state);
@@ -956,27 +990,14 @@ void next_state::next_0b_m_mo_mem(address_map &map)
 void next_state::next_0c_m_mem(address_map &map)
 {
 	next_fdc_mem(map);
+	next_turbo_mem(map);
 	map(0x0c000000, 0x0c1fffff).ram().share("vram");
 }
 
 void next_state::next_0c_c_mem(address_map &map)
 {
 	next_fdc_mem(map);
-	map(0x0c000000, 0x0c1fffff).ram().share("vram");
-	map(0x02018180, 0x02018183).mirror(0x300000).w(FUNC(next_state::ramdac_w));
-}
-
-void next_state::next_0c_m_mo_mem(address_map &map)
-{
-	next_fdc_mem(map);
-	next_mo_mem(map);
-	map(0x0c000000, 0x0c1fffff).ram().share("vram");
-}
-
-void next_state::next_0c_c_mo_mem(address_map &map)
-{
-	next_fdc_mem(map);
-	next_mo_mem(map);
+	next_turbo_mem(map);
 	map(0x0c000000, 0x0c1fffff).ram().share("vram");
 	map(0x02018180, 0x02018183).mirror(0x300000).w(FUNC(next_state::ramdac_w));
 }
@@ -986,6 +1007,33 @@ void next_state::next_2c_c_mem(address_map &map)
 	next_fdc_mem(map);
 	map(0x2c000000, 0x2c1fffff).ram().share("vram");
 	map(0x02018180, 0x02018183).mirror(0x300000).w(FUNC(next_state::ramdac_w));
+}
+
+void next_state::next_turbo_mem(address_map &map)
+{
+	// Turbo Ethernet keeps the received packet's end pointer in the TMC.
+	map(0x02004050, 0x02004053).mirror(0x100000).lr32(NAME([this] () -> uint32_t { return dma_slots[20].limit; }));
+	map(0x02200000, 0x02200003).lr32(NAME([this] () -> uint32_t { return tmc_scr1; }));
+	map(0x02200010, 0x02200013).ram(); // memory controller configuration
+	map(0x02200020, 0x02200023).lw32(NAME([this] (uint32_t data) { irq_set(31, BIT(data, 0)); }));
+	map(0x02200080, 0x02200080).lrw8(
+		NAME([this] () -> uint8_t { return tmc_video; }),
+		NAME([this] (uint8_t data) {
+			tmc_video = (tmc_video & 1) | (data & 6);
+			if(data & 1) {
+				tmc_video &= ~1;
+				irq_set(13, false);
+			}
+		}));
+	map(0x02200088, 0x0220008f).ram(); // horizontal and vertical video timing
+	// There is no Nitro board, so its register bus-errors.
+	map(0x02210000, 0x02210003).lrw32(
+		NAME([this] () -> uint32_t {
+			if(!machine().side_effects_disabled())
+				maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
+			return 0;
+		}),
+		NAME([this] (uint32_t data) { maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero); }));
 }
 
 
@@ -1020,13 +1068,21 @@ void next_state::next_base(machine_config &config)
 
 	MCCS1850(config, rtc, XTAL(32'768));
 
-	SCC8530(config, scc, XTAL(25'000'000));
+	// PCLK and both RTxC inputs use the serial baud-rate crystal.
+	SCC8530(config, scc, XTAL(3'686'400));
+	scc->configure_channels(3'686'400, 0, 3'686'400, 0);
 	scc->out_int_callback().set(FUNC(next_state::scc_irq));
+	scc->out_wreqa_callback().set([this] (int state) { dma_drq_w(12, !state); });
 
 	NEXTKBD(config, keyboard);
 	keyboard->int_change_wr_callback().set(FUNC(next_state::keyboard_irq));
 	keyboard->int_power_wr_callback().set(FUNC(next_state::power_irq));
 	keyboard->int_nmi_wr_callback().set(FUNC(next_state::nmi_irq));
+	keyboard->sound_drq_callback().set([this] (int state) { dma_drq_w(4, state); });
+	keyboard->sound_irq_callback().set([this] (int state) { irq_set(8, state); });
+	SPEAKER(config, "speaker", 2).front();
+	keyboard->add_route(0, "speaker", 1.0, 0);
+	keyboard->add_route(1, "speaker", 1.0, 1);
 
 	NSCSI_CONNECTOR(config, "scsibus:0", next_scsi_devices, "harddisk");
 	NSCSI_CONNECTOR(config, "scsibus:1", next_scsi_devices, "cdrom");
@@ -1056,6 +1112,17 @@ void next_state::next_mo_config(machine_config &config)
 	NEXTMO(config, mo);
 	mo->irq_wr_callback().set(FUNC(next_state::mo_irq));
 	mo->drq_wr_callback().set(FUNC(next_state::mo_drq));
+}
+
+void next_state::next_turbo_config(machine_config &config)
+{
+	keyboard->set_revision(1);
+
+	ATT7213(config.replace(), net);
+	net->tx_irq().set(FUNC(next_state::net_tx_irq));
+	net->rx_irq().set(FUNC(next_state::net_rx_irq));
+	net->tx_drq().set(FUNC(next_state::net_tx_drq));
+	net->rx_drq().set(FUNC(next_state::net_rx_drq));
 }
 
 void next_state::next_fdc_config(machine_config &config)
@@ -1091,6 +1158,7 @@ void next_state::next_mo_fdc_base(machine_config &config)
 void next_state::next(machine_config &config)
 {
 	next_mo_base(config);
+	MC68HC68T1(config.replace(), rtc, XTAL(32'768));
 	M68030(config, maincpu, XTAL(25'000'000));
 	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_nofdc_mem);
 }
@@ -1098,6 +1166,7 @@ void next_state::next(machine_config &config)
 void next_state::nextc(machine_config &config)
 {
 	next_mo_fdc_base(config);
+	MC68HC68T1(config.replace(), rtc, XTAL(32'768));
 	M68040(config, maincpu, XTAL(25'000'000));
 	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_mo_mem);
 }
@@ -1111,9 +1180,9 @@ void next_state::nexts(machine_config &config)
 
 void next_state::nexts2(machine_config &config)
 {
-	next_fdc_base(config);
+	next_mo_fdc_base(config);
 	M68040(config, maincpu, XTAL(25'000'000));
-	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_mem);
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_mo_mem);
 }
 
 void next_state::nextsc(machine_config &config)
@@ -1126,31 +1195,17 @@ void next_state::nextsc(machine_config &config)
 void next_state::nextst(machine_config &config)
 {
 	next_fdc_base(config);
+	next_turbo_config(config);
 	M68040(config, maincpu, XTAL(33'000'000));
-	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0b_m_mem);
+	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0c_m_mem);
 }
 
 void next_state::nextstc(machine_config &config)
 {
 	next_fdc_base(config);
+	next_turbo_config(config);
 	M68040(config, maincpu, XTAL(33'000'000));
 	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0c_c_mem);
-	subdevice<screen_device>("screen")->set_visarea(0, 832-1, 0, 624-1);
-}
-
-void next_state::nextct(machine_config &config)
-{
-	next_mo_fdc_base(config);
-	M68040(config, maincpu, XTAL(33'000'000));
-	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0c_m_mo_mem);
-}
-
-void next_state::nextctc(machine_config &config)
-{
-	next_mo_fdc_base(config);
-	M68040(config, maincpu, XTAL(33'000'000));
-	maincpu->set_addrmap(AS_PROGRAM, &next_state::next_0c_c_mo_mem);
-	subdevice<screen_device>("screen")->set_visarea(0, 832-1, 0, 624-1);
 }
 
 /* ROM definition */
@@ -1239,12 +1294,12 @@ void next_state::init_next()
 
 void next_state::init_nextc()
 {
-	setup(0x00010002, 1120, 832, 2, false);
+	setup(0x00012002, 1120, 832, 2, false);
 }
 
 void next_state::init_nexts()
 {
-	setup(0x00011002, 1120, 832, 2, false);
+	setup(0x00011102, 1120, 832, 2, false);
 }
 
 void next_state::init_nexts2()
@@ -1259,12 +1314,12 @@ void next_state::init_nextsc()
 
 void next_state::init_nextst()
 {
-	setup(0x00014103, 1120, 832, 2, false);
+	setup(0x00014103, 1120, 832, 0, false);
 }
 
 void next_state::init_nextstc()
 {
-	setup(0x00015103,  832, 624, 0, true);
+	setup(0x00015103, 1120, 832, 0, true);
 }
 
 void next_state::init_nextct()
@@ -1274,18 +1329,18 @@ void next_state::init_nextct()
 
 void next_state::init_nextctc()
 {
-	setup(0x00019103,  832, 624, 0, true);
+	setup(0x00019103, 1120, 832, 0, true);
 }
 
 /* Driver */
 
-//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY              FULLNAME                     FLAGS
-COMP( 1987, next,    0,      0,      next,    next,  next_state, init_next,    "Next Software Inc", "NeXT Computer",             MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nexts,   0,      0,      nexts,   next,  next_state, init_nexts,   "Next Software Inc", "NeXTstation",               MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nextc,   nexts,  0,      next,    next,  next_state, init_nextc,   "Next Software Inc", "NeXTcube",                  MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nexts2,  nexts,  0,      nexts2,  next,  next_state, init_nexts2,  "Next Software Inc", "NeXTstation (X15 variant)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nextsc,  nexts,  0,      nextsc,  next,  next_state, init_nextsc,  "Next Software Inc", "NeXTstation Color",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nextst,  0,      0,      nextst,  next,  next_state, init_nextst,  "Next Software Inc", "NeXTstation Turbo",         MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1990, nextstc, nextst, 0,      nextstc, next,  next_state, init_nextstc, "Next Software Inc", "NeXTstation Turbo Color",   MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1992, nextct,  nextst, 0,      nextct,  next,  next_state, init_nextct,  "Next Software Inc", "NeXTcube Turbo",            MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-COMP( 1992, nextctc, nextst, 0,      nextctc, next,  next_state, init_nextctc, "Next Software Inc", "NeXTcube Turbo Color",      MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+//    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT          COMPANY              FULLNAME                         FLAGS
+COMP( 1987, next,    0,      0,      next,    next,  next_state, init_next,    "Next Software Inc", "NeXT Computer",                 MACHINE_NOT_WORKING )
+COMP( 1990, nexts,   0,      0,      nexts,   next,  next_state, init_nexts,   "Next Software Inc", "NeXTstation",                   MACHINE_NOT_WORKING )
+COMP( 1990, nextc,   nexts,  0,      nextc,   next,  next_state, init_nextc,   "Next Software Inc", "NeXTcube",                      MACHINE_NOT_WORKING )
+COMP( 1990, nexts2,  nexts,  0,      nexts2,  next,  next_state, init_nexts2,  "Next Software Inc", "NeXTcube (cost-reduced board)", MACHINE_NOT_WORKING )
+COMP( 1990, nextsc,  nexts,  0,      nextsc,  next,  next_state, init_nextsc,  "Next Software Inc", "NeXTstation Color",             MACHINE_NOT_WORKING )
+COMP( 1990, nextst,  0,      0,      nextst,  next,  next_state, init_nextst,  "Next Software Inc", "NeXTstation Turbo",             MACHINE_NOT_WORKING )
+COMP( 1990, nextstc, nextst, 0,      nextstc, next,  next_state, init_nextstc, "Next Software Inc", "NeXTstation Turbo Color",       MACHINE_NOT_WORKING )
+COMP( 1992, nextct,  nextst, 0,      nextst,  next,  next_state, init_nextct,  "Next Software Inc", "NeXTcube Turbo",                MACHINE_NOT_WORKING )
+COMP( 1992, nextctc, nextst, 0,      nextstc, next,  next_state, init_nextctc, "Next Software Inc", "NeXTcube Turbo Color",          MACHINE_NOT_WORKING )

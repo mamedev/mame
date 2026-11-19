@@ -58,7 +58,7 @@ public:
 		m_soundlatch(*this, "soundlatch")
 	{ }
 
-	void flkatck(machine_config &config) ATTR_COLD;
+	void flkatck(machine_config &config) ATTR_COLD ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -125,17 +125,13 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_a)
 	int const bit1 = (ctrl_5 >> 2) & 0x03;
 	int const bit2 = (ctrl_5 >> 4) & 0x03;
 	int const bit3 = (ctrl_5 >> 6) & 0x03;
-	int bank = ((attr >> (bit0 + 3)) & 0x01) |
-			((attr >> (bit1 + 2)) & 0x02) |
-			((attr >> (bit2 + 1)) & 0x04) |
-			((attr >> (bit3 + 0)) & 0x08);
-	int const mask = (ctrl_4 & 0xf0) >> 4;
+	int const mask = (ctrl_4 >> 4) & 0x0f;
+	int bank = bitswap<4>(attr, bit3 + 3, bit2 + 3, bit1 + 3, bit0 + 3);
 	bank = (bank & ~mask) | (ctrl_4 & mask);
 	bank = ((attr & 0x80) >> 7) | (bank << 1) | ((ctrl_3 & 0x01) << 5);
 
 	if ((attr == 0x0d) && (!ctrl_0) && (!ctrl_2))
-		bank = 0;   /*  this allows the game to print text
-		            in all banks selected by the k007121 */
+		bank = 0;   // this allows the game to print text in all banks selected by the k007121
 
 	tileinfo.set(0,
 			code + 256 * bank,

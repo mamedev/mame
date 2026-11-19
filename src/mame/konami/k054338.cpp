@@ -170,13 +170,13 @@ int k054338_device::set_alpha_level(int pblend)
 
 	const u8 mixset = m_regs[K338_REG_PBLEND + (pblend >> 1 & 1)] >> (~pblend << 3 & 8);
 	int mixlv = mixset & 0x1f;
+	const bool additive_mode = mixset & 0x20;
 
-	if (m_alpha_inv) mixlv = 0x1f - mixlv;
+	if (m_alpha_inv && !additive_mode) mixlv = 0x1f - mixlv;
 
 	// expand mix level (5 bits -> 8)
 	mixlv = (mixlv << 3) | (mixlv >> 2);
 
-	const bool additive_mode = mixset & 0x20;
 	const bool mixpri = m_regs[K338_REG_CONTROL] & K338_CTL_MIXPRI;
 
 	mixlv |= additive_mode << 8;

@@ -1,0 +1,711 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Giulio Zausa, m1macrophage
+Roland RE-3 Digital Space Echo
+-->
+<mamelayout version="2">
+	<element name="rect">
+		<rect><color red="1" green="1" blue="1" /></rect>
+	</element>
+	<element name="text_roland">
+		<text string="Roland" align="1"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_space_echo">
+		<text string="SPACE ECHO" align="1"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_digital_echo_re_3">
+		<text string="DIGITAL ECHO RE-3" align="1"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_mic">
+		<text string="MIC" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_1">
+		<text string="1" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="disk">
+		<disk><color red="1" green="1" blue="1" /></disk>
+	</element>
+	<element name="text_2">
+		<text string="2" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_input_level">
+		<text string="INPUT LEVEL" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="knob">
+		<disk><color red="0.3" green="0.31" blue="0.32"/></disk>
+		<disk state="0"><bounds x="0.1" y="0.1" width="0.8" height="0.8"/><color red="0.06" green="0.06" blue="0.065"/></disk>
+		<disk state="1"><bounds x="0.1" y="0.1" width="0.8" height="0.8"/><color red="0.14" green="0.14" blue="0.15"/></disk>
+	</element>
+	<element name="text_0">
+		<text string="0" align="1"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_10">
+		<text string="10" align="2"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_warmth">
+		<text string="WARMTH" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_echo">
+		<text string="ECHO" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_level">
+		<text string="LEVEL" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_repeat_rate">
+		<text string="REPEAT RATE" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_intensity">
+		<text string="INTENSITY" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_reverb">
+		<text string="REVERB" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_programmable">
+		<text string="PROGRAMMABLE" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="led" defstate="0">
+		<rect state="0"><color red="0.18" green="0.18" blue="0.18" /></rect>
+		<rect state="1"><color red="1" green="1" blue="1" /></rect>
+	</element>
+	<element name="text_12">
+		<text string="+12" align="1"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_6">
+		<text string="+6" align="1"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_3">
+		<text string="+3" align="1"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_0db">
+		<text string="0dB" align="1"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_3_24">
+		<text string="-3" align="1"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_6_25">
+		<text string="-6" align="1"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="vfd_char" defstate="32">
+		<text state="33" string="!"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="34" string="&quot;"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="35" string="#"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="36" string="$"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="37" string="%"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="38" string="&amp;"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="39" string="'"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="40" string="("><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="41" string=")"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="42" string="*"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="43" string="+"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="44" string=","><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="45" string="-"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="46" string="."><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="47" string="/"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="48" string="0"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="49" string="1"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="50" string="2"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="51" string="3"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="52" string="4"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="53" string="5"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="54" string="6"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="55" string="7"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="56" string="8"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="57" string="9"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="58" string=":"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="59" string=";"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="60" string="&lt;"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="61" string="="><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="62" string="&gt;"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="63" string="?"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="64" string="@"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="65" string="A"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="66" string="B"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="67" string="C"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="68" string="D"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="69" string="E"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="70" string="F"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="71" string="G"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="72" string="H"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="73" string="I"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="74" string="J"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="75" string="K"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="76" string="L"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="77" string="M"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="78" string="N"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="79" string="O"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="80" string="P"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="81" string="Q"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="82" string="R"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="83" string="S"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="84" string="T"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="85" string="U"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="86" string="V"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="87" string="W"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="88" string="X"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="89" string="Y"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="90" string="Z"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="91" string="["><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="92" string="\"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="93" string="]"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="94" string="^"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="95" string="_"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="96" string="`"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="97" string="a"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="98" string="b"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="99" string="c"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="100" string="d"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="101" string="e"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="102" string="f"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="103" string="g"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="104" string="h"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="105" string="i"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="106" string="j"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="107" string="k"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="108" string="l"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="109" string="m"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="110" string="n"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="111" string="o"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="112" string="p"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="113" string="q"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="114" string="r"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="115" string="s"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="116" string="t"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="117" string="u"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="118" string="v"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="119" string="w"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="120" string="x"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="121" string="y"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="122" string="z"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="123" string="{"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="124" string="|"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="125" string="}"><color red="0.35" green="1" blue="0.82"/></text>
+		<text state="126" string="~"><color red="0.35" green="1" blue="0.82"/></text>
+	</element>
+	<element name="vfd_mark" defstate="0">
+		<disk state="0"><color red="0.05" green="0.11" blue="0.095"/></disk>
+		<disk state="1"><color red="0.35" green="1" blue="0.82"/></disk>
+	</element>
+	<element name="text_mode">
+		<text string="MODE" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="text_memory">
+		<text string="MEMORY" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="key_0">
+		<rect state="0"><color red="0.62" green="0.63" blue="0.62"/></rect>
+		<rect state="0"><bounds x="0" y="0" width="1" height="0.06"/><color red="0.77" green="0.78" blue="0.77"/></rect>
+		<rect state="1"><color red="0.42" green="0.43" blue="0.42"/></rect>
+		<rect state="1"><bounds x="0" y="0" width="1" height="0.06"/><color red="0.57" green="0.58" blue="0.57"/></rect>
+	</element>
+	<element name="text_midi">
+		<text string="MIDI" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="key_1">
+		<rect state="0"><color red="0.62" green="0.63" blue="0.62"/></rect>
+		<rect state="0"><bounds x="0" y="0" width="1" height="0.06"/><color red="0.77" green="0.78" blue="0.77"/></rect>
+		<rect state="1"><color red="0.42" green="0.43" blue="0.42"/></rect>
+		<rect state="1"><bounds x="0" y="0" width="1" height="0.06"/><color red="0.57" green="0.58" blue="0.57"/></rect>
+	</element>
+	<element name="key_2">
+		<rect state="0"><color red="0.62" green="0.63" blue="0.62"/></rect>
+		<rect state="0"><bounds x="0" y="0" width="1" height="0.06"/><color red="0.77" green="0.78" blue="0.77"/></rect>
+		<rect state="1"><color red="0.42" green="0.43" blue="0.42"/></rect>
+		<rect state="1"><bounds x="0" y="0" width="1" height="0.06"/><color red="0.57" green="0.58" blue="0.57"/></rect>
+	</element>
+	<element name="text_write">
+		<text string="WRITE" align="0"><color red="1" green="1" blue="1" /></text>
+	</element>
+	<element name="key_3">
+		<rect state="0"><color red="0.62" green="0.63" blue="0.62"/></rect>
+		<rect state="0"><bounds x="0" y="0" width="1" height="0.06"/><color red="0.77" green="0.78" blue="0.77"/></rect>
+		<rect state="1"><color red="0.42" green="0.43" blue="0.42"/></rect>
+		<rect state="1"><bounds x="0" y="0" width="1" height="0.06"/><color red="0.57" green="0.58" blue="0.57"/></rect>
+	</element>
+	<element name="script_warning" defstate="1">
+		<text state="1" string="To turn the knobs with the mouse, enable the layout plugin (-plugin layout). Sliders menu: Tab." align="0"><color red="0.55" green="0.56" blue="0.56"/></text>
+	</element>
+
+	<view name="Front Panel">
+		<element ref="rect"><bounds x="0" y="0" width="1160" height="590" /><color red="0.105" green="0.108" blue="0.115" /></element>
+		<element ref="rect"><bounds x="0" y="0" width="1160" height="3" /><color red="0.25" green="0.25" blue="0.26" /></element>
+
+		<!-- Logo -->
+		<element ref="text_roland"><bounds x="26" y="18" width="120" height="34" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_space_echo"><bounds x="160" y="14" width="270" height="40" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_digital_echo_re_3"><bounds x="440" y="32" width="180" height="16" /><color red="0.86" green="0.86" blue="0.82" /></element>
+
+		<!-- MIC sockets (decorative) -->
+		<element ref="rect"><bounds x="40" y="102.5" width="60.05" height="2" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="rect"><bounds x="139.95" y="102.5" width="60.05" height="2" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="text_mic"><bounds x="106.05" y="96" width="27.9" height="15" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_1"><bounds x="70" y="118" width="20" height="14" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="54" y="174" width="52" height="52" /><color red="0.55" green="0.56" blue="0.57" /></element>
+		<element ref="disk"><bounds x="60" y="180" width="40" height="40" /><color red="0.2" green="0.2" blue="0.21" /></element>
+		<element ref="disk"><bounds x="71" y="191" width="18" height="18" /><color red="0.02" green="0.02" blue="0.02" /></element>
+		<element ref="text_2"><bounds x="150" y="118" width="20" height="14" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="134" y="174" width="52" height="52" /><color red="0.55" green="0.56" blue="0.57" /></element>
+		<element ref="disk"><bounds x="140" y="180" width="40" height="40" /><color red="0.2" green="0.2" blue="0.21" /></element>
+		<element ref="disk"><bounds x="151" y="191" width="18" height="18" /><color red="0.02" green="0.02" blue="0.02" /></element>
+
+		<!-- Knobs, in panel order -->
+		<element ref="rect"><bounds x="236" y="102.5" width="59.85" height="2" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="rect"><bounds x="410.15" y="102.5" width="59.85" height="2" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="text_input_level"><bounds x="301.85" y="96" width="102.3" height="15" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_1"><bounds x="280" y="118" width="20" height="14" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="265" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="249.529" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="243.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="249.529" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="266" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="287.5" y="152.5" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="311" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="327.471" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="333.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="327.471" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="310" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="knob" id="knob_INPUT"><bounds x="254" y="164" width="72" height="72"/></element>
+		<element ref="disk" id="dot_INPUT"><bounds x="286" y="174.2" width="8" height="8" /><color red="0.95" green="0.95" blue="0.92" /></element>
+		<element ref="text_0"><bounds x="232" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_10"><bounds x="304" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_2"><bounds x="404" y="118" width="20" height="14" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="389" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="373.529" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="367.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="373.529" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="390" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="411.5" y="152.5" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="435" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="451.471" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="457.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="451.471" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="434" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="knob" id="knob_INPUT2"><bounds x="378" y="164" width="72" height="72"/></element>
+		<element ref="disk" id="dot_INPUT2"><bounds x="410" y="174.2" width="8" height="8" /><color red="0.95" green="0.95" blue="0.92" /></element>
+		<element ref="text_0"><bounds x="356" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_10"><bounds x="428" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_warmth"><bounds x="484" y="118" width="120" height="16" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="519" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="503.529" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="497.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="503.529" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="520" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="541.5" y="152.5" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="565" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="581.471" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="587.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="581.471" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="564" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="knob" id="knob_KNOB6"><bounds x="508" y="164" width="72" height="72"/></element>
+		<element ref="disk" id="dot_KNOB6"><bounds x="540" y="174.2" width="8" height="8" /><color red="0.95" green="0.95" blue="0.92" /></element>
+		<element ref="text_0"><bounds x="486" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_10"><bounds x="558" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="rect"><bounds x="620" y="102.5" width="150.4" height="2" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="rect"><bounds x="819.6" y="102.5" width="150.4" height="2" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="text_echo"><bounds x="776.4" y="96" width="37.2" height="15" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_level"><bounds x="610" y="118" width="120" height="16" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="645" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="629.529" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="623.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="629.529" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="646" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="667.5" y="152.5" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="691" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="707.471" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="713.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="707.471" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="690" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="knob" id="knob_KNOB5"><bounds x="634" y="164" width="72" height="72"/></element>
+		<element ref="disk" id="dot_KNOB5"><bounds x="666" y="174.2" width="8" height="8" /><color red="0.95" green="0.95" blue="0.92" /></element>
+		<element ref="text_0"><bounds x="612" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_10"><bounds x="684" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_repeat_rate"><bounds x="735" y="118" width="120" height="16" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="770" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="754.529" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="748.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="754.529" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="771" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="792.5" y="152.5" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="816" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="832.471" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="838.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="832.471" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="815" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="knob" id="knob_KNOB0"><bounds x="759" y="164" width="72" height="72"/></element>
+		<element ref="disk" id="dot_KNOB0"><bounds x="791" y="174.2" width="8" height="8" /><color red="0.95" green="0.95" blue="0.92" /></element>
+		<element ref="text_0"><bounds x="737" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_10"><bounds x="809" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_intensity"><bounds x="860" y="118" width="120" height="16" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="895" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="879.529" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="873.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="879.529" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="896" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="917.5" y="152.5" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="941" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="957.471" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="963.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="957.471" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="940" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="knob" id="knob_KNOB1"><bounds x="884" y="164" width="72" height="72"/></element>
+		<element ref="disk" id="dot_KNOB1"><bounds x="916" y="174.2" width="8" height="8" /><color red="0.95" green="0.95" blue="0.92" /></element>
+		<element ref="text_0"><bounds x="862" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_10"><bounds x="934" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_reverb"><bounds x="1000" y="118" width="120" height="16" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="1035" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="1019.53" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="1013.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="1019.53" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="1036" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="1057.5" y="152.5" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="disk"><bounds x="1081" y="159.529" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="1097.47" y="176" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="1103.5" y="198.5" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="1097.47" y="221" width="3" height="3" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="disk"><bounds x="1080" y="236.471" width="5" height="5" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="knob" id="knob_KNOB2"><bounds x="1024" y="164" width="72" height="72"/></element>
+		<element ref="disk" id="dot_KNOB2"><bounds x="1056" y="174.2" width="8" height="8" /><color red="0.95" green="0.95" blue="0.92" /></element>
+		<element ref="text_0"><bounds x="1002" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="text_10"><bounds x="1074" y="250" width="44" height="13" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="rect"><bounds x="494" y="288.5" width="246.2" height="2" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="rect"><bounds x="863.8" y="288.5" width="246.2" height="2" /><color red="0.55" green="0.56" blue="0.56" /></element>
+		<element ref="text_programmable"><bounds x="746.2" y="282" width="111.6" height="15" /><color red="0.86" green="0.86" blue="0.82" /></element>
+
+		<!-- Display and key strip -->
+		<element ref="rect"><bounds x="0" y="318" width="1160" height="272" /><color red="0.085" green="0.087" blue="0.092" /></element>
+		<element ref="rect"><bounds x="0" y="318" width="1160" height="2" /><color red="0.2" green="0.2" blue="0.21" /></element>
+		<element ref="rect"><bounds x="36" y="344" width="740" height="200" /><color red="0.02" green="0.035" blue="0.032" /></element>
+		<element ref="rect"><bounds x="50" y="358" width="108" height="170" /><color red="0.05" green="0.05" blue="0.055" /></element>
+		<element ref="led" name="level0"><bounds x="62" y="368" width="30" height="11" /><color red="1" green="0.15" blue="0.1" /></element>
+		<element ref="text_12"><bounds x="100" y="366" width="50" height="15" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="led" name="level1"><bounds x="62" y="394" width="30" height="11" /><color red="1" green="0.15" blue="0.1" /></element>
+		<element ref="text_6"><bounds x="100" y="392" width="50" height="15" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="led" name="level2"><bounds x="62" y="420" width="30" height="11" /><color red="1" green="0.8" blue="0.1" /></element>
+		<element ref="text_3"><bounds x="100" y="418" width="50" height="15" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="led" name="level3"><bounds x="62" y="446" width="30" height="11" /><color red="0.2" green="1" blue="0.25" /></element>
+		<element ref="text_0db"><bounds x="100" y="444" width="50" height="15" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="led" name="level4"><bounds x="62" y="472" width="30" height="11" /><color red="0.2" green="1" blue="0.25" /></element>
+		<element ref="text_3_24"><bounds x="100" y="470" width="50" height="15" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="led" name="level5"><bounds x="62" y="498" width="30" height="11" /><color red="0.2" green="1" blue="0.25" /></element>
+		<element ref="text_6_25"><bounds x="100" y="496" width="50" height="15" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="rect"><bounds x="186" y="384" width="46" height="76" /><color red="0.03" green="0.06" blue="0.055" /></element>
+		<element ref="vfd_char" name="char0"><bounds x="188" y="388" width="42" height="68"/></element>
+		<element ref="vfd_mark" name="mark0"><bounds x="233" y="450" width="7" height="7"/></element>
+		<element ref="rect"><bounds x="242" y="384" width="46" height="76" /><color red="0.03" green="0.06" blue="0.055" /></element>
+		<element ref="vfd_char" name="char1"><bounds x="244" y="388" width="42" height="68"/></element>
+		<element ref="vfd_mark" name="mark1"><bounds x="289" y="450" width="7" height="7"/></element>
+		<element ref="rect"><bounds x="298" y="384" width="46" height="76" /><color red="0.03" green="0.06" blue="0.055" /></element>
+		<element ref="vfd_char" name="char2"><bounds x="300" y="388" width="42" height="68"/></element>
+		<element ref="vfd_mark" name="mark2"><bounds x="345" y="450" width="7" height="7"/></element>
+		<element ref="rect"><bounds x="354" y="384" width="46" height="76" /><color red="0.03" green="0.06" blue="0.055" /></element>
+		<element ref="vfd_char" name="char3"><bounds x="356" y="388" width="42" height="68"/></element>
+		<element ref="vfd_mark" name="mark3"><bounds x="401" y="450" width="7" height="7"/></element>
+		<element ref="rect"><bounds x="410" y="384" width="46" height="76" /><color red="0.03" green="0.06" blue="0.055" /></element>
+		<element ref="vfd_char" name="char4"><bounds x="412" y="388" width="42" height="68"/></element>
+		<element ref="vfd_mark" name="mark4"><bounds x="457" y="450" width="7" height="7"/></element>
+		<element ref="rect"><bounds x="466" y="384" width="46" height="76" /><color red="0.03" green="0.06" blue="0.055" /></element>
+		<element ref="vfd_char" name="char5"><bounds x="468" y="388" width="42" height="68"/></element>
+		<element ref="vfd_mark" name="mark5"><bounds x="513" y="450" width="7" height="7"/></element>
+		<element ref="rect"><bounds x="522" y="384" width="46" height="76" /><color red="0.03" green="0.06" blue="0.055" /></element>
+		<element ref="vfd_char" name="char6"><bounds x="524" y="388" width="42" height="68"/></element>
+		<element ref="vfd_mark" name="mark6"><bounds x="569" y="450" width="7" height="7"/></element>
+		<element ref="rect"><bounds x="578" y="384" width="46" height="76" /><color red="0.03" green="0.06" blue="0.055" /></element>
+		<element ref="vfd_char" name="char7"><bounds x="580" y="388" width="42" height="68"/></element>
+		<element ref="vfd_mark" name="mark7"><bounds x="625" y="450" width="7" height="7"/></element>
+		<element ref="rect"><bounds x="634" y="384" width="46" height="76" /><color red="0.03" green="0.06" blue="0.055" /></element>
+		<element ref="vfd_char" name="char8"><bounds x="636" y="388" width="42" height="68"/></element>
+		<element ref="vfd_mark" name="mark8"><bounds x="681" y="450" width="7" height="7"/></element>
+		<element ref="rect"><bounds x="690" y="384" width="46" height="76" /><color red="0.03" green="0.06" blue="0.055" /></element>
+		<element ref="vfd_char" name="char9"><bounds x="692" y="388" width="42" height="68"/></element>
+		<element ref="vfd_mark" name="mark9"><bounds x="737" y="450" width="7" height="7"/></element>
+		<element ref="rect"><bounds x="186" y="480" width="382" height="20" /><color red="0.32" green="0.33" blue="0.34" /></element>
+		<element ref="text_mode"><bounds x="186" y="482" width="382" height="16" /><color red="0.05" green="0.05" blue="0.05" /></element>
+		<element ref="rect"><bounds x="630" y="478" width="110" height="24" /><color red="0.32" green="0.33" blue="0.34" /></element>
+		<element ref="rect"><bounds x="632" y="480" width="106" height="20" /><color red="0.02" green="0.035" blue="0.032" /></element>
+		<element ref="text_memory"><bounds x="634" y="482" width="102" height="16" /><color red="0.55" green="0.56" blue="0.57" /></element>
+
+		<!-- Keys: MODE | MIDI over MEMORY | WRITE -->
+		<element ref="text_mode"><bounds x="818" y="350" width="140" height="16" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="key_0" inputtag="KEY0" inputmask="0x01"><bounds x="818" y="372" width="140" height="60"/></element>
+		<element ref="text_midi"><bounds x="968" y="350" width="140" height="16" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="key_1" inputtag="KEY3" inputmask="0x01"><bounds x="968" y="372" width="140" height="60"/></element>
+		<element ref="text_memory"><bounds x="818" y="450" width="140" height="16" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="key_2" inputtag="KEY1" inputmask="0x01"><bounds x="818" y="472" width="140" height="60"/></element>
+		<element ref="text_write"><bounds x="968" y="450" width="140" height="16" /><color red="0.86" green="0.86" blue="0.82" /></element>
+		<element ref="key_3" inputtag="KEY2" inputmask="0x01"><bounds x="968" y="472" width="140" height="60"/></element>
+		<element ref="script_warning" id="warning"><bounds x="24" y="564" width="700" height="14"/></element>
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(
+			function()
+				local view = file.views["Front Panel"]
+				install_slider_callbacks(view)
+				add_knob(view, "knob_INPUT", "INPUT", 2.5, VERTICAL, "dot_INPUT")
+				add_knob(view, "knob_INPUT2", "INPUT2", 2.5, VERTICAL, "dot_INPUT2")
+				add_knob(view, "knob_KNOB6", "KNOB6", 2.5, VERTICAL, "dot_KNOB6")
+				add_knob(view, "knob_KNOB5", "KNOB5", 2.5, VERTICAL, "dot_KNOB5")
+				add_knob(view, "knob_KNOB0", "KNOB0", 2.5, VERTICAL, "dot_KNOB0")
+				add_knob(view, "knob_KNOB1", "KNOB1", 2.5, VERTICAL, "dot_KNOB1")
+				add_knob(view, "knob_KNOB2", "KNOB2", 2.5, VERTICAL, "dot_KNOB2")
+				view.items["warning"]:set_state(0)
+			end)
+
+		-----------------------------------------------------------------------
+		-- Slider and knob library starts.
+		-- Can be copied as-is to other layouts.
+		-- version: 11
+		-----------------------------------------------------------------------
+
+		-- Global configuration. Can be overwritten in the resolve_tags callback.
+		KNOB_DOT_ANGLE_SPAN = 150  -- -/+ 150 degrees from top center.
+		UPDATE_CLICK_STATE = true
+
+		-- Constants.
+		VERTICAL = 0
+		HORIZONTAL = 1
+
+		local widgets = {}   -- Stores slider and knob information.
+		local pointers = {}  -- Tracks pointer state.
+
+		-- The knob's Y position must be animated using <animate inputtag="{port_name}">.
+		-- The click area's vertical size must exactly span the range of the
+		-- knob's movement.
+		function add_slider(view, clickarea_id, knob_id, port_name)
+			table.insert(widgets, {
+				clickarea   = get_layout_item(view, clickarea_id),
+				slider_knob = get_layout_item(view, knob_id),
+				field       = get_port_field(port_name),
+				is_knob     = false })
+		end
+
+		-- A sweep between the attached field's min and max values requires
+		-- moving the pointer by `scale * clickarea.height` pixels, when drag
+		-- direction is VERTICAL. Replace `height` with `width` when HORIZONTAL.
+		--
+		-- `dot_id` is optional. If not nil, this script will take control of the
+		-- element's position as the knob rotates. The distance of the dot from
+		-- the center of `clickarea` will be preserved during rotation.
+		-- It is suggested you place the dot at the top-center of the knob.
+		function add_knob(view, clickarea_id, port_name, scale, drag_direction, dot_id)
+			table.insert(widgets, {
+				clickarea     = get_layout_item(view, clickarea_id),
+				field         = get_port_field(port_name),
+				is_knob       = true,
+				scale         = scale,
+				is_horizontal = (drag_direction == HORIZONTAL),
+				knob_dot      = dot_id and get_layout_item(view, dot_id) })
+		end
+
+		function get_layout_item(view, item_id)
+			local item = view.items[item_id]
+			if item == nil then
+				emu.print_error("Layout element: '" .. item_id .. "' not found.")
+			end
+			return item
+		end
+
+		function get_port_field(port_name)
+			local port = file.device:ioport(port_name)
+			if port == nil then
+				emu.print_error("Port: '" .. port_name .. "' not found.")
+				return nil
+			end
+			local field = nil
+			for k, val in pairs(port.fields) do
+				field = val
+				break
+			end
+			local field_msg = "Needs to either be an IPT_ADJUSTER, or an analog port with auto-center."
+			if field == nil then
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+				return nil
+			end
+			if field.is_analog and (not field.centerdelta or field.centerdelta == 0) then
+				emu.print_error("Port '" .. port_name .."' " .. field_msg)
+				return nil
+			end
+			return field
+		end
+
+		local function set_click_state(widget, state)
+			if UPDATE_CLICK_STATE then
+				if widget.is_knob then
+					widget.clickarea:set_state(state)
+				else
+					widget.slider_knob:set_state(state)
+				end
+			end
+		end
+
+		local function release_pointer(pointer_id)
+			if pointers[pointer_id] then
+				local widget = widgets[pointers[pointer_id].selected_widget]
+				set_click_state(widget, 0)
+				local field = widget.field
+				if field.is_analog then
+					field:clear_value()
+				end
+			end
+			pointers[pointer_id] = nil
+		end
+
+		local function pointer_updated(type, id, dev, x, y, btn, dn, up, cnt)
+			-- If a button is not pressed, reset the state of the current pointer.
+			if btn & 1 == 0 then
+				release_pointer(id)
+				return
+			end
+
+			-- If a button was just pressed, find the affected widget, if any.
+			if dn & 1 ~= 0 then
+				for i = 1, #widgets do
+					local found, relative
+					if widgets[i].slider_knob and widgets[i].slider_knob.bounds:includes(x, y) then
+						found = true
+						relative = true
+					elseif widgets[i].clickarea.bounds:includes(x, y) then
+						found = true
+						relative = false
+					end
+					if found then
+						set_click_state(widgets[i], 1)
+						pointers[id] = {
+							selected_widget = i,
+							relative = relative,
+							start_x = x,
+							start_y = y,
+							start_value = widgets[i].field.port:read() }
+						break
+					end
+				end
+			end
+
+			-- If there is no widget selected by the current pointer, we are done.
+			if pointers[id] == nil then
+				return
+			end
+
+			-- A widget is selected. Update its state based on the pointer's position.
+
+			local pointer = pointers[id]
+			local widget = widgets[pointer.selected_widget]
+
+			local min_value = widget.field.minvalue
+			local max_value = widget.field.maxvalue
+			local value_range = max_value - min_value
+
+			local new_value
+			if widget.is_knob then
+				if widget.is_horizontal then
+					local step_x = value_range / (widget.scale * widget.clickarea.bounds.width)
+					new_value = pointer.start_value + (x - pointer.start_x) * step_x
+				else
+					local step_y = value_range / (widget.scale * widget.clickarea.bounds.height)
+					new_value = pointer.start_value + (pointer.start_y - y) * step_y
+				end
+			else
+				local knob_half_height = widget.slider_knob.bounds.height / 2
+				local min_y = widget.clickarea.bounds.y0 + knob_half_height
+				local max_y = widget.clickarea.bounds.y1 - knob_half_height
+
+				if pointer.relative then
+					-- User clicked on the knob. The new value will depend on how
+					--  much the knob was dragged.
+					new_value = pointer.start_value - value_range * (y - pointer.start_y) / (max_y - min_y)
+				else
+					-- User clicked elsewhere on the slider. The new value will depend on
+					-- the absolute position of the click.
+					new_value = max_value - value_range * (y - min_y) / (max_y - min_y)
+				end
+			end
+
+			new_value = math.floor(new_value + 0.5)
+			if new_value < min_value then new_value = min_value end
+			if new_value > max_value then new_value = max_value end
+
+			if widget.field.is_analog then
+				widget.field:set_value(new_value)
+			else
+				widget.field.user_value = new_value
+			end
+		end
+
+		local function get_knob_dot_bounds(widget)
+			local dot = widget.knob_dot_cache
+			local value = (widget.field.port:read() - dot.value_min) / dot.value_range
+			local angle = dot.angle_min + value * dot.angle_range
+			local rx = -dot.center_y * math.sin(angle) * dot.aspect
+			local ry = dot.center_y * math.cos(angle)
+			local x = rx + dot.dx
+			local y = ry + dot.dy
+			return emu.render_bounds(x, y, x + dot.width, y + dot.height)
+		end
+
+		local function configure_knob_dots()
+			for i = 1, #widgets do
+				local dot = widgets[i].knob_dot
+				if dot then
+					-- Remove bounds callback, since we need to access the
+					-- configured bounds.
+					dot:set_bounds_callback(nil)
+
+					local field = widgets[i].field
+					local knob_bounds = widgets[i].clickarea.bounds
+					local dot_bounds = dot.bounds
+					local max_angle = KNOB_DOT_ANGLE_SPAN * 2.0 * math.pi / 360.0
+
+					-- Compute the distance of the knob dot from the knob center.
+					local dot_x = dot_bounds.x0 + dot_bounds.width / 2.0
+					local dot_y = dot_bounds.y0 + dot_bounds.height / 2.0
+					local knob_x = knob_bounds.x0 + knob_bounds.width / 2.0
+					local knob_y = knob_bounds.y0 + knob_bounds.height / 2.0
+					local radius = math.sqrt((dot_y - knob_y) ^ 2 + (dot_x - knob_x) ^ 2)
+
+					widgets[i].knob_dot_cache = {
+						width       = dot_bounds.width,
+						height      = dot_bounds.height,
+						aspect      = dot_bounds.aspect,
+						value_min   = field.minvalue,
+						value_range = field.maxvalue - field.minvalue,
+						angle_min   = -max_angle,
+						angle_range = 2.0 * max_angle,
+						center_y    = -radius,
+						dx = knob_bounds.x0 + (knob_bounds.width - dot_bounds.width) / 2.0,
+						dy = knob_bounds.y0 + (knob_bounds.height - dot_bounds.height) / 2.0 }
+
+					dot:set_bounds_callback(
+						function()
+							return get_knob_dot_bounds(widgets[i])
+						end)
+				end
+			end
+		end
+
+		local function pointer_left(type, id, dev, x, y, up, cnt)
+			release_pointer(id)
+		end
+
+		local function pointer_aborted(type, id, dev, x, y, up, cnt)
+			release_pointer(id)
+		end
+
+		local function forget_pointers()
+			for id, pointer in pairs(pointers) do
+				release_pointer(id)
+			end
+			pointers = {}
+		end
+
+		function install_slider_callbacks(view)
+			view:set_recomputed_callback(configure_knob_dots)
+			view:set_pointer_updated_callback(pointer_updated)
+			view:set_pointer_left_callback(pointer_left)
+			view:set_pointer_aborted_callback(pointer_aborted)
+			view:set_forget_pointers_callback(forget_pointers)
+		end
+		-----------------------------------------------------------------------
+		-- Slider and knob library ends.
+		-----------------------------------------------------------------------
+	]]></script>
+</mamelayout>

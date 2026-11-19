@@ -91,7 +91,7 @@ void eolith_e1_speedup_state_base::init_speedup()
 	save_item(NAME(m_speedup_scanline));
 }
 
-/* todo, use timers instead! */
+/* TODO, use timers instead! */
 TIMER_DEVICE_CALLBACK_MEMBER(eolith_e1_speedup_state_base::eolith_speedup)
 {
 	if (param == 0)

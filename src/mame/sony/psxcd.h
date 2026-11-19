@@ -40,16 +40,18 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(handle_event);
+	TIMER_CALLBACK_MEMBER(second_response);
 
 private:
 	static constexpr unsigned MAX_PSXCD_TIMERS = 4;
+	static constexpr unsigned RESULT_SIZE = 32;
 
 	void write_command(uint8_t byte);
 
 	typedef void (psxcd_device::*cdcmd)();
 	struct command_result
 	{
-		uint8_t data[32], sz, res;
+		uint8_t data[RESULT_SIZE], sz, res;
 		command_result *next;
 	};
 	union CDPOS {
@@ -64,7 +66,7 @@ private:
 	void cdcmd_forward();
 	void cdcmd_backward();
 	void cdcmd_readn();
-	void cdcmd_standby();
+	void cdcmd_motoron();
 	void cdcmd_stop();
 	void cdcmd_pause();
 	void cdcmd_init();
@@ -93,8 +95,9 @@ private:
 	void illegalcmd(uint8_t cmd);
 
 	void cmd_complete(command_result *res);
-	void send_result(uint8_t res, uint8_t *data=nullptr, int sz=0, int delay=default_irq_delay, uint8_t errcode = 0);
-	command_result *prepare_result(uint8_t res, uint8_t *data=nullptr, int sz=0, uint8_t errcode = 0);
+	void send_result(uint8_t res, const uint8_t *data=nullptr, int sz=0, int delay=default_irq_delay, uint8_t errcode = 0);
+	command_result *prepare_result(uint8_t res, const uint8_t *data=nullptr, int sz=0, uint8_t errcode = 0);
+	void queue_second_response(uint8_t cmd, int delay);
 
 	void start_read();
 	void start_play();
@@ -125,6 +128,8 @@ private:
 	uint16_t m_transcurr = 0;
 	uint8_t m_transbuf[raw_sector_size]{};
 	command_result *res_queue = nullptr;
+	uint8_t m_lastres[RESULT_SIZE]{};
+	uint8_t m_lastres_count = 0;
 	command_result *m_int1 = nullptr;
 
 	struct {
@@ -170,6 +175,9 @@ private:
 	uint32_t m_sysclock = 0;
 	emu_timer *m_timers[MAX_PSXCD_TIMERS]{};
 	bool m_timerinuse[MAX_PSXCD_TIMERS]{};
+	emu_timer *m_second_timer = nullptr;
+	emu_timer *m_pause_timer = nullptr;
+	uint8_t m_second_cmd = 0;
 	command_result *m_results[MAX_PSXCD_TIMERS]{};
 
 	devcb_write_line m_irq_handler;

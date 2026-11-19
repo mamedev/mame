@@ -490,10 +490,10 @@ void k057714_device::draw_frame(int frame, bitmap_ind16 &bitmap, const rectangle
 
 	uint16_t trans_value = inverse_trans ? 0x8000 : 0x0000;
 
-	if (m_frame[frame].y + height > cliprect.max_y)
-		height = cliprect.max_y - m_frame[frame].y;
-	if (m_frame[frame].x + width > cliprect.max_x)
-		width = cliprect.max_x - m_frame[frame].x;
+	if (m_frame[frame].y + height > cliprect.bottom())
+		height = cliprect.bottom() - m_frame[frame].y;
+	if (m_frame[frame].x + width > cliprect.right())
+		width = cliprect.right() - m_frame[frame].x;
 
 	for (int j = 0; j <= height; j++)
 	{

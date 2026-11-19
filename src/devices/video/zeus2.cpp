@@ -48,7 +48,7 @@ zeus2_device::zeus2_device(const machine_config &mconfig, const char *tag, devic
 attotime zeus2_device::time_until_line(uint32_t line, const attotime &fallback) const
 {
 	line <<= m_yScale;
-	if (line > screen().visible_area().max_y && line < screen().height())
+	if (line > screen().visible_area().bottom() && line < screen().height())
 		return screen().time_until_pos(line);
 	return fallback;
 }
@@ -235,10 +235,10 @@ uint32_t zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	if (1)
 	{
 		/* normal update case */
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			uint32_t *colorptr = &m_frameColor[frame_addr_from_xy(0, y, false)];
-			std::copy(colorptr + cliprect.min_x, colorptr + cliprect.max_x + 1, &bitmap.pix(y, cliprect.min_x));
+			std::copy(colorptr + cliprect.left(), colorptr + cliprect.right() + 1, &bitmap.pix(y, cliprect.left()));
 		}
 	}
 	else
@@ -260,11 +260,11 @@ uint32_t zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 		else
 			base = &m_frameColor[yoffs << 6];
 
-		int xoffs = screen.visible_area().min_x;
-		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		int xoffs = screen.visible_area().left();
+		for (y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			uint32_t *const dest = &bitmap.pix(y);
-			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				if (1)
 				{
@@ -465,8 +465,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			const XTAL dotclk = ZEUS2_VIDEO_CLOCK * 3 / 2 / (((m_zeusbase[0x31] >> 16) & 0xff) + 1) * (m_yScale ? 4 : 1);
 			screen().configure(htotal, vtotal, visarea, attotime::from_ticks(htotal * vtotal, dotclk));
 			zeus_cliprect = visarea;
-			zeus_cliprect.max_x -= zeus_cliprect.min_x;
-			zeus_cliprect.min_x = 0;
+			zeus_cliprect.set_origin(0, zeus_cliprect.top());
 			// re-time vertical sync against the mode just programmed
 			rearm_vsync();
 		}

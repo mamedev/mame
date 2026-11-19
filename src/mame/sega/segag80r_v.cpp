@@ -633,13 +633,12 @@ void segag80r_state::draw_videoram(bitmap_ind16 &bitmap, const rectangle &clipre
 {
 	uint8_t *videoram = m_videoram;
 	int flipmask = m_video_flip ? 0x1f : 0x00;
-	int x, y;
 
 	/* iterate over the screen and draw visible tiles */
-	for (y = cliprect.min_y / 8; y <= cliprect.max_y / 8; y++)
+	for (int y = cliprect.top() / 8; y <= cliprect.bottom() / 8; y++)
 	{
 		int effy = m_video_flip ? 27 - y : y;
-		for (x = cliprect.min_x / 8; x <= cliprect.max_x / 8; x++)
+		for (int x = cliprect.left() / 8; x <= cliprect.right() / 8; x++)
 		{
 			int offs = effy * 32 + (x ^ flipmask);
 			uint8_t tile = videoram[offs];
@@ -673,14 +672,14 @@ void segag80r_state::draw_background_spaceod(bitmap_ind16 &bitmap, const rectang
 	/* 240, giving us an offset of (262-240) = 22 scanlines. */
 
 	/* now fill in the background wherever there are black pixels */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int effy = (y + m_spaceod_vcounter + 22) ^ flipmask;
 		uint16_t const *const src = &pixmap.pix(effy & ymask);
 		uint16_t *const dst = &bitmap.pix(y);
 
 		/* loop over horizontal pixels */
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int effx = ((x + m_spaceod_hcounter) ^ flipmask) + xoffset;
 			uint8_t fgpix = m_paletteram[dst[x]];
@@ -729,14 +728,14 @@ void segag80r_state::draw_background_page_scroll(bitmap_ind16 &bitmap, const rec
 	}
 
 	/* now fill in the background wherever there are black pixels */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int effy = m_bg_scrolly + (((y ^ flipmask) + (flipmask & 0xe0)) & 0xff);
 		uint16_t const *const src = &pixmap.pix(effy & ymask);
 		uint16_t *const dst = &bitmap.pix(y);
 
 		/* loop over horizontal pixels */
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int effx = m_bg_scrollx + (x ^ flipmask);
 			dst[x] = src[effx & xmask];
@@ -768,14 +767,14 @@ void segag80r_state::draw_background_full_scroll(bitmap_ind16 &bitmap, const rec
 	}
 
 	/* now fill in the background wherever there are black pixels */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		int effy = (y + m_bg_scrolly) ^ flipmask;
 		uint16_t const *const src = &pixmap.pix(effy & ymask);
 		uint16_t *const dst = &bitmap.pix(y);
 
 		/* loop over horizontal pixels */
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int effx = (x + m_bg_scrollx) ^ flipmask;
 			dst[x] = src[effx & xmask];

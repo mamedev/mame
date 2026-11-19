@@ -168,11 +168,10 @@ protected:
 	u32 m_last_line_state; // last state of input lines line
 	int m_t0_cnt;          // number of 0->1 transitions on T0 line
 	int m_t1_cnt;          // number of 0->1 transitions on T1 line
-	int m_t2_cnt;          // number of 0->1 transitions on T2 line
-	int m_t2ex_cnt;        // number of 0->1 transitions on T2EX line
 	int m_cur_irq_prio;    // Holds value of the current IRQ Priority Level; -1 if no irq
 	u8 m_irq_active;       // mask which irq levels are serviced
-	u8 m_irq_prio[8];      // interrupt priority
+	u8 m_irq_prio[16];     // interrupt priority
+	u16 m_irq_delayed;     // interrupt sources excluded from the next poll
 
 	u8 m_forced_inputs[4]; // allow read even if configured as output
 
@@ -306,9 +305,9 @@ protected:
 	void clear_current_irq();
 	virtual offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask);
 	virtual void handle_8bit_uart_clock(int source);
-	virtual void irqs_complete_and_mask(u8 &ints, u8 int_mask);
+	virtual void irqs_complete_and_mask(u16 &ints, u16 int_mask);
 	virtual void handle_ta_window();
-	virtual bool manage_idle_on_interrupt(u8 ints);
+	virtual bool manage_idle_on_interrupt(u16 ints);
 	virtual void handle_irq(int irqline, int state, u32 new_state, u32 tr_state);
 
 	u8 port_default_r(int port);
@@ -330,6 +329,15 @@ protected:
 	void execute_op(u8 op);
 	void check_irqs();
 	void burn_cycles(int cycles);
+	u16 pending_irq_flags(u16 int_mask);
+	virtual u16 interrupt_mask();
+	virtual void interrupt_taken();
+	virtual bool execute_ready();
+	virtual bool instruction_enabled() const;
+	virtual void prepare_instruction(u8 op);
+	virtual void update_peripherals();
+	virtual bool timer1_split_uses_input() const;
+	bool timer_running(u32 timer) const;
 	void acall(u8 r);
 	void set_reg(u8 r, u8 v);
 	u8 r_reg(u8 r);

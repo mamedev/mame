@@ -6,6 +6,8 @@
 #include "cpu/tlcs90/tlcs90.h"
 
 DEFINE_DEVICE_TYPE(SEGA_837_13551, sega_837_13551_device, "jvs13551", "Sega 837-13551 I/O Board")
+DEFINE_DEVICE_TYPE(SEGA_837_13844, sega_837_13844_device, "jvs13844", "Sega 837-13844 I/O Board")
+DEFINE_DEVICE_TYPE(SEGA_837_13938, sega_837_13938_device, "jvs13938", "Sega 837-13938 I/O Board")
 
 void sega_837_13551_device::jvs13551_coin_1_w(int state)
 {
@@ -56,8 +58,15 @@ ioport_constructor sega_837_13551_device::device_input_ports() const
 }
 
 sega_837_13551_device::sega_837_13551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : jvs_device(mconfig, SEGA_837_13551, tag, owner, clock)
+	, port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	, m_analog_bits(8)
+{
+}
+
+sega_837_13551_device::sega_837_13551_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) : jvs_device(mconfig, type, tag, owner, clock)
 , port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
 {
+
 }
 
 const char *sega_837_13551_device::device_id()
@@ -109,8 +118,12 @@ void sega_837_13551_device::function_list(uint8_t *&buf)
 	// Coin input - 2 slots
 	*buf++ = 0x02; *buf++ = 2; *buf++ = 0; *buf++ = 0;
 
-	// Analog input - 8 channels
-	*buf++ = 0x03; *buf++ = 8; *buf++ = 16; *buf++ = 0;
+	// Analog input - 8 channels, 16 bits
+	// TODO: investigate otrigger
+	// Wants no analog bits set for the trackball on the other node to work, different part name?
+	if (m_analog_bits) {
+		*buf++ = 0x03; *buf++ = m_analog_bits; *buf++ = 16; *buf++ = 0;
+	}
 
 	// Driver out - 6 channels
 	*buf++ = 0x12; *buf++ = 6; *buf++ = 0; *buf++ = 0;
@@ -175,8 +188,7 @@ bool sega_837_13551_device::swoutputs(uint8_t count, const uint8_t *vals)
 		return false;
 	jvs_outputs = vals[0] & 0xfc;
 	logerror("837-13551: output %02x\n", jvs_outputs);
-	if (port[11])
-	{
+	if (port[11]) {
 		port[11]->write(jvs_outputs, 0xfc);
 	}
 	return true;
@@ -188,5 +200,123 @@ bool sega_837_13551_device::swoutputs(uint8_t id, uint8_t val)
 		return false;
 	handle_output(port[11], id, val);
 	logerror("837-13551: output %d, %d\n", id, val);
+	return true;
+}
+
+/*
+ * 837-13844 (smarinef, anpanman2, inunoos)
+ */
+
+sega_837_13844_device::sega_837_13844_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : sega_837_13551_device(mconfig, SEGA_837_13844, tag, owner, clock)
+	, rotary_port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	, lightgun_port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+	, m_digital_bits(12)
+	, m_encoder_bits(0)
+	, m_lightgun_count(0)
+{
+}
+
+const char *sega_837_13844_device::device_id()
+{
+	return "SEGA ENTERPRISES,LTD.;837-13844-01 I/O CNTL BD2 ;Ver1.00;99/07";
+}
+
+void sega_837_13844_device::function_list(uint8_t *&buf)
+{
+	// SW input - 2 players, 12 bits / 8 bits (inunoos)
+	*buf++ = 0x01; *buf++ = 2; *buf++ = m_digital_bits; *buf++ = 0;
+
+	// Coin input - 2 slots
+	*buf++ = 0x02; *buf++ = 2; *buf++ = 0; *buf++ = 0;
+
+	// Analog input - 8 channels
+	*buf++ = 0x03; *buf++ = 8; *buf++ = 16; *buf++ = 0;
+
+	if (m_encoder_bits) {
+		// rotary encoders - 4 channels (inunoos)
+		*buf++ = 0x04; *buf++ = m_encoder_bits; *buf++ = 0; *buf++ = 0;
+	}
+
+	if (m_lightgun_count) {
+		// lightgun - 16 bits of X/Y then count (tduno, tduno2, ntvmys)
+		*buf++ = 0x06; *buf++ = 16; *buf++ = 16; *buf++ = m_lightgun_count;
+	}
+
+	// Driver out - 22 channels
+	*buf++ = 0x12; *buf++ = 22; *buf++ = 0; *buf++ = 0;
+}
+
+bool sega_837_13844_device::rotary(uint8_t *&buf, uint8_t count)
+{
+	if(count > 4)
+		return false;
+	for(int i=0; i<count; i++) {
+		uint16_t val = rotary_port[i] ? rotary_port[i]->read() : 0x8000;
+		// TODO: calculate a delta where necessary (crackndj)
+		*buf++ = val >> 8;
+		*buf++ = val;
+	}
+	return true;
+}
+
+bool sega_837_13844_device::lightgun(uint8_t *&buf, uint8_t count)
+{
+	if(count > 1)
+		return false;
+	const bool hit = lightgun_port[2] ? lightgun_port[2]->read() : 0;
+	for(int i=0; i<count * 2; i++) {
+		uint16_t val = lightgun_port[i] ? lightgun_port[i]->read() : 0x0800;
+		// unknown value, needs to be non-zero for touch to actually work
+		if (hit)
+			val |= 0xf000;
+		*buf++ = val >> 8;
+		*buf++ = val;
+	}
+	return true;
+}
+
+
+/*
+ * 837-13938 (crackndj)
+ */
+
+sega_837_13938_device::sega_837_13938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : sega_837_13551_device(mconfig, SEGA_837_13938, tag, owner, clock)
+	, rotary_port(*this, {finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG, finder_base::DUMMY_TAG})
+{
+}
+
+const char *sega_837_13938_device::device_id()
+{
+	return "SEGA ENTERPRISES,LTD.;837-13938 ENCORDER BD  ;Ver0.01;99/08";
+}
+
+void sega_837_13938_device::function_list(uint8_t *&buf)
+{
+	// SW input - 1 players, 9 bits
+	*buf++ = 0x01; *buf++ = 1; *buf++ = 9; *buf++ = 0;
+
+	// Coin input - 0 slots
+	//*buf++ = 0x02; *buf++ = 2; *buf++ = 0; *buf++ = 0;
+
+	// Analog input - 0 channels
+	//*buf++ = 0x03; *buf++ = 8; *buf++ = 16; *buf++ = 0;
+
+	// rotary encoders - 4 channels
+	*buf++ = 0x04; *buf++ = 4; *buf++ = 0; *buf++ = 0;
+
+	// Driver out - 8 channels
+	*buf++ = 0x12; *buf++ = 8; *buf++ = 0; *buf++ = 0;
+}
+
+bool sega_837_13938_device::rotary(uint8_t *&buf, uint8_t count)
+{
+	if(count > 4)
+		return false;
+	for(int i=0; i<count; i++) {
+		uint16_t val = rotary_port[i] ? rotary_port[i]->read() : 0x8000;
+		// TODO: pass a delta
+		*buf++ = val >> 8;
+		*buf++ = val;
+	}
 	return true;
 }

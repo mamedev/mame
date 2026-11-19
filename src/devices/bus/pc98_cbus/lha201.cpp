@@ -14,8 +14,6 @@ TODO:
   uses SC_MODE_SENSE_6 pages 0xc3 and 0xc4, then SC_READ_CAPACITY, finally keeps SC_TEST_UNIT_READY
   -> SC_REQUEST_SENSE with length = 0x16 trimmed internally with 18 (?).
   What it reads comes from initial device_reset sense request.
-- Need data throttle between here, wd33c9x and/or NSCSI harddisk, otherwise executing anything will
-  fail (should be fixed with pc98_hd option?);
 - PIO mode (involves port $cc6 and a ready flag in port $37 bit 0)
 - Remaining remap options;
 

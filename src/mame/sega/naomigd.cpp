@@ -411,11 +411,17 @@ void idegdrom_device::map_extra(uint64_t memory_window_start, uint64_t memory_wi
 	io_space->install_device(io_offset + 0x03b0, io_offset + 0x03cf, *static_cast<idegdrom_device*>(this), &idegdrom_device::map_control);
 }
 
+static void gdrom_option_config(device_t *device)
+{
+	auto gdrom = device->subdevice<gdrom_image_device>("image");
+	gdrom->add_region("gdrom", true); // must match the disk region name in the rom definitions
+}
+
 static void gdrom_devices(device_slot_interface &device)
 {
 	device.option_add("gdrom", ATAPI_GDROM);
+	device.set_option_machine_config("gdrom", gdrom_option_config);
 }
-
 
 void idegdrom_device::ide_irq(int state)
 {
@@ -1151,10 +1157,9 @@ ROM_START( dimm )
 	ROMX_LOAD( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638), ROM_BIOS(8))
 
 	// dynamically filled with data
-	ROM_REGION(0x4010, "pic", ROMREGION_ERASE00)
-	// configuration word: 0x3ffb
+	ROM_REGION16_LE(0x4010, "pic", ROMREGION_ERASEFF)
 	ROM_FILL(0x400e, 0x01, 0xfb)
-	ROM_FILL(0x400f, 0x01, 0x3f)
+	ROM_FILL(0x400f, 0x01, 0x3f) // configuration: 0x3ffb
 
 	ROM_REGION(0x80, "i2c_0", ROMREGION_ERASE00)
 	ROM_LOAD("dimmspd.bin", 0x00, 0x80, CRC(45dac6d7) SHA1(4548675f8d31348fa6828d5b4f247af1f072b62d))

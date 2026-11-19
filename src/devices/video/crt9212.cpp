@@ -97,90 +97,80 @@ void crt9212_device::clrcnt_w(int state)
 
 
 //-------------------------------------------------
-//  rclk_w - read clock
+//  rclk_rise - read clock rising edge
 //-------------------------------------------------
 
-void crt9212_device::rclk_w(int state)
+void crt9212_device::rclk_rise()
 {
-	if (!m_rclk && state)
+	if (m_clrcnt_edge)
 	{
-		if (m_clrcnt_edge)
+		// reset read address counter
+		m_rac = 0;
+
+		// reset read overflow
+		m_write_rof(0);
+
+		if (!m_tog)
 		{
-			// reset read address counter
-			m_rac = 0;
+			// switch buffers
+			m_buffer = !m_buffer;
 
-			// reset read overflow
-			m_write_rof(0);
+			// reset write address counter
+			m_wac = 0;
 
-			if (!m_tog)
-			{
-				// switch buffers
-				m_buffer = !m_buffer;
-
-				// reset write address counter
-				m_wac = 0;
-
-				// reset write overflow
-				m_write_wof(0);
-			}
-
-			m_clrcnt_edge = false;
+			// reset write overflow
+			m_write_wof(0);
 		}
 
-		// unlike the write data, which is latched one clock before it is written to
-		// the RAM, the read enable is not delayed, so the character output on the
-		// clock following the one that cleared the counter is the first character
-		// of the row buffer
-		if (m_ren && (m_rac < RAM_SIZE))
-		{
-			// output data
-			m_write_dout(m_ram[m_rac][!m_buffer]);
-
-			// increment read address counter
-			m_rac++;
-
-			if (m_rac == RAM_SIZE - 1)
-			{
-				// set read overflow
-				m_write_rof(1);
-			}
-		}
+		m_clrcnt_edge = false;
 	}
 
-	m_rclk = state;
+	// unlike the write data, which is latched one clock before it is written to
+	// the RAM, the read enable is not delayed, so the character output on the
+	// clock following the one that cleared the counter is the first character
+	// of the row buffer
+	if (m_ren && (m_rac < RAM_SIZE))
+	{
+		// output data
+		m_write_dout(m_ram[m_rac][!m_buffer]);
+
+		// increment read address counter
+		m_rac++;
+
+		if (m_rac == RAM_SIZE - 1)
+		{
+			// set read overflow
+			m_write_rof(1);
+		}
+	}
 }
 
 
 //-------------------------------------------------
-//  wclk_w - write clock
+//  wclk_rise - write clock rising edge
 //-------------------------------------------------
 
-void crt9212_device::wclk_w(int state)
+void crt9212_device::wclk_rise()
 {
-	if (!m_wclk && state)
+	if (m_wen_int && (m_wac < RAM_SIZE))
 	{
-		if (m_wen_int && (m_wac < RAM_SIZE))
+		// input data
+		m_ram[m_wac][m_buffer] = m_data_latch;
+
+		// increment write address counter
+		m_wac++;
+
+		if (m_wac == RAM_SIZE - 1)
 		{
-			// input data
-			m_ram[m_wac][m_buffer] = m_data_latch;
-
-			// increment write address counter
-			m_wac++;
-
-			if (m_wac == RAM_SIZE - 1)
-			{
-				// set write overflow
-				m_write_wof(1);
-			}
+			// set write overflow
+			m_write_wof(1);
 		}
-
-		if (m_wen1 && m_wen2)
-		{
-			m_data_latch = m_data;
-		}
-
-		m_wen_int = m_wen1 && m_wen2;
 	}
 
-	m_wclk = state;
+	if (m_wen1 && m_wen2)
+	{
+		m_data_latch = m_data;
+	}
+
+	m_wen_int = m_wen1 && m_wen2;
 }

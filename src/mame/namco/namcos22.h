@@ -13,6 +13,8 @@
 
 #include "namcomcu.h"
 
+#include "bus/snes_ctrl/ctrl.h"
+
 #include "machine/eeprompar.h"
 #include "machine/timer.h"
 #include "sound/c352.h"
@@ -220,12 +222,13 @@ public:
 		m_polygonram(*this, "polygonram"),
 		m_mixer(*this, "video_mixer"),
 		m_gamma_proms(*this, "gamma_proms"),
+		m_pointrom(*this, "pointrom"),
 		m_vics_data(*this, "vics_data"),
 		m_vics_control(*this, "vics_control"),
 		m_screen(*this, "screen"),
 		m_adc_ports(*this, "ADC.%u", 0),
 		m_inputs(*this, "INPUTS"),
-		m_custom(*this, "CUSTOM.%u", 0),
+		m_devpad(*this, "devpad%u", 0),
 		m_opt(*this, "OPT.%u", 0),
 		m_mcu_out(*this, "mcuout%u", 0U),
 		m_cpuled_out(*this, "cpuled%u", 0U),
@@ -327,8 +330,8 @@ protected:
 	void namcos22_shared_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 namcos22_keycus_r(offs_t offset);
 	void namcos22_keycus_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u16 namcos22_portbit_r(offs_t offset);
-	void namcos22_portbit_w(offs_t offset, u16 data);
+	u16 namcos22_devpad_r(offs_t offset);
+	void namcos22_devpad_w(offs_t offset, u16 data);
 	void namcos22_cpuleds_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u8 mcu_port4_s22_r();
 	u8 iomcu_port4_s22_r();
@@ -353,7 +356,7 @@ protected:
 	inline void pdp_polygonram_write(offs_t offs, u32 data) { m_polygonram[offs & 0x7fff] = data; }
 	void point_write(offs_t offs, u32 data);
 	s32 pointram_read(offs_t offs);
-	inline s32 point_read(offs_t offs) { offs &= 0x00ffffff; return (offs < m_pointrom_size) ? m_pointrom[offs] : pointram_read(offs); }
+	inline s32 point_read(offs_t offs) { offs &= 0x00ffffff; return (offs < m_pointrom.length()) ? m_pointrom[offs] : pointram_read(offs); }
 	void master_enable(bool enable);
 	void slave_enable(bool enable);
 
@@ -433,12 +436,13 @@ protected:
 	required_shared_ptr<u32> m_polygonram;
 	required_shared_ptr<u32> m_mixer;
 	optional_region_ptr<u8> m_gamma_proms;
+	required_region_ptr<s32> m_pointrom;
 	optional_shared_ptr<u32> m_vics_data;
 	optional_shared_ptr<u32> m_vics_control;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_adc_ports;
 	required_ioport m_inputs;
-	optional_ioport_array<2> m_custom;
+	required_device_array<snes_control_port_device, 2> m_devpad;
 	optional_ioport_array<2> m_opt;
 	output_finder<16> m_mcu_out;
 	output_finder<8> m_cpuled_out;
@@ -457,7 +461,6 @@ protected:
 	u16 m_SerialDataSlaveToMasterCurrent = 0;
 	int m_RenderBufSize = 0;
 	u16 m_RenderBufData[NAMCOS22_MAX_RENDER_CMD_SEQ] = { };
-	u16 m_portbits[2] = { };
 	int m_irq_state = 0;
 	int m_irq_enabled = 0;
 	namcos22_dsp_upload_state m_dsp_upload_state;
@@ -485,8 +488,7 @@ protected:
 	int m_LitSurfaceIntensity = 0;
 	bool m_LitSurfaceGouraud = false;
 	bool m_LitSurfaceTriangles = false;
-	int m_pointrom_size = 0;
-	std::unique_ptr<s32[]> m_pointrom;
+	
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 

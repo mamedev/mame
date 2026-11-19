@@ -168,19 +168,22 @@ public:
 		m_videoram(*this, "videoram"),
 		m_videoregs(*this, "videoregs"),
 		m_tcram(*this, "tcram"),
-		m_comhack(*this, "comhack"),
 		m_fbram1(*this, "fbram1"),
 		m_fbram2(*this, "fbram2"),
 		m_fbscale(*this, "fbscale"),
 		m_fbscroll(*this, "fbscroll"),
 		m_fbunk(*this, "fbunk"),
-		m_idt7133_dpram(*this, "com_ram"),
+		m_com_dpram(*this, "com_dpram", 0x1000, ENDIANNESS_LITTLE),
 		m_com_bank(*this, "com_bank"),
 		m_audio_bank(*this, "audio_bank_%u", 0U),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_in(*this, "IN%u", 0U),
-		m_samsho64_3d_hack(0),
-		m_roadedge_3d_hack(0),
+		m_dl_upload(0),
+		m_mips_to_comm(0),
+		m_comm_to_mips(0),
+		m_mips_to_comm_full(false),
+		m_comm_to_mips_full(false),
+		m_com_irq_enable(false),
 		m_vertsrom(*this, "verts"),
 		m_wheel_motor(*this, "wheel_motor"),
 		m_lamps_out(*this, "lamp%u", 0U)
@@ -193,11 +196,9 @@ public:
 	void hng64_shoot(machine_config &config) ATTR_COLD;
 	void hng64_fight(machine_config &config) ATTR_COLD;
 
-	void init_roadedge() ATTR_COLD;
 	void init_hng64_drive() ATTR_COLD;
 	void init_hng64() ATTR_COLD;
 	void init_hng64_shoot() ATTR_COLD;
-	void init_ss64() ATTR_COLD;
 	void init_hng64_fght() ATTR_COLD;
 
 	required_region_ptr<u8> m_texturerom;
@@ -248,15 +249,13 @@ private:
 	required_shared_ptr<u32> m_tcram;
 
 	std::unique_ptr<u16[]> m_dl;
-	required_shared_ptr<u32> m_comhack;
 	required_shared_ptr<u32> m_fbram1;
 	required_shared_ptr<u32> m_fbram2;
 	required_shared_ptr<u32> m_fbscale;
 	required_shared_ptr<u32> m_fbscroll;
 	required_shared_ptr<u32> m_fbunk;
 
-	required_shared_ptr<u32> m_idt7133_dpram;
-	//required_shared_ptr<u8> m_com_mmu_mem;
+	memory_share_creator<u16> m_com_dpram;
 	required_memory_bank m_com_bank;
 
 	required_memory_bank_array<16> m_audio_bank;
@@ -265,8 +264,7 @@ private:
 
 	required_ioport_array<8> m_in;
 
-	bool m_samsho64_3d_hack = false;
-	bool m_roadedge_3d_hack = false;
+	u32 m_dl_upload;
 
 	u8 m_fbcontrol[4]{};
 	u8 m_texture_wrapsize_table[0x20]{};
@@ -274,10 +272,11 @@ private:
 	std::unique_ptr<u16[]> m_soundram;
 	std::unique_ptr<u16[]> m_soundram2;
 
-	/* Communications stuff */
-	std::unique_ptr<u8[]> m_com_op_base;
-	std::unique_ptr<u8[]> m_com_virtual_mem;
-	u8 m_com_shared[8]{};
+	u16 m_mips_to_comm;
+	u16 m_comm_to_mips;
+	bool m_mips_to_comm_full;
+	bool m_comm_to_mips_full;
+	bool m_com_irq_enable;
 
 	s32 m_dma_start = 0;
 	s32 m_dma_dst = 0;
@@ -339,8 +338,6 @@ private:
 
 	u32 m_irq_pending = 0;
 
-	emu_timer *m_comhack_timer = nullptr;
-
 	u32 m_irq_level = 0;
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 
@@ -366,13 +363,20 @@ private:
 
 	void fight_lamps6_w(u8 data);
 
-	u32 com_r(offs_t offset, u32 mem_mask = ~0);
-	void com_w(offs_t offset, u32 data, u32 mem_mask = ~0);
-	void com_share_w(offs_t offset, u8 data);
-	u8 com_share_r(offs_t offset);
-	void com_bank_w(u8 data);
-	void com_share_mips_w(offs_t offset, u8 data);
-	u8 com_share_mips_r(offs_t offset);
+	u16 com_dpram_r(offs_t offset, u16 mem_mask = ~0);
+	void com_dpram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	void com_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	TIMER_CALLBACK_MEMBER(com_data_sync);
+	u16 com_data_r();
+	u8 com_status_r();
+	void com_control_w(u8 data);
+	void com_reset_w(u8 data);
+	u8 net_dpram_r(offs_t offset);
+	void net_dpram_w(offs_t offset, u8 data);
+	u8 net_data_r(offs_t offset);
+	void net_data_w(offs_t offset, u8 data);
+	u8 net_status_r();
+	void net_bank_w(u8 data);
 	u32 sysregs_r(offs_t offset, u32 mem_mask = ~0);
 	void sysregs_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 rtc_r(offs_t offset, u32 mem_mask = ~0);
@@ -454,7 +458,6 @@ private:
 	void init_reorder_gfx();
 
 	void set_irq(u32 irq_vector);
-	TIMER_CALLBACK_MEMBER(comhack_callback);
 	template <u8 Which, u8 Size> TILE_GET_INFO_MEMBER(get_tile_info);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank(int state);
@@ -519,7 +522,6 @@ private:
 	void init_sound();
 
 	void reset_sound();
-	void reset_net();
 
 	void dma_hreq_cb(int state);
 	u8 dma_memr_cb(offs_t offset);

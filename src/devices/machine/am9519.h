@@ -70,6 +70,7 @@ private:
 	u8 m_prio;
 	u8 m_imr;
 	u8 m_irq_lines;
+	u8 m_irq_driven;
 
 	u8 m_curcnt;
 	u8 m_mode;

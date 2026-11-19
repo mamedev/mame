@@ -1734,8 +1734,7 @@ swp30_device::swp30_device(const machine_config &mconfig, const char *tag, devic
 	  m_program_config("meg_program", ENDIANNESS_LITTLE, 64, 9, -3, address_map_constructor(FUNC(swp30_device::meg_prg_map), this)),
 	  m_wave_config("wave", ENDIANNESS_LITTLE, 32, 25, -2),
 	  m_reverb_config("reverb_ram", ENDIANNESS_LITTLE, 16, 18, -1, address_map_constructor(FUNC(swp30_device::meg_reverb_map), this)),
-	  m_sintab(*this, "sintab"),
-	  m_drccache(32*1024*1024 + sizeof(meg_state))
+	  m_sintab(*this, "sintab")
 {
 }
 
@@ -1748,8 +1747,9 @@ void swp30_device::device_start()
 	m_wave->cache(m_wave_cache);
 	m_reverb->cache(m_reverb_cache);
 
-	m_drccache.allocate_cache(mconfig().options().drc_rwx());
-	m_meg = m_drccache.alloc_near<meg_state>();
+	m_drcuml = std::make_unique<drcuml_state>(*this, 32*1024*1024 + sizeof(meg_state));
+	m_drcuml->initialize(0, 1, 9, 0, 0);
+	m_meg = m_drcuml->cache_alloc_near<meg_state>();
 	m_meg->m_swp = this;
 	m_meg->reset();
 
@@ -1763,7 +1763,6 @@ void swp30_device::device_start()
 
 	// SWP30 compiles the entire MEG program as one block, so the max sequence length is
 	// passed as 0 bytes.  In the unlikely event that changes, this should be updated.
-	m_drcuml = std::make_unique<drcuml_state>(*this, m_drccache, 0, 1, 9, 0, 0);
 	m_drcuml->symbol_add(&m_meg->m_pc,          sizeof(m_meg->m_pc),          "pc");
 	m_drcuml->symbol_add(&m_meg->m_icount,      sizeof(m_meg->m_icount),      "icount");
 	m_drcuml->symbol_add(&m_meg->m_program,     sizeof(m_meg->m_program),     "program");

@@ -30,6 +30,7 @@ class megadrive_eeprom_nbajam_device : public megadrive_eeprom_device
 public:
 	megadrive_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual void cart_map(address_map &map) override ATTR_COLD;
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 };

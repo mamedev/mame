@@ -115,11 +115,11 @@ void goldart_state::video_start()
 
 uint32_t goldart_state::screen_update(screen_device& screen, bitmap_ind16& bitmap, const rectangle& cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		int count = (y * 192) + (cliprect.min_x >> 1);
+		int count = (y * 192) + (cliprect.left() >> 1);
 		uint16_t *const dstptr_bitmap = &bitmap.pix(y);
-		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.left() & ~1; x <= cliprect.right(); x += 2)
 		{
 			uint8_t const data = m_ram[count];
 			uint8_t const data2 = m_ram2[count];

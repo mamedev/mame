@@ -822,10 +822,9 @@ uint8_t nes_cart_slot_device::read_l(offs_t offset)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_l(offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4100) & 0xff00) >> 8);
-		return val;
+		return m_cart->read_l(offset);
 	}
 	else
 		return 0xff;
@@ -835,10 +834,9 @@ uint8_t nes_cart_slot_device::read_m(offs_t offset)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_m(offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x6000) & 0xff00) >> 8);
-		return val;
+		return m_cart->read_m(offset);
 	}
 	else
 		return 0xff;
@@ -848,10 +846,9 @@ uint8_t nes_cart_slot_device::read_h(offs_t offset)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_h(offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x8000) & 0xff00) >> 8);
-		return val;
+		return m_cart->read_h(offset);
 	}
 	else
 		return 0xff;
@@ -861,10 +858,9 @@ uint8_t nes_cart_slot_device::read_ex(offs_t offset)
 {
 	if (m_cart)
 	{
-		uint8_t val = m_cart->read_ex(offset);
 		// update open bus
 		m_cart->set_open_bus(((offset + 0x4020) & 0xff00) >> 8);
-		return val;
+		return m_cart->read_ex(offset);
 	}
 	else
 		return 0xff;
@@ -879,9 +875,9 @@ void nes_cart_slot_device::write_l(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 	{
-		m_cart->write_l(offset, data);
 		// update open bus
-		m_cart->set_open_bus(((offset + 0x4100) & 0xff00) >> 8);
+		m_cart->set_open_bus(data);
+		m_cart->write_l(offset, data);
 	}
 }
 
@@ -889,9 +885,9 @@ void nes_cart_slot_device::write_m(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 	{
-		m_cart->write_m(offset, data);
 		// update open bus
-		m_cart->set_open_bus(((offset + 0x6000) & 0xff00) >> 8);
+		m_cart->set_open_bus(data);
+		m_cart->write_m(offset, data);
 	}
 }
 
@@ -899,9 +895,9 @@ void nes_cart_slot_device::write_h(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 	{
-		m_cart->write_h(offset, data);
 		// update open bus
-		m_cart->set_open_bus(((offset + 0x8000) & 0xff00) >> 8);
+		m_cart->set_open_bus(data);
+		m_cart->write_h(offset, data);
 	}
 }
 
@@ -909,8 +905,8 @@ void nes_cart_slot_device::write_ex(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 	{
-		m_cart->write_ex(offset, data);
 		// update open bus
-		m_cart->set_open_bus(((offset + 0x4020) & 0xff00) >> 8);
+		m_cart->set_open_bus(data);
+		m_cart->write_ex(offset, data);
 	}
 }

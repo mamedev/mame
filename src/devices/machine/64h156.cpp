@@ -85,6 +85,54 @@ void c64h156_device::device_start()
 	save_item(NAME(m_yb));
 	save_item(NAME(m_atni));
 	save_item(NAME(m_atna));
+
+	save_item(NAME(cur_live.tm));
+	save_item(NAME(cur_live.state));
+	save_item(NAME(cur_live.next_state));
+	save_item(NAME(cur_live.sync));
+	save_item(NAME(cur_live.byte));
+	save_item(NAME(cur_live.byte_in));
+	save_item(NAME(cur_live.ds));
+	save_item(NAME(cur_live.oe));
+	save_item(NAME(cur_live.soe));
+	save_item(NAME(cur_live.accl));
+	save_item(NAME(cur_live.accl_yb));
+	save_item(NAME(cur_live.edge));
+	save_item(NAME(cur_live.shift_reg));
+	save_item(NAME(cur_live.cycle_counter));
+	save_item(NAME(cur_live.cell_counter));
+	save_item(NAME(cur_live.bit_counter));
+	save_item(NAME(cur_live.filter_counter));
+	save_item(NAME(cur_live.zero_counter));
+	save_item(NAME(cur_live.cycles_until_random_flux));
+	save_item(NAME(cur_live.xorshift));
+	save_item(NAME(cur_live.yb));
+	save_item(NAME(cur_live.shift_reg_write));
+	save_item(NAME(cur_live.write_transition_count));
+
+	save_item(NAME(checkpoint_live.tm));
+	save_item(NAME(checkpoint_live.state));
+	save_item(NAME(checkpoint_live.next_state));
+	save_item(NAME(checkpoint_live.sync));
+	save_item(NAME(checkpoint_live.byte));
+	save_item(NAME(checkpoint_live.byte_in));
+	save_item(NAME(checkpoint_live.ds));
+	save_item(NAME(checkpoint_live.oe));
+	save_item(NAME(checkpoint_live.soe));
+	save_item(NAME(checkpoint_live.accl));
+	save_item(NAME(checkpoint_live.accl_yb));
+	save_item(NAME(checkpoint_live.edge));
+	save_item(NAME(checkpoint_live.shift_reg));
+	save_item(NAME(checkpoint_live.cycle_counter));
+	save_item(NAME(checkpoint_live.cell_counter));
+	save_item(NAME(checkpoint_live.bit_counter));
+	save_item(NAME(checkpoint_live.filter_counter));
+	save_item(NAME(checkpoint_live.zero_counter));
+	save_item(NAME(checkpoint_live.cycles_until_random_flux));
+	save_item(NAME(checkpoint_live.xorshift));
+	save_item(NAME(checkpoint_live.yb));
+	save_item(NAME(checkpoint_live.shift_reg_write));
+	save_item(NAME(checkpoint_live.write_transition_count));
 }
 
 
@@ -244,6 +292,7 @@ void c64h156_device::live_abort()
 
 	cur_live.sync = 1;
 	cur_live.byte = 1;
+	cur_live.byte_in = 1;
 }
 
 void c64h156_device::live_run(const attotime &limit)
@@ -329,16 +378,15 @@ void c64h156_device::live_run(const attotime &limit)
 				}
 
 				// update signals
-				if (byte != cur_live.byte) {
-					if (!byte || !cur_live.accl) {
-						LOG("%s BYTE %02x\n", cur_live.tm.as_string(), cur_live.shift_reg & 0xff);
-						cur_live.byte = byte;
-						syncpoint = true;
-					}
+				if (byte != cur_live.byte && (!cur_live.accl || (!byte && cur_live.byte_in))) {
+					LOG("%s BYTE %02x\n", cur_live.tm.as_string(), cur_live.shift_reg & 0xff);
+					cur_live.byte = byte;
+					syncpoint = true;
 					if (!byte) {
 						cur_live.accl_yb = cur_live.shift_reg & 0xff;
 					}
 				}
+				cur_live.byte_in = byte;
 
 				if (sync != cur_live.sync) {
 					LOG("%s SYNC %u\n", cur_live.tm.as_string(),sync);

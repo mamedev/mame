@@ -625,7 +625,7 @@ void gottlieb_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprec
 
 	/* this is a temporary guess until the sprite hardware is better understood
 	   there is some additional clipping, but this may not be it */
-	clip.min_x = 8;
+	clip.setx(8, clip.right());
 
 	for (int offs = 0; offs < 256; offs += 4)
 	{

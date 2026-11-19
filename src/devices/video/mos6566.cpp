@@ -204,7 +204,8 @@ enum : uint16_t
 	DECODE_SPR_DMA = 0x0100,
 	DECODE_SPR_YEXP = 0x0200,
 	DECODE_ROW_END = 0x0400,
-	DECODE_SPR_DISPLAY = 0x0800
+	DECODE_SPR_DISPLAY = 0x0800,
+	DECODE_SPR_SLOT = 0x1000
 };
 
 } // anonymous namespace
@@ -329,6 +330,7 @@ mos6566_device::mos6566_device(const machine_config &mconfig, device_type type, 
 	, m_write_irq(*this)
 	, m_write_ba(*this)
 	, m_write_aec(*this)
+	, m_write_phi2(*this)
 	, m_write_k(*this)
 	, m_read_charrom(*this, 0)
 	, m_cpu(*this, finder_base::DUMMY_TAG)
@@ -422,6 +424,9 @@ void mos6566_device::build_decode()
 			decode.strobes |= DECODE_ROW_END;
 		if (cycle == m_timing.spr_disp_cycle)
 			decode.strobes |= DECODE_SPR_DISPLAY;
+		for (int pos = 0; pos < CYCLE_DOTS; pos++)
+			if (sprite_slot_dot((cycle - 1) * CYCLE_DOTS + pos) < 8 * SPRITE_SLOT_DOTS)
+				decode.strobes |= DECODE_SPR_SLOT;
 
 		decode.spr_pointer = -1;
 		decode.spr_data = -1;
@@ -439,6 +444,14 @@ void mos6566_device::build_decode()
 				decode.spr_ba |= 1 << i;
 		}
 	}
+}
+
+int mos6566_device::sprite_slot_dot(int dot) const
+{
+	int slot_dot = dot + PHI2_START - CYCLE_DOTS * (m_timing.spr_first_cycle - 1);
+	if (slot_dot < 0)
+		slot_dot += CYCLE_DOTS * m_timing.cycles_per_line;
+	return slot_dot;
 }
 
 int mos6566_device::phase_x(int phase) const
@@ -503,6 +516,9 @@ mos8566_device::mos8566_device(const machine_config &mconfig, const char *tag, d
 void mos6566_device::device_start()
 {
 	set_icountptr(m_icount);
+
+	space(0).specific(m_videoram);
+	space(1).specific(m_colorram);
 
 	build_decode();
 
@@ -734,7 +750,7 @@ void mos6566_device::check_raster_irq()
 
 uint8_t mos6566_device::fetch(offs_t address)
 {
-	m_last_data = space(0).read_byte(address & 0x3fff);
+	m_last_data = m_videoram.read_byte(address & 0x3fff);
 	return m_last_data;
 }
 
@@ -748,7 +764,7 @@ uint8_t mos6566_device::fetch_phi2(offs_t address)
 
 uint8_t mos6566_device::read_color(offs_t offset)
 {
-	return space(1).read_byte(offset & 0x3ff) & 0x0f;
+	return m_colorram.read_byte(offset & 0x3ff) & 0x0f;
 }
 
 
@@ -1013,32 +1029,63 @@ void mos6566_device::apply_registers(uint64_t dot)
 
 void mos6566_device::draw_until(uint64_t dot)
 {
-	while (m_dot < dot && m_draw_pos < 8)
+	if (m_dot >= dot || m_draw_pos >= CYCLE_DOTS)
+		return;
+
+	dot_controls controls;
+	controls.strobes = m_decode[m_draw_col / CYCLE_DOTS + 1].strobes;
+	if (m_draw_pos == 0 && (controls.strobes & DECODE_SPR_DISPLAY))
+		m_spr_pending = m_spr_disp;
+
+	uint8_t ring = 0;
+	for (int i = 0; i < COLLISION_LAG; i++)
+		ring |= m_coll_mm[i] | m_coll_md[i];
+
+	controls.sprites = m_spr_pending || m_spr_active || (controls.strobes & DECODE_SPR_SLOT);
+	controls.collisions = controls.sprites || ring;
+	latch_dot_controls(controls);
+
+	while (m_dot < dot && m_draw_pos < CYCLE_DOTS)
 	{
 		if (m_write_count)
+		{
 			apply_registers(m_dot);
+			latch_dot_controls(controls);
+		}
 
-		draw_dot();
+		draw_dot(controls);
 		m_draw_pos++;
 		m_dot++;
 	}
 }
 
-void mos6566_device::draw_dot()
+void mos6566_device::latch_dot_controls(dot_controls &controls) const
 {
-	int const x = m_phase_x[m_draw_col / 4 + (m_draw_pos >> 2)] + (m_draw_pos & 3);
 	uint8_t const cr1 = m_dreg[REGISTER_CR1];
 	uint8_t const cr2 = m_dreg[REGISTER_CR2];
 
-	border_unit(x, cr1, cr2);
+	controls.cr1 = cr1;
+	controls.cr2 = cr2;
+	controls.mode = (BIT(cr1, 6) << 2) | (BIT(cr1, 5) << 1) | BIT(cr2, 4);
+	controls.mcm_flop_dot = MCM_FLOP_DOT + (BIT(cr2, 4) ? 0 : mcm_fall_lag(cr1));
+}
+
+inline void mos6566_device::draw_dot(const dot_controls &controls)
+{
+	int const x = m_phase_x[m_draw_col / 4 + (m_draw_pos >> 2)] + (m_draw_pos & 3);
+
+	border_unit(x, controls.cr1, controls.cr2);
 
 	int color;
-	bool const fg = graphics_sequencer(cr1, cr2, color);
+	bool const fg = graphics_sequencer(controls, color);
 
 	int sprite_color[8];
-	uint8_t const sprite_mask = sprite_sequencer(x, sprite_color);
+	uint8_t const sprite_mask = controls.sprites ? sprite_sequencer(x, sprite_color) : 0;
 
-	collision_unit(sprite_mask, fg);
+	if (controls.collisions)
+		collision_unit(sprite_mask, fg);
+	else
+		m_coll_index = (m_coll_index + 1) & (COLLISION_LAG - 1);
 
 	if (sprite_mask)
 	{
@@ -1058,7 +1105,7 @@ void mos6566_device::draw_dot()
 	output_stage(color);
 }
 
-void mos6566_device::border_unit(int x, uint8_t cr1, uint8_t cr2)
+inline void mos6566_device::border_unit(int x, uint8_t cr1, uint8_t cr2)
 {
 	bool const csel = BIT(cr2, 3);
 	bool const rsel = BIT(cr1, 3);
@@ -1077,20 +1124,20 @@ void mos6566_device::border_unit(int x, uint8_t cr1, uint8_t cr2)
 	}
 }
 
-bool mos6566_device::graphics_sequencer(uint8_t cr1, uint8_t cr2, int &color)
+inline bool mos6566_device::graphics_sequencer(const dot_controls &controls, int &color)
 {
 	int const slot = m_draw_pos;
-	bool const next_mcm = BIT(cr2, 4);
+	bool const next_mcm = BIT(controls.cr2, 4);
 
-	if (slot == MCM_FLOP_DOT + (next_mcm ? 0 : mcm_fall_lag(cr1)))
+	if (slot == controls.mcm_flop_dot)
 	{
 		if (next_mcm && !m_seq_mcm)
 			m_seq_count |= 1;
 		m_seq_mcm = next_mcm;
 	}
 
-	if ((m_decode[m_draw_col / CYCLE_DOTS + 1].strobes & DECODE_GRAPHICS) && !m_vert_border)
-		m_seq_xscroll = cr2 & 7;
+	if ((controls.strobes & DECODE_GRAPHICS) && !m_vert_border)
+		m_seq_xscroll = controls.cr2 & 7;
 
 	if (((slot - PHI2_START) & 7) == m_seq_xscroll)
 	{
@@ -1114,15 +1161,14 @@ bool mos6566_device::graphics_sequencer(uint8_t cr1, uint8_t cr2, int &color)
 	}
 	m_seq_count++;
 	m_seq_shift <<= 1;
-	m_seq_bmm = (m_seq_bmm << 1) | BIT(cr1, 5);
+	m_seq_bmm = (m_seq_bmm << 1) | BIT(controls.cr1, 5);
 
 	int const bit = BIT(m_seq_mc, 1);
 	int const pair = m_seq_mc;
-	int const mode = (BIT(cr1, 6) << 2) | (BIT(cr1, 5) << 1) | BIT(cr2, 4);
 	bool fg = false;
 	color = 0;
 
-	switch (mode)
+	switch (controls.mode)
 	{
 	case 0:
 		fg = bit;
@@ -1179,15 +1225,9 @@ bool mos6566_device::graphics_sequencer(uint8_t cr1, uint8_t cr2, int &color)
 	return fg;
 }
 
-uint8_t mos6566_device::sprite_sequencer(int x, int (&color)[8])
+inline uint8_t mos6566_device::sprite_sequencer(int x, int (&color)[8])
 {
-	int const dot = m_draw_col + m_draw_pos;
-	if (m_draw_pos == 0 && (m_decode[m_draw_col / CYCLE_DOTS + 1].strobes & DECODE_SPR_DISPLAY))
-		m_spr_pending = m_spr_disp;
-
-	int slot_dot = dot + PHI2_START - CYCLE_DOTS * (m_timing.spr_first_cycle - 1);
-	if (slot_dot < 0)
-		slot_dot += CYCLE_DOTS * m_timing.cycles_per_line;
+	int const slot_dot = sprite_slot_dot(m_draw_col + m_draw_pos);
 	if (slot_dot < 8 * SPRITE_SLOT_DOTS)
 	{
 		int const i = slot_dot / SPRITE_SLOT_DOTS;
@@ -1282,7 +1322,7 @@ uint8_t mos6566_device::sprite_sequencer(int x, int (&color)[8])
 	return sprite_mask;
 }
 
-void mos6566_device::collision_unit(uint8_t sprite_mask, bool fg)
+inline void mos6566_device::collision_unit(uint8_t sprite_mask, bool fg)
 {
 	uint8_t const mm = (sprite_mask & (sprite_mask - 1)) ? sprite_mask : 0;
 	uint8_t const md = (sprite_mask && fg) ? sprite_mask : 0;
@@ -1310,7 +1350,7 @@ void mos6566_device::collision_unit(uint8_t sprite_mask, bool fg)
 	m_coll_index = (m_coll_index + 1) & (COLLISION_LAG - 1);
 }
 
-void mos6566_device::output_stage(int color)
+inline void mos6566_device::output_stage(int color)
 {
 	int const lag = m_process.output_lag;
 	if (m_pixel_count == lag)
@@ -1502,6 +1542,8 @@ void mos6566_device::execute_run()
 			m_aec_out = m_aec;
 			m_write_aec(m_aec);
 		}
+
+		m_write_phi2(1);
 
 		m_cycle_dot = m_dot;
 		m_draw_row = (m_beam_line + m_timing.row_shift) % m_timing.lines;

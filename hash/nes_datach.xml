@@ -5,7 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="nes_datach" description="Nintendo Entertainment System - Datach Joint ROM System mini-cartridges">
 
-	<software name="dtc_brsh" supported="partial">
+	<software name="dtc_brsh">
 		<description>Datach - Battle Rush - Build Up Robot Tournament (Japan)</description>
 		<year>1993</year>
 		<publisher>Bandai</publisher>

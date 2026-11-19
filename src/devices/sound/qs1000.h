@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Philip Bennett
+// copyright-holders:R. Belmont, Philip Bennett
 /***************************************************************************
 
     qs1000.h
@@ -14,7 +14,6 @@
 #pragma once
 
 #include "cpu/mcs51/i8052.h"
-#include "sound/okiadpcm.h"
 #include "dirom.h"
 
 //**************************************************************************
@@ -63,21 +62,23 @@ public:
 	void qs1000_prg_map(address_map &map) ATTR_COLD;
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// device_sound_interface overrides
+	// device_sound_interface implementation
 	virtual void sound_stream_update(sound_stream &stream) override;
 
-	// device_rom_interface overrides
+	// device_rom_interface implementation
 	virtual void rom_bank_pre_change() override;
 
 private:
 	static constexpr unsigned QS1000_CHANNELS       = 32;
 	static constexpr offs_t   QS1000_ADDRESS_MASK   = 0x00ffffff;
+	static constexpr unsigned QS1000_ACC_FRAC_BITS  = 26;
+	static constexpr uint32_t QS1000_RELEASE_UNIT   = 768 * 16;   // stream samples per (byte 10 + 1) unit of full-scale release
 
 	enum
 	{
@@ -86,7 +87,47 @@ private:
 		QS1000_ADPCM   = 4
 	};
 
+	struct qs1000_adpcm
+	{
+		void reset();
+		int16_t clock(uint8_t nibble);
+		void save();
+		void restore();
+
+		int32_t           m_signal;
+		int32_t           m_step;
+		int32_t           m_loop_signal;
+		int32_t           m_loop_step;
+		bool              m_saved;
+	};
+
+	struct qs1000_channel
+	{
+		uint32_t          m_acc;
+		float             m_previous_sample;
+		int32_t           m_adpcm_signal;
+		uint32_t          m_addr;
+		uint32_t          m_adpcm_addr;
+		uint32_t          m_loop_start;
+		uint32_t          m_loop_end;
+		uint16_t          m_freq;
+		uint16_t          m_flags;
+		uint16_t          m_env_addr;
+		uint16_t          m_env_period;       // source samples per curve point
+		uint32_t          m_release_period;   // stream samples for a full-scale release
+		uint32_t          m_env_remaining;
+		uint32_t          m_env_level;        // 8.16 fixed point
+		int32_t           m_env_step;
+		uint8_t           m_env_target;
+
+		uint8_t           m_regs[0x11];
+
+		qs1000_adpcm      m_adpcm;
+	};
+
 	void start_voice(int ch);
+	static void set_envelope_target(qs1000_channel &chan, uint8_t target, uint32_t period);
+	void advance_envelope(qs1000_channel &chan, uint32_t samples);
 
 	bool                    m_external_rom;
 
@@ -104,25 +145,7 @@ private:
 	required_device<i8052_device>   m_cpu;
 
 	// Wavetable engine
-	uint8_t                           m_wave_regs[18];
-
-	struct qs1000_channel
-	{
-		uint32_t          m_acc;
-		int32_t           m_adpcm_signal;
-		uint32_t          m_start;
-		uint32_t          m_addr;
-		uint32_t          m_adpcm_addr;
-		uint32_t          m_loop_start;
-		uint32_t          m_loop_end;
-		uint16_t          m_freq;
-		uint16_t          m_flags;
-
-		uint8_t           m_regs[16]; // FIXME
-
-		oki_adpcm_state m_adpcm;
-	};
-
+	uint8_t                         m_wave_regs[18];
 	qs1000_channel                  m_channels[QS1000_CHANNELS];
 };
 

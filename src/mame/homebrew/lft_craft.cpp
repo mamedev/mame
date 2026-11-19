@@ -158,7 +158,9 @@ uint32_t lft_craft_state::screen_update(screen_device &screen, bitmap_rgb32 &bit
 		uint8_t *src = &m_pixels[y * LINE_CYCLES];
 		for(int x = 0; x < LINE_CYCLES; x++)
 		{
-			*dst++ = pens[*src++];
+			*dst++ = pens[*src];
+			*src = 0; // otherwise junk persists onscreen
+			src++;
 		}
 	}
 	return 0;

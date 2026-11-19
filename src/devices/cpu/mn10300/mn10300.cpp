@@ -77,6 +77,20 @@ mn10300_device::mn10300_device(const machine_config &mconfig, device_type type, 
 	, m_tm_mode{ 0, 0 }
 	, m_tm_base{ 0, 0 }
 	, m_tm_timer{ nullptr, nullptr }
+	, m_tm6_mode(0)
+	, m_tm6_mda(0)
+	, m_tm6_ca(0)
+	, m_tm6_timer(nullptr)
+	, m_dma_tc_cb(*this)
+	, m_dma_timer(nullptr)
+	, m_dma_ctrl(0)
+	, m_dma_src(0)
+	, m_dma_dst(0)
+	, m_dma_count(0)
+	, m_dma_remain(0)
+	, m_dma_active(false)
+	, m_dma_started(false)
+	, m_dma_drq(false)
 	, m_sio_tx_cb(*this)
 	, m_sio_rx_enable_cb(*this)
 	, m_sio_bit_rate{ 0, 0, 0 }
@@ -92,6 +106,9 @@ mn10300_device::mn10300_device(const machine_config &mconfig, device_type type, 
 void mn10300_device::mn103002a_internal_map(address_map &map)
 {
 	map(0x20000000, 0x2000001b).rw(FUNC(mn10300_device::ivar_r), FUNC(mn10300_device::ivar_w));
+
+	// DMA controller channel 0: control/start, source, destination, byte count
+	map(0x32000800, 0x3200080f).rw(FUNC(mn10300_device::dmac_r), FUNC(mn10300_device::dmac_w));
 
 	map(0x34000100, 0x340002ff).noprw();
 	map(0x34000100, 0x34000101).r(FUNC(mn10300_device::iagr_r));
@@ -118,10 +135,14 @@ void mn10300_device::mn103002a_internal_map(address_map &map)
 
 	map(0x34001080, 0x34001080).rw(FUNC(mn10300_device::tm_mode_r<0>), FUNC(mn10300_device::tm_mode_w<0>));
 	map(0x34001082, 0x34001082).rw(FUNC(mn10300_device::tm_mode_r<1>), FUNC(mn10300_device::tm_mode_w<1>));
+	map(0x34001084, 0x34001085).rw(FUNC(mn10300_device::tm6_mode_r), FUNC(mn10300_device::tm6_mode_w));
 	map(0x34001090, 0x34001091).rw(FUNC(mn10300_device::tm_base_r<0>), FUNC(mn10300_device::tm_base_w<0>));
 	map(0x34001092, 0x34001093).rw(FUNC(mn10300_device::tm_base_r<1>), FUNC(mn10300_device::tm_base_w<1>));
 	map(0x340010a0, 0x340010a1).r(FUNC(mn10300_device::tm_count_r<0>));
 	map(0x340010a2, 0x340010a3).r(FUNC(mn10300_device::tm_count_r<1>));
+	map(0x340010a4, 0x340010a5).r(FUNC(mn10300_device::tm6_count_r));
+	map(0x340010b4, 0x340010b4).rw(FUNC(mn10300_device::tm6_mda_r), FUNC(mn10300_device::tm6_mda_w));
+	map(0x340010c4, 0x340010c5).rw(FUNC(mn10300_device::tm6_ca_r), FUNC(mn10300_device::tm6_ca_w));
 }
 
 device_memory_interface::space_config_vector mn10300_device::memory_space_config() const
@@ -141,8 +162,11 @@ void mn10300_device::device_start()
 
 	for (auto &timer : m_tm_timer)
 		timer = timer_alloc(FUNC(mn10300_device::tm_underflow), this);
+	m_tm6_timer = timer_alloc(FUNC(mn10300_device::tm6_match), this);
 	for (auto &timer : m_sio_tx_timer)
 		timer = timer_alloc(FUNC(mn10300_device::sio_tx_shifted), this);
+
+	m_dma_timer = timer_alloc(FUNC(mn10300_device::dma_transfer), this);
 
 	save_item(NAME(m_pc));
 	save_item(NAME(m_d));
@@ -164,6 +188,17 @@ void mn10300_device::device_start()
 	save_item(NAME(m_irq_level));
 	save_item(NAME(m_tm_mode));
 	save_item(NAME(m_tm_base));
+	save_item(NAME(m_tm6_mode));
+	save_item(NAME(m_tm6_mda));
+	save_item(NAME(m_tm6_ca));
+	save_item(NAME(m_dma_ctrl));
+	save_item(NAME(m_dma_src));
+	save_item(NAME(m_dma_dst));
+	save_item(NAME(m_dma_count));
+	save_item(NAME(m_dma_remain));
+	save_item(NAME(m_dma_active));
+	save_item(NAME(m_dma_started));
+	save_item(NAME(m_dma_drq));
 	save_item(NAME(m_sio_config));
 	save_item(NAME(m_sio_control));
 	save_item(NAME(m_sio_rxbuf));
@@ -216,6 +251,10 @@ void mn10300_device::device_reset()
 		m_tm_base[n] = 0;
 		m_tm_timer[n]->adjust(attotime::never);
 	}
+	m_tm6_mode = 0;
+	m_tm6_mda = 0;
+	m_tm6_ca = 0;
+	m_tm6_timer->adjust(attotime::never);
 
 	for (unsigned ch = 0; ch < NUM_SIO; ch++)
 	{
@@ -226,6 +265,12 @@ void mn10300_device::device_reset()
 		m_sio_rx_full[ch] = false;
 		m_sio_tx_timer[ch]->adjust(attotime::never);
 	}
+
+	m_dma_ctrl = 0;
+	m_dma_active = false;
+	m_dma_started = false;
+	m_dma_drq = false;
+	m_dma_timer->adjust(attotime::never);
 }
 
 void mn10300_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -483,6 +528,151 @@ void mn10300_device::tm_rearm(unsigned n, bool restart_phase)
 TIMER_CALLBACK_MEMBER(mn10300_device::tm_underflow)
 {
 	intc_assert(TM4_GROUP + param);
+}
+
+// TM6 is a 16-bit up-counter with two compare/capture registers. Only compare A
+// is modelled: bit 15 of the mode word enables counting and bit 14 is a load
+// pulse; the count clears when it matches compare A, which raises group 9. The
+// KN6000 sequencer runs on it: it selects clock source 1 in the low mode bits
+// and programs compare A with 1,250,000 / BPM for a 96 PPQN tick, which keeps
+// time if source 1 counts at IOCLK / 8, the rate of TM4 and TM5. No other clock
+// source is decoded.
+u16 mn10300_device::tm6_mode_r()
+{
+	return m_tm6_mode;
+}
+
+void mn10300_device::tm6_mode_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	const u16 old = m_tm6_mode;
+	COMBINE_DATA(&m_tm6_mode);
+	const u16 rising = m_tm6_mode & ~old;
+	if (!BIT(m_tm6_mode, 15))
+		m_tm6_timer->adjust(attotime::never);
+	else if (rising & 0xc000)
+	{
+		if ((m_tm6_mode & 0x0007) != 1)
+			logerror("TM6 clock source %u not supported, counting at IOCLK/8\n", m_tm6_mode & 0x0007);
+		tm6_rearm(true);
+	}
+}
+
+u8 mn10300_device::tm6_mda_r()
+{
+	return m_tm6_mda;
+}
+
+void mn10300_device::tm6_mda_w(u8 data)
+{
+	m_tm6_mda = data;
+}
+
+u16 mn10300_device::tm6_ca_r()
+{
+	return m_tm6_ca;
+}
+
+void mn10300_device::tm6_ca_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_tm6_ca);
+	// a new compare value sets the period from the next match on
+	if (BIT(m_tm6_mode, 15) && !m_tm6_timer->remaining().is_never())
+		tm6_rearm(false);
+}
+
+u16 mn10300_device::tm6_count_r()
+{
+	if (!BIT(m_tm6_mode, 15) || m_tm6_timer->remaining().is_never())
+		return 0;
+	const u64 period = u64(m_tm6_ca + 1) * TM_PRESCALE;
+	const u64 remaining = m_tm6_timer->remaining().as_ticks(clock() / 2);
+	return u16(remaining < period ? ((period - remaining) / TM_PRESCALE) : 0);
+}
+
+void mn10300_device::tm6_rearm(bool restart_phase)
+{
+	const attotime period = attotime::from_ticks(u64(m_tm6_ca + 1) * TM_PRESCALE, clock() / 2);
+	if (restart_phase)
+		m_tm6_timer->adjust(period, 0, period);
+	else
+		m_tm6_timer->adjust(m_tm6_timer->remaining(), 0, period);
+}
+
+TIMER_CALLBACK_MEMBER(mn10300_device::tm6_match)
+{
+	intc_assert(TM6A_GROUP);
+}
+
+// DMA controller channel 0. The control register (0x800) starts the channel when
+// its low nibble reads 0xf; 0x804 and 0x808 are the source and destination, and
+// 0x80c is a 16-bit count. The channel moves (count + 1) bytes, then raises its
+// end-of-transfer interrupt.
+u32 mn10300_device::dmac_r(offs_t offset)
+{
+	switch (offset)
+	{
+	case 0: return m_dma_ctrl;
+	case 1: return m_dma_src;
+	case 2: return m_dma_dst;
+	case 3: return m_dma_count;
+	}
+	return 0;
+}
+
+void mn10300_device::dmac_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	switch (offset)
+	{
+	case 0:
+	{
+		COMBINE_DATA(&m_dma_ctrl);
+		const bool go = (m_dma_ctrl & 0x0f) == 0x0f;
+		if (go && !m_dma_active)
+			m_dma_started = false;   // new transfer; latch the length at the first byte
+		m_dma_active = go;
+		break;
+	}
+	case 1: COMBINE_DATA(&m_dma_src); break;
+	case 2: COMBINE_DATA(&m_dma_dst); break;
+	case 3: if (ACCESSING_BITS_0_15) m_dma_count = data & 0xffff; break;
+	}
+}
+
+// An external request on the channel (the floppy controller's DRQ). The byte
+// moves run from a timer so that reading the peripheral port and pulsing terminal
+// count happen outside the requesting device's own request callback.
+void mn10300_device::dma_req_w(int state)
+{
+	m_dma_drq = state;
+	if (state && m_dma_active)
+		m_dma_timer->adjust(attotime::zero);
+}
+
+TIMER_CALLBACK_MEMBER(mn10300_device::dma_transfer)
+{
+	if (!m_dma_active)
+		return;
+	if (!m_dma_started)
+	{
+		m_dma_remain = u32(m_dma_count) + 1;
+		m_dma_started = true;
+	}
+	const bool src_is_memory = m_dma_src < 0x80000000;
+	while (m_dma_active && m_dma_drq)
+	{
+		m_program.write_byte(m_dma_dst, m_program.read_byte(m_dma_src));
+		if (src_is_memory)
+			m_dma_src++;
+		else
+			m_dma_dst++;
+		if (--m_dma_remain == 0)
+		{
+			m_dma_tc_cb(1);
+			m_dma_tc_cb(0);
+			m_dma_active = false;
+			intc_assert(DMA0_GROUP);
+		}
+	}
 }
 
 

@@ -38,6 +38,7 @@ license:CC0-1.0
 		<description>ABCUTE Universell Terminalemulator</description>
 		<year>1982</year>
 		<publisher>Sören Tirfing &amp; Kari Dubbelman</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -50,6 +51,7 @@ license:CC0-1.0
 		<description>ABCUTE Universell Terminalemulator (v1.4)</description>
 		<year>1982</year>
 		<publisher>Sören Tirfing &amp; Kari Dubbelman</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -62,6 +64,7 @@ license:CC0-1.0
 		<description>asm800</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -74,6 +77,7 @@ license:CC0-1.0
 		<description>asm800 (alt)</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -87,6 +91,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>unknown</publisher>
 		<info name="usage" value="RUN EXTEND" />
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -100,6 +105,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>unknown</publisher>
 		<info name="usage" value="RUN E" />
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="eeprom_programer" />
@@ -113,6 +119,7 @@ license:CC0-1.0
 		<description>Inpräk</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -137,6 +144,7 @@ license:CC0-1.0
 		<description>L&amp;L Forth</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -149,6 +157,7 @@ license:CC0-1.0
 		<description>Meny0 v6.03</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -161,6 +170,7 @@ license:CC0-1.0
 		<description>Miscellanous 1</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -173,6 +183,7 @@ license:CC0-1.0
 		<description>Miscellanous 2</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -185,6 +196,7 @@ license:CC0-1.0
 		<description>Miscellanous 3</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -197,6 +209,7 @@ license:CC0-1.0
 		<description>Ord 800 v2.3W</description>
 		<year>198?</year>
 		<publisher>P-Data</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -209,6 +222,7 @@ license:CC0-1.0
 		<description>Produktion 856</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -221,6 +235,7 @@ license:CC0-1.0
 		<description>PUG programutveckling</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -233,6 +248,7 @@ license:CC0-1.0
 		<description>Snoka</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -245,6 +261,7 @@ license:CC0-1.0
 		<description>Systemskiva för ABC850 v6.43</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -257,6 +274,7 @@ license:CC0-1.0
 		<description>Systemskiva HD v6.43</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -269,6 +287,7 @@ license:CC0-1.0
 		<description>Systemskiva Transfor</description>
 		<year>198?</year>
 		<publisher>unknown</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -281,6 +300,7 @@ license:CC0-1.0
 		<description>Systemskiva v6.31 för UFD-DOS (alt)</description>
 		<year>198?</year>
 		<publisher>Luxor</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="655360">
@@ -293,6 +313,7 @@ license:CC0-1.0
 		<description>ABC16</description>
 		<year>1985</year>
 		<publisher>MYAB Mikrokonsult</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<!--
@@ -314,6 +335,7 @@ license:CC0-1.0
 		<description>Concurrent-DOS v3.1 för ABC16</description>
 		<year>198?</year>
 		<publisher>MYAB Mikrokonsult</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<!--
@@ -399,6 +421,8 @@ license:CC0-1.0
 		<description>Concurrent-DOS v4.1 för ABC16</description>
 		<year>198?</year>
 		<publisher>MYAB Mikrokonsult</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="137544">
 				<rom name="disk007.imd" size="137544" crc="f08b9876" sha1="9331b3d3cf2eaf1144d5dc5524346391dd32eb4a"/>
@@ -411,6 +435,7 @@ license:CC0-1.0
 		<year>1986</year>
 		<publisher>Luxor</publisher>
 		<sharedfeat name="requirement" value="pr:teletex800"/>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="TELETEXT 800 V1.33" />
@@ -466,6 +491,7 @@ license:CC0-1.0
 		<description>Kronstat v2.1</description>
 		<year>198?</year>
 		<publisher>ABC-klubben</publisher>
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="186394">
@@ -479,6 +505,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="68 29067-43" />
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="77214">
@@ -492,6 +519,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>P-Data</publisher>
 		<info name="serial" value="68 20037-56" />
+		<sharedfeat name="bus_default" value="abc832" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="50916">

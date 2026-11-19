@@ -200,20 +200,21 @@ u32 isa16_amgda_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	{
 		u8 const *vram = m_vram.get();
 
-		for (s32 y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+		for (s32 y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
 		{
-			for (s32 x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 8)
+			auto *const dst = &bitmap.pix(y);
+			for (s32 x = screen.visible_area().left(); x <= screen.visible_area().right(); x += 8)
 			{
 				u8 const data = *vram++;
 
-				bitmap.pix(y, x + 0) = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y, x + 1) = BIT(data, 6) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y, x + 2) = BIT(data, 5) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y, x + 3) = BIT(data, 4) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y, x + 4) = BIT(data, 3) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y, x + 5) = BIT(data, 2) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y, x + 6) = BIT(data, 1) ? rgb_t::white() : rgb_t::black();
-				bitmap.pix(y, x + 7) = BIT(data, 0) ? rgb_t::white() : rgb_t::black();
+				dst[x + 0] = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
+				dst[x + 1] = BIT(data, 6) ? rgb_t::white() : rgb_t::black();
+				dst[x + 2] = BIT(data, 5) ? rgb_t::white() : rgb_t::black();
+				dst[x + 3] = BIT(data, 4) ? rgb_t::white() : rgb_t::black();
+				dst[x + 4] = BIT(data, 3) ? rgb_t::white() : rgb_t::black();
+				dst[x + 5] = BIT(data, 2) ? rgb_t::white() : rgb_t::black();
+				dst[x + 6] = BIT(data, 1) ? rgb_t::white() : rgb_t::black();
+				dst[x + 7] = BIT(data, 0) ? rgb_t::white() : rgb_t::black();
 			}
 
 			vram += 38;
@@ -340,14 +341,14 @@ u16 isa16_amgda_device::ras_r()
 
 		if (visible.contains(hpos, vpos))
 		{
-			unsigned const bit = (vpos - visible.min_y) * 1024 + (hpos - visible.min_x);
+			unsigned const bit = (vpos - visible.top()) * 1024 + (hpos - visible.left());
 
 			if ((m_dcr & DCR_VE) && BIT(m_vram[bit >> 3], 7 - (bit & 7)))
 				data |= RAS_SV;
 		}
-		else if (vpos < visible.min_y || vpos > visible.max_y)
+		else if (!visible.containsy(vpos))
 			data |= RAS_VS;
-		else if (hpos < visible.min_x || hpos > visible.max_x)
+		else if (!visible.containsx(hpos))
 			data |= RAS_HS;
 
 		LOGMASKED(LOG_REGR, "%s: ras_r 0x%02x\n", machine().describe_context(), data);

@@ -66,10 +66,12 @@ ROM_START( c1571 )
 	ROM_DEFAULT_BIOS("r5")
 	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
 	ROMX_LOAD( "310654-03.u2", 0x0000, 0x8000, CRC(3889b8b8) SHA1(e649ef4419d65829d2afd65e07d31f3ce147d6eb), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
-	ROMX_LOAD( "310654-05.u2", 0x0000, 0x8000, CRC(5755bae3) SHA1(f1be619c106641a685f6609e4d43d6fc9eac1e70), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos 1571.u2", 0x0000, 0x8000, CRC(fe6cac6d) SHA1(d4b79b60cf1eaa399d0932200eb7811e00455249), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
+	ROMX_LOAD( "310654-04.u2", 0x0000, 0x8000, CRC(49cc496d) SHA1(cc61b82ed9e102ff28a337d075ed00dfb8e7ae52), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
+	ROMX_LOAD( "310654-05.u2", 0x0000, 0x8000, CRC(5755bae3) SHA1(f1be619c106641a685f6609e4d43d6fc9eac1e70), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "jiffydos", "JiffyDOS v6.01" )
+	ROMX_LOAD( "jiffydos 1571.u2", 0x0000, 0x8000, CRC(fe6cac6d) SHA1(d4b79b60cf1eaa399d0932200eb7811e00455249), ROM_BIOS(3) )
 ROM_END
 
 
@@ -309,7 +311,7 @@ void c1571_device::via1_pb_w(uint8_t data)
 	m_ga->mtr_w(BIT(data, 2));
 
 	// stepper motor
-	m_ga->stp_w(data & 0x03); // TODO actually STP1=0, STP0=!(PB0^PB1), Y0=PB1, Y2=!PB1
+	m_ga->stp_w(data & 0x03);
 
 	// activity LED
 	m_leds[LED_ACT] = BIT(data, 3);

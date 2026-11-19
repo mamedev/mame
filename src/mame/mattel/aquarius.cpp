@@ -99,7 +99,7 @@ void aquarius_state::mapper_w(uint8_t data)
 */
 uint8_t aquarius_state::printer_r()
 {
-	return m_printer->cts_r(); /* ready */
+	return !m_printer->cts_r(); // CTS is asserted low
 }
 
 

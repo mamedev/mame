@@ -105,11 +105,10 @@ Variants: T denotes an active 8.4" display, C a passive 9.5" color display. 3560
 #include "emu.h"
 
 #include "bus/isa/isa_cards.h"
-#include "bus/lpci/pci.h"
-#include "bus/lpci/vt82c505.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
 #include "cpu/i386/i386.h"
+#include "cpu/i386/x87slot.h"
 #include "cpu/i86/i286.h"
 #include "machine/at.h"
 #include "machine/cs8221.h"
@@ -118,6 +117,7 @@ Variants: T denotes an active 8.4" display, C a passive 9.5" color display. 3560
 #include "machine/nvram.h"
 #include "machine/ram.h"
 #include "machine/vt82c496.h"
+#include "machine/vt82c505.h"
 
 #include "emupal.h"
 #include "softlist_dev.h"
@@ -314,7 +314,6 @@ void at_state::ficpio_io(address_map &map)
 	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
 	map(0x0370, 0x0377).rw("ide2", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
-	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_device::read), FUNC(pci_bus_device::write));
 }
 
 // TODO: verify and remove this hack
@@ -393,11 +392,6 @@ void at_state::cfg_dual_1440K(device_t *device)
 {
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:0")).set_default_option("35hd");
 	dynamic_cast<device_slot_interface &>(*device->subdevice("fdc:1")).set_default_option("35hd");
-}
-
-static void pci_devices(device_slot_interface &device)
-{
-	device.option_add_internal("vt82c505", VT82C505);
 }
 
 void at_state::ibm5170(machine_config &config)
@@ -516,6 +510,9 @@ void at_state::at386(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &at_state::at32_map);
 	maincpu.set_addrmap(AS_IO, &at_state::at32_io);
 	maincpu.set_irq_acknowledge_callback("mb:pic8259_master", FUNC(pic8259_device::inta_cb));
+	maincpu.ferr().set(m_mb, FUNC(at_mb_device::fpu_error_w));
+
+	I387_SLOT(config, "fpu", m_maincpu);
 
 	config.set_maximum_quantum(attotime::from_hz(60));
 
@@ -695,8 +692,8 @@ void at_state::ficpio2(machine_config &config)
 	ide_controller_32_device &ide2(IDE_CONTROLLER_32(config, "ide2").options(ata_devices, "cdrom", nullptr, true));
 	ide2.irq_handler().set("mb:pic8259_slave", FUNC(pic8259_device::ir7_w));
 
-	PCI_BUS(config, "pcibus").set_busnum(0);
-	PCI_CONNECTOR(config, "pcibus:0", pci_devices, "vt82c505", true);
+	PCI_ROOT(config, "pci");
+	VT82C505(config, "pci:00.0", m_maincpu);
 	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "isa1", 0, "mb:isabus", pc_isa16_cards, "svga_et4k", false);
 	ISA16_SLOT(config, "isa2", 0, "mb:isabus", pc_isa16_cards, nullptr, false);

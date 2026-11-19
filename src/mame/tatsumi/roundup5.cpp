@@ -23,6 +23,7 @@
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/mb3773.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -37,6 +38,7 @@ public:
 	roundup5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: tatsumi_state(mconfig, type, tag)
 		, m_subcpu(*this, "sub")
+		, m_watchdog(*this, "watchdog")
 		, m_vregs(*this, "vregs")
 		, m_bg_scrollx(*this, "bg_scrollx")
 		, m_bg_scrolly(*this, "bg_scrolly")
@@ -68,10 +70,11 @@ private:
 	void roundup5_v30_map(address_map &map) ATTR_COLD;
 	void roundup5_z80_map(address_map &map) ATTR_COLD;
 
-	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type);
+	void draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bitmap_ind8 &shadow);
+	void draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bitmap_ind8 &shadow, uint8_t type);
 
 	required_device<cpu_device> m_subcpu;
+	required_device<mb3773_device> m_watchdog;
 
 	required_shared_ptr<uint16_t> m_vregs;
 	required_shared_ptr<uint16_t> m_bg_scrollx;
@@ -135,7 +138,10 @@ void roundup5_state::video_start()
 	save_pointer(NAME(m_bg_gfxram), 0x20000);
 }
 
-void roundup5_state::draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect)
+// Offset between the normal and shadow halves of the palette
+static constexpr int SHADOW_PALETTE_OFFSET = 0x200;
+
+void roundup5_state::draw_road(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bitmap_ind8 &shadow)
 {
 /*
 0xf980 0x0008 0x8c80 0x4a00 - road right to below, width unknown (32 pixels guess)
@@ -208,17 +214,13 @@ pos is 11.5 fixed point
 
 	int visible_line=0;
 
-	for ( ; y<cliprect.max_y+1; y++)
+	for ( ; y <= cliprect.bottom(); y++)
 	{
-		// TODO: tunnels road drawing has a different format?
-		// shift is always 0x88** while data[3] is a variable argument with bit 15 always on
-		int shift=data[0];
-		int shift2=data[2];
+		uint16_t const shift=data[0];
+		uint16_t const shift2=data[2];
 		int pal = 4; //(data[3]>>8)&0xf;
 		int step = swapendian_int16(data[1]);
-		int samplePos=0;
 		uint16_t const *const linedata=m_road_pixel_ram;// + (0x100 * pal);
-		int startPos=0, endPos=0;
 
 		int palette_byte;//=m_road_color_ram[visible_line/8];
 
@@ -233,15 +235,13 @@ pos is 11.5 fixed point
 		    Word 0: Line shift for 1st set - 13.3 signed fixed point value.
 		    Word 1: Line scale - 5.11 fixed point value.  So 0x800 is 1:1, 0x400 is 1:2, etc
 		    Word 2: Line shift for 2nd set - 13.3 signed fixed point value.
-		    Word 3: ?
+		    Word 3: ? (bit 15 is set on every line in tunnels)
 
-		    The scale is shared between both pixel sets.  The 2nd set is only used when the road
-		    forks into two between stages.  The 2nd line shift is an offset from the last pixel
-		    of the 1st set.  The 2nd line shift uses a different palette bank.
+		    The scale is shared between both pixel sets.  The 2nd set is used when the road
+		    forks into two between stages, and for the road in tunnels.  The 2nd line shift is
+		    added to the 1st.  The 2nd set uses a different palette bank.
 
 2nd road uses upper palette - confirmed by water stage.
-offset is from last pixel of first road segment?
-//last pixel of first road is really colour from 2nd road line?
 
 		*/
 
@@ -250,102 +250,70 @@ offset is from last pixel of first road segment?
 
 		visible_line++;
 
-		if (shift&0x8000)
-			shift=-(0x10000 - shift);
-		shift=-shift;
+		/*
+		    Both pixel sets are placed independently: the 1st at -shift, the 2nd at
+		    -(shift + shift2), both 13.3 values wrapping at 16 bits. On a plain road the sum is
+		    far off screen; in tunnels the game pushes the 1st set off screen (shift 0x87b9) and
+		    draws the road with the 2nd set and its palette, so the sum lands on screen.
+		*/
+		int const start1 = step ? ((-int16_t(shift) * 256) + 0x80) / step : 0x10000;
+		int const start2 = step ? ((-int16_t(uint16_t(shift + shift2)) * 256) + 0x80) / step : 0x10000;
 
-		if (step)
-			startPos=((shift<<8) + 0x80 )/ step;
+		// Pixels outside both sets take the edge pen of the outermost set on that side, from that set's palette bank
+		bool const set2_left = start2 < start1;
+		int const left_col = linedata[set2_left ? 0x200 : 0] & 0xf;
+		int const left_bank = set2_left ? 32 : 0;
+		int const right_col = linedata[set2_left ? 0x7f : (0x7f + 0x200)] & 0xf;
+		int const right_bank = set2_left ? 0 : 32;
 
-		int x;
-
-		/* Fill in left of road segment */
-		for (x=0; (x < startPos) && (x < cliprect.max_x+1); x++)
+		uint32_t *const dest = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			int col = linedata[0]&0xf;
-			bitmap.pix(y, x) = m_palette->pen(256 + pal*16 + col);
-		}
-
-		/* If startpos is negative, clip it and adjust the sampling position accordingly */
-		if (startPos<0)
-		{
-			samplePos=step*(0-startPos);
-			startPos=0;
-		}
-		else
-		{
-			samplePos=0;
-		}
-
-		/* Fill in main part of road, then right-hand side edge */
-		for (x=startPos; x < (cliprect.max_x + 1) && ((samplePos>>11)<0x80); x++)
-		{
-			// look up colour
-			int col = linedata[(samplePos>>11)&0x7f]&0xf;
-
-			/* Clamp if we have reached the end of the pixel data */
-			//if ((samplePos>>11) > 0x7f)
-			//  col=linedata[0x7f]&0xf;
-
-			bitmap.pix(y, x) = m_palette->pen(256 + pal*16 + col);
-
-			samplePos+=step;
-		}
-
-		/* Now work out how many pixels until start of 2nd segment */
-		startPos=x;
-
-		if (shift2&0x8000)
-			shift2=-(0x10000 - shift2);
-		shift2=-shift2;
-
-		if (step)
-			endPos=((shift2<<8) + 0x80) / step;
-		else
-			endPos=0;
-		endPos-=128;
-		endPos=startPos+endPos;
-
-		/* Fill pixels */
-		for (x=startPos; x < (cliprect.max_x+1) && (x < endPos); x++)
-		{
-			int col = linedata[0x80]&0xf;
-
-			/* Clamp if we have reached the end of the pixel data */
-			//if ((samplePos>>11) > 0x7f)
-			//  col=linedata[0x7f]&0xf;
-
-			bitmap.pix(y, x) = m_palette->pen(256 + pal*16 + col + 32);
-		}
-
-		if (endPos<0)
-		{
-			// end of left intersection (taking right turn)
-			samplePos=step*(0-startPos);
-		}
-		else if (endPos<x)
-		{
-			// start of right intersection
-			samplePos=step*(x-endPos);
-		}
-		else
-		{
-			// end of right intersection (taking right turn)
-			samplePos=0; // todo
-		}
-
-		for (/*x=endPos*/; x < cliprect.max_x+1; x++)
-		{
-			// look up colour
-			int col = linedata[((samplePos>>11)&0x7f) + 0x200]&0xf;
-
-			/* Clamp if we have reached the end of the pixel data */
-			if ((samplePos>>11) > 0x7f)
-				col=linedata[0x7f + 0x200]&0xf;
-
-			bitmap.pix(y, x) = m_palette->pen(256 + pal*16 + col + 32);
-
-			samplePos+=step;
+			int col;
+			int bank = 0;
+			int64_t const pos1 = int64_t(x - start1) * step;
+			int64_t const pos2 = int64_t(x - start2) * step;
+			bool const in1 = pos1 >= 0 && (pos1 >> 11) < 0x80;
+			bool const in2 = pos2 >= 0 && (pos2 >> 11) < 0x80;
+			if (in1 && in2)
+			{
+				// Where the sets overlap, as in a fork, the higher pen appears to win so that the asphalt
+				// of one set covers the kerb of the other and the two roads merge
+				int const col1 = linedata[pos1 >> 11] & 0xf;
+				int const col2 = linedata[(pos2 >> 11) + 0x200] & 0xf;
+				if (col2 > col1)
+				{
+					col = col2;
+					bank = 32;
+				}
+				else
+				{
+					col = col1;
+				}
+			}
+			else if (in1)
+				col = linedata[pos1 >> 11] & 0xf;
+			else if (in2)
+			{
+				col = linedata[(pos2 >> 11) + 0x200] & 0xf;
+				bank = 32;
+			}
+			else if (x < start1 && x < start2)
+			{
+				col = left_col;                              // left of both sets
+				bank = left_bank;
+			}
+			else if (x >= start1 && x >= start2)
+			{
+				col = right_col;                             // right of both sets
+				bank = right_bank;
+			}
+			else
+			{
+				col = linedata[0x80] & 0xf;                  // between the sets
+				bank = 32;
+			}
+			dest[x] = m_palette->pen(256 + pal*16 + col + bank + (shadow.pix(y, x) ? SHADOW_PALETTE_OFFSET : 0));
 		}
 		data+=4;
 	}
@@ -354,7 +322,7 @@ offset is from last pixel of first road segment?
 // background layer landscape for Round Up 5
 // two bitmap layers, back layer is 512 x 128, the other one is 512 x 64
 // it's safe to assume that three monitor version will have a different arrangement here ...
-void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint8_t type)
+void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &cliprect, const bitmap_ind8 &shadow, uint8_t type)
 {
 	// TODO: guess, assume back layer having less scroll increment than front for parallax scrolling.
 	// also notice that m_vregs[8/2] >> 8 is identical to [0x0c/2], always?
@@ -385,7 +353,7 @@ void roundup5_state::draw_landscape(bitmap_rgb32 &bitmap, const rectangle &clipr
 			color &= 0xf;
 
 			if(cliprect.contains(x, y+y_scroll) && color)
-				bitmap.pix(y+y_scroll, x) = m_palette->pen(color+color_base);
+				bitmap.pix(y+y_scroll, x) = m_palette->pen(color + color_base + (shadow.pix(y+y_scroll, x) ? SHADOW_PALETTE_OFFSET : 0));
 		}
 	}
 }
@@ -402,13 +370,25 @@ uint32_t roundup5_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	m_tx_layer->set_scrollx(0,24);
 	m_tx_layer->set_scrolly(0,(tx_start_addr >> 4) | m_hd6445_reg[0x1d]);
 
-	bitmap.fill(m_palette->pen(384), cliprect); // todo
 	screen.priority().fill(0, cliprect);
 	m_sprites->draw_sprites(screen.priority(),cliprect,1,(m_sprite_control_ram[0xe0]&0x1000) ? 0x1000 : 0); // Alpha pass only
-	draw_landscape(bitmap,cliprect,0);
-	draw_landscape(bitmap,cliprect,1);
-	draw_road(bitmap,cliprect);
-	apply_shadow_bitmap(bitmap,cliprect,screen.priority(), 0);
+
+	// Pixels under a shadow sprite take their colour from the shadow half of the palette. While in
+	// a tunnel the game fills that half with the scenery colours (and blacks out the normal half),
+	// so the tunnel mouth, a shadow sprite, reveals the scenery beyond it as it grows.
+	bitmap_ind8 const &shadow = screen.priority();
+	pen_t const fill_pen = m_palette->pen(384); // TODO
+	pen_t const shadow_pen = m_palette->pen(384 + SHADOW_PALETTE_OFFSET);
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	{
+		uint32_t *const dest = &bitmap.pix(y);
+		uint8_t const *const src = &shadow.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
+			dest[x] = src[x] ? shadow_pen : fill_pen;
+	}
+	draw_landscape(bitmap,cliprect,shadow,0);
+	draw_landscape(bitmap,cliprect,shadow,1);
+	draw_road(bitmap,cliprect,shadow);
 	if(m_control_word & 0x80) // enabled on map screen after a play
 	{
 		m_tx_layer->draw(screen, bitmap, cliprect, 0,0);
@@ -465,7 +445,8 @@ void roundup5_state::roundup5_control_w(offs_t offset, uint16_t data, uint16_t m
 //  if (offset == 1 && (tatsumi_control_w & 0xfeff) != (last_bank & 0xfeff))
 //      logerror("%s:  Changed bank to %04x (%d)\n", m_maincpu->pc(), tatsumi_control_w,offset);
 
-//todo - watchdog
+	// The control word latch drives the MB3773 watchdog clock (EHCK); the program pulses it every frame
+	m_watchdog->write_line_ck(BIT(m_control_word, 8));
 
 	/* Bank:
 
@@ -599,7 +580,7 @@ static INPUT_PORTS_START( roundup5 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -702,6 +683,8 @@ void roundup5_state::roundup5(machine_config &config)
 
 	config.set_maximum_quantum(attotime::from_hz(6000));
 
+	MB3773(config, m_watchdog); // resets the board when the program stops pulsing the clock
+
 	i8255_device &ppi(I8255(config, "ppi"));
 	ppi.in_pa_callback().set_ioport("IN0");
 	ppi.in_pb_callback().set_ioport("IN1");
@@ -780,4 +763,4 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, init_tatsumi,  ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING, layout_roundup5 )
+GAMEL(1989, roundup5,  0,        roundup5,  roundup5, roundup5_state, init_tatsumi,  ROT0, "Tatsumi", "Round Up 5 - Super Delta Force", MACHINE_IMPERFECT_GRAPHICS, layout_roundup5 )

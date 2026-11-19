@@ -53,7 +53,7 @@ public:
 		m_rambank(*this, "rambank")
 	{ }
 
-	void hcastle(machine_config &config);
+	void hcastle(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -81,7 +81,7 @@ private:
 	int32_t m_old_pf[2]{};
 	uint8_t m_gfx_bank = 0;
 
-	void palette(palette_device &palette) const;
+	void palette(palette_device &palette) const ATTR_COLD;
 
 	TILEMAP_MAPPER_MEMBER(tilemap_scan);
 	template <uint8_t Which> TILE_GET_INFO_MEMBER(get_tile_info);
@@ -146,19 +146,16 @@ TILEMAP_MAPPER_MEMBER(hcastle_state::tilemap_scan)
 template <uint8_t Which> // 0 = FG, 1 = BG
 TILE_GET_INFO_MEMBER(hcastle_state::get_tile_info)
 {
-	uint8_t ctrl_5 = m_k007121[Which]->ctrl_r(5);
-	uint8_t ctrl_6 = m_k007121[Which]->ctrl_r(6);
-	int bit0 = (ctrl_5 >> 0) & 0x03;
-	int bit1 = (ctrl_5 >> 2) & 0x03;
-	int bit2 = (ctrl_5 >> 4) & 0x03;
-	int bit3 = (ctrl_5 >> 6) & 0x03;
-	int attr = m_pf_videoram[Which][tile_index];
-	int tile = m_pf_videoram[Which][tile_index + 0x400];
-	int color = attr & 0x7;
-	int bank = ((attr >> (bit0 + 3)) & 0x01) |
-			((attr >> (bit1 + 2)) & 0x02) |
-			((attr >> (bit2 + 1)) & 0x04) |
-			((attr >> (bit3 + 0)) & 0x08);
+	uint8_t const ctrl_5 = m_k007121[Which]->ctrl_r(5);
+	uint8_t const ctrl_6 = m_k007121[Which]->ctrl_r(6);
+	int const bit0 = (ctrl_5 >> 0) & 0x03;
+	int const bit1 = (ctrl_5 >> 2) & 0x03;
+	int const bit2 = (ctrl_5 >> 4) & 0x03;
+	int const bit3 = (ctrl_5 >> 6) & 0x03;
+	int const attr = m_pf_videoram[Which][tile_index];
+	int const tile = m_pf_videoram[Which][tile_index + 0x400];
+	int const color = attr & 0x7;
+	int bank = bitswap<4>(attr, bit3 + 3, bit2 + 3, bit1 + 3, bit0 + 3);
 	bank = ((attr & 0x80) >> 7) | (bank << 1);
 
 	tileinfo.set(0,

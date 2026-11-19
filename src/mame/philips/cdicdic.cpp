@@ -43,6 +43,8 @@ TODO:
 
 namespace {
 
+constexpr uint16_t NO_MAP_POSITION = 0xffff;
+
 constexpr int16_t clip_int16(int32_t sample)
 {
 	return int16_t(std::clamp<int32_t>(sample, -32768, 32767));
@@ -372,12 +374,6 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 		return;
 	}
 
-	if (coding & 0x40)
-	{
-		LOGMASKED(LOG_SECTORS, "Emphasis is not implemented (%02x), ignoring\n", coding);
-		// TODO: Emphasis is commonly used. Do not throw a fatal error.
-	}
-
 	int channels = 2;
 	//offs_t buffer_length = 1;
 	if (!(coding & CODING_STEREO))
@@ -421,8 +417,10 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 
 	LOGMASKED(LOG_SECTORS, "Coding %02x, %d channels, %d bits, %08x frequency\n", coding, channels, bits, sample_frequency);
 
-	m_dmadac[0]->set_frequency(sample_frequency);
-	m_dmadac[1]->set_frequency(sample_frequency);
+	// Upsample 18.9kHz. This prevents stretching during rate changes.
+	const bool half_rate = (coding & CODING_RATE_MASK) == CODING_18KHZ;
+	m_dmadac[0]->set_frequency(clock2() / 512.0f);
+	m_dmadac[1]->set_frequency(clock2() / 512.0f);
 	m_dmadac[0]->set_volume(0x100);
 	m_dmadac[1]->set_volume(0x100);
 
@@ -446,6 +444,29 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 			offset += 28 * num_samples;
 		}
 
+		if (coding & CODING_EMPHASIS)
+		{
+			// 50/15 us de-emphasis, y = g * (x - z * x') + p * y'
+			static const float s_deemph[2][3] =
+			{
+				{ 0.475001f,  0.135021f, 0.589135f }, // 37.8 kHz: g, z, p
+				{ 0.614375f, -0.062739f, 0.347080f }  // 18.9 kHz
+			};
+			const float *const coef = s_deemph[(coding & CODING_RATE_MASK) == CODING_18KHZ];
+			for (int ch = 0; ch < channels; ch++)
+			{
+				int16_t *const samples = &m_samples[ch][0];
+				for (uint16_t i = 0; i < 18 * 28 * num_samples; i++)
+				{
+					const float x = samples[i];
+					const float y = coef[0] * (x - coef[1] * m_deemph_x1[ch]) + coef[2] * m_deemph_y1[ch];
+					m_deemph_x1[ch] = x;
+					m_deemph_y1[ch] = y;
+					samples[i] = int16_t(std::clamp(y, -32768.0f, 32767.0f));
+				}
+			}
+		}
+
 		int16_t sampleL = 0, sampleR = 0, outL = 0, outR = 0;
 		const float scaleLL = m_atten[0] / 255.0f;
 		const float scaleLR = m_atten[1] / 255.0f;
@@ -456,8 +477,16 @@ void cdicdic_device::play_audio_sector(const uint8_t coding, const uint8_t *data
 			sampleL = m_samples[0][i];
 			sampleR = m_samples[coding & CODING_STEREO][i];
 
+			const int16_t prevL = outL, prevR = outR;
 			outL = int16_t(std::clamp(sampleL * scaleLL + sampleR * scaleRL, -32768.0f, 32767.0f));
 			outR = int16_t(std::clamp(sampleL * scaleLR + sampleR * scaleRR, -32768.0f, 32767.0f));
+			if (half_rate)
+			{
+				int16_t midL = i ? (prevL + outL) >> 1 : outL;
+				int16_t midR = i ? (prevR + outR) >> 1 : outR;
+				m_dmadac[0]->transfer(0, 1, 1, 1, &midL);
+				m_dmadac[1]->transfer(0, 1, 1, 1, &midR);
+			}
 			m_dmadac[0]->transfer(0, 1, 1, 1, &outL);
 			m_dmadac[1]->transfer(0, 1, 1, 1, &outR);
 		}
@@ -485,7 +514,7 @@ TIMER_CALLBACK_MEMBER( cdicdic_device::audio_tick )
 
 void cdicdic_device::process_audio_map()
 {
-	if (m_decode_addr == 0xffff)
+	if (m_decode_addr == NO_MAP_POSITION)
 	{
 		m_audio_sector_counter = 0;
 		m_audio_format_sectors = 0;
@@ -518,8 +547,9 @@ void cdicdic_device::process_audio_map()
 	}
 	else
 	{
-		m_decode_addr = 0xffff;
+		m_decode_addr = NO_MAP_POSITION;
 		m_audio_sector_counter = 0;
+		m_z_buffer |= 0x0001;
 	}
 
 	if (was_decoding)
@@ -745,8 +775,9 @@ void cdicdic_device::process_disc_sector()
 	uint8_t buffer[2560] = { 0 };
 	m_cdrom->read_data(m_curr_lba, buffer, cdrom_file::CD_TRACK_RAW_DONTCARE);
 
-	// Detect (badly) if we're dealing with a byteswapped loose-bin image
-	if (buffer[0] == 0xff && buffer[1] == 0x00)
+	// Detect a byteswapped loose-bin image from a data sector's sync pattern
+	static const uint8_t s_byteswapped_sync[12] = { 0xff, 0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0xff };
+	if (m_disc_mode != DISC_CDDA && !memcmp(buffer, s_byteswapped_sync, sizeof(s_byteswapped_sync)))
 	{
 		LOGMASKED(LOG_SECTORS, "Byteswapping\n");
 		m_cd_byteswap = true;
@@ -799,6 +830,7 @@ void cdicdic_device::process_disc_sector()
 			LOGMASKED(LOG_SECTORS, "Audio is selected\n");
 			m_audio_sector_counter = get_sector_count_for_coding(buffer[SECTOR_CODING2]);
 			m_decoding_audio_map = false;
+			m_decode_addr = NO_MAP_POSITION;
 
 			play_audio_sector(buffer[SECTOR_CODING2], buffer + SECTOR_DATA);
 		}
@@ -810,6 +842,7 @@ void cdicdic_device::process_disc_sector()
 
 		m_audio_sector_counter = 2;
 		m_decoding_audio_map = false;
+		m_decode_addr = NO_MAP_POSITION;
 
 		// Byteswap if not already detected as byteswapped
 		if (!m_cd_byteswap)
@@ -825,11 +858,6 @@ void cdicdic_device::process_disc_sector()
 		else
 		{
 			play_cdda_sector(buffer);
-		}
-
-		if (frac != 0 && cdg == nullptr)
-		{
-			return;
 		}
 	}
 
@@ -1075,10 +1103,14 @@ uint16_t cdicdic_device::regs_r(offs_t offset, uint16_t mem_mask)
 		}
 
 		case 0x3ffa/2: // AUDCTL
-			if (!m_decoding_audio_map)
-				m_z_buffer ^= 0x0001;
-			LOGMASKED(LOG_READS, "%s: cdic_r: Z-Buffer Register Read: %04x & %04x\n", machine().describe_context(), m_z_buffer, mem_mask);
-			return m_z_buffer;
+		{
+			// bit 11: audio map decoding (live); bit 0: decoder went idle since the last read
+			const uint16_t data = (m_z_buffer & ~0x0800) | ((m_decoding_audio_map && m_decode_addr != NO_MAP_POSITION) ? 0x0800 : 0);
+			if (!machine().side_effects_disabled())
+				m_z_buffer &= ~0x0001;
+			LOGMASKED(LOG_READS, "%s: cdic_r: Z-Buffer Register Read: %04x & %04x\n", machine().describe_context(), data, mem_mask);
+			return data;
+		}
 
 		case 0x3ffe/2:
 			LOGMASKED(LOG_READS, "%s: cdic_r: Data buffer Register = %04x & %04x\n", machine().describe_context(), m_data_buffer, mem_mask);
@@ -1170,21 +1202,35 @@ void cdicdic_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		}
 
 		case 0x3ffa/2:
+		{
 			LOGMASKED(LOG_WRITES, "%s: cdic_w: Z-Buffer Register Write: %04x & %04x\n", machine().describe_context(), data, mem_mask);
 			COMBINE_DATA(&m_z_buffer);
 			if (!(m_z_buffer & 0x2000))
 			{
-				m_decode_addr = 0xffff;
+				// bit 11 requests decoder status; bit 0 reads the answer
+				if ((m_z_buffer & 0x0800) && m_audio_sector_counter == 0)
+					m_z_buffer |= 0x0001;
+
+				if (m_decoding_audio_map)
+				{
+					m_decoding_audio_map = false;
+					m_audio_sector_counter = 0;
+					m_audio_format_sectors = 0;
+				}
 			}
-			else if (!m_decoding_audio_map)
+			else if (!m_decoding_audio_map || m_decode_addr == NO_MAP_POSITION)
 			{
-				m_decode_addr = m_z_buffer & 0x3a00;
+				if (m_decode_addr == NO_MAP_POSITION)
+					m_decode_addr = m_z_buffer & 0x3a00;
 				m_audio_format_sectors = 0;
 				m_audio_sector_counter = 1;
 				m_decoding_audio_map = true;
 				std::fill_n(m_xa_last, 4, 0);
+				std::fill_n(m_deemph_x1, 2, 0.0f);
+				std::fill_n(m_deemph_y1, 2, 0.0f);
 			}
 			break;
+		}
 
 		case 0x3ffc/2:
 			LOGMASKED(LOG_WRITES, "%s: cdic_w: Interrupt Vector Register = %04x & %04x\n", machine().describe_context(), data, mem_mask);
@@ -1205,6 +1251,8 @@ void cdicdic_device::regs_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 				m_disc_mode = 0;
 				m_disc_spinup_counter = 0;
 				m_curr_lba = 0;
+				m_x_buffer &= 0x7fff; // Data-ready interrupt is only serviced while bit 14 is set
+				update_interrupt_state();
 			}
 			break;
 
@@ -1354,6 +1402,8 @@ void cdicdic_device::device_start()
 	save_item(NAME(m_interrupt_vector));
 	save_item(NAME(m_data_buffer));
 
+	save_item(NAME(m_cd_byteswap));
+
 	save_item(NAME(m_disc_command));
 	save_item(NAME(m_disc_mode));
 	save_item(NAME(m_disc_spinup_counter));
@@ -1366,6 +1416,8 @@ void cdicdic_device::device_start()
 
 	save_item(NAME(m_atten));
 	save_item(NAME(m_xa_last));
+	save_item(NAME(m_deemph_x1));
+	save_item(NAME(m_deemph_y1));
 
 	m_audio_timer = timer_alloc(FUNC(cdicdic_device::audio_tick), this);
 	m_audio_timer->adjust(attotime::never);
@@ -1377,6 +1429,11 @@ void cdicdic_device::device_start()
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
+
+void cdicdic_device::device_post_load()
+{
+	update_interrupt_state();
+}
 
 void cdicdic_device::device_reset()
 {
@@ -1402,7 +1459,7 @@ void cdicdic_device::device_reset()
 	m_audio_sector_counter = 0;
 	m_audio_format_sectors = 0;
 	m_decoding_audio_map = false;
-	m_decode_addr = 0;
+	m_decode_addr = NO_MAP_POSITION;
 
 	m_audio_timer->adjust(attotime::from_hz(75), 0, attotime::from_hz(75));
 	m_sector_timer->adjust(attotime::from_hz(75), 0, attotime::from_hz(75));
@@ -1414,6 +1471,8 @@ void cdicdic_device::device_reset()
 
 	std::fill_n(m_atten, 4, 0xff);
 	std::fill_n(m_xa_last, 4, 0);
+	std::fill_n(m_deemph_x1, 2, 0.0f);
+	std::fill_n(m_deemph_y1, 2, 0.0f);
 }
 
 void cdicdic_device::ram_w(offs_t offset, uint16_t data, uint16_t mem_mask)

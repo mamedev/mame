@@ -68,7 +68,7 @@
 DEFINE_DEVICE_TYPE(SH7709S, sh7709s_device, "sh7709s", "Hitachi SH7709S")
 
 sh7709s_device::sh7709s_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock, endianness_t endianness)
-	: sh3_base_device(mconfig, SH7709S, tag, owner, clock, endianness)
+	: sh7709_base_device(mconfig, SH7709S, tag, owner, clock, endianness)
 {
 }
 

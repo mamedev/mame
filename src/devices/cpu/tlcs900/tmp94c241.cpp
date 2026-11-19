@@ -496,7 +496,7 @@ void tmp94c241_device::change_timer_flipflop(uint8_t flipflop, uint8_t operation
 		case 0x8:
 			if (!BIT(m_port_function[PORT_E], 0)) return;
 			break;
-		case 0xA:
+		case 0xa:
 			if (!BIT(m_port_function[PORT_E], 4)) return;
 			break;
 		default:
@@ -792,6 +792,9 @@ uint8_t tmp94c241_device::port_r()
 	/* Reading a port returns:
 	   - Output latch value for bits configured as output (PXCR bit = 1)
 	   - External pin level for bits configured as input (PXCR bit = 0) */
+	// ports A and B have no control register: their pins are outputs
+	if constexpr (P == PORT_A || P == PORT_B)
+		return m_port_latch[P];
 	uint8_t dir = m_port_control[P];
 	uint8_t external = m_port_read[P](0);
 	return (m_port_latch[P] & dir) | (external & ~dir);
@@ -1343,33 +1346,15 @@ void tmp94c241_device::tlcs900_check_irqs()
 		// Clear taken IRQ
 		m_int_reg[irq_vector_map[irq].reg] &= ~ irq_vector_map[irq].iff;
 
-		// Level-detect re-assertion: Level-triggered interrupt
-		// flags are continuously driven by the input level. Clearing the flag
-		// during dispatch has no lasting effect if the input is still asserted.
-		// Re-assert INT0 flag if input is still active in level-detect mode.
-		// Only the ISR-driven path may re-assert. When a micro-DMA channel is
-		// armed on the INT0 start vector the DMA engine consumes each request and
-		// manages the flag itself; re-asserting there makes it read stale latch
-		// data.
+		// In level mode the INT0 flag follows the pin, so taking the
+		// interrupt does not clear it while the pin is still high.
 		if (irq_vector_map[irq].reg == INTE0AD &&
 			irq_vector_map[irq].iff == 0x08 &&
-			!(m_iimc & 0x02) &&
+			BIT(m_iimc, 1) &&
 			m_level[TLCS900_INT0] == ASSERT_LINE)
 		{
-			bool hdma_steals_int0 = false;
-			for (int ch = 0; ch < 4; ch++)
-			{
-				if (m_dma_vector[ch] == 0x0a)
-				{
-					hdma_steals_int0 = true;
-					break;
-				}
-			}
-			if (!hdma_steals_int0)
-			{
-				m_int_reg[INTE0AD] |= 0x08;
-				m_check_irqs = 1;
-			}
+			m_int_reg[INTE0AD] |= 0x08;
+			m_check_irqs = 1;
 		}
 
 		// Compute the default priority index from the vector table.
@@ -1618,7 +1603,8 @@ void tmp94c241_device::execute_set_input(int input, int level)
 			break;
 
 		case TLCS900_INT0:
-			if (m_iimc & 0x02)
+			// IIMC bit 1 (I0LE) set selects level detection
+			if (!BIT(m_iimc, 1))
 			{
 				// Rising edge detect
 				if (level != m_level[TLCS900_INT0] && level == ASSERT_LINE)

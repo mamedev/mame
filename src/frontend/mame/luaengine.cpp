@@ -2385,6 +2385,15 @@ void lua_engine::initialize()
 	sound_type["system_mute"] = sol::property(
 			static_cast<bool (sound_manager::*)() const>(&sound_manager::system_mute),
 			static_cast<void (sound_manager::*)(bool)>(&sound_manager::system_mute));
+	sound_type["volume"] = sol::property(
+			[] (sound_manager &sm) -> float
+			{
+				return osd::linear_to_db(sm.master_gain());
+			},
+			[] (sound_manager &sm, float db)
+			{
+				sm.set_master_gain(osd::db_to_linear(db));
+			});
 	sound_type["recording"] = sol::property(&sound_manager::is_recording);
 
 

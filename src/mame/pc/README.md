@@ -46,9 +46,11 @@ ISA debug port $80, `wpiset 0x80,1,w,1,{printf "%02x",wpdata;g}`.
 
 - Booting in Award BootBlock: implement shadow RAM;
 - PCI targets with OHCI (and probably EHCI) may crash at startup: implement USB chipset, requires relocatable BAR that will default to RAM $0 if not implemented;
-- "Unknown" CPU: r/w the info thru CMOS (Phoenix BIOSes do something similar);
+- "Unknown" CPU reported in POST info messages: Phoenix BIOSes (at least) r/w that info thru CMOS;
 - DOS (up to Win98) startup stuck while looping around on clearly incorrect conventional memory opcodes: fix A20, chipset possibly has fast A20 mechanism at I/O $92;
 - Award System Config shows N/A for PCI card IRQs: check PCI config space numbering, use cards with confirmed good line/pin setup.
 - Running awfully slow with moderate CPU clocks: don't use `DERIVED_CLOCK` with PIT;
 - Early PCI hosts make no dword access to PCI config space, ISA video card works but PCI don't: check that
 it r/w at $c000 then implement [Configuration Space Access Mechanism 2](https://wiki.osdev.org/PCI#Configuration_Space_Access_Mechanism_#2) if it does;
+- DMA16 diagnose test fails for Sound Blaster 16 mounted thru `-isaN sb16_lle`: check that chipset r/w high byte properly in channels, like this [PR patch](https://github.com/mamedev/mame/pull/16542/changes);
+- "Floppy disk error(80)" or problems with secondary IDE at POST: check that chipset and/or Super I/O used don't clash mapping at $3f0-$3f7;

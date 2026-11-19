@@ -94,6 +94,7 @@ DEFINE_DEVICE_TYPE(PIC16C622A, pic16c622a_device, "pic16c622a", "Microchip PIC16
 DEFINE_DEVICE_TYPE(PIC16CR83,  pic16cr83_device,  "pic16cr83",  "Microchip PIC16CR83")
 DEFINE_DEVICE_TYPE(PIC16CR84,  pic16cr84_device,  "pic16cr84",  "Microchip PIC16CR84")
 DEFINE_DEVICE_TYPE(PIC16F628A, pic16f628a_device, "pic16f628a", "Microchip PIC16F628A")
+DEFINE_DEVICE_TYPE(PIC16F648A, pic16f648a_device, "pic16f648a", "Microchip PIC16F648A")
 DEFINE_DEVICE_TYPE(PIC16F83,   pic16f83_device,   "pic16f83",   "Microchip PIC16F83")
 DEFINE_DEVICE_TYPE(PIC16F84,   pic16f84_device,   "pic16f84",   "Microchip PIC16F84")
 DEFINE_DEVICE_TYPE(PIC16F84A,  pic16f84a_device,  "pic16f84a",  "Microchip PIC16F84A")
@@ -164,8 +165,18 @@ pic16cr84_device::pic16cr84_device(const machine_config &mconfig, const char *ta
 {
 }
 
+pic16f6xxa_device::pic16f6xxa_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, address_map_constructor data_map, u16 eeprom_size)
+	: pic16_mid_eeprom_device(mconfig, type, tag, owner, clock, program_width, data_map, eeprom_size, 0xff, 0xff)
+{
+}
+
 pic16f628a_device::pic16f628a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: pic16_mid_eeprom_device(mconfig, PIC16F628A, tag, owner, clock, 11, address_map_constructor(FUNC(pic16f628a_device::data_map), this), 128, 0xff, 0xff)
+	: pic16f6xxa_device(mconfig, PIC16F628A, tag, owner, clock, 11, address_map_constructor(FUNC(pic16f628a_device::data_map), this), 128)
+{
+}
+
+pic16f648a_device::pic16f648a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: pic16f6xxa_device(mconfig, PIC16F648A, tag, owner, clock, 12, address_map_constructor(FUNC(pic16f648a_device::data_map), this), 256)
 {
 }
 
@@ -310,7 +321,7 @@ void pic16cr84_device::data_map(address_map &map)
 	map(0x0c, 0x4f).ram().mirror(0x80);
 }
 
-void pic16f628a_device::data_map(address_map &map)
+void pic16f6xxa_device::base_map(address_map &map)
 {
 	// bank 0
 	map(0x000, 0x000).mirror(0x180).noprw(); // "indirect addr." - not a physical register
@@ -374,10 +385,21 @@ void pic16f628a_device::data_map(address_map &map)
 	map(0x10e, 0x10e).mirror(0x080).noprw();
 	map(0x10f, 0x10f).mirror(0x080).noprw();
 	map(0x110, 0x11f).mirror(0x080).noprw();
-	map(0x120, 0x14f).ram();
 	map(0x150, 0x16f).mirror(0x080).noprw();
 	// bank 3
 	map(0x190, 0x1ef).noprw();
+}
+
+void pic16f628a_device::data_map(address_map &map)
+{
+	pic16f6xxa_device::base_map(map);
+	map(0x120, 0x14f).ram();
+}
+
+void pic16f648a_device::data_map(address_map &map)
+{
+	pic16f6xxa_device::base_map(map);
+	map(0x120, 0x16f).ram();
 }
 
 void pic16f83_device::data_map(address_map &map)
@@ -439,7 +461,6 @@ void pic16_mid_device::device_start()
 	m_inst_cycles = 0;
 	m_status_write_protect = TO_FLAG | PD_FLAG;
 	m_stack_pointer = 0;
-	m_debugger_temp = 0;
 	m_portb_mismatch_detect = 0xff;
 	m_sleeping = false;
 
@@ -482,15 +503,41 @@ void pic16_mid_device::device_start()
 	save_item(NAME(m_sleeping));
 
 	// debugger
-	state_add(PIC16_MID_PC,     "PC",   m_PC).mask(PC_MASK).formatstr("%04X");
-	state_add(PIC16_MID_W,      "W",    m_W).formatstr("%02X");
-	state_add(PIC16_MID_ALU,    "ALU",  m_ALU).formatstr("%02X");
-	state_add(PIC16_MID_CONFIG, "CNF",  m_CONFIG).formatstr("%04X");
-	state_add(PIC16_MID_PSCL,   "PSCL", m_debugger_temp).callimport().formatstr("%3s");
+	state_add(PIC16_MID_CONFIG, "CONFIG", m_CONFIG).formatstr("%04X").readonly();
+	state_add(PIC16_MID_PC,     "PC",     m_PC).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_FSR,    "FSR",    m_FSR).formatstr("%02X");
+	state_add(PIC16_MID_PCLATH, "PCLATH", m_PCLATH).mask(0x1f).formatstr("%02X");
 
-	state_add(STATE_GENPC,     "GENPC",    m_PC).noshow();
-	state_add(STATE_GENPCBASE, "CURPC",    m_PREVPC).noshow();
-	state_add(STATE_GENFLAGS,  "GENFLAGS", m_OPTION).formatstr("%13s").noshow();
+	state_add<u8>(PIC16_MID_BANK, "BANK",
+		[this]() -> u8 { return (m_STATUS >> 5) & 0x03; },
+		[this](u8 data) { m_STATUS = (m_STATUS & ~(RP1_FLAG | RP0_FLAG)) | (data << 5); }
+	).mask((m_status_mask >> 5) & 0x03).formatstr("%01X");
+
+	state_add(PIC16_MID_W, "W", m_W).formatstr("%02X");
+
+	state_add<u8>(PIC16_MID_PRESCALER, "PRESCALER",
+		[this]() -> u8 { return m_prescaler & 0xff; },
+		[this](u8 data) { m_prescaler = data; }
+	).formatstr("%2s");
+
+	state_add(PIC16_MID_LATCHA,   "LATCHA",   m_port_data[PORTA]).mask(m_porta_mask).formatstr("%02X").readonly();
+	state_add(PIC16_MID_LATCHB,   "LATCHB",   m_port_data[PORTB]).formatstr("%02X").readonly();
+	state_add(PIC16_MID_STACKPTR, "STACKPTR", m_stack_pointer).mask(0x07).formatstr("%01X");
+	state_add(PIC16_MID_STACK0,   "STACK0",   m_STACK[0]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK1,   "STACK1",   m_STACK[1]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK2,   "STACK2",   m_STACK[2]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK3,   "STACK3",   m_STACK[3]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK4,   "STACK4",   m_STACK[4]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK5,   "STACK5",   m_STACK[5]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK6,   "STACK6",   m_STACK[6]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_STACK7,   "STACK7",   m_STACK[7]).mask(PC_MASK).formatstr("%04X");
+	state_add(PIC16_MID_SLEEP,    "SLEEP",    m_sleeping).formatstr("%01X").readonly();
+
+	state_add<u8>(PIC16_MID_WDT, "WDT", []() -> u8 { return 0; }).formatstr("%11s");
+
+	state_add(STATE_GENPC,        "GENPC",    m_PC).noshow();
+	state_add(STATE_GENPCBASE,    "CURPC",    m_PREVPC).noshow();
+	state_add(STATE_GENFLAGS,     "GENFLAGS", m_STATUS).mask(m_status_mask).formatstr("%8s").noshow();
 
 	set_icountptr(m_icount);
 }
@@ -526,7 +573,7 @@ void pic16_mid_eeprom_device::device_start()
 	save_pointer(NAME(m_eeprom_data), m_internal_eeprom_size);
 }
 
-void pic16f628a_device::device_start()
+void pic16f6xxa_device::device_start()
 {
 	pic16_mid_eeprom_device::device_start();
 
@@ -588,7 +635,7 @@ void pic16_mid_eeprom_device::device_reset()
 	m_eeprom_unlock_state = EEPROM_LOCKED;
 }
 
-void pic16f628a_device::device_reset()
+void pic16f6xxa_device::device_reset()
 {
 	pic16_mid_eeprom_device::device_reset();
 
@@ -609,44 +656,29 @@ void pic16f628a_device::device_reset()
 //  DEBUGGER
 //**************************************************************************
 
-void pic16_mid_device::state_import(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case PIC16_MID_PSCL:
-			m_prescaler = m_debugger_temp;
-			break;
-	}
-}
-
-void pic16_mid_device::state_export(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-	}
-}
-
 void pic16_mid_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
-		case PIC16_MID_PSCL:
-			str = string_format("%c%02X", ((m_OPTION & 0x08) ? 'W' : 'T'), m_prescaler);
+		case STATE_GENFLAGS:
+			str = string_format("%c %c%c %c%c%c",
+				BIT(m_STATUS, 7) ? 'I' : '.',
+				BIT(m_STATUS, 4) ? 'T' : '.',
+				BIT(m_STATUS, 3) ? 'P' : '.',
+				BIT(m_STATUS, 2) ? 'Z' : '.',
+				BIT(m_STATUS, 1) ? 'D' : '.',
+				BIT(m_STATUS, 0) ? 'C' : '.');
 			break;
 
-		case STATE_GENFLAGS:
-			str = string_format("%01x%c%c%c%c%c %c%c%c%03x",
-				(m_STATUS & 0xe0) >> 5,
-				m_STATUS & 0x10 ? '.':'O',      // WDT Overflow
-				m_STATUS & 0x08 ? 'P':'D',      // Power/Down
-				m_STATUS & 0x04 ? 'Z':'.',      // Zero
-				m_STATUS & 0x02 ? 'c':'b',      // Nibble Carry/Borrow
-				m_STATUS & 0x01 ? 'C':'B',      // Carry/Borrow
+		case PIC16_MID_PRESCALER:
+			str = (m_OPTION & PSA_FLAG) ? "--" : string_format("%02X", m_prescaler & 0xff);
+			break;
 
-				m_OPTION & 0x20 ? 'C':'T',    // Counter/Timer
-				m_OPTION & 0x10 ? 'N':'P',    // Negative/Positive
-				m_OPTION & 0x08 ? 'W':'T',    // WatchDog/Timer
-				m_OPTION & 0x08 ? (1<<(m_OPTION&7)) : (2<<(m_OPTION&7)));
+		case PIC16_MID_WDT:
+			{
+				const attotime remaining = m_wdt_timer->remaining();
+				str = remaining.is_never() ? "disabled" : string_format("%.3f ms", remaining.as_double() * 1000.0);
+			}
 			break;
 	}
 }
@@ -771,7 +803,7 @@ bool pic16_mid_eeprom_device::irq_active() const
 	return false;
 }
 
-bool pic16f628a_device::irq_active() const
+bool pic16f6xxa_device::irq_active() const
 {
 	if (pic16_mid_device::irq_active())
 		return true;
@@ -896,7 +928,7 @@ void pic16_mid_device::wdt_reset()
 	m_STATUS = (0 | status_unaffected);
 }
 
-void pic16f628a_device::wdt_reset()
+void pic16f6xxa_device::wdt_reset()
 {
 	const u8 pcon_unaffected = m_PCON & (POR_FLAG | BOR_FLAG);
 	pic16_mid_device::wdt_reset();
@@ -1057,6 +1089,7 @@ void pic16_mid_device::porta_w(u8 data)
 	data &= m_porta_mask;
 	const u8 mask = u8(~m_port_tris[PORTA]) & m_porta_mask;
 	m_port_data[PORTA] = data;
+
 	m_write_port[PORTA](PORTA, data & mask, mask);
 }
 
@@ -1067,7 +1100,8 @@ u8 pic16_mid_device::portb_r()
 	data |= (u8(~m_port_tris[PORTB]) & m_port_data[PORTB]);
 
 	// reading PORTB updates the change detection latch for RB7:RB4
-	m_portb_mismatch_detect = data & 0xf0;
+	if (!machine().side_effects_disabled())
+		m_portb_mismatch_detect = data & 0xf0;
 
 	return data;
 }
@@ -1080,6 +1114,7 @@ void pic16_mid_device::portb_w(u8 data)
 
 	const u8 mask = u8(~m_port_tris[PORTB]);
 	m_port_data[PORTB] = data;
+
 	m_write_port[PORTB](PORTB, data & mask, mask);
 }
 
@@ -1158,7 +1193,7 @@ void pic16_mid_eeprom_device::set_eeif()
 	m_EECON1 |= EEIF_FLAG;
 }
 
-void pic16f628a_device::set_eeif()
+void pic16f6xxa_device::set_eeif()
 {
 	m_PIR1 |= 0x80;
 }
@@ -1239,122 +1274,122 @@ void pic16c62x_device::pir1_w(u8 data)
 	m_PIR1 = data & 0x40; // only bit 6 is implemented, other bits read as 0
 }
 
-u8 pic16f628a_device::pir1_r()
+u8 pic16f6xxa_device::pir1_r()
 {
 	return m_PIR1;
 }
 
-void pic16f628a_device::pir1_w(u8 data)
+void pic16f6xxa_device::pir1_w(u8 data)
 {
 	m_PIR1 = data & 0xf7; // bit 3 is unimplemented and reads as 0
 }
 
-u8 pic16f628a_device::tmr1l_r()
+u8 pic16f6xxa_device::tmr1l_r()
 {
 	return 0;
 }
 
-void pic16f628a_device::tmr1l_w(u8 data)
+void pic16f6xxa_device::tmr1l_w(u8 data)
 {
 	logerror("tmr1l_w %02x\n", data);
 }
 
-u8 pic16f628a_device::tmr1h_r()
+u8 pic16f6xxa_device::tmr1h_r()
 {
 	return 0;
 }
 
-void pic16f628a_device::tmr1h_w(u8 data)
+void pic16f6xxa_device::tmr1h_w(u8 data)
 {
 	logerror("tmr1h_w %02x\n", data);
 }
 
-u8 pic16f628a_device::t1con_r()
+u8 pic16f6xxa_device::t1con_r()
 {
 	return m_T1CON;
 }
 
-void pic16f628a_device::t1con_w(u8 data)
+void pic16f6xxa_device::t1con_w(u8 data)
 {
 	m_T1CON = data;
 }
 
-u8 pic16f628a_device::tmr2_r()
+u8 pic16f6xxa_device::tmr2_r()
 {
 	return 0;
 }
 
-void pic16f628a_device::tmr2_w(u8 data)
+void pic16f6xxa_device::tmr2_w(u8 data)
 {
 	logerror("tmr2_w %02x\n", data);
 }
 
-u8 pic16f628a_device::t2con_r()
+u8 pic16f6xxa_device::t2con_r()
 {
 	return m_T2CON;
 }
 
-void pic16f628a_device::t2con_w(u8 data)
+void pic16f6xxa_device::t2con_w(u8 data)
 {
 	m_T2CON = data;
 }
 
-u8 pic16f628a_device::ccpr1l_r()
+u8 pic16f6xxa_device::ccpr1l_r()
 {
 	return 0;
 }
 
-void pic16f628a_device::ccpr1l_w(u8 data)
+void pic16f6xxa_device::ccpr1l_w(u8 data)
 {
 	logerror("ccpr1l_w %02x\n", data);
 }
 
-u8 pic16f628a_device::ccpr1h_r()
+u8 pic16f6xxa_device::ccpr1h_r()
 {
 	return 0;
 }
 
-void pic16f628a_device::ccpr1h_w(u8 data)
+void pic16f6xxa_device::ccpr1h_w(u8 data)
 {
 	logerror("ccpr1h_w %02x\n", data);
 }
 
-u8 pic16f628a_device::ccp1con_r()
+u8 pic16f6xxa_device::ccp1con_r()
 {
 	return m_CCP1CON;
 }
 
-void pic16f628a_device::ccp1con_w(u8 data)
+void pic16f6xxa_device::ccp1con_w(u8 data)
 {
 	m_CCP1CON = data;
 }
 
-u8 pic16f628a_device::rcsta_r()
+u8 pic16f6xxa_device::rcsta_r()
 {
 	return m_RCSTA;
 }
 
-void pic16f628a_device::rcsta_w(u8 data)
+void pic16f6xxa_device::rcsta_w(u8 data)
 {
 	m_RCSTA = data;
 }
 
-u8 pic16f628a_device::txreg_r()
+u8 pic16f6xxa_device::txreg_r()
 {
 	return 0;
 }
 
-void pic16f628a_device::txreg_w(u8 data)
+void pic16f6xxa_device::txreg_w(u8 data)
 {
 	logerror("txreg_w %02x\n", data);
 }
 
-u8 pic16f628a_device::rcreg_r()
+u8 pic16f6xxa_device::rcreg_r()
 {
 	return 0;
 }
 
-void pic16f628a_device::rcreg_w(u8 data)
+void pic16f6xxa_device::rcreg_w(u8 data)
 {
 	logerror("rcreg_w %02x\n", data);
 }
@@ -1369,12 +1404,12 @@ void pic16c62x_device::cmcon_w(u8 data)
 	m_CMCON = data & 0xcf; // bits 5-4 unimplemented and read as 0
 }
 
-u8 pic16f628a_device::cmcon_r()
+u8 pic16f6xxa_device::cmcon_r()
 {
 	return m_CMCON;
 }
 
-void pic16f628a_device::cmcon_w(u8 data)
+void pic16f6xxa_device::cmcon_w(u8 data)
 {
 	m_CMCON = data;
 }
@@ -1389,12 +1424,12 @@ void pic16c62x_device::pie1_w(u8 data)
 	m_PIE1 = data & 0x40; // only bit 6 is implemented, other bits read as 0
 }
 
-u8 pic16f628a_device::pie1_r()
+u8 pic16f6xxa_device::pie1_r()
 {
 	return m_PIE1;
 }
 
-void pic16f628a_device::pie1_w(u8 data)
+void pic16f6xxa_device::pie1_w(u8 data)
 {
 	m_PIE1 = data & 0xf7; // bit 3 is unimplemented and reads as 0
 }
@@ -1409,42 +1444,42 @@ void pic16c62x_device::pcon_w(u8 data)
 	m_PCON = data & 0x03; // bits 7-2 are unimplemented and read as 0
 }
 
-u8 pic16f628a_device::pcon_r()
+u8 pic16f6xxa_device::pcon_r()
 {
 	return m_PCON;
 }
 
-void pic16f628a_device::pcon_w(u8 data)
+void pic16f6xxa_device::pcon_w(u8 data)
 {
 	m_PCON = data & 0x0b; // bits 2 and 7-4 are unimplemented and read as 0
 }
 
-u8 pic16f628a_device::pr2_r()
+u8 pic16f6xxa_device::pr2_r()
 {
 	return 0;
 }
 
-void pic16f628a_device::pr2_w(u8 data)
+void pic16f6xxa_device::pr2_w(u8 data)
 {
 	logerror("pr2_w %02x\n", data);
 }
 
-u8 pic16f628a_device::txsta_r()
+u8 pic16f6xxa_device::txsta_r()
 {
 	return m_TXSTA;
 }
 
-void pic16f628a_device::txsta_w(u8 data)
+void pic16f6xxa_device::txsta_w(u8 data)
 {
 	m_TXSTA = data;
 }
 
-u8 pic16f628a_device::spbrg_r()
+u8 pic16f6xxa_device::spbrg_r()
 {
 	return 0;
 }
 
-void pic16f628a_device::spbrg_w(u8 data)
+void pic16f6xxa_device::spbrg_w(u8 data)
 {
 	logerror("spbrg_w %02x\n", data);
 }
@@ -1459,12 +1494,12 @@ void pic16c62x_device::vrcon_w(u8 data)
 	m_VRCON = data & 0xef; // bit 4 is unimplemented and reads as 0
 }
 
-u8 pic16f628a_device::vrcon_r()
+u8 pic16f6xxa_device::vrcon_r()
 {
 	return m_VRCON;
 }
 
-void pic16f628a_device::vrcon_w(u8 data)
+void pic16f6xxa_device::vrcon_w(u8 data)
 {
 	m_VRCON = data;
 }

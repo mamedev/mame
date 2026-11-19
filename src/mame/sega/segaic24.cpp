@@ -369,14 +369,14 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 				uint16_t v = (-vscr) & 0x1ff;
 				if(!((-vscr) & 0x200))
 					layer ^= 1;
-				for(y=cliprect.min_y; y<=cliprect.max_y; y++) {
+				for(y=cliprect.top(); y<=cliprect.bottom(); y++) {
 					uint16_t h;
 					rectangle c = cliprect;
 					int l1 = layer;
 					if(y >= v)
 						l1 ^= 1;
 
-					c.min_y = c.max_y = y;
+					c.sety(y, y);
 
 					hscr = hscrtb[y];
 
@@ -388,7 +388,7 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 			}
 			case 2: case 3: {
 				int y;
-				for(y=cliprect.min_y; y<=cliprect.max_y; y++) {
+				for(y=cliprect.top(); y<=cliprect.bottom(); y++) {
 					uint16_t h;
 					rectangle c1 = cliprect;
 					rectangle c2 = cliprect;
@@ -400,14 +400,15 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 					tile_layer[layer]->set_scrollx(0, -h);
 					tile_layer[layer|1]->set_scrollx(0, -h);
 
-					if(c1.max_x >= h)
+					if(c1.right() >= h)
 						c1.max_x = h-1;
-					if(c2.min_x < h)
+					if(c2.left() < h)
 						c2.min_x = h;
 					if(!(hscr & 0x200))
 						l1 ^= 1;
 
-					c1.min_y = c1.max_y = c2.min_y = c2.max_y = y;
+					c1.sety(y, y);
+					c2.sety(y, y);
 
 					tile_layer[l1]->draw(screen, bitmap, c1, tpri | flags, lpri);
 					tile_layer[l1^1]->draw(screen, bitmap, c2, tpri | flags, lpri);
@@ -426,9 +427,9 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 				rectangle c2 = cliprect;
 				uint16_t v;
 				v = (-vscr) & 0x1ff;
-				if(c1.max_y >= v)
+				if(c1.bottom() >= v)
 					c1.max_y = v-1;
-				if(c2.min_y < v)
+				if(c2.top() < v)
 					c2.min_y = v;
 				if(!((-vscr) & 0x200))
 					layer ^= 1;
@@ -442,9 +443,9 @@ void segas24_tile_device::draw_common(screen_device &screen, BitmapClass &bitmap
 				rectangle c2 = cliprect;
 				uint16_t h;
 				h = (+hscr) & 0x1ff;
-				if(c1.max_x >= h)
+				if(c1.right() >= h)
 					c1.max_x = h-1;
-				if(c2.min_x < h)
+				if(c2.left() < h)
 					c2.min_x = h;
 				if(!((+hscr) & 0x200))
 					layer ^= 1;
@@ -646,24 +647,24 @@ void segas24_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cliprect
 			// Crackdown uses this on pre-title screen intro
 			// for masking both avatars and the Sega logo itself.
 			const bool clip_reverse_y = (cclip[1] & 0x2000) >> 13;
-			min_x = std::max<int>(cliprect.min_x, (cclip[3] & 511) - 8);
-			max_x = std::min<int>(cliprect.max_x, (cclip[5] & 511) - 8);
+			min_x = std::max<int>(cliprect.left(), (cclip[3] & 511) - 8);
+			max_x = std::min<int>(cliprect.right(), (cclip[5] & 511) - 8);
 			if(clip_reverse_y) {
-				min_y = std::max<int>(cliprect.min_y, 0);
-				max_y = std::min<int>(cliprect.max_y, 383);
+				min_y = std::max<int>(cliprect.top(), 0);
+				max_y = std::min<int>(cliprect.bottom(), 383);
 				clip_first = (cclip[2] & 511) - 1;
 				clip_last = (cclip[4] & 511) + 1;
 			} else {
-				min_y = std::max<int>(cliprect.min_y, cclip[2] & 511);
-				max_y = std::min<int>(cliprect.max_y, cclip[4] & 511);
+				min_y = std::max<int>(cliprect.top(), cclip[2] & 511);
+				max_y = std::min<int>(cliprect.bottom(), cclip[4] & 511);
 				clip_first = max_y;
 				clip_last = min_y;
 			}
 		} else {
-			min_x = std::max<int>(cliprect.min_x, 0);
-			max_x = std::min<int>(cliprect.max_x, 495);
-			min_y = std::max<int>(cliprect.min_y, 0);
-			max_y = std::min<int>(cliprect.max_y, 383);
+			min_x = std::max<int>(cliprect.left(), 0);
+			max_x = std::min<int>(cliprect.right(), 495);
+			min_y = std::max<int>(cliprect.top(), 0);
+			max_y = std::min<int>(cliprect.bottom(), 383);
 			clip_first = max_y;
 			clip_last = min_y;
 		}

@@ -48,7 +48,10 @@ public:
 
 	auto wdm_handler() { return m_wdm_w.bind(); }
 	auto sync_cb() { return m_sync_w.bind(); }
+	auto rdy_cb() { return m_rdy_w.bind(); }
 	bool get_sync() const { return m_sync; }
+	bool get_vda() const { return m_vda; }
+	bool get_vpa() const { return m_vpa; }
 	// the program counter as it stands part way through an instruction, i.e. the address
 	// following the last instruction byte fetched (pc() reports the start of the instruction)
 	uint32_t get_live_pc() const { return (m_PB << 16) | m_PC; }
@@ -152,6 +155,7 @@ protected:
 
 	devcb_write8 m_wdm_w;
 	devcb_write_line m_sync_w;
+	devcb_write_line m_rdy_w;
 
 	address_space_config m_program_config, m_sprogram_config, m_vector_config, m_data_config;
 
@@ -178,15 +182,20 @@ protected:
 	int m_icount;
 	bool m_nmi_state, m_irq_state, m_abort_state, m_v_state;
 	bool m_nmi_pending, m_irq_taken, m_sync, m_inhibit_interrupts;
+	bool m_vda, m_vpa, m_wai;
 
 	uint32_t m_XPC;             // debugger-visible PB:PC
 
-	uint8_t read(uint32_t adr) { return m_mintf->read(adr); }
-	void write(uint32_t adr, uint8_t val) { m_mintf->write(adr, val); }
-	uint8_t read_sync(uint16_t adr) { return m_mintf->read_sync((m_PB << 16) | adr); }
-	uint8_t read_arg(uint16_t adr) { return m_mintf->read_arg((m_PB << 16) | adr); }
+	void set_bus_valid(bool vda, bool vpa) { m_vda = vda; m_vpa = vpa; }
+	uint8_t read(uint32_t adr) { set_bus_valid(true, false); return m_mintf->read(adr); }
+	void write(uint32_t adr, uint8_t val) { set_bus_valid(true, false); m_mintf->write(adr, val); }
+	uint8_t read_sync(uint16_t adr) { set_bus_valid(true, true); return m_mintf->read_sync((m_PB << 16) | adr); }
+	uint8_t read_arg(uint16_t adr) { set_bus_valid(false, true); return m_mintf->read_arg((m_PB << 16) | adr); }
 	uint8_t read_pc() { return read_arg(m_PC); }
-	uint8_t read_vector(uint16_t adr) { return m_mintf->read_vector(adr); }
+	uint8_t read_idle(uint32_t adr) { set_bus_valid(false, false); return m_mintf->read(adr); }
+	uint8_t read_pc_idle() { return read_arg_idle(m_PC); }
+	uint8_t read_arg_idle(uint16_t adr) { set_bus_valid(false, false); return m_mintf->read_arg((m_PB << 16) | adr); }
+	uint8_t read_vector(uint16_t adr) { set_bus_valid(true, false); return m_mintf->read_vector(adr); }
 
 	void prefetch_start();
 	void prefetch_end();
@@ -226,7 +235,7 @@ protected:
 	uint16_t do_trb16(uint16_t v);
 
 	// RMW helper.  Named for the write so that m6502make.py gives the line a bus cycle.
-	void write_modify_cycle(uint32_t adr, uint8_t val) { if(m_E) write(adr, val); else read(adr); }
+	void write_modify_cycle(uint32_t adr, uint8_t val) { set_bus_valid(false, false); if(m_E) m_mintf->write(adr, val); else m_mintf->read(adr); }
 
 	virtual offs_t pc_to_external(uint16_t pc);
 	virtual void do_exec_full();

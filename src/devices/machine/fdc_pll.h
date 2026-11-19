@@ -15,7 +15,7 @@ class fdc_pll_t {
 public:
 	attotime ctime, period, min_period, max_period, period_adjust_base, phase_adjust;
 
-	int freq_hist = 0;
+	int32_t freq_hist = 0;
 
 	void set_clock(const attotime &period);
 	void reset(const attotime &when);

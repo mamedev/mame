@@ -69,6 +69,7 @@ private:
 	void pm7200_map(address_map &map) ATTR_COLD;
 
 	void cuda_reset_w(int state);
+	void cuda_power_w(int state);
 
 	u32 nvram_addr_r(offs_t offset, u32 mem_mask);
 	void nvram_addr_w(offs_t offset, u32 data, u32 mem_mask);
@@ -159,6 +160,14 @@ void catalyst_state::pm7200_map(address_map &map)
 	map(0xf800'0000, 0xf800'07ff).m(m_platinum, FUNC(platinum_device::map));
 
 	map(0xffc0'0000, 0xffff'ffff).rom().region("bootrom", 0);
+}
+
+void catalyst_state::cuda_power_w(int state)
+{
+	if (state)
+	{
+		machine().schedule_exit();
+	}
 }
 
 void catalyst_state::cuda_reset_w(int state)
@@ -328,6 +337,7 @@ void catalyst_state::pm7200(machine_config &config)
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(catalyst_state::cuda_reset_w));
+	m_cuda->poweroff_callback().set(FUNC(catalyst_state::cuda_power_w));
 	m_cuda->linechange_callback().set(m_adbbus, FUNC(adb_bus_device::adb_host_line_w));
 	m_cuda->via_clock_callback().set(m_grandcentral, FUNC(heathrow_device::cb1_w));
 	m_cuda->via_data_callback().set(m_grandcentral, FUNC(heathrow_device::cb2_w));

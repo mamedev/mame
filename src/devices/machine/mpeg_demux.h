@@ -21,11 +21,11 @@ class device_t;
 class mpeg_demux
 {
 public:
-	// Feed one byte of the system stream.  stream_filter is the low nibble of
-	// the stream id to keep.  packet_body says whether the NEXT byte belongs
-	// to the selected elementary stream, so the caller tests it before the
-	// call, exactly as a registered output would present it.
-	void byte(u8 data, u8 stream_filter);
+	// Feed one byte of the system stream.  stream_id is the id of the
+	// elementary stream to keep.  packet_body says whether the NEXT byte
+	// belongs to the selected elementary stream, so the caller tests it before
+	// the call, exactly as a registered output would present it.
+	void byte(u8 data, u8 stream_id);
 
 	void reset();
 

@@ -10,6 +10,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Rainbow Arts</publisher>
 		<info name="usage" value="mame c64p -tape cdaudio -cdrom firstcd"/>
+		<sharedfeat name="tape_default" value="cdaudio"/>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
@@ -23,6 +24,7 @@ license:CC0-1.0
 		<year>1989</year>
 		<publisher>Codemasters</publisher>
 		<info name="usage" value="mame c64p -joy2 cdgames -cdrom cdgames -cass cdgames"/>
+		<sharedfeat name="joy2_default" value="cdgames"/>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">

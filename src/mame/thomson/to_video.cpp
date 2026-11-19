@@ -164,7 +164,7 @@ bool thomson_video_device::update_screen_size()
 
 	int new_w = ( 320 + m_bwidth * 2 ) * ( m_hires + 1 ) - 1;
 	int new_h = ( 200 + m_bheight * 2 ) /** (m_hires + 1 )*/ - 1;
-	if ( ( visarea.max_x != new_w ) || ( visarea.max_y != new_h ) )
+	if ( ( visarea.right() != new_w ) || ( visarea.bottom() != new_h ) )
 	{
 		changed = true;
 		screen().set_visible_area(0, new_w, 0, new_h );

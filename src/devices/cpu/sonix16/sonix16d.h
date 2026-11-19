@@ -8,7 +8,9 @@
 
 #pragma once
 
-#include <functional>
+#include <iosfwd>
+#include <string>
+
 
 class sonix16_disassembler : public util::disasm_interface
 {

@@ -1852,7 +1852,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	<software name="silviana" supported="no">
 		<description>Silviana - Ai Ippai no Boukensya</description>
 		<year>1988</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="PAC-SIL"/>
 		<info name="release" value="19880810"/>
 		<info name="alt_title" value="シルヴィアーナ 愛いっぱいの冒険者"/>
@@ -3413,7 +3413,7 @@ Re-releases (probably the same as the original release, but listed while waiting
 	<software name="kattobiw">
 		<description>Kattobi! Warabe Ko</description>
 		<year>1989</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-In-Video</publisher>
 		<info name="serial" value="PAC-KTD"/>
 		<info name="release" value="19891020"/>
 		<info name="alt_title" value="かっとび!童児"/>
@@ -3705,11 +3705,13 @@ Re-releases (probably the same as the original release, but listed while waiting
 		</part>
 	</software>
 
-<!-- Freezes right after starting a game -->
 	<software name="puttputt" supported="no">
 		<description>Putt Putt Golf</description>
 		<year>1989</year>
-		<publisher>Pack-In Video</publisher>
+		<publisher>Pack-In-Video</publisher>
+		<notes><![CDATA[
+Freezes right after starting a game
+]]></notes>
 		<info name="serial" value="PAC-PPG"/>
 		<info name="release" value="19890330"/>
 		<info name="alt_title" value="パットパットゴルフ"/>

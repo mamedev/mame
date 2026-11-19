@@ -333,8 +333,8 @@ void agat9video_device::text_update_lores(screen_device &screen, bitmap_ind16 &b
 	int fg = 0;
 	int bg = color_1_p[palette_index];
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (row = beginrow; row <= endrow; row += 8)
 	{
@@ -364,8 +364,8 @@ void agat9video_device::text_update_hires(screen_device &screen, bitmap_ind16 &b
 	uint8_t ch;
 	int fg, bg;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	if (m_start_address & 0x800)
 	{
@@ -394,8 +394,8 @@ void agat9video_device::graph_update_mono_lores(screen_device &screen, bitmap_in
 {
 	int fg = 7, bg = 0;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (int row = beginrow; row <= endrow; row++)
 	{
@@ -421,8 +421,8 @@ void agat9video_device::graph_update_mono_hires(screen_device &screen, bitmap_in
 {
 	int fg = 7, bg = 0;
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (int row = beginrow; row <= endrow; row++)
 	{
@@ -453,8 +453,8 @@ static constexpr int color_4_p[4][4] =
 
 void agat9video_device::graph_update_color_hires(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (int row = beginrow; row <= endrow; row++)
 	{
@@ -478,8 +478,8 @@ void agat9video_device::graph_update_color_hires(screen_device &screen, bitmap_i
 
 void agat9video_device::graph_update_color_lores(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (int row = beginrow; row <= endrow; row++)
 	{
@@ -542,8 +542,8 @@ void agat9video_device::text_update_apple(screen_device &screen, bitmap_ind16 &b
 	int const fg = color_2_p[palette_index][1];
 	int const bg = color_2_p[palette_index][0];
 
-	beginrow = std::max(beginrow, cliprect.min_y - (cliprect.min_y % 8));
-	endrow = std::min(endrow, cliprect.max_y - (cliprect.max_y % 8) + 7);
+	beginrow = std::max(beginrow, cliprect.top() - (cliprect.top() % 8));
+	endrow = std::min(endrow, cliprect.bottom() - (cliprect.bottom() % 8) + 7);
 
 	for (int row = beginrow; row <= endrow; row += 8)
 	{
@@ -563,19 +563,19 @@ void agat9video_device::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	int begincol = 0, endcol = 40;
 
 	/* sanity checks */
-	if (beginrow < cliprect.min_y)
-		beginrow = cliprect.min_y;
-	if (endrow > cliprect.max_y)
-		endrow = cliprect.max_y;
+	if (beginrow < cliprect.top())
+		beginrow = cliprect.top();
+	if (endrow > cliprect.bottom())
+		endrow = cliprect.bottom();
 	if (endrow < beginrow)
 		return;
 
 	// we generate 2 pixels per "column" so adjust
-	if (begincol < (cliprect.min_x/7))
-		begincol = (cliprect.min_x/7);
-	if (endcol > (cliprect.max_x/7))
-		endcol = (cliprect.max_x/7);
-	if (cliprect.max_x > 39*7)
+	if (begincol < (cliprect.left()/7))
+		begincol = cliprect.left()/7;
+	if (endcol > (cliprect.right()/7))
+		endcol = cliprect.right()/7;
+	if (cliprect.right() > 39*7)
 		endcol = 40;
 	if (endcol < begincol)
 		return;

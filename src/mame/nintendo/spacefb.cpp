@@ -182,6 +182,7 @@ private:
 
 	u8 m_sound_latch = 0;
 	emu_timer *m_interrupt_timer = nullptr;
+	uint8_t m_irq_vector = 0;
 	std::unique_ptr<u8[]> m_object_present_map;
 	u8 m_port_0 = 0;
 	u8 m_port_2 = 0;
@@ -198,6 +199,7 @@ private:
 	u8 audio_t1_r();
 
 	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void start_interrupt_timer();
 
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -639,20 +641,19 @@ u32 spacefb_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
 {
-	int next_vpos;
-
 	// compute vector and set the interrupt line
 	int vpos = m_screen->vpos();
-	u8 vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, vector); // Z80
+	m_irq_vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
+	m_maincpu->set_input_line(0, HOLD_LINE);
 
 	// set up for next interrupt
-	if (vpos == SPACEFB_INT_TRIGGER_COUNT_1)
-		next_vpos = SPACEFB_INT_TRIGGER_COUNT_2;
-	else
-		next_vpos = SPACEFB_INT_TRIGGER_COUNT_1;
-
+	int next_vpos = (vpos == SPACEFB_INT_TRIGGER_COUNT_1 ? SPACEFB_INT_TRIGGER_COUNT_2 : SPACEFB_INT_TRIGGER_COUNT_1);
 	m_interrupt_timer->adjust(m_screen->time_until_pos(next_vpos));
+}
+
+IRQ_CALLBACK_MEMBER(spacefb_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void spacefb_state::start_interrupt_timer()
@@ -673,6 +674,7 @@ void spacefb_state::machine_start()
 	m_interrupt_timer = timer_alloc(FUNC(spacefb_state::interrupt_callback), this);
 
 	save_item(NAME(m_sound_latch));
+	save_item(NAME(m_irq_vector));
 }
 
 
@@ -691,6 +693,8 @@ void spacefb_state::machine_reset()
 	port_2_w(0);
 
 	start_interrupt_timer();
+
+	m_irq_vector = 0;
 }
 
 
@@ -838,6 +842,7 @@ void spacefb_state::spacefb(machine_config &config)
 	Z80(config, m_maincpu, SPACEFB_MAIN_CPU_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &spacefb_state::spacefb_main_map);
 	m_maincpu->set_addrmap(AS_IO, &spacefb_state::spacefb_main_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(spacefb_state::cpu_acknowledge_irq));
 
 	I8035(config, m_audiocpu, SPACEFB_AUDIO_CPU_CLOCK);
 	m_audiocpu->set_addrmap(AS_PROGRAM, &spacefb_state::spacefb_audio_map);

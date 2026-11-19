@@ -112,6 +112,7 @@
 #include "bus/isa/amgda.h"
 #include "bus/isa/ega.h"
 #include "bus/isa/fddda.h"
+#include "bus/isa/stda.h"
 #include "bus/isa/mda.h"
 #include "bus/isa/pcat512me.h"
 #include "bus/isa/ubpnic.h"
@@ -509,6 +510,7 @@ static void rtpc_isa16_cards(device_slot_interface &device)
 	device.option_add("5080pa", ISA16_5080PA);
 	device.option_add("amgda", ISA16_AMGDA);
 	device.option_add("fddda", ISA16_FDDDA);
+	device.option_add("stda", ISA16_STDA);
 	device.option_add("pcat512me", ISA16_PCAT512ME);
 
 	rtpc_isa8_cards(device);
@@ -556,7 +558,7 @@ void rtpc_state::ibm6150(machine_config &config)
 	ISA16_SLOT(config, m_slot[0], m_isa->clock(), m_isa, rtpc_isa16_cards, "fddda",    false); // slot 1: disk/diskette adapter
 	ISA16_SLOT(config, m_slot[1], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option (second fddda/esdi must be here)
 	ISA8_SLOT(config,  m_slot[2], m_isa->clock(), m_isa, rtpc_isa8_cards,  "mda",      false); // slot 3: option (mda must be here, ega must be here or slot 6)
-	ISA16_SLOT(config, m_slot[3], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
+	ISA16_SLOT(config, m_slot[3], m_isa->clock(), m_isa, rtpc_isa16_cards, "stda",     false); // slot 4: option
 	ISA16_SLOT(config, m_slot[4], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 5: option
 	ISA8_SLOT(config,  m_slot[5], m_isa->clock(), m_isa, rtpc_isa8_cards,  "baseband", false); // slot 6: option
 	ISA16_SLOT(config, m_slot[6], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 7: option
@@ -571,7 +573,7 @@ void rtpc_state::ibm6151(machine_config &config)
 	// ISA slots
 	ISA8_SLOT(config,  m_slot[0], m_isa->clock(), m_isa, rtpc_isa8_cards,  "mda",      false); // slot 1: option (mda or ega must be here)
 	ISA16_SLOT(config, m_slot[1], m_isa->clock(), m_isa, rtpc_isa16_cards, "baseband", false); // slot 2: option
-	ISA16_SLOT(config, m_slot[2], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 2: option
+	ISA16_SLOT(config, m_slot[2], m_isa->clock(), m_isa, rtpc_isa16_cards, "stda",     false); // slot 2: option
 	ISA16_SLOT(config, m_slot[3], m_isa->clock(), m_isa, rtpc_isa16_cards, nullptr,    false); // slot 4: option
 	ISA16_SLOT(config, m_slot[4], m_isa->clock(), m_isa, rtpc_copro_cards, nullptr,    false); // slot 5: coprocessor/option
 	ISA16_SLOT(config, m_slot[5], m_isa->clock(), m_isa, rtpc_isa16_cards, "fddda",    false); // slot 6: disk/diskette adapter

@@ -77,4 +77,5 @@ private:
 
 
 DECLARE_DEVICE_TYPE(SPECNEXT_TILES, specnext_tiles_device)
+
 #endif // MAME_SINCLAIR_NEXT_SPECNEXT_TILES_H

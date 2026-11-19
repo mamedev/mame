@@ -75,6 +75,13 @@
 #define INT_NEWDMA2             0x40000000  // DSi only
 #define INT_NEWDMA3             0x80000000  // DSi only
 
+namespace
+{
+
+constexpr uint32_t SLEEP_IRQS = INT_SIO | INT_KEYPAD | INT_GAMEPAK | INT_CARDIREQ | INT_SCREENUNFOLD;
+
+} // anonymous namespace
+
 // DMA startup modes.  The ARM9 has 3 mode bits, the ARM7 only 2 (and its
 // modes 2 and 3 do not match the ARM9's).
 enum
@@ -123,7 +130,9 @@ nds_state::nds_state(const machine_config &mconfig, device_type type, const char
 	m_screen(*this, "screen%u", 0U),
 	m_ppu(*this, "ppu_%c", 'a'),
 	m_ndssound(*this, "ndssound"),
+	m_amp(*this, "amp%u", 0U),
 	m_rtc(*this, "rtc"),
+	m_wifi(*this, "wifi"),
 	m_gbsound(*this, "gbsound"),
 	m_gba_ldac(*this, "gba_ldac%c", 'a'),
 	m_gba_rdac(*this, "gba_rdac%c", 'a'),
@@ -133,6 +142,7 @@ nds_state::nds_state(const machine_config &mconfig, device_type type, const char
 	m_extkeys(*this, "EXTKEYS"),
 	m_touch_x(*this, "TOUCH_X"),
 	m_touch_y(*this, "TOUCH_Y"),
+	m_headphones(*this, "HEADPHONES"),
 	m_arm7_postflg(0), m_arm9_postflg(0),
 	m_ime{ 0, 0 }, m_ie{ 0, 0 }, m_if{ 0, 0 }, m_ipcsync{ 0, 0 },
 	m_WRAM{},
@@ -142,6 +152,7 @@ nds_state::nds_state(const machine_config &mconfig, device_type type, const char
 	m_powcnt{ 0x0001, 0x0001 },
 	m_biosprot(0),
 	m_halted{ 0, 0 },
+	m_sleeping(false), m_sleep_start(attotime::zero), m_sleep_remaining{},
 	m_sioregs{ 0, 0, 0, 0 },
 	m_rcnt(0x8000),
 	m_card_seed{ 0, 0, 0 },
@@ -158,7 +169,7 @@ nds_state::nds_state(const machine_config &mconfig, device_type type, const char
 	m_rtc_io(0),
 	m_gba_mode(false),
 	m_total_lines(TOTAL_LINES), m_visible_lines(VISIBLE_LINES),
-	m_gba_soundregs{}, m_gba_waitcnt(0), m_gba_bios_prefetch(0), m_gba_fifo{},
+	m_gba_soundregs{}, m_gba_waitcnt(0), m_gba_fifo{},
 	m_auxspicnt(0), m_auxspidata(0),
 	m_romctrl(0),
 	m_card_command{}, m_cartdata_len(0), m_card_cpu(1),
@@ -170,6 +181,10 @@ nds_state::nds_state(const machine_config &mconfig, device_type type, const char
 void nds_state::update_irqs(int cpu)
 {
 	const bool pending = (m_ie[cpu] & m_if[cpu]) != 0;
+	if ((cpu == 1) && m_sleeping && (m_ie[1] & m_if[1] & SLEEP_IRQS))
+	{
+		set_sleeping(false);
+	}
 
 	// HALT is left as soon as any enabled interrupt is pending, regardless of IME
 	if (pending && m_halted[cpu])
@@ -197,6 +212,15 @@ void nds_state::request_irq(int cpu, uint32_t int_type)
 	update_irqs(cpu);
 }
 
+// IF.24 is set when the wifi request goes active; it does not follow the line
+void nds_state::wifi_irq_w(int state)
+{
+	if (state)
+	{
+		request_irq(1, INT_WIFI);
+	}
+}
+
 void nds_state::set_halted(int cpu, bool halted)
 {
 	// halt applies if (IE & IF) is clear, so a pending IRQ means no halt at all
@@ -221,6 +245,79 @@ void nds_state::set_halted(int cpu, bool halted)
 	{
 		cpudev->resume(SUSPEND_REASON_HALT);
 	}
+}
+
+void nds_state::set_sleeping(bool sleeping)
+{
+	if ((m_sleeping == sleeping) || (sleeping && (m_ie[1] & m_if[1] & SLEEP_IRQS)))
+	{
+		return;
+	}
+
+	m_ndssound->set_sleep(sleeping);
+	const attotime now = machine().time();
+	if (sleeping)
+	{
+		m_sleep_start = now;
+		m_arm7->suspend(SUSPEND_REASON_CLOCK, true);
+		m_arm9->suspend(SUSPEND_REASON_CLOCK, true);
+	}
+	else
+	{
+		m_arm7->resume(SUSPEND_REASON_CLOCK);
+		m_arm9->resume(SUSPEND_REASON_CLOCK);
+		for (auto &start : m_timer_start)
+		{
+			start += now - m_sleep_start;
+		}
+	}
+	for (int i = 0; i < std::size(m_sleep_remaining); i++)
+	{
+		emu_timer *const timer = (i < 2) ? (i ? m_hblank_timer : m_scanline_timer) : m_tmr_timer[i - 2];
+		if (sleeping)
+		{
+			m_sleep_remaining[i] = timer->remaining();
+			timer->enable(false);
+		}
+		else
+		{
+			timer->reset(m_sleep_remaining[i]);
+		}
+	}
+	m_sleeping = sleeping;
+	update_audio();
+}
+
+void nds_state::update_audio()
+{
+	const bool headphones = BIT(m_headphones->read(), 0);
+	const bool muted = BIT(m_pm_regs[0], 0) && BIT(m_pm_regs[0], 1);
+	const bool speaker = BIT(m_powcnt[1], 0) && BIT(m_powcnt[0], 0) && !muted;
+	// The original DS leaks quiet audio with its amplifier disabled; its gain is unmeasured.
+	const float gain = (!m_sleeping && (headphones || speaker)) ? 1.0f : 0.0f;
+	for (auto &amp : m_amp)
+	{
+		amp->set_gain(gain);
+	}
+}
+
+INPUT_CHANGED_MEMBER(nds_state::headphones_changed)
+{
+	update_audio();
+}
+
+INPUT_CHANGED_MEMBER(nds_state::lid_changed)
+{
+	if (oldval && !newval)
+	{
+		request_irq(1, INT_SCREENUNFOLD);
+	}
+}
+
+INPUT_CHANGED_MEMBER(nds_state::keypad_changed)
+{
+	update_keypad_irq(0);
+	update_keypad_irq(1);
 }
 
 TIMER_CALLBACK_MEMBER(nds_state::scanline_tick)
@@ -353,9 +450,17 @@ uint16_t nds_state::ipcfifo_cnt_r()
 	return data;
 }
 
+// the IPC registers change once the other CPU has caught up (the CPUs run in steps of 64 cycles)
 template <int Cpu>
 void nds_state::ipcfifo_cnt_w(uint16_t data)
 {
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nds_state::ipcfifo_cnt_sync<Cpu>), this), data);
+}
+
+template <int Cpu>
+TIMER_CALLBACK_MEMBER(nds_state::ipcfifo_cnt_sync)
+{
+	const uint16_t data = uint16_t(param);
 	const bool old_send_empty_irq = BIT(m_ipcfifocnt[Cpu], 2) && (m_ipcfifo_count[Cpu] == 0);
 	const bool old_recv_irq = BIT(m_ipcfifocnt[Cpu], 10) && (m_ipcfifo_count[Cpu ^ 1] != 0);
 
@@ -388,6 +493,13 @@ void nds_state::ipcfifo_cnt_w(uint16_t data)
 template <int Cpu>
 void nds_state::ipcfifo_send(uint32_t data)
 {
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nds_state::ipcfifo_send_sync<Cpu>), this), int32_t(data));
+}
+
+template <int Cpu>
+TIMER_CALLBACK_MEMBER(nds_state::ipcfifo_send_sync)
+{
+	const uint32_t data = uint32_t(param);
 	if (!BIT(m_ipcfifocnt[Cpu], 15))
 	{
 		return;
@@ -564,6 +676,11 @@ uint8_t nds_state::powerman_spi_transfer(uint8_t data)
 	}
 
 	m_pm_regs[reg] = data;
+	if (reg == 0)
+	{
+		m_pm_regs[0] &= 0x7f;
+		update_audio();
+	}
 
 	if (BIT(m_pm_regs[0], 6))
 	{
@@ -937,7 +1054,8 @@ uint16_t nds_state::timer_count_r(int timer)
 	}
 
 	const uint32_t rate = (m_gba_mode ? gba_timer_clks : timer_clks)[(m_timer_regs[timer] >> 16) & 3];
-	const uint64_t ticks = (machine().time() - m_timer_start[timer]).as_ticks(rate);
+	const attotime now = m_sleeping ? m_sleep_start : machine().time();
+	const uint64_t ticks = (now - m_timer_start[timer]).as_ticks(rate);
 
 	return uint16_t(m_timer_reload[timer] + ticks);
 }
@@ -1209,6 +1327,13 @@ uint32_t nds_state::ipcsync_r(offs_t offset, uint32_t mem_mask)
 template <int Cpu>
 void nds_state::ipcsync_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	machine().scheduler().synchronize(timer_expired_delegate(FUNC(nds_state::ipcsync_sync<Cpu>), this), data & 0xffff);
+}
+
+template <int Cpu>
+TIMER_CALLBACK_MEMBER(nds_state::ipcsync_sync)
+{
+	const uint32_t data = uint32_t(param);
 	const int remote = Cpu ^ 1;
 
 	LOGMASKED(LOG_IPC, "CPU%d: %04x to IPCSYNC\n", Cpu, data & 0xffff);
@@ -1461,7 +1586,7 @@ void nds_state::arm7_haltcnt_w(uint8_t data)
 
 		case 3:
 			LOGMASKED(LOG_INTERRUPT, "arm7: SLEEP\n");
-			set_halted(1, true);
+			set_sleeping(true);
 			break;
 	}
 }
@@ -1474,6 +1599,7 @@ uint16_t nds_state::arm7_powcnt_r()
 void nds_state::arm7_powcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_powcnt[1] = (m_powcnt[1] & ~(mem_mask & 0x0003)) | (data & mem_mask & 0x0003);
+	update_audio();
 }
 
 void nds_state::arm7_biosprot_w(offs_t offset, uint32_t data, uint32_t mem_mask)
@@ -1694,6 +1820,7 @@ uint16_t nds_state::arm9_powcnt_r()
 void nds_state::arm9_powcnt_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	m_powcnt[0] = (m_powcnt[0] & ~(mem_mask & 0x820f)) | (data & mem_mask & 0x820f);
+	update_audio();
 }
 
 /***************************************************************************
@@ -1735,6 +1862,7 @@ void nds_state::nds_arm7_map(address_map &map)
 	map(0x04000308, 0x0400030b).w(FUNC(nds_state::arm7_biosprot_w));
 	map(0x04000400, 0x0400051f).rw(m_ndssound, FUNC(nds_sound_device::read), FUNC(nds_sound_device::write));
 	map(0x04100000, 0x04100003).r(FUNC(nds_state::ipcfifo_recv<1>));
+	map(0x04800000, 0x0480ffff).rw(m_wifi, FUNC(nds_wifi_device::read), FUNC(nds_wifi_device::write));
 	map(0x04100010, 0x04100013).r(FUNC(nds_state::gamecard_data_r));
 	map(0x06000000, 0x0603ffff).mirror(0x00fc0000).rw(FUNC(nds_state::vram_region_r<VRAM_REGION_ARM7>), FUNC(nds_state::vram_region_w<VRAM_REGION_ARM7>));
 	map(0x08000000, 0x09ffffff).r(FUNC(nds_state::gba_rom_r<1>)).nopw();
@@ -1888,8 +2016,8 @@ void nds_state::update_vram_mapping()
 		const int ofs = (cnt[bank] >> 3) & 3;
 		const uint32_t base = bank_off[bank];
 
-		// F and G are 16K, and both their BG/OBJ offsets skip in a 4K/64K pattern
-		const int fg_page = (ofs & 1) + ((ofs & 2) * 4);
+		// F and G are 16K; OFS.0 steps their BG/OBJ base by 16K and OFS.1 by 64K
+		const int fg_page = (ofs & 1) + ((ofs & 2) * 2);
 
 		switch (bank)
 		{
@@ -2116,7 +2244,7 @@ void nds_state::draw_scanline(int line)
 uint32_t nds_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// POWCNT1 bit 0 powers both LCDs; bit 15 puts engine A on the top screen
-	if (!BIT(m_powcnt[0], 0))
+	if (m_sleeping || !BIT(m_powcnt[0], 0))
 	{
 		bitmap.fill(rgb_t::white(), cliprect);
 		return 0;
@@ -2134,16 +2262,16 @@ uint32_t nds_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 static INPUT_PORTS_START( nds )
 	PORT_START("KEYS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SELECT )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("R")
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("L")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::keypad_changed), 0)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::keypad_changed), 0)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SELECT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::keypad_changed), 0)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::keypad_changed), 0)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::keypad_changed), 0)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::keypad_changed), 0)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::keypad_changed), 0)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::keypad_changed), 0)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("R") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::keypad_changed), 0)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("L") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::keypad_changed), 0)
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("EXTKEYS")
@@ -2153,8 +2281,13 @@ static INPUT_PORTS_START( nds )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )   // DEBUG button, not fitted
 	PORT_BIT( 0x0030, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Touch")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNUSED )  // hinge: 0 = open
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Lid Closed") PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::lid_changed), 0)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("HEADPHONES")
+	PORT_CONFNAME( 0x01, 0x00, "Headphones" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(nds_state::headphones_changed), 0)
+	PORT_CONFSETTING( 0x00, DEF_STR( No ) )
+	PORT_CONFSETTING( 0x01, DEF_STR( Yes ) )
 
 	// raw 12-bit touchscreen controller readings
 	PORT_START("TOUCH_X")
@@ -2179,6 +2312,9 @@ void nds_state::machine_reset()
 	m_arm7wrambnk->set_bank(0);
 	m_arm9wrambnk->set_bank(0);
 	m_halted[0] = m_halted[1] = false;
+	m_sleeping = false;
+	m_sleep_start = attotime::zero;
+	std::fill(std::begin(m_sleep_remaining), std::end(m_sleep_remaining), attotime::never);
 
 	m_vramcnta = m_vramcntb = m_vramcntc = m_vramcntd = m_vramcnte = 0;
 	m_vramcntf = m_vramcntg = m_vramcnth = m_vramcnti = 0;
@@ -2206,6 +2342,7 @@ void nds_state::machine_reset()
 	m_pm_have_index = false;
 	std::fill(std::begin(m_pm_regs), std::end(m_pm_regs), 0);
 	m_pm_regs[0] = 0x0d;    // sound amp on, both backlights on
+	update_audio();
 	m_tsc_pos = 0;
 
 	m_auxspicnt = 0;
@@ -2378,7 +2515,7 @@ void nds_state::install_ds_arm7_map()
 	space.install_readwrite_handler(0x04000214, 0x04000217,
 			read32smo_delegate(*this, FUNC(nds_state::if_r<1>)),
 			write32s_delegate(*this, FUNC(nds_state::if_w<1>)));
-	space.install_read_handler(0x04000240, 0x04000243, read32smo_delegate(*this, FUNC(nds_state::if_r<1>)));
+	space.install_read_handler(0x04000240, 0x04000243, read32smo_delegate(*this, FUNC(nds_state::arm7_wramstat_r)));
 	space.install_readwrite_handler(0x04000300, 0x04000300,
 			read8smo_delegate(*this, FUNC(nds_state::arm7_postflg_r)),
 			write8smo_delegate(*this, FUNC(nds_state::arm7_postflg_w)));
@@ -2392,6 +2529,9 @@ void nds_state::install_ds_arm7_map()
 		write32s_delegate(*m_ndssound, FUNC(nds_sound_device::write)));
 	space.install_read_handler(0x04100000, 0x04100003, read32smo_delegate(*this, FUNC(nds_state::ipcfifo_recv<1>)));
 	space.install_read_handler(0x04100010, 0x04100013, read32smo_delegate(*this, FUNC(nds_state::gamecard_data_r)));
+	space.install_readwrite_handler(0x04800000, 0x0480ffff,
+			read16sm_delegate(*m_wifi, FUNC(nds_wifi_device::read)),
+			write16s_delegate(*m_wifi, FUNC(nds_wifi_device::write)));
 
 	space.install_readwrite_handler(0x06000000, 0x0603ffff, 0, 0x00fc0000, 0,
 			read32sm_delegate(*this, FUNC(nds_state::vram_region_r<VRAM_REGION_ARM7>)),
@@ -2408,6 +2548,7 @@ void nds_state::install_gba_map()
 	space.unmap_readwrite(0x00000000, 0xffffffff);
 
 	space.install_read_handler(0x00000000, 0x00003fff, read32s_delegate(*this, FUNC(nds_state::gba_bios_r)));
+	m_arm7->set_fetch_shadow(0x00000000, 0x00003fff);       // the BIOS protection returns the last opcode fetched there
 	space.nop_write(0x00000000, 0x00003fff);
 	space.install_read_handler(0x00004000, 0x01ffffff, read32s_delegate(*this, FUNC(nds_state::gba_open_bus_r)));
 	space.install_read_handler(0x10000000, 0xffffffff, read32s_delegate(*this, FUNC(nds_state::gba_open_bus_r)));
@@ -2455,9 +2596,16 @@ void nds_state::install_gba_map()
 	space.install_write_handler(0x04000300, 0x04000303, write8smo_delegate(*this, FUNC(nds_state::gba_haltcnt_w)), 0x0000ff00);
 	space.install_read_handler(0x04000800, 0x04000803, read32smo_delegate(*this, FUNC(nds_state::gba_memctrl_r)));
 	space.install_ram(0x05000000, 0x050003ff, 0x00fffc00, m_palette.target());                          // engine A palette
-	space.install_ram(0x06000000, 0x0600ffff, 0x00fe0000, &m_vram[0]);                                  // VRAM bank A, GBA layout
-	space.install_ram(0x06010000, 0x06017fff, 0x00fe8000, &m_vram[0x10000/4]);                          // OBJ half, mirrored at +0x8000
 	space.install_ram(0x07000000, 0x070003ff, 0x00fffc00, m_oam.target());                              // engine A OAM
+	space.install_readwrite_handler(0x06000000, 0x0601ffff, 0, 0x00fe0000, 0,                           // VRAM bank A, GBA layout
+			emu::detail::make_lr32_delegate(*this, NAME([this] (offs_t offset) -> uint32_t { return m_ppu[0]->gba_vram_load(&m_vram[0], offset); })),
+			emu::detail::make_lw32_delegate(*this, NAME([this] (offs_t offset, uint32_t data, uint32_t mem_mask) { m_ppu[0]->gba_vram_store(&m_vram[0], offset, data, mem_mask); })));
+
+	// stores follow the GBA's byte store rules for palette RAM and OAM
+	space.install_write_handler(0x05000000, 0x050003ff, 0, 0x00fffc00, 0,
+			emu::detail::make_lw32_delegate(*this, NAME([this] (offs_t offset, uint32_t data, uint32_t mem_mask) { gba_ppu_device::gba_pram_store(m_palette.target(), offset, data, mem_mask); })));
+	space.install_write_handler(0x07000000, 0x070003ff, 0, 0x00fffc00, 0,
+			emu::detail::make_lw32_delegate(*this, NAME([this] (offs_t offset, uint32_t data, uint32_t mem_mask) { gba_ppu_device::gba_oam_store(m_oam.target(), offset, data, mem_mask); })));
 
 	for (offs_t base = 0x08000000; base < 0x0e000000; base += 0x02000000)
 	{
@@ -2509,23 +2657,14 @@ uint32_t nds_state::gba_pak_r(offs_t offset)
 
 uint32_t nds_state::gba_bios_r(offs_t offset, uint32_t mem_mask)
 {
-	const uint32_t pc = m_arm7->pc();
-	if (pc >= 0x4000)
+	if (m_arm7->pc() >= 0x4000)
 	{
 		// The BIOS can only be read while executing from it; other reads return the most recently
 		// fetched BIOS opcode as per GBATEK.
-		return m_gba_bios_prefetch;
+		return m_arm7->fetch_shadow();
 	}
 
-	const uint32_t data = get_u32le(&m_gbabios[offset << 2]);
-
-	// The core prefetches 2 words ahead of the PC like the real pipeline, so PC+8
-	if (((offset << 2) == ((pc & ~3) + 8)) && !machine().side_effects_disabled())
-	{
-		m_gba_bios_prefetch = data;
-	}
-
-	return data;
+	return get_u32le(&m_gbabios[offset << 2]);
 }
 
 // Reads from unused address space return the most recently prefetched opcode.
@@ -2909,6 +3048,10 @@ uint32_t nds_state::gba_memctrl_r()
 
 void nds_state::machine_start()
 {
+	// the recompilers access main RAM in place: the ARM9 all of it, the ARM7 the 256K that is EWRAM in GBA mode too
+	m_arm9->arm7drc_add_fastram(0x02000000, 0x023fffff, false, memshare("mainram")->ptr());
+	m_arm7->arm7drc_add_fastram(0x02000000, 0x0203ffff, false, memshare("mainram")->ptr());
+
 	for (int i = 0; i < 8; i++)
 	{
 		m_dma_timer[i] = timer_alloc(FUNC(nds_state::dma_complete), this);
@@ -2932,7 +3075,6 @@ void nds_state::machine_start()
 	save_item(STRUCT_MEMBER(m_gba_fifo, sample));
 	save_item(STRUCT_MEMBER(m_gba_fifo, word));
 	save_item(NAME(m_gba_waitcnt));
-	save_item(NAME(m_gba_bios_prefetch));
 
 	// the card decrypts KEY1 commands with the same Blowfish tables the BIOS encrypts them with
 	m_ndscart->set_key1_table(memregion("arm7")->base() + 0x30);
@@ -2982,6 +3124,9 @@ void nds_state::machine_start()
 	save_item(NAME(m_powcnt));
 	save_item(NAME(m_biosprot));
 	save_item(NAME(m_halted));
+	save_item(NAME(m_sleeping));
+	save_item(NAME(m_sleep_start));
+	save_item(NAME(m_sleep_remaining));
 	save_item(NAME(m_sioregs));
 	save_item(NAME(m_rcnt));
 	save_item(NAME(m_card_seed));
@@ -3065,9 +3210,9 @@ void nds_state::nds(machine_config &config)
 	m_arm9->set_high_vectors();
 	m_arm9->set_addrmap(AS_PROGRAM, &nds_state::nds_arm9_map);
 
-	// the two CPUs communicate through shared RAM and the IPC registers,
-	// so they need to be kept in lockstep
-	config.set_perfect_quantum(m_arm9);
+	// the two CPUs communicate through shared RAM and the IPC registers, so they run
+	// in steps of 64 cycles of the 33 MHz clock (the bound melonDS uses too)
+	config.set_maximum_quantum(attotime::from_hz(MASTER_CLOCK / 64));
 
 	// WRAM
 	ADDRESS_MAP_BANK(config, "nds7wram").set_map(&nds_state::nds7_wram_map).set_options(ENDIANNESS_LITTLE, 32, 32, 0x10000);
@@ -3090,21 +3235,29 @@ void nds_state::nds(machine_config &config)
 	// battery-backed clock
 	S35180(config, m_rtc, 32'768);
 
+	// wireless module
+	NDS_WIFI(config, m_wifi, MASTER_CLOCK);
+	m_wifi->irq_cb().set(FUNC(nds_state::wifi_irq_w));
+
 	// DS native sound: 16 channels mixed to a stereo speaker
 	SPEAKER(config, "speaker", 2).front();
-	NDS_SOUND(config, m_ndssound, 0);
-	m_ndssound->add_route(0, "speaker", 1.0, 0);
-	m_ndssound->add_route(1, "speaker", 1.0, 1);
+	for (int i = 0; i < 2; i++)
+	{
+		FILTER_VOLUME(config, m_amp[i]).add_route(ALL_OUTPUTS, "speaker", 1.0, i);
+	}
+	NDS_SOUND(config, m_ndssound, MASTER_CLOCK);
+	m_ndssound->add_route(0, m_amp[0], 1.0);
+	m_ndssound->add_route(1, m_amp[1], 1.0);
 
 	// GBA-mode sound: the AGB APU (4 PSG channels + wave) and the two
 	// DirectSound FIFO channels' DACs
 	AGB_APU(config, m_gbsound, 4.194304_MHz_XTAL);
-	m_gbsound->add_route(0, "speaker", 0.5, 0);
-	m_gbsound->add_route(1, "speaker", 0.5, 1);
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_gba_ldac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_gba_rdac[0], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_gba_ldac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
-	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_gba_rdac[1], 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 1);
+	m_gbsound->add_route(0, m_amp[0], 0.5);
+	m_gbsound->add_route(1, m_amp[1], 0.5);
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_gba_ldac[0], 0).add_route(ALL_OUTPUTS, m_amp[0], 0.5);
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_gba_rdac[0], 0).add_route(ALL_OUTPUTS, m_amp[1], 0.5);
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_gba_ldac[1], 0).add_route(ALL_OUTPUTS, m_amp[0], 0.5);
+	DAC_8BIT_R2R_TWOS_COMPLEMENT(config, m_gba_rdac[1], 0).add_route(ALL_OUTPUTS, m_amp[1], 0.5);
 
 	// game card slot
 	NDS_CART_SLOT(config, m_ndscart, nds_cart, nullptr);

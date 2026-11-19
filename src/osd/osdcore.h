@@ -144,6 +144,7 @@ void osd_sleep(osd_ticks_t duration) noexcept;
 #define WORK_QUEUE_FLAG_IO          0x0001
 #define WORK_QUEUE_FLAG_MULTI       0x0002
 #define WORK_QUEUE_FLAG_HIGH_FREQ   0x0004
+static constexpr int WORK_QUEUE_FLAG_COARSE = 0x0008;
 
 /* these flags can be set when queueing a work item to indicate how to handle
    its deconstruction */
@@ -180,6 +181,12 @@ typedef void *(*osd_work_callback)(void *param, int threadid);
                 general, this implies doing some spin-waiting internally
                 before falling back to OS-specific synchronization
 
+            WORK_QUEUE_FLAG_COARSE - indicates that items are independent
+                and each does a substantial amount of work; idle threads
+                sleep until new items are queued instead of spinning, and
+                with WORK_QUEUE_FLAG_HIGH_FREQ the queue uses up to eight
+                processors by default instead of four
+
     Return value:
 
         A pointer to an allocated osd_work_queue object.
@@ -206,6 +213,23 @@ osd_work_queue *osd_work_queue_alloc(int flags);
         The number of incomplete items remaining in the queue.
 -----------------------------------------------------------------------------*/
 int osd_work_queue_items(osd_work_queue *queue);
+
+
+/*-----------------------------------------------------------------------------
+    osd_work_queue_thread_count: return the number of background threads
+
+    Parameters:
+
+        queue - pointer to an osd_work_queue that was previously created via
+            osd_work_queue_alloc
+
+    Return value:
+
+        The number of threads the queue created. The thread that waits on a
+        WORK_QUEUE_FLAG_MULTI queue is not counted; when it helps with the
+        work, its callbacks receive this value as their threadid.
+-----------------------------------------------------------------------------*/
+int osd_work_queue_thread_count(osd_work_queue *queue);
 
 
 /*-----------------------------------------------------------------------------
@@ -283,6 +307,38 @@ static inline osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work
 {
 	return osd_work_item_queue_multiple(queue, callback, 1, param, 0, flags);
 }
+
+
+/*-----------------------------------------------------------------------------
+    osd_work_item_queue_list: queue one work item per entry of a parameter
+    array
+
+    Parameters:
+
+        queue - pointer to an osd_work_queue that was previously created via
+            osd_work_queue_alloc
+
+        callback - pointer to a function that will do the work
+
+        numitems - number of work items to queue
+
+        params - array of numitems void * parameters, one per work item; the
+            values are copied before this function returns, so the array
+            itself need not remain valid
+
+        flags - one or more of the WORK_ITEM_FLAG_* values ORed together
+
+    Return value:
+
+        A pointer to the final allocated osd_work_item in the list, or
+        nullptr if numitems is zero or WORK_ITEM_FLAG_AUTO_RELEASE is set.
+
+    Notes:
+
+        On single-threaded systems, this function may actually execute the
+        work items immediately before returning.
+-----------------------------------------------------------------------------*/
+osd_work_item *osd_work_item_queue_list(osd_work_queue *queue, osd_work_callback callback, int32_t numitems, void *const *params, uint32_t flags);
 
 
 /*-----------------------------------------------------------------------------

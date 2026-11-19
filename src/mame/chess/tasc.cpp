@@ -289,6 +289,7 @@ void tasc_state::tasc(machine_config &config)
 	// basic machine hardware
 	ARM60(config, m_maincpu, 30_MHz_XTAL); // PROG32/DATA32 low: the 26-bit configuration
 	m_maincpu->set_addrmap(AS_PROGRAM, &tasc_state::main_map);
+	m_maincpu->set_force_no_drc(true); // rom_r charges the ROM wait states per opcode fetch, which recompiled code doesn't make
 
 	const attotime irq_period = attotime::from_hz(32.768_kHz_XTAL / 128); // 256Hz
 	m_maincpu->set_periodic_int(FUNC(tasc_state::irq1_line_assert), irq_period);

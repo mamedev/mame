@@ -83,21 +83,33 @@ acia6850_device::acia6850_device(const machine_config &mconfig, device_type type
 	, m_irq_handler(*this)
 	, m_status(SR_TDRE)
 	, m_tdr(0)
+	, m_rdr(0)
 	, m_first_master_reset(true)
 	, m_dcd_irq_pending(false)
 	, m_overrun_pending(false)
 	, m_divide(0)
+	, m_bits(0)
+	, m_stopbits(0)
+	, m_parity(0)
+	, m_brk(0)
 	, m_rts(0)
 	, m_dcd(0)
 	, m_irq(0)
 	, m_txc(0)
 	, m_txd(0)
 	, m_tx_state(0)
+	, m_tx_bits(0)
+	, m_tx_shift(0)
+	, m_tx_parity(0)
 	, m_tx_counter(0)
 	, m_tx_irq_enable(false)
 	, m_rxc(0)
 	, m_rxd(1)
 	, m_rx_state(0)
+	, m_rx_wait_mark(false)
+	, m_rx_bits(0)
+	, m_rx_shift(0)
+	, m_rx_parity(0)
 	, m_rx_counter(0)
 	, m_rx_irq_enable(false)
 {
@@ -139,6 +151,7 @@ void acia6850_device::device_start()
 	save_item(NAME(m_rxc));
 	save_item(NAME(m_rxd));
 	save_item(NAME(m_rx_state));
+	save_item(NAME(m_rx_wait_mark));
 	save_item(NAME(m_rx_bits));
 	save_item(NAME(m_rx_shift));
 	save_item(NAME(m_rx_parity));
@@ -213,6 +226,7 @@ void acia6850_device::control_w(uint8_t data)
 
 		m_rx_state = STATE_START;
 		m_rx_counter = 0;
+		m_rx_wait_mark = false;
 
 		m_tx_state = STATE_START;
 		output_txd(1);
@@ -362,7 +376,15 @@ void acia6850_device::write_rxc(int state)
 				switch (m_rx_state)
 				{
 				case STATE_START:
-					if (m_rxd == 0)
+					if (m_rx_wait_mark)
+					{
+						// a start bit is a 1-to-0 transition: after a framing
+						// error, ignore the line until it has returned to mark
+						if (m_rxd)
+							m_rx_wait_mark = false;
+						m_rx_counter = 0;
+					}
+					else if (m_rxd == 0)
 					{
 						if (m_rx_counter == 1)
 						{
@@ -461,6 +483,7 @@ void acia6850_device::write_rxc(int state)
 						if (!m_rxd)
 						{
 							m_status |= SR_FE;
+							m_rx_wait_mark = true;
 						}
 						else
 						{

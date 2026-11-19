@@ -270,6 +270,7 @@ private:
 	uint8_t z80_comms_status_r();
 	void z80_comms_ctrl_w(uint8_t data);
 	void ppi_irq(int state);
+	IRQ_CALLBACK_MEMBER(extcpu_acknowledge_irq);
 	void x86_dsr(int state);
 
 	virtual void machine_reset() override ATTR_COLD;
@@ -897,7 +898,12 @@ void attache816_state::z80_comms_ctrl_w(uint8_t data)
 void attache816_state::ppi_irq(int state)
 {
 	if(m_x86_irq_enable & 0x01)
-		m_extcpu->set_input_line_and_vector(0,state,0x03); // I8086
+		m_extcpu->set_input_line(0,state);
+}
+
+IRQ_CALLBACK_MEMBER(attache816_state::extcpu_acknowledge_irq)
+{
+	return 0x03;
 }
 
 void attache816_state::x86_dsr(int state)
@@ -1198,6 +1204,7 @@ void attache816_state::attache816(machine_config &config)
 	I8086(config, m_extcpu, 24_MHz_XTAL / 3);
 	m_extcpu->set_addrmap(AS_PROGRAM, &attache816_state::attache_x86_map);
 	m_extcpu->set_addrmap(AS_IO, &attache816_state::attache_x86_io);
+	m_extcpu->set_irq_acknowledge_callback(FUNC(attache816_state::extcpu_acknowledge_irq));
 	config.set_perfect_quantum(m_extcpu);
 
 	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));

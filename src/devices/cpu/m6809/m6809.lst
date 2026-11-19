@@ -21,6 +21,7 @@ DISPATCH01:
 
 	if (m_free_run) goto FREERUN;
 
+EXECUTE01:
 	// dispatch opcode
 	switch(m_opcode)
 	{
@@ -353,7 +354,8 @@ DISPATCH10:
 		case 0xFE:              set_regop16(m_s);       %EXTENDED;  %LD16;      return;
 		case 0xFF:              set_regop16(m_s);       %EXTENDED;  %ST16;      return;
 
-		default:                                                    %DISPATCH01; return;
+		// Undefined page 2/3 opcodes execute as page 1, discarding the prefix
+		default:                                                    goto EXECUTE01;
 	}
 	return;
 
@@ -382,7 +384,8 @@ DISPATCH11:
 		case 0xD3:              set_regop16(m_u);       %DIRECT;    %XADD16;    return;
 		case 0xE3:              set_regop16(m_u);       %INDEXED;   %XADD16;    return;
 		case 0xF3:              set_regop16(m_u);       %EXTENDED;  %XADD16;    return;
-		default:                                                    %DISPATCH01; return;
+		// Undefined page 2/3 opcodes execute as page 1, discarding the prefix
+		default:                                                    goto EXECUTE01;
 	}
 	return;
 

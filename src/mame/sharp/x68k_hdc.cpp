@@ -28,12 +28,15 @@ DEFINE_DEVICE_TYPE(X68KHDC, x68k_hdc_image_device, "x68k_hdc_image", "SASI Hard 
 
 x68k_hdc_image_device::x68k_hdc_image_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: harddisk_image_base_device(mconfig, X68KHDC, tag, owner, clock)
+	, m_drq_callback(*this)
 {
 }
 
 TIMER_CALLBACK_MEMBER(x68k_hdc_image_device::req_timer_callback)
 {
 	m_status_port |= SASI_STATUS_REQ;
+	// Command, status and message bytes are transferred by the CPU.
+	m_drq_callback(m_phase == sasi_phase::READ || m_phase == sasi_phase::WRITE);
 }
 
 void x68k_hdc_image_device::device_start()
@@ -118,6 +121,7 @@ void x68k_hdc_image_device::hdc_w(offs_t offset, u16 data)
 			}
 
 			m_status_port &= ~SASI_STATUS_REQ;
+			m_drq_callback(0);
 			m_req_timer->adjust(attotime::from_nsec(450));
 			m_transfer_byte_count++;
 			if(m_transfer_byte_count >= m_transfer_byte_total)
@@ -377,6 +381,7 @@ u16 x68k_hdc_image_device::hdc_r(offs_t offset)
 			}
 
 			m_status_port &= ~SASI_STATUS_REQ;
+			m_drq_callback(0);
 			m_req_timer->adjust(attotime::from_nsec(450));
 			m_transfer_byte_count++;
 			if(m_transfer_byte_count >= m_transfer_byte_total)

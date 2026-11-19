@@ -27,6 +27,8 @@ public:
 	// construction/destruction
 	mcs820_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
+	static constexpr flags_type emulation_flags() { return flags::NOT_WORKING; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;

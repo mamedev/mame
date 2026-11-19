@@ -86,6 +86,9 @@ mos8722_device::mos8722_device(const machine_config &mconfig, const char *tag, d
 
 void mos8722_device::device_start()
 {
+	save_item(NAME(m_reg));
+	save_item(NAME(m_p0h_latch));
+	save_item(NAME(m_p1h_latch));
 }
 
 

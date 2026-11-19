@@ -52,6 +52,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	void clock_falling();
 	void set_sr_line(bool state);
 
 	TIMER_CALLBACK_MEMBER(update_do);
@@ -62,6 +63,7 @@ private:
 	devcb_read8        m_read_data;
 	devcb_write8       m_write_data;
 
+	bool m_mode;                // mode input
 	bool m_new_data;            // new data written
 	u8 m_data;                  // data latch
 

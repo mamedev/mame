@@ -57,6 +57,8 @@
 #include "screen.h"
 #include "tilemap.h"
 
+#include <bit>
+
 
 namespace {
 
@@ -395,11 +397,7 @@ void m52_state::colorram_w(offs_t offset, uint8_t data)
    follows: result = popcount(value & 0x7f) ^ (value >> 7) */
 uint8_t m52_state::protection_r()
 {
-	int popcount = 0;
-
-	for (int temp = m_bgxpos[0] & 0x7f; temp != 0; temp >>= 1)
-		popcount += temp & 1;
-	return popcount ^ (m_bgxpos[0] >> 7);
+	return std::popcount(m_bgxpos[0] & 0x7fU) ^ (m_bgxpos[0] >> 7);
 }
 
 
@@ -459,7 +457,6 @@ void alpha1v_state::flipscreen_w(uint8_t data)
 
 void m52_state::draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect, int xpos, int ypos, int image)
 {
-	rectangle rect;
 	const rectangle &visarea = m_screen->visible_area();
 	const pen_t *paldata = m_bg_palette->pens();
 	constexpr uint8_t BGHEIGHT = 128;
@@ -495,19 +492,13 @@ void m52_state::draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	// create a solid fill below the 64 pixel high bg images
 	if (m_do_bg_fills)
 	{
-		rect.min_x = visarea.min_x;
-		rect.max_x = visarea.max_x;
+		rectangle rect;
+		rect.setx(visarea.left(), visarea.right());
 
 		if (flip_screen())
-		{
-			rect.min_y = ypos - BGHEIGHT;
-			rect.max_y = ypos - 1;
-		}
+			rect.sety(ypos - BGHEIGHT, ypos - 1);
 		else
-		{
-			rect.min_y = ypos + BGHEIGHT;
-			rect.max_y = ypos + 2 * BGHEIGHT - 1;
-		}
+			rect.sety(ypos + BGHEIGHT, ypos + 2 * BGHEIGHT - 1);
 
 		bitmap.fill(paldata[m_bg_gfxdecode->gfx(image)->colorbase() + 3], rect);
 	}
@@ -537,16 +528,14 @@ void m52_state::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, in
 		// sprites from offsets $80-$FF are processed in the lower half of the frame
 		rectangle clip = cliprect;
 		if (!(offs & 0x80))
-			clip.min_y = 0, clip.max_y = 127;
+			clip.sety(0, 127);
 		else
-			clip.min_y = 128, clip.max_y = 255;
+			clip.sety(128, 255);
 
 		// adjust for flipping
 		if (flip_screen())
 		{
-			int temp = clip.min_y;
-			clip.min_y = 255 - clip.max_y;
-			clip.max_y = 255 - temp;
+			clip.sety(255 - clip.bottom(), 255 - clip.top());
 			flipx = !flipx;
 			flipy = !flipy;
 			sx = 238 - sx;

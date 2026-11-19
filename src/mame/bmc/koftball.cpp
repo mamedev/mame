@@ -236,17 +236,18 @@ void koftball_state::draw_pixlayer(bitmap_ind16 &bitmap, const rectangle &clipre
 {
 	const u8 pix_bank = (m_pixpal & 0xf) << 4;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
+		auto *const dst = &bitmap.pix(y);
 		const u16 pitch = y << 7;
-		for (int x = cliprect.min_x >> 2; x <= cliprect.max_x >> 2; x++)
+		for (int x = cliprect.left() >> 2; x <= cliprect.right() >> 2; x++)
 		{
 			const u16 tile_data = m_pixram[(pitch + x) & 0xffff];
 			for (int xi = 0; xi < 4; xi++)
 			{
 				const u8 nibble = (tile_data >> ((3 - xi) << 2)) & 0xf;
 				if (nibble)
-					bitmap.pix(y, (x << 2) | xi) = pix_bank | nibble;
+					dst[(x << 2) | xi] = pix_bank | nibble;
 			}
 		}
 	}

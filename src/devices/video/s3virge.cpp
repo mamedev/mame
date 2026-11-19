@@ -264,7 +264,7 @@ void s3virge_vga_device::crtc_map(address_map &map)
 	map(0x3a, 0x3a).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			s3.cr3a = data;
-			s3_define_video_mode();
+			recompute_params();
 		})
 	);
 	map(0x40, 0x40).lw8(
@@ -413,7 +413,8 @@ void s3virge_vga_device::crtc_map(address_map &map)
 	);
 }
 
-void s3virge_vga_device::s3_define_video_mode()
+// TODO: merge with pc_vga_s3 version (mostly if not all same)
+void s3virge_vga_device::recompute_params()
 {
 	int divisor = 1;
 	const XTAL base_xtal = XTAL(14'318'181);
@@ -421,6 +422,7 @@ void s3virge_vga_device::s3_define_video_mode()
 
 	if((vga.miscellaneous_output & 0xc) == 0x0c)
 	{
+		// TODO: same as pc_vga_s3 with 1600x1200x8
 		// Dot clock is set via SR12 and SR13
 		// DCLK calculation
 		double ratio = (double)(s3.clk_pll_m+2) / (double)((s3.clk_pll_n+2)*(pow(2.0,s3.clk_pll_r))); // clock between XIN and XOUT

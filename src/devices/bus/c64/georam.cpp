@@ -30,6 +30,7 @@ DEFINE_DEVICE_TYPE(C64_GEORAM, c64_georam_cartridge_device, "c64_georam", "C64 G
 c64_georam_cartridge_device::c64_georam_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_GEORAM, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
+	device_nvram_interface(mconfig, *this, false),
 	m_ram(*this, "ram", 0x80000, ENDIANNESS_LITTLE),
 	m_bank(0)
 {
@@ -54,6 +55,40 @@ void c64_georam_cartridge_device::device_start()
 void c64_georam_cartridge_device::device_reset()
 {
 	m_bank = 0;
+}
+
+
+//-------------------------------------------------
+//  nvram_default - RAM is only retained when
+//  something else powers the cartridge
+//-------------------------------------------------
+
+void c64_georam_cartridge_device::nvram_default()
+{
+}
+
+
+//-------------------------------------------------
+//  nvram_read - called to read NVRAM from the
+//  .nv file
+//-------------------------------------------------
+
+bool c64_georam_cartridge_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = read(file, m_ram.target(), m_ram.bytes());
+	return !err && (actual == m_ram.bytes());
+}
+
+
+//-------------------------------------------------
+//  nvram_write - called to write NVRAM to the
+//  .nv file
+//-------------------------------------------------
+
+bool c64_georam_cartridge_device::nvram_write(util::write_stream &file)
+{
+	auto const [err, actual] = write(file, m_ram.target(), m_ram.bytes());
+	return !err;
 }
 
 

@@ -49,30 +49,34 @@ void v1050_state::videoram_w(offs_t offset, uint8_t data)
 
 MC6845_UPDATE_ROW( v1050_state::crtc_update_row )
 {
+	pen_t const *const pens = m_palette->pens();
+	uint32_t *p = &bitmap.pix(vbp + y, hbp);
+
 	for (int column = 0; column < x_count; column++)
 	{
 		uint16_t address = (((ra & 0x03) + 1) << 13) | ((ma & 0x1fff) + column);
 		uint8_t data = m_video_ram[address & V1050_VIDEORAM_MASK];
 		uint8_t attr = (m_attr & 0xfc) | (m_attr_ram[address & V1050_VIDEORAM_MASK] & 0x03);
 
-		for (int bit = 0; bit < 8; bit++)
+		pen_t off = pens[0], on = pens[0];
+
+		if (de && !(attr & V1050_ATTR_BLANK))
 		{
-			int x = (column * 8) + bit;
-			int dot = BIT(data, 7);
+			int const reverse = BIT(attr, 4);
+			off = pens[reverse];
 
 			/* blinking */
-			if ((attr & V1050_ATTR_BD1) && !(attr & V1050_ATTR_BLINK)) dot = 0;
+			if ((attr & V1050_ATTR_BD1) && !(attr & V1050_ATTR_BLINK))
+				on = off;
+			else if ((attr & V1050_ATTR_BOLD) && (attr & V1050_ATTR_BD0))
+				on = pens[2];
+			else
+				on = pens[reverse ^ 1];
+		}
 
-			/* reverse video */
-			int color = dot ^ BIT(attr, 4);
-
-			if (dot && (attr & V1050_ATTR_BOLD) && (attr & V1050_ATTR_BD0)) color = 2;
-
-			/* display blank */
-			if (attr & V1050_ATTR_BLANK) color = 0;
-
-			bitmap.pix(vbp + y, hbp + x) = m_palette->pen(de ? color : 0);
-
+		for (int bit = 0; bit < 8; bit++)
+		{
+			*p++ = BIT(data, 7) ? on : off;
 			data <<= 1;
 		}
 	}

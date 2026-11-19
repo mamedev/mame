@@ -24,6 +24,7 @@ public:
 	vr0video_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void execute_flipping();
+	void set_hres(u32 hdisp);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	auto idleskip_cb() { return m_idleskip_cb.bind(); }
 
@@ -130,12 +131,18 @@ private:
 	u32 m_draw_dest;       // frameram pointer to draw buffer area
 	u32 m_display_dest;    // frameram pointer to display buffer area
 	bool m_flip_sync = false;
+	u8 m_fb_shift;              // frame buffer line pitch (log2 of the pixels)
 
 	emu_timer *m_pipeline_timer;
 
-	// 2 bytes per framebuffer data
-	inline u32 get_fb_addr(u16 x, u16 y) { return ((x & 0x3ff) | ((u32(y) & 0x1ff) << 10)) << 1; }
+	// 2 bytes per framebuffer data, X wraps around the line
+	inline u32 get_fb_addr(u16 x, u16 y) { return ((x & ((1 << m_fb_shift) - 1)) | ((u32(y) & 0x1ff) << m_fb_shift)) << 1; }
 	inline u16 get_packet(u32 ptr) { return m_texcache.read_word(ptr << 1); }
+
+	// Dx-EndX and Dy-EndY are counted with 10 and 9 bit counters, wrapping around the frame buffer
+	static u32 get_quad_width(const quad_info &quad) { return ((quad.endx - quad.dx) & 0x3ff) + 1; }
+	static u32 get_quad_height(const quad_info &quad) { return ((quad.endy - quad.dy) & 0x1ff) + 1; }
+
 	u16 do_alpha(quad_info &quad, u16 src, u16 dst);
 	template <u8 Bpp, bool Tiled, u8 Blend> void draw_quad(quad_info &quad);
 	void draw_quad_fill(quad_info &quad);

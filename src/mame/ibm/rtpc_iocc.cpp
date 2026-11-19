@@ -399,7 +399,7 @@ template <typename T> bool rtpc_iocc_device::pio_store(offs_t address, T data, r
 	}
 	else if ((address & REG_MASK) == TCW_BASE)
 	{
-		logerror("tcw[0x%03x] = 0x%04x\n", (address & ~REG_MASK) >> 1, data);
+		LOG("tcw[0x%03x] = 0x%04x\n", (address & ~REG_MASK) >> 1, data);
 		m_tcw[(address & ~REG_MASK) >> 1] = data;
 
 		return true;

@@ -19,8 +19,8 @@
         ROM clears it to 0 at boot, then never touches it again. Likely a reset signal
 
         - $5300000F: RAM / control switch
-            Bit 2 = Tag RAM map enable?
-            Bit 1 = L2 cache map enable?
+            Bit 2 = Tag RAM write enable
+            Bit 1 = L2 cache write enable
             Bit 0 = ?
 
         - $53000017: ???
@@ -65,6 +65,8 @@ void capella_device::map(address_map &map)
 	map(0x53000010, 0x53000017).rw(FUNC(capella_device::ctrl_b_r), FUNC(capella_device::ctrl_b_w));
 	map(0x53000018, 0x5300001f).rw(FUNC(capella_device::irq_ack_r), FUNC(capella_device::irq_ack_w));
 	map(0x53000020, 0x53000027).r(FUNC(capella_device::ipl_lines_r));
+	map(0x51000000, 0x5103ffff).rw(FUNC(capella_device::l2_data_r), FUNC(capella_device::l2_data_w)).mirror(0x000c0000);
+	map(0x52000000, 0x5203ffff).rw(FUNC(capella_device::l2_tag_r), FUNC(capella_device::l2_tag_w)).mirror(0x000c0000);
 }
 
 //-------------------------------------------------
@@ -95,6 +97,11 @@ void capella_device::device_start()
 	save_item(NAME(m_nmi));
 	save_item(NAME(m_ipl));
 	save_item(NAME(m_irq_pending));
+
+	std::fill(std::begin(m_l2_data), std::end(m_l2_data), 0);
+	std::fill(std::begin(m_l2_tag), std::end(m_l2_tag), 0);
+	save_item(NAME(m_l2_data));
+	save_item(NAME(m_l2_tag));
 }
 
 //-------------------------------------------------
@@ -136,6 +143,38 @@ u64 capella_device::ctrl_b_r(offs_t offset)
 void capella_device::ctrl_b_w(offs_t offset, u64 data)
 {
 	m_ctrl_reg_b = data & 0x1f;
+}
+
+static u64 l2_bus_data(u64 data, u64 mem_mask)
+{
+	data &= mem_mask;
+	if (!(mem_mask >> 32))
+		data |= data << 32;
+	else if (!u32(mem_mask))
+		data |= data >> 32;
+	return data;
+}
+
+u64 capella_device::l2_data_r(offs_t offset)
+{
+	return m_l2_data[offset];
+}
+
+void capella_device::l2_data_w(offs_t offset, u64 data, u64 mem_mask)
+{
+	if ((m_ctrl_reg & 3) == 2)
+		m_l2_data[offset] = l2_bus_data(data, mem_mask);
+}
+
+u64 capella_device::l2_tag_r(offs_t offset)
+{
+	return (m_l2_data[offset] & ~u64(0x0f)) | m_l2_tag[offset];
+}
+
+void capella_device::l2_tag_w(offs_t offset, u64 data, u64 mem_mask)
+{
+	if ((m_ctrl_reg & 5) == 4)
+		m_l2_tag[offset] = l2_bus_data(data, mem_mask) & ((offset & 3) ? 0x0f : 0x07);
 }
 
 u64 capella_device::ipl_lines_r(offs_t offset)

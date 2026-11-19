@@ -221,8 +221,8 @@ ROM_END
 
 
 // years were taken from GFX ROMs
-GAME( 2004,  crzyddz,  0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Crazy Dou Di Zhu",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004,  sandaha,  0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "San Da Ha",            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004,  fkddz,    0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Fengkuang Dou Dizhu",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2004,  fdjqb,    0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Fengdou Jiaqiang Ban", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 2003,  gbsf,     0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Gangbao Sifang",       MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004,  crzyddz,  0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Crazy Dou Di Zhu",                          MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004,  sandaha,  0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "San Da Ha",                                 MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004,  fkddz,    0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Fengkuang Dou Dizhu (M16C-based hardware)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2004,  fdjqb,    0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Fengdou Jiaqiang Ban",                      MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2003,  gbsf,     0, sealy, sealy, sealy_m16c_state, empty_init, ROT0, "Sealy", "Gangbao Sifang",                            MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

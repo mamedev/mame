@@ -39,6 +39,7 @@ cassette_image_device::cassette_image_device(const machine_config &mconfig, cons
 	device_t(mconfig, CASSETTE, tag, owner, clock),
 	device_image_interface(mconfig, *this),
 	device_sound_interface(mconfig, *this),
+	m_change_handler(*this),
 	m_cassette(nullptr),
 	m_state(CASSETTE_STOPPED),
 	m_position(0.0),
@@ -98,7 +99,10 @@ void cassette_image_device::update()
 		case CASSETTE_PLAY:
 			if (m_cassette)
 			{
-				m_cassette->get_sample(m_channel, new_position, 0.0, &m_value);
+				if (m_cassette->has_pulses())
+					m_value = m_cassette->pulse_sample(new_position, m_direction);
+				else
+					m_cassette->get_sample(m_channel, new_position, 0.0, &m_value);
 				// See if reached end of tape
 				double length = get_length();
 				if (new_position > length)
@@ -106,7 +110,7 @@ void cassette_image_device::update()
 					m_state = (m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED;
 					new_position = length;
 				}
-				else if (new_position < 0.0)
+				else if (new_position <= 0.0 && m_direction < 0)
 				{
 					m_state = (m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED;
 					new_position = 0.0;
@@ -134,9 +138,25 @@ void cassette_image_device::change_state(cassette_state state, cassette_state ma
 	{
 		update();
 		m_state = new_state;
+		m_change_handler(0);
 	}
 }
 
+
+
+attotime cassette_image_device::time_to_next_transition()
+{
+	if (!m_cassette || !is_playing() || !motor_on() || m_speed <= 0)
+		return attotime::never;
+	if (!m_cassette->has_pulses())
+		return attotime::from_double(1.0 / (m_cassette->get_info().sample_frequency * m_speed));
+	double const position = get_position();
+	double const next = m_cassette->next_transition(position, m_direction);
+	if (next < 0)
+		return attotime::never;
+	double const delay = (next - position) / (m_speed * m_direction);
+	return delay > 0 ? attotime::from_double(delay) : attotime::never;
+}
 
 
 double cassette_image_device::input()
@@ -182,22 +202,38 @@ double cassette_image_device::get_length()
 
 void cassette_image_device::set_channel(int channel)
 {
+	if (started())
+		update();
 	m_channel = channel;
+	if (started())
+		m_change_handler(0);
 }
 
 void cassette_image_device::set_speed(double speed)
 {
+	if (started())
+		update();
 	m_speed = speed;
+	if (started())
+		m_change_handler(0);
 }
 
 void cassette_image_device::go_forward()
 {
+	if (started())
+		update();
 	m_direction = 1;
+	if (started())
+		m_change_handler(0);
 }
 
 void cassette_image_device::go_reverse()
 {
+	if (started())
+		update();
 	m_direction = -1;
+	if (started())
+		m_change_handler(0);
 }
 
 
@@ -223,6 +259,7 @@ void cassette_image_device::seek(double time, int origin)
 
 	// clip position into legal bounds
 	m_position = std::clamp(time, 0.0, length);
+	m_change_handler(0);
 }
 
 
@@ -353,6 +390,7 @@ std::error_condition cassette_image_device::internal_load(bool is_create)
 		m_channel = 0;
 		m_speed = 1;
 		m_direction = 1;
+		m_change_handler(0);
 
 		return std::error_condition();
 	}
@@ -389,11 +427,9 @@ void cassette_image_device::call_unload()
 	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
 		update();
 
-	// close out the cassette
-	m_cassette.reset();
-
-	// set to default state, but only change the UI state
 	change_state(CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+	m_cassette.reset();
+	m_change_handler(0);
 }
 
 

@@ -382,7 +382,7 @@ u32 ibm5100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, re
 	for (unsigned char_y = 0; char_y < 16; char_y++)
 	{
 		// every alternate scan line is blank
-		int const y = screen.visible_area().min_y + char_y * 12 * 2;
+		int const y = screen.visible_area().top() + char_y * 12 * 2;
 
 		// compute offset into rws for each row
 		offs_t offset = 0x200 + char_y * 64 + r32;
@@ -393,7 +393,7 @@ u32 ibm5100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, re
 			if (!n64 && (char_x & 1))
 				continue;
 
-			int const x = screen.visible_area().min_x + char_x * 10;
+			int const x = screen.visible_area().left() + char_x * 10;
 
 			// read next character
 			u8 const char_data = rws[offset++];

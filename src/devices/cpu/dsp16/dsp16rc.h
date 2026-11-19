@@ -23,6 +23,8 @@ public:
 	recompiler(dsp16_device_base &host, u32 flags);
 	~recompiler();
 
+	core_state &core() { return *m_core; }
+
 private:
 	// compilation boundaries
 	enum : u32
@@ -42,11 +44,14 @@ private:
 		EXEC_RESET_CACHE
 	};
 
+	struct core_destructer { void operator()(core_state *obj) const noexcept; };
+	using core_state_ptr = std::unique_ptr<core_state, core_destructer>;
+
 	// host CPU device, frontend to describe instructions, and UML engine
 	dsp16_device_base   &m_host;
-	core_state          &m_core;
 	frontend            m_frontend;
 	drcuml_state        m_uml;
+	core_state_ptr      m_core;
 };
 
 #endif // MAME_CPU_DSP16_DSP16RC_H

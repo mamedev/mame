@@ -33,9 +33,9 @@ public:
 	{ }
 
 	int clock_r();
-	void bzone(machine_config &config);
-	void bradley(machine_config &config);
-	void dsrtwars(machine_config &config);
+
+	void bzone(machine_config &config) ATTR_COLD;
+	void bradley(machine_config &config) ATTR_COLD;
 
 protected:
 	void bzone_coin_counter_w(offs_t offset, uint8_t data);
@@ -45,11 +45,11 @@ protected:
 	INTERRUPT_GEN_MEMBER(bzone_interrupt);
 	void bzone_sounds_w(uint8_t data);
 
-	void bzone_base(machine_config &config);
-	void bzone_audio(machine_config &config);
+	void bzone_base(machine_config &config) ATTR_COLD;
+	void bzone_audio(machine_config &config) ATTR_COLD;
+	void bzone_discrete_audio(machine_config &config) ATTR_COLD;
 	void bzone_map(address_map &map) ATTR_COLD;
 	void bradley_map(address_map &map) ATTR_COLD;
-	void dsrtwars_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mathbox_device> m_mathbox;
@@ -72,7 +72,7 @@ public:
 		m_fake_ports(*this, "FAKE%u", 1U)
 	{ }
 
-	void redbaron(machine_config &config);
+	void redbaron(machine_config &config) ATTR_COLD;
 
 protected:
 	uint8_t redbaron_joy_r();

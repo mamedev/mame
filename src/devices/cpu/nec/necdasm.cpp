@@ -797,11 +797,28 @@ const char *const nec_disassembler::nec_sfreg[256] =
 
 #define MAX_LENGTH  8
 
+offs_t nec_disassembler::code_address(offs_t pc_base, offs_t pc) const
+{
+	const auto cs = m_config->get_cs_base();
+	if (cs && ((pc_base - *cs) & 0xfffff) < 0x10000)
+		return (*cs + u16(pc - *cs)) & 0xfffff;
+	return pc;
+}
+
+offs_t nec_disassembler::relative_address(offs_t pc_base, offs_t pc, s32 displacement, bool word) const
+{
+	const auto cs = m_config->get_cs_base();
+	if (cs && ((pc_base - *cs) & 0xfffff) < 0x10000)
+		return (*cs + u16(pc - *cs + displacement)) & 0xfffff;
+	// Retain the stateless convention when the code segment is not known.
+	return word ? (pc & 0xffff0000) | ((pc + displacement) & 0xffff) : pc + displacement;
+}
+
 uint8_t nec_disassembler::FETCH(offs_t pc_base, offs_t &pc, const data_buffer &opcodes)
 {
 	if ((pc - pc_base) + 1 > MAX_LENGTH)
 		return 0xff;
-	u8 r = opcodes.r8(pc);
+	u8 r = opcodes.r8(code_address(pc_base, pc));
 	pc++;
 	return r;
 }
@@ -810,7 +827,7 @@ uint16_t nec_disassembler::FETCH16(offs_t pc_base, offs_t &pc, const data_buffer
 {
 	if ((pc - pc_base) + 1 > MAX_LENGTH)
 		return 0xff;
-	u16 r = opcodes.r16(pc);
+	u16 r = opcodes.r8(code_address(pc_base, pc)) | (u16(opcodes.r8(code_address(pc_base, pc + 1))) << 8);
 	pc += 2;
 	return r;
 }
@@ -962,12 +979,12 @@ void nec_disassembler::handle_param(std::ostream &stream, uint32_t param, offs_t
 		case PARAM_REL16:
 			/* make sure to keep the relative offset within the segment */
 			d16 = FETCH16(pc_base, pc, params);
-			util::stream_format( stream, "%s", hexstring((pc & 0xFFFF0000) | ((pc + d16) & 0x0000FFFF), 0) );
+			util::stream_format( stream, "%s", hexstring(relative_address(pc_base, pc, d16, true), 0) );
 			break;
 
 		case PARAM_REL8:
 			d8 = FETCH(pc_base, pc, params);
-			util::stream_format( stream, "%s", hexstring(pc + d8, 0) );
+			util::stream_format( stream, "%s", hexstring(relative_address(pc_base, pc, d8, false), 0) );
 			break;
 
 		case PARAM_MEM_OFFS:
@@ -1383,6 +1400,13 @@ void nec_disassembler::handle_fpu(std::ostream &stream, uint8_t op1, uint8_t op2
 	}
 }
 
+u8 nec_disassembler::decrypt_opcode(u8 opcode)
+{
+	if (m_decryption_table && m_config->get_decryption_mode())
+		return m_decryption_table[opcode];
+	return opcode;
+}
+
 void nec_disassembler::decode_opcode(std::ostream &stream, const NEC_I386_OPCODE *op, uint8_t op1, offs_t pc_base, offs_t &pc, const data_buffer &opcodes, const data_buffer &params)
 {
 	int i;
@@ -1400,15 +1424,13 @@ void nec_disassembler::decode_opcode(std::ostream &stream, const NEC_I386_OPCODE
 		case SEG_DS1:
 		case SEG_SS:
 			m_segment = op->flags;
-			op2 = FETCH(pc_base, pc, opcodes);
-			if (m_decryption_table) op2 = m_decryption_table[op2];
+			op2 = decrypt_opcode(FETCH(pc_base, pc, opcodes));
 			decode_opcode( stream, &necv_opcode_table1[op2], op1, pc_base, pc, opcodes, params );
 			return;
 
 		case PREFIX:
 			util::stream_format( stream, "%-8s", op->mnemonic );
-			op2 = FETCH(pc_base, pc, opcodes);
-			if (m_decryption_table) op2 = m_decryption_table[op2];
+			op2 = decrypt_opcode(FETCH(pc_base, pc, opcodes));
 			decode_opcode( stream, &necv_opcode_table1[op2], op1, pc_base, pc, opcodes, params );
 			return;
 
@@ -1743,10 +1765,7 @@ offs_t nec_disassembler::disassemble(std::ostream &stream, offs_t eip, const dat
 	m_dasm_flags = 0;
 	m_segment = 0;
 
-	op = FETCH(eip, pc, opcodes);
-
-	if (m_decryption_table)
-		op = m_decryption_table[op];
+	op = decrypt_opcode(FETCH(eip, pc, opcodes));
 
 	decode_opcode( stream, &necv_opcode_table1[op], op, eip, pc, opcodes, params );
 	return (pc-eip) | m_dasm_flags | SUPPORTED;
@@ -1761,3 +1780,12 @@ u32 nec_disassembler::opcode_alignment() const
 	return 1;
 }
 
+bool nec_disassembler::config::get_decryption_mode() const
+{
+	return true;
+}
+
+std::optional<u32> nec_disassembler::config::get_cs_base() const
+{
+	return std::nullopt;
+}

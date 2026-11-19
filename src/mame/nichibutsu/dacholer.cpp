@@ -89,6 +89,7 @@ private:
 	INTERRUPT_GEN_MEMBER(sound_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void adpcm_int(int state);
+	IRQ_CALLBACK_MEMBER(audiocpu_acknowledge_irq);
 	void itaten_main_map(address_map &map) ATTR_COLD;
 	void itaten_snd_io_map(address_map &map) ATTR_COLD;
 	void itaten_snd_map(address_map &map) ATTR_COLD;
@@ -129,7 +130,7 @@ private:
 	uint8_t m_snd_interrupt_enable = 0;
 	uint8_t m_music_interrupt_enable = 0;
 	uint8_t m_snd_ack = 0;
-
+	uint8_t m_snd_irq_vector = 0;
 };
 
 TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
@@ -569,7 +570,8 @@ INTERRUPT_GEN_MEMBER(dacholer_state::sound_irq)
 {
 	if (m_music_interrupt_enable == 1)
 	{
-		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x30); // Z80
+		m_snd_irq_vector = 0x30;
+		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -582,9 +584,15 @@ void dacholer_state::adpcm_int(int state)
 		m_msm_toggle ^= 1;
 		if (m_msm_toggle == 0)
 		{
-			m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x38); // Z80
+			m_snd_irq_vector = 0x38;
+			m_audiocpu->set_input_line(0, HOLD_LINE);
 		}
 	}
+}
+
+IRQ_CALLBACK_MEMBER(dacholer_state::audiocpu_acknowledge_irq)
+{
+	return m_snd_irq_vector;
 }
 
 void dacholer_state::machine_start()
@@ -595,6 +603,7 @@ void dacholer_state::machine_start()
 	save_item(NAME(m_snd_interrupt_enable));
 	save_item(NAME(m_music_interrupt_enable));
 	save_item(NAME(m_snd_ack));
+	save_item(NAME(m_snd_irq_vector));
 }
 
 void dacholer_state::machine_reset()
@@ -606,6 +615,7 @@ void dacholer_state::machine_reset()
 	m_snd_interrupt_enable = 0;
 	m_music_interrupt_enable = 0;
 	m_snd_ack = 0;
+	m_snd_irq_vector = 0;
 }
 
 // guess: use the same resistor values as Crazy Climber (needs checking on the real hardware)
@@ -660,6 +670,7 @@ void dacholer_state::dacholer(machine_config &config)
 	m_audiocpu->set_addrmap(AS_PROGRAM, &dacholer_state::snd_map);
 	m_audiocpu->set_addrmap(AS_IO, &dacholer_state::snd_io_map);
 	m_audiocpu->set_vblank_int("screen", FUNC(dacholer_state::sound_irq));
+	m_audiocpu->set_irq_acknowledge_callback(FUNC(dacholer_state::audiocpu_acknowledge_irq));
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen"));

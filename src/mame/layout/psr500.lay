@@ -1,0 +1,681 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+
+Control positions follow the front-panel diagram in the Yamaha PSR-400/PSR-500
+service manual (printed pages 6-7) and owner's manual (page 3).
+-->
+<mamelayout version="2">
+
+	<element name="background">
+		<rect />
+	</element>
+
+	<element name="surface">
+		<rect />
+	</element>
+
+	<element name="rule">
+		<rect />
+	</element>
+
+	<element name="display_background">
+		<rect />
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg />
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.22" green="0.045" blue="0.025" /></disk>
+		<disk state="1"><color red="1.0" green="0.16" blue="0.06" /></disk>
+	</element>
+
+	<element name="button" defstate="0">
+		<rect state="0"><color red="0.54" green="0.54" blue="0.54" /></rect>
+		<rect state="1" />
+	</element>
+
+	<element name="manufacturer">
+		<text string="Yamaha" align="1" />
+	</element>
+
+	<element name="model">
+		<text string="PSR-500" align="1" />
+	</element>
+
+	<element name="text_0">
+		<text string="0" />
+	</element>
+
+	<element name="text_1">
+		<text string="1" />
+	</element>
+
+	<element name="text_2">
+		<text string="2" />
+	</element>
+
+	<element name="text_3">
+		<text string="3" />
+	</element>
+
+	<element name="text_4">
+		<text string="4" />
+	</element>
+
+	<element name="text_5">
+		<text string="5" />
+	</element>
+
+	<element name="text_6">
+		<text string="6" />
+	</element>
+
+	<element name="text_7">
+		<text string="7" />
+	</element>
+
+	<element name="text_8">
+		<text string="8" />
+	</element>
+
+	<element name="text_9">
+		<text string="9" />
+	</element>
+
+	<element name="text_accomp">
+		<text string="Accomp." />
+	</element>
+
+	<element name="text_accompaniment_control">
+		<text string="ACCOMPANIMENT CONTROL" />
+	</element>
+
+	<element name="text_auto_accompaniment">
+		<text string="AUTO ACCOMPANIMENT" />
+	</element>
+
+	<element name="text_auto_harmony">
+		<text string="Auto Harmony" />
+	</element>
+
+	<element name="text_bass">
+		<text string="Bass" />
+	</element>
+
+	<element name="text_bridge">
+		<text string="Bridge" />
+	</element>
+
+	<element name="text_ch">
+		<text string="Ch." />
+	</element>
+
+	<element name="text_ch_clock">
+		<text string="Ch./Clock" />
+	</element>
+
+	<element name="text_chord">
+		<text string="Chord" />
+	</element>
+
+	<element name="text_clear">
+		<text string="Clear" />
+	</element>
+
+	<element name="text_conductor">
+		<text string="Conductor" />
+	</element>
+
+	<element name="text_custom">
+		<text string="Custom" />
+	</element>
+
+	<element name="text_demo">
+		<text string="DEMO" />
+	</element>
+
+	<element name="text_depth">
+		<text string="Depth" />
+	</element>
+
+	<element name="text_display">
+		<text string="DISPLAY" />
+	</element>
+
+	<element name="text_dual_voice">
+		<text string="Dual Voice" />
+	</element>
+
+	<element name="text_dump">
+		<text string="Dump" />
+	</element>
+
+	<element name="text_ending">
+		<text string="Ending" />
+	</element>
+
+	<element name="text_fill_1">
+		<text string="Fill 1" />
+	</element>
+
+	<element name="text_fill_2">
+		<text string="Fill 2" />
+	</element>
+
+	<element name="text_fingered_left">
+		<text string="Fingered" align="1" />
+	</element>
+
+	<element name="text_hall_left">
+		<text string="Hall" align="1" />
+	</element>
+
+	<element name="text_harmony">
+		<text string="Harmony" />
+	</element>
+
+	<element name="text_intro">
+		<text string="Intro" />
+	</element>
+
+	<element name="text_melody">
+		<text string="Melody" />
+	</element>
+
+	<element name="text_midi">
+		<text string="MIDI" />
+	</element>
+
+	<element name="text_midi_bulk">
+		<text string="MIDI Bulk" />
+	</element>
+
+	<element name="text_minus">
+		<text string="-" />
+	</element>
+
+	<element name="text_mode">
+		<text string="Mode" />
+	</element>
+
+	<element name="text_multi_pad">
+		<text string="MULTI PAD" />
+	</element>
+
+	<element name="text_normal">
+		<text string="Normal" />
+	</element>
+
+	<element name="text_normal_left">
+		<text string="Normal" align="1" />
+	</element>
+
+	<element name="text_octave">
+		<text string="Octave" />
+	</element>
+
+	<element name="text_off_left">
+		<text string="Off" align="1" />
+	</element>
+
+	<element name="text_on_off">
+		<text string="On/Off" />
+	</element>
+
+	<element name="text_orchestration">
+		<text string="Orchestration" />
+	</element>
+
+	<element name="text_overall_control">
+		<text string="OVERALL CONTROL" />
+	</element>
+
+	<element name="text_page_memory">
+		<text string="PAGE MEMORY" />
+	</element>
+
+	<element name="text_pan">
+		<text string="Pan" />
+	</element>
+
+	<element name="text_play_stop">
+		<text string="Play/Stop" />
+	</element>
+
+	<element name="text_plus">
+		<text string="+" />
+	</element>
+
+	<element name="text_pose">
+		<text string="pose" />
+	</element>
+
+	<element name="text_rec_edit">
+		<text string="Rec/Edit" />
+	</element>
+
+	<element name="text_rec_end">
+		<text string="Rec/End" />
+	</element>
+
+	<element name="text_receive">
+		<text string="Receive" />
+	</element>
+
+	<element name="text_record">
+		<text string="Record" />
+	</element>
+
+	<element name="text_reverb">
+		<text string="Reverb" />
+	</element>
+
+	<element name="text_rhy">
+		<text string="Rhy" />
+	</element>
+
+	<element name="text_room_left">
+		<text string="Room" align="1" />
+	</element>
+
+	<element name="text_set">
+		<text string="Set" />
+	</element>
+
+	<element name="text_single_finger_left">
+		<text string="Single Finger" align="1" />
+	</element>
+
+	<element name="text_song_memory">
+		<text string="SONG MEMORY" />
+	</element>
+
+	<element name="text_split_left">
+		<text string="Split" align="1" />
+	</element>
+
+	<element name="text_split_point">
+		<text string="Split Point" />
+	</element>
+
+	<element name="text_start_stop">
+		<text string="Start/Stop" />
+	</element>
+
+	<element name="text_style_left_voice">
+		<text string="Style / Left Voice" />
+	</element>
+
+	<element name="text_style_select">
+		<text string="Style Select" />
+	</element>
+
+	<element name="text_synchro">
+		<text string="Synchro" />
+	</element>
+
+	<element name="text_tempo">
+		<text string="Tempo" />
+	</element>
+
+	<element name="text_trans">
+		<text string="Trans-" />
+	</element>
+
+	<element name="text_tuning">
+		<text string="Tuning" />
+	</element>
+
+	<element name="text_type">
+		<text string="Type" />
+	</element>
+
+	<element name="text_voice">
+		<text string="Voice" />
+	</element>
+
+	<element name="text_voice_2">
+		<text string="VOICE" />
+	</element>
+
+	<element name="text_voice_memory">
+		<text string="VOICE MEMORY" />
+	</element>
+
+	<element name="text_voice_select">
+		<text string="Voice Select" />
+	</element>
+
+	<element name="text_volume">
+		<text string="Volume" />
+	</element>
+
+	<view name="Control Panel">
+		<element ref="background"><bounds x="0" y="0" width="2120" height="730" /><color red="0.055" green="0.07" blue="0.085" /></element>
+		<element ref="surface"><bounds x="156" y="24" width="1820" height="521" /><color red="0.105" green="0.13" blue="0.15" /></element>
+		<element ref="surface"><bounds x="20" y="560" width="2080" height="150" /><color red="0.105" green="0.13" blue="0.15" /></element>
+		<element ref="manufacturer"><bounds x="178" y="204" width="128" height="32" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="model"><bounds x="318" y="212" width="132" height="24" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="text_display"><bounds x="950" y="42" width="202" height="18" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="text_style_left_voice"><bounds x="944" y="74" width="106" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="text_voice"><bounds x="1054" y="74" width="96" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="display_background"><bounds x="944" y="98" width="210" height="96" /><color red="0.015" green="0.01" blue="0.01" /></element>
+		<element ref="digit" name="digit0"><bounds x="952" y="107" width="43" height="76" /><color red="1.0" green="0.12" blue="0.06" /></element>
+		<element ref="digit" name="digit1"><bounds x="1002" y="107" width="43" height="76" /><color red="1.0" green="0.12" blue="0.06" /></element>
+		<element ref="digit" name="digit2"><bounds x="1052" y="107" width="43" height="76" /><color red="1.0" green="0.12" blue="0.06" /></element>
+		<element ref="digit" name="digit3"><bounds x="1102" y="107" width="43" height="76" /><color red="1.0" green="0.12" blue="0.06" /></element>
+		<!-- OVERALL CONTROL -->
+		<element ref="text_overall_control"><bounds x="178" y="267" width="394" height="20" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="rule"><bounds x="178" y="296" width="394" height="1.5" /><color red="0.31" green="0.37" blue="0.41" /></element>
+		<element ref="led" name="0.8"><bounds x="200" y="323" width="8" height="8" /></element>
+		<element ref="text_normal_left"><bounds x="216" y="319" width="106" height="16" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="led" name="0.9"><bounds x="200" y="349" width="8" height="8" /></element>
+		<element ref="text_split_left"><bounds x="216" y="345" width="106" height="16" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="led" name="0.10"><bounds x="200" y="375" width="8" height="8" /></element>
+		<element ref="text_single_finger_left"><bounds x="216" y="371" width="106" height="16" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="led" name="0.11"><bounds x="200" y="401" width="8" height="8" /></element>
+		<element ref="text_fingered_left"><bounds x="216" y="397" width="106" height="16" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S1" inputmask="0x01"><bounds x="200" y="462" width="48" height="50" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_mode"><bounds x="203" y="478" width="42" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="0.13"><bounds x="324" y="349" width="8" height="8" /></element>
+		<element ref="text_off_left"><bounds x="340" y="345" width="48" height="16" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="led" name="0.15"><bounds x="324" y="375" width="8" height="8" /></element>
+		<element ref="text_room_left"><bounds x="340" y="371" width="48" height="16" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="led" name="0.14"><bounds x="324" y="401" width="8" height="8" /></element>
+		<element ref="text_hall_left"><bounds x="340" y="397" width="48" height="16" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S1" inputmask="0x02"><bounds x="304" y="462" width="56" height="50" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_reverb"><bounds x="307" y="478" width="50" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S0" inputmask="0x01"><bounds x="382" y="410" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="385" y="414" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_accomp"><bounds x="376" y="442" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="text_volume"><bounds x="376" y="457" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S0" inputmask="0x02"><bounds x="382" y="482" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="385" y="486" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S0" inputmask="0x04"><bounds x="429" y="410" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="432" y="414" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_trans"><bounds x="423" y="442" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="text_pose"><bounds x="423" y="457" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S0" inputmask="0x08"><bounds x="429" y="482" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="432" y="486" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S0" inputmask="0x10"><bounds x="476" y="410" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="479" y="414" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_tuning"><bounds x="470" y="442" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S0" inputmask="0x20"><bounds x="476" y="482" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="479" y="486" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S0" inputmask="0x40"><bounds x="523" y="410" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="526" y="414" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_tempo"><bounds x="517" y="442" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S0" inputmask="0x80"><bounds x="523" y="482" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="526" y="486" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_split_point"><bounds x="502" y="315" width="74" height="18" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S1" inputmask="0x04"><bounds x="517" y="339" width="42" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_set"><bounds x="520" y="346" width="36" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<!-- AUTO ACCOMPANIMENT -->
+		<element ref="text_auto_accompaniment"><bounds x="582" y="267" width="366" height="20" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="rule"><bounds x="582" y="296" width="366" height="1.5" /><color red="0.31" green="0.37" blue="0.41" /></element>
+		<element ref="text_style_select"><bounds x="576" y="315" width="154" height="18" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S2" inputmask="0x01"><bounds x="578" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_0"><bounds x="581" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S2" inputmask="0x02"><bounds x="622" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_1"><bounds x="625" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S2" inputmask="0x04"><bounds x="666" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_2"><bounds x="669" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S2" inputmask="0x08"><bounds x="710" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_3"><bounds x="713" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S2" inputmask="0x20"><bounds x="578" y="409" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="581" y="416" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S2" inputmask="0x10"><bounds x="622" y="409" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_4"><bounds x="625" y="416" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S3" inputmask="0x01"><bounds x="666" y="409" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_5"><bounds x="669" y="416" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S3" inputmask="0x02"><bounds x="710" y="409" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_6"><bounds x="713" y="416" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S3" inputmask="0x20"><bounds x="578" y="479" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="581" y="486" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S3" inputmask="0x04"><bounds x="622" y="479" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_7"><bounds x="625" y="486" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S3" inputmask="0x08"><bounds x="666" y="479" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_8"><bounds x="669" y="486" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S3" inputmask="0x10"><bounds x="710" y="479" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_9"><bounds x="713" y="486" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_orchestration"><bounds x="763" y="312" width="186" height="18" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S1" inputmask="0x08"><bounds x="767" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_rhy"><bounds x="770" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="1.8"><bounds x="767.0" y="331.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S1" inputmask="0x10"><bounds x="807" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_bass"><bounds x="810" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="1.9"><bounds x="807.0" y="331.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S1" inputmask="0x20"><bounds x="847" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_1"><bounds x="850" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="1.10"><bounds x="847.0" y="331.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S1" inputmask="0x40"><bounds x="887" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_2"><bounds x="890" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="1.11"><bounds x="887.0" y="331.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S1" inputmask="0x80"><bounds x="927" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_3"><bounds x="930" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="1.12"><bounds x="927.0" y="331.0" width="8" height="8" /></element>
+		<element ref="text_custom"><bounds x="770" y="459" width="178" height="16" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S3" inputmask="0x40"><bounds x="767" y="479" width="76" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_rec_end"><bounds x="770" y="486" width="70" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S3" inputmask="0x80"><bounds x="888" y="479" width="64" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_clear"><bounds x="891" y="486" width="58" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<!-- VOICE -->
+		<element ref="text_voice_2"><bounds x="999" y="267" width="450" height="20" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="rule"><bounds x="999" y="296" width="450" height="1.5" /><color red="0.31" green="0.37" blue="0.41" /></element>
+		<element ref="text_voice_select"><bounds x="995" y="315" width="154" height="18" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S4" inputmask="0x01"><bounds x="998" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_0"><bounds x="1001" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S4" inputmask="0x02"><bounds x="1042" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_1"><bounds x="1045" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S4" inputmask="0x04"><bounds x="1086" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_2"><bounds x="1089" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S4" inputmask="0x08"><bounds x="1130" y="339" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_3"><bounds x="1133" y="346" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S4" inputmask="0x20"><bounds x="998" y="409" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="1001" y="416" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S4" inputmask="0x10"><bounds x="1042" y="409" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_4"><bounds x="1045" y="416" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S5" inputmask="0x01"><bounds x="1086" y="409" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_5"><bounds x="1089" y="416" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S5" inputmask="0x02"><bounds x="1130" y="409" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_6"><bounds x="1133" y="416" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S5" inputmask="0x20"><bounds x="998" y="479" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="1001" y="486" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S5" inputmask="0x04"><bounds x="1042" y="479" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_7"><bounds x="1045" y="486" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S5" inputmask="0x08"><bounds x="1086" y="479" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_8"><bounds x="1089" y="486" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S5" inputmask="0x10"><bounds x="1130" y="479" width="34" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_9"><bounds x="1133" y="486" width="28" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_auto_harmony"><bounds x="1186" y="309" width="126" height="18" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S6" inputmask="0x01"><bounds x="1204" y="339" width="52" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_on_off"><bounds x="1207" y="346" width="46" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="1.13"><bounds x="1204.0" y="331.0" width="8" height="8" /></element>
+		<element ref="text_dual_voice"><bounds x="1400" y="309" width="88" height="18" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S6" inputmask="0x02"><bounds x="1424" y="339" width="52" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_on_off"><bounds x="1427" y="346" width="46" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="1.14"><bounds x="1424.0" y="331.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S4" inputmask="0x40"><bounds x="1215" y="410" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="1218" y="414" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_harmony"><bounds x="1209" y="442" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="text_type"><bounds x="1209" y="457" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S4" inputmask="0x80"><bounds x="1215" y="482" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="1218" y="486" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S5" inputmask="0x40"><bounds x="1259" y="410" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="1262" y="414" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_reverb"><bounds x="1253" y="442" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="text_depth"><bounds x="1253" y="457" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S5" inputmask="0x80"><bounds x="1259" y="482" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="1262" y="486" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S6" inputmask="0x04"><bounds x="1303" y="410" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="1306" y="414" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_volume"><bounds x="1297" y="442" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S6" inputmask="0x08"><bounds x="1303" y="482" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="1306" y="486" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S6" inputmask="0x10"><bounds x="1347" y="410" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="1350" y="414" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_octave"><bounds x="1341" y="442" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S6" inputmask="0x20"><bounds x="1347" y="482" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="1350" y="486" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S6" inputmask="0x40"><bounds x="1391" y="410" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="1394" y="414" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_pan"><bounds x="1385" y="442" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S6" inputmask="0x80"><bounds x="1391" y="482" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="1394" y="486" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S7" inputmask="0x40"><bounds x="1435" y="410" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="1438" y="414" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_midi"><bounds x="1429" y="442" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="text_ch"><bounds x="1429" y="457" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S7" inputmask="0x80"><bounds x="1435" y="482" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="1438" y="486" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<!-- SONG MEMORY -->
+		<element ref="text_song_memory"><bounds x="1505" y="267" width="198" height="20" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="rule"><bounds x="1505" y="296" width="198" height="1.5" /><color red="0.31" green="0.37" blue="0.41" /></element>
+		<element ref="text_chord"><bounds x="1505" y="310" width="198" height="18" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S8" inputmask="0x01"><bounds x="1508" y="339" width="32" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_1"><bounds x="1511" y="346" width="26" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="3.8"><bounds x="1508.0" y="331.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S8" inputmask="0x02"><bounds x="1548" y="339" width="32" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_2"><bounds x="1551" y="346" width="26" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="3.9"><bounds x="1548.0" y="331.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S8" inputmask="0x04"><bounds x="1588" y="339" width="32" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_3"><bounds x="1591" y="346" width="26" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="3.10"><bounds x="1588.0" y="331.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S8" inputmask="0x08"><bounds x="1628" y="339" width="32" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_4"><bounds x="1631" y="346" width="26" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="3.11"><bounds x="1628.0" y="331.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S8" inputmask="0x10"><bounds x="1668" y="339" width="32" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_5"><bounds x="1671" y="346" width="26" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="3.12"><bounds x="1668.0" y="331.0" width="8" height="8" /></element>
+		<element ref="text_melody"><bounds x="1505" y="379" width="198" height="18" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S7" inputmask="0x01"><bounds x="1508" y="409" width="32" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_1"><bounds x="1511" y="416" width="26" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="2.8"><bounds x="1508.0" y="401.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S7" inputmask="0x02"><bounds x="1548" y="409" width="32" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_2"><bounds x="1551" y="416" width="26" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="2.9"><bounds x="1548.0" y="401.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S7" inputmask="0x04"><bounds x="1588" y="409" width="32" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_3"><bounds x="1591" y="416" width="26" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="2.10"><bounds x="1588.0" y="401.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S7" inputmask="0x08"><bounds x="1628" y="409" width="32" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_4"><bounds x="1631" y="416" width="26" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="2.11"><bounds x="1628.0" y="401.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S7" inputmask="0x10"><bounds x="1668" y="409" width="32" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_5"><bounds x="1671" y="416" width="26" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="2.12"><bounds x="1668.0" y="401.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S8" inputmask="0x20"><bounds x="1509" y="479" width="90" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_conductor"><bounds x="1512" y="486" width="84" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="2.13"><bounds x="1509.0" y="471.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S8" inputmask="0x40"><bounds x="1618" y="479" width="84" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_rec_edit"><bounds x="1621" y="486" width="78" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<!-- MIDI -->
+		<element ref="text_midi"><bounds x="1738" y="267" width="94" height="20" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="rule"><bounds x="1738" y="296" width="94" height="1.5" /><color red="0.31" green="0.37" blue="0.41" /></element>
+		<element ref="text_receive"><bounds x="1725" y="312" width="66" height="18" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="text_mode"><bounds x="1800" y="312" width="48" height="18" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S9" inputmask="0x01"><bounds x="1730" y="339" width="50" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_on_off"><bounds x="1733" y="346" width="44" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S9" inputmask="0x02"><bounds x="1789" y="339" width="50" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_mode"><bounds x="1792" y="346" width="44" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S9" inputmask="0x04"><bounds x="1740" y="410" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_plus"><bounds x="1743" y="414" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="text_receive"><bounds x="1734" y="442" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="text_ch_clock"><bounds x="1734" y="457" width="42" height="15" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S9" inputmask="0x08"><bounds x="1740" y="482" width="30" height="26" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_minus"><bounds x="1743" y="486" width="24" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<!-- DEMO -->
+		<element ref="text_demo"><bounds x="1880" y="267" width="72" height="20" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="rule"><bounds x="1880" y="296" width="72" height="1.5" /><color red="0.31" green="0.37" blue="0.41" /></element>
+		<element ref="button" inputtag="S9" inputmask="0x10"><bounds x="1897" y="339" width="38" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_1"><bounds x="1900" y="346" width="32" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S9" inputmask="0x20"><bounds x="1897" y="409" width="38" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_2"><bounds x="1900" y="416" width="32" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S9" inputmask="0x40"><bounds x="1897" y="479" width="38" height="32" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_3"><bounds x="1900" y="486" width="32" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<!-- PAGE MEMORY -->
+		<element ref="text_page_memory"><bounds x="39" y="575" width="300" height="20" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="rule"><bounds x="39" y="604" width="300" height="1.5" /><color red="0.31" green="0.37" blue="0.41" /></element>
+		<element ref="button" inputtag="S10" inputmask="0x01"><bounds x="28" y="644" width="68" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_record"><bounds x="31" y="654" width="62" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S10" inputmask="0x02"><bounds x="109" y="644" width="36" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_1"><bounds x="112" y="654" width="30" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="4.8"><bounds x="109.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S10" inputmask="0x04"><bounds x="156" y="644" width="36" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_2"><bounds x="159" y="654" width="30" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="4.9"><bounds x="156.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S10" inputmask="0x08"><bounds x="203" y="644" width="36" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_3"><bounds x="206" y="654" width="30" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="4.10"><bounds x="203.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S10" inputmask="0x10"><bounds x="250" y="644" width="36" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_4"><bounds x="253" y="654" width="30" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="4.11"><bounds x="250.0" y="636.0" width="8" height="8" /></element>
+		<element ref="text_midi_bulk"><bounds x="294" y="618" width="72" height="17" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="button" inputtag="S9" inputmask="0x80"><bounds x="301" y="644" width="56" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_dump"><bounds x="304" y="654" width="50" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<!-- ACCOMPANIMENT CONTROL -->
+		<element ref="text_accompaniment_control"><bounds x="458" y="575" width="648" height="20" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="rule"><bounds x="458" y="604" width="648" height="1.5" /><color red="0.31" green="0.37" blue="0.41" /></element>
+		<element ref="button" inputtag="S10" inputmask="0x20"><bounds x="455" y="644" width="74" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_intro"><bounds x="458" y="654" width="68" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="4.12"><bounds x="455.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S11" inputmask="0x02"><bounds x="538" y="644" width="74" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_fill_1"><bounds x="541" y="654" width="68" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="5.8"><bounds x="538.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S10" inputmask="0x80"><bounds x="621" y="644" width="74" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_normal"><bounds x="624" y="654" width="68" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="4.14"><bounds x="621.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S11" inputmask="0x04"><bounds x="704" y="644" width="74" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_fill_2"><bounds x="707" y="654" width="68" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="5.9"><bounds x="704.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S11" inputmask="0x01"><bounds x="787" y="644" width="74" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_bridge"><bounds x="790" y="654" width="68" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="4.15"><bounds x="787.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S10" inputmask="0x40"><bounds x="870" y="644" width="74" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_ending"><bounds x="873" y="654" width="68" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="4.13"><bounds x="870.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S11" inputmask="0x08"><bounds x="953" y="644" width="74" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_synchro"><bounds x="956" y="654" width="68" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="5.10"><bounds x="953.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S11" inputmask="0x10"><bounds x="1036" y="644" width="74" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_start_stop"><bounds x="1039" y="654" width="68" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<!-- VOICE MEMORY -->
+		<element ref="text_voice_memory"><bounds x="1200" y="575" width="230" height="20" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="rule"><bounds x="1200" y="604" width="230" height="1.5" /><color red="0.31" green="0.37" blue="0.41" /></element>
+		<element ref="button" inputtag="S11" inputmask="0x20"><bounds x="1180" y="644" width="68" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_record"><bounds x="1183" y="654" width="62" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S11" inputmask="0x40"><bounds x="1261" y="644" width="36" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_1"><bounds x="1264" y="654" width="30" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="5.11"><bounds x="1261.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S11" inputmask="0x80"><bounds x="1308" y="644" width="36" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_2"><bounds x="1311" y="654" width="30" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="5.12"><bounds x="1308.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S12" inputmask="0x01"><bounds x="1355" y="644" width="36" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_3"><bounds x="1358" y="654" width="30" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="5.13"><bounds x="1355.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S12" inputmask="0x02"><bounds x="1402" y="644" width="36" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_4"><bounds x="1405" y="654" width="30" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="5.14"><bounds x="1402.0" y="636.0" width="8" height="8" /></element>
+		<!-- SONG MEMORY -->
+		<element ref="text_song_memory"><bounds x="1540" y="575" width="148" height="20" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="rule"><bounds x="1540" y="604" width="148" height="1.5" /><color red="0.31" green="0.37" blue="0.41" /></element>
+		<element ref="button" inputtag="S12" inputmask="0x04"><bounds x="1571" y="644" width="86" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_play_stop"><bounds x="1574" y="654" width="80" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<!-- MULTI PAD -->
+		<element ref="text_multi_pad"><bounds x="1730" y="575" width="348" height="20" /><color red="0.83" green="0.87" blue="0.90" /></element>
+		<element ref="rule"><bounds x="1730" y="604" width="348" height="1.5" /><color red="0.31" green="0.37" blue="0.41" /></element>
+		<element ref="button" inputtag="S12" inputmask="0x08"><bounds x="1706" y="644" width="68" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_rec_end"><bounds x="1709" y="654" width="62" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="led" name="5.15"><bounds x="1706.0" y="636.0" width="8" height="8" /></element>
+		<element ref="button" inputtag="S12" inputmask="0x10"><bounds x="1776" y="644" width="68" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_1"><bounds x="1779" y="654" width="62" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S12" inputmask="0x20"><bounds x="1852" y="644" width="68" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_2"><bounds x="1855" y="654" width="62" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S12" inputmask="0x40"><bounds x="1928" y="644" width="68" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_3"><bounds x="1931" y="654" width="62" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+		<element ref="button" inputtag="S12" inputmask="0x80"><bounds x="2004" y="644" width="68" height="38" /><color red="0.43" green="0.50" blue="0.55" /></element>
+		<element ref="text_4"><bounds x="2007" y="654" width="62" height="18" /><color red="0.96" green="0.96" blue="0.94" /></element>
+	</view>
+</mamelayout>

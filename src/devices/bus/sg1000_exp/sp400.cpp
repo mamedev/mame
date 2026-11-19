@@ -29,13 +29,12 @@
     port D connected to M5L8035LP parallel data
 */
 
-// this is currently incomplete: missing paper output and pen sensor, everything else is working
-
 #include "emu.h"
 #include "sp400.h"
 
 #include "cpu/m6805/m68705.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/alpsdpg23.h"
 
 
 namespace {
@@ -43,8 +42,6 @@ namespace {
 class sp400_printer_device : public device_t, public device_sk1100_printer_port_interface
 {
 public:
-	static constexpr feature_type unemulated_features() { return feature::PRINTER; }
-
 	sp400_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -67,16 +64,14 @@ private:
 	uint8_t mot_pc_r();
 	void mot_pc_w(uint8_t data);
 	uint8_t mot_pd_r();
-	void update_pen_state(uint8_t data);
-	uint8_t pen_sensor() { return 0; }  // not currently hooked up
 
 	required_device<i8035_device> m_dsercpu;     // "deserializer CPU"
 	required_device<m6805_hmos_device> m_motcpu; // "motor CPU"
+	required_device<alps_dpg23_device> m_plotter;
 
 	uint8_t m_data, m_busy;
 	uint8_t m_dserdataout, m_dserstrobe;
 	uint8_t m_motbusy, m_motpenup, m_motpendown;
-	uint8_t m_pendown;
 
 	required_ioport m_buttons;
 };
@@ -86,6 +81,7 @@ sp400_printer_device::sp400_printer_device(const machine_config &mconfig, const 
 	device_sk1100_printer_port_interface(mconfig, *this),
 	m_dsercpu(*this, "dsercpu"),
 	m_motcpu(*this, "motcpu"),
+	m_plotter(*this, "plotter"),
 	m_data(0),
 	m_busy(1),
 	m_dserdataout(0xff),
@@ -93,7 +89,6 @@ sp400_printer_device::sp400_printer_device(const machine_config &mconfig, const 
 	m_motbusy(0),
 	m_motpenup(1),
 	m_motpendown(1),
-	m_pendown(0),
 	m_buttons(*this, "BUTTONS")
 {
 }
@@ -107,7 +102,6 @@ void sp400_printer_device::device_start()
 	save_item(NAME(m_motbusy));
 	save_item(NAME(m_motpenup));
 	save_item(NAME(m_motpendown));
-	save_item(NAME(m_pendown));
 }
 
 void sp400_printer_device::dser_map(address_map &map)
@@ -153,8 +147,7 @@ uint8_t sp400_printer_device::mot_pa_r()
 
 void sp400_printer_device::mot_pb_w(uint8_t data)
 {
-	// cr stepper data in 0..3
-	// pf stepper data in 4..7
+	m_plotter->motor_w(bitswap<8>(data, 7, 6, 4, 5, 3, 2, 0, 1));
 }
 
 uint8_t sp400_printer_device::mot_pc_r()
@@ -163,7 +156,7 @@ uint8_t sp400_printer_device::mot_pc_r()
 			(m_motpenup   << 0) |
 			(m_motpendown << 1) |
 			(1 << 2) |
-			(pen_sensor() << 3) |
+			(m_plotter->sensor_r() << 3) |
 			(m_motbusy    << 4) |
 			(1 << 5) | (1 << 6) | (1 << 7); // unconfirmed
 }
@@ -173,18 +166,12 @@ void sp400_printer_device::mot_pc_w(uint8_t data)
 	m_motpenup   = BIT(data, 0);
 	m_motpendown = BIT(data, 1);
 	m_motbusy    = BIT(data, 4);
-	update_pen_state(data);
+	m_plotter->pen_w(data);
 }
 
 uint8_t sp400_printer_device::mot_pd_r()
 {
 	return sp400_printer_device::m_dserdataout;
-}
-
-void sp400_printer_device::update_pen_state(uint8_t data)
-{
-	if (!BIT(data, 0)) m_pendown = 0;
-	if (!BIT(data, 1)) m_pendown = 1;
 }
 
 void sp400_printer_device::device_add_mconfig(machine_config &config)
@@ -201,6 +188,8 @@ void sp400_printer_device::device_add_mconfig(machine_config &config)
 	m_motcpu->portc_r().set(FUNC(sp400_printer_device::mot_pc_r));
 	m_motcpu->portc_w().set(FUNC(sp400_printer_device::mot_pc_w));
 	m_motcpu->portd_r().set(FUNC(sp400_printer_device::mot_pd_r));
+
+	ALPS_DPG23(config, m_plotter);
 }
 
 ROM_START( sp400 )

@@ -9,6 +9,7 @@
 #include "bus/cbmiec/c1541.h"
 #include "bus/cbmiec/clipper_fdd.h"
 #include "bus/c64/exp.h"
+#include "bus/c64/sid.h"
 #include "bus/vic20/user.h"
 #include "bus/pet/cass.h"
 #include "bus/vcs_ctrl/ctrl.h"
@@ -21,7 +22,6 @@
 #include "machine/mos6526.h"
 #include "machine/pla.h"
 #include "machine/ram.h"
-#include "sound/mos6581.h"
 #include "video/mos6566.h"
 
 
@@ -29,7 +29,6 @@ namespace {
 
 #define MOS6567_TAG     "u19"
 #define MOS6569_TAG     "u19"
-#define MOS6581_TAG     "u18"
 #define MOS6526_1_TAG   "u1"
 #define MOS6526_2_TAG   "u2"
 #define PLA_TAG         "u17"
@@ -85,7 +84,7 @@ public:
 		m_nmi(*this, "nmi"),
 		m_pla(*this, PLA_TAG),
 		m_vic(*this, MOS6569_TAG),
-		m_sid(*this, MOS6581_TAG),
+		m_sid(*this, "sid"),
 		m_cia1(*this, MOS6526_1_TAG),
 		m_cia2(*this, MOS6526_2_TAG),
 		m_iec(*this, CBM_IEC_TAG),
@@ -118,7 +117,7 @@ public:
 	required_device<input_merger_device> m_nmi;
 	required_device<pla_device> m_pla;
 	required_device<mos6566_device> m_vic;
-	required_device<mos6581_device> m_sid;
+	required_device<c64_sid_slot_device> m_sid;
 	required_device<mos6526_device> m_cia1;
 	required_device<mos6526_device> m_cia2;
 	optional_device<cbm_iec_device> m_iec;
@@ -144,6 +143,8 @@ public:
 	void write_memory(offs_t offset, uint8_t data, int aec, int ba);
 
 	uint8_t read(offs_t offset);
+	uint8_t exp_dma_cd_r(offs_t offset);
+	void exp_dma_cd_w(offs_t offset, uint8_t data);
 	void write(offs_t offset, uint8_t data);
 	void cpu_mem_w(offs_t offset, uint8_t data);
 
@@ -154,8 +155,8 @@ public:
 
 	uint8_t sid_potx_r();
 	uint8_t sid_poty_r();
-	virtual uint8_t sid_r(offs_t offset) { return m_sid->read(offset & 0x1f); }
-	virtual void sid_w(offs_t offset, uint8_t data) { m_sid->write(offset & 0x1f, data); }
+	virtual uint8_t sid_r(offs_t offset) { return m_sid->read(offset); }
+	virtual void sid_w(offs_t offset, uint8_t data) { m_sid->write(offset, data); }
 
 	uint8_t cia1_pa_r();
 	void cia1_pa_w(uint8_t data);
@@ -721,6 +722,26 @@ uint8_t c64_state::read(offs_t offset)
 	offs_t va = 0x3fff;
 
 	return read_memory(offset, va, aec, ba);
+}
+
+
+//-------------------------------------------------
+//  exp_dma_cd_r - expansion port bus master read
+//-------------------------------------------------
+
+uint8_t c64_state::exp_dma_cd_r(offs_t offset)
+{
+	return read_memory(offset, 0x3fff, 1, 1);
+}
+
+
+//-------------------------------------------------
+//  exp_dma_cd_w - expansion port bus master write
+//-------------------------------------------------
+
+void c64_state::exp_dma_cd_w(offs_t offset, uint8_t data)
+{
+	write_memory(offset, data, 1, m_vic->ba_r());
 }
 
 
@@ -1392,18 +1413,18 @@ uint8_t c64_state::cia2_pa_r()
 
 	    bit     description
 
-	    PA0
-	    PA1
+	    PA0		1
+	    PA1		1
 	    PA2     USER PORT
-	    PA3
-	    PA4
-	    PA5
+	    PA3		1
+	    PA4		1
+	    PA5		1
 	    PA6     CLK
 	    PA7     DATA
 
 	*/
 
-	uint8_t data = 0;
+	uint8_t data = 0x3b;
 
 	// user port
 	data |= m_user_pa2 << 2;
@@ -1620,6 +1641,8 @@ void c64_state::vic_ba_w(int state)
 	m_vic_ba = state;
 
 	update_rdy();
+
+	m_exp->ba_w(state);
 }
 
 void c64_state::update_rdy()
@@ -1630,9 +1653,7 @@ void c64_state::update_rdy()
 void c64_state::exp_reset_w(int state)
 {
 	if (!state)
-	{
-		machine_reset();
-	}
+		machine().schedule_soft_reset();
 }
 
 
@@ -1849,6 +1870,7 @@ void c64_state::vic_config(mos6566_device &vic)
 	vic.set_cpu(m_maincpu);
 	vic.irq_callback().set(m_irq, FUNC(input_merger_device::in_w<1>));
 	vic.ba_callback().set(FUNC(c64_state::vic_ba_w));
+	vic.phi2_callback().set(m_exp, FUNC(c64_expansion_slot_device::phi2_w));
 	vic.charrom_callback().set(FUNC(c64_state::vic_charrom_r));
 	vic.set_screen(SCREEN_TAG);
 	vic.set_addrmap(0, &c64_state::vic_videoram_map);
@@ -1899,10 +1921,13 @@ void c64_state::ntsc(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 
-	INPUT_MERGER_ANY_HIGH(config, m_irq).output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_irq);
+	m_irq->output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
+	m_irq->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_irq_w));
 
 	INPUT_MERGER_ANY_HIGH(config, m_nmi);
 	m_nmi->output_handler().set_inputline(m_maincpu, m6510_device::NMI_LINE);
+	m_nmi->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_nmi_w));
 
 	// video hardware
 	vic_config(MOS6567(config, m_vic, XTAL(14'318'181)/14));
@@ -1912,11 +1937,12 @@ void c64_state::ntsc(machine_config &config)
 	screen.set_screen_update(MOS6567_TAG, FUNC(mos6567_device::screen_update));
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	MOS6581(config, m_sid, XTAL(14'318'181)/14);
+	SPEAKER(config, "speaker", 2).front();
+	C64_SID_SLOT(config, m_sid, XTAL(14'318'181)/14, c64_sid_cards, "6581");
 	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
-	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_sid->add_route(0, "speaker", 1.0, 0);
+	m_sid->add_route(1, "speaker", 1.0, 1);
 
 	// devices
 	PLS100(config, m_pla);
@@ -1944,8 +1970,8 @@ void c64_state::ntsc(machine_config &config)
 	m_exp->irq_callback().set(m_irq, FUNC(input_merger_device::in_w<2>));
 	m_exp->nmi_callback().set(m_nmi, FUNC(input_merger_device::in_w<2>));
 	m_exp->reset_callback().set(FUNC(c64_state::exp_reset_w));
-	m_exp->cd_input_callback().set(FUNC(c64_state::read));
-	m_exp->cd_output_callback().set(FUNC(c64_state::write));
+	m_exp->cd_input_callback().set(FUNC(c64_state::exp_dma_cd_r));
+	m_exp->cd_output_callback().set(FUNC(c64_state::exp_dma_cd_w));
 	m_exp->dma_callback().set(FUNC(c64_state::exp_dma_w));
 
 	PET_USER_PORT(config, m_user, c64_user_port_cards, nullptr);
@@ -2062,10 +2088,7 @@ void c64c_state::ntsc_c(machine_config &config)
 	MOS8521(config.replace(), m_cia1, XTAL(14'318'181)/14);
 	MOS8521(config.replace(), m_cia2, XTAL(14'318'181)/14);
 	cia_config(config, 60);
-	MOS8580(config.replace(), m_sid, XTAL(14'318'181)/14);
-	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
-	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
-	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_sid->set_default_option("8580");
 }
 
 
@@ -2085,10 +2108,13 @@ void c64_state::pal(machine_config &config)
 	m_maincpu->set_dasm_override(FUNC(c64_state::dasm_override));
 	config.set_perfect_quantum(m_maincpu);
 
-	INPUT_MERGER_ANY_HIGH(config, m_irq).output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
+	INPUT_MERGER_ANY_HIGH(config, m_irq);
+	m_irq->output_handler().set_inputline(m_maincpu, m6510_device::IRQ_LINE);
+	m_irq->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_irq_w));
 
 	INPUT_MERGER_ANY_HIGH(config, m_nmi);
 	m_nmi->output_handler().set_inputline(m_maincpu, m6510_device::NMI_LINE);
+	m_nmi->output_handler().append(m_exp, FUNC(c64_expansion_slot_device::host_nmi_w));
 
 	// video hardware
 	vic_config(MOS6569(config, m_vic, XTAL(17'734'472)/18));
@@ -2098,11 +2124,12 @@ void c64_state::pal(machine_config &config)
 	screen.set_screen_update(MOS6569_TAG, FUNC(mos6569_device::screen_update));
 
 	// sound hardware
-	SPEAKER(config, "mono").front_center();
-	MOS6581(config, m_sid, XTAL(17'734'472)/18);
+	SPEAKER(config, "speaker", 2).front();
+	C64_SID_SLOT(config, m_sid, XTAL(17'734'472)/18, c64_sid_cards, "6581");
 	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
 	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
-	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_sid->add_route(0, "speaker", 1.0, 0);
+	m_sid->add_route(1, "speaker", 1.0, 1);
 
 	// devices
 	PLS100(config, m_pla);
@@ -2130,8 +2157,8 @@ void c64_state::pal(machine_config &config)
 	m_exp->irq_callback().set(m_irq, FUNC(input_merger_device::in_w<2>));
 	m_exp->nmi_callback().set(m_nmi, FUNC(input_merger_device::in_w<2>));
 	m_exp->reset_callback().set(FUNC(c64_state::exp_reset_w));
-	m_exp->cd_input_callback().set(FUNC(c64_state::read));
-	m_exp->cd_output_callback().set(FUNC(c64_state::write));
+	m_exp->cd_input_callback().set(FUNC(c64_state::exp_dma_cd_r));
+	m_exp->cd_output_callback().set(FUNC(c64_state::exp_dma_cd_w));
 	m_exp->dma_callback().set(FUNC(c64_state::exp_dma_w));
 
 	PET_USER_PORT(config, m_user, c64_user_port_cards, nullptr);
@@ -2207,10 +2234,7 @@ void c64c_state::pal_c(machine_config &config)
 	MOS8521(config.replace(), m_cia1, XTAL(17'734'472)/18);
 	MOS8521(config.replace(), m_cia2, XTAL(17'734'472)/18);
 	cia_config(config, 50);
-	MOS8580(config.replace(), m_sid, XTAL(17'734'472)/18);
-	m_sid->potx().set(FUNC(c64_state::sid_potx_r));
-	m_sid->poty().set(FUNC(c64_state::sid_poty_r));
-	m_sid->add_route(ALL_OUTPUTS, "mono", 1.00);
+	m_sid->set_default_option("8580");
 }
 
 
@@ -2255,6 +2279,8 @@ void clipper_state::clipper(machine_config &config)
 	pal(config);
 
 	subdevice<mos6566_device>(MOS6569_TAG)->set_palette(PALETTE_CLIPPER);
+
+	m_sid->set_fixed(true);
 
 	m_cia1->pa_rd_callback().set(FUNC(clipper_state::cia1_pa_r));
 	m_cia1->pb_rd_callback().set(FUNC(clipper_state::cia1_pb_r));
@@ -2337,26 +2363,22 @@ ROM_START( c64 )
 	ROMX_LOAD( "kernal-30.u4", 0x0000, 0x2000, CRC(5402d643) SHA1(733acb96fead2fb4df77840c5bb618f08439fc7e), ROM_BIOS(19) )
 	ROM_SYSTEM_BIOS(20, "taccess", "TurboAccess v2.6" )
 	ROMX_LOAD( "turboaccess26.u4", 0x0000, 0x2000, CRC(93de6cd9) SHA1(a74478f3b9153c13176eac80ebfacc512ae7cbf0), ROM_BIOS(20) )
-	ROM_SYSTEM_BIOS(21, "ttrans301", "TurboTrans v3.0 1" )
-	ROMX_LOAD( "turboaccess301.u4", 0x0000, 0x2000, CRC(b3304dcf) SHA1(4d47a265ef65e4823f862cfc3d514c2a71473580), ROM_BIOS(21) )
-	ROM_SYSTEM_BIOS(22, "ttrans302", "TurboTrans v3.0 2" )
-	ROMX_LOAD( "turboaccess302.u4", 0x0000, 0x2000, CRC(9e696a7b) SHA1(5afae75d66d539f4bb4af763f029f0ef6523a4eb), ROM_BIOS(22) )
-	ROM_SYSTEM_BIOS(23, "tprocess", "Turbo-Process (PAL)" )
-	ROMX_LOAD( "turboprocess.u4", 0x0000, 0x2000, CRC(e5610d76) SHA1(e3f35777cfd16cce4717858f77ff354763395ba9), ROM_BIOS(23) )
-	ROM_SYSTEM_BIOS(24, "tprocessn", "Turbo-Process (NTSC)" )
-	ROMX_LOAD( "turboprocessus.u4", 0x0000, 0x2000, CRC(7480b76a) SHA1(ef1664b5057ae3cc6d104fc2f5c1fb29ee5a1b2b), ROM_BIOS(24) )
-	ROM_SYSTEM_BIOS(25, "exos3", "EXOS v3" )
-	ROMX_LOAD( "exos3.u4", 0x0000, 0x2000, CRC(4e54d020) SHA1(f8931b7c0b26807f4de0cc241f0b1e2c8f5271e9), ROM_BIOS(25) )
-	ROM_SYSTEM_BIOS(26, "exos4", "EXOS v4" )
-	ROMX_LOAD( "exos4.u4", 0x0000, 0x2000, CRC(d5cf83a9) SHA1(d5f03a5c0e9d00032d4751ecc6bcd6385879c9c7), ROM_BIOS(26) )
-	ROM_SYSTEM_BIOS(27, "digidos", "DigiDOS" )
-	ROMX_LOAD( "digidos.u4", 0x0000, 0x2000, CRC(2b0c8e89) SHA1(542d6f61c318bced0642e7c2d4d3b34a0f13e634), ROM_BIOS(27) )
-	ROM_SYSTEM_BIOS(28, "magnum", "Magnum Load" )
-	ROMX_LOAD( "magnum.u4", 0x0000, 0x2000, CRC(b2cffcc6) SHA1(827c782c1723b5d0992c05c00738ae4b2133b641), ROM_BIOS(28) )
-	ROM_SYSTEM_BIOS(29, "mercury31s", "Mercury-ROM v3.1s" )
-	ROMX_LOAD( "mercury31s.u4", 0x0000, 0x2000, CRC(97aa5d2f) SHA1(9fc653e61c34225245036f266db14e05feeadb21), ROM_BIOS(29) )
-	ROM_SYSTEM_BIOS(30, "rapidos", "RapiDOS Professional 2.0" )
-	ROMX_LOAD( "rapidos_pro_20_kernal.u4", 0x0000, 0x2000, CRC(bb2bdf0e) SHA1(f47456ef5f9336ac6529131d546a5ce873cb780f), ROM_BIOS(30) )
+	ROM_SYSTEM_BIOS(21, "tprocess", "Turbo-Process (PAL)" )
+	ROMX_LOAD( "turboprocess.u4", 0x0000, 0x2000, CRC(e5610d76) SHA1(e3f35777cfd16cce4717858f77ff354763395ba9), ROM_BIOS(21) )
+	ROM_SYSTEM_BIOS(22, "tprocessn", "Turbo-Process (NTSC)" )
+	ROMX_LOAD( "turboprocessus.u4", 0x0000, 0x2000, CRC(7480b76a) SHA1(ef1664b5057ae3cc6d104fc2f5c1fb29ee5a1b2b), ROM_BIOS(22) )
+	ROM_SYSTEM_BIOS(23, "exos3", "EXOS v3" )
+	ROMX_LOAD( "exos3.u4", 0x0000, 0x2000, CRC(4e54d020) SHA1(f8931b7c0b26807f4de0cc241f0b1e2c8f5271e9), ROM_BIOS(23) )
+	ROM_SYSTEM_BIOS(24, "exos4", "EXOS v4" )
+	ROMX_LOAD( "exos4.u4", 0x0000, 0x2000, CRC(d5cf83a9) SHA1(d5f03a5c0e9d00032d4751ecc6bcd6385879c9c7), ROM_BIOS(24) )
+	ROM_SYSTEM_BIOS(25, "digidos", "DigiDOS" )
+	ROMX_LOAD( "digidos.u4", 0x0000, 0x2000, CRC(2b0c8e89) SHA1(542d6f61c318bced0642e7c2d4d3b34a0f13e634), ROM_BIOS(25) )
+	ROM_SYSTEM_BIOS(26, "magnum", "Magnum Load" )
+	ROMX_LOAD( "magnum.u4", 0x0000, 0x2000, CRC(b2cffcc6) SHA1(827c782c1723b5d0992c05c00738ae4b2133b641), ROM_BIOS(26) )
+	ROM_SYSTEM_BIOS(27, "mercury31s", "Mercury-ROM v3.1s" )
+	ROMX_LOAD( "mercury31s.u4", 0x0000, 0x2000, CRC(97aa5d2f) SHA1(9fc653e61c34225245036f266db14e05feeadb21), ROM_BIOS(27) )
+	ROM_SYSTEM_BIOS(28, "rapidos", "RapiDOS Professional 2.0" )
+	ROMX_LOAD( "rapidos_pro_20_kernal.u4", 0x0000, 0x2000, CRC(bb2bdf0e) SHA1(f47456ef5f9336ac6529131d546a5ce873cb780f), ROM_BIOS(28) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )
@@ -2546,8 +2568,10 @@ ROM_START( c64c )
 	ROM_DEFAULT_BIOS("cbm")
 	ROM_SYSTEM_BIOS(0, "cbm", "Original" )
 	ROMX_LOAD( "251913-01.u4", 0x0000, 0x4000, CRC(0010ec31) SHA1(765372a0e16cbb0adf23a07b80f6b682b39fbf88), ROM_BIOS(0) )
-	ROM_SYSTEM_BIOS(1, "pdc", "ProLogic-DOS Classic" )
-	ROMX_LOAD( "pdc.u4", 0x0000, 0x4000, CRC(6b653b9c) SHA1(0f44a9c62619424a0cd48a90e1b377b987b494e0), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "jiffydos", "JiffyDOS v6.01" )
+	ROMX_LOAD( "jiffydos c64c.u4", 0x0000, 0x4000, CRC(f48a93ba) SHA1(23152a7afcd90826a4034e826c8f5b3432da0b4a), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(2, "pdc", "ProLogic-DOS Classic" )
+	ROMX_LOAD( "pdc.u4", 0x0000, 0x4000, CRC(6b653b9c) SHA1(0f44a9c62619424a0cd48a90e1b377b987b494e0), ROM_BIOS(2) )
 
 	ROM_REGION( 0x1000, "charom", 0 )
 	ROM_LOAD( "901225-01.u5", 0x0000, 0x1000, CRC(ec4272ee) SHA1(adc7c31e18c7c7413d54802ef2f4193da14711aa) )

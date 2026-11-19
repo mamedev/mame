@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+license:CC0-1.0
+
+Digitiser overlay for Ericsson MC 218 (English)
+-->
+
+<mamelayout version="2">
+
+	<element name="overlay_left">
+		<!-- background -->
+		<rect>
+			<bounds x="0" y="0" width="35" height="260" />
+			<color red="0.65" green="0.69" blue="0.65" />
+		</rect>
+
+		<!-- icons (placeholder) -->
+		<text string="menu">
+			<bounds x="5" y="16" width="25" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+
+		<text string="cut">
+			<bounds x="5" y="56" width="25" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+		<text string="paste">
+			<bounds x="5" y="73" width="25" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+
+		<text string="IR">
+			<bounds x="5" y="116" width="25" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+
+		<text string="zoom">
+			<bounds x="5" y="156" width="25" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+		<text string="+">
+			<bounds x="5" y="173" width="25" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+
+		<text string="zoom">
+			<bounds x="5" y="206" width="25" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+		<text string="-">
+			<bounds x="5" y="223" width="25" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+
+		<!-- separators -->
+		<rect>
+			<bounds x="2" y="49" width="30" height="1" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</rect>
+
+		<rect>
+			<bounds x="2" y="99" width="30" height="1" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</rect>
+
+		<rect>
+			<bounds x="2" y="149" width="30" height="1" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</rect>
+
+		<rect>
+			<bounds x="2" y="199" width="30" height="1" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</rect>
+	</element>
+
+	<element name="overlay_icons">
+		<!-- background -->
+		<rect>
+			<bounds x="0" y="5" width="55" height="25" />
+			<color red="0.67" green="0.69" blue="0.66" />
+		</rect>
+		<rect>
+			<bounds x="55" y="5" width="560" height="25" />
+			<color red="0.65" green="0.69" blue="0.65" />
+		</rect>
+		<rect>
+			<bounds x="615" y="5" width="80" height="25" />
+			<color red="0.67" green="0.69" blue="0.66" />
+		</rect>
+
+		<!-- icons (placeholder) -->
+		<disk>
+			<bounds x="20" y="7.5" width="15" height="15" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</disk>
+		<disk>
+			<bounds x="87.5" y="7.5" width="15" height="15" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</disk>
+		<disk>
+			<bounds x="167.5" y="7.5" width="15" height="15" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</disk>
+		<disk>
+			<bounds x="247.5" y="7.5" width="15" height="15" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</disk>
+		<disk>
+			<bounds x="327.5" y="7.5" width="15" height="15" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</disk>
+		<disk>
+			<bounds x="407.5" y="7.5" width="15" height="15" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</disk>
+		<disk>
+			<bounds x="487.5" y="7.5" width="15" height="15" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</disk>
+		<disk>
+			<bounds x="567.5" y="7.5" width="15" height="15" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</disk>
+		<disk>
+			<bounds x="647.5" y="7.5" width="15" height="15" />
+			<color red="0.35" green="0.35" blue="0.36" />
+		</disk>
+</element>
+
+	<element name="overlay_labels">
+		<!-- background -->
+		<rect>
+			<bounds x="0" y="0" width="695" height="25" />
+			<color red="0.78" green="0.78" blue="0.78" />
+		</rect>
+
+		<!-- labels -->
+		<text string="desktop">
+			<bounds x="0" y="4" width="55" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+		<text string="contacts">
+			<bounds x="55" y="4" width="80" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+		<text string="calendar">
+			<bounds x="135" y="4" width="80" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+		<text string="my phone">
+			<bounds x="215" y="4" width="80" height="16" />
+			<color red="0.24" green="0.35" blue="0.58" />
+		</text>
+		<text string="message">
+			<bounds x="295" y="4" width="80" height="16" />
+			<color red="0.24" green="0.35" blue="0.58" />
+		</text>
+		<text string="internet">
+			<bounds x="375" y="4" width="80" height="16" />
+			<color red="0.24" green="0.35" blue="0.58" />
+		</text>
+		<text string="word">
+			<bounds x="455" y="4" width="80" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+		<text string="sheet">
+			<bounds x="535" y="4" width="80" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+		<text string="extras">
+			<bounds x="615" y="4" width="80" height="16" />
+			<color red="0.25" green="0.24" blue="0.25" />
+		</text>
+	</element>
+
+	<view name="Digitiser Overlay (no icons)">
+		<bounds left="0" right="695" top="0" bottom="305" />
+		<screen index="0">
+			<bounds left="0" right="695" top="0" bottom="280" />
+		</screen>
+
+		<element ref="overlay_left">
+			<bounds x="0" y="0" width="35" height="255" />
+		</element>
+
+		<element ref="overlay_icons">
+			<bounds x="0" y="255" width="695" height="30" />
+		</element>
+
+		<element ref="overlay_labels">
+			<bounds x="0" y="280" width="695" height="25" />
+		</element>
+	</view>
+
+	<view name="LCD Panel">
+		<bounds x="45" width="640" y="5" height="240" />
+		<screen index="0">
+			<bounds left="0" right="695" top="0" bottom="280" />
+		</screen>
+	</view>
+
+</mamelayout>

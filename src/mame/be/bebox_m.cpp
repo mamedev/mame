@@ -96,12 +96,9 @@
 #include "bebox.h"
 
 /* Components */
-#include "video/pc_vga.h"
-#include "bus/lpci/cirrus.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/mc146818.h"
 #include "bus/ata/ataintf.h"
-#include "bus/lpci/pci.h"
 
 #define LOG_CPUIMASK   (1U << 1)
 #define LOG_INTERRUPTS (1U << 2)
@@ -192,40 +189,11 @@ uint64_t bebox_state::bebox_crossproc_interrupts_r(address_space &space)
 
 void bebox_state::bebox_crossproc_interrupts_w(offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	static const struct
-	{
-		uint32_t mask;
-		int cpunum;
-		int active_high;
-		int inputline;
-	} crossproc_map[] =
-	{
-		{ 0x40000000, 0, 1, 0/*PPC_INPUT_LINE_SMI*/ },
-		{ 0x20000000, 1, 1, 0/*PPC_INPUT_LINE_SMI*/ },
-		{ 0x08000000, 0, 0, 0/*PPC_INPUT_LINE_TLBISYNC*/ },
-		{ 0x04000000, 1, 0, 0/*PPC_INPUT_LINE_TLBISYNC*/ }
-	};
-	uint32_t old_crossproc_interrupts = m_crossproc_interrupts;
-
+	// SMI is separate from the normal interrupt input. TLBISYNC (bits
+	// 27/26, active low) is retained for readback. The CPU core has no
+	// TLBISYNC input; these bits must not drive the ordinary IRQ line.
 	bebox_mbreg32_w(&m_crossproc_interrupts, data, mem_mask);
-
-	for (int i = 0; i < std::size(crossproc_map); i++)
-	{
-		if ((old_crossproc_interrupts ^ m_crossproc_interrupts) & crossproc_map[i].mask)
-		{
-			int line;
-			if (m_crossproc_interrupts & crossproc_map[i].mask)
-				line = crossproc_map[i].active_high ? ASSERT_LINE : CLEAR_LINE;
-			else
-				line = crossproc_map[i].active_high ? CLEAR_LINE : ASSERT_LINE;
-
-			LOGMASKED(LOG_INTERRUPTS, "bebox_crossproc_interrupts_w(): CPU #%d %s %s\n",
-				crossproc_map[i].cpunum, line ? "Asserting" : "Clearing",
-				(crossproc_map[i].inputline == 0/*PPC_INPUT_LINE_SMI*/) ? "SMI" : "TLBISYNC");
-
-			m_ppc[crossproc_map[i].cpunum]->set_input_line(crossproc_map[i].inputline, line);
-		}
-	}
+	bebox_update_interrupts();
 }
 
 void bebox_state::bebox_processor_resets_w(uint64_t data)
@@ -251,6 +219,9 @@ void bebox_state::bebox_update_interrupts()
 			m_interrupts, m_cpu_imask[cpunum], interrupt ? "on" : "off");
 
 		m_ppc[cpunum]->set_input_line(INPUT_LINE_IRQ0, interrupt ? ASSERT_LINE : CLEAR_LINE);
+		u32 const smi_mask = 0x40000000U >> cpunum;
+		m_ppc[cpunum]->set_input_line(PPC_SMI,
+			(m_crossproc_interrupts & m_cpu_imask[cpunum] & smi_mask) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -315,252 +286,10 @@ void bebox_state::bebox_set_irq_bit(unsigned int interrupt_bit, int val)
 		bebox_update_interrupts();
 }
 
-/*************************************
- *
- *  Floppy Disk Controller
- *
- *************************************/
-
-void bebox_state::fdc_interrupt(int state)
-{
-	bebox_set_irq_bit(13, state);
-	m_pic8259[0]->ir6_w(state);
-}
-
-/*************************************
- *
- *  8259 PIC
- *
- *************************************/
-
 uint64_t bebox_state::bebox_interrupt_ack_r()
 {
-	uint32_t result;
-	result = m_pic8259[0]->acknowledge();
-	bebox_set_irq_bit(5, 0);   /* HACK */
-	return ((uint64_t) result) << 56;
+	return u64(m_sio->acknowledge()) << 56;
 }
-
-
-/*************************************************************
- *
- * pic8259 configuration
- *
- *************************************************************/
-
-void bebox_state::bebox_pic8259_master_set_int_line(int state)
-{
-	bebox_set_irq_bit(5, state);
-}
-
-void bebox_state::bebox_pic8259_slave_set_int_line(int state)
-{
-	m_pic8259[0]->ir2_w(state);
-}
-
-/*************************************
- *
- *  Floppy/IDE/ATA
- *
- *************************************/
-
-void bebox_state::bebox_ide_interrupt(int state)
-{
-	bebox_set_irq_bit(7, state);
-	m_pic8259[0]->ir6_w(state);
-}
-
-
-/*************************************
- *
- *  Video card (Cirrus Logic CL-GD5430)
- *
- *************************************/
-/*
-uint64_t bebox_state::bebox_video_r(offs_t offset, uint64_t mem_mask)
-{
-    uint64_t result = 0;
-    mem_mask = FLIPENDIAN_INT64(mem_mask);
-    if (ACCESSING_BITS_0_7)
-        result |= (uint64_t)vga_mem_linear_r(offset * 8 + 0, mem_mask >> 0) << 0;
-    if (ACCESSING_BITS_8_15)
-        result |= (uint64_t)vga_mem_linear_r(offset * 8 + 1, mem_mask >> 8) << 8;
-    if (ACCESSING_BITS_16_23)
-        result |= (uint64_t)vga_mem_linear_r(offset * 8 + 2, mem_mask >> 16) << 16;
-    if (ACCESSING_BITS_24_31)
-        result |= (uint64_t)vga_mem_linear_r(offset * 8 + 3, mem_mask >> 24) << 24;
-    if (ACCESSING_BITS_32_39)
-        result |= (uint64_t)vga_mem_linear_r(offset * 8 + 4, mem_mask >> 32) << 32;
-    if (ACCESSING_BITS_40_47)
-        result |= (uint64_t)vga_mem_linear_r(offset * 8 + 5, mem_mask >> 40) << 40;
-    if (ACCESSING_BITS_48_55)
-        result |= (uint64_t)vga_mem_linear_r(offset * 8 + 6, mem_mask >> 48) << 48;
-    if (ACCESSING_BITS_56_63)
-        result |= (uint64_t)vga_mem_linear_r(offset * 8 + 7, mem_mask >> 56) << 56;
-    return FLIPENDIAN_INT64(result);
-}
-
-
-void bebox_state::bebox_video_w(offs_t offset, uint64_t data, uint64_t mem_mask)
-{
-    data = FLIPENDIAN_INT64(data);
-    mem_mask = FLIPENDIAN_INT64(mem_mask);
-    if (ACCESSING_BITS_0_7)
-        vga_mem_linear_w(offset * 8 + 0, data >> 0 , mem_mask >> 0);
-    if (ACCESSING_BITS_8_15)
-        vga_mem_linear_w(offset * 8 + 1, data >> 8 , mem_mask >> 8);
-    if (ACCESSING_BITS_16_23)
-        vga_mem_linear_w(offset * 8 + 2, data >> 16, mem_mask >> 16);
-    if (ACCESSING_BITS_24_31)
-        vga_mem_linear_w(offset * 8 + 3, data >> 24, mem_mask >> 24);
-    if (ACCESSING_BITS_32_39)
-        vga_mem_linear_w(offset * 8 + 4, data >> 32, mem_mask >> 32);
-    if (ACCESSING_BITS_40_47)
-        vga_mem_linear_w(offset * 8 + 5, data >> 40, mem_mask >> 40);
-    if (ACCESSING_BITS_48_55)
-        vga_mem_linear_w(offset * 8 + 6, data >> 48, mem_mask >> 48);
-    if (ACCESSING_BITS_56_63)
-        vga_mem_linear_w(offset * 8 + 7, data >> 56, mem_mask >> 56);
-}
-*/
-/*************************************
- *
- *  8237 DMA
- *
- *************************************/
-
-
-uint8_t bebox_state::bebox_page_r(offs_t offset)
-{
-	uint8_t data = m_at_pages[offset % 0x10];
-
-	switch(offset % 8)
-	{
-		case 1:
-			data = m_dma_offset[(offset / 8) & 1][2];
-			break;
-		case 2:
-			data = m_dma_offset[(offset / 8) & 1][3];
-			break;
-		case 3:
-			data = m_dma_offset[(offset / 8) & 1][1];
-			break;
-		case 7:
-			data = m_dma_offset[(offset / 8) & 1][0];
-			break;
-	}
-	return data;
-}
-
-
-void bebox_state::bebox_page_w(offs_t offset, uint8_t data)
-{
-	m_at_pages[offset % 0x10] = data;
-
-	switch(offset % 8)
-	{
-		case 1:
-			m_dma_offset[(offset / 8) & 1][2] &= 0xFF00;
-			m_dma_offset[(offset / 8) & 1][2] |= ((uint16_t ) data) << 0;
-			break;
-		case 2:
-			m_dma_offset[(offset / 8) & 1][3] &= 0xFF00;
-			m_dma_offset[(offset / 8) & 1][3] |= ((uint16_t ) data) << 0;
-			break;
-		case 3:
-			m_dma_offset[(offset / 8) & 1][1] &= 0xFF00;
-			m_dma_offset[(offset / 8) & 1][1] |= ((uint16_t ) data) << 0;
-			break;
-		case 7:
-			m_dma_offset[(offset / 8) & 1][0] &= 0xFF00;
-			m_dma_offset[(offset / 8) & 1][0] |= ((uint16_t ) data) << 0;
-			break;
-	}
-}
-
-
-void bebox_state::bebox_80000480_w(offs_t offset, uint8_t data)
-{
-	switch(offset % 8)
-	{
-		case 1:
-			m_dma_offset[(offset / 8) & 1][2] &= 0x00FF;
-			m_dma_offset[(offset / 8) & 1][2] |= ((uint16_t ) data) << 8;
-			break;
-		case 2:
-			m_dma_offset[(offset / 8) & 1][3] &= 0x00FF;
-			m_dma_offset[(offset / 8) & 1][3] |= ((uint16_t ) data) << 8;
-			break;
-		case 3:
-			m_dma_offset[(offset / 8) & 1][1] &= 0x00FF;
-			m_dma_offset[(offset / 8) & 1][1] |= ((uint16_t ) data) << 8;
-			break;
-		case 7:
-			m_dma_offset[(offset / 8) & 1][0] &= 0x00FF;
-			m_dma_offset[(offset / 8) & 1][0] |= ((uint16_t ) data) << 8;
-			break;
-	}
-}
-
-
-uint8_t bebox_state::bebox_80000480_r()
-{
-	fatalerror("NYI\n");
-}
-
-
-void bebox_state::bebox_dma_hrq_changed(int state)
-{
-	m_ppc[0]->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-
-	/* Assert HLDA */
-	m_dma8237[0]->hack_w( state );
-}
-
-
-uint8_t bebox_state::bebox_dma_read_byte(offs_t offset)
-{
-	address_space& prog_space = m_ppc[0]->space(AS_PROGRAM); // get the right address space
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0x7FFF0000;
-	return prog_space.read_byte(page_offset + offset);
-}
-
-
-void bebox_state::bebox_dma_write_byte(offs_t offset, uint8_t data)
-{
-	address_space& prog_space = m_ppc[0]->space(AS_PROGRAM); // get the right address space
-	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
-		& 0x7FFF0000;
-	prog_space.write_byte(page_offset + offset, data);
-}
-
-void bebox_state::bebox_dma8237_out_eop(int state)
-{
-	m_smc37c78->tc_w(state);
-}
-
-inline void bebox_state::set_dma_channel(int channel, int state)
-{
-	if (!state) m_dma_channel = channel;
-}
-
-void bebox_state::pc_dack0_w(int state) { set_dma_channel(0, state); }
-void bebox_state::pc_dack1_w(int state) { set_dma_channel(1, state); }
-void bebox_state::pc_dack2_w(int state) { set_dma_channel(2, state); }
-void bebox_state::pc_dack3_w(int state) { set_dma_channel(3, state); }
-
-/*************************************
- *
- *  8254 PIT
- *
- *************************************/
-
-void bebox_state::bebox_timer0_w(int state)
-{
-	m_pic8259[0]->ir0_w(state);
-}
-
 
 /*************************************
  *
@@ -581,138 +310,60 @@ void bebox_state::bebox_flash_w(offs_t offset, uint8_t data)
 	m_flash->write(offset, data);
 }
 
-/*************************************
- *
- *  SCSI
- *
- *************************************/
-
-
-uint64_t bebox_state::scsi53c810_r(offs_t offset, uint64_t mem_mask)
+// The I/O card presents a parallel interface to the serial MAX186.
+// Firmware supplies SEL/UNI/SGL in bits 6:2; the glue supplies START
+// and the serial clock. Bit 11 reports that the result has been latched.
+// TODO: Verify the glue clock and implement continuous/rate/IRQ modes
+// (0x364 and the remaining control bits) from the I/O card schematics.
+u16 bebox_state::adc_control_r()
 {
-	int reg = offset*8;
-	uint64_t r = 0;
-	if (!ACCESSING_BITS_56_63) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+0) << 56;
-	}
-	if (!ACCESSING_BITS_48_55) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+1) << 48;
-	}
-	if (!ACCESSING_BITS_40_47) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+2) << 40;
-	}
-	if (!ACCESSING_BITS_32_39) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+3) << 32;
-	}
-	if (!ACCESSING_BITS_24_31) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+4) << 24;
-	}
-	if (!ACCESSING_BITS_16_23) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+5) << 16;
-	}
-	if (!ACCESSING_BITS_8_15) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+6) << 8;
-	}
-	if (!ACCESSING_BITS_0_7) {
-		r |= (uint64_t)m_lsi53c810->reg_r(reg+7) << 0;
-	}
-
-	return r;
+	return (m_adc_control & ~0x0800) | (m_adc_done ? 0x0800 : 0);
 }
 
-
-void bebox_state::scsi53c810_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+void bebox_state::adc_control_w(offs_t offset, u16 data, u16 mem_mask)
 {
-	int reg = offset*8;
-	if (!ACCESSING_BITS_56_63) {
-		m_lsi53c810->reg_w(reg+0, data >> 56);
-	}
-	if (!ACCESSING_BITS_48_55) {
-		m_lsi53c810->reg_w(reg+1, data >> 48);
-	}
-	if (!ACCESSING_BITS_40_47) {
-		m_lsi53c810->reg_w(reg+2, data >> 40);
-	}
-	if (!ACCESSING_BITS_32_39) {
-		m_lsi53c810->reg_w(reg+3, data >> 32);
-	}
-	if (!ACCESSING_BITS_24_31) {
-		m_lsi53c810->reg_w(reg+4, data >> 24);
-	}
-	if (!ACCESSING_BITS_16_23) {
-		m_lsi53c810->reg_w(reg+5, data >> 16);
-	}
-	if (!ACCESSING_BITS_8_15) {
-		m_lsi53c810->reg_w(reg+6, data >> 8);
-	}
-	if (!ACCESSING_BITS_0_7) {
-		m_lsi53c810->reg_w(reg+7, data >> 0);
-	}
-}
-
-// the 2 following methods are legacy code, currently unused
-
-uint32_t bebox_state::scsi53c810_pci_read(int function, int offset, uint32_t mem_mask)
-{
-	uint32_t result = 0;
-
-	if (function == 0)
+	COMBINE_DATA(&m_adc_control);
+	if (ACCESSING_BITS_0_7)
 	{
-		switch(offset)
-		{
-			case 0x00:  /* vendor/device ID */
-				result = 0x00011000;
-				break;
-
-			case 0x08:
-				result = 0x01000000;
-				break;
-
-			default:
-				result = m_scsi53c810_data[offset / 4];
-				break;
-		}
+		m_adc_done = false;
+		m_adc_shift = 0;
+		m_adc_cycle = 0;
+		m_adc->cs_w(1);
+		m_adc->sclk_w(0);
+		m_adc->cs_w(0);
+		// Approximate the board serializer with a 2 MHz external clock.
+		m_adc_timer->adjust(attotime::from_nsec(500), 0, attotime::from_nsec(500));
 	}
-	return result;
 }
 
-
-void bebox_state::scsi53c810_pci_write(int function, int offset, uint32_t data, uint32_t mem_mask)
+TIMER_CALLBACK_MEMBER(bebox_state::adc_tick)
 {
-	offs_t addr;
-
-	if (function == 0)
+	++m_adc_cycle;
+	u8 const command = (m_adc_control & 0x7c) | 0x83;
+	m_adc->din_w(m_adc_cycle <= 8 ? BIT(command, 8 - m_adc_cycle) : 0);
+	m_adc->sclk_w(1);
+	m_adc->sclk_w(0);
+	if (m_adc_cycle >= 9 && m_adc_cycle <= 20)
+		m_adc_shift = (m_adc_shift << 1) | m_adc->dout_r();
+	if (m_adc_cycle == 24)
 	{
-		m_scsi53c810_data[offset / 4] = data;
-
-		switch(offset)
-		{
-			case 0x04:
-				/* command
-				 *
-				 * bit 8:   SERR/ Enable
-				 * bit 6:   Enable Parity Response
-				 * bit 4:   Write and Invalidate Mode
-				 * bit 2:   Enable Bus Mastering
-				 * bit 1:   Enable Memory Space
-				 * bit 0:   Enable IO Space
-				 */
-				if (data & 0x02)
-				{
-					/* brutal ugly hack; at some point the PCI code should be handling this stuff */
-					if (m_scsi53c810_data[5] != 0xFFFFFFF0)
-					{
-						address_space &space = m_ppc[0]->space(AS_PROGRAM);
-
-						addr = (m_scsi53c810_data[5] | 0xC0000000) & ~0xFF;
-						space.install_readwrite_handler(addr, addr + 0xFF, read64s_delegate(*this, FUNC(bebox_state::scsi53c810_r)), write64s_delegate(*this, FUNC(bebox_state::scsi53c810_w)));
-					}
-				}
-				break;
-		}
+		m_adc_result = m_adc_shift;
+		m_adc_done = true;
+		m_adc->cs_w(1);
+		m_adc_timer->adjust(attotime::never);
 	}
 }
 
+double bebox_state::adc_input(u8 channel)
+{
+	if (channel == 4 || channel == 5)
+		return double(m_joy_axes[(channel - 4) * 4 + BIT(m_joy_mux, 8, 2)]->read()) / 4096.0;
+	// R3 distinguishes I/O card revisions 4 and 5 using channel 6.
+	// Model revision 5 with its identification input pulled high.
+	// The four GeekPort inputs and unused channel 7 are tied to ground
+	// until external analog peripherals are supported.
+	return channel == 6 ? 1.0 : 0.0;
+}
 
 /*************************************
  *
@@ -722,6 +373,14 @@ void bebox_state::scsi53c810_pci_write(int function, int offset, uint32_t data, 
 
 void bebox_state::machine_reset()
 {
+	m_adc_timer->adjust(attotime::never);
+	m_adc_control = m_adc_result = m_adc_shift = m_joy_mux = 0;
+	m_adc_cycle = 0;
+	m_adc_done = false;
+	m_cpu_imask[0] = m_cpu_imask[1] = 0;
+	m_crossproc_interrupts = 0;
+	bebox_update_interrupts();
+	m_adc->cs_w(1);
 	m_ppc[0]->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 	m_ppc[1]->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
@@ -731,20 +390,28 @@ void bebox_state::machine_reset()
 
 void bebox_state::machine_start()
 {
-	m_interrupts = 0;
+	m_adc_timer = timer_alloc(FUNC(bebox_state::adc_tick), this);
+	save_item(NAME(m_adc_control));
+	save_item(NAME(m_adc_result));
+	save_item(NAME(m_adc_shift));
+	save_item(NAME(m_joy_mux));
+	save_item(NAME(m_adc_cycle));
+	save_item(NAME(m_adc_done));
+	save_item(NAME(m_cpu_imask));
+	save_item(NAME(m_interrupts));
+	save_item(NAME(m_crossproc_interrupts));
+	m_mpc105->set_ram_info(m_ram->pointer(), m_ram->size());
+
+	// board devices outside the 82378/82091 pair sit on the ISA side
+	m_isabus->space(isa16_device::AS_ISA_IO).install_device(0x0000, 0xffff, *this, &bebox_state::io_map);
 }
 
 void bebox_state::init_bebox()
 {
-	address_space &space_0 = m_ppc[0]->space(AS_PROGRAM);
 	address_space &space_1 = m_ppc[1]->space(AS_PROGRAM);
 
 	/* set up boot and flash ROM */
 	membank("bank2")->set_base(memregion("user2")->base());
-
-	/* install managed RAM */
-	space_0.install_ram(0, m_ram->size() - 1, 0x02000000, m_ram->pointer());
-	space_1.install_ram(0, m_ram->size() - 1, 0x02000000, m_ram->pointer());
 
 	/* The following is a verrrry ugly hack put in to support NetBSD for
 	 * NetBSD.  When NetBSD/bebox it does most of its work on CPU #0 and then

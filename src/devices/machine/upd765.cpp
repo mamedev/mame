@@ -208,6 +208,7 @@ upd765_family_device::upd765_family_device(const machine_config &mconfig, device
 	select_multiplexed(true),
 	ts_connected(true),
 	has_dor(true),
+	has_base_mode(false),
 	external_ready(false),
 	recalibrate_steps(77),
 	mode(mode_t::AT),
@@ -250,6 +251,7 @@ void upd765_family_device::device_start()
 	save_item(STRUCT_MEMBER(flopi, pcn));
 	save_item(STRUCT_MEMBER(flopi, st0));
 	save_item(STRUCT_MEMBER(flopi, st0_filled));
+	save_item(STRUCT_MEMBER(flopi, st0_seek));
 	save_item(STRUCT_MEMBER(flopi, live));
 	save_item(STRUCT_MEMBER(flopi, index));
 	save_item(STRUCT_MEMBER(flopi, ready));
@@ -289,6 +291,7 @@ void upd765_family_device::device_start()
 	save_item(NAME(locked));
 	save_item(NAME(mfm));
 	save_item(NAME(scan_done));
+	save_item(NAME(base_mode_pending));
 	save_item(NAME(fifo_write));
 	save_item(NAME(fifo_pos));
 	save_item(NAME(fifo_expected));
@@ -335,6 +338,7 @@ void upd765_family_device::device_start()
 		flopi[i].pcn = 0;
 		flopi[i].st0 = 0;
 		flopi[i].st0_filled = false;
+		flopi[i].st0_seek = false;
 		flopi[i].live = false;
 		flopi[i].index = false;
 		flopi[i].ready = false;
@@ -361,6 +365,7 @@ void upd765_family_device::device_start()
 
 	cur_irq = false;
 	locked = false;
+	base_mode_pending = false;
 }
 
 void upd765_family_device::device_reset()
@@ -368,6 +373,7 @@ void upd765_family_device::device_reset()
 	if(has_dor)
 		dor = 0x00;
 	locked = false;
+	base_mode_pending = has_base_mode;
 	soft_reset();
 }
 
@@ -381,6 +387,7 @@ void upd765_family_device::soft_reset()
 		flopi[i].ready = !ready_polled;
 		flopi[i].st0 = i;
 		flopi[i].st0_filled = false;
+		flopi[i].st0_seek = false;
 	}
 	clr_drive_busy();
 	irq = false;
@@ -414,6 +421,16 @@ void upd765_family_device::end_reset()
 	main_phase = PHASE_CMD;
 	if(ready_polled)
 		poll_timer->adjust(attotime::from_usec(100), 0, attotime::from_usec(1024));
+}
+
+void upd765_family_device::base_mode_access()
+{
+	if(!base_mode_pending || machine().side_effects_disabled())
+		return;
+
+	base_mode_pending = false;
+	dor |= 0x04;
+	end_reset();
 }
 
 void upd765_family_device::tc_w(bool _tc)
@@ -549,6 +566,7 @@ void upd765_family_device::dor_w(uint8_t data)
 {
 	assert(has_dor);
 	LOGREGS("dor = %02x\n", data);
+	base_mode_pending = false;
 	uint8_t diff = dor ^ data;
 	dor = data;
 	if(BIT(diff, 2)) {
@@ -580,6 +598,8 @@ void upd765_family_device::tdr_w(uint8_t data)
 
 uint8_t upd765_family_device::msr_r()
 {
+	base_mode_access();
+
 	uint8_t msr = 0;
 	switch(main_phase) {
 	case PHASE_CMD:
@@ -632,6 +652,8 @@ void upd765_family_device::set_rate(int rate)
 
 uint8_t upd765_family_device::fifo_r()
 {
+	base_mode_access();
+
 	uint8_t r = 0xff;
 	if(!machine().side_effects_disabled())
 	{
@@ -659,9 +681,13 @@ uint8_t upd765_family_device::fifo_r()
 		if(!machine().side_effects_disabled()) {
 			result_pos--;
 			memmove(result, result+1, result_pos);
-			if(!result_pos)
+			if(!result_pos) {
 				main_phase = PHASE_CMD;
-			else if(result_pos == 1) {
+				for(floppy_info &fi : flopi)
+					if(fi.st0_filled && fi.st0_seek)
+						irq = true;
+				check_irq();
+			} else if(result_pos == 1) {
 				// clear drive busy bit after the first sense interrupt status result byte is read
 				for(floppy_info &fi : flopi)
 					if((fi.main_state == RECALIBRATE || fi.main_state == SEEK) && fi.sub_state == IDLE && fi.st0_filled == false)
@@ -680,6 +706,8 @@ uint8_t upd765_family_device::fifo_r()
 
 void upd765_family_device::fifo_w(uint8_t data)
 {
+	base_mode_access();
+
 	if(!BIT(dor, 2))
 		LOGWARN("%s: fifo_w(%02x) in reset\n", machine().describe_context(), data);
 
@@ -1721,6 +1749,7 @@ void upd765_family_device::command_end(floppy_info &fi, bool data_completion)
 	irq = true;
 	if(!data_completion) {
 		fi.st0_filled = true;
+		fi.st0_seek = true;
 		drive_busy |= (1 << fi.id);
 	}
 	check_irq();
@@ -2734,6 +2763,7 @@ TIMER_CALLBACK_MEMBER(upd765_family_device::run_drive_ready_polling)
 			if(!flopi[fid].st0_filled) {
 				flopi[fid].st0 = ST0_ABRT | fid | (ready ? 0 : ST0_NR);
 				flopi[fid].st0_filled = true;
+				flopi[fid].st0_seek = false;
 				irq = true;
 			}
 		}
@@ -3389,6 +3419,7 @@ wd37c65_device::wd37c65_device(const machine_config &mconfig, device_type type, 
 	upd765_family_device(mconfig, type, tag, owner, clock),
 	m_clock2(0)
 {
+	has_base_mode = true;
 	ready_polled = true;
 	ready_connected = false;
 	select_connected = true;

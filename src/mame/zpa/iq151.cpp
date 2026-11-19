@@ -87,7 +87,7 @@ public:
 		, m_keyboard(*this, "X%X", 0U)
 	{ }
 
-	void iq151(machine_config &config);
+	void iq151(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
 

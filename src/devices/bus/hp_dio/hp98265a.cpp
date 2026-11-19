@@ -12,8 +12,6 @@
 #include "machine/nscsi_bus.h"
 #include "bus/nscsi/devices.h"
 #include "machine/mb87030.h"
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsicd.h"
 
 #define VERBOSE 0
 #include "logmacro.h"

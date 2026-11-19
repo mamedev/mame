@@ -486,12 +486,10 @@ uint32_t m62_state::screen_update_ldrun3(screen_device &screen, bitmap_rgb32 &bi
 	{
 		rectangle my_cliprect = cliprect;
 
-		my_cliprect.min_y = 0 * 8;
-		my_cliprect.max_y = 1 * 8 - 1;
+		my_cliprect.sety(0 * 8, 1 * 8 - 1);
 		bitmap.fill(m_chr_palette->black_pen(), my_cliprect);
 
-		my_cliprect.min_y = 31 * 8;
-		my_cliprect.max_y = 32 * 8 - 1;
+		my_cliprect.sety(31 * 8, 32 * 8 - 1);
 		bitmap.fill(m_chr_palette->black_pen(), my_cliprect);
 	}
 

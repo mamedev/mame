@@ -174,10 +174,9 @@ void atapi_cdrom_device::ExecCommand()
 				m_sense_asc = SCSI_SENSE_ASC_NOT_READY_TO_READY_TRANSITION;
 				m_status_code = SCSI_STATUS_CODE_CHECK_CONDITION;
 				m_transfer_length = 0;
-
-				if (command[0] == T10SPC_CMD_TEST_UNIT_READY || // amiga(idefix97)/firebeat/namcos12/sprinter
-					command[0] == T10SPC_CMD_MODE_SENSE_10) // stingnet
-					m_media_change = false;
+				// Per SCSI-2 7.9, always clear after the unit attention is reported.
+				// Fixes Award BIOS El Torito boot.
+				m_media_change = false;
 				return;
 			}
 			break;

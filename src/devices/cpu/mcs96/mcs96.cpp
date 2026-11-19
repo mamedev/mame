@@ -19,7 +19,7 @@ mcs96_device::mcs96_device(const machine_config &mconfig, device_type type, cons
 	regs_config("register", ENDIANNESS_LITTLE, 16, 8, 0, regs_map),
 	program(nullptr), regs(nullptr), register_file(*this, "register_file"),
 	icount(0), bcount(0), inst_state(0), cycles_scaling(0), pending_irq(0),
-	PC(0), PPC(0), PSW(0), OP1(0), OP2(0), OP3(0), OPI(0), TMP(0), irq_requested(false)
+	PC(0), PPC(0), PSW(0), OP1(0), OP2(0), OP3(0), OPI(0), TMP(0), irq_requested(false), m_long_index(false)
 {
 }
 
@@ -69,6 +69,7 @@ void mcs96_device::device_start()
 	save_item(NAME(OPI));
 	save_item(NAME(TMP));
 	save_item(NAME(irq_requested));
+	save_item(NAME(m_long_index));
 }
 
 void mcs96_device::device_reset()
@@ -260,8 +261,10 @@ uint8_t mcs96_device::do_addb(uint8_t v1, uint8_t v2)
 		PSW |= F_Z;
 	else if(int8_t(sum) < 0)
 		PSW |= F_N;
-	if(~(v1^v2) & (v1^sum) & 0x80)
+	if(~(v1^v2) & (v1^sum) & 0x80) {
 		PSW |= F_V|F_VT;
+		PSW ^= F_N;
+	}
 	if(sum & 0xff00)
 		PSW |= F_C;
 	return sum;
@@ -275,8 +278,10 @@ uint16_t mcs96_device::do_add(uint16_t v1, uint16_t v2)
 		PSW |= F_Z;
 	else if(int16_t(sum) < 0)
 		PSW |= F_N;
-	if(~(v1^v2) & (v1^sum) & 0x8000)
+	if(~(v1^v2) & (v1^sum) & 0x8000) {
 		PSW |= F_V|F_VT;
+		PSW ^= F_N;
+	}
 	if(sum & 0xffff0000)
 		PSW |= F_C;
 	return sum;
@@ -290,8 +295,10 @@ uint8_t mcs96_device::do_subb(uint8_t v1, uint8_t v2)
 		PSW |= F_Z;
 	else if(int8_t(diff) < 0)
 		PSW |= F_N;
-	if((v1^v2) & (v1^diff) & 0x80)
-		PSW |= F_V;
+	if((v1^v2) & (v1^diff) & 0x80) {
+		PSW |= F_V|F_VT;
+		PSW ^= F_N;
+	}
 	if(!(diff & 0xff00))
 		PSW |= F_C;
 	return diff;
@@ -305,8 +312,10 @@ uint16_t mcs96_device::do_sub(uint16_t v1, uint16_t v2)
 		PSW |= F_Z;
 	else if(int16_t(diff) < 0)
 		PSW |= F_N;
-	if((v1^v2) & (v1^diff) & 0x8000)
-		PSW |= F_V;
+	if((v1^v2) & (v1^diff) & 0x8000) {
+		PSW |= F_V|F_VT;
+		PSW ^= F_N;
+	}
 	if(!(diff & 0xffff0000))
 		PSW |= F_C;
 	return diff;
@@ -320,8 +329,10 @@ uint8_t mcs96_device::do_addcb(uint8_t v1, uint8_t v2)
 		PSW |= F_Z;
 	else if(int8_t(sum) < 0)
 		PSW |= F_N;
-	if(~(v1^v2) & (v1^sum) & 0x80)
+	if(~(v1^v2) & (v1^sum) & 0x80) {
 		PSW |= F_V|F_VT;
+		PSW ^= F_N;
+	}
 	if(sum & 0xff00)
 		PSW |= F_C;
 	return sum;
@@ -335,8 +346,10 @@ uint16_t mcs96_device::do_addc(uint16_t v1, uint16_t v2)
 		PSW |= F_Z;
 	else if(int16_t(sum) < 0)
 		PSW |= F_N;
-	if(~(v1^v2) & (v1^sum) & 0x8000)
+	if(~(v1^v2) & (v1^sum) & 0x8000) {
 		PSW |= F_V|F_VT;
+		PSW ^= F_N;
+	}
 	if(sum & 0xffff0000)
 		PSW |= F_C;
 	return sum;
@@ -350,8 +363,10 @@ uint8_t mcs96_device::do_subcb(uint8_t v1, uint8_t v2)
 		PSW |= F_Z;
 	else if(int8_t(diff) < 0)
 		PSW |= F_N;
-	if((v1^v2) & (v1^diff) & 0x80)
-		PSW |= F_V;
+	if((v1^v2) & (v1^diff) & 0x80) {
+		PSW |= F_V|F_VT;
+		PSW ^= F_N;
+	}
 	if(!(diff & 0xff00))
 		PSW |= F_C;
 	return diff;
@@ -365,8 +380,10 @@ uint16_t mcs96_device::do_subc(uint16_t v1, uint16_t v2)
 		PSW |= F_Z;
 	else if(int16_t(diff) < 0)
 		PSW |= F_N;
-	if((v1^v2) & (v1^diff) & 0x8000)
-		PSW |= F_V;
+	if((v1^v2) & (v1^diff) & 0x8000) {
+		PSW |= F_V|F_VT;
+		PSW ^= F_N;
+	}
 	if(!(diff & 0xffff0000))
 		PSW |= F_C;
 	return diff;
@@ -388,6 +405,42 @@ void mcs96_device::set_nz16(uint16_t v)
 		PSW |= F_Z;
 	else if(int16_t(v) < 0)
 		PSW |= F_N;
+}
+
+// Shift counts come from an immediate nibble or a register's low five bits.
+// Avoid host shifts by the word width and retain sticky/overflow behavior.
+u32 mcs96_device::shift(u32 value, unsigned width, unsigned count, shift_type kind)
+{
+	const u32 sign = u32(1) << (width - 1);
+	const u32 mask = u32((u64(1) << width) - 1);
+	PSW &= ~(F_Z | F_N | F_C | F_V | F_ST);
+	if(kind == shift_type::LEFT) {
+		if(count && count <= width && BIT(value, width - count))
+			PSW |= F_C;
+		if(count) {
+			const u32 top = count >= width ? value : value >> (width - count - 1);
+			const u32 ones = count >= width ? mask : u32((u64(1) << (count + 1)) - 1);
+			if(count >= width ? value != 0 : top != 0 && top != ones)
+				PSW |= F_V | F_VT;
+		}
+		value = count >= width ? 0 : (value << count) & mask;
+	} else {
+		if(count >= 2 && (value & u32((u64(1) << std::min(count - 1, width)) - 1)))
+			PSW |= F_ST;
+		if(count && count <= width && BIT(value, count - 1))
+			PSW |= F_C;
+		if(kind == shift_type::ARITHMETIC_RIGHT && (value & sign)) {
+			if(count > width)
+				PSW |= F_C;
+			value = count >= width ? mask : u32((s64(value) - (s64(1) << width)) >> count) & mask;
+		} else
+			value = count >= width ? 0 : value >> count;
+	}
+	if(!value)
+		PSW |= F_Z;
+	else if(value & sign)
+		PSW |= F_N;
+	return value;
 }
 
 #include "cpu/mcs96/mcs96.hxx"

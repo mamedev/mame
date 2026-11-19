@@ -12,11 +12,13 @@
 #include "pcd_kbd.h"
 #include "pcd.h"
 
+#include "bus/nscsi/devices.h"
 #include "bus/rs232/rs232.h"
-#include "bus/scsi/omti5100.h"
 #include "cpu/i86/i186.h"
 #include "imagedev/floppy.h"
 #include "machine/mc146818.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cb.h"
 #include "machine/nvram.h"
 #include "machine/pic8259.h"
 #include "machine/scn_pci.h"
@@ -25,6 +27,7 @@
 #include "machine/wd_fdc.h"
 #include "sound/spkrdev.h"
 
+#include "softlist_dev.h"
 #include "speaker.h"
 
 
@@ -44,9 +47,7 @@ public:
 		, m_fdc(*this, "fdc")
 		, m_rtc(*this, "rtc")
 		, m_usart(*this, "usart%u", 1U)
-		, m_scsi(*this, "scsi")
-		, m_scsi_data_out(*this, "scsi_data_out")
-		, m_scsi_data_in(*this, "scsi_data_in")
+		, m_scsi(*this, "scsi:7:scsicb")
 		, m_ram(*this, "ram")
 	{ }
 
@@ -77,7 +78,6 @@ private:
 	void write_scsi_bsy(int state);
 	void write_scsi_cd(int state);
 	void write_scsi_io(int state);
-	void write_scsi_msg(int state);
 	void write_scsi_req(int state);
 
 	void pcd_io(address_map &map) ATTR_COLD;
@@ -95,12 +95,10 @@ private:
 	required_device<wd2793_device> m_fdc;
 	required_device<mc146818_device> m_rtc;
 	required_device_array<scn2661b_device, 3> m_usart;
-	required_device<scsi_port_device> m_scsi;
-	required_device<output_latch_device> m_scsi_data_out;
-	required_device<input_buffer_device> m_scsi_data_in;
+	required_device<nscsi_callback_device> m_scsi;
 	required_device<ram_device> m_ram;
 	uint8_t m_stat = 0, m_led = 0;
-	int m_msg = 0, m_bsy = 0, m_io = 0, m_cd = 0, m_req = 0, m_rst = 0;
+	int m_bsy = 0, m_io = 0, m_cd = 0, m_req = 0, m_rst = 0;
 	uint16_t m_dskctl = 0;
 	struct {
 		uint16_t ctl = 0;
@@ -121,6 +119,11 @@ void pcd_state::machine_start()
 {
 	save_item(NAME(m_mmu.ctl));
 	save_item(NAME(m_mmu.regs));
+	save_item(NAME(m_bsy));
+	save_item(NAME(m_io));
+	save_item(NAME(m_cd));
+	save_item(NAME(m_req));
+	save_item(NAME(m_rst));
 }
 
 void pcd_state::machine_reset()
@@ -128,6 +131,10 @@ void pcd_state::machine_reset()
 	m_stat = 0;
 	m_led = 0;
 	m_dskctl = 0;
+	m_bsy = 0;
+	m_io = 0;
+	m_cd = 0;
+	m_req = 0;
 	m_rst = 0;
 	m_mmu.ctl = 0;
 	m_mmu.sc = false;
@@ -268,14 +275,17 @@ uint8_t pcd_state::scsi_r(offs_t offset)
 	{
 		case 0:
 		case 2:
-			ret = m_scsi_data_in->read();
-			m_scsi->write_ack(1);
+			ret = m_scsi->read();
+			if(machine().side_effects_disabled())
+				break;
+			// DRQ goes first: the target can raise REQ for the next byte inside the ACK
 			if(!offset)
 				m_maincpu->drq0_w(0);
+			m_scsi->ack_w(1);
 			break;
 
 		case 1:
-			ret = (m_cd << 7) | (m_req << 5) | (m_bsy << 4);
+			ret = (m_scsi->cd_r() << 7) | (m_scsi->req_r() << 5) | (m_scsi->bsy_r() << 4);
 			break;
 	}
 
@@ -287,32 +297,36 @@ void pcd_state::scsi_w(offs_t offset, uint8_t data)
 	switch(offset)
 	{
 		case 0:
-			m_scsi_data_out->write(data);
-			m_scsi->write_ack(1);
+			m_scsi->write(data);
 			m_maincpu->drq0_w(0);
+			m_scsi->ack_w(1);
 			break;
 		case 1:
 			if(data & 4)
 			{
 				m_rst = 1;
-				m_scsi->write_rst(1);
+				m_scsi->rst_w(1);
 				break;
 			}
 			if(m_rst)
 			{
 				m_rst = 0;
-				m_scsi->write_rst(0);
+				m_scsi->rst_w(0);
 				break;
 			}
 
-			if(!m_bsy)
+			if(!m_scsi->bsy_r())
 			{
-				m_scsi_data_out->write(0);
-				m_scsi->write_sel(1);
+				// the controller is at ID 0
+				m_scsi->write(1 << 0);
+				m_scsi->sel_w(1);
 			}
 			break;
 	}
 }
+
+// nscsi_callback_device reports every line on every bus change, so the
+// handlers below only act when their own line changes
 
 void pcd_state::check_scsi_irq()
 {
@@ -321,46 +335,51 @@ void pcd_state::check_scsi_irq()
 
 void pcd_state::write_scsi_bsy(int state)
 {
-	m_bsy = state ? 1 : 0;
-	m_scsi->write_sel(0);
+	if(state == m_bsy)
+		return;
+	m_bsy = state;
+	m_scsi->sel_w(0);
 }
 void pcd_state::write_scsi_cd(int state)
 {
-	m_cd = state ? 1 : 0;
+	if(state == m_cd)
+		return;
+	m_cd = state;
 	check_scsi_irq();
 }
 void pcd_state::write_scsi_io(int state)
 {
-	m_io = state ? 1 : 0;
+	if(state == m_io)
+		return;
+	m_io = state;
 	if(state)
-		m_scsi_data_out->write(0);
+		m_scsi->write(0);
 	check_scsi_irq();
-}
-void pcd_state::write_scsi_msg(int state)
-{
-	m_msg = state ? 1 : 0;
 }
 
 void pcd_state::write_scsi_req(int state)
 {
-	m_req = state ? 1 : 0;
+	if(state == m_req)
+		return;
+	m_req = state;
+	check_scsi_irq();
 	if(state)
 	{
-		if(!m_cd)
+		if(!m_scsi->cd_r())
 		{
 			m_maincpu->drq0_w(1);
 		}
-		else if(m_msg)
+		else if(m_scsi->msg_r())
 		{
-			m_scsi_data_in->read();
-			m_scsi->write_ack(1);
+			// message in is acknowledged without the CPU; the target can drop REQ inside the ACK
+			m_scsi->read();
+			m_scsi->ack_w(1);
 		}
 	}
 	else
 	{
-		m_scsi->write_ack(0);
+		m_scsi->ack_w(0);
 	}
-	check_scsi_irq();
 }
 
 void pcd_state::mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -533,19 +552,18 @@ void pcd_state::pcd(machine_config &config)
 	pcd_keyboard_device &keyboard(PCD_KEYBOARD(config, "keyboard"));
 	keyboard.out_tx_handler().set(m_usart[1], FUNC(scn2661b_device::rxd_w));
 
-	SCSI_PORT(config, m_scsi);
-	m_scsi->set_data_input_buffer("scsi_data_in");
-	m_scsi->msg_handler().set(FUNC(pcd_state::write_scsi_msg));
-	m_scsi->bsy_handler().set(FUNC(pcd_state::write_scsi_bsy));
-	m_scsi->io_handler().set(FUNC(pcd_state::write_scsi_io));
-	m_scsi->cd_handler().set(FUNC(pcd_state::write_scsi_cd));
-	m_scsi->req_handler().set(FUNC(pcd_state::write_scsi_req));
-
-	output_latch_device &scsi_out(OUTPUT_LATCH(config, "scsi_data_out"));
-	m_scsi->set_output_latch(scsi_out);
-
-	INPUT_BUFFER(config, "scsi_data_in");
-	m_scsi->set_slot_device(1, "harddisk", OMTI5100, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+	NSCSI_BUS(config, "scsi");
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "omti5100");
+	NSCSI_CONNECTOR(config, "scsi:7", default_scsi_devices, "scsicb", true)
+		.option_add_internal("scsicb", NSCSI_CB)
+		.machine_config([this] (device_t *device)
+		{
+			nscsi_callback_device &scsicb = downcast<nscsi_callback_device &>(*device);
+			scsicb.bsy_callback().set(*this, FUNC(pcd_state::write_scsi_bsy));
+			scsicb.cd_callback().set(*this, FUNC(pcd_state::write_scsi_cd));
+			scsicb.io_callback().set(*this, FUNC(pcd_state::write_scsi_io));
+			scsicb.req_callback().set(*this, FUNC(pcd_state::write_scsi_req));
+		});
 
 	SOFTWARE_LIST(config, "flop_list").set_original("pcd_flop");
 }

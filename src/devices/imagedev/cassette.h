@@ -75,6 +75,8 @@ public:
 	virtual const char *image_type_name() const noexcept override { return "cassette"; }
 	virtual const char *image_brief_type_name() const noexcept override { return "cass"; }
 
+	auto change_handler() { return m_change_handler.bind(); }
+	attotime time_to_next_transition();
 	double input();
 	void output(double value);
 
@@ -118,6 +120,7 @@ protected:
 	void update();
 
 private:
+	devcb_write_line m_change_handler;
 	cassette_image::ptr m_cassette;
 	cassette_state  m_state;
 	double          m_position;

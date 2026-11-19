@@ -40,7 +40,12 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
+#include <sstream>
+
 #define LOG_SPRITEBASE       (1U << 1)
+#define LOG_SERIAL           (1U << 2)
+#define LOG_PEDOMETER        (1U << 3)
 
 #define VERBOSE (0)
 #include "logmacro.h"
@@ -57,7 +62,30 @@ public:
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_mainram(*this, "mainram"),
-		m_palram(*this, "palram")
+		m_palram(*this, "palram"),
+		m_vidirq_status(0),
+		m_unk_802000c(0),
+		m_intc_status(0),
+		m_intc_mask(0xffffffff),
+		m_serial_ctrl{},
+		m_serial_dma{},
+		m_serial_data{},
+		m_serial_rxidx{},
+		m_serial_timer{},
+		m_serial_status{},
+		m_serial_enable(0),
+		m_vidctrl(0),
+		m_display_was_on(false),
+		m_adc_busy(false),
+		m_adc_timer(nullptr),
+		m_pedo_rx{},
+		m_pedo_rxlen{},
+		m_pedo_tx{},
+		m_pedo_txlen{},
+		m_pedo_txpos{},
+		m_pedo_wrlen{},
+		m_pedo_wraddr{},
+		m_pedo_timer{}
 	{ }
 
 	void hudson_poems(machine_config &config);
@@ -69,6 +97,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	static constexpr u32 PEDO_MEM = 0x10000;
+
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void draw_tile(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u32 tile, int xx, int yy, int gfxbase, int extrapal, bool use_flips);
@@ -77,18 +107,51 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int which, int priority);
 
-	u32 poems_random_r();
-	void unk_trigger_w(offs_t offset, u32 data, u32 mem_mask);
+	template<int Ch> u32 serial_ctrl_r();
+	template<int Ch> void serial_ctrl_w(offs_t offset, u32 data, u32 mem_mask);
+	template<int Ch> u32 serial_dma_r();
+	template<int Ch> void serial_dma_w(offs_t offset, u32 data, u32 mem_mask);
+	template<int Ch> void serial_data_w(offs_t offset, u32 data, u32 mem_mask);
+	template<int Ch> void serial_start_w(offs_t offset, u32 data, u32 mem_mask);
+	template<int Ch> u32 serial_status_r();
+	template<int Ch> void serial_status_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 serial_enable_r();
+	void serial_enable_w(offs_t offset, u32 data, u32 mem_mask);
+	TIMER_CALLBACK_MEMBER(serial_tx_done);
+	void serial_raise(int ch);
+	void serial_rx_word(int ch, u8 byte);
+
+	// e-walkeylife2 pedometer HLE, one per serial channel
+	void pedometer_byte(int ch, u8 byte);
+	void pedometer_packet(int ch);
+	void pedometer_send(int ch, const u8 *data, int len);
+	TIMER_CALLBACK_MEMBER(pedometer_reply);
+
+	u32 vidctrl_r();
+	void vidctrl_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 vpos_r();
+	u32 hpos_r();
+	u32 adc_start_r();
+	void adc_start_w(u32 data);
+	u32 adc_result_r();
+	TIMER_CALLBACK_MEMBER(adc_done);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	template<int Which> void tilemap_map(address_map &map, u32 base) ATTR_COLD;
+	template<int Ch> void serial_map(address_map &map, u32 base) ATTR_COLD;
 	void mem_map(address_map &map) ATTR_COLD;
 
-	u32 poems_8020010_r();
+	u32 intc_status_r();
+	void intc_ack_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 intc_mask_r();
+	void intc_mask_w(offs_t offset, u32 data, u32 mem_mask);
+	void intc_update();
 	u32 poems_count_r();
-	u32 poems_unk_r();
-	u32 poems_8000038_r(offs_t offset, u32 mem_mask);
+	u32 vidirq_status_r();
+	void vidirq_ack_w(offs_t offset, u32 data, u32 mem_mask);
+	u32 unk_802000c_r();
+	void unk_802000c_w(offs_t offset, u32 data, u32 mem_mask);
 	u32 poems_8000200_r(offs_t offset, u32 mem_mask);
 	u32 unk_aa04_r(offs_t offset, u32 mem_mask);
 	void unk_aa00_w(offs_t offset, u32 data, u32 mem_mask);
@@ -150,6 +213,32 @@ private:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<u32> m_mainram;
 	required_shared_ptr<u32> m_palram;
+
+	u32 m_vidirq_status; // bit 0 = frame
+	u32 m_unk_802000c;
+	u32 m_intc_status;   // bit 2 = serial, bit 4 = frame
+	u32 m_intc_mask;     // set bits are masked
+	u32 m_serial_ctrl[4];
+	u32 m_serial_dma[4];    // receive ring base
+	u32 m_serial_data[4];
+	u8 m_serial_rxidx[4];
+	emu_timer *m_serial_timer[4];
+	u32 m_serial_status[4]; // bit 0 = done
+	u32 m_serial_enable;    // one nibble per channel
+	u32 m_vidctrl;          // bit 15 = display on
+	bool m_display_was_on;
+	bool m_adc_busy;
+	emu_timer *m_adc_timer;
+
+	std::unique_ptr<u8[]> m_pedo_mem; // PEDO_MEM bytes per channel
+	u8 m_pedo_rx[4][16];
+	u8 m_pedo_rxlen[4];
+	u8 m_pedo_tx[4][128];
+	u8 m_pedo_txlen[4];
+	u8 m_pedo_txpos[4];
+	u8 m_pedo_wrlen[4];   // write data bytes still expected
+	u32 m_pedo_wraddr[4];
+	emu_timer *m_pedo_timer[4];
 };
 
 void hudson_poems_state::machine_start()
@@ -167,6 +256,36 @@ void hudson_poems_state::machine_start()
 	save_item(NAME(m_tilemaphigh));
 
 	save_item(NAME(m_hackcounter));
+	save_item(NAME(m_vidirq_status));
+	save_item(NAME(m_unk_802000c));
+	save_item(NAME(m_intc_status));
+	save_item(NAME(m_intc_mask));
+	save_item(NAME(m_serial_ctrl));
+	save_item(NAME(m_serial_dma));
+	save_item(NAME(m_serial_data));
+	save_item(NAME(m_serial_rxidx));
+	save_item(NAME(m_serial_status));
+	save_item(NAME(m_serial_enable));
+	save_item(NAME(m_vidctrl));
+	save_item(NAME(m_display_was_on));
+	save_item(NAME(m_adc_busy));
+
+	m_adc_timer = timer_alloc(FUNC(hudson_poems_state::adc_done), this);
+	for (int ch = 0; ch < 4; ch++)
+	{
+		m_serial_timer[ch] = timer_alloc(FUNC(hudson_poems_state::serial_tx_done), this);
+		m_pedo_timer[ch] = timer_alloc(FUNC(hudson_poems_state::pedometer_reply), this);
+	}
+
+	m_pedo_mem = make_unique_clear<u8[]>(4 * PEDO_MEM);
+	save_pointer(NAME(m_pedo_mem), 4 * PEDO_MEM);
+	save_item(NAME(m_pedo_rx));
+	save_item(NAME(m_pedo_rxlen));
+	save_item(NAME(m_pedo_tx));
+	save_item(NAME(m_pedo_txlen));
+	save_item(NAME(m_pedo_txpos));
+	save_item(NAME(m_pedo_wrlen));
+	save_item(NAME(m_pedo_wraddr));
 
 	save_item(NAME(m_fade));
 
@@ -183,6 +302,24 @@ void hudson_poems_state::machine_reset()
 {
 	m_unktableoffset = 0;
 	m_hackcounter = 0;
+	m_vidirq_status = 0;
+	m_unk_802000c = 0;
+	m_intc_status = 0;
+	m_intc_mask = 0xffffffff;
+	std::fill(std::begin(m_serial_ctrl), std::end(m_serial_ctrl), 0);
+	std::fill(std::begin(m_serial_dma), std::end(m_serial_dma), 0);
+	std::fill(std::begin(m_serial_data), std::end(m_serial_data), 0);
+	std::fill(std::begin(m_serial_rxidx), std::end(m_serial_rxidx), 0);
+	std::fill(std::begin(m_serial_status), std::end(m_serial_status), 0);
+	std::fill(std::begin(m_pedo_rxlen), std::end(m_pedo_rxlen), 0);
+	std::fill(std::begin(m_pedo_txlen), std::end(m_pedo_txlen), 0);
+	std::fill(std::begin(m_pedo_txpos), std::end(m_pedo_txpos), 0);
+	std::fill(std::begin(m_pedo_wrlen), std::end(m_pedo_wrlen), 0);
+	m_serial_enable = 0;
+	m_vidctrl = 0;
+	m_display_was_on = false;
+	m_adc_busy = false;
+	intc_update();
 
 	for (int i = 0; i < 4; i++)
 	{
@@ -235,7 +372,14 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ewalk )
 	PORT_START( "IN1" )
-	PORT_BIT( 0xffffffff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	// the firmware reads only these six bits
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0xfffe69ef, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 void hudson_poems_state::draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -380,16 +524,9 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 	if (xscroll & 0x400)
 		xscroll -= 0x800;
 
-	int tilemap_drawheight = ((m_tilemaphigh[which] >> 16) & 0xff);
-	int tilemap_drawwidth = ((m_tilemaphigh[which] >> 0) & 0x1ff);
-
-	// 0 might be maximum, poemzet2
-	if (tilemap_drawheight == 0)
-		tilemap_drawheight = 240;
-
-	// 0 might be maximum, poemzet
-	if (tilemap_drawwidth == 0)
-		tilemap_drawwidth = 320;
+	// display size in pixels, height in the top word; zero hides the layer
+	int tilemap_drawheight = ((m_tilemaphigh[which] >> 16) & 0x3ff);
+	int tilemap_drawwidth = ((m_tilemaphigh[which] >> 0) & 0x3ff);
 
 	// clamp to size of tilemap (test mode has 256 wide tilemap in RAM, but sets full 320 width?)
 	if (tilemap_drawwidth > width)
@@ -403,7 +540,7 @@ void hudson_poems_state::draw_tilemap(screen_device &screen, bitmap_rgb32 &bitma
 
 		for (int x = 0; x < tilemap_drawwidth / 8 / 2; x++)
 		{
-			u32 tiles = m_mainram[base + (y * width / 8 / 2) + x];
+			u32 tiles = m_mainram[(base + (y * width / 8 / 2) + x) & 0xffff];
 			const int xpos = (x * 16 + xscroll) & 0x1ff;
 
 			if (bpp == 4)
@@ -510,25 +647,291 @@ u32 hudson_poems_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	return 0;
 }
 
-u32 hudson_poems_state::poems_unk_r()
+// interrupt controller on Xtensa interrupt 2: +0x10 pending, +0x14 acknowledge, +0x18 mask
+u32 hudson_poems_state::intc_status_r()
 {
-	return 0x00000000;
+	return m_intc_status;
 }
 
-u32 hudson_poems_state::poems_random_r()
+void hudson_poems_state::intc_ack_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	return machine().rand();
+	m_intc_status &= ~(data & mem_mask);
+	intc_update();
+}
+
+u32 hudson_poems_state::intc_mask_r()
+{
+	return m_intc_mask;
+}
+
+void hudson_poems_state::intc_mask_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_intc_mask);
+	intc_update();
+}
+
+void hudson_poems_state::intc_update()
+{
+	m_maincpu->set_input_line(2, (m_intc_status & ~m_intc_mask) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+/*
+    Serial controller, 0x100 bytes per channel: +0x00 control, +0x38 receive ring base (the low byte reads back
+    the write index), +0x3c start, +0x40 status, +0x44 transmit frame. Mode 3 is the EEPROM read on channel 3,
+    mode 4 a 9600 baud async link with bit-reversed data (ewalk2tv's pedometer).
+*/
+
+template<int Ch> u32 hudson_poems_state::serial_ctrl_r()
+{
+	return m_serial_ctrl[Ch];
+}
+
+template<int Ch> void hudson_poems_state::serial_ctrl_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_serial_ctrl[Ch]);
+}
+
+template<int Ch> u32 hudson_poems_state::serial_dma_r()
+{
+	return (m_serial_dma[Ch] & ~0xffU) | (m_serial_rxidx[Ch] << 1);
+}
+
+template<int Ch> void hudson_poems_state::serial_dma_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_serial_dma[Ch]);
+	m_serial_rxidx[Ch] = 0;
+}
+
+template<int Ch> void hudson_poems_state::serial_data_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_serial_data[Ch]);
+}
+
+void hudson_poems_state::serial_raise(int ch)
+{
+	m_serial_status[ch] |= 1;
+	if (BIT(m_serial_enable, ch * 4))
+	{
+		m_intc_status |= 0x04;
+		intc_update();
+	}
+}
+
+TIMER_CALLBACK_MEMBER(hudson_poems_state::serial_tx_done)
+{
+	serial_raise(param);
+}
+
+void hudson_poems_state::serial_rx_word(int ch, u8 byte)
+{
+	const u16 frame = 0x200 | (bitswap<8>(byte, 0, 1, 2, 3, 4, 5, 6, 7) << 1);
+	const offs_t addr = (0x2c000000 | (m_serial_dma[ch] & 0x3ffff)) + m_serial_rxidx[ch] * 2;
+	m_maincpu->space(AS_PROGRAM).write_word(addr, frame);
+	m_serial_rxidx[ch] = (m_serial_rxidx[ch] + 1) & 15;
+}
+
+template<int Ch> u32 hudson_poems_state::serial_status_r()
+{
+	return m_serial_status[Ch];
+}
+
+template<int Ch> void hudson_poems_state::serial_status_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_serial_status[Ch] &= ~(data & mem_mask);
+}
+
+template<int Ch> void hudson_poems_state::serial_start_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	LOGMASKED(LOG_SERIAL, "%s: serial channel %d start %08x %08x (control %08x)\n", machine().describe_context(), Ch, data, mem_mask, m_serial_ctrl[Ch]);
+	if ((m_serial_ctrl[Ch] & 7) == 3)
+	{
+		serial_raise(Ch);
+	}
+	else if ((m_serial_ctrl[Ch] & 7) == 4 && data == 0x100)
+	{
+		// one frame; completion follows after the frame time
+		const u8 byte = bitswap<8>((m_serial_data[Ch] >> 1) & 0xff, 0, 1, 2, 3, 4, 5, 6, 7);
+		pedometer_byte(Ch, byte);
+		m_serial_timer[Ch]->adjust(attotime::from_usec(1042), Ch);
+	}
+}
+
+u32 hudson_poems_state::serial_enable_r()
+{
+	return m_serial_enable;
+}
+
+void hudson_poems_state::serial_enable_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_serial_enable);
+}
+
+u32 hudson_poems_state::vidctrl_r()
+{
+	return m_vidctrl;
+}
+
+u32 hudson_poems_state::vpos_r()
+{
+	// ewalk2tv's decompressor budgets its time per frame with this
+	return m_screen->vpos();
+}
+
+u32 hudson_poems_state::hpos_r()
+{
+	return m_screen->hpos();
+}
+
+/*
+    e-walkeylife2 pedometer HLE. Packets are E0 A5 cmd addr(3) len chk, with chk = ~(cmd ^ addr ^ len);
+    cmd 1 reads, cmd 2 writes. The pedometer's memory contents are unknown, so it starts out blank.
+*/
+
+void hudson_poems_state::pedometer_byte(int ch, u8 byte)
+{
+	u8 *const rx = m_pedo_rx[ch];
+	u8 &len = m_pedo_rxlen[ch];
+
+	if (m_pedo_wrlen[ch])
+	{
+		// data phase of a write: len bytes then a checksum
+		rx[len++] = byte;
+		if (len == m_pedo_wrlen[ch] + 1)
+		{
+			u8 chk = 0;
+			std::ostringstream bytes;
+			for (int i = 0; i < m_pedo_wrlen[ch]; i++)
+			{
+				chk ^= rx[i];
+				util::stream_format(bytes, " %02x", rx[i]);
+			}
+			LOGMASKED(LOG_PEDOMETER, "pedometer %d: write data for %06x, %d bytes, checksum %s:%s\n", ch, m_pedo_wraddr[ch], m_pedo_wrlen[ch], (u8(~chk) == rx[len - 1]) ? "ok" : "BAD", std::move(bytes).str());
+			for (int i = 0; i < m_pedo_wrlen[ch]; i++)
+				m_pedo_mem[ch * PEDO_MEM + ((m_pedo_wraddr[ch] + i) & (PEDO_MEM - 1))] = rx[i];
+			m_pedo_wrlen[ch] = 0;
+			len = 0;
+			static constexpr u8 ack[8] = { 0xe0, 0xa5, 0x02, 0x00, 0x00, 0x00, 0x00, u8(~0x02) };
+			pedometer_send(ch, ack, 8);
+		}
+		return;
+	}
+
+	// resynchronise on the E0 A5 header
+	if ((len == 0 && byte != 0xe0) || (len == 1 && byte != 0xa5))
+	{
+		logerror("pedometer %d: stray byte %02x\n", ch, byte);
+		len = 0;
+		return;
+	}
+	rx[len++] = byte;
+	if (len == 8)
+	{
+		len = 0;
+		pedometer_packet(ch);
+	}
+}
+
+void hudson_poems_state::pedometer_packet(int ch)
+{
+	const u8 *const rx = m_pedo_rx[ch];
+	const u8 chk = ~(rx[2] ^ rx[3] ^ rx[4] ^ rx[5] ^ rx[6]);
+	const u32 addr = (rx[3] << 16) | (rx[4] << 8) | rx[5];
+	const int len = rx[6];
+	LOGMASKED(LOG_PEDOMETER, "pedometer %d: command %02x address %06x length %d checksum %s\n", ch, rx[2], addr, len, (chk == rx[7]) ? "ok" : "BAD");
+	if (chk != rx[7])
+		return;
+
+	switch (rx[2])
+	{
+	case 0x01: // read
+	{
+		u8 reply[128] = { 0xe0, 0xa5, 0x01, u8(len) };
+		u8 sum = 0x01 ^ len;
+		const int n = std::min(len, 120);
+		for (int i = 0; i < n; i++)
+		{
+			reply[4 + i] = m_pedo_mem[ch * PEDO_MEM + ((addr + i) & (PEDO_MEM - 1))];
+			sum ^= reply[4 + i];
+		}
+		reply[4 + n] = ~sum;
+		pedometer_send(ch, reply, 5 + n);
+		break;
+	}
+
+	case 0x02: // write
+	{
+		m_pedo_wraddr[ch] = addr;
+		m_pedo_wrlen[ch] = std::min(len, 15);
+		static constexpr u8 ready[8] = { 0xe0, 0xa5, 0x03, 0x00, 0x00, 0x00, 0x00, u8(~0x03) };
+		pedometer_send(ch, ready, 8);
+		break;
+	}
+
+	default:
+		logerror("pedometer %d: unhandled command %02x\n", ch, rx[2]);
+		break;
+	}
+}
+
+void hudson_poems_state::pedometer_send(int ch, const u8 *data, int len)
+{
+	std::copy_n(data, len, m_pedo_tx[ch]);
+	m_pedo_txlen[ch] = len;
+	m_pedo_txpos[ch] = 0;
+	// one frame at a time, each with an interrupt; the receive ring is only 16 deep
+	m_pedo_timer[ch]->adjust(attotime::from_msec(3), ch);
+}
+
+TIMER_CALLBACK_MEMBER(hudson_poems_state::pedometer_reply)
+{
+	const int ch = param;
+	if (m_pedo_txpos[ch] < m_pedo_txlen[ch])
+	{
+		serial_rx_word(ch, m_pedo_tx[ch][m_pedo_txpos[ch]++]);
+		serial_raise(ch);
+		if (m_pedo_txpos[ch] < m_pedo_txlen[ch])
+			m_pedo_timer[ch]->adjust(attotime::from_usec(1042), ch);
+		else
+			m_pedo_txlen[ch] = m_pedo_txpos[ch] = 0;
+	}
+}
+
+// two-channel ADC: +0x04 start/busy, +0x18 and +0x1c signed 12-bit results
+u32 hudson_poems_state::adc_start_r()
+{
+	return m_adc_busy ? 1 : 0;
+}
+
+void hudson_poems_state::adc_start_w(u32 data)
+{
+	if (BIT(data, 0))
+	{
+		m_adc_busy = true;
+		m_adc_timer->adjust(attotime::from_usec(50));
+	}
+}
+
+TIMER_CALLBACK_MEMBER(hudson_poems_state::adc_done)
+{
+	m_adc_busy = false;
+}
+
+u32 hudson_poems_state::adc_result_r()
+{
+	// real signal levels unknown
+	return 0;
+}
+
+void hudson_poems_state::vidctrl_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	// no frame events until bit 15 is set
+	COMBINE_DATA(&m_vidctrl);
 }
 
 
 u32 hudson_poems_state::poems_count_r()
 {
 	return ((m_hackcounter++) & 0x3) ? 0xffffffff : 0;
-}
-
-u32 hudson_poems_state::poems_8020010_r()
-{
-	return 0x4;
 }
 
 u32 hudson_poems_state::unk_aa04_r(offs_t offset, u32 mem_mask)
@@ -541,23 +944,26 @@ void hudson_poems_state::unk_aa00_w(offs_t offset, u32 data, u32 mem_mask)
 	logerror("%s: unk_aa00_w %08x %08x\n", machine().describe_context(), data, mem_mask);
 }
 
-u32 hudson_poems_state::poems_8000038_r(offs_t offset, u32 mem_mask)
+u32 hudson_poems_state::vidirq_status_r()
 {
-	if (!machine().side_effects_disabled())
-		if (m_maincpu->pc() != 0x2c000b5a)
-			logerror("%s: poems_8000038_r %08x\n", machine().describe_context(), mem_mask);
+	// bit 0 = frame; marimba waits for bit 3 once after it starts the display
+	return m_vidirq_status;
+}
 
-	if (machine().rand() & 1)
-		return 0xffffffff;
-	else
-		return 0x00000000;
+void hudson_poems_state::vidirq_ack_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	m_vidirq_status &= ~(data & mem_mask);
+}
 
-	/*
-	if (m_mainram[0x1baf8/4] == 0x00000000)
-	    return 0xffffffff;
-	else
-	    return 0x00000000;
-	*/
+u32 hudson_poems_state::unk_802000c_r()
+{
+	// poembase whites out the palette while this reads zero
+	return m_unk_802000c;
+}
+
+void hudson_poems_state::unk_802000c_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_unk_802000c);
 }
 
 u32 hudson_poems_state::poems_8000200_r(offs_t offset, u32 mem_mask)
@@ -626,12 +1032,6 @@ void hudson_poems_state::unktable_w(offs_t offset, u32 data, u32 mem_mask)
 void hudson_poems_state::unktable_reset_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	m_unktableoffset = 0;
-}
-
-void hudson_poems_state::unk_trigger_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	logerror("%s: unk_trigger_w %08x %08x\n", machine().describe_context(), data, mem_mask);
-	m_maincpu->set_input_line(0x4, ASSERT_LINE);
 }
 
 
@@ -737,19 +1137,28 @@ void hudson_poems_state::tilemap_map(address_map &map, u32 base)
 	map(base+0x3c, base+0x3f).ram(); // not used?
 }
 
+template <int Ch>
+void hudson_poems_state::serial_map(address_map &map, u32 base)
+{
+	map(base+0x00, base+0x03).rw(FUNC(hudson_poems_state::serial_ctrl_r<Ch>), FUNC(hudson_poems_state::serial_ctrl_w<Ch>));
+	map(base+0x38, base+0x3b).rw(FUNC(hudson_poems_state::serial_dma_r<Ch>), FUNC(hudson_poems_state::serial_dma_w<Ch>));
+	map(base+0x3c, base+0x3f).w(FUNC(hudson_poems_state::serial_start_w<Ch>));
+	map(base+0x40, base+0x43).rw(FUNC(hudson_poems_state::serial_status_r<Ch>), FUNC(hudson_poems_state::serial_status_w<Ch>));
+	map(base+0x44, base+0x47).w(FUNC(hudson_poems_state::serial_data_w<Ch>));
+}
+
 void hudson_poems_state::mem_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).mirror(0x20000000).rom().region("maincpu", 0);
 
 	/////////////////// unknown
-	map(0x04000040, 0x04000043).r(FUNC(hudson_poems_state::poems_random_r)).nopw();
-	map(0x04000140, 0x04000143).r(FUNC(hudson_poems_state::poems_random_r)).nopw();
-	map(0x04000240, 0x04000243).r(FUNC(hudson_poems_state::poems_random_r)).nopw();
-	map(0x04000340, 0x04000343).r(FUNC(hudson_poems_state::poems_random_r)).nopw();
+	serial_map<0>(map, 0x04000000);
+	serial_map<1>(map, 0x04000100);
+	serial_map<2>(map, 0x04000200);
+	serial_map<3>(map, 0x04000300);
 
 	//map(0x04000324, 0x04000327).nopw(); // uploads a table here from ROM after uploading fixed values from ROM to some other addresses
-	map(0x0400033c, 0x0400033f).w(FUNC(hudson_poems_state::unk_trigger_w)); // maybe DMA?
-	map(0x04001000, 0x04001003).r(FUNC(hudson_poems_state::poems_random_r)).nopw();
+	map(0x04001000, 0x04001003).rw(FUNC(hudson_poems_state::serial_enable_r), FUNC(hudson_poems_state::serial_enable_w));
 
 
 	map(0x0400100c, 0x0400100f).nopr(); // read in various places at end of calls, every frame, but result seems to go unused?
@@ -757,8 +1166,11 @@ void hudson_poems_state::mem_map(address_map &map)
 
 	/////////////////// palette / regs?
 
-	map(0x08000038, 0x0800003b).r(FUNC(hudson_poems_state::poems_8000038_r));
-	//map(0x0800003c, 0x0800003f).nopw(); // used close to the fade write code, writes FFFFFFFF
+	map(0x08000000, 0x08000003).rw(FUNC(hudson_poems_state::vidctrl_r), FUNC(hudson_poems_state::vidctrl_w));
+	map(0x08000038, 0x0800003b).r(FUNC(hudson_poems_state::vidirq_status_r));
+	map(0x0800003c, 0x0800003f).w(FUNC(hudson_poems_state::vidirq_ack_w));
+	map(0x08000040, 0x08000043).r(FUNC(hudson_poems_state::vpos_r));
+	map(0x08000044, 0x08000047).r(FUNC(hudson_poems_state::hpos_r));
 
 	//map(0x08000048, 0x0800004b).nopw(); // ^^
 	//map(0x0800004c, 0x0800004f).nopw(); // ^^
@@ -809,7 +1221,10 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x0800b000, 0x0800b003).w(FUNC(hudson_poems_state::unktable_w)); // writes a table of increasing 16-bit values here
 	map(0x0800b004, 0x0800b007).w(FUNC(hudson_poems_state::unktable_reset_w));
 
-	map(0x0800c040, 0x0800c05f).ram();
+	map(0x0800c040, 0x0800c043).ram(); // ADC configuration
+	map(0x0800c044, 0x0800c047).rw(FUNC(hudson_poems_state::adc_start_r), FUNC(hudson_poems_state::adc_start_w));
+	map(0x0800c048, 0x0800c057).ram();
+	map(0x0800c058, 0x0800c05f).r(FUNC(hudson_poems_state::adc_result_r));
 
 	///////////////////
 	map(0x0801c000, 0x0801c003).w(FUNC(hudson_poems_state::dma_trigger_w));
@@ -822,9 +1237,10 @@ void hudson_poems_state::mem_map(address_map &map)
 	map(0x08020000, 0x08020003).nopr().nopw();
 	map(0x08020004, 0x08020007).nopr().nopw();
 	map(0x08020008, 0x0802000b).nopr();
-	map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::poems_8020010_r));
-	map(0x08020014, 0x08020017).nopw(); // writes 0x10
-	map(0x08020018, 0x0802001b).r(FUNC(hudson_poems_state::poems_unk_r)).nopw(); // writes 0x10
+	map(0x0802000c, 0x0802000f).rw(FUNC(hudson_poems_state::unk_802000c_r), FUNC(hudson_poems_state::unk_802000c_w));
+	map(0x08020010, 0x08020013).r(FUNC(hudson_poems_state::intc_status_r)).nopw(); // written with 0 at startup
+	map(0x08020014, 0x08020017).w(FUNC(hudson_poems_state::intc_ack_w));
+	map(0x08020018, 0x0802001b).rw(FUNC(hudson_poems_state::intc_mask_r), FUNC(hudson_poems_state::intc_mask_w));
 	map(0x08020020, 0x08020023).r(FUNC(hudson_poems_state::poems_count_r));
 
 	///////////////////
@@ -846,13 +1262,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(hudson_poems_state::screen_scanline)
 
 	if (scanline == 100)
 	{
-		if (m_tilemapunk[0] != 1) // wrong, this is probably just tilemap size, with 1 being 256 and 2 being 512, but prevents unwanted IRQs in Test Mode
-			m_maincpu->set_input_line(0x10, ASSERT_LINE);
-	}
-
-	if (scanline == 150)
-	{
-		m_maincpu->set_input_line(0x04, CLEAR_LINE);
+		// the first frame event comes a frame after the display is switched on
+		const bool display_on = BIT(m_vidctrl, 15);
+		if (display_on && m_display_was_on && m_tilemapunk[0] != 1) // wrong, this is probably just tilemap size, but prevents unwanted IRQs in Test Mode
+		{
+			// sets use either Xtensa interrupt 4 or 5 for the frame
+			m_vidirq_status |= 0x9;
+			m_maincpu->pulse_input_line(4, attotime::zero);
+			m_maincpu->pulse_input_line(5, attotime::zero);
+			m_intc_status |= 0x10;
+			intc_update();
+		}
+		m_display_was_on = display_on;
 	}
 }
 
@@ -861,20 +1282,30 @@ void hudson_poems_state::hudson_poems(machine_config &config)
 	// 27Mhz XTAL, Xtensa based CPU
 	XTENSA(config, m_maincpu, 27_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hudson_poems_state::mem_map);
-	// the vectors can be configured when the CPU is manufactured, so treat as config options
+	// the core configuration was recovered from the firmware
 	m_maincpu->set_startupvector(0x00000040);
-	m_maincpu->set_irq_vector(4, 0x2c0001b4); // 0x10
-	m_maincpu->set_irq_vector(1, 0x2c000194); // 0x02
-	m_maincpu->set_irq_vector(2, 0x2c000194); // 0x04
-	// 0x2c0001b4 these are also valid vectors
-	// 0x2c0001c4
-	// 0x2c0001d4
-	// 0x2c000000 is a register window exception (4)
-	// 0x2c000040 is a register window exception (4)
-	// 0x2c000080 is a register window exception (8)
-	// 0x2c0000c0 is a register window exception (8)
-	// 0x2c000100 is a register window exception (12)
-	// 0x2c000140 is a register window exception (12)
+	m_maincpu->set_xea1(true); // the level 3 handler runs loops without touching PS
+	m_maincpu->set_num_aregs(32);
+	m_maincpu->set_user_exception_vector(0x2c000184); // user and kernel may be swapped
+	m_maincpu->set_kernel_exception_vector(0x2c000194);
+	m_maincpu->set_interrupt_vector(2, 0x2c0001a4);
+	m_maincpu->set_interrupt_vector(3, 0x2c0001b4);
+	m_maincpu->set_interrupt_vector(4, 0x2c0001c4);
+	m_maincpu->set_interrupt_vector(5, 0x2c0001d4);
+	m_maincpu->set_window_vector_base(0x2c000000);
+	m_maincpu->set_irq_level(0, 2);
+	m_maincpu->set_irq_type(0, xtensa_device::IRQ_TIMER);
+	m_maincpu->set_timer_interrupt(0, 0);
+	m_maincpu->set_irq_level(1, 1);
+	m_maincpu->set_irq_type(1, xtensa_device::IRQ_SOFTWARE);
+	m_maincpu->set_irq_level(2, 1);
+	m_maincpu->set_irq_type(2, xtensa_device::IRQ_LEVEL); // interrupt controller
+	m_maincpu->set_irq_level(3, 2);
+	m_maincpu->set_irq_type(3, xtensa_device::IRQ_EDGE); // source unknown
+	m_maincpu->set_irq_level(4, 3);
+	m_maincpu->set_irq_type(4, xtensa_device::IRQ_EDGE); // frame
+	m_maincpu->set_irq_level(5, 4);
+	m_maincpu->set_irq_type(5, xtensa_device::IRQ_EDGE); // frame
 
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
@@ -952,9 +1383,7 @@ ROM_END
 
 CONS( 2005, marimba,      0,       0,      hudson_poems, hudson_poems, hudson_poems_state, init_marimba, "Konami", "Marimba Tengoku (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
-// waits for 2c008f00 to become 0 (missing irq?) happens before it gets to the DMA transfers
 CONS( 2004, poemgolf,     0,       0,      hudson_poems, poemgolf,     hudson_poems_state, init_marimba, "Konami", "Soukai Golf Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
-// waits for 2c005d00 to become 0 (missing irq?) happens before it gets to the DMA transfers
 CONS( 2004, poembase,     0,       0,      hudson_poems, poemgolf,     hudson_poems_state, init_marimba, "Konami", "Nekketsu Pawapuro Champ (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )
 
 CONS( 2004, poemzet,      0,       0,      hudson_poems, poemzet,      hudson_poems_state, init_marimba, "Konami", "Zettai Zetsumei Dangerous Jiisan - Mini Game de Taiketsu ja!", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_SOUND )

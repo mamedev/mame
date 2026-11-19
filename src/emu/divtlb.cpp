@@ -34,6 +34,7 @@ device_vtlb_interface::device_vtlb_interface(const machine_config &mconfig, devi
 		m_space(space),
 		m_dynamic(0),
 		m_fixed(0),
+		m_saved(true),
 		m_dynindex(0),
 		m_pageshift(0),
 		m_addrwidth(0),
@@ -71,6 +72,8 @@ void device_vtlb_interface::interface_validity_check(validity_checker &valid) co
 		else if ((1 << spaceconfig->page_shift()) <= FLAGS_MASK || spaceconfig->logaddr_width() <= spaceconfig->page_shift())
 			osd_printf_error("Invalid page shift %d for VTLB\n", spaceconfig->page_shift());
 	}
+	if (!m_saved && m_fixed > 0)
+		osd_printf_error("VTLB fixed entries must be saved\n");
 }
 
 
@@ -114,11 +117,16 @@ void device_vtlb_interface::interface_pre_start()
 
 void device_vtlb_interface::interface_post_start()
 {
-	device().save_item(NAME(m_live));
-	device().save_item(NAME(m_table));
-	device().save_item(NAME(m_refcnt));
-	if (m_fixed > 0)
-		device().save_item(NAME(m_fixedpages));
+	if (m_saved)
+	{
+		device().save_item(NAME(m_live));
+		device().save_item(NAME(m_table));
+		device().save_item(NAME(m_refcnt));
+		if (m_fixed > 0)
+		{
+			device().save_item(NAME(m_fixedpages));
+		}
+	}
 }
 
 
@@ -130,6 +138,20 @@ void device_vtlb_interface::interface_post_start()
 void device_vtlb_interface::interface_pre_reset()
 {
 	vtlb_flush_dynamic();
+}
+
+
+//-------------------------------------------------
+//  interface_post_load - work to be done after
+//  loading a saved state
+//-------------------------------------------------
+
+void device_vtlb_interface::interface_post_load()
+{
+	if (!m_saved)
+	{
+		vtlb_flush_dynamic();
+	}
 }
 
 

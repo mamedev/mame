@@ -42,6 +42,8 @@ diag264_cassette_loopback_device::diag264_cassette_loopback_device(const machine
 
 void diag264_cassette_loopback_device::device_start()
 {
+	save_item(NAME(m_read));
+	save_item(NAME(m_sense));
 }
 
 
@@ -62,6 +64,7 @@ int diag264_cassette_loopback_device::datassette_read()
 void diag264_cassette_loopback_device::datassette_write(int state)
 {
 	m_read = state;
+	m_slot->read_w(m_read);
 }
 
 

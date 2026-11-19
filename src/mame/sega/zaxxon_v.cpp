@@ -310,7 +310,7 @@ void zaxxon_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 			flipoffs += 7;
 
 		/* loop over visible rows */
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			uint16_t *const dst = &bitmap.pix(y);
 
@@ -323,7 +323,7 @@ void zaxxon_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipre
 			uint16_t const *src = &pixmap.pix(srcy & ymask);
 
 			/* loop over visible columns */
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				/* start with HF = flipped H signals */
 				int srcx = x ^ flipmask;
