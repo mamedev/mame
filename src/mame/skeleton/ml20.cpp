@@ -460,7 +460,7 @@ void ml20nb_state::ml20nb(machine_config &config)
 	m_maincpu->p0_out_cb().set(FUNC(ml20nb_state::p0_w));
 
 	AMD_29F040(config, m_flash);
-	EEPROM_93C66_16BIT(config, m_eeprom); // 16-bit organisation, as the firmware addresses it
+	EEPROM_93C66_16BIT(config, m_eeprom);
 	RTC72423(config, m_rtc, 32.768_kHz_XTAL);
 }
 
@@ -473,19 +473,19 @@ ROM_START( ml20nb )
 	ROM_REGION(0x80000, "flash", 0)
 	ROM_LOAD("bios_net_100_0.4_am29f040.ic2", 0x0000, 0x80000, CRC(ab9af8ff) SHA1(308ea6336be6bace1c7e55c5d922308510173430) )
 
-	ROM_REGION16_BE(0x200, "eeprom", ROMREGION_ERASEFF)
-	ROM_LOAD("rt93lc66-a.ic4", 0x000, 0x200, NO_DUMP)
+	ROM_REGION16_LE(0x200, "eeprom", ROMREGION_ERASEFF)
+	ROM_LOAD("rt93lc66-a.ic4", 0x000, 0x200, CRC(690b739f) SHA1(36a0265d79782e7d7e71a201d7929de77e2315c6))
 
-	ROM_REGION(0x29200, "rfid", 0)
-	ROM_LOAD("atmega128a.ic1", 0x00000, 0x20000, NO_DUMP) // internal flash
-	ROM_LOAD("atmega128a_eeprom.ic1", 0x20000, 0x01000, NO_DUMP) // internal EEPROM
-	ROM_LOAD("clrc632.ic4", 0x21000, 0x00200, NO_DUMP) // EEPROM, blocks 8-31 hold the Crypto1 keys and can't be read back
-	ROM_LOAD("at25256b.ic2", 0x21200, 0x08000, NO_DUMP)
+	ROM_REGION(0x20000, "rfid", 0)
+	ROM_LOAD("atmega128a.ic1",        0x00000, 0x20000, NO_DUMP) // internal flash
+	ROM_LOAD("atmega128a_eeprom.ic1", 0x00000, 0x01000, NO_DUMP) // internal EEPROM
+	ROM_LOAD("clrc632.ic4",           0x00000, 0x00200, NO_DUMP) // EEPROM, blocks 8-31 hold the Crypto1 keys and can't be read back
+	ROM_LOAD("at25256b.ic2",          0x00000, 0x08000, CRC(5667b30a) SHA1(863e45279f667201661afa662830eafcb4b1dadf))
 
 	ROM_REGION(0x400500, "fingerprint", 0)
-	ROM_LOAD("39vf3201b.u4", 0x000000, 0x400000, NO_DUMP)
-	ROM_LOAD("at88sc153.u7", 0x400000, 0x000100, NO_DUMP)
-	ROM_LOAD("sfm3050-tc_v21f_16022200_nov-17_adsp-bf531.u6", 0x400100, 0x000400, NO_DUMP) // internal boot ROM
+	ROM_LOAD("39vf3201b.u4",                                  0x000000, 0x400000, NO_DUMP)
+	ROM_LOAD("at88sc153.u7",                                  0x000000, 0x000100, NO_DUMP)
+	ROM_LOAD("sfm3050-tc_v21f_16022200_nov-17_adsp-bf531.u6", 0x000000, 0x000400, NO_DUMP) // internal boot ROM
 
 	ROM_REGION(0x4000, "smartcard", 0)
 	ROM_LOAD("gc144gh-ul.ic2", 0x0000, 0x4000, NO_DUMP) // AT83C21GC (GemCore Serial Lite PRO on an AT83C5121), firmware version 144
