@@ -213,6 +213,12 @@ public:
 	void h89(machine_config &config);
 };
 
+/**
+ * Heathkit H89 with CDR hardware
+ *  - CDR FDC-880H soft-sectored floppy controller
+ *  - CDR8390 monitor ROM
+ *
+ */
 class h89_cdr_state : public h89_base_state
 {
 public:
@@ -377,6 +383,18 @@ static INPUT_PORTS_START( h88 )
 
 INPUT_PORTS_END
 
+
+#define H89_SW501_DEFINITIONS(def) \
+	PORT_CONFNAME(0x3c, def, "Switch SW501 Definitions") \
+	PORT_CONFSETTING(   0x00, "Generic" ) \
+	PORT_CONFSETTING(   0x04, "Heath MTR-90") \
+	PORT_CONFSETTING(   0x08, "Heath MTR-89") \
+	PORT_CONFSETTING(   0x0c, "MMS 444-84B/444-84A") \
+	PORT_CONFSETTING(   0x10, "Kres KMR-100") \
+	PORT_CONFSETTING(   0x14, "Ultimeth MTRHEX-4k") \
+	PORT_CONFSETTING(   0x18, "Ultimeth MTRHEX-2k") \
+	PORT_CONFSETTING(   0x1c, "SigmaROM") \
+	PORT_CONFSETTING(   0x20, "CDR8390 ROM")
 
 static INPUT_PORTS_START( h89 )
 
@@ -588,15 +606,15 @@ static INPUT_PORTS_START( h89 )
 	// CDR8390 ROM
 	PORT_DIPNAME( 0x03, 0x00, "Disk I/O #2" )                        PORT_DIPLOCATION("SW501:1,2")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
 	PORT_DIPSETTING(    0x00, "H-88-1" )
-	PORT_DIPSETTING(    0x01, "undefined" )
+	PORT_DIPSETTING(    0x01, "CDR FDC-880H" )
 	PORT_DIPSETTING(    0x02, "undefined" )
 	PORT_DIPSETTING(    0x03, "undefined" )
-	PORT_DIPNAME( 0x0c, 0x00, "Disk I/O #1" )                        PORT_DIPLOCATION("SW501:3,4")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPNAME( 0x0c, 0x04, "Disk I/O #1" )                        PORT_DIPLOCATION("SW501:3,4")     PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
 	PORT_DIPSETTING(    0x00, "undefined" )
 	PORT_DIPSETTING(    0x04, "CDR FDC-880H" )
 	PORT_DIPSETTING(    0x08, "undefined" )
 	PORT_DIPSETTING(    0x0c, "undefined" )
-	PORT_DIPNAME( 0x10, 0x00, "Primary Boot from" )                  PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
+	PORT_DIPNAME( 0x10, 0x10, "Primary Boot from" )                  PORT_DIPLOCATION("SW501:5")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
 	PORT_DIPSETTING(    0x00, "Disk I/O #2" )
 	PORT_DIPSETTING(    0x10, "Disk I/O #1" )
 	PORT_DIPNAME( 0x20, 0x20, "Perform memory test at start" )       PORT_DIPLOCATION("SW501:6")       PORT_CONDITION("CONFIG", 0x3c, EQUALS, 0x20)
@@ -611,16 +629,25 @@ static INPUT_PORTS_START( h89 )
 
 
 	PORT_START("CONFIG")
-	PORT_CONFNAME(0x3c, 0x04, "Switch SW501 Definitions")
-	PORT_CONFSETTING(   0x00, "Generic" )
-	PORT_CONFSETTING(   0x04, "Heath MTR-90")
-	PORT_CONFSETTING(   0x08, "Heath MTR-89")
-	PORT_CONFSETTING(   0x0c, "MMS 444-84B/444-84A")
-	PORT_CONFSETTING(   0x10, "Kres KMR-100")
-	PORT_CONFSETTING(   0x14, "Ultimeth MTRHEX-4k")
-	PORT_CONFSETTING(   0x18, "Ultimeth MTRHEX-2k")
-	PORT_CONFSETTING(   0x1c, "SigmaROM")
-	PORT_CONFSETTING(   0x20, "CDR8390 ROM")
+	H89_SW501_DEFINITIONS(0x04)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( h89_cdr )
+	PORT_INCLUDE( h89 )
+
+	// default to the CDR8390 ROM switch layout
+	PORT_MODIFY("CONFIG")
+	H89_SW501_DEFINITIONS(0x20)
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( h89_mms )
+	PORT_INCLUDE( h89 )
+
+	// default to the MMS 444-84B ROM switch layout
+	PORT_MODIFY("CONFIG")
+	H89_SW501_DEFINITIONS(0x0c)
 
 INPUT_PORTS_END
 
@@ -1197,6 +1224,6 @@ ROM_END
 //    year  name           parent compat machine        input class                init        company                fullname                   flags
 COMP( 1979, h88,           h89,   0,     h88,           h88,  h88_state,           empty_init, "Heath Company",       "H-88",                    MACHINE_SUPPORTS_SAVE)
 COMP( 1979, h89,           0,     0,     h89,           h89,  h89_state,           empty_init, "Heath Company",       "H-89",                    MACHINE_SUPPORTS_SAVE)
-COMP( 1981, h89_cdr,       h89,   0,     h89_cdr,       h89,  h89_cdr_state,       empty_init, "Heath Company",       "H-89 with CDR Equipment", MACHINE_SUPPORTS_SAVE)
-COMP( 1981, h89_mms,       h89,   0,     h89_mms,       h89,  h89_mms_state,       empty_init, "Heath Company",       "H-89 with MMS Equipment", MACHINE_SUPPORTS_SAVE)
+COMP( 1981, h89_cdr,       h89,   0,     h89_cdr,       h89_cdr, h89_cdr_state,    empty_init, "Heath Company",       "H-89 with CDR Equipment", MACHINE_SUPPORTS_SAVE)
+COMP( 1981, h89_mms,       h89,   0,     h89_mms,       h89_mms, h89_mms_state,    empty_init, "Heath Company",       "H-89 with MMS Equipment", MACHINE_SUPPORTS_SAVE)
 COMP( 1981, z90,           h89,   0,     h89,           h89,  h89_state,           empty_init, "Zenith Data Systems", "Z-90",                    MACHINE_SUPPORTS_SAVE)
