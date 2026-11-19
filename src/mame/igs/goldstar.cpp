@@ -684,6 +684,7 @@ public:
 	void init_cb2() ATTR_COLD;
 	void init_cbaai() ATTR_COLD;
 	void init_feverchb()ATTR_COLD;
+	void init_feverchc()ATTR_COLD;
 	void init_fl7_3121() ATTR_COLD;
 	void init_flam7_tw() ATTR_COLD;
 	void init_flaming7() ATTR_COLD;
@@ -34509,6 +34510,21 @@ void wingco_state::init_feverchb()
 	downcast<mc8123_device &>(*m_maincpu).decode(memregion("maincpu")->base(), &m_decrypted_opcodes[0], 0x8000);
 }
 
+void wingco_state::init_feverchc()
+{
+	u8 *const rom = memregion("maincpu")->base();
+    std::vector<u8> probe(0x8000), op(0x8000);
+
+    for (int v = 0; v < 256; v++)
+    {
+        std::fill(probe.begin(), probe.end(), v);
+		downcast<mc8123_device &>(*m_maincpu).decode(probe.data(), op.data(), 0x8000);
+
+        for (offs_t addr = 0; addr < 0x8000; addr++)
+            if (probe[addr] == rom[addr]) m_decrypted_opcodes[addr] = op[addr];
+    }
+}
+
 /*
   Flaming 7's
   Cyberdyne Systems.
@@ -35353,7 +35369,7 @@ GAME(  199?, special7b,  special7, flam7_tw, flaming7, wingco_state,   init_spec
 GAMEL( 1986, feverch,    0,        feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         0,          layout_lucky8 )
 GAMEL( 1986, fevercha,   feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         0,          layout_lucky8 )
 GAMEL( 1986, feverchb,   feverch,  feverchb, feverch,  wingco_state,   init_feverchb,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123, set 1)",                0,          layout_lucky8 )
-GAMEL( 1986, feverchc,   feverch,  feverchb, feverch,  wingco_state,   init_feverchb,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123, set 2)",                MACHINE_NOT_WORKING,  layout_lucky8 )
+GAMEL( 1986, feverchc,   feverch,  feverchb, feverch,  wingco_state,   init_feverchc,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123, set 2)",                MACHINE_NOT_WORKING,  layout_lucky8 )
 GAMEL( 1986, feverchtw,  feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               0,          layout_lucky8 )
 GAMEL( 1986, feverchw4,  feverch,  fevchw4,  lucky8b,  wingco_state,   empty_init,     ROT0, "bootleg",           "Fever Chance (W-6, cross-system for W-4)",                 0,          layout_lucky8p1 )
 
