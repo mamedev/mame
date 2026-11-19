@@ -1559,7 +1559,7 @@ ROM_END
 ROM_START( lhzb3in1 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "lhzb3in1_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "lhzb3in1_igs036,bin", 0x00000, 0x4000, CRC(a597d0c8) SHA1(1bca73acc5ef820b860e6c99dc5be0bcff2b1c45) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhzb3in1_v100cn.u17",  0x000000, 0x200000, CRC(03caaba4) SHA1(701b97d791e9329bad2ddc4d365748e65c430758) )
@@ -1846,7 +1846,7 @@ ROM_END
 ROM_START( cjjl )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "igs036.u16", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "cjjl_igs036.u16", 0x00000, 0x4000, CRC(3176e2e7) SHA1(8f94ef22158a03cbfaf65d8cf949354328842d0a) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "system_v100cn.u18", 0x000000, 0x200000, CRC(cca9f4c0) SHA1(4df69657804b6da4508958a7d1b40089669e4a5a) )
@@ -2151,6 +2151,10 @@ GAME( 200?, xydn,         0,       m036_cjgdy,    cjgdy,    m036_tt_state,      
 
 GAME( 2010, mjzhizun,     0,       m036_mjzhizun, lhtb,     m036_mj_state,       empty_init,      ROT0, "IGS",           "Majiang Zhizun (S100CN)", MACHINE_NOT_WORKING )
 
+GAME( 200?, cjjl,         0,       m036_tt_boot,  cjgdy,    m036_tt_state,       empty_init,      ROT0, "IGS",           "Chaoji Jielong (V100CN)", MACHINE_NOT_WORKING )
+
+GAME( 2010, lhzb3in1,     0,       m036_tt_boot,  lhtb,     m036_tt_state,       empty_init,      ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_NOT_WORKING ) // 龙虎争霸三合一
+
 // sets with a TT5665 for sound and 800x600 display
 
 GAME( 2010, lhfy,         0,       m036_hd,       lhfy,     m036_hd_state,       empty_init,      ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NOT_WORKING )
@@ -2169,11 +2173,7 @@ GAME( 201?, hlqqq,        0,       m036_hd,       ddz_hd,   m036_hd_state,      
 
 GAME( 200?, super70s,     0,       m036_tt, m036, m036_state, init_m036,          ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-GAME( 2010, lhzb3in1,     0,       m036_tt, m036, m036_state, init_key<lhzb3in1_key>, ROT0, "IGS",           "Long Hu Zhengba San He Yi (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 龙虎争霸三合一
-
 GAME( 200?, igsm312,      0,       m036_tt, m036, m036_state, init_key<m312cn_key>,   ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
-
-GAME( 200?, cjjl,         0,       m036_tt, m036, m036_state, init_key<cjjl_key>,     ROT0, "IGS",           "Chaoji Jielong (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 2010, lhzbgqb,      0,       m036_tt, m036, m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
