@@ -482,7 +482,7 @@ void video_manager::begin_recording(const char *name, movie_recording::format fo
 				if (1 < count)
 					tempname = util::string_format("%s%d%s", basename, index, extension);
 				else
-					tempname.assign(name).append(extension);
+					tempname.assign(basename).append(extension);
 			}
 
 			begin_recording_screen(
