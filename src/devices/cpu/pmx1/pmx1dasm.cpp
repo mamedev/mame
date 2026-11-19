@@ -31,11 +31,12 @@
       fill                          repeated store, moving the pointer before each
       tacmd                         a 64-bit instruction for the tile accelerator
       out                           write a port register
-      feed                          give the oldest read to the display feed and queue another
+      feed                          give the oldest read to the display feed and queue another;
+                                    [pointer += offset] repeats, moving the pointer before each
       nop, frag                     nothing; frag is the word that starts each fragment of code
 
-    A mnemonic ending in .f sets the flags; .eq .ne .hi .ge .lt .gt make the
-    instruction conditional.  Thread 0 counts the address a jump goes to from
+    A mnemonic ending in .f sets the flags; .eq .ne .cs .cc .mi .pl .vs .vc
+    .hi .ls .ge .lt .gt .le make the instruction conditional.  Thread 0 counts the address a jump goes to from
     four instructions past the jump: without a processor to ask, addresses
     are shown as threads 1 to 3 would take them.
 */
@@ -50,10 +51,10 @@ constexpr char const *const OPERATIONS[7] = { "add", "sub", "and", "or", "xor", 
 
 constexpr char const *const BANKS[5] = { nullptr, "da", "db", "aa", "ab" };
 
-// condition codes: only those with a name are known
+// condition codes, those of the ARM plus one: only those with a name are known
 constexpr char const *const CONDITIONS[16] = {
-		"", "eq", "ne", nullptr, nullptr, nullptr, nullptr, nullptr,
-		nullptr, "hi", nullptr, "ge", "lt", "gt", nullptr, nullptr };
+		"", "eq", "ne", "cs", "cc", "mi", "pl", "vs",
+		"vc", "hi", "ls", "ge", "lt", "gt", "le", nullptr };
 
 } // anonymous namespace
 
@@ -116,7 +117,8 @@ bool pmx1core_disassembler::arithmetic(std::ostream &stream, u32 op)
 	const u32 unit = ((major == 9) ? 3 : 1) + BIT(op, 24);
 	const bool flags = BIT(op, 27), conditional = BIT(op, 26), immediate = BIT(op, 25);
 	const bool shift = operation >= 5;
-	if (flags && ((major == 9) || conditional))
+	const bool to_unit = conditional && immediate && !shift && BIT(op, 5);
+	if (flags && ((major == 9) || (conditional && !to_unit)))
 		return false;
 
 	const std::string name = flags ? util::string_format("%s.f", OPERATIONS[operation]) : std::string(OPERATIONS[operation]);
@@ -186,14 +188,15 @@ bool pmx1core_disassembler::arithmetic(std::ostream &stream, u32 op)
 		}
 		else if (immediate)
 		{
-			if (BIT(op, 0) || d.empty() || s1.empty())
+			// what bit 0 does is not known
+			if (d.empty() || s1.empty())
 				return false;
 			util::stream_format(stream, "%-8s%s, %s, 0x%x", cond_name, d, s1, BIT(op, 6, 8));
 		}
 		else
 		{
 			const std::string to = target(BIT(op, 5, 4), BIT(op, 19, 5));
-			if (shift || BIT(op, 0) || to.empty() || s1.empty() || s2.empty())
+			if (shift || to.empty() || s1.empty() || s2.empty())
 				return false;
 			util::stream_format(stream, "%-8s%s, %s, %s", cond_name, to, s1, s2);
 		}
@@ -330,12 +333,16 @@ bool pmx1core_disassembler::memory(std::ostream &stream, u32 op)
 		util::stream_format(stream, "%-8s[%s += %s], db%u", "fill", base, index, d);
 		return true;
 	}
-	if (!load && !(minor & 0xb))
+	if (!(minor & 0xb))
 	{
-		const std::string source = reg(unit, d);
-		if (BIT(op, 13) || BIT(op, 6, 3) || !BIT(op, 5) || BIT(op, 0) || source.empty())
+		// the offset is in a register of the same bank
+		const std::string data = reg(unit, d);
+		if (BIT(op, 13) || BIT(op, 6, 3) || !BIT(op, 5) || BIT(op, 0) || data.empty())
 			return false;
-		util::stream_format(stream, "%-8s[%s %s %s], %s", "st", base, plus, index, source);
+		if (load)
+			util::stream_format(stream, "%-8s%s, [%s %s %s]", "ld", data, base, plus, index);
+		else
+			util::stream_format(stream, "%-8s[%s %s %s], %s", "st", base, plus, index, data);
 		return true;
 	}
 
@@ -373,6 +380,12 @@ bool pmx1core_disassembler::port(std::ostream &stream, u32 op)
 		if (BIT(op, 0, 14) != 0x000b)
 			return false;
 		util::stream_format(stream, "%-8s[%s]", "feed", pointer(d));
+		return true;
+
+	case 13:
+		if (BIT(op, 0, 14) != 0x1c03)
+			return false;
+		util::stream_format(stream, "%-8s[%s += %s]", "feed", pointer(d), reg(3 + BIT(d, 4), s1 & 15));
 		return true;
 
 	default:

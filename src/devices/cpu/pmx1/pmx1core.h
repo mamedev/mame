@@ -103,7 +103,7 @@ private:
 		u32 pc = 0;
 		u32 jump_target = 0;
 		u8 jump_delay = 0;              // instructions to complete before a jump that was made is taken
-		u32 repeat = 0;                 // stores that a repeated store has still to make
+		u32 repeat = 0;                 // stores or feeds that a repeated instruction has still to make
 		u64 reads[READ_QUEUE_SIZE] = { };
 		u8 read_first = 0;              // where the oldest read is
 		u8 read_count = 0;
@@ -141,6 +141,7 @@ private:
 	outcome implicit(thread_state &ts, u32 op);
 	outcome move64(thread_state &ts, u32 op);
 	outcome memory(thread_state &ts, u32 op);
+	bool start_repeat(thread_state &ts, u32 pc);
 	outcome repeated_store(thread_state &ts, u32 pc, u32 op);
 	outcome port(thread_state &ts, u32 op);
 

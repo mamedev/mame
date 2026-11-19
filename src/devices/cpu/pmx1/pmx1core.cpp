@@ -44,16 +44,24 @@
         10      kickers
         11      cycle counter
 
+    The condition codes are those of the ARM plus one: 0 is always, 1 EQ,
+    2 NE, 3 CS, 4 CC, 5 MI, 6 PL, 7 VS, 8 VC, 9 HI, 10 LS, 11 GE, 12 LT,
+    13 GT and 14 LE.  A shift leaves the last bit shifted out in C.
+
     VideoLogic did not publish the instruction set.  What is known of the
-    encoding was worked out from the microcode of the Neon 250 drivers and
-    the Gaelco games, so that only what this code uses is known. A thread
-    that meets anything else is stopped and the instruction is logged.
+    encoding was worked out from the microcode of the Neon 250 drivers, the
+    Gaelco games and the Aristocrat MK6, so that only what this code uses
+    is known. A thread that meets anything else is stopped and the
+    instruction is logged.
 
     TODO:
-    - How the processor is told the number of stores of a repeated store
-      is not known.  The known code always has three comparisons of the
-      same register in front of it, with -2, -1 and 0, and that register
-      holds three less than the number.
+    - How the processor is told the number of stores of a repeated store,
+      or of feeds of a repeated feed, is not known.  The known code always
+      has three comparisons of the same register in front of it, with -2,
+      -1 and 0, and that register holds three less than the number.
+    - What bit 0 does in the conditional forms of the arithmetic is not
+      known.  The MK6 code has it set in a few places where the use of the
+      result shows it makes no difference.
     - What a jump does when thread 0 has not yet taken the one before is
       not known.
     - Instructions are fetched from the chip's own memory only.  A thread
@@ -282,8 +290,8 @@ bool pmx1core_device::can_take(u32 unit, u32 number)
 
 bool pmx1core_device::condition_known(u32 code)
 {
-	// 0, 1, 2, 9, 11, 12 and 13 are all that the known code uses
-	return BIT(0x3a07, code);
+	// 15 is not used by the known code
+	return code != 15;
 }
 
 bool pmx1core_device::condition(u32 code, u8 flags)
@@ -302,8 +310,24 @@ bool pmx1core_device::condition(u32 code, u8 flags)
 		return !less;
 	case 12:
 		return less;
+	case 3:
+		return flags & FLAG_C;
+	case 4:
+		return !(flags & FLAG_C);
+	case 5:
+		return flags & FLAG_N;
+	case 6:
+		return !(flags & FLAG_N);
+	case 7:
+		return flags & FLAG_V;
+	case 8:
+		return !(flags & FLAG_V);
+	case 10:
+		return !(flags & FLAG_C) || zero;
 	case 13:
 		return !zero && !less;
+	case 14:
+		return zero || less;
 	default:
 		return true;
 	}
@@ -339,7 +363,8 @@ u32 pmx1core_device::compute(u32 operation, u32 a, u32 b)
 
 u8 pmx1core_device::flags_after(u32 operation, u32 a, u32 b, u32 result, u8 flags)
 {
-	// the logical operations leave C and V alone, the shifts clear them, and a subtraction has C set when there is no borrow
+	// the logical operations leave C and V alone, a subtraction has C set when there is no borrow, and a shift has the last
+	// bit shifted out in C and clears V: the MK6 code multiplies by a number of bytes per pixel with shr.f by 1 and add.cs
 	bool carry = flags & FLAG_C, overflow = flags & FLAG_V;
 	switch (operation)
 	{
@@ -352,8 +377,11 @@ u8 pmx1core_device::flags_after(u32 operation, u32 a, u32 b, u32 result, u8 flag
 		overflow = BIT((a ^ b) & (a ^ result), 31);
 		break;
 	case 5:
+		carry = b && (b <= 32) && BIT(a, 32 - b);
+		overflow = false;
+		break;
 	case 6:
-		carry = false;
+		carry = b && (b <= 32) && BIT(a, b - 1);
 		overflow = false;
 		break;
 	default:
@@ -553,7 +581,8 @@ pmx1core_device::outcome pmx1core_device::arithmetic(u32 thread, u32 op)
 	const bool flags = BIT(op, 27), conditional = BIT(op, 26), immediate = BIT(op, 25);
 	const bool shift = operation >= 5;
 	const u32 d = BIT(op, 19, 5), s1 = BIT(op, 14, 5), s2 = BIT(op, 9, 5);
-	if (flags && ((major == 9) || conditional))
+	const bool to_unit = conditional && immediate && !shift && BIT(op, 5);
+	if (flags && ((major == 9) || (conditional && !to_unit)))
 		return outcome::UNKNOWN;
 
 	if (!conditional)
@@ -615,7 +644,11 @@ pmx1core_device::outcome pmx1core_device::arithmetic(u32 thread, u32 op)
 		const u32 to = BIT(op, 1, 4);
 		if ((operation > 2) || !can_take(to, d))
 			return outcome::UNKNOWN;
-		return send(thread, to, d, compute(operation, reg(unit, s1), BIT(op, 6, 8))) ? outcome::DONE : outcome::UNKNOWN;
+		const u32 a = reg(unit, s1), b = BIT(op, 6, 8);
+		const u32 result = compute(operation, a, b);
+		if (flags)
+			ts.flags = flags_after(operation, a, b, result, ts.flags);
+		return send(thread, to, d, result) ? outcome::DONE : outcome::UNKNOWN;
 	}
 
 	// the other forms have a condition
@@ -634,7 +667,8 @@ pmx1core_device::outcome pmx1core_device::arithmetic(u32 thread, u32 op)
 	}
 	else if (immediate)
 	{
-		if (BIT(op, 0) || !has_register(unit, d))
+		// FIXME: what bit 0 does is not known
+		if (!has_register(unit, d))
 			return outcome::UNKNOWN;
 		if (met)
 			reg(unit, d) = compute(operation, reg(unit, s1), BIT(op, 6, 8));
@@ -642,8 +676,9 @@ pmx1core_device::outcome pmx1core_device::arithmetic(u32 thread, u32 op)
 	else
 	{
 		// two registers, and the result can go to another unit
+		// FIXME: what bit 0 does is not known
 		const u32 to = BIT(op, 5, 4);
-		if (shift || BIT(op, 0) || !has_register(unit, s2) || !can_take(to, d))
+		if (shift || !has_register(unit, s2) || !can_take(to, d))
 			return outcome::UNKNOWN;
 		if (met && !send(thread, to, d, compute(operation, reg(unit, s1), reg(unit, s2))))
 			return outcome::UNKNOWN;
@@ -891,6 +926,20 @@ pmx1core_device::outcome pmx1core_device::memory(thread_state &ts, u32 op)
 		return outcome::DONE;
 	}
 
+	if (load && !(minor & 0xb))
+	{
+		// load with the offset in a register of the same bank
+		if (BIT(op, 13) || BIT(op, 6, 3) || !BIT(op, 5) || BIT(op, 0) || !has_register(unit, d))
+			return outcome::UNKNOWN;
+		const u32 address = pointer + reg(bank, BIT(op, 9, 4));
+		if (!queue_read(ts, address))
+			return outcome::UNKNOWN;
+		if (BIT(op, 26))
+			pointer = address;
+		reg(unit, d) = u32(take_read(ts));
+		return outcome::DONE;
+	}
+
 	// the other forms have the offset in the instruction, in words
 	if (BIT(op, 6, 2) || !BIT(op, 5) || BIT(op, 0))
 		return outcome::UNKNOWN;
@@ -941,27 +990,32 @@ pmx1core_device::outcome pmx1core_device::memory(thread_state &ts, u32 op)
 	return outcome::DONE;
 }
 
+bool pmx1core_device::start_repeat(thread_state &ts, u32 pc)
+{
+	// FIXME: the number is taken from the data register that the three instructions in front compare with -2, -1
+	// and 0, which is three less.  How the processor comes by the number is not known.
+	const u32 last = m_cache.read_dword(fetch_address(pc - 4));
+	const u32 unit = 1 + BIT(last, 24), number = BIT(last, 19, 5);
+	for (u32 n = 0; n < 3; n++)
+	{
+		const u32 before = m_cache.read_dword(fetch_address(pc - 12 + (4 * n)));
+		if (((before & 0xfef8'0004) != (0x8200'0000 | (number << 19))) || (BIT(before, 24) != BIT(last, 24)) || (operand16(before) != (n - 2)))
+			return false;
+	}
+	const u32 count = reg(unit, number) + 3;
+	if (ts.jump_delay || (s32(count) < 1))
+		return false;
+	ts.repeat = count;
+	return true;
+}
+
 pmx1core_device::outcome pmx1core_device::repeated_store(thread_state &ts, u32 pc, u32 op)
 {
 	if (BIT(op, 13) || (BIT(op, 0, 9) != 0x059))
 		return outcome::UNKNOWN;
 
-	if (!ts.repeat)
-	{
-		// FIXME: the number of stores is taken from the register that the three instructions in front compare
-		// with -2, -1 and 0, which is three less.  How the processor comes by the number is not known.
-		const u32 number = BIT(m_cache.read_dword(fetch_address(pc - 4)), 19, 5);
-		for (u32 n = 0; n < 3; n++)
-		{
-			const u32 before = m_cache.read_dword(fetch_address(pc - 12 + (4 * n)));
-			if (((before & 0xfff8'0004) != (0x8200'0000 | (number << 19))) || (operand16(before) != (n - 2)))
-				return outcome::UNKNOWN;
-		}
-		const u32 count = reg(1, number) + 3;
-		if (ts.jump_delay || (s32(count) < 1))
-			return outcome::UNKNOWN;
-		ts.repeat = count;
-	}
+	if (!ts.repeat && !start_repeat(ts, pc))
+		return outcome::UNKNOWN;
 
 	// one store in each cycle, each time after moving the address register on by another register of its bank
 	const u32 bank = 3 + BIT(op, 18);
@@ -1014,6 +1068,27 @@ pmx1core_device::outcome pmx1core_device::port(thread_state &ts, u32 op)
 			return outcome::UNKNOWN;
 		m_dac_feed_cb(take_read(ts));
 		return queue_read(ts, reg(3 + BIT(d, 4), d & 15)) ? outcome::DONE : outcome::UNKNOWN;
+
+	case 13:
+		{
+			// repeated feed: each time the oldest read goes to the display feed, address register D is moved on by
+			// register S1 of its bank, and a read from there is queued
+			if (BIT(op, 0, 14) != 0x1c03)
+				return outcome::UNKNOWN;
+			if (!ts.repeat && !start_repeat(ts, ts.pc))
+				return outcome::UNKNOWN;
+			if (m_dac_busy_cb())
+				return outcome::WAIT_FEED;
+			if (!ts.read_count)
+				return outcome::UNKNOWN;
+			m_dac_feed_cb(take_read(ts));
+			u32 &pointer = reg(3 + BIT(d, 4), d & 15);
+			pointer += reg(3 + BIT(d, 4), s1 & 15);
+			if (!queue_read(ts, pointer))
+				return outcome::UNKNOWN;
+			ts.repeat--;
+			return ts.repeat ? outcome::REPEAT : outcome::DONE;
+		}
 
 	default:
 		return outcome::UNKNOWN;
