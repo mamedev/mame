@@ -99,6 +99,10 @@ private:
 	void interlace_w(offs_t offset, u8 data);
 	u8 misc_control_1_r(offs_t offset);
 	void misc_control_1_w(offs_t offset, u8 data);
+	u8 misc_control_2_r(offs_t offset);
+	void misc_control_2_w(offs_t offset, u8 data);
+	u8 misc_control_3_r(offs_t offset);
+	void misc_control_3_w(offs_t offset, u8 data);
 
 	bool m_ext_crtc_read_unlock = false;
 	bool m_ext_crtc_write_unlock = false;
@@ -108,6 +112,8 @@ private:
 	u8 m_interlace_end = 0;
 	bool m_interlace_mode = 0;
 	u8 m_pr15 = 0;
+	u8 m_pr16 = 0;
+	u8 m_pr17 = 0;
 
 	devcb_read_line m_cnf15_read_cb;
 	devcb_read_line m_cnf14_read_cb;

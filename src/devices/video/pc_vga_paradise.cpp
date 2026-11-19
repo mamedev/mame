@@ -399,8 +399,8 @@ void wd90c00_vga_device::crtc_map(address_map &map)
 	map(0x2b, 0x2b).ram(); // PR12 scratch pad
 	map(0x2c, 0x2d).rw(FUNC(wd90c00_vga_device::interlace_r), FUNC(wd90c00_vga_device::interlace_w));
 	map(0x2e, 0x2e).rw(FUNC(wd90c00_vga_device::misc_control_1_r), FUNC(wd90c00_vga_device::misc_control_1_w));
-//  map(0x2f, 0x2f) PR16 Misc Control 2
-//  map(0x30, 0x30) PR17 Misc Control 3
+	map(0x2f, 0x2f).rw(FUNC(wd90c00_vga_device::misc_control_2_r), FUNC(wd90c00_vga_device::misc_control_2_w));
+	map(0x30, 0x30).rw(FUNC(wd90c00_vga_device::misc_control_3_r), FUNC(wd90c00_vga_device::misc_control_3_w));
 //  map(0x31, 0x3f) <reserved>, may still read device ASCII ID like later variants?
 }
 
@@ -548,11 +548,54 @@ void wd90c00_vga_device::misc_control_1_w(offs_t offset, u8 data)
 
 /*
  * [0x2f] PR16 Misc Control 2
+ *
+ * x--- ---- External $46E8 lock
+ * -xx- ---- CRT Control Address Count Width bits 1-0
+ * ---x x--- CRT Control Address Counter Offset bits 1-0
+ * ---- -x-- Enable Odd/Even Page Bit
+ * ---- --x- VGA Mapping Enable
+ * ---- ---x Lock RAMDAC Write Strobe
  */
+
+u8 wd90c00_vga_device::misc_control_2_r(offs_t offset)
+{
+	LOG("PR16 Misc Control 2 R (%02x)\n", m_pr16);
+	return m_pr16;
+}
+
+void wd90c00_vga_device::misc_control_2_w(offs_t offset, u8 data)
+{
+	LOG("PR16 Misc Control 2 W %02x\n", data);
+	m_pr16 = data;
+}
 
 /*
  * [0x30] PR17 Misc Control 3
+ *
+ * 'C00
+ * xxxx xxx- <reserved>
+ * ---- ---x Map Out 2K of BIOS ROM (C600:0000 ~ C67F:000F)
+ *
+ * 'C33
+ * --x- ---- Character Clock Period Select
+ * ---x ---- PCLK = VCLK/2
+ * ---- x--- Map Out 4K of BIOS ROM (C600:0000 ~ C6FF:000F)
+ * ---- -x-- Enable 64K BIOS ROM
+ * ---- --x- Hercules Compatibility (I/O $3bf)
+ *
  */
+
+u8 wd90c00_vga_device::misc_control_3_r(offs_t offset)
+{
+	LOG("PR17 Misc Control 3 R (%02x)\n", m_pr17);
+	return m_pr17;
+}
+
+void wd90c00_vga_device::misc_control_3_w(offs_t offset, u8 data)
+{
+	LOG("PR17 Misc Control 3 W %02x\n", data);
+	m_pr17 = data;
+}
 
 /**************************************
  *
@@ -697,6 +740,17 @@ void wd90c30_vga_device::crtc_map(address_map &map)
 void wd90c30_vga_device::sequencer_map(address_map &map)
 {
 	wd90c11a_vga_device::sequencer_map(map);
+	// handled by svga_device under the hood
+//	map(0x04, 0x04).lrw8(
+//		NAME([this] (offs_t offset) {
+//			return vga.sequencer.data[0x04];
+//		}),
+//		NAME([this] (offs_t offset, u8 data) {
+//			LOG("Memory Mode: %02x\n", data);
+//			vga.sequencer.data[0x04] = data;
+//			//svga.ignore_chain4 = BIT(data, 3);
+//		})
+//	);
 //  m_ext_seq_view[1](0x13, 0x13) PR33 DRAM Timing and zero Wait State Control
 //  m_ext_seq_view[1](0x14, 0x14) PR34 Video Memory Mapping
 //  m_ext_seq_view[1](0x15, 0x15) PR35 USR0, USR1 Output Select, <reserved> on 'C31A

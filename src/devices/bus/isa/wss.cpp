@@ -5,8 +5,9 @@
 Microsoft Windows Sound System based cards
 
 TODO:
-- Untested;
-- Configuration jumpers;
+- Configuration jumpers (JP1, top left);
+- PnP settings at $530;
+- How DMA selection works for 16-bit modes on original config?
 
 **************************************************************************************************/
 
@@ -70,3 +71,16 @@ void isa16_wss_device::host_io(address_map &map)
 	map(0x04, 0x07).rw(m_soundport, FUNC(ad1848_device::read), FUNC(ad1848_device::write));
 	map(0x08, 0x09).rw(m_opl3, FUNC(ymf262_device::read), FUNC(ymf262_device::write));
 }
+
+u8 isa16_wss_device::dack_r(int line)
+{
+	return m_soundport->dack_r();
+}
+
+void isa16_wss_device::dack_w(int line, u8 data)
+{
+	m_soundport->dack_w(data);
+}
+
+// TODO: dack16 lines should be a thing for later Crystal/Analog variants
+// MIDAS sound engine allows selecting DMA16 lines, which this hookup shouldn't be able to select.

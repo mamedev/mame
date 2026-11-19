@@ -126,8 +126,8 @@ void sis496_state::sis496(machine_config &config)
 
 	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board4", 0, "pci:05.0:isabus", isa_internal_devices, "w83787f", true).set_option_machine_config("w83787f", winbond_superio_config);
-	ISA16_SLOT(config, "isa1",   0, "pci:05.0:isabus",  pc_isa16_cards, "wd90c31_lr", false);
-	ISA16_SLOT(config, "isa2",   0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa1",   0, "pci:05.0:isabus",  pc_isa16_cards, "wd90c30_lr", false);
+	ISA16_SLOT(config, "isa2",   0, "pci:05.0:isabus",  pc_isa16_cards, "wss", false);
 	ISA16_SLOT(config, "isa3",   0, "pci:05.0:isabus",  pc_isa16_cards, nullptr, false);
 
 	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, "logitech_mouse"));
@@ -155,6 +155,7 @@ void sis496_state::sis496(machine_config &config)
 	SOFTWARE_LIST(config, "photocd_list").set_compatible("photo_cd");
 }
 
+// NOTE: this is an experiment, an actual Voodoo 1 hookup would require a Socket 7 class PC
 void sis496_voodoo1_state::sis496_voodoo1(machine_config &config)
 {
 	sis496_state::sis496(config);
