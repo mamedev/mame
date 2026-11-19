@@ -649,16 +649,22 @@ void avr8_device<NumTimers>::base_internal_map(address_map &map)
 void atmega88_device::atmega88_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
+	// 1 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x04ff).ram().share("sram");
 }
 
 void atmega168_device::atmega168_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
+	// 1 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x04ff).ram().share("sram");
 }
 
 void atmega328_device::atmega328_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
+	// 2 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x08ff).ram().share("sram");
 }
 
 void atmega32u4_device::atmega32u4_internal_map(address_map &map)
@@ -667,16 +673,23 @@ void atmega32u4_device::atmega32u4_internal_map(address_map &map)
 
 	// fake USB PLL lock so that code that reads it is satisfied
 	map(0x0049, 0x0049).lr8(NAME([this] { return m_r[0x49] | 1; }));
+
+	// 2.5 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x0aff).ram().share("sram");
 }
 
 void atmega644_device::atmega644_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
+	// 4 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x10ff).ram().share("sram");
 }
 
 void atmega1284_device::atmega1284_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
+	// 16 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x40ff).ram().share("sram");
 }
 
 void atmega1280_device::atmega1280_internal_map(address_map &map)
@@ -820,6 +833,7 @@ avr8_base_device::avr8_base_device(const machine_config &mconfig, const char *ta
 	, m_addr_mask((addr_mask << 1) | 1)
 	, m_sleeping(false)
 	, m_sei_delay_pending(false)
+	, m_power_on(true)
 {
 }
 
@@ -834,6 +848,7 @@ avr8_device<NumTimers>::avr8_device(const machine_config &mconfig, const char *t
 	, m_spi_prescale(0)
 	, m_spi_prescale_count(0)
 	, m_spi_rx_shift(0)
+	, m_spi_tx_shift(0)
 {
 	// Fill in default callbacks
 	for (int i = 0; i < 8*4; i++)
@@ -1097,6 +1112,7 @@ void avr8_base_device::device_start()
 	save_item(NAME(m_addr_mask));
 	save_item(NAME(m_sleeping));
 	save_item(NAME(m_sei_delay_pending));
+	save_item(NAME(m_power_on));
 	save_item(NAME(m_opcycles));
 
 	// set our instruction counter
@@ -1153,6 +1169,7 @@ void avr8_device<NumTimers>::device_start()
 	save_item(NAME(m_spi_prescale_count));
 	save_item(NAME(m_spi_prescale_countdown));
 	save_item(NAME(m_spi_rx_shift));
+	save_item(NAME(m_spi_tx_shift));
 }
 
 //-------------------------------------------------
@@ -1201,10 +1218,16 @@ void avr8_base_device::device_reset()
 		LOGMASKED(LOG_BOOT, "AVR Boot loader section size: %d words\n", m_boot_size);
 	}
 
+	// MCUSR keeps its flags across a reset other than power-on; the first
+	// reset is power-on (PORF), later ones come from the RESET pin (EXTRF).
+	const uint8_t mcusr = m_power_on ? 0x01 : (m_r[MCUSR] | 0x02);
+	m_power_on = false;
+
 	for (int i = 0; i < 0x200; i++)
 	{
 		m_r[i] = 0;
 	}
+	m_r[MCUSR] = mcusr;
 
 	m_sleeping = false;
 	m_sei_delay_pending = false;
@@ -1229,6 +1252,7 @@ void avr8_device<NumTimers>::device_reset()
 	m_spi_prescale = 0;
 	m_spi_prescale_count = 0;
 	m_spi_rx_shift = 0;
+	m_spi_tx_shift = 0;
 
 	for (int t = 0; t < NumTimers; t++)
 	{
@@ -1437,6 +1461,15 @@ void avr8_base_device::fire_interrupts()
 			const uint8_t intidx = m_vector_to_intidx[vector];
 			const interrupt_condition &condition = m_int_conditions_table[intidx];
 
+			// Software can acknowledge a pending event by clearing its flag
+			// while global interrupts are disabled.  Do not fire a cached
+			// request after that write-one-to-clear acknowledgement.
+			if (!(m_r[condition.m_regindex] & condition.m_regmask))
+			{
+				set_interrupt_flag(intidx, false);
+				continue;
+			}
+
 			// if the interrupt is disabled, don't fire it
 			if (!(m_r[condition.m_intreg] & condition.m_intmask))
 				continue;
@@ -1622,7 +1655,7 @@ void avr8_device<NumTimers>::spi_tick()
 	spi_pins(mosi_mask, miso_mask, sck_mask);
 
 	const int bit_index = SPCR_DORD ? (7 - m_spi_prescale_countdown) : m_spi_prescale_countdown;
-	const uint8_t out_bit = BIT(m_r[SPDR], bit_index);
+	const uint8_t out_bit = BIT(m_spi_tx_shift, bit_index);
 
 	// SCK rising edge: MOSI is sampled by the slave
 	uint8_t data = (m_r[PORTB] & ~(mosi_mask | sck_mask)) | (out_bit ? mosi_mask : 0) | sck_mask;
@@ -2963,7 +2996,10 @@ void avr8_device<NumTimers>::spcr_w(uint8_t data)
 template <int NumTimers>
 void avr8_device<NumTimers>::spdr_w(uint8_t data)
 {
-	m_r[SPDR] = data;
+	// SPDR reads the receive buffer, even after the next transfer is started.
+	// Keep the outgoing byte separate so pipelined software can read the
+	// previous result while the next byte is shifting out.
+	m_spi_tx_shift = data;
 	m_r[SPSR] &= ~SPSR_SPIF_MASK; // note: can't clear this flag by writing 1 there
 	m_spi_rx_shift = 0;
 	m_spi_active = true;

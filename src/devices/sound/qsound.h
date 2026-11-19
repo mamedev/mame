@@ -21,6 +21,8 @@ public:
 	qsound_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 60'000'000);
 	virtual ~qsound_device();
 
+	auto dsp_ready_cb() { return m_dsp_ready_cb.bind(); }
+
 	void qsound_w(offs_t offset, u8 data);
 	u8 qsound_r();
 
@@ -52,6 +54,7 @@ private:
 	void set_cmd(s32 param);
 
 	// MAME resources
+	devcb_write_line m_dsp_ready_cb;
 	required_device<dsp16_device_base> m_dsp;
 	sound_stream *m_stream;
 

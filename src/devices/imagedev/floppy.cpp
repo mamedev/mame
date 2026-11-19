@@ -1052,6 +1052,18 @@ void floppy_image_device::stp_w(int state)
 	}
 }
 
+void floppy_image_device::ss_w(int state)
+{
+	m_actual_ss = state;
+	if (m_sides > 1 && m_ss != state)
+	{
+		// The flux cache describes the old surface, and on an empty or
+		// all-neutral one it never expires by itself
+		cache_clear();
+		m_ss = state;
+	}
+}
+
 void floppy_image_device::seek_phase_w(int _phases)
 {
 	m_phases = _phases;
@@ -2694,6 +2706,7 @@ void mac_floppy_device::device_start()
 	floppy_image_device::device_start();
 	save_item(NAME(m_reg));
 	save_item(NAME(m_strb));
+	save_item(NAME(m_mfm));
 }
 
 void mac_floppy_device::device_reset()

@@ -37,7 +37,7 @@ nrf24e1_device::nrf24e1_device(const machine_config &mconfig, const char *tag, d
 	, m_spi_mosi_cb(*this)
 	, m_spi_miso_cb(*this, 1)
 {
-	m_num_interrupts = 11;
+	m_num_interrupts = 13;
 	m_program_config = address_space_config("program", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(nrf24e1_device::ram_map), this));
 	m_xdata_config = address_space_config("xdata", ENDIANNESS_LITTLE, 8, 16, 0, address_map_constructor(FUNC(nrf24e1_device::ram_map), this));
 	for (u32 port = 0; port != 8; ++port)
@@ -232,23 +232,13 @@ bool nrf24e1_device::execute_ready()
 u16 nrf24e1_device::interrupt_mask()
 {
 	u16 const mask = dw8051_device::interrupt_mask();
-	return (mask & 0x3f) | (BIT(mask, 7) ? (m_extra[SFR_EIE] & 0x1f) << 6 : 0);
+	return (mask & 0x3f) | (BIT(mask, 7) ? (m_extra[SFR_EIE] & 0x1f) << 8 : 0);
 }
 
-u16 nrf24e1_device::pending_irq_flags(u16 int_mask)
+void nrf24e1_device::irqs_complete_and_mask(u16 &ints, u16 int_mask)
 {
-	u16 const pending = ((m_extra[SFR_EXIF] >> 4) | (BIT(m_extra[SFR_EICON], 3) << 4)) << 6;
-	return dw8051_device::pending_irq_flags(int_mask) | (pending & int_mask);
-}
-
-u8 nrf24e1_device::interrupt_vector(u32 source) const
-{
-	return source < 6 ? dw8051_device::interrupt_vector(source) : (source - 6) * 8 + 0x43;
-}
-
-u32 nrf24e1_device::interrupt_priority(u32 source) const
-{
-	return source < 6 ? dw8051_device::interrupt_priority(source) : BIT(m_extra[SFR_EIP], source - 6);
+	ints |= ((m_extra[SFR_EXIF] >> 4) | (BIT(m_extra[SFR_EICON], 3) << 4)) << 8;
+	dw8051_device::irqs_complete_and_mask(ints, int_mask);
 }
 
 void nrf24e1_device::sample_gpio()
@@ -292,7 +282,14 @@ void nrf24e1_device::extra_w(offs_t offset, u8 data)
 	case SFR_REGX_CTRL: regx_start(data); return;
 	case SFR_CK_CTRL: clock_control_w(data); return;
 	case SFR_EICON: data = (data & 8) | 0x40; break;
-	case SFR_EIE: case SFR_EIP: data |= 0xe0; m_irq_delayed = 0xffff; break;
+	case SFR_EIP:
+		for (u32 i = 0; i < 5; ++i)
+			m_irq_prio[8 + i] = BIT(data, i);
+		[[fallthrough]];
+	case SFR_EIE:
+		data |= 0xe0;
+		m_irq_delayed = 0xffff;
+		break;
 	}
 	m_extra[offset] = data;
 	if (offset >= SFR_P0_DIR && offset <= SFR_P1_ALT)

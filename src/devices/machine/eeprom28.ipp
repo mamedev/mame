@@ -156,12 +156,14 @@ void eeprom28_device<EEPROM28_ARGS>::device_reset()
 	if (m_programming_completed_timer != nullptr)
 		m_programming_completed_timer->enable(false);
 
-	change_to_state(COMMAND_STATE_NONE);
+	change_to_command_state(COMMAND_STATE_NONE);
 	change_to_state(STATE_IDLE);
 
 	m_last_written_offset = -1;
-	m_software_data_protection_enabled = false;
+	m_program_buffer_to_eeprom = false;
+	m_toggle_bit = 0;
 	m_buffering_page = -1;
+	// Software data protection is nonvolatile, including across a machine reset.
 }
 
 template <EEPROM28_PARAMS>
@@ -327,56 +329,42 @@ void eeprom28_device<EEPROM28_ARGS>::write(uint32_t offset, uint8_t data)
 template <EEPROM28_PARAMS>
 uint8_t eeprom28_device<EEPROM28_ARGS>::read(uint32_t offset)
 {
-	if (m_command_state != COMMAND_STATE_NONE) {
-		// Per the X28C256 datasheet regarding the command sequence,
-		//   "Note: Once initiated, the sequence of write operations
-		//   should not be interrupted."
-		// A read operation would seem to interrupt that sequence, and thus end that sequence.
-		change_to_state(STATE_BUFFERING);
+	// Work out the value before applying read-triggered state changes, so
+	// debugger reads see the same data/polling bits without advancing them.
+	const int state = (m_command_state != COMMAND_STATE_NONE) ? STATE_BUFFERING : m_state;
+	const bool start_programming = m_program_on_read && (state == STATE_BUFFERING || state == STATE_PROTECTED_WRITE);
+	const bool programming = start_programming ? (m_t_wc_usec != 0) : (state == STATE_PROGRAMMING);
+	const bool polling = m_program_buffer_to_eeprom && (!start_programming || m_t_wc_usec != 0);
+	const bool read_from_buffer = m_buffering_page >= 0 && (offset & PAGE_MASK) == m_buffering_page
+			&& (!start_programming || m_program_buffer_to_eeprom);
+	uint8_t data = read_from_buffer ? m_page_buffer[offset & PAGE_OFFSET_MASK] : m_storage[storage_offset(offset)];
+
+	if (polling && offset == m_last_written_offset) {
+		// /DATA polling inverts bit 7 of the last byte being programmed.
+		data ^= INVERSE_DATA_BIT;
+	}
+	if (polling || programming) {
+		data ^= m_toggle_bit;
 	}
 
-	if (m_program_on_read) {
-		if (m_state == STATE_BUFFERING || m_state == STATE_PROTECTED_WRITE) {
-			// We have some buffered data or a change to enable write protection;
-			// immediately write any buffered data to storage:
-			// First, cancel any existing programming cycle timer
+	if (!machine().side_effects_disabled()) {
+		if (m_command_state != COMMAND_STATE_NONE) {
+			// A read interrupts the protection-command sequence.
+			change_to_state(STATE_BUFFERING);
+		}
+		if (start_programming) {
 			if (m_t_blc_usec > 0) {
 				m_start_programming_timer->enable(false);
 			}
-			// Then, start the programming cycle. If T_WC is 0, this will in turn also change the
-			// state to STATE_IDLE.
 			start_programming_cycle();
 		}
-	}
-
-	// If we're currently buffering a page, then reads from the page in question
-	// should be sourced from the page buffer.
-	bool read_from_buffer = m_buffering_page >= 0 && (offset & PAGE_MASK) == m_buffering_page;
-	uint8_t data = read_from_buffer ? m_page_buffer[offset & PAGE_OFFSET_MASK] : m_storage[storage_offset(offset)];
-
-	if (m_program_buffer_to_eeprom || (m_state == STATE_PROGRAMMING)) {
-		// "/DATA Polling"
-		// While programming or preparing to progam, if the client reads back the
-		// last written byte, the returned bit 7 is the inverse of what was written.
-		// But according to at least one datasheet:
-		//   "If the X28C64 is in the protected state and an illegal write
-		//    operation is attempted /DATA Polling will not operate."
-		// so we only perform this if we're actually going to be writing to storage.
-		if (m_program_buffer_to_eeprom && (offset == m_last_written_offset)) {
-			data = data ^ INVERSE_DATA_BIT;
+		if (polling || programming) {
+			m_toggle_bit ^= TOGGLE_BIT;
 		}
 
-		// While programming or preparing to progam, bit 6 of what is returned
-		// alternates between 0 and 1.
-		data = data ^ m_toggle_bit;
-		m_toggle_bit ^= TOGGLE_BIT;
+		EE28LOGMASKED(EE28_LOG_DETAIL, "%s: eeprom28.read(%04x), returning %02x\n",
+			machine().describe_context(), offset, data);
 	}
-
-	EE28LOGMASKED(EE28_LOG_DETAIL, "%s: eeprom28.read(%04x), have %02x in %s, returning %02x\n",
-		machine().describe_context(), offset,
-		read_from_buffer ? m_page_buffer[offset & PAGE_OFFSET_MASK] : m_storage[storage_offset(offset)],
-		read_from_buffer ? "buffer" : "storage",
-		data);
 
 	return data;
 }

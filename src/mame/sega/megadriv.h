@@ -42,6 +42,9 @@ protected:
 
 	void megadriv_tas_callback(offs_t offset, uint8_t data);
 
+	void vdp_vint_cb(int state);
+	void vdp_hint_cb(int state);
+
 	uint32_t screen_update_megadriv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_vblank_megadriv(int state);
 
@@ -56,12 +59,9 @@ private:
 //  IRQ_CALLBACK_MEMBER(genesis_int_callback);
 	void cpu_space_map(address_map &map);
 
-	void vdp_vint_cb(int state);
-	void vdp_hint_cb(int state);
 
 	void megadriv_timers(machine_config &config);
 };
-
 
 class md_base_state : public md_core_state
 {
@@ -127,12 +127,14 @@ protected:
 	required_device<cpu_device> m_z80snd;
 	required_device<ym_generic_device> m_ymsnd;
 	optional_shared_ptr<uint16_t> m_megadrive_ram;
+	required_device_array<megadrive_io_port_device, 3> m_ioports;
 
 	genesis_z80_vars m_genz80;
+	uint8_t m_active_version_hi_nibble; // Firecore can change this, so we copy the default config value here in reset.
+
+	// these are config, no need to save
 	uint8_t m_version_hi_nibble;
 	uint8_t m_version_lo_nibble; // 0 = non-TMSS, 1 = TMSS
-
-	required_device_array<megadrive_io_port_device, 3> m_ioports;
 
 private:
 	uint16_t m68k_version_read();

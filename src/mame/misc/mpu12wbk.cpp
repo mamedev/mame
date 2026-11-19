@@ -11,7 +11,10 @@
   Games running on this hardware:
 
   * Fruit Star Bonus (Ver 8.2.00ITL),                     199?, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.27PVIE),                      199?, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.27PVIE),                      200?, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.24MB-VIE, set 1),             2002, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.24MB-VIE, set 2),             2002, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.22MB-VIE),                    1998, Webak Elektronik.
   * Fruit Star Bonus (Ver 8.20MB-VIE),                    1999, Webak Elektronik.
   * Fruit Star Bonus (Ver 8.20PIR),                       1997, Webak Elektronik.
   * Fruit Star Bonus (Ver 8.36UNG-1100),                  1996, Webak Elektronik.
@@ -19,11 +22,13 @@
   * Fruit Star Bonus (Ver 8.30UNG-25, set 1),             1996, Webak Elektronik.
   * Fruit Star Bonus (Ver 8.30UNG-25, set 2),             1996, Webak Elektronik.
   * Fruit Star Bonus (Ver 8.23PSTK, Steiermark),          1999, Webak Elektronik.
-  * Fruit Star Bonus (Ver 8.20MB-STK, Steiermark),        199?, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.20MB-STK, Steiermark),        1999, Webak Elektronik.
+  * Fruit Star Bonus (Ver 8.20JP-STK, Steiermark),        1999, Webak Elektronik.
   * Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 1),  1997, Webak Elektronik.
   * Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 2),  1997, Webak Elektronik.
   * Golden Joker (Ver 16.06UNG-25, set 1),                1996, Webak Elektronik.
   * Golden Joker (Ver 16.06UNG-25, set 2),                1996, Webak Elektronik.
+  * Golden Joker (Ver 16.2.02VIE),                        1996, Webak Elektronik.
 
 
 *****************************************************************************************
@@ -49,7 +54,7 @@
   Video:  1x MC68B45P CRTC.
   Sound:  1x AY-3-8910A.
   ROMS:   3x 27C512 (IC37-IC38-IC39) for graphics.
-          1x Empty socket (IC4) for unknown purposes.
+          1x Empty socket (IC4) for optional printer/ticket module EPROM ("DRUCKER ENABLED").
 
   Bipolar PROMs: 1x 82S147; 1x 82S131.
 
@@ -76,10 +81,10 @@
   |  |     Fruit 3      |  |74LS194AN|  | 8 Mhz |   '---------------------------------'  |
   |  |      27C512      |  '---------'  '-------'                                        |
   |  |              IC39|  .---------.  .--.        .--------------------.  .----------. |
-  |  '------------------'  |74LS194AN|  |SN|        |                    |  |SN74LS02N | |
-  |                        '---------'  |74|        |    EMPTY SOCKET    |  '----------' |
-  |  .------------------.  .---------.  |LS| .--.   |                    |               |
-  |  |     Fruit 2      |  |74LS194AN|  |00| |SN|   |                 IC4|               |
+  |  '------------------'  |74LS194AN|  |SN|        |    EMPTY SOCKET    |  |SN74LS02N | |
+  |                        '---------'  |74|        | FOR PRINTER/TICKET |  '----------' |
+  |  .------------------.  .---------.  |LS| .--.   |  OPTIONAL MODULE   |               |
+  |  |     Fruit 2      |  |74LS194AN|  |00| |SN|   |       EPROM     IC4|               |
   |  |      27C512      |  '---------'  |N | |74|   '--------------------'     .------.  |
   |  |              IC38|               '--' |LS|                              |      |  |
   |  '------------------'  .---------.  .--. |00|     .------------------.     |      |  |
@@ -372,9 +377,11 @@
   0x1301 - 0x1301    ; AY-3-8910 (adress).
   0x1400 - 0x1400    ; M6845 CRTC (adress).
   0x1401 - 0x1401    ; M6845 CRTC (data).
+  0x1600 - 0x1600    ; Expansion / printer module bank select (IC4).
   0x1800 - 0x1FFF    ; Working RAM (also battery backed).
   0x2000 - 0x2FFF    ; Video RAM.
   0x3000 - 0x3FFF    ; Color RAM.
+  0x4000 - 0x7FFF    ; Optional printer module ROM space (IC4, checked for "DRUCKER ENABLED" signature at 0x7F00).
   0x8000 - 0xFFFF    ; ROM space.
 
 
@@ -1019,10 +1026,10 @@ ROM_START( fruitstb )
 	ROM_LOAD( "02.ic38",  0x10000, 0x10000, CRC(bb974684) SHA1(aa8dff82ceb397904cb3a6887541c5b83a372f41) )
 	ROM_LOAD( "01.ic37",  0x20000, 0x10000, CRC(26c8bf72) SHA1(59ffe2da97f3596fef2b071532c06295a71d6988) )
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstb_820_nvram.bin",  0x0000, 0x1000, CRC(b7c2537a) SHA1(883febf6d0122ad974af5751de83d1a823a5a4fb) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstb_820_nvram2.bin", 0x0000, 0x0800, CRC(ce18880f) SHA1(b56245154673f65bbc6de003ec5b93bbd85e480d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1052,10 +1059,10 @@ ROM_START( fruitstba )
 	ROM_LOAD( "2.ic38",  0x10000, 0x10000, CRC(0a7126aa) SHA1(28a05ca824922bb362b86f25f300833db30a91ae) )
 	ROM_LOAD( "1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstba_827_nvram.bin",  0x0000, 0x1000, CRC(90326cbd) SHA1(cc6c105e3faec88dd3b2f81d1d853d30b154ecdf) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstba_827_nvram2.bin", 0x0000, 0x0800, CRC(cc5f35e4) SHA1(03a451b8f6ac3849732e3567d6b5111df418e5af) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1084,10 +1091,10 @@ ROM_START( fruitstbo )
 	ROM_LOAD( "fu_2.ic38",       0x10000, 0x10000, CRC(0a7126aa) SHA1(28a05ca824922bb362b86f25f300833db30a91ae) )
 	ROM_LOAD( "fru_neu_1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbo_822mb-vie_nvram.bin",  0x0000, 0x1000, CRC(6e5da820) SHA1(67c14b45e84b32efdddc1fec5f63be6c0cc721ec) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbo_822mb-vie_nvram2.bin", 0x0000, 0x0800, CRC(54e29c68) SHA1(f80709f5a08156a223cba9e86b3a62520d03166d) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1116,10 +1123,10 @@ ROM_START( fruitstbm )
 	ROM_LOAD( "fu_2.ic38",  0x10000, 0x10000, CRC(0a7126aa) SHA1(28a05ca824922bb362b86f25f300833db30a91ae) )
 	ROM_LOAD( "fu_1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbm_824mb-vie_nvram.bin",  0x0000, 0x1000, CRC(d5872467) SHA1(b6fee17d8d5e42582477742e750bc0fec2e62ee7) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbm_824mb-vie_nvram2.bin", 0x0000, 0x0800, CRC(9247322d) SHA1(1dabff2f046e2278b7055f1cf43c7f76796be496) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1148,16 +1155,16 @@ ROM_START( fruitstbn )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )  // double sized roms.
 	ROM_LOAD( "fruneu_3.ic39",  0x00000, 0x10000, CRC(b59b9701) SHA1(d74b099e960c0c9d8bdb3d1882dede3f675c9d18) )
-	ROM_IGNORE(                 0x10000 )    // identical halves.
+	ROM_IGNORE(                 0x10000 )  // identical halves.
 	ROM_LOAD( "fruneu_2.ic38",  0x10000, 0x10000, CRC(30b7c69c) SHA1(f41ffdd380eefb2998031c47ef72a20683caba95) )
-	ROM_IGNORE(                 0x10000 )    // identical halves.
+	ROM_IGNORE(                 0x10000 )  // identical halves.
 	ROM_LOAD( "fruneu_1.ic37",  0x20000, 0x10000, CRC(bd232696) SHA1(aec5c1082533c87bebd3dce9ad22daaec5e2c5e8) )
-	ROM_IGNORE(                 0x10000 )    // identical halves.
+	ROM_IGNORE(                 0x10000 )  // identical halves.
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbn_824mb-vie_nvram.bin",  0x0000, 0x1000, CRC(14c22a9f) SHA1(d4ff7e13a0836f11bd54e72572a38bdb941afe4a) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbn_824mb-vie_nvram2.bin", 0x0000, 0x0800, CRC(7e5ba068) SHA1(5903470bccc47d5f6fbc0139cfc0a16b0fa8b405) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1183,16 +1190,16 @@ ROM_START( fruitstbj )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )
 	ROM_LOAD( "fu_3.ic39",       0x00000, 0x10000, CRC(e433f5cc) SHA1(8776b43837c64a0ebe4e7129585d59c15cd039b0) )
-	ROM_IGNORE(                           0x10000 )  // duped halves.
+	ROM_IGNORE(                           0x10000 )  // identical halves.
 	ROM_LOAD( "fu_2.ic38",       0x10000, 0x10000, CRC(31e6c32a) SHA1(b0c2dcd4b04ffc83c0d69c5d4468f66d354d1dfa) )
-	ROM_IGNORE(                           0x10000 )  // duped halves.
+	ROM_IGNORE(                           0x10000 )  // identical halves.
 	ROM_LOAD( "fru_neu_1.ic37",  0x20000, 0x10000, CRC(1f50181b) SHA1(b3a9a99bac7d8d470903eec506f539bd5d5524e6) )
-	ROM_IGNORE(                           0x10000 )  // duped halves.
+	ROM_IGNORE(                           0x10000 )  // identical halves.
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbj_820mb-vie_nvram.bin",  0x0000, 0x1000, CRC(bc608b5e) SHA1(08f1977c8c402f143ed7f6aee6bff62571a51d86) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbj_820mb-vie_nvram2.bin", 0x0000, 0x0800, CRC(a0ad117f) SHA1(1aa11f1514770235711dab279e4bf157794dce79) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1219,10 +1226,10 @@ ROM_START( fruitstbb )
 	ROM_LOAD( "fruit2.ic38",  0x10000, 0x10000, CRC(32d282a8) SHA1(792174d75dc7ec5f1e6f145539a5ec8e3953e1dd) )
 	ROM_LOAD( "fruit1.ic37",  0x20000, 0x10000, CRC(c1834a6d) SHA1(ece1e47641087be342d3c5c092d8a7233ae871f3) )
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbb_820_nvram.bin",  0x0000, 0x1000, CRC(90f4cf2e) SHA1(cb63a4cc8461ff993c00449dc4559c0fd8e70de6) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbb_820_nvram2.bin", 0x0000, 0x0800, CRC(12edfdef) SHA1(b20b992db0189dfa063cfac7444881a3251b5f92) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1257,10 +1264,10 @@ ROM_START( fruitstbc )
 	ROM_LOAD( "fru-neu_1.ic37",  0x20000, 0x10000, CRC(0da9fa11) SHA1(85539287a1930d0da0d1a58c1894b37e09a2a378) )
 	ROM_IGNORE(                           0x10000 )  // duplicated halves.
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbc_836_nvram.bin",  0x0000, 0x1000, CRC(4d43b56a) SHA1(0dabb3d5eeed4b48e248794317711fc8ff856201) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbc_836_nvram2.bin", 0x0000, 0x0800, CRC(6b3bd2f9) SHA1(f2fa7299e81c0b709f3e37a0eb497da5a714ffb4) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1293,10 +1300,10 @@ ROM_START( fruitstbd )
 	ROM_LOAD( "fru-neu_1.ic37",  0x20000, 0x10000, CRC(0da9fa11) SHA1(85539287a1930d0da0d1a58c1894b37e09a2a378) )
 	ROM_IGNORE(                           0x10000 )  // duplicated halves.
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbd_830_nvram.bin",  0x0000, 0x1000, CRC(6483b841) SHA1(cb48063b842b04f5ab34dce515c564e0ee596deb) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbd_830_nvram2.bin", 0x0000, 0x0800, CRC(72e5fadb) SHA1(1960c3d9c9a06a98579fca86cf16e8e99ffc3df5) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1326,10 +1333,10 @@ ROM_START( fruitstbh )
 	ROM_LOAD( "f-neu2.ic38",  0x10000, 0x10000, CRC(6478e395) SHA1(838c52e1a7117b15b91d7098e20bbcbfd5e9bce8) )
 	ROM_LOAD( "f-neu1.ic37",  0x20000, 0x10000, CRC(85641001) SHA1(f99240f2d9b947a525fdd7545c1a5d285806d374) )
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbh_830ung-25_nvram.bin",  0x0000, 0x1000, CRC(8fc5db4e) SHA1(8d85b799e70a867f67842a0cc1eb34358f200336) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbh_830ung-25_nvram2.bin", 0x0000, 0x0800, CRC(8473d004) SHA1(63a3b57f853589154ed2f5f255a2b28cbaedda84) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1359,10 +1366,10 @@ ROM_START( fruitstbi )
 	ROM_LOAD( "f-neu2.ic38",  0x10000, 0x10000, CRC(6478e395) SHA1(838c52e1a7117b15b91d7098e20bbcbfd5e9bce8) )
 	ROM_LOAD( "f-neu1.ic37",  0x20000, 0x10000, CRC(85641001) SHA1(f99240f2d9b947a525fdd7545c1a5d285806d374) )
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbi_830ung-25_nvram.bin",  0x0000, 0x1000, CRC(d639901f) SHA1(252601d2c8632ba39108b77a162a0c51523f5f5f) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbi_830ung-25_nvram2.bin", 0x0000, 0x0800, CRC(f6385903) SHA1(be81f09fb77a69a2198c3fb45ee7111a80d3511e) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1390,16 +1397,16 @@ ROM_START( fruitstbe )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )  // double sized roms.
 	ROM_LOAD( "fu_3.ic39",  0x00000, 0x10000, CRC(70efbf69) SHA1(32bb019db5aaff4d3f3f98a30cdca422cca7b598) )
-	ROM_IGNORE(                      0x10000 )    // identical halves.
+	ROM_IGNORE(                      0x10000 )  // identical halves.
 	ROM_LOAD( "fu_2.ic38",  0x10000, 0x10000, CRC(82c196b8) SHA1(ea1a74a6b13dbea253a804b88f22bd124fb1a3e6) )
-	ROM_IGNORE(                      0x10000 )    // identical halves.
+	ROM_IGNORE(                      0x10000 )  // identical halves.
 	ROM_LOAD( "fu_1.ic37",  0x20000, 0x10000, CRC(11ee9747) SHA1(19931a8c99e4c521cd7aed42398a9557a0d7579a) )
-	ROM_IGNORE(                      0x10000 )    // identical halves.
+	ROM_IGNORE(                      0x10000 )  // identical halves.
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbe_823_nvram.bin",  0x0000, 0x1000, CRC(4255e21c) SHA1(055f2e1e507993184a15ec3133fbb1d8fafd6c22) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbe_823_nvram2.bin", 0x0000, 0x0800, CRC(ad6d8b59) SHA1(79de1b8e44bb2fc8e8dbd3210c0d1d26e641da4b) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1427,16 +1434,16 @@ ROM_START( fruitstbk )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )  // double sized roms.
 	ROM_LOAD( "03.ic39",  0x00000, 0x10000, CRC(70efbf69) SHA1(32bb019db5aaff4d3f3f98a30cdca422cca7b598) )
-	ROM_IGNORE(                    0x10000 )    // identical halves.
+	ROM_IGNORE(                    0x10000 )  // identical halves.
 	ROM_LOAD( "02.ic38",  0x10000, 0x10000, CRC(82c196b8) SHA1(ea1a74a6b13dbea253a804b88f22bd124fb1a3e6) )
-	ROM_IGNORE(                    0x10000 )    // identical halves.
+	ROM_IGNORE(                    0x10000 )  // identical halves.
 	ROM_LOAD( "01.ic37",  0x20000, 0x10000, CRC(11ee9747) SHA1(19931a8c99e4c521cd7aed42398a9557a0d7579a) )
-	ROM_IGNORE(                    0x10000 )    // identical halves.
+	ROM_IGNORE(                    0x10000 )  // identical halves.
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbk_820mb-stk_nvram.bin",  0x0000, 0x1000, CRC(f7e7a90e) SHA1(487574a30e02ee5b439a73fc283a5d887bbfab4a) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbk_820mb-stk_nvram2.bin", 0x0000, 0x0800, CRC(93157657) SHA1(f8a828ffd40ad65d29d4019dd853e7b6a95d3b35) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1464,16 +1471,16 @@ ROM_START( fruitstbl )
 
 	ROM_REGION( 0x30000, "gfx1", 0 )  // double sized roms.
 	ROM_LOAD( "fu_3.ic39",     0x00000, 0x10000, CRC(70efbf69) SHA1(32bb019db5aaff4d3f3f98a30cdca422cca7b598) )
-	ROM_IGNORE(                0x10000 )    // identical halves.
+	ROM_IGNORE(                0x10000 )  // identical halves.
 	ROM_LOAD( "fu_2.ic38",     0x10000, 0x10000, CRC(82c196b8) SHA1(ea1a74a6b13dbea253a804b88f22bd124fb1a3e6) )
-	ROM_IGNORE(                0x10000 )    // identical halves.
+	ROM_IGNORE(                0x10000 )  // identical halves.
 	ROM_LOAD( "fu_neu_1.ic37", 0x20000, 0x10000, CRC(11ee9747) SHA1(19931a8c99e4c521cd7aed42398a9557a0d7579a) )
-	ROM_IGNORE(                0x10000 )    // identical halves.
+	ROM_IGNORE(                0x10000 )  // identical halves.
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbl_820jp-stk_nvram.bin",  0x0000, 0x1000, CRC(26e72b68) SHA1(9d94d5919a1b63aae63677e9e8d029a0abe3e587) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbl_820jp-stk_nvram2.bin", 0x0000, 0x0800, CRC(f6cf75ec) SHA1(70ee572027b76ed386a28bb340f6f3e81b57a6f4) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1503,10 +1510,10 @@ ROM_START( fruitstbf )
 	ROM_LOAD( "fu_2.ic38",  0x10000, 0x10000, CRC(0a7126aa) SHA1(28a05ca824922bb362b86f25f300833db30a91ae) )
 	ROM_LOAD( "fu_1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbf_817_nvram.bin",  0x0000, 0x1000, CRC(08dd5a3e) SHA1(f8f6775a0ece56ffd9c1c2e3384f2da405cc6c60) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbf_817_nvram2.bin", 0x0000, 0x0800, CRC(0907a8dd) SHA1(14b54a753aef94543ee97c5022f5664863eebb8a) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1539,10 +1546,10 @@ ROM_START( fruitstbg )
 	ROM_LOAD( "fu2.ic38",  0x10000, 0x10000, CRC(0a7126aa) SHA1(28a05ca824922bb362b86f25f300833db30a91ae) )
 	ROM_LOAD( "fu1.ic37",  0x20000, 0x10000, CRC(eaa231ad) SHA1(6c6d708a05b23b8b3f1f5844a587ae6d06940486) )
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbg_817_nvram.bin",  0x0000, 0x1000, CRC(ff3e8883) SHA1(a6603d825b8298cba8b16005485a57acdd6243c0) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "fruitstbg_817_nvram2.bin", 0x0000, 0x0800, CRC(6efbfb43) SHA1(0a6e36ea47683baa2b502ea9e17e1847cee65b45) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1578,10 +1585,10 @@ ROM_START( goldnjkr )
 	ROM_LOAD( "goldenjoker_zg1.ic37",  0x20000, 0x10000, CRC(be0c62a9) SHA1(e4355cc9895ca03fb8de59fb0ee1765059f26b4e) )
 	ROM_IGNORE(                                 0x10000 )  // duplicated halves.
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "goldnjkr_nvram.bin",  0x0000, 0x1000, CRC(89681d3a) SHA1(923e7bf29d68e0707275e6d66b6d8821e6c2584c) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "goldnjkr_nvram2.bin", 0x0000, 0x0800, CRC(f33601ca) SHA1(246555d62d5a5584d708a80036c244b33cd6002f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1615,10 +1622,10 @@ ROM_START( goldnjkra )
 	ROM_LOAD( "goldenjoker_zg1.ic37",  0x20000, 0x10000, CRC(be0c62a9) SHA1(e4355cc9895ca03fb8de59fb0ee1765059f26b4e) )
 	ROM_IGNORE(                                 0x10000 )  // duplicated halves.
 
-	ROM_REGION( 0x1000, "nvram", 0 )    // first 0x1000 of the battery backed MB8464A-10L
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
 	ROM_LOAD( "goldnjkra_nvram.bin",  0x0000, 0x1000, CRC(89681d3a) SHA1(923e7bf29d68e0707275e6d66b6d8821e6c2584c) )
 
-	ROM_REGION( 0x0800, "nvram2", 0 )    // last 0x0800 of the battery backed MB8464A-10L
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
 	ROM_LOAD( "goldnjkra_nvram2.bin", 0x0000, 0x0800, CRC(f33601ca) SHA1(246555d62d5a5584d708a80036c244b33cd6002f) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
@@ -1626,6 +1633,41 @@ ROM_START( goldnjkra )
 
 	ROM_REGION( 0x0200, "proms2", 0 )
 	ROM_LOAD( "am27s13.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
+ROM_END
+
+/*
+  Golden Joker
+  Version 16.2.02VIE
+  3/02 - MPU Nº 5526
+
+  Program flash ROM is inside a CPU epoxy block
+  with a M6809 CPU and a 16L8 PLD.
+
+*/
+ROM_START( goldnjkrb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "p28f512.box",  0x8000, 0x8000, CRC(00637111) SHA1(2b4676bb7cc7cf0e10f61a1b3897c01c0f105294) )
+	ROM_IGNORE(                       0x8000 )  // using first half
+
+	ROM_REGION( 0x30000, "gfx1", 0 )
+	ROM_LOAD( "golden_joker_zg3.ic39",  0x00000, 0x10000, CRC(afb7d634) SHA1(cba6fc5d582317b7c4e029839b6fd5e9aa76343c) )
+	ROM_IGNORE(                                  0x10000 )  // duplicated halves.
+	ROM_LOAD( "golden_joker_zg2.ic38",  0x10000, 0x10000, CRC(4ce27c43) SHA1(23c665cee92d00564a799651d23e09d029e420e1) )
+	ROM_IGNORE(                                  0x10000 )  // duplicated halves.
+	ROM_LOAD( "golden_joker_zg1.ic37",  0x20000, 0x10000, CRC(49b6088a) SHA1(da550eba7c412314ffa449a2cb09fb8809a29d57) )
+	ROM_IGNORE(                                  0x10000 )  // duplicated halves.
+
+	ROM_REGION( 0x1000, "nvram", 0 )  // first 0x1000 of the battery backed MB8464A-10L
+	ROM_LOAD( "goldnjkrb_nvram.bin",  0x0000, 0x1000, CRC(e42b7f67) SHA1(80acfb08bab8f926fd7654cd4cd71234eb398b85) )
+
+	ROM_REGION( 0x0800, "nvram2", 0 )  // last 0x0800 of the battery backed MB8464A-10L
+	ROM_LOAD( "goldnjkrb_nvram2.bin", 0x0000, 0x0800, CRC(738594a6) SHA1(22c6b391b603381db8b74c8a7d8f47685f6b98da) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "82s147.ic46",  0x0000, 0x0200, CRC(ee576268) SHA1(8964526fa253f484d784aec46c4c31358bc1667b) )
+
+	ROM_REGION( 0x0200, "proms2", 0 )
+	ROM_LOAD( "82s131.ic47",  0x0000, 0x0200, CRC(54565d41) SHA1(8e412a3441c9c1e7f8309f2087389ac4250896e6) )
 ROM_END
 
 
@@ -1647,10 +1689,10 @@ void mpu12wbk_state::init_mpu12wbk()
 
 //     YEAR  NAME       PARENT    MACHINE   INPUT     STATE           INIT           ROT    COMPANY             FULLNAME                                              FLAGS   LAYOUT
 GAMEL( 199?, fruitstb,  0,        mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.2.00ITL)",                    0,      layout_fruitstb )
-GAMEL( 199?, fruitstba, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.27PVIE)",                     0,      layout_fruitstb )
-GAMEL( 1998, fruitstbo, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.22MB-VIE)",                   0,      layout_fruitstb )
+GAMEL( 200?, fruitstba, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.27PVIE)",                     0,      layout_fruitstb )
 GAMEL( 2002, fruitstbm, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.24MB-VIE, set 1)",            0,      layout_fruitstb )
 GAMEL( 2002, fruitstbn, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.24MB-VIE, set 2)",            0,      layout_fruitstb )
+GAMEL( 1998, fruitstbo, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.22MB-VIE)",                   0,      layout_fruitstb )
 GAMEL( 1999, fruitstbj, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20MB-VIE)",                   0,      layout_fruitstb )
 GAMEL( 1997, fruitstbb, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.20PIR)",                      0,      layout_fruitstb )
 GAMEL( 1996, fruitstbc, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.36UNG-1100)",                 0,      layout_fruitstb )
@@ -1664,3 +1706,4 @@ GAMEL( 1997, fruitstbf, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12
 GAMEL( 1997, fruitstbg, fruitstb, mpu12wbk, mpu12wbk, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Fruit Star Bonus (Ver 8.17BGL-3, Burgenland, set 2)", 0,      layout_fruitstb )
 GAMEL( 1996, goldnjkr,  0,        mpu12wbk, goldnjkr, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Golden Joker (Ver 16.06UNG-25, set 1)",               0,      layout_goldnjkr )
 GAMEL( 1996, goldnjkra, goldnjkr, mpu12wbk, goldnjkr, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Golden Joker (Ver 16.06UNG-25, set 2)",               0,      layout_goldnjkr )
+GAMEL( 1996, goldnjkrb, goldnjkr, mpu12wbk, goldnjkr, mpu12wbk_state, init_mpu12wbk, ROT0, "Webak Elektronik", "Golden Joker (Ver 16.2.02VIE)",                       0,      layout_goldnjkr )

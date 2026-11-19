@@ -112,6 +112,7 @@ i8291a_device::i8291a_device(const machine_config &mconfig, const char *tag,
 void i8291a_device::device_reset()
 {
 	m_pon = true;
+	m_din_flag = false;
 	m_ints1 = 0;
 	m_ints2 = 0;
 	m_auxa = 0;
@@ -219,7 +220,7 @@ uint8_t i8291a_device::din_r()
 void i8291a_device::update_int()
 {
 	bool dreq = ((m_ie2 & REG_IE2_DMAO) && (m_ints1 & REG_INTS1_BO)) |
-			((m_ie2 & REG_IE2_DMAI)  && (m_ints1 & REG_INTS1_BI));
+			((m_ie2 & REG_IE2_DMAI)  && m_din_flag);
 
 	if (m_dreq_out != dreq) {
 		LOGMASKED(LOG_INT, "%s: dreq %s\n", __FUNCTION__, dreq ? "true" : "false");
@@ -256,7 +257,7 @@ uint8_t i8291a_device::ints1_r()
 
 	if (!machine().side_effects_disabled()) {
 		LOGMASKED(LOG_REG, "%s: %02X\n", __FUNCTION__, ret);
-		// TODO: reading ISR1 should not affect DREQ (p. 3-11)
+		// TODO: reading ISR1 should not clear DREQ for DMA output (p. 3-11)
 		m_ints1 = 0;
 		update_int();
 	}

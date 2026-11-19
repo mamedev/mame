@@ -466,70 +466,62 @@ u64 dsp563xx_device::do_asr56(u8 n, u64 v)
 	return util::sext(v, BIT(m_emr, 1) ? 40 : 56) >> n;
 }
 
-u64 dsp563xx_device::do_lsl56(u8 n, u64 v)
+u32 dsp563xx_device::do_lsl24(u8 n, u32 v)
 {
 	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
-	u32 d = (v >> 24) & 0xffffff;
-	u32 res = (n >= 24) ? 0 : ((d << n) & 0xffffff);
-	v = (v & 0xff000000ffffff) | ((u64)res << 24);
+	u32 res = (n >= 24) ? 0 : ((v << n) & 0xffffff);
 	if(BIT(res, 23))
 		m_ccr |= CCR_N;
 	if(!res)
 		m_ccr |= CCR_Z;
-	if(n != 0 && n < 24 && BIT(d, 24-n))
+	if(n != 0 && n < 24 && BIT(v, 24-n))
 		m_ccr |= CCR_C;
 
-	return v;
+	return res;
 }
 
-u64 dsp563xx_device::do_lsr56(u8 n, u64 v)
+u32 dsp563xx_device::do_lsr24(u8 n, u32 v)
 {
 	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
-	u32 d = (v >> 24) & 0xffffff;
-	u32 res = (n >= 24) ? 0 : (d >> n);
-	v = (v & 0xff000000ffffff) | ((u64)res << 24);
+	u32 res = (n >= 24) ? 0 : (v >> n);
 	if(BIT(res, 23))
 		m_ccr |= CCR_N;
 	if(!res)
 		m_ccr |= CCR_Z;
-	if(n != 0 && n <= 24 && BIT(d, n-1))
+	if(n != 0 && n <= 24 && BIT(v, n-1))
 		m_ccr |= CCR_C;
 
-	return v;
+	return res;
 }
 
-u64 dsp563xx_device::do_rol56(u64 v)
+u32 dsp563xx_device::do_rol24(u32 v)
 {
 	bool old_c = (m_ccr & CCR_C) != 0;
 	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
-	u32 d = (v >> 24) & 0xffffff;
-	u32 res = (((u32)d << 1) | (old_c ? 1 : 0)) & 0xffffff;
-	v = (v & 0xff000000ffffff) | ((u64)res << 24);
+	u32 res = (((u32)v << 1) | (old_c ? 1 : 0)) & 0xffffff;
 	if(BIT(res, 23))
 		m_ccr |= CCR_N;
 	if(!res)
 		m_ccr |= CCR_Z;
-	if(BIT(d, 23))
+	if(BIT(v, 23))
 		m_ccr |= CCR_C;
 
-	return v;
+	return res;
 }
 
-u64 dsp563xx_device::do_ror56(u64 v)
+u32 dsp563xx_device::do_ror24(u32 v)
 {
 	bool old_c = (m_ccr & CCR_C) != 0;
 	m_ccr &= ~(CCR_N|CCR_Z|CCR_V|CCR_C);
-	u32 d = (v >> 24) & 0xffffff;
-	u32 res = (d >> 1) | ((old_c ? 1 : 0) << 23);
-	v = (v & 0xff000000ffffff) | ((u64)res << 24);
+	u32 res = (v >> 1) | ((old_c ? 1 : 0) << 23);
 	if(BIT(res, 23))
 		m_ccr |= CCR_N;
 	if(!res)
 		m_ccr |= CCR_Z;
-	if(BIT(d, 0))
+	if(BIT(v, 0))
 		m_ccr |= CCR_C;
 
-	return v;
+	return res;
 }
 
 void dsp563xx_device::do_tst56(u64 v)

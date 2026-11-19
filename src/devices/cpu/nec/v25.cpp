@@ -16,7 +16,7 @@
     READY pin.  The figures are the ones for internal RAM access enabled, which
     costs two clocks more for each memory write than disabled does.
 
-    BTCLR and STOP instructions not implemented.
+    STOP instruction not implemented.
 
     IBRK flag (trap I/O instructions) not implemented.
 
@@ -24,8 +24,8 @@
 
     Port implementation is incomplete: mode control registers are ignored.
 
-    Timer implementation is incomplete: polling is not implemented
-    (reading any of the registers just returns the last value written)
+    Timer 0 implementation is incomplete: polling is not implemented
+    (reading TM0 returns the last value written)
 
     The serial interface implements asynchronous mode only; I/O interface
     mode is not emulated.  Note that the serial interface and the DMA
@@ -112,6 +112,14 @@ device_memory_interface::space_config_vector v25_common_device::memory_space_con
 
 TIMER_CALLBACK_MEMBER(v25_common_device::v25_timer_callback)
 {
+	if (param == INTTU2)
+	{
+		// Timer 1 reloads the current modulo at expiry. In timer 0's
+		// one-shot mode, INTTU1 belongs to MD0 rather than TM1.
+		tm1_w(m_MD1);
+		if (!BIT(m_TMC0, 0))
+			param |= INTTU1;
+	}
 	m_pending_irq |= param;
 }
 
@@ -889,6 +897,16 @@ void v25_common_device::execute_set_input(int irqline, int state)
 std::unique_ptr<util::disasm_interface> v25_common_device::create_disassembler()
 {
 	return std::make_unique<nec_disassembler>(this, m_v25v35_decryptiontable);
+}
+
+bool v25_common_device::get_decryption_mode() const
+{
+	return m_MF == 0;
+}
+
+std::optional<u32> v25_common_device::get_cs_base() const
+{
+	return Sreg(PS) << 4;
 }
 
 void v25_common_device::device_start()

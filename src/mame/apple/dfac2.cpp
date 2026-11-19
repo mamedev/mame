@@ -60,7 +60,8 @@ dfac2_device::dfac2_device(const machine_config &mconfig, const char *tag, devic
 	i2c_hle_interface(mconfig, *this, 0x6f),
 	m_dac(*this, "dac_%u", 0),
 	m_filter(*this, "filter3_%u", 0),
-	m_rec(*this, "rec_%u", 0)
+	m_rec(*this, "rec_%u", 0),
+	m_jacks(*this, "jacks")
 {
 }
 
@@ -81,8 +82,28 @@ void dfac2_device::device_add_mconfig(machine_config &config)
 			.add_route(0, *this, 1.0, ch);
 	}
 
-	for (u32 i = 0; i < 4; i++)
+	for (u32 i = 0; i < RECORD_INPUTS; i++)
 		FILTER_VOLUME(config, m_rec[i]);
+
+	// The left and right outputs are routed to the last two recording inputs, the output loopback
+	for (u32 ch = 0; ch < 2; ch++)
+		add_route(ch, m_rec[RECORD_INPUTS - 2 + ch], 1.0);
+}
+
+static INPUT_PORTS_START(dfac2)
+	PORT_START("jacks")
+	// Only the sense bits are changed; audio routed to the jack inputs is recorded either way
+	PORT_CONFNAME(0x80, 0x00, "Sound Input Jack")
+	PORT_CONFSETTING(0x00, "Empty")
+	PORT_CONFSETTING(0x80, "Connected")
+	PORT_CONFNAME(0x20, 0x00, "Sound Output Jack")
+	PORT_CONFSETTING(0x00, "Empty")
+	PORT_CONFSETTING(0x20, "Connected")
+INPUT_PORTS_END
+
+ioport_constructor dfac2_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(dfac2);
 }
 
 void dfac2_device::device_start()
@@ -108,6 +129,21 @@ void dfac2_device::device_reset()
 
 void dfac2_device::update_controls()
 {
+	// Register 0x0e source selection for each recording input to the ADC, and the gain of each input;
+	// the 1:8 output loopback tap is an approximation of the left-output level measured at the default input gain
+	static constexpr struct { u8 source; double gain; } RECORD_SOURCE[RECORD_INPUTS] =
+	{
+		{ 4, 1.0 }, { 4, 1.0 },     // CD-ROM drive left/right
+		{ 3, 1.0 }, { 3, 1.0 },     // sound input jack left/right
+		{ 5, 0.125 }, { 6, 0.125 }  // left/right output loopback
+	};
+
+	const u8 source = m_regs[0x0e] & 7;
+	const double rec_gain = 0.5 * std::pow(10.0, (1.5 * (m_regs[0x08] & 0x1f) - 8.0) / 20.0);
+	// The recording inputs are updated before the output gains, so the loopback is brought up to now with the previous gains
+	for (u32 i = 0; i < RECORD_INPUTS; i++)
+		m_rec[i]->set_gain((source == RECORD_SOURCE[i].source) ? rec_gain * RECORD_SOURCE[i].gain : 0.0);
+
 	const bool mute_all = BIT(m_regs[0x0e], 7);
 	const bool mute_l = mute_all || BIT(m_regs[0x0d], 6);
 	const bool mute_r = mute_all || BIT(m_regs[0x0d], 7);
@@ -126,11 +162,6 @@ void dfac2_device::update_controls()
 		m_filter[ch]->set_output_gain(0, filter ? 1.0 : 0.0);
 		set_output_gain(ch, (ch ? mute_r : mute_l) ? 0.0 : 1.0);
 	}
-
-	const u8 source = m_regs[0x0e] & 7;
-	const double rec_gain = 0.5 * std::pow(10.0, (1.5 * (m_regs[0x08] & 0x1f) - 8.0) / 20.0);
-	for (u32 i = 0; i < 4; i++)
-		m_rec[i]->set_gain((source == ((i < 2) ? 4 : 3)) ? rec_gain : 0.0);
 }
 
 /*
@@ -156,7 +187,7 @@ void dfac2_device::update_controls()
               attenuates both sides by 6dB; bits 6/7 mute left/right
     0x0e    - bits 2-0 input source: 7 = none, the idle default; 3 = the sound input jack,
               with mic or line gain; 4 = the CD-ROM drive; 2 = the video input module; 5/6 =
-              the left/right output, not emulated. Bit 7 mutes both sides
+              the left/right output. Bit 7 = mute both sides
     0x0f    - bit 7 switches in the 7kHz output filter; the other bits are input settings
     0x10    - read only: bit 5 = something plugged into sound out, bit 7 = sound in
 */
@@ -173,6 +204,8 @@ bool dfac2_device::subaddress_valid(u8 subaddress) const
 
 u8 dfac2_device::read_data(u16 offset)
 {
+	if (offset == 0x10)
+		return (m_regs[offset] & ~0xa0) | m_jacks->read();
 	return m_regs[offset];
 }
 

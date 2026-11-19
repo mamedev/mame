@@ -33,9 +33,7 @@ protected:
 	virtual void sfr_map(address_map &map) override ATTR_COLD;
 	virtual bool execute_ready() override;
 	virtual u16 interrupt_mask() override;
-	virtual u16 pending_irq_flags(u16 int_mask) override;
-	virtual u8 interrupt_vector(u32 source) const override;
-	virtual u32 interrupt_priority(u32 source) const override;
+	virtual void irqs_complete_and_mask(u16 &ints, u16 int_mask) override;
 	virtual offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask) override;
 
 private:

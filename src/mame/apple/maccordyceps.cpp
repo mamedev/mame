@@ -135,7 +135,7 @@ private:
 	u32 comm_r();
 	void comm_w(u32 data);
 	u32 bus_error_pds_r();
-	void io_wait(offs_t address);
+	void io_wait(offs_t address, u64 mem_mask);
 	void add_wait(u32 cycles);
 
 	u32 m_model_id;
@@ -163,8 +163,8 @@ void pmac6200_state::machine_start()
 
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_readwrite_tap(0x50000000, 0x53ffffff, "io_wait",
-			[this] (offs_t offset, u64 &data, u64 mem_mask) { io_wait(offset); },
-			[this] (offs_t offset, u64 &data, u64 mem_mask) { io_wait(offset); });
+			[this] (offs_t offset, u64 &data, u64 mem_mask) { io_wait(offset, mem_mask); },
+			[this] (offs_t offset, u64 &data, u64 mem_mask) { io_wait(offset, mem_mask); });
 	space.install_readwrite_tap(0xf9000000, 0xf90fffff, "vram_wait",
 			[this] (offs_t offset, u64 &data, u64 mem_mask) { add_wait(m_wait_io_long); },
 			[this] (offs_t offset, u64 &data, u64 mem_mask) { add_wait(m_wait_io_long); });
@@ -176,7 +176,7 @@ void pmac6200_state::add_wait(u32 cycles)
 		m_maincpu->adjust_icount(-int(cycles));
 }
 
-void pmac6200_state::io_wait(offs_t address)
+void pmac6200_state::io_wait(offs_t address, u64 mem_mask)
 {
 	struct wait_range { offs_t start, end; u32 pmac6200_state::*wait; };
 	static constexpr wait_range PRIMETIME_WAITS[] = {
@@ -194,6 +194,10 @@ void pmac6200_state::io_wait(offs_t address)
 		add_wait(m_wait_capella);
 		return;
 	}
+
+	// The bus waits for the F108 IDE registers are added in F108; only the upper half of each register is wired
+	if ((address >= 0x50f1a000) && (address <= 0x50f1a03f) && (mem_mask & 0xffff0000'ffff0000U))
+		return;
 
 	offs_t const primetime = address & 0x3ffff;
 	for (auto const &range : PRIMETIME_WAITS)
@@ -301,6 +305,8 @@ void pmac6200_state::pmac6200(machine_config &config)
 	m_f108->set_maincpu_tag("maincpu");
 	m_f108->set_primetimeii_tag(m_primetimeiii);
 	m_f108->set_scc_sync(false);
+	m_f108->set_ata_timing_clock(C32M / 2);
+	m_f108->set_ata_bus_waits(attotime::from_nsec(500), attotime::from_nsec(393));
 	m_f108->write_ata_irq().set(m_primetimeiii, FUNC(primetimeii_device::ata_irq_w));
 	m_f108->set_scsi_clock(CPU_BCLK / ((15.0 / 8) + (1.0 / 2048)));
 
@@ -367,7 +373,7 @@ void pmac6200_state::pmac6200(machine_config &config)
 	asc.add_route(0, m_dfac2->dac(0), 1.0);
 	asc.add_route(1, m_dfac2->dac(1), 1.0);
 	MICROPHONE(config, "sound_in", 2).front().add_route(0, m_dfac2->rec(2), 1.0).add_route(1, m_dfac2->rec(3), 1.0);
-	for (int i = 0; i < 4; i++)
+	for (u32 i = 0; i < dfac2_device::RECORD_INPUTS; i++)
 		m_dfac2->rec(i).lookup()->add_route(0, asc, 1.0);
 	// The board's reconstruction low-pass is modeled as two RC stages, with corners fitted to the line output of a Performa 6200CD
 	static constexpr const char *const LPF_TAGS[2][2] = { { "lpf1_l", "lpf_l" }, { "lpf1_r", "lpf_r" } };
@@ -397,7 +403,8 @@ void pmac6200_state::pmac6200(machine_config &config)
 
 	RAM(config, m_ram);
 	m_ram->set_default_size("8M");
-	m_ram->set_extra_options("8M,16M,32M,64M"); // per service manual
+	// Two independently populated 72-pin SIMM sockets (developer note table 4-1).
+	m_ram->set_extra_options("12M,16M,20M,24M,32M,36M,40M,48M,64M");
 }
 
 

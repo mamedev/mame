@@ -179,6 +179,7 @@ UR DEALER       - Three traditional poker games. The player plays the role of De
 #include "emu.h"
 
 #include "astro_cpucode.h"
+#include "astro_v102px.h"
 
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
@@ -333,6 +334,7 @@ class zoo_state : public astrocorp_state
 public:
 	zoo_state(const machine_config &mconfig, device_type type, const char *tag) :
 		astrocorp_state(mconfig, type, tag),
+		m_v102px(*this, "maincpu"),
 		m_cpucode(*this, "astro_cpucode"),
 		m_cpucode_in(*this, "CPUCODE_IN"),
 		m_cpucode_out(*this, "CPUCODE_OUT")
@@ -363,17 +365,6 @@ public:
 	void zoo(machine_config &config) ATTR_COLD;
 	void zulu(machine_config &config) ATTR_COLD;
 
-	void init_gostopac() ATTR_COLD { decrypt_rom(gostopac_table); }
-	void init_px001() ATTR_COLD { decrypt_rom(v102_px001_table); }
-	void init_px002() ATTR_COLD { decrypt_rom(v102_px002_table); }
-	void init_px005() ATTR_COLD { decrypt_rom(v102_px005_table); }
-	void init_px006() ATTR_COLD { decrypt_rom(v102_px006_table); }
-	void init_px007() ATTR_COLD { decrypt_rom(v102_px007_table); }
-	void init_px008() ATTR_COLD { decrypt_rom(v102_px008_table); }
-	void init_px010() ATTR_COLD { decrypt_rom(v102_px010_table); }
-	void init_px012() ATTR_COLD { decrypt_rom(v102_px012_table); }
-	void init_px014() ATTR_COLD { decrypt_rom(v102_px014_table); }
-	void init_px016() ATTR_COLD { decrypt_rom(v102_px016_table); }
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -381,6 +372,8 @@ protected:
 	virtual void eeprom_w(u8 data) override;
 
 	u16 cpucode_r();
+
+	required_device<astro_v102px_device> m_v102px;
 
 private:
 	required_device<astro_cpucode_device> m_cpucode;
@@ -413,36 +406,6 @@ private:
 	void zoo_map(address_map &map) ATTR_COLD;
 	void zulu_map(address_map &map) ATTR_COLD;
 
-
-	struct decryption_info {
-		struct {
-			// Address bits used for bitswap/xor selection
-			u8 bits[3];
-			struct {
-				// 8-8 Bitswap
-				u8 bits[8];
-				// Xor
-				u8 xor_mask;
-			} entries[8];
-		} rom[2];
-		// Global address bitswap (src -> dest, some sets use bits 12-8 only, while others 12-2)
-		u8 bits[11];
-	};
-	void decrypt_rom(const decryption_info &table) ATTR_COLD;
-
-	// px004 and px013 are implemented in astrocorp/hummer.cpp,
-	// so they can be copied over if needed by future dumps
-	static const decryption_info gostopac_table;
-	static const decryption_info v102_px001_table;
-	static const decryption_info v102_px002_table;
-	static const decryption_info v102_px005_table;
-	static const decryption_info v102_px006_table;
-	static const decryption_info v102_px007_table;
-	static const decryption_info v102_px008_table;
-	static const decryption_info v102_px010_table;
-	static const decryption_info v102_px012_table;
-	static const decryption_info v102_px014_table;
-	static const decryption_info v102_px016_table;
 };
 
 // Adds RAMDAC and 16x32 sprites
@@ -1580,7 +1543,7 @@ static INPUT_PORTS_START( keno21 )
 	PORT_INCLUDE( dinodino )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1         ) PORT_IMPULSE(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1         ) PORT_IMPULSE(5)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_GAMBLE_KEYOUT )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_SLOT_STOP3    ) PORT_NAME("Take / Play 3 / Stand")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_SLOT_STOP1    ) PORT_NAME("Play 1 / Double")
@@ -1816,7 +1779,12 @@ void zoo_state::machine_start()
 void zoo_state::zoo(machine_config &config)
 {
 	skilldrp(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::zoo_map);
+
+	ASTRO_V102PX(config.replace(), m_v102px, 24_MHz_XTAL / 2);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::zoo_map);
+	m_v102px->set_encrypted_region("encrypted_rom");
+	m_v102px->set_decryption(astro_v102px::px005);
+
 	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_1_2_scanline_cb), "screen", 0, 1);
 
 	m_screen->set_raw(26.824_MHz_XTAL / 4, 437, 0, 320, 261, 0, 240); // ??? ~15.345kHz Hsync, ??? ~58.795Hz Vsync
@@ -1827,33 +1795,35 @@ void zoo_state::zoo(machine_config &config)
 void zoo_state::zulu(machine_config &config)
 {
 	zoo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::zulu_map);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::zulu_map);
 	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_2_4_scanline_cb), "screen", 0, 1);
 }
 
 void zoo_state::magibomb_aa72d(machine_config &config)
 {
 	zoo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::magibomb_aa72d_map);
+	m_v102px->set_decryption(astro_v102px::px014);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::magibomb_aa72d_map);
 }
 
 void zoo_state::magibomb_nb61(machine_config &config)
 {
 	zoo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::magibomb_nb61_map);
+	m_v102px->set_decryption(astro_v102px::px014);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::magibomb_nb61_map);
 	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_2_4_scanline_cb), "screen", 0, 1);
 }
 
 void zoo_state::magibomb_ab53(machine_config &config)
 {
 	magibomb_nb61(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::magibomb_ab53_map);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::magibomb_ab53_map);
 }
 
 void zoo_state::magibomb_br71a(machine_config &config)
 {
 	magibomb_aa72d(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::magibomb_br71a_map);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::magibomb_br71a_map);
 }
 
 void zoo_state::magibomb_ab60j(machine_config &config)
@@ -1866,26 +1836,28 @@ void zoo_state::magibomb_lb51(machine_config &config)
 {
 	magibomb_ab60j(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::magibomb_lb51_map);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::magibomb_lb51_map);
 }
 
 void zoo_state::winbingo(machine_config &config)
 {
 	zoo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::winbingo_map);
+	m_v102px->set_decryption(astro_v102px::px006);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::winbingo_map);
 	m_screen->set_raw(24_MHz_XTAL / 2, 781, 0, 512, 261, 0, 240); // double horizontal resolution
 }
 
 void zoo_state::hacher(machine_config &config)
 {
 	winbingo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::hacher_map);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::hacher_map);
 }
 
 void zoo_state::dinodino(machine_config &config)
 {
 	winbingo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::dinodino_map);
+	m_v102px->set_decryption(astro_v102px::px010);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::dinodino_map);
 
 	TIMER(config.replace(), "scantimer").configure_scanline(FUNC(zoo_state::irq_2_4_scanline_cb), "screen", 0, 1);
 }
@@ -1893,19 +1865,22 @@ void zoo_state::dinodino(machine_config &config)
 void zoo_state::keno21(machine_config &config)
 {
 	dinodino(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::keno21_map);
+	m_v102px->set_decryption(astro_v102px::px001);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::keno21_map);
 }
 
 void zoo_state::gostopac(machine_config &config)
 {
 	dinodino(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::gostopac_map);
+	m_v102px->set_decryption(astro_v102px::gostopac);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::gostopac_map);
 }
 
 void zoo_state::monkeyl(machine_config &config)
 {
 	winbingo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::monkeyl_map);
+	m_v102px->set_decryption(astro_v102px::px005);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::monkeyl_map);
 }
 
 void zoo_state::monkeyl_a12(machine_config &config)
@@ -1917,55 +1892,63 @@ void zoo_state::monkeyl_a12(machine_config &config)
 void zoo_state::monkeyl_en20b(machine_config &config)
 {
 	monkeyl(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::monkeyl_en20b_map);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::monkeyl_en20b_map);
 }
 
 void zoo_state::speedmst(machine_config &config)
 {
 	magibomb_nb61(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::speedmst_map);
+	m_v102px->set_decryption(astro_v102px::px005);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::speedmst_map);
 }
 
 void zoo_state::wwitch(machine_config &config)
 {
 	winbingo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::wwitch_map);
+	m_v102px->set_decryption(astro_v102px::px016);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::wwitch_map);
 }
 
 void zoo_state::lwitch(machine_config &config)
 {
 	winbingo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::lwitch_map);
+	m_v102px->set_decryption(astro_v102px::px016);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::lwitch_map);
 }
 
 void zoo_state::foxyruby(machine_config &config)
 {
 	winbingo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::foxyruby_map);
+	m_v102px->set_decryption(astro_v102px::px002);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::foxyruby_map);
 }
 
 void zoo_state::hapfarm(machine_config &config)
 {
 	winbingo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::hapfarm_map);
+	m_v102px->set_decryption(astro_v102px::px008);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::hapfarm_map);
 }
 
 void zoo_state::hapfarm_in0102b(machine_config &config)
 {
 	winbingo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::hapfarm_in0102b_map);
+	m_v102px->set_decryption(astro_v102px::px008);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::hapfarm_in0102b_map);
 }
 
 void zoo_state::westvent(machine_config &config)
 {
 	winbingo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::westvent_map);
+	m_v102px->set_decryption(astro_v102px::px007);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::westvent_map);
 }
 
 void zoo_state::crzcircus(machine_config &config)
 {
 	westvent(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &zoo_state::crzcircus_map);
+	m_v102px->set_decryption(astro_v102px::px001);
+	m_v102px->set_addrmap(AS_PROGRAM, &zoo_state::crzcircus_map);
 }
 
 void astoneag_state::ramdac_map(address_map &map)
@@ -1976,7 +1959,8 @@ void astoneag_state::ramdac_map(address_map &map)
 void astoneag_state::astoneag(machine_config &config)
 {
 	winbingo(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &astoneag_state::astoneag_map);
+	m_v102px->set_decryption(astro_v102px::px012);
+	m_v102px->set_addrmap(AS_PROGRAM, &astoneag_state::astoneag_map);
 
 	// 120MHz XTAL + VGA connector
 	// TODO: verify H/VSync & pixel clock for this type of HW
@@ -4160,431 +4144,8 @@ void magibomb_state::init_magibomb()
 	}
 }
 
-// Heavier encryption
-
-void zoo_state::decrypt_rom(const decryption_info &table)
-{
-	const u32 size = memregion("maincpu")->bytes();
-	u16 const *const rom = &memregion("encrypted_rom")->as_u16();
-	u16 *const decrypted = &memregion("maincpu")->as_u16();
-	std::unique_ptr<u16 []> tmp = std::make_unique<u16 []>(size/2);
-
-	// Pass 1: decrypt high and low byte independently.  They go
-	// through a bitswap and an xor, choosing between 8 possibilities
-	// through address bits.
-
-	for (u32 i = 0; i != size; i += 2)
-	{
-		u16 orig = rom[i >> 1];
-		u16 result = 0;
-		for (u32 rb = 0; rb < 2; rb ++)
-		{
-			u8 val = orig >> (rb ? 0 : 8);
-			u32 index =
-				(BIT(i, table.rom[rb].bits[0]) << 2) |
-				(BIT(i, table.rom[rb].bits[1]) << 1) |
-				BIT(i, table.rom[rb].bits[2]);
-			val = bitswap(val,
-						  table.rom[rb].entries[index].bits[0],
-						  table.rom[rb].entries[index].bits[1],
-						  table.rom[rb].entries[index].bits[2],
-						  table.rom[rb].entries[index].bits[3],
-						  table.rom[rb].entries[index].bits[4],
-						  table.rom[rb].entries[index].bits[5],
-						  table.rom[rb].entries[index].bits[6],
-						  table.rom[rb].entries[index].bits[7]);
-			val = val ^ table.rom[rb].entries[index].xor_mask;
-
-			result |= val << (rb ? 0 : 8);
-		}
-		tmp[i >> 1] = result;
-	}
-
-	// Pass 2: copy back the decrypted data following the address
-	// scrambling
-	for (u32 i = 0; i != size; i += 2)
-	{
-		u32 dest =
-			(i & 0xffffe003) |
-			(BIT(i, table.bits[0])  << 12) |
-			(BIT(i, table.bits[1])  << 11) |
-			(BIT(i, table.bits[2])  << 10) |
-			(BIT(i, table.bits[3])  <<  9) |
-			(BIT(i, table.bits[4])  <<  8) |
-			(BIT(i, table.bits[5])  <<  7) |
-			(BIT(i, table.bits[6])  <<  6) |
-			(BIT(i, table.bits[7])  <<  5) |
-			(BIT(i, table.bits[8])  <<  4) |
-			(BIT(i, table.bits[9])  <<  3) |
-			(BIT(i, table.bits[10]) <<  2);
-		decrypted[dest >> 1] = tmp[i >> 1];
-	}
-
-	// TODO: are these overlays provided by the custom CPU? It does seem so.
-	// both the encrypted and decrypted bytes at these positions make no sense.
-	// gostopac explicitly checks that 0x4-0x7 are 0x0400'0400
-	decrypted[0x00004/2] = 0x0400;
-	decrypted[0x00006/2] = 0x0400;
-}
-
-// TODO: identify custom CPU model. On the dumped PCB it wasn't readable
-const zoo_state::decryption_info zoo_state::gostopac_table = {
-	{
-		{
-			{ 8, 9, 10 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 9, 11 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 10, 8, 11, 9, 7, 2, 6, 3, 5, 4 }
-};
-
-const zoo_state::decryption_info zoo_state::v102_px001_table = {
-	{
-		{
-			{ 8, 9, 10 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 9, 11 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 10, 8, 11, 9, 7, 2, 4, 6, 5, 3 }
-};
-
-const zoo_state::decryption_info zoo_state::v102_px002_table = {
-	{
-		{
-			{ 8, 11, 9 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 11, 10 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 9, 8, 10, 11, 7, 2, 4, 6, 5, 3 }
-};
-
-const zoo_state::decryption_info zoo_state::v102_px005_table = {
-	{
-		{
-			{ 8, 9, 10 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 9, 11 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 10, 8, 11, 9, 7, 5, 3, 6, 2, 4 }
-};
-
-const zoo_state::decryption_info zoo_state::v102_px006_table = {
-	{
-		{
-			{ 8, 11, 9 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 11, 10 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 9, 8, 10, 11, 7, 5, 3, 6, 2, 4 }
-};
-
-const zoo_state::decryption_info zoo_state::v102_px007_table = {
-	{
-		{
-			{ 10, 8, 11 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 8, 9 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 11, 10, 9, 8, 7, 5, 3, 6, 2, 4 }
-};
-
-const zoo_state::decryption_info zoo_state::v102_px008_table = {
-	{
-		{
-			{ 11, 10, 9 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 10, 8 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 9, 11, 8, 10, 7, 2, 6, 3, 5, 4 }
-};
-
-const zoo_state::decryption_info zoo_state::v102_px010_table = {
-	{
-		{
-			{ 8, 11, 9 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 11, 10 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 9, 8, 10, 11, 7, 2, 6, 3, 5, 4 }
-};
-
-const zoo_state::decryption_info zoo_state::v102_px012_table = {
-	{
-		{
-			{ 11, 10, 9 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 10, 8 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 9, 11, 8, 10, 7, 6, 5, 4, 3, 2 }
-};
-
-const zoo_state::decryption_info zoo_state::v102_px014_table = {
-	{
-		{
-			{ 8, 11, 9 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 11, 10 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 9, 8, 10, 11, 7, 6, 5, 4, 3, 2 }
-};
-
-const zoo_state::decryption_info zoo_state::v102_px016_table = {
-	{
-		{
-			{ 11, 10, 9 },
-			{
-				{ { 7, 5, 4, 6,  0, 3, 2, 1 }, 0x00 },
-				{ { 1, 4, 6, 0,  2, 5, 3, 7 }, 0xd0 },
-				{ { 1, 7, 4, 3,  6, 5, 0, 2 }, 0x88 },
-				{ { 6, 5, 2, 3,  7, 1, 0, 4 }, 0xd1 },
-				{ { 6, 1, 7, 2,  4, 0, 3, 5 }, 0x64 },
-				{ { 1, 7, 2, 6,  5, 4, 3, 0 }, 0x83 },
-				{ { 6, 7, 4, 2,  5, 0, 1, 3 }, 0x81 },
-				{ { 7, 5, 1, 0,  2, 4, 6, 3 }, 0xea },
-			}
-		},
-		{
-			{ 12, 10, 8 },
-			{
-				{ { 6, 5, 4, 3,  2, 1, 0, 7 }, 0x90 },
-				{ { 2, 4, 0, 7,  5, 6, 3, 1 }, 0x32 },
-				{ { 7, 1, 0, 6,  5, 2, 3, 4 }, 0xa9 },
-				{ { 2, 0, 3, 5,  1, 4, 6, 7 }, 0xa2 },
-				{ { 3, 0, 6, 5,  2, 1, 4, 7 }, 0x02 },
-				{ { 0, 1, 6, 4,  5, 2, 7, 3 }, 0x30 },
-				{ { 3, 5, 2, 7,  6, 1, 4, 0 }, 0x0a },
-				{ { 0, 6, 4, 2,  7, 3, 1, 5 }, 0x81 },
-			}
-		}
-	},
-	{ 12, 9, 11, 8, 10, 7, 2, 4, 6, 5, 3 }
-};
-
-
 void astoneag_state::init_astoneag()
 {
-	init_px012();
-
 	interleave_sprites_16x32();
 }
 
@@ -4639,45 +4200,45 @@ GAMEL( 2002,  magibomb_nb45,   magibomb, magibomb_nb45,   magibomb,       magibo
 // Heavier encryption
 GAMEL( 2005,  astoneag,        0,        astoneag,        astoneag,       astoneag_state,  init_astoneag,  ROT0, "Astro Corp.",                  "Stone Age (Astro, Ver. EN.03.A, 2005/02/21)",  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_astoneag )
 GAMEL( 2007,  astoneag_aa05h,  astoneag, astoneag,        astoneag,       astoneag_state,  init_astoneag,  ROT0, "Astro Corp.",                  "Stone Age (Astro, Ver. AA.05.H, 2007/03/15)",  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_astoneag )
-GAMEL( 2006,  cptshark,        0,        winbingo,        winbingo,       zoo_state,       init_px006,     ROT0, "Astro Corp. / American Alpha", "Captain Shark (Ver. CS.01.6, Apr 21 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_winbingo ) // 13:50:11 Apr 21 2006
-GAME(  2007,  crzcircus,       0,        crzcircus,       winbingo,       zoo_state,       init_px001,     ROT0, "Astro Corp.",                  "Crazy Circus (Ver. US.01.7)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Dec 25 2007
-GAMEL( 2005,  dinodino,        0,        dinodino,        dinodino,       zoo_state,       init_px010,     ROT0, "Astro Corp.",                  "Dino Dino (Ver. A1.1, 01/13/2005)",            MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_dinodino ) // 13/01.2005 10:59
-GAME ( 2009,  foxyruby,        0,        foxyruby,        magibomb_aa72d, zoo_state,       init_px002,     ROT0, "Astro Corp.",                  "Foxy Ruby (Ver. US.01.01.A)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2009/06/17
-GAME(  2004,  gostopac,        0,        gostopac,        gostopac,       zoo_state,       init_gostopac,  ROT0, "Astro Corp.",                  "Go & Stop (Ver. EN1.10)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME ( 2008,  hapfarm,         0,        hapfarm,         magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. US.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/16
-GAME ( 2008,  hapfarm_in0101a, hapfarm,  hapfarm_in0102b, magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. IN.01.01.A)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/27
-GAME ( 2011,  hapfarm_in0102b, hapfarm,  hapfarm_in0102b, magibomb_aa72d, zoo_state,       init_px008,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. IN.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2011/06/02
-GAME(  200?,  keno21,          0,        keno21,          keno21,         zoo_state,       init_px001,     ROT0, "Astro Corp.",                  "Keno 21 (Ver. A-2.30)",                        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
-GAMEL( 2004,  magibomb_aa71a,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.71.A, 30/04/04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 30/04/04 10:55
-GAMEL( 2005,  magibomb_aa72c,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.72.C, 25/05/05)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 25/05/05 11:26
-GAMEL( 2005,  magibomb_aa72d,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.72.D, 14/11/05)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 15/11/05 09:31
-GAMEL( 2006,  magibomb_aa73a,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.73.A, 17/10/06)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 17/10/06 17:13
-GAMEL( 2003,  magibomb_ab50,   magibomb, magibomb_ab53,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB5.0, 09/26/02)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 092602S
-GAMEL( 2003,  magibomb_ab51,   magibomb, magibomb_ab53,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB5.1, 01/10/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 011003S
-GAMEL( 2003,  magibomb_ab53,   magibomb, magibomb_ab53,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB5.3, 20/06/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 062003S
-GAMEL( 2003,  magibomb_ab60j,  magibomb, magibomb_ab60j,  dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB6.0J, 26/11/03)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 112603S
-GAMEL( 2004,  magibomb_bb60,   magibomb, magibomb_nb61,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. BB6.0, 02/24/04)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 022404S
-GAMEL( 2014,  magibomb_br71a,  magibomb, magibomb_br71a,  magibomb_aa72d, zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. BR71.A, 30/05/14)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 30/05/14 10:29
-GAMEL( 2001?, magibomb_lb51,   magibomb, magibomb_lb51,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. LB5.1 12/13/02)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
-GAMEL( 2004,  magibomb_nb61,   magibomb, magibomb_nb61,   dinodino,       zoo_state,       init_px014,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. NB6.1, 26/04/04)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 26/04/04
-GAME(  2005,  monkeyl,         0,        monkeyl,         magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.21.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 18/02/2005 15:47
-GAME(  2003,  monkeyl_a11,     monkeyl,  monkeyl_a12,     dinodino,       zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. A1.1)",                      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 102203S
-GAME(  2003,  monkeyl_a12,     monkeyl,  monkeyl_a12,     dinodino,       zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. A1.2)",                      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 122303S
-GAME(  2004,  monkeyl_aa13b,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.13.B)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 23/04/2004 14:57
-GAME(  2004,  monkeyl_aa20a,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.20.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 1/06/2004 10:51
-GAME(  2005,  monkeyl_aa21b,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.21.B)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 25/05/2005 11:18
-GAME(  2007,  monkeyl_aa21c,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.21.C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 05/03/2007 10:40
-GAME(  2013,  monkeyl_en20b,   monkeyl,  monkeyl_en20b,   magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. EN.20.B)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 24/03/2013 17:42
-GAMEL( 2004,  speedmst,        0,        speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D2.01.C, Apr 29 2004)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // Apr 29 2004 16:29:35
-GAMEL( 2003,  speedmst_d14,    speedmst, speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D1.4, May 23 2003)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // May 23 2003 16:38:02
-GAMEL( 2003,  speedmst_d201ca, speedmst, speedmst,        dinodino,       zoo_state,       init_px005,     ROT0, "D2 Enterprises",               "Speed Master (D2.01.C, Apr 28 2004)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // Apr 28 2004 17:21:26
-GAME ( 2008,  westvent,        0,        westvent,        winbingo,       zoo_state,       init_px007,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.02.D)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2008/1/21
-GAME ( 2006,  westvent_aa01b,  westvent, westvent,        winbingo,       zoo_state,       init_px007,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.01.B)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2006/8/15
-GAME ( 2008,  westvent_aa02e,  westvent, westvent,        winbingo,       zoo_state,       init_px007,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.02.E)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2008/9/8
-GAMEL( 2006,  winbingo,        0,        winbingo,        winbingo,       zoo_state,       init_px006,     ROT0, "Astro Corp.",                  "Win Win Bingo (Ver. GM.03.3, Feb 23 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_winbingo ) // 15:47:48 Feb 23 2006
-GAMEL( 2006,  winbingo_gm051,  winbingo, winbingo,        winbingo,       zoo_state,       init_px006,     ROT0, "Astro Corp.",                  "Win Win Bingo (Ver. GM.05.1, May 11 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_winbingo ) // 11:02:07 May 1
-GAMEL( 2005,  hacher,          winbingo, hacher,          winbingo,       zoo_state,       init_px006,     ROT0, "bootleg (Gametron)",           "Hacher (hack of Win Win Bingo EN.01.6)",       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS, layout_winbingo ) // 14:25:46 Mar 10 2005. One bad sprite ROM1 2006. Undumped sprite ROMs
-GAME ( 2005,  wwitch,          0,        wwitch,          magibomb_aa72d, zoo_state,       init_px016,     ROT0, "Astro Corp.",                  "Wicked Witch (Ver. AA.01.A)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 29/12/05 09:29
-GAME ( 2006,  lwitch,          wwitch,   lwitch,          magibomb_aa72d, zoo_state,       init_px016,     ROT0, "Astro Corp.",                  "Little Witch (Ver. EN.01.A)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 06/01/06 14:08
-GAMEL( 2004,  zoo,             0,        zoo,             magibomb_aa72d, zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Zoo (Ver. ZO.02.D, Aug 27 2004)",              MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_zoo ) // 10:53:44 Aug 27 2004
-GAMEL( 2004,  zulu,            zoo,      zulu,            dinodino,       zoo_state,       init_px005,     ROT0, "Astro Corp.",                  "Zulu (Ver. 2.04J, Feb 3 2004)",                MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_zoo ) // 14:06:51 Feb  3 2004
+GAMEL( 2006,  cptshark,        0,        winbingo,        winbingo,       zoo_state,       empty_init,     ROT0, "Astro Corp. / American Alpha", "Captain Shark (Ver. CS.01.6, Apr 21 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_winbingo ) // 13:50:11 Apr 21 2006
+GAME(  2007,  crzcircus,       0,        crzcircus,       winbingo,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Crazy Circus (Ver. US.01.7)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // Dec 25 2007
+GAMEL( 2005,  dinodino,        0,        dinodino,        dinodino,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Dino Dino (Ver. A1.1, 01/13/2005)",            MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_dinodino ) // 13/01.2005 10:59
+GAME ( 2009,  foxyruby,        0,        foxyruby,        magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Foxy Ruby (Ver. US.01.01.A)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2009/06/17
+GAME(  2004,  gostopac,        0,        gostopac,        gostopac,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Go & Stop (Ver. EN1.10)",                      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME ( 2008,  hapfarm,         0,        hapfarm,         magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. US.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/16
+GAME ( 2008,  hapfarm_in0101a, hapfarm,  hapfarm_in0102b, magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. IN.01.01.A)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2008/10/27
+GAME ( 2011,  hapfarm_in0102b, hapfarm,  hapfarm_in0102b, magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Happy Farm (Ver. IN.01.02.B)",                 MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 2011/06/02
+GAME(  200?,  keno21,          0,        keno21,          keno21,         zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Keno 21 (Ver. A-2.30)",                        MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAMEL( 2004,  magibomb_aa71a,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.71.A, 30/04/04)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 30/04/04 10:55
+GAMEL( 2005,  magibomb_aa72c,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.72.C, 25/05/05)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 25/05/05 11:26
+GAMEL( 2005,  magibomb_aa72d,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.72.D, 14/11/05)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 15/11/05 09:31
+GAMEL( 2006,  magibomb_aa73a,  magibomb, magibomb_aa72d,  magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AA.73.A, 17/10/06)",          MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb_ab45a ) // 17/10/06 17:13
+GAMEL( 2003,  magibomb_ab50,   magibomb, magibomb_ab53,   dinodino,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB5.0, 09/26/02)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 092602S
+GAMEL( 2003,  magibomb_ab51,   magibomb, magibomb_ab53,   dinodino,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB5.1, 01/10/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 011003S
+GAMEL( 2003,  magibomb_ab53,   magibomb, magibomb_ab53,   dinodino,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB5.3, 20/06/03)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 062003S
+GAMEL( 2003,  magibomb_ab60j,  magibomb, magibomb_ab60j,  dinodino,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. AB6.0J, 26/11/03)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 112603S
+GAMEL( 2004,  magibomb_bb60,   magibomb, magibomb_nb61,   dinodino,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. BB6.0, 02/24/04)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 022404S
+GAMEL( 2014,  magibomb_br71a,  magibomb, magibomb_br71a,  magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. BR71.A, 30/05/14)",           MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 30/05/14 10:29
+GAMEL( 2001?, magibomb_lb51,   magibomb, magibomb_lb51,   dinodino,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. LB5.1 12/13/02)",             MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb  )
+GAMEL( 2004,  magibomb_nb61,   magibomb, magibomb_nb61,   dinodino,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Magic Bomb (Ver. NB6.1, 26/04/04)",            MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_magibomb ) // 26/04/04
+GAME(  2005,  monkeyl,         0,        monkeyl,         magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.21.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 18/02/2005 15:47
+GAME(  2003,  monkeyl_a11,     monkeyl,  monkeyl_a12,     dinodino,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. A1.1)",                      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 102203S
+GAME(  2003,  monkeyl_a12,     monkeyl,  monkeyl_a12,     dinodino,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. A1.2)",                      MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 122303S
+GAME(  2004,  monkeyl_aa13b,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.13.B)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 23/04/2004 14:57
+GAME(  2004,  monkeyl_aa20a,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.20.A)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 1/06/2004 10:51
+GAME(  2005,  monkeyl_aa21b,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.21.B)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 25/05/2005 11:18
+GAME(  2007,  monkeyl_aa21c,   monkeyl,  monkeyl,         magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. AA.21.C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 05/03/2007 10:40
+GAME(  2013,  monkeyl_en20b,   monkeyl,  monkeyl_en20b,   magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Monkey Land (Ver. EN.20.B)",                   MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 24/03/2013 17:42
+GAMEL( 2004,  speedmst,        0,        speedmst,        dinodino,       zoo_state,       empty_init,     ROT0, "D2 Enterprises",               "Speed Master (D2.01.C, Apr 29 2004)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // Apr 29 2004 16:29:35
+GAMEL( 2003,  speedmst_d14,    speedmst, speedmst,        dinodino,       zoo_state,       empty_init,     ROT0, "D2 Enterprises",               "Speed Master (D1.4, May 23 2003)",             MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // May 23 2003 16:38:02
+GAMEL( 2003,  speedmst_d201ca, speedmst, speedmst,        dinodino,       zoo_state,       empty_init,     ROT0, "D2 Enterprises",               "Speed Master (D2.01.C, Apr 28 2004)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_magibomb ) // Apr 28 2004 17:21:26
+GAME ( 2008,  westvent,        0,        westvent,        winbingo,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.02.D)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2008/1/21
+GAME ( 2006,  westvent_aa01b,  westvent, westvent,        winbingo,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.01.B)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2006/8/15
+GAME ( 2008,  westvent_aa02e,  westvent, westvent,        winbingo,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Western Venture (Ver. AA.02.E)",               MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // 2008/9/8
+GAMEL( 2006,  winbingo,        0,        winbingo,        winbingo,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Win Win Bingo (Ver. GM.03.3, Feb 23 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_winbingo ) // 15:47:48 Feb 23 2006
+GAMEL( 2006,  winbingo_gm051,  winbingo, winbingo,        winbingo,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Win Win Bingo (Ver. GM.05.1, May 11 2006)",    MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING,                                        layout_winbingo ) // 11:02:07 May 1
+GAMEL( 2005,  hacher,          winbingo, hacher,          winbingo,       zoo_state,       empty_init,     ROT0, "bootleg (Gametron)",           "Hacher (hack of Win Win Bingo EN.01.6)",       MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS, layout_winbingo ) // 14:25:46 Mar 10 2005. One bad sprite ROM1 2006. Undumped sprite ROMs
+GAME ( 2005,  wwitch,          0,        wwitch,          magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Wicked Witch (Ver. AA.01.A)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 29/12/05 09:29
+GAME ( 2006,  lwitch,          wwitch,   lwitch,          magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Little Witch (Ver. EN.01.A)",                  MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING ) // 06/01/06 14:08
+GAMEL( 2004,  zoo,             0,        zoo,             magibomb_aa72d, zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Zoo (Ver. ZO.02.D, Aug 27 2004)",              MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION,                              layout_zoo ) // 10:53:44 Aug 27 2004
+GAMEL( 2004,  zulu,            zoo,      zulu,            dinodino,       zoo_state,       empty_init,     ROT0, "Astro Corp.",                  "Zulu (Ver. 2.04J, Feb 3 2004)",                MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING,        layout_zoo ) // 14:06:51 Feb  3 2004

@@ -87,7 +87,11 @@ abc1600_mmu_device::abc1600_mmu_device(machine_config const &mconfig, char const
 	m_s_program_config("mac", ENDIANNESS_BIG, 8, 20, 0, address_map_constructor(FUNC(abc1600_mmu_device::mac_map), this)),
 	m_watchdog(*this, "watchdog"),
 	m_segment_ram(*this, "segment_ram", 0x400, ENDIANNESS_LITTLE),
-	m_page_ram(*this, "page_ram", 0x400*2, ENDIANNESS_LITTLE)
+	m_page_ram(*this, "page_ram", 0x400*2, ENDIANNESS_LITTLE),
+	m_rstbut(false),
+	m_partst(false),
+	m_sysfs(false),
+	m_sysscc(false)
 {
 }
 
@@ -102,7 +106,11 @@ abc1600_mmu_device::mmu::mmu(m68008_device *maincpu, address_space &boot, addres
 	m_super(false),
 	m_boote(0),
 	m_magic(0),
-	m_task(0)
+	m_task(0),
+	m_cause(0),
+	m_bus_end(0),
+	m_refresh(0),
+	m_rack_ready(0)
 {
 	boot.specific(m_boot);
 	program.specific(m_program);
@@ -128,12 +136,17 @@ void abc1600_mmu_device::device_start()
 	// state saving
 	save_item(NAME(m_rstbut));
 	save_item(NAME(m_partst));
+	save_item(NAME(m_sysfs));
+	save_item(NAME(m_sysscc));
 	save_item(NAME(m_dmamap));
 	save_item(NAME(m_mmu->m_super));
 	save_item(NAME(m_mmu->m_boote));
 	save_item(NAME(m_mmu->m_magic));
 	save_item(NAME(m_mmu->m_task));
 	save_item(NAME(m_mmu->m_cause));
+	save_item(NAME(m_mmu->m_bus_end));
+	save_item(NAME(m_mmu->m_refresh));
+	save_item(NAME(m_mmu->m_rack_ready));
 }
 
 void abc1600_mmu_device::device_reset()
@@ -235,13 +248,67 @@ bool abc1600_mmu_device::mmu::translate(int spacenum, int intention, offs_t &add
 	return true;
 }
 
+abc1600_mmu_device::mmu::bus_target abc1600_mmu_device::mmu::physical_target(offs_t physical)
+{
+	if (physical < 0x100000)
+		return bus_target::RAM;
+
+	if (physical >= 0x1fe000)
+		return bus_target::IO;
+
+	return bus_target::OTHER;
+}
+
+void abc1600_mmu_device::mmu::bus_cycle(bus_target target, bool write)
+{
+	// times are in half CPU clock periods, PCLK rises on multiples of 4
+	constexpr u64 REFRESH_PERIOD = 2 * 120; // E/2/6
+	u64 const start = m_maincpu->total_cycles() * 2;
+	u64 wait = 0;
+
+	// refresh starts on a CLK* edge 2.5 clocks after RFRQ when AS is inactive, RACK is held off for 5.5 clocks
+	if (m_refresh + 5 <= start + 1)
+	{
+		m_refresh += ((start + 1 - (m_refresh + 5)) / REFRESH_PERIOD) * REFRESH_PERIOD;
+		m_rack_ready = std::max(m_refresh + 5, m_bus_end + 1) + 11;
+		m_refresh += REFRESH_PERIOD;
+	}
+
+	if (target == bus_target::RAM)
+	{
+		if (m_rack_ready > start + 4)
+			wait = (m_rack_ready - (start + 4)) / 2;
+	}
+	else if (target == bus_target::IO)
+	{
+		auto const next_edge = [] (u64 t, u64 phase) { return t + 1 + ((phase - (t + 1)) & 3); };
+
+		u64 const gds = next_edge(start + (write ? 4 : 2), 2);  // 3C/2
+		u64 const ack = next_edge(gds, 0) + (write ? 4 : 0);   // 11E
+		u64 const ioack = next_edge(ack, 2) + 1;               // 9C/2, 9C/1
+
+		wait = (ioack + 2 - (start + 5)) / 2;
+	}
+
+	m_bus_end = start + 8 + wait * 2;
+
+	if (wait)
+		m_maincpu->adjust_icount(-int(wait));
+}
+
 u8 abc1600_mmu_device::mmu::mmu_read(offs_t logical, int intention)
 {
 	if (!m_boote && (logical < 0x20000))
+	{
+		bus_cycle(bus_target::OTHER, false);
 		return m_boot.read_interruptible(logical);
+	}
 
 	if (!ifc2(intention) && BIT(logical, 19))
+	{
+		bus_cycle(bus_target::OTHER, false);
 		return m_s_program.read_interruptible(logical);
+	}
 
 	bool nonx, wp;
 	offs_t physical = get_physical_address(logical, intention, nonx, wp);
@@ -251,12 +318,15 @@ u8 abc1600_mmu_device::mmu::mmu_read(offs_t logical, int intention)
 		return 0xff;
 	}
 
+	bus_cycle(physical_target(physical), false);
+
 	return m_program.read_interruptible(physical);
 }
 
 void abc1600_mmu_device::mmu::mmu_write(offs_t logical, u8 data)
 {
 	if (!ifc2(TR_WRITE) && BIT(logical, 19)) {
+		bus_cycle(bus_target::OTHER, true);
 		m_s_program.write_interruptible(logical, data);
 		return;
 	}
@@ -268,6 +338,8 @@ void abc1600_mmu_device::mmu::mmu_write(offs_t logical, u8 data)
 		m_maincpu->trigger_bus_error();
 		return;
 	}
+
+	bus_cycle(physical_target(physical), true);
 
 	m_program.write_interruptible(physical, data);
 }
@@ -561,6 +633,9 @@ uint8_t abc1600_mmu_device::dma_mreq_r(int index, int dmamap, offs_t logical)
 		data = space(AS_PROGRAM).read_byte(physical);
 
 		m_write_tren[index](data);
+
+		if (!((index == 0 && m_sysfs) || (index == 1 && m_sysscc)))
+			data = 0xff;
 	}
 	else
 	{

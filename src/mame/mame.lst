@@ -16998,6 +16998,9 @@ sz1
 dg10
 dg20
 
+@source:casio/dh100.cpp
+dh100
+
 @source:casio/fp200.cpp
 fp200
 
@@ -18817,6 +18820,7 @@ vintkeys
 
 @source:ensoniq/enmirage.cpp
 enmirage
+enmirdms
 
 @source:ensoniq/esq1.cpp
 esq1
@@ -21004,6 +21008,9 @@ et3400a
 @source:heathzenith/h8.cpp
 h8
 
+@source:heathzenith/h9.cpp
+h9
+
 @source:heathzenith/h19.cpp
 h19
 
@@ -21521,6 +21528,9 @@ tpad600x
 tpad760xd
 tpad770z
 
+@source:ibm/thinkpad750.cpp
+tpad750cs
+
 @source:ibm/thinkpad8xx.cpp
 tpad850
 
@@ -21721,6 +21731,7 @@ fb2010a
 feverch
 fevercha
 feverchb
+feverchc
 feverchtw
 feverchw4
 fl7_3121
@@ -21765,6 +21776,16 @@ fl7_50_gs37
 fl7_50_gs38
 fl7_50_gs39
 fl7_500
+fl7_500_gs01
+fl7_500_gs02
+fl7_500_gs03
+fl7_500_gs04
+fl7_500_gs05
+fl7_500_gs06
+fl7_500_gs07
+fl7_500_gs08
+fl7_500_gs09
+fl7_500_gs10
 fl7_1000
 fl7_2000
 fl7_2k16
@@ -21802,6 +21823,7 @@ lonestar
 lonestara
 lucky8
 lucky8a
+lucky8aa
 lucky8b
 lucky8c
 lucky8d
@@ -21838,6 +21860,7 @@ magoddsd
 match98
 mbs2euro
 megaline
+mirjoker
 missbingo
 missbingoc
 moonlght
@@ -30271,6 +30294,8 @@ am_mg4sk
 am_mg4v
 am_mg5hu
 fpoker
+starline
+starlinea
 suprstar
 
 @source:misc/amerihok.cpp
@@ -32757,6 +32782,7 @@ fruitstbn
 fruitstbo
 goldnjkr
 goldnjkra
+goldnjkrb
 
 @source:misc/mpu2000.cpp
 gw606
@@ -40891,7 +40917,11 @@ st1714
 jinsanse
 
 @source:sealy/sealy_eagle.cpp
+abaozang
+laiziddz
 qczl
+qqddz
+zduoxing
 
 @source:sealy/sealy_fr.cpp
 snowbwar
@@ -41192,6 +41222,8 @@ mypacgld
 mysf2
 mysinv
 mysinva
+pxp3
+pxp3a
 reactmd
 sarc110
 sarc110a

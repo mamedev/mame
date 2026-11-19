@@ -59,7 +59,7 @@ public:
 	virtual uint8_t header_type_r();
 	virtual uint8_t bist_r();
 	uint32_t address_base_r(offs_t offset);
-	void address_base_w(offs_t offset, uint32_t data);
+	void address_base_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint16_t subvendor_r();
 	uint16_t subsystem_r();
 	uint32_t expansion_base_r();
@@ -119,6 +119,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	void map_bars(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+				  uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space);
 	void skip_map_regs(int count);
 	void add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to = nullptr);
 	template <typename T> void add_map(uint64_t size, int flags, void (T::*map)(address_map &map), const char *name) {

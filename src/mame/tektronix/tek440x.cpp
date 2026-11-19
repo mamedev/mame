@@ -150,6 +150,9 @@ public:
 DEFINE_DEVICE_TYPE(NSCSI_ADAPTEC, nscsi_adaptec_device, "scsi_adaptec", "Adaptec 4000 5.25 Inch Winchester Disk Controller")
 
 
+#define RS232_A_TAG     "rs232a"
+#define RS232_B_TAG     "rs232b"
+
 namespace {
 
 class tek440x_state : public driver_device
@@ -210,6 +213,8 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	void delayed_irq3(int state);
+	void raise_irq3(int state);
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	u16 memory_r(offs_t offset, u16 mem_mask);
@@ -335,6 +340,8 @@ private:
 	u8 m_mouse_pc;
 
 	u8 m_soundrdy;
+	
+	emu_timer *m_irq_delay_timer;
 };
 
 
@@ -397,6 +404,8 @@ void tek440x_state::machine_start()
 
 	// AB is this needed for external MMU?
 	m_maincpu->set_emmu_enable(true);
+	
+	m_irq_delay_timer = timer_alloc(FUNC(tek440x_state::raise_irq3), this);
 }
 
 
@@ -1060,13 +1069,12 @@ void tek440x_state::kb_tdata_w(int state)
 
 void tek440x_state::timer_irq(int state)
 {
-	LOGMASKED(LOG_IRQ,"%10s: irq1_raise %04x\n", machine().time().as_string(8), state);
+	LOGMASKED(LOG_IRQ,"%10s: timer IRQ_1 state(%d)\n", machine().time().as_string(8), state);
 
 	if (!machine().side_effects_disabled())
 	{
 		if (state == 0)
 		{
-			//LOG("M68K_IRQ_1 assert\n");
 			m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 
 			m_u244latch = true;
@@ -1088,7 +1096,7 @@ u16 tek440x_state::timer_r(offs_t offset)
 	{
 		if (m_u244latch)
 		{
-			LOGMASKED(LOG_IRQ,"timer_r: M68K_IRQ_1 clear\n");
+			LOGMASKED(LOG_IRQ,"timer_r: IRQ_1 clear\n");
 			m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 			m_u244latch = false;
 		}
@@ -1231,6 +1239,7 @@ void tek440x_state::physical_map(address_map &map)
 	// 786000-787fff: spare
 	map(0x788000, 0x788000).w(FUNC(tek440x_state::sound_w));
 	map(0x78a000, 0x78bfff).rw(FUNC(tek440x_state::fpu_r),FUNC(tek440x_state::fpu_w));
+	// this is the DEBUG serial port
 	map(0x78c000, 0x78c007).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write)).umask16(0xff00);
 	// 78e000-78ffff: spare
 
@@ -1285,10 +1294,9 @@ static INPUT_PORTS_START( tek4404 )
 	PORT_BIT( 0x00ff, 0, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START("MOUSEBTN")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Button 1") PORT_CODE(MOUSECODE_BUTTON1)       // left
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mouse Button 2") PORT_CODE(MOUSECODE_BUTTON2)       // right
-	// FIXME: why does this not work?
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mouse Button 3") PORT_CODE(MOUSECODE_BUTTON3)       // middle
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Mouse Button 1")      // left
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Mouse Button 2")      // right
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Mouse Button 3")      // middle
 INPUT_PORTS_END
 
 /*************************************
@@ -1301,6 +1309,30 @@ static void scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_ADAPTEC);
 	device.option_add("tek_msu_fdc", TEK_MSU_FDC);
+}
+
+
+// ncr5385 emulation raises IRQ3 on last byte written where 68000 relies on there being time after last write to clear
+// internal flags before waiting for IRQ, so IRQ processed then CPU continues clearing flags and waits forever.
+TIMER_CALLBACK_MEMBER(tek440x_state::raise_irq3)
+{
+	m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
+}
+
+void tek440x_state::delayed_irq3(int state)
+{
+	LOGMASKED(LOG_IRQ, "%s: \033[31mdelayed_irq3 state(%d)\033[0m\n", machine().time().as_string(8), state);
+
+	if (state)
+	{
+		// give target some time
+		m_irq_delay_timer->adjust(attotime::from_usec(30));
+	}
+	else
+	{
+		m_irq_delay_timer->adjust(attotime::never);
+		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+	}
 }
 
 // interrupts
@@ -1344,11 +1376,6 @@ void tek440x_state::tek4404(machine_config &config)
 	});
 	PALETTE(config, "palette", FUNC(tek440x_state::palette),2);
 
-	MOS6551(config, m_acia, 40_MHz_XTAL / 4 / 10);
-	m_acia->set_xtal(1.8432_MHz_XTAL);
-	m_acia->txd_handler().set("rs232", FUNC(rs232_port_device::write_txd));
-	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
-
 	I8255A(config, m_printer);
 	m_printer->in_pb_callback().set_constant(0x30);
 	// HACK:  vblank always checks if printer status < 0
@@ -1375,11 +1402,32 @@ void tek440x_state::tek4404(machine_config &config)
 
 	X2210(config, m_novram);
 
+	// primary rs232 connection /dev/comm  (tagging as "terminal" makes mame open double-width window)
+	rs232_port_device &rs232a(RS232_PORT(config, RS232_A_TAG, default_rs232_devices, nullptr));
+	rs232a.rxd_handler().set("duart", FUNC(mc68681_device::rx_b_w));
+	rs232a.cts_handler().set("duart", FUNC(mc68681_device::ip0_w));
+
+	// DEBUG serial port
+	MOS6551(config, m_acia, 40_MHz_XTAL / 4 / 10);
+	m_acia->set_xtal(1.8432_MHz_XTAL);
+	m_acia->txd_handler().set(RS232_B_TAG, FUNC(rs232_port_device::write_txd));
+	m_acia->irq_handler().set_inputline(m_maincpu, M68K_IRQ_7);
+
+	rs232_port_device &rs232b(RS232_PORT(config, RS232_B_TAG, default_rs232_devices, nullptr));
+	rs232b.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
+	rs232b.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
+	rs232b.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
+	rs232b.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
+
 	MC68681(config, m_duart, 14.7456_MHz_XTAL / 4);
+	// CHAN A: keyboard
 	m_duart->irq_cb().set_inputline(m_maincpu, M68K_IRQ_5); // auto-vectored
 	m_duart->outport_cb().set(FUNC(tek440x_state::kb_rclamp_w)).bit(4);
 	m_duart->outport_cb().append(m_keyboard, FUNC(tek410x_keyboard_device::reset_w)).bit(3);
 	m_duart->a_tx_cb().set(m_keyboard, FUNC(tek410x_keyboard_device::kdi_w));
+	// CHAN B: /dev/comm
+	m_duart->outport_cb().append(RS232_A_TAG, FUNC(rs232_port_device::write_rts)).bit(0);
+	m_duart->b_tx_cb().set(RS232_A_TAG, FUNC(rs232_port_device::write_txd));
 
 	TEK410X_KEYBOARD(config, m_keyboard);
 	m_keyboard->tdata_callback().set(FUNC(tek440x_state::kb_tdata_w));
@@ -1407,13 +1455,7 @@ void tek440x_state::tek4404(machine_config &config)
 	// clock crystal p2.2-25
 	NCR5385(config, m_scsi, 40_MHz_XTAL / 4);
 	scsi.set_external_device(7, m_scsi);
-	m_scsi->irq().set_inputline(m_maincpu, M68K_IRQ_3);
-
-	rs232_port_device &rs232(RS232_PORT(config, "rs232", default_rs232_devices, nullptr));
-	rs232.rxd_handler().set(m_acia, FUNC(mos6551_device::write_rxd));
-	rs232.dcd_handler().set(m_acia, FUNC(mos6551_device::write_dcd));
-	rs232.dsr_handler().set(m_acia, FUNC(mos6551_device::write_dsr));
-	rs232.cts_handler().set(m_acia, FUNC(mos6551_device::write_cts));
+	m_scsi->irq().set(FUNC(tek440x_state::delayed_irq3));
 
 	SPEAKER(config, "mono").front_center();
 

@@ -8,6 +8,8 @@
 #include "sh3comn.h"
 #include "sh4dmac.h"
 
+#include <algorithm>
+
 static const int dmasize[8] = { 8, 1, 2, 4, 32, 0, 0, 0 };
 
 static const int sh3_dmasize[4] = { 1, 2, 4, 16 };
@@ -418,6 +420,108 @@ int sh34_base_device::sh4_dma_data(struct sh4_device_dma *s)
 	}
 	else
 		return 0;
+}
+
+// called by drivers when an external device takes data from a channel in on-demand data transfer mode
+// (DMAOR.DDT) set for external request, single address mode, memory to device.  'count' is in transfer
+// units; each unit goes in one element of 'buffer' (a 32-byte unit fills four).  Returns the units read
+// and completes the channel when its count reaches zero; 'done' tells whether this call completed it.
+uint32_t sh34_base_device::sh4_dma_external_read(int channel, uint64_t *buffer, uint32_t count, bool &done)
+{
+	done = false;
+	uint32_t *sar, *dmatcr;
+	uint32_t chcr;
+	switch (channel)
+	{
+	case 0:
+		sar = &m_sar0;
+		dmatcr = &m_dmatcr0;
+		chcr = m_chcr0;
+		break;
+	case 1:
+		sar = &m_sar1;
+		dmatcr = &m_dmatcr1;
+		chcr = m_chcr1;
+		break;
+	case 2:
+		sar = &m_sar2;
+		dmatcr = &m_dmatcr2;
+		chcr = m_chcr2;
+		break;
+	case 3:
+		sar = &m_sar3;
+		dmatcr = &m_dmatcr3;
+		chcr = m_chcr3;
+		break;
+	default:
+		return 0;
+	}
+
+	if (!count || (m_cpu_type != CPU_TYPE_SH4) || !(m_dmaor & DMAOR_DDT) || ((chcr & CHCR_RS) >> 8) != 2)
+		return 0;
+	if (!(chcr & m_dmaor & DMAOR_DME) || (chcr & CHCR_TE) || (m_dmaor & (DMAOR_AE | DMAOR_NMIF)) || m_dma_timer_active[channel])
+		return 0;
+
+	const int incs = (chcr & CHCR_SM) >> 12;
+	const int size = dmasize[(chcr & CHCR_TS) >> 4];
+	if (!size || incs == 3)
+	{
+		logerror("SH4: DMA %d: bad external read setup (%d, %d, %04x)\n", channel, incs, size, chcr);
+		return 0;
+	}
+
+	uint32_t src = *sar & SH34_AM;
+	if (src & (size - 1))
+	{
+		// a source address off the transfer size boundary is an address error: the DMAC halts on all channels
+		logerror("SH4: DMA %d: address error, source %08x not aligned to %d bytes\n", channel, src, size);
+		m_dmaor |= DMAOR_AE;
+		sh4_exception_request(SH4_INTC_DMAE);
+		return 0;
+	}
+
+	uint32_t remaining = *dmatcr ? *dmatcr : 0x1000000;
+	count = std::min(count, remaining);
+
+	// SAR holds the next source address: read from it, then step
+	for (uint32_t pos = 0; pos < count; pos++)
+	{
+		const uint32_t address = src & SH34_AM;
+		switch (size)
+		{
+		case 1:
+			*buffer++ = m_program->read_byte(address);
+			break;
+		case 2:
+			*buffer++ = m_program->read_word(address);
+			break;
+		case 4:
+			*buffer++ = m_program->read_dword(address);
+			break;
+		case 8:
+			*buffer++ = m_program->read_qword(address);
+			break;
+		case 32:
+			for (int i = 0; i < 32; i += 8)
+				*buffer++ = m_program->read_qword((address + i) & SH34_AM);
+			break;
+		}
+		if (incs == 1)
+			src += size;
+		else if (incs == 2)
+			src -= size;
+	}
+	*sar = (*sar & ~SH34_AM) | (src & SH34_AM);
+
+	remaining -= count;
+	*dmatcr = remaining;
+	if (!remaining) // all data transferred ?
+	{
+		m_dma_timer_active[channel] = 1;
+		m_dma_timer[channel]->adjust(attotime::zero, channel);
+		done = true;
+	}
+	return count;
 }
 
 // called by drivers to transfer data in a DDT dma.

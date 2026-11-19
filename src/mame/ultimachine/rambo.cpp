@@ -86,7 +86,7 @@ void rambo_state::rambo(machine_config &config)
 	m_maincpu->set_addrmap(AS_DATA, &rambo_state::rambo_data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->set_low_fuses(0xff);
-	m_maincpu->set_high_fuses(0xd0);
+	m_maincpu->set_high_fuses(0xd1); // actually 0xd0, but stk500 bootloader uses spm opcodes
 	m_maincpu->set_extended_fuses(0xfd);
 	m_maincpu->set_lock_bits(0x0f);
 	m_maincpu->gpio_in<atmega2560_device::GPIOA>().set([this]() { return m_port_a; });

@@ -546,6 +546,10 @@ void maciici_state::maciixi_base(machine_config &config)
 	m_scc->out_int_callback().set(FUNC(maciici_state::scc_irq_w));
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	// mini-DIN-8 serial ports: HSKo (pin 1) is driven from the SCC's /DTR
+	// through a 26LS30 line driver; GPi (pin 7) reaches /DCD
+	m_scc->out_dtra_callback().set("modem", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_dtrb_callback().set("printer", FUNC(rs232_port_device::write_dtr));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));

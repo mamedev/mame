@@ -18,6 +18,7 @@
 #include "machine/dp83932c.h"
 
 namespace {
+
 class nubus_enetlctp_device :
 	public device_t,
 	public device_nubus_card_interface
@@ -36,7 +37,7 @@ protected:
 	required_device<dp83932c_device> m_sonic;
 
 private:
-	void card_map(address_map &map);
+	void card_map(address_map &map) ATTR_COLD;
 	u16 ethernet_mac_r(offs_t offset, u16 mem_mask);
 	u8 mac_prom(offs_t index) const;
 
@@ -110,12 +111,12 @@ nubus_enetlc_device::nubus_enetlc_device(const machine_config &mconfig, const ch
 void nubus_enetlctp_device::card_map(address_map &map)
 {
 	// LC and LC II mappings
-	map(0x8000'0000, 0x8000'01ff).m(m_sonic, FUNC(dp83932c_device::map)).umask32(0xffff0000);
+	map(0x8000'0000, 0x8000'01ff).umask32(0xffff'0000).m(m_sonic, FUNC(dp83932c_device::map));
 	map(0x8004'0000, 0x8004'01ff).r(FUNC(nubus_enetlctp_device::ethernet_mac_r));
 	map(0x8040'0000, 0x8040'01ff).r(FUNC(nubus_enetlctp_device::ethernet_mac_r));
 
 	// LC III and LC5xx mappings
-	map(0xfe00'0000, 0xfe00'01ff).m(m_sonic, FUNC(dp83932c_device::map)).umask32(0xffff0000);
+	map(0xfe00'0000, 0xfe00'01ff).umask32(0xffff'0000).m(m_sonic, FUNC(dp83932c_device::map));
 	map(0xfe04'0000, 0xfe04'0007).r(FUNC(nubus_enetlctp_device::ethernet_mac_r));
 	map(0xfe40'0000, 0xfe40'0007).r(FUNC(nubus_enetlctp_device::ethernet_mac_r));
 }

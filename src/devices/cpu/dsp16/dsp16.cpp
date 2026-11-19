@@ -64,6 +64,7 @@
     the current value in the input register and initiates a read.
 
     TODO:
+    * A DSP16A with the 8 kiloword ROM option only has 1 kiloword of RAM
     * PSW overflow bits - are they sticky, how are they reset?
     * Clarify rounding behaviour (F2 1011)
     * Random condition (CON 01000/01001)
@@ -2071,10 +2072,18 @@ dsp16_device::dsp16_device(machine_config const &mconfig, char const *tag, devic
 {
 }
 
+void dsp16_device::device_start()
+{
+	dsp16_device_base::device_start();
+
+	if (m_rom.length() != 0x0800)
+		throw emu_fatalerror("dsp16(%s): Invalid ROM size (must be 2K words)", tag());
+}
+
 void dsp16_device::external_memory_enable(address_space &space, bool enable)
 {
 	// manual implies the DSP16 doesn't support enabling both internal and external ROM at the same time (page 2-2)
-	// this assumes internal ROM is mirrored above 2KiB, but actual hardware behaviour is unknown
+	// this assumes internal ROM is mirrored above 2 kilowords, but actual hardware behaviour is unknown
 	space.unmap_read(0x0000, 0xffff);
 	if (enable)
 		space.install_read_handler(0x0000, 0xffff, read16s_delegate(*this, FUNC(dsp16_device::external_memory_r<0x0000>)));
@@ -2103,6 +2112,22 @@ dsp16a_device::dsp16a_device(machine_config const &mconfig, char const *tag, dev
 {
 }
 
+void dsp16a_device::device_start()
+{
+	dsp16_device_base::device_start();
+
+	switch (m_rom.length())
+	{
+	case 0x1000:
+	case 0x2000:
+	case 0x3000:
+	case 0x6000:
+		break;
+	default:
+		throw emu_fatalerror("dsp16a(%s): Invalid ROM size (must be 4K, 8K, 12K or 24K words)", tag());
+	}
+}
+
 void dsp16a_device::external_memory_enable(address_space &space, bool enable)
 {
 	space.unmap_read(0x0000, 0xffff);
@@ -2112,8 +2137,22 @@ void dsp16a_device::external_memory_enable(address_space &space, bool enable)
 	}
 	else
 	{
-		space.install_rom(0x0000, 0x0fff, &m_rom[0]);
-		space.install_read_handler(0x1000, 0xffff, read16s_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x1000>)));
+		space.install_rom(0x0000, m_rom.length() - 1, &m_rom[0]);
+		switch (m_rom.length())
+		{
+		case 0x1000:
+			space.install_read_handler(0x1000, 0xffff, read16s_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x1000>)));
+			break;
+		case 0x2000:
+			space.install_read_handler(0x2000, 0xffff, read16s_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x2000>)));
+			break;
+		case 0x3000:
+			space.install_read_handler(0x3000, 0xffff, read16s_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x3000>)));
+			break;
+		case 0x6000:
+			space.install_read_handler(0x6000, 0xffff, read16s_delegate(*this, FUNC(dsp16a_device::external_memory_r<0x6000>)));
+			break;
+		}
 	}
 }
 

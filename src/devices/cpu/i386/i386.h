@@ -1659,6 +1659,20 @@ public:
 	mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
+	mediagx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+};
+
+
+class mediagxm_device : public mediagx_device
+{
+public:
+	// construction/destruction
+	mediagxm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 };
@@ -1728,6 +1742,7 @@ DECLARE_DEVICE_TYPE(I486DX4,     i486dx4_device)
 DECLARE_DEVICE_TYPE(PENTIUM,     pentium_device)
 DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(MEDIAGX,     mediagx_device)
+DECLARE_DEVICE_TYPE(MEDIAGXM,    mediagxm_device)
 DECLARE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device)
 DECLARE_DEVICE_TYPE(PENTIUM2,    pentium2_device)
 DECLARE_DEVICE_TYPE(PENTIUM3,    pentium3_device)

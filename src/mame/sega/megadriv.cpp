@@ -240,7 +240,7 @@ uint16_t md_base_state::m68k_version_read()
 	*/
 	LOG("%s: read version register\n", machine().describe_context());
 	// Version number contained in bits 3-0 (TMSS)
-	uint16_t const retdata = m_version_hi_nibble | m_version_lo_nibble;
+	uint16_t const retdata = m_active_version_hi_nibble | m_version_lo_nibble;
 
 	return retdata | (retdata << 8);
 }
@@ -675,6 +675,8 @@ void md_base_state::machine_start()
 	md_core_state::machine_start();
 
 	m_genz80.z80_run_timer = timer_alloc(FUNC(md_base_state::megadriv_z80_run_state), this);
+
+	save_item(NAME(m_active_version_hi_nibble));
 }
 
 void md_base_state::machine_reset()
@@ -692,6 +694,8 @@ void md_base_state::machine_reset()
 
 	if (m_megadrive_ram)
 		memset(m_megadrive_ram, 0x00, 0x10000);
+
+	m_active_version_hi_nibble = m_version_hi_nibble;
 }
 
 

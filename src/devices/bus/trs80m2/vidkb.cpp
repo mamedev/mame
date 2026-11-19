@@ -401,9 +401,16 @@ void trs80m2_vidkb_device_base::kb_clock_w(int state)
 
 MC6845_UPDATE_ROW( trs80m2_vidkb_device_base::crtc_update_row )
 {
+	int const row = vbp + y;
+
+	if (row > bitmap.cliprect().bottom())
+		return;
+
 	pen_t const *const pen = m_palette->pens();
 
-	uint32_t *dst = &bitmap.pix(vbp + y, hbp);
+	std::fill_n(&bitmap.pix(row), bitmap.width(), pen[0]);
+
+	uint32_t *dst = &bitmap.pix(row, hbp);
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -417,7 +424,7 @@ MC6845_UPDATE_ROW( trs80m2_vidkb_device_base::crtc_update_row )
 		for (int bit = 0; bit < 8; bit++)
 		{
 			int const dout = BIT(data, 7);
-			int const color = (dcursor ^ drevid ^ dout) && de;
+			int const color = (dcursor ^ drevid ^ dout) && de && !m_blnkvid;
 
 			*dst++ = pen[color];
 
@@ -428,10 +435,5 @@ MC6845_UPDATE_ROW( trs80m2_vidkb_device_base::crtc_update_row )
 
 uint32_t trs80m2_vidkb_device_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	bitmap.fill(rgb_t::black(), cliprect);
-
-	if (!m_blnkvid)
-		m_crtc->screen_update(screen, bitmap, cliprect);
-
-	return 0;
+	return m_crtc->screen_update(screen, bitmap, cliprect);
 }

@@ -511,10 +511,7 @@ bool mc6845_device::match_line()
 {
 	/* Check if we've reached the end of active display */
 	if (m_line_counter == m_vert_disp)
-	{
 		m_line_enable_ff = false;
-		m_current_disp_addr = m_disp_start_addr;
-	}
 
 	/* Check if VSYNC should be enabled */
 	if (m_line_counter == m_vert_sync_pos)
@@ -921,7 +918,7 @@ uint32_t mc6845_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		/* call the set up function if any */
 		m_begin_update_cb(bitmap, cliprect);
 
-		if (cliprect.top() == 0)
+		if (cliprect.top() == 0 || cliprect.top() == screen.visible_area().top())
 		{
 			/* read the start address at the beginning of the frame */
 			m_current_disp_addr = m_disp_start_addr;

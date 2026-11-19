@@ -779,6 +779,7 @@ protected:
 	uint32_t m_addr_mask;
 	bool m_sleeping;
 	bool m_sei_delay_pending;
+	bool m_power_on;
 
 	// other internal states
 	int m_icount;
@@ -1080,6 +1081,7 @@ protected:
 	uint8_t m_spi_prescale_count;
 	int8_t m_spi_prescale_countdown;
 	uint8_t m_spi_rx_shift;
+	uint8_t m_spi_tx_shift;
 
 	// timers
 	void gtccr_w(uint8_t data);

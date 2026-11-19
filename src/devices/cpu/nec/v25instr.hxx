@@ -75,6 +75,25 @@ OP( 0x0f, i_pre_v25  ) { uint32_t ModRM, tmp, tmp2;
 		case 0x92 : FINT; CLK(2); m_no_interrupt = 1; break;
 		case 0x94 : GetRB; TSKSW; CLK(20); break;
 		case 0x95 : GetRB; MOVSPB; CLK(11); break;
+		case 0x9c : // BTCLR sfr, imm3, rel8 (flags are unaffected)
+		{
+			const uint16_t sfr = 0x100 | fetch();
+			const uint8_t mask = 1U << (fetch() & 7);
+			const int8_t displacement = fetch();
+			const uint8_t value = m_data.read_byte(sfr);
+			if (value & mask)
+			{
+				m_data.write_byte(sfr, value & ~mask);
+				m_ip += displacement;
+				CHANGE_PC;
+				CLK(29);
+			}
+			else
+			{
+				CLK(21);
+			}
+			break;
+		}
 		case 0x9e : logerror("%06x: STOP\n",PC()); m_icount=0; break;
 		default:    logerror("%06x: Unknown V25 instruction\n",PC()); break;
 	}
