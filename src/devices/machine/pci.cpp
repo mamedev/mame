@@ -158,6 +158,8 @@ void pci_device::device_start()
 	bank_reg_count = 0;
 
 	save_item(STRUCT_MEMBER(bank_infos, adr));
+	save_item(STRUCT_MEMBER(bank_infos, size));
+	save_item(STRUCT_MEMBER(bank_infos, flags));
 	save_item(NAME(command));
 	save_item(NAME(command_mask));
 	save_item(NAME(status));

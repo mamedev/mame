@@ -64,6 +64,7 @@ public:
 
 	// call before a CPU samples the bus; returns false after setting up a retry of the access
 	bool sample_ready(cpu_device &cpu);
+	bool sample_ready();
 
 	// reads for both host and peripherals
 	uint8_t dio_r() { return read_signal(DIO); }

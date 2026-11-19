@@ -160,7 +160,7 @@ void vt8231_acpi_device::general_configuration_0_w(uint8_t data)
 
 void vt8231_acpi_device::power_well_control_w(uint8_t data)
 {
-	LOGMASKED(LOG_REG, "m_power_well_control: %02x\n", data);
+	LOGMASKED(LOG_REG, "power_well_control_w: %02x\n", data);
 	m_power_well_control = data;
 }
 
