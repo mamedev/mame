@@ -13,12 +13,12 @@
         - 32 channels wavetable synth (8bit linear, 16bit linear and 8bit ulaw sample format)
         - Custom 2D video rendering device (texture mapping, alphablend, roz)
 
-    The protection is a PIC device labeled SMART-IC in the ROM board, I'm not sure how
-    it exactly works, but it supplies some opcodes that have been replaced with garbage
-    in the main program. I don't know if it traps reads and returns the correct ones when
-    reading from flash, or if it's interfaced by the main program after copying the program
-    from flash to RAM and it provides the addresses and values to patch. I patch the flash
-    program with the correct data
+    The SMART-IC protection PIC authenticates over a bit-banged serial link and returns
+    encrypted address/data records. The main CPU decrypts these records and repairs
+    deliberately damaged instructions after copying the program from flash to RAM.
+    Patching flash alone leaves failed authentication results behind: Donghaer and
+    Office Yeoin Cheonha contain timer handlers that then corrupt arbitrary work RAM.
+    Dumped PICs are executed; undumped PICs use a simulation of their serial protocol.
 
     MAME driver by ElSemi
     Additional work and refactoring by Angelo Salese
@@ -27,9 +27,10 @@
     - Move flash memory implementation into machine/intelfsh.cpp
     - provide NVRAM defaults where applicable;
     - add an actual reset button (helps with inp record/playback);
-    - donghaer: very randomly corrupts itself during gameplay, or outright crashes;
     - wulybuly: inputs, not extensively tested;
-    - maldaiza: PIC protection, inputs, requires superhuman mashing which looks quite off;
+    - maldaiza: verify alternate prize dispensers and mechanical timing against hardware;
+    - protection HLE: verify timing, EEPROM defaults and Crystal of Kings nonce generation
+      against original PICs when dumps or hardware traces become available;
     - urachamu: some animation timings seems off, like bat hit animation before starting a given game.
       They were actually too fast before adding 30 Hz vblank for interlace mode, even if the game don't
       really read crtc blanking reg or use any other interrupt but the coin ones;
@@ -140,16 +141,557 @@ Notes:
 #include "machine/ds1302.h"
 #include "machine/eepromser.h"
 #include "machine/nvram.h"
+#include "machine/ticket.h"
 #include "machine/vrender0.h"
 
 #include "speaker.h"
 
 #include "endianness.h"
+#include "multibyte.h"
 
 #include <algorithm>
+#include <array>
+#include <cassert>
+
+#define LOG_PROTECTION (1U << 1)
+#include "logmacro.h"
 
 
 namespace {
+
+// The host and PIC use DES with reversed bit numbering within each byte.
+// Tables are decoded from the cartridge's host protection module.
+namespace crystal_prot {
+
+using block = std::array<u8, 8>;
+using schedule = std::array<u8, 128>;
+using tables = std::array<u8, 0x298>;
+
+enum : u16
+{
+	PC1 = 0x000,
+	PC2 = 0x038,
+	KEY_BYTES = 0x068,
+	KEY_BITS = 0x098,
+	IP = 0x0c8,
+	FP = 0x108,
+	EXPAND = 0x148,
+	SBOX = 0x178,
+	PERMUTE = 0x278
+};
+
+schedule make_schedule(const block &key, const tables &table)
+{
+	const u64 raw = get_u64le(key.data()) & 0x00ff'ffff'ffff'ffff;
+	u64 cd = 0;
+	for (u32 i = 0; i < 56; ++i)
+		cd |= u64(BIT(raw, table[PC1 + i])) << i;
+	u32 c = cd & 0x0fff'ffff;
+	u32 d = cd >> 28;
+	schedule result{};
+	for (u32 r = 0; r < 16; ++r)
+	{
+		const u32 shift = (r == 0 || r == 1 || r == 8 || r == 15) ? 1 : 2;
+		c = ((c >> shift) | (c << (28 - shift))) & 0x0fff'ffff;
+		d = ((d >> shift) | (d << (28 - shift))) & 0x0fff'ffff;
+		cd = c | (u64(d) << 28);
+		u64 packed = 0;
+		for (u32 i = 0; i < 48; ++i)
+			packed |= u64(BIT(cd, table[PC2 + i])) << i;
+		for (u32 i = 0; i < 48; ++i)
+			result[8 * r + i / 6] |= BIT(packed, 8 * table[KEY_BYTES + i] + table[KEY_BITS + i]) << (i % 6);
+	}
+	return result;
+}
+
+block transform(block data, const schedule &keys, const tables &table)
+{
+	for (u32 r = 0; r < 16; ++r)
+	{
+		const u32 src = (r & 1) ? 4 : 0;
+		const u32 dst = src ^ 4;
+		u8 groups[8]{};
+		u8 sub[4]{};
+		for (u32 g = 0; g < 8; ++g)
+		{
+			for (u32 i = 0; i < 6; ++i)
+			{
+				const u8 bit = table[EXPAND + 6 * g + i];
+				groups[g] |= BIT(data[src + bit / 8], bit & 7) << i;
+			}
+			groups[g] ^= keys[8 * r + g];
+		}
+		for (u32 i = 0; i < 4; ++i)
+			sub[i] = (table[SBOX + 64 * i + groups[2 * i]] & 0x0f) | (table[SBOX + 64 * i + groups[2 * i + 1]] & 0xf0);
+		for (u32 g = 0; g < 4; ++g)
+		{
+			for (u32 i = 0; i < 8; ++i)
+			{
+				const u8 bit = table[PERMUTE + 8 * g + i];
+				data[dst + g] ^= BIT(sub[bit / 8], bit & 7) << i;
+			}
+		}
+	}
+	return data;
+}
+
+block permutation(const block &data, const u8 *table)
+{
+	const u64 raw = get_u64le(data.data());
+	u64 result = 0;
+	for (u32 i = 0; i < 64; ++i)
+		result |= u64(BIT(raw, table[i])) << i;
+	block bytes;
+	put_u64le(bytes.data(), result);
+	return bytes;
+}
+
+block encrypt(const block &data, const schedule &keys, const tables &table)
+{
+	block initial = permutation(data, &table[IP]);
+	std::swap_ranges(initial.begin(), initial.begin() + 4, initial.begin() + 4);
+	return permutation(transform(initial, keys, table), &table[FP]);
+}
+
+block simple_transform(block state, const block &data)
+{
+	for (u32 i = 0; i < 8; ++i)
+	{
+		u8 v = u8(state[i] + data[i]) ^ data[i];
+		v = (v >> 1) | (v << 7);
+		state[i] = ~u8((v >> 4) | (v << 4));
+	}
+	return state;
+}
+
+} // namespace crystal_prot
+
+
+// HLE for the undumped PICs, reconstructed from the matching SE3208 code
+// and the Office Yeoin Cheonha/Top Blade V firmware. The SE3208 performs
+// authentication, decrypts the returned records and writes its own RAM.
+// This device has no access to the host address space.
+//
+// The Crystal of Kings uses an older command assignment and authentication
+// transform. The later games use the DES round function and rolling serial
+// XOR masks seen in Top Blade V. Their host code reads counters at EEPROM
+// 0x7c/0x7d, despite the tentative PIC16F84A labels in the ROM definitions.
+// EEPROM defaults, instruction-level delays and the older nonce table are
+// unknown; this models the host-visible protocol, not an undumped firmware.
+class crystal_hle_device : public device_t, public device_nvram_interface
+{
+public:
+	struct configuration
+	{
+		bool legacy = false;
+		u32 key_offset = 0;
+		u32 mask_offset = 0;
+		char identifier[20]{};
+		std::array<u32, 8> records{};
+	};
+
+	crystal_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+	void set_config(const configuration &config) { m_config = &config; }
+	void set_flash_region(const finder_base &finder) { m_flash.set_tag(finder); }
+	auto data_callback() { return m_data_cb.bind(); }
+	void lines_w(int reset, int data);
+	int data_r() const { return m_output; }
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// device_nvram_interface implementation
+	virtual void nvram_default() override { m_eeprom.fill(0); }
+	virtual bool nvram_read(util::read_stream &file) override;
+	virtual bool nvram_write(util::write_stream &file) override;
+
+private:
+	enum : u8 { BOOT_TX, BOOT_RX, COMMAND, AUTH_A, AUTH_B, AUTH_REPLY, ECHO, EE_ADDRESS, EE_COUNT, EE_WRITE };
+
+	bool old_protocol() const { return m_config->legacy; }
+	u8 eeprom_mask() const { return old_protocol() ? 63 : 127; }
+	void output_w(int state);
+	void receive(u8 data);
+	void send(u8 data);
+	void expect(u8 state, u16 count);
+	TIMER_CALLBACK_MEMBER(rx_tick);
+	TIMER_CALLBACK_MEMBER(tx_tick);
+
+	required_region_ptr<u32> m_flash;
+	devcb_write_line m_data_cb;
+	const configuration *m_config;
+	crystal_prot::block m_key, m_auth, m_session;
+	crystal_prot::schedule m_keys;
+	crystal_prot::tables m_tables;
+	std::array<u8, 32> m_patch;
+	std::array<u8, 128> m_eeprom;
+	std::array<u8, 256> m_input;
+	std::array<u8, 512> m_output_queue;
+	u16 m_in_count, m_expected, m_out_head, m_out_count;
+	u8 m_state, m_mask, m_status, m_rx_key, m_tx_key, m_address, m_command;
+	bool m_reset, m_line, m_output, m_receiving;
+	u8 m_rx_bit, m_rx_byte, m_rx_parity;
+	s32 m_tx_bit;
+	u8 m_tx_byte, m_tx_parity;
+	emu_timer *m_rx_timer, *m_tx_timer;
+};
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(CRYSTAL_HLE, crystal_hle_device, crystal_hle_device, "crystal_hle", "Crystal System protection (HLE)")
+
+namespace {
+
+crystal_hle_device::crystal_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, CRYSTAL_HLE, tag, owner, clock),
+	device_nvram_interface(mconfig, *this),
+	m_flash(*this, finder_base::DUMMY_TAG),
+	m_data_cb(*this),
+	m_config(nullptr)
+{
+}
+
+void crystal_hle_device::device_start()
+{
+	if (!m_config)
+		fatalerror("%s: protection configuration is missing\n", tag());
+
+	// Decode the key and DES tables from the cartridge's host protection module.
+	// Table offsets are relative to its XOR mask, and include linear bit indices
+	// in place of the PIC's equivalent byte/mask pairs.
+	if (u64(m_config->key_offset) + m_key.size() > m_flash.bytes()
+		|| u64(m_config->mask_offset) + 0x100 + m_tables.size() > m_flash.bytes()
+		|| (m_config->mask_offset & 3))
+		fatalerror("%s: invalid protection data location in cartridge ROM\n", tag());
+	const u32 mask = m_flash[m_config->mask_offset / 4];
+	const auto read_byte = [this, mask] (u32 offset) -> u8
+	{
+		return BIT(m_flash[offset / 4] ^ mask, 8 * (offset & 3), 8);
+	};
+	// The Crystal of Kings key is unaligned. Its older authentication uses all
+	// eight bytes; the DES key schedule uses only the first seven.
+	for (u32 i = 0; i < m_key.size(); ++i)
+		m_key[i] = read_byte(m_config->key_offset + i);
+	for (u32 i = 0; i < m_tables.size(); ++i)
+		m_tables[i] = read_byte(m_config->mask_offset + 0x100 + i);
+	m_keys = crystal_prot::make_schedule(m_key, m_tables);
+	for (u32 i = 0; i < 4; ++i)
+	{
+		crystal_prot::block block;
+		put_u32le(&block[0], m_config->records[2 * i]);
+		put_u32le(&block[4], m_config->records[2 * i + 1]);
+		const auto encrypted = crystal_prot::encrypt(block, m_keys, m_tables);
+		std::copy(encrypted.begin(), encrypted.end(), &m_patch[8 * i]);
+	}
+	m_reset = false;
+	m_line = m_output = true;
+	m_eeprom.fill(0);
+	m_input.fill(0);
+	m_output_queue.fill(0);
+	m_rx_timer = timer_alloc(FUNC(crystal_hle_device::rx_tick), this);
+	m_tx_timer = timer_alloc(FUNC(crystal_hle_device::tx_tick), this);
+	save_item(NAME(m_auth));
+	save_item(NAME(m_session));
+	save_item(NAME(m_eeprom));
+	save_item(NAME(m_input));
+	save_item(NAME(m_output_queue));
+	save_item(NAME(m_in_count));
+	save_item(NAME(m_expected));
+	save_item(NAME(m_out_head));
+	save_item(NAME(m_out_count));
+	save_item(NAME(m_state));
+	save_item(NAME(m_mask));
+	save_item(NAME(m_status));
+	save_item(NAME(m_rx_key));
+	save_item(NAME(m_tx_key));
+	save_item(NAME(m_address));
+	save_item(NAME(m_command));
+	save_item(NAME(m_reset));
+	save_item(NAME(m_line));
+	save_item(NAME(m_output));
+	save_item(NAME(m_receiving));
+	save_item(NAME(m_rx_bit));
+	save_item(NAME(m_rx_byte));
+	save_item(NAME(m_rx_parity));
+	save_item(NAME(m_tx_bit));
+	save_item(NAME(m_tx_byte));
+	save_item(NAME(m_tx_parity));
+}
+
+void crystal_hle_device::device_reset()
+{
+	m_rx_timer->adjust(attotime::never);
+	m_tx_timer->adjust(attotime::never);
+	m_state = old_protocol() ? COMMAND : BOOT_TX;
+	m_mask = 0x11;
+	m_status = m_rx_key = m_tx_key = 0;
+	m_in_count = m_expected = m_out_head = m_out_count = 0;
+	m_receiving = false;
+	output_w(1);
+	m_address = m_command = 0;
+	m_rx_bit = m_rx_byte = m_rx_parity = 0;
+	m_tx_byte = m_tx_parity = 0;
+	m_tx_bit = -1;
+	m_auth.fill(0);
+	m_session.fill(0);
+}
+
+bool crystal_hle_device::nvram_read(util::read_stream &file)
+{
+	auto const [err, actual] = util::read(file, m_eeprom.data(), eeprom_mask() + 1);
+	return !err && actual == eeprom_mask() + 1;
+}
+
+bool crystal_hle_device::nvram_write(util::write_stream &file)
+{
+	return !util::write(file, m_eeprom.data(), eeprom_mask() + 1).first;
+}
+
+void crystal_hle_device::expect(u8 state, u16 count)
+{
+	m_state = state;
+	m_in_count = 0;
+	m_expected = count;
+}
+
+void crystal_hle_device::output_w(int state)
+{
+	if (m_output != bool(state))
+	{
+		m_output = state;
+		m_data_cb(state);
+	}
+}
+
+void crystal_hle_device::lines_w(int reset, int data)
+{
+	if (reset && !m_reset)
+		device_reset();
+	m_reset = reset;
+	// The host may start its reply during the final stop bit.  At that point
+	// the PIC has released the shared line and is ready to receive again.
+	const bool listening = !m_out_count || (m_out_count == 1 && m_tx_bit >= 11);
+	if (!reset && !m_receiving && listening && m_line && !data)
+	{
+		m_receiving = true;
+		m_rx_bit = m_rx_byte = m_rx_parity = 0;
+		m_rx_timer->adjust(attotime::from_nsec(156250)); // 1.5 bits at 9600 baud
+	}
+	m_line = data;
+}
+
+TIMER_CALLBACK_MEMBER(crystal_hle_device::rx_tick)
+{
+	if (m_rx_bit < 8)
+	{
+		m_rx_byte |= u32(m_line) << m_rx_bit;
+		m_rx_parity ^= u8(m_line);
+	}
+	else if (m_rx_bit == 8)
+	{
+		m_status = (m_status & ~1) | (m_rx_parity ^ u8(m_line));
+	}
+	else
+	{
+		m_receiving = false;
+		if (m_line)
+			receive(m_rx_byte);
+		return;
+	}
+	++m_rx_bit;
+	m_rx_timer->adjust(attotime::from_hz(9600));
+}
+
+void crystal_hle_device::send(u8 data)
+{
+	assert(m_out_count < m_output_queue.size());
+	m_output_queue[(m_out_head + m_out_count++) % m_output_queue.size()] = data;
+	if (m_out_count == 1)
+		m_tx_timer->adjust(attotime::from_usec(200));
+}
+
+TIMER_CALLBACK_MEMBER(crystal_hle_device::tx_tick)
+{
+	if (m_tx_bit == -1)
+	{
+		m_tx_byte = m_output_queue[m_out_head];
+		if (!old_protocol())
+			m_tx_byte ^= m_tx_key++;
+		m_tx_parity = 0;
+		for (u32 i = 0; i < 8; ++i)
+			m_tx_parity ^= BIT(m_tx_byte, i);
+		m_tx_bit = 0;
+	}
+	if (m_tx_bit == 0)
+		output_w(0);
+	else if (m_tx_bit <= 8)
+		output_w(BIT(m_tx_byte, m_tx_bit - 1));
+	else if (m_tx_bit == 9)
+		output_w(m_tx_parity);
+	else
+		output_w(1);
+	if (++m_tx_bit == 12)
+	{
+		m_tx_bit = -1;
+		m_out_head = (m_out_head + 1) % m_output_queue.size();
+		if (--m_out_count)
+			m_tx_timer->adjust(attotime::from_usec(300));
+	}
+	else
+		m_tx_timer->adjust(attotime::from_hz(9600));
+}
+
+void crystal_hle_device::receive(u8 data)
+{
+	if (!old_protocol())
+		data ^= m_rx_key--;
+	LOGMASKED(LOG_PROTECTION, "%s: RX %02x state %u\n", machine().describe_context(), data, m_state);
+	if (m_state == BOOT_TX)
+	{
+		m_tx_key = data;
+		m_state = BOOT_RX;
+		return;
+	}
+	if (m_state == BOOT_RX)
+	{
+		m_rx_key = data;
+		m_state = COMMAND;
+		return;
+	}
+	if (m_state == COMMAND)
+	{
+		if (old_protocol())
+		{
+			switch (data)
+			{
+			case 1: data = 0x10; break;
+			case 2: data = 1; break;
+			case 4: data = 0x20; break;
+			case 8: data = 4; break;
+			case 0x10: data = 8; break;
+			case 0x20: data = 0x40; break;
+			default: data = 0; break;
+			}
+		}
+		m_command = data & m_mask;
+		switch (m_command)
+		{
+		case 0x10:
+		{
+			for (const char c : m_config->identifier)
+				send(c);
+			m_mask = 0x31;
+			break;
+		}
+		case 0x20:
+			send(m_status | 0x80);
+			expect(AUTH_A, 8);
+			break;
+		case 0x40:
+			for (u32 i = 0; i < 32; ++i)
+				send(m_patch[i] ^ m_session[i & 7]);
+			m_mask = 0xff;
+			break;
+		case 1:
+			send(m_status | 0x80);
+			expect(ECHO, 16);
+			break;
+		case 4:
+		case 8:
+			send(m_status | 0x80);
+			expect(EE_ADDRESS, 1);
+			break;
+		default:
+			m_status |= 4;
+			send(m_status);
+			break;
+		}
+		return;
+	}
+	m_input[m_in_count++] = data;
+	if (m_in_count != m_expected)
+		return;
+	switch (m_state)
+	{
+	case AUTH_A:
+		std::copy_n(m_input.begin(), 8, m_session.begin());
+		if (old_protocol())
+		{
+			m_auth = crystal_prot::simple_transform(m_key, m_session);
+			// The undumped PIC's nonce table is unknown.  Any eight-byte nonce
+			// is accepted by the host; keep it deterministic across save states.
+			for (auto &v : m_session)
+				v ^= ++m_eeprom[0x3f];
+			m_auth = crystal_prot::simple_transform(m_auth, m_session);
+			for (const u8 v : m_session)
+				send(v);
+			expect(AUTH_B, 8);
+		}
+		else
+		{
+			m_session = crystal_prot::transform(m_session, m_keys, m_tables);
+			m_auth = m_session;
+			for (u32 i = 0; i < 4; ++i)
+				send(m_auth[i]);
+			expect(AUTH_REPLY, 4);
+		}
+		break;
+	case AUTH_B:
+		std::copy_n(m_input.begin(), 8, m_session.begin());
+		m_auth = crystal_prot::simple_transform(m_auth, m_session);
+		for (u32 i = 0; i < 4; ++i)
+			send(m_auth[i]);
+		expect(AUTH_REPLY, 4);
+		break;
+	case AUTH_REPLY:
+		if (std::equal(m_input.begin(), m_input.begin() + 4, m_auth.begin() + 4))
+		{
+			++m_eeprom[eeprom_mask() - 2];
+			m_mask = 0x7f;
+			send(m_status | 0x80);
+		}
+		else
+		{
+			++m_eeprom[eeprom_mask() - 3];
+			m_status |= 8;
+			send(m_status);
+		}
+		m_state = COMMAND;
+		break;
+	case ECHO:
+		for (u32 i = 0; i < 16; ++i)
+			send(m_input[i]);
+		m_state = COMMAND;
+		break;
+	case EE_ADDRESS:
+		m_address = data;
+		expect(EE_COUNT, 1);
+		break;
+	case EE_COUNT:
+		if (m_command == 8)
+		{
+			expect(EE_WRITE, data ? data : 256);
+		}
+		else
+		{
+			send(m_status);
+			const u16 count = data ? data : 256;
+			for (u16 i = 0; i < count; ++i)
+				send(m_eeprom[(m_address + i) & eeprom_mask()]);
+			m_state = COMMAND;
+		}
+		break;
+	case EE_WRITE:
+		for (u32 i = 0; i < m_expected; ++i)
+			m_eeprom[(m_address + i) & eeprom_mask()] = m_input[i];
+		send(m_status);
+		m_state = COMMAND;
+		break;
+	}
+}
+
 
 class crystal_state : public driver_device
 {
@@ -164,15 +706,15 @@ public:
 		m_vr0soc(*this, "vr0soc"),
 		m_ds1302(*this, "rtc"),
 		m_pic(*this, "pic"),
+		m_hle(*this, "protection"),
 		m_dsw(*this, "DSW"),
 		m_system(*this, "SYSTEM"),
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
-	void init_crysking() ATTR_COLD;
-	void init_evosocc() ATTR_COLD;
-	void init_donghaer() ATTR_COLD;
-	void init_maldaiza() ATTR_COLD;
+	void crysking(machine_config &config) ATTR_COLD;
+	void evosocc(machine_config &config) ATTR_COLD;
+	void donghaer(machine_config &config) ATTR_COLD;
 
 	void crystal(machine_config &config) ATTR_COLD;
 	void pic16f84a(machine_config &config) ATTR_COLD;
@@ -183,6 +725,9 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void lamps_w(offs_t offset, u8 data);
+	void protection(machine_config &config, const crystal_hle_device::configuration &protection_config) ATTR_COLD;
+	void set_soc_clock(u32 clock) ATTR_COLD;
 
 private:
 	// memory pointers
@@ -197,6 +742,7 @@ private:
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<ds1302_device> m_ds1302;
 	optional_device<pic16_mid_device> m_pic;
+	optional_device<crystal_hle_device> m_hle;
 
 	required_ioport m_dsw;
 	required_ioport m_system;
@@ -214,7 +760,6 @@ private:
 
 	u32 system_input_r();
 	void banksw_w(u32 data);
-	void lamps_w(offs_t offset, u8 data);
 	u32 flashcmd_r();
 	void flashcmd_w(u32 data);
 	void coin_counters_w(u8 data);
@@ -230,6 +775,25 @@ private:
 	// PIC
 	uint8_t pic_porta_r();
 	void pic_porta_w(offs_t offset, uint8_t data, uint8_t mem_mask);
+	void pic_line_w(int state);
+};
+
+
+class maldaiza_state : public crystal_state
+{
+public:
+	maldaiza_state(const machine_config &mconfig, device_type type, const char *tag) :
+		crystal_state(mconfig, type, tag),
+		m_prize(*this, "prize%u", 0U)
+	{ }
+
+	void maldaiza(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void lamps_w(offs_t offset, u8 data) override;
+
+private:
+	required_device_array<ticket_dispenser_device, 2> m_prize;
 };
 
 
@@ -250,6 +814,15 @@ void crystal_state::lamps_w(offs_t offset, u8 data)
 		m_lamps[(offset << 3) | i] = BIT(data, i);
 }
 
+void maldaiza_state::lamps_w(offs_t offset, u8 data)
+{
+	crystal_state::lamps_w(offset, data);
+
+	// Maldaliza's normal prize motors use output 3 and output 7 in its
+	// packed twelve-output table (bits 3 and 1 of the two physical bytes).
+	m_prize[offset]->motor_w(BIT(data, offset ? 1 : 3));
+}
+
 u32 crystal_state::pioldat_r()
 {
 	return m_pio;
@@ -258,9 +831,11 @@ u32 crystal_state::pioldat_r()
 // PIO Latched output DATa Register
 void crystal_state::pioldat_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	const u32 rst = BIT(data, 24);
-	const u32 clk = BIT(data, 25);
-	const u32 dat = BIT(data, 28);
+	COMBINE_DATA(&m_pio);
+
+	const u32 rst = BIT(m_pio, 24);
+	const u32 clk = BIT(m_pio, 25);
+	const u32 dat = BIT(m_pio, 28);
 
 	m_ds1302->ce_w(rst);
 	m_ds1302->io_w(dat);
@@ -268,11 +843,12 @@ void crystal_state::pioldat_w(offs_t offset, u32 data, u32 mem_mask)
 
 	if (m_pic)
 	{
-		m_pic->set_input_line(INPUT_LINE_RESET, BIT(data, 30) ? ASSERT_LINE : CLEAR_LINE);
-		m_pic_data = !BIT(data, 29);
+		m_pic->set_input_line(INPUT_LINE_RESET, BIT(m_pio, 30) ? ASSERT_LINE : CLEAR_LINE);
+		m_pic_data = !BIT(m_pio, 29);
 	}
 
-	COMBINE_DATA(&m_pio);
+	if (m_hle)
+		m_hle->lines_w(BIT(m_pio, 30), !BIT(m_pio, 29));
 }
 
 // PIO External DATa Register
@@ -284,6 +860,8 @@ u32 crystal_state::pioedat_r()
 
 	if (m_pic)
 		data |= m_pic_data << 29;
+	else if (m_hle)
+		data |= m_hle->data_r() << 29;
 
 	return data;
 }
@@ -296,7 +874,16 @@ uint8_t crystal_state::pic_porta_r()
 void crystal_state::pic_porta_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	if (BIT(mem_mask, 0))
-		m_pic_data = BIT(data, 0);
+		pic_line_w(BIT(data, 0));
+}
+
+void crystal_state::pic_line_w(int state)
+{
+	// The Crystal of Kings uses IRQ 20 to detect the serial start bit,
+	// then samples the frame with timer 2.  Later games poll PIOEDAT.
+	if (m_pic_data && !state)
+		m_vr0soc->int_req(20);
+	m_pic_data = state;
 }
 
 u32 crystal_state::flashcmd_r()
@@ -591,6 +1178,43 @@ static INPUT_PORTS_START( officeye )
 	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( maldaiza )
+	// The three buttons also join/select; there are no separate start buttons.
+	// In setup, P1 button 2 moves down and P1 buttons 1/3 change/select.
+	PORT_START("P1_P2")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("prize1", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("prize0", FUNC(ticket_dispenser_device::line_r))
+	PORT_BIT( 0xffaaffaa, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P3_P4")
+	PORT_BIT( 0xffffffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x0000000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(crystal_state::coin_inserted), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(crystal_state::coin_inserted), 1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
+
+	// Coinage, demo sound, race length and prize probability are set in the
+	// service menu. The generic Crystal DIP meanings are not established here.
+	PORT_START("DSW")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW:1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW:8" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( urachamu )
 	PORT_INCLUDE( officeye )
 
@@ -626,7 +1250,8 @@ void crystal_state::crystal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::main_map);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
-	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+	// maldaiza requires DEFAULT_ALL_1 or it doesn't create valid defaults
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	VRENDER0_SOC(config, m_vr0soc, 14'318'180 * 6); // TODO : dynamic via PLL
 	m_vr0soc->set_host_space_tag(m_maincpu, AS_PROGRAM);
@@ -637,6 +1262,70 @@ void crystal_state::crystal(machine_config &config)
 	SPEAKER(config, "speaker", 2).front();
 	m_vr0soc->add_route(0, "speaker", 1.0, 0);
 	m_vr0soc->add_route(1, "speaker", 1.0, 1);
+}
+
+void crystal_state::protection(machine_config &config, const crystal_hle_device::configuration &protection_config)
+{
+	CRYSTAL_HLE(config, m_hle).set_config(protection_config);
+	m_hle->set_flash_region(m_flash);
+	m_hle->data_callback().set(FUNC(crystal_state::pic_line_w));
+}
+
+void crystal_state::set_soc_clock(u32 clock)
+{
+	m_maincpu->set_clock(clock / 2);
+	m_vr0soc->set_clock(clock);
+}
+
+void crystal_state::crysking(machine_config &config)
+{
+	crystal(config);
+	// Reconstructed PIC response records; the host applies them to its own RAM.
+	static constexpr crystal_hle_device::configuration PROTECTION = {
+		true, 0x000078ea, 0x00007534, "Brezza Soft Corp.  ",
+		{ 0x02012bfa, 0x9c00df01, 0x020147ae, 0x9001901c, 0x020130da, 0x900190fc, 0x02013a96, 0x403c4000 }
+	};
+	protection(config, PROTECTION);
+}
+
+void crystal_state::evosocc(machine_config &config)
+{
+	crystal(config);
+	// Reconstructed PIC response records; the host applies them to its own RAM.
+	static constexpr crystal_hle_device::configuration PROTECTION = {
+		false, 0x028f7fe8, 0x028f7c18, "Brezza Soft Soccer.",
+		{ 0x0208e2d6, 0x900190fc, 0x0208baa0, 0x9001907c, 0x02092a7e, 0x8303900c, 0x0208f918, 0x900190fc }
+	};
+	protection(config, PROTECTION);
+}
+
+void crystal_state::donghaer(machine_config &config)
+{
+	crystal(config);
+	// Reconstructed PIC response records; the host applies them to its own RAM.
+	static constexpr crystal_hle_device::configuration PROTECTION = {
+		false, 0x00003590, 0x000031c0, "Danbi System HERONG",
+		{ 0x02012c42, 0x82029004, 0x02012cd4, 0x92009001, 0x0201a13e, 0x40819004, 0x02029110, 0x9001900c }
+	};
+	protection(config, PROTECTION);
+}
+
+void maldaiza_state::maldaiza(machine_config &config)
+{
+	crystal(config);
+
+	// Feedback wiring follows the game's prize-output/input handlers. The
+	// half-second mechanical delay is estimated, pending cabinet measurements.
+	TICKET_DISPENSER(config, m_prize[0], attotime::from_msec(500));
+	TICKET_DISPENSER(config, m_prize[1], attotime::from_msec(500));
+	// Reconstructed PIC response records; the host applies them to its own RAM.
+	static constexpr crystal_hle_device::configuration PROTECTION = {
+		false, 0x00002e4c, 0x00002a7c, "Danbi System RUN H.",
+		{ 0x020196f6, 0x82029004, 0x0201976c, 0x401a4000, 0x0201bf54, 0x4080900c, 0x020194a2, 0x90019004 }
+	};
+	protection(config, PROTECTION);
+	// The game programs the same 0x573c PLL setting as Top Blade V.
+	set_soc_clock(14'318'180 * (87 + 8) / (15 + 2));
 }
 
 void crystal_state::pic16f84a(machine_config &config)
@@ -655,8 +1344,7 @@ void crystal_state::topbladv(machine_config &config)
 	// the PLL is programmed with 0x573c
 	// assuming a reference clock of 14'318'180 this gives ~40 MHz
 	// needs to be correct for CPU <-> PIC communication
-	m_maincpu->set_clock(14'318'180 * (87 + 8) / (15 + 2) / 2);
-	m_vr0soc->set_clock(14'318'180 * (87 + 8) / (15 + 2));
+	set_soc_clock(14'318'180 * (87 + 8) / (15 + 2));
 
 	PIC16F628A(config, m_pic, 3.579545_MHz_XTAL);
 	m_pic->read_a().set(FUNC(crystal_state::pic_porta_r));
@@ -777,7 +1465,7 @@ ROM_START( maldaiza )
 	ROM_LOAD( "u2",           0x1000000, 0x1000000,  CRC(86175ebf) SHA1(c1800f7339dafd3ec6c0302eebc8406582a46b04) ) // $ff filled
 ROM_END
 
-/* note on PIC protection from ElSemi (for actually emulating it instead of patching)
+/* Original note on the PIC serial connection from ElSemi:
 
 The PIC uses a software UART bit banged on a single output pin of the main CPU:
 the data port is bit 0x20000000 on the PIO register, the same register where the
@@ -789,77 +1477,6 @@ loop.  Also it seems that bit 0x40000000 is the PIC reset.
 
 */
 
-void crystal_state::init_crysking()
-{
-	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
-
-	//patch the data feed by the protection
-
-	rom[0x7bb6 / 2] = 0xdf01;
-	rom[0x7bb8 / 2] = 0x9c00;
-
-	rom[0x976a / 2] = 0x901c;
-	rom[0x976c / 2] = 0x9001;
-
-	rom[0x8096 / 2] = 0x90fc;
-	rom[0x8098 / 2] = 0x9001;
-
-	rom[0x8a52 / 2] = 0x4000;    //NOP
-	rom[0x8a54 / 2] = 0x403c;    //NOP
-}
-
-void crystal_state::init_evosocc()
-{
-	auto rom = util::little_endian_cast<u16>(&m_flash[0]) + (0x1000000 * 2 / 2);
-
-	rom[0x97388e / 2] = 0x90fc;  //PUSH R2..R7
-	rom[0x973890 / 2] = 0x9001;  //PUSH R0
-
-	rom[0x971058 / 2] = 0x907c;  //PUSH R2..R6
-	rom[0x971060 / 2] = 0x9001; //PUSH R0
-
-	rom[0x978036 / 2] = 0x900c;  //PUSH R2-R3
-	rom[0x978038 / 2] = 0x8303;  //LD    (%SP,0xC),R3
-
-	rom[0x974ed0 / 2] = 0x90fc;  //PUSH R7-R6-R5-R4-R3-R2
-	rom[0x974ed2 / 2] = 0x9001;  //PUSH R0
-}
-
-void crystal_state::init_donghaer()
-{
-	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
-
-	rom[0x037a2 / 2] = 0x9004; // PUSH %R2
-	rom[0x037a4 / 2] = 0x8202; // LD   (%SP,0x8),%R2
-
-	rom[0x03834 / 2] = 0x9001; // PUSH %R0
-	rom[0x03836 / 2] = 0x9200; // PUSH %SR
-
-	rom[0x0ac9e / 2] = 0x9004; // PUSH %R2
-	rom[0x0aca0 / 2] = 0x4081; // LERI 0x81
-
-	rom[0x19c70 / 2] = 0x900c; // PUSH %R2-%R3
-	rom[0x19c72 / 2] = 0x9001; // PUSH %R0
-}
-
-void crystal_state::init_maldaiza()
-{
-	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
-
-	rom[0x09b12 / 2] = 0x9004; // PUSH %R2
-	rom[0x09b14 / 2] = 0x8202; // LD   (%SP,0x8),%R2
-
-	rom[0x09b88 / 2] = 0x4000; // LERI 0x0
-	rom[0x09b8a / 2] = 0x401a; // LERI 0x1a
-
-	rom[0x0c370 / 2] = 0x900c; // PUSH %R3-%R2
-	rom[0x0c372 / 2] = 0x4080; // LERI 0x80
-
-	rom[0x098be / 2] = 0x9004; // PUSH %R2
-	rom[0x098c0 / 2] = 0x9001; // PUSH %R0
-}
-
-
 } // anonymous namespace
 
 
@@ -869,11 +1486,11 @@ void crystal_state::init_maldaiza()
 
 //    YEAR  NAME      PARENT    MACHINE    INPUT     CLASS          INIT           ROT   COMPANY                FULLNAME                              FLAGS
 GAME( 2001, crysbios, 0,        crystal,   crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS",                MACHINE_IS_BIOS_ROOT )
-GAME( 2001, crysking, crysbios, pic16f84a, crystal,  crystal_state, init_crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",               MACHINE_UNEMULATED_PROTECTION )
-GAME( 2001, evosocc,  crysbios, pic16f84a, crystal,  crystal_state, init_evosocc,  ROT0, "Evoga / BrezzaSoft",  "Evolution Soccer",                   MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, crysking, crysbios, crysking,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "The Crystal of Kings",               0 )
+GAME( 2001, evosocc,  crysbios, evosocc,   crystal,  crystal_state, empty_init,    ROT0, "Evoga / BrezzaSoft",  "Evolution Soccer",                   0 )
 GAME( 2001, officeye, 0,        pic16f84a, officeye, crystal_state, empty_init,    ROT0, "Danbi",               "Office Yeoin Cheonha (version 1.2)", 0 )
-GAME( 2001, donghaer, crysbios, pic16f84a, crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 2 players mode has GFX issues, seldomly hangs
+GAME( 2001, donghaer, crysbios, donghaer,  crystal,  crystal_state, empty_init,    ROT0, "Danbi",               "Donggul Donggul Haerong",            0 )
 GAME( 2002, urachamu, crysbios, crystal,   urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)",          0 ) // lamps, verify game timings
 GAME( 2003, topbladv, crysbios, topbladv,  topbladv, crystal_state, empty_init,    ROT0, "Sonokong / Expotato", "Top Blade V",                        0 )
 GAME( 200?, wulybuly, crysbios, crystal,   wulybuly, crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully",                        MACHINE_NOT_WORKING )
-GAME( 2002, maldaiza, crysbios, pic16f84a, crystal,  crystal_state, init_maldaiza, ROT0, "GamToU",              "Maldaliza!",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // controls
+GAME( 2002, maldaiza, crysbios, maldaiza,  maldaiza, maldaiza_state, empty_init,    ROT0, "GamToU",              "Maldaliza!",                        0 )

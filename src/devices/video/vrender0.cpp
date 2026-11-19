@@ -221,6 +221,8 @@ void vr0video_device::device_start()
 	save_item(NAME(m_dither_mode));
 	save_item(NAME(m_flip_sync));
 	save_item(NAME(m_fb_shift));
+	save_item(NAME(m_draw_dest));
+	save_item(NAME(m_display_dest));
 
 	m_pipeline_timer = timer_alloc(FUNC(vr0video_device::pipeline_cb), this);
 
@@ -236,6 +238,17 @@ void vr0video_device::device_reset()
 	std::fill(std::begin(m_internal_palette), std::end(m_internal_palette), 0);
 	m_last_pal_update = 0xffffffff;
 
+	// Stop the old display list before the host starts configuring the engine again.
+	m_render_state = render_state_info();
+	m_queue_front = m_queue_rear = 0;
+	m_bank1_select = false;
+	m_display_bank = 0;
+	m_draw_select = false;
+	m_render_reset = false;
+	m_render_start = false;
+	m_dither_mode = 0;
+	m_flip_count = 0;
+	m_flip_sync = false;
 	m_display_dest = m_draw_dest = 0;
 	// 1100 objects per second at ~80 MHz
 	// TODO: stub, move as from_ticks counting inside related functions
@@ -682,6 +695,10 @@ void vr0video_device::execute_flipping()
 	if (!m_render_start)
 		return;
 
+	// A sync packet waits for vblank even when no framebuffer flip is pending.
+	// Keeping the pipeline stopped in that case deadlocks Donghaer's stage 6 transition.
+	m_flip_sync = false;
+
 	// don't execute any flipping if the count is 0
 	// - trivrus cfr. MT08891
 	// - crospuzl disappearing text around service mode RTC test (option 1 then 5)
@@ -708,7 +725,6 @@ void vr0video_device::execute_flipping()
 	m_draw_dest = m_draw_select ? front : back;
 	m_display_dest = front;
 
-	m_flip_sync = false;
 	if (m_flip_count)
 	{
 		m_flip_count--;
