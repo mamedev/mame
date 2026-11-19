@@ -2,9 +2,11 @@
 // copyright-holders:Peter Wilhelmsen
 #ifndef MAME_VIDEO_HANTRO_G1_H
 #define MAME_VIDEO_HANTRO_G1_H
+
 #pragma once
 
-class ISVCDecoder;
+#include "util/openh264dec.h"
+
 
 class hantro_g1_device : public device_t
 {
@@ -49,8 +51,10 @@ private:
 	u32 m_history_size;
 	u32 m_history_units;
 	u32 m_jobs;
-	ISVCDecoder *m_decoder;
+	util::openh264::decoder_api::ptr m_openh264;
+	util::openh264::ISVCDecoder *m_decoder;
 };
+
 DECLARE_DEVICE_TYPE(HANTRO_G1, hantro_g1_device)
 
 #endif // MAME_VIDEO_HANTRO_G1_H
