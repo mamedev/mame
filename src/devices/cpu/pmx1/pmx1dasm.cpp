@@ -15,6 +15,7 @@
       rq                    the executing thread's queue of memory reads (unit 6):
                             written with an address to queue a read, read to take the oldest
       ans                   what the last read of an implicit register gave (unit 8)
+      pans                  what the last ask of a port register gave (unit 8)
       kick0-kick3           taking a kick from a thread's kicker, or waiting for one (unit 10)
       kick                  the executing thread's own kicker, left as it is
       cycles                the cycle counter (unit 11)
@@ -31,6 +32,7 @@
       fill                          repeated store, moving the pointer before each
       tacmd                         a 64-bit instruction for the tile accelerator
       out                           write a port register
+      ask                           send a data register to a port register, and have pans answered
       feed                          give the oldest read to the display feed and queue another;
                                     [pointer += offset] repeats, moving the pointer before each
       nop, frag                     nothing; frag is the word that starts each fragment of code
@@ -267,6 +269,8 @@ bool pmx1core_disassembler::move(std::ostream &stream, u32 op, u32 &flags) const
 				case 8:
 					if (s1 == 2)
 						source = "ans";
+					else if (!s1)
+						source = "pans";
 					break;
 				case 10:
 					if (s1 < 4)
@@ -370,8 +374,10 @@ bool pmx1core_disassembler::port(std::ostream &stream, u32 op)
 	case 2:
 		if (BIT(op, 0, 14) == 0x0004)
 			util::stream_format(stream, "%-8saa%u, ab%u", "tacmd", d & 15, s1 & 15);
-		else if (!BIT(op, 0, 3) && BIT(op, 5) && BIT(op, 4) && ((BIT(op, 6, 8) == 0x64) || (BIT(op, 6, 8) == 0x65)))
+		else if (!BIT(op, 0, 3) && BIT(op, 5) && BIT(op, 4))
 			util::stream_format(stream, "%-8s0x%02x, %s", "out", BIT(op, 6, 8), BIT(op, 3) ? reg(1, d) : reg(3, d & 15));
+		else if (!BIT(op, 0, 3) && !BIT(op, 5) && BIT(op, 4) && BIT(op, 3))
+			util::stream_format(stream, "%-8s0x%02x, %s", "ask", BIT(op, 6, 8), reg(1, d));
 		else
 			return false;
 		return true;

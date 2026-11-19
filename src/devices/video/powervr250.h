@@ -167,6 +167,29 @@ private:
 	static constexpr u32 MAX_SPANS = 64;
 	static constexpr u32 PAGE_SHIFT = 12;
 
+	// 2D core: registers that the primary core writes through its port registers
+	enum : u8
+	{
+		P2D_SRC_POS = 0x24,         // source x << 16 | y
+		P2D_LINE_START = 0x31,      // first pixel of a line, x << 16 | y
+		P2D_LINE_DIAGONAL = 0x32,   // step of a line along both axes, x << 16 | y
+		P2D_LINE_STEP = 0x33,       // step of a line along its main axis, x << 16 | y
+		P2D_DEST_POS = 0x34,        // destination x << 16 | y
+		P2D_START = 0x38,           // (width in 64-bit words - 1) << 16 | lines, or for a line pixels << 16 | error term
+		P2D_LINE_ERROR = 0x3b,      // what a diagonal step of a line adds to its error term
+		P2D_SRC_A = 0x3e,           // source of a copy, background of a blend
+		P2D_SRC_B = 0x3f,           // foreground of a blend
+		P2D_PITCH_A = 0x41,
+		P2D_PITCH_B = 0x42,
+		P2D_OPERATION = 0x4b,
+		P2D_FILL_COLOR = 0x4d,
+		P2D_LINE_COLOR = 0x4f,
+		P2D_CLIP = 0x52,            // height << 16 | width
+		P2D_SIZE = 0x53,            // width << 16 | x
+		P2D_DEST = 0x54,
+		P2D_DEST_PITCH = 0x55
+	};
+
 	template <u16 Reg> u16 immediate_r(offs_t offset);
 	template <u16 Reg> void immediate_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void write_access_w(offs_t offset, u32 data, u32 mem_mask = ~0);
@@ -183,6 +206,10 @@ private:
 	u32 ta_find_tile();
 	void dac_feed_w(u64 data);
 	int dac_busy_r();
+
+	u32 port_r(offs_t offset);
+	void port_w(offs_t offset, u32 data);
+	void draw_2d();
 
 	void update_irq();
 	void set_irq(u16 bits);
@@ -260,6 +287,8 @@ private:
 	dac_span m_dac_showing[MAX_SPANS];
 	u8 m_dac_feeding_count;
 	bool m_dac_after_blank;     // the span fed before was blank
+
+	u32 m_2d[256];              // 2D core registers
 	u8 m_dac_showing_count;
 };
 

@@ -34,6 +34,8 @@ public:
 	auto ta_status() { return m_ta_status_cb.bind(); }
 	auto dac_feed() { return m_dac_feed_cb.bind(); }
 	auto dac_busy() { return m_dac_busy_cb.bind(); }
+	auto port_read() { return m_port_r_cb.bind(); }
+	auto port_write() { return m_port_w_cb.bind(); }
 
 	// signals from the rest of the chip
 	void core_reset_w(int state);
@@ -110,6 +112,7 @@ private:
 		u16 kick_count = 0;
 		bool kick_async = false;
 		u32 answer = 0;                 // from the last read of an implicit register
+		u32 port_answer = 0;            // from the last read of a port register
 		u8 flags = 0;
 		u8 hold = HOLD_NONE;
 	};
@@ -155,6 +158,8 @@ private:
 	devcb_read64 m_ta_status_cb;
 	devcb_write64 m_dac_feed_cb;
 	devcb_read_line m_dac_busy_cb;
+	devcb_read32 m_port_r_cb;
+	devcb_write32 m_port_w_cb;
 
 	// what the chip tells the core
 	u32 m_reset_vector;

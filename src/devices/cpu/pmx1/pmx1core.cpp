@@ -40,7 +40,8 @@
         3, 4    address registers
         5       program counters of the four threads
         6       read queue
-        8       answer to the last read of an implicit register
+        8       answer to the last read of an implicit register (2) or of a
+                port register (0)
         10      kickers
         11      cycle counter
 
@@ -95,6 +96,8 @@ pmx1core_device::pmx1core_device(const machine_config &mconfig, const char *tag,
 	m_ta_status_cb(*this, 0),
 	m_dac_feed_cb(*this),
 	m_dac_busy_cb(*this, 0),
+	m_port_r_cb(*this, 0),
+	m_port_w_cb(*this),
 	m_reset_vector(0),
 	m_fb_offset(0),
 	m_in_reset(false),
@@ -125,6 +128,7 @@ void pmx1core_device::device_start()
 	save_item(STRUCT_MEMBER(m_thread, kick_count));
 	save_item(STRUCT_MEMBER(m_thread, kick_async));
 	save_item(STRUCT_MEMBER(m_thread, answer));
+	save_item(STRUCT_MEMBER(m_thread, port_answer));
 	save_item(STRUCT_MEMBER(m_thread, flags));
 	save_item(STRUCT_MEMBER(m_thread, hold));
 	save_item(NAME(m_latch));
@@ -795,7 +799,7 @@ pmx1core_device::outcome pmx1core_device::move(u32 thread, u32 pc, u32 op)
 	case 6:
 		break;
 	case 8:
-		if (s1 != 2)
+		if ((s1 != 0) && (s1 != 2))
 			return outcome::UNKNOWN;
 		break;
 	case 10:
@@ -829,7 +833,7 @@ pmx1core_device::outcome pmx1core_device::move(u32 thread, u32 pc, u32 op)
 		break;
 
 	case 8:
-		value = ts.answer;
+		value = s1 ? ts.answer : ts.port_answer;
 		break;
 
 	case 10:
@@ -1051,11 +1055,23 @@ pmx1core_device::outcome pmx1core_device::port(thread_state &ts, u32 op)
 		else
 		{
 			// an address register or a data register is written to a port register: one port register keeps
-			// the value, and the other stores what was kept at the address written to it
-			if (BIT(op, 0, 3) || !BIT(op, 5) || !BIT(op, 4))
+			// the value, and the other stores what was kept at the address written to it; the others belong to the
+			// rest of the chip
+			if (BIT(op, 0, 3) || !BIT(op, 4))
 				return outcome::UNKNOWN;
+			const u32 port = BIT(op, 6, 8);
+			if (!BIT(op, 5))
+			{
+				// with bit 5 clear a data register goes to a port register and what the port register gives back is
+				// read as unit 8 register 0 (the MK6 code does it with 0xff and 0x51)
+				// TODO: what the port register does with the value is not known
+				if (!BIT(op, 3))
+					return outcome::UNKNOWN;
+				ts.port_answer = m_port_r_cb(port);
+				return outcome::DONE;
+			}
 			const u32 value = BIT(op, 3) ? reg(1, d) : reg(3, d & 15);
-			switch (BIT(op, 6, 8))
+			switch (port)
 			{
 			case 0x64:
 				m_program.write_dword(value, m_latch);
@@ -1064,7 +1080,8 @@ pmx1core_device::outcome pmx1core_device::port(thread_state &ts, u32 op)
 				m_latch = value;
 				break;
 			default:
-				return outcome::UNKNOWN;
+				m_port_w_cb(port, value);
+				break;
 			}
 		}
 		return outcome::DONE;

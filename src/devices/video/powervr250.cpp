@@ -30,7 +30,12 @@
     - 3D core: modifier volumes, dither, color keys, YUV and bump map
       textures, supersampling, filtering in two passes, the scaler; how
       long a render takes
-    - 2D core, video in, VGA, ROM and GPIO port, IIC
+    - 2D core: only the copy, blend, fill and line that the Aristocrat MK6
+      uses, worked out from what its code writes to the port registers;
+      the registers that it writes and nothing here reads, the raster
+      operation (perhaps port register 4c) and what port register ff gives
+      back are not known
+    - video in, VGA, ROM and GPIO port, IIC
     - bus mastering: only the chip's own memory is reached
     - DAC feed: scaler, colour space conversion, lookup table, slave
       stream, cursor, line compare interrupt, sync polarities
@@ -335,6 +340,8 @@ void powervr250_device::device_add_mconfig(machine_config &config)
 	m_core->ta_status().set(FUNC(powervr250_device::ta_status_r));
 	m_core->dac_feed().set(FUNC(powervr250_device::dac_feed_w));
 	m_core->dac_busy().set(FUNC(powervr250_device::dac_busy_r));
+	m_core->port_read().set(FUNC(powervr250_device::port_r));
+	m_core->port_write().set(FUNC(powervr250_device::port_w));
 }
 
 void powervr250_device::device_start()
@@ -413,6 +420,7 @@ void powervr250_device::device_start()
 	save_item(STRUCT_MEMBER(m_dac_showing, blank));
 	save_item(NAME(m_dac_feeding_count));
 	save_item(NAME(m_dac_after_blank));
+	save_item(NAME(m_2d));
 	save_item(NAME(m_dac_showing_count));
 
 	map_frame_buffer();
@@ -493,6 +501,7 @@ void powervr250_device::device_reset()
 	m_dac_feeding_count = 0;
 	m_dac_after_blank = true;
 	m_dac_showing_count = 0;
+	std::fill(std::begin(m_2d), std::end(m_2d), 0);
 	m_dac_timer->adjust(attotime::never);
 }
 
@@ -2572,6 +2581,125 @@ void powervr250_device::dac_feed_w(u64 data)
 	// while the display is sent the span, all the clocks of all its lines, the feed is busy and accepts nothing else
 	m_dac_busy = true;
 	m_dac_timer->adjust(attotime::from_ticks(u64(clocks) * lines, pixel_frequency()));
+}
+
+//**************************************************************************
+//  2D core
+//**************************************************************************
+
+u32 powervr250_device::port_r(offs_t offset)
+{
+	// TODO: the MK6 code asks port register ff for something before each copy and blend, and 51 once
+	return 0;
+}
+
+void powervr250_device::port_w(offs_t offset, u32 data)
+{
+	m_2d[offset & 0xff] = data;
+	if ((offset & 0xff) == P2D_START)
+		draw_2d();
+}
+
+void powervr250_device::draw_2d()
+{
+	// the operation is done at once, as soon as it is started
+	const u32 mask = m_vram_size - 1;
+	const u32 lines = m_2d[P2D_START] & 0xffff;
+	const u32 width = m_2d[P2D_SIZE] >> 16;
+	const u32 x = m_2d[P2D_DEST_POS] >> 16, y = m_2d[P2D_DEST_POS] & 0xffff;
+	const u32 sx = m_2d[P2D_SRC_POS] >> 16, sy = m_2d[P2D_SRC_POS] & 0xffff;
+	const u32 dest_pitch = m_2d[P2D_DEST_PITCH], pitch_a = m_2d[P2D_PITCH_A] & 0xffff, pitch_b = m_2d[P2D_PITCH_B];
+	const u32 operation = m_2d[P2D_OPERATION];
+	switch (operation >> 28)
+	{
+	case 2:
+		// copy, with the positions and the width in bytes
+		for (u32 line = 0; line < lines; line++)
+		{
+			const u32 to = m_2d[P2D_DEST] + (y + line) * dest_pitch + x;
+			const u32 from = m_2d[P2D_SRC_A] + (sy + line) * pitch_a + sx;
+			for (u32 i = 0; i < width; i++)
+			{
+				const u32 s = (from + i) & mask, d = (to + i) & mask;
+				const u32 shift = (d & 3) * 8;
+				m_vram[d >> 2] = (m_vram[d >> 2] & ~(0xffU << shift)) | (BIT(m_vram[s >> 2], (s & 3) * 8, 8) << shift);
+			}
+			written(to & mask, width);
+		}
+		break;
+
+	case 1:
+		// source B over source A with the alpha of source B, in pixels of 32 bits; source A is at the destination position
+		// FIXME: the rounding of the blend is not known
+		for (u32 line = 0; line < lines; line++)
+		{
+			const u32 to = m_2d[P2D_DEST] + (y + line) * dest_pitch + x * 4;
+			const u32 back = m_2d[P2D_SRC_A] + (y + line) * pitch_a + x * 4;
+			const u32 front = m_2d[P2D_SRC_B] + (sy + line) * pitch_b + sx * 4;
+			for (u32 i = 0; i < width; i++)
+			{
+				const u32 f = m_vram[((front + i * 4) & mask) >> 2];
+				const u32 b = m_vram[((back + i * 4) & mask) >> 2];
+				const u32 alpha = f >> 24;
+				u32 result = f;
+				if (alpha != 0xff)
+				{
+					result = f & 0xff00'0000;
+					for (int shift = 0; shift < 24; shift += 8)
+						result |= ((BIT(f, shift, 8) * alpha + BIT(b, shift, 8) * (255 - alpha) + 127) / 255) << shift;
+				}
+				m_vram[((to + i * 4) & mask) >> 2] = result;
+			}
+			written(to & mask, width * 4);
+		}
+		break;
+
+	case 0:
+		if ((operation & 0xff) != 0x90)
+		{
+			logerror("2D operation %08x is not known\n", operation);
+			break;
+		}
+		// fill, in pixels of 32 bits
+		for (u32 line = 0; line < lines; line++)
+		{
+			const u32 to = m_2d[P2D_DEST] + (y + line) * dest_pitch + x * 4;
+			for (u32 i = 0; i < width; i++)
+				m_vram[((to + i * 4) & mask) >> 2] = m_2d[P2D_FILL_COLOR];
+			written(to & mask, width * 4);
+		}
+		break;
+
+	case 7:
+		{
+			// line, a pixel of 32 bits at a time, moving along the main axis while the error term is negative and
+			// diagonally otherwise
+			const u32 count = m_2d[P2D_START] >> 16;
+			const s32 diagonal_add = s16(m_2d[P2D_LINE_ERROR]);
+			const s32 step_add = diagonal_add + 2 * (s32(count) - 1);
+			s32 error = s16(m_2d[P2D_START]);
+			s32 px = s16(m_2d[P2D_LINE_START] >> 16), py = s16(m_2d[P2D_LINE_START]);
+			const s32 clip_width = m_2d[P2D_CLIP] & 0xffff, clip_height = m_2d[P2D_CLIP] >> 16;
+			for (u32 i = 0; i < count; i++)
+			{
+				if ((px >= 0) && (py >= 0) && (px < clip_width) && (py < clip_height))
+				{
+					const u32 to = (m_2d[P2D_DEST] + py * dest_pitch + px * 4) & mask;
+					m_vram[to >> 2] = m_2d[P2D_LINE_COLOR];
+					written(to, 4);
+				}
+				const u32 step = (error >= 0) ? m_2d[P2D_LINE_DIAGONAL] : m_2d[P2D_LINE_STEP];
+				px += s16(step >> 16);
+				py += s16(step);
+				error += (error >= 0) ? diagonal_add : step_add;
+			}
+		}
+		break;
+
+	default:
+		logerror("2D operation %08x is not known\n", operation);
+		break;
+	}
 }
 
 TIMER_CALLBACK_MEMBER(powervr250_device::dac_span_done)
