@@ -8,12 +8,12 @@
   - dump CROM and emulate cpu at microinstruction level
   - memory modes with IOCNT0, currently always running in faked full expansion mode
   - timer event counter mode (timer control register, bit 6)
-  - TMS70x1/2 serial port and timer 3
+  - TMS70x1/2 and TMS70Cx2 serial port and timer 3
   - TMS70C46 DOCK-BUS comms with external pins
   - TMS70C46 external memory mode is via "E" bus instead of configuring IOCNT0
   - TMS70C46 clock divider
   - TMS70C46 INT3 on keypress
-  - when they're needed, add TMS70Cx2, TMS7742, TMS77C82, SE70xxx
+  - when they're needed, add TMS7742, TMS77C82, SE70xxx
 
 *****************************************************************************/
 
@@ -42,6 +42,9 @@ DEFINE_DEVICE_TYPE(TMS7001, tms7001_device, "tms7001", "Texas Instruments TMS700
 DEFINE_DEVICE_TYPE(TMS7041, tms7041_device, "tms7041", "Texas Instruments TMS7041")
 DEFINE_DEVICE_TYPE(TMS7002, tms7002_device, "tms7002", "Texas Instruments TMS7002")
 DEFINE_DEVICE_TYPE(TMS7042, tms7042_device, "tms7042", "Texas Instruments TMS7042")
+
+DEFINE_DEVICE_TYPE(TMS70C02, tms70c02_device, "tms70c02", "Texas Instruments TMS70C02")
+DEFINE_DEVICE_TYPE(TMS70C42, tms70c42_device, "tms70c42", "Texas Instruments TMS70C42")
 
 // TMS70C46 is literally a shell around a TMS70C40, with support for external
 // memory bus, auto external clock divider on slow memory, and wake-up on keypress.
@@ -73,6 +76,24 @@ void tms7000_device::tms7002_mem(address_map &map)
 	map(0x0000, 0x00ff).ram().share("rf"); // 256 bytes internal RAM
 	map(0x0100, 0x010b).rw(FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
 	map(0x0110, 0x0117).rw(FUNC(tms7000_device::tms7002_pf_r), FUNC(tms7000_device::tms7002_pf_w));
+}
+
+void tms7000_device::tms70c02_mem(address_map &map)
+{
+	map(0x0000, 0x00ff).ram().share("rf");
+	map(0x0100, 0x010b).rw(FUNC(tms7000_device::tms7000_pf_r), FUNC(tms7000_device::tms7000_pf_w));
+	map(0x0100, 0x0100).rw(FUNC(tms7000_device::iocnt0_r), FUNC(tms7000_device::iocnt0_w));
+	map(0x0101, 0x0101).rw(FUNC(tms7000_device::iocnt2_r), FUNC(tms7000_device::iocnt2_w));
+	map(0x0102, 0x0102).rw(FUNC(tms7000_device::iocnt1_r), FUNC(tms7000_device::iocnt1_w));
+	map(0x0103, 0x0103).noprw();
+	map(0x010c, 0x0113).rw(FUNC(tms7000_device::timer16_r), FUNC(tms7000_device::timer16_w));
+	map(0x0114, 0x0123).noprw(); // TODO: serial port and timer 3
+}
+
+void tms7000_device::tms70c42_mem(address_map &map)
+{
+	tms70c02_mem(map);
+	map(0xf000, 0xffff).rom().region(DEVICE_SELF, 0);
 }
 
 void tms7000_device::tms7020_mem(address_map &map)
@@ -176,6 +197,16 @@ tms7042_device::tms7042_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+tms70c02_device::tms70c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS70C02, tag, owner, clock, address_map_constructor(FUNC(tms70c02_device::tms70c02_mem), this), CHIP_FAMILY_70CX2 | CHIP_IS_CMOS)
+{
+}
+
+tms70c42_device::tms70c42_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	tms7000_device(mconfig, TMS70C42, tag, owner, clock, address_map_constructor(FUNC(tms70c42_device::tms70c42_mem), this), CHIP_FAMILY_70CX2 | CHIP_IS_CMOS)
+{
+}
+
 tms70c46_device::tms70c46_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	tms7000_device(mconfig, TMS70C46, tag, owner, clock, address_map_constructor(FUNC(tms70c46_device::tms70c46_mem), this), CHIP_IS_CMOS)
 {
@@ -227,6 +258,10 @@ void tms7000_device::device_start()
 		m_timer_decrementer[tmr] = 0;
 		m_timer_prescaler[tmr] = 0;
 		m_timer_capture_latch[tmr] = 0;
+		m_timer16_data[tmr] = 0;
+		m_timer16_control[tmr] = 0;
+		m_timer16_readout[tmr] = 0;
+		m_timer16_clocks[tmr] = 0;
 	}
 
 	// register for savestates
@@ -245,6 +280,10 @@ void tms7000_device::device_start()
 	save_item(NAME(m_timer_decrementer));
 	save_item(NAME(m_timer_prescaler));
 	save_item(NAME(m_timer_capture_latch));
+	save_item(NAME(m_timer16_data));
+	save_item(NAME(m_timer16_control));
+	save_item(NAME(m_timer16_readout));
+	save_item(NAME(m_timer16_clocks));
 
 	// register for debugger
 	state_add(TMS7000_PC, "PC", m_pc).formatstr("%04X");
@@ -300,6 +339,13 @@ void tms7000_device::device_reset()
 	}
 
 	// while _RESET is asserted:
+	if (chip_is_family_70cx2())
+	{
+		// Reset disables timer outputs, but preserves the timer registers.
+		m_timer16_control[0] &= ~0x40;
+		m_timer16_control[1] &= ~0x40;
+	}
+
 	// clear ports
 	write_p(0x04, 0xff); // port a
 	write_p(0x06, 0xff); // port b
@@ -320,6 +366,8 @@ void tms7000_device::device_reset()
 	write_p(0x00, 0x00); // IOCNT0
 	if (chip_is_family_70x2())
 		write_p(0x10, 0x00); // IOCNT1
+	else if (chip_is_family_70cx2())
+		write_p(0x02, 0x00); // IOCNT1
 
 	m_sp = 0xff;
 	m_op = 0xff;
@@ -338,10 +386,22 @@ void tms7000_device::execute_set_input(int extline, int state)
 		return;
 
 	bool irqstate = (state == CLEAR_LINE) ? false : true;
-
-	// reverse polarity (TMS70cx2-only)
-	if (m_io_control[2] & (0x01 << (4 * extline)))
-		irqstate = !irqstate;
+	if (chip_is_family_70cx2())
+	{
+		// Keep the pin level separate from the latched interrupt flag.
+		if (m_irq_state[extline] == irqstate)
+			return;
+		m_irq_state[extline] = irqstate;
+		if (irqstate != bool(BIT(m_io_control[2], 4 * extline)))
+		{
+			m_io_control[0] |= 0x02 << (4 * extline);
+			uint8_t const timer = extline ^ 1;
+			if (!m_idle_state || !BIT(m_timer_control[timer], 5))
+				m_timer_capture_latch[timer] = m_timer_decrementer[timer];
+			check_interrupts();
+		}
+		return;
+	}
 
 	if (m_irq_state[extline] != irqstate)
 	{
@@ -356,14 +416,6 @@ void tms7000_device::execute_set_input(int extline, int state)
 			if (extline == TMS7000_INT3_LINE)
 				m_timer_capture_latch[0] = m_timer_decrementer[0];
 
-			// on TMS70cx2, latch timer 2 on INT1
-			if (extline == TMS7000_INT1_LINE && chip_is_family_70cx2())
-				m_timer_capture_latch[1] = m_timer_decrementer[1];
-
-			// clear external if it's edge-triggered (TMS70cx2-only)
-			if (m_io_control[2] & (0x02 << (4 * extline)))
-				m_irq_state[extline] = false;
-
 			check_interrupts();
 		}
 	}
@@ -372,6 +424,9 @@ void tms7000_device::execute_set_input(int extline, int state)
 void tms7000_device::flag_ext_interrupt(int extline)
 {
 	if (extline != TMS7000_INT1_LINE && extline != TMS7000_INT3_LINE)
+		return;
+
+	if (chip_is_family_70cx2())
 		return;
 
 	// set/clear for pending external interrupt
@@ -393,7 +448,8 @@ void tms7000_device::check_interrupts()
 		// INT 1,2,3 are in IOCNT0 d0-d5
 		// INT 4,5 are in IOCNT1 d0-d3
 		int shift = (irqline > 2) ? irqline * 2 - 6 : irqline * 2;
-		if ((m_io_control[irqline > 2] >> shift & 3) == 3)
+		uint8_t const control = (irqline > 2) ? m_io_control[1] : iocnt0_r();
+		if ((control >> shift & 3) == 3)
 		{
 			// ack
 			m_io_control[irqline > 2] &= ~(0x02 << shift);
@@ -457,7 +513,7 @@ void tms7000_device::timer_reload(int tmr)
 void tms7000_device::timer_tick_pre(int tmr)
 {
 	// timer prescaler underflow
-	if (--m_timer_prescaler[tmr] < 0)
+	if (m_timer_prescaler[tmr]-- == 0)
 	{
 		m_timer_prescaler[tmr] = m_timer_control[tmr] & 0x1f;
 		timer_tick_low(tmr);
@@ -467,7 +523,7 @@ void tms7000_device::timer_tick_pre(int tmr)
 void tms7000_device::timer_tick_low(int tmr)
 {
 	// timer decrementer underflow
-	if (--m_timer_decrementer[tmr] < 0)
+	if (m_timer_decrementer[tmr]-- == 0)
 	{
 		timer_reload(tmr);
 
@@ -495,6 +551,161 @@ TIMER_CALLBACK_MEMBER(tms7000_device::simple_timer_cb)
 //  note: TMS7000 family is from $00 to $0b, TMS7002 family adds $10 to $17
 //-------------------------------------------------
 
+uint8_t tms7000_device::iocnt0_r()
+{
+	uint8_t data = m_io_control[0];
+	if (chip_is_family_70cx2())
+	{
+		// Level-sensitive pins are ORed with the interrupt pulse latches.
+		for (uint8_t line = 0; line < 2; line++)
+		{
+			if (!BIT(m_io_control[2], 4 * line + 1) &&
+				(m_irq_state[line] != bool(BIT(m_io_control[2], 4 * line))))
+				data |= 0x02 << (4 * line);
+		}
+	}
+	return data;
+}
+
+uint8_t tms7000_device::iocnt1_r()
+{
+	return m_io_control[1];
+}
+
+uint8_t tms7000_device::iocnt2_r()
+{
+	return m_io_control[2];
+}
+
+void tms7000_device::iocnt0_w(uint8_t data)
+{
+	// Interrupt flags are cleared by writing one.
+	m_io_control[0] = (m_io_control[0] & (~data & 0x2a)) | (data & 0xd5);
+	if (data & 0x02)
+		flag_ext_interrupt(TMS7000_INT1_LINE);
+	if (data & 0x20)
+		flag_ext_interrupt(TMS7000_INT3_LINE);
+	check_interrupts();
+}
+
+void tms7000_device::iocnt1_w(uint8_t data)
+{
+	m_io_control[1] = (m_io_control[1] & (~data & 0x0a)) | (data & 0x05);
+	check_interrupts();
+}
+
+void tms7000_device::iocnt2_w(uint8_t data)
+{
+	m_io_control[2] = data & 0x33;
+	flag_ext_interrupt(TMS7000_INT1_LINE);
+	flag_ext_interrupt(TMS7000_INT3_LINE);
+	check_interrupts();
+}
+
+// TMS70Cx2 timers: SPND001C, sections 3.7.2-3.7.9.
+uint8_t tms7000_device::timer16_r(offs_t offset)
+{
+	timer16_update();
+
+	uint8_t const timer = offset / 4;
+	offset &= 3;
+
+	if (!(offset & 1))
+		return m_timer16_readout[timer];
+
+	uint16_t const value = (offset == 1) ? m_timer_decrementer[timer] : m_timer_capture_latch[timer];
+	if (!machine().side_effects_disabled())
+		m_timer16_readout[timer] = value >> 8;
+	return value & 0xff;
+}
+
+void tms7000_device::timer16_w(offs_t offset, uint8_t data)
+{
+	timer16_update();
+
+	uint8_t const timer = offset / 4;
+	offset &= 3;
+
+	switch (offset)
+	{
+		case 0:
+			m_timer16_data[timer] = (m_timer16_data[timer] & 0x00ff) | (uint16_t(data) << 8);
+			break;
+		case 1:
+			m_timer16_data[timer] = (m_timer16_data[timer] & 0xff00) | data;
+			break;
+		case 2:
+			m_timer16_control[timer] = data & ((timer == 0) ? 0x40 : 0xc0);
+			break;
+		case 3:
+			m_timer_control[timer] = data;
+			if (BIT(data, 7))
+			{
+				m_timer_decrementer[timer] = m_timer16_data[timer];
+				m_timer_prescaler[timer] = data & 0x1f;
+				m_timer16_clocks[timer] = 0;
+			}
+			else
+			{
+				m_io_control[timer] &= ~0x08;
+			}
+			break;
+	}
+}
+
+uint8_t tms7000_device::timer16_output_mask() const
+{
+	return (BIT(m_timer16_control[0], 6) ? 0x02 : 0x00) |
+		(((m_timer16_control[1] & 0xc0) == 0x40) ? 0x01 : 0x00);
+}
+
+void tms7000_device::timer16_tick(uint8_t timer)
+{
+	if (!BIT(m_timer_control[timer], 7) || (m_idle_state && BIT(m_timer_control[timer], 5)))
+		return;
+	if (m_timer_prescaler[timer]-- != 0)
+		return;
+	m_timer_prescaler[timer] = m_timer_control[timer] & 0x1f;
+	if (m_timer_decrementer[timer]-- != 0)
+		return;
+
+	m_timer_decrementer[timer] = m_timer16_data[timer];
+	m_io_control[timer] |= 0x08;
+	uint8_t const output = 0x02 >> timer;
+	if (timer16_output_mask() & output)
+	{
+		m_port_latch[1] ^= output;
+		m_port_out_cb[1](m_port_latch[1]);
+	}
+	if (timer == 0 && BIT(m_timer16_control[1], 7))
+		timer16_tick(1);
+}
+
+void tms7000_device::timer16_update()
+{
+	if (!chip_is_family_70cx2() || !executing() || machine().side_effects_disabled())
+		return;
+
+	uint64_t const cycles = total_cycles();
+	uint64_t const elapsed = cycles - m_timer16_cycles;
+	m_timer16_cycles = cycles;
+	uint64_t clocks = elapsed * m_divider;
+	while (clocks--)
+	{
+		for (uint8_t timer = 0; timer < 2; timer++)
+		{
+			if (!BIT(m_timer_control[timer], 7) || BIT(m_timer_control[timer], 6) ||
+				(m_idle_state && BIT(m_timer_control[timer], 5)) || (timer == 1 && BIT(m_timer16_control[1], 7)))
+				continue;
+			if (++m_timer16_clocks[timer] == 4)
+			{
+				m_timer16_clocks[timer] = 0;
+				timer16_tick(timer);
+			}
+		}
+	}
+}
+
 uint8_t tms7000_device::tms7000_pf_r(offs_t offset)
 {
 	switch (offset)
@@ -518,6 +729,8 @@ uint8_t tms7000_device::tms7000_pf_r(offs_t offset)
 		{
 			// note: port B is write-only, reading it returns the output value as if ddr is 0xff
 			int port = offset / 2 - 2;
+			if (chip_is_family_70cx2() && port == 1)
+				return m_port_latch[1];
 			if (!machine().side_effects_disabled())
 				return (m_port_in_cb[port]() & ~m_port_ddr[port]) | (m_port_latch[port] & m_port_ddr[port]);
 			break;
@@ -542,26 +755,12 @@ void tms7000_device::tms7000_pf_w(offs_t offset, uint8_t data)
 	{
 		// i/o control (IOCNT0)
 		case 0x00:
-			// d0,d2,d4: INT1,2,3 enable
-			// d1,d3,d5: INT1,2,3 flag (write 1 to clear flag)
-			// d6-d7: memory mode (currently not implemented)
-			m_io_control[0] = (m_io_control[0] & (~data & 0x2a)) | (data & 0xd5);
-
-			// possibly need to reactivate flags
-			if (data & 0x02)
-				flag_ext_interrupt(TMS7000_INT1_LINE);
-			if (data & 0x20)
-				flag_ext_interrupt(TMS7000_INT3_LINE);
-
-			check_interrupts();
+			iocnt0_w(data);
 			break;
 
 		// i/o control (IOCNT1)
 		case 0x10:
-			// d0,d2: INT4,5 enable
-			// d1,d3: INT4,5 flag (write 1 to clear flag)
-			m_io_control[1] = (m_io_control[1] & (~data & 0x0a)) | (data & 0x05);
-			check_interrupts();
+			iocnt1_w(data);
 			break;
 
 		// timer 1/2 data
@@ -602,6 +801,8 @@ void tms7000_device::tms7000_pf_w(offs_t offset, uint8_t data)
 			// note: in memory expansion modes, some port output pins are used for memory strobes.
 			// this is currently ignored, since port writes will always be visible externally on peripheral expansion anyway.
 			int port = offset / 2 - 2;
+			if (chip_is_family_70cx2() && port == 1)
+				data = (data & ~timer16_output_mask()) | (m_port_latch[1] & timer16_output_mask());
 			m_port_out_cb[port](data & m_port_ddr[port]);
 			m_port_latch[port] = data;
 			break;
@@ -626,14 +827,19 @@ void tms7000_device::tms7000_pf_w(offs_t offset, uint8_t data)
 
 void tms7000_device::execute_run()
 {
-	check_interrupts();
+	m_timer16_cycles = total_cycles();
+	if (!chip_is_family_70cx2())
+		check_interrupts();
 
 	do
 	{
+		if (chip_is_family_70cx2())
+			check_interrupts();
 		debugger_instruction_hook(m_pc);
 
 		m_op = m_cache.read_byte(m_pc++);
 		execute_one(m_op);
+		timer16_update();
 	} while (m_icount > 0);
 }
 

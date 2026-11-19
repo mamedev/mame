@@ -668,6 +668,7 @@ void tms7000_device::nop()
 void tms7000_device::idle()
 {
 	m_icount -= 6;
+	timer16_update();
 	m_pc--;
 	m_idle_state = true;
 }
