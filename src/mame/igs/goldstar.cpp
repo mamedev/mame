@@ -29037,6 +29037,11 @@ ROM_START( fevercha )
 	ROM_LOAD( "82s123.10d", 0x0100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
 ROM_END
 
+/*
+  Fever Chance (W6)
+  NEC MC-8123 CPU
+
+*/
 ROM_START( feverchb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "eagle_38.11b", 0x00000, 0x8000, CRC(c10e75db) SHA1(94e40c97683c1635a0f33d219d9b1a04d249fafc) )
@@ -29064,6 +29069,16 @@ ROM_START( feverchb )
 	ROM_LOAD( "82s129.4e",  0x0000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) )  // same as megaline
 ROM_END
 
+/*
+  Fever Chance (W6)
+  NEC MC-8123 CPU
+
+  GFX bank 1 has different tiles
+  for Lucky 8 Lines title.
+
+  Maybe it's a cross platform.
+
+*/
 ROM_START( feverchc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cpu.18.11c", 0x00000, 0x8000, CRC(ab57990d) SHA1(c60886cfc9caafd54511c3ff7ac96b025db209cb) )
