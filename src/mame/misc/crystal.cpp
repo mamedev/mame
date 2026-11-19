@@ -159,141 +159,6 @@ Notes:
 
 namespace {
 
-// The host and PIC use DES with reversed bit numbering within each byte.
-// Tables are decoded from the cartridge's host protection module.
-namespace crystal_prot {
-
-using block = std::array<u8, 8>;
-using schedule = std::array<u8, 128>;
-using tables = std::array<u8, 0x298>;
-
-enum : u16
-{
-	PC1 = 0x000,
-	PC2 = 0x038,
-	KEY_BYTES = 0x068,
-	KEY_BITS = 0x098,
-	IP = 0x0c8,
-	FP = 0x108,
-	EXPAND = 0x148,
-	SBOX = 0x178,
-	PERMUTE = 0x278
-};
-
-const char *invalid_table(const tables &table)
-{
-	static constexpr struct
-	{
-		u16 offset;
-		u8 count;
-		u8 limit;
-		const char *name;
-	} LIMITS[] = {
-		{ PC1,       56, 56, "PC1" },
-		{ PC2,       48, 56, "PC2" },
-		{ KEY_BYTES, 48,  6, "key byte" },
-		{ KEY_BITS,  48,  8, "key bit" },
-		{ IP,        64, 64, "initial permutation" },
-		{ FP,        64, 64, "final permutation" },
-		{ EXPAND,    48, 32, "expansion" },
-		{ PERMUTE,   32, 32, "round permutation" }
-	};
-	for (const auto &range : LIMITS)
-	{
-		if (!std::all_of(table.begin() + range.offset, table.begin() + range.offset + range.count,
-			[limit = range.limit] (u8 value) { return value < limit; }))
-			return range.name;
-	}
-	return nullptr;
-}
-
-schedule make_schedule(const block &key, const tables &table)
-{
-	const u64 raw = get_u64le(key.data()) & 0x00ff'ffff'ffff'ffff;
-	u64 cd = 0;
-	for (u32 i = 0; i < 56; ++i)
-		cd |= u64(BIT(raw, table[PC1 + i])) << i;
-	u32 c = cd & 0x0fff'ffff;
-	u32 d = cd >> 28;
-	schedule result{};
-	for (u32 r = 0; r < 16; ++r)
-	{
-		const u32 shift = (r == 0 || r == 1 || r == 8 || r == 15) ? 1 : 2;
-		c = ((c >> shift) | (c << (28 - shift))) & 0x0fff'ffff;
-		d = ((d >> shift) | (d << (28 - shift))) & 0x0fff'ffff;
-		cd = c | (u64(d) << 28);
-		u64 packed = 0;
-		for (u32 i = 0; i < 48; ++i)
-			packed |= u64(BIT(cd, table[PC2 + i])) << i;
-		for (u32 i = 0; i < 48; ++i)
-			result[8 * r + i / 6] |= BIT(packed, 8 * table[KEY_BYTES + i] + table[KEY_BITS + i]) << (i % 6);
-	}
-	return result;
-}
-
-block transform(block data, const schedule &keys, const tables &table)
-{
-	for (u32 r = 0; r < 16; ++r)
-	{
-		const u32 src = (r & 1) ? 4 : 0;
-		const u32 dst = src ^ 4;
-		u8 groups[8]{};
-		u8 sub[4]{};
-		for (u32 g = 0; g < 8; ++g)
-		{
-			for (u32 i = 0; i < 6; ++i)
-			{
-				const u8 bit = table[EXPAND + 6 * g + i];
-				groups[g] |= BIT(data[src + bit / 8], bit & 7) << i;
-			}
-			groups[g] ^= keys[8 * r + g];
-		}
-		for (u32 i = 0; i < 4; ++i)
-			sub[i] = (table[SBOX + 64 * i + groups[2 * i]] & 0x0f) | (table[SBOX + 64 * i + groups[2 * i + 1]] & 0xf0);
-		for (u32 g = 0; g < 4; ++g)
-		{
-			for (u32 i = 0; i < 8; ++i)
-			{
-				const u8 bit = table[PERMUTE + 8 * g + i];
-				data[dst + g] ^= BIT(sub[bit / 8], bit & 7) << i;
-			}
-		}
-	}
-	return data;
-}
-
-block permutation(const block &data, const u8 *table)
-{
-	const u64 raw = get_u64le(data.data());
-	u64 result = 0;
-	for (u32 i = 0; i < 64; ++i)
-		result |= u64(BIT(raw, table[i])) << i;
-	block bytes;
-	put_u64le(bytes.data(), result);
-	return bytes;
-}
-
-block encrypt(const block &data, const schedule &keys, const tables &table)
-{
-	block initial = permutation(data, &table[IP]);
-	std::swap_ranges(initial.begin(), initial.begin() + 4, initial.begin() + 4);
-	return permutation(transform(initial, keys, table), &table[FP]);
-}
-
-block simple_transform(block state, const block &data)
-{
-	for (u32 i = 0; i < 8; ++i)
-	{
-		u8 v = u8(state[i] + data[i]) ^ data[i];
-		v = (v >> 1) | (v << 7);
-		state[i] = ~u8((v >> 4) | (v << 4));
-	}
-	return state;
-}
-
-} // namespace crystal_prot
-
-
 // HLE for the undumped PICs, reconstructed from the matching SE3208 code
 // and the Office Yeoin Cheonha/Top Blade V firmware. The SE3208 performs
 // authentication, decrypts the returned records and writes its own RAM.
@@ -335,6 +200,32 @@ protected:
 	virtual bool nvram_write(util::write_stream &file) override;
 
 private:
+	// The host and PIC use DES with reversed bit numbering within each byte.
+	// Tables are decoded from the cartridge's host protection module.
+	using block = std::array<u8, 8>;
+	using schedule = std::array<u8, 128>;
+	using tables = std::array<u8, 0x298>;
+
+	enum : u16
+	{
+		PC1 = 0x000,
+		PC2 = 0x038,
+		KEY_BYTES = 0x068,
+		KEY_BITS = 0x098,
+		IP = 0x0c8,
+		FP = 0x108,
+		EXPAND = 0x148,
+		SBOX = 0x178,
+		PERMUTE = 0x278
+	};
+
+	static const char *invalid_table(const tables &table);
+	static schedule make_schedule(const block &key, const tables &table);
+	static block transform(block data, const schedule &keys, const tables &table);
+	static block permutation(const block &data, const u8 *table);
+	static block encrypt(const block &data, const schedule &keys, const tables &table);
+	static block simple_transform(block state, const block &data);
+
 	enum : u8 { BOOT_TX, BOOT_RX, COMMAND, AUTH_A, AUTH_B, AUTH_REPLY, ECHO, EE_ADDRESS, EE_COUNT, EE_WRITE };
 
 	bool old_protocol() const { return m_config->legacy; }
@@ -349,9 +240,9 @@ private:
 	required_region_ptr<u32> m_flash;
 	devcb_write_line m_data_cb;
 	const configuration *m_config;
-	crystal_prot::block m_key, m_auth, m_session;
-	crystal_prot::schedule m_keys;
-	crystal_prot::tables m_tables;
+	block m_key, m_auth, m_session;
+	schedule m_keys;
+	tables m_tables;
 	std::array<u8, 32> m_patch;
 	std::array<u8, 128> m_eeprom;
 	std::array<u8, 256> m_input;
@@ -371,6 +262,117 @@ private:
 DEFINE_DEVICE_TYPE_PRIVATE(CRYSTAL_HLE, crystal_hle_device, crystal_hle_device, "crystal_hle", "Crystal System protection (HLE)")
 
 namespace {
+
+const char *crystal_hle_device::invalid_table(const tables &table)
+{
+	static constexpr struct
+	{
+		u16 offset;
+		u8 count;
+		u8 limit;
+		const char *name;
+	} LIMITS[] = {
+		{ PC1,       56, 56, "PC1" },
+		{ PC2,       48, 56, "PC2" },
+		{ KEY_BYTES, 48,  6, "key byte" },
+		{ KEY_BITS,  48,  8, "key bit" },
+		{ IP,        64, 64, "initial permutation" },
+		{ FP,        64, 64, "final permutation" },
+		{ EXPAND,    48, 32, "expansion" },
+		{ PERMUTE,   32, 32, "round permutation" }
+	};
+	for (const auto &range : LIMITS)
+	{
+		if (!std::all_of(table.begin() + range.offset, table.begin() + range.offset + range.count,
+			[limit = range.limit] (u8 value) { return value < limit; }))
+			return range.name;
+	}
+	return nullptr;
+}
+
+crystal_hle_device::schedule crystal_hle_device::make_schedule(const block &key, const tables &table)
+{
+	const u64 raw = get_u64le(key.data()) & 0x00ff'ffff'ffff'ffff;
+	u64 cd = 0;
+	for (u32 i = 0; i < 56; ++i)
+		cd |= u64(BIT(raw, table[PC1 + i])) << i;
+	u32 c = cd & 0x0fff'ffff;
+	u32 d = cd >> 28;
+	schedule result{};
+	for (u32 r = 0; r < 16; ++r)
+	{
+		const u32 shift = (r == 0 || r == 1 || r == 8 || r == 15) ? 1 : 2;
+		c = ((c >> shift) | (c << (28 - shift))) & 0x0fff'ffff;
+		d = ((d >> shift) | (d << (28 - shift))) & 0x0fff'ffff;
+		cd = c | (u64(d) << 28);
+		u64 packed = 0;
+		for (u32 i = 0; i < 48; ++i)
+			packed |= u64(BIT(cd, table[PC2 + i])) << i;
+		for (u32 i = 0; i < 48; ++i)
+			result[8 * r + i / 6] |= BIT(packed, 8 * table[KEY_BYTES + i] + table[KEY_BITS + i]) << (i % 6);
+	}
+	return result;
+}
+
+crystal_hle_device::block crystal_hle_device::transform(block data, const schedule &keys, const tables &table)
+{
+	for (u32 r = 0; r < 16; ++r)
+	{
+		const u32 src = (r & 1) ? 4 : 0;
+		const u32 dst = src ^ 4;
+		u8 groups[8]{};
+		u8 sub[4]{};
+		for (u32 g = 0; g < 8; ++g)
+		{
+			for (u32 i = 0; i < 6; ++i)
+			{
+				const u8 bit = table[EXPAND + 6 * g + i];
+				groups[g] |= BIT(data[src + bit / 8], bit & 7) << i;
+			}
+			groups[g] ^= keys[8 * r + g];
+		}
+		for (u32 i = 0; i < 4; ++i)
+			sub[i] = (table[SBOX + 64 * i + groups[2 * i]] & 0x0f) | (table[SBOX + 64 * i + groups[2 * i + 1]] & 0xf0);
+		for (u32 g = 0; g < 4; ++g)
+		{
+			for (u32 i = 0; i < 8; ++i)
+			{
+				const u8 bit = table[PERMUTE + 8 * g + i];
+				data[dst + g] ^= BIT(sub[bit / 8], bit & 7) << i;
+			}
+		}
+	}
+	return data;
+}
+
+crystal_hle_device::block crystal_hle_device::permutation(const block &data, const u8 *table)
+{
+	const u64 raw = get_u64le(data.data());
+	u64 result = 0;
+	for (u32 i = 0; i < 64; ++i)
+		result |= u64(BIT(raw, table[i])) << i;
+	block bytes;
+	put_u64le(bytes.data(), result);
+	return bytes;
+}
+
+crystal_hle_device::block crystal_hle_device::encrypt(const block &data, const schedule &keys, const tables &table)
+{
+	block initial = permutation(data, &table[IP]);
+	std::swap_ranges(initial.begin(), initial.begin() + 4, initial.begin() + 4);
+	return permutation(transform(initial, keys, table), &table[FP]);
+}
+
+crystal_hle_device::block crystal_hle_device::simple_transform(block state, const block &data)
+{
+	for (u32 i = 0; i < 8; ++i)
+	{
+		u8 v = u8(state[i] + data[i]) ^ data[i];
+		v = (v >> 1) | (v << 7);
+		state[i] = ~u8((v >> 4) | (v << 4));
+	}
+	return state;
+}
 
 crystal_hle_device::crystal_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, CRYSTAL_HLE, tag, owner, clock),
@@ -404,15 +406,15 @@ void crystal_hle_device::device_start()
 		m_key[i] = read_byte(m_config->key_offset + i);
 	for (u32 i = 0; i < m_tables.size(); ++i)
 		m_tables[i] = read_byte(m_config->mask_offset + 0x100 + i);
-	if (const char *const invalid = crystal_prot::invalid_table(m_tables))
+	if (const char *const invalid = invalid_table(m_tables))
 		fatalerror("%s: invalid %s protection table in cartridge ROM\n", tag(), invalid);
-	m_keys = crystal_prot::make_schedule(m_key, m_tables);
+	m_keys = make_schedule(m_key, m_tables);
 	for (u32 i = 0; i < 4; ++i)
 	{
-		crystal_prot::block block;
-		put_u32le(&block[0], m_config->records[2 * i]);
-		put_u32le(&block[4], m_config->records[2 * i + 1]);
-		const auto encrypted = crystal_prot::encrypt(block, m_keys, m_tables);
+		block record;
+		put_u32le(&record[0], m_config->records[2 * i]);
+		put_u32le(&record[4], m_config->records[2 * i + 1]);
+		const auto encrypted = encrypt(record, m_keys, m_tables);
 		std::copy(encrypted.begin(), encrypted.end(), &m_patch[8 * i]);
 	}
 	m_reset = false;
@@ -660,19 +662,19 @@ void crystal_hle_device::receive(u8 data)
 		std::copy_n(m_input.begin(), 8, m_session.begin());
 		if (old_protocol())
 		{
-			m_auth = crystal_prot::simple_transform(m_key, m_session);
+			m_auth = simple_transform(m_key, m_session);
 			// The undumped PIC's nonce table is unknown.  Any eight-byte nonce
 			// is accepted by the host; keep it deterministic across save states.
 			for (auto &v : m_session)
 				v ^= ++m_eeprom[0x3f];
-			m_auth = crystal_prot::simple_transform(m_auth, m_session);
+			m_auth = simple_transform(m_auth, m_session);
 			for (const u8 v : m_session)
 				send(v);
 			expect(AUTH_B, 8);
 		}
 		else
 		{
-			m_session = crystal_prot::transform(m_session, m_keys, m_tables);
+			m_session = transform(m_session, m_keys, m_tables);
 			m_auth = m_session;
 			for (u32 i = 0; i < 4; ++i)
 				send(m_auth[i]);
@@ -681,7 +683,7 @@ void crystal_hle_device::receive(u8 data)
 		break;
 	case AUTH_B:
 		std::copy_n(m_input.begin(), 8, m_session.begin());
-		m_auth = crystal_prot::simple_transform(m_auth, m_session);
+		m_auth = simple_transform(m_auth, m_session);
 		for (u32 i = 0; i < 4; ++i)
 			send(m_auth[i]);
 		expect(AUTH_REPLY, 4);
