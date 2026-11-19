@@ -1822,7 +1822,7 @@ void cli_frontend::execute_commands(std::string_view exename)
 
 				util::owritestream str(file_plugin);
 				str.imbue(std::locale::classic());
-				str << std::flush;
+				str << plugins << std::flush;
 			}
 			else
 			{
