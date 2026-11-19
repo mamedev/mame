@@ -8923,6 +8923,16 @@ static INPUT_PORTS_START( pkrmast )
 	PORT_DIPSETTING(    0x00, "Only Logos" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( pkrmastc )
+	PORT_INCLUDE( pkrmast )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x02, 0x00, "Reels Roll" )      PORT_DIPLOCATION("DSW1:2")  // Default to Long so the reels spin normally.
+	PORT_DIPSETTING(    0x02, "Short" )
+	PORT_DIPSETTING(    0x00, "Long" )
+
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( jkrmast )
 	PORT_START("IN0") // PLAYER
@@ -35209,7 +35219,7 @@ GAME(  1997, jkrmastc,   jkrmast,   jkrmastc,  jkrmastb,  cmaster_state, init_jk
 GAME(  1997, jkrmastd,   jkrmast,   jkrmastc,  jkrmastb,  cmaster_state, init_jkrmastd,  ROT0, "Pick-A-Party USA",   "The New 1997 Joker Master - New York (V3G)",   MACHINE_NOT_WORKING ) // protected? calls into NVRAM when starting wheels. Needs inputs / outputs
 GAME(  1993, pkrmast,    0,         pkrmast,   pkrmast,   cmaster_state, init_pkrmast,   ROT0, "Fun USA",            "Poker Master (ED-1993, dual game, set 1)",     0 ) // puts FUN USA 95H N/G  V2.20 in NVRAM
 GAME(  1993, pkrmasta,   pkrmast,   pkrmast,   pkrmast,   cmaster_state, init_pkrmast,   ROT0, "Fun USA",            "Poker Master (ED-1993, dual game, set 2)",     0 ) // puts PM93 JAN 29/1996 V1.52 in NVRAM
-GAME(  1997, pkrmastc,   pkrmast,   pkrmast,   pkrmast,   cmaster_state, init_palnibbles, ROT0, "Yang Int'l Game Corp", "Poker Master (CUBA 1997, dual game)",       0 ) // puts FUN USA  (H)  93 V3.55 in NVRAM
+GAME(  1997, pkrmastc,   pkrmast,   pkrmast,   pkrmastc,  cmaster_state, init_palnibbles, ROT0, "Yang Int'l Game Corp", "Poker Master (CUBA 1997, dual game)",       0 ) // puts FUN USA  (H)  93 V3.55 in NVRAM
 GAME(  1993, missbingo,  pkrmast,   pkrmast,   pkrmast,   cmaster_state, init_pkrmast,   ROT0, "Fun USA",            "Miss Bingo (Poker Master HW, dual game)",      0 )
 GAME(  1997, crazybonb,  0,         crazybonb, crazybonb, cmaster_state, init_crazybonb, ROT0, "bootleg (TV Games)", "Crazy Bonus 2002 (Ver. 1, dual game)",         MACHINE_UNEMULATED_PROTECTION ) // F.B. & POKER 94, VER.1 in NVRAM
 GAME(  1993, missbingoc, crazybonb, crazybonb, crazybonb, cmaster_state, init_crazybonb, ROT0, "bootleg",            "Miss Bingo (Crazy Bonus DB, dual game)",       MACHINE_UNEMULATED_PROTECTION ) // same program as crazybonb
