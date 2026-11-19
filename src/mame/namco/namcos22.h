@@ -222,6 +222,7 @@ public:
 		m_polygonram(*this, "polygonram"),
 		m_mixer(*this, "video_mixer"),
 		m_gamma_proms(*this, "gamma_proms"),
+		m_pointrom(*this, "pointrom"),
 		m_vics_data(*this, "vics_data", 0x10000, ENDIANNESS_BIG),
 		m_vics_control(*this, "vics_control"),
 		m_attributeram(*this, "attributeram", 0xa00, ENDIANNESS_BIG),
@@ -436,6 +437,7 @@ protected:
 	required_shared_ptr<u32> m_polygonram;
 	required_shared_ptr<u32> m_mixer;
 	optional_region_ptr<u8> m_gamma_proms;
+	required_region_ptr<s32> m_pointrom;
 	memory_share_creator<u16> m_vics_data;
 	optional_shared_ptr<u32> m_vics_control;
 	memory_share_creator<u16> m_attributeram;
