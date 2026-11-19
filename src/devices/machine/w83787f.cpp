@@ -145,7 +145,7 @@ void w83787f_device::remap(int space_id, offs_t start, offs_t end)
 
 		for (int i = 0; i < 2; i++)
 		{
-			const u8 uart_setting = (BIT(m_cr1, 2 + i) >> 1) | (BIT(m_cr1, i));
+			const u8 uart_setting = (BIT(m_cr1, 2 + i) << 1) | (BIT(m_cr1, i) << 0);
 			if (uart_setting != 3)
 			{
 				const u16 uart_port[3] = { 0x2e8, 0x3e8, 0x3f8 };
@@ -274,16 +274,25 @@ void w83787f_device::drq_floppy_w(int state)
 
 void w83787f_device::irq_serial1_w(int state)
 {
-	if ((m_cr1 & 0x05) == 0x05)
+	const u8 uart_setting = (BIT(m_cr1, 2 + 0) << 1) | (BIT(m_cr1, 0) << 0);
+	// COM1 or COM3 = IRQ4
+	// COM2 or COM4 = IRQ3
+	//const u16 uart_port[3] = { COM4, COM3, COM1 };
+
+	if (uart_setting == 3)
 		return;
-	request_irq(3, state ? ASSERT_LINE : CLEAR_LINE);
+
+	request_irq(uart_setting == 0 ? 3 : 4, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void w83787f_device::irq_serial2_w(int state)
 {
-	if ((m_cr1 & 0x0a) == 0x0a)
+	const u8 uart_setting = (BIT(m_cr1, 2 + 1) << 1) | (BIT(m_cr1, 1) << 0);
+	//const u16 uart_port[3] = { COM3, COM4, COM2 };
+
+	if (uart_setting == 3)
 		return;
-	request_irq(4, state ? ASSERT_LINE : CLEAR_LINE);
+	request_irq(uart_setting == 0 ? 4 : 3, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void w83787f_device::txd_serial1_w(int state)
