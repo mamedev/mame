@@ -128,7 +128,7 @@ samsung_k9f2808u0b_device::samsung_k9f2808u0b_device(const machine_config &mconf
 	m_num_pages = 32 * 1024;
 	m_col_address_cycles = 1;
 	m_row_address_cycles = 2;
-	m_sequential_row_read = 0;
+	m_sequential_row_read = 1; // K9F2808U0B-Y and -V only, the -D package lacks it
 }
 
 samsung_k9f1g08u0b_device::samsung_k9f1g08u0b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

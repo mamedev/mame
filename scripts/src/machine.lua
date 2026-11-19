@@ -3965,6 +3965,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/tlc5620.h,MACHINES["TLC5620"] = true
+---------------------------------------------------
+
+if MACHINES["TLC5620"] then
+	files {
+		MAME_DIR .. "src/devices/machine/tlc5620.cpp",
+		MAME_DIR .. "src/devices/machine/tlc5620.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/tmc0430.h,MACHINES["TMC0430"] = true
 ---------------------------------------------------
 
