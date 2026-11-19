@@ -17,6 +17,7 @@
 #include "fileio.h"
 #include "main.h"
 #include "output.h"
+#include "rendlay.h"
 #include "screen.h"
 #include "divo.h"
 
@@ -109,6 +110,7 @@ video_manager::video_manager(running_machine &machine)
 	, m_frameskip_adjust(0)
 	, m_skipping_this_frame(false)
 	, m_average_oversleep(0)
+	, m_last_draw(0)
 	, m_snap_target(nullptr)
 	, m_snap_native(true)
 	, m_snap_width(0)
@@ -241,10 +243,21 @@ void video_manager::frame_update(bool from_debugger)
 	if (!from_debugger && phase > machine_phase::INIT && !m_low_latency && effective_throttle())
 		update_throttle(current_time);
 
+	// When unthrottled, cap to 60 FPS to avoid unnecessary draws.
+	bool skip_draw = skipped_it;
+	if (!skip_draw)
+	{
+		osd_ticks_t const now = osd_ticks();
+		if (!effective_throttle() && (now - m_last_draw < osd_ticks_per_second() / 60))
+			skip_draw = true;
+		else
+			m_last_draw = now;
+	}
+
 	// ask the OSD to update
 	{
 		auto profile = g_profiler.start(PROFILER_BLIT);
-		machine().osd().update(!from_debugger && skipped_it);
+		machine().osd().update(!from_debugger && skip_draw);
 	}
 
 	// we synchronize after rendering instead of before, if low latency mode is enabled
@@ -1063,7 +1076,9 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 	// render the screen there
 	render_primitive_list &primlist = m_snap_target->get_primitives();
 	primlist.acquire_lock();
-	if (machine().options().snap_bilinear())
+	layout_view const &view = m_snap_target->current_view();
+	const bool native_size = (m_snap_width == 0 || m_snap_height == 0) && (view.visible_items().size() == 1);
+	if (machine().options().snap_bilinear() && !native_size)
 		snap_renderer_bilinear::draw_primitives(primlist, &m_snap_bitmap.pix(0), width, height, m_snap_bitmap.rowpixels());
 	else
 		snap_renderer::draw_primitives(primlist, &m_snap_bitmap.pix(0), width, height, m_snap_bitmap.rowpixels());

@@ -151,6 +151,7 @@ private:
 	s8                  m_frameskip_adjust;
 	bool                m_skipping_this_frame;      // flag: true if we are skipping the current frame
 	osd_ticks_t         m_average_oversleep;        // average number of ticks the OSD oversleeps
+	osd_ticks_t         m_last_draw;                // real time the window was last drawn
 
 	// snapshot stuff
 	render_target *     m_snap_target;              // screen shapshot target
