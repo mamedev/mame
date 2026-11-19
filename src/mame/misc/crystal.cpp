@@ -180,6 +180,33 @@ enum : u16
 	PERMUTE = 0x278
 };
 
+const char *invalid_table(const tables &table)
+{
+	static constexpr struct
+	{
+		u16 offset;
+		u8 count;
+		u8 limit;
+		const char *name;
+	} LIMITS[] = {
+		{ PC1,       56, 56, "PC1" },
+		{ PC2,       48, 56, "PC2" },
+		{ KEY_BYTES, 48,  6, "key byte" },
+		{ KEY_BITS,  48,  8, "key bit" },
+		{ IP,        64, 64, "initial permutation" },
+		{ FP,        64, 64, "final permutation" },
+		{ EXPAND,    48, 32, "expansion" },
+		{ PERMUTE,   32, 32, "round permutation" }
+	};
+	for (const auto &range : LIMITS)
+	{
+		if (!std::all_of(table.begin() + range.offset, table.begin() + range.offset + range.count,
+			[limit = range.limit] (u8 value) { return value < limit; }))
+			return range.name;
+	}
+	return nullptr;
+}
+
 schedule make_schedule(const block &key, const tables &table)
 {
 	const u64 raw = get_u64le(key.data()) & 0x00ff'ffff'ffff'ffff;
@@ -295,7 +322,7 @@ public:
 	void set_flash_region(const finder_base &finder) { m_flash.set_tag(finder); }
 	auto data_callback() { return m_data_cb.bind(); }
 	void lines_w(int reset, int data);
-	int data_r() const { return m_output; }
+	int data_r() const { return m_host_data && m_output; }
 
 protected:
 	// device_t implementation
@@ -331,7 +358,8 @@ private:
 	std::array<u8, 512> m_output_queue;
 	u16 m_in_count, m_expected, m_out_head, m_out_count;
 	u8 m_state, m_mask, m_status, m_rx_key, m_tx_key, m_address, m_command;
-	bool m_reset, m_line, m_output, m_receiving;
+	bool m_reset, m_receiving;
+	bool m_host_data, m_output; // released levels of the two shared-line drivers
 	u8 m_rx_bit, m_rx_byte, m_rx_parity;
 	s32 m_tx_bit;
 	u8 m_tx_byte, m_tx_parity;
@@ -376,6 +404,8 @@ void crystal_hle_device::device_start()
 		m_key[i] = read_byte(m_config->key_offset + i);
 	for (u32 i = 0; i < m_tables.size(); ++i)
 		m_tables[i] = read_byte(m_config->mask_offset + 0x100 + i);
+	if (const char *const invalid = crystal_prot::invalid_table(m_tables))
+		fatalerror("%s: invalid %s protection table in cartridge ROM\n", tag(), invalid);
 	m_keys = crystal_prot::make_schedule(m_key, m_tables);
 	for (u32 i = 0; i < 4; ++i)
 	{
@@ -386,7 +416,7 @@ void crystal_hle_device::device_start()
 		std::copy(encrypted.begin(), encrypted.end(), &m_patch[8 * i]);
 	}
 	m_reset = false;
-	m_line = m_output = true;
+	m_host_data = m_output = true;
 	m_eeprom.fill(0);
 	m_input.fill(0);
 	m_output_queue.fill(0);
@@ -409,7 +439,7 @@ void crystal_hle_device::device_start()
 	save_item(NAME(m_address));
 	save_item(NAME(m_command));
 	save_item(NAME(m_reset));
-	save_item(NAME(m_line));
+	save_item(NAME(m_host_data));
 	save_item(NAME(m_output));
 	save_item(NAME(m_receiving));
 	save_item(NAME(m_rx_bit));
@@ -458,45 +488,56 @@ void crystal_hle_device::expect(u8 state, u16 count)
 
 void crystal_hle_device::output_w(int state)
 {
-	if (m_output != bool(state))
-	{
-		m_output = state;
-		m_data_cb(state);
-	}
+	const int old_line = data_r();
+	m_output = state;
+	if (old_line != data_r())
+		m_data_cb(data_r());
 }
 
 void crystal_hle_device::lines_w(int reset, int data)
 {
-	if (reset && !m_reset)
-		device_reset();
+	const int old_line = data_r();
+	const bool reset_asserted = reset && !m_reset;
 	m_reset = reset;
+	m_host_data = data;
+	if (reset_asserted)
+		device_reset();
 	// The host may start its reply during the final stop bit.  At that point
 	// the PIC has released the shared line and is ready to receive again.
 	const bool listening = !m_out_count || (m_out_count == 1 && m_tx_bit >= 11);
-	if (!reset && !m_receiving && listening && m_line && !data)
+	if (!reset && !m_receiving && listening && old_line && !data_r())
 	{
 		m_receiving = true;
 		m_rx_bit = m_rx_byte = m_rx_parity = 0;
-		m_rx_timer->adjust(attotime::from_nsec(156250)); // 1.5 bits at 9600 baud
+		m_rx_timer->adjust(attotime::from_hz(19200)); // validate the start bit halfway through
 	}
-	m_line = data;
 }
 
 TIMER_CALLBACK_MEMBER(crystal_hle_device::rx_tick)
 {
-	if (m_rx_bit < 8)
+	const u8 line = data_r();
+	if (!m_rx_bit)
 	{
-		m_rx_byte |= u32(m_line) << m_rx_bit;
-		m_rx_parity ^= u8(m_line);
+		// Both dumped firmwares reject pulses shorter than half a bit.
+		if (line)
+		{
+			m_receiving = false;
+			return;
+		}
 	}
-	else if (m_rx_bit == 8)
+	else if (m_rx_bit <= 8)
 	{
-		m_status = (m_status & ~1) | (m_rx_parity ^ u8(m_line));
+		m_rx_byte |= u32(line) << (m_rx_bit - 1);
+		m_rx_parity ^= line;
+	}
+	else if (m_rx_bit == 9)
+	{
+		m_status = (m_status & ~1) | (m_rx_parity ^ line);
 	}
 	else
 	{
 		m_receiving = false;
-		if (m_line)
+		if (line)
 			receive(m_rx_byte);
 		return;
 	}
@@ -848,7 +889,11 @@ void crystal_state::pioldat_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 
 	if (m_hle)
+	{
 		m_hle->lines_w(BIT(m_pio, 30), !BIT(m_pio, 29));
+		// Host writes update readback without raising the PIC output interrupt.
+		m_pic_data = m_hle->data_r();
+	}
 }
 
 // PIO External DATa Register
@@ -1250,7 +1295,8 @@ void crystal_state::crystal(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &crystal_state::main_map);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 
-	// maldaiza requires DEFAULT_ALL_1 or it doesn't create valid defaults
+	// DEFAULT_ALL_1 seems to be correct
+	// maldaiza and donghaer require it or they don't create valid defaults
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
 	VRENDER0_SOC(config, m_vr0soc, 14'318'180 * 6); // TODO : dynamic via PLL
@@ -1486,7 +1532,7 @@ loop.  Also it seems that bit 0x40000000 is the PIC reset.
 
 //    YEAR  NAME      PARENT    MACHINE    INPUT     CLASS          INIT           ROT   COMPANY                FULLNAME                              FLAGS
 GAME( 2001, crysbios, 0,        crystal,   crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS",                MACHINE_IS_BIOS_ROOT )
-GAME( 2001, crysking, crysbios, crysking,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "The Crystal of Kings",               0 )
+GAME( 2001, crysking, crysbios, crysking,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "The Crystal of Kings",               MACHINE_UNEMULATED_PROTECTION )
 GAME( 2001, evosocc,  crysbios, evosocc,   crystal,  crystal_state, empty_init,    ROT0, "Evoga / BrezzaSoft",  "Evolution Soccer",                   0 )
 GAME( 2001, officeye, 0,        pic16f84a, officeye, crystal_state, empty_init,    ROT0, "Danbi",               "Office Yeoin Cheonha (version 1.2)", 0 )
 GAME( 2001, donghaer, crysbios, donghaer,  crystal,  crystal_state, empty_init,    ROT0, "Danbi",               "Donggul Donggul Haerong",            0 )
