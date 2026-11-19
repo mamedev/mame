@@ -57,9 +57,9 @@ private:
 	u8 m_clip_y2;
 	u8 m_scroll_x;
 	u8 m_scroll_y;
-
 };
 
 
 DECLARE_DEVICE_TYPE(SPECNEXT_LORES, specnext_lores_device)
+
 #endif // MAME_SINCLAIR_NEXT_SPECNEXT_LORES_H

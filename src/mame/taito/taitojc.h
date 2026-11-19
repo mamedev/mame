@@ -163,7 +163,7 @@ public:
 	void init_dendego2() ATTR_COLD;
 
 private:
-	output_finder<6> m_counters;
+	output_finder<4> m_counters;
 
 	void speedmeter_w(uint8_t data);
 	void brakemeter_w(uint8_t data);

@@ -101,17 +101,12 @@
  *************************************/
 
 // configurable logging
-#define LOG_BLITTER     (1U << 1)
+#define LOG_BLITTER   (1U << 1)
 #define LOG_VIDEO     (1U << 2)
 
 //#define VERBOSE (LOG_GENERAL | LOG_BLITTER | LOG_VIDEO)
 
 #include "logmacro.h"
-
-#define LOGBLITTER(...)     LOGMASKED(LOG_BLITTER,     __VA_ARGS__)
-#define LOGVIDEO(...)     LOGMASKED(LOG_VIDEO,     __VA_ARGS__)
-
-
 
 
 /*************************************
@@ -163,6 +158,7 @@ void itech8_state::video_start()
 	save_item(NAME(m_fetch_rle_count));
 	save_item(NAME(m_fetch_rle_value));
 	save_item(NAME(m_fetch_rle_literal));
+	save_item(NAME(m_analog_last));
 }
 
 
@@ -189,7 +185,7 @@ void itech8_state::palette_w(offs_t offset, u8 data)
 void itech8_state::page_w(u8 data)
 {
 	m_screen->update_partial(m_screen->vpos());
-	LOGVIDEO("%s:display_page = %02X (%d)\n", machine().describe_context(), data, m_screen->vpos());
+	LOGMASKED(LOG_VIDEO, "%s:display_page = %02X (%d)\n", machine().describe_context(), data, m_screen->vpos());
 	m_page_select = data;
 }
 
@@ -283,7 +279,7 @@ void itech8_state::perform_blit()
 	int x, y;
 
 	// debugging
-	LOGBLITTER("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
+	LOGMASKED(LOG_BLITTER, "Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
 				m_screen->vpos(),
 				(m_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				m_tms34061->xyaddress() | ((m_tms34061->xyoffset() & 0x300) << 8),
@@ -407,7 +403,7 @@ TIMER_CALLBACK_MEMBER(itech8_state::blitter_done)
 	m_blit_in_progress = 0;
 	update_interrupts(-1, -1, 1);
 
-	LOGBLITTER("------------ BLIT DONE (%d) --------------\n", m_screen->vpos());
+	LOGMASKED(LOG_BLITTER, "------------ BLIT DONE (%d) --------------\n", m_screen->vpos());
 }
 
 
@@ -423,7 +419,7 @@ u8 itech8_state::blitter_r(offs_t offset)
 	int result = m_blitter_data[offset / 2];
 
 	// debugging
-	LOGBLITTER("%s:blitter_r(%02x)\n", machine().describe_context(), offset / 2);
+	LOGMASKED(LOG_BLITTER, "%s: blitter_r(%02x)\n", machine().describe_context(), offset / 2);
 
 	// low bit seems to be ignored
 	offset /= 2;
@@ -441,7 +437,10 @@ u8 itech8_state::blitter_r(offs_t offset)
 
 	// a read from offsets 12-15 return input port values
 	if (offset >= 12 && offset <= 15)
-		result = m_an[offset - 12].read_safe(0);
+	{
+		LOGMASKED(LOG_BLITTER, "%s: Reading input port %d\n", machine().describe_context(), offset - 12);
+		result = m_an[offset - 12].read_safe(0) - m_analog_last[offset - 12];
+	}
 
 	return result;
 }
@@ -457,12 +456,12 @@ void itech8_state::blitter_w(offs_t offset, u8 data)
 	if (offset == 3)
 	{
 		// log to the blitter file
-		LOGBLITTER("Blit: XY=%1X%04X SRC=%02X%02X%02X SIZE=%3dx%3d FLAGS=%02x",
+		LOGMASKED(LOG_BLITTER, "Blit: XY=%1X%04X SRC=%02X%02X%02X SIZE=%3dx%3d FLAGS=%02x",
 						(m_tms34061->xyoffset() >> 8) & 0x0f, m_tms34061->xyaddress(),
 						m_grom_bank, m_blitter_data[0], m_blitter_data[1],
 						m_blitter_data[4], m_blitter_data[5],
 						m_blitter_data[2]);
-		LOGBLITTER("   %02X %02X %02X [%02X] %02X %02X %02X [%02X]-%02X %02X %02X %02X [%02X %02X %02X %02X]\n",
+		LOGMASKED(LOG_BLITTER, "   %02X %02X %02X [%02X] %02X %02X %02X [%02X]-%02X %02X %02X %02X [%02X %02X %02X %02X]\n",
 						m_blitter_data[0], m_blitter_data[1],
 						m_blitter_data[2], m_blitter_data[3],
 						m_blitter_data[4], m_blitter_data[5],
@@ -480,8 +479,15 @@ void itech8_state::blitter_w(offs_t offset, u8 data)
 		m_blitter_done_timer->adjust(attotime::from_hz(12000000/4) * (BLITTER_WIDTH * BLITTER_HEIGHT + 12));
 	}
 
+	if (offset == 12)
+	{
+		// writes to offset 12 (0xc) seem to correspond to trackball latching for delta purposes
+		for (int i = 0; i < 4; i++)
+			m_analog_last[i] = m_an[i].read_safe(0);
+	}
+
 	// debugging
-	LOGBLITTER("%s:blitter_w(%02x)=%02x\n", machine().describe_context(), offset, data);
+	LOGMASKED(LOG_BLITTER, "%s:blitter_w(%02x)=%02x\n", machine().describe_context(), offset, data);
 }
 
 
@@ -595,13 +601,13 @@ u32 itech8_state::screen_update_2layer(screen_device &screen, bitmap_rgb32 &bitm
 	//    top layer @ 0x00000 is only 4bpp, colors come from the first 16 palettes
 	// bottom layer @ 0x20000 is full 8bpp
 	u32 const page_offset = m_tms34061->m_display.dispstart & 0x0ffff;
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u8 const *const base0 = &m_tms34061->m_display.vram[(0x00000 + page_offset + y * 256) & VRAM_MASK];
 		u8 const *const base2 = &m_tms34061->m_display.vram[(0x20000 + page_offset + y * 256) & VRAM_MASK];
 		u32 *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			u8 const pix0 = base0[x] & 0x0f;
 			dest[x] = pens[pix0 ? pix0 : base2[x]];
@@ -631,13 +637,13 @@ u32 grmatch_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	// 4bpp pixels are packed 2 to a byte
 	// xscroll is set via a separate register
 	u32 const page_offset = (m_tms34061->m_display.dispstart & 0x0ffff) | m_xscroll;
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u8 const *const base0 = &m_tms34061->m_display.vram[0x00000 + ((page_offset + y * 256) & 0xffff)];
 		u8 const *const base2 = &m_tms34061->m_display.vram[0x20000 + ((page_offset + y * 256) & 0xffff)];
 		u32 *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.left() & ~1; x <= cliprect.right(); x += 2)
 		{
 			u8 const pix0 = base0[x / 2];
 			u8 const pix2 = base2[x / 2];
@@ -674,12 +680,12 @@ u32 itech8_state::screen_update_2page(screen_device &screen, bitmap_rgb32 &bitma
 	// there are two pages, each of which is a full 8bpp
 	// page index is selected by the top bit of the page_select register
 	u32 const page_offset = ((m_page_select & 0x80) << 10) | (m_tms34061->m_display.dispstart & 0x0ffff);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u8 const *const base = &m_tms34061->m_display.vram[(page_offset + y * 256) & VRAM_MASK];
 		u32 *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			dest[x] = pens[base[x]];
 	}
 	return 0;
@@ -705,13 +711,13 @@ u32 itech8_state::screen_update_2page_large(screen_device &screen, bitmap_rgb32 
 	// the upper 4 bits were latched on each write into a separate bitmap
 	// page index is selected by the top bit of the page_select register
 	u32 const page_offset = ((~m_page_select & 0x80) << 10) | (m_tms34061->m_display.dispstart & 0x0ffff);
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u8 const *const base = &m_tms34061->m_display.vram[(page_offset + y * 256) & VRAM_MASK];
 		u8 const *const latch = &m_tms34061->m_display.latchram[(page_offset + y * 256) & VRAM_MASK];
 		u32 *const dest = &bitmap.pix(y);
 
-		for (int x = cliprect.min_x & ~1; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.left() & ~1; x <= cliprect.right(); x += 2)
 		{
 			dest[x + 0] = pens[(latch[x/2] & 0xf0) | (base[x/2] >> 4)];
 			dest[x + 1] = pens[((latch[x/2] << 4) & 0xf0) | (base[x/2] & 0x0f)];

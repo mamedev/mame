@@ -30,11 +30,12 @@
 #include "emu.h"
 #include "d9060.h"
 
-#include "bus/scsi/d9060hd.h"
-#include "bus/scsi/scsi.h"
+#include "bus/nscsi/devices.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/6522via.h"
 #include "machine/mos6530.h"
+#include "machine/nscsi_bus.h"
+#include "machine/nscsi_cb.h"
 
 
 
@@ -116,8 +117,7 @@ private:
 	required_device<mos6532_device> m_riot0;
 	required_device<mos6532_device> m_riot1;
 	required_device<via6522_device> m_via;
-	required_device<scsi_port_device> m_sasibus;
-	required_device<output_latch_device> m_sasi_data_out;
+	required_device<nscsi_callback_device> m_sasi;
 	required_ioport m_address;
 	output_finder<3> m_leds;
 
@@ -228,6 +228,9 @@ void d9060_device_base::hdc_mem(address_map &map)
 
 uint8_t d9060_device_base::dio_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -274,6 +277,9 @@ void d9060_device_base::dio_w(uint8_t data)
 
 uint8_t d9060_device_base::riot1_pa_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -340,6 +346,9 @@ void d9060_device_base::riot1_pa_w(uint8_t data)
 
 uint8_t d9060_device_base::riot1_pb_r()
 {
+	if (!m_bus->sample_ready(*m_maincpu))
+		return 0xff;
+
 	/*
 
 	    bit     description
@@ -414,13 +423,13 @@ void d9060_device_base::via_pb_w(uint8_t data)
 
 	*/
 
-	m_sasibus->write_sel(BIT(data, 0));
-	m_sasibus->write_rst(BIT(data, 1));
+	m_sasi->sel_w(BIT(data, 0));
+	m_sasi->rst_w(BIT(data, 1));
 }
 
 void d9060_device_base::ack_w(int state)
 {
-	m_sasibus->write_ack(!state);
+	m_sasi->ack_w(!state);
 }
 
 void d9060_device_base::enable_w(int state)
@@ -429,11 +438,11 @@ void d9060_device_base::enable_w(int state)
 
 	if( !m_enable )
 	{
-		m_sasi_data_out->write( m_data );
+		m_sasi->write( m_data );
 	}
 	else
 	{
-		m_sasi_data_out->write( 0 );
+		m_sasi->write( 0 );
 	}
 }
 
@@ -443,7 +452,7 @@ void d9060_device_base::scsi_data_w(uint8_t data)
 
 	if( !m_enable )
 	{
-		m_sasi_data_out->write( m_data );
+		m_sasi->write( m_data );
 	}
 }
 
@@ -474,31 +483,26 @@ void d9060_device_base::device_add_mconfig(machine_config &config)
 	m_hdccpu->set_addrmap(AS_PROGRAM, &d9060_device::hdc_mem);
 
 	MOS6522(config, m_via, XTAL(4'000'000)/4);
+	m_via->readpa_handler().set(m_sasi, FUNC(nscsi_callback_device::read));
 	m_via->writepa_handler().set(FUNC(d9060_device_base::scsi_data_w));
 	m_via->writepb_handler().set(FUNC(d9060_device_base::via_pb_w));
 	m_via->ca2_handler().set(FUNC(d9060_device_base::ack_w));
 	m_via->cb2_handler().set(FUNC(d9060_device_base::enable_w));
 	m_via->irq_handler().set_inputline(m_hdccpu, M6502_IRQ_LINE);
 
-	SCSI_PORT(config, m_sasibus);
-	m_sasibus->req_handler().set(M6522_TAG, FUNC(via6522_device::write_ca1));
-	m_sasibus->cd_handler().set(M6522_TAG, FUNC(via6522_device::write_pb2));
-	m_sasibus->bsy_handler().set(M6522_TAG, FUNC(via6522_device::write_pb3));
-	m_sasibus->io_handler().set(M6522_TAG, FUNC(via6522_device::write_pb6));
-	m_sasibus->msg_handler().set(M6522_TAG, FUNC(via6522_device::write_pb7));
-	m_sasibus->data0_handler().set(M6522_TAG, FUNC(via6522_device::write_pa0));
-	m_sasibus->data1_handler().set(M6522_TAG, FUNC(via6522_device::write_pa1));
-	m_sasibus->data2_handler().set(M6522_TAG, FUNC(via6522_device::write_pa2));
-	m_sasibus->data3_handler().set(M6522_TAG, FUNC(via6522_device::write_pa3));
-	m_sasibus->data4_handler().set(M6522_TAG, FUNC(via6522_device::write_pa4));
-	m_sasibus->data5_handler().set(M6522_TAG, FUNC(via6522_device::write_pa5));
-	m_sasibus->data6_handler().set(M6522_TAG, FUNC(via6522_device::write_pa6));
-	m_sasibus->data7_handler().set(M6522_TAG, FUNC(via6522_device::write_pa7));
-
-	OUTPUT_LATCH(config, m_sasi_data_out);
-	m_sasibus->set_output_latch(*m_sasi_data_out);
-
-	m_sasibus->set_slot_device(1, "harddisk", D9060HD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
+	NSCSI_BUS(config, SASIBUS_TAG);
+	NSCSI_CONNECTOR(config, SASIBUS_TAG ":0", default_scsi_devices, "d9060hd");
+	NSCSI_CONNECTOR(config, SASIBUS_TAG ":7", default_scsi_devices, "scsicb", true)
+		.option_add_internal("scsicb", NSCSI_CB)
+		.machine_config([this] (device_t *device)
+		{
+			nscsi_callback_device &sasi = downcast<nscsi_callback_device &>(*device);
+			sasi.req_callback().set(m_via, FUNC(via6522_device::write_ca1));
+			sasi.cd_callback().set(m_via, FUNC(via6522_device::write_pb2));
+			sasi.bsy_callback().set(m_via, FUNC(via6522_device::write_pb3));
+			sasi.io_callback().set(m_via, FUNC(via6522_device::write_pb6));
+			sasi.msg_callback().set(m_via, FUNC(via6522_device::write_pb7));
+		});
 }
 
 
@@ -567,8 +571,7 @@ d9060_device_base::d9060_device_base(const machine_config &mconfig, device_type 
 	, m_riot0(*this, M6532_0_TAG)
 	, m_riot1(*this, M6532_1_TAG)
 	, m_via(*this, M6522_TAG)
-	, m_sasibus(*this, SASIBUS_TAG)
-	, m_sasi_data_out(*this, "sasi_data_out")
+	, m_sasi(*this, SASIBUS_TAG ":7:scsicb")
 	, m_address(*this, "ADDRESS")
 	, m_leds(*this, "led%u", 0U)
 	, m_rfdo(1)
@@ -613,9 +616,17 @@ void d9060_device_base::device_start()
 	save_item(NAME(m_daco));
 	save_item(NAME(m_atna));
 	save_item(NAME(m_enable));
+	save_item(NAME(m_ifc));
+	save_item(NAME(m_data));
 
 	m_via->write_pb4(!(m_variant == TYPE_9090)); // J14 (6 HEADS)
 	m_via->write_pb5(!(m_variant == TYPE_9060)); // J13 (4 HEADS)
+
+	// SASI status lines start out deasserted
+	m_via->write_pb2(0);
+	m_via->write_pb3(0);
+	m_via->write_pb6(0);
+	m_via->write_pb7(0);
 }
 
 
@@ -630,7 +641,7 @@ void d9060_device_base::device_reset()
 
 	m_hdccpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 
-	m_riot1->pa_bit_w<7>(1);
+	m_riot1->pa_bit_w<7>(0);
 }
 
 
@@ -642,7 +653,7 @@ void d9060_device_base::ieee488_atn(int state)
 {
 	update_ieee_signals();
 
-	m_riot1->pa_bit_w<7>(state);
+	m_riot1->pa_bit_w<7>(!state);
 }
 
 

@@ -73,6 +73,7 @@ private:
 	devcb_write_line m_intrq_cb;
 
 	uint16_t m_sector_bytes; // sector size taken from the mounted drive (128/256/512)
+	bool m_read_busy;        // a READ SECTOR is in progress: report BSY until the WD1010 completes it
 };
 
 DECLARE_DEVICE_TYPE(WD1002_HD0, wd1002_hd0_device)

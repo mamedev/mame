@@ -38,14 +38,11 @@ B; see the link handlers below and the 'Protection' section in the comments
 above init_hshavoc().
 
 
-TODO: three things need the board rather than more analysis, and between them
-      they would close everything still open here.  Continuity from the PIC's
-      port A pins to the control inputs of the two PEELs would give the rule
-      for the 0x3d000 block, which is currently decrypted by replicating one
-      copy; whether any PEEL I/O pin reaches the 68000 data bus would confirm
-      or demolish the model of the scrambling as a whole; and what sits on the
-      PIC's port C, together with what holds the 68000 off at start-up, would
-      replace the two guesses in the machine config that happen to work.
+TODO: - what holds the 68000 off at start-up, and what drives the PIC's port C,
+        are both guesses that happen to work (see 'Talking to the PIC');
+      - which signal pulls i8 of the 5b PEEL low is not known; it follows
+        whoever other than the 68000 owns the bus, so the regions those bus
+        masters read are still listed by address (see 'Program ROM scrambling').
       See the comments above init_hshavoc().
 */
 
@@ -196,10 +193,14 @@ void hshavoc_state::pic_porta_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_pic_porta = (m_pic_porta & ~mem_mask) | (data & mem_mask);
 
-	/* Port A bit 1 is pulsed low for a single instruction at the top of the
-	   self test routine at 0x000, and then held low from 0x086 until 0x0d4 -
-	   the window in which the boot handshake happens.  Only the second of
-	   those means the PIC is ready, so wait and see whether it stays low. */
+	/* Port A bit 1 is taken to be the clear input of the PEEL at 4b (see 'What
+	   the PEELs do' above init_hshavoc()).  The PIC holds it low
+	   from 0x086 until 0x0d4, while the 68000 runs its boot code and the boot
+	   handshake happens, so it marks the moment the 68000 has to start - but it
+	   is also pulsed low for a single instruction at the top of the self test
+	   at 0x000, so wait and see whether it stays low.  Bits 0 and 3 are taken
+	   to select the descrambler setting; since every part of the ROM only ever
+	   runs under one setting, init_hshavoc() applies them statically. */
 	if (!m_pic_ready && !BIT(m_pic_porta, 1))
 		m_ready_timer->adjust(attotime::from_usec(20));
 }
@@ -378,98 +379,114 @@ Program ROM scrambling
 
 The 68000 data bus is scrambled.  Ten of the sixteen bits are simply permuted,
 which the PCB traces do for free; the remaining six - bits 0, 1, 2, 8, 9 and 10 -
-also go through the logic in the PEEL at 5b.  Which of two transforms it
-applies alternates on a period of 16 words, driven by a counter in the PEEL at
-4b; counter_decode[] below is that counter's output.
+also go through the PEEL at 5b, which applies one of six fixed functions to
+them.  Which one is decided by the PEEL at 4b and, through it, by the PIC, so on
+the board the decryption depends on what the PIC has selected when a word is
+fetched rather than on a list of address ranges.  Statically it comes down to:
 
-Most of the ROM decrypts with that scheme.  These regions do not:
-
-    0x000000-0x000007   initial SSP and reset PC        always 'type 0'
-    0x000c42-0x00109b   arcade-specific startup code    always 'type 0'
-    0x03c000-0x03c2ff   arcade-only HUD tiles           transform 0, no XOR
-    0x040440-0x04ff39   sprite tiles and arcade HUD     transform 0, no XOR
-    0x053f94-0x0544b3   further tiles                   transform 0, no XOR
-    0x0e8000-0x0fffff   graphics and data               transform 0, no XOR
-    0x03d000-0x03e1ff   six copies of one routine       see 'The 0x3d000 block'
-
-Older versions of this driver applied a second, different bitswap to the four
-regions marked above.  There is no second bitswap: that permutation is the one
-below followed by transform 0, which exchanges two of the three pairs and adds
-no XOR.  It leaves 0x0000 and 0xffff alone, which is why those regions look
-unencrypted and why the graphics match the Mega Drive release byte for byte.
+    most of the ROM              setting 0 - type 1 and type 0 alternating with
+                                 address bits A1-A4
+    0x000000-0x000007            always type 0, because they are fetched while
+    0x000c42-0x00109b            the PIC holds low what is taken to be the
+                                 clear input of 4b
+    0x03d000-0x03e1ff            settings 1 to 6, see 'The 0x3d000 block'
+    0x03c000-0x03c2ff            function 0, with i8 of 5b low, because only
+    0x04043a-0x04ff39            the VDP (by DMA) or the Z80 (through its bank
+    0x053f94-0x0544b3            window) ever reads them
+    0x0e8000-0x0fffff
 
 The startup block at 0xc42 holds the boot chain (a run of 'move.l #imm,-(A7)'
 pushes terminated by an rts, so the pushed addresses run as a chain of
-subroutines), the JAMMA input reading code, and the "DATA EAST CORPORATION"
-string the PIC checks.  Because it is uniformly type 0 it also decrypts the
-reset vector, so the four hand-patched XORs that older versions of this driver
-applied to src[0..3] are no longer needed.
+subroutines), the JAMMA input reading code and the "DATA EAST CORPORATION"
+string the PIC checks.  The PIC pulls port A bit 1 - taken to be the 4b clear,
+see 'What the PEELs do' - low at 0x086, just before it starts listening, and
+lets go at 0x0d4 once the exchange is over, so the reset vectors and everything
+the 68000 runs up to that point decrypt as type 0.
 
-Three of the four tile regions can be checked against the Mega Drive release
-(Captain Lang), which they match byte-for-byte: 0x40440-0x4e239 at a shift of
--0x50, 0x53f94-0x544b3 at -0x1604, and 0xe8000 up at 0.  0x40440 is also where
-the index tables that precede it end.  Beyond 0x4e23a the graphics are
-arcade-only - the coin-op HUD and score digits have no home equivalent - so
-there is no reference for them, but they use the same bitswap and the set is
-zero-padded up to 0x4ff3a, where the main scheme resumes and picks the Mega
-Drive data up again.  0x3c000-0x3c2ff is arcade-only too, bounded by 0xff fill
-below and blank EPROM above.
+In the four function 0 regions the permutation below is followed by function 0,
+which exchanges two of the three pairs and adds no XOR.  That leaves 0x0000 and
+0xffff alone, which is why those regions look unencrypted and why they match the
+Mega Drive release byte for byte.
 
-Note that 0x4e23a is a real boundary that appears as a pointer inside the
-tables at 0x40406, but it is the end of the first sprite set, not of the
-scrambling region - a distinction that cost some time to work out.
+Three of those four regions can be checked against the Mega Drive release
+(Captain Lang), which they match byte-for-byte: 0x4043a-0x4e239 at a shift of
+-0x50, 0x53f94-0x544b3 at -0x1604, and 0xe8000 up at 0.  0x4043a is where the
+index tables that precede it end and the first sprite DMA starts.  Beyond
+0x4e23a the graphics are arcade-only - the coin-op HUD and score digits have no
+home equivalent - so there is no reference for them, but they take the same
+function and the set is zero-padded up to 0x4ff3a, where setting 0 resumes and
+picks the Mega Drive data up again.  0x3c000-0x3c2ff is arcade-only too, bounded
+by 0xff fill below and blank EPROM above.  Note that 0x4e23a appears as a
+pointer inside the tables at 0x40406, but it is the end of the first sprite set,
+not of the region.
 
-When looking for further regions of this kind, the giveaway is that a raw
-0x0000 word - eight transparent pixels, which tile data is full of - comes out
-of the main scheme as 0x0701 on a type-1 word and 0x0606 on a type-0 one.  A
-high density of those two values is a far sharper indicator than any
-statistical measure of the decrypted result.
+These regions are what the other two bus masters on the board read.  Read
+watchpoints over all four, together with a log of every write to the VDP control
+port and of every Z80 access to its bank window, were taken over the attract
+mode and a game up to stage 2, and they show
+    - no read of any of the four regions by the 68000 itself;
+    - 9613 DMAs from ROM, every one of them inside the regions;
+    - 615225 Z80 reads through the bank window, every one of them between 0xe8000
+      and 0xfffff, which is sound data rather than graphics.
+That fits i8 being high while the 68000 is driving the bus and low while the VDP
+or the Z80 is, with the address ranges only a way of saying which data those two
+ever fetch.  It was measured in MAME rather than on the board, and which pin
+feeds i8 - BGACK, or something in the bus arbitration of the Sega chip - is not
+known.  The ranges cannot simply be replaced by a test on the bus master in the
+driver, because MAME's VDP DMA and Z80 bank window both read the 68000 address
+space directly, with nothing to say who is asking.
+
+When looking for further regions of this kind, the giveaway is that a raw 0x0000
+word - eight transparent pixels, which tile data is full of - comes out of
+setting 0 as 0x0701 on a type-1 word and 0x0606 on a type-0 one.  A high density
+of those two values is a far sharper indicator than any statistical measure of
+the decrypted result.
 
 
 What the PEELs do
 -----------------
 
-The two PEEL18CV8s generate the scrambling control, and their fuse maps explain
-the scheme completely enough to have cracked the 0x3d000 block with.
+Both fuse maps have been read with jedutil.  Which pin does what is deduced from
+those equations together with the ROM and PIC contents; none of it has been
+traced on a board.
 
-The one at 4b is a 4-bit synchronous binary counter (its four registered
-outputs are a textbook ripple chain) with an asynchronous clear, plus a
-one-clock delay of one input pin.  Its o18 output, with that input and its
-delayed copy both low, is the exact complement of counter_decode[] below for
-all sixteen entries - which is how that table was identified as the counter's
-output rather than an arbitrary pattern.
+5b transforms the six bits as three pairs, (0,1), (2,8) and (9,10).  Exactly one
+assignment of its pins to those bits makes its equations reproduce, entry for
+entry, both 64-value tables the bulk of the ROM needs.  Under that assignment
+its 32 control settings give six distinct functions, numbered as in peel_5b():
 
-The one at 5b transforms three input pairs into three output pairs, gated by
-i1, i8, i9, i12 and an internal state bit.  Six outputs matches the six data
-bits that need more than a permutation, and there is exactly one assignment of
-pins to bits under which its equations reproduce, entry for entry, both of the
-64-value tables this driver applies by hand: the pairs are (0,1), (2,8) and
-(9,10), and the two transforms differ only in i9, which must therefore be
-driven by the counter decode from 4b.
+    0              b1   | b0   | b8      | b2    | b9       | b10        i8 low
+    1  type 1      b0^1 | b1   | b2      | b8^1  | b9^b10^1 | b10^1      i1 low,  i9 low
+    2  type 0      b0   | b1^1 | b2^b8^1 | b8    | b10^1    | b9^b10^1   i1 low,  i9 high
+    3              b1^1 | b0   | b8^1    | b2^b8 | b10^1    | b9         i1 high, i9 low, state 0
+    4              b1   | b0^1 | b2^b8   | b2^1  | b10      | b9^1       i1 high, i9 low, state 1
+    5              b0^1 | b1^1 | b2^1    | b8^1  | b9       | b9^b10^1   i1 high, i9 high
 
-Across its 32 control settings 5b produces six distinct transforms; four of
-them are peel_5b() below, and two of those four are the type 1 and type 0 that
-the main scheme alternates between.  Written out on the pairs the six are:
+with i8 high and i12 low on every line but the first.  0 exchanges the members
+of (0,1) and (2,8) outright, and 3 and 4 those of (0,1) and (9,10), at most
+inverting one of them; everywhere else a pair either keeps its members in place
+or mixes them with an XOR.
 
-    1 = type 1 above     b0^1 | b1   | b2      | b8^1  | b9^b10^1 | b10^1
-    2 = type 0 above     b0   | b1^1 | b2^b8^1 | b8    | b10^1    | b9^b10^1
-    3                    b1^1 | b0   | b8^1    | b2^b8 | b10^1    | b9
-    4                    b1   | b0^1 | b2^b8   | b2^1  | b10      | b9^1
-    5                    b0^1 | b1^1 | b2^1    | b8^1  | b9       | b9^b10^1
+'state' is 5b's one registered output.  i1 is pin 1, which on an 18CV8 is also
+the register clock, so the state is loaded on each rising edge of i1 and held
+until the next.  With i8 high the value loaded is a function of the six
+scrambled bits on the inputs at that moment, taken from the word fetched just
+before the edge; peel_5b_state() is that function.
 
-3 and 4 exchange the two members of every pair, the others do not - the
-conditional swap the 5b equations describe.  Earlier versions of this driver
-wrote the first two out as XOR keys with tests on the value being decrypted;
-that gives identical results everywhere it was used, but it is not what the
-hardware does, and it does not extend to the other four.
+4b provides i1 and i9.  Its pins 13 to 16 carry a 4-bit counter, but the
+counter's outputs are only enabled while its i2 is low, and o18 and o19 decode
+the pins rather than the registers.  The decryption follows address bits A1-A4
+exactly, so those pins are evidently driven by the address bus and the counter
+itself plays no part.  o18 drives i9 of 5b and o19 drives i1.  The other inputs
+that matter are i1 - also 4b's own clock - i4, and i3, an asynchronous clear;
+rf12 holds i4 as it was on the last rising edge of i1.  The three bits (i1, i4,
+rf12) are the 'setting' used in init_hshavoc(), and PLD_4B[] there lists o19
+and o18 for each of the seven settings and each value of A1-A4, plus the clear.
+With the clear held o18 is high and o19 low whatever the address, which is
+type 0.
 
-None of this has been confirmed on the board.  The discriminating measurement
-is whether any of the PEEL I/O pins reach the 68000 data bus at all: if none
-do, the scrambling was applied to the ROM image when it was built, the PEELs do
-something else, and the match between the 4b counter decode and the pattern
-this driver applies is a remarkable coincidence rather than an explanation.
-The PIC's port A pins are worth tracing at the same time - see 'The 0x3d000 block'
-below for why they look like the thing that picks among these six.
+Those three inputs come from the PIC: port A bit 3 is i1, bit 0 is i4 and bit 1
+is i3.  That is not measured either, but it is not a fit - see below.
 
 
 The 0x3d000 block
@@ -481,65 +498,47 @@ reached by any visible call - the dispatch table at 0x3a424 is the
 authoritative list of entry points, and looking for them by code signature
 instead will miss the ones whose entry decrypts into something unrecognisable.
 
-The main scheme does not decrypt them: the first branch in each comes out with
-an odd target or an illegal opcode, the 68000 takes an exception, and the game
-restarts.  What does work is the transforms above.  The ten bits the XOR stages
-never touch are already correct here, so only six bits per word are wrong, and
-choosing among T1, T3 and T5 by word position decrypts the first copy
-completely - 62 of 62 accesses to 0xa10005 well formed, and a routine that
-writes 0xfffe30, 0xfffe31 and 0xfffe32, which is exactly what the protection
-below reads.
+Each entry of that table pairs a copy with a serial routine that runs first and
+sends the PIC one byte.  The PIC's dispatcher at 0x0e1 branches on it to a short
+block that sets port A, and read with the wiring above each block leaves 4b in
+a different setting:
 
-Five of the six copies then come out identical to the first, word for word,
-under the same choice seen from a different starting point; every word of the
-sixth admits a transform that agrees with it as well, and the chance of that
-happening by accident is nil, so all six certainly hold the same code.
+    serial routine   sends   PIC block   setting   copy
+    0x3a4ee          0x11    0x1a9       1         0x3d000
+    0x3a6b6          0x16    0x1b2       2         0x3d302
+    0x3a87e          0x1d    0x1b9       3         0x3d604
+    0x3aa46          0x23    0x1bf       4         0x3d900
+    0x3ac0e          0x2c    0x1c4       5         0x3dc02
+    0x3add6          0x2f    0x1cb       6         0x3df04
 
-No rule based on the address reproduces that, because the selection does not
-come from the address - it comes from the two PEELs, with the PIC setting them
-up.  The counter in 4b drives 5b: its o18 goes to i9 and its o19 to i1, with i8
-tied high and i12 and the state bit low.  That wiring is forced - it is the only
-one that turns the counter into the exact sequence of transforms the first copy
-needs.  The counter is cleared at the top of every routine, so every copy starts
-from the same phase, and what distinguishes them is two more inputs of 4b: i1
-and i4, the latter also appearing one clock late in rf12.
+Each copy ends by calling the subroutine at its own offset 0xe0 (0x3d0e0,
+0x3d3e2, 0x3d6e4, ...; all branches in the copies are PC-relative), which sends
+0x08; that goes to the block at 0x1a1 and puts 4b back to setting 0.  Logging
+port A against the PIC's program counter across a two player game shows exactly
+that alternation.
 
-Solving for those against the decrypted first copy gives, read as a three bit
-field,
+The settings follow independently from the ROM and from the PIC: solving for
+(i1, i4, rf12) against the decrypted first copy gives 1 to 6, in order, and
+reading them out of the PIC's port A sequences gives the same values, the idle 0
+included.  Two independent sources agreeing on all seven is the main reason to
+trust the model.
 
-    0x3d000 = 1   0x3d302 = 2   0x3d604 = 3
-    0x3d900 = 4   0x3dc02 = 5   0x3df04 = 6
+The sixth copy needs 5b's state register as well.  Where a setting puts i1 high
+and i9 low the function is 3 or 4 depending on the state, and the state is
+loaded on the rising edge of i1 - o19 of 4b - from the word fetched just before.
+In copies 1 to 5 every such load gives 0; in the sixth fourteen of them give 1,
+and those are exactly where the sixth copy differs.  Across the six copies that
+is 564 loads which affect the result, all of them right.  With it all six copies
+decrypt to the same 376 words, and the padding between them to nops.
 
-one per entry of the dispatch table, in order.  That is what the PIC selects.
-Its dispatcher at 0x0e1 exchanges a byte with the 68000 and branches on the
-value; 0x08, 0x11, 0x16, 0x1d, 0x23 and 0x2c each lead to a short block between
-0x1a1 and 0x1d1 that drives a different combination of port A bits 0, 1 and 3
-and returns to the exchange loop, while 0x04 - the byte these routines send
-first - goes to a second level at 0x10e that dispatches on an internal index.
-Logging port A against the PIC's own program counter across a full two player
-game gives
+The loads are done here in address order, and none of them falls on a branch
+target inside the routine.  How they relate to the 68000's actual bus cycles -
+prefetch, and the I/O accesses the routine is full of - is not known.
 
-    boot  B A  C A  D A  E A  F A  G A  B A  C A  B A  C A  D A  E A
-
-with A the idle configuration restored after each exchange and B to G the six
-distinct ones, cycled in step with the dispatch table.  So the board configures
-the descrambler before running each routine and Data East encrypted each copy
-for the configuration in force when it runs - which is also why every ROM
-address still has exactly one correct decryption and decrypting statically is
-right.
-
-Five of the six copies decrypt to identical code under this model, 376 words out
-of 376.  The sixth takes the value the sequence predicts and still leaves 37
-words differing, all in the classes the model puts on transform 2 or 4, so it is
-replicated from the first instead - its bytes are certainly right, since every
-one of its words admits a transform agreeing with the first copy and the chance
-of that by accident is nil.  Whether the remainder is a seventh control value,
-an input of 4b held fixed here, or code that genuinely differs is not known.
-
-What has not been checked on the board is which port A pin reaches which input
-of the PEELs.  The model rests on the decryption coming out right rather than on
-any measurement, so a continuity check there would either confirm it or show
-that something else produces the same six sequences.
+Each copy writes 0xfffe30-0xfffe32 with the reply it reads back from the PIC,
+which is what the protection below compares.  Decrypting it statically is right
+even though the hardware does it on the fly: each copy only ever runs with its
+own setting, so every address still has exactly one correct decryption.
 
 
 Protection
@@ -595,13 +594,15 @@ more.
 
 That self test takes some 163000 instructions, while the 68000 reaches the boot
 handshake about a hundred instructions after reset and never retries, so on the
-board something must hold the 68000 off until the PIC is listening.  Port A bit
-1 is low exactly across the handshake window, from 0x086 until 0x0d4, so it is
-used here as the cue to release the 68000 - but it cannot be the real signal,
-since it goes high again at 0x0d4 while the PIC still needs the 68000 clocking
-to send its reply.  Note also that it is pulsed low for a single instruction at
-0x000, at the top of the self test, so releasing on the first low edge lets the
-68000 run through the whole test; the timer waits to see whether it stays low.
+board something must hold the 68000 off until the PIC is listening.  What does
+so is not known.  Port A bit 1 is used here as the cue to release it: it is
+taken to be the clear input of 4b (see 'What the PEELs do'), which the PIC pulls
+low at 0x086, just before listening, and lets go at 0x0d4 once the exchange is
+over.  So it marks the right moment, but
+it is not itself the line that holds the 68000.  It is also pulsed low for a
+single instruction at the top of the self test at 0x000, so releasing on the
+first low edge lets the 68000 run through the whole test; the timer waits to see
+whether it stays low.
 
 The symptom when any of this is wrong is a first bit sampled without waiting for
 a clock edge, leaving the exchange one bit out of step, which makes the
@@ -612,17 +613,7 @@ with zero mismatches.
 
 */
 
-/*
-    The six bits that the PEEL at 5b works on, as the three pairs (0,1), (2,8)
-    and (9,10).  Its fuse map yields six functions of them, and every part of
-    the ROM uses one of these five: 1 and 2 are the 'type 1' and 'type 0' the
-    counter in 4b alternates between, 0 covers the graphics and everything from
-    0xe8000 up, and 3 and 5 are used by the block at 0x3d000.  0 and 3 exchange
-    the members of a pair, the others do not - the conditional swap the
-    equations describe.  Writing them out this way rather than as tests on the
-    data being decrypted is what the hardware actually does; the two happen to
-    agree everywhere the main scheme is used.
-*/
+// the six functions the PEEL at 5b can apply, numbered as in the table above
 static uint16_t peel_5b(uint16_t w, int which)
 {
 	uint8_t const b0 = BIT(w, 0), b1 = BIT(w, 1), b2 = BIT(w, 2);
@@ -631,29 +622,34 @@ static uint16_t peel_5b(uint16_t w, int which)
 
 	switch (which)
 	{
-	case 0: // a pure exchange, no XOR at all
+	case 0:
 		n0 = b1;       n1 = b0;       n2 = b8;
 		n8 = b2;       n9 = b9;       n10 = b10;
 		break;
 
-	case 1: // 'type 1'
+	case 1:
 		n0 = b0 ^ 1;   n1 = b1;       n2 = b2;
 		n8 = b8 ^ 1;   n9 = b9 ^ b10 ^ 1;   n10 = b10 ^ 1;
 		break;
 
-	case 2: // 'type 0'
+	case 2:
 		n0 = b0;       n1 = b1 ^ 1;   n2 = b2 ^ b8 ^ 1;
 		n8 = b8;       n9 = b10 ^ 1;  n10 = b9 ^ b10 ^ 1;
 		break;
 
-	case 5:
-		n0 = b0 ^ 1;   n1 = b1 ^ 1;   n2 = b2 ^ 1;
-		n8 = b8 ^ 1;   n9 = b9;       n10 = b9 ^ b10 ^ 1;
-		break;
-
-	default: // 3
+	case 3:
 		n0 = b1 ^ 1;   n1 = b0;       n2 = b8 ^ 1;
 		n8 = b2 ^ b8;  n9 = b10 ^ 1;  n10 = b9;
+		break;
+
+	case 4:
+		n0 = b1;       n1 = b0 ^ 1;   n2 = b2 ^ b8;
+		n8 = b2 ^ 1;   n9 = b10;      n10 = b9 ^ 1;
+		break;
+
+	default: // 5
+		n0 = b0 ^ 1;   n1 = b1 ^ 1;   n2 = b2 ^ 1;
+		n8 = b8 ^ 1;   n9 = b9;       n10 = b9 ^ b10 ^ 1;
 		break;
 	}
 
@@ -662,130 +658,105 @@ static uint16_t peel_5b(uint16_t w, int which)
 			| (n8 << 8) | (n9 << 9) | (n10 << 10);
 }
 
+// what the state register of the PEEL at 5b loads, with i8 high, from a word
+static bool peel_5b_state(uint16_t w)
+{
+	return ((w & 0x0706) == 0x0204) || ((w & 0x0707) == 0x0506)
+			|| ((w & 0x0707) == 0x0101) || ((w & 0x0607) == 0x0604)
+			|| ((w & 0x0507) == 0x0007) || ((w & 0x0307) == 0x0201)
+			|| ((w & 0x0107) == 0x0002);
+}
+
 
 void hshavoc_state::init_hshavoc()
 {
 	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
-	/* The decode of the 4-bit counter in the PEEL at 4b, which is what picks
-	   between the two transforms the bulk of the ROM alternates between.  This
-	   used to be called 'typedat' and treated as a table; it is really the
-	   output of that counter, and its period of 16 is the counter wrapping. */
-	static const uint8_t counter_decode[16] = {
-		1,1,1,1, 1,1,1,1,
-		1,0,0,1, 1,0,1,1  };
+	/* o19 (bit 1) and o18 (bit 0) of the PEEL at 4b, by address bits A1-A4, for
+	   each setting the PIC can select through port A, and with its clear held
+	   low in the last row.  o18 is taken to drive i9 of 5b and o19 i1 (see
+	   'What the PEELs do'). */
+	static constexpr uint8_t PLD_4B[8][16] =
+	{
+		{ 0, 0, 0, 0,  0, 0, 0, 0,  0, 1, 1, 0,  0, 1, 0, 0 },   // 0, PIC command 0x08
+		{ 0, 2, 3, 2,  0, 2, 3, 2,  0, 2, 2, 2,  0, 2, 2, 2 },   // 1, 0x11
+		{ 2, 0, 3, 3,  2, 0, 2, 3,  2, 0, 3, 2,  2, 0, 2, 2 },   // 2, 0x16
+		{ 3, 2, 0, 2,  2, 2, 0, 2,  2, 2, 0, 2,  3, 2, 0, 2 },   // 3, 0x1d
+		{ 0, 2, 2, 2,  0, 2, 2, 2,  0, 3, 3, 2,  0, 3, 2, 2 },   // 4, 0x23
+		{ 2, 0, 3, 2,  2, 0, 3, 2,  2, 0, 2, 2,  2, 0, 2, 2 },   // 5, 0x2c
+		{ 2, 2, 1, 3,  2, 2, 0, 3,  2, 2, 1, 2,  2, 2, 0, 2 },   // 6, 0x2f
+		{ 1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1 }    // clear held low
+	};
 
-	/* Regions that take transform 0 - a pure exchange of two of the three
-	   pairs, with no XOR at all.  Everything from 0xe8000 up is like this, and
-	   so are three blocks of tile data lower down.  When hunting for further
-	   ones, note that a raw 0x0000 word - eight transparent pixels, which tile
-	   data is full of - comes out of the main scheme as 0x0701 on a type-1
-	   word and 0x0606 on a type-0 one; a high density of those two values is a
-	   much sharper indicator than any statistical measure of the result. */
-	static const struct { int start, end; } bitswap_only[] =
+	// what is selected when each part of the ROM is fetched; anything else is 0
+	static constexpr struct { int start, end, setting; } SETTINGS[] =
+	{
+		{ 0x000000, 0x000008, 7 },   // reset vectors, fetched with the clear held
+		{ 0x000c42, 0x00109c, 7 },   // boot code, likewise
+		{ 0x03d000, 0x03d302, 1 },   // per-life handshake routines
+		{ 0x03d302, 0x03d604, 2 },
+		{ 0x03d604, 0x03d900, 3 },
+		{ 0x03d900, 0x03dc02, 4 },
+		{ 0x03dc02, 0x03df04, 5 },
+		{ 0x03df04, 0x03e200, 6 }
+	};
+
+	// what only the VDP and the Z80 read, so with i8 of 5b low
+	static constexpr struct { int start, end; } FUNCTION_0[] =
 	{
 		{ 0x03c000, 0x03c300 },   // arcade-only HUD tiles (timer, health bar)
-		{ 0x040440, 0x04ff3a },   // sprite tiles and arcade HUD
+		{ 0x04043a, 0x04ff3a },   // sprite tiles and arcade HUD
 		{ 0x053f94, 0x0544b4 },   // further tiles
-		{ 0x0e8000, 0x100000 }    // graphics and data
+		{ 0x0e8000, 0x100000 }    // sound data, read by the Z80
 	};
+
+	bool state = false;
+	uint16_t prev = 0;
 
 	for (int x = 0; x < 0x100000 / 2; x++)
 	{
-		bool plain = false;
-		for (auto &r : bitswap_only)
-		{
-			if (x >= r.start / 2 && x < r.end / 2)
-			{
-				plain = true;
-				break;
-			}
-		}
-
 		// the permutation the PCB traces do, the same everywhere
-		src[x] = bitswap<16>(src[x],
+		uint16_t const w = bitswap<16>(src[x],
 								7, 15,6, 14,
 								5, 2, 1, 10,
 								13,4, 12,3,
 								11,0, 8, 9 );
 
-		if (plain)
+		bool i8 = true;
+		for (auto &r : FUNCTION_0)
 		{
-			src[x] = peel_5b(src[x], 0);
-			continue;
+			if (x >= r.start / 2 && x < r.end / 2)
+			{
+				i8 = false;
+				break;
+			}
 		}
 
-		// the 0x3d000 block picks its own transforms, applied further down
-		if (x >= 0x03d000 / 2 && x < 0x03e200 / 2)
-			continue;
-
-		int type = counter_decode[x & 0xf];
-
-		/* The initial SSP/PC and the arcade-specific startup block at
-		   0xc42-0x109b behave as if every word were 'type 0'. */
-		if (x < 0x000008 / 2)
-			type = 0;
-		else if (x >= 0x000c42 / 2 && x < 0x00109c / 2)
-			type = 0;
-
-		src[x] = peel_5b(src[x], type ? 1 : 2);
-	}
-
-	/* The six per-life handshake routines all hold the same 0x2f0 bytes of
-	   code.  The permutation above already puts ten of the sixteen bits in
-	   place; the other six are transformed by the PEEL at 5b, and this block
-	   uses three of the six functions that its fuse map yields, picked by word
-	   position.  See 'The 0x3d000 block' above for why the first copy is
-	   decrypted and replicated rather than each copy being decrypted in
-	   place. */
-	/* Which of the transforms applies is not a property of the address: it comes
-	   out of the counter in 4b, whose o18 drives i9 of 5b and whose o19 drives
-	   i1, with i8 tied high and i12 and the state bit low.  The counter is
-	   cleared at the top of every routine, and the PIC sets two more of its
-	   inputs beforehand - so a copy is characterised by (i1, i4) of 4b plus the
-	   one-clock delayed copy of i4 in rf12.  Solving for those against the
-	   decrypted first copy gives 1, 2, 3, 4, 5, 6 read as a three bit field,
-	   one per entry of the dispatch table, which is what the PIC's six port A
-	   configurations select.  Five of the six then decrypt to identical code.
-
-	   The sixth does not - 37 of its 376 words still differ, all in the classes
-	   that the model puts on transform 2 or 4 - so it is replicated from the
-	   first, whose bytes are certainly right.  Whether that is a seventh
-	   control value, or an input of 4b held fixed here, is not known. */
-
-	static const struct { int base, i1, i4, rf12; } copies[] =
-	{
-		{ 0x03d000, 0, 0, 1 },
-		{ 0x03d302, 0, 1, 0 },
-		{ 0x03d604, 0, 1, 1 },
-		{ 0x03d900, 1, 0, 0 },
-		{ 0x03dc02, 1, 0, 1 },
-		{ 0x03df04, 1, 1, 0 }   // the odd one out, replicated below
-	};
-
-	static const uint8_t sel[6][16] =
-	{
-		{ 1,3,5,3, 1,3,5,3, 1,3,3,3, 1,3,3,3 },
-		{ 3,1,5,5, 3,1,3,5, 3,1,5,3, 3,1,3,3 },
-		{ 5,3,1,3, 3,3,1,3, 3,3,1,3, 5,3,1,3 },
-		{ 1,3,3,3, 1,3,3,3, 1,5,5,3, 1,5,3,3 },
-		{ 3,1,5,3, 3,1,5,3, 3,1,3,3, 3,1,3,3 },
-		{ 3,3,2,5, 3,3,1,5, 3,3,2,3, 3,3,1,3 }
-	};
-
-	for (int c = 0; c < 5; c++)
-	{
-		for (int i = 0; i < 0x2f0 / 2; i++)
+		int setting = 0;
+		for (auto &r : SETTINGS)
 		{
-			int const x = (copies[c].base / 2) + i;
-
-			src[x] = peel_5b(src[x], sel[c][x & 0x0f]);
+			if (x >= r.start / 2 && x < r.end / 2)
+			{
+				setting = r.setting;
+				break;
+			}
 		}
-	}
 
-	// the sixth copy holds the same code, so take it from the first
-	for (int i = 0; i < 0x2f0 / 2; i++)
-		src[(0x03df04 / 2) + i] = src[(0x03d000 / 2) + i];
+		uint8_t const ctl = PLD_4B[setting][x & 0x0f];
+		uint8_t const ctl_prev = PLD_4B[setting][(x - 1) & 0x0f];
+
+		// 5b loads its state on the rising edge of i1, from the word before
+		if (BIT(ctl, 1) && !BIT(ctl_prev, 1))
+			state = peel_5b_state(prev);
+
+		int const which = !i8 ? 0
+				: !BIT(ctl, 1) ? (BIT(ctl, 0) ? 2 : 1)
+				: BIT(ctl, 0) ? 5
+				: state ? 4 : 3;
+
+		src[x] = peel_5b(w, which);
+		prev = w;
+	}
 
 	{
 		address_space &space = m_maincpu->space(AS_PROGRAM);

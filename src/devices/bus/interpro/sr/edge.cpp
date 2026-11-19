@@ -733,31 +733,37 @@ void edge1_device_base::vblank(int state)
 
 u32 edge1_device_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u8 *pixel_data = m_vram->pointer();
+	u8 const *pixel_data = m_vram->pointer();
 
 	// 8bpp mode
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
-			bitmap.pix(y, x) = m_ramdac->pen_color(*pixel_data++);
+	for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
+	{
+		auto *const dst = &bitmap.pix(y);
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
+			dst[x] = m_ramdac->pen_color(*pixel_data++);
+	}
 
 	return 0;
 }
 
 u32 edge2plus_framebuffer_device_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	u8 *pixel_data = m_vram->pointer();
+	u8 const *pixel_data = m_vram->pointer();
 
 	// 8bpp mode
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x++)
+	for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
+	{
+		auto *const dst = &bitmap.pix(y);
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x++)
 		{
 			const u8 index = *pixel_data++;
 
-			bitmap.pix(y, x) = rgb_t(
-				m_ramdac[0]->lookup(index),
-				m_ramdac[1]->lookup(index),
-				m_ramdac[2]->lookup(index));
+			dst[x] = rgb_t(
+					m_ramdac[0]->lookup(index),
+					m_ramdac[1]->lookup(index),
+					m_ramdac[2]->lookup(index));
 		}
+	}
 
 	return 0;
 }

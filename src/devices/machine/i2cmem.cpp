@@ -44,6 +44,7 @@ constexpr int DEVSEL_ADDRESS(0xfe);
 #define LOG_STATE     (1U << 1)
 #define LOG_READLINE  (1U << 2)
 #define LOG_WRITELINE (1U << 3)
+#define LOG_SELECT    (1U << 4)
 
 #define VERBOSE       (0)
 #include "logmacro.h"
@@ -607,9 +608,11 @@ int i2cmem_device::select_device()
 
 	if( ( m_devsel & mask ) == ( device & mask ) )
 	{
+		LOGMASKED( LOG_SELECT, "i2c: device selected, %02x & %08x matches our address %02x & %08x\n", m_devsel, mask, device, mask);
 		return 1;
 	}
 
+	LOGMASKED( LOG_SELECT, "i2c: not selected, device address %02x does not match our address %02x\n", m_devsel & mask, device & mask);
 	return 0;
 }
 

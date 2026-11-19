@@ -64,20 +64,25 @@ Notes:
 
     TODO:
      - blitter timing is guessed, definitely expect non-instant transfers otherwise game is too fast
-     - no sound (custom SS9804 as per subsino_kr_h8.cpp and subsino2.cpp later games)
+     - sound chip handshake timing is guessed
 
     The EEPROM protection method is the same as in the subsino2.cpp games.
 
 *********************************************************************************************************************/
 
 #include "emu.h"
+
+#include "ss9904.h"
 #include "subsino_io.h"
+
 #include "cpu/h8/h83048.h"
 #include "machine/ds2430a.h"
 #include "machine/nvram.h"
 #include "video/ramdac.h"
+
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
 
 #define DEBUG_GFX 0
 
@@ -92,7 +97,8 @@ public:
 		m_maincpu(*this,"maincpu"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_sound(*this, "ss9904")
 	{ }
 
 	void lastfght(machine_config &config);
@@ -117,8 +123,6 @@ private:
 	uint8_t c00000_r();
 	uint8_t c00002_r();
 	void c00007_w(uint8_t data);
-	uint16_t sound_r();
-	void sound_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void lastfght_map(address_map &map) ATTR_COLD;
@@ -150,6 +154,7 @@ private:
 	required_device<ds2430a_device> m_eeprom;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<ss9804_device> m_sound;
 
 	bool m_blitter_busy = false;
 	emu_timer *m_blitter_end_timer = nullptr;
@@ -383,28 +388,14 @@ uint8_t lastfght_state::c00000_r()
 
 uint8_t lastfght_state::c00002_r()
 {
-	// mask 0x1c: from sound?
-	return (machine().rand() & 0x1c) | 0x03;
+	// bits 3-4: sound chip handshake. The game waits for both to be set before sending a command byte,
+	// and for them to drop right after it (bit 2 must be clear)
+	return (m_sound->busy_r() ? 0x00 : 0x18) | 0x03;
 }
 
 void lastfght_state::c00007_w(uint8_t data)
 {
 	m_eeprom->data_w(!BIT(data, 6));
-}
-
-uint16_t lastfght_state::sound_r()
-{
-	// low byte:
-	// bit 3
-	return 8;
-}
-
-void lastfght_state::sound_w(offs_t offset, uint16_t data, uint16_t mem_mask)
-{
-	if (ACCESSING_BITS_8_15)
-		logerror("%06x: sound_w msb = %02x\n", m_maincpu->pc(), data >> 8);
-	if (ACCESSING_BITS_0_7)
-		logerror("%06x: sound_w lsb = %02x\n", m_maincpu->pc(), data);
 }
 
 /***************************************************************************
@@ -421,7 +412,7 @@ void lastfght_state::lastfght_map(address_map &map)
 	map(0x200000, 0x20ffff).ram().share("nvram"); // battery
 
 	map(0x600000, 0x600001).w(FUNC(lastfght_state::hi_w));
-	map(0x600002, 0x600003).rw(FUNC(lastfght_state::sound_r), FUNC(lastfght_state::sound_w));
+	map(0x600003, 0x600003).rw(m_sound, FUNC(ss9804_device::read), FUNC(ss9804_device::write));
 	map(0x600006, 0x600007).w(FUNC(lastfght_state::blit_w));
 	map(0x600008, 0x600008).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x600009, 0x600009).w("ramdac", FUNC(ramdac_device::pal_w));
@@ -571,6 +562,13 @@ void lastfght_state::lastfght(machine_config &config)
 	m_screen->set_screen_update(FUNC(lastfght_state::screen_update));
 	m_screen->set_palette(m_palette);
 	m_screen->screen_vblank().set_inputline(m_maincpu, 0);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	SS9804(config, m_sound, 32_MHz_XTAL);
+	m_sound->set_divider(4608); // 6944 Hz measured on the real board (the 44.1/48 MHz boards divide by 6144)
+	m_sound->add_route(ALL_OUTPUTS, "mono", 1.0);
 }
 
 
@@ -589,7 +587,7 @@ ROM_START( lastfght )
 	ROM_LOAD( "3.b3", 0x400000, 0x200000, CRC(4236c79a) SHA1(94f093d12c096d38d1e7278796f6d58e4ba14e2e) )
 	ROM_LOAD( "4.b4", 0x600000, 0x200000, CRC(68153b0f) SHA1(46ddf37d5885f411e0e6de9c7e8969ba3a00f17f) )
 
-	ROM_REGION( 0x100000, "samples", 0 ) // Samples
+	ROM_REGION( 0x100000, "ss9904", 0 ) // Samples
 	ROM_LOAD( "v100.u7", 0x000000, 0x100000, CRC(c134378c) SHA1(999c75f3a7890421cfd904a926ca377ee43a6825) )
 
 	ROM_REGION( 0x28, "eeprom", 0 )
@@ -599,4 +597,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, empty_init, ROT0, "Subsino", "Last Fighting", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, lastfght, 0, lastfght, lastfght, lastfght_state, empty_init, ROT0, "Subsino", "Last Fighting", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING | MACHINE_SUPPORTS_SAVE )

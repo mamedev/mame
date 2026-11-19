@@ -40,6 +40,7 @@ Operating system: CP/M
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
 #include "machine/6522via.h"
+#include "machine/clock.h"
 #include "machine/mc6854.h"
 #include "machine/mos6551.h"
 #include "machine/tms9914.h"
@@ -529,6 +530,11 @@ void hhtiger_state::hhtiger(machine_config &config)
 
 	MC6854(config, m_adlc);
 	m_adlc->out_irq_cb().set("irqs", FUNC(input_merger_device::in_w<2>));
+
+	// FIXME: ADLC clock source unknown, rate of the old internal MC6854 timer used
+	clock_device &adlc_clock(CLOCK(config, "adlc_clock", 500'000));
+	adlc_clock.signal_handler().set(m_adlc, FUNC(mc6854_device::txc_w));
+	adlc_clock.signal_handler().append(m_adlc, FUNC(mc6854_device::rxc_w));
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);

@@ -1,11 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
 /*
-
-  ES5503 - Ensoniq ES5503 "DOC" emulator v2.4
-  By R. Belmont.
-
-  Copyright R. Belmont.
+  es5503.cpp - Ensoniq ES5503 "DOC" emulator v3.0
+  Emulation by R. Belmont.
 
   History: the ES5503 was the next design after the famous C64 "SID" by Bob Yannes.
   It powered the legendary Mirage sampler (the first affordable pro sampler) as well
@@ -41,19 +38,32 @@
                Skate or Die on the IIgs accidentally relies on this behavior.
   2.4.1 (RB) - Fixed a bug where halting an oscillator from the CPU with IRQs disabled in the new mode would
                fire the IRQ anyway.  This caused Bard's Tale IIgs to crash after the intro screen.
+  3.0   (RB) - Oscillators are now serviced one per 8-clock slot in scan order, with halted oscillators
+               still fetching.  Swap, sync, one-shot, interrupt request and DATA register behavior
+               follow what the DOCGRADE test suite measures on an Apple IIgs.
+  3.1   (RB) - The volume register follows the output level measured on an Apple IIgs instead of
+               being a straight multiply.
 */
 
 #include "emu.h"
 #include "es5503.h"
 
+#include <cmath>
+
 // device type definition
 DEFINE_DEVICE_TYPE(ES5503, es5503_device, "es5503", "Ensoniq ES5503")
 
 // useful constants
-static constexpr uint16_t wavesizes[8] = { 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 };
 static constexpr uint32_t wavemasks[8] = { 0x1ff00, 0x1fe00, 0x1fc00, 0x1f800, 0x1f000, 0x1e000, 0x1c000, 0x18000 };
 static constexpr uint32_t accmasks[8]  = { 0xff, 0x1ff, 0x3ff, 0x7ff, 0xfff, 0x1fff, 0x3fff, 0x7fff };
-static constexpr int      resshifts[8] = { 9, 10, 11, 12, 13, 14, 15, 16 };
+
+// The volume multiply is analog.  Nothing gets through below a soft knee, the level rises a
+// little faster than the register above it, and a trace of the wave data leaks through inverted.
+static constexpr double VOL_KNEE  = 22.1;       // register value at the middle of the knee
+static constexpr double VOL_WIDTH = 2.77;       // how soft the knee is, in register steps
+static constexpr double VOL_POWER = 1.104;      // rise above the knee
+static constexpr double VOL_LEAK  = 0.0042;     // inverted leak, as a fraction of volume 255
+static constexpr int VOL_SHIFT    = 8;          // fraction bits in the level table
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -67,211 +77,297 @@ es5503_device::es5503_device(const machine_config &mconfig, const char *tag, dev
 	device_t(mconfig, ES5503, tag, owner, clock),
 	device_sound_interface(mconfig, *this),
 	device_rom_interface(mconfig, *this),
+	m_stream(nullptr),
 	m_irq_func(*this),
-	m_adc_func(*this, 0)
+	m_adc_func(*this, 0),
+	m_oscillators{},
+	m_oscsenabled(1),
+	m_rege0(0),
+	m_irq_active(false),
+	m_present_slot(0),
+	m_slot(0),
+	m_scan(IDLE_SCAN),
+	m_idle(1),
+	m_scan_off(true),
+	m_drift_slots(0),
+	m_bus(0),
+	m_channel_strobe(0),
+	m_output_channels(1),
+	m_output_rate(0),
+	m_volume{},
+	m_timer(nullptr),
+	m_mix{},
+	m_last{},
+	m_fifo_head(0),
+	m_fifo_count(0)
 {
 }
 
 
 //-------------------------------------------------
-//  delayed_stream_update -
+//  scan_tick - keep the scan going when nobody
+//  is touching the chip
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(es5503_device::delayed_stream_update)
+TIMER_CALLBACK_MEMBER(es5503_device::scan_tick)
 {
-	m_stream->update();
+	// stay a couple of slots behind so a host that times its own accesses can still place one
+	const u64 now = now_clock();
+	if (now > 16)
+	{
+		run_to(now - 16);
+	}
 }
 
 //-------------------------------------------------
-//  rom_bank_pre_change - refresh the stream if the
-//  ROM banking changes
+//  rom_bank_pre_change - bring the scan up to date
+//  before the wave memory banking changes
 //-------------------------------------------------
 
 void es5503_device::rom_bank_pre_change()
 {
-	m_stream->update();
+	run_to(now_clock());
 }
 
-// halt_osc: handle halting an oscillator
-// onum = oscillator #
-// type = 1 for 0 found in sample data, 0 for hit end of table size
-void es5503_device::halt_osc(int onum, int type, uint32_t *accumulator, int resshift, uint8_t newCtrl)
+// registers are dynamic and are only refreshed when the scan visits their oscillator
+void es5503_device::drift(ES5503Osc &osc)
 {
-	ES5503Osc *pOsc = &m_oscillators[onum];
-	ES5503Osc *pPartner = &m_oscillators[onum^1];
-	int mode = (pOsc->control>>1) & 3;
-	const int partnerMode = (pPartner->control>>1) & 3;
+	osc.freq = 0xffff;
+	osc.control = 0xff;
+	osc.vol = 0xff;
+	osc.data = 0xff;
+	osc.wavetblpointer = 0x1ff00;
+	osc.wavetblsize = 7;
+	osc.resolution = 7;
+	osc.accumulator = 0xffffff;
+	osc.irqpend = 1;
+	osc.prevhalt = 1;
+}
 
-	// check for sync mode
-	if (mode == MODE_SYNCAM)
+void es5503_device::check_drift(int onum)
+{
+	ES5503Osc &osc = m_oscillators[onum];
+
+	if ((m_slot - osc.refresh) > m_drift_slots)
 	{
-		if (!(onum & 1))
+		drift(osc);
+		osc.refresh = m_slot;
+	}
+}
+
+// service one oscillator
+void es5503_device::visit(int onum)
+{
+	check_drift(onum);
+
+	ES5503Osc &osc = m_oscillators[onum];
+	ES5503Osc &partner = m_oscillators[onum ^ 1];
+	const bool even = !(onum & 1);
+	const bool was_halted = osc.control & 1;
+	const int mode = (osc.control >> 1) & 3;
+	const int resshift = 9 + osc.resolution - osc.wavetblsize;
+	const uint32_t top = 1U << (17 + osc.resolution);
+	const uint32_t wtptr = osc.wavetblpointer & wavemasks[osc.wavetblsize];
+	const bool partner_swapped = (partner.control & 1) && (((partner.control >> 1) & 3) == MODE_SWAP);
+
+	osc.refresh = m_slot;
+
+	// An oscillator found halted in one-shot or swap mode is rewound, a visit late.  One started
+	// from the CPU in those modes therefore begins at the top of its table, while free-run and
+	// sync oscillators pick up where they stopped.
+	if (osc.prevhalt && (mode & 1))
+	{
+		osc.accumulator = 0;
+	}
+	osc.prevhalt = was_halted;
+
+	// channel strobe is always valid when reading; this allows potentially banking per voice
+	m_channel_strobe = (osc.control >> 4) & 0xf;
+
+	// halted oscillators fetch too
+	m_bus = read_byte(wtptr + ((osc.accumulator >> resshift) & accmasks[osc.wavetblsize]));
+
+	// the data register never takes a zero
+	if (m_bus != 0)
+	{
+		osc.data = m_bus;
+	}
+
+	bool ended = false;
+	if (!was_halted)
+	{
+		if (m_bus != 0)
 		{
-			// we're even, so if the odd oscillator 1 below us is playing,
-			// restart it.
-			if (!(m_oscillators[onum - 1].control & 1))
+			const int32_t data = int8_t(m_bus ^ 0x80);
+			const int chan = (osc.control >> 4) & (m_output_channels - 1);
+
+			// in AM mode an odd oscillator plays nothing itself, it sets the volume of the next one up
+			if ((mode == MODE_SYNCAM) && !even)
 			{
-				m_oscillators[onum - 1].accumulator = 0;
+				if ((onum < 31) && !(m_oscillators[onum + 1].control & 1))
+				{
+					m_oscillators[onum + 1].vol = m_bus;
+				}
+			}
+			else
+			{
+				// the uppermost enabled oscillator is heard for three slots
+				m_mix[chan] += data * m_volume[osc.vol] * ((onum == (m_oscsenabled - 1)) ? 3 : 1);
 			}
 		}
 
-		// loop this oscillator for both sync and AM
-		mode = MODE_FREE;
-	}
+		// only the bits that address the table take part
+		osc.accumulator = (osc.accumulator & (top - 1)) + osc.freq;
 
-	// if 0 found in sample data or mode is not free-run, halt this oscillator
-	if ((mode != MODE_FREE) || (type != 0))
-	{
-		pOsc->control |= 1;
-	}
-	else    // preserve the relative phase of the oscillator when looping
-	{
-		uint16_t wtsize = pOsc->wtsize - 1;
-		*accumulator -= (wtsize << resshift);
-	}
+		if (m_bus == 0)
+		{
+			osc.control |= 1;
+			ended = true;
+		}
+		else if (osc.accumulator >= top)
+		{
+			osc.accumulator &= top - 1;
+			ended = true;
 
-	// if we're in swap mode, start the partner
-	if (mode == MODE_SWAP)
-	{
-		pPartner->control &= ~1;    // clear the halt bit
-		pPartner->accumulator = 0;  // and make sure it starts from the top (does this also need phase preservation?)
+			switch (mode)
+			{
+				case MODE_ONESHOT:
+					// an even oscillator keeps going while its partner sits halted in swap mode
+					if (!even || !partner_swapped)
+					{
+						osc.control |= 1;
+					}
+					break;
+
+				case MODE_SYNCAM:
+					// an even oscillator starts itself and its partner over
+					if (even)
+					{
+						osc.accumulator = 0;
+						partner.accumulator = 0;
+					}
+					break;
+
+				case MODE_SWAP:
+					osc.control |= 1;
+					break;
+			}
+		}
 	}
 	else
 	{
-		// if we're the even oscillator of the pair and the partner's swap
-		// but we aren't, we retrigger (!!!)  Verified on IIgs hardware, and hinted by
-		// the Ensoniq data sheet.
-		if ((partnerMode == MODE_SWAP) && ((onum & 1)==0))
-		{
-			pOsc->control &= ~1;
+		// an oscillator halted on a zero finds it again every time
+		ended = (m_bus == 0);
 
-			// preserve the phase in this case too
-			uint16_t wtsize = pOsc->wtsize - 1;
-			*accumulator -= (wtsize << resshift);
+		// an odd oscillator halted in swap mode keeps its partner running
+		if (even && partner_swapped && (m_bus != 0))
+		{
+			osc.control &= ~1;
 		}
 	}
-	// IRQ enabled for this voice?
-	if (pOsc->control & 0x08)
+
+	if (ended)
 	{
-		// If the halt is coming from a CPU write, only trigger IRQ if the new control value has it set (need to test on h/w)
-		if ((type == 0) && !(newCtrl & 0x08))
+		if (osc.control & 0x08)
 		{
-			return;
+			osc.irqpend = 1;
 		}
 
-		pOsc->irqpend = 1;
+		// an even oscillator ending in swap mode starts its partner where it left off
+		if (even && (mode == MODE_SWAP) && (osc.control & 1))
+		{
+			partner.control &= ~1;
+		}
+	}
 
+	// one request is presented at a time, and it holds until 0xe0 is read
+	if (osc.irqpend && !m_irq_active)
+	{
+		m_rege0 = onum;
+		m_irq_active = true;
+		m_present_slot = m_slot;
 		m_irq_func(1);
 	}
 }
+
+void es5503_device::end_round()
+{
+	if (m_fifo_count == FIFO_FRAMES)
+	{
+		m_fifo_head = (m_fifo_head + 1) % FIFO_FRAMES;
+		m_fifo_count--;
+	}
+
+	const int tail = (m_fifo_head + m_fifo_count) % FIFO_FRAMES;
+	std::copy_n(&m_mix[0], m_output_channels, &m_fifo[tail * m_output_channels]);
+	std::fill_n(&m_mix[0], m_output_channels, 0);
+	m_fifo_count++;
+}
+
+// each oscillator gets a slot of 8 clocks, and 2 slots for RAM refresh follow the last one
+void es5503_device::run_slot()
+{
+	if (m_scan_off)
+	{
+		// nothing is serviced between a reset and the first write of the oscillator count
+	}
+	else if (m_idle == 2)
+	{
+		m_idle = 0;
+		m_scan = 0;
+		end_round();
+		visit(m_scan);
+	}
+	else if (m_idle == 1)
+	{
+		m_idle = 2;
+		m_scan = IDLE_SCAN + 1;
+	}
+	else if (m_scan == (m_oscsenabled - 1))
+	{
+		// the end is found by an equality compare, so a scan that is already past it runs on to 31
+		m_idle = 1;
+		m_scan = IDLE_SCAN;
+	}
+	else
+	{
+		m_scan = (m_scan + 1) & 0x1f;
+		if (m_scan == 0)
+		{
+			end_round();
+		}
+		visit(m_scan);
+	}
+
+	m_slot++;
+}
+
+void es5503_device::run_to(u64 clock)
+{
+	const u64 target = clock >> 3;
+
+	while (m_slot <= target)
+	{
+		run_slot();
+	}
+}
+
 void es5503_device::sound_stream_update(sound_stream &stream)
 {
-	int32_t *mixp;
-	int osc, snum, i;
-	uint32_t ramptr;
-	int samples = stream.samples();
+	run_to(now_clock());
 
-	assert(samples < (44100/50));
-	std::fill_n(&m_mix_buffer[0], samples * m_output_channels, 0);
-
-	for (int chan = 0; chan < m_output_channels; chan++)
+	for (int i = 0; i < stream.samples(); i++)
 	{
-		for (osc = 0; osc < m_oscsenabled; osc++)
+		if (m_fifo_count != 0)
 		{
-			ES5503Osc *pOsc = &m_oscillators[osc];
-
-			if (!(pOsc->control & 1) && ((pOsc->control >> 4) & (m_output_channels - 1)) == chan)
-			{
-				uint32_t wtptr = pOsc->wavetblpointer & wavemasks[pOsc->wavetblsize], altram;
-				uint32_t acc = pOsc->accumulator;
-				const uint16_t wtsize = pOsc->wtsize - 1;
-				uint8_t ctrl = pOsc->control;
-				const uint16_t freq = pOsc->freq;
-				int16_t vol = pOsc->vol;
-				int8_t data = -128;
-				const int resshift = resshifts[pOsc->resolution] - pOsc->wavetblsize;
-				const uint32_t sizemask = accmasks[pOsc->wavetblsize];
-				const int mode = (pOsc->control>>1) & 3;
-				mixp = &m_mix_buffer[0] + chan;
-
-				for (snum = 0; snum < samples; snum++)
-				{
-					altram = acc >> resshift;
-					ramptr = altram & sizemask;
-
-					acc += freq;
-
-					// channel strobe is always valid when reading; this allows potentially banking per voice
-					m_channel_strobe = (ctrl>>4) & 0xf;
-					data = (int32_t)read_byte(ramptr + wtptr) ^ 0x80;
-
-					if (read_byte(ramptr + wtptr) == 0x00)
-					{
-						halt_osc(osc, 1, &acc, resshift, pOsc->control);
-					}
-					else
-					{
-						if (mode != MODE_SYNCAM)
-						{
-							*mixp += data * vol;
-							if (osc == (m_oscsenabled - 1))
-							{
-								*mixp += data * vol;
-								*mixp += data * vol;
-							}
-						}
-						else
-						{
-							// if we're odd, we play nothing ourselves
-							if (osc & 1)
-							{
-								if (osc < 31)
-								{
-									// if the next oscillator up is playing, it's volume becomes our control
-									if (!(m_oscillators[osc + 1].control & 1))
-									{
-										m_oscillators[osc + 1].vol = data ^ 0x80;
-									}
-								}
-							}
-							else    // hard sync, both oscillators play?
-							{
-								*mixp += data * vol;
-								if (osc == (m_oscsenabled - 1))
-								{
-									*mixp += data * vol;
-									*mixp += data * vol;
-								}
-							}
-						}
-						mixp += m_output_channels;
-
-						if (altram >= wtsize)
-						{
-							halt_osc(osc, 0, &acc, resshift, pOsc->control);
-						}
-					}
-
-					// if oscillator halted, we've got no more samples to generate
-					if (pOsc->control & 1)
-					{
-						ctrl |= 1;
-						break;
-					}
-				}
-
-				pOsc->control = ctrl;
-				pOsc->accumulator = acc;
-				pOsc->data = data ^ 0x80;
-			}
+			std::copy_n(&m_fifo[m_fifo_head * m_output_channels], m_output_channels, &m_last[0]);
+			m_fifo_head = (m_fifo_head + 1) % FIFO_FRAMES;
+			m_fifo_count--;
 		}
-	}
-	mixp = &m_mix_buffer[0];
-	for (int chan = 0; chan < m_output_channels; chan++)
-	{
-		for (i = 0; i < stream.samples(); i++)
+
+		for (int chan = 0; chan < m_output_channels; chan++)
 		{
-			stream.put_int(chan, i, *mixp++, 32768*8);
+			stream.put_int(chan, i, m_last[chan], (32768 * 8) << VOL_SHIFT);
 		}
 	}
 }
@@ -279,10 +375,7 @@ void es5503_device::sound_stream_update(sound_stream &stream)
 
 void es5503_device::device_start()
 {
-	m_rege0 = 0xff;
-
 	save_pointer(STRUCT_MEMBER(m_oscillators, freq), 32);
-	save_pointer(STRUCT_MEMBER(m_oscillators, wtsize), 32);
 	save_pointer(STRUCT_MEMBER(m_oscillators, control), 32);
 	save_pointer(STRUCT_MEMBER(m_oscillators, vol), 32);
 	save_pointer(STRUCT_MEMBER(m_oscillators, data), 32);
@@ -291,59 +384,109 @@ void es5503_device::device_start()
 	save_pointer(STRUCT_MEMBER(m_oscillators, resolution), 32);
 	save_pointer(STRUCT_MEMBER(m_oscillators, accumulator), 32);
 	save_pointer(STRUCT_MEMBER(m_oscillators, irqpend), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, prevhalt), 32);
+	save_pointer(STRUCT_MEMBER(m_oscillators, refresh), 32);
+	save_item(NAME(m_oscsenabled));
+	save_item(NAME(m_rege0));
+	save_item(NAME(m_irq_active));
+	save_item(NAME(m_present_slot));
+	save_item(NAME(m_slot));
+	save_item(NAME(m_scan));
+	save_item(NAME(m_idle));
+	save_item(NAME(m_scan_off));
+	save_item(NAME(m_bus));
+	save_item(NAME(m_channel_strobe));
+	save_item(NAME(m_mix));
+	save_item(NAME(m_last));
 
-	m_oscsenabled = 1;
+	m_fifo.resize(FIFO_FRAMES * m_output_channels);
+
+	// volume 255 keeps the level of a straight multiply, and volume 0 is silent with no leak
+	const auto conduct =
+			[] (double vol)
+			{
+				return std::pow(VOL_WIDTH * std::log1p(std::exp((vol - VOL_KNEE) / VOL_WIDTH)), VOL_POWER);
+			};
+	const double scale = (1.0 + VOL_LEAK) / conduct(255.0);
+
+	m_volume[0] = 0;
+	for (int vol = 1; vol < 256; vol++)
+	{
+		m_volume[vol] = std::lround(((conduct(vol) * scale) - VOL_LEAK) * (255 << VOL_SHIFT));
+	}
+
+	// the registers are dynamic and nothing has refreshed them yet, so they come up as all ones
+	for (auto &osc : m_oscillators)
+	{
+		drift(osc);
+		osc.refresh = 0;
+	}
+
 	m_output_rate = (clock() / 8) / (m_oscsenabled + 2);
 	m_stream = stream_alloc(0, m_output_channels, m_output_rate);
 
-	m_timer = timer_alloc(FUNC(es5503_device::delayed_stream_update), this);
+	m_timer = timer_alloc(FUNC(es5503_device::scan_tick), this);
 }
 
-void es5503_device::device_clock_changed()
+void es5503_device::update_rate()
 {
 	m_output_rate = (clock() / 8) / (m_oscsenabled + 2);
 	m_stream->set_sample_rate(m_output_rate);
 
-	m_mix_buffer.resize((m_output_rate/50)*8);
-
-	attotime update_rate = m_output_rate ? attotime::from_hz(m_output_rate) : attotime::never;
+	const attotime update_rate = m_output_rate ? attotime::from_hz(m_output_rate) : attotime::never;
 	m_timer->adjust(update_rate, 0, update_rate);
+}
+
+void es5503_device::device_clock_changed()
+{
+	// slots are counted from time zero, so move everything that remembers one
+	const u64 slot = (now_clock() >> 3) + 1;
+
+	for (auto &elem : m_oscillators)
+	{
+		elem.refresh = slot - (m_slot - elem.refresh);
+	}
+	m_present_slot = slot - (m_slot - m_present_slot);
+	m_slot = slot;
+
+	m_drift_slots = u64(clock() / 8) * 3 / 2;
+
+	update_rate();
 }
 
 void es5503_device::device_reset()
 {
-	m_rege0 = 0xff;
-
-	for (auto & elem : m_oscillators)
-	{
-		elem.freq = 0;
-		elem.wtsize = 0;
-		elem.control = 0;
-		elem.vol = 0;
-		elem.data = 0x80;
-		elem.wavetblpointer = 0;
-		elem.wavetblsize = 0;
-		elem.resolution = 0;
-		elem.accumulator = 0;
-		elem.irqpend = 0;
-	}
-
+	// Reset turns every oscillator off.  Their registers are left alone, but with nothing
+	// refreshing them they are soon lost.
+	m_slot = (now_clock() >> 3) + 1;
 	m_oscsenabled = 1;
-	notify_clock_changed();
-
+	m_irq_active = false;
+	m_present_slot = 0;
+	m_scan = IDLE_SCAN;
+	m_idle = 1;
+	m_scan_off = true;
+	m_drift_slots = u64(clock() / 8) * 3 / 2;
+	m_bus = 0;
 	m_channel_strobe = 0;
+	m_fifo_head = m_fifo_count = 0;
+	std::fill(std::begin(m_mix), std::end(m_mix), 0);
+	std::fill(std::begin(m_last), std::end(m_last), 0);
+
+	m_irq_func(0);
+	update_rate();
 }
 
 u8 es5503_device::read(offs_t offset)
 {
 	uint8_t retval;
-	int i;
 
-	m_stream->update();
+	run_to(now_clock());
 
 	if (offset < 0xe0)
 	{
-		int osc = offset & 0x1f;
+		const int osc = offset & 0x1f;
+
+		check_drift(osc);
 
 		switch(offset & 0xe0)
 		{
@@ -366,7 +509,7 @@ u8 es5503_device::read(offs_t offset)
 				return m_oscillators[osc].control;
 
 			case 0xc0:  // bank select / wavetable size / resolution
-				retval = 0;
+				retval = 0x80;
 				if (m_oscillators[osc].wavetblpointer & 0x10000)
 				{
 					retval |= 0x40;
@@ -382,56 +525,45 @@ u8 es5503_device::read(offs_t offset)
 		switch (offset)
 		{
 			case 0xe0:  // interrupt status
-				retval = m_rege0;
+				retval = (m_rege0 << 1) | 0x41;
 
-				m_irq_func(0);
-
-				// scan all oscillators
-				for (i = 0; i < m_oscsenabled; i++)
+				if (m_irq_active)
 				{
-					if (m_oscillators[i].irqpend)
+					// a read in the slot that presents the request leaves it standing
+					if (!machine().side_effects_disabled() && (m_present_slot != (m_slot - 1)))
 					{
-						// signal this oscillator has an interrupt
-						retval = i<<1;
-
-						m_rege0 = retval | 0x80;
-
-						// and clear its flag
-						m_oscillators[i].irqpend = 0;
-						break;
+						m_oscillators[m_rege0].irqpend = 0;
+						m_irq_active = false;
+						m_irq_func(0);
 					}
 				}
-
-				// if any oscillators still need to be serviced, assert IRQ again immediately
-				for (i = 0; i < m_oscsenabled; i++)
+				else
 				{
-					if (m_oscillators[i].irqpend)
-					{
-						m_irq_func(1);
-						break;
-					}
+					retval |= 0x80;
 				}
-
-				return retval | 0x41;
+				return retval;
 
 			case 0xe1:  // oscillator enable
-				return (m_oscsenabled - 1) << 1;
+				return ((m_oscsenabled - 1) << 1) | 0xc1;
 
 			case 0xe2:  // A/D converter
 				return m_adc_func();
 		}
 	}
 
-	return 0;
+	return 0xff;    // invalid registers float high
 }
 
 void es5503_device::write(offs_t offset, u8 data)
 {
-	m_stream->update();
+	run_to(now_clock());
 
 	if (offset < 0xe0)
 	{
-		int osc = offset & 0x1f;
+		const int osc = offset & 0x1f;
+
+		check_drift(osc);
+		m_oscillators[osc].refresh = m_slot;
 
 		switch(offset & 0xe0)
 		{
@@ -453,23 +585,14 @@ void es5503_device::write(offs_t offset, u8 data)
 				break;
 
 			case 0x80:  // wavetable pointer
-				m_oscillators[osc].wavetblpointer = (data<<8);
+				m_oscillators[osc].wavetblpointer &= 0x10000;
+				m_oscillators[osc].wavetblpointer |= (data<<8);
 				break;
 
 			case 0xa0:  // oscillator control
-				// key on?
-				if ((m_oscillators[osc].control & 1) && (!(data&1)))
-				{
-					m_oscillators[osc].accumulator = 0;
-				}
-
-				// The Ensoniq data sheet says that if the low bit of the mode is set,
-				// then halting either internally or from the CPU will reset the oscillator.
-				// In practice, this means in swap mode that we will also do the swap.
-				if (!(m_oscillators[osc].control & 1) && ((data & 1)) && ((data >> 1) & 1))
-				{
-					halt_osc(osc, 0, &m_oscillators[osc].accumulator, resshifts[m_oscillators[osc].resolution], data);
-				}
+				// Halting from the CPU raises no interrupt and starts no swap partner by itself, and
+				// the scan takes care of rewinding.  Any write drops a waiting request.
+				m_oscillators[osc].irqpend = 0;
 				m_oscillators[osc].control = data;
 				break;
 
@@ -484,7 +607,6 @@ void es5503_device::write(offs_t offset, u8 data)
 				}
 
 				m_oscillators[osc].wavetblsize = ((data >> 3) & 7);
-				m_oscillators[osc].wtsize = wavesizes[m_oscillators[osc].wavetblsize];
 				m_oscillators[osc].resolution = (data & 7);
 				break;
 		}
@@ -499,8 +621,14 @@ void es5503_device::write(offs_t offset, u8 data)
 			case 0xe1:  // oscillator enable
 				// The number here is the number of oscillators to enable -1 times 2.  You can never
 				// have zero oscilllators enabled.  So a value of 62 enables all 32 oscillators.
+				m_stream->update();
 				m_oscsenabled = ((data>>1) & 0x1f) + 1;
-				notify_clock_changed();
+				update_rate();
+
+				// a write during the refresh slots calls off the end of the round, and the scan
+				// carries on from where its counter sits
+				m_idle = 0;
+				m_scan_off = false;
 				break;
 
 			case 0xe2:  // A/D converter

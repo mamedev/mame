@@ -58,7 +58,7 @@ public:
 		m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void poker21(machine_config &config);
+	void poker21(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -76,7 +76,7 @@ protected:
 
 	void program_map(address_map &map) ATTR_COLD;
 
-	void base(machine_config &config);
+	void base(machine_config &config) ATTR_COLD;
 
 private:
 	required_shared_ptr<uint8_t> m_fgram;
@@ -107,7 +107,7 @@ public:
 		m_reel1_alt_scroll(*this, "reel1_alt_scroll")
 	{ }
 
-	void funtech(machine_config &config);
+	void funtech(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( fts2in1 )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_50C ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Pay Rate" )          PORT_DIPLOCATION("NO. 3:1,2,3,4")
+	PORT_DIPNAME( 0x0f, 0x0f, "Main Game Payout Rate" )       PORT_DIPLOCATION("NO. 3:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "50%" )
 	PORT_DIPSETTING(    0x08, "53%" )
 	PORT_DIPSETTING(    0x04, "56%" )
@@ -470,7 +470,7 @@ static INPUT_PORTS_START( fts2in1 )
 	PORT_DIPNAME( 0x10, 0x10, "Double Up Game" )              PORT_DIPLOCATION("NO. 3:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Double Up Pay Rate" )          PORT_DIPLOCATION("NO. 3:6")
+	PORT_DIPNAME( 0x20, 0x20, "Double Up Game Payout Rate" )  PORT_DIPLOCATION("NO. 3:6")
 	PORT_DIPSETTING(    0x00, "80%" )
 	PORT_DIPSETTING(    0x20, "90%" )
 	PORT_DIPNAME( 0x40, 0x40, "Double Up 7 Player Value" )    PORT_DIPLOCATION("NO. 3:7")
@@ -484,12 +484,12 @@ static INPUT_PORTS_START( fts2in1 )
 	PORT_DIPNAME( 0x01, 0x01, "Reel Speed" )                  PORT_DIPLOCATION("NO. 4:1")
 	PORT_DIPSETTING(    0x01, "Low" )
 	PORT_DIPSETTING(    0x00, "High" )
-	PORT_DIPNAME( 0x06, 0x06, "Max Bet" )                     PORT_DIPLOCATION("NO. 4:2,3")
+	PORT_DIPNAME( 0x06, 0x06, "Maximum Bet" )                 PORT_DIPLOCATION("NO. 4:2,3")
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x04, "16" )
 	PORT_DIPSETTING(    0x02, "32" )
 	PORT_DIPSETTING(    0x06, "64" )
-	PORT_DIPNAME( 0x08, 0x08, "Min Bet for Any Bonus" )       PORT_DIPLOCATION("NO. 4:4")
+	PORT_DIPNAME( 0x08, 0x08, "Minimum Bet for Any Bonus" )   PORT_DIPLOCATION("NO. 4:4")
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x08, "16" )
 	PORT_DIPNAME( 0x30, 0x30, "Bonus Games Entry Condition" ) PORT_DIPLOCATION("NO. 4:5,6")

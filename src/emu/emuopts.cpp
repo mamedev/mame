@@ -20,6 +20,8 @@
 #include "corestr.h"
 #include "path.h"
 
+#include <algorithm>
+#include <set>
 #include <stack>
 
 
@@ -870,11 +872,47 @@ void emu_options::set_software(std::string &&new_software)
 	}
 
 	// distribute slot option defaults
-	for (auto &slot_opt : softlist_opts.slot_defaults)
+	bool defaults_applied = false;
+	std::set<std::string> defaults_done;
+	for (bool progress = true; progress; )
 	{
-		auto iter = m_slot_options.find(slot_opt.first);
-		if (iter != m_slot_options.end())
-			iter->second.set_default_card_software(std::move(slot_opt.second));
+		progress = false;
+		for (auto &slot_opt : softlist_opts.slot_defaults)
+		{
+			if (defaults_done.count(slot_opt.first))
+				continue;
+
+			auto iter = m_slot_options.find(slot_opt.first);
+			if (iter != m_slot_options.end())
+			{
+				iter->second.set_default_card_software(std::move(slot_opt.second));
+				defaults_done.insert(slot_opt.first);
+				defaults_applied = true;
+				progress = true;
+			}
+		}
+
+		// slot defaults can add slots, so defaults for slots nested inside them need another pass
+		if (progress)
+			softlist_opts.slot_defaults = evaluate_initial_softlist_options(new_software).slot_defaults;
+	}
+
+	// slot defaults can add image devices, so parts that had nowhere to mount need another pass
+	if (defaults_applied)
+	{
+		for (auto &image_opt : evaluate_initial_softlist_options(new_software).image)
+		{
+			auto iter = m_image_options.find(image_opt.first);
+			if ((iter == m_image_options.end()) || !iter->second->value().empty())
+				continue;
+
+			bool const assigned = std::any_of(
+					m_image_options_canonical.begin(),
+					m_image_options_canonical.end(),
+					[&image_opt] (auto const &opt) { return opt.second.value() == image_opt.second; });
+			if (!assigned)
+				iter->second->specify(std::move(image_opt.second));
+		}
 	}
 
 	// we've succeeded; update the set name

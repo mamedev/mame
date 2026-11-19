@@ -16,7 +16,7 @@
     READY pin.  The figures are the ones for internal RAM access enabled, which
     costs two clocks more for each memory write than disabled does.
 
-    BTCLR and STOP instructions not implemented.
+    STOP instruction not implemented.
 
     IBRK flag (trap I/O instructions) not implemented.
 
@@ -24,8 +24,8 @@
 
     Port implementation is incomplete: mode control registers are ignored.
 
-    Timer implementation is incomplete: polling is not implemented
-    (reading any of the registers just returns the last value written)
+    Timer 0 implementation is incomplete: polling is not implemented
+    (reading TM0 returns the last value written)
 
     The serial interface implements asynchronous mode only; I/O interface
     mode is not emulated.  Note that the serial interface and the DMA
@@ -112,6 +112,14 @@ device_memory_interface::space_config_vector v25_common_device::memory_space_con
 
 TIMER_CALLBACK_MEMBER(v25_common_device::v25_timer_callback)
 {
+	if (param == INTTU2)
+	{
+		// Timer 1 reloads the current modulo at expiry. In timer 0's
+		// one-shot mode, INTTU1 belongs to MD0 rather than TM1.
+		tm1_w(m_MD1);
+		if (!BIT(m_TMC0, 0))
+			param |= INTTU1;
+	}
 	m_pending_irq |= param;
 }
 
@@ -408,6 +416,9 @@ void v25_common_device::device_reset()
 	m_intm = 0;
 	m_halted = 0;
 	m_rep_params = 0;
+	m_io_retry = false;
+	m_io_word_pending = false;
+	m_io_word_latch = 0;
 
 	m_TMC0 = m_TMC1 = 0;
 
@@ -888,6 +899,16 @@ std::unique_ptr<util::disasm_interface> v25_common_device::create_disassembler()
 	return std::make_unique<nec_disassembler>(this, m_v25v35_decryptiontable);
 }
 
+bool v25_common_device::get_decryption_mode() const
+{
+	return m_MF == 0;
+}
+
+std::optional<u32> v25_common_device::get_cs_base() const
+{
+	return Sreg(PS) << 4;
+}
+
 void v25_common_device::device_start()
 {
 	unsigned int i, j, c;
@@ -923,6 +944,9 @@ void v25_common_device::device_start()
 	m_EA = 0;
 	m_EO = 0;
 	m_E16 = 0;
+	m_io_retry = false;
+	m_io_word_pending = false;
+	m_io_word_latch = 0;
 
 	m_TM0 = m_MD0 = m_TM1 = m_MD1 = 0;
 	m_dmac[0] = m_dmac[1] = 0;
@@ -1000,6 +1024,10 @@ void v25_common_device::device_start()
 	save_item(NAME(m_intm));
 	save_item(NAME(m_halted));
 	save_item(NAME(m_rep_params));
+	save_item(NAME(m_prefix_base));
+	save_item(NAME(m_io_retry));
+	save_item(NAME(m_io_word_pending));
+	save_item(NAME(m_io_word_latch));
 	save_item(NAME(m_TM0));
 	save_item(NAME(m_MD0));
 	save_item(NAME(m_TM1));
@@ -1135,6 +1163,45 @@ void v25_common_device::state_export(const device_state_entry &entry)
 }
 
 
+uint16_t v25_common_device::io_read_word(offs_t a)
+{
+	if (!(a & 1) && m_io->data_width() == 16)
+		return m_io->read_word(a);
+
+	// an odd word (or an 8-bit bus) takes two cycles; keep the first byte if the second is retried
+	if (!m_io_word_pending)
+	{
+		m_io_word_latch = m_io->read_byte(a);
+		if (access_to_be_redone_noclear())
+			return 0;
+		m_io_word_pending = true;
+	}
+	const uint16_t result = m_io_word_latch | (m_io->read_byte((a + 1) & 0xffff) << 8);
+	if (!access_to_be_redone_noclear())
+		m_io_word_pending = false;
+	return result;
+}
+
+void v25_common_device::io_write_word(offs_t a, uint16_t v)
+{
+	if (!(a & 1) && m_io->data_width() == 16)
+	{
+		m_io->write_word(a, v);
+		return;
+	}
+
+	if (!m_io_word_pending)
+	{
+		m_io->write_byte(a, v);
+		if (access_to_be_redone_noclear())
+			return;
+		m_io_word_pending = true;
+	}
+	m_io->write_byte((a + 1) & 0xffff, v >> 8);
+	if (!access_to_be_redone_noclear())
+		m_io_word_pending = false;
+}
+
 void v25_common_device::execute_run()
 {
 	int pending = m_pending_irq & m_unmasked_irq;
@@ -1182,7 +1249,7 @@ void v25_common_device::execute_run()
 
 		// Dispatch IRQ
 		m_prev_ip = m_ip;
-		if (m_no_interrupt==0 && (m_pending_irq & m_unmasked_irq))
+		if (!m_io_retry && m_no_interrupt==0 && (m_pending_irq & m_unmasked_irq))
 		{
 			if (m_pending_irq & NMI_IRQ)
 				external_int();
@@ -1191,7 +1258,7 @@ void v25_common_device::execute_run()
 		}
 
 		// No interrupt allowed between last instruction and this one
-		if (m_no_interrupt)
+		if (!m_io_retry && m_no_interrupt)
 			m_no_interrupt--;
 
 		debugger_instruction_hook((Sreg(PS)<<4) + m_ip);
@@ -1201,6 +1268,16 @@ void v25_common_device::execute_run()
 			cont_rep();
 		else
 			(this->*s_nec_instruction[fetchop()])();
+
+		// only I/O accesses may be retried; other instructions would repeat their side effects
+		m_io_retry = access_to_be_redone();
+		if (m_io_retry)
+		{
+			m_ip = m_prev_ip;
+			m_icount -= 4; // the attempted bus cycle
+			m_prefetch_reset = 1;
+			continue;
+		}
 		do_prefetch();
 
 		if (dma_requested(0) || dma_requested(1))

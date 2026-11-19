@@ -80,17 +80,17 @@ uint32_t gba_lcd_device::gba_pram_r(offs_t offset)
 
 void gba_lcd_device::gba_pram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_pram[offset]);
+	gba_pram_store(m_pram.get(), offset, data, mem_mask);
 }
 
 uint32_t gba_lcd_device::gba_vram_r(offs_t offset)
 {
-	return m_vram[offset];
+	return gba_vram_load(m_vram.get(), offset);
 }
 
 void gba_lcd_device::gba_vram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_vram[offset]);
+	gba_vram_store(m_vram.get(), offset, data, mem_mask);
 }
 
 uint32_t gba_lcd_device::gba_oam_r(offs_t offset)
@@ -100,7 +100,7 @@ uint32_t gba_lcd_device::gba_oam_r(offs_t offset)
 
 void gba_lcd_device::gba_oam_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	COMBINE_DATA(&m_oam[offset]);
+	gba_oam_store(m_oam.get(), offset, data, mem_mask);
 }
 
 TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)

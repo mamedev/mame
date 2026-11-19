@@ -85,11 +85,11 @@ std::pair<std::error_condition, std::string> colecovision_cartridge_slot_device:
 
 		if (!loaded_through_softlist())
 		{
-			fread(m_card->m_rom, size);
+			if (fread(m_card->m_rom, size) != size)
+				return std::make_pair(image_error::UNSPECIFIED, "Error reading cartridge file");
 		}
 		else
 		{
-			// TODO 8000/a000/c000/e000
 			memcpy(m_card->m_rom, get_software_region("rom"), size);
 		}
 
@@ -110,13 +110,14 @@ std::string colecovision_cartridge_slot_device::get_default_card_software(get_de
 	if (hook.image_file())
 	{
 		uint64_t length;
-		hook.image_file()->length(length); // FIXME: check error return
+		if (!hook.image_file()->length(length))
+		{
+			if (length == 0x100000 || length == 0x200000)
+				return software_get_default_slot("xin1");
 
-		if (length == 0x100000 || length == 0x200000)
-			return software_get_default_slot("xin1");
-
-		if (length > 0x8000) // Assume roms longer than 32K are megacarts.
-			return software_get_default_slot("megacart");
+			if (length > 0x8000) // Assume roms longer than 32K are megacarts.
+				return software_get_default_slot("megacart");
+		}
 	}
 
 	return software_get_default_slot("standard");

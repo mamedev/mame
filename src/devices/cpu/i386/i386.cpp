@@ -51,10 +51,12 @@
 DEFINE_DEVICE_TYPE(I386,        i386_device,        "i386",        "Intel I386")
 DEFINE_DEVICE_TYPE(I386SX,      i386sx_device,      "i386sx",      "Intel I386SX")
 DEFINE_DEVICE_TYPE(I486,        i486_device,        "i486",        "Intel I486")
+DEFINE_DEVICE_TYPE(I486SX,      i486sx_device,      "i486sx",      "Intel I486SX")
 DEFINE_DEVICE_TYPE(I486DX4,     i486dx4_device,     "i486dx4",     "Intel I486DX4")
 DEFINE_DEVICE_TYPE(PENTIUM,     pentium_device,     "pentium",     "Intel Pentium")
 DEFINE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device, "pentium_mmx", "Intel Pentium MMX")
 DEFINE_DEVICE_TYPE(MEDIAGX,     mediagx_device,     "mediagx",     "Cyrix MediaGX")
+DEFINE_DEVICE_TYPE(MEDIAGXM,    mediagxm_device,    "mediagxm",    "Cyrix MediaGX MMX-Enhanced")
 DEFINE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device, "pentium_pro", "Intel Pentium Pro")
 DEFINE_DEVICE_TYPE(PENTIUM2,    pentium2_device,    "pentium2",    "Intel Pentium II")
 DEFINE_DEVICE_TYPE(PENTIUM3,    pentium3_device,    "pentium3",    "Intel Pentium III")
@@ -74,6 +76,7 @@ i386_device::i386_device(const machine_config &mconfig, device_type type, const 
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
 	, m_smiact(*this)
 	, m_ferr_handler(*this)
+	, m_x87_present(false)
 {
 	// 32 unified
 	set_vtlb_dynamic_entries(32);
@@ -92,6 +95,13 @@ i486_device::i486_device(const machine_config &mconfig, const char *tag, device_
 i486_device::i486_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: i386_device(mconfig, type, tag, owner, clock, 32, 32, 32)
 {
+	m_x87_present = true;
+}
+
+i486sx_device::i486sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: i486_device(mconfig, I486SX, tag, owner, clock)
+{
+	m_x87_present = false;
 }
 
 i486dx4_device::i486dx4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -112,7 +122,17 @@ pentium_device::pentium_device(const machine_config &mconfig, device_type type, 
 }
 
 mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: i386_device(mconfig, MEDIAGX, tag, owner, clock, 32, 32, 32)
+	: mediagx_device(mconfig, MEDIAGX, tag, owner, clock)
+{
+}
+
+mediagx_device::mediagx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: i386_device(mconfig, type, tag, owner, clock, 32, 32, 32)
+{
+}
+
+mediagxm_device::mediagxm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: mediagx_device(mconfig, MEDIAGXM, tag, owner, clock)
 {
 }
 
@@ -1541,12 +1561,12 @@ uint32_t i386_device::GetNonTranslatedEA(uint8_t modrm,uint8_t *seg)
 	return ea;
 }
 
-uint32_t i386_device::GetEA(uint8_t modrm, int rwn)
+uint32_t i386_device::GetEA(uint8_t modrm, int rwn, int size)
 {
 	uint8_t segment;
 	uint32_t ea;
 	modrm_to_EA(modrm, &ea, &segment );
-	return i386_translate(segment, ea, rwn );
+	return i386_translate(segment, ea, rwn, size );
 }
 
 void i386_device::i386_check_irq_line()
@@ -2071,11 +2091,19 @@ void i386_device::device_start()
 {
 	i386_common_init();
 
-	build_opcode_table(OP_I386);
+	build_opcode_table(OP_I386 | (m_x87_present ? OP_FPU : 0));
 	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I386].get();
 	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_I386].get();
 
-	register_state_i386();
+	if (m_x87_present)
+	{
+		build_x87_opcode_table();
+		register_state_i386_x87();
+	}
+	else
+	{
+		register_state_i386();
+	}
 }
 
 void i386_device::register_state_i386()
@@ -2537,6 +2565,12 @@ void i386_device::device_reset()
 	m_a20_mask = ~0;
 
 	m_cr[0] = 0x7fffffe0; // reserved bits set to 1
+	if (m_x87_present)
+	{
+		// ET comes up set when the 80387 is sensed at reset
+		m_cr[0] |= CR0_ET;
+		x87_reset();
+	}
 	m_eflags = 0;
 	m_eflags_mask = 0x00037fd7;
 	m_eip = 0xfff0;
@@ -2943,7 +2977,7 @@ void i486_device::device_start()
 {
 	i386_common_init();
 
-	build_opcode_table(OP_I386 | OP_FPU | OP_I486);
+	build_opcode_table(OP_I386 | (m_x87_present ? OP_FPU : 0) | OP_I486);
 	build_x87_opcode_table();
 	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I486].get();
 	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_I486].get();
@@ -2989,6 +3023,17 @@ void i486_device::device_reset()
 	m_cpu_version = REG32(EDX);
 
 	CHANGE_PC(m_eip);
+}
+
+// No FPU: ESC opcodes fault with #NM under CR0.EM/TS, otherwise do nothing.
+// A 487SX in the I487SX_SLOT upgrade socket provides the x87.
+void i486sx_device::device_reset()
+{
+	i486_device::device_reset();
+
+	// Family 4 (486), Model 2 (SX), Stepping 7 (cC0)
+	REG32(EDX) = (4 << 8) | (2 << 4) | 7;
+	m_cpu_version = REG32(EDX);
 }
 
 void i486dx4_device::device_reset()
@@ -3136,6 +3181,37 @@ void mediagx_device::device_reset()
 	m_feature_flags = 0x00000001;
 
 	CHANGE_PC(m_eip);
+}
+
+/*****************************************************************************/
+/* Cyrix MediaGX MMX-Enhanced (GXm) */
+
+void mediagxm_device::device_start()
+{
+	i386_common_init();
+	register_state_i386_x87();
+
+	build_x87_opcode_table();
+	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM | OP_PPRO | OP_MMX | OP_CYRIX);
+	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_MEDIAGX].get();
+	m_cycle_table_pm = cycle_table_pm[CPU_CYCLES_MEDIAGX].get();
+}
+
+void mediagxm_device::device_reset()
+{
+	mediagx_device::device_reset();
+
+	// Family 5, Model 4 (MediaGX MMX-Enhanced databook, table 9-18), stepping unknown
+	REG32(EDX) = (5 << 8) | (4 << 4) | (1);
+	m_cpu_version = REG32(EDX);
+
+	// [ 0:0] FPU on chip
+	// [ 4:4] Time Stamp Counter
+	// [ 5:5] RDMSR / WRMSR
+	// [ 8:8] CMPXCHG8B
+	// [15:15] CMOV
+	// [23:23] MMX
+	m_feature_flags = 0x00808131;
 }
 
 /*****************************************************************************/

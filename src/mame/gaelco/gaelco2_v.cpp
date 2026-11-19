@@ -338,7 +338,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 	const u32 end_offset = start_offset + 0x1000;
 
 	// sprite offset is based on the visible area - this seems very kludgy
-	const int spr_x_adjust = (screen.visible_area().max_x - 320 + 1) - (511 - 320 - 1) - ((m_vregs[0] >> 4) & 0x01) + m_global_spritexoff;
+	const int spr_x_adjust = (screen.visible_area().right() - 320 + 1) - (511 - 320 - 1) - ((m_vregs[0] >> 4) & 0x01) + m_global_spritexoff;
 
 	for (int j = start_offset; j < end_offset; j += 8)
 	{
@@ -391,7 +391,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 						{
 							// get a pointer to the current line in the screen bitmap
 							const int ypos = ((sy + ey * 16 + py) & 0x1ff);
-							if ((ypos < cliprect.min_y) || (ypos > cliprect.max_y))
+							if (!cliprect.containsy(ypos))
 								continue;
 
 							const int gfx_py = yflip ? (gfx->height() - 1 - py) : py;
@@ -402,7 +402,7 @@ void gaelco2_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, co
 							{
 								// get current pixel
 								const int xpos = (((sx + ex * 16 + px) & 0x3ff) + spr_x_adjust) & 0x3ff;
-								if ((xpos < cliprect.min_x) || (xpos > cliprect.max_x))
+								if (!cliprect.containsx(xpos))
 									continue;
 
 								const int gfx_px = xflip ? (gfx->width() - 1 - px) : px;

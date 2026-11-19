@@ -115,6 +115,7 @@ private:
 	uint8_t m_command;
 	uint8_t m_mode_byte;       // mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous
 	bool m_delayed_tx_en;
+	bool m_rxrdy;              // level last driven on RxRDY
 
 	int32_t m_cts;
 	int32_t m_dsr;
@@ -124,6 +125,7 @@ private:
 	int m_rxc_count;
 	int m_txc_count;
 	int m_br_factor;
+	bool m_rx_start_check;     // async: start bit seen, check it again at mid-bit
 
 	uint8_t m_rx_data;         // data being received
 	uint8_t m_tx_data;         // tx buffer

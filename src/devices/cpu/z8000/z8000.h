@@ -155,6 +155,8 @@ protected:
 	uint32_t  m_op[4];      /* opcodes/data of current instruction */
 	uint32_t  m_ppc;        /* previous program counter */
 	uint32_t  m_pc;         /* program counter */
+	uint8_t   m_pc_b15;     /* bit 15 of the segment word the PC was loaded from */
+	uint8_t   m_addr_b15;   /* bit 15 of the last address operand's segment word (per-instruction, not saved) */
 	uint16_t  m_psapseg;    /* program status pointer, segment (Z8001 only) */
 	uint16_t  m_psapoff;    /* program status pointer, offset */
 	uint16_t  m_fcw;        /* flags and control word */
@@ -211,13 +213,16 @@ protected:
 	inline void cycles(int cycles);
 	virtual void PUSH_PC();
 	virtual void CHANGE_FCW(uint16_t fcw);
-	static inline uint32_t make_segmented_addr(uint32_t addr);
+	inline uint32_t make_segmented_pc(uint32_t addr);
 	static inline uint32_t segmented_addr(uint32_t addr);
 	inline uint32_t addr_from_reg(int regno);
 	inline void addr_to_reg(int regno, uint32_t addr);
 	inline void add_to_addr_reg(int regno, uint16_t addend);
 	inline void sub_from_addr_reg(int regno, uint16_t subtrahend);
 	inline void set_pc(uint32_t addr);
+	inline void set_pc_long(uint32_t segaddr);
+	inline void set_pc_reg(int regno);
+	inline void set_pc_addr(uint32_t addr);
 	inline uint8_t RDIR_B(uint8_t reg);
 	inline uint16_t RDIR_W(uint8_t reg);
 	inline uint32_t RDIR_L(uint8_t reg);

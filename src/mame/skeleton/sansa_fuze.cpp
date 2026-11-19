@@ -47,7 +47,7 @@ INPUT_PORTS_END
 void sansa_fuze_state::sansa_fuze(machine_config &config)
 {
 	/* basic machine hardware */
-	ARM7(config, m_maincpu, 50000000); // arm based, speed unknown
+	ARM920T(config, m_maincpu, 50000000); // AMS AS3525 (ARM922T core), speed unknown
 	m_maincpu->set_addrmap(AS_PROGRAM, &sansa_fuze_state::sansa_fuze_map);
 }
 

@@ -37,8 +37,8 @@ TODO:
 #include "bus/isa/isa.h"
 #include "bus/isa/isa_cards.h"
 #include "cpu/i386/i386.h"
+#include "machine/cx5510.h"
 #include "machine/idectrl.h"
-#include "machine/lpci.h"
 #include "machine/pckeybrd.h"
 #include "video/ramdac.h"
 
@@ -105,8 +105,6 @@ private:
 	//int m_control_num2 = 0;
 	//int m_control_read = 0;
 
-	uint32_t m_cx5510_regs[256/4]{};
-
 	uint32_t disp_ctrl_r(offs_t offset);
 	void disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t memory_ctrl_r(offs_t offset);
@@ -130,9 +128,6 @@ private:
 	void mediagx_io(address_map &map) ATTR_COLD;
 	void mediagx_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
-
-	uint32_t cx5510_pci_r(int function, int reg, uint32_t mem_mask);
-	void cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
 };
 
 // Display controller registers
@@ -473,23 +468,6 @@ void pinball2k_state::parallel_port_w(uint32_t data)
 {
 }
 
-uint32_t pinball2k_state::cx5510_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	//osd_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
-	switch (reg)
-	{
-		case 0:     return 0x00001078;
-	}
-
-	return m_cx5510_regs[reg/4];
-}
-
-void pinball2k_state::cx5510_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	//osd_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
-	COMBINE_DATA(&m_cx5510_regs[reg/4]);
-}
-
 /*****************************************************************************/
 
 void pinball2k_state::mediagx_map(address_map &map)
@@ -515,7 +493,6 @@ void pinball2k_state::mediagx_io(address_map &map)
 	map(0x0378, 0x037b).rw(FUNC(pinball2k_state::parallel_port_r), FUNC(pinball2k_state::parallel_port_w));
 	map(0x0400, 0x0403).rw(FUNC(pinball2k_state::port400_r), FUNC(pinball2k_state::port400_w));
 	map(0x0800, 0x0803).rw(FUNC(pinball2k_state::port800_r), FUNC(pinball2k_state::port800_w));
-	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
 }
 
 /*****************************************************************************/
@@ -627,8 +604,8 @@ void pinball2k_state::mediagx(machine_config &config)
 
 	pcat_common(config);
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device(18, FUNC(pinball2k_state::cx5510_pci_r), FUNC(pinball2k_state::cx5510_pci_w));
+	PCI_ROOT(config, "pci");
+	CX5510(config, "pci:12.0", m_maincpu);
 	// TODO: prism code do hard checks for PCIR vendor 0x146e (Williams) device 0x0001
 
 	ide_controller_device &ide(IDE_CONTROLLER(config, "ide").options(ata_devices, "hdd", nullptr, true));

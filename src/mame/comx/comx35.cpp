@@ -35,18 +35,18 @@ namespace {
 class comx35_state : public driver_device
 {
 public:
-	comx35_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, CDP1802_TAG),
-			m_vis(*this, CDP1869_TAG),
-			m_kbe(*this, CDP1871_TAG),
-			m_cassette(*this, "cassette"),
-			m_ram(*this, RAM_TAG),
-			m_exp(*this, EXPANSION_TAG),
-			m_rom(*this, CDP1802_TAG),
-			m_char_ram(*this, "char_ram", COMX35_CHARRAM_SIZE, ENDIANNESS_LITTLE),
-			m_d6(*this, "D6"),
-			m_modifiers(*this, "MODIFIERS")
+	comx35_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, CDP1802_TAG),
+		m_vis(*this, CDP1869_TAG),
+		m_kbe(*this, CDP1871_TAG),
+		m_cassette(*this, "cassette"),
+		m_ram(*this, RAM_TAG),
+		m_exp(*this, EXPANSION_TAG),
+		m_rom(*this, CDP1802_TAG),
+		m_char_ram(*this, "char_ram", COMX35_CHARRAM_SIZE, ENDIANNESS_LITTLE),
+		m_d6(*this, "D6"),
+		m_modifiers(*this, "MODIFIERS")
 	{ }
 
 	void pal(machine_config &config) ATTR_COLD;
@@ -794,8 +794,7 @@ void comx35_state::base(machine_config &config, const XTAL clock)
 	m_cassette->add_route(ALL_OUTPUTS, "mono", 0.05);
 
 	// expansion bus
-	// FIXME: determine expansion bus clock frequency
-	COMX_EXPANSION_SLOT(config, m_exp, 0, comx_expansion_cards, nullptr).irq_callback().set(FUNC(comx35_state::irq_w));
+	COMX_EXPANSION_SLOT(config, m_exp, clock, comx_expansion_cards, nullptr).irq_callback().set(FUNC(comx35_state::irq_w));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("32K");
@@ -856,7 +855,7 @@ void comx35_state::ntsc(machine_config &config)
 
 ROM_START( comx35p )
 	ROM_REGION( 0x4000, CDP1802_TAG, 0 )
-	ROM_DEFAULT_BIOS( "basic100" )
+	ROM_DEFAULT_BIOS( "basic101" )
 	ROM_SYSTEM_BIOS( 0, "basic100", "COMX BASIC V1.00" )
 	ROMX_LOAD( "comx_10.u21", 0x0000, 0x4000, CRC(68d0db2d) SHA1(062328361629019ceed9375afac18e2b7849ce47), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "basic101", "COMX BASIC V1.01" )

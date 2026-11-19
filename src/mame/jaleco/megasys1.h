@@ -219,21 +219,35 @@ class megasys1_typed_state : public megasys1_state
 public:
 	megasys1_typed_state(const machine_config &mconfig, device_type type, const char *tag) :
 		megasys1_state(mconfig, type, tag),
-		m_okibank(*this, "okibank")
+		m_mcu(*this, "mcu"),
+		m_mculatch(*this, "mculatch"),
+		m_okibank(*this, "okibank"),
+		m_mcu_p2(0),
+		m_mcu_p3(0)
 	{ }
 
 	void system_D(machine_config &config) ATTR_COLD;
 
 	void init_peekaboo() ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
+	required_device<tmp91640_device> m_mcu;
+	required_device<generic_latch_8_device> m_mculatch;
 	required_memory_bank m_okibank;
 
-	// peekaboo
-	u16 m_protection_val = 0;
+	u8 m_mcu_p2;
+	u8 m_mcu_p3;
 
-	u16 protection_peekaboo_r();
-	void protection_peekaboo_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u8 mcu_r();
+	void mcu_w(u8 data);
+	void mcu_p2_w(u8 data);
+	void mcu_p3_w(u8 data);
+	void mcu_p4_w(u8 data);
+	void mcu_p6_w(u8 data);
 
 	INTERRUPT_GEN_MEMBER(megasys1D_irq);
 

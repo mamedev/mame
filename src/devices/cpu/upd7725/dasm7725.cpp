@@ -35,6 +35,49 @@ offs_t necdsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 		uint8_t src     = (opcode >>  4)&0xf;  //move source
 		uint8_t dst     = (opcode >>  0)&0xf;  //move destination
 
+	if(dst || (pselect == 1)) {
+		stream << "mov  ";
+
+		switch(src) {
+		case  0: stream << "trb,"; break;
+		case  1: stream << "a,"; break;
+		case  2: stream << "b,"; break;
+		case  3: stream << "tr,"; break;
+		case  4: stream << "dp,"; break;
+		case  5: stream << "rp,"; break;
+		case  6: stream << "ro,"; break;
+		case  7: stream << "sgn,"; break;
+		case  8: stream << "dr,"; break;
+		case  9: stream << "drnf,"; break;
+		case 10: stream << "sr,"; break;
+		case 11: stream << "sim,"; break;
+		case 12: stream << "sil,"; break;
+		case 13: stream << "k,"; break;
+		case 14: stream << "l,"; break;
+		case 15: stream << "mem,"; break;
+		}
+
+		switch(dst) {
+		case  0: stream << "@non"; break;
+		case  1: stream << "@a"; break;
+		case  2: stream << "@b"; break;
+		case  3: stream << "@tr"; break;
+		case  4: stream << "@dp"; break;
+		case  5: stream << "@rp"; break;
+		case  6: stream << "@dr"; break;
+		case  7: stream << "@sr"; break;
+		case  8: stream << "@sol"; break;
+		case  9: stream << "@som"; break;
+		case 10: stream << "@k"; break;
+		case 11: stream << "@klr"; break;
+		case 12: stream << "@klm"; break;
+		case 13: stream << "@l"; break;
+		case 14: stream << "@trb"; break;
+		case 15: stream << "@mem"; break;
+		}
+		stream << " | ";
+	}
+
 	switch(alu) {
 		case  0: stream << "nop  "; break;
 		case  1: stream << "or   "; break;
@@ -66,48 +109,6 @@ offs_t necdsp_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 	switch(asl) {
 		case 0: stream << "a"; break;
 		case 1: stream << "b"; break;
-	}
-
-	if(dst) {
-		stream << " | mov ";
-
-		switch(src) {
-		case  0: stream << "trb,"; break;
-		case  1: stream << "a,"; break;
-		case  2: stream << "b,"; break;
-		case  3: stream << "tr,"; break;
-		case  4: stream << "dp,"; break;
-		case  5: stream << "rp,"; break;
-		case  6: stream << "ro,"; break;
-		case  7: stream << "sgn,"; break;
-		case  8: stream << "dr,"; break;
-		case  9: stream << "drnf,"; break;
-		case 10: stream << "sr,"; break;
-		case 11: stream << "sim,"; break;
-		case 12: stream << "sil,"; break;
-		case 13: stream << "k,"; break;
-		case 14: stream << "l,"; break;
-		case 15: stream << "mem,"; break;
-		}
-
-		switch(dst) {
-		case  0: stream << "non"; break;
-		case  1: stream << "a"; break;
-		case  2: stream << "b"; break;
-		case  3: stream << "tr"; break;
-		case  4: stream << "dp"; break;
-		case  5: stream << "rp"; break;
-		case  6: stream << "dr"; break;
-		case  7: stream << "sr"; break;
-		case  8: stream << "sol"; break;
-		case  9: stream << "som"; break;
-		case 10: stream << "k"; break;
-		case 11: stream << "klr"; break;
-		case 12: stream << "klm"; break;
-		case 13: stream << "l"; break;
-		case 14: stream << "trb"; break;
-		case 15: stream << "mem"; break;
-		}
 	}
 
 	if(dpl) {

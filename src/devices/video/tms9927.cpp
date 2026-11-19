@@ -294,7 +294,7 @@ bool tms9927_device::cursor_bounds(rectangle &bounds) const
 	bounds.min_y = cursory * SCANS_PER_DATA_ROW;
 	bounds.max_y = bounds.min_y + SCANS_PER_DATA_ROW - 1;
 
-	return (cursorx < HCOUNT && cursory <= LAST_DISP_DATA_ROW);
+	return (cursorx < HCOUNT && CURSOR_ROW_ADDRESS < DATA_ROWS_PER_FRAME);
 }
 
 

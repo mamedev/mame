@@ -35,14 +35,14 @@ DEFINE_DEVICE_TYPE(CDI_SLAVE_HLE, cdislave_hle_device, "cdislavehle", "CD-i Mono
 
 namespace {
 
-const u8 s_attenuation_table[46] =
+constexpr u8 s_attenuation_table[] =
 {
 	0xff, 0xe4, 0xcb, 0xb5, 0xa2, 0x90, 0x80, 0x72,
 	0x66, 0x5b, 0x51, 0x48, 0x40, 0x39, 0x33, 0x2e,
 	0x29, 0x24, 0x20, 0x1d, 0x1a, 0x17, 0x14, 0x12,
 	0x10, 0x0e, 0x0d, 0x0b, 0x0a, 0x09, 0x08, 0x07,
 	0x06, 0x06, 0x05, 0x05, 0x04, 0x04, 0x03, 0x03,
-	0x03, 0x02, 0x02, 0x02, 0x02, 0x01,
+	0x03, 0x02, 0x02, 0x02, 0x02,
 };
 
 }
@@ -298,6 +298,12 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 						m_in_count = 0;
 						break;
 					}
+					case 0x8a: // Reset System
+						LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Reset System (0x8a)\n", offset);
+						m_in_index = 0;
+						m_in_count = 0;
+						machine().schedule_soft_reset();
+						break;
 					case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 					case 0xc8: case 0xc9: case 0xca: case 0xcb: case 0xcc: case 0xcd: case 0xce: case 0xcf:
 						LOGMASKED(LOG_COMMANDS, "slave_w: Channel %d: Set Attenuation Audio\n", offset);
@@ -359,7 +365,7 @@ void cdislave_hle_device::slave_w(offs_t offset, uint16_t data)
 						break;
 					case 0xf0: // Request SLAVE Revision
 						LOGMASKED(LOG_COMMANDS | LOG_WRITES, "slave_w: Channel %d: Request SLAVE Revision (0xf0)\n", offset);
-						prepare_readback(attotime::from_hz(10000), 2, 2, 0xf0, 0x32, 0x31, 0, 0xf0);
+						prepare_readback(attotime::from_hz(10000), 2, 3, 0xf0, 0x20, 0x20, 0, 0xf0);
 						m_in_index = 0;
 						break;
 					case 0xf3: // Request Pointer Type

@@ -76,7 +76,6 @@ TODO:
 
 #include "emu.h"
 
-
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
@@ -325,8 +324,8 @@ void lvcards_state::lvcards_map(address_map &map)
 void lvcards_state::io_map(address_map &map)
 {
 	map.global_mask(0xff);
-	map(0x00, 0x00).r("aysnd", FUNC(ay8910_device::data_r));
-	map(0x00, 0x01).w("aysnd", FUNC(ay8910_device::data_address_w));
+	map(0x00, 0x00).r("aysnd", FUNC(ym2149_device::data_r));
+	map(0x00, 0x01).w("aysnd", FUNC(ym2149_device::data_address_w));
 }
 
 void lvcards_state::lvcardsa_decrypted_opcodes_map(address_map &map)
@@ -623,7 +622,8 @@ void lvcards_state::lvcards(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ay8910_device &aysnd(AY8910(config, "aysnd", 18'432'000 / 12)); // unknown frequency, assume same as tehkanwc.cpp
+	// unknown frequency, assume same as tehkanwc.cpp
+	ym2149_device &aysnd(YM2149(config, "aysnd", 18'432'000 / 12));
 	aysnd.port_a_read_callback().set_ioport("DSW0");
 	aysnd.port_b_read_callback().set_ioport("DSW1");
 	aysnd.add_route(ALL_OUTPUTS, "mono", 0.25);

@@ -277,5 +277,5 @@ ROM_END
 //    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  CLASS           INIT        COMPANY     FULLNAME             FLAGS
 CONS( 2001, gcjp,  0,      0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Japan)",  MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2001, gcus,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (USA)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2002, gceu,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (EUR)",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, gceu,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Europe)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 CONS( 2002, gcbr,  gcjp,   0,      gc,      gc,    gamecube_state, empty_init, "Nintendo", "GameCube (Brazil)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

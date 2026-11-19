@@ -68,42 +68,17 @@ Notes:
     S7      -
     S8      -
     S9      -
+    S20     - ABC bus card address bit 1
     LD1     - LED
 
 */
 
 /*
 
-    Copy protection device (sends sector header bytes to CPU? DDEN is serial clock? code checks for either $b6 or $f7)
-
-        06F8: ld   a,$2F                    ; SEEK
-        06FA: out  ($BC),a
-        06FC: push af
-        06FD: push bc
-        06FE: ld   bc,$0724
-        0701: push bc
-        0702: ld   b,$07
-        0704: rr   a
-        0706: call $073F
-        073F: DB 7E         in   a,($7E)    ; PIO PORT B
-        0741: EE 08         xor  $08        ; DDEN
-        0743: D3 7E         out  ($7E),a
-        0745: EE 08         xor  $08
-        0747: D3 7E         out  ($7E),a
-        0749: DB 7E         in   a,($7E)
-        074B: 1F            rra
-        074C: 1F            rra
-        074D: 1F            rra
-        074E: CB 11         rl   c
-        0750: 79            ld   a,c
-        0751: C9            ret
-        0709: djnz $0703            <-- jumps to middle of instruction!
-        0703: rlca
-        0704: rr   a
-        0706: call $073F
-
-        There is an alternate format function in the controller firmware that allows to set a secret byte which is stored in the sector header.
-        Copy protected software checks the secret byte read from the sector header and refuses to start if the disk has not been appropriately formatted.
+    The 2C140E ULA holds a 16-bit signature that the controller firmware shifts out
+    on PB2 by pulsing _DDEN, and the firmware refuses to work unless it finds $B6
+    followed by $F7. The ULA's internal logic is unknown; a recirculating $B6F7
+    shift register clocked by the rising edge of _DDEN satisfies every ROM.
 
 */
 
@@ -144,18 +119,16 @@ ROM_START( luxor_55_10828 )
 	ROMX_LOAD( "basf .02.7c", 0x000, 0x800, CRC(5daba200) SHA1(7881933760bed3b94f27585c0a6fc43e5d5153f5), ROM_BIOS(0) )
 	ROM_SYSTEM_BIOS( 1, "mpi02", "MPI 51" )
 	ROMX_LOAD( "mpi .02.7c",  0x000, 0x800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 2, "mpi02n", "MPI 51 (newer)" )
-	ROMX_LOAD( "new mpi .02.7c", 0x000, 0x800, CRC(ab788171) SHA1(c8e29965c04c85f2f2648496ea10c9c7ff95392f), ROM_BIOS(2) )
 	// ABC 832
-	ROM_SYSTEM_BIOS( 3, "micr1015", "Micropolis 1015 (v1.4)" )
-	ROMX_LOAD( "micr 1.4.7c", 0x000, 0x800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS( 4, "micr1115", "Micropolis 1115 (v2.3)" )
-	ROMX_LOAD( "micr 2.3.7c", 0x000, 0x800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b), ROM_BIOS(4) )
-	ROM_SYSTEM_BIOS( 5, "basf6118", "BASF 6118 (v1.2)" )
-	ROMX_LOAD( "basf 1.2.7c", 0x000, 0x800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS( 2, "micr1015", "Micropolis 1015 (v1.4)" )
+	ROMX_LOAD( "micr 1.4.7c", 0x000, 0x800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 3, "micr1115", "Micropolis 1115 (v2.3)" )
+	ROMX_LOAD( "micr 2.3.7c", 0x000, 0x800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS( 4, "basf6118", "BASF 6118 (v1.2)" )
+	ROMX_LOAD( "basf 1.2.7c", 0x000, 0x800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1), ROM_BIOS(4) )
 	// ABC 838
-	ROM_SYSTEM_BIOS( 6, "basf6104", "BASF 6104, BASF 6115 (v1.0)" )
-	ROMX_LOAD( "basf 8 1.0.7c", 0x000, 0x800, NO_DUMP, ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS( 5, "basf6104", "BASF 6104, BASF 6115 (v1.0)" )
+	ROMX_LOAD( "basf 8 1.0.7c", 0x000, 0x800, CRC(6db87d46) SHA1(a8fcd94f3f0f93e1d595dd36c420f29bb43b3f60), ROM_BIOS(5) )
 ROM_END
 
 
@@ -239,8 +212,8 @@ uint8_t luxor_55_10828_device::pio_pb_r()
 	bool dd1 = BIT(m_sel, 1) ? BIT(sw1, 3) : 1;
 	data |= !(dd0 && dd1) << 1;
 
-	// TODO ULA output
-	data |= 0x4;
+	// ULA signature
+	data |= BIT(ULA_SIGNATURE, 15 - m_ula_bit) << 2;
 
 	// radial/binary drive select
 	data |= 0x10;
@@ -272,7 +245,11 @@ void luxor_55_10828_device::pio_pb_w(uint8_t data)
 	*/
 
 	// double density enable
-	m_fdc->dden_w(BIT(data, 3));
+	if (!m_dden && BIT(data, 3))
+		m_ula_bit = (m_ula_bit + 1) & 0x0f;
+
+	m_dden = BIT(data, 3);
+	m_fdc->dden_w(m_dden);
 
 	// head load timing
 	m_fdc->hlt_w(BIT(data, 5));
@@ -295,6 +272,7 @@ static void abc_floppies(device_slot_interface &device)
 	device.option_add("525sd", FLOPPY_525_SD);
 	device.option_add("525ssdd", FLOPPY_525_SSDD);
 	device.option_add("525dd", FLOPPY_525_DD);
+	device.option_add("525qd", FLOPPY_525_QD);
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
@@ -308,7 +286,7 @@ void luxor_55_10828_device::floppy_formats(format_registration &fr)
 void luxor_55_10828_device::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
-	m_pio->port_b_write(state << 7);
+	m_pio->port_b_write(pio_pb_r());
 
 	// release the CPU from the wait state
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
@@ -370,9 +348,16 @@ INPUT_PORTS_START( luxor_55_10828 )
 	PORT_DIPSETTING(    0x00, "Double" )
 
 	PORT_START("S1")
-	PORT_DIPNAME( 0x01, 0x01, "Card Address" )
+	PORT_DIPNAME( 0x03, 0x01, "Card Address" )
 	PORT_DIPSETTING(    0x00, "44 (ABC 832/834/850)" )
 	PORT_DIPSETTING(    0x01, "45 (ABC 830)" )
+	PORT_DIPSETTING(    0x02, "46 (ABC 838)" )
+	PORT_DIPSETTING(    0x03, "47" )
+
+	PORT_START("XTAL")
+	PORT_CONFNAME( 0x01, 0x00, "Crystal" )
+	PORT_CONFSETTING(    0x00, "4 MHz (5.25\")" )
+	PORT_CONFSETTING(    0x01, "8 MHz (8\")" )
 
 	PORT_START("S2_S3")
 	PORT_DIPNAME( 0x01, 0x01, "Shift Clock" )
@@ -414,13 +399,16 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 	m_floppy(*this, MB8876_TAG":%u", 0U),
 	m_sw1(*this, "SW1"),
 	m_s1(*this, "S1"),
+	m_xtal(*this, "XTAL"),
 	m_cs(false),
 	m_status(0),
 	m_data(0),
 	m_fdc_irq(0),
 	m_fdc_drq(0),
 	m_wait_enable(0),
-	m_sel(0)
+	m_sel(0),
+	m_dden(true),
+	m_ula_bit(0)
 {
 }
 
@@ -439,15 +427,8 @@ void luxor_55_10828_device::device_start()
 	save_item(NAME(m_fdc_drq));
 	save_item(NAME(m_wait_enable));
 	save_item(NAME(m_sel));
-
-	// patch out protection checks (bioses basf6106/mpi02)
-	uint8_t *rom = memregion(Z80_TAG)->base();
-	rom[0x00fa] = 0xff;
-	rom[0x0336] = 0xff;
-	rom[0x0718] = 0xff;
-	rom[0x072c] = 0xff;
-	rom[0x0771] = 0xff;
-	rom[0x0788] = 0xff;
+	save_item(NAME(m_dden));
+	save_item(NAME(m_ula_bit));
 }
 
 
@@ -457,6 +438,11 @@ void luxor_55_10828_device::device_start()
 
 void luxor_55_10828_device::device_reset()
 {
+	XTAL const xtal = BIT(m_xtal->read(), 0) ? 8_MHz_XTAL : 4_MHz_XTAL;
+	m_maincpu->set_unscaled_clock(xtal / 2);
+	m_pio->set_unscaled_clock(xtal / 2);
+	m_fdc->set_unscaled_clock(xtal / 4);
+
 	m_cs = false;
 
 	ctrl_w(0);
@@ -476,7 +462,7 @@ void luxor_55_10828_device::device_reset()
 
 void luxor_55_10828_device::abcbus_cs(uint8_t data)
 {
-	uint8_t address = 0x2c | BIT(m_s1->read(), 0);
+	uint8_t address = 0x2c | (m_s1->read() & 0x03);
 
 	m_cs = (data == address);
 }
@@ -609,8 +595,9 @@ void luxor_55_10828_device::ctrl_w(uint8_t data)
 
 	if (floppy)
 	{
-		// motor enable
-		floppy->mon_w(BIT(data, 3));
+		// motor enable (8" drives have no motor control)
+		if (floppy->get_form_factor() != floppy_image::FF_8)
+			floppy->mon_w(BIT(data, 3));
 
 		// side select
 		floppy->ss_w(!BIT(data, 4));

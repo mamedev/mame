@@ -67,7 +67,6 @@
 #define RS232_A_TAG         "pr"
 #define RS232_B_TAG         "v24"
 #define ABC_KEYBOARD_PORT_TAG   "kb"
-#define TIMER_CTC_TAG       "timer_ctc"
 #define TIMER_CASSETTE_TAG  "timer_cass"
 
 
@@ -89,6 +88,7 @@ public:
 		m_sio(*this, Z80SIO_TAG),
 		m_discrete(*this, DISCRETE_TAG),
 		m_cassette(*this, CASSETTE_TAG),
+		m_cassette_timer(*this, TIMER_CASSETTE_TAG),
 		m_quickload(*this, "quickload"),
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
@@ -110,6 +110,7 @@ public:
 	required_device<z80sio_device> m_sio;
 	optional_device<discrete_sound_device> m_discrete;
 	optional_device<cassette_image_device> m_cassette;
+	optional_device<timer_device> m_cassette_timer;
 	required_device<snapshot_image_device> m_quickload;
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
@@ -135,7 +136,6 @@ public:
 	void sio_dtrb_w(int state);
 	void sio_rtsb_w(int state);
 	void keydtr_w(int state);
-	TIMER_DEVICE_CALLBACK_MEMBER( ctc_tick );
 	TIMER_DEVICE_CALLBACK_MEMBER( cassette_input_tick );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
@@ -158,9 +158,6 @@ public:
 	size_t m_char_ram_size = 0;
 	uint8_t m_hrs = 0;                    // HR picture start scanline
 	uint8_t m_fgctl = 0;                  // HR foreground control
-
-	// timers
-	emu_timer *m_cassette_timer;
 	void common(machine_config &config);
 	void abc800_m1(address_map &map) ATTR_COLD;
 	void abc800_mem(address_map &map) ATTR_COLD;

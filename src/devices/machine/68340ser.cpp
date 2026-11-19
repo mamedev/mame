@@ -34,6 +34,11 @@ void mc68340_serial_module_device::device_start()
 {
 	m_cpu = downcast<m68340_cpu_device *>(owner());
 	mc68340_duart_device::device_start();
+
+	save_item(NAME(m_mcrh));
+	save_item(NAME(m_mcrl));
+	save_item(NAME(m_ilr));
+	save_item(NAME(m_ivr));
 }
 
 uint8_t mc68340_serial_module_device::read(offs_t offset)
@@ -152,6 +157,10 @@ void mc68340_serial_module_device::irq_w(int state)
 
 mc68340_serial_module_device::mc68340_serial_module_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
   : mc68340_duart_device(mconfig, MC68340_SERIAL_MODULE, tag, owner, clock)
+  , m_mcrh(0)
+  , m_mcrl(0)
+  , m_ilr(0)
+  , m_ivr(0)
 {
 }
 

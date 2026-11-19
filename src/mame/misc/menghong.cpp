@@ -660,12 +660,12 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004?, menghong,  0,        menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2004?, menghonga, menghong, menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou (earlier)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2006,  jzst,      fkddz2,   crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jue Zhan Shanghai Tan",    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2006,  fkddz2,    0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Fengkuang Dou Dizhu II",   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2005,  jpddz,     0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jipin Dou Dizhu (set 1)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // this one boots
-GAME( 2005,  jpddza,    jpddz,    crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jipin Dou Dizhu (set 2)",  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // this one doesn't
-GAME( 2005,  sandayi,   0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "San Da Yi",                MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 200?,  pljh2,     0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Piaoliang Jinhua 2",       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2006,  wakeng,    0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Wakeng",                   MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004?, menghong,  0,        menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou",                    MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004?, menghonga, menghong, menghong, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Meng Hong Lou (earlier)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006,  jzst,      fkddz2,   crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jue Zhan Shanghai Tan",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006,  fkddz2,    0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Fengkuang Dou Dizhu II",           MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2005,  jpddz,     0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jipin Dou Dizhu (set 1)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // this one boots
+GAME( 2005,  jpddza,    jpddz,    crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Jipin Dou Dizhu (set 2)",          MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // this one doesn't
+GAME( 2005,  sandayi,   0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "San Da Yi",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 200?,  pljh2,     0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Piaoliang Jinhua 2",               MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006,  wakeng,    0,        crzyddz2, crzyddz2, menghong_state, empty_init,    ROT0, "Sealy", "Wakeng (VRender0-based hardware)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

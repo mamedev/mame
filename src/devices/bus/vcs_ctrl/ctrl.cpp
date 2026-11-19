@@ -164,6 +164,7 @@ void vcs_control_port_device::device_start()
 //-------------------------------------------------
 
 #include "c1350.h"
+#include "cdgames.h"
 #include "cx85.h"
 #include "joybooster.h"
 #include "joystick.h"
@@ -192,6 +193,7 @@ void vcs_control_port_devices(device_slot_interface &device)
 	device.option_add("trakball", ATARI_TRAKBALL);
 	device.option_add("c1350", C1350);
 	device.option_add("c1351", C1351);
+	device.option_add("cdgames", VCS_CD_ADAPTER);
 }
 
 void a800_control_port_devices(device_slot_interface &device)

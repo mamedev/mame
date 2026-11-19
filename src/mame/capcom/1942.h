@@ -58,6 +58,8 @@ protected:
 	void control_w(uint8_t data);
 	void _1942_palette(palette_device &palette) const;
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(maincpu_acknowledge_irq);
+	IRQ_CALLBACK_MEMBER(audiocpu_acknowledge_irq);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -82,6 +84,9 @@ protected:
 	uint8_t m_scroll[2]{};
 	void create_palette(palette_device &palette) const;
 	uint8_t m_sprite_bufs[2][512]{};
+
+	// interrupt-related
+	uint8_t m_irq_vector = 0xff;
 };
 
 class _1942p_state : public _1942_state

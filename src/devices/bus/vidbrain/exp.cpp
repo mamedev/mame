@@ -81,7 +81,7 @@ videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine
 	device_t(mconfig, VIDEOBRAIN_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_videobrain_expansion_card_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),
-	m_write_extres(*this), m_cart(nullptr)
+	m_write_extres(*this), m_write_eject(*this), m_cart(nullptr)
 {
 }
 
@@ -123,6 +123,18 @@ std::pair<std::error_condition, std::string> videobrain_expansion_slot_device::c
 	}
 
 	return std::make_pair(std::error_condition(), std::string());
+}
+
+
+//-------------------------------------------------
+//  call_unload - the eject button resets the
+//  computer
+//-------------------------------------------------
+
+void videobrain_expansion_slot_device::call_unload()
+{
+	m_write_eject(1);
+	m_write_eject(0);
 }
 
 

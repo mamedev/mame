@@ -4,7 +4,17 @@
 #include "emu.h"
 #include "nextkbd.h"
 
-DEFINE_DEVICE_TYPE(NEXTKBD, nextkbd_device, "nextkbd", "NeXT Keyboard")
+#include <algorithm>
+#include <cmath>
+
+#define LOG_REGR (1U << 1)
+#define LOG_REGW (1U << 2)
+#define LOG_CMD  (1U << 3)
+
+//#define VERBOSE (LOG_GENERAL|LOG_REGR|LOG_REGW|LOG_CMD)
+#include "logmacro.h"
+
+DEFINE_DEVICE_TYPE(NEXTKBD, nextkbd_device, "nextkbd", "NeXT Keyboard/Mouse/Sound")
 
 void nextkbd_device::amap(address_map &map)
 {
@@ -18,18 +28,30 @@ void nextkbd_device::amap(address_map &map)
 
 nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEXTKBD, tag, owner, clock),
+	device_mixer_interface(mconfig, *this),
 	int_change_cb(*this),
 	int_power_cb(*this),
 	int_nmi_cb(*this),
+	sound_drq_cb(*this),
+	sound_irq_cb(*this),
+	dac(*this, "dac%u", 0U),
 	mousex(*this, "mousex"),
 	mousey(*this, "mousey"),
-	mousebtn(*this, "mousebtn")
+	mousebtn(*this, "mousebtn"),
+	revision(0)
 {
+}
+
+void nextkbd_device::device_add_mconfig(machine_config &config)
+{
+	for(int channel = 0; channel != 2; channel++)
+		DAC_16BIT_R2R_TWOS_COMPLEMENT(config, dac[channel]).add_route(0, *this, 1.0, channel);
 }
 
 void nextkbd_device::device_start()
 {
 	poll_timer = timer_alloc(FUNC(nextkbd_device::update_tick), this);
+	sound_timer = timer_alloc(FUNC(nextkbd_device::sound_tick), this);
 
 	save_item(NAME(ctrl_snd));
 	save_item(NAME(ctrl_kms));
@@ -42,9 +64,24 @@ void nextkbd_device::device_start()
 	save_item(NAME(fifo_size));
 	save_item(NAME(fifo));
 	save_item(NAME(modifiers_state));
+	save_item(NAME(nmi_active));
+	save_item(NAME(km_address));
 	save_item(NAME(prev_mousex));
 	save_item(NAME(prev_mousey));
 	save_item(NAME(prev_mousebtn));
+	save_item(NAME(sound_data));
+	save_item(NAME(sound_sample));
+	save_item(NAME(dac_sample));
+	save_item(NAME(sound_bytes));
+	save_item(NAME(sound_mode));
+	save_item(NAME(sound_active));
+	save_item(NAME(sound_repeat));
+	save_item(NAME(sound_drq));
+	save_item(NAME(sound_irq));
+	save_item(NAME(sound_gpo));
+	save_item(NAME(volume_shift));
+	save_item(NAME(volume_bits));
+	save_item(NAME(volume));
 }
 
 void nextkbd_device::device_reset()
@@ -65,7 +102,146 @@ void nextkbd_device::device_reset()
 	prev_mousey = 0;
 	prev_mousebtn = 0;
 	km_address = 0;
+	sound_data = sound_sample = dac_sample = 0;
+	sound_bytes = sound_mode = sound_gpo = 0;
+	volume_shift = volume_bits = 0;
+	volume[0] = volume[1] = 0;
+	update_gain();
+	sound_active = sound_repeat = sound_drq = sound_irq = false;
+	sound_timer->adjust(attotime::never);
+	sound_drq_cb(false);
+	sound_irq_cb(false);
+	sound_output(0);
 	poll_timer->adjust(attotime::from_hz(200), 0, attotime::from_hz(200));
+}
+
+void nextkbd_device::device_post_load()
+{
+	update_gain();
+}
+
+// The KMS serial link carries one big-endian 16-bit sample per channel.
+// Sound commands and the serial volume-control protocol are documented in
+// https://github.com/mihaip/previous/blob/master/src/kms.c and src/snd.c.
+// TODO: the switchable analog low-pass filter (GPO bit 3).
+void nextkbd_device::sound_output(uint32_t sample)
+{
+	dac_sample = sample;
+	for(int channel = 0; channel != 2; channel++) {
+		const int16_t value = int16_t(channel ? sample : (sample >> 16));
+		const double gain = BIT(sound_gpo, 4) ? 0.0 : sound_gain[channel];
+		dac[channel]->write(int16_t(value * gain));
+	}
+}
+
+void nextkbd_device::sound_request()
+{
+	const bool request = sound_active && (ctrl_dma & C_KMS_ENABLE) && sound_bytes < 4;
+	if(request)
+		ctrl_snd |= C_SOUND_OUT_REQUEST;
+	else
+		ctrl_snd &= ~C_SOUND_OUT_REQUEST;
+	const bool drq = request && (ctrl_snd & C_SOUND_OUT_ENABLE);
+	if(drq)
+		ctrl_dma |= C_SDMA_OUT_PENDING;
+	else
+		ctrl_dma &= ~(C_SDMA_OUT_PENDING | C_SDMA_OUT_RUNNING);
+	if(sound_drq != drq) {
+		sound_drq = drq;
+		sound_drq_cb(drq);
+	}
+}
+
+void nextkbd_device::update_sound_irq()
+{
+	const bool state = ctrl_snd & (C_SOUND_OUT_UNDERRUN | C_SOUND_IN_OVERRUN);
+	if(sound_irq != state) {
+		sound_irq = state;
+		sound_irq_cb(state);
+	}
+}
+
+void nextkbd_device::sound_dma_w(uint8_t data)
+{
+	ctrl_dma |= C_SDMA_OUT_RUNNING;
+	sound_data = (sound_data << 8) | data;
+	++sound_bytes;
+	// Withdraw DRQ after a stereo frame. The sample clock requests the next
+	// frame, rather than allowing the DMA controller to drain the whole buffer.
+	sound_request();
+}
+
+TIMER_CALLBACK_MEMBER(nextkbd_device::sound_tick)
+{
+	if(sound_repeat) {
+		sound_repeat = false;
+		sound_output(BIT(sound_mode, 5) ? 0 : sound_sample);
+		return;
+	}
+	if(sound_bytes == 4) {
+		sound_sample = sound_data;
+		sound_bytes = 0;
+	} else {
+		sound_sample = 0;
+		ctrl_snd |= C_SOUND_OUT_UNDERRUN;
+		update_sound_irq();
+	}
+	sound_output(sound_sample);
+	sound_repeat = BIT(sound_mode, 4);
+	sound_request();
+}
+
+void nextkbd_device::sound_enable(uint8_t command)
+{
+	sound_mode = command & 0x30;
+	const bool enable = BIT(command, 3) && (ctrl_dma & C_KMS_ENABLE);
+	if(enable && !sound_active) {
+		sound_repeat = false;
+		sound_timer->adjust(attotime::from_hz(44'100), 0, attotime::from_hz(44'100));
+	} else if(!enable) {
+		sound_timer->adjust(attotime::never);
+		sound_bytes = 0;
+		sound_sample = 0;
+		ctrl_snd &= ~C_SOUND_OUT_UNDERRUN;
+		update_sound_irq();
+		sound_output(0);
+	}
+	sound_active = enable;
+	sound_request();
+}
+
+void nextkbd_device::update_gain()
+{
+	for(int channel = 0; channel != 2; channel++)
+		sound_gain[channel] = (volume[channel] >= 43) ? 0.0 : std::pow(10.0, -double(volume[channel]) / 10.0);
+}
+
+void nextkbd_device::sound_volume(uint8_t data)
+{
+	if(BIT(data, 6))
+		volume[0] = data & 0x3f;
+	if(BIT(data, 7))
+		volume[1] = data & 0x3f;
+	update_gain();
+	sound_output(dac_sample);
+}
+
+void nextkbd_device::sound_control(uint8_t data)
+{
+	// Eleven bits, MSB first: 111, right/left selects, six-bit attenuation
+	// in 2 dB steps. STROBE latches the word; CLOCK samples DATA on rising edges.
+	if(BIT(data, 0) && !BIT(sound_gpo, 0)) {
+		if(volume_bits == 11 && (volume_shift & 0x700) == 0x700)
+			sound_volume(uint8_t(volume_shift));
+	} else if(!BIT(data, 0) && BIT(sound_gpo, 0)) {
+		volume_shift = 0;
+		volume_bits = 0;
+	} else if(!BIT(data, 0) && BIT(data, 2) && !BIT(sound_gpo, 2)) {
+		volume_shift = (volume_shift << 1) | BIT(data, 1);
+		volume_bits = std::min<uint8_t>(volume_bits + 1, 12);
+	}
+	sound_gpo = data;
+	sound_output(dac_sample);
 }
 
 void nextkbd_device::send()
@@ -159,87 +335,88 @@ bool nextkbd_device::fifo_empty() const
 
 uint8_t nextkbd_device::status_snd_r()
 {
-	logerror("status_snd_r %02x %s\n", ctrl_snd, machine().describe_context());
+	LOGMASKED(LOG_REGR, "status_snd_r %02x %s\n", ctrl_snd, machine().describe_context());
 	return ctrl_snd;
 }
 
 uint8_t nextkbd_device::status_kms_r()
 {
-	logerror("status_kms_r %02x %s\n", ctrl_kms, machine().describe_context());
+	LOGMASKED(LOG_REGR, "status_kms_r %02x %s\n", ctrl_kms, machine().describe_context());
 	return ctrl_kms;
 }
 
 uint8_t nextkbd_device::status_dma_r()
 {
-	logerror("status_dma_r %02x %s\n", ctrl_dma, machine().describe_context());
+	LOGMASKED(LOG_REGR, "status_dma_r %02x %s\n", ctrl_dma, machine().describe_context());
 	return ctrl_dma;
 }
 
 uint8_t nextkbd_device::status_cmd_r()
 {
-	logerror("status_cmd_r %02x %s\n", ctrl_cmd, machine().describe_context());
+	LOGMASKED(LOG_REGR, "status_cmd_r %02x %s\n", ctrl_cmd, machine().describe_context());
 	return ctrl_cmd;
 }
 
 uint32_t nextkbd_device::cdata_r(offs_t offset, uint32_t mem_mask)
 {
-	logerror("cdata_r %08x @ %08x %s\n", cdata, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_REGR, "cdata_r %08x @ %08x %s\n", cdata, mem_mask, machine().describe_context());
 	return cdata;
 }
 
 uint32_t nextkbd_device::kmdata_r(offs_t offset, uint32_t mem_mask)
 {
-	uint8_t old = ctrl_kms;
-	ctrl_kms &= ~(C_KBD_INTERRUPT|C_KBD_DATA);
-	if(old & C_KBD_INTERRUPT)
-		int_change_cb(false);
-	logerror("kmdata_r %08x @ %08x %s\n", kmdata, mem_mask, machine().describe_context());
+	if(!machine().side_effects_disabled()) {
+		uint8_t old = ctrl_kms;
+		ctrl_kms &= ~(C_KBD_INTERRUPT|C_KBD_DATA);
+		if(old & C_KBD_INTERRUPT)
+			int_change_cb(false);
+	}
+	LOGMASKED(LOG_REGR, "kmdata_r %08x @ %08x %s\n", kmdata, mem_mask, machine().describe_context());
 	return kmdata;
 }
 
 void nextkbd_device::ctrl_snd_w(uint8_t data)
 {
-	uint8_t old = ctrl_snd;
-	ctrl_snd = (ctrl_snd & ~C_SOUND_WMASK) | (data & C_SOUND_WMASK);
-	uint8_t diff = old ^ ctrl_snd;
-
-	logerror("ctrl_snd_w %02x | %02x %s\n", ctrl_snd, diff, machine().describe_context());
+	LOGMASKED(LOG_REGW, "ctrl_snd_w %02x %s\n", data, machine().describe_context());
+	ctrl_snd = (ctrl_snd & ~(C_SOUND_OUT_ENABLE | C_SOUND_IN_ENABLE)) | (data & (C_SOUND_OUT_ENABLE | C_SOUND_IN_ENABLE));
+	if(!sound_active && (data & C_SOUND_OUT_UNDERRUN))
+		ctrl_snd &= ~C_SOUND_OUT_UNDERRUN;
+	if(data & C_SOUND_IN_OVERRUN)
+		ctrl_snd &= ~C_SOUND_IN_OVERRUN;
+	update_sound_irq();
+	sound_request();
 }
 
 void nextkbd_device::ctrl_kms_w(uint8_t data)
 {
-	uint8_t old = ctrl_kms;
 	ctrl_kms = (ctrl_kms & ~C_KMS_WMASK) | (data & C_KMS_WMASK);
-	uint8_t diff = old ^ ctrl_kms;
-
-	logerror("ctrl_kms_w %02x | %02x %s\n", ctrl_kms, diff, machine().describe_context());
+	LOGMASKED(LOG_REGW, "ctrl_kms_w %02x %s\n", ctrl_kms, machine().describe_context());
 }
 
 void nextkbd_device::ctrl_dma_w(uint8_t data)
 {
-	uint8_t old = ctrl_dma;
 	ctrl_dma = (ctrl_dma & ~C_WMASK) | (data & C_WMASK);
-	uint8_t diff = old ^ ctrl_dma;
-
-	logerror("ctrl_dma_w %02x | %02x %s\n", ctrl_dma, diff, machine().describe_context());
+	LOGMASKED(LOG_REGW, "ctrl_dma_w %02x %s\n", ctrl_dma, machine().describe_context());
+	if(!(ctrl_dma & C_KMS_ENABLE))
+		sound_enable(0);
 }
 
 void nextkbd_device::ctrl_cmd_w(uint8_t data)
 {
 	ctrl_cmd = data;
-	logerror("ctrl_cmd_w %02x %s\n", ctrl_cmd, machine().describe_context());
+	LOGMASKED(LOG_REGW, "ctrl_cmd_w %02x %s\n", ctrl_cmd, machine().describe_context());
 }
 
 void nextkbd_device::cdata_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&cdata);
-	logerror("cdata_w %08x @ %08x %s\n", data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_REGW, "cdata_w %08x @ %08x %s\n", data, mem_mask, machine().describe_context());
 	handle_command();
 }
 
 void nextkbd_device::kmdata_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
-	logerror("kmdata_w %08x @ %08x %s\n", data, mem_mask, machine().describe_context());
+	LOGMASKED(LOG_REGW, "kmdata_w %08x @ %08x %s\n", data, mem_mask, machine().describe_context());
 }
 
 INPUT_CHANGED_MEMBER( nextkbd_device::update )
@@ -287,7 +464,7 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 
 void nextkbd_device::handle_fifo_command()
 {
-	logerror("Fifo command %08x?\n", cdata);
+	LOGMASKED(LOG_CMD, "Fifo command %08x\n", cdata);
 	fifo_ir = 0;
 	fifo_iw = 0;
 	fifo_size = 0;
@@ -319,13 +496,38 @@ void nextkbd_device::handle_kbd_command()
 
 void nextkbd_device::handle_command()
 {
+	if((ctrl_cmd & 0xc7) == 0x07) {
+		sound_enable(ctrl_cmd);
+		return;
+	}
 	switch(ctrl_cmd) {
+	case 0xc2:
+		// only the later KMS takes the volume directly
+		if(!revision)
+			logerror("Volume command on the original KMS %08x\n", cdata);
+		else if(ctrl_dma & C_KMS_ENABLE)
+			sound_volume(cdata >> 24);
+		break;
+
+	case 0xc4:
+		if(ctrl_dma & C_KMS_ENABLE)
+			sound_control(cdata >> 24);
+		break;
+
 	case 0xc5:
 		handle_kbd_command();
 		break;
 
 	case 0xc6:
 		handle_fifo_command();
+		break;
+
+	case 0xc7:
+		if(sound_active) {
+			sound_data = cdata;
+			sound_bytes = 4;
+			sound_request();
+		}
 		break;
 
 	default:

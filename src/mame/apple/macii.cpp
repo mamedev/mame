@@ -49,6 +49,10 @@
 
 #include "formats/ap_dsk35.h"
 
+#include "endianness.h"
+
+//#define VERBOSE 1
+#include "logmacro.h"
 
 namespace {
 
@@ -104,14 +108,14 @@ public:
 	{
 	}
 
-	void macii(machine_config &config);
-	void maciihmu(machine_config &config);
-	void maciihd(machine_config &config);
-	void maciix(machine_config &config);
-	void maciicx(machine_config &config);
-	void macse30(machine_config &config);
+	void macii(machine_config &config) ATTR_COLD;
+	void maciihmu(machine_config &config) ATTR_COLD;
+	void maciihd(machine_config &config) ATTR_COLD;
+	void maciix(machine_config &config) ATTR_COLD;
+	void maciicx(machine_config &config) ATTR_COLD;
+	void macse30(machine_config &config) ATTR_COLD;
 
-	void macii_init();
+	void macii_init() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -170,6 +174,7 @@ private:
 	void via2_out_a(u8 data);
 	void via2_out_b(u8 data);
 	void hmmu_via2_out_b(u8 data);
+	void cpu_reset_w(int state);
 	void state_load();
 	void via_irq(int state);
 	void via2_irq(int state);
@@ -215,18 +220,18 @@ private:
 u32 macii_state::screen_update_macse30(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	u32 const video_base = (m_screen_buffer ? 0x8000 : 0) + (MAC_H_VIS / 8);
-	u16 const *const video_ram = (const u16 *)&m_vram[video_base / 4];
+	auto const video_ram = util::big_endian_cast<const u16>(&m_vram[video_base / 4]);
 
-	for (int y = 0; y < MAC_V_VIS; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		u32 *const line = &bitmap.pix(y);
 
 		for (int x = 0; x < MAC_H_VIS; x += 16)
 		{
-			u16 const word = video_ram[((y * MAC_H_VIS) / 16) + ((x / 16) ^ 1)];
+			u16 const word = video_ram[((y * MAC_H_VIS) / 16) + (x / 16)];
 			for (int b = 0; b < 16; b++)
 			{
-				line[x + b] = ((word >> (15 - b)) & 0x0001) ? 0 : 0xffffff;
+				line[x + b] = BIT(word, 15 - b) ? 0 : 0xffffff;
 			}
 		}
 	}
@@ -772,6 +777,32 @@ void macii_state::machine_reset()
 	m_last_taken_interrupt = 0;
 }
 
+// The RESET instruction drives the CPU's RESET pin, which is the board's
+// /RESET: it brings "all of the internal devices" to their initial state
+// (Guide to the Macintosh Family Hardware, 2nd ed., p. 244).  On the Mac II
+// logic board (820-0228) the 68020's RESET shares a net with both VIAs, the
+// IWM, the 5380 and the ADB modem (sheet 3, B13 pin 4), reset here, and with
+// the ASC and the 68851, which are not; the later machines are assumed to
+// match.  The IIcx (sheet 4, UL6 pin 4) and SE/30 (050-0253 sheet 4,
+// UL11 pin 4) schematics show the ADB modem on /RESET too.  The SCC has no
+// reset input.
+void macii_state::cpu_reset_w(int state)
+{
+	if (!state)
+		return;
+
+	LOG("RESET from CPU\n");
+
+	// VIA1 first: its PA4 going high brings back the ROM overlay (p. 244), so
+	// VIA2's RAM-size outputs then leave the RAM map alone
+	m_via1->reset();
+	m_via2->reset();
+	m_fdc->reset();
+	m_ncr5380->reset();
+	m_scsihelp->reset();
+	m_adbmodem->reset();
+}
+
 void macii_state::state_load()
 {
 	int overlay = m_overlay;
@@ -801,7 +832,7 @@ void macii_state::macii_init()
 
 void macii_state::nubus_slot_interrupt(u8 slot, u32 state)
 {
-	static const u8 masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
+	constexpr u8 masks[8] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
 	u8 mask = 0x3f;
 
 	slot -= 9;
@@ -924,6 +955,7 @@ void macii_state::macse30_map(address_map &map)
 void macii_state::macii(machine_config &config)
 {
 	M68020PMMU(config, m_maincpu, C15M);
+	m_maincpu->reset_cb().set(FUNC(macii_state::cpu_reset_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -947,6 +979,10 @@ void macii_state::macii(machine_config &config)
 	m_scc->out_int_callback().set(FUNC(macii_state::set_scc_interrupt));
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	// mini-DIN-8 serial ports: HSKo (pin 1) is driven from the SCC's /DTR
+	// through a 26LS30 line driver; GPi (pin 7) reaches /DCD
+	m_scc->out_dtra_callback().set("modem", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_dtrb_callback().set("printer", FUNC(rs232_port_device::write_dtr));
 
 	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
@@ -1043,6 +1079,7 @@ void macii_state::maciihmu(machine_config &config)
 	macii(config);
 
 	M68020HMMU(config.replace(), m_maincpu, C15M);
+	m_maincpu->reset_cb().set(FUNC(macii_state::cpu_reset_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 
@@ -1073,6 +1110,7 @@ void macii_state::maciix(machine_config &config)
 
 	// IIx = Mac II FDHD with a 68030 instead of the 020
 	M68030(config.replace(), m_maincpu, C15M);
+	m_maincpu->reset_cb().set(FUNC(macii_state::cpu_reset_w));
 	m_maincpu->set_addrmap(AS_PROGRAM, &macii_state::macii_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 

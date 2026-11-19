@@ -277,7 +277,6 @@ void sound_manager::input_get(int id, sound_stream &stream)
 	u32 dest_samples = stream.samples();
 	u64 dest_start_pos = stream.start_index();
 	u64 dest_end_pos = dest_start_pos + dest_samples;
-	u32 skip = stream.output_count();
 
 	for(const auto &step : m_microphones[id].m_input_mixing_steps) {
 		if(step.m_mode == mixing_step::CLEAR || step.m_mode == mixing_step::COPY)
@@ -310,7 +309,7 @@ void sound_manager::input_get(int id, sound_stream &stream)
 			float gain = step.m_linear_volume / 32768.0;
 			for(u32 sample = 0; sample != dest_samples; sample++) {
 				stream.add(step.m_device_channel, sample, *src * gain);
-				src += skip;
+				src += istream.m_buffer.channels();
 			}
 		}
 	}

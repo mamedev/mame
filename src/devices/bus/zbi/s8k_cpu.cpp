@@ -75,6 +75,8 @@ s8k_cpu_base::s8k_cpu_base(const machine_config &mconfig, device_type type, cons
 	, m_dipsw(*this, "DIPSW")
 	, m_ns_cb(*this)
 	, m_busack_cb(*this)
+	, m_memory_error_enabled(false)
+	, m_memory_error_latched(false)
 {
 }
 
@@ -89,6 +91,9 @@ void s8k_cpu_base::base_device_start()
 	save_item(NAME(m_lad_low));
 	save_item(NAME(m_if1_low));
 	save_item(NAME(m_segt_state));
+	save_item(NAME(m_nmi_code));
+	save_item(NAME(m_memory_error_enabled));
+	save_item(NAME(m_memory_error_latched));
 }
 
 void s8k_cpu_base::base_device_reset()
@@ -102,6 +107,10 @@ void s8k_cpu_base::base_device_reset()
 	m_lad_low = 0;
 	m_if1_low = 0;
 	m_segt_state = false;
+	m_nmi_code = 0;
+	m_memory_error_enabled = false;
+	m_memory_error_latched = false;
+	m_maincpu->set_input_line(z8001_device::NMI_LINE, CLEAR_LINE);
 
 	m_view_code.select(0);
 	m_view_data.select(0);
@@ -115,7 +124,8 @@ void s8k_cpu_base::base_device_resolve_objects()
 
 	m_maincpu->ns().append(*m_bus, FUNC(zbi_bus_device::ns_w));
 	m_maincpu->busack().append(*m_bus, FUNC(zbi_bus_device::busack_w));
-	m_maincpu->viack().set(*m_bus, FUNC(zbi_bus_device::viack_r));
+	m_maincpu->viack().set(*this, FUNC(s8k_cpu_base::viack_r));
+	m_maincpu->nviack().set(*this, FUNC(s8k_cpu_base::nviack_r));
 }
 
 //**************************************************************************
@@ -170,20 +180,65 @@ uint16_t s8k_cpu_base::segtack_r()
 	return code;
 }
 
+void s8k_cpu_base::mmu_instruction_end()
+{
+	m_mmu_code->instruction_end();
+	m_mmu_data->instruction_end();
+	m_mmu_stck->instruction_end();
+}
+
+uint16_t s8k_cpu_base::viack_r()
+{
+	mmu_instruction_end();
+	return m_bus->viack_r();
+}
+
+uint16_t s8k_cpu_base::nviack_r()
+{
+	mmu_instruction_end();
+	return 0xffff;
+}
+
 uint16_t s8k_cpu_base::nmiack_r()
 {
-	uint16_t code = m_nmi_code;
+	mmu_instruction_end();
 
-	m_nmi_code = 0;
+	uint16_t code = m_nmi_code;
 
 	if (code == 0)
 	{
 		code = m_bus->nmiack_r();
 	}
 
+	// Manual and power-fail sources are acknowledged here.  The memory-error
+	// identifier is driven by the CPU-board parity latch until SCR D3 clears it.
+	m_nmi_code = m_memory_error_latched ? NMI_ECCERR : 0;
 	m_maincpu->set_input_line(z8001_device::NMI_LINE, CLEAR_LINE);
 
 	return code;
+}
+
+void s8k_cpu_base::card_memerr_w(int state)
+{
+	if (state && m_memory_error_enabled && !m_memory_error_latched)
+	{
+		m_memory_error_latched = true;
+		m_nmi_code |= NMI_ECCERR;
+		card_nmi_w(ASSERT_LINE);
+	}
+}
+
+void s8k_cpu_base::memory_error_control_w(bool enable)
+{
+	m_memory_error_enabled = enable;
+
+	if (!enable)
+	{
+		m_memory_error_latched = false;
+		m_nmi_code &= ~NMI_ECCERR;
+		if (m_nmi_code == 0)
+			card_nmi_w(CLEAR_LINE);
+	}
 }
 
 void s8k_cpu_base::nmi_switch_w(int state)
@@ -224,7 +279,8 @@ z8010_device *s8k_cpu_base::select_code_mmu(offs_t offset)
 			if (m_normal_mode)  // Trying to access in normal mode?
 			{
 				mmu = nullptr;
-				segt_interrupt(1);
+				if (!machine().side_effects_disabled())
+					segt_interrupt(1);
 			}
 		}
 		else if (m_is_seg_user)
@@ -274,7 +330,8 @@ z8010_device *s8k_cpu_base::select_data_mmu(offs_t offset, uint8_t sbr, uint8_t 
 				// SEGTRAP!  (the address latches are captured by the
 				// segment trap flip-flop in segt_interrupt)
 				mmu = nullptr;
-				segt_interrupt(1);
+				if (!machine().side_effects_disabled())
+					segt_interrupt(1);
 			}
 			else if (seg_offs < sbr)
 			{
@@ -338,6 +395,7 @@ void s8k_cpu_base::install_memory(offs_t lrom_end, offs_t lram_start, offs_t lme
 	LROM = memregion("maincpu")->base();
 	LRAM = memshare("local_ram")->ptr();
 	m_view_code[0].install_rom(0x0000, lrom_end, LROM);
+	m_view_code[0].install_ram(lram_start, lram_start + 0x7ff, LRAM);
 	m_view_data[0].install_rom(0x0000, lrom_end, LROM);
 	m_view_data[0].install_ram(lram_start, lram_start + 0x7ff, LRAM);
 	m_view_stck[0].install_ram(lram_start, lram_start + 0x7ff, LRAM);
@@ -437,6 +495,9 @@ void zbi_s8k_cpu10_card_device::reg_scr_w(uint16_t data)
 	{
 		m_is_seg_user = !!(data & SCR_SEG_USER);
 	}
+
+	if (diff & SCR_CLR_PARITY)
+		memory_error_control_w(!!(data & SCR_CLR_PARITY));
 
 	m_reg_scr = (m_reg_scr & 0xf0) | ( data & 0x0f );   // Mask off read-only nibble
 }
@@ -547,40 +608,45 @@ void zbi_s8k_cpu10_card_device::addrmap_sio(address_map &map)
 
 bool zbi_s8k_cpu10_card_device::translate_addr(int spacenum, bool write, offs_t &offset)
 {
-	bool stack_access = (spacenum == z8001_device::AS_STACK);
+	bool const stack_access = (spacenum == z8001_device::AS_STACK);
+	bool const side_effects = !machine().side_effects_disabled();
 
 	offset <<= 1;
 
-	if (stack_access)
+	if (side_effects && stack_access)
 	{
 		m_ctc[0]->trg3(1);
 		m_ctc[0]->trg3(0);
 	}
 
-	if (m_reg_scr & SCR_MMU_ONH)
+	bool const code_access = (spacenum == AS_PROGRAM);
+	int const st = code_access ?
+				(m_maincpu->is_ifetch1() ?
+					z8002_device::ST_IFETCH_1 :
+					z8002_device::ST_IFETCH_N) :
+				(stack_access ?
+					z8002_device::ST_REQ_STACK :
+					z8002_device::ST_REQ_DATA);
+
+	if (side_effects)
+		observe_bus_cycle(offset, !m_dma_on && st == z8002_device::ST_IFETCH_1);
+	// SUP is shared by all three MMUs, not just the selected address driver.
+	if (side_effects && !m_dma_on &&
+		(m_mmu_code->cpu_suppressed() || m_mmu_data->cpu_suppressed() || m_mmu_stck->cpu_suppressed()))
+		return false;
+
+	z8010_device *const mmu = code_access ?
+						select_code_mmu(offset) : select_data_mmu(offset, m_reg_sbr, m_reg_nbr);
+
+	if (mmu)
 	{
-		bool code_access = (spacenum == AS_PROGRAM);
-		int st = code_access ?
-					(m_maincpu->is_ifetch1() ?
-						z8002_device::ST_IFETCH_1 :
-						z8002_device::ST_IFETCH_N) :
-					(stack_access ?
-						z8002_device::ST_REQ_STACK :
-						z8002_device::ST_REQ_DATA);
+		LOG("%s MMU MEM REQ (space %d): %06x\n", machine().describe_context(), spacenum, offset);
 
-		observe_bus_cycle(offset, st == z8002_device::ST_IFETCH_1);
-
-		z8010_device *mmu = code_access ?
-							select_code_mmu(offset) : select_data_mmu(offset, m_reg_sbr, m_reg_nbr);
-
-		if (mmu)
-		{
-			LOG("%s MMU MEM REQ (space %d): %06x\n", machine().describe_context(), spacenum, offset);
-
-			offset &= 0x3f'ffff;    // Mask off seg bit 7 to disable URS checking in MMUs
-
-			return mmu->translate(offset, write, true, m_dma_on, st);
-		}
+		auto const result = mmu->translate(offset & 0x3f'ffff, write, true, m_dma_on, st);
+		if (result.suppress || ((m_reg_scr & SCR_MMU_ONH) && !result.address_driven))
+			return false;
+		if (m_reg_scr & SCR_MMU_ONH)
+			offset = result.address;
 	}
 
 	return true;
@@ -1014,36 +1080,41 @@ zbi_s8k_hpcpu_card_device::zbi_s8k_hpcpu_card_device(const machine_config &mconf
 
 bool zbi_s8k_hpcpu_card_device::translate_addr(int spacenum, bool write, offs_t &offset)
 {
-	bool stack_access = (spacenum == z8001_device::AS_STACK);
+	bool const stack_access = (spacenum == z8001_device::AS_STACK);
+	bool const side_effects = !machine().side_effects_disabled();
 
 	offset <<= 1;
 
-	if (m_reg_scr & SCR_MMU_ONH)
+	bool const code_access = (spacenum == AS_PROGRAM);
+	int const st = code_access ?
+				(m_maincpu->is_ifetch1() ?
+					z8002_device::ST_IFETCH_1 :
+					z8002_device::ST_IFETCH_N) :
+				(stack_access ?
+					z8002_device::ST_REQ_STACK :
+					z8002_device::ST_REQ_DATA);
+
+	// Board latches and MMU bus snoop see the cycle before any
+	// violation can be raised for it.
+	if (side_effects)
+		observe_bus_cycle(offset, !m_dma_on && st == z8002_device::ST_IFETCH_1);
+	// SUP is shared by all three MMUs, not just the selected address driver.
+	if (side_effects && !m_dma_on &&
+		(m_mmu_code->cpu_suppressed() || m_mmu_data->cpu_suppressed() || m_mmu_stck->cpu_suppressed()))
+		return false;
+
+	z8010_device *const mmu = code_access ?
+						select_code_mmu(offset) : select_data_mmu(offset, 0, m_reg_ubr);
+
+	if (mmu)
 	{
-		bool code_access = (spacenum == AS_PROGRAM);
-		int st = code_access ?
-					(m_maincpu->is_ifetch1() ?
-						z8002_device::ST_IFETCH_1 :
-						z8002_device::ST_IFETCH_N) :
-					(stack_access ?
-						z8002_device::ST_REQ_STACK :
-						z8002_device::ST_REQ_DATA);
+		LOG("%s MMU MEM REQ (space %d): %06x\n", machine().describe_context(), spacenum, offset);
 
-		// Board latches and MMU bus snoop see the cycle before any
-		// violation can be raised for it.
-		observe_bus_cycle(offset, st == z8002_device::ST_IFETCH_1);
-
-		z8010_device *mmu = code_access ?
-							select_code_mmu(offset) : select_data_mmu(offset, 0, m_reg_ubr);
-
-		if (mmu)
-		{
-			LOG("%s MMU MEM REQ (space %d): %06x\n", machine().describe_context(), spacenum, offset);
-
-			offset &= 0x3f'ffff;    // Mask off seg bit 7 to disable URS checking in MMUs
-
-			return mmu->translate(offset, write, true, m_dma_on, st);
-		}
+		auto const result = mmu->translate(offset & 0x3f'ffff, write, true, m_dma_on, st);
+		if (result.suppress || ((m_reg_scr & SCR_MMU_ONH) && !result.address_driven))
+			return false;
+		if (m_reg_scr & SCR_MMU_ONH)
+			offset = result.address;
 	}
 
 	return true;
@@ -1099,6 +1170,9 @@ void zbi_s8k_hpcpu_card_device::reg_scr_w(uint16_t data)
 	{
 		m_is_seg_user = !!(data & SCR_SEG_USER);
 	}
+
+	if (diff & SCR_CLR_PARITY)
+		memory_error_control_w(!!(data & SCR_CLR_PARITY));
 
 	m_reg_scr = (m_reg_scr & 0x0ff0) | ( data & 0xf00f );   // Mask off read-only parts
 }

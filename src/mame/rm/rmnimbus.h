@@ -16,7 +16,7 @@
 #include "cpu/mcs51/i8051.h"
 #include "machine/z80sio.h"
 #include "machine/wd_fdc.h"
-#include "bus/scsi/scsi.h"
+#include "machine/nscsi_cb.h"
 #include "machine/6522via.h"
 #include "machine/ram.h"
 #include "machine/eepromser.h"
@@ -65,15 +65,12 @@ public:
 		m_maincpu(*this, MAINCPU_TAG),
 		m_iocpu(*this, IOCPU_TAG),
 		m_msm(*this, MSM5205_TAG),
-		m_scsibus(*this, SCSIBUS_TAG),
+		m_scsi(*this, SCSIBUS_TAG ":7:scsicb"),
 		m_ram(*this, RAM_TAG),
 		m_eeprom(*this, ER59256_TAG),
 		m_via(*this, VIA_TAG),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_palette(*this, "palette"),
-		m_scsi_data_out(*this, "scsi_data_out"),
-		m_scsi_data_in(*this, "scsi_data_in"),
-		m_scsi_ctrl_out(*this, "scsi_ctrl_out"),
 		m_fdc(*this, FDC_TAG),
 		m_z80sio(*this, Z80SIO_TAG),
 		m_screen(*this, "screen"),
@@ -93,15 +90,12 @@ private:
 	required_device<i80186_cpu_device> m_maincpu;
 	required_device<i8031_device> m_iocpu;
 	required_device<msm5205_device> m_msm;
-	required_device<scsi_port_device> m_scsibus;
+	required_device<nscsi_callback_device> m_scsi;
 	required_device<ram_device> m_ram;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<via6522_device> m_via;
 	required_device<centronics_device> m_centronics;
 	required_device<palette_device> m_palette;
-	required_device<output_latch_device> m_scsi_data_out;
-	required_device<input_buffer_device> m_scsi_data_in;
-	required_device<output_latch_device> m_scsi_ctrl_out;
 	required_device<wd2793_device> m_fdc;
 	required_device<z80sio_device> m_z80sio;
 	required_device<screen_device> m_screen;
@@ -169,13 +163,11 @@ private:
 	int nimbus_fdc_enmf_r();
 
 	void nimbus_via_write_portb(uint8_t data);
-	void write_scsi_bsy(int state);
 	void write_scsi_cd(int state);
 	void write_scsi_io(int state);
-	void write_scsi_msg(int state);
 	void write_scsi_req(int state);
 	void nimbus_msm5205_vck(int state);
-	void write_scsi_iena(int state);
+	void hdc_ctrl_w(uint8_t data);
 
 	uint8_t get_pixel(uint16_t x, uint16_t y);
 	uint16_t read_pixel_line(uint16_t x, uint16_t y, uint8_t pixels, uint8_t bpp);
@@ -204,8 +196,6 @@ private:
 	void set_scsi_drqlat(bool   clock, bool clear);
 
 	int m_scsi_iena = 0;
-	int m_scsi_msg = 0;
-	int m_scsi_bsy = 0;
 	int m_scsi_io = 0;
 	int m_scsi_cd = 0;
 	int m_scsi_req = 0;

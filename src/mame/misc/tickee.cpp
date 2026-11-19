@@ -31,7 +31,7 @@
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/ymopm.h"
-#include "video/tlc34076.h"
+#include "video/bt47x.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -48,7 +48,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_screen(*this, "screen"),
 		m_oki(*this, "oki"),
-		m_tlc34076(*this, "tlc34076"),
+		m_ramdac(*this, "ramdac"),
 		m_ticket(*this, "ticket%u", 1)
 	{
 	}
@@ -65,7 +65,7 @@ protected:
 	required_device<screen_device> m_screen;
 
 	optional_device<okim6295_device> m_oki;
-	required_device<tlc34076_device> m_tlc34076;
+	required_device<bt476_device> m_ramdac;
 	optional_device_array<ticket_dispenser_device, 2> m_ticket;
 
 	int m_palette_blank = 0;
@@ -262,7 +262,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(tickee_state::scanline_update)
 {
 	uint16_t const *const src = &m_vram[(params->rowaddr << 8) & 0x3ff00];
 	uint32_t *const dest = &bitmap.pix(scanline);
-	pen_t const *const pens = m_tlc34076->pens();
+	pen_t const *const pens = m_ramdac->pens();
 	int coladdr = params->coladdr << 1;
 
 	if (m_palette_blank)
@@ -435,7 +435,7 @@ void tickee_gun_state::tickee_map(address_map &map)
 	map(0x00000000, 0x003fffff).ram().share("vram");
 	map(0x02000000, 0x02ffffff).rom().region("user1", 0);
 	map(0x04000000, 0x04003fff).ram().share("nvram");
-	map(0x04100000, 0x041000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0x04100000, 0x0410003f).nopr().w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
 	map(0x04200000, 0x0420000f).r("ym1", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04200000, 0x0420001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04200100, 0x0420010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
@@ -453,7 +453,7 @@ void tickee_gun_state::ghoshunt_map(address_map &map)
 	map(0x00000000, 0x003fffff).ram().share("vram");
 	map(0x02000000, 0x02ffffff).rom().region("user1", 0);
 	map(0x04100000, 0x04103fff).ram().share("nvram");
-	map(0x04200000, 0x042000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0x04200000, 0x0420003f).nopr().w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
 	map(0x04300000, 0x0430000f).r("ym1", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04300000, 0x0430001f).w("ym1", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04300100, 0x0430010f).r("ym2", FUNC(ay8910_device::data_r)).umask16(0x00ff);
@@ -469,7 +469,7 @@ void tickee_state::mouseatk_map(address_map &map)
 	map(0x00000000, 0x003fffff).ram().share("vram");
 	map(0x02000000, 0x02ffffff).rom().region("user1", 0);
 	map(0x04000000, 0x04003fff).ram().share("nvram");
-	map(0x04100000, 0x041000ff).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0x04100000, 0x0410003f).nopr().w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
 	map(0x04200000, 0x0420000f).r("ym", FUNC(ay8910_device::data_r)).umask16(0x00ff);
 	map(0x04200000, 0x0420000f).w("ym", FUNC(ay8910_device::address_data_w)).umask16(0x00ff);
 	map(0x04200100, 0x0420010f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
@@ -498,7 +498,8 @@ void tickee_gun_state::rapidfir_map(address_map &map)
 	map(0xfc000b00, 0xfc000b0f).portr("DSW0");
 	map(0xfc000c00, 0xfc000c1f).portr("DSW1");
 	map(0xfc000e00, 0xfc000e1f).r("watchdog", FUNC(watchdog_timer_device::reset16_r));
-	map(0xfc100000, 0xfc1000ff).mirror(0x80000).rw(m_tlc34076, FUNC(tlc34076_device::read), FUNC(tlc34076_device::write)).umask16(0x00ff);
+	map(0xfc100000, 0xfc10003f).nopr().w(m_ramdac, FUNC(bt476_device::write)).umask16(0x00ff);
+	map(0xfc180000, 0xfc18003f).nopw().r(m_ramdac, FUNC(bt476_device::read)).umask16(0x00ff);
 	map(0xfc200000, 0xfc207fff).ram().share("nvram");
 	map(0xfc300000, 0xfc30000f).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write)).umask16(0x00ff);
 	map(0xfc400000, 0xfc40001f).rw("ym", FUNC(ym2151_device::read), FUNC(ym2151_device::write)).umask16(0x00ff);
@@ -570,7 +571,7 @@ static INPUT_PORTS_START( tickee )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_SERVICE( 0x0001, IP_ACTIVE_LOW )
+	PORT_SERVICE_NO_TOGGLE( 0x0001, IP_ACTIVE_LOW )
 	PORT_BIT( 0xfffe, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -810,7 +811,7 @@ void tickee_gun_state::tickee(machine_config &config)
 	TICKET_DISPENSER(config, m_ticket[1], attotime::from_msec(100));
 
 	// video hardware
-	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
+	BT476(config, m_ramdac); // ADV476KN50E
 
 	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 444, 0, 320, 233, 0, 200);
@@ -854,7 +855,7 @@ void tickee_state::mouseatk(machine_config &config)
 	TICKET_DISPENSER(config, m_ticket[1], attotime::from_msec(100));
 
 	// video hardware
-	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
+	BT476(config, m_ramdac); // ADV476KN50E
 
 	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 444, 0, 320, 233, 0, 200);
@@ -890,7 +891,7 @@ void tickee_gun_state::rapidfir(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
+	BT476(config, m_ramdac); // ADV476KN50
 
 	SCREEN(config, m_screen);
 	m_screen->set_raw(18_MHz_XTAL/2, 556, 0, 384, 293, 0, 240);

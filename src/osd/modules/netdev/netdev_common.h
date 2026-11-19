@@ -26,6 +26,8 @@ protected:
 
 	virtual int recv_dev(uint8_t **buf) = 0;
 
+	static int finalise_frame(uint8_t buf[], int length);
+
 private:
 	network_handler &m_handler;
 	bool m_stopped;

@@ -224,8 +224,8 @@ public:
 		m_colorram(*this, "colorram")
 	{ }
 
-	void gluck2(machine_config &config);
-	void sise7(machine_config &config);
+	void gluck2(machine_config &config) ATTR_COLD;
+	void sise7(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -278,8 +278,8 @@ TILE_GET_INFO_MEMBER(gluck2_state::get_tile_info)
 */
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index];
-	int bank = ((attr & 0xc0) >> 5 ) + ((attr & 0x02) >> 1 );   // bits 1-6-7 handle the gfx banks
-	int color = (attr & 0x3c) >> 2;                             // bits 2-3-4-5 handle the color
+	int bank = bitswap<3>(attr, 7, 6, 1);   // bits 1-6-7 handle the gfx banks
+	int color = (attr >> 2) & 0x0f;         // bits 2-3-4-5 handle the color
 
 	tileinfo.set(bank, code, color, 0);
 }
@@ -314,9 +314,9 @@ void gluck2_state::counters_w(uint8_t data)
 */
 	data = data ^ 0xff;  // inverted
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x10);  // coins
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);  // notes
-	machine().bookkeeping().coin_counter_w(2, data & 0x04);  // payout
+	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));  // coins
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 1));  // notes
+	machine().bookkeeping().coin_counter_w(2, BIT(data, 2));  // payout
 }
 
 
@@ -330,8 +330,8 @@ void gluck2_state::gluck2_map(address_map &map)
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x084b).noprw();  // see below
-	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share("videoram");  // 6116 #1 (2K x 8) RAM (only 1st half used)
-	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share("colorram");  // 6116 #2 (2K x 8) RAM (only 1st half used)
+	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share(m_videoram);  // 6116 #1 (2K x 8) RAM (only 1st half used)
+	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share(m_colorram);  // 6116 #2 (2K x 8) RAM (only 1st half used)
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2d00, 0x2d01).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x3400, 0x3400).portr("IN0");
@@ -354,8 +354,8 @@ void gluck2_state::sise7_map(address_map &map)
 	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
 	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 	map(0x0844, 0x084b).noprw();  // see below
-	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share("videoram");  // 6116 #1 (2K x 8) RAM (only 1st half used)
-	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share("colorram");  // 6116 #2 (2K x 8) RAM (only 1st half used)
+	map(0x1000, 0x13ff).ram().w(FUNC(gluck2_state::videoram_w)).share(m_videoram);  // 6116 #1 (2K x 8) RAM (only 1st half used)
+	map(0x1800, 0x1bff).ram().w(FUNC(gluck2_state::colorram_w)).share(m_colorram);  // 6116 #2 (2K x 8) RAM (only 1st half used)
 	map(0x2000, 0x2000).portr("SW1");
 	map(0x2d00, 0x2d00).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 	map(0x3400, 0x3400).portr("IN0");

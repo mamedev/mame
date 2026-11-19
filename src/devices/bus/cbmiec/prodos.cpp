@@ -56,9 +56,10 @@ const tiny_rom_entry *c1541_professional_dos_v1_device::device_rom_region() cons
 void c1541_professional_dos_v1_device::c1541pd_mem(address_map &map)
 {
 	map(0x0000, 0x07ff).mirror(0x6000).ram();
-	map(0x1800, 0x180f).mirror(0x63f0).m(M6522_0_TAG, FUNC(via6522_device::map));
+	map(0x1800, 0x180f).mirror(0x63f0).r(FUNC(c1541_professional_dos_v1_device::via0_r)).w(M6522_0_TAG, FUNC(via6522_device::write));
 	map(0x1c00, 0x1c0f).mirror(0x63f0).m(M6522_1_TAG, FUNC(via6522_device::map));
-	map(0x8000, 0x9fff).rom().region(M6502_TAG, 0x4000);
+	map(0x8000, 0x8fff).r(FUNC(c1541_professional_dos_v1_device::decoder_r));
+	map(0x9000, 0x9fff).rom().region(M6502_TAG, 0x5000);
 	map(0xa000, 0xbfff).ram();
 	map(0xc000, 0xffff).rom().region(M6502_TAG, 0x0000);
 }
@@ -73,6 +74,10 @@ void c1541_professional_dos_v1_device::device_add_mconfig(machine_config &config
 	c1541_device_base::device_add_mconfig(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &c1541_professional_dos_v1_device::c1541pd_mem);
+
+	m_via0->readpa_handler().set(FUNC(c1541_professional_dos_v1_device::via0_pa_r));
+	m_via0->writepa_handler().set(FUNC(c1541_professional_dos_v1_device::via0_pa_w));
+	m_via0->ca2_handler().set(FUNC(c1541_professional_dos_v1_device::via0_ca2_w));
 }
 
 
@@ -85,5 +90,87 @@ void c1541_professional_dos_v1_device::device_add_mconfig(machine_config &config
 //  c1541_professional_dos_v1_device - constructor
 //-------------------------------------------------
 
-c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: c1541_device_base(mconfig, C1541_PROFESSIONAL_DOS_V1, tag, owner, clock) {  }
+c1541_professional_dos_v1_device::c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	c1541_device_base(mconfig, C1541_PROFESSIONAL_DOS_V1, tag, owner, clock),
+	device_c64_floppy_parallel_interface(mconfig, *this),
+	m_rom(*this, M6502_TAG)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void c1541_professional_dos_v1_device::device_start()
+{
+	c1541_device_base::device_start();
+
+	save_item(NAME(m_parallel_data));
+	save_item(NAME(m_latch));
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void c1541_professional_dos_v1_device::device_reset()
+{
+	c1541_device_base::device_reset();
+
+	m_latch = 0;
+}
+
+
+u8 c1541_professional_dos_v1_device::decoder_r(offs_t offset)
+{
+	offs_t const addr = (offset & 0xf00) | (m_latch << 4) | (BIT(offset, 8) ? BIT(offset, 4, 4) : BIT(offset, 0, 4));
+
+	if (!machine().side_effects_disabled())
+		m_latch = addr & 0x0f;
+
+	return m_rom[0x4000 | addr];
+}
+
+
+//-------------------------------------------------
+//  parallel_data_w -
+//-------------------------------------------------
+
+void c1541_professional_dos_v1_device::parallel_data_w(u8 data)
+{
+	m_parallel_data = data;
+}
+
+
+//-------------------------------------------------
+//  parallel_strobe_w -
+//-------------------------------------------------
+
+void c1541_professional_dos_v1_device::parallel_strobe_w(int state)
+{
+	m_via0->write_cb1(state);
+}
+
+
+u8 c1541_professional_dos_v1_device::via0_pa_r()
+{
+	return m_parallel_data;
+}
+
+void c1541_professional_dos_v1_device::via0_pa_w(u8 data)
+{
+	if (m_other != nullptr)
+	{
+		m_other->parallel_data_w(data);
+	}
+}
+
+void c1541_professional_dos_v1_device::via0_ca2_w(int state)
+{
+	if (m_other != nullptr)
+	{
+		m_other->parallel_strobe_w(state);
+	}
+}

@@ -92,13 +92,20 @@ protected:
 	static constexpr u8 CTRL_STEP_COMMAND     = 6; // (Active high)
 	static constexpr u8 CTRL_WRITE_ENABLE_RAM = 7; // 0 - write protected
 
-	// USRT clock
-	static constexpr XTAL USRT_BASE_CLOCK = XTAL(12'288'000) / 6 / 16;
-	static constexpr u32  USRT_TX_CLOCK   = USRT_BASE_CLOCK.value();
+	// The host bus clock, which the card divides down for the USRT.
+	virtual u32 bus_clock() = 0;
+
+	// USRT clock is the 2 MHz bus clock divided by 16, so the board only reads
+	// and writes the disk correctly with a 2.048 MHz bus clock.
+	static constexpr u32 USRT_CLOCK_DIVIDER = 16;
+
+	u32 usrt_clock() { return bus_clock() / USRT_CLOCK_DIVIDER; }
 
 	// A bit cell holds an FM clock half-cell followed by a data half-cell.
-	static attotime fm_cell_time() { return attotime::from_hz(USRT_TX_CLOCK * 2); }
-	static attotime fm_bit_time()  { return attotime::from_hz(USRT_TX_CLOCK); }
+	attotime fm_cell_time() { return attotime::from_hz(usrt_clock() * 2); }
+	attotime fm_bit_time()  { return attotime::from_hz(usrt_clock()); }
+
+	void start_tx_clock();
 };
 
 #endif // MAME_BUS_HEATHZENITH_H8X_COMMON_H17_FDC_BASE_H

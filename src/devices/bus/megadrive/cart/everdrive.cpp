@@ -52,7 +52,7 @@ void megadrive_hb_everdrive_device::device_add_mconfig(machine_config &config)
 // NOTE: bootloader stores boot flags (?) at $d0000
 ROM_START( everdrive_md )
 	ROM_REGION16_BE(0x800000, "flash", ROMREGION_ERASE00)
-	ROM_LOAD16_WORD_SWAP("v35.bin", 0x00000, 0x20000, CRC(161b4d2e) SHA1(fe71de7dd1f2117409b158ccd45c68b1d6781a9c) )
+	ROM_LOAD16_WORD("v35.bin", 0x00000, 0x20000, CRC(161b4d2e) SHA1(fe71de7dd1f2117409b158ccd45c68b1d6781a9c) )
 
 //  ROM_LOAD16_WORD_SWAP("game.bin", 0x400000, 0x3e0000, CRC(1) SHA1(1) )
 //  ROM_LOAD16_WORD_SWAP("mdos_v2.bin", 0x10000, 0x20000, CRC(b777ef96) SHA1(8efe2ec873fa4fcaddf08a2c156e540ba4a05b57) )

@@ -1162,6 +1162,29 @@ int duart_base_device::calc_baud(int ch, bool rx, uint8_t data)
 	else
 	{
 		baud_rate = baud_rate_ACR_1[data & 0x0f];
+
+		if (ch == 0)
+		{
+			if ((data & 0xf) == 0xe)
+			{
+				baud_rate = ip3clk/16;
+			}
+			else if ((data & 0xf) == 0xf)
+			{
+				baud_rate = ip3clk;
+			}
+		}
+		else if (ch == 1)
+		{
+			if ((data & 0xf) == 0xe)
+			{
+				baud_rate = ip5clk/16;
+			}
+			else if ((data & 0xf) == 0xf)
+			{
+				baud_rate = ip5clk;
+			}
+		}
 	}
 
 	if ((baud_rate == 0) && ((data & 0xf) != 0xd))
@@ -1330,6 +1353,7 @@ duart_channel::duart_channel(const machine_config &mconfig, const char *tag, dev
 	, m_tx_break(false)
 	, m_bits_transmitted(255)
 	, m_tx_enabled(false)
+	, m_rx_pin(1)
 {
 	std::fill_n(&rx_fifo[0], MC68681_RX_FIFO_SIZE + 1, 0);
 }
@@ -1357,6 +1381,7 @@ void duart_channel::device_start()
 	save_item(NAME(m_tx_break));
 	save_item(NAME(m_bits_transmitted));
 	save_item(NAME(m_tx_enabled));
+	save_item(NAME(m_rx_pin));
 }
 
 void duart_channel::device_reset()
@@ -1393,7 +1418,7 @@ void duart_channel::rcv_complete()
 
 void duart_channel::rx_fifo_push(uint8_t data, uint8_t errors)
 {
-	if (rx_fifo_num == (MC68681_RX_FIFO_SIZE + 1))
+	if (rx_fifo_num == MC68681_RX_FIFO_SIZE)
 	{
 		logerror("68681: FIFO overflow\n");
 		SR |= STATUS_OVERRUN_ERROR;
@@ -1659,10 +1684,32 @@ void duart_channel::write_MR(uint8_t data)
 	}
 	else
 	{
-		MR2 = data;
+		set_MR2(data);
 	}
 	recalc_framing();
 	update_interrupts();
+}
+
+void duart_channel::set_MR2(uint8_t data)
+{
+	const bool was_local_loopback = (MR2 & 0xc0) == 0x80;
+	MR2 = data;
+
+	// local loopback disconnects RxD and feeds the receiver from the (idle, marking) transmitter
+	const bool local_loopback = (MR2 & 0xc0) == 0x80;
+	if (local_loopback != was_local_loopback)
+	{
+		rx_w(local_loopback ? 1 : m_rx_pin);
+	}
+}
+
+void duart_channel::rx_pin_w(int state)
+{
+	m_rx_pin = state;
+	if ((MR2 & 0xc0) != 0x80)
+	{
+		rx_w(state);
+	}
 }
 
 void duart_channel::recalc_framing()
@@ -1731,6 +1778,7 @@ void duart_channel::write_CR(uint8_t data)
 		SR &= ~STATUS_RECEIVER_READY;
 		SR &= ~(STATUS_RECEIVED_BREAK | STATUS_FRAMING_ERROR | STATUS_PARITY_ERROR);
 		SR &= ~STATUS_OVERRUN_ERROR; // is this correct?
+		SR &= ~STATUS_FIFO_FULL;
 		rx_fifo_read_ptr = 0;
 		rx_fifo_write_ptr = 0;
 		rx_fifo_num = 0;

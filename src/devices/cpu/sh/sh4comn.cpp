@@ -1937,8 +1937,9 @@ uint8_t sh4_base_device::scssr1_r(offs_t offset, uint8_t mem_mask)
 
 void sh4_base_device::scssr1_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	COMBINE_DATA(&m_scssr1);
-	logerror("scssr1_w: Unmapped write %02x @ %02x\n", data, mem_mask);
+	// the flags in bits 7-3 can only be cleared, TEND and MPB are read only
+	// TODO: the transmitter is not emulated: a character counts as sent when TDRE is cleared, so that TDRE and TEND read as set again at once
+	m_scssr1 = (m_scssr1 & (data | 0x06) & 0xfe) | (data & 0x01) | 0x84;
 }
 
 uint8_t sh4_base_device::scrdr1_r(offs_t offset, uint8_t mem_mask)
@@ -2020,8 +2021,9 @@ uint16_t sh4_base_device::scfsr2_r(offs_t offset, uint16_t mem_mask)
 
 void sh4_base_device::scfsr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	m_scfsr2 &= data | 0xff0c;
-	logerror("scfsr2_w: Unmapped write %04x @ %04x\n", data, mem_mask);
+	// ER, TEND, TDFE, BRK, RDF and DR can only be cleared, the other bits are read only
+	// TODO: the transmitter is not emulated: a character counts as sent at once, so that TEND and TDFE read as set again (MT09399)
+	m_scfsr2 = (m_scfsr2 & (data | ~mem_mask | 0xff0c)) | 0x0060;
 }
 
 uint8_t sh4_base_device::scfrdr2_r(offs_t offset, uint8_t mem_mask)

@@ -362,13 +362,14 @@ uint32_t kinst_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	pen_t const *const pen = m_palette->pens();
 
 	/* loop over rows and copy to the destination */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
+		// FIXME: doesn't work if cliprect.left() is not the horizontal origin
 		uint32_t const *src = &m_video_base[640/4 * y];
-		uint32_t *dest = &bitmap.pix(y, cliprect.min_x);
+		uint32_t *dest = &bitmap.pix(y, cliprect.left());
 
 		/* loop over columns */
-		for (int x = cliprect.min_x; x < cliprect.max_x; x += 2)
+		for (int x = cliprect.left(); x <= cliprect.right(); x += 2)
 		{
 			uint32_t const data = *src++;
 

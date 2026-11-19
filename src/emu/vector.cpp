@@ -227,8 +227,8 @@ bool vector_device::video_output_update()
 	const rectangle &visarea = m_visarea;
 	float xscale = 1.0f / (65536 * visarea.width());
 	float yscale = 1.0f / (65536 * visarea.height());
-	float xoffs = (float)visarea.min_x;
-	float yoffs = (float)visarea.min_y;
+	float xoffs = (float)visarea.left();
+	float yoffs = (float)visarea.top();
 
 	point *curpoint;
 

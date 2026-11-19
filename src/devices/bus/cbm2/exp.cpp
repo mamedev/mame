@@ -17,6 +17,23 @@
 
 DEFINE_DEVICE_TYPE(CBM2_EXPANSION_SLOT, cbm2_expansion_slot_device, "cbm2_expansion_slot", "CBM-II expansion port")
 
+void cbm2_expansion_window::install_view(address_space_installer &program)
+{
+	program.install_view(m_start, m_start + 0x1fff, m_view);
+	m_view[0];
+}
+
+void cbm2_expansion_window::install_rom(offs_t start, offs_t end, void *baseptr)
+{
+	m_view[0].install_rom(m_start + start, m_start + end, baseptr);
+	m_view.select(0);
+}
+
+void cbm2_expansion_window::install_ram(offs_t start, offs_t end, void *baseptr)
+{
+	m_view[0].install_ram(m_start + start, m_start + end, baseptr);
+	m_view.select(0);
+}
 
 
 //**************************************************************************
@@ -56,37 +73,12 @@ cbm2_expansion_slot_device::cbm2_expansion_slot_device(const machine_config &mco
 	device_t(mconfig, CBM2_EXPANSION_SLOT, tag, owner, clock),
 	device_single_card_slot_interface<device_cbm2_expansion_card_interface>(mconfig, *this),
 	device_cartrom_image_interface(mconfig, *this),
-	device_memory_interface(mconfig, *this),
+	m_program(*this, finder_base::DUMMY_TAG, -1),
 	m_card(nullptr),
-	m_space_config("cart", ENDIANNESS_LITTLE, 8, 15, 0, address_map_constructor(FUNC(cbm2_expansion_slot_device::cart_map), this)),
-	m_bank1(0x2000),
-	m_bank2(0x4000),
-	m_bank3(0x6000),
-	m_data(0xff)
+	m_bank1(*this, "bank1", 0xf2000),
+	m_bank2(*this, "bank2", 0xf4000),
+	m_bank3(*this, "bank3", 0xf6000)
 {
-}
-
-
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-device_memory_interface::space_config_vector cbm2_expansion_slot_device::memory_space_config() const
-{
-	return space_config_vector {
-		std::make_pair(0, &m_space_config)
-	};
-}
-
-
-//-------------------------------------------------
-//  cart_map -
-//-------------------------------------------------
-
-void cbm2_expansion_slot_device::cart_map(address_map &map)
-{
-	map(0x0000, 0x7fff).lr8(NAME([this] () { return m_data; })).nopw();
 }
 
 
@@ -98,8 +90,14 @@ void cbm2_expansion_slot_device::device_start()
 {
 	m_card = get_card_device();
 
+	if (m_program)
+		install_program_views(*m_program.target());
+}
+
+void cbm2_expansion_slot_device::install_program_views(address_space_installer &program)
+{
 	for (cbm2_expansion_window *window : { &m_bank1, &m_bank2, &m_bank3 })
-		window->m_space = &space(0);
+		window->install_view(program);
 }
 
 
@@ -169,36 +167,6 @@ uint8_t *cbm2_expansion_slot_device::alloc_region(const char *tag)
 std::string cbm2_expansion_slot_device::get_default_card_software(get_default_card_software_hook &hook) const
 {
 	return software_get_default_slot("standard");
-}
-
-
-//-------------------------------------------------
-//  read - cartridge data read
-//-------------------------------------------------
-
-uint8_t cbm2_expansion_slot_device::read(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
-{
-	int const bank = !csbank1 ? 1 : !csbank2 ? 2 : !csbank3 ? 3 : 0;
-
-	if (!bank)
-		return data;
-
-	m_data = data;
-
-	return space(0).read_byte((bank << 13) | (offset & 0x1fff));
-}
-
-
-//-------------------------------------------------
-//  write - cartridge data write
-//-------------------------------------------------
-
-void cbm2_expansion_slot_device::write(offs_t offset, uint8_t data, int csbank1, int csbank2, int csbank3)
-{
-	int const bank = !csbank1 ? 1 : !csbank2 ? 2 : !csbank3 ? 3 : 0;
-
-	if (bank)
-		space(0).write_byte((bank << 13) | (offset & 0x1fff), data);
 }
 
 

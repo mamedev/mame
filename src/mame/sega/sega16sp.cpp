@@ -181,9 +181,9 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 		// loop from top to bottom
 		int minx = xpos;
-		int maxx = cliprect.min_x - 1;
-		int miny = cliprect.max_y + 1;
-		int maxy = cliprect.min_y - 1;
+		int maxx = cliprect.left() - 1;
+		int miny = cliprect.bottom() + 1;
+		int maxy = cliprect.top() - 1;
 		for (int y = top; y < bottom; y++)
 		{
 			// advance a row
@@ -194,7 +194,7 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				addr += pitch;
 
 			// skip drawing if not within the cliprect
-			if (y >= cliprect.min_y && y <= cliprect.max_y)
+			if (cliprect.containsy(y))
 			{
 				uint16_t *dest = &bitmap.pix(y);
 				int xacc = 0x00;
@@ -204,43 +204,42 @@ void sega_hangon_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				// to carry into the flip flag, which is the topmost bit -- it is very important
 				// to emulate this as the games compensate for it
 
-				// non-flipped case
 				if (!(addr & 0x8000))
 				{
+					// non-flipped case
 					// start at the word before because we preincrement below
 					data[7] = addr - 1;
-					for (x = xpos; x <= cliprect.max_x; )
+					for (x = xpos; x <= cliprect.right(); )
 					{
 						uint16_t pixels = spritedata[++data[7] & 0x7fff];
 
 						// draw four pixels
 						int pix;
-						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
 
 						// stop if the last pixel in the group was 0xf
 						if (pix == 15)
 							break;
 					}
 				}
-
-				// flipped case
 				else
 				{
+					// flipped case
 					// start at the word after because we predecrement below
 					data[7] = addr + 1;
-					for (x = xpos; x <= cliprect.max_x; )
+					for (x = xpos; x <= cliprect.right(); )
 					{
 						uint16_t pixels = spritedata[--data[7] & 0x7fff];
 
 						// draw four pixels
 						int pix;
-						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
 
 						// stop if the last pixel in the group was 0xf
 						if (pix == 15)
@@ -361,9 +360,9 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 
 		// loop from top to bottom
 		int minx = xpos;
-		int maxx = cliprect.min_x - 1;
-		int miny = cliprect.max_y + 1;
-		int maxy = cliprect.min_y - 1;
+		int maxx = cliprect.left() - 1;
+		int miny = cliprect.bottom() + 1;
+		int maxy = cliprect.top() - 1;
 		for (int y = top; y < bottom; y++)
 		{
 			// advance a row
@@ -374,7 +373,7 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 				addr += pitch;
 
 			// skip drawing if not within the cliprect
-			if (y >= cliprect.min_y && y <= cliprect.max_y)
+			if (cliprect.containsy(y))
 			{
 				uint16_t *dest = &bitmap.pix(y);
 				int xacc = 0x00;
@@ -384,51 +383,50 @@ void sega_sharrier_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &cl
 				// to carry into the flip flag, which is the topmost bit -- it is very important
 				// to emulate this as the games compensate for it
 
-				// non-flipped case
 				if (!(addr & 0x8000))
 				{
+					// non-flipped case
 					// start at the word before because we preincrement below
 					data[7] = addr - 1;
-					for (x = xpos; x <= cliprect.max_x; )
+					for (x = xpos; x <= cliprect.right(); )
 					{
 						uint32_t pixels = spritedata[++data[7] & 0x7fff];
 
 						// draw 8 pixels
 						int pix;
-						pix = (pixels >> 28) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >> 24) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >> 20) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >> 16) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 28) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 24) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 20) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 16) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
 
 						// stop if the last pixel in the group was 0xf
 						if (pix == 15)
 							break;
 					}
 				}
-
-				// flipped case
 				else
 				{
+					// flipped case
 					// start at the word after because we predecrement below
 					data[7] = addr + 1;
-					for (x = xpos; x <= cliprect.max_x; )
+					for (x = xpos; x <= cliprect.right(); )
 					{
 						uint32_t pixels = spritedata[--data[7] & 0x7fff];
 
 						// draw 8 pixels
 						int pix;
-						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >> 16) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >> 20) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >> 24) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
-						pix = (pixels >> 28) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.min_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 16) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 20) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 24) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
+						pix = (pixels >> 28) & 0xf; xacc = (xacc & 0xff) + hzoom; if (xacc < 0x100) { if (x >= cliprect.left() && pix != 0 && pix != 15) dest[x] = colpri | pix; x++; }
 
 						// stop if the last pixel in the group was 0xf
 						if (pix == 15)
@@ -555,15 +553,15 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		// loop from top to bottom
 		int minx = xpos;
 		int maxx = xpos;
-		int miny = cliprect.max_y + 1;
-		int maxy = cliprect.min_y - 1;
+		int miny = cliprect.bottom() + 1;
+		int maxy = cliprect.top() - 1;
 		for (int y = top; y < bottom; y++)
 		{
 			// advance a row
 			addr += pitch;
 
 			// skip drawing if not within the cliprect
-			if (y >= cliprect.min_y && y <= cliprect.max_y)
+			if (cliprect.containsy(y))
 			{
 				uint16_t *dest = &bitmap.pix(y);
 				int x;
@@ -572,9 +570,9 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				// to carry into the flip flag, which is the topmost bit -- it is very important
 				// to emulate this as the games compensate for it
 
-				// non-flipped case
 				if (!(addr & 0x8000))
 				{
+					// non-flipped case
 					// start at the word before because we preincrement below
 					data[7] = addr - 1;
 					for (x = xpos; ((xpos - x) & 0x1ff) != 1; )
@@ -583,20 +581,19 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 						// draw four pixels
 						int pix;
-						pix = (pixels >> 12) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >>  8) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >>  4) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >>  0) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >> 12) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  8) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  4) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  0) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
 
 						// stop if the last pixel in the group was 0xf
 						if (pix == 15)
 							break;
 					}
 				}
-
-				// flipped case
 				else
 				{
+					// flipped case
 					// start at the word after because we predecrement below
 					data[7] = addr + 1;
 					for (x = xpos; ((xpos - x) & 0x1ff) != 1; )
@@ -605,10 +602,10 @@ void sega_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 						// draw four pixels
 						int pix;
-						pix = (pixels >>  0) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >>  4) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >>  8) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >> 12) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  0) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  4) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  8) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >> 12) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
 
 						// stop if the last pixel in the group was 0xf
 						if (pix == 15)
@@ -742,12 +739,12 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 		// loop from top to bottom
 		int minx = xpos;
 		int maxx = xpos;
-		int miny = cliprect.max_y + 1;
-		int maxy = cliprect.min_y - 1;
+		int miny = cliprect.bottom() + 1;
+		int maxy = cliprect.top() - 1;
 		for (int y = top; y < bottom; y++)
 		{
 			// skip drawing if not within the cliprect
-			if (y >= cliprect.min_y && y <= cliprect.max_y)
+			if (cliprect.containsy(y))
 			{
 				uint16_t *dest = &bitmap.pix(y);
 				int x;
@@ -756,9 +753,9 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 				// to carry into the flip flag, which is the topmost bit -- it is very important
 				// to emulate this as the games compensate for it
 
-				// non-flipped case
 				if (!(addr & 0x8000))
 				{
+					// non-flipped case
 					// start at the word before because we preincrement below
 					data7 = addr - 1;
 					for (x = xpos; ((xpos - x) & 0x1ff) != 1; )
@@ -767,20 +764,19 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 
 						// draw four pixels
 						int pix;
-						pix = (pixels >> 12) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >>  8) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >>  4) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >>  0) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >> 12) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  8) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  4) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  0) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
 
 						// stop if the last pixel in the group was 0xf
 						if (pix == 15)
 							break;
 					}
 				}
-
-				// flipped case
 				else
 				{
+					// flipped case
 					// start at the word after because we predecrement below
 					data7 = addr + 1;
 					for (x = xpos; ((xpos - x) & 0x1ff) != 1; )
@@ -789,10 +785,10 @@ void bootleg_sys16a_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &c
 
 						// draw four pixels
 						int pix;
-						pix = (pixels >>  0) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >>  4) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >>  8) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
-						pix = (pixels >> 12) & 0xf; if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  0) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  4) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >>  8) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
+						pix = (pixels >> 12) & 0xf; if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta;
 
 						// stop if the last pixel in the group was 0xf
 						if (pix == 15)
@@ -931,8 +927,8 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		// loop from top to bottom
 		int minx = xpos;
 		int maxx = xpos;
-		int miny = cliprect.max_y + 1;
-		int maxy = cliprect.min_y - 1;
+		int miny = cliprect.bottom() + 1;
+		int maxy = cliprect.top() - 1;
 		for (int y = top; y < bottom; y++)
 		{
 			// advance a row
@@ -947,7 +943,7 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 			}
 
 			// skip drawing if not within the cliprect
-			if (y >= cliprect.min_y && y <= cliprect.max_y)
+			if (cliprect.containsy(y))
 			{
 				uint16_t *dest = &bitmap.pix(y);
 				int x;
@@ -955,9 +951,9 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				// compute the initial X zoom accumulator; this is verified on the real PCB
 				int xacc = 4 * hzoom;
 
-				// non-flipped case
 				if (!flip)
 				{
+					// non-flipped case
 					// start at the word before because we preincrement below
 					data[7] = addr - 1;
 					for (x = xpos; ((xpos - x) & 0x1ff) != 1; )
@@ -966,20 +962,19 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 						// draw four pixels
 						int pix;
-						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
-						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
-						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
-						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
+						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
+						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
+						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
+						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
 
 						// stop if the last pixel in the group was 0xf
 						if (pix == 15)
 							break;
 					}
 				}
-
-				// flipped case
 				else
 				{
+					// flipped case
 					// start at the word after because we predecrement below
 					data[7] = addr + 1;
 					for (x = xpos; ((xpos - x) & 0x1ff) != 1; )
@@ -988,10 +983,10 @@ void sega_sys16b_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 
 						// draw four pixels
 						int pix;
-						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
-						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
-						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
-						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
+						pix = (pixels >>  0) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
+						pix = (pixels >>  4) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
+						pix = (pixels >>  8) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
+						pix = (pixels >> 12) & 0xf; xacc = (xacc & 0x3f) + hzoom; if (xacc < 0x40) { if (cliprect.containsx(x) && pix != 0 && pix != 15) dest[x] = colpri | pix; x += xdelta; }
 
 						// stop if the last pixel in the group was 0xf
 						if (pix == 15)
@@ -1141,21 +1136,21 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		// loop from top to bottom
 		int minx = xpos;
 		int maxx = xpos;
-		int miny = cliprect.max_y + 1;
-		int maxy = cliprect.min_y - 1;
+		int miny = cliprect.bottom() + 1;
+		int maxy = cliprect.top() - 1;
 		int yacc = 0;
 		int ytarget = top + ydelta * height;
 		for (int y = top; y != ytarget; y += ydelta)
 		{
 			// skip drawing if not within the cliprect
-			if (y >= cliprect.min_y && y <= cliprect.max_y)
+			if (cliprect.containsy(y))
 			{
 				uint16_t *dest = &bitmap.pix(y);
 				int xacc = 0;
 				int x;
 
 				data[7] = addr;
-				for (x = xpos; (xdelta > 0 && x <= cliprect.max_x) || (xdelta < 0 && x >= cliprect.min_x);)
+				for (x = xpos; (xdelta > 0 && x <= cliprect.right()) || (xdelta < 0 && x >= cliprect.left()); )
 				{
 					uint32_t pixels = spritedata[data[7]];
 					if (flip)
@@ -1166,14 +1161,14 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 					{
 						data[7]++;
 						pixels =
-							(( pixels << 28) & 0xf0000000) |
-							(( pixels << 20) & 0x0f000000) |
-							(( pixels << 12) & 0x00f00000) |
-							(( pixels <<  4) & 0x000f0000) |
-							(( pixels >>  4) & 0x0000f000) |
-							(( pixels >> 12) & 0x00000f00) |
-							(( pixels >> 20) & 0x000000f0) |
-							(( pixels >> 28) & 0x0000000f);
+							((pixels << 28) & 0xf0000000) |
+							((pixels << 20) & 0x0f000000) |
+							((pixels << 12) & 0x00f00000) |
+							((pixels <<  4) & 0x000f0000) |
+							((pixels >>  4) & 0x0000f000) |
+							((pixels >> 12) & 0x00000f00) |
+							((pixels >> 20) & 0x000000f0) |
+							((pixels >> 28) & 0x0000000f);
 					}
 					bool last_data = (pixels & 0x0f00'0000) == 0x0f00'0000;
 
@@ -1183,7 +1178,7 @@ void sega_outrun_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 						int pix = pixels & 0xf;
 						while (xacc < 0x200)
 						{
-							if (x >= cliprect.min_x && x <= cliprect.max_x && pix != 0 && pix != 15)
+							if (cliprect.containsx(x) && pix != 0 && pix != 15)
 								dest[x] = colpri | pix;
 							x += xdelta;
 							xacc += hzoom;
@@ -1278,9 +1273,9 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 	// clear out any scanlines we might be using
 	const uint16_t *rotatebase = m_segaic16_rotate[0].buffer ? m_segaic16_rotate[0].buffer.get() : m_segaic16_rotate[0].rotateram;
 	rotatebase -= yorigin();
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		if (!(rotatebase[y & ~1] & 0xc000))
-			memset(&bitmap.pix(y, cliprect.min_x), 0xff, cliprect.width() * sizeof(uint16_t));
+			memset(&bitmap.pix(y, cliprect.left()), 0xff, cliprect.width() * sizeof(uint16_t));
 
 	// reset the visited list
 	uint8_t visited[0x1000];
@@ -1325,14 +1320,14 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 		// loop from top to bottom
 		int dminx = xpos;
 		int dmaxx = xpos;
-		int dminy = cliprect.max_y + 1;
-		int dmaxy = cliprect.min_y - 1;
+		int dminy = cliprect.bottom() + 1;
+		int dmaxy = cliprect.top() - 1;
 		int ytarget = top + ydelta * height;
 		int yacc = 0;
 		for (int y = top; y != ytarget; y += ydelta)
 		{
 			// skip drawing if not within the cliprect
-			if (y >= cliprect.min_y && y <= cliprect.max_y)
+			if (cliprect.containsy(y))
 			{
 				uint16_t *dest = &bitmap.pix(y);
 				int minx = rotatebase[y & ~1];
@@ -1351,10 +1346,10 @@ void sega_yboard_sprite_device::draw(bitmap_ind16 &bitmap, const rectangle &clip
 				if (!(minx & 0xc000))
 				{
 					// clamp min/max to the cliprect
-					if (minx < cliprect.min_x)
-						minx = cliprect.min_x;
-					if (maxx > cliprect.max_x)
-						maxx = cliprect.max_x;
+					if (minx < cliprect.left())
+						minx = cliprect.left();
+					if (maxx > cliprect.right())
+						maxx = cliprect.right();
 
 					// non-flipped case
 					int x;

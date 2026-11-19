@@ -124,6 +124,7 @@ private:
 		int state = 0, next_state = 0;
 		int sync = 0;
 		int byte = 0;
+		int byte_in = 0;
 		int ds = 0;
 		int oe = 0;
 		int soe = 0;
@@ -180,6 +181,7 @@ private:
 	void live_sync();
 	void live_abort();
 	void live_run(const attotime &limit = attotime::never);
+	void skip_idle_cycles(const attotime &limit);
 	void get_next_edge(const attotime &when);
 	int get_next_bit(attotime &tm, const attotime &limit);
 	uint32_t next_rand();

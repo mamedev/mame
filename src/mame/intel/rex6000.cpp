@@ -657,8 +657,8 @@ uint32_t oz750_state::screen_update_oz(screen_device &screen, bitmap_ind16 &bitm
 
 	if (m_lcd_enabled && m_power_on)
 	{
-		for (int y=0; y<=cliprect.max_y; y++)
-			for (int x=0; x<30; x++)
+		for (int y = 0; y <= cliprect.bottom(); y++)
+			for (int x = 0; x < 30; x++)
 			{
 				uint8_t data = m_bankdev0->space(AS_PROGRAM).read_byte((lcd_bank << 13) + y*30 + x);
 

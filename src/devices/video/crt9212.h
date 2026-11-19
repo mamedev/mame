@@ -52,8 +52,21 @@ public:
 	void wen1_w(int state) { m_wen1 = state; }
 	void wen2_w(int state) { m_wen2 = state; }
 	void oe_w(int state) { m_oe = state; }
-	void rclk_w(int state) ;
-	void wclk_w(int state) ;
+	void rclk_w(int state)
+	{
+		if (!m_rclk && state)
+			rclk_rise();
+
+		m_rclk = state;
+	}
+
+	void wclk_w(int state)
+	{
+		if (!m_wclk && state)
+			wclk_rise();
+
+		m_wclk = state;
+	}
 
 protected:
 	// device-level overrides
@@ -61,6 +74,9 @@ protected:
 
 private:
 	static constexpr int RAM_SIZE  = 135;
+
+	void rclk_rise();
+	void wclk_rise();
 
 	devcb_write8           m_write_dout;
 	devcb_write_line       m_write_rof;

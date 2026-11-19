@@ -81,31 +81,59 @@ public:
 	void write(offs_t offset, uint8_t data);
 
 	void ext_int_w(int state);
+	void reset_w(int state);
+	int bus_request(bool registers);
 	int kbd_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+private:
 	TIMER_CALLBACK_MEMBER(y_update_tick);
 	TIMER_CALLBACK_MEMBER(hblank_on);
 	TIMER_CALLBACK_MEMBER(hblank_off);
 
-private:
 	void initialize_palette();
 	int get_field_vpos();
 	int get_field();
 	void set_y_interrupt();
-	void do_partial_update();
+	void reset_state();
+
+	int sprite_bank(int i) const;
+	int sprite_y(int i) const;
+	int sprite_width(int i) const;
+	int next_sprite(int i) const;
+
+	void fifo_clear();
+	void fifo_push(uint16_t count, uint8_t data, uint8_t color);
+	bool fifo_pop();
+
+	void fetch_start();
+	void fetch_next(int width);
+	void fetch_end(int y);
+	void fetch_clock(int y);
+	uint8_t render_clock();
+	void update();
+
+	static constexpr int FIFO_DEPTH = 10;
+
+	enum : uint8_t
+	{
+		FETCH_IDLE = 0,
+		FETCH_DELAY,
+		FETCH_DMA
+	};
 
 	devcb_write_line   m_write_ext_int;
 	devcb_write_line   m_write_hblank;
 	devcb_read8        m_read_db;
 
-	rgb_t m_palette_val[32];
+	bitmap_rgb32 m_bitmap[2];
+	rgb_t m_palette_val[16];
 	uint8_t m_ram[0x90];
 	uint8_t m_y_int;
 	uint8_t m_fmod;
@@ -113,7 +141,46 @@ private:
 	uint8_t m_cmd;
 	uint8_t m_freeze_x;
 	uint16_t m_freeze_y;
-	int m_field;
+	uint8_t m_ext_int;
+
+	// beam position
+	int32_t m_vpos;
+	int32_t m_hpos;
+	uint64_t m_cycle;
+
+	// sprite list state
+	uint16_t m_in_range;
+	uint16_t m_height;
+
+	// fetcher
+	uint8_t m_fetch_state;
+	int32_t m_fetch_sprite;
+	int32_t m_fetch_byte;
+	uint16_t m_fetch_ptr;
+	int32_t m_fetch_delay;
+	int32_t m_fetch_total;
+	uint64_t m_fetch_start;
+	int32_t m_fetch_ws;
+	int32_t m_fetch_pending;
+	int32_t m_fetch_cpu_at;
+	int32_t m_dma_count;
+	uint64_t m_bus_free;
+	int32_t m_xdelta;
+
+	// FIFO
+	uint16_t m_fifo_count[FIFO_DEPTH];
+	uint8_t m_fifo_data[FIFO_DEPTH];
+	uint8_t m_fifo_color[FIFO_DEPTH];
+	int32_t m_fifo_head;
+	int32_t m_fifo_level;
+	bool m_fifo_full;
+
+	// renderer
+	int32_t m_render_left;
+	int32_t m_render_pos;
+	uint16_t m_render_count;
+	uint8_t m_render_data;
+	uint8_t m_render_color;
 
 	// timers
 	emu_timer *m_timer_y_odd;

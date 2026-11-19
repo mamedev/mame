@@ -1224,13 +1224,13 @@ inline void ygv608_device::draw_layer_roz(screen_device &screen, bitmap_ind16 &b
 		// R#25-38 affine step, in the order tilemap_t::draw_roz() uses it:
 		//     srcx = startx + x * DX  + y * DXY
 		//     srcy = starty + x * DYX + y * DY
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
-			u32 curx = startx + u32(cliprect.min_x) * m_dx + u32(y) * m_dxy;
-			u32 cury = starty + u32(cliprect.min_x) * m_dyx + u32(y) * m_dy;
-			u16 *dest = &bitmap.pix(y, cliprect.min_x);
+			u32 curx = startx + u32(cliprect.left()) * m_dx + u32(y) * m_dxy;
+			u32 cury = starty + u32(cliprect.left()) * m_dyx + u32(y) * m_dy;
+			u16 *dest = &bitmap.pix(y, cliprect.left());
 
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				int px = s32(curx) >> 16;
 				int py = s32(cury) >> 16;
@@ -1301,14 +1301,14 @@ void ygv608_device::draw_layer_scroll(screen_device &screen, bitmap_ind16 &bitma
 	// reads the plane from x = 288, plus nine column entries in three groups of
 	// three for the three ball lanes at plane x 0-287.  Taken off the plane x the
 	// banner lands on entries 9..17, which are zero, and stays put.
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const int scrollx = scroll12(0x80 + get_row_division(y));
-		u16 *dest = &bitmap.pix(y, cliprect.min_x);
+		u16 *dest = &bitmap.pix(y, cliprect.left());
 		int last_col_index = -1;
 		int sy = -1;
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			const int plane_x = wrap_camera(x + scrollx, x_dom);
 			const int col_index = get_col_division(plane_x);
@@ -1338,11 +1338,13 @@ void ygv608_device::draw_mosaic(bitmap_ind16 &bitmap, const rectangle &cliprect,
 	// mask to drop the lowest n-bits
 	const int mask = ~((1 << n) - 1);
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		auto const *const src = &bitmap.pix(y & mask);
+		auto *const dst = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
-			bitmap.pix(y, x) = bitmap.pix(y & mask, x & mask);
+			dst[x] = src[x & mask];
 		}
 	}
 }
@@ -1413,7 +1415,7 @@ u32 ygv608_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 
 	// Rebuild tiles once per frame only: with raster interrupts on, this runs
 	// again for every update_partial() strip.
-	if (cliprect.min_y <= visarea.min_y)
+	if (cliprect.top() <= visarea.top())
 	{
 		m_tilemap[0]->mark_all_dirty();
 		m_tilemap[1]->mark_all_dirty();

@@ -279,11 +279,11 @@ uint32_t sub_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	draw_sprites(bitmap, cliprect);
 
 	// re-draw score display above the sprites (window effect)
-	rectangle opaque_rect;
-	opaque_rect.min_y = cliprect.min_y;
-	opaque_rect.max_y = cliprect.max_y;
-	opaque_rect.min_x = flip_screen() ? cliprect.min_x : (cliprect.max_x - 32);
-	opaque_rect.max_x = flip_screen() ? (cliprect.min_x + 32) : cliprect.max_x;
+	rectangle opaque_rect(
+			flip_screen() ? cliprect.left() : (cliprect.right() - 32),
+			flip_screen() ? (cliprect.left() + 32) : cliprect.right(),
+			cliprect.top(),
+			cliprect.bottom());
 
 	m_tilemap->draw(screen, bitmap, opaque_rect, 0, 0);
 

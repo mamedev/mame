@@ -225,12 +225,14 @@ private:
 
 	// The bits in these vectors indicate a packet has been allocated
 	u32 m_alloc_rx, m_alloc_tx;
+	bool m_alloc_pending;
 
 	// Requests a packet allocation and returns true
 	// and sets the packet number if successful
 	bool alloc_req(const int tx, int &packet_num);
 	// Releases an allocation
 	void alloc_release(const int packet_num);
+	void alloc_tx_complete(int packet_num);
 	// Resets the MMU
 	void mmu_reset();
 

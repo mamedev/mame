@@ -433,7 +433,7 @@ void popobear_state::draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, c
 	if (get_tilemap_enable(which) & 0x02) // or & 0x10 (no, based on popobear ending)
 	{
 		int const base = m_vregs[basereg] << 9, hi = m_vregs[hireg] << 9;
-		for (int line = cliprect.min_y; line <= cliprect.max_y; line++)
+		for (int line = cliprect.top(); line <= cliprect.bottom(); line++)
 		{
 			u16 const v = m_vram[base / 2 + line];
 			u16 u;
@@ -493,12 +493,15 @@ u32 popobear_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	if (!get_tilemap_enable(0) && !get_tilemap_enable(1) && !get_tilemap_enable(2) && !get_tilemap_enable(3) && BIT(m_vregs[0x0e], 5))
 	{
 		auto const fb = util::big_endian_cast<u8 const>(m_vram.target()) + ((m_vregs[0x0e] & 0x0f) << 16);
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
+		{
+			auto *const dst = &bitmap.pix(y);
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				u8 const byte = fb[(y * 0x100) + (x >> 1)];
-				bitmap.pix(y, x) = m_palette->pen((x & 1) ? (byte & 0x0f) : (byte >> 4));
+				dst[x] = m_palette->pen((x & 1) ? (byte & 0x0f) : (byte >> 4));
 			}
+		}
 		return 0;
 	}
 

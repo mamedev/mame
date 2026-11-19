@@ -17,36 +17,38 @@
 #include "machine/dp83932c.h"
 
 namespace {
-	class nubus_enetnbtp_device :
-		public device_t,
-		public device_nubus_card_interface,
-		public device_memory_interface
-	{
-	public:
-		nubus_enetnbtp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	protected:
-		// device-level overrides
-		virtual void device_start() override ATTR_COLD;
-		virtual space_config_vector memory_space_config() const override;
+class nubus_enetnbtp_device :
+	public device_t,
+	public device_nubus_card_interface,
+	public device_memory_interface
+{
+public:
+	nubus_enetnbtp_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-		virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-		virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-		required_device<dp83932c_device> m_sonic;
+	// device_memory_interface implementation
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
-	private:
-		void card_map(address_map &map);
+	required_device<dp83932c_device> m_sonic;
 
-		u32 ram_r(offs_t offset, u32 mem_mask);
-		void ram_w(offs_t offset, u32 data, u32 mem_mask);
+private:
+	void card_map(address_map &map) ATTR_COLD;
 
-		u8 ethernet_mac_r(offs_t offset);
+	u32 ram_r(offs_t offset, u32 mem_mask);
+	void ram_w(offs_t offset, u32 data, u32 mem_mask);
 
-		address_space_config m_mem_config;
-		u8 m_mac[6];
-		std::unique_ptr<u32[]> m_ram;
-	};
+	u8 ethernet_mac_r(offs_t offset);
+	u8 mac_prom(offs_t index) const;
+
+	address_space_config m_mem_config;
+	std::unique_ptr<u32[]> m_ram;
+};
 
 ROM_START( enetnbtp )
 	ROM_REGION(0x8000, "declrom", 0)
@@ -76,10 +78,10 @@ nubus_enetnbtp_device::nubus_enetnbtp_device(const machine_config &mconfig, cons
 
 void nubus_enetnbtp_device::card_map(address_map &map)
 {
-	map(0x00000000, 0x0001ffff).rw(FUNC(nubus_enetnbtp_device::ram_r), FUNC(nubus_enetnbtp_device::ram_w));
-	map(0x000c0000, 0x000c00ff).m(m_sonic, FUNC(dp83932c_device::map));
-	map(0x00400000, 0x0040000f).r(FUNC(nubus_enetnbtp_device::ethernet_mac_r)).umask32(0x00ff00ff);
-	map(0x00c20000, 0x00c3ffff).rw(FUNC(nubus_enetnbtp_device::ram_r), FUNC(nubus_enetnbtp_device::ram_w));
+	map(0x0000'0000, 0x0001'ffff).rw(FUNC(nubus_enetnbtp_device::ram_r), FUNC(nubus_enetnbtp_device::ram_w));
+	map(0x000c'0000, 0x000c'00ff).m(m_sonic, FUNC(dp83932c_device::map));
+	map(0x0040'0000, 0x0040'000f).umask32(0x00ff'00ff).r(FUNC(nubus_enetnbtp_device::ethernet_mac_r));
+	map(0x00c2'0000, 0x00c3'ffff).rw(FUNC(nubus_enetnbtp_device::ram_r), FUNC(nubus_enetnbtp_device::ram_w));
 }
 
 void nubus_enetnbtp_device::device_start()
@@ -89,16 +91,9 @@ void nubus_enetnbtp_device::device_start()
 	install_declaration_rom("declrom");
 	nubus().install_map(*this, &nubus_enetnbtp_device::card_map);
 
-	// MAC PROM is stored with a bit swizzle and must match
-	// Apple's assigned OUI block 08:00:07 (the address PROM is even stamped )
-	const std::array<u8, 6> &MAC = m_sonic->get_mac();
-	m_mac[0] = bitswap<8>(0x08, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[1] = bitswap<8>(0x00, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[2] = bitswap<8>(0x07, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[3] = bitswap<8>(MAC[3], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[4] = bitswap<8>(MAC[4], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[5] = bitswap<8>(MAC[5], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_sonic->set_mac(&m_mac[0]);
+	u32 const num = machine().rand();
+	u8 const mac[6] = { 0x08, 0x00, 0x07, u8(num >> 16), u8(num >> 8), u8(num) };
+	m_sonic->set_mac(mac);
 
 	const u32 slot_base = get_slotspace();
 	this->space(AS_PROGRAM).install_read_handler(slot_base, slot_base + 0x1'ffff, emu::rw_delegate(*this, FUNC(nubus_enetnbtp_device::ram_r)));
@@ -122,11 +117,19 @@ void nubus_enetnbtp_device::ram_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_ram[offset]);
 }
 
+// MAC PROM is stored with a bit swizzle and must match
+// Apple's assigned OUI block 08:00:07 (the address PROM is even stamped )
+u8 nubus_enetnbtp_device::mac_prom(offs_t index) const
+{
+	static constexpr u8 OUI[3] = { 0x08, 0x00, 0x07 };
+	return bitswap<8>((index < 3) ? OUI[index] : m_sonic->get_mac()[index], 0, 1, 2, 3, 4, 5, 6, 7);
+}
+
 u8 nubus_enetnbtp_device::ethernet_mac_r(offs_t offset)
 {
 	if (offset < 6)
 	{
-		return m_mac[offset];
+		return mac_prom(offset);
 	}
 	else if (offset == 7)
 	{
@@ -134,7 +137,7 @@ u8 nubus_enetnbtp_device::ethernet_mac_r(offs_t offset)
 
 		for (int i = 0; i < 6; i++)
 		{
-			xor_total ^= (u8)m_mac[i];
+			xor_total ^= mac_prom(i);
 		}
 
 		return xor_total ^ 0xff;
@@ -142,7 +145,6 @@ u8 nubus_enetnbtp_device::ethernet_mac_r(offs_t offset)
 
 	return 0;
 }
-
 
 } // anonymous namespace
 

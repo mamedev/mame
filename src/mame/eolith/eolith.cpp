@@ -76,7 +76,12 @@
   - racooon (Raccoon World)
 
       Game animation & timers seem too fast? demoted to NOT WORKING as a
-      result
+      result.  The game sets BCR to 0xFA1501C4: MEM3 (ROM and I/O) accesses
+      take 11 cycles plus 1 hold cycle, where the other games in this
+      driver use 8.  The Hyperstone core does not emulate memory access
+      latency.  An FPGA implementation that adds these access times runs
+      the game at a speed that looks right, but it has not been compared
+      with a PCB.
 
 -----------------------------------------------------------------------------
  Game Issues (unknown):
@@ -142,7 +147,6 @@ public:
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	void eolith_map(address_map &map) ATTR_COLD;
@@ -256,13 +260,6 @@ void eolith_state::machine_start()
 
 	// Configure the sound ROM banking
 	m_sndbank->configure_entries(0, 16, memregion("sounddata")->base(), 0x8000);
-}
-
-void eolith_state::machine_reset()
-{
-	eolith_e1_speedup_state_base::machine_reset();
-
-	m_soundcpu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }
 
 uint32_t eolith_state::eolith_custom_r()
@@ -694,6 +691,7 @@ void eolith_state::eolith45(machine_config &config)
 	TIMER(config, "scantimer").configure_scanline(FUNC(eolith_state::eolith_speedup), "screen", 0, 1);
 
 	/* Sound CPU */
+	// /INT1 must stay high: the serial baud clock (Timer 1) is gated by it
 	I8032(config, m_soundcpu, XTAL(12'000'000));
 	m_soundcpu->set_addrmap(AS_PROGRAM, &eolith_state::sound_prg_map);
 	m_soundcpu->set_addrmap(AS_DATA, &eolith_state::sound_data_map);

@@ -288,6 +288,18 @@ iop_device::iop_device(machine_config const &mconfig, char const *tag, device_t 
 	m_endianness = ENDIANNESS_LITTLE;
 }
 
+mips1core_device_base::translate_result iop_device::translate(int intention, offs_t &address, bool debug)
+{
+	// kuseg maps 1:1 without the IDT base-part offset, and the only data cache is the scratchpad
+	if (BIT(address, 31))
+	{
+		translate_result const result = mips1core_device_base::translate(intention, address, debug);
+		return (result == ERROR) ? ERROR : UNCACHED;
+	}
+
+	return UNCACHED;
+}
+
 void mips1core_device_base::device_start()
 {
 	// set our instruction counter

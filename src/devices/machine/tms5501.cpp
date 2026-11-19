@@ -260,6 +260,7 @@ void tms5501_device::cmd_w(uint8_t data)
 {
 	if (LOG) logerror("TMS5501 '%s' Command %02x\n", tag(), data);
 
+	uint8_t const old = m_cmd;
 	m_cmd = data;
 
 	if (m_cmd & CMD_RST)
@@ -287,6 +288,10 @@ void tms5501_device::cmd_w(uint8_t data)
 		transmit_register_reset();
 
 		m_write_xmt(0);
+	}
+	else if (old & CMD_BRK)
+	{
+		m_write_xmt(1);
 	}
 }
 

@@ -54,7 +54,7 @@ void c64_cpm_cartridge_device::z80_io(address_map &map)
 
 void c64_cpm_cartridge_device::device_add_mconfig(machine_config &config)
 {
-	Z80(config, m_maincpu, 3000000); // DOTCLOCK/2 gated by PHI2, approximation
+	Z80(config, m_maincpu, DERIVED_CLOCK(2, 1)); // DOT/2 cleared while PHI2 is high
 	m_maincpu->set_addrmap(AS_PROGRAM, &c64_cpm_cartridge_device::z80_mem);
 	m_maincpu->set_addrmap(AS_IO, &c64_cpm_cartridge_device::z80_io);
 }

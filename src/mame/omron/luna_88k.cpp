@@ -646,9 +646,9 @@ void luna88k2_state::luna88k2(machine_config &config)
 
 u32 luna_88k_state_base::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, rectangle const &cliprect)
 {
-	for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+	for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
 	{
-		for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 32)
+		for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x += 32)
 		{
 			unsigned const offset = (y * 64) + (x >> 5);
 

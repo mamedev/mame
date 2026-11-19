@@ -50,6 +50,21 @@ Notes: (All ICs shown)
 DEFINE_DEVICE_TYPE(C64_TIB_DD_001, c64_tib_dd_001_device, "c64_tibdd001", "C64 TIB Disc Drive DD-001 cartridge")
 
 
+ROM_START( c64_tibdd001 )
+	ROM_REGION( 0x2000, "rom", 0 )
+	ROM_DEFAULT_BIOS("v11")
+	ROM_SYSTEM_BIOS( 0, "v10", "v1.0" )
+	ROMX_LOAD( "rom_dd001_v1.0.bin", 0x0000, 0x2000, CRC(58f83983) SHA1(f18cfb42c8e2c9152e18b129d01408f702271363), ROM_BIOS(0) )
+	ROM_SYSTEM_BIOS( 1, "v11", "v1.1" )
+	ROMX_LOAD( "rom_dd001_v1.1.bin", 0x0000, 0x2000, CRC(d266b628) SHA1(24d178560dad3d955ebbe15f4274d966e031142d), ROM_BIOS(1) )
+ROM_END
+
+const tiny_rom_entry *c64_tib_dd_001_device::device_rom_region() const
+{
+	return ROM_NAME( c64_tibdd001 );
+}
+
+
 static void tib_dd_001_floppies(device_slot_interface &device)
 {
 	device.option_add("35dd", FLOPPY_35_DD);
@@ -88,7 +103,8 @@ c64_tib_dd_001_device::c64_tib_dd_001_device(const machine_config &mconfig, cons
 	device_t(mconfig, C64_TIB_DD_001, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_fdc(*this, GM82C765B_TAG),
-	m_floppy(*this, GM82C765B_TAG":0")
+	m_floppy(*this, GM82C765B_TAG":0"),
+	m_rom(*this, "rom")
 {
 }
 
@@ -99,6 +115,7 @@ c64_tib_dd_001_device::c64_tib_dd_001_device(const machine_config &mconfig, cons
 
 void c64_tib_dd_001_device::device_start()
 {
+	m_exrom = 0;
 }
 
 
@@ -119,7 +136,7 @@ uint8_t c64_tib_dd_001_device::c64_cd_r(offs_t offset, uint8_t data, int sphi2, 
 {
 	if (!roml)
 	{
-		data = m_roml[offset & 0x1fff];
+		data = m_rom[offset & 0x1fff];
 	}
 
 	if (sphi2 && !io1)

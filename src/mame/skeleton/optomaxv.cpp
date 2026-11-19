@@ -332,7 +332,7 @@ public:
 		, m_b1_pit(*this, "b1_pit")
 	{ }
 
-	void optomaxv(machine_config &config);
+	void optomaxv(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -368,6 +368,8 @@ private:
 	// Video PCB (B1)
 	required_device<pit68230_device> m_b1_pit;
 
+	uint8_t m_map = 0x00;
+
 	void mem_map(address_map &map) ATTR_COLD;
 	void osd_map(address_map &map) ATTR_COLD;
 
@@ -385,8 +387,6 @@ private:
 
 	uint8_t map_r();
 	void map_w(uint8_t data);
-
-	uint8_t m_map = 0x00;
 };
 
 
@@ -398,25 +398,25 @@ void optomaxv_state::mem_map(address_map &map)
 	map(0x000000, 0x000007).rom().region("eprom_sys", 0);
 	map(0x080000, 0x087fff).rom().region("eprom_sys", 0);
 	map(0x0a0000, 0x0affff).rom().region("eprom_usr", 0);
-	map(0x0c0040, 0x0c0043).rw(m_b4_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
-	map(0x0c0080, 0x0c0083).rw(m_b4_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0xff00);
-	map(0x0c0100, 0x0c0103).rw(m_b4_acia[2], FUNC(acia6850_device::read), FUNC(acia6850_device::write)).umask16(0x00ff);
-	map(0x0c0400, 0x0c042f).rw(m_b4_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write)).umask16(0x00ff);
-	map(0x0e0000, 0x0e003f).rw(m_b4_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
+	map(0x0c0040, 0x0c0043).umask16(0x00ff).rw(m_b4_acia[0], FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x0c0080, 0x0c0083).umask16(0xff00).rw(m_b4_acia[1], FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x0c0100, 0x0c0103).umask16(0x00ff).rw(m_b4_acia[2], FUNC(acia6850_device::read), FUNC(acia6850_device::write));
+	map(0x0c0400, 0x0c042f).umask16(0x00ff).rw(m_b4_rtc, FUNC(mm58167_device::read), FUNC(mm58167_device::write));
+	map(0x0e0000, 0x0e003f).umask16(0x00ff).rw(m_b4_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
 
 	// Measurement PCB (B2)
 
 	map(0x100000, 0x117fff).ram();
-	map(0x140000, 0x14003f).rw(m_b2_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0xff00);
-	//map(0x160000, 0x160007).rw(m_b2_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
-	//map(0x160008, 0x16000f).rw(m_b2_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
+	map(0x140000, 0x14003f).umask16(0xff00).rw(m_b2_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
+	//map(0x160000, 0x160007).umask16(0x00ff).rw(m_b2_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
+	//map(0x160008, 0x16000f).umask16(0x00ff).rw(m_b2_pit8254, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 
 	// VIDEO PCB (B1)
 
 	// B1 2 x 8K static ram
 	// B1 2K rom
 	//map(0x200000, 0x201fff).ram();
-	map(0x300000, 0x30003f).rw(m_b1_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write)).umask16(0x00ff);
+	map(0x300000, 0x30003f).umask16(0x00ff).rw(m_b1_pit, FUNC(pit68230_device::read), FUNC(pit68230_device::write));
 }
 
 void optomaxv_state::osd_map(address_map &map)
@@ -535,36 +535,36 @@ static INPUT_PORTS_START(optomaxv)
 
 	PORT_START("BAUD_P3")
 	PORT_CONFNAME(0x0f, 0x00, "P3 Host Baud Lo/Hi") // F1-Fx pins on MC14411
-	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "9600/38400") // RSA=1x/16x
-	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "4800/19200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "2400/9600")
-	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "1200/4800")
-	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "600/2400")
-	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "300/1200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150/600")
 	PORT_CONFSETTING(mc14411_device::TIMER_F13, "110/440")
+	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150/600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "300/1200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "600/2400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "1200/4800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "2400/9600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "4800/19200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "9600/38400") // RSA=1x/16x
 
 	PORT_START("BAUD_P4")
 	PORT_CONFNAME(0x0f, 0x00, "P4 Terminal Baud Lo/Hi") // F1-Fx pins on MC14411
-	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "9600/38400") // RSA=1x/16x
-	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "4800/19200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "2400/9600")
-	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "1200/4800")
-	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "600/2400")
-	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "300/1200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150/600")
 	PORT_CONFSETTING(mc14411_device::TIMER_F13, "110/440")
+	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150/600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "300/1200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "600/2400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "1200/4800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "2400/9600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "4800/19200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "9600/38400") // RSA=1x/16x
 
 	PORT_START("BAUD_P5")
 	PORT_CONFNAME(0x0f, 0x00, "P5 Remote Baud Lo/Hi") // F1-Fx pins on MC14411
-	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "9600/38400") // RSA=1x/16x
-	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "4800/19200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "2400/9600")
-	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "1200/4800")
-	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "600/2400")
-	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "300/1200")
-	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150/600")
 	PORT_CONFSETTING(mc14411_device::TIMER_F13, "110/440")
+	PORT_CONFSETTING(mc14411_device::TIMER_F11, "150/600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F9,  "300/1200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F8,  "600/2400")
+	PORT_CONFSETTING(mc14411_device::TIMER_F7,  "1200/4800")
+	PORT_CONFSETTING(mc14411_device::TIMER_F5,  "2400/9600")
+	PORT_CONFSETTING(mc14411_device::TIMER_F3,  "4800/19200")
+	PORT_CONFSETTING(mc14411_device::TIMER_F1,  "9600/38400") // RSA=1x/16x
 INPUT_PORTS_END
 
 

@@ -26,6 +26,7 @@
 #define VERBOSE (0)
 
 #include "logmacro.h"
+
 namespace {
 
 enum
@@ -61,13 +62,11 @@ public:
 protected:
 	nubus_m2video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-
-	// optional information overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(vbl_tick);
 
@@ -103,11 +102,11 @@ ROM_END
 
 void nubus_m2video_device::card_map(address_map &map)
 {
-	map(0x00'0000, 0x07'ffff).rw(FUNC(nubus_m2video_device::vram_r), FUNC(nubus_m2video_device::vram_w)).mirror(0xf00000);
-	map(0x08'0000, 0x08'ffff).w(FUNC(nubus_m2video_device::tfb_w)).mirror(0xf00000);
-	map(0x09'0000, 0x09'001f).rw(FUNC(nubus_m2video_device::ramdac_r), FUNC(nubus_m2video_device::ramdac_w)).umask32(0xff000000).mirror(0xf00000);
-	map(0x0a'0000, 0x0a'ffff).w(FUNC(nubus_m2video_device::vbl_w)).umask32(0xffffffff).mirror(0xf00000);
-	map(0x0d'0000, 0x0d'ffff).r(FUNC(nubus_m2video_device::vbl_r)).umask32(0x000000ff).mirror(0xf00000);
+	map(0x00'0000, 0x07'ffff).mirror(0xf0'0000).rw(FUNC(nubus_m2video_device::vram_r), FUNC(nubus_m2video_device::vram_w));
+	map(0x08'0000, 0x08'ffff).mirror(0xf0'0000).w(FUNC(nubus_m2video_device::tfb_w));
+	map(0x09'0000, 0x09'001f).mirror(0xf0'0000).umask32(0xff00'0000).rw(FUNC(nubus_m2video_device::ramdac_r), FUNC(nubus_m2video_device::ramdac_w));
+	map(0x0a'0000, 0x0a'ffff).mirror(0xf0'0000).umask32(0xffff'ffff).w(FUNC(nubus_m2video_device::vbl_w));
+	map(0x0d'0000, 0x0d'ffff).mirror(0xf0'0000).umask32(0x0000'00ff).r(FUNC(nubus_m2video_device::vbl_r));
 }
 
 void nubus_m2video_device::device_add_mconfig(machine_config &config)

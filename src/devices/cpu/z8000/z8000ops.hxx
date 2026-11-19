@@ -86,9 +86,15 @@ void z8001_device::CHANGE_FCW(uint16_t fcw)
 	m_fcw = fcw;  /* set new m_fcw */
 }
 
-uint32_t z8002_device::make_segmented_addr(uint32_t addr)
+/* The PC segment register keeps bit 15 of the segment word it was loaded
+   from, and that bit comes back out wherever the PC is written as a
+   segmented long: LDAR, and the return address pushed by CALL, CALR and
+   traps.  Measured on a Z8001 (z8000_test seg_ldar_pc_*, seg_push_pcseg_*,
+   seg_calr_push_*): entered through 0x0100:0200 the part gives 0x0100,
+   entered through 0x8100:0200 it gives 0x8100. */
+uint32_t z8002_device::make_segmented_pc(uint32_t addr)
 {
-	return ((addr & 0x007f0000) << 8) | 0x80000000 | (addr & 0xffff);
+	return ((addr & 0x007f0000) << 8) | (m_pc_b15 ? 0x80000000 : 0) | (addr & 0xffff);
 }
 
 uint32_t z8002_device::segmented_addr(uint32_t addr)
@@ -107,10 +113,10 @@ uint32_t z8002_device::addr_from_reg(int regno)
 void z8002_device::addr_to_reg(int regno, uint32_t addr)
 {
 	if (get_segmented_mode()) {
-		uint32_t segaddr = make_segmented_addr(addr);
-		/* the whole high word is replaced - the segment number with bit
-		   31 set - so nothing of the previous contents survives, not
-		   even the unused low byte */
+		uint32_t segaddr = make_segmented_pc(addr);
+		/* the whole high word is replaced - the segment number, with
+		   bit 31 as the PC segment register holds it - so nothing of the
+		   previous contents survives, not even the unused low byte */
 		RW(regno) = (segaddr >> 16) & 0xff00;
 		RW(regno | 1) = segaddr & 0xffff;
 	}
@@ -132,12 +138,40 @@ void z8002_device::sub_from_addr_reg(int regno, uint16_t subtrahend)
 	RW(regno) -= subtrahend;
 }
 
+/* PC-relative transfers (JR, CALR, DJNZ) and non-segmented jumps: the
+   segment register, and so its bit 15, is left alone */
 void z8002_device::set_pc(uint32_t addr)
 {
 	if (get_segmented_mode())
 		m_pc = addr;
 	else
 		m_pc = (m_pc & 0xffff0000) | (addr & 0xffff);
+}
+
+/* PC loaded from a segmented long: a register pair, a popped return
+   address or a program status block */
+void z8002_device::set_pc_long(uint32_t segaddr)
+{
+	m_pc_b15 = (segaddr >> 31) & 1;
+	m_pc = segmented_addr(segaddr);
+}
+
+/* PC loaded through a register (JP/CALL @Rd) */
+void z8002_device::set_pc_reg(int regno)
+{
+	if (get_segmented_mode())
+		set_pc_long(RL(regno));
+	else
+		set_pc(RW(regno));
+}
+
+/* PC loaded from an address operand (JP/CALL addr, addr(Rd)): bit 15 of the
+   address word is set for the long-offset form, clear for the short one */
+void z8002_device::set_pc_addr(uint32_t addr)
+{
+	if (get_segmented_mode())
+		m_pc_b15 = m_addr_b15;
+	set_pc(addr);
 }
 
 uint8_t z8002_device::RDIR_B(uint8_t reg)
@@ -2152,22 +2186,22 @@ void z8002_device::Z1E_ddN0_cccc()
 	GET_CCC(OP0,NIB3);
 	GET_DST(OP0,NIB2);
 	switch (cc) {
-		case  0: if (CC0) set_pc(addr_from_reg(dst)); break;
-		case  1: if (CC1) set_pc(addr_from_reg(dst)); break;
-		case  2: if (CC2) set_pc(addr_from_reg(dst)); break;
-		case  3: if (CC3) set_pc(addr_from_reg(dst)); break;
-		case  4: if (CC4) set_pc(addr_from_reg(dst)); break;
-		case  5: if (CC5) set_pc(addr_from_reg(dst)); break;
-		case  6: if (CC6) set_pc(addr_from_reg(dst)); break;
-		case  7: if (CC7) set_pc(addr_from_reg(dst)); break;
-		case  8: if (CC8) set_pc(addr_from_reg(dst)); break;
-		case  9: if (CC9) set_pc(addr_from_reg(dst)); break;
-		case 10: if (CCA) set_pc(addr_from_reg(dst)); break;
-		case 11: if (CCB) set_pc(addr_from_reg(dst)); break;
-		case 12: if (CCC) set_pc(addr_from_reg(dst)); break;
-		case 13: if (CCD) set_pc(addr_from_reg(dst)); break;
-		case 14: if (CCE) set_pc(addr_from_reg(dst)); break;
-		case 15: if (CCF) set_pc(addr_from_reg(dst)); break;
+		case  0: if (CC0) set_pc_reg(dst); break;
+		case  1: if (CC1) set_pc_reg(dst); break;
+		case  2: if (CC2) set_pc_reg(dst); break;
+		case  3: if (CC3) set_pc_reg(dst); break;
+		case  4: if (CC4) set_pc_reg(dst); break;
+		case  5: if (CC5) set_pc_reg(dst); break;
+		case  6: if (CC6) set_pc_reg(dst); break;
+		case  7: if (CC7) set_pc_reg(dst); break;
+		case  8: if (CC8) set_pc_reg(dst); break;
+		case  9: if (CC9) set_pc_reg(dst); break;
+		case 10: if (CCA) set_pc_reg(dst); break;
+		case 11: if (CCB) set_pc_reg(dst); break;
+		case 12: if (CCC) set_pc_reg(dst); break;
+		case 13: if (CCD) set_pc_reg(dst); break;
+		case 14: if (CCE) set_pc_reg(dst); break;
+		case 15: if (CCF) set_pc_reg(dst); break;
 	}
 }
 
@@ -2179,10 +2213,10 @@ void z8002_device::Z1F_ddN0_0000()
 {
 	GET_DST(OP0,NIB2);
 	if (get_segmented_mode())
-		PUSHL(SP, make_segmented_addr(m_pc));
+		PUSHL(SP, make_segmented_pc(m_pc));
 	else
 		PUSHW(SP, m_pc);
-	set_pc(addr_from_reg(dst));
+	set_pc_reg(dst);
 }
 
 /******************************************
@@ -2680,7 +2714,7 @@ void z8002_device::Z39_ssN0_0000()
 	if (get_segmented_mode()) {
 		uint32_t addr = addr_from_reg(src);
 		fcw = RDMEM_W(space, addr + 2);
-		set_pc(segmented_addr(RDMEM_L(space, addr + 4)));
+		set_pc_long(RDMEM_L(space, addr + 4));
 	}
 	else {
 		fcw = RDMEM_W(space, RW(src));
@@ -4155,22 +4189,22 @@ void z8002_device::Z5E_0000_cccc_addr()
 	GET_CCC(OP0,NIB3);
 	GET_ADDR(OP1);
 	switch (cc) {
-		case  0: if (CC0) set_pc(addr); break;
-		case  1: if (CC1) set_pc(addr); break;
-		case  2: if (CC2) set_pc(addr); break;
-		case  3: if (CC3) set_pc(addr); break;
-		case  4: if (CC4) set_pc(addr); break;
-		case  5: if (CC5) set_pc(addr); break;
-		case  6: if (CC6) set_pc(addr); break;
-		case  7: if (CC7) set_pc(addr); break;
-		case  8: if (CC8) set_pc(addr); break;
-		case  9: if (CC9) set_pc(addr); break;
-		case 10: if (CCA) set_pc(addr); break;
-		case 11: if (CCB) set_pc(addr); break;
-		case 12: if (CCC) set_pc(addr); break;
-		case 13: if (CCD) set_pc(addr); break;
-		case 14: if (CCE) set_pc(addr); break;
-		case 15: if (CCF) set_pc(addr); break;
+		case  0: if (CC0) set_pc_addr(addr); break;
+		case  1: if (CC1) set_pc_addr(addr); break;
+		case  2: if (CC2) set_pc_addr(addr); break;
+		case  3: if (CC3) set_pc_addr(addr); break;
+		case  4: if (CC4) set_pc_addr(addr); break;
+		case  5: if (CC5) set_pc_addr(addr); break;
+		case  6: if (CC6) set_pc_addr(addr); break;
+		case  7: if (CC7) set_pc_addr(addr); break;
+		case  8: if (CC8) set_pc_addr(addr); break;
+		case  9: if (CC9) set_pc_addr(addr); break;
+		case 10: if (CCA) set_pc_addr(addr); break;
+		case 11: if (CCB) set_pc_addr(addr); break;
+		case 12: if (CCC) set_pc_addr(addr); break;
+		case 13: if (CCD) set_pc_addr(addr); break;
+		case 14: if (CCE) set_pc_addr(addr); break;
+		case 15: if (CCF) set_pc_addr(addr); break;
 	}
 }
 
@@ -4185,22 +4219,22 @@ void z8002_device::Z5E_ddN0_cccc_addr()
 	GET_ADDR(OP1);
 	addr = addr_add(addr, RW(dst));
 	switch (cc) {
-		case  0: if (CC0) set_pc(addr); break;
-		case  1: if (CC1) set_pc(addr); break;
-		case  2: if (CC2) set_pc(addr); break;
-		case  3: if (CC3) set_pc(addr); break;
-		case  4: if (CC4) set_pc(addr); break;
-		case  5: if (CC5) set_pc(addr); break;
-		case  6: if (CC6) set_pc(addr); break;
-		case  7: if (CC7) set_pc(addr); break;
-		case  8: if (CC8) set_pc(addr); break;
-		case  9: if (CC9) set_pc(addr); break;
-		case 10: if (CCA) set_pc(addr); break;
-		case 11: if (CCB) set_pc(addr); break;
-		case 12: if (CCC) set_pc(addr); break;
-		case 13: if (CCD) set_pc(addr); break;
-		case 14: if (CCE) set_pc(addr); break;
-		case 15: if (CCF) set_pc(addr); break;
+		case  0: if (CC0) set_pc_addr(addr); break;
+		case  1: if (CC1) set_pc_addr(addr); break;
+		case  2: if (CC2) set_pc_addr(addr); break;
+		case  3: if (CC3) set_pc_addr(addr); break;
+		case  4: if (CC4) set_pc_addr(addr); break;
+		case  5: if (CC5) set_pc_addr(addr); break;
+		case  6: if (CC6) set_pc_addr(addr); break;
+		case  7: if (CC7) set_pc_addr(addr); break;
+		case  8: if (CC8) set_pc_addr(addr); break;
+		case  9: if (CC9) set_pc_addr(addr); break;
+		case 10: if (CCA) set_pc_addr(addr); break;
+		case 11: if (CCB) set_pc_addr(addr); break;
+		case 12: if (CCC) set_pc_addr(addr); break;
+		case 13: if (CCD) set_pc_addr(addr); break;
+		case 14: if (CCE) set_pc_addr(addr); break;
+		case 15: if (CCF) set_pc_addr(addr); break;
 	}
 }
 
@@ -4212,10 +4246,10 @@ void z8002_device::Z5F_0000_0000_addr()
 {
 	GET_ADDR(OP1);
 	if (get_segmented_mode())
-		PUSHL(SP, make_segmented_addr(m_pc));
+		PUSHL(SP, make_segmented_pc(m_pc));
 	else
 		PUSHW(SP, m_pc);
-	set_pc(addr);
+	set_pc_addr(addr);
 }
 
 /******************************************
@@ -4227,11 +4261,11 @@ void z8002_device::Z5F_ddN0_0000_addr()
 	GET_DST(OP0,NIB2);
 	GET_ADDR(OP1);
 	if (get_segmented_mode())
-		PUSHL(SP, make_segmented_addr(m_pc));
+		PUSHL(SP, make_segmented_pc(m_pc));
 	else
 		PUSHW(SP, m_pc);
 	addr = addr_add(addr, RW(dst));
-	set_pc(addr);
+	set_pc_addr(addr);
 }
 
 /******************************************
@@ -4779,7 +4813,7 @@ void z8002_device::Z79_0000_0000_addr()
 	uint16_t fcw;
 	if (get_segmented_mode()) {
 		fcw = RDMEM_W(m_data, addr + 2);
-		set_pc(segmented_addr(RDMEM_L(m_data, addr + 4)));
+		set_pc_long(RDMEM_L(m_data, addr + 4));
 	}
 	else {
 		fcw = RDMEM_W(m_data, addr);
@@ -4801,7 +4835,7 @@ void z8002_device::Z79_ssN0_0000_addr()
 	addr = addr_add(addr, RW(src));
 	if (get_segmented_mode()) {
 		fcw = RDMEM_W(m_data, addr + 2);
-		set_pc(segmented_addr(RDMEM_L(m_data, addr + 4)));
+		set_pc_long(RDMEM_L(m_data, addr + 4));
 	}
 	else {
 		fcw = RDMEM_W(m_data, addr);
@@ -4833,7 +4867,7 @@ void z8002_device::Z7B_0000_0000()
 	tag = POPW(SP);   /* get type tag */
 	fcw = POPW(SP);   /* get m_fcw  */
 	if (get_segmented_mode())
-		set_pc(segmented_addr(POPL(SP)));
+		set_pc_long(POPL(SP));
 	else
 		m_pc    = POPW(SP);   /* get m_pc   */
 	CHANGE_FCW(fcw);       /* check for user/system mode change */
@@ -5512,22 +5546,22 @@ void z8002_device::Z9E_0000_cccc()
 	GET_CCC(OP0,NIB3);
 	if (get_segmented_mode()) {
 		switch (cc) {
-			case  0: if (CC0) set_pc(segmented_addr(POPL(SP))); break;
-			case  1: if (CC1) set_pc(segmented_addr(POPL(SP))); break;
-			case  2: if (CC2) set_pc(segmented_addr(POPL(SP))); break;
-			case  3: if (CC3) set_pc(segmented_addr(POPL(SP))); break;
-			case  4: if (CC4) set_pc(segmented_addr(POPL(SP))); break;
-			case  5: if (CC5) set_pc(segmented_addr(POPL(SP))); break;
-			case  6: if (CC6) set_pc(segmented_addr(POPL(SP))); break;
-			case  7: if (CC7) set_pc(segmented_addr(POPL(SP))); break;
-			case  8: if (CC8) set_pc(segmented_addr(POPL(SP))); break;
-			case  9: if (CC9) set_pc(segmented_addr(POPL(SP))); break;
-			case 10: if (CCA) set_pc(segmented_addr(POPL(SP))); break;
-			case 11: if (CCB) set_pc(segmented_addr(POPL(SP))); break;
-			case 12: if (CCC) set_pc(segmented_addr(POPL(SP))); break;
-			case 13: if (CCD) set_pc(segmented_addr(POPL(SP))); break;
-			case 14: if (CCE) set_pc(segmented_addr(POPL(SP))); break;
-			case 15: if (CCF) set_pc(segmented_addr(POPL(SP))); break;
+			case  0: if (CC0) set_pc_long(POPL(SP)); break;
+			case  1: if (CC1) set_pc_long(POPL(SP)); break;
+			case  2: if (CC2) set_pc_long(POPL(SP)); break;
+			case  3: if (CC3) set_pc_long(POPL(SP)); break;
+			case  4: if (CC4) set_pc_long(POPL(SP)); break;
+			case  5: if (CC5) set_pc_long(POPL(SP)); break;
+			case  6: if (CC6) set_pc_long(POPL(SP)); break;
+			case  7: if (CC7) set_pc_long(POPL(SP)); break;
+			case  8: if (CC8) set_pc_long(POPL(SP)); break;
+			case  9: if (CC9) set_pc_long(POPL(SP)); break;
+			case 10: if (CCA) set_pc_long(POPL(SP)); break;
+			case 11: if (CCB) set_pc_long(POPL(SP)); break;
+			case 12: if (CCC) set_pc_long(POPL(SP)); break;
+			case 13: if (CCD) set_pc_long(POPL(SP)); break;
+			case 14: if (CCE) set_pc_long(POPL(SP)); break;
+			case 15: if (CCF) set_pc_long(POPL(SP)); break;
 		}
 	}
 	else {
@@ -6984,7 +7018,7 @@ void z8002_device::ZD_dsp12()
 {
 	int16_t dsp12 = m_op[0] & 0xfff;
 	if (get_segmented_mode())
-		PUSHL(SP, make_segmented_addr(m_pc));
+		PUSHL(SP, make_segmented_pc(m_pc));
 	else
 		PUSHW(SP, m_pc);
 	dsp12 = (dsp12 & 2048) ? 4096 - 2 * (dsp12 & 2047) : -2 * (dsp12 & 2047);

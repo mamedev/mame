@@ -278,3 +278,12 @@ bool cdrom_image_device::is_dvd() const
 	return m_dvdrom_handle != nullptr;
 }
 
+
+device_cd_player_interface::device_cd_player_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "cd_player")
+{
+}
+
+device_cd_player_interface::~device_cd_player_interface()
+{
+}

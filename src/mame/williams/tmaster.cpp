@@ -409,6 +409,7 @@ void tmaster_state::tm(machine_config &config)
 	CESBLIT(config, m_blitter, XTAL(32'000'000), m_screen);
 	m_blitter->set_compute_addr(tmaster_compute_addr);
 	m_blitter->irq_callback().set(FUNC(tmaster_state::blitter_irq_callback));
+	m_blitter->set_extended_palette(true);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

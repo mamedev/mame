@@ -358,7 +358,7 @@ uint32_t metalmx_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 //  uint32_t *src_base = &gsp_vram[(vreg_base[0x40/4] & 0x40) ? 0x20000 : 0];
 	uint32_t const *const src_base = &m_gsp_vram[0];
 
-	for (int y = (std::max)(0, cliprect.min_y); y <= (std::min)(383, cliprect.max_y); ++y)
+	for (int y = (std::max)(0, cliprect.top()); y <= (std::min)(383, cliprect.bottom()); ++y)
 	{
 		uint16_t *pix = &bitmap.pix(y);
 		for (int x = 0; x < 256; x++)

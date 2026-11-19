@@ -8,9 +8,14 @@ TODO:
 */
 
 #include "emu.h"
-#include "bus/rs232/rs232.h"
-//#include "bus/s100/s100.h"
 #include "super6.h"
+
+#include "bus/rs232/rs232.h"
+#include "bus/s100/dj2db.h"
+#include "bus/s100/djdma.h"
+#include "bus/s100/mm65k16s.h"
+#include "bus/s100/superslave.h"
+#include "bus/s100/wunderbus.h"
 #include "softlist_dev.h"
 
 //**************************************************************************
@@ -29,8 +34,8 @@ void super6_state::bankswitch()
 	// power on jump
 	if (!BIT(m_bank0, 6)) { program.install_rom(0x0000, 0x07ff, 0xf800, m_rom); return; }
 
-	// first 64KB of memory
-	program.install_ram(0x0000, 0xffff, ram);
+	// S-100 bus memory
+	program.install_readwrite_handler(0x0000, 0xffff, emu::rw_delegate(*this, FUNC(super6_state::s100_mem_r)), emu::rw_delegate(*this, FUNC(super6_state::s100_mem_w)));
 
 	// second 64KB of memory
 	int map = (m_bank1 >> 4) & 0x07;
@@ -106,6 +111,24 @@ void super6_state::s100_w(uint8_t data)
 	*/
 
 	m_s100 = data;
+}
+
+void super6_state::s100_rdy_w(int state)
+{
+	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, state ? CLEAR_LINE : ASSERT_LINE);
+
+	if (!state)
+		m_maincpu->retry_access();
+}
+
+uint8_t super6_state::s100_mem_r(offs_t offset)
+{
+	return m_bus->smemr_r((m_s100 << 16) | offset);
+}
+
+void super6_state::s100_mem_w(offs_t offset, uint8_t data)
+{
+	m_bus->mwrt_w((m_s100 << 16) | offset, data);
 }
 
 
@@ -267,6 +290,7 @@ void super6_state::super6_io(address_map &map)
 {
 	map.global_mask(0xff);
 	map.unmap_value_high();
+	map(0x00, 0xff).rw(m_bus, FUNC(s100_bus_device::sinp_r), FUNC(s100_bus_device::sout_w));
 	map(0x00, 0x03).rw(m_dart, FUNC(z80dart_device::ba_cd_r), FUNC(z80dart_device::ba_cd_w));
 	map(0x04, 0x07).rw(m_pio, FUNC(z80pio_device::read), FUNC(z80pio_device::write));
 	map(0x08, 0x0b).rw(m_ctc, FUNC(z80ctc_device::read), FUNC(z80ctc_device::write));
@@ -389,6 +413,20 @@ void super6_state::fdc_drq_w(int state)
 
 
 //-------------------------------------------------
+//  super6_s100_cards
+//-------------------------------------------------
+
+static void super6_s100_cards(device_slot_interface &device)
+{
+	device.option_add("dj2db", S100_DJ2DB);
+	device.option_add("djdma", S100_DJDMA);
+	device.option_add("mm65k16s", S100_MM65K16S);
+	device.option_add("superslave", S100_SUPERSLAVE);
+	device.option_add("wunderbus", S100_WUNDERBUS);
+}
+
+
+//-------------------------------------------------
 //  z80_daisy_config super6_daisy_chain
 //-------------------------------------------------
 
@@ -489,6 +527,19 @@ void super6_state::super6(machine_config &config)
 	m_brg->fr_handler().append(m_dart, FUNC(z80dart_device::rxca_w));
 	m_brg->fr_handler().append(m_ctc, FUNC(z80ctc_device::trg1));
 	m_brg->ft_handler().set(m_dart, FUNC(z80dart_device::rxtxcb_w));
+
+	// S-100 bus
+	S100_BUS(config, m_bus, 24_MHz_XTAL / 4);
+	m_bus->rdy().set(FUNC(super6_state::s100_rdy_w));
+	S100_SLOT(config, S100_TAG ":2", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":3", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":4", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":5", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":6", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":7", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":8", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":9", super6_s100_cards, nullptr);
+	S100_SLOT(config, S100_TAG ":10", super6_s100_cards, nullptr);
 
 	// internal ram
 	RAM(config, RAM_TAG).set_default_size("128K");

@@ -213,12 +213,12 @@ void namcos16_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clip
 	u32 const src_base = 0x200/2;
 	u16 const src_pitch = 288 / 2;
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
-		u16 const *src = &m_bgvram[y * src_pitch + cliprect.min_x + src_base];
-		u16 *dst = &bitmap.pix(flip ? (cliprect.max_y - y) : y, flip ? cliprect.max_x : cliprect.min_x);
+		u16 const *src = &m_bgvram[y * src_pitch + cliprect.left() + src_base];
+		u16 *dst = &bitmap.pix(flip ? (cliprect.bottom() - y) : y, flip ? cliprect.right() : cliprect.left());
 
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x += 2)
+		for (int x = cliprect.left(); x <= cliprect.right(); x += 2)
 		{
 			u32 const srcpix = *src++;
 			int const idx1 = ((srcpix >> 8) & 0xf) + pal_base;

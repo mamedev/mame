@@ -36,10 +36,7 @@ protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
-	// device_pet_expansion_card_interface overrides
-	virtual int pet_norom_r(offs_t offset, int sel) override;
-	virtual uint8_t pet_bd_r(offs_t offset, uint8_t data, int &sel) override;
-	virtual void pet_bd_w(offs_t offset, uint8_t data, int &sel) override;
+	void mode_w(uint8_t data);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

@@ -28,7 +28,7 @@ class nec_common_device : public cpu_device, public nec_disassembler::config
 
 protected:
 	// construction/destruction
-	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, bool has_div_quirk, address_map_constructor internal_port_map = address_map_constructor());
+	nec_common_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, bool is_16bit, uint8_t prefetch_size, uint8_t prefetch_cycles, uint32_t chip_type, bool has_div_quirk, bool has_v30_quirks, address_map_constructor internal_port_map = address_map_constructor());
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -55,9 +55,9 @@ protected:
 	virtual int get_mode() const override { return m_MF; }
 
 	virtual u8 io_read_byte(offs_t a) { return m_io->read_byte(a); }
-	virtual u16 io_read_word(offs_t a) { return m_io->read_word_unaligned(a); }
+	virtual u16 io_read_word(offs_t a);
 	virtual void io_write_byte(offs_t a, u8 v) { m_io->write_byte(a, v); }
-	virtual void io_write_word(offs_t a, u16 v) { m_io->write_word_unaligned(a, v); }
+	virtual void io_write_word(offs_t a, u16 v);
 
 	void set_int_line(int state);
 	void set_nmi_line(int state);
@@ -101,6 +101,9 @@ private:
 	uint8_t   m_no_interrupt;
 	uint8_t   m_halted;
 	uint32_t  m_rep_params;
+	bool      m_io_retry;
+	bool      m_io_word_pending;
+	uint8_t   m_io_word_latch;
 
 	address_space *m_program;
 	memory_access<24, 0, 0, ENDIANNESS_LITTLE>::cache m_cache8;
@@ -116,6 +119,7 @@ private:
 	int32_t   m_prefetch_count;
 	uint8_t   m_prefetch_reset;
 	const uint32_t m_chip_type;
+	const bool m_has_v30_quirks;
 	// https://github.com/mamedev/mame/pull/15620
 	bool      m_has_div_quirk;
 
@@ -159,6 +163,15 @@ private:
 	void do_repc(uint8_t next);
 	void do_repne(uint8_t next);
 	void do_repe(uint8_t next);
+	bool has_v30_quirks() const { return m_has_v30_quirks; }
+	void decimal_adjust(bool subtract);
+	void ascii_adjust(bool subtract);
+	void packed_decimal(bool subtract, bool store);
+	void bitfield_flags(unsigned position, unsigned length, bool extract);
+	void mul_flags(uint32_t low, bool word);
+	void divu_flags(uint32_t remainder, uint32_t divisor, bool word, bool overflow);
+	void div_flags(int32_t quotient, bool word, bool overflow);
+	void shift_rotate(uint32_t value, uint8_t modrm, uint8_t count, bool word, bool count_one);
 
 	void i_add_br8();
 	void i_add_wr16();

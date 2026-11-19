@@ -555,7 +555,7 @@ void apf_state::apfm1000(machine_config &config)
 	MC6847(config, m_crtc, 3.579545_MHz_XTAL);
 	m_crtc->fsync_wr_callback().set(m_pia0, FUNC(pia6821_device::cb1_w));
 	m_crtc->input_callback().set(FUNC(apf_state::videoram_r));
-	m_crtc->set_get_fixed_mode(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1);
+	m_crtc->set_fixed_mode(mc6847_device::MODE_GM2 | mc6847_device::MODE_GM1);
 	m_crtc->set_screen("screen");
 	// INTEXT = GND
 	// other lines not connected

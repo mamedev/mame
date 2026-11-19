@@ -1374,7 +1374,8 @@ INST(SWI)
 
 	if (!TESTFLAG(FLAG_ENI))
 		return;
-	push_val(m_PC);
+	// returns to the next instruction (xfkddz uC/OS-II context switch)
+	push_val(m_PC + 2);
 	push_val(m_SR);
 
 	CLRFLAG(FLAG_ENI|FLAG_E|FLAG_M);
@@ -1740,7 +1741,7 @@ void se3208_device::execute_run()
 		{
 			interrupt_execute();
 		}
-		--(m_icount);
+		m_icount -= 3;
 	} while(m_icount > 0);
 }
 

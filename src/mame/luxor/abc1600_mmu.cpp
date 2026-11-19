@@ -78,6 +78,7 @@ abc1600_mmu_device::abc1600_mmu_device(machine_config const &mconfig, char const
 	device_t(mconfig, LUXOR_ABC1600_MMU, tag, owner, clock),
 	device_memory_interface(mconfig, *this),
 	device_state_interface(mconfig, *this),
+	m_pack_cb(*this),
 	m_read_tren(*this, 0xff),
 	m_write_tren(*this),
 	m_maincpu(*this, finder_base::DUMMY_TAG),
@@ -87,12 +88,17 @@ abc1600_mmu_device::abc1600_mmu_device(machine_config const &mconfig, char const
 	m_s_program_config("mac", ENDIANNESS_BIG, 8, 20, 0, address_map_constructor(FUNC(abc1600_mmu_device::mac_map), this)),
 	m_watchdog(*this, "watchdog"),
 	m_segment_ram(*this, "segment_ram", 0x400, ENDIANNESS_LITTLE),
-	m_page_ram(*this, "page_ram", 0x400*2, ENDIANNESS_LITTLE)
+	m_page_ram(*this, "page_ram", 0x400*2, ENDIANNESS_LITTLE),
+	m_rstbut(false),
+	m_partst(false),
+	m_sysfs(false),
+	m_sysscc(false)
 {
 }
 
-abc1600_mmu_device::mmu::mmu(m68008_device *maincpu, address_space &boot, address_space &program, address_space &cpu_space, address_space &mac_space, u8 *segment_ram, u16 *page_ram) :
+abc1600_mmu_device::mmu::mmu(m68008_device *maincpu, pack_delegate &pack, address_space &boot, address_space &program, address_space &cpu_space, address_space &mac_space, u8 *segment_ram, u16 *page_ram) :
 	m_maincpu(maincpu),
+	m_pack(pack),
 	m_segment_ram(segment_ram),
 	m_page_ram(page_ram),
 	m_a_boot(boot),
@@ -102,7 +108,11 @@ abc1600_mmu_device::mmu::mmu(m68008_device *maincpu, address_space &boot, addres
 	m_super(false),
 	m_boote(0),
 	m_magic(0),
-	m_task(0)
+	m_task(0),
+	m_cause(0),
+	m_bus_end(0),
+	m_refresh(0),
+	m_rack_ready(0)
 {
 	boot.specific(m_boot);
 	program.specific(m_program);
@@ -110,9 +120,14 @@ abc1600_mmu_device::mmu::mmu(m68008_device *maincpu, address_space &boot, addres
 	mac_space.specific(m_s_program);
 }
 
+void abc1600_mmu_device::device_resolve_objects()
+{
+	m_pack_cb.resolve();
+}
+
 void abc1600_mmu_device::device_start()
 {
-	m_mmu = std::make_unique<mmu>(m_maincpu.target(), space(AS_BOOT), space(AS_PROGRAM), space(m68000_base_device::AS_CPU_SPACE), space(AS_MAC), m_segment_ram.target(), m_page_ram.target());
+	m_mmu = std::make_unique<mmu>(m_maincpu.target(), m_pack_cb, space(AS_BOOT), space(AS_PROGRAM), space(m68000_base_device::AS_CPU_SPACE), space(AS_MAC), m_segment_ram.target(), m_page_ram.target());
 	m_maincpu->set_current_mmu8(m_mmu.get());
 
 	for (auto & s : m_segment_ram)
@@ -128,12 +143,17 @@ void abc1600_mmu_device::device_start()
 	// state saving
 	save_item(NAME(m_rstbut));
 	save_item(NAME(m_partst));
+	save_item(NAME(m_sysfs));
+	save_item(NAME(m_sysscc));
 	save_item(NAME(m_dmamap));
 	save_item(NAME(m_mmu->m_super));
 	save_item(NAME(m_mmu->m_boote));
 	save_item(NAME(m_mmu->m_magic));
 	save_item(NAME(m_mmu->m_task));
 	save_item(NAME(m_mmu->m_cause));
+	save_item(NAME(m_mmu->m_bus_end));
+	save_item(NAME(m_mmu->m_refresh));
+	save_item(NAME(m_mmu->m_rack_ready));
 }
 
 void abc1600_mmu_device::device_reset()
@@ -235,13 +255,80 @@ bool abc1600_mmu_device::mmu::translate(int spacenum, int intention, offs_t &add
 	return true;
 }
 
+abc1600_mmu_device::mmu::bus_target abc1600_mmu_device::mmu::physical_target(offs_t physical)
+{
+	if (physical < 0x100000)
+		return bus_target::RAM;
+
+	if (physical < 0x180000)
+		return bus_target::VIDEO;
+
+	if (physical >= 0x1fe000)
+		return bus_target::IO;
+
+	return bus_target::OTHER;
+}
+
+void abc1600_mmu_device::mmu::bus_cycle(bus_target target, bool write)
+{
+	// times are in half CPU clock periods, PCLK rises on multiples of 4
+	constexpr u64 REFRESH_PERIOD = 2 * 120; // E/2/6
+	u64 const start = m_maincpu->total_cycles() * 2;
+	u64 wait = 0;
+
+	// refresh starts on a CLK* edge 2.5 clocks after RFRQ when AS is inactive, RACK is held off for 5.5 clocks
+	if (m_refresh + 5 <= start + 1)
+	{
+		m_refresh += ((start + 1 - (m_refresh + 5)) / REFRESH_PERIOD) * REFRESH_PERIOD;
+		m_rack_ready = std::max(m_refresh + 5, m_bus_end + 1) + 11;
+		m_refresh += REFRESH_PERIOD;
+	}
+
+	if (target == bus_target::RAM)
+	{
+		if (m_rack_ready > start + 4)
+			wait = (m_rack_ready - (start + 4)) / 2;
+	}
+	else if (target == bus_target::VIDEO)
+	{
+		u64 das = std::max(start + 4, m_rack_ready);
+		das += das & 1;
+
+		u64 const pack = (m_pack(das * 4, write) + 3) / 4;
+
+		if (pack > start + 4)
+			wait = (pack - (start + 4) + 1) / 2;
+	}
+	else if (target == bus_target::IO || target == bus_target::INTACK)
+	{
+		auto const next_edge = [] (u64 t, u64 phase) { return t + 1 + ((phase - (t + 1)) & 3); };
+
+		u64 const gds = next_edge(start + (write ? 4 : 2), 2);  // 3C/2
+		u64 const ack = next_edge(gds, 0) + (write ? 4 : 0) + ((target == bus_target::INTACK) ? 8 : 0);  // 11E
+		u64 const ioack = next_edge(ack, 2) + 1;               // 9C/2, 9C/1
+
+		wait = (ioack + 2 - (start + 5)) / 2;
+	}
+
+	m_bus_end = start + 8 + wait * 2;
+
+	if (wait)
+		m_maincpu->adjust_icount(-int(wait));
+}
+
 u8 abc1600_mmu_device::mmu::mmu_read(offs_t logical, int intention)
 {
 	if (!m_boote && (logical < 0x20000))
+	{
+		bus_cycle(bus_target::OTHER, false);
 		return m_boot.read_interruptible(logical);
+	}
 
 	if (!ifc2(intention) && BIT(logical, 19))
+	{
+		bus_cycle(bus_target::OTHER, false);
 		return m_s_program.read_interruptible(logical);
+	}
 
 	bool nonx, wp;
 	offs_t physical = get_physical_address(logical, intention, nonx, wp);
@@ -251,12 +338,15 @@ u8 abc1600_mmu_device::mmu::mmu_read(offs_t logical, int intention)
 		return 0xff;
 	}
 
+	bus_cycle(physical_target(physical), false);
+
 	return m_program.read_interruptible(physical);
 }
 
 void abc1600_mmu_device::mmu::mmu_write(offs_t logical, u8 data)
 {
 	if (!ifc2(TR_WRITE) && BIT(logical, 19)) {
+		bus_cycle(bus_target::OTHER, true);
 		m_s_program.write_interruptible(logical, data);
 		return;
 	}
@@ -268,6 +358,8 @@ void abc1600_mmu_device::mmu::mmu_write(offs_t logical, u8 data)
 		m_maincpu->trigger_bus_error();
 		return;
 	}
+
+	bus_cycle(physical_target(physical), true);
 
 	m_program.write_interruptible(physical, data);
 }
@@ -294,6 +386,9 @@ void abc1600_mmu_device::mmu::write_data(offs_t logical, u8 data)
 
 u8 abc1600_mmu_device::mmu::read_cpu(offs_t logical)
 {
+	u8 const level = (logical >> 1) & 7;
+	bus_cycle((level == 2 || level == 5) ? bus_target::INTACK : bus_target::OTHER, false);
+
 	return m_cpu_space.read_byte(logical);
 }
 
@@ -561,6 +656,9 @@ uint8_t abc1600_mmu_device::dma_mreq_r(int index, int dmamap, offs_t logical)
 		data = space(AS_PROGRAM).read_byte(physical);
 
 		m_write_tren[index](data);
+
+		if (!((index == 0 && m_sysfs) || (index == 1 && m_sysscc)))
+			data = 0xff;
 	}
 	else
 	{

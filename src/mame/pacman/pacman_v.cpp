@@ -422,9 +422,9 @@ uint32_t alibaba_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	// sprites clipped area is larger than with pacman
 	rectangle spriteclip = cliprect;
 	if (m_flipscreen)
-		spriteclip.min_x = 6*8;
+		spriteclip.setx(6*8, spriteclip.right());
 	else
-		spriteclip.max_x = 30*8-1;
+		spriteclip.setx(spriteclip.left(), 30*8-1);
 
 	spriteclip &= cliprect;
 	draw_sprites(screen, bitmap, spriteclip);

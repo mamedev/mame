@@ -280,6 +280,7 @@ void c1526_device_base::device_start()
 	save_item(NAME(m_u6d_pb_out));
 	save_item(NAME(m_t_signal));
 	save_item(NAME(m_home));
+	save_item(NAME(m_last_cr_step));
 }
 
 

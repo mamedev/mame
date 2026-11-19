@@ -634,7 +634,7 @@ bool video_manager::finish_screen_updates()
 	for (device_video_output_interface &output : iter)
 	{
 		if (auto *screen = dynamic_cast<screen_device *>(&output))
-			screen->update_partial(screen->visible_area().max_y);
+			screen->update_partial(screen->visible_area().bottom());
 
 		if (machine().render().is_live(output))
 			has_live_screen = true;

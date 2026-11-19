@@ -231,7 +231,7 @@ static void draw_wireframe_line(bitmap_rgb32 &bitmap, const rectangle &clip, int
 	const double lx1 = x1, ly1 = y1;
 	const double cdx = double(x2) - lx1, cdy = double(y2) - ly1;
 	const double p[4] = { -cdx, cdx, -cdy, cdy };
-	const double q[4] = { lx1 - clip.min_x, clip.max_x - lx1, ly1 - clip.min_y, clip.max_y - ly1 };
+	const double q[4] = { lx1 - clip.left(), clip.right() - lx1, ly1 - clip.top(), clip.bottom() - ly1 };
 	double t0 = 0.0, t1 = 1.0;
 	for (int i = 0; i < 4; i++)
 	{
@@ -577,10 +577,10 @@ void model1_state::draw_quads(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int save_x2 = view->x2;
 	int save_y1 = view->y1;
 	int save_y2 = view->y2;
-	view->x1 = std::max(view->x1, cliprect.min_x);
-	view->x2 = std::min(view->x2, cliprect.max_x);
-	view->y1 = std::max(view->y1, cliprect.min_y);
-	view->y2 = std::min(view->y2, cliprect.max_y);
+	view->x1 = std::max(view->x1, cliprect.left());
+	view->x2 = std::min(view->x2, cliprect.right());
+	view->y1 = std::max(view->y1, cliprect.top());
+	view->y2 = std::min(view->y2, cliprect.bottom());
 
 	for (int i = 0; i < count; i++)
 	{
@@ -855,8 +855,11 @@ float model1_state::compute_specular(glm::vec3& normal, glm::vec3& light, float 
 // through the wall.
 void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t size, float &old_z)
 {
-	// Protect against bad data when attacking a super destroyer
-	if(tex_adr == 0xffffffff || size >= 0x1000000)
+	// swa sends objects whose color and polygon addresses are out of range: tex_adr
+	// 0xffffffff when attacking a super destroyer, and both addresses taken from the wrong
+	// halves of its reactor core explosion frame table (the table index at 0x0e6bbe is
+	// not scaled to the 8-byte entries)
+	if ((tex_adr + 1 - 0x40000) > (0x100000 - 0x40000) || size >= 0x1000000)
 		return;
 
 #if 0
@@ -864,12 +867,21 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 #endif
 
 	float *poly_data;
+	uint32_t poly_limit;
 	if (poly_adr & 0x800000)
+	{
 		poly_data = (float *)m_poly_ram.get();
+		poly_limit = POLY_RAM_SIZE;
+	}
 	else
+	{
 		poly_data = (float *)m_poly_rom.target();
+		poly_limit = m_poly_rom.length();
+	}
 
 	poly_adr &= 0x7fffff;
+	if (poly_adr + 6 > poly_limit)
+		return;
 #if 0
 	dump = poly_adr == 0x944ea;
 	dump = 0;
@@ -937,6 +949,9 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 			poly_data[poly_adr + 4], poly_data[poly_adr + 5], poly_data[poly_adr + 6],
 			poly_data[poly_adr + 7], poly_data[poly_adr + 8], poly_data[poly_adr + 9]);
 #endif
+		if (poly_adr + 10 > poly_limit)
+			break;
+
 		uint32_t flags = *reinterpret_cast<uint32_t*>(poly_data + poly_adr);
 
 		int type = flags & 3;
@@ -1057,7 +1072,7 @@ void model1_state::push_object(uint32_t tex_adr, uint32_t poly_adr, uint32_t siz
 			// bits [11:10] of the tile word select a colour mode: bit 10 marks a
 			// flat UI element (radar blips, HUD text) drawn unlit, and mode 01
 			// additionally blinks by rotating the BGR channels on alternate frames.
-			uint16_t tex_data = m_tgp_ram[tex_adr - 0x40000];
+			const uint16_t tex_data = tgp_ram_entry(tex_adr);
 			int color = m_paletteram16[0x1000 | (tex_data & 0x3ff)];
 			int r = (color >> 0x0) & 0x1f;
 			int g = (color >> 0x5) & 0x1f;
@@ -1221,7 +1236,7 @@ int model1_state::push_direct(int list_offset) {
 		cquad.z = z;
 		{
 			int lumval = ((float)(lum >> 24)) * 2.0f;
-			int color = m_paletteram16[0x1000 | (m_tgp_ram[tex_adr - 0x40000] & 0x3ff)];
+			const int color = m_paletteram16[0x1000 | (tgp_ram_entry(tex_adr) & 0x3ff)];
 			int r = (color >> 0x0) & 0x1f;
 			int g = (color >> 0x5) & 0x1f;
 			int b = (color >> 0xA) & 0x1f;
@@ -1244,7 +1259,7 @@ int model1_state::push_direct(int list_offset) {
 			// gunner 2nd-viewport overlay); the arcade alternates backdrop/scene.
 			// Paint the backdrop pen (palette[0]) so the stipple reads
 			// backdrop/scene.
-			if ((m_tgp_ram[tex_adr - 0x40000] & 0x3ff) == 0)
+			if ((tgp_ram_entry(tex_adr) & 0x3ff) == 0)
 				cquad.col = MOIRE | (m_palette->pen(0) & 0xffffff);
 
 			// wingwar's display list carries a constant degenerate moiré record
@@ -1529,7 +1544,7 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect, r
 				int len = readi(list_offset + 4);
 				for (int i = 0; i < len; i++)
 				{
-					m_poly_ram[adr - 0x800000 + i] = readi(list_offset + 2 * i + 6);
+					m_poly_ram[(adr - 0x800000 + i) & (POLY_RAM_SIZE - 1)] = readi(list_offset + 2 * i + 6);
 				}
 				list_offset += 6 + len * 2;
 				break;
@@ -1665,7 +1680,7 @@ void model1_state::tgp_scan()
 					int len = readi(list_offset + 4);
 					for (int i = 0; i < len; i++)
 					{
-						m_poly_ram[adr - 0x800000 + i] = readi(list_offset + 2 * i + 6);
+						m_poly_ram[(adr - 0x800000 + i) & (POLY_RAM_SIZE - 1)] = readi(list_offset + 2 * i + 6);
 					}
 					list_offset += 6 + len * 2;
 					break;
@@ -1723,7 +1738,7 @@ void model1_state::video_start()
 {
 	m_view = std::make_unique<model1_state::view_t>();
 
-	m_poly_ram = make_unique_clear<uint32_t[]>(0x400000);
+	m_poly_ram = make_unique_clear<uint32_t[]>(POLY_RAM_SIZE);
 	m_tgp_ram = make_unique_clear<uint16_t[]>(0x100000-0x40000);
 	m_pointdb = std::make_unique<point_t[]>(1000000*2);
 	m_quaddb  = std::make_unique<quad_t[]>(1000000);
@@ -1747,7 +1762,7 @@ void model1_state::video_start()
 	m_clipfn[3].m_clip = &model1_state::fclip_clip_right;
 
 	save_pointer(NAME(m_tgp_ram), 0x100000-0x40000);
-	save_pointer(NAME(m_poly_ram), 0x40000);
+	save_pointer(NAME(m_poly_ram), POLY_RAM_SIZE);
 	save_item(NAME(m_listctl));
 }
 
@@ -1757,10 +1772,10 @@ void model1_state::video_start()
 void model1_state::build_overlay_mask(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	constexpr int feature_level = 8; // anything darker counts as HUD background
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint32_t const *const src = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint32_t argb = src[x];
 			int r = (argb >> 16) & 0xff, g = (argb >> 8) & 0xff, b = argb & 0xff;
@@ -1775,10 +1790,10 @@ void model1_state::build_overlay_mask(bitmap_rgb32 &bitmap, const rectangle &cli
 // remain where the HUD pixel was transparent / near-black.
 void model1_state::apply_overlay_stencil(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		uint32_t *const dst = &bitmap.pix(y);
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int i = y * m_overlay_stride + x;
 			if (m_overlay_block[i])

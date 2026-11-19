@@ -5,10 +5,11 @@ license:CC0-1.0
 -->
 <softwarelist name="plus4_cass" description="Commodore Plus/4 / C16 / C116 cassettes">
 
-	<software name="dtstar" supported="no">
+	<software name="dtstar">
 		<description>Daley Thompson's Star Events</description>
 		<year>1985</year>
 		<publisher>Ocean</publisher>
+		<info name="usage" value="LOAD&quot;&quot;,1,1: SYS1536"/>
 
 		<part name="cass1" interface="cbm_cass">
 			<dataarea name="cass" size="620778">

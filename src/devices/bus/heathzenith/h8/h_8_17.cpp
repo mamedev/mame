@@ -59,6 +59,10 @@ protected:
 
 	virtual void set_ram_write_enable(int state) override;
 
+	// The H8 bus device has no clock to read, so use the 2.048 MHz phi 2
+	// clock of the 8080 CPU board in cpu8080.cpp.
+	virtual u32 bus_clock() override { return (XTAL(18'432'000) / 9).value(); }
+
 	void ram_w(offs_t offset, u8 data);
 
 	required_memory_region   m_rom;

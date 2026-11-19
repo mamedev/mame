@@ -309,7 +309,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(lethalj_state::scanline_update)
 	{
 		for (int x = params->heblnk; x < params->hsblnk; x++)
 			dest[x] = 0x7fff;
-		if (scanline == screen.visible_area().max_y)
+		if (scanline == screen.visible_area().bottom())
 			m_blank_palette = 0;
 	}
 	else

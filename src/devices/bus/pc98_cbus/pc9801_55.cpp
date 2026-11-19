@@ -26,8 +26,12 @@ TODO:
 #include "emu.h"
 #include "pc9801_55.h"
 
+#include "bus/nscsi/cdr52.h"
+#include "bus/nscsi/pc98_hd.h"
+
 DEFINE_DEVICE_TYPE(PC9801_55U, pc9801_55u_device, "pc9801_55u", "NEC PC-9801-55U SCSI interface")
 DEFINE_DEVICE_TYPE(PC9801_55L, pc9801_55l_device, "pc9801_55l", "NEC PC-9801-55L SCSI interface")
+DEFINE_DEVICE_TYPE(SCSI1_PC98, scsi1_pc98_device, "scsi1_pc98", "NEC PC-98 built-in SCSI-1 interface")
 
 pc9801_55_device::pc9801_55_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, tag, owner, clock)
@@ -49,10 +53,22 @@ pc9801_55u_device::pc9801_55u_device(const machine_config &mconfig, const char *
 
 }
 
+pc9801_55u_device::pc9801_55u_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: pc9801_55_device(mconfig, type, tag, owner, clock)
+{
+}
+
+
 pc9801_55l_device::pc9801_55l_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pc9801_55_device(mconfig, PC9801_55L, tag, owner, clock)
 {
 	m_space_io_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(pc9801_55l_device::internal_map), this));
+}
+
+scsi1_pc98_device::scsi1_pc98_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: pc9801_55u_device(mconfig, SCSI1_PC98, tag, owner, clock)
+{
+	m_space_io_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(scsi1_pc98_device::internal_map), this));
 }
 
 
@@ -80,6 +96,12 @@ ROM_END
 const tiny_rom_entry *pc9801_55l_device::device_rom_region() const
 {
 	return ROM_NAME( pc9801_55l );
+}
+
+const tiny_rom_entry *scsi1_pc98_device::device_rom_region() const
+{
+	// mapped from client bases
+	return nullptr;
 }
 
 void pc9801_55_device::scsi_irq_w(int state)
@@ -112,14 +134,13 @@ void pc9801_55_device::dack_w(int line, u8 data)
 static void pc98_scsi_devices(device_slot_interface &device)
 {
 	device.option_add("harddisk", NSCSI_PC98_HD);
-	// TODO: at least a CD-ROM option
+	device.option_add("cdr52", NSCSI_CDR52);
 }
 
 
 void pc9801_55_device::device_add_mconfig(machine_config &config)
 {
 	NSCSI_BUS(config, m_scsi_bus);
-	// TODO: currently returning default_scsi_devices, checkout if true for PC-98
 	NSCSI_CONNECTOR(config, "scsi:0", pc98_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:1", pc98_scsi_devices, nullptr);
 	NSCSI_CONNECTOR(config, "scsi:2", pc98_scsi_devices, nullptr);
@@ -252,7 +273,9 @@ void pc9801_55_device::increment_addr()
 {
 	if (machine().side_effects_disabled()) return;
 
-	if (m_ar <= 0x19)
+	// 'A documentation says command, data and auxiliary status
+	// 'B omits aux, assume same deal anyway.
+	if (m_ar <= 0x17)
 		m_ar ++;
 }
 

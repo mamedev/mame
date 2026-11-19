@@ -191,7 +191,6 @@
 #include "formats/esq16_dsk.h"
 #include "formats/hxchfe_dsk.h"
 
-#include <cstdarg>
 #include <cstdio>
 
 #include "sd1.lh"
@@ -217,16 +216,6 @@ enum esq5505_system_type : int {
 
 #if KEYBOARD_HACK
 static int shift = 32;
-#endif
-
-#if 0
-static void ATTR_PRINTF(1,2) print_to_stderr(const char *format, ...)
-{
-	va_list arg;
-	va_start(arg, format);
-	vfprintf(stderr, format, arg);
-	va_end(arg);
-}
 #endif
 
 class esq5505_state : public driver_device
@@ -1090,7 +1079,7 @@ ROM_START( vfx )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
 	ROM_LOAD16_BYTE( "u14.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
-	ROM_LOAD16_BYTE( "u15.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) )
+	ROM_LOAD16_BYTE( "u15.bin", 0x100001, 0x080000, CRC(a7deec02) SHA1(9b6530a5823bc8bd1f0e7ea1eebbe1ac6bf976c5) )
 
 	ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
 	ROM_LOAD( "u16.bin", 0x000000, 0x080000, CRC(c3ddaf95) SHA1(44a7bd89cd7e82952cc5100479e110c385246559) )
@@ -1107,7 +1096,7 @@ ROM_START( vfxsd )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)
 	ROM_LOAD16_BYTE( "u57.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
-	ROM_LOAD16_BYTE( "u58.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) )
+	ROM_LOAD16_BYTE( "u58.bin", 0x100001, 0x080000, CRC(a7deec02) SHA1(9b6530a5823bc8bd1f0e7ea1eebbe1ac6bf976c5) )
 
 	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
 
@@ -1122,7 +1111,7 @@ ROM_START( sd1 )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // BS=0 region (12-bit)
 	ROM_LOAD16_BYTE( "u34.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
-	ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) )
+	ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(a7deec02) SHA1(9b6530a5823bc8bd1f0e7ea1eebbe1ac6bf976c5) )
 
 	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
 	ROM_LOAD16_WORD_SWAP( "u38.bin", 0x000000, 0x100000, CRC(a904190e) SHA1(e4fd4e1130906086fb4182dcb8b51269969e2836) )
@@ -1144,7 +1133,7 @@ ROM_START( sd132 )
 
 	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // BS=0 region (12-bit)
 	ROM_LOAD16_BYTE( "u34.bin", 0x000001, 0x080000, CRC(85592299) SHA1(1aa7cf612f91972baeba15991d9686ccde01599c) )
-	ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(c0055975) SHA1(5a22f1d5e437c6277eb0cfb1ff1b3f8dcdea1cc6) )
+	ROM_LOAD16_BYTE( "u35.bin", 0x100001, 0x080000, CRC(a7deec02) SHA1(9b6530a5823bc8bd1f0e7ea1eebbe1ac6bf976c5) )
 
 	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
 	ROM_LOAD16_WORD_SWAP( "u38.bin", 0x000000, 0x100000, CRC(a904190e) SHA1(e4fd4e1130906086fb4182dcb8b51269969e2836) )

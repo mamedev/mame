@@ -14,46 +14,50 @@ TODO:
 #include "tlcs900.h"
 #include "dasm900.h"
 
+#include <algorithm>
+#include <bit>
+#include <type_traits>
+
 
 tlcs900_device::tlcs900_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	m_am8_16(0),
-	m_mnemonic_80(s_mnemonic_80),
-	m_mnemonic_88(s_mnemonic_88),
-	m_mnemonic_90(s_mnemonic_90),
-	m_mnemonic_98(s_mnemonic_98),
-	m_mnemonic_a0(s_mnemonic_a0),
-	m_mnemonic_b0(s_mnemonic_b0),
-	m_mnemonic_b8(s_mnemonic_b8),
-	m_mnemonic_c0(s_mnemonic_c0),
-	m_mnemonic_c8(s_mnemonic_c8),
-	m_mnemonic_d0(s_mnemonic_d0),
-	m_mnemonic_d8(s_mnemonic_d8),
-	m_mnemonic_e0(s_mnemonic_e0),
-	m_mnemonic_e8(s_mnemonic_e8),
-	m_mnemonic_f0(s_mnemonic_f0),
-	m_mnemonic(s_mnemonic)
+	m_mnemonic_80(&s_mnemonic_80),
+	m_mnemonic_88(&s_mnemonic_88),
+	m_mnemonic_90(&s_mnemonic_90),
+	m_mnemonic_98(&s_mnemonic_98),
+	m_mnemonic_a0(&s_mnemonic_a0),
+	m_mnemonic_b0(&s_mnemonic_b0),
+	m_mnemonic_b8(&s_mnemonic_b8),
+	m_mnemonic_c0(&s_mnemonic_c0),
+	m_mnemonic_c8(&s_mnemonic_c8),
+	m_mnemonic_d0(&s_mnemonic_d0),
+	m_mnemonic_d8(&s_mnemonic_d8),
+	m_mnemonic_e0(&s_mnemonic_e0),
+	m_mnemonic_e8(&s_mnemonic_e8),
+	m_mnemonic_f0(&s_mnemonic_f0),
+	m_mnemonic(&s_mnemonic)
 {
 }
 
 tlcs900h_device::tlcs900h_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	tlcs900_device(mconfig, type, tag, owner, clock)
 {
-	m_mnemonic_80 = s_mnemonic_80;
-	m_mnemonic_88 = s_mnemonic_88;
-	m_mnemonic_90 = s_mnemonic_90;
-	m_mnemonic_98 = s_mnemonic_98;
-	m_mnemonic_a0 = s_mnemonic_a0;
-	m_mnemonic_b0 = s_mnemonic_b0;
-	m_mnemonic_b8 = s_mnemonic_b8;
-	m_mnemonic_c0 = s_mnemonic_c0;
-	m_mnemonic_c8 = s_mnemonic_c8;
-	m_mnemonic_d0 = s_mnemonic_d0;
-	m_mnemonic_d8 = s_mnemonic_d8;
-	m_mnemonic_e0 = s_mnemonic_e0;
-	m_mnemonic_e8 = s_mnemonic_e8;
-	m_mnemonic_f0 = s_mnemonic_f0;
-	m_mnemonic = s_mnemonic;
+	m_mnemonic_80 = &s_mnemonic_80;
+	m_mnemonic_88 = &s_mnemonic_88;
+	m_mnemonic_90 = &s_mnemonic_90;
+	m_mnemonic_98 = &s_mnemonic_98;
+	m_mnemonic_a0 = &s_mnemonic_a0;
+	m_mnemonic_b0 = &s_mnemonic_b0;
+	m_mnemonic_b8 = &s_mnemonic_b8;
+	m_mnemonic_c0 = &s_mnemonic_c0;
+	m_mnemonic_c8 = &s_mnemonic_c8;
+	m_mnemonic_d0 = &s_mnemonic_d0;
+	m_mnemonic_d8 = &s_mnemonic_d8;
+	m_mnemonic_e0 = &s_mnemonic_e0;
+	m_mnemonic_e8 = &s_mnemonic_e8;
+	m_mnemonic_f0 = &s_mnemonic_f0;
+	m_mnemonic = &s_mnemonic;
 }
 
 device_memory_interface::space_config_vector tlcs900_device::memory_space_config() const
@@ -82,21 +86,21 @@ inline uint8_t tlcs900_device::RDOP()
 {
 	uint8_t data;
 
-	if ( m_prefetch_clear )
+	if (m_prefetch_clear)
 	{
-		for ( int i = 0; i < 4; i++ )
+		for (int i = 0; i < 4; i++)
 		{
-			m_prefetch[ i ] = RDMEM( m_pc.d + i );
+			m_prefetch[i] = RDMEM(m_pc.d + i);
 		}
 		m_prefetch_index = 0;
 		m_prefetch_clear = false;
 	}
 	else
 	{
-		m_prefetch[ m_prefetch_index ] = RDMEM( m_pc.d + 3 );
-		m_prefetch_index = ( m_prefetch_index + 1 ) & 0x03;
+		m_prefetch[m_prefetch_index] = RDMEM(m_pc.d + 3);
+		m_prefetch_index = (m_prefetch_index + 1) & 0x03;
 	}
-	data = m_prefetch[ m_prefetch_index ];
+	data = m_prefetch[m_prefetch_index];
 	m_pc.d++;
 	return data;
 }
@@ -104,97 +108,99 @@ inline uint8_t tlcs900_device::RDOP()
 
 void tlcs900_device::device_start()
 {
-	m_program = &space( AS_PROGRAM );
+	m_program = &space(AS_PROGRAM);
 
 	m_pc.d = 0;
-	memset(m_xwa, 0x00, sizeof(m_xwa));
-	memset(m_xbc, 0x00, sizeof(m_xbc));
-	memset(m_xde, 0x00, sizeof(m_xde));
-	memset(m_xhl, 0x00, sizeof(m_xhl));
+	std::fill(std::begin(m_xwa), std::end(m_xwa), PAIR{});
+	std::fill(std::begin(m_xbc), std::end(m_xbc), PAIR{});
+	std::fill(std::begin(m_xde), std::end(m_xde), PAIR{});
+	std::fill(std::begin(m_xhl), std::end(m_xhl), PAIR{});
 	m_xix.d = 0;
 	m_xiy.d = 0;
 	m_xiz.d = 0;
 	m_xnsp.d = 0;
 	m_xssp.d = 0;
-	memset(m_dmas, 0x00, sizeof(m_dmas));
-	memset(m_dmad, 0x00, sizeof(m_dmad));
-	memset(m_dmac, 0x00, sizeof(m_dmac));
-	memset(m_dmam, 0x00, sizeof(m_dmam));
+	std::fill(std::begin(m_dmas), std::end(m_dmas), PAIR{});
+	std::fill(std::begin(m_dmad), std::end(m_dmad), PAIR{});
+	std::fill(std::begin(m_dmac), std::end(m_dmac), PAIR{});
+	std::fill(std::begin(m_dmam), std::end(m_dmam), PAIR{});
 	m_intnest = 0;
+	m_reg1 = regsel_dummy;
+	m_reg2 = regsel_dummy;
 
-	save_item( NAME(m_xwa) );
-	save_item( NAME(m_xbc) );
-	save_item( NAME(m_xde) );
-	save_item( NAME(m_xhl) );
-	save_item( NAME(m_xix) );
-	save_item( NAME(m_xiy) );
-	save_item( NAME(m_xiz) );
-	save_item( NAME(m_xssp) );
-	save_item( NAME(m_xnsp) );
-	save_item( NAME(m_pc) );
-	save_item( NAME(m_sr) );
-	save_item( NAME(m_f2) );
-	save_item( NAME(m_dmas) );
-	save_item( NAME(m_dmad) );
-	save_item( NAME(m_dmac) );
-	save_item( NAME(m_dmam) );
-	save_item( NAME(m_intnest) );
-	save_item( NAME(m_timer_pre) );
-	save_item( NAME(m_timer_8) );
-	save_item( NAME(m_timer_change) );
-	save_item( NAME(m_level) );
-	save_item( NAME(m_check_irqs) );
-	save_item( NAME(m_ad_cycles_left) );
-	save_item( NAME(m_nmi_state) );
-	save_item( NAME(m_prefetch_clear) );
-	save_item( NAME(m_irq_inhibit) );
-	save_item( NAME(m_prefetch_index) );
-	save_item( NAME(m_prefetch) );
-	save_item( NAME(m_halted) );
-	save_item( NAME(m_regbank) );
+	save_item(NAME(m_xwa));
+	save_item(NAME(m_xbc));
+	save_item(NAME(m_xde));
+	save_item(NAME(m_xhl));
+	save_item(NAME(m_xix));
+	save_item(NAME(m_xiy));
+	save_item(NAME(m_xiz));
+	save_item(NAME(m_xssp));
+	save_item(NAME(m_xnsp));
+	save_item(NAME(m_pc));
+	save_item(NAME(m_sr));
+	save_item(NAME(m_f2));
+	save_item(NAME(m_dmas));
+	save_item(NAME(m_dmad));
+	save_item(NAME(m_dmac));
+	save_item(NAME(m_dmam));
+	save_item(NAME(m_intnest));
+	save_item(NAME(m_timer_pre));
+	save_item(NAME(m_timer_8));
+	save_item(NAME(m_timer_change));
+	save_item(NAME(m_level));
+	save_item(NAME(m_check_irqs));
+	save_item(NAME(m_ad_cycles_left));
+	save_item(NAME(m_nmi_state));
+	save_item(NAME(m_prefetch_clear));
+	save_item(NAME(m_irq_inhibit));
+	save_item(NAME(m_prefetch_index));
+	save_item(NAME(m_prefetch));
+	save_item(NAME(m_halted));
+	save_item(NAME(m_regbank));
 
-	state_add( TLCS900_PC,    "PC",    m_pc.d ).callimport().formatstr("%08X");
-	state_add( TLCS900_XWA0,  "XWA0",  m_xwa[0].d ).formatstr("%08X");
-	state_add( TLCS900_XBC0,  "XBC0",  m_xbc[0].d ).formatstr("%08X");
-	state_add( TLCS900_XDE0,  "XDE0",  m_xde[0].d ).formatstr("%08X");
-	state_add( TLCS900_XHL0,  "XHL0",  m_xhl[0].d ).formatstr("%08X");
-	state_add( TLCS900_XWA1,  "XWA1",  m_xwa[1].d ).formatstr("%08X");
-	state_add( TLCS900_XBC1,  "XBC1",  m_xbc[1].d ).formatstr("%08X");
-	state_add( TLCS900_XDE1,  "XDE1",  m_xde[1].d ).formatstr("%08X");
-	state_add( TLCS900_XHL1,  "XHL1",  m_xhl[1].d ).formatstr("%08X");
-	state_add( TLCS900_XWA2,  "XWA2",  m_xwa[2].d ).formatstr("%08X");
-	state_add( TLCS900_XBC2,  "XBC2",  m_xbc[2].d ).formatstr("%08X");
-	state_add( TLCS900_XDE2,  "XDE2",  m_xde[2].d ).formatstr("%08X");
-	state_add( TLCS900_XHL2,  "XHL2",  m_xhl[2].d ).formatstr("%08X");
-	state_add( TLCS900_XWA3,  "XWA3",  m_xwa[3].d ).formatstr("%08X");
-	state_add( TLCS900_XBC3,  "XBC3",  m_xbc[3].d ).formatstr("%08X");
-	state_add( TLCS900_XDE3,  "XDE3",  m_xde[3].d ).formatstr("%08X");
-	state_add( TLCS900_XHL3,  "XHL3",  m_xhl[3].d ).formatstr("%08X");
-	state_add( TLCS900_XIX,   "XIX",   m_xix.d ).formatstr("%08X");
-	state_add( TLCS900_XIY,   "XIY",   m_xiy.d ).formatstr("%08X");
-	state_add( TLCS900_XIZ,   "XIZ",   m_xiz.d ).formatstr("%08X");
-	state_add( TLCS900_XNSP,  "XNSP",  m_xnsp.d ).formatstr("%08X");
-	state_add( TLCS900_XSSP,  "XSSP",  m_xssp.d ).formatstr("%08X");
-	state_add( TLCS900_DMAS0, "DMAS0", m_dmas[0].d ).formatstr("%08X");
-	state_add( TLCS900_DMAD0, "DMAD0", m_dmad[0].d ).formatstr("%08X");
-	state_add( TLCS900_DMAC0, "DMAC0", m_dmac[0].w.l ).formatstr("%04X");
-	state_add( TLCS900_DMAM0, "DMAM0", m_dmam[0].b.l ).formatstr("%02X");
-	state_add( TLCS900_DMAS1, "DMAS1", m_dmas[1].d ).formatstr("%08X");
-	state_add( TLCS900_DMAD1, "DMAD1", m_dmad[1].d ).formatstr("%08X");
-	state_add( TLCS900_DMAC1, "DMAC1", m_dmac[1].w.l ).formatstr("%04X");
-	state_add( TLCS900_DMAM1, "DMAM1", m_dmam[1].b.l ).formatstr("%02X");
-	state_add( TLCS900_DMAS2, "DMAS2", m_dmas[2].d ).formatstr("%08X");
-	state_add( TLCS900_DMAD2, "DMAD2", m_dmad[2].d ).formatstr("%08X");
-	state_add( TLCS900_DMAC2, "DMAC2", m_dmac[2].w.l ).formatstr("%04X");
-	state_add( TLCS900_DMAM2, "DMAM2", m_dmam[2].b.l ).formatstr("%02X");
-	state_add( TLCS900_DMAS3, "DMAS3", m_dmas[3].d ).formatstr("%08X");
-	state_add( TLCS900_DMAD3, "DMAD3", m_dmad[3].d ).formatstr("%08X");
-	state_add( TLCS900_DMAC3, "DMAC3", m_dmac[3].w.l ).formatstr("%04X");
-	state_add( TLCS900_DMAM3, "DMAM3", m_dmam[3].b.l ).formatstr("%02X");
+	state_add(TLCS900_PC,    "PC",    m_pc.d).callimport().formatstr("%08X");
+	state_add(TLCS900_XWA0,  "XWA0",  m_xwa[0].d).formatstr("%08X");
+	state_add(TLCS900_XBC0,  "XBC0",  m_xbc[0].d).formatstr("%08X");
+	state_add(TLCS900_XDE0,  "XDE0",  m_xde[0].d).formatstr("%08X");
+	state_add(TLCS900_XHL0,  "XHL0",  m_xhl[0].d).formatstr("%08X");
+	state_add(TLCS900_XWA1,  "XWA1",  m_xwa[1].d).formatstr("%08X");
+	state_add(TLCS900_XBC1,  "XBC1",  m_xbc[1].d).formatstr("%08X");
+	state_add(TLCS900_XDE1,  "XDE1",  m_xde[1].d).formatstr("%08X");
+	state_add(TLCS900_XHL1,  "XHL1",  m_xhl[1].d).formatstr("%08X");
+	state_add(TLCS900_XWA2,  "XWA2",  m_xwa[2].d).formatstr("%08X");
+	state_add(TLCS900_XBC2,  "XBC2",  m_xbc[2].d).formatstr("%08X");
+	state_add(TLCS900_XDE2,  "XDE2",  m_xde[2].d).formatstr("%08X");
+	state_add(TLCS900_XHL2,  "XHL2",  m_xhl[2].d).formatstr("%08X");
+	state_add(TLCS900_XWA3,  "XWA3",  m_xwa[3].d).formatstr("%08X");
+	state_add(TLCS900_XBC3,  "XBC3",  m_xbc[3].d).formatstr("%08X");
+	state_add(TLCS900_XDE3,  "XDE3",  m_xde[3].d).formatstr("%08X");
+	state_add(TLCS900_XHL3,  "XHL3",  m_xhl[3].d).formatstr("%08X");
+	state_add(TLCS900_XIX,   "XIX",   m_xix.d).formatstr("%08X");
+	state_add(TLCS900_XIY,   "XIY",   m_xiy.d).formatstr("%08X");
+	state_add(TLCS900_XIZ,   "XIZ",   m_xiz.d).formatstr("%08X");
+	state_add(TLCS900_XNSP,  "XNSP",  m_xnsp.d).formatstr("%08X");
+	state_add(TLCS900_XSSP,  "XSSP",  m_xssp.d).formatstr("%08X");
+	state_add(TLCS900_DMAS0, "DMAS0", m_dmas[0].d).formatstr("%08X");
+	state_add(TLCS900_DMAD0, "DMAD0", m_dmad[0].d).formatstr("%08X");
+	state_add(TLCS900_DMAC0, "DMAC0", m_dmac[0].w.l).formatstr("%04X");
+	state_add(TLCS900_DMAM0, "DMAM0", m_dmam[0].b.l).formatstr("%02X");
+	state_add(TLCS900_DMAS1, "DMAS1", m_dmas[1].d).formatstr("%08X");
+	state_add(TLCS900_DMAD1, "DMAD1", m_dmad[1].d).formatstr("%08X");
+	state_add(TLCS900_DMAC1, "DMAC1", m_dmac[1].w.l).formatstr("%04X");
+	state_add(TLCS900_DMAM1, "DMAM1", m_dmam[1].b.l).formatstr("%02X");
+	state_add(TLCS900_DMAS2, "DMAS2", m_dmas[2].d).formatstr("%08X");
+	state_add(TLCS900_DMAD2, "DMAD2", m_dmad[2].d).formatstr("%08X");
+	state_add(TLCS900_DMAC2, "DMAC2", m_dmac[2].w.l).formatstr("%04X");
+	state_add(TLCS900_DMAM2, "DMAM2", m_dmam[2].b.l).formatstr("%02X");
+	state_add(TLCS900_DMAS3, "DMAS3", m_dmas[3].d).formatstr("%08X");
+	state_add(TLCS900_DMAD3, "DMAD3", m_dmad[3].d).formatstr("%08X");
+	state_add(TLCS900_DMAC3, "DMAC3", m_dmac[3].w.l).formatstr("%04X");
+	state_add(TLCS900_DMAM3, "DMAM3", m_dmam[3].b.l).formatstr("%02X");
 
-	state_add( STATE_GENPC, "GENPC", m_pc.d ).callimport().noshow();
-	state_add( STATE_GENPCBASE, "CURPC", m_pc.d ).callimport().noshow();
-	state_add( STATE_GENFLAGS, "GENFLAGS", m_sr.w.l ).formatstr("%12s").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc.d).callimport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc.d).callimport().noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_sr.w.l).formatstr("%12s").noshow();
 
 	set_icountptr(m_icount);
 }
@@ -215,9 +221,9 @@ void tlcs900_device::device_reset()
 
 void tlcs900h_device::device_reset()
 {
-	m_pc.b.l = RDMEM( 0xffff00 );
-	m_pc.b.h = RDMEM( 0xffff01 );
-	m_pc.b.h2 = RDMEM( 0xffff02 );
+	m_pc.b.l = RDMEM(0xff'ff00);
+	m_pc.b.h = RDMEM(0xff'ff01);
+	m_pc.b.h2 = RDMEM(0xff'ff02);
 	m_pc.b.h3 = 0;
 	/* system mode, iff set to 111, max mode, register bank 0 */
 	m_sr.d = 0xf800;
@@ -249,18 +255,18 @@ void tlcs900_device::state_string_export(const device_state_entry &entry, std::s
 	{
 		case STATE_GENFLAGS:
 			str = string_format("%c%d%c%d%c%c%c%c%c%c%c%c",
-					m_sr.w.l & 0x8000 ? 'S' : 'U',
-					( m_sr.w.l & 0x7000 ) >> 12,
-					m_sr.w.l & 0x0800 ? 'M' : 'N',
-					( m_sr.w.l & 0x0700 ) >> 8,
-					m_sr.w.l & 0x0080 ? 'S' : '.',
-					m_sr.w.l & 0x0040 ? 'Z' : '.',
-					m_sr.w.l & 0x0020 ? '1' : '.',
-					m_sr.w.l & 0x0010 ? 'H' : '.',
-					m_sr.w.l & 0x0008 ? '1' : '.',
-					m_sr.w.l & 0x0004 ? 'V' : '.',
-					m_sr.w.l & 0x0002 ? 'N' : '.',
-					m_sr.w.l & 0x0001 ? 'C' : '.' );
+					BIT(m_sr.w.l, 15) ? 'S' : 'U',
+					(m_sr.w.l & 0x7000) >> 12,
+					BIT(m_sr.w.l, 11) ? 'M' : 'N',
+					(m_sr.w.l & 0x0700) >> 8,
+					BIT(m_sr.w.l, 7) ? 'S' : '.',
+					BIT(m_sr.w.l, 6) ? 'Z' : '.',
+					BIT(m_sr.w.l, 5) ? '1' : '.',
+					BIT(m_sr.w.l, 4) ? 'H' : '.',
+					BIT(m_sr.w.l, 3) ? '1' : '.',
+					BIT(m_sr.w.l, 2) ? 'V' : '.',
+					BIT(m_sr.w.l, 1) ? 'N' : '.',
+					BIT(m_sr.w.l, 0) ? 'C' : '.');
 			break;
 	}
 }
@@ -274,13 +280,11 @@ void tlcs900_device::execute_run()
 {
 	do
 	{
-		const tlcs900inst *inst;
-
 		m_cycles = 0;
 
-		if ( m_check_irqs )
+		if (m_check_irqs)
 		{
-			if ( m_irq_inhibit )
+			if (m_irq_inhibit)
 			{
 				/* Interrupt shadow after EI/RETI: on real TLCS-900 hardware,
 				   interrupt acceptance is deferred until after the next instruction
@@ -300,22 +304,16 @@ void tlcs900_device::execute_run()
 			m_irq_inhibit = false;
 		}
 
-		if ( m_halted )
+		if (m_halted)
 		{
 			debugger_wait_hook();
 			m_cycles += 8;
 		}
 		else
 		{
-			debugger_instruction_hook( m_pc.d );
+			debugger_instruction_hook(m_pc.d);
 
-			m_op = RDOP();
-			inst = &m_mnemonic[m_op];
-			prepare_operands( inst );
-
-			/* Execute the instruction */
-			(this->*inst->opfunc)();
-			m_cycles += inst->cycles;
+			execute_op(*m_mnemonic);
 		}
 
 		tlcs900_handle_ad();
@@ -325,5 +323,5 @@ void tlcs900_device::execute_run()
 		tlcs900_check_hdma();
 
 		m_icount -= m_cycles;
-	} while ( m_icount > 0 );
+	} while (m_icount > 0);
 }

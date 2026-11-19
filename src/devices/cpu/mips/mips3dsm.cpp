@@ -400,12 +400,20 @@ uint32_t mips3_disassembler::dasm_idt(uint32_t pc, uint32_t op, std::ostream &st
 	uint32_t flags = 0;
 
 	/* IDT-specific opcodes: mad/madu/mul on R4640/4650, msub on RC32364 */
-	switch (op & 0x1f)
+	switch (op & (m_vr5500 ? 0x3f : 0x1f))
 	{
-		case 0: util::stream_format(stream, "mad       %s,%s", reg[rs], reg[rt]); break;
-		case 1: util::stream_format(stream, "madu      %s,%s", reg[rs], reg[rt]); break;
+		case 0: util::stream_format(stream, "%-10s%s,%s", m_vr5500 ? "madd" : "mad", reg[rs], reg[rt]); break;
+		case 1: util::stream_format(stream, "%-10s%s,%s", m_vr5500 ? "maddu" : "madu", reg[rs], reg[rt]); break;
 		case 2: util::stream_format(stream, "mul       %s,%s,%s", reg[rd], reg[rs], reg[rt]); break;
 		case 4: util::stream_format(stream, "msub      %s,%s", reg[rs], reg[rt]); break;
+		case 5:
+			if (m_vr5500) util::stream_format(stream, "msubu     %s,%s", reg[rs], reg[rt]);
+			else util::stream_format(stream, ".word     0x%08x /*invalid*/", op);
+			break;
+		case 0x20: util::stream_format(stream, "clz       %s,%s", reg[rd], reg[rs]); break;
+		case 0x21: util::stream_format(stream, "clo       %s,%s", reg[rd], reg[rs]); break;
+		case 0x24: util::stream_format(stream, "dclz      %s,%s", reg[rd], reg[rs]); break;
+		case 0x25: util::stream_format(stream, "dclo      %s,%s", reg[rd], reg[rs]); break;
 		default:util::stream_format(stream, ".word     0x%08x /*invalid*/", op);  break;
 	}
 
@@ -887,10 +895,10 @@ offs_t mips3_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 							util::stream_format(stream, "sll       %s,%s,%d", reg[rd], reg[rt], shift);
 					break;
 				case 0x01:  util::stream_format(stream, "mov%c      %s,%s,%d", ((op >> 16) & 1) ? 't' : 'f', reg[rd], reg[rs], (op >> 18) & 7); break;
-				case 0x02:  util::stream_format(stream, "srl       %s,%s,%d", reg[rd], reg[rt], shift);            break;
+				case 0x02:  util::stream_format(stream, "%-10s%s,%s,%d", (m_vr5500 && rs == 1) ? "ror" : "srl", reg[rd], reg[rt], shift);            break;
 				case 0x03:  util::stream_format(stream, "sra       %s,%s,%d", reg[rd], reg[rt], shift);            break;
 				case 0x04:  util::stream_format(stream, "sllv      %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
-				case 0x06:  util::stream_format(stream, "srlv      %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
+				case 0x06:  util::stream_format(stream, "%-10s%s,%s,%s", (m_vr5500 && shift == 1) ? "rorv" : "srlv", reg[rd], reg[rt], reg[rs]);          break;
 				case 0x07:  util::stream_format(stream, "srav      %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
 				case 0x08:  util::stream_format(stream, "jr        %s", reg[rs]); if (rs == 31) flags = STEP_OUT | step_over_extra(1); break;
 				case 0x09:  if (rd == 31)
@@ -909,10 +917,21 @@ offs_t mips3_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 				case 0x12:  util::stream_format(stream, "mflo      %s", reg[rd]);                                  break;
 				case 0x13:  util::stream_format(stream, "mtlo      %s", reg[rs]);                                  break;
 				case 0x14:  util::stream_format(stream, "dsllv     %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
-				case 0x16:  util::stream_format(stream, "dsrlv     %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
+				case 0x16:  util::stream_format(stream, "%-10s%s,%s,%s", (m_vr5500 && shift == 1) ? "drorv" : "dsrlv", reg[rd], reg[rt], reg[rs]);          break;
 				case 0x17:  util::stream_format(stream, "dsrav     %s,%s,%s", reg[rd], reg[rt], reg[rs]);          break;
-				case 0x18:  util::stream_format(stream, "mult      %s,%s", reg[rs], reg[rt]);                      break;
-				case 0x19:  util::stream_format(stream, "multu     %s,%s", reg[rs], reg[rt]);                      break;
+				case 0x18:
+				case 0x19:
+					if (shift != 0)
+					{
+						// VR5500 multiply family: sa bit 1 negates, bit 2 accumulates, bit 3 moves HI
+						util::stream_format(stream, "%-10s%s,%s,%s",
+								std::string(BIT(shift, 2) ? (BIT(shift, 1) ? "msac" : "macc") : (BIT(shift, 1) ? "muls" : "mul"))
+										+ (BIT(shift, 3) ? "hi" : "") + (BIT(op, 0) ? "u" : ""),
+								reg[rd], reg[rs], reg[rt]);
+					}
+					else
+						util::stream_format(stream, "%-10s%s,%s", BIT(op, 0) ? "multu" : "mult", reg[rs], reg[rt]);
+					break;
 				case 0x1a:  util::stream_format(stream, "div       %s,%s", reg[rs], reg[rt]);                      break;
 				case 0x1b:  util::stream_format(stream, "divu      %s,%s", reg[rs], reg[rt]);                      break;
 				case 0x1c:  util::stream_format(stream, "dmult     %s,%s", reg[rs], reg[rt]);                      break;
@@ -960,10 +979,10 @@ offs_t mips3_disassembler::dasm_one(std::ostream &stream, offs_t pc, u32 op)
 				case 0x34:  util::stream_format(stream, "teq       %s,%s", reg[rs], reg[rt]); flags = STEP_OVER; break;
 				case 0x36:  util::stream_format(stream, "tne       %s,%s", reg[rs], reg[rt]) ;flags = STEP_OVER; break;
 				case 0x38:  util::stream_format(stream, "dsll      %s,%s,%d", reg[rd], reg[rt], shift);            break;
-				case 0x3a:  util::stream_format(stream, "dsrl      %s,%s,%d", reg[rd], reg[rt], shift);            break;
+				case 0x3a:  util::stream_format(stream, "%-10s%s,%s,%d", (m_vr5500 && rs == 1) ? "dror" : "dsrl", reg[rd], reg[rt], shift);            break;
 				case 0x3b:  util::stream_format(stream, "dsra      %s,%s,%d", reg[rd], reg[rt], shift);            break;
 				case 0x3c:  util::stream_format(stream, "dsll      %s,%s,%d", reg[rd], reg[rt], shift+32);         break;
-				case 0x3e:  util::stream_format(stream, "dsrl      %s,%s,%d", reg[rd], reg[rt], shift+32);         break;
+				case 0x3e:  util::stream_format(stream, "%-10s%s,%s,%d", (m_vr5500 && rs == 1) ? "dror" : "dsrl", reg[rd], reg[rt], shift+32);         break;
 				case 0x3f:  util::stream_format(stream, "dsra      %s,%s,%d", reg[rd], reg[rt], shift+32);         break;
 				default:    flags = dasm_extra_special(pc, op, stream);                                         break;
 			}

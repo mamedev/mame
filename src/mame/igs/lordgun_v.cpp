@@ -331,9 +331,9 @@ uint32_t lordgun_base_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 	// copy to screen bitmap
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			uint16_t pens[5] = {0};
 

@@ -17,7 +17,7 @@
 
 #include "bus/cbmiec/cbmiec.h"
 #include "bus/rs232/rs232.h"
-#include "cpu/g65816/g65816.h"
+#include "cpu/m6502/w65816.h"
 #include "machine/6522via.h"
 #include "machine/ds1302.h"
 #include "machine/input_merger.h"
@@ -59,7 +59,7 @@ private:
 	void via1_pa_w(uint8_t data);
 	void via2_pb_w(uint8_t data);
 
-	required_device<g65816_device> m_maincpu;
+	required_device<w65816_device> m_maincpu;
 	required_device<tms9918a_device> m_vdp;
 	required_device<ay8910_device> m_psg;
 	required_device<cbm_iec_device> m_iec;
@@ -246,10 +246,10 @@ INPUT_PORTS_END
 
 void we816_state::we816(machine_config &config)
 {
-	G65816(config, m_maincpu, 16_MHz_XTAL / 8);
+	W65816(config, m_maincpu, 16_MHz_XTAL / 8);
 	m_maincpu->set_addrmap(AS_PROGRAM, &we816_state::mem_map);
 
-	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, G65816_LINE_IRQ);
+	INPUT_MERGER_ANY_HIGH(config, "irqs").output_handler().set_inputline(m_maincpu, w65816_device::IRQ_LINE);
 
 	TMS9918A(config, m_vdp, 10.738635_MHz_XTAL).set_screen("screen");
 	m_vdp->set_vram_size(0x8000);

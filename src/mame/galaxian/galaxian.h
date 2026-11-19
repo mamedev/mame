@@ -313,6 +313,7 @@ public:
 	void mandingarf(machine_config &config) ATTR_COLD;
 	void mandinka(machine_config &config) ATTR_COLD;
 	void thepitm(machine_config &config) ATTR_COLD;
+	void amidarc(machine_config &config) ATTR_COLD;
 	void kong(machine_config &config) ATTR_COLD;
 	void bongo(machine_config &config) ATTR_COLD;
 	void bongog(machine_config &config) ATTR_COLD;
@@ -338,6 +339,7 @@ protected:
 	void set_x_scale(uint8_t scale) { m_x_scale = scale; }
 	void set_h0_start(uint8_t start) { m_h0_start = start; }
 
+	void amidarc_map(address_map &map) ATTR_COLD;
 	void amigo2_map(address_map &map) ATTR_COLD;
 	void anteaterg_map(address_map &map) ATTR_COLD;
 	void anteatergg_map(address_map &map) ATTR_COLD;
@@ -938,6 +940,23 @@ private:
 
 	void bmxstunts_map(address_map &map) ATTR_COLD;
 	void snsnd_w(uint8_t data) { m_snsnd->write(bitswap<8>(data,0,1,2,3,4,5,6,7)); }
+};
+
+class staratk_state : public galaxian_state
+{
+public:
+	staratk_state(const machine_config &mconfig, device_type type, const char *tag)
+		: galaxian_state(mconfig, type, tag)
+	{
+	}
+
+	void init_staratk() ATTR_COLD;
+	void staratk(machine_config &config) ATTR_COLD;
+
+private:
+	void staratk_map(address_map &map) ATTR_COLD;
+	void staratk_extend_sprite_info(const uint8_t *base, uint8_t *sx, uint8_t *sy, uint8_t *flipx, uint8_t *flipy, uint16_t *code, uint8_t *color);
+	void staratk_extend_tile_info(uint16_t *code, uint8_t *color, uint8_t attrib, uint8_t x, uint8_t y);
 };
 
 

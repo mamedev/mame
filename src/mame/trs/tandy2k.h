@@ -20,6 +20,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
+#include "machine/sab3019.h"
 #include "machine/timer.h"
 #include "machine/upd765.h"
 #include "sound/spkrdev.h"
@@ -66,7 +67,6 @@ public:
 		m_screen(*this, SCREEN_TAG),
 		m_colpal(*this, "colpal"),
 		m_vrambank(*this, "vrambank"),
-		m_timer_vidldsh(*this, "vidldsh"),
 		m_centronics(*this, CENTRONICS_TAG),
 		m_speaker(*this, "speaker"),
 		m_ram(*this, RAM_TAG),
@@ -77,6 +77,7 @@ public:
 		m_hires_ram(*this, "hires_ram"),
 		m_char_ram(*this, "char_ram", 0x1000, ENDIANNESS_LITTLE),
 		m_pc_keyboard(*this, "pc_keyboard"),
+		m_rtc(*this, "rtc"),
 		m_dma_mux(0),
 		m_kbdclk(0),
 		m_kbddat(0),
@@ -145,7 +146,6 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_colpal;
 	required_device<address_map_bank_device> m_vrambank;
-	required_device<timer_device> m_timer_vidldsh;
 	required_device<centronics_device> m_centronics;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ram_device> m_ram;
@@ -156,6 +156,7 @@ public:
 	required_shared_ptr<uint16_t> m_hires_ram;
 	memory_share_creator<uint8_t> m_char_ram;
 	required_device<pc_keyboard_device> m_pc_keyboard; // temporary until the tandy keyboard has a rom dump
+	required_device<sab3019_device> m_rtc;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -195,10 +196,15 @@ public:
 	void drb_attr_w(uint8_t data);
 	int character_width() const { return m_clkcnt ? 8 : 10; }
 	void set_vidldsh_timer();
+	void vid_catch_up();
+	void colpal_w(offs_t offset, uint8_t data);
 	void kbdclk_w(int state);
 	void kbddat_w(int state);
 	uint8_t clkmouse_r(offs_t offset);
 	void clkmouse_w(offs_t offset, uint8_t data);
+	void rtc_cbus(uint16_t bits, int count);
+	uint8_t rtc_read(int addr);
+	void rtc_set(int addr, uint8_t data);
 	uint8_t irq_callback(offs_t offset);
 	void fdc_drq_w(int state);
 	void fdc_hdl_w(int state);
@@ -208,7 +214,7 @@ public:
 	void write_centronics_select(int state);
 	void write_centronics_fault(int state);
 	CRT9021_DRAW_CHARACTER_MEMBER( vac_draw_character );
-	TIMER_DEVICE_CALLBACK_MEMBER( vidldsh_tick );
+	void vidldsh_tick();
 	static void floppy_formats(format_registration &fr);
 	static rgb_t IRGB(uint32_t raw);
 
@@ -260,6 +266,10 @@ public:
 	bool m_frame = false;
 	int m_int = 0;
 	int m_col = 0;
+	uint8_t m_hchar = 0;
+	attotime m_vid_next;
+	attotime m_vid_period;
+	attotime m_vid_time;
 	int m_row = 0;
 	int m_scanline = 0;
 
@@ -300,14 +310,16 @@ public:
 		m_hdc(*this, "hdc")
 	{
 	}
-	
+
 	void tandy2k_hd(machine_config &config);
-	
+
 protected:
 	required_device<tandy2k_hdc_device> m_hdc;
 
 private:
 	void tandy2k_hd_io(address_map &map) ATTR_COLD;
+
+	void hdc_bdrq_w(int state);
 };
 
 #endif // MAME_TRS_TANDY2K_H

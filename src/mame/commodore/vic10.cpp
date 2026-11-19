@@ -550,9 +550,7 @@ void vic10_state::vic10(machine_config &config)
 	mos6566.set_addrmap(1, &vic10_state::vic_colorram_map);
 
 	screen_device &screen(SCREEN(config, SCREEN_TAG));
-	screen.set_refresh_hz(VIC6566_VRETRACERATE);
-	screen.set_size(VIC6567_COLUMNS, VIC6566_LINES);
-	screen.set_visarea(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
+	screen.set_raw(mos6566_device::VIC6566_CLOCK * 8, mos6566_device::VIC6566_COLUMNS, mos6566_device::VIC6567_FIRST_COLUMN, mos6566_device::VIC6567_FIRST_COLUMN + mos6566_device::VIC6567_VISIBLECOLUMNS, mos6566_device::VIC6566_LINES, 0, mos6566_device::VIC6567_VISIBLELINES);
 	screen.set_screen_update(MOS6566_TAG, FUNC(mos6566_device::screen_update));
 
 	// sound hardware

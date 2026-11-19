@@ -719,7 +719,7 @@ void aica_device::UpdateReg(int reg)
 		case 0x9c: //SCIEB
 		case 0x9d:
 			if (m_udata.data[0x9c / 2] & 0x631)
-				popmessage("AICA: SCIEB enabled %04x, contact MAME/MESSdev",m_udata.data[0x9c / 2]);
+				popmessage("AICA: SCIEB enabled %04x", m_udata.data[0x9c / 2]);
 			break;
 
 		case 0xa4:  //SCIRE
@@ -763,7 +763,7 @@ void aica_device::UpdateReg(int reg)
 		case 0xb4: //MCIEB
 		case 0xb5:
 			if (m_udata.data[0xb4 / 2] & 0x7df)
-				popmessage("AICA: MCIEB enabled %04x, contact MAME/MESSdev",m_udata.data[0xb4 / 2]);
+				popmessage("AICA: MCIEB enabled %04x", m_udata.data[0xb4 / 2]);
 			m_mcieb = m_udata.data[0xb4 / 2];
 			CheckPendingIRQ_SH4();
 			break;

@@ -384,8 +384,8 @@ uint32_t portrait_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	cliprect_scroll = cliprect_no_scroll = cliprect;
 
 	// TODO: make clipping areas more readable
-	cliprect_no_scroll.min_x = cliprect_no_scroll.max_x - 111;
-	cliprect_scroll.max_x = cliprect_scroll.min_x + 319;
+	cliprect_no_scroll.setx(cliprect_no_scroll.right() - 111, cliprect_no_scroll.right());
+	cliprect_scroll.setx(cliprect_scroll.left(), cliprect_scroll.left() + 319);
 
 	// status bar
 	m_background->set_scrolly(0, 0);
@@ -633,6 +633,9 @@ ROM_START( portrait )
 	ROM_REGION( 0x40, "proms", 0 ) // colors
 	ROM_LOAD( "port_pr1.bin", 0x00, 0x0020, CRC(1e2deabb) SHA1(8357e53dba26bca9bc5d7a25c715836f0b3700b9) )
 	ROM_LOAD( "port_pr2.n4",  0x20, 0x0020, CRC(008634f3) SHA1(7cde6b09ede672d562569866d944428198f2ba9c) )
+
+	ROM_REGION( 0x20, "photo_acquisition_pcb_prom", 0 )
+	ROM_LOAD( "74s288.h4", 0x00, 0x20, CRC(b7e49a7e) SHA1(dc69b5ad37fd9bc421659e41afe5ce5e5f496425) )
 ROM_END
 
 ROM_START( portraita )
@@ -667,6 +670,9 @@ ROM_START( portraita )
 	ROM_REGION( 0x40, "proms", 0 ) // colors
 	ROM_LOAD( "port_pr1.bin", 0x00, 0x0020, CRC(1e2deabb) SHA1(8357e53dba26bca9bc5d7a25c715836f0b3700b9) )
 	ROM_LOAD( "port_pr2.n4",  0x20, 0x0020, CRC(008634f3) SHA1(7cde6b09ede672d562569866d944428198f2ba9c) )
+
+	ROM_REGION( 0x20, "photo_acquisition_pcb_prom", 0 )
+	ROM_LOAD( "74s288.h4", 0x00, 0x20, CRC(b7e49a7e) SHA1(dc69b5ad37fd9bc421659e41afe5ce5e5f496425) )
 ROM_END
 
 } // anonymous namespace

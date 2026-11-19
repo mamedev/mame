@@ -3,7 +3,20 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="rtpc" description="IBM RT PC floppy disk images">
+<softwarelist name="rtpc" description="IBM RT PC software">
+
+	<software name="sautil">
+		<description>4.3 BSD UNIX Standalone Maintenance Program Revision 12.0</description>
+		<year>1988</year>
+		<publisher>IBM</publisher>
+		<info name="usage" value="Use this utility to create/update hard disk configuration records, required before VRM/AIX will recognize a blank hard disk. When the main menu is displayed, use option 2 (format), enter &quot;hd(0,2)&quot; for the device, and respond &quot;y&quot; at the &quot;Change defaults?&quot; prompt."/>
+		<part name="sautil" interface="floppy_5_25">
+			<feature name="part_id" value="Standalone Maintenance Program"/>
+			<dataarea name="flop" size="368640">
+				<rom name="sautil.dd" size="368640" crc="f6e9c64d" sha1="42dfbe158277bcd55455f79ef188ed23c571fa4d"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="aix100">
 		<description>IBM RT PC Advanced Interactive Executive Operating System Version 1.00</description>
@@ -566,6 +579,24 @@ license:CC0-1.0
 			<feature name="part_id" value="Virtual Resource Manager Program 2 of 2"/>
 			<dataarea name="flop" size="418876">
 				<rom name="27f4400.imd" size="418876" crc="5387c231" sha1="0d06b029bbb1b9ddc21d2923fb2931aa6cac74f1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aix100_hdd">
+		<description>AIX 1.00 hard disk image</description>
+		<year>1986</year>
+		<publisher>IBM</publisher>
+		<info name="usage" value="Login with username &quot;mame&quot;, no password."/>
+		<part name="hdd" interface="mfm_hdd">
+			<diskarea name="harddriv">
+				<disk name="aix100" sha1="76787e42df10223f6926ef51aa299871c399dfeb" writeable="yes"/>
+			</diskarea>
+		</part>
+		<!-- FIXME: non-bootable floppy must be inserted to boot from hard disk image -->
+		<part name="fdd" interface="floppy_5_25">
+			<dataarea name="flop" size="32">
+				<rom name="blank.mfi" size="32" crc="c1c5761e" sha1="c7554387e812abcabcd4fd907ed546d53579e14c"/>
 			</dataarea>
 		</part>
 	</software>

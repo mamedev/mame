@@ -86,7 +86,12 @@ protected:
 	void vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual uint8_t pc_vga_choosevideomode();
+	// divisor is the base value in pixel units over the horizontal scan when drawing.
+	// Normally 1, bump if the geometry mismatch.
 	void recompute_params_clock(int divisor, int xtal);
+	// clients has to call this over *any* change in CRTC setup, and finalize with recompute_params_clock.
+	// Most often screen setup depends on stuff that is declared in the base regs such as
+	// miscellaneous output.
 	virtual void recompute_params();
 	uint8_t vga_vblank();
 	virtual void enter_setup_mode();
@@ -161,6 +166,8 @@ protected:
 
 		return res;
 	}
+	// TODO: may need an extra parameter or fn for some targets expecting line compare to be << 1
+	// cfr. S3 targets at 1600x1200x8 where SDD value is 0x2ff and feature needs to be knocked out.
 	virtual bool get_interlace_mode() { return false; }
 	virtual void palette_update();
 

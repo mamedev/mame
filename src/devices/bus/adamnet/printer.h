@@ -26,6 +26,8 @@ class adam_printer_device :  public device_t,
 								public device_adamnet_card_interface
 {
 public:
+	static constexpr flags_type emulation_flags() { return flags::NOT_WORKING; }
+
 	// construction/destruction
 	adam_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
@@ -42,6 +44,9 @@ protected:
 
 private:
 	required_device<m6801_cpu_device> m_maincpu;
+
+	uint8_t m_p1;
+	uint8_t m_sensors;
 
 	void p1_w(uint8_t data);
 	uint8_t p2_r();

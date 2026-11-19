@@ -859,11 +859,11 @@ void cmmb_state::draw_atari_sprites(bitmap_ind16 &bitmap, const rectangle &clipr
 	rectangle spriteclip = cliprect;
 	if (m_flipscreen)
 	{
-		spriteclip.min_x += 8;
+		spriteclip.insetx(8, 0);
 	}
 	else
 	{
-		spriteclip.max_x -= 8;
+		spriteclip.insetx(0, 8);
 	}
 
 	u8 const *const spr = &m_rambase[base];

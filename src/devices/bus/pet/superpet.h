@@ -34,6 +34,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override;
 
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -41,14 +42,14 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// device_pet_expansion_card_interface overrides
-	virtual int pet_norom_r(offs_t offset, int sel) override;
-	virtual uint8_t pet_bd_r(offs_t offset, uint8_t data, int &sel) override;
-	virtual void pet_bd_w(offs_t offset, uint8_t data, int &sel) override;
 	virtual int pet_diag_r() override;
 	virtual void pet_irq_w(int state) override;
 
 private:
 	void acia_irq_w(int state);
+	void update_window();
+	void system_w(uint8_t data);
+	void bank_w(uint8_t data);
 
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);

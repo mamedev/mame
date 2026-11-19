@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="compis_hdd" description="Telenova Compis hard disk images">
+
+	<software name="cpm86">
+		<description>CP/M-86</description>
+		<year>1986</year>
+		<publisher>Telenova</publisher>
+		<sharedfeat name="isbx1_default" value="hdc" />
+
+		<part name="hdd" interface="st506_hdd">
+			<diskarea name="harddriv">
+				<disk name="cpm86" sha1="fd3b0e315f384c56ba51496e409137317cf59b46" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

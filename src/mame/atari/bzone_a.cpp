@@ -397,14 +397,19 @@ void bzone_state::bzone_sounds_w(uint8_t data)
 	machine().sound().system_mute(!BIT(data, 5));
 }
 
-void bzone_state::bzone_audio(machine_config &config)
+void bzone_state::bzone_discrete_audio(machine_config &config)
 {
 	SPEAKER(config, "mono").front_center();
+
+	DISCRETE(config, m_discrete, bzone_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void bzone_state::bzone_audio(machine_config &config)
+{
+	bzone_discrete_audio(config);
 
 	pokey_device &pokey(POKEY(config, "pokey", BZONE_MASTER_CLOCK / 8));
 	pokey.allpot_r().set_ioport("IN3");
 	pokey.set_output_rc(RES_K(10), CAP_U(0.015), 5.0);
-	pokey.add_route(0, "discrete", 1.0, 0);
-
-	DISCRETE(config, "discrete", bzone_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);
+	pokey.add_route(0, m_discrete, 1.0, 0);
 }

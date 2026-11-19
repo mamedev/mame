@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    RCA VIP ASCII Keyboard Interface VP-620 emulation
+    RCA VIP VP-620 ASCII Keyboard Cable emulation
 
 **********************************************************************/
 
@@ -12,7 +12,7 @@
 #pragma once
 
 #include "byteio.h"
-#include "machine/keyboard.h"
+#include "vp601.h"
 
 
 
@@ -39,14 +39,19 @@ protected:
 	virtual int vip_ef4_r() override;
 
 private:
-	void kb_w(uint8_t data);
+	void data_w(uint8_t data) { m_data = data; }
+	void st_w(int state) { m_slot->inst_w(state); }
+	void kd_w(int state) { m_kd = bool(state); }
 
-	uint8_t m_keydata;
-	int m_keystb;
+	required_device<vip_ascii_keyboard_port_device> m_kb;
+
+	uint8_t m_data;
+	bool m_kd;
 };
 
 
 // device type definition
 DECLARE_DEVICE_TYPE(VP620, vp620_device)
+
 
 #endif // MAME_BUS_VIP_VP620_H

@@ -105,7 +105,7 @@ public:
 	}
 
 	DECLARE_INPUT_CHANGED_MEMBER(printer_type);
-	void zorba(machine_config &config);
+	void zorba(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -122,6 +122,7 @@ private:
 	void intmask_w(uint8_t data);
 	template <unsigned N> void tx_rx_rdy_w(int state);
 	template <unsigned N> void irq_w(int state);
+	IRQ_CALLBACK_MEMBER(irq_cb);
 
 	// DMA controller handlers
 	uint8_t memory_read_byte(offs_t offset);
@@ -247,6 +248,7 @@ void zorba_state::zorba(machine_config &config)
 	Z80(config, m_maincpu, 24_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zorba_state::zorba_mem);
 	m_maincpu->set_addrmap(AS_IO, &zorba_state::zorba_io);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(zorba_state::irq_cb));
 	m_maincpu->busack_cb().set(m_dma, FUNC(z80dma_device::bai_w));
 
 	/* video hardware */
@@ -457,8 +459,14 @@ template <unsigned N> void zorba_state::tx_rx_rdy_w(int state)
 
 template <unsigned N> void zorba_state::irq_w(int state)
 {
+	uint8_t const prev = m_irq;
 	m_irq = (m_irq & ~(1 << N)) | ((state ? 1 : 0) << N);
+	if (bool(prev) != bool(m_irq))
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_irq ? ASSERT_LINE : CLEAR_LINE);
+}
 
+IRQ_CALLBACK_MEMBER(zorba_state::irq_cb)
+{
 	// TODO: get a good dump of the interrupt vector PROM and get rid of this hack
 	// There are six interrupt sources:
 	// * IRQ0: DMAC/CRTC shared
@@ -470,12 +478,9 @@ template <unsigned N> void zorba_state::irq_w(int state)
 	// Valid vectors are 0x80, 0x84, 0x88, 0x8c, 0x90 and 0x94
 	// Floppy needs to be on 0x80, and RS232 is apparently on 0x88
 	// Everything else, including priority, is a complete guess
-	u8 vector;
-	if (BIT(m_irq, 2))      vector = 0x80;
-	else if (BIT(m_irq, 3)) vector = 0x88;
-	else                    vector = 0x84; // very wrong, need test cases for other things
-
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, m_irq ? ASSERT_LINE : CLEAR_LINE, vector); // Z80
+	if (BIT(m_irq, 2))      return 0x80;
+	else if (BIT(m_irq, 3)) return 0x88;
+	else                    return 0x84; // very wrong, need test cases for other things
 }
 
 

@@ -423,7 +423,7 @@ void votrax_sc01_device::phone_commit()
 
 			// That does not happen in the sc01(a) rom, but let's
 			// cover our behind.
-			if(m_rom_cld == 0)
+			if(m_rom_vd == 0)
 				m_cur_closure = m_rom_closure;
 
 			return;
@@ -450,7 +450,14 @@ void votrax_sc01_device::chip_update()
 		if(m_phonetick == ((m_rom_duration << 2) | 1)) {
 			m_phonetick = 0;
 			m_ticks++;
-			if(m_ticks == m_rom_cld)
+			// The closure latches on the same delay that gates the
+			// noise amplitude (m_rom_vd here).  US 4,433,210 gives the
+			// closure and the fricative amplitude one shared delay and
+			// the vocal amplitude a delay of its own; latching on
+			// m_rom_cld, the field that gates the voice amplitude, kept
+			// a stop's closure on well into the next phone, after its
+			// noise had decayed, so P, T and K lost their release burst.
+			if(m_ticks == m_rom_vd)
 				m_cur_closure = m_rom_closure;
 		}
 	}
@@ -470,7 +477,7 @@ void votrax_sc01_device::chip_update()
 	// noise volumes are zero.
 	if(tick_208 && (!m_rom_pause || !(m_filt_fa || m_filt_va))) {
 		// interpolate(m_cur_va,  m_rom_va);
-		interpolate(m_cur_fc,  m_rom_fc);
+		// fc moves with fa, below
 		interpolate(m_cur_f1,  m_rom_f1);
 		interpolate(m_cur_f2,  m_rom_f2);
 		interpolate(m_cur_f2q, m_rom_f2q);
@@ -480,8 +487,14 @@ void votrax_sc01_device::chip_update()
 
 	// Non-formant update. Same bug there, va should be updated, not fc.
 	if(tick_625) {
-		if(m_ticks >= m_rom_vd)
+		if(m_ticks >= m_rom_vd) {
 			interpolate(m_cur_fa, m_rom_fa);
+			// fc routes the noise, so it moves with the noise amplitude:
+			// fast and on the same delay.  On the slow formant update a
+			// stop's fc was still drifting toward its own value when the
+			// stop released, so its noise took the wrong path.
+			interpolate(m_cur_fc, m_rom_fc);
+		}
 		if(m_ticks >= m_rom_cld) {
 			// interpolate(m_cur_fc, m_rom_fc);
 			interpolate(m_cur_va, m_rom_va);
@@ -620,8 +633,9 @@ sound_stream::sample_t votrax_sc01_device::analog_calc()
 
 	// Noise-only path
 	// 5. Pick up the noise pitch.  Amplitude is linear.  Base
-	// intensity should be checked w.r.t the voice.
-	double n = 1e4 * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1);
+	// intensity checked against line-in SC-01-A recordings: with the
+	// second insertion below corrected, half the previous level.
+	double n = 5e3 * ((m_pitch & 0x40 ? m_cur_noise : false) ? 1 : -1);
 	n = n * m_filt_fa / 15.0;
 	shift_hist(n, m_noise_1);
 
@@ -646,8 +660,12 @@ sound_stream::sample_t votrax_sc01_device::analog_calc()
 	vn = apply_filter(m_vn_1, m_vn_2, m_f3_a, m_f3_b);
 	shift_hist(vn, m_vn_2);
 
-	// 11. Second noise insertion
-	vn += n * (5 + (15^m_filt_fc))/20.0;
+	// 11. Second noise insertion, complementary to the f2 injection
+	// (step 7): fc=15 phones (P, SH, CH) send their noise through f2
+	// only, fc=0 phones (S, Z, T) through here.  The previous
+	// (5 + (15^fc))/20 put a quarter of every phone's noise here, which
+	// made a P's release as loud and bright as a T's.
+	vn += n * (15^m_filt_fc)/15.0;
 	shift_hist(vn, m_vn_3);
 
 	// 12. Apply the f4 filter

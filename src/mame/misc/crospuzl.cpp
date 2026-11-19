@@ -1,41 +1,44 @@
 // license:BSD-3-Clause
 // copyright-holders:Angelo Salese
-/****************************************************************************
+/**************************************************************************************************
 
-    Cross Puzzle
+Cross Puzzle
 
-    driver by Angelo Salese, based off original crystal.cpp by ElSemi
+driver by Angelo Salese, based off original crystal.cpp by ElSemi
 
-    TODO:
-    - The RTC is not hooked up, so its test screen shows nothing useful.  It is
-      not on I2C, which is what an earlier pcf8583 attempt assumed and why the
-      traffic looked like an unrecognized slave address 0x30.  It is a three
-      wire part on the same PIO: CE on bit 22, SCLK on bit 20 and a
-      bidirectional data line on bit 19, the direction register picking who
-      drives it.  The game bit bangs it 4 bits at a time, least significant
-      first (__rtcSendNibble at 0x02018e58, __rtcReadNibble at 0x02018f6c), and
-      a read - 0x02018fb2 - raises CE, sends a command nibble 0xc and a start
-      address nibble 0, then clocks twelve nibbles back and pairs them into six
-      BCD bytes, masking the tens of seconds and minutes to 0x70.  Twelve
-      consecutive 4-bit registers from zero is the MSM6242 / RTC-62421 layout -
-      S1 S10 MI1 MI10 H1 H10 D1 D10 MO1 MO10 Y1 Y10 - so the register model is
-      that of the 4-bit family, but the interface plainly is not: those parts
-      are parallel, and this one is clocked a nibble at a time over three
-      wires.  Whatever it is, it is a serial part carrying that register map.
-    - Lamps / counters.
-    - Are there really DIPs on PCB or is it an assumption?
-    - Is there a payout button or is it game-driven? The hopper test works.
+TODO:
+- Needs a severe CPU downclock hack to boot;
+- Identify RTC type;
+- Lamps / counters;
+- Are there really DIPs on PCB or is it an assumption?
+- Is there a payout button or is it game-driven? The hopper test works.
 
-    Notes:
-    - Game enables UART1 receive irq, if that irq is enable it just prints
-      "___sysUART1_ISR<LF>___sysUART1_ISR_END<LF>"
+Notes:
+- Game enables UART1 receive irq, if that irq is enable it just prints
+    "___sysUART1_ISR<LF>___sysUART1_ISR_END<LF>"
 
-=============================================================================
+Original LLM note about RTC:
+  It is not on I2C, which is what an earlier pcf8583 attempt assumed and why the
+  traffic looked like an unrecognized slave address 0x30.  It is a three
+  wire part on the same PIO: CE on bit 22, SCLK on bit 20 and a
+  bidirectional data line on bit 19, the direction register picking who
+  drives it.  The game bit bangs it 4 bits at a time, least significant
+  first (__rtcSendNibble at 0x02018e58, __rtcReadNibble at 0x02018f6c), and
+  a read - 0x02018fb2 - raises CE, sends a command nibble 0xc and a start
+  address nibble 0, then clocks twelve nibbles back and pairs them into six
+  BCD bytes, masking the tens of seconds and minutes to 0x70.  Twelve
+  consecutive 4-bit registers from zero is the MSM6242 / RTC-62421 layout -
+  S1 S10 MI1 MI10 H1 H10 D1 D10 MO1 MO10 Y1 Y10 - so the register model is
+  that of the 4-bit family, but the interface plainly is not: those parts
+  are parallel, and this one is clocked a nibble at a time over three
+  wires.  Whatever it is, it is a serial part carrying that register map.
+
+===================================================================================================
 
  This PCB uses ADC 'Amazon-LF' SoC, EISC CPU core - However PCBs have been
  seen with a standard VRenderZERO+ MagicEyes EISC chip
 
-=============================================================================
+===================================================================================================
 
  The boot ROM is a two stage affair.  Only 0x430-0xed1c is used; at 0x2000
  sits a u32 little endian decompressed length (0x126ee) followed by an LZSS
@@ -95,7 +98,7 @@
  ready: with a part that never goes busy the first wait times out and the
  loader gives up before reading a single page.
 
-****************************************************************************/
+**************************************************************************************************/
 
 #include "emu.h"
 
@@ -348,17 +351,10 @@ INPUT_PORTS_END
 
 void crospuzl_state::crospuzl(machine_config &config)
 {
-	// The real part runs somewhere around 80 MHz but averages about five cycles
-	// per instruction, while this core retires one per cycle, so it is clocked
-	// at a fifth of that to execute at the right rate.  The software timed delay
-	// loop at 0x024052e6 is the yardstick: sixteen instructions per turn, called
-	// with counts meant to be microseconds - 480 for the 1-Wire reset, 70 for
-	// the presence sample, 6 and 10 for the bit slots - so one microsecond per
-	// turn works out at exactly 16 MHz.  Clock it any faster and the DS2401
-	// never sees a reset long enough to answer.  Revisit once the core counts
-	// cycles.
-	SE3208(config, m_maincpu, 14318180 * 3); // FIXME: 72 MHz-ish
-	m_maincpu->set_clock_scale(0.26);
+	// main program PLL write: 0x5d48
+	// assuming a reference clock of 14'318'180 this gives ~36 MHz
+	// TODO: actual PLL support
+	SE3208(config, m_maincpu, 14'318'180 * (93 + 8) / (18 + 2) / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &crospuzl_state::main_map);
 	m_maincpu->iackx_cb().set(m_vr0soc, FUNC(vrender0soc_device::irq_callback));
 

@@ -39,6 +39,12 @@ void at_mb_device::device_reset()
 {
 	m_at_spkrdata = 0;
 	m_pit_out2 = 1;
+	m_fpu_error = 0;
+	if (m_fpu_irq)
+	{
+		m_fpu_irq = 0;
+		m_pic8259_slave->ir5_w(CLEAR_LINE);
+	}
 	m_dma_channel = -1;
 	m_cur_eop = false;
 }
@@ -48,6 +54,9 @@ void at_mb_device::device_start()
 	// FIXME: this is gross and should be done in machine configuration
 	if(!strncmp(m_maincpu->shortname(), "i80286", 6))
 		downcast<i80286_cpu_device *>(m_maincpu.target())->set_a20_callback(*this, FUNC(at_mb_device::a20_286));
+
+	save_item(NAME(m_fpu_error));
+	save_item(NAME(m_fpu_irq));
 }
 
 void at_mb_device::at_softlists(machine_config &config)
@@ -122,9 +131,9 @@ void at_mb_device::device_add_mconfig(machine_config &config)
 	m_isabus->irq5_callback().set("pic8259_master", FUNC(pic8259_device::ir5_w));
 	m_isabus->irq6_callback().set("pic8259_master", FUNC(pic8259_device::ir6_w));
 	m_isabus->irq7_callback().set("pic8259_master", FUNC(pic8259_device::ir7_w));
-	m_isabus->irq10_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir3_w));
-	m_isabus->irq11_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir4_w));
-	m_isabus->irq12_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir5_w));
+	m_isabus->irq10_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir2_w));
+	m_isabus->irq11_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir3_w));
+	m_isabus->irq12_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir4_w));
 	m_isabus->irq14_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir6_w));
 	m_isabus->irq15_callback().set(m_pic8259_slave, FUNC(pic8259_device::ir7_w));
 	m_isabus->drq0_callback().set(m_dma8237_1, FUNC(am9517a_device::dreq0_w));
@@ -165,6 +174,27 @@ void at_mb_device::map(address_map &map)
 	map(0x0080, 0x009f).rw(FUNC(at_mb_device::page8_r), FUNC(at_mb_device::page8_w)).umask16(0xffff);
 	map(0x00a0, 0x00bf).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0xffff);
 	map(0x00c0, 0x00df).rw("dma8237_2", FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask16(0x00ff);
+	map(0x00f0, 0x00f0).w(FUNC(at_mb_device::fpu_clear_w));
+}
+
+// 80287/80387 ERROR# is latched onto IRQ13, a write to port F0h clears the latch
+void at_mb_device::fpu_error_w(int state)
+{
+	if (state && !m_fpu_error && !m_fpu_irq)
+	{
+		m_fpu_irq = 1;
+		m_pic8259_slave->ir5_w(ASSERT_LINE);
+	}
+	m_fpu_error = state ? 1 : 0;
+}
+
+void at_mb_device::fpu_clear_w(uint8_t data)
+{
+	if (m_fpu_irq)
+	{
+		m_fpu_irq = 0;
+		m_pic8259_slave->ir5_w(CLEAR_LINE);
+	}
 }
 
 /*************************************************************

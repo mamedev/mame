@@ -53,6 +53,9 @@ private:
 	void fdc_intrq_w(int state);
 	void fdc_drq_w(int state);
 
+	bool stall_data_access();
+	void release_stall();
+
 	// internal state
 	required_device<mb8866_device> m_fdc;
 	required_device<com8116_device> m_dbrg;
@@ -78,6 +81,7 @@ private:
 	int m_access_enbl;          // access enable
 	int m_board_enbl;           // board enable
 	int m_phantom;              // phantom
+	int m_stalled;              // RDY held low waiting for DRQ/INTRQ
 };
 
 

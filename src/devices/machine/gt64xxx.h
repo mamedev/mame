@@ -121,6 +121,14 @@ private:
 
 	void cpu_map(address_map &map) ATTR_COLD;
 
+	// a processor window's low register holds address bits 35:21 and its high register bits 27:21
+	uint32_t proc_window_start(int lo) const { return m_reg[lo] << 21; }
+	uint32_t proc_window_end(int lo) const { return (((m_reg[lo] & ~0x7f) | (m_reg[lo + 2] & 0x7f)) << 21) | 0x1fffff; }
+
+	// a DRAM bank or device's registers hold address bits 27:20 within its processor window
+	uint32_t sub_window_start(int proc_lo, int lo) const { return ((m_reg[proc_lo] & ~0x7f) << 21) | ((m_reg[lo] & 0xff) << 20); }
+	uint32_t sub_window_end(int proc_lo, int lo) const { return ((m_reg[proc_lo] & ~0x7f) << 21) | ((m_reg[lo + 1] & 0xff) << 20) | 0xfffff; }
+
 	void map_cpu_space();
 
 	uint32_t m_prev_addr;

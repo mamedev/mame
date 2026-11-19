@@ -194,10 +194,17 @@ INPUT_PORTS_END
 
 void cdi_state::machine_start()
 {
+	save_item(NAME(m_cdic_intreq));
+	save_item(NAME(m_dvc_intreq));
+	save_item(NAME(m_in4_owner));
+
+	m_maincpu->uart_ctsn(0);
 }
 
 void cdi_state::machine_reset()
 {
+	std::fill_n(&m_plane_ram[0][0], m_plane_ram[0].length(), 0);
+
 	uint16_t *src = &m_main_rom[0];
 	uint16_t *dst = &m_plane_ram[0][0];
 	memcpy(dst, src, 0x8);
@@ -215,6 +222,7 @@ void quizard_state::machine_start()
 	cdi_state::machine_start();
 
 	save_item(NAME(m_boot_press));
+	save_item(NAME(m_mcu_rxd));
 
 	m_boot_timer = timer_alloc(FUNC(quizard_state::boot_press_tick), this);
 }
@@ -226,6 +234,7 @@ void quizard_state::machine_reset()
 	m_boot_press = false;
 	m_boot_timer->adjust(attotime::from_seconds(22), 1);
 	m_mcu_rxd = 1;
+	m_maincpu->uart_ctsn(1);
 }
 
 
@@ -441,7 +450,6 @@ void cdi_state::cdimono1_base(machine_config &config)
 	m_maincpu->out_txd_cb().set(m_serial_port, FUNC(rs232_port_device::write_txd));
 	m_maincpu->uart_rtsn_callback().set(m_serial_port, FUNC(rs232_port_device::write_rts));
 	m_serial_port->rxd_handler().set(m_maincpu, FUNC(scc68070_device::rx_w));
-	m_serial_port->cts_handler().set(m_maincpu, FUNC(scc68070_device::uart_ctsn));
 
 	m_maincpu->iack4_callback().set(FUNC(cdi_state::in4_iack_r));
 

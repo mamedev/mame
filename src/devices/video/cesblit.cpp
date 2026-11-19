@@ -41,8 +41,8 @@
 
     Color Register:
 
-                fedc ba98 ---- ----       Source Pen (Pen Replacement Mode)
-                ---- ---- 7654 3210       Palette (0-f) / Destination Pen (Pen Replacement Mode)
+                fedc ba98 ---- ----       Destination Pen (Pen Replacement Mode)
+                ---- ---- 7654 3210       Palette (0-f) / Source Pen (Pen Replacement Mode)
 
     A write to the source address (mid) triggers the blit.
     A the end of the blit, an IRQ is issued.
@@ -75,7 +75,8 @@ cesblit_device::cesblit_device(const machine_config &mconfig, const char *tag, d
 	device_video_interface(mconfig, *this),
 	device_memory_interface(mconfig, *this),
 	m_space_config("blitter_space", ENDIANNESS_BIG, 16, 23),
-	m_blit_irq_cb(*this)
+	m_blit_irq_cb(*this),
+	m_extended_palette(false)
 {
 }
 
@@ -205,7 +206,7 @@ void cesblit_device::do_blit()
 	if (flipy)  { y0 = sh-1;    y1 = -1;    dy = -1;    sy -= sh-1; }
 	else        { y0 = 0;       y1 = sh;    dy = +1;    }
 
-	int color = (m_color & 0x0f) << 8;
+	int color = m_extended_palette ? ((m_color & 0x0f) << 8) : 0;
 
 	// Draw
 
@@ -232,7 +233,7 @@ void cesblit_device::do_blit()
 							pen = dst_pen;
 
 						if (pen != 0xff)
-							bitmap.pix((sy + y) & 0x1ff, (sx + x) & 0x1ff) = pen + color;
+							bitmap.pix((sy + y) & 0x1ff, (sx + x) & 0x1ff) = pen;
 
 						++addr;
 					}

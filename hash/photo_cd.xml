@@ -7,11 +7,164 @@ https://redump.info/discs/system/photo-cd/
 -->
 <softwarelist name="photo_cd" description="Kodak Photo CD images (Beige Book)">
 
-	<software name="toilhana" supported="no">
+	<software name="flowers" supported="partial">
+		<!--
+		Origin: TOSEC
+		<rom name="Flowers of Robert Mapplethorpe, The (1992)(Philips)(US)(Track 1 of 2)[!][Photo CD].iso" size="511030800" crc="fbf3915f" md5="22ae24fd51d368f534b3963aed4a8350"/>
+		<rom name="Flowers of Robert Mapplethorpe, The (1992)(Philips)(US)(Track 2 of 2)[!][Photo CD].wav" size="218030444" crc="73b4776b" md5="ac291bb92f9033e9a90cb8572de02a6c"/>
+		<rom name="Flowers of Robert Mapplethorpe, The (1992)(Philips)(US)[!][Photo CD].cue" size="333" crc="5d4e0813" md5="7d75fbaa2960289a5f4a17e591db0b76"/>
+		-->
+		<description>The Flowers of Robert Mapplethorpe (USA)</description>
+		<year>1992</year>
+		<publisher>Philips Interactive Media</publisher>
+		<notes><![CDATA[
+https://www.theworldofcdi.com/cd-i_encyclopedia/flowers-of-robert-mapplethorpe/
+3do_*: either purges the disc or hangs with a blue screen, incompatible?
+]]></notes>
+		<info name="barcode" value="7 31069 02232 9"/>
+		<info name="serial" value="310690223-2"/>
+		<!-- PCEC: PP0223 GA -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="flowers of robert mapplethorpe, the (1992)(philips)(us)[photo cd]" sha1="e66a82313a0894eff7d93803febb645c7fd67f07"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="howphoto" supported="partial">
+		<!--
+		Origin: TOSEC
+		<rom name="How to Photograph Nature (1993)(Philips)(US)(Track 1 of 2)[!][CD-i-Photo CD].iso" size="490392000" crc="e3c64107" md5="c9b23be5e796b517f29b77a358f7deaf"/>
+		<rom name="How to Photograph Nature (1993)(Philips)(US)(Track 2 of 2)[!][CD-i-Photo CD].wav" size="230202044" crc="c92dbd5b" md5="d816d1ef2c27d4f10be7e0ba7b8f274e"/>
+		<rom name="How to Photograph Nature (1993)(Philips)(US)[!][CD-i-Photo CD].cue" size="321" crc="7a10ddfa" md5="59c7d8e28bb242bf0c0c6a33491b03fc"/>
+		-->
+		<description>How to Photograph Nature (USA)</description>
+		<year>1993</year>
+		<publisher>Philips Interactive Media</publisher>
+		<notes><![CDATA[
+https://www.theworldofcdi.com/cd-i_encyclopedia/how-to-photograph-nature/
+3do_*: either purges the disc or hangs with a blue screen, incompatible?
+]]></notes>
+		<info name="barcode" value="73106902248"/>
+		<info name="serial" value="310690224-2"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="how to photograph nature (1993)(philips)(us)[cd-i-photo cd]" sha1="5a0338596cec6feef16283ba7c3aa30066d48a77"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="pcd1904" supported="partial">
+		<!--
+		Origin: Foxhack
+		<rom name="PCD1904 (Track 1).bin" size="818496" crc="1d037f6d" md5="05dde46197ea63a14510717960e414fd" sha1="0a805e88a5f40e5fd6ba8a579cb6ca0cf379ed05" />
+		<rom name="PCD1904 (Track 2).bin" size="100018800" crc="24233b6d" md5="24444ff73512426f74e2fc0505bf0df6" sha1="34c8dd58666d502ede55d632e643bd121426a1a0" />
+		<rom name="PCD1904 (Track 3).bin" size="16581600" crc="b779625b" md5="fc057c2568599b68bd3a657e3688ef85" sha1="b3c4ad5df7568b0a891d192bc49f673e352fd243" />
+		<rom name="PCD1904 (Track 4).bin" size="4762800" crc="88c2e4e9" md5="cd6402f0b46c83996d24826a03186c3c" sha1="5690073a9162bf31123e07f6fdd8e1ddcc8077d4" />
+		<rom name="PCD1904 (Track 5).bin" size="132300000" crc="c4a7ee90" md5="3c4731edeffded203ab96c184edd84d1" sha1="723f14cad145fb8dc197d2066ae77fb09a775d93" />
+		<rom name="PCD1904 (Track 6).bin" size="38631600" crc="099b3382" md5="2bc8816b0d2194801e6a98e756067613" sha1="79712b1aa0a0b5b4901d3ed91cde25ac871b029d" />
+		<rom name="PCD1904 (Track 7).bin" size="26460000" crc="7b76c4b6" md5="4586c3b510abf2dee4ac532a2ad6bf86" sha1="3407398b97cae5d5af4121cd2759c85f1dcf4b49" />
+		<rom name="PCD1904 (Track 8).bin" size="26283600" crc="825108c2" md5="c118c88266b337ebbd5df15bca71a8a5" sha1="24d9e26729e780891a598657fabf11a41708f67a" />
+		<rom name="PCD1904 (Track 9).bin" size="41207040" crc="823fb562" md5="f2abea76d3e4d823c2356232ad60d39c" sha1="ce794bbf1b299107133cb8797342e44868d90b6c" />
+
+		Note: This is a Windows ISO9660-formatted CD that included Photo CD on CD-Interactive, Version 3.1 (April 14, 1993). This disc also works under Windows
+		3.1, and includes demo software for that platform.
+
+		-->
+		<description>The Photo CD Book Companion CD-ROM</description>
+		<year>1994</year>
+		<publisher>Abacus</publisher>
+		<notes><![CDATA[
+3do_fz1*: purged at startup, incompatible?
+ibmpc win95: verify compatibility (conceals mouse cursor on Win 3.1 style windowing)
+]]></notes>
+		<info name="barcode" value="0 90869 55262 8"/>
+		<info name="isbn" value="1-55755-262-2"/>
+		<!-- Side of box art -->
+		<info name="serial" value="S262"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="pcd1904" sha1="19c7875a0329b2a75b3c0c05fa646536473e8c7d"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="photocdd" supported="partial">
+		<!--
+		Origin: TOSEC
+		<rom name="Photo CD Demo Disc v3.2 (1995)(Philips)(EU)[1995-11].iso" size="297281040" crc="4090c3ad" md5="ee6557e858a6b789bb622c34e429c54e"/>
+		<rom name="Photo CD Demo Disc v3.2 (1995)(Philips)(EU)[1995-11].cue" size="141" crc="16767025" md5="e0be2e958b118049ec1d582e24f4332c"/>
+		-->
+		<description>Photo CD Demo Disc (Europe, v3.2)</description>
+		<year>1995</year>
+		<publisher>Philips Interactive Media</publisher>
+		<notes><![CDATA[
+https://www.theworldofcdi.com/cd-i_encyclopedia/photo-cd-demo-disc-3-2/
+3do_fz1*: purged at startup, incompatible?
+pcfx: background strip of garbage on thumbnails screen (verify)
+]]></notes>
+		<info name="release" value="199511xx"/>
+		<!-- serial: 902272 / 998014 -->
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="photo cd demo disc v3.2 (1995)(philips)(eu)[1995-11]" sha1="d32fb0741e06f247c6f2b7e49c66ea284a0d5caf"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="photocddo" cloneof="photocdd" supported="partial">
+		<!--
+		Origin: TOSEC
+		<rom name="Photo CD Demo Disc v3.0 (1993)(Philips)(EU)[1993-03].iso" size="463108800" crc="58fce69a" md5="c5cb66dff16c1ec69bc118a394eab777"/>
+		<rom name="Photo CD Demo Disc v3.0 (1993)(Philips)(EU)[1993-03].cue" size="141" crc="5f1b92d2" md5="9f82863685d80426ce9e0eb37fe4d703"/>
+		-->
+		<description>Photo CD Demo Disc (Europe, v3.0)</description>
+		<year>1993</year>
+		<publisher>Philips Interactive Media</publisher>
+		<notes><![CDATA[
+https://www.theworldofcdi.com/cd-i_encyclopedia/photo-cd-demo-disc-3-0/
+3do_fz1*: purged at startup, incompatible?
+]]></notes>
+		<info name="release" value="199303xx"/>
+		<info name="serial" value="819.0007"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="photo cd demo disc v3.0 (1993)(philips)(eu)[1993-03]" sha1="bd46faaebe1725eb345de81dd912187b74b4dea8"/>
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="schonste" supported="no">
+		<!--
+		Origin: TOSEC
+		<rom name="Schonsten Hotels der Welt, Die - von Burba Holiday (1992)(Philips)(DE)[!][Photo CD].iso" size="117835200" crc="be3eabc9" md5="e1bea9ed5369040db3e669409ce362da"/>
+		<rom name="Schonsten Hotels der Welt, Die - von Burba Holiday (1992)(Philips)(DE)[!][Photo CD].cue" size="172" crc="cbdde2d5" md5="e0029a07753cb512891111325f0c4536"/>
+		-->
+		<description>Die Schonsten Hotels der Welt: von Burba Holiday (Germany)</description>
+		<year>1992</year>
+		<publisher>Philips Interactive Media</publisher>
+		<notes><![CDATA[
+https://www.theworldofcdi.com/cd-i_encyclopedia/die-schonsten-hotels-der-welt/
+3do_fz1*: purged at startup, incompatible?
+pcfx: hangs at 4th photo of 1st hotel package (that shows as rotated in CD-i) (verify)
+cdimono1: doesn't show main menu as pcfx (last photo, verify), thumbnail 19 doesn't decode properly (bad dump?)
+]]></notes>
+		<info name="serial" value="8130060"/>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="schonsten hotels der welt, die - von burba holiday (1992)(philips)(de)[photo cd]" sha1="f233fa4abf5b60a363f1e664a3f5688193e05a78" status="baddump" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="toilhana" supported="partial">
 		<!-- https://redump.info/disc/103991/ -->
 		<description>Toilet no Hanako-san (Japan)</description>
 		<year>1995</year>
 		<publisher>Times In</publisher>
+		<notes><![CDATA[
+3do_fz*: DSPP punts with a loud bang once its supposed to playback any voice
+]]></notes>
 		<info name="alt_title" value="トイレの花子さん" />
 		<info name="serial" value="PCD0924" />
 		<part name="cdrom" interface="cdrom">
@@ -21,11 +174,14 @@ https://redump.info/discs/system/photo-cd/
 		</part>
 	</software>
 
-	<software name="winsenna" supported="no">
+	<software name="winsenna" supported="partial">
 		<!-- https://redump.info/disc/103998/ -->
 		<description>Winning Run: Ayrton Senna: 20-nen no Kiseki (Japan)</description>
 		<year>1995</year>
 		<publisher>Kasakura Shuppan</publisher>
+		<notes><![CDATA[
+3do_fz*: Doesn't playback any voice (verify)
+]]></notes>
 		<info name="alt_title" value="ＷＩＮＮＩＮＧ ＲＵＮ アイルトン・セナ ２０年の軌跡" />
 		<info name="barcode" value="T4934878151235" />
 		<info name="serial" value="PCD0806" />

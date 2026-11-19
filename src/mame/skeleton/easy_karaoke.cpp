@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MagikalUnicorn
 /******************************************************************************
 
     IVL Technologies Karaoke systems
@@ -85,6 +85,20 @@
     different unique bytes after the header information for each unit we've seen. (maybe encryption?)
     The bootloader ROM has a unique ID on a sticker in each case too (could be a bytesum, haven't checked)
 
+    Bandai implementation notes:
+    - Clarity's ARM720T uses the shared ARM core; cache/write-buffer timing is not modelled.
+    - TC58V64BFT NAND is accessed through byte-wide data, command and address windows.
+    - The loader's NTSC framebuffer is full-range UYVY with separate even/odd fields.
+    - USB cable detection selects the download screen, but the USB peripheral is not emulated.
+
+    - Initial IRQ/FIQ masking, timer 0, codec frame sync and audio DMA are implemented.
+      Counter clocks and audio framing still need hardware verification. Audio output
+      through the IVL support chip is not implemented.
+
+    TODO: IVL support-chip cipher (busy is held high until implemented), remaining
+    Clarity timers/watchdog, full codec/FIFO operation, cartridge protocol, GPIO and
+    video timing.
+
 
 *******************************************************************************/
 
@@ -94,6 +108,8 @@
 
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "machine/clock.h"
+#include "machine/nandflash.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -109,9 +125,16 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_screen(*this, "screen")
+		, m_nand(*this, "nand")
+		, m_gpiob(*this, "GPIOB")
+		, m_gpioext(*this, "GPIO_EXT")
+		, m_ram(*this, "ram")
+		, m_codec_clock(*this, "codec_clock")
 	{ }
 
-	void ivl_karaoke_base(machine_config &config);
+	void ivl_karaoke_base(machine_config &config) ATTR_COLD;
+	void ivl_karaoke_base_pal(machine_config &config) ATTR_COLD;
+	void ivl_karaoke_nand(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -120,12 +143,47 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
+	optional_device<nand_device> m_nand;
+	required_ioport m_gpiob;
+	required_ioport m_gpioext;
+	required_shared_ptr<u32> m_ram;
+	optional_device<clock_device> m_codec_clock;
+	u16 m_flash_control = 0;
+	u16 m_gpio_output = 0;
+	u16 m_gpio_direction = 0;
+	u16 m_video_dma[6] = {};
+	u16 m_video_timing[4] = {};
+	u16 m_interrupt_pending[2] = {};
+	u16 m_interrupt_enable[2] = {};
+	u16 m_timer_control = 0;
+	u16 m_timer_reload = 0;
+	emu_timer *m_tick_timer = nullptr;
+	u16 m_peripheral_enable = 0;
+	u16 m_codec_control[13] = {};
+	u16 m_audio_dma[2][8] = {};
+	u32 m_audio_active[2][3] = {};
+	emu_timer *m_audio_timer[2] = {};
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	uint32_t a000004_r();
+	template <unsigned Bank> u16 interrupt_r(offs_t offset);
+	template <unsigned Bank> void interrupt_w(offs_t offset, u16 data, u16 mem_mask);
+	void update_interrupts();
+	void timer_control_w(offs_t offset, u16 data, u16 mem_mask);
+	void timer_reload_w(offs_t offset, u16 data, u16 mem_mask);
+	void update_timer();
+	TIMER_CALLBACK_MEMBER(timer_expired);
+	void vblank_w(int state);
+	u16 peripheral_status_r();
+	void peripheral_enable_w(offs_t offset, u16 data, u16 mem_mask);
+	void codec_control_w(offs_t offset, u16 data, u16 mem_mask);
+	template <unsigned Channel> u16 audio_dma_r(offs_t offset);
+	template <unsigned Channel> void audio_dma_w(offs_t offset, u16 data, u16 mem_mask);
+	void update_audio_dma(unsigned channel);
+	TIMER_CALLBACK_MEMBER(audio_dma_complete);
 
 	void arm_map(address_map &map) ATTR_COLD;
+	void nand_map(address_map &map) ATTR_COLD;
 };
 
 class easy_karaoke_cartslot_state : public ivl_karaoke_state
@@ -137,12 +195,15 @@ public:
 		, m_cart_region(nullptr)
 	{ }
 
-	void easy_karaoke(machine_config &config);
+	void ivl_karaoke_rom_pal(machine_config &config) ATTR_COLD;
+	void ivl_karaoke_rom_ntsc(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 
 private:
+	void add_cart_slot(machine_config &config) ATTR_COLD;
+
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
 	required_device<generic_slot_device> m_cart;
@@ -151,12 +212,64 @@ private:
 
 uint32_t ivl_karaoke_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	bitmap.fill(rgb_t::black(), cliprect);
+	if (!BIT(m_video_dma[1], 0))
+		return 0;
+
+	u32 const base = m_video_dma[4] | (u32(m_video_dma[5]) << 16);
+	u32 const length = m_video_dma[2] | (u32(m_video_dma[3]) << 16);
+	u32 const stride = u32(m_video_timing[2]) + 1;
+	if (stride < 4 || length < stride || (stride & 3) || (base & 3))
+		return 0;
+
+	// NTSC loader output is UYVY, with the two fields stored consecutively.
+	// TODO: other DMA formats, PAL, and the encoder's interlaced output timing.
+	u32 const rows = length / stride;
+	u32 const field_offset = ((rows + 1) / 2) * stride;
+	rectangle visible = cliprect & screen.visible_area();
+	visible &= rectangle(0, stride / 2 - 1, 0, rows ? rows - 1 : 0);
+	for (int y = visible.top(); y <= visible.bottom(); y++)
+	{
+		u64 const row = u64(base) + (y / 2) * stride + (BIT(y, 0) ? field_offset : 0);
+		if (row + stride > m_ram.bytes())
+			continue;
+
+		for (int x = visible.left(); x <= visible.right(); x++)
+		{
+			u32 const pixels = m_ram[(row + (x & ~1) * 2) / 4];
+			int const luminance = BIT(pixels, BIT(x, 0) ? 24 : 8, 8);
+			int const u = int(BIT(pixels, 0, 8)) - 128;
+			int const v = int(BIT(pixels, 16, 8)) - 128;
+			// Full-range BT.601, matching the loader's RGB-to-YUV conversion.
+			bitmap.pix(y, x) = rgb_t(
+				std::clamp(luminance + ((5743 * v) >> 12), 0, 255),
+				std::clamp(luminance - ((1410 * u + 2925 * v) >> 12), 0, 255),
+				std::clamp(luminance + ((7258 * u) >> 12), 0, 255));
+		}
+	}
 	return 0;
 }
 
 void ivl_karaoke_state::machine_start()
 {
+	m_tick_timer = timer_alloc(FUNC(ivl_karaoke_state::timer_expired), this);
+	for (auto &timer : m_audio_timer)
+		timer = timer_alloc(FUNC(ivl_karaoke_state::audio_dma_complete), this);
 
+	save_item(NAME(m_flash_control));
+	save_item(NAME(m_gpio_output));
+	save_item(NAME(m_gpio_direction));
+	save_item(NAME(m_video_dma));
+	save_item(NAME(m_video_timing));
+	save_item(NAME(m_interrupt_pending));
+	save_item(NAME(m_interrupt_enable));
+	save_item(NAME(m_timer_control));
+	save_item(NAME(m_timer_reload));
+	save_item(NAME(m_peripheral_enable));
+	save_item(NAME(m_codec_control));
+	save_item(NAME(m_audio_dma));
+	save_item(NAME(m_audio_active));
+	machine().save().register_postload(save_prepost_delegate(FUNC(ivl_karaoke_state::update_interrupts), this));
 }
 
 void easy_karaoke_cartslot_state::machine_start()
@@ -172,6 +285,25 @@ void easy_karaoke_cartslot_state::machine_start()
 
 void ivl_karaoke_state::machine_reset()
 {
+	m_flash_control = 0;
+	m_gpio_output = 0;
+	m_gpio_direction = 0;
+	std::fill(std::begin(m_video_dma), std::end(m_video_dma), 0);
+	std::fill(std::begin(m_video_timing), std::end(m_video_timing), 0);
+	std::fill(std::begin(m_interrupt_pending), std::end(m_interrupt_pending), 0);
+	std::fill(std::begin(m_interrupt_enable), std::end(m_interrupt_enable), 0);
+	m_timer_control = 0;
+	m_timer_reload = 0;
+	m_tick_timer->adjust(attotime::never);
+	m_peripheral_enable = 0;
+	std::fill(std::begin(m_codec_control), std::end(m_codec_control), 0);
+	for (auto &channel : m_audio_dma)
+		std::fill(std::begin(channel), std::end(channel), 0);
+	for (auto &channel : m_audio_active)
+		std::fill(std::begin(channel), std::end(channel), 0);
+	for (auto &timer : m_audio_timer)
+		timer->adjust(attotime::never);
+	update_interrupts();
 	m_maincpu->set_state_int(arm7_cpu_device::ARM7_R15, 0x04000000);
 }
 
@@ -186,44 +318,288 @@ DEVICE_IMAGE_LOAD_MEMBER(easy_karaoke_cartslot_state::cart_load)
 }
 
 static INPUT_PORTS_START( ivl_karaoke )
+	PORT_START("GPIOB")
+	// The loader samples this active-low input before entering its shutdown path.
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_POWER_OFF)
+	PORT_BIT(0xbf, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("GPIO_EXT")
+	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0xfdff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-uint32_t ivl_karaoke_state::a000004_r()
+static INPUT_PORTS_START( ivl_karaoke_nand )
+	PORT_INCLUDE(ivl_karaoke)
+
+	PORT_MODIFY("GPIO_EXT")
+	// Active-low cable detection selects the loader's download mode. USB is not emulated.
+	PORT_CONFNAME(0x0200, 0x0200, "USB Cable")
+	PORT_CONFSETTING(0x0200, "Disconnected")
+	PORT_CONFSETTING(0x0000, "Connected")
+	PORT_BIT(0xfdff, IP_ACTIVE_HIGH, IPT_UNUSED)
+INPUT_PORTS_END
+
+template <unsigned Bank> u16 ivl_karaoke_state::interrupt_r(offs_t offset)
 {
-	return machine().rand();
+	switch (offset)
+	{
+	case 0: return m_interrupt_pending[Bank] & m_interrupt_enable[Bank];
+	case 1: return m_interrupt_pending[Bank];
+	case 2: return m_interrupt_enable[Bank];
+	default: return 0;
+	}
+}
+
+template <unsigned Bank> void ivl_karaoke_state::interrupt_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	switch (offset)
+	{
+	case 1: m_interrupt_pending[Bank] &= ~(data & mem_mask); break;
+	case 2: m_interrupt_enable[Bank] |= data & mem_mask; break;
+	case 3: m_interrupt_enable[Bank] &= ~(data & mem_mask); break;
+	}
+	update_interrupts();
+}
+
+void ivl_karaoke_state::update_interrupts()
+{
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, (m_interrupt_pending[0] & m_interrupt_enable[0]) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(arm7_cpu_device::ARM7_FIRQ_LINE, (m_interrupt_pending[1] & m_interrupt_enable[1]) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void ivl_karaoke_state::timer_control_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_timer_control);
+	update_timer();
+}
+
+void ivl_karaoke_state::timer_reload_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_timer_reload);
+	update_timer();
+}
+
+void ivl_karaoke_state::update_timer()
+{
+	m_tick_timer->adjust(attotime::never);
+	if (!BIT(m_timer_control, 15))
+		return;
+
+	// TODO: verify Clarity's clock selectors/prescaler. These two rates are
+	// inferred from the ROM delay loop and loader's apparent 5 ms timebase.
+	u32 timer_clock;
+	switch (m_timer_control & 7)
+	{
+	case 3: timer_clock = m_maincpu->clock() / 3; break;
+	case 5: timer_clock = m_maincpu->clock() / 10; break;
+	default: return;
+	}
+	attotime const period = attotime::from_ticks(u32(m_timer_reload) + 1, timer_clock);
+	m_tick_timer->adjust(period, 0, period);
+}
+
+TIMER_CALLBACK_MEMBER(ivl_karaoke_state::timer_expired)
+{
+	m_interrupt_pending[0] |= 0x10;
+	update_interrupts();
+}
+
+void ivl_karaoke_state::vblank_w(int state)
+{
+	if (state && BIT(m_video_dma[1], 0))
+	{
+		m_interrupt_pending[0] |= 0x40;
+		update_interrupts();
+	}
+}
+
+u16 ivl_karaoke_state::peripheral_status_r()
+{
+	u16 status = 0;
+
+	if (m_nand)
+		status = m_nand->is_busy() ? 0 : 4;
+
+	// The loader synchronises to a codec frame edge before enabling DMA.
+	if (BIT(m_peripheral_enable, 0) && (m_codec_control[12] & 3))
+		status |= m_codec_clock->signal_r();
+	return status;
+}
+
+void ivl_karaoke_state::peripheral_enable_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	u16 const previous = m_peripheral_enable;
+	COMBINE_DATA(&m_peripheral_enable);
+	for (unsigned channel = 0; channel != 2; channel++)
+		if (BIT(previous ^ m_peripheral_enable, channel ? 4 : 0))
+			update_audio_dma(channel);
+}
+
+void ivl_karaoke_state::codec_control_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	u16 const previous = m_codec_control[offset];
+	COMBINE_DATA(&m_codec_control[offset]);
+	if (offset == 12 && ((previous ^ m_codec_control[offset]) & 3))
+	{
+		update_audio_dma(0);
+		update_audio_dma(1);
+	}
+}
+
+template <unsigned Channel> u16 ivl_karaoke_state::audio_dma_r(offs_t offset)
+{
+	return m_audio_dma[Channel][offset];
+}
+
+template <unsigned Channel> void ivl_karaoke_state::audio_dma_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	u16 const previous = m_audio_dma[Channel][offset];
+	COMBINE_DATA(&m_audio_dma[Channel][offset]);
+	if (offset == 1 && BIT(previous ^ m_audio_dma[Channel][offset], 0))
+		update_audio_dma(Channel);
+}
+
+void ivl_karaoke_state::update_audio_dma(unsigned channel)
+{
+	m_audio_timer[channel]->adjust(attotime::never);
+	if (!BIT(m_audio_dma[channel][1], 0) || !BIT(m_peripheral_enable, channel ? 4 : 0) || !(m_codec_control[12] & 3))
+		return;
+
+	u32 const bytes = m_audio_dma[channel][2] | (u32(m_audio_dma[channel][3]) << 16);
+	if (bytes)
+	{
+		m_audio_active[channel][0] = bytes;
+		m_audio_active[channel][1] = m_audio_dma[channel][4] | (u32(m_audio_dma[channel][5]) << 16);
+		m_audio_active[channel][2] = m_audio_dma[channel][6] | (u32(m_audio_dma[channel][7]) << 16);
+		m_audio_timer[channel]->adjust(attotime::from_ticks((u64(bytes) + 3) / 4, m_codec_clock->clock()), channel);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(ivl_karaoke_state::audio_dma_complete)
+{
+	auto &dma = m_audio_dma[param];
+	u32 const bytes = m_audio_active[param][0];
+	u32 const source = m_audio_active[param][1];
+	u32 const destination = m_audio_active[param][2];
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+	if (!param)
+	{
+		// Capture silence until the codec/microphone path is implemented.
+		if (u64(destination) + bytes <= m_ram.bytes())
+			for (u32 pos = 0; pos + 1 < bytes; pos += 2)
+				space.write_word(destination + pos, 0);
+	}
+	else if (u64(source) + bytes <= m_ram.bytes())
+	{
+		for (u32 pos = 0; pos + 1 < bytes; pos += 2)
+			space.write_word(destination, space.read_word(source + pos));
+	}
+
+	// Firmware advances the programmed address and explicitly rearms each block.
+	dma[1] &= ~1;
+	m_interrupt_pending[1] |= param ? 8 : 1;
+	update_interrupts();
 }
 
 void ivl_karaoke_state::arm_map(address_map &map)
 {
-	map(0x00000000, 0x007fffff).ram();
+	map(0x00000000, 0x007fffff).ram().share("ram");
 	map(0x04000000, 0x047fffff).rom().region("maincpu", 0);
-	map(0x0a000004, 0x0a000007).r(FUNC(ivl_karaoke_state::a000004_r));
+	map(0x0a000000, 0x0a00010f).unmaprw();
+	map(0x0a000000, 0x0a00000f).umask32(0x0000ffff).rw(FUNC(ivl_karaoke_state::interrupt_r<0>), FUNC(ivl_karaoke_state::interrupt_w<0>));
+	map(0x0a000100, 0x0a00010f).umask32(0x0000ffff).rw(FUNC(ivl_karaoke_state::interrupt_r<1>), FUNC(ivl_karaoke_state::interrupt_w<1>));
+	map(0x0a800000, 0x0a800001).lr16(NAME([this]() { return m_timer_control; })).w(FUNC(ivl_karaoke_state::timer_control_w));
+	map(0x0a800030, 0x0a800031).lr16(NAME([this]() { return m_timer_reload; })).w(FUNC(ivl_karaoke_state::timer_reload_w));
+	map(0x0c001000, 0x0c001017).umask32(0x0000ffff).lrw16(
+		NAME([this](offs_t offset) { return m_video_dma[offset]; }),
+		NAME([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_video_dma[offset]); }));
+	map(0x0c002000, 0x0c00200f).umask32(0x0000ffff).lrw16(
+		NAME([this](offs_t offset) { return m_video_timing[offset]; }),
+		NAME([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_video_timing[offset]); }));
+	map(0x0c800000, 0x0c800033).umask32(0x0000ffff).lr16(NAME([this](offs_t offset) { return m_codec_control[offset]; }))
+		.w(FUNC(ivl_karaoke_state::codec_control_w));
+	map(0x0c801000, 0x0c80101f).umask32(0x0000ffff).rw(FUNC(ivl_karaoke_state::audio_dma_r<0>), FUNC(ivl_karaoke_state::audio_dma_w<0>));
+	map(0x0cc01000, 0x0cc0101f).umask32(0x0000ffff).rw(FUNC(ivl_karaoke_state::audio_dma_r<1>), FUNC(ivl_karaoke_state::audio_dma_w<1>));
+
+	map(0x0e800000, 0x0e800003).nopw(); // TODO: IVL support-chip audio FIFO
+	// The cipher is not implemented; do not feed fabricated plaintext to the loader.
+	map(0x0f000034, 0x0f000034).lr8(NAME([this]() { return m_gpiob->read() | 0x80; }));
+	map(0x0f000048, 0x0f000049).lr16(NAME([this]() { return m_peripheral_enable; })).w(FUNC(ivl_karaoke_state::peripheral_enable_w));
+	map(0x0f000070, 0x0f000071).lrw16(
+		NAME([this]() { return m_flash_control; }),
+		NAME([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_flash_control); }));
+	map(0x0f000074, 0x0f000075).r(FUNC(ivl_karaoke_state::peripheral_status_r));
+	map(0x0f00007c, 0x0f00007d).lrw16(
+		NAME([this]() { return (m_gpio_output & m_gpio_direction) | (m_gpioext->read() & ~m_gpio_direction); }),
+		NAME([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_gpio_output); }));
+	map(0x0f000080, 0x0f000081).lrw16(
+		NAME([this]() { return m_gpio_direction; }),
+		NAME([this](offs_t offset, u16 data, u16 mem_mask) { COMBINE_DATA(&m_gpio_direction); }));
+
 }
 
+void ivl_karaoke_state::nand_map(address_map &map)
+{
+	arm_map(map);
+	map(0x0e400000, 0x0e400000).rw(m_nand, FUNC(nand_device::data_r), FUNC(nand_device::data_w));
+	map(0x0e400001, 0x0e400001).w(m_nand, FUNC(nand_device::command_w));
+	map(0x0e400002, 0x0e400002).w(m_nand, FUNC(nand_device::address_w));
+}
 
 void ivl_karaoke_state::ivl_karaoke_base(machine_config &config)
 {
-	ARM9(config, m_maincpu, 72000000); // ARM 720 core
+	ARM720T(config, m_maincpu, 72000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ivl_karaoke_state::arm_map);
 
+	// Provisional nominal voice-codec rate; Clarity's divider/format fields need decoding.
+	CLOCK(config, m_codec_clock, 8000);
+
 	SCREEN(config, m_screen);
-	m_screen->set_refresh_hz(60);
-	m_screen->set_size(320, 262);
-	m_screen->set_visarea(0, 320-1, 0, 240-1);
+	m_screen->set_refresh_hz(60'000.0 / 1001);
+	m_screen->set_size(720, 480);
+	m_screen->set_visarea(0, 719, 0, 479);
+	m_screen->set_physical_aspect(4, 3);
+	m_screen->screen_vblank().set(FUNC(ivl_karaoke_state::vblank_w));
 	m_screen->set_screen_update(FUNC(ivl_karaoke_state::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
 }
 
-void easy_karaoke_cartslot_state::easy_karaoke(machine_config &config)
+void ivl_karaoke_state::ivl_karaoke_base_pal(machine_config &config)
 {
 	ivl_karaoke_base(config);
+	m_screen->set_refresh_hz(50);
+	m_screen->set_size(720, 600);
+	m_screen->set_visarea(0, 719, 0, 511);
+}
 
+void ivl_karaoke_state::ivl_karaoke_nand(machine_config &config)
+{
+	ivl_karaoke_base(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ivl_karaoke_state::nand_map);
+	TOSHIBA_TC58V64BFT(config, m_nand);
+}
+
+void easy_karaoke_cartslot_state::add_cart_slot(machine_config &config)
+{
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "easy_karaoke_cart");
 	m_cart->set_width(GENERIC_ROM16_WIDTH);
 	m_cart->set_device_load(FUNC(easy_karaoke_cartslot_state::cart_load));
 	SOFTWARE_LIST(config, "cart_list").set_original("easy_karaoke_cart");
 }
+
+void easy_karaoke_cartslot_state::ivl_karaoke_rom_pal(machine_config &config)
+{
+	ivl_karaoke_base_pal(config);
+	add_cart_slot(config);
+}
+
+void easy_karaoke_cartslot_state::ivl_karaoke_rom_ntsc(machine_config &config)
+{
+	ivl_karaoke_base(config);
+	add_cart_slot(config);
+}
+
 
 /*
 The 'karatvst' set has the following 50 songs built in, there don't appear to be any downloaded songs in this NAND dump
@@ -534,21 +910,13 @@ ROM_END
 
 ROM_START( bkarasta )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "1ed041.u9", 0x000000, 0x20000, CRC(b6a9c84b) SHA1(062b44dfbbf1dcbc40aa86ab0836fc19c6bddcd5) ) // bootloader
-
-	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
-	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(50ff920d) SHA1(421850df09d7f407291de31102ebcdfc69da1872) )
-ROM_END
-
-ROM_START( bkarastb )
-	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "1f2aea.u9", 0x000000, 0x20000, CRC(4001da51) SHA1(3b3a7cc08d8a30b6b8a422c108d71cb34b0c0b3a) ) // bootloader
 
 	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
 	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(a7e8ae4f) SHA1(69cc81c574a47c9b1e8c6570b6d3f1144ec99168) )
 ROM_END
 
-ROM_START( bkarastc )
+ROM_START( bkarastb )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "1f260f.u9", 0x000000, 0x20000, CRC(a8ba923f) SHA1(79295b4508b02d9db2dd38b785693146c5be34f2) ) // bootloader
 
@@ -556,7 +924,7 @@ ROM_START( bkarastc )
 	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(34cafa82) SHA1(4c3970a996c06398d11ada88fa412e0e66ebf509) )
 ROM_END
 
-ROM_START( bkarastd )
+ROM_START( bkarastc )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "1f2589.u9", 0x000000, 0x20000, CRC(62cec581) SHA1(c7737be096805565db53ab668089296efb4a8984) ) // bootloader
 
@@ -564,7 +932,7 @@ ROM_START( bkarastd )
 	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(491578a4) SHA1(e20be74daa83fce5dcd5d90822de73f98b7d25d5) )
 ROM_END
 
-ROM_START( bkaraste )
+ROM_START( bkarastd )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "1f4808.u9", 0x000000, 0x20000, CRC(77244cac) SHA1(17b8db2d94a0f83a175d6ad8ce8ffd31ebb8500b) ) // bootloader
 
@@ -572,7 +940,7 @@ ROM_START( bkaraste )
 	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(6b3985f3) SHA1(8dda8ece164d6cbad99f6f6cfde5a714c7271e1f) )
 ROM_END
 
-ROM_START( bkarastf )
+ROM_START( bkaraste )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "200cc8.u9", 0x000000, 0x20000, CRC(2e24ad8a) SHA1(64e4b7756c1a8818f8c445286f63113f6b5c61c6) ) // bootloader
 
@@ -580,6 +948,13 @@ ROM_START( bkarastf )
 	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(4d300ac8) SHA1(afec80f68265e1cd81de6024be4b744acf9a2d3c) )
 ROM_END
 
+ROM_START( bkarastf )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "1ed041.u9", 0x000000, 0x20000, CRC(b6a9c84b) SHA1(062b44dfbbf1dcbc40aa86ab0836fc19c6bddcd5) ) // bootloader
+
+	ROM_REGION( 0x840000, "nand", ROMREGION_ERASEFF ) // NAND with main program, graphics, built in songs (and potentially user downloads)
+	ROM_LOAD( "tc58v64bft_with_spare.u8", 0x000000, 0x840000, CRC(50ff920d) SHA1(421850df09d7f407291de31102ebcdfc69da1872) )
+ROM_END
 
 /*
 The 'easykara' set has the following 10 songs built in.
@@ -785,27 +1160,29 @@ ROM_END
 
 // This is the original US release, there's no cartridge slot, but it has a NAND Flash inside, and in addition to 50 built-in songs, advertises
 // use of a (now defunct) www.onkeysongs.com service for downloading additional songs to the microphone via bundled PC software.
-CONS( 2002, karatvst,      0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 50 songs)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2002, karatvsta,     karatvst,       0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 25 songs, 'FREE 35 Hit Songs / $35 value' packaging)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 25 songs on unit, download code for 10 songs
+CONS( 2002, karatvst,      0,              0,      ivl_karaoke_nand, ivl_karaoke_nand, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 50 songs)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, karatvsta,     karatvst,       0,      ivl_karaoke_nand, ivl_karaoke_nand, ivl_karaoke_state, empty_init, "IVL Technologies", "KaraokeTV Star (US, with 25 songs, 'FREE 35 Hit Songs / $35 value' packaging)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 25 songs on unit, download code for 10 songs
 
 // The "Memorex Star Singer Karaoke / MKS4001" is also made by IVL and boasts 50 built in songs, the casing is different too.
-CONS( 2002, mks4001,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Memorex license)", "Star Singer Karaoke (MKS4001)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 50 songs built in, appears to have around 54 downloads, including a test download
+CONS( 2002, mks4001,       0,              0,      ivl_karaoke_nand, ivl_karaoke_nand, ivl_karaoke_state, empty_init, "IVL Technologies (Memorex license)", "Star Singer Karaoke (MKS4001)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // 50 songs built in, appears to have around 54 downloads, including a test download
 
 // Bandai's Japanese release also lacks a cartridge slot, relying on downloads for additional songs. It also comes with a CD containing the PC-side software.  The external microphone design differs slightly.
-CONS( 2002, bkarast,       0,              0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2002, bkarasta,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2002, bkarastb,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2002, bkarastc,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 4)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2002, bkarastd,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2002, bkaraste,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station (Japan, set 6)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, bkarast,       0,              0,      ivl_karaoke_nand, ivl_karaoke_nand, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai / u's mobile license)", "Karaoke Station (Japan, set 1)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, bkarasta,      bkarast,        0,      ivl_karaoke_nand, ivl_karaoke_nand, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai / u's mobile license)", "Karaoke Station (Japan, set 2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, bkarastb,      bkarast,        0,      ivl_karaoke_nand, ivl_karaoke_nand, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai / u's mobile license)", "Karaoke Station (Japan, set 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, bkarastc,      bkarast,        0,      ivl_karaoke_nand, ivl_karaoke_nand, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai / u's mobile license)", "Karaoke Station (Japan, set 4)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, bkarastd,      bkarast,        0,      ivl_karaoke_nand, ivl_karaoke_nand, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai / u's mobile license)", "Karaoke Station (Japan, set 5)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// might be another 'for girls' set as it boots to a Sammy logo
+CONS( 2002, bkarastf,      bkarast,        0,      ivl_karaoke_nand, ivl_karaoke_nand, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai / Sammy license)", "Karaoke Station (Japan, set 6)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 // this set has no downloaded data (or session data) suggesting it hasn't been used, the headers on the 3 songs that are included are different from the above sets however, so these themed units are likely different from factory
-CONS( 2002, bkarastf,      bkarast,        0,      ivl_karaoke_base, ivl_karaoke, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai license)", "Karaoke Station 'For Girls' (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2002, bkaraste,      bkarast,        0,      ivl_karaoke_nand, ivl_karaoke_nand, ivl_karaoke_state, empty_init, "IVL Technologies (Bandai / Sammy license)", "Karaoke Station 'For Girls' (Japan)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // The European releases take cartridges rather than relying on a download service
-CONS( 2004, easykara,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2004, easykara,      0,              0,      ivl_karaoke_rom_pal, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Easy Karaoke license)", "Easy Karaoke Groove Station (UK)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
-CONS( 2003, karams,        0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",             "KaraokeMicro Star (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2003, karamsg,       0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook / Imago license)",     "Karaoke Microphone Pro / KaraokeMicro Star (Greece)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // KaraokeMicro Star branding is used on-screen, Karaoke Microphone Pro on the box
+CONS( 2003, karams,        0,              0,      ivl_karaoke_rom_pal, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook license)",             "KaraokeMicro Star (France)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2003, karamsg,       0,              0,      ivl_karaoke_rom_pal, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Lexibook / Imago license)",     "Karaoke Microphone Pro / KaraokeMicro Star (Greece)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // KaraokeMicro Star branding is used on-screen, Karaoke Microphone Pro on the box
 
-CONS( 2003, dks7000c,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Classic Handheld Karaoke Player (DKS7000-C)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-CONS( 2003, dks7000p,      0,              0,      easy_karaoke, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Princess Handheld Karaoke Player (DKS7000-P)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+// US Disney releases take cartridges
+CONS( 2003, dks7000c,      0,              0,      ivl_karaoke_rom_ntsc, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Classic Handheld Karaoke Player (DKS7000-C)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+CONS( 2003, dks7000p,      0,              0,      ivl_karaoke_rom_ntsc, ivl_karaoke, easy_karaoke_cartslot_state, empty_init, "IVL Technologies (Disney / Memcorp Inc license)", "Disney Princess Handheld Karaoke Player (DKS7000-P)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

@@ -176,17 +176,20 @@ void gba_rom_wariotws_device::device_start()
 
 void gba_rom_wariotws_device::device_reset()
 {
+	gba_rom_sram_device::device_reset();
 	m_last_val = 0;
 	m_counter = 0;
 }
 
 void gba_rom_flash_device::device_reset()
 {
+	gba_rom_device::device_reset();
 	m_flash_mask = 0xffff/4;
 }
 
 void gba_rom_flash1m_device::device_reset()
 {
+	gba_rom_device::device_reset();
 	m_flash_mask = 0x1ffff/4;
 }
 
@@ -210,6 +213,7 @@ void gba_rom_yoshiug_device::device_start()
 
 void gba_rom_yoshiug_device::device_reset()
 {
+	gba_rom_eeprom_device::device_reset();
 	m_tilt_ready = 0;
 	m_xpos = 0;
 	m_ypos = 0;
@@ -218,6 +222,8 @@ void gba_rom_yoshiug_device::device_reset()
 
 void gba_rom_eeprom64_device::device_start()
 {
+	gba_rom_device::device_start();
+
 	// for the moment we use a custom eeprom implementation, so we alloc/save it as nvram
 	nvram_alloc(0x2000);
 	m_eeprom = std::make_unique<gba_eeprom_device>(machine(), (uint8_t*)get_nvram_base(), get_nvram_size(), 14);
@@ -233,6 +239,7 @@ void gba_rom_boktai_device::device_start()
 
 void gba_rom_boktai_device::device_reset()
 {
+	gba_rom_eeprom64_device::device_reset();
 	m_last_val = 0;
 	m_counter = 0;
 }
@@ -247,6 +254,7 @@ void gba_rom_3dmatrix_device::device_start()
 
 void gba_rom_3dmatrix_device::device_reset()
 {
+	gba_rom_device::device_reset();
 	m_src = 0;
 	m_dst = 0;
 	m_nblock = 0;

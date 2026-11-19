@@ -21,7 +21,6 @@ ATMEL 93C46 EEPROM
 
 
 TODO:
-- crashes strong with ACRTC, plenty of unsupported features (starting with COMMAND_DWT);
 - EEPROM;
 - sound;
 - I/Os;
@@ -49,14 +48,16 @@ class hy268a_state : public driver_device
 {
 public:
 	hy268a_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_acrtc(*this, "acrtc")
 	{ }
 
 	void xycs(machine_config &config) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
+	required_device<hd63484_device> m_acrtc;
 
 	void program_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
@@ -70,11 +71,13 @@ void hy268a_state::program_map(address_map &map)
 
 	map(0x000000, 0x07ffff).rom();
 	map(0x110020, 0x110021).portr("IN0");
+	map(0x110040, 0x110043).w("ymsnd", FUNC(ym2413_device::write)).umask16(0x00ff);
 	map(0x170000, 0x170003).rw("acrtc", FUNC(hd63484_device::read16), FUNC(hd63484_device::write16));
 	map(0x170009, 0x170009).w("ramdac", FUNC(ramdac_device::index_w));
 	map(0x17000b, 0x17000b).w("ramdac", FUNC(ramdac_device::pal_w));
 	map(0x17000d, 0x17000d).w("ramdac", FUNC(ramdac_device::mask_w));
 	map(0x1f0000, 0x1f7fff).ram();
+
 }
 
 void hy268a_state::ramdac_map(address_map &map)
@@ -84,21 +87,31 @@ void hy268a_state::ramdac_map(address_map &map)
 
 void hy268a_state::hd63484_map(address_map &map)
 {
-	// TODO: likely banked, also writes
-	map(0x00000, 0xfffff).rom().region("tiles", 0);
+	// TODO: Fix banks
+	map(0x00000, 0x3ffff).ram();
+	map(0x40000, 0xbffff).rom().region("tiles", 0x000000);
+	map(0xc0000, 0xfffff).rom().region("tiles", 0x200000); 
 }
 
 
 static INPUT_PORTS_START( xycs )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_DIPUNKNOWN_DIPLOC(0x0001, 0x0001, "IN0:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x0002, 0x0002, "IN0:2")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) 	
+	PORT_BIT(0x0008, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )	
+	PORT_DIPUNKNOWN_DIPLOC(0x0020, 0x0020, "IN0:6")
+	PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_START )
+	PORT_DIPUNKNOWN_DIPLOC(0x0080, 0x0080, "IN0:8")
+	PORT_DIPUNKNOWN_DIPLOC(0x0100, 0x0100, "IN0:9")
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	
+	PORT_BIT( 0x0800, IPT_MEMORY_RESET, IPT_COIN1 ) 
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	
+   PORT_DIPUNKNOWN_DIPLOC(0x4000, 0x4000, "IN0:15")
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -143,7 +156,8 @@ void hy268a_state::xycs(machine_config &config)
 
 	RAMDAC(config, "ramdac", "palette").set_addrmap(0, &hy268a_state::ramdac_map);
 
-	HD63484(config, "acrtc", 22_MHz_XTAL / 4).set_addrmap(0, &hy268a_state::hd63484_map); // divider not verified
+	HD63484(config, m_acrtc, 22_MHz_XTAL / 4).set_addrmap(0, &hy268a_state::hd63484_map); // divider not verified
+	m_acrtc->set_auto_configure_screen(false);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();

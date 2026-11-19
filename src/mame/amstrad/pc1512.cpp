@@ -1197,6 +1197,7 @@ void pc1512_state::pc1512(machine_config &config)
 	AMS40041(config, m_vdu, XTAL(28'636'363));
 	m_vdu->set_screen(SCREEN_TAG);
 	m_vdu->set_show_border_area(true);
+	m_vdu->lk_rd_callback().set_ioport("LK");
 
 	// sound
 	SPEAKER(config, "mono").front_center();

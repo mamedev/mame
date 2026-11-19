@@ -1274,10 +1274,10 @@ void gamegear_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rg
 	const rectangle visarea = screen.visible_area();
 
 	/* Plot positions relative to visarea minimum values */
-	const int plot_min_x = cliprect.min_x - visarea.min_x;
-	const int plot_max_x = std::min(cliprect.max_x - visarea.min_x, 159); // avoid m_line_buffer overflow.
-	const int plot_min_y = cliprect.min_y - visarea.min_y;
-	const int plot_max_y = cliprect.max_y - visarea.min_y;
+	const int plot_min_x = cliprect.left() - visarea.left();
+	const int plot_max_x = std::min(cliprect.right() - visarea.left(), 159); // avoid m_line_buffer overflow.
+	const int plot_min_y = cliprect.top() - visarea.top();
+	const int plot_max_y = cliprect.bottom() - visarea.top();
 
 	/* For each group of 3 SMS pixels, a group of 2 GG pixels is processed.
 	   In case the cliprect coordinates may map any region of the visible area,
@@ -1287,12 +1287,12 @@ void gamegear_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rg
 
 	/* Calculation of the minimum scaled value for X */
 	const int visarea_xcenter = visarea.xcenter();
-	const int sms_offset_min_x = ((int) (visarea_xcenter - cliprect.min_x) / 2) * 3;
+	const int sms_offset_min_x = (int(visarea_xcenter - cliprect.left()) / 2) * 3;
 	const int sms_min_x = visarea_xcenter - sms_offset_min_x;
 
 	/* Calculation of the minimum scaled value for Y */
 	const int visarea_ycenter = visarea.ycenter();
-	const int sms_offset_min_y = ((int) (visarea_ycenter - cliprect.min_y) / 2) * 3;
+	const int sms_offset_min_y = (int(visarea_ycenter - cliprect.top()) / 2) * 3;
 	const int sms_min_y = visarea_ycenter - sms_offset_min_y;
 
 	int sms_y = sms_min_y;
@@ -1316,9 +1316,9 @@ void gamegear_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rg
 			{
 				int *combineline_buffer =  m_line_buffer.get() + (sms_y2 & 0x03) * 160;
 
-				if (sms_y2 >= vdp_bitmap.cliprect().min_y && sms_y2 <= vdp_bitmap.cliprect().max_y)
+				if (vdp_bitmap.cliprect().containsy(sms_y2))
 				{
-					uint32_t *const vdp_buffer =  &vdp_bitmap.pix(sms_y2);
+					uint32_t *const vdp_buffer = &vdp_bitmap.pix(sms_y2);
 
 					int sms_x = sms_min_x;
 					int x_min_i = plot_min_x - plot_x_first_group;
@@ -1332,7 +1332,7 @@ void gamegear_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rg
 						{
 							int combined = 0;
 
-							if (sms_x + x_i >= vdp_bitmap.cliprect().min_x && sms_x + x_i + 1 <= vdp_bitmap.cliprect().max_x)
+							if (sms_x + x_i >= vdp_bitmap.cliprect().left() && sms_x + x_i + 1 <= vdp_bitmap.cliprect().right())
 							{
 								switch (x_i)
 								{
@@ -1381,7 +1381,7 @@ void gamegear_state::screen_gg_sms_mode_scaling(screen_device &screen, bitmap_rg
 				line3 = m_line_buffer.get() + ((sms_y + y_i + 1) & 0x03) * 160;
 				line4 = m_line_buffer.get() + ((sms_y + y_i + 2) & 0x03) * 160;
 
-				uint32_t *const p_bitmap = &bitmap.pix(visarea.min_y + plot_y_group + y_i, visarea.min_x);
+				uint32_t *const p_bitmap = &bitmap.pix(visarea.top() + plot_y_group + y_i, visarea.left());
 
 				for (int plot_x = plot_min_x; plot_x <= plot_max_x; plot_x++)
 				{
@@ -1438,12 +1438,12 @@ uint32_t gamegear_state::screen_update_gamegear(screen_device &screen, bitmap_rg
 	{
 		// HACK: fake LCD persistence effect
 		// (it would be better to generalize this in the core, to be used for all LCD systems)
-		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 		{
 			uint32_t *const linedst = &bitmap.pix(y);
 			uint32_t const *const line0 = &source_bitmap->pix(y);
 			uint32_t const *const line1 = &m_prev_bitmap.pix(y);
-			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+			for (int x = cliprect.left(); x <= cliprect.right(); x++)
 			{
 				uint32_t color0 = line0[x];
 				uint32_t color1 = line1[x];

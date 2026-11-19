@@ -37,7 +37,6 @@ when actually playing the games because otherwise you'll be sending inputs to th
 #include "machine/fdc37c93x.h"
 #include "machine/i82371sb.h"
 #include "machine/i82439hx.h"
-#include "machine/i82439tx.h"
 #include "machine/pci.h"
 
 #include "jaleco_vj_ups.h"

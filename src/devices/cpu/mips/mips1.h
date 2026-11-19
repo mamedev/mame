@@ -253,6 +253,9 @@ class iop_device : public mips1core_device_base
 {
 public:
 	iop_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
+
+protected:
+	virtual translate_result translate(int intention, offs_t &address, bool debug) override;
 };
 
 DECLARE_DEVICE_TYPE(R2000,       r2000_device)

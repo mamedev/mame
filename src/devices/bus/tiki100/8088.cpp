@@ -107,6 +107,11 @@ void tiki100_8088_device::device_start()
 			0xc0000, 0xcffff,
 			read8sm_delegate(*m_bus, FUNC(tiki100_bus_device::exin_mrq_r)),
 			write8sm_delegate(*m_bus, FUNC(tiki100_bus_device::exin_mrq_w)));
+
+	m_maincpu->space(AS_IO).install_readwrite_handler(
+			0x00, 0x7e,
+			read8sm_delegate(*m_bus, FUNC(tiki100_bus_device::exin_iorq_r)),
+			write8sm_delegate(*m_bus, FUNC(tiki100_bus_device::exin_iorq_w)));
 }
 
 

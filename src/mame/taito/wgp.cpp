@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Graves
+// copyright-holders:David Graves, R. Belmont
 // thanks-to:Richard Bush
 
 /***************************************************************************
@@ -8,6 +8,7 @@ WGP    (c) Taito Corporation 1989
 ===
 
 David Graves
+Sprite and full-screen ROZ plus some cleanup by R. Belmont
 
 (Thanks to Richard Bush and the Raine team for their
 preliminary driver.)
@@ -70,17 +71,14 @@ TODO
 
 Offer fake-dip selectable analogue steer
 
-Is piv/sprite layers rotation control at 0x600000 ?
+Verify the global rotation origin and the function of rotation ports 4-7.
 
 Verify y-zoom is correct on the stages that use it (including WGP 2
 default course). Row zoom may be hard to verify, but WGP 2 course
 selection screen is probably a good test.
 
-Implement proper positioning/zoom/rotation for sprites.
-
-(The current sprite coord calculations are kludgy and flawed and
-ignore four control words. The sprites also seem jerky
-and have [int?] timing glitches.)
+Verify sprite positioning and drawing extent (the Y alignment is a
+heuristic). The sprites also seem jerky and have [int?] timing glitches.
 
 DIP coinage
 
@@ -184,19 +182,9 @@ when 0x20 would be correct. Careless programming: in the lookup
 table Taito got codes 6 and 7 back to front. Enable the patch in
 init_wgp to correct this... I can't see what changes.
 
-I'm guessing sprites may be variable size, and the junk sprites
-mapped +0x9b80-9d80 are 2x2 tiles rather than 4x4.
-
-If we only use the first 4 tilemapping words, then the junk sprites
-look fine. But their spacing is bad: they have gaps left between
-them. They'll need to be magnified to 2x size - the pixel zoom
-value must do this automatically.
-
-This ties in with the lookup table we need to draw the sprites:
-it makes sense if our standard 4x4 tile sprite is actually 4 2x2
-sprites.
-
-But what tells the sprite hardware if a sprite is 2x2 or 4x4 ??
+2x2 objects use the first quadrant of a 4x4 sprite map with the same
+source offsets and increments; WGP halves their drawing extent (+$06,
+see $2362), which crops the garbage copied after the map.
 
 
 Data ROM entry
@@ -410,12 +398,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "sound/ymopn.h"
 
 #include "emupal.h"
-#include "input.h" // for video debug keys
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
 
 #include <algorithm>
+#include <cmath>
+#include <limits>
 
 
 namespace {
@@ -482,7 +471,8 @@ private:
 	u16 m_piv_scrollx[3]{};
 	u16 m_piv_scrolly[3]{};
 	u16 m_rotate_ctrl[8]{};
-	[[maybe_unused]] u8 m_dislayer[4]{};
+	bitmap_ind16 m_rotate_bitmap;
+	bitmap_ind8 m_rotate_priority;
 
 	// misc
 	u16 m_cpua_ctrl = 0;
@@ -513,8 +503,9 @@ private:
 
 	template<unsigned Offset> TILE_GET_INFO_MEMBER(get_piv_tile_info);
 
-	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs);
-	void piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority);
+	void draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, int y_offs);
+	void piv_layer_draw(bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, int layer, int flags, u32 priority);
+	void draw_rotate(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void parse_control();
 };
 
@@ -552,6 +543,9 @@ void wgp_state::video_start()
 
 	// We don't need tilemap_set_scroll_rows, as the custom draw routine applies rowscroll manually
 	m_tc0100scn->set_colbanks(0x80, 0xc0, 0x40);
+
+	m_rotate_bitmap.allocate(1024, 1024);
+	m_rotate_priority.allocate(1024, 1024);
 
 	save_item(NAME(m_piv_ctrl_reg));
 	save_item(NAME(m_rotate_ctrl));
@@ -698,15 +692,9 @@ void wgp_state::piv_ctrl_word_w(offs_t offset, u16 data, u16 mem_mask)
 TODO
 ====
 
-Implement rotation/zoom properly.
+Verify the source coordinate origin and output clipping on hardware.
 
 Sprite/piv priority: sprites always over?
-
-WGP round 1 had some junky brown mud bank sprites in-game.
-They are indexed 0xe720-e790. 0x2720*4 => +0x9c80-9e80 in
-the spritemap area. They should be 2x2 not 4x4 tiles. We
-kludge this. Round 2 +0x9d40-9f40 contains the 2x2 sprites.
-What REALLY controls number of tiles in a sprite?
 
 Sprite colors: dust after crash in WGP 2 is odd; some
 black/grey barrels on late WGP circuit also look strange -
@@ -731,9 +719,8 @@ Memory Map
     Tile map for each standard big sprite is 64 bytes (16 tiles).
     (standard big sprite comprises 4x4 16x16 tiles)
 
-    Tile map for each small sprite only uses 16 of the 64 bytes.
-      The remaining 48 bytes are garbage and should be ignored.
-    (small sprite comprises 2x2 16x16 tiles)
+    Small sprites (2x2 tiles) use the first 16 of the 64 bytes; the
+    drawing extent crops the rest (garbage in WGP, tile zero in WGP 2).
 
 40c000 - 40dbff : Sprite Table
 
@@ -753,34 +740,26 @@ Memory Map
            (400000 + (index & 0x3fff) << 2) points to relevant part of
            sprite tile mapping area. Index >0x2fff would be invalid.
 
-    +0x06  zoom size (pixels) [typical range 0x1-5f, 0x3f = standard]
-           Looked up from a logarithm table in the data ROM indexed
-           by the z coordinate. Max size prog allows before it blanks
-           the sprite is 0x140.
+    +0x06  drawing extent minus one (low 9 bits): 0x3f for a 4x4 object
+           at unity, 0x1f for 2x2, 0x5f for the rotating logo.
 
-    +0x08  incxx ?? (usually stuck at 0xf800)
-    +0x0a  incyy ?? (usually stuck at 0xf800)
+    +0x08  signed source X offset, six fractional bits
+    +0x0a  signed source Y offset, six fractional bits
+           (usually both 0xf800 = -32; the origin is biased by 32 pixels)
 
-    +0x0c  z coordinate i.e. how far away the sprite is from you
-           going into the screen. Max distance prog allows before it
-           blanks the sprite is 0x3fff. 0x1400 is about the farthest
-           away that the code creates sprites. 0x400 = standard
-           distance corresponding to 0x3f zoom.  <0x400 = close to
+    +0x0c  incxx / incyy, ten fractional bits (0x400 = unity)
+    +0x0e  incxy / -incyx, ten fractional bits
+           Unrotated sprites use the z coordinate directly as the
+           increment; rotation uses the sine/cosine table at $d4010.
 
-    +0x0e  non-zero only during rotation.
-
-    NB: +0x0c and +0x0e are paired. Equivalent of incyx and incxy ??
-
-    (No longer used entries typically have 0xfff6 in +0x06 and +0x08.)
+    (Unused entries have 0xfff6 in +0x08 and 0 in +0x0a.)
 
     Only 2 rotation examples (i) at 0x40c000 when Taito
     logo displayed (WGP only). (ii) stage 5 (rain).
     Other in-game sprites are simply using +0x06 and +0x0c,
 
-    So the sprite rotation in WGP screenshots must be a *blanket*
-    rotate effect, identical to the one applied to piv layers.
-    This explains why sprite/piv positions are basically okay
-    despite failure to implement rotation.
+    Banking during racing is a separate blanket rotation of the combined
+    pivot and sprite layers (see draw_rotate).
 
 40dc00 - 40dfff: Active Sprites list
 
@@ -796,145 +775,115 @@ Memory Map
 
 ****************************************************************/
 
-/* Sprite tilemapping area doesn't have a straightforward
-   structure for each big sprite: the hardware is probably
-   constructing each 4x4 sprite from 4 2x2 sprites... */
-
-static const u8 xlookup[16] =
-	{ 0, 1, 0, 1,
-		2, 3, 2, 3,
-		0, 1, 0, 1,
-		2, 3, 2, 3 };
-
-static const u8 ylookup[16] =
-	{ 0, 0, 1, 1,
-		0, 0, 1, 1,
-		2, 2, 3, 3,
-		2, 2, 3, 3 };
-
-void wgp_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs)
+void wgp_state::draw_sprites(bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, int y_offs)
 {
-	int i, j, k;
-//  u16 rotate = 0;
-	const u32 tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
-	static const u32 primasks[2] = {0x0, 0xfffc};   // fff0 => under rhs of road only
+	gfx_element &gfx = *m_gfxdecode->gfx(0);
+	const u32 tile_mask = gfx.elements() - 1;
+	static constexpr int SOURCE_SIZE = 64;
+	static constexpr u32 PRIMASKS[2] = { 0x8000'0000, 0x8000'fffc };
 
 	for (int offs = 0x1ff; offs >= 0; offs--)
 	{
-		const int code = (m_spriteram[0xe00 + offs]);
+		const int code = m_spriteram[0xe00 + offs];
+		if (!code)
+			continue;
 
-		if (code)   // do we have an active sprite ?
+		const int entry = (code << 3) & 0xfff;
+		if ((m_spriteram[entry + 4] == 0xfff6) && (m_spriteram[entry + 5] == 0))
+			continue;
+
+		const int map_index = (m_spriteram[entry + 2] & 0x3fff) << 1;
+		if (map_index + 0x1f >= m_spritemap.length())
+			continue;
+
+		// Source offsets have six fractional bits and a 32 pixel bias; increments have ten.
+		const s32 startx = s16(m_spriteram[entry + 4]) * 16 + 0x8000;
+		const s32 starty = s16(m_spriteram[entry + 5]) * 16 + 0x8000;
+		const s32 incxx = s16(m_spriteram[entry + 6]);
+		const s32 incxy = s16(m_spriteram[entry + 7]);
+		const s64 determinant = s64(incxx) * incxx + s64(incxy) * incxy;
+		if (!determinant)
+			continue;
+
+		int x = s16(m_spriteram[entry]);
+		const int extent = (m_spriteram[entry + 3] & 0x1ff) + 1;
+		// TODO: the Y alignment is empirical
+		const int size = std::min(extent, int(SOURCE_SIZE * 1024 / std::sqrt(double(determinant))));
+		int y = s16(m_spriteram[entry + 1]) - y_offs + 12 - (64 - size) / 4;
+
+		// Destination bounds of the transformed source, cropped to the drawing extent
+		s64 minx = std::numeric_limits<s64>::max(), miny = minx;
+		s64 maxx = std::numeric_limits<s64>::min(), maxy = maxx;
+		for (int corner = 0; corner < 4; corner++)
 		{
-			i = (code << 3) & 0xfff;    // yes, so we look up its sprite entry
+			const s32 u = (BIT(corner, 0) ? SOURCE_SIZE * 1024 : 0) - startx;
+			const s32 v = (BIT(corner, 1) ? SOURCE_SIZE * 1024 : 0) - starty;
+			const s64 dx = s64(incxx) * u + s64(incxy) * v;
+			const s64 dy = -s64(incxy) * u + s64(incxx) * v;
+			minx = std::min(minx, dx);
+			maxx = std::max(maxx, dx);
+			miny = std::min(miny, dy);
+			maxy = std::max(maxy, dy);
+		}
+		const auto floor_div = [determinant] (s64 n) { return (n - ((n < 0) ? determinant - 1 : 0)) / determinant; };
+		const int left = x + floor_div(minx);
+		const int top = y + floor_div(miny);
+		const int width = std::min(extent, x - int(floor_div(-maxx)) - left);
+		const int height = std::min(extent, y - int(floor_div(-maxy)) - top);
+		// Wrap within the 1024x1024 rotation source
+		x += (left & 0x3ff) - left;
+		y += (top & 0x3ff) - top;
 
-			int x = m_spriteram[i];
-			int y = m_spriteram[i + 1];
-			const int bigsprite = m_spriteram[i + 2] & 0x3fff;
+		const u8 *tiles[16];
+		u16 colors[16];
+		u32 priorities[16];
+		for (int tile = 0; tile < 16; tile++)
+		{
+			const u16 attr = m_spritemap[map_index + tile * 2 + 1];
+			tiles[tile] = gfx.get_data(m_spritemap[map_index + tile * 2] & tile_mask);
+			colors[tile] = gfx.colorbase() + (attr & 0xf) * gfx.granularity();
+			priorities[tile] = PRIMASKS[BIT(attr, 5)];
+		}
 
-			/* The last five words [i + 3 through 7] must be zoom/rotation
-			   control: for time being we kludge zoom using 1 word.
-			   Timing problems are causing many glitches. */
-
-			if ((m_spriteram[i + 4] == 0xfff6) && (m_spriteram[i + 5] == 0))
-				continue;
-
-//          if (((m_spriteram[i + 4] != 0xf800) && (m_spriteram[i + 4] != 0xfff6))
-//              || ((m_spriteram[i + 5] != 0xf800) && (m_spriteram[i + 5] != 0))
-//              || m_spriteram[i + 7] != 0)
-//              rotate = i << 1;
-
-			/***** Begin zoom kludge ******/
-
-			const int zoomx = (m_spriteram[i + 3] & 0x1ff) + 1;
-			const int zoomy = (m_spriteram[i + 3] & 0x1ff) + 1;
-
-			y -= 4;
-			// distant sprites were some 16 pixels too far down
-			y -= ((0x40 - zoomy)/4);
-
-			/****** end zoom kludge *******/
-
-			// Treat coords as signed
-			if (x & 0x8000)  x -= 0x10000;
-			if (y & 0x8000)  y -= 0x10000;
-
-			const int map_index = bigsprite << 1; // now we access sprite tilemap
-
-			// don't know what selects 2x2 sprites: we use a nasty kludge which seems to work
-
-			i = m_spritemap[map_index + 0xa];
-			j = m_spritemap[map_index + 0xc];
-			const bool small_sprite = ((i > 0) & (i <= 8) & (j > 0) & (j <= 8));
-
-			if (small_sprite)
+		for (int wrapy = 0; wrapy <= 1024; wrapy += 1024)
+		{
+			for (int wrapx = 0; wrapx <= 1024; wrapx += 1024)
 			{
-				for (i = 0; i < 4; i++)
+				rectangle bounds((left & 0x3ff) - wrapx, (left & 0x3ff) - wrapx + width - 1,
+						(top & 0x3ff) - wrapy, (top & 0x3ff) - wrapy + height - 1);
+				bounds &= cliprect;
+				if (bounds.empty())
+					continue;
+
+				for (int sy = bounds.top(); sy <= bounds.bottom(); sy++)
 				{
-					const u32 tile = m_spritemap[(map_index + (i << 1))] & tile_mask;
-					const u32 col  = m_spritemap[(map_index + (i << 1) + 1)] & 0xf;
+					u16 *const dst = &bitmap.pix(sy);
+					u8 *const pri = &priority_bitmap.pix(sy);
+					// Sample at pixel centres
+					s64 u = startx + s64(bounds.left() - x + wrapx) * incxx - s64(sy - y + wrapy) * incxy + (incxx - incxy) / 2;
+					s64 v = starty + s64(bounds.left() - x + wrapx) * incxy + s64(sy - y + wrapy) * incxx + (incxy + incxx) / 2;
+					for (int sx = bounds.left(); sx <= bounds.right(); sx++, u += incxx, v += incxy)
+					{
+						if (u < 0 || v < 0 || u >= SOURCE_SIZE * 1024 || v >= SOURCE_SIZE * 1024)
+							continue;
 
-					// not known what controls priority
-					const int priority = (m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
-
-					int flipx = 0;  // no flip xy?
-					int flipy = 0;
-
-					k = xlookup[i]; // assumes no xflip
-					j = ylookup[i]; // assumes no yflip
-
-					const int curx = x + ((k * zoomx) / 2);
-					const int cury = y + ((j * zoomy) / 2);
-
-					const int zx = x + (((k + 1) * zoomx) / 2) - curx;
-					const int zy = y + (((j + 1) * zoomy) / 2) - cury;
-
-					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap, cliprect,
-							tile,
-							col,
-							flipx, flipy,
-							curx, cury,
-							zx << 12, zy << 12,
-							screen.priority(), primasks[((priority >> 1) & 1)], 0);  // maybe >> 2 or 0...?
-				}
-			}
-			else
-			{
-				for (i = 0; i < 16; i++)
-				{
-					const u32 tile = m_spritemap[(map_index + (i << 1))] & tile_mask;
-					const u32 col  = m_spritemap[(map_index + (i << 1) + 1)] & 0xf;
-
-					// not known what controls priority
-					const int priority = (m_spritemap[(map_index + (i << 1) + 1)] & 0x70) >> 4;
-
-					int flipx = 0;  // no flip xy?
-					int flipy = 0;
-
-					k = xlookup[i]; // assumes no xflip
-					j = ylookup[i]; // assumes no yflip
-
-					const int curx = x + ((k * zoomx) / 4);
-					const int cury = y + ((j * zoomy) / 4);
-
-					const int zx = x + (((k + 1) * zoomx) / 4) - curx;
-					const int zy = y + (((j + 1) * zoomy) / 4) - cury;
-
-					m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap, cliprect,
-							tile,
-							col,
-							flipx, flipy,
-							curx, cury,
-							zx << 12, zy << 12,
-							screen.priority(), primasks[((priority >> 1) & 1)], 0);  // maybe >> 2 or 0...?
+						const int px = u >> 10;
+						const int py = v >> 10;
+						// Tile addresses interleave X and Y bits (four 2x2 groups).
+						const int tile = BIT(px, 4) | (BIT(py, 4) << 1) | (BIT(px, 5) << 2) | (BIT(py, 5) << 3);
+						const u8 pen = tiles[tile][(py & 0xf) * gfx.rowbytes() + (px & 0xf)];
+						if (pen)
+						{
+							u8 &priority = pri[sx];
+							if (!BIT(priorities[tile], priority & 0x1f))
+								dst[sx] = colors[tile] + pen;
+							priority = 31;
+						}
+					}
 				}
 			}
 		}
-
 	}
-#if 0
-	if (rotate)
-		popmessage("sprite rotate offs %04x ?", rotate);
-#endif
 }
 
 
@@ -942,144 +891,98 @@ void wgp_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const 
                        CUSTOM DRAW
 *********************************************************/
 
-static inline void bryan2_drawscanline(bitmap_ind16 &bitmap, int x, int y, int length,
-		const u16 *src, bool transparent, u32 orient, bitmap_ind8 &priority, u8 pri, u8 primask = 0xff)
-{
-	u16 *dsti = &bitmap.pix(y, x);
-	u8 *dstp = &priority.pix(y, x);
-
-	if (transparent)
-	{
-		while (length--)
-		{
-			const u32 spixel = *src++;
-			if (spixel < 0x7fff)
-			{
-				*dsti = spixel;
-				*dstp = (*dstp & primask) | pri;
-			}
-			dsti++;
-			dstp++;
-		}
-	}
-	else  // Not transparent case
-	{
-		while (length--)
-		{
-			*dsti++ = *src++;
-			*dstp = (*dstp & primask) | pri;
-			dstp++;
-		}
-	}
-}
-
-
-
-void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, u32 priority)
+void wgp_state::piv_layer_draw(bitmap_ind16 &bitmap, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, int layer, int flags, u32 priority)
 {
 	bitmap_ind16 &srcbitmap = m_piv_tilemap[layer]->pixmap();
 	bitmap_ind8 &flagsbitmap = m_piv_tilemap[layer]->flagsmap();
 
-	int y_index;
+	// Y zoom, 0x7f = unity.  TODO: verify the zoom and scroll origins
+	const u32 zoomy = (0xff - (m_piv_ctrlram[0x08 + layer] & 0xff)) << 9;
+	u32 y_index = (u32(m_piv_scrolly[layer]) << 16) + (16 + cliprect.top()) * zoomy;
+	const u32 sx = (u32(m_piv_scrollx[layer]) + 32) << 16;
 
-	/* I have a fairly strong feeling these should be u32's, x_index is
-	   falling through from max +ve to max -ve quite a lot in this routine */
-	int sx;
-
-	u16 scanline[512];
-	int flipscreen = 0; // n/a
-
-	const int screen_width = cliprect.width();
-	const int min_y = cliprect.min_y;
-	const int max_y = cliprect.max_y;
-
-	const int width_mask = 0x3ff;
-
-	const u32 zoomx = 0x10000;    // No overall X zoom, unlike TC0480SCP
-
-	/* Y-axis zoom offers expansion/compression: 0x7f = no zoom, 0xff = max ???
-	   In WGP see: stage 4 (big spectator stand)
-	               stage 5 (cloud layer)
-	               stage 7 (two bits of background scenery)
-	               stage 8 (unknown - surely something should be appearing here...)
-	   In WGP 2 see: road at big hill (default course) */
-
-	// This calculation may be wrong, the y_index one too
-	const u32 zoomy = 0x10000 - (((m_piv_ctrlram[0x08 + layer] & 0xff) - 0x7f) * 512);
-
-	if (!flipscreen)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++, y_index += zoomy)
 	{
-		sx = ((m_piv_scrollx[layer]) << 16);
-		sx += (32) * zoomx;     // may be imperfect
+		const int row = (y_index >> 16) & 0x3ff;
+		const u16 row_ctrl = m_pivram[row + layer * 0x400 + 0x3400];
+		const int row_zoom = row_ctrl & 0xff;
+		const u16 row_colbank = (((row_ctrl >> 8) & 0xe0) | ((row_ctrl >> 7) & 0x1e)) << 4;
+		const u16 scroll = m_pivram[row + layer * 0x1000 + 0x4000];
+		const u16 row_scroll = ((scroll >> 1) & 0x3f0) | (scroll & 0xf);
+		const u32 x_step = 0x10000 + (0x7f - row_zoom) * 0x100;
+		u32 x_index = sx - (u32(row_scroll) << 16) + cliprect.left() * x_step;
 
-		y_index = (m_piv_scrolly[layer] << 16);
-		y_index += (16 + min_y) * zoomy;        // may be imperfect
-	}
-	else    // piv tiles flipscreen n/a
-	{
-		sx = 0;
-		y_index = 0;
-	}
-
-	for (int y = min_y; y <= max_y; y++)
-	{
-		int a;
-
-		const int src_y_index = (y_index >> 16) & 0x3ff;
-		const int row_index = src_y_index;
-
-		const int row_zoom = m_pivram[row_index + layer * 0x400 + 0x3400] & 0xff;
-
-		u16 row_colbank = m_pivram[row_index + layer * 0x400 + 0x3400] >> 8;
-		a = (row_colbank & 0xe0);   // kill bit 4
-		row_colbank = (((row_colbank & 0xf) << 1) | a) << 4;
-
-		u16 row_scroll = m_pivram[row_index + layer * 0x1000 + 0x4000];
-		a = (row_scroll & 0xffe0) >> 1; // kill bit 4
-		row_scroll = ((row_scroll & 0xf) | a) & width_mask;
-
-		int x_index = sx - (row_scroll << 16);
-
-		int x_step = zoomx;
-		if (row_zoom > 0x7f)    // zoom in: reduce x_step
+		const u16 *const src = &srcbitmap.pix(row);
+		const u8 *const srcflags = &flagsbitmap.pix(row);
+		u16 *const dst = &bitmap.pix(y);
+		u8 *const pri = &priority_bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x++, x_index += x_step)
 		{
-			x_step -= (((row_zoom - 0x7f) << 8) & 0xffff);
-		}
-		else if (row_zoom < 0x7f)   // zoom out: increase x_step
-		{
-			x_step += (((0x7f - row_zoom) << 8) & 0xffff);
-		}
-
-		const u16 *const src16 = &srcbitmap.pix(src_y_index);
-		const u8 *const  tsrc  = &flagsbitmap.pix(src_y_index);
-		u16 *dst16 = scanline;
-
-		if (flags & TILEMAP_DRAW_OPAQUE)
-		{
-			for (int i = 0; i < screen_width; i++)
+			const int column = (x_index >> 16) & 0x3ff;
+			if ((flags & TILEMAP_DRAW_OPAQUE) || srcflags[column])
 			{
-				*dst16++ = src16[(x_index >> 16) & width_mask] + row_colbank;
-				x_index += x_step;
+				dst[x] = src[column] + row_colbank;
+				pri[x] |= priority;
 			}
 		}
-		else
-		{
-			for (int i = 0; i < screen_width; i++)
-			{
-				if (tsrc[(x_index >> 16) & width_mask])
-					*dst16++ = src16[(x_index >> 16) & width_mask] + row_colbank;
-				else
-					*dst16++ = 0x8000;
-				x_index += x_step;
-			}
-		}
-
-		bryan2_drawscanline(bitmap, 0, y, screen_width, scanline, (flags & TILEMAP_DRAW_OPAQUE) ? false : true, ROT0, screen.priority(), priority);
-
-		y_index += zoomy;
 	}
 }
 
+
+void wgp_state::draw_rotate(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	// Ports 0/1 are signed source offsets (four fractional bits),
+	// ports 2/3 the cosine/sine increments (twelve fractional bits).
+	const s32 xx = s16(m_rotate_ctrl[2]);
+	const s32 xy = s16(m_rotate_ctrl[3]);
+	if (!xx && !xy)
+		return;
+
+	// Origin inferred from the unity settings ($f9ad, $00c8, $1000, $0000).
+	// TODO: verify against hardware video timing
+	const s32 startx = s16(m_rotate_ctrl[0]) * 0x1000 + xx * 0x653 + xy * 0xc8 + (xx - xy) * 8;
+	const s32 starty = s16(m_rotate_ctrl[1]) * 0x1000 + xy * 0x653 - xx * 0xc8 + (xy + xx) * 8;
+	const s32 incxx = xx * 16;
+	const s32 incxy = xy * 16;
+
+	// Render only the part of the 1024x1024 source this update samples, split at the wrap
+	int minx = std::numeric_limits<int>::max(), miny = minx;
+	int maxx = std::numeric_limits<int>::min(), maxy = maxx;
+	for (int corner = 0; corner < 4; corner++)
+	{
+		const int x = BIT(corner, 0) ? cliprect.right() : cliprect.left();
+		const int y = BIT(corner, 1) ? cliprect.bottom() : cliprect.top();
+		const int u = (startx + x * incxx - y * incxy) >> 16;
+		const int v = (starty + x * incxy + y * incxx) >> 16;
+		minx = std::min(minx, u);
+		maxx = std::max(maxx, u);
+		miny = std::min(miny, v);
+		maxy = std::max(maxy, v);
+	}
+	const int left = (maxx - minx >= 1023) ? 0 : (minx & 0x3ff);
+	const int top = (maxy - miny >= 1023) ? 0 : (miny & 0x3ff);
+	const int right = left + std::min(maxx - minx, 1023);
+	const int bottom = top + std::min(maxy - miny, 1023);
+	const int layer[3] = { 0, (m_piv_ctrl_reg == 0x2d) ? 2 : 1, (m_piv_ctrl_reg == 0x2d) ? 1 : 2 };
+
+	for (int y = 0; y <= (bottom >> 10); y++)
+	{
+		for (int x = 0; x <= (right >> 10); x++)
+		{
+			const rectangle source_clip(std::max(left - x * 1024, 0), std::min(right - x * 1024, 1023),
+					std::max(top - y * 1024, 0), std::min(bottom - y * 1024, 1023));
+			m_rotate_bitmap.fill(0, source_clip);
+			m_rotate_priority.fill(0, source_clip);
+			for (int i = 0; i < 3; i++)
+			{
+				piv_layer_draw(m_rotate_bitmap, m_rotate_priority, source_clip, layer[i], i ? 0 : TILEMAP_DRAW_OPAQUE, 1 << i);
+			}
+			draw_sprites(m_rotate_bitmap, m_rotate_priority, source_clip, 16);
+		}
+	}
+
+	copyrozbitmap(bitmap, cliprect, m_rotate_bitmap, startx, starty, incxx, incxy, -incxy, incxx, true);
+}
 
 
 /**************************************************************
@@ -1089,32 +992,6 @@ void wgp_state::piv_layer_draw(screen_device &screen, bitmap_ind16 &bitmap, cons
 u32 wgp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	u8 layer[3];
-
-#ifdef MAME_DEBUG
-	if (machine().input().code_pressed_once (KEYCODE_V))
-	{
-		m_dislayer[0] ^= 1;
-		popmessage("piv0: %01x",m_dislayer[0]);
-	}
-
-	if (machine().input().code_pressed_once (KEYCODE_B))
-	{
-		m_dislayer[1] ^= 1;
-		popmessage("piv1: %01x",m_dislayer[1]);
-	}
-
-	if (machine().input().code_pressed_once (KEYCODE_N))
-	{
-		m_dislayer[2] ^= 1;
-		popmessage("piv2: %01x",m_dislayer[2]);
-	}
-
-	if (machine().input().code_pressed_once (KEYCODE_M))
-	{
-		m_dislayer[3] ^= 1;
-		popmessage("TC0100SCN top bg layer: %01x",m_dislayer[3]);
-	}
-#endif
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -1127,67 +1004,16 @@ u32 wgp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const 
 	screen.priority().fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	layer[0] = 0;
-	layer[1] = 1;
-	layer[2] = 2;
+	draw_rotate(bitmap, cliprect);
 
-	if (m_piv_ctrl_reg == 0x2d)
-	{
-		layer[1] = 2;
-		layer[2] = 1;
-	}
-
-// We should draw the following on a 1024x1024 bitmap...
-
-#ifdef MAME_DEBUG
-	if (m_dislayer[layer[0]] == 0)
-#endif
-	piv_layer_draw(screen, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 1);
-
-#ifdef MAME_DEBUG
-	if (m_dislayer[layer[1]] == 0)
-#endif
-	piv_layer_draw(screen, bitmap, cliprect, layer[1], 0, 2);
-
-#ifdef MAME_DEBUG
-	if (m_dislayer[layer[2]] == 0)
-#endif
-	piv_layer_draw(screen, bitmap, cliprect, layer[2], 0, 4);
-
-	draw_sprites(screen, bitmap, cliprect, 16);
-
-// ... then here we should apply rotation from m_rotate_ctrl[] to the bitmap before we draw the TC0100SCN layers on it
 	layer[0] = m_tc0100scn->bottomlayer();
 	layer[1] = layer[0] ^ 1;
 	layer[2] = 2;
 
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[0], 0, 0);
-
-#ifdef MAME_DEBUG
-	if (m_dislayer[3] == 0)
-#endif
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[1], 0, 0);
 	m_tc0100scn->tilemap_draw(screen, bitmap, cliprect, layer[2], 0, 0);
 
-#if 0
-	popmessage("piv_ctrl_reg: %04x y zoom: %04x %04x %04x",
-			m_piv_ctrl_reg,
-			m_piv_zoom[0], m_piv_zoom[1], m_piv_zoom[2]);
-#endif
-
-// Enable this to watch the rotation control words
-#if 0
-	{
-		char buf[80];
-		int i;
-
-		for (int i = 0; i < 8; i += 1)
-		{
-			sprintf (buf, "%02x: %04x", i, rotate_ctrl[i]);
-			ui_draw_text (buf, 0, i*8);
-		}
-	}
-#endif
 	return 0;
 }
 
@@ -1249,21 +1075,8 @@ u16 wgp_state::lan_status_r()
 
 void wgp_state::rotate_port_w(offs_t offset, u16 data)
 {
-	/* This port may be for piv/sprite layer rotation.
-
-	WGP 2 pokes a single set of values (see 2 routines from
-	$4e4a), so if this is rotation then WGP 2 *doesn't* use
-	it.
-
-	WGP pokes a wide variety of values here, which appear
-	to move up and down as rotation control words might.
-	See $ae06-d8 which pokes piv ctrl words, then pokes
-	values to this port.
-
-	There is a lookup area in the data ROM from $d0000-$da400
-	which contains sets of 4 words (used for ports 0-3).
-	NB: port 6 is not written.
-	*/
+	// Ports 0-3 transform the combined pivot/sprite image (see draw_rotate).
+	// Ports 4/5 and the high bits of port 7 are unknown.
 
 	switch (offset)
 	{
@@ -1379,7 +1192,7 @@ void wgp_state::main_map(address_map &map)
 	map(0x500000, 0x501fff).ram(); // unknown/unused
 	map(0x502000, 0x517fff).ram().w(FUNC(wgp_state::pivram_word_w)).share(m_pivram); // piv tilemaps
 	map(0x520000, 0x52001f).ram().w(FUNC(wgp_state::piv_ctrl_word_w)).share(m_piv_ctrlram);
-	map(0x600000, 0x600003).w(FUNC(wgp_state::rotate_port_w)); // rotation control ?
+	map(0x600000, 0x600003).w(FUNC(wgp_state::rotate_port_w)); // combined pivot/sprite rotation
 	map(0x700000, 0x701fff).ram().w(m_palette, FUNC(palette_device::write16)).share("palette");
 }
 

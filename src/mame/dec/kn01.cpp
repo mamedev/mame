@@ -191,14 +191,15 @@ uint32_t kn01_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 	if (m_status & MONO)
 	{
-		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+		for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
 		{
-			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 32)
+			auto *const dst = &bitmap.pix(y);
+			for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x += 32)
 			{
 				u32 const pixel_data = *pixel_pointer++;
 
 				for (unsigned i = 0; i < 32; i++)
-					bitmap.pix(y, x + i) = m_vdac->pen_color(BIT(pixel_data, i) * 128);
+					dst[x + i] = m_vdac->pen_color(BIT(pixel_data, i) * 128);
 			}
 
 			pixel_pointer += 1024 / 32;
@@ -206,16 +207,17 @@ uint32_t kn01_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	}
 	else
 	{
-		for (int y = screen.visible_area().min_y; y <= screen.visible_area().max_y; y++)
+		for (int y = screen.visible_area().top(); y <= screen.visible_area().bottom(); y++)
 		{
-			for (int x = screen.visible_area().min_x; x <= screen.visible_area().max_x; x += 4)
+			auto *const dst = &bitmap.pix(y);
+			for (int x = screen.visible_area().left(); x <= screen.visible_area().right(); x += 4)
 			{
 				u32 const pixel_data = *pixel_pointer++;
 
-				bitmap.pix(y, x + 3) = m_vdac->pen_color(u8(pixel_data >> 24));
-				bitmap.pix(y, x + 2) = m_vdac->pen_color(u8(pixel_data >> 16));
-				bitmap.pix(y, x + 1) = m_vdac->pen_color(u8(pixel_data >> 8));
-				bitmap.pix(y, x + 0) = m_vdac->pen_color(u8(pixel_data >> 0));
+				dst[x + 3] = m_vdac->pen_color(u8(pixel_data >> 24));
+				dst[x + 2] = m_vdac->pen_color(u8(pixel_data >> 16));
+				dst[x + 1] = m_vdac->pen_color(u8(pixel_data >> 8));
+				dst[x + 0] = m_vdac->pen_color(u8(pixel_data >> 0));
 			}
 		}
 	}

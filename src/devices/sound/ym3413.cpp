@@ -27,7 +27,7 @@
     a word from either file and the step's coefficient (1.7 fixed point); the product is either
     added to the accumulator or loaded into it, optionally together with a word from T.
     Whatever is stored to T or to delay memory in a step is the accumulator as left by the
-    previous step, optionally doubled, saturated to 16 bits.
+    previous step, optionally doubled or halved, saturated to 16 bits.
 
     Control bytes:
         byte 0  7    T write address bit 0
@@ -37,7 +37,8 @@
         byte 1  7654 T read address
                 3    T write enable
                 210  T write address bits 3-1
-        byte 2  5    stored value is accumulator * 2
+        byte 2  7    stored value is accumulator / 2 (PSR-500 programs)
+                5    stored value is accumulator * 2
                 4    accumulator = product (otherwise product + T, if bit 0 is clear)
                 2    T read word goes to the output level multiplier, accumulator holds
                 1    multiplier input is T instead of R
@@ -48,7 +49,8 @@
                 3    R write data is the serial input instead of memory read data
                 2    latch output
                 0    output channel
-        Byte 2 bits 7, 6, 3 and byte 3 bits 4, 1 are never set by the TG100.
+        Byte 2 bits 6, 3 and byte 3 bits 4, 1 are not understood.
+        Byte 2 bit 7 is not used by the TG100.
 
     Unknowns and assumptions:
     - Word size, accumulator width, truncation and saturation behavior. (Truncation toward zero
@@ -225,14 +227,13 @@ void ym3413_device::command(u8 cmd, u8 data)
 	}
 }
 
-s16 ym3413_device::export_acc(s32 acc, bool shift)
+s16 ym3413_device::export_acc(s32 acc, u32 shift)
 {
 	// The fraction is truncated toward zero. How the chip does it is not known: plainly dropping
 	// the bits or rounding to nearest both leave a limit cycle (and the former a DC offset of
 	// some -80 LSB) circulating in the reverb forever, this is the only choice that decays
 	// to silence.
-	const unsigned bits = shift ? (COEF_FRAC - 1) : COEF_FRAC;
-	const s32 word = (acc < 0) ? -(-acc >> bits) : (acc >> bits);
+	const s32 word = (acc < 0) ? -(-acc >> shift) : (acc >> shift);
 	return std::clamp<s32>(word, -0x8000, 0x7fff);
 }
 
@@ -264,7 +265,8 @@ void ym3413_device::run_frame(s16 in_l, s16 in_r)
 		// register reads see the state before this step's writes
 		const s16 r_read = m_r[(b0 >> 4) & 7];
 		const s16 t_read = m_t[b1 >> 4];
-		const s16 store = export_acc(m_acc, BIT(b2, 5));
+		// byte 2 bit 7 halves the stored value (PSR-500 feedback paths)
+		const s16 store = export_acc(m_acc, COEF_FRAC + BIT(b2, 7) - BIT(b2, 5));
 
 		// delay memory, one access per pair of steps
 		if (!(step & 1) && BIT(b3, 6))

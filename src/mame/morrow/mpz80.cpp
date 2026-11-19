@@ -187,23 +187,17 @@ uint8_t mpz80_state::mmu_r(offs_t offset)
 		{
 			data = m_ram->pointer()[offset & 0x3ff];
 		}
-		else if (offset == 0x400)
+		else if (offset < 0x600)
 		{
-			data = trap_addr_r();
+			switch (offset & 3)
+			{
+			case 0: data = trap_addr_r(); break;
+			case 1: data = keyboard_r(); break;
+			case 2: data = switch_r(); break;
+			case 3: data = status_r(); break;
+			}
 		}
-		else if (offset == 0x401)
-		{
-			data = keyboard_r();
-		}
-		else if (offset == 0x402)
-		{
-			data = switch_r();
-		}
-		else if (offset == 0x403)
-		{
-			data = status_r();
-		}
-		else if (offset >= 0x600 && offset < 0x800)
+		else if (offset < 0x800)
 		{
 			// TODO this might change the map RAM contents
 		}
@@ -240,23 +234,17 @@ void mpz80_state::mmu_w(offs_t offset, uint8_t data)
 		{
 			m_ram->pointer()[offset & 0x3ff] = data;
 		}
-		else if (offset == 0x400)
+		else if (offset < 0x600)
 		{
-			disp_seg_w(data);
+			switch (offset & 3)
+			{
+			case 0: disp_seg_w(data); break;
+			case 1: disp_col_w(data); break;
+			case 2: task_w(data); break;
+			case 3: mask_w(data); break;
+			}
 		}
-		else if (offset == 0x401)
-		{
-			disp_col_w(data);
-		}
-		else if (offset == 0x402)
-		{
-			task_w(data);
-		}
-		else if (offset == 0x403)
-		{
-			mask_w(data);
-		}
-		else if (offset >= 0x600 && offset < 0x800)
+		else if (offset < 0x800)
 		{
 			m_map_ram[offset - 0x600] = data;
 		}
@@ -426,8 +414,8 @@ uint8_t mpz80_state::keyboard_r()
 
 	    bit     description
 
-	    0
-	    1
+	    0       12C pin 12
+	    1       12C pin 13
 	    2
 	    3
 	    4
@@ -437,7 +425,7 @@ uint8_t mpz80_state::keyboard_r()
 
 	*/
 
-	return 0;
+	return 0xfc | (~m_12c->read() & 0x03);
 }
 
 
@@ -626,7 +614,7 @@ static INPUT_PORTS_START( mpz80 )
 	PORT_DIPNAME( 0x02, 0x02, "Operation Mode" )
 	PORT_DIPSETTING(    0x02, "Monitor" )
 	PORT_DIPSETTING(    0x00, "Diagnostic" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Stop")
 INPUT_PORTS_END
 
 
@@ -682,17 +670,14 @@ static void mpz80_s100_cards(device_slot_interface &device)
 //**************************************************************************
 
 //-------------------------------------------------
-//  MACHINE_START( mpz80 )
+//  MACHINE_RESET( mpz80 )
 //-------------------------------------------------
-
-void mpz80_state::machine_start()
-{
-	m_task = 0;
-}
-
 
 void mpz80_state::machine_reset()
 {
+	m_task = 0;
+	m_mask = 0;
+	m_pretrap_addr = 0;
 	m_trap_reset = 0;
 	m_trap = 1;
 	m_trap_start = 0;

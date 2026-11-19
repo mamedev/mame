@@ -47,7 +47,7 @@ public:
 	// inline configuration helpers
 	auto open_bus_callback() { return m_openbus_cb.bind(); }
 
-	void refresh_scanline(bitmap_rgb32 &bitmap, uint16_t curline);
+	void refresh_scanline(bitmap_rgb32 &bitmap, uint16_t curline, uint16_t dstline = 0);
 
 	int16_t current_x() const { return screen().hpos(); }
 	int16_t current_y() const { return screen().vpos(); }

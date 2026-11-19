@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+
+<softwarelist name="e01_hdd" description="Acorn FileStore hard discs">
+
+	<software name="e20">
+		<description>FileStore E20</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="Requires the FileStore E01" />
+
+		<!-- Rodime RO652 -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="e20" sha1="4f034a033eb1853d43f3b93755e6da21a1072998" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="e40s">
+		<description>FileStore E40S</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="Requires the FileStore E01S" />
+
+		<!-- Rodime RO3057S -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="e40s" sha1="cdf46648cc5bc45b3609e11caa14a25e5d3f3fa3" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="e60s">
+		<description>FileStore E60S</description>
+		<year>198?</year>
+		<publisher>Acorn</publisher>
+		<info name="usage" value="Requires the FileStore E01S" />
+
+		<!-- Rodime RO3085S -->
+		<part name="hdd" interface="scsi_hdd">
+			<diskarea name="harddriv">
+				<disk name="e60s" sha1="4523f90ae7d2d346a9b18f2194db3aedeeeded8e" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

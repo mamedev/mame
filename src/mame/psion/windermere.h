@@ -54,6 +54,7 @@ public:
 	void eint1_w(int state);
 	void eint2_w(int state);
 	void eint3_w(int state);
+	void medchg_w(int state);
 
 	uint32_t periphs_r(offs_t offset, uint32_t mem_mask = ~0);
 	void periphs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);

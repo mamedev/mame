@@ -19,6 +19,8 @@
 
 #define X86_NUM_CPUS        4
 
+class x87_slot_device;
+
 class i386_device : public cpu_device, public device_vtlb_interface, public i386_disassembler::config
 {
 public:
@@ -415,6 +417,9 @@ protected:
 	uint32_t m_smbase;
 	devcb_write_line m_smiact;
 	devcb_write_line m_ferr_handler;
+	// coprocessor fitted, set by an I387_SLOT/I387SX_SLOT/I487SX_SLOT before start
+	friend class x87_slot_device;
+	bool m_x87_present;
 	bool m_lock;
 
 	// bytes in current opcode, debug only
@@ -503,7 +508,7 @@ protected:
 	void sib_byte(uint8_t mod, uint32_t* out_ea, uint8_t* out_segment);
 	void modrm_to_EA(uint8_t mod_rm, uint32_t* out_ea, uint8_t* out_segment);
 	uint32_t GetNonTranslatedEA(uint8_t modrm,uint8_t *seg);
-	uint32_t GetEA(uint8_t modrm, int rwn);
+	uint32_t GetEA(uint8_t modrm, int rwn, int size = 1);
 	uint32_t Getx87EA(uint8_t modrm, int rwn);
 	void i386_check_sreg_validity(int reg);
 	int i386_limit_check(int seg, uint32_t offset, int size = 1);
@@ -1596,6 +1601,16 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 };
 
+class i486sx_device : public i486_device
+{
+public:
+	// construction/destruction
+	i486sx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	virtual void device_reset() override ATTR_COLD;
+};
+
 class i486dx4_device : public i486_device
 {
 public:
@@ -1642,6 +1657,20 @@ class mediagx_device : public i386_device
 public:
 	// construction/destruction
 	mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	mediagx_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+};
+
+
+class mediagxm_device : public mediagx_device
+{
+public:
+	// construction/destruction
+	mediagxm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -1708,10 +1737,12 @@ protected:
 DECLARE_DEVICE_TYPE(I386,        i386_device)
 DECLARE_DEVICE_TYPE(I386SX,      i386sx_device)
 DECLARE_DEVICE_TYPE(I486,        i486_device)
+DECLARE_DEVICE_TYPE(I486SX,      i486sx_device)
 DECLARE_DEVICE_TYPE(I486DX4,     i486dx4_device)
 DECLARE_DEVICE_TYPE(PENTIUM,     pentium_device)
 DECLARE_DEVICE_TYPE(PENTIUM_MMX, pentium_mmx_device)
 DECLARE_DEVICE_TYPE(MEDIAGX,     mediagx_device)
+DECLARE_DEVICE_TYPE(MEDIAGXM,    mediagxm_device)
 DECLARE_DEVICE_TYPE(PENTIUM_PRO, pentium_pro_device)
 DECLARE_DEVICE_TYPE(PENTIUM2,    pentium2_device)
 DECLARE_DEVICE_TYPE(PENTIUM3,    pentium3_device)

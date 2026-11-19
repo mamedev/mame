@@ -170,6 +170,16 @@ protected:
 	u32 ea_addr();
 	// Commit the current EA read/write operation once it's safe to do so (we're cycle-by-cycle initerruptable)
 	void ea_commit();
+	// Extra states an instruction with a memory EA takes for its addressing mode (charged by
+	// ea_addr), and the part of them that depends on where the instruction starts (table A-8)
+	int ea_overhead() const;
+	int ea_align() const;
+	// Charge an operation's own states by the class of its EA: register direct, memory or immediate
+	void ea_time(int reg, int mem, int imm)
+	{
+		const u8 ea = m_ir[0];
+		internal(((ea & 0xf0) == 0xa0) ? reg : (ea == 0x04 || ea == 0x0c) ? imm : mem);
+	}
 	// Read/write the value at the current effective address
 	u8   read_ea_8();
 	void write_ea_8(u8 val);

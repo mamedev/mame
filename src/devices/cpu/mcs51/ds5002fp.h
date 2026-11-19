@@ -83,9 +83,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask) override;
-	virtual void irqs_complete_and_mask(u8 &ints, u8 int_mask) override;
+	virtual void irqs_complete_and_mask(u16 &ints, u16 int_mask) override;
 	virtual void handle_ta_window() override;
-	virtual bool manage_idle_on_interrupt(u8 ints) override;
+	virtual bool manage_idle_on_interrupt(u16 ints) override;
 	virtual void handle_irq(int irqline, int state, u32 new_state, u32 tr_state) override;
 	virtual void sfr_map(address_map &map) override ATTR_COLD;
 

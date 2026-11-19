@@ -1241,13 +1241,8 @@ void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 
 void namcos22_state::blit_polyobject(int code, float m[4][4])
 {
-	// list start address, code 5 is special case for pointram
-	int list_addr;
-	const bool pointram = (code == 0x5);
-	if (pointram)
-		list_addr = (m_is_ss22) ? 0xf80000 : 0xf00000;
-	else
-		list_addr = point_read(code);
+	// list start address
+	int list_addr = point_read(code);
 
 	m_LitSurfaceCount = 0;
 	m_LitSurfaceIndex = 0;
@@ -1261,11 +1256,6 @@ void namcos22_state::blit_polyobject(int code, float m[4][4])
 			if (object_addr == -1)
 			{
 				// 0xffffff is end-of-list marker
-				break;
-			}
-			else if (!pointram)
-			{
-				logerror("blit_polyobject unexpected end: addr=0x%06x\n", list_addr-1);
 				break;
 			}
 			object_addr &= 0x00ffffff;
@@ -2623,16 +2613,9 @@ void namcos22_state::init_tables()
 		save_item(NAME(m_fog_b_per_cztype));
 	}
 
-	// init pointrom
-	m_pointrom_size = memregion("pointrom")->bytes()/3;
-	m_pointrom = std::make_unique<s32[]>(m_pointrom_size);
-	u8* pointrom_low = memregion("pointrom")->base();
-	u8* pointrom_mid = pointrom_low + m_pointrom_size;
-	u8* pointrom_high = pointrom_mid + m_pointrom_size;
-	for (int i = 0; i < m_pointrom_size; i++)
-	{
-		m_pointrom[i] = signed24(pointrom_high[i] << 16 | pointrom_mid[i] << 8 | pointrom_low[i]);
-	}
+	// sign-extend point rom
+	for (int i = 0; i < m_pointrom.length(); i++)
+		m_pointrom[i] = signed24(m_pointrom[i]);
 
 	m_pointram = make_unique_clear<u32[]>(0x20000);
 	save_pointer(NAME(m_pointram), 0x20000);

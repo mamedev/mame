@@ -21,6 +21,9 @@ class sh2_device::sh2_frontend : public sh_common_execution::frontend
 public:
 	sh2_frontend(sh_common_execution *device, uint32_t window_start, uint32_t window_end, uint32_t max_sequence);
 
+protected:
+	virtual uint16_t read_word(opcode_desc &desc) override;
+
 private:
 	virtual bool describe_group_15(opcode_desc &desc, const opcode_desc *prev, uint16_t opcode) override;
 };

@@ -607,10 +607,10 @@ void snug_bwg_device::device_add_mconfig(machine_config& config)
 
 	MM58274C(config, CLOCK_TAG, 32.768_kHz_XTAL).set_mode_and_day(1, 0); // 24h, sunday
 
-	FLOPPY_CONNECTOR(config, m_floppy[0], bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[1], bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[2], bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
-	FLOPPY_CONNECTOR(config, m_floppy[3], bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound(true);
+	FLOPPY_CONNECTOR(config, m_floppy[0], bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound("ti99_peb_dsk1");
+	FLOPPY_CONNECTOR(config, m_floppy[1], bwg_floppies, "525dd", snug_bwg_device::floppy_formats).enable_sound("ti99_peb_dsk2");
+	FLOPPY_CONNECTOR(config, m_floppy[2], bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound("ti99_peb_dsk3");
+	FLOPPY_CONNECTOR(config, m_floppy[3], bwg_floppies, nullptr, snug_bwg_device::floppy_formats).enable_sound("ti99_peb_dsk4");
 
 	RAM(config, BUFFER).set_default_size("2K").set_default_value(0);
 

@@ -38,7 +38,7 @@ PCB:
 *************************************************************/
 
 #include "emu.h"
-#include "cpu/pic16x8x/pic16x8x.h"
+#include "cpu/pic16_mid/pic16_mid.h"
 
 namespace {
 

@@ -363,8 +363,15 @@ void heath_h17_fdc_base_device::device_reset()
 	m_write_gate         = false;
 	m_sync_char_received = false;
 
-	m_tx_timer->adjust(attotime::from_hz(USRT_TX_CLOCK), 0, attotime::from_hz(USRT_TX_CLOCK));
+	start_tx_clock();
 	reset_rx_separator();
+}
+
+void heath_h17_fdc_base_device::start_tx_clock()
+{
+	attotime const period = fm_bit_time();
+
+	m_tx_timer->adjust(period, 0, period);
 }
 
 static void h17_floppies(device_slot_interface &device)

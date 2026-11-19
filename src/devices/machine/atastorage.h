@@ -62,7 +62,7 @@ protected:
 
 	int m_can_identify_device;
 	uint32_t          m_num_cylinders;
-	uint8_t           m_num_sectors;
+	uint16_t          m_num_sectors;
 	uint8_t           m_num_heads;
 
 	virtual uint64_t lba_address();
@@ -70,7 +70,7 @@ protected:
 	bool is_lba48();
 
 private:
-	void set_geometry(uint8_t sectors, uint8_t heads) { m_num_sectors = sectors; m_num_heads = heads; }
+	void set_geometry(uint16_t sectors, uint8_t heads) { m_num_sectors = sectors; m_num_heads = heads; }
 	void finished_read();
 	void finished_write();
 	void next_sector();

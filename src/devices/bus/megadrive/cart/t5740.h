@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "machine/m95320.h"
+#include "machine/eepromspi.h"
 
 #include "slot.h"
 
@@ -28,7 +28,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 private:
 	memory_bank_array_creator<8> m_rom_bank;
-	required_device<m95320_eeprom_device> m_spi_eeprom;
+	required_device<eeprom_spi_m95320_device> m_spi_eeprom;
 };
 
 DECLARE_DEVICE_TYPE(MEGADRIVE_HB_PSOLAR, megadrive_hb_psolar_device)

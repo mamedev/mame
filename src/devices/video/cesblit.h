@@ -38,6 +38,7 @@ public:
 	// configuration
 	void set_compute_addr(compute_addr_t compute_addr)  { m_compute_addr = compute_addr; }
 	auto irq_callback() { return m_blit_irq_cb.bind(); }
+	void set_extended_palette(bool extended_palette) { m_extended_palette = extended_palette; }
 
 	void color_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	void addr_hi_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
@@ -64,6 +65,7 @@ protected:
 	uint16_t m_color;
 	uint16_t m_addr_hi;
 	compute_addr_t m_compute_addr;
+	bool m_extended_palette;
 };
 
 /***************************************************************************

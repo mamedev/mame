@@ -449,6 +449,23 @@ void mpeg_video::reset_input()
 	m_macroblock_address = -1;
 }
 
+void mpeg_video::set_sequence(int width, int height, unsigned picture_rate)
+{
+	if (m_in_picture || !width || !height ||
+		(width > m_maximum_width) || (height > m_maximum_height) ||
+		(picture_rate >= std::size(s_picture_rates)) || !s_picture_rates[picture_rate])
+		return;
+
+	m_horizontal_size = width;
+	m_vertical_size = height;
+	m_frame_rate = s_picture_rates[picture_rate];
+	m_picture_rate_code = picture_rate;
+	m_mb_width = (m_horizontal_size + 15) / 16;
+	m_mb_height = (m_vertical_size + 15) / 16;
+	m_luma_pitch = m_mb_width * 16;
+	m_chroma_pitch = m_mb_width * 8;
+}
+
 void mpeg_video::clear()
 {
 	reset_input();
@@ -461,6 +478,7 @@ void mpeg_video::clear()
 	m_frame_rate = 0.0;
 	m_picture_rate_code = 0;
 	m_time_code = 0;
+	m_closed_group = false;
 	std::copy(
 			std::begin(s_default_intra_quantizer_matrix),
 			std::end(s_default_intra_quantizer_matrix),
@@ -510,6 +528,7 @@ void mpeg_video::register_save_state(device_t &device, int index)
 	device.save_item(m_frame_rate, "mpeg_video_frame_rate", index);
 	device.save_item(m_picture_rate_code, "mpeg_video_picture_rate_code", index);
 	device.save_item(m_time_code, "mpeg_video_time_code", index);
+	device.save_item(m_closed_group, "mpeg_video_closed_group", index);
 	device.save_item(m_sequence_header_seen, "mpeg_video_sequence_header_seen", index);
 	device.save_item(m_group_seen, "mpeg_video_group_seen", index);
 	device.save_item(m_intra_quantizer_matrix, "mpeg_video_intra_quantizer_matrix", index);
@@ -860,10 +879,11 @@ void mpeg_video::group_of_pictures()
 	const unsigned pictures = gb(6);
 	if ((hours > 23) || (minutes > 59) || (seconds > 59) || (pictures > 59))
 		throw invalid_stream();
-	gb(1); // closed GOP
+	const bool closed_group = gb(1);
 	gb(1); // broken link
 
 	m_time_code = time_code;
+	m_closed_group = closed_group;
 	m_group_seen = true;
 }
 

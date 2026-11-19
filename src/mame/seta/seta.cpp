@@ -1942,7 +1942,7 @@ u32 seta_state::screen_update_seta_no_layers(screen_device &screen, bitmap_ind16
 void seta_state::seta_layers_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int sprite_bank_size)
 {
 	const rectangle &visarea = screen.visible_area();
-	const int vis_dimy = visarea.max_y - visarea.min_y + 1;
+	const int vis_dimy = visarea.height();
 
 	const int flip = m_spritegen->is_flipped() ^ m_tilemaps_flip;
 	for (int layer = 0; layer < 2; layer++)

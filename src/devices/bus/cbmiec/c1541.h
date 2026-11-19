@@ -48,10 +48,13 @@ protected:
 	required_device<m6502_device> m_maincpu;
 	required_device<floppy_image_device> m_floppy;
 	required_device<via6522_device> m_via0;
+	required_device<via6522_device> m_via1;
 
 	void wpt_callback(floppy_image_device *floppy, int state);
 
 	void c1541_mem(address_map &map) ATTR_COLD;
+
+	uint8_t via0_r(offs_t offset);
 
 private:
 	enum
@@ -69,7 +72,6 @@ private:
 
 	static void floppy_formats(format_registration &fr);
 
-	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
 	required_ioport m_address;
 	output_finder<2> m_leds;
@@ -79,9 +81,6 @@ private:
 
 	emu_timer *m_mtr_on_timer;
 	TIMER_CALLBACK_MEMBER(mtr_on_tick);
-	
-	emu_timer *m_iec_sync_timer;
-	TIMER_CALLBACK_MEMBER(iec_sync_tick);
 };
 
 

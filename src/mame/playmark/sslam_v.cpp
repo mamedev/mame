@@ -170,11 +170,11 @@ uint32_t sslam_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	/* remove wraparound from the tilemap (used on title screen) */
 	if (m_regs[2]+2 > 0x8c8)
 	{
-		rectangle md_clip;
-		md_clip.min_x = cliprect.min_x;
-		md_clip.max_x = cliprect.max_x - (m_regs[2]+2 - 0x8c8);
-		md_clip.min_y = cliprect.min_y;
-		md_clip.max_y = cliprect.max_y;
+		rectangle md_clip(
+				cliprect.left(),
+				cliprect.right() - (m_regs[2]+2 - 0x8c8),
+				cliprect.top(),
+				cliprect.bottom());
 
 		m_md_tilemap->draw(screen, bitmap, md_clip, 0,0);
 	}

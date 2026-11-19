@@ -212,15 +212,10 @@ uint8_t pic8259_device::read(offs_t offset)
 			}
 			else
 			{
-				switch ( m_ocw3 & 0x01 )
-				{
-				case 0:
-					data = m_irr;
-					break;
-				case 1:
+				if ( m_ocw3 & 0x01 )
 					data = m_isr & ~m_imr;
-					break;
-				}
+				else
+					data = m_irr;
 			}
 			break;
 

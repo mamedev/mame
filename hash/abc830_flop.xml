@@ -9,6 +9,7 @@ license:CC0-1.0
 		<description>Basope v1.0 (Finland)</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="51302">
@@ -22,6 +23,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="68 20027-41" />
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="59476">
@@ -34,6 +36,7 @@ license:CC0-1.0
 		<description>ORD 800 v2.4</description>
 		<year>198?</year>
 		<publisher>P-Data</publisher>
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="65069">
@@ -46,6 +49,7 @@ license:CC0-1.0
 		<description>PROMMIS v6.2</description>
 		<year>1983</year>
 		<publisher>ELogik</publisher>
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="51535">
@@ -58,6 +62,7 @@ license:CC0-1.0
 		<description>Bokföring 800 v2.0</description>
 		<year>198?</year>
 		<publisher>P-Data</publisher>
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="141304">
@@ -70,6 +75,7 @@ license:CC0-1.0
 		<description>TTY800 v1.5</description>
 		<year>1983</year>
 		<publisher>Front-Line</publisher>
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="53398">
@@ -83,6 +89,7 @@ license:CC0-1.0
 		<year>1983</year>
 		<publisher>Front-Line</publisher>
 		<info name="usage" value="RUN TTY" />
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="40815">
@@ -96,6 +103,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>Luxor</publisher>
 		<info name="usage" value="RUN CATNETL" />
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="32173">
@@ -109,6 +117,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>Luxor</publisher>
 		<info name="usage" value="RUN LIB" />
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="22884">
@@ -123,6 +132,7 @@ license:CC0-1.0
 		<publisher>Luxor</publisher>
 		<info name="serial" value="68 29011-41" />
 		<info name="usage" value="RUN LIB" />
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="24026">
@@ -136,6 +146,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>Luxor</publisher>
 		<info name="usage" value="RUN LIB" />
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="119474">
@@ -149,6 +160,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>Luxor</publisher>
 		<info name="usage" value="RUN LIB" />
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="136796">
@@ -162,6 +174,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>Luxor</publisher>
 		<info name="serial" value="68 20018-41" />
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
@@ -176,6 +189,7 @@ license:CC0-1.0
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="usage" value="RUN KOMPIL" />
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
@@ -188,6 +202,7 @@ license:CC0-1.0
 		<description>Trim</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<sharedfeat name="bus_default" value="abc830" />
 
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="163840">
@@ -204,6 +219,8 @@ license:CC0-1.0
 Throws "Error 48"
 ]]></notes>
 		<info name="isbn" value="40-71682-1"/>
+		<sharedfeat name="bus_default" value="abc830" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Programskiva" />
 			<dataarea name="flop" size="1560810">
@@ -229,6 +246,8 @@ Preferrably the image should be an MFI, but for some reason the MFI refuses to l
 		<info name="usage" value="Auto-boots on startup" />
 		<info name="isbn" value="40-71676-7"/>
 		<info name="version" value="1.1"/>
+		<sharedfeat name="bus_default" value="abc830" />
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="2217743">
 				<rom name="sockenliv i aldre tid demo.mfm" size="2217743" crc="5421fca2" sha1="569e888c7b472b1f86bffd796c07a1846a11f722" status="baddump"/>

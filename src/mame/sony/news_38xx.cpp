@@ -28,7 +28,6 @@
  *
  * TODO:
  *   - slots (I/O and UBUS expansion slots)
- *   - graphics
  *   - sound
  *   - AST
  *   - Something in the format/install flow is iffy: you have to manually write the disklabel before the installer works
@@ -39,33 +38,27 @@
 
 #include "emu.h"
 
-#include "cpu/mips/mips1.h"
-#include "cpu/m68000/m68030.h"
-
-// memory
-#include "machine/ram.h"
-
-// various hardware
-#include "machine/msm6242.h"
-#include "machine/z80scc.h"
-#include "machine/am79c90.h"
-#include "machine/upd765.h"
 #include "dmac_0266.h"
 #include "news_hid.h"
-#include "machine/ncr5380.h"
+#include "nwb_512.h"
 
-// video
-#include "screen.h"
-
-// busses and connectors
-#include "machine/nscsi_bus.h"
 #include "bus/centronics/ctronics.h"
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
 #include "bus/nscsi/tape.h"
 #include "bus/rs232/rs232.h"
-
+#include "cpu/m68000/m68030.h"
+#include "cpu/mips/mips1.h"
 #include "imagedev/floppy.h"
+#include "machine/am79c90.h"
+#include "machine/msm6242.h"
+#include "machine/ncr5380.h"
+#include "machine/nscsi_bus.h"
+#include "machine/ram.h"
+#include "machine/upd765.h"
+#include "machine/z80scc.h"
+
+#include "screen.h"
 
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_TIMER (1U << 2)
@@ -88,8 +81,6 @@ constexpr auto DISABLED = "disabled";
 class news_38xx_state : public driver_device
 {
 public:
-	static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
-
 	news_38xx_state(machine_config const &mconfig, device_type type, char const *tag) :
 		driver_device(mconfig, type, tag),
 		m_cpu(*this, "cpu"),
@@ -107,6 +98,7 @@ public:
 		m_parallel(*this, "parallel"),
 		m_parallel_data(*this, "parallel_data"),
 		m_eprom(*this, "eprom"),
+		m_fb(*this, "nwb512"),
 		m_led(*this, "led%u", 0U)
 	{
 	}
@@ -145,6 +137,8 @@ protected:
 	};
 	static constexpr u32 IOP_NMI_MASK = 1 << u32(iop_irq::FDCDRQ) |
 										1 << u32(iop_irq::SCC) |
+										1 << u32(iop_irq::KEYBOARD) |
+										1 << u32(iop_irq::MOUSE) |
 										1 << u32(iop_irq::SCSI0) |
 										1 << u32(iop_irq::SCSI1) |
 										1 << u32(iop_irq::LANCE) |
@@ -255,8 +249,9 @@ protected:
 	required_device_array<nscsi_bus_device, 2> m_scsibus;
 	required_device<centronics_device> m_parallel;
 	optional_device<output_latch_device> m_parallel_data;
-
 	required_region_ptr<u32> m_eprom;
+	required_device<nwb_512_device> m_fb;
+
 	output_finder<4> m_led;
 	std::unique_ptr<u16[]> m_net_ram;
 
@@ -422,7 +417,11 @@ void news_38xx_state::iop_map(address_map &map)
 	map(0x2c000000, 0x2c0000ff).rom().region("idrom", 0);
 	map(0x2c000100, 0x2c000103).portr("SW1");
 
-	map(0x2e000000, 0x2effffff).r(FUNC(news_38xx_state::iop_bus_error_r)).mirror(0x10000000); // Expansion I/O
+	// Expansion I/O
+	map(0x2e000000, 0x2eefffff).mirror(0x10000000).r(FUNC(news_38xx_state::iop_bus_error_r));
+
+	// NWB-512 Monochrome Framebuffer (in Expansion I/O space)
+	map(0x2ef00000, 0x2effffff).mirror(0x10000000).m(m_fb, FUNC(nwb_512_device::map));
 }
 
 void news_38xx_state::iop_vector_map(address_map &map)
@@ -888,7 +887,7 @@ void news_38xx_state::common(machine_config &config)
 		});
 
 	// scc channel A
-	RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+	RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
 	m_serial[0]->cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 	m_serial[0]->dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	m_serial[0]->rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
@@ -985,6 +984,9 @@ void news_38xx_state::common(machine_config &config)
 	m_hid->irq_out<news_hid_hle_device::KEYBOARD>().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::KEYBOARD>));
 	m_hid->irq_out<news_hid_hle_device::MOUSE>().set(*this, FUNC(news_38xx_state::irq_w<iop_irq::MOUSE>));
 
+	// NWB-512 monochrome framebuffer + NWP-512D 15" Monochrome Display (816x1024)
+	NWB_512(config, m_fb);
+
 	SOFTWARE_LIST(config, "software_list").set_original("sony_news").set_filter("RISC,NWS3000");
 }
 
@@ -1004,10 +1006,10 @@ ROM_END
 
 INPUT_PORTS_START(nws3860)
 	PORT_START("SW1")
-	PORT_DIPNAME(0x07000000, 0x07000000, "Display") PORT_DIPLOCATION("SW1:1,2,3")
+	PORT_DIPNAME(0x07000000, 0x03000000, "Display") PORT_DIPLOCATION("SW1:1,2,3")
 	PORT_DIPSETTING(0x07000000, "Console")
-	PORT_DIPSETTING(0x06000000, "NWB-512")
-	PORT_DIPSETTING(0x03000000, "NWB-225A")
+	PORT_DIPSETTING(0x06000000, "NWB-225A")
+	PORT_DIPSETTING(0x03000000, "NWB-512")
 	PORT_DIPSETTING(0x00000000, "Autoselect")
 
 	PORT_DIPNAME(0x08000000, 0x08000000, "Boot Device") PORT_DIPLOCATION("SW1:4")
@@ -1030,4 +1032,4 @@ INPUT_PORTS_END
 
 
 /*   YEAR  NAME     P  C  MACHINE  INPUT    CLASS            INIT         COMPANY  FULLNAME   FLAGS */
-COMP(1989, nws3860, 0, 0, nws3860, nws3860, news_38xx_state, init_common, "Sony", "NWS-3860", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+COMP(1989, nws3860, 0, 0, nws3860, nws3860, news_38xx_state, init_common, "Sony", "NWS-3860", MACHINE_NO_SOUND)

@@ -84,7 +84,7 @@ ioport_constructor c64_action_replay_cartridge_device::device_input_ports() cons
 c64_action_replay_cartridge_device::c64_action_replay_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_ACTION_REPLAY, tag, owner, clock),
 	device_c64_expansion_card_interface(mconfig, *this),
-	m_ram(*this, "ram", 0x1000, ENDIANNESS_LITTLE),
+	m_ram(*this, "ram", 0x2000, ENDIANNESS_LITTLE),
 	m_pla(*this, "pla"),
 	m_freeze_timer(nullptr)
 {
@@ -140,7 +140,7 @@ uint8_t c64_action_replay_cartridge_device::c64_cd_r(offs_t offset, uint8_t data
 
 		if (!BIT(pla, 1))
 		{
-			data = m_ram[offset & 0xfff];
+			data = m_ram[offset & 0x1fff];
 		}
 	}
 
@@ -189,7 +189,7 @@ void c64_action_replay_cartridge_device::c64_cd_w(offs_t offset, uint8_t data, i
 
 		if (!BIT(pla, 1))
 		{
-			m_ram[offset & 0xfff] = data;
+			m_ram[offset & 0x1fff] = data;
 		}
 	}
 }

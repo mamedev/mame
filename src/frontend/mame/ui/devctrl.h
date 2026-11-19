@@ -24,9 +24,11 @@
 
 #include "ui/menu.h"
 
+#include <type_traits>
+
 namespace ui {
 
-template<class DeviceType>
+template<class DeviceType, class Enumerator = device_type_enumerator<DeviceType>>
 class menu_device_control : public menu
 {
 public:
@@ -44,7 +46,7 @@ protected:
 
 private:
 	// device enumerator
-	typedef device_type_enumerator<DeviceType> enumerator;
+	typedef Enumerator enumerator;
 
 	DeviceType *    m_device;
 	int             m_count;
@@ -55,8 +57,8 @@ private:
 //  ctor
 //-------------------------------------------------
 
-template<class DeviceType>
-menu_device_control<DeviceType>::menu_device_control(mame_ui_manager &mui, render_target &target, DeviceType *device)
+template<class DeviceType, class Enumerator>
+menu_device_control<DeviceType, Enumerator>::menu_device_control(mame_ui_manager &mui, render_target &target, DeviceType *device)
 	: menu(mui, target)
 {
 	enumerator iter(mui.machine().root_device());
@@ -69,8 +71,8 @@ menu_device_control<DeviceType>::menu_device_control(mame_ui_manager &mui, rende
 //  current_index
 //-------------------------------------------------
 
-template<class DeviceType>
-int menu_device_control<DeviceType>::current_index()
+template<class DeviceType, class Enumerator>
+int menu_device_control<DeviceType, Enumerator>::current_index()
 {
 	enumerator iter(machine().root_device());
 	return iter.indexof(*m_device);
@@ -81,8 +83,8 @@ int menu_device_control<DeviceType>::current_index()
 //  previous
 //-------------------------------------------------
 
-template<class DeviceType>
-bool menu_device_control<DeviceType>::previous()
+template<class DeviceType, class Enumerator>
+bool menu_device_control<DeviceType, Enumerator>::previous()
 {
 	// left arrow - rotate left through devices
 	if (m_device && (1 < m_count))
@@ -104,8 +106,8 @@ bool menu_device_control<DeviceType>::previous()
 //  next
 //-------------------------------------------------
 
-template<class DeviceType>
-bool menu_device_control<DeviceType>::next()
+template<class DeviceType, class Enumerator>
+bool menu_device_control<DeviceType, Enumerator>::next()
 {
 	// right arrow - rotate right through cassette devices
 	if (m_device && (1 < m_count))
@@ -127,11 +129,14 @@ bool menu_device_control<DeviceType>::next()
 //  current_display_name
 //-------------------------------------------------
 
-template<class DeviceType>
-std::string menu_device_control<DeviceType>::current_display_name()
+template<class DeviceType, class Enumerator>
+std::string menu_device_control<DeviceType, Enumerator>::current_display_name()
 {
 	std::string display_name;
-	display_name.assign(current_device()->name());
+	if constexpr (std::is_base_of_v<device_t, DeviceType>)
+		display_name.assign(current_device()->name());
+	else
+		display_name.assign(current_device()->device().name());
 	if (count() > 1)
 		display_name.append(string_format(" %d", current_index() + 1));
 	return display_name;
@@ -142,8 +147,8 @@ std::string menu_device_control<DeviceType>::current_display_name()
 //  current_display_flags
 //-------------------------------------------------
 
-template<class DeviceType>
-uint32_t menu_device_control<DeviceType>::current_display_flags()
+template<class DeviceType, class Enumerator>
+uint32_t menu_device_control<DeviceType, Enumerator>::current_display_flags()
 {
 	uint32_t flags = 0;
 	if (count() > 1)

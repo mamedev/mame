@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "bus/s100/s100.h"
 #include "cpu/z80/z80.h"
 #include "imagedev/floppy.h"
 #include "machine/z80daisy.h"
@@ -26,6 +27,7 @@
 #define SCREEN_TAG      "screen"
 #define RS232_A_TAG     "rs232a"
 #define RS232_B_TAG     "rs232b"
+#define S100_TAG        "s100"
 
 class super6_state : public driver_device
 {
@@ -40,6 +42,7 @@ public:
 		, m_fdc(*this, WD2793_TAG)
 		, m_brg(*this, BR1945_TAG)
 		, m_ram(*this, RAM_TAG)
+		, m_bus(*this, S100_TAG)
 		, m_floppy(*this, WD2793_TAG":%u", 0U)
 		, m_rom(*this, Z80_TAG)
 		, m_j7(*this, "J7")
@@ -54,6 +57,9 @@ private:
 	uint8_t fdc_r();
 	void fdc_w(uint8_t data);
 	void s100_w(uint8_t data);
+	void s100_rdy_w(int state);
+	uint8_t s100_mem_r(offs_t offset);
+	void s100_mem_w(offs_t offset, uint8_t data);
 	void bank0_w(uint8_t data);
 	void bank1_w(uint8_t data);
 	void fdc_intrq_w(int state);
@@ -76,6 +82,7 @@ private:
 	required_device<wd2793_device> m_fdc;
 	required_device<com8116_device> m_brg;
 	required_device<ram_device> m_ram;
+	required_device<s100_bus_device> m_bus;
 	required_device_array<floppy_connector, 2> m_floppy;
 	required_region_ptr<uint8_t> m_rom;
 	required_ioport m_j7;

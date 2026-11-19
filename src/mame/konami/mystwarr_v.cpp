@@ -136,9 +136,9 @@ TILE_GET_INFO_MEMBER(mystwarr_state::get_gai_936_tile_info)
 	tileno = dat3[tile_index] | ((dat2[tile_index] & 0x3f) << 8);
 
 	if (tile_index & 1)
-		colour = (dat1[tile_index >> 1] & 0xf);
-	else
 		colour = ((dat1[tile_index >> 1] >> 4) & 0xf);
+	else
+		colour = (dat1[tile_index >> 1] & 0xf);
 
 	if (dat2[tile_index] & 0x80) colour |= 0x10;
 

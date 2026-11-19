@@ -36,7 +36,7 @@ public:
 		T &&cpu_tag, int ram_size
 	) : sis85c496_host_device(mconfig, tag, owner, clock)
 	{
-		// Revision 3
+		// Revision 3 (2 on datasheet)
 		set_ids(0x10390496, 0x03, 0x060000, 0x00);
 		//set_multifunction_device(true);
 		set_cpu_tag(std::forward<T>(cpu_tag));
@@ -189,6 +189,11 @@ private:
 
 	int pin_mapper(int pin);
 	void irq_handler(int line, int state);
+
+	uint8_t ide1_read_cs1_r(offs_t offset);
+	void ide1_write_cs1_w(offs_t offset, uint8_t data);
+	uint8_t ide2_read_cs1_r(offs_t offset);
+	void ide2_write_cs1_w(offs_t offset, uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(SIS85C496_HOST, sis85c496_host_device)

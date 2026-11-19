@@ -110,7 +110,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(advance_counters);
+	TIMER_CALLBACK_MEMBER(counter_timer);
 
 	bool is_reset() const { return (m_register[MASTER_INTERRUPT_CONTROL] & MICR_RESET) != 0; }
 
@@ -251,12 +251,12 @@ protected:
 	// counter/timer mode specification registers
 	enum
 	{
-		CTMS_DCS_MASK = 0x03,   // output duty cycle (TODO)
+		CTMS_DCS_MASK = 0x03,   // output duty cycle
 		CTMS_REB      = 0x04,   // retrigger enable bit
 		CTMS_EDE      = 0x08,   // external gate enable (TODO)
 		CTMS_ETE      = 0x10,   // external trigger enable (TODO)
 		CTMS_ECE      = 0x20,   // external count enable (TODO)
-		CTMS_EOE      = 0x40,   // external output enable (TODO)
+		CTMS_EOE      = 0x40,   // external output enable
 		CTMS_CSC      = 0x80    // continuous/single cycle
 	};
 
@@ -392,7 +392,16 @@ protected:
 	bool counter_external_trigger(int id);
 	bool counter_external_gate(int id);
 	bool counter_gated(int id);
+	bool counter_running(int id);
+	bool counter_pulse(int id);
+	u32 counter_ticks(int id);
+	void advance_counters();
+	void sync_counters();
+	void update_counter_timer();
 	void count(int id);
+	void counter_output_w(int id, bool state);
+	void output_port_b();
+	void output_port_c();
 	void trigger(int id);
 	void gate(int id, int state);
 	void match_pattern(int port);
@@ -424,8 +433,12 @@ protected:
 
 	// timers
 	emu_timer *m_timer;
+	u64 m_tick;
 	u16 m_counter[3];
 	bool m_counter_error[3];
+	bool m_load_pending[3];
+	bool m_counter_output[3];
+	bool m_counter_second_half[3];
 };
 
 // ======================> z8036_device

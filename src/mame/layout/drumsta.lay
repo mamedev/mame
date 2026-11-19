@@ -1,0 +1,406 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:R. Belmont
+-->
+<mamelayout version="2">
+	<element name="rect"><rect/></element>
+	<element name="disk"><disk/></element>
+	<element name="label_novation_drum_station"><text string="novation  DRUM STATION"/></element>
+	<element name="label_bass_drum"><text string="BASS DRUM"/></element>
+	<element name="label_snare_drum"><text string="SNARE DRUM"/></element>
+	<element name="label_tom_toms"><text string="TOM TOMS"/></element>
+	<element name="label_rim_clap_bell"><text string="RIM / CLAP / BELL"/></element>
+	<element name="label_hi_hat"><text string="HI-HAT"/></element>
+	<element name="label_cymbals"><text string="CYMBALS"/></element>
+	<element name="label_congas_maracas_claves"><text string="CONGAS / MARACAS / CLAVES"/></element>
+	<element name="label_909"><text string="909"/></element>
+	<element name="label_9"><text string="9"/></element>
+	<element name="label_1"><text string="1"/></element>
+	<element name="label_5"><text string="5"/></element>
+	<element name="label_808"><text string="808"/></element>
+	<element name="label_minus"><text string="-"/></element>
+	<element name="label_2"><text string="2"/></element>
+	<element name="label_6"><text string="6"/></element>
+	<element name="label_0"><text string="0"/></element>
+	<element name="label_3"><text string="3"/></element>
+	<element name="label_7"><text string="7"/></element>
+	<element name="key_mode"><text string="Mode"/></element>
+	<element name="label_plus"><text string="+"/></element>
+	<element name="label_4"><text string="4"/></element>
+	<element name="label_8"><text string="8"/></element>
+	<element name="label_audition"><text string="AUDITION"/></element>
+	<element name="label_auto_trigger"><text string="AUTO TRIGGER"/></element>
+	<element name="label_mode"><text string="MODE"/></element>
+	<element name="label_drum_select"><text string="DRUM SELECT"/></element>
+	<element name="label_front_cut"><text string="FRONT CUT"/></element>
+	<element name="label_cont_vel"><text string="CONT / VEL"/></element>
+	<element name="label_note_off"><text string="NOTE-OFF"/></element>
+	<element name="label_gen_midi"><text string="GEN MIDI"/></element>
+	<element name="label_output"><text string="OUTPUT"/></element>
+	<element name="label_bank"><text string="BANK"/></element>
+	<element name="label_distortion"><text string="DISTORTION"/></element>
+	<element name="label_demo"><text string="DEMO"/></element>
+	<element name="label_compare"><text string="COMPARE"/></element>
+	<element name="label_trigger"><text string="TRIGGER"/></element>
+	<element name="label_write"><text string="WRITE"/></element>
+	<element name="label_edit"><text string="EDIT"/></element>
+	<element name="label_program"><text string="PROGRAM"/></element>
+	<element name="label_midi_rx"><text string="MIDI RX"/></element>
+	<element name="label_midi_tx"><text string="MIDI TX"/></element>
+	<element name="label_utility"><text string="UTILITY"/></element>
+	<element name="label_save"><text string="SAVE"/></element>
+	<element name="label_drum_kit"><text string="DRUM KIT"/></element>
+	<element name="label_protect_enable"><text string="PROTECT   ENABLE"/></element>
+	<element name="label_headphones"><text string="HEADPHONES"/></element>
+	<element name="label_volume"><text string="VOLUME"/></element>
+	<element name="label_tune"><text string="TUNE"/></element>
+	<element name="label_level"><text string="LEVEL"/></element>
+	<element name="label_attack_tone"><text string="ATTACK / TONE"/></element>
+	<element name="label_decay"><text string="DECAY"/></element>
+	<element name="label_tone"><text string="TONE"/></element>
+	<element name="label_snappy"><text string="SNAPPY"/></element>
+	<element name="label_tune_tone"><text string="TUNE / TONE"/></element>
+	<element name="label_low_mid_high"><text string="LOW  MID  HIGH"/></element>
+	<element name="label_select"><text string="SELECT"/></element>
+	<element name="label_rim_clap_bell_2"><text string="RIM  CLAP  BELL"/></element>
+	<element name="label_closed_open"><text string="CLOSED  OPEN"/></element>
+	<element name="label_crash_ride"><text string="CRASH  RIDE"/></element>
+	<element name="label_conga_mar_clv"><text string="CONGA  MAR  CLV"/></element>
+	<element name="digit"><led7seg><color red="1" green="0.12" blue="0.04"/></led7seg></element>
+	<element name="led"><disk state="0"><color red="0.18" green="0.025" blue="0.015"/></disk><disk state="1"><color red="1" green="0.12" blue="0.04"/></disk></element>
+	<element name="button"><rect state="0"><color red="0.70" green="0.72" blue="0.73"/></rect><rect state="1"><color red="1" green="0.88" blue="0.28"/></rect></element>
+	<element name="knob"><disk><color red="0.65" green="0.67" blue="0.68"/></disk><disk><bounds x="0.12" y="0.12" width="0.76" height="0.76"/><color red="0.12" green="0.13" blue="0.14"/></disk></element>
+	<element name="help" defstate="1"><text state="1" string="Enable the layout plugin to drag knobs and click selectors; controls are also available in the menus."/></element>
+
+	<group name="knob">
+		<element ref="knob" id="knob~index~"><bounds x="0" y="0" width="48" height="48"/></element>
+		<element ref="disk">
+			<animate inputtag="AN~index~"/>
+			<color red="1" green="0.9" blue="0.4"/>
+			<bounds state="0" x="11.972" y="33.427" width="6" height="6"/>
+			<bounds state="5" x="9.165" y="30.791" width="6" height="6"/>
+			<bounds state="10" x="7.102" y="27.540" width="6" height="6"/>
+			<bounds state="15" x="5.912" y="23.878" width="6" height="6"/>
+			<bounds state="20" x="5.670" y="20.036" width="6" height="6"/>
+			<bounds state="25" x="6.392" y="16.253" width="6" height="6"/>
+			<bounds state="30" x="8.031" y="12.770" width="6" height="6"/>
+			<bounds state="35" x="10.485" y="9.803" width="6" height="6"/>
+			<bounds state="40" x="13.600" y="7.540" width="6" height="6"/>
+			<bounds state="45" x="17.180" y="6.123" width="6" height="6"/>
+			<bounds state="50" x="21.000" y="5.640" width="6" height="6"/>
+			<bounds state="55" x="24.820" y="6.123" width="6" height="6"/>
+			<bounds state="60" x="28.400" y="7.540" width="6" height="6"/>
+			<bounds state="65" x="31.515" y="9.803" width="6" height="6"/>
+			<bounds state="70" x="33.969" y="12.770" width="6" height="6"/>
+			<bounds state="75" x="35.608" y="16.253" width="6" height="6"/>
+			<bounds state="80" x="36.330" y="20.036" width="6" height="6"/>
+			<bounds state="85" x="36.088" y="23.878" width="6" height="6"/>
+			<bounds state="90" x="34.898" y="27.540" width="6" height="6"/>
+			<bounds state="95" x="32.835" y="30.791" width="6" height="6"/>
+			<bounds state="100" x="30.028" y="33.427" width="6" height="6"/>
+		</element>
+	</group>
+
+	<view name="Front Panel">
+		<bounds x="0" y="0" width="1740" height="260"/>
+		<element ref="rect"><bounds x="0" y="0" width="1740" height="260"/><color red="0.055" green="0.06" blue="0.065"/></element>
+		<element ref="disk"><bounds x="12" y="15" width="18" height="18"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="disk"><bounds x="12" y="223" width="18" height="18"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="disk"><bounds x="1710" y="15" width="18" height="18"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="disk"><bounds x="1710" y="223" width="18" height="18"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="rect"><bounds x="46" y="12" width="1648" height="23"/><color red="1" green="0.85" blue="0.02"/></element>
+		<element ref="label_novation_drum_station"><bounds x="52" y="14" width="455" height="19"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="label_bass_drum"><bounds x="537" y="16" width="156" height="15"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="rect"><bounds x="537" y="238" width="156" height="2"/><color red="0.45" green="0.47" blue="0.48"/></element>
+		<element ref="label_snare_drum"><bounds x="701" y="16" width="156" height="15"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="rect"><bounds x="697" y="12" width="3" height="23"/><color red="0.055" green="0.06" blue="0.065"/></element>
+		<element ref="rect"><bounds x="701" y="238" width="156" height="2"/><color red="0.45" green="0.47" blue="0.48"/></element>
+		<element ref="label_tom_toms"><bounds x="865" y="16" width="156" height="15"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="rect"><bounds x="861" y="12" width="3" height="23"/><color red="0.055" green="0.06" blue="0.065"/></element>
+		<element ref="rect"><bounds x="865" y="238" width="156" height="2"/><color red="0.45" green="0.47" blue="0.48"/></element>
+		<element ref="label_rim_clap_bell"><bounds x="1029" y="16" width="156" height="15"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="rect"><bounds x="1025" y="12" width="3" height="23"/><color red="0.055" green="0.06" blue="0.065"/></element>
+		<element ref="rect"><bounds x="1029" y="238" width="156" height="2"/><color red="0.45" green="0.47" blue="0.48"/></element>
+		<element ref="label_hi_hat"><bounds x="1193" y="16" width="156" height="15"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="rect"><bounds x="1189" y="12" width="3" height="23"/><color red="0.055" green="0.06" blue="0.065"/></element>
+		<element ref="rect"><bounds x="1193" y="238" width="156" height="2"/><color red="0.45" green="0.47" blue="0.48"/></element>
+		<element ref="label_cymbals"><bounds x="1357" y="16" width="156" height="15"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="rect"><bounds x="1353" y="12" width="3" height="23"/><color red="0.055" green="0.06" blue="0.065"/></element>
+		<element ref="rect"><bounds x="1357" y="238" width="156" height="2"/><color red="0.45" green="0.47" blue="0.48"/></element>
+		<element ref="label_congas_maracas_claves"><bounds x="1521" y="16" width="156" height="15"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="rect"><bounds x="1517" y="12" width="3" height="23"/><color red="0.055" green="0.06" blue="0.065"/></element>
+		<element ref="rect"><bounds x="1521" y="238" width="156" height="2"/><color red="0.45" green="0.47" blue="0.48"/></element>
+		<element ref="button" inputtag="KEY0" inputmask="0x04"><bounds x="135" y="98" width="47" height="18"/></element>
+		<element ref="label_909"><bounds x="135" y="100" width="47" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY0" inputmask="0x08"><bounds x="317" y="142" width="40" height="18"/></element>
+		<element ref="label_9"><bounds x="317" y="144" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY0" inputmask="0x10"><bounds x="215" y="54" width="40" height="18"/></element>
+		<element ref="label_1"><bounds x="215" y="56" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY0" inputmask="0x20"><bounds x="266" y="98" width="40" height="18"/></element>
+		<element ref="label_5"><bounds x="266" y="100" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY1" inputmask="0x04"><bounds x="135" y="54" width="47" height="18"/></element>
+		<element ref="label_808"><bounds x="135" y="56" width="47" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY1" inputmask="0x08"><bounds x="215" y="186" width="40" height="18"/></element>
+		<element ref="label_minus"><bounds x="215" y="188" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY1" inputmask="0x10"><bounds x="266" y="54" width="40" height="18"/></element>
+		<element ref="label_2"><bounds x="266" y="56" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY1" inputmask="0x20"><bounds x="317" y="98" width="40" height="18"/></element>
+		<element ref="label_6"><bounds x="317" y="100" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY2" inputmask="0x08"><bounds x="266" y="186" width="40" height="18"/></element>
+		<element ref="label_0"><bounds x="266" y="188" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY2" inputmask="0x10"><bounds x="317" y="54" width="40" height="18"/></element>
+		<element ref="label_3"><bounds x="317" y="56" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY2" inputmask="0x20"><bounds x="215" y="142" width="40" height="18"/></element>
+		<element ref="label_7"><bounds x="215" y="144" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY3" inputmask="0x04"><bounds x="469" y="205" width="48" height="18"/></element>
+		<element ref="key_mode"><bounds x="469" y="207" width="48" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY3" inputmask="0x08"><bounds x="317" y="186" width="40" height="18"/></element>
+		<element ref="label_plus"><bounds x="317" y="188" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY3" inputmask="0x10"><bounds x="215" y="98" width="40" height="18"/></element>
+		<element ref="label_4"><bounds x="215" y="100" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="KEY3" inputmask="0x20"><bounds x="266" y="142" width="40" height="18"/></element>
+		<element ref="label_8"><bounds x="266" y="144" width="40" height="14"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="button" inputtag="AUDITION" inputmask="0x10"><bounds x="376" y="205" width="72" height="18"/></element>
+		<element ref="label_audition"><bounds x="376" y="207" width="72" height="13"/><color red="0.02" green="0.02" blue="0.02"/></element>
+		<element ref="label_auto_trigger"><bounds x="365" y="227" width="94" height="9"/></element>
+		<element ref="label_mode"><bounds x="469" y="228" width="48" height="9"/></element>
+		<element ref="label_drum_select"><bounds x="209" y="75" width="52" height="8"/></element>
+		<element ref="label_front_cut"><bounds x="260" y="75" width="52" height="8"/></element>
+		<element ref="label_cont_vel"><bounds x="311" y="75" width="52" height="8"/></element>
+		<element ref="label_note_off"><bounds x="209" y="119" width="52" height="8"/></element>
+		<element ref="label_gen_midi"><bounds x="260" y="119" width="52" height="8"/></element>
+		<element ref="label_output"><bounds x="311" y="119" width="52" height="8"/></element>
+		<element ref="label_bank"><bounds x="209" y="163" width="52" height="8"/></element>
+		<element ref="label_distortion"><bounds x="260" y="163" width="52" height="8"/></element>
+		<element ref="label_demo"><bounds x="311" y="163" width="52" height="8"/></element>
+		<element ref="label_compare"><bounds x="209" y="207" width="52" height="8"/></element>
+		<element ref="label_trigger"><bounds x="260" y="207" width="52" height="8"/></element>
+		<element ref="label_write"><bounds x="311" y="207" width="52" height="8"/></element>
+		<element ref="rect"><bounds x="366" y="58" width="94" height="128"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="digit" name="digit0"><bounds x="372" y="79" width="36" height="72"/></element>
+		<element ref="digit" name="digit1"><bounds x="412" y="79" width="36" height="72"/></element>
+		<element ref="label_edit"><bounds x="371" y="161" width="36" height="10"/></element>
+		<element ref="label_write"><bounds x="411" y="161" width="36" height="10"/></element>
+		<element ref="led" name="led6"><bounds x="469" y="66" width="8" height="8"/></element>
+		<element ref="label_program"><bounds x="480" y="65" width="42" height="10"/></element>
+		<element ref="led" name="led5"><bounds x="469" y="90" width="8" height="8"/></element>
+		<element ref="label_midi_rx"><bounds x="480" y="89" width="42" height="10"/></element>
+		<element ref="led" name="led4"><bounds x="469" y="114" width="8" height="8"/></element>
+		<element ref="label_midi_tx"><bounds x="480" y="113" width="42" height="10"/></element>
+		<element ref="led" name="led3"><bounds x="469" y="138" width="8" height="8"/></element>
+		<element ref="label_utility"><bounds x="480" y="137" width="42" height="10"/></element>
+		<element ref="led" name="led2"><bounds x="469" y="162" width="8" height="8"/></element>
+		<element ref="label_save"><bounds x="480" y="161" width="42" height="10"/></element>
+		<element ref="led" name="led7"><bounds x="190" y="58" width="9" height="9"/></element>
+		<element ref="led" name="led0"><bounds x="190" y="102" width="9" height="9"/></element>
+		<element ref="label_drum_kit"><bounds x="135" y="129" width="65" height="11"/></element>
+		<element ref="led" name="led1"><bounds x="157" y="158" width="9" height="9"/></element>
+		<element ref="label_protect_enable"><bounds x="120" y="197" width="87" height="9"/></element>
+		<element ref="label_write"><bounds x="129" y="217" width="69" height="11"/></element>
+		<element ref="disk"><bounds x="70" y="191" width="30" height="30"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="label_headphones"><bounds x="50" y="227" width="72" height="9"/></element>
+		<param name="index" value="23"/>
+		<group ref="knob"><bounds x="58" y="58" width="48" height="48"/></group>
+		<element ref="label_volume"><bounds x="43" y="111" width="78" height="11"/></element>
+		<param name="index" value="7"/>
+		<group ref="knob"><bounds x="546" y="54" width="48" height="48"/></group>
+		<element ref="label_tune"><bounds x="531" y="107" width="78" height="11"/></element>
+		<param name="index" value="3"/>
+		<group ref="knob"><bounds x="624" y="54" width="48" height="48"/></group>
+		<element ref="label_level"><bounds x="609" y="107" width="78" height="11"/></element>
+		<param name="index" value="5"/>
+		<group ref="knob"><bounds x="546" y="157" width="48" height="48"/></group>
+		<element ref="label_attack_tone"><bounds x="531" y="210" width="78" height="11"/></element>
+		<param name="index" value="1"/>
+		<group ref="knob"><bounds x="624" y="157" width="48" height="48"/></group>
+		<element ref="label_decay"><bounds x="609" y="210" width="78" height="11"/></element>
+		<param name="index" value="6"/>
+		<group ref="knob"><bounds x="710" y="54" width="48" height="48"/></group>
+		<element ref="label_tune"><bounds x="695" y="107" width="78" height="11"/></element>
+		<param name="index" value="2"/>
+		<group ref="knob"><bounds x="788" y="54" width="48" height="48"/></group>
+		<element ref="label_level"><bounds x="773" y="107" width="78" height="11"/></element>
+		<param name="index" value="4"/>
+		<group ref="knob"><bounds x="710" y="157" width="48" height="48"/></group>
+		<element ref="label_tone"><bounds x="695" y="210" width="78" height="11"/></element>
+		<param name="index" value="0"/>
+		<group ref="knob"><bounds x="788" y="157" width="48" height="48"/></group>
+		<element ref="label_snappy"><bounds x="773" y="210" width="78" height="11"/></element>
+		<param name="index" value="15"/>
+		<group ref="knob"><bounds x="874" y="54" width="48" height="48"/></group>
+		<element ref="label_tune"><bounds x="859" y="107" width="78" height="11"/></element>
+		<param name="index" value="11"/>
+		<group ref="knob"><bounds x="952" y="54" width="48" height="48"/></group>
+		<element ref="label_level"><bounds x="937" y="107" width="78" height="11"/></element>
+		<param name="index" value="13"/>
+		<group ref="knob"><bounds x="874" y="157" width="48" height="48"/></group>
+		<element ref="label_decay"><bounds x="859" y="210" width="78" height="11"/></element>
+		<param name="index" value="9"/>
+		<group ref="knob"><bounds x="1038" y="54" width="48" height="48"/></group>
+		<element ref="label_tune"><bounds x="1023" y="107" width="78" height="11"/></element>
+		<param name="index" value="14"/>
+		<group ref="knob"><bounds x="1116" y="54" width="48" height="48"/></group>
+		<element ref="label_level"><bounds x="1101" y="107" width="78" height="11"/></element>
+		<param name="index" value="10"/>
+		<group ref="knob"><bounds x="1202" y="54" width="48" height="48"/></group>
+		<element ref="label_tune"><bounds x="1187" y="107" width="78" height="11"/></element>
+		<param name="index" value="12"/>
+		<group ref="knob"><bounds x="1280" y="54" width="48" height="48"/></group>
+		<element ref="label_level"><bounds x="1265" y="107" width="78" height="11"/></element>
+		<param name="index" value="8"/>
+		<group ref="knob"><bounds x="1202" y="157" width="48" height="48"/></group>
+		<element ref="label_decay"><bounds x="1187" y="210" width="78" height="11"/></element>
+		<param name="index" value="18"/>
+		<group ref="knob"><bounds x="1366" y="54" width="48" height="48"/></group>
+		<element ref="label_tune_tone"><bounds x="1351" y="107" width="78" height="11"/></element>
+		<param name="index" value="22"/>
+		<group ref="knob"><bounds x="1444" y="54" width="48" height="48"/></group>
+		<element ref="label_level"><bounds x="1429" y="107" width="78" height="11"/></element>
+		<param name="index" value="17"/>
+		<group ref="knob"><bounds x="1366" y="157" width="48" height="48"/></group>
+		<element ref="label_decay"><bounds x="1351" y="210" width="78" height="11"/></element>
+		<param name="index" value="21"/>
+		<group ref="knob"><bounds x="1530" y="54" width="48" height="48"/></group>
+		<element ref="label_tune"><bounds x="1515" y="107" width="78" height="11"/></element>
+		<param name="index" value="19"/>
+		<group ref="knob"><bounds x="1608" y="54" width="48" height="48"/></group>
+		<element ref="label_level"><bounds x="1593" y="107" width="78" height="11"/></element>
+		<element ref="rect" id="switch1"><bounds x="132" y="174" width="54" height="18"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="rect">
+			<animate inputtag="SW0" mask="0x80"/>
+			<bounds state="0" x="133.8" y="175.8" width="14.4" height="14.4"/>
+			<bounds state="1" x="169.8" y="175.8" width="14.4" height="14.4"/>
+		</element>
+		<element ref="rect" id="switch0"><bounds x="949" y="173" width="54" height="18"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="rect">
+			<animate inputtag="SW0" mask="0x60"/>
+			<bounds state="1" x="950.8" y="174.8" width="14.4" height="14.4"/>
+			<bounds state="2" x="986.8" y="174.8" width="14.4" height="14.4"/>
+			<bounds state="3" x="968.8" y="174.8" width="14.4" height="14.4"/>
+		</element>
+		<element ref="label_low_mid_high"><bounds x="936" y="196" width="80" height="9"/></element>
+		<element ref="label_select"><bounds x="941" y="216" width="70" height="10"/></element>
+		<element ref="rect" id="switch2"><bounds x="1097" y="173" width="54" height="18"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="rect">
+			<animate inputtag="SW1" mask="0x60"/>
+			<bounds state="1" x="1098.8" y="174.8" width="14.4" height="14.4"/>
+			<bounds state="2" x="1134.8" y="174.8" width="14.4" height="14.4"/>
+			<bounds state="3" x="1116.8" y="174.8" width="14.4" height="14.4"/>
+		</element>
+		<element ref="label_rim_clap_bell_2"><bounds x="1084" y="196" width="80" height="9"/></element>
+		<element ref="label_select"><bounds x="1089" y="216" width="70" height="10"/></element>
+		<element ref="rect" id="switch3"><bounds x="1277" y="173" width="54" height="18"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="rect">
+			<animate inputtag="SW1" mask="0x80"/>
+			<bounds state="0" x="1278.8" y="174.8" width="14.4" height="14.4"/>
+			<bounds state="1" x="1314.8" y="174.8" width="14.4" height="14.4"/>
+		</element>
+		<element ref="label_closed_open"><bounds x="1264" y="196" width="80" height="9"/></element>
+		<element ref="label_select"><bounds x="1269" y="216" width="70" height="10"/></element>
+		<element ref="rect" id="switch5"><bounds x="1441" y="173" width="54" height="18"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="rect">
+			<animate inputtag="SW2" mask="0x80"/>
+			<bounds state="0" x="1442.8" y="174.8" width="14.4" height="14.4"/>
+			<bounds state="1" x="1478.8" y="174.8" width="14.4" height="14.4"/>
+		</element>
+		<element ref="label_crash_ride"><bounds x="1428" y="196" width="80" height="9"/></element>
+		<element ref="label_select"><bounds x="1433" y="216" width="70" height="10"/></element>
+		<element ref="rect" id="switch4"><bounds x="1527" y="173" width="54" height="18"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="rect">
+			<animate inputtag="SW2" mask="0x60"/>
+			<bounds state="1" x="1528.8" y="174.8" width="14.4" height="14.4"/>
+			<bounds state="2" x="1564.8" y="174.8" width="14.4" height="14.4"/>
+			<bounds state="3" x="1546.8" y="174.8" width="14.4" height="14.4"/>
+		</element>
+		<element ref="label_low_mid_high"><bounds x="1514" y="196" width="80" height="9"/></element>
+		<element ref="label_select"><bounds x="1519" y="216" width="70" height="10"/></element>
+		<element ref="rect" id="switch6"><bounds x="1605" y="173" width="54" height="18"/><color red="0.015" green="0.015" blue="0.015"/></element>
+		<element ref="rect">
+			<animate inputtag="SW3" mask="0x60"/>
+			<bounds state="1" x="1606.8" y="174.8" width="14.4" height="14.4"/>
+			<bounds state="2" x="1642.8" y="174.8" width="14.4" height="14.4"/>
+			<bounds state="3" x="1624.8" y="174.8" width="14.4" height="14.4"/>
+		</element>
+		<element ref="label_conga_mar_clv"><bounds x="1592" y="196" width="80" height="9"/></element>
+		<element ref="label_select"><bounds x="1597" y="216" width="70" height="10"/></element>
+		<element ref="help" id="help"><bounds x="250" y="246" width="1220" height="10"/></element>
+	</view>
+
+	<script><![CDATA[
+		file:set_resolve_tags_callback(function()
+			local view = file.views["Front Panel"]
+			local knobs, switches, pointers = {}, {}, {}
+			for _, index in ipairs({23, 7, 3, 5, 1, 6, 2, 4, 0, 15, 11, 13, 9, 14, 10, 12, 8, 18, 22, 17, 21, 19}) do
+				local port = file.device:ioport("AN" .. index)
+				local field
+				for _, candidate in pairs(port.fields) do field = candidate break end
+				local item = view.items["knob" .. index]
+				table.insert(knobs, {item = item, field = field})
+			end
+			do
+				local field = file.device:ioport("SW0").fields["Tom Select"]
+				local item = view.items["switch0"]
+				table.insert(switches, {item = item, field = field, mask = 0x60, values = {32, 96, 64}})
+			end
+			do
+				local field = file.device:ioport("SW0").fields["Write"]
+				local item = view.items["switch1"]
+				table.insert(switches, {item = item, field = field, mask = 0x80, values = {0, 128}})
+			end
+			do
+				local field = file.device:ioport("SW1").fields["Rimshot / Handclap / Cowbell Select"]
+				local item = view.items["switch2"]
+				table.insert(switches, {item = item, field = field, mask = 0x60, values = {32, 96, 64}})
+			end
+			do
+				local field = file.device:ioport("SW1").fields["Hi-Hat Select"]
+				local item = view.items["switch3"]
+				table.insert(switches, {item = item, field = field, mask = 0x80, values = {0, 128}})
+			end
+			do
+				local field = file.device:ioport("SW2").fields["Conga Select"]
+				local item = view.items["switch4"]
+				table.insert(switches, {item = item, field = field, mask = 0x60, values = {32, 96, 64}})
+			end
+			do
+				local field = file.device:ioport("SW2").fields["Cymbal Select"]
+				local item = view.items["switch5"]
+				table.insert(switches, {item = item, field = field, mask = 0x80, values = {0, 128}})
+			end
+			do
+				local field = file.device:ioport("SW3").fields["Congas / Maracas / Claves Select"]
+				local item = view.items["switch6"]
+				table.insert(switches, {item = item, field = field, mask = 0x60, values = {32, 96, 64}})
+			end
+			view:set_pointer_updated_callback(function(kind, id, device, x, y, buttons, pressed)
+				if (buttons & 1) == 0 then pointers[id] = nil return end
+				if (pressed & 1) ~= 0 then
+					for _, switch in ipairs(switches) do
+						if switch.item.bounds:includes(x, y) then
+							local value = switch.field.port:read() & switch.mask
+							for n, option in ipairs(switch.values) do
+								if value == option then switch.field.user_value = switch.values[n % #switch.values + 1] break end
+							end
+						end
+					end
+					for _, knob in ipairs(knobs) do
+						if knob.item.bounds:includes(x, y) then
+							pointers[id] = {knob = knob, y = y, value = knob.field.port:read()}
+							break
+						end
+					end
+				end
+				local p = pointers[id]
+				if p then
+					local value = p.value + (p.y - y) * 100 / (p.knob.item.bounds.height * 3)
+					p.knob.field.user_value = math.max(0, math.min(100, math.floor(value + 0.5)))
+				end
+			end)
+			view:set_pointer_left_callback(function(kind, id) pointers[id] = nil end)
+			view:set_pointer_aborted_callback(function(kind, id) pointers[id] = nil end)
+			view:set_forget_pointers_callback(function() pointers = {} end)
+			view.items["help"]:set_state(0)
+		end)
+	]]></script>
+</mamelayout>

@@ -18,6 +18,12 @@ class quadencoder_device : public device_t
 public:
 	quadencoder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0) ATTR_COLD;
 
+	// Generate a full quadrature cycle (4 events) for each change in input.
+	// Useful for emulating encoders with mechanical click-stops (detents) that
+	// force the encoder to land on cycle boundaries, and encoders with very
+	// narrow slits.
+	quadencoder_device &configure_clustered() ATTR_COLD;
+
 	// Signal `mn` leads signal `pl` when the value increases, and vice versa
 	// when it decreases.
 	auto write_mn() { return m_mn_cb.bind(); }
@@ -37,6 +43,7 @@ protected:
 private:
 	devcb_write_line m_mn_cb, m_pl_cb;
 	emu_timer *m_timer;
+	s32 m_events_per_change; // not needed in save state
 	attotime m_time;
 	s32 m_delta;
 	bool m_mn, m_pl;

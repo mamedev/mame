@@ -67,7 +67,7 @@ protected:
 	uint8_t m_scroll_latch = 0;
 	bool m_scroll_latch_valid = false;
 	uint8_t m_blink_flip_flop = 0;
-	uint8_t m_reverse_field = 0;
+	uint8_t m_reverse_field = 1; // 0 when reverse field is on
 	uint8_t m_basic_attribute = 0;
 	// dc011 attributes
 	uint8_t m_columns = 0;

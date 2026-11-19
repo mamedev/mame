@@ -162,7 +162,6 @@ hyperstone_device::hyperstone_device(
 	, m_program_config("program", ENDIANNESS_BIG, prg_data_width, 32, 0, internal_map)
 	, m_io_config("io", ENDIANNESS_BIG, io_data_width, io_addr_bits, (io_data_width == 16) ? -1 : -2)
 	, m_disassembler(nullptr) // for logging - pass nullptr so output doesn't depend on state
-	, m_cache(CACHE_SIZE + sizeof(internal_hyperstone_state))
 	, m_drcuml(nullptr)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
@@ -1471,8 +1470,11 @@ void hyperstone_device::device_start()
 	m_enable_drc = allow_drc();
 	if (m_enable_drc)
 	{
-		m_cache.allocate_cache(mconfig().options().drc_rwx());
-		m_core = m_cache.alloc_near<internal_hyperstone_state>();
+		const uint32_t umlflags = 0;
+		m_drcuml = std::make_unique<drcuml_state>(*this, CACHE_SIZE + sizeof(internal_hyperstone_state));
+		m_drcuml->initialize(umlflags, 4, 32, 1, COMPILE_FORWARDS_BYTES);
+
+		m_core = m_drcuml->cache_alloc_near<internal_hyperstone_state>();
 	}
 	else
 	{
@@ -1566,9 +1568,6 @@ void hyperstone_device::device_start()
 
 	if (m_enable_drc)
 	{
-		const uint32_t umlflags = 0;
-		m_drcuml = std::make_unique<drcuml_state>(*this, m_cache, umlflags, 4, 32, 1, COMPILE_FORWARDS_BYTES);
-
 		// add UML symbols
 		m_drcuml->symbol_add(&m_core->global_regs[PC_REGISTER],  sizeof(m_core->global_regs[PC_REGISTER]),  "pc");
 		m_drcuml->symbol_add(&m_core->global_regs[SR_REGISTER],  sizeof(m_core->global_regs[SR_REGISTER]),  "sr");

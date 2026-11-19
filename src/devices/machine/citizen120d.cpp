@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Citizen 120D 9-pin dot matrix print mechanism (skeleton)
+    Citizen 120D 9-pin dot matrix print mechanism
 
 **********************************************************************/
 
@@ -137,7 +137,7 @@ void citizen_120d_device::head_en_w(int state)
 	if (x < 0)
 		return;
 
-	// TODO: pin pitch not traced, one dot row per pin
+	// pin pitch not traced, assumed 1/72"
 	for (int pin = 0; pin < 9; pin++)
 		if (BIT(m_solenoid_data, pin))
 			for (int dot = 0; dot < DOT_WIDTH; dot++)

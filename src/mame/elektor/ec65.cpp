@@ -24,7 +24,7 @@ EC65K - To be developed from scratch. Similar design to EC65, but 6522
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "cpu/g65816/g65816.h"
+#include "cpu/m6502/w65816.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
@@ -247,7 +247,7 @@ void ec65_state::ec65(machine_config &config)
 void ec65k_state::ec65k(machine_config &config)
 {
 	/* basic machine hardware */
-	g65816_device &maincpu(G65816(config, "maincpu", XTAL(4'000'000))); // can use 4,2 or 1 MHz
+	w65816_device &maincpu(W65816(config, "maincpu", XTAL(4'000'000))); // can use 4,2 or 1 MHz
 	maincpu.set_addrmap(AS_PROGRAM, &ec65k_state::ec65k_mem);
 
 	/* video hardware */

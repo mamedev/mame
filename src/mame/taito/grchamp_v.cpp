@@ -375,7 +375,7 @@ uint32_t grchamp_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	int cxmask = (m_cpu1_out[3] & 0x20) ? 0xff : 0x1ff;
 
 	/* iterate over scanlines */
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		/* select either left or right tilemaps based on Y */
 		bitmap_ind16 const &lrpixmap = (y < 128) ? lpixmap : rpixmap;
@@ -392,7 +392,7 @@ uint32_t grchamp_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 		draw_objects(y, objdata);
 
 		/* iterate over columns */
-		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		for (int x = cliprect.left(); x <= cliprect.right(); x++)
 		{
 			int headbit = 0;
 			int kill = 0;

@@ -487,10 +487,15 @@ void hd6120_device::execute_run()
 				m_oaddr = (m_iaddr & (BIT(m_ir, 7) ? 0177600 : 0170000)) | (m_ir & 0177);
 				if (BIT(m_ir, 8))
 					m_state = minor_state::INDIR_1;
-				else if ((m_ir & 07000) == 05000)
-					m_state = minor_state::JMP_1;
 				else
-					m_state = minor_state::EXEC_1;
+				{
+					if (m_ir >= 04000 && m_iiff)
+						m_oaddr = u16(m_ib) << 12 | (m_oaddr & 07777);
+					if ((m_ir & 07000) == 05000)
+						m_state = minor_state::JMP_1;
+					else
+						m_state = minor_state::EXEC_1;
+				}
 			}
 			break;
 
@@ -1186,7 +1191,7 @@ void hd6120_device::execute_run()
 			break;
 
 		case minor_state::RTN_4:
-			m_oaddr = u16(m_ib) << 12 | m_inst.read_word(m_sp[BIT(m_ir, 5)]);
+			m_oaddr = u16(m_ib) << 12 | (m_inst.read_word(m_oaddr) & 07777);
 			m_state = minor_state::JMP_1;
 			break;
 
@@ -1206,7 +1211,7 @@ void hd6120_device::execute_run()
 			break;
 
 		case minor_state::POP_4:
-			m_ac = m_inst.read_word(m_sp[BIT(m_ir, 5)]);
+			m_ac = m_inst.read_word(m_oaddr) & 07777;
 			m_state = minor_state::SKON_3;
 			break;
 

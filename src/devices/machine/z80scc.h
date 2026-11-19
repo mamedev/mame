@@ -106,16 +106,18 @@ public:
 	uint8_t data_read();
 	void data_write(uint8_t data);
 
-	void receive_data(uint8_t data);
+	void receive_data(uint8_t data, uint8_t status = 0);
 	void m_tx_fifo_rp_step();
 	void m_rx_fifo_rp_step();
 	uint8_t m_rx_fifo_rp_data();
 
-	void write_rx(int state);
+	void write_rx(int state, bool loopback = false);
 	void cts_w(int state);
 	void dcd_w(int state);
 	void rxc_w(int state);
 	void txc_w(int state);
+	void rtxc_w(int state);
+	void trxc_w(int state);
 	void sync_w(int state);
 
 	TIMER_CALLBACK_MEMBER(brg_tick);
@@ -183,7 +185,7 @@ protected:
 		INT_TRANSMIT_PRIO       = 1,
 		INT_EXTERNAL_PRIO       = 0,
 		INT_RECEIVE_PRIO        = 2,
-		INT_SPECIAL_PRIO        = 0,
+		INT_SPECIAL_PRIO        = 2,
 	};
 
 	// Read registers
@@ -234,11 +236,16 @@ protected:
 
 	unsigned int get_brg_rate();
 	unsigned int get_rtxc_rate();
+	void rx_clock_edge(int state);
+	void tx_clock_edge(int state);
 	void update_baudtimer();
 
 	void scc_register_write(uint8_t reg, uint8_t data);
 	uint8_t scc_register_read(uint8_t reg);
 	void update_serial();
+	bool receive_allowed() const;
+	bool transmit_allowed() const;
+	void resume_transmit();
 	void set_dtr(int state);
 	void set_rts(int state);
 
@@ -248,13 +255,17 @@ protected:
 	int get_rx_word_length();
 	int get_tx_word_length();
 	void safe_transmit_register_reset();
+	void set_tx_brg_rate();
 	void check_dma_request();
 	void check_receive_interrupt();
+	bool rx_special_condition(uint8_t status) const;
+	bool rx_holds_special_condition() const;
 
 	emu_timer *m_baudtimer;
 	uint16_t m_brg_counter;
 	unsigned int m_brg_rate;
 	unsigned int m_delayed_tx_brg_change;
+	bool m_tx_clocked;
 
 	// receiver state
 	uint8_t m_rx_data_fifo[8 + 1];    // receive data FIFO (ring buffer, one slot is always left unused)
@@ -378,6 +389,10 @@ public:
 	void txca_w(int state) { m_chanA->txc_w(state); }
 	void txcb_w(int state) { m_chanB->txc_w(state); }
 	void rxtxcb_w(int state) { m_chanB->rxc_w(state); m_chanB->txc_w(state); }
+	void rtxca_w(int state) { m_chanA->rtxc_w(state); }
+	void rtxcb_w(int state) { m_chanB->rtxc_w(state); }
+	void trxca_w(int state) { m_chanA->trxc_w(state); }
+	void trxcb_w(int state) { m_chanB->trxc_w(state); }
 	void synca_w(int state) { m_chanA->sync_w(state); }
 	void syncb_w(int state) { m_chanB->sync_w(state); }
 	int update_extint(int i);
@@ -454,6 +469,10 @@ protected:
 	int m_out_int_state;
 	int m_int_state[6]; // interrupt state
 	int m_int_source[6]; // interrupt source
+
+	static constexpr int INT_PRIORITY[6] = {
+			z80scc_channel::INT_RECEIVE_PRIO, z80scc_channel::INT_TRANSMIT_PRIO, z80scc_channel::INT_EXTERNAL_PRIO,
+			3 + z80scc_channel::INT_RECEIVE_PRIO, 3 + z80scc_channel::INT_TRANSMIT_PRIO, 3 + z80scc_channel::INT_EXTERNAL_PRIO };
 
 	int const m_variant;
 	uint8_t m_wr0_ptrbits;

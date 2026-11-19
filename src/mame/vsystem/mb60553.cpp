@@ -212,11 +212,16 @@ void mb60553_zooming_tilemap_device::draw_line(bitmap_ind16 &destbitmap, int lin
 
 	for (int sx = min_x; sx <= max_x; sx++)
 	{
-		const int xx = (xxx >> 16) & xmask;
-		const int yy = (yyy >> 16) & ymask;
+		int32_t src_x = xxx >> 16;
+		int32_t src_y = yyy >> 16 & ymask;
 
-		if ((flagsbitmap.pix(yy, xx) & TILEMAP_PIXEL_LAYER0) != 0)
-			*dest = srcbitmap.pix(yy, xx);
+		// no wraparound on X axis (gstriker logo during attract)
+		// TODO: this may be controlled by $20'0011, also note Y axis wrap needed by vgoalsoc
+		if (src_x == std::clamp(src_x, 0, xmask))
+		{
+			if ((flagsbitmap.pix(src_y, src_x) & TILEMAP_PIXEL_LAYER0) != 0)
+				*dest = srcbitmap.pix(src_y, src_x);
+		}
 
 		dest++;
 		xxx += incxx;

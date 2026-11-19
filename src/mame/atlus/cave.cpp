@@ -618,6 +618,26 @@ void cave_z80_state::hotdogst_map(address_map &map)
 	map(0xf00000, 0xf0ffff).ram().share(m_spriteram[0]);                                                          // Sprites
 }
 
+void cave_state::hotdogstbl_map(address_map &map)
+{
+	map(0x000000, 0x0fffff).rom();                                                                                // ROM
+	map(0x300000, 0x30ffff).ram();                                                                                // RAM
+	map(0x408000, 0x408fff).ram().w(m_palette[0], FUNC(palette_device::write16)).share("palette.0");              // Palette
+	map(0x880000, 0x887fff).m(m_tilemap[0], FUNC(tilemap038_device::vram_map));                                   // Layer 0
+	map(0x900000, 0x907fff).m(m_tilemap[1], FUNC(tilemap038_device::vram_map));                                   // Layer 1
+	map(0x980000, 0x987fff).m(m_tilemap[2], FUNC(tilemap038_device::vram_map));                                   // Layer 2
+	map(0xa80000, 0xa8007f).w(m_spritegen[0], FUNC(sprite013_device::videoregs_w));                               // Video Regs
+	map(0xa80000, 0xa80007).r(FUNC(cave_state::irq_cause_r));                                                     // IRQ Cause
+	map(0xb00000, 0xb00005).rw(m_tilemap[0], FUNC(tilemap038_device::vregs_r), FUNC(tilemap038_device::vregs_w)); // Layer 0 Control
+	map(0xb80000, 0xb80005).rw(m_tilemap[1], FUNC(tilemap038_device::vregs_r), FUNC(tilemap038_device::vregs_w)); // Layer 1 Control
+	map(0xc00000, 0xc00005).rw(m_tilemap[2], FUNC(tilemap038_device::vregs_r), FUNC(tilemap038_device::vregs_w)); // Layer 2 Control
+	map(0xc80000, 0xc80001).portr("IN0");                                                                         // Inputs
+	map(0xc80002, 0xc80003).portr("IN1");                                                                         // Inputs + EEPROM
+	map(0xd00000, 0xd00000).w(FUNC(cave_state::eeprom_w));                                                        // EEPROM
+	map(0xd00002, 0xd00003).nopw();                                                                               // ???
+	map(0xf00000, 0xf0ffff).ram().share(m_spriteram[0]);                                                          // Sprites
+}
+
 
 /***************************************************************************
                                Koro Koro Quest
@@ -2385,6 +2405,31 @@ void cave_z80_state::hotdogst(machine_config &config)
 	m_oki[0]->set_addrmap(0, &cave_z80_state::oki_map<0>);
 }
 
+void cave_state::hotdogstbl(machine_config &config)
+{
+	add_base_config(config, 3);
+
+	/* basic machine hardware */
+	m_maincpu->set_clock(32_MHz_XTAL/2);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cave_state::hotdogstbl_map);
+
+	EEPROM_93C46_16BIT(config, m_eeprom);
+
+	/* video hardware */
+	m_screen[0]->set_size(384, 240);
+	m_screen[0]->set_visarea(0, 384-1, 0, 240-1);
+
+	m_spritegen[0]->set_offsets(0, 0, 384, 240);
+
+	GFXDECODE(config, m_gfxdecode[0], m_palette[0], gfx_hotdogst);
+	m_palette[0]->set_entries(0x1000/2);
+
+	/* sound hardware */
+	SPEAKER(config, "mono").front_center();
+
+	OKIM6295(config, m_oki[0], 32_MHz_XTAL/16, okim6295_device::PIN7_HIGH); // pin 7 not verified
+	m_oki[0]->add_route(ALL_OUTPUTS, "mono", 1.0);
+}
 
 /***************************************************************************
                                Koro Koro Quest
@@ -3913,6 +3958,30 @@ ROM_START( hotdogst )
 	ROM_LOAD16_WORD( "eeprom-hotdogst.u14", 0x0000, 0x0080, CRC(12b4f934) SHA1(5b28d8fbd78869db78ce49e541a9d65558841966) )
 ROM_END
 
+// bootleg PCB with MC68EC000FU10, 32.000MHz XTAL, 6295 (Oki clone), 5x QL2003-XPL84C, 93C46, test button, no DIPs
+ROM_START( hotdogstbl )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "29f1610.8m16", 0x000000, 0x100000, CRC(7d8f41d8) SHA1(e42b30436c2b9c97df3bdc4a6827b260d47e84f2) )
+
+	ROM_REGION( 0x400000, "sprites0", 0 )
+	ROM_LOAD32_WORD_SWAP( "29f1610.16m16top",    0x000000, 0x200000, CRC(79e0ae04) SHA1(a056342c424e2ca6937e13c24870664a4de0f5e0) )
+	ROM_LOAD32_WORD_SWAP( "29f1610.16m16bottom", 0x000002, 0x200000, CRC(f1f77821) SHA1(7d1c344111f7f760d0bce1d9d66d0b40a3f2827a) )
+
+	ROM_REGION( 0x200000, "tiles", 0 )
+	ROM_LOAD( "mx29f1610mc.16m16", 0x000000, 0x200000, CRC(4cc7ad9f) SHA1(7803e359499ded9aa1cb932b59fd74182740ffeb) )
+
+	ROM_REGION( 0x80000, "layer0", 0 )
+	ROM_COPY( "tiles", 0x00000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "layer1", 0 )
+	ROM_COPY( "tiles", 0x80000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "layer2", 0 )
+	ROM_COPY( "tiles", 0x100000, 0x00000, 0x80000)
+
+	ROM_REGION( 0x80000, "oki1", 0 )
+	ROM_LOAD( "27c040.bin", 0x00000, 0x80000, CRC(c3f87b60) SHA1(9aa49cfcaaceeea740fee0661ab37da605fddef0) )
+ROM_END
 
 /***************************************************************************
 
@@ -5621,7 +5690,8 @@ GAME( 1996, agalletat,  agallet,  agallet,  cave,     cave_z80_state, init_agall
 GAME( 1996, agalletah,  agallet,  agallet,  cave,     cave_z80_state, init_agallet,   ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Hong Kong)", MACHINE_SUPPORTS_SAVE )
 
 // 68000 ROM string 0x328e-32b5 has 1993 copyright and publisher string, it's planned release date but cancelled?
-GAME( 1996, hotdogst,   0,        hotdogst, cave,     cave_z80_state, init_hotdogst,  ROT90,  "Marble (Ace International license)",     "Hotdog Storm (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, hotdogst,   0,        hotdogst,   cave,   cave_z80_state, init_hotdogst,  ROT90,  "Marble (Ace International license)",     "Hotdog Storm (Korea)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1996, hotdogstbl, hotdogst, hotdogstbl, cave,   cave_state,     init_guwange,   ROT90,  "bootleg",                                "Hotdog Storm (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, cellage,    0,        cellage,  cellage,  cave_state,     init_tjumpman,  ROT0,   "Yujin / Namco",                          "Cellage", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 

@@ -211,6 +211,41 @@ void wd_fdc_device_base::device_start()
 	save_item(NAME(drq));
 	if (head_control)
 		save_item(NAME(hld));
+	save_item(NAME(hlt));
+	save_item(NAME(enp));
+	save_item(NAME(data));
+	save_item(NAME(motor_timeout));
+	save_item(NAME(sector_size));
+	save_item(NAME(enmf));
+	save_item(NAME(delay_int));
+	save_item(NAME(delay_cmd));
+	save_item(NAME(force_ready));
+
+	save_item(NAME(cur_live.tm));
+	save_item(NAME(cur_live.state));
+	save_item(NAME(cur_live.next_state));
+	save_item(NAME(cur_live.shift_reg));
+	save_item(NAME(cur_live.crc));
+	save_item(NAME(cur_live.bit_counter));
+	save_item(NAME(cur_live.byte_counter));
+	save_item(NAME(cur_live.previous_type));
+	save_item(NAME(cur_live.data_separator_phase));
+	save_item(NAME(cur_live.data_bit_context));
+	save_item(NAME(cur_live.data_reg));
+	save_item(NAME(cur_live.idbuf));
+
+	save_item(NAME(checkpoint_live.tm));
+	save_item(NAME(checkpoint_live.state));
+	save_item(NAME(checkpoint_live.next_state));
+	save_item(NAME(checkpoint_live.shift_reg));
+	save_item(NAME(checkpoint_live.crc));
+	save_item(NAME(checkpoint_live.bit_counter));
+	save_item(NAME(checkpoint_live.byte_counter));
+	save_item(NAME(checkpoint_live.previous_type));
+	save_item(NAME(checkpoint_live.data_separator_phase));
+	save_item(NAME(checkpoint_live.data_bit_context));
+	save_item(NAME(checkpoint_live.data_reg));
+	save_item(NAME(checkpoint_live.idbuf));
 }
 
 void wd_fdc_device_base::device_reset()
@@ -255,6 +290,7 @@ void wd_fdc_device_base::mr_w(int state)
 		}
 
 		mon_cb(1); // Clear the MON* line
+		set_sso(0); // set to side 0
 
 		intrq_cond = 0;
 		live_abort();
@@ -283,6 +319,7 @@ void wd_fdc_device_base::set_floppy(floppy_image_device *_floppy)
 		floppy->setup_ready_cb(floppy_image_device::ready_cb());
 	}
 
+	// TODO: the selected drive isn't saved; it needs reconstructing after loading a state
 	floppy = _floppy;
 
 	int next_ready = floppy ? floppy->ready_r() : 1;
@@ -758,7 +795,7 @@ void wd_fdc_device_base::read_id_start()
 	}
 
 	main_state = READ_ID;
-	status &= ~(S_WP|S_DDM|S_LOST|S_RNF);
+	status &= ~(S_CRC|S_WP|S_DDM|S_LOST|S_RNF);
 	update_sso();
 	set_hld();
 	sub_state = motor_control ? SPINUP : SPINUP_DONE;
@@ -1086,8 +1123,12 @@ void wd_fdc_device_base::interrupt_start()
 	//logerror("main_state=%s, cur_live.state=%s\n",states[main_state],states[cur_live.state]);
 
 	if(status & S_BUSY) {
-		main_state = sub_state = cur_live.state = IDLE;
-		cur_live.tm = attotime::never;
+		// End the floppy's write session before discarding the live state.
+		// Otherwise an aborted WRITE TRACK leaves the write gate active,
+		// and subsequent reads can flush empty spans over the remaining track.
+		if(!cur_live.tm.is_never())
+			live_abort();
+		main_state = sub_state = IDLE;
 		status &= ~S_BUSY;
 		motor_timeout = 0;
 		// Real hardware never presents BUSY=0 with DRQ still pending (see
@@ -1325,6 +1366,9 @@ void wd_fdc_device_base::cmd_w(uint8_t val)
 		intrq_cond = 0;
 		// set busy, then set a timer to process the command
 		status |= S_BUSY;
+		// the status layout follows the command register at once
+		if(val & 0x80)
+			status_type_1 = false;
 		drop_drq();
 		delay_cycles(t_cmd, dden ? delay_command_commit*2 : delay_command_commit);
 	}
@@ -2195,7 +2239,10 @@ void wd_fdc_device_base::live_run(attotime limit)
 					break;
 				}
 			}
-			set_drq();
+			if(!drq) {
+				drq = true;
+				drq_cb(true);
+			}
 			cur_live.state = WRITE_BYTE;
 			cur_live.bit_counter = 16;
 			checkpoint();
@@ -2454,12 +2501,15 @@ void wd_fdc_device_base::drop_hld()
 
 void wd_fdc_device_base::update_sso()
 {
+	set_sso((command & 0x02) ? 1 : 0);
+}
+
+void wd_fdc_device_base::set_sso(int side)
+{
 	// The 'side_control' flag is interpreted as meaning that the FDC has
 	// a SSO output feature, not that it necessarily controls the floppy.
 	if(!side_control)
 		return;
-
-	uint8_t side = (command & 0x02) ? 1 : 0;
 
 	// If a SSO callback is defined then it is assumed that this callback
 	// will update the floppy side if that is the connection. There are
@@ -2473,7 +2523,7 @@ void wd_fdc_device_base::update_sso()
 	// intended the driver to update the floppy side which appears to be
 	// the case in most cases.
 	if(floppy) {
-		floppy->ss_w((command & 0x02) ? 1 : 0);
+		floppy->ss_w(side);
 	}
 }
 
@@ -2491,6 +2541,27 @@ wd_fdc_analog_device_base::wd_fdc_analog_device_base(const machine_config &mconf
 	wd_fdc_device_base(mconfig, type, tag, owner, clock)
 {
 	clock_ratio = 1;
+}
+
+void wd_fdc_analog_device_base::device_start()
+{
+	wd_fdc_device_base::device_start();
+
+	save_item(NAME(cur_pll.ctime));
+	save_item(NAME(cur_pll.period));
+	save_item(NAME(cur_pll.min_period));
+	save_item(NAME(cur_pll.max_period));
+	save_item(NAME(cur_pll.period_adjust_base));
+	save_item(NAME(cur_pll.phase_adjust));
+	save_item(NAME(cur_pll.freq_hist));
+
+	save_item(NAME(checkpoint_pll.ctime));
+	save_item(NAME(checkpoint_pll.period));
+	save_item(NAME(checkpoint_pll.min_period));
+	save_item(NAME(checkpoint_pll.max_period));
+	save_item(NAME(checkpoint_pll.period_adjust_base));
+	save_item(NAME(checkpoint_pll.phase_adjust));
+	save_item(NAME(checkpoint_pll.freq_hist));
 }
 
 void wd_fdc_analog_device_base::pll_reset(bool fm, bool enmf, const attotime &when)
@@ -2546,6 +2617,35 @@ wd_fdc_digital_device_base::wd_fdc_digital_device_base(const machine_config &mco
 }
 
 constexpr int wd_fdc_digital_device_base::wd_digital_step_times[4];
+
+void wd_fdc_digital_device_base::device_start()
+{
+	wd_fdc_device_base::device_start();
+
+	save_item(NAME(cur_pll.counter));
+	save_item(NAME(cur_pll.increment));
+	save_item(NAME(cur_pll.transition_time));
+	save_item(NAME(cur_pll.history));
+	save_item(NAME(cur_pll.slot));
+	save_item(NAME(cur_pll.phase_add));
+	save_item(NAME(cur_pll.phase_sub));
+	save_item(NAME(cur_pll.freq_add));
+	save_item(NAME(cur_pll.freq_sub));
+	save_item(NAME(cur_pll.ctime));
+	save_item(NAME(cur_pll.delays));
+
+	save_item(NAME(checkpoint_pll.counter));
+	save_item(NAME(checkpoint_pll.increment));
+	save_item(NAME(checkpoint_pll.transition_time));
+	save_item(NAME(checkpoint_pll.history));
+	save_item(NAME(checkpoint_pll.slot));
+	save_item(NAME(checkpoint_pll.phase_add));
+	save_item(NAME(checkpoint_pll.phase_sub));
+	save_item(NAME(checkpoint_pll.freq_add));
+	save_item(NAME(checkpoint_pll.freq_sub));
+	save_item(NAME(checkpoint_pll.ctime));
+	save_item(NAME(checkpoint_pll.delays));
+}
 
 void wd_fdc_digital_device_base::pll_reset(bool fm, bool enmf, const attotime &when)
 {

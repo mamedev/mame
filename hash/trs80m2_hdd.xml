@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="trs80m2_hdd" description="Tandy TRS-80 Model II hard disk images">
+
+	<software name="lsdos631">
+		<description>LS-DOS v6.3.1A</description>
+		<year>1990</year>
+		<publisher>Misosys</publisher>
+		<info name="usage" value="Requires the hdi card. Boot lsdos631ds from floppy, then SYSTEM (DRIVE=2,DRIVER=&quot;TRSHD2&quot;) with drive select 1, 6 heads, 306 tracks, step rate 0, 4 heads for partition, starting head 1" />
+
+		<!-- Tandon TM503 -->
+		<part name="hdd" interface="st506_hdd">
+			<diskarea name="harddriv">
+				<disk name="lsdos631" sha1="37ea00b87db2d7fd5c4f10eb0484dcb2b48af996" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
+</softwarelist>

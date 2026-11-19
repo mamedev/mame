@@ -81,6 +81,8 @@ public:
 	void mem_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 mem_slot_r(offs_t offset, u16 mem_mask = ~0);
 	void mem_slot_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 mem_15m_r(offs_t offset, u16 mem_mask = ~0);
+	void mem_15m_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 io_r(offs_t offset, u16 mem_mask = ~0);
 	void io_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	void remap(int space_id, offs_t start, offs_t end);

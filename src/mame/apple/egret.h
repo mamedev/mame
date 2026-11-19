@@ -8,12 +8,6 @@
 #include "cpu/m6805/m68hc05e1.h"
 #include "machine/macseconds.h"
 
-#define USE_BUS_ADB (0)
-
-#if USE_BUS_ADB
-#include "bus/adb/adb.h"
-#endif
-
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -34,12 +28,6 @@ public:
 	virtual void nvram_default() override;
 	virtual bool nvram_read(util::read_stream &file) override;
 	virtual bool nvram_write(util::write_stream &file) override;
-
-#if USE_BUS_ADB
-	void adb_w(int id, int state);
-	void adb_poweron_w(int id, int state);
-	void adb_change();
-#endif
 
 	// interface routines
 	u8 get_xcvr_session() { return m_xcvr_session; }
@@ -85,14 +73,6 @@ private:
 	s32 m_adb_dtime;
 	u8 m_disk_pram[0x100]{};
 	bool m_pram_loaded;
-
-#if USE_BUS_ADB
-	optional_device <adb_connector> m_adb_connector[2];
-	adb_device *m_adb_device[2]{};
-	bool m_adb_device_out[2]{};
-	bool m_adb_device_poweron[2]{};
-	bool m_adb_out = false;
-	#endif
 
 	u8 pa_r();
 	u8 pb_r();

@@ -708,21 +708,22 @@ uint32_t pega1a_device::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 	const pen_t *const pens = m_palette->pens();
 
-	for (int y = active.min_y; y <= active.max_y; y++)
+	for (int y = active.top(); y <= active.bottom(); y++)
 	{
 		const int dst_y = y + m_ega_timing.y_off;
 
-		if (dst_y < cliprect.min_y || dst_y > cliprect.max_y)
+		if (!cliprect.containsy(dst_y))
 			continue;
 
-		uint16_t const *src = &m_ega_bitmap.pix(y, active.min_x);
+		uint16_t const *src = &m_ega_bitmap.pix(y, active.left());
+		auto *const dst = &bitmap.pix(dst_y);
 
-		for (int x = active.min_x; x <= active.max_x; x++, src++)
+		for (int x = active.left(); x <= active.right(); x++, src++)
 		{
 			const int dst_x = x + m_ega_timing.x_off;
 
-			if (dst_x >= cliprect.min_x && dst_x <= cliprect.max_x)
-				bitmap.pix(dst_y, dst_x) = pens[*src & 0x3f];
+			if (cliprect.containsx(dst_x))
+				dst[dst_x] = pens[*src & 0x3f];
 		}
 	}
 

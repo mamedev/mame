@@ -73,7 +73,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_cart(*this, "cartslot")
 		, m_maintimer(*this, "timer_main")
+		, m_padtimer(*this, "timer_pad")
 		, m_palette(*this, "palette")
+		, m_input(*this, "INPUT")
 	{
 	}
 
@@ -90,7 +92,7 @@ private:
 		uint32_t lpc = 0, lpc2 = 0, lpt = 0, lpr = 0;
 		uint32_t khb = 0, klb = 0;
 		uint8_t thb = 0, tlb = 0;
-		uint32_t tcr = 0, wcr = 0, kcr = 0x80;
+		uint32_t tcr = 0, wcr = 0, kcr = 0;
 	};
 
 	struct vip_io_regs_t
@@ -120,10 +122,12 @@ private:
 		uint16_t latch = 0;
 	};
 
-	required_device<cpu_device> m_maincpu;
+	required_device<v810_device> m_maincpu;
 	required_device<vboy_cart_slot_device> m_cart;
 	required_device<timer_device> m_maintimer;
+	required_device<timer_device> m_padtimer;
 	required_device<palette_device> m_palette;
+	required_ioport m_input;
 
 	std::unique_ptr<uint16_t[]> m_font;
 	std::unique_ptr<uint16_t[]> m_bgmap;
@@ -139,7 +143,7 @@ private:
 	uint8_t m_displayfb = 0;
 	uint8_t m_drawfb = 0;
 	uint8_t m_row_num = 0;
-	attotime m_input_latch_time;
+	uint16_t m_key_last = 0;
 
 	void io_map(address_map &map) ATTR_COLD;
 	u8 timer_control_r();
@@ -185,7 +189,8 @@ private:
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
+	TIMER_DEVICE_CALLBACK_MEMBER(pad_read_done);
+	int bus_wait(offs_t address, int access, int size);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
 
 	void vboy_map(address_map &map) ATTR_COLD;
@@ -649,24 +654,43 @@ u8 vboy_state::keypad_control_r()
 	return m_regs.kcr | 0x4c;
 }
 
+// SCR (Development Manual 4-4-12): bit 7 K-Int-Inh, 5 Para/Si, 4 Soft-Ck, 2 HW-SI (write only),
+// 1 SI-Stat (read only), 0 S-Abt/Dis; bits 6 and 3 are unused and read 1
 void vboy_state::keypad_control_w(offs_t offset, u8 data)
 {
-	if (data & 0x04 )
+	if (BIT(data, 0))
 	{
-		m_regs.klb = (ioport("INPUT")->read() & 0x00ff);
-		m_regs.khb = (ioport("INPUT")->read() & 0xff00) >> 8;
-		//m_input_latch_time = machine().time();
-	}
-
-	if (data & 1)
-	{
+		// S-Abt/Dis: abort the hardware read (on hardware it takes effect at the next serial clock edge)
+		m_padtimer->reset();
+		m_regs.kcr &= ~0x02;
 		m_regs.klb = 0;
 		m_regs.khb = 0;
-		//m_input_latch_time = attotime::zero;
+	}
+	else if (BIT(data, 2) && !BIT(m_regs.kcr, 0) && !BIT(m_regs.kcr, 1))
+	{
+		// HW-SI, once S-Abt/Dis is clear: 16 bits read at 31.25 kHz (4-4-9), SI-Stat is set meanwhile
+		m_regs.kcr |= 0x02;
+		m_padtimer->adjust(attotime::from_hz(31'250) * 16);
 	}
 
-	// according to docs: bit 6 & bit 3 are unused and set to 1, bit 1 is read only.
-	m_regs.kcr = (data | 0x48) & 0xfd;
+	// K-Int-Inh clears the key input interrupt request
+	if (BIT(data, 7))
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+
+	m_regs.kcr = (data & 0xb1) | (m_regs.kcr & 0x02);
+}
+
+// end of a hardware read: unless K-Int-Inh is set, the key input interrupt is raised when a key on bits 15-4
+// is pushed ("transition to 1", 4-4-10), that is, set in this read and clear in the previous one
+TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::pad_read_done)
+{
+	const u16 data = m_input->read();
+	m_regs.klb = data & 0x00ff;
+	m_regs.khb = data >> 8;
+	m_regs.kcr &= ~0x02;
+	if (!BIT(m_regs.kcr, 7) && (data & ~m_key_last & 0xfff0))
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	m_key_last = data;
 }
 
 
@@ -1100,7 +1124,10 @@ void vboy_state::machine_reset()
 	m_regs.thb = 0xff;
 	m_regs.tcr = 0xe4;
 	m_regs.wcr = 0xfc;
-	m_regs.kcr = 0x4c | 0x80;
+	m_regs.kcr = 0x00;
+	m_key_last = 0;
+	m_padtimer->reset();
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_vip_io.DPCTRL = 2; // ssquash relies on this at boot otherwise no frame_start irq is fired
 	m_displayfb = 0;
 	m_drawfb = 0;
@@ -1139,10 +1166,36 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_main_tick)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_pad_tick)
+// wait states of one 16-bit bus cycle per area (Development Manual Table 4-4-3, Internal Wait Control);
+// the external data bus is 16 bits wide (4-3-1), so a word access takes a second bus cycle
+int vboy_state::bus_wait(offs_t address, int access, int size)
 {
-	if((m_regs.kcr & 0x80) == 0)
-		m_maincpu->set_input_line(0, HOLD_LINE);
+	int wait;
+	switch (BIT(address, 24, 3))
+	{
+		case 0: // VIP: 2 waits for registers and VRAM writes, 5 for VRAM reads
+		{
+			const offs_t offset = address & 0x7ffff;
+			const bool regs = (offset >= 0x40000) && (offset < 0x60000);
+			const bool write = (access == v810_device::BUS_WRITE) || (access == v810_device::BUS_IO_WRITE);
+			wait = (regs || write) ? 2 : 5;
+			break;
+		}
+		case 4: // game pak expansion: 2 waits, 1 with EXP1W
+			wait = BIT(m_regs.wcr, 1) ? 1 : 2;
+			break;
+		case 7: // game pak ROM: 2 waits, 1 with ROM1W
+			wait = BIT(m_regs.wcr, 0) ? 1 : 2;
+			break;
+		default: // sound, internal registers, work RAM, game pak RAM
+			wait = 1;
+			break;
+	}
+
+	// the second bus cycle of a word access: 2 clocks plus its waits
+	if (size == 4)
+		wait = (wait * 2) + 2;
+	return wait;
 }
 
 void vboy_state::vboy_palette(palette_device &palette) const
@@ -1234,8 +1287,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineR)
 void vboy_state::vboy(machine_config &config)
 {
 	/* basic machine hardware */
-	V810(config, m_maincpu, XTAL(20'000'000));
+	NINTENDO_NVC(config, m_maincpu, 20_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vboy_state::vboy_map);
+	m_maincpu->set_bus_wait_callback(FUNC(vboy_state::bus_wait));
 	// no AS_IO, and some games relies on r/w the program map with INH/OUTH
 	// cfr. vforce, nesterfb, panicbom (sound)
 
@@ -1245,8 +1299,8 @@ void vboy_state::vboy(machine_config &config)
 	// programmable timer
 	TIMER(config, m_maintimer).configure_generic(FUNC(vboy_state::timer_main_tick));
 
-	// pad ready, which should be once per VBL
-	TIMER(config, "timer_pad").configure_periodic(FUNC(vboy_state::timer_pad_tick), attotime::from_hz(50.038029f));
+	// game pad hardware read
+	TIMER(config, m_padtimer).configure_generic(FUNC(vboy_state::pad_read_done));
 
 	/* video hardware */
 	config.set_default_layout(layout_vboy);

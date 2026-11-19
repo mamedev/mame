@@ -16,7 +16,7 @@
 class mips3_disassembler : public util::disasm_interface
 {
 public:
-	mips3_disassembler() = default;
+	mips3_disassembler(bool vr5500 = false) : m_vr5500(vr5500) { }
 	virtual ~mips3_disassembler() = default;
 
 	virtual u32 opcode_alignment() const override;
@@ -25,6 +25,7 @@ public:
 	offs_t dasm_one(std::ostream &stream, offs_t pc, u32 op);
 
 protected:
+	const bool m_vr5500;
 	static const char *const reg[32];
 	static const char *const cacheop[32];
 	static const char *const cpreg[4][32];

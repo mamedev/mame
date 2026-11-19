@@ -146,6 +146,7 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("oti64111",       OTI64111_PCI);
 	device.option_add("sis6326_pci",    SIS6326_PCI);
 	device.option_add("wd9710",         WD9710_PCI);
+//	device.option_add("permedia",       PERMEDIA_PCI);
 
 	// 0x04 - multimedia controllers
 	// sound cards
@@ -186,6 +187,7 @@ void agp_cards(device_slot_interface &device)
 {
 	// 3Dlabs
 	device.option_add("permedia2",      PERMEDIA2);
+	device.option_add("permedia2v",     PERMEDIA2V);
 	// nVidia
 	device.option_add("riva128",        RIVA128);
 	device.option_add("riva128zx",      RIVA128ZX);

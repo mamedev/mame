@@ -36,14 +36,14 @@ uint32_t turrett_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		fade_r = -fade_r;
 	}
 
-	for (int y = cliprect.min_y; y <= cliprect.max_y; ++y)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); ++y)
 	{
-		const uint16_t *src = &vram[y * X_VISIBLE + cliprect.min_x];
-		uint16_t *dest = &bitmap.pix(y, cliprect.min_x);
+		const uint16_t *src = &vram[y * X_VISIBLE + cliprect.left()];
+		uint16_t *dest = &bitmap.pix(y, cliprect.left());
 
 		if (m_video_fade != 0)
 		{
-			for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
+			for (int x = cliprect.left(); x <= cliprect.right(); ++x)
 			{
 				const uint16_t srcpix = *src++;
 
@@ -60,7 +60,7 @@ uint32_t turrett_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		}
 		else
 		{
-			for (int x = cliprect.min_x; x <= cliprect.max_x; ++x)
+			for (int x = cliprect.left(); x <= cliprect.right(); ++x)
 			{
 				*dest++ = *src++ & 0x7fff;
 			}

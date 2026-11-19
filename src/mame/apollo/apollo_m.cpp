@@ -495,6 +495,7 @@ uint8_t apollo_state::pc_dma8237_0_dack_r() { return m_isa->dack_r(0); }
 uint8_t apollo_state::pc_dma8237_1_dack_r() { return m_isa->dack_r(1); }
 uint8_t apollo_state::pc_dma8237_2_dack_r() { return m_isa->dack_r(2); }
 uint8_t apollo_state::pc_dma8237_3_dack_r() { return m_isa->dack_r(3); }
+// TODO: test me, may not work right for DMA16 (requiring high byte being fed from ad-hoc port)
 uint8_t apollo_state::pc_dma8237_5_dack_r() { return m_isa->dack_r(5); }
 uint8_t apollo_state::pc_dma8237_6_dack_r() { return m_isa->dack_r(6); }
 uint8_t apollo_state::pc_dma8237_7_dack_r() { return m_isa->dack_r(7); }
@@ -503,6 +504,7 @@ void apollo_state::pc_dma8237_0_dack_w(uint8_t data){ m_isa->dack_w(0, data); }
 void apollo_state::pc_dma8237_1_dack_w(uint8_t data){ m_isa->dack_w(1, data); }
 void apollo_state::pc_dma8237_2_dack_w(uint8_t data){ m_isa->dack_w(2, data); }
 void apollo_state::pc_dma8237_3_dack_w(uint8_t data){ m_isa->dack_w(3, data); }
+// TODO: as above
 void apollo_state::pc_dma8237_5_dack_w(uint8_t data){ m_isa->dack_w(5, data); }
 void apollo_state::pc_dma8237_6_dack_w(uint8_t data){ m_isa->dack_w(6, data); }
 void apollo_state::pc_dma8237_7_dack_w(uint8_t data){ m_isa->dack_w(7, data); }
@@ -577,7 +579,7 @@ u16 apollo_state::apollo_pic_get_vector()
 			apollo_csr_set_status_register(APOLLO_CSR_SR_INTERRUPT_PENDING, 0);
 		} else {
 			// clear bit Interrupt Pending in Cache Status Register
-			apollo_set_cache_status_register(this,0x10, 0x00);
+			apollo_set_cache_status_register(this, 0x10, 0x00);
 		}
 	}
 	return vector;
@@ -607,7 +609,7 @@ void apollo_state::apollo_pic8259_master_set_int_line(int state) {
 				state ? APOLLO_CSR_SR_INTERRUPT_PENDING : 0);
 	} else {
 		// set bit Interrupt Pending in Cache Status Register
-		apollo_set_cache_status_register(this,0x10, state ? 0x10 : 0x00);
+		apollo_set_cache_status_register(this, 0x10, state ? 0x10 : 0x00);
 	}
 
 	m_maincpu->set_input_line(M68K_IRQ_6,state ? ASSERT_LINE : CLEAR_LINE);
@@ -634,14 +636,14 @@ void apollo_state::apollo_ptm_timer_tick(int state)
 {
 	if ((state) && (m_ptm->started()))
 	{
-		ptm_counter++;
+		m_ptm_counter++;
 		m_ptm->set_c1( 1);
 		m_ptm->set_c1( 0);
-		m_ptm->set_c2(ptm_counter & 1);
+		m_ptm->set_c2(m_ptm_counter & 1);
 
-		if ((ptm_counter & 1) == 0)
+		if ((m_ptm_counter & 1) == 0)
 		{
-			m_ptm->set_c3((ptm_counter >> 1) & 1);
+			m_ptm->set_c3((m_ptm_counter >> 1) & 1);
 		}
 	}
 }
@@ -799,7 +801,7 @@ void apollo_state::sio_output(uint8_t data)
 {
 //  CLOG2(("apollo_sio - sio_output %02x", data));
 
-	if ((data & 0x80) != (sio_output_data & 0x80))
+	if ((data & 0x80) != (m_sio_output_data & 0x80))
 	{
 		apollo_pic_set_irq_line(APOLLO_IRQ_DIAG, (data & 0x80) ? 1 : 0);
 	}
@@ -808,12 +810,12 @@ void apollo_state::sio_output(uint8_t data)
 	// This is set up in the timer mode to produce a square wave output on output OP3.
 	// The period of the output is 15 microseconds.
 
-	if ((data & 0x08) != (sio_output_data & 0x08))
+	if ((data & 0x08) != (m_sio_output_data & 0x08))
 	{
 		m_sio->ip0_w((data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 
-	sio_output_data = data;
+	m_sio_output_data = data;
 }
 
 //##########################################################################
@@ -1227,8 +1229,8 @@ MACHINE_RESET_MEMBER(apollo_state,apollo)
 		apollo_rtc_w(9, year);
 	}
 
-	ptm_counter = 0;
-	sio_output_data = 0xff;
+	m_ptm_counter = 0;
+	m_sio_output_data = 0xff;
 }
 
 #ifdef APOLLO_XXL

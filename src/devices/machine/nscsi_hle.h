@@ -524,6 +524,11 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual void scsi_message();
+	// ABORT or BUS DEVICE RESET message received (SCSI-2 6.6.1/6.6.3): the current
+	// command is dropped and the bus goes free. Overrides must cancel any of their
+	// own pending deferred scsi_data_in()/scsi_data_out()/scsi_status_complete()
+	// (timers etc.) themselves; the base class only clears its own control queue.
+	virtual void scsi_abort();
 	virtual void scsi_command();
 	virtual bool scsi_command_done(uint8_t command, uint8_t length);
 
@@ -672,7 +677,8 @@ private:
 		TARGET_WAIT_MSG_BYTE,
 		TARGET_WAIT_CMD_BYTE,
 		TARGET_WAIT_DATA_IN_BYTE,
-		TARGET_WAIT_DATA_OUT_BYTE
+		TARGET_WAIT_DATA_OUT_BYTE,
+		TARGET_MSG_REJECT_SENT
 	};
 
 	enum {
@@ -713,11 +719,26 @@ private:
 	int m_buf_control_rpos;
 	int m_buf_control_wpos;
 
+	// Transfer interrupted by ATN, resumed after a message other than ABORT or
+	// BUS DEVICE RESET.  The message bytes are received into m_scsi_cmdbuf, so
+	// it is saved with the rest.
+	int m_resume_state;
+	uint32_t m_resume_phase;
+	int m_resume_buffer_id, m_resume_buffer_pos;
+	int m_resume_cmdsize;
+	uint8_t m_resume_cmdbuf[4096];
+
+	bool m_reset_unit_attention;
+
 	control *buf_control_push();
 	control *buf_control_pop();
 
 	void step(bool timeout);
 	void target_recv_byte();
+	void target_go_message_out();
+	void target_abort(bool bus_device_reset);
+	void target_interrupt_message();
+	void target_resume_transfer();
 	void target_send_byte(uint8_t val);
 	void target_send_buffer_byte();
 };

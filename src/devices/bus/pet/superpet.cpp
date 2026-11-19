@@ -132,6 +132,7 @@ ioport_constructor superpet_device::device_input_ports() const
 inline void superpet_device::update_cpu()
 {
 	bool active = is_6809_active();
+	update_window();
 
 	m_slot->halt_w(active ? ASSERT_LINE : CLEAR_LINE);
 	m_maincpu->set_input_line(INPUT_LINE_HALT, active ? CLEAR_LINE : ASSERT_LINE);
@@ -237,170 +238,64 @@ void superpet_device::device_reset()
 }
 
 
-//-------------------------------------------------
-//  pet_norom_r - NO ROM read
-//-------------------------------------------------
-
-int superpet_device::pet_norom_r(offs_t offset, int sel)
+void superpet_device::device_post_load()
 {
-	return !is_6809_active();
+	update_window();
 }
 
-
-//-------------------------------------------------
-//  pet_bd_r - buffered data read
-//-------------------------------------------------
-
-uint8_t superpet_device::pet_bd_r(offs_t offset, uint8_t data, int &sel)
+void superpet_device::update_window()
 {
-	int norom = pet_norom_r(offset, sel);
-
-	switch (sel)
+	memory_view &window = m_slot->window();
+	for (int slot = 0; slot < 2; slot++)
 	{
-	case pet_expansion_slot_device::SEL9:
+		auto &view = window[slot];
+		uint8_t *const bank = &m_ram[0] + ((m_bank & 0x0f) << 12);
+
 		if (m_sel9_rom)
 		{
-			data = m_rom->base()[offset - 0x9000];
+			view.install_rom(0x9000, 0x9fff, m_rom->base());
+			view.nop_write(0x9000, 0x9fff);
 		}
+		else if (is_ram_writable())
+			view.install_ram(0x9000, 0x9fff, bank);
 		else
 		{
-			data = m_ram[((m_bank & 0x0f) << 12) | (offset & 0xfff)];
+			view.install_rom(0x9000, 0x9fff, bank);
+			view.nop_write(0x9000, 0x9fff);
 		}
-		break;
 
-	case pet_expansion_slot_device::SELA:
-	case pet_expansion_slot_device::SELB:
-	case pet_expansion_slot_device::SELC:
-	case pet_expansion_slot_device::SELD:
-	case pet_expansion_slot_device::SELF:
-		if (!norom)
-		{
-			data = m_rom->base()[offset - 0x9000];
-		}
-		break;
-
-	case pet_expansion_slot_device::SELE:
-		if (!norom && !BIT(offset, 11))
-		{
-			data = m_rom->base()[offset - 0x9000];
-		}
-		break;
+		view.nop_readwrite(0xef00, 0xefff);
+		view.install_readwrite_handler(0xefe0, 0xefe3,
+			read8sm_delegate(*m_dongle, FUNC(mos6702_device::read)),
+			write8sm_delegate(*m_dongle, FUNC(mos6702_device::write)));
+		view.install_readwrite_handler(0xeff0, 0xeff3,
+			read8sm_delegate(*m_acia, FUNC(mos6551_device::read)),
+			write8sm_delegate(*m_acia, FUNC(mos6551_device::write)));
+		view.install_write_handler(0xeff8, 0xeffb, write8smo_delegate(*this, FUNC(superpet_device::system_w)));
+		view.install_write_handler(0xeffc, 0xefff, write8smo_delegate(*this, FUNC(superpet_device::bank_w)));
 	}
 
-	switch (offset)
-	{
-	case 0xefe0:
-	case 0xefe1:
-	case 0xefe2:
-	case 0xefe3:
-		data = m_dongle->read(offset & 0x03);
-		break;
-
-	case 0xeff0:
-	case 0xeff1:
-	case 0xeff2:
-	case 0xeff3:
-		data = m_acia->read(offset & 0x03);
-		break;
-	}
-
-	if ((offset & 0xff00) == 0xef00)
-	{
-		sel = pet_expansion_slot_device::SEL_NONE;
-	}
-
-	return data;
+	auto &rom = window[1];
+	rom.install_rom(0xa000, 0xe7ff, m_rom->base() + 0x1000);
+	rom.install_rom(0xf000, 0xffff, m_rom->base() + 0x6000);
+	window.select(is_6809_active() ? 1 : 0);
 }
 
-
-//-------------------------------------------------
-//  pet_bd_w - buffered data write
-//-------------------------------------------------
-
-void superpet_device::pet_bd_w(offs_t offset, uint8_t data, int &sel)
+void superpet_device::system_w(uint8_t data)
 {
-	switch (sel)
+	if (BIT(m_bank, 7))
 	{
-	case pet_expansion_slot_device::SEL9:
-		if (!m_sel9_rom && is_ram_writable())
-		{
-			m_ram[((m_bank & 0x0f) << 12) | (offset & 0xfff)] = data;
-		}
-		break;
+		m_system = data;
+		update_cpu();
+		logerror("SYSTEM %02x\n", data);
 	}
+}
 
-	switch (offset)
-	{
-	case 0xefe0:
-	case 0xefe1:
-	case 0xefe2:
-	case 0xefe3:
-		m_dongle->write(offset & 0x03, data);
-		logerror("6702 %u %02x\n", offset & 0x03, data);
-		break;
-
-	case 0xeff0:
-	case 0xeff1:
-	case 0xeff2:
-	case 0xeff3:
-		m_acia->write(offset & 0x03, data);
-		break;
-
-	case 0xeff8:
-	case 0xeff9:
-	case 0xeffa:
-	case 0xeffb:
-		if (BIT(m_bank, 7))
-		{
-			/*
-
-			    bit     description
-
-			    0       SW2 CPU (0=6809, 1=6502)
-			    1       SW1 RAM (0=read only, 1=read/write)
-			    2
-			    3       DIAG
-			    4
-			    5
-			    6
-			    7
-
-			*/
-
-			m_system = data;
-			update_cpu();
-			logerror("SYSTEM %02x\n", data);
-		}
-		break;
-
-	case 0xeffc:
-	case 0xeffd:
-	case 0xeffe:
-	case 0xefff:
-		/*
-
-		    bit     description
-
-		    0       A0
-		    1       A1
-		    2       A2
-		    3       SEL A
-		    4       J1 pin 40
-		    5       SEL B
-		    6       J1 pin 39
-		    7       BIT 7
-
-		*/
-
-		m_bank = data;
-		logerror("BANK %02x\n", data);
-		break;
-	}
-
-	if ((offset & 0xff00) == 0xef00)
-	{
-		sel = pet_expansion_slot_device::SEL_NONE;
-	}
+void superpet_device::bank_w(uint8_t data)
+{
+	m_bank = data;
+	update_window();
+	logerror("BANK %02x\n", data);
 }
 
 

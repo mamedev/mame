@@ -491,7 +491,7 @@ void spc1000_state::spc1000(machine_config &config)
 	m_vdg->fsync_wr_callback().set(FUNC(spc1000_state::irq_w));
 	m_vdg->input_callback().set(FUNC(spc1000_state::mc6847_videoram_r));
 	m_vdg->set_get_char_rom(FUNC(spc1000_state::get_char_rom));
-	m_vdg->set_get_fixed_mode(mc6847_device::MODE_GM2);
+	m_vdg->set_fixed_mode(mc6847_device::MODE_GM2);
 	// other lines not connected
 
 	/* sound hardware */

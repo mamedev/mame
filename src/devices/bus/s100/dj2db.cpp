@@ -6,14 +6,6 @@
 
 **********************************************************************/
 
-/*
-
-    TODO:
-
-    - stall logic (read from fdc data register halts CPU until intrq/drq from FDC)
-
-*/
-
 #include "emu.h"
 #include "dj2db.h"
 
@@ -71,9 +63,29 @@ static void s100_dj2db_floppies(device_slot_interface &device)
 	device.option_add("8dsdd", FLOPPY_8_DSDD);
 }
 
+bool s100_dj2db_device::stall_data_access()
+{
+	if (machine().side_effects_disabled() || m_fdc->drq_r() || m_fdc->intrq_r())
+		return false;
+
+	m_stalled = 1;
+	m_bus->rdy_w(0);
+
+	return true;
+}
+
+void s100_dj2db_device::release_stall()
+{
+	if (m_stalled)
+	{
+		m_stalled = 0;
+		m_bus->rdy_w(1);
+	}
+}
+
 void s100_dj2db_device::fdc_intrq_w(int state)
 {
-	if (state) m_bus->rdy_w(CLEAR_LINE);
+	if (state) release_stall();
 
 	switch (m_j1a->read())
 	{
@@ -91,7 +103,7 @@ void s100_dj2db_device::fdc_intrq_w(int state)
 
 void s100_dj2db_device::fdc_drq_w(int state)
 {
-	if (state) m_bus->rdy_w(CLEAR_LINE);
+	if (state) release_stall();
 }
 
 
@@ -107,7 +119,7 @@ void s100_dj2db_device::device_add_mconfig(machine_config &config)
 
 	AY51013(config, m_uart); // TR1602
 
-	MB8866(config, m_fdc, 10_MHz_XTAL / 10); // clocked by QC output of LS390
+	MB8866(config, m_fdc, 10_MHz_XTAL / 5); // clocked by QC output of LS390
 	m_fdc->intrq_wr_callback().set(FUNC(s100_dj2db_device::fdc_intrq_w));
 	m_fdc->drq_wr_callback().set(FUNC(s100_dj2db_device::fdc_drq_w));
 
@@ -264,7 +276,8 @@ s100_dj2db_device::s100_dj2db_device(const machine_config &mconfig, const char *
 	m_int_enbl(0),
 	m_access_enbl(0),
 	m_board_enbl(1),
-	m_phantom(1)
+	m_phantom(1),
+	m_stalled(0)
 {
 }
 
@@ -282,6 +295,7 @@ void s100_dj2db_device::device_start()
 	save_item(NAME(m_access_enbl));
 	save_item(NAME(m_board_enbl));
 	save_item(NAME(m_phantom));
+	save_item(NAME(m_stalled));
 }
 
 
@@ -292,6 +306,7 @@ void s100_dj2db_device::device_start()
 void s100_dj2db_device::device_reset()
 {
 	m_board_enbl = m_j4->read();
+	m_stalled = 0;
 
 	m_fdc->mr_w(0);
 }
@@ -358,7 +373,8 @@ uint8_t s100_dj2db_device::s100_smemr_r(offs_t offset)
 	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
-		m_bus->rdy_w(ASSERT_LINE);
+		if ((offset == 0xfbff) && stall_data_access())
+			return 0xff;
 
 		data = m_fdc->read(offset & 0x03);
 	}
@@ -454,12 +470,11 @@ void s100_dj2db_device::s100_mwrt_w(offs_t offset, uint8_t data)
 		// density select
 		m_fdc->dden_w(BIT(data, 0));
 	}
-	else if (offset == 0xfbfb) // WAIT ENBL
-	{
-		fatalerror("Z80 WAIT not supported by MAME core\n");
-	}
 	else if ((offset >= 0xfbfc) && (offset < 0xfc00))
 	{
+		if ((offset == 0xfbff) && stall_data_access())
+			return;
+
 		m_fdc->write(offset & 0x03, data);
 	}
 	else if ((offset >= 0xfc00) && (offset < 0x10000))

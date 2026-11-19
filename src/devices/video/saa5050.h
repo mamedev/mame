@@ -121,6 +121,7 @@ private:
 	void get_character_data(uint8_t data);
 
 	required_region_ptr<uint8_t> m_char_rom;
+	std::unique_ptr<uint16_t []> m_rounded_rom;
 
 	devcb_read8 m_read_d;
 

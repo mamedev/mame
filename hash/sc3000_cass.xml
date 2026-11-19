@@ -9,7 +9,7 @@ license:CC0-1.0
 		<description>Addition Tutor</description>
 		<year>1983</year>
 		<publisher>John Sands Electronics</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4454040">
 				<rom name="Addition_Tutor.wav" size="4454040" crc="5c3ec6bc" sha1="9b39f9b7b24952bc2699a73b144352eb72d68f28"/>
@@ -21,7 +21,7 @@ license:CC0-1.0
 		<description>Australian General Knowledge Tutor</description>
 		<year>1984</year>
 		<publisher>John Sands Electronics</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4979510">
 				<rom name="Australian_General_knowledge_Tutor.wav" size="4979510" crc="98bf965e" sha1="618f961691a4f149a68cf95eaacaa96efd44e521"/>
@@ -33,7 +33,7 @@ license:CC0-1.0
 		<description>The Secret of Bastow Manor</description>
 		<year>1984</year>
 		<publisher>Dotsoft</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass1" interface="sc3000_cass">
 			<dataarea name="cass" size="1660342">
 				<rom name="TheSecretOfBastowManor_Pt1.wav" size="1660342" crc="4e26b753" sha1="e23d728b3959cf5f42b62f1495c33e65aa06580e"/>
@@ -65,7 +65,7 @@ license:CC0-1.0
 		<description>City Lander</description>
 		<year>198?</year>
 		<publisher>Grandstand Leisure</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="7141680">
 				<rom name="CityLander.wav" size="7141680" crc="4570cb68" sha1="868fa0a002d02805533fdfb027853fcf613c4e13"/>
@@ -79,7 +79,7 @@ license:CC0-1.0
 		<publisher>Sprites</publisher>
 		<info name="author" value="Thierry Vanbaelinghem" />
 		<info name="serial" value="YE 003" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="5048058">
 				<rom name="Colombia_RewriteB.wav" size="5048058" crc="8521d137" sha1="fdf55d919fa878d94ae7d526fdf12fbac98758b5"/>
@@ -94,7 +94,7 @@ license:CC0-1.0
 		<info name="alt_title" value="Creations de Dessins" />
 		<info name="author" value="Ari Concept" />
 		<info name="serial" value="YE 001" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4529142">
 				<rom name="Creation_Des_Sprites_mono.wav" size="4529142" crc="3ea7395b" sha1="95dc324f26b48e8042def30bee3242a67ad533b7"/>
@@ -108,7 +108,7 @@ license:CC0-1.0
 		<publisher>Loriciels</publisher>
 		<info name="author" value="Alain Kerautret, Gilles Gameiro" />
 		<info name="notice" value="COPYRIGHT LORICIELS Septembre 1984" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge (export version only)" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3e"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4972158">
 				<rom name="Crocky.wav" size="4972158" crc="24d62355" sha1="f91382534f24b70f9af64910081e3eabc88ba325"/>
@@ -121,7 +121,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>John Sands Electronics</publisher>
 		<info name="author" value="Hercules Gunter" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="10451972">
 				<rom name="Dragonquest.wav" size="10451972" crc="39e55170" sha1="01c5ad7697ad980401781ec9eae33e359e30f67d"/>
@@ -133,7 +133,7 @@ license:CC0-1.0
 		<description>Dungeons Beneath Cairo</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="14216966">
 				<rom name="DungeonsBeneathCairo.wav" size="14216966" crc="49ec80c2" sha1="36bfc2d0cb992de1aecff1851ed4d7c514bf4f25"/>
@@ -146,7 +146,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>John Sands Electronics</publisher>
 		<info name="developer" value="Programming Concepts" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="9565890">
 				<rom name="Environoid.wav" size="9565890" crc="8f878a44" sha1="5e826099ac4c8af7865df990cdaa96455e9ce6d9"/>
@@ -159,7 +159,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Distribution &amp; Services</publisher>
 		<info name="author" value="M-A &amp; G. Letraublon" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass1" interface="sc3000_cass">
 			<dataarea name="cass" size="16923822">
 				<rom name="faitesvosjeuxA.wav" size="16923822" crc="720f3832" sha1="ba054c8d0e046d90e75a8eb49533aecc6198d57d"/>
@@ -177,7 +177,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Grandstand Leisure</publisher>
 		<info name="author" value="Michael Howard" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="18196834">
 				<rom name="Help.wav" size="18196834" crc="cd952d6b" sha1="6d32dd33f884677c54300be57a8cdaf283478a82"/>
@@ -190,7 +190,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Grandstand Leisure</publisher>
 		<info name="author" value="Michael Howard" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="25191280">
 				<rom name="TheHouse.wav" size="25191280" crc="85b183d2" sha1="a222e8763a357b4f962b207b6c7d4b73bbc841a9"/>
@@ -204,7 +204,7 @@ license:CC0-1.0
 		<publisher>Sprites</publisher>
 		<info name="author" value="Sophie Vataux" />
 		<info name="serial" value="YE 002" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass1" interface="sc3000_cass">
 			<feature name="part_id" value="Side 1: Indiana Jaune"/>
 			<dataarea name="cass" size="4107578">
@@ -225,7 +225,7 @@ license:CC0-1.0
 		<publisher>Loriciels</publisher>
 		<info name="author" value="Pascal Pellier" />
 		<info name="notice" value="COPYRIGHT LORICIELS Avril 1984" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge (export version only)" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3e"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="3602926">
 				<rom name="Kamikaze.wav" size="3602926" crc="939ff913" sha1="a7228514e5770da4dfa147c718594f0b5042a217"/>
@@ -238,7 +238,7 @@ license:CC0-1.0
 		<year>1983</year>
 		<publisher>John Sands Electronics</publisher>
 		<info name="alt_title" value="An Introduction to the John Sands Sega SC-3000" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge (export version only)" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3e"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4959424">
 				<rom name="Keyboard_Learning_Program.wav" size="4959424" crc="0f46a379" sha1="900fd1142caaabf3f4cb4d37013176fb1122bae3"/>
@@ -250,7 +250,7 @@ license:CC0-1.0
 		<description>Lawn</description>
 		<year>198?</year>
 		<publisher>Hi-Tech Programming</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4539370">
 				<rom name="Lawn.wav" size="4539370" crc="bcc0d3ae" sha1="fe453dcf1db4f1f2972367a734488c482a6a9cc8"/>
@@ -262,7 +262,7 @@ license:CC0-1.0
 		<description>The Case of the Mad Mummy</description>
 		<year>1984</year>
 		<publisher>Dotsoft</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass1" interface="sc3000_cass">
 			<dataarea name="cass" size="1471940">
 				<rom name="TheCaseOfTheMadMummy_Pt1.wav" size="1471940" crc="015e9f5a" sha1="f9dad83618df356ec90c4e6b17c79d60548c86b7"/>
@@ -296,7 +296,7 @@ license:CC0-1.0
 		<publisher>Loriciels</publisher>
 		<info name="author" value="Pascal Pellier" />
 		<info name="notice" value="COPYRIGHT LORICIELS Mars 1984" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge (export version only)" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3e"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="3482862">
 				<rom name="Moniteur_Desassembleur.wav" size="3482862" crc="1ad31dc9" sha1="629bb1f4d8254c10c697ef4ff530c4aca8f20067"/>
@@ -308,7 +308,7 @@ license:CC0-1.0
 		<description>Quick Draw</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4331832">
 				<rom name="QuickDraw.wav" size="4331832" crc="1e6b2539" sha1="01d74b28d4d156aa5c111bfb31e568c4f2bbfdb9"/>
@@ -321,7 +321,7 @@ license:CC0-1.0
 		<description>Reversi Champion</description>
 		<year>1983</year>
 		<publisher>Loriciels</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="2834680">
 				<rom name="Reversi_Champion.wav" size="2834680" crc="52327f55" sha1="aeb4d83ab9d2891479ebea784835c7701c87f78c" status="baddump"/>
@@ -334,7 +334,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>John Sands Electronics</publisher>
 		<info name="developer" value="Programming Concepts" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="14320112">
 				<rom name="SolarConquest.wav" size="14320112" crc="7c3653f9" sha1="0c74aabf394f4d765df130a93625c1db72189d98"/>
@@ -346,7 +346,7 @@ license:CC0-1.0
 		<description>Pre-School Shape and Colour Quiz</description>
 		<year>198?</year>
 		<publisher>Grandstand Leisure</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="3191168">
 				<rom name="Shapes_&amp;_Colors_Quiz.wav" size="3191168" crc="9aaeaa05" sha1="ff561fff322cff804195bf05f6384231a384e898"/>
@@ -359,7 +359,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Dotsoft</publisher>
 		<info name="developer" value="Softgold" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge (export version only)" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3e"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="15220728">
 				<rom name="Skull_Island.wav" size="15220728" crc="61978ba3" sha1="47419434a3780e2d756c9dfb6694a88045df82d4"/>
@@ -371,6 +371,7 @@ license:CC0-1.0
 		<description>Subtraction Tutor</description>
 		<year>198?</year>
 		<publisher>Grandstand Leisure</publisher>
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4270120">
 				<rom name="substraction.wav" size="4270120" crc="aa24027f" sha1="d9925d0e4488cfdb5fcb28255f44d2fb2660fac1"/>
@@ -383,7 +384,7 @@ license:CC0-1.0
 		<!-- Compilation of 6 educational programs -->
 		<year>1984</year>
 		<publisher>John Sands Electronics</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass1" interface="sc3000_cass">
 			<feature name="part_id" value="Keyboard Learning Program"/>
 			<dataarea name="cass" size="4900792">
@@ -426,7 +427,7 @@ license:CC0-1.0
 		<description>Télécran</description>
 		<year>198?</year>
 		<publisher>Yeno</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4617958">
 				<rom name="telecran8bits_mono.wav" size="4617958" crc="5e08305f" sha1="88ad29cecff2fae98f9e81ec9d6fde3136bb2229"/>
@@ -439,7 +440,7 @@ license:CC0-1.0
 		<year>1984</year>
 		<publisher>Gold Record Software</publisher>
 		<info name="author" value="Neil Kube" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="9770486">
 				<rom name="VideoPoker.wav" size="9770486" crc="88a59002" sha1="bfaa050f28b855a856039effcc0498484070f370"/>
@@ -452,7 +453,7 @@ license:CC0-1.0
 		<year>1987</year>
 		<publisher>&lt;homebrew&gt;</publisher>
 		<info name="author" value="Keith Zuch" />
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="4364214">
 				<rom name="Voltron.wav" size="4364214" crc="39589e11" sha1="951c4166299dfc52518bbec67000aa504ff7563b"/>
@@ -464,7 +465,7 @@ license:CC0-1.0
 		<description>Vortex Blaster</description>
 		<year>1984</year>
 		<publisher>Poseidon Software</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="31128834">
 				<rom name="vortex blaster 2.wav" size="31128834" crc="242851df" sha1="5a0be3c35317ff39e2e687c72bb1ea73e3b6cd28"/>
@@ -476,7 +477,7 @@ license:CC0-1.0
 		<description>Watch Me Draw</description>
 		<year>1984</year>
 		<publisher>John Sands Electronics</publisher>
-		<info name="usage" value="Requires BASIC Level 3 cartridge" />
+		<sharedfeat name="requirement" value="sc3000_cart:basic3"/>
 		<part name="cass" interface="sc3000_cass">
 			<dataarea name="cass" size="6622356">
 				<rom name="Watch_Me_Draw.wav" size="6622356" crc="69ad3e0f" sha1="5f9ccd506e7579f6b5a5ba15b8f54b16e10059ce"/>

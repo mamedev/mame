@@ -5,6 +5,8 @@
 #ifndef MAME_NINTENDO_NDS_H
 #define MAME_NINTENDO_NDS_H
 
+#include "nds_wifi.h"
+
 #include "bus/gba/gba_slot.h"
 #include "bus/nds/ndsslot.h"
 #include "cpu/arm7/arm7.h"
@@ -16,6 +18,7 @@
 #include "sound/nds_sound.h"
 #include "sound/gb.h"
 #include "sound/dac.h"
+#include "sound/flt_vol.h"
 #include "speaker.h"
 
 class nds_state : public driver_device
@@ -24,6 +27,9 @@ public:
 	nds_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	void nds(machine_config &config);
+	INPUT_CHANGED_MEMBER(keypad_changed);
+	INPUT_CHANGED_MEMBER(lid_changed);
+	INPUT_CHANGED_MEMBER(headphones_changed);
 
 private:
 	// LCD timing
@@ -98,6 +104,7 @@ private:
 	template <int Cpu> void keyinput_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	template <int Cpu> uint32_t ipcsync_r(offs_t offset, uint32_t mem_mask = ~0);
 	template <int Cpu> void ipcsync_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	template <int Cpu> TIMER_CALLBACK_MEMBER(ipcsync_sync);
 	uint16_t auxspi_cnt_r(offs_t offset, uint16_t mem_mask = ~0);
 	void auxspi_cnt_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t auxspi_data_r();
@@ -181,13 +188,16 @@ private:
 	required_device_array<screen_device, 2> m_screen;
 	required_device_array<gba_ppu_device, 2> m_ppu;
 	required_device<nds_sound_device> m_ndssound;
+	required_device_array<filter_volume_device, 2> m_amp;
 	required_device<s35180_device> m_rtc;
+	required_device<nds_wifi_device> m_wifi;
 	required_device<gameboy_sound_device> m_gbsound;
 	required_device_array<dac_8bit_r2r_twos_complement_device, 2> m_gba_ldac, m_gba_rdac;
 	required_device<nds_cart_slot_device> m_ndscart;
 	required_device<gba_cart_slot_device> m_gbacart;
 	required_ioport m_keys, m_extkeys;
 	required_ioport m_touch_x, m_touch_y;
+	required_ioport m_headphones;
 
 	enum {
 		VRAMCNT_A_OFFSET = (0x240/4),
@@ -214,6 +224,9 @@ private:
 	uint16_t m_powcnt[2];
 	uint32_t m_biosprot;
 	bool m_halted[2];
+	bool m_sleeping;
+	attotime m_sleep_start;
+	attotime m_sleep_remaining[10];
 
 	uint32_t m_sioregs[4];
 	uint16_t m_rcnt;
@@ -233,8 +246,11 @@ private:
 
 	// interrupt controller
 	void request_irq(int cpu, uint32_t int_type);
+	void wifi_irq_w(int state);
 	void update_irqs(int cpu);
 	void set_halted(int cpu, bool halted);
+	void set_sleeping(bool sleeping);
+	void update_audio();
 
 	// IPC FIFO
 	uint16_t m_ipcfifocnt[2];
@@ -243,8 +259,10 @@ private:
 	uint8_t m_ipcfifo_head[2], m_ipcfifo_count[2];
 	template <int Cpu> uint32_t ipcfifo_recv();
 	template <int Cpu> void ipcfifo_send(uint32_t data);
+	template <int Cpu> TIMER_CALLBACK_MEMBER(ipcfifo_send_sync);
 	template <int Cpu> uint16_t ipcfifo_cnt_r();
 	template <int Cpu> void ipcfifo_cnt_w(uint16_t data);
+	template <int Cpu> TIMER_CALLBACK_MEMBER(ipcfifo_cnt_sync);
 
 	// SPI bus
 	uint16_t m_spi_cnt;
@@ -288,7 +306,6 @@ private:
 	int m_visible_lines;
 	uint32_t m_gba_soundregs[0x50/4];
 	uint16_t m_gba_waitcnt;
-	uint32_t m_gba_bios_prefetch;
 
 	// GBA mode DirectSound: two FIFOs fed by DMA, drained to the DACs on timer overflow
 	struct gba_fifo_t

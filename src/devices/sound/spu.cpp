@@ -936,10 +936,7 @@ spu_device::spu_device(const machine_config &mconfig, const char *tag, device_t 
 	m_irq_cb(*this),
 	m_ram(*this, finder_base::DUMMY_TAG),
 	dirty_flags(-1),
-	status_enabled(false),
-	xa_voll(0x8000),
-	xa_volr(0x8000),
-	changed_xa_vol(0)
+	status_enabled(false)
 {
 }
 
@@ -1028,9 +1025,7 @@ void spu_device::device_reset()
 	sample_cache::cache_size = 0;
 
 	status_enabled = false;
-	xa_voll = xa_volr = 0x8000;
 	dirty_flags = -1;
-	changed_xa_vol = 0;
 
 	xa_cnt=0;
 	xa_freq=0;
@@ -1711,19 +1706,16 @@ void spu_device::update_voice_loop(const unsigned int v)
 
 	else if ((! vi->loop) && (vi->play.cache->is_loop))
 	{
+		// The voice jumps to the repeat address whatever the flags of the
+		// block found there
+
 		ra=spureg.voice[v].repaddr<<m_counter_shift;
 
-		const adpcm_packet *ap=(adpcm_packet *)packet_read(ra);
-		if (ap->flags&adpcmflag_loop_repeat)
+		if (! vi->play.cache->get_sample_pointer(ra,&vi->loop))
 		{
-			// Repeat address points to a block with loop flag set
+			// Repeat address is in a different block
 
-			if (! vi->play.cache->get_sample_pointer(ra,&vi->loop))
-			{
-				// Repeat address is in a different block
-
-				translate_sample_addr(ra,&vi->loop);
-			}
+			translate_sample_addr(ra,&vi->loop);
 		}
 	}
 
@@ -2415,11 +2407,6 @@ void spu_device::generate_xa(void *ptr, const unsigned int sz)
 
 		assert((xa_channels==1) || (xa_channels==2));
 
-		// Calculate volume
-
-		const int16_t voll=(spureg.cdvol[0]*xa_voll)>>14;
-		const int16_t volr=(spureg.cdvol[1]*xa_volr)>>14;
-
 		// Generate requested number of XA samples
 
 		while ((xa_buffer->get_bytes_in()) && (n--))
@@ -2436,8 +2423,8 @@ void spu_device::generate_xa(void *ptr, const unsigned int sz)
 			write_decoded_data(0, l);
 			write_decoded_data(1, r);
 
-			const int16_t vl=(l*voll)>>15;
-			const int16_t vr=(r*volr)>>15;
+			const int16_t vl=(l*spureg.cdvol[0])>>15;
+			const int16_t vr=(r*spureg.cdvol[1])>>15;
 
 			dp[0]=clamp(vl+dp[0]);
 			dp[1]=clamp(vr+dp[1]);

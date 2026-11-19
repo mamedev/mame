@@ -27,12 +27,9 @@
     - Move flash memory implementation into machine/intelfsh.cpp
     - provide NVRAM defaults where applicable;
     - add an actual reset button (helps with inp record/playback);
-    - donghaer: needs "raster effect" for 2 players mode split screen, but no
-      interrupt is actually provided for the task so apparently not a timer
-      related effect;
-    - wulybuly: strips off main RAM to texture transfers except for text after
-      the first couple of frames;
-    - maldaiza: PIC protection.
+    - donghaer: very randomly corrupts itself during gameplay, or outright crashes;
+    - wulybuly: inputs, not extensively tested;
+    - maldaiza: PIC protection, inputs, requires superhuman mashing which looks quite off;
     - urachamu: some animation timings seems off, like bat hit animation before starting a given game.
       They were actually too fast before adding 30 Hz vblank for interlace mode, even if the game don't
       really read crtc blanking reg or use any other interrupt but the coin ones;
@@ -138,6 +135,7 @@ Notes:
 
 #include "emu.h"
 
+#include "cpu/pic16_mid/pic16_mid.h"
 #include "cpu/se3208/se3208.h"
 #include "machine/ds1302.h"
 #include "machine/eepromser.h"
@@ -165,19 +163,20 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_vr0soc(*this, "vr0soc"),
 		m_ds1302(*this, "rtc"),
+		m_pic(*this, "pic"),
 		m_dsw(*this, "DSW"),
 		m_system(*this, "SYSTEM"),
 		m_lamps(*this, "lamp%u", 1U)
 	{ }
 
-	void init_topbladv() ATTR_COLD;
-	void init_officeye() ATTR_COLD;
 	void init_crysking() ATTR_COLD;
 	void init_evosocc() ATTR_COLD;
 	void init_donghaer() ATTR_COLD;
 	void init_maldaiza() ATTR_COLD;
 
 	void crystal(machine_config &config) ATTR_COLD;
+	void pic16f84a(machine_config &config) ATTR_COLD;
+	void topbladv(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -197,6 +196,7 @@ private:
 	required_device<se3208_device> m_maincpu;
 	required_device<vrender0soc_device> m_vr0soc;
 	required_device<ds1302_device> m_ds1302;
+	optional_device<pic16_mid_device> m_pic;
 
 	required_ioport m_dsw;
 	required_ioport m_system;
@@ -209,6 +209,8 @@ private:
 	u32 m_maxbank = 0;
 	u32 m_flashcmd = 0xff;
 	u32 m_pio = 0;
+
+	bool m_pic_data = true; // pull-up
 
 	u32 system_input_r();
 	void banksw_w(u32 data);
@@ -224,6 +226,10 @@ private:
 	u32 pioldat_r();
 	void pioldat_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 pioedat_r();
+
+	// PIC
+	uint8_t pic_porta_r();
+	void pic_porta_w(offs_t offset, uint8_t data, uint8_t mem_mask);
 };
 
 
@@ -260,13 +266,37 @@ void crystal_state::pioldat_w(offs_t offset, u32 data, u32 mem_mask)
 	m_ds1302->io_w(dat);
 	m_ds1302->sclk_w(clk);
 
+	if (m_pic)
+	{
+		m_pic->set_input_line(INPUT_LINE_RESET, BIT(data, 30) ? ASSERT_LINE : CLEAR_LINE);
+		m_pic_data = !BIT(data, 29);
+	}
+
 	COMBINE_DATA(&m_pio);
 }
 
 // PIO External DATa Register
 u32 crystal_state::pioedat_r()
 {
-	return m_ds1302->io_r() << 28;
+	u32 data = 0;
+
+	data |= m_ds1302->io_r() << 28;
+
+	if (m_pic)
+		data |= m_pic_data << 29;
+
+	return data;
+}
+
+uint8_t crystal_state::pic_porta_r()
+{
+	return m_pic_data ? 1 : 0;
+}
+
+void crystal_state::pic_porta_w(offs_t offset, uint8_t data, uint8_t mem_mask)
+{
+	if (BIT(mem_mask, 0))
+		m_pic_data = BIT(data, 0);
 }
 
 u32 crystal_state::flashcmd_r()
@@ -406,6 +436,7 @@ void crystal_state::machine_start()
 	save_item(NAME(m_bank));
 	save_item(NAME(m_flashcmd));
 	save_item(NAME(m_pio));
+	save_item(NAME(m_pic_data));
 }
 
 void crystal_state::machine_reset()
@@ -608,6 +639,34 @@ void crystal_state::crystal(machine_config &config)
 	m_vr0soc->add_route(1, "speaker", 1.0, 1);
 }
 
+void crystal_state::pic16f84a(machine_config &config)
+{
+	crystal(config);
+
+	PIC16F84A(config, m_pic, 3.579545_MHz_XTAL);
+	m_pic->read_a().set(FUNC(crystal_state::pic_porta_r));
+	m_pic->write_a().set(FUNC(crystal_state::pic_porta_w));
+}
+
+void crystal_state::topbladv(machine_config &config)
+{
+	crystal(config);
+
+	// the PLL is programmed with 0x573c
+	// assuming a reference clock of 14'318'180 this gives ~40 MHz
+	// needs to be correct for CPU <-> PIC communication
+	m_maincpu->set_clock(14'318'180 * (87 + 8) / (15 + 2) / 2);
+	m_vr0soc->set_clock(14'318'180 * (87 + 8) / (15 + 2));
+
+	PIC16F628A(config, m_pic, 3.579545_MHz_XTAL);
+	m_pic->read_a().set(FUNC(crystal_state::pic_porta_r));
+	m_pic->write_a().set(FUNC(crystal_state::pic_porta_w));
+}
+
+
+//**************************************************************************
+//  ROM DEFINITIONS
+//**************************************************************************
 
 #define CRYSBIOS \
 	ROM_REGION( 0x20000, "maincpu", 0 )  \
@@ -625,6 +684,10 @@ ROM_END
 ROM_START( crysking )
 	CRYSBIOS
 
+	ROM_REGION16_LE(0x4280, "pic", 0) // PIC16F84A? - not dumped
+	// Label: "dgSMART-PR3  MAGIC EYES"
+	ROM_LOAD("crysking_pic16f84a.u14", 0x0000, 0x4280, NO_DUMP)
+
 	ROM_REGION32_LE( 0x3000000, "flash", 0 )
 	ROM_LOAD("bcsv0004f01.u1",  0x0000000, 0x1000000, CRC(8feff120) SHA1(2ea42fa893bff845b5b855e2556789f8354e9066) )
 	ROM_LOAD("bcsv0004f02.u2",  0x1000000, 0x1000000, CRC(0e799845) SHA1(419674ce043cb1efb18303f4cb7fdbbae642ee39) )
@@ -633,6 +696,10 @@ ROM_END
 
 ROM_START( evosocc )
 	CRYSBIOS
+
+	ROM_REGION16_LE(0x4280, "pic", 0) // PIC16F84A? - not dumped
+	// Label: "MAGICEYES  dgSMART-PR2  0134HAH"
+	ROM_LOAD("evosocc_pic16f84a.u14", 0x0000, 0x4280, NO_DUMP)
 
 	ROM_REGION32_LE( 0x3000000, "flash", 0 )
 	ROM_LOAD("bcsv0001u01",  0x0000000, 0x1000000, CRC(2581a0ea) SHA1(ee483ac60a3ed00a21cb515974cec4af19916a7d) )
@@ -643,8 +710,9 @@ ROM_END
 ROM_START( topbladv )
 	CRYSBIOS
 
-	ROM_REGION( 0x4300, "pic", 0 ) // pic16c727 - we don't have a core for this
-	ROM_LOAD("top_blade_v_pic16c727.bin",  0x000000, 0x4300, CRC(9cdea57b) SHA1(884156085f9e780cdf719aedc2e8a0fd5983613b) )
+	ROM_REGION16_LE(0x4300, "pic", 0) // PIC16F628A
+	// Label: "MAGICEYES  dgSMART-PR2  0134HAG"
+	ROM_LOAD("top_blade_v_pic16f628a.u14", 0x0000, 0x4300, CRC(9cdea57b) SHA1(884156085f9e780cdf719aedc2e8a0fd5983613b))
 
 	ROM_REGION32_LE( 0x1000000, "flash", 0 )
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(bd23f640) SHA1(1d22aa2c828642bb7c1dfea4e13f777f95acc701) )
@@ -654,8 +722,8 @@ ROM_START( officeye )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios (not the standard one)
 	ROM_LOAD("bios.u14",  0x000000, 0x020000, CRC(ffc57e90) SHA1(6b6a17fd4798dea9c7b880f3063be8494e7db302) )
 
-	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this
-	ROM_LOAD("office_yeo_in_cheon_ha_pic16f84a.bin",  0x000000, 0x4280, CRC(7561cdf5) SHA1(eade592823a110019b4af81a7dc56d01f7d6589f) )
+	ROM_REGION16_LE( 0x4280, "pic", 0) // PIC16F84A
+	ROM_LOAD("office_yeo_in_cheon_ha_pic16f84a.u14", 0x0000, 0x4280, CRC(7561cdf5) SHA1(eade592823a110019b4af81a7dc56d01f7d6589f))
 
 	ROM_REGION32_LE( 0x2000000, "flash", 0 )
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(d3f3eec4) SHA1(ea728415bd4906964b7d37f4379a8a3bd42a1c2d) )
@@ -665,8 +733,9 @@ ROM_END
 ROM_START( donghaer )
 	CRYSBIOS
 
-	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this (or the dump in this case)
-	ROM_LOAD("donghaer_pic16f84a.bin",  0x000000, 0x4280, NO_DUMP )
+	ROM_REGION16_LE(0x4280, "pic", 0) // PIC16F84A? - not dumped
+	// Label: "MAGICEYES  dgSMART-PR2  0134HAF"
+	ROM_LOAD("donghaer_pic16f84a.u14", 0x0000, 0x4280, NO_DUMP)
 
 	ROM_REGION32_LE( 0x2000000, "flash", 0 )
 	ROM_LOAD( "u1",           0x0000000, 0x1000000, CRC(61217ad7) SHA1(2593f1356aa850f4f9aa5d00bec822aa59c59224) )
@@ -675,8 +744,6 @@ ROM_END
 
 ROM_START( wulybuly )
 	CRYSBIOS
-
-	ROM_REGION( 0x4280, "pic", ROMREGION_ERASEFF ) // empty socket
 
 	ROM_REGION32_LE( 0x1000000, "flash", 0 )
 	ROM_LOAD( "u1",           0x0000000, 0x1000000,  CRC(7406f5db) SHA1(dd53afb08d0567241d08d2422c672d429ef9b78f) )
@@ -687,8 +754,6 @@ ROM_END
 
 ROM_START( urachamu )
 	CRYSBIOS
-
-	ROM_REGION( 0x4280, "pic", ROMREGION_ERASEFF ) // empty socket
 
 	ROM_REGION32_LE( 0x4000000, "flash", 0 )
 	ROM_LOAD( "u1",           0x0000000, 0x1000000,  CRC(f341d6fc) SHA1(23ecd9f3e5e20fc2a293cc735c8c4d60d01b68c0) )
@@ -704,8 +769,8 @@ ROM_END
 ROM_START( maldaiza )
 	CRYSBIOS
 
-	ROM_REGION( 0x4280, "pic", ROMREGION_ERASEFF )
-	ROM_LOAD("maldaliza_pic16f84a.bin",  0x000000, 0x4280, NO_DUMP )
+	ROM_REGION16_LE(0x4280, "pic", 0) // PIC16F84A? - not dumped
+	ROM_LOAD("maldaliza_pic16f84a.bin", 0x0000, 0x4280, NO_DUMP)
 
 	ROM_REGION32_LE( 0x2000000, "flash", 0 )
 	ROM_LOAD( "u1",           0x0000000, 0x1000000,  CRC(f484d12b) SHA1(29641cda9138b5bf02c2ece34f8289385fd2ba29) )
@@ -760,60 +825,6 @@ void crystal_state::init_evosocc()
 	rom[0x974ed2 / 2] = 0x9001;  //PUSH R0
 }
 
-void crystal_state::init_topbladv()
-{
-	// patches based on analysis of PIC dump
-	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
-	/*
-	    PIC Protection data:
-	    - RAM ADDR - --PATCH--
-	    62 0f 02 02 fc 90 01 90
-	    68 6a 02 02 04 90 01 90
-	    2c cf 03 02 e9 df c2 c3
-	    00 e0 03 02 01 90 00 92
-	*/
-
-	rom[0x12d7a / 2] = 0x90fc; //PUSH R7-R6-R5-R4-R3-R2
-	rom[0x12d7c / 2] = 0x9001; //PUSH R0
-
-	rom[0x18880 / 2] = 0x9004; //PUSH R2
-	rom[0x18882 / 2] = 0x9001; //PUSH R0
-
-	rom[0x2fe18 / 2] = 0x9001; //PUSH R0
-	rom[0x2fe1a / 2] = 0x9200; //PUSH SR
-
-	rom[0x2ed44 / 2] = 0xdfe9; //CALL 0x3cf00
-	rom[0x2ed46 / 2] = 0xc3c2; //MOV %SR0,%DR1
-
-}
-
-void crystal_state::init_officeye()
-{
-	// patches based on analysis of PIC dump
-	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
-
-	/*
-	    PIC Protection data:
-	    - RAM ADDR - --PATCH--
-	    0a 83 01 02 1c 90 01 90
-	    50 85 01 02 7c 90 01 90
-	    4c 99 05 02 04 90 01 90
-	    3a c1 01 02 1c 90 01 90
-	*/
-
-	rom[0x9c9e / 2] = 0x901c;  //PUSH R4-R3-R2
-	rom[0x9ca0 / 2] = 0x9001;  //PUSH R0
-
-	rom[0x9ee4 / 2] = 0x907c;  //PUSH R6-R5-R4-R3-R2
-	rom[0x9ee6 / 2] = 0x9001;  //PUSH R0
-
-	rom[0x4b2e0 / 2] = 0x9004; //PUSH R2
-	rom[0x4b2e2 / 2] = 0x9001; //PUSH R0
-
-	rom[0xdace / 2] = 0x901c;  //PUSH R4-R3-R2
-	rom[0xdad0 / 2] = 0x9001;  //PUSH R0
-}
-
 void crystal_state::init_donghaer()
 {
 	auto rom = util::little_endian_cast<u16>(&m_flash[0]);
@@ -848,15 +859,21 @@ void crystal_state::init_maldaiza()
 	rom[0x098c0 / 2] = 0x9001; // PUSH %R0
 }
 
+
 } // anonymous namespace
 
 
-GAME( 2001, crysbios, 0,        crystal,  crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS", MACHINE_IS_BIOS_ROOT )
-GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, init_crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings", 0 )
-GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, init_evosocc,  ROT0, "Evoga / BrezzaSoft",  "Evolution Soccer", 0 )
-GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, init_officeye, ROT0, "Danbi",               "Office Yeoin Cheonha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
-GAME( 2001, donghaer, crysbios, crystal,  crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 2 players mode has GFX issues, seldomly hangs
-GAME( 2002, urachamu, crysbios, crystal,  urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)", 0 ) // lamps, verify game timings
-GAME( 2003, topbladv, crysbios, crystal,  topbladv, crystal_state, init_topbladv, ROT0, "Sonokong / Expotato", "Top Blade V", 0 )
-GAME( 200?, wulybuly, crysbios, crystal,  wulybuly, crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully", MACHINE_NOT_WORKING )
-GAME( 2002, maldaiza, crysbios, crystal,  crystal,  crystal_state, init_maldaiza, ROT0, "GamToU",              "Maldaliza", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // controls
+//**************************************************************************
+//  GAME DRIVERS
+//**************************************************************************
+
+//    YEAR  NAME      PARENT    MACHINE    INPUT     CLASS          INIT           ROT   COMPANY                FULLNAME                              FLAGS
+GAME( 2001, crysbios, 0,        crystal,   crystal,  crystal_state, empty_init,    ROT0, "BrezzaSoft",          "Crystal System BIOS",                MACHINE_IS_BIOS_ROOT )
+GAME( 2001, crysking, crysbios, pic16f84a, crystal,  crystal_state, init_crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",               MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, evosocc,  crysbios, pic16f84a, crystal,  crystal_state, init_evosocc,  ROT0, "Evoga / BrezzaSoft",  "Evolution Soccer",                   MACHINE_UNEMULATED_PROTECTION )
+GAME( 2001, officeye, 0,        pic16f84a, officeye, crystal_state, empty_init,    ROT0, "Danbi",               "Office Yeoin Cheonha (version 1.2)", 0 )
+GAME( 2001, donghaer, crysbios, pic16f84a, crystal,  crystal_state, init_donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",            MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // 2 players mode has GFX issues, seldomly hangs
+GAME( 2002, urachamu, crysbios, crystal,   urachamu, crystal_state, empty_init,    ROT0, "GamToU",              "Urachacha Mudaeri (Korea)",          0 ) // lamps, verify game timings
+GAME( 2003, topbladv, crysbios, topbladv,  topbladv, crystal_state, empty_init,    ROT0, "Sonokong / Expotato", "Top Blade V",                        0 )
+GAME( 200?, wulybuly, crysbios, crystal,   wulybuly, crystal_state, empty_init,    ROT0, "<unknown>",           "Wully Bully",                        MACHINE_NOT_WORKING )
+GAME( 2002, maldaiza, crysbios, pic16f84a, crystal,  crystal_state, init_maldaiza, ROT0, "GamToU",              "Maldaliza!",                         MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // controls

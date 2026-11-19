@@ -74,8 +74,8 @@ public:
 		, m_opto(*this, "opto%u", 1U)
 	{ }
 
-	void pkspirit(machine_config &config);
-	void shun(machine_config &config);
+	void pkspirit(machine_config &config) ATTR_COLD;
+	void shun(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

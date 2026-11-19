@@ -30,7 +30,6 @@ List of games in the プチプチメダル (Puchi Puchi Medal) series (so probab
 9 - きせかえスタジオ - Kisekae Studio
 
 TODO:
-- fix GFX glitches (then it could probably be considered working);
 - hook up RTC (is is even used by the dumped game?)
 */
 
@@ -281,4 +280,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2003, ddflower, 0, namcos6, namcos6, namcos6_state, empty_init, ROT0, "Namco", "Doki Doki! Flower (DFL1, Ver. A07)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2003, ddflower, 0, namcos6, namcos6, namcos6_state, empty_init, ROT0, "Namco", "Doki Doki! Flower (DFL1, Ver. A07)", MACHINE_NOT_WORKING )

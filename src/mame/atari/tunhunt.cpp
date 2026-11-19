@@ -491,8 +491,8 @@ uint32_t tunhunt_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 		m_control & 0x10); // hstretch
 
 	rectangle cr = cliprect;
-	if (cr.min_x < 192)
-		cr.min_x = 192;
+	if (cr.left() < 192)
+		cr.setx(192, cr.right());
 
 	m_fg_tilemap->draw(screen, bitmap, cr, 0, 0);
 	return 0;

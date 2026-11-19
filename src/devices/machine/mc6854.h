@@ -43,9 +43,9 @@ public:
 	/* high-level, frame-based interface */
 	int send_frame( uint8_t* data, int length ); /* ret -1 if busy */
 
-	/* control lines */
-	void set_cts(int state); /* 1 = clear-to-send, 0 = busy */
-	void set_dcd(int state); /* 1 = carrier, 0 = no carrier */
+	/* control lines (pin levels) */
+	void set_cts(int state); /* 1 = /CTS high (transmitter inhibited), 0 = clear-to-send */
+	void set_dcd(int state); /* 1 = /DCD high (no carrier), 0 = carrier */
 
 	/* clock */
 	void rxc_w(int state);
@@ -55,7 +55,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	bool receive_allowed() const;
 
 private:
 	static constexpr unsigned FIFO_SIZE = 3; // hardcoded size of the 6854 FIFO (this is a hardware limit)
@@ -72,7 +71,7 @@ private:
 	out_frame_delegate   m_out_frame_cb;
 
 	/* control lines */
-	devcb_write_line  m_out_rts_cb; /* 1 = transmitting, 0 = idle */
+	devcb_write_line  m_out_rts_cb; /* 1 = /RTS low (transmitting), 0 = /RTS high (idle) */
 	devcb_write_line  m_out_dtr_cb; /* 1 = data transmit ready, 0 = busy */
 
 	/* registers */
@@ -85,7 +84,18 @@ private:
 	uint8_t  m_tstate;
 	uint16_t m_tfifo[FIFO_SIZE];  /* X x 8-bit FIFO + full & last marker bits */
 	uint8_t  m_tones;             /* counter for zero-insertion */
-	emu_timer *m_ttimer;       /* when to ask for more data */
+	uint64_t m_tqueue;            /* serial bits waiting to be shifted out, LSB first */
+	uint8_t  m_tqlen;             /* number of bits in m_tqueue */
+	uint16_t m_tcrc;              /* transmit frame check sequence */
+	bool     m_tabort;            /* abort requested */
+	uint8_t  m_tclose;            /* bits left until the queued closing flag or abort is sent */
+	uint8_t  m_tflag;             /* last queued pattern: 0 = data/mark, 1 = idle flag, 2 = closing flag */
+	bool     m_tfc;               /* frame complete */
+	bool     m_cts_stored;
+	uint32_t m_tflen;             /* transmitted frame length (frame-based interface) */
+	bool     m_txc;
+	bool     m_txd;
+	bool     m_rts;               /* /RTS output active */
 
 	/* receive state */
 	uint8_t  m_rstate;
@@ -93,7 +103,12 @@ private:
 	uint8_t  m_rones;             /* count '1 bits */
 	uint8_t  m_rsize;             /* bits in the shift register */
 	uint16_t m_rfifo[FIFO_SIZE];  /* X x 8-bit FIFO + full & addr marker bits */
+	uint16_t m_rcrc;              /* receive frame check sequence */
+	uint8_t  m_rdelay;            /* last 8 received bits, not yet included in the FCS */
+	uint8_t  m_rdcount;           /* number of bits in m_rdelay */
+	uint32_t m_rbits;             /* bits received between flags */
 	bool     m_rxd;
+	bool     m_rxd_last;
 	bool     m_rxc;
 
 	/* frame-based interface*/
@@ -110,14 +125,21 @@ private:
 	   6 = variable-length data field(s)
 	*/
 
-	void send_bits( uint32_t data, int len, int zi );
+	void queue_bits( uint32_t data, int len, bool zi );
+	void queue_flag( );
+	void queue_abort( );
+	void tx_refill( );
+	void tx_bit( );
+	void update_rts( );
 	void tfifo_push( uint8_t data );
 	void tfifo_terminate( );
-	TIMER_CALLBACK_MEMBER(tfifo_cb);
 	void tfifo_clear( );
 
+	void rx_bit( int bit );
+	void rx_shift( int bit );
+	void rx_end_frame( );
 	void rfifo_push( uint8_t d );
-	void rfifo_terminate( );
+	void rfifo_terminate( bool error );
 	uint8_t rfifo_pop( );
 	void rfifo_clear( );
 
@@ -147,6 +169,9 @@ DECLARE_DEVICE_TYPE(MC6854, mc6854_device)
    fail and return -1 if the 6854 is not ready to accept the frame; even
    if the frame is accepted and 0 is returned, the CPU may abort it). Ony
    full frames are accepted.
+
+   The transmitter (and so out_frame) is clocked by TxC and bit-based
+   reception by RxC; the MC6854 has no internal clock source.
 */
 
 #endif // MAME_MACHINE_MC6854_H

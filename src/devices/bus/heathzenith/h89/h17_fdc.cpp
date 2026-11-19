@@ -26,13 +26,18 @@ class h_88_1_device : public heath_h17_fdc_base_device, public device_h89bus_rig
 public:
 	h_88_1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
+	virtual void bus_clock_changed(u32 clock) override;
+
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual void set_ram_write_enable(int state) override;
+	virtual u32 bus_clock() override { return h89bus().clock(); }
 
 	bool m_installed;
+
+	u32 m_bus_clock;
 };
 
 
@@ -52,8 +57,10 @@ void h_88_1_device::device_start()
 	heath_h17_fdc_base_device::device_start();
 
 	m_installed = false;
+	m_bus_clock = h89bus().clock();
 
 	save_item(NAME(m_installed));
+	save_item(NAME(m_bus_clock));
 }
 
 void h_88_1_device::device_reset()
@@ -74,7 +81,21 @@ void h_88_1_device::device_reset()
 		m_installed = true;
 	}
 
+	m_bus_clock = h89bus().clock();
+
 	heath_h17_fdc_base_device::device_reset();
+}
+
+void h_88_1_device::bus_clock_changed(u32 clock)
+{
+	// loading a state reports the clock it restored, leave the restored timing alone
+	if (clock == m_bus_clock)
+		return;
+
+	m_bus_clock = clock;
+
+	start_tx_clock();
+	reset_rx_separator();
 }
 
 } // anonymous namespace

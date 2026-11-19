@@ -577,12 +577,12 @@ inline uint8_t electron_ula_device::read_vram(uint16_t addr)
 
 uint32_t electron_ula_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		if ((y >= mode_dispend[m_disp_mode]) || (m_screen_ra >= 8))
 		{
 			// blank line
-			rectangle r(cliprect.min_x, cliprect.max_x, y, y);
+			rectangle r(cliprect.left(), cliprect.right(), y, y);
 			bitmap.fill(rgb_t::black(), r);
 		}
 		else

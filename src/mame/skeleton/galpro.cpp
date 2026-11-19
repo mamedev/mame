@@ -28,7 +28,7 @@ public:
 		, m_rs232(*this, "rs232")
 	{ }
 
-	void galpro(machine_config &config);
+	void galpro(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

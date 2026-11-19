@@ -53,9 +53,8 @@ Notes:
 
     TODO:
 
-    - interrupts
+    - configurable interrupts
     - configuration switches
-    - PIA odd/even byte access
 
 */
 

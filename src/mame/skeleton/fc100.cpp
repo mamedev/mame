@@ -520,7 +520,7 @@ void fc100_state::fc100(machine_config &config)
 	m_vdg->set_screen("screen");
 	m_vdg->input_callback().set(FUNC(fc100_state::mc6847_videoram_r));
 	m_vdg->set_get_char_rom(FUNC(fc100_state::get_char_rom));
-	m_vdg->set_get_fixed_mode(m5c6847p1_device::MODE_INTEXT);
+	m_vdg->set_fixed_mode(m5c6847p1_device::MODE_INTEXT);
 	// other lines not connected
 
 	screen_device &screen(SCREEN(config, "screen"));

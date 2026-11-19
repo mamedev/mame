@@ -238,7 +238,7 @@ uint32_t arcompact_device::handleop32_MAX_do_op(arcompact_device &o, uint32_t sr
 	if (set_flags) // TODO: verify
 	{
 		o.do_flags_nz(alu);
-		o.do_flags_overflow(alu, src1, src2);
+		o.do_flags_overflow_sub(alu, src1, src2);
 		if ((int32_t)src2 >= (int32_t)src1)
 			o.status32_set_c();
 		else
@@ -277,7 +277,7 @@ uint32_t arcompact_device::handleop32_MIN_do_op(arcompact_device &o, uint32_t sr
 	if (set_flags) // TODO: verify
 	{
 		o.do_flags_nz(alu);
-		o.do_flags_overflow(alu, src1, src2);
+		o.do_flags_overflow_sub(alu, src1, src2);
 		if ((int32_t)src2 <= (int32_t)src1)
 			o.status32_set_c();
 		else
@@ -306,9 +306,9 @@ uint32_t arcompact_device::handleop32_MIN_do_op(arcompact_device &o, uint32_t sr
 
 void arcompact_device::handleop32_MOV_do_op(uint32_t breg, uint32_t src2, bool set_flags)
 {
-	m_regs[breg] = src2;
+	write_reg(breg, src2);
 	if (set_flags)
-		do_flags_nz(m_regs[breg]);
+		do_flags_nz(src2);
 }
 
 uint32_t arcompact_device::handleop32_MOV(uint32_t op)
@@ -320,7 +320,7 @@ uint32_t arcompact_device::handleop32_MOV(uint32_t op)
 		uint8_t breg = common32_get_breg(op);
 		uint8_t creg = common32_get_creg(op);
 		int size = check_limm(creg);
-		handleop32_MOV_do_op(breg, m_regs[creg], common32_get_F(op));
+		handleop32_MOV_do_op(breg, read_reg(creg), common32_get_F(op));
 		return m_pc + size;
 	}
 	case 0x01:
@@ -345,7 +345,7 @@ uint32_t arcompact_device::handleop32_MOV(uint32_t op)
 			uint8_t creg = common32_get_creg(op);
 			int size = check_limm(creg);
 			if (check_condition(common32_get_condition(op)))
-				handleop32_MOV_do_op(breg, m_regs[creg], common32_get_F(op));
+				handleop32_MOV_do_op(breg, read_reg(creg), common32_get_F(op));
 			return m_pc + size;
 		}
 		case 0x01:

@@ -10,7 +10,7 @@
 #include "machine/idectrl.h"
 #include "machine/input_merger.h"
 
-class pdc20262_device : public pci_card_device
+class pdc20262_device : public pci_card_device, public device_memory_interface
 {
 public:
 	pdc20262_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -25,6 +25,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 //  virtual void map_extra(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
 //                         uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
@@ -42,13 +44,18 @@ private:
 	void ide2_control_map(address_map &map) ATTR_COLD;
 	void bus_master_ide_control_map(address_map &map) ATTR_COLD;
 	void extra_map(address_map &map) ATTR_COLD;
+	void bus_master_map(address_map &map) ATTR_COLD;
 
 //  virtual void device_config_complete() override;
+
+	u8 bus_master_r(offs_t offset);
+	void bus_master_w(offs_t offset, u8 data);
+
+	address_space_config m_bus_master_config;
 
 	required_device<bus_master_ide_controller_device> m_ide1;
 	required_device<bus_master_ide_controller_device> m_ide2;
 	required_device<input_merger_device> m_irqs;
-	required_address_space m_bus_master_space;
 
 	u8 m_clock = 0;
 	u8 m_irq_state = 0;

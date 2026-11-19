@@ -1,4 +1,4 @@
-// license:GPL2+
+// license:GPL-2.0+
 // copyright-holders:Felipe Sanches
 /***************************************************************************
 
@@ -18,7 +18,7 @@
         Type 3-5: Sync/ACK
         Type 6,7: Multi-byte data
 
-    See: https://felipesanches.github.io/kn5000-docs/control-panel-protocol/
+    See: https://arqueologiadigital.github.io/technics-docs/control-panel-protocol/
 
 ***************************************************************************/
 

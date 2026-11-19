@@ -8,6 +8,8 @@
 #include <limits>
 
 
+// *** VA_VCO ***
+
 va_vco_device::va_vco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: va_vco_device(mconfig, VA_VCO, tag, owner, clock)
 {
@@ -661,4 +663,30 @@ void va_vco_device::sound_stream_update(sound_stream &stream)
 	m_last_sample_time = stream.end_time() - stream.sample_period();
 }
 
-DEFINE_DEVICE_TYPE(VA_VCO, va_vco_device, "va_vco", "Virtual Analog Oscillator")
+
+// *** VA_NOISE ***
+
+va_noise_device::va_noise_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, VA_NOISE, tag, owner, clock)
+	, device_sound_interface(mconfig, *this)
+{
+}
+
+void va_noise_device::sound_stream_update(sound_stream &stream)
+{
+	const int n = stream.samples();
+	for (int i = 0; i < n; ++i)
+	{
+		// Uniformly distributed random number between -1 and 1.
+		stream.put(0, i, 2 * (float(machine().rand()) / std::numeric_limits<u32>::max() - 0.5F));
+	}
+}
+
+void va_noise_device::device_start()
+{
+	m_stream = stream_alloc(0, 1, SAMPLE_RATE_OUTPUT_ADAPTIVE);
+}
+
+
+DEFINE_DEVICE_TYPE(VA_VCO, va_vco_device, "va_vco", "Virtual analog oscillator")
+DEFINE_DEVICE_TYPE(VA_NOISE, va_noise_device, "va_noise", "Virtual analog noise generator")
