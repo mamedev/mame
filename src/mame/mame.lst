@@ -1193,6 +1193,9 @@ dsp3000
 dsp3500
 dsp5500
 
+@source:apollo/apollo_dn300.cpp
+dn300
+
 @source:apple/apple1.cpp
 apple1
 
