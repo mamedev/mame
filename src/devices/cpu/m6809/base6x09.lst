@@ -440,7 +440,11 @@ SYNC:
 	// SYNC stops processing instructions until an interrupt request happens.
 	// This doesn't require the corresponding interrupt to be enabled: if it
 	// is disabled, execution continues with the next instruction.
-	@dummy_read_opcode_arg(0);
+	if(!hd6309_native_mode())
+	{
+		@dummy_read_opcode_arg(0);
+		;
+	}
 
 	m_syncack_write_func(1);
 	while(!interrupt_line_waiting())
@@ -579,10 +583,12 @@ CWAI:
 	m_temp.w = entire_state_registers();
 	%PUSH_REGISTERS;
 
-	while((m_ea.w = get_pending_interrupt()) == 0)
+	m_ea.w = get_pending_interrupt();
+	while(m_ea.w == 0)
 	{
-		// step one cycle at a time while a line is waiting to be latched
-		if(interrupt_line_waiting())
+		// step one cycle at a time while an input change is waiting to be
+		// latched; otherwise nothing can happen until the next input change
+		if(m_interrupt_settling)
 		{
 			@eat(1);
 			;
@@ -592,9 +598,10 @@ CWAI:
 			@eat_remaining();
 			;
 		}
+		m_ea.w = get_pending_interrupt(CWAI_INTERRUPT_LATENCY_CYCLES);
 	}
 
-	if (m_nmi_asserted)
+	if (m_ea.w == VECTOR_NMI)
 		m_nmi_asserted = false;
 
 	set_ea(m_ea.w); // need to do this to set the addressing mode
