@@ -99,6 +99,7 @@ void i8251_device::device_start()
 	m_command = 0;
 	m_mode_byte = 0;
 	m_delayed_tx_en = false;
+	m_rxrdy = false;
 
 	m_rxc_count = 0;
 	m_txc_count = 0;
@@ -125,6 +126,7 @@ void i8251_device::device_start()
 	save_item(NAME(m_command));
 	save_item(NAME(m_mode_byte));
 	save_item(NAME(m_delayed_tx_en));
+	save_item(NAME(m_rxrdy));
 
 	save_item(NAME(m_cts));
 	save_item(NAME(m_dsr));
@@ -156,7 +158,17 @@ void i8251_device::device_start()
 
 void i8251_device::update_rx_ready()
 {
-	m_rxrdy_handler(rxrdy_r());
+	// Repeat a 1, but send a 0 only when the level falls.  A consumer that
+	// defers its input (input_merger, rst_pos_buffer) applies calls in time
+	// order, and a CPU access can run before an earlier-timed receive: a
+	// repeated 0 would land after the receive's 1 and lose its interrupt.
+	// A data read's 0 can still land late; the next repeated 1 restores it.
+	bool const state = rxrdy_r();
+	if (state || m_rxrdy)
+	{
+		m_rxrdy = state;
+		m_rxrdy_handler(state);
+	}
 }
 
 void v5x_scu_device::update_rx_ready()
@@ -564,7 +576,9 @@ void i8251_device::device_reset()
 
 	/* update tx empty pin output */
 	update_tx_empty();
-	/* update rx ready pin output */
+	/* update rx ready pin output; RESET forces it low, so send the low
+	   whatever was last driven */
+	m_rxrdy = true;
 	update_rx_ready();
 	/* update tx ready pin output */
 	update_tx_ready();

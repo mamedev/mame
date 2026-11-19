@@ -70,7 +70,7 @@ void i8052_device::handle_8bit_uart_clock(int source)
 	}
 }
 
-void i8052_device::irqs_complete_and_mask(u8 &ints, u8 int_mask)
+void i8052_device::irqs_complete_and_mask(u16 &ints, u16 int_mask)
 {
 	ints |= ((BIT(m_t2con, T2CON_TF2) | BIT(m_t2con, T2CON_EXF2)) << 5);
 	ints &= int_mask;

@@ -167,6 +167,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 private:
 	required_device<w65816_device> m_maincpu;
@@ -500,6 +501,7 @@ private:
 	device_a2bus_card_interface *m_slotdevice[8]{};
 
 	u32 m_slow_counter = 0;
+	u32 m_slow_step = 0;
 
 	// clock/BRAM
 	u8 m_clkdata = 0, m_clock_control = 0;
@@ -517,6 +519,9 @@ private:
 	void raise_irq(int irq);
 	void lower_irq(int irq);
 	void update_speed();
+	void set_cpu_clock(u32 clock, bool realign);
+	void update_slow_step();
+	void slow_cycle();
 	void get_beam_pos(int &hpos, int &vpos);
 	int get_vpos();
 	void process_clock();
@@ -541,17 +546,15 @@ private:
 
 // FF6ACF is speed test routine in ROM 3
 
-// slow_cycle() - take a 1 MHz cycle.  Theory: a 2.8 MHz cycle is 14M / 5.
-// 1 MHz is 14M / 14.  14/5 = 2.8 * 65536 (16.16 fixed point) = 0x2cccd.
-#define slow_cycle() \
-{   \
-	if (m_last_speed && !machine().side_effects_disabled()) \
-	{\
-		m_slow_counter += 0x0002cccd; \
-		int cycles = (m_slow_counter >> 16) & 0xffff; \
-		m_slow_counter &= 0xffff; \
-		m_maincpu->adjust_icount(-cycles); \
-	} \
+// take a 1 MHz cycle
+inline void apple2gs_state::slow_cycle()
+{
+	if (m_last_speed && !machine().side_effects_disabled())
+	{
+		m_slow_counter += m_slow_step;
+		m_maincpu->adjust_icount(-int(m_slow_counter >> 16));
+		m_slow_counter &= 0xffff;
+	}
 }
 
 
@@ -896,7 +899,7 @@ void apple2gs_state::machine_reset()
 	m_slow_counter = 0;
 
 	// always assert full speed on reset
-	m_maincpu->set_unscaled_clock(A2GS_2_8M);
+	set_cpu_clock(A2GS_2_8M.value(), false);
 	m_last_speed = true;
 
 	m_sndglu_ctrl = 0;
@@ -966,6 +969,11 @@ void apple2gs_state::machine_reset()
 	}
 }
 
+void apple2gs_state::device_post_load()
+{
+	update_slow_step();
+}
+
 void apple2gs_state::raise_irq(int irq)
 {
 	if (!(m_irqmask & (1 << irq)))
@@ -1017,7 +1025,26 @@ void apple2gs_state::update_speed()
 		m_last_speed = false;
 	}
 
-	m_maincpu->set_unscaled_clock(new_speed, !m_last_speed); // re-align with PH0
+	set_cpu_clock(new_speed, !m_last_speed); // re-align with PH0
+}
+
+void apple2gs_state::set_cpu_clock(u32 clock, bool realign)
+{
+	m_maincpu->set_unscaled_clock(clock, realign);
+	update_slow_step();
+}
+
+// a 1 MHz cycle in 16.16 CPU cycles: 14 14M clocks, 2.8 at 2.8 MHz
+void apple2gs_state::update_slow_step()
+{
+	// a ZipGS also waits one 2.8 MHz motherboard cycle to hand over and half a 1 MHz cycle on average for
+	// its next edge (estimated)
+	constexpr u32 SLOW_TICKS = 14;
+	constexpr u32 ZIP_SYNC_TICKS = 12;
+
+	const u32 clock = m_maincpu->unscaled_clock();
+	const u64 ticks = (clock > A2GS_2_8M.value()) ? (SLOW_TICKS + ZIP_SYNC_TICKS) : SLOW_TICKS;
+	m_slow_step = u32((((u64(clock) * ticks) << 16) + (A2GS_14M.value() / 2)) / A2GS_14M.value());
 }
 
 void apple2gs_state::accel_reset()

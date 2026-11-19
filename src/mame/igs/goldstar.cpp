@@ -9449,34 +9449,34 @@ static INPUT_PORTS_START( mirjoker )
 
 	// DSW5-7 are on the L8SUB2 sub board
 	PORT_START("DSW5")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW5:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW5:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW5:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW5:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW5:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW5:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW5:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW5:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "DSW5:!1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "DSW5:!2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "DSW5:!3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "DSW5:!4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "DSW5:!5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "DSW5:!6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "DSW5:!7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "DSW5:!8" )
 
 	PORT_START("DSW6")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW6:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW6:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW6:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW6:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW6:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW6:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW6:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW6:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "DSW6:!1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "DSW6:!2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "DSW6:!3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "DSW6:!4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "DSW6:!5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "DSW6:!6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "DSW6:!7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "DSW6:!8" )
 
 	PORT_START("DSW7")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW7:1" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "DSW7:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW7:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW7:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "DSW7:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "DSW7:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW7:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW7:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "DSW7:!1" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x00, "DSW7:!2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "DSW7:!3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "DSW7:!4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "DSW7:!5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "DSW7:!6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "DSW7:!7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "DSW7:!8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( lucky8a )
@@ -23561,6 +23561,7 @@ ROM_END
   - 27C256 program ROM
   - UM6116K-3 RAM, battery backed
   - 3x bank of 8 switches
+
 */
 ROM_START( mirjoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -29036,6 +29037,11 @@ ROM_START( fevercha )
 	ROM_LOAD( "82s123.10d", 0x0100, 0x0020, CRC(71670863) SHA1(bd0d18c55774db7720413632d130cf3790fca1ad) )
 ROM_END
 
+/*
+  Fever Chance (W6)
+  NEC MC-8123 CPU
+
+*/
 ROM_START( feverchb )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "eagle_38.11b", 0x00000, 0x8000, CRC(c10e75db) SHA1(94e40c97683c1635a0f33d219d9b1a04d249fafc) )
@@ -29061,6 +29067,40 @@ ROM_START( feverchb )
 
 	ROM_REGION( 0x0100, "unkproms", 0 )
 	ROM_LOAD( "82s129.4e",  0x0000, 0x0100, CRC(7edb311b) SHA1(8e7f933313dc7a1f2a5e8803c26953ced3f798d0) )  // same as megaline
+ROM_END
+
+/*
+  Fever Chance (W6)
+  NEC MC-8123 CPU
+
+  GFX bank 1 has different tiles
+  for Lucky 8 Lines title.
+
+  Maybe it's a cross platform.
+
+*/
+ROM_START( feverchc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cpu.18.11c", 0x00000, 0x8000, CRC(ab57990d) SHA1(c60886cfc9caafd54511c3ff7ac96b025db209cb) )
+
+	ROM_REGION( 0x2000, "maincpu:key", 0 )
+	ROM_LOAD( "key", 0x0000, 0x2000, CRC(489cdfd6) SHA1(805f6c5a1f9c0038a800f5cae1cafc348654fd50) )  // from feverchb
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "5.bin", 0x00000, 0x08000, CRC(9ef963fa) SHA1(5616b4330b714cac521a9839369ff496d99c79bf) )
+	ROM_LOAD( "6.bin", 0x08000, 0x08000, CRC(6c732d07) SHA1(529b71500abca7f68e551e17a659c153b535c97c) )
+	ROM_LOAD( "7.bin", 0x10000, 0x08000, CRC(3685cfec) SHA1(7fba2e9586154fdbeb884fddb02d052ccf33c46e) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "1.1h", 0x0000, 0x2000, CRC(c2f72d5f) SHA1(3e4f37a60931a417929255e782d8f7f219d8ebd0) )
+	ROM_LOAD( "2.3h", 0x2000, 0x2000, CRC(b4a0f2ad) SHA1(f68d5134156b646c5eeadbab6bdc21507018eafa) )
+	ROM_LOAD( "3.4h", 0x4000, 0x2000, CRC(abfa998c) SHA1(3a8e516cf3c21f3b4908fe62c2aa40fe980351cc) )
+	ROM_LOAD( "4.5h", 0x6000, 0x2000, CRC(bc3a09c4) SHA1(952dcd4aace87fd7249fc2391c8b4832fa17b083) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD_NIB_LOW(  "82s129.12f", 0x0000, 0x0100, CRC(5b826df5) SHA1(c6e8ffec328f1bb8acdcad70d7045f96cc150166) )
+	ROM_LOAD_NIB_HIGH( "82s129.11f", 0x0000, 0x0100, CRC(0a15ccc6) SHA1(7915e2cbfe4264cab42a780364ca56038412a249) )
+	ROM_LOAD(          "82s123.13f", 0x0080, 0x0020, CRC(82b2660a) SHA1(af4a8f4560ec22a7adda1f590651d6a84f894314) )
 ROM_END
 
 ROM_START( feverchtw )
@@ -31739,6 +31779,64 @@ ROM_START( fl7_500_gs08 )  // Serial 000000125873.
 
 	ROM_REGION( 0x8000, "gfx2", 0 )
 	ROM_LOAD( "fl7_gs08.u3",   0x0000, 0x8000, CRC(cfc8f3e2) SHA1(7dd72e3ffb0904776f3c07635b953e72f4c63068) )
+
+	// Proper bipolar PROM dump
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
+	ROM_LOAD( "ds1994l-f5_500.bin", 0x0000, 0x0008, CRC(b34d646f) SHA1(bcd6c4475412ecb1904b6732cf44e8f6bfce9d90) )
+ROM_END
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Cyberdyne Systems 7V5.00 (CB500), 500 bonus.
+  Custom Hardware.
+
+  GS09: Golden Treasure, Flaming 7's #2, Cherry Bonus, Nevada Numbers.
+
+*/
+ROM_START( fl7_500_gs09 )  // Serial 000000125873.
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "500-main.u22",  0x0000, 0x8000, CRC(e2c82c67) SHA1(951b0044de9b6104f51aa5a3176d0ea475415f7c) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "fl7_gs09.u3",   0x0000, 0x8000, CRC(3bc762ce) SHA1(b5179c74fad7355f16fb37000d990ee1369632dc) )
+
+	// Proper bipolar PROM dump
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "am27s29.u1", 0x0000, 0x0100, CRC(3fe7e369) SHA1(cf4ae287cb58581a4bf9e9ff1994426461fb38cc) )
+	ROM_CONTINUE(           0x0000, 0x0100)  // palette data is stored in the second half.
+
+	ROM_REGION(0x8, "fl7w4_id", 0)  // Electronic Serial. Hand built to match our ROM set
+	ROM_LOAD( "ds1994l-f5_500.bin", 0x0000, 0x0008, CRC(b34d646f) SHA1(bcd6c4475412ecb1904b6732cf44e8f6bfce9d90) )
+ROM_END
+
+/*
+  Flaming 7's
+  Cyberdyne Systems.
+
+  Cyberdyne Systems 7V5.00 (CB500), 500 bonus.
+  Custom Hardware.
+
+  GS10: Greenbacks, Lucky Shamrock, Red White & Blue 7's, Nevada Numbers.
+
+*/
+ROM_START( fl7_500_gs10 )  // Serial 000000125873.
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "500-main.u22",  0x0000, 0x8000, CRC(e2c82c67) SHA1(951b0044de9b6104f51aa5a3176d0ea475415f7c) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )
+	ROM_LOAD( "27c1001.u6",  0x00000, 0x20000, CRC(00eac3c1) SHA1(1a955f8bc044e17f0885b4b126a66d7ad191e410) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "fl7_gs10.u3",   0x0000, 0x8000, CRC(4b6090cd) SHA1(cd2aafbd1ad119b67444b72e561822a9801ab928) )
 
 	// Proper bipolar PROM dump
 	ROM_REGION( 0x200, "proms", 0 )
@@ -35242,6 +35340,8 @@ GAME(  199?, fl7_500_gs05, fl7_50, flaming7, flaming7, wingco_state,   init_flam
 GAME(  199?, fl7_500_gs06, fl7_50, flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (500 bonus, GS06: Dream Catcher, Diamonds 7's, Cherry Bonus, Nevada Numbers)",             0 )
 GAME(  199?, fl7_500_gs07, fl7_50, flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (500 bonus, GS07: Egyptian Gold, Diamonds 7's, Cherry Bonus, Nevada Numbers)",             0 )
 GAME(  199?, fl7_500_gs08, fl7_50, flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (500 bonus, GS08: Flaming 7's, Diamonds 7's, Cherry Bonus, Nevada Numbers)",               0 )
+GAME(  199?, fl7_500_gs09, fl7_50, flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (500 bonus, GS09: Golden Treasure, Flaming 7's #2, Cherry Bonus, Nevada Numbers)",         0 )
+GAME(  199?, fl7_500_gs10, fl7_50, flaming7, flaming7, wingco_state,   init_flaming7,  ROT0, "Cyberdyne Systems", "Flaming 7's (500 bonus, GS10: Greenbacks, Lucky Shamrock, Red White & Blue 7's, Nevada Numbers)",      0 )
 
 // special 7 sets
 GAME(  199?, special7,   0,        flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted, set 1)",         0 )
@@ -35252,7 +35352,8 @@ GAME(  199?, special7b,  special7, flam7_tw, flaming7, wingco_state,   init_spec
 // --- Wing W-6 hardware ---
 GAMEL( 1986, feverch,    0,        feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         0,          layout_lucky8 )
 GAMEL( 1986, fevercha,   feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         0,          layout_lucky8 )
-GAMEL( 1986, feverchb,   feverch,  feverchb, feverch,  wingco_state,   init_feverchb,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123)",                       0,          layout_lucky8 )
+GAMEL( 1986, feverchb,   feverch,  feverchb, feverch,  wingco_state,   init_feverchb,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123, set 1)",                0,          layout_lucky8 )
+GAMEL( 1986, feverchc,   feverch,  feverchb, feverch,  wingco_state,   init_feverchb,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123, set 2)",                MACHINE_NOT_WORKING,  layout_lucky8 )
 GAMEL( 1986, feverchtw,  feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               0,          layout_lucky8 )
 GAMEL( 1986, feverchw4,  feverch,  fevchw4,  lucky8b,  wingco_state,   empty_init,     ROT0, "bootleg",           "Fever Chance (W-6, cross-system for W-4)",                 0,          layout_lucky8p1 )
 

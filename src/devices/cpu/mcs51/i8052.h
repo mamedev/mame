@@ -45,7 +45,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void handle_8bit_uart_clock(int source) override;
-	virtual void irqs_complete_and_mask(u8 &ints, u8 int_mask) override;
+	virtual void irqs_complete_and_mask(u16 &ints, u16 int_mask) override;
 	virtual void handle_irq(int irqline, int state, u32 new_state, u32 tr_state) override;
 	virtual void sfr_map(address_map &map) override ATTR_COLD;
 	virtual void update_timer_t2(int cycles) override;

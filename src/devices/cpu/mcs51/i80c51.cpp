@@ -50,7 +50,7 @@ u8 i80c51_device::slave_mask_r()
 	return m_slave_mask;
 }
 
-bool i80c51_device::manage_idle_on_interrupt(u8 ints)
+bool i80c51_device::manage_idle_on_interrupt(u16 ints)
 {
 	// any interrupt terminates idle mode
 	set_idl(0);

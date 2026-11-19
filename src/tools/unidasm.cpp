@@ -158,6 +158,7 @@ using util::BIT;
 #include "cpu/pic1670/pic1670d.h"
 #include "cpu/pic16c5x/16c5xdsm.h"
 #include "cpu/pic17/pic17d.h"
+#include "cpu/pmx1/pmx1dasm.h"
 #include "cpu/powerpc/ppc_dasm.h"
 #include "cpu/pps4/pps4dasm.h"
 #include "cpu/pps41/pps41d.h"
@@ -616,6 +617,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "pic16c5x",        le, -1, []() -> util::disasm_interface * { return new pic16c5x_disassembler; } },
 	{ "pic1670",         le, -1, []() -> util::disasm_interface * { return new pic1670_disassembler; } },
 	{ "pic17",           le, -1, []() -> util::disasm_interface * { return new pic17_disassembler; } },
+	{ "pmx1core",        le,  0, []() -> util::disasm_interface * { return new pmx1core_disassembler; } },
 	{ "power",           be,  0, []() -> util::disasm_interface * { return new power_disassembler; } },
 	{ "powerpc",         be,  0, []() -> util::disasm_interface * { return new powerpc_disassembler; } },
 	{ "pps4",            le,  0, []() -> util::disasm_interface * { return new pps4_disassembler; } },
