@@ -249,6 +249,10 @@ void mac_scsi_helper_device::write_wrapper(bool pseudo_dma, offs_t offset, u8 da
 
 u32 mac_scsi_helper_device::pseudo_dma_r(offs_t offset, u32 mem_mask)
 {
+	// the debugger may read any lane
+	if (machine().side_effects_disabled())
+		return dma_read(4) & mem_mask;
+
 	switch (mem_mask)
 	{
 	case 0xff000000:
@@ -268,6 +272,9 @@ u32 mac_scsi_helper_device::pseudo_dma_r(offs_t offset, u32 mem_mask)
 
 void mac_scsi_helper_device::pseudo_dma_w(offs_t offset, u32 data, u32 mem_mask)
 {
+	if (machine().side_effects_disabled())
+		return;
+
 	switch (mem_mask)
 	{
 	case 0xff000000:
