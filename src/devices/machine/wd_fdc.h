@@ -64,6 +64,12 @@ public:
 	void dden_w(int state);
 	void set_floppy(floppy_image_device *floppy);
 	void set_force_ready(bool force_ready);
+
+	// Take the READY input from ready_w() instead of the selected floppy,
+	// for boards that gate or combine the drive READY signals
+	void set_external_ready(bool external_ready);
+	void ready_w(int state);
+
 	void set_disable_motor_control(bool _disable_motor_control);
 
 	void cmd_w(uint8_t val);
@@ -295,6 +301,7 @@ private:
 
 	bool dden, status_type_1, intrq, drq, hld, hlt, enp, mr;
 	bool force_ready, disable_motor_control;
+	bool external_ready, ready_in;
 	int main_state, sub_state;
 	uint8_t command, track, sector, data, status, intrq_cond;
 	int last_dir;

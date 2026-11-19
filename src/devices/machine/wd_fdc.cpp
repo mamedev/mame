@@ -155,6 +155,8 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 	mon_cb(*this)
 {
 	force_ready = false;
+	external_ready = false;
+	ready_in = false;
 	disable_motor_control = false;
 	spinup_on_interrupt = false;
 	extended_ddam = false;
@@ -164,6 +166,29 @@ wd_fdc_device_base::wd_fdc_device_base(const machine_config &mconfig, device_typ
 void wd_fdc_device_base::set_force_ready(bool _force_ready)
 {
 	force_ready = _force_ready;
+}
+
+void wd_fdc_device_base::set_external_ready(bool _external_ready)
+{
+	external_ready = _external_ready;
+}
+
+void wd_fdc_device_base::ready_w(int state)
+{
+	if(bool(state) == ready_in)
+		return;
+
+	ready_in = bool(state);
+
+	if(!external_ready || !ready_hooked)
+		return;
+
+	live_sync();
+
+	if(!intrq && (((intrq_cond & I_RDY) && ready_in) || ((intrq_cond & I_NRDY) && !ready_in))) {
+		intrq = true;
+		intrq_cb(intrq);
+	}
 }
 
 void wd_fdc_device_base::set_disable_motor_control(bool _disable_motor_control)
@@ -207,6 +232,7 @@ void wd_fdc_device_base::device_start()
 	if (!disable_mfm)
 		save_item(NAME(dden));
 	save_item(NAME(mr));
+	save_item(NAME(ready_in));
 	save_item(NAME(intrq));
 	save_item(NAME(drq));
 	if (head_control)
@@ -602,7 +628,13 @@ bool wd_fdc_device_base::sector_matches() const
 
 bool wd_fdc_device_base::is_ready()
 {
-	return !ready_hooked || force_ready || (floppy && !floppy->ready_r());
+	if(!ready_hooked || force_ready)
+		return true;
+
+	if(external_ready)
+		return ready_in;
+
+	return floppy && !floppy->ready_r();
 }
 
 void wd_fdc_device_base::read_sector_start()
@@ -1551,7 +1583,9 @@ void wd_fdc_device_base::ready_callback(floppy_image_device *floppy, int state)
 		return;
 
 	live_sync();
-	if(!ready_hooked)
+
+	// with an external READY input, the board decides what the FDC sees
+	if(!ready_hooked || external_ready)
 		return;
 
 	if(!intrq && (((intrq_cond & I_RDY) && !state) || ((intrq_cond & I_NRDY) && state))) {
