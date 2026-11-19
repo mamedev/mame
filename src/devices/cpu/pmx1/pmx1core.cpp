@@ -222,6 +222,17 @@ void pmx1core_device::core_reset_w(int state)
 		ts.read_count = 0;
 		ts.hold = HOLD_NONE;
 	}
+	else if (!state && !m_in_reset)
+	{
+		// the reads that every thread has queued are dropped, or a thread that thread 0 sends somewhere after the reset
+		// takes them first (the MK6 BIOS resets the chip while thread 3 is in its display routine)
+		for (thread_state &ts : m_thread)
+		{
+			ts.repeat = 0;
+			ts.read_first = 0;
+			ts.read_count = 0;
+		}
+	}
 	m_in_reset = !state;
 }
 
