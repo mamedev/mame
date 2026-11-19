@@ -17,9 +17,12 @@
 class abc1600_mmu_device : public device_t, public device_memory_interface, public device_state_interface
 {
 public:
+	using pack_delegate = device_delegate<u64 (u64 das, bool write)>;
+
 	abc1600_mmu_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock = 0);
 
 	template <typename T> void set_cpu(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	template <typename... T> void set_pack_callback(T &&... args) { m_pack_cb.set(std::forward<T>(args)...); }
 	template <int N> auto in_tren_cb() { return m_read_tren[N].bind(); }
 	template <int N> auto out_tren_cb() { return m_write_tren[N].bind(); }
 
@@ -47,6 +50,7 @@ public:
 
 protected:
 	// device_t implementation
+	virtual void device_resolve_objects() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
@@ -79,7 +83,7 @@ private:
 		friend class abc1600_mmu_device;
 
 	public:
-		mmu(m68008_device *maincpu, address_space &boot, address_space &program, address_space &cpu_space, address_space &mac_space, u8 *segment_ram, u16 *page_ram);
+		mmu(m68008_device *maincpu, pack_delegate &pack, address_space &boot, address_space &program, address_space &cpu_space, address_space &mac_space, u8 *segment_ram, u16 *page_ram);
 		virtual ~mmu() = default;
 
 		virtual u8 read_program(offs_t addr) override;
@@ -91,9 +95,10 @@ private:
 		virtual bool translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
 	private:
-		enum class bus_target : u8 { OTHER, RAM, IO };
+		enum class bus_target : u8 { OTHER, RAM, VIDEO, IO, INTACK };
 
 		m68008_device *m_maincpu;
+		pack_delegate &m_pack;
 		u8 *m_segment_ram;
 		u16 *m_page_ram;
 		address_space &m_a_boot, &m_a_program, &m_a_cpu_space, &m_a_mac_space;
@@ -125,6 +130,7 @@ private:
 		u64 m_rack_ready;
 	};
 
+	pack_delegate m_pack_cb;
 	devcb_read8::array<3> m_read_tren;
 	devcb_write8::array<3> m_write_tren;
 

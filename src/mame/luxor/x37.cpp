@@ -125,7 +125,7 @@ void x37_state::program_map(address_map &map)
 	map(0x400000, 0x47ffff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::vram_map)).umask16(0xffff);
 	map(0x480100, 0x480101).mirror(0xfe).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::crtc_map)).umask16(0xffff);
 	map(0x480800, 0x480807).mirror(0xf8).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr0_map)).umask16(0xffff);
-	map(0x480900, 0x480907).mirror(0xf8).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr1_map)).umask16(0xffff);
+	map(0x480900, 0x4809ff).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr1_map)).umask16(0xffff);
 	map(0x480a00, 0x480a07).mirror(0xf8).m(ABC1600_MOVER_TAG, FUNC(abc1600_mover_device::iowr2_map)).umask16(0xffff);
 	for (offs_t base = 0x800000; base < 0xc00000; base += 0x200)
 	{

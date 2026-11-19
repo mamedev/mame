@@ -27,6 +27,22 @@
 DEFINE_DEVICE_TYPE(VIC1112, vic1112_device, "vic1112", "VIC-1112 IEEE-488 Interface")
 
 
+uint8_t vic1112_device::via0_r(offs_t offset)
+{
+	if (offset == 0 && !m_bus->sample_ready())
+		return 0xff;
+
+	return m_via0->read(offset);
+}
+
+uint8_t vic1112_device::via1_r(offs_t offset)
+{
+	if (offset == 0 && !m_bus->sample_ready())
+		return 0xff;
+
+	return m_via1->read(offset);
+}
+
 uint8_t vic1112_device::via0_pb_r()
 {
 	/*
@@ -129,8 +145,8 @@ vic1112_device::vic1112_device(const machine_config &mconfig, const char *tag, d
 
 void vic1112_device::device_start()
 {
-	m_slot->io2().install_readwrite_handler(0x00, 0x0f, 0x3e0, read8sm_delegate(*m_via0, FUNC(via6522_device::read)), write8sm_delegate(*m_via0, FUNC(via6522_device::write)));
-	m_slot->io2().install_readwrite_handler(0x10, 0x1f, 0x3e0, read8sm_delegate(*m_via1, FUNC(via6522_device::read)), write8sm_delegate(*m_via1, FUNC(via6522_device::write)));
+	m_slot->io2().install_readwrite_handler(0x00, 0x0f, 0x3e0, read8sm_delegate(*this, FUNC(vic1112_device::via0_r)), write8sm_delegate(*m_via0, FUNC(via6522_device::write)));
+	m_slot->io2().install_readwrite_handler(0x10, 0x1f, 0x3e0, read8sm_delegate(*this, FUNC(vic1112_device::via1_r)), write8sm_delegate(*m_via1, FUNC(via6522_device::write)));
 }
 
 

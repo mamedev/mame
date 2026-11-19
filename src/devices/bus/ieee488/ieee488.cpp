@@ -466,6 +466,14 @@ bool ieee488_device::sample_ready(cpu_device &cpu)
 	return ready;
 }
 
+bool ieee488_device::sample_ready()
+{
+	device_execute_interface *const executing = machine().scheduler().currently_executing();
+	cpu_device *const cpu = executing ? dynamic_cast<cpu_device *>(&executing->device()) : nullptr;
+
+	return !cpu || sample_ready(*cpu);
+}
+
 
 //-------------------------------------------------
 //  read_signal - sample the bus, seeing the

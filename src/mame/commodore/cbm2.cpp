@@ -162,6 +162,8 @@ public:
 	uint8_t sid_potx_r();
 	uint8_t sid_poty_r();
 
+	uint8_t cia_r(offs_t offset);
+	uint8_t tpi1_r(offs_t offset);
 	uint8_t tpi1_pa_r();
 	void tpi1_pa_w(uint8_t data);
 	uint8_t tpi1_pb_r();
@@ -420,9 +422,9 @@ void cbm2_state::system_mem(address_map &map)
 	map(0xd800, 0xd801).mirror(0xfe).m(m_crtc, FUNC(mc6845_device::map));
 	map(0xda00, 0xda1f).mirror(0xe0).rw(m_sid, FUNC(mos6581_device::read), FUNC(mos6581_device::write));
 	map(0xdb00, 0xdb0f).mirror(0xf0).rw(FUNC(cbm2_state::ext_cia_r), FUNC(cbm2_state::ext_cia_w));
-	map(0xdc00, 0xdc0f).mirror(0xf0).rw(m_cia, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
+	map(0xdc00, 0xdc0f).mirror(0xf0).r(FUNC(cbm2_state::cia_r)).w(m_cia, FUNC(mos6526_device::write));
 	map(0xdd00, 0xdd03).mirror(0xfc).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xde00, 0xde07).mirror(0xf8).rw(m_tpi1, FUNC(tpi6525_device::read), FUNC(tpi6525_device::write));
+	map(0xde00, 0xde07).mirror(0xf8).r(FUNC(cbm2_state::tpi1_r)).w(m_tpi1, FUNC(tpi6525_device::write));
 	map(0xdf00, 0xdf07).mirror(0xf8).rw(m_tpi2, FUNC(tpi6525_device::read), FUNC(tpi6525_device::write));
 	map(0xe000, 0xffff).rom().region("kernal", 0);
 }
@@ -480,9 +482,9 @@ void p500_state::p500_mem(address_map &map)
 	map(0xfd400, 0xfd7ff).ram().share(m_color_ram).lw8(NAME([this] (offs_t offset, uint8_t data) { m_color_ram[offset] = data & 0x0f; }));
 	map(0xfd800, 0xfd83f).mirror(0xc0).rw(m_vic, FUNC(mos6566_device::read), FUNC(mos6566_device::write));
 	map(0xfda00, 0xfda1f).mirror(0xe0).rw(m_sid, FUNC(mos6581_device::read), FUNC(mos6581_device::write));
-	map(0xfdc00, 0xfdc0f).mirror(0xf0).rw(m_cia, FUNC(mos6526_device::read), FUNC(mos6526_device::write));
+	map(0xfdc00, 0xfdc0f).mirror(0xf0).r(FUNC(cbm2_state::cia_r)).w(m_cia, FUNC(mos6526_device::write));
 	map(0xfdd00, 0xfdd03).mirror(0xfc).rw(m_acia, FUNC(mos6551_device::read), FUNC(mos6551_device::write));
-	map(0xfde00, 0xfde07).mirror(0xf8).rw(m_tpi1, FUNC(tpi6525_device::read), FUNC(tpi6525_device::write));
+	map(0xfde00, 0xfde07).mirror(0xf8).r(FUNC(cbm2_state::tpi1_r)).w(m_tpi1, FUNC(tpi6525_device::write));
 	map(0xfdf00, 0xfdf07).mirror(0xf8).rw(m_tpi2, FUNC(tpi6525_device::read), FUNC(tpi6525_device::write));
 	map(0xfe000, 0xfffff).rom().region("kernal", 0);
 }
@@ -878,6 +880,14 @@ uint8_t cbm2_state::sid_poty_r()
 //  tpi6525_interface tpi1_intf
 //-------------------------------------------------
 
+uint8_t cbm2_state::tpi1_r(offs_t offset)
+{
+	if (offset < 2 && !m_ieee->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_tpi1->read(offset);
+}
+
 uint8_t cbm2_state::tpi1_pa_r()
 {
 	/*
@@ -1149,6 +1159,14 @@ void p500_state::tpi2_pc_w(uint8_t data)
 //-------------------------------------------------
 //  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
+
+uint8_t cbm2_state::cia_r(offs_t offset)
+{
+	if (offset == 0 && !m_ieee->sample_ready(*m_maincpu))
+		return 0xff;
+
+	return m_cia->read(offset);
+}
 
 uint8_t cbm2_state::cia_pa_r()
 {

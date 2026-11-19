@@ -69,6 +69,7 @@
 #include "ivelultrkb.h"
 #include "kb200.h"
 #include "nkbd.h"
+#include "okbd.h"
 #include "tk10.h"
 #include "videnh2.h"
 
@@ -92,7 +93,7 @@ a2kbd_connector_device::a2kbd_connector_device(const machine_config &mconfig, co
 
 void a2kbd_connector_device::default_options(device_slot_interface &slot)
 {
-	//slot.option_add("okbd", APPLE2_OKBD);
+	slot.option_add("okbd", APPLE2_OKBD);
 	slot.option_add("nkbd", APPLE2_NKBD);
 	slot.option_add("am100", AM100_KEYBOARD);
 	slot.option_add("ivelultr", IVEL_ULTRA_KEYBOARD);

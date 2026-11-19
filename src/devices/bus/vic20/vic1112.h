@@ -43,6 +43,8 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 private:
+	uint8_t via0_r(offs_t offset);
+	uint8_t via1_r(offs_t offset);
 	uint8_t via0_pb_r();
 	void via0_pb_w(uint8_t data);
 
