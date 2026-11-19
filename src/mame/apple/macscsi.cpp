@@ -47,10 +47,6 @@ static constexpr u8 WRITE_ERROR = 0;
 // resumes the CPU suspended in wait()
 static constexpr int WAKE_TRIGGER = 1;
 
-// the SE's BBU times out any access after 265 ms (Guide to the Macintosh
-// Family Hardware, 2nd ed., p. 126); other models' figures are unknown
-static constexpr attotime TIMEOUT = attotime::from_msec(265);
-
 // device type definition
 DEFINE_DEVICE_TYPE(MAC_SCSI_HELPER, mac_scsi_helper_device, "scsipdma", "Mac 5380 SCSI helper")
 
@@ -62,6 +58,9 @@ mac_scsi_helper_device::mac_scsi_helper_device(const machine_config &mconfig, co
 	, m_scsi_dma_read_callback(*this, BAD_BYTE)
 	, m_scsi_dma_write_callback(*this)
 	, m_timeout_error_callback(*this)
+	// every model since the Mac II bus-errors after 16 us without a byte
+	// (Inside Macintosh: Devices, SCSI Manager 4.3, p. 4-18)
+	, m_timeout(attotime::from_usec(16))
 	, m_timeout_timer(nullptr)
 	, m_drq(false)
 	, m_waiting(false)
@@ -154,7 +153,7 @@ bool mac_scsi_helper_device::timed_out(u8 error)
 void mac_scsi_helper_device::wait(bool progress)
 {
 	if (progress || !m_timeout_timer->enabled())
-		m_timeout_timer->adjust(TIMEOUT);
+		m_timeout_timer->adjust(m_timeout);
 	m_waiting = true;
 	m_woken = false;
 

@@ -23,6 +23,7 @@ public:
 
 	// miscellaneous configuration
 	template <typename T> void set_maincpu(T &&tag) { m_maincpu.set_tag(std::forward<T>(tag)); }
+	void set_timeout(attotime timeout) { m_timeout = timeout; }
 
 	// read/write handlers
 	u8 read_wrapper(bool pseudo_dma, offs_t offset);
@@ -55,6 +56,9 @@ private:
 	devcb_read8 m_scsi_dma_read_callback;
 	devcb_write8 m_scsi_dma_write_callback;
 	devcb_write8 m_timeout_error_callback;
+
+	// misc. parameters
+	attotime m_timeout;
 
 	// internal state
 	emu_timer *m_timeout_timer;
