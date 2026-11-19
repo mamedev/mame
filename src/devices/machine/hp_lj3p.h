@@ -25,17 +25,17 @@
 #include "emupal.h"
 #include "screen.h"
 
-#include <vector>
+#include <memory>
 
 
 class hp_lj3p_device : public device_t
 {
 public:
-	hp_lj3p_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
 	// the engine timing and the system tick are derived from the firmware,
 	// not measured
 	static constexpr feature_type imperfect_features() { return feature::TIMING; }
+
+	hp_lj3p_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// parallel interface: data, /STROBE and /INIT from the computer, the
 	// status lines to it
@@ -54,7 +54,7 @@ public:
 	auto txd_cb() { return m_txd_cb.bind(); }
 	auto dtr_cb() { return m_dtr_cb.bind(); }
 
-	// for the bus adapters: the view with the computer's first screen next to
+	// for the bus adapters: the view with the computer's screen (tag "screen") next to
 	// the paper and the control panel
 	static void host_layout(machine_config &config) ATTR_COLD;
 
@@ -138,7 +138,7 @@ private:
 	// every band requests IRQ 5.  The firmware writes the blank top margin and
 	// the first band with data back to back.
 	u16 m_video[4];
-	std::vector<u8> m_page;     // the page, one bit per dot, set = black
+	std::unique_ptr<u8 []> m_page;  // the page, one bit per dot, set = black
 	s32 m_page_y;
 	bool m_page_dirty;
 	band_t m_cur;
@@ -146,7 +146,7 @@ private:
 	bool m_cur_active;
 	bool m_next_valid;
 	bool m_stop_pending;
-	std::vector<u8> m_view;     // paper view, grey level per pixel
+	std::unique_ptr<u8 []> m_view;  // paper view, grey level per pixel
 	bool m_view_clear;
 
 	// glyph and rule merger: 3a0004 destination (CPU address, bits 0-22),
@@ -183,6 +183,7 @@ private:
 	u16 m_ctrl;
 	u16 m_ctrl2;        // 3e0006 written
 	u16 m_irqctl;       // 3e0004 written
+	bool m_irq3;        // system tick (acknowledged with 3e0004 bit 5)
 	bool m_irq4;        // engine sync interrupt (acknowledged with 3e0004 bit 7)
 	bool m_irq5;        // video band interrupt (acknowledged with 3e0004 bit 6)
 	bool m_top;         // engine TOP input (3e0006 bit 9)
@@ -201,7 +202,7 @@ private:
 	u16 unk_r(offs_t offset, u16 mem_mask);
 	void unk_w(offs_t offset, u16 data, u16 mem_mask);
 
-	TIMER_CALLBACK_MEMBER(tick) { m_maincpu->set_input_line(M68K_IRQ_3, HOLD_LINE); }
+	TIMER_CALLBACK_MEMBER(tick);
 
 	void video_w(offs_t offset, u16 data, u16 mem_mask);
 	band_t latch_band() const;
@@ -219,7 +220,8 @@ private:
 	void blt_out(u16 data);
 
 	TIMER_CALLBACK_MEMBER(ack_end);
-	void update_parallel(bool force = false);
+	u8 status_lines() const;
+	void update_parallel();
 	void pctrl_w(offs_t offset, u16 data, u16 mem_mask);
 	u16 pdata_r();
 

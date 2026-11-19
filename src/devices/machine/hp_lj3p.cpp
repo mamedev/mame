@@ -100,12 +100,12 @@ Additional notes
 
 #include "png.h"
 
-#include "hplj3p.lh"
-#include "hplj3p_host.lh"
-
 #include <algorithm>
 #include <bit>
 #include <iterator>
+
+#include "hplj3p.lh"
+#include "hplj3p_host.lh"
 
 #define VERBOSE 0
 #include "logmacro.h"
@@ -218,15 +218,29 @@ void hp_lj3p_device::device_start()
 	attotime const tick = attotime::from_hz(600);
 	m_tick_timer->adjust(tick, 0, tick);
 
-	m_page.resize(PAGE_STRIDE * PAGE_H);
-	m_view.resize(VIEW_W * VIEW_H);
-	std::fill(m_view.begin(), m_view.end(), 0xff);
+	m_page = make_unique_clear<u8 []>(PAGE_STRIDE * PAGE_H);
+	m_view = make_unique_clear<u8 []>(VIEW_W * VIEW_H);
+	std::fill_n(m_view.get(), VIEW_W * VIEW_H, 0xff);
 	m_view_clear = false;
 	m_strobe = true;
 
+	// the host interface register's reset value is not known; this is the
+	// firmware's first write (not ready, DTR inactive), so that a computer
+	// does not send before the firmware runs
+	m_pctrl = 0x0078;
+	m_pdata = 0;
+	m_pfull = false;
+	m_lines = status_lines();
+	m_busy_cb(BIT(m_lines, 0));
+	m_select_cb(BIT(m_lines, 1));
+	m_perror_cb(BIT(m_lines, 2));
+	m_fault_cb(BIT(m_lines, 3));
+	m_dtr_cb(BIT(m_lines, 4));
+	m_ack_cb(1);
+
 	save_item(NAME(m_data));
 	save_item(NAME(m_video));
-	save_item(NAME(m_page));
+	save_pointer(NAME(m_page), PAGE_STRIDE * PAGE_H);
 	save_item(NAME(m_page_y));
 	save_item(NAME(m_page_dirty));
 	save_item(NAME(m_cur.addr));
@@ -242,7 +256,7 @@ void hp_lj3p_device::device_start()
 	save_item(NAME(m_cur_active));
 	save_item(NAME(m_next_valid));
 	save_item(NAME(m_stop_pending));
-	save_item(NAME(m_view));
+	save_pointer(NAME(m_view), VIEW_W * VIEW_H);
 	save_item(NAME(m_view_clear));
 	save_item(NAME(m_blt_dest));
 	save_item(NAME(m_blt_row));
@@ -262,6 +276,7 @@ void hp_lj3p_device::device_start()
 	save_item(NAME(m_ctrl));
 	save_item(NAME(m_ctrl2));
 	save_item(NAME(m_irqctl));
+	save_item(NAME(m_irq3));
 	save_item(NAME(m_irq4));
 	save_item(NAME(m_irq5));
 	save_item(NAME(m_top));
@@ -296,7 +311,8 @@ void hp_lj3p_device::device_reset()
 	m_ctrl = 0;
 	m_ctrl2 = 0;
 	m_irqctl = 0;
-	m_irq4 = m_irq5 = m_top = m_sheet = false;
+	m_irq3 = m_irq4 = m_irq5 = m_top = m_sheet = false;
+	m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
 	m_maincpu->set_input_line(M68K_IRQ_4, CLEAR_LINE);
 	m_maincpu->set_input_line(M68K_IRQ_5, CLEAR_LINE);
 
@@ -308,13 +324,12 @@ void hp_lj3p_device::device_reset()
 	m_acia->write_dcd(0);
 	m_acia_clock->set_unscaled_clock(19200);
 
-	// the host interface register's reset value is not known; this is the
-	// firmware's first write (not ready, DTR inactive), so that a computer
-	// does not send before the firmware runs
+	// the host interface register returns to its initial state (see
+	// device_start); a pending /ACK pulse ends
 	m_pctrl = 0x0078;
 	m_pdata = 0;
 	m_pfull = false;
-	update_parallel(true);
+	update_parallel();
 	m_ack_cb(1);
 }
 
@@ -457,19 +472,24 @@ u16 hp_lj3p_device::status_r()
 	return data;
 }
 
-void hp_lj3p_device::update_parallel(bool force)
+u8 hp_lj3p_device::status_lines() const
 {
-	// the interrupt is only requested while the formatter accepts data
-	m_maincpu->set_input_line(M68K_IRQ_2, (m_pfull && BIT(m_pctrl, 15)) ? ASSERT_LINE : CLEAR_LINE);
-
-	// the status lines to the computer, each passed on when it changes
-	u8 const lines =
+	return
 			((m_pfull || !BIT(m_pctrl, 15)) ? 0x01 : 0x00) |  // BUSY
 			(BIT(m_pctrl, 4) ? 0x00 : 0x02) |                 // SELECT
 			(BIT(m_pctrl, 6) << 2) |                          // PERROR
 			(BIT(m_pctrl, 5) << 3) |                          // /FAULT
 			(BIT(m_pctrl, 3) << 4);                           // DTR
-	u8 const changed = force ? 0xff : (lines ^ m_lines);
+}
+
+void hp_lj3p_device::update_parallel()
+{
+	// the interrupt is only requested while the formatter accepts data
+	m_maincpu->set_input_line(M68K_IRQ_2, (m_pfull && BIT(m_pctrl, 15)) ? ASSERT_LINE : CLEAR_LINE);
+
+	// the status lines to the computer, each passed on when it changes
+	u8 const lines = status_lines();
+	u8 const changed = lines ^ m_lines;
 	m_lines = lines;
 	if (BIT(changed, 0))
 		m_busy_cb(BIT(lines, 0));
@@ -563,6 +583,14 @@ void hp_lj3p_device::irqctl_w(offs_t offset, u16 data, u16 mem_mask)
 {
 	u16 const old = m_irqctl;
 	COMBINE_DATA(&m_irqctl);
+	// the firmware sets bit 5 to acknowledge the system tick but clears it only
+	// in its copy of the register (routine at 12e6a), so a write with bit 5 set
+	// is taken as the acknowledge, not its rising edge (assumed)
+	if (BIT(m_irqctl, 5) && m_irq3)
+	{
+		m_irq3 = false;
+		m_maincpu->set_input_line(M68K_IRQ_3, CLEAR_LINE);
+	}
 	if (BIT(m_irqctl, 7) && !BIT(old, 7) && m_irq4)
 	{
 		m_irq4 = false;
@@ -575,6 +603,13 @@ void hp_lj3p_device::irqctl_w(offs_t offset, u16 data, u16 mem_mask)
 	}
 	if ((m_irqctl ^ old) & 0xff1f)
 		LOG("%s: 3e0004 %04x\n", machine().describe_context(), m_irqctl);
+}
+
+TIMER_CALLBACK_MEMBER(hp_lj3p_device::tick)
+{
+	// the level 3 handler (c06) acknowledges with 3e0004 bit 5 (see irqctl_w)
+	m_irq3 = true;
+	m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 }
 
 hp_lj3p_device::band_t hp_lj3p_device::latch_band() const
@@ -751,7 +786,7 @@ void hp_lj3p_device::view_dot(int x, int y)
 {
 	if (m_view_clear)
 	{
-		std::fill(m_view.begin(), m_view.end(), 0xff);
+		std::fill_n(m_view.get(), VIEW_W * VIEW_H, 0xff);
 		m_view_clear = false;
 	}
 	if (x / 4 < VIEW_W && y / 4 < VIEW_H)
@@ -763,7 +798,7 @@ void hp_lj3p_device::view_dot(int x, int y)
 
 void hp_lj3p_device::clear_page()
 {
-	std::fill(m_page.begin(), m_page.end(), 0);
+	std::fill_n(m_page.get(), PAGE_STRIDE * PAGE_H, 0);
 	m_page_y = 0;
 	m_page_dirty = false;
 }
@@ -781,9 +816,9 @@ void hp_lj3p_device::save_page()
 		u8 const *const src = &m_page[y * PAGE_STRIDE];
 		u16 *const dst = &page.pix(y);
 		for (int x = 0; x < PAGE_W; x++)
-			dst[x] = BIT(src[x >> 3], 7 - (x & 7)) ? 0 : 1;
+			dst[x] = BIT(src[x >> 3], ~x & 7) ? 0 : 1;
 	}
-	static const rgb_t PAPER[2] = { rgb_t::black(), rgb_t::white() };
+	static constexpr rgb_t PAPER[2] = { rgb_t::black(), rgb_t::white() };
 	util::png_write_bitmap(file, nullptr, page, 2, PAPER);
 	machine().popmessage("printer page saved as %s", file.filename());
 }
