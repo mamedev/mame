@@ -709,6 +709,8 @@ void atmega1280_device::atmega1280_internal_map(address_map &map)
 	map(0x010b, 0x010b).rw(FUNC(atmega1280_device::gpio_r<GPIOL>),FUNC(atmega1280_device::port_w<GPIOL>));
 	map(0x0120, 0x0120).w(FUNC(atmega1280_device::tccr5a_w));
 	map(0x0121, 0x0121).w(FUNC(atmega1280_device::tccr5b_w));
+	// 8 KiB SRAM; separate from the register file so it survives reset
+	map(0x0200, 0x21ff).ram().share("sram");
 }
 
 void atmega2560_device::atmega2560_internal_map(address_map &map)
@@ -728,6 +730,8 @@ void atmega2560_device::atmega2560_internal_map(address_map &map)
 	map(0x010b, 0x010b).rw(FUNC(atmega2560_device::gpio_r<GPIOL>),FUNC(atmega2560_device::port_w<GPIOL>));
 	map(0x0120, 0x0120).w(FUNC(atmega2560_device::tccr5a_w));
 	map(0x0121, 0x0121).w(FUNC(atmega2560_device::tccr5b_w));
+	// 8 KiB SRAM; separate from the register file so it survives reset
+	map(0x0200, 0x21ff).ram().share("sram");
 }
 
 
