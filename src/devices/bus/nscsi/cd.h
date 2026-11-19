@@ -45,6 +45,8 @@ protected:
 	virtual bool scsi_command_done(uint8_t command, uint8_t length) override;
 
 	virtual void return_no_cd();
+	virtual void return_media_changed();
+	bool check_media_change();
 	static int to_msf(int frame);
 
 	void update_directory();

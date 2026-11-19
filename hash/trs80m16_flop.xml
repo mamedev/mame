@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="trs80m16_flop" description="Tandy TRS-80 Model 16 floppy disk images">
+
+	<software name="trsxenix">
+		<description>TRS-XENIX v01.03.05</description>
+		<year>1984</year>
+		<publisher>Tandy</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<feature name="part_id" value="Boot"/>
+			<dataarea name="flop" size="465409">
+				<rom name="xnx135d1.imd" size="465409" crc="7ff0b11b" sha1="c9b9f39b0b975de4affef3b3896c5e4379381d47"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_8">
+			<feature name="part_id" value="Install 1"/>
+			<dataarea name="flop" size="616426">
+				<rom name="xnx135d2.imd" size="616426" crc="15f05b88" sha1="cf138031c7ac242fdf91bb88db4879a1f75c2b0d"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_8">
+			<feature name="part_id" value="Install 2"/>
+			<dataarea name="flop" size="371657">
+				<rom name="xnx135d3.imd" size="371657" crc="cfc14b22" sha1="713c520769f0c9726ac60862e39def9699fd4579"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_8">
+			<feature name="part_id" value="File Maintenance"/>
+			<dataarea name="flop" size="295256">
+				<rom name="xnx135fm.imd" size="295256" crc="9f6fd0b4" sha1="2658db6c4b424139c6c3312b0dbb1e1120a2ba5b"/>
+			</dataarea>
+		</part>
+
+		<part name="flop5" interface="floppy_8">
+			<feature name="part_id" value="TRS-XENIX Update"/>
+			<dataarea name="flop" size="544874">
+				<rom name="xnx135up.imd" size="544874" crc="844feaa1" sha1="71957f22d009a75b025b74dda72acc78c15a7663"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trsxenix134" cloneof="trsxenix">
+		<description>TRS-XENIX v01.03.04</description>
+		<year>1984</year>
+		<publisher>Tandy</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<feature name="part_id" value="Boot"/>
+			<dataarea name="flop" size="470519">
+				<rom name="xnx134d1.imd" size="470519" crc="5903053a" sha1="ea30a3bd7f9a0e532c6fa73f837957a2746251c4"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_8">
+			<feature name="part_id" value="Install 1"/>
+			<dataarea name="flop" size="618470">
+				<rom name="xnx134d2.imd" size="618470" crc="ab689833" sha1="31a9942b3f86128ffdb41c34eca099f4450fda38"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_8">
+			<feature name="part_id" value="Install 2"/>
+			<dataarea name="flop" size="371657">
+				<rom name="xnx134d3.imd" size="371657" crc="c8d69ff1" sha1="a5285f9c3a6fc44f4f90163ec8746dd9cdae2999"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_8">
+			<feature name="part_id" value="File Maintenance"/>
+			<dataarea name="flop" size="275327">
+				<rom name="xnx134fm.imd" size="275327" crc="09e2bdb8" sha1="dd80f4a8730ad8f7c682798bb83f164bdb3be4d3"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trsxenix132" cloneof="trsxenix">
+		<description>TRS-XENIX v01.03.02</description>
+		<year>1984</year>
+		<publisher>Tandy</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<feature name="part_id" value="Boot"/>
+			<dataarea name="flop" size="462854">
+				<rom name="xnx132d1.imd" size="462854" crc="6bf7ba6e" sha1="759656677fdda5a46f34d0784239607299c47bb6"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_8">
+			<feature name="part_id" value="Install 1"/>
+			<dataarea name="flop" size="618470">
+				<rom name="xnx132d2.imd" size="618470" crc="f1b5c289" sha1="b89e9737deb9a7d7595940b67fa7517af9d68a9c"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_8">
+			<feature name="part_id" value="Install 2"/>
+			<dataarea name="flop" size="371146">
+				<rom name="xnx132d3.imd" size="371146" crc="16b767f8" sha1="d145d3f304db2fa809d691cae626e3c313b46dd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trsxenix130" cloneof="trsxenix">
+		<description>TRS-XENIX v01.03.00</description>
+		<year>1983</year>
+		<publisher>Tandy</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<feature name="part_id" value="Boot"/>
+			<dataarea name="flop" size="397957">
+				<rom name="xnx130d1.imd" size="397957" crc="8d5adec7" sha1="a39daba818d5f5ed9a075443865773c1b2c625e9"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_8">
+			<feature name="part_id" value="Install 1"/>
+			<dataarea name="flop" size="616665">
+				<rom name="xnx130d2.imd" size="616665" crc="f9dd543e" sha1="e7df89127fd3fb7b2921a6401f4ac333ca55b2f5"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_8">
+			<feature name="part_id" value="Install 2"/>
+			<dataarea name="flop" size="624841">
+				<rom name="xnx130d3.imd" size="624841" crc="6be2dfc6" sha1="245da96258e4c58bf70df3f753aa96a4b43baf1c"/>
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_8">
+			<feature name="part_id" value="Install 3"/>
+			<dataarea name="flop" size="408688">
+				<rom name="xnx130d4.imd" size="408688" crc="f1536b76" sha1="cbe786d0da4d6231e45520c860599527a78fdaac"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trsxenix110" cloneof="trsxenix">
+		<description>TRS-XENIX v01.01.00</description>
+		<year>1983</year>
+		<publisher>Tandy</publisher>
+
+		<part name="flop1" interface="floppy_8">
+			<feature name="part_id" value="Boot"/>
+			<dataarea name="flop" size="393869">
+				<rom name="xnx110d1.imd" size="393869" crc="0f53d8d0" sha1="d41f980f816b4f7678f46ac5aacde24317624703"/>
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_8">
+			<feature name="part_id" value="Install 1"/>
+			<dataarea name="flop" size="593942">
+				<rom name="xnx110d2.imd" size="593942" crc="a63cb1d0" sha1="1ed2f0780b969cf867f0675f289c6e7058322138"/>
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_8">
+			<feature name="part_id" value="Install 2"/>
+			<dataarea name="flop" size="489934">
+				<rom name="xnx110d3.imd" size="489934" crc="66a52ceb" sha1="1a7ac7b42519c0e79631b117f17782839d05bbd5"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

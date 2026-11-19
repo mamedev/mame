@@ -519,7 +519,7 @@ bool mips3_device::frontend::describe_regimm(uint32_t op, opcode_desc &desc)
 
 bool mips3_device::frontend::describe_idt(uint32_t op, opcode_desc &desc)
 {
-	if (m_mips3->m_flavor == mips3_device::MIPS3_TYPE_VR5500)
+	if (m_mips3->m_flavor == mips3_device::MIPS3_TYPE_VR5500 || m_mips3->m_flavor == mips3_device::MIPS3_TYPE_XBURST)
 	{
 		switch (op & 0x3f)
 		{
@@ -538,6 +538,34 @@ bool mips3_device::frontend::describe_idt(uint32_t op, opcode_desc &desc)
 				desc.set_r_used(RTREG);
 				desc.set_r_modified(RDREG);
 				desc.cycles = 2;
+				return true;
+
+			case 0x10: // S32LDD (XBurst MXU)
+				if (m_mips3->m_flavor != mips3_device::MIPS3_TYPE_XBURST)
+					return false;
+				desc.set_r_used(RSREG);
+				desc.set_reads_memory();
+				desc.set_can_cause_exception();
+				return true;
+
+			case 0x11: // S32STD (XBurst MXU)
+				if (m_mips3->m_flavor != mips3_device::MIPS3_TYPE_XBURST)
+					return false;
+				desc.set_r_used(RSREG);
+				desc.set_writes_memory();
+				desc.set_can_cause_exception();
+				return true;
+
+			case 0x2e: // S32M2I (XBurst MXU)
+				if (m_mips3->m_flavor != mips3_device::MIPS3_TYPE_XBURST)
+					return false;
+				desc.set_r_modified(RTREG);
+				return true;
+
+			case 0x2f: // S32I2M (XBurst MXU)
+				if (m_mips3->m_flavor != mips3_device::MIPS3_TYPE_XBURST)
+					return false;
+				desc.set_r_used(RTREG);
 				return true;
 
 			case 0x20: // CLZ

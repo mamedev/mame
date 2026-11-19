@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "mmc186.h"
 
+#include "softlist_dev.h"
+
 #define UPD765_TAG "upd765"
 
 DEFINE_DEVICE_TYPE(NOKIA_MMC186, mmc186_device, "nokia_mmc186", "Nokia MikroMikko 2 MMC186")

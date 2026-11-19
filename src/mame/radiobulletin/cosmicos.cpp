@@ -663,6 +663,8 @@ void cosmicos_state::cosmicos(machine_config &config)
 	m_maincpu->q_cb().set(FUNC(cosmicos_state::q_w));
 	m_maincpu->dma_rd_cb().set(FUNC(cosmicos_state::dma_r));
 	m_maincpu->sc_cb().set(FUNC(cosmicos_state::sc_w));
+	m_maincpu->sc_cb().append(m_cti, FUNC(cdp1864_device::sc_w));
+	m_maincpu->tpa_cb().set(m_cti, FUNC(cdp1864_device::tpa_w));
 
 	/* video hardware */
 	config.set_default_layout(layout_cosmicos);

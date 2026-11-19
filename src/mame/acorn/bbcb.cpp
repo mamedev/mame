@@ -573,7 +573,7 @@ void bbcb_state::bbcb(machine_config &config)
 
 	ttl74123_device &ic87(TTL74123(config, "ic87", RES_K(39), CAP_N(2.2)));
 	ic87.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
-	ic87.set_a_pin_value(0);
+	ic87.set_b_pin_value(1);
 	ic87.set_clear_pin_value(1);
 	ic87.out_cb().set(m_adlc, FUNC(mc6854_device::set_dcd)).invert();
 	ic87.out_cb().append("ic91", FUNC(input_merger_device::in_w<0>));
@@ -583,7 +583,7 @@ void bbcb_state::bbcb(machine_config &config)
 	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
-	econet.clk_wr_callback().append(ic87, FUNC(ttl74123_device::b_w));
+	econet.clk_wr_callback().append(ic87, FUNC(ttl74123_device::a_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 	econet.valid_wr_callback().set("ic91", FUNC(input_merger_device::in_w<1>));
 	ECONET_SLOT(config, "econet", "network", econet_devices);

@@ -161,7 +161,7 @@ uint8_t eeprom_parallel_28xx_device::read(address_space &space, offs_t offset)
 {
 	if (m_oe == 1)
 	{
-		LOG("%s: Read attempted while /OE inactive (offset = %X)\n", machine().describe_context(), offset);
+		LOG("%s: Read attempted while /OE inactive (offset = %X)\n", machine().describe_context(), offset);
 		return space.unmap();
 	}
 

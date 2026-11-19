@@ -32,17 +32,15 @@ public:
 protected:
 	nubus_radiustpd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	// optional information overrides
-	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
-
 	TIMER_CALLBACK_MEMBER(vbl_tick);
 
-	void card_map(address_map &map);
+	void card_map(address_map &map) ATTR_COLD;
 
 private:
 	u32 radiustpd_r(offs_t offset, u32 mem_mask = ~0);

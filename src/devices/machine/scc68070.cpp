@@ -303,6 +303,7 @@ void scc68070_device::device_start()
 	save_item(NAME(m_i2c.first_byte));
 	save_item(NAME(m_i2c.ack_or_nak_sent));
 
+	m_uart.transmit_ctsn = true;
 	save_item(NAME(m_uart.mode_register));
 	save_item(NAME(m_uart.status_register));
 	save_item(NAME(m_uart.clock_select));
@@ -377,7 +378,6 @@ void scc68070_device::reset_peripheral_state()
 	m_uart.command_register = 0;
 	m_uart.transmit_holding_register = 0;
 	m_uart.receive_holding_register = 0;
-	m_uart.transmit_ctsn = true;
 	m_uart.transmit_break = false;
 	receive_register_reset();
 	transmit_register_reset();

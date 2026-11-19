@@ -4007,8 +4007,6 @@ void sh34_base_device::device_start()
 		m_fd_regmap[regnum] = uml::mem(((double *)(m_sh2_state->m_fr+(regnum))));
 	}
 
-	drc_start();
-
 	m_drcuml->symbol_add(&m_sh2_state->m_fpmode, sizeof(m_sh2_state->m_fpmode), "fpmode");
 
 	if (m_isdrc)

@@ -41,8 +41,8 @@
 #include "emu.h"
 #include "fmt121.h"
 
-#include "bus/scsi/scsi.h"
-#include "bus/scsi/scsihd.h"
+#include "bus/nscsi/devices.h"
+#include "machine/nscsi_bus.h"
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -74,15 +74,17 @@ fmt121_device::fmt121_device(const machine_config &mconfig, const char *tag, dev
 
 void fmt121_device::device_add_mconfig(machine_config &config)
 {
-	scsi_port_device &scsi(SCSI_PORT(config, "scsi"));
-	scsi.set_slot_device(1, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-	scsi.set_slot_device(2, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_1));
-	scsi.set_slot_device(3, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_2));
-	scsi.set_slot_device(4, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_3));
-	scsi.set_slot_device(5, "harddisk", SCSIHD, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_4));
+	nscsi_bus_device &scsi(NSCSI_BUS(config, "scsi"));
+	NSCSI_CONNECTOR(config, "scsi:0", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:1", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:2", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:3", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:4", default_scsi_devices, "harddisk");
+	NSCSI_CONNECTOR(config, "scsi:5", default_scsi_devices, nullptr);
+	NSCSI_CONNECTOR(config, "scsi:6", default_scsi_devices, nullptr);
 
 	FMSCSI(config, m_scsi_ctlr);
-	m_scsi_ctlr->set_scsi_port("scsi");
+	scsi.set_external_device(7, m_scsi_ctlr);
 	m_scsi_ctlr->irq_handler().set(FUNC(fmt121_device::irq_w));
 	m_scsi_ctlr->drq_handler().set(FUNC(fmt121_device::drq_w));
 }
@@ -106,7 +108,7 @@ void fmt121_device::device_start()
 
 u8 fmt121_device::fmt_scsi_read(offs_t offset)
 {
-	return m_scsi_ctlr->fmscsi_r(offset);
+	return m_scsi_ctlr->read(offset);
 }
 
 
@@ -116,7 +118,7 @@ u8 fmt121_device::fmt_scsi_read(offs_t offset)
 
 void fmt121_device::fmt_scsi_write(offs_t offset, u8 data)
 {
-	m_scsi_ctlr->fmscsi_w(offset, data);
+	m_scsi_ctlr->write(offset, data);
 }
 
 //-------------------------------------------------
@@ -125,7 +127,7 @@ void fmt121_device::fmt_scsi_write(offs_t offset, u8 data)
 
 u8 fmt121_device::fmt_scsi_data_read()
 {
-	return m_scsi_ctlr->fmscsi_data_r();
+	return m_scsi_ctlr->data_r();
 }
 
 //-------------------------------------------------
@@ -134,7 +136,7 @@ u8 fmt121_device::fmt_scsi_data_read()
 
 void fmt121_device::fmt_scsi_data_write(u8 data)
 {
-	m_scsi_ctlr->fmscsi_data_w(data);
+	m_scsi_ctlr->data_w(data);
 }
 
 

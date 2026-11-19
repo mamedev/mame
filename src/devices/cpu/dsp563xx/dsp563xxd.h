@@ -63,6 +63,7 @@ private:
 	static const char *const ts_damo1_a[8];
 	static const char *const ts_damo1_b[8];
 	static const char *const ts_damo2[4];
+	static const char *const ts_qq2[4];
 
 	static std::string disasm_move(u8 kmove, u32 opcode, u32 exv, u32 pc);
 	static std::string disasm_npar(u8 knpar, u32 opcode, u32 exv, u32 pc);

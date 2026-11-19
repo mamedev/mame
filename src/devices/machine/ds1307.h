@@ -17,15 +17,18 @@ public:
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
+	virtual bool rtc_feature_leap_year() const override;
 
 	virtual u8 read_data(u16 offset) override;
 	virtual void write_data(u16 offset, u8 data) override;
+	virtual void i2c_start() override;
+	virtual bool reset_pointer_on_stop() const override;
 
 private:
 	u8 m_cmos[0x40];
+	u8 m_read_buffer[7];
 	required_device<nvram_device> m_nvram;
 	emu_timer *m_timer;
 

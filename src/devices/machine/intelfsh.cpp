@@ -23,10 +23,14 @@ Notes:
 #include "emu.h"
 #include "intelfsh.h"
 
+#include <algorithm>
+
 
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
+
+namespace {
 
 enum
 {
@@ -52,7 +56,10 @@ enum
 	FM_WRITEBUFFER2, // part 2 of write to buffer sequence
 	FM_FAST_RESET,
 	FM_WRITEPAGEWINBOND,
+	FM_ERASEAMDSELECT,
 };
+
+} // anonymous namespace
 
 
 enum
@@ -105,6 +112,7 @@ DEFINE_DEVICE_TYPE(AMD_29F400T,              amd_29f400t_device,              "a
 DEFINE_DEVICE_TYPE(AMD_29F800T,              amd_29f800t_device,              "amd_29f800t",              "AMD 29F800T Flash")
 DEFINE_DEVICE_TYPE(AMD_29F800B_16BIT,        amd_29f800b_16bit_device,        "amd_29f800b_16bit",        "AMD 29F800B Flash (16-bit)")
 DEFINE_DEVICE_TYPE(AMD_29LV160DT,            amd_29lv160dt_device,            "amd_29lv160dt",            "AMD 29LV160DT Flash")
+DEFINE_DEVICE_TYPE(AMD_29LV160DB_16BIT,       amd_29lv160db_16bit_device,       "amd_29lv160db_16bit",       "AMD 29LV160DB Flash (16-bit)")
 DEFINE_DEVICE_TYPE(AMD_29LV200T,             amd_29lv200t_device,             "amd_29lv200t",             "AMD 29LV200T Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29F160TE,         fujitsu_29f160te_device,         "mbm29f160te",              "Fujitsu MBM29F160TE Flash")
 DEFINE_DEVICE_TYPE(FUJITSU_29F160TE_16BIT,   fujitsu_29f160te_16bit_device,   "mbm29f160te_16bit",        "Fujitsu MBM29F160TE Flash (16-bit)")
@@ -134,6 +142,7 @@ DEFINE_DEVICE_TYPE(SST_39VF020,              sst_39vf020_device,              "s
 DEFINE_DEVICE_TYPE(SST_49LF020,              sst_49lf020_device,              "sst_49lf020",              "SST 49LF020 Flash")
 
 DEFINE_DEVICE_TYPE(SHARP_LH28F400,           sharp_lh28f400_device,           "sharp_lh28f400",           "Sharp LH28F400 Flash")
+DEFINE_DEVICE_TYPE(SHARP_LH28F800SG,         sharp_lh28f800sg_device,         "sharp_lh28f800sg",         "Sharp LH28F800SG Flash")
 DEFINE_DEVICE_TYPE(INTEL_E28F008SA,          intel_e28f008sa_device,          "intel_e28f008sa",          "Intel E28F008SA Flash")
 DEFINE_DEVICE_TYPE(INTEL_TE28F160,           intel_te28f160_device,           "intel_te28f160",           "Intel TE28F160 Flash")
 DEFINE_DEVICE_TYPE(SHARP_LH28F160S3,         sharp_lh28f160s3_device,         "sharp_lh28f160s3",         "Sharp LH28F160S3 Flash")
@@ -178,6 +187,7 @@ intelfsh_device::intelfsh_device(const machine_config &mconfig, device_type type
 		m_sector_is_16k(false),
 		m_top_boot_sector(false),
 		m_bot_boot_sector(false),
+		m_sector_erase_selection(false),
 		m_page_size(0),
 		m_page_timeout_usec(0),
 		m_has_reset_pin(false),
@@ -210,7 +220,7 @@ fujitsu_29f160te_device::fujitsu_29f160te_device(const machine_config &mconfig, 
 	: intelfsh8_device(mconfig, FUJITSU_29F160TE, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xd2) { m_top_boot_sector = true; m_has_reset_pin = true; }
 
 fujitsu_29f160te_16bit_device::fujitsu_29f160te_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, FUJITSU_29F160TE_16BIT, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xd2) { m_top_boot_sector = true; m_sector_is_4k = true; m_has_reset_pin = true; }
+	: intelfsh16_device(mconfig, FUJITSU_29F160TE_16BIT, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xd2) { m_top_boot_sector = true; m_has_reset_pin = true; }
 
 fujitsu_29f016a_device::fujitsu_29f016a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, FUJITSU_29F016A, tag, owner, clock, 0x200000, MFG_FUJITSU, 0xad) { m_has_reset_pin = true; }
@@ -261,10 +271,16 @@ amd_29f800t_device::amd_29f800t_device(const machine_config &mconfig, const char
 	: intelfsh8_device(mconfig, AMD_29F800T, tag, owner, clock, 0x100000, MFG_AMD, 0xda) { m_top_boot_sector = true; m_has_reset_pin = true; }
 
 amd_29f800b_16bit_device::amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, AMD_29F800B_16BIT, tag, owner, clock, 0x100000, MFG_AMD, 0x2258) { m_top_boot_sector = false; m_has_reset_pin = true; }
+	: intelfsh16_device(mconfig, AMD_29F800B_16BIT, tag, owner, clock, 0x100000, MFG_AMD, 0x2258) { m_bot_boot_sector = true; m_has_reset_pin = true; }
 
 amd_29lv160dt_device::amd_29lv160dt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29LV160DT, tag, owner, clock, 0x200000, MFG_AMD, 0xc4) { m_has_reset_pin = true; }
+
+amd_29lv160db_16bit_device::amd_29lv160db_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, AMD_29LV160DB_16BIT, tag, owner, clock, 0x200000, MFG_AMD, 0x2249)
+{
+	m_bot_boot_sector = true;
+}
 
 amd_29lv200t_device::amd_29lv200t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, AMD_29LV200T, tag, owner, clock, 0x40000, MFG_AMD, 0x3b) { m_has_reset_pin = true; }
@@ -297,7 +313,7 @@ st_m29w640gb_device::st_m29w640gb_device(const machine_config &mconfig, const ch
 	: intelfsh8_device(mconfig, ST_M29W640GB, tag, owner, clock, 0x800000, MFG_ST, 0x227e) { m_bot_boot_sector = true; m_device_id2 = 0x2210; m_device_id3 = 0x2200; m_has_reset_pin = true; }
 
 st_m29w640ft_device::st_m29w640ft_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh16_device(mconfig, ST_M29W640FT, tag, owner, clock, 0x800000, MFG_ST, 0x22ed) { m_bot_boot_sector = true; m_device_id2 = 0x2210; m_device_id3 = 0x2200; m_has_reset_pin = true; }
+	: intelfsh16_device(mconfig, ST_M29W640FT, tag, owner, clock, 0x800000, MFG_ST, 0x22ed) { m_sector_erase_selection = true; m_device_id2 = 0x2210; m_device_id3 = 0x2200; m_has_reset_pin = true; }
 
 panasonic_mn63f805mnp_device::panasonic_mn63f805mnp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh8_device(mconfig, PANASONIC_MN63F805MNP, tag, owner, clock, 0x10000, MFG_PANASONIC, 0x1b) { m_sector_is_4k = true; }
@@ -325,6 +341,10 @@ sst_49lf020_device::sst_49lf020_device(const machine_config &mconfig, const char
 
 sharp_lh28f400_device::sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, SHARP_LH28F400, tag, owner, clock, 0x80000, MFG_SHARP, 0xed) { m_has_reset_pin = true; }
+
+// 16 symmetrical 64KB blocks
+sharp_lh28f800sg_device::sharp_lh28f800sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: intelfsh16_device(mconfig, SHARP_LH28F800SG, tag, owner, clock, 0x100000, MFG_SHARP, 0x50) { }
 
 intel_te28f160_device::intel_te28f160_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: intelfsh16_device(mconfig, INTEL_TE28F160, tag, owner, clock, 0x200000, MFG_SHARP, 0xd0) { m_has_reset_pin = true; }
@@ -394,6 +414,11 @@ void intelfsh_device::device_start()
 		page_load_start();
 	}
 	m_timer = timer_alloc(FUNC(intelfsh_device::delay_tick), this);
+	if (m_sector_erase_selection)
+	{
+		m_erase_selected = make_unique_clear<bool []>(m_size / ERASE_BLOCK_SIZE);
+		save_pointer(NAME(m_erase_selected), m_size / ERASE_BLOCK_SIZE);
+	}
 
 	save_item( NAME(m_status) );
 	save_item( NAME(m_erase_sector) );
@@ -420,6 +445,8 @@ void intelfsh_device::device_reset()
 		m_flash_mode = FM_NORMAL;
 		m_status = 0x80;
 		m_timer->reset();
+		if (m_sector_erase_selection)
+			std::fill_n(m_erase_selected.get(), m_size / ERASE_BLOCK_SIZE, false);
 	}
 }
 
@@ -444,6 +471,22 @@ TIMER_CALLBACK_MEMBER(intelfsh_device::delay_tick)
 	case FM_READSTATUS:
 		m_status = 0x80;
 		break;
+
+	case FM_ERASEAMDSELECT:
+	{
+		for (uint32_t base = 0; base < m_size; )
+		{
+			uint32_t const length = (base >= m_size - 64 * 1024) ? ERASE_BLOCK_SIZE : (64 * 1024);
+			if (m_erase_selected[base / ERASE_BLOCK_SIZE])
+				std::fill_n(&m_data[base], length, 0xff);
+			base += length;
+		}
+		m_status |= 1 << 3;
+		m_flash_mode = FM_ERASEAMD4;
+		// TODO: Model multi-sector erase timing.
+		m_timer->adjust(attotime::from_seconds(1));
+		break;
+	}
 
 	case FM_ERASEAMD4:
 		m_flash_mode = FM_NORMAL;
@@ -648,12 +691,27 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 			}
 		}
 		break;
+	case FM_ERASEAMDSELECT:
 	case FM_ERASEAMD4:
-		// reads outside of the erasing sector return normal data
-		if (
-			!(m_maker_id == MFG_FUJITSU && m_device_id == 0xad) /* Firebeat: pop'n music will poll sector 0 for status updates even when clearing section 1 and beyond */
-			&& ((address < m_erase_sector) || (address >= m_erase_sector+(64*1024)))
-		)
+	{
+		bool read_array = false;
+		bool toggle_dq2 = true;
+		if (m_sector_erase_selection)
+		{
+			// M29W640FT toggles DQ6 at every address and DQ2 only in selected sectors.
+			uint32_t const byte_address = address * (m_bits / 8);
+			toggle_dq2 = m_erase_sector < 0 || m_erase_selected[byte_address / ERASE_BLOCK_SIZE];
+		}
+		else
+		{
+			// MBM29F016A permits DQ6 polling at any address during erase.
+			// Firebeat's pop'n music polls sector 0 while erasing other sectors.
+			read_array =
+				!(m_maker_id == MFG_FUJITSU && m_device_id == 0xad)
+				&& ((address < m_erase_sector) || (address >= m_erase_sector + (64 * 1024)));
+		}
+
+		if (read_array)
 		{
 			switch( m_bits )
 			{
@@ -667,16 +725,39 @@ uint32_t intelfsh_device::read_full(uint32_t address)
 		}
 		else
 		{
+			uint8_t status = m_status ^ (1 << 6);
+			if (toggle_dq2)
+				status ^= 1 << 2;
+			else
+				status |= 1 << 2;
 			if (!machine().side_effects_disabled())
-				m_status ^= ( 1 << 6 ) | ( 1 << 2 );
-			data = m_status;
+				m_status = status;
+			data = m_sector_erase_selection ? status : m_status;
 		}
 		break;
+	}
 	}
 
 	//if (m_flash_mode != FM_NORMAL) logerror( "intelflash_read( %08x ) %08x\n", address, data );
 
 	return data;
+}
+
+
+//-------------------------------------------------
+//  select_erase_sector - extend the pending erase
+//-------------------------------------------------
+
+void intelfsh_device::select_erase_sector(uint32_t address)
+{
+	// M29W640FT has 64 KiB sectors, with eight 8 KiB sectors at the top.
+	uint32_t const byte_address = address * (m_bits / 8);
+	uint32_t const length = (byte_address >= m_size - 64 * 1024) ? ERASE_BLOCK_SIZE : (64 * 1024);
+	uint32_t const base = byte_address & ~(length - 1);
+	std::fill_n(&m_erase_selected[base / ERASE_BLOCK_SIZE], length / ERASE_BLOCK_SIZE, true);
+	m_erase_sector = base / (m_bits / 8);
+	// Every additional sector selection restarts the erase timeout.
+	m_timer->adjust(attotime::from_usec(50));
 }
 
 
@@ -953,6 +1034,8 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;
+			if (m_sector_erase_selection)
+				m_erase_sector = -1;
 
 			if (m_sector_is_4k)
 			{
@@ -969,8 +1052,16 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 		}
 		else if( ( data & 0xff ) == 0x30 )
 		{
+			if (m_sector_erase_selection)
+			{
+				std::fill_n(m_erase_selected.get(), m_size / ERASE_BLOCK_SIZE, false);
+				m_status = 0;
+				m_flash_mode = FM_ERASEAMDSELECT;
+				select_erase_sector(address);
+				break;
+			}
+
 			// sector erase
-			// clear the 4k/64k block containing the current address to all 0xffs
 			uint32_t base = address * ((m_bits == 16) ? 2 : 1);
 			if (m_sector_is_4k)
 			{
@@ -984,15 +1075,15 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 				m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 				m_timer->adjust( attotime::from_msec( 500 ) );
 			}
-			else if(m_top_boot_sector && address >= (m_size - 64*1024))
+			else if(m_top_boot_sector && base >= (m_size - 64*1024))
 			{
-				if (address >= (m_size - (16*1024)))
+				if (base >= (m_size - (16*1024)))
 				{
 					memset(&m_data[base & ~0x3fff], 0xff, 16 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
-				else if (address >= (m_size - (32*1024)))
+				else if (base >= (m_size - (32*1024)))
 				{
 					memset(&m_data[base & ~0x1fff], 0xff, 8 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
@@ -1005,7 +1096,7 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
 			}
-			else if(m_bot_boot_sector && address < (64*1024))
+			else if(m_bot_boot_sector && base < (64*1024))
 			{
 				if (m_maker_id == MFG_ST)
 				{
@@ -1013,13 +1104,13 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
 					m_timer->adjust(attotime::from_msec(250));
 				}
-				else if (address < (16*1024))
+				else if (base < (16*1024))
 				{
 					memset(&m_data[base & ~0x3fff], 0xff, 16 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0x1fff : ~0x3fff);
 					m_timer->adjust( attotime::from_msec( 500 ) );
 				}
-				else if (address < (32*1024))
+				else if (base < (32*1024))
 				{
 					memset(&m_data[base & ~0x1fff], 0xff, 8 * 1024);
 					m_erase_sector = address & ((m_bits == 16) ? ~0xfff : ~0x1fff);
@@ -1077,6 +1168,17 @@ void intelfsh_device::write_full(uint32_t address, uint32_t data)
 			logerror( "unexpected %08x=%02x in FM_ERASEAMD3\n", address, data & 0xff );
 		}
 		break;
+	case FM_ERASEAMDSELECT:
+		if ((data & 0xff) == 0x30)
+			select_erase_sector(address);
+		else if ((data & 0xff) != 0xb0) // TODO: erase suspend
+		{
+			m_timer->reset();
+			m_status = 0x80;
+			m_flash_mode = FM_NORMAL;
+		}
+		break;
+
 	case FM_BYTEPROGRAM:
 		switch( m_bits )
 		{

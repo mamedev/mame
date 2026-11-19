@@ -221,6 +221,7 @@ public:
 		m_polygonram(*this, "polygonram"),
 		m_mixer(*this, "video_mixer"),
 		m_gamma_proms(*this, "gamma_proms"),
+		m_pointrom(*this, "pointrom"),
 		m_vics_control(*this, "vics_control"),
 		m_screen(*this, "screen"),
 		m_adc_ports(*this, "ADC.%u", 0),
@@ -353,7 +354,7 @@ protected:
 	inline void pdp_polygonram_write(offs_t offs, u32 data) { m_polygonram[offs & 0x7fff] = data; }
 	void point_write(offs_t offs, u32 data);
 	s32 pointram_read(offs_t offs);
-	inline s32 point_read(offs_t offs) { offs &= 0x00ffffff; return (offs < m_pointrom_size) ? m_pointrom[offs] : pointram_read(offs); }
+	inline s32 point_read(offs_t offs) { offs &= 0x00ffffff; return (offs < m_pointrom.length()) ? m_pointrom[offs] : pointram_read(offs); }
 	void master_enable(bool enable);
 	void slave_enable(bool enable);
 
@@ -433,6 +434,7 @@ protected:
 	required_shared_ptr<u32> m_polygonram;
 	required_shared_ptr<u32> m_mixer;
 	optional_region_ptr<u8> m_gamma_proms;
+	required_region_ptr<s32> m_pointrom;
 	optional_shared_ptr<u32> m_vics_control;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_adc_ports;
@@ -483,8 +485,7 @@ protected:
 	int m_LitSurfaceIntensity = 0;
 	bool m_LitSurfaceGouraud = false;
 	bool m_LitSurfaceTriangles = false;
-	int m_pointrom_size = 0;
-	std::unique_ptr<s32[]> m_pointrom;
+	
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 	std::unique_ptr<u16[]> m_vics_data;

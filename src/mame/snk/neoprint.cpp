@@ -6,9 +6,6 @@
 
     preliminary driver by David Haywood & Angelo Salese
 
-    npcartv1 bp 1260 pc += 2
-    98best44 bp 1312 pc += 2
-
     TODO:
     - implement remaining video features;
     - sound interface, needs full Neo-Geo conversion;
@@ -63,17 +60,6 @@ public:
 	void neoprint(machine_config &config) ATTR_COLD;
 	void nprsp(machine_config &config) ATTR_COLD;
 
-	void init_98best44() ATTR_COLD;
-	void init_npmillen() ATTR_COLD;
-	void init_npcartv1() ATTR_COLD;
-	void init_npotogib() ATTR_COLD;
-	void init_nprsp() ATTR_COLD;
-	void init_npscv1() ATTR_COLD;
-	void init_npskv() ATTR_COLD;
-	void init_npsprgv4() ATTR_COLD;
-	void init_npspscv() ATTR_COLD;
-	void init_unkneo() ATTR_COLD;
-
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
@@ -82,6 +68,8 @@ private:
 	uint8_t calendar_r();
 	void calendar_w(uint8_t data);
 	uint8_t unk_r();
+	uint8_t mech_status_r();
+	void mech_command_w(uint8_t data);
 	uint8_t audio_result_r();
 	void audio_cpu_clear_nmi_w(uint8_t data);
 	void audio_command_w(offs_t offset, uint8_t data, uint8_t mem_mask = ~0);
@@ -118,6 +106,7 @@ private:
 
 	uint8_t m_audio_result = 0;
 	uint8_t m_bank_val = 0;
+	uint8_t m_mech_pos = 0;
 };
 
 
@@ -205,16 +194,39 @@ void neoprint_state::calendar_w(uint8_t data)
 
 uint8_t neoprint_state::unk_r()
 {
-	/* ---x ---- tested in irq routine, odd/even field number? */
-	/* ---- xx-- one of these two must be high */
-	/* ---- --xx checked right before entering into attract mode, presumably printer/camera related */
+	// ---x ---- tested in irq routine, odd/even field number?
+	// ---- xxxx printer/camera mechanism status, see mech_status_r
 
 	const uint8_t vblank = (m_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
 	//if (m_maincpu->pc() != 0x1504 && m_maincpu->pc() != 0x5f86 && m_maincpu->pc() != 0x5f90)
 	//  printf("%08x\n",m_maincpu->pc());
 
-	return vblank | 4 | 3;
+	return vblank | mech_status_r();
+}
+
+/*
+    Printer/camera mechanism, behaviour deduced from the program code only:
+    ---- xx-- position sensor of a mechanism with three stops (0 = between stops)
+    ---- --xx active low busy/acknowledge lines, always idle here
+
+    Command 0x12 moves the mechanism to the previous stop (3 -> 2 -> 1 -> 3), the
+    nprsp boot code checks this sequence. Other commands need a busy/acknowledge
+    handshake that isn't emulated.
+    The code always writes the command to both 0x0a and 0x0c in the I/O area, only
+    the one that is also read back as status is mapped.
+*/
+uint8_t neoprint_state::mech_status_r()
+{
+	static constexpr uint8_t POS_ID[3] = { 0x0c, 0x04, 0x08 }; // stops 1, 2, 3
+
+	return POS_ID[m_mech_pos] | 0x03;
+}
+
+void neoprint_state::mech_command_w(uint8_t data)
+{
+	if (data == 0x12)
+		m_mech_pos = (m_mech_pos + 2) % 3;
 }
 
 uint8_t neoprint_state::audio_result_r()
@@ -239,7 +251,7 @@ void neoprint_state::audio_command_w(offs_t offset, uint8_t data, uint8_t mem_ma
 
 	audio_cpu_assert_nmi();
 
-	/* boost the interleave to let the audio CPU read the command */
+	// boost the interleave to let the audio CPU read the command
 	machine().scheduler().perfect_quantum(attotime::from_usec(50));
 
 	//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", m_maincpu->pc(), data, mem_mask);
@@ -252,7 +264,7 @@ uint8_t neoprint_state::audio_command_r()
 
 	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", m_audiocpu->pc(), ret);
 
-	/* this is a guess */
+	// this is a guess
 	if (!machine().side_effects_disabled())
 		audio_cpu_clear_nmi_w(0);
 
@@ -271,7 +283,7 @@ void neoprint_state::audio_result_w(uint8_t data)
 void neoprint_state::neoprint_map(address_map &map)
 {
 	map(0x000000, 0x07ffff).rom();
-/*  map(0x100000, 0x17ffff) multi-cart or banking, some writes points here if anything lies there too */
+//  map(0x100000, 0x17ffff) multi-cart or banking, some writes points here if anything lies there too
 	map(0x200000, 0x20ffff).ram();
 	map(0x300000, 0x30ffff).ram().share("nvram");
 	map(0x400000, 0x43ffff).ram().share(m_vram);
@@ -281,7 +293,7 @@ void neoprint_state::neoprint_map(address_map &map)
 	map(0x600004, 0x600005).portr("SYSTEM").nopw();
 	map(0x600006, 0x600007).portr("IN").nopw();
 	map(0x600008, 0x600009).portr("DSW1");
-	map(0x60000a, 0x60000a).r(FUNC(neoprint_state::unk_r));
+	map(0x60000a, 0x60000a).rw(FUNC(neoprint_state::unk_r), FUNC(neoprint_state::mech_command_w));
 	map(0x60000c, 0x60000d).portr("DSW2");
 	map(0x60000e, 0x60000f).nopw();
 
@@ -302,7 +314,7 @@ void neoprint_state::nprsp_palette_w(offs_t offset, uint16_t data, uint16_t mem_
 	g |= i;
 	b |= i;
 
-	/* hack: bypass MAME 65536 palette entries limit */
+	// hack: bypass MAME 65536 palette entries limit
 	if (offset & 0x10000)
 		return;
 
@@ -313,7 +325,7 @@ void neoprint_state::nprsp_palette_w(offs_t offset, uint16_t data, uint16_t mem_
 
 void neoprint_state::nprsp_bank_w(uint8_t data)
 {
-	/* this register seems flip-flop based ... */
+	// this register seems flip-flop based ...
 
 	if ((data & 0xf0) == 0x20)
 	{
@@ -339,8 +351,8 @@ void neoprint_state::nprsp_map(address_map &map)
 	map(0x200006, 0x200007).portr("IN").nopw();
 	map(0x200008, 0x200009).portr("DSW1");
 	map(0x200008, 0x200008).w(FUNC(neoprint_state::nprsp_bank_w));
-	map(0x20000a, 0x20000a).r(FUNC(neoprint_state::unk_r));
-	map(0x20000c, 0x20000d).portr("DSW2");
+	map(0x20000a, 0x20000b).portr("DSW2");
+	map(0x20000c, 0x20000c).rw(FUNC(neoprint_state::mech_status_r), FUNC(neoprint_state::mech_command_w));
 	map(0x20000e, 0x20000f).nopw();
 
 	map(0x240000, 0x24001b).ram().share(m_vregs);
@@ -374,13 +386,13 @@ void neoprint_state::audio_map(address_map &map)
 
 void neoprint_state::audio_io_map(address_map &map)
 {
-	/*map(0x00, 0x00).mirror(0xff00).rw(FUNC(neoprint_state::audio_command_r), FUNC(neoprint_state::audio_cpu_clear_nmi_w));*/  /* may not and NMI clear */
+//  map(0x00, 0x00).mirror(0xff00).rw(FUNC(neoprint_state::audio_command_r), FUNC(neoprint_state::audio_cpu_clear_nmi_w)); // may not and NMI clear
 	map(0x00, 0x00).mirror(0xff00).r(FUNC(neoprint_state::audio_command_r)).nopw();
 	map(0x04, 0x07).mirror(0xff00).rw("ymsnd", FUNC(ym2610_device::read), FUNC(ym2610_device::write));
-//  map(0x08, 0x08).mirror(0xff00); /* write - NMI enable / acknowledge? (the data written doesn't matter) */
+//  map(0x08, 0x08).mirror(0xff00); // write - NMI enable / acknowledge? (the data written doesn't matter)
 	map(0x08, 0x0b).select(0xff00).r(m_neo_zmc, FUNC(neo_zmc_device::bank_r));
 	map(0x0c, 0x0c).mirror(0xff00).w(FUNC(neoprint_state::audio_result_w));
-//  map(0x18, 0x18).mirror(0xff00); /* write - NMI disable? (the data written doesn't matter) */
+//  map(0x18, 0x18).mirror(0xff00); // write - NMI disable? (the data written doesn't matter)
 }
 
 static INPUT_PORTS_START( neoprint )
@@ -499,13 +511,15 @@ void neoprint_state::machine_start()
 	m_upd4990a->c0_w(1);
 	m_upd4990a->c1_w(1);
 	m_upd4990a->c2_w(1);
+
+	save_item(NAME(m_mech_pos));
 }
 
 void neoprint_state::neoprint(machine_config &config)
 {
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &neoprint_state::neoprint_map);
-	m_maincpu->set_periodic_int(FUNC(neoprint_state::irq3_line_hold), attotime::from_hz(45)); /* camera / printer irq, unknown timing */
+	m_maincpu->set_periodic_int(FUNC(neoprint_state::irq3_line_hold), attotime::from_hz(45)); // camera / printer irq, unknown timing
 	m_maincpu->set_vblank_int("screen", FUNC(neoprint_state::irq2_line_hold)); // lv1,2,3 valid?
 
 	Z80(config, m_audiocpu, 4000000);
@@ -551,7 +565,7 @@ void neoprint_state::nprsp(machine_config &config)
 {
 	M68000(config, m_maincpu, 12000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &neoprint_state::nprsp_map);
-	m_maincpu->set_periodic_int(FUNC(neoprint_state::irq3_line_hold), attotime::from_hz(45)); /* camera / printer irq, unknown timing */
+	m_maincpu->set_periodic_int(FUNC(neoprint_state::irq3_line_hold), attotime::from_hz(45)); // camera / printer irq, unknown timing
 	m_maincpu->set_vblank_int("screen", FUNC(neoprint_state::irq2_line_hold)); // lv1,2,3 valid?
 
 	Z80(config, m_audiocpu, 4000000);
@@ -596,12 +610,12 @@ void neoprint_state::nprsp(machine_config &config)
 ROM_START( neoprint ) // NP 1.21 19961210 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ep1.bin", 0x000000, 0x80000, CRC(271da3ee) SHA1(50132d2ac5524e880ec0c2ba3617bf516fd36e7d) )
-//  ROM_RELOAD(                      0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
+//  ROM_RELOAD(                      0x100000, 0x80000 ) // checks the same string from above to be present there? Why?
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "m1- tc571000.bin", 0x00000, 0x20000, CRC(d720f53e) SHA1(7a20200065d3da43fcf7d5922d1808dc896b0da8) ) // possible bad dump? (although looks ok, just mostly empty?)
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "v1.bin", 0x00000, 0x200000, CRC(c1984fa9) SHA1(9702d253ad75e0b0f0182d8da449328648ff1a2f) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -614,12 +628,12 @@ ROM_END
 ROM_START( npcartv1 ) // NP 1.11 19961018 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ep1.bin", 0x000000, 0x80000, CRC(18606198) SHA1(d968e09131c22769e22c7310aca1f02e739f38f1) )
-//  ROM_RELOAD(                      0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
+//  ROM_RELOAD(                      0x100000, 0x80000 ) // checks the same string from above to be present there? Why?
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "m1.bin", 0x00000, 0x20000, CRC(b2d38e12) SHA1(ab96c5d3d22eb71ed6e0a03f3ff5d4b23e72fad8) )
 
-	ROM_REGION( 0x080000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x080000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "v1.bin", 0x00000, 0x80000, CRC(2d6608f9) SHA1(7dbde1c305ab3438b7fe7417816427c682371bd4) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
@@ -631,10 +645,10 @@ ROM_START( npsprgv4 ) // NP 1.30 19970228 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p004-ep1 neo-mvs progbk1.ep1", 0x000000, 0x80000, CRC(4a322439) SHA1(4478f0e20d2c892a2c8e67ccc1173fd5edaa42e3) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "p004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "p004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
@@ -650,12 +664,12 @@ ROM_END
 ROM_START( 98best44 ) // NP 1.30 19970430 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p060-ep1", 0x000000, 0x080000, CRC(d42e505d) SHA1(0ad6b0288f36c339832730a03e53cbc07dab4f82))
-//  ROM_RELOAD(                      0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
+//  ROM_RELOAD(                      0x100000, 0x80000 ) // checks the same string from above to be present there? Why?
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "pt004-m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) )
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "pt004-v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -667,10 +681,10 @@ ROM_START( npsprg98 ) // NP 1.30 19970430 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p042-p1 neo-mvs progbk1.p1", 0x000000, 0x100000, CRC(c0621456) SHA1(eb615a11f909a680aed2d99c641b3c47be4fc56e) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "pt004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "pt004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -682,10 +696,10 @@ ROM_START( npskv ) // NP 1.30 19970430 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p012-p1 neo-mvs progbk1.p1", 0x000000, 0x100000, CRC(de8996f6) SHA1(8fb2bc78206ec543148740f94c19bcdb50ad3271) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "p004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "p04-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -697,10 +711,10 @@ ROM_START( npusagif ) // NP 1.30 19970430 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p061-ep1 neo-mvs progbk1.ep1", 0x000000, 0x080000, CRC(ec6d7fda) SHA1(f219f8a9763f92ef952236ea3e01fe9b684823df) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "pt004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "pt004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -712,10 +726,10 @@ ROM_START( npotogib ) // NP 1.30 19970430 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p0025-ep1 neo-mvs progbk1.ep1", 0x000000, 0x080000, CRC(eaefe748) SHA1(9facab7e70901a9030d40b823473e46cfa5389ad) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "pt004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "pt004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -729,10 +743,10 @@ ROM_START( npfpit ) // NP 1.30 19990225 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "po97-ep1 neo-mvs progbk1.ep1", 0x000000, 0x080000, CRC(d2940f25) SHA1(d65e719d9df993e1433e580797bf0580d564c9a2) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "pt004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "pt004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -747,10 +761,10 @@ ROM_START( nprsp ) // STAFYAMA19980925 string
 	ROM_LOAD16_WORD_SWAP( "s038a-ep1.bin", 0x000000, 0x080000, CRC(529fb4fa) SHA1(f31ba8998bb01458f43df1934222995f22d590a1) ) // program ROM
 	ROM_LOAD16_WORD_SWAP( "s046-ep2.bin",  0x080000, 0x080000, CRC(846ae929) SHA1(e5544cde32794865e17d7dffd4e603ad5418d91e) ) // data ROM
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "s001-m1.bin", 0x00000, 0x20000, CRC(ea8111c1) SHA1(69e6bb7ad9a8d61db4513a762c0ce9e9da2a1785) )
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "s001-v1.bin", 0x000000, 0x100000, CRC(13d63625) SHA1(4a9e3b1192a4a7e405becfd5d2a95ffc14ae6e79)  )
 
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
@@ -765,10 +779,10 @@ ROM_START( npssr2 ) // STAFYAMA19980925 string
 	ROM_LOAD16_WORD_SWAP( "s038a-ep1 nps-prg1.ep1", 0x000000, 0x080000, CRC(529fb4fa) SHA1(f31ba8998bb01458f43df1934222995f22d590a1) ) // program ROM, same as nprsp
 	ROM_LOAD16_WORD_SWAP( "s072-ep2 nps-prg1.ep2",  0x080000, 0x080000, CRC(5514e29f) SHA1(fd508b6b4b2ed587b5dfd4a186865c72181612e6) ) // data ROM
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "s001-m1 neo-pstm cha64c.m1", 0x00000, 0x20000, CRC(ea8111c1) SHA1(69e6bb7ad9a8d61db4513a762c0ce9e9da2a1785) )
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "s001-v1 nps-prg1.v1", 0x000000, 0x100000, CRC(13d63625) SHA1(4a9e3b1192a4a7e405becfd5d2a95ffc14ae6e79)  )
 
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
@@ -786,10 +800,10 @@ ROM_START( npspscv ) // STAFYAMA19970717 string
 	ROM_LOAD16_WORD_SWAP( "s005-p2.p2",   0x080000, 0x080000, CRC(93f618c2) SHA1(3e4b018095ee1c17dfaefb85e8bcc683bb77e93a) )
 	ROM_IGNORE(                                     0x180000 ) // BADADDR   --xxxxxxxxxxxxxxxxxxx
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "s001-m1.m1", 0x00000, 0x20000, CRC(ea8111c1) SHA1(69e6bb7ad9a8d61db4513a762c0ce9e9da2a1785) )
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "s001-v1.v1", 0x000000, 0x100000, CRC(13d63625) SHA1(4a9e3b1192a4a7e405becfd5d2a95ffc14ae6e79)  )
 
 	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
@@ -820,10 +834,10 @@ ROM_START( npscv1 ) // NP 1.10 19961015 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "np-jp1 neo-mvs progbk1.ep1", 0x000000, 0x080000, CRC(c4648dfa) SHA1(ca7770f363027e3fe2f47d77085464486c024d2a) )
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "np-m1 pstm-romc.m1", 0x00000, 0x20000, CRC(adbcad85) SHA1(76ebecea081a47b9fb133ef7793b48b51ef2f5c5) )
 
-	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x80000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "np-v1 neo-mvs progbk1.v1", 0x000000, 0x80000, CRC(99d414e8) SHA1(5aecb09c7f18fca18f61e67047dfca06744928ed) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
@@ -831,29 +845,14 @@ ROM_START( npscv1 ) // NP 1.10 19961015 string
 	ROM_LOAD32_BYTE( "np-jc2 pstm-romc.c2", 0x000001, 0x080000, CRC(c9687cd8) SHA1(809d9efd7ea76de0884ad76effb71217e9068f89) )
 ROM_END
 
-ROM_START( npcramen ) // ? string
-	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_WORD_SWAP( "l009-ep1 neo-mvs progbk1.ep1", 0x000000, 0x080000, BAD_DUMP CRC(ff470ded) SHA1(d33dd90f9ac1cc7f2dcadb6a855d9cd5f3260d00) ) // 111111111xxxxxxxxxx = 0xFF, reads were consistent, but..
-
-	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) /* Z80 program */
-	// empty (removed or never populated)?
-
-	ROM_REGION( 0x80000, "ymsnd:adpcma", ROMREGION_ERASEFF ) /* Samples */
-	// empty (removed or never populated)?
-
-	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
-	ROM_LOAD32_BYTE( "l009-c1 pstm-romc.c1", 0x000000, 0x080000, CRC(d6b44550) SHA1(d402ffe372646b93344f7e36d29e4fe913f2479a) )
-	ROM_LOAD32_BYTE( "l009-c2 pstm-romc.c2", 0x000001, 0x080000, CRC(d63dea34) SHA1(cf2dbf982ed955fe5a4c737d1752cdb66ab5f84a) )
-ROM_END
-
 ROM_START( npft ) // NP 1.30 19970430 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ft_ep1.ep1", 0x000000, 0x080000, CRC(870d6e77) SHA1(651958d5254763f308e53ab46c4c70694e57acd7) ) // hand-written label
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "p004-m1 neo-pstm cha136.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "p004-v1 neo-mvs progbk1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 ) // hand-written labels
@@ -867,10 +866,10 @@ ROM_START( nppopeye ) // NP 1.30 19970430 string
 	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p027-ep1", 0x000000, 0x080000, CRC(f928ad2e) SHA1(a958b2d357af6daf2bde6d5b8874963c9c4130c3))
 
-	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
 	ROM_LOAD( "pt004-m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) )
 
-	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // Samples
 	ROM_LOAD( "pt004-v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) )
 
 	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
@@ -915,117 +914,145 @@ ROM_START( npeurver2 ) // NP 1.30 19970430 string
 	// c5-c8 not populated
 ROM_END
 
-// FIXME: get rid of these patches
-// probably something to do with irq3 and camera / printer devices
-void neoprint_state::init_npcartv1()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+ROM_START( npwint97 ) // NP 1.20 19961128 string
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "4002.ep1", 0x000000, 0x80000, CRC(adace0b2) SHA1(5fa3ad30c19609b31fb72ce4f1ae6f6f69fb0d8e) )
 
-	ROM[0x1260/2] = 0x4e71;
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "p001a.m1", 0x00000, 0x20000, CRC(d720f53e) SHA1(7a20200065d3da43fcf7d5922d1808dc896b0da8) ) // same as neoprint
 
-	ROM[0x43c8/2] = 0x4e71; //ROM checksum
-}
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // samples
+	ROM_LOAD( "p001a.v1", 0x00000, 0x200000, CRC(c1984fa9) SHA1(9702d253ad75e0b0f0182d8da449328648ff1a2f) ) // same as neoprint
 
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "c1.c1", 0x000000, 0x80000, CRC(8736f154) SHA1(7f88fe7a5d9f0f8fea530faa9b7c7288976ff37b) )
+	ROM_LOAD32_BYTE( "c2.c2", 0x000001, 0x80000, CRC(3e129fce) SHA1(36d362e04c7b7798c593aec55e08f89be0e95641) )
+	ROM_LOAD32_BYTE( "c3.c3", 0x200000, 0x80000, CRC(ec9547f5) SHA1(6ccaae7d8884f356d4b454bad99077260cf305e8) )
+	ROM_LOAD32_BYTE( "c4.c4", 0x200001, 0x80000, CRC(8091dbe5) SHA1(e97e337f134c69188a1ee5380628d6b59242d300) )
+ROM_END
 
-void neoprint_state::init_98best44()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+ROM_START( npobake ) // NP 1.30 19970419 string
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "p010-p1.p1", 0x000000, 0x80000, CRC(787040ae) SHA1(7d0fd586735a647509f4fd23631dbae5a09b4e2b) )
 
-	ROM[0x1312/2] = 0x4e71;
-}
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "p004-m1.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-void neoprint_state::init_npmillen()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // samples
+	ROM_LOAD( "p004-v1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
-	ROM[0x1312/2] = 0x4e71;
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "p010-c1.c1", 0x000000, 0x100000, CRC(3a4ca1d3) SHA1(d4f204a77609edd4491e8cf56c17ec561ce7c474) )
+	ROM_LOAD32_BYTE( "p010-c2.c2", 0x000001, 0x100000, CRC(ba5acee8) SHA1(5848e684f39af0a43ae6044e8347cf77b866f8e2) )
+ROM_END
 
-	ROM[0x42a8/2] = 0x4e71; //ROM checksum
-}
+ROM_START( npminani ) // NP 1.30 19970430 string
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "p058-ep1.ep1", 0x000000, 0x80000, CRC(d73d7df0) SHA1(f01dbd7c72b51c6f92f40e25c1c4a33c285b3b41) )
 
-void neoprint_state::init_npsprgv4()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "pt004-m1.m1", 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) ) // same as 98best44
 
-	ROM[0x12e8/2] = 0x4e71;
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // samples
+	ROM_LOAD( "pt004-v1.v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) ) // same as 98best44
 
-	ROM[0x3ba0/2] = 0x4e71; //ROM checksum
-}
+	ROM_REGION( 0x400000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "p058-1-c1.c1", 0x000000, 0x100000, CRC(ec8e9220) SHA1(bc9e05a6060fe13f29a5eecf5be4df316d93160c) )
+	ROM_LOAD32_BYTE( "p058-1-c2.c2", 0x000001, 0x100000, CRC(712d9fbf) SHA1(9ebea8f70fc31713e1d5626e9d1a8a5c286b78bd) )
+ROM_END
 
-void neoprint_state::init_npskv()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+ROM_START( npspstc ) // STAFYAMA19980401 string
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "s020-ep1.ep1", 0x000000, 0x080000, CRC(b6cb8601) SHA1(8d0d3e0b11ec40d39c2bffc4a84f3bd269e58768) ) // program ROM
+	ROM_LOAD16_WORD_SWAP( "s022-ep2.ep2", 0x080000, 0x080000, CRC(f736d752) SHA1(a03f31d016cea5a06a986d919a25610d580a281e) ) // data ROM
 
-	ROM[0x130a/2] = 0x4e71;
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // Z80 program
+	ROM_LOAD( "s001-m1.bin", 0x00000, 0x20000, CRC(ea8111c1) SHA1(69e6bb7ad9a8d61db4513a762c0ce9e9da2a1785) ) // same as nprsp
 
-	ROM[0x3bf4/2] = 0x4e71; //ROM checksum
-}
+	ROM_REGION( 0x200000, "ymsnd:adpcma", 0 ) // samples
+	ROM_LOAD( "s001-v1.bin", 0x000000, 0x100000, CRC(13d63625) SHA1(4a9e3b1192a4a7e405becfd5d2a95ffc14ae6e79) ) // same as nprsp
 
-void neoprint_state::init_nprsp()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	ROM_REGION( 0x800000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "s022-c1.c1", 0x000000, 0x200000, CRC(14a2aa76) SHA1(49b09729ad11566c22a698e35657fafedbf04779) )
+	ROM_LOAD32_BYTE( "s022-c2.c2", 0x000001, 0x200000, CRC(f2460cf5) SHA1(df5e84ea09280b4aff1b3a4062a6f6b57cf9f490) )
+	ROM_LOAD32_BYTE( "s022-c3.c3", 0x000002, 0x200000, CRC(6223c1c6) SHA1(eb0ed1d10b20e11e2fa470a10b7de03d5edb9084) )
+ROM_END
 
-	ROM[0x13a4/2] = 0x4e71;
-	ROM[0x13bc/2] = 0x4e71;
-	ROM[0x140c/2] = 0x4e71;
+// the following are data-only cartridges: the EP1 ROM begins with a "NP16" string, followed by about 0x2a6 bytes of data, the rest is 0xff
+// they probably need a program from another source, not dumped / not understood
 
-	ROM[0x4832/2] = 0x4e71; //ROM checksum
-	ROM[0x4834/2] = 0x4e71;
-}
+ROM_START( npcramen )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "l009-ep1 neo-mvs progbk1.ep1", 0x000000, 0x080000, CRC(ff470ded) SHA1(d33dd90f9ac1cc7f2dcadb6a855d9cd5f3260d00) )
 
-void neoprint_state::init_npspscv()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) // Z80 program
+	// empty (removed or never populated)?
 
-	ROM[0x13a4/2] = 0x4e71;
-	ROM[0x13bc/2] = 0x4e71;
-	ROM[0x13f0/2] = 0x4e71;
+	ROM_REGION( 0x80000, "ymsnd:adpcma", ROMREGION_ERASEFF ) // Samples
+	// empty (removed or never populated)?
 
-	ROM[0x44b0/2] = 0x4e71; //ROM checksum
-	ROM[0x44b2/2] = 0x4e71;
-}
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "l009-c1 pstm-romc.c1", 0x000000, 0x080000, CRC(d6b44550) SHA1(d402ffe372646b93344f7e36d29e4fe913f2479a) )
+	ROM_LOAD32_BYTE( "l009-c2 pstm-romc.c2", 0x000001, 0x080000, CRC(d63dea34) SHA1(cf2dbf982ed955fe5a4c737d1752cdb66ab5f84a) )
+ROM_END
 
-void neoprint_state::init_unkneo()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-	ROM[0x12c2/2] = 0x4e71;
-}
+ROM_START( npdalmtn )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "p006-p1.p1", 0x000000, 0x80000, CRC(2c81e50f) SHA1(6d25e72284aea2991a4418c607298105310fa367) ) // data repeated every 0x20000
 
-void neoprint_state::init_npscv1()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-	ROM[0x1242/2] = 0x4e71;
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) // Z80 program
+	// not populated
 
-	ROM[0x4390/2] = 0x4e71; //ROM checksum
-}
+	ROM_REGION( 0x80000, "ymsnd:adpcma", ROMREGION_ERASEFF ) // samples
+	// not populated
 
-void neoprint_state::init_npotogib()
-{
-	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-	ROM[0x1312/2] = 0x4e71;
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "p006-c1.c1", 0x000000, 0x80000, CRC(43a14567) SHA1(250869222cd8dc42236f5784cf3f4e920ceab2b0) )
+	ROM_LOAD32_BYTE( "p006-c2.c2", 0x000001, 0x80000, CRC(700f4a0e) SHA1(7541164c61779269e23c57107afb666b2ed16fd9) )
+ROM_END
 
-	ROM[0x3f4e/2] = 0x4e71; //ROM checksum
-}
+ROM_START( npcramen2 )
+	ROM_REGION16_BE( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "l020-1-ep1.ep1", 0x000000, 0x80000, CRC(ac0b09be) SHA1(bd58eba8010601c4a45b0367430d05985cfbc0e1) )
+
+	ROM_REGION( 0x20000, "audiocpu", ROMREGION_ERASEFF ) // Z80 program
+	// not populated
+
+	ROM_REGION( 0x80000, "ymsnd:adpcma", ROMREGION_ERASEFF ) // samples
+	// not populated
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD32_BYTE( "l020-1-c1.c1", 0x000000, 0x80000, CRC(39614315) SHA1(d318bc7a011d8d57d9cabccd048eafb0b85a22b5) )
+	ROM_LOAD32_BYTE( "l020-1-c2.c2", 0x000001, 0x80000, CRC(13e0ebbc) SHA1(3bb4c5e6e61f3e9bdcb62a1add2ce5fc924ebded) )
+ROM_END
 
 } // anonymous namespace
 
 
-GAME( 1996, neoprint,    0,        neoprint,    neoprint, neoprint_state, init_unkneo,   ROT0, "SNK", "Neo Print (Japan) (T2d)",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npcartv1,    0,        neoprint,    neoprint, neoprint_state, init_npcartv1, ROT0, "SNK", "Neo Print V1 (World) (E1a)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npscv1,      0,        neoprint,    neoprint, neoprint_state, init_npscv1,   ROT0, "SNK", "Neo Print - Senyou Cassette Ver. 1 (Japan)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, neoprint,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print (Japan) (T2d)",                                       MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npwint97,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - 1997 Winter Version (Japan) (T3e)",                 MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npcartv1,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print V1 (World) (E1a)",                                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npscv1,      0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Senyou Cassette Ver. 1 (Japan)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npsprgv4,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Spring Ver. 4 (Japan) (T4f 1.00)",                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npskv,       0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Suizokukan Version (Japan) (T4i 2.00)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npotogib,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Otogibanashi (Japan) (T4i 3.00)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npobake,     0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Obake Yashiki Version (Japan) (T4i 1.03)",          MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, nppopeye,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Popeye (Japan) (T4i 3.04)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npeurver,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - European Version (World) (T4i 2.00)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npeurver2,   0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - European Version II (World) (T4i 3.07)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npusagif,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Usagi Frame (Japan) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, 98best44,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan) (T4i 3.07)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, npsprg98,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Spring '98 (T4i 3.07)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, npminani,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Mini Mini Animals (Japan) (T4i 3.07)",              MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, npmillen,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Millennium Multi Shot Edition (World) (T4i 3.07)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, npfpit,      0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Fuyu Pri Iitoko-dori (Japan) (T4i 3.07)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1999, npft,        0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Fairy Tales (World) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state, empty_init,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1996, npssr2,      0,        nprsp,       neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print Special: Sekai Ryokou 2 (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npspscv,     0,        nprsp,       neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print SP! Super Collection Version (Japan)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1998, npspstc,     0,        nprsp,       neoprint, neoprint_state, empty_init,    ROT0, "SNK", "NeopriSP Street Collection (Japan)",                            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
+// data-only cartridges
 GAME( 1996, npcramen,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Chicken Ramen (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npsprgv4,    0,        neoprint,    neoprint, neoprint_state, init_npsprgv4, ROT0, "SNK", "Neo Print - Spring Ver. 4 (Japan) (T4f 1.00)",                  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npskv,       0,        neoprint,    neoprint, neoprint_state, init_npskv,    ROT0, "SNK", "Neo Print - Suizokukan Version (Japan) (T4i 2.00)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npotogib,    0,        neoprint,    neoprint, neoprint_state, init_npotogib, ROT0, "SNK", "Neo Print - Otogibanashi (Japan) (T4i 3.00)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, nppopeye,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - Popeye (Japan) (T4i 3.04)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npeurver,    0,        neoprint,    neoprint, neoprint_state, init_npskv,    ROT0, "SNK", "Neo Print - European Version (World) (T4i 2.00)",               MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npeurver2,   0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - European Version II (World) (T4i 3.07)",            MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npusagif,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - Usagi Frame (Japan) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1998, 98best44,    0,        neoprint,    neoprint, neoprint_state, init_98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan) (T4i 3.07)",             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1998, npsprg98,    0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Spring '98 (T4i 3.07)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, npmillen,    0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Millennium Multi Shot Edition (World) (T4i 3.07)",  MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, npfpit,      0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Fuyu Pri Iitoko-dori (Japan) (T4i 3.07)",           MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1999, npft,        0,        neoprint,    neoprint, neoprint_state, init_npmillen, ROT0, "SNK", "Neo Print - Fairy Tales (World) (T4i 3.07)",                    MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, nprsp,       0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "NeopriSP Retro Collection (Japan)",                             MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1996, npssr2,      0,        nprsp,       neoprint, neoprint_state, init_nprsp,    ROT0, "SNK", "Neo Print Special: Sekai Ryokou 2 (Japan)",                     MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1997, npspscv,     0,        nprsp,       neoprint, neoprint_state, init_npspscv,  ROT0, "SNK", "Neo Print SP! Super Collection Version (Japan)",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1997, npdalmtn,    0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Dalmatian Version (Japan)",                         MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 199?, npcramen2,   0,        neoprint,    neoprint, neoprint_state, empty_init,    ROT0, "SNK", "Neo Print - Chicken Ramen Version 2 (Japan)",                   MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

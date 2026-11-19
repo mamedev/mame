@@ -28,7 +28,7 @@ enum { DO_ELIDE_CONDITION_CALC = 1 };
     already allocated
 -------------------------------------------------*/
 
-static inline void alloc_handle(drcuml_state &drcuml, uml::code_handle *&handleptr, const char *name)
+inline void alloc_handle(drcuml_state &drcuml, uml::code_handle *&handleptr, const char *name)
 {
 	if (!handleptr)
 		handleptr = drcuml.handle_alloc(name);
@@ -38,11 +38,11 @@ static inline void alloc_handle(drcuml_state &drcuml, uml::code_handle *&handlep
 struct hyperstone_device::compiler_state
 {
 private:
-	const uint8_t   m_mode;
-	uint32_t        m_pc = 0;
+	uint8_t const                   m_mode;
+	uint32_t                        m_pc = 0;
 public:
-	uml::code_label m_labelnum  = 1;
-	uint8_t         m_check_delay = 1;
+	uml::code_label                 m_labelnum  = 1;
+	uint8_t                         m_check_delay = 1;
 
 	compiler_state(uint8_t mode) : m_mode(mode) { }
 	compiler_state(compiler_state const &) = delete;
@@ -437,11 +437,11 @@ void hyperstone_device::static_generate_interrupt_checks(drcuml_block &block, um
 {
 	UML_HANDLE(block, *m_interrupt_checks);
 
-	const int timer_int_pending = label++;
-	const int take_int = label++;
-	const int take_timer = label++;
-	const int dispatch_int = label++;
-	const int done_int = label++;
+	uml::code_label const timer_int_pending = label++;
+	uml::code_label const take_int = label++;
+	uml::code_label const take_timer = label++;
+	uml::code_label const dispatch_int = label++;
+	uml::code_label const done_int = label++;
 
 	UML_TEST(block, DRC_SR, L_MASK);
 	UML_JMPc(block, uml::COND_NZ, done_int);
@@ -615,8 +615,17 @@ void hyperstone_x_device::static_generate_io_accessor(drcuml_block &block, uml::
     CODE GENERATION
 ***************************************************************************/
 
-void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code_label &labelnum, bool with_timer, int take_int, int take_timer)
+void hyperstone_device::generate_interrupt_checks(
+		drcuml_block &block,
+		uml::code_label &labelnum,
+		bool with_timer,
+		uml::code_label take_int,
+		uml::code_label take_timer)
 {
+	// expects ISR value in I0
+	// clobbers I1, I2, I3 and I4
+	// I0 is set to trap number if interrupt is taken, or left unchanged otherwise
+
 	UML_MOV(block, I1, mem(&FCR));
 
 	// combine I/O mask and direction in I4 bits 0/4/8
@@ -624,7 +633,7 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
 	UML_XOR(block, I4, I1, 0xffffffff);
 	UML_AND(block, I4, I4, I2);
 
-	const int skip_io3 = labelnum++;
+	uml::code_label const skip_io3 = labelnum++;
 	UML_TEST(block, I0, 0x40);
 	UML_JMPc(block, uml::COND_Z, skip_io3);
 	UML_TEST(block, I4, 0x100);
@@ -647,7 +656,7 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
 	UML_XOR(block, I3, I3, 0xffffffff);
 	UML_AND(block, I3, I3, I0);
 
-	const int skip_int1 = labelnum++;
+	uml::code_label const skip_int1 = labelnum++;
 	UML_TEST(block, I3, 0x01);
 	UML_JMPc(block, uml::COND_Z, skip_int1);
 	UML_MOV(block, mem(&m_core->arg0), IRQ_INT1);
@@ -661,7 +670,7 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
 		UML_JMPc(block, uml::COND_E, take_timer);
 	}
 
-	const int skip_int2 = labelnum++;
+	uml::code_label const skip_int2 = labelnum++;
 	UML_TEST(block, I3, 0x02);
 	UML_JMPc(block, uml::COND_Z, skip_int2);
 	UML_MOV(block, mem(&m_core->arg0), IRQ_INT2);
@@ -675,7 +684,7 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
 		UML_JMPc(block, uml::COND_E, take_timer);
 	}
 
-	const int skip_int3 = labelnum++;
+	uml::code_label const skip_int3 = labelnum++;
 	UML_TEST(block, I3, 0x04);
 	UML_JMPc(block, uml::COND_Z, skip_int3);
 	UML_MOV(block, mem(&m_core->arg0), IRQ_INT3);
@@ -689,7 +698,7 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
 		UML_JMPc(block, uml::COND_E, take_timer);
 	}
 
-	const int skip_int4 = labelnum++;
+	uml::code_label const skip_int4 = labelnum++;
 	UML_TEST(block, I3, 0x08);
 	UML_JMPc(block, uml::COND_Z, skip_int4);
 	UML_MOV(block, mem(&m_core->arg0), IRQ_INT4);
@@ -697,7 +706,7 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
 	UML_JMP(block, take_int);
 	UML_LABEL(block, skip_int4);
 
-	const int skip_io1 = labelnum++;
+	uml::code_label const skip_io1 = labelnum++;
 	UML_TEST(block, I0, 0x10);
 	UML_JMPc(block, uml::COND_Z, skip_io1);
 	UML_TEST(block, I4, 0x1);
@@ -707,7 +716,7 @@ void hyperstone_device::generate_interrupt_checks(drcuml_block &block, uml::code
 	UML_JMP(block, take_int);
 	UML_LABEL(block, skip_io1);
 
-	const int skip_io2 = labelnum++;
+	uml::code_label const skip_io2 = labelnum++;
 	UML_TEST(block, I0, 0x20);
 	UML_JMPc(block, uml::COND_Z, skip_io2);
 	UML_TEST(block, I4, 0x10);
@@ -911,8 +920,8 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 		if (compiler.check_delay())
 		{
 			// if PC is used in a delay instruction, the delayed PC should be used
-			const int set_delay_pc = compiler.next_label();
-			const int done = compiler.next_label();
+			uml::code_label const set_delay_pc = compiler.next_label();
+			uml::code_label const done = compiler.next_label();
 			UML_TEST(block, mem(&m_core->delay_slot), ~uint32_t(0));
 			UML_JMPc(block, uml::COND_NZ, set_delay_pc);
 
@@ -966,9 +975,7 @@ void hyperstone_device::generate_sequence_instruction(drcuml_block &block, compi
 
 bool hyperstone_device::generate_opcode(drcuml_block &block, compiler_state &compiler, const opcode_desc *desc)
 {
-	uint32_t op = (uint32_t)desc->opptr[0];
-
-	switch (op >> 8)
+	switch (desc->opptr[0] >> 8)
 	{
 		case 0x00: generate_chk<GLOBAL, GLOBAL>(block, compiler, desc); break;
 		case 0x01: generate_chk<GLOBAL, LOCAL>(block, compiler, desc); break;

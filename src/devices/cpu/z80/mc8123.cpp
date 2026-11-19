@@ -78,6 +78,7 @@ CPU #    Game                      Notes              Seed   Upper Limit
 317-???? Center Court (sound CPU)  NEC MC-8123B 703   640506  1800
 317-???? Omega                                        861226  1C00?
 no nr.   Fever Chance (Wing)       NEC MC-8123 643    437437  1800?
+no nr.   New Lucky 8 Lines (Wing)  NEC MC-8123 642    620217  1800?
 
 ***************************************************************************/
 

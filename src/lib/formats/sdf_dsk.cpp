@@ -9,12 +9,19 @@
 
     http://cocosdc.blogspot.com/p/sd-card-socket-sd-card-socket-is-push.html
 
+    Saving shares DMK's FM/MFM decoder and its preservation limits.
+    SDF output is limited to 80 cylinders, two sides, 31 sectors per
+    track, and a 6250-byte SD/DD revolution with doubled FM bytes.
+
 *********************************************************************/
 
 #include "sdf_dsk.h"
 
+#include "hashing.h"
 #include "ioprocs.h"
 #include "multibyte.h"
+
+#include <algorithm>
 
 
 sdf_format::sdf_format()
@@ -42,147 +49,205 @@ const char *sdf_format::extensions() const noexcept
 
 int sdf_format::identify(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants) const
 {
-	uint8_t header[HEADER_SIZE];
-
-	uint64_t size;
-	if (io.length(size) || (size < HEADER_SIZE))
-	{
-		return 0;
-	}
-
-	auto const [err, actual] = read_at(io, 0, header, HEADER_SIZE);
-	if (err || (HEADER_SIZE != actual))
-	{
-		return 0;
-	}
-
-	int tracks = header[4];
-	int heads = header[5];
-
-	// Check magic bytes
-	if (header[0] != 'S' || header[1] != 'D' || header[2] != 'F' || header[3] != '1')
-	{
-		return 0;
-	}
-
-	// Check heads
-	if (heads != 1 && heads != 2)
-	{
-		return 0;
-	}
-
-	if (size == HEADER_SIZE + heads * tracks * TOTAL_TRACK_SIZE)
-	{
-		return FIFID_SIGN|FIFID_SIZE|FIFID_STRUCT;
-	}
-
-	return 0;
+	return dmk_format::identify(io, form_factor, variants) ? FIFID_SIGN | FIFID_SIZE | FIFID_STRUCT : 0;
 }
 
 
-bool sdf_format::load(util::random_read &io, uint32_t form_factor, const std::vector<uint32_t> &variants, floppy_image &image) const
+bool sdf_format::read_header(util::random_read &io, disk_header &disk) const
 {
+	uint64_t size;
+	if (io.length(size))
+		return false;
+
 	uint8_t header[HEADER_SIZE];
-	std::vector<uint8_t> track_data(TOTAL_TRACK_SIZE);
-	std::vector<uint32_t> raw_track_data;
+	auto const [err, actual] = read_at(io, 0, header, HEADER_SIZE);
+	if (err || actual != HEADER_SIZE)
+		return false;
 
-	read_at(io, 0, header, HEADER_SIZE); // FIXME: check for errors and premature EOF
+	if (header[0] != 'S' || header[1] != 'D' || header[2] != 'F' || header[3] != '1')
+		return false;
+	if (!header[4] || header[4] > 80 || (header[5] != 1 && header[5] != 2))
+		return false;
 
-	const int tracks = header[4];
-	const int heads = header[5];
+	disk.tracks = header[4];
+	disk.heads = header[5];
+	disk.track_size = dmk_format::TRACK_HEADER_SIZE + TRACK_SIZE;
+	disk.flags = 0; // SDF always doubles FM bytes, including on mixed-density tracks.
+	return size == HEADER_SIZE + uint64_t(disk.tracks) * disk.heads * TOTAL_TRACK_SIZE;
+}
 
-	if (heads == 2)
+
+bool sdf_format::read_track(util::random_read &io, const disk_header &disk, int track, int head,
+	std::vector<uint8_t> &data, std::vector<int> &dams) const
+{
+	std::vector<uint8_t> record(TOTAL_TRACK_SIZE);
+	auto const [err, actual] = read_at(io, HEADER_SIZE + (disk.heads * track + head) * TOTAL_TRACK_SIZE, record.data(), record.size());
+	if (err || actual != record.size() || record[0] > SECTOR_SLOT_COUNT)
+		return false;
+
+	// Keep only the revolution, replacing SDF's header with a DMK IDAM table.
+	data.assign(dmk_format::TRACK_HEADER_SIZE, 0);
+	data.insert(data.end(), record.begin() + TRACK_HEADER_SIZE, record.begin() + TRACK_HEADER_SIZE + TRACK_SIZE);
+	dams.clear();
+	for (int i = 0; i < record[0]; i++)
 	{
-		image.set_variant(floppy_image::DSDD);
+		uint16_t const id = get_u16le(&record[8 * (i + 1)]);
+		uint16_t const dam = get_u16le(&record[8 * (i + 1) + 2]);
+		bool const fm = id & 0x4000;
+		int const stride = fm ? 2 : 1;
+		// SDF points at the first field byte after FE/FB, rather than the mark.
+		int const id_field = id & 0x3fff;
+		int const data_field = dam & 0x3fff;
+		if (id_field < TRACK_HEADER_SIZE || id_field >= TRACK_HEADER_SIZE + TRACK_SIZE)
+			return false;
+		if (data_field && (data_field < TRACK_HEADER_SIZE || data_field >= TRACK_HEADER_SIZE + TRACK_SIZE))
+			return false;
+		int const id_offset = TRACK_HEADER_SIZE + (id_field - TRACK_HEADER_SIZE - stride + TRACK_SIZE) % TRACK_SIZE;
+		int const dam_offset = TRACK_HEADER_SIZE + (data_field - TRACK_HEADER_SIZE - stride + TRACK_SIZE) % TRACK_SIZE;
+		if (data_field && (record[dam_offset] < 0xf8 || record[dam_offset] > 0xfb))
+			return false;
+
+		int const adjustment = TRACK_HEADER_SIZE - dmk_format::TRACK_HEADER_SIZE;
+		put_u16le(&data[i * 2], (id_offset - adjustment) | (fm ? 0 : 0x8000));
+		dams.push_back((dam & 0x3fff) ? dam_offset - adjustment : 0);
 	}
-	else
-	{
-		image.set_variant(floppy_image::SSDD);
-	}
+	return true;
+}
 
-	for (int track = 0; track < tracks; track++)
+
+bool sdf_format::save(util::random_read_write &io, const std::vector<uint32_t> &variants, const floppy_image &image) const
+{
+	int tracks, heads;
+	image.get_actual_geometry(tracks, heads);
+	if (tracks > 80 || image.get_form_factor() == floppy_image::FF_8
+		|| image.get_variant() == floppy_image::DSHD || image.get_variant() == floppy_image::DSED)
+		return false;
+
+	return dmk_format::save(io, variants, image);
+}
+
+
+bool sdf_format::write_image(util::random_read_write &io, int tracks, int heads, bool initial_mfm,
+	std::vector<decoded_track> &data) const
+{
+	uint8_t header[HEADER_SIZE] = { 'S', 'D', 'F', '1' };
+	header[4] = tracks;
+	header[5] = heads;
+	std::vector<std::vector<uint8_t>> records(data.size());
+	for (unsigned index = 0; index < data.size(); index++)
 	{
-		for (int head = 0; head < heads; head++)
+		auto &track = data[index];
+		int const length = int(track.data.size()) - dmk_format::TRACK_HEADER_SIZE;
+		if (!length || track.dams.size() > SECTOR_SLOT_COUNT)
+			return false;
+
+		// Density/phase changes can add or lose a byte during decoding.  Fit
+		// SDF's fixed revolution by adjusting only filler outside syncs and
+		// recorded fields, including fields which cross index.
+		if (length != TRACK_SIZE)
 		{
-			int iam_location = -1;
-			int idam_location[SECTOR_SLOT_COUNT+1];
-			int dam_location[SECTOR_SLOT_COUNT+1];
-			raw_track_data.clear();
-
-			// Read track
-			read_at(io, HEADER_SIZE + (heads * track + head) * TOTAL_TRACK_SIZE, &track_data[0], TOTAL_TRACK_SIZE); // FIXME: check for errors and premature EOF
-
-			int sector_count = track_data[0];
-
-			if (sector_count > SECTOR_SLOT_COUNT) return false;
-
-			// Transfer IDAM and DAM locations to table
-			for (int i = 0; i < SECTOR_SLOT_COUNT+1; i++)
+			std::vector<bool> field(length, false);
+			auto protect = [&](int begin, int count)
 			{
-				if (i < sector_count )
+				for (int i = 0; i < count; i++)
+					field[(begin - dmk_format::TRACK_HEADER_SIZE + i + length) % length] = true;
+			};
+			for (unsigned sector = 0; sector < track.dams.size(); sector++)
+			{
+				uint16_t const id = get_u16le(&track.data[sector * 2]);
+				int const stride = (id & 0x8000) ? 1 : 2;
+				int const idam = id & 0x3fff;
+				int const sync = stride == 1 ? 15 : 12;
+				protect(idam - sync, sync + 7 * stride);
+				if (track.dams[sector])
 				{
-					idam_location[i] = (get_u16le(&track_data[ 8 * (i+1)]) & 0x3FFF) - 4;
-					dam_location[i] = (get_u16le(&track_data[ 8 * (i+1) + 2]) & 0x3FFF) - 4;
-
-					if (idam_location[i] > TOTAL_TRACK_SIZE) return false;
-					if (dam_location[i] > TOTAL_TRACK_SIZE) return false;
-				}
-				else
-				{
-					idam_location[i] = -1;
-					dam_location[i] = -1;
+					int const size_offset = dmk_format::TRACK_HEADER_SIZE + (idam - dmk_format::TRACK_HEADER_SIZE + 4 * stride) % length;
+					int const size = 128 << (track.data[size_offset] & 3);
+					protect(track.dams[sector] - sync, sync + (size + 3) * stride);
 				}
 			}
-
-			// Find IAM location
-			for (int i = idam_location[0] - 1; i >= TRACK_HEADER_SIZE + 3; i--)
+			int const remove = std::max(0, length - TRACK_SIZE);
+			int run = 0;
+			int gap = -1;
+			for (int i = 0; i < length; i++)
 			{
-				// It's usually 3 bytes but several dumped tracks seem to contain only 2 bytes
-				if (track_data[i] == 0xfc && track_data[i-1] == 0xc2 && track_data[i-2] == 0xc2)
+				uint8_t const value = track.data[dmk_format::TRACK_HEADER_SIZE + i];
+				run = !field[i] && (value == 0x4e || value == 0xff) ? run + 1 : 0;
+				if (run >= std::max(2, remove))
 				{
-					iam_location = i - 3;
+					gap = dmk_format::TRACK_HEADER_SIZE + i - run + 1;
 					break;
 				}
 			}
-
-			int idam_index = 0;
-			int dam_index = 0;
-			for (int offset = TRACK_HEADER_SIZE; offset < TRACK_HEADER_SIZE + TRACK_SIZE; offset++)
+			if (gap < 0)
+				return false;
+			int const change = TRACK_SIZE - length;
+			for (unsigned sector = 0; sector < track.dams.size(); sector++)
 			{
-				if (offset == iam_location)
-				{
-					// Write IAM
-					raw_w(raw_track_data, 16, 0x5224);
-					raw_w(raw_track_data, 16, 0x5224);
-					raw_w(raw_track_data, 16, 0x5224);
-					offset += 3;
-				}
-
-				if (offset == idam_location[idam_index])
-				{
-					raw_w(raw_track_data, 16, 0x4489);
-					raw_w(raw_track_data, 16, 0x4489);
-					raw_w(raw_track_data, 16, 0x4489);
-					idam_index += 1;
-					offset += 3;
-				}
-
-				if (offset == dam_location[dam_index])
-				{
-					raw_w(raw_track_data, 16, 0x4489);
-					raw_w(raw_track_data, 16, 0x4489);
-					raw_w(raw_track_data, 16, 0x4489);
-					dam_index += 1;
-					offset += 3;
-				}
-
-				mfm_w(raw_track_data, 8, track_data[offset]);
+				uint16_t id = get_u16le(&track.data[sector * 2]);
+				if ((id & 0x3fff) >= gap)
+					put_u16le(&track.data[sector * 2], (id & 0x8000) | ((id & 0x3fff) + change));
+				if (track.dams[sector] >= gap)
+					track.dams[sector] += change;
 			}
+			if (remove)
+				track.data.erase(track.data.begin() + gap, track.data.begin() + gap + remove);
+			else
+				track.data.insert(track.data.begin() + gap + 1, change, track.data[gap]);
+		}
 
-			generate_track_from_levels(track, head, raw_track_data, 0, image);
+		auto &record = records[index];
+		record.assign(TOTAL_TRACK_SIZE, 0);
+		record[0] = track.dams.size();
+		std::copy(track.data.begin() + dmk_format::TRACK_HEADER_SIZE, track.data.end(), record.begin() + TRACK_HEADER_SIZE);
+		auto offset = [](int position) { return TRACK_HEADER_SIZE + (position - TRACK_HEADER_SIZE + TRACK_SIZE) % TRACK_SIZE; };
+		for (unsigned sector = 0; sector < track.dams.size(); sector++)
+		{
+			uint16_t const id = get_u16le(&track.data[sector * 2]);
+			bool const fm = !(id & 0x8000);
+			int const stride = fm ? 2 : 1;
+			int const adjustment = TRACK_HEADER_SIZE - dmk_format::TRACK_HEADER_SIZE;
+			int const idam = (id & 0x3fff) + adjustment;
+			int const dam = track.dams[sector] ? track.dams[sector] + adjustment : 0;
+			auto *entry = &record[8 * (sector + 1)];
+			// Include the recorded CRC bytes: a correct field has remainder zero.
+			auto bad_crc = [&](int mark, int bytes)
+			{
+				util::crc16_creator crc(fm ? 0xffff : 0xcdb4); // MFM includes three A1 sync bytes.
+				for (int i = 0; i < bytes; i++)
+					crc.append(&record[offset(mark + i * stride)], 1);
+				return crc.finish() != util::crc16_t(0);
+			};
+			put_u16le(entry, offset(idam + stride) | (fm ? 0x4000 : 0) | (bad_crc(idam, 7) ? 0x8000 : 0));
+			for (int i = 0; i < 4; i++)
+				entry[4 + i] = record[offset(idam + (i + 1) * stride)];
+			if (!dam)
+				continue;
+
+			int const size = 128 << (entry[7] & 3);
+			put_u16le(entry + 2, offset(dam + stride) | ((record[dam] == 0xf8 || record[dam] == 0xfa) ? 0x4000 : 0)
+				| (bad_crc(dam, size + 3) ? 0x8000 : 0));
+			// Mark nested sectors, including a data field which wraps through index.
+			for (unsigned other = 0; other < track.dams.size(); other++)
+			{
+				int const other_id = (get_u16le(&track.data[other * 2]) & 0x3fff) + adjustment;
+				int const distance = (other_id - offset(dam + stride) + TRACK_SIZE) % TRACK_SIZE;
+				if (distance < size * stride)
+					header[7] = 1;
+			}
 		}
 	}
 
+	// Validate every record before writing any part of the image.
+	auto const [header_error, header_actual] = write_at(io, 0, header, sizeof(header));
+	if (header_error || header_actual != sizeof(header))
+		return false;
+	for (unsigned index = 0; index < records.size(); index++)
+	{
+		auto const [err, actual] = write_at(io, HEADER_SIZE + uint64_t(index) * TOTAL_TRACK_SIZE, records[index].data(), TOTAL_TRACK_SIZE);
+		if (err || actual != TOTAL_TRACK_SIZE)
+			return false;
+	}
 	return true;
 }
 

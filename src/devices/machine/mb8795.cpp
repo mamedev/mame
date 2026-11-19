@@ -7,6 +7,9 @@
 #include "hashing.h"
 #include "multibyte.h"
 
+#include <algorithm>
+#include <iterator>
+
 #define LOG_REGR   (1U << 1)
 #define LOG_REGW   (1U << 2)
 #define LOG_TX     (1U << 3)
@@ -60,6 +63,9 @@ enum rst_mask : u8 {
 };
 
 DEFINE_DEVICE_TYPE(MB8795, mb8795_device, "mb8795", "Fujitsu MB8795")
+DEFINE_DEVICE_TYPE(ATT7213, att7213_device, "att7213", "AT&T 7213 Ethernet")
+
+// TODO: AT&T 7213 collision and twisted-pair status
 
 void mb8795_device::map(address_map &map)
 {
@@ -76,10 +82,17 @@ void mb8795_device::map(address_map &map)
 }
 
 mb8795_device::mb8795_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
-	device_t(mconfig, MB8795, tag, owner, clock),
+	mb8795_device(mconfig, MB8795, tag, owner, clock, 0x0f, 0xaf, 0x8f, 0x9f)
+{
+}
+
+mb8795_device::mb8795_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u8 txstat_ack, u8 txmask_bits, u8 rxstat_ack, u8 rxmask_bits) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_network_interface(mconfig, *this, 10),
 	m_mac{},
-	m_txstat(0), m_txmask(0), m_rxstat(0), m_rxmask(0), m_txmode(0), m_rxmode(0), m_txlen(0), m_rxlen(0), m_txcount(0),
+	m_txstat(0), m_txmode(0), m_rxmode(0), m_rx_nibble(0),
+	m_txstat_ack(txstat_ack), m_txmask_bits(txmask_bits), m_rxstat_ack(rxstat_ack), m_rxmask_bits(rxmask_bits),
+	m_txmask(0), m_rxstat(0), m_rxmask(0), m_txlen(0), m_rxlen(0), m_txcount(0),
 	m_drq_tx(false), m_drq_rx(false), m_irq_tx(false), m_irq_rx(false),
 	m_timer_tx(nullptr), m_timer_rx(nullptr),
 	m_irq_tx_cb(*this),
@@ -105,6 +118,24 @@ void mb8795_device::device_start()
 {
 	m_timer_tx = timer_alloc(FUNC(mb8795_device::tx_update), this);
 	m_timer_rx = timer_alloc(FUNC(mb8795_device::rx_update), this);
+
+	save_item(NAME(m_mac));
+	save_item(NAME(m_txbuf));
+	save_item(NAME(m_rxbuf));
+	save_item(NAME(m_txstat));
+	save_item(NAME(m_txmask));
+	save_item(NAME(m_rxstat));
+	save_item(NAME(m_rxmask));
+	save_item(NAME(m_txmode));
+	save_item(NAME(m_rxmode));
+	save_item(NAME(m_txlen));
+	save_item(NAME(m_rxlen));
+	save_item(NAME(m_txcount));
+	save_item(NAME(m_rx_nibble));
+	save_item(NAME(m_drq_tx));
+	save_item(NAME(m_drq_rx));
+	save_item(NAME(m_irq_tx));
+	save_item(NAME(m_irq_rx));
 }
 
 void mb8795_device::device_reset()
@@ -120,6 +151,7 @@ void mb8795_device::device_reset()
 	m_irq_tx = m_irq_rx = false;
 
 	m_txlen = m_rxlen = m_txcount = 0;
+	m_rx_nibble = 0;
 
 	// TODO: verify if LBC is asserted after reset
 	set_loopback(true);
@@ -151,7 +183,7 @@ u8 mb8795_device::txstat_r()
 
 void mb8795_device::txstat_w(u8 data)
 {
-	m_txstat = m_txstat & (0xf0 | ~data);
+	m_txstat &= ~(data & m_txstat_ack);
 	check_irq();
 	LOGMASKED(LOG_REGW, "txstat_w %02x %s\n", m_txstat, machine().describe_context());
 }
@@ -164,7 +196,7 @@ u8 mb8795_device::txmask_r()
 
 void mb8795_device::txmask_w(u8 data)
 {
-	m_txmask = data & 0xaf;
+	m_txmask = data & m_txmask_bits;
 	check_irq();
 	LOGMASKED(LOG_REGW, "txmask_w %02x %s\n", m_txmask, machine().describe_context());
 }
@@ -177,7 +209,7 @@ u8 mb8795_device::rxstat_r()
 
 void mb8795_device::rxstat_w(u8 data)
 {
-	m_rxstat = m_rxstat & (0x70 | ~data);
+	m_rxstat &= ~(data & m_rxstat_ack);
 	check_irq();
 	LOGMASKED(LOG_REGW, "rxstat_w %02x %s\n", m_rxstat, machine().describe_context());
 }
@@ -190,7 +222,7 @@ u8 mb8795_device::rxmask_r()
 
 void mb8795_device::rxmask_w(u8 data)
 {
-	m_rxmask = data & 0x9f;
+	m_rxmask = data & m_rxmask_bits;
 	check_irq();
 	LOGMASKED(LOG_REGW, "rxmask_w %02x %s\n", m_rxmask, machine().describe_context());
 }
@@ -254,6 +286,15 @@ void mb8795_device::start_send()
 	m_timer_tx->adjust(attotime::zero);
 }
 
+void mb8795_device::stop_send()
+{
+	m_timer_tx->adjust(attotime::never);
+	if(m_drq_tx) {
+		m_drq_tx = false;
+		m_drq_tx_cb(false);
+	}
+}
+
 void mb8795_device::tx_dma_w(u8 data, bool eof)
 {
 	m_txbuf[m_txlen++] = data;
@@ -284,7 +325,7 @@ void mb8795_device::tx_dma_w(u8 data, bool eof)
 
 		// transmitted frames are seen by the receiver
 		// TODO: TXS_TXRECV
-		if(m_txmode & TMD_LB_DISABLE) {
+		if(tx_echo()) {
 			memcpy(m_rxbuf, m_txbuf, m_txlen);
 			m_rxlen = m_txlen;
 			receive();
@@ -292,6 +333,7 @@ void mb8795_device::tx_dma_w(u8 data, bool eof)
 
 		m_txlen = 0;
 		m_txstat |= TXS_READY;
+		check_irq();
 		start_send();
 	} else
 		m_timer_tx->adjust(attotime::from_nsec(800));
@@ -316,23 +358,28 @@ void mb8795_device::rx_dma_r(u8 &data, bool &eof)
 		eof = true;
 }
 
+bool mb8795_device::tx_echo() const
+{
+	return m_txmode & TMD_LB_DISABLE;
+}
+
+bool mb8795_device::recv_accept()
+{
+	switch(m_rxmode & RMD_WHATRECV) {
+	case RMD_RECV_NORMAL:
+		return recv_is_broadcast() || recv_is_me() || recv_is_local_multicast();
+	case RMD_RECV_MULTI:
+		return recv_is_broadcast() || recv_is_me() || recv_is_multicast();
+	case RMD_RECV_PROMISC:
+		return true;
+	default:
+		return false;
+	}
+}
+
 void mb8795_device::receive()
 {
-	bool keep = false;
-	switch(m_rxmode & RMD_WHATRECV) {
-	case RMD_RECV_NONE:
-		keep = false;
-		break;
-	case RMD_RECV_NORMAL:
-		keep = recv_is_broadcast() || recv_is_me() || recv_is_local_multicast();
-		break;
-	case RMD_RECV_MULTI:
-		keep = recv_is_broadcast() || recv_is_me() || recv_is_multicast();
-		break;
-	case RMD_RECV_PROMISC:
-		keep = true;
-		break;
-	}
+	const bool keep = recv_accept();
 	LOGMASKED(LOG_RX, "received packet for %02x.%02x.%02x.%02x.%02x.%02x len=%04x, mode=%d -> %s\n",
 			m_rxbuf[0], m_rxbuf[1], m_rxbuf[2], m_rxbuf[3], m_rxbuf[4], m_rxbuf[5],
 			m_rxlen, m_rxmode & 3, keep ? "kept" : "dropped");
@@ -353,11 +400,12 @@ void mb8795_device::receive()
 		}
 
 		// TODO: RMD_TEST
-		if(util::crc32_creator::simple(m_rxbuf, m_rxlen).m_raw != get_u32le(&m_rxbuf[m_rxlen - 4]))
+		if(util::crc32_creator::simple(m_rxbuf, m_rxlen - 4).m_raw != get_u32le(&m_rxbuf[m_rxlen - 4]))
 			m_rxstat |= RXS_CRCERR;
 
 		// frame check sequence is not added to fifo
 		m_rxlen -= 4;
+		m_rx_nibble = m_rxlen & 15;
 
 		if(!(m_rxstat & (RXS_SHORT | RXS_CRCERR)))
 			m_rxstat |= RXS_OK;
@@ -415,4 +463,85 @@ TIMER_CALLBACK_MEMBER(mb8795_device::rx_update)
 		m_drq_rx = true;
 		m_drq_rx_cb(m_drq_rx);
 	}
+}
+
+att7213_device::att7213_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	mb8795_device(mconfig, ATT7213, tag, owner, clock, 0xbe, 0xbe, 0xdf, 0xdf),
+	m_control(0)
+{
+}
+
+void att7213_device::map(address_map &map)
+{
+	mb8795_device::map(map);
+	map(0x6, 0x6).rw(FUNC(att7213_device::control_r), FUNC(att7213_device::control_w));
+}
+
+void att7213_device::device_start()
+{
+	mb8795_device::device_start();
+
+	save_item(NAME(m_control));
+}
+
+void att7213_device::device_reset()
+{
+	mb8795_device::device_reset();
+
+	// the transmitter is idle and the chip is held in reset until software releases it
+	m_txstat = 0;
+	m_control = RST_RESET;
+}
+
+u8 att7213_device::control_r()
+{
+	return m_control;
+}
+
+void att7213_device::control_w(u8 data)
+{
+	if(data & RST_RESET)
+		reset();
+	m_control = data & RST_RESET;
+}
+
+void att7213_device::txmode_w(u8 data)
+{
+	set_loopback(BIT(data, 1));
+	m_txmode = data;
+	if(BIT(data, 7))
+		start_send();
+	else
+		stop_send();
+	LOGMASKED(LOG_REGW, "txmode_w %02x %s\n", m_txmode, machine().describe_context());
+}
+
+u8 att7213_device::tdr1_r()
+{
+	return m_rx_nibble;
+}
+
+u8 att7213_device::tdr2_r()
+{
+	return 0;
+}
+
+bool att7213_device::tx_echo() const
+{
+	return false;
+}
+
+bool att7213_device::recv_accept()
+{
+	if(!BIT(m_rxmode, 7))
+		return false;
+	if(BIT(m_rxmode, 0) || recv_is_broadcast())
+		return true;
+	return BIT(m_rxmode, 1) && std::equal(std::begin(m_mac), std::end(m_mac), m_rxbuf);
+}
+
+TIMER_CALLBACK_MEMBER(att7213_device::tx_update)
+{
+	if(BIT(m_txmode, 7))
+		mb8795_device::tx_update(param);
 }

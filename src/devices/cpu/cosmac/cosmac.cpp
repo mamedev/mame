@@ -2,16 +2,19 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-RCA "COSMAC" CDP1800 series CPU emulation
-CDP1801, CDP1802, CDP1804, CDP1805, CDP1806
+	RCA "COSMAC" CDP1800 series CPU emulation
 
 TODO:
-- does CDP1803 exist?
-- is it useful to emulate I and N registers or can they just be defined as (m_op >> x & 0xf)?
-- 1804/5/6: extended opcode timing is wrong, multiple execute states
-- 1804/5/6: add more extended opcodes (05/06 supports more than 04)
-- 1804/5/6: other counter modes
-- 1804/5: add internal address map (ram/rom)
+- the core steps whole 8-clock machine cycles and samples WAIT only between
+  them; real pause starts mid-cycle (1802: any falling clock edge, 1804/5/6:
+  rising edge of TPA or TPB), which needs the state machine stepped per clock
+- 1805/6: SEQ/REQ change Q half a clock earlier and memory access gets 4.5
+  clocks instead of 5; also needs per-clock stepping to be visible
+- 1801: bus contents during IDLE are undocumented, so idl_1801() performs no
+  memory read; the 1802 reads M(R(0)), or M(R(0)-1) in load mode
+- counter event/pulse modes see EF1/EF2 edges from read callbacks only once
+  per machine cycle and not at all during pause; only edges pushed with
+  set_input_line are counted while paused, as the datasheet requires
 
 **********************************************************************/
 
@@ -27,7 +30,7 @@ ALLOW_SAVE_TYPE(cosmac_device::cosmac_state);
 //  CONSTANTS
 //**************************************************************************
 
-#define CLOCKS_INIT         8 // really 9, but needs to be 8 to synchronize cdp1861 video timings
+#define CLOCKS_INIT         9
 #define CLOCKS_FETCH        8
 #define CLOCKS_EXECUTE      8
 #define CLOCKS_DMA          8
@@ -74,7 +77,7 @@ ALLOW_SAVE_TYPE(cosmac_device::cosmac_state);
 
 const cosmac_device::ophandler cdp1801_device::s_opcodetable[256] =
 {
-	&cdp1801_device::idl,    &cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,
+	&cdp1801_device::idl_1801, &cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,
 	&cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,
 	&cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,
 	&cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,    &cdp1801_device::ldn,
@@ -251,9 +254,9 @@ cosmac_device::ophandler cdp1802_device::get_ophandler(uint16_t opcode) const
 
 const cosmac_device::ophandler cdp1804_device::s_opcodetable_ex[256] =
 {
-	&cdp1804_device::stpc,   &cdp1804_device::und,    &cdp1804_device::spm2,   &cdp1804_device::scm2,
-	&cdp1804_device::spm1,   &cdp1804_device::scm1,   &cdp1804_device::ldc,    &cdp1804_device::stm,
-	&cdp1804_device::gec,    &cdp1804_device::und,    &cdp1804_device::xie,    &cdp1804_device::xid,
+	&cdp1804_device::stpc,   &cdp1804_device::dtc,    &cdp1804_device::spm2,   &cdp1804_device::scm2,
+	&cdp1804_device::spm1,   &cdp1804_device::scm1,   &cdp1804_device::ldc_1804, &cdp1804_device::stm,
+	&cdp1804_device::gec,    &cdp1804_device::etq,    &cdp1804_device::xie,    &cdp1804_device::xid,
 	&cdp1804_device::cie,    &cdp1804_device::cid,    &cdp1804_device::und,    &cdp1804_device::und,
 
 	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
@@ -291,15 +294,15 @@ const cosmac_device::ophandler cdp1804_device::s_opcodetable_ex[256] =
 	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
 	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
 
-	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
-	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
-	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
-	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::scal,   &cdp1804_device::scal,   &cdp1804_device::scal,   &cdp1804_device::scal,
+	&cdp1804_device::scal,   &cdp1804_device::scal,   &cdp1804_device::scal,   &cdp1804_device::scal,
+	&cdp1804_device::scal,   &cdp1804_device::scal,   &cdp1804_device::scal,   &cdp1804_device::scal,
+	&cdp1804_device::scal,   &cdp1804_device::scal,   &cdp1804_device::scal,   &cdp1804_device::scal,
 
-	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
-	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
-	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
-	&cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,    &cdp1804_device::und,
+	&cdp1804_device::sret,   &cdp1804_device::sret,   &cdp1804_device::sret,   &cdp1804_device::sret,
+	&cdp1804_device::sret,   &cdp1804_device::sret,   &cdp1804_device::sret,   &cdp1804_device::sret,
+	&cdp1804_device::sret,   &cdp1804_device::sret,   &cdp1804_device::sret,   &cdp1804_device::sret,
+	&cdp1804_device::sret,   &cdp1804_device::sret,   &cdp1804_device::sret,   &cdp1804_device::sret,
 
 	&cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,
 	&cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,   &cdp1804_device::rsxd,
@@ -340,6 +343,97 @@ cosmac_device::ophandler cdp1804_device::get_ophandler(uint16_t opcode) const
 		return cdp1802_device::get_ophandler(opcode);
 }
 
+const cosmac_device::ophandler cdp1806_device::s_opcodetable_ex[256] =
+{
+	&cdp1806_device::stpc,   &cdp1806_device::dtc,    &cdp1806_device::spm2,   &cdp1806_device::scm2,
+	&cdp1806_device::spm1,   &cdp1806_device::scm1,   &cdp1806_device::ldc,    &cdp1806_device::stm,
+	&cdp1806_device::gec,    &cdp1806_device::etq,    &cdp1806_device::xie,    &cdp1806_device::xid,
+	&cdp1806_device::cie,    &cdp1806_device::cid,    &cdp1806_device::und,    &cdp1806_device::und,
+
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+
+	&cdp1806_device::dbnz,   &cdp1806_device::dbnz,   &cdp1806_device::dbnz,   &cdp1806_device::dbnz,
+	&cdp1806_device::dbnz,   &cdp1806_device::dbnz,   &cdp1806_device::dbnz,   &cdp1806_device::dbnz,
+	&cdp1806_device::dbnz,   &cdp1806_device::dbnz,   &cdp1806_device::dbnz,   &cdp1806_device::dbnz,
+	&cdp1806_device::dbnz,   &cdp1806_device::dbnz,   &cdp1806_device::dbnz,   &cdp1806_device::dbnz,
+
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::bci,    &cdp1806_device::bxi,
+
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+
+	&cdp1806_device::rlxa,   &cdp1806_device::rlxa,   &cdp1806_device::rlxa,   &cdp1806_device::rlxa,
+	&cdp1806_device::rlxa,   &cdp1806_device::rlxa,   &cdp1806_device::rlxa,   &cdp1806_device::rlxa,
+	&cdp1806_device::rlxa,   &cdp1806_device::rlxa,   &cdp1806_device::rlxa,   &cdp1806_device::rlxa,
+	&cdp1806_device::rlxa,   &cdp1806_device::rlxa,   &cdp1806_device::rlxa,   &cdp1806_device::rlxa,
+
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::dadc,   &cdp1806_device::und,    &cdp1806_device::dsav,   &cdp1806_device::dsmb,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::daci,   &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::dsbi,
+
+	&cdp1806_device::scal,   &cdp1806_device::scal,   &cdp1806_device::scal,   &cdp1806_device::scal,
+	&cdp1806_device::scal,   &cdp1806_device::scal,   &cdp1806_device::scal,   &cdp1806_device::scal,
+	&cdp1806_device::scal,   &cdp1806_device::scal,   &cdp1806_device::scal,   &cdp1806_device::scal,
+	&cdp1806_device::scal,   &cdp1806_device::scal,   &cdp1806_device::scal,   &cdp1806_device::scal,
+
+	&cdp1806_device::sret,   &cdp1806_device::sret,   &cdp1806_device::sret,   &cdp1806_device::sret,
+	&cdp1806_device::sret,   &cdp1806_device::sret,   &cdp1806_device::sret,   &cdp1806_device::sret,
+	&cdp1806_device::sret,   &cdp1806_device::sret,   &cdp1806_device::sret,   &cdp1806_device::sret,
+	&cdp1806_device::sret,   &cdp1806_device::sret,   &cdp1806_device::sret,   &cdp1806_device::sret,
+
+	&cdp1806_device::rsxd,   &cdp1806_device::rsxd,   &cdp1806_device::rsxd,   &cdp1806_device::rsxd,
+	&cdp1806_device::rsxd,   &cdp1806_device::rsxd,   &cdp1806_device::rsxd,   &cdp1806_device::rsxd,
+	&cdp1806_device::rsxd,   &cdp1806_device::rsxd,   &cdp1806_device::rsxd,   &cdp1806_device::rsxd,
+	&cdp1806_device::rsxd,   &cdp1806_device::rsxd,   &cdp1806_device::rsxd,   &cdp1806_device::rsxd,
+
+	&cdp1806_device::rnx,    &cdp1806_device::rnx,    &cdp1806_device::rnx,    &cdp1806_device::rnx,
+	&cdp1806_device::rnx,    &cdp1806_device::rnx,    &cdp1806_device::rnx,    &cdp1806_device::rnx,
+	&cdp1806_device::rnx,    &cdp1806_device::rnx,    &cdp1806_device::rnx,    &cdp1806_device::rnx,
+	&cdp1806_device::rnx,    &cdp1806_device::rnx,    &cdp1806_device::rnx,    &cdp1806_device::rnx,
+
+	&cdp1806_device::rldi,   &cdp1806_device::rldi,   &cdp1806_device::rldi,   &cdp1806_device::rldi,
+	&cdp1806_device::rldi,   &cdp1806_device::rldi,   &cdp1806_device::rldi,   &cdp1806_device::rldi,
+	&cdp1806_device::rldi,   &cdp1806_device::rldi,   &cdp1806_device::rldi,   &cdp1806_device::rldi,
+	&cdp1806_device::rldi,   &cdp1806_device::rldi,   &cdp1806_device::rldi,   &cdp1806_device::rldi,
+
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::dadd,   &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::dsm,
+	&cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::und,
+	&cdp1806_device::dadi,   &cdp1806_device::und,    &cdp1806_device::und,    &cdp1806_device::dsmi,
+};
+
+cosmac_device::ophandler cdp1806_device::get_ophandler(uint16_t opcode) const
+{
+	if ((opcode & 0xff00) == 0x6800)
+		return s_opcodetable_ex[opcode & 0xff];
+	else
+		return cdp1802_device::get_ophandler(opcode);
+}
+
 
 
 //**************************************************************************
@@ -358,10 +452,10 @@ DEFINE_DEVICE_TYPE(CDP1806, cdp1806_device, "cdp1806", "RCA CDP1806")
 //  cosmac_device - constructor
 //-------------------------------------------------
 
-cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
 	cpu_device(mconfig, type, tag, owner, clock),
 	cosmac_disassembler::config(),
-	m_program_config("program", ENDIANNESS_LITTLE, 8, 16),
+	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 	m_io_config("io", ENDIANNESS_LITTLE, 8, 3),
 	m_read_wait(*this, 0),
 	m_read_clear(*this, 0),
@@ -373,12 +467,18 @@ cosmac_device::cosmac_device(const machine_config &mconfig, device_type type, co
 	m_read_dma(*this, 0),
 	m_write_dma(*this),
 	m_write_sc(*this),
+	m_write_tpa(*this),
 	m_write_tpb(*this),
+	m_write_ems(*this),
 	m_state(cosmac_state::STATE_1_INIT),
+	m_exec_cycle(0),
 	m_mode(cosmac_mode::RESET),
 	m_pmode(cosmac_mode::RUN),
 	m_wait(true),
 	m_clear(true),
+	m_test(false),
+	m_tpb_held(false),
+	m_ems(1),
 	m_irq(CLEAR_LINE),
 	m_dmain(CLEAR_LINE),
 	m_dmaout(CLEAR_LINE)
@@ -407,8 +507,8 @@ cdp1802_device::cdp1802_device(const machine_config &mconfig, const char *tag, d
 	cdp1802_device(mconfig, CDP1802, tag, owner, clock)
 { }
 
-cdp1802_device::cdp1802_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	cosmac_device(mconfig, type, tag, owner, clock)
+cdp1802_device::cdp1802_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
+	cosmac_device(mconfig, type, tag, owner, clock, internal_map)
 { }
 
 
@@ -417,24 +517,16 @@ cdp1802_device::cdp1802_device(const machine_config &mconfig, device_type type, 
 //-------------------------------------------------
 
 cdp1804_device::cdp1804_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	cdp1804_device(mconfig, CDP1804, tag, owner, clock)
+	cdp1804_device(mconfig, CDP1804, tag, owner, clock, address_map_constructor(FUNC(cdp1804_device::internal_map), this))
 { }
 
-cdp1804_device::cdp1804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	cdp1802_device(mconfig, type, tag, owner, clock)
-{ }
-
-
-//-------------------------------------------------
-//  cdp1805_device - constructor
-//-------------------------------------------------
-
-cdp1805_device::cdp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	cdp1805_device(mconfig, CDP1805, tag, owner, clock)
-{ }
-
-cdp1805_device::cdp1805_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	cdp1804_device(mconfig, type, tag, owner, clock)
+cdp1804_device::cdp1804_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
+	cdp1802_device(mconfig, type, tag, owner, clock, internal_map),
+	m_internal(*this, "internal"),
+	m_rom_mask(0xf800),
+	m_rom_value(0xf800),
+	m_ram_mask(0xffc0),
+	m_ram_value(0xffc0)
 { }
 
 
@@ -443,7 +535,20 @@ cdp1805_device::cdp1805_device(const machine_config &mconfig, device_type type, 
 //-------------------------------------------------
 
 cdp1806_device::cdp1806_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	cdp1805_device(mconfig, CDP1806, tag, owner, clock)
+	cdp1806_device(mconfig, CDP1806, tag, owner, clock, address_map_constructor())
+{ }
+
+cdp1806_device::cdp1806_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map) :
+	cdp1804_device(mconfig, type, tag, owner, clock, internal_map)
+{ }
+
+
+//-------------------------------------------------
+//  cdp1805_device - constructor
+//-------------------------------------------------
+
+cdp1805_device::cdp1805_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	cdp1806_device(mconfig, CDP1805, tag, owner, clock, address_map_constructor(FUNC(cdp1805_device::internal_map), this))
 { }
 
 
@@ -471,15 +576,17 @@ void cosmac_device::device_start()
 	m_cie = 0;
 	m_xie = 0;
 	m_cil = 0;
+	m_etq = 0;
 	m_q = 0;
 
 	for (uint16_t &r : m_r)
 		r = 0;
 
-	m_cnt_mode = 0;
+	m_cnt_mode = CNT_STOPPED;
 	m_cnt_load = 0;
 	m_cnt_count = 0;
-	m_cnt_timer = timer_alloc(FUNC(cosmac_device::cnt_timerout), this);
+	m_cnt_prescaler = 0;
+	m_cnt_ef[0] = m_cnt_ef[1] = 0;
 
 	// get our address spaces
 	space(AS_PROGRAM).cache(m_cache);
@@ -511,6 +618,7 @@ void cosmac_device::device_start()
 	save_item(NAME(m_op));
 	save_item(NAME(m_flagsio));
 	save_item(NAME(m_state));
+	save_item(NAME(m_exec_cycle));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_pmode));
 	save_item(NAME(m_irq));
@@ -531,10 +639,18 @@ void cosmac_device::device_start()
 	save_item(NAME(m_cie));
 	save_item(NAME(m_xie));
 	save_item(NAME(m_cil));
+	save_item(NAME(m_etq));
 	save_item(NAME(m_q));
 	save_item(NAME(m_cnt_mode));
 	save_item(NAME(m_cnt_load));
 	save_item(NAME(m_cnt_count));
+	save_item(NAME(m_cnt_prescaler));
+	save_item(NAME(m_cnt_ef));
+	save_item(NAME(m_test));
+	save_item(NAME(m_tpb_held));
+	save_item(NAME(m_ems));
+
+	m_write_ems(m_ems);
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -548,6 +664,50 @@ void cosmac_device::device_start()
 void cosmac_device::device_reset()
 {
 	// not here, it's done with WAIT and CLEAR lines
+}
+
+
+//-------------------------------------------------
+//  device_start - start up the device
+//-------------------------------------------------
+
+void cdp1804_device::device_start()
+{
+	cdp1802_device::device_start();
+
+	if (has_test_mode())
+		test_mode_changed();
+}
+
+
+//-------------------------------------------------
+//  device_post_load - restore internal memory
+//  selection after loading a saved state
+//-------------------------------------------------
+
+void cdp1804_device::device_post_load()
+{
+	cdp1802_device::device_post_load();
+
+	if (has_test_mode())
+		test_mode_changed();
+}
+
+
+//-------------------------------------------------
+//  internal_map - on-chip ROM and RAM
+//-------------------------------------------------
+
+void cdp1804_device::internal_map(address_map &map)
+{
+	map(0x0000, 0xffff).view(m_internal);
+	m_internal[0](m_rom_value, m_rom_value | 0x07ff).mirror(~m_rom_mask & 0xf800).rom().region(DEVICE_SELF, 0);
+	m_internal[0](m_ram_value, m_ram_value | 0x003f).mirror(~m_ram_mask & 0xffc0).ram();
+}
+
+void cdp1805_device::internal_map(address_map &map)
+{
+	map(m_ram_value, m_ram_value | 0x003f).mirror(~m_ram_mask & 0xffc0).ram();
 }
 
 
@@ -644,7 +804,13 @@ std::unique_ptr<util::disasm_interface> cdp1802_device::create_disassembler()
 }
 
 
-std::unique_ptr<util::disasm_interface> cdp1805_device::create_disassembler()
+std::unique_ptr<util::disasm_interface> cdp1804_device::create_disassembler()
+{
+	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1804, this);
+}
+
+
+std::unique_ptr<util::disasm_interface> cdp1806_device::create_disassembler()
 {
 	return std::make_unique<cosmac_disassembler>(cosmac_disassembler::TYPE_1805, this);
 }
@@ -659,6 +825,7 @@ std::unique_ptr<util::disasm_interface> cdp1805_device::create_disassembler()
 
 inline uint8_t cosmac_device::read_opcode(offs_t pc)
 {
+	ems_cycle(pc);
 	return m_cache.read_byte(pc);
 }
 
@@ -669,6 +836,7 @@ inline uint8_t cosmac_device::read_opcode(offs_t pc)
 
 inline uint8_t cosmac_device::read_byte(offs_t address)
 {
+	ems_cycle(address);
 	return m_program.read_byte(address);
 }
 
@@ -690,6 +858,7 @@ inline uint8_t cosmac_device::read_io_byte(offs_t address)
 
 inline void cosmac_device::write_byte(offs_t address, uint8_t data)
 {
+	ems_cycle(address);
 	m_program.write_byte(address, data);
 }
 
@@ -742,6 +911,12 @@ uint32_t cosmac_device::execute_max_cycles() const noexcept
 }
 
 
+uint32_t cdp1804_device::execute_max_cycles() const noexcept
+{
+	return 8 * 10;
+}
+
+
 //-------------------------------------------------
 //  execute_set_input -
 //-------------------------------------------------
@@ -764,6 +939,8 @@ void cosmac_device::execute_set_input(int inputnum, int state)
 
 	case COSMAC_INPUT_LINE_EF1:
 	case COSMAC_INPUT_LINE_EF2:
+		counter_ef_w(inputnum - COSMAC_INPUT_LINE_EF1, state ? 1 : 0);
+		[[fallthrough]];
 	case COSMAC_INPUT_LINE_EF3:
 	case COSMAC_INPUT_LINE_EF4:
 		m_ef_line[inputnum - COSMAC_INPUT_LINE_EF1] = state;
@@ -865,6 +1042,24 @@ inline void cosmac_device::run_state()
 {
 	output_state_code();
 
+	if (!m_ems)
+		set_ems(1);
+
+	if (m_tpb_held && !idle_stopped())
+	{
+		m_tpb_held = false;
+		m_write_tpb(0);
+	}
+
+	if (!idle_stopped() && !(m_mode == cosmac_mode::LOAD && m_state == cosmac_state::STATE_1_EXECUTE))
+	{
+		m_write_tpa(1);
+		m_write_tpa(0);
+	}
+
+	if (m_cnt_mode != CNT_STOPPED)
+		counter_clock();
+
 	switch (m_state)
 	{
 	case cosmac_state::STATE_0_FETCH:
@@ -929,6 +1124,37 @@ inline void cosmac_device::sample_wait_clear()
 
 	m_pmode = m_mode;
 	m_mode = cosmac_mode((m_clear << 1) | m_wait);
+
+	bool const test = (m_mode == cosmac_mode::LOAD) && has_test_mode();
+	if (test)
+		m_mode = cosmac_mode::RUN;
+
+	if (test != m_test)
+	{
+		m_test = test;
+		test_mode_changed();
+	}
+}
+
+
+//-------------------------------------------------
+//  ems_cycle - drive EMS low for an external
+//  memory cycle
+//-------------------------------------------------
+
+inline void cosmac_device::ems_cycle(offs_t address)
+{
+	if (!m_write_ems.isunset() && !internal_address(address))
+		set_ems(0);
+}
+
+void cosmac_device::set_ems(int state)
+{
+	if (m_ems != state)
+	{
+		m_ems = state;
+		m_write_ems(state);
+	}
 }
 
 
@@ -1057,6 +1283,41 @@ inline void cosmac_device::put_high_reg(int reg, uint8_t data)
 
 
 //-------------------------------------------------
+//  execute_cycles - number of execute machine
+//  cycles for the current instruction
+//-------------------------------------------------
+
+inline uint8_t cosmac_device::execute_cycles() const
+{
+	if ((m_op & 0xff00) == 0x6800)
+	{
+		switch (I)
+		{
+		case 0x2: case 0x6: case 0xa: case 0xc: return 3;
+		case 0x7: return (N == 0x6) ? 4 : 2;
+		case 0x8: return 8;
+		case 0x9: return 6;
+		case 0xb: case 0xf: return 2;
+		default: return 1;
+		}
+	}
+
+	return (I == 0xc) ? 2 : 1;
+}
+
+
+//-------------------------------------------------
+//  idle_stopped - CDP1805/1806 stop all external
+//  timing after the first IDLE machine cycle
+//-------------------------------------------------
+
+inline bool cosmac_device::idle_stopped() const
+{
+	return (m_state == cosmac_state::STATE_1_EXECUTE) && !m_op && m_exec_cycle && idle_stops_clock();
+}
+
+
+//-------------------------------------------------
 //  fetch_instruction - fetch instruction from
 //  the program memory
 //-------------------------------------------------
@@ -1073,6 +1334,7 @@ inline void cosmac_device::fetch_instruction()
 	N = m_op & 0x0f;
 
 	m_icount -= CLOCKS_FETCH;
+	m_exec_cycle = 0;
 
 	// CDP1804 and up: 0x68 for extended opcodes
 	if (m_op == 0x68 && has_extended_opcodes())
@@ -1089,6 +1351,13 @@ inline void cosmac_device::fetch_instruction()
 void cosmac_device::reset_state()
 {
 	m_state = cosmac_state::STATE_1_INIT;
+	m_exec_cycle = 0;
+
+	if (m_tpb_held)
+	{
+		m_tpb_held = false;
+		m_write_tpb(0);
+	}
 
 	m_op = 0;
 	I = 0;
@@ -1105,6 +1374,7 @@ void cdp1804_device::reset_state()
 	m_xie = 1;
 	m_cie = 1;
 	m_cil = 0;
+	m_etq = 0;
 	stop_count();
 
 	cosmac_device::reset_state();
@@ -1151,16 +1421,23 @@ inline void cosmac_device::initialize()
 inline void cosmac_device::execute_instruction()
 {
 	// parse the instruction
-	m_write_tpb(1);
+	if (!idle_stopped())
+		m_write_tpb(1);
+
 	(this->*this->get_ophandler(m_op))();
-	m_write_tpb(0);
+
+	if (!m_op && idle_stops_clock())
+		m_tpb_held = true;
+	else
+		m_write_tpb(0);
 
 	m_icount -= CLOCKS_EXECUTE;
 
 	sample_dma_io();
 
-	if (m_state == cosmac_state::STATE_1_EXECUTE && (m_op >> 4) == 0xc) // "long" opcodes
+	if (m_exec_cycle + 1 < execute_cycles())
 	{
+		m_exec_cycle++;
 		m_state = cosmac_state::STATE_1_EXECUTE_2ND;
 	}
 	else if (m_dmain)
@@ -1178,6 +1455,10 @@ inline void cosmac_device::execute_instruction()
 	else if (m_op != 0) // not idling
 	{
 		m_state = cosmac_state::STATE_0_FETCH;
+	}
+	else
+	{
+		m_exec_cycle = 1;
 	}
 }
 
@@ -1445,7 +1726,13 @@ void cosmac_device::lsnq()  { long_skip(!Q); }
 void cosmac_device::lsie()  { long_skip(IE); }
 
 // control instructions opcode handlers
-void cosmac_device::idl()   { /* idle */ }
+void cosmac_device::idl()
+{
+	if (!idle_stops_clock())
+		RAM_R((m_mode == cosmac_mode::LOAD) ? uint16_t(R[0] - 1) : R[0]);
+}
+
+void cosmac_device::idl_1801() { }
 void cosmac_device::nop()   { }
 void cosmac_device::und()   { /* undefined opcode */ }
 void cosmac_device::sep()   { P = N; }
@@ -1498,13 +1785,151 @@ void cosmac_device::out()   { IO_W(N, RAM_R(R[X])); R[X]++; }
 void cosmac_device::inp()   { D = IO_R(N & 0x07); RAM_W(R[X], D); }
 
 // CDP1804(and up) extended opcodes
-void cosmac_device::rldi()  { put_high_reg(N, RAM_R(R[P])); R[P]++; put_low_reg(N, RAM_R(R[P])); R[P]++; }
-void cosmac_device::rlxa()  { put_high_reg(N, RAM_R(R[X])); R[X]++; put_low_reg(N, RAM_R(R[X])); R[X]++; }
-void cosmac_device::rsxd()  { RAM_W(R[X], R[N] & 0xff); R[X]--; RAM_W(R[X], R[N] >> 8 & 0xff); R[X]--; }
+void cosmac_device::rldi()
+{
+	switch (m_exec_cycle)
+	{
+	case 0: B = RAM_R(R[P]); R[P]++; break;
+	case 1: T = B; B = RAM_R(R[P]); R[P]++; break;
+	case 2: R[N] = (T << 8) | B; break;
+	}
+}
 
-void cosmac_device::rnx()   { R[X] = R[N]; }
+void cosmac_device::rlxa()
+{
+	switch (m_exec_cycle)
+	{
+	case 0: B = RAM_R(R[X]); R[X]++; break;
+	case 1: T = B; B = RAM_R(R[X]); R[X]++; break;
+	case 2: R[N] = (T << 8) | B; break;
+	}
+}
 
-void cosmac_device::bci()   { short_branch(m_cil); m_cil = 0; }
+void cosmac_device::rsxd()
+{
+	switch (m_exec_cycle)
+	{
+	case 0: T = R[N] & 0xff; B = R[N] >> 8; break;
+	case 1: RAM_W(R[X], T); R[X]--; break;
+	case 2: RAM_W(R[X], B); R[X]--; break;
+	}
+}
+
+void cosmac_device::rnx()
+{
+	switch (m_exec_cycle)
+	{
+	case 0: T = R[N] & 0xff; B = R[N] >> 8; break;
+	case 1: R[X] = (B << 8) | T; break;
+	}
+}
+
+void cosmac_device::dbnz()
+{
+	switch (m_exec_cycle)
+	{
+	case 0: R[N]--; break;
+	case 1: B = OPCODE_R(R[P]); R[P]++; break;
+	case 2:
+		if (R[N])
+			R[P] = (B << 8) | OPCODE_R(R[P]);
+		else
+			R[P]++;
+		break;
+	}
+}
+
+void cosmac_device::scal()
+{
+	switch (m_exec_cycle)
+	{
+	case 0: T = R[N] & 0xff; B = R[N] >> 8; break;
+	case 1: RAM_W(R[X], T); R[X]--; break;
+	case 2: RAM_W(R[X], B); R[X]--; break;
+	case 3: T = R[P] & 0xff; B = R[P] >> 8; break;
+	case 4: R[N] = (B << 8) | T; break;
+	case 5: B = OPCODE_R(R[N]); R[N]++; break;
+	case 6: T = B; B = OPCODE_R(R[N]); R[N]++; break;
+	case 7: R[P] = (T << 8) | B; break;
+	}
+}
+
+void cosmac_device::sret()
+{
+	switch (m_exec_cycle)
+	{
+	case 0: T = R[N] & 0xff; B = R[N] >> 8; break;
+	case 1: R[X]++; break;
+	case 2: R[P] = (B << 8) | T; break;
+	case 3: B = RAM_R(R[X]); R[X]++; break;
+	case 4: T = B; B = RAM_R(R[X]); break;
+	case 5: R[N] = (T << 8) | B; break;
+	}
+}
+
+void cosmac_device::dsav()
+{
+	switch (m_exec_cycle)
+	{
+	case 0: R[X]--; break;
+	case 1: RAM_W(R[X], T); R[X]--; break;
+	case 2: RAM_W(R[X], D); R[X]--; shrc(); break;
+	case 3: RAM_W(R[X], D); break;
+	}
+}
+
+void cosmac_device::decimal_add(int left, int right, int carry)
+{
+	int result = left + right + carry;
+
+	if (((left & 0x0f) + (right & 0x0f) + carry) > 0x09)
+		result += 0x06;
+
+	if (result > 0x9f)
+		result += 0x60;
+
+	D = result & 0xff;
+	DF = result > 0xff;
+}
+
+void cosmac_device::decimal_subtract(int left, int right, int carry)
+{
+	int result = left - right - (carry ? 0 : 1);
+
+	DF = result >= 0;
+
+	if (((left & 0x0f) - (right & 0x0f) - (carry ? 0 : 1)) < 0)
+		result -= 0x06;
+
+	if (!DF)
+		result -= 0x60;
+
+	D = result & 0xff;
+}
+
+void cosmac_device::dadd()  { if (!m_exec_cycle) decimal_add(RAM_R(R[X]), D, 0); }
+void cosmac_device::dadi()  { if (!m_exec_cycle) { decimal_add(RAM_R(R[P]), D, 0); R[P]++; } }
+void cosmac_device::dadc()  { if (!m_exec_cycle) decimal_add(RAM_R(R[X]), D, DF); }
+void cosmac_device::daci()  { if (!m_exec_cycle) { decimal_add(RAM_R(R[P]), D, DF); R[P]++; } }
+void cosmac_device::dsm()   { if (!m_exec_cycle) decimal_subtract(D, RAM_R(R[X]), 1); }
+void cosmac_device::dsmi()  { if (!m_exec_cycle) { decimal_subtract(D, RAM_R(R[P]), 1); R[P]++; } }
+void cosmac_device::dsmb()  { if (!m_exec_cycle) decimal_subtract(D, RAM_R(R[X]), DF); }
+void cosmac_device::dsbi()  { if (!m_exec_cycle) { decimal_subtract(D, RAM_R(R[P]), DF); R[P]++; } }
+
+void cosmac_device::bci()
+{
+	if (m_cil)
+	{
+		short_branch(1);
+		m_cil = 0;
+		m_etq = 0;
+	}
+	else
+	{
+		short_branch(0);
+	}
+}
+
 void cosmac_device::bxi()   { short_branch(sample_interrupt()); }
 
 void cosmac_device::xie()   { m_xie = 1; }
@@ -1512,60 +1937,163 @@ void cosmac_device::xid()   { m_xie = 0; }
 void cosmac_device::cie()   { m_cie = 1; }
 void cosmac_device::cid()   { m_cie = 0; }
 
-void cosmac_device::scm1()  { stop_count(); m_cnt_mode = 2; }
-void cosmac_device::scm2()  { stop_count(); m_cnt_mode = 3; }
-void cosmac_device::spm1()  { stop_count(); m_cnt_mode = 4; }
-void cosmac_device::spm2()  { stop_count(); m_cnt_mode = 5; }
+void cosmac_device::stm()   { set_counter_mode(CNT_TIMER); }
+void cosmac_device::scm1()  { set_counter_mode(CNT_EVENT1); }
+void cosmac_device::scm2()  { set_counter_mode(CNT_EVENT2); }
+void cosmac_device::spm1()  { set_counter_mode(CNT_PULSE1); }
+void cosmac_device::spm2()  { set_counter_mode(CNT_PULSE2); }
 
-void cosmac_device::gec()   { D = get_count(); }
+void cosmac_device::gec()   { D = m_cnt_count; }
 void cosmac_device::stpc()  { stop_count(); }
-
-void cosmac_device::stm()
-{
-	if (m_cnt_mode != 1)
-	{
-		// start clocking counter in timer mode
-		m_cnt_mode = 1;
-		int count = (m_cnt_count == 0) ? 0x100 : m_cnt_count;
-		m_cnt_timer->adjust(attotime::from_ticks(0x100 * count, clock()));
-	}
-}
+void cosmac_device::dtc()   { counter_decrement(); }
+void cosmac_device::etq()   { m_etq = 1; }
 
 void cosmac_device::ldc()
 {
 	m_cnt_load = D;
-	if (m_cnt_mode == 0)
+
+	if (m_cnt_mode == CNT_STOPPED)
 	{
-		m_cnt_count = m_cnt_load;
+		m_cnt_count = D;
 		m_cil = 0;
+		m_etq = 0;
 	}
 }
 
-uint8_t cosmac_device::get_count()
+void cosmac_device::ldc_1804()
 {
-	if (m_cnt_mode == 1)
-	{
-		// get current count of active timer (rounded up)
-		uint64_t ticks = m_cnt_timer->remaining().as_ticks(clock());
-		return (ticks >> 8) + ((ticks & 0xff) ? 1 : 0);
-	}
-	else
-		return m_cnt_count;
+	stop_count();
+
+	m_cnt_load = D;
+	m_cnt_count = D;
+	m_cil = 0;
+	m_etq = 0;
+}
+
+void cosmac_device::set_counter_mode(uint8_t mode)
+{
+	if (mode != CNT_TIMER)
+		m_cnt_prescaler = 0;
+
+	for (int i = 0; i < 2; i++)
+		if (!m_read_ef[i].isunset())
+			m_cnt_ef[i] = m_read_ef[i]() ? 1 : 0;
+
+	m_cnt_mode = mode;
 }
 
 void cosmac_device::stop_count()
 {
-	m_cnt_count = get_count();
-	m_cnt_mode = 0;
-	m_cnt_timer->adjust(attotime::never);
+	m_cnt_mode = CNT_STOPPED;
+	m_cnt_prescaler = 0;
 }
 
-TIMER_CALLBACK_MEMBER(cosmac_device::cnt_timerout)
+void cosmac_device::counter_decrement()
 {
-	m_cil = 1;
-	int count = (m_cnt_load == 0) ? 0x100 : m_cnt_load;
-	m_cnt_timer->adjust(attotime::from_ticks(0x100 * count, clock()));
+	if (m_cnt_count == 1)
+	{
+		m_cnt_count = m_cnt_load;
+		m_cil = 1;
+
+		if (m_etq)
+			set_q_flag(!Q);
+	}
+	else
+	{
+		m_cnt_count--;
+	}
 }
 
-// CDP1805/06 additional extended opcodes
-// TODO
+void cosmac_device::counter_ef_w(int line, uint8_t state)
+{
+	if (m_cnt_ef[line] == state)
+		return;
+
+	m_cnt_ef[line] = state;
+
+	if (state)
+	{
+		if (m_cnt_mode == CNT_EVENT1 + line)
+			counter_decrement();
+	}
+	else if (m_cnt_mode == CNT_PULSE1 + line)
+	{
+		m_cnt_mode = CNT_STOPPED;
+		m_cil = 1;
+	}
+}
+
+bool cosmac_device::idle_stops_clock() const
+{
+	return false;
+}
+
+bool cdp1806_device::idle_stops_clock() const
+{
+	return true;
+}
+
+bool cosmac_device::has_test_mode() const
+{
+	return false;
+}
+
+bool cdp1804_device::has_test_mode() const
+{
+	return true;
+}
+
+bool cdp1806_device::has_test_mode() const
+{
+	return false;
+}
+
+void cosmac_device::test_mode_changed()
+{
+}
+
+void cdp1804_device::test_mode_changed()
+{
+	if (m_test)
+		m_internal.disable();
+	else
+		m_internal.select(0);
+}
+
+bool cosmac_device::internal_address(offs_t address) const
+{
+	return false;
+}
+
+bool cdp1804_device::internal_address(offs_t address) const
+{
+	return !m_test && (((address & m_rom_mask) == m_rom_value) || ((address & m_ram_mask) == m_ram_value));
+}
+
+inline void cosmac_device::counter_clock()
+{
+	if (m_cnt_mode >= CNT_EVENT1)
+	{
+		for (int i = 0; i < 2; i++)
+			if (!m_read_ef[i].isunset())
+				counter_ef_w(i, m_read_ef[i]() ? 1 : 0);
+	}
+
+	if (idle_stopped())
+		return;
+
+	switch (m_cnt_mode)
+	{
+	case CNT_TIMER:
+		m_cnt_prescaler = (m_cnt_prescaler + 1) & 0x1f;
+		if (!m_cnt_prescaler)
+			counter_decrement();
+		break;
+
+	case CNT_PULSE1:
+	case CNT_PULSE2:
+		if (m_cnt_ef[m_cnt_mode - CNT_PULSE1])
+			counter_decrement();
+		break;
+	}
+}

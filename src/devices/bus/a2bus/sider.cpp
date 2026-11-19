@@ -75,8 +75,6 @@
 
 #include "emu.h"
 #include "sider.h"
-#include "bus/scsi/scsihd.h"
-#include "bus/scsi/s1410.h"
 
 /***************************************************************************
     PARAMETERS

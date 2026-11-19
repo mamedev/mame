@@ -58,6 +58,7 @@ huc6272_device::huc6272_device(const machine_config &mconfig, const char *tag, d
 	, m_kram_load_reg(0)
 	, m_kram_write_reg(0)
 	, m_page_setting(0)
+	, m_kram_mode(0)
 	, m_program_space_config("microprg", ENDIANNESS_LITTLE, 16, 4, -1, address_map_constructor(FUNC(huc6272_device::microprg_map), this))
 	, m_data_space_config("kram", ENDIANNESS_LITTLE, 16, 19, -1, address_map_constructor(FUNC(huc6272_device::kram_map), this))
 	, m_io_space_config("io", ENDIANNESS_LITTLE, 32, 7, -2, address_map_constructor(FUNC(huc6272_device::io_map), this))
@@ -112,6 +113,7 @@ void huc6272_device::device_start()
 	save_item(NAME(m_kram_load_reg));
 	save_item(NAME(m_kram_write_reg));
 	save_item(NAME(m_page_setting));
+	save_item(NAME(m_kram_mode));
 	save_item(NAME(m_irq_state));
 
 	save_item(STRUCT_MEMBER(m_scsi, data));
@@ -185,6 +187,16 @@ void huc6272_device::device_start()
 
 void huc6272_device::device_reset()
 {
+	// every register is 0 after reset, except $05 PHASE (1) and $07 (FFh); $0A reads 3FFFFh, equivalent to the 0 kept here
+	m_register = 0;
+	m_kram_addr_r = m_kram_addr_w = 0;
+	m_kram_inc_r = m_kram_inc_w = 0;
+	m_kram_page_r = m_kram_page_w = 0;
+	m_kram_load_reg = m_kram_write_reg = 0;
+	m_page_setting = 0;
+	m_kram_mode = 0;
+	m_micro_prg.index = 0;
+	m_adpcm = decltype(m_adpcm)();
 	for (auto &bg : m_bg)
 		bg = bg_t();
 	m_bg_mode = 0;
@@ -306,7 +318,13 @@ void huc6272_device::io_map(address_map &map)
 	map(0x5d, 0x5d).w(FUNC(huc6272_device::adpcm_end_address_w<1>));
 	map(0x5e, 0x5e).w(FUNC(huc6272_device::adpcm_imm_address_w<1>));
 
-//  map(0x61, 0x61) KRAM mode (undocumented, used by backup RAM menu)
+	// KRAM mode: D0 selects 1M or 4M DRAM; the IPL sets 4M before any KRAM access, so only the value is kept
+	map(0x61, 0x61).lrw32(
+		NAME([this] () -> u32 { return m_kram_mode; }),
+		NAME([this] (offs_t offset, u32 data, u32 mem_mask) {
+			if (ACCESSING_BITS_0_15)
+				m_kram_mode = data & 1;
+		}));
 }
 
 
@@ -900,8 +918,7 @@ u16 huc6272_device::kram_read_data_r(offs_t offset, u16 mem_mask)
 	const u16 res = space(AS_DATA).read_word(((m_kram_addr_r) | (m_kram_page_r << 18)) << 0, mem_mask);
 	if (!machine().side_effects_disabled())
 	{
-		m_kram_addr_r += util::sext<s32>(m_kram_inc_r & 0x3ff, 10);
-		m_kram_addr_r &= 0x3ffff;
+		m_kram_addr_r = (m_kram_addr_r & 0x20000) | ((m_kram_addr_r + util::sext<s32>(m_kram_inc_r & 0x3ff, 10)) & 0x1ffff);
 	}
 	return res;
 }
@@ -913,8 +930,8 @@ void huc6272_device::kram_write_data_w(offs_t offset, u16 data, u16 mem_mask)
 		data,
 		mem_mask
 	);
-	m_kram_addr_w += util::sext<s32>(m_kram_inc_w & 0x3ff, 10);
-	m_kram_addr_w &= 0x3ffff;
+	// increments wrap within the A/B bank
+	m_kram_addr_w = (m_kram_addr_w & 0x20000) | ((m_kram_addr_w + util::sext<s32>(m_kram_inc_w & 0x3ff, 10)) & 0x1ffff);
 }
 
 /*
@@ -1355,8 +1372,12 @@ void huc6272_device::rainbow_control_w(offs_t offset, u32 data, u32 mem_mask)
 	m_rainbow.control = data & 3;
 	if (!BIT(data, 0))
 		m_rainbow.blocks = 0;
-	m_rainbow.raster_irq = false;
-	interrupt_update();
+	// resetting RINT clears the raster interrupt (so does a status read)
+	if (!BIT(data, 1))
+	{
+		m_rainbow.raster_irq = false;
+		interrupt_update();
+	}
 }
 
 void huc6272_device::rainbow_address_w(offs_t offset, u32 data, u32 mem_mask)
@@ -1517,19 +1538,23 @@ u32 huc6272_device::adpcm_status_r(offs_t offset)
 }
 
 // start address in 256 word units, end address in words, intermediate address in 64 word units
+// only the end address is wider than 16 bits; its halves are written independently
 template <unsigned N> void huc6272_device::adpcm_start_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_adpcm.start[N] = (data & 0x3ff) * 256;
+	if (ACCESSING_BITS_0_15)
+		m_adpcm.start[N] = (data & 0x3ff) * 256;
 }
 
 template <unsigned N> void huc6272_device::adpcm_end_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_adpcm.end[N] = data & 0x3ffff;
+	COMBINE_DATA(&m_adpcm.end[N]);
+	m_adpcm.end[N] &= 0x3ffff;
 }
 
 template <unsigned N> void huc6272_device::adpcm_imm_address_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	m_adpcm.imm[N] = (data & 0xfff) * 64;
+	if (ACCESSING_BITS_0_15)
+		m_adpcm.imm[N] = (data & 0xfff) * 64;
 }
 
 // fetch the next word of ADPCM data and handle the end/intermediate addresses

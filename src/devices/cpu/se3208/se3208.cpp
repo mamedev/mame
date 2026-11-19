@@ -1374,7 +1374,8 @@ INST(SWI)
 
 	if (!TESTFLAG(FLAG_ENI))
 		return;
-	push_val(m_PC);
+	// returns to the next instruction (xfkddz uC/OS-II context switch)
+	push_val(m_PC + 2);
 	push_val(m_SR);
 
 	CLRFLAG(FLAG_ENI|FLAG_E|FLAG_M);

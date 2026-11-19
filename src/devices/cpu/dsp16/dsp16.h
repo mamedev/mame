@@ -12,8 +12,6 @@
 
 #include "dsp16dis.h"
 
-#include "cpu/drccache.h"
-
 #include <memory>
 #include <utility>
 
@@ -177,8 +175,6 @@ private:
 	class opcode_desc;
 	class frontend;
 	class recompiler;
-	struct core_destructer { void operator()(core_state *obj) const noexcept; };
-	using core_state_ptr = std::unique_ptr<core_state, core_destructer>;
 	using recompiler_ptr = std::unique_ptr<recompiler>;
 
 	// internal address maps
@@ -280,9 +276,9 @@ private:
 	u16                         m_workram_mask;
 
 	// recompiler stuff
-	drc_cache                   m_drc_cache;
-	core_state_ptr              m_core;
+	core_state                  *m_core;
 	recompiler_ptr              m_recompiler;
+	std::unique_ptr<core_state> m_heap_core;
 
 	// execution state
 	cache       m_cache_mode;
@@ -346,6 +342,9 @@ public:
 	dsp16_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+
 	// dsp16_device_base implementation
 	virtual void external_memory_enable(address_space &space, bool enable) override;
 
@@ -364,6 +363,9 @@ public:
 	dsp16a_device(machine_config const &mconfig, char const *tag, device_t *owner, u32 clock);
 
 protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+
 	// dsp16_device_base implementation
 	virtual void external_memory_enable(address_space &space, bool enable) override;
 

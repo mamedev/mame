@@ -19,11 +19,11 @@ NVRAM   :   Battery for main RAM
 ---------------------------------------------------------------------------
 Year  Game                         Manufacturer    Notes
 ---------------------------------------------------------------------------
-1997  Jingle Bell (US, V157US)     IGS             patched protection
-1997  Jingle Bell (EU, V155UE)     IGS             patched protection
-1997  Jingle Bell (EU, V153UE)     IGS             patched protection
-1995  Jingle Bell (EU, V141UE)     IGS             patched protection
-1995? Jingle Bell (Italy, V133I)   IGS             patched protection
+1997  Jingle Bell (US, V157US)     IGS
+1997  Jingle Bell (EU, V155UE)     IGS
+1997  Jingle Bell (EU, V153UE)     IGS
+1995  Jingle Bell (EU, V141UE)     IGS
+1995? Jingle Bell (Italy, V133I)   IGS
 1998  Grand Prix '98               Romtec
 ---------------------------------------------------------------------------
 
@@ -60,6 +60,7 @@ public:
 		, m_bg_scroll(*this, "bg_scroll.%u", 0U)
 		, m_fg_tile_ram(*this, "fg_tile_ram")
 		, m_fg_color_ram(*this, "fg_color_ram")
+		, m_prgrom(*this, "maincpu")
 		, m_dsw(*this, "DSW%u", 1U)
 		, m_leds(*this, "led%u", 0U)
 	{ }
@@ -67,8 +68,6 @@ public:
 	void jingbell(machine_config &config) ATTR_COLD;
 
 	void init_jingbell() ATTR_COLD;
-	void init_jingbelli() ATTR_COLD;
-	void init_animalhjb() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -101,6 +100,7 @@ private:
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 
+	required_region_ptr<uint8_t> m_prgrom;
 	required_ioport_array<5> m_dsw;
 	output_finder<7> m_leds;
 
@@ -108,6 +108,8 @@ private:
 	uint8_t m_nmi_enable = 0;
 	uint8_t m_out[3]{};
 	uint8_t m_igs_magic[2]{};
+	uint8_t m_prot_counter = 0;
+	uint8_t m_prot_mode = 0;
 
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 	template<uint8_t Reel> void reel_ram_w(offs_t offset, uint8_t data);
@@ -116,10 +118,9 @@ private:
 	void fg_color_w(offs_t offset, uint8_t data);
 	void magic_w(offs_t offset, uint8_t data);
 	uint8_t magic_r();
+	uint8_t prot_r(offs_t offset);
 	void show_out();
 	void vblank_irq(int state);
-
-	void decrypt_jingbell() ATTR_COLD;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void program_map(address_map &map) ATTR_COLD;
@@ -139,6 +140,7 @@ protected:
 private:
 	template<uint8_t Reel> TILE_GET_INFO_MEMBER(get_reel_tile_info);
 
+	void program_map(address_map &map) ATTR_COLD;
 	void portmap(address_map &map) ATTR_COLD;
 };
 
@@ -371,8 +373,63 @@ uint8_t igs009_state::magic_r()
 	return 0;
 }
 
+/*
+  Jingle Bell protection
+
+  Behaviour inferred from the program code only (same routine in all sets);
+  the actual device isn't known (probably one of the undumped PLDs).
+  It sits in the program ROM space at 0x1fc0-0x1fff (mirrored at 0x3fc0-0x3fff,
+  the game uses both), with A5-A3 selecting the function.
+  Note: the ROM has the same small stub + filler at 0x1fc0 of every 8KB block, but it
+  is also present in jbell (spoker.cpp, no protection check), so it doesn't
+  necessarily mean further mirrors.
+
+  0x08  decrement counter (when mode = 0)
+  0x10  decrement counter (when mode = 1)
+  0x18  read, D1-D0 = f(counter) (when mode = 1)
+  0x20  read, D1-D0 = f(counter) (when mode = 0)
+  0x28  toggle mode
+
+  f(counter): D1 = c1 ^ c3, D0 = !(c0 | c2)
+  Counter and mode are zero after reset (the game clears its own copies at boot).
+  Only the accesses above are performed by the game: what the other
+  combinations (e.g. 0x08 with mode = 1) do is unknown.
+*/
+uint8_t igs009_state::prot_r(offs_t offset)
+{
+	offset += 0x08; // handler starts at 0x1fc8
+
+	// ROM contents in this range are the same in all mirrors
+	uint8_t data = m_prgrom[0x1fc0 + offset];
+
+	if (((offset & 0x38) == 0x18 && m_prot_mode) || ((offset & 0x38) == 0x20 && !m_prot_mode))
+	{
+		uint8_t const c = m_prot_counter;
+		return (data & 0xfc) | ((BIT(c, 1) ^ BIT(c, 3)) << 1) | ((BIT(c, 0) | BIT(c, 2)) ^ 1);
+	}
+
+	if (machine().side_effects_disabled())
+		return data;
+
+	if (((offset & 0x38) == 0x08 && !m_prot_mode) || ((offset & 0x38) == 0x10 && m_prot_mode))
+		m_prot_counter = (m_prot_counter - 1) & 0x0f;
+	else if ((offset & 0x38) == 0x28)
+		m_prot_mode ^= 1;
+	else
+		logerror("%s: unknown protection read %04x (mode %d)\n", machine().describe_context(), 0x1fc0 + offset, m_prot_mode);
+
+	return data;
+}
+
 
 void igs009_state::program_map(address_map &map)
+{
+	map(0x00000, 0x0f3ff).rom();
+	map(0x01fc8, 0x01fff).mirror(0x2000).r(FUNC(igs009_state::prot_r));
+	map(0x0f400, 0x0ffff).ram().share("nvram");
+}
+
+void gp98_state::program_map(address_map &map)
 {
 	map(0x00000, 0x0f3ff).rom();
 	map(0x0f400, 0x0ffff).ram().share("nvram");
@@ -676,12 +733,16 @@ void igs009_state::machine_start()
 	save_item(NAME(m_nmi_enable));
 	save_item(NAME(m_out));
 	save_item(NAME(m_igs_magic));
+	save_item(NAME(m_prot_counter));
+	save_item(NAME(m_prot_mode));
 }
 
 void igs009_state::machine_reset()
 {
 	m_nmi_enable = 0;
 	m_video_enable = 1;
+	m_prot_counter = 0;
+	m_prot_mode = 0;
 }
 
 void igs009_state::vblank_irq(int state)
@@ -736,6 +797,7 @@ void gp98_state::gp98(machine_config &config)
 {
 	jingbell(config);
 	// basic machine hardware
+	m_maincpu->set_addrmap(AS_PROGRAM, &gp98_state::program_map);
 	m_maincpu->set_addrmap(AS_IO, &gp98_state::portmap);
 
 	m_gfxdecode->set_info(gfx_gp98);
@@ -935,7 +997,7 @@ ROM_START( jbell133i )
 	ROM_REGION( 0x2dd, "plds",0 )
 	ROM_LOAD( "palce16v8h-ch-jin-u12v.u12", 0x000, 0x117, NO_DUMP )
 	ROM_LOAD( "palce16v8h-ch-jin-u33v.u33", 0x000, 0x117, NO_DUMP )
-	ROM_LOAD( "palce22v10h-ajbu24.u24",     0x000, 0x2dd, CRC(6310f441) SHA1(b610e170ccca1fcb06a57f718ece1408b696ba9c) )
+	ROM_LOAD( "palce22v10h-ajbu24.u24",     0x000, 0x2dd, CRC(6310f441) SHA1(b610e170ccca1fcb06a57f718ece1408b696ba9c) BAD_DUMP )
 	ROM_LOAD( "palce22v10h-ch-jin-u27.u27", 0x000, 0x2dd, NO_DUMP )
 ROM_END
 
@@ -967,7 +1029,7 @@ ROM_START( animalhjb )
 	ROM_LOAD( "pal22v10.u27",   0x00000, 0x002dd, CRC(848a42fc) SHA1(2cfeecbf934b81e9fbf3018efc00cc431a14b266) )
 ROM_END
 
-void igs009_state::decrypt_jingbell()
+void igs009_state::init_jingbell()
 {
 	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
@@ -991,33 +1053,6 @@ void igs009_state::decrypt_jingbell()
 
 		rom[i] = x;
 	}
-}
-
-void igs009_state::init_jingbelli()
-{
-	decrypt_jingbell();
-
-	// HACK: protection patch
-	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
-	rom[0x01f19] = 0x18;
-}
-
-void igs009_state::init_animalhjb()
-{
-	decrypt_jingbell();
-
-	// HACK: protection patch
-	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
-	rom[0x01f21] = 0x18;
-}
-
-void igs009_state::init_jingbell()
-{
-	decrypt_jingbell();
-
-	// HACK: protection patch
-	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
-	rom[0x0e753] = 0x18;
 }
 
 /***************************************************************************
@@ -1117,8 +1152,8 @@ ROM_END
 GAME( 1997,  jbell157us, jbell,  jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (US, V157US)",              MACHINE_SUPPORTS_SAVE )
 GAME( 1997,  jbell155ue, jbell,  jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V155UE)",              MACHINE_SUPPORTS_SAVE ) // Shows V154UE in test mode!
 GAME( 1997,  jbell153ue, jbell,  jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  jbell141ue, jbell,  jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",              MACHINE_SUPPORTS_SAVE )
-GAME( 1995?, jbell133i,  jbell,  jingbell, jingbell, igs009_state,  init_jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)",            MACHINE_SUPPORTS_SAVE )
-GAME( 1995?, animalhjb,  jbell,  jingbell, jingbell, igs009_state,  init_animalhjb, ROT0, "bootleg",        "Animal House (bootleg of Jingle Bell)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  jbell141ue, jbell,  jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V141UE)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1995?, jbell133i,  jbell,  jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "IGS",            "Jingle Bell (Italy, V133I)",            MACHINE_SUPPORTS_SAVE )
+GAME( 1995?, animalhjb,  jbell,  jingbell, jingbell, igs009_state,  init_jingbell,  ROT0, "bootleg",        "Animal House (bootleg of Jingle Bell)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998,  gp98,       0,      gp98,     jingbell, gp98_state,    empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 1)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1998,  gp98a,      gp98,   gp98,     jingbell, gp98_state,    empty_init,     ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K, set 2)",         MACHINE_SUPPORTS_SAVE ) // "V100K JINGLEBELL" string on program ROM

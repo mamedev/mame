@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "video80.h"
+
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 
@@ -32,9 +33,6 @@
 #include "logmacro.h"
 
 namespace {
-
-// Dot clock
-constexpr auto DOT_CLOCK = 16_MHz_XTAL;
 
 class msx_cart_video80_device : public device_t, public msx_cart_interface
 {
@@ -105,6 +103,8 @@ void msx_cart_video80_device::device_start()
 
 void msx_cart_video80_device::device_add_mconfig(machine_config &config)
 {
+	constexpr auto DOT_CLOCK = 16_MHz_XTAL;
+
 	PALETTE(config, m_palette, palette_device::MONOCHROME);
 
 	SCREEN(config, m_screen).set_color(rgb_t::green());

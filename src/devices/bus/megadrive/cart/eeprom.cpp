@@ -56,7 +56,7 @@ void megadrive_eeprom_device::cart_map(address_map &map)
 /*
  * nbajam/nbajam1/nbajamj NBA Jam
  *
- * Uses a 24C02, otherwise same as Sega handling
+ * Uses a 24C02, same as Sega handling on writes, uses bit 1 on reads
  *
  */
 
@@ -73,12 +73,30 @@ void megadrive_eeprom_nbajam_device::device_add_mconfig(machine_config &config)
 	I2C_24C02(config, m_i2cmem);
 }
 
+void megadrive_eeprom_nbajam_device::cart_map(address_map &map)
+{
+	map(0x00'0000, m_rom_mask).mirror(m_rom_mirror).bankr(m_rom);
+	map(0x20'0001, 0x20'0001).lrw8(
+		NAME([this] (offs_t offset) {
+			return m_i2cmem->read_sda() << 1;
+		}),
+		NAME([this] (offs_t offset, u8 data) {
+			m_i2cmem->write_scl(BIT(data, 1));
+			m_i2cmem->write_sda(BIT(data, 0));
+		})
+	);
+}
+
 /*
  * nbajamte NBA Jam TE (MD and 32x versions)
  * nflqb    NFL Quarterback Club
  * blockb   Blockbuster World Video Game Championship II
  *
  * Uses a 24C02, moves SCL to $200000
+ *
+ * nbajamte MD is infamously known to be SW buggy, requiring pre-setup with two single player warmup
+ * plays before actual record use.
+ * https://segaretro.org/File:NBAJamTE_MD_US_SaveInitializationSheet.jpg
  *
  */
 

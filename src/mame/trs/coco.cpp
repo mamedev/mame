@@ -158,6 +158,10 @@ void coco_state::machine_reset()
 	m_dac_output = 0;
 	m_pia0_pa_buffer = 0;
 	m_vhd_select = 0;
+
+	// PIA1 CB2 is an input at reset, leaving SNDEN low.  The mux resets
+	// after the PIA, so establish the disabled sound path here.
+	m_mux->inhibit_y_w(1);
 }
 
 
@@ -468,14 +472,28 @@ uint8_t coco_state::pia1_pb_r()
 	// We only need to specify the input lines here
 	uint32_t ram_size = m_ram->size();
 
-	//  For the CoCo 1, the logic has been changed to only select 64K rams
-	//  if there is more than 16K of memory, as the Color Basic 1.0 rom
-	//  can only configure 4K or 16K ram banks (as documented in "Color
-	//  Basic Unreveled"), doing this allows this  allows the coco driver
-	//  to access 32K of ram, and also allows the cocoe driver to access
-	//  the full 64K, as this uses Color Basic 1.2, which can configure 64K rams
-	bool memory_sense = (ram_size >= 0x4000 && ram_size <= 0x7fff)
-		|| (ram_size >= 0x8000 && (m_pia_0->b_output() & 0x40));
+	//  RAMSZ is strapped for the RAM chips fitted:
+	//
+	//      4K chips (4K, 8K)       grounded
+	//      16K chips (16K)         pulled high
+	//      64K chips (32K, 64K+)   PIA0 PB6, a keyboard column strobe
+	//
+	//  32K machines use 64K chips with one working half.  Color BASIC
+	//  reads RAMSZ to choose the SAM memory size:
+	//
+	//      1.0         PB6 high: low = 4K, high = 16K
+	//      1.1, 1.2    PB6 high then low: low = 4K, high/high = 16K,
+	//                  high/low = 64K
+	//      1.3         PB6 low: low = 64K, high = 16K
+	//
+	//  So BASIC 1.0 uses 16K on a 64K machine, as on hardware.
+	bool memory_sense;
+	if (ram_size < 0x4000)
+		memory_sense = false;
+	else if (ram_size < 0x8000)
+		memory_sense = true;
+	else
+		memory_sense = BIT(m_pia_0->b_output(), 6);
 
 	// serial in (PB0)
 	bool serial_in = (m_rs232 != nullptr) && (m_rs232->rxd_r() ? true : false);
@@ -1251,7 +1269,7 @@ void coco_diecom_light_gun::lightgun_clock(int clock)
 		if (half_state > 7)
 		{
 			/* bit shift timer data on half states 8 thru 15 */
-			if (m_horizontal_clock_count & (1 << (half_state - 7)))
+			if (m_horizontal_clock_count & (1 << (half_state - 8)))
 			{
 				m_output_h |= 0x01;
 			}
@@ -1271,13 +1289,28 @@ void coco_diecom_light_gun::lightgun_clock(int clock)
 		/* while in full state 15, prepare to check next video frame for a hit */
 		if (m_adaptor_state == 15)
 		{
-			int dclg_vpos = m_v_port->read() + 12;
-			// this clock starts at zero at the left edge of the screen,
-			// and rolls over every scanline
-			m_horizontal_clock_count = m_h_port->read();
+			// the gun position is in visible screen pixels, matching the crosshair;
+			// Diecom software expects the hit to register 10 scanlines after
+			// the beam passes the target (calibrated with Iron Forest)
+			const rectangle &visarea = m_host.get_screen()->visible_area();
+			int dclg_vpos = visarea.top() + m_v_port->read() + 10;
+			int dclg_hpos = visarea.left() + m_h_port->read();
 
-			int horizontal_pixel = ((m_horizontal_clock_count - 105.0) / (420.0 - 110.0)) * (639.0 - 0.0) + 0.0;
-			attotime dclg_time = m_host.get_screen()->time_until_pos(dclg_vpos, horizontal_pixel);
+			// this clock runs at half the pixel clock and rolls over every
+			// scanline.  Diecom software disagrees on its value at the left
+			// edge of the 640 pixel wide active area (40 pixels into the
+			// screen).  Both games share the same reading routine and
+			// subtract a constant from the clock to get a 0-319 X position:
+			//   Iron Forest subtracts 107  -> use 107 here to be exact
+			//   Medieval Madness subtracts 99 -> use 99 here to be exact
+			// Both draw sprites at the same screen position, so no single
+			// value suits both.  103 splits the difference, leaving each game
+			// 4 clocks (8 screen pixels) off in opposite directions.  The
+			// cause is unknown; one guess is the games were calibrated on
+			// different GIME revisions.
+			m_horizontal_clock_count = (dclg_hpos - 40) / 2 + 103;
+
+			attotime dclg_time = m_host.get_screen()->time_until_pos(dclg_vpos, dclg_hpos);
 			m_host.adjust_host_joy_timer(m_base_slot+1, dclg_time);
 
 		}

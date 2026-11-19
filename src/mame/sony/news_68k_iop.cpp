@@ -16,7 +16,7 @@
  * The CPU and IOP interrupt each other whenever they need to communicate, after populating main memory with whatever data is needed.
  * The CPU delegates almost all I/O to the IOP (as the DMA controller), only handling I/O for some VME bus peripherals.
  * The CPU bus (on the NWS-800, this is routed through the MMU) is often called the Hyperbus. The NWS-1800/1900/3800 series and the single-CPU
- * 68k and R3000 models explictly call this the Hyperbus, but it is unclear if the NWS-800's CPU bus was only referred to that retroactively or not.
+ * 68k and R3000 models explicitly call this the Hyperbus, but it is unclear if the NWS-800's CPU bus was only referred to that retroactively or not.
  * There are a couple of mentions of the Hyperbus in NEWS-OS 4 related to even the NWS-800, but the NWS-1xxx/3xxx series were already released by the time NEWS-OS 4 was.
  * So, for clarity due to the number of busses on this system, the Hyperbus term is used throughout this code, but it may or may not be a 100% accurate description.
  * The Hyperbus is directly connected to main memory, the system ROM, and the VME bus interface. Everything else is connected to the I/O
@@ -53,9 +53,10 @@
  *   - Debug general OS issues - random segfaults when running `ps`, system sometimes fails to shutdown when running `shutdown -x now` after using the networking stack, etc.
  *   - AST (Asynchronous System Trap) emulation
  *   - System cache emulation
- *   - Expansion slots (I/O Bus and VMEBus)
+ *   - NEWS I/O Bus - for now, the framebuffer is directly wired in
+ *   - VMEBus
  *   - Networking is very flaky, especially on NEWS-OS 4.
- *   - Graphics, kbms, and parallel port emulation
+ *   - Parallel port emulation
  *   - Hyperbus handshake for IOP and CPU accesses. The bus has arbitration circuitry to prevent bus contention when both the CPU and IOP are trying to access the hyperbus (RAM and VME)
  */
 
@@ -64,6 +65,7 @@
 #include "news_020_mmu.h"
 #include "news_hid.h"
 #include "news_iop_scsi.h"
+#include "nwb_512.h"
 
 #include "bus/nscsi/cd.h"
 #include "bus/nscsi/hd.h"
@@ -73,19 +75,15 @@
 #include "cpu/m68000/m68020.h"
 
 #include "machine/am79c90.h"
-#include "machine/bankdev.h"
 #include "machine/msm58321.h"
 #include "machine/ncr5380.h"
 #include "machine/nscsi_bus.h"
 #include "machine/pit8253.h"
 #include "machine/ram.h"
-#include "machine/timekpr.h"
 #include "machine/upd765.h"
 #include "machine/z80scc.h"
 
 #include "imagedev/floppy.h"
-
-#include "formats/pc_dsk.h"
 
 #define LOG_INTERRUPT (1U << 1)
 #define LOG_ALL_INTERRUPT (1U << 2)
@@ -98,8 +96,6 @@
 #define LOG_AST (1U << 9)
 #define LOG_RTC (1U << 10)
 
-#define VERBOSE (LOG_GENERAL)
-
 #include "logmacro.h"
 
 namespace
@@ -109,8 +105,6 @@ namespace
 	class news_iop_state : public driver_device
 	{
 	public:
-		static constexpr feature_type unemulated_features() { return feature::GRAPHICS; }
-
 		news_iop_state(machine_config const &mconfig, device_type type, char const *tag) :
 			driver_device(mconfig, type, tag),
 			m_iop(*this, "iop"),
@@ -129,6 +123,9 @@ namespace
 			m_scsi_dma(*this, "scsi_dma"),
 			m_dip_switch(*this, "FRONT_PANEL"),
 			m_serial(*this, "serial%u", 0U),
+			m_keyboard(*this, "nwp411"),
+			m_mouse(*this, "mouse"),
+			m_fb(*this, "nwb512"),
 			iop_irq_line_map({
 				{INPUT_LINE_IRQ1, {CPIRQ_3_1}},
 				{INPUT_LINE_IRQ2, {SCSI_IRQ, SCSI_DRQ}},
@@ -180,7 +177,7 @@ namespace
 			FDCDRQ          // DRQ from FDC
 		};
 		static constexpr std::array iop_irq_names = {"CPIRQ"sv, "SCSI_IRQ"sv, "SCSI_DRQ"sv, "LANCE"sv, "CPU"sv, "SCC"sv, "SCC_PERIPHERAL"sv, "TIMEOUT"sv, "FDCIRQ"sv, "FDCDRQ"sv};
-		static constexpr uint32_t iop_nmi_mask = (1 << SCSI_IRQ) | (1 << SCC) | (1 << LANCE) | (1 << FDCIRQ) | (1 << FDCDRQ);
+		static constexpr uint32_t iop_nmi_mask = (1 << SCSI_IRQ) | (1 << SCC) | (1 << SCC_PERIPHERAL) | (1 << LANCE) | (1 << FDCIRQ) | (1 << FDCDRQ);
 
 		template <iop_irq_number Number>
 		void iop_irq_w(int state);
@@ -270,6 +267,9 @@ namespace
 		required_device<news_iop_scsi_helper_device> m_scsi_dma;
 		required_ioport m_dip_switch;
 		required_device_array<rs232_port_device, 2> m_serial;
+		required_device<news_hid_serial_keyboard_device> m_keyboard;
+		required_device<news_hid_serial_mouse_device> m_mouse;
+		required_device<nwb_512_device> m_fb;
 		std::unique_ptr<u16[]> m_net_ram;
 
 		// IOP IRQ state
@@ -286,12 +286,11 @@ namespace
 		bool m_cpu_bus_error = false;
 		offs_t m_last_berr_pc_cpu = 0;
 		uint8_t m_cpu_bus_error_status = 0;
-		emu_timer *m_cpu_bus_error_timer;
+		emu_timer *m_cpu_bus_error_timer = nullptr;
 
 		// Front panel
 		bool m_panel_clear = false;
 		bool m_panel_shift = false;
-		int m_sw1_first_read = 0;
 		int m_panel_shift_count = 0;
 		uint8_t m_rtc_data = 0;
 
@@ -318,7 +317,6 @@ namespace
 		save_item(NAME(m_cpu_bus_error_status));
 		save_item(NAME(m_panel_clear));
 		save_item(NAME(m_panel_shift));
-		save_item(NAME(m_sw1_first_read));
 		save_item(NAME(m_panel_shift_count));
 		save_item(NAME(m_rtc_data));
 	}
@@ -542,7 +540,10 @@ namespace
 		map(0x03000000, 0x0300ffff).rom().region("eprom", 0).mirror(0x007f0000);
 
 		// IOP bus expansion I/O
-		map(0x20000000, 0x20ffffff).rw(FUNC(news_iop_state::extio_bus_error_r),FUNC(news_iop_state::extio_bus_error_w)).mirror(0x1f000000);
+		map(0x20000000, 0x20efffff).mirror(0x1f000000).rw(FUNC(news_iop_state::extio_bus_error_r), FUNC(news_iop_state::extio_bus_error_w));
+
+		// NWB-512 Monochrome Framebuffer (in Expansion I/O space)
+		map(0x20f00000, 0x20ffffff).mirror(0x1f000000).m(m_fb, FUNC(nwb_512_device::map));
 
 		// Expansion slot SCC (bus errors here kill iopboot, so the probe process may not use bus errors, at least not with the same setup as extio)
 		// TODO: Does the fact that NEWS-OS 4 poke at these addresses mean that something is not configured properly elsewhere?
@@ -714,12 +715,12 @@ namespace
 
 	void news_iop_state::int_check_iop()
 	{
-	   const int active_irq = m_iop_intst & (m_iop_inten | iop_nmi_mask);
-	   for (auto irq : iop_irq_line_map)
-	   {
+		const int active_irq = m_iop_intst & (m_iop_inten | iop_nmi_mask);
+		for (auto irq : iop_irq_line_map)
+		{
 			// Calculate state of input pin (logical OR of all attached inputs)
 			bool state = false;
-			for (auto irq_input : irq.second)
+			for (const auto irq_input : irq.second)
 			{
 				state |= active_irq & (1 << irq_input);
 			}
@@ -733,7 +734,7 @@ namespace
 
 				m_iop->set_input_line(irq.first, state ? 1 : 0);
 			}
-	   }
+		}
 	}
 
 	template <news_iop_state::cpu_irq_number Number>
@@ -838,24 +839,12 @@ namespace
 	{
 		// the shift pin and the counter drive a multiplexer (the shift pin also drives the counter)
 		uint8_t multiplexer_value = (m_panel_shift_count & 0x3) << 1;
-		multiplexer_value |= (m_panel_shift ? 0x1 : 0x0);
+		multiplexer_value |= m_panel_shift ? 0x1 : 0x0;
 
 		bool dcd_state = false;
 		if (multiplexer_value < 6) // DIPSW
 		{
-			// The reset condition (somehow) seems to start the multiplexer count at 5. This is a workaround to achieve the same results.
-			// This seems to be correct because it causes diag mode to start when SW6 is set, and also allows the NWB-512 init code to start
-			// when SW1 is set. When framebuffer emulation is added, this can be confirmed (maybe also with an oscilloscope readout?)
-			// The 2 is there because the reset condition of the emulated pins results in an extra reset.
-			if ((m_sw1_first_read < 2) && multiplexer_value == 0)
-			{
-				m_sw1_first_read++;
-				dcd_state = BIT(m_dip_switch->read(), 5);
-			}
-			else
-			{
-				dcd_state = BIT(m_dip_switch->read(), multiplexer_value);
-			}
+			dcd_state = BIT(m_dip_switch->read(), multiplexer_value);
 		}
 		else // IDROM
 		{
@@ -975,12 +964,20 @@ namespace
 		m_scc_external->out_int_callback().set(FUNC(news_iop_state::iop_irq_w<SCC>));
 		m_scc_peripheral->out_int_callback().set(FUNC(news_iop_state::iop_irq_w<SCC_PERIPHERAL>));
 
+		// Keyboard and mouse
+		NEWS_HID_SERIAL_KEYBOARD(config, m_keyboard);
+		m_keyboard->txd_handler().set(m_scc_peripheral, FUNC(z80scc_device::rxa_w));
+		m_scc_peripheral->out_txda_callback().set(m_keyboard, FUNC(news_hid_serial_keyboard_device::rxd_w));
+
+		NEWS_HID_SERIAL_MOUSE(config, m_mouse);
+		m_mouse->txd_handler().set(m_scc_peripheral, FUNC(z80scc_device::rxb_w));
+
 		// The monitor ROM repurposes the status pins as a serial interface to read the front panel switches and IDROM data
 		m_scc_peripheral->out_dtrb_callback().set(FUNC(news_iop_state::handle_dtr));
 		m_scc_peripheral->out_rtsb_callback().set(FUNC(news_iop_state::handle_rts));
 
 		// scc channel A
-		RS232_PORT(config, m_serial[0], default_rs232_devices, "terminal");
+		RS232_PORT(config, m_serial[0], default_rs232_devices, nullptr);
 		m_serial[0]->cts_handler().set(m_scc_external, FUNC(z80scc_device::ctsa_w));
 		m_serial[0]->dcd_handler().set(m_scc_external, FUNC(z80scc_device::dcda_w));
 		m_serial[0]->rxd_handler().set(m_scc_external, FUNC(z80scc_device::rxa_w));
@@ -1038,7 +1035,7 @@ namespace
 		m_scsi->drq_handler().set(DEVICE_SELF, FUNC(news_iop_state::scsi_drq_handler));
 
 		// Virtual device for handling SCSI DMA
-		// (workaround for 68k bus access limitiations; normally iopboot's BERR handler would deal with SCSI DMA stuff)
+		// (workaround for 68k bus access limitations; normally iopboot's BERR handler would deal with SCSI DMA stuff)
 		NEWS_IOP_SCSI_HELPER(config, m_scsi_dma);
 		m_scsi_dma->scsi_read_callback().set(m_scsi, FUNC(ncr53c80_device::read));
 		m_scsi_dma->scsi_write_callback().set(m_scsi, FUNC(ncr53c80_device::write));
@@ -1054,6 +1051,9 @@ namespace
 		m_rtc->d1_handler().set([this] (int data) { set_rtc_data_bit(1, data); });
 		m_rtc->d2_handler().set([this] (int data) { set_rtc_data_bit(2, data); });
 		m_rtc->d3_handler().set([this] (int data) { set_rtc_data_bit(3, data); });
+
+		// NWB-512 monochrome framebuffer + NWP-512D 15" Monochrome Display (816x1024)
+		NWB_512(config, m_fb);
 	}
 
 	void news_iop_state::iop_autovector_map(address_map &map)
@@ -1093,12 +1093,11 @@ namespace
 
 	static INPUT_PORTS_START(nws8xx)
 		PORT_START("FRONT_PANEL")
-			PORT_DIPNAME(0x07, 0x07, "Display")
+			PORT_DIPNAME(0x07, 0x03, "Display")
 				PORT_DIPLOCATION("FRONT_PANEL:1,2,3")
 				PORT_DIPSETTING(0x07, "Console")
-				PORT_DIPSETTING(0x06, "NWB-512")
-				PORT_DIPSETTING(0x03, "NWB-225A")
-				PORT_DIPSETTING(0x00, "Autoselect")
+				PORT_DIPSETTING(0x06, "NWB-225A")
+				PORT_DIPSETTING(0x03, "NWB-512")
 			PORT_DIPNAME(0x08, 0x08, "Boot Device")
 				PORT_DIPLOCATION("FRONT_PANEL:4")
 				PORT_DIPSETTING(0x08, "SCSI")

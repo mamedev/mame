@@ -34,6 +34,7 @@ public:
 	// video output, for the '6261
 	void render_bg_line(int raster, u32 *dest);
 	int rainbow_line(int raster, u32 *dest);
+	void rainbow_hsync() { m_huc6271->hsync(); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -50,6 +51,7 @@ private:
 	u8 m_kram_page_r, m_kram_page_w;
 	u32 m_kram_load_reg, m_kram_write_reg;
 	u32 m_page_setting;
+	u8 m_kram_mode;
 
 	struct bg_t {
 		u16 bat = 0;

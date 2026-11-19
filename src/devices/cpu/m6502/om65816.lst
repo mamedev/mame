@@ -856,8 +856,8 @@ mvn_dbf
 	m_DB = m_DST;
 	m_TMP2 = read((m_SRC << 16) | (m_X & 0xff));
 	write((m_DST << 16) | (m_Y & 0xff), m_TMP2);
-	read_pc_idle();
-	read_pc_idle();
+	read_idle((m_DST << 16) | (m_Y & 0xff));
+	read_idle((m_DST << 16) | (m_Y & 0xff));
 	m_X = set_l(m_X, m_X + 1);
 	m_Y = set_l(m_Y, m_Y + 1);
 	m_A--;
@@ -873,8 +873,8 @@ mvn_w_dbf
 	m_DB = m_DST;
 	m_TMP2 = read((m_SRC << 16) | m_X);
 	write((m_DST << 16) | m_Y, m_TMP2);
-	read_pc_idle();
-	read_pc_idle();
+	read_idle((m_DST << 16) | m_Y);
+	read_idle((m_DST << 16) | m_Y);
 	m_X++;
 	m_Y++;
 	m_A--;
@@ -890,8 +890,8 @@ mvp_dbf
 	m_DB = m_DST;
 	m_TMP2 = read((m_SRC << 16) | (m_X & 0xff));
 	write((m_DST << 16) | (m_Y & 0xff), m_TMP2);
-	read_pc_idle();
-	read_pc_idle();
+	read_idle((m_DST << 16) | (m_Y & 0xff));
+	read_idle((m_DST << 16) | (m_Y & 0xff));
 	m_X = set_l(m_X, m_X - 1);
 	m_Y = set_l(m_Y, m_Y - 1);
 	m_A--;
@@ -907,8 +907,8 @@ mvp_w_dbf
 	m_DB = m_DST;
 	m_TMP2 = read((m_SRC << 16) | m_X);
 	write((m_DST << 16) | m_Y, m_TMP2);
-	read_pc_idle();
-	read_pc_idle();
+	read_idle((m_DST << 16) | m_Y);
+	read_idle((m_DST << 16) | m_Y);
 	m_X--;
 	m_Y--;
 	m_A--;

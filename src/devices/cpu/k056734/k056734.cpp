@@ -560,7 +560,7 @@ void k056734_device::execute_one(u32 op)
 
 			// register op local memory
 			case dasm::op4(0, 1, 0, 3): set_reg(ra, (a & ~mask) | alu(ALU_ADD, a, m_local.read_dword(local()), size)); break;
-			case dasm::op4(0, 1, 1, 3): alu(ALU_SUB, a, m_local.read_dword(local()), size); break;
+			case dasm::op4(0, 1, 1, 3): set_reg(ra, (a & ~mask) | alu(ALU_SUB, a, m_local.read_dword(local()), size)); break;
 			case dasm::op4(0, 1, 2, 3): set_reg(ra, (a & ~mask) | alu(ALU_AND, a, m_local.read_dword(local()), size)); break;
 			case dasm::op4(0, 1, 3, 3): set_reg(ra, (a & ~mask) | alu(ALU_XOR, a, m_local.read_dword(local()), size)); break;
 			case dasm::op4(2, 1, 1, 3): set_reg(ra, (a & ~mask) | alu(ALU_OR, a, m_local.read_dword(local()), size)); break;

@@ -21,6 +21,8 @@ public:
 	// device type constructor
 	ams40041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	auto lk_rd_callback() { return m_lk_cb.bind(); }
+
 	// screen update callback
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -49,7 +51,7 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_video_ram;
 	required_region_ptr<uint8_t> m_char_rom;
-	required_ioport m_lk;
+	devcb_read8 m_lk_cb;
 
 	// video state
 	int m_toggle;

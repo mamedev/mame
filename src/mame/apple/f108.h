@@ -34,23 +34,36 @@ public:
 		m_ncr1.lookup()->irq_handler_cb().set(m_primetimeii, FUNC(primetime_device::scsi_irq_w));
 		m_ncr1.lookup()->drq_handler_cb().set(m_primetimeii, FUNC(primetime_device::scsi_drq_w));
 	}
+	void set_scsi_clock(const XTAL &clock) { m_ncr1.lookup()->set_clock(clock); }
 	template <typename... T> void set_rom_tag(T &&... args) { m_rom.set_tag(std::forward<T>(args)...); }
 	void set_ram_info(u32 *ram, u32 size);
+	void set_scc_sync(bool sync) { m_scc_sync = sync; }
+	void set_ata_timing_clock(const XTAL &clock) { m_ata_timing_clock = clock.value(); }
+	void set_ata_bus_waits(const attotime &read, const attotime &write) { m_ata_read_wait = read; m_ata_write_wait = write; }
 
 	auto write_ata_irq() { return m_ata_irq.bind(); }
+
+	void overlay_off();
 
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	u32 rom_switch_r(offs_t offset);
 
 private:
+	void update_overlay();
 	void ata_irq_w(int state);
 	u8 ata_timing_r(offs_t offset);
 	void ata_timing_w(offs_t offset, u8 data);
+	void ata_wait(const attotime &bus_wait);
+	u16 ata_cs0_r(offs_t offset);
+	void ata_cs0_w(offs_t offset, u16 data);
+	u16 ata_cs1_r(offs_t offset);
+	void ata_cs1_w(offs_t offset, u16 data);
 	u32 ata_data_r(offs_t offset, u32 mem_mask);
 	void ata_data_w(offs_t offset, u32 data, u32 mem_mask);
 	u16 scc_r(offs_t offset);
@@ -68,7 +81,11 @@ private:
 	devcb_write_line m_ata_irq;
 
 	bool m_overlay;
+	bool m_scc_sync;
 	u8 m_ata_active, m_ata_recovery;
+	u32 m_ata_timing_clock;
+	attotime m_ata_read_wait, m_ata_write_wait;
+	attotime m_ata_ready;
 	u32 *m_ram_ptr, *m_rom_ptr;
 	u32 m_ram_size, m_rom_size;
 };

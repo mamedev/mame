@@ -546,7 +546,7 @@ bool cbm_iec_device::sample_ready(cpu_device &cpu)
 		attotime const cycle = exec->cycles_to_attotime(1);
 		if (!cycle.is_never())
 		{
-			ready = (exec->local_time() + (cycle / 2)) > time;
+			ready = (exec->local_time() + (cycle / 2)) >= time;
 			if (!ready && ((exec->local_time() + cycle) > time))
 				stalled = cycle;
 		}
@@ -616,6 +616,7 @@ int cbm_iec_device::get_signal(int signal, const attotime &time)
 #include "mps1000.h"
 #include "mps1200.h"
 #include "mps1224.h"
+#include "mps1230.h"
 #include "mps1270a.h"
 #include "mps2020.h"
 #include "mps801.h"
@@ -626,6 +627,7 @@ int cbm_iec_device::get_signal(int signal, const attotime &time)
 #include "rapidos.h"
 #include "sd2iec.h"
 #include "serialbox.h"
+#include "speeddos.h"
 #include "turbotrans.h"
 #include "vic1515.h"
 #include "vic1520.h"
@@ -642,6 +644,7 @@ void cbm_iec_devices(device_slot_interface &device)
 	device.option_add("c1541pd", C1541_PROFESSIONAL_DOS_V1);
 	device.option_add("c1541pdc", C1541_PROLOGIC_DOS_CLASSIC);
 	device.option_add("c1541rp", C1541_RAPIDOS_PROFESSIONAL);
+	device.option_add("c1541sd", C1541_SPEEDDOS);
 	device.option_add("c1541tt", C1541_TURBOTRANS);
 	device.option_add("c1570", C1570);
 	device.option_add("c1571", C1571);
@@ -681,6 +684,7 @@ void cbm_iec_printer_devices(device_slot_interface &device)
 	device.option_add("mps1000", MPS1000);
 	device.option_add("mps1200", MPS1200);
 	device.option_add("mps1224", MPS1224);
+	device.option_add("mps1230", MPS1230);
 	device.option_add("mps1250", MPS1250);
 	device.option_add("mps1270a", MPS1270A);
 	device.option_add("mps2020", MPS2020);

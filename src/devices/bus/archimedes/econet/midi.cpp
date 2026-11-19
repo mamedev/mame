@@ -98,7 +98,7 @@ void arc_serial_midi_device::device_add_mconfig(machine_config &config)
 {
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set("mdout", FUNC(midi_port_device::write_txd));
-	m_adlc->out_irq_cb().set(DEVICE_SELF_OWNER, FUNC(archimedes_econet_slot_device::efiq_w));
+	m_adlc->out_irq_cb().set(DEVICE_SELF_OWNER, FUNC(archimedes_econet_slot_device::efiq_w)).invert();
 
 	// FIXME: ADLC clock source unknown, rate of the old internal MC6854 timer used
 	clock_device &adlc_clock(CLOCK(config, "adlc_clock", 500'000));

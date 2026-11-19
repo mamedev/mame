@@ -201,6 +201,7 @@ void vrender0soc_device::device_start()
 	save_item(NAME(m_inten));
 	save_item(NAME(m_int_high));
 	save_item(NAME(m_intst));
+	save_item(NAME(m_int_accepted));
 
 	save_item(STRUCT_MEMBER(m_timer, control));
 	save_item(STRUCT_MEMBER(m_timer, count));
@@ -227,6 +228,7 @@ void vrender0soc_device::device_reset()
 
 	//m_FlipCount = 0;
 	m_int_high = 0;
+	m_int_accepted = false;
 
 	for (auto &dma : m_dma)
 	{
@@ -287,8 +289,8 @@ void vrender0soc_device::intvec_w(offs_t offset, u32 data, u32 mem_mask)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_intst &= ~(1 << (data & 0x1f));
-		if (!m_intst)
-			m_int_cb(CLEAR_LINE);
+		m_int_accepted = false;
+		m_int_cb(m_intst ? ASSERT_LINE : CLEAR_LINE);
 	}
 	if (ACCESSING_BITS_8_15)
 		m_int_high = (data >> 8) & 7;
@@ -304,8 +306,8 @@ void vrender0soc_device::inten_w(offs_t offset, u32 data, u32 mem_mask)
 	COMBINE_DATA(&m_inten);
 	// psattack has a timer 0 irq service with no call to intvec_w but just this
 	m_intst &= m_inten;
-	if (!m_intst)
-		m_int_cb(CLEAR_LINE);
+	m_int_accepted = false;
+	m_int_cb(m_intst ? ASSERT_LINE : CLEAR_LINE);
 }
 
 u32 vrender0soc_device::intst_r()
@@ -325,13 +327,19 @@ void vrender0soc_device::int_req(int num)
 	if (m_inten & (1 << num))
 	{
 		m_intst |= (1 << num);
-		m_int_cb(ASSERT_LINE);
+		if (!m_int_accepted)
+			m_int_cb(ASSERT_LINE);
 	}
 }
 
 
+// the CPU can accept the next interrupt request only after the latched one is cleared through
+// INTVEC: xfkddz enables the interrupts in its vblank service routine before doing it
 u8 vrender0soc_device::irq_callback()
 {
+	m_int_accepted = true;
+	m_int_cb(CLEAR_LINE);
+
 	// NOTE: the highest irq source would be b26
 	for (int i = 0; i < 32; ++i)
 	{

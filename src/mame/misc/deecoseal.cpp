@@ -7,15 +7,18 @@
 ***************************************************************************/
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i186.h"
 #include "cpu/mcs51/i80c51.h"
-#include "screen.h"
-#include "emupal.h"
-#include "video/upd7220.h"
-#include "bus/rs232/rs232.h"
-#include "machine/mc68681.h"
 #include "machine/i2cmem.h"
+#include "machine/mc68681.h"
 #include "machine/nvram.h"
+#include "video/upd7220.h"
+
+#include "emupal.h"
+#include "screen.h"
+
 
 namespace {
 
@@ -33,15 +36,19 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
-	void deecoseal(machine_config &config);
+	void deecoseal(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
 
 private:
-	virtual void machine_start() override ATTR_COLD;
-	void map(address_map &map);
-	void io(address_map &map);
-	void mcs51_map(address_map &map);
-	void crtc_map(address_map &map);
+	void map(address_map &map) ATTR_COLD;
+	void io(address_map &map) ATTR_COLD;
+	void mcs51_map(address_map &map) ATTR_COLD;
+	void crtc_map(address_map &map) ATTR_COLD;
+
 	UPD7220_DISPLAY_PIXELS_MEMBER(draw);
+	u16 port0_r();
 	u8 i2c_r();
 	void i2c_w(u8 data);
 
@@ -91,9 +98,9 @@ void deecoseal_state::map(address_map &map)
 
 void deecoseal_state::io(address_map &map)
 {
-	map(0x0000, 0x0001).lr16([this](){ m_port0 = !m_port0; return m_port0 ? 0x10 : 0; }, "port0");
-	map(0x0110, 0x011f).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write)).umask16(0x00ff);
-	map(0x0180, 0x0183).rw(m_crtc, FUNC(upd7220_device::read), FUNC(upd7220_device::write)).umask16(0x00ff);
+	map(0x0000, 0x0001).r(FUNC(deecoseal_state::port0_r));
+	map(0x0110, 0x011f).umask16(0x00ff).rw(m_duart, FUNC(scn2681_device::read), FUNC(scn2681_device::write));
+	map(0x0180, 0x0183).umask16(0x00ff).rw(m_crtc, FUNC(upd7220_device::read), FUNC(upd7220_device::write));
 	map(0x0200, 0x0200).rw(FUNC(deecoseal_state::i2c_r), FUNC(deecoseal_state::i2c_w));
 }
 
@@ -114,6 +121,14 @@ UPD7220_DISPLAY_PIXELS_MEMBER( deecoseal_state::draw )
 
 	for(u16  i = 0; i < 16; i++)
 		bitmap.pix(y, x + i) = pen[BIT(gfx, i)];
+}
+
+u16 deecoseal_state::port0_r()
+{
+	u16 result = m_port0 ? 0 : 0x10;
+	if (!machine().side_effects_disabled())
+		m_port0 = !m_port0;
+	return result;
 }
 
 u8 deecoseal_state::i2c_r()

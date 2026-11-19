@@ -94,78 +94,78 @@
 #include "emu.h"
 #include "pgm2.h"
 
+#include "igs036crypt.h"
 
-// checked on startup, or doesn't boot
-u32 pgm2_state::unk_startup_r()
-{
-	logerror("%s: unk_startup_r\n", machine().describe_context().c_str());
-	return 0x00000180;
-}
+#include "sound/ymz770.h"
 
-u32 pgm2_state::rtc_r()
-{
-	// write to FFFFFD20 if bit 18 set (0x40000) probably reset this RTC timer
-	// TODO: somehow hook here current time/date, which is a bit complicated because value is relative, later to it added "base time" stored in SRAM
-	return machine().time().seconds();
-}
+#include "speaker.h"
 
-u8 pgm2_state::encryption_r(offs_t offset)
-{
-	return m_encryption_table[offset];
-}
+#include "endianness.h"
 
-void pgm2_state::encryption_w(offs_t offset, u8 data)
-{
-	m_encryption_table[offset] = data;
-}
+#include <algorithm>
+#include <iterator>
+#include <vector>
 
 void pgm2_state::sprite_encryption_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_spritekey);
 
-	if (!m_sprite_predecrypted)
-		m_realspritekey = bitswap<32>(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
+	m_realspritekey = bitswap<32>(m_spritekey ^ 0x90055555, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31);
 }
 
-void pgm2_state::device_post_load()
+
+void pgm2_state::restore_decrypted_rom(offs_t word_offset)
 {
-	// make sure the encrypted area is in the correct state after we load a savestate because we don't want to have to save the whole rom.
+	if (m_maincpu->get_has_decrypted())
+	{
+		igs036_decryptor decrypter(m_maincpu->get_encryption_table());
+		auto const rom = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(m_mainrom->base()));
+		for (u32 i = 0; i < m_mainrom->bytes() / 2; ++i)
+			rom[i] = decrypter.decrypt(rom[i], i + word_offset);
+	}
+}
 
-	memcpy(m_mainrom->base(), &m_encrypted_copy[0], m_mainrom->bytes());
 
+void pgm2_state::restore_decrypted_state()
+{
+	std::copy_n(m_encrypted_copy.get(), m_mainrom->bytes(), m_mainrom->base());
+	restore_decrypted_rom(0);
+}
+
+void kov3_state::restore_decrypted_state()
+{
+	std::copy_n(m_encrypted_copy.get(), m_mainrom->bytes(), m_mainrom->base());
 	if (m_has_decrypted_kov3_module)
 	{
 		decrypt_kov3_module(module_key->addr_xor, module_key->data_xor);
 	}
-
-	if (m_has_decrypted)
-	{
-		igs036_decryptor decrypter(m_encryption_table);
-
-		if (m_romboard_ram)
-		{
-			decrypter.decrypter_rom((u16*)m_mainrom->base(), m_mainrom->bytes(), m_romboard_ram.bytes());
-		}
-		else
-		{
-			decrypter.decrypter_rom((u16*)m_mainrom->base(), m_mainrom->bytes(), 0);
-		}
-	}
+	restore_decrypted_rom(0);
 }
 
-void pgm2_state::encryption_do_w(u32 data)
+void ddpdojt_state::restore_decrypted_state()
 {
-	igs036_decryptor decrypter(m_encryption_table);
-	if (m_romboard_ram)
+	std::copy_n(m_encrypted_copy.get(), m_mainrom->bytes(), m_mainrom->base());
+
+	if (m_maincpu->get_has_decrypted())
 	{
-		decrypter.decrypter_rom((u16*)&m_romboard_ram[0], m_romboard_ram.bytes(), 0);
-		decrypter.decrypter_rom((u16*)m_mainrom->base(), m_mainrom->bytes(), m_romboard_ram.bytes());   // assume the rom at 0x0200000 also gets decrypted as if it was at 0x0200000 even if it isn't used (the game has already copied it to RAM where it properly decrypted)
+		for (u32 i = 0; i < m_romboard_ram.length(); ++i)
+			m_decrypted_ram_copy[i] = decrypt_ram_word(i);
 	}
 	else
-	{
-		decrypter.decrypter_rom((u16*)m_mainrom->base(), m_mainrom->bytes(), 0);
-	}
-	m_has_decrypted = true;
+		std::copy_n(&m_romboard_ram[0], m_romboard_ram.length(), m_decrypted_ram_copy.get());
+
+	restore_decrypted_rom(m_romboard_ram.bytes() / 2);
+}
+
+void pgm2_state::device_post_load()
+{
+	// Rebuild the decrypted views from the saved key and ciphertext.
+	restore_decrypted_state();
+}
+
+void pgm2_state::decrypt(int state)
+{
+	restore_decrypted_state();
 }
 
 
@@ -186,7 +186,7 @@ void pgm2_state::shareram_w(offs_t offset, u8 data)
 
 TIMER_DEVICE_CALLBACK_MEMBER(pgm2_state::mcu_interrupt)
 {
-	m_arm_aic->set_irq(3, ASSERT_LINE);
+	m_maincpu->set_aic_irq(3, ASSERT_LINE);
 }
 
 // "MPU" MCU HLE starts here
@@ -348,13 +348,13 @@ void pgm2_state::mcu_w(offs_t offset, u32 data, u32 mem_mask)
 	if (reg == 5 && m_mcu_regs[5]) // ack to mcu (written at the end of irq handler routine)
 	{
 		mcu_command(false);
-		m_arm_aic->set_irq(3, CLEAR_LINE);
+		m_maincpu->set_aic_irq(3, CLEAR_LINE);
 	}
 }
 
 void pgm2_state::vbl_ack_w(u16 data)
 {
-	m_arm_aic->set_irq(12, CLEAR_LINE);
+	m_maincpu->set_aic_irq(12, CLEAR_LINE);
 }
 
 void pgm2_state::unk30120014_w(offs_t offset, u16 data)
@@ -394,15 +394,15 @@ void pgm2_state::unk30120014_w(offs_t offset, u16 data)
  or security chip just waiting to be be written magic value at specific address in ROM area, and if this happen enable descrambling using hardcoded values.
  */
 
-int pgm2_state::module_data_r()
+int kov3_state::module_data_r()
 {
 	return module_out_latch ? ASSERT_LINE : CLEAR_LINE;
 }
-void pgm2_state::module_data_w(int state)
+void kov3_state::module_data_w(int state)
 {
 	module_in_latch = (state == ASSERT_LINE) ? 1 : 0;
 }
-void pgm2_state::module_clk_w(int state)
+void kov3_state::module_clk_w(int state)
 {
 	if (module_prev_state != state && state == CLEAR_LINE)
 	{
@@ -449,27 +449,31 @@ void pgm2_state::module_clk_w(int state)
 	module_prev_state = state;
 }
 
-u16 pgm2_state::module_rom_r(offs_t offset)
+u16 kov3_state::module_rom_r(offs_t offset)
 {
 	if (module_sum_read && offset > 0 && offset < 5) // checksum read mode
 	{
-		if (offset == 4)
+		if (offset == 4 && !machine().side_effects_disabled())
 			module_sum_read = false;
 		u32 const offs = ((offset - 1) * 2) ^ 2;
 		return (module_key->sum[offs] ^ module_key->key[offs]) | ((module_key->sum[offs + 1] ^ module_key->key[offs + 1]) << 8);
 	}
 
-	return ((u16 *)m_mainrom->base())[offset];
+	return util::little_endian_cast<u16>(reinterpret_cast<u32 *>(m_mainrom->base()))[offset];
 }
 
-void pgm2_state::module_rom_w(offs_t offset, u16 data)
+void kov3_state::module_rom_w(offs_t offset, u16 data)
 {
 	//logerror("module write %04X at %08X\n", data, offset);
 	u32 const dec_val = ((module_key->key[0] | (module_key->key[1] << 8) | (module_key->key[2] << 16)) >> 6) & 0xffff;
 	if (data == dec_val)
 	{
 		// might be wrong and normal data access enabled only after whole sequence complete
-		decrypt_kov3_module(module_key->addr_xor, module_key->data_xor);
+		if (!m_has_decrypted_kov3_module)
+		{
+			m_has_decrypted_kov3_module = true;
+			restore_decrypted_state();
+		}
 	}
 	else
 		switch (data)
@@ -491,29 +495,19 @@ void pgm2_state::module_rom_w(offs_t offset, u16 data)
 }
 
 // very primitive Atmel ARM PIO simulation, should be improved and devicified
-void pgm2_state::pio_sodr_w(offs_t offset, u32 data, u32 mem_mask)
+void kov3_state::module_ctrl_w(u32 data)
 {
-	m_pio_out_data |= data & mem_mask;
-	module_data_w((m_pio_out_data & 0x100) ? ASSERT_LINE : CLEAR_LINE);
-	module_clk_w((m_pio_out_data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
+	module_data_w((data & 0x100) ? ASSERT_LINE : CLEAR_LINE);
+	module_clk_w((data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
 }
-void pgm2_state::pio_codr_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	m_pio_out_data &= ~(data & mem_mask);
-	module_data_w((m_pio_out_data & 0x100) ? ASSERT_LINE : CLEAR_LINE);
-	module_clk_w((m_pio_out_data & 0x200) ? ASSERT_LINE : CLEAR_LINE);
-}
-u32 pgm2_state::pio_pdsr_r()
+
+u32 kov3_state::module_ctrl_r()
 {
 	return (module_data_r() == ASSERT_LINE ? 1 : 0) << 8; // fpga data read and status (bit 7, must be 0)
 }
 
 void pgm2_state::pgm2_map(address_map &map)
 {
-	map(0x00000000, 0x00003fff).rom(); //.region("mainrom", 0x00000); // internal ROM
-
-	map(0x02000000, 0x0200ffff).ram().share("sram"); // 'battery RAM' (in CPU?)
-
 	map(0x03600000, 0x036bffff).rw(FUNC(pgm2_state::mcu_r), FUNC(pgm2_state::mcu_w));
 
 	map(0x03900000, 0x03900003).portr("INPUTS0");
@@ -552,23 +546,6 @@ void pgm2_state::pgm2_map(address_map &map)
 	// there are other 0x301200xx regs
 
 	map(0x40000000, 0x40000003).r("ymz774", FUNC(ymz774_device::read)).w("ymz774", FUNC(ymz774_device::write));
-
-	// internal IGS036 - most of them is standard ATMEL peripherals followed by custom bits
-	// map(0xfffa0000, 0xfffa00ff) TC (Timer Counter) not used, mentioned in disabled / unused code
-	// map(0xffffec00, 0xffffec7f) SMC (Static Memory Controller)
-	// map(0xffffee00, 0xffffee57) MATRIX (Bus Matrix)
-	map(0xfffff000, 0xfffff14b).m(m_arm_aic, FUNC(arm_aic_device::regs_map));
-	// map(0xfffff200, 0xfffff247) DBGU (Debug Unit)
-	// map(0xfffff400, 0xfffff4af) PIO (Parallel Input Output Controller)
-	map(0xfffff430, 0xfffff437).nopw(); // often
-	// map(0xfffffd00, 0xfffffd0b) RSTC (Reset Controller)
-	// map(0xfffffd20, 0xfffffd2f) RTTC (Real Time Timer)
-	map(0xfffffd28, 0xfffffd2b).r(FUNC(pgm2_state::rtc_r));
-	// map(0xfffffd40, 0xfffffd4b) WDTC (Watch Dog Timer)
-	// custom IGS036 stuff starts here
-	map(0xfffffa08, 0xfffffa0b).w(FUNC(pgm2_state::encryption_do_w)); // after uploading encryption? table might actually send it or enable external ROM? when read bits0-1 called FUSE 0 and 1, must be 0
-	map(0xfffffa0c, 0xfffffa0f).r(FUNC(pgm2_state::unk_startup_r)); // written 0, then 0x1c, then expected to return (result&0x180)==0x180, then written 0x7c
-	map(0xfffffc00, 0xfffffcff).rw(FUNC(pgm2_state::encryption_r), FUNC(pgm2_state::encryption_w));
 }
 
 
@@ -578,21 +555,39 @@ void pgm2_state::pgm2_rom_map(address_map &map)
 	map(0x10000000, 0x10ffffff).rom().region("mainrom", 0); // external ROM
 }
 
-void pgm2_state::pgm2_ram_rom_map(address_map &map)
+u32 ddpdojt_state::romboard_ram_r(offs_t offset)
+{
+	return m_decrypted_ram_copy[offset];
+}
+
+void ddpdojt_state::romboard_ram_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	COMBINE_DATA(&m_romboard_ram[offset]);
+
+	// Decrypt the merged word: each cipher halfword can mix bits from both bytes.
+	m_decrypted_ram_copy[offset] = m_maincpu->get_has_decrypted() ? decrypt_ram_word(offset) : m_romboard_ram[offset];
+}
+
+u32 ddpdojt_state::decrypt_ram_word(offs_t offset) const
+{
+	igs036_decryptor const decrypter(m_maincpu->get_encryption_table());
+	u32 const data = m_romboard_ram[offset];
+	return u32(decrypter.decrypt(u16(data), offset * 2))
+			| (u32(decrypter.decrypt(u16(data >> 16), offset * 2 + 1)) << 16);
+}
+
+void ddpdojt_state::pgm2_ram_rom_map(address_map &map)
 {
 	pgm2_map(map);
-	map(0x10000000, 0x101fffff).ram().share("romboard_ram"); // we should also probably decrypt writes once the encryption is enabled, but the game never writes with it turned on anyway
+	map(0x10000000, 0x101fffff).ram().rw(FUNC(ddpdojt_state::romboard_ram_r), FUNC(ddpdojt_state::romboard_ram_w)).share(m_romboard_ram);
 	map(0x10200000, 0x103fffff).rom().region("mainrom", 0); // external ROM
 }
 
-void pgm2_state::pgm2_module_rom_map(address_map &map)
+void kov3_state::pgm2_module_rom_map(address_map &map)
 {
 	pgm2_rom_map(map);
-	map(0x10000000, 0x107fffff).w(FUNC(pgm2_state::module_rom_w));
-	map(0x10000000, 0x1000000f).r(FUNC(pgm2_state::module_rom_r));
-	map(0xfffff430, 0xfffff433).w(FUNC(pgm2_state::pio_sodr_w));
-	map(0xfffff434, 0xfffff437).w(FUNC(pgm2_state::pio_codr_w));
-	map(0xfffff43c, 0xfffff43f).r(FUNC(pgm2_state::pio_pdsr_r));
+	map(0x10000000, 0x107fffff).w(FUNC(kov3_state::module_rom_w));
+	map(0x10000000, 0x1000000f).r(FUNC(kov3_state::module_rom_r));
 }
 
 static INPUT_PORTS_START( pgm2 )
@@ -680,19 +675,11 @@ static INPUT_PORTS_START( pgm2 )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-
-void pgm2_state::irq(int state)
-{
-//  logerror("irq\n");
-	if (state == ASSERT_LINE) m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, ASSERT_LINE);
-	else m_maincpu->set_input_line(arm7_cpu_device::ARM7_IRQ_LINE, CLEAR_LINE);
-}
-
 void pgm2_state::machine_start()
 {
-	save_item(NAME(m_encryption_table));
-	save_item(NAME(m_has_decrypted));
-	save_item(NAME(m_has_decrypted_kov3_module));
+	m_encrypted_copy = std::make_unique<u8 []>(m_mainrom->bytes());
+	std::copy_n(m_mainrom->base(), m_mainrom->bytes(), m_encrypted_copy.get());
+
 	save_item(NAME(m_spritekey));
 	save_item(NAME(m_realspritekey));
 	save_item(NAME(m_mcu_regs));
@@ -701,7 +688,12 @@ void pgm2_state::machine_start()
 	save_item(NAME(m_mcu_last_cmd));
 	save_item(NAME(m_shareram));
 	save_item(NAME(m_share_bank));
-	save_item(NAME(m_pio_out_data));
+}
+
+void kov3_state::machine_start()
+{
+	pgm2_state::machine_start();
+	save_item(NAME(m_has_decrypted_kov3_module));
 	save_item(NAME(module_in_latch));
 	save_item(NAME(module_sum_read));
 	save_item(NAME(module_out_latch));
@@ -719,15 +711,32 @@ void pgm2_state::machine_reset()
 	m_share_bank = 0;
 
 	// as the decryption is dynamic controlled by the program, restore the encrypted copy
-	memcpy(m_mainrom->base(), &m_encrypted_copy[0], m_mainrom->bytes());
+	std::copy_n(m_encrypted_copy.get(), m_mainrom->bytes(), m_mainrom->base());
+}
 
-	m_has_decrypted = false;
+void ddpdojt_state::machine_start()
+{
+	pgm2_state::machine_start();
+	m_decrypted_ram_copy = std::make_unique<u32 []>(m_romboard_ram.length());
+}
+
+void ddpdojt_state::machine_reset()
+{
+	pgm2_state::machine_reset();
+	std::copy_n(&m_romboard_ram[0], m_romboard_ram.length(), m_decrypted_ram_copy.get());
+}
+
+void kov3_state::machine_reset()
+{
 	m_has_decrypted_kov3_module = false;
-
-	m_pio_out_data = 0;
 	module_prev_state = 0;
 	module_sum_read = false;
 	module_clk_cnt = 151; // this needed because of "false" clock pulse happen during gpio init
+	module_in_latch = 0;
+	module_out_latch = 0;
+	std::fill(std::begin(module_rcv_buf), std::end(module_rcv_buf), 0);
+	std::fill(std::begin(module_send_buf), std::end(module_send_buf), 0);
+	pgm2_state::machine_reset();
 }
 
 static const gfx_layout tiles32x32x8_layout =
@@ -754,10 +763,9 @@ void pgm2_state::pgm2(machine_config &config)
 	// basic machine hardware
 	IGS036(config, m_maincpu, 100000000); // Unknown clock / divider
 	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_rom_map);
+	m_maincpu->set_do_decrypt().set(FUNC(pgm2_state::decrypt));
 
 	TIMER(config, m_mcu_timer).configure_generic(FUNC(pgm2_state::mcu_interrupt));
-
-	ARM_AIC(config, m_arm_aic).irq_callback().set(FUNC(pgm2_state::irq));
 
 	// video hardware
 	SCREEN(config, m_screen);
@@ -774,8 +782,6 @@ void pgm2_state::pgm2(machine_config &config)
 	PALETTE(config, m_sp_palette).set_format(palette_device::xRGB_888, 0x4000 / 4); // sprites
 	PALETTE(config, m_tx_palette).set_format(palette_device::xRGB_888, 0x800 / 4); // text
 	PALETTE(config, m_bg_palette).set_format(palette_device::xRGB_888, 0x2000 / 4); // bg
-
-	NVRAM(config, "sram", nvram_device::DEFAULT_ALL_0);
 
 	SPEAKER(config, "speaker", 2).front();
 
@@ -797,17 +803,20 @@ void pgm2_state::pgm2_lores(machine_config &config)
 	m_screen->set_visarea(0, 320-1, 0, 240-1);
 }
 
-void pgm2_state::pgm2_hires(machine_config &config)
+void kov3_state::pgm2_hires(machine_config &config)
 {
 	pgm2(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_module_rom_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &kov3_state::pgm2_module_rom_map);
+	m_maincpu->set_gpio_r().set(FUNC(kov3_state::module_ctrl_r));
+	m_maincpu->set_gpio_w().set(FUNC(kov3_state::module_ctrl_w));
+
 	m_screen->set_visarea(0, 512-1, 0, 240-1);
 }
 
-void pgm2_state::pgm2_ramrom(machine_config &config)
+void ddpdojt_state::pgm2_ramrom(machine_config &config)
 {
 	pgm2(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &pgm2_state::pgm2_ram_rom_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &ddpdojt_state::pgm2_ram_rom_map);
 }
 
 /* using macros for the video / sound roms because the locations never change between sets, and
@@ -835,7 +844,7 @@ void pgm2_state::pgm2_ramrom(machine_config &config)
 	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "ig-a_sp.u2",  0x00000000, 0x1000000, CRC(8250688c) SHA1(d2488477afc528aeee96826065deba2bce4f0a7d) ) \
 	\
-	ROM_REGION( 0x10000, "sram", 0 ) \
+	ROM_REGION( 0x10000, "maincpu:sram", 0 ) \
 	ROM_LOAD( "xyj2_nvram",            0x00000000, 0x10000, CRC(ccccc71c) SHA1(585b5ccbf89dd28d8532da785d7c8af12f31c6d6) )
 
 /*
@@ -957,7 +966,7 @@ ROM_END
 	ROM_REGION( 0x2000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "ig-a3_sp.u37",            0x00000000, 0x2000000, CRC(45cdf422) SHA1(8005d284bcee73cff37a147fcd1c3e9f039a7203) ) \
 	\
-	ROM_REGION(0x10000, "sram", 0) \
+	ROM_REGION(0x10000, "maincpu:sram", 0) \
 	ROM_LOAD("gsyx_nvram", 0x00000000, 0x10000, CRC(22400c16) SHA1(f775a16299c30f2ce23d683161b910e06eff37c1) )
 
 #define KOV2NL_PROGRAM_302(prefix, extension) \
@@ -1059,7 +1068,7 @@ ROM_END
 	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "ddpdoj_wave0.u12",        0x00000000, 0x1000000, CRC(2b71a324) SHA1(f69076cc561f40ca564d804bc7bd455066f8d77c) ) \
 	\
-	ROM_REGION( 0x10000, "sram", 0 ) \
+	ROM_REGION( 0x10000, "maincpu:sram", 0 ) \
 	ROM_LOAD( "ddpdojt_sram",            0x00000000, 0x10000, CRC(af99e304) SHA1(e44fed22b902431298748eca84533f8685926afd) )
 
 ROM_START( ddpdojt )
@@ -1100,7 +1109,7 @@ ROM_END
 	ROM_REGION( 0x4000000, "ymz774", ROMREGION_ERASEFF ) /* ymz774 */ \
 	ROM_LOAD16_WORD_SWAP( "kov3_wave0.u13",              0x00000000, 0x4000000, CRC(aa639152) SHA1(2314c6bd05524525a31a2a4668a36a938b924ba4) ) \
 	\
-	ROM_REGION( 0x10000, "sram", 0 ) \
+	ROM_REGION( 0x10000, "maincpu:sram", 0 ) \
 	ROM_LOAD( "kov3_sram",            0x00000000, 0x10000, CRC(d9608102) SHA1(dec5631642393f4ec76912c81fd60249bb45aa13) )
 
 #define KOV3_INTERNAL_CHINA \
@@ -1179,7 +1188,7 @@ all others:         SPANSION S99-50070
 	ROM_LOAD16_WORD_SWAP( "ig-d3_wave0.u12",        0x00000000, 0x4000000, CRC(edf2332d) SHA1(7e01c7e03e515814d7de117c265c3668d32842fa) ) \
 	ROM_LOAD16_WORD_SWAP( "ig-d3_wave1.u11",        0x04000000, 0x4000000, CRC(62321b20) SHA1(a388c8a2489430fbe92fb26b3ef81c66ce97f318) ) \
 	\
-	ROM_REGION( 0x10000, "sram", 0 ) \
+	ROM_REGION( 0x10000, "maincpu:sram", 0 ) \
 	ROM_LOAD( "kof98umh_sram",            0x00000000, 0x10000, CRC(60460ed9) SHA1(55cd8de37cee04ff7ad940fb52f8fb8db042c26e) )
 
 
@@ -1218,7 +1227,7 @@ ROM_START( bubucar )
 	ROM_REGION( 0x1000000, "ymz774", ROMREGION_ERASEFF ) // YMZ774
 	ROM_LOAD16_WORD_SWAP( "jg_wave.u18",          0x0000000, 0x1000000, CRC(8ba99c0c) SHA1(5a7cccfae47eee5c9ea4c172f5126d514156f771) ) // K8Q2815UQB
 
-	ROM_REGION( 0x10000, "sram", 0 )
+	ROM_REGION( 0x10000, "maincpu:sram", 0 )
 	ROM_LOAD( "bubucar_en_sram",                  0x0000000, 0x0010000, NO_DUMP )
 
 	ROM_REGION( 0x603, "cpld", 0 )
@@ -1290,237 +1299,70 @@ static void sprite_colour_decode(u16* rom, int len)
 	}
 }
 
-u32 pgm2_state::orleg2_speedup_r()
-{
-	u32 const pc = m_maincpu->pc();
-	if ((pc == 0x1002faec) || (pc == 0x1002f9b8))
-	{
-		if ((m_mainram[0x20114 / 4] == 0x00) && (m_mainram[0x20118 / 4] == 0x00))
-			m_maincpu->spin_until_interrupt();
-	}
-	/*else
-	{
-	    logerror("pc is %08x\n", pc);
-	}*/
-
-	return m_mainram[0x20114 / 4];
-}
-
-u32 pgm2_state::kov2nl_speedup_r()
-{
-	u32 const pc = m_maincpu->pc();
-
-	if ((pc == 0x10053a94) || (pc == 0x1005332c) || (pc == 0x1005327c))
-	{
-		if ((m_mainram[0x20470 / 4] == 0x00) && (m_mainram[0x20474 / 4] == 0x00))
-			m_maincpu->spin_until_interrupt();
-	}
-	/*
-	else
-	{
-	    logerror("pc is %08x\n", pc);
-	}
-	*/
-
-	return m_mainram[0x20470 / 4];
-}
-
-u32 pgm2_state::kof98umh_speedup_r()
-{
-	u32 const pc = m_maincpu->pc();
-
-	if (pc == 0x100028f6)
-	{
-		if ((m_mainram[0x00060 / 4] == 0x00) && (m_mainram[0x00064 / 4] == 0x00))
-			m_maincpu->spin_until_interrupt();
-	}
-	/*
-	else
-	{
-	    logerror("pc is %08x\n", pc);
-	}
-	*/
-
-	return m_mainram[0x00060 / 4];
-}
-
-u32 pgm2_state::kov3_speedup_r()
-{
-	u32 const pc = m_maincpu->pc();
-
-	if ((pc == 0x1000729a) || (pc == 0x1000729e))
-	{
-		if ((m_mainram[0x000b4 / 4] == 0x00) && (m_mainram[0x000b8 / 4] == 0x00))
-			m_maincpu->spin_until_interrupt();
-	}
-	/*
-	else
-	{
-	    logerror("pc is %08x\n", pc);
-	}
-	*/
-
-	return m_mainram[0x000b4 / 4];
-}
-
-
-
-
-u32 pgm2_state::ddpdojt_speedup_r()
-{
-	u32 const pc = m_maincpu->pc();
-
-	if (pc == 0x10001a7e)
-	{
-		if ((m_mainram[0x00060 / 4] == 0x00) && (m_mainram[0x00064 / 4] == 0x00))
-			m_maincpu->spin_until_interrupt();
-	}
-	/*
-	else
-	{
-	    logerror("pc is %08x\n", pc);
-	}
-	*/
-
-	return m_mainram[0x00060 / 4];
-}
-
-u32 pgm2_state::ddpdojt_speedup2_r()
-{
-	u32 const pc = m_maincpu->pc();
-
-	if (pc == 0x1008fefe || pc == 0x1008fbe8)
-	{
-		if ((m_mainram[0x21e04 / 4] & 0x00ff0000) != 0) // not sure if this endian safe ?
-			m_maincpu->spin_until_interrupt();
-	}
-	/*
-	else
-	{
-	    logerror("pc is %08x\n", pc);
-	}
-	*/
-
-	return m_mainram[0x21e04 / 4];
-}
-
-
 // for games with the internal ROMs fully dumped that provide the sprite key and program rom key at runtime
-void pgm2_state::common_encryption_init()
+void pgm2_state::common_init()
 {
-	// store off a copy of the encrypted rom so we can restore it later when needed
-	m_encrypted_copy.resize(m_mainrom->bytes());
-	memcpy(&m_encrypted_copy[0], m_mainrom->base(), m_mainrom->bytes());
-
 	u16 *src = (u16 *)memregion("sprites_mask")->base();
 
 	iga_u12_decode(src, memregion("sprites_mask")->bytes(), 0x0000);
 	iga_u16_decode(src, memregion("sprites_mask")->bytes(), 0x0000);
-	m_sprite_predecrypted = false;
 
 	src = (u16 *)memregion("sprites_colour")->base();
 	sprite_colour_decode(src, memregion("sprites_colour")->bytes());
-
-	m_has_decrypted = false;
-}
-
-void pgm2_state::init_orleg2()
-{
-	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32smo_delegate(*this, FUNC(pgm2_state::orleg2_speedup_r)));
-}
-
-void pgm2_state::init_kov2nl()
-{
-	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020470, 0x20020473, read32smo_delegate(*this, FUNC(pgm2_state::kov2nl_speedup_r)));
-}
-
-void pgm2_state::init_ddpdojt()
-{
-	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32smo_delegate(*this, FUNC(pgm2_state::ddpdojt_speedup_r)));
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20021e04, 0x20021e07, read32smo_delegate(*this, FUNC(pgm2_state::ddpdojt_speedup2_r)));
 }
 
 // currently we don't know how to derive address/data xor values from real keys, so we need both
 
-void pgm2_state::init_kov3()
+void kov3_state::decrypt_kov3_module(u32 addrxor, u16 dataxor)
 {
-	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x200000b4, 0x200000b7, read32smo_delegate(*this, FUNC(pgm2_state::kov3_speedup_r)));
+	auto const rom = util::little_endian_cast<u16>(reinterpret_cast<u32 *>(m_mainrom->base()));
+	u32 const words = m_mainrom->bytes() / 2;
+	std::vector<u16> buffer(words);
+	for (u32 i = 0; i < words; ++i)
+		buffer[i] = rom[i ^ addrxor] ^ dataxor;
+	for (u32 i = 0; i < words; ++i)
+		rom[i] = buffer[i];
 }
 
-void pgm2_state::decrypt_kov3_module(u32 addrxor, u16 dataxor)
-{
-	u16 *src = (u16 *)m_mainrom->base();
-	u32 size = m_mainrom->bytes();
-
-	std::vector<u16> buffer(size/2);
-
-	for (int i = 0; i < size/2; i++)
-		buffer[i] = src[i^addrxor]^dataxor;
-
-	memcpy(src, &buffer[0], size);
-
-	m_has_decrypted_kov3_module = true;
-}
-
-void pgm2_state::init_kov3_104()
+void kov3_state::init_kov3_104()
 {
 	static const kov3_module_key kov3_104_key = {
 			{ 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 },
 			{ 0xeb,0x7d,0x8d,0x90,0x2c,0xf4,0x09,0x82 },
 			0x18ec71, 0xb89d }; // fake zero-key
 	module_key = &kov3_104_key;
-	init_kov3();
+	common_init();
 }
 
-void pgm2_state::init_kov3_102()
+void kov3_state::init_kov3_102()
 {
 	static const kov3_module_key kov3_102_key = {
 			{ 0x49,0xac,0xb0,0xec,0x47,0x49,0x95,0x38 },
 			{ 0x09,0xbd,0xf1,0x31,0xe6,0xf0,0x65,0x2b },
 			0x021d37, 0x81d0 };
 	module_key = &kov3_102_key;
-	init_kov3();
+	common_init();
 }
 
-void pgm2_state::init_kov3_101()
+void kov3_state::init_kov3_101()
 {
 	static const kov3_module_key kov3_101_key = {
 			{ 0xc1,0x2c,0xc1,0xe5,0x3c,0xc1,0x59,0x9e },
 			{ 0xf2,0xb2,0xf0,0x89,0x37,0xf2,0xc7,0x0b },
 			0, 0xffff }; // real xor values is unknown
 	module_key = &kov3_101_key;
-	init_kov3();
+	common_init();
 }
 
-void pgm2_state::init_kov3_100()
+void kov3_state::init_kov3_100()
 {
 	static const kov3_module_key kov3_100_key = {
 			{ 0x40,0xac,0x30,0x00,0x47,0x49,0x00,0x00 },
 			{ 0x96,0xf0,0x91,0xe1,0xb3,0xf1,0xef,0x90 },
 			0x3e8aa8, 0xc530 }; // fake zero-key
 	module_key = &kov3_100_key;
-	init_kov3();
+	common_init();
 }
-
-void pgm2_state::init_kof98umh()
-{
-	common_encryption_init();
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0x20000060, 0x20000063, read32smo_delegate(*this, FUNC(pgm2_state::kof98umh_speedup_r)));
-}
-
-void pgm2_state::init_bubucar()
-{
-	common_encryption_init();
-	// m_maincpu->space(AS_PROGRAM).install_read_handler(0x20020114, 0x20020117, read32smo_delegate(*this, FUNC(pgm2_state::bubucar_speedup_r))); TODO: once this is fully dumped and decrypted
-}
-
-
-
-
 
 // PGM2
 
@@ -1530,45 +1372,45 @@ void pgm2_state::init_bubucar()
 // Oriental Legend 2 - should be a V102 and V100 too
 //西游释厄传2/Xīyóu shì è zhuàn 2 (China; Simplified Chinese)
 //西遊釋厄傳2/Saiyū Shakuyakuden 2 (Japan; Traditional Chinese - Taiwan(undumped) too?)
-GAME( 2007, orleg2,       0,      pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) // Overseas sets of OL2 do not use the card reader
-GAME( 2007, orleg2_103,   orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101,   orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2,       0,      pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Oriental Legend 2 (V104, Oversea)", MACHINE_SUPPORTS_SAVE ) // Overseas sets of OL2 do not use the card reader
+GAME( 2007, orleg2_103,   orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Oriental Legend 2 (V103, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101,   orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Oriental Legend 2 (V101, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_103cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101cn, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_104cn, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V104, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103cn, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V103, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101cn, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Xiyou Shi E Zhuan 2 (V101, China)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2007, orleg2_104jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_103jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2007, orleg2_101jp, orleg2, pgm2,        pgm2, pgm2_state, init_orleg2,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V101, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_104jp, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V104, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_103jp, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V103, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2007, orleg2_101jp, orleg2, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Alta license)", "Saiyuu Shakuyakuden 2 (V101, Japan)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 2 New Legend
 //三國戰紀2橫掃千軍 New Legend/Sānguó Zhàn Jì 2 Héngsǎo Qiān Jūn  New Legend (Oversea; Mixed Traditional and Simplified Chinese)
 //三國戰紀2盖世英雄/Sānguó Zhàn Jì 2 Gàishì Yīngxióng (China; Mixed Traditional and Simplified Chinese)
 //三國戰紀2乱世英雄/Sangoku-Senki 2 Ranse Eiyū (Japan; Mixed Traditional and Simplified Chinese - Undumped)
-GAME( 2008, kov2nl,       0,      pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V302, Oversea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_301,   kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V301, Oversea)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_300,   kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V300, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl,       0,      pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V302, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_301,   kov2nl, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V301, Oversea)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_300,   kov2nl, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS", "Knights of Valour 2 New Legend / Sanguo Zhan Ji 2 Hengsao Qian Jun (V300, Oversea)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2008, kov2nl_302cn, kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V302, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_301cn, kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V301, China)", MACHINE_SUPPORTS_SAVE )
-GAME( 2008, kov2nl_300cn, kov2nl, pgm2,        pgm2, pgm2_state, init_kov2nl,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V300, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_302cn, kov2nl, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V302, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_301cn, kov2nl, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V301, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2008, kov2nl_300cn, kov2nl, pgm2,        pgm2, pgm2_state, common_init,   ROT0, "IGS (Huatong license)", "Sanguo Zhan Ji 2 Gaishi Yingxiong (V300, China)", MACHINE_SUPPORTS_SAVE )
 
 
 // Dodonpachi Daioujou Tamashii - should be a V200 too
-GAME( 2010, ddpdojt,      0,      pgm2_ramrom, pgm2, pgm2_state, init_ddpdojt,  ROT270, "IGS / Cave (Tong Li Animation license)", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", MACHINE_SUPPORTS_SAVE )
+GAME( 2010, ddpdojt,      0,      pgm2_ramrom, pgm2, ddpdojt_state, common_init,  ROT270, "IGS / Cave (Tong Li Animation license)", "DoDonPachi Dai-Ou-Jou Tamashii (V201, China)", MACHINE_SUPPORTS_SAVE )
 
 // Knights of Valour 3 - should be a V103 and V101 too
 //三国战纪3/Sānguó zhàn jì 3 (Simplified Chinese)
-GAME( 2011, kov3,         0,      pgm2_hires,  pgm2, pgm2_state, init_kov3_104, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V104, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2011, kov3_102,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_102, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V102, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2011, kov3_101,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_101, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V101, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
-GAME( 2011, kov3_100,     kov3,   pgm2_hires,  pgm2, pgm2_state, init_kov3_100, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V100, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3,         0,      pgm2_hires,  pgm2, kov3_state, init_kov3_104, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V104, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_102,     kov3,   pgm2_hires,  pgm2, kov3_state, init_kov3_102, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V102, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_101,     kov3,   pgm2_hires,  pgm2, kov3_state, init_kov3_101, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V101, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
+GAME( 2011, kov3_100,     kov3,   pgm2_hires,  pgm2, kov3_state, init_kov3_100, ROT0, "IGS (Huatong license)", "Knights of Valour 3 / Sanguo Zhan Ji 3 (V100, China, Hong Kong, Taiwan)", MACHINE_SUPPORTS_SAVE )
 
 // King of Fighters '98: Ultimate Match Hero
-GAME( 2009, kof98umh,     0,      pgm2_lores,  pgm2, pgm2_state, init_kof98umh, ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
+GAME( 2009, kof98umh,     0,      pgm2_lores,  pgm2, pgm2_state, common_init, ROT0, "IGS / SNK Playmore / New Channel", "The King of Fighters '98: Ultimate Match HERO (China, V100, 09-08-23)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2009, bubucar,      0,      pgm2,        pgm2, pgm2_state, init_bubucar,  ROT0, "IGS", "Bu Bu Car (English)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2009, bubucar,      0,      pgm2,        pgm2, pgm2_state, common_init,  ROT0, "IGS", "Bu Bu Car (English)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // ジグソーワールドアリーナ/Jigsaw World Arena
 

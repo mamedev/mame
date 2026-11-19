@@ -4,7 +4,7 @@
 /*
 slot (?) multigame
 
-only available info is a string in the program ROM:
+only available info is a string in the external ROM:
 MGT MULTI GAME 9 VER 9.04 ENG
 so for now assume the title is 'Multi Game 9'
 
@@ -18,7 +18,7 @@ PCB is silkscreened:
 Main components:
 ATMEGA2560 CPU
 15 MHz XTAL
-AMIC A29040B-70/N ROM (external program)
+AMIC A29040B-70/N ROM (external data)
 BS62LV256SC-70 SRAM (near CPU)
 DS1337 serial RTC
 MAX691CWE supervisory circuit
@@ -29,7 +29,7 @@ ADV7123 RAMDAC
 TDA7057AQ amplifier
 
 TODO:
-- currently crashes due to unsupported opcodes in the core (0x95e4, which should be equivalent to 0x95e8 (SPM))
+- main MCU dump missing; the external data ROM is not valid AVR8 binary code.
 */
 
 
@@ -73,7 +73,7 @@ uint32_t mgt_multigame_state::screen_update(screen_device &screen, bitmap_ind16 
 
 void mgt_multigame_state::program_map(address_map &map)
 {
-	map(0x00000, 0x7ffff).rom();
+	map(0x00000, 0x3ffff).rom();
 }
 
 void mgt_multigame_state::data_map(address_map &map)
@@ -142,9 +142,13 @@ void mgt_multigame_state::mgtmg9(machine_config &config)
 
 
 ROM_START( mgtmg9 )
-	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "atmega2560", 0x00000, 0x40000, NO_DUMP )
+
+	// External ROM headered "MGT MULTI GAME 9 VER 9.04 ENG"; contents unclear
+	// but definitely not a valid AVR8 program
+	ROM_REGION( 0x80000, "extrom", 0 )
 	ROM_LOAD( "a29040b.21", 0x00000, 0x80000, CRC(d70959c5) SHA1(09f1e2cec76cb50c71151c6d9b8082faa1f9c65b) )
-	ROM_FILL( 0x577c, 2, 0x00) // avoid crash due to unimplemented opcode for now
 
 	// on-die 4kbyte EEPROM
 	ROM_REGION( 0x1000, "eeprom", ROMREGION_ERASEFF )

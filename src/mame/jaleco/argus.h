@@ -46,6 +46,7 @@ protected:
 	u8 m_bg_status = 0U;
 	u8 m_flipscreen = 0U;
 	u16 m_palette_intensity = 0U;
+	u8 m_irq_vector = 0U;
 
 	// argus specific
 	u8 m_vrom_offset = 0U;
@@ -64,6 +65,7 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	void reset_common();
 	void change_palette(int color, int lo_offs, int hi_offs);

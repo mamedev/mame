@@ -294,7 +294,6 @@ private:
 	inline void trigger_irq(int line);
 	void check_irqs();
 
-	drc_cache m_drccache;
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<frontend> m_drcfe;
 	uint32_t m_drcoptions;

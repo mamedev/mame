@@ -18,6 +18,7 @@
 #include "machine/dp83932c.h"
 
 namespace {
+
 class nubus_enetlctp_device :
 	public device_t,
 	public device_nubus_card_interface
@@ -36,10 +37,10 @@ protected:
 	required_device<dp83932c_device> m_sonic;
 
 private:
-	void card_map(address_map &map);
+	void card_map(address_map &map) ATTR_COLD;
 	u16 ethernet_mac_r(offs_t offset, u16 mem_mask);
+	u8 mac_prom(offs_t index) const;
 
-	u8 m_mac[6];
 	std::string m_fulltag;
 };
 
@@ -110,12 +111,12 @@ nubus_enetlc_device::nubus_enetlc_device(const machine_config &mconfig, const ch
 void nubus_enetlctp_device::card_map(address_map &map)
 {
 	// LC and LC II mappings
-	map(0x8000'0000, 0x8000'01ff).m(m_sonic, FUNC(dp83932c_device::map)).umask32(0xffff0000);
+	map(0x8000'0000, 0x8000'01ff).umask32(0xffff'0000).m(m_sonic, FUNC(dp83932c_device::map));
 	map(0x8004'0000, 0x8004'01ff).r(FUNC(nubus_enetlctp_device::ethernet_mac_r));
 	map(0x8040'0000, 0x8040'01ff).r(FUNC(nubus_enetlctp_device::ethernet_mac_r));
 
 	// LC III and LC5xx mappings
-	map(0xfe00'0000, 0xfe00'01ff).m(m_sonic, FUNC(dp83932c_device::map)).umask32(0xffff0000);
+	map(0xfe00'0000, 0xfe00'01ff).umask32(0xffff'0000).m(m_sonic, FUNC(dp83932c_device::map));
 	map(0xfe04'0000, 0xfe04'0007).r(FUNC(nubus_enetlctp_device::ethernet_mac_r));
 	map(0xfe40'0000, 0xfe40'0007).r(FUNC(nubus_enetlctp_device::ethernet_mac_r));
 }
@@ -127,16 +128,17 @@ void nubus_enetlctp_device::device_start()
 	nubus().install_lcpds_map(*this, &nubus_enetlctp_device::card_map);
 	install_declaration_rom("declrom");
 
-	// MAC PROM is stored with a bit swizzle (IEEE standard according to SuperMario source?)
-	// and must match Apple's assigned OUI block 08:00:07
-	const std::array<u8, 6> &MAC = m_sonic->get_mac();
-	m_mac[0] = bitswap<8>(0x08, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[1] = bitswap<8>(0x00, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[2] = bitswap<8>(0x07, 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[3] = bitswap<8>(MAC[3], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[4] = bitswap<8>(MAC[4], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_mac[5] = bitswap<8>(MAC[5], 0, 1, 2, 3, 7, 6, 5, 4);
-	m_sonic->set_mac(&m_mac[0]);
+	u32 const num = machine().rand();
+	u8 const mac[6] = { 0x08, 0x00, 0x07, u8(num >> 16), u8(num >> 8), u8(num) };
+	m_sonic->set_mac(mac);
+}
+
+// MAC PROM is stored with a bit swizzle (IEEE standard according to SuperMario source?)
+// and must match Apple's assigned OUI block 08:00:07
+u8 nubus_enetlctp_device::mac_prom(offs_t index) const
+{
+	static constexpr u8 OUI[3] = { 0x08, 0x00, 0x07 };
+	return bitswap<8>((index < 3) ? OUI[index] : m_sonic->get_mac()[index], 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 u16 nubus_enetlctp_device::ethernet_mac_r(offs_t offset, u16 mem_mask)
@@ -155,7 +157,7 @@ u16 nubus_enetlctp_device::ethernet_mac_r(offs_t offset, u16 mem_mask)
 
 	if (offset < 6)
 	{
-		return m_mac[offset] | m_mac[offset] << 8;
+		return (mac_prom(offset) << 8) | mac_prom(offset);
 	}
 	else if (offset == 7)
 	{
@@ -163,7 +165,7 @@ u16 nubus_enetlctp_device::ethernet_mac_r(offs_t offset, u16 mem_mask)
 
 		for (int i = 0; i < 6; i++)
 		{
-			xor_total ^= (u8)m_mac[i];
+			xor_total ^= mac_prom(i);
 		}
 
 		return xor_total ^ 0xff;

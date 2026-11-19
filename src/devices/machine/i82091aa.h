@@ -8,6 +8,7 @@
 
 #include "bus/isa/isa.h"
 #include "imagedev/floppy.h"
+#include "machine/idectrl.h"
 #include "machine/ins8250.h"
 #include "machine/pc_lpt.h"
 #include "machine/upd765.h"
@@ -19,6 +20,14 @@ class i82091aa_device : public device_t,
 public:
 	i82091aa_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~i82091aa_device();
+
+	template <typename T> void set_ide_tag(T &&tag) { m_ide.set_tag(std::forward<T>(tag)); }
+	// address selected by the board's configuration straps: 22h, 24h, 26eh or 398h
+	void set_config_address(u16 address) { m_config_address = address; }
+
+	virtual u8 dack_r(int line) override;
+	virtual void dack_w(int line, u8 data) override;
+	virtual void eop_w(int state) override;
 
 	void remap(int space_id, offs_t start, offs_t end) override;
 
@@ -45,6 +54,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 	virtual space_config_vector memory_space_config() const override;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
@@ -53,6 +63,7 @@ private:
 	required_device<n82077aa_device> m_fdc;
 	required_device_array<ns16550_device, 2> m_com;
 	required_device<pc_lpt_device> m_lpt;
+	optional_device<ide_controller_device> m_ide;
 
 	devcb_write_line m_txd1_callback;
 	devcb_write_line m_ndtr1_callback;
@@ -61,13 +72,25 @@ private:
 	devcb_write_line m_ndtr2_callback;
 	devcb_write_line m_nrts2_callback;
 
+	void unmap_io_map(address_map &map) ATTR_COLD;
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
+	template <bool Secondary> u8 ide_alt_r(offs_t offset);
+	template <bool Secondary> void ide_alt_w(offs_t offset, u8 data);
 	void config_map(address_map &map) ATTR_COLD;
 	void request_irq(int irq, int state);
-	void request_dma(int dreq, int state);
+	void update_irq();
+	void update_drq();
 
+	u16 m_config_address;
+	std::vector<std::pair<u16, u16>> m_io_ranges;
+	u8 m_aipcfg1, m_aipcfg2;
+	bool m_fdc_irq, m_fdc_drq;
+	bool m_serial_irq[2];
+	bool m_parallel_irq;
+	u8 m_irq_out;
+	bool m_drq_out;
 	u8 m_index;
 	u8 m_fcfg1, m_fcfg2;
 	u8 m_pcfg1, m_pcfg2;

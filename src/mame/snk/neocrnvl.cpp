@@ -11,7 +11,7 @@ MC68B09P CPU
 HM6116LP-3 RAM
 TMP82C255AN-2 PPI
 2x TD62803P stepping motor controller/driver
-YM2413 sound chip
+2x SN76489AN, x1 YM2413 sound chip
 3.579545 MHz XTAL
 2x bank of 8 switches
 lots ot TTL

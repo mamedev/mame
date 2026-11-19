@@ -9,6 +9,7 @@
 #include "emu.h"
 #include "heath_h19.h"
 
+#include "bus/heathzenith/h19/cards.h"
 #include "bus/heathzenith/h19/tlb.h"
 
 
@@ -35,24 +36,11 @@ protected:
 
 private:
 	required_device<heath_tlb_connector> m_tlbc;
-
-	static void tlb_options(device_slot_interface &device);
 };
-
-void serial_heath_h19_device::tlb_options(device_slot_interface &device)
-{
-	device.option_add("heath",      HEATH_TLB);
-	device.option_add("gp19",       HEATH_GP19);
-	device.option_add("imaginator", HEATH_IMAGINATOR);
-	device.option_add("super19",    HEATH_SUPER19);
-	device.option_add("superset",   HEATH_SUPERSET);
-	device.option_add("ultrarom",   HEATH_ULTRA);
-	device.option_add("watzman",    HEATH_WATZ);
-}
 
 void serial_heath_h19_device::device_add_mconfig(machine_config &config)
 {
-	HEATH_TLB_CONNECTOR(config, m_tlbc, tlb_options, "heath");
+	HEATH_TLB_CONNECTOR(config, m_tlbc, h19_tlb_options, "heath");
 	m_tlbc->serial_data_callback().set(FUNC(serial_heath_h19_device::output_rxd));
 	m_tlbc->rts_callback().set(FUNC(serial_heath_h19_device::output_cts));
 	m_tlbc->dtr_callback().set(FUNC(serial_heath_h19_device::input_dtr));

@@ -22,6 +22,7 @@
 #include "machine/ins8250.h"
 
 namespace {
+
 class nubus_bootbug_device : public device_t,
 							 public device_nubus_card_interface
 {
@@ -31,15 +32,13 @@ public:
 protected:
 	required_device<ns16450_device> m_uart;
 
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-
-	// optional information overrides
+	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
 
 private:
-	void card_map(address_map &map);
+	void card_map(address_map &map) ATTR_COLD;
 };
 
 static void isa_com(device_slot_interface &device)
@@ -86,7 +85,7 @@ nubus_bootbug_device::nubus_bootbug_device(const machine_config &mconfig, const 
 
 void nubus_bootbug_device::card_map(address_map &map)
 {
-	map(0x00'0000, 0x00'00ff).rw(m_uart, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w)).umask32(0x000000ff);
+	map(0x00'0000, 0x00'00ff).umask32(0x0000'00ff).rw(m_uart, FUNC(ns16450_device::ins8250_r), FUNC(ns16450_device::ins8250_w));
 }
 
 void nubus_bootbug_device::device_start()

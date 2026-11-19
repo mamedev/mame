@@ -145,18 +145,12 @@ void model3_state::video_start()
 	m_m3_char_ram = make_unique_clear<uint64_t[]>(0x100000/8);
 	m_m3_tile_ram = make_unique_clear<uint64_t[]>(0x8000/8);
 
-	m_texture_fifo = make_unique_clear<uint32_t[]>(0x100000/4);
-
-	/* 2x 4MB texture sheets */
-	m_texture_ram[0] = std::make_unique<uint16_t[]>(0x400000/2);
-	m_texture_ram[1] = std::make_unique<uint16_t[]>(0x400000/2);
-
-	/* 1MB Display List RAM */
-	m_display_list_ram = make_unique_clear<uint32_t[]>(0x100000/4);
-	/* 4MB for nodes (< Step 2.0 have only 2MB) */
-	m_culling_ram = make_unique_clear<uint32_t[]>(0x400000/4);
-	/* 4MB Polygon RAM */
-	m_polygon_ram = make_unique_clear<uint32_t[]>(0x400000/4);
+	m_texture_ram[0] = m_render_adapter->texture_ram(0);
+	m_texture_ram[1] = m_render_adapter->texture_ram(1);
+	m_display_list_ram = m_graphics->display_list_ram();
+	m_culling_ram = m_graphics->culling_ram();
+	m_polygon_ram = m_graphics->polygon_ram();
+	m_render_vrom = m_graphics->vrom();
 
 	m_vid_reg0 = 0;
 
@@ -949,266 +943,25 @@ cached_texture *model3_state::get_texture(int page, int texx, int texy, int texw
 */
 
 
-void model3_state::real3d_display_list_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+void model3_state::real3d_sync()
 {
-	if (ACCESSING_BITS_32_63)
-	{
-		m_display_list_ram[offset*2] = BYTE_REVERSE32((uint32_t)(data >> 32));
-	}
-	if (ACCESSING_BITS_0_31)
-	{
-		m_display_list_ram[(offset*2)+1] = BYTE_REVERSE32((uint32_t)(data));
-	}
+	if (m_renderer)
+		m_renderer->wait_for_polys();
 }
 
-void model3_state::real3d_polygon_ram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+void model3_state::real3d_invalidate(u32 page)
 {
-	if (ACCESSING_BITS_32_63)
-	{
-		m_polygon_ram[offset*2] = BYTE_REVERSE32((uint32_t)(data >> 32));
-	}
-	if (ACCESSING_BITS_0_31)
-	{
-		m_polygon_ram[(offset*2)+1] = BYTE_REVERSE32((uint32_t)(data));
-	}
+	invalidate_texture(page, 0, 0, 6, 5);
 }
 
-static const uint8_t texture_decode16[64] =
+void model3_state::real3d_submit(const model3_real3d_renderer_device::memory_view &view)
 {
-		0,  1,  4,  5,  8,  9, 12, 13,
-		2,  3,  6,  7, 10, 11, 14, 15,
-	16, 17, 20, 21, 24, 25, 28, 29,
-	18, 19, 22, 23, 26, 27, 30, 31,
-	32, 33, 36, 37, 40, 41, 44, 45,
-	34, 35, 38, 39, 42, 43, 46, 47,
-	48, 49, 52, 53, 56, 57, 60, 61,
-	50, 51, 54, 55, 58, 59, 62, 63
-};
-
-static const uint8_t texture_decode8[32] =
-{
-		1,  3,  5,  7,
-		0,  2,  4,  6,
-		9, 11, 13, 15,
-		8, 10, 12, 14,
-	17, 19, 21, 23,
-	16, 18, 20, 22,
-	25, 27, 29, 31,
-	24, 26, 28, 30
-};
-
-inline void model3_state::write_texture16(int xpos, int ypos, int width, int height, int page, uint16_t *data)
-{
-	int x,y,i,j;
-
-	for(y=ypos; y < ypos+height; y+=8)
-	{
-		for(x=xpos; x < xpos+width; x+=8)
-		{
-			uint16_t *texture = &m_texture_ram[page][y*2048+x];
-			int b = 0;
-			for(j=y; j < y+8; j++) {
-				for(i=x; i < x+8; i++) {
-					*texture++ = data[texture_decode16[b^1]];
-					++b;
-				}
-				texture += 2048-8;
-			}
-			data += 64;
-		}
-	}
-}
-
-inline void model3_state::write_texture8(int xpos, int ypos, int width, int height, int page, int upper, int lower, uint16_t *data)
-{
-	int x,y,i,j;
-
-	for(y=ypos; y < ypos+height; y+=8)
-	{
-		for(x=xpos; x < xpos+width; x+=8)
-		{
-			uint16_t *texture = &m_texture_ram[page][y*2048+x];
-			int b = 0;
-			for(j=y; j < y+8; j++)
-			{
-				for(i=x; i < x+8; i+=2)
-				{
-					uint16_t d = data[texture_decode8[b]];
-
-					if (upper)
-						*texture = (*texture & 0xff) | (d & 0xff00);
-					if (lower)
-						*texture = (*texture & 0xff00) | ((d >> 8) & 0xff);
-					texture++;
-
-					if (upper)
-						*texture = (*texture & 0xff) | ((d & 0xff) << 8);
-					if (lower)
-						*texture = (*texture & 0xff00) | (d & 0xff);
-					texture++;
-
-					++b;
-				}
-				texture += 2048-8;
-			}
-			data += 32;
-		}
-	}
-}
-
-/*
-    Texture header:
-
-    -------- -------- -------- --xxxxxx X-position
-    -------- -------- ----xxxx x------- Y-position
-    -------- -------x xx------ -------- Width
-    -------- ----xxx- -------- -------- Height
-    -------- ---x---- -------- -------- Texture page
-    -------- --x----- -------- -------- Write 8-bit data to the lower byte of texel
-    -------- -x------ -------- -------- Write 8-bit data to the upper byte of texel
-    -------- x------- -------- -------- Bitdepth, 0 = 8-bit, 1 = 16-bit
-    xxxxxxxx -------- -------- -------- Texture type
-                                            0x00 = texture with mipmaps
-                                            0x01 = texture without mipmaps
-                                            0x02 = only mipmaps
-                                            0x80 = possibly gamma table
-
-*/
-
-static const int mipmap_coords[9][2] =
-{
-	{ 1024,  512 },
-	{ 1536,  768 },
-	{ 1792,  896 },
-	{ 1920,  960 },
-	{ 1984,  992 },
-	{ 2016, 1008 },
-	{ 2032, 1016 },
-	{ 2040, 1020 },
-	{ 2044, 1022 },
-};
-
-static const int mipmap_divider[9] = { 2, 4, 8, 16, 32, 64, 128, 256, 512 };
-
-void model3_state::real3d_upload_texture(uint32_t header, uint32_t *data)
-{
-	int width   = 32 << ((header >> 14) & 0x7);
-	int height  = 32 << ((header >> 17) & 0x7);
-	int xpos    = (header & 0x3f) * 32;
-	int ypos    = ((header >> 7) & 0x1f) * 32;
-	int page    = (header >> 20) & 0x1;
-	int bitdepth = (header >> 23) & 0x1;
-	int upper_byte = (header >> 22) & 0x1;
-	int lower_byte = (header >> 21) & 0x1;
-
-	//printf("write tex: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
-
-	switch(header >> 24)
-	{
-		case 0x00:      /* Texture with mipmaps */
-		{
-			int x = xpos;
-			int y = ypos;
-			int w = width;
-			int h = height;
-
-			int mipmap = 0;
-
-			while (w >= 8 && h >= 8)
-			{
-				if (bitdepth)
-				{
-					write_texture16(x, y, w, h, page, (uint16_t*)data);
-				}
-				else
-				{
-					//printf("write tex8: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
-					write_texture8(x, y, w, h, page, upper_byte, lower_byte, (uint16_t*)data);
-				}
-
-				data += (w * h * (bitdepth ? 2 : 1)) / 4;
-				w /= 2;
-				h /= 2;
-
-				x = mipmap_coords[mipmap][0] + (xpos / mipmap_divider[mipmap]);
-				y = mipmap_coords[mipmap][1] + (ypos / mipmap_divider[mipmap]);
-				mipmap++;
-			}
-
-			invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
-			break;
-		}
-		case 0x01:      /* Texture without mipmaps */
-		{
-			if (bitdepth)
-			{
-				write_texture16(xpos, ypos, width, height, page, (uint16_t*)data);
-			}
-			else
-			{
-				//printf("write tex8: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
-				write_texture8(xpos, ypos, width, height, page, upper_byte, lower_byte, (uint16_t*)data);
-			}
-
-			invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
-			break;
-		}
-		case 0x02:      /* Only mipmaps */
-		{
-			int x = mipmap_coords[0][0] + (xpos / mipmap_divider[0]);
-			int y = mipmap_coords[0][1] + (ypos / mipmap_divider[0]);
-			int w = width / 2;
-			int h = height / 2;
-
-			int mipmap = 1;
-
-			while (w >= 8 && h >= 8)
-			{
-				if (bitdepth)
-				{
-					write_texture16(x, y, w, h, page, (uint16_t*)data);
-				}
-				else
-				{
-					//printf("write tex8: %08X, w %d, h %d, x %d, y %d, p %d, b %d\n", header, width, height, xpos, ypos, page, bitdepth);
-					write_texture8(x, y, w, h, page, upper_byte, lower_byte, (uint16_t*)data);
-				}
-
-				data += (w * h * (bitdepth ? 2 : 1)) / 4;
-				w /= 2;
-				h /= 2;
-
-				x = mipmap_coords[mipmap][0] + (xpos / mipmap_divider[mipmap]);
-				y = mipmap_coords[mipmap][1] + (ypos / mipmap_divider[mipmap]);
-				mipmap++;
-			}
-
-			invalidate_texture(page, header & 0x3f, (header >> 7) & 0x1f, (header >> 14) & 0x7, (header >> 17) & 0x7);
-			break;
-		}
-		case 0x80:      /* Gamma-table ? */
-			break;
-		default:
-			fatalerror("Unknown texture type: %02X (%08X)\n", header >> 24, header);
-			break;
-	}
-}
-
-void model3_state::real3d_display_list_end()
-{
-	/* upload textures if there are any in the FIFO */
-	if (m_texture_fifo_pos > 0)
-	{
-		int i = 0;
-		while (i < m_texture_fifo_pos)
-		{
-			int length = (m_texture_fifo[i] / 2) + 2;
-			uint32_t header = m_texture_fifo[i+1];
-			real3d_upload_texture(header, &m_texture_fifo[i+2]);
-			i += length;
-		};
-	}
-	m_texture_fifo_pos = 0;
+	m_display_list_ram = view.display_list;
+	m_culling_ram = view.culling;
+	m_polygon_ram = view.polygon;
+	m_render_vrom = view.vrom;
+	m_texture_ram[0] = view.texture[0];
+	m_texture_ram[1] = view.texture[1];
 
 	m_renderer->clear_fb();
 
@@ -1240,97 +993,6 @@ void model3_state::real3d_display_list_end()
 		}
 	}
 }
-
-void model3_state::real3d_display_list1_dma(uint32_t src, uint32_t dst, int length, int byteswap)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int d = (dst & 0xffffff) / 4;
-	for (int i = 0; i < length; i += 4)
-	{
-		uint32_t w = space.read_dword(src);
-
-		if (byteswap)
-			w = BYTE_REVERSE32(w);
-
-		m_display_list_ram[d++] = w;
-		src += 4;
-	}
-}
-
-void model3_state::real3d_display_list2_dma(uint32_t src, uint32_t dst, int length, int byteswap)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int d = (dst & 0xffffff) / 4;
-	for (int i = 0; i < length; i += 4)
-	{
-		uint32_t w = space.read_dword(src);
-
-		if (byteswap)
-			w = BYTE_REVERSE32(w);
-
-		m_culling_ram[d++] = w;
-		src += 4;
-	}
-}
-
-void model3_state::real3d_vrom_texture_dma(uint32_t src, uint32_t dst, int length, int byteswap)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	if ((dst & 0xff) == 0)
-	{
-		for (int i=0; i < length; i+=12)
-		{
-			uint32_t address = space.read_dword(src+i+0);
-			uint32_t header = space.read_dword(src+i+4);
-
-			if (byteswap)
-			{
-				address = BYTE_REVERSE32(address);
-				header = BYTE_REVERSE32(header);
-			}
-
-			real3d_upload_texture(header, (uint32_t*)&m_vrom[address]);
-		}
-	}
-}
-
-void model3_state::real3d_texture_fifo_dma(uint32_t src, int length, int byteswap)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	for (int i = 0; i < length; i += 4)
-	{
-		uint32_t w = space.read_dword(src);
-
-		if (byteswap)
-			w = BYTE_REVERSE32(w);
-
-		m_texture_fifo[m_texture_fifo_pos] = w;
-		m_texture_fifo_pos++;
-		src += 4;
-	}
-}
-
-void model3_state::real3d_polygon_ram_dma(uint32_t src, uint32_t dst, int length, int byteswap)
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	int d = (dst & 0xffffff) / 4;
-	for (int i = 0; i < length; i += 4)
-	{
-		uint32_t w = space.read_dword(src);
-
-		if (byteswap)
-			w = BYTE_REVERSE32(w);
-
-		m_polygon_ram[d++] = w;
-		src += 4;
-	}
-}
-
-void model3_state::real3d_cmd_w(uint64_t data)
-{
-	real3d_display_list_end();
-}
-
 
 /*****************************************************************************/
 /* matrix and vector operations */
@@ -1494,7 +1156,7 @@ m3_triangle *model3_state::push_triangle(bool alpha)
 void model3_state::draw_model(uint32_t addr)
 {
 	// Polygon RAM is mapped to the low 4MB of VROM
-	uint32_t *model = (addr >= 0x100000) ? &m_vrom[addr] :  &m_polygon_ram[addr];
+	const uint32_t *model = (addr >= 0x100000) ? &m_render_vrom[addr] : &m_polygon_ram[addr];
 
 	uint32_t header[7];
 	int index = 0;
@@ -1769,7 +1431,7 @@ void model3_state::draw_model(uint32_t addr)
 /*****************************************************************************/
 /* display list parser */
 
-uint32_t *model3_state::get_memory_pointer(uint32_t address)
+const uint32_t *model3_state::get_memory_pointer(uint32_t address)
 {
 	if (address & 0x800000)
 	{
@@ -1789,7 +1451,7 @@ uint32_t *model3_state::get_memory_pointer(uint32_t address)
 
 void model3_state::load_matrix(int matrix_num, MATRIX *out)
 {
-	float *matrix = (float *)get_memory_pointer(m_matrix_base_address + matrix_num * 12);
+	const float *matrix = (const float *)get_memory_pointer(m_matrix_base_address + matrix_num * 12);
 
 	(*out)[0][0] = matrix[3];   (*out)[0][1] = matrix[6];   (*out)[0][2] = matrix[9];   (*out)[0][3] = 0.0f;
 	(*out)[1][0] = matrix[4];   (*out)[1][1] = matrix[7];   (*out)[1][2] = matrix[10];  (*out)[1][3] = 0.0f;
@@ -1800,7 +1462,7 @@ void model3_state::load_matrix(int matrix_num, MATRIX *out)
 void model3_state::traverse_list4(int lod_num, uint32_t address)
 {
 	/* does something with the LOD selection */
-	uint32_t *list = get_memory_pointer(address);
+	const uint32_t *list = get_memory_pointer(address);
 	uint32_t link = list[0];
 
 	draw_model(link & 0xffffff);
@@ -1808,7 +1470,7 @@ void model3_state::traverse_list4(int lod_num, uint32_t address)
 
 void model3_state::traverse_list(uint32_t address)
 {
-	uint32_t *list = get_memory_pointer(address);
+	const uint32_t *list = get_memory_pointer(address);
 	int list_ptr = 0;
 
 	if (m_list_depth > 2)

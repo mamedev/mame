@@ -1330,7 +1330,7 @@ GAME_CUSTOM( 199?, m4shv__2,    m4shv, bootleg_fixedret<0x15>(R4, RT1), mpu4,  i
 GAME_CUSTOM( 199?, m4shv__3,    m4shv, bootleg_fixedret<0x11>(R4, RT1), mpu4,  init_m4,  "hypr58c",              0x0000, 0x010000, CRC(d6028f8f) SHA1(54a3188ddb5196808a1161a0e1e6a8c1fe8bfde3), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 4)" )
 GAME_CUSTOM( 199?, m4shv__4,    m4shv, bootleg_fixedret<0x11>(R4, RT1), mpu4,  init_m4,  "hypv_05_.4",           0x0000, 0x010000, CRC(246f171c) SHA1(7bbefb0cae57cf8097aa6d033df1a428e8bfe744), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 5)" )
 GAME_CUSTOM( 199?, m4shv__5,    m4shv, bootleg_fixedret<0x11>(R4, RT1), mpu4,  init_m4,  "hvip_05_.8",           0x0000, 0x010000, CRC(625f1b9d) SHA1(f8dc0cde774f3fc4fb3d66d014ad47e9576c0f44), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, hack, set 1)" )
-// "DICK WAS ERE" and "HVP 3.0"
+// "DICK WAS ERE" and "HVP 3.0"
 GAME_CUSTOM( 199?, m4shv__6,    m4shv, bootleg_fixedret<0x5b>(R4, RT1), mpu4,  init_m4,  "hv108c",               0x0000, 0x010000, CRC(4d40ebfe) SHA1(0e355fe5b185ba595c5040335956037b8ed21599), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 6)" )
 GAME_CUSTOM( 199?, m4shv__8,    m4shv, bootleg_fixedret<0x5b>(R4, RT1), mpu4,  init_m4,  "hypv_10_.4",           0x0000, 0x010000, CRC(f85d21a1) SHA1(55ed92147335a1471b7b443f68dd700f579d21f3), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0 C, hack, set 8)" )
 GAME_CUSTOM( 199?, m4shv__9,    m4shv, bootleg_fixedret<0x5b>(R4, RT1), mpu4,  init_m4,  "hvip_10_.8",           0x0000, 0x010000, CRC(f91d7fec) SHA1(4c8130f9ce0ee3b14744e2b3cab79d4a65767e78), "hack","Super Hyper Viper (Barcrest) (MPU4) (HVP 3.0, hack, set 2)" )

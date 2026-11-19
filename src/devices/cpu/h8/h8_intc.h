@@ -28,6 +28,7 @@ public:
 
 	int interrupt_taken(int vector);
 	void internal_interrupt(int vector) override;
+	void clear_interrupt(int vector) override;
 	void set_input(int inputnum, int state);
 	void set_filter(int icr_filter, int ipr_filter);
 	void set_nmi_edge(int state) { m_nmi_type = state ? EDGE_RISE : EDGE_FALL; }
@@ -149,8 +150,6 @@ public:
 	{
 		m_cpu.set_tag(std::forward<T>(cpu));
 	}
-
-	void clear_interrupt(int vector);
 
 protected:
 	virtual void device_reset() override ATTR_COLD;

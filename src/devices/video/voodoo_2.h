@@ -218,6 +218,7 @@ protected:
 	u32 reg_cmdfifodepth_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_cmdfifoholes_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_fbiinit5_7_w(u32 chipmask, u32 regnum, u32 data);
+	u32 reg_blt_fill_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_draw_tri_w(u32 chipmask, u32 regnum, u32 data);
 	u32 reg_begin_tri_w(u32 chipmask, u32 regnum, u32 data);
 

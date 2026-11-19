@@ -28,6 +28,13 @@ individual devices, as sub-device of this.
 
 #include "logmacro.h"
 
+namespace {
+
+// DMA channel of each high page register, 480h-487h and 488h-48Fh
+constexpr s8 HIGH_PAGE_CHANNEL[8] = { -1, 2, 3, 1, -1, -1, -1, 0 };
+
+} // anonymous namespace
+
 DEFINE_DEVICE_TYPE(I82378ZB_SIO, i82378zb_sio_device, "i82378zb_sio", "Intel 82378ZB System I/O (SIO)")
 //DEFINE_DEVICE_TYPE(I82379AB_SIO, i82379ab_sio_device, "i82379ab_sio", "Intel 82379AB System I/O (SIO.A)")
 
@@ -44,6 +51,7 @@ i82378zb_sio_device::i82378zb_sio_device(const machine_config &mconfig, device_t
 	, m_xbus_keybc(*this, "xbus_keybc")
 //  , m_xbus_rtc(*this, "xbus_rtc")
 	, m_xbus_ide(*this, "xbus_ide%u", 0U)
+	, m_write_intr(*this)
 	, m_boot_state_hook(*this)
 	, m_write_a20m(*this)
 	, m_write_cpureset(*this)
@@ -96,6 +104,7 @@ void i82378zb_sio_device::device_add_mconfig(machine_config &config)
 
 	AM9517A(config, m_dma[1], XTAL(14'318'181) / 3);
 	m_dma[1]->out_hreq_callback().set(FUNC(i82378zb_sio_device::pc_dma_hrq_changed));
+	m_dma[1]->out_eop_callback().set(FUNC(i82378zb_sio_device::at_dma8237_out_eop));
 	m_dma[1]->in_memr_callback().set(FUNC(i82378zb_sio_device::pc_dma_read_word));
 	m_dma[1]->out_memw_callback().set(FUNC(i82378zb_sio_device::pc_dma_write_word));
 	m_dma[1]->in_ior_callback<1>().set(FUNC(i82378zb_sio_device::pc_dma8237_5_dack_r));
@@ -111,7 +120,7 @@ void i82378zb_sio_device::device_add_mconfig(machine_config &config)
 
 	// 8259A-equivalent
 	PIC8259(config, m_pic[0]);
-	m_pic[0]->out_int_callback().set_inputline(m_host_cpu, 0);
+	m_pic[0]->out_int_callback().set(FUNC(i82378zb_sio_device::pic_int_w));
 	m_pic[0]->in_sp_callback().set_constant(1);
 	m_pic[0]->read_slave_ack_callback().set(FUNC(i82378zb_sio_device::get_slave_ack));
 
@@ -121,6 +130,7 @@ void i82378zb_sio_device::device_add_mconfig(machine_config &config)
 
 	// TODO: ISA bus runs at 6 to 8.33 MHz
 	ISA16(config, m_isabus);
+	m_isabus->set_custom_spaces();
 	m_isabus->irq3_callback().set(FUNC(i82378zb_sio_device::pc_irq3_w));
 	m_isabus->irq4_callback().set(FUNC(i82378zb_sio_device::pc_irq4_w));
 	m_isabus->irq5_callback().set(FUNC(i82378zb_sio_device::pc_irq5_w));
@@ -145,18 +155,11 @@ void i82378zb_sio_device::device_add_mconfig(machine_config &config)
 	SPEAKER_SOUND(config, m_speaker).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
-void i82378zb_sio_device::device_config_complete()
-{
-	auto isabus = m_isabus.finder_target();
-	isabus.first.subdevice<isa16_device>(isabus.second)->set_memspace(m_host_cpu, AS_PROGRAM);
-	isabus.first.subdevice<isa16_device>(isabus.second)->set_iospace(m_host_cpu, AS_IO);
-
-	pci_device::device_config_complete();
-}
-
 void i82378zb_sio_device::device_start()
 {
 	pci_device::device_start();
+	m_isabus->space(isa16_device::AS_ISA_MEM).unmap_value_high();
+	m_isabus->space(isa16_device::AS_ISA_IO).unmap_value_high();
 
 //  m_pci_root->set_pin_mapper(pci_pin_mapper(*this, FUNC(i82378zb_sio_device::pin_mapper)));
 //  m_pci_root->set_irq_handler(pci_irq_handler(*this, FUNC(i82378zb_sio_device::irq_handler)));
@@ -188,6 +191,17 @@ void i82378zb_sio_device::device_start()
 	save_item(NAME(m_ctltmr));
 	save_item(NAME(m_ctltmrh));
 
+	save_item(NAME(m_at_spkrdata));
+	save_item(NAME(m_pit_out2));
+	save_item(NAME(m_at_speaker));
+	save_item(NAME(m_refresh));
+	save_item(NAME(m_dma_channel));
+	save_item(NAME(m_cur_eop));
+	save_item(NAME(m_dma_offset));
+	save_item(NAME(m_at_pages));
+	save_item(NAME(m_dma_high_byte));
+	save_item(NAME(m_channel_check));
+	save_item(NAME(m_nmi_enabled));
 	save_item(NAME(m_port92));
 
 	save_item(NAME(m_ext_gatea20));
@@ -245,6 +259,15 @@ void i82378zb_sio_device::device_reset()
 	m_ctltmr = 0x00;
 	m_ctltmrh = 0x00;
 
+	m_port92 = 0;
+	m_at_spkrdata = 0;
+	m_at_speaker = 0;
+	for (auto &pages : m_dma_offset)
+		std::fill(std::begin(pages), std::end(pages), 0);
+	std::fill(std::begin(m_at_pages), std::end(m_at_pages), 0);
+	m_dma_high_byte = 0;
+	m_channel_check = 0;
+	m_nmi_enabled = false;
 	m_ext_gatea20 = 0;
 	m_fast_gatea20 = 0;
 
@@ -525,10 +548,11 @@ void i82378zb_sio_device::config_map(address_map &map)
 
 void i82378zb_sio_device::internal_io_map(address_map &map)
 {
-	map(0x0000, 0x001f).rw(m_dma[0], FUNC(am9517a_device::read), FUNC(am9517a_device::write));
+	map(0x0000, 0x001f).r(m_dma[0], FUNC(am9517a_device::read)).w(FUNC(i82378zb_sio_device::at_dma8237_1_w));
 	map(0x0020, 0x0021).rw(m_pic[0], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x0040, 0x005f).rw(m_pit, FUNC(pit8254_device::read), FUNC(pit8254_device::write));
-	// map(0x0060, 0x0060) keyboard
+	// 60h is not decoded here, but shares a dword with port B: forward it to the ISA bus
+	map(0x0060, 0x0060).rw(FUNC(i82378zb_sio_device::isa_port60_r), FUNC(i82378zb_sio_device::isa_port60_w));
 	map(0x0061, 0x0061).rw(FUNC(i82378zb_sio_device::at_portb_r), FUNC(i82378zb_sio_device::at_portb_w));
 	// map(0x0064, 0x0064) keyboard
 
@@ -537,6 +561,8 @@ void i82378zb_sio_device::internal_io_map(address_map &map)
 //  map(0x0092, 0x0092).rw(FUNC(i82378zb_sio_device::port92_r), FUNC(i82378zb_sio_device::port92_w));
 	map(0x00a0, 0x00a1).rw(m_pic[1], FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(FUNC(i82378zb_sio_device::at_dma8237_2_r), FUNC(i82378zb_sio_device::at_dma8237_2_w));
+
+	map(0x0480, 0x048f).rw(FUNC(i82378zb_sio_device::dma_page_high_r), FUNC(i82378zb_sio_device::dma_page_high_w));
 
 	// timestamp for this southbridge?
 	map(0x00e1, 0x00e1).lw8(NAME([] (offs_t offset, u8 data) { }));
@@ -572,7 +598,11 @@ void i82378zb_sio_device::map_extra(
 		address_space *io_space)
 {
 	// assume that map_extra of the southbridge is called before the one of the northbridge
-	m_isabus->remap(AS_PROGRAM, 0, 1 << 24);
+	m_isabus->remap(AS_PROGRAM, 0, 0xffffff);
+	// ISA devices decode in their own little-endian spaces, independent of the host CPU.
+	memory_space->install_readwrite_handler(0, 0xffffff,
+		read16s_delegate(*m_isabus, FUNC(isa16_device::mem16_r)),
+		write16s_delegate(*m_isabus, FUNC(isa16_device::mem16_w)));
 	// TODO: bits 7-6 in UBCSA for BIOS enable control, retrieve region size from flash type
 	if (m_has_xbus.flash_bios)
 	{
@@ -580,6 +610,9 @@ void i82378zb_sio_device::map_extra(
 		memory_space->install_readwrite_handler(0x000e0000, 0x000fffff, read8sm_delegate(*m_xbus_flash, FUNC(intelfsh8_device::read)), write8sm_delegate(*m_xbus_flash, FUNC(intelfsh8_device::write)));
 	}
 	m_isabus->remap(AS_IO, 0, 0xffff);
+	io_space->install_readwrite_handler(0, 0xffff,
+		read16s_delegate(*m_isabus, FUNC(isa16_device::io16_r)),
+		write16s_delegate(*m_isabus, FUNC(isa16_device::io16_w)));
 	io_space->install_device(0, 0xffff, *this, &i82378zb_sio_device::internal_io_map);
 
 	// TODO: UBCSA bits 3,2 for FDC + bit 5 for location address
@@ -604,11 +637,11 @@ void i82378zb_sio_device::map_extra(
 	// This maps thru X-Bus but we don't know yet the type it expects so using devcb for now.
 	if (BIT(m_ubcsa, 0))
 	{
-		// no read support at $70
-		io_space->install_write_handler(0x70, 0x70,
+		// RTCALE# at 70/72/74/76h (no read support), RTCCS# at 71/73/75/77h
+		io_space->install_write_handler(0x70, 0x70, 0, 0x06, 0,
 			write8sm_delegate(*this, FUNC(i82378zb_sio_device::rtc_index_w))
 		);
-		io_space->install_readwrite_handler(0x71, 0x71,
+		io_space->install_readwrite_handler(0x71, 0x71, 0, 0x06, 0,
 			read8sm_delegate(*this, FUNC(i82378zb_sio_device::rtc_data_r)),
 			write8sm_delegate(*this, FUNC(i82378zb_sio_device::rtc_data_w))
 		);
@@ -634,6 +667,14 @@ void i82378zb_sio_device::map_extra(
 /*
  * Southbridge common stuff
  */
+
+void i82378zb_sio_device::pic_int_w(int state)
+{
+	if (m_write_intr.isunset())
+		m_host_cpu->set_input_line(0, state);
+	else
+		m_write_intr(state);
+}
 
 void i82378zb_sio_device::pc_irq1_w(int state)   { m_pic[0]->ir1_w(state); }
 void i82378zb_sio_device::pc_irq3_w(int state)   { m_pic[0]->ir3_w(state); }
@@ -679,6 +720,16 @@ void i82378zb_sio_device::at_speaker_set_spkrdata(uint8_t data)
 {
 	m_at_spkrdata = data ? 1 : 0;
 	m_speaker->level_w(m_at_spkrdata & m_pit_out2);
+}
+
+u8 i82378zb_sio_device::isa_port60_r()
+{
+	return m_isabus->io16_r(0x60 / 2, 0x00ff);
+}
+
+void i82378zb_sio_device::isa_port60_w(u8 data)
+{
+	m_isabus->io16_w(0x60 / 2, data, 0x00ff);
 }
 
 uint8_t i82378zb_sio_device::at_portb_r()
@@ -768,7 +819,7 @@ void i82378zb_sio_device::pc_dma_hrq_changed(int state)
 
 uint8_t i82378zb_sio_device::pc_dma_read_byte(offs_t offset)
 {
-	address_space &prog_space = m_host_cpu->space(AS_PROGRAM); // get the right address space
+	address_space &prog_space = *get_pci_busmaster_space();
 	if (m_dma_channel == -1)
 		return 0xff;
 	uint8_t result;
@@ -780,7 +831,7 @@ uint8_t i82378zb_sio_device::pc_dma_read_byte(offs_t offset)
 
 void i82378zb_sio_device::pc_dma_write_byte(offs_t offset, uint8_t data)
 {
-	address_space &prog_space = m_host_cpu->space(AS_PROGRAM); // get the right address space
+	address_space &prog_space = *get_pci_busmaster_space();
 	if (m_dma_channel == -1)
 		return;
 	offs_t page_offset = ((offs_t)m_dma_offset[0][m_dma_channel]) << 16;
@@ -790,13 +841,13 @@ void i82378zb_sio_device::pc_dma_write_byte(offs_t offset, uint8_t data)
 
 uint8_t i82378zb_sio_device::pc_dma_read_word(offs_t offset)
 {
-	address_space &prog_space = m_host_cpu->space(AS_PROGRAM); // get the right address space
+	address_space &prog_space = *get_pci_busmaster_space();
 	if (m_dma_channel == -1)
 		return 0xff;
 	uint16_t result;
 	offs_t page_offset = ((offs_t)m_dma_offset[1][m_dma_channel & 3]) << 16;
 
-	result = prog_space.read_word((page_offset & 0xfe0000) | (offset << 1));
+	result = prog_space.read_word((page_offset & 0xfffe0000) | (offset << 1));
 	m_dma_high_byte = result & 0xFF00;
 
 	return result & 0xFF;
@@ -804,29 +855,44 @@ uint8_t i82378zb_sio_device::pc_dma_read_word(offs_t offset)
 
 void i82378zb_sio_device::pc_dma_write_word(offs_t offset, uint8_t data)
 {
-	address_space &prog_space = m_host_cpu->space(AS_PROGRAM); // get the right address space
+	address_space &prog_space = *get_pci_busmaster_space();
 	if (m_dma_channel == -1)
 		return;
 	offs_t page_offset = ((offs_t)m_dma_offset[1][m_dma_channel & 3]) << 16;
 
-	prog_space.write_word((page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
+	prog_space.write_word((page_offset & 0xfffe0000) | (offset << 1), m_dma_high_byte | data);
 }
 
 uint8_t i82378zb_sio_device::pc_dma8237_0_dack_r() { return m_isabus->dack_r(0); }
 uint8_t i82378zb_sio_device::pc_dma8237_1_dack_r() { return m_isabus->dack_r(1); }
 uint8_t i82378zb_sio_device::pc_dma8237_2_dack_r() { return m_isabus->dack_r(2); }
 uint8_t i82378zb_sio_device::pc_dma8237_3_dack_r() { return m_isabus->dack_r(3); }
-uint8_t i82378zb_sio_device::pc_dma8237_5_dack_r() { return m_isabus->dack_r(5); }
-uint8_t i82378zb_sio_device::pc_dma8237_6_dack_r() { return m_isabus->dack_r(6); }
-uint8_t i82378zb_sio_device::pc_dma8237_7_dack_r() { return m_isabus->dack_r(7); }
+uint8_t i82378zb_sio_device::pc_dma8237_5_dack_r()
+{
+	const u16 data = m_isabus->dack16_r(5);
+	m_dma_high_byte = data & 0xff00;
+	return data;
+}
+uint8_t i82378zb_sio_device::pc_dma8237_6_dack_r()
+{
+	const u16 data = m_isabus->dack16_r(6);
+	m_dma_high_byte = data & 0xff00;
+	return data;
+}
+uint8_t i82378zb_sio_device::pc_dma8237_7_dack_r()
+{
+	const u16 data = m_isabus->dack16_r(7);
+	m_dma_high_byte = data & 0xff00;
+	return data;
+}
 
 void i82378zb_sio_device::pc_dma8237_0_dack_w(uint8_t data) { m_isabus->dack_w(0, data); }
 void i82378zb_sio_device::pc_dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
 void i82378zb_sio_device::pc_dma8237_2_dack_w(uint8_t data) { m_isabus->dack_w(2, data); }
 void i82378zb_sio_device::pc_dma8237_3_dack_w(uint8_t data) { m_isabus->dack_w(3, data); }
-void i82378zb_sio_device::pc_dma8237_5_dack_w(uint8_t data) { m_isabus->dack_w(5, data); }
-void i82378zb_sio_device::pc_dma8237_6_dack_w(uint8_t data) { m_isabus->dack_w(6, data); }
-void i82378zb_sio_device::pc_dma8237_7_dack_w(uint8_t data) { m_isabus->dack_w(7, data); }
+void i82378zb_sio_device::pc_dma8237_5_dack_w(uint8_t data) { m_isabus->dack16_w(5, m_dma_high_byte | data); }
+void i82378zb_sio_device::pc_dma8237_6_dack_w(uint8_t data) { m_isabus->dack16_w(6, m_dma_high_byte | data); }
+void i82378zb_sio_device::pc_dma8237_7_dack_w(uint8_t data) { m_isabus->dack16_w(7, m_dma_high_byte | data); }
 
 void i82378zb_sio_device::at_dma8237_out_eop(int state)
 {
@@ -862,6 +928,39 @@ void i82378zb_sio_device::pc_dack5_w(int state) { pc_select_dma_channel(5, state
 void i82378zb_sio_device::pc_dack6_w(int state) { pc_select_dma_channel(6, state); }
 void i82378zb_sio_device::pc_dack7_w(int state) { pc_select_dma_channel(7, state); }
 
+// Programming a low address/page clears the high page (82378ZB section 3.2.11).
+// TODO: extended-mode carry between the address and page registers, and auto-initialization.
+uint8_t i82378zb_sio_device::dma_page_high_r(offs_t offset)
+{
+	const int channel = HIGH_PAGE_CHANNEL[offset & 7];
+	return channel < 0 || offset == 15 ? 0xff : m_dma_offset[BIT(offset, 3)][channel] >> 8;
+}
+
+void i82378zb_sio_device::dma_page_high_w(offs_t offset, uint8_t data)
+{
+	const int channel = HIGH_PAGE_CHANNEL[offset & 7];
+	if (channel >= 0 && offset != 15)
+	{
+		u16 &page = m_dma_offset[BIT(offset, 3)][channel];
+		page = (page & 0xff) | (u16(data) << 8);
+	}
+}
+
+void i82378zb_sio_device::dma_write(u8 controller, offs_t offset, uint8_t data)
+{
+	offset &= 15;
+	if (offset < 8 && !BIT(offset, 0))
+		m_dma_offset[controller][offset >> 1] &= 0xff;
+	else if (offset == 13)
+		std::fill(std::begin(m_dma_offset[controller]), std::end(m_dma_offset[controller]), 0);
+	m_dma[controller]->write(offset, data);
+}
+
+void i82378zb_sio_device::at_dma8237_1_w(offs_t offset, uint8_t data)
+{
+	dma_write(0, offset, data);
+}
+
 uint8_t i82378zb_sio_device::at_dma8237_2_r(offs_t offset)
 {
 	return m_dma[1]->read(offset / 2);
@@ -869,7 +968,7 @@ uint8_t i82378zb_sio_device::at_dma8237_2_r(offs_t offset)
 
 void i82378zb_sio_device::at_dma8237_2_w(offs_t offset, uint8_t data)
 {
-	m_dma[1]->write(offset / 2, data);
+	dma_write(1, offset / 2, data);
 }
 
 void i82378zb_sio_device::cpu_a20_w(int state)
