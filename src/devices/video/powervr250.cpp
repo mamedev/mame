@@ -317,6 +317,7 @@ powervr250_device::powervr250_device(const machine_config &mconfig, const char *
 	, m_dac_line(0)
 	, m_dac_htotal(0)
 	, m_dac_feeding_count(0)
+	, m_dac_after_blank(true)
 	, m_dac_showing_count(0)
 {
 }
@@ -411,6 +412,7 @@ void powervr250_device::device_start()
 	save_item(STRUCT_MEMBER(m_dac_showing, format));
 	save_item(STRUCT_MEMBER(m_dac_showing, blank));
 	save_item(NAME(m_dac_feeding_count));
+	save_item(NAME(m_dac_after_blank));
 	save_item(NAME(m_dac_showing_count));
 
 	map_frame_buffer();
@@ -489,6 +491,7 @@ void powervr250_device::device_reset()
 	m_dac_line = 0;
 	m_dac_htotal = 0;
 	m_dac_feeding_count = 0;
+	m_dac_after_blank = true;
 	m_dac_showing_count = 0;
 	m_dac_timer->adjust(attotime::never);
 }
@@ -2510,7 +2513,11 @@ void powervr250_device::dac_feed_w(u64 data)
 	if (hsync)
 		clocks += BIT(m_implicit[REG_DAC_HS_FRONT], 0, 11) + BIT(m_implicit[REG_DAC_HS_BACK], 0, 11) + BIT(m_implicit[REG_DAC_HS_WIDTH], 0, 11) + 3;
 
-	if (BIT(data, 61))
+	// a frame is taken to start with a span that has bit 61 after a blank one: the Aristocrat MK6 shows its picture as a
+	// span of 472 lines and eight of one line, all with bit 61
+	const bool frame_start = BIT(data, 61) && m_dac_after_blank;
+	m_dac_after_blank = BIT(data, 25) || BIT(dlw, 38);
+	if (frame_start)
 	{
 		// start of frame: what was fed is what is shown
 		std::copy_n(m_dac_feeding, m_dac_feeding_count, m_dac_showing);

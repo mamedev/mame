@@ -259,6 +259,7 @@ private:
 	dac_span m_dac_feeding[MAX_SPANS];
 	dac_span m_dac_showing[MAX_SPANS];
 	u8 m_dac_feeding_count;
+	bool m_dac_after_blank;     // the span fed before was blank
 	u8 m_dac_showing_count;
 };
 
