@@ -35,6 +35,7 @@
 #include "machine/mv6436x.h"
 #include "machine/pci.h"
 #include "machine/vt8231_acpi.h"
+#include "machine/vt8231_ide.h"
 #include "machine/vt8231_isa.h"
 
 
@@ -128,28 +129,40 @@ void pegasos2_state::pegasos2(machine_config &config)
 	DDR_SDRAM_SLOT(config, m_dimm[1], nullptr).set_address(0x57);
 	m_dimm[1]->sda_cb().set(m_smbus_data, FUNC(input_merger_device::in_w<2>));
 
-	MV64361(config, m_syscon, m_maincpu, "pci0:00.0", "pci1:00.0");
+	input_merger_any_high_device &cpuint(INPUT_MERGER_ANY_HIGH(config, "cpuint"));
+	cpuint.output_handler().set_inputline(m_maincpu, PPC_IRQ);
+
+	MV64361(config, m_syscon, m_maincpu, "pci0", "pci1");
 	m_syscon->set_cs_tag(0, "^dimm1:rank0");
 	m_syscon->set_cs_tag(1, "^dimm1:rank1");
 	m_syscon->set_cs_tag(2, "^dimm0:rank0");
 	m_syscon->set_cs_tag(3, "^dimm0:rank1");
+	m_syscon->cpuint0_cb().set("cpuint", FUNC(input_merger_any_high_device::in_w<0>));
+	m_syscon->cpuint1_cb().set("cpuint", FUNC(input_merger_any_high_device::in_w<1>));
 
-	PCI_ROOT(config, "pci0");
-	MV64361_PCI_HOST(config, "pci0:00.0", 66'666'666);
+	PCI_ROOT(config, "pci0", 66'666'666);
+	MV64361_PCI_HOST(config, "pci0:00.0");
+	MV64361_PCI_FUNCTION1(config, "pci0:00.1");
 
 	PCI_SLOT(config, "pci0:1", agp_cards, 1, 0, 1, 2, 3, nullptr);
 
-	PCI_ROOT(config, "pci1");
-	MV64361_PCI_HOST(config, "pci1:00.0", 33'333'333);
+	PCI_ROOT(config, "pci1", 33'333'333);
+	MV64361_PCI_HOST(config, "pci1:00.0");
+	MV64361_PCI_FUNCTION1(config, "pci1:00.1");
 
 	PCI_SLOT(config, "pci1:2", pci_cards, 7, 1, 2, 3, 0, nullptr);
 	PCI_SLOT(config, "pci1:3", pci_cards, 6, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci1:4", pci_cards, 5, 3, 0, 1, 2, nullptr);
 
 	vt8231_isa_device &isa(VT8231_ISA(config, "pci1:0c.0"));
+	isa.intr_cb().set(m_syscon, FUNC(mv64361_device::mpp31_w));
 	isa.com1_txd_cb().set("com1", FUNC(rs232_port_device::write_txd));
 	isa.com1_dtr_cb().set("com1", FUNC(rs232_port_device::write_dtr));
 	isa.com1_rts_cb().set("com1", FUNC(rs232_port_device::write_rts));
+
+	vt8231_ide_device &ide(VT8231_IDE(config, "pci1:0c.1", 0, "pci1:00.0", mv64361_pci_host_device::AS_PCI_BUSMASTER_MEM));
+	ide.subdevice<bus_master_ide_controller_device>("ide0")->default_data(0xff7f); // DD7 is pulled down
+	ide.subdevice<bus_master_ide_controller_device>("ide1")->default_data(0xff7f);
 
 	vt8231_acpi_device &acpi(VT8231_ACPI(config, "pci1:0c.4"));
 	acpi.smbck1_cb().set(m_dimm[0], FUNC(ddr_sdram_slot_device::scl_w));
