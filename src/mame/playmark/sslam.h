@@ -62,8 +62,6 @@ protected:
 	uint8_t m_oki_command = 0;
 	uint8_t m_oki_bank = 0;
 
-	uint32_t m_unk_458 = 0;
-
 	tilemap_t *m_bg_tilemap = nullptr;
 	tilemap_t *m_tx_tilemap = nullptr;
 	tilemap_t *m_md_tilemap = nullptr;

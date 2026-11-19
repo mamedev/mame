@@ -4,7 +4,6 @@
 
 /*
 
-Still some unknown reads / writes (it writes all over the place ...)
 Inputs / DSW's need finishing / verifying.
 
 The 87C751 MCU for sound has not had its internal program ROM dumped.
@@ -368,16 +367,25 @@ void powerbls_state::powerbls_sound_w(uint16_t data)
 
 /* Memory Maps */
 
-/* these will need verifying .. the game writes all over the place ... */
+/*
+    The program is a hack of Namco's Super World Court (NA-1 hardware).  It still runs from 0xc00000 with its
+    work RAM at the bottom of memory, and much of the code that drives the NA-1 hardware is still executed:
+    it uploads the sound data to 0x020000-0x07cfff, writes to the blitter registers at 0xefff00, the palette
+    at 0xf00000, the character RAM at 0xf40000 and the tilemaps at 0xff0000, and reads graphics and palettes
+    from where the upper program ROM (0xd00000-0xdfffff) and the mask ROMs (0x400000-0xbfffff) used to be.
+
+    How the program ROMs are really mirrored isn't known, but 0xffcea1-0xffcffe mustn't read as zero.  The
+    routine replacing the random number generator of the NA-1 key custom (0xca82ec) destroys D1, which the
+    opponent selection (0xc094fc) expects to be preserved, so that tests a byte up there for each opponent.
+    If it reads zero an invalid character number is used, and the game crashes loading that character's
+    palette.
+*/
 
 void sslam_state::sslam_program_map(address_map &map)
 {
-	map(0x000000, 0xffffff).rom();   /* I don't honestly know where the rom is mirrored .. so all unmapped reads / writes go to rom */
-
-	map(0x000400, 0x07ffff).ram();
-	// maybe video register, protection in fpga, rand?  Nothing about this is hardware correct.
-	map(0x000458, 0x00045b).lrw16([this](offs_t offset) { return offset ? m_unk_458 : m_unk_458 >> 16; }, "unk_458_r",
-			[this](offs_t offset, uint16_t data) { if(offset) m_unk_458 = (data & 0xfff) * 0xb1; }, "unk_458_w");
+	map(0x000000, 0x0fffff).mirror(0xf00000).rom();
+	map(0x000400, 0x00ffff).ram();   // 2x 62256, initial SSP is 0x010000
+	map(0x010000, 0x07ffff).nopw();  // rest of the NA-1 work RAM
 	map(0x100000, 0x103fff).ram().w(FUNC(sslam_state::sslam_bg_tileram_w)).share("bg_tileram");
 	map(0x104000, 0x107fff).ram().w(FUNC(sslam_state::sslam_md_tileram_w)).share("md_tileram");
 	map(0x108000, 0x10ffff).ram().w(FUNC(sslam_state::sslam_tx_tileram_w)).share("tx_tileram");
@@ -394,7 +402,10 @@ void sslam_state::sslam_program_map(address_map &map)
 	map(0x30001a, 0x30001b).portr("DSW2");
 	map(0x30001c, 0x30001d).portr("DSW1");
 	map(0x30001f, 0x30001f).w(FUNC(sslam_state::sslam_snd_w));
-	map(0xf00000, 0xffffff).ram();   /* Main RAM */
+	map(0xefff00, 0xefffff).nopw();  // NA-1 blitter and video registers
+	map(0xf00000, 0xf01fff).nopw();  // NA-1 palette
+	map(0xf40000, 0xf7ffff).nopw();  // NA-1 character RAM
+	map(0xff0000, 0xffbfff).nopw();  // NA-1 tilemaps
 }
 
 void powerbls_state::powerbls_map(address_map &map)
@@ -692,13 +703,11 @@ void sslam_state::machine_start()
 	m_track = 0;
 	m_melody = 0;
 	m_bar = 0;
-	m_unk_458 = 0;
 
 	save_item(NAME(m_track));
 	save_item(NAME(m_melody));
 	save_item(NAME(m_bar));
 	save_item(NAME(m_snd_bank));
-	save_item(NAME(m_unk_458));
 
 	m_music_timer = timer_alloc(FUNC(sslam_state::music_playback), this);
 }
@@ -776,64 +785,10 @@ void powerbls_state::powerbls(machine_config &config)
 
 
 
-#define ROM_RELOAD_SSLAM(base) \
-	ROM_RELOAD ( base+0x000000, 0x80000 ) \
-	ROM_RELOAD ( base+0x100000, 0x80000 ) \
-	ROM_RELOAD ( base+0x200000, 0x80000 ) \
-	ROM_RELOAD ( base+0x300000, 0x80000 ) \
-	ROM_RELOAD ( base+0x400000, 0x80000 ) \
-	ROM_RELOAD ( base+0x500000, 0x80000 ) \
-	ROM_RELOAD ( base+0x600000, 0x80000 ) \
-	ROM_RELOAD ( base+0x700000, 0x80000 ) \
-	ROM_RELOAD ( base+0x800000, 0x80000 ) \
-	ROM_RELOAD ( base+0x900000, 0x80000 ) \
-	ROM_RELOAD ( base+0xa00000, 0x80000 ) \
-	ROM_RELOAD ( base+0xb00000, 0x80000 ) \
-	ROM_RELOAD ( base+0xc00000, 0x80000 ) \
-	ROM_RELOAD ( base+0xd00000, 0x80000 ) \
-	ROM_RELOAD ( base+0xe00000, 0x80000 )
-
-
-
 ROM_START( sslam ) // verified on 2 PCBs
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "2.u67", 0x00000, 0x80000, CRC(1ce52917) SHA1(b9b1d14ea44c248ce6e615c5c553c0d485c1302b) )
-	ROM_RELOAD_SSLAM(0x100000)
 	ROM_LOAD16_BYTE( "1.u56", 0x00001, 0x80000,  CRC(59bec8ae) SHA1(2d53213a1d335184384b2138d18d496b602dc3fb) )
-	ROM_RELOAD_SSLAM(0x100001)
-
-	ROM_REGION( 0x1000, "audiocpu", 0 )
-	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, NO_DUMP )
-
-	ROM_REGION( 0x200000, "gfx1", 0  ) /* Bg */
-	ROM_LOAD( "7.u45",     0x000000, 0x80000, CRC(64ecdde9) SHA1(576ba1169d90970622249e532baa4209bf12de5a) )
-	ROM_LOAD( "6.u39",     0x080000, 0x80000, CRC(6928065c) SHA1(ad5b1889bebf0358df0295d6041b798ac53ac625) )
-	ROM_LOAD( "5.u42",     0x100000, 0x80000, CRC(8d18bdc6) SHA1(cacc4f475f85438a00ead4911730202e995983a7) )
-	ROM_LOAD( "4.u36",     0x180000, 0x80000, CRC(8e15fb9d) SHA1(47917d8aac1bce2e15f36904f5c2534e5b80236b) )
-
-	ROM_REGION( 0x200000, "gfx2", 0  ) /* Sprites */
-	ROM_LOAD( "8.u83",     0x000000, 0x80000, CRC(19bb89dd) SHA1(c2a0c32d350a193d366b5086502998281fd0bec4) )
-	ROM_LOAD( "9.u84",     0x080000, 0x80000, CRC(d50d86c7) SHA1(7ecbcc03851a8174610f7f5ad889e40543da928e) )
-	ROM_LOAD( "10.u85",    0x100000, 0x80000, CRC(681b8ac8) SHA1(ebfeffc091f53af246311574b9c5d83d2716a7be) )
-	ROM_LOAD( "11.u86",    0x180000, 0x80000, CRC(e41f89e3) SHA1(e4b39411a4cea6aa6c01564f74bb8e432d382a73) )
-
-	/* $00000-$20000 stays the same in all sound banks, */
-	/* the second half of the bank is the area that gets switched */
-	ROM_REGION( 0xc0000, "oki", 0 ) /* OKI Samples */
-	ROM_LOAD( "3.u13",       0x00000, 0x40000, CRC(d0a9245f) SHA1(2e840cdd7bdfe7c6f986daf88576de0559597499) )
-	ROM_CONTINUE(            0x60000, 0x20000 )
-	ROM_CONTINUE(            0xa0000, 0x20000 )
-	ROM_COPY( "oki", 0x00000,0x40000, 0x20000)
-	ROM_COPY( "oki", 0x00000,0x80000, 0x20000)
-ROM_END
-
-ROM_START( sslama ) // this might be a bad dump, the ONLY difference vs. the parent set is the initial stack pointer (0xff0000 in this vs 0x010000 in the other sets)
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
-	ROM_LOAD16_BYTE( "2.u67", 0x00000, 0x80000, CRC(1ce52917) SHA1(b9b1d14ea44c248ce6e615c5c553c0d485c1302b) )
-	ROM_RELOAD_SSLAM(0x100000)
-	ROM_LOAD16_BYTE( "it_22.bin", 0x00001, 0x80000, CRC(51c56828) SHA1(d71d64b0268c156456bed64b4c13b98181fa3e0f) )
-	ROM_RELOAD_SSLAM(0x100001)
-
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, NO_DUMP )
@@ -864,12 +819,10 @@ ROM_END
 // other labels seem to be that of the powerbals set below, but with sslam content, maybe it was
 // factory converted to powerbals at one time, then back again?
 // there are quite a lot of changes from the above sets.
-ROM_START( sslamb )
-	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
+ROM_START( sslama )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "21.u67", 0x00000, 0x80000, CRC(a7c57d58) SHA1(28964c30a12bf7b236fd10bd3b1da341b54f4b7c) )
-	ROM_RELOAD_SSLAM(0x100000)
 	ROM_LOAD16_BYTE( "22.u68", 0x00001, 0x80000,  CRC(782ecd53) SHA1(27a712a4f9d031b1bff7618f60ee6cf7a5241aa1) )
-	ROM_RELOAD_SSLAM(0x100001)
 
 	ROM_REGION( 0x1000, "audiocpu", 0 )
 	ROM_LOAD( "s87c751.bin",  0x0000, 0x0800, NO_DUMP )
@@ -930,5 +883,4 @@ ROM_END
 
 GAME( 1993, sslam,    0,        sslam,    sslam,    sslam_state,    empty_init, ROT0, "Playmark", "Super Slam (set 1)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1993, sslama,   sslam,    sslam,    sslam,    sslam_state,    empty_init, ROT0, "Playmark", "Super Slam (set 2)",                  MACHINE_SUPPORTS_SAVE )
-GAME( 1993, sslamb,   sslam,    sslam,    sslam,    sslam_state,    empty_init, ROT0, "Playmark", "Super Slam (set 3)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1994, powerbals,powerbal, powerbls, powerbls, powerbls_state, empty_init, ROT0, "Playmark", "Power Balls (Super Slam conversion)", MACHINE_SUPPORTS_SAVE )
