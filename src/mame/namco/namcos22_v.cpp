@@ -1591,30 +1591,6 @@ void namcos22_state::screen_vblank(int state)
 
 void namcos22_state::draw_sprites()
 {
-#if 0 // show reg contents
-	int i;
-	char msg1[0x1000]={0}, msg2[0x1000]={0};
-	// 980000-98023f (spriteram header)
-	for (i=0x00;i<0x02;i++) {
-		sprintf(msg2,"98%04X %04X %04X %04X %04X %04X %04X %04X %04X\n",i*16,m_spriteram[i*8+0],m_spriteram[i*8+1],m_spriteram[i*8+2],m_spriteram[i*8+3],
-			m_spriteram[i*8+4],m_spriteram[i*8+5],m_spriteram[i*8+6],m_spriteram[i*8+7]);
-		strcat(msg1,msg2);
-	}
-	for (i=0x20;i<0x24;i++) {
-		sprintf(msg2,"98%04X %04X %04X %04X %04X %04X %04X %04X %04X\n",i*16,m_spriteram[i*8+0],m_spriteram[i*8+1],m_spriteram[i*8+2],m_spriteram[i*8+3],
-			m_spriteram[i*8+4],m_spriteram[i*8+5],m_spriteram[i*8+6],m_spriteram[i*8+7]);
-		strcat(msg1,msg2);
-	}
-	strcat(msg1,"\n");
-	// 940000-94007c (vics control)
-	for (i=0x00;i<0x08;i++) {
-		sprintf(msg2,"94%04X %08X %08X %08X %08X\n",i*16,m_vics_control[i*4+0],m_vics_control[i*4+1],m_vics_control[i*4+2],m_vics_control[i*4+3]);
-		strcat(msg1,msg2);
-	}
-	if (machine().input().code_pressed(KEYCODE_S))
-		popmessage("%s",msg1);
-	else popmessage("[S] shows sprite/vics regs");
-#endif
 	/*
 	    0x980000:   00060000 00010000 02ff0000 000007ff
 	                   ^                                 misc control
@@ -1871,23 +1847,23 @@ void namcos22_state::vics_copy_sprite_data()
 		const int dst = (m_vics_control[(offset + 0xc) / 4] & 0xffff) / 2;
 
 		// make sure we don't read past the end of m_vics_data[]
-		size = std::min(size, 0x8000 - src);
+		size = std::min(size, (int)m_vics_data.length() - src);
 
 		if (m_vics_control[offset / 4] & 0x1000000)
 		{
 			// make sure we don't write past the end of m_attributeram[]
-			if (UNEXPECTED(dst >= 0x500))
+			if (UNEXPECTED(dst >= (int)m_attributeram.length()))
 				continue;
-			size = std::min(size, 0x500 - dst);
+			size = std::min(size, (int)m_attributeram.length() - dst);
 
 			std::copy_n(&m_vics_data[src], size, &m_attributeram[dst]);
 		}
 		else
 		{
 			// make sure we don't write past the end of m_spriteram[]
-			if (UNEXPECTED(dst >= 0x4000))
+			if (UNEXPECTED(dst >= (int)m_spriteram.length()))
 				continue;
-			size = std::min(size, 0x4000 - dst);
+			size = std::min(size, (int)m_spriteram.length() - dst);
 
 			std::copy_n(&m_vics_data[src], size, &m_spriteram[dst]);
 		}
@@ -2425,27 +2401,6 @@ void namcos22s_state::recalc_czram()
 
 void namcos22_state::update_mixer()
 {
-#if 0 // show reg contents
-	char msg1[0x1000] = {0}, msg2[0x1000] = {0};
-	int st = 0x000 / 16;
-	for (int i = st; i < (st+3); i++)
-	{
-		sprintf(msg2,"%04X %08X %08X %08X %08X\n", i*16, m_mixer[i*4+0], m_mixer[i*4+1], m_mixer[i*4+2], m_mixer[i*4+3]);
-		strcat(msg1,msg2);
-	}
-	if (1) // + other non-super regs
-	if (!m_is_ss22)
-	{
-		strcat(msg1,"\n");
-		for (int i = 8; i <= 0x20; i += 8)
-		{
-			sprintf(msg2,"%04X %08X %08X %08X %08X\n", i*16, m_mixer[i*4+0], m_mixer[i*4+1], m_mixer[i*4+2], m_mixer[i*4+3]);
-			strcat(msg1,msg2);
-		}
-	}
-	popmessage("%s",msg1);
-#endif
-
 	if (m_is_ss22)
 	{
 		/*
@@ -2738,14 +2693,9 @@ void namcos22s_state::init_tables()
 	save_item(NAME(m_czattr));
 	save_item(NAME(m_cz_was_written));
 
-	m_vics_data = make_unique_clear<u16[]>(0x8000);
-	save_pointer(NAME(m_vics_data), 0x8000);
-
-	m_spriteram = make_unique_clear<u16[]>(0x4000);
-	save_pointer(NAME(m_spriteram), 0x4000);
-
-	m_attributeram = make_unique_clear<u16[]>(0x500);
-	save_pointer(NAME(m_attributeram), 0x500);
+	memset(m_vics_data, 0, m_vics_data.bytes());
+	memset(m_spriteram, 0, m_spriteram.bytes());
+	memset(m_attributeram, 0, m_attributeram.bytes());
 }
 
 void namcos22_state::video_start()

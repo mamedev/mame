@@ -203,6 +203,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_czram(*this, "czram"),
+		m_spriteram(*this, "spriteram", 0x8000, ENDIANNESS_BIG),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_maincpu(*this, "maincpu"),
 		m_master(*this, "master"),
@@ -221,8 +222,9 @@ public:
 		m_polygonram(*this, "polygonram"),
 		m_mixer(*this, "video_mixer"),
 		m_gamma_proms(*this, "gamma_proms"),
-		m_pointrom(*this, "pointrom"),
+		m_vics_data(*this, "vics_data", 0x10000, ENDIANNESS_BIG),
 		m_vics_control(*this, "vics_control"),
+		m_attributeram(*this, "attributeram", 0xa00, ENDIANNESS_BIG),
 		m_screen(*this, "screen"),
 		m_adc_ports(*this, "ADC.%u", 0),
 		m_inputs(*this, "INPUTS"),
@@ -273,7 +275,7 @@ public:
 
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<u32> m_czram;
-	std::unique_ptr<u16[]> m_spriteram;
+	memory_share_creator<u16> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
@@ -434,8 +436,9 @@ protected:
 	required_shared_ptr<u32> m_polygonram;
 	required_shared_ptr<u32> m_mixer;
 	optional_region_ptr<u8> m_gamma_proms;
-	required_region_ptr<s32> m_pointrom;
+	memory_share_creator<u16> m_vics_data;
 	optional_shared_ptr<u32> m_vics_control;
+	memory_share_creator<u16> m_attributeram;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_adc_ports;
 	required_ioport m_inputs;
@@ -488,8 +491,6 @@ protected:
 	
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
-	std::unique_ptr<u16[]> m_vics_data;
-	std::unique_ptr<u16[]> m_attributeram;
 
 	tilemap_t *m_text_tilemap;
 	u16 m_tilemapattr[8] = { };
