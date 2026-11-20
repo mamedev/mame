@@ -252,6 +252,8 @@
 
 #include "emu.h"
 
+#include "sr_controls.h"
+
 #include "cpu/m6809/m6809.h"
 #include "machine/2812fifo.h"
 #include "machine/6821pia.h"
@@ -297,6 +299,10 @@ public:
 	void starrider(machine_config &config) ATTR_COLD;
 
 	DECLARE_INPUT_CHANGED_MEMBER(sound_sw1_changed);
+
+	ioport_value steering_r() { return sr_controls::steering(ioport("STEERING")->read()); }
+	ioport_value throttle_r() { return sr_controls::throttle(ioport("THROTTLE")->read()); }
+	ioport_value brake_r() { return sr_controls::brake(ioport("BRAKE")->read()); }
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -888,15 +894,24 @@ void sr_state::sound_memory(address_map &map)
 
 INPUT_PORTS_START(starrider)
 	PORT_START("IN0")
-	PORT_BIT(0x3f, IP_ACTIVE_LOW, IPT_UNKNOWN) // TODO: steering Gray code
+	PORT_BIT(0x3f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(sr_state::steering_r))
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_START2)
 
 	PORT_START("IN1")
-	PORT_BIT(0x0f, IP_ACTIVE_LOW,  IPT_UNKNOWN) // TODO: accelerator
-	PORT_BIT(0x30, IP_ACTIVE_LOW,  IPT_UNKNOWN) // TODO: brake
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON1)                  PORT_NAME("Turbo")
-	PORT_BIT(0x80, IP_ACTIVE_LOW,  IPT_BUTTON2)      PORT_TOGGLE PORT_NAME("Hi/Lo")
+	PORT_BIT(0x0f, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(sr_state::throttle_r))
+	PORT_BIT(0x30, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(sr_state::brake_r))
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_BUTTON1)                  PORT_NAME("Turbo")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED) // Cabinet harness leaves PB7 disconnected.
+
+	PORT_START("STEERING")
+	PORT_BIT(sr_controls::STEERING_MASK, 0x20, IPT_PADDLE) PORT_NAME("Steering") PORT_MINMAX(0, sr_controls::STEERING_MASK) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)
+
+	PORT_START("THROTTLE")
+	PORT_BIT(sr_controls::THROTTLE_MASK, 0x00, IPT_PEDAL) PORT_NAME("Throttle") PORT_MINMAX(0, sr_controls::THROTTLE_MASK) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)
+
+	PORT_START("BRAKE")
+	PORT_BIT(sr_controls::BRAKE_MASK, 0x00, IPT_PEDAL2) PORT_NAME("Brake") PORT_MINMAX(0, sr_controls::BRAKE_MASK) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)
 
 	PORT_START("IN2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE1)     PORT_TOGGLE PORT_NAME("Auto Up / Manual Down")
