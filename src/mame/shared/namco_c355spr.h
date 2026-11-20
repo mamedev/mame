@@ -31,6 +31,7 @@ public:
 	void set_alt_precision(bool alt_precision) { m_alt_precision = alt_precision; }
 	void set_colors(int colors) { m_colors = colors; }
 	void set_granularity(int granularity) { m_granularity = granularity; }
+	void set_palette_shift(bool enable) { m_pal_shift = true; };
 
 	// the Namco code currently requires us to allocate memory in the device, the Data East hookup uses access callbacks
 	void set_device_allocates_spriteram(bool allocate_memory) { m_device_allocates_spriteram = allocate_memory;  }
@@ -141,6 +142,7 @@ private:
 	int m_colors;
 	int m_granularity;
 	bool m_device_allocates_spriteram;
+	bool m_pal_shift;
 };
 
 // device type definition

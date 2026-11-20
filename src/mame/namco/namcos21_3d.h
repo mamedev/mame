@@ -21,7 +21,18 @@ public:
 	void set_num_palettes(int num)
 	{
 		m_num_palettes = num;
-		m_penmask = (m_num_palettes == 0x20) ? 0x1f00 : 0x1e00;
+		switch (num)
+		{
+			case 0x08:
+				m_penmask = 0x1c00;
+			break;
+			case 0x10:
+				m_penmask = 0x1e00;
+			break;
+			case 0x20:
+				m_penmask = 0x1f00;
+			break;
+		}
 	}
 
 	void set_depth_reverse(bool reverse) { m_depth_reverse = reverse; }
