@@ -1059,11 +1059,11 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			adjust_timer_interrupt();
 			return;
 		case TCR_REGISTER:
-			if (m_core->global_regs[code] != val)
-			{
-				m_core->global_regs[code] = val;
-				adjust_timer_interrupt();
-			}
+			// any write re-checks the comparison, even with the value unchanged, and requests the
+			// interrupt if TR is already at or past it: the interrupt is only cleared by loading a
+			// value above TR (E1-32XS user's manual, section 5.1.3)
+			m_core->global_regs[code] = val;
+			adjust_timer_interrupt();
 			return;
 		case TR_REGISTER:
 			m_core->global_regs[code] = val;
@@ -1077,10 +1077,15 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 		case ISR_REGISTER:
 			return;
 		case FCR_REGISTER:
-			if ((m_core->global_regs[code] ^ val) & 0x00800000)
-				adjust_timer_interrupt();
+		{
+			// bit 23 only masks the timer interrupt (E1-32XS user's manual, section 5.1.3), so
+			// store the new value first and reschedule the timer using the new mask
+			const uint32_t changed = m_core->global_regs[code] ^ val;
 			m_core->global_regs[code] = val;
+			if (BIT(changed, 23))
+				adjust_timer_interrupt();
 			return;
+		}
 		case MCR_REGISTER:
 			m_core->global_regs[code] = val;
 			update_memory_control();
