@@ -31,7 +31,6 @@ Two version updaters known:
     TODO:
     - Dynamically load smart applets as cartridges or similar.
     - Support the Alphasmart Neo (needs driver for ST7675).
-    - USB support?
 
 ***************************************************************************************************/
 
@@ -44,6 +43,7 @@ Two version updaters known:
 #include "screen.h"
 #include "softlist_dev.h"
 #include "util/multibyte.h"
+#include "alphasmart_usb_socket.h"
 
 static const uint32_t SMALLOS_BEGIN = 0x00'0000;
 static const uint32_t APPLETS_BEGIN = 0x00'8000;
@@ -137,6 +137,7 @@ public:
 		, m_flash_base(*this, "flash", ROM_SIZE, ENDIANNESS_BIG)
 		, m_keyboard(*this, "COL.%u", 0)
 		, m_applet(*this, "applet")
+		, m_usb(*this, "usb")
 	{
 	}
 
@@ -163,6 +164,8 @@ protected:
 	memory_share_creator<uint16_t> m_flash_base;
 	required_ioport_array<16> m_keyboard;
 	required_device<alphasmart_applet_device> m_applet;
+	required_device<alphasmart_usb_device> m_usb;
+	memory_passthrough_handler m_usb_gpio_tap;
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 
@@ -210,6 +213,14 @@ uint32_t alphasmart3k_state::screen_update(screen_device &screen, bitmap_ind16 &
 
 void alphasmart3k_state::machine_start()
 {
+	// Firmware drives SDA/SCL low by setting PEDIR; clearing it releases
+	// the open-drain pin. Data-write callbacks alone miss these transitions.
+	m_usb_gpio_tap = m_maincpu->space(AS_PROGRAM).install_write_tap(
+		0xfffff420, 0xfffff421, "usb_gpio",
+		[this](offs_t, uint16_t &data, uint16_t mem_mask)
+		{
+			if (mem_mask & 0xff00) m_usb->gpio_w(data >> 8);
+		});
 	m_tmp_bitmap = std::make_unique<bitmap_ind16>(6 * 40, 9 * 4);
 
 	// Hold CPU in reset until flash is ready
@@ -564,6 +575,10 @@ void alphasmart3k_state::alphasmart3k(machine_config &config)
 	m_maincpu->in_port_d<7>().set(FUNC(alphasmart3k_state::port_d_r<7>));
 
 	m_maincpu->in_port_g<4>().set_constant(1);
+	m_maincpu->in_port_e<0>().set(m_usb, FUNC(alphasmart_usb_device::suspend_r));
+	m_maincpu->in_port_e<1>().set(m_usb, FUNC(alphasmart_usb_device::sda_r));
+	m_maincpu->in_port_e<2>().set(m_usb, FUNC(alphasmart_usb_device::scl_r));
+	m_maincpu->in_port_f<1>().set(m_usb, FUNC(alphasmart_usb_device::irq_r));
 
 	m_maincpu->in_port_c<0>().set(FUNC(alphasmart3k_state::port_c_r<0>));
 	m_maincpu->in_port_c<1>().set(FUNC(alphasmart3k_state::port_c_r<1>));
@@ -593,7 +608,8 @@ void alphasmart3k_state::alphasmart3k(machine_config &config)
 	}
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen"));
+	screen.set_lcd();
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update(FUNC(alphasmart3k_state::screen_update));
@@ -606,6 +622,8 @@ void alphasmart3k_state::alphasmart3k(machine_config &config)
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0).set_custom_handler(FUNC(alphasmart3k_state::init_empty_ram));
 	NVRAM(config, "flash", nvram_device::DEFAULT_ALL_1).set_custom_handler(FUNC(alphasmart3k_state::init_empty_flash));
 	ALPHASMART_APPLET(config, m_applet);
+	ALPHASMART_USB(config, m_usb);
+	m_usb->irq_callback().set(m_maincpu, FUNC(mc68328_base_device::irq5_w));
 }
 
 // ROM definitions
