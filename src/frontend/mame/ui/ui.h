@@ -204,7 +204,9 @@ public:
 	bool show_profiler() const;
 	bool show_menu();
 	bool show_menu(render_target &target);
-	virtual bool is_menu_active() override;
+	virtual bool is_menu_active() const override;
+	virtual bool wants_ui_interleave() const override;
+	virtual bool ui_interleave_update() override;
 	bool can_paste();
 	void image_handler_ingame();
 	void request_quit();
@@ -257,6 +259,7 @@ public:
 
 	// other
 	void process_ui_events();
+	void update_ui_input();
 	ui::text_layout create_layout(render_target &target, float width = 1.0, ui::text_layout::text_justify justify = ui::text_layout::text_justify::LEFT, ui::text_layout::word_wrapping wrap = ui::text_layout::word_wrapping::WORD);
 	void set_image_display_enabled(bool image_display_enabled) { m_image_display_enabled = image_display_enabled; }
 	bool image_display_enabled() const { return m_image_display_enabled; }
