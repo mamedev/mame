@@ -1,0 +1,166 @@
+{
+  "status": "PASS",
+  "header_sha256": "87d6e8a869dc3a72e8009cca98aa80f865ae05a54b5ff50bdbfa102a45566ad5",
+  "binary_sha256": "3d962ebd7319c73b74cc4c0801254c48ad8c55f82dc2e7d602632df9c8cbd8a1",
+  "vertices": 433844,
+  "pixels": 5243616,
+  "frames": 36,
+  "records": [
+    {
+      "case": "goro",
+      "frames": [
+        586,
+        587,
+        588
+      ],
+      "vertices": 38728,
+      "mismatches": 0,
+      "pixels": 434431,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    },
+    {
+      "case": "shaolin",
+      "frames": [
+        650,
+        651,
+        652
+      ],
+      "vertices": 40156,
+      "mismatches": 0,
+      "pixels": 444548,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    },
+    {
+      "case": "forest",
+      "frames": [
+        548,
+        549,
+        550
+      ],
+      "vertices": 43288,
+      "mismatches": 0,
+      "pixels": 511867,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    },
+    {
+      "case": "prison",
+      "frames": [
+        586,
+        587,
+        588
+      ],
+      "vertices": 39288,
+      "mismatches": 0,
+      "pixels": 601963,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    },
+    {
+      "case": "well",
+      "frames": [
+        523,
+        524,
+        525
+      ],
+      "vertices": 40072,
+      "mismatches": 0,
+      "pixels": 465690,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    },
+    {
+      "case": "elder",
+      "frames": [
+        685,
+        686,
+        687
+      ],
+      "vertices": 53236,
+      "mismatches": 0,
+      "pixels": 446978,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    },
+    {
+      "case": "tomb",
+      "frames": [
+        576,
+        577,
+        578
+      ],
+      "vertices": 42528,
+      "mismatches": 0,
+      "pixels": 455101,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    },
+    {
+      "case": "wind",
+      "frames": [
+        710,
+        711,
+        712
+      ],
+      "vertices": 40636,
+      "mismatches": 0,
+      "pixels": 427658,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    },
+    {
+      "case": "reptile",
+      "frames": [
+        557,
+        558,
+        559
+      ],
+      "vertices": 48140,
+      "mismatches": 0,
+      "pixels": 427744,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    },
+    {
+      "case": "continue-sub-zero-10200",
+      "frames": [
+        10201,
+        10202,
+        10203
+      ],
+      "vertices": 22972,
+      "mismatches": 0,
+      "pixels": 347809,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    },
+    {
+      "case": "continue-sub-zero-10400",
+      "frames": [
+        10401,
+        10402,
+        10403
+      ],
+      "vertices": 23672,
+      "mismatches": 0,
+      "pixels": 344748,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    },
+    {
+      "case": "ui-3600",
+      "frames": [
+        3601,
+        3602,
+        3603
+      ],
+      "vertices": 1128,
+      "mismatches": 0,
+      "pixels": 335079,
+      "pixel_mismatches": 0,
+      "unchanged_rtl_frames": true
+    }
+  ]
+}
