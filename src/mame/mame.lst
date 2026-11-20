@@ -44500,6 +44500,7 @@ minihockey
 
 @source:skeleton/ml20.cpp
 ml20
+ml20nb
 
 @source:skeleton/mmd1.cpp
 mmd1
