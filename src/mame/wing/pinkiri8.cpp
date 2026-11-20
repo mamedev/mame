@@ -52,6 +52,7 @@ Dumped by Chackn
 #include "screen.h"
 #include "speaker.h"
 
+#include <algorithm>
 #include <iterator>
 
 #define LOG_VRAM (1U << 1)
@@ -116,16 +117,18 @@ public:
 
 	void pinkiri8(machine_config &config) ATTR_COLD;
 	void ronjan(machine_config &config) ATTR_COLD;
-	void _4jokers(machine_config &config) ATTR_COLD;
-
-	void init_dec() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-private:
 	void common(machine_config &config) ATTR_COLD;
 
+	void pinkiri8_io(address_map &map) ATTR_COLD;
+
+	required_device<hd647180x_device> m_maincpu;
+
+private:
 	void output_regs_w(uint8_t data);
 	void counters_w(uint8_t data);
 	void io_matrix_w(uint8_t data);
@@ -135,24 +138,37 @@ private:
 	uint8_t ronjan_prot_status_r();
 	uint8_t ronjan_patched_prot_r();
 
-	void _4jokers_prg_map(address_map &map) ATTR_COLD;
-	void _4jokers_io(address_map &map) ATTR_COLD;
-	void pinkiri8_io(address_map &map) ATTR_COLD;
 	void prg_map(address_map &map) ATTR_COLD;
 	void ronjan_io(address_map &map) ATTR_COLD;
 
-	required_device<hd647180x_device> m_maincpu;
 	required_device<janshi_vdp_device> m_vdp;
 
 	required_ioport_array<5> m_io_pl[2];
 
-	uint8_t m_io_matrix = 0;
-	uint8_t m_prot_read_index = 0;
-	uint8_t m_prot_char[5]{};
-	uint8_t m_prot_index = 0;
+	uint8_t m_io_matrix;
+	uint8_t m_prot_read_index;
+	uint8_t m_prot_char[5];
+	uint8_t m_prot_index;
 };
 
+class fourjokers_state : public pinkiri8_state
+{
+public:
+	fourjokers_state(const machine_config &mconfig, device_type type, const char *tag) :
+		pinkiri8_state(mconfig, type, tag),
+		m_rtc(*this, "rtc")
+	{ }
 
+	void _4jokers(machine_config &config) ATTR_COLD;
+
+	void init_dec() ATTR_COLD;
+
+private:
+	void _4jokers_prg_map(address_map &map) ATTR_COLD;
+	void _4jokers_io(address_map &map) ATTR_COLD;
+
+	required_device<msm6242_device> m_rtc;
+};
 
 void janshi_vdp_device::map(address_map &map)
 {
@@ -288,7 +304,7 @@ void janshi_vdp_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 
 	for (int i = bank * 32 + 31; i >= bank * 32; i--)
 	{
-		// The firmware preserves ff when transforming disabled objects for flipping.
+		// sprite disable
 		if (m_vram2[i * 2] == 0xff)
 			continue;
 
@@ -306,6 +322,7 @@ void janshi_vdp_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip
 		int const col = (m_vram1[i * 4 + 2] >> 3) | (col_bank << 5);
 		int const x = ((m_vram1[i * 4 + 3] + xoffset) & 0xff) * 2;
 		int y = 0x100 - ((m_vram2[i * 2] + yoffset) & 0x1ff) - height * 8;
+
 		// The flipped coordinate tables compensate for a 32-line Y origin.
 		if (flipy)
 			y = ((y + 0x20) & 0xff) - (control & 0x100);
@@ -355,7 +372,7 @@ void pinkiri8_state::prg_map(address_map &map)
 	map(0x10000, 0x1ffff).rom();
 }
 
-void pinkiri8_state::_4jokers_prg_map(address_map &map)
+void fourjokers_state::_4jokers_prg_map(address_map &map)
 {
 	map(0x10000, 0x1ffff).rom().region("rom_data", 0x10000);
 	map(0x20000, 0x2ffff).rom().region("rom_data", 0x00000);
@@ -437,11 +454,10 @@ void pinkiri8_state::ronjan_io(address_map &map)
 	map(0x9f, 0x9f).r(FUNC(pinkiri8_state::ronjan_patched_prot_r));
 }
 
-void pinkiri8_state::_4jokers_io(address_map &map)
+void fourjokers_state::_4jokers_io(address_map &map)
 {
 	pinkiri8_io(map);
-	map(0x90, 0x9f).rw("rtc", FUNC(msm6242_device::read), FUNC(msm6242_device::write));
-	map(0xb1, 0xb1).unmapw();
+	map(0x90, 0x9f).rw(m_rtc, FUNC(msm6242_device::read), FUNC(msm6242_device::write));
 }
 
 static INPUT_PORTS_START( base_inputs )
@@ -1034,6 +1050,15 @@ void pinkiri8_state::machine_start()
 	save_item(NAME(m_prot_index));
 }
 
+void pinkiri8_state::machine_reset()
+{
+	m_io_matrix = 0;
+
+	m_prot_read_index = 0;
+	std::fill(std::begin(m_prot_char), std::end(m_prot_char), 0);
+	m_prot_index = 0;
+}
+
 void pinkiri8_state::common(machine_config &config)
 {
 	HD647180X(config, m_maincpu, XTAL(32'000'000)/2);
@@ -1042,11 +1067,13 @@ void pinkiri8_state::common(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(pinkiri8_state::nmi_line_assert));
 	m_maincpu->out_pa_callback().set(FUNC(pinkiri8_state::output_regs_w));
 
+	// not accurate, exact refresh rate, visible area etc. still unconfirmed
+	// going by the test grid would crop graphics
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 64*8);
-	screen.set_visarea(0*8, 62*8-1, 0*8, 32*8-1);
+	screen.set_visarea(0*8, 62*8-1, 2*8, 31*8-1);
 	screen.set_screen_update(m_vdp, FUNC(janshi_vdp_device::screen_update));
 	screen.set_palette("janshivdp:palette");
 
@@ -1073,15 +1100,15 @@ void pinkiri8_state::ronjan(machine_config &config)
 	m_maincpu->in_pg_callback().set(FUNC(pinkiri8_state::ronjan_prot_status_r));
 }
 
-void pinkiri8_state::_4jokers(machine_config &config)
+void fourjokers_state::_4jokers(machine_config &config)
 {
 	common(config);
 
-	m_maincpu->set_addrmap(AS_PROGRAM, &pinkiri8_state::_4jokers_prg_map);
-	m_maincpu->set_addrmap(AS_IO, &pinkiri8_state::_4jokers_io);
+	m_maincpu->set_addrmap(AS_PROGRAM, &fourjokers_state::_4jokers_prg_map);
+	m_maincpu->set_addrmap(AS_IO, &fourjokers_state::_4jokers_io);
 
 	// The date-setting and validation routines use an MSM6242-compatible register map.
-	MSM6242(config, "rtc", 32'768); // exact part and clock unverified
+	MSM6242(config, m_rtc, 32'768); // exact part and clock unverified
 }
 
 /***************************************************************************
@@ -1274,8 +1301,14 @@ void pinkiri8_state::ronjan_prot_w(uint8_t data)
 		m_prot_char[m_prot_index++] = data;
 
 		if ((m_prot_index == std::size(m_prot_char)) &&
-			(m_prot_char[0] == 'E') && (m_prot_char[1] == 'R') && (m_prot_char[2] == 'R') && (m_prot_char[3] == 'O') && (m_prot_char[4] == 'R'))
+			(m_prot_char[0] == 'E') &&
+			(m_prot_char[1] == 'R') &&
+			(m_prot_char[2] == 'R') &&
+			(m_prot_char[3] == 'O') &&
+			(m_prot_char[4] == 'R'))
+		{
 			m_prot_read_index = 0;
+		}
 	}
 }
 
@@ -1289,7 +1322,7 @@ uint8_t pinkiri8_state::ronjan_patched_prot_r()
 	return 0; //value is read then discarded
 }
 
-void pinkiri8_state::init_dec() // same as wing/luckglrn.cpp
+void fourjokers_state::init_dec() // same as wing/luckglrn.cpp
 {
 	uint8_t *rom = memregion("rom_data")->base();
 
@@ -1312,5 +1345,8 @@ GAME( 1994,  ronjans,  0,       ronjan,   ronjan,   pinkiri8_state, empty_init, 
 GAME( 1994,  ronjansa, ronjans, ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan Super (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // possibly Super or not, needs internal ROM dump
 GAME( 1994,  ronjansb, ronjans, ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Ron Jan Super (set 3)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // "
 GAME( 1990,  janmu,    0,       ronjan,   ronjan,   pinkiri8_state, empty_init, ROT0, "Wing Co., Ltd", "Jan Mu",                MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs internal ROM dump
-GAME( 1992,  4jokers,  0,       _4jokers, pinkiri8, pinkiri8_state, init_dec,   ROT0, "Jaleco",        "Four Jokers",           MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs internal ROM dump
 GAME( 1994,  pinkiri8, 0,       pinkiri8, pinkiri8, pinkiri8_state, empty_init, ROT0, "Alta",          "Pinkiri 8",             MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
+// slightly different hardware?
+GAME( 1992,  4jokers,  0,       _4jokers, pinkiri8, fourjokers_state,  init_dec,   ROT0, "Jaleco",        "Four Jokers",           MACHINE_NO_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING ) // needs internal ROM dump
+
