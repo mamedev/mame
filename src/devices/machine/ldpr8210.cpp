@@ -71,8 +71,9 @@
 //**************************************************************************
 
 // devices
-DEFINE_DEVICE_TYPE(PIONEER_PR8210,   pioneer_pr8210_device,   "pr8210",   "Pioneer PR-8210")
-DEFINE_DEVICE_TYPE(SIMUTREK_SPECIAL, simutrek_special_device, "simutrek", "Simutrek Modified PR-8210")
+DEFINE_DEVICE_TYPE(PIONEER_PR8210,    pioneer_pr8210_device,   "pr8210",   "Pioneer PR-8210")
+DEFINE_DEVICE_TYPE(SIMUTREK_SPECIAL,  simutrek_special_device, "simutrek", "Simutrek Modified PR-8210")
+DEFINE_DEVICE_TYPE(WILLIAMS_PR8210,   williams_pr8210_device,  "pr8210_williams", "Williams Modified PR-8210")
 
 
 // bitmaps for the characters
@@ -638,6 +639,8 @@ void pioneer_pr8210_device::i8049_port1_w(uint8_t data)
 	// set the new value
 	uint8_t prev = m_i8049_port1;
 	m_i8049_port1 = data;
+	if (prev != data)
+		LOGMASKED(LOG_SIMUTREK, "PORT1 = %02X\n", data);
 
 	// bit 7 selects the direction of slider movement for JUMP TRG and scanning
 	int direction = (data & 0x80) ? 1 : -1;
@@ -1074,4 +1077,64 @@ int simutrek_special_device::i8748_t0_r()
 {
 	// return 1 if data is waiting from main CPU
 	return m_data_ready;
+}
+
+
+
+//**************************************************************************
+//  WILLIAMS IMPLEMENTATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  williams_pr8210_device - constructor
+//-------------------------------------------------
+
+williams_pr8210_device::williams_pr8210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	pioneer_pr8210_device(mconfig, WILLIAMS_PR8210, tag, owner, clock),
+	m_field(false)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - device initialization
+//-------------------------------------------------
+
+void williams_pr8210_device::device_start()
+{
+	pioneer_pr8210_device::device_start();
+	save_item(NAME(m_field));
+}
+
+
+//-------------------------------------------------
+//  player_vsync - latch the field presented to PIF
+//-------------------------------------------------
+
+void williams_pr8210_device::player_vsync(const vbi_metadata &vbi, int fieldnum, const attotime &curtime)
+{
+	m_field = (fieldnum != 0);
+	pioneer_pr8210_device::player_vsync(vbi, fieldnum, curtime);
+}
+
+
+//-------------------------------------------------
+//  pif_status_r - player signals presented to PIF
+//-------------------------------------------------
+
+uint8_t williams_pr8210_device::pif_status_r() const
+{
+	// FIXME: Derive the exported FIELD/VREF timing from the modified player circuit.
+	return (BIT(m_i8049_port2, 4) ? 0x20 : 0) | (m_field ? 0 : 0x40) | (m_vsync ? 0x80 : 0);
+}
+
+
+//-------------------------------------------------
+//  jump_trigger - external jump request
+//-------------------------------------------------
+
+void williams_pr8210_device::jump_trigger(bool forward)
+{
+	// FIXME: Model the modified player's jump servo and trigger selection.
+	advance_slider(forward ? 1 : -1);
 }
