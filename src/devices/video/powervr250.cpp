@@ -2760,11 +2760,16 @@ u32 powervr250_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	const u32 stride = BIT(m_dac_reg[3], 7, 15);
 	const u32 mask = m_vram_size - 1;
 
+	// the display shows a span in the frame it is fed in: the spans fed so far in this frame, then the rest of the frame
+	// before
+	const u32 count = std::max(m_dac_showing_count, m_dac_feeding_count);
+	const auto shown = [this] (u32 i) -> const dac_span & { return (i < m_dac_feeding_count) ? m_dac_feeding[i] : m_dac_showing[i]; };
+
 	// a render that is still being drawn has to be done first when what is shown is where its pixels go
 	bool in_use = false;
-	for (u32 i = 0; !in_use && i < m_dac_showing_count; i++)
+	for (u32 i = 0; !in_use && i < count; i++)
 	{
-		const dac_span &span = m_dac_showing[i];
+		const dac_span &span = shown(i);
 		if (!span.blank && span.lines)
 		{
 			const u32 last = ((span.address + (span.lines - 1) * stride + span.pixels * 4) & mask) >> PAGE_SHIFT;
@@ -2781,9 +2786,9 @@ u32 powervr250_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	const auto byte = [this, mask] (u32 address) -> u8 { return m_vram[(address & mask) >> 2] >> (8 * (address & 3)); };
 	const auto word = [this, mask] (u32 address) -> u16 { return m_vram[(address & mask) >> 2] >> (8 * (address & 2)); };
 
-	for (u32 i = 0; i < m_dac_showing_count; i++)
+	for (u32 i = 0; i < count; i++)
 	{
-		const dac_span &span = m_dac_showing[i];
+		const dac_span &span = shown(i);
 		if (span.blank)
 			continue;
 
