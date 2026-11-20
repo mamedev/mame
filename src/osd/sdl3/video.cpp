@@ -79,6 +79,7 @@ bool sdl_osd_interface::video_init()
 
 #ifdef SDLMAME_MACOSX
 		// ensure focus is acquired before the input modules start polling
+		start_app_activation_check();
 		process_events();
 		if (!has_focus())
 			osd_printf_verbose("Window did not acquire input focus\n");
