@@ -160,6 +160,9 @@ public:
 
 	// SDL-specific
 	virtual bool has_focus() const override { return bool(m_focus_window); }
+#ifdef SDLMAME_MACOSX
+	void start_app_activation_check();
+#endif
 	void release_keys();
 	bool should_hide_mouse();
 	void process_events_buf();
@@ -180,12 +183,19 @@ private:
 		MODIFIER_KEY_SHIFT = MODIFIER_KEY_LSHIFT | MODIFIER_KEY_RSHIFT
 	};
 
+#ifdef SDLMAME_MACOSX
+	enum class activation_state { IDLE, WAIT, DOCK };
+#endif
+
 	virtual void osd_exit() override;
 
 	void extract_video_config();
 	void output_oslog(const char *buffer);
 
 	void process_window_event(SDL_Event const &event);
+#ifdef SDLMAME_MACOSX
+	void check_app_activation();
+#endif
 	void process_textinput_event(SDL_Event const &event);
 
 	bool mouse_over_window() const { return m_mouse_over_window > 0; }
@@ -203,6 +213,10 @@ private:
 	int m_last_click_y;
 
 	bool m_enable_touch;
+#ifdef SDLMAME_MACOSX
+	activation_state m_activation_state;
+	std::chrono::steady_clock::time_point m_activation_time;
+#endif
 	unsigned m_next_ptrdev;
 	std::vector<std::pair<SDL_TouchID, unsigned> > m_ptrdev_map;
 };

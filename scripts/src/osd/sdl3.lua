@@ -399,6 +399,10 @@ project ("osd_" .. _OPTIONS["osd"])
 			MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.h",
 			MAME_DIR .. "src/osd/modules/debugger/osx/debugosx.h",
 		}
+		files {
+			MAME_DIR .. "src/osd/sdl3/sdlmacos.h",
+			MAME_DIR .. "src/osd/sdl3/sdlmacos.mm",
+		}
 	end
 
 	files {
