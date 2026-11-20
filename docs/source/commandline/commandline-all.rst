@@ -3767,6 +3767,21 @@ Debugging Options
         :ref:`debugger_host <mame-commandline-debuggerhost>` option to set the
         address to bind to.  Supported on all platforms with TCP socket support.
 
+        The GDB ``monitor lua`` command evaluates Lua code in the running MAME
+        process and returns text written with Lua's ``print`` function to GDB.
+        For example, query driver metadata and parentage, and report memory
+        from any configured ``ram_slot`` devices:
+
+        .. code-block:: console
+
+            (gdb) monitor lua local s=manager.machine.system; print("driver",s.name,s.description)
+            (gdb) monitor lua local s=manager.machine.system; print("parent",s.parent ~= "0" and s.parent or "(none)")
+            (gdb) monitor lua print("source",manager.machine.system.source_file)
+            (gdb) monitor lua for tag,d in pairs(manager.machine.devices) do if d.shortname == "ram_slot" then local item=emu.item(d.items["0/m_pointer"]); print("RAM",tag,item.count*item.size) end end
+
+        RAM sizes are reported in bytes.  Lua commands run in MAME's Lua
+        environment; only connect trusted GDB clients.
+
     Example:
         .. code-block:: bash
 
