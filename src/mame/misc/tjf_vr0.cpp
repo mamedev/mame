@@ -130,6 +130,26 @@ and program scrambling, with these differences:
   erased in the default contents, which satisfies the checks; the real
   contents are unknown.
 
+=============================================================================
+
+ddzzcs:
+
+斗地主之财神 (Dou Dizhu zhi Caishen) sticker on a main board with the SoC and
+rom1 (U16, 2MB) plus rom4 (U14, MSP55LV100S, 128MB), and a daughterboard with
+another QFP. rom1 has the boot stub and two programs, both TJF (the second one
+has "author=zhangchunleiTJF" in it):
+
+- rom1: the address lines A8 and A9 are swapped, then A8-A15 are inverted
+- rom4 holds the assets, seen at 0x08000000 (the first program copies 0x2f800
+  bytes from 0x08bd0000 to 0x03fc0000), with both address and data lines
+  scrambled (see init_ddzzcs); the data goes from 0 to 0x5365c7f, the rest is
+  blank
+- the boot stub copies 0x4ec4 blocks of 27 words, unscrambling them like the
+  medal games, either from 0x6ce to 0x02080000 (the game) or from 0x902ce to
+  0x02180000 (a setup program, which the game can also load and run)
+  depending on bit 3 of I/O device register 0x94 (0 selects the game), and
+  jumps there
+
 
     TODO:
     - Dump the second stage loader the external device sends to the boot stub
@@ -145,6 +165,8 @@ and program scrambling, with these differences:
     - Serial security memory: password, access rights, configuration zone
     - xbnz, hzniqiu: unknown inputs, I/O device registers 0x05, 0x22 and 0x23, FS8806 EEPROM
       and key
+    - ddzzcs: I/O device (other block storage magic words and commands, the programs check
+      data in the block storage), register 0x94, inputs, what is on the PIO, video clock
 
 ****************************************************************************/
 
@@ -911,10 +933,10 @@ public:
 		m_encdata(*this, "enc_data"),
 		m_maincpu(*this, "maincpu"),
 		m_io(*this, "io"),
+		m_vr0soc(*this, "vr0soc"),
 		m_workram(*this, "workram"),
 		m_players(*this, "P%u", 1U),
 		m_matrix(*this, "KEY%u", 0U),
-		m_vr0soc(*this, "vr0soc"),
 		m_cryptomem(*this, "cryptomem"),
 		m_hopper(*this, "hopper")
 	{ }
@@ -937,6 +959,7 @@ protected:
 	required_region_ptr<u8> m_encdata;
 	required_device<se3208_device> m_maincpu;
 	required_device<tjf_io_device> m_io;
+	required_device<vrender0soc_device> m_vr0soc;
 
 	void tjf_common(machine_config &config) ATTR_COLD;
 
@@ -949,7 +972,6 @@ private:
 	required_ioport_array<2> m_players;
 	required_ioport_array<5> m_matrix;
 
-	required_device<vrender0soc_device> m_vr0soc;
 	required_device<tjf_cryptomem_device> m_cryptomem;
 	required_device<hopper_device> m_hopper;
 
@@ -975,9 +997,11 @@ public:
 	{ }
 
 	void medal(machine_config &config) ATTR_COLD;
+	void ddzzcs(machine_config &config) ATTR_COLD;
 
 	void init_xbnz() ATTR_COLD;
 	void init_hzniqiu() ATTR_COLD;
+	void init_ddzzcs() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -999,6 +1023,7 @@ private:
 	u32 pioedat_r();
 
 	void medal_map(address_map &map) ATTR_COLD;
+	void ddzzcs_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -1132,6 +1157,13 @@ void tjf_medal_state::medal_map(address_map &map)
 	map(0x01802000, 0x01802003).rw(FUNC(tjf_medal_state::piomod_r), FUNC(tjf_medal_state::piomod_w));
 	map(0x01802004, 0x01802007).rw(FUNC(tjf_medal_state::pioldat_r), FUNC(tjf_medal_state::pioldat_w));
 	map(0x01802008, 0x0180200b).r(FUNC(tjf_medal_state::pioedat_r));
+}
+
+void tjf_medal_state::ddzzcs_map(address_map &map)
+{
+	medal_map(map);
+
+	map(0x08000000, 0x0fffffff).rom().region("rom4", 0);
 }
 
 
@@ -1293,6 +1325,15 @@ void tjf_medal_state::medal(machine_config &config)
 	FS8806(config, m_fs8806).set_key(0xffffffff'ffffffffU);
 }
 
+void tjf_medal_state::ddzzcs(machine_config &config)
+{
+	medal(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &tjf_medal_state::ddzzcs_map);
+
+	m_vr0soc->set_external_vclk(14.318181_MHz_XTAL * 2); // TODO: verify, the programs select the external video clock
+}
+
 
 /*
     Generated files, not dumps:
@@ -1438,6 +1479,17 @@ ROM_START( hzniqiu )
 	// rom4 not populated
 ROM_END
 
+// 斗地主之财神 (Dòu Dìzhǔ zhī Cáishén) (Dou Dizhu: God of Wealth)
+ROM_START( ddzzcs )
+	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x1000000, "enc_data", ROMREGION_ERASEFF )
+	ROM_LOAD( "rom1.u16", 0x000000, 0x200000, CRC(3b6e953f) SHA1(37267fe6dfcbd79aaeb9a3a801e2fc992e4e474a) )
+
+	ROM_REGION32_LE( 0x8000000, "rom4", 0 )
+	ROM_LOAD( "rom4.u14", 0x0000000, 0x8000000, CRC(66a942c2) SHA1(0a617285469d66c5b6fb414bba1b320daebf82d3) ) // MSP55LV100S
+ROM_END
+
 
 void tjf_state::descramble_flash(u8 *dst, u8 const *src, u32 len, u16 addrxor)
 {
@@ -1539,6 +1591,27 @@ void tjf_medal_state::init_hzniqiu()
 	descramble(0xfc00);
 }
 
+void tjf_medal_state::init_ddzzcs()
+{
+	// rom1: A8 <-> A9, then A8-A15 inverted; the boot stub copies and unscrambles the program by itself
+	u32 const len = m_encdata.bytes();
+	u8 *const ipl = memregion("ipl")->base();
+	for (u32 i = 0; i < len; i++)
+		ipl[BYTE4_XOR_LE(i)] = m_encdata[(i & ~0xffff) | (bitswap<16>(i, 15,14,13,12,11,10, 8,9, 7,6,5,4,3,2,1,0) ^ 0xff00)];
+
+	// rom4: address and data lines scrambled
+	memory_region *const rom4 = memregion("rom4");
+	u8 *const dst = rom4->base();
+	std::vector<u8> const src(dst, dst + rom4->bytes());
+	for (u32 i = 0; i < rom4->bytes(); i += 2)
+	{
+		u32 const a = bitswap<27>(i, 20,21,18,24,22,23,19,25,26, 16,15,14,13,12,11,10,9,8,7,6,5,4,3,2, 17, 1,0);
+		u16 const data = bitswap<16>(src[a] | (src[a + 1] << 8), 11,3,10,2,9,1,8,0, 4,12,5,13,6,14,7,15);
+		dst[BYTE4_XOR_LE(i)] = data & 0xff;
+		dst[BYTE4_XOR_LE(i + 1)] = data >> 8;
+	}
+}
+
 } // anonymous namespace
 
 
@@ -1550,3 +1623,4 @@ GAME( 2005, btlfront, 0, btlfront, btlfront, tjf_state,       init_btlfront, ROT
 
 GAME( 200?, xbnz,     0, medal,    medal,    tjf_medal_state, init_xbnz,     ROT0, "TJF", "Xibu Niuzai",         MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 GAME( 200?, hzniqiu,  0, medal,    medal,    tjf_medal_state, init_hzniqiu,  ROT0, "TJF", "Huozhuo Niqiu",       MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, ddzzcs,   0, ddzzcs,   medal,    tjf_medal_state, init_ddzzcs,   ROT0, "TJF", "Dou Dizhu zhi Caishen", MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
