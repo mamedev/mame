@@ -47,7 +47,7 @@ The following additional games are also known to be undumped
     - added Fishing Maniac 3
 
  - Pierpaolo Prazzoli 2006.01.16
-   - added King of Dynast Gear (protection patched by Tomasz)
+   - added King of Dynast Gear
    - fixed frame buffer drawing
    - fixed flash roms reading
    - added game settings writing to flash roms
@@ -58,9 +58,6 @@ The following additional games are also known to be undumped
 
  - TS 2005.02.06
    Preliminary emulation of X-Files. VRender0- is probably just framebuffer.
-   Patch in DRIVER_INIT removes call at RAM adr $8f30 - protection ?
-   (without fix, game freezes at one of startup screens - like on real
-   board  with  protection PIC removed)
 
 *********************************************************************
 
@@ -181,6 +178,138 @@ Notes:
 
 namespace {
 
+/*
+  Security module (U100, marked 'dgPIX-PR1') - simulated
+
+  The BIOS library linked into every game treats U100 as an ISO 7816 style
+  smart card reached through a parallel, nibble-wide handshake port:
+
+    I/O 0x080 (r)   bit 0 = module ready, bit 1 = byte available
+    I/O 0x180 (r/w) data bits 0-3
+    I/O 0x200 (r/w) data bits 4-7
+    I/O 0x280 (w)   transfer direction (0 = module to host, 1 = host to module)
+    I/O 0x300 (w)   reset, active low
+
+  At start-up every game pulses reset once and reads an 18 byte answer to
+  reset (TS, T0, TB1 and 15 historical bytes), keeping the first 13 bytes.
+  Nothing talks to the module after that.  What is done with the stored
+  bytes depends on the game:
+
+  - The X-Files, Jump Jump, Let's Dance, Beat Player 2000: a BIOS kernel
+    thread compares them with a scrambled copy held in the program's data
+    every 10ms, and ends the program on a mismatch.  The same thread is the
+    only place the coin inputs are read.
+  - King of Dynast Gear: as above, and the game also stops with "Reset
+    request!!!" after a mismatch, or with "Coin timer error!!!" if that
+    thread is found not to be running.
+  - Elfin, Fishing Maniac 2+, Fishing Maniac 3: the bytes are stored but
+    never looked at (the Fishing Maniac boards have no U100 fitted and the
+    read simply times out).
+
+  The library also contains a complete command set (select file, read/
+  update binary, get challenge, external authenticate...) and a card
+  personalisation routine, but no dumped game references any of it, so
+  only the answer to reset is simulated and nothing is ever sent to the
+  module.  The answer was recovered from the scrambled copy the programs
+  hold, which also has the five bytes they don't check.  Boards without
+  the module fitted leave its ports unmapped.
+*/
+
+class dgpix_pr1_device : public device_t
+{
+public:
+	dgpix_pr1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	u8 status_r();
+	u8 data_lo_r();
+	u8 data_hi_r();
+	void dir_w(u8 data);
+	void reset_w(u8 data);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	// answer to reset: TS, T0 (TB1 present, 15 historical bytes), TB1, historical bytes
+	static constexpr u8 ATR[18] = { 0x3b, 0x2f, 0x00, 0x6a, 'S', 'C', 'O', 'S', 'L', 'I', 'G', 'H', 'T', 'd', 'g', 'P', 'I', 'X' };
+
+	bool m_reset;
+	u8 m_tx_pos;
+};
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(DGPIX_PR1, dgpix_pr1_device, dgpix_pr1_device, "dgpix_pr1", "dgPIX-PR1 security module (HLE)")
+
+namespace {
+
+dgpix_pr1_device::dgpix_pr1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, DGPIX_PR1, tag, owner, clock)
+{
+}
+
+void dgpix_pr1_device::device_start()
+{
+	save_item(NAME(m_reset));
+	save_item(NAME(m_tx_pos));
+}
+
+void dgpix_pr1_device::device_reset()
+{
+	m_reset = true;
+	m_tx_pos = std::size(ATR);
+}
+
+u8 dgpix_pr1_device::status_r()
+{
+	u8 data = 0;
+
+	if (m_reset)
+	{
+		data |= 1;
+		if (m_tx_pos < std::size(ATR))
+			data |= 2;
+	}
+
+	return data;
+}
+
+u8 dgpix_pr1_device::data_lo_r()
+{
+	return (m_tx_pos < std::size(ATR)) ? (ATR[m_tx_pos] & 0x0f) : 0;
+}
+
+u8 dgpix_pr1_device::data_hi_r()
+{
+	if (m_tx_pos >= std::size(ATR))
+		return 0;
+
+	// the program reads the high nibble last, so step to the next byte here
+	const u8 data = ATR[m_tx_pos] >> 4;
+	if (!machine().side_effects_disabled())
+		m_tx_pos++;
+
+	return data;
+}
+
+void dgpix_pr1_device::dir_w(u8 data)
+{
+	if (BIT(data, 0))
+		logerror("%s: set to receive, not simulated\n", machine().describe_context());
+}
+
+void dgpix_pr1_device::reset_w(u8 data)
+{
+	// the answer to reset is sent when reset is released
+	if (!m_reset && BIT(data, 0))
+		m_tx_pos = 0;
+
+	m_reset = BIT(data, 0);
+}
+
+
 class dgpix_state : public driver_device
 {
 public:
@@ -189,6 +318,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "ks0164"),
 		m_flash(*this, "flash%u", 0),
+		m_secmod(*this, "secmod"),
 		m_vblank(*this, "VBLANK")
 	{ }
 
@@ -208,15 +338,9 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ks0164_device> m_sound;
 	optional_device_array<intel_28f320j5_device, 8> m_flash; // up to 8 but not all populated
+	optional_device<dgpix_pr1_device> m_secmod; // U100, not fitted on every board
 
 private:
-	// answer to reset of the simulated security module
-	static constexpr u8 SECMOD_ATR[18] =
-	{
-		0x3b, 0x2f, 0x00, // TS, T0 (TB1 present, 15 historical bytes), TB1
-		0x6a, 'S', 'C', 'O', 'S', 'L', 'I', 'G', 'H', 'T', 'd', 'g', 'P', 'I', 'X'
-	};
-
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void io_map(address_map &map) ATTR_COLD;
 
@@ -231,19 +355,11 @@ private:
 
 	u16 flash_raw_rom_r(offs_t offset);
 
-	u32 secmod_status_r();
-	u32 secmod_data_lo_r();
-	u32 secmod_data_hi_r();
-	void secmod_dir_w(u32 data);
-	void secmod_reset_w(u32 data);
-
 	required_ioport m_vblank;
 
 	std::unique_ptr<u16[]> m_vram;
 	int m_vbuffer;
 	int m_old_vbuf;
-	u8 m_secmod_reset;
-	u8 m_secmod_tx_pos;
 };
 
 
@@ -348,89 +464,6 @@ u32 dgpix_state::vblank_r()
 	return m_vblank->read();
 }
 
-/*
-  Security module (U100, marked 'dgPIX-PR1') - simulated
-
-  The BIOS library linked into every game treats U100 as an ISO 7816 style
-  smart card reached through a parallel, nibble-wide handshake port:
-
-    I/O 0x080 (r)   bit 0 = module ready, bit 1 = byte available
-    I/O 0x180 (r/w) data bits 0-3
-    I/O 0x200 (r/w) data bits 4-7
-    I/O 0x280 (w)   transfer direction (0 = module to host, 1 = host to module)
-    I/O 0x300 (w)   reset, active low
-
-  At start-up every game pulses reset once and reads an 18 byte answer to
-  reset (TS, T0, TB1 and 15 historical bytes), keeping the first 13 bytes.
-  Nothing talks to the module after that.  What is done with the stored
-  bytes depends on the game:
-
-  - The X-Files, Jump Jump, Let's Dance, Beat Player 2000: a BIOS kernel
-    thread compares them with a scrambled copy held in the program's data
-    every 10ms, and ends the program on a mismatch.  The same thread is the
-    only place the coin inputs are read.
-  - King of Dynast Gear: as above, and the game also stops with "Reset
-    request!!!" after a mismatch, or with "Coin timer error!!!" if that
-    thread is found not to be running.
-  - Elfin, Fishing Maniac 2+, Fishing Maniac 3: the bytes are stored but
-    never looked at (the Fishing Maniac boards have no U100 fitted and the
-    read simply times out).
-
-  The library also contains a complete command set (select file, read/
-  update binary, get challenge, external authenticate...) and a card
-  personalisation routine, but no dumped game references any of it, so
-  only the answer to reset is simulated and nothing is ever sent to the
-  module.  The answer was recovered from the scrambled copy the programs
-  hold, which also has the five bytes they don't check.
-*/
-
-u32 dgpix_state::secmod_status_r()
-{
-	u32 data = 0;
-
-	if (m_secmod_reset)
-	{
-		data |= 1;
-		if (m_secmod_tx_pos < std::size(SECMOD_ATR))
-			data |= 2;
-	}
-
-	return data;
-}
-
-u32 dgpix_state::secmod_data_lo_r()
-{
-	return (m_secmod_tx_pos < std::size(SECMOD_ATR)) ? (SECMOD_ATR[m_secmod_tx_pos] & 0x0f) : 0;
-}
-
-u32 dgpix_state::secmod_data_hi_r()
-{
-	if (m_secmod_tx_pos >= std::size(SECMOD_ATR))
-		return 0;
-
-	// the program reads the high nibble last, so step to the next byte here
-	const u8 data = SECMOD_ATR[m_secmod_tx_pos] >> 4;
-	if (!machine().side_effects_disabled())
-		m_secmod_tx_pos++;
-
-	return data;
-}
-
-void dgpix_state::secmod_dir_w(u32 data)
-{
-	if (BIT(data, 0))
-		logerror("%s: security module set to receive, not simulated\n", machine().describe_context());
-}
-
-void dgpix_state::secmod_reset_w(u32 data)
-{
-	// the answer to reset is sent when reset is released
-	if (!m_secmod_reset && BIT(data, 0))
-		m_secmod_tx_pos = 0;
-
-	m_secmod_reset = BIT(data, 0);
-}
-
 void dgpix_bmkey_state::sound_bank_w(u16 data)
 {
 	auto bank_addr = data * 0x400000;
@@ -469,11 +502,11 @@ void dgpix_bmkey_state::mem_map(address_map &map)
 
 void dgpix_state::io_map(address_map &map)
 {
-	map(0x0080, 0x0080).nopr(); // used to sync with the protecion PIC? tested bits 0 and 1
+	map(0x0080, 0x0080).nopr(); // U100 status, reads as 0 where the module is not fitted
 	map(0x0080, 0x0080).w(FUNC(dgpix_state::coin_w));
 	map(0x0100, 0x0100).rw(FUNC(dgpix_state::vblank_r), FUNC(dgpix_state::vbuffer_w));
 	map(0x0284, 0x0284).portr("INPUTS");
-	map(0x0300, 0x0300).nopw(); // writes only: 1, 0, 1 at startup
+	map(0x0300, 0x0300).nopw(); // U100 reset
 	map(0x0320, 0x0320).umask32(0x000000ff).rw(m_sound, FUNC(ks0164_device::mpu401_data_r), FUNC(ks0164_device::mpu401_data_w));
 	map(0x0321, 0x0321).umask32(0x000000ff).rw(m_sound, FUNC(ks0164_device::mpu401_status_r), FUNC(ks0164_device::mpu401_ctrl_w));
 }
@@ -482,11 +515,11 @@ void dgpix_state::secmod_io_map(address_map &map)
 {
 	io_map(map);
 
-	map(0x0080, 0x0080).r(FUNC(dgpix_state::secmod_status_r));
-	map(0x0180, 0x0180).r(FUNC(dgpix_state::secmod_data_lo_r));
-	map(0x0200, 0x0200).r(FUNC(dgpix_state::secmod_data_hi_r));
-	map(0x0280, 0x0280).w(FUNC(dgpix_state::secmod_dir_w));
-	map(0x0300, 0x0300).w(FUNC(dgpix_state::secmod_reset_w));
+	map(0x0080, 0x0080).umask32(0x000000ff).r(m_secmod, FUNC(dgpix_pr1_device::status_r));
+	map(0x0180, 0x0180).umask32(0x000000ff).r(m_secmod, FUNC(dgpix_pr1_device::data_lo_r));
+	map(0x0200, 0x0200).umask32(0x000000ff).r(m_secmod, FUNC(dgpix_pr1_device::data_hi_r));
+	map(0x0280, 0x0280).umask32(0x000000ff).w(m_secmod, FUNC(dgpix_pr1_device::dir_w));
+	map(0x0300, 0x0300).umask32(0x000000ff).w(m_secmod, FUNC(dgpix_pr1_device::reset_w));
 }
 
 static INPUT_PORTS_START( dgpix )
@@ -589,17 +622,12 @@ void dgpix_state::machine_start()
 {
 	save_item(NAME(m_vbuffer));
 	save_item(NAME(m_old_vbuf));
-	save_item(NAME(m_secmod_reset));
-	save_item(NAME(m_secmod_tx_pos));
 }
 
 void dgpix_state::machine_reset()
 {
 	m_vbuffer = 0;
 	m_old_vbuf = 3;
-
-	m_secmod_reset = 1;
-	m_secmod_tx_pos = std::size(SECMOD_ATR);
 }
 
 void dgpix_bmkey_state::machine_reset()
@@ -644,6 +672,8 @@ void dgpix_typea_state::dgpix_secmod(machine_config &config)
 {
 	dgpix(config);
 	m_maincpu->set_addrmap(AS_IO, &dgpix_typea_state::secmod_io_map);
+
+	DGPIX_PR1(config, m_secmod);
 }
 
 void dgpix_typea_state::dgpix_kdynastg(machine_config &config)
@@ -659,6 +689,8 @@ void dgpix_bmkey_state::dgpix(machine_config &config)
 	dgpix_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dgpix_bmkey_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dgpix_bmkey_state::secmod_io_map);
+
+	DGPIX_PR1(config, m_secmod);
 }
 
 

@@ -213,6 +213,10 @@ void ks0164_device::mpuin_set(bool control, u8 data)
 
 	if(m_mpu_status & MPUS_RX_INT)
 		m_cpu->set_input_line(11, ASSERT_LINE);
+
+	// the host polls the status port until the internal CPU has taken the byte,
+	// so run the two in step for long enough for that to happen
+	machine().scheduler().perfect_quantum(attotime::from_usec(100));
 }
 
 void ks0164_device::mpu401_data_w(u8 data)
@@ -240,13 +244,8 @@ u8 ks0164_device::mpu401_status_r()
 	u8 res = 0x3f;
 	if(!(m_mpu_status & MPUS_TX_FULL))
 		res |= 0x80;
-	if(m_mpu_status & MPUS_RX_FULL) {
+	if(m_mpu_status & MPUS_RX_FULL)
 		res |= 0x40;
-
-		// the host polls this until the internal CPU has taken the byte, so let that CPU catch up
-		if(!machine().side_effects_disabled())
-			machine().scheduler().synchronize();
-	}
 
 	return res;
 }
