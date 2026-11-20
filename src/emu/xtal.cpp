@@ -340,6 +340,7 @@ const double XTAL::known_xtals[] = {
 	 19'660'800, // 19.6608_MHz_XTAL       Euro League (bootleg), labeled as "UKI 19.6608 20PF"
 	 19'661'400, // 19.6614_MHz_XTAL       Wyse WY-30
 	 19'718'400, // 19.7184_MHz_XTAL       Informer 207/100
+	 19'767'600, // 19.7676_MHz_XTAL       Zenith Z-49 80-column display clock
 	 19'923'000, // 19.923_MHz_XTAL        Cinematronics vectors
 	 19'968'000, // 19.968_MHz_XTAL        Used mostly by some Taito games
 	 20'000'000, // 20_MHz_XTAL            -
@@ -382,6 +383,7 @@ const double XTAL::known_xtals[] = {
 	 24'270'000, // 24.27_MHz_XTAL         CIT-101XL
 	 24'300'000, // 24.3_MHz_XTAL          ADM 36 132-column display clock
 	 24'576'000, // 24.576_MHz_XTAL        Pole Position h/w, Model 3 CPU board
+	 24'806'400, // 24.8064_MHz_XTAL       Zenith Z-49 132-column display and CPU clock
 	 24'883'200, // 24.8832_MHz_XTAL       DEC VT100
 	 25'000'000, // 25_MHz_XTAL            Namco System 22, Taito GNET, Dogyuun h/w
 	 25'174'800, // 25.1748_MHz_XTAL       Sega System 16A/16B (1600x NTSC line rate)
