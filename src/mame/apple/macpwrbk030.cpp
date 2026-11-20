@@ -293,8 +293,6 @@ private:
 	u32 rom_switch_r(offs_t offset);
 	u16 scsi_r(offs_t offset, u16 mem_mask);
 	void scsi_w(offs_t offset, u16 data, u16 mem_mask);
-	u32 scsi_drq_r(offs_t offset, u32 mem_mask = ~0);
-	void scsi_drq_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	void scsi_berr_w(u8 data);
 	u16 scc_r(offs_t offset);
 	void scc_w(offs_t offset, u16 data);
@@ -1036,52 +1034,6 @@ void macpb030_state::scsi_w(offs_t offset, u16 data, u16 mem_mask)
 	m_scsihelp->write_wrapper(pseudo_dma, reg, data>>8);
 }
 
-u32 macpb030_state::scsi_drq_r(offs_t offset, u32 mem_mask)
-{
-	switch (mem_mask)
-	{
-		case 0xff000000:
-			return m_scsihelp->read_wrapper(true, 6)<<24;
-
-		case 0xffff0000:
-			return (m_scsihelp->read_wrapper(true, 6)<<24) | (m_scsihelp->read_wrapper(true, 6)<<16);
-
-		case 0xffffffff:
-			return (m_scsihelp->read_wrapper(true, 6)<<24) | (m_scsihelp->read_wrapper(true, 6)<<16) | (m_scsihelp->read_wrapper(true, 6)<<8) | m_scsihelp->read_wrapper(true, 6);
-
-		default:
-			logerror("scsi_drq_r: unknown mem_mask %08x\n", mem_mask);
-	}
-
-	return 0;
-}
-
-void macpb030_state::scsi_drq_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	switch (mem_mask)
-	{
-		case 0xff000000:
-			m_scsihelp->write_wrapper(true, 0, data>>24);
-			break;
-
-		case 0xffff0000:
-			m_scsihelp->write_wrapper(true, 0, data>>24);
-			m_scsihelp->write_wrapper(true, 0, data>>16);
-			break;
-
-		case 0xffffffff:
-			m_scsihelp->write_wrapper(true, 0, data>>24);
-			m_scsihelp->write_wrapper(true, 0, data>>16);
-			m_scsihelp->write_wrapper(true, 0, data>>8);
-			m_scsihelp->write_wrapper(true, 0, data&0xff);
-			break;
-
-		default:
-			logerror("scsi_drq_w: unknown mem_mask %08x\n", mem_mask);
-			break;
-	}
-}
-
 void macpb030_state::scsi_berr_w(u8 data)
 {
 	m_maincpu->pulse_input_line(M68K_LINE_BUSERROR, attotime::zero);
@@ -1099,9 +1051,9 @@ void macpb030_state::macpb140_map(address_map &map)
 	map(0x50000000, 0x50001fff).rw(FUNC(macpb030_state::via_r), FUNC(macpb030_state::via_w)).mirror(0x01f00000);
 	map(0x50002000, 0x50003fff).rw(FUNC(macpb030_state::via2_r), FUNC(macpb030_state::via2_w)).mirror(0x01f00000);
 	map(0x50004000, 0x50005fff).rw(FUNC(macpb030_state::scc_r), FUNC(macpb030_state::scc_w)).mirror(0x01f00000);
-	map(0x50006000, 0x50007fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w)).mirror(0x01f00000);
+	map(0x50006000, 0x50007fff).rw(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r), FUNC(mac_scsi_helper_device::pseudo_dma_w)).mirror(0x01f00000);
 	map(0x50010000, 0x50011fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w)).mirror(0x01f00000);
-	map(0x50012060, 0x50012063).r(FUNC(macpb030_state::scsi_drq_r)).mirror(0x01f00000);
+	map(0x50012060, 0x50012063).r(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r)).mirror(0x01f00000);
 	map(0x50014000, 0x50015fff).rw(m_easc, FUNC(asc_easc_device::read), FUNC(asc_easc_device::write)).mirror(0x01f00000);
 	map(0x50016000, 0x50017fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w)).mirror(0x01f00000);
 	map(0x50024000, 0x50027fff).r(FUNC(macpb030_state::buserror_r)).mirror(0x01f00000); // bus error here to make sure we aren't mistaken for another decoder
@@ -1121,9 +1073,9 @@ void macpb030_state::macpb160_map(address_map &map)
 	map(0x50f00000, 0x50f01fff).rw(FUNC(macpb030_state::via_r), FUNC(macpb030_state::via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(macpb030_state::via2_r), FUNC(macpb030_state::via2_w));
 	map(0x50f04000, 0x50f05fff).rw(FUNC(macpb030_state::scc_r), FUNC(macpb030_state::scc_w));
-	map(0x50f06000, 0x50f07fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w));
+	map(0x50f06000, 0x50f07fff).rw(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r), FUNC(mac_scsi_helper_device::pseudo_dma_w));
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
-	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
+	map(0x50f12060, 0x50f12063).r(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r));
 	map(0x50f14000, 0x50f15fff).rw(m_easc, FUNC(asc_easc_device::read), FUNC(asc_easc_device::write));
 	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
 	map(0x50f24000, 0x50f27fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to make sure we aren't mistaken for another decoder
@@ -1141,9 +1093,9 @@ void macpb030_state::macpb165c_map(address_map &map)
 	map(0x50f00000, 0x50f01fff).rw(FUNC(macpb030_state::via_r), FUNC(macpb030_state::via_w));
 	map(0x50f02000, 0x50f03fff).rw(FUNC(macpb030_state::via2_r), FUNC(macpb030_state::via2_w));
 	map(0x50f04000, 0x50f05fff).rw(FUNC(macpb030_state::scc_r), FUNC(macpb030_state::scc_w));
-	map(0x50f06000, 0x50f07fff).rw(FUNC(macpb030_state::scsi_drq_r), FUNC(macpb030_state::scsi_drq_w));
+	map(0x50f06000, 0x50f07fff).rw(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r), FUNC(mac_scsi_helper_device::pseudo_dma_w));
 	map(0x50f10000, 0x50f11fff).rw(FUNC(macpb030_state::scsi_r), FUNC(macpb030_state::scsi_w));
-	map(0x50f12060, 0x50f12063).r(FUNC(macpb030_state::scsi_drq_r));
+	map(0x50f12060, 0x50f12063).r(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r));
 	map(0x50f14000, 0x50f15fff).rw(m_easc, FUNC(asc_easc_device::read), FUNC(asc_easc_device::write));
 	map(0x50f16000, 0x50f17fff).rw(FUNC(macpb030_state::swim_r), FUNC(macpb030_state::swim_w));
 	map(0x50f20000, 0x50f21fff).r(FUNC(macpb030_state::buserror_r)); // bus error here to detect we're not the grayscale 160/165/180
@@ -1303,7 +1255,7 @@ void macpb030_state::macpb140(machine_config &config)
 	m_scsihelp->scsi_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::write));
 	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_r));
 	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_w));
-	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->set_maincpu(m_maincpu);
 	m_scsihelp->timeout_error_callback().set(FUNC(macpb030_state::scsi_berr_w));
 
 	SCC85C30(config, m_scc, 31.3344_MHz_XTAL / 4);

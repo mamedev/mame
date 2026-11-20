@@ -114,8 +114,6 @@ private:
 
 	u16 scsi_r(offs_t offset, u16 mem_mask = ~0);
 	void scsi_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u32 scsi_drq_r(offs_t offset, u32 mem_mask = ~0);
-	void scsi_drq_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void scsi_berr_w(u8 data)
 	{
@@ -162,9 +160,9 @@ void macvail_state::base_map(address_map &map)
 	map(0x40000000, 0x600fffff).m(m_sonora, FUNC(sonora_device::map));
 
 	map(0x50004000, 0x50005fff).rw(FUNC(macvail_state::scc_r), FUNC(macvail_state::scc_w)).mirror(0x00f00000);
-	map(0x50006000, 0x50007fff).rw(FUNC(macvail_state::scsi_drq_r), FUNC(macvail_state::scsi_drq_w)).mirror(0x00f00000);
+	map(0x50006000, 0x50007fff).rw(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r), FUNC(mac_scsi_helper_device::pseudo_dma_w)).mirror(0x00f00000);
 	map(0x50010000, 0x50011fff).rw(FUNC(macvail_state::scsi_r), FUNC(macvail_state::scsi_w)).mirror(0x00f00000);
-	map(0x50012000, 0x50013fff).rw(FUNC(macvail_state::scsi_drq_r), FUNC(macvail_state::scsi_drq_w)).mirror(0x00f00000);
+	map(0x50012000, 0x50013fff).rw(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r), FUNC(mac_scsi_helper_device::pseudo_dma_w)).mirror(0x00f00000);
 }
 
 void macvail_state::maclc3_map(address_map &map)
@@ -205,52 +203,6 @@ void macvail_state::scsi_w(offs_t offset, u16 data, u16 mem_mask)
 	const bool pseudo_dma = (reg == 0) && (offset == 0x100);
 
 	m_scsihelp->write_wrapper(pseudo_dma, reg, data >> 8);
-}
-
-u32 macvail_state::scsi_drq_r(offs_t offset, u32 mem_mask)
-{
-	switch (mem_mask)
-	{
-	case 0xff000000:
-		return m_scsihelp->read_wrapper(true, 6) << 24;
-
-	case 0xffff0000:
-		return (m_scsihelp->read_wrapper(true, 6) << 24) | (m_scsihelp->read_wrapper(true, 6) << 16);
-
-	case 0xffffffff:
-		return (m_scsihelp->read_wrapper(true, 6) << 24) | (m_scsihelp->read_wrapper(true, 6) << 16) | (m_scsihelp->read_wrapper(true, 6) << 8) | m_scsihelp->read_wrapper(true, 6);
-
-	default:
-		logerror("scsi_drq_r: unknown mem_mask %08x\n", mem_mask);
-	}
-
-	return 0;
-}
-
-void macvail_state::scsi_drq_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	switch (mem_mask)
-	{
-	case 0xff000000:
-		m_scsihelp->write_wrapper(true, 0, data >> 24);
-		break;
-
-	case 0xffff0000:
-		m_scsihelp->write_wrapper(true, 0, data >> 24);
-		m_scsihelp->write_wrapper(true, 0, data >> 16);
-		break;
-
-	case 0xffffffff:
-		m_scsihelp->write_wrapper(true, 0, data >> 24);
-		m_scsihelp->write_wrapper(true, 0, data >> 16);
-		m_scsihelp->write_wrapper(true, 0, data >> 8);
-		m_scsihelp->write_wrapper(true, 0, data & 0xff);
-		break;
-
-	default:
-		logerror("scsi_drq_w: unknown mem_mask %08x\n", mem_mask);
-		break;
-	}
 }
 
 /***************************************************************************
@@ -299,7 +251,7 @@ void macvail_state::maclc3_base(machine_config &config)
 	m_scsihelp->scsi_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::write));
 	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_r));
 	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_w));
-	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->set_maincpu(m_maincpu);
 	m_scsihelp->timeout_error_callback().set(FUNC(macvail_state::scsi_berr_w));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");

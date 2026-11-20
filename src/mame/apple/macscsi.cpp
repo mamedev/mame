@@ -21,343 +21,275 @@
     before exiting with the scBusTOErr code; the MC68000's rudimentary
     handling of bus errors does not permit this.
 
-    This causes some conflicts between MAME's line-level emulation of
-    the SCSI bus and its current M68000 family core, which has no
-    working concept of wait states and tries to execute each read or
-    write instruction instantaneously. The problems are least
-    pronounced on the Macintosh Plus, which never reads or writes more
-    than one SCSI byte at a time in any case. However, the SE and
-    later models implement the "blind" transfer modes using unrolled
-    loops with MOVEP.L (MC68000) or MOVE.L (MC68020/030) to transfer
-    four bytes at a time (after first transfering a single byte if its
-    buffer pointer is not word-aligned).
-
-    The workaround this device provides is to mediate pseudo-DMA
-    transfers through four-byte FIFOs (implementing these using
-    32-bit integers is not a coincidence) and halt the CPU to keep
-    the FIFO filled during read operations and emptied during write
-    operations. In the case of read operations, the buffer must of
-    course be filled before CPU attempts its first data read, which
-    could be a MOVEP.L or MOVE.L already. To make read operations a
-    little more realistic, the device waits until the CPU polls DRQ as
-    active before it begins halting the CPU to fill the FIFO. The CPU
-    halt will be released if DRQ is not asserted within a certain
-    time.
-
-    It is possible for the current implementation to lose data if
-    there are still bytes in the FIFO when the pseudo-DMA operation
-    ends. However, this is unlikely to be relevant due to a defect in
-    the SCSI Manager which Apple's documentation warns about.
+    The SE and later models implement the "blind" transfer modes using
+    unrolled loops with MOVEP.L (MC68000) or MOVE.L (MC68020/030) to
+    transfer four bytes at a time. On the MC68020/030 a long access to
+    the 8-bit port is four bus cycles, each waiting for DRQ; MAME
+    performs it as a single access. A pseudo-DMA access that finds no
+    DRQ for one of its bytes therefore suspends the CPU and has the
+    access (MC68000) or instruction (MC68020/030) retried when DRQ
+    comes, keeping the bytes already transferred for the retry. The
+    helper moves no byte ahead of the access that wants it; the 5380
+    itself, in DMA mode, latches and acknowledges one on REQ (NCR
+    SP-1051, sec. 6.1.3 and 11.6).
 
 **********************************************************************/
 
 #include "emu.h"
 #include "macscsi.h"
 
-#define VERBOSE 0
-#include "logmacro.h"
+#include "cpu/m68000/m68kmusashi.h"
 
 static constexpr u8 BAD_BYTE = 0xbb;
 static constexpr u8 READ_ERROR = 1;
 static constexpr u8 WRITE_ERROR = 0;
 
+// resumes the CPU suspended in wait()
+static constexpr int WAKE_TRIGGER = 1;
+
 // device type definition
 DEFINE_DEVICE_TYPE(MAC_SCSI_HELPER, mac_scsi_helper_device, "scsipdma", "Mac 5380 SCSI helper")
 
-ALLOW_SAVE_TYPE(mac_scsi_helper_device::mode);
-
 mac_scsi_helper_device::mac_scsi_helper_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, MAC_SCSI_HELPER, tag, owner, clock)
+	, m_maincpu(*this, finder_base::DUMMY_TAG)
 	, m_scsi_read_callback(*this, BAD_BYTE)
 	, m_scsi_write_callback(*this)
 	, m_scsi_dma_read_callback(*this, BAD_BYTE)
 	, m_scsi_dma_write_callback(*this)
-	, m_cpu_halt_callback(*this)
 	, m_timeout_error_callback(*this)
+	// every model since the Mac II bus-errors after 16 us without a byte
+	// (Inside Macintosh: Devices, SCSI Manager 4.3, p. 4-18)
 	, m_timeout(attotime::from_usec(16))
-	, m_pseudo_dma_timer(nullptr)
-	, m_mode(mode::NON_DMA)
-	, m_read_fifo_bytes(0)
-	, m_write_fifo_bytes(0)
-	, m_read_fifo_data(0)
-	, m_write_fifo_data(0)
+	, m_timeout_timer(nullptr)
+	, m_drq(false)
+	, m_waiting(false)
+	, m_woken(false)
+	, m_timed_out(false)
+	, m_count(0)
+	, m_data(0)
 {
 }
 
 void mac_scsi_helper_device::device_start()
 {
-	m_pseudo_dma_timer = timer_alloc(FUNC(mac_scsi_helper_device::timer_callback), this);
+	m_timeout_timer = timer_alloc(FUNC(mac_scsi_helper_device::timeout), this);
 
-	save_item(NAME(m_mode));
-	save_item(NAME(m_read_fifo_bytes));
-	save_item(NAME(m_write_fifo_bytes));
-	save_item(NAME(m_read_fifo_data));
-	save_item(NAME(m_write_fifo_data));
+	// wait() restarts the access on a 68020/030, which Musashi only honours
+	// with instruction restart on; that is otherwise on only while a PMMU is
+	// enabled, so not on a 68020/030 without one, such as the HMMU II (as
+	// scsidma.cpp does)
+	if (!m_maincpu->cpu_is_interruptible())
+		downcast<m68000_musashi_device &>(*m_maincpu).set_emmu_enable(true);
+
+	save_item(NAME(m_drq));
+	save_item(NAME(m_waiting));
+	save_item(NAME(m_woken));
+	save_item(NAME(m_timed_out));
+	save_item(NAME(m_count));
+	save_item(NAME(m_data));
 }
 
 void mac_scsi_helper_device::device_reset()
 {
-	dma_stop();
-	m_read_fifo_bytes = 0;
-	m_write_fifo_bytes = 0;
-
-	m_cpu_halt_callback(CLEAR_LINE);
-	m_pseudo_dma_timer->enable(false);
-}
-
-void mac_scsi_helper_device::read_fifo_process()
-{
-	assert(m_read_fifo_bytes < 4);
-
-	u8 data = m_scsi_dma_read_callback(6);
-	++m_read_fifo_bytes;
-	LOG("Read byte %02X into FIFO (%d/4 filled)\n", data, m_read_fifo_bytes);
-	m_read_fifo_data |= u32(data) << (32 - m_read_fifo_bytes * 8);
-	if (m_read_fifo_bytes != 4)
-		m_pseudo_dma_timer->adjust(m_timeout);
-	else
-	{
-		m_cpu_halt_callback(CLEAR_LINE);
-		m_pseudo_dma_timer->enable(false);
-	}
-}
-
-void mac_scsi_helper_device::write_fifo_process()
-{
-	assert(m_write_fifo_bytes != 0);
-	--m_write_fifo_bytes;
-	u8 data = BIT(m_write_fifo_data, m_write_fifo_bytes * 8, 8);
-	LOG("Write byte %02X from FIFO (%d left)\n", data, m_write_fifo_bytes);
-	m_scsi_dma_write_callback(0, data);
-
-	if (m_write_fifo_bytes != 0)
-		m_pseudo_dma_timer->adjust(m_timeout);
-	else
-	{
-		m_cpu_halt_callback(CLEAR_LINE);
-		m_pseudo_dma_timer->enable(false);
-	}
+	if (m_waiting)
+		m_maincpu->trigger(WAKE_TRIGGER);
+	m_timed_out = false;
+	done();
 }
 
 void mac_scsi_helper_device::drq_w(int state)
 {
-	if (state)
-	{
-		if (m_mode == mode::READ_DMA && m_read_fifo_bytes < 4)
-			read_fifo_process();
-		else if ((m_mode == mode::WRITE_DMA || m_mode == mode::BAD_DMA) && m_write_fifo_bytes != 0)
-			write_fifo_process();
-	}
+	m_drq = state;
+	if (state && m_waiting)
+		wake();
 }
 
-TIMER_CALLBACK_MEMBER(mac_scsi_helper_device::timer_callback)
+// a CPU reset meanwhile (no longer suspended here, or held in reset) isn't
+// counted as woken
+void mac_scsi_helper_device::wake()
 {
-	if (m_mode == mode::WRITE_DMA && m_write_fifo_bytes != 0 && BIT(m_scsi_read_callback(5), 6))
-		write_fifo_process();
-	else if (m_mode == mode::READ_DMA || m_mode == mode::WRITE_DMA)
+	if (m_maincpu->suspended(SUSPEND_REASON_TRIGGER) && !m_maincpu->suspended(SUSPEND_REASON_RESET))
+		m_woken = true;
+	m_maincpu->trigger(WAKE_TRIGGER);
+}
+
+TIMER_CALLBACK_MEMBER(mac_scsi_helper_device::timeout)
+{
+	// the CPU alone was reset while waiting (Egret, Cuda or the PMU): it is
+	// held in reset, or the reset resumed it without a wake from here; the
+	// access is gone.  The helper isn't told of that reset, so a reset
+	// between a wake and the retry (a 68020/030 can take an interrupt
+	// there), or a new access before this fires, can still meet the old
+	// access's state.
+	if (m_maincpu->suspended(SUSPEND_REASON_RESET) || (!m_woken && !m_maincpu->suspended(SUSPEND_REASON_TRIGGER)))
 	{
-		LOG("DMA timed out\n");
-		m_cpu_halt_callback(CLEAR_LINE);
+		done();
+		return;
 	}
+
+	// DRQ at the same instant: the retry finds it
+	if (!m_drq)
+		m_timed_out = true;
+	wake();
+}
+
+// the retried access after a timeout ends in a bus error; bytes already
+// transferred are gone, as they would be on hardware
+bool mac_scsi_helper_device::timed_out(u8 error)
+{
+	if (!m_timed_out)
+		return false;
+
+	logerror("%s: SCSI pseudo-DMA %s timed out after %d byte(s)\n", machine().describe_context(), error == READ_ERROR ? "read" : "write", m_count);
+	m_timed_out = false;
+	done();
+	m_timeout_error_callback(error);
+	return true;
+}
+
+// suspend the CPU until DRQ, then have it retry the access; the timeout runs
+// from the last byte transferred
+void mac_scsi_helper_device::wait(bool progress)
+{
+	if (progress || !m_timeout_timer->enabled())
+		m_timeout_timer->adjust(m_timeout);
+	m_waiting = true;
+	m_woken = false;
+
+	if (m_maincpu->cpu_is_interruptible())
+		m_maincpu->retry_access();
 	else
-		dma_stop();
+		downcast<m68000_musashi_device &>(*m_maincpu).restart_this_instruction();
+	m_maincpu->suspend_until_trigger(WAKE_TRIGGER, true);
 }
 
-void mac_scsi_helper_device::dma_stop()
+void mac_scsi_helper_device::done()
 {
-	// Unread bytes are kept in the FIFO: they were already ACKed on the SCSI
-	// bus by the prefetch, but the CPU has not consumed them yet. A/UX's
-	// standalone shell and kernel read a single data-in phase using several
-	// short pseudo-DMA sessions, ending DMA mode in between; on real hardware
-	// the unconsumed bytes simply remain in the target until the next session.
-	if (m_read_fifo_bytes != 0)
-		LOG("%s: %d unread byte(s) held in FIFO (%08X)\n", machine().describe_context(), m_read_fifo_bytes, m_read_fifo_data);
-	if (m_write_fifo_bytes != 0)
-		LOG("%s: %d unwritten byte(s) lost (%08X)\n", machine().describe_context(), m_write_fifo_bytes, m_write_fifo_data);
-
-	m_mode = mode::NON_DMA;
-	m_write_fifo_bytes = 0;
-	m_write_fifo_data = 0;
+	m_timeout_timer->enable(false);
+	m_waiting = false;
+	m_woken = false;
+	m_count = 0;
+	m_data = 0;
 }
 
-void mac_scsi_helper_device::read_fifo_flush()
+// read the given number of bytes, returned in the low bits
+u32 mac_scsi_helper_device::dma_read(u8 bytes)
 {
-	if (m_read_fifo_bytes != 0)
+	// a debugger read sees the byte the 5380 has latched, in every lane
+	if (machine().side_effects_disabled())
 	{
-		logerror("%s: %d stale unread byte(s) discarded (%08X)\n", machine().describe_context(), m_read_fifo_bytes, m_read_fifo_data);
-		m_read_fifo_bytes = 0;
-		m_read_fifo_data = 0;
+		u8 const latched = m_scsi_read_callback(6);
+		u32 data = 0;
+		for (u8 i = 0; i < bytes; i++)
+			data = (data << 8) | latched;
+		return data;
 	}
+	if (timed_out(READ_ERROR))
+		return ~u32(0);
+	if (m_count >= bytes)
+		done(); // left over from an access that never finished
+
+	// reading the data clears DRQ until the next byte is latched, so at most
+	// one byte per pass
+	bool const progress = m_drq;
+	if (m_drq)
+	{
+		m_data = (m_data << 8) | m_scsi_dma_read_callback(6);
+		m_count++;
+	}
+	if (m_count < bytes)
+	{
+		wait(progress);
+		return ~u32(0);
+	}
+
+	u32 const data = m_data;
+	done();
+	return data;
+}
+
+// write the given number of bytes from the low bits
+void mac_scsi_helper_device::dma_write(u32 data, u8 bytes)
+{
+	if (machine().side_effects_disabled() || timed_out(WRITE_ERROR))
+		return;
+	if (m_count >= bytes)
+		done(); // left over from an access that never finished
+
+	// writing the data clears DRQ until the byte has gone out, so at most one
+	// byte per pass
+	bool const progress = m_drq;
+	if (m_drq)
+	{
+		m_scsi_dma_write_callback(0, BIT(data, (bytes - 1 - m_count) * 8, 8));
+		m_count++;
+	}
+	if (m_count < bytes)
+		wait(progress);
+	else
+		done();
 }
 
 u8 mac_scsi_helper_device::read_wrapper(bool pseudo_dma, offs_t offset)
 {
-	u8 data = BAD_BYTE;
-	switch (offset & 7)
-	{
-	case 2:
-		data = m_scsi_read_callback(2);
-		if (!machine().side_effects_disabled() && !BIT(data, 1))
-			dma_stop();
-		break;
-
-	case 4:
-		data = m_scsi_read_callback(4);
-		if (!machine().side_effects_disabled() && !BIT(m_scsi_read_callback(2), 1))
-			dma_stop();
-		// Bytes preserved across a pseudo-DMA stop are still logically inside
-		// the target: until a new session drains them, the bus must keep
-		// looking like DATA IN with REQ asserted, as it would on hardware.
-		if (m_read_fifo_bytes != 0 && (m_mode == mode::NON_DMA || m_mode == mode::READ_WAIT_DRQ))
-			data = (data & 0x83) | 0x64; // keep RST/SEL/DBP; force BSY|REQ|I/O, clear MSG|C/D
-		break;
-
-	case 5:
-		data = m_scsi_read_callback(5);
-		if (!machine().side_effects_disabled())
-		{
-			if (!BIT(m_scsi_read_callback(2), 1))
-				dma_stop();
-			if (m_mode == mode::READ_WAIT_DRQ && (BIT(data, 6) || m_read_fifo_bytes != 0))
-			{
-				m_mode = mode::READ_DMA;
-				if (m_read_fifo_bytes == 0)
-				{
-					m_read_fifo_data = u32(m_scsi_dma_read_callback(6)) << 24;
-					LOG("%s: Pseudo-DMA read started: first byte = %02X\n", machine().describe_context(), m_read_fifo_data >> 24);
-					m_read_fifo_bytes = 1;
-					m_pseudo_dma_timer->adjust(m_timeout);
-					m_cpu_halt_callback(ASSERT_LINE);
-
-				}
-				else
-					LOG("%s: Pseudo-DMA read resumed: %d byte(s) buffered\n", machine().describe_context(), m_read_fifo_bytes);
-			}
-		}
-		if (m_mode == mode::READ_DMA && m_read_fifo_bytes != 0)
-			data |= 0x48; // DRQ, and phase match while the FIFO still holds data
-		else if (m_read_fifo_bytes != 0 && (m_mode == mode::NON_DMA || m_mode == mode::READ_WAIT_DRQ))
-		{
-			// preserved bytes waiting for the next session: fake DRQ and phase
-			// match, and hide the (premature) phase-mismatch interrupt that
-			// the over-eager prefetch provoked
-			data |= 0x48;
-			data &= ~0x10;
-		}
-		else if (m_mode == mode::WRITE_DMA && m_write_fifo_bytes < 4)
-			data |= 0x40;
-		break;
-
-	case 6:
-		if (!machine().side_effects_disabled() && !BIT(m_scsi_read_callback(2), 1))
-			dma_stop();
-		if (m_read_fifo_bytes != 0)
-		{
-			data = BIT(m_read_fifo_data, 24, 8);
-			if (!machine().side_effects_disabled())
-			{
-				--m_read_fifo_bytes;
-				LOG("%s: CPU read byte %02X from FIFO (%d left)\n", machine().describe_context(), data, m_read_fifo_bytes);
-				m_read_fifo_data <<= 8;
-				if (BIT(m_scsi_read_callback(5), 6))
-					read_fifo_process();
-				else if (!m_pseudo_dma_timer->enabled())
-				{
-					m_pseudo_dma_timer->adjust(m_timeout);
-					m_cpu_halt_callback(ASSERT_LINE);
-				}
-			}
-		}
-		else if (m_mode != mode::NON_DMA && pseudo_dma)
-		{
-			if (m_mode != mode::BAD_DMA)
-			{
-				logerror("%s: Read underflow on SCSI pseudo-DMA\n", machine().describe_context());
-				m_mode = mode::BAD_DMA;
-			}
-			m_timeout_error_callback(READ_ERROR);
-			m_pseudo_dma_timer->enable(false);
-		}
-		else
-			data = pseudo_dma ? m_scsi_dma_read_callback(6) : m_scsi_read_callback(6);
-		break;
-
-	default:
-		if (!machine().side_effects_disabled() && !BIT(m_scsi_read_callback(2), 1))
-			dma_stop();
-		data = m_scsi_read_callback(offset & 7);
-		break;
-	}
-
-	return data;
+	if (pseudo_dma && (offset & 7) == 6)
+		return dma_read(1);
+	return m_scsi_read_callback(offset & 7);
 }
 
 void mac_scsi_helper_device::write_wrapper(bool pseudo_dma, offs_t offset, u8 data)
 {
-	switch (offset & 7)
+	if (pseudo_dma && (offset & 7) == 0)
+		dma_write(data, 1);
+	else
+		m_scsi_write_callback(offset & 7, data);
+}
+
+u32 mac_scsi_helper_device::pseudo_dma_r(offs_t offset, u32 mem_mask)
+{
+	// the debugger may read any lane
+	if (machine().side_effects_disabled())
+		return dma_read(4) & mem_mask;
+
+	switch (mem_mask)
 	{
-	case 0:
-		if (m_mode == mode::BAD_DMA && pseudo_dma)
-			m_timeout_error_callback(WRITE_ERROR);
-		else if (m_mode == mode::WRITE_DMA && (m_write_fifo_bytes != 0 || !BIT(m_scsi_read_callback(5), 6)))
-		{
-			if (m_write_fifo_bytes < 4)
-			{
-				m_write_fifo_data = (m_write_fifo_data << 8) | data;
-				++m_write_fifo_bytes;
-				LOG("%s: CPU writing byte %02X into FIFO (%d/4 filled)\n", machine().describe_context(), data, m_write_fifo_bytes);
-				if (!m_pseudo_dma_timer->enabled())
-				{
-					m_pseudo_dma_timer->adjust(m_timeout);
-					m_cpu_halt_callback(ASSERT_LINE);
-				}
-			}
-			else if (pseudo_dma)
-			{
-				logerror("%s: Write overflow on SCSI pseudo-DMA\n", machine().describe_context());
-				m_timeout_error_callback(WRITE_ERROR);
-				m_mode = mode::BAD_DMA;
-			}
-		}
-		else if (pseudo_dma)
-		{
-			m_scsi_dma_write_callback(0, data);
-		}
-		else
-		{
-			// data going out for arbitration/selection begins a new bus
-			// transaction; anything still unread from the last one is gone
-			read_fifo_flush();
-			m_scsi_write_callback(0, data);
-		}
+	case 0xff000000:
+		return dma_read(1) << 24;
+
+	case 0xffff0000:
+		return dma_read(2) << 16;
+
+	case 0xffffffff:
+		return dma_read(4);
+
+	default:
+		logerror("%s: pseudo_dma_r: unknown mem_mask %08x\n", machine().describe_context(), mem_mask);
+		return 0;
+	}
+}
+
+void mac_scsi_helper_device::pseudo_dma_w(offs_t offset, u32 data, u32 mem_mask)
+{
+	if (machine().side_effects_disabled())
+		return;
+
+	switch (mem_mask)
+	{
+	case 0xff000000:
+		dma_write(data >> 24, 1);
 		break;
 
-			case 2:
-				if (!BIT(data, 1))
-					dma_stop();
-				m_scsi_write_callback(2, data);
-				break;
+	case 0xffff0000:
+		dma_write(data >> 16, 2);
+		break;
 
-			case 5:
-				if (m_mode == mode::NON_DMA && BIT(m_scsi_read_callback(2), 1))
-				{
-					m_mode = mode::WRITE_DMA;
-				}
-				m_scsi_write_callback(5, data);
-				break;
-
-			case 6: case 7:
-		if (m_mode == mode::NON_DMA && BIT(m_scsi_read_callback(2), 1))
-			m_mode = mode::READ_WAIT_DRQ;
-		m_scsi_write_callback(offset & 7, data);
+	case 0xffffffff:
+		dma_write(data, 4);
 		break;
 
 	default:
-		if ((offset & 7) == 1 && BIT(data, 7)) // RST
-		{
-			read_fifo_flush();
-		}
-		m_scsi_write_callback(offset & 7, data);
+		logerror("%s: pseudo_dma_w: unknown mem_mask %08x\n", machine().describe_context(), mem_mask);
 		break;
 	}
 }

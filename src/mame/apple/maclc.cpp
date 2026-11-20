@@ -126,8 +126,6 @@ private:
 
 	u16 scsi_r(offs_t offset, u16 mem_mask = ~0);
 	void scsi_w(offs_t offset, u16 data, u16 mem_mask = ~0);
-	u32 scsi_drq_r(offs_t offset, u32 mem_mask = ~0);
-	void scsi_drq_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 
 	void scsi_berr_w(u8 data)
 	{
@@ -187,9 +185,9 @@ void maclc_state::maclc_map(address_map &map)
 	map(0xa00000, 0xffffff).m(m_v8, FUNC(v8_device::map));
 
 	map(0xf04000, 0xf05fff).rw(FUNC(maclc_state::scc_r), FUNC(maclc_state::scc_w));
-	map(0xf06000, 0xf07fff).rw(FUNC(maclc_state::scsi_drq_r), FUNC(maclc_state::scsi_drq_w));
+	map(0xf06000, 0xf07fff).rw(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r), FUNC(mac_scsi_helper_device::pseudo_dma_w));
 	map(0xf10000, 0xf11fff).rw(FUNC(maclc_state::scsi_r), FUNC(maclc_state::scsi_w));
-	map(0xf12000, 0xf13fff).rw(FUNC(maclc_state::scsi_drq_r), FUNC(maclc_state::scsi_drq_w));
+	map(0xf12000, 0xf13fff).rw(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r), FUNC(mac_scsi_helper_device::pseudo_dma_w));
 	map(0xf16000, 0xf17fff).rw(FUNC(maclc_state::swim_r), FUNC(maclc_state::swim_w));
 }
 
@@ -201,9 +199,9 @@ void maclc_state::maccclassic_map(address_map &map)
 	map(0xa00000, 0xffffff).m(m_v8, FUNC(v8_device::map));
 
 	map(0xf04000, 0xf05fff).rw(FUNC(maclc_state::scc_r), FUNC(maclc_state::scc_w));
-	map(0xf06000, 0xf07fff).rw(FUNC(maclc_state::scsi_drq_r), FUNC(maclc_state::scsi_drq_w));
+	map(0xf06000, 0xf07fff).rw(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r), FUNC(mac_scsi_helper_device::pseudo_dma_w));
 	map(0xf10000, 0xf11fff).rw(FUNC(maclc_state::scsi_r), FUNC(maclc_state::scsi_w));
-	map(0xf12000, 0xf13fff).rw(FUNC(maclc_state::scsi_drq_r), FUNC(maclc_state::scsi_drq_w));
+	map(0xf12000, 0xf13fff).rw(m_scsihelp, FUNC(mac_scsi_helper_device::pseudo_dma_r), FUNC(mac_scsi_helper_device::pseudo_dma_w));
 }
 
 u16 maclc_state::scsi_r(offs_t offset, u16 mem_mask)
@@ -220,52 +218,6 @@ void maclc_state::scsi_w(offs_t offset, u16 data, u16 mem_mask)
 	const bool pseudo_dma = (reg == 0) && (offset == 0x100);
 
 	m_scsihelp->write_wrapper(pseudo_dma, reg, data >> 8);
-}
-
-u32 maclc_state::scsi_drq_r(offs_t offset, u32 mem_mask)
-{
-	switch (mem_mask)
-	{
-	case 0xff000000:
-		return m_scsihelp->read_wrapper(true, 6) << 24;
-
-	case 0xffff0000:
-		return (m_scsihelp->read_wrapper(true, 6) << 24) | (m_scsihelp->read_wrapper(true, 6) << 16);
-
-	case 0xffffffff:
-		return (m_scsihelp->read_wrapper(true, 6) << 24) | (m_scsihelp->read_wrapper(true, 6) << 16) | (m_scsihelp->read_wrapper(true, 6) << 8) | m_scsihelp->read_wrapper(true, 6);
-
-	default:
-		logerror("scsi_drq_r: unknown mem_mask %08x\n", mem_mask);
-	}
-
-	return 0;
-}
-
-void maclc_state::scsi_drq_w(offs_t offset, u32 data, u32 mem_mask)
-{
-	switch (mem_mask)
-	{
-	case 0xff000000:
-		m_scsihelp->write_wrapper(true, 0, data >> 24);
-		break;
-
-	case 0xffff0000:
-		m_scsihelp->write_wrapper(true, 0, data >> 24);
-		m_scsihelp->write_wrapper(true, 0, data >> 16);
-		break;
-
-	case 0xffffffff:
-		m_scsihelp->write_wrapper(true, 0, data >> 24);
-		m_scsihelp->write_wrapper(true, 0, data >> 16);
-		m_scsihelp->write_wrapper(true, 0, data >> 8);
-		m_scsihelp->write_wrapper(true, 0, data & 0xff);
-		break;
-
-	default:
-		logerror("scsi_drq_w: unknown mem_mask %08x\n", mem_mask);
-		break;
-	}
 }
 
 uint16_t maclc_state::swim_r(offs_t offset, u16 mem_mask)
@@ -371,7 +323,7 @@ void maclc_state::maclc_base(machine_config &config)
 	m_scsihelp->scsi_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::write));
 	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_r));
 	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr53c80_device::dma_w));
-	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->set_maincpu(m_maincpu);
 	m_scsihelp->timeout_error_callback().set(FUNC(maclc_state::scsi_berr_w));
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
