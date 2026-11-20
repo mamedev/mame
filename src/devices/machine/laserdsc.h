@@ -257,6 +257,8 @@ private:
 	frame_data &current_frame();
 	void read_track_data();
 	static void *read_async_static(void *param, int threadid);
+	void wait_for_read();
+	void clear_read_result();
 	void process_track_data();
 	void config_load(config_type cfg_type, config_level cfg_level, util::xml::data_node const *parentnode);
 	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
@@ -278,7 +280,8 @@ private:
 	int                 m_height;               // height of video
 	uint32_t            m_fps_times_1million;   // frame rate of video
 	int                 m_samplerate;           // audio samplerate
-	std::error_condition m_readresult;          // result of the most recent read
+	std::error_condition m_readresult;          // transient host codec result; read after joining
+	bool                m_read_error;          // did the most recent read fail?
 	uint32_t            m_chdtracks;            // number of tracks in the CHD
 	bitmap_yuy16        m_avhuff_video;         // decompresed frame buffer
 	avhuff_decoder::config m_avhuff_config;     // decompression configuration
@@ -303,6 +306,7 @@ private:
 
 	// audio data
 	sound_stream *      m_stream;
+	std::vector<int16_t> m_audio_decode[2];     // pending field, owned by the decoder
 	std::vector<int16_t> m_audiobuffer[2];      // buffer for audio samples
 	uint32_t            m_audiobufsize;         // size of buffer
 	uint32_t            m_audiobufin;           // input index

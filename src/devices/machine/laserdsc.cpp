@@ -83,7 +83,7 @@ laserdisc_device::laserdisc_device(const machine_config &mconfig, device_type ty
 	, m_height(0)
 	, m_fps_times_1million(0)
 	, m_samplerate(0)
-	, m_readresult()
+	, m_read_error(false)
 	, m_chdtracks(0)
 	, m_work_queue(osd_work_queue_alloc(WORK_QUEUE_FLAG_IO))
 	, m_audiosquelch(0)
@@ -243,6 +243,14 @@ void laserdisc_device::device_start()
 			configuration_manager::load_delegate(&laserdisc_device::config_load, this),
 			configuration_manager::save_delegate(&laserdisc_device::config_save, this));
 
+	// Finish host writes before the save system copies decoder-owned memory.
+	machine().save().register_presave(save_prepost_delegate(FUNC(laserdisc_device::wait_for_read), this));
+	machine().save().register_preload(save_prepost_delegate(FUNC(laserdisc_device::wait_for_read), this));
+	machine().save().register_postload(save_prepost_delegate(FUNC(laserdisc_device::clear_read_result), this));
+	save_item(NAME(m_read_error));
+	save_item(NAME(m_audio_decode[0]));
+	save_item(NAME(m_audio_decode[1]));
+
 	// register state
 	save_item(NAME(m_player_state.m_state));
 	save_item(NAME(m_player_state.m_substate));
@@ -319,8 +327,7 @@ void laserdisc_device::device_start()
 void laserdisc_device::device_stop()
 {
 	// make sure all async operations have completed
-	if (m_disc)
-		osd_work_queue_wait(m_work_queue, osd_ticks_per_second() * 10);
+	wait_for_read();
 
 	// free any textures and palettes
 	if (m_videotex)
@@ -338,6 +345,9 @@ void laserdisc_device::device_stop()
 
 void laserdisc_device::device_reset()
 {
+	wait_for_read();
+	clear_read_result();
+
 	// attempt to wire up the audio
 	m_stream->set_sample_rate(m_samplerate);
 
@@ -856,6 +866,8 @@ void laserdisc_device::init_audio()
 	// allocate audio buffers
 	m_audiomaxsamples = ((uint64_t)m_samplerate * 1000000 + m_fps_times_1million - 1) / m_fps_times_1million;
 	m_audiobufsize = m_audiomaxsamples * 4;
+	m_audio_decode[0].resize(m_audiomaxsamples);
+	m_audio_decode[1].resize(m_audiomaxsamples);
 	m_audiobuffer[0].resize(m_audiobufsize);
 	m_audiobuffer[1].resize(m_audiobufsize);
 }
@@ -1010,18 +1022,11 @@ void laserdisc_device::read_track_data()
 	m_avhuff_video.wrap(&frame->m_bitmap.pix(m_fieldnum), frame->m_bitmap.width(), frame->m_bitmap.height() / 2, frame->m_bitmap.rowpixels() * 2);
 	m_avhuff_config.video = &m_avhuff_video;
 
-	// set the audio target information
-	if (m_audiobufin + m_audiomaxsamples <= m_audiobufsize)
+	// Keep decoder writes separate from samples owned by the stream consumer.
+	for (int chnum = 0; chnum < 2; chnum++)
 	{
-		// if we can fit without wrapping, just read the data directly
-		m_avhuff_config.audio[0] = &m_audiobuffer[0][m_audiobufin];
-		m_avhuff_config.audio[1] = &m_audiobuffer[1][m_audiobufin];
-	}
-	else
-	{
-		// otherwise, read to the beginning of the buffer
-		m_avhuff_config.audio[0] = &m_audiobuffer[0][0];
-		m_avhuff_config.audio[1] = &m_audiobuffer[1][0];
+		std::fill(m_audio_decode[chnum].begin(), m_audio_decode[chnum].end(), 0);
+		m_avhuff_config.audio[chnum] = m_audio_decode[chnum].data();
 	}
 
 	// override if we're not decoding
@@ -1043,15 +1048,16 @@ void laserdisc_device::read_track_data()
 		m_metadata[m_fieldnum].line17 = m_metadata[m_fieldnum].line18 = m_metadata[m_fieldnum].line1718 = VBI_CODE_LEADIN;
 	}
 
-	// configure the codec and then read
-	m_readresult = std::errc::no_such_file_or_directory;
+	// configure the codec and then read; a skipped read is not a codec error
+	clear_read_result();
+	m_read_error = true;
 	if (m_disc && !m_videosquelch)
 	{
 		m_readresult = m_disc->codec_configure(CHD_CODEC_AVHUFF, AVHUFF_CODEC_DECOMPRESS_CONFIG, &m_avhuff_config);
-		if (!m_readresult)
+		m_read_error = bool(m_readresult);
+		if (!m_read_error)
 		{
 			m_queued_hunknum = readhunk;
-			m_readresult = chd_file::error::OPERATION_PENDING;
 			osd_work_item_queue(m_work_queue, read_async_static, this, WORK_ITEM_FLAG_AUTO_RELEASE);
 		}
 	}
@@ -1067,7 +1073,23 @@ void *laserdisc_device::read_async_static(void *param, int threadid)
 {
 	laserdisc_device &ld = *reinterpret_cast<laserdisc_device *>(param);
 	ld.m_readresult = ld.m_disc->codec_process_hunk(ld.m_queued_hunknum);
+	ld.m_read_error = bool(ld.m_readresult);
 	return nullptr;
+}
+
+
+void laserdisc_device::wait_for_read()
+{
+	while (!osd_work_queue_wait(m_work_queue, osd_ticks_per_second() * 10))
+	{
+	}
+}
+
+
+void laserdisc_device::clear_read_result()
+{
+	// Host diagnostics are not part of the saved state.
+	m_readresult.clear();
 }
 
 
@@ -1078,13 +1100,17 @@ void *laserdisc_device::read_async_static(void *param, int threadid)
 
 void laserdisc_device::process_track_data()
 {
-	// wait for the async operation to complete
-	if (m_readresult == chd_file::error::OPERATION_PENDING)
-		osd_work_queue_wait(m_work_queue, osd_ticks_per_second() * 10);
-	assert(m_readresult != chd_file::error::OPERATION_PENDING);
+	// A completed result can be visible before the worker releases its buffers.
+	wait_for_read();
+	if (machine().allow_logging() && m_readresult)
+		logerror("Laserdisc codec error: %s (%s:%d)\n",
+				m_readresult.message(), m_readresult.category().name(), m_readresult.value());
+
+	if (m_audiocursamples > m_audiomaxsamples)
+		fatalerror("Laserdisc audio field exceeds decode buffer\n");
 
 	// remove the video if we had an error
-	if (m_readresult)
+	if (m_read_error)
 		m_avhuff_video.reset();
 
 	// count the field as read if we are successful
@@ -1098,20 +1124,16 @@ void laserdisc_device::process_track_data()
 	if (!m_audio_callback.isnull())
 		m_audio_callback(m_samplerate, m_audiocursamples, m_avhuff_config.audio[0], m_avhuff_config.audio[1]);
 
-	// shift audio data if we read it into the beginning of the buffer
-	if (m_audiocursamples != 0 && m_audiobufin != 0)
+	// Publish the completed field at the existing emulated boundary.
+	if (m_audiocursamples != 0)
+	{
+		uint32_t const first = std::min(m_audiocursamples, m_audiobufsize - m_audiobufin);
 		for (int chnum = 0; chnum < 2; chnum++)
-			if (m_avhuff_config.audio[chnum] == &m_audiobuffer[chnum][0])
-			{
-				// move data to the end
-				uint32_t samplesleft = m_audiobufsize - m_audiobufin;
-				samplesleft = std::min(samplesleft, m_audiocursamples);
-				memmove(&m_audiobuffer[chnum][m_audiobufin], &m_audiobuffer[chnum][0], samplesleft * 2);
-
-				// shift data at the beginning
-				if (samplesleft < m_audiocursamples)
-					memmove(&m_audiobuffer[chnum][0], &m_audiobuffer[chnum][samplesleft], (m_audiocursamples - samplesleft) * 2);
-			}
+		{
+			std::copy_n(m_audio_decode[chnum].data(), first, &m_audiobuffer[chnum][m_audiobufin]);
+			std::copy_n(m_audio_decode[chnum].data() + first, m_audiocursamples - first, m_audiobuffer[chnum].data());
+		}
+	}
 
 	// update the input buffer pointer
 	m_audiobufin = (m_audiobufin + m_audiocursamples) % m_audiobufsize;
