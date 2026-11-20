@@ -69,12 +69,12 @@
 #include "emu.h"
 #include "pcshare.h"
 
+#include "bus/centronics/atari_jammit.h"
 #include "cpu/i386/i386.h"
 #include "machine/cx5510.h"
 #include "machine/pc_lpt.h"
 #include "machine/pckeybrd.h"
 #include "machine/idectrl.h"
-#include "machine/timer.h"
 #include "sound/dmadac.h"
 #include "video/ramdac.h"
 
@@ -103,7 +103,10 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_lpt0(*this, "lpt0"),
-		m_ports(*this, "IN%u", 0U)
+		m_guns(*this, "GUN%u", 0U),
+		m_jammit_outputs(*this, "jammit_out%u", 0U),
+		m_triggers(*this, "TRIGGERS"),
+		m_render_options(*this, "RENDER_OPTIONS")
 	{ }
 
 	void init_a51site4();
@@ -127,22 +130,25 @@ private:
 	void memory_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint32_t biu_ctrl_r(offs_t offset);
 	void biu_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	uint32_t parallel_port_r(offs_t offset, uint32_t mem_mask = ~0);
-	void parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
+	uint32_t jammit_gun_r(offs_t player);
+	void jammit_output_w(uint16_t data);
 	uint32_t ad1847_r(offs_t offset);
 	void ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	[[maybe_unused]] void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint8_t io20_r(offs_t offset);
 	void io20_w(offs_t offset, uint8_t data);
+	void invalidate_render_cache();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	template <offs_t N> uint32_t speedup_r(address_space &space) { return generic_speedup(space, N); }
-	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void ad1847_reg_write(int reg, uint8_t data);
+	uint32_t ad1847_fifo_level(bool update = true);
 	inline uint32_t generic_speedup(address_space &space, int idx);
+	uint32_t frame_counter_r();
 	void report_speedups();
+	TIMER_CALLBACK_MEMBER(video_poll_end);
 	void install_speedups(const speedup_entry *entries, int count);
 	void init_mediagx();
 	void mediagx_io(address_map &map) ATTR_COLD;
@@ -162,7 +168,13 @@ private:
 	required_device<pc_lpt_device> m_lpt0;
 	uint8_t m_pal[768];
 
-	optional_ioport_array<9> m_ports;   // but parallel_pointer takes values 0 -> 23
+	required_ioport_array<4> m_guns;
+	output_finder<14> m_jammit_outputs;
+	required_ioport m_triggers;
+	required_ioport m_render_options;
+	bitmap_rgb32 m_last_normal_frame;
+	bool m_last_normal_frame_valid = false;
+	uint32_t m_last_normal_pitch = 0;
 
 	uint32_t m_disp_ctrl_reg[256/4]{};
 	int m_frame_width = 0;
@@ -176,24 +188,15 @@ private:
 	uint8_t m_mediagx_config_reg_sel = 0;
 	uint8_t m_mediagx_config_regs[256]{};
 
-	//uint8_t m_controls_data = 0;
-	uint8_t m_parallel_pointer = 0;
-	uint8_t m_parallel_latched = 0;
-	uint32_t m_parport = 0;
-	//int m_control_num = 0;
-	//int m_control_num2 = 0;
-	//int m_control_read = 0;
-
-	std::unique_ptr<int16_t[]> m_dacl;
-	std::unique_ptr<int16_t[]> m_dacr;
-	int m_dacl_ptr = 0;
-	int m_dacr_ptr = 0;
-
 	uint8_t m_ad1847_regs[16]{};
-	uint32_t m_ad1847_sample_counter = 0;
+	uint32_t m_audio_fifo_count = 0;
+	uint64_t m_audio_fifo_sample_tick = 0;
 	uint32_t m_ad1847_sample_rate = 0;
 
 #if SPEEDUP_HACKS
+	emu_timer *m_video_poll_timer = nullptr;
+	uint32_t m_video_poll_pc = 0;
+	uint32_t m_video_poll_vna = 0;
 	const speedup_entry *m_speedup_table = nullptr;
 	uint32_t m_speedup_hits[12]{};
 	int m_speedup_count = 0;
@@ -245,8 +248,16 @@ static const rgb_t cga_palette[16] =
 	rgb_t( 0xff, 0x55, 0x55 ), rgb_t( 0xff, 0x55, 0xff ), rgb_t( 0xff, 0xff, 0x55 ), rgb_t( 0xff, 0xff, 0xff ),
 };
 
+void mediagx_state::invalidate_render_cache()
+{
+	m_last_normal_frame_valid = false;
+	m_last_normal_pitch = 0;
+}
+
 void mediagx_state::video_start()
 {
+	m_screen->register_screen_bitmap(m_last_normal_frame);
+	machine().save().register_postload(save_prepost_delegate(FUNC(mediagx_state::invalidate_render_cache), this));
 	int i;
 	for (i=0; i < 16; i++)
 	{
@@ -390,6 +401,18 @@ void mediagx_state::draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 uint32_t mediagx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	const uint32_t pitch = (m_disp_ctrl_reg[DC_LINE_DELTA] & 0x3ff) * 4;
+	const uint32_t start = m_disp_ctrl_reg[DC_FB_ST_OFFSET];
+	const bool gun_flash = !(m_disp_ctrl_reg[DC_OUTPUT_CFG] & 1) && !pitch &&
+		m_last_normal_frame_valid && m_last_normal_pitch &&
+		start == 2 * m_frame_height * m_last_normal_pitch &&
+		start < m_vram.bytes() && m_vram[start / 4] == 0xffffffff;
+	if (BIT(m_render_options->read(), 0) && gun_flash)
+	{
+		copybitmap(bitmap, m_last_normal_frame, 0, 0, 0, 0, cliprect);
+		return 0;
+	}
+
 	bitmap.fill(0, cliprect);
 
 	draw_framebuffer( bitmap, cliprect);
@@ -397,6 +420,12 @@ uint32_t mediagx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 	if (m_disp_ctrl_reg[DC_OUTPUT_CFG] & 0x1)   // don't show MDA text screen on 16-bit mode. this is basically a hack
 	{
 		draw_cga(bitmap, cliprect);
+	}
+	if (pitch && !(m_disp_ctrl_reg[DC_OUTPUT_CFG] & 1))
+	{
+		copybitmap(m_last_normal_frame, bitmap, 0, 0, 0, 0, cliprect);
+		m_last_normal_pitch = pitch;
+		m_last_normal_frame_valid = true;
 	}
 	return 0;
 }
@@ -408,15 +437,32 @@ uint32_t mediagx_state::disp_ctrl_r(offs_t offset)
 	switch (offset)
 	{
 		case DC_TIMING_CFG:
-			r |= 0x40000000;
-
-			if (m_screen->vpos() >= m_frame_height)
-				r &= ~0x40000000;
+			// VNA is high outside the active display (MediaGX DC_TIMING_CFG).
+			r = (r & ~0x40000000U) | (m_screen->vpos() >= m_frame_height ? 0x40000000U : 0);
 
 #if SPEEDUP_HACKS
-			// wait for vblank speedup
-			m_maincpu->spin_until_interrupt();
+			if (!machine().side_effects_disabled())
+			{
+				const uint32_t pc = m_maincpu->pc();
+				const uint32_t vna = r & 0x40000000U;
+				// HD 2.01 polls both edges of VNA. A repeated read at the same
+				// instruction with unchanged status means its loop is still waiting.
+				// Leave first reads and successful edge reads unsuspended. Wake on
+				// either an IRQ or the raster edge, without asserting a guest IRQ.
+				if ((pc == 0x364d1 || pc == 0x364f8) && pc == m_video_poll_pc && vna == m_video_poll_vna &&
+					m_main_ram[0x364d0 / 4] == 0x00002508 && m_main_ram[0x364f8 / 4] == 0x00000025 &&
+					m_frame_height > 0 && m_frame_height < m_screen->height())
+				{
+					m_video_poll_timer->adjust(m_screen->time_until_pos(vna ? 0 : m_frame_height));
+					m_maincpu->spin_until_interrupt();
+				}
+				m_video_poll_pc = pc;
+				m_video_poll_vna = vna;
+			}
 #endif
+			break;
+		case DC_V_LINE_CNT:
+			r = m_screen->vpos() & 0x7ff;
 			break;
 	}
 
@@ -425,8 +471,13 @@ uint32_t mediagx_state::disp_ctrl_r(offs_t offset)
 
 void mediagx_state::disp_ctrl_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
+	if (offset == DC_V_LINE_CNT)
+		return;
 //  printf("disp_ctrl_w %08X, %08X, %08X\n", data, offset*4, mem_mask);
 	COMBINE_DATA(m_disp_ctrl_reg + offset);
+#if SPEEDUP_HACKS
+	m_video_poll_pc = 0;
+#endif
 }
 
 
@@ -520,133 +571,48 @@ void mediagx_state::io20_w(offs_t offset, uint8_t data)
 	}
 }
 
-uint32_t mediagx_state::parallel_port_r(offs_t offset, uint32_t mem_mask)
+void mediagx_state::jammit_output_w(uint16_t data)
 {
-	uint32_t r = 0;
-
-	if (ACCESSING_BITS_8_15)
-	{
-		uint8_t nibble = m_parallel_latched;
-		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
-		logerror("%08X:parallel_port_r()\n", m_maincpu->pc());
-#if 0
-		if (m_controls_data == 0x18)
-		{
-			r |= m_ports[0]->read() << 8;
-		}
-		else if (m_controls_data == 0x60)
-		{
-			r |= m_ports[1]->read() << 8;
-		}
-		else if (m_controls_data == 0xff || m_controls_data == 0x50)
-		{
-			r |= m_ports[2]->read() << 8;
-		}
-
-		//r |= m_control_read << 8;
-#endif
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= m_parport & 0xff0000;
-	}
-
-	return r;
+	// Keep the existing cabinet output names at the machine root.
+	for (unsigned bit = 0; bit < 14; ++bit)
+		m_jammit_outputs[bit] = BIT(data, bit);
 }
 
-void mediagx_state::parallel_port_w(offs_t offset, uint32_t data, uint32_t mem_mask)
+// Convert host aim to the existing JAMMIT beam-counter units.  The peripheral
+// samples both players once at the beginning of each input packet.
+uint32_t mediagx_state::jammit_gun_r(offs_t player)
 {
-	COMBINE_DATA( &m_parport );
-
-	if (ACCESSING_BITS_0_7)
-	{
-		/*
-		    Controls:
-
-		        18 = reset internal pointer to 0
-		        19 = reset internal pointer to 1
-		        1a = reset internal pointer to 2
-		        1b = reset internal pointer to 3
-		        2x = set low 4 bits of general purpose output to 'x'
-		        3x = set high 4 bits of general purpose output to 'x'
-		        4x = control up to 4 coin counters; each bit of 'x' controls one
-		        5x = control up to 2 watchdogged outputs (kickers); bits D0-D1 control each one
-		        6x = watchdog reset
-		        7x..ff = advance pointer
-		*/
-
-		logerror("%08X:", m_maincpu->pc());
-
-		m_parallel_latched = (m_ports[m_parallel_pointer / 3].read_safe(0) >> (4 * (m_parallel_pointer % 3))) & 15;
-		//parallel_pointer++;
-		//logerror("[%02X] Advance pointer to %d\n", data, parallel_pointer);
-		switch (data & 0xfc)
-		{
-			case 0x18:
-				m_parallel_pointer = data & 3;
-				logerror("[%02X] Reset pointer to %d\n", data, m_parallel_pointer);
-				break;
-
-			case 0x20:
-			case 0x24:
-			case 0x28:
-			case 0x2c:
-				logerror("[%02X] General purpose output = x%X\n", data, data & 0x0f);
-				break;
-
-			case 0x30:
-			case 0x34:
-			case 0x38:
-			case 0x3c:
-				logerror("[%02X] General purpose output = %Xx\n", data, data & 0x0f);
-				break;
-
-			case 0x40:
-			case 0x44:
-			case 0x48:
-			case 0x4c:
-				logerror("[%02X] Coin counters = %d%d%d%d\n", data, (data >> 3) & 1, (data >> 2) & 1, (data >> 1) & 1, data & 1);
-				break;
-
-			case 0x50:
-			case 0x54:
-			case 0x58:
-			case 0x5c:
-				logerror("[%02X] Kickers = %d%d\n", data, (data >> 1) & 1, data & 1);
-				break;
-
-			case 0x60:
-			case 0x64:
-			case 0x68:
-			case 0x6c:
-				logerror("[%02X] Watchdog reset\n", data);
-				break;
-
-			default:
-				if (data >= 0x70)
-				{
-					m_parallel_pointer++;
-					logerror("[%02X] Advance pointer to %d\n", data, m_parallel_pointer);
-				}
-				else
-					logerror("[%02X] Unknown write\n", data);
-				break;
-		}
-	}
+	const uint8_t triggers = m_triggers->read();
+	const unsigned htotal = ((m_disp_ctrl_reg[DC_H_TIMING_1] >> 16) & 0x7ff) + 8;
+	// Horizontal gun counter is referenced to the leading edge of HSYNC.
+	const unsigned hsyncstart = (m_disp_ctrl_reg[DC_H_TIMING_3] & 0x7ff) + 8;
+	const unsigned backporch = htotal > hsyncstart ? htotal - hsyncstart : 0;
+	const unsigned pixel_double = BIT(m_disp_ctrl_reg[DC_TIMING_CFG], 15) ? 2 : 1;
+	const double counts_per_line = m_screen->scan_period().as_double() * 14'318'180;
+	const unsigned x = m_guns[player * 2]->read();
+	const unsigned y = m_guns[player * 2 + 1]->read();
+	const bool offscreen = BIT(triggers, player + 4) || x == 0 || x == 255 || y == 0 || y == 255;
+	const unsigned xpos = x * std::max(m_frame_width - 1, 0) / 255;
+	const unsigned ypos = y * std::max(m_frame_height - 1, 0) / 255;
+	const unsigned vertical = ~ypos & 0x0fff;
+	const unsigned horizontal = std::min<unsigned>(1023, (backporch + xpos * pixel_double) * counts_per_line / htotal);
+	return vertical | (horizontal << 12) | (BIT(triggers, player) << 24)
+		| (unsigned(offscreen) << 25);
 }
 
 /* Analog Devices AD1847 Stereo DAC */
 
-TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
+uint32_t mediagx_state::ad1847_fifo_level(bool update)
 {
-	m_ad1847_sample_counter = 0;
-	timer.adjust(attotime::from_msec(10));
-
-	m_dmadac[0]->transfer(1, 0, 1, m_dacl_ptr, m_dacl.get());
-	m_dmadac[1]->transfer(1, 0, 1, m_dacr_ptr, m_dacr.get());
-
-	m_dacl_ptr = 0;
-	m_dacr_ptr = 0;
+	const uint64_t sample_tick = m_ad1847_sample_rate ? machine().time().as_ticks(m_ad1847_sample_rate) : 0;
+	const uint64_t elapsed = sample_tick >= m_audio_fifo_sample_tick ? sample_tick - m_audio_fifo_sample_tick : 0;
+	const uint32_t level = m_audio_fifo_count - std::min<uint64_t>(m_audio_fifo_count, elapsed);
+	if (update)
+	{
+		m_audio_fifo_count = level;
+		m_audio_fifo_sample_tick = sample_tick;
+	}
+	return level;
 }
 
 void mediagx_state::ad1847_reg_write(int reg, uint8_t data)
@@ -657,6 +623,7 @@ void mediagx_state::ad1847_reg_write(int reg, uint8_t data)
 	{
 		case 8:     // Data format register
 		{
+			ad1847_fifo_level();
 			if (data & 0x1)
 			{
 				m_ad1847_sample_rate = 16934400 / divide_factor[(data >> 1) & 0x7];
@@ -666,6 +633,7 @@ void mediagx_state::ad1847_reg_write(int reg, uint8_t data)
 				m_ad1847_sample_rate = 24576000 / divide_factor[(data >> 1) & 0x7];
 			}
 
+			m_audio_fifo_sample_tick = machine().time().as_ticks(m_ad1847_sample_rate);
 			m_dmadac[0]->set_frequency(m_ad1847_sample_rate);
 			m_dmadac[1]->set_frequency(m_ad1847_sample_rate);
 
@@ -693,7 +661,9 @@ uint32_t mediagx_state::ad1847_r(offs_t offset)
 	switch (offset)
 	{
 		case 0x14/4:
-			return ((m_ad1847_sample_rate) / 100) - m_ad1847_sample_counter;
+			// Bits 8-13 report occupancy of the 32-entry stereo FIFO.
+			// Advance on the native sample clock, retaining fractional periods.
+			return ad1847_fifo_level(!machine().side_effects_disabled()) << 8;
 	}
 	return 0;
 }
@@ -702,18 +672,24 @@ void mediagx_state::ad1847_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 {
 	if (offset == 0)
 	{
+		if (!mem_mask || ad1847_fifo_level() >= 32)
+			return;
+		// Consume the previous FIFO contents up to this write before adding
+		// new samples. A periodic 10 ms batch loses the FIFO's clock feedback.
+		m_dmadac[0]->flush();
+		m_dmadac[1]->flush();
 		if (ACCESSING_BITS_16_31)
 		{
-			uint16_t ldata = (data >> 16) & 0xffff;
-			m_dacl[m_dacl_ptr++] = ldata;
+			int16_t ldata = data >> 16;
+			m_dmadac[0]->transfer(0, 0, 1, 1, &ldata);
 		}
 		if (ACCESSING_BITS_0_15)
 		{
-			uint16_t rdata = data & 0xffff;
-			m_dacr[m_dacr_ptr++] = rdata;
+			int16_t rdata = data;
+			m_dmadac[1]->transfer(0, 0, 1, 1, &rdata);
 		}
 
-		m_ad1847_sample_counter++;
+		m_audio_fifo_count++;
 	}
 	else if (offset == 3)
 	{
@@ -745,7 +721,7 @@ void mediagx_state::mediagx_io(address_map &map)
 	map(0x0022, 0x0023).rw(FUNC(mediagx_state::io20_r), FUNC(mediagx_state::io20_w));
 	map(0x00e8, 0x00eb).noprw();     // I/O delay port
 	map(0x01f0, 0x01f7).rw(m_ide, FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
-	map(0x0378, 0x037b).rw(FUNC(mediagx_state::parallel_port_r), FUNC(mediagx_state::parallel_port_w));
+	map(0x0378, 0x037b).m("jammit_lpt", FUNC(pc_lpt_device::isa_map));
 	map(0x03bc, 0x03bf).rw(m_lpt0, FUNC(pc_lpt_device::read), FUNC(pc_lpt_device::write)).umask16(0x00ff);
 	map(0x03f0, 0x03f7).rw(m_ide, FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
 	map(0x0400, 0x04ff).rw(FUNC(mediagx_state::ad1847_r), FUNC(mediagx_state::ad1847_w));
@@ -776,77 +752,75 @@ static GFXDECODE_START( gfx_cga )
 GFXDECODE_END
 
 static INPUT_PORTS_START(mediagx)
-	PORT_START("IN0")
-	PORT_SERVICE_NO_TOGGLE( 0x001, IP_ACTIVE_HIGH )
-	PORT_BIT( 0x002, IP_ACTIVE_HIGH, IPT_SERVICE1 )
-	PORT_BIT( 0x004, IP_ACTIVE_HIGH, IPT_SERVICE2 )
-	PORT_BIT( 0x008, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN )
-	PORT_BIT( 0x010, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x020, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x040, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_BIT( 0x080, IP_ACTIVE_HIGH, IPT_COIN4 )
-	PORT_BIT( 0x100, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x400, IP_ACTIVE_HIGH, IPT_START3 )
-	PORT_BIT( 0x800, IP_ACTIVE_HIGH, IPT_START4 )
+	PORT_START("SYSTEM")
+	PORT_BIT(0x001, IP_ACTIVE_HIGH, IPT_COIN1)
+	PORT_BIT(0x002, IP_ACTIVE_HIGH, IPT_COIN2)
+	PORT_BIT(0x004, IP_ACTIVE_HIGH, IPT_COIN3)
+	PORT_BIT(0x008, IP_ACTIVE_HIGH, IPT_COIN4)
+	PORT_BIT(0x010, IP_ACTIVE_HIGH, IPT_TILT)
+	PORT_SERVICE_NO_TOGGLE(0x020, IP_ACTIVE_HIGH) PORT_NAME("Test / Operator Menu")
+	PORT_BIT(0x040, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x080, IP_ACTIVE_HIGH, IPT_BILL1)
+	PORT_BIT(0x100, IP_ACTIVE_HIGH, IPT_SERVICE1)
+	PORT_BIT(0x200, IP_ACTIVE_HIGH, IPT_SERVICE2)
+	PORT_BIT(0x400, IP_ACTIVE_HIGH, IPT_VOLUME_DOWN)
+	PORT_BIT(0x800, IP_ACTIVE_HIGH, IPT_VOLUME_UP)
 
-	PORT_START("IN1")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 )
+	PORT_START("STARTS")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2)
+	PORT_BIT(0x0c, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("IN2")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON4 )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON5 )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON6 )
+	PORT_START("TRIGGERS")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1) PORT_NAME("P1 Offscreen Shot")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2) PORT_NAME("P2 Offscreen Shot")
+	PORT_BIT(0xcc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
-	PORT_START("IN3")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON7 )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON8 )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON9 )
-
-	PORT_START("IN4")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
-
-	PORT_START("IN5")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(3)
-
-	PORT_START("IN6")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-
-	PORT_START("IN7")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-
-	PORT_START("IN8")
-	PORT_BIT( 0x00f, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
-	PORT_BIT( 0x0f0, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(3)
-	PORT_BIT( 0xf00, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
+	PORT_START("GUN0")
+	PORT_BIT(0xff, 0x80, IPT_LIGHTGUN_X) PORT_MINMAX(0, 255) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_PLAYER(1)
+	PORT_START("GUN1")
+	PORT_BIT(0xff, 0x80, IPT_LIGHTGUN_Y) PORT_MINMAX(0, 255) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_PLAYER(1)
+	PORT_START("GUN2")
+	PORT_BIT(0xff, 0x80, IPT_LIGHTGUN_X) PORT_MINMAX(0, 255) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_PLAYER(2)
+	PORT_START("GUN3")
+	PORT_BIT(0xff, 0x80, IPT_LIGHTGUN_Y) PORT_MINMAX(0, 255) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_PLAYER(2)
+	PORT_START("RENDER_OPTIONS")
+	PORT_CONFNAME(0x01, 0x01, "Gun Flash (presentation only)")
+	PORT_CONFSETTING(0x00, "Original")
+	PORT_CONFSETTING(0x01, "Hidden (LCD lightguns)")
 INPUT_PORTS_END
 
 void mediagx_state::machine_start()
 {
-	m_dacl = std::make_unique<int16_t[]>(65536);
-	m_dacr = std::make_unique<int16_t[]>(65536);
+#if SPEEDUP_HACKS
+	m_video_poll_timer = timer_alloc(FUNC(mediagx_state::video_poll_end), this);
+	save_item(NAME(m_video_poll_pc));
+	save_item(NAME(m_video_poll_vna));
+#endif
+	save_item(NAME(m_audio_fifo_count));
+	save_item(NAME(m_audio_fifo_sample_tick));
+	save_item(NAME(m_ad1847_sample_rate));
 }
 
 void mediagx_state::machine_reset()
 {
+	invalidate_render_cache();
+#if SPEEDUP_HACKS
+	m_video_poll_pc = 0;
+	m_video_poll_vna = 0;
+	m_video_poll_timer->adjust(attotime::never);
+#endif
 	// HACK: pretend shadow RAM doesn't exist in a x86 BIOS ...
 	uint8_t *rom = memregion("bios")->base();
 	memcpy(m_bios_ram, rom, 0x40000);
 	m_maincpu->reset();
 
-	timer_device *sound_timer = subdevice<timer_device>("sound_timer");
-	sound_timer->adjust(attotime::from_msec(10));
-
+	m_audio_fifo_count = 0;
+	m_audio_fifo_sample_tick = m_ad1847_sample_rate ? machine().time().as_ticks(m_ad1847_sample_rate) : 0;
+	m_dmadac[0]->enable(0);
+	m_dmadac[1]->enable(0);
 	m_dmadac[0]->enable(1);
 	m_dmadac[1]->enable(1);
 }
@@ -868,15 +842,31 @@ void mediagx_state::mediagx(machine_config &config)
 	PC_LPT(config, m_lpt0);
 //  m_lpt0->irq_handler().set("mb:pic8259", FUNC(pic8259_device::ir7_w));
 
-	pcat_common(config);
+	// External Atari JAMMIT board on the mainboard's DB25 parallel connector.
+	pc_lpt_device &jammit_lpt(PC_LPT(config, "jammit_lpt"));
+	centronics_device &centronics(*jammit_lpt.subdevice<centronics_device>("centronics"));
+	centronics.option_add_internal("atari_jammit", ATARI_JAMMIT);
+	centronics.set_default_option("atari_jammit");
+	centronics.set_fixed(true);
+	centronics.set_option_machine_config("atari_jammit", [this] (device_t *device)
+	{
+		auto &jammit = downcast<atari_jammit_device &>(*device);
+		jammit.system_callback().set_ioport(":SYSTEM");
+		jammit.starts_callback().set_ioport(":STARTS");
+		jammit.gun_callback().set(*this, FUNC(mediagx_state::jammit_gun_r));
+		jammit.output_callback().set(*this, FUNC(mediagx_state::jammit_output_w));
+	});
+
+	// Cabinet PS/2 connectors are unused. Keep the 8042, but do not attach
+	// a PC keyboard: its input ports put MAME in full keyboard mode and
+	// disable the default UI shortcuts (including Tab).
+	pcat_common_nokeyboard(config);
 
 	PCI_ROOT(config, "pci");
 	CX5510(config, "pci:12.0", m_maincpu);
 
 	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
 	ide.irq_handler().set(m_pic8259_2, FUNC(pic8259_device::ir6_w));
-
-	TIMER(config, "sound_timer").configure_generic(FUNC(mediagx_state::sound_timer_callback));
 
 	RAMDAC(config, m_ramdac, m_palette);
 	m_ramdac->set_addrmap(0, &mediagx_state::ramdac_map);
@@ -904,22 +894,46 @@ void mediagx_state::mediagx(machine_config &config)
 void mediagx_state::init_mediagx()
 {
 	m_frame_width = m_frame_height = 1;
-	m_parallel_pointer = 0;
 	std::fill(std::begin(m_disp_ctrl_reg), std::end(m_disp_ctrl_reg), 0);
 	std::fill(std::begin(m_biu_ctrl_reg), std::end(m_biu_ctrl_reg), 0);
 	std::fill(std::begin(m_speedup_hits), std::end(m_speedup_hits), 0);
 }
 
+TIMER_CALLBACK_MEMBER(mediagx_state::video_poll_end)
+{
+	// Release a polling wait only; this is not a hardware interrupt.
+	m_maincpu->signal_interrupt_trigger();
+}
+
 #if SPEEDUP_HACKS
+
+uint32_t mediagx_state::frame_counter_r()
+{
+	const uint32_t counter = m_main_ram[0x8c2ec / 4];
+	const uint32_t pc = m_maincpu->pc();
+	const uint32_t elapsed = counter - m_main_ram[0x6cfa0 / 4];
+	// HD 2.01 waits for two/four vertical ticks before starting the next frame.
+	// The tick is advanced by the game's interrupt handler. Yield only while
+	// the observed unsigned loop condition is true, preserving IRQ execution.
+	if (!machine().side_effects_disabled() &&
+		m_main_ram[0x54c4 / 4] == 0x0006cfcc &&
+		m_main_ram[0x54c8 / 4] == 0x290c408b &&
+		((pc == 0x54cb && elapsed < 4) || (pc == 0x54b4 && elapsed < 2)))
+		m_maincpu->spin_until_interrupt();
+	return counter;
+}
 
 uint32_t mediagx_state::generic_speedup(address_space &space, int idx)
 {
-	if (m_maincpu->pc() == m_speedup_table[idx].pc)
+	const uint32_t value = m_main_ram[m_speedup_table[idx].offset / 4];
+	// Only yield while the observed loop condition is still true.
+	const bool waiting = m_speedup_table[idx].pc == 0x363e ? value == 0 : value != 0x65;
+	if (!machine().side_effects_disabled() && waiting && m_maincpu->pc() == m_speedup_table[idx].pc)
 	{
 		m_speedup_hits[idx]++;
 		space.device().execute().spin_until_interrupt();
 	}
-	return m_main_ram[m_speedup_table[idx].offset/4];
+	return value;
 }
 
 const mediagx_state::speedup_handler mediagx_state::s_speedup_handlers[]
@@ -974,6 +988,8 @@ void mediagx_state::init_a51site4()
 
 #if SPEEDUP_HACKS
 	install_speedups(a51site4_speedups, std::size(a51site4_speedups));
+	if (!strcmp(machine().system().name, "a51site4"))
+		m_maincpu->space(AS_PROGRAM).install_read_handler(0x8c2ec, 0x8c2ef, read32smo_delegate(*this, FUNC(mediagx_state::frame_counter_r)));
 #endif
 }
 
@@ -1018,3 +1034,4 @@ ROM_END
 
 GAME( 1998, a51site4, 0       , mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.01, September 7, 1998)", MACHINE_NOT_WORKING )
 GAME( 1998, a51site4a,a51site4, mediagx, mediagx, mediagx_state, init_a51site4,  ROT0,   "Atari Games",  "Area 51: Site 4 (HD Rev 2.0, September 11, 1998)", MACHINE_NOT_WORKING )
+
