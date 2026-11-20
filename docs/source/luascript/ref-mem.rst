@@ -65,7 +65,9 @@ space:read_i{8,16,32,64}(addr)
     Reads a signed integer value of the size in bits from the specified address.
 space:read_u{8,16,32,64}(addr)
     Reads an unsigned integer value of the size in bits from the specified
-    address.
+    address.  A 64-bit value is returned as the Lua integer with the same bits,
+    so values of 2\ :sup:`63` and above are negative.  Use ``math.ult`` to
+    compare such values as unsigned integers.
 space:write_i{8,16,32,64}(addr, val)
     Writes a signed integer value of the size in bits to the specified address.
 space:write_u{8,16,32,64}(addr, val)
