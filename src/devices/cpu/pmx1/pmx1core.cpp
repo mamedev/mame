@@ -60,9 +60,9 @@
       or of feeds of a repeated feed, is not known.  The known code always
       has three comparisons of the same register in front of it, with -2,
       -1 and 0, and that register holds three less than the number.
-    - What bit 0 does in the conditional forms of the arithmetic is not
-      known.  The MK6 code has it set in a few places where the use of the
-      result shows it makes no difference.
+    - What bit 0 does in the conditional forms of the arithmetic and in
+      the shifts by a count is not known.  The MK6 code has it set in a few
+      places where the use of the result shows it makes no difference.
     - What a jump does when thread 0 has not yet taken the one before is
       not known.
     - Instructions are fetched from the chip's own memory only.  A thread
@@ -371,8 +371,10 @@ u32 pmx1core_device::compute(u32 operation, u32 a, u32 b)
 		return a ^ b;
 	case 5:
 		return a << (b & 31);
-	default:
+	case 6:
 		return a >> (b & 31);
+	default:
+		return u32(s32(a) >> (b & 31));
 	}
 }
 
@@ -396,6 +398,7 @@ u8 pmx1core_device::flags_after(u32 operation, u32 a, u32 b, u32 result, u8 flag
 		overflow = false;
 		break;
 	case 6:
+	case 7:
 		carry = b && (b <= 32) && BIT(a, b - 1);
 		overflow = false;
 		break;
@@ -507,7 +510,7 @@ void pmx1core_device::step(u32 thread)
 	outcome result = outcome::UNKNOWN;
 	switch (BIT(op, 28, 4))
 	{
-	case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 9:
+	case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 9:
 		result = arithmetic(thread, op);
 		break;
 
@@ -588,7 +591,7 @@ void pmx1core_device::step(u32 thread)
 
 pmx1core_device::outcome pmx1core_device::arithmetic(u32 thread, u32 op)
 {
-	// majors 0 to 6 are the operations on the data registers; major 9 adds address registers
+	// majors 0 to 7 are the operations on the data registers; major 9 adds address registers
 	thread_state &ts = m_thread[thread];
 	const u32 major = BIT(op, 28, 4);
 	const u32 operation = (major == 9) ? 0 : major;
@@ -596,7 +599,7 @@ pmx1core_device::outcome pmx1core_device::arithmetic(u32 thread, u32 op)
 	const bool flags = BIT(op, 27), conditional = BIT(op, 26), immediate = BIT(op, 25);
 	const bool shift = operation >= 5;
 	const u32 d = BIT(op, 19, 5), s1 = BIT(op, 14, 5), s2 = BIT(op, 9, 5);
-	const bool to_unit = conditional && immediate && !shift && BIT(op, 5);
+	const bool to_unit = conditional && immediate && BIT(op, 5);
 	if (flags && ((major == 9) || (conditional && !to_unit)))
 		return outcome::UNKNOWN;
 
@@ -626,7 +629,9 @@ pmx1core_device::outcome pmx1core_device::arithmetic(u32 thread, u32 op)
 		else if (shift)
 		{
 			// the count is the S2 field itself
-			if (BIT(op, 0, 9))
+			// FIXME: what bit 0 does is not known; the MK6 text code has it set where the use of the result shows it makes
+			// no difference
+			if (BIT(op, 1, 8))
 				return outcome::UNKNOWN;
 			a = reg(unit, s1);
 			b = s2;
@@ -678,7 +683,13 @@ pmx1core_device::outcome pmx1core_device::arithmetic(u32 thread, u32 op)
 		if (!has_register(to, d))
 			return outcome::UNKNOWN;
 		if (met)
-			reg(to, d) = compute(operation, reg(unit, s1), s2);
+		{
+			const u32 a = reg(unit, s1);
+			const u32 result = compute(operation, a, s2);
+			reg(to, d) = result;
+			if (flags)
+				ts.flags = flags_after(operation, a, s2, result, ts.flags);
+		}
 	}
 	else if (immediate)
 	{

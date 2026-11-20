@@ -22,6 +22,7 @@
 
     Instructions
       add sub and or xor shl shr    destination, source, source; or destination, 16-bit immediate
+      sar                           the same, shifting in copies of the sign bit
       mov, movn                     load a register with a register, an immediate or minus an immediate
       cmp, tst                      subtract or AND for the flags only
       b                             jump relative to the instruction
@@ -49,7 +50,7 @@
 
 namespace {
 
-constexpr char const *const OPERATIONS[7] = { "add", "sub", "and", "or", "xor", "shl", "shr" };
+constexpr char const *const OPERATIONS[8] = { "add", "sub", "and", "or", "xor", "shl", "shr", "sar" };
 
 constexpr char const *const BANKS[5] = { nullptr, "da", "db", "aa", "ab" };
 
@@ -113,13 +114,13 @@ std::string pmx1core_disassembler::mnemonic(const char *name, u32 condition)
 
 bool pmx1core_disassembler::arithmetic(std::ostream &stream, u32 op)
 {
-	// majors 0 to 6 are the operations on data registers, major 9 adds address registers
+	// majors 0 to 7 are the operations on data registers, major 9 adds address registers
 	const u32 major = BIT(op, 28, 4);
 	const u32 operation = (major == 9) ? 0 : major;
 	const u32 unit = ((major == 9) ? 3 : 1) + BIT(op, 24);
 	const bool flags = BIT(op, 27), conditional = BIT(op, 26), immediate = BIT(op, 25);
 	const bool shift = operation >= 5;
-	const bool to_unit = conditional && immediate && !shift && BIT(op, 5);
+	const bool to_unit = conditional && immediate && BIT(op, 5);
 	if (flags && ((major == 9) || (conditional && !to_unit)))
 		return false;
 
@@ -148,8 +149,8 @@ bool pmx1core_disassembler::arithmetic(std::ostream &stream, u32 op)
 	{
 		if (shift)
 		{
-			// the count is in the instruction
-			if (BIT(op, 0, 9))
+			// the count is in the instruction; what bit 0 does is not known
+			if (BIT(op, 1, 8))
 				return false;
 			util::stream_format(stream, "%-8s%s, %s, %u", name, d, s1, BIT(op, 9, 5));
 		}
@@ -178,7 +179,7 @@ bool pmx1core_disassembler::arithmetic(std::ostream &stream, u32 op)
 	else
 	{
 		// the conditional forms
-		const std::string cond_name = mnemonic(OPERATIONS[operation], BIT(op, 1, 4));
+		const std::string cond_name = mnemonic(flags ? name.c_str() : OPERATIONS[operation], BIT(op, 1, 4));
 		if (cond_name.empty())
 			return false;
 		if (immediate && shift)
@@ -430,7 +431,7 @@ offs_t pmx1core_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	bool known;
 	switch (BIT(op, 28, 4))
 	{
-	case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 9:
+	case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 9:
 		known = arithmetic(stream, op);
 		break;
 
