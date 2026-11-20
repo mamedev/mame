@@ -1166,9 +1166,9 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_discrete(*this, "discrete"),
+		m_snsnd(*this, "snsnd"),
 		m_hopper(*this, "hopper"),
 		m_ay8910(*this, "ay8910"),
-		m_snsnd(*this, "snsnd"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
@@ -1204,6 +1204,7 @@ public:
 	void touksysp(machine_config &config) ATTR_COLD;
 	void pk5_07sb(machine_config &config) ATTR_COLD;
 	void jokerush(machine_config &config) ATTR_COLD;
+	void goldpnew(machine_config &config) ATTR_COLD;
 
 	void init_vkdlswwh() ATTR_COLD;
 	void init_icp1db() ATTR_COLD;
@@ -1242,6 +1243,7 @@ public:
 	void init_touk() ATTR_COLD;
 	void init_pk5sb() ATTR_COLD;
 	void init_jokerush() ATTR_COLD; 
+	void init_gldpnw() ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -1278,6 +1280,7 @@ protected:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<discrete_device> m_discrete;
+	optional_device<sn76489a_device> m_snsnd;
 
 	uint8_t m_mux_data = 0;
 
@@ -1288,6 +1291,8 @@ private:
 	uint8_t snsnd_ready_r();
 	void ay8910_data_w(uint8_t data);
 	void ay8910_control_w(uint8_t data);
+	void goldpnew_pia1_pa_w(uint8_t data);
+	void goldpnew_pia1_pb_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
@@ -1339,10 +1344,10 @@ private:
 	void touksysp_opcodes_map(address_map &map) ATTR_COLD;
 	void pk5_07sb_map(address_map &map) ATTR_COLD;
 	void jokerush_map(address_map &map) ATTR_COLD;
+	void goldpnew_map(address_map &map) ATTR_COLD;
 
 	optional_device<ticket_dispenser_device> m_hopper;
 	optional_device<ay8910_device> m_ay8910;
-	optional_device<sn76489a_device> m_snsnd;
 	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	tilemap_t *m_bg_tilemap = nullptr;
@@ -1961,6 +1966,19 @@ void goldnpkr_state::ay8910_control_w(uint8_t data)
 }
 
 
+void goldnpkr_state::goldpnew_pia1_pa_w(uint8_t data)
+{
+//	logerror("written data:%02x\n", data );
+}
+
+
+void goldnpkr_state::goldpnew_pia1_pb_w(uint8_t data)
+{
+//	logerror("written data:%02x\n", data );
+}
+
+
+
 /***** Lamps wiring *****
 
   -------------------
@@ -2487,6 +2505,25 @@ void goldnpkr_state::jokerush_map(address_map &map)
 
 	map(0x0000, 0x07ff).ram().share("nvram");  // battery backed RAM
 	map(0x8000, 0xffff).rom();
+}
+
+
+void goldnpkr_state::goldpnew_map(address_map &map)
+{
+	map.global_mask(0x7fff);
+
+	map(0x0000, 0x07ff).ram().share("nvram");  // Atmel AT28C16-25PC 2KB Parallel EEPROM
+
+	// CRTC & PIAs are simulated inside the CPLD/FPGA (under "DZ" sticker)
+	map(0x0800, 0x0800).w("crtc", FUNC(mc6845_device::address_w));
+	map(0x0801, 0x0801).rw("crtc", FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
+	map(0x0844, 0x0847).rw("pia0", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+	map(0x0848, 0x084b).rw("pia1", FUNC(pia6821_device::read), FUNC(pia6821_device::write));
+
+	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
+	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
+
+	map(0x2000, 0x7fff).rom();
 }
 
 
@@ -6848,6 +6885,46 @@ void goldnpkr_state::kmhpan(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 	SN76489A(config, "sn", MASTER_CLOCK / 4).add_route(ALL_OUTPUTS, "mono", 0.5); // divider unknown
+}
+
+void goldnpkr_state::goldpnew(machine_config &config)
+{
+	// basic machine hardware
+	G65SC02(config, m_maincpu, 20_MHz_XTAL / 16);  // 1.25 MHz (CMD G65SC02P-2 on KD003)
+	m_maincpu->set_addrmap(AS_PROGRAM, &goldnpkr_state::goldpnew_map);
+
+	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
+
+	PIA6821(config, m_pia[0]);
+	m_pia[0]->readpa_handler().set(FUNC(goldnpkr_state::goldnpkr_mux_port_r));
+	m_pia[0]->writepb_handler().set(FUNC(goldnpkr_state::lamps_a_w));
+	m_pia[0]->ca2_handler().set_nop();
+
+	PIA6821(config, m_pia[1]);
+	m_pia[1]->readpa_handler().set_ioport("SW1");
+	m_pia[1]->writepa_handler().set(FUNC(goldnpkr_state::goldpnew_pia1_pa_w));
+	m_pia[1]->writepb_handler().set(FUNC(goldnpkr_state::goldpnew_pia1_pb_w));
+
+	// video hardware (simulated inside CPLD/FPGA)
+	SCREEN(config, m_screen);
+	m_screen->set_raw(PIXEL_CLOCK, (39 + 1) * 8, 0, 32 * 8, ((31 + 1) * 8) + 4, 0, 29 * 8);
+	m_screen->set_screen_update(FUNC(goldnpkr_state::screen_update_goldnpkr));
+
+	mc6845_device &crtc(MC6845(config, "crtc", 20_MHz_XTAL / 16));
+	crtc.set_screen("screen");
+	crtc.set_show_border_area(false);
+	crtc.set_char_width(8);
+	crtc.out_vsync_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
+
+	MCFG_VIDEO_START_OVERRIDE(goldnpkr_state, smb_be4k)
+	GFXDECODE(config, m_gfxdecode, m_palette, gfx_smb_be4k);
+	PALETTE(config, m_palette, FUNC(goldnpkr_state::goldnpkr_palette), 256);
+
+	HOPPER(config, m_hopper, attotime::from_msec(50));
+
+	// sound hardware
+	SPEAKER(config, "mono").front_center();
+	SN76489A(config, m_snsnd, 20_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void goldnpkr_state::unkicpf40(machine_config &config)
@@ -16275,6 +16352,78 @@ ROM_START( jokerush )
 	ROM_LOAD( "prom.2m",    0x0000, 0x0100, CRC(c4dcb312) SHA1(777c5c557a8623dd3db7dc558888f3f44ade1890) )
 ROM_END
 
+/*
+  Golden Poker Double Up (PAN Electronics, 2012 re-release)
+  ---------------------------------------------------------
+
+  Mainboard etched "TAI WAN 2010" with PAN Electronics logo,
+  plus KD003 / CHK00126 CPU daughterboard also with PAN Electronics logo.
+
+  Mainboard components:
+
+  - Unknown 44-pin QFP CPLD/FPGA (covered by "DZ" security sticker)
+      with AMS1117 3.3V regulator, simulating MC6845 CRTC, 2x MC6821
+      PIAs and dynamic bus/address protection.
+
+  - 20.000 MHz XTAL (KYOCERA).
+  - SN76489AN PSG for sound.
+  - 3x 27C256 GFX EPROMs (labeled "1", "2", "3").
+  - 1x EPROM/PROM (labeled "06" with "DZ" stickers, undumped)
+  - 1x 10-DIP switch bank (SW1) + 1x 2-DIP switch bank (SW2) + Battery backup.
+
+  KD003 / CHK00126 daughterboard (PAN Electronics) components:
+
+  - CPU: CMD G65SC02P-2 (U1).
+  - Program ROM: AM27C512-205DC (labeled "4").
+  - NVRAM: Atmel AT28C16-25PC (2KB parallel EEPROM).
+  - Security PLD: 20-pin PAL/GAL (unmarked/scratched) + 74HC logic.
+
+
+  Protection notes:
+  - Program ROM data lines (D0-D7) are unencrypted G65SC02 code, but address lines
+    are dynamically scrambled/banked through the KD003 GAL and mainboard CPLD.
+
+*/
+ROM_START( goldpnew )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "4.bin",  0x0000, 0x8000, CRC(f0b598f4) SHA1(e6cf6ec2fa2aedbc9e0091ab6dd482c98b2918f9) )
+	ROM_CONTINUE(       0x0000, 0x8000)    // program is in the seconf half.
+
+	ROM_REGION( 0x6000, "gfxpool", 0 )
+	ROM_LOAD( "1.bin", 0x0000, 0x2000, CRC(8fd87614) SHA1(1b48343db986fd2c16b6c5e7f426f78d23aff592) )  // gfx, bitplane1
+	ROM_IGNORE(                0x6000 )
+	ROM_LOAD( "2.bin", 0x2000, 0x2000, CRC(70acbc30) SHA1(3741ec6ad4972b54343f2c41f346c01e14810b5a) )  // gfx, bitplane2
+	ROM_IGNORE(                0x6000 )
+	ROM_LOAD( "3.bin", 0x4000, 0x2000, CRC(5332df66) SHA1(1ba0dde79332ae04711b01ef496ecd7a4c39fca9) )  // gfx, bitplane3
+	ROM_IGNORE(                0x6000 )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )  // chars
+	ROM_COPY( "gfxpool", 0x0000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x2000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x4000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx2", 0 )  // cards
+	ROM_COPY( "gfxpool", 0x0800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x2800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x4800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx3", 0 )  // fruits
+	ROM_COPY( "gfxpool", 0x1000, 0x0000, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x3000, 0x0800, 0x0800 ) // src-dest-size (empty)
+	ROM_COPY( "gfxpool", 0x5000, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x1800, "gfx4", 0 )  // jokers + mouse + numbers
+	ROM_COPY( "gfxpool", 0x1800, 0x0000, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x3800, 0x0800, 0x0800 ) // src-dest-size (data)
+	ROM_COPY( "gfxpool", 0x5800, 0x1000, 0x0800 ) // src-dest-size (data)
+
+	ROM_REGION( 0x8000, "unknown", 0 )
+	ROM_LOAD( "06.bin",  0x0000, 0x8000, NO_DUMP )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10n.7d",       0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 
 /*********************************************
 *                Driver Init                 *
@@ -17060,6 +17209,15 @@ void goldnpkr_state::init_jokerush()
 }
 
 
+void goldnpkr_state::init_gldpnw()
+{
+	// Program ROM address lines are dynamically scrambled/banked through
+	// the KD003 GAL and mainboard CPLD ("DZ"). Needs logic analyzer traces
+	// or PLD dump to implement decryption.
+}
+
+
+
 } // anonymous namespace
 
 
@@ -17353,3 +17511,4 @@ GAMEL( 1986, touksysp,  0,        touksysp, touksysp, goldnpkr_state, init_touk,
 GAMEL( 198?, pk5_07sb,  goldnpkr, pk5_07sb, pk5_07sb, goldnpkr_state, init_pk5sb,    ROT0,   "<unknown>",                "Fever Poker (pk5-07sb, encrypted)",       0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
 GAMEL( 198?, jokerush,  0,        jokerush, goldnpkr, goldnpkr_state, init_jokerush, ROT0,   "<unknown>",                "Joker Rush!! (SMH-803-J)",                0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
 
+GAME(  2012, goldpnew,  goldnpkr, goldpnew, goldnpkr, goldnpkr_state, init_gldpnw,   ROT0,   "PAN Electronics",          "Golden Poker Double Up (PAN Electronics)",  MACHINE_NOT_WORKING )
