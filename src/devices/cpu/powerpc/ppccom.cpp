@@ -2426,6 +2426,20 @@ void ppc_device::ppccom_execute_mfspr()
 		}
 	}
 
+	if (m_flavor == PPC_MODEL_740 || m_flavor == PPC_MODEL_750)
+	{
+		switch (m_core->param0)
+		{
+			/* same as MFTB (see MPC750 family manual, §2.3.5.1) */
+			case SPRVEA_TBL_R:
+				m_core->param1 = get_timebase();
+				return;
+			case SPRVEA_TBU_R:
+				m_core->param1 = get_timebase() >> 32;
+				return;
+		}
+	}
+
 	/* default handling */
 	osd_printf_debug("SPR %03X read\n", m_core->param0);
 	m_core->param1 = m_core->spr[m_core->param0];
