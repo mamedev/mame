@@ -386,7 +386,7 @@ crystal_hle_device::crystal_hle_device(const machine_config &mconfig, const char
 void crystal_hle_device::device_start()
 {
 	if (!m_config)
-		fatalerror("%s: protection configuration is missing\n", tag());
+		fatalerror("%s: no configuration supplied\n", tag());
 
 	// Decode the key and DES tables from the cartridge's host protection module.
 	// Table offsets are relative to its XOR mask, and include linear bit indices
