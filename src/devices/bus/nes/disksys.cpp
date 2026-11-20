@@ -108,7 +108,7 @@ nes_disksys_device::nes_disksys_device(const machine_config &mconfig, const char
 	, m_write_started(false), m_write_pending_valid(false), m_write_pending(0)
 	, m_disk(*this, "floppy0")
 	, m_sound(*this, "rp2c33snd")
-	, irq_timer(nullptr), transfer_timer(nullptr)
+	, transfer_timer(nullptr)
 	, m_irq_count(0), m_irq_count_latch(0), m_irq_enable(false), m_irq_repeat(false), m_irq_transfer(false), m_disk_reg_enable(false), m_sound_en(false)
 	, m_fds_scan(0), m_fds_door_closed(0), m_fds_current_side(0), m_fds_head_position(0), m_scan_bytes(0), m_fds_status0(0), m_read_mode(0), m_drive_ready(0)
 	, m_fds_sides(0), m_fds_last_side(0), m_fds_count(0)

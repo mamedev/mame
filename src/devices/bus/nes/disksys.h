@@ -76,7 +76,6 @@ private:
 	required_device<legacy_floppy_image_device> m_disk;
 	required_device<rp2c33_sound_device> m_sound;
 
-	emu_timer *irq_timer;
 	emu_timer *transfer_timer;
 
 	void load_disk(device_image_interface &image);

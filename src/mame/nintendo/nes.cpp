@@ -649,16 +649,10 @@ void nes_state::nes(machine_config &config)
 	maincpu.set_addrmap(AS_PROGRAM, &nes_state::nes_map);
 	nes_m2_setup(maincpu);
 
+	// NESdev "NTSC video": a dot is 4 master clocks, a line 341 dots and a frame 262 lines (60.0988 Hz); the picture is the 256
+	// dots of the first 240 lines. The PPU keeps its own vblank and takes its dot times from the line period.
 	SCREEN(config, m_screen);
-	m_screen->set_refresh_hz(60.0988);
-	// This isn't used so much to calulate the vblank duration (the PPU code tracks that manually) but to determine
-	// the number of cycles in each scanline for the PPU scanline timer. Since the PPU has 20 vblank scanlines + 2
-	// non-rendering scanlines, we compensate. This ends up being 2500 cycles for the non-rendering portion, 2273
-	// cycles for the actual vblank period.
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(NTSC_APU_CLOCK.dvalue()/1000000)) *
-							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_NTSC-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
-	m_screen->set_size(32*8, 262);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	m_screen->set_raw(RP2A03_NTSC_XTAL / 4, 341, 0, 256, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(nes_state::screen_update_nes));
 
 	PPU_2C02(config, m_ppu);
@@ -716,11 +710,9 @@ void nes_state::nespal(machine_config &config)
 	m_cartslot->set_clock(PAL_APU_CLOCK);
 
 	// video hardware
-	m_screen->set_refresh_hz(50.0070);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((106.53/(PAL_APU_CLOCK.dvalue()/1000000)) *
-							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE+1+2)));
-	m_screen->set_size(32*8, 312);
-	m_screen->set_visarea(0*8, 32*8-1, 0*8, 30*8-1);
+	// NESdev "PAL video": a dot is 5 master clocks of the PAL crystal, 341 dots to a line, 312 lines to a frame (50.0070 Hz);
+	// the Dendy clones use the same
+	m_screen->set_raw(RP2A03_PAL_XTAL / 5, 341, 0, 256, 312, 0, 240);
 }
 
 void nes_state::famicom(machine_config &config)
@@ -778,11 +770,6 @@ void nes_state::nespalc(machine_config &config)
 	m_ppu->int_callback().set_inputline(m_maincpu, INPUT_LINE_NMI);
 
 	m_cartslot->set_clock(PALC_APU_CLOCK);
-
-	// video hardware
-	m_screen->set_refresh_hz(50.0070);
-	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC((113.66/(PALC_APU_CLOCK.dvalue()/1000000)) *
-							 (ppu2c0x_device::VBLANK_LAST_SCANLINE_PAL-ppu2c0x_device::VBLANK_FIRST_SCANLINE_PALC+1+2)));
 }
 
 void nes_state::famipalc(machine_config &config)
