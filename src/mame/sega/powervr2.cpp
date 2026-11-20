@@ -2553,13 +2553,21 @@ template <int tsinst, bool bilinear>
 inline uint32_t powervr2_device::sample_textured(texinfo *ti, float u, float v, uint32_t offset_color, uint32_t base_color)
 {
 	uint32_t tmp;
-	uint32_t c = (this->*(ti->r))(ti, u, v);
+	uint32_t c;
 	if (bilinear)
 	{
-		uint32_t c1 = (this->*(ti->r))(ti, u + 1.0f, v);
-		uint32_t c2 = (this->*(ti->r))(ti, u + 1.0f, v + 1.0f);
-		uint32_t c3 = (this->*(ti->r))(ti, u,        v + 1.0f);
-		c = bilinear_filter(c, c1, c2, c3, u, v);
+		// texel centres are at +0.5: blend the texel pair around (u - 0.5, v - 0.5)
+		const float fu = u - 0.5f, fv = v - 0.5f;
+		const float iu = floorf(fu), iv = floorf(fv);
+		c = (this->*(ti->r))(ti, iu, iv);
+		const uint32_t c1 = (this->*(ti->r))(ti, iu + 1.0f, iv);
+		const uint32_t c2 = (this->*(ti->r))(ti, iu + 1.0f, iv + 1.0f);
+		const uint32_t c3 = (this->*(ti->r))(ti, iu,        iv + 1.0f);
+		c = bilinear_filter(c, c1, c2, c3, fu - iu, fv - iv);
+	}
+	else
+	{
+		c = (this->*(ti->r))(ti, u, v);
 	}
 
 	switch (tsinst) {
