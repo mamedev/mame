@@ -22,6 +22,7 @@ TODO:
   0x38 on bbddz/djddz/wakenz80, 0x36 on ddz2) is OFF
 - dump the lucky168, ddz1 and ddz2b-e secure chips if possible
 - ddz2f: verify the bank decoding and the EEPROM type against the PCB
+- clonek2: verify the visible area (36 rows are cleared, 35 used)
 - verify display timing, sound clock and remaining I/O against hardware
 */
 
@@ -54,11 +55,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_fgtiles(*this, "fgtiles"),
 		m_bgtiles(*this, "bgtiles"),
-		m_oki(*this, "oki"),
 		m_rombank(*this, "rombank"),
 		m_opfixed(*this, "opfixed"),
 		m_opbank(*this, "opbank"),
 		m_videoram(*this, "videoram"),
+		m_oki(*this, "oki"),
 		m_in0(*this, "IN0")
 	{ }
 
@@ -91,13 +92,17 @@ protected:
 	required_region_ptr<uint16_t> m_fgtiles;
 	required_region_ptr<uint16_t> m_bgtiles;
 
-private:
-	required_device<okim6295_device> m_oki;
-
 	required_memory_bank m_rombank;
 	required_memory_bank m_opfixed;
 	required_memory_bank m_opbank;
 	required_shared_ptr<uint8_t> m_videoram;
+
+	uint32_t m_rombank_size = 0x4000;
+	uint32_t m_tile_plane_size = 0x800; // per byte plane of a layer
+	uint16_t m_tile_mask = 0x3fff;
+
+private:
+	required_device<okim6295_device> m_oki;
 
 	required_ioport m_in0;
 
@@ -129,6 +134,7 @@ public:
 
 	void sealy(machine_config &config) ATTR_COLD;
 	void pljh(machine_config &config) ATTR_COLD;
+	void clonek2(machine_config &config) ATTR_COLD;
 
 	void init_bbddz() ATTR_COLD;
 	void init_djddza() ATTR_COLD;
@@ -139,7 +145,12 @@ public:
 private:
 	void program_map(address_map &map) ATTR_COLD;
 	void pljh_program_map(address_map &map) ATTR_COLD;
+	void clonek2_program_map(address_map &map) ATTR_COLD;
+	void clonek2_opcodes_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
+	void clonek2_io_map(address_map &map) ATTR_COLD;
+
+	void clonek2_rombank_w(uint8_t data);
 };
 
 
@@ -209,9 +220,10 @@ private:
 void sealy_z80_state::machine_start()
 {
 	uint8_t *const rom = memregion("maincpu")->base();
-	m_rombank->configure_entries(0, 8, rom, 0x4000);
+	const uint32_t banks = memregion("maincpu")->bytes() / m_rombank_size;
+	m_rombank->configure_entries(0, banks, rom, m_rombank_size);
 	m_opfixed->set_base(m_decrypted_opcodes.get());
-	m_opbank->configure_entries(0, 8, m_decrypted_opcodes.get(), 0x4000);
+	m_opbank->configure_entries(0, banks, m_decrypted_opcodes.get(), m_rombank_size);
 	m_oki_banked = memregion("oki")->bytes() > 0x40000;
 
 	save_item(NAME(m_nmi_enable));
@@ -257,8 +269,9 @@ void sealy_z80_state::vblank(int state)
 }
 
 
-// Each layer is 64x32 cells; the low and high bytes of the tile codes sit in two
-// separate 0x800-byte planes.  Tiles are 8x8 pixels of one 16-bit word each.
+// Each layer is 64 cells wide; the low and high bytes of the tile codes sit in two
+// separate planes of 0x800 bytes (32 rows), 0x1000 on clonek2 (64 rows).  Tiles
+// are 8x8 pixels of one 16-bit word each.
 void sealy_z80_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *ram, const uint16_t *tiles, bool transparent)
 {
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -269,7 +282,7 @@ void sealy_z80_state::draw_layer(bitmap_ind16 &bitmap, const rectangle &cliprect
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			const uint32_t cell = x >> 3;
-			const uint32_t code = (row[cell] | (row[cell + 0x800] << 8)) & 0x3fff;
+			const uint32_t code = (row[cell] | (row[cell + m_tile_plane_size] << 8)) & m_tile_mask;
 			const uint16_t pix = tiles[code * 64 + (y & 7) * 8 + (x & 7)];
 
 			if (!transparent || BIT(pix, 15))
@@ -286,7 +299,7 @@ uint32_t sealy_z80_state::screen_update(screen_device &screen, bitmap_ind16 &bit
 		return 0;
 	}
 
-	draw_layer(bitmap, cliprect, &m_videoram[0x1000], &m_bgtiles[0], false);
+	draw_layer(bitmap, cliprect, &m_videoram[m_tile_plane_size * 2], &m_bgtiles[0], false);
 	draw_layer(bitmap, cliprect, &m_videoram[0x0000], &m_fgtiles[0], true);
 	return 0;
 }
@@ -365,6 +378,35 @@ void sealy_z80_eeprom_state::io_map(address_map &map)
 	map(0x50, 0x50).portw("EEPROMCLK");
 	map(0x60, 0x60).portw("EEPROMCS");
 	map(0xe0, 0xe0).portw("EEPROMOUT");
+}
+
+// clonek2: the program banks in 4K pages at 6000-6fff (pages 6-9, 0x16 and 0x17 are
+// used) and both layers have 64 rows
+void sealy_z80_eeprom_state::clonek2_program_map(address_map &map)
+{
+	map(0x0000, 0x5fff).rom();
+	map(0x6000, 0x6fff).bankr(m_rombank);
+	map(0xafd0, 0xafd0).portr("EEPROMIN");
+	map(0xb000, 0xbfff).ram();
+	map(0xc000, 0xffff).ram().share(m_videoram);
+}
+
+void sealy_z80_eeprom_state::clonek2_opcodes_map(address_map &map)
+{
+	map(0x0000, 0x5fff).bankr(m_opfixed);
+	map(0x6000, 0x6fff).bankr(m_opbank);
+}
+
+void sealy_z80_eeprom_state::clonek2_io_map(address_map &map)
+{
+	io_map(map);
+	map(0x90, 0x90).w(FUNC(sealy_z80_eeprom_state::clonek2_rombank_w));
+}
+
+void sealy_z80_eeprom_state::clonek2_rombank_w(uint8_t data)
+{
+	m_rombank->set_entry(data & 0x1f);
+	m_opbank->set_entry(data & 0x1f);
 }
 
 
@@ -582,6 +624,33 @@ static INPUT_PORTS_START( pljh )
 INPUT_PORTS_END
 
 
+// Functions observed running the program; the original button legends are unknown,
+// the menu keys are named after the on-screen legends
+static INPUT_PORTS_START( clonek2 )
+	PORT_INCLUDE(sealy_eeprom)
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) // acts like Start when choosing big or small
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_NAME("Double Up / Menu Select")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") // password protected
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // clears RAM when held for ten frames
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Small / Menu Decrement")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_NAME("Big / Menu Increment")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start / Deal / Menu Exit")
+INPUT_PORTS_END
+
+
 void sealy_z80_state::sealy_base(machine_config &config)
 {
 	Z80(config, m_maincpu, 12_MHz_XTAL / 2); // divider not verified, but part rated for 6 MHz
@@ -621,6 +690,23 @@ void sealy_z80_eeprom_state::pljh(machine_config &config)
 	sealy(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &sealy_z80_eeprom_state::pljh_program_map);
 	m_maincpu->set_addrmap(AS_OPCODES, &sealy_z80_eeprom_state::alt_opcodes_map);
+}
+
+void sealy_z80_eeprom_state::clonek2(machine_config &config)
+{
+	sealy(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &sealy_z80_eeprom_state::clonek2_program_map);
+	m_maincpu->set_addrmap(AS_OPCODES, &sealy_z80_eeprom_state::clonek2_opcodes_map);
+	m_maincpu->set_addrmap(AS_IO, &sealy_z80_eeprom_state::clonek2_io_map);
+
+	m_rombank_size = 0x1000;
+	m_tile_plane_size = 0x1000;
+	m_tile_mask = 0x7fff;
+
+	// the program clears 36 rows of each layer and uses the first 35
+	screen_device &screen(*subdevice<screen_device>("screen"));
+	screen.set_size(512, 288);
+	screen.set_visarea(0, 512-1, 0, 288-1);
 }
 
 
@@ -916,6 +1002,24 @@ ROM_START( pljh )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "4.u23", 0x00000, 0x40000, CRC(8cbb5623) SHA1(90169df14264c1e53040bc43106fd8b86b4f1d59) ) // 27c020
+ROM_END
+
+// 克隆王 II (Kèlóng Wáng II), Clone 2 King - 克隆王 on the title screen.  PCB
+// silkscreened SEALY 2009.1, same layout as the Dou Dizhu boards.  ROM labels
+// 01-04, the CPU is labelled 克隆王 II.  Graphics data only fills the first and
+// third quarters of each tile ROM.
+ROM_START( clonek2 )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "3.u11", 0x00000, 0x20000, CRC(4d3c03d5) SHA1(9473c7446996de475f2652bddfeb77fd373dd0c8) )
+
+	ROM_REGION16_LE( 0x400000, "bgtiles", 0 )
+	ROM_LOAD( "1.u18", 0x000000, 0x400000, CRC(0c3e750a) SHA1(1a5d4efeb3a18caebcdd0488e90d7207fd08e597) )
+
+	ROM_REGION16_LE( 0x400000, "fgtiles", 0 )
+	ROM_LOAD( "2.u21", 0x000000, 0x400000, CRC(9d0ebbbe) SHA1(1e13a1ea4f83ad7cb834c4926e256d5a4d11f70b) ) // 1ST AND 2ND HALF IDENTICAL
+
+	ROM_REGION( 0x20000, "oki", 0 )
+	ROM_LOAD( "4.u23", 0x00000, 0x20000, CRC(2e966a95) SHA1(f436c4a8f30d88372ef41bf2751ec06bce52a142) )
 ROM_END
 
 // 挖坑 (Wākēng). All labels prepend 挖坑 and have TIAN SHENG underneath
@@ -1373,6 +1477,7 @@ void sealy_z80_eeprom_state::init_wakenz80()
 
 GAME( 2005, bbddz,    0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu (set 1)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2005, bbddza,   bbddz, sealy,    djddz,    sealy_z80_eeprom_state,   init_bbddz,    ROT0, "Sealy", "Bai Bian Dou Dizhu (set 2)",               MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, clonek2,  0,     clonek2,  clonek2,  sealy_z80_eeprom_state,   init_pljh,     ROT0, "Sealy", "Clone King 2 - Kelong Wang II",            MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, ddz1,     0,     ddz1,     ddz1,     sealy_z80_esam_state,     init_ddz1,     ROT0, "Sealy", "Dou Dizhu (Sealy)",                        MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2003, ddz2,     0,     sealy,    djddz,    sealy_z80_eeprom_state,   init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 1)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 2003, ddz2a,    ddz2,  sealy,    djddz,    sealy_z80_eeprom_state,   init_ddz2,     ROT0, "Sealy", "Dou Dizhu II (set 2)",                     MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

@@ -207,6 +207,7 @@ ROM_START( tzfx )
 ROM_END
 
 // 大家来找碴 (Dàjiā Lái Zhǎo Chá)
+// this is a bootleg of photoy2k (igs/pgm.cpp)
 // same PCB, but with all 6 DIP switch banks populated. CY1013-R3 is marked 6868A-10121 9953M FC4FS
 ROM_START( dlzc )
 	ROM_REGION( 0x800000, "maincpu", 0 )
@@ -243,4 +244,4 @@ void highway_m68k_state::init_tzfx()
 
 
 GAME( 199?, tzfx, 0, highway_m68k, tzfx, highway_m68k_state, init_tzfx, ROT0, "Xin Yun", "Tianwang Zhi Fenghua Xueyue (v. 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1999, dlzc, 0, highway_m68k, tzfx, highway_m68k_state, init_tzfx, ROT0, "Highway", "Dajia Lai Zhao Cha",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, dlzc, 0, highway_m68k, tzfx, highway_m68k_state, init_tzfx, ROT0, "ASI",     "Dajia Lai Zhao Cha",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
