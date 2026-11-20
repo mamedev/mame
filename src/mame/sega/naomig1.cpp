@@ -157,9 +157,12 @@ void naomi_g1_device::sb_gdst_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 			len -= tlen;
 		}
 
-		/* 12x * 75 Hz = 0,00(1) secs per sector */
-		/* TODO: make DMA to be single step */
-		timer->adjust(attotime::from_usec(1111*(gdlen/2048)));
+		// The data comes from the board's ROM/RAM over the G1 bus, not from a disc.
+		// The bus is 16 bits wide at up to 50 MHz (100 MB/s peak), a GD-ROM to RAM
+		// transfer is documented at 14.4 MB/s, and Flycast uses 20 MB/s for cartridge
+		// DMA (7 MB/s for Atomiswave).  Use 20 MB/s, i.e. 50 ns per byte.
+		// TODO: make DMA to be single step
+		timer->adjust(attotime::from_nsec(uint64_t(gdlen) * 50));
 	}
 }
 
