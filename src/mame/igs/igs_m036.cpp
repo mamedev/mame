@@ -1559,7 +1559,7 @@ ROM_END
 ROM_START( lhzb3in1 )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "lhzb3in1_igs036,bin", 0x00000, 0x4000, CRC(a597d0c8) SHA1(1bca73acc5ef820b860e6c99dc5be0bcff2b1c45) )
+	ROM_LOAD( "lhzb3in1_igs036.bin", 0x00000, 0x4000, CRC(a597d0c8) SHA1(1bca73acc5ef820b860e6c99dc5be0bcff2b1c45) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "lhzb3in1_v100cn.u17",  0x000000, 0x200000, CRC(03caaba4) SHA1(701b97d791e9329bad2ddc4d365748e65c430758) )

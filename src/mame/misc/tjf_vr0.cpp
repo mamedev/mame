@@ -1479,7 +1479,7 @@ ROM_START( hzniqiu )
 	// rom4 not populated
 ROM_END
 
-// 斗地主之财神 (Dòu Dìzhǔ zhī Cáishén) (Dou Dizhu: God of Wealth)
+// 斗地主之财神 (Dòu Dìzhǔ Zhī Cáishén) (Dou Dizhu: God of Wealth)
 ROM_START( ddzzcs )
 	ROM_REGION32_LE( 0x1000000, "ipl", ROMREGION_ERASEFF )
 
@@ -1615,12 +1615,12 @@ void tjf_medal_state::init_ddzzcs()
 } // anonymous namespace
 
 
-GAME( 200?, kxddz,    0, kxddz,    tjf,      tjf_state,       init_kxddz,    ROT0, "TJF", "Kaixin Dou Dizhu",    MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, crzclass, 0, tjf,      tjf,      tjf_state,       init_crzclass, ROT0, "TJF", "Chaoji Fengdou",      MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-GAME( 200?, baibians, 0, tjf,      tjf,      tjf_state,       init_baibians, ROT0, "TJF", "Baibian Shuangkou",   MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-GAME( 200?, cjmx,     0, tjf,      tjf,      tjf_state,       init_cjmx,     ROT0, "TJF", "Chaoji Mingxing",     MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-GAME( 2005, btlfront, 0, btlfront, btlfront, tjf_state,       init_btlfront, ROT0, "TJF", "BattleFront (V133F)", MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, kxddz,    0, kxddz,    tjf,      tjf_state,       init_kxddz,    ROT0, "TJF", "Kaixin Dou Dizhu",      MACHINE_IMPERFECT_CONTROLS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, crzclass, 0, tjf,      tjf,      tjf_state,       init_crzclass, ROT0, "TJF", "Chaoji Fengdou",        MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, baibians, 0, tjf,      tjf,      tjf_state,       init_baibians, ROT0, "TJF", "Baibian Shuangkou",     MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, cjmx,     0, tjf,      tjf,      tjf_state,       init_cjmx,     ROT0, "TJF", "Chaoji Mingxing",       MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 2005, btlfront, 0, btlfront, btlfront, tjf_state,       init_btlfront, ROT0, "TJF", "BattleFront (V133F)",   MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
 
-GAME( 200?, xbnz,     0, medal,    medal,    tjf_medal_state, init_xbnz,     ROT0, "TJF", "Xibu Niuzai",         MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-GAME( 200?, hzniqiu,  0, medal,    medal,    tjf_medal_state, init_hzniqiu,  ROT0, "TJF", "Huozhuo Niqiu",       MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
-GAME( 200?, ddzzcs,   0, ddzzcs,   medal,    tjf_medal_state, init_ddzzcs,   ROT0, "TJF", "Dou Dizhu zhi Caishen", MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, xbnz,     0, medal,    medal,    tjf_medal_state, init_xbnz,     ROT0, "TJF", "Xibu Niuzai",           MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, hzniqiu,  0, medal,    medal,    tjf_medal_state, init_hzniqiu,  ROT0, "TJF", "Huozhuo Niqiu",         MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
+GAME( 200?, ddzzcs,   0, ddzzcs,   medal,    tjf_medal_state, init_ddzzcs,   ROT0, "TJF", "Dou Dizhu Zhi Caishen", MACHINE_IMPERFECT_CONTROLS | MACHINE_NOT_WORKING )
