@@ -72,6 +72,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
+	// device_isa8_card_interface implementation
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
+
 private:
 	u8 port_r(offs_t offset);
 	void port_w(offs_t offset, u8 data);
@@ -87,7 +90,7 @@ private:
 	u8 m_prom[32];
 	memory_share_creator<u8> m_ram;
 	u8 m_irq;
-	bool m_installed;
+	u16 m_io_base;
 	bool m_wts_warned;
 };
 
@@ -99,7 +102,7 @@ kiselev_eth_device::kiselev_eth_device(machine_config const &mconfig, char const
 	, m_prom{}
 	, m_ram(*this, "ram", 16 * 1024, ENDIANNESS_LITTLE)
 	, m_irq(0)
-	, m_installed(false)
+	, m_io_base(0)
 	, m_wts_warned(false)
 {
 }
@@ -130,28 +133,33 @@ void kiselev_eth_device::device_start()
 	std::fill(std::begin(m_prom), std::end(m_prom), 0x57);
 	std::copy(std::begin(mac), std::end(mac), std::begin(m_prom));
 
-	m_installed = false;
 	m_wts_warned = false;
 
 	save_item(NAME(m_irq));
+	save_item(NAME(m_io_base));
 }
 
 void kiselev_eth_device::device_reset()
 {
-	// the switches are only sampled at power-on
-	if (!m_installed)
+	// the switches are latched while RSTDRV is asserted
+	u8 const config = m_config->read();
+
+	m_irq = BIT(config, 0, 2);
+
+	// IOS3 selects 0x200 or 0x300, IOS2-IOS0 select one of eight 0x20 steps
+	m_io_base = (BIT(config, 7) ? 0x200 : 0x300) | (BIT(config, 4, 3) << 5);
+
+	remap(AS_IO, 0, 0x3ff);
+}
+
+void kiselev_eth_device::remap(int space_id, offs_t start, offs_t end)
+{
+	// nothing is decoded until the switches have been latched
+	if ((space_id == AS_IO) && m_io_base)
 	{
-		u8 const config = m_config->read();
-
-		m_irq = BIT(config, 0, 2);
-
-		// IOS3 selects 0x200 or 0x300, IOS2-IOS0 select one of eight 0x20 steps
-		offs_t const base = (BIT(config, 7) ? 0x200 : 0x300) | (BIT(config, 4, 3) << 5);
-		m_isa->install_device(base, base | 0x1f,
+		m_isa->install_device(m_io_base, m_io_base | 0x1f,
 				read8sm_delegate(*this, FUNC(kiselev_eth_device::port_r)),
 				write8sm_delegate(*this, FUNC(kiselev_eth_device::port_w)));
-
-		m_installed = true;
 	}
 }
 
