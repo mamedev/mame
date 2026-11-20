@@ -2655,7 +2655,52 @@ void powervr250_device::draw_2d()
 		break;
 
 	case 0:
-		if ((operation & 0xff) != 0x90)
+		if ((operation & 0xff) == 0x16)
+		{
+			// a 1-bit image, the leftmost pixel in the top bit of each byte and each row in whole bytes, with set bits drawn
+			// in the fill colour and clear bits left alone; only the destination clip of a line limits it
+			// FIXME: bit 11 of the value last sent to port register ff is taken to draw the clear bits in the background
+			// colour; the MK6 code sets it from a flag of its text request, and no known game has been seen to set it
+			// FIXME: the bits start two bytes past the address in source B, which the MK6 code points at the last two bytes
+			// of the header of its glyphs; how the chip is told to pass over them is not known
+			const u32 bits = m_2d[P2D_SRC_B] + 2;
+			const u32 row_bytes = ((m_2d[P2D_MONO_WIDTH] & 0xffff) + 7) / 8;
+			const bool opaque = BIT(m_2d[P2D_ASK], 11);
+			const u32 clip_width = m_2d[P2D_CLIP] & 0xffff, clip_height = m_2d[P2D_CLIP] >> 16;
+			for (u32 line = 0; line < lines; line++)
+			{
+				if (y + line >= clip_height)
+					break;
+				const u32 to = m_2d[P2D_DEST] + (y + line) * dest_pitch + x * 4;
+				for (u32 i = 0; (i < width) && (x + i < clip_width); i++)
+				{
+					const u32 s = (bits + line * row_bytes + i / 8) & mask;
+					if (BIT(m_vram[s >> 2], (s & 3) * 8 + (~i & 7)))
+						m_vram[((to + i * 4) & mask) >> 2] = m_2d[P2D_FILL_COLOR];
+					else if (opaque)
+						m_vram[((to + i * 4) & mask) >> 2] = m_2d[P2D_BACK_COLOR];
+				}
+				written(to & mask, width * 4);
+			}
+			break;
+		}
+		if ((operation & 0xfff) == 0x190)
+		{
+			// copy of source B, the high half of the start register a number of 64-bit words for each line; bit 16 of
+			// the pitches is set and is not part of them; the MK6 code moves frames of symbol animations with it
+			// FIXME: what bit 16 of a pitch means is not known
+			const u32 words = m_2d[P2D_START] >> 16;
+			for (u32 line = 0; line < lines; line++)
+			{
+				const u32 to = m_2d[P2D_DEST] + (y + line) * (dest_pitch & 0xffff) + x * 4;
+				const u32 from = m_2d[P2D_SRC_B] + (sy + line) * (pitch_b & 0xffff) + sx * 4;
+				for (u32 i = 0; i < words * 2; i++)
+					m_vram[((to + i * 4) & mask) >> 2] = m_vram[((from + i * 4) & mask) >> 2];
+				written(to & mask, words * 8);
+			}
+			break;
+		}
+		if ((operation & 0xfff) != 0x090)
 		{
 			logerror("2D operation %08x is not known\n", operation);
 			break;

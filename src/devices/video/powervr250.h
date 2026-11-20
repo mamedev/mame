@@ -170,6 +170,7 @@ private:
 	// 2D core: registers that the primary core writes through its port registers
 	enum : u8
 	{
+		P2D_MONO_WIDTH = 0x23,      // width in pixels of a row of a 1-bit image
 		P2D_SRC_POS = 0x24,         // source x << 16 | y
 		P2D_LINE_START = 0x31,      // first pixel of a line, x << 16 | y
 		P2D_LINE_DIAGONAL = 0x32,   // step of a line along both axes, x << 16 | y
@@ -182,12 +183,14 @@ private:
 		P2D_PITCH_A = 0x41,
 		P2D_PITCH_B = 0x42,
 		P2D_OPERATION = 0x4b,
-		P2D_FILL_COLOR = 0x4d,
+		P2D_FILL_COLOR = 0x4d,      // also the colour of the set bits of a 1-bit image
+		P2D_BACK_COLOR = 0x4e,      // colour of the clear bits of a 1-bit image
 		P2D_LINE_COLOR = 0x4f,
 		P2D_CLIP = 0x52,            // height << 16 | width
 		P2D_SIZE = 0x53,            // width << 16 | x
 		P2D_DEST = 0x54,
-		P2D_DEST_PITCH = 0x55
+		P2D_DEST_PITCH = 0x55,
+		P2D_ASK = 0xff              // what the MK6 code sends before each operation
 	};
 
 	template <u16 Reg> u16 immediate_r(offs_t offset);
