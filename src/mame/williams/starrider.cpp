@@ -486,7 +486,7 @@ void sr_state::starrider(machine_config &config)
 INPUT_CHANGED_MEMBER(sr_state::sound_sw1_changed)
 {
 	// TODO: 4.7kΩ/0.01µF RC time constant to stretch/debounce this
-	m_sound_cpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	m_sound_cpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
