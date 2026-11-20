@@ -1344,6 +1344,16 @@ void powervr2_device::wait_for_render(bool discard)
 	grab[renderselect].busy = 0;
 }
 
+// the user tile clip rectangle is kept in pixels, as set from the TA packet; binning works
+// in tiles, so convert it when a strip latches the clip
+void powervr2_device::set_strip_tile_clip(strip &ts) const
+{
+	ts.clip_x0 = user_tile_clip.left() >> 5;
+	ts.clip_y0 = user_tile_clip.top() >> 5;
+	ts.clip_x1 = std::max((user_tile_clip.right() >> 5) - 1, 0);
+	ts.clip_y1 = std::max((user_tile_clip.bottom() >> 5) - 1, 0);
+}
+
 void powervr2_device::collect_texture_pages(int buffer)
 {
 	std::fill(std::begin(m_render.texture_pages), std::end(m_render.texture_pages), 0);
@@ -2288,10 +2298,6 @@ void powervr2_device::process_ta_fifo()
 			(tafifo_buff[5] & 0xf) * 32,
 			((tafifo_buff[7] & 0xf) + 1) * 32
 		);
-		m_utc_tiles[0] = tafifo_buff[4] & 0x3f;
-		m_utc_tiles[1] = tafifo_buff[5] & 0xf;
-		m_utc_tiles[2] = tafifo_buff[6] & 0x3f;
-		m_utc_tiles[3] = tafifo_buff[7] & 0xf;
 		// TODO: make cliprect to actually have a printable version on its own
 		LOGTATILE("(%d , %d) - (%d , %d)\n", user_tile_clip.left(), user_tile_clip.right(), user_tile_clip.top(), user_tile_clip.bottom());
 	}
@@ -2444,10 +2450,7 @@ void powervr2_device::process_ta_fifo()
 					strip * const ts = &grp->strips[grp->strips_size++];
 					tex_get_info(&ts->ti);
 					ts->clip_mode = (user_tile_mode >= 2) ? user_tile_mode : 0;
-					ts->clip_x0 = m_utc_tiles[0];
-					ts->clip_y0 = m_utc_tiles[1];
-					ts->clip_x1 = m_utc_tiles[2];
-					ts->clip_y1 = m_utc_tiles[3];
+					set_strip_tile_clip(*ts);
 					ts->svert = rd->verts_size;
 					ts->evert = rd->verts_size + 3;
 
@@ -2534,10 +2537,7 @@ void powervr2_device::process_ta_fifo()
 						strip *ts = &grp->strips[grp->strips_size++];
 						tex_get_info(&ts->ti);
 						ts->clip_mode = (user_tile_mode >= 2) ? user_tile_mode : 0;
-						ts->clip_x0 = m_utc_tiles[0];
-						ts->clip_y0 = m_utc_tiles[1];
-						ts->clip_x1 = m_utc_tiles[2];
-						ts->clip_y1 = m_utc_tiles[3];
+						set_strip_tile_clip(*ts);
 						ts->svert = rd->verts_size;
 						ts->evert = -1;
 					}
@@ -4470,7 +4470,10 @@ void powervr2_device::device_start()
 	save_item(NAME(region_base));
 	save_item(NAME(vo_border_col));
 	save_item(NAME(user_tile_mode));
-	save_item(NAME(m_utc_tiles));
+	save_item(NAME(user_tile_clip.min_x));
+	save_item(NAME(user_tile_clip.max_x));
+	save_item(NAME(user_tile_clip.min_y));
+	save_item(NAME(user_tile_clip.max_y));
 	save_item(NAME(fb_r_ctrl));
 	save_item(NAME(fb_w_ctrl));
 	save_item(NAME(fb_w_linestride));

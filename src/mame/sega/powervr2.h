@@ -399,7 +399,6 @@ private:
 	uint32_t palette[0x400];
 	rectangle user_tile_clip;
 	uint8_t user_tile_mode;
-	uint8_t m_utc_tiles[4] = { }; // x0, y0, x1, y1 of the latest user tile clip, in tiles
 
 	// PD DMA registers
 	uint32_t sb_pdstap, sb_pdstar, sb_pdlen, sb_pddir, sb_pdtsel, sb_pden, sb_pdst, sb_pdapro;
@@ -471,6 +470,7 @@ private:
 
 	std::vector<bin_ref> m_bins[WORK_MAX_THREADS][3]; // per band, per list (opaque, translucent, punch-through)
 	void wait_for_render(bool discard = false);
+	void set_strip_tile_clip(strip &ts) const;
 	void collect_texture_pages(int buffer);
 	bool render_reads_texture(uint32_t start, uint32_t end) const;
 	bool render_writes_framebuffer(uint32_t start, uint32_t size) const;
