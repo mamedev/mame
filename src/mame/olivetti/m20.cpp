@@ -752,7 +752,9 @@ void m20_state::machine_reset()
 	else
 		m_port21 = 0xff;
 
-	if(system_bios() > 0)  // bits have different meanings?
+	// BIOS 1.0 must run POST to query the keyboard nationality.
+	// Later BIOS revisions retain MAME's historical fast-boot behaviour.
+	if(system_bios() > 1)  // bits have different meanings?
 		m_port21 &= ~8;
 
 	m_fd1797->reset();
@@ -776,9 +778,34 @@ void m20_state::floppy_formats(format_registration &fr)
 	fr.add(FLOPPY_M20_FORMAT);
 }
 
+// Keyboard slot options describe physical keycaps, not PCOS releases.
+// "m20" remains the Italian default for existing command lines.
+static DEVICE_INPUT_DEFAULTS_START(m20_kbd_it)
+	DEVICE_INPUT_DEFAULTS("LAYOUT", 0x0f, 0x00)
+DEVICE_INPUT_DEFAULTS_END
+
+// Both German keycap layouts use the same country-1 jumpers.
+static DEVICE_INPUT_DEFAULTS_START(m20_kbd_de)
+	DEVICE_INPUT_DEFAULTS("LAYOUT", 0x0f, 0x01)
+	DEVICE_INPUT_DEFAULTS("LAYOUT", 0x10, 0x10) // DIN 2137
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(m20_kbd_de_original)
+	DEVICE_INPUT_DEFAULTS("LAYOUT", 0x0f, 0x01)
+	DEVICE_INPUT_DEFAULTS("LAYOUT", 0x10, 0x00) // Original DIN 2127
+DEVICE_INPUT_DEFAULTS_END
+
+static DEVICE_INPUT_DEFAULTS_START(m20_kbd_us)
+	DEVICE_INPUT_DEFAULTS("LAYOUT", 0x0f, 0x04)
+DEVICE_INPUT_DEFAULTS_END
+
 static void keyboard(device_slot_interface &device)
 {
-	device.option_add("m20", M20_KEYBOARD);
+	device.option_add("m20", M20_KEYBOARD).input_device_defaults(DEVICE_INPUT_DEFAULTS_NAME(m20_kbd_it));
+	device.option_add("m20_it", M20_KEYBOARD).input_device_defaults(DEVICE_INPUT_DEFAULTS_NAME(m20_kbd_it));
+	device.option_add("m20_de", M20_KEYBOARD_DE).input_device_defaults(DEVICE_INPUT_DEFAULTS_NAME(m20_kbd_de));
+	device.option_add("m20_de_original", M20_KEYBOARD_DE_ORIGINAL).input_device_defaults(DEVICE_INPUT_DEFAULTS_NAME(m20_kbd_de_original));
+	device.option_add("m20_us", M20_KEYBOARD_US).input_device_defaults(DEVICE_INPUT_DEFAULTS_NAME(m20_kbd_us));
 }
 
 void m20_state::m20(machine_config &config)
