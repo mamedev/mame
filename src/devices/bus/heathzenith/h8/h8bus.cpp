@@ -155,6 +155,7 @@ void h8bus_device::device_reset()
 	m_int7_slot_states = 0;
 	m_reset_slot_states = 0;
 	m_hold_slot_states = 0;
+	m_disable_rom_slot_states = 0;
 	m_m1_slot_states = 0;
 }
 
