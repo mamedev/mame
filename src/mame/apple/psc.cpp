@@ -1352,8 +1352,9 @@ void psc_device::psc_regs_w(offs_t offset, u32 data, u32 mem_mask)
 
 u32 psc_device::snd_rate() const
 {
-	static constexpr u32 RATES[4] = { 24000, 32000, 48000, 48000 };
-	return RATES[(m_snd_com >> 9) & 3];
+	// BIO2 multiplexes XTAL inputs for ATECS PLL
+	static constexpr u32 DIVS[4] = { 2048, 1536, 1024, 1024 };
+	return (BIT(m_dsp_bio, 2) ? 15.0528_MHz_XTAL : 16.384_MHz_XTAL).value() * 3 / DIVS[(m_snd_com >> 9) & 3];
 }
 
 u32 psc_device::snd_size() const
