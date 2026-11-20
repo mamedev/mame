@@ -143,6 +143,7 @@ Core Performance Options
 
 | :ref:`[no]autoframeskip <mame-commandline-noautoframeskip>`
 | :ref:`frameskip <mame-commandline-frameskip>`
+| :ref:`screenless_framerate <mame-commandline-screenless-framerate>`
 | :ref:`seconds_to_run <mame-commandline-secondstorun>`
 | :ref:`[no]throttle <mame-commandline-nothrottle>`
 | :ref:`[no]sleep <mame-commandline-nosleep>`
