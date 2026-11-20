@@ -23,6 +23,10 @@
 #include "corefloat.h"
 #include "endianness.h"
 
+#include <algorithm>
+#include <bitset>
+#include <cmath>
+
 #define LOG_WARN        (1U << 1) // Show warnings
 #define LOG_TA_CMD      (1U << 2) // Show TA CORE commands
 #define LOG_TA_FIFO     (1U << 3) // Show TA FIFO polygon entries
@@ -1032,6 +1036,7 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 			m_render.debug_dip_status = debug_dip_status;
 			std::copy(std::begin(palette), std::end(palette), std::begin(m_render.palette));
 			m_render.tiles.clear();
+			std::fill(std::begin(m_render.tile_listed), std::end(m_render.tile_listed), 0);
 
 			/* collect the tiles to copy to the framebuffer once the render is done (really the rendering should be per tile too) */
 			int sizera = fpu_param_cfg & 0x200000 ? 6 : 5;
@@ -1071,6 +1076,10 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 					// the framebuffer
 
 					m_render.tiles.push_back((y << 16) | x);
+
+					// a tile the region array lists twice is drawn once
+					const int tx = x >> 5, ty = y >> 5;
+					m_render.tile_listed[ty] |= uint64_t(1) << tx;
 				}
 
 				if (st[0] & 0x80000000)
@@ -1121,12 +1130,189 @@ void powervr2_device::startrender_w(address_space &space, uint32_t data)
 void *powervr2_device::render_thread_callback(void *param, int threadid)
 {
 	powervr2_device *const pvr = reinterpret_cast<powervr2_device *>(param);
-	// TODO: isn't this supposed to be screen size clipped (to not mention user clipping?)
-	// also note: it's completely ignored by render_group_to_accumulation_buffer class inside
-	const rectangle clip(0, 1023, 0, 1023);
+	if (pvr->renderselect < 0)
+		return nullptr;
 
-	pvr->render_to_accumulation_buffer(*pvr->fake_accumulationbuffer_bitmap, clip);
+	// one band of whole tile rows per thread, counting this one; tiles share nothing, so the bands can be drawn in any order
+	int bands = osd_work_queue_thread_count(pvr->m_band_queue) + 1;
+	bool scale_uv = false;
+	if ((bands == 1) || !pvr->scale_all_texture_coordinates())
+	{
+		// texture coordinates are scaled strip by strip as the strips are drawn, so nothing is split up
+		bands = 1;
+		scale_uv = true;
+	}
+	bands = std::min<int>(bands, std::min<int>(TILE_ROWS, WORK_MAX_THREADS));
+
+	pvr->bin_triangles(bands, scale_uv);
+
+	for (int band = 0; band < bands; band++)
+	{
+		render_band &item = pvr->m_render_bands[band];
+		item.device = pvr;
+		item.index = band;
+		item.row0 = TILE_ROWS * band / bands;
+		item.row1 = TILE_ROWS * (band + 1) / bands;
+		item.clip.set(0, 1023, item.row0 * 32, item.row1 * 32 - 1);
+	}
+
+	if (bands == 1)
+	{
+		pvr->render_band_tiles(pvr->m_render_bands[0]);
+	}
+	else
+	{
+		osd_work_item_queue_multiple(pvr->m_band_queue, render_band_callback, bands, &pvr->m_render_bands[0], sizeof(pvr->m_render_bands[0]), WORK_ITEM_FLAG_AUTO_RELEASE);
+		// wait until all bands are done
+		while (!osd_work_queue_wait(pvr->m_band_queue, osd_ticks_per_second()))
+		{
+		}
+	}
 	return nullptr;
+}
+
+void *powervr2_device::render_band_callback(void *param, int threadid)
+{
+	const render_band *const band = reinterpret_cast<const render_band *>(param);
+
+	band->device->render_band_tiles(*band);
+	return nullptr;
+}
+
+// The tiles a triangle is drawn into: the tiles of its bounding box (one pixel of margin, as pixels and rows round to the nearest
+// integer) that the region array lists and that its user tile clip keeps. One bit per tile column of tile row ty.
+uint64_t powervr2_device::tile_mask(const strip &ts, const bin_ref &r, int ty) const
+{
+	uint64_t mask = m_render.tile_listed[ty];
+	mask &= (~uint64_t(0) >> (63 - (r.tx1 - r.tx0))) << r.tx0;
+	if (ts.clip_mode >= 2)
+	{
+		// the clip works on whole tiles: inside keeps the tiles in the rectangle, outside keeps the others
+		uint64_t inside = 0;
+		if ((ty >= ts.clip_y0) && (ty <= ts.clip_y1) && (ts.clip_x1 >= ts.clip_x0))
+			inside = (~uint64_t(0) >> (63 - (ts.clip_x1 - ts.clip_x0))) << ts.clip_x0;
+		mask &= (ts.clip_mode == 2) ? inside : ~inside;
+	}
+	return mask;
+}
+
+// Models what the hardware does before it draws: every triangle goes into the tiles it covers, minus those its user tile clip
+// removes. Each band then keeps the triangles that reach at least one of its tiles, in drawing order.
+void powervr2_device::bin_triangles(int bands, bool scale_uv)
+{
+	for (int b = 0; b < bands; b++)
+		for (auto &list : m_bins[b])
+			list.clear();
+
+	const int rs = renderselect;
+	static constexpr int groups[] = { DISPLAY_LIST_OPAQUE, DISPLAY_LIST_TRANS, DISPLAY_LIST_PUNCH_THROUGH };
+	for (int g = 0; g < 3; g++)
+	{
+		const poly_group &grp = grab[rs].groups[groups[g]];
+		for (int cs = 0; cs < grp.strips_size; cs++)
+		{
+			const strip &ts = grp.strips[cs];
+			const int sv = ts.svert, ev = ts.evert;
+			if (ev == -1)
+				continue;
+			if (scale_uv)
+				m_bins[0][g].push_back({ cs, -1, 0, 0, 0, 0 });
+			for (int i = sv; i <= ev - 2; i++)
+			{
+				const vert *v = grab[rs].verts + i;
+				int tx0 = 0, tx1 = 19, ty0 = 0, ty1 = TILE_ROWS - 1; // 640 x 480 pixels are drawn
+				const float xs[3] = { v[0].x, v[1].x, v[2].x };
+				const float ys[3] = { v[0].y, v[1].y, v[2].y };
+				if (std::isfinite(xs[0]) && std::isfinite(xs[1]) && std::isfinite(xs[2]) && std::isfinite(ys[0]) && std::isfinite(ys[1]) && std::isfinite(ys[2]))
+				{
+					const float minx = std::clamp(std::min({ xs[0], xs[1], xs[2] }), -1e6f, 1e6f);
+					const float maxx = std::clamp(std::max({ xs[0], xs[1], xs[2] }), -1e6f, 1e6f);
+					const float miny = std::clamp(std::min({ ys[0], ys[1], ys[2] }), -1e6f, 1e6f);
+					const float maxy = std::clamp(std::max({ ys[0], ys[1], ys[2] }), -1e6f, 1e6f);
+					const float fx0 = std::floor((minx - 1.0f) / 32.0f), fx1 = std::floor((maxx + 1.0f) / 32.0f);
+					const float fy0 = std::floor((miny - 1.0f) / 32.0f), fy1 = std::floor((maxy + 1.0f) / 32.0f);
+					if ((fx1 < 0) || (fy1 < 0) || (fx0 >= 20) || (fy0 >= TILE_ROWS))
+						continue;
+					tx0 = std::max<int>(int(fx0), 0);
+					tx1 = std::min<int>(int(fx1), 19);
+					ty0 = std::max<int>(int(fy0), 0);
+					ty1 = std::min<int>(int(fy1), TILE_ROWS - 1);
+				}
+				const bin_ref r = { cs, i, uint8_t(tx0), uint8_t(tx1), uint8_t(ty0), uint8_t(ty1) };
+				for (int b = 0; b < bands; b++)
+				{
+					const int row0 = std::max(ty0, TILE_ROWS * b / bands);
+					const int row1 = std::min(ty1, TILE_ROWS * (b + 1) / bands - 1);
+					for (int ty = row0; ty <= row1; ty++)
+					{
+						if (tile_mask(ts, r, ty))
+						{
+							m_bins[b][g].push_back(r);
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+template <int group_no>
+void powervr2_device::render_band_group(bitmap_rgb32 &bitmap, const render_band &band, const std::vector<bin_ref> &refs)
+{
+	const int rs = renderselect;
+	const poly_group &grp = grab[rs].groups[group_no];
+	for (const bin_ref &r : refs)
+	{
+		const strip &ts = grp.strips[r.strip];
+		if (r.vert < 0)
+		{
+			scale_texture_coordinates(rs, ts);
+			continue;
+		}
+		// set up once for the band, drawn in the tiles of each row it is binned into
+		uint64_t rowmask[TILE_ROWS] = { };
+		const int row1 = std::min<int>(r.ty1, band.row1 - 1);
+		for (int ty = std::max<int>(r.ty0, band.row0); ty <= row1; ty++)
+			rowmask[ty] = tile_mask(ts, r, ty);
+		render_tri<group_no>(bitmap, band.clip, rowmask, const_cast<texinfo *>(&ts.ti), grab[rs].verts + r.vert);
+	}
+}
+
+// draws the tile rows of a band: every pixel of a listed tile gets the same operations in the same order however the rows are split up
+void powervr2_device::render_band_tiles(const render_band &band)
+{
+	bitmap_rgb32 &bitmap = *fake_accumulationbuffer_bitmap;
+
+	// only the tiles of the region array are cleared (and later copied to the framebuffer)
+	const int last_row = (band.row1 == TILE_ROWS) ? 63 : (band.row1 - 1);
+	for (int ty = band.row0; ty <= last_row; ty++)
+	{
+		const uint64_t listed = m_render.tile_listed[ty];
+		for (int tx = 0; tx < 64; )
+		{
+			if (!BIT(listed, tx))
+			{
+				tx++;
+				continue;
+			}
+			int tx1 = tx;
+			while ((tx1 < 64) && BIT(listed, tx1))
+				tx1++;
+			bitmap.fill(m_render.background, rectangle(tx * 32, tx1 * 32 - 1, ty * 32, ty * 32 + 31));
+			if ((ty < TILE_ROWS) && (tx * 32 < 640))
+			{
+				const int w = std::min(tx1 * 32, 640) - tx * 32;
+				for (int y = ty * 32; y < ty * 32 + 32; y++)
+					std::fill_n(&wbuffer[y][tx * 32], w, 0.0f);
+			}
+			tx = tx1;
+		}
+	}
+
+	render_band_group<DISPLAY_LIST_OPAQUE>(bitmap, band, m_bins[band.index][0]);
+	render_band_group<DISPLAY_LIST_TRANS>(bitmap, band, m_bins[band.index][1]);
+	render_band_group<DISPLAY_LIST_PUNCH_THROUGH>(bitmap, band, m_bins[band.index][2]);
 }
 
 // Everything the emulation can observe of a render (framebuffer contents, the list buffer
@@ -1156,6 +1342,16 @@ void powervr2_device::wait_for_render(bool discard)
 		}
 	}
 	grab[renderselect].busy = 0;
+}
+
+// the user tile clip rectangle is kept in pixels, as set from the TA packet; binning works
+// in tiles, so convert it when a strip latches the clip
+void powervr2_device::set_strip_tile_clip(strip &ts) const
+{
+	ts.clip_x0 = user_tile_clip.left() >> 5;
+	ts.clip_y0 = user_tile_clip.top() >> 5;
+	ts.clip_x1 = std::max((user_tile_clip.right() >> 5) - 1, 0);
+	ts.clip_y1 = std::max((user_tile_clip.bottom() >> 5) - 1, 0);
 }
 
 void powervr2_device::collect_texture_pages(int buffer)
@@ -2253,6 +2449,8 @@ void powervr2_device::process_ta_fifo()
 
 					strip * const ts = &grp->strips[grp->strips_size++];
 					tex_get_info(&ts->ti);
+					ts->clip_mode = (user_tile_mode >= 2) ? user_tile_mode : 0;
+					set_strip_tile_clip(*ts);
 					ts->svert = rd->verts_size;
 					ts->evert = rd->verts_size + 3;
 
@@ -2338,6 +2536,8 @@ void powervr2_device::process_ta_fifo()
 					{
 						strip *ts = &grp->strips[grp->strips_size++];
 						tex_get_info(&ts->ti);
+						ts->clip_mode = (user_tile_mode >= 2) ? user_tile_mode : 0;
+						set_strip_tile_clip(*ts);
 						ts->svert = rd->verts_size;
 						ts->evert = -1;
 					}
@@ -2591,7 +2791,7 @@ inline uint32_t powervr2_device::sample_textured(texinfo *ti, float u, float v, 
 }
 
 template <powervr2_device::pix_sample_fn sample_fn, int group_no>
-inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr, float const bl_in[4], float const br_in[4], float const offl_in[4], float const offr_in[4])
+inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, uint64_t tilemask, int y, float xl, float xr, float ul, float ur, float vl, float vr, float wl, float wr, float const bl_in[4], float const br_in[4], float const offl_in[4], float const offr_in[4])
 {
 	int idx;
 	int xxl, xxr;
@@ -2644,7 +2844,8 @@ inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int
 	ul += ddx * dudx;
 	vl += ddx * dvdx;
 	wl += ddx * dwdx;
-	for (idx = 0; idx < 4; idx++) {
+	for (idx = 0; idx < 4; idx++)
+	{
 		bl[idx] += ddx * dbdx[idx];
 		offl[idx] += ddx * dodx[idx];
 	}
@@ -2652,40 +2853,55 @@ inline void powervr2_device::render_hline(bitmap_rgb32 &bitmap, texinfo *ti, int
 	tdata = &bitmap.pix(y, xxl);
 	wbufline = &wbuffer[y][xxl];
 
-	while(xxl < xxr) {
-		if((wl >= *wbufline)) {
-			uint32_t c;
-			float u = ul/wl;
-			float v = vl/wl;
-			uint32_t offset_color = float_argb_to_packed_argb(offl);
-			uint32_t base_color = float_argb_to_packed_argb(bl);
-			c = (this->*sample_fn)(ti, u, v, offset_color, base_color);
-			if (group_no == DISPLAY_LIST_OPAQUE) {
-				*tdata = c;
-				*wbufline = wl;
-			} else {
-				if(c & 0xff000000) {
+	// the line is walked in tile columns: tiles the polygon isn't binned into are stepped over, so the pixels
+	// that are drawn get exactly the values they would get with the whole line drawn
+	while(xxl < xxr)
+	{
+		const int tile_end = std::min(xxr, ((xxl >> 5) + 1) << 5);
+		const bool draw = BIT(tilemask, xxl >> 5);
+
+		while(xxl < tile_end)
+		{
+			if(draw && (wl >= *wbufline))
+			{
+				uint32_t c;
+				float u = ul/wl;
+				float v = vl/wl;
+				uint32_t offset_color = float_argb_to_packed_argb(offl);
+				uint32_t base_color = float_argb_to_packed_argb(bl);
+				c = (this->*sample_fn)(ti, u, v, offset_color, base_color);
+				if (group_no == DISPLAY_LIST_OPAQUE)
+				{
+					*tdata = c;
 					*wbufline = wl;
-					*tdata = ti->blend(c, *tdata);
+				}
+				else
+				{
+					if(c & 0xff000000)
+					{
+						*wbufline = wl;
+						*tdata = ti->blend(c, *tdata);
+					}
 				}
 			}
-		}
-		wbufline++;
-		tdata++;
+			wbufline++;
+			tdata++;
 
-		ul += dudx;
-		vl += dvdx;
-		wl += dwdx;
-		for (idx = 0; idx < 4; idx++) {
-			bl[idx] += dbdx[idx];
-			offl[idx] += dodx[idx];
+			ul += dudx;
+			vl += dvdx;
+			wl += dwdx;
+			for (idx = 0; idx < 4; idx++)
+			{
+				bl[idx] += dbdx[idx];
+				offl[idx] += dodx[idx];
+			}
+			xxl ++;
 		}
-		xxl ++;
 	}
 }
 
 template <powervr2_device::pix_sample_fn sample_fn, int group_no>
-inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
+inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint64_t *rowmask, texinfo *ti,
 									float y0, float y1,
 									float xl, float xr,
 									float ul, float ur,
@@ -2745,6 +2961,10 @@ inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 	if((yy0 < 0 && y0 > 0) || (yy1 < 0 && y1 > 0)) //temp handling of int32 overflow, needed by hotd2/totd
 		return;
 
+	// the edges are still stepped through the rows above the clip rectangle, so they take the same values in every band
+	if(yy1 > cliprect.bottom() + 1)
+		yy1 = cliprect.bottom() + 1;
+
 	dy = yy0+0.5f-y0;
 
 	if(0)
@@ -2768,7 +2988,8 @@ inline void powervr2_device::render_span(bitmap_rgb32 &bitmap, texinfo *ti,
 	}
 
 	while(yy0 < yy1) {
-		render_hline<sample_fn, group_no>(bitmap, ti, yy0, xl, xr, ul, ur, vl, vr, wl, wr, bl, br, offl, offr);
+		if(yy0 >= cliprect.top())
+			render_hline<sample_fn, group_no>(bitmap, ti, rowmask[yy0 >> 5], yy0, xl, xr, ul, ur, vl, vr, wl, wr, bl, br, offl, offr);
 
 		xl += dxldy;
 		xr += dxrdy;
@@ -2821,13 +3042,17 @@ void powervr2_device::sort_vertices(const vert *v, int *i0, int *i1, int *i2)
 
 
 template <powervr2_device::pix_sample_fn sample_fn, int group_no>
-inline void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
+inline void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint64_t *rowmask, texinfo *ti, const vert *v0, const vert *v1, const vert *v2)
 {
 	float dy01, dy02, dy12;
 
 	float dx01dy, dx02dy, dx12dy, du01dy, du02dy, du12dy, dv01dy, dv02dy, dv12dy, dw01dy, dw02dy, dw12dy;
 
 	if(v0->y >= 480 || v2->y < 0)
+		return;
+
+	// rows are rounded to the nearest integer, so this can't reject a triangle that touches the clip rectangle
+	if(v0->y >= cliprect.bottom() + 2 || v2->y < cliprect.top() - 1)
 		return;
 
 	float db01[4] = {
@@ -2939,15 +3164,15 @@ inline void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti
 			return;
 
 		if(v1->x > v0->x)
-			render_span<sample_fn, group_no>(bitmap, ti, v1->y, v2->y, v0->x, v1->x, v0->u, v1->u, v0->v, v1->v, v0->w, v1->w, v0->b, v1->b, v0->o, v1->o, dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy, db02dy, db12dy, do02dy, do12dy);
+			render_span<sample_fn, group_no>(bitmap, cliprect, rowmask, ti, v1->y, v2->y, v0->x, v1->x, v0->u, v1->u, v0->v, v1->v, v0->w, v1->w, v0->b, v1->b, v0->o, v1->o, dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy, db02dy, db12dy, do02dy, do12dy);
 		else
-			render_span<sample_fn, group_no>(bitmap, ti, v1->y, v2->y, v1->x, v0->x, v1->u, v0->u, v1->v, v0->v, v1->w, v0->w, v1->b, v0->b, v1->o, v0->o, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy, db12dy, db02dy, do12dy, do02dy);
+			render_span<sample_fn, group_no>(bitmap, cliprect, rowmask, ti, v1->y, v2->y, v1->x, v0->x, v1->u, v0->u, v1->v, v0->v, v1->w, v0->w, v1->b, v0->b, v1->o, v0->o, dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy, db12dy, db02dy, do12dy, do02dy);
 
 	} else if(!dy12) {
 		if(v2->x > v1->x)
-			render_span<sample_fn, group_no>(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy, db01dy, db02dy, do01dy, do02dy);
+			render_span<sample_fn, group_no>(bitmap, cliprect, rowmask, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy, db01dy, db02dy, do01dy, do02dy);
 		else
-			render_span<sample_fn, group_no>(bitmap, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy, db02dy, db01dy, do02dy, do01dy);
+			render_span<sample_fn, group_no>(bitmap, cliprect, rowmask, ti, v0->y, v1->y, v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o, dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy, db02dy, db01dy, do02dy, do01dy);
 
 	} else {
 			float idk_b[4] = {
@@ -2963,17 +3188,17 @@ inline void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti
 				v0->o[3] + do02dy[3] * dy01
 			};
 		if(dx01dy < dx02dy) {
-			render_span<sample_fn, group_no>(bitmap, ti, v0->y, v1->y,
+			render_span<sample_fn, group_no>(bitmap, cliprect, rowmask, ti, v0->y, v1->y,
 						v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o,
 						dx01dy, dx02dy, du01dy, du02dy, dv01dy, dv02dy, dw01dy, dw02dy, db01dy, db02dy, do01dy, do02dy);
-			render_span<sample_fn, group_no>(bitmap, ti, v1->y, v2->y,
+			render_span<sample_fn, group_no>(bitmap, cliprect, rowmask, ti, v1->y, v2->y,
 						v1->x, v0->x + dx02dy*dy01, v1->u, v0->u + du02dy*dy01, v1->v, v0->v + dv02dy*dy01, v1->w, v0->w + dw02dy*dy01, v1->b, idk_b, v1->o, idk_o,
 						dx12dy, dx02dy, du12dy, du02dy, dv12dy, dv02dy, dw12dy, dw02dy, db12dy, db02dy, do12dy, do02dy);
 		} else {
-			render_span<sample_fn, group_no>(bitmap, ti, v0->y, v1->y,
+			render_span<sample_fn, group_no>(bitmap, cliprect, rowmask, ti, v0->y, v1->y,
 						v0->x, v0->x, v0->u, v0->u, v0->v, v0->v, v0->w, v0->w, v0->b, v0->b, v0->o, v0->o,
 						dx02dy, dx01dy, du02dy, du01dy, dv02dy, dv01dy, dw02dy, dw01dy, db02dy, db01dy, do02dy, do01dy);
-			render_span<sample_fn, group_no>(bitmap, ti, v1->y, v2->y,
+			render_span<sample_fn, group_no>(bitmap, cliprect, rowmask, ti, v1->y, v2->y,
 						v0->x + dx02dy*dy01, v1->x, v0->u + du02dy*dy01, v1->u, v0->v + dv02dy*dy01, v1->v, v0->w + dw02dy*dy01, v1->w, idk_b, v1->b, idk_o, v1->o,
 						dx02dy, dx12dy, du02dy, du12dy, dv02dy, dv12dy, dw02dy, dw12dy, db02dy, db12dy, do02dy, do12dy);
 		}
@@ -2981,7 +3206,7 @@ inline void powervr2_device::render_tri_sorted(bitmap_rgb32 &bitmap, texinfo *ti
 }
 
 template <int group_no>
-void powervr2_device::render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *v)
+void powervr2_device::render_tri(bitmap_rgb32 &bitmap, const rectangle &cliprect, const uint64_t *rowmask, texinfo *ti, const vert *v)
 {
 	int i0, i1, i2;
 
@@ -2994,16 +3219,16 @@ void powervr2_device::render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *
 		if (bilinear) {
 			switch (ti->tsinstruction) {
 			case 0:
-				render_tri_sorted<&powervr2_device::sample_textured<0,true>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<0,true>, group_no>(bitmap, cliprect, rowmask, ti, v+i0, v+i1, v+i2);
 				break;
 			case 1:
-				render_tri_sorted<&powervr2_device::sample_textured<1,true>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<1,true>, group_no>(bitmap, cliprect, rowmask, ti, v+i0, v+i1, v+i2);
 				break;
 			case 2:
-				render_tri_sorted<&powervr2_device::sample_textured<2,true>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<2,true>, group_no>(bitmap, cliprect, rowmask, ti, v+i0, v+i1, v+i2);
 				break;
 			case 3:
-				render_tri_sorted<&powervr2_device::sample_textured<3,true>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<3,true>, group_no>(bitmap, cliprect, rowmask, ti, v+i0, v+i1, v+i2);
 				break;
 			default:
 				/*
@@ -3011,21 +3236,21 @@ void powervr2_device::render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *
 				 * AND'd with 3
 				 */
 				logerror("%s - tsinstruction is 0x%08x\n", (unsigned)ti->tsinstruction);
-				render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, cliprect, rowmask, ti, v+i0, v+i1, v+i2);
 			}
 		} else {
 			switch (ti->tsinstruction) {
 			case 0:
-				render_tri_sorted<&powervr2_device::sample_textured<0,false>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<0,false>, group_no>(bitmap, cliprect, rowmask, ti, v+i0, v+i1, v+i2);
 				break;
 			case 1:
-				render_tri_sorted<&powervr2_device::sample_textured<1,false>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<1,false>, group_no>(bitmap, cliprect, rowmask, ti, v+i0, v+i1, v+i2);
 				break;
 			case 2:
-				render_tri_sorted<&powervr2_device::sample_textured<2,false>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<2,false>, group_no>(bitmap, cliprect, rowmask, ti, v+i0, v+i1, v+i2);
 				break;
 			case 3:
-				render_tri_sorted<&powervr2_device::sample_textured<3,false>, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_textured<3,false>, group_no>(bitmap, cliprect, rowmask, ti, v+i0, v+i1, v+i2);
 				break;
 			default:
 				/*
@@ -3033,71 +3258,54 @@ void powervr2_device::render_tri(bitmap_rgb32 &bitmap, texinfo *ti, const vert *
 				 * AND'd with 3
 				 */
 				logerror("%s - tsinstruction is 0x%08x\n", (unsigned)ti->tsinstruction);
-				render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+				render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, cliprect, rowmask, ti, v+i0, v+i1, v+i2);
 			}
 		}
 	} else {
-			render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, ti, v+i0, v+i1, v+i2);
+			render_tri_sorted<&powervr2_device::sample_nontextured, group_no>(bitmap, cliprect, rowmask, ti, v+i0, v+i1, v+i2);
 	}
 }
 
-template <int group_no>
-void powervr2_device::render_group_to_accumulation_buffer(bitmap_rgb32 &bitmap,const rectangle &cliprect)
+// texture coordinates are scaled in place, so this must happen exactly once per strip per render
+inline void powervr2_device::scale_texture_coordinates(int rs, const strip &ts)
 {
-#if 0
-	int stride;
-	uint16_t *bmpaddr16;
-	uint32_t k;
-#endif
-
-
-	if (renderselect < 0)
-		return;
-
-	//printf("drawtest!\n");
-
-	int rs = renderselect;
-
-	struct poly_group *grp = grab[rs].groups + group_no;
-
-	int ns = grp->strips_size;
-
-	for (int cs = 0; cs < ns; cs++)
+	for(int i = ts.svert; i <= ts.evert; i++)
 	{
-		strip *ts = &grp->strips[cs];
-		int sv = ts->svert;
-		int ev = ts->evert;
-		int i;
-		if(ev == -1)
-			continue;
-
-		for(i = sv; i <= ev; i++)
-		{
-			vert *tv = grab[rs].verts + i;
-			tv->u = tv->u * ts->ti.sizex * tv->w;
-			tv->v = tv->v * ts->ti.sizey * tv->w;
-		}
-
-		for(i = sv; i <= ev - 2; i++)
-		{
-			//if (!(m_render.debug_dip_status&0x2))
-			render_tri<group_no>(bitmap, &ts->ti, grab[rs].verts + i);
-		}
+		vert *tv = grab[rs].verts + i;
+		tv->u = tv->u * ts.ti.sizex * tv->w;
+		tv->v = tv->v * ts.ti.sizey * tv->w;
 	}
 }
 
-void powervr2_device::render_to_accumulation_buffer(bitmap_rgb32 &bitmap, const rectangle &cliprect) {
-	if (renderselect < 0)
-		return;
+// scales the texture coordinates of every strip ahead of drawing, so the bands only read the vertices
+// returns false, doing nothing, if a vertex is in two strips: scaling ahead would change what the earlier strip draws
+bool powervr2_device::scale_all_texture_coordinates()
+{
+	static constexpr int groups[] = { DISPLAY_LIST_OPAQUE, DISPLAY_LIST_TRANS, DISPLAY_LIST_PUNCH_THROUGH };
+	const int rs = renderselect;
 
-	memset(wbuffer, 0x00, sizeof(wbuffer));
+	std::bitset<MAX_VERTS> used;
+	for (const int group_no : groups)
+	{
+		const poly_group &grp = grab[rs].groups[group_no];
+		for (int cs = 0; cs < grp.strips_size; cs++)
+		{
+			for (int i = grp.strips[cs].svert; i <= grp.strips[cs].evert; i++)
+			{
+				if (used[i])
+					return false;
+				used.set(i);
+			}
+		}
+	}
 
-	bitmap.fill(m_render.background, cliprect);
-
-	// TODO: modifier volumes
-	render_group_to_accumulation_buffer<DISPLAY_LIST_OPAQUE>(bitmap, cliprect);
-	render_group_to_accumulation_buffer<DISPLAY_LIST_TRANS>(bitmap, cliprect);
-	render_group_to_accumulation_buffer<DISPLAY_LIST_PUNCH_THROUGH>(bitmap, cliprect);
+	for (const int group_no : groups)
+	{
+		const poly_group &grp = grab[rs].groups[group_no];
+		for (int cs = 0; cs < grp.strips_size; cs++)
+			scale_texture_coordinates(rs, grp.strips[cs]);
+	}
+	return true;
 }
 
 // copies the accumulation buffer into the framebuffer, converting to the specified format
@@ -4133,6 +4341,7 @@ powervr2_device::powervr2_device(const machine_config &mconfig, const char *tag,
 	, m_cpu_space(*this, finder_base::DUMMY_TAG, -1)
 	, m_mamedebug(*this, "PVR_DEBUG")
 	, m_render_queue(nullptr)
+	, m_band_queue(nullptr)
 	, m_render_request(nullptr)
 	, m_texture_page_mask(0)
 	, m_texture_base(0x04000000)
@@ -4169,6 +4378,7 @@ void powervr2_device::device_start()
 	fake_accumulationbuffer_bitmap = std::make_unique<bitmap_rgb32>(2048,2048);
 
 	m_render_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_HIGH_FREQ);
+	m_band_queue = osd_work_queue_alloc(WORK_QUEUE_FLAG_MULTI | WORK_QUEUE_FLAG_HIGH_FREQ);
 	m_texture_page_mask = std::min<size_t>(dc_texture_ram.bytes() >> TEXTURE_PAGE_SHIFT, TEXTURE_PAGES) - 1;
 
 	// the SH-4 can also reach VRAM directly: accesses that would see a render in flight wait for it
@@ -4259,6 +4469,11 @@ void powervr2_device::device_start()
 	save_item(NAME(param_base));
 	save_item(NAME(region_base));
 	save_item(NAME(vo_border_col));
+	save_item(NAME(user_tile_mode));
+	save_item(NAME(user_tile_clip.min_x));
+	save_item(NAME(user_tile_clip.max_x));
+	save_item(NAME(user_tile_clip.min_y));
+	save_item(NAME(user_tile_clip.max_y));
 	save_item(NAME(fb_r_ctrl));
 	save_item(NAME(fb_w_ctrl));
 	save_item(NAME(fb_w_linestride));
@@ -4360,6 +4575,8 @@ void powervr2_device::device_stop()
 	wait_for_render(true);
 	osd_work_queue_free(m_render_queue);
 	m_render_queue = nullptr;
+	osd_work_queue_free(m_band_queue);
+	m_band_queue = nullptr;
 }
 
 void powervr2_device::device_pre_save()
