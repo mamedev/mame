@@ -19,8 +19,6 @@
 
 #include "screen.h"
 
-#include "input.h"
-
 #define LOG_REGS (1U << 1)
 #define LOG_BLIT (1U << 2)
 #define LOG_HDAC (1U << 3) // log hidden DAC
