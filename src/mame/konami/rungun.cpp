@@ -696,14 +696,15 @@ void rungun_state::rng(machine_config &config)
 	K054539(config, m_k054539[0], 18.432_MHz_XTAL);
 	m_k054539[0]->set_device_rom_tag("k054539");
 	m_k054539[0]->timer_handler().set(FUNC(rungun_state::k054539_nmi_gen));
-	m_k054539[0]->add_route(0, "speaker", 1.0, 1);
-	m_k054539[0]->add_route(1, "speaker", 1.0, 0);
+	// the gains include +5.5 dB for the 054539 global volumes the game sets
+	m_k054539[0]->add_route(0, "speaker", 1.9, 1);
+	m_k054539[0]->add_route(1, "speaker", 1.9, 0);
 
 	// BGM, volumes handtuned to make SFXs audible (still not 100% right tho)
 	K054539(config, m_k054539[1], 18.432_MHz_XTAL);
 	m_k054539[1]->set_device_rom_tag("k054539");
-	m_k054539[1]->add_route(0, "speaker", 0.6, 1);
-	m_k054539[1]->add_route(1, "speaker", 0.6, 0);
+	m_k054539[1]->add_route(0, "speaker", 1.1, 1);
+	m_k054539[1]->add_route(1, "speaker", 1.1, 0);
 }
 
 // for dual-screen output Run and Gun requires the video de-multiplexer board connected to the Jamma output, this gives you 2 Jamma connectors, one for each screen.

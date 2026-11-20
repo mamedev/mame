@@ -263,6 +263,7 @@ protected:
 	s32 m_vcblk[6]{}, m_ocblk = 0;
 	s32 m_vinmix = 0, m_vmixon = 0, m_osinmix = 0, m_osmixon = 0;
 	u8  m_gx_wrport1_0 = 0, m_gx_wrport1_1 = 0;
+	float m_k054539_level = 1.0f; // make-up for the 054539 global volumes the game sets, per machine config
 	u16 m_gx_wrport2 = 0;
 
 	// 2nd-Tier GX/MW Graphics Variables

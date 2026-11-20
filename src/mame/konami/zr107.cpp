@@ -788,13 +788,14 @@ void zr107_state::zr107(machine_config &config)
 	k054539_device &k054539_1(K054539(config, "k054539_1", XTAL(18'432'000)));
 	k054539_1.set_device_rom_tag("k054539");
 	k054539_1.timer_handler().set(FUNC(zr107_state::k054539_irq_gen));
-	k054539_1.add_route(0, "speaker", 0.75, 0);
-	k054539_1.add_route(1, "speaker", 0.75, 1);
+	// the gains include +2.9 dB for the 054539 global volumes the games set
+	k054539_1.add_route(0, "speaker", 1.05, 0);
+	k054539_1.add_route(1, "speaker", 1.05, 1);
 
 	k054539_device &k054539_2(K054539(config, "k054539_2", XTAL(18'432'000)));
 	k054539_2.set_device_rom_tag("k054539");
-	k054539_2.add_route(0, "speaker", 0.75, 0);
-	k054539_2.add_route(1, "speaker", 0.75, 1);
+	k054539_2.add_route(0, "speaker", 1.05, 0);
+	k054539_2.add_route(1, "speaker", 1.05, 1);
 
 	ADC0838(config, m_adc);
 	m_adc->set_input_callback(FUNC(zr107_state::adc0838_callback));

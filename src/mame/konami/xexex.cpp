@@ -763,7 +763,6 @@ void xexex_state::xexex(machine_config &config)
 	ymsnd.add_route(1, "filter2_r", 0.5);
 
 	K054539(config, m_k054539, 18.432_MHz_XTAL);
-	m_k054539->set_global_volume(true);
 	m_k054539->set_analog_callback(FUNC(xexex_state::ym_set_mixing));
 	m_k054539->set_aux_gain_callback(FUNC(xexex_state::ym_aux_gain));
 	m_k054539->add_route(0, "speaker", 1.0, 0);

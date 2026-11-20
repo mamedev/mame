@@ -884,6 +884,10 @@ MACHINE_START_MEMBER(mystwarr_state,mystwarr)
 
 MACHINE_RESET_MEMBER(mystwarr_state,mystwarr)
 {
+	// +1.9 dB for the 054539 global volumes the game sets
+	m_k054539_1->set_output_gain(ALL_OUTPUTS, 1.25);
+	m_k054539_2->set_output_gain(ALL_OUTPUTS, 1.25);
+
 	// soften chorus(chip 0 channel 0-3), boost voice(chip 0 channel 4-7)
 	for (int i = 0; i <= 3; i++)
 	{
@@ -897,6 +901,10 @@ MACHINE_RESET_MEMBER(mystwarr_state,mystwarr)
 
 MACHINE_RESET_MEMBER(mystwarr_state,dadandrn)
 {
+	// +2.9 dB for the 054539 global volumes the game sets
+	m_k054539_1->set_output_gain(ALL_OUTPUTS, 1.4);
+	m_k054539_2->set_output_gain(ALL_OUTPUTS, 1.4);
+
 	// boost voice(chip 0 channel 4-7)
 	for (int i = 4; i <= 7; i++) m_k054539_1->set_gain(i, 2.0);
 }
@@ -915,12 +923,22 @@ MACHINE_START_MEMBER(mystwarr_state,viostormbl)
 
 MACHINE_RESET_MEMBER(mystwarr_state,viostorm)
 {
+	// +2.9 dB for the 054539 global volumes the game sets
+	if (m_k054539_1.found())
+		m_k054539_1->set_output_gain(ALL_OUTPUTS, 1.4);
+	if (m_k054539_2.found())
+		m_k054539_2->set_output_gain(ALL_OUTPUTS, 1.4);
+
 	if (m_k054539_1.found())
 		for (int i = 4; i <= 7; i++) m_k054539_1->set_gain(i, 2.0); // boost voice(chip 0 channel 4-7)
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 {
+	// +5.1 dB for the 054539 global volumes the game sets (9.3 dB would clip, see the boosted voice channels below)
+	m_k054539_1->set_output_gain(ALL_OUTPUTS, 1.8);
+	m_k054539_2->set_output_gain(ALL_OUTPUTS, 1.8);
+
 	// boost voice(chip 0 channel 4-7) and soften other channels
 	for (int i = 0; i <= 3; i++)
 	{
@@ -933,12 +951,19 @@ MACHINE_RESET_MEMBER(mystwarr_state,metamrph)
 
 MACHINE_RESET_MEMBER(mystwarr_state,martchmp)
 {
+	// +6.8 dB for the 054539 global volume the game sets (one 054539 on this board)
+	m_k054539_1->set_output_gain(ALL_OUTPUTS, 2.2);
+
 	// boost voice(chip 0 channel 4-7)
 	for (int i = 4; i <= 7; i++) m_k054539_1->set_gain(i, 1.4);
 }
 
 MACHINE_RESET_MEMBER(mystwarr_state,gaiapols)
 {
+	// +4.9 dB for the 054539 global volumes the game sets
+	m_k054539_1->set_output_gain(ALL_OUTPUTS, 1.75);
+	m_k054539_2->set_output_gain(ALL_OUTPUTS, 1.75);
+
 	// boost voice(chip 0 channel 5-7)
 	for (int i = 5; i <= 7; i++) m_k054539_1->set_gain(i, 2.0);
 }

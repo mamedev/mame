@@ -23,7 +23,6 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 	, device_sound_interface(mconfig, *this)
 	, device_rom_interface(mconfig, *this)
 	, m_flags(RESET_FLAGS)
-	, m_global_volume(false)
 	, m_stream(nullptr)
 	, m_timer(nullptr)
 	, m_timer_handler(*this)
@@ -54,13 +53,15 @@ k054539_device::k054539_device(const machine_config &mconfig, const char *tag, d
 
    210: analog input 0, global volume select (b0-1)
    211: analog input 1, global volume select (b0-1)
+   212: effects return A, global volume select (b0-1)
+   213: effects return B, global volume select (b0-1)
    214: Key on (b0-7 = channel 0-7)
    215: Key off          ""
    225: ?
    227: Timer frequency
-   228..22b: global volumes 0-3 (0=max, 0x40=-36dB, b7 unused). Each channel and
-             analog input selects one. It applies after the channel volume and
-             does not change the reverb send.
+   228..22b: global volumes 0-3 (0=max, 0x40=-36dB, b7 unused). Each channel,
+             analog input and effects return selects one. It applies after the
+             channel volume and does not change the reverb send.
    22c: Channel active? (b0-7 = channel 0-7)
    22d: Data read/write port
    22e: ROM/RAM select (00..7f == ROM banks, 80 = Reverb RAM)
@@ -94,9 +95,6 @@ void k054539_device::set_gain(int channel, double gain)
 
 double k054539_device::global_volume(int sel) const
 {
-	if(!m_global_volume)
-		return 1.0;
-
 	return m_voltab[m_regs[0x228 + (sel & 3)] & 0x7f] * 4.0;
 }
 
@@ -138,10 +136,14 @@ void k054539_device::sound_stream_update(sound_stream &stream)
 	if(!(m_regs[0x22f] & 1))
 		return;
 
+	// The chip has two effects returns (0x212/0x213), each selecting a global volume; MAME mixes the
+	// effects RAM back as one, so it takes the average of the two.
+	double const return_gain = (global_volume(m_regs[0x212]) + global_volume(m_regs[0x213])) / 2;
+
 	for(int sample = 0; sample != stream.samples(); sample++) {
 		double lval, rval;
 		if(!(m_flags & DISABLE_REVERB))
-			lval = rval = rbase[m_reverb_pos];
+			lval = rval = rbase[m_reverb_pos] * return_gain;
 		else
 			lval = rval = 0;
 		rbase[m_reverb_pos] = 0;

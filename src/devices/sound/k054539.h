@@ -43,8 +43,6 @@ public:
 	template <typename... T> void set_analog_callback(T &&... args) { m_apan_cb.set(std::forward<T>(args)...); }
 	// gain of each analog input from the global volume it selects (0x210/0x211, 0x228-0x22b)
 	template <typename... T> void set_aux_gain_callback(T &&... args) { m_again_cb.set(std::forward<T>(args)...); }
-	// apply the global volumes (0x228-0x22b); off by default until each game's mixing is checked with them
-	void set_global_volume(bool enable) { m_global_volume = enable; }
 
 	void write(offs_t offset, u8 data);
 	u8 read(offs_t offset);
@@ -93,7 +91,6 @@ private:
 	double m_gain[8];
 	uint8_t m_posreg_latch[8][3];
 	int m_flags;
-	bool m_global_volume;
 
 	unsigned char m_regs[0x230];
 	std::unique_ptr<uint8_t []> m_ram;
