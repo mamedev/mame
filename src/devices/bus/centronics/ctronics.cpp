@@ -135,6 +135,7 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "mz1p16.h"
 #include "nec_p72.h"
 #include "nlq401.h"
+#include "nx1020.h"
 #include "pc6022.h"
 #include "printer.h"
 #include "samdac.h"
@@ -166,6 +167,7 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("mz1p16", MZ1P16);
 	device.option_add("pc6022", PC6022);
 	device.option_add("mps1250", MPS1250);
+	device.option_add("nx1020", STAR_NX1020);
 
 	device.option_add_internal("hardlock", HARDLOCK);
 	device.option_add_internal("hasp_savquest", HASP_SAVQUEST);
