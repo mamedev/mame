@@ -49,9 +49,10 @@ protected:
 	void recompute_parameters();
 	void vblank_callback(screen_device &screen, bool state);
 	void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type, bool invert, bool bold, bool blink, bool underline, bool blank);
+	void draw_scan(bitmap_ind16 &bitmap, int y_preset, int x, uint8_t code, int i, uint8_t display_type, bool invert, bool bold, bool blink, bool underline, bool blank, bool also_next_row);
 	TIMER_CALLBACK_MEMBER(lba3_change);
 	TIMER_CALLBACK_MEMBER(lba7_change);
-	virtual void notify_vblank(bool choice) { }
+	virtual void notify_vblank(bool choice);
 
 	devcb_read8        m_read_ram;
 	devcb_write_line   m_write_vert_freq_intr;
@@ -83,7 +84,7 @@ protected:
 	required_device<palette_device> m_palette;
 
 	bool m_notify_vblank = false;
-	int m_last_scroll = 0;
+	uint8_t m_last_scroll = 0;
 
 	bool m_linedoubler = false;
 };

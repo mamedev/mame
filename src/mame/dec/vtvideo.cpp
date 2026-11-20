@@ -13,7 +13,7 @@ Code developed with Rainbow-100 hardware in mind (a PC-like machine with a video
 Details (termination characters, option hardware, MHFU watchdog) differ when compared to VT.
 
 As of July 2014, the Rainbow video section is more mature than the 'VT100_VIDEO' part (essentially unchanged since 2009).
-List of features not yet ported to VT: line doubler; 48 line mode; soft scroll; intensity / palette, AVO (ext.attributes)
+List of features not yet ported to VT: 48 line mode; intensity / palette, AVO (ext.attributes)
 
 FIXME: work out the differences and identify common code between VT and Rainbow. Unify different code trees.
 
@@ -21,14 +21,15 @@ FIXME: work out the differences and identify common code between VT and Rainbow.
   * do line and character attributes (plus combinations) match real hardware?
   * how does the AVO fit in?
 
-- SCROLLING REGIONS / SPLIT SCREEN SCROLLING UNTESTED (if you open > 1 file with the VAX editor EDT)
+- SCROLLING REGIONS / SPLIT SCREEN SCROLLING UNTESTED ON THE RAINBOW (if you open > 1 file with the VAX editor EDT).
+  The VT100 runs the DC012's counters (see video_update).
   See VT100 Technical Manual: 4.7.4 Address Shuffling to 4.7.9 Split Screen Smooth Scrolling.
   More on scrolling regions: Rainbow 100 B technical documentation (QV069-GZ) April 1985 page 22
 
-- NEW - INTERLACED MODE (Rainbow only):
+- NEW - INTERLACED MODE:
   Vertical resolution increases from 240 to 480, while the refresh rate halves (flickers on CRTs).
   To accomplish this, the display controller repeats even lines in odd scans.
-  VTVIDEO activates line doubling in 24 line, interlaced mode only.
+  VTVIDEO activates line doubling in 24 or 25 line, interlaced mode only.
 
   Although the DC12 has the ability to display 48 lines, most units are low on screen RAM and
   won't even show 80 x 48. -> REASON: (83 x 48 = 3984 Byte) > (screen RAM) minus 'scratch area'
@@ -115,6 +116,7 @@ void vt100_video_device::device_start()
 
 	save_item(NAME(m_lba7));
 	save_item(NAME(m_scroll_latch));
+	save_item(NAME(m_last_scroll));
 	save_item(NAME(m_blink_flip_flop));
 	save_item(NAME(m_reverse_field));
 	save_item(NAME(m_basic_attribute));
@@ -232,9 +234,22 @@ void vt100_video_device::vblank_callback(screen_device &screen, bool state)
 {
 	if (state)
 	{
-		m_write_vert_freq_intr(ASSERT_LINE);
 		notify_vblank(true);
+		m_write_vert_freq_intr(ASSERT_LINE);
 	}
+}
+
+// At VERTICAL RESET the DC012 presets its Offset counter from the scroll
+// latch (TM-003 4.6.3.3), and on its falling edge sets the vertical
+// frequency interrupt (4.6.3.1), so the latch is taken at the start of
+// vblank and the firmware loads it from the interrupt for the next frame
+// (4.7.8).  The screen updates before the vblank callbacks, so the frame
+// drawn at one vblank uses the latch taken at the one before.  The Rainbow
+// overrides this.
+void vt100_video_device::notify_vblank(bool choice)
+{
+	if (choice)
+		m_last_scroll = m_scroll_latch;
 }
 
 // Also used by Rainbow-100 ************
@@ -261,7 +276,9 @@ void vt100_video_device::dc012_w(offs_t offset, uint8_t data)
 		if (!(data & 0x04))
 		{
 			m_scroll_latch_valid = false;
-			m_scroll_latch = data & 0x03; // LSB is written first.
+			// LSB is written first; the high pair keeps its value until the
+			// second write (TM-003 4.6.3.1: separate low and high loads).
+			m_scroll_latch = (m_scroll_latch & 0x0c) | (data & 0x03);
 		}
 		else // set MSB of scroll_latch
 		{
@@ -359,69 +376,121 @@ void vt100_video_device::brightness_w(uint8_t data)
 
 
 
+// The DC012 (TM-003 4.6.3.3, 4.7.9 and figure 4-7-11).  Two divide-by-10
+// counters run at the scan rate from VERTICAL RESET: the Scan counter from
+// 0, the Offset counter from the scroll latch.  The scroll flip-flop takes
+// the scroll attribute read at the end of the last DMA, and can change only
+// where the Scan counter is 0; it selects the Offset counter inside the
+// scrolling region and the Scan counter outside it.  A DMA fetches the next
+// line whenever the counter in use is 0, and when the flip-flop first selects
+// the Offset counter.  So lines outside the region stay on fixed 10-scan
+// boundaries, and the region starts and ends with part of a line.
+// Characters come from the line fetched by the last DMA; its terminator
+// (7F, then the next address and that line's attributes) is read at the end
+// of the DMA.  VERTICAL RESET points the DMA at 2000 with all line
+// attributes cleared.  The fill lines are fetched during vertical blank.
 void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	uint16_t addr = 0;
-	int line = 0;
-	int xpos = 0;
-	int ypos = 0;
-	int x = 0;
-	uint8_t scroll_region = 1; // binary 1
-	uint8_t display_type = 3;  // binary 11
-	uint16_t temp = 0;
-
 	if (m_read_ram(0) != 0x7f)
 		return;
 
-	int fill_lines = m_fill_lines;
-	int vert_charlines_MAX = m_height + fill_lines;
-	if (m_linedoubler)
+	int const columns = m_columns;
+	int const first_scan = m_fill_lines * 10;
+	int const end_scan = first_scan + m_height * 10;
+
+	int scan_counter = 0;
+	int offset_counter = m_last_scroll;
+	bool scroll_ff = false;
+
+	// interlaced: both fields show the same scans
+	int const fields = m_linedoubler ? 2 : 1;
+
+	// the line being displayed: up to 132 characters and the terminator
+	static constexpr int MAX_LINE = 133;
+	uint8_t codes[MAX_LINE];
+	uint8_t attrs[MAX_LINE];
+	int length = 0;
+	uint8_t display_type = 3; // cleared: normal
+	bool valid = true;
+
+	// read from the last terminator
+	uint16_t next_addr = 0;
+	bool next_scroll = false;
+	uint8_t next_type = 3;
+
+	for (int scan = 0; scan < end_scan; scan++)
 	{
-		vert_charlines_MAX *= 2;
-		fill_lines *= 2;
-	}
-	while (line < vert_charlines_MAX)
-	{
-		uint8_t code = m_read_ram(addr + xpos);
-		if (code == 0x7f)
+		bool entered = false;
+		if (scan_counter == 0)
 		{
-			// end of line, fill empty till end of line
-			if (line >= fill_lines)
+			entered = next_scroll && !scroll_ff;
+			scroll_ff = next_scroll;
+		}
+
+		int const row = scroll_ff ? offset_counter : scan_counter;
+		if ((row == 0 || entered) && valid)
+		{
+			// DMA: the next line's characters, up to its terminator
+			uint16_t const addr = next_addr;
+			display_type = next_type;
+			length = 0;
+			while (length <= columns)
 			{
-				for (x = xpos; x < ((display_type != 3) ? (m_columns / 2) : m_columns); x++)
+				uint8_t const code = m_read_ram(addr + length);
+				if (code == 0x7f)
+					break;
+				codes[length] = code;
+				attrs[length] = m_read_ram(0x1000 + addr + length);
+				length++;
+			}
+			if (length > columns)
+			{
+				// no terminator: nothing to follow, so blank the rest of the
+				// frame (inferred: the manual only says the DMA runs to the 7F)
+				logerror("unterminated screen line at %04x\n", 0x2000 + addr);
+				valid = false;
+				display_type = 3;
+			}
+			else
+			{
+				uint16_t const temp = m_read_ram(addr + length + 1) * 256 + m_read_ram(addr + length + 2);
+				next_addr = temp & 0x0fff;
+				next_scroll = BIT(temp, 15);
+				next_type = bitswap<2>((temp >> 13) & 3, 0, 1);
+			}
+		}
+
+		if (scan >= first_scan)
+		{
+			int const y = (scan - first_scan) * fields;
+			auto const draw = [&] (int x, uint8_t code, bool invert, bool bold, bool blink, bool underline, bool blank)
+			{
+				for (int field = 0; field < fields; field++)
+					draw_scan(bitmap, y + field, x, code, row, display_type, invert, bold, blink, underline, blank, false);
+			};
+			int const width = (display_type != 3) ? (columns / 2) : columns;
+			for (int x = 0; x < width; x++)
+			{
+				if (!valid)
 				{
-					display_char(bitmap, code, x, ypos, scroll_region, display_type, false, false, false, false, false);
+					draw(x, 0, false, false, false, false, true);
+				}
+				else if (x < length)
+				{
+					// AVO attribute bits (low active): 0 blink, 1 underline, 2 bold
+					uint8_t const attr = attrs[x];
+					draw(x, codes[x] & 0x7f, BIT(codes[x], 7), !BIT(attr, 2), !BIT(attr, 0), !BIT(attr, 1), false);
+				}
+				else
+				{
+					// past the terminator
+					draw(x, 0x7f, false, false, false, false, false);
 				}
 			}
-			// move to new data
-			temp = m_read_ram(addr + xpos + 1) * 256 + m_read_ram(addr + xpos + 2);
-			addr = (temp)& 0x1fff;
-			// if A12 is 1 then it is 0x2000 block, if 0 then 0x4000 (AVO - not actually implemented?)
-			/*if (addr & 0x1000)*/ addr &= 0xfff; /*else addr |= 0x2000;*/
-			scroll_region = (temp >> 15) & 1;
-			display_type = bitswap<2>((temp >> 13) & 3, 0, 1);
-			if (line >= fill_lines)
-				ypos++;
-			xpos = 0;
-			line++;
-			if (m_linedoubler)
-				line++;
 		}
-		else
-		{
-			// display regular char
-			if (line >= fill_lines)
-			{
-				uint8_t attr = m_read_ram(0x1000 + addr + xpos);
-				display_char(bitmap, code & 0x7f, xpos, ypos, scroll_region, display_type, BIT(code, 7), !BIT(attr, 2), !BIT(attr, 0), !BIT(attr, 1), false);
-			}
-			xpos++;
-			if (xpos > m_columns)
-			{
-				line++;
-				xpos = 0;
-			}
-		}
+
+		scan_counter = (scan_counter + 1) % 10;
+		offset_counter = (offset_counter + 1) % 10;
 	}
 }
 
@@ -451,49 +520,12 @@ void vt100_video_device::video_update(bitmap_ind16 &bitmap, const rectangle &cli
 // 0 = display char. w. UNDERLINE (encoded as 8 in attribute) LOW ACTIVE
 void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type, bool invert, bool bold, bool blink, bool underline, bool blank)
 {
-	uint16_t x_preset = x << 3; // x_preset = x * 9 (= 132 column mode)
-	x_preset += x;
-
-	if (m_columns == 80)
-		x_preset += x; //        x_preset = x * 10 (80 column mode)
-
-	uint16_t y_preset;
-
 	uint16_t CHARPOS_y_preset = y << 3; // CHARPOS_y_preset = y * 10;
 	CHARPOS_y_preset += y;
 	CHARPOS_y_preset += y;
 
-	uint16_t DOUBLE_x_preset = x_preset << 1; // 18 for 132 column mode, else 20 (x_preset * 2)
-
-	uint8_t line = 0;
-	int bit = 0, j = 0;
-
-	display_type = display_type & 3;
-
-	// * SCREEN ATTRIBUTES (see VT-180 manual 6-30) *
-	// 'reverse field' = reverse video over entire screen
-
-	// VT100 technical manual (EK-VT100-TM-003) table 4-6-4: reverse =
-	// reverse field XOR reverse video.  The base attribute (character bit 7)
-	// is reverse video or underline as the basic attribute flip-flop selects
-	// (4.6.3.8).
-	bool const reverse_field = !m_reverse_field;
-	bool const reverse_video = m_basic_attribute && invert;
-	bool const underlined = underline || (!m_basic_attribute && invert);
-	bool const reversed = reverse_video != reverse_field;
-
-	// intensities: 0 off, 1 dim, 2 normal, 3 bright
-	// reverse: black character on dim (normal when bold) background
-	// otherwise: normal (bright when bold) on black
-	// blink lowers a non-reverse character one step, and shows a reverse one
-	// in its non-reverse form
-	bool const blink_on = blink && m_blink_flip_flop;
-	bool const reverse = reversed && !blink_on;
-	int const fg_intensity = reverse ? 0 : (bold + 2 - ((blink_on && !reversed) ? 1 : 0));
-	int const back_intensity = reverse ? (bold + 1) : 0;
-
-	bool double_width = (display_type != 3) ? true : false; // all except normal: double width
 	bool double_height = (display_type & 1) ? false : true;  // 0,2 = double height
+	uint16_t y_preset;
 
 	int smooth_offset = 0;
 	if (scroll_region != 0)
@@ -526,134 +558,179 @@ void vt100_video_device::display_char(bitmap_ind16 &bitmap, uint8_t code, int x,
 			}
 		}
 
-		switch (display_type)
+		draw_scan(bitmap, y_preset, x, code, i, display_type, invert, bold, blink, underline, blank, double_height);
+	} // for (scan_line)
+}
+
+// One scan of one character on bitmap row y_preset.  i is the value of the
+// counter in use, Scan or Offset (0-9); the character ROM row comes from it
+// and the line's double height half.  also_next_row repeats the pixels on
+// the row below (without the dot stretching).
+void vt100_video_device::draw_scan(bitmap_ind16 &bitmap, int y_preset, int x, uint8_t code, int i, uint8_t display_type, bool invert, bool bold, bool blink, bool underline, bool blank, bool also_next_row)
+{
+	uint16_t x_preset = x << 3; // x_preset = x * 9 (= 132 column mode)
+	x_preset += x;
+
+	if (m_columns == 80)
+		x_preset += x; //        x_preset = x * 10 (80 column mode)
+
+	uint16_t DOUBLE_x_preset = x_preset << 1; // 18 for 132 column mode, else 20 (x_preset * 2)
+
+	uint8_t line = 0;
+	int bit = 0, j = 0;
+
+	display_type = display_type & 3;
+
+	// * SCREEN ATTRIBUTES (see VT-180 manual 6-30) *
+	// 'reverse field' = reverse video over entire screen
+
+	// VT100 technical manual (EK-VT100-TM-003) table 4-6-4: reverse =
+	// reverse field XOR reverse video.  The base attribute (character bit 7)
+	// is reverse video or underline as the basic attribute flip-flop selects
+	// (4.6.3.8).
+	bool const reverse_field = !m_reverse_field;
+	bool const reverse_video = m_basic_attribute && invert;
+	bool const underlined = underline || (!m_basic_attribute && invert);
+	bool const reversed = reverse_video != reverse_field;
+
+	// intensities: 0 off, 1 dim, 2 normal, 3 bright
+	// reverse: black character on dim (normal when bold) background
+	// otherwise: normal (bright when bold) on black
+	// blink lowers a non-reverse character one step, and shows a reverse one
+	// in its non-reverse form
+	bool const blink_on = blink && m_blink_flip_flop;
+	bool const reverse = reversed && !blink_on;
+	int const fg_intensity = reverse ? 0 : (bold + 2 - ((blink_on && !reversed) ? 1 : 0));
+	int const back_intensity = reverse ? (bold + 1) : 0;
+
+	bool double_width = (display_type != 3) ? true : false; // all except normal: double width
+
+	switch (display_type)
+	{
+	case 0:  // bottom half of 'double height, double width' char.
+		j = (i >> 1) + 5;
+		break;
+
+	case 2:  // top half of 'double height, double width' char.
+		j = (i >> 1);
+		break;
+
+	default: // 1: double width
+		// 3: normal
+		j = i;
+		break;
+	}
+
+	// modify line since that is how it is stored in rom
+	if (j == 0) j = 15; else j = j - 1;
+
+	line = m_char_rom[(code << 4) + j]; // code * 16
+
+	// underline: the 9th scan takes the character intensity (black when reverse)
+	if (underlined && (i == 8))
+		line = 0xff;
+
+	for (int b = 0; b < 8; b++) // 0..7
+	{
+		if (blank)
 		{
-		case 0:  // bottom half of 'double height, double width' char.
-			j = (i >> 1) + 5;
-			break;
+			bit = reverse_field;
+		}
+		else
+		{
+			bit = BIT((line << b), 7);
 
-		case 2:  // top half of 'double height, double width' char.
-			j = (i >> 1);
-			break;
-
-		default: // 1: double width
-			// 3: normal
-			j = i;
-			break;
+			if (bit > 0)
+				bit = fg_intensity;
+			else
+				bit = back_intensity;
 		}
 
-		// modify line since that is how it is stored in rom
-		if (j == 0) j = 15; else j = j - 1;
-
-		line = m_char_rom[(code << 4) + j]; // code * 16
-
-		// underline: the 9th scan takes the character intensity (black when reverse)
-		if (underlined && (i == 8))
-			line = 0xff;
-
-		for (int b = 0; b < 8; b++) // 0..7
-		{
-			if (blank)
-			{
-				bit = reverse_field;
-			}
-			else
-			{
-				bit = BIT((line << b), 7);
-
-				if (bit > 0)
-					bit = fg_intensity;
-				else
-					bit = back_intensity;
-			}
-
-			// Double, 'double_height + double_width', then normal.
-			if (double_width)
-			{
-				bitmap.pix(y_preset, DOUBLE_x_preset + (b << 1) + 1) = bit;
-				bitmap.pix(y_preset, DOUBLE_x_preset + (b << 1)) = bit;
-
-				if (double_height)
-				{
-					bitmap.pix(1 + y_preset, DOUBLE_x_preset + (b << 1) + 1) = bit;
-					bitmap.pix(1 + y_preset, DOUBLE_x_preset + (b << 1)) = bit;
-				}
-			}
-			else
-			{
-				bitmap.pix(y_preset, x_preset + b) = bit;
-			}
-		} // for (8 bit)
-
-		// char interleave (X) is filled with last bit
+		// Double, 'double_height + double_width', then normal.
 		if (double_width)
 		{
-			// double chars: 18 or 20 bits
-			bitmap.pix(y_preset, DOUBLE_x_preset + 16) = bit;
-			bitmap.pix(y_preset, DOUBLE_x_preset + 17) = bit;
+			bitmap.pix(y_preset, DOUBLE_x_preset + (b << 1) + 1) = bit;
+			bitmap.pix(y_preset, DOUBLE_x_preset + (b << 1)) = bit;
 
-			if (m_columns == 80)
+			if (also_next_row)
 			{
-				bitmap.pix(y_preset, DOUBLE_x_preset + 18) = bit;
-				bitmap.pix(y_preset, DOUBLE_x_preset + 19) = bit;
+				bitmap.pix(1 + y_preset, DOUBLE_x_preset + (b << 1) + 1) = bit;
+				bitmap.pix(1 + y_preset, DOUBLE_x_preset + (b << 1)) = bit;
 			}
 		}
 		else
-		{   // normal chars: 9 or 10 bits
-			bitmap.pix(y_preset, x_preset + 8) = bit;
-
-			if (m_columns == 80)
-				bitmap.pix(y_preset, x_preset + 9) = bit;
-		}
-
-		/* The DEC terminals use a single ROM bitmap font and
-		 * dot-stretching to synthesize multiple variants that are not
-		 * just nearest neighbor resampled. The result is the same
-		 * as one would get by fake-bolding; the already doubled raster image;
-		 * by rendering twice with 1px horizontal offset.
-		 *
-		 * For details see: https://vt100.net/dec/vt220/glyphs
-		 */
-		int prev_bit = back_intensity;
-		int bits_width = 21;
-		if (!double_width)
 		{
-			if (m_columns == 80)
-				bits_width = 11;
-			else
-				bits_width = 10;
+			bitmap.pix(y_preset, x_preset + b) = bit;
 		}
-		for (int b = 0; b < bits_width; b++)
+	} // for (8 bit)
+
+	// char interleave (X) is filled with last bit
+	if (double_width)
+	{
+		// double chars: 18 or 20 bits
+		bitmap.pix(y_preset, DOUBLE_x_preset + 16) = bit;
+		bitmap.pix(y_preset, DOUBLE_x_preset + 17) = bit;
+
+		if (m_columns == 80)
 		{
-			if (double_width)
+			bitmap.pix(y_preset, DOUBLE_x_preset + 18) = bit;
+			bitmap.pix(y_preset, DOUBLE_x_preset + 19) = bit;
+		}
+	}
+	else
+	{   // normal chars: 9 or 10 bits
+		bitmap.pix(y_preset, x_preset + 8) = bit;
+
+		if (m_columns == 80)
+			bitmap.pix(y_preset, x_preset + 9) = bit;
+	}
+
+	/* The DEC terminals use a single ROM bitmap font and
+	 * dot-stretching to synthesize multiple variants that are not
+	 * just nearest neighbor resampled. The result is the same
+	 * as one would get by fake-bolding; the already doubled raster image;
+	 * by rendering twice with 1px horizontal offset.
+	 *
+	 * For details see: https://vt100.net/dec/vt220/glyphs
+	 */
+	int prev_bit = back_intensity;
+	int bits_width = 21;
+	if (!double_width)
+	{
+		if (m_columns == 80)
+			bits_width = 11;
+		else
+			bits_width = 10;
+	}
+	for (int b = 0; b < bits_width; b++)
+	{
+		if (double_width)
+		{
+			if (bitmap.pix(y_preset, DOUBLE_x_preset + b) == fg_intensity)
 			{
-				if (bitmap.pix(y_preset, DOUBLE_x_preset + b) == fg_intensity)
-				{
-					prev_bit = fg_intensity;
-				}
-				else
-				{
-					if (prev_bit == fg_intensity)
-						bitmap.pix(y_preset, DOUBLE_x_preset + b) = fg_intensity;
-					prev_bit = back_intensity;
-				}
+				prev_bit = fg_intensity;
 			}
 			else
 			{
-				if (bitmap.pix(y_preset, x_preset + b) == fg_intensity)
-				{
-					prev_bit = fg_intensity;
-				}
-				else
-				{
-					if (prev_bit == fg_intensity)
-						bitmap.pix(y_preset, x_preset + b) = fg_intensity;
-					prev_bit = back_intensity;
-				}
+				if (prev_bit == fg_intensity)
+					bitmap.pix(y_preset, DOUBLE_x_preset + b) = fg_intensity;
+				prev_bit = back_intensity;
 			}
 		}
-	} // for (scan_line)
-
+		else
+		{
+			if (bitmap.pix(y_preset, x_preset + b) == fg_intensity)
+			{
+				prev_bit = fg_intensity;
+			}
+			else
+			{
+				if (prev_bit == fg_intensity)
+					bitmap.pix(y_preset, x_preset + b) = fg_intensity;
+				prev_bit = back_intensity;
+			}
+		}
+	}
 }
 
 // ****** RAINBOW ******
