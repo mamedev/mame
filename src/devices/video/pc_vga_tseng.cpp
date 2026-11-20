@@ -12,6 +12,8 @@
  * \- MMIO ports
  * \- ACL BitBlt at I/O $21xy (x = IOD pin selectable?)
  * \- Secondary CRTC controller (CRTCB/Sprite)
+ * \- employs a Wide DAC 6/8 selector somewhere;
+ * \- Has CRTC display issues at higher color depths (i.e. 640x480x24 sets 524)
  * - ET4000/W32p (PCI version of above)
  * - ET6000/ET6100
  *
@@ -26,12 +28,11 @@
 
 DEFINE_DEVICE_TYPE(TSENG_VGA,    tseng_vga_device,    "tseng_vga",    "Tseng Labs ET4000AX VGA i/f")
 DEFINE_DEVICE_TYPE(ET4KW32I_VGA, et4kw32i_vga_device, "et4kw32i_vga", "Tseng Labs ET4000/W32i TC6167HF VGA i/f")
+DEFINE_DEVICE_TYPE(ET4KW32P_VGA, et4kw32p_vga_device, "et4kw32p_vga", "Tseng Labs ET4000/W32p VGA i/f")
 
 tseng_vga_device::tseng_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
 {
-	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(tseng_vga_device::io_3bx_3dx_map), this));
-	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::crtc_map), this));
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::sequencer_map), this));
 	m_atc_space_config = address_space_config("attribute_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::attribute_map), this));
 }
@@ -39,6 +40,8 @@ tseng_vga_device::tseng_vga_device(const machine_config &mconfig, device_type ty
 tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tseng_vga_device(mconfig, TSENG_VGA, tag, owner, clock)
 {
+	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(tseng_vga_device::io_3bx_3dx_map), this));
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(tseng_vga_device::crtc_map), this));
 }
 
 void tseng_vga_device::device_start()
@@ -101,7 +104,8 @@ u8 tseng_vga_device::ramdac_hidden_mask_r(offs_t offset)
 {
 	if(et4k.dac_state == 4)
 	{
-		if(!et4k.dac_ctrl)
+		// TODO: what's this for?
+		if(!et4k.dac_ctrl && !machine().side_effects_disabled())
 			et4k.dac_ctrl = 0x80;
 		return et4k.dac_ctrl;
 	}
@@ -224,8 +228,8 @@ void tseng_vga_device::crtc_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			et4k.horz_overflow = data;
-			vga.crtc.horz_total = (vga.crtc.horz_total & 0xff) | ((data & 1) << 8);
-			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x80) << 1);
+			vga.crtc.horz_total = (vga.crtc.horz_total & 0xff) | (BIT(data, 0) << 8);
+			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | (BIT(data, 7) << 8);
 			// TODO: bits 4 & 2 (horizontal sync and blank start, bit 8)
 			recompute_params();
 		})
@@ -283,6 +287,9 @@ void tseng_vga_device::recompute_params()
 	svga.rgb15_en = 0;
 	svga.rgb16_en = 0;
 	svga.rgb24_en = 0;
+
+	// TODO: auxiliary control doesn't seem to be used for w32i / w32p cases
+	// (moved in CRTC reg $31 instead)
 	switch(((et4k.aux_ctrl << 1) & 4)|(vga.miscellaneous_output & 0xc)>>2)
 	{
 		case 0:
@@ -310,7 +317,8 @@ void tseng_vga_device::recompute_params()
 			xtal = 38000000;
 			break;
 	}
-	// TODO: also read et4k.misc1?
+
+	// TODO: pinpoint when they moved this in misc1
 	switch(et4k.dac_ctrl & 0xe0)
 	{
 		case 0xa0:
@@ -361,7 +369,7 @@ void tseng_vga_device::mem_w(offs_t offset, uint8_t data)
 uint32_t tseng_vga_device::latch_start_addr()
 {
 	// TODO: condition for this (SDD scroll/buffer tests)
-	if(svga.rgb8_en)
+	if(svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en)
 	{
 		return vga.crtc.start_addr_latch << 2;
 	}
@@ -374,14 +382,22 @@ uint32_t tseng_vga_device::latch_start_addr()
  *
  *************************************/
 
-et4kw32i_vga_device::et4kw32i_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: tseng_vga_device(mconfig, ET4KW32I_VGA, tag, owner, clock)
+et4kw32i_vga_device::et4kw32i_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
+	: tseng_vga_device(mconfig, type, tag, owner, clock)
 {
+	m_main_if_space_config = address_space_config("io_regs", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(et4kw32i_vga_device::io_3bx_3dx_map), this));
+	m_crtc_space_config = address_space_config("crtc_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(et4kw32i_vga_device::crtc_map), this));
+
 	m_acl_space_config = address_space_config("acl_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(et4kw32i_vga_device::acl_map), this));
 	m_mmu_space_config = address_space_config("mmu_regs", ENDIANNESS_LITTLE, 8, 15, 0, address_map_constructor(FUNC(et4kw32i_vga_device::mmu_map), this));
 
 	m_acl_idx = 0;
 	m_ima.control = 0;
+}
+
+et4kw32i_vga_device::et4kw32i_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: et4kw32i_vga_device(mconfig, ET4KW32I_VGA, tag, owner, clock)
+{
 }
 
 device_memory_interface::space_config_vector et4kw32i_vga_device::memory_space_config() const
@@ -683,5 +699,81 @@ uint32_t et4kw32i_vga_device::screen_update(screen_device &screen, bitmap_rgb32 
 	}
 
 	return 0;
+}
+
+/**************************************
+ *
+ * ET4000W32/p overrides
+ *
+ *************************************/
+
+et4kw32p_vga_device::et4kw32p_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: et4kw32i_vga_device(mconfig, ET4KW32P_VGA, tag, owner, clock)
+{
+}
+
+// Looks different wrt w32i (and documentation doesn't help at all ...)
+void et4kw32p_vga_device::recompute_params()
+{
+	int divisor = 1;
+	int xtal = 0;
+	svga.rgb8_en = 0;
+	svga.rgb15_en = 0;
+	svga.rgb16_en = 0;
+	svga.rgb24_en = 0;
+	switch(((et4k.aux_ctrl << 1) & 4)|(vga.miscellaneous_output & 0xc)>>2)
+	{
+		case 0:
+			xtal = XTAL(25'174'800).value();
+			break;
+		case 1:
+			xtal = XTAL(28'636'363).value();
+			break;
+		case 2:
+			xtal = 16257000*2; //2xEGA clock
+			break;
+		case 3:
+			xtal = XTAL(40'000'000).value();
+			break;
+		case 4:
+			xtal = XTAL(36'000'000).value();
+			break;
+		case 5:
+			xtal = XTAL(45'000'000).value();
+			break;
+		case 6:
+			xtal = 31000000;
+			break;
+		case 7:
+			xtal = 38000000;
+			break;
+	}
+
+	if (BIT(et4k.misc1, 7))
+	{
+		// TODO: unclear how it selects RGB15 mode (if possible at all)
+		// - SDD just uses the same combination of bits
+		if ((et4k.misc1 & 0x30) == 0x20)
+		{
+			svga.rgb16_en = 1;
+			divisor = 1;
+		}
+		else
+		{
+			if (et4k.dac_ctrl == 0xe0)
+			{
+				svga.rgb24_en = 1;
+				divisor = 3;
+				xtal *= 2.0f/3.0f;
+			}
+			else
+			{
+				svga.rgb8_en = (!(vga.sequencer.data[1] & 8) && (vga.sequencer.data[4] & 8) && vga.gc.shift256 && vga.crtc.div2 && vga.gc.alpha_dis);
+				divisor = 1;
+			}
+		}
+	}
+
+	recompute_params_clock(divisor, xtal);
 }
 

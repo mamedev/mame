@@ -48,15 +48,13 @@ const tiny_rom_entry *et4kw32p_pci_device::device_rom_region() const
 	return ROM_NAME(et4kw32p_pci);
 }
 
-
 void et4kw32p_pci_device::device_add_mconfig(machine_config &config)
 {
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
 	screen.set_screen_update(m_vga, FUNC(et4kw32i_vga_device::screen_update));
 
-	// TODO: should be W32p specific core
-	ET4KW32I_VGA(config, m_vga);
+	ET4KW32P_VGA(config, m_vga);
 	m_vga->set_screen("screen");
 	m_vga->set_vram_size(2*1024*1024);
 }
@@ -65,7 +63,7 @@ void et4kw32p_pci_device::device_start()
 {
 	pci_card_device::device_start();
 
-	// TODO: make it coexist with pcd5h decoding from system ROM on its own thru strapping
+	// TODO: make it coexist with pcd5h decoding from system ROM (i.e. no BIOS) thru strapping
 	//add_rom((u8 *)memregion("bios")->base(), 0x8000);
 
 	// INTA#

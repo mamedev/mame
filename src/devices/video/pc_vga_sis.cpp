@@ -1532,10 +1532,16 @@ uint32_t sis6326_vga_device::latch_start_addr()
 {
 	if (BIT(m_dram_fb_size, 4))
 	{
-		return m_fast_page_address;
+		return m_fast_page_address << 2;
 	}
-	// TODO: similar to S3 variant, is there an enable bit?
-	return vga.crtc.start_addr_latch << (svga.rgb8_en ? 2 : 0);
+
+	// TODO: enable bit
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
+	{
+		return vga.crtc.start_addr_latch << 2;
+	}
+
+	return vga.crtc.start_addr_latch;
 }
 
 // undocumented, win98se access this for X/Y positions to actually work
