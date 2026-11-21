@@ -642,16 +642,18 @@ MICROPROGRAM(clr_seto_mp)
 	END
 };
 
-MICROPROGRAM(divide_mp)     // TODO: Verify cycles on the real machine
+MICROPROGRAM(divide_mp)
 {
 	OPERAND_ADDR,           // x Address of divisor S in Q=W1W2/S
 	MEMORY_READ,            // 1 (1) Get S
 	ALU_DIV,                // 1
 	MEMORY_READ,            // 1 (1) Get W1
-	ALU_DIV,                // 1 Check for overflow; skip next instruction if not
-	ABORT,                  // 1
-	MEMORY_READ,            // 1 (1) Get W2
-	ALU_DIV,                // d Calculate quotient
+	ALU_DIV,                // 0 Set up W2 immediately after reading W1
+	MEMORY_READ,            // 1 (1) Get W2 even on overflow
+	ALU_DIV,                // Internal division clocks, one pass per clock
+	PREFETCH,               // Overflow: fetch the next instruction
+	ALU_NOP,                // 1
+	END,
 	MEMORY_WRITE,           // 1 (1) Write quotient to &W1
 	ALU_DIV,                // 0
 	PREFETCH,               // 1 (1)
@@ -659,21 +661,22 @@ MICROPROGRAM(divide_mp)     // TODO: Verify cycles on the real machine
 	END
 };
 
-MICROPROGRAM(divide_signed_mp)  // TODO: Verify cycles on the real machine
+MICROPROGRAM(divide_signed_mp)
 {
-	OPERAND_ADDR,           // x Address of divisor S in Q=W1W2/S
-	MEMORY_READ,            // 1 (1) Get S
+	OPERAND_ADDR,
+	MEMORY_READ,            // Read divisor
 	ALU_DIVS,               // 1
-	MEMORY_READ,            // 1 (1) Get W1
+	MEMORY_READ,            // Read R1 (low dividend word)
 	ALU_DIVS,               // 1
-	MEMORY_READ,            // 1 (1) Get W2
-	ALU_DIVS,               // 1 Check for overflow, skip next instruction if not
-	ABORT,                  // 1
-	ALU_DIVS,               // d Calculate quotient
-	MEMORY_WRITE,           // 1 (1) Write quotient to &W1
+	MEMORY_READ,            // Read R0 (high dividend word)
+	ALU_DIVS,               // 3, 6 or 25 clocks after the read
+	PREFETCH,               // Overflow path
+	ALU_NOP,                // 1
+	END,
+	MEMORY_WRITE,           // Write quotient to R0
 	ALU_DIVS,               // 0
-	PREFETCH,               // 1
-	MEMORY_WRITE,           // 1 (1) Write remainder to &W2
+	PREFETCH,
+	MEMORY_WRITE,           // Write remainder to R1 after the fetch
 	END
 };
 
@@ -2539,167 +2542,118 @@ void tms9995_device::alu_clr_seto()
 */
 void tms9995_device::alu_divide()
 {
-	int n=1;
-	uint32_t uval32;
-
-	bool overflow = true;
-	uint16_t value1;
-
+	enum { GET_DIVISOR, GET_HIGH_WORD, START_DIVISION, SET_REMAINDER, DIVIDING };
 	switch (m_inst_state)
 	{
-	case 0:
+	case GET_DIVISOR:
 		m_source_value = m_current_value;
 		// Set address of register
 		m_address = WP + ((IR >> 5) & 0x001e);
 		m_address_copy = m_address;
+		pulse_clock(1);
 		break;
-	case 1:
-		// Value of register is in m_current_value
-		// We have an overflow when the quotient cannot be stored in 16 bits
-		// This is the case when the dividend / divisor >= 0x10000,
-		// or equivalently, dividend / 0x10000 >= divisor
-
-		// Check overflow for unsigned DIV
-		if (m_current_value < m_source_value)   // also if source=0
+	case GET_HIGH_WORD:
+		m_value_copy = m_current_value; // High word of the dividend
+		m_address += 2;
+		set_status_bit(ST_OV, m_value_copy >= m_source_value); // Includes a zero divisor
+		break;
+	case START_DIVISION:
+		if (m_source_value == 0)
+			break;
+		// Clocks from the low-word read to the overflow prefetch or quotient write.
+		m_pass = (m_value_copy >= m_source_value) ? 4 : 21;
+		m_inst_state = DIVIDING;
+		[[fallthrough]];
+	case DIVIDING:
+		// Return to execute_run every clock for RESET and scheduler deadlines.
+		// Keep the existing HOLD boundary at the end of this internal operation.
+		m_check_hold = (m_pass == 1);
+		pulse_clock(1);
+		if (m_pass > 1)
+			return;
+		if (m_value_copy < m_source_value)
 		{
-			MPC++;  // skip the abort
-			overflow = false;
+			const uint32_t dividend = (uint32_t(m_value_copy) << 16) | m_current_value;
+			m_current_value = dividend / m_source_value;
+			m_value_copy = dividend % m_source_value;
+			m_address = m_address_copy;
+			MPC += 3; // Skip PREFETCH, ALU_NOP, END on success.
 		}
-		set_status_bit(ST_OV, overflow);
-		m_value_copy = m_current_value;         // Save the high word
-		m_address = m_address + 2;
-		break;
-	case 2:
-		// W2 is in m_current_value
-		uval32 = (m_value_copy << 16) | m_current_value;
-		// Calculate
-		// The number of ALU cycles depends on the number of steps in
-		// the division algorithm. The number of cycles is between 1 and 16
-		// As in TMS9900, this is a guess; it depends on the actual algorithm
-		// used in the chip.
-
-		m_current_value = uval32 / m_source_value;
-		m_value_copy = uval32 % m_source_value;
-		m_address = m_address_copy;
-
-		value1 = m_value_copy & 0xffff;
-		while (value1 != 0)
-		{
-			value1 = (value1 >> 1) & 0xffff;
-			n++;
-		}
-
-		break;
-	case 3:
-		// now write the remainder
+		m_inst_state = SET_REMAINDER;
+		return;
+	case SET_REMAINDER:
+		// The next instruction is fetched between the quotient and remainder writes.
 		m_current_value = m_value_copy;
 		m_address = m_address + 2;
 		break;
 	}
 	m_inst_state++;
-	pulse_clock(n);
 }
 
 /*
-    Signed Division
-    We cannot handle this by the same ALU operation because we can NOT decide
-    whether there is an overflow before we have retrieved the whole 32 bit
-    word. Also, the overflow detection is pretty complicated for signed
-    division when done before the actual calculation.
+    Signed division. The full dividend is needed for signed overflow detection.
 */
 void tms9995_device::alu_divide_signed()
 {
-	int n=1;
-	bool overflow;
-	uint16_t w1, w2, dwait;
-	int16_t divisor;
-	int32_t dividend;
+	int cycles = 0;
 
 	switch (m_inst_state)
 	{
 	case 0:
-		// Got the source value (divisor)
 		m_source_value = m_current_value;
-		m_address = WP;  // DIVS always uses R0,R1
+		m_address = WP + 2;
+		cycles = 1;
 		break;
 	case 1:
-		// Value of register is in m_current_value
-		m_value_copy = m_current_value;
-		m_address += 2;
+		m_value_copy = m_current_value; // R1, low word of the dividend
+		m_address = WP;
+		cycles = 1;
 		break;
 	case 2:
-		// Now we have the dividend low word in m_current_value,
-		// the dividend high word in m_value_copy, and
-		// the divisor in m_source_value.
-
-		w1 = m_value_copy;
-		w2 = m_current_value;
-		divisor = m_source_value;
-		dividend = w1 << 16 | w2;
-
-		// Now check for overflow
-		// We need to go for four cases
-		// if the divisor is not 0 anyway
-		if (divisor != 0)
+	{
+		const int16_t divisor = int16_t(m_source_value);
+		if (divisor == 0)
 		{
-			if (dividend >= 0)
-			{
-				if (divisor > 0)
-				{
-					overflow = (dividend > ((divisor<<15) - 1));
-				}
-				else
-				{
-					overflow = (dividend > (((-divisor)<<15) + (-divisor) - 1));
-				}
-			}
-			else
-			{
-				if (divisor > 0)
-				{
-					overflow = ((-dividend) > ((divisor<<15) + divisor - 1));
-				}
-				else
-				{
-					overflow = ((-dividend) > (((-divisor)<<15) - 1));
-				}
-			}
+			set_status_bit(ST_OV, true);
+			cycles = 3;
+			break;
 		}
-		else
+
+		// Widen the signed high word before combining the halves so even
+		// the most negative dividend can be divided safely.
+		const int64_t dividend = int64_t(int16_t(m_current_value)) * 0x10000 + m_value_copy;
+		const int64_t quotient = dividend / divisor;
+
+		if (quotient <= -0x10000 || quotient >= 0x10000)
 		{
-			overflow = true; // divisor is 0
+			// The early overflow path preserves LGT/AGT/EQ.
+			set_status_bit(ST_OV, true);
+			cycles = 6;
+			break;
 		}
+
+		// Measured from the end of the R0 read to the quotient write
+		// (success) or the following fetch (signed-range overflow).
+		cycles = 25;
+		compare_and_set_lae(uint16_t(quotient), 0);
+		const bool overflow = quotient < -0x8000 || quotient > 0x7fff;
 		set_status_bit(ST_OV, overflow);
-		if (!overflow) MPC++;       // Skip the next microinstruction when there is no overflow
-		break;
-	case 3:
-		// We are here because there was no overflow
-		dividend = m_value_copy << 16 | m_current_value;
-		// Do the calculation
-		m_current_value =  (uint16_t)(dividend / (int16_t)m_source_value);
-		m_value_copy = (uint16_t)(dividend % (int16_t)m_source_value);
-		m_address = WP;
-
-		// As we have not implemented the real division algorithm we must
-		// simulate the number of steps required for calculating the result.
-		// This is just a guess.
-		dwait = m_value_copy;
-		while (dwait != 0)
+		if (!overflow)
 		{
-			dwait = (dwait >> 1) & 0xffff;
-			n++;
+			m_current_value = uint16_t(quotient);
+			m_value_copy = uint16_t(dividend % divisor);
+			m_address = WP;
+			MPC += 3; // Skip the overflow path (PREFETCH, ALU_NOP, END).
 		}
-		// go write the quotient into R0
 		break;
-	case 4:
-		// Now write the remainder
+	}
+	case 3:
 		m_current_value = m_value_copy;
-		m_address += 2;
-		n = 0;
+		m_address = WP + 2;
 		break;
 	}
 	m_inst_state++;
-	pulse_clock(n);
+	pulse_clock(cycles);
 }
 
 /*
