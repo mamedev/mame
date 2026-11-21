@@ -550,7 +550,7 @@ MICROPROGRAM(operand_address_derivation)
 	WORD_READ, RETADDR, 0, 0,                   // Register indirect                1 (1)
 	WORD_READ, RETADDR, 0, 0,                   // Symbolic                         1 (1)
 	WORD_READ, INCREG, WORD_WRITE, RETADDR1,    // Reg indirect auto-increment      3 (1) (1)
-	WORD_READ, INDX, WORD_READ, RETADDR         // Indexed                          3 (1) (1)
+	WORD_READ, INDX, WORD_READ, ALU_NOP, RETADDR // Indexed                         3 (1) (1)
 };
 
 MICROPROGRAM(add_s_sxc_mp)
@@ -1873,10 +1873,9 @@ void tms9995_device::mem_read()
 		// We put fffc-ffff back into the f000-f0ff area
 		offs_t intaddr = m_address & 0x00fe;
 
-		// An on-chip memory access is also visible to the outside world ([1], 2.3.1.2)
-		// but only on word boundary, as only full words are read.
+		// The bus shows the addressed byte even though the RAM supplies a full word.
 		if (m_setaddr)
-			m_setaddr->write_byte(m_address & 0xfffe, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
+			m_setaddr->write_byte(m_address, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
 
 		// Always read a word from internal memory
 		m_current_value = (m_onchip_memory[intaddr] << 8) | m_onchip_memory[intaddr + 1];
@@ -2357,7 +2356,9 @@ void tms9995_device::increment_register()
 /*
     Used for indexed addressing. We store the contents of the index register
     in m_address_add which is set to 0 by default. Then we set the address
-    pointer to the PC location and advance it.
+    pointer to the PC location and advance it. The displacement read follows
+    the register read immediately; the address calculation takes one clock
+    after the complete displacement word has been read.
 */
 void tms9995_device::indexed_addressing()
 {
@@ -2365,7 +2366,6 @@ void tms9995_device::indexed_addressing()
 	m_address = PC;
 	PC = (PC + 2) & 0xfffe;
 	m_mem_phase = 1;
-	pulse_clock(1);
 }
 
 void tms9995_device::set_immediate()
