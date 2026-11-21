@@ -47,7 +47,6 @@ private:
 	void do_io(int offset);
 
 	int m_inh_state;
-	int m_last_offset;
 	int m_dxxx_bank;
 	int m_main_bank;
 	uint8_t m_ram[128*1024];

@@ -19,9 +19,11 @@
 
 #include "corestr.h"
 
-#include <cstdarg>
-#include <cstdio>
 #include <algorithm>
+#include <cstring>
+#include <sstream>
+#include <string>
+#include <utility>
 
 // Should writes to DOL, which is 16 bits wide, round towards zero?
 // This seems to fix a noise issue, but may not be what the hardware does.
@@ -52,13 +54,6 @@ constexpr uint8_t FLAG_Z = 1 << 3;
 constexpr uint8_t FLAG_NOT = 1 << 2;
 
 constexpr uint8_t FLAG_MASK = FLAG_N | FLAG_C | FLAG_V | FLAG_LT | FLAG_Z;
-
-// FIXME: rework the code so this "I can't believe it's not strcpy!" buffer overrun waiting to happen isn't needed
-inline char *stpcpy_int (char *dst, const char *src)
-{
-	const size_t len = strlen(src);
-	return (char *) memcpy (dst, src, len + 1) + len;
-}
 
 constexpr uint8_t setFlag(uint8_t ccr, uint8_t flag)
 {
@@ -185,6 +180,8 @@ es5510_device::es5510_device(const machine_config &mconfig, const char *tag, dev
 	, dol_count(0)
 	, instr(nullptr)
 	, dram(nullptr)
+	, m_gpr_config("gprs", ENDIANNESS_BIG, 32, 8, -2)
+	, m_instructions_config("instructions", ENDIANNESS_BIG, 64, 8, -3)
 	, dol_latch(0)
 	, dil_latch(0)
 	, dadr_latch(0)
@@ -201,11 +198,16 @@ es5510_device::es5510_device(const machine_config &mconfig, const char *tag, dev
 
 typedef es5510_device::alu_op_t alu_op_t;
 typedef es5510_device::op_select_t op_select_t;
-typedef es5510_device::op_src_dst_t op_src_dst_t;
 
-static inline const char * REGNAME(uint8_t r) {
-	static char rn[8];
-	if (r < 234) { sprintf(rn, "GPR_%02x", r); return rn; }
+static inline std::string REGNAME(uint8_t r) {
+	switch (r) {
+	case 0xcc: return "DACL";
+	case 0xcd: return "DACR";
+	case 0xe8: return "PWDACR";
+	case 0xe9: return "PWDACL";
+	}
+	if (r < 234)
+		return util::string_format("GPR_%02x", r);
 	switch(r) {
 	case 234: return "SER0R";
 	case 235: return "SER0L";
@@ -230,18 +232,7 @@ static inline const char * REGNAME(uint8_t r) {
 	case 254: return "MAX";
 	case 255: return "ZERO";
 	}
-	return nullptr;
-}
-
-static inline char * DESCRIBE_REG(char *s, uint8_t r, const char *name) {
-	if (name && *name) {
-		return s + sprintf(s, "%s/%s", REGNAME(r), name);
-	} else {
-		return stpcpy_int(s, REGNAME(r));
-	}
-
-	// never executed
-	//return 0;
+	return {};
 }
 
 const alu_op_t es5510_device::ALU_OPS[16] = {
@@ -285,97 +276,16 @@ const op_select_t es5510_device::OPERAND_SELECT[16] = {
 	{ es5510_device::SRC_DST_DELAY, es5510_device::SRC_DST_BOTH, es5510_device::SRC_DST_DELAY, es5510_device::SRC_DST_REG },
 };
 
-static inline char * DESCRIBE_SRC_DST(char *s, uint8_t reg, const char *regname, op_src_dst_t src_dst) {
-	switch (src_dst) {
-	case es5510_device::SRC_DST_REG:
-		return DESCRIBE_REG(s, reg, regname);
-	case es5510_device::SRC_DST_DELAY:
-		return stpcpy_int(s, "Delay");
-	case es5510_device::SRC_DST_BOTH:
-		s = DESCRIBE_REG(s, reg, regname);
-		return stpcpy_int(s, ",Delay");
-	}
-	// should never happen!
-	return s;
-}
-
 const es5510_device::ram_control_t es5510_device::RAM_CONTROL[8] = {
-	{ es5510_device::RAM_CYCLE_READ,      es5510_device::RAM_CONTROL_DELAY,   "Read Delay+%06x" },
-	{ es5510_device::RAM_CYCLE_WRITE,     es5510_device::RAM_CONTROL_DELAY,   "Write Delay+%06x" },
-	{ es5510_device::RAM_CYCLE_READ,      es5510_device::RAM_CONTROL_TABLE_A, "Read Table A+%06x" },
-	{ es5510_device::RAM_CYCLE_WRITE,     es5510_device::RAM_CONTROL_TABLE_A, "Write Table A+%06x" },
-	{ es5510_device::RAM_CYCLE_READ,      es5510_device::RAM_CONTROL_TABLE_B, "Read Table B+%06x" },
-	{ es5510_device::RAM_CYCLE_DUMP_FIFO, es5510_device::RAM_CONTROL_DELAY,   "Read Delay+%06x and Dump FIFO" },
-	{ es5510_device::RAM_CYCLE_READ,      es5510_device::RAM_CONTROL_IO,      "Read from I/O at %06x" },
-	{ es5510_device::RAM_CYCLE_WRITE,     es5510_device::RAM_CONTROL_IO,      "Write to I/O at %06x" },
+	{ es5510_device::RAM_CYCLE_READ,      es5510_device::RAM_CONTROL_DELAY   },
+	{ es5510_device::RAM_CYCLE_WRITE,     es5510_device::RAM_CONTROL_DELAY   },
+	{ es5510_device::RAM_CYCLE_READ,      es5510_device::RAM_CONTROL_TABLE_A },
+	{ es5510_device::RAM_CYCLE_WRITE,     es5510_device::RAM_CONTROL_TABLE_A },
+	{ es5510_device::RAM_CYCLE_READ,      es5510_device::RAM_CONTROL_TABLE_B },
+	{ es5510_device::RAM_CYCLE_DUMP_FIFO, es5510_device::RAM_CONTROL_DELAY   },
+	{ es5510_device::RAM_CYCLE_READ,      es5510_device::RAM_CONTROL_IO      },
+	{ es5510_device::RAM_CYCLE_WRITE,     es5510_device::RAM_CONTROL_IO      },
 };
-
-static inline char * DESCRIBE_RAM(char *s, uint8_t ramControl, uint32_t gprContents) {
-	return s + sprintf(s, es5510_device::RAM_CONTROL[ramControl].description, gprContents & 0x00ffffff);
-}
-
-static inline char * DESCRIBE_ALU(char *s, uint8_t opcode, uint8_t aReg, const char *aName, uint8_t bReg, const char *bName, const op_select_t &opSelect) {
-	const alu_op_t &op = es5510_device::ALU_OPS[opcode];
-
-	switch (op.operands) {
-	case 0:
-		return stpcpy_int(s, op.opcode);
-
-	case 1:
-		s += sprintf(s, "%s ", op.opcode);
-		s = DESCRIBE_SRC_DST(s, bReg, bName, opSelect.alu_src);
-		s += sprintf(s, " >");
-		return DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_dst);
-
-	case 2:
-		s += sprintf(s, "%s ", op.opcode);
-		s = DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_src);
-		s += sprintf(s, " ");
-		s = DESCRIBE_REG(s, bReg, bName);
-		s += sprintf(s, " >");
-		return DESCRIBE_SRC_DST(s, aReg, aName, opSelect.alu_dst);
-	}
-	return s;
-}
-
-static inline char * DESCRIBE_MAC(char *s, uint8_t mac, uint8_t cReg, const char *cName, uint8_t dReg, const char *dName, const op_select_t &opSelect)
-{
-	if (mac)
-	{
-		s += sprintf(s, "MAC + ");
-	}
-	s = DESCRIBE_SRC_DST(s, cReg, cName, opSelect.mac_src);
-	s += sprintf(s, " * ");
-	s = DESCRIBE_REG(s, dReg, dName);
-	s += sprintf(s, " >");
-	return DESCRIBE_SRC_DST(s, cReg, cName, opSelect.mac_dst);
-}
-
-static inline char * DESCRIBE_INSTR(char *s, uint64_t instr, uint32_t gpr, const char *aName, const char *bName, const char *cName, const char *dName)
-{
-	uint8_t dReg = (uint8_t)((instr >> 40) & 0xff);
-	uint8_t cReg = (uint8_t)((instr >> 32) & 0xff);
-	uint8_t bReg = (uint8_t)((instr >> 24) & 0xff);
-	uint8_t aReg = (uint8_t)((instr >> 16) & 0xff);
-	uint8_t aluOpcode = (uint8_t)((instr >> 12) & 0x0f);
-	uint8_t operandSelect = (uint8_t)((instr >> 8) & 0x0f);
-	uint8_t skip = (uint8_t)((instr >> 7) & 0x01);
-	uint8_t mac = (uint8_t)((instr >> 6) & 0x01);
-	uint8_t ramControl = (uint8_t)((instr >> 3) & 0x07);
-
-	const op_select_t &opSelect = es5510_device::OPERAND_SELECT[operandSelect];
-
-	s = DESCRIBE_ALU(s, aluOpcode, aReg, aName, bReg, bName, opSelect);
-	s += sprintf(s, "; ");
-	s = DESCRIBE_MAC(s, mac, cReg, cName, dReg, dName, opSelect);
-	s += sprintf(s, "; ");
-	s = DESCRIBE_RAM(s, ramControl, gpr);
-	if (skip) {
-		s += sprintf(s, "; skippable");
-	}
-
-	return s;
-}
 
 
 uint8_t es5510_device::host_r(address_space &space, offs_t offset)
@@ -417,9 +327,6 @@ uint8_t es5510_device::host_r(address_space &space, offs_t offset)
 
 void es5510_device::host_w(offs_t offset, uint8_t data)
 {
-#if VERBOSE
-	static char buf[1024];
-#endif
 	switch (offset) {
 	case 0x00:
 		gpr_latch = (gpr_latch&0x00ffff) | ((data&0xff)<<16);
@@ -459,13 +366,17 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 
 	case 0x0f:
 		dadr_latch = (dadr_latch&0x00ffff) | ((data&0xff)<<16);
-		if (ram_sel)
 		{
-			dil_latch = dram_r(dadr_latch) << 8;
-		}
-		else
-		{
-			dram_w(dadr_latch, dol_latch >> 8);
+			// DADR is left-justified like the GPR offsets, so map it through MEMSIZ the same way program accesses are
+			const int32_t address = (int32_t(dadr_latch) & memmask) >> memshift;
+			if (ram_sel)
+			{
+				dil_latch = dram_r(address) << 8;
+			}
+			else
+			{
+				dram_w(address, dol_latch >> 8);
+			}
 		}
 		break;
 
@@ -534,8 +445,11 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 
 	case 0xc0: /* Write select - INSTR */
 #if VERBOSE
-		DESCRIBE_INSTR(buf, instr_latch, gpr[data], nullptr, nullptr, nullptr, nullptr);
-		LOG("ES5510: Host Write INSTR %02x %012x: %s\n", data, instr_latch & 0xffffffffffffULL, buf);
+		{
+			std::ostringstream stream;
+			es5510_disassembler::describe(stream, instr_latch, gpr[data] & 0x00ffffff, true);
+			LOG("ES5510: Host Write INSTR %02x %012x: %s\n", data, instr_latch & 0xffffffffffffULL, std::move(stream).str());
+		}
 #endif
 		if (data < 0xa0) {
 			instr[data] = instr_latch & 0xffffffffffffULL;
@@ -544,8 +458,11 @@ void es5510_device::host_w(offs_t offset, uint8_t data)
 
 	case 0xe0: /* Write select - GPR + INSTR */
 #if VERBOSE
-		DESCRIBE_INSTR(buf, instr_latch, gpr_latch, nullptr, nullptr, nullptr, nullptr);
-		LOG("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, util::sext(gpr_latch, 24), buf);
+		{
+			std::ostringstream stream;
+			es5510_disassembler::describe(stream, instr_latch, gpr_latch & 0x00ffffff, true);
+			LOG("ES5510: Host Write INSTR+GPR %02x (%s): %012x %06x (%d): %s\n", data, REGNAME(data&0xff), instr_latch, gpr_latch, util::sext(gpr_latch, 24), std::move(stream).str());
+		}
 #endif
 		if (data < 0xa0) {
 			instr[data] = instr_latch;
@@ -590,6 +507,8 @@ void es5510_device::device_start() {
 	gpr = std::make_unique<int32_t[]>(0xc0);     // 24 bits, right justified
 	instr = std::make_unique<uint64_t[]>(160);    // 48 bits, right justified
 	dram = std::make_unique<int16_t[]>(DRAM_SIZE);   // there are up to 20 address bits (at least 16 expected), left justified within the 24 bits of a gpr or dadr; we preallocate all of it.
+	space(AS_PROGRAM).install_ram(0x00, 0xbf, gpr.get());
+	space(AS_OPCODES).install_rom(0x00, 0x9f, instr.get());
 	set_icountptr(icount);
 	state_add(STATE_GENPC,"GENPC", pc).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", pc).noshow();
@@ -684,7 +603,13 @@ void es5510_device::device_reset() {
 
 device_memory_interface::space_config_vector es5510_device::memory_space_config() const
 {
-	return space_config_vector { };
+	// AS_PROGRAM holds the GPR file because the debugger uses it as the
+	// parameter space for instruction disassembly; AS_OPCODES holds the
+	// microinstructions.
+	return space_config_vector {
+		std::make_pair(AS_PROGRAM, &m_gpr_config),
+		std::make_pair(AS_OPCODES, &m_instructions_config)
+	};
 }
 
 uint64_t es5510_device::execute_clocks_to_cycles(uint64_t clocks) const noexcept {
@@ -709,89 +634,6 @@ void es5510_device::execute_set_input(int linenum, int state) {
 	}
 }
 
-void es5510_device::list_program(void(p)(const char *, ...)) {
-	LOG("ES5501: Starting!\n");
-
-	char buf[1024];
-	bool is_written[0x100], is_read[0x100];
-	char name[0x100][16];
-	int addr;
-
-	for (int i = 0; i < 0x100; i++) {
-		is_written[i] = is_read[i] = false;
-		name[i][0] = '\0';
-	}
-
-	for (addr = 0; addr < 0xa0; addr++) {
-		DESCRIBE_INSTR(buf, instr[addr], gpr[addr], nullptr, nullptr, nullptr, nullptr);
-		uint64_t inst = instr[addr];
-		uint8_t aReg = (uint8_t)((inst >> 16) & 0xff);
-		uint8_t bReg = (uint8_t)((inst >> 24) & 0xff);
-		uint8_t cReg = (uint8_t)((inst >> 32) & 0xff);
-		uint8_t dReg = (uint8_t)((inst >> 40) & 0xff);
-		uint8_t alu_op = (inst >> 12) & 0x0f;
-		if (alu_op == 0x0f) {
-			// END!
-			break;
-		}
-
-		uint8_t operandSelect = (uint8_t)((inst >> 8) & 0x0f);
-		const op_select_t &opSelect = OPERAND_SELECT[operandSelect];
-
-		if (opSelect.mac_src == SRC_DST_REG) {
-			is_read[cReg] = true;
-		}
-		is_read[dReg] = true;
-		if (opSelect.mac_dst != SRC_DST_DELAY) { // either REG or BOTH
-			is_written[cReg] = true;
-		}
-
-		alu_op_t aluOp = ALU_OPS[alu_op];
-		if (aluOp.operands == 1) {
-			if (opSelect.alu_src == SRC_DST_REG) {
-				is_read[bReg] = true;
-			}
-		} else if (aluOp.operands == 2) {
-			if (opSelect.alu_src == SRC_DST_REG) {
-				is_read[aReg] = true;
-			}
-			is_read[bReg] = true;
-		}
-		if (opSelect.mac_dst != SRC_DST_DELAY) { // either REG or BOTH
-			is_written[aReg] = true;
-		}
-	}
-
-	int varIndex = 1;
-	int constIndex = 1;
-	for (int i = 0; i < 0xc0; i++) {
-		if (is_written[i]) {
-			// this is a variable
-			sprintf(name[i], "v_%03d", varIndex++);
-		} else if (is_read[i]) {
-			// this is only read, so a constant - or possibly something updated by the CPU
-			sprintf(name[i], "c_%03d", constIndex++);
-		} else {
-			name[i][0] = 0;
-		}
-	}
-	for (int i = 0xc0; i < 0x100; i++) {
-		name[i][0] = 0;
-	}
-
-	for (addr = 0; addr < 0xa0; addr++) {
-		uint8_t aReg = (uint8_t)((instr[addr] >> 16) & 0xff);
-		uint8_t bReg = (uint8_t)((instr[addr] >> 24) & 0xff);
-		uint8_t cReg = (uint8_t)((instr[addr] >> 32) & 0xff);
-		uint8_t dReg = (uint8_t)((instr[addr] >> 40) & 0xff);
-		DESCRIBE_INSTR(buf, instr[addr], gpr[addr], name[aReg], name[bReg], name[cReg], name[dReg]);
-		p("%s",string_format("%02x: %012x %06x (%8d) %s\n", addr, instr[addr], gpr[addr]&0xffffff, util::sext(gpr[addr], 24), buf).c_str());
-	}
-	for (; addr < 0xc0; addr++) {
-		p("%02x: %06x (%d)\n", addr, gpr[addr]&0xffffff, util::sext(gpr[addr], 24));
-	}
-}
-
 void es5510_device::execute_run() {
 	while (icount > 0) {
 		if (state == STATE_HALTED) {
@@ -807,12 +649,13 @@ void es5510_device::execute_run() {
 			}
 		} else {
 			// currently running, execute one instruction.
+			u8 const instr_pc = pc;
 
 			if (VERBOSE & LOG_EXECUTION)
 			{
-				char buf[1024];
-				DESCRIBE_INSTR(buf, instr[pc], gpr[pc], nullptr, nullptr, nullptr, nullptr);
-				LOG_EXEC("EXECUTING %02x: %012x %06x  %s\n", pc, instr[pc], gpr[pc]&0xffffff, buf);
+				std::ostringstream stream;
+				es5510_disassembler::describe(stream, instr[instr_pc], u32(gpr[instr_pc]) & 0x00ffffff, true);
+				LOG_EXEC("EXECUTING %02x: %012x %06x  %s\n", instr_pc, instr[instr_pc], gpr[instr_pc] & 0xffffff, std::move(stream).str());
 			}
 
 			ram_pp = ram_p;
@@ -825,7 +668,7 @@ void es5510_device::execute_run() {
 
 			// *** T0, clock low
 			// --- Read instruction N
-			uint64_t instr = this->instr[pc];
+			uint64_t cur_instr = instr[instr_pc];
 
 			// --- RAM cycle N-2 (if a Read cycle): data read from bus is stored in DIL
 			if (ram_pp.cycle != RAM_CYCLE_WRITE) {
@@ -838,12 +681,12 @@ void es5510_device::execute_run() {
 			}
 
 			// --- start of RAM cycle N
-			ram_control_t ramControl = RAM_CONTROL[((instr >> 3) & 0x07)];
+			ram_control_t ramControl = RAM_CONTROL[((cur_instr >> 3) & 0x07)];
 			ram.cycle = ramControl.cycle;
 			ram.io = ramControl.access == RAM_CONTROL_IO;
 
 			// --- RAM cycle N: read offset N
-			int32_t offset = gpr[pc];
+			int32_t offset = gpr[instr_pc];
 			switch(ramControl.access) {
 			case RAM_CONTROL_DELAY:
 				ram.address = (((dbase + offset) % (dlength + memincrement)) & memmask) >> memshift;
@@ -869,10 +712,10 @@ void es5510_device::execute_run() {
 
 			LOG_EXEC("- T1.1\n");
 
-			uint8_t operandSelect = (uint8_t)((instr >> 8) & 0x0f);
+			uint8_t operandSelect = (uint8_t)((cur_instr >> 8) & 0x0f);
 			const op_select_t &opSelect = OPERAND_SELECT[operandSelect];
 			bool skip;
-			bool skippable = (instr & (0x01 << 7)) != 0; // aka the 'SKIP' bit in the instruction word
+			bool skippable = (cur_instr & (0x01 << 7)) != 0; // aka the 'SKIP' bit in the instruction word
 			if (skippable) {
 				bool skipConditionSatisfied = (ccr & cmr & FLAG_MASK) != 0;
 				if (isFlagSet(cmr, FLAG_NOT)) {
@@ -925,11 +768,11 @@ void es5510_device::execute_run() {
 
 			// --- Start of multiplier cycle N
 			LOG_EXEC(". start mulacc:\n");
-			mulacc.cReg = (uint8_t)((instr >> 32) & 0xff);
-			mulacc.dReg = (uint8_t)((instr >> 40) & 0xff);
+			mulacc.cReg = (uint8_t)((cur_instr >> 32) & 0xff);
+			mulacc.dReg = (uint8_t)((cur_instr >> 40) & 0xff);
 			mulacc.src = opSelect.mac_src;
 			mulacc.dst = opSelect.mac_dst;
-			mulacc.accumulate = ((instr >> 6) & 0x01) != 0;
+			mulacc.accumulate = ((cur_instr >> 6) & 0x01) != 0;
 			mulacc.write_result = !skip;
 
 			// --- Read Multiplier Operands N
@@ -970,9 +813,9 @@ void es5510_device::execute_run() {
 
 			// --- Start of ALU cycle N
 			LOG_EXEC(". start ALU:\n");
-			alu.aReg = (instr >> 16) & 0xff;
-			alu.bReg = (instr >> 24) & 0xff;
-			alu.op = (instr >> 12) & 0x0f;
+			alu.aReg = (cur_instr >> 16) & 0xff;
+			alu.bReg = (cur_instr >> 24) & 0xff;
+			alu.op = (cur_instr >> 12) & 0x0f;
 			alu.src = opSelect.alu_src;
 			alu.dst = opSelect.alu_dst;
 			alu.write_result = !skip || (alu.op == OP_CMP);
@@ -999,6 +842,20 @@ void es5510_device::execute_run() {
 					}
 					alu.bValue = read_reg(alu.bReg);
 				}
+			}
+
+			if (VERBOSE & LOG_EXECUTION)
+			{
+				es5510_disassembler::operand_values const values{
+					u32(alu.aValue) & 0x00ffffff,
+					u32(alu.bValue) & 0x00ffffff,
+					u32(mulacc.cValue) & 0x00ffffff,
+					u32(mulacc.dValue) & 0x00ffffff,
+					(u32(u16(dil)) << 8) & 0x00ffffff
+				};
+				std::ostringstream stream;
+				es5510_disassembler::describe(stream, cur_instr, u32(gpr[instr_pc]) & 0x00ffffff, true, &values);
+				LOG_EXEC("  . operands: %s\n", std::move(stream).str());
 			}
 
 			// --- RAM cycle N-1
@@ -1038,7 +895,7 @@ void es5510_device::execute_run() {
 
 std::unique_ptr<util::disasm_interface> es5510_device::create_disassembler()
 {
-	return std::make_unique<es5510_disassembler>();
+	return std::make_unique<es5510_disassembler>(es5510_disassembler::format::PARAMS);
 }
 
 #if VERBOSE_EXEC

@@ -236,6 +236,18 @@ if SOUNDS["CEM3320"] then
 end
 
 ---------------------------------------------------
+-- CEM 3328 voltage-controlled filter chip
+--@src/devices/sound/cem3328.h,SOUNDS["CEM3328"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3328"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3328.cpp",
+		MAME_DIR .. "src/devices/sound/cem3328.h",
+	}
+end
+
+---------------------------------------------------
 -- CEM 3340 voltage-controlled oscillator chip
 --@src/devices/sound/cem3340.h,SOUNDS["CEM3340"] = true
 ---------------------------------------------------
@@ -280,6 +292,20 @@ if SOUNDS["CEM3394"] then
 	files {
 		MAME_DIR .. "src/devices/sound/cem3394.cpp",
 		MAME_DIR .. "src/devices/sound/cem3394.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- Cirrus Logic CS43L43 I2S Stereo DAC
+--@src/devices/sound/cs43l43.h,SOUNDS["CS43L43"] = true
+---------------------------------------------------
+
+if (SOUNDS["CS43L43"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/cs43l43.cpp",
+		MAME_DIR .. "src/devices/sound/cs43l43.h",
 	}
 end
 
@@ -870,6 +896,19 @@ if SOUNDS["IMAADPCM"] then
 	}
 end
 
+
+
+---------------------------------------------------
+-- Novatek NT3570F sound generator
+--@src/devices/sound/nt3570.h,SOUNDS["NT3570"] = true
+---------------------------------------------------
+
+if SOUNDS["NT3570"] then
+	files {
+		MAME_DIR .. "src/devices/sound/nt3570.cpp",
+		MAME_DIR .. "src/devices/sound/nt3570.h",
+	}
+end
 
 
 ---------------------------------------------------
@@ -1634,6 +1673,18 @@ if SOUNDS["AD1848"] then
 	files {
 		MAME_DIR .. "src/devices/sound/ad1848.cpp",
 		MAME_DIR .. "src/devices/sound/ad1848.h",
+	}
+end
+
+---------------------------------------------------
+-- AD1859
+--@src/devices/sound/ad1859.h,SOUNDS["AD1859"] = true
+---------------------------------------------------
+
+if SOUNDS["AD1859"] then
+	files {
+		MAME_DIR .. "src/devices/sound/ad1859.cpp",
+		MAME_DIR .. "src/devices/sound/ad1859.h",
 	}
 end
 

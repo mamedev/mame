@@ -432,6 +432,31 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
+	<software name="fcopy3">
+		<description>FCOPY III (for 2 parallel drives)</description>
+		<year>19??</year>
+		<publisher>The Whiz-zards Association</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="fcopy3.d64" size="174848" crc="8cfc7a45" sha1="2c1d9807d59704d3dd376ed0f9e8889a2f9740a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tttools" supported="no">
+		<description>TurboTrans Tools</description>
+		<year>1986</year>
+		<publisher>Rossmöller</publisher>
+		<sharedfeat name="iec8_default" value="c1541tt"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="tt-tools.d64" size="174848" crc="fcf210de" sha1="1420b617d8d462d4347633c4e75106e6bd389897"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="digitlzr">
 		<description>Digitizer Datasette</description>
 		<year>19??</year>
@@ -980,7 +1005,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="prologic" supported="no">
+	<software name="prologic">
 		<description>Prologic-DOS</description>
 		<year>1987</year>
 		<publisher>REX Data Technology</publisher>

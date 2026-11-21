@@ -339,7 +339,8 @@ void vga_device::io_3bx_3dx_map(address_map &map)
 void vga_device::io_3cx_map(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(vga_device::atc_address_r), FUNC(vga_device::atc_address_data_w));
-	map(0x01, 0x01).r(FUNC(vga_device::atc_data_r));
+	// NOTE: netbsd VESAFindIsaDevice test ask for write to 0x3c1 to act as write to 0x3c0
+	map(0x01, 0x01).rw(FUNC(vga_device::atc_data_r), FUNC(vga_device::atc_address_data_w));
 	map(0x02, 0x02).rw(FUNC(vga_device::input_status_0_r), FUNC(vga_device::miscellaneous_output_w));
 //  map(0x03, 0x03).w(FUNC(vga_device::wakeup_w));
 	map(0x04, 0x04).rw(FUNC(vga_device::sequencer_address_r), FUNC(vga_device::sequencer_address_w));
@@ -1216,6 +1217,7 @@ uint16_t vga_device::offset()
 		return vga.crtc.offset << 2;
 }
 
+// TODO: move this (VGA mode 13h) logic when latching not at display time
 uint32_t vga_device::start_addr()
 {
 //  popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
@@ -1612,6 +1614,8 @@ uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 void vga_device::recompute_params_clock(int divisor, int xtal)
 {
+	assert(divisor > 0);
+	assert(xtal > 0);
 	int vblank_period, hblank_period;
 	// if not in graphic mode and not Clocking Mode bit 0 select 9 dots per charset
 	uint8_t hclock_m = !vga.gc.alpha_dis && !BIT(vga.sequencer.data[1], 0) ? 9 : 8;
@@ -1931,8 +1935,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	const int VGA_COLUMNS = vga.crtc.horz_disp_end + 1;
 	const int LINES = (vga.crtc.vert_disp_end + 1) * (get_interlace_mode() + 1);
 
-	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08) || svga.ignore_chain4) ? 2 : 0;
-	for (int addr = vga.crtc.start_addr << start_shift, line=0; line < LINES; line+=height, addr += offset(), curr_addr+=offset())
+	for (int addr = vga.crtc.start_addr, line=0; line < LINES; line+=height, addr += offset(), curr_addr+=offset())
 	{
 		for (int yi = 0;yi < height; yi++)
 		{
@@ -1975,7 +1978,7 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	bitmap.fill(0, cliprect);
 
-	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+	for (int addr = vga.crtc.start_addr, line = 0; line < TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2018,7 +2021,7 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	bitmap.fill(0, cliprect);
 
-	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line += height, addr += offset(), curr_addr += offset())
+	for (int addr = vga.crtc.start_addr, line = 0; line < TLINES; line += height, addr += offset(), curr_addr += offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2061,7 +2064,7 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	bitmap.fill(0, cliprect);
 
-	for (int addr = vga.crtc.start_addr << 3, line=0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
+	for (int addr = vga.crtc.start_addr, line=0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2104,7 +2107,7 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	bitmap.fill(0, cliprect);
 
-	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
+	for (int addr = vga.crtc.start_addr, line = 0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2215,6 +2218,28 @@ uint8_t svga_device::get_video_depth()
 			return 32;
 	}
 	return 0;
+}
+
+// TODO: fallback logic, probably wrong most of the time
+uint32_t svga_device::latch_start_addr()
+{
+	if (svga.rgb32_en)
+		return vga.crtc.start_addr_latch << 2;
+
+	if (svga.rgb24_en)
+		return vga.crtc.start_addr_latch << 3;
+
+	if (svga.rgb15_en || svga.rgb16_en)
+		return vga.crtc.start_addr_latch << 2;
+
+	if (svga.rgb8_en)
+	{
+		// TODO: this logic should be in clients not here
+		uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08) || svga.ignore_chain4) ? 2 : 0;
+		return vga.crtc.start_addr_latch << start_shift;
+	}
+
+	return vga_device::latch_start_addr();
 }
 
 // TODO: inherit from base class

@@ -244,6 +244,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void recompute_params() override;
+	virtual bool get_interlace_mode() override { return m_interlace; }
+	// TODO: bit 10 is an extension, mask may be knocked off in some way
+	virtual u16 line_compare_mask() override { return 0x7ff; }
 
 	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
 
@@ -299,178 +302,15 @@ void vis_vga_device::io_3cx_map(address_map &map)
 void vis_vga_device::crtc_map(address_map &map)
 {
 	svga_device::crtc_map(map);
-	// Override with interlace into account
-	map(0x00, 0x00).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			if(vga.crtc.protect_enable)
-				return;
-			vga.crtc.horz_total = data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
-			recompute_params();
-		})
-	);
-	map(0x01, 0x01).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			if(vga.crtc.protect_enable)
-				return;
-			vga.crtc.horz_disp_end = (data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1)) | 1;
-			recompute_params();
-		})
-	);
-	map(0x02, 0x02).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			if(vga.crtc.protect_enable)
-				return;
-			vga.crtc.horz_blank_start = data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
-		})
-	);
-	map(0x03, 0x03).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			if(vga.crtc.protect_enable)
-				return;
-			vga.crtc.horz_blank_end = (vga.crtc.data[0x05] & 0x80) >> 2;
-			vga.crtc.horz_blank_end |= data & 0x1f;
-			vga.crtc.horz_blank_end /= (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
-			vga.crtc.disp_enable_skew = (data & 0x60) >> 5;
-			vga.crtc.evra = (data & 0x80) >> 7;
-		})
-	);
-	map(0x04, 0x04).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			if(vga.crtc.protect_enable)
-				return;
-			vga.crtc.horz_retrace_start = data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
-		})
-	);
-	map(0x05, 0x05).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			if(vga.crtc.protect_enable)
-				return;
-			vga.crtc.horz_blank_end = vga.crtc.data[0x05] & 0x1f;
-			vga.crtc.horz_blank_end |= ((data & 0x80) >> 2);
-			vga.crtc.horz_blank_end /= (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
-			vga.crtc.horz_retrace_skew = ((data & 0x60) >> 5);
-			vga.crtc.horz_retrace_end = data & 0x1f;
-		})
-	);
-	map(0x06, 0x06).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			if(vga.crtc.protect_enable)
-				return;
-			vga.crtc.vert_total = ((vga.crtc.data[0x07] & 0x20) << (9-6)) | ((vga.crtc.data[0x07] & 0x01) << (8-0));
-			vga.crtc.vert_total |= data;
-			vga.crtc.vert_total *= (m_interlace ? 2 : 1);
-			recompute_params();
-		})
-	);
-	map(0x07, 0x07).lw8(
-		NAME([this] (offs_t offset, u8 data) { // Overflow Register
-			vga.crtc.line_compare       &= ~0x100;
-			vga.crtc.line_compare       |= ((data & 0x10) << (8-4));
-			if(vga.crtc.protect_enable)
-				return;
-			vga.crtc.vert_total         = vga.crtc.data[0x05];
-			vga.crtc.vert_retrace_start = vga.crtc.data[0x10];
-			vga.crtc.vert_disp_end      = vga.crtc.data[0x12];
-			vga.crtc.vert_blank_start   = vga.crtc.data[0x15] | ((vga.crtc.data[0x09] & 0x20) << (9-5));
-			vga.crtc.vert_retrace_start |= ((data & 0x80) << (9-7));
-			vga.crtc.vert_disp_end      |= ((data & 0x40) << (9-6));
-			vga.crtc.vert_total         |= ((data & 0x20) << (9-5));
-			vga.crtc.vert_blank_start   |= ((data & 0x08) << (8-3));
-			vga.crtc.vert_retrace_start |= ((data & 0x04) << (8-2));
-			vga.crtc.vert_disp_end      |= ((data & 0x02) << (8-1));
-			vga.crtc.vert_total         |= ((data & 0x01) << (8-0));
-			vga.crtc.vert_total *= (m_interlace ? 2 : 1);
-			vga.crtc.vert_blank_start *= (m_interlace ? 2 : 1);
-			vga.crtc.vert_retrace_start *= (m_interlace ? 2 : 1);
-			vga.crtc.vert_disp_end *= (m_interlace ? 2 : 1);
-			recompute_params();
-		})
-	);
-	map(0x09, 0x09).lw8(
-		NAME([this] (offs_t offset, u8 data) { // Maximum Scan Line Register
-			vga.crtc.line_compare      &= ~0x200;
-			vga.crtc.vert_blank_start  = vga.crtc.data[0x15] | ((vga.crtc.data[0x07] & 0x02) << (8-3));
-			vga.crtc.scan_doubling      = ((data & 0x80) >> 7);
-			vga.crtc.line_compare      |= ((data & 0x40) << (9-6));
-			vga.crtc.vert_blank_start  |= ((data & 0x20) << (9-5));
-			vga.crtc.maximum_scan_line  = (data & 0x1f) + 1;
-			vga.crtc.vert_blank_start *= (m_interlace ? 2 : 1);
-		})
-	);
-	map(0x10, 0x10).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			vga.crtc.vert_retrace_start = ((vga.crtc.data[0x07] & 0x80) << (9-7)) | ((vga.crtc.data[0x07] & 0x40) << (8-2));
-			vga.crtc.vert_retrace_start |= data;
-			vga.crtc.vert_retrace_start *= (m_interlace ? 2 : 1);
-		})
-	);
-	map(0x12, 0x12).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			vga.crtc.vert_disp_end = ((vga.crtc.data[0x07] & 0x40) << (9-6)) | ((vga.crtc.data[0x07] & 0x02) << (8-1));
-			vga.crtc.vert_disp_end |= data;
-			vga.crtc.vert_disp_end *= (m_interlace ? 2 : 1);
-			recompute_params();
-		})
-	);
-	map(0x15, 0x15).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			vga.crtc.vert_blank_start = ((vga.crtc.data[0x09] & 0x20) << (9-5)) | ((vga.crtc.data[0x07] & 0x02) << (8-3));
-			vga.crtc.vert_blank_start |= data;
-			vga.crtc.vert_blank_start *= (m_interlace ? 2 : 1);
-		})
-	);
-	map(0x16, 0x16).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			vga.crtc.vert_blank_end = (data & 0x7f) * (m_interlace ? 2 : 1);
-		})
-	);
-	map(0x14, 0x14).lw8(
-		NAME([this] (offs_t offset, u8 data) {
-			m_dw = data & 0x40 ? 1 : 0;
-			if(vga.sequencer.data[0x1f] & 0x10)
-				data |= 0x40;
-		})
-	);
 	map(0x30, 0x30).lrw8(
 		NAME([this] (offs_t offset) {
 			return vga.crtc.data[0x30];
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			if(data && !m_interlace)
-			{
-				if(!(vga.sequencer.data[0x25] & 0x20))
-				{
-					vga.crtc.horz_total /= 2;
-					vga.crtc.horz_disp_end = (vga.crtc.horz_disp_end / 2) | 1;
-					vga.crtc.horz_blank_end /= 2;
-					vga.crtc.horz_retrace_start /= 2;
-					vga.crtc.horz_retrace_end /= 2;
-				}
-				vga.crtc.vert_total *= 2;
-				vga.crtc.vert_retrace_start *= 2;
-				vga.crtc.vert_disp_end *= 2;
-				vga.crtc.vert_blank_start *= 2;
-				vga.crtc.vert_blank_end *= 2;
-				recompute_params();
-			}
-			else if(!data && m_interlace)
-			{
-				if(!(vga.sequencer.data[0x25] & 0x20))
-				{
-					vga.crtc.horz_total *= 2;
-					vga.crtc.horz_disp_end  = (vga.crtc.horz_disp_end * 2) | 1;
-					vga.crtc.horz_blank_end *= 2;
-					vga.crtc.horz_retrace_start *= 2;
-					vga.crtc.horz_retrace_end *= 2;
-				}
-				vga.crtc.vert_total /= 2;
-				vga.crtc.vert_retrace_start /= 2;
-				vga.crtc.vert_disp_end /= 2;
-				vga.crtc.vert_blank_start /= 2;
-				vga.crtc.vert_blank_end /= 2;
-				recompute_params();
-			}
-			m_interlace = data;
+			m_interlace = BIT(data, 4);
+			vga.crtc.data[0x30] = data;
+			logerror("CR30: %02x\n", data);
+			recompute_params();
 		})
 	);
 }
@@ -552,6 +392,13 @@ void vis_vga_device::sequencer_map(address_map &map)
 			flush_8bpp_mode();
 		})
 	);
+	map(0x25, 0x25).lw8(NAME([this] (offs_t offset, u8 data) {
+		vga.sequencer.data[0x25] = data;
+		logerror("SR25: %02x\n", data);
+		// TODO: guess, assumed by links and amherit pushing high with the purpose of knocking out
+		vga.crtc.line_compare = (vga.crtc.line_compare & 0x03ff) | ((BIT(data, 6) << 10));
+		recompute_params();
+	}));
 }
 void vis_vga_device::io_isa_map(address_map &map)
 {
@@ -565,28 +412,31 @@ void vis_vga_device::flush_8bpp_mode()
 
 void vis_vga_device::recompute_params()
 {
-	uint8_t hclock_m = (!vga.gc.alpha_dis) ? (vga.sequencer.data[1]&1)?8:9 : 8;
-	int pixel_clock;
-	const XTAL base_xtal = XTAL(14'318'181);
-	const XTAL xtal = (vga.miscellaneous_output & 0xc) ? base_xtal*2 : base_xtal*1.75;
-	int divisor = 1; // divisor is 2 for 15/16 bit rgb/yuv modes and 3 for 24bit
+	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
+	int xtal;
 
-	/* safety check */
-	if(!vga.crtc.horz_disp_end || !vga.crtc.vert_disp_end || !vga.crtc.horz_total || !vga.crtc.vert_total)
-		return;
+	switch(xtal_select & 3)
+	{
+		case 0: xtal = XTAL(14'318'181).value() * 1.75; break;
+		default:
+			logerror("Warning: ext source select %02x\n", xtal_select);
+			[[fallthrough]];
+		case 1: xtal = XTAL(14'318'181).value() * 2; break;
+	}
 
-	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * ((float)(hclock_m)/divisor))-1, 0, vga.crtc.vert_disp_end);
+	// TODO: inconclusive, links title screen wants halved pixel clock
+	u8 pixel_div = !BIT(vga.sequencer.data[0x25], 5) && m_interlace;
 
-	int vblank_period = (vga.crtc.vert_total + 2);
-	int hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
+	// 0x80 columbus images
+	// 0xc0 sampler preview videos (at 320x200)
+	// 0x90 links title screen
+	if (BIT(vga.crtc.data[0x30], 7) && !m_interlace)
+	{
+		pixel_div ++;
+		xtal >>= 1;
+	}
 
-	/* TODO: 10b and 11b settings aren't known */
-	pixel_clock = xtal.value() / (((vga.sequencer.data[1]&8) >> 3) + 1);
-
-	attotime refresh  = attotime::from_ticks(hblank_period * vblank_period, pixel_clock);
-	screen().configure((hblank_period), (vblank_period), visarea, refresh );
-	//popmessage("%d %d\n",vga.crtc.horz_total * 8,vga.crtc.vert_total);
-	m_vblank_timer->adjust( screen().time_until_pos((vga.crtc.vert_blank_start + vga.crtc.vert_blank_end)) );
+	recompute_params_clock(1 + pixel_div, xtal);
 }
 
 rgb_t vis_vga_device::yuv_to_rgb(int y, int u, int v) const
@@ -607,15 +457,16 @@ void vis_vga_device::vga_vh_yuv8(bitmap_rgb32 &bitmap, const rectangle &cliprect
 	int curr_addr = 0;
 	const uint8_t decode_tbl[] = {0, 1, 2, 3, 4, 5, 6, 9, 12, 17, 22, 29, 38, 50, 66, 91, 128, 165, 190,
 		206, 218, 227, 234, 239, 244, 247, 250, 251, 252, 253, 254, 255};
+	const int LINES = (vga.crtc.vert_disp_end + 1) * (get_interlace_mode() + 1);
 
-	for (int addr = vga.crtc.start_addr, line=0; line<(vga.crtc.vert_disp_end+1); line+=height, addr+=offset(), curr_addr+=offset())
+	for (int addr = vga.crtc.start_addr, line=0; line < LINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		for(int yi = 0;yi < height; yi++)
 		{
 			uint8_t ydelta = 0, ua = 0, va = 0;
-			if((line + yi) < (vga.crtc.line_compare & 0x3ff))
+			if((line + yi) < (vga.crtc.line_compare & line_compare_mask()))
 				curr_addr = addr;
-			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
+			if((line + yi) == (vga.crtc.line_compare & line_compare_mask()))
 				curr_addr = 0;
 			for (int pos=curr_addr, col=0, column=0; column<(vga.crtc.horz_disp_end+1); column++, col+=8, pos+=8)
 			{
@@ -676,14 +527,16 @@ void vis_vga_device::vga_vh_yuv422(bitmap_rgb32 &bitmap, const rectangle &clipre
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int curr_addr = 0;
 
-	for (int addr = vga.crtc.start_addr, line=0; line<(vga.crtc.vert_disp_end+1); line+=height, addr+=offset(), curr_addr+=offset())
+	const int LINES = (vga.crtc.vert_disp_end + 1) * (get_interlace_mode() + 1);
+
+	for (int addr = vga.crtc.start_addr, line=0; line < LINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		for(int yi = 0;yi < height; yi++)
 		{
 			uint8_t ua = 0, va = 0;
-			if((line + yi) < (vga.crtc.line_compare & 0x3ff))
+			if((line + yi) < (vga.crtc.line_compare & line_compare_mask()))
 				curr_addr = addr;
-			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
+			if((line + yi) == (vga.crtc.line_compare & line_compare_mask()))
 				curr_addr = 0;
 			for (int pos=curr_addr, col=0, column=0; column<(vga.crtc.horz_disp_end+1); column++, col+=8,  pos+=8)
 			{

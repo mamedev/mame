@@ -101,11 +101,11 @@ public:
 		regout.set(REG_FP);
 	}
 
-	bool c_calc_required() const { return regreq[REG_C] || in_delay_slot(); }
-	bool z_calc_required() const { return regreq[REG_Z] || in_delay_slot(); }
-	bool n_calc_required() const { return regreq[REG_N] || in_delay_slot(); }
-	bool v_calc_required() const { return regreq[REG_V] || in_delay_slot(); }
-	bool condition_calc_required() const { return regreq[REG_C] || regreq[REG_Z] || regreq[REG_N] || regreq[REG_V] || in_delay_slot(); }
+	bool c_calc_required() const { return regreq[REG_C]; }
+	bool z_calc_required() const { return regreq[REG_Z]; }
+	bool n_calc_required() const { return regreq[REG_N]; }
+	bool v_calc_required() const { return regreq[REG_V]; }
+	bool condition_calc_required() const { return regreq[REG_C] || regreq[REG_Z] || regreq[REG_N] || regreq[REG_V]; }
 
 	void set_check_h() { m_extra_flags.set(CHECK_H); }
 	void set_can_change_modes() { m_extra_flags.set(CAN_CHANGE_MODES); }

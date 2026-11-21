@@ -136,6 +136,7 @@ private:
 	u32 m_inten = 0;
 	u8 m_int_high = 0;
 	u32 m_intst = 0;
+	bool m_int_accepted = false;
 
 	// bare numbers indicate <reserved> IRQSs
 	enum {

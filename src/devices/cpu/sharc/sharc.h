@@ -260,7 +260,6 @@ private:
 	sharc_boot_mode m_boot_mode;
 
 	// UML stuff
-	drc_cache m_cache;
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<frontend> m_drcfe;
 	uml::parameter   m_regmap[16];

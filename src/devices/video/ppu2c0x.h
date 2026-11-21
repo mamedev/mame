@@ -28,6 +28,7 @@
 
 #define PPU_DRAW_BG       0
 #define PPU_DRAW_OAM      1
+#define PPU_DRAW_NONE     2   // not rendering (for CPU accesses through $2007)
 
 /* constant definitions */
 #define VISIBLE_SCREEN_WIDTH         (32*8) /* Visible screen width */
@@ -219,9 +220,11 @@ protected:
 	u8                          m_x_fine;               /* refresh-related */
 	bool                        m_toggle;               /* used to latch hi-lo scroll */
 	s32                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
+	bool                        m_render_at_hblank;     /* rendering enabled at ~dot 256 of the current line */
 	latch_delegate              m_latch;
 
 	u16                         m_spriteramsize;
+	bool                        m_oamaddr_render_reset;
 
 	u8 readbyte(offs_t address);
 

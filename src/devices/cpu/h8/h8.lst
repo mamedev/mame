@@ -204,16 +204,16 @@ macro jsr32 %opc %spreg
 
 10003 dma
 	m_TMP2 = m_current_dma;
-	if(m_dma_channel[m_TMP2]->m_flags & h8_dma_state::MODE_16) {
+	m_dma_dest = m_dma_channel[m_TMP2]->m_dest;
+	m_dma_mode16 = m_dma_channel[m_TMP2]->m_flags & h8_dma_state::MODE_16;
+	if(m_dma_mode16) {
 		m_TMP1 = read16(m_dma_channel[m_TMP2]->m_source);
 		if(m_dma_channel[m_TMP2]->m_count == 1 && !(m_dma_channel[m_TMP2]->m_flags & (h8_dma_state::BLOCK|h8_dma_state::REPEAT)))
 			m_dma_device->count_last(m_dma_channel[m_TMP2]->m_id);
-		write16(m_dma_channel[m_TMP2]->m_dest, m_TMP1);
 	} else {
 		m_TMP1 = read8(m_dma_channel[m_TMP2]->m_source);
 		if(m_dma_channel[m_TMP2]->m_count == 1 && !(m_dma_channel[m_TMP2]->m_flags & (h8_dma_state::BLOCK|h8_dma_state::REPEAT)))
 			m_dma_device->count_last(m_dma_channel[m_TMP2]->m_id);
-		write8(m_dma_channel[m_TMP2]->m_dest, m_TMP1);
 	}
 	m_dma_channel[m_TMP2]->m_source += m_dma_channel[m_TMP2]->m_incs;
 	m_dma_channel[m_TMP2]->m_dest   += m_dma_channel[m_TMP2]->m_incd;
@@ -224,6 +224,11 @@ macro jsr32 %opc %spreg
 	}
 	if(!m_dma_channel[m_TMP2]->m_count)
 		m_dma_device->count_done(m_TMP2);
+	if(m_dma_mode16) {
+		write16(m_dma_dest, m_TMP1);
+	} else {
+		write8(m_dma_dest, m_TMP1);
+	}
 	prefetch_done();
 
 10004 dtc s20

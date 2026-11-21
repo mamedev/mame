@@ -139,7 +139,7 @@ public:
 	virtual void seek_phase_w(int phases);
 	void stp_w(int state);
 	void dir_w(int state) { m_dir = state; }
-	void ss_w(int state) { m_actual_ss = state; if (m_sides > 1) m_ss = state; }
+	void ss_w(int state);
 	void inuse_w(int state) { }
 	void dskchg_w(int state) { if (m_dskchg_writable) m_dskchg = state; }
 	void ds_w(int state) { m_ds = state; check_led(); }
@@ -239,9 +239,11 @@ protected:
 	attotime m_amplifier_freakout_time;
 	int m_cache_index;
 	u32 m_cache_entry;
+	u32 m_cache_weak_id;
 	bool m_cache_weak;
 
 	bool m_image_dirty, m_track_dirty;
+	// TODO: the pending write state below isn't saved, so a state saved during a write won't resume it
 	bool m_writing;
 	int m_write_cyl, m_write_ss, m_write_subcyl;
 	attotime m_write_start_time;

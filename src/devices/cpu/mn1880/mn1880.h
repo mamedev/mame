@@ -250,6 +250,7 @@ public:
 	template <int Channel> auto ad_in_cb() { return m_ad_in_cb[Channel].bind(); }
 	template <int N> auto sio_in_cb() { return m_sio_in_cb[N].bind(); }
 	template <int N> auto sio_out_cb() { return m_sio_out_cb[N].bind(); }
+	auto uart_txd_cb() { return m_uart_txd_cb.bind(); }
 	auto pwm_out_cb() { return m_pwm_out_cb.bind(); }
 
 	// port direction registers are unknown, so the board names its input pins
@@ -257,6 +258,7 @@ public:
 
 	void timer2_capture_w(int state);
 	void timer4_count_w(int state);
+	void uart_rxd_w(int state);
 
 	u16 pwm_reload() const;
 	u16 pwm_compare() const;
@@ -273,7 +275,8 @@ private:
 		IRQ_TIMER0 = 3,
 		IRQ_PWM = 4,
 		IRQ_TIMER3 = 6,
-		IRQ_TIMER4 = 8
+		IRQ_TIMER4 = 8,
+		IRQ_UART_RX = 9
 	};
 
 	void internal_map(address_map &map) ATTR_COLD;
@@ -283,6 +286,7 @@ private:
 	u8 port_r(offs_t offset);
 	void port_w(offs_t offset, u8 data);
 	void irq_flags_w(u8 data);
+	void sio0_control_w(u8 data);
 	void sio0_data_w(u8 data);
 	void sio1_data_w(u8 data);
 	void adc_control_w(u8 data);
@@ -293,6 +297,7 @@ private:
 	void timer3_w(offs_t offset, u8 data);
 	void timer_run_w(u8 data);
 	void timer_control_w(u8 data);
+	void timer3_control_w(u8 data);
 	u8 timer4_r(offs_t offset);
 	void pwm_reload_w(offs_t offset, u8 data);
 	void pwm_control_w(u8 data);
@@ -301,11 +306,16 @@ private:
 	void update_timer3();
 	void update_pwm();
 	u16 timer2_count() const;
+	bool uart_enabled() const { return m_regs[0x19] == 0x62; }
+	attotime uart_bit_period() const;
+	void uart_txd(int state);
 
 	TIMER_CALLBACK_MEMBER(timer0_tick);
 	TIMER_CALLBACK_MEMBER(timer3_tick);
 	TIMER_CALLBACK_MEMBER(sio0_tick);
 	TIMER_CALLBACK_MEMBER(sio1_tick);
+	TIMER_CALLBACK_MEMBER(uart_tx_tick);
+	TIMER_CALLBACK_MEMBER(uart_rx_tick);
 	TIMER_CALLBACK_MEMBER(adc_tick);
 	TIMER_CALLBACK_MEMBER(pwm_tick);
 
@@ -314,11 +324,14 @@ private:
 	devcb_read8::array<8> m_ad_in_cb;
 	devcb_read8::array<2> m_sio_in_cb;
 	devcb_write8::array<2> m_sio_out_cb;
+	devcb_write_line m_uart_txd_cb;
 	devcb_write_line m_pwm_out_cb;
 
 	emu_timer *m_timer0;
 	emu_timer *m_timer3;
 	emu_timer *m_sio_timer[2];
+	emu_timer *m_uart_tx_timer;
+	emu_timer *m_uart_rx_timer;
 	emu_timer *m_adc_timer;
 	emu_timer *m_pwm_timer;
 
@@ -329,6 +342,12 @@ private:
 	u8 m_timer4_prescale;
 	bool m_timer2_capture_input;
 	bool m_timer4_count_input;
+	u8 m_uart_tx_data;
+	u8 m_uart_rx_data;
+	u8 m_uart_tx_bits;
+	u8 m_uart_rx_bits;
+	bool m_uart_rxd;
+	bool m_uart_txd;
 };
 
 class mn18801a_device : public mn1880_device

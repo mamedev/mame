@@ -30,7 +30,7 @@
     — 16-level on-chip program stack (non-addressable)
     — Multiple 8-bit and 16-bit on-chip timer/counters, with 16-bit
       input capture and 10-bit PWM output
-    — USART serial I/O with dedicated 8-bit baud rate generator
+    — USART serial I/O with dedicated 8-bit baud rate generator
     — Watchdog timer with internal RC oscillator
     — SLEEP mode with wake-up upon interrupt
 
@@ -52,7 +52,7 @@
       TABLRD will be written back by a following TABLWT. To ensure
       correct data is present on both halves of the bus, TLWT must
       precede TABLWT to refresh the alternate half of TABLAT.
-    — “Long” writes to internal EPROM (not emulated) can be aborted
+    — “Long” writes to internal EPROM (not emulated) can be aborted
       by the setting of any interrupt flag, whether enabled or not.
     — SFR bank 15 is “reserved for Microchip use.”
 

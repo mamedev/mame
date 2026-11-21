@@ -27,7 +27,6 @@
     - bar code reader (!RxDB -> RST5.5, Hewlett-Packard HREDS-3050 interface)
     - un-Y2K-hack tandy200
     - keyboard is unresponsive for couple of seconds after boot, and rather slow thereafter
-    - soft power on/off
     - pc8201 48K RAM option
     - pc8201 NEC PC-8241A video interface (TMS9918, 16K videoRAM, 8K ROM)
     - pc8201 NEC PC-8233 floppy controller
@@ -38,8 +37,6 @@
     - tandy200 RTC alarm
     - tandy200 TCM5089 DTMF sound
     - international keyboard option ROMs
-    - cassette is not working on pc8201, pc8201a, npc8300
-    - natural keyboard is far too slow to be usable; paste is useless
 
     10 FOR A=0 TO 255
     20 PRINT CHR$(A);
@@ -86,7 +83,7 @@ uint8_t pc8201_state::bank_r()
 
 	*/
 
-	return (m_iosel << 5) | m_bank;
+	return (m_iosel << 6) | m_bank;
 }
 
 void pc8201_state::bankswitch(uint8_t data)
@@ -195,7 +192,7 @@ void pc8201_state::scp_w(uint8_t data)
 	m_centronics->write_strobe(BIT(data, 5));
 
 	/* serial interface select */
-	m_iosel = data >> 5;
+	m_iosel = data >> 6;
 }
 
 uint8_t kc85_state::uart_r()
@@ -270,7 +267,7 @@ uint8_t kc85_state::uart_status_r()
 	data |= m_uart->tbre_r() << 4;
 
 	// low power sensor
-	data |= BIT(m_battery->read(), 0) << 7;
+	data |= lps_r() << 7;
 
 	return data;
 }
@@ -310,7 +307,7 @@ uint8_t pc8201_state::uart_status_r()
 	data |= m_uart->tbre_r() << 4;
 
 	// low power sensor
-	data |= BIT(m_battery->read(), 0) << 7;
+	data |= lps_r() << 7;
 
 	return data;
 }
@@ -715,6 +712,9 @@ static INPUT_PORTS_START( kc85 )
 	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Normal ) )
 	PORT_CONFSETTING( 0x00, "Low Battery" )
+
+	PORT_START("POWER")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") PORT_CODE(KEYCODE_END) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kc85_state::power_w), 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc8201 )
@@ -831,6 +831,13 @@ INPUT_PORTS_END
 - QWERTY with [{ [UK and US versions]
 - QZERTY with $& [Italy?]
 but our machine is different again, unable to find a specific photo of it. Could be French. */
+static INPUT_PORTS_START( tandy200 )
+	PORT_INCLUDE( kc85 )
+
+	PORT_MODIFY("POWER")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") PORT_CODE(KEYCODE_END) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(tandy200_state::power_w), 0)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( olivm10 )
 	PORT_START("Y0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('(') PORT_CHAR('5')
@@ -926,6 +933,9 @@ static INPUT_PORTS_START( olivm10 )
 	PORT_CONFNAME( 0x01, 0x01, "Battery Status" )
 	PORT_CONFSETTING( 0x01, DEF_STR( Normal ) )
 	PORT_CONFSETTING( 0x00, "Low Battery" )
+
+	PORT_START("POWER")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") PORT_CODE(KEYCODE_END) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(kc85_state::power_w), 0)
 INPUT_PORTS_END
 
 
@@ -984,6 +994,15 @@ void kc85_state::i8155_pb_w(uint8_t data)
 	m_bell = BIT(data, 5);
 
 	if (m_buzzer) m_speaker->level_w(m_bell);
+
+	// auto power off
+	if (!m_apo && BIT(data, 4) && !BIT(m_power->read(), 0))
+	{
+		m_power_cut = true;
+		power_down();
+	}
+
+	m_apo = BIT(data, 4);
 
 	// RS-232
 	m_rs232->write_dtr(BIT(data, 6));
@@ -1089,6 +1108,15 @@ void tandy200_state::i8155_pb_w(uint8_t data)
 	m_bell = BIT(data, 5);
 
 	if (m_buzzer) m_speaker->level_w(m_bell);
+
+	// power cut
+	if (!m_pcs && BIT(data, 4) && !BIT(m_power->read(), 0))
+	{
+		m_power_cut = true;
+		power_down();
+	}
+
+	m_pcs = BIT(data, 4);
 }
 
 void tandy200_state::write_centronics_busy(int state)
@@ -1116,7 +1144,10 @@ uint8_t tandy200_state::i8155_pc_r()
 
 	*/
 
-	uint8_t data = 0x01;
+	uint8_t data = 0;
+
+	// low power sense
+	data |= !BIT(m_power->read(), 0);
 
 	// centronics
 	data |= m_centronics_select << 1;
@@ -1136,7 +1167,115 @@ void tandy200_state::i8155_to_w(int state)
 	}
 }
 
+/* Power */
+
+static constexpr attotime POWER_HOLDUP = attotime::from_msec(50);
+
+int kc85_state::lps_r()
+{
+	return BIT(m_battery->read(), 0) && !BIT(m_power->read(), 0);
+}
+
+void kc85_state::power_down()
+{
+	m_holdup_timer->adjust(attotime::never);
+
+	if (!m_powered)
+		return;
+
+	m_powered = false;
+	m_speaker->level_w(0);
+	m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	machine().schedule_soft_reset();
+}
+
+TIMER_CALLBACK_MEMBER(kc85_state::holdup_expired)
+{
+	power_down();
+}
+
+INPUT_CHANGED_MEMBER(kc85_state::power_w)
+{
+	m_maincpu->set_input_line(I8085_TRAP_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+
+	if (newval)
+	{
+		m_power_cut = false;
+
+		if (m_powered)
+			m_holdup_timer->adjust(POWER_HOLDUP);
+	}
+	else
+	{
+		m_holdup_timer->adjust(attotime::never);
+
+		if (!m_powered && !m_power_cut)
+		{
+			m_powered = true;
+			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		}
+	}
+}
+
+void tandy200_state::power_down()
+{
+	m_holdup_timer->adjust(attotime::never);
+
+	if (!m_powered)
+		return;
+
+	m_powered = false;
+	m_speaker->level_w(0);
+	m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	machine().schedule_soft_reset();
+}
+
+TIMER_CALLBACK_MEMBER(tandy200_state::holdup_expired)
+{
+	power_down();
+}
+
+INPUT_CHANGED_MEMBER(tandy200_state::power_w)
+{
+	m_maincpu->set_input_line(I8085_TRAP_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+
+	if (newval)
+	{
+		m_power_cut = false;
+
+		if (m_powered)
+			m_holdup_timer->adjust(POWER_HOLDUP);
+	}
+	else
+	{
+		m_holdup_timer->adjust(attotime::never);
+
+		if (!m_powered && !m_power_cut)
+		{
+			m_powered = true;
+			m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		}
+	}
+}
+
 /* Machine Drivers */
+
+void kc85_state::power_start()
+{
+	m_holdup_timer = timer_alloc(FUNC(kc85_state::holdup_expired), this);
+
+	save_item(NAME(m_apo));
+	save_item(NAME(m_power_cut));
+	save_item(NAME(m_powered));
+}
+
+void kc85_state::machine_reset()
+{
+	m_apo = false;
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, m_powered ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(I8085_TRAP_LINE, BIT(m_power->read(), 0) ? ASSERT_LINE : CLEAR_LINE);
+}
 
 void kc85_state::machine_start()
 {
@@ -1179,6 +1318,8 @@ void kc85_state::machine_start()
 	save_item(NAME(m_bell));
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_select));
+
+	power_start();
 }
 
 void pc8201_state::machine_start()
@@ -1194,7 +1335,7 @@ void pc8201_state::machine_start()
 
 	/* configure ROM banking */
 	m_bank1->configure_entry(0, m_rom->base());
-	m_bank1->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base());
+	m_bank1->configure_entry(1, m_opt_region ? m_opt_region->base() : m_rom->base() + ((m_rom->bytes() > 0x8000) ? 0x8000 : 0));
 	m_bank1->configure_entries(2, 2, ram + 0x8000, 0x8000);
 	m_bank1->set_entry(0);
 
@@ -1215,6 +1356,16 @@ void pc8201_state::machine_start()
 	save_item(NAME(m_rom_sel));
 	save_item(NAME(m_rom_addr));
 	save_item(NAME(m_iosel));
+	save_item(NAME(m_cmt_div));
+	save_item(NAME(m_sod));
+	save_item(NAME(m_cmt_sod));
+	save_item(NAME(m_cmt_out));
+	save_item(NAME(m_sid));
+
+	power_start();
+
+	m_cmt_timer = timer_alloc(FUNC(pc8201_state::cmt_tick), this);
+	m_cmt_timer->adjust(attotime::from_hz(XTAL(4'915'200) / 2 / 128), 0, attotime::from_hz(XTAL(4'915'200) / 2 / 128));
 }
 
 void trsm100_state::machine_start()
@@ -1268,6 +1419,8 @@ void trsm100_state::machine_start()
 	save_item(NAME(m_bell));
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_select));
+
+	power_start();
 }
 
 void tandy200_state::machine_start()
@@ -1295,6 +1448,19 @@ void tandy200_state::machine_start()
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_select));
 	save_item(NAME(m_tp));
+	save_item(NAME(m_pcs));
+	save_item(NAME(m_power_cut));
+	save_item(NAME(m_powered));
+
+	m_holdup_timer = timer_alloc(FUNC(tandy200_state::holdup_expired), this);
+}
+
+void tandy200_state::machine_reset()
+{
+	m_pcs = false;
+
+	m_maincpu->set_input_line(INPUT_LINE_RESET, m_powered ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(I8085_TRAP_LINE, BIT(m_power->read(), 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void kc85_state::kc85_sod_w(int state)
@@ -1315,6 +1481,49 @@ void tandy200_state::kc85_sod_w(int state)
 int tandy200_state::kc85_sid_r()
 {
 	return (m_cassette->input() > 0.04) ? 0 : 1;
+}
+
+void pc8201_state::sod_w(int state)
+{
+	m_sod = state;
+}
+
+int pc8201_state::sid_r()
+{
+	double level = m_cassette->input();
+
+	if (level > 0.04)
+		m_sid = true;
+	else if (level < -0.04)
+		m_sid = false;
+
+	return m_sid;
+}
+
+TIMER_CALLBACK_MEMBER(pc8201_state::cmt_tick)
+{
+	bool out = m_cmt_out;
+
+	// m_cmt_div counts 9600 Hz half periods, U41 divides it to 2400 Hz
+	m_cmt_div++;
+
+	if (BIT(m_cmt_div, 0))
+	{
+		if ((m_cmt_div & 0x07) == 0x01)
+			out = !out;
+		else if ((m_cmt_div & 0x07) == 0x05 && m_cmt_sod)
+			out = true;
+	}
+	else
+	{
+		m_cmt_sod = m_sod;
+	}
+
+	if (out != m_cmt_out)
+	{
+		m_cmt_out = out;
+		m_cassette->output(out ? +1.0 : -1.0);
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(tandy200_state::tandy200_tp_tick)
@@ -1381,8 +1590,8 @@ void pc8201_state::pc8201(machine_config &config)
 	I8085A(config, m_maincpu, XTAL(4'915'200));
 	m_maincpu->set_addrmap(AS_PROGRAM, &pc8201_state::pc8201_mem);
 	m_maincpu->set_addrmap(AS_IO, &pc8201_state::pc8201_io);
-	m_maincpu->in_sid_func().set(FUNC(pc8201_state::kc85_sid_r));
-	m_maincpu->out_sod_func().set(FUNC(pc8201_state::kc85_sod_w));
+	m_maincpu->in_sid_func().set(FUNC(pc8201_state::sid_r));
+	m_maincpu->out_sod_func().set(FUNC(pc8201_state::sod_w));
 
 	/* video hardware */
 	kc85_video(config);
@@ -1563,18 +1772,18 @@ ROM_START( kc85 )
 ROM_END
 
 ROM_START( pc8201 )
-	ROM_REGION( 0x10000, I8085_TAG, 0 )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "3256a41-3b1 n 82 basic.rom0", 0x0000, 0x8000, CRC(3dbaa484) SHA1(9886a973faa639ca9e0ba478790bab20e5163495) )
 ROM_END
 
 ROM_START( pc8201a )
-	ROM_REGION( 0x10000, I8085_TAG, 0 )
-	ROM_LOAD( "pc8201rom.rom", 0x0000, 0x8000, CRC(30555035) SHA1(96f33ff235db3028bf5296052acedbc94437c596) )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
+	ROM_LOAD( "pc8201rom.rom", 0x0000, 0x8000, CRC(3725d32a) SHA1(5b63b520e667b202b27c630cda821beae819e914) )
 ROM_END
 
 ROM_START( npc8300 )
-	ROM_REGION( 0x10000, I8085_TAG, 0 )
-	ROM_LOAD( "831000-438_n83a_basic_1986_microsoft_8716_z01.bin", 0x0000, 0x8000, CRC(a3c15dcb) SHA1(f0322dfe3f2e951de043bf6d0973e6ffc2c87181))
+	ROM_REGION( 0x20000, I8085_TAG, 0 )
+	ROM_LOAD( "831000-438_n83a_basic_1986_microsoft_8716_z01.bin", 0x00000, 0x20000, CRC(1152c931) SHA1(9ee424acc218148506b23c7fe2941fdc339bbae1) )
 ROM_END
 
 ROM_START( trsm100 )
@@ -1595,29 +1804,44 @@ ROM_START( m10 )
 	ROM_LOAD( "m10rom.m12", 0x0000, 0x8000, CRC(f0e8447a) SHA1(d58867276213116a79f7074109b7d7ce02e8a3af) )
 ROM_END
 
+ROM_START( m10us )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
+	ROM_LOAD( "m10na.m12", 0x0000, 0x8000, CRC(80d1c1b7) SHA1(7177baacff5a3192fb15ae10838e1b87a90115a8) )
+ROM_END
+
+ROM_START( modell100 )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
+	ROM_LOAD( "modell100.m12", 0x0000, 0x8000, CRC(028ac87d) SHA1(5d6330c933d72ab1f969faba03bf2aaa7dd0d485) )
+ROM_END
+
 ROM_START( tandy102 )
 	ROM_REGION( 0x8000, I8085_TAG, 0 )
 	ROM_LOAD( "m102rom.m12", 0x0000, 0x8000, CRC(08e9f89c) SHA1(b6ede7735a361c80419f4c9c0e36e7d480c36d11) )
 ROM_END
 
+ROM_START( tandy102uk )
+	ROM_REGION( 0x8000, I8085_TAG, 0 )
+	ROM_LOAD( "m102uk.m12", 0x0000, 0x8000, CRC(20a6dd54) SHA1(cd7ec33e9a3b7ca1b41780c94bab2b334d116176) )
+ROM_END
+
 ROM_START( tandy200 )
 	ROM_REGION( 0x18000, I8085_TAG, 0 )
-	ROM_LOAD( "rom 1-1.m15", 0x00000, 0x8000, NO_DUMP )
-	ROM_LOAD( "rom 1-2.m13", 0x08000, 0x2000, NO_DUMP )
-	ROM_LOAD( "rom 2.m14",   0x10000, 0x8000, NO_DUMP )
-	ROM_LOAD( "t200rom.bin", 0x0000, 0xa000, BAD_DUMP CRC(e3358b38) SHA1(35d4e6a5fb8fc584419f57ec12b423f6021c0991) ) /* Y2K hacked */
-	ROM_CONTINUE(           0x10000, 0x8000 )
+	ROM_LOAD( "rom 1-1.m15", 0x00000, 0x8000, CRC(d0c56acf) SHA1(c644fabed28e659156527cd8acf45835dbb0cb5e) )
+	ROM_LOAD( "rom 1-2.m13", 0x08000, 0x2000, CRC(03a320c2) SHA1(f02a99c57c7bcd75cc31701059d4cc65298f2a7a) )
+	ROM_LOAD( "rom 2.m14",   0x10000, 0x8000, CRC(0a0da302) SHA1(865ce196ff72d6a1677eaa6ef6e6c815d9726f4d) )
 ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT    CLASS           INIT        COMPANY              FULLNAME */
-COMP( 1983, kc85,     0,       0,      kc85,     kc85,    kc85_state,     empty_init, "Kyosei",            "Kyotronic 85 (Japan)", MACHINE_SUPPORTS_SAVE )
-COMP( 1983, m10,      kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10",                 MACHINE_SUPPORTS_SAVE )
-//COMP( 1983, m10m,     kc85,    0,      kc85,     olivm10, kc85_state,     empty_init, "Olivetti",          "M-10 Modem (US)",      MACHINE_SUPPORTS_SAVE )
-COMP( 1983, trsm100,  0,       0,      trsm100,  kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "TRS-80 Model 100",     MACHINE_SUPPORTS_SAVE )
-COMP( 1986, tandy102, trsm100, 0,      tandy102, kc85,    trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102",            MACHINE_SUPPORTS_SAVE )
-COMP( 1983, pc8201,   0,       0,      pc8201,   pc8201,  pc8201_state,   empty_init, "NEC",               "PC-8201 (Japan)",      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1983, pc8201a,  pc8201,  0,      pc8201,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8201A",             MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1987, npc8300,  pc8201,  0,      pc8300,   pc8201a, pc8201_state,   empty_init, "NEC",               "PC-8300",              MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
-COMP( 1984, tandy200, 0,       0,      tandy200, kc85,    tandy200_state, empty_init, "Tandy Radio Shack", "Tandy 200",            MACHINE_SUPPORTS_SAVE )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     CLASS           INIT        COMPANY              FULLNAME */
+COMP( 1983, kc85,     0,       0,      kc85,     kc85,     kc85_state,     empty_init, "Kyosei",            "Kyotronic 85 (Japan)", MACHINE_SUPPORTS_SAVE )
+COMP( 1983, m10,      kc85,    0,      kc85,     olivm10,  kc85_state,     empty_init, "Olivetti",          "M-10 (Europe)",        MACHINE_SUPPORTS_SAVE )
+COMP( 1983, m10us,    kc85,    0,      kc85,     olivm10,  kc85_state,     empty_init, "Olivetti",          "M-10 (US)",            MACHINE_SUPPORTS_SAVE )
+COMP( 1983, trsm100,  0,       0,      trsm100,  kc85,     trsm100_state,  empty_init, "Tandy Radio Shack", "TRS-80 Model 100",     MACHINE_SUPPORTS_SAVE )
+COMP( 198?, modell100, trsm100, 0,     trsm100,  kc85,     trsm100_state,  empty_init, "Televerket",        "Modell 100 (Norway)",  MACHINE_SUPPORTS_SAVE )
+COMP( 1986, tandy102, trsm100, 0,      tandy102, kc85,     trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102 (US)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1986, tandy102uk, trsm100, 0,    tandy102, kc85,     trsm100_state,  empty_init, "Tandy Radio Shack", "Tandy 102 (UK)",       MACHINE_SUPPORTS_SAVE )
+COMP( 1983, pc8201,   0,       0,      pc8201,   pc8201,   pc8201_state,   empty_init, "NEC",               "PC-8201 (Japan)",      MACHINE_SUPPORTS_SAVE )
+COMP( 1983, pc8201a,  pc8201,  0,      pc8201,   pc8201a,  pc8201_state,   empty_init, "NEC",               "PC-8201A",             MACHINE_SUPPORTS_SAVE )
+COMP( 1987, npc8300,  pc8201,  0,      pc8300,   pc8201a,  pc8201_state,   empty_init, "NEC",               "PC-8300",              MACHINE_SUPPORTS_SAVE )
+COMP( 1984, tandy200, 0,       0,      tandy200, tandy200, tandy200_state, empty_init, "Tandy Radio Shack", "Tandy 200",            MACHINE_SUPPORTS_SAVE )

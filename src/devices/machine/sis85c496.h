@@ -36,7 +36,7 @@ public:
 		T &&cpu_tag, int ram_size
 	) : sis85c496_host_device(mconfig, tag, owner, clock)
 	{
-		// Revision 3
+		// Revision 3 (2 on datasheet)
 		set_ids(0x10390496, 0x03, 0x060000, 0x00);
 		//set_multifunction_device(true);
 		set_cpu_tag(std::forward<T>(cpu_tag));
@@ -108,6 +108,7 @@ private:
 	void at_speaker_set_spkrdata(uint8_t data);
 	uint8_t m_channel_check;
 	uint8_t m_nmi_enabled;
+	uint8_t m_port92;
 
 	uint8_t m_pirqrc[4];
 
@@ -118,6 +119,7 @@ private:
 	uint16_t m_shadctrl;
 	uint8_t m_smramctrl;
 	uint16_t m_ide_vesa_ctrl;
+	uint8_t m_pci_keyb_ctrl;
 	u8 m_dram_boundary[8]{};
 
 	void internal_io_map(address_map &map) ATTR_COLD;
@@ -138,6 +140,9 @@ private:
 	void ide_vesa_config_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0) { COMBINE_DATA(&m_ide_vesa_ctrl); logerror("SiS496: %04x to IDE/VESA Bus configuration\n", m_ide_vesa_ctrl); remap_cb(); }
 
 	// southbridge
+	uint8_t port92_r(offs_t offset);
+	void port92_w(offs_t offset, u8 data);
+
 	uint8_t at_page8_r(offs_t offset);
 	void at_page8_w(offs_t offset, uint8_t data);
 	uint8_t at_portb_r();
@@ -189,6 +194,11 @@ private:
 
 	int pin_mapper(int pin);
 	void irq_handler(int line, int state);
+
+	uint8_t ide1_read_cs1_r(offs_t offset);
+	void ide1_write_cs1_w(offs_t offset, uint8_t data);
+	uint8_t ide2_read_cs1_r(offs_t offset);
+	void ide2_write_cs1_w(offs_t offset, uint8_t data);
 };
 
 DECLARE_DEVICE_TYPE(SIS85C496_HOST, sis85c496_host_device)

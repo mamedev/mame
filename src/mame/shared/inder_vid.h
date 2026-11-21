@@ -41,9 +41,11 @@ private:
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
 
 	void mode_w(uint8_t data);
+	void hscroll_w(uint8_t data);
 
 	int m_shiftfull = 0; // this might be a driver specific hack for a TMS bug.
-	bool m_8bpp_mode;
+	bool m_8bpp_mode = false;
+	uint8_t m_hscroll = 0;
 };
 
 #endif // MAME_SHARED_INDER_VID_H

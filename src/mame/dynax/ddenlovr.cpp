@@ -770,6 +770,7 @@ private:
 	uint8_t funkyfig_coin_r();
 	uint8_t funkyfig_key_r();
 	void funkyfig_lockout_w(uint8_t data);
+	IRQ_CALLBACK_MEMBER(mmpanic_acknowledge_irq);
 
 	void mmpanic_update_leds();
 
@@ -787,6 +788,7 @@ private:
 
 	uint16_t m_mmpanic_leds = 0;  // A LED for each of the 9 buttons
 	uint8_t m_funkyfig_lockout = 0;
+	uint8_t m_mmpanic_irq_vector = 0;
 };
 
 class hanakanz_state : public ddenlovr_state
@@ -2747,7 +2749,10 @@ void mmpanic_state::mmpanic_blitter2_w(offs_t offset, uint8_t data)
 void mmpanic_state::mmpanic_blitter_irq(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf);    // Z80 - RST 18
+	{
+		m_mmpanic_irq_vector = 0xdf; // Z80 - RST 18
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 void mmpanic_state::mmpanic_update_leds()
@@ -2893,7 +2898,10 @@ void mmpanic_state::funkyfig_blitter_w(offs_t offset, uint8_t data)
 void mmpanic_state::funkyfig_blitter_irq(int state)
 {
 	if (0) // this vector looks wrong
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xe0);  // Z80
+	{
+		m_mmpanic_irq_vector = 0xe0;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
 void mmpanic_state::funkyfig_rombank_w(uint8_t data)
@@ -9649,6 +9657,7 @@ MACHINE_START_MEMBER(mmpanic_state,mmpanic)
 	membank("bank1")->configure_entries(0, 8, &rom[0x10000], 0x8000);
 
 	save_item(NAME(m_mmpanic_leds));
+	save_item(NAME(m_mmpanic_irq_vector));
 
 	MACHINE_START_CALL_MEMBER(ddenlovr);
 }
@@ -9669,6 +9678,7 @@ MACHINE_RESET_MEMBER(mmpanic_state,mmpanic)
 {
 	m_mmpanic_leds = 0;
 	m_funkyfig_lockout = 0;
+	m_mmpanic_irq_vector = 0;
 
 	MACHINE_RESET_CALL_MEMBER(ddenlovr);
 }
@@ -9943,7 +9953,8 @@ void mmpanic_state::mmpanic_irq(int state)
 	//if (downcast<cpu_device *>(m_maincpu)->input_line_state(0))
 	//  return;
 
-	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf); // Z80 - RST 08, vblank
+	m_mmpanic_irq_vector = 0xcf; // Z80 - RST 08, vblank
+	m_maincpu->set_input_line(0, HOLD_LINE);
 	m_soundcpu->set_input_line(0, HOLD_LINE);   // Z80 - NMI by main cpu
 }
 
@@ -9951,7 +9962,15 @@ void mmpanic_state::mmpanic_irq(int state)
 void mmpanic_state::mmpanic_rtc_irq(int state)
 {
 	if (state)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xdf); // Z80 - RST 18, clock
+	{
+		m_mmpanic_irq_vector = 0xdf; // Z80 - RST 18, clock
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
+
+IRQ_CALLBACK_MEMBER(mmpanic_state::mmpanic_acknowledge_irq)
+{
+	return m_mmpanic_irq_vector;
 }
 
 void mmpanic_state::mmpanic(machine_config &config)
@@ -9960,6 +9979,7 @@ void mmpanic_state::mmpanic(machine_config &config)
 	Z80(config, m_maincpu, 16_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_map);
 	m_maincpu->set_addrmap(AS_IO, &mmpanic_state::mmpanic_portmap);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(mmpanic_state::mmpanic_acknowledge_irq));
 
 	Z80(config, m_soundcpu, 14.318181_MHz_XTAL / 4);
 	m_soundcpu->set_addrmap(AS_PROGRAM, &mmpanic_state::mmpanic_sound_map);
@@ -13416,6 +13436,56 @@ ROM_START( mjkokryu )
 	ROM_LOAD( "nvram", 0x0000, 0x8000,CRC(c2590a33) SHA1(1af61af7200fa84cc96131fb83c9f44aea4c3d01) )
 ROM_END
 
+ROM_START( mjstama ) // 麻雀 戦国魂
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "r0422-4.6e", 0x00000, 0x80000, CRC(2f5cc188) SHA1(9b67cb089c23836fcbcbf436d1fe2fbb070ef71f) )
+
+	ROM_REGION( 0x800000, "blitter", 0 )
+	ROM_LOAD( "t0423.7b",  0x000000, 0x200000, CRC(cf69b2d8) SHA1(445ca25be036ed50e14c2f034e23649dc8a8c207) )
+	ROM_LOAD( "t0424.8b",  0x200000, 0x200000, CRC(3f7767b8) SHA1(9d31c08b64b644f09af80f24d1c72963a712bb65) )
+	ROM_LOAD( "t0425.9b",  0x400000, 0x200000, CRC(d3042be3) SHA1(7d3de0e08d10554136737738323eb170d81e9d93) )
+	ROM_LOAD( "t0426.11b", 0x600000, 0x200000, CRC(1fb03f69) SHA1(652ada2bb4ad271a6acaae2c510703ffb3437b4a) )
+
+	ROM_REGION( 0x80000, "oki", 0 )  // samples
+	ROM_LOAD( "t0421.2b", 0x00000, 0x80000, CRC(f45457c4) SHA1(fab8911032809fcf506f4a9a63fc4193c53c7e1d) )
+
+	ROM_REGION( 0x8000, "nvram", 0 ) // pre-initialized with 36 months to next inspection (0 by default, so it wouldn't boot past test mode)
+	ROM_LOAD( "nvram", 0x0000, 0x8000,CRC(7629be5e) SHA1(bacd550a929a9693d2e9c20f7b30ec11a999c6b3) )
+ROM_END
+
+ROM_START( mjrking ) // 麻雀 連荘王, DIP sheets are available
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "r0452.6e", 0x00000, 0x80000, CRC(5f277dce) SHA1(a9636dead804bdb368745dc7ff272ccbcba82590) )
+
+	ROM_REGION( 0x800000, "blitter", 0 )
+	ROM_LOAD( "t0453.7b",  0x000000, 0x200000, CRC(4dd061b1) SHA1(82585bf4937c62018dbb7b77c1b8a2e1605a0780) )
+	ROM_LOAD( "t0454.8b",  0x200000, 0x200000, CRC(61ceb5ca) SHA1(dcc34c79a851debb2acfcbba01a18f901e4f8018) )
+	ROM_LOAD( "t0455.9b",  0x400000, 0x200000, CRC(6703e168) SHA1(e81be0bf5ddb25df341fadc88264f70022a1287a) )
+	ROM_LOAD( "t0456.11b", 0x600000, 0x200000, CRC(e5e22a35) SHA1(072d4b25937023c61ff1b2395734ceb893977295) )
+
+	ROM_REGION( 0x100000, "oki", 0 )  // samples
+	ROM_LOAD( "t0451.2b", 0x000000, 0x100000, CRC(9462e258) SHA1(79cf4264fa09075c9c6fed5632f8ee79614e7186) )
+
+	ROM_REGION( 0x8000, "nvram", 0 ) // pre-initialized with 36 months to next inspection (0 by default, so it wouldn't boot past test mode)
+	ROM_LOAD( "nvram", 0x0000, 0x8000,CRC(f1407f10) SHA1(8cdf30694a61f547a630c44ffbc2043e53f646dd) )
+ROM_END
+
+ROM_START( mjrkingl ) // 麻雀 連荘王 Light Version
+	ROM_REGION( 0x80000, "maincpu", 0 )  // Z80 Code
+	ROM_LOAD( "r0462.6e", 0x00000, 0x80000, CRC(8be23836) SHA1(b54409202eecd7439363ac41986daa0bc15799f3) )
+
+	ROM_REGION( 0x800000, "blitter", 0 )
+	ROM_LOAD( "t0463.7b",  0x000000, 0x200000, CRC(6c334358) SHA1(f67373edb7b8792b116dfcc48f17df94c7f2f5ae) )
+	ROM_LOAD( "t0464.8b",  0x200000, 0x200000, CRC(b8e2108b) SHA1(84d01e18f55e0fe848ac572dee650ebb2dd40a76) )
+	ROM_LOAD( "t0465.9b",  0x400000, 0x200000, CRC(c2886409) SHA1(36d11316ba52fe9a60021199cb082277d8ae150e) )
+	ROM_LOAD( "t0466.11b", 0x600000, 0x200000, CRC(4b772985) SHA1(d889625b4fcde619d74706bb097d3b3293c5404f) )
+
+	ROM_REGION( 0x100000, "oki", 0 )  // samples
+	ROM_LOAD( "t0461.2b", 0x000000, 0x100000, CRC(9462e258) SHA1(79cf4264fa09075c9c6fed5632f8ee79614e7186) ) // same as mjrking
+
+	ROM_REGION( 0x8000, "nvram", 0 ) // pre-initialized with 36 months to next inspection (0 by default, so it wouldn't boot past test mode)
+	ROM_LOAD( "nvram", 0x0000, 0x8000,CRC(0a192d86) SHA1(0f888a0b0f84984a42552c9f85f6f819e4f1d259) )
+ROM_END
 
 /***************************************************************************
 
@@ -13841,3 +13911,9 @@ GAME( 2004, momotaro,    0,        momotaro,  daimyojn,   hanakanz_state, empty_
 GAME( 2007, mjnigiri,    0,        mjnigiri,  mjnigiri,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Nigiri Itcho!! (Japan, T038-PB-002)",                    MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 GAME( 2008, mjkokryu,    0,        momotaro,  mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Kokuryu (Japan, T040-RB-03)",                            MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
+GAME( 2009, mjstama,     0,        momotaro,  mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Sengoku Tamashii (Japan, T042-RB-04)",                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
+GAME( 2011, mjrking,     0,        momotaro,  mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Renchan King (Japan, T045-RB-01)",                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+
+GAME( 2012, mjrkingl,    0,        momotaro,  mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Renchan King Light Version (Japan, T046-RB-01)",         MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

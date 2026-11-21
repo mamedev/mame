@@ -57,7 +57,6 @@ void mk3835_device::device_start()
 	save_item(NAME(m_command_received));
 	save_item(NAME(m_burst));
 	save_item(NAME(m_transfer_done));
-	save_item(NAME(m_register));
 	save_item(NAME(m_time_initialized));
 }
 

@@ -777,7 +777,7 @@ private:
 	uint32_t op5D();
 	uint32_t op59();
 	[[noreturn]] uint32_t opUNHANDLED();
-	void v60_do_irq(int vector);
+	void v60_do_irq(int line, int vector);
 	void v60_try_irq();
 };
 

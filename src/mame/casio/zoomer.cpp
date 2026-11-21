@@ -107,6 +107,7 @@ private:
 	void irq_ack_w(offs_t offset, u8 data);
 
 	void update_irq();
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	u16 pen_x_scaled();
 	u16 pen_y_scaled();
@@ -136,6 +137,7 @@ private:
 	u16 m_timer_rate[3];
 
 	u16 m_irq_status;
+	u8 m_irq_vector;
 	u16 m_pending_irq;
 
 	u16 m_bank_2000_num[4];
@@ -289,6 +291,7 @@ INPUT_PORTS_END
 void zoomer_state::machine_start()
 {
 	m_irq_status = 0;
+	m_irq_vector = 0;
 	m_pending_irq = 0;
 
 	std::fill(std::begin(m_timer_rate), std::end(m_timer_rate), 0);
@@ -308,6 +311,7 @@ void zoomer_state::machine_start()
 
 	save_item(NAME(m_power));
 	save_item(NAME(m_irq_status));
+	save_item(NAME(m_irq_vector));
 	save_item(NAME(m_pending_irq));
 	save_item(NAME(m_timer_rate));
 	save_item(NAME(m_bank_2000_num));
@@ -525,7 +529,7 @@ void zoomer_state::update_irq()
 	if (m_pending_irq) return;
 
 	int state = CLEAR_LINE;
-	int vector = 0;
+	u8 vector = 0;
 
 	for (int i = 0; i < 14; i++)
 	{
@@ -538,7 +542,16 @@ void zoomer_state::update_irq()
 		}
 	}
 
-	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, vector);
+	if (state == ASSERT_LINE)
+	{
+		m_irq_vector = vector;
+	}
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
+}
+
+IRQ_CALLBACK_MEMBER(zoomer_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 //**************************************************************************
@@ -645,6 +658,7 @@ void zoomer_state::zoomer(machine_config &config)
 	V20(config, m_maincpu, 7.3728_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &zoomer_state::maincpu_map);
 	m_maincpu->set_addrmap(AS_IO, &zoomer_state::maincpu_io_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(zoomer_state::cpu_acknowledge_irq));
 
 	for (int i = 0; i < 4; i++)
 		ADDRESS_MAP_BANK(config, m_bank_2000[i]).set_map(&zoomer_state::maincpu_ems_map).set_options(ENDIANNESS_LITTLE, 8, 25, 0x10000);

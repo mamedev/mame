@@ -30,6 +30,7 @@ static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 
 
 device_rtc_interface::device_rtc_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "rtc")
+	, m_register{ }
 	, m_use_utc(false)
 {
 }
@@ -41,6 +42,17 @@ device_rtc_interface::device_rtc_interface(const machine_config &mconfig, device
 
 device_rtc_interface::~device_rtc_interface()
 {
+}
+
+
+//-------------------------------------------------
+//  interface_post_start - register calendar state
+//-------------------------------------------------
+
+void device_rtc_interface::interface_post_start()
+{
+	// Use a separate namespace from devices that have their own m_register.
+	device().machine().save().save_item(&device(), "rtc", device().tag(), 0, NAME(m_register));
 }
 
 
@@ -199,7 +211,7 @@ void device_rtc_interface::advance_days()
 
 	if (m_register[RTC_MONTH] > 0 && m_register[RTC_DAY] > DAYS_PER_MONTH[m_register[RTC_MONTH] - 1])
 	{
-		if (m_register[RTC_MONTH] != 2 || m_register[RTC_DAY] != 29 || !rtc_feature_leap_year() || !(m_register[RTC_YEAR] % 4))
+		if (m_register[RTC_MONTH] != 2 || m_register[RTC_DAY] != 29 || !rtc_feature_leap_year() || (m_register[RTC_YEAR] % 4))
 		{
 			m_register[RTC_DAY] = 1;
 			m_register[RTC_MONTH]++;

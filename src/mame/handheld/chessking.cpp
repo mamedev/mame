@@ -91,6 +91,7 @@ private:
 	void beeper_enable_w(uint8_t data);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void irq_clear_w(uint8_t data);
 	void unk_1f_w(uint8_t data);
 	void unk_2f_w(uint8_t data);
@@ -211,7 +212,12 @@ void chessking_state::cart_bank_w(uint8_t data)
 
 INTERRUPT_GEN_MEMBER(chessking_state::interrupt)
 {
-	device.execute().set_input_line_and_vector(0, ASSERT_LINE, 0x20/4);
+	device.execute().set_input_line(0, ASSERT_LINE);
+}
+
+IRQ_CALLBACK_MEMBER(chessking_state::cpu_acknowledge_irq)
+{
+	return 0x20/4;
 }
 
 void chessking_state::irq_clear_w(uint8_t data)
@@ -320,6 +326,7 @@ void chessking_state::chesskng(machine_config &config)
 
 	attotime irq_freq = attotime::from_hz(9.6_MHz_XTAL / 0x10000); // gives approximate seconds on timer
 	m_maincpu->set_periodic_int(FUNC(chessking_state::interrupt), irq_freq);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(chessking_state::cpu_acknowledge_irq));
 
 	NVRAM(config, "mainram", nvram_device::DEFAULT_ALL_0);
 

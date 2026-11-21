@@ -1719,7 +1719,7 @@ Weapon bar goes under some playfield elements during gameplay, on stage 1 pick a
 	<software name="btlchess" supported="yes">
 		<description>Battle Chess</description>
 		<year>1989</year>
-		<publisher>パックインビデオ (Pack-in Video)</publisher>
+		<publisher>パックインビデオ (Pack-in-Video)</publisher>
 		<info name="alt_title" value="バトルチェス" />
 		<info name="release" value="19891210" />
 		<part name="flop1" interface="floppy_5_25">
@@ -7675,7 +7675,7 @@ Sometimes turning doesn't work (verify)
 	<software name="billiard">
 		<description>Jissen Billiards</description>
 		<year>1990</year>
-		<publisher>パックインビデオ (Pack-in Video)</publisher>
+		<publisher>パックインビデオ (Pack-in-Video)</publisher>
 		<info name="alt_title" value="実戦ビリヤード" />
 		<info name="release" value="19900621" />
 		<part name="flop1" interface="floppy_5_25">

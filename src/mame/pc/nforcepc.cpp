@@ -79,11 +79,6 @@ void crush11_host_device::config_map(address_map &map)
 	map(0xf0, 0xf0).rw(FUNC(crush11_host_device::unknown_r), FUNC(crush11_host_device::unknown_w));
 }
 
-uint8_t crush11_host_device::header_type_r()
-{
-	return 0x80; // from lspci dump
-}
-
 crush11_host_device::crush11_host_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, CRUSH11, tag, owner, clock)
 	, cpu(*this, finder_base::DUMMY_TAG)

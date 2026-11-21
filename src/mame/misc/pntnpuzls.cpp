@@ -43,17 +43,18 @@ RGB O/P connector
 #include "bus/rs232/rs232.h"
 #include "cpu/i86/i286.h"
 #include "machine/ins8250.h"
+#include "machine/microtch.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/microtch.h"
+#include "sound/dac.h"
 #include "video/mc6845.h"
 #include "video/ramdac.h"
-#include "sound/dac.h"
 
 #include "screen.h"
 #include "speaker.h"
 
 #include "pntnpuzls.lh"
+
 
 namespace {
 
@@ -75,6 +76,10 @@ public:
 
 	void pntnpuzls(machine_config &config) ATTR_COLD;
 
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
+
 private:
 	required_device<cpu_device> m_maincpu;
 	required_memory_region m_font;
@@ -86,8 +91,7 @@ private:
 	required_device<dac_8bit_r2r_device> m_dac;
 	required_ioport_array<3> m_in;
 
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
+	bool m_nmi_enable;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -96,7 +100,6 @@ private:
 	void ramdac_map(address_map &map) ATTR_COLD;
 
 	void nmi_cb(int s) { if(m_nmi_enable) m_maincpu->set_input_line(INPUT_LINE_NMI, s); }
-	bool m_nmi_enable;
 };
 
 
@@ -161,14 +164,14 @@ void pntnpuzls_state::io_map(address_map &map)
 
 	map(0x0310, 0x0310).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x0312, 0x0312).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
-	map(0x0314, 0x0317).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x0314, 0x0317).umask16(0x00ff).rw("pic", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 
-	map(0x0320, 0x0320).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x0322, 0x0322).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x0324, 0x0324).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x0328, 0x032f).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask16(0x00ff);
+	map(0x0320, 0x0320).w(m_ramdac, FUNC(ramdac_device::index_w));
+	map(0x0322, 0x0322).w(m_ramdac, FUNC(ramdac_device::pal_w));
+	map(0x0324, 0x0324).w(m_ramdac, FUNC(ramdac_device::mask_w));
+	map(0x0328, 0x032f).umask16(0x00ff).rw("pit", FUNC(pit8254_device::read), FUNC(pit8254_device::write));
 
-	map(0x0340, 0x034f).rw("uart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w)).umask16(0x00ff);
+	map(0x0340, 0x034f).umask16(0x00ff).rw("uart", FUNC(ins8250_device::ins8250_r), FUNC(ins8250_device::ins8250_w));
 }
 
 // no DIP switches on PCB

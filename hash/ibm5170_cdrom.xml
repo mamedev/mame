@@ -4051,10 +4051,14 @@ https://mametesters.org/view.php?id=9334
 	</software>
 
 	<!-- https://redump.info/disc/114360/ -->
-	<software name="fulltilt">
+	<software name="fulltilt" supported="partial">
 		<description>Full Tilt! Pinball (version 1.1)</description>
 		<year>1996</year>
 		<publisher>Maxis</publisher>
+		<notes><![CDATA[
+[pc_joy] right trigger doesn't work regardless of where it's mapped.
+A ct486 win95 CD install went "C:" prompt failure after rebooting (retest, verify)
+]]></notes>
 		<info name="developer" value="Cinematronics" />
 		<info name="release" value="19960319" />
 		<info name="required_os" value="Windows 3.1/95" />
@@ -4987,11 +4991,15 @@ Untested multiplayer options
 		</part>
 	</software>
 
+	<!-- TODO: move this either near Duke Nukem 3D or in Collection section -->
 	<software name="killaton">
 		<description>Duke Nukem 3D: Kill-A-Ton Collection</description>
 		<year>1997</year>
 		<publisher>GT Interactive</publisher>
-		<info name="developer" value="3D Realms / Game Wizards / Sunstorm Interactive" />
+		<!-- TODO: acknowledge who developed what thru parenthesis notes -->
+		<info name="developer" value="3D Realms" />
+		<info name="developer" value="Game Wizards" />
+		<info name="developer" value="Sunstorm Interactive" />
 		<info name="language" value="English" />
 		<part name="cdrom1" interface="cdrom">
 			<feature name="part_id" value="Duke Nukem 1 / Duke Nukem 2 / Duke Nukem 3D / Plutonium Pak / Level Editor" />
@@ -5966,7 +5974,7 @@ https://www.pcgamingwiki.com/wiki/Primal_Rage
 		<publisher>GT Interactive</publisher>
 		<notes><![CDATA[
 Untested multiplayer options
-Looks too dark on s3_764 (verify)
+Looks too dark, needs bumped brightness (verify)
 ]]></notes>
 		<info name="developer" value="id Software" />
 		<info name="language" value="English" />
@@ -8315,6 +8323,29 @@ Ends with “Workspace Manager Error” and cannot login.
 			<dataarea name="flop" size="1474560">
 				<rom name="rhapsody dr1 device drivers.img" size="1474560" crc="b174ae3d" sha1="b80fb03e131bb22ba10d8bd38af00be31b2bb593" />
 			</dataarea>
+		</part>
+	</software>
+
+	<software name="theos50182" supported="no">
+		<description>THEOS Corona Operating System Release 6 PL 50182</description>
+		<year>2008</year>
+		<publisher>THEOS Software Corporation</publisher>
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corona50182" sha1="bcd996cae4dba7e9158277fe3f506612ba2b26cd" />
+			</diskarea>
+		</part>
+	</software>
+
+	<software name="theos50209" supported="no">
+		<description>THEOS Corona Operating System PL 50209 (Beta)</description>
+		<year>2013</year>
+		<publisher>THEOS Software Corporation</publisher>
+		<info name="usage" value="Attach eeprom_dongle to the LPT port and use BCPP-M962-PPH2-MMMM-VSMM-MM as code" />
+		<part name="cdrom" interface="cdrom">
+			<diskarea name="cdrom">
+				<disk name="corona50209" sha1="28aca5192d0ff37587a76c0f9b9ab5c44177a117" />
+			</diskarea>
 		</part>
 	</software>
 

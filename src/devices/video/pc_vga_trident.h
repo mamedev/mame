@@ -56,13 +56,12 @@ protected:
 	u8 svga_bank_read_r(offs_t offset);
 	void svga_bank_read_w(offs_t offset, u8 data);
 
-
 	virtual void crtc_map(address_map &map) override ATTR_COLD;
 	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 	virtual void gc_map(address_map &map) override ATTR_COLD;
 
 	virtual void recompute_params() override;
-
+	//virtual uint32_t latch_start_addr() override;
 
 	// TODO: remove this leaky abstraction
 	struct

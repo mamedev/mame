@@ -428,7 +428,12 @@ void via6522_device::device_reset()
 	m_pcr = 0;
 	m_acr = 0;
 	m_ier = 0;
-	m_ifr = 0;
+	// reset clears IFR and IER and disables interrupting from the chip (SY6522
+	// data sheet, RES pin; W65C22S data sheet 3.9): keep only INT_ANY, so that
+	// output_irq() releases /IRQ if it was asserted
+	m_ifr &= INT_ANY;
+	output_irq();
+
 	m_t1_active = 0;
 	m_t1_pb7 = 1;
 	m_t2_active = 0;
@@ -647,7 +652,9 @@ TIMER_CALLBACK_MEMBER(via6522_device::t1_tick)
 	// PB7 toggles on timeout in one-shot mode too, only while PB7 output is enabled
 	if (T1_CONTINUOUS(m_acr))
 	{
-		if (TIMER1_VALUE > 0 && T1_SET_PB7(m_acr))
+		// A latch of 0 still toggles PB7, every 2 cycles. The Ensoniq Mirage
+		// relies on this to generate its MIDI clock.
+		if (T1_SET_PB7(m_acr))
 			m_t1_pb7 = !m_t1_pb7;
 		m_t1->adjust(clocks_to_attotime(TIMER1_VALUE + 2));
 	}

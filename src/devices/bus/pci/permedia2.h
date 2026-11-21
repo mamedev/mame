@@ -45,8 +45,25 @@ private:
 	void control_map(address_map &map) ATTR_COLD;
 	void aperture1_map(address_map &map) ATTR_COLD;
 	void aperture2_map(address_map &map) ATTR_COLD;
+
+	void subvendor_w(offs_t offset, u32 data, u32 mem_mask);
+
+	u32 m_subsystem_logger_mask;
 };
 
-DECLARE_DEVICE_TYPE(PERMEDIA2, permedia2_device)
+DECLARE_DEVICE_TYPE(PERMEDIA2,  permedia2_device)
+
+class permedia2v_device : public permedia2_device
+{
+public:
+	permedia2v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	static auto parent_rom_device_type() { return &PERMEDIA2; }
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override;
+};
+
+DECLARE_DEVICE_TYPE(PERMEDIA2V, permedia2v_device)
 
 #endif // MAME_BUS_PCI_PERMEDIA2_H

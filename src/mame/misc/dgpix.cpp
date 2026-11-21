@@ -26,6 +26,13 @@ The following additional games are also known to be undumped
  Original bugs:
  - In King of Dynast Gear, Roger's fast attack shows some blank lines
    in the sword "shadow" if you do it in the left direction
+ - Elfin and The X-Files read eight bytes from 0xf0c8b440-0xf0c8b447
+   whenever they convert a 256x256 picture to 15-bit colour.  The BIOS
+   library holds an eight byte ordered dither table (f0 c8 b4 40 fa a4 d0
+   e8); two hand written routines load its first four bytes and use them
+   as a pointer instead of indexing the table.  Only the rounding of each
+   colour component depends on the result.  What the hardware returns at
+   that address is not known.
 
  Info about the cpu inside KS0164 sound chip:
  - "The 16-bit CPU core was Sequoia's design and was licensed to Samsung.
@@ -40,7 +47,7 @@ The following additional games are also known to be undumped
     - added Fishing Maniac 3
 
  - Pierpaolo Prazzoli 2006.01.16
-   - added King of Dynast Gear (protection patched by Tomasz)
+   - added King of Dynast Gear
    - fixed frame buffer drawing
    - fixed flash roms reading
    - added game settings writing to flash roms
@@ -51,9 +58,6 @@ The following additional games are also known to be undumped
 
  - TS 2005.02.06
    Preliminary emulation of X-Files. VRender0- is probably just framebuffer.
-   Patch in DRIVER_INIT removes call at RAM adr $8f30 - protection ?
-   (without fix, game freezes at one of startup screens - like on real
-   board  with  protection PIC removed)
 
 *********************************************************************
 
@@ -169,8 +173,142 @@ Notes:
 
 #include "endianness.h"
 
+#include <iterator>
+
 
 namespace {
+
+/*
+  Security module (U100, marked 'dgPIX-PR1') - simulated
+
+  The BIOS library linked into every game treats U100 as an ISO 7816 style
+  smart card reached through a parallel, nibble-wide handshake port:
+
+    I/O 0x080 (r)   bit 0 = module ready, bit 1 = byte available
+    I/O 0x180 (r/w) data bits 0-3
+    I/O 0x200 (r/w) data bits 4-7
+    I/O 0x280 (w)   transfer direction (0 = module to host, 1 = host to module)
+    I/O 0x300 (w)   reset, active low
+
+  At start-up every game pulses reset once and reads an 18 byte answer to
+  reset (TS, T0, TB1 and 15 historical bytes), keeping the first 13 bytes.
+  Nothing talks to the module after that.  What is done with the stored
+  bytes depends on the game:
+
+  - The X-Files, Jump Jump, Let's Dance, Beat Player 2000: a BIOS kernel
+    thread compares them with a scrambled copy held in the program's data
+    every 10ms, and ends the program on a mismatch.  The same thread is the
+    only place the coin inputs are read.
+  - King of Dynast Gear: as above, and the game also stops with "Reset
+    request!!!" after a mismatch, or with "Coin timer error!!!" if that
+    thread is found not to be running.
+  - Elfin, Fishing Maniac 2+, Fishing Maniac 3: the bytes are stored but
+    never looked at (the Fishing Maniac boards have no U100 fitted and the
+    read simply times out).
+
+  The library also contains a complete command set (select file, read/
+  update binary, get challenge, external authenticate...) and a card
+  personalisation routine, but no dumped game references any of it, so
+  only the answer to reset is simulated and nothing is ever sent to the
+  module.  The answer was recovered from the scrambled copy the programs
+  hold, which also has the five bytes they don't check.  Boards without
+  the module fitted leave its ports unmapped.
+*/
+
+class dgpix_pr1_device : public device_t
+{
+public:
+	dgpix_pr1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
+
+	u8 status_r();
+	u8 data_lo_r();
+	u8 data_hi_r();
+	void dir_w(u8 data);
+	void reset_w(u8 data);
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+private:
+	// answer to reset: TS, T0 (TB1 present, 15 historical bytes), TB1, historical bytes
+	static constexpr u8 ATR[18] = { 0x3b, 0x2f, 0x00, 0x6a, 'S', 'C', 'O', 'S', 'L', 'I', 'G', 'H', 'T', 'd', 'g', 'P', 'I', 'X' };
+
+	bool m_reset;
+	u8 m_tx_pos;
+};
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(DGPIX_PR1, dgpix_pr1_device, dgpix_pr1_device, "dgpix_pr1", "dgPIX-PR1 security module (HLE)")
+
+namespace {
+
+dgpix_pr1_device::dgpix_pr1_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, DGPIX_PR1, tag, owner, clock)
+{
+}
+
+void dgpix_pr1_device::device_start()
+{
+	save_item(NAME(m_reset));
+	save_item(NAME(m_tx_pos));
+}
+
+void dgpix_pr1_device::device_reset()
+{
+	m_reset = true;
+	m_tx_pos = std::size(ATR);
+}
+
+u8 dgpix_pr1_device::status_r()
+{
+	u8 data = 0;
+
+	if (m_reset)
+	{
+		data |= 1;
+		if (m_tx_pos < std::size(ATR))
+			data |= 2;
+	}
+
+	return data;
+}
+
+u8 dgpix_pr1_device::data_lo_r()
+{
+	return (m_tx_pos < std::size(ATR)) ? (ATR[m_tx_pos] & 0x0f) : 0;
+}
+
+u8 dgpix_pr1_device::data_hi_r()
+{
+	if (m_tx_pos >= std::size(ATR))
+		return 0;
+
+	// the program reads the high nibble last, so step to the next byte here
+	const u8 data = ATR[m_tx_pos] >> 4;
+	if (!machine().side_effects_disabled())
+		m_tx_pos++;
+
+	return data;
+}
+
+void dgpix_pr1_device::dir_w(u8 data)
+{
+	if (BIT(data, 0))
+		logerror("%s: set to receive, not simulated\n", machine().describe_context());
+}
+
+void dgpix_pr1_device::reset_w(u8 data)
+{
+	// the answer to reset is sent when reset is released
+	if (!m_reset && BIT(data, 0))
+		m_tx_pos = 0;
+
+	m_reset = BIT(data, 0);
+}
+
 
 class dgpix_state : public driver_device
 {
@@ -180,6 +318,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "ks0164"),
 		m_flash(*this, "flash%u", 0),
+		m_secmod(*this, "secmod"),
 		m_vblank(*this, "VBLANK")
 	{ }
 
@@ -191,6 +330,7 @@ protected:
 	void dgpix_base(machine_config &config);
 
 	void base_map(address_map &map) ATTR_COLD;
+	void secmod_io_map(address_map &map) ATTR_COLD;
 
 	u16 flash_r(offs_t offset);
 	void flash_w(offs_t offset, u16 data, u16 mem_mask = ~0);
@@ -198,6 +338,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ks0164_device> m_sound;
 	optional_device_array<intel_28f320j5_device, 8> m_flash; // up to 8 but not all populated
+	optional_device<dgpix_pr1_device> m_secmod; // U100, not fitted on every board
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -231,14 +372,7 @@ public:
 
 	void dgpix(machine_config &config);
 	void dgpix_kdynastg(machine_config &config);
-
-	void init_elfin();
-	void init_jumpjump();
-	void init_xfiles();
-	void init_xfilesk();
-	void init_kdynastg();
-	void init_fmaniac2p();
-	void init_fmaniac3();
+	void dgpix_secmod(machine_config &config) ATTR_COLD;
 
 private:
 	void mem_map(address_map &map) ATTR_COLD;
@@ -254,9 +388,6 @@ public:
 	{ }
 
 	void dgpix(machine_config &config);
-
-	void init_letsdnce();
-	void init_btplay2k();
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -371,13 +502,24 @@ void dgpix_bmkey_state::mem_map(address_map &map)
 
 void dgpix_state::io_map(address_map &map)
 {
-	map(0x0080, 0x0080).nopr(); // used to sync with the protecion PIC? tested bits 0 and 1
+	map(0x0080, 0x0080).nopr(); // U100 status, reads as 0 where the module is not fitted
 	map(0x0080, 0x0080).w(FUNC(dgpix_state::coin_w));
 	map(0x0100, 0x0100).rw(FUNC(dgpix_state::vblank_r), FUNC(dgpix_state::vbuffer_w));
 	map(0x0284, 0x0284).portr("INPUTS");
-	map(0x0300, 0x0300).nopw(); // writes only: 1, 0, 1 at startup
+	map(0x0300, 0x0300).nopw(); // U100 reset
 	map(0x0320, 0x0320).umask32(0x000000ff).rw(m_sound, FUNC(ks0164_device::mpu401_data_r), FUNC(ks0164_device::mpu401_data_w));
 	map(0x0321, 0x0321).umask32(0x000000ff).rw(m_sound, FUNC(ks0164_device::mpu401_status_r), FUNC(ks0164_device::mpu401_ctrl_w));
+}
+
+void dgpix_state::secmod_io_map(address_map &map)
+{
+	io_map(map);
+
+	map(0x0080, 0x0080).umask32(0x000000ff).r(m_secmod, FUNC(dgpix_pr1_device::status_r));
+	map(0x0180, 0x0180).umask32(0x000000ff).r(m_secmod, FUNC(dgpix_pr1_device::data_lo_r));
+	map(0x0200, 0x0200).umask32(0x000000ff).r(m_secmod, FUNC(dgpix_pr1_device::data_hi_r));
+	map(0x0280, 0x0280).umask32(0x000000ff).w(m_secmod, FUNC(dgpix_pr1_device::dir_w));
+	map(0x0300, 0x0300).umask32(0x000000ff).w(m_secmod, FUNC(dgpix_pr1_device::reset_w));
 }
 
 static INPUT_PORTS_START( dgpix )
@@ -526,9 +668,17 @@ void dgpix_typea_state::dgpix(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &dgpix_typea_state::mem_map);
 }
 
-void dgpix_typea_state::dgpix_kdynastg(machine_config &config)
+void dgpix_typea_state::dgpix_secmod(machine_config &config)
 {
 	dgpix(config);
+	m_maincpu->set_addrmap(AS_IO, &dgpix_typea_state::secmod_io_map);
+
+	DGPIX_PR1(config, m_secmod);
+}
+
+void dgpix_typea_state::dgpix_kdynastg(machine_config &config)
+{
+	dgpix_secmod(config);
 
 	INTEL_28F320J5(config, m_flash[4]);
 	INTEL_28F320J5(config, m_flash[5]);
@@ -538,6 +688,9 @@ void dgpix_bmkey_state::dgpix(machine_config &config)
 {
 	dgpix_base(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dgpix_bmkey_state::mem_map);
+	m_maincpu->set_addrmap(AS_IO, &dgpix_bmkey_state::secmod_io_map);
+
+	DGPIX_PR1(config, m_secmod);
 }
 
 
@@ -866,115 +1019,15 @@ ROM_START( fmaniac3 )
 	// not present
 ROM_END
 
-void dgpix_typea_state::init_elfin()
-{
-	u8 *rom = memregion("flash7")->base();
-
-	// HACK: patch around undumped/unemulated PIC microcontroller
-	rom[BYTE4_XOR_LE(0x3a9e94)] = 0;
-	rom[BYTE4_XOR_LE(0x3a9e95)] = 3;
-	rom[BYTE4_XOR_LE(0x3a9e96)] = 0;
-	rom[BYTE4_XOR_LE(0x3a9e97)] = 3;
-	rom[BYTE4_XOR_LE(0x3a9e98)] = 0;
-	rom[BYTE4_XOR_LE(0x3a9e99)] = 3;
-}
-
-void dgpix_typea_state::init_jumpjump()
-{
-	u8 *rom = memregion("flash7")->base();
-
-	// HACK: patch around undumped/unemulated PIC microcontroller
-	rom[BYTE4_XOR_LE(0x3a829a)] = 0;
-	rom[BYTE4_XOR_LE(0x3a829b)] = 3;
-	rom[BYTE4_XOR_LE(0x3a829c)] = 0;
-	rom[BYTE4_XOR_LE(0x3a829d)] = 3;
-	rom[BYTE4_XOR_LE(0x3a829e)] = 0;
-	rom[BYTE4_XOR_LE(0x3a829f)] = 3;
-}
-
-void dgpix_typea_state::init_xfiles()
-{
-	u8 *rom = memregion("flash7")->base();
-
-	// HACK: patch around undumped/unemulated PIC microcontroller
-	rom[BYTE4_XOR_LE(0x3a9a2a)] = 0;
-	rom[BYTE4_XOR_LE(0x3a9a2b)] = 3;
-	rom[BYTE4_XOR_LE(0x3a9a2c)] = 0;
-	rom[BYTE4_XOR_LE(0x3a9a2d)] = 3;
-	rom[BYTE4_XOR_LE(0x3a9a2e)] = 0;
-	rom[BYTE4_XOR_LE(0x3a9a2f)] = 3;
-}
-
-void dgpix_typea_state::init_xfilesk()
-{
-	u8 *rom = memregion("flash7")->base();
-
-	// HACK: patch around undumped/unemulated PIC microcontroller
-	rom[BYTE4_XOR_LE(0x3aa92e)] = 0;
-	rom[BYTE4_XOR_LE(0x3aa92f)] = 3;
-	rom[BYTE4_XOR_LE(0x3aa930)] = 0;
-	rom[BYTE4_XOR_LE(0x3aa931)] = 3;
-	rom[BYTE4_XOR_LE(0x3aa932)] = 0;
-	rom[BYTE4_XOR_LE(0x3aa933)] = 3;
-
-//  protection related ?
-//  m_maincpu->space(AS_PROGRAM).nop_read(0xf0c8b440, 0xf0c8b447);
-}
-
-void dgpix_typea_state::init_kdynastg()
-{
-	u8 *rom = memregion("flash7")->base();
-
-	// HACK: patch around undumped/unemulated PIC microcontroller
-	rom[BYTE4_XOR_LE(0x3aaa10)] = 0; // 129f0 - nopped call
-	rom[BYTE4_XOR_LE(0x3aaa11)] = 3;
-	rom[BYTE4_XOR_LE(0x3aaa12)] = 0;
-	rom[BYTE4_XOR_LE(0x3aaa13)] = 3;
-	rom[BYTE4_XOR_LE(0x3aaa14)] = 0;
-	rom[BYTE4_XOR_LE(0x3aaa15)] = 3;
-
-	rom[BYTE4_XOR_LE(0x3a45c8)] = 0; // c5a8 - added ret
-	rom[BYTE4_XOR_LE(0x3a45c9)] = 5;
-
-	// protection related ?
-	//m_maincpu->space(AS_PROGRAM).nop_read(0x12341234, 0x12341243);
-}
-
-void dgpix_bmkey_state::init_letsdnce()
-{
-	u8 *rom = memregion("flash7")->base();
-
-	// HACK: patch around undumped/unemulated PIC microcontroller
-	rom[BYTE4_XOR_LE(0x3a9eb2)] = 0;
-	rom[BYTE4_XOR_LE(0x3a9eb3)] = 3;
-	rom[BYTE4_XOR_LE(0x3a9eb4)] = 0;
-	rom[BYTE4_XOR_LE(0x3a9eb5)] = 3;
-	rom[BYTE4_XOR_LE(0x3a9eb6)] = 0;
-	rom[BYTE4_XOR_LE(0x3a9eb7)] = 3;
-}
-
-void dgpix_bmkey_state::init_btplay2k()
-{
-	u8 *rom = memregion("flash7")->base();
-
-	// HACK: patch around undumped/unemulated PIC microcontroller
-	rom[BYTE4_XOR_LE(0x3a7914)] = 0;
-	rom[BYTE4_XOR_LE(0x3a7915)] = 3;
-	rom[BYTE4_XOR_LE(0x3a7916)] = 0;
-	rom[BYTE4_XOR_LE(0x3a7917)] = 3;
-	rom[BYTE4_XOR_LE(0x3a7918)] = 0;
-	rom[BYTE4_XOR_LE(0x3a7919)] = 3;
-}
-
 } // anonymous namespace
 
 
-GAME( 1999, elfin,     0,      dgpix,          dgpix,    dgpix_typea_state, init_elfin,     ROT0, "dgPIX Entertainment Inc.", "Elfin",                             MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, jumpjump,  0,      dgpix,          dgpix,    dgpix_typea_state, init_jumpjump,  ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, xfiles,    0,      dgpix,          dgpix,    dgpix_typea_state, init_xfiles,    ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, xfilesk,   xfiles, dgpix,          dgpix,    dgpix_typea_state, init_xfilesk,   ROT0, "dgPIX Entertainment Inc.", "The X-Files (censored, Korea)",     MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, kdynastg,  0,      dgpix_kdynastg, dgpix,    dgpix_typea_state, init_kdynastg,  ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1999, letsdnce,  0,      dgpix,          letsdnce, dgpix_bmkey_state, init_letsdnce,  ROT0, "dgPIX Entertainment Inc.", "Let's Dance",                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 2000, btplay2k,  0,      dgpix,          btplay2k, dgpix_bmkey_state, init_btplay2k,  ROT0, "dgPIX Entertainment Inc.", "Beat Player 2000",                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, elfin,     0,      dgpix_secmod,   dgpix,    dgpix_typea_state, empty_init,     ROT0, "dgPIX Entertainment Inc.", "Elfin",                             MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, jumpjump,  0,      dgpix_secmod,   dgpix,    dgpix_typea_state, empty_init,     ROT0, "dgPIX Entertainment Inc.", "Jump Jump",                         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, xfiles,    0,      dgpix_secmod,   dgpix,    dgpix_typea_state, empty_init,     ROT0, "dgPIX Entertainment Inc.", "The X-Files",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, xfilesk,   xfiles, dgpix_secmod,   dgpix,    dgpix_typea_state, empty_init,     ROT0, "dgPIX Entertainment Inc.", "The X-Files (censored, Korea)",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, kdynastg,  0,      dgpix_kdynastg, dgpix,    dgpix_typea_state, empty_init,     ROT0, "EZ Graphics",              "King of Dynast Gear (version 1.8)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, letsdnce,  0,      dgpix,          letsdnce, dgpix_bmkey_state, empty_init,     ROT0, "dgPIX Entertainment Inc.", "Let's Dance",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 2000, btplay2k,  0,      dgpix,          btplay2k, dgpix_bmkey_state, empty_init,     ROT0, "dgPIX Entertainment Inc.", "Beat Player 2000",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2000, fmaniac2p, 0,      dgpix,          dgpix,    dgpix_typea_state, empty_init,     ROT0, "Saero Entertainment",      "Fishing Maniac 2+",                 MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 2002, fmaniac3,  0,      dgpix,          dgpix,    dgpix_typea_state, empty_init,     ROT0, "Saero Entertainment",      "Fishing Maniac 3",                  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

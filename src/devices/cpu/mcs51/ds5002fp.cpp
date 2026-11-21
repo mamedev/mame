@@ -137,7 +137,7 @@ offs_t ds5002fp_device::external_ram_iaddr(offs_t offset, offs_t mem_mask)
 	return offset;
 }
 
-void ds5002fp_device::irqs_complete_and_mask(u8 &ints, u8 int_mask)
+void ds5002fp_device::irqs_complete_and_mask(u16 &ints, u16 int_mask)
 {
 	ints |= BIT(m_pcon, PCON_PFW) << 5;
 	m_irq_prio[5] = 3; // force highest priority
@@ -179,7 +179,7 @@ void ds5002fp_device::handle_ta_window()
 		m_rnr_delay -= m_inst_cycles;
 }
 
-bool ds5002fp_device::manage_idle_on_interrupt(u8 ints)
+bool ds5002fp_device::manage_idle_on_interrupt(u16 ints)
 {
 	// any interrupt terminates idle mode
 	set_idl(0);
@@ -223,6 +223,7 @@ void ds5002fp_device::pcon_ds_w(u8 data)
 void ds5002fp_device::ip_ds_w(u8 data)
 {
 	ds_protected(m_ip, data, 0x7f, 0xff);
+	m_irq_delayed = 0xffff;
 }
 
 u8 ds5002fp_device::crcr_r()

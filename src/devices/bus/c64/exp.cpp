@@ -406,6 +406,7 @@ void c64_expansion_slot_device::set_passthrough()
 #include "ocean.h"
 #include "pagefox.h"
 #include "partner.h"
+#include "prologicdos.h"
 #include "prophet64.h"
 #include "ps64.h"
 #include "ramlink.h"
@@ -429,6 +430,7 @@ void c64_expansion_slot_device::set_passthrough()
 #include "tibdd001.h"
 #include "tdos.h"
 #include "turbo232.h"
+#include "turbotrans.h"
 #include "vizastar.h"
 #include "vw64.h"
 #include "warp_speed.h"
@@ -459,6 +461,7 @@ void c64_expansion_cards(device_slot_interface &device)
 	device.option_add("multiscreen", C64_MULTISCREEN);
 	device.option_add("music64", C64_MUSIC64);
 	device.option_add("neoram", C64_NEORAM);
+	device.option_add("pdc", C64_PROLOGIC_DOS_CLASSIC);
 	device.option_add("ramlink", C64_RAMLINK);
 	device.option_add("reu1700", C64_REU1700);
 	device.option_add("reu1750", C64_REU1750);
@@ -470,6 +473,7 @@ void c64_expansion_cards(device_slot_interface &device)
 	device.option_add("swiftlink", C64_SWIFTLINK);
 	device.option_add("tibdd001", C64_TIB_DD_001);
 	device.option_add("turbo232", C64_TURBO232);
+	device.option_add("turbotrans", C64_TURBOTRANS);
 
 	// the following need ROMs from the software list
 	device.option_add_internal("standard", C64_STD);

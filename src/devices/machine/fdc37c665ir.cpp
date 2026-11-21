@@ -21,7 +21,7 @@ TODO:
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(FDC37C665IR, fdc37c665ir_device, "fdc37c665ir", "SMSC FDC37C665IR Super I/O FDC with IR support")
+DEFINE_DEVICE_TYPE(FDC37C665IR, fdc37c665ir_device, "fdc37c665ir", "SMSC FDC37C665IR Super I/O")
 
 fdc37c665ir_device::fdc37c665ir_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FDC37C665IR, tag, owner, clock)
@@ -219,7 +219,7 @@ u8 fdc37c665ir_device::read(offs_t offset)
 	if (m_config_phase != config_phase_t::UNLOCK_DATA)
 	{
 		if (!machine().side_effects_disabled())
-			LOG("Invalid config phase (%d) read %d\n", m_config_phase, offset);
+			LOG("Invalid config phase (%d) read %d\n", (u8)m_config_phase, offset);
 
 		return 0xff;
 	}
@@ -237,14 +237,14 @@ void fdc37c665ir_device::write(offs_t offset, u8 data)
 				if (data == 0x55)
 					m_config_phase = config_phase_t::UNLOCK_55_1;
 				else
-					LOG("Invalid config phase (%d) write %02x\n", m_config_phase, data);
+					LOG("Invalid config phase (%d) write %02x\n", (u8)m_config_phase, data);
 				break;
 
 			case config_phase_t::UNLOCK_55_1:
 				if (data == 0x55)
 					m_config_phase = config_phase_t::UNLOCK_DATA;
 				else
-					LOG("Invalid config phase (%d) write %02x\n", m_config_phase, data);
+					LOG("Invalid config phase (%d) write %02x\n", (u8)m_config_phase, data);
 				break;
 
 			case config_phase_t::UNLOCK_DATA:
@@ -253,11 +253,11 @@ void fdc37c665ir_device::write(offs_t offset, u8 data)
 				else if ((data & 0xf0) == 0)
 					m_index = data;
 				else
-					LOG("Invalid config phase (%d) [%d] write %02x\n", m_config_phase, offset, data);
+					LOG("Invalid config phase (%d) [%d] write %02x (register out of bounds)\n", (u8)m_config_phase, offset, data);
 				break;
 
 			case config_phase_t::LOCK_CR:
-				LOG("Invalid config phase (%d) [%d] write %02x\n", m_config_phase, offset, data);
+				LOG("Invalid config phase (%d) [%d] write %02x\n", (u8)m_config_phase, offset, data);
 				break;
 		}
 	}
@@ -266,7 +266,7 @@ void fdc37c665ir_device::write(offs_t offset, u8 data)
 		if (m_config_phase == config_phase_t::UNLOCK_DATA)
 			space().write_byte(m_index, data);
 		else
-			LOG("Invalid config phase (%d) [%d] write %02x\n", m_config_phase, offset, data);
+			LOG("Invalid config phase (%d) [%d] write %02x\n", (u8)m_config_phase, offset, data);
 	}
 }
 

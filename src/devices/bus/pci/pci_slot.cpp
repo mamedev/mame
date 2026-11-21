@@ -15,6 +15,7 @@
 #include "cs4281.h"
 #include "ds2416.h"
 #include "ess_maestro.h"
+#include "et4kw32p.h"
 #include "geforce.h"
 #include "mga2064w.h"
 #include "ncr53c825.h"
@@ -134,18 +135,29 @@ void pci_cards(device_slot_interface &device)
 	device.option_add("rtl8139",        RTL8139_PCI);
 
 	// 0x03 - display controllers
+	// S3
 	device.option_add("vision968",      VISION968_PCI);
 	device.option_add("trio64dx",       TRIO64DX_PCI);
 	device.option_add("virge",          VIRGE_PCI);
 	device.option_add("virgedx",        VIRGEDX_PCI);
 	device.option_add("virgevx",        VIRGEVX_PCI);
+	// Matrox
 	device.option_add("mga2064w",       MGA2064W);
+	// Alliance
 	device.option_add("promotion3210",  PROMOTION3210);
+	// Cirrus Logic
 	device.option_add("gd5434",         GD5434_PCI);
 	device.option_add("gd5446",         GD5446_PCI);
+	// OAK
 	device.option_add("oti64111",       OTI64111_PCI);
+	// SiS
 	device.option_add("sis6326_pci",    SIS6326_PCI);
+	// Western Digital / Paradise
 	device.option_add("wd9710",         WD9710_PCI);
+	// 3D Labs
+//	device.option_add("permedia",       PERMEDIA_PCI);
+	// Tseng
+	device.option_add("et4kw32p",       ET4KW32P_PCI);
 
 	// 0x04 - multimedia controllers
 	// sound cards
@@ -186,6 +198,7 @@ void agp_cards(device_slot_interface &device)
 {
 	// 3Dlabs
 	device.option_add("permedia2",      PERMEDIA2);
+	device.option_add("permedia2v",     PERMEDIA2V);
 	// nVidia
 	device.option_add("riva128",        RIVA128);
 	device.option_add("riva128zx",      RIVA128ZX);

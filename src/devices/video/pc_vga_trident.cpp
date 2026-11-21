@@ -211,7 +211,7 @@ void trident_vga_device::crtc_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			tri.cr1e = data;
-			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffeffff) | ((data & 0x20)<<11);
+			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xfffeffff) | (BIT(data, 5) << 16);
 			recompute_params();
 		})
 	);
@@ -248,10 +248,13 @@ void trident_vga_device::crtc_map(address_map &map)
 	);
 	map(0x27, 0x27).lrw8(
 		NAME([this] (offs_t offset) {
-			return (vga.crtc.start_addr & 0x60000) >> 17;
+			return (vga.crtc.start_addr_latch & 0x60000) >> 17;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfff9ffff) | ((data & 0x03)<<17);
+			// TODO: this logic doesn't seem correct for later variants
+			vga.crtc.start_addr_latch &= ~0x60000;
+			vga.crtc.start_addr_latch |= (BIT(data, 1) << 18);
+			vga.crtc.start_addr_latch |= (BIT(data, 0) << 17);
 		})
 	);
 	map(0x29, 0x29).lrw8(
@@ -554,6 +557,8 @@ void trident_vga_device::sequencer_map(address_map &map)
 
 void trident_vga_device::device_start()
 {
+	// TODO: subclass from parent, don't mimic the same stuff
+	// (for starter this disallows being able to control current video mode from debugger ...)
 	zero();
 
 	for (int i = 0; i < 0x100; i++)

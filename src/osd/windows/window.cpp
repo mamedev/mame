@@ -109,8 +109,8 @@ static DWORD main_threadid;
 static int ui_temp_pause;
 static int ui_temp_was_paused;
 
-static HANDLE window_thread;
-static DWORD window_threadid;
+[[maybe_unused]] static HANDLE window_thread; // to be able to get it in a debugger when debugging COM issues
+[[maybe_unused]] static DWORD window_threadid; // debug builds only
 
 static DWORD last_update_time;
 

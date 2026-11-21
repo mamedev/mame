@@ -33,10 +33,10 @@ private:
 	required_ioport m_modifiers;
 	required_ioport m_lock_keys;
 	devcb_write_line m_irq_cb;
-	std::array<u8, 32> m_fifo{};
-	u8 m_last_code = 0;
-	u8 m_head = 0, m_count = 0;
-	u8 m_modifier_state = 0, m_lock_pressed = 0, m_lock_state = 0;
+	std::array<u8, 32> m_fifo;
+	u8 m_last_code;
+	u8 m_head, m_count;
+	u8 m_modifier_state, m_lock_pressed, m_lock_state;
 };
 
 DECLARE_DEVICE_TYPE(B16_KBD, b16_kbd_device)

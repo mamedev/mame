@@ -35,44 +35,54 @@
 #include "cpu/drcumlsh.h"
 
 
+inline void dsp16_device_base::recompiler::core_destructer::operator()(core_state *obj) const noexcept
+{
+	if (obj)
+		obj->~core_state();
+}
+
+
 /***********************************************************************
     construction/destruction
 ***********************************************************************/
 
 dsp16_device_base::recompiler::recompiler(dsp16_device_base &host, u32 flags)
 	: m_host(host)
-	, m_core(*host.m_core)
 	, m_frontend(host, COMPILE_BACKWARDS_BYTES, COMPILE_FORWARDS_BYTES, COMPILE_MAX_SEQUENCE)
-	, m_uml(host, host.m_drc_cache, flags, 2, 16, 0, COMPILE_FORWARDS_BYTES)
+	, m_uml(host, CACHE_SIZE)
+	, m_core()
 {
-	m_uml.symbol_add(&m_core.xaau_pc, sizeof(m_core.xaau_pc), "pc");
-	m_uml.symbol_add(&m_core.xaau_pt, sizeof(m_core.xaau_pt), "pt");
-	m_uml.symbol_add(&m_core.xaau_pr, sizeof(m_core.xaau_pr), "pr");
-	m_uml.symbol_add(&m_core.xaau_pi, sizeof(m_core.xaau_pi), "pi");
-	m_uml.symbol_add(&m_core.xaau_i, sizeof(m_core.xaau_i), "i");
-
-	m_uml.symbol_add(&m_core.yaau_r[0], sizeof(m_core.yaau_r[0]), "r0");
-	m_uml.symbol_add(&m_core.yaau_r[1], sizeof(m_core.yaau_r[1]), "r1");
-	m_uml.symbol_add(&m_core.yaau_r[2], sizeof(m_core.yaau_r[2]), "r2");
-	m_uml.symbol_add(&m_core.yaau_r[3], sizeof(m_core.yaau_r[3]), "r3");
-	m_uml.symbol_add(&m_core.yaau_rb, sizeof(m_core.yaau_rb), "rb");
-	m_uml.symbol_add(&m_core.yaau_re, sizeof(m_core.yaau_re), "re");
-	m_uml.symbol_add(&m_core.yaau_j, sizeof(m_core.yaau_j), "j");
-	m_uml.symbol_add(&m_core.yaau_k, sizeof(m_core.yaau_k), "k");
-
-	m_uml.symbol_add(&m_core.dau_x, sizeof(m_core.dau_x), "x");
-	m_uml.symbol_add(&m_core.dau_y, sizeof(m_core.dau_y), "y");
-	m_uml.symbol_add(&m_core.dau_p, sizeof(m_core.dau_p), "p");
-	m_uml.symbol_add(&m_core.dau_a[0], sizeof(m_core.dau_a[0]), "a0");
-	m_uml.symbol_add(&m_core.dau_a[1], sizeof(m_core.dau_a[1]), "a1");
-	m_uml.symbol_add(&m_core.dau_c[0], sizeof(m_core.dau_c[0]), "c0");
-	m_uml.symbol_add(&m_core.dau_c[1], sizeof(m_core.dau_c[1]), "c1");
-	m_uml.symbol_add(&m_core.dau_c[2], sizeof(m_core.dau_c[2]), "c2");
-	m_uml.symbol_add(&m_core.dau_auc, sizeof(m_core.dau_auc), "auc");
-	m_uml.symbol_add(&m_core.dau_psw, sizeof(m_core.dau_psw), "psw");
-	m_uml.symbol_add(&m_core.dau_temp, sizeof(m_core.dau_temp), "temp");
-
 	(void)m_host;
+
+	m_uml.initialize(flags, 2, 16, 0, COMPILE_FORWARDS_BYTES);
+	m_core.reset(m_uml.cache_alloc_near<core_state>(host.m_yaau_bits));
+
+	m_uml.symbol_add(&m_core->xaau_pc, sizeof(m_core->xaau_pc), "pc");
+	m_uml.symbol_add(&m_core->xaau_pt, sizeof(m_core->xaau_pt), "pt");
+	m_uml.symbol_add(&m_core->xaau_pr, sizeof(m_core->xaau_pr), "pr");
+	m_uml.symbol_add(&m_core->xaau_pi, sizeof(m_core->xaau_pi), "pi");
+	m_uml.symbol_add(&m_core->xaau_i, sizeof(m_core->xaau_i), "i");
+
+	m_uml.symbol_add(&m_core->yaau_r[0], sizeof(m_core->yaau_r[0]), "r0");
+	m_uml.symbol_add(&m_core->yaau_r[1], sizeof(m_core->yaau_r[1]), "r1");
+	m_uml.symbol_add(&m_core->yaau_r[2], sizeof(m_core->yaau_r[2]), "r2");
+	m_uml.symbol_add(&m_core->yaau_r[3], sizeof(m_core->yaau_r[3]), "r3");
+	m_uml.symbol_add(&m_core->yaau_rb, sizeof(m_core->yaau_rb), "rb");
+	m_uml.symbol_add(&m_core->yaau_re, sizeof(m_core->yaau_re), "re");
+	m_uml.symbol_add(&m_core->yaau_j, sizeof(m_core->yaau_j), "j");
+	m_uml.symbol_add(&m_core->yaau_k, sizeof(m_core->yaau_k), "k");
+
+	m_uml.symbol_add(&m_core->dau_x, sizeof(m_core->dau_x), "x");
+	m_uml.symbol_add(&m_core->dau_y, sizeof(m_core->dau_y), "y");
+	m_uml.symbol_add(&m_core->dau_p, sizeof(m_core->dau_p), "p");
+	m_uml.symbol_add(&m_core->dau_a[0], sizeof(m_core->dau_a[0]), "a0");
+	m_uml.symbol_add(&m_core->dau_a[1], sizeof(m_core->dau_a[1]), "a1");
+	m_uml.symbol_add(&m_core->dau_c[0], sizeof(m_core->dau_c[0]), "c0");
+	m_uml.symbol_add(&m_core->dau_c[1], sizeof(m_core->dau_c[1]), "c1");
+	m_uml.symbol_add(&m_core->dau_c[2], sizeof(m_core->dau_c[2]), "c2");
+	m_uml.symbol_add(&m_core->dau_auc, sizeof(m_core->dau_auc), "auc");
+	m_uml.symbol_add(&m_core->dau_psw, sizeof(m_core->dau_psw), "psw");
+	m_uml.symbol_add(&m_core->dau_temp, sizeof(m_core->dau_temp), "temp");
 }
 
 dsp16_device_base::recompiler::~recompiler()

@@ -594,8 +594,6 @@ u8 mcs48_cpu_device::p2_mask()
 	u8 result = 0xff;
 	if ((m_feature_mask & UPI41_FEATURE) == 0)
 		return result;
-	if (m_flags_enabled)
-		result &= ~(P2_OBF | P2_NIBF);
 	if (m_dma_enabled)
 		result &= ~(P2_DRQ | P2_NDACK);
 	return result;
@@ -774,8 +772,8 @@ OPHANDLER( in_a_dbb )
 	m_sts &= ~STS_IBF;
 
 	// if P2 flags are enabled, update the state of P2
-	if (m_flags_enabled && (m_p2 & P2_NIBF) == 0)
-		port_w(2, m_p2 |= P2_NIBF);
+	if (m_flags_enabled)
+		port_w(2, m_p2);
 	m_a = m_dbbi;
 }
 
@@ -914,8 +912,8 @@ OPHANDLER( out_dbb_a )
 	m_sts |= STS_OBF;
 
 	// if P2 flags are enabled, update the state of P2
-	if (m_flags_enabled && (m_p2 & P2_OBF) == 0)
-		port_w(2, m_p2 |= P2_OBF);
+	if (m_flags_enabled)
+		port_w(2, m_p2);
 }
 
 OPHANDLER( ret )            { burn_cycles(2); pull_pc(); }
@@ -1423,6 +1421,36 @@ void mcs48_cpu_device::execute_run()
 *******************************************************************************/
 
 /*-------------------------------------------------
+    p2_output - apply UPI-41 buffer flags to the
+    port pins without changing the port latch
+-------------------------------------------------*/
+
+u8 upi41_cpu_device::p2_output(u8 data) const
+{
+	if (m_flags_enabled)
+	{
+		if (!(m_sts & STS_OBF))
+			data &= ~P2_OBF;
+		if (m_sts & STS_IBF)
+			data &= ~P2_NIBF;
+	}
+	return data;
+}
+
+
+u8 upi41_cpu_device::port_r(offs_t a)
+{
+	const u8 data = mcs48_cpu_device::port_r(a);
+	return (a == 2) ? p2_output(data) : data;
+}
+
+void upi41_cpu_device::port_w(offs_t a, u8 v)
+{
+	mcs48_cpu_device::port_w(a, (a == 2) ? p2_output(v) : v);
+}
+
+
+/*-------------------------------------------------
     upi41_master_r - master CPU data/status
     read
 -------------------------------------------------*/
@@ -1438,7 +1466,7 @@ u8 upi41_cpu_device::upi41_master_r(offs_t offset)
 	{
 		m_sts &= ~STS_OBF;
 		if (m_flags_enabled)
-			port_w(2, m_p2 &= ~P2_OBF);
+			port_w(2, m_p2);
 	}
 	return m_dbbo;
 }
@@ -1459,7 +1487,7 @@ TIMER_CALLBACK_MEMBER(upi41_cpu_device::master_callback)
 	{
 		m_sts |= STS_IBF;
 		if (m_flags_enabled)
-			port_w(2, m_p2 &= ~P2_NIBF);
+			port_w(2, m_p2);
 	}
 
 	// set F1 accordingly

@@ -24,9 +24,7 @@
  * TODO:
  *   - IAM gambling machines need standard gambling inputs figured out and hooked up
  *   - rodent needs the ARM caches emulated.  We have a workaround in place.
- *   - 19in1 needs its unique flash ROM to be dumped.
  *   - 48in1, 48in1a and 48in1c also seem to need a unique flash ROM to be dumped.
- *   - An ARM DRC would be nice so these run at the correct speed.
  *
  **************************************************************************/
 
@@ -97,8 +95,8 @@ public:
 	void base(machine_config &config) ATTR_COLD;
 	void iam(machine_config &config) ATTR_COLD;
 
+	void init_4in1() ATTR_COLD;
 	void init_4in1a() ATTR_COLD;
-	void init_4in1b() ATTR_COLD;
 	void init_19in1() ATTR_COLD;
 	void init_39in1() ATTR_COLD;
 	void init_48in1() ATTR_COLD;
@@ -136,7 +134,7 @@ private:
 	u8 m_prot2_resp;
 	u8 m_prot2_op[3];
 
-	required_device<cpu_device> m_maincpu;
+	required_device<pxa255_cpu_device> m_maincpu;
 	required_device<pxa255_periphs_device> m_pxa_periphs;
 	required_device<eeprom_serial_93c66_16bit_device> m_eeprom;
 	required_shared_ptr<u32> m_ram;
@@ -163,6 +161,9 @@ private:
 
 void _39in1_state::machine_start()
 {
+	// the recompiler accesses RAM in place, unless a tap covers it (init_rodent())
+	m_maincpu->arm7drc_add_fastram(0xa0000000, 0xa0000000 + m_ram.bytes() - 1, false, &m_ram[0]);
+
 	save_item(NAME(m_prot_state));
 	save_item(NAME(m_prot_mode));
 	save_item(NAME(m_prot_count));
@@ -204,7 +205,7 @@ void _39in1_state::machine_reset()
        0   1   1   protection data port
        1   -   -   protection command port
 
-    The I.A.M. slots are the same as 4in1a/4in1b, at 04100040-0410007e:
+    The I.A.M. slots are the same as 4in1/4in1a, at 04100040-0410007e:
     reads return the challenge state in the high nibble and an 8-entry signature
     indexed by A3-A5 in the low nibble, while writes clock the state.  They check
     the signature eight times and then run four challenge rounds, and a failure
@@ -219,7 +220,7 @@ void _39in1_state::machine_reset()
              indexed by A3-A5, 1 selects the challenge/response register
       bit 6  what a write to the data port does to that register
 
-    4in1a and 4in1b use an earlier part with no command port at all.  There the
+    4in1 and 4in1a use an earlier part with no command port at all.  There the
     register is only the top nibble of the data port and the signature is always
     in the bottom nibble, so the games can read both at once and no mode bit is
     needed.
@@ -624,11 +625,11 @@ static const cpld_prot PROT_39IN1 = {
 	{ 5, 1, 2, 7, 6, 4, 3, 0 }, { 0, 7, 2, 4, 6, 3, 5, 1 }, 0xff, 0xff, true };
 
 // the earlier part only keeps the top nibble and has no command port
-static const cpld_prot PROT_4IN1A = {
+static const cpld_prot PROT_4IN1 = {
 	{ 0x03, 0x00, 0x0f, 0x04, 0x07, 0x0b, 0x06, 0x05 },
 	{ 4, 2, 0, 7, 1, 3, 5, 6 }, { 4, 6, 5, 7, 0, 1, 2, 3 }, 0xd0, 0xf0, false };
 
-static const cpld_prot PROT_4IN1B = {
+static const cpld_prot PROT_4IN1A = {
 	{ 0x0e, 0x04, 0x00, 0x02, 0x01, 0x00, 0x0c, 0x01 },
 	{ 5, 2, 4, 7, 0, 1, 3, 6 }, { 6, 7, 4, 5, 0, 1, 2, 3 }, 0x20, 0xf0, false };
 
@@ -686,20 +687,20 @@ static const cpld2_key PROT_PLUTUS = {
 	  { 7, prot_value_bit(0) }, { 1, prot_value_bit(5) }, { 4, prot_value_bit(4) }, { 0, prot_state_bit(2) } },
 	{ 11, 7, 6, 5, 4, 3, 2, 1 }, true };
 
-void _39in1_state::init_4in1a()
+void _39in1_state::init_4in1()
 {
 	static const cpld_key key = { { 6, 0, 2, 1, 7, 5, 4, 3 }, 0x64, { { 3, 0x40 }, { 4, 0x08 }, { 5, 0x20 }, { 6, 0x80 } } };
 	decrypt(key);
-	set_protection(PROT_4IN1A);
+	set_protection(PROT_4IN1);
 }
 
 // rodent shares this key: the whole 0a00-0ffff gap in its ROM descrambles to ff
-static const cpld_key KEY_4IN1B = { { 2, 4, 0, 6, 7, 3, 1, 5 }, 0x32, { { 3, 0x08 }, { 4, 0x80 }, { 5, 0x10 }, { 6, 0x04 } } };
+static const cpld_key KEY_4IN1A = { { 2, 4, 0, 6, 7, 3, 1, 5 }, 0x32, { { 3, 0x08 }, { 4, 0x80 }, { 5, 0x10 }, { 6, 0x04 } } };
 
-void _39in1_state::init_4in1b()
+void _39in1_state::init_4in1a()
 {
-	decrypt(KEY_4IN1B);
-	set_protection(PROT_4IN1B);
+	decrypt(KEY_4IN1A);
+	set_protection(PROT_4IN1A);
 }
 
 void _39in1_state::init_19in1()
@@ -759,7 +760,7 @@ void _39in1_state::init_48in1c() { init_48in1(); } // same encryption as 48in1
 // of the page tables the loader happens to build.
 void _39in1_state::init_rodent()
 {
-	decrypt(KEY_4IN1B);
+	decrypt(KEY_4IN1A);
 
 	m_maincpu->space(AS_PROGRAM).install_read_tap(0xa071048c, 0xa071048f, "rodent_vector_wipe",
 			[] (offs_t offset, u32 &data, u32 mem_mask) { data = 0xe1a00000; });
@@ -957,21 +958,38 @@ ROM_START( 60in1 )
 	ROM_LOAD16_WORD_SWAP( "60in1_eeprom.u32", 0x000, 0x200, CRC(54af5973) SHA1(30aca7790458f4be906f7fa7c74206e16d9fc36f) )
 ROM_END
 
-ROM_START( 4in1a )
+// XML-19IN1 PCB, with an Altera MAX II EPM240 CPLD.  Same program and data as 60in1,
+// but the loader patches the decompressed program before jumping to it: the boot time
+// CPLD check is stubbed out and "System Check Error" no longer halts the game.
+ROM_START( 60in1u )
+	// main program, encrypted
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "60in1-prg.u4", 0x000000, 0x080000, CRC(cae25461) SHA1(2daba81ca83a22006097d7e8d1afaf9e33c25066) )
+
+	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
+	ROM_LOAD( "60in1-32m.u6", 0x000000, 0x400000, CRC(0cfed2a0) SHA1(9aac23f5267af56255e6f8aefade9f00bc106325) )  // CGC-NP206 string
+
+	// EEPROM - contains security data
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c66.u32", 0x000, 0x200, CRC(27d7bbaf) SHA1(085cf60aa4df5ffdbc99a737aabd578b060eeb62) )
+ROM_END
+
+ROM_START( 4in1 )
 	// main program, encrypted
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "plz-v014_ver300.bin", 0x000000, 0x080000, CRC(775f101d) SHA1(8a299a67b487518ba2e2cb5334347b93f8640190) )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
-	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // confirmed same flash rom as 39 in 1,   CGC-NP203 string
+	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // confirmed same flash rom as 39 in 1, CGC-NP203 string
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "4in1_eeprom.bin", 0x000, 0x200, CRC(df1724f7) SHA1(07814aee3622f4bb8bada938f2a93fae791d6e31) )
 ROM_END
 
-ROM_START( 4in1b )
+ROM_START( 4in1a )
 	// main program, encrypted
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "pzv001-4.bin", 0x000000, 0x080000, CRC(7679a95f) SHA1(56c20fa7d086560b76477b42208cb43d42adba41) )
@@ -995,11 +1013,65 @@ ROM_START( 19in1 )
 
 	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
 	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
-	ROM_LOAD( "16mflash.bin", 0x000000, 0x200000, BAD_DUMP CRC(a089f0f8) SHA1(e975eadd9176a8b9e416229589dfe3158cba22cb) ) // not the same flash rom as the vertical games
+	ROM_LOAD("m29dw323dt.u6", 0x000000, 0x400000, CRC(0776b62a) SHA1(055d88702592e948d27a73061b30d97da64f0352))
 
 	// EEPROM - contains security data
 	ROM_REGION16_BE( 0x200, "eeprom", 0 )
 	ROM_LOAD16_WORD_SWAP( "19in1_eeprom.bin", 0x000, 0x200, NO_DUMP )
+ROM_END
+
+/*
+19 in 1 Horizontal Bootleg
+
+Software revision is shown at the very end of all the game DIP switch settings (enter TEST then press button 2 to the end).
+
+
+PCB Number: XML-19IN1
+
+Main parts....
+LUPXA255A0 CPU
+3.686MHz Crystal tied directly to CPU
+M29F400 TSOP48 Flash ROM at U4
+M29DW323DT TSOP48 Flash ROM at U6
+Atmel 93C66 EEPROM at U32
+EM638325TS-6G 2Mx32-bit SDRAM
+Altera MAX II EPM240T100I5N CPLD
+MOSA MS6335G 16-bit Stereo Audio DAC Integrated Headphone Driver with I2C Volume Control. Simultaneous output with JAMMA audio.
+  - software volume control is available in test mode at the end of the game DIP switch settings.
+15-pin VGA Connector (simultaneous output with JAMMA RGB output, DIPSW2 sets frequency)
+4 Pin Power Plug
+3.5mm Audio Headphone Jack
+JAMMA Edge Connector
+2x 6-position connectors for extra controls/buttons labelled CON3, CON4
+4-position DIP Switch
+TDA2003 Power AMP
+3.3V Linear Regulator
+1.2V Linear Regulator
+4x SMD LEDs
+2K-ohm Volume Pot
+
+DIP Switch....
+1 = Screen Flip. Off:Normal, On:Flip
+2 = Frequency. Off:15.75kHz CGA, On:31.5kHz VGA
+3 = High Score Save. Off:Disabled (EEPROM not used), On:Enabled (high scores saved to EEPROM)
+4 = Mode. Off:Normal, On:Test (move to on-position then power-on to see test screens)
+
+Note 60in1u in MAME is the exact same PCB with different software.
+*/
+
+// Same program and data as 19in1, with the same loader patch as 60in1u.
+ROM_START( 19in1u )
+	// main program, encrypted
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "29f400.u4", 0x000000, 0x080000, CRC(324e6ed8) SHA1(5d2902d81e6bcb55ded3aca834da56e51a9dc068) )
+
+	// data ROM - contains a filesystem with ROMs, fonts, graphics, etc. in an unknown compressed format
+	ROM_REGION32_LE( 0x400000, "data", ROMREGION_ERASEFF )
+	ROM_LOAD( "m29dw323dt.u6", 0x000000, 0x400000, CRC(0776b62a) SHA1(055d88702592e948d27a73061b30d97da64f0352) )
+
+	// EEPROM - contains security data
+	ROM_REGION16_BE( 0x200, "eeprom", 0 )
+	ROM_LOAD16_WORD_SWAP( "93c66.u32", 0x000, 0x200, CRC(a653b2b4) SHA1(0c7c1e424e90aff1be35abd885ae9ca7e9e131eb) )
 ROM_END
 
 ROM_START( rodent )
@@ -1085,21 +1157,23 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(2004, 4in1a,     39in1,    cpld,   39in1, _39in1_state, init_4in1a,    ROT90, "bootleg", "4 in 1 MAME bootleg (ver 3.00, PLZ-V014)",             MACHINE_IMPERFECT_SOUND)
-GAME(2004, 4in1b,     39in1,    cpld,   39in1, _39in1_state, init_4in1b,    ROT90, "bootleg", "4 in 1 MAME bootleg (PLZ-V001)",                       MACHINE_IMPERFECT_SOUND)
-GAME(2004, 19in1,     39in1,    cpld2,  39in1, _39in1_state, init_19in1,    ROT0,  "bootleg", "19 in 1 MAME bootleg (BAR-V000)",                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(2004, 39in1,     0,        cpld,   39in1, _39in1_state, init_39in1,    ROT90, "bootleg", "39 in 1 MAME bootleg (GNO-V000)",                      MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1,     39in1,    cpld2,  39in1, _39in1_state, init_48in1,    ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.09, HPH-V000)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1b,    39in1,    cpld2,  39in1, _39in1_state, init_48in1,    ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.09, HPH-V000, alt flash)", MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1a,    39in1,    cpld2,  39in1, _39in1_state, init_48in1a,   ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.02, HPH-V000)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(2004, 48in1c,    39in1,    cpld2,  39in1, _39in1_state, init_48in1c,   ROT90, "bootleg", "48 in 1 MAME bootleg (ver 3.08, HPH-V000)",            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(2004, 60in1,     39in1,    cpld2,  39in1, _39in1_state, init_60in1,    ROT90, "bootleg", "60 in 1 MAME bootleg (ver 3.00, ICD-V000)",            MACHINE_IMPERFECT_SOUND)
-GAME(2005, rodent,    0,        cpld,   39in1, _39in1_state, init_rodent,   ROT0,  "The Game Room", "Rodent Exterminator",                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1,      39in1,    cpld,   39in1, _39in1_state, init_4in1,     ROT90, "bootleg",       "4 in 1 MAME bootleg (ver 3.00, PLZ-V014)",                 MACHINE_IMPERFECT_SOUND)
+GAME(2004, 4in1a,     39in1,    cpld,   39in1, _39in1_state, init_4in1a,    ROT90, "bootleg",       "4 in 1 MAME bootleg (PLZ-V001)",                           MACHINE_IMPERFECT_SOUND)
+GAME(2004, 19in1,     0,        cpld2,  39in1, _39in1_state, init_19in1,    ROT0,  "bootleg",       "19 in 1 MAME bootleg (BAR-V000)",                          MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 19in1u,    19in1,    cpld2,  39in1, _39in1_state, init_19in1,    ROT0,  "bootleg",       "19 in 1 MAME bootleg (BAR-V000, no protection)",           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 39in1,     0,        cpld,   39in1, _39in1_state, init_39in1,    ROT90, "bootleg",       "39 in 1 MAME bootleg (GNO-V000)",                          MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1,     39in1,    cpld2,  39in1, _39in1_state, init_48in1,    ROT90, "bootleg",       "48 in 1 MAME bootleg (ver 3.09, HPH-V000)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1b,    39in1,    cpld2,  39in1, _39in1_state, init_48in1,    ROT90, "bootleg",       "48 in 1 MAME bootleg (ver 3.09, HPH-V000, alt flash)",     MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1a,    39in1,    cpld2,  39in1, _39in1_state, init_48in1a,   ROT90, "bootleg",       "48 in 1 MAME bootleg (ver 3.02, HPH-V000)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 48in1c,    39in1,    cpld2,  39in1, _39in1_state, init_48in1c,   ROT90, "bootleg",       "48 in 1 MAME bootleg (ver 3.08, HPH-V000)",                MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(2004, 60in1,     39in1,    cpld2,  39in1, _39in1_state, init_60in1,    ROT90, "bootleg",       "60 in 1 MAME bootleg (ver 3.00, ICD-V000)",                MACHINE_IMPERFECT_SOUND)
+GAME(2004, 60in1u,    39in1,    cpld2,  39in1, _39in1_state, init_60in1,    ROT90, "bootleg",       "60 in 1 MAME bootleg (ver 3.00, ICD-V000, no protection)", MACHINE_IMPERFECT_SOUND)
+GAME(2005, rodent,    0,        cpld,   39in1, _39in1_state, init_rodent,   ROT0,  "The Game Room", "Rodent Exterminator",                                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 
 // I.A.M. slots. Versions are taken from program ROM stickers or ROM strings, where available
-GAME(2008, fruitwld,  0,        iam,    39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V111)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V111.BIN 2008-04-30 15:59:21
-GAME(2007, fruitwlda, fruitwld, iam,    39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",  "Fruit World (V110)",                                   MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V110.BIN 2007-07-26 13:46:30
-GAME(2007, jumanji,   0,        iam,    39in1, _39in1_state, init_jumanji,  ROT0,  "I.A.M.",  "Jumanji (V502)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // CHZ_V502.BIN 2007-07-26 13:49:35 in clear text at the end of the main CPU ROM
-GAME(2007, jumanjia,  jumanji,  iam,    39in1, _39in1_state, init_jumanjia, ROT0,  "I.A.M.",  "Jumanji (V113)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // JUMANJI_V113.BIN 2007-07-25 10:54:33
-GAME(200?, plutus,    0,        iam2,   39in1, _39in1_state, init_plutus,   ROT0,  "I.A.M.",  "Plutus (V100)",                                        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string
-GAME(200?, pokrwild,  0,        iam,    39in1, _39in1_state, init_pokrwild, ROT0,  "I.A.M.",  "Poker's Wild (V117)",                                  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string
+GAME(2008, fruitwld,  0,        iam,    39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",        "Fruit World (V111)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V111.BIN 2008-04-30 15:59:21
+GAME(2007, fruitwlda, fruitwld, iam,    39in1, _39in1_state, init_fruitwld, ROT0,  "I.A.M.",        "Fruit World (V110)",                                       MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // FRUIT_V110.BIN 2007-07-26 13:46:30
+GAME(2007, jumanji,   0,        iam,    39in1, _39in1_state, init_jumanji,  ROT0,  "I.A.M.",        "Jumanji (V502)",                                           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // CHZ_V502.BIN 2007-07-26 13:49:35 in clear text at the end of the main CPU ROM
+GAME(2007, jumanjia,  jumanji,  iam,    39in1, _39in1_state, init_jumanjia, ROT0,  "I.A.M.",        "Jumanji (V113)",                                           MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // JUMANJI_V113.BIN 2007-07-25 10:54:33
+GAME(200?, plutus,    0,        iam2,   39in1, _39in1_state, init_plutus,   ROT0,  "I.A.M.",        "Plutus (V100)",                                            MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string
+GAME(200?, pokrwild,  0,        iam,    39in1, _39in1_state, init_pokrwild, ROT0,  "I.A.M.",        "Poker's Wild (V117)",                                      MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND) // no string

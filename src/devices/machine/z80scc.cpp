@@ -512,10 +512,10 @@ void z80scc_device::device_reset_after_children()
 	m_chanB->m_wr10  = 0x00;
 	m_chanA->m_wr11  = 0x08;
 	m_chanB->m_wr11  = 0x08;
-	m_chanA->m_wr14 &= 0xf0;
-	m_chanA->m_wr14 |= 0x30;
-	m_chanB->m_wr14 &= 0xf0;
-	m_chanB->m_wr14 |= 0x30;
+	m_chanA->m_wr14 &= 0xc0;
+	m_chanA->m_wr14 |= 0x20;
+	m_chanB->m_wr14 &= 0xc0;
+	m_chanB->m_wr14 |= 0x20;
 }
 
 /*
@@ -1011,6 +1011,7 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 		m_brg_counter(0),
 		m_brg_rate(0),
 		m_delayed_tx_brg_change(0),
+		m_tx_clocked(false),
 		m_rx_error(0),
 		m_rx_clock(0),
 		m_rx_first(0),
@@ -1129,6 +1130,7 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_index));
 	save_item(NAME(m_brg_rate));
 	save_item(NAME(m_delayed_tx_brg_change));
+	save_item(NAME(m_tx_clocked));
 	save_item(NAME(m_brg_counter));
 }
 
@@ -1231,8 +1233,7 @@ void z80scc_channel::tra_complete()
 	// Delayed baudrate change according to SCC specs
 	if ( m_delayed_tx_brg_change == 1)
 	{
-		m_delayed_tx_brg_change = 0;
-		set_tra_rate(m_brg_rate);
+		set_tx_brg_rate();
 		LOGTX("Delayed Init - Baud Rate Generator: %d mode: %dx\n", m_brg_rate, get_clock_mode() );
 	}
 
@@ -2037,6 +2038,7 @@ void z80scc_channel::do_sccreg_wr4(uint8_t data)
 		update_serial();
 		safe_transmit_register_reset();
 		receive_register_reset();
+		resume_transmit();
 	}
 }
 
@@ -2184,7 +2186,7 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	switch (data & WR11_RCVCLK_SRC_MASK)
 	{
 	case WR11_RCVCLK_SRC_RTXC: LOG("Receive clock source is RTxC\n"); break;
-	case WR11_RCVCLK_SRC_TRXC: LOG("Receive clock source is TRxC - not implemented\n"); break;
+	case WR11_RCVCLK_SRC_TRXC: LOG("Receive clock source is TRxC\n"); break;
 	case WR11_RCVCLK_SRC_BR:   LOG("Receive clock source is Baudrate Generator\n"); break;
 	case WR11_RCVCLK_SRC_DPLL: LOG("Receive clock source is DPLL - not implemented\n"); break;
 	}
@@ -2198,7 +2200,7 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	switch (data & WR11_TRACLK_SRC_MASK)
 	{
 	case WR11_TRACLK_SRC_RTXC: LOG("Transmit clock source is RTxC\n"); break;
-	case WR11_TRACLK_SRC_TRXC: LOG("Transmit clock source is TRxC - not implemented\n"); break;
+	case WR11_TRACLK_SRC_TRXC: LOG("Transmit clock source is TRxC\n"); break;
 	case WR11_TRACLK_SRC_BR:   LOG("Transmit clock source is Baudrate Generator\n"); break;
 	case WR11_TRACLK_SRC_DPLL: LOG("Transmit clock source is DPLL - not implemented\n"); break;
 	}
@@ -2841,19 +2843,67 @@ void z80scc_channel::rxc_w(int state)
 		bool edge_driven_rxc = ((m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_RTXC) && !source && !m_rxc;
 		if (!edge_driven_rxc)
 			return;
-		int clocks = get_clock_mode();
-		if (clocks == 1)
-			rx_clock_w(state);
-		else if (state)
-		{
-			rx_clock_w(m_rx_clock < clocks / 2);
+		rx_clock_edge(state);
+	}
+}
 
-			m_rx_clock++;
-			if (m_rx_clock == clocks)
-			{
-				m_rx_clock = 0;
-			}
+//-------------------------------------------------
+//  rtxc_w - /RTxC pin
+//-------------------------------------------------
+void z80scc_channel::rtxc_w(int state)
+{
+	int source = (m_index == z80scc_device::CHANNEL_A) ? m_uart->m_rxca : m_uart->m_rxcb;
+	if (source || m_rxc)
+		return;
+
+	if (((m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_RTXC) && receive_allowed())
+		rx_clock_edge(state);
+
+	if (((m_wr11 & WR11_TRACLK_SRC_MASK) == WR11_TRACLK_SRC_RTXC) && (m_wr5 & WR5_TX_ENABLE))
+		tx_clock_edge(state);
+}
+
+//-------------------------------------------------
+//  trxc_w - /TRxC pin
+//-------------------------------------------------
+void z80scc_channel::trxc_w(int state)
+{
+	if (((m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_TRXC) && receive_allowed())
+		rx_clock_edge(state);
+
+	if (((m_wr11 & WR11_TRACLK_SRC_MASK) == WR11_TRACLK_SRC_TRXC) && (m_wr5 & WR5_TX_ENABLE))
+		tx_clock_edge(state);
+}
+
+void z80scc_channel::rx_clock_edge(int state)
+{
+	int clocks = get_clock_mode();
+	if (clocks == 1)
+		rx_clock_w(state);
+	else if (state)
+	{
+		rx_clock_w(m_rx_clock < clocks / 2);
+
+		m_rx_clock++;
+		if (m_rx_clock == clocks)
+		{
+			m_rx_clock = 0;
 		}
+	}
+}
+
+void z80scc_channel::tx_clock_edge(int state)
+{
+	int clocks = get_clock_mode();
+	if (clocks == 1)
+		tx_clock_w(state);
+	else if (state)
+	{
+		tx_clock_w(m_tx_clock < clocks / 2);
+
+		m_tx_clock++;
+		if (m_tx_clock == clocks)
+			m_tx_clock = 0;
 	}
 }
 
@@ -2864,19 +2914,7 @@ void z80scc_channel::txc_w(int state)
 {
 	//LOG("Transmitter Clock Pulse\n");
 	if (m_wr5 & WR5_TX_ENABLE)
-	{
-		int clocks = get_clock_mode();
-		if (clocks == 1)
-			tx_clock_w(state);
-		else if(state)
-		{
-			tx_clock_w(m_tx_clock < clocks/2);
-
-			m_tx_clock++;
-			if (m_tx_clock == clocks)
-				m_tx_clock = 0;
-		}
-	}
+		tx_clock_edge(state);
 }
 
 //--------------------------------------------------------------------------------------------------------
@@ -2898,6 +2936,19 @@ void z80scc_channel::safe_transmit_register_reset()
 		logerror("Attempt to reset transmit shift register while busy detected, please report\n");
 	}
 	transmit_register_reset();
+	if (m_delayed_tx_brg_change)
+		set_tx_brg_rate();
+}
+
+//-------------------------------------------------
+//  set_tx_brg_rate - clock the transmitter from
+//  the baud rate generator
+//-------------------------------------------------
+void z80scc_channel::set_tx_brg_rate()
+{
+	m_delayed_tx_brg_change = 0;
+	set_tra_rate(m_brg_rate);
+	m_tx_clocked = m_brg_rate != 0;
 }
 
 //-------------------------------------------------
@@ -3045,11 +3096,12 @@ void z80scc_channel::update_serial()
 			set_tra_rate(0);
 			LOGTX("   - Transmit clock source RTxC is edge-driven externally\n");
 		}
+		m_tx_clocked = true;
 		break;
 	case WR11_TRACLK_SRC_BR:
-		if (is_transmit_register_empty())
+		if (is_transmit_register_empty() || !m_tx_clocked)
 		{
-			set_tra_rate(m_brg_rate);
+			set_tx_brg_rate();
 			LOGTX("   - Baud Rate Generator: %d clock mode: %dx\n", m_brg_rate, get_clock_mode());
 		}
 		else
@@ -3060,6 +3112,7 @@ void z80scc_channel::update_serial()
 		break;
 	default:
 		set_tra_rate(0);
+		m_tx_clocked = false;
 		LOGTX("   - Transmit clock source unimplemented: stopping\n");
 		break;
 	}
@@ -3074,6 +3127,7 @@ void z80scc_channel::update_serial()
 	if (m_txc > 0 && !(m_wr14 & WR14_BRG_ENABLE))
 	{
 		set_tra_rate(m_txc / clocks);
+		m_tx_clocked = true;
 		LOG("   - Transmit clock: %d mode: %d rate: %d/%xh\n", m_txc, clocks, m_txc / clocks, m_txc / clocks);
 	}
 }
@@ -3100,8 +3154,9 @@ void z80scc_channel::write_rx(int state, bool loopback)
 	if ((m_wr14 & (WR14_AUTO_ECHO | WR14_LOCAL_LOOPBACK)) == WR14_LOCAL_LOOPBACK && !loopback)
 		return;
 
-	// the receiver runs straight off the /RTxC pin, whether that's a configured crystal/oscillator or edges from rxc_w
+	// the receiver runs straight off the /RTxC pin (a configured crystal/oscillator or external edges) or the /TRxC pin
 	const bool rtxc_driven_rxc = (m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_RTXC;
+	const bool trxc_driven_rxc = (m_wr11 & WR11_RCVCLK_SRC_MASK) == WR11_RCVCLK_SRC_TRXC;
 
 #if START_BIT_HUNT
 	// Check for start bit if not receiving
@@ -3113,7 +3168,7 @@ void z80scc_channel::write_rx(int state, bool loopback)
 	}
 #endif
 
-	if (m_rxd && !state && rtxc_driven_rxc && (get_clock_mode() > 1))
+	if (m_rxd && !state && (rtxc_driven_rxc || trxc_driven_rxc) && (get_clock_mode() > 1))
 		m_rx_clock = 0;
 
 	LOGRCV("%s(%d)\n", FUNCNAME, state);
@@ -3135,7 +3190,7 @@ void z80scc_channel::write_rx(int state, bool loopback)
 	m_rxd = state;
 	// a disabled receiver doesn't hunt for start bits, but it keeps following the idle (mark) level
 	// so that the first start bit after it's enabled again is recognised
-	if ((receive_allowed() || state) && (rtxc_driven_rxc || m_rxc != 0 || m_brg_rate != 0))
+	if ((receive_allowed() || state) && (rtxc_driven_rxc || trxc_driven_rxc || m_rxc != 0 || m_brg_rate != 0))
 		device_serial_interface::rx_w(state);
 }
 

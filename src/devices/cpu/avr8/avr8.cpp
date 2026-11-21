@@ -22,6 +22,10 @@
 #include "avr8.h"
 #include "avr8dasm.h"
 
+#include <algorithm>
+#include <bit>
+#include <iterator>
+
 #define LOG_UNKNOWN         (1U << 1)
 #define LOG_BOOT            (1U << 2)
 #define LOG_TIMER0          (1U << 3)
@@ -645,16 +649,22 @@ void avr8_device<NumTimers>::base_internal_map(address_map &map)
 void atmega88_device::atmega88_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
+	// 1 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x04ff).ram().share("sram");
 }
 
 void atmega168_device::atmega168_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
+	// 1 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x04ff).ram().share("sram");
 }
 
 void atmega328_device::atmega328_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
+	// 2 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x08ff).ram().share("sram");
 }
 
 void atmega32u4_device::atmega32u4_internal_map(address_map &map)
@@ -663,16 +673,23 @@ void atmega32u4_device::atmega32u4_internal_map(address_map &map)
 
 	// fake USB PLL lock so that code that reads it is satisfied
 	map(0x0049, 0x0049).lr8(NAME([this] { return m_r[0x49] | 1; }));
+
+	// 2.5 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x0aff).ram().share("sram");
 }
 
 void atmega644_device::atmega644_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
+	// 4 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x10ff).ram().share("sram");
 }
 
 void atmega1284_device::atmega1284_internal_map(address_map &map)
 {
 	avr8_device::base_internal_map(map);
+	// 16 KiB SRAM; separate from the register file so it survives reset
+	map(0x0100, 0x40ff).ram().share("sram");
 }
 
 void atmega1280_device::atmega1280_internal_map(address_map &map)
@@ -816,6 +833,7 @@ avr8_base_device::avr8_base_device(const machine_config &mconfig, const char *ta
 	, m_addr_mask((addr_mask << 1) | 1)
 	, m_sleeping(false)
 	, m_sei_delay_pending(false)
+	, m_power_on(true)
 {
 }
 
@@ -830,6 +848,7 @@ avr8_device<NumTimers>::avr8_device(const machine_config &mconfig, const char *t
 	, m_spi_prescale(0)
 	, m_spi_prescale_count(0)
 	, m_spi_rx_shift(0)
+	, m_spi_tx_shift(0)
 {
 	// Fill in default callbacks
 	for (int i = 0; i < 8*4; i++)
@@ -1093,6 +1112,7 @@ void avr8_base_device::device_start()
 	save_item(NAME(m_addr_mask));
 	save_item(NAME(m_sleeping));
 	save_item(NAME(m_sei_delay_pending));
+	save_item(NAME(m_power_on));
 	save_item(NAME(m_opcycles));
 
 	// set our instruction counter
@@ -1114,8 +1134,8 @@ void avr8_base_device::device_start()
 	populate_shift_flag_cache();
 
 	populate_interrupt_condition_table();
-	std::fill_n(m_int_statuses, INTIDX_COUNT, 0);
-	save_item(NAME(m_int_statuses));
+	std::ranges::fill(m_int_pending, 0);
+	save_item(NAME(m_int_pending));
 }
 
 template <int NumTimers>
@@ -1149,6 +1169,7 @@ void avr8_device<NumTimers>::device_start()
 	save_item(NAME(m_spi_prescale_count));
 	save_item(NAME(m_spi_prescale_countdown));
 	save_item(NAME(m_spi_rx_shift));
+	save_item(NAME(m_spi_tx_shift));
 }
 
 //-------------------------------------------------
@@ -1197,20 +1218,23 @@ void avr8_base_device::device_reset()
 		LOGMASKED(LOG_BOOT, "AVR Boot loader section size: %d words\n", m_boot_size);
 	}
 
+	// MCUSR keeps its flags across a reset other than power-on; the first
+	// reset is power-on (PORF), later ones come from the RESET pin (EXTRF).
+	const uint8_t mcusr = m_power_on ? 0x01 : (m_r[MCUSR] | 0x02);
+	m_power_on = false;
+
 	for (int i = 0; i < 0x200; i++)
 	{
 		m_r[i] = 0;
 	}
+	m_r[MCUSR] = mcusr;
 
 	m_sleeping = false;
 	m_sei_delay_pending = false;
 
 	// clear any pending interrupts (the register zero loop above will have already
 	// acknowledged any pending and disabled any that could have fired)
-	for (int i = 0; i < INTIDX_COUNT; i++)
-	{
-		m_int_statuses[i] = 0;
-	}
+	std::ranges::fill(m_int_pending, 0);
 }
 
 template <int NumTimers>
@@ -1228,6 +1252,7 @@ void avr8_device<NumTimers>::device_reset()
 	m_spi_prescale = 0;
 	m_spi_prescale_count = 0;
 	m_spi_rx_shift = 0;
+	m_spi_tx_shift = 0;
 
 	for (int t = 0; t < NumTimers; t++)
 	{
@@ -1338,7 +1363,7 @@ const avr8_base_device::interrupt_condition avr8_base_device::s_int_conditions[]
 	{ INTIDX_PCINT2, AVR8_INT_PCINT2,  PCICR,     PCICR_PCIE2_MASK,   PCIFR,    PCIFR_PCIF2_MASK },
 	{ INTIDX_INT0,   AVR8_INT_INT0,    EIMSK,     EIMSK_INT0_MASK,    EIFR,     EIFR_INTF0_MASK  },
 	{ INTIDX_INT1,   AVR8_INT_INT1,    EIMSK,     EIMSK_INT1_MASK,    EIFR,     EIFR_INTF1_MASK  },
-	{ 0,             0,                0,         0,                  0,        0, 				 } // end of list
+	{ 0,             0,                0,         0,                  0,        0,               } // end of list
 };
 
 void avr8_base_device::update_interrupt(uint8_t intidx)
@@ -1373,7 +1398,7 @@ void avr8_base_device::set_interrupt(uint8_t intidx)
 	m_r[condition.m_regindex] |= condition.m_regmask;
 	if (m_r[condition.m_intreg] & condition.m_intmask)
 	{
-		m_int_statuses[intidx] = 1;
+		set_interrupt_flag(intidx, true);
 	}
 }
 
@@ -1390,18 +1415,24 @@ void avr8_base_device::clear_interrupt(uint8_t intidx)
 	// or if the interrupt was manually acknowledged (if interrupts off).
 	m_r[condition.m_regindex] &= ~condition.m_regmask;
 
-	m_int_statuses[intidx] = 0;
+	set_interrupt_flag(intidx, false);
+}
+
+void avr8_base_device::set_interrupt_flag(uint8_t intidx, bool state)
+{
+	const uint8_t vector = m_int_conditions_table[intidx].m_intvector;
+	const uint64_t mask = uint64_t(1) << (vector & 63);
+	if (state)
+		m_int_pending[vector >> 6] |= mask;
+	else
+		m_int_pending[vector >> 6] &= ~mask;
 }
 
 void avr8_base_device::fire_interrupts()
 {
-	int interrupt_winner_idx = -1;
-	bool interrupt_firing = false;
-
-	if (BIT(m_r[SREG], SREG_I) == 0)
-	{
+	// if no interrupts pending, or interrupts are disabled, do nothing
+	if (!(m_int_pending[0] | m_int_pending[1]) || BIT(m_r[SREG], SREG_I) == 0)
 		return;
-	}
 
 	// Basic rules for interrupts handling on the AVR8 series:
 	//
@@ -1421,56 +1452,42 @@ void avr8_base_device::fire_interrupts()
 	//
 	// - There should never be a case where we need a tiebreaker, i.e., every interrupt
 	//   should be mapped to its own unique vector.
-	for (int i = 0; i < INTIDX_COUNT; i++)
+	for (int i = 0; i < std::size(m_int_pending); i++)
 	{
-		if (!m_int_statuses[i]) continue;
-
-		interrupt_condition condition = m_int_conditions_table[i];
-		if (!(0 <= condition.m_intidx && condition.m_intidx < INTIDX_COUNT))
+		// loop through bitmask starting from LSB
+		for (uint64_t pending = m_int_pending[i]; pending; pending &= pending - 1)
 		{
-			fatalerror("interrupt %d set to fire, but wasn't mapped to anything", i);
+			const int vector = (i << 6) + std::countr_zero(pending);
+			const uint8_t intidx = m_vector_to_intidx[vector];
+			const interrupt_condition &condition = m_int_conditions_table[intidx];
+
+			// Software can acknowledge a pending event by clearing its flag
+			// while global interrupts are disabled.  Do not fire a cached
+			// request after that write-one-to-clear acknowledgement.
+			if (!(m_r[condition.m_regindex] & condition.m_regmask))
+			{
+				set_interrupt_flag(intidx, false);
+				continue;
+			}
+
+			// if the interrupt is disabled, don't fire it
+			if (!(m_r[condition.m_intreg] & condition.m_intmask))
+				continue;
+
+			LOGMASKED(LOG_INTERRUPTS, "firing interrupt vector %d => intidx %d\n", vector, intidx);
+
+			m_r[SREG] &= ~SREG_MASK_I;
+			push((m_pc >> 1) & 0x00ff);
+			push((m_pc >> 9) & 0x00ff);
+			// TODO: 24-bit address pushes for 2560 and friends that use bigger flash space
+
+			m_pc = vector * (2 * vector_size_in_words());
+
+			m_sleeping = false;
+
+			clear_interrupt(intidx);
+			return;
 		}
-
-		if (!(m_r[condition.m_intreg] & condition.m_intmask))
-		{
-			logerror("%s: avr8 standard interrupt %d scheduled but its enable flag at %02x is cleared\n",
-					 machine().describe_context(),
-					 i,
-					 condition.m_intreg
-					 );
-			continue;
-		}
-
-		interrupt_firing = true;
-		if (interrupt_winner_idx == -1)
-		{
-			interrupt_winner_idx = i;
-		}
-		else if (condition.m_intvector >= m_int_conditions_table[interrupt_winner_idx].m_intvector)
-		{
-			LOGMASKED(LOG_INTERRUPTS, "interrupt %d already losing the race, currently winning is %d\n", i, interrupt_winner_idx);
-		}
-		else
-		{
-			LOGMASKED(LOG_INTERRUPTS, "interrupt %d now losing the race, currently winning is %d\n", i, interrupt_winner_idx);
-			interrupt_winner_idx = i;
-		}
-	}
-
-	if (interrupt_firing)
-	{
-		LOGMASKED(LOG_INTERRUPTS, "interrupt %d won the race, firing it.\n", interrupt_winner_idx);
-		
-		m_r[SREG] &= ~SREG_MASK_I;
-		push((m_pc >> 1) & 0x00ff);
-		push((m_pc >> 9) & 0x00ff);
-		// TODO: 24-bit address pushes for 2560 and friends that use bigger flash space
-
-		m_pc = m_int_conditions_table[interrupt_winner_idx].m_intvector * (2 * vector_size_in_words());
-
-		m_sleeping = false;
-
-		clear_interrupt(interrupt_winner_idx);
 	}
 }
 
@@ -1485,7 +1502,7 @@ inline bool avr8_base_device::interrupt_condition_entry_is_terminator(interrupt_
 void avr8_base_device::populate_interrupt_condition_table()
 {
 	const avr8_base_device::interrupt_condition* int_conds = interrupt_conditions();
-	
+
 	m_int_conditions_table = std::make_unique<avr8_base_device::interrupt_condition[]>(INTIDX_COUNT);
 
 	for (int i = 0; i < INTIDX_COUNT; i++)
@@ -1494,9 +1511,19 @@ void avr8_base_device::populate_interrupt_condition_table()
 		m_int_conditions_table[i].m_intidx = INTIDX_COUNT;
 	}
 
+	// same deal; vector-to-intidx lookups must be unwired by default
+	std::ranges::fill(m_vector_to_intidx, INTIDX_COUNT);
+
 	for (int i = 0; !interrupt_condition_entry_is_terminator(int_conds[i]); i++)
 	{
+		if (int_conds[i].m_intvector >= std::size(m_vector_to_intidx))
+		{
+			fatalerror("interrupt %d has vector %d, but only %d vectors are supported\n",
+					   int_conds[i].m_intidx, int_conds[i].m_intvector, int(std::size(m_vector_to_intidx)));
+		}
+
 		std::memcpy(&m_int_conditions_table[int_conds[i].m_intidx], &int_conds[i], sizeof(avr8_base_device::interrupt_condition));
+		m_vector_to_intidx[int_conds[i].m_intvector] = int_conds[i].m_intidx;
 	}
 }
 
@@ -1553,11 +1580,11 @@ bool atmega32u4_device::pcint_group(gpio_t port, uint8_t &pcmsk_reg, int &group)
 const avr8_base_device::interrupt_condition avr8_base_device::s_mega640_int_conditions[avr8_base_device::INTIDX_COUNT] =
 {
 	// irq id        vector                  irq reg   irq reg mask        flag reg  flag reg mask
-	{ INTIDX_SPI,  	 ATMEGA640_INT_SPI_STC,  SPCR,     SPCR_SPIE_MASK,     SPSR,     SPSR_SPIF_MASK },
+	{ INTIDX_SPI,    ATMEGA640_INT_SPI_STC,  SPCR,     SPCR_SPIE_MASK,     SPSR,     SPSR_SPIF_MASK },
 	{ INTIDX_OCF0B,  ATMEGA640_INT_T0COMPB,  TIMSK0,   TIMSK0_OCIE0B_MASK, TIFR0,    TIFR0_OCF0B_MASK },
 	{ INTIDX_OCF0A,  ATMEGA640_INT_T0COMPA,  TIMSK0,   TIMSK0_OCIE0A_MASK, TIFR0,    TIFR0_OCF0A_MASK },
-	{ INTIDX_TOV0,   ATMEGA640_INT_T0OVF,  	 TIMSK0,   TIMSK0_TOIE0_MASK,  TIFR0,    TIFR0_TOV0_MASK },
-	{ INTIDX_ICF1, 	 ATMEGA640_INT_T1CAPT,   TIMSK1,   TIMSK1_ICIE1_MASK,  TIFR1,    TIFR1_ICF1_MASK },
+	{ INTIDX_TOV0,   ATMEGA640_INT_T0OVF,    TIMSK0,   TIMSK0_TOIE0_MASK,  TIFR0,    TIFR0_TOV0_MASK },
+	{ INTIDX_ICF1,   ATMEGA640_INT_T1CAPT,   TIMSK1,   TIMSK1_ICIE1_MASK,  TIFR1,    TIFR1_ICF1_MASK },
 	{ INTIDX_OCF1B,  ATMEGA640_INT_T1COMPB,  TIMSK1,   TIMSK1_OCIE1B_MASK, TIFR1,    TIFR1_OCF1B_MASK },
 	{ INTIDX_OCF1A,  ATMEGA640_INT_T1COMPA,  TIMSK1,   TIMSK1_OCIE1A_MASK, TIFR1,    TIFR1_OCF1A_MASK },
 	{ INTIDX_TOV1,   ATMEGA640_INT_T1OVF,    TIMSK1,   TIMSK1_TOIE1_MASK,  TIFR1,    TIFR1_TOV1_MASK },
@@ -1628,7 +1655,7 @@ void avr8_device<NumTimers>::spi_tick()
 	spi_pins(mosi_mask, miso_mask, sck_mask);
 
 	const int bit_index = SPCR_DORD ? (7 - m_spi_prescale_countdown) : m_spi_prescale_countdown;
-	const uint8_t out_bit = BIT(m_r[SPDR], bit_index);
+	const uint8_t out_bit = BIT(m_spi_tx_shift, bit_index);
 
 	// SCK rising edge: MOSI is sampled by the slave
 	uint8_t data = (m_r[PORTB] & ~(mosi_mask | sck_mask)) | (out_bit ? mosi_mask : 0) | sck_mask;
@@ -2871,7 +2898,7 @@ template <int NumTimers>
 void avr8_device<NumTimers>::tifr0_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER0, "%s: TIFR0 = %02x\n", machine().describe_context(), data);
-	
+
 	if (data & TIFR0_OCF0A_MASK) clear_interrupt(INTIDX_OCF0A);
 	if (data & TIFR0_OCF0B_MASK) clear_interrupt(INTIDX_OCF0B);
 	if (data & TIFR0_TOV0_MASK) clear_interrupt(INTIDX_TOV0);
@@ -2892,7 +2919,7 @@ template <int NumTimers>
 void avr8_device<NumTimers>::tifr2_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER2, "%s: TIFR2 = %02x\n", machine().describe_context(), data);
-	
+
 	if (m_r[TIFR2] & TIFR2_OCF2A_MASK) clear_interrupt(INTIDX_OCF2A);
 	if (m_r[TIFR2] & TIFR2_OCF2B_MASK) clear_interrupt(INTIDX_OCF2B);
 	if (m_r[TIFR2] & TIFR2_TOV2_MASK) clear_interrupt(INTIDX_TOV2);
@@ -2969,7 +2996,10 @@ void avr8_device<NumTimers>::spcr_w(uint8_t data)
 template <int NumTimers>
 void avr8_device<NumTimers>::spdr_w(uint8_t data)
 {
-	m_r[SPDR] = data;
+	// SPDR reads the receive buffer, even after the next transfer is started.
+	// Keep the outgoing byte separate so pipelined software can read the
+	// previous result while the next byte is shifting out.
+	m_spi_tx_shift = data;
 	m_r[SPSR] &= ~SPSR_SPIF_MASK; // note: can't clear this flag by writing 1 there
 	m_spi_rx_shift = 0;
 	m_spi_active = true;
@@ -3137,7 +3167,7 @@ void avr8_device<NumTimers>::timsk0_w(uint8_t data)
 {
 	LOGMASKED(LOG_TIMER0, "%s: TIMSK0 = %02x\n", machine().describe_context(), data);
 	m_r[TIMSK0] = data;
-	
+
 	update_interrupt(INTIDX_OCF0A);
 	update_interrupt(INTIDX_OCF0B);
 	update_interrupt(INTIDX_TOV0);

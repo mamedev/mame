@@ -415,13 +415,14 @@ protected:
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
 	template <typename T> void draw_sprites(T &&draw_sprite);
 
 private:
 	uint8_t m_bank_mask = 0;
-
 	uint8_t m_bank_latch = 0;
+	uint8_t m_irq_vector = 0;
 
 	void change_palette(int offset, uint8_t* palram, int palbase);
 };
@@ -847,6 +848,7 @@ void psychic5_state_base::machine_start()
 	save_item(NAME(m_sy2));
 
 	save_item(NAME(m_bank_latch));
+	save_item(NAME(m_irq_vector));
 }
 
 void psychic5_state::machine_start()
@@ -882,6 +884,8 @@ void psychic5_state_base::machine_reset()
 	m_vrambank.select(0);
 
 	m_bg_clip_mode = 0;
+
+	m_irq_vector = 0;
 }
 
 void psychic5_state::machine_reset()
@@ -901,15 +905,23 @@ void psychic5_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state_base::scanline)
 {
-	int const scanline = param;
+	if (param == 240) // vblank-out irq
+	{
+		m_irq_vector = 0xd7; // RST 10h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 
-	if (scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);   // Z80 - RST 10h - vblank
-
-	if (scanline == 0) // sprite buffer irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);   // Z80 - RST 08h
+	if (param == 0) // sprite buffer irq
+	{
+		m_irq_vector = 0xcf; // RST 08h
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 }
 
+IRQ_CALLBACK_MEMBER(psychic5_state_base::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
+}
 
 
 /***************************************************************************
@@ -1187,6 +1199,7 @@ void psychic5_state::psychic5(machine_config &config)
 	Z80(config, m_maincpu, XTAL(12'000'000)/2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &psychic5_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(psychic5_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(psychic5_state::cpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, XTAL(5'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &psychic5_state::sound_map);
@@ -1229,6 +1242,7 @@ void bombsa_state::bombsa(machine_config &config)
 	Z80(config, m_maincpu, XTAL(12'000'000)/2); // 6 MHz
 	m_maincpu->set_addrmap(AS_PROGRAM, &bombsa_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(bombsa_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(bombsa_state::cpu_acknowledge_irq));
 
 	Z80(config, m_audiocpu, XTAL(5'000'000));
 	m_audiocpu->set_addrmap(AS_PROGRAM, &bombsa_state::sound_map);

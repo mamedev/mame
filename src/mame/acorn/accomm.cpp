@@ -31,12 +31,14 @@
 #include "cpu/m6502/w65816.h"
 #include "machine/6522via.h"
 #include "machine/6850acia.h"
+#include "machine/74123.h"
 #include "machine/clock.h"
 #include "machine/input_merger.h"
 #include "machine/mc6854.h"
 #include "machine/nvram.h"
 #include "machine/pcf8573.h"
 #include "machine/ram.h"
+#include "machine/rescap.h"
 #include "machine/scn_pci.h"
 #include "sound/pcd3311.h"
 #include "video/saa5240.h"
@@ -57,6 +59,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_maincpu_region(*this, "maincpu"),
 		m_irqs(*this, "irqs"),
+		m_nmi(*this, "nmi"),
 		m_screen(*this, "screen"),
 		m_cct(*this, "saa5240"),
 		m_dtmf(*this, "dtmf"),
@@ -90,6 +93,7 @@ private:
 	required_device<w65816_device> m_maincpu;
 	required_memory_region m_maincpu_region;
 	required_device<input_merger_device> m_irqs;
+	required_device<input_merger_device> m_nmi;
 	required_device<screen_device> m_screen;
 	required_device<saa5240_device> m_cct;
 	required_device<pcd3311_device> m_dtmf;
@@ -110,6 +114,7 @@ private:
 
 	void set_cpu_clock(offs_t offset);
 	void ch00switch();
+	void econet_int_enable(int state);
 	uint8_t kbd_r(offs_t offset);
 	uint8_t ram_r(offs_t offset);
 	void ram_w(offs_t offset, uint8_t data);
@@ -139,6 +144,7 @@ uint8_t accomm_state::kbd_r(offs_t offset)
 void accomm_state::machine_reset()
 {
 	m_ch00rom_enabled = true;
+	m_nmi->in_w<1>(0);
 }
 
 void accomm_state::machine_start()
@@ -172,6 +178,12 @@ void accomm_state::ch00switch()
 {
 	if (!machine().side_effects_disabled())
 		m_ch00rom_enabled = false;
+}
+
+void accomm_state::econet_int_enable(int state)
+{
+	if (!machine().side_effects_disabled())
+		m_nmi->in_w<1>(state);
 }
 
 
@@ -234,11 +246,11 @@ void accomm_state::mem_map(address_map &map)
 	map(0x000000, 0x1fffff).rw(FUNC(accomm_state::ram_r), FUNC(accomm_state::ram_w));               /* System RAM */
 	map(0x200000, 0x3fffff).noprw();                                                                /* External expansion RAM */
 	map(0x400000, 0x400001).rw(m_acia, FUNC(acia6850_device::read), FUNC(acia6850_device::write));  /* MODEM */
-	map(0x410000, 0x410000).mirror(0xffff).ram();                                                                  /* Econet ID */
+	map(0x410000, 0x410000).mirror(0xffff).portr("ECONETID");                                                      /* Econet ID */
 	map(0x420000, 0x42000f).mirror(0xfff0).m(m_via, FUNC(via6522_device::map));                                    /* 6522 VIA (printer etc) */
 	map(0x430000, 0x430003).mirror(0xfffc).rw(m_scn2641, FUNC(scn2641_device::read), FUNC(scn2641_device::write)); /* 2641 ACIA (RS423) */
-	map(0x440000, 0x440000).mirror(0xffff).lr8(NAME([this]() { ch00switch(); return 0x44; }));                     /* CH00SWITCH */
-	map(0x440000, 0x440000).mirror(0xffff).lw8(NAME([this](u8 data) { ch00switch(); }));                           /* CH00SWITCH */
+	map(0x440000, 0x440000).mirror(0xffff).lr8(NAME([this]() -> u8 { ch00switch(); econet_int_enable(1); return 0x44; })); /* CH00SWITCH, INTON */
+	map(0x440000, 0x440000).mirror(0xffff).lw8(NAME([this](u8 data) { ch00switch(); econet_int_enable(0); }));     /* CH00SWITCH, INTOFF */
 	map(0x450000, 0x45ffff).rw(m_ula, FUNC(electron_ula_device::read), FUNC(electron_ula_device::write));          /* Video ULA */
 	map(0x460000, 0x467fff).mirror(0x8000).ram().share("nvram");                                                   /* CMOS RAM */
 	map(0x470000, 0x470003).mirror(0xfffc).rw(m_adlc, FUNC(mc6854_device::read), FUNC(mc6854_device::write));      /* 68B54 (Econet) */
@@ -419,6 +431,17 @@ static INPUT_PORTS_START( accomm )
 
 	PORT_START("STOP")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F12)        PORT_CHAR(UCHAR_MAMEKEY(F12))      PORT_NAME("Stop") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(accomm_state::trigger_reset), 0)
+
+	PORT_START("ECONETID")
+	PORT_CONFNAME(0x1f, 0x01, "Econet Station ID")
+	PORT_CONFSETTING( 0x00,   "0" )    PORT_CONFSETTING( 0x01,   "1" )    PORT_CONFSETTING( 0x02,   "2" )    PORT_CONFSETTING( 0x03,   "3" )    PORT_CONFSETTING( 0x04,   "4" )
+	PORT_CONFSETTING( 0x05,   "5" )    PORT_CONFSETTING( 0x06,   "6" )    PORT_CONFSETTING( 0x07,   "7" )    PORT_CONFSETTING( 0x08,   "8" )    PORT_CONFSETTING( 0x09,   "9" )
+	PORT_CONFSETTING( 0x0a,  "10" )    PORT_CONFSETTING( 0x0b,  "11" )    PORT_CONFSETTING( 0x0c,  "12" )    PORT_CONFSETTING( 0x0d,  "13" )    PORT_CONFSETTING( 0x0e,  "14" )
+	PORT_CONFSETTING( 0x0f,  "15" )    PORT_CONFSETTING( 0x10,  "16" )    PORT_CONFSETTING( 0x11,  "17" )    PORT_CONFSETTING( 0x12,  "18" )    PORT_CONFSETTING( 0x13,  "19" )
+	PORT_CONFSETTING( 0x14,  "20" )    PORT_CONFSETTING( 0x15,  "21" )    PORT_CONFSETTING( 0x16,  "22" )    PORT_CONFSETTING( 0x17,  "23" )    PORT_CONFSETTING( 0x18,  "24" )
+	PORT_CONFSETTING( 0x19,  "25" )    PORT_CONFSETTING( 0x1a,  "26" )    PORT_CONFSETTING( 0x1b,  "27" )    PORT_CONFSETTING( 0x1c,  "28" )    PORT_CONFSETTING( 0x1d,  "29" )
+	PORT_CONFSETTING( 0x1e,  "30" )    PORT_CONFSETTING( 0x1f,  "31" )
+	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN)
 INPUT_PORTS_END
 
 
@@ -428,6 +451,7 @@ void accomm_state::accomm(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &accomm_state::mem_map);
 
 	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set_inputline(m_maincpu, w65816_device::IRQ_LINE);
+	INPUT_MERGER_ALL_HIGH(config, m_nmi).output_handler().set_inputline(m_maincpu, w65816_device::NMI_LINE);
 
 	SCREEN(config, m_screen);
 	m_screen->set_raw(16_MHz_XTAL, 1024, 0, 640, 312, 0, 256);
@@ -489,13 +513,30 @@ void accomm_state::accomm(machine_config &config)
 
 	PCD3311(config, m_dtmf, 3.57864_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.25); // PCD3312
 
+	// FIXME: Econet line interface unverified, Master Econet module circuit assumed
+	ttl74123_device &txen(TTL74123(config, "txen", RES_K(220), CAP_U(47)));
+	txen.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	txen.set_a_pin_value(0);
+	txen.set_b_pin_value(1);
+	txen.set_clear_pin_value(0);
+	txen.out_cb().set("econet", FUNC(econet_device::host_rts_w));
+
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set("econet", FUNC(econet_device::host_data_w));
-	m_adlc->out_irq_cb().set_inputline(m_maincpu, w65816_device::NMI_LINE);
+	m_adlc->out_irq_cb().set(m_nmi, FUNC(input_merger_device::in_w<0>));
+	m_adlc->out_rts_cb().set(txen, FUNC(ttl74123_device::clear_w));
+	m_adlc->out_rts_cb().append(m_adlc, FUNC(mc6854_device::set_cts)).invert();
+
+	ttl74123_device &clkdet(TTL74123(config, "clkdet", RES_K(39), CAP_N(2.2)));
+	clkdet.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	clkdet.set_b_pin_value(1);
+	clkdet.set_clear_pin_value(1);
+	clkdet.out_cb().set(m_adlc, FUNC(mc6854_device::set_dcd)).invert();
 
 	econet_device &econet(ECONET(config, "econet"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
+	econet.clk_wr_callback().append(clkdet, FUNC(ttl74123_device::a_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 
 	ECONET_SLOT(config, "econet254", "econet", econet_devices);

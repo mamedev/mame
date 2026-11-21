@@ -112,12 +112,29 @@ inline int msm58321_device::read_counter(int counter)
 			data += (h10 & 1) * 10;
 		}
 	}
+	else if (counter == REGISTER_D1)
+	{
+		// D10 bits 2 and 3 select the leap year
+		data += (m_reg[REGISTER_D10] & 3) * 10;
+	}
 	else
 	{
 		data += (m_reg[counter + 1] * 10);
 	}
 
 	return data;
+}
+
+
+//-------------------------------------------------
+//  registers_updated - set the RTC time from the
+//  registers
+//-------------------------------------------------
+
+void msm58321_device::registers_updated()
+{
+	set_time(false, read_counter(REGISTER_Y1) + m_year0, read_counter(REGISTER_MO1), read_counter(REGISTER_D1), m_reg[REGISTER_W],
+		read_counter(REGISTER_H1), read_counter(REGISTER_MI1), read_counter(REGISTER_S1));
 }
 
 
@@ -147,7 +164,8 @@ inline void msm58321_device::write_counter(int address, int data)
 		break;
 
 	case REGISTER_D1:
-		flag = (m_reg[REGISTER_D10] & ~3);
+		// D10 bits 2 and 3 select the leap year
+		flag = m_reg[REGISTER_D10] & 0x0c;
 		break;
 	}
 
@@ -337,7 +355,7 @@ void msm58321_device::nvram_default()
 	if (m_default_24h)
 		m_reg[REGISTER_H10] = H10_24;
 
-	clock_updated();
+	registers_updated();
 }
 
 
@@ -352,7 +370,10 @@ bool msm58321_device::nvram_read(util::read_stream &file)
 	if (err || (actual != m_reg.size()))
 		return false;
 
-	clock_updated();
+	for (auto & elem : m_reg)
+		elem &= 0x0f;
+
+	registers_updated();
 	return true;
 }
 
@@ -496,8 +517,7 @@ void msm58321_device::update_input()
 					break;
 				}
 
-				set_time(false, read_counter(REGISTER_Y1) + m_year0, read_counter(REGISTER_MO1), read_counter(REGISTER_D1), m_reg[REGISTER_W],
-					read_counter(REGISTER_H1), read_counter(REGISTER_MI1), read_counter(REGISTER_S1));
+				registers_updated();
 				break;
 			}
 		}

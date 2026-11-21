@@ -226,7 +226,7 @@ u8 mesh_device::fifo_r()
 		return 0;
 	}
 
-	u8 const data = fifo_pop();
+	const u8 data = fifo_pop();
 	LOGMASKED(LOG_FIFO, "fifo_r %02x fifo_count %u (%s)\n", data, unsigned(m_fifo_count), machine().describe_context());
 	step(false);
 	return data;
@@ -307,14 +307,10 @@ void mesh_device::start_sequence(u8 data)
 	case SEQ_MSG_OUT:
 	case SEQ_MSG_IN:
 		m_expected_phase = phase_for_sequence();
-		// A hanging ACK is only released once the target drops REQ
-		if (m_scsi_bus->ctrl_r() & S_ACK)
+		// keep ACK and data until the previous byte's REQ falls
+		m_state = (m_scsi_bus->ctrl_r() & S_ACK) ? sequence_state::XFER_WAIT_REQ_FALSE : sequence_state::XFER_WAIT_REQ;
+		if (m_state == sequence_state::XFER_WAIT_REQ)
 		{
-			m_state = sequence_state::XFER_WAIT_REQ_FALSE;
-		}
-		else
-		{
-			m_state = sequence_state::XFER_WAIT_REQ;
 			m_scsi_bus->data_w(m_scsi_refid, 0);
 		}
 		m_scsi_bus->ctrl_wait(m_scsi_refid, S_REQ, S_REQ);
@@ -368,8 +364,8 @@ void mesh_device::step(bool timeout)
 		return;
 	}
 
-	u32 const ctrl = m_scsi_bus->ctrl_r();
-	u32 const data = m_scsi_bus->data_r();
+	const u32 ctrl = m_scsi_bus->ctrl_r();
+	const u32 data = m_scsi_bus->data_r();
 
 	switch (m_state)
 	{
@@ -550,7 +546,7 @@ void mesh_device::do_information_transfer()
 			return;
 		}
 
-		u32 const ctrl = m_scsi_bus->ctrl_r();
+		const u32 ctrl = m_scsi_bus->ctrl_r();
 
 		if (m_state == sequence_state::XFER_WAIT_REQ_FALSE)
 		{
@@ -634,7 +630,7 @@ void mesh_device::do_information_transfer()
 		m_scsi_bus->ctrl_w(m_scsi_refid, S_ACK, S_ACK);
 		update_drq();
 
-		// Output counts bytes into the FIFO, so it must drain too
+		// output counts FIFO writes, so wait for the FIFO to drain
 		if (xfer_count_done() && (!transfer_to_scsi() || !m_fifo_count))
 		{
 			if (!data_in_fifo_pending())
@@ -954,10 +950,10 @@ u8 mesh_device::interrupt_value() const
 
 void mesh_device::update_lines()
 {
-	int const irq = (interrupt_value() & m_interrupt_mask) != 0;
-	int const cmd_done = m_cmd_done;
-	int const error = m_error != 0;
-	int const exception = m_exception != 0;
+	const int irq = (interrupt_value() & m_interrupt_mask) != 0;
+	const int cmd_done = m_cmd_done;
+	const int error = m_error != 0;
+	const int exception = m_exception != 0;
 
 	if (irq != m_irq)
 	{
@@ -996,9 +992,9 @@ void mesh_device::update_drq()
 		}
 		else if (transfer_from_scsi())
 		{
-			// Flush an odd last byte; sync DataIn counts at DMA, async at the handshake
+			// flush an odd final byte once no more bus data is due
 			drq = m_fifo_count >= 2 || (m_fifo_count && m_xfer_started &&
-					(sync_data_in() ? m_xfer_count == 1 : m_xfer_count == 0));
+					(sync_data_in() ? (m_xfer_count == 1) : (m_xfer_count == 0)));
 		}
 	}
 
@@ -1011,7 +1007,7 @@ void mesh_device::update_drq()
 
 u8 mesh_device::bus_status_0_value() const
 {
-	u32 const ctrl = m_scsi_bus->ctrl_r();
+	const u32 ctrl = m_scsi_bus->ctrl_r();
 	u8 data = 0;
 
 	if (ctrl & S_REQ)
@@ -1044,7 +1040,7 @@ u8 mesh_device::bus_status_0_value() const
 
 u8 mesh_device::bus_status_1_value() const
 {
-	u32 const ctrl = m_scsi_bus->ctrl_r();
+	const u32 ctrl = m_scsi_bus->ctrl_r();
 	u8 data = 0;
 
 	if (ctrl & S_RST)
@@ -1230,7 +1226,7 @@ bool mesh_device::is_data_xfer() const
 
 bool mesh_device::transfer_to_scsi() const
 {
-	bool const target = bool(m_sequence & SEQ_TARGET);
+	const bool target = bool(m_sequence & SEQ_TARGET);
 
 	switch (m_sequence & SEQ_CMD_MASK)
 	{
@@ -1249,7 +1245,7 @@ bool mesh_device::transfer_to_scsi() const
 
 bool mesh_device::transfer_from_scsi() const
 {
-	bool const target = bool(m_sequence & SEQ_TARGET);
+	const bool target = bool(m_sequence & SEQ_TARGET);
 
 	switch (m_sequence & SEQ_CMD_MASK)
 	{

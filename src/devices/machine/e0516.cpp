@@ -57,6 +57,7 @@ e0516_device::e0516_device(const machine_config &mconfig, const char *tag, devic
 	m_state(STATE_ADDRESS),
 	m_bits_left(4),
 	m_dio(0),
+	m_dout(0),
 	m_reset(1),
 	m_timer(nullptr)
 {
@@ -82,6 +83,7 @@ void e0516_device::device_start()
 	save_item(NAME(m_state));
 	save_item(NAME(m_bits_left));
 	save_item(NAME(m_dio));
+	save_item(NAME(m_dout));
 	save_item(NAME(m_reset));
 }
 
@@ -239,10 +241,10 @@ void e0516_device::clk_w(int state)
 		if (m_state == STATE_DATA_READ)
 		{
 			// read
-			m_dio = BIT(m_data_latch, 0);
+			m_dout = BIT(m_data_latch, 0);
 			m_data_latch >>= 1;
 
-			LOG("E05-16 '%s' Data Bit OUT %u\n", tag(), m_dio);
+			LOG("E05-16 '%s' Data Bit OUT %u\n", tag(), m_dout);
 		}
 		else
 		{
@@ -299,10 +301,7 @@ void e0516_device::dio_w(int state)
 {
 	LOG("E05-16 '%s' DIO %u\n", tag(), state);
 
-	if ((m_state != STATE_DATA_READ) && (m_state != STATE_HI_Z))
-	{
-		m_dio = state;
-	}
+	m_dio = state;
 }
 
 
@@ -312,13 +311,13 @@ void e0516_device::dio_w(int state)
 
 int e0516_device::dio_r()
 {
-	if (m_cs || (m_state == STATE_HI_Z))
+	if (m_cs || (m_state != STATE_DATA_READ))
 	{
 		// high impedance
-		return 0;
+		return 1;
 	}
 
-	return m_dio;
+	return m_dout;
 }
 
 

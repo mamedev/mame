@@ -76,6 +76,9 @@ void kbdc8042_device::device_start()
 
 void kbdc8042_device::device_reset()
 {
+	// Interrupts must remain disabled until the host configures the controller.
+	m_command = 0;
+
 	m_operation_write_state = -1;
 	m_status_read_mode = 2;
 	m_keyboard.on = false;

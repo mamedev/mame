@@ -655,10 +655,13 @@ void mps1200_device::p3_w(u8 data)
 		return;
 
 	u16 sw = m_sw->read();
-	if (BIT(device_cbm_iec_interface::m_slot->get_address() - 4, 0))
-		sw &= ~device_number_mask();
-	else
-		sw |= device_number_mask();
+	if (device_cbm_iec_interface::m_slot != nullptr)
+	{
+		if (BIT(device_cbm_iec_interface::m_slot->get_address() - 4, 0))
+			sw &= ~device_number_mask();
+		else
+			sw |= device_number_mask();
+	}
 
 	m_dip_shift = 0;
 	for (int i = 0; i < 8; i++)

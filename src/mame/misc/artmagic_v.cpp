@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
-#include "video/tlc34076.h"
 #include "artmagic.h"
 
 
@@ -338,7 +337,7 @@ TMS340X0_SCANLINE_RGB32_CB_MEMBER(artmagic_state::scanline)
 	offs_t offset = (params->rowaddr << 12) & 0x7ff000;
 	uint16_t const *vram = address_to_vram(offset);
 	uint32_t *const dest = &bitmap.pix(scanline);
-	pen_t const *const pens = m_tlc34076->pens();
+	pen_t const *const pens = m_ramdac->pens();
 	int coladdr = params->coladdr << 1;
 
 	vram += offset;

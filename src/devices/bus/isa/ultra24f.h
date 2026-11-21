@@ -24,6 +24,10 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
+
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
@@ -37,7 +41,7 @@ private:
 	required_device<cpu_device> m_uscpu;
 	required_device<i82355_device> m_bmic;
 	required_device<upd765_family_device> m_fdc;
-	required_region_ptr<u16> m_bios16;
+	required_region_ptr<u16> m_bios;
 };
 
 DECLARE_DEVICE_TYPE(ULTRA24F, ultra24f_device)

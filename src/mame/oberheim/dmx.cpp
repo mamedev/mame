@@ -1219,7 +1219,7 @@ void dmx_state::update_mix_level(int voice)
 	const float gain_right = -v_pot * R_FEEDBACK_RIGHT / r_mix_right;
 
 	// Resistance as seen from the output side of the DC-blocking capacitor.
-	const float rc_r = r_pot_top + r_gnd;
+	const float rc_r = r_top_extra + r_pot_top + r_gnd;
 	const float rc_c = (voice == METRONOME_INDEX) ? PB_C24 : VC_C10;
 
 	m_voice_rc[voice]->filter_rc_set_RC(filter_rc_device::HIGHPASS, rc_r, 0, 0, rc_c);

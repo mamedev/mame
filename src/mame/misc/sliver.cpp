@@ -71,11 +71,10 @@ Notes:
 #include "machine/timer.h"
 #include "sound/okim6295.h"
 #include "video/ramdac.h"
+#include "video/zr36050.h"
 
 #include "screen.h"
 #include "speaker.h"
-
-#include "jpeglib.h"
 
 
 namespace {
@@ -95,13 +94,17 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_screen(*this, "screen"),
 		m_soundlatch(*this, "soundlatch"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_jpeg(*this, "jpeg"),
+		m_jpeg_rom(*this, "user2"),
+		m_jpeg_addr(0)
 	{ }
 
 	void sliver(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	virtual void device_post_load() override;
 
@@ -122,6 +125,9 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<palette_device> m_palette;
+	required_device<zr36050_device> m_jpeg;
+	required_region_ptr<u8> m_jpeg_rom;
+	u32 m_jpeg_addr;
 	bitmap_rgb32 m_bitmap_fg;
 	bitmap_rgb32 m_bitmap_bg;
 
@@ -140,10 +146,11 @@ private:
 	TIMER_DEVICE_CALLBACK_MEMBER(obj_irq_cb);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t b);
+	void plot_pixel_rgb(int x, int y, rgb_t color);
 	void plot_pixel_pal(int x, int y, u8 addr);
 	void blit_gfx();
 	void render_jpeg();
+	u8 jpeg_code_r();
 
 	void oki_map(address_map &map) ATTR_COLD;
 	void ramdac_map(address_map &map) ATTR_COLD;
@@ -164,14 +171,18 @@ void sliver_state::machine_start()
 	save_item(NAME(m_tmp_counter));
 }
 
-void sliver_state::plot_pixel_rgb(int x, int y, uint32_t r, uint32_t g, uint32_t b)
+void sliver_state::machine_reset()
 {
-//  printf("plot %d %d %d\n", r,g,b);
+	// the FPGA has the ZR36050 master the code bus
+	m_jpeg->write(0x002, 0x40);
+}
 
+void sliver_state::plot_pixel_rgb(int x, int y, rgb_t color)
+{
 	if (y < 0 || x < 0 || x > 383 || y > 255)
 		return;
 
-	m_bitmap_bg.pix(y, x) = r | (g<<8) | (b<<16);
+	m_bitmap_bg.pix(y, x) = color & 0x00ffffff;
 }
 
 void sliver_state::plot_pixel_pal(int x, int y, u8 addr)
@@ -255,9 +266,13 @@ void sliver_state::jpeg1_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	COMBINE_DATA(&m_jpeg1);
 }
 
+u8 sliver_state::jpeg_code_r()
+{
+	return (m_jpeg_addr < m_jpeg_rom.bytes()) ? m_jpeg_rom[m_jpeg_addr++] : 0xff;
+}
+
 void sliver_state::render_jpeg()
 {
-	int x;
 	int addr = (int)m_jpeg2 + (((int)m_jpeg1) << 16);
 
 	m_bitmap_bg.fill(0);
@@ -266,44 +281,18 @@ void sliver_state::render_jpeg()
 		return;
 	}
 
-	//printf("access address %04x\n", addr);
+	m_jpeg_addr = addr;
+	m_jpeg->write(0x000, 0x01); // GO
 
-	/* Access libJPEG */
+	for (int y = 0; y < m_jpeg->image_height(); y++)
 	{
-		struct jpeg_decompress_struct cinfo;
-		struct jpeg_error_mgr jerr;
-		JSAMPARRAY buffer;
-
-		cinfo.err = jpeg_std_error(&jerr);
-		jpeg_create_decompress(&cinfo);
-
-		jpeg_mem_src(&cinfo, memregion("user2")->base()+addr, memregion("user2")->bytes()-addr);
-
-		jpeg_read_header(&cinfo, true);
-		jpeg_start_decompress(&cinfo);
-
-		int row_stride = cinfo.output_width * cinfo.output_components;
-
-		buffer = (*cinfo.mem->alloc_sarray)((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
-
-		while (cinfo.output_scanline < cinfo.output_height)
+		const u8 *const src = m_jpeg->image_row(y);
+		for (int x = 0; x < m_jpeg->image_width(); x++)
 		{
-			jpeg_read_scanlines(&cinfo, buffer, 1);
-			int y = cinfo.output_scanline;
-
-			for (x = 0; x < row_stride/3; x++)
-			{
-				uint8_t b = buffer[0][(x*3)];
-				uint8_t g = buffer[0][(x*3)+1];
-				uint8_t r = buffer[0][(x*3)+2];
-				plot_pixel_rgb(x - x_offset + m_jpeg_x, y - y_offset - m_jpeg_y, r, g, b);
-			}
+			const rgb_t color = zr36050_device::ycbcr_to_rgb(src[x * 3], src[x * 3 + 1], src[x * 3 + 2]);
+			plot_pixel_rgb(x - x_offset + m_jpeg_x, y + 1 - y_offset - m_jpeg_y, color);
 		}
-
-		jpeg_finish_decompress(&cinfo);
-		jpeg_destroy_decompress(&cinfo);
 	}
-
 }
 
 void sliver_state::jpeg2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -533,6 +522,9 @@ void sliver_state::sliver(machine_config &config)
 	// AT76C176
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
 	ramdac.set_addrmap(0, &sliver_state::ramdac_map);
+
+	ZR36050(config, m_jpeg);
+	m_jpeg->code_read().set(FUNC(sliver_state::jpeg_code_r));
 
 	SPEAKER(config, "speaker", 2).front();
 

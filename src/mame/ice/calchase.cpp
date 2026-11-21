@@ -6,8 +6,6 @@ California Chase (c) 1999 The Game Room
 Eggs Playing Chicken (c) 2002 The Game Room
 Host Invaders (c) 1998 The Game Room
 
-driver by Angelo Salese & Grull Osgo
-
 Hardware is known as "AUSCOM System 1" hardware.
 
 Other games that may be on this hardware (if ever finished):
@@ -17,14 +15,17 @@ Other games that may be on this hardware (if ever finished):
 
 Notes:
 - calchase: type boot to load game
+- hostinv: need to set CMOS to load from CD-ROM (BIOS features setup -> Boot Sequence)
 
 TODO:
-- Convert to PCI, needs its own Super I/O, pre-AGP VIA chipset (VT82C580VPX Apollo VPX) and
-  TGUI9680 conversion;
+- Convert TGUI9680 to be PCI;
+- Hookup actual Super I/O (currently getting a port conflict out of it);
+- Unmapped writes to 0x04xx'xxxx, chipset feature?
 - calchase: needs a redump, most of Win98 is damaged (has no folder structure);
 - calchase: requires franticf style wheel, service mode just black screen, has various gfx bugs
   during gameplay;
-- hostinv: is an El Torito CD-ROM, can't boot here until PCI section is rewritten;
+- hostinv: crashes around ROM-DOS "Qualitas MAX" memory manager, which eventually leads to a
+  DOS-extender page fault. Passes that check if RAM is 256MB but then it will reset along the way;
 - eggsplc: fix input labels (needs card subclassing), ticket dispenser, should require a default
   NVRAM (has "63" for every winning zone, unlikely), becomes unwinnable after first ticket
   win (propagates to successive reboots), EMM386 fails during boot, should be heavily idle
@@ -91,52 +92,29 @@ all files across to new HDD, boots up fine.
 Host Invaders is the same motherboard and video card as above, but instead of an HDD,
 there is a CD-ROM drive.
 
-************************************************************************************/
-/*
-Grull Osgo - Improvements
-
-- Changes about BIOS memory management so ROM Shadow now works properly.
-  The changes are:
-  Rom Memory Map remmapped to 128K size map(0xfffe0000, 0xffffffff).rom().region("bios", 0);
-
-- Changes in mtxc write handler and bios_ram write handler. Now The internal register access are
-  compatible with chipset VIA.
-  (this motherboard has VIA Apollo VXPro chipset. It is not compatible with Intel i430).
-  With this changes now BIOS Shadow ram works fine, BIOS can relocate and decompress the full code
-  necessary to run the Extended BIOS, POST and Boot). No more BIOS Checksum error.
-
-- Suppressed all video related items wich will be replaced with VGA driver.
-
-- Temporarily added a VGA driver that is working based on original IBM VGA BIOS.(From MESS)
-  (This VGA driver doesn't work yet with TRIDENT VGA BIOS as I can see).
-
-- Added the flag READONLY to the calchase imagen rom load function, to avoid
-  "DIFF CHD ERROR".
-
-- Minor changes and NOPS into address maps for debugging purposes.
-
-- Now BIOS is looking for the disk (BIOS Auto detection). It seems all works fine but must be there
-  something wrong in the disk geometry reported by calchase.chd (20,255,63) since BIOS does not accept
-  255 heads as parameter. Perhaps a bad dump?
-
-- update by peter ferrie:
-- corrected memory map to 64kb blocks
-- corrected access to PAM register
-*/
-
+**************************************************************************************************/
 
 #include "emu.h"
 
-#include "pcshare.h"
-
-#include "bus/isa/isa.h"
+#include "bus/isa/isa_cards.h"
 #include "bus/isa/svga_trident.h"
+#include "bus/pci/pci_slot.h"
+#include "bus/rs232/hlemouse.h"
+#include "bus/rs232/null_modem.h"
+#include "bus/rs232/rs232.h"
+#include "bus/rs232/sun_kbd.h"
+#include "bus/rs232/terminal.h"
 #include "cpu/i386/i386.h"
-#include "machine/lpci.h"
-#include "machine/pckeybrd.h"
-#include "machine/idectrl.h"
 #include "machine/ds128x.h"
+#include "machine/fdc37c669.h"
+#include "machine/idectrl.h"
 #include "machine/nvram.h"
+#include "machine/pci.h"
+#include "machine/vt82c585vp.h"
+#include "machine/vt82c586b_acpi.h"
+#include "machine/vt82c586b_ide.h"
+#include "machine/vt82c586b_isa.h"
+#include "machine/vt82c586b_usb.h"
 #include "sound/dac.h"
 #include "video/pc_vga.h"
 
@@ -159,8 +137,7 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	// TODO: implement me once conversion to PCI kicks in
-//  virtual void remap(int space_id, offs_t start, offs_t end) override;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 private:
 	required_ioport_array<5> m_iocard;
 	std::unique_ptr<uint8_t[]> m_nvram_data;
@@ -201,14 +178,20 @@ void isa16_calchase_jamma_if::device_start()
 	subdevice<nvram_device>("nvram")->set_base(m_nvram_data.get(), 0x800);
 
 	m_hb_timer = timer_alloc(FUNC(isa16_calchase_jamma_if::heartbeat_cb), this);
-
-	m_isa->install_memory(0x000d0000, 0x000d0fff, *this, &isa16_calchase_jamma_if::io_map);
 }
 
 void isa16_calchase_jamma_if::device_reset()
 {
 	// TODO: timing and actual source
 	m_hb_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));
+}
+
+void isa16_calchase_jamma_if::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_memory(0x000d0000, 0x000d0fff, *this, &isa16_calchase_jamma_if::io_map);
+	}
 }
 
 template <unsigned N>
@@ -407,374 +390,192 @@ ioport_constructor isa16_calchase_jamma_if::device_input_ports() const
 
 namespace {
 
-class calchase_state : public pcat_base_state
+class calchase_state : public driver_device
 {
 public:
 	calchase_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag)
+		: driver_device(mconfig, type, tag)
 	{
 	}
 
 	void calchase(machine_config &config);
 	void hostinv(machine_config &config);
-	void init_calchase();
-	void init_hostinv();
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
-	std::unique_ptr<uint32_t[]> m_bios_ram;
-	std::unique_ptr<uint32_t[]> m_bios_ext_ram;
-	uint8_t m_mtxc_config_reg[256]{};
-	uint8_t m_piix4_config_reg[4][256]{};
-
-	void bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-	void bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
-
-	void intel82439tx_init();
 	void calchase_io(address_map &map) ATTR_COLD;
 	void calchase_map(address_map &map) ATTR_COLD;
 
-	uint8_t mtxc_config_r(int function, int reg);
-	void mtxc_config_w(int function, int reg, uint8_t data);
-	uint32_t intel82439tx_pci_r(int function, int reg, uint32_t mem_mask);
-	void intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
-	uint8_t piix4_config_r(int function, int reg);
-	void piix4_config_w(int function, int reg, uint8_t data);
-	uint32_t intel82371ab_pci_r(int function, int reg, uint32_t mem_mask);
-	void intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask);
+	static void superio_config(device_t *device);
 };
-
-// Intel 82439TX System Controller (MTXC)
-// TODO: change with a VIA82C585VPX (North Bridge - APOLLO Chipset)
-
-uint8_t calchase_state::mtxc_config_r(int function, int reg)
-{
-//  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
-
-	return m_mtxc_config_reg[reg];
-}
-
-void calchase_state::mtxc_config_w(int function, int reg, uint8_t data)
-{
-//  osd_printf_debug("%s:MTXC: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
-
-	/*
-	memory banking with North Bridge:
-	0x63 (PAM)  xx-- ---- BIOS extension 0xe0000 - 0xeffff
-	            --xx ---- BIOS area 0xf0000-0xfffff
-	            ---- xx-- ISA add-on BIOS 0xc0000 - 0xcffff
-	            ---- --xx ISA add-on BIOS 0xd0000 - 0xdffff
-
-	10 -> 1 = Write Enable, 0 = Read Enable
-	*/
-
-	if (reg == 0x63)
-	{
-		if (data & 0x20)        // enable RAM access to region 0xf0000 - 0xfffff
-			membank("bios_bank")->set_base(m_bios_ram.get());
-		else                    // disable RAM access (reads go to BIOS ROM)
-			membank("bios_bank")->set_base(memregion("bios")->base() + 0x10000);
-		if (data & 0x80)        // enable RAM access to region 0xe0000 - 0xeffff
-			membank("bios_ext")->set_base(m_bios_ext_ram.get());
-		else
-			membank("bios_ext")->set_base(memregion("bios")->base() + 0);
-	}
-
-	m_mtxc_config_reg[reg] = data;
-}
-
-void calchase_state::intel82439tx_init()
-{
-	m_mtxc_config_reg[0x60] = 0x02;
-	m_mtxc_config_reg[0x61] = 0x02;
-	m_mtxc_config_reg[0x62] = 0x02;
-	m_mtxc_config_reg[0x63] = 0x02;
-	m_mtxc_config_reg[0x64] = 0x02;
-	m_mtxc_config_reg[0x65] = 0x02;
-}
-
-uint32_t calchase_state::intel82439tx_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-
-	if(reg == 0)
-		return 0x05851106; // VT82C585VPX, VIA
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= mtxc_config_r(function, reg + 3) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= mtxc_config_r(function, reg + 2) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= mtxc_config_r(function, reg + 1) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= mtxc_config_r(function, reg + 0) << 0;
-	}
-	return r;
-}
-
-void calchase_state::intel82439tx_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		mtxc_config_w(function, reg + 3, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		mtxc_config_w(function, reg + 2, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		mtxc_config_w(function, reg + 1, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		mtxc_config_w(function, reg + 0, (data >> 0) & 0xff);
-	}
-}
-
-// Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
-//TODO: change with VIA82C586B (South Bridge - APOLLO Chipset)
-
-uint8_t calchase_state::piix4_config_r(int function, int reg)
-{
-//  osd_printf_debug("PIIX4: read %d, %02X\n", function, reg);
-	return m_piix4_config_reg[function][reg];
-}
-
-void calchase_state::piix4_config_w(int function, int reg, uint8_t data)
-{
-//  osd_printf_debug("%s:PIIX4: write %d, %02X, %02X\n", machine().describe_context(), function, reg, data);
-	m_piix4_config_reg[function][reg] = data;
-}
-
-uint32_t calchase_state::intel82371ab_pci_r(int function, int reg, uint32_t mem_mask)
-{
-	uint32_t r = 0;
-
-	if(reg == 0)
-		return 0x30401106; // VT82C586B, VIA
-
-	if (ACCESSING_BITS_24_31)
-	{
-		r |= piix4_config_r(function, reg + 3) << 24;
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		r |= piix4_config_r(function, reg + 2) << 16;
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		r |= piix4_config_r(function, reg + 1) << 8;
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		r |= piix4_config_r(function, reg + 0) << 0;
-	}
-	return r;
-}
-
-void calchase_state::intel82371ab_pci_w(int function, int reg, uint32_t data, uint32_t mem_mask)
-{
-	if (ACCESSING_BITS_24_31)
-	{
-		piix4_config_w(function, reg + 3, (data >> 24) & 0xff);
-	}
-	if (ACCESSING_BITS_16_23)
-	{
-		piix4_config_w(function, reg + 2, (data >> 16) & 0xff);
-	}
-	if (ACCESSING_BITS_8_15)
-	{
-		piix4_config_w(function, reg + 1, (data >> 8) & 0xff);
-	}
-	if (ACCESSING_BITS_0_7)
-	{
-		piix4_config_w(function, reg + 0, (data >> 0) & 0xff);
-	}
-}
-
-void calchase_state::bios_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x63] & 0x10)       // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ram.get() + offset);
-	}
-}
-
-void calchase_state::bios_ext_ram_w(offs_t offset, uint32_t data, uint32_t mem_mask)
-{
-	if (m_mtxc_config_reg[0x63] & 0x40)       // write to RAM if this region is write-enabled
-	{
-		COMBINE_DATA(m_bios_ext_ram.get() + offset);
-	}
-}
 
 void calchase_state::calchase_map(address_map &map)
 {
-	map(0x00000000, 0x0009ffff).ram();
-//  map(0x000a0000, 0x000bffff).rw("vga", FUNC(trident_vga_device::mem_r), FUNC(trident_vga_device::mem_w)); // VGA VRAM
-//  map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
-//  map(0x000c8000, 0x000cffff).noprw();
-//  map(0x000d0000, 0x000d0fff) ISA custom JAMMA (above)
-	map(0x000e0000, 0x000effff).bankr("bios_ext").w(FUNC(calchase_state::bios_ext_ram_w));
-	map(0x000f0000, 0x000fffff).bankr("bios_bank").w(FUNC(calchase_state::bios_ram_w));
-	map(0x00100000, 0x03ffffff).ram();  // 64MB
-	map(0x04000000, 0x28ffffff).noprw();
-	map(0xfffe0000, 0xffffffff).rom().region("bios", 0);    /* System BIOS */
+	map.unmap_value_high();
 }
 
 void calchase_state::calchase_io(address_map &map)
 {
-	pcat32_io_common(map);
-	map(0x00e8, 0x00ef).noprw(); //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
-//  map(0x0170, 0x0177).noprw(); //To debug
-	map(0x01f0, 0x01f7).rw("ide", FUNC(ide_controller_32_device::cs0_r), FUNC(ide_controller_32_device::cs0_w));
-	map(0x03f0, 0x03f7).rw("ide", FUNC(ide_controller_32_device::cs1_r), FUNC(ide_controller_32_device::cs1_w));
-//  map(0x03f8, 0x03ff).noprw(); // To debug Serial Port COM1:
-//  map(0x0a78, 0x0a7b).nopw();//.w(FUNC(calchase_state::pnp_data_w));
-	map(0x0cf8, 0x0cff).rw("pcibus", FUNC(pci_bus_legacy_device::read), FUNC(pci_bus_legacy_device::write));
-//  map(0x43c4, 0x43cb).rw("vga", FUNC(trident_vga_device::port_43c6_r), FUNC(trident_vga_device::port_43c6_w));  // Trident Memory and Video Clock register
-//  map(0x83c4, 0x83cb).rw("vga", FUNC(trident_vga_device::port_83c6_r), FUNC(trident_vga_device::port_83c6_w));  // Trident LUTDAC
+	map.unmap_value_high();
 }
 
-
-void calchase_state::machine_start()
-{
-	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
-	m_bios_ext_ram = std::make_unique<uint32_t[]>(0x10000/4);
-
-	for (int i = 0; i < 4; i++)
-		std::fill(std::begin(m_piix4_config_reg[i]), std::end(m_piix4_config_reg[i]), 0);
-}
-
-void calchase_state::machine_reset()
-{
-	//membank("bank1")->set_base(memregion("bios")->base() + 0x10000);
-	membank("bios_bank")->set_base(memregion("bios")->base() + 0x10000);
-	membank("bios_ext")->set_base(memregion("bios")->base() + 0);
-}
 
 void calchase_isa16_cards(device_slot_interface &device)
 {
 	device.option_add("calchase_jamma_if", ISA16_CALCHASE_JAMMA_IF);
 	device.option_add("tgui9680", ISA16_SVGA_TGUI9680);
+	device.option_add_internal("superio", FDC37C669);
+}
+
+static void isa_com(device_slot_interface &device)
+{
+	device.option_add("microsoft_mouse", MSFT_HLE_SERIAL_MOUSE);
+	device.option_add("logitech_mouse", LOGITECH_HLE_SERIAL_MOUSE);
+	device.option_add("wheel_mouse", WHEEL_HLE_SERIAL_MOUSE);
+	device.option_add("msystems_mouse", MSYSTEMS_HLE_SERIAL_MOUSE);
+	device.option_add("rotatable_mouse", ROTATABLE_HLE_SERIAL_MOUSE);
+	device.option_add("terminal", SERIAL_TERMINAL);
+	device.option_add("null_modem", NULL_MODEM);
+	device.option_add("sun_kbd", SUN_KBD_ADAPTOR);
+}
+
+void calchase_state::superio_config(device_t *device)
+{
+	// FD37C669QF
+	fdc37c669_device &fdc = *downcast<fdc37c669_device *>(device);
+	// CR26: 20 (FDC DRQ 2 LPT DRQ 0) DMA_B / <disabled>
+	// CR27: 65 (FDC IRQ 6 LPT IRQ 5) IRQ_F / IRQ_E
+	// CR28: 43 (COM1 IRQ 4 COM2 IRQ 3) IRQ_D / IRQ_C
+	// CR29: 30 (IRQIN f) <disabled>
+//	fdc.irq_a().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq1_w));
+//	fdc.irq_b().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq2_w));
+	fdc.irq_c().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq3_w));
+	fdc.irq_d().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq4_w));
+	fdc.irq_e().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq7_w));
+	fdc.irq_f().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq6_w));
+//	fdc.irq_h().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq8n_w));
+
+	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts1().set(":serport0", FUNC(rs232_port_device::write_rts));
+	fdc.txd2().set(":serport1", FUNC(rs232_port_device::write_txd));
+	fdc.ndtr2().set(":serport1", FUNC(rs232_port_device::write_dtr));
+	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
 void calchase_state::calchase(machine_config &config)
 {
-	PENTIUM(config, m_maincpu, 133000000); // Cyrix 686MX-PR200 CPU
-	m_maincpu->set_addrmap(AS_PROGRAM, &calchase_state::calchase_map);
-	m_maincpu->set_addrmap(AS_IO, &calchase_state::calchase_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
+	// Cyrix 686MX-PR200 CPU
+	pentium_device &maincpu(PENTIUM(config, "maincpu", 133'000'000));
+	maincpu.set_addrmap(AS_PROGRAM, &calchase_state::calchase_map);
+	maincpu.set_addrmap(AS_IO, &calchase_state::calchase_io);
+	maincpu.set_irq_acknowledge_callback("pci:07.0:pic0", FUNC(pic8259_device::inta_cb));
+	maincpu.smiact().set("pci:00.0", FUNC(vt82c585vp_host_device::smi_act_w));
 
-	pcat_common(config);
+	PCI_ROOT(config, "pci");
+	VT82C585VP_HOST(config, "pci:00.0", 0, "maincpu", 64*1024*1024);
 
-	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "hdd", nullptr, true));
-	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
+	vt82c586b_isa_device &isa(VT82C586B_ISA(config, "pci:07.0", XTAL(33'000'000), "maincpu"));
+	isa.boot_state_hook().set([](u8 data) { /* printf("%02x\n", data); */ });
+	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
+	isa.cpureset().set_inputline("maincpu", INPUT_LINE_RESET);
+	isa.pcirst().set([this] (int state) {
+		if (state)
+			machine().schedule_soft_reset();
+	});
+	//isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
-	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
+	vt82c586b_ide_device &ide(VT82C586B_IDE(config, "pci:07.1", 0, "maincpu"));
+	ide.irq_pri().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_ide0_w));
+	ide.irq_sec().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_ide1_w));
 
-	// FIXME: determine ISA bus clock
-	isa16_device &isa(ISA16(config, "isa"));
-	isa.set_memspace("maincpu", AS_PROGRAM);
-	isa.set_iospace("maincpu", AS_IO);
-	ISA16_SLOT(config, "isa1", 0, "isa", calchase_isa16_cards, "calchase_jamma_if", true);
+	VT82C586B_USB (config, "pci:07.2", 0);
+
+	vt82c586b_acpi_device &acpi_pci(VT82C586B_ACPI(config, "pci:07.3", 0));
+	acpi_pci.sci_pin_cb().set("pci:07.0", FUNC(vt82c586b_isa_device::acpi_pin_config_w));
+	acpi_pipc_device &acpi_dev(ACPI_PIPC(config, "pci:07.3:acpi"));
+	acpi_dev.smi().set_inputline("maincpu", INPUT_LINE_SMI);
+	acpi_dev.sci().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_acpi_w));
+
+	PCI_SLOT(config, "pci:1", pci_cards,  8, 0, 1, 2, 3, nullptr);
+	PCI_SLOT(config, "pci:2", pci_cards,  9, 1, 2, 3, 0, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
+
+	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", calchase_isa16_cards, "superio", true).set_option_machine_config("superio", superio_config);
 	// TODO: temp, to be converted to PCI slot
-	ISA16_SLOT(config, "isa2", 0, "isa", calchase_isa16_cards, "tgui9680", true);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", calchase_isa16_cards, "tgui9680", true);
+	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", calchase_isa16_cards, "calchase_jamma_if", true);
+	ISA16_SLOT(config, "isa3",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
+	ISA16_SLOT(config, "isa4",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 
-	ds12885_device &rtc(DS12885(config.replace(), "rtc"));
-	rtc.irq().set("pic8259_2", FUNC(pic8259_device::ir0_w));
-	rtc.set_century_index(0x32);
+	rs232_port_device &serport0(RS232_PORT(config, "serport0", isa_com, nullptr));
+	serport0.rxd_handler().set("board4:superio", FUNC(fdc37c669_device::rxd1_w));
+	serport0.dcd_handler().set("board4:superio", FUNC(fdc37c669_device::ndcd1_w));
+	serport0.dsr_handler().set("board4:superio", FUNC(fdc37c669_device::ndsr1_w));
+	serport0.ri_handler().set("board4:superio", FUNC(fdc37c669_device::nri1_w));
+	serport0.cts_handler().set("board4:superio", FUNC(fdc37c669_device::ncts1_w));
 
+	rs232_port_device &serport1(RS232_PORT(config, "serport1", isa_com, nullptr));
+	serport1.rxd_handler().set("board4:superio", FUNC(fdc37c669_device::rxd2_w));
+	serport1.dcd_handler().set("board4:superio", FUNC(fdc37c669_device::ndcd2_w));
+	serport1.dsr_handler().set("board4:superio", FUNC(fdc37c669_device::ndsr2_w));
+	serport1.ri_handler().set("board4:superio", FUNC(fdc37c669_device::nri2_w));
+	serport1.cts_handler().set("board4:superio", FUNC(fdc37c669_device::ncts2_w));
 }
 
 void calchase_state::hostinv(machine_config &config)
 {
-	PENTIUM(config, m_maincpu, 133000000); // Cyrix 686MX-PR200 CPU
-	m_maincpu->set_addrmap(AS_PROGRAM, &calchase_state::calchase_map);
-	m_maincpu->set_addrmap(AS_IO, &calchase_state::calchase_io);
-	m_maincpu->set_irq_acknowledge_callback("pic8259_1", FUNC(pic8259_device::inta_cb));
+	calchase(config);
 
-	pcat_common(config);
+	// TODO: change up JAMMA i/f (this is a lightgun game)
 
-	ide_controller_32_device &ide(IDE_CONTROLLER_32(config, "ide").options(ata_devices, "cdrom", nullptr, true));
-	ide.irq_handler().set("pic8259_2", FUNC(pic8259_device::ir6_w));
+	vt82c586b_ide_device &ide(VT82C586B_IDE(config.replace(), "pci:07.1", 0, "maincpu"));
+	ide.irq_pri().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_ide0_w));
+	ide.irq_sec().set("pci:07.0", FUNC(vt82c586b_isa_device::pc_ide1_w));
 
-	pci_bus_legacy_device &pcibus(PCI_BUS_LEGACY(config, "pcibus", 0, 0));
-	pcibus.set_device(0, FUNC(calchase_state::intel82439tx_pci_r), FUNC(calchase_state::intel82439tx_pci_w));
-	pcibus.set_device(7, FUNC(calchase_state::intel82371ab_pci_r), FUNC(calchase_state::intel82371ab_pci_w));
+	ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_default_option("cdrom");
+//  ide.subdevice<bus_master_ide_controller_device>("ide1")->slot(0).set_option_machine_config("cdrom", cdrom_config);
+	ide.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_default_option(nullptr);
 
-	// TODO: determine isa bus clock
-	isa16_device &isa(ISA16(config, "isa"));
-	isa.set_memspace("maincpu", AS_PROGRAM);
-	isa.set_iospace("maincpu", AS_IO);
-	ISA16_SLOT(config, "isa1", 0, "isa", calchase_isa16_cards, "calchase_jamma_if", true);
-	// TODO: temp, to be converted to PCI slot
-	ISA16_SLOT(config, "isa2", 0, "isa", calchase_isa16_cards, "tgui9680", true);
-}
-
-void calchase_state::init_calchase()
-{
-	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
-
-	intel82439tx_init();
-}
-
-void calchase_state::init_hostinv()
-{
-	m_bios_ram = std::make_unique<uint32_t[]>(0x20000/4);
-
-	intel82439tx_init();
 }
 
 ROM_START( calchase )
-	ROM_REGION32_LE( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x20000, "pci:07.0", 0 )
 	ROM_LOAD( "mb_bios.bin", 0x00000, 0x20000, CRC(dea7a51b) SHA1(e2028c00bfa6d12959fc88866baca8b06a1eab68) )
 
 	ROM_REGION( 0x800, "isa1:calchase_jamma_if:nvram", 0 )
 	ROM_LOAD( "ds1220y_nv.bin", 0x000, 0x800, CRC(7912c070) SHA1(b4c55c7ca76bcd8dad1c4b50297233349ae02ed3) )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE_READONLY( "calchase", 0, BAD_DUMP SHA1(6ae51a9b3f31cf4166322328a98c0235b0874eb3) )
 ROM_END
 
 ROM_START( hostinv )
-	ROM_REGION32_LE( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x20000, "pci:07.0", 0 )
 	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
 
 	ROM_REGION( 0x800, "isa1:calchase_jamma_if:nvram", ROMREGION_ERASEFF )
 	ROM_LOAD( "ds1220y_hostinv.bin", 0x000, 0x800, NO_DUMP )
 
-	DISK_REGION( "ide:0:cdrom" )
+	DISK_REGION( "pci:07.1:ide1:0:cdrom" )
 	DISK_IMAGE_READONLY( "hostinv", 0, SHA1(3cb86c62e80be98a717172b717f7276a0e5f6830) )
 ROM_END
 
 ROM_START( eggsplc )
-	ROM_REGION32_LE( 0x40000, "bios", 0 )
+	ROM_REGION32_LE( 0x20000, "pci:07.0", 0 )
 	ROM_LOAD( "hostinv_bios.bin", 0x000000, 0x020000, CRC(5111e4b8) SHA1(20ab93150b61fd068f269368450734bba5dcb284) )
 
 	ROM_REGION( 0x800, "isa1:calchase_jamma_if:nvram", ROMREGION_ERASEFF )
 	ROM_LOAD( "ds1220y_eggsplc.bin", 0x000, 0x800, NO_DUMP )
 
-	DISK_REGION( "ide:0:hdd" )
+	DISK_REGION( "pci:07.1:ide1:0:hdd" )
 	DISK_IMAGE_READONLY( "eggsplc", 0, SHA1(fa38dd6b0d25cde644f68cf639768f137c607eb5) )
 ROM_END
 
 } // Anonymous namespace
 
 
-GAME( 1998, hostinv,  0, hostinv,  0, calchase_state, init_hostinv,  ROT0, "The Game Room", "Host Invaders",        MACHINE_NOT_WORKING )
-GAME( 1999, calchase, 0, calchase, 0, calchase_state, init_calchase, ROT0, "The Game Room", "California Chase",     MACHINE_NOT_WORKING )
-GAME( 2002, eggsplc,  0, calchase, 0, calchase_state, init_hostinv,  ROT0, "The Game Room", "Eggs Playing Chicken", MACHINE_NOT_WORKING )
+GAME( 1998, hostinv,  0, hostinv,  0, calchase_state, empty_init,  ROT0, "The Game Room", "Host Invaders",        MACHINE_NOT_WORKING )
+GAME( 1999, calchase, 0, calchase, 0, calchase_state, empty_init,  ROT0, "The Game Room", "California Chase",     MACHINE_NOT_WORKING )
+GAME( 2002, eggsplc,  0, calchase, 0, calchase_state, empty_init,  ROT0, "The Game Room", "Eggs Playing Chicken", MACHINE_NOT_WORKING )

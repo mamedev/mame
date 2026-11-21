@@ -193,7 +193,7 @@ public:
 protected:
 	// describe a block
 	template <typename T>
-	Desc const *do_describe_code(T && describe, offs_t startpc);
+	Desc const *do_describe_code(T &&describe, offs_t startpc);
 
 private:
 	// internal helpers
@@ -204,17 +204,17 @@ private:
 	void release_descriptions();
 
 	// configuration parameters
-	u32 const           m_window_start;             // code window start offset = startpc - window_start
-	u32 const           m_window_end;               // code window end offset = startpc + window_end
-	u32 const           m_max_sequence;             // maximum instructions to include in a sequence
+	u32 const               m_window_start;         // code window start offset = startpc - window_start
+	u32 const               m_window_end;           // code window end offset = startpc + window_end
+	u32 const               m_max_sequence;         // maximum instructions to include in a sequence
 
 	// CPU parameters
-	offs_t const        m_pageshift;                // shift to convert address to a page index
+	offs_t const            m_pageshift;            // shift to convert address to a page index
 
 	// opcode descriptor arrays
-	simple_list<Desc>   m_desc_live_list;           // list of live descriptions
-	fixed_allocator<Desc> m_desc_allocator;         // fixed allocator for descriptions
-	std::vector<Desc *> m_desc_array;               // array of descriptions in PC order
+	simple_list<Desc>       m_desc_live_list;       // list of live descriptions
+	fixed_allocator<Desc>   m_desc_allocator;       // fixed allocator for descriptions
+	std::vector<Desc *>     m_desc_array;           // array of descriptions in PC order
 };
 
 #endif // MAME_CPU_DRCFE_H

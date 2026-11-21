@@ -215,14 +215,17 @@ void pc8801_state::draw_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, 
 
 uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// BG Pal applies to 1bpp mode only
+	// - sharrier draws blue backdrop with pen #0 during gameplay
+	// - archon sets a blue BG Pal but definitely expects pen #0 black on BPS logo, and dark blue
+	//   in gameplay
+	// - pc8001:fejobust wants flashy BG Pal when player get hit, with bitmap layer disabled
+	//   (presumably doesn't work for PC-8001 itself)
+	const bool bitmap_color_mode = bool(m_gfx_ctrl & 0x10);
+	bitmap.fill(m_palette->pen(bitmap_color_mode ? 0 : BGPAL_PEN), cliprect);
+
 	if (m_gfx_ctrl & 8)
 	{
-		// BG Pal applies to 1bpp mode only
-		// - sharrier draws blue backdrop with pen #0 during gameplay
-		// - archon sets a blue BG Pal but definitely expects pen #0 black (BPS logo)
-		const bool bitmap_color_mode = bool(m_gfx_ctrl & 0x10);
-		bitmap.fill(m_palette->pen(bitmap_color_mode ? 0 : BGPAL_PEN), cliprect);
-
 		if (bitmap_color_mode)
 		{
 			draw_bitmap(bitmap, cliprect, m_palette,
@@ -269,6 +272,7 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 				//    that runs in 3bpp)
 				// - byoin set a transparent text layer (ASCII=0x20 / attribute = 0x80 0x00)
 				//   but it's in gfx_mode = 0 (b&w) so it just draw white from here.
+				// TODO: byoin also set reverse for user selections, currently draws solid white
 				draw_bitmap(bitmap, cliprect, m_crtc_palette,
 						[this] (u32 bitmap_offset, int y, int x, int xi)
 						{
@@ -292,8 +296,8 @@ uint32_t pc8801_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 			}
 		}
 	}
-	else
-		bitmap.fill(0, cliprect);
+//	else
+//		bitmap.fill(0, cliprect);
 
 	if (!m_text_layer_mask)
 	{
@@ -692,6 +696,10 @@ void pc8801_state::palram_w(offs_t offset, uint8_t data)
 {
 	if (m_misc_ctrl & 0x20) //analog palette
 	{
+		// archon writes with bit 7 high, expecting to route to border color rather than offset reg.
+		// (would cause white backdrop in gameplay otherwise)
+		if (BIT(data, 7))
+			offset = BORDER_PEN;
 		if ((data & 0x40) == 0)
 		{
 			m_palram[offset].b = data & 0x7;

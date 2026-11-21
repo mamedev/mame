@@ -266,6 +266,7 @@ void psion5mx_state::machine_start()
 
 	// install RAM
 	m_maincpu->space(AS_PROGRAM).install_ram(0xc0000000, 0xc0000000 + m_ram->mask(), 0x0fffffff ^ m_ram->mask(), m_ram->pointer());
+	m_maincpu->arm7drc_add_fastram(0xc0000000, 0xc0000000 + m_ram->mask(), false, m_ram->pointer());    // the recompiler accesses it in place
 
 	m_nvram->set_base(m_ram->pointer(), m_ram->size());
 

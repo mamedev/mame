@@ -43,6 +43,8 @@ void i82371sb_isa_device::internal_io_map(address_map &map)
 //  map(0x0070, 0x0070) RTC address, bit 7 NMI enable
 //  map(0x0071, 0x0071) RTC data
 //  map(0x0078, 0x0079) Board Configuration
+	// TODO: should be 0x80, 0x8f
+	// (0x92 canonically for fast init, which this chipset don't use)
 	map(0x0080, 0x009f).rw(FUNC(i82371sb_isa_device::at_page8_r), FUNC(i82371sb_isa_device::at_page8_w));
 	map(0x00a0, 0x00a1).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00b2, 0x00b3).rw(FUNC(i82371sb_isa_device::read_apmcapms), FUNC(i82371sb_isa_device::write_apmcapms));

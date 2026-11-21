@@ -147,6 +147,7 @@ private:
 		uint32_t alutemp;
 		uint32_t multemp;
 		uint32_t condtemp;
+		uint32_t cur_value; // FIFO word or status exchanged with the C callbacks
 
 		uint32_t pdr;
 		uint32_t ddr;
@@ -230,15 +231,12 @@ private:
 	bool aluop_has_result(int aluop);
 	bool check_previous_op_stall();
 
-	// UML is sad...
-	u32 m_cur_value;
-
-	static void clear_fifoin(void *param);
-	static void clear_fifoout(void *param);
-	static void read_fifoin(void *param);
-	static void write_fifoout(void *param);
-	static void empty_fifoin(void *param);
-	static void full_fifoout(void *param);
+	static void clear_fifoin(mb86235_device &cpu);
+	static void clear_fifoout(mb86235_device &cpu);
+	static void read_fifoin(mb86235_device &cpu);
+	static void write_fifoout(mb86235_device &cpu);
+	static void empty_fifoin(mb86235_device &cpu);
+	static void full_fifoout(mb86235_device &cpu);
 
 	// interpreter
 	void execute_op(uint64_t op);

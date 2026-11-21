@@ -116,6 +116,8 @@ public:
 	void dcd_w(int state);
 	void rxc_w(int state);
 	void txc_w(int state);
+	void rtxc_w(int state);
+	void trxc_w(int state);
 	void sync_w(int state);
 
 	TIMER_CALLBACK_MEMBER(brg_tick);
@@ -234,6 +236,8 @@ protected:
 
 	unsigned int get_brg_rate();
 	unsigned int get_rtxc_rate();
+	void rx_clock_edge(int state);
+	void tx_clock_edge(int state);
 	void update_baudtimer();
 
 	void scc_register_write(uint8_t reg, uint8_t data);
@@ -251,6 +255,7 @@ protected:
 	int get_rx_word_length();
 	int get_tx_word_length();
 	void safe_transmit_register_reset();
+	void set_tx_brg_rate();
 	void check_dma_request();
 	void check_receive_interrupt();
 	bool rx_special_condition(uint8_t status) const;
@@ -260,6 +265,7 @@ protected:
 	uint16_t m_brg_counter;
 	unsigned int m_brg_rate;
 	unsigned int m_delayed_tx_brg_change;
+	bool m_tx_clocked;
 
 	// receiver state
 	uint8_t m_rx_data_fifo[8 + 1];    // receive data FIFO (ring buffer, one slot is always left unused)
@@ -383,6 +389,10 @@ public:
 	void txca_w(int state) { m_chanA->txc_w(state); }
 	void txcb_w(int state) { m_chanB->txc_w(state); }
 	void rxtxcb_w(int state) { m_chanB->rxc_w(state); m_chanB->txc_w(state); }
+	void rtxca_w(int state) { m_chanA->rtxc_w(state); }
+	void rtxcb_w(int state) { m_chanB->rtxc_w(state); }
+	void trxca_w(int state) { m_chanA->trxc_w(state); }
+	void trxcb_w(int state) { m_chanB->trxc_w(state); }
 	void synca_w(int state) { m_chanA->sync_w(state); }
 	void syncb_w(int state) { m_chanB->sync_w(state); }
 	int update_extint(int i);

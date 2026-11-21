@@ -115,244 +115,18 @@ void galpani2_state::galpani2_eeprom_w(offs_t offset, uint16_t data, uint16_t me
 }
 
 
-/***************************************************************************
-
-
-                                MCU Simulation
-
-100010.w    software watchdog?
-100020.b    number of tasks for the mcu
-
-***************************************************************************/
-
 void galpani2_state::machine_start()
 {
 	uint8_t *ROM = memregion("subdata")->base();
-	membank("subdatabank")->configure_entries(0, 0x2000000/0x0800000, ROM, 0x0800000);
-	membank("subdatabank")->set_entry(0);
+	m_subdatabank->configure_entries(0, 0x2000000/0x0800000, ROM, 0x0800000);
+	m_subdatabank->set_entry(0);
 
 	save_item(NAME(m_eeprom_word));
-	save_item(NAME(m_old_mcu_nmi1));
-	save_item(NAME(m_old_mcu_nmi2));
 }
 
 void galpani2_state::machine_reset()
 {
 	machine().scheduler().perfect_quantum(attotime::from_usec(50)); //initial mcu xchk
-}
-
-static void galpani2_write_kaneko(cpu_device *cpu)
-{
-	address_space &dstspace = cpu->space(AS_PROGRAM);
-	int i,x,tpattidx;
-	unsigned char testpattern[] = {0xFF,0x55,0xAA,0xDD,0xBB,0x99};
-
-	/* Write "KANEKO" to 100000-100005, but do not clash with ram test */
-
-	x  = 0;
-
-	for (i = 0x100000; i < 0x100007; i++)
-	{
-		for (tpattidx = 0; tpattidx < 6; tpattidx++)
-		{
-			if (dstspace.read_byte(i) == testpattern[tpattidx]) x = 1; //ram test fragment present
-		}
-	}
-
-	if  ( x == 0 )
-	{
-		dstspace.write_byte(0x100000,0x4b); //K
-		dstspace.write_byte(0x100001,0x41); //A
-		dstspace.write_byte(0x100002,0x4e); //N
-		dstspace.write_byte(0x100003,0x45); //E
-		dstspace.write_byte(0x100004,0x4b); //K
-		dstspace.write_byte(0x100005,0x4f); //O
-	}
-}
-
-void galpani2_state::galpani2_mcu_init_w(uint8_t data)
-{
-	address_space &srcspace = m_maincpu->space(AS_PROGRAM);
-	address_space &dstspace = m_subcpu->space(AS_PROGRAM);
-	uint32_t mcu_address, mcu_data;
-
-	for ( mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address += 1 )
-	{
-		mcu_data    =   srcspace.read_byte(mcu_address );
-		dstspace.write_byte(mcu_address-0x10, mcu_data);
-	}
-	m_subcpu->set_input_line(INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
-}
-
-void galpani2_state::galpani2_mcu_nmi1()
-{
-	address_space &mspace = m_maincpu->space(AS_PROGRAM);
-	address_space &sspace = m_subcpu->space(AS_PROGRAM);
-
-	uint8_t len = mspace.read_byte(0x100020);
-	for(uint8_t slot = 0; slot < len; slot += 4) {
-		uint8_t command = mspace.read_byte(0x100021 + slot);
-		uint32_t address = 0x100000 | mspace.read_word(0x100022 + slot);
-
-		switch (command)
-		{
-		case 0x02: { //Copy N bytes from RAM2 to RAM1?, gp2se is the only one to use it, often!
-			uint16_t src  = mspace.read_word(address + 2);
-			uint16_t dst  = mspace.read_word(address + 6);
-			uint16_t size = mspace.read_word(address + 8);
-			logerror("MCU master %02x:%06x copy s:%04x, m:%04x, size:%04x\n", slot, address, src, dst, size);
-
-			for(uint16_t i = 0; i != size; i++)
-			{
-				mspace.write_byte(0x100000 + dst, sspace.read_byte(0x100000 + src));
-				src ++;
-				dst ++;
-			}
-			break;
-		}
-
-		case 0x0a: { // Copy N bytes from RAM1 to RAM2
-			uint16_t src  = mspace.read_word(address + 2);
-			uint16_t dst  = mspace.read_word(address + 6);
-			uint16_t size = mspace.read_word(address + 8);
-			logerror("MCU master %02x:%06x copy m:%04x, s:%04x, size:%04x\n", slot, address, src, dst, size);
-
-			for(uint16_t i = 0; i != size; i++)
-			{
-				sspace.write_byte(0x100000 + dst, mspace.read_byte(0x100000 + src));
-				src ++;
-				dst ++;
-			}
-			break;
-		}
-
-		//case 0x10: //? Clear gal?
-		//case 0x14: //? Display gal?
-		//until
-		//case 0x50: //? Display gal?
-		//case 0x68: //? Display "Changed" monster?
-		//until
-		//case 0x6E: //? Display "Changed" monster?
-		//case 0x85: //? Do what?
-		default:
-			machine().debug_break();
-			logerror("MCU master %02x:%04x: unknown command %02x\n", slot, address, command);
-			break;
-		}
-
-		/* Raise a "job done" flag */
-		if (command)
-			mspace.write_word(address, 0xffff);
-	}
-	if (len)
-		mspace.write_byte(0x100020, 0x00);
-}
-
-void galpani2_state::galpani2_mcu_nmi2()
-{
-	static const uint32_t imlist[794] = {
-		0x000ccbf4, 0x000eac7e, 0x0010db66, 0x00125050, 0x0012b3b6, 0x00132140, 0x00137cae, 0x0013f256, 0x00144ac4, 0x0014dc5c, 0x00153bf8, 0x00158cae, 0x0015e5b2, 0x001672a6, 0x00170c5e, 0x0017306c,
-		0x00173a88, 0x00174d44, 0x001759da, 0x0017693e, 0x001773f4, 0x0017802c, 0x0017abd6, 0x0017baca, 0x0017d37a, 0x0017e97e, 0x0017ff34, 0x00180cfe, 0x00181e5c, 0x00183be0, 0x001858b2, 0x00186dae,
-		0x00187c82, 0x0018946a, 0x00189fdc, 0x0018abd2, 0x0018b7c8, 0x0018c6ec, 0x0018e7c4, 0x00190cba, 0x00191cb4, 0x00192d08, 0x00193fbc, 0x00196cc6, 0x00197f72, 0x00199400, 0x0019ab40, 0x0019b790,
-		0x0019c974, 0x001a1c3a, 0x001a53d4, 0x001a615c, 0x001a6f70, 0x001a7e6c, 0x001a8a60, 0x001aad0c, 0x001acec6, 0x001ada66, 0x001ae690, 0x001afdb4, 0x001b1378, 0x001b1dbe, 0x001b2804, 0x001b3bcc,
-		0x001b4648, 0x001b577e, 0x001b66fa, 0x001b76fa, 0x001b96fa, 0x001bb5e8, 0x001bc174, 0x001bce04, 0x001be434, 0x001bf3c2, 0x001bfeca, 0x001c0708, 0x001c1abc, 0x001c29a8, 0x001c38b0, 0x001c4a28,
-		0x001c5ce6, 0x001c725a, 0x001c8bc0, 0x001c98ec, 0x001ca6d4, 0x001cb4de, 0x001cbe86, 0x001cc82a, 0x001cd1ce, 0x001cdb72, 0x001ce516, 0x001ceeba, 0x001cf85e, 0x001d03c2, 0x001d0f16, 0x001d1a0e,
-		0x001d250c, 0x001d2fd2, 0x001d3ad6, 0x001d4574, 0x001d4f84, 0x001d5bae, 0x001d678e, 0x001d7340, 0x001d7dc2, 0x001d85f8, 0x001d8c30, 0x001d9220, 0x001d9be6, 0x001da5ac, 0x001daf72, 0x001db938,
-		0x001dc198, 0x001dca00, 0x001dd600, 0x001dddec, 0x001de6c2, 0x001decdc, 0x001df6b0, 0x001e0140, 0x001e085e, 0x001e0d54, 0x001e16e2, 0x001e1ffa, 0x001e2d1c, 0x001e3700, 0x001e42de, 0x001e4b66,
-		0x001e530a, 0x001e598e, 0x001e6052, 0x001e6da4, 0x001e753a, 0x001e7cfe, 0x001e84c2, 0x001e8b84, 0x001e96e6, 0x001ea9a8, 0x001eadfc, 0x001eaf72, 0x001eb2b8, 0x001ebe46, 0x001ec652, 0x001ecefe,
-		0x001edbb8, 0x001ee46e, 0x001ef220, 0x001f02cc, 0x001f10fc, 0x001f1f9e, 0x001f2e42, 0x001f3d16, 0x001f531c, 0x001f62c2, 0x001f7900, 0x001f8840, 0x001f9236, 0x001f9dc8, 0x001faba0, 0x001fc168,
-		0x001fc988, 0x001fd3de, 0x001fe5e0, 0x00200000, 0x0020ce1a, 0x00219cde, 0x0022394e, 0x0022d5e8, 0x0023d180, 0x0024cbe6, 0x00255490, 0x0025d494, 0x00265748, 0x0026cbf2, 0x0027d586, 0x0028d466,
-		0x0029694a, 0x002a04f6, 0x002aee02, 0x002bdcc8, 0x002c6816, 0x002cfb1e, 0x002dec9a, 0x002ebc86, 0x002f6714, 0x00300f54, 0x0030c55e, 0x00317276, 0x00327f04, 0x00338c7c, 0x00346bd6, 0x00353482,
-		0x0035a410, 0x00361a64, 0x0036d80a, 0x00378dfa, 0x0037d4cc, 0x0038394e, 0x0038bcb4, 0x00393c92, 0x003ab826, 0x003c33b2, 0x003d58ee, 0x003e6582, 0x003f2cac, 0x003fefbc, 0x0040a15e, 0x00414ae2,
-		0x004198e0, 0x0041ea8c, 0x004307ce, 0x0044250c, 0x00450582, 0x0045d55a, 0x0046daa8, 0x0047ddca, 0x0048cea4, 0x0049bcfa, 0x004ac926, 0x004bcd98, 0x004c994c, 0x004db07c, 0x004eb484, 0x004fb774,
-		0x00507246, 0x00516308, 0x005244bc, 0x00532684, 0x0053fce4, 0x0054d68c, 0x0055a036, 0x00566a2e, 0x00572e12, 0x0057f656, 0x0058a95e, 0x0059393c, 0x0059ee82, 0x005a8444, 0x005b1268, 0x005bbb30,
-		0x005c5802, 0x005cec60, 0x005e1b74, 0x005ebfc0, 0x005f63ee, 0x00605150, 0x006114e4, 0x0061ccc0, 0x0062aa52, 0x006375d8, 0x006417d0, 0x006497f0, 0x0064f578, 0x0065618e, 0x0065d8fe, 0x00660b22,
-		0x006648b2, 0x00668644, 0x0066c562, 0x00674776, 0x006819aa, 0x00690a12, 0x0069f4c4, 0x006adbea, 0x006bc27a, 0x006c86ce, 0x006d6b68, 0x006e500a, 0x006f3634, 0x00702412, 0x0070c8ca, 0x00716d44,
-		0x007210d8, 0x0072b232, 0x00735254, 0x0073f1e0, 0x0074938a, 0x00753506, 0x0075d6de, 0x007678ba, 0x00771a4e, 0x0077bc10, 0x00787526, 0x0079325a, 0x0079f450, 0x007abc56, 0x007b84b4, 0x007c2e12,
-		0x007cc098, 0x007d46cc, 0x007dd882, 0x007e447c, 0x007ef81e, 0x007fb22a, 0x0080252a, 0x0080a3b0, 0x00812c7e, 0x0081be46, 0x0082592a, 0x0082fb34, 0x0083b0da, 0x008480f6, 0x00850484, 0x00858c4e,
-		0x00861422, 0x0086ca68, 0x008780ba, 0x008835ba, 0x0088eb36, 0x0089a21c, 0x008a58dc, 0x008b0d34, 0x008c01b8, 0x008cf94a, 0x008df31a, 0x008eefba, 0x008ff166, 0x0090f69c, 0x0091f344, 0x00929424,
-		0x00937394, 0x009454de, 0x00954228, 0x0095fa9e, 0x00969674, 0x00972660, 0x00979952, 0x00987280, 0x00994baa, 0x009a24d0, 0x009afde8, 0x009bdbc6, 0x009cda1a, 0x009db8c8, 0x009eb4ee, 0x009f9726,
-		0x00a08c62, 0x00a15874, 0x00a396a0, 0x00a5b598, 0x00a7a3d6, 0x00a9d562, 0x00ac03b0, 0x00ae1ae0, 0x00b0514a, 0x00b23ff4, 0x00b472fa, 0x00b693bc, 0x00b8d0be, 0x00bb1062, 0x00bcdb34, 0x00bed9ea,
-		0x00bfbb04, 0x00c09b8a, 0x00c2104e, 0x00c36f8c, 0x00c4bf52, 0x00c5cfee, 0x00c64c4e, 0x00c6b144, 0x00c71e82, 0x00c7807a, 0x00c7ccaa, 0x00c83a78, 0x00c87fe4, 0x00c8df9e, 0x00c942c2, 0x00c98c5c,
-		0x00cb5cee, 0x00cbecdc, 0x00cc7f04, 0x00cd18da, 0x00cdb400, 0x00ce5056, 0x00ceea2c, 0x00cf84b8, 0x00d01fde, 0x00d0baa8, 0x00d156fe, 0x00d1f0e8, 0x00d28b74, 0x00d3263e, 0x00d3c028, 0x00d464cc,
-		0x00d50bb6, 0x00d5d5fe, 0x00d6a21e, 0x00d759b0, 0x00d823f8, 0x00d8f018, 0x00d9a7aa, 0x00da21be, 0x00daa136, 0x00db30aa, 0x00dbc0b6, 0x00dc5380, 0x00dce2f4, 0x00dd707c, 0x00de0088, 0x00de9352,
-		0x00df20da, 0x00df8c16, 0x00dfff2e, 0x00e08d9e, 0x00e12642, 0x00e1caec, 0x00e2595c, 0x00e2f832, 0x00e390d6, 0x00e41cb0, 0x00e4c15a, 0x00e56030, 0x00e5ec0a, 0x00e634f0, 0x00e67f52, 0x00e6d362,
-		0x00e72772, 0x00e785c6, 0x00e7e902, 0x00e850f8, 0x00e8e4a4, 0x00e98b5c, 0x00e9f352, 0x00ea97d8, 0x00eb2b84, 0x00eb9e9e, 0x00ec4556, 0x00ecbb98, 0x00ed601e, 0x00edd338, 0x00ee497a, 0x00eee790,
-		0x00ef8642, 0x00f02f1e, 0x00f0d6b4, 0x00f18050, 0x00f2292c, 0x00f2cecc, 0x00f37662, 0x00f41a3a, 0x00f4c3d6, 0x00f564a2, 0x00f60a42, 0x00f6ae1a, 0x00f74ee6, 0x00f7c780, 0x00f8412e, 0x00f8bdba,
-		0x00f93a00, 0x00f9b618, 0x00fa32a4, 0x00faad4c, 0x00fb2992, 0x00fba29e, 0x00fc1eb6, 0x00fc99b4, 0x00fd145c, 0x00fd8d68, 0x00fe0866, 0x00fe7b24, 0x00feebbc, 0x00ff7060, 0x00fff494, 0x0100821a,
-		0x010106be, 0x01018af2, 0x01021878, 0x0102aaf0, 0x01034cce, 0x0104087c, 0x0104c42a, 0x010552fe, 0x0105d4e8, 0x01067b28, 0x01070f84, 0x0107aa12, 0x01085052, 0x0108ede2, 0x0109823e, 0x010a1d3e,
-		0x010ab7cc, 0x010b5764, 0x010bf4f4, 0x010c8ff4, 0x010d2f8c, 0x010da00e, 0x010e0d58, 0x010ea416, 0x010f3ad4, 0x010fad1c, 0x011020ca, 0x0110aea6, 0x01113620, 0x0111d4d8, 0x011262b4, 0x0112fe58,
-		0x011385d2, 0x0114182c, 0x0114b6e4, 0x01155118, 0x0115ecbc, 0x01167f16, 0x0117194a, 0x0117a9d4, 0x01184160, 0x0118d94a, 0x011973c8, 0x011a1ed2, 0x011ab6bc, 0x011b610c, 0x011bfb8a, 0x011ca956,
-		0x011d5460, 0x011df7d0, 0x011ea220, 0x011f4fec, 0x011ff35c, 0x0120ace0, 0x0121810a, 0x01226602, 0x01238036, 0x01249b06, 0x012551d4, 0x0125f67c, 0x0126b690, 0x0126dccc, 0x0126e77e, 0x0126f57a,
-		0x01279d4c, 0x012880a0, 0x01292630, 0x0129e3bc, 0x012a89ae, 0x012b6660, 0x012c5a90, 0x012d3c5e, 0x012df5ca, 0x012eaf86, 0x012f6a48, 0x01305a94, 0x0131af60, 0x0132e3d8, 0x01337bb8, 0x01346216,
-		0x0134c896, 0x01355652, 0x0135cf0c, 0x013647ca, 0x01372338, 0x01375ff2, 0x0137afc0, 0x01383e88, 0x0139825a, 0x013b9cb6, 0x013dd902, 0x013ff79a, 0x0141d440, 0x0141e0b0, 0x0141f032, 0x0141fefc,
-		0x01420cdc, 0x01421920, 0x01422ac4, 0x014239d8, 0x01424ad6, 0x01426476, 0x01428038, 0x014294f4, 0x0142a6b4, 0x0142af38, 0x0142bd48, 0x0142cd52, 0x0142df28, 0x0142f07a, 0x0143072c, 0x01432662,
-		0x014344e2, 0x01437346, 0x0143a38c, 0x0143b5da, 0x0143cb60, 0x0143e350, 0x0143f852, 0x01440b3e, 0x014420a8, 0x0144338a, 0x01444358, 0x01444f24, 0x01446fa8, 0x01448d84, 0x0144ac96, 0x0144ce78,
-		0x0144e3d0, 0x0144eb2e, 0x0144f2f0, 0x0144faac, 0x014502c4, 0x01450b96, 0x014519f8, 0x0145315a, 0x01454882, 0x01455e32, 0x014573be, 0x014588cc, 0x01459dda, 0x0145b2da, 0x0145d020, 0x0145e690,
-		0x0145faec, 0x01460a0e, 0x01462416, 0x01463636, 0x01464894, 0x01465d24, 0x0146749e, 0x01469062, 0x0146ac32, 0x0146ca82, 0x0146e9ea, 0x01470ba8, 0x01473c36, 0x01474f10, 0x014762a4, 0x014779f8,
-		0x01478bc4, 0x01479d8a, 0x0147af50, 0x0147c116, 0x0147d2dc, 0x0147e4a2, 0x01481bd6, 0x01482cf2, 0x014841ac, 0x014858c6, 0x014879de, 0x0148a1b4, 0x0148ae88, 0x0148d57a, 0x01490290, 0x014930c4,
-		0x01495580, 0x01496a54, 0x0149765c, 0x01498c4a, 0x0149a166, 0x0149b68e, 0x0149cbf6, 0x0149d82c, 0x0149f176, 0x014a017e, 0x014a17ea, 0x014a1d20, 0x014a1eae, 0x014a220c, 0x014a3240, 0x014a4008,
-		0x014a511c, 0x014a6620, 0x014a771e, 0x014a8ada, 0x014a9d06, 0x014aaf34, 0x014ac64a, 0x014acdee, 0x014ad592, 0x014addb8, 0x014ae69e, 0x014af186, 0x014afc22, 0x014b032c, 0x014b0a44, 0x014b0d9a,
-		0x014b10da, 0x014b1fc4, 0x014b2e7e, 0x014b3992, 0x014b48d8, 0x014b5056, 0x014b5834, 0x014b5fac, 0x014b67d6, 0x014b7bc6, 0x014b8340, 0x014b8e2e, 0x014b991c, 0x014ba0da, 0x014ba786, 0x014bb710,
-		0x014bc7c8, 0x014bd046, 0x014bd7ac, 0x014be204, 0x014bef08, 0x014bf9de, 0x014c04f0, 0x014c0d6a, 0x014c15ca, 0x014c2266, 0x014c2e62, 0x014c3522, 0x014c3be2, 0x014c462a, 0x014c5096, 0x014c5f02,
-		0x014c6a66, 0x014c71d0, 0x014c7848, 0x014c82ac, 0x014c8d10, 0x014c9422, 0x014c9b34, 0x014ca48e, 0x014cae3a, 0x014cb748, 0x014cc056, 0x014cc702, 0x014ccd6a, 0x014cd85e, 0x014ce322, 0x014ced58,
-		0x014cfe4a, 0x014d0b68, 0x014d16ba, 0x014d1ffe, 0x014d2952, 0x014d350c, 0x014d40c6, 0x014d480e, 0x014d505c, 0x014d5db2, 0x014d6b0c, 0x014d7542, 0x014d7f9c, 0x014d8998, 0x014d904c, 0x014d9758,
-		0x014d9e88, 0x014da878, 0x014db76a, 0x014dbd3c, 0x014dc724, 0x014dd248, 0x014dd812, 0x014de390, 0x014ded12, 0x014df474, 0x014dfd30, 0x014e05ec, 0x014e0d4a, 0x014e18a2, 0x014e1e0e, 0x014e2dfc,
-		0x014e402c, 0x014e54fe, 0x014e5b52, 0x014e62e8, 0x014e6a80, 0x014e71de, 0x014e799a, 0x014e827c, 0x014e8e6a, 0x014e99a4, 0x014ea49c, 0x014eaf4c, 0x014eb9d8, 0x014ec6b4, 0x014ed3c8, 0x014edfc8,
-		0x014eed5e, 0x014ef1c2, 0x014ef61e, 0x014efa7a, 0x014efed6, 0x014f02f4, 0x014f0750, 0x014f1212, 0x014f1cd4, 0x014f2796, 0x014f3258, 0x014f3d1c, 0x014f47e0, 0x014f56dc, 0x014f65b0, 0x014f7476,
-		0x014f8360, 0x014f925e, 0x014f9cb0, 0x014fa518, 0x014fad36, 0x014fbb0e, 0x014fca76, 0x014fd416, 0x014fe15e, 0x014fe914
-	};
-
-	address_space &sspace = m_subcpu->space(AS_PROGRAM);
-
-	uint8_t len = sspace.read_byte(0x101012);
-	for(uint8_t slot = 0; slot < len; slot += 4) {
-		uint8_t command = sspace.read_byte(0x101013 + slot);
-		uint32_t address = 0x100000 | sspace.read_word(0x101014 + slot);
-
-		switch (command)
-		{
-		case 0x0c: {
-			uint16_t img = sspace.read_word(address);
-			uint32_t iadr = img < 794 ? imlist[img] : 0;
-			logerror("MCU slave %02x:%06x: image address lookup %04x -> %08x\n", slot, address, img, iadr);
-			sspace.write_dword(address+2, iadr);
-			break;
-		}
-
-		default:
-			machine().debug_break();
-			logerror("MCU slave %02x:%06x: unknown command %02x\n", slot, address, command);
-			break;
-		}
-
-		/* Raise a "job done" flag */
-		if (command)
-			sspace.write_word(address, 0xffff);
-	}
-	if (len)
-		sspace.write_byte(0x101012, 0x00);
-
-	galpani2_write_kaneko(m_maincpu);
-	//logerror("%s : MCU executes CHECKs synchro\n", machine().describe_context());
-}
-
-void galpani2_state::galpani2_mcu_nmi1_w(uint8_t data) //driven by CPU1's int5 ISR
-{
-//for galpan2t:
-//Triggered from 'maincpu' (00007D60),once, with no command, using alternate line, during init
-//Triggered from 'maincpu' (000080BE),once, for unknown command, during init
-//Triggered from 'maincpu' (0000741E),from here on...driven by int5, even if there's no command
-	if ( (data & 1) && !(m_old_mcu_nmi1 & 1) )  galpani2_mcu_nmi1();
-	//if ( (data & 0x10) && !(m_old_mcu_nmi1 & 0x10) )    galpani2_mcu_nmi1(machine());
-	//alternate line, same function?
-	m_old_mcu_nmi1 = data;
-}
-
-void galpani2_state::galpani2_mcu_nmi2_w(uint8_t data) //driven by CPU2's int5 ISR
-{
-	if ( (data & 1) && !(m_old_mcu_nmi2 & 1) )  galpani2_mcu_nmi2();
-	m_old_mcu_nmi2 = data;
 }
 
 
@@ -427,8 +201,8 @@ void galpani2_state::galpani2_mem1(address_map &map)
 	map(0x5405ca, 0x5405cb).nopr();                                         // ? galpani2 at F148
 
 	map(0x600000, 0x600001).noprw();                                        // Watchdog
-	map(0x640001, 0x640001).w(FUNC(galpani2_state::galpani2_mcu_init_w));   // ? 0 before resetting and at startup, Reset mcu ?
-	map(0x680001, 0x680001).w(FUNC(galpani2_state::galpani2_mcu_nmi1_w));             // ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
+	map(0x640001, 0x640001).w(m_mcu, FUNC(kaneko_pisces_hle_device::init_w));   // ? 0 before resetting and at startup, Reset mcu ?
+	map(0x680001, 0x680001).w(m_mcu, FUNC(kaneko_pisces_hle_device::main_nmi_w));             // ? 0 -> 1 -> 0 (lev 5) / 0 -> $10 -> 0
 	map(0x6c0000, 0x6c0000).w(FUNC(galpani2_state::galpani2_coin_lockout_w));   // Coin + Card Lockout
 	map(0x780000, 0x780001).portr("DSW1_P1");
 	map(0x780002, 0x780003).portr("DSW2_P2");
@@ -454,8 +228,10 @@ void galpani2_state::subdatabank_select_w(offs_t offset, uint16_t data, uint16_t
 {
 	data &= mem_mask;
 
-	if (data & 0xfffc) printf("subdatabank_select_w %04x\n", data);
-	membank("subdatabank")->set_entry(data&3);
+	if (data & 0xfffc)
+		logerror("subdatabank_select_w %04x\n", data);
+
+	m_subdatabank->set_entry(data & 3);
 }
 
 
@@ -470,7 +246,7 @@ void galpani2_state::galpani2_mem2(address_map &map)
 //  map(0x6c0000, 0x6c0001).nopw();                                // ? 0 at startup only
 	map(0x700000, 0x700001).noprw();                               // Watchdog
 //  map(0x740000, 0x740001).nopw();                                // ? Reset mcu
-	map(0x780001, 0x780001).w(FUNC(galpani2_state::galpani2_mcu_nmi2_w));    // ? 0 -> 1 -> 0 (lev 5)
+	map(0x780001, 0x780001).w(m_mcu, FUNC(kaneko_pisces_hle_device::sub_nmi_w));    // ? 0 -> 1 -> 0 (lev 5)
 	map(0x7c0000, 0x7c0001).w(FUNC(galpani2_state::subdatabank_select_w));   // Rom Bank
 	map(0x800000, 0xffffff).bankr("subdatabank");
 }
@@ -609,7 +385,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt1)
 	int scanline = param;
 
 	if(scanline == 240)
-			m_maincpu->set_input_line(5, HOLD_LINE);
+		m_maincpu->set_input_line(5, HOLD_LINE);
 
 	/* MCU related? */
 	if(scanline == 128)
@@ -619,7 +395,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt1)
 	}
 
 	if(scanline == 0)
-			m_maincpu->set_input_line(6, HOLD_LINE); // hblank?
+		m_maincpu->set_input_line(6, HOLD_LINE); // hblank?
 }
 
 /* CPU#2 interrupts, lev 3,4 & 5 are tested on power up. The rest is rte, but lev 7 */
@@ -628,7 +404,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
 	int scanline = param;
 
 	if(scanline == 240)
+	{
+		m_mcu->vblank();
 		m_subcpu->set_input_line(5, HOLD_LINE);
+	}
 
 	if(scanline == 128)
 		m_subcpu->set_input_line(4, HOLD_LINE);
@@ -648,6 +427,10 @@ void galpani2_state::galpani2(machine_config &config)
 	M68000(config, m_subcpu, XTAL(27'000'000)/2);           /* Confirmed on galpani2i PCB */
 	m_subcpu->set_addrmap(AS_PROGRAM, &galpani2_state::galpani2_mem2);
 	TIMER(config, "s_scantimer").configure_scanline(FUNC(galpani2_state::galpani2_interrupt2), "screen", 0, 1);
+
+	KANEKO_PISCES_HLE(config, m_mcu, m_maincpu, m_subcpu, "subdata", m_bg15);
+	// The native sub CPU decompressor keeps its current task record in A6.
+	m_mcu->decoder_task_callback().set([this]() { return uint32_t(m_subcpu->state_int(M68K_A6)) & 0xffffff; });
 
 	EEPROM_93C46_16BIT(config, "eeprom");
 
@@ -674,6 +457,20 @@ void galpani2_state::galpani2(machine_config &config)
 	OKIM6295(config, "oki1", XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);    /* Confirmed on galpani2i PCB */
 
 	OKIM6295(config, m_oki2, XTAL(20'000'000)/10, okim6295_device::PIN7_HIGH).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);    /* Confirmed on galpani2i PCB */
+}
+
+
+void galpani2_state::gp2se(machine_config &config)
+{
+	galpani2(config);
+	m_mcu->set_special();
+
+	// SE uses field origin x=32 and mask pens 0050/8050.
+	m_is_special = true;
+	m_field_origin_x = 32;
+	m_mask_girl_pen = 0x8050;
+	m_mask_nongirl_pen = 0x0050;
+	m_mask_captured_lo = 0x60;  // SE writes 0060 to plane 0 on capture
 }
 
 
@@ -836,17 +633,44 @@ ROM_START( galpani2e )
 	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
 	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
-	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
-	ROM_LOAD( "gp2-302.036", 0x0400000, 0x200000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
-	ROM_LOAD( "gp2-303.037", 0x0600000, 0x200000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
-	ROM_LOAD( "gp2-304.038", 0x0800000, 0x200000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
-	ROM_LOAD( "gp2-305.039", 0x0a00000, 0x200000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
-	ROM_LOAD( "gp2-306.040", 0x0c00000, 0x200000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
-	ROM_LOAD( "gp2-307.041", 0x0e00000, 0x200000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
-	ROM_LOAD( "gp2-308.042", 0x1000000, 0x200000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
-	ROM_LOAD16_BYTE( "gp2-309a.050", 0x1200000, 0x100000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
-	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
-	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_LOAD( "gp2-301.035", 0x0380000, 0x080000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
+	ROM_CONTINUE( 0x0300000, 0x080000 )
+	ROM_CONTINUE( 0x0280000, 0x080000 )
+	ROM_CONTINUE( 0x0200000, 0x080000 )
+	ROM_LOAD( "gp2-302.036", 0x0580000, 0x080000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
+	ROM_CONTINUE( 0x0500000, 0x080000 )
+	ROM_CONTINUE( 0x0480000, 0x080000 )
+	ROM_CONTINUE( 0x0400000, 0x080000 )
+	ROM_LOAD( "gp2-303.037", 0x0780000, 0x080000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
+	ROM_CONTINUE( 0x0700000, 0x080000 )
+	ROM_CONTINUE( 0x0680000, 0x080000 )
+	ROM_CONTINUE( 0x0600000, 0x080000 )
+	ROM_LOAD( "gp2-304.038", 0x0980000, 0x080000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
+	ROM_CONTINUE( 0x0900000, 0x080000 )
+	ROM_CONTINUE( 0x0880000, 0x080000 )
+	ROM_CONTINUE( 0x0800000, 0x080000 )
+	ROM_LOAD( "gp2-305.039", 0x0b80000, 0x080000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
+	ROM_CONTINUE( 0x0b00000, 0x080000 )
+	ROM_CONTINUE( 0x0a80000, 0x080000 )
+	ROM_CONTINUE( 0x0a00000, 0x080000 )
+	ROM_LOAD( "gp2-306.040", 0x0d80000, 0x080000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
+	ROM_CONTINUE( 0x0d00000, 0x080000 )
+	ROM_CONTINUE( 0x0c80000, 0x080000 )
+	ROM_CONTINUE( 0x0c00000, 0x080000 )
+	ROM_LOAD( "gp2-307.041", 0x0f80000, 0x080000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
+	ROM_CONTINUE( 0x0f00000, 0x080000 )
+	ROM_CONTINUE( 0x0e80000, 0x080000 )
+	ROM_CONTINUE( 0x0e00000, 0x080000 )
+	ROM_LOAD( "gp2-308.042", 0x1180000, 0x080000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
+	ROM_CONTINUE( 0x1100000, 0x080000 )
+	ROM_CONTINUE( 0x1080000, 0x080000 )
+	ROM_CONTINUE( 0x1000000, 0x080000 )
+	ROM_LOAD16_WORD_SWAP( "gp2-309a.050", 0x1280000, 0x080000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
+	ROM_CONTINUE( 0x1200000, 0x080000 )
+	ROM_LOAD( "gp2-309b.051", 0x1380000, 0x080000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
+	ROM_CONTINUE( 0x1300000, 0x080000 )
+	ROM_LOAD( "gp2-310a.055", 0x1480000, 0x080000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_CONTINUE( 0x1400000, 0x080000 )
 
 	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
@@ -883,17 +707,44 @@ ROM_START( galpani2i )
 	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
 	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
-	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
-	ROM_LOAD( "gp2-302.036", 0x0400000, 0x200000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
-	ROM_LOAD( "gp2-303.037", 0x0600000, 0x200000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
-	ROM_LOAD( "gp2-304.038", 0x0800000, 0x200000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
-	ROM_LOAD( "gp2-305.039", 0x0a00000, 0x200000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
-	ROM_LOAD( "gp2-306.040", 0x0c00000, 0x200000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
-	ROM_LOAD( "gp2-307.041", 0x0e00000, 0x200000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
-	ROM_LOAD( "gp2-308.042", 0x1000000, 0x200000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
-	ROM_LOAD16_BYTE( "gp2-309a.050", 0x1200000, 0x100000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
-	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
-	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_LOAD( "gp2-301.035", 0x0380000, 0x080000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
+	ROM_CONTINUE( 0x0300000, 0x080000 )
+	ROM_CONTINUE( 0x0280000, 0x080000 )
+	ROM_CONTINUE( 0x0200000, 0x080000 )
+	ROM_LOAD( "gp2-302.036", 0x0580000, 0x080000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
+	ROM_CONTINUE( 0x0500000, 0x080000 )
+	ROM_CONTINUE( 0x0480000, 0x080000 )
+	ROM_CONTINUE( 0x0400000, 0x080000 )
+	ROM_LOAD( "gp2-303.037", 0x0780000, 0x080000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
+	ROM_CONTINUE( 0x0700000, 0x080000 )
+	ROM_CONTINUE( 0x0680000, 0x080000 )
+	ROM_CONTINUE( 0x0600000, 0x080000 )
+	ROM_LOAD( "gp2-304.038", 0x0980000, 0x080000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
+	ROM_CONTINUE( 0x0900000, 0x080000 )
+	ROM_CONTINUE( 0x0880000, 0x080000 )
+	ROM_CONTINUE( 0x0800000, 0x080000 )
+	ROM_LOAD( "gp2-305.039", 0x0b80000, 0x080000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
+	ROM_CONTINUE( 0x0b00000, 0x080000 )
+	ROM_CONTINUE( 0x0a80000, 0x080000 )
+	ROM_CONTINUE( 0x0a00000, 0x080000 )
+	ROM_LOAD( "gp2-306.040", 0x0d80000, 0x080000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
+	ROM_CONTINUE( 0x0d00000, 0x080000 )
+	ROM_CONTINUE( 0x0c80000, 0x080000 )
+	ROM_CONTINUE( 0x0c00000, 0x080000 )
+	ROM_LOAD( "gp2-307.041", 0x0f80000, 0x080000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
+	ROM_CONTINUE( 0x0f00000, 0x080000 )
+	ROM_CONTINUE( 0x0e80000, 0x080000 )
+	ROM_CONTINUE( 0x0e00000, 0x080000 )
+	ROM_LOAD( "gp2-308.042", 0x1180000, 0x080000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
+	ROM_CONTINUE( 0x1100000, 0x080000 )
+	ROM_CONTINUE( 0x1080000, 0x080000 )
+	ROM_CONTINUE( 0x1000000, 0x080000 )
+	ROM_LOAD16_WORD_SWAP( "gp2-309a.050", 0x1280000, 0x080000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
+	ROM_CONTINUE( 0x1200000, 0x080000 )
+	ROM_LOAD( "gp2-309b.051", 0x1380000, 0x080000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
+	ROM_CONTINUE( 0x1300000, 0x080000 )
+	ROM_LOAD( "gp2-310a.055", 0x1480000, 0x080000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_CONTINUE( 0x1400000, 0x080000 )
 
 	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
@@ -932,17 +783,44 @@ ROM_START( galpani2gs ) // basically the same as the Italy set but with differen
 	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
 	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
-	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
-	ROM_LOAD( "gp2-302.036", 0x0400000, 0x200000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
-	ROM_LOAD( "gp2-303.037", 0x0600000, 0x200000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
-	ROM_LOAD( "gp2-304.038", 0x0800000, 0x200000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
-	ROM_LOAD( "gp2-305.039", 0x0a00000, 0x200000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
-	ROM_LOAD( "gp2-306.040", 0x0c00000, 0x200000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
-	ROM_LOAD( "gp2-307.041", 0x0e00000, 0x200000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
-	ROM_LOAD( "gp2-308.042", 0x1000000, 0x200000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
-	ROM_LOAD16_BYTE( "gp2-309a.050", 0x1200000, 0x100000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
-	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
-	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_LOAD( "gp2-301.035", 0x0380000, 0x080000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
+	ROM_CONTINUE( 0x0300000, 0x080000 )
+	ROM_CONTINUE( 0x0280000, 0x080000 )
+	ROM_CONTINUE( 0x0200000, 0x080000 )
+	ROM_LOAD( "gp2-302.036", 0x0580000, 0x080000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
+	ROM_CONTINUE( 0x0500000, 0x080000 )
+	ROM_CONTINUE( 0x0480000, 0x080000 )
+	ROM_CONTINUE( 0x0400000, 0x080000 )
+	ROM_LOAD( "gp2-303.037", 0x0780000, 0x080000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
+	ROM_CONTINUE( 0x0700000, 0x080000 )
+	ROM_CONTINUE( 0x0680000, 0x080000 )
+	ROM_CONTINUE( 0x0600000, 0x080000 )
+	ROM_LOAD( "gp2-304.038", 0x0980000, 0x080000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
+	ROM_CONTINUE( 0x0900000, 0x080000 )
+	ROM_CONTINUE( 0x0880000, 0x080000 )
+	ROM_CONTINUE( 0x0800000, 0x080000 )
+	ROM_LOAD( "gp2-305.039", 0x0b80000, 0x080000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
+	ROM_CONTINUE( 0x0b00000, 0x080000 )
+	ROM_CONTINUE( 0x0a80000, 0x080000 )
+	ROM_CONTINUE( 0x0a00000, 0x080000 )
+	ROM_LOAD( "gp2-306.040", 0x0d80000, 0x080000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
+	ROM_CONTINUE( 0x0d00000, 0x080000 )
+	ROM_CONTINUE( 0x0c80000, 0x080000 )
+	ROM_CONTINUE( 0x0c00000, 0x080000 )
+	ROM_LOAD( "gp2-307.041", 0x0f80000, 0x080000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
+	ROM_CONTINUE( 0x0f00000, 0x080000 )
+	ROM_CONTINUE( 0x0e80000, 0x080000 )
+	ROM_CONTINUE( 0x0e00000, 0x080000 )
+	ROM_LOAD( "gp2-308.042", 0x1180000, 0x080000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
+	ROM_CONTINUE( 0x1100000, 0x080000 )
+	ROM_CONTINUE( 0x1080000, 0x080000 )
+	ROM_CONTINUE( 0x1000000, 0x080000 )
+	ROM_LOAD16_WORD_SWAP( "gp2-309a.050", 0x1280000, 0x080000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
+	ROM_CONTINUE( 0x1200000, 0x080000 )
+	ROM_LOAD( "gp2-309b.051", 0x1380000, 0x080000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
+	ROM_CONTINUE( 0x1300000, 0x080000 )
+	ROM_LOAD( "gp2-310a.055", 0x1480000, 0x080000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_CONTINUE( 0x1400000, 0x080000 )
 
 	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
@@ -982,17 +860,44 @@ ROM_START( galpani2g )
 	ROM_LOAD16_BYTE( "g300a1.u41-00", 0x0000001, 0x080000, CRC(d26b7c4f) SHA1(b491170010977ba1e5111893937cc6bab0539e7d) )
 	ROM_LOAD16_BYTE( "g300b0.u45-00", 0x0100000, 0x080000, CRC(9637934c) SHA1(d3b39d9f44825bdf24d4aa39ca32035bc5af4905) )
 	ROM_LOAD16_BYTE( "g300b1.u42-00", 0x0100001, 0x080000, CRC(d72e154b) SHA1(e367c8f9af47b999fcba4afcd293565bad2038ec) )
-	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
-	ROM_LOAD( "gp2-302.036", 0x0400000, 0x200000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
-	ROM_LOAD( "gp2-303.037", 0x0600000, 0x200000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
-	ROM_LOAD( "gp2-304.038", 0x0800000, 0x200000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
-	ROM_LOAD( "gp2-305.039", 0x0a00000, 0x200000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
-	ROM_LOAD( "gp2-306.040", 0x0c00000, 0x200000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
-	ROM_LOAD( "gp2-307.041", 0x0e00000, 0x200000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
-	ROM_LOAD( "gp2-308.042", 0x1000000, 0x200000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
-	ROM_LOAD16_BYTE( "gp2-309a.050", 0x1200000, 0x100000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
-	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
-	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_LOAD( "gp2-301.035", 0x0380000, 0x080000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
+	ROM_CONTINUE( 0x0300000, 0x080000 )
+	ROM_CONTINUE( 0x0280000, 0x080000 )
+	ROM_CONTINUE( 0x0200000, 0x080000 )
+	ROM_LOAD( "gp2-302.036", 0x0580000, 0x080000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
+	ROM_CONTINUE( 0x0500000, 0x080000 )
+	ROM_CONTINUE( 0x0480000, 0x080000 )
+	ROM_CONTINUE( 0x0400000, 0x080000 )
+	ROM_LOAD( "gp2-303.037", 0x0780000, 0x080000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
+	ROM_CONTINUE( 0x0700000, 0x080000 )
+	ROM_CONTINUE( 0x0680000, 0x080000 )
+	ROM_CONTINUE( 0x0600000, 0x080000 )
+	ROM_LOAD( "gp2-304.038", 0x0980000, 0x080000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
+	ROM_CONTINUE( 0x0900000, 0x080000 )
+	ROM_CONTINUE( 0x0880000, 0x080000 )
+	ROM_CONTINUE( 0x0800000, 0x080000 )
+	ROM_LOAD( "gp2-305.039", 0x0b80000, 0x080000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
+	ROM_CONTINUE( 0x0b00000, 0x080000 )
+	ROM_CONTINUE( 0x0a80000, 0x080000 )
+	ROM_CONTINUE( 0x0a00000, 0x080000 )
+	ROM_LOAD( "gp2-306.040", 0x0d80000, 0x080000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
+	ROM_CONTINUE( 0x0d00000, 0x080000 )
+	ROM_CONTINUE( 0x0c80000, 0x080000 )
+	ROM_CONTINUE( 0x0c00000, 0x080000 )
+	ROM_LOAD( "gp2-307.041", 0x0f80000, 0x080000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
+	ROM_CONTINUE( 0x0f00000, 0x080000 )
+	ROM_CONTINUE( 0x0e80000, 0x080000 )
+	ROM_CONTINUE( 0x0e00000, 0x080000 )
+	ROM_LOAD( "gp2-308.042", 0x1180000, 0x080000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
+	ROM_CONTINUE( 0x1100000, 0x080000 )
+	ROM_CONTINUE( 0x1080000, 0x080000 )
+	ROM_CONTINUE( 0x1000000, 0x080000 )
+	ROM_LOAD16_WORD_SWAP( "gp2-309a.050", 0x1280000, 0x080000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
+	ROM_CONTINUE( 0x1200000, 0x080000 )
+	ROM_LOAD( "gp2-309b.051", 0x1380000, 0x080000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
+	ROM_CONTINUE( 0x1300000, 0x080000 )
+	ROM_LOAD( "gp2-310a.055", 0x1480000, 0x080000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_CONTINUE( 0x1400000, 0x080000 )
 
 	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
@@ -1034,17 +939,44 @@ ROM_START( galpani2i2 )
 	ROM_LOAD16_BYTE( "g300a1.u41-00", 0x0000001, 0x080000, CRC(d26b7c4f) SHA1(b491170010977ba1e5111893937cc6bab0539e7d) )
 	ROM_LOAD16_BYTE( "g300b0.u45-00", 0x0100000, 0x080000, CRC(9637934c) SHA1(d3b39d9f44825bdf24d4aa39ca32035bc5af4905) )
 	ROM_LOAD16_BYTE( "g300b1.u42-00", 0x0100001, 0x080000, CRC(d72e154b) SHA1(e367c8f9af47b999fcba4afcd293565bad2038ec) )
-	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
-	ROM_LOAD( "gp2-302.036", 0x0400000, 0x200000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
-	ROM_LOAD( "gp2-303.037", 0x0600000, 0x200000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
-	ROM_LOAD( "gp2-304.038", 0x0800000, 0x200000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
-	ROM_LOAD( "gp2-305.039", 0x0a00000, 0x200000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
-	ROM_LOAD( "gp2-306.040", 0x0c00000, 0x200000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
-	ROM_LOAD( "gp2-307.041", 0x0e00000, 0x200000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
-	ROM_LOAD( "gp2-308.042", 0x1000000, 0x200000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
-	ROM_LOAD16_BYTE( "gp2-309a.050", 0x1200000, 0x100000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
-	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
-	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_LOAD( "gp2-301.035", 0x0380000, 0x080000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
+	ROM_CONTINUE( 0x0300000, 0x080000 )
+	ROM_CONTINUE( 0x0280000, 0x080000 )
+	ROM_CONTINUE( 0x0200000, 0x080000 )
+	ROM_LOAD( "gp2-302.036", 0x0580000, 0x080000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
+	ROM_CONTINUE( 0x0500000, 0x080000 )
+	ROM_CONTINUE( 0x0480000, 0x080000 )
+	ROM_CONTINUE( 0x0400000, 0x080000 )
+	ROM_LOAD( "gp2-303.037", 0x0780000, 0x080000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
+	ROM_CONTINUE( 0x0700000, 0x080000 )
+	ROM_CONTINUE( 0x0680000, 0x080000 )
+	ROM_CONTINUE( 0x0600000, 0x080000 )
+	ROM_LOAD( "gp2-304.038", 0x0980000, 0x080000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
+	ROM_CONTINUE( 0x0900000, 0x080000 )
+	ROM_CONTINUE( 0x0880000, 0x080000 )
+	ROM_CONTINUE( 0x0800000, 0x080000 )
+	ROM_LOAD( "gp2-305.039", 0x0b80000, 0x080000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
+	ROM_CONTINUE( 0x0b00000, 0x080000 )
+	ROM_CONTINUE( 0x0a80000, 0x080000 )
+	ROM_CONTINUE( 0x0a00000, 0x080000 )
+	ROM_LOAD( "gp2-306.040", 0x0d80000, 0x080000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
+	ROM_CONTINUE( 0x0d00000, 0x080000 )
+	ROM_CONTINUE( 0x0c80000, 0x080000 )
+	ROM_CONTINUE( 0x0c00000, 0x080000 )
+	ROM_LOAD( "gp2-307.041", 0x0f80000, 0x080000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
+	ROM_CONTINUE( 0x0f00000, 0x080000 )
+	ROM_CONTINUE( 0x0e80000, 0x080000 )
+	ROM_CONTINUE( 0x0e00000, 0x080000 )
+	ROM_LOAD( "gp2-308.042", 0x1180000, 0x080000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
+	ROM_CONTINUE( 0x1100000, 0x080000 )
+	ROM_CONTINUE( 0x1080000, 0x080000 )
+	ROM_CONTINUE( 0x1000000, 0x080000 )
+	ROM_LOAD16_WORD_SWAP( "gp2-309a.050", 0x1280000, 0x080000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
+	ROM_CONTINUE( 0x1200000, 0x080000 )
+	ROM_LOAD( "gp2-309b.051", 0x1380000, 0x080000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
+	ROM_CONTINUE( 0x1300000, 0x080000 )
+	ROM_LOAD( "gp2-310a.055", 0x1480000, 0x080000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_CONTINUE( 0x1400000, 0x080000 )
 
 	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
@@ -1086,17 +1018,44 @@ ROM_START( galpani2e2 ) // Kaneko Z04G2-003 + Z04G2-SUB3
 	ROM_LOAD16_BYTE( "g300a1.u41-00", 0x0000001, 0x080000, CRC(d26b7c4f) SHA1(b491170010977ba1e5111893937cc6bab0539e7d) )
 	ROM_LOAD16_BYTE( "g300b0.u45-00", 0x0100000, 0x080000, CRC(9637934c) SHA1(d3b39d9f44825bdf24d4aa39ca32035bc5af4905) )
 	ROM_LOAD16_BYTE( "g300b1.u42-00", 0x0100001, 0x080000, CRC(d72e154b) SHA1(e367c8f9af47b999fcba4afcd293565bad2038ec) )
-	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
-	ROM_LOAD( "gp2-302.036", 0x0400000, 0x200000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
-	ROM_LOAD( "gp2-303.037", 0x0600000, 0x200000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
-	ROM_LOAD( "gp2-304.038", 0x0800000, 0x200000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
-	ROM_LOAD( "gp2-305.039", 0x0a00000, 0x200000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
-	ROM_LOAD( "gp2-306.040", 0x0c00000, 0x200000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
-	ROM_LOAD( "gp2-307.041", 0x0e00000, 0x200000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
-	ROM_LOAD( "gp2-308.042", 0x1000000, 0x200000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
-	ROM_LOAD16_BYTE( "gp2-309a.050", 0x1200000, 0x100000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
-	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
-	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_LOAD( "gp2-301.035", 0x0380000, 0x080000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
+	ROM_CONTINUE( 0x0300000, 0x080000 )
+	ROM_CONTINUE( 0x0280000, 0x080000 )
+	ROM_CONTINUE( 0x0200000, 0x080000 )
+	ROM_LOAD( "gp2-302.036", 0x0580000, 0x080000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
+	ROM_CONTINUE( 0x0500000, 0x080000 )
+	ROM_CONTINUE( 0x0480000, 0x080000 )
+	ROM_CONTINUE( 0x0400000, 0x080000 )
+	ROM_LOAD( "gp2-303.037", 0x0780000, 0x080000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
+	ROM_CONTINUE( 0x0700000, 0x080000 )
+	ROM_CONTINUE( 0x0680000, 0x080000 )
+	ROM_CONTINUE( 0x0600000, 0x080000 )
+	ROM_LOAD( "gp2-304.038", 0x0980000, 0x080000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
+	ROM_CONTINUE( 0x0900000, 0x080000 )
+	ROM_CONTINUE( 0x0880000, 0x080000 )
+	ROM_CONTINUE( 0x0800000, 0x080000 )
+	ROM_LOAD( "gp2-305.039", 0x0b80000, 0x080000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
+	ROM_CONTINUE( 0x0b00000, 0x080000 )
+	ROM_CONTINUE( 0x0a80000, 0x080000 )
+	ROM_CONTINUE( 0x0a00000, 0x080000 )
+	ROM_LOAD( "gp2-306.040", 0x0d80000, 0x080000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
+	ROM_CONTINUE( 0x0d00000, 0x080000 )
+	ROM_CONTINUE( 0x0c80000, 0x080000 )
+	ROM_CONTINUE( 0x0c00000, 0x080000 )
+	ROM_LOAD( "gp2-307.041", 0x0f80000, 0x080000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
+	ROM_CONTINUE( 0x0f00000, 0x080000 )
+	ROM_CONTINUE( 0x0e80000, 0x080000 )
+	ROM_CONTINUE( 0x0e00000, 0x080000 )
+	ROM_LOAD( "gp2-308.042", 0x1180000, 0x080000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
+	ROM_CONTINUE( 0x1100000, 0x080000 )
+	ROM_CONTINUE( 0x1080000, 0x080000 )
+	ROM_CONTINUE( 0x1000000, 0x080000 )
+	ROM_LOAD16_WORD_SWAP( "gp2-309a.050", 0x1280000, 0x080000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
+	ROM_CONTINUE( 0x1200000, 0x080000 )
+	ROM_LOAD( "gp2-309b.051", 0x1380000, 0x080000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
+	ROM_CONTINUE( 0x1300000, 0x080000 )
+	ROM_LOAD( "gp2-310a.055", 0x1480000, 0x080000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_CONTINUE( 0x1400000, 0x080000 )
 
 	ROM_REGION( 0x480000, "kan_spr", 0 )   // Sprites
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
@@ -1134,17 +1093,44 @@ ROM_START( galpani2t )
 	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300a.052", 0x0000000, 0x100000, CRC(09ebedba) SHA1(3c06614633f0da03facb5199deac492b8ce07257) )
 	ROM_LOAD( "gp2-300b.053", 0x0100000, 0x100000, CRC(d7d12920) SHA1(4b6e01cc0ac5192758f4b3d26f102905b2b5e8ac) )
-	ROM_LOAD( "gp2-301.035", 0x0200000, 0x200000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
-	ROM_LOAD( "gp2-302.036", 0x0400000, 0x200000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
-	ROM_LOAD( "gp2-303.037", 0x0600000, 0x200000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
-	ROM_LOAD( "gp2-304.038", 0x0800000, 0x200000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
-	ROM_LOAD( "gp2-305.039", 0x0a00000, 0x200000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
-	ROM_LOAD( "gp2-306.040", 0x0c00000, 0x200000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
-	ROM_LOAD( "gp2-307.041", 0x0e00000, 0x200000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
-	ROM_LOAD( "gp2-308.042", 0x1000000, 0x200000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
-	ROM_LOAD16_BYTE( "gp2-309a.050", 0x1200000, 0x100000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
-	ROM_LOAD16_BYTE( "gp2-309b.051", 0x1200001, 0x100000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
-	ROM_LOAD( "gp2-310a.055", 0x1400000, 0x100000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_LOAD( "gp2-301.035", 0x0380000, 0x080000, CRC(e71e749d) SHA1(420c4c085e89d9641a84e34fa870df2bc02165b6) )
+	ROM_CONTINUE( 0x0300000, 0x080000 )
+	ROM_CONTINUE( 0x0280000, 0x080000 )
+	ROM_CONTINUE( 0x0200000, 0x080000 )
+	ROM_LOAD( "gp2-302.036", 0x0580000, 0x080000, CRC(832ebbb0) SHA1(a753285d874fcab979e70d6a289cf9fcd48affc6) )
+	ROM_CONTINUE( 0x0500000, 0x080000 )
+	ROM_CONTINUE( 0x0480000, 0x080000 )
+	ROM_CONTINUE( 0x0400000, 0x080000 )
+	ROM_LOAD( "gp2-303.037", 0x0780000, 0x080000, CRC(36c872d0) SHA1(e0aa3089dfa1765ba70ce60e8696b1ba87c95703) )
+	ROM_CONTINUE( 0x0700000, 0x080000 )
+	ROM_CONTINUE( 0x0680000, 0x080000 )
+	ROM_CONTINUE( 0x0600000, 0x080000 )
+	ROM_LOAD( "gp2-304.038", 0x0980000, 0x080000, CRC(7200f918) SHA1(6d23bd371b32319fdd08923deb81278b36b9cd79) )
+	ROM_CONTINUE( 0x0900000, 0x080000 )
+	ROM_CONTINUE( 0x0880000, 0x080000 )
+	ROM_CONTINUE( 0x0800000, 0x080000 )
+	ROM_LOAD( "gp2-305.039", 0x0b80000, 0x080000, CRC(a308dc4b) SHA1(db40329c383c765471941ab89fded6b8789d29c7) )
+	ROM_CONTINUE( 0x0b00000, 0x080000 )
+	ROM_CONTINUE( 0x0a80000, 0x080000 )
+	ROM_CONTINUE( 0x0a00000, 0x080000 )
+	ROM_LOAD( "gp2-306.040", 0x0d80000, 0x080000, CRC(cd294225) SHA1(c51c95d5edd5e5d7191ccbfa1ba2e92199bb04b9) )
+	ROM_CONTINUE( 0x0d00000, 0x080000 )
+	ROM_CONTINUE( 0x0c80000, 0x080000 )
+	ROM_CONTINUE( 0x0c00000, 0x080000 )
+	ROM_LOAD( "gp2-307.041", 0x0f80000, 0x080000, CRC(0fda01af) SHA1(ca30d995ff8d83b46c05898a2ecde3f08a95c788) )
+	ROM_CONTINUE( 0x0f00000, 0x080000 )
+	ROM_CONTINUE( 0x0e80000, 0x080000 )
+	ROM_CONTINUE( 0x0e00000, 0x080000 )
+	ROM_LOAD( "gp2-308.042", 0x1180000, 0x080000, CRC(3c806376) SHA1(5c440a0cfd5d5c07ff074bc0c2563956d256a80e) )
+	ROM_CONTINUE( 0x1100000, 0x080000 )
+	ROM_CONTINUE( 0x1080000, 0x080000 )
+	ROM_CONTINUE( 0x1000000, 0x080000 )
+	ROM_LOAD16_WORD_SWAP( "gp2-309a.050", 0x1280000, 0x080000, CRC(2c025ec3) SHA1(bc25ad92415e662d6b0f845aa4621a733fbf5a48) )
+	ROM_CONTINUE( 0x1200000, 0x080000 )
+	ROM_LOAD( "gp2-309b.051", 0x1380000, 0x080000, CRC(e8bf1730) SHA1(0d9a446aecc19a43368550348745c9b167ec4941) )
+	ROM_CONTINUE( 0x1300000, 0x080000 )
+	ROM_LOAD( "gp2-310a.055", 0x1480000, 0x080000, CRC(01eca246) SHA1(19cb35d7873b84486f9105127a1e3cf3235d3109) )
+	ROM_CONTINUE( 0x1400000, 0x080000 )
 
 	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200.046", 0x080000, 0x080000, CRC(11b49470) SHA1(d11c2374a7c9b9b0d1f27c29759b16630700561d) )
@@ -1180,14 +1166,14 @@ ROM_START( galpani2k ) // Kaneko Z04G2-004 single PCB
 	ROM_LOAD16_BYTE( "27c010.u63", 0x000001, 0x020000, CRC(c74f6763) SHA1(e39063ec1789fbacfaba6e97031247222f7b206d) ) // No labels, but likely different to the PCB layout in header
 
 	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
-	ROM_LOAD16_BYTE( "gp2-300a-k_0067.u175", 0x000000, 0x100000, CRC(68145adc) SHA1(6d8ab1f344adf2f0ec79aad7bb3c7977c5229651) ) // KANEKO GP2-300A-K 0067
-	ROM_LOAD16_BYTE( "gp2-300b-k_0068.u176", 0x000001, 0x100000, CRC(e77af845) SHA1(c88cc93f718b3057120c81403cd0b1659305008b) ) // KANEKO GP2-300B-K 0068
-	ROM_LOAD16_BYTE( "gp2-301a-k_0069.u177", 0x200000, 0x100000, CRC(b6610c77) SHA1(8f53360bde92de24fc8154718aece497cd9178d3) ) // KANEKO GP2-301A-K 0069
-	ROM_LOAD16_BYTE( "gp2-301b-k_0070.u178", 0x200001, 0x100000, CRC(71969a41) SHA1(337d18caf57bca8025669cdcc11e16c49e7fe854) ) // KANEKO GP2-301B-K 0070
-	ROM_LOAD16_BYTE( "gp2-302a_0057.u179",   0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) ) // KANEKO GP2-302A 0057
-	ROM_LOAD16_BYTE( "gp2-302b_0058.u180",   0x400001, 0x100000, CRC(80cb211b) SHA1(7567c9d1309edddb9c1fa68346506de48e91ca6a) ) // KANEKO GP2-302B 0058
-	ROM_LOAD16_BYTE( "gp2-303a_0063.u181",   0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) ) // KANEKO GP2-303A 0063
-	ROM_LOAD16_BYTE( "gp2-303b_0064.u182",   0x600001, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) ) // KANEKO GP2-303B 0064
+	ROM_LOAD( "gp2-300a-k_0067.u175", 0x000000, 0x100000, CRC(68145adc) SHA1(6d8ab1f344adf2f0ec79aad7bb3c7977c5229651) ) // KANEKO GP2-300A-K 0067
+	ROM_LOAD( "gp2-300b-k_0068.u176", 0x100000, 0x100000, CRC(e77af845) SHA1(c88cc93f718b3057120c81403cd0b1659305008b) ) // KANEKO GP2-300B-K 0068
+	ROM_LOAD( "gp2-301a-k_0069.u177", 0x200000, 0x100000, CRC(b6610c77) SHA1(8f53360bde92de24fc8154718aece497cd9178d3) ) // KANEKO GP2-301A-K 0069
+	ROM_LOAD( "gp2-301b-k_0070.u178", 0x300000, 0x100000, CRC(71969a41) SHA1(337d18caf57bca8025669cdcc11e16c49e7fe854) ) // KANEKO GP2-301B-K 0070
+	ROM_LOAD( "gp2-302a_0057.u179",   0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) ) // KANEKO GP2-302A 0057
+	ROM_LOAD( "gp2-302b_0058.u180",   0x500000, 0x100000, CRC(80cb211b) SHA1(7567c9d1309edddb9c1fa68346506de48e91ca6a) ) // KANEKO GP2-302B 0058
+	ROM_LOAD( "gp2-303a_0063.u181",   0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) ) // KANEKO GP2-303A 0063
+	ROM_LOAD( "gp2-303b_0064.u182",   0x700000, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) ) // KANEKO GP2-303B 0064
 	/* For this PCB set, GROM21L / GROM21U & GROM22L / GROM22U were unpopulated. Unlike what's shown in the PCB layout in the header */
 
 	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
@@ -1241,10 +1227,10 @@ ROM_START( galpani2j )
 	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300j.175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
 	ROM_LOAD( "gp2-301j.176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
-	ROM_LOAD16_BYTE( "gp2-302a.177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
-	ROM_LOAD16_BYTE( "gp2-302b.178", 0x400001, 0x100000, CRC(80cb211b) SHA1(7567c9d1309edddb9c1fa68346506de48e91ca6a) )
-	ROM_LOAD16_BYTE( "gp2-303a.179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
-	ROM_LOAD16_BYTE( "gp2-303b.180", 0x600001, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
+	ROM_LOAD( "gp2-302a.177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
+	ROM_LOAD( "gp2-302b.178", 0x500000, 0x100000, CRC(80cb211b) SHA1(7567c9d1309edddb9c1fa68346506de48e91ca6a) )
+	ROM_LOAD( "gp2-303a.179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
+	ROM_LOAD( "gp2-303b.180", 0x700000, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
 
 	ROM_REGION( 0x480000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200j.189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
@@ -1260,6 +1246,39 @@ ROM_START( galpani2j )
 	ROM_LOAD( "gp2-101.60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) )
 ROM_END
 
+
+ROM_START( gp2quiz )
+	ROM_REGION( 0x100000, "maincpu", 0 )            /* CPU#1 Code */
+	ROM_LOAD16_BYTE( "g000e3.u165-3", 0x000000, 0x080000, CRC(b6de2653) SHA1(a24daf5e6b6b268f60b1dbb374861c85f642cea5) )
+	ROM_LOAD16_BYTE( "g001e3.u164-3", 0x000001, 0x080000, CRC(74e8d0e8) SHA1(d131be9f52ee79e1b82f46721c2ad5d71b3da649) )
+
+	ROM_REGION( 0x40000, "sub", 0 )         /* CPU#2 Code */
+	ROM_LOAD16_BYTE( "g002e3.u64-3",  0x000000, 0x020000, CRC(5e523829) SHA1(dad11e4a3348c988ff658609cf78a3fbee58064e) )
+	ROM_LOAD16_BYTE( "g003e3.u63-3",  0x000001, 0x020000, CRC(2a0d5f89) SHA1(0a7031c4b8b7bc757da25250dbb5fa1004205aeb) )
+
+	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
+	ROM_LOAD( "gp2-300-j-0071.u175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
+	ROM_LOAD( "gp2-301-j-0072.u176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
+	ROM_LOAD( "gp2-302a-0057.u177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
+	ROM_LOAD( "gp2-302b-0058.u178", 0x500000, 0x100000, CRC(80cb211b) SHA1(7567c9d1309edddb9c1fa68346506de48e91ca6a) )
+	ROM_LOAD( "gp2-303a-0063.u179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
+	ROM_LOAD( "gp2-303b-0064.u180", 0x700000, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
+
+	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
+	ROM_LOAD( "gp2-200-j-0073.u189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
+	ROM_LOAD( "gp2-201-j-0074.u171", 0x200000, 0x200000, CRC(bbe404e0) SHA1(198db9a6c6ec97ed8fd32d946051ba4d6e4bd354) )
+	ROM_LOAD16_BYTE( "g204a3.u169-3", 0x400000, 0x080000, CRC(92a837b7) SHA1(f581e1f7754f1fb20255c6c55ffc4e486d867111) )
+	ROM_LOAD16_BYTE( "g204a4.u170-3", 0x400001, 0x080000, CRC(3c2dd1cd) SHA1(d5267ad6f51283191174988ac0519c0e0aa6552f) )
+
+	ROM_REGION( 0x180000, "oki1", 0 )   /* Samples */
+	ROM_LOAD( "gp2-100-0043.u61", 0x000000, 0x100000, CRC(a61e8868) SHA1(ad84ae00ebe7c70a36b1aa75e743686a0193e5d9) )
+	ROM_LOAD( "g104a3.u62-3", 0x100000, 0x080000, CRC(42b3470e) SHA1(c121ea6c98e6ff452f4bcc49c3a5179e99237128) )
+
+	ROM_REGION( 0x300000, "oki2", 0 )   /* Samples */
+	ROM_LOAD( "gp2-102-0045.u59",  0x000000, 0x200000, CRC(1bed6ecd) SHA1(3208aacac64ac95fcb6eeef59986c3154c1c415b) )
+	ROM_LOAD( "gp2-101-0044.u60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) )
+ROM_END
+
 ROM_START( gp2se )
 	ROM_REGION( 0x100000, "maincpu", 0 )            /* CPU#1 Code */
 	ROM_LOAD16_BYTE( "g000j4.u165", 0x000000, 0x080000, CRC(d8258a7a) SHA1(12991392d7e70bfba394ec4ad49b427959ca019e) )
@@ -1272,14 +1291,15 @@ ROM_START( gp2se )
 	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
 	ROM_LOAD( "gp2-300-j-0071.u175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
 	ROM_LOAD( "gp2-301-j-0072.u176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
-	ROM_LOAD16_BYTE( "gp2-302a-0057.u177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
-	ROM_LOAD16_BYTE( "gp2-302b-0058.u178", 0x400001, 0x100000, CRC(80cb211b) SHA1(7567c9d1309edddb9c1fa68346506de48e91ca6a) )
-	ROM_LOAD16_BYTE( "gp2-303a-0063.u179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
-	ROM_LOAD16_BYTE( "gp2-303b-0064.u180", 0x600001, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
-	ROM_LOAD16_BYTE( "g304aj4.u158", 0x800000, 0x080000, CRC(3a1c9d53) SHA1(058311da5f47036f5e388895e41abc1757ed8518) )
-	ROM_LOAD16_BYTE( "g304bj4.u159", 0x800001, 0x080000, CRC(ae87cf2c) SHA1(a397e9441048ae6b5699b7e45f420c92903e8a96) )
-	ROM_LOAD16_BYTE( "g305aj4.u160", 0x900000, 0x080000, CRC(2d4a8fbb) SHA1(8a00e6ba4e061678da4c41446df7278c9b4f26c2) )
-	ROM_LOAD16_BYTE( "g305bj4.u161", 0x900001, 0x080000, CRC(53d13974) SHA1(29ca4d36f2a8153228c2eec8e9ef6a6bf712cb59) )
+	ROM_LOAD( "gp2-302a-0057.u177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
+	ROM_LOAD( "gp2-302b-0058.u178", 0x500000, 0x100000, CRC(80cb211b) SHA1(7567c9d1309edddb9c1fa68346506de48e91ca6a) )
+	ROM_LOAD( "gp2-303a-0063.u179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
+	ROM_LOAD( "gp2-303b-0064.u180", 0x700000, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
+	// SE upgrade EPROMs overlay the first 2 MiB of background data.
+	ROM_LOAD16_BYTE( "g304aj4.u158", 0x000000, 0x080000, CRC(3a1c9d53) SHA1(058311da5f47036f5e388895e41abc1757ed8518) )
+	ROM_LOAD16_BYTE( "g304bj4.u159", 0x000001, 0x080000, CRC(ae87cf2c) SHA1(a397e9441048ae6b5699b7e45f420c92903e8a96) )
+	ROM_LOAD16_BYTE( "g305aj4.u160", 0x100000, 0x080000, CRC(2d4a8fbb) SHA1(8a00e6ba4e061678da4c41446df7278c9b4f26c2) )
+	ROM_LOAD16_BYTE( "g305bj4.u161", 0x100001, 0x080000, CRC(53d13974) SHA1(29ca4d36f2a8153228c2eec8e9ef6a6bf712cb59) )
 
 	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
 	ROM_LOAD( "gp2-200-j-0073.u189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
@@ -1297,38 +1317,8 @@ ROM_START( gp2se )
 ROM_END
 
 
-ROM_START( gp2quiz )
-	ROM_REGION( 0x100000, "maincpu", 0 )            /* CPU#1 Code */
-	ROM_LOAD16_BYTE( "g000e3.u165-3", 0x000000, 0x080000, CRC(b6de2653) SHA1(a24daf5e6b6b268f60b1dbb374861c85f642cea5) )
-	ROM_LOAD16_BYTE( "g001e3.u164-3", 0x000001, 0x080000, CRC(74e8d0e8) SHA1(d131be9f52ee79e1b82f46721c2ad5d71b3da649) )
 
-	ROM_REGION( 0x40000, "sub", 0 )         /* CPU#2 Code */
-	ROM_LOAD16_BYTE( "g002e3.u64-3",  0x000000, 0x020000, CRC(5e523829) SHA1(dad11e4a3348c988ff658609cf78a3fbee58064e) )
-	ROM_LOAD16_BYTE( "g003e3.u63-3",  0x000001, 0x020000, CRC(2a0d5f89) SHA1(0a7031c4b8b7bc757da25250dbb5fa1004205aeb) )
-
-	ROM_REGION16_BE( 0x2000000, "subdata", ROMREGION_ERASEFF )    /* Backgrounds (CPU2) */
-	ROM_LOAD( "gp2-300-j-0071.u175", 0x000000, 0x200000, CRC(3a0afc1d) SHA1(91fba9074cc3c28e919053f0ea07b28d88b2ce5f) )
-	ROM_LOAD( "gp2-301-j-0072.u176", 0x200000, 0x200000, CRC(5b6d1709) SHA1(a7d35247fe71895f2b6169409aa0bdaef446804c) )
-	ROM_LOAD16_BYTE( "gp2-302a-0057.u177", 0x400000, 0x100000, CRC(311fa273) SHA1(c2adeac45be701f6f474841755fac4347d44f844) )
-	ROM_LOAD16_BYTE( "gp2-302b-0058.u178", 0x400001, 0x100000, CRC(80cb211b) SHA1(7567c9d1309edddb9c1fa68346506de48e91ca6a) )
-	ROM_LOAD16_BYTE( "gp2-303a-0063.u179", 0x600000, 0x100000, CRC(162d83b7) SHA1(16daf2ba09e63eaca5e50c944472773b1774c946) )
-	ROM_LOAD16_BYTE( "gp2-303b-0064.u180", 0x600001, 0x100000, CRC(458a1fbc) SHA1(971548ec8cce592773e762a0c972264013b7cb8d) )
-
-	ROM_REGION( 0x500000, "kan_spr", 0 )   /* Sprites */
-	ROM_LOAD( "gp2-200-j-0073.u189", 0x000000, 0x200000, CRC(2f81e519) SHA1(c07f4dad15b6f7f1fb867f773c0ada309d172326) )
-	ROM_LOAD( "gp2-201-j-0074.u171", 0x200000, 0x200000, CRC(bbe404e0) SHA1(198db9a6c6ec97ed8fd32d946051ba4d6e4bd354) )
-	ROM_LOAD16_BYTE( "g204a3.u169-3", 0x400000, 0x080000, CRC(92a837b7) SHA1(f581e1f7754f1fb20255c6c55ffc4e486d867111) )
-	ROM_LOAD16_BYTE( "g204a4.u170-3", 0x400001, 0x080000, CRC(3c2dd1cd) SHA1(d5267ad6f51283191174988ac0519c0e0aa6552f) )
-
-	ROM_REGION( 0x180000, "oki1", 0 )   /* Samples */
-	ROM_LOAD( "gp2-100-0043.u61", 0x000000, 0x100000, CRC(a61e8868) SHA1(ad84ae00ebe7c70a36b1aa75e743686a0193e5d9) )
-	ROM_LOAD( "g104a3.u62-3", 0x100000, 0x080000, CRC(42b3470e) SHA1(c121ea6c98e6ff452f4bcc49c3a5179e99237128) )
-
-	ROM_REGION( 0x300000, "oki2", 0 )   /* Samples */
-	ROM_LOAD( "gp2-102-0045.u59",  0x000000, 0x200000, CRC(1bed6ecd) SHA1(3208aacac64ac95fcb6eeef59986c3154c1c415b) )
-	ROM_LOAD( "gp2-101-0044.u60",  0x200000, 0x100000, CRC(3c45134f) SHA1(a5362bfcc6beb6e776c1bce4544475f8947fccea) )
-ROM_END
-
+// The regular version, has no attract demo
 GAME( 1993, galpani2,   0,        galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Asia)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, galpani2e,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (English)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, galpani2e2, galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (English, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
@@ -1338,8 +1328,11 @@ GAME( 1993, galpani2i,  galpani2, galpani2, galpani2, galpani2_state, empty_init
 GAME( 1993, galpani2gs, galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Germany, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, galpani2t,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Taiwan, 2 PCB ver.)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 1993, galpani2k,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko (Karam Trading Co., Ltd. license)", "Gals Panic II (Korea, single PCB)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1993, galpani2j,  galpani2, galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
 
+// The English Quiz version, and Japanese version seem to be a separate (later?) release with full attract mode
+// and additional features (such as the quiz)
 GAME( 1993, gp2quiz,    0,        galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II - Quiz Version", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // this one has 'quiz edition' on the title screen
+GAME( 1993, galpani2j,  gp2quiz,  galpani2, galpani2, galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // it is a 'quiz edition' but the title screen doesn't say, maybe all Japanese versions have the Quiz
 
-GAME( 1994, gp2se,      0,        galpani2, gp2se,    galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+// Special Edition is yet another release
+GAME( 1994, gp2se,      0,        gp2se,    gp2se,    galpani2_state, empty_init, ROT90, "Kaneko", "Gals Panic II' - Special Edition (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

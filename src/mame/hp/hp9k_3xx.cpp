@@ -65,6 +65,7 @@
 #include "cpu/m68000/m68030.h"
 #include "cpu/m68000/m68040.h"
 #include "machine/6840ptm.h"
+#include "machine/ram.h"
 #include "bus/hp_dio/hp_dio.h"
 
 #include "screen.h"
@@ -83,6 +84,7 @@ public:
 	hp9k3xx_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, MAINCPU_TAG),
+		m_ram(*this, RAM_TAG),
 		m_diag_led(*this, "led_diag_%u", 0U)
 	{ }
 
@@ -102,6 +104,7 @@ protected:
 private:
 	void hp9k300(machine_config &config);
 	required_device<m68000_musashi_device> m_maincpu;
+	optional_device<ram_device> m_ram;
 
 	output_finder<8> m_diag_led;
 
@@ -209,11 +212,10 @@ void hp9k3xx_state::hp9k380_map(address_map &map)
 }
 
 // 9000/382 - onboard VGA compatible video (where?)
+// main memory (4 to 32 MB, ending at 0xffffffff) is installed in machine_start
 void hp9k3xx_state::hp9k382_map(address_map &map)
 {
 	hp9k3xx_common(map);
-	// main memory
-	map(0xffc00000, 0xffffffff).ram();
 }
 
 /* Input ports */
@@ -225,6 +227,12 @@ void hp9k3xx_state::machine_start()
 	m_bus_error_timer = timer_alloc(FUNC(hp9k3xx_state::bus_error_timeout), this);
 	m_bus_error = false;
 	save_item(NAME(m_bus_error));
+
+	if (m_ram)
+	{
+		const offs_t start = offs_t(0x100000000ULL - m_ram->size());
+		m_maincpu->space(AS_PROGRAM).install_ram(start, 0xffffffff, m_ram->pointer());
+	}
 }
 
 TIMER_CALLBACK_MEMBER(hp9k3xx_state::bus_error_timeout)
@@ -443,6 +451,8 @@ void hp9k3xx_state::hp9k382(machine_config &config)
 
 	M68040(config.replace(), m_maincpu, 25000000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &hp9k3xx_state::hp9k382_map);
+
+	RAM(config, m_ram).set_default_size("32M").set_extra_options("4M,8M,12M,16M,20M,24M,28M");
 }
 
 ROM_START( hp9k310 )

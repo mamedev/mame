@@ -109,6 +109,8 @@ private:
 	TILE_GET_INFO_MEMBER(get_infotile_info_2);
 	TILE_GET_INFO_MEMBER(get_txttile_info);
 
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 	void panicr_palette(palette_device &palette) const;
 
@@ -116,6 +118,7 @@ private:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 	void panicr_map(address_map &map) ATTR_COLD;
 
 	required_device<cpu_device> m_maincpu;
@@ -141,6 +144,7 @@ private:
 	std::unique_ptr<bitmap_ind16> m_tempbitmap_1;
 	rectangle m_tempbitmap_clip;
 
+	uint8_t m_irq_vector = 0;
 };
 
 
@@ -234,6 +238,15 @@ TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
 		0);
 }
 
+void panicr_state::machine_start()
+{
+	save_item(NAME(m_irq_vector));
+}
+
+void panicr_state::machine_reset()
+{
+	m_irq_vector = 0;
+}
 
 void panicr_state::video_start()
 {
@@ -583,13 +596,21 @@ GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
 {
-	int scanline = param;
+	if (param == 240) // vblank-out irq
+	{
+		m_irq_vector = 0xc4 / 4;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (param == 0) // <unknown>
+	{
+		m_irq_vector = 0xc8 / 4;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+}
 
-	if(scanline == 240) // vblank-out irq
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc4/4); // V20
-
-	if(scanline == 0) // <unknown>
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); // V20
+IRQ_CALLBACK_MEMBER(panicr_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 void panicr_state::panicr(machine_config &config)
@@ -600,6 +621,7 @@ void panicr_state::panicr(machine_config &config)
 	V20(config, m_maincpu, MASTER_CLOCK/2); // Sony 8623h9 CXQ70116D-8 (V20 compatible)
 	m_maincpu->set_addrmap(AS_PROGRAM, &panicr_state::panicr_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(panicr_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(panicr_state::cpu_acknowledge_irq));
 
 	T5182(config, m_t5182, SOUND_CLOCK/4);
 	m_t5182->ym_read_callback().set("ymsnd", FUNC(ym2151_device::read));

@@ -71,7 +71,7 @@ public:
 		, m_sslcpu(*this, "sslcpu")
 	{ }
 
-	void css11501sk9(machine_config &config);
+	void css11501sk9(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;

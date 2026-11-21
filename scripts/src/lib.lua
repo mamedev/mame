@@ -123,6 +123,8 @@ end
 		MAME_DIR .. "src/lib/util/nanosvg.cpp",
 		MAME_DIR .. "src/lib/util/nanosvg.h",
 		MAME_DIR .. "src/lib/util/notifier.h",
+		MAME_DIR .. "src/lib/util/openh264dec.cpp",
+		MAME_DIR .. "src/lib/util/openh264dec.h",
 		MAME_DIR .. "src/lib/util/opresolv.cpp",
 		MAME_DIR .. "src/lib/util/opresolv.h",
 		MAME_DIR .. "src/lib/util/options.cpp",

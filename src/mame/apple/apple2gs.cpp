@@ -167,6 +167,7 @@ public:
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 private:
 	required_device<w65816_device> m_maincpu;
@@ -364,6 +365,7 @@ private:
 	u8 c300_r(offs_t offset);
 	u8 c300_int_r(offs_t offset);
 	void c300_w(offs_t offset, u8 data);
+	void c300_int_w(offs_t offset, u8 data);
 	u8 c800_r(offs_t offset);
 	void c800_w(offs_t offset, u8 data);
 	u8 inh_r(offs_t offset);
@@ -395,6 +397,13 @@ private:
 	void doc_irq_w(int state);
 	void scc_irq_w(int state);
 	u8 doc_adc_read();
+	u64 sndglu_now() const { return m_doc->attotime_to_clocks(machine().time()); }
+	void sndglu_run(u64 clk);
+	void sndglu_access(u64 clk);
+	void sndglu_read_request(u64 clk);
+	void sndglu_write_request(u64 clk, u8 data);
+	void sndglu_arm();
+	TIMER_CALLBACK_MEMBER(sndglu_tick);
 	u8 apple2gs_read_vector(offs_t offset);
 
 	u8 keyglu_mcu_read(u8 offset);
@@ -447,9 +456,32 @@ private:
 	bool m_last_speed = false;
 
 	// Sound GLU variables
+	enum
+	{
+		SNDGLU_IDLE = 0,
+		SNDGLU_WAIT,    // access waiting for its slot
+		SNDGLU_RUN,     // access underway
+		SNDGLU_LATE,    // second half of the access
+		SNDGLU_DONE     // access finished, busy until the DOC cycle ends
+	};
+
 	u8 m_sndglu_ctrl = 0;
 	u16 m_sndglu_addr = 0;
-	int m_sndglu_dummy_read = 0;
+	u8 m_sndglu_dummy_read = 0;
+	u8 m_sndglu_wdata = 0, m_sndglu_xdata = 0;
+	u8 m_sndglu_state = SNDGLU_IDLE;
+	bool m_sndglu_write = false, m_sndglu_queued = false;
+	u64 m_sndglu_clk = 0;       // DOC clock the GLU has been run to
+	u64 m_sndglu_slot = 0;      // DOC clock at which the current access starts
+	bool m_sndglu_ram = false;  // mode and pointer low byte in the middle of the access
+	u8 m_sndglu_lo = 0;
+	u8 m_sndglu_reg = 0;        // DOC register last written, and the slot it was written in
+	u64 m_sndglu_reg_slot = 0;
+	emu_timer *m_sndglu_timer = nullptr;
+
+	// when in a 1 MHz cycle the GLU sees a write or starts the fetch for a read, in DOC clocks
+	static constexpr int SNDGLU_WRITE = 4;
+	static constexpr int SNDGLU_READ = 7;
 
 	// Key GLU variables
 	u8 m_glu_regs[12]{}, m_glu_bus = 0;
@@ -469,6 +501,7 @@ private:
 	device_a2bus_card_interface *m_slotdevice[8]{};
 
 	u32 m_slow_counter = 0;
+	u32 m_slow_step = 0;
 
 	// clock/BRAM
 	u8 m_clkdata = 0, m_clock_control = 0;
@@ -486,6 +519,9 @@ private:
 	void raise_irq(int irq);
 	void lower_irq(int irq);
 	void update_speed();
+	void set_cpu_clock(u32 clock, bool realign);
+	void update_slow_step();
+	void slow_cycle();
 	void get_beam_pos(int &hpos, int &vpos);
 	int get_vpos();
 	void process_clock();
@@ -510,17 +546,15 @@ private:
 
 // FF6ACF is speed test routine in ROM 3
 
-// slow_cycle() - take a 1 MHz cycle.  Theory: a 2.8 MHz cycle is 14M / 5.
-// 1 MHz is 14M / 14.  14/5 = 2.8 * 65536 (16.16 fixed point) = 0x2cccd.
-#define slow_cycle() \
-{   \
-	if (m_last_speed && !machine().side_effects_disabled()) \
-	{\
-		m_slow_counter += 0x0002cccd; \
-		int cycles = (m_slow_counter >> 16) & 0xffff; \
-		m_slow_counter &= 0xffff; \
-		m_maincpu->adjust_icount(-cycles); \
-	} \
+// take a 1 MHz cycle
+inline void apple2gs_state::slow_cycle()
+{
+	if (m_last_speed && !machine().side_effects_disabled())
+	{
+		m_slow_counter += m_slow_step;
+		m_maincpu->adjust_icount(-int(m_slow_counter >> 16));
+		m_slow_counter &= 0xffff;
+	}
 }
 
 
@@ -628,6 +662,8 @@ u8 apple2gs_state::apple2gs_read_vector(offs_t offset)
 
 void apple2gs_state::machine_start()
 {
+	m_sndglu_timer = timer_alloc(FUNC(apple2gs_state::sndglu_tick), this);
+
 	m_ram_ptr = m_ram->pointer();
 	m_ram_size = m_ram->size();
 	m_speaker_state = 0;
@@ -781,6 +817,17 @@ void apple2gs_state::machine_start()
 	save_item(NAME(m_sndglu_ctrl));
 	save_item(NAME(m_sndglu_addr));
 	save_item(NAME(m_sndglu_dummy_read));
+	save_item(NAME(m_sndglu_wdata));
+	save_item(NAME(m_sndglu_xdata));
+	save_item(NAME(m_sndglu_state));
+	save_item(NAME(m_sndglu_write));
+	save_item(NAME(m_sndglu_queued));
+	save_item(NAME(m_sndglu_clk));
+	save_item(NAME(m_sndglu_slot));
+	save_item(NAME(m_sndglu_ram));
+	save_item(NAME(m_sndglu_lo));
+	save_item(NAME(m_sndglu_reg));
+	save_item(NAME(m_sndglu_reg_slot));
 	save_item(NAME(m_last_speed));
 	save_item(NAME(m_glu_regs));
 	save_item(NAME(m_glu_bus));
@@ -852,12 +899,16 @@ void apple2gs_state::machine_reset()
 	m_slow_counter = 0;
 
 	// always assert full speed on reset
-	m_maincpu->set_unscaled_clock(A2GS_2_8M);
+	set_cpu_clock(A2GS_2_8M.value(), false);
 	m_last_speed = true;
 
 	m_sndglu_ctrl = 0;
 	m_sndglu_addr = 0;
 	m_sndglu_dummy_read = 0;
+	m_sndglu_state = SNDGLU_IDLE;
+	m_sndglu_queued = false;
+	m_sndglu_reg_slot = 0;
+	m_sndglu_timer->adjust(attotime::never);
 
 	m_b0_0000bank.select(0);
 	m_e0_0000bank.select(0);
@@ -918,6 +969,11 @@ void apple2gs_state::machine_reset()
 	}
 }
 
+void apple2gs_state::device_post_load()
+{
+	update_slow_step();
+}
+
 void apple2gs_state::raise_irq(int irq)
 {
 	if (!(m_irqmask & (1 << irq)))
@@ -969,7 +1025,26 @@ void apple2gs_state::update_speed()
 		m_last_speed = false;
 	}
 
-	m_maincpu->set_unscaled_clock(new_speed, !m_last_speed); // re-align with PH0
+	set_cpu_clock(new_speed, !m_last_speed); // re-align with PH0
+}
+
+void apple2gs_state::set_cpu_clock(u32 clock, bool realign)
+{
+	m_maincpu->set_unscaled_clock(clock, realign);
+	update_slow_step();
+}
+
+// a 1 MHz cycle in 16.16 CPU cycles: 14 14M clocks, 2.8 at 2.8 MHz
+void apple2gs_state::update_slow_step()
+{
+	// a ZipGS also waits one 2.8 MHz motherboard cycle to hand over and half a 1 MHz cycle on average for
+	// its next edge (estimated)
+	constexpr u32 SLOW_TICKS = 14;
+	constexpr u32 ZIP_SYNC_TICKS = 12;
+
+	const u32 clock = m_maincpu->unscaled_clock();
+	const u64 ticks = (clock > A2GS_2_8M.value()) ? (SLOW_TICKS + ZIP_SYNC_TICKS) : SLOW_TICKS;
+	m_slow_step = u32((((u64(clock) * ticks) << 16) + (A2GS_14M.value() / 2)) / A2GS_14M.value());
 }
 
 void apple2gs_state::accel_reset()
@@ -1735,32 +1810,36 @@ u8 apple2gs_state::c000_r(offs_t offset)
 			return m_a2bus->get_dma_bank();
 
 		case 0x3c:  // SOUNDCTL
-			return m_sndglu_ctrl | 0x1f; // "write only" bits read as 1
-
-		case 0x3d:  // SOUNDDATA
-			ret = m_sndglu_dummy_read;
 			if (!machine().side_effects_disabled())
 			{
-				if (m_sndglu_ctrl & 0x40)    // docram access
-				{
-					m_sndglu_dummy_read = m_docram[m_sndglu_addr];
-				}
-				else
-				{
-					m_sndglu_dummy_read = m_doc->read(m_sndglu_addr);
-				}
-
-				if (m_sndglu_ctrl & 0x20)    // auto-increment
-				{
-					m_sndglu_addr++;
-				}
+				sndglu_run(sndglu_now() + SNDGLU_READ);
 			}
-			return ret;
+			// "write only" bits read as 1
+			return m_sndglu_ctrl | 0x1f | ((m_sndglu_state != SNDGLU_IDLE) ? 0x80 : 0);
+
+		case 0x3d:  // SOUNDDATA
+			// the CPU gets what the last read fetched, and the fetch for this read starts as the cycle ends
+			if (!machine().side_effects_disabled())
+			{
+				sndglu_run(sndglu_now() + SNDGLU_READ);
+				ret = m_sndglu_dummy_read;
+				sndglu_read_request(sndglu_now() + SNDGLU_READ);
+				return ret;
+			}
+			return m_sndglu_dummy_read;
 
 		case 0x3e:  // SOUNDADRL
+			if (!machine().side_effects_disabled())
+			{
+				sndglu_run(sndglu_now() + SNDGLU_READ);
+			}
 			return m_sndglu_addr & 0xff;
 
 		case 0x3f:  // SOUNDADRH
+			if (!machine().side_effects_disabled())
+			{
+				sndglu_run(sndglu_now() + SNDGLU_READ);
+			}
 			return (m_sndglu_addr >> 8) & 0xff;
 
 		case 0x41:  // INTEN
@@ -1916,6 +1995,8 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x06:  // INTCXROMOFF
+			if (m_intcxrom)
+				m_intc8rom = false; // undocumented behavior, differs from IIe
 			m_intcxrom = false;
 			update_slotrom_banks();
 			break;
@@ -2093,35 +2174,22 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x3c:  // SOUNDCTL
-			m_sndglu_ctrl = data & 0x7f; // make sure DOC is never busy
-			if (!(m_sndglu_ctrl & 0x40)) // clear hi byte of address pointer on DOC access
-			{
-				m_sndglu_addr &= 0xff;
-			}
+			sndglu_run(sndglu_now() + SNDGLU_WRITE);
+			m_sndglu_ctrl = data & 0x7f;
 			break;
 
 		case 0x3d:  // SOUNDDATA
-			if (m_sndglu_ctrl & 0x40)    // docram access
-			{
-				m_docram[m_sndglu_addr] = data;
-			}
-			else
-			{
-				m_doc->write(m_sndglu_addr, data);
-			}
-
-			if (m_sndglu_ctrl & 0x20)    // auto-increment
-			{
-				m_sndglu_addr++;
-			}
+			sndglu_write_request(sndglu_now() + SNDGLU_WRITE, data);
 			break;
 
 		case 0x3e:  // SOUNDADRL
+			sndglu_run(sndglu_now() + SNDGLU_WRITE);
 			m_sndglu_addr &= 0xff00;
 			m_sndglu_addr |= data;
 			break;
 
 		case 0x3f:  // SOUNDADRH
+			sndglu_run(sndglu_now() + SNDGLU_WRITE);
 			m_sndglu_addr &= 0x00ff;
 			m_sndglu_addr |= data<<8;
 			break;
@@ -2253,6 +2321,9 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			break;
 
 		case 0x68: // STATEREG
+			if (m_intcxrom && !(data & 0x01))
+				m_intc8rom = false; // undocumented behavior, differs from IIe
+
 			m_altzp = (data & 0x80);
 			m_video->scr_w(data & 0x40);
 			m_ramrd = (data & 0x20);
@@ -2262,11 +2333,9 @@ void apple2gs_state::c000_w(offs_t offset, u8 data)
 			m_rombank = (data & 0x02);
 			m_intcxrom = (data & 0x01);
 
-			// update the aux state
-			auxbank_update();
-
-			// update LC state
 			lcrom_update();
+			auxbank_update();
+			update_slotrom_banks();
 			break;
 
 		default:
@@ -2442,6 +2511,7 @@ void apple2gs_state::c100_w(offs_t offset, u8 data)
 	}
 }
 
+u8 apple2gs_state::c300_r(offs_t offset) { return read_slot_rom(3, offset); }
 u8 apple2gs_state::c300_int_r(offs_t offset)
 {
 	if ((!m_slotc3rom) && !machine().side_effects_disabled())
@@ -2452,8 +2522,14 @@ u8 apple2gs_state::c300_int_r(offs_t offset)
 	return read_int_rom(0x3c300, offset);
 }
 
-u8 apple2gs_state::c300_r(offs_t offset)  { return read_slot_rom(3, offset); }
 void apple2gs_state::c300_w(offs_t offset, u8 data) { write_slot_rom(3, offset, data); }
+void apple2gs_state::c300_int_w(offs_t offset, u8 data)
+{
+	if ((!m_slotc3rom) && !machine().side_effects_disabled())
+	{
+		m_intc8rom = true;
+	}
+}
 
 u8 apple2gs_state::c800_r(offs_t offset)
 {
@@ -2462,7 +2538,8 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
+		if (!m_intcxrom)
+			m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
 	}
 
@@ -2482,17 +2559,19 @@ u8 apple2gs_state::c800_r(offs_t offset)
 
 void apple2gs_state::c800_w(offs_t offset, u8 data)
 {
-	if ((m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
+	const int internal = (m_intcxrom) || (m_intc8rom);
+
+	if ((!internal) && (m_cnxx_slot > 0) && (m_slotdevice[m_cnxx_slot] != nullptr))
 	{
 		slow_cycle();
 		m_slotdevice[m_cnxx_slot]->write_c800(offset&0xfff, data);
 	}
 
-	if (offset == 0x7ff)
+	if ((offset == 0x7ff) && !machine().side_effects_disabled())
 	{
-		m_cnxx_slot = CNXX_UNCLAIMED;
+		if (!m_intcxrom)
+			m_cnxx_slot = CNXX_UNCLAIMED;
 		m_intc8rom = false;
-		return;
 	}
 }
 
@@ -3352,7 +3431,7 @@ void apple2gs_state::vectors_map(address_map &map)
 void apple2gs_state::c300bank_map(address_map &map)
 {
 	map(0x0000, 0x00ff).rw(FUNC(apple2gs_state::c300_r), FUNC(apple2gs_state::c300_w));
-	map(0x0100, 0x01ff).r(FUNC(apple2gs_state::c300_int_r)).nopw();
+	map(0x0100, 0x01ff).rw(FUNC(apple2gs_state::c300_int_r), FUNC(apple2gs_state::c300_int_w));
 }
 
 void apple2gs_state::a2gs_es5503_map(address_map &map)
@@ -3729,6 +3808,191 @@ void apple2gs_state::scc_irq_w(int state)
 	{
 		lower_irq(IRQS_SCC);
 	}
+}
+
+/*
+    Sound GLU
+
+    The GLU holds each access to the sound data register until the DOC can take it.  The DOC
+    services one oscillator every 8 of its clocks, and the GLU gets the bus for clocks 3 and 4
+    of each such cycle, staying busy until the cycle ends.  The read latch and the write data
+    are separate, a second access before the first is done is dropped or replaces it, and the
+    pointer and mode are not latched with the request.  Timing follows what the DOCGRADE test
+    suite measures on real hardware.
+*/
+void apple2gs_state::sndglu_access(u64 clk)
+{
+	const bool ram = BIT(m_sndglu_ctrl, 6);
+	const u16 addr = (m_sndglu_addr & 0xff00) | m_sndglu_lo;
+
+	// an access right behind a register write lands on the same register
+	const bool same_reg = (m_sndglu_reg_slot + 8) == m_sndglu_slot;
+	const u8 reg = same_reg ? m_sndglu_reg : m_sndglu_lo;
+
+	// the access can land a little ahead of the CPU's own time
+	m_doc->run_to(clk);
+
+	if (m_sndglu_write)
+	{
+		// changing the mode in the middle of a write loses it
+		if (ram == m_sndglu_ram)
+		{
+			if (ram)
+			{
+				m_docram[addr] = m_sndglu_xdata;
+			}
+			else
+			{
+				m_doc->write(reg, m_sndglu_xdata);
+				m_sndglu_reg = reg;
+				m_sndglu_reg_slot = m_sndglu_slot;
+			}
+		}
+	}
+	else if (m_sndglu_ram)
+	{
+		m_sndglu_dummy_read = m_docram[addr];
+	}
+	else
+	{
+		m_sndglu_dummy_read = m_doc->read(reg);
+		if (same_reg)
+		{
+			// and a read there fights whatever the DOC last fetched
+			m_sndglu_dummy_read &= m_doc->bus_r();
+		}
+	}
+
+	if (BIT(m_sndglu_ctrl, 5))    // auto-increment
+	{
+		m_sndglu_addr++;
+	}
+}
+
+void apple2gs_state::sndglu_run(u64 clk)
+{
+	static constexpr u8 step[] = { 0, 0, 1, 2, 5 };
+
+	while (m_sndglu_state != SNDGLU_IDLE)
+	{
+		// the CPU's side of a tie comes first
+		const u64 when = m_sndglu_slot + step[m_sndglu_state];
+		if (when >= clk)
+		{
+			break;
+		}
+
+		switch (m_sndglu_state)
+		{
+			case SNDGLU_WAIT:
+				m_sndglu_xdata = m_sndglu_wdata;
+				m_sndglu_state = SNDGLU_RUN;
+				break;
+
+			case SNDGLU_RUN:
+				m_sndglu_ram = BIT(m_sndglu_ctrl, 6);
+				m_sndglu_lo = m_sndglu_addr & 0xff;
+				m_sndglu_state = SNDGLU_LATE;
+				break;
+
+			case SNDGLU_LATE:
+				sndglu_access(when);
+				m_sndglu_state = SNDGLU_DONE;
+				break;
+
+			case SNDGLU_DONE:
+				if (m_sndglu_queued)
+				{
+					m_sndglu_queued = false;
+					m_sndglu_write = true;
+					m_sndglu_slot += 8;
+					m_sndglu_state = SNDGLU_WAIT;
+				}
+				else
+				{
+					m_sndglu_state = SNDGLU_IDLE;
+				}
+				break;
+		}
+	}
+
+	m_sndglu_clk = std::max(m_sndglu_clk, clk);
+}
+
+void apple2gs_state::sndglu_arm()
+{
+	if ((m_sndglu_state == SNDGLU_IDLE) || ((m_sndglu_state == SNDGLU_DONE) && !m_sndglu_queued))
+	{
+		m_sndglu_timer->adjust(attotime::never);
+	}
+	else
+	{
+		// a timer fires ahead of the CPU cycle it lands in, and that cycle can still change what
+		// the access sees, so finish the access a cycle late if the CPU doesn't get there first
+		const u64 done = m_sndglu_slot + ((m_sndglu_state == SNDGLU_DONE) ? 10 : 2);
+		const attotime when = m_doc->clocks_to_attotime(done + SNDGLU_READ + 2);
+		m_sndglu_timer->adjust((when > machine().time()) ? (when - machine().time()) : attotime::zero);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(apple2gs_state::sndglu_tick)
+{
+	sndglu_run(sndglu_now() - SNDGLU_READ);
+	sndglu_arm();
+}
+
+void apple2gs_state::sndglu_read_request(u64 clk)
+{
+	clk = std::max(clk, m_sndglu_clk);
+	sndglu_run(clk);
+
+	// a read while the GLU is busy is ignored
+	if (m_sndglu_state == SNDGLU_IDLE)
+	{
+		m_sndglu_write = false;
+		m_sndglu_slot = clk + ((11 - (clk & 7)) & 7);
+		m_sndglu_state = SNDGLU_WAIT;
+	}
+
+	sndglu_arm();
+}
+
+void apple2gs_state::sndglu_write_request(u64 clk, u8 data)
+{
+	clk = std::max(clk, m_sndglu_clk);
+	sndglu_run(clk);
+
+	m_sndglu_wdata = data;
+	switch (m_sndglu_state)
+	{
+		case SNDGLU_IDLE:
+			m_sndglu_write = true;
+			m_sndglu_slot = clk + ((11 - (clk & 7)) & 7);
+			m_sndglu_state = SNDGLU_WAIT;
+			break;
+
+		case SNDGLU_WAIT:
+			// a write takes the place of a read that hasn't started, and the read latch is left
+			// holding whatever the DOC last put on the bus
+			if (!m_sndglu_write)
+			{
+				m_doc->run_to(clk);
+				m_sndglu_dummy_read = m_doc->bus_r();
+				m_sndglu_write = true;
+			}
+			break;
+
+		case SNDGLU_RUN:
+		case SNDGLU_LATE:
+			// lost
+			break;
+
+		case SNDGLU_DONE:
+			m_sndglu_queued = true;
+			break;
+	}
+
+	sndglu_arm();
 }
 
 /* Sound - DOC */

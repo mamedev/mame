@@ -30,6 +30,8 @@
 #include "acorn_serproc.h"
 #include "bbc_kbd.h"
 
+#include "machine/74123.h"
+#include "machine/rescap.h"
 #include "machine/tms6100.h"
 #include "machine/wd_fdc.h"
 #include "sound/tms5220.h"
@@ -619,11 +621,29 @@ void bbcbp_state::bbcbp(machine_config &config)
 	MC6854(config, m_adlc);
 	m_adlc->out_txd_cb().set("network", FUNC(econet_device::host_data_w));
 	m_adlc->out_irq_cb().set(FUNC(bbcbp_state::adlc_irq_w));
-	//m_adlc->out_rts_cb().
+	m_adlc->out_rts_cb().set("ic88", FUNC(ttl74123_device::clear_w));
+	m_adlc->out_rts_cb().append("ic70", FUNC(input_merger_device::in_w<1>));
+
+	ttl74123_device &ic88(TTL74123(config, "ic88", RES_K(220), CAP_U(47)));
+	ic88.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	ic88.set_a_pin_value(0);
+	ic88.set_b_pin_value(1);
+	ic88.set_clear_pin_value(0);
+	ic88.out_cb().set("network", FUNC(econet_device::host_rts_w));
+
+	ttl74123_device &ic80(TTL74123(config, "ic80", RES_K(39), CAP_N(2.2)));
+	ic80.set_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE);
+	ic80.set_b_pin_value(1);
+	ic80.set_clear_pin_value(1);
+	ic80.out_cb().set(m_adlc, FUNC(mc6854_device::set_dcd)).invert();
+	ic80.out_cb().append("ic70", FUNC(input_merger_device::in_w<0>));
+
+	INPUT_MERGER_ALL_HIGH(config, "ic70").output_handler().set(m_adlc, FUNC(mc6854_device::set_cts)).invert();
 
 	econet_device &econet(ECONET(config, "network"));
 	econet.clk_wr_callback().set(m_adlc, FUNC(mc6854_device::txc_w));
 	econet.clk_wr_callback().append(m_adlc, FUNC(mc6854_device::rxc_w));
+	econet.clk_wr_callback().append(ic80, FUNC(ttl74123_device::a_w));
 	econet.data_wr_callback().set(m_adlc, FUNC(mc6854_device::set_rx));
 	ECONET_SLOT(config, "econet", "network", econet_devices);
 

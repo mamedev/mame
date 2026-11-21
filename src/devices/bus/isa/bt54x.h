@@ -24,10 +24,14 @@ protected:
 	bt54x_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 
 	u8 local_status_r();
 
 	void local_map(address_map &map) ATTR_COLD;
+	void fsc_local_map(address_map &map) ATTR_COLD;
 	void fsc_base(machine_config &config);
 
 	required_device<i80188_cpu_device> m_mpu;

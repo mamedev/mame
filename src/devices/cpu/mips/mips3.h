@@ -51,6 +51,7 @@ DECLARE_DEVICE_TYPE(RM7000BE, rm7000be_device)
 DECLARE_DEVICE_TYPE(RM7000LE, rm7000le_device)
 DECLARE_DEVICE_TYPE(R5900LE, r5900le_device)
 DECLARE_DEVICE_TYPE(R5900BE, r5900be_device)
+DECLARE_DEVICE_TYPE(XBURST, xburst_device)
 
 
 /***************************************************************************
@@ -281,7 +282,10 @@ protected:
 		MIPS3_TYPE_VR5500,
 		MIPS3_TYPE_QED5271,
 		MIPS3_TYPE_R5900,
-		MIPS3_TYPE_RM7000
+		MIPS3_TYPE_RM7000,
+
+		/* MIPS32 variants */
+		MIPS3_TYPE_XBURST
 	};
 
 	static inline constexpr unsigned MIPS3_MAX_FASTRAM      = 3;
@@ -305,7 +309,7 @@ public:
 	mips3_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, mips3_flavor flavor, endianness_t endiannes, uint32_t data_bits);
 	virtual ~mips3_device();
 
-	void set_drc_cache_size(size_t bytes) { m_drc_cache.set_size(bytes); }
+	void set_drc_cache_size(size_t bytes) { m_drcuml.set_cache_size(bytes); }
 	void set_icache_size(size_t icache_size) { c_icache_size = icache_size; }
 	void set_dcache_size(size_t dcache_size) { c_dcache_size = dcache_size; }
 	void set_secondary_cache_line_size(uint8_t secondary_cache_line_size) { c_secondary_cache_line_size = secondary_cache_line_size; }
@@ -393,6 +397,12 @@ protected:
 		uint64_t        random_zero_time;           /* Random counter origin; reset by a Wired write */
 		uint32_t        compare_armed;
 		uint32_t        jmpdest;                    /* destination jump target */
+
+		/* MIPS32 CP0 registers with a non-zero select field, indexed [register][select]; select 0 lives in cpr[0] */
+		uint32_t        cp0_sel[32][8];
+
+		/* XBurst MXU SIMD registers xr0-xr15 (xr0 reads as zero) and the control register xr16; only the moves and loads/stores are implemented */
+		uint32_t        mxu[32];
 	};
 
 	/* core state */
@@ -501,8 +511,7 @@ protected:
 	uint32_t        m_debugger_temp;
 
 	/* core state */
-	drc_cache       m_drc_cache;                /* pointer to the DRC code cache */
-	std::unique_ptr<drcuml_state>  m_drcuml;    /* DRC UML generator state */
+	drcuml_state    m_drcuml;                   /* DRC UML generator state */
 	std::unique_ptr<frontend>      m_drcfe;     /* pointer to the DRC front-end state */
 	uint32_t        m_drcoptions;               /* configurable DRC options */
 
@@ -551,10 +560,10 @@ protected:
 	void set_link(offs_t address);
 	bool address_error_check(offs_t address, uint32_t size, bool iswrite);
 
-	void static_generate_memory_mode_checks(drcuml_block &block, uml::code_handle &exception_addrerr, int &label, int mode);
-	void static_generate_fastram_accessor(drcuml_block &block, int &label, int size, bool iswrite, bool ismasked);
+	void static_generate_memory_mode_checks(drcuml_block &block, uml::code_handle &exception_addrerr, uml::code_label &label, int mode);
+	void static_generate_fastram_accessor(drcuml_block &block, uml::code_label &label, int size, bool iswrite, bool ismasked);
 	void static_generate_memory_rw(drcuml_block &block, int size, bool iswrite, bool ismasked);
-	virtual void static_generate_memory_accessor(drcuml_block &block, int &label, int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr);
+	virtual void static_generate_memory_accessor(drcuml_block &block, uml::code_label &label, int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr);
 
 	virtual void check_irqs();
 	virtual void handle_mult(uint32_t op);
@@ -624,7 +633,7 @@ private:
 	static void cfunc_dcache_op(void *param);
 	static void cfunc_icache_op(void *param);
 	static void cfunc_dcache_memory(void *param);
-	void static_generate_dcache_memory(drcuml_block &block, int &label, int tlbmiss, int size, bool iswrite, bool ismasked);
+	void static_generate_dcache_memory(drcuml_block &block, uml::code_label &label, int tlbmiss, int size, bool iswrite, bool ismasked);
 
 	void lwl_be(uint32_t op);
 	void lwr_be(uint32_t op);
@@ -665,11 +674,11 @@ private:
 		uml::code_label  labelnum;                   /* index for local labels */
 	};
 
-	void static_generate_entry_point(drcuml_block &block, int &label);
-	void static_generate_nocode_handler(drcuml_block &block, int &label);
-	void static_generate_out_of_cycles(drcuml_block &block, int &label);
-	void static_generate_tlb_mismatch(drcuml_block &block, int &label);
-	void static_generate_exception(drcuml_block &block, int &label, uint8_t exception, int recover, const char *name);
+	void static_generate_entry_point(drcuml_block &block, uml::code_label &label);
+	void static_generate_nocode_handler(drcuml_block &block, uml::code_label &label);
+	void static_generate_out_of_cycles(drcuml_block &block, uml::code_label &label);
+	void static_generate_tlb_mismatch(drcuml_block &block, uml::code_label &label);
+	void static_generate_exception(drcuml_block &block, uml::code_label &label, uint8_t exception, int recover, const char *name);
 
 	void generate_update_mode(drcuml_block &block);
 	void generate_update_cycles(drcuml_block &block, compiler_state &compiler, uml::parameter param, bool allow_exception);
@@ -805,7 +814,7 @@ public:
 protected:
 	virtual bool memory_translate(int spacenum, int intention, offs_t &address, address_space *&target_space) override;
 
-	virtual void static_generate_memory_accessor(drcuml_block &block, int &label, int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr) override;
+	virtual void static_generate_memory_accessor(drcuml_block &block, uml::code_label &label, int mode, int size, bool iswrite, bool ismasked, const char *name, uml::code_handle *&handleptr) override;
 
 	virtual bool RBYTE(offs_t address, uint32_t *result) override;
 	virtual bool RHALF(offs_t address, uint32_t *result) override;
@@ -1049,6 +1058,16 @@ public:
 	// construction/destruction
 	rm7000le_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: mips3_device(mconfig, RM7000LE, tag, owner, clock, MIPS3_TYPE_RM7000, ENDIANNESS_LITTLE, 32) // Should be 64 bits
+	{
+	}
+};
+
+// Ingenic XBurst: the MIPS32 release 1 core of the JZ47xx SoCs (JZ4740/JZ4750/JZ4755), no FPU, little-endian
+class xburst_device : public mips3_device {
+public:
+	// construction/destruction
+	xburst_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: mips3_device(mconfig, XBURST, tag, owner, clock, MIPS3_TYPE_XBURST, ENDIANNESS_LITTLE, 32)
 	{
 	}
 };

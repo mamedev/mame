@@ -26,6 +26,8 @@ public:
 	// construction/destruction
 	wd1010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	void set_rotational_latency(const attotime &latency) { m_latency = latency; }
+
 	auto out_intrq_callback() { return m_out_intrq_cb.bind(); }
 	auto out_bdrq_callback() { return m_out_bdrq_cb.bind(); }
 	auto out_bcs_callback() { return m_out_bcs_cb.bind(); }
@@ -38,6 +40,7 @@ public:
 	uint8_t read(offs_t offset);
 	void write(offs_t offset, uint8_t data);
 
+	void mr_w(int state);
 	void drdy_w(int state);
 	void brdy_w(int state);
 	void sc_w(int state);
@@ -95,11 +98,13 @@ private:
 	};
 
 	void set_error(int error);
+	bool single_read_done() const;
 	void set_intrq(int state);
 	void set_bdrq(int state);
 	attotime get_stepping_rate();
 	void start_command();
 	void end_command();
+	bool id_found();
 	int get_lbasector(uint8_t sector);
 
 	// extract values from sdh
@@ -138,6 +143,7 @@ private:
 	emu_timer *m_read_timer;
 	emu_timer *m_write_timer;
 
+	attotime m_latency;
 	int m_intrq;
 	//int m_bdrq;
 	int m_brdy;

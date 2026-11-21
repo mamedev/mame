@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Grundy NewBrain FDC emulation
+    Grundy NewBrain Disk Controller emulation
 
 **********************************************************************/
 
@@ -45,9 +45,16 @@ protected:
 	virtual uint8_t iorq_r(offs_t offset, uint8_t data, bool &prtov) override;
 	virtual void iorq_w(offs_t offset, uint8_t data, bool &prtov) override;
 	virtual uint8_t page_r(int page, offs_t offset, uint8_t data) override;
+	virtual void busak_w(int state) override;
 
 private:
 	void fdc_int_w(int state);
+	void fdc_drq_w(int state);
+
+	TIMER_CALLBACK_MEMBER(busrq_tick);
+	TIMER_CALLBACK_MEMBER(busak_tick);
+	bool bus_request();
+	void bus_release();
 
 	void fdc_auxiliary_w(uint8_t data);
 	uint8_t fdc_control_r();
@@ -67,12 +74,19 @@ private:
 
 	void moton(int state);
 
+	emu_timer *m_busrq_timer;
+	emu_timer *m_busak_timer;
+
 	int m_paging;
 	int m_ma16;
 	int m_mpm;
 	int m_fdc_att;
 	int m_fdc_int;
 	int m_pa15;
+	bool m_extbusrq;
+	bool m_extbusrqd;
+	bool m_busak;
+	bool m_busakd;
 };
 
 

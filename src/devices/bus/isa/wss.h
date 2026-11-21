@@ -26,6 +26,8 @@ protected:
 	// virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
+	virtual uint8_t dack_r(int line) override;
+	virtual void dack_w(int line, uint8_t data) override;
 
 private:
 	required_device<ymf262_device> m_opl3;

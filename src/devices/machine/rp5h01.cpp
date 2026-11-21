@@ -96,32 +96,15 @@ void rp5h01_device::reset_w(int state)
 	if (!m_enabled)
 		return;
 
-	/* now look for a 0->1 transition */
-	if (!m_old_reset && state)
+	/* reset holds the counter at zero while asserted */
+	if (state)
 	{
 		/* reset the counter */
 		m_counter = 0;
 	}
 
 	/* update the pin */
-	m_old_reset = state;
-}
-
-/*-------------------------------------------------
-    cs_w
--------------------------------------------------*/
-
-void rp5h01_device::cs_w(int state)
-{
-	/* if it's not enabled, ignore */
-	if (!m_enabled)
-		return;
-
-	if (state)
-	{
-		/* reset the counter */
-		m_counter = 0;
-	}
+	m_old_reset = state ? 1 : 0;
 }
 
 /*-------------------------------------------------
@@ -134,15 +117,15 @@ void rp5h01_device::clock_w(int state)
 	if (!m_enabled)
 		return;
 
-	/* now look for a 1->0 transition */
-	if (m_old_clock && !state)
+	/* count falling clock edges only while reset is released */
+	if (!m_old_reset && m_old_clock && !state)
 	{
 		/* increment the counter, and mask it with the mode */
 		m_counter++;
 	}
 
 	/* update the pin */
-	m_old_clock = state;
+	m_old_clock = state ? 1 : 0;
 }
 
 /*-------------------------------------------------

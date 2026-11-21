@@ -2,22 +2,9 @@
 // copyright-holders:
 
 /*
+Namco mid-2000s H8 based redemption games
 
-Sweet Land 4
-
-Namco 'M188 MAIN PCB'
-1656960100 (1656970100)
-
-Main components:
-
-1x H8/3007 5B4 HD6413007F20
-1x RTC 72423 A EPSON E220E
-1x Oki M9810B
-1x 14.7456 OSC near the H8
-1x HRD051R5 DC/DC converter
-2x MTB011 High Output Interface Driver ICs
-1x 4-dip bank
-11x connectors
+For hardware description, see ROM entries
 
 Sweet Land 4 video: https://www.youtube.com/watch?v=Zj8_RRGlCI4
 */
@@ -153,12 +140,53 @@ void sweetland4_state::tairyodk(machine_config &config)
 }
 
 
-ROM_START( sweetld4 )
+/*
+Sweet Land 4 Bright
+
+Namco 'M188 MAIN PCB'
+1656960100 (1656970100)
+
+Main components:
+
+1x H8/3007 5B4 HD6413007F20
+1x RTC 72423 A EPSON E220E
+1x Oki M9810B
+1x 14.7456 OSC near the H8
+1x HRD051R5 DC/DC converter
+2x MTB011 High Output Interface Driver ICs
+1x 4-dip bank
+11x connectors
+*/
+ROM_START( sweetl4b )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "swb 1 mpr0b.19f", 0x00000, 0x80000, CRC(8a3e9e87) SHA1(8b1532bac5e1668bdf719a66fdc8b9165cf0722a) )
 
 	ROM_REGION( 0x200000, "oki", 0 )
 	ROM_LOAD( "swb 1 snd0.19d", 0x000000, 0x200000, CRC(39294dc7) SHA1(6094a53f10f220d1df8c3e35df11e0566e9c099c) ) // 11xxxxxxxxxxxxxxxxx = 0x00
+ROM_END
+
+/*
+Sweet Land 4 ?
+
+Namco 'M143 MAIN PCB'
+1641960101 (1641970101)
+
+Main components:
+
+1x H8/3002 9L1 HD6413002F17
+1x 14.7SC9K OSC
+1x Oki M9810
+1x 4.096 MHz blue resonator
+1x Atmel AT28C16-15SC
+1x 4-dip bank
+5x connectors
+*/
+ROM_START( sweetld4 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "swf 1 prg0b.10j", 0x00000, 0x80000, CRC(f574ef25) SHA1(9464b07ce0e1d225a490e7952e4c8f76fe735159) ) // 111xxxxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x400000, "oki", 0 )
+	ROM_LOAD( "swf1 snd0.14f", 0x000000, 0x400000, CRC(ffb7fedd) SHA1(46c8a51b3776c004ec2402ea448977beb7265035) )
 ROM_END
 
 /* Tairyo-Daiko 337 Byoshi (大漁太鼓337拍子, https://bandainamco-am.co.jp/am/english/aa/tairyodaiko337byoshi/) runs on Namco M151 PCB:
@@ -210,5 +238,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 2004, sweetld4,  0, sweetland4, sweetld4, sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 2004, sweetl4b,  0, sweetland4, sweetld4, sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4 Bright (ver 2004.9.29)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
 GAME( 2000, tairyodk,  0, tairyodk,   tairyodk, sweetland4_state, empty_init, ROT0, "Namco", "Tairyo-Daiko 337 Byoshi",             MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK )
+GAME( 200?, sweetld4,  0, tairyodk,   tairyodk, sweetland4_state, empty_init, ROT0, "Namco", "Sweet Land 4",                        MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_MECHANICAL | MACHINE_REQUIRES_ARTWORK ) // title to be verified

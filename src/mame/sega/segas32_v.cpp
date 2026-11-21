@@ -23,15 +23,6 @@
     - Sonic while globally flipped via the service menu, fails to flip
       the "SEGA" and "SEGASONIC" sprite based logos on the title screen.
 
-    - Wrong priority cases (parenthesis for the level setup):
-      dbzvrvs: draws text layer ($e) behind sprite-based gauges ($f).
-      dbzvrvs: Shen-Long speech balloon during Piccolo ending (fixme: check levels).
-      f1lap: attract mode ranking sprite-based text ($a) vs. road ($d)
-      f1lap: attract mode map display (after aforementioned), sprite-based turn names
-      ($a) are hidden by map ($d) again;
-      (Note: Theory about these being CPU core bug(s) is debunked by the fact that latter
-       sets up via immediate opcodes)
-
     - Tilemap opaque behaviour is incorrect
 
     Information extracted from below, and from Modeler:
@@ -289,6 +280,7 @@ void segas32_state::device_start()
 	save_item(NAME(m_v60_irq_control));
 	save_item(NAME(m_sound_irq_control));
 	save_item(NAME(m_sound_irq_input));
+	save_item(NAME(m_sound_irq_vector));
 	save_item(NAME(m_sound_dummy_value));
 	save_item(NAME(m_sound_bank));
 
@@ -1490,7 +1482,7 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 	int ypos           = util::sext(data[4], 12);
 	int xpos           = util::sext(data[5], 12);
 	uint32_t addr      = data[6] | ((data[2] & 0xf000) << 4);
-	const int color    = 0x8000 | (data[7] & (bpp8 ? 0x7f00 : 0x7ff0));
+	int color          = data[7] & (bpp8 ? 0x7f00 : 0x7ff0);
 	int hzoom, vzoom;
 	int xdelta = 1, ydelta = 1;
 	int xtarget, ytarget, yacc = 0, pix, transmask;
@@ -1501,6 +1493,12 @@ int segas32_state::draw_one_sprite(uint16_t const *data, int xoffs, int yoffs, c
 	/* if hidden, or top greater than/equal to bottom, or invalid bank, punt */
 	if (srcw == 0 || srch == 0 || dstw == 0 || dsth == 0)
 		goto bail;
+
+	// sprite group modes 0-3 take the top group bit from palette bit 15, the other modes use pixel bit 15 for shadows
+	if ((m_mixer_control[(m_is_multi32 && BIT(data[3], 11))][0x4c/2] & 0x0c) == 0)
+		color |= data[7] & 0x8000;
+	else
+		color |= 0x8000;
 
 	/* determine the transparency mask for pixels */
 	transmask = transparency_masks[m_sprite_control_latched[0x08/2] & 3][m_sprite_control_latched[0x0a/2] & 3];
@@ -1820,29 +1818,29 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
 	rgboffs[2][2] = 0;
 
 	/* determine the sprite grouping parameters first */
-	uint8_t sprgroup_shift, sprgroup_mask, sprgroup_or;
+	uint8_t sprgroup_shift, sprgroup_mask;
 	switch (m_mixer_control[which][0x4c/2] & 0x0f)
 	{
 		default:
-		case 0x0:   sprgroup_shift = 14;    sprgroup_mask = 0x00;   sprgroup_or = 0x01; break;
-		case 0x1:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   sprgroup_or = 0x02; break;
-		case 0x2:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   sprgroup_or = 0x04; break;
-		case 0x3:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   sprgroup_or = 0x08; break;
+		case 0x0:   sprgroup_shift = 15;    sprgroup_mask = 0x01;   break;
+		case 0x1:   sprgroup_shift = 14;    sprgroup_mask = 0x03;   break;
+		case 0x2:   sprgroup_shift = 13;    sprgroup_mask = 0x07;   break;
+		case 0x3:   sprgroup_shift = 12;    sprgroup_mask = 0x0f;   break;
 
-		case 0x4:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   sprgroup_or = 0x00; break;
-		case 0x5:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   sprgroup_or = 0x00; break;
-		case 0x6:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   sprgroup_or = 0x00; break;
-		case 0x7:   sprgroup_shift = 11;    sprgroup_mask = 0x0f;   sprgroup_or = 0x00; break;
+		case 0x4:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   break;
+		case 0x5:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   break;
+		case 0x6:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   break;
+		case 0x7:   sprgroup_shift = 11;    sprgroup_mask = 0x0f;   break;
 
-		case 0x8:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   sprgroup_or = 0x00; break;
-		case 0x9:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   sprgroup_or = 0x00; break;
-		case 0xa:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   sprgroup_or = 0x00; break;
-		case 0xb:   sprgroup_shift = 11;    sprgroup_mask = 0x0f;   sprgroup_or = 0x00; break;
+		case 0x8:   sprgroup_shift = 14;    sprgroup_mask = 0x01;   break;
+		case 0x9:   sprgroup_shift = 13;    sprgroup_mask = 0x03;   break;
+		case 0xa:   sprgroup_shift = 12;    sprgroup_mask = 0x07;   break;
+		case 0xb:   sprgroup_shift = 11;    sprgroup_mask = 0x0f;   break;
 
-		case 0xc:   sprgroup_shift = 13;    sprgroup_mask = 0x01;   sprgroup_or = 0x00; break;
-		case 0xd:   sprgroup_shift = 12;    sprgroup_mask = 0x03;   sprgroup_or = 0x00; break;
-		case 0xe:   sprgroup_shift = 11;    sprgroup_mask = 0x07;   sprgroup_or = 0x00; break;
-		case 0xf:   sprgroup_shift = 10;    sprgroup_mask = 0x0f;   sprgroup_or = 0x00; break;
+		case 0xc:   sprgroup_shift = 13;    sprgroup_mask = 0x01;   break;
+		case 0xd:   sprgroup_shift = 12;    sprgroup_mask = 0x03;   break;
+		case 0xe:   sprgroup_shift = 11;    sprgroup_mask = 0x07;   break;
+		case 0xf:   sprgroup_shift = 10;    sprgroup_mask = 0x0f;   break;
 	}
 	const int sprshadowmask = BIT(m_mixer_control[which][0x4c/2], 2) ? 0x8000 : 0x0000;
 	const int sprpixmask = ((1 << sprgroup_shift) - 1) & 0x3fff;
@@ -1889,8 +1887,7 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
 	/* for each possible sprite group, insert the sprites into the list at the appropriate point */
 	for (int groupnum = 0; groupnum <= sprgroup_mask; groupnum++)
 	{
-		const int effgroup = sprgroup_or | groupnum;
-		const int priority = m_mixer_control[which][0x00/2 + effgroup] & 0x0f;
+		const int priority = m_mixer_control[which][0x00/2 + groupnum] & 0x0f;
 		const int effpri = (priority << 3) | 7;
 		int sprindex = numlayers;
 		int dstnum = 0;
@@ -1907,10 +1904,10 @@ void segas32_state::mix_all_layers(int which, int xoffs, bitmap_rgb32 &bitmap, c
 		layerorder[groupnum][sprindex].index = MIXER_LAYER_SPRITES;
 		layerorder[groupnum][sprindex].effpri = effpri;
 		if ((m_mixer_control[which][0x4c/2] & 3) != 3)
-			layerorder[groupnum][sprindex].palbase = (m_mixer_control[which][0x00/2 + effgroup] & 0x00f0) << 6;
+			layerorder[groupnum][sprindex].palbase = (m_mixer_control[which][0x00/2 + groupnum] & 0x00f0) << 6;
 		else
 			layerorder[groupnum][sprindex].palbase = (m_mixer_control[which][0x4c/2] & 0x00f0) << 6;
-		layerorder[groupnum][sprindex].mixshift = (m_mixer_control[which][0x00/2 + effgroup] >> 8) & 3;
+		layerorder[groupnum][sprindex].mixshift = (m_mixer_control[which][0x00/2 + groupnum] >> 8) & 3;
 		layerorder[groupnum][sprindex].blendmask = 0;
 		layerorder[groupnum][sprindex].sprblendmask = 0;
 		layerorder[groupnum][sprindex].coloroffs = compute_color_offsets(which, BIT(m_mixer_control[which][0x3e/2], 6), BIT(m_mixer_control[which][0x4c/2], 15));
