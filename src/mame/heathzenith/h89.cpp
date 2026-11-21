@@ -99,9 +99,8 @@ protected:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_maincpu_region(*this, "maincpu")
-		, m_mem_view(*this, "rom_bank")
 		, m_ram(*this, RAM_TAG)
-		, m_floppy_ram(*this, "floppyram")
+		, m_floppy_ram(*this, "floppyram", 0x400, ENDIANNESS_LITTLE)
 		, m_tlbc(*this, "tlbc")
 		, m_intr_socket(*this, "intr_socket")
 		, m_h89bus(*this, "h89bus")
@@ -114,9 +113,8 @@ protected:
 
 	required_device<z80_device>                          m_maincpu;
 	required_memory_region                               m_maincpu_region;
-	memory_view                                          m_mem_view;
 	required_device<ram_device>                          m_ram;
-	required_shared_ptr<u8>                              m_floppy_ram;
+	memory_share_creator<u8>                             m_floppy_ram;
 	required_device<heath_tlb_connector>                 m_tlbc;
 	required_device<heath_intr_socket>                   m_intr_socket;
 	required_device<h89bus_device>                       m_h89bus;
@@ -124,10 +122,8 @@ protected:
 	required_ioport                                      m_sw501;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
-	bool m_rom_enabled;
 	bool m_timer_intr_enabled;
 	bool m_single_step_enabled;
-	bool m_floppy_ram_we;
 
 	// single step flags
 	bool m_555a_latch;
@@ -140,11 +136,8 @@ protected:
 	static constexpr XTAL H89_CLOCK                      = XTAL(12'288'000) / 6;
 	static constexpr XTAL INS8250_CLOCK                  = XTAL(1'843'200);
 
-	void update_mem_view();
-
 	void gpp_single_step_w(u8 data);
 	void gpp_timer_intr_w(u8 data);
-	void gpp_mem1_w(u8 data);
 	void port_f2_w(u8 data);
 	u8 read_sw();
 
@@ -159,8 +152,6 @@ protected:
 	void h89_base_io(address_map &map) ATTR_COLD;
 
 	void set_wait_state(int data);
-
-	void set_fmwe(int data);
 
 	u8 raise_NMI_r();
 	void raise_NMI_w(u8 data);
@@ -292,26 +283,13 @@ public:
   |    ROM    |        +------>  |    RAM    |
   -------------  0k              -------------  0k
 
+  The memory map is set by the primary (U517) and secondary (U516) memory
+  decoder PROMs, see h89bus_device::install_mem_map().
+
 */
 void h89_base_state::h89_mem(address_map &map)
 {
 	map.unmap_value_high();
-
-	map(0x0000, 0xffff).view(m_mem_view);
-
-	// View 0 - ROM / Floppy RAM R/O
-	// View 1 - ROM / Floppy RAM R/W
-	// monitor ROM
-	m_mem_view[0](0x0000, 0x0fff).rom().region(m_maincpu_region, 0).unmapw();
-	m_mem_view[1](0x0000, 0x0fff).rom().region(m_maincpu_region, 0).unmapw();
-
-	// Floppy RAM
-	m_mem_view[0](0x1400, 0x17ff).readonly().share(m_floppy_ram);
-	m_mem_view[1](0x1400, 0x17ff).ram().share(m_floppy_ram);
-
-	// Floppy ROM
-	m_mem_view[0](0x1800, 0x1fff).rom().region(m_maincpu_region, 0x1800).unmapw();
-	m_mem_view[1](0x1800, 0x1fff).rom().region(m_maincpu_region, 0x1800).unmapw();
 }
 
 void h89_base_state::map_fetch(address_map &map)
@@ -631,13 +609,9 @@ void h89_base_state::machine_start()
 		write8smo_delegate(*this, FUNC(h89_base_state::gpp_single_step_w)));
 	m_h89bus->add_gpp_handler(h89bus::GPP_TIMER_INTR,
 		write8smo_delegate(*this, FUNC(h89_base_state::gpp_timer_intr_w)));
-	m_h89bus->add_gpp_handler(h89bus::GPP_MEM1,
-		write8smo_delegate(*this, FUNC(h89_base_state::gpp_mem1_w)));
 
-	save_item(NAME(m_rom_enabled));
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_single_step_enabled));
-	save_item(NAME(m_floppy_ram_we));
 	save_item(NAME(m_555a_latch));
 	save_item(NAME(m_555b_latch));
 	save_item(NAME(m_556b_latch));
@@ -647,47 +621,7 @@ void h89_base_state::machine_start()
 
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
-	// update RAM mappings based on RAM size
-	u8 *ram_ptr  = m_ram->pointer();
-	u32 ram_size = m_ram->size();
-
-	if (ram_size == 0x10000)
-	{
-		// system has a full 64k
-		m_maincpu->space(AS_PROGRAM).install_ram(0x2000, 0xffff, ram_ptr);
-
-		// install shadow writing to RAM when in ROM mode and Floppy RAM is write-protected.
-		m_mem_view[0].install_writeonly(0x0000, 0x1fff, ram_ptr + 0xe000);
-		// when Floppy RAM is in write enable mode, must use write_tap so writes occur to both RAMs
-		// NOTE: the H89 had space reserved for additional RAM (without write protection) in the ROM space, but not aware
-		// it was ever used. If that was added to this emulation, m_mem_view[0] would also need to be a write_tap.
-		m_mem_view[1].install_write_tap(0x0000, 0x1fff, "shadow_w", [ram_ptr](offs_t offset, u8 &data, u8 mem_mask)
-		{
-			ram_ptr[0xe000 + offset] = data;
-		});
-
-		// The Org-0 (often used for CP/M) view has RAM at the lower 8k
-		m_mem_view[2].install_ram(0x0000, 0x1fff, ram_ptr + 0xe000);
-	}
-	else
-	{
-		// less than 64k
-
-		// for views with ROM visible, the top of memory is 8k higher than
-		// the memory size, since the base starts at 8k.
-		u32 ram_top = ram_size + 0x1fff;
-
-		m_mem_view[0].install_ram(0x2000, ram_top, ram_ptr);
-		m_mem_view[1].install_ram(0x2000, ram_top, ram_ptr);
-
-		// when ROM is not active, memory still starts at 8k, but is 8k smaller so the last 8k can be mapped to addr 0.
-		m_mem_view[2].install_ram(0x2000, ram_size - 1, ram_ptr);
-
-		// remap the top 8k down to addr 0
-		m_mem_view[2].install_ram(0x0000, 0x1fff, ram_ptr + ram_size - 0x2000);
-	}
-
-	m_floppy_ram_we       = false;
+	m_h89bus->install_mem_map(m_ram->pointer(), m_ram->size(), m_maincpu_region->base(), m_floppy_ram.target());
 }
 
 u8 h89_base_state::read_sw()
@@ -752,13 +686,6 @@ void h89_base_state::set_wait_state(int data)
 	}
 }
 
-void h89_base_state::set_fmwe(int data)
-{
-	m_floppy_ram_we = bool(data);
-
-	update_mem_view();
-}
-
 u8 h89_base_state::raise_NMI_r()
 {
 	m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::from_usec(2));
@@ -802,11 +729,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_base_state::h89_irq_timer)
 	}
 }
 
-void h89_base_state::update_mem_view()
-{
-	m_mem_view.select(m_rom_enabled ? (m_floppy_ram_we ? 1 : 0) : 2);
-}
-
 void h89_base_state::reset_single_step_state()
 {
 	LOGSS("reset_single_step_state\n");
@@ -832,13 +754,6 @@ void h89_base_state::gpp_single_step_w(u8 data)
 void h89_base_state::gpp_timer_intr_w(u8 data)
 {
 	m_timer_intr_enabled = bool(data & h89bus::GPP_TIMER_INTR);
-}
-
-void h89_base_state::gpp_mem1_w(u8 data)
-{
-	m_rom_enabled = !(data & h89bus::GPP_MEM1);
-
-	update_mem_view();
 }
 
 // General Purpose Port, latched by the bus
@@ -921,6 +836,18 @@ static void io_decoder_options(device_slot_interface &device)
 	device.option_add("cdr86",   H89BUS_IO_DECODER_CDR_86);
 }
 
+static void pri_mem_decoder_options(device_slot_interface &device)
+{
+	device.option_add("444_42",  H89BUS_MEM_DECODER_444_42);
+	device.option_add("444_66",  H89BUS_MEM_DECODER_444_66);
+}
+
+static void sec_mem_decoder_options(device_slot_interface &device)
+{
+	device.option_add("444_41",  H89BUS_MEM_DECODER_444_41);
+	device.option_add("444_83",  H89BUS_MEM_DECODER_444_83);
+}
+
 void h89_base_state::h89_base(machine_config &config)
 {
 	config.set_default_layout(layout_h89);
@@ -959,7 +886,11 @@ void h89_base_state::h89_base(machine_config &config)
 	m_h89bus->out_int4_callback().set(FUNC(h89_base_state::slot_irq<4>));
 	m_h89bus->out_int5_callback().set(FUNC(h89_base_state::slot_irq<5>));
 	m_h89bus->out_wait_callback().set(FUNC(h89_base_state::set_wait_state));
-	m_h89bus->out_fmwe_callback().set(FUNC(h89_base_state::set_fmwe));
+	// Heath recommended the 444-66 for all systems, it replaced the 444-42.
+	// The 444-83 is for 4K system ROMs, the 444-41 for 2K ROMs.
+	H89BUS_MEM_DECODER_SOCKET(config, "h89bus:pri_mem_decoder", pri_mem_decoder_options, "444_66");
+	H89BUS_MEM_DECODER_SOCKET(config, "h89bus:sec_mem_decoder", sec_mem_decoder_options, "444_83");
+
 	H89BUS_LEFT_SLOT(config, "p501", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
 	H89BUS_LEFT_SLOT(config, "p502", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
 	H89BUS_LEFT_SLOT(config, "p503", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
@@ -982,6 +913,9 @@ void h88_state::h88(machine_config &config)
 	m_intr_socket->set_fixed(true);
 
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "h_88_5");
+
+	// MTR-88 is a 2K ROM
+	H89BUS_MEM_DECODER_SOCKET(config.replace(), "h89bus:sec_mem_decoder", sec_mem_decoder_options, "444_41");
 
 	LOGSETUP("%s: about to call set_io_prom_tag\n", FUNCNAME);
 	H89BUS_IO_DECODER_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "444_43");

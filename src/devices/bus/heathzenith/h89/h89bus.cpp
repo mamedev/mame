@@ -40,6 +40,7 @@
 #include "h89bus.h"
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 
 #define LOG_SETUP (1U << 1)
@@ -414,6 +415,153 @@ heath_io_decoder_socket::heath_io_decoder_socket(const machine_config &mconfig, 
 void heath_io_decoder_socket::device_start()
 {
 	m_decoder = get_card_device();
+
+	if (!m_decoder)
+		osd_printf_warning("%s: no I/O decoder PROM installed, no I/O ports will be decoded\n", tag());
+}
+
+
+//**************************************************************************
+//  MEMORY DECODER PROMS
+//**************************************************************************
+
+/*
+  Primary Memory Decoder PROM (U517) - 256 x 8
+
+    Input                                 Output
+    -----------------------------------   -----------------------------------
+    A7 - MEM 1 H  ORG-0 (CP/M) map        D7 - WE L
+    A6 - JJ502    memory size jumpers     D6 - RD7 L
+    A5 - JJ501                            D5 - RD6 L     16K expansion memory
+    A4 - BRD L    board read              D4 - RAS2 L
+    A3 - BRFSH L  DRAM refresh            D3 - RAS1 L
+    A2 - A15                              D2 - RAS0 L
+    A1 - A14                              D1 - No Memory L
+    A0 - A13                              D0 - U516 L    secondary decoder
+
+  Secondary Memory Decoder PROM (U516) - 32 x 8
+
+    Input                                 Output
+    -----------------------------------   -----------------------------------
+    A4 - FMWE H   floppy memory write     D7 - WE L
+    A3 - WE L     from U517 D7            D4 - Floppy ROM L
+    A2 - A12                              D3 - Floppy RAM L
+    A1 - A11                              D2 - Option RAM L
+    A0 - A10                              D1 - Option ROM L
+                                          D0 - System ROM L
+*/
+
+device_heath_mem_decoder_interface::device_heath_mem_decoder_interface(const machine_config &mconfig, device_t &device) :
+	device_interface(device, "h89bus")
+{
+}
+
+namespace {
+
+ROM_START(mem_444_42)
+	ROM_REGION(0x100, "mem_decode", 0)
+	// original primary decoder, supports up to 48K, no ORG-0
+	ROM_LOAD("444-42.u517", 0x0000, 0x0100, CRC(65831fa4) SHA1(ed9865b4b11c292eef3bc7f415de836af8c6bcc7))
+ROM_END
+
+ROM_START(mem_444_66)
+	ROM_REGION(0x100, "mem_decode", 0)
+	// replacement primary decoder, adds 64K and ORG-0
+	ROM_LOAD("444-66.u517", 0x0000, 0x0100, CRC(ad94a5df) SHA1(33b478e2c19da1cfa301506866d6810e4171556d))
+ROM_END
+
+ROM_START(mem_444_41)
+	ROM_REGION(0x20, "mem_decode", 0)
+	// secondary decoder for 2K system ROMs (MTR-88, MTR-89), option ROM at 0x0800
+	ROM_LOAD("444-41.u516", 0x0000, 0x0020, CRC(1232f9f6) SHA1(44ee87741e25c51e0f6dc4d5f0408c5d9ec499a5))
+ROM_END
+
+ROM_START(mem_444_83)
+	ROM_REGION(0x20, "mem_decode", 0)
+	// secondary decoder for 4K system ROMs (MTR-90)
+	ROM_LOAD("444-83.u516", 0x0000, 0x0020, CRC(9160de2b) SHA1(50fb3f9358514f79c407585e3ccd3f3b0aef54df))
+ROM_END
+
+class heath_mem_decoder_prom_device : public device_t, public device_heath_mem_decoder_interface
+{
+public:
+	virtual u8 decode(offs_t inputs) const override { return m_prom[inputs & (m_prom.length() - 1)] ^ 0xff; }
+
+protected:
+	heath_mem_decoder_prom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const tiny_rom_entry *rom) :
+		device_t(mconfig, type, tag, owner, clock),
+		device_heath_mem_decoder_interface(mconfig, *this),
+		m_rom(rom),
+		m_prom(*this, "mem_decode")
+	{
+	}
+
+	virtual void device_start() override ATTR_COLD { }
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD { return m_rom; }
+
+private:
+	const tiny_rom_entry *const m_rom;
+	required_region_ptr<u8> m_prom;
+};
+
+class heath_mem_decoder_444_42 : public heath_mem_decoder_prom_device
+{
+public:
+	heath_mem_decoder_444_42(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) :
+		heath_mem_decoder_prom_device(mconfig, H89BUS_MEM_DECODER_444_42, tag, owner, clock, ROM_NAME(mem_444_42))
+	{
+	}
+};
+
+class heath_mem_decoder_444_66 : public heath_mem_decoder_prom_device
+{
+public:
+	heath_mem_decoder_444_66(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) :
+		heath_mem_decoder_prom_device(mconfig, H89BUS_MEM_DECODER_444_66, tag, owner, clock, ROM_NAME(mem_444_66))
+	{
+	}
+};
+
+class heath_mem_decoder_444_41 : public heath_mem_decoder_prom_device
+{
+public:
+	heath_mem_decoder_444_41(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) :
+		heath_mem_decoder_prom_device(mconfig, H89BUS_MEM_DECODER_444_41, tag, owner, clock, ROM_NAME(mem_444_41))
+	{
+	}
+};
+
+class heath_mem_decoder_444_83 : public heath_mem_decoder_prom_device
+{
+public:
+	heath_mem_decoder_444_83(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) :
+		heath_mem_decoder_prom_device(mconfig, H89BUS_MEM_DECODER_444_83, tag, owner, clock, ROM_NAME(mem_444_83))
+	{
+	}
+};
+
+} // anonymous namespace
+
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_42, device_heath_mem_decoder_interface, heath_mem_decoder_444_42, "h89bus_mem_decoder_444_42", "Heath H89 Primary Memory Decoder 444-42 PROM")
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_66, device_heath_mem_decoder_interface, heath_mem_decoder_444_66, "h89bus_mem_decoder_444_66", "Heath H89 Primary Memory Decoder 444-66 PROM")
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_41, device_heath_mem_decoder_interface, heath_mem_decoder_444_41, "h89bus_mem_decoder_444_41", "Heath H89 Secondary Memory Decoder 444-41 PROM")
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_83, device_heath_mem_decoder_interface, heath_mem_decoder_444_83, "h89bus_mem_decoder_444_83", "Heath H89 Secondary Memory Decoder 444-83 PROM")
+
+DEFINE_DEVICE_TYPE(H89BUS_MEM_DECODER_SOCKET, heath_mem_decoder_socket, "h89bus_mem_decoder_socket", "Heath H89 Memory Decoder Socket")
+
+heath_mem_decoder_socket::heath_mem_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, H89BUS_MEM_DECODER_SOCKET, tag, owner, clock),
+	device_single_card_slot_interface(mconfig, *this),
+	m_decoder(nullptr)
+{
+}
+
+void heath_mem_decoder_socket::device_start()
+{
+	m_decoder = get_card_device();
+
+	if (!m_decoder)
+		osd_printf_warning("%s: no memory decoder PROM installed, memory it selects will not be mapped\n", tag());
 }
 
 
@@ -435,11 +583,19 @@ h89bus_device::h89bus_device(const machine_config &mconfig, device_type type, co
 	m_program_space(*this, finder_base::DUMMY_TAG, -1),
 	m_io_space(*this, finder_base::DUMMY_TAG, -1),
 	m_io_decoder_socket(*this, "io_decoder"),
+	m_pri_mem_decoder(*this, "pri_mem_decoder"),
+	m_sec_mem_decoder(*this, "sec_mem_decoder"),
 	m_out_int3_cb(*this),
 	m_out_int4_cb(*this),
 	m_out_int5_cb(*this),
-	m_out_fmwe_cb(*this),
-	m_out_wait_cb(*this)
+	m_out_wait_cb(*this),
+	m_mem_view(*this, "mem_map"),
+	m_mem_installed(false),
+	m_fmwe(false),
+	m_ram(nullptr),
+	m_ram_size(0),
+	m_rom(nullptr),
+	m_floppy_ram(nullptr)
 {
 }
 
@@ -456,6 +612,7 @@ void h89bus_device::device_start()
 	m_gpp = 0;
 
 	save_item(NAME(m_gpp));
+	save_item(NAME(m_fmwe));
 }
 
 //-------------------------------------------------
@@ -470,6 +627,8 @@ void h89bus_device::device_reset()
 
 	for (auto &[mask, handler] : m_gpp_handlers)
 		handler(0);
+
+	update_mem_view();
 }
 
 //-------------------------------------------------
@@ -531,6 +690,211 @@ void h89bus_device::gpp_w(u8 data)
 		if (changed & mask)
 			handler(data);
 	}
+
+	if (changed & h89bus::GPP_MEM1)
+		update_mem_view();
+}
+
+//-------------------------------------------------
+//  install_mem_map - build the memory map from
+//  the memory decoder PROMs
+//
+//  The only PROM inputs that change while running
+//  are MEM 1 (ORG-0) and FMWE (floppy RAM write
+//  enable), so a view entry is built for each of
+//  their four combinations.
+//-------------------------------------------------
+
+void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *floppy_ram)
+{
+	m_ram = ram;
+	m_ram_size = ram_size;
+	m_rom = rom;
+	m_floppy_ram = floppy_ram;
+
+	m_program_space->install_view(0x0000, 0xffff, m_mem_view);
+
+	for (int org0 = 0; org0 < 2; org0++)
+	{
+		for (int fmwe = 0; fmwe < 2; fmwe++)
+		{
+			install_mem_view_entry(m_mem_view[(org0 << 1) | fmwe], org0, fmwe);
+		}
+	}
+
+	m_mem_installed = true;
+}
+
+// 16K RAM bank for a primary memory decoder select line, null if it is not installed
+u8 *h89bus_device::ram_bank(u8 select_line) const
+{
+	// the CPU board has three banks (RAS0 - RAS2), a 64K system also has the
+	// 16K expansion (RD6), and they are filled in that order
+	u32 bank;
+
+	switch (select_line)
+	{
+	case h89bus::MEM_PRI_RAS0: bank = 0; break;
+	case h89bus::MEM_PRI_RAS1: bank = 1; break;
+	case h89bus::MEM_PRI_RAS2: bank = 2; break;
+	case h89bus::MEM_PRI_RD6:  bank = 3; break;
+	default: return nullptr;
+	}
+
+	if (((bank + 1) * 0x4000) > m_ram_size)
+	{
+		return nullptr;
+	}
+
+	return m_ram + (bank * 0x4000);
+}
+
+void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry, bool org0, bool fmwe)
+{
+	// memory size jumpers JJ501/JJ502 match the installed RAM: 16K, 32K, 48K or 64K
+	u8 const jumpers = (m_ram_size / 0x4000) - 1;
+
+	// what each 1K page of the address space reads from and writes to
+	constexpr u32 PAGES = 0x10000 / 0x400;
+	std::array<u8 *, PAGES> read_src{};
+	std::array<std::vector<u8 *>, PAGES> write_dst;
+
+	for (int write = 0; write < 2; write++)
+	{
+		for (u32 block = 0; block < 8; block++)
+		{
+			// A3 is BRFSH L, which is never active here
+			u8 const pri = m_pri_mem_decoder->decode((org0 ? 0x80 : 0x00) | (jumpers << 5) | (write ? 0x10 : 0x00) | 0x08 | block);
+
+			if (pri & h89bus::MEM_PRI_NOMEM)
+			{
+				continue;
+			}
+
+			for (u32 sub = 0; sub < 8; sub++)
+			{
+				u32 const page = (block << 3) | sub;
+				offs_t const addr = page << 10;
+
+				auto const add = [this, &write_dst, &read_src, write, page, addr] (u8 *ptr)
+				{
+					if (!ptr)
+						return;
+
+					if (write)
+						write_dst[page].push_back(ptr);
+					else if (read_src[page])
+						logerror("memory decoder selects more than one device for reads at 0x%04x\n", addr);
+					else
+						read_src[page] = ptr;
+				};
+
+				// RAM banks are 16K, A13 selects the half
+				if (!write || (pri & h89bus::MEM_PRI_WE))
+				{
+					for (u8 line : { h89bus::MEM_PRI_RAS0, h89bus::MEM_PRI_RAS1, h89bus::MEM_PRI_RAS2, h89bus::MEM_PRI_RD6, h89bus::MEM_PRI_RD7 })
+					{
+						if (pri & line)
+						{
+							u8 *const bank = ram_bank(line);
+							add(bank ? bank + (addr & 0x3fff) : nullptr);
+						}
+					}
+				}
+
+				if (pri & h89bus::MEM_PRI_U516)
+				{
+					// the WE L input is the WE L output of the primary decoder
+					u8 const sec = m_sec_mem_decoder->decode((fmwe ? 0x10 : 0x00) | ((pri & h89bus::MEM_PRI_WE) ? 0x00 : 0x08) | sub);
+
+					if (write)
+					{
+						if ((sec & h89bus::MEM_SEC_FPY_RAM) && (sec & h89bus::MEM_SEC_WE))
+							add(m_floppy_ram + (addr & 0x3ff));
+					}
+					else
+					{
+						// the option ROM and option RAM sockets are not populated
+						if (sec & (h89bus::MEM_SEC_SYS_ROM | h89bus::MEM_SEC_FPY_ROM))
+							add(m_rom + (addr & 0x1fff));
+						if (sec & h89bus::MEM_SEC_FPY_RAM)
+							add(m_floppy_ram + (addr & 0x3ff));
+					}
+				}
+			}
+		}
+	}
+
+	// install runs of pages that are contiguous in the same device
+	auto const install_runs = [] (auto const &target, auto const &install)
+	{
+		for (u32 page = 0; page < PAGES; )
+		{
+			u8 *const base = target(page);
+			u32 end = page + 1;
+
+			if (base)
+			{
+				while ((end < PAGES) && (target(end) == (base + ((end - page) << 10))))
+					end++;
+
+				install(page << 10, (end << 10) - 1, base);
+			}
+
+			page = end;
+		}
+	};
+
+	install_runs(
+			[&read_src] (u32 page) { return read_src[page]; },
+			[&entry] (offs_t start, offs_t end, u8 *base) { entry.install_rom(start, end, base); });
+
+	install_runs(
+			[&write_dst] (u32 page) { return (write_dst[page].size() == 1) ? write_dst[page][0] : nullptr; },
+			[&entry] (offs_t start, offs_t end, u8 *base) { entry.install_writeonly(start, end, base); });
+
+	// a write can go to more than one device, such as the floppy RAM and the
+	// RAM that shadows the lower 8K in a 64K system; these pages get a handler
+	// that writes to all of them (not a write tap, as a view in the bus is
+	// destroyed after the CPU's address space that a tap is registered with)
+	for (u32 page = 0; page < PAGES; )
+	{
+		std::vector<u8 *> const &targets = write_dst[page];
+		u32 end = page + 1;
+
+		if (targets.size() > 1)
+		{
+			auto const contiguous = [&write_dst, &targets, page] (u32 next)
+			{
+				std::vector<u8 *> const &next_targets = write_dst[next];
+
+				if (next_targets.size() != targets.size())
+					return false;
+
+				for (size_t i = 0; i < targets.size(); i++)
+				{
+					if (next_targets[i] != (targets[i] + ((next - page) << 10)))
+						return false;
+				}
+
+				return true;
+			};
+
+			while ((end < PAGES) && contiguous(end))
+				end++;
+
+			entry.install_write_handler(page << 10, (end << 10) - 1,
+					write8sm_delegate(*this, NAME([targets] (offs_t offset, u8 data) { for (u8 *const target : targets) target[offset] = data; })));
+		}
+
+		page = end;
+	}
+}
+
+void h89bus_device::update_mem_view()
+{
+	if (m_mem_installed)
+		m_mem_view.select(((m_gpp & h89bus::GPP_MEM1) ? 2 : 0) | (m_fmwe ? 1 : 0));
 }
 
 void h89bus_device::set_int3_line(int state)
@@ -550,7 +914,9 @@ void h89bus_device::set_int5_line(int state)
 
 void h89bus_device::set_fmwe_line(int state)
 {
-	m_out_fmwe_cb(state);
+	m_fmwe = bool(state);
+
+	update_mem_view();
 }
 
 void h89bus_device::set_wait_line(int state)

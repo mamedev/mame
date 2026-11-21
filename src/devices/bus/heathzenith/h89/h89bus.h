@@ -126,6 +126,43 @@ namespace h89bus
 		MEM_RD7 = 0x04,
 	};
 
+	// outputs of the primary memory decoder PROM (U517), as returned by
+	// heath_mem_decoder_socket::decode() (a selected line reads as 1)
+	enum mem_pri_lines : u8
+	{
+		// select the secondary decoder (U516) for the devices in the lower 8K
+		MEM_PRI_U516  = 0x01,
+		// no memory at this address
+		MEM_PRI_NOMEM = 0x02,
+		// 16K RAM banks on the CPU board
+		MEM_PRI_RAS0  = 0x04,
+		MEM_PRI_RAS1  = 0x08,
+		MEM_PRI_RAS2  = 0x10,
+		// select lines on the left slots, RD6 is the 16K expansion memory
+		MEM_PRI_RD6   = 0x20,
+		MEM_PRI_RD7   = 0x40,
+		// write enable
+		MEM_PRI_WE    = 0x80,
+	};
+
+	// outputs of the secondary memory decoder PROM (U516), as returned by
+	// heath_mem_decoder_socket::decode() (a selected line reads as 1)
+	enum mem_sec_lines : u8
+	{
+		// system ROM socket (U518)
+		MEM_SEC_SYS_ROM = 0x01,
+		// option ROM socket (U519)
+		MEM_SEC_OPT_ROM = 0x02,
+		// option RAM sockets
+		MEM_SEC_OPT_RAM = 0x04,
+		// 1K floppy RAM
+		MEM_SEC_FPY_RAM = 0x08,
+		// floppy ROM socket (U520)
+		MEM_SEC_FPY_ROM = 0x10,
+		// write enable for the floppy RAM
+		MEM_SEC_WE      = 0x80,
+	};
+
 	// lines latched by the general purpose port (port 0xf2), as bit masks
 	enum gpp_lines : u8
 	{
@@ -472,6 +509,55 @@ protected:
 DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_SOCKET,  heath_io_decoder_socket)
 
 
+// ======================> memory decoder PROMs on the CPU board
+
+// primary (U517) or secondary (U516) memory decoder PROM
+class device_heath_mem_decoder_interface : public device_interface
+{
+public:
+	// PROM output for the given inputs, inverted so a selected line reads as 1
+	virtual u8 decode(offs_t inputs) const = 0;
+
+protected:
+	device_heath_mem_decoder_interface(const machine_config &mconfig, device_t &device);
+};
+
+// primary decoders (U517)
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_444_42, device_heath_mem_decoder_interface)
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_444_66, device_heath_mem_decoder_interface)
+
+// secondary decoders (U516)
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_444_41, device_heath_mem_decoder_interface)
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_444_83, device_heath_mem_decoder_interface)
+
+
+class heath_mem_decoder_socket : public device_t,
+								public device_single_card_slot_interface<device_heath_mem_decoder_interface>
+{
+public:
+	template <typename T>
+	heath_mem_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false) :
+		heath_mem_decoder_socket(mconfig, tag, owner, 0)
+	{
+		set_options(std::forward<T>(opts), dflt, fixed);
+	}
+
+	heath_mem_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// PROM output for the given inputs, nothing is selected with an empty socket
+	u8 decode(offs_t inputs) const { return m_decoder ? m_decoder->decode(inputs) : 0; }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	device_heath_mem_decoder_interface *m_decoder;
+};
+
+// device type declaration
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_SOCKET, heath_mem_decoder_socket)
+
+
 // ======================> h89bus_device
 class h89bus_device : public device_t
 {
@@ -500,13 +586,19 @@ public:
 	void gpp_w(u8 data);
 	void add_gpp_handler(u8 mask, write8smo_delegate handler) ATTR_COLD { m_gpp_handlers.emplace_back(mask, std::move(handler)); }
 
+	// map the CPU board memory into the program space, as selected by the
+	// memory decoder PROMs; call from machine_start
+	// - ram: RAM banks in 16K steps (RAS0 - RAS2, then the 16K expansion on RD6)
+	// - rom: the lower 8K, with the system ROM at 0x0000 and the floppy ROM at 0x1800
+	// - floppy_ram: the 1K floppy RAM
+	void install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *floppy_ram) ATTR_COLD;
+
 	// inline configuration
 	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program_space.set_tag(std::forward<T>(tag), spacenum); }
 	template <typename T> void set_io_space(T &&tag, int spacenum) { m_io_space.set_tag(std::forward<T>(tag), spacenum); }
 	auto out_int3_callback() { return m_out_int3_cb.bind(); }
 	auto out_int4_callback() { return m_out_int4_cb.bind(); }
 	auto out_int5_callback() { return m_out_int5_cb.bind(); }
-	auto out_fmwe_callback() { return m_out_fmwe_cb.bind(); }
 	auto out_wait_callback() { return m_out_wait_cb.bind(); }
 
 protected:
@@ -529,10 +621,25 @@ protected:
 	// internal state
 	required_address_space m_program_space, m_io_space;
 	required_device<heath_io_decoder_socket> m_io_decoder_socket;
+	required_device<heath_mem_decoder_socket> m_pri_mem_decoder;
+	required_device<heath_mem_decoder_socket> m_sec_mem_decoder;
 
 private:
+	u8 *ram_bank(u8 select_line) const ATTR_COLD;
+	void install_mem_view_entry(memory_view::memory_view_entry &entry, bool org0, bool fmwe) ATTR_COLD;
+	void update_mem_view();
+
 	devcb_write_line m_out_int3_cb, m_out_int4_cb, m_out_int5_cb;
-	devcb_write_line m_out_fmwe_cb, m_out_wait_cb;
+	devcb_write_line m_out_wait_cb;
+
+	// memory map, one view entry for each combination of ORG-0 (MEM 1) and FMWE
+	memory_view m_mem_view;
+	bool m_mem_installed;
+	bool m_fmwe;
+	u8 *m_ram;
+	offs_t m_ram_size;
+	u8 *m_rom;
+	u8 *m_floppy_ram;
 
 	u8 m_gpp;
 	std::vector<std::pair<u8, write8smo_delegate>> m_gpp_handlers;
