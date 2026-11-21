@@ -2692,10 +2692,6 @@ void namcos22s_state::init_tables()
 
 	save_item(NAME(m_czattr));
 	save_item(NAME(m_cz_was_written));
-
-	memset(m_vics_data, 0, m_vics_data.bytes());
-	memset(m_spriteram, 0, m_spriteram.bytes());
-	memset(m_attributeram, 0, m_attributeram.bytes());
 }
 
 void namcos22_state::video_start()
