@@ -1,8 +1,8 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MagikalUnicorn
 /***************************************************************************
 
-    xavix2000.h (Super XaviX)
+    XaviX2000 CPU
 
 ***************************************************************************/
 #ifndef MAME_CPU_M6502_XAVIX2000_H
@@ -24,12 +24,13 @@ protected:
 	virtual void do_exec_partial() override;
 
 	virtual void device_start() override ATTR_COLD;
-	virtual void state_import(const device_state_entry &entry) override;
+	virtual void device_reset() override ATTR_COLD;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+	virtual void state_import(const device_state_entry &entry) override;
 
 #define O(o) void o ## _full(); void o ## _partial()
 
-	// Super XaviX opcodes
+	// Extended opcodes shared by XaviX2000 and Super XaviX
 
 	O(phx_imp); // 12
 	O(phy_imp); // 52
@@ -82,15 +83,15 @@ protected:
 	O(sbcl_imp);
 	O(sbcm_imp);
 
-	O(spa2_imp); // Store accumulator in 24-bit address register PA MSB (Bank bit)
-	O(lpa2_imp); // Load accumulator from 24-bit address register PA MSB (Bank bit)
+	O(spa2_imp); // Store accumulator in 24-bit address register PA MSB (Bank byte)
+	O(lpa2_imp); // Load accumulator from 24-bit address register PA MSB (Bank byte)
 	O(spa0_imp); // Store accumulator in 24-bit address register PA LSB (Low 8 bits of address)
 	O(lpa0_imp); // Load accumulator from 24-bit address register PA LSB (Low 8 bits of address)
 	O(spa1_imp); // Store accumulator in 24-bit address register PA MID (High 8 bits of address)
 	O(lpa1_imp); // Load accumulator from 24-bit address register PA MID (High 8 bits of address)
 
-	O(spb2_imp); // Store accumulator in 24-bit address register PB MSB (Bank bit)
-	O(lpb2_imp); // Load accumulator from 24-bit address register PB MSB (Bank bit)
+	O(spb2_imp); // Store accumulator in 24-bit address register PB MSB (Bank byte)
+	O(lpb2_imp); // Load accumulator from 24-bit address register PB MSB (Bank byte)
 	O(spb0_imp); // Store accumulator in 24-bit address register PB LSB (Low 8 bits of address)
 	O(lpb0_imp); // Load accumulator from 24-bit address register PB LSB (Low 8 bits of address)
 	O(spb1_imp); // Store accumulator in 24-bit address register PB MID (High 8 bits of address)
@@ -102,23 +103,24 @@ protected:
 	O(incpb_imp);
 	O(decpb_imp);
 
-	O(orapa_imp); // (ora ($PA), y) ?
-	O(andpa_imp); // (and ($PA), y) ?
-	O(eorpa_imp); // (eor ($PA), y) ?
-	O(adcpa_imp); // (adc ($PA), y) ?
-	O(stapa_imp); // (sta ($PA), y) ?
-	O(ldapa_imp); // (lda ($PA), y) ?
-	O(cmppa_imp); // (cmp ($PA), y) ?
-	O(sbcpa_imp); // (sbc ($PA), y) ?
+	// Accumulator operations use the banked address in PA/PB directly, without Y indexing.
+	O(orapa_imp);
+	O(andpa_imp);
+	O(eorpa_imp);
+	O(adcpa_imp);
+	O(stapa_imp);
+	O(ldapa_imp);
+	O(cmppa_imp);
+	O(sbcpa_imp);
 
-	O(orapb_imp); // (ora ($PB), y) ?
-	O(andpb_imp); // (and ($PB), y) ?
-	O(eorpb_imp); // (eor ($PB), y) ?
-	O(adcpb_imp); // (adc ($PB), y) ?
-	O(stapb_imp); // (sta ($PB), y) ?
-	O(ldapb_imp); // (lda ($PB), y) ?
-	O(cmppb_imp); // (cmp ($PB), y) ?
-	O(sbcpb_imp); // (sbc ($PB), y) ?
+	O(orapb_imp);
+	O(andpb_imp);
+	O(eorpb_imp);
+	O(adcpb_imp);
+	O(stapb_imp);
+	O(ldapb_imp);
+	O(cmppb_imp);
+	O(sbcpb_imp);
 
 	O(stx_aby);
 	O(sty_abx);
@@ -139,36 +141,46 @@ protected:
 	O(cmc_imp);
 	O(sev_imp);
 
+	O(jmp_ind);
 	O(jmpf_ind);
+	O(brk_xav_imp);
+	O(rti_xav_imp);
+	O(plp_xav_imp);
+
+	// Memory operations write only the modified value.
+	O(asl_xav_zpg); O(asl_xav_zpx); O(asl_aba); O(asl_abx);
+	O(lsr_xav_zpg); O(lsr_xav_zpx); O(lsr_aba); O(lsr_abx);
+	O(rol_xav_zpg); O(rol_xav_zpx); O(rol_aba); O(rol_abx);
+	O(ror_xav_zpg); O(ror_xav_zpx); O(ror_aba); O(ror_abx);
+	O(inc_xav_zpg); O(inc_xav_zpx); O(inc_aba); O(inc_abx);
+	O(dec_xav_zpg); O(dec_xav_zpx); O(dec_aba); O(dec_abx);
 
 #undef O
+
+	// The opcode generator charges one internal cycle without a bus access.
+	void read_idle() { }
 
 	uint8_t m_j;
 	uint8_t m_k;
 	uint8_t m_l;
 	uint8_t m_m;
 
-	uint32_t m_pa; // 24-bit address register?
-	uint32_t m_pb; // ^
+	// 24-bit banked address registers: bank in bits 23-16, address in bits 15-0.
+	uint32_t m_pa;
+	uint32_t m_pb;
+	bool m_interrupt_is_nmi;
 
+private:
+	enum {
+		XAVIX2000_J = XAVIX_CODEBANK + 1,
+		XAVIX2000_K,
+		XAVIX2000_L,
+		XAVIX2000_M,
+		XAVIX2000_PA,
+		XAVIX2000_PB
+	};
 };
-
-enum {
-	SXAVIX_J = XAVIX_CODEBANK+1,
-	SXAVIX_K,
-	SXAVIX_L,
-	SXAVIX_M,
-	SXAVIX_PA,
-	SXAVIX_PB
-};
-
-class xavix2002_device : public xavix2000_device {
-public:
-	xavix2002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-};
-
 
 DECLARE_DEVICE_TYPE(XAVIX2000, xavix2000_device)
-DECLARE_DEVICE_TYPE(XAVIX2002, xavix2002_device)
 
 #endif // MAME_CPU_M6502_XAVIX2000_H

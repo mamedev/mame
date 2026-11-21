@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:MagikalUnicorn
+-->
+<mamelayout version="2">
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="0.85" green="0.08" blue="0.06" /></led7seg>
+	</element>
+
+	<element name="display_bezel">
+		<rect><color red="0.12" green="0.12" blue="0.13" /></rect>
+	</element>
+
+	<element name="display_window">
+		<rect><color red="0.015" green="0.01" blue="0.01" /></rect>
+	</element>
+
+	<view name="Segment Display Overlay">
+		<bounds x="0" y="0" width="320" height="240" />
+		<screen index="0"><bounds x="0" y="0" width="320" height="240" /></screen>
+		<element ref="display_bezel"><bounds x="294" y="212" width="16" height="18" /></element>
+		<element ref="display_window"><bounds x="295" y="213" width="14" height="16" /></element>
+		<element name="digit" ref="digit"><bounds x="296" y="214" width="12" height="14" /></element>
+	</view>
+
+	<view name="Panel Display">
+		<bounds x="0" y="0" width="18" height="22" />
+		<element ref="display_bezel"><bounds x="0" y="0" width="18" height="22" /></element>
+		<element ref="display_window"><bounds x="1" y="1" width="16" height="20" /></element>
+		<element name="digit" ref="digit"><bounds x="3" y="3" width="12" height="16" /></element>
+	</view>
+
+</mamelayout>
