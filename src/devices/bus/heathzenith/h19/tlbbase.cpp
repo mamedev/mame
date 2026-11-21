@@ -66,7 +66,7 @@ static constexpr XTAL H19_BEEP_FRQ   = (H19_CLOCK / 2048);
 
 // Capacitor value in pF
 static constexpr u32 H19_KEY_DEBOUNCE_CAPACITOR = 5000;
-static const     u32 MM5740_CLOCK               = mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR);
+static constexpr u32 MM5740_CLOCK               = mm5740_device::calc_effective_clock_key_debounce(H19_KEY_DEBOUNCE_CAPACITOR);
 
 // Keyboard flag masks
 static constexpr u8 KB_STATUS_SHIFT_KEYS_MASK      = 0x01;
@@ -743,7 +743,7 @@ void heath_tlb_device::device_add_mconfig(machine_config &config)
 	m_ace->out_rts_callback().set(FUNC(heath_tlb_device::rts_out));
 
 	// keyboard
-	MM5740(config, m_mm5740, MM5740_CLOCK);
+	MM5740AAC(config, m_mm5740, MM5740_CLOCK);
 	m_mm5740->x_cb<1>().set_ioport("X1");
 	m_mm5740->x_cb<2>().set_ioport("X2");
 	m_mm5740->x_cb<3>().set_ioport("X3");
