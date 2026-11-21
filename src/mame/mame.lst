@@ -36775,9 +36775,7 @@ sbasssta
 drumsta
 
 @source:nsm/dataprint.cpp
-dp3_407
-dp3_411
-dp3_412
+dp3000
 
 @source:oberheim/dmx.cpp
 obdmx
