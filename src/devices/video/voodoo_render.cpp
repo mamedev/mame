@@ -1529,7 +1529,7 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::combine_color(rgbaint_t &color, t
 
 	// handle chroma key
 	if (fbzmode.enable_chromakey())
-		if (!chroma_key_test(threadstats, c_other, chromakey))
+		if (!chroma_key_test(threadstats, c_other, chromakey, poly.chromarange))
 			return false;
 
 	// compute a_other
@@ -1817,12 +1817,11 @@ inline bool ATTR_FORCE_INLINE voodoo_renderer::alpha_test(thread_stats_block &th
 //  be checked by the caller
 //-------------------------------------------------
 
-inline bool ATTR_FORCE_INLINE voodoo_renderer::chroma_key_test(thread_stats_block &threadstats, rgbaint_t const &colorin, rgb_t chromakey)
+inline bool ATTR_FORCE_INLINE voodoo_renderer::chroma_key_test(thread_stats_block &threadstats, rgbaint_t const &colorin, rgb_t chromakey, reg_chroma_range const chromarange)
 {
 	rgb_t color = colorin.to_rgba();
 
 	// non-range version
-	auto const chromarange = m_fbi_reg.chroma_range();
 	if (!chromarange.enable())
 	{
 		if (((color ^ chromakey) & 0xffffff) == 0)
@@ -2179,7 +2178,7 @@ void voodoo_renderer::pixel_pipeline(thread_stats_block &threadstats, u16 *dest,
 	rgbaint_t color(src_color);
 
 	// handle chroma key
-	if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color, m_fbi_reg.chroma_key().argb()))
+	if (fbzmode.enable_chromakey() && !chroma_key_test(threadstats, color, m_fbi_reg.chroma_key().argb(), m_fbi_reg.chroma_range()))
 		return;
 
 	// handle alpha mask
