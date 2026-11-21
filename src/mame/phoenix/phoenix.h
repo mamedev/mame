@@ -28,6 +28,7 @@ public:
 
 	void condor(machine_config &config);
 	void phoenix(machine_config &config);
+	void phoenix_mn6221ab(machine_config &config) ATTR_COLD;
 	void survival(machine_config &config);
 	void pleiads(machine_config &config);
 

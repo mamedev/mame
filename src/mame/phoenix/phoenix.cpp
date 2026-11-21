@@ -481,6 +481,21 @@ void phoenix_state::phoenix(machine_config &config)
 	DISCRETE(config, "discrete", 120000, phoenix_discrete).add_route(ALL_OUTPUTS, "mono", 0.6);
 }
 
+// Preliminary MN6221AB parameters fitted to the Eleken bench recording,
+// not measured on an Assa PCB. The model clock is not the physical oscillator.
+// Sound B bits 7:6 select 3 at game start and 2 after the mothership score;
+// their correspondence to the physical MI/ALON pins is not verified.
+void phoenix_state::phoenix_mn6221ab(machine_config &config)
+{
+	phoenix(config);
+
+	tms36xx_device &tms(*subdevice<tms36xx_device>("tms"));
+	tms.set_subtype(tms36xx_device::subtype::MN6221AB);
+	tms.set_clock(333);
+	tms.set_tune_speed(0.2985355);
+	tms.set_decays(0.705, 0, 0, 0.711, 0, 0);
+}
+
 void phoenix_state::pleiads(machine_config &config)
 {
 	phoenix(config);
@@ -1883,7 +1898,7 @@ GAME( 1981, nextfase,   phoenix, phoenix,  nextfase, phoenix_state, empty_init, 
 // as is this
 GAME( 1981, phoenixs,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Sonic)",                        "Phoenix (Sonic, Spanish bootleg)",                           MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixbl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg",                                "Phoenix (bootleg)",                                          MACHINE_SUPPORTS_SAVE )
-GAME( 1981, phoenixass, phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Assa)",                         "Phoenix (Assa, Spanish bootleg)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1981, phoenixass, phoenix, phoenix_mn6221ab, phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Assa)",                         "Phoenix (Assa, Spanish bootleg)",                            MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, avefenix,   phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Video Game)",                   "Ave Fenix (Electrogame, Spanish bootleg of Phoenix)",        MACHINE_SUPPORTS_SAVE ) // Electrogame (Barcelona) made the dedicated cabinet. Ingame shows 'Video Game', as Electrogame changed its name to Video Game S.A.
 GAME( 1980, avefenixrf, phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Recreativos Franco S.A.)",      "Ave Fenix (Recreativos Franco, Spanish bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, avefenixl,  phoenix, phoenix,  phoenix,  phoenix_state, empty_init,           ROT90, "bootleg (Laguna)",                       "Ave Fenix (Laguna, Spanish bootleg of Phoenix)",             MACHINE_SUPPORTS_SAVE )
