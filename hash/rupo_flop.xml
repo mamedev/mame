@@ -74,12 +74,13 @@ Dumped from non-original media.
 	<software name="mahgokuu" supported="no">
 		<description>Mahjong Gokuu</description>
 		<year>1990</year>
-		<publisher>Chatnoir</publisher>
+		<publisher>ASCII Corporation</publisher>
 		<notes><![CDATA[
 256 bytes/sector, 16 sectors/track, 80 tracks/side.
 Dumped from non-original media.
 ]]></notes>
 		<info name="alt_title" value="麻雀悟空"/>
+		<info name="developer" value="Chatnoir"/>
 		<info name="serial" value="JW-S020"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
@@ -91,12 +92,13 @@ Dumped from non-original media.
 	<software name="mahgoten" supported="no">
 		<description>Mahjong Gokuu Tenjiku</description>
 		<year>1995</year>
-		<publisher>Chatnoir</publisher>
+		<publisher>ASCII Corporation</publisher>
 		<notes><![CDATA[
 Monochrome Version: 256 bytes/sector, 16 sectors/track, 80 tracks/side.
 Color Version: 512 bytes/sector, 18 sectors/track, 80 tracks/side.
 ]]></notes>
 		<info name="alt_title" value="麻雀悟空天竺"/>
+		<info name="developer" value="Chatnoir"/>
 		<info name="serial" value="PN-S306"/>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Monochrome Version (モノクロ液晶対応版)"/>
@@ -132,7 +134,7 @@ Dumped from non-original media.
 	<software name="shanghai" supported="no">
 		<description>Shanghai</description>
 		<year>1990</year>
-		<publisher>ASCII Corporation / Activision</publisher>
+		<publisher>ASCII Corporation</publisher>
 		<notes><![CDATA[
 256 bytes/sector, 16 sectors/track, 80 tracks/side.
 Track 78 null-filled: no flux in MFM pulse intervals.
@@ -149,7 +151,7 @@ Track 78 null-filled: no flux in MFM pulse intervals.
 	<software name="shang2" supported="no">
 		<description>Shanghai II</description>
 		<year>1991</year>
-		<publisher>ASCII Corporation / Activision</publisher>
+		<publisher>ASCII Corporation</publisher>
 		<notes><![CDATA[
 256 bytes/sector, 16 sectors/track, 80 tracks/side.
 Dumped from non-original media.
@@ -166,7 +168,7 @@ Tracks 47,48 Side 1 Sector 15 have invalid header CRCs.
 	<software name="sokoban" supported="no">
 		<description>Sokoban</description>
 		<year>1990</year>
-		<publisher>ASCII Corporation / Thinking Rabbit</publisher>
+		<publisher>Thinking Rabbit</publisher>
 		<notes><![CDATA[
 256 bytes/sector, 16 sectors/track, 80 tracks/side.
 Dumped from non-original media.
@@ -200,12 +202,13 @@ Dumped from non-original media.
 	<software name="tetris" supported="no">
 		<description>Tetris</description>
 		<year>1990</year>
-		<publisher>ASCII Corporation / Bullet-Proof Software Inc.</publisher>
+		<publisher>ASCII Corporation</publisher>
 		<notes><![CDATA[
 256 bytes/sector, 16 sectors/track, 80 tracks/side.
 Track 78 null-filled: no flux in MFM pulse intervals.
 ]]></notes>
 		<info name="alt_title" value="テトリス"/>
+		<info name="developer" value="Bullet-Proof Software"/>
 		<info name="serial" value="JW-S023"/>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="655360">
