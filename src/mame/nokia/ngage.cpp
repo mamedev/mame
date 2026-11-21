@@ -14,14 +14,17 @@
     models. The UPP DSP provides MDI version replies and signed mono PCM. D550 models
     audio DSP startup and diagnostics over EUART1. The UPP LCD DMA path
     supports packed writes to the panel. SIMIF can use a synthetic GSM test
-    card. MMC remains TODO.
+    card. The native MMC path models the host and card at transaction level.
 
 ***************************************************************************/
 
 #include "emu.h"
 
 #include "ngage_adsp.h"
+#include "ngage_bt.h"
+#include "ngage_mmc.h"
 #include "ngage_pcm.h"
+#include "ngage_rtc.h"
 #include "ngage_sim.h"
 
 #include "cpu/arm7/arm7.h"
@@ -30,6 +33,8 @@
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "multibyte.h"
 
 #include <algorithm>
 #include <bit>
@@ -43,12 +48,20 @@ constexpr u32 PMM_SIZE = 0x10000;
 constexpr u32 CDRIVE_SIZE = 0x400000;
 constexpr u32 UPP_BASE = 0x0c100000;
 constexpr u32 UPP_WORDS = 0x100000 / 4;
+constexpr u32 ARM_SDRAM_CLOCK = 104'000'000;
 constexpr u32 GENERAL_TIMER_CLOCK = 26'000'000;
 constexpr u32 CTSI_FAST_CLOCK = 32'768;
 constexpr u32 CTSI_NOS_CLOCK = 64;
 constexpr u32 CTSI_EVENT_MASK = 0x3680;
 constexpr u32 CTSI_SOFTWARE_EVENTS = 0x3000;
 constexpr u32 KEYPAD_EVENTS = 0x00ee0004;
+constexpr u32 BLUETOOTH_EVENT = 0x00100000;
+constexpr u32 GENIO_ENABLE_MASK = ((KEYPAD_EVENTS | BLUETOOTH_EVENT) >> 16) * 0x10001U;
+constexpr u8 BLUETOOTH_CBUS_DEVICE = 5;
+constexpr u16 UEM_ADC_DEFAULT = 512;
+constexpr ioport_value BATTERY_LEVEL_MASK = 0x70;
+// UEM channel 12 samples that produce seven through one bars in NEM-4 4.03.
+constexpr u16 BATTERY_VOLTAGE_ADC[] = { UEM_ADC_DEFAULT, 470, 465, 460, 450, 440, 430 };
 constexpr unsigned MDI_RING_WORDS = 250;
 constexpr u32 MDI_TX_POINTERS = 0x3e8 / 4;
 constexpr u32 MDI_RX_POINTERS = 0x3ec / 4;
@@ -111,6 +124,9 @@ public:
 		, m_pmm_nvram(*this, "pmm")
 		, m_cdrive_nvram(*this, "cdrive")
 		, m_adsp(*this, "adsp")
+		, m_bt(*this, "bluetooth")
+		, m_mmc(*this, "mmc")
+		, m_rtc(*this, "rtc")
 		, m_pcm(*this, "pcm")
 		, m_sim(*this, "sim")
 		, m_config(*this, "CONFIG")
@@ -129,18 +145,26 @@ private:
 	template <unsigned Chip> u16 flash_r(offs_t offset);
 	template <unsigned Chip> void flash_w(offs_t offset, u16 data, u16 mem_mask);
 	template <unsigned Chip> u8 *flash_storage(u32 addr);
+	u32 cdrive_r(offs_t offset, u32 mem_mask);
+	void finish_cdrive_erase();
 	u32 upp_r(offs_t offset, u32 mem_mask);
 	void upp_w(offs_t offset, u32 data, u32 mem_mask);
 	u16 uem_r(u8 reg) const;
 	void uem_w(u8 reg, u16 data);
-	u64 uem_rtc_seconds() const;
+	void bt_event(int state);
+	bool bt_irq_active() const;
+	void recover_calendar_mirror();
 	void mdi_update();
 	void pcm_reply_ready(int state);
 	u16 mdi_word(unsigned index) const;
 	void mdi_publish(std::span<u16 const> words);
 	u16 euart_status() const;
 	void euart_update();
+	void dma_start(unsigned channel);
 	void lcd_dma_start(unsigned channel);
+	void mmc_dma_start(unsigned channel);
+	void mmc_event(int state);
+	TIMER_CALLBACK_MEMBER(lcd_dma_complete);
 	struct keypad_levels { u8 rows, columns; u16 genio; };
 	keypad_levels keypad_read() const;
 	void keypad_update();
@@ -168,6 +192,9 @@ private:
 	required_device<nvram_device> m_pmm_nvram;
 	required_device<nvram_device> m_cdrive_nvram;
 	required_device<ngage_adsp_device> m_adsp;
+	required_device<ngage_bt_device> m_bt;
+	required_device<ngage_mmc_device> m_mmc;
+	required_device<ngage_rtc_device> m_rtc;
 	required_device<ngage_pcm_device> m_pcm;
 	required_device<ngage_sim_device> m_sim;
 	required_ioport m_config;
@@ -183,6 +210,9 @@ private:
 	bool m_flash_amd_tail[3]{};
 	u8 m_pmm[PMM_SIZE]{};
 	u8 m_cdrive[CDRIVE_SIZE]{};
+	u32 m_cdrive_erase_base = 0;
+	u32 m_cdrive_erase_size = 0;
+	bool m_cdrive_erase_polled = false;
 
 	u32 m_upp[UPP_WORDS]{};
 	std::bitset<UPP_WORDS> m_upp_reads;
@@ -198,12 +228,13 @@ private:
 	u64 m_ctsi_nos_start = 0;
 
 	u16 m_uem_regs[256]{};
+	u16 m_uem_adc_result = UEM_ADC_DEFAULT;
 	emu_timer *m_uem_timer = nullptr;
 	bool m_uem_irq = false;
-	u32 m_uem_rtc_start = 0;
-	u8 m_uem_rtc_day_offset = 0;
 	bool m_uem_rtc_calibration_written = false;
 	u16 m_cbus_command = 0;
+	u16 m_cbus_bt_data = 0;
+	bool m_bt_irq_pending = false;
 	u8 m_uem_alarm_status = 8;
 	bool m_cbus_complete = true;
 	bool m_power_key_released = false;
@@ -227,11 +258,12 @@ private:
 	u8 m_key_column_drive = 0;
 	u8 m_key_row_enable = 0;
 	u8 m_key_column_enable = 0;
-	u8 m_key_genio_enable = 0;
+	u8 m_ctsi_genio_enable = 0;
 	u8 m_key_last_columns = 0x3f;
 	u16 m_key_last_genio = 0x3c06;
 	bool m_key_gpio30 = false;
 
+	emu_timer *m_lcd_dma_timer[8]{};
 	u16 m_lcd_pixels[LCD_WIDTH * LCD_HEIGHT]{};
 	u32 m_lcd_window_first = 0;
 	unsigned m_lcd_cursor = 0;
@@ -274,10 +306,8 @@ void ngage_state::machine_start()
 	m_ctsi_compare_timer = timer_alloc(FUNC(ngage_state::ctsi_compare_expired), this);
 	m_mdi_timer = timer_alloc(FUNC(ngage_state::mdi_announce), this);
 	m_uem_timer = timer_alloc(FUNC(ngage_state::uem_tick), this);
-	system_time system_clock;
-	machine().base_datetime(system_clock);
-	auto const &time = system_clock.local_time;
-	m_uem_rtc_start = time.hour * 3600 + time.minute * 60 + time.second;
+	for (auto &timer : m_lcd_dma_timer)
+		timer = timer_alloc(FUNC(ngage_state::lcd_dma_complete), this);
 	m_pmm_nvram->set_base(m_pmm, sizeof(m_pmm));
 	m_cdrive_nvram->set_base(m_cdrive, sizeof(m_cdrive));
 
@@ -289,6 +319,9 @@ void ngage_state::machine_start()
 	save_item(NAME(m_flash_amd_tail));
 	save_item(NAME(m_pmm));
 	save_item(NAME(m_cdrive));
+	save_item(NAME(m_cdrive_erase_base));
+	save_item(NAME(m_cdrive_erase_size));
+	save_item(NAME(m_cdrive_erase_polled));
 	save_item(NAME(m_upp));
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_fiq_enable));
@@ -297,11 +330,12 @@ void ngage_state::machine_start()
 	save_item(NAME(m_ctsi_fast_start));
 	save_item(NAME(m_ctsi_nos_start));
 	save_item(NAME(m_uem_regs));
+	save_item(NAME(m_uem_adc_result));
 	save_item(NAME(m_uem_irq));
-	save_item(NAME(m_uem_rtc_start));
-	save_item(NAME(m_uem_rtc_day_offset));
 	save_item(NAME(m_uem_rtc_calibration_written));
 	save_item(NAME(m_cbus_command));
+	save_item(NAME(m_cbus_bt_data));
+	save_item(NAME(m_bt_irq_pending));
 	save_item(NAME(m_uem_alarm_status));
 	save_item(NAME(m_cbus_complete));
 	save_item(NAME(m_power_key_released));
@@ -322,7 +356,7 @@ void ngage_state::machine_start()
 	save_item(NAME(m_key_column_drive));
 	save_item(NAME(m_key_row_enable));
 	save_item(NAME(m_key_column_enable));
-	save_item(NAME(m_key_genio_enable));
+	save_item(NAME(m_ctsi_genio_enable));
 	save_item(NAME(m_key_last_columns));
 	save_item(NAME(m_key_last_genio));
 	save_item(NAME(m_key_gpio30));
@@ -343,6 +377,13 @@ void ngage_state::machine_start()
 
 void ngage_state::machine_reset()
 {
+	ioport_field::user_settings clock_config;
+	m_config->field(0x0e)->get_user_settings(clock_config);
+	u32 const half_steps = (clock_config.value >> 1) & 7;
+	m_maincpu->set_unscaled_clock(ARM_SDRAM_CLOCK + (half_steps <= 4 ? half_steps : 0) * (ARM_SDRAM_CLOCK / 2));
+
+	finish_cdrive_erase();
+	recover_calendar_mirror();
 	std::fill(std::begin(m_flash_mode), std::end(m_flash_mode), ARRAY);
 	std::fill(std::begin(m_flash_unlock), std::end(m_flash_unlock), 0);
 	std::fill(std::begin(m_flash_operation), std::end(m_flash_operation), IDLE);
@@ -358,10 +399,12 @@ void ngage_state::machine_reset()
 	m_ctsi_compare_timer->enable(false);
 
 	std::fill(std::begin(m_uem_regs), std::end(m_uem_regs), 0);
+	m_uem_adc_result = UEM_ADC_DEFAULT;
 	m_uem_irq = false;
 	m_uem_rtc_calibration_written = false;
 	m_uem_timer->adjust(attotime::from_seconds(1), 0, attotime::from_seconds(1));
-	m_cbus_command = 0;
+	m_cbus_command = m_cbus_bt_data = 0;
+	m_bt_irq_pending = false;
 	m_uem_alarm_status = 8;
 	m_cbus_complete = true;
 	m_power_key_released = false;
@@ -377,12 +420,14 @@ void ngage_state::machine_reset()
 	m_sim->set_present(BIT(m_config->read(), 0));
 	m_key_pending = 0;
 	m_key_row_drive = 0x3f;
-	m_key_column_drive = m_key_row_enable = m_key_column_enable = m_key_genio_enable = 0;
+	m_key_column_drive = m_key_row_enable = m_key_column_enable = m_ctsi_genio_enable = 0;
 	m_key_gpio30 = false;
 	auto const levels = keypad_read();
 	m_key_last_columns = levels.columns;
 	m_key_last_genio = levels.genio;
 
+	for (auto *timer : m_lcd_dma_timer)
+		timer->enable(false);
 	m_lcd_cursor = 0;
 	m_lcd_band_first = 0;
 	m_lcd_limit = m_lcd_band_end = LCD_PAIRS;
@@ -438,6 +483,40 @@ u16 ngage_state::flash_r(offs_t offset)
 	return m_flash[index] | (m_flash[index + 1] << 8);
 }
 
+u32 ngage_state::cdrive_r(offs_t offset, u32 mem_mask)
+{
+	u32 const addr = NOR_SIZE - CDRIVE_SIZE + offset * 4;
+	if (m_flash_mode[1] == ARRAY && m_cdrive_erase_size && addr >= m_cdrive_erase_base
+			&& addr - m_cdrive_erase_base < m_cdrive_erase_size)
+	{
+		// NOS first waits for DQ3 set and DQ7 clear. The FPGA model
+		// completes on a second status read or an erase suspend command.
+		if (!m_cdrive_erase_polled)
+		{
+			if (!machine().side_effects_disabled())
+				m_cdrive_erase_polled = true;
+			return 0x00080008;
+		}
+		if (!machine().side_effects_disabled())
+			finish_cdrive_erase();
+		return 0xffffffff;
+	}
+
+	u32 const low = (mem_mask & 0xffff) ? flash_r<1>(addr / 2) : 0;
+	u32 const high = (mem_mask & 0xffff0000) ? flash_r<1>(addr / 2 + 1) : 0;
+	return low | (high << 16);
+}
+
+void ngage_state::finish_cdrive_erase()
+{
+	if (m_cdrive_erase_size)
+	{
+		std::fill_n(flash_storage<1>(m_cdrive_erase_base), m_cdrive_erase_size, 0xff);
+		m_cdrive_erase_size = 0;
+		m_cdrive_erase_polled = false;
+	}
+}
+
 template <unsigned Chip>
 void ngage_state::flash_w(offs_t offset, u16 data, u16 mem_mask)
 {
@@ -468,12 +547,19 @@ void ngage_state::flash_w(offs_t offset, u16 data, u16 mem_mask)
 	else if ((operation == AMD_ERASE && unlock == 2 && data == 0x30)
 		|| (operation == INTEL_ERASE && data == 0xd0 && m_flash_erase_sector[Chip] == sector))
 	{
-		// The write or erase takes effect at command completion; busy timing is unmodeled.
-		if (storage)
+		if (Chip == 1 && storage && operation == AMD_ERASE)
+		{
+			finish_cdrive_erase();
+			m_cdrive_erase_base = sector;
+			m_cdrive_erase_size = sector_size;
+		}
+		else if (storage)
 			std::fill_n(flash_storage<Chip>(sector), sector_size, 0xff);
 		mode = operation == AMD_ERASE ? ARRAY : STATUS;
 		operation = IDLE;
 	}
+	else if (Chip == 1 && storage && data == 0xb0)
+		finish_cdrive_erase();
 	else if (data == 0xf0 || data == 0xff)
 	{
 		mode = ARRAY;
@@ -528,12 +614,26 @@ u32 ngage_state::interrupt_sources(unsigned bank, bool fiq) const
 	if (fiq)
 		return bank == 0 ? (m_irq_pending[0] & 0x3f) | ((m_sim->status() || (euart_status() & m_euart_enable)) ? (1U << 26) : 0) : 0;
 
-	return m_irq_pending[bank] | (bank == 0 && m_uem_irq ? 2 : 0);
+	return m_irq_pending[bank] | (bank == 0 ? m_mmc->irq_sources() | (m_uem_irq ? 2 : 0) : 0);
+}
+
+void ngage_state::bt_event(int state)
+{
+	if (state)
+	{
+		m_bt_irq_pending = true;
+		update_interrupts();
+	}
+}
+
+bool ngage_state::bt_irq_active() const
+{
+	return m_bt_irq_pending && (m_ctsi_genio_enable & (BLUETOOTH_EVENT >> 16));
 }
 
 void ngage_state::update_interrupts()
 {
-	if (m_key_pending || (m_upp[0x50100 / 4] & (m_upp[0x50010 / 4] >> 16) & CTSI_EVENT_MASK))
+	if (m_key_pending || bt_irq_active() || (m_upp[0x50100 / 4] & (m_upp[0x50010 / 4] >> 16) & CTSI_EVENT_MASK))
 		m_irq_pending[0] |= 1U << 25;
 	else
 		m_irq_pending[0] &= ~(1U << 25);
@@ -599,9 +699,51 @@ TIMER_CALLBACK_MEMBER(ngage_state::timer_expired)
 	update_interrupts();
 }
 
-u64 ngage_state::uem_rtc_seconds() const
+void ngage_state::recover_calendar_mirror()
 {
-	return u64(m_uem_rtc_start) + machine().time().seconds();
+	// Stock 4.03 can persist the two RTC calendar mirrors a minute apart.
+	// Its restore guard rejects that pair. Repair the older mirror only
+	// when both active records are unique and in the same native catalog.
+	static constexpr unsigned SECTOR_SIZE = 0x4000;
+	static constexpr unsigned HEADER_SIZE = 12;
+	u8 *records[2]{};
+	unsigned record_bank = PMM_SIZE;
+	for (unsigned bank = 0; bank < PMM_SIZE; bank += SECTOR_SIZE)
+	{
+		u8 *const sector = &m_pmm[bank];
+		if (std::memcmp(&sector[6], "PMMCAT", 6))
+			continue;
+		for (unsigned offset = 32; offset <= SECTOR_SIZE - HEADER_SIZE; )
+		{
+			u8 *const entry = &sector[offset];
+			if (entry[0] == 0xff)
+				break;
+			unsigned const length = get_u16le(&entry[8]);
+			unsigned const next = get_u16le(&entry[10]);
+			if (next != offset + HEADER_SIZE + length || next > SECTOR_SIZE)
+				return;
+			u16 const record = get_u16le(&entry[2]);
+			if (entry[0] == 0xf4 && entry[1] == 0xd4 && entry[4] == 0x55 && length == 8 && record < 2)
+			{
+				if (records[record] || (record_bank != PMM_SIZE && record_bank != bank))
+					return;
+				records[record] = entry + HEADER_SIZE;
+				record_bank = bank;
+			}
+			offset = next;
+		}
+	}
+
+	if (records[0] && records[1])
+	{
+		u64 const primary = get_u64le(records[0]);
+		u64 const mirror = get_u64le(records[1]);
+		if (mirror && primary > mirror && primary - mirror == 60'000'000)
+		{
+			put_u64le(records[1], primary);
+			logerror("UEM RTC: reconciled the saved calendar mirror\n");
+		}
+	}
 }
 
 u16 ngage_state::uem_r(u8 reg) const
@@ -610,10 +752,10 @@ u16 ngage_state::uem_r(u8 reg) const
 	// maintains the date base in PMM and can set the counter's eight-bit day.
 	if (u16(m_upp[0x50420 / 4]) == 7)
 	{
-		u64 const time = uem_rtc_seconds();
+		u32 const time = m_rtc->counter();
 		switch (reg)
 		{
-		case 0x21: return u8(m_uem_rtc_day_offset + time / 86400);
+		case 0x21: return u8(time / 86400);
 		case 0x31: return time % 60;
 		case 0x32: return (time / 60) % 60;
 		case 0x33: return (time / 3600) % 24;
@@ -623,7 +765,7 @@ u16 ngage_state::uem_r(u8 reg) const
 	{
 	case 0x24: return m_uem_rtc_calibration_written ? m_uem_regs[reg] : 1;
 	case 0x35: return m_uem_alarm_status | ((!m_power_key_released || BIT(m_keys, 26)) ? 0x10 : 0);
-	case 0x3a: return 512; // Startup battery ADC sample from the NEM-4 model.
+	case 0x3a: return m_uem_adc_result;
 	case 0x3f: return (!m_power_key_released || BIT(m_keys, 26)) ? 2 : 0;
 	case 0x80: return 0x0400;
 	default:   return m_uem_regs[reg];
@@ -645,11 +787,23 @@ void ngage_state::uem_w(u8 reg, u16 data)
 		euart_update();
 	}
 	if (reg == 0x21 && u16(m_upp[0x50420 / 4]) == 7)
-		m_uem_rtc_day_offset = u8(data - uem_rtc_seconds() / 86400);
+		m_rtc->set_day(u8(data));
 	if (reg == 0x24)
 		m_uem_rtc_calibration_written = true;
 	if (reg == 0x35)
 		m_uem_alarm_status &= ~data;
+	if (reg == 0x39 && BIT(data, 11))
+	{
+		m_uem_adc_result = UEM_ADC_DEFAULT;
+		if ((data >> 12) == 12)
+		{
+			ioport_field::user_settings battery;
+			m_config->field(BATTERY_LEVEL_MASK)->get_user_settings(battery);
+			unsigned const level = (battery.value & BATTERY_LEVEL_MASK) >> 4;
+			if (level < std::size(BATTERY_VOLTAGE_ADC))
+				m_uem_adc_result = BATTERY_VOLTAGE_ADC[level];
+		}
+	}
 	if (reg == 0x36 && (m_upp[0x50420 / 4] & 0xffff) == 15 && (data & 0xfff8) == 0xfff0)
 		m_power_key_released = true;
 	if (reg == 0x30 && BIT(m_upp[0x20a04 / 4], 1) && m_timer[0]->enabled())
@@ -807,9 +961,62 @@ void ngage_state::euart_update()
 	update_interrupts();
 }
 
+void ngage_state::dma_start(unsigned channel)
+{
+	u32 const request = (m_upp[0x20064 / 4] >> (channel * 4)) & 15;
+	if (request == 2)
+		mmc_dma_start(channel);
+	else if (request == 7)
+		lcd_dma_start(channel);
+}
+
+void ngage_state::mmc_event(int state)
+{
+	if (!state)
+		return;
+	for (unsigned channel = 0; channel < 8; ++channel)
+		if (((m_upp[0x20064 / 4] >> (channel * 4)) & 15) == 2)
+			mmc_dma_start(channel);
+	update_interrupts();
+}
+
+void ngage_state::mmc_dma_start(unsigned channel)
+{
+	u32 *const reg = &m_upp[(0x20300 + channel * 0x40) / 4];
+	if (reg[1] != 1 || (reg[2] != 2 && reg[2] != 3))
+		return;
+
+	static constexpr u32 fifo = 0x0c120624;
+	static constexpr u32 fifo_alias = 0x10120624;
+	bool const receive = (reg[5] == fifo || reg[5] == fifo_alias) && reg[6] == 0 && reg[7] == 8
+		&& reg[9] == 4 && reg[10] == 32;
+	bool const transmit = (reg[8] == fifo || reg[8] == fifo_alias) && reg[9] == 0 && reg[10] == 8
+		&& reg[6] == 4 && reg[7] == 32;
+	u32 const address = receive ? reg[8] : reg[5];
+	u64 const bytes = u64(reg[11]) + 1;
+	if ((!receive && !transmit) || !m_mmc->dma_ready(transmit) || (address & 3) || (bytes & 3)
+			|| bytes > 4096 || address < 0x0a000000 || u64(address) + bytes > 0x0b000000)
+		return;
+
+	// Clear the run register before the FIFO's last word raises DataIdle.
+	// The callback can then see other armed channels without reentering this one.
+	reg[2] = 0;
+	address_space &program = m_maincpu->space(AS_PROGRAM);
+	for (unsigned n = 0; n < bytes; n += 4)
+		if (receive)
+			program.write_dword(address + n, m_mmc->read(0x24 / 4, 0xffffffff));
+		else
+			m_mmc->write(0x24 / 4, program.read_dword(address + n), 0xffffffff);
+	m_irq_pending[0] |= 1U << (channel + 6);
+	update_interrupts();
+}
+
 void ngage_state::lcd_dma_start(unsigned channel)
 {
-	u32 *const registers = &m_upp[(0x20300 + channel * 0x40) / 4];
+	if (m_lcd_dma_timer[channel]->enabled())
+		return;
+
+	u32 const *const registers = &m_upp[(0x20300 + channel * 0x40) / 4];
 	u32 const request = (m_upp[0x20064 / 4] >> (channel * 4)) & 15;
 	u32 const source = registers[5];
 	u32 const destination = registers[8];
@@ -818,19 +1025,26 @@ void ngage_state::lcd_dma_start(unsigned channel)
 	if (registers[2] != 2 || registers[1] != 1 || request != 7 || !sdram || (source & 3)
 			|| registers[6] != 4 || registers[7] != 32 || registers[9] != 0 || registers[10] != 32
 			|| (destination != 0x10121208 && destination != 0x0c121208)
-			|| !m_lcd_pixel_header || !m_lcd_write || words > m_lcd_limit - m_lcd_cursor)
+			|| !m_lcd_pixel_header || !m_lcd_write || m_lcd_cursor >= m_lcd_limit
+			|| words > m_lcd_limit - m_lcd_cursor)
 	{
 		logerror("%s: unsupported UPP DMA channel %u transfer %08x to %08x (%u words)\n",
 			machine().describe_context(), channel, source, destination, words);
 		return;
 	}
 
-	// The FIFO transfers and channel completion are synchronous in this model.
+	// Deliver the FIFO data in a batch and pace completion by the minimum
+	// transfer time of the 16-bit SDRAM interface, clocked 1:1 with the ARM.
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	for (u32 n = 0; n < words; ++n)
 		lcd_data_w(program.read_dword(source + n * 4));
-	registers[2] = 0;
-	m_irq_pending[0] |= 1U << (channel + 6);
+	m_lcd_dma_timer[channel]->adjust(attotime::from_ticks(words * 2, m_maincpu->unscaled_clock()), channel);
+}
+
+TIMER_CALLBACK_MEMBER(ngage_state::lcd_dma_complete)
+{
+	m_upp[(0x20308 + param * 0x40) / 4] = 0;
+	m_irq_pending[0] |= 1U << (param + 6);
 	update_interrupts();
 }
 
@@ -888,7 +1102,7 @@ void ngage_state::keypad_update()
 	u16 const falling = m_key_last_genio & ~levels.genio & ~direction;
 	static constexpr unsigned pins[] = { 0, 10, 11, 13, 0, 1, 12, 2 };
 	for (unsigned i = 1; i < std::size(pins); ++i)
-		if (BIT(m_key_genio_enable, i) && BIT(falling, pins[i]))
+		if (BIT(m_ctsi_genio_enable & (KEYPAD_EVENTS >> 16), i) && BIT(falling, pins[i]))
 			m_key_pending |= 1U << (16 + i);
 	m_key_last_columns = levels.columns;
 	m_key_last_genio = levels.genio;
@@ -905,6 +1119,8 @@ INPUT_CHANGED_MEMBER(ngage_state::key_changed)
 u32 ngage_state::upp_r(offs_t offset, u32 mem_mask)
 {
 	u32 const addr = offset * 4;
+	if (addr >= 0x20600 && addr < 0x20640)
+		return m_mmc->read((addr - 0x20600) / 4, mem_mask);
 	if (addr >= 0x20100 && addr < 0x20280)
 	{
 		unsigned const plane = (addr - 0x20100) / 0xc0;
@@ -952,9 +1168,10 @@ u32 ngage_state::upp_r(offs_t offset, u32 mem_mask)
 	case 0x49000: return m_upp[offset] | 1; // DPLL lock, with settling time unmeasured.
 	case 0x4b000: return m_upp[offset] | 0x80;
 	case 0x50000: return m_upp[offset] | 0x00400000; // GSM board strap.
-	case 0x50014: return (m_upp[offset] & ~0x00ee00ee) | ((m_key_genio_enable * 0x10001U) & 0x00ee00ee);
+	case 0x50014: return (m_upp[offset] & ~GENIO_ENABLE_MASK) | ((m_ctsi_genio_enable * 0x10001U) & GENIO_ENABLE_MASK);
 	case 0x500b8: return (u32(euart_status()) << 16) | (m_sim->status() ? 4 : 0);
-	case 0x50100: return (m_upp[offset] & ~KEYPAD_EVENTS) | m_key_pending;
+	case 0x50100: return (m_upp[offset] & ~(KEYPAD_EVENTS | BLUETOOTH_EVENT)) | m_key_pending
+		| (bt_irq_active() ? BLUETOOTH_EVENT : 0);
 	case 0x50110:
 	{
 		u32 const window = ctsi_window();
@@ -972,7 +1189,12 @@ u32 ngage_state::upp_r(offs_t offset, u32 mem_mask)
 	case 0x5021c: // MBUS strobes are self-clearing; startup tests the loopback.
 		return (m_upp[offset] & 0xffbf0000) | ((m_upp[offset] & 0x00800000) >> 1);
 	case 0x50420: return u32((m_cbus_command & ~0x0400) | (m_cbus_complete ? 0x0400 : 0)) << 16;
-	case 0x50424: return BIT(m_cbus_command, 8) && m_cbus_complete ? u32(uem_r(u8(m_cbus_command))) << 16 : 0;
+	case 0x50424:
+		if (!BIT(m_cbus_command, 8) || !m_cbus_complete)
+			return 0;
+		if (((m_cbus_command >> 5) & 7) == BLUETOOTH_CBUS_DEVICE)
+			return u32(m_cbus_bt_data) << 16;
+		return u32(uem_r(u8(m_cbus_command))) << 16;
 	case 0x50400: return (m_upp[offset] & ~0x001f001f) | (u32(m_key_row_drive & 0x1f) << 16) | keypad_read().rows;
 	case 0x50404: return (m_upp[offset] & ~0x1f) | m_key_row_enable;
 	case 0x5040c: return (m_upp[offset] & ~0x003f003f) | (u32(m_key_column_drive) << 16) | keypad_read().columns;
@@ -1030,6 +1252,11 @@ u32 ngage_state::upp_r(offs_t offset, u32 mem_mask)
 void ngage_state::upp_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	u32 const addr = offset * 4;
+	if (addr >= 0x20600 && addr < 0x20640)
+	{
+		m_mmc->write((addr - 0x20600) / 4, data, mem_mask);
+		return;
+	}
 	u32 const previous = m_upp[offset];
 	COMBINE_DATA(&m_upp[offset]);
 
@@ -1101,6 +1328,8 @@ void ngage_state::upp_w(offs_t offset, u32 data, u32 mem_mask)
 	}
 	case 0x50100:
 		m_key_pending &= ~(data & mem_mask);
+		if (data & mem_mask & BLUETOOTH_EVENT)
+			m_bt_irq_pending = false;
 		m_upp[offset] = (m_upp[offset] & ~CTSI_EVENT_MASK) | (previous & CTSI_EVENT_MASK & ~(data & mem_mask));
 		update_interrupts();
 		break;
@@ -1159,7 +1388,7 @@ void ngage_state::upp_w(offs_t offset, u32 data, u32 mem_mask)
 	switch (addr)
 	{
 	case 0x50014:
-		m_key_genio_enable = (m_key_genio_enable | (bits >> 16)) & ~bits;
+		m_ctsi_genio_enable = (m_ctsi_genio_enable | (bits >> 16)) & ~bits;
 		keypad_update();
 		break;
 	case 0x50400:
@@ -1192,6 +1421,8 @@ void ngage_state::upp_w(offs_t offset, u32 data, u32 mem_mask)
 		{
 			m_cbus_command = data >> 16;
 			m_cbus_complete = BIT(m_cbus_command, 8);
+			if (m_cbus_complete && ((m_cbus_command >> 5) & 7) == BLUETOOTH_CBUS_DEVICE)
+				m_cbus_bt_data = m_bt->read(m_cbus_command & 0x1f);
 		}
 		return;
 	}
@@ -1199,7 +1430,10 @@ void ngage_state::upp_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		if (mem_mask == 0xffff0000 && !m_cbus_complete && !BIT(m_cbus_command, 8))
 		{
-			uem_w(u8(m_cbus_command), data >> 16);
+			if (((m_cbus_command >> 5) & 7) == BLUETOOTH_CBUS_DEVICE)
+				m_bt->write(m_cbus_command & 0x1f, data >> 16);
+			else
+				uem_w(u8(m_cbus_command), data >> 16);
 			m_cbus_complete = true;
 		}
 		return;
@@ -1248,11 +1482,13 @@ void ngage_state::upp_w(offs_t offset, u32 data, u32 mem_mask)
 		unsigned const reg = addr & 0x3f;
 		if ((reg == 4 || reg == 8) && !m_upp[offset])
 		{
+			m_lcd_dma_timer[channel]->enable(false);
+			m_upp[(0x20308 + channel * 0x40) / 4] = 0;
 			m_irq_pending[0] &= ~(1U << (channel + 6));
 			update_interrupts();
 		}
 		else if (reg == 8)
-			lcd_dma_start(channel);
+			dma_start(channel);
 	}
 	if (addr >= 0x20a00 && addr < 0x20ac0)
 	{
@@ -1393,7 +1629,9 @@ void ngage_state::nos_trace_w(u32 data, u32 mem_mask)
 void ngage_state::nem4_map(address_map &map)
 {
 	map(0x00000000, 0x007fffff).rw(FUNC(ngage_state::flash_r<0>), FUNC(ngage_state::flash_w<0>));
-	map(0x02000000, 0x027fffff).rw(FUNC(ngage_state::flash_r<1>), FUNC(ngage_state::flash_w<1>));
+	map(0x02000000, 0x023fffff).r(FUNC(ngage_state::flash_r<1>));
+	map(0x02400000, 0x027fffff).r(FUNC(ngage_state::cdrive_r));
+	map(0x02000000, 0x027fffff).w(FUNC(ngage_state::flash_w<1>));
 	map(0x04000000, 0x047fffff).rw(FUNC(ngage_state::flash_r<2>), FUNC(ngage_state::flash_w<2>));
 	map(0x08000000, 0x08000fff).ram(); // External memory controller latches
 	map(0x0a000000, 0x0affffff).ram();
@@ -1407,11 +1645,16 @@ void ngage_state::nem4_map(address_map &map)
 
 void ngage_state::nem4(machine_config &config)
 {
-	ARM920T(config, m_maincpu, 104'000'000);
+	ARM920T(config, m_maincpu, ARM_SDRAM_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ngage_state::nem4_map);
 	NVRAM(config, m_pmm_nvram, nvram_device::DEFAULT_ALL_1);
 	NVRAM(config, m_cdrive_nvram, nvram_device::DEFAULT_ALL_1);
 	NGAGE_ADSP(config, m_adsp, 0);
+	NGAGE_BT(config, m_bt, 0);
+	m_bt->irq_cb().set(FUNC(ngage_state::bt_event));
+	NGAGE_MMC(config, m_mmc, 8'666'667);
+	NGAGE_RTC(config, m_rtc, 0);
+	m_mmc->event_cb().set(FUNC(ngage_state::mmc_event));
 	NGAGE_SIM(config, m_sim, 0);
 
 	SPEAKER(config, "mono").front_center();
@@ -1428,6 +1671,20 @@ INPUT_PORTS_START(ngage)
 	PORT_CONFNAME(0x01, 0x00, "SIM Card")
 	PORT_CONFSETTING(0x00, DEF_STR(None))
 	PORT_CONFSETTING(0x01, "Test SIM")
+	PORT_CONFNAME(0x0e, 0x00, "ARM / SDRAM Clock")
+	PORT_CONFSETTING(0x00, "104 MHz (1x)")
+	PORT_CONFSETTING(0x02, "156 MHz (1.5x)")
+	PORT_CONFSETTING(0x04, "208 MHz (2x)")
+	PORT_CONFSETTING(0x06, "260 MHz (2.5x)")
+	PORT_CONFSETTING(0x08, "312 MHz (3x)")
+	PORT_CONFNAME(BATTERY_LEVEL_MASK, 0x00, "Battery Level")
+	PORT_CONFSETTING(0x00, "Full (7 bars)")
+	PORT_CONFSETTING(0x10, "6 bars")
+	PORT_CONFSETTING(0x20, "5 bars")
+	PORT_CONFSETTING(0x30, "4 bars")
+	PORT_CONFSETTING(0x40, "3 bars")
+	PORT_CONFSETTING(0x50, "2 bars")
+	PORT_CONFSETTING(0x60, "1 bar")
 
 	PORT_START("KEYS")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_8WAY PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(ngage_state::key_changed), 0)
