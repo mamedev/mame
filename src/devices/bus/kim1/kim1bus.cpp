@@ -132,6 +132,11 @@ void kim1bus_device::install_bank(offs_t start, offs_t end, uint8_t *data)
 	m_space->install_ram(start, end, data);
 }
 
+void kim1bus_device::install_view(offs_t start, offs_t end, memory_view &view)
+{
+	m_space->install_view(start, end, view);
+}
+
 // interrupt request from kim1bus card
 void kim1bus_device::irq_w(int state) { m_out_irq_cb(state); }
 void kim1bus_device::nmi_w(int state) { m_out_nmi_cb(state); }
@@ -176,4 +181,9 @@ void device_kim1bus_card_interface::install_device(offs_t start, offs_t end, rea
 void device_kim1bus_card_interface::install_bank(offs_t start, offs_t end, uint8_t *data)
 {
 	m_kim1bus->install_bank(start, end, data);
+}
+
+void device_kim1bus_card_interface::install_view(offs_t start, offs_t end, memory_view &view)
+{
+	m_kim1bus->install_view(start, end, view);
 }
