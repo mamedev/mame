@@ -529,8 +529,12 @@ void ks0164_device::sound_stream_update(sound_stream &stream)
 				regs[2] = current >> 16;
 				regs[3] = current;
 
-				suml += (s64(samp) * regs[0x12] * regs[0x16]) >> 32;
-				sumr += (s64(samp) * regs[0x10] * regs[0x14]) >> 32;
+				// 0x10/0x12 are the left/right gains: the MIDI programs put pan, volume and
+				// expression there.  0x14/0x16 follow velocity only, and the PCM players set
+				// 0x16 to 0 for a centred mono stream, so they are not output gains (an effect
+				// send that isn't connected on the known boards?)
+				suml += (s32(samp) * regs[0x10]) >> 16;
+				sumr += (s32(samp) * regs[0x12]) >> 16;
 
 				if(regs[0xc]) {
 					regs[0x10] += regs[0x11];
@@ -541,7 +545,10 @@ void ks0164_device::sound_stream_update(sound_stream &stream)
 				}
 			}
 		}
-		stream.put_int(0, sample, suml, 32768 * 32);
-		stream.put_int(1, sample, sumr, 32768 * 32);
+		// The headroom of the accumulator is not known.  A full-volume voice is full
+		// scale, and the loudest known program (Elfin) peaks at about four times that,
+		// so divide by four and saturate beyond.
+		stream.put_int_clamp(0, sample, suml >> 2, 32768);
+		stream.put_int_clamp(1, sample, sumr >> 2, 32768);
 	}
 }
