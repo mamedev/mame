@@ -29,6 +29,7 @@ The Grid         v1.2   10/18/2000
 #include "emu.h"
 
 #include "midzeus.h"
+#include "midway_shifter.h"
 
 #include "dcs.h"
 
@@ -145,9 +146,6 @@ public:
 	void crusnexo(machine_config &config) ATTR_COLD;
 
 	ioport_value keypad_r();
-	ioport_value gear_r();
-	DECLARE_INPUT_CHANGED_MEMBER(gear_shift);
-	DECLARE_INPUT_CHANGED_MEMBER(gear_select);
 
 protected:
 	virtual void machine_start() override ATTR_COLD
@@ -156,7 +154,6 @@ protected:
 
 		save_item(NAME(m_keypad_select));
 		save_item(NAME(m_crusnexo_leds_select));
-		save_item(NAME(m_gear));
 	}
 
 private:
@@ -170,7 +167,6 @@ private:
 
 	uint8_t     m_keypad_select = 0;
 	uint8_t     m_crusnexo_leds_select = 0;
-	uint8_t     m_gear = 0; // 0 = neutral, 1-4 = gear engaged
 
 	output_finder<7> m_digits;
 	output_finder<32> m_leds;
@@ -722,31 +718,6 @@ ioport_value crusnexo_state::keypad_r()
 	return bits;
 }
 
-/*
-    The shifter closes one of four switches per gear and none in neutral. With
-    the shifter polarity DIP switch off the game reads a closed switch as 1, so
-    reading every switch as 1 looks like a broken shifter and locks out the
-    manual transmission. The switches are driven from a gear position that the
-    gear buttons set directly or step up and down.
-*/
-ioport_value crusnexo_state::gear_r()
-{
-	return m_gear ? (1 << (m_gear - 1)) : 0;
-}
-
-INPUT_CHANGED_MEMBER(crusnexo_state::gear_shift)
-{
-	if (newval)
-		m_gear = std::clamp<int>(m_gear + int(param), 0, 4);
-}
-
-INPUT_CHANGED_MEMBER(crusnexo_state::gear_select)
-{
-	if (newval)
-		m_gear = param;
-}
-
-
 uint32_t thegrid_state::grid_keypad_r(offs_t offset)
 {
 	uint32_t const bits = (m_io_keypad->read() >> ((offset >> 1) << 2)) & 0xf;
@@ -1268,19 +1239,22 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2")   // View 2
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3")   // View 3
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 4")  // View 4
-	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_MEMBER(FUNC(crusnexo_state::gear_r)) // Gears 1-4
+	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_CUSTOM_DEVICE_MEMBER("shifter", FUNC(midway_shifter_device::gears_r)) // Gears 1-4
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )                       // Not Used
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )                       // Not Used
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                       // Not Used
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("GEARS") // shifter position, set directly or stepped up and down
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("1st Gear") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(crusnexo_state::gear_select), 1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("2nd Gear") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(crusnexo_state::gear_select), 2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("3rd Gear") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(crusnexo_state::gear_select), 3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("4th Gear") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(crusnexo_state::gear_select), 4)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Gear Up") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(crusnexo_state::gear_shift), 1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Gear Down") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(crusnexo_state::gear_shift), -1)
+	PORT_INCLUDE( midway_shifter )
+
+	PORT_START("GEARS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("1st Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("2nd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("3rd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("4th Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 4)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Neutral Gear") PORT_CONDITION("CONF", 0x07, EQUALS, 0x01) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("Shift Down") PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Shift Up") PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 1)
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(crusnexo_state::keypad_r))
@@ -1543,6 +1517,8 @@ void crusnexo_state::crusnexo(machine_config &config)
 	m_zeus->set_system_type(zeus2_device::CRUSNEXO);
 
 	m_ioasic->set_upper(472 /* or 476,477,478,110 */ );
+
+	MIDWAY_SHIFTER(config, "shifter");
 }
 
 void thegrid_state::thegrid(machine_config &config)

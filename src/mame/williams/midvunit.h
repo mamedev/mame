@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "midway_shifter.h"
 #include "midwayic.h"
 
 #include "dcs.h"
@@ -135,20 +136,17 @@ class midvunit_state : public midvunit_base_state
 public:
 	void midvunit(machine_config &config);
 
-	DECLARE_INPUT_CHANGED_MEMBER(gear_button);
-	DECLARE_INPUT_CHANGED_MEMBER(shift_button);
-
 protected:
 	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: midvunit_base_state(mconfig, type, tag)
 		, m_adc(*this, "adc")
+		, m_shifter(*this, "shifter")
 		, m_nvram(*this, "nvram")
 		, m_optional_drivers(*this, "lamp%u", 0U)
 		, m_wheel_motor(*this, "wheel")
 		, m_in0(*this, "IN0")
 		, m_in1(*this, "IN1")
 		, m_dsw(*this, "DSW")
-		, m_conf(*this, "CONF")
 	{ }
 
 	virtual void machine_start() override ATTR_COLD;
@@ -171,6 +169,7 @@ protected:
 	void midvunit_map(address_map &map) ATTR_COLD;
 
 	required_device<adc0844_device> m_adc;
+	required_device<midway_shifter_device> m_shifter;
 
 	required_shared_ptr<uint32_t> m_nvram;
 
@@ -179,11 +178,9 @@ protected:
 	required_ioport m_in0;
 	required_ioport m_in1;
 	required_ioport m_dsw;
-	required_ioport m_conf;
 
 	uint8_t m_adc_shift = 0;
 	uint16_t m_last_port0 = 0;
-	uint16_t m_shifter_state = 0;
 	uint8_t m_galil_input_index = 0;
 	uint8_t m_galil_input_length = 0;
 	const char *m_galil_input = nullptr;

@@ -71,11 +71,8 @@ void midvunit_state::machine_start()
 {
 	midvunit_base_state::machine_start();
 
-	m_shifter_state = 0; // start with fake shifter in neutral
-
 	save_item(NAME(m_adc_shift));
 	save_item(NAME(m_last_port0));
-	save_item(NAME(m_shifter_state));
 	save_item(NAME(m_galil_input_index));
 	save_item(NAME(m_galil_input_length));
 	save_item(NAME(m_galil_output_index));
@@ -128,36 +125,12 @@ void midvplus_state::machine_reset()
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(midvunit_state::gear_button)
-{
-	if (newval)
-	{
-		if ((param != m_shifter_state) || !BIT(m_conf->read(), 1))
-			m_shifter_state = param;
-		else
-			m_shifter_state = 0;
-	}
-}
-
-INPUT_CHANGED_MEMBER(midvunit_state::shift_button)
-{
-	if (newval)
-	{
-		if (!param)
-			m_shifter_state = (m_shifter_state << 1) & 0x3c00;
-		else if (!m_shifter_state)
-			m_shifter_state = 0x2000;
-		else if (0x0400 != m_shifter_state)
-			m_shifter_state >>= 1;
-	}
-}
-
 uint32_t midvunit_state::port0_r()
 {
 	uint16_t val = m_in0->read();
 
-	if (BIT(m_conf->read(), 0))
-		val = (val | 0x3c00) ^ m_shifter_state;
+	// gear switches are active low, 1st gear in bit 13 down to 4th gear in bit 10
+	val = (val | 0x3c00) ^ (bitswap<4>(m_shifter->gears_r(), 0, 1, 2, 3) << 10);
 
 	return (uint32_t(val) << 16) | val;
 }
@@ -756,10 +729,10 @@ static INPUT_PORTS_START( midvunit )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_UP )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("4th Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::gear_button), 0x0400)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("3rd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::gear_button), 0x0800)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("2nd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::gear_button), 0x1000)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("1st Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::gear_button), 0x2000)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("4th Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 4)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("3rd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 3)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("2nd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 2)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("1st Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -782,17 +755,12 @@ static INPUT_PORTS_START( midvunit )
 	PORT_START("BRAKE")     // brake pedal
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START("FAKE")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Neutral Gear") PORT_CONDITION("CONF", 0x07, EQUALS, 0x01) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::gear_button), 0x0000)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Shift Down")   PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::shift_button), 0)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Shift Up")     PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(midvunit_state::shift_button), 1)
+	PORT_INCLUDE( midway_shifter )
 
-	PORT_START("CONF")
-	PORT_CONFNAME( 0x07, 0x01, "Shifter Type" )
-	PORT_CONFSETTING(    0x01, "Buttons (sticky)" )   // for convenience for people without a shifter
-	PORT_CONFSETTING(    0x03, "Buttons (toggling)" ) // avoids the need for the neutral button
-	PORT_CONFSETTING(    0x05, "Sequential" )         // for spring-return shifter, paddles or buttons
-	PORT_CONFSETTING(    0x00, "H-Pattern" )          // for use with a real shifter
+	PORT_START("FAKE")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Neutral Gear") PORT_CONDITION("CONF", 0x07, EQUALS, 0x01) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 0)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Shift Down")   PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 0)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Shift Up")     PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 1)
 INPUT_PORTS_END
 
 
@@ -1191,6 +1159,8 @@ void midvunit_state::midvunit(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &midvunit_state::midvunit_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
+
+	MIDWAY_SHIFTER(config, m_shifter);
 
 	ADC0844(config, m_adc);
 	m_adc->intr_callback().set_inputline("maincpu", 3);
