@@ -8927,13 +8927,23 @@ static INPUT_PORTS_START( pkrmastc )
 	PORT_INCLUDE( pkrmast )
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x02, 0x00, "Reels Roll" )      PORT_DIPLOCATION("DSW1:2")  // Default to Long so the reels spin normally.
+	PORT_DIPNAME( 0x02, 0x00, "Reels Roll" )  PORT_DIPLOCATION("DSW1:2")  // Default to Long so the reels spin normally.
 	PORT_DIPSETTING(    0x02, "Short" )
 	PORT_DIPSETTING(    0x00, "Long" )
-	PORT_DIPNAME( 0x10, 0x10, "Double Up Game Payout Rate" ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game Payout Rate" )  PORT_DIPLOCATION("DSW1:5")
 	PORT_DIPSETTING(    0x10, "70%" )
 	PORT_DIPSETTING(    0x00, "80%" )
 
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x07, 0x07, "Main Game Payout Rate" )  PORT_DIPLOCATION("DSW2:1,2,3")
+	PORT_DIPSETTING(    0x07, "70%" )
+	PORT_DIPSETTING(    0x06, "65%" )
+	PORT_DIPSETTING(    0x05, "60%" )
+	PORT_DIPSETTING(    0x04, "55%" )
+	PORT_DIPSETTING(    0x03, "50%" )
+	PORT_DIPSETTING(    0x02, "45%" )
+	PORT_DIPSETTING(    0x01, "35%" )
+	PORT_DIPSETTING(    0x00, "25%" )
 INPUT_PORTS_END
 
 
