@@ -1701,13 +1701,13 @@ void exctsccr_state::init_exctsccr()
  *************************************/
 
 /*    YEAR  NAME        PARENT    MACHINE     INPUT     INIT                           MONITOR COMPANY, FULLNAME, FLAGS */
-GAME( 1982, talbot,     0,        talbot,     talbot,   champbas_state, empty_init,    ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE )
+GAME( 1982, talbot,     0,        talbot,     talbot,   champbas_state, empty_init,    ROT270, "Alpha Denshi Co. (Volt Electronics license)", "Talbot", MACHINE_SUPPORTS_SAVE ) // World ?
 
-GAME( 1983, champbas,   0,        champbas,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball (USA)", MACHINE_SUPPORTS_SAVE ) // no protection
+GAME( 1983, champbas,   0,        champbas,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball (US)", MACHINE_SUPPORTS_SAVE ) // no protection
 GAME( 1983, champbasj,  champbas, champbasj,  champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, champbasja, champbas, champbasja, champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan, set 2)", MACHINE_SUPPORTS_SAVE ) // simplified protection, no mcu
 GAME( 1983, champbasjb, champbas, champbasjb, champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball (Japan, set 3)", MACHINE_SUPPORTS_SAVE ) // no protection
-GAME( 1983, champbb2,   0,        champbb2,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2 (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, champbb2,   0,        champbb2,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co. (Sega license)", "Champion Base Ball Part-2 (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, champbb2j,  champbb2, champbb2j,  champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Champion Base Ball Part-2 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, tbasebal,   champbb2, tbasebal,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Taikyoku Base Ball", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 68705 protection instead
 
