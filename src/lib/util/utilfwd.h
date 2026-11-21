@@ -31,6 +31,9 @@ class random_read;
 class random_write;
 class random_read_write;
 
+// line_idx_file.h
+class line_indexed_file;
+
 // opresolv.h
 class option_guide;
 class option_resolution;

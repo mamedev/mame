@@ -301,6 +301,11 @@ Core Debugging Options
 | :ref:`debugger_port <mame-commandline-debuggerport>`
 | :ref:`debugger_font <mame-commandline-debuggerfont>`
 | :ref:`debugger_font_size <mame-commandline-debuggerfontsize>`
+| :ref:`src_debug_info <mame-commandline-srcdbginfo>`
+| :ref:`src_debug_search_path <mame-commandline-srcdbgsearchpath>`
+| :ref:`src_debug_prefix_map <mame-commandline-srcdbgprefixmap>`
+| :ref:`src_debug_offset <mame-commandline-srcdbgoffset>`
+| :ref:`src_debug_spaces_per_tab <mame-commandline-srcdbgtabs>`
 
 
 Core Communication Options

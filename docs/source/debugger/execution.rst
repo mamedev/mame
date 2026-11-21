@@ -4,12 +4,19 @@ Execution Debugger Commands
 ===========================
 
 :ref:`debugger-command-step`
-    single step for <count> instructions (F11)
+    single step for <count> instructions (F11, when disassembly view is active)
+:ref:`debugger-command-steps`
+    single step one source line (F11, when source view is active)
 :ref:`debugger-command-over`
-    single step over <count> instructions (F10)
+    single step over <count> instructions (F10, when disassembly view is active)
+:ref:`debugger-command-overs`
+    single step over one source line (F10, when source view is active)
 :ref:`debugger-command-out`
     single step until the current subroutine/exception handler returns
     (Shift-F11)
+:ref:`debugger-command-outs`
+    single step until the current subroutine/exception handler returns
+    to a source line (Shift-F11)
 :ref:`debugger-command-go`
     resume execution (F5)
 :ref:`debugger-command-gbt`
@@ -63,6 +70,39 @@ Examples:
 Back to :ref:`debugger-execution-list`
 
 
+.. _debugger-command-steps:
+
+steps
+-----
+
+**steps**
+
+When :ref:`source-level debugging <srcdbg>` is enabled, this single-steps
+one *source* line on the currently executing CPU.  When the original
+source is assembly language, ``step`` and ``steps`` generally behave the same.
+But when the original source is in a higher level language like C or BASIC,
+``steps`` results in executing the remainder of a block of instructions
+associated with the current source line.
+
+If the current source line is a
+call instruction, ``steps`` stops at the first source line in the called
+function, but only if the called function has source associated with it.
+If neither the called function nor any of its callees have source associated
+with them, ``steps`` will continue execution until the call is complete, and
+the first instruction with source associated with it is encountered.
+
+
+
+Examples:
+
+``steps``
+    Steps forward to the next source line on the current CPU.
+``sts``
+    Steps forward to the next source line on the current CPU.
+
+Back to :ref:`debugger-execution-list`
+
+
 .. _debugger-command-over:
 
 over
@@ -93,6 +133,30 @@ Examples:
 Back to :ref:`debugger-execution-list`
 
 
+.. _debugger-command-overs:
+
+overs
+-----
+
+**o[ver]s**
+
+When :ref:`source-level debugging <srcdbg>` is enabled, this steps forward
+over one *source* line on the currently executing CPU.  When the original
+source is assembly language, ``over`` and ``overs`` generally behave the same.
+But when the original source is in a higher level language like C or BASIC,
+``overs`` results in executing the remainder of a block of instructions
+associated with the current source line.
+
+Examples:
+
+``overs``
+    Steps forward over the next source line on the current CPU.
+``os``
+    Steps forward over the next source line on the current CPU.
+
+Back to :ref:`debugger-execution-list`
+
+
 .. _debugger-command-out:
 
 out
@@ -114,6 +178,38 @@ Example:
 
 ``out``
     Steps until a subroutine or exception handler returns.
+
+Back to :ref:`debugger-execution-list`
+
+
+.. _debugger-command-outs:
+
+outs
+----
+
+**outs**
+
+When :ref:`source-level debugging <srcdbg>` is enabled, this single-steps
+until the next return from subroutine or return from exception instruction
+lands the currently executing CPU to a *source* line.  When the original
+source is assembly language and source-level debugging information is provided
+for the current and calling subroutine, ``out`` and ``outs`` generally
+behave the same.  But when layers of functions or subroutines *without*
+source-level information exist between the current instruction and the
+most recent calling instruction *with* source-level information, ``outs``
+will skip over those "non source-level information" layers until it lands on
+calling code with source-level information.
+
+If the current line returns from a recursive function, ``outs`` will stop
+at the same line, but in the prior call frame.  It will appear as if
+no stepping occurred, but the stack register will indicate a return
+has occurred.
+
+Examples:
+
+``outs``
+    Steps until a subroutine or exception handler returns to code with
+    source-level information.
 
 Back to :ref:`debugger-execution-list`
 

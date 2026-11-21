@@ -44,4 +44,6 @@ jobs:
           mame
           chdman
           unidasm
+          libmame_srcdbg_shared.dylib
+          libmame_srcdbg_static.a
         if-no-files-found: error

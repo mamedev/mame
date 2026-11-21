@@ -115,6 +115,8 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/debugger/osx/registerpointsview.h",
 		MAME_DIR .. "src/osd/modules/debugger/osx/registersview.mm",
 		MAME_DIR .. "src/osd/modules/debugger/osx/registersview.h",
+		MAME_DIR .. "src/osd/modules/debugger/osx/srcdebugview.mm",
+		MAME_DIR .. "src/osd/modules/debugger/osx/srcdebugview.h",
 		MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.mm",
 		MAME_DIR .. "src/osd/modules/debugger/osx/watchpointsview.h",
 		MAME_DIR .. "src/osd/modules/debugger/osx/debugosx.h",

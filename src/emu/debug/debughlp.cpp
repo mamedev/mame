@@ -48,6 +48,7 @@ const help_item f_static_help_list[] =
 		"  Registerpoints\n"
 		"  Exceptionpoints\n"
 		"  Expressions\n"
+		"  Sourcedebugging\n"
 		"  Comments\n"
 		"  Cheats\n"
 		"  Image\n"
@@ -137,8 +138,11 @@ const help_item f_static_help_list[] =
 		"Type help <command> for further details on each command\n"
 		"\n"
 		"  s[tep] [<count>=1] -- single steps for <count> instructions (F11)\n"
+		"  st[ep]s -- single steps until the next source line (F11)\n"
 		"  o[ver] [<count>=1] -- single steps over <count> instructions (F10)\n"
+		"  o[ver]s -- single steps over until the next source line (F10)\n"
 		"  out -- single steps until the current subroutine/exception handler is exited (Shift-F11)\n"
+		"  outs -- single steps until the current subroutine/exception handler exits to the next source line (Shift-F11)\n"
 		"  g[o] [<address>] -- resumes execution, sets temp breakpoint at <address> (F5)\n"
 		"  gbf [<condition>] -- resumes execution until next false branch\n"
 		"  gbt [<condition>] -- resumes execution until next true branch\n"
@@ -250,6 +254,20 @@ const help_item f_static_help_list[] =
 		"As such, dw@300 refers to data memory word at address 300 and id@400 refers to an I/O memory "
 		"dword at address 400.\n"
 
+	},
+	{
+		"sourcedebugging",
+		"\n"
+		"Source-level debugging commands\n"
+		"Type help <command> for further details on each command\n"
+		"\n"
+		"  s[tep]s -- single steps until the next source line (F11)\n"
+		"  o[ver]s -- single steps over until the next source line (F10)\n"
+		"  outs -- single steps until the current subroutine/exception handler exits to the next source line (Shift-F11)\n"
+		"  sdoffset <offset> -- sets the address offset to be used when source-level debugging relocated code\n"
+		"  sdlist -- lists all source-level debugging information files loaded on startup, to aid with programs that use bank switching.\n"
+		"  sdenable <sdnum> -- enables the source-level debugging information file; useful when its corresponding code is mapped into memory.\n"
+		"  sddisable <sdnum> -- disables the source-level debugging information file; useful when its corresponding code is unmapped from memory.\n"
 	},
 	{
 		"comments",
@@ -902,6 +920,33 @@ const help_item f_static_help_list[] =
 		"  Steps forward four instructions on the current CPU.\n"
 	},
 	{
+		"steps",
+		"\n"
+		"  st[ep]s\n"
+		"\n"
+		"When source-level debugging is enabled via -src_debug_info, this single-steps "
+		"one source line on the currently executing CPU.  When the original "
+		"source is assembly language, step and steps generally behave the same. "
+		"But when the original source is in a higher level language like C or BASIC, "
+		"steps results in executing the remainder of a block of instructions "
+		"associated with the current source line.\n"
+		"\n"
+		"If the current source line is a "
+		"call instruction, steps stops at the first source line in the called "
+		"function, but only if the called function has source associated with it. "
+		"If neither the called function nor any of its callees have source associated "
+		"with them, steps will continue execution until the call is complete, and "
+		"the first instruction with source associated with it is encountered.\n"
+		"\n"
+		"Examples:\n"
+		"\n"
+		"steps\n"
+		"  Steps forward to the next source line on the current CPU.\n"
+		"\n"
+		"sts\n"
+		"  Steps forward to the next source line on the current CPU.\n"
+	},
+	{
 		"over",
 		"\n"
 		"  o[ver] [<count>=1]\n"
@@ -925,6 +970,26 @@ const help_item f_static_help_list[] =
 		"  Steps forward over four instructions on the current CPU.\n"
 	},
 	{
+		"overs",
+		"\n"
+		"  o[ver]s\n"
+		"\n"
+		"When source-level debugging is enabled via -src_debug_info, this steps forward "
+		"over one source line on the currently executing CPU.  When the original "
+		"source is assembly language, over and overs generally behave the same. "
+		"But when the original source is in a higher level language like C or BASIC, "
+		"overs results in executing the remainder of a block of instructions "
+		"associated with the current source line. "
+		"\n"
+		"Examples:\n"
+		"\n"
+		"overs\n"
+		"  Steps forward over the next source line on the current CPU.\n"
+		"\n"
+		"os\n"
+		"  Steps forward over the next source line on the current CPU.\n"
+	},
+	{
 		"out",
 		"\n"
 		"  out\n"
@@ -941,6 +1006,33 @@ const help_item f_static_help_list[] =
 		"\n"
 		"out\n"
 		"  Steps until the current subroutine or exception handler returns.\n"
+	},
+	{
+		"outs",
+		"\n"
+		"  outs\n"
+		"\n"
+		"When source-level debugging is enabled via -src_debug_info, this single-steps "
+		"until the next return from subroutine or return from exception instruction "
+		"lands the currently executing CPU to a source line.  When the original "
+		"source is assembly language and source-level debugging information is provided "
+		"for the current and calling subroutine, out and outs generally "
+		"behave the same.  But when layers of functions or subroutines without "
+		"source-level information exist between the current instruction and the "
+		"most recent calling instruction with source-level information, outs "
+		"will skip over those \"non source-level information\" layers until it lands on "
+		"calling code with source-level information.\n"
+		"\n"
+		"If the current line returns from a recursive function, outs will stop "
+		"at the same line, but in the prior call frame.  It will appear as if "
+		"no stepping occurred, but the stack register will indicate a return "
+		"has occurred.\n"
+		"\n"
+		"Example:\n"
+		"\n"
+		"outs\n"
+		"  Steps until a subroutine or exception handler returns to code with "
+		"  source-level information.\n"
 	},
 	{
 		"go",
@@ -1741,6 +1833,70 @@ const help_item f_static_help_list[] =
 		"\n"
 		"memdump mylog.log,1\n"
 		"  Dumps memory maps for the CPU 1 and all its child devices to the file mylog.log.\n"
+	},
+	{
+		"sdoffset",
+		"\n"
+		"  sdoffset <offset>\n"
+		"\n"
+		"When source-level debugging is enabled via -src_debug_info, this "
+		"sets the address offset to be used when source-level debugging relocated code.\n"
+		"\n"
+		"Example:\n"
+		"\n"
+		"sdoffset E000\n"
+		"  Apply an offset of $E000 to all addresses present in the source-level debugging information File.\n"
+	},
+	{
+		"sdlist",
+		"\n"
+		"  sdlist\n"
+		"\n"
+		"When source-level debugging is enabled via -src_debug_info, this "
+		"lists all source-level debugging information files loaded on startup, along "
+		"with their indices, to aid with programs that use bank switching.\n"
+		"\n"
+		"Example:\n"
+		"\n"
+		"sdlist\n"
+	},
+	{
+		"sdenable",
+		"\n"
+		"  sdenable <sdnum>\n"
+		"\n"
+		"When source-level debugging is enabled via -src_debug_info, this "
+		"enables the source-level debugging information file with the specified index. "
+		"This is useful when debugging a "
+		"program that uses bank switching, and the program has mapped "
+		"code into memory that corresponds to the specified source-level "
+		"debugging information file.  Note that this command has no effect on any "
+		"breakpoints or watchpoints currently set.\n"
+		"\n"
+		"Example:\n"
+		"\n"
+		"sdenable 3\n"
+		"  Enables source-level debugging information file with index 3 as shown "
+		"in the output from the sdlist command.\n"
+	},
+	{
+		"sddisable",
+		"\n"
+		"  sddisable <sdnum>\n"
+		"\n"
+		"When source-level debugging is enabled via -src_debug_info, this "
+		"disables the source-level debugging information file with the specified index. "
+		"This is useful when debugging a "
+		"program that uses bank switching, and the program has unmapped "
+		"code from memory that corresponds to the specified source-level "
+		"debugging information file.  Note that this command has no effect on any "
+		"breakpoints or watchpoints currently set.\n"
+		"\n"
+		"Example:\n"
+		"\n"
+		"sddisable 0\n"
+		"  Disables source-level debugging information file with index 0 as shown "
+		"in the output from the sdlist command.\n"
 	},
 	{
 		"comlist",
