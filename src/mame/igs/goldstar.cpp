@@ -8930,6 +8930,9 @@ static INPUT_PORTS_START( pkrmastc )
 	PORT_DIPNAME( 0x02, 0x00, "Reels Roll" )      PORT_DIPLOCATION("DSW1:2")  // Default to Long so the reels spin normally.
 	PORT_DIPSETTING(    0x02, "Short" )
 	PORT_DIPSETTING(    0x00, "Long" )
+	PORT_DIPNAME( 0x10, 0x10, "Double Up Game Payout Rate" ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPSETTING(    0x10, "70%" )
+	PORT_DIPSETTING(    0x00, "80%" )
 
 INPUT_PORTS_END
 
