@@ -183,6 +183,7 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		m_setaddr(nullptr),
 		m_cru(nullptr),
 		m_external_operation(*this),
+		m_cru_read_strobe(*this),
 		m_clock_out_line(*this),
 		m_holda_line(*this)
 {
@@ -204,6 +205,7 @@ void tms9995_device::device_start()
 	m_prgspace = &space(AS_PROGRAM);
 	m_setaddr = has_space(AS_SETADDRESS) ? &space(AS_SETADDRESS) : nullptr;
 	m_cru = &space(AS_IO);
+	m_cru_timer = timer_alloc(FUNC(tms9995_device::sample_cru_input), this);
 
 	// set our instruction counter
 	set_icountptr(m_icount);
@@ -270,6 +272,26 @@ void tms9995_device::device_start()
 	save_item(NAME(m_auto_wait));
 	save_item(NAME(m_icount));
 	save_item(NAME(m_mem_phase));
+	save_item(NAME(m_word_tail_delay));
+	save_item(NAME(m_word_high_start));
+	save_item(NAME(m_reset_bus_address));
+	save_item(NAME(m_reset_bus_lines));
+	save_item(NAME(m_write_pending));
+	save_item(NAME(m_write_address));
+	save_item(NAME(m_write_data));
+	save_item(NAME(m_write_sample));
+	save_item(NAME(m_reset_edge_pending));
+	save_item(NAME(m_reset_edge_asserted));
+	save_item(NAME(m_reset_edge_ready));
+	save_item(NAME(m_reset_edge_time));
+	save_item(NAME(m_ready_fall));
+	save_item(NAME(m_ready_deferred_fall));
+	save_item(NAME(m_ready_before_late_edge));
+	save_item(NAME(m_ready_sample_auto));
+	save_item(NAME(m_cru_sample_address));
+	save_item(NAME(m_cru_sample_last));
+	save_item(NAME(m_cru_early_high));
+	save_item(NAME(m_cru_sample_bit));
 	save_item(NAME(m_iaq));
 	save_item(NAME(m_check_ready));
 	save_item(NAME(m_check_hold));
@@ -1415,12 +1437,190 @@ void tms9995_device::device_reset()
 void tms9995_device::reset_line(int state)
 {
 	const bool asserted = state == ASSERT_LINE;
+	const attotime now = machine().time();
+	if (m_reset_edge_pending)
+	{
+		if (asserted == m_reset_edge_asserted)
+			return;
+		// A board's synchronous soft reset can assert and release at one
+		// scheduler timestamp. Preserve both transitions and the READY latch.
+		m_reset_edge_pending = false;
+		apply_reset_edge(m_reset_edge_asserted, m_reset_edge_ready, m_reset_edge_time);
+		apply_reset_edge(asserted, m_ready_bufd, now);
+		return;
+	}
 	if (asserted == m_reset_asserted)
 		return;
+	const attotime start = local_time();
+	if (!executing() && now > start && now < start + clocks_to_attotime(4))
+	{
+		// A timer can run between the two CLKOUT edges before the scheduler
+		// gives this CPU the enclosing whole cycle. Let that cycle start
+		// its bus operation before RESET interrupts it.
+		m_reset_edge_time = now;
+		m_reset_edge_asserted = asserted;
+		m_reset_edge_ready = m_ready_bufd;
+		m_reset_edge_pending = true;
+		return;
+	}
+	apply_reset_edge(asserted, m_ready_bufd, now);
+}
 
+// The address/byte sequencer and the read and write strobes drain separately.
+// These are pin notifications. No instruction is retired while RESET is held.
+void tms9995_device::latch_reset_bus(bool ready, attotime when)
+{
+	const reset_cycle idle{0, 0};
+	auto read = [](uint16_t a) -> reset_cycle { return {a, RESET_DBIN}; };
+	auto write = [](uint16_t a) -> reset_cycle { return {a, RESET_WE}; };
+	auto external = [this](uint16_t a) { return !is_onchip(a) && ((a & 0xfffe) != 0xfffa || m_mp9537); };
+	auto put = [this](int slot, reset_cycle c) {
+		m_reset_bus_address[slot] = c.address;
+		m_reset_bus_lines[slot] = c.lines;
+	};
+	auto next_pair = [&](reset_cycle first, reset_cycle second) {
+		put(0, first);
+		if (first.lines && external(first.address))
+			second.address = first.address | (m_auto_wait ? 0 : 1);
+		put(1, second);
+	};
+	auto finish_word = [&](uint16_t address, uint8_t direction, reset_cycle next, reset_cycle following) {
+		if (external(address) && m_mem_phase <= 2)
+		{
+			const uint16_t low = address | 1;
+			if (!m_auto_wait || m_mem_phase == 2)
+				put(0, {low, direction});
+			if (m_auto_wait)
+				next.address = low;
+			put(1, next);
+		}
+		else if (external(address) && m_auto_wait && m_mem_phase == 3)
+			put(1, next);
+		else
+			next_pair(next, following);
+	};
+	auto first_operand = [&](uint16_t opcode) -> reset_cycle {
+		if ((opcode & 0xfff0) == 0x0600 || (opcode & 0xf030) == 0x8030)
+			return read(WP + 2 * (opcode & 15)); // DEC Rn, or C with autoincrement source
+		return idle;
+	};
+	auto branch_fetch = [&](uint16_t cmd, uint16_t opcode) -> reset_cycle {
+		return (cmd == JMP || cmd == JNE) ? read(jump_destination(cmd, opcode, PC)) : idle;
+	};
+
+	put(0, idle);
+	put(1, idle);
+	const auto prog = s_command[m_index].prog;
+	if (MPC >= 0 && prog == single_arithm_mp && m_command == DEC && (IR & 0x30) == 0)
+	{
+		const reset_cycle dest = write(WP + 2 * (IR & 15));
+		switch (prog[MPC])
+		{
+		case MEMORY_READ:
+			finish_word(m_address, RESET_DBIN, read(PC), dest);
+			return;
+		case PREFETCH:
+			finish_word(m_address, RESET_DBIN, dest, idle);
+			return;
+		case MEMORY_WRITE:
+			finish_word(m_address, RESET_WE, idle, branch_fetch(m_pre_command, m_pre_IR));
+			return;
+		default:
+			break;
+		}
+	}
+	if (MPC >= 0 && prog == sbo_sbz_mp)
+	{
+		const uint16_t bit_address = (m_cru_address & 0xfffe) | (m_cru_value & 1);
+		switch (prog[MPC])
+		{
+		case ALU_SBO_SBZ:
+			if (m_inst_state == 1)
+				put(1, read(WP + 24));
+			else
+				put(1, {bit_address, RESET_DBIN | RESET_WE});
+			return;
+		case ALU_NOP:
+			if (m_inst_state == 1)
+				put(0, read(WP + 24));
+			else if (prog[MPC + 1] == CRU_OUTPUT)
+			{
+				put(0, {bit_address, RESET_CRU});
+				put(1, read(PC));
+			}
+			return;
+		case CRU_OUTPUT:
+			put(0, read(PC));
+			return;
+		default:
+			break;
+		}
+	}
+	if (MPC >= 0 && prog == jump_mp)
+	{
+		if (prog[MPC] == ALU_NOP)
+		{
+			const bool following = prog[MPC + 1] == END;
+			const reset_cycle operand = following ? first_operand(m_pre_IR) : idle;
+			if (operand.lines)
+				next_pair(operand, read(PC));
+			else
+				put(following ? 1 : 0, following ? branch_fetch(m_pre_command, m_pre_IR) : branch_fetch(m_command, IR));
+			return;
+		}
+		if (prog[MPC] == PREFETCH)
+		{
+			reset_cycle operand = idle;
+			if (!external(m_address))
+				operand = first_operand(m_current_value);
+			else if (m_mem_phase == (m_auto_wait ? 4 : 3) &&
+					((m_current_value & 0xff00) == 0x0600 || (m_current_value & 0xf000) == 0x8000))
+			{
+				// The low opcode byte is on the pins; sample it without an
+				// architectural read or side effects in a mapped peripheral.
+				auto guard = machine().disable_side_effects();
+				operand = first_operand((m_current_value & 0xff00) | m_prgspace->read_byte(m_address | 1));
+			}
+			finish_word(m_address, RESET_DBIN, idle, operand);
+			return;
+		}
+	}
+	// Other measured microprograms can leave the low byte of the current
+	// external word on the bus, including a repeated strobe in automatic wait.
+	if (m_word_tail_delay >= 0 && ready)
+	{
+		const int slot = m_word_tail_delay > 1 ? 1 : 0;
+		put(slot, read(m_address | 1));
+		const attotime elapsed = when - m_word_high_start;
+		if (!slot && m_auto_wait && elapsed >= clocks_to_attotime(4) && elapsed < clocks_to_attotime(8))
+			put(1, read(m_address | 1));
+	}
+}
+
+void tms9995_device::emit_reset_bus()
+{
+	const uint8_t lines = m_reset_bus_lines[0];
+	const uint16_t address = m_reset_bus_address[0];
+	m_reset_bus_lines[0] = m_reset_bus_lines[1];
+	m_reset_bus_address[0] = m_reset_bus_address[1];
+	m_reset_bus_lines[1] = 0;
+	if (m_setaddr && (lines & RESET_DBIN))
+		m_setaddr->write_byte(address, TMS99xx_BUS_DBIN);
+	if (m_setaddr && (lines & RESET_WE))
+		m_setaddr->write_byte(address, TMS99xx_BUS_WRITE);
+	if (lines & RESET_CRU)
+		m_cru->write_byte(address & 0xfffe, address & 1);
+}
+
+void tms9995_device::apply_reset_edge(bool asserted, bool ready, attotime when)
+{
 	m_reset_asserted = asserted;
 	if (asserted)
 	{
+		latch_reset_bus(ready, when);
+		if (m_write_pending && when < m_write_sample)
+			m_write_pending = false;
+		m_cru_timer->adjust(attotime::never);
 		// RESET allows the active two-clock IDLE sequence to issue its last
 		// strobe on its normal cadence. The HOLD check is set in the strobe
 		// phase and cleared in the intervening poll phase.
@@ -1438,8 +1638,10 @@ void tms9995_device::reset_line(int state)
 	else
 	{
 		m_idle_reset_clocks = 0;
+		m_reset_bus_lines[0] = m_reset_bus_lines[1] = 0;
+		m_word_tail_delay = -1;
 		// A fixed reset level applies only to this latch. Bus cycles still sample the live READY input.
-		m_auto_wait = m_auto_wait_on_reset.value_or(m_ready_bufd);
+		m_auto_wait = m_auto_wait_on_reset.value_or(ready);
 		m_reset = true;
 		LOGMASKED(LOG_READY, "RESET released, automatic wait = %d\n", m_auto_wait);
 	}
@@ -1452,6 +1654,8 @@ void tms9995_device::pulse_clock(int count, bool hold_cycle)
 {
 	for (int i=0; i < count; i++)
 	{
+		if (m_reset_asserted)
+			emit_reset_bus();
 		if (!m_clock_out_line.isunset()) m_clock_out_line(ASSERT_LINE);
 		m_hold_sampled = m_hold_requested;
 		if (hold_cycle && !m_hold_state)
@@ -1461,8 +1665,22 @@ void tms9995_device::pulse_clock(int count, bool hold_cycle)
 		m_int4_samples = ((m_int4_samples << 1) | (!m_flag[0] && (m_int4_active || m_flag[4]))) & 7;
 		// Keep the physical pin history even while this input is routed to INT4.
 		m_ec_samples = ((m_ec_samples << 1) | m_int4_active) & 7;
-		m_ready = m_ready_bufd && !m_request_auto_wait_state;                // get the latched READY state
 		if (!m_clock_out_line.isunset()) m_clock_out_line(CLEAR_LINE);
+		if (m_reset_edge_pending)
+		{
+			m_reset_edge_pending = false;
+			apply_reset_edge(m_reset_edge_asserted, m_reset_edge_ready, m_reset_edge_time);
+		}
+		if (m_write_pending)
+		{
+			m_write_pending = false;
+			m_prgspace->write_byte(m_write_address, m_write_data);
+		}
+		m_ready_fall = local_time() + clocks_to_attotime(2);
+		m_ready_sample_auto = m_request_auto_wait_state;
+		m_ready = !m_ready_sample_auto && (m_ready_fall == m_ready_deferred_fall ? m_ready_before_late_edge : m_ready_bufd);
+		if (m_word_tail_delay > 0)
+			--m_word_tail_delay;
 		// Release HOLDA on this falling edge. The next bus cycle can start at
 		// the following rising edge, after the sampled HOLD request clears.
 		if (m_hold_state && !m_hold_sampled)
@@ -1502,6 +1720,17 @@ void tms9995_device::ready_line(int state)
 	const bool newready = state == ASSERT_LINE;
 	if (newready != m_ready_bufd)
 	{
+		// A scheduler callback can be on either side of the CPU's current
+		// whole CLKOUT cycle. Preserve the pin at the falling edge in both cases.
+		const attotime now = machine().time();
+		const attotime fall = local_time() + clocks_to_attotime(2);
+		if (now > fall && m_ready_deferred_fall != fall)
+		{
+			m_ready_before_late_edge = m_ready_bufd;
+			m_ready_deferred_fall = fall;
+		}
+		if (m_ready_fall != attotime::never && now <= m_ready_fall && now > m_ready_fall - clocks_to_attotime(4))
+			m_ready = newready && !m_ready_sample_auto;
 		m_ready_bufd = newready;
 		LOGMASKED(LOG_READY, "set READY = %d\n", m_ready_bufd);
 	}
@@ -1954,6 +2183,9 @@ void tms9995_device::mem_read()
 			}
 			else m_pass = 2;
 
+			m_word_tail_delay = (m_word_access || !m_byteop) ? 1 + int(m_auto_wait) : -1;
+			if (m_word_tail_delay >= 0)
+				m_word_high_start = local_time();
 			m_check_hold = false;
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & 0xfffe);
 			if (m_setaddr)
@@ -1969,6 +2201,7 @@ void tms9995_device::mem_read()
 			m_current_value = (value << 8) & 0xff00;
 			break;
 		case 3:
+			m_word_tail_delay = -1;
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
 			if (m_setaddr)
@@ -2026,6 +2259,20 @@ inline void tms9995_device::word_read()
 
     Make sure that m_lowbyte is false on the first call.
 */
+// A board can see /WE before the data byte is accepted. Preserve that
+// distinction if RESET reaches the CPU before the falling CLKOUT edge.
+void tms9995_device::external_write_cycle(uint16_t address, uint8_t data)
+{
+	m_write_address = address;
+	m_write_data = data;
+	m_write_sample = local_time() + clocks_to_attotime(2);
+	m_write_pending = true;
+	if (m_setaddr)
+		m_setaddr->write_byte(address, TMS99xx_BUS_WRITE);
+	m_request_auto_wait_state = m_auto_wait;
+	pulse_clock(1);
+}
+
 void tms9995_device::mem_write()
 {
 	if ((m_address & 0xfffe)==0xfffa && !m_mp9537)
@@ -2095,13 +2342,7 @@ void tms9995_device::mem_write()
 			else m_pass = 2;
 
 			m_check_hold = false;
-			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", address);
-			if (m_setaddr)
-				m_setaddr->write_byte(address, TMS99xx_BUS_WRITE);
-			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
-			m_prgspace->write_byte(address, (m_current_value >> 8)&0xff);
-			m_request_auto_wait_state = m_auto_wait;
-			pulse_clock(1);
+			external_write_cycle(address, m_current_value >> 8);
 			break;
 
 		case 2:
@@ -2109,13 +2350,7 @@ void tms9995_device::mem_write()
 			break;
 		case 3:
 			// Set address + 1 (unless byte command)
-			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
-			if (m_setaddr)
-				m_setaddr->write_byte(m_address | 1, TMS99xx_BUS_WRITE);
-			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
-			m_prgspace->write_byte(m_address | 1, m_current_value & 0xff);
-			m_request_auto_wait_state = m_auto_wait;
-			pulse_clock(1);
+			external_write_cycle(m_address | 1, m_current_value & 0xff);
 			break;
 		case 4:
 			// no action here, just wait for READY
@@ -2271,46 +2506,63 @@ void tms9995_device::cru_input_operation()
 		m_pass = m_count;
 	}
 
-	// Read a single CRU bit
-	bool crubit = BIT(m_cru->read_byte(m_cru_address & CRUREADMASK), 0);
-	m_cru_value = (m_cru_value >> 1) & 0x7fff;
-
-	// During internal reading, the CRUIN line will be ignored. We emulate this
-	// by overwriting the bit which we got from outside. Also, READY is ignored.
-	if (m_cru_address == 0x1fda)
+	m_cru_sample_address = m_cru_address & CRUREADMASK;
+	m_cru_sample_last = m_pass == 1;
+	if (!m_cru_read_strobe.isunset())
+		m_cru_read_strobe(m_cru_sample_address);
+	const bool mid = m_cru_address == 0x1fda;
+	const bool internal = mid || (m_cru_address & 0xffe0) == 0x1ee0;
+	m_check_ready = !internal;
+	if (internal)
 	{
-		crubit = m_mid_flag;
-		m_check_ready = false;
+		m_cru->read_byte(m_cru_sample_address);
+		shift_cru_input(mid ? m_mid_flag : m_flag[(m_cru_address >> 1) & 15]);
 	}
 	else
 	{
-		if ((m_cru_address & 0xffe0)==0x1ee0)
+		m_cru_early_high = false;
+		// B05 at 8 MHz bounds the two thresholds. These are representative
+		// digital cutoffs, not guaranteed setup times for other chips.
+		m_cru_timer->adjust(std::max(attotime::zero, clocks_to_attotime(2) - attotime::from_nsec(31)), m_command == TB ? TB_EARLY : STCR_SAMPLE);
+	}
+	m_cru_address = (m_cru_address + 2) & 0xfffe;
+	pulse_clock(m_command == STCR ? 2 : 1);
+}
+
+void tms9995_device::sample_cru_input(int32_t phase)
+{
+	if (phase == TB_EARLY || phase == TB_LATE || phase == STCR_SAMPLE)
+	{
+		// Sampling the level must not acknowledge the peripheral. Only the
+		// qualified end of the strobe performs the mapped read with side effects.
+		auto const guard = machine().disable_side_effects();
+		const bool high = BIT(m_cru->read_byte(m_cru_sample_address), 0);
+		if (phase == TB_EARLY)
 		{
-			crubit = m_flag[(m_cru_address>>1)&0x000f];
-			m_check_ready = false;
+			m_cru_early_high = high;
+			m_cru_timer->adjust(attotime::from_nsec(6), TB_LATE);
 		}
 		else
 		{
-			m_check_ready = true;
+			m_cru_sample_bit = high || (phase == TB_LATE && m_cru_early_high);
+			m_cru_timer->adjust(attotime::from_nsec(phase == TB_LATE ? 25 : 31), phase == TB_LATE ? TB_ACCEPT : STCR_ACCEPT);
 		}
+		return;
 	}
-
-	LOGMASKED(LOG_CRU, "CRU input operation, address %04x, value %d\n", m_cru_address, crubit ? 1 : 0);
-
-	if (crubit)
-		m_cru_value |= 0x8000;
-
-	m_cru_address = (m_cru_address + 2) & 0xfffe;
-
-	if (m_pass == 1)
+	if (!m_ready_bufd)
 	{
-		// This is the final shift. For both byte and word length transfers,
-		// the first bit is always m_cru_value & 0x0001.
-		m_cru_value >>= (16 - m_count);
+		m_cru_timer->adjust(clocks_to_attotime(4) - attotime::from_nsec(31), phase == TB_ACCEPT ? TB_EARLY : STCR_SAMPLE);
+		return;
 	}
-	// TB prefetches one clock after the strobe, including for on-chip CRU flags.
-	// STCR uses two clocks per bit even when its transfer count is one.
-	pulse_clock(m_command == STCR ? 2 : 1);
+	m_cru->read_byte(m_cru_sample_address);
+	shift_cru_input(m_cru_sample_bit);
+}
+
+void tms9995_device::shift_cru_input(bool bit)
+{
+	m_cru_value = (m_cru_value >> 1) | (bit ? 0x8000 : 0);
+	if (m_cru_sample_last)
+		m_cru_value >>= 16 - m_count;
 }
 
 /*
@@ -2880,10 +3132,13 @@ void tms9995_device::alu_imm_arithm()
 */
 void tms9995_device::alu_jump()
 {
-	bool cond = false;
-	int8_t displacement = (IR & 0xff);
+	PC = jump_destination(m_command, IR, PC);
+}
 
-	switch (m_command)
+uint16_t tms9995_device::jump_destination(uint16_t command, uint16_t opcode, uint16_t base) const
+{
+	bool cond = false;
+	switch (command)
 	{
 	case JMP:
 		cond = true;
@@ -2926,15 +3181,7 @@ void tms9995_device::alu_jump()
 		break;
 	}
 
-	if (!cond)
-	{
-		LOGMASKED(LOG_DETAIL, "Jump condition false\n");
-	}
-	else
-	{
-		LOGMASKED(LOG_DETAIL, "Jump condition true\n");
-		PC = (PC + (displacement<<1)) & 0xfffe;
-	}
+	return cond ? (base + 2 * int8_t(opcode)) & 0xfffe : base;
 }
 
 /*

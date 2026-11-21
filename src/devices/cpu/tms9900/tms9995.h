@@ -51,6 +51,8 @@ public:
 	// Callbacks
 	auto extop_cb() { return m_external_operation.bind(); }
 	auto clkout_cb() { return m_clock_out_line.bind(); }
+	// Address on the CRU read strobe, before the input bit is sampled.
+	auto cru_read_strobe_cb() { return m_cru_read_strobe.bind(); }
 	auto holda_cb() { return m_holda_line.bind(); }
 
 	// For debugger access
@@ -134,6 +136,10 @@ private:
 	bool    m_ready;        // sampled value
 
 	// Auto-wait state generation
+	attotime m_ready_fall = attotime::never;
+	attotime m_ready_deferred_fall = attotime::never;
+	bool    m_ready_before_late_edge = true;
+	bool    m_ready_sample_auto = false;
 	bool    m_request_auto_wait_state;
 	std::optional<bool> m_auto_wait_on_reset;
 	bool    m_auto_wait;
@@ -143,6 +149,25 @@ private:
 
 	// Phase of the memory access
 	int     m_mem_phase;
+	int     m_word_tail_delay = -1; // clocks until an in-flight external word presents its low byte
+	attotime m_word_high_start = attotime::never;
+	enum : uint8_t
+	{
+		RESET_DBIN = 1,
+		RESET_WE = 2,
+		RESET_CRU = 4
+	};
+	struct reset_cycle
+	{
+		uint16_t address;
+		uint8_t  lines;
+	};
+	uint16_t m_reset_bus_address[2]{};
+	uint8_t m_reset_bus_lines[2]{};
+	bool    m_write_pending = false;
+	uint16_t m_write_address = 0;
+	uint8_t m_write_data = 0;
+	attotime m_write_sample = attotime::never;
 
 	// Check the READY line?
 	bool    m_check_ready;
@@ -175,6 +200,14 @@ private:
 
 	bool    m_reset;            // released, vector service pending
 	bool    m_reset_asserted;   // /RESET pin held low
+	bool    m_reset_edge_pending = false;
+	bool    m_reset_edge_asserted = false;
+	bool    m_reset_edge_ready = false;
+	attotime m_reset_edge_time = attotime::never;
+	void apply_reset_edge(bool asserted, bool ready, attotime when);
+	void latch_reset_bus(bool ready, attotime when);
+	void emit_reset_bus();
+	void external_write_cycle(uint16_t address, uint8_t data);
 	uint8_t m_idle_reset_clocks; // remaining clocks to the final IDLE control strobe
 	bool    m_mid_flag;
 	bool    m_mid_active;
@@ -327,7 +360,7 @@ private:
 	int     m_operand_address_derivation_index;
 
 	// Micro-operation program counter (as opposed to the program counter PC)
-	int     MPC;
+	int     MPC = -1;
 
 	// Calling microprogram (used when data derivation is called)
 	int     m_caller_index;
@@ -359,6 +392,21 @@ private:
 	void return_with_address();
 	void return_with_address_copy();
 	void cru_input_operation();
+	void sample_cru_input(int32_t phase);
+	void shift_cru_input(bool bit);
+	emu_timer *m_cru_timer = nullptr;
+	uint16_t m_cru_sample_address = 0;
+	bool    m_cru_sample_last = false;
+	bool    m_cru_early_high = false;
+	enum cru_sample_phase
+	{
+		STCR_SAMPLE,
+		TB_EARLY,
+		TB_LATE,
+		STCR_ACCEPT,
+		TB_ACCEPT
+	};
+	bool    m_cru_sample_bit = false;
 	void cru_output_operation();
 	void command_completed();
 	void next_command();
@@ -379,6 +427,7 @@ private:
 	void alu_f3();
 	void alu_imm_arithm();
 	void alu_jump();
+	uint16_t jump_destination(uint16_t command, uint16_t opcode, uint16_t base) const;
 	void alu_ldcr();
 	void alu_li();
 	void alu_limi_lwpi();
@@ -415,6 +464,7 @@ private:
 	// is not that simple to emulate. For the sake of homogeneity between the
 	// chip emulations we use a dedicated callback.
 	devcb_write8   m_external_operation;
+	devcb_write16  m_cru_read_strobe;
 
 	// Clock output.
 	devcb_write_line   m_clock_out_line;
