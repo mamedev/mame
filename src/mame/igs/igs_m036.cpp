@@ -1688,7 +1688,7 @@ ROM_END
 ROM_START( lhzbgqb )
 	ROM_REGION( 0x04000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "lhzbgqb_igs036", 0x00000, 0x4000, NO_DUMP )
+	ROM_LOAD( "lhzbgqb_igs036.bin", 0x00000, 0x4000, CRC(f38af294) SHA1(a6f3c185ffccec48b8997357d3847c86c95da83d) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "v-105cn.u11", 0x000000, 0x200000, CRC(cecbb560) SHA1(262d7df19b57e57aa50cc241ddc25090411d6b74) )
@@ -2159,6 +2159,8 @@ GAME( 2010, lhzb3in1,     0,       m036_tt_boot,  lhtb,     m036_tt_state,      
 
 GAME( 2010, lhfy,         0,       m036_hd,       lhfy,     m036_hd_state,       empty_init,      ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NOT_WORKING )
 
+GAME( 2010, lhzbgqb,         0,    m036_hd,       lhfy,     m036_hd_state,       empty_init,      ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+
 GAME( 2010, hlddz,        0,       m036_hd,       ddz_hd,   m036_hd_state,       empty_init,      ROT0, "IGS",           "Huanle Dou Dizhu (V104CN)", MACHINE_NOT_WORKING )
 
 GAME( 2010, zjddz,        0,       m036_hd,       ddz_hd,   m036_hd_state,       empty_init,      ROT0, "IGS",           "Zhongji Dou Dizhu (V204CN)", MACHINE_NOT_WORKING )
@@ -2174,8 +2176,6 @@ GAME( 201?, hlqqq,        0,       m036_hd,       ddz_hd,   m036_hd_state,      
 GAME( 200?, super70s,     0,       m036_tt, m036, m036_state, init_m036,          ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 200?, igsm312,      0,       m036_tt, m036, m036_state, init_key<m312cn_key>,   ROT0, "IGS",           "unknown 'IGS 6POKER2' game (V312CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING ) // there's very little code and no gfx ROMs, might be a 'set/clear' chip for a gambling game.
-
-GAME( 2010, lhzbgqb,      0,       m036_tt, m036, m036_state, init_key<lhzbgqb_key>,  ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 201?, xcjnh,        0,       m036_tt, m036, m036_state, init_key<xcjnh_key>,    ROT0, "IGS",           "Xiaochou Jianianhua (S100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
