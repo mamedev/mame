@@ -1132,11 +1132,9 @@ void geneve_state::machine_reset()
 	m_int2 = CLEAR_LINE;    // flag reflecting the INT2 line
 	m_keyint = CLEAR_LINE;
 
-	// READY=ASSERT; RESET -> no additional wait states
-	// READY=CLEAR; RESET -> create wait state in every memory cycle
-	m_cpu->ready_line(ASSERT_LINE);
 	m_cpu->hold_line(CLEAR_LINE);
-	m_cpu->reset_line(ASSERT_LINE);
+	// geneve_common() selects zero automatic waits. The PAL drives READY once clocks resume.
+	m_cpu->ready_line(ASSERT_LINE);
 
 	m_joyport->write_port(0x01);    // select Joystick 1
 
@@ -1202,6 +1200,8 @@ void geneve_state::geneve_common(machine_config &config)
 	// basic machine hardware
 	// TMS9995 CPU @ 12.0 MHz
 	TMS9995(config, m_cpu, 12000000);
+	// Let the PAL generate the bus wait states via READY.
+	m_cpu->set_auto_wait_on_reset(false);
 	m_cpu->set_addrmap(AS_PROGRAM, &geneve_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &geneve_state::crumap);
 	m_cpu->set_addrmap(tms9995_device::AS_SETADDRESS, &geneve_state::memmap_setaddress);

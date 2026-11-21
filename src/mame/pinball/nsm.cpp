@@ -412,15 +412,15 @@ void nsm_state::machine_reset()
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
-	// Disable auto wait state generation by raising the READY line on reset
-	m_maincpu->ready_line(ASSERT_LINE);
-	m_maincpu->reset_line(ASSERT_LINE);
+	// The TMS9995 takes its reset wait mode from nsm().
 }
 
 void nsm_state::nsm(machine_config &config)
 {
 	// CPU TMS9995, standard variant; no line connection
 	TMS9995(config, m_maincpu, 11052000);
+	// Model READY low at /RESET release for zero automatic wait states.
+	m_maincpu->set_auto_wait_on_reset(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nsm_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &nsm_state::io_map);
 

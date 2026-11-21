@@ -246,15 +246,15 @@ void jpmmps_state::jpmmps_ic22_portc_w(uint8_t data)
 
 void jpmmps_state::machine_reset()
 {
-	// Disable auto wait state generation by raising the READY line on reset
-	m_maincpu->ready_line(ASSERT_LINE);
-	m_maincpu->reset_line(ASSERT_LINE);
+	// The TMS9995 latches the wait mode configured in jpmmps() when reset is released.
 }
 
 void jpmmps_state::jpmmps(machine_config &config)
 {
 	// CPU TMS9995, standard variant; no line connections
 	TMS9995(config, m_maincpu, MAIN_CLOCK);
+	// Model READY low at /RESET release for zero automatic wait states.
+	m_maincpu->set_auto_wait_on_reset(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &jpmmps_state::jpmmps_map);
 	m_maincpu->set_addrmap(AS_IO, &jpmmps_state::jpmmps_io_map);
 

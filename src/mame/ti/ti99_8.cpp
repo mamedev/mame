@@ -605,9 +605,10 @@ void ti99_8_state::console_reset(int state)
 		m_mainboard->crus_in(true); // assert
 		m_mainboard->ptgen_in(true); // clear
 
-		// Setting ready to false so that automatic wait states are enabled
-		m_cpu->ready_line(CLEAR_LINE);
-		m_cpu->reset_line(ASSERT_LINE);
+		// READY high at reset release enables automatic wait states
+		if (state == CLEAR_LINE)
+			m_cpu->ready_line(ASSERT_LINE);
+		m_cpu->reset_line(state);
 
 		// Send RESET to the IOPort
 		m_ioport->reset_in(state);
@@ -664,10 +665,6 @@ void ti99_8_state::machine_reset()
 {
 	m_cpu->hold_line(CLEAR_LINE);
 
-	// Pulling down the line on RESET configures the CPU to insert one wait
-	// state on external memory accesses
-	//  m_cpu->ready_line(ASSERT_LINE);
-
 	// m_gromport->set_grom_base(0x9800, 0xfff1);
 
 	m_keyboard_column = 0;
@@ -675,6 +672,7 @@ void ti99_8_state::machine_reset()
 	// Clear INT1 and INT2 latch
 	m_int1 = CLEAR_LINE;
 	m_int2 = CLEAR_LINE;
+	// console_reset() drives READY at /RESET release for both machine and cartridge resets.
 	console_reset(ASSERT_LINE);
 	console_reset(CLEAR_LINE);
 }

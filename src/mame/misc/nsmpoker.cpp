@@ -414,9 +414,7 @@ GFXDECODE_END
 
 void nsmpoker_state::machine_reset()
 {
-	// Disable auto wait state generation by raising the READY line on reset
-	m_maincpu->ready_line(ASSERT_LINE);
-	m_maincpu->reset_line(ASSERT_LINE);
+	// The TMS9995 latches the wait mode configured in nsmpoker() when reset is released.
 }
 
 /*************************
@@ -427,6 +425,8 @@ void nsmpoker_state::nsmpoker(machine_config &config)
 {
 	// CPU TMS9995, standard variant; no line connections
 	TMS9995(config, m_maincpu, MASTER_CLOCK/2);
+	// Model READY low at /RESET release for zero automatic wait states.
+	m_maincpu->set_auto_wait_on_reset(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nsmpoker_state::nsmpoker_map);
 	m_maincpu->set_addrmap(AS_IO, &nsmpoker_state::nsmpoker_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(nsmpoker_state::nsmpoker_interrupt));

@@ -254,13 +254,8 @@ void ti99_2_state::machine_start()
 
 void ti99_2_state::machine_reset()
 {
+	// MAME calls tms9995_device::device_reset() before this handler.
 	m_otherbank = false;
-
-	// Configure CPU to insert 1 wait state for each external memory access
-	// by lowering the READY line on reset
-	// This has been verified with the real machine, running test loops.
-	m_maincpu->ready_line(CLEAR_LINE);
-	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 void ti99_2_state::rombank_set(int state)
@@ -463,6 +458,10 @@ void ti99_2_state::ti99_2(machine_config& config)
 	// Documents state that there is a divider by 2 for the clock rate
 	// Experiments with real consoles proved them wrong.
 	TMS9995(config, m_maincpu, XTAL(10'738'635));
+	// Configure CPU to insert 1 wait state for each external memory access
+	// with READY high at reset release.
+	// This has been verified with the real machine, running test loops.
+	m_maincpu->set_auto_wait_on_reset(true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &ti99_2_state::memmap);
 	m_maincpu->set_addrmap(AS_IO, &ti99_2_state::crumap);
 	m_maincpu->holda_cb().set(FUNC(ti99_2_state::holda));

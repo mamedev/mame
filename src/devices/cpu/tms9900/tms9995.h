@@ -14,6 +14,8 @@
 
 #include "tms99com.h"
 
+#include <optional>
+
 // device type definition
 DECLARE_DEVICE_TYPE(TMS9995, tms9995_device)
 DECLARE_DEVICE_TYPE(TMS9995_MP9537, tms9995_mp9537_device)
@@ -43,8 +45,7 @@ public:
 	// is acknowledged by the HOLDA output line.
 	void hold_line(int state);
 
-	// RESET input line. Unlike the standard set_input_line, this input method
-	// is synchronous and will immediately lead to a reset of the CPU.
+	// Active-low /RESET: ASSERT_LINE holds reset; CLEAR_LINE latches the wait mode.
 	void reset_line(int state);
 
 	// Callbacks
@@ -58,12 +59,17 @@ public:
 	bool is_onchip(offs_t addrb) { return (((addrb & 0xff00)==0xf000 && (addrb < 0xf0fc)) || ((addrb & 0xfffc)==0xfffc)) && !m_mp9537; }
 
 	void set_overflow_interrupt( int enable ) { m_check_overflow = (enable!=0); }
+	// For fixed wiring, true models READY high at /RESET release (one automatic wait state per
+	// external memory byte) and false models READY low (zero). If unset, the CPU samples READY.
+	// READY can still extend individual transfers after reset in either mode.
+	void set_auto_wait_on_reset(bool enable) { m_auto_wait_on_reset = enable; }
 
 protected:
 	tms9995_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void        device_start() override;
+	virtual void        device_reset() override;
 
 	// device_execute_interface overrides
 	virtual uint32_t    execute_min_cycles() const noexcept override;
@@ -128,6 +134,7 @@ private:
 
 	// Auto-wait state generation
 	bool    m_request_auto_wait_state;
+	std::optional<bool> m_auto_wait_on_reset;
 	bool    m_auto_wait;
 
 	// Cycle counter
@@ -162,8 +169,8 @@ private:
 	bool    m_int4_active;
 	bool    m_int_overflow;
 
-	bool    m_reset;
-	bool    m_from_reset;
+	bool    m_reset;            // released, vector service pending
+	bool    m_reset_asserted;   // /RESET pin held low
 	bool    m_mid_flag;
 	bool    m_mid_active;
 
@@ -305,6 +312,7 @@ private:
 
 	// Index of the interrupt program
 	int     m_interrupt_mp_index;
+	int     m_reset_mp_index;
 
 	// Index of the operand address derivation subprogram
 	int     m_operand_address_derivation_index;
@@ -375,6 +383,7 @@ private:
 	void alu_x();
 	void alu_xop();
 	void alu_int();
+	void alu_reset();
 
 	// ================ Connections ====================
 

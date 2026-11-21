@@ -142,14 +142,14 @@ INPUT_PORTS_END
 
 void triviaquiz_state::machine_reset()
 {
-	//TODO: check these
-	m_maincpu->ready_line(ASSERT_LINE);
-	m_maincpu->reset_line(ASSERT_LINE);
+	// The TMS9995 latches the wait mode configured in triviaquiz() when reset is released.
 }
 
 void triviaquiz_state::triviaquiz(machine_config &config)
 {
 	TMS9995(config, m_maincpu, 10.738635_MHz_XTAL); // TMS9995NL, 10.73864 XTAL
+	// TODO: Verify the assumed low READY level at /RESET release on this board.
+	m_maincpu->set_auto_wait_on_reset(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &triviaquiz_state::prg_map);
 	m_maincpu->set_addrmap(AS_IO, &triviaquiz_state::io_map);
 

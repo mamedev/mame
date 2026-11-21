@@ -74,9 +74,9 @@
 
      Auto wait state:
 
-     In order to enable automatic wait state creation, the READY line must be
-     cleared on reset time. A good position to do this is MACHINE_RESET in
-     the driver.
+     READY high at the release of /RESET selects one automatic wait state
+     per external memory byte. READY low selects zero. After release,
+     READY controls ordinary bus waits independently of that selection.
 
 
      References (see comments below)
@@ -166,7 +166,9 @@ tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, d
 tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_state_any(0),
+		WP(0),
 		PC(0),
+		ST(0),
 		PC_debug(0),
 		m_iaq(false),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
@@ -210,6 +212,11 @@ void tms9995_device::device_start()
 	m_int_overflow = false;
 
 	m_reset = false;
+	m_reset_asserted = false;
+	m_ready_bufd = true;
+	m_ready = true;
+	m_auto_wait = false;
+	m_request_auto_wait_state = false;
 
 	m_idle_state = false;
 
@@ -260,7 +267,7 @@ void tms9995_device::device_start()
 	save_item(NAME(m_int4_active));
 	save_item(NAME(m_int_overflow));
 	save_item(NAME(m_reset));
-	save_item(NAME(m_from_reset));
+	save_item(NAME(m_reset_asserted));
 	save_item(NAME(m_mid_flag));
 	save_item(NAME(m_mid_active));
 	save_item(NAME(m_decrementer_clkdiv));
@@ -516,7 +523,8 @@ enum
 	ALU_TB,
 	ALU_X,
 	ALU_XOP,
-	ALU_INT
+	ALU_INT,
+	ALU_RESET
 };
 
 #define MICROPROGRAM(_MP) \
@@ -928,6 +936,21 @@ MICROPROGRAM(int_mp)
 	END
 };
 
+MICROPROGRAM(reset_mp)
+{
+	ALU_NOP, ALU_NOP, ALU_NOP,          // sampled release to first vector read
+	WORD_READ,                          // >0000: new WP
+	ALU_RESET,
+	ALU_NOP, ALU_NOP, ALU_NOP, ALU_NOP, // four internal cycles between words
+	WORD_READ,                          // >0002: new PC
+	ALU_RESET, WORD_WRITE,              // R13: interrupted WP
+	ALU_RESET, WORD_WRITE,              // R14: interrupted PC
+	ALU_RESET, WORD_WRITE,              // R15: interrupted ST
+	PREFETCH_NO_INT,
+	ALU_NOP,                            // one clock from the completed fetch to the first instruction
+	END
+};
+
 const tms9995_device::ophandler tms9995_device::s_microoperation[] =
 {
 	&tms9995_device::int_prefetch_and_decode,
@@ -975,7 +998,8 @@ const tms9995_device::ophandler tms9995_device::s_microoperation[] =
 	&tms9995_device::alu_tb,
 	&tms9995_device::alu_x,
 	&tms9995_device::alu_xop,
-	&tms9995_device::alu_int
+	&tms9995_device::alu_int,
+	&tms9995_device::alu_reset
 };
 
 /*****************************************************************************
@@ -997,7 +1021,7 @@ enum
 	LIMI, LREX, LST, LWP, LWPI, MOV, MOVB, MPY, MPYS, NEG,
 	ORI, RSET, RTWP, S, SB, SBO, SBZ, SETO, SLA, SOC,
 	SOCB, SRA, SRC, SRL, STCR, STST, STWP, SWPB, SZC, SZCB,
-	TB, X, XOP, XOR, INTR, OPAD
+	TB, X, XOP, XOR, INTR, OPAD, RESET_ENTRY
 };
 
 static const char opname[][5] =
@@ -1008,7 +1032,7 @@ static const char opname[][5] =
 	"LIMI", "LREX", "LST ", "LWP ", "LWPI", "MOV ", "MOVB", "MPY ", "MPYS", "NEG ",
 	"ORI ", "RSET", "RTWP", "S   ", "SB  ", "SBO ", "SBZ ", "SETO", "SLA ", "SOC ",
 	"SOCB", "SRA ", "SRC ", "SRL ", "STCR", "STST", "STWP", "SWPB", "SZC ", "SZCB",
-	"TB  ", "X   ", "XOP ", "XOR ", "*int", "*oad"
+	"TB  ", "X   ", "XOP ", "XOR ", "*int", "*oad", "*rst"
 };
 
 /*
@@ -1127,9 +1151,10 @@ const tms9995_device::tms_instruction tms9995_device::s_command[] =
 	{ 0xe000, SOC, 1, add_s_sxc_mp },
 	{ 0xf000, SOCB, 1, add_s_sxc_mp },
 
-// Special entries for interrupt and the address derivation subprogram; not in lookup table
+	// Special microprograms, excluded from the opcode lookup table.
 	{ 0x0000, INTR, 1, int_mp},
-	{ 0x0000, OPAD, 1, operand_address_derivation }
+	{ 0x0000, OPAD, 1, operand_address_derivation },
+	{ 0x0000, RESET_ENTRY, 1, reset_mp }
 };
 
 /*
@@ -1204,9 +1229,9 @@ void tms9995_device::build_command_lookup_table()
 		i++;
 	} while (inst->opcode != 0xf000);
 
-	// Save the index to these two special microprograms
 	m_interrupt_mp_index = i++;
-	m_operand_address_derivation_index = i;
+	m_operand_address_derivation_index = i++;
+	m_reset_mp_index = i;
 }
 
 /*
@@ -1219,6 +1244,10 @@ void tms9995_device::build_command_lookup_table()
 */
 void tms9995_device::execute_run()
 {
+	while (m_reset_asserted && m_icount > 0)
+		pulse_clock(1);
+	if (m_icount <= 0)
+		return;
 	if (m_reset) service_interrupt();
 
 	LOGMASKED(LOG_EMU, "calling execute_run for %d cycles\n", m_icount);
@@ -1261,7 +1290,7 @@ void tms9995_device::execute_run()
 				}
 			}
 		}
-	} while (m_icount>0 && !m_reset);
+	} while (m_icount>0 && !m_reset && !m_reset_asserted);
 
 	LOGMASKED(LOG_EMU, "cycles expired; will return soon.\n");
 }
@@ -1279,11 +1308,7 @@ void tms9995_device::execute_set_input(int irqline, int state)
 {
 	if (irqline == INT_9995_RESET)
 	{
-		if (state == ASSERT_LINE)
-		{
-			logerror("RESET interrupt line; READY=%d\n", m_ready_bufd);
-			reset_line(ASSERT_LINE);
-		}
+		reset_line(state);
 	}
 	else
 	{
@@ -1338,18 +1363,39 @@ void tms9995_device::execute_set_input(int irqline, int state)
 	}
 }
 
-/*
-    Triggers a RESET.
-*/
+// Machine resets without separate pin transitions are instantaneous pulses.
+// A reset already issued by the board must keep its sampled READY level.
+void tms9995_device::device_reset()
+{
+	if (!m_reset_asserted && !m_reset)
+	{
+		reset_line(ASSERT_LINE);
+		reset_line(CLEAR_LINE);
+	}
+}
+
 void tms9995_device::reset_line(int state)
 {
-	if (state==ASSERT_LINE)
+	const bool asserted = state == ASSERT_LINE;
+	if (asserted == m_reset_asserted)
+		return;
+
+	m_reset_asserted = asserted;
+	if (asserted)
 	{
-		m_reset = true;     // for the main loop
-		m_log_interrupt = false;   // only for debugging
+		m_reset = false;
+		m_log_interrupt = false;
+		m_check_ready = false;
 		m_request_auto_wait_state = false;
 		m_hold_requested = false;
 		memset(m_flag, 0, sizeof(m_flag));
+	}
+	else
+	{
+		// A fixed reset level applies only to this latch. Bus cycles still sample the live READY input.
+		m_auto_wait = m_auto_wait_on_reset.value_or(m_ready_bufd);
+		m_reset = true;
+		LOGMASKED(LOG_READY, "RESET released, automatic wait = %d\n", m_auto_wait);
 	}
 }
 
@@ -1400,19 +1446,11 @@ void tms9995_device::hold_line(int state)
 */
 void tms9995_device::ready_line(int state)
 {
-	bool newready = (state==ASSERT_LINE);
-
+	const bool newready = state == ASSERT_LINE;
 	if (newready != m_ready_bufd)
 	{
-		if (m_reset)
-		{
-			LOGMASKED(LOG_WARN, "Ignoring READY=%d change due to pending RESET\n", state);
-		}
-		else
-		{
-			m_ready_bufd = newready;
-			LOGMASKED(LOG_READY, "set READY = %d\n", m_ready_bufd? 1 : 0);
-		}
+		m_ready_bufd = newready;
+		LOGMASKED(LOG_READY, "set READY = %d\n", m_ready_bufd);
 	}
 }
 
@@ -1662,7 +1700,14 @@ void tms9995_device::service_interrupt()
 	if (m_reset)
 	{
 		vectorpos = 0;
+		// These latches survive both vector reads and the three context writes.
+		m_source_value = WP;
+		// PC advances only when the prefetch of both opcode bytes completes.
+		m_address_saved = m_iaq ? PC : (PC - 2) & 0xfffe;
+		m_value_copy = ST;
 		m_intmask = 0;  // clear interrupt mask
+		m_iaq = false;  // a reset can interrupt an instruction fetch
+		m_idle_state = false;
 
 		m_nmi_state = false;
 		m_hold_requested = false;
@@ -1674,18 +1719,14 @@ void tms9995_device::service_interrupt()
 		m_int4_active = false;
 		m_decrementer_clkdiv = 0;
 
-		m_pass = 0;
+		m_mid_flag = false;
+		m_mid_active = false;
+		m_int_pending = 0;
+		m_int_overflow = false;
 
 		memset(m_flag, 0, sizeof(m_flag));
 
 		ST = 0;
-
-		// The auto-wait state generation is turned on when the READY line is cleared
-		// on RESET.
-		m_auto_wait = !m_ready_bufd;
-		logerror("RESET; automatic wait state creation is %s\n", m_auto_wait? "enabled":"disabled");
-		// We reset the READY flag, or the CPU will not start
-		m_ready_bufd = true;
 	}
 	else
 	{
@@ -1761,13 +1802,12 @@ void tms9995_device::service_interrupt()
 	// The microinstructions will do the context switch
 	m_address = vectorpos;
 
-	m_index = m_interrupt_mp_index;
+	m_index = m_reset ? m_reset_mp_index : m_interrupt_mp_index;
 	m_inst_state = 0;
 	m_byteop = false;
-	m_command = INTR;
+	m_command = m_reset ? RESET_ENTRY : INTR;
 
 	m_pass = m_reset? 1 : 2;
-	m_from_reset = m_reset;
 
 	if (m_reset)
 	{
@@ -3423,21 +3463,6 @@ void tms9995_device::alu_int()
 			m_intmask = 0;
 			MPC = 0;    // redo the interrupt service for the NMI
 		}
-		else
-		{
-			if (m_from_reset)
-			{
-				LOGMASKED(LOG_INTD, "interrupt service (6): RESET completed\n");
-				// We came from the RESET interrupt
-				m_from_reset = false;
-				ST &= 0x01ff;
-				m_mid_flag = false;
-				m_mid_active = false;
-				// FLAG0 and FLAG1 are also set to zero after RESET ([1], sect. 2.3.1.2.2)
-				for (int i=0; i < 5; i++) m_flag[i] = false;
-				m_check_hold = true;
-			}
-		}
 		pulse = 0;
 		break;
 
@@ -3445,6 +3470,30 @@ void tms9995_device::alu_int()
 	}
 	m_inst_state++;
 	pulse_clock(pulse);
+}
+
+void tms9995_device::alu_reset()
+{
+	switch (m_inst_state++)
+	{
+	case 0:
+		WP = m_current_value & 0xfffe;
+		m_address = 0x0002;
+		break;
+	case 1:
+		PC = m_current_value & 0xfffe;
+		m_address = WP + 26;
+		m_current_value = m_source_value;
+		break;
+	case 2:
+		m_address = WP + 28;
+		m_current_value = m_address_saved;
+		break;
+	case 3:
+		m_address = WP + 30;
+		m_current_value = m_value_copy;
+		break;
+	}
 }
 
 /**************************************************************************/
