@@ -402,9 +402,9 @@ winbond_w29c020c_device::winbond_w29c020c_device(const machine_config &mconfig, 
 }
 
 winbond_w29gl032cb_device::winbond_w29gl032cb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: intelfsh8_device(mconfig, WINBOND_W29GL032CB, tag, owner, clock, 0x400000, MFG_AMD, 0x7e) { 
-    m_device_id2 = 0x1a; 
-    m_bot_boot_sector = true;
+	: intelfsh8_device(mconfig, WINBOND_W29GL032CB, tag, owner, clock, 0x400000, MFG_AMD, 0x7e) {
+	m_device_id2 = 0x1a;
+	m_bot_boot_sector = true;
 }
 
 //-------------------------------------------------
