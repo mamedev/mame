@@ -850,9 +850,9 @@ MICROPROGRAM(sbo_sbz_mp)
 MICROPROGRAM(shift_mp)
 {
 	MEMORY_READ,            // 1 (1)
-	ALU_SHIFT,              // 2 skip next operation if count != 0
-	MEMORY_READ,            // 1 (1) if count=0 we must read R0
-	ALU_SHIFT,              // c  do the shift
+	ALU_SHIFT,              // 2 for an encoded count, 1 before reading R0
+	MEMORY_READ,            // 1 (1) read R0 if the instruction count is zero
+	ALU_SHIFT,              // c shifts, plus 2 internal clocks if R0 supplied the count
 	PREFETCH,               // 1 (1)
 	MEMORY_WRITE,           // 1 (1)
 	END
@@ -3179,6 +3179,7 @@ void tms9995_device::alu_sbo_sbz()
 */
 void tms9995_device::alu_shift()
 {
+	const int instruction_count = (IR >> 4) & 0x000f;
 	bool carry = false;
 	bool overflow = false;
 	uint16_t sign = 0;
@@ -3195,21 +3196,22 @@ void tms9995_device::alu_shift()
 		m_address_saved = m_address;
 		m_address = WP;
 		// store this in m_current_value where the R0 value will be put
-		m_current_value = (IR >> 4)& 0x000f;
-		if (m_current_value != 0)
+		m_current_value = instruction_count;
+		if (instruction_count != 0)
 		{
-			// skip the next read operation
-			MPC++;
+			MPC++;          // skip the R0 read
+			pulse_clock(2);
 		}
 		else
 		{
 			LOGMASKED(LOG_DETAIL, "Shift operation gets count from R0\n");
+			pulse_clock(1);
 		}
-		pulse_clock(1);
-		pulse_clock(1);
 		break;
 
 	case 1:
+		if (instruction_count == 0)
+			pulse_clock(2); // internal clocks after the R0 read, before shifting
 		count = m_current_value & 0x000f; // from the instruction or from R0
 		if (count==0) count = 16;
 
