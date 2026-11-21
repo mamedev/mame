@@ -1169,34 +1169,48 @@ void vga_device::attribute_map(address_map &map)
 	map.global_mask(0x3f);
 	map.unmap_value_high();
 	map(0x00, 0x0f).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ offset & 0x1f]; }),
+		NAME([this] (offs_t offset) { return vga.attribute.data[offset & 0x1f]; }),
 		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[offset & 0x1f] = data & 0x3f; })
 	);
 	map(0x20, 0x2f).noprw();
-	// Mode Control
+	// $10 Mode Control
+	// x--- ---- P54S Palette Bits 5-4 Select
+	// -x-- ---- 8BIT 8-bit Color Enable
+	// --x- ---- PPM Pixel Panning Mode
+	// ---x ---- <reserved>
+	// ---- x--- BLINK Blink Enable
+	// ---- -x-- LGE Line Graphics Mode
+	// ---- --x- MONO Monochrome Emulation (strapping bit in most implementations)
+	// ---- ---x ATGE Attribute Controller Graphics Enable
 	map(0x10, 0x10).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x10 ]; }),
-		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[ 0x10 ] = data & 0x3f; })
+		NAME([this] (offs_t offset) { return vga.attribute.data[0x10]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[0x10] = data & 0xff; })
 	);
-	// Overscan Color
+	// $11 Overscan Color
+	// xxxx xxxx Overscan Palette Index
 	map(0x11, 0x11).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x11 ]; }),
-		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[ 0x11 ] = data & 0x3f; })
+		NAME([this] (offs_t offset) { return vga.attribute.data[0x11]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[0x11] = data & 0xff; })
 	);
-	// Color Plane Enable
+	// $12 Color Plane Enable
+	// ---- xxxx Color Plane Enable
+	// TODO: verify following three if they acts as strapping on reserved bits
 	map(0x12, 0x12).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x12 ]; }),
-		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[ 0x12 ] = data & 0x3f; })
+		NAME([this] (offs_t offset) { return vga.attribute.data[0x12]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[0x12] = data & 0xff; })
 	);
-	// Horizontal PEL shift
+	// $13 Horizontal PEL shift
+	// ---- xxxx Pixel Shift Count
 	map(0x13, 0x13).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x13 ]; }),
-		NAME([this] (offs_t offset, u8 data) { vga.attribute.pel_shift_latch = vga.attribute.data[ 0x13 ] = data & 0xf; })
+		NAME([this] (offs_t offset) { return vga.attribute.data[0x13]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.pel_shift_latch = vga.attribute.data[0x13] = data & 0xf; })
 	);
-	// Color Select
+	// $14 Color Select
+	// ---- xx-- Color Select 7-6
+	// ---- --xx Color Select 5-4
 	map(0x14, 0x14).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x14 ]; }),
-		NAME([this] (offs_t offset, u8 data) { vga.attribute.pel_shift_latch = vga.attribute.data[ 0x14 ] = data & 0xf; })
+		NAME([this] (offs_t offset) { return vga.attribute.data[0x14]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.pel_shift_latch = vga.attribute.data[0x14] = data & 0xf; })
 	);
 }
 
@@ -1272,6 +1286,10 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	bool blink_rate = frame_number & 0x20;
 	const int TEXT_LINES = vga.crtc.vert_disp_end + 1;
+	const bool blink_sel = !!BIT(vga.attribute.data[0x10], 3);
+	// blink disabled translates MSB of attribute as extra intensity for background color
+	// - win95+ scandisk uses this (yellow fill bar)
+	const uint8_t back_color_mask = (!blink_sel << 7) | 0x70;
 
 	for (int addr = vga.crtc.start_addr, line = -vga.crtc.preset_row_scan; line < TEXT_LINES;
 			line += height, addr += (offset() >> 1))
@@ -1281,13 +1299,10 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			const uint8_t ch   = vga.memory[(pos << 1) + 0];
 			const uint8_t attr = vga.memory[(pos << 1) + 1];
 			const uint32_t font_base = vga.sequencer.char_sel.base[BIT(attr, 3)] + (ch << 5);
-			const bool blink_sel = !!BIT(vga.attribute.data[0x10], 3);
 			const uint8_t blink_en = (blink_sel && blink_rate) ? BIT(attr, 7) : 0;
 
-			uint8_t fore_col = attr & 0xf;
-			uint8_t back_col = (attr & 0x70) >> 4;
-			// blink disabled translates MSB of attribute as extra intensity for background color
-			back_col |= (blink_sel) ? 0 : (BIT(attr, 7) >> 4);
+			uint8_t fore_col = attr & 0x0f;
+			uint8_t back_col = (attr & back_color_mask) >> 4;
 
 			for (int h = std::max(-line, 0); (h < height) && (line + h < std::min(TEXT_LINES, bitmap.height())); h++)
 			{
@@ -1546,6 +1561,7 @@ uint8_t vga_device::pc_vga_choosevideomode()
 			vga.dac.dirty = 0;
 		}
 
+		// TODO: Mode Control bit 6 unused, also cache and cleanup
 		if (vga.attribute.data[0x10] & 0x80)
 		{
 			for (int i=0; i<16;i++)
