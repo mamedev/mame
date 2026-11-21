@@ -122,7 +122,7 @@ private:
 
 	// Processor states
 	bool    m_idle_state;
-	bool    m_nmi_state;
+	bool    m_nmi_serviced;
 	bool    m_hold_state;
 	bool    m_hold_requested;
 
@@ -165,6 +165,9 @@ private:
 
 	// Interrupt handling
 	bool    m_nmi_active;
+	uint8_t m_nmi_samples = 0;
+	uint8_t m_int1_samples = 0;
+	uint8_t m_int4_samples = 0;
 	bool    m_int1_active;
 	bool    m_int4_active;
 	bool    m_int_overflow;
@@ -174,7 +177,10 @@ private:
 	bool    m_mid_flag;
 	bool    m_mid_active;
 
-	int     m_decrementer_clkdiv;
+	uint8_t m_decrementer_clkdiv = 0;
+	uint8_t m_decrementer_reload = 0;
+	bool    m_decrementer_enabled = false;
+	uint8_t m_ec_samples = 0;
 	bool    m_log_interrupt;
 
 	// Flag field
@@ -239,13 +245,13 @@ private:
 	int     m_count;
 
 	// ============== Decrementer =======================
-	void trigger_decrementer();
+	void clock_decrementer();
 
 	// Start value
-	uint16_t  m_starting_count_storage_register;
+	uint16_t  m_starting_count_storage_register = 0;
 
 	// Current decrementer value.
-	uint16_t  m_decrementer_value;
+	uint16_t  m_decrementer_value = 0;
 
 	// ============== CRU support ======================
 
@@ -313,6 +319,7 @@ private:
 	// Index of the interrupt program
 	int     m_interrupt_mp_index;
 	int     m_reset_mp_index;
+	int     m_mid_mp_index;
 
 	// Index of the operand address derivation subprogram
 	int     m_operand_address_derivation_index;
@@ -336,6 +343,7 @@ private:
 	void set_status_parity(uint8_t value);
 
 	// Micro-operation declarations
+	bool check_interrupts();
 	void int_prefetch_and_decode();
 	void prefetch_and_decode();
 	void mem_read();
@@ -357,13 +365,14 @@ private:
 	void alu_nop();
 	void alu_add_s_sxc();
 	void alu_b();
-	void alu_blwp();
+	void alu_context();
 	void alu_c();
 	void alu_ci();
 	void alu_clr_seto();
 	void alu_divide();
 	void alu_divide_signed();
 	void alu_external();
+	void alu_idle_poll();
 	void alu_f3();
 	void alu_imm_arithm();
 	void alu_jump();
@@ -383,7 +392,6 @@ private:
 	void alu_tb();
 	void alu_x();
 	void alu_xop();
-	void alu_int();
 	void alu_reset();
 
 	// ================ Connections ====================
