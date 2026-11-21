@@ -68,7 +68,7 @@ bool menu::exclusive_input_pressed(int &iptkey, int key, int repeat)
 ***************************************************************************/
 
 menu::global_state::global_state(mame_ui_manager &ui)
-	: widgets_manager(ui.machine())
+	: widgets_manager(ui.machine().render(), ui.colors())
 	, m_ui(ui)
 	, m_bgrnd_bitmap()
 	, m_bgrnd_texture(nullptr, ui.machine().render())
@@ -495,7 +495,7 @@ int menu::item_append(menu_item_type type, uint32_t flags)
 //  end of the menu
 //-------------------------------------------------
 
-int menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type)
+int menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type, menu_item_color_state color_state)
 {
 	assert(m_rebuilding);
 
@@ -503,6 +503,7 @@ int menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags,
 	menu_item pitem(type, ref, flags);
 	pitem.set_text(std::move(text));
 	pitem.set_subtext(std::move(subtext));
+	pitem.set_color_state(color_state);
 
 	// append to array
 	auto index = m_items.size();
@@ -538,7 +539,7 @@ int menu::item_append_on_off(const std::string &text, bool state, uint32_t flags
 	else
 		flags |= state ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW;
 
-	return item_append(std::string(text), state ? _("On") : _("Off"), flags, ref, type);
+	return item_append(std::string(text), state ? _("On") : _("Off"), flags, ref, type, state ? menu_item_color_state::ON : menu_item_color_state::OFF);
 }
 
 
@@ -595,12 +596,26 @@ void menu::do_draw_menu()
 				return true;
 			};
 	if (draw_parent(draw_parent, m_parent.get()))
-		container().add_rect(0.0F, 0.0F, 1.0F, 1.0F, rgb_t(114, 0, 0, 0), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_rect(0.0F, 0.0F, 1.0F, 1.0F, ui().colors().overlay_color(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	// draw the menu proper
 	draw(m_process_flags);
 }
 
+//-------------------------------------------------
+//  deemphasis_color - resolve the color for
+//  deemphasized item text in the current context
+//-------------------------------------------------
+
+rgb_t menu::deemphasis_color(uint32_t flags) const
+{
+	if (menu_color_context::SELECTION == color_context())
+		return ui().colors().clone_color();
+	else if (flags & FLAG_DISABLE)
+		return ui().colors().unavailable_color();
+	else
+		return ui().colors().config_deemphasized_color();
+}
 
 //-------------------------------------------------
 //  draw - draw the menu itself
@@ -637,7 +652,7 @@ void menu::draw(uint32_t flags)
 	if (m_heading)
 	{
 		heading_layout.emplace(create_layout(max_width - (gutter_width() * 2.0F), text_layout::text_justify::CENTER));
-		heading_layout->add_text(*m_heading, ui().colors().text_color());
+		heading_layout->add_text(*m_heading, ui().colors().colored_text_color());
 
 		// readjust visible width if heading width exceeds that of the menu
 		visible_width = std::max(gutter_width() + heading_layout->actual_width() + gutter_width(), visible_width);
@@ -680,7 +695,7 @@ void menu::draw(uint32_t flags)
 					container(),
 					x1, y1 - top_extra_menu_height,
 					x2, y1 - m_customtop - tb_border(),
-					UI_GREEN_COLOR);
+					ui().colors().accent_color());
 			heading_layout->emit(container(), (1.0F - heading_layout->width()) * 0.5F, y1 - top_extra_menu_height + tb_border());
 		}
 
@@ -743,10 +758,7 @@ void menu::draw(uint32_t flags)
 			auto const itemnum = top_line + linenum;
 			menu_item const &pitem = m_items[itemnum];
 			std::string_view const itemtext = pitem.text();
-			rgb_t fgcolor = ui().colors().text_color();
-			rgb_t bgcolor = ui().colors().text_bg_color();
-			rgb_t fgcolor2 = ui().colors().subitem_color();
-			rgb_t fgcolor3 = ui().colors().clone_color();
+			ui_colors::color_pair const &normal(ui().colors().normal());
 			float const line_y0 = m_items_top + (float(linenum) * line_height());
 			float const line_y1 = line_y0 + line_height();
 
@@ -755,47 +767,53 @@ void menu::draw(uint32_t flags)
 			bool const downarrow = (linenum == (m_visible_lines - 1)) && m_show_down_arrow;
 			bool const hovered = have_pointer() && pointer_in_rect(m_items_left, line_y0, m_items_right, line_y1);
 
-			// highlight if necessary
+			// highlight if necessary - the foreground/background pair is selected
+			// atomically: selected wins over everything, then pointer adjustment,
+			// then tracking/hover
+			ui_colors::color_pair const *pair(&normal);
 			if (is_selected(itemnum))
 			{
 				// if we're selected, draw with a different background
-				fgcolor = fgcolor2 = fgcolor3 = ui().colors().selected_color();
-				bgcolor = ui().colors().selected_bg_color();
+				pair = &ui().colors().selected();
 			}
 			else if (uparrow || downarrow || is_selectable(pitem))
 			{
 				bool pointerline(linenum == m_pointer_line);
 				if ((track_pointer::ADJUST == m_pointer_state) && pointerline)
 				{
-					// use the hover background if an adjust gesture is attempted on an item that isn't selected
-					fgcolor = fgcolor2 = fgcolor3 = ui().colors().mouseover_color();
-					bgcolor = ui().colors().mouseover_bg_color();
+					// use the pressed colors if an adjust gesture is attempted on an item that isn't selected
+					pair = &ui().colors().mousedown();
 				}
 				else if (hovered)
 				{
 					if ((track_pointer::TRACK_LINE == m_pointer_state) && pointerline)
 					{
-						// use the selected background for an item being selected
-						fgcolor = fgcolor2 = fgcolor3 = ui().colors().selected_color();
-						bgcolor = ui().colors().selected_bg_color();
+						// use the selected colors for an item being selected
+						pair = &ui().colors().selected();
 					}
 					else if (track_pointer::IDLE == m_pointer_state)
 					{
 						// else if the pointer is over this item, draw with a different background
-						fgcolor = fgcolor2 = fgcolor3 = ui().colors().mouseover_color();
-						bgcolor = ui().colors().mouseover_bg_color();
+						pair = &ui().colors().mouseover();
 					}
 				}
 				else if ((track_pointer::TRACK_LINE == m_pointer_state) && pointerline)
 				{
-					// use the hover background if the pointer moved out of the tracked item
-					fgcolor = fgcolor2 = fgcolor3 = ui().colors().mouseover_color();
-					bgcolor = ui().colors().mouseover_bg_color();
+					// use the hover colors if the pointer moved out of the tracked item
+					pair = &ui().colors().mouseover();
 				}
 			}
 
+			// subitem and deemphasized text colors only differ from the row pair
+			// in the normal state
+			rgb_t const fgcolor(pair->foreground);
+			rgb_t const bgcolor(pair->background);
+			bool const row_state(&normal != pair);
+			rgb_t fgcolor2(row_state ? fgcolor : ui().colors().subitem_color());
+			rgb_t fgcolor3(row_state ? fgcolor : deemphasis_color(pitem.flags()));
+
 			// if we have some background hilighting to do, add a quad behind everything else
-			if (bgcolor != ui().colors().text_bg_color())
+			if (bgcolor != normal.background)
 				highlight(m_items_left, line_y0, m_items_right, line_y1, bgcolor);
 
 			if (uparrow || downarrow)
@@ -878,13 +896,26 @@ void menu::draw(uint32_t flags)
 							selected_subitem_too_big = true;
 					}
 
-					// customize subitem text color
-					if (!core_stricmp(pitem.subtext(), _("On")))
-						fgcolor2 = rgb_t(0x00, 0xff, 0x00);
-					else if (!core_stricmp(pitem.subtext(), _("Off")))
-						fgcolor2 = rgb_t(0xff, 0x00, 0x00);
-					else if (!core_stricmp(pitem.subtext(), _("Auto")))
-						fgcolor2 = rgb_t(0xff, 0xff, 0x00);
+					// apply semantic value state color to subitem text; never on the
+					// selected row, where the selected pair takes precedence, and
+					// never when the subitem is deemphasized
+					if (!is_selected(itemnum))
+					{
+						switch (pitem.color_state())
+						{
+						case menu_item_color_state::ON:
+							fgcolor2 = ui().colors().status_good_color();
+							break;
+						case menu_item_color_state::OFF:
+							fgcolor2 = ui().colors().status_error_color();
+							break;
+						case menu_item_color_state::AUTO:
+							fgcolor2 = ui().colors().status_warning_color();
+							break;
+						case menu_item_color_state::NORMAL:
+							break;
+						}
+					}
 
 					// draw the subitem right-justified
 					ui().draw_text_full(

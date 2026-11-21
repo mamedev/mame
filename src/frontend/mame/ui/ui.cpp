@@ -825,7 +825,7 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 					warning_text = machine_info().warnings_string();
 					warning_text.append(_("\n\nPress any key to continue"));
 					set_handler(ui_callback_type::MODAL, handler_callback_func(handler_messagebox_anykey));
-					warning_color = machine_info().warnings_color();
+					warning_color = machine_info().warnings_color(m_ui_colors);
 				}
 			}
 			break;
@@ -2716,10 +2716,54 @@ void mame_ui_manager::load_ui_options()
 		{
 			options().parse_ini_file((util::core_file &)file, OPTION_PRIORITY_MAME_INI, OPTION_PRIORITY_MAME_INI < OPTION_PRIORITY_DRIVER_INI, true);
 		}
-		catch (options_exception &)
+		catch (options_error_exception &)
 		{
 			osd_printf_error("**Error loading ui.ini**\n");
 		}
+		catch (options_exception &ex)
+		{
+			osd_printf_warning("%s", ex.message());
+		}
+	}
+
+
+	// a valid palette is simply one we have a definition for
+	auto const valid_palette = [] (char const *value)
+	{
+		if (!value)
+			return false;
+		for (ui_colors::theme_palette const &candidate : ui_colors::predefined_palettes())
+			if (!strcmp(value, candidate.id))
+				return true;
+		return false;
+	};
+	// Migrate a legacy color configuration that lacks an explicit palette.
+	core_options::entry::shared_const_ptr palette_entry(options().get_entry(OPTION_UI_PALETTE));
+	char const *const palette(palette_entry ? palette_entry->value() : nullptr);
+	bool const explicit_palette(
+			palette_entry
+			&& (OPTION_PRIORITY_DEFAULT < palette_entry->priority())
+			&& valid_palette(palette));
+	if (!explicit_palette)
+	{
+		// A legacy file without an explicit palette keeps its role colors;
+		// the palette selector itself defaults to Classic.
+		options().set_value(OPTION_UI_PALETTE, "classic", OPTION_PRIORITY_MAME_INI);
+	}
+
+	char const *const effective_palette(explicit_palette ? palette : "classic");
+	if (!strcmp(effective_palette, "classic"))
+	{
+		// Replace only those exact generated defaults; keep deliberate edits.
+		auto migrate_classic_default = [this](char const *option, char const *old_value, char const *new_value)
+		{
+			core_options::entry::shared_const_ptr const entry(options().get_entry(option));
+			if (entry && !strcmp(entry->value(), old_value))
+				options().set_value(option, new_value, OPTION_PRIORITY_MAME_INI);
+		};
+		migrate_classic_default(OPTION_UI_FOCUS_OUTLINE_COLOR, "ffffffff", "ff2b2b2b");
+		migrate_classic_default(OPTION_UI_FOCUS_GRADIENT_TOP, "ef808000", "ff00a9ff");
+		migrate_classic_default(OPTION_UI_FOCUS_GRADIENT_BOTTOM, "ef000000", "ff002782");
 	}
 }
 
@@ -2872,22 +2916,286 @@ std::string mame_ui_manager::get_general_input_setting(ioport_type type, int pla
 }
 
 
+namespace
+{
+
+//-------------------------------------------------
+//  built-in palettes - canonical token sources
+//  expanded into shared semantic roles
+//-------------------------------------------------
+
+enum palette_token : uint8_t
+{
+	TOKEN_BASE03,
+	TOKEN_BASE02,
+	TOKEN_BASE01,
+	TOKEN_BASE00,
+	TOKEN_BASE0,
+	TOKEN_BASE1,
+	TOKEN_BASE2,
+	TOKEN_BASE3,
+	TOKEN_YELLOW,
+	TOKEN_ORANGE,
+	TOKEN_RED,
+	TOKEN_MAGENTA,
+	TOKEN_VIOLET,
+	TOKEN_BLUE,
+	TOKEN_CYAN,
+	TOKEN_GREEN,
+	TOKEN_COUNT
+};
+
+// everything needed to define a palette lives in ui_colors::theme_palette;
+// this array is the single source for the selector and semantic expansion
+
+std::array<ui_colors::palette_color, 16> make_palette_colors(ui_colors::theme_palette const &palette)
+{
+	std::array<ui_colors::palette_color, 16> result;
+	for (uint8_t i = 0; i < TOKEN_COUNT; ++i)
+		result[i] = { palette.color_names[i], palette.colors[i] };
+	return result;
+}
+
+ui_colors::semantic_colors expand_palette(ui_colors::theme_palette const &palette)
+{
+	auto const token = [&palette](palette_token index) { return palette.colors[index]; };
+
+	// foreground/background pairs
+
+	// menu item text, headings, info panels
+	ui_colors::color_pair const normal{ token(TOKEN_BASE2), token(TOKEN_BASE02) };
+	// selected rows in configuration menus, clicked/tracked rows, and the
+	// keyboard-focused main list item, right panel heading and active tab
+	// (keyboard focus is drawn as this pair tinting the highlight gradient)
+	ui_colors::color_pair const selected{ token(TOKEN_YELLOW), token(TOKEN_BASE03) };
+	// hovered rows, unfocused main-list selection
+	ui_colors::color_pair const mouseover{ token(TOKEN_YELLOW), token(TOKEN_BASE01) };
+	// pressed/adjusted rows
+	ui_colors::color_pair const mousedown{ token(TOKEN_YELLOW), token(TOKEN_BASE00) };
+
+	// scalar roles
+
+	// disabled menu rows, unchangeable DIP switch nubs
+	rgb_t const unavailable(token(TOKEN_BASE00));
+	// deemphasized rows in configuration menus (defaults)
+	rgb_t const config_deemphasized(token(TOKEN_BASE0));
+	// right-side values of menu rows
+	rgb_t const subitem(token(TOKEN_BASE1));
+	// clone entries in system/software list, disabled toolbar icons, inactive right panel tabs
+	rgb_t const clone(token(TOKEN_BASE1));
+	// text on accent/status fills: panel titles, Supported footer, On/Off/Auto
+	rgb_t const colored_text(token(TOKEN_BASE3));
+
+	// outlines of boxes and panels, slider track lines
+	rgb_t const border(token(TOKEN_BASE2));
+	// fill of selection menu boxes and panels
+	rgb_t const background(token(TOKEN_BASE02));
+	// DIP switch nubs
+	rgb_t const dipsw(token(TOKEN_CYAN));
+	// slider fill bar
+	rgb_t const slider(token(TOKEN_BASE2));
+	// graphics viewer backdrop
+	rgb_t const gfxviewer_background(token(TOKEN_BASE02));
+	// heading boxes: menu titles, tab bars, audit/directory/about info boxes
+	rgb_t const accent(token(TOKEN_CYAN));
+	// select menu toolbar strip behind icons
+	rgb_t const selection_toolbar(token(TOKEN_CYAN));
+	// working status, Supported: Yes, On subitems
+	rgb_t const status_good(token(TOKEN_GREEN));
+	// imperfect status, Supported: Partial, Auto subitems
+	rgb_t const status_warning(token(TOKEN_ORANGE));
+	// broken status, Supported: No, Off subitems, error overlays
+	rgb_t const status_error(token(TOKEN_RED));
+	// outline of focused rows, tabs and right panel heading
+	rgb_t const focus_outline(token(TOKEN_BASE2));
+	// top stop of the main menu highlight gradient
+	rgb_t const focus_gradient_top(token(TOKEN_BASE03));
+	// bottom stop of the main menu highlight gradient
+	rgb_t const focus_gradient_bottom(token(TOKEN_BASE02));
+	// dim behind stacked menus and error overlays
+	rgb_t const overlay(token(TOKEN_BASE02));
+
+	ui_colors::semantic_colors colors{
+			normal, selected, mouseover, mousedown,
+			subitem, clone, border, background, dipsw, unavailable, slider, gfxviewer_background,
+			config_deemphasized, colored_text, accent, selection_toolbar,
+			status_good, status_warning, status_error,
+			focus_outline, focus_gradient_top, focus_gradient_bottom, overlay
+	};
+
+	if (!strcmp(palette.id, "classic"))
+	{
+		// Classic kept its original look: re-seat the roles where it
+		// never followed the shared mapping
+
+		// menu text sits on flat black rather than the panel surface
+		colors.normal.background = token(TOKEN_MAGENTA);
+		// disabled rows and DIP nubs share the deemphasis grey
+		colors.unavailable = token(TOKEN_BASE0);
+		// right-side values render at full emphasis like main text
+		colors.subitem = token(TOKEN_BASE2);
+		// clone entries and inactive tabs use the deemphasis grey
+		colors.clone = token(TOKEN_BASE0);
+		// white text on accent/status fills
+		colors.colored_text = token(TOKEN_BASE2);
+		// heading boxes stay green
+		colors.accent = token(TOKEN_GREEN);
+		// toolbar strip stays dark blue
+		colors.selection_toolbar = token(TOKEN_BASE1);
+		// focus ring is charcoal
+		colors.focus_outline = token(TOKEN_VIOLET);
+		// highlight gradient runs light blue to navy
+		colors.focus_gradient_top = token(TOKEN_CYAN);
+		colors.focus_gradient_bottom = token(TOKEN_BLUE);
+		// scrim behind stacked menus
+		colors.overlay = token(TOKEN_BASE3);
+	}
+
+	return colors;
+}
+
+std::array<ui_colors::theme_palette, 5> const s_theme_palettes = {{
+	{
+		"classic", N_("Classic"),
+		{
+			N_("Olive"), N_("Midnight"), N_("Dark Olive"), N_("Brown"), N_("Gray"), N_("Dark Blue"), N_("White"), N_("Translucent Black"),
+			N_("Yellow"), N_("Orange"), N_("Red"), N_("Black"), N_("Charcoal"), N_("Navy"), N_("Light Blue"), N_("Green")
+		},
+		{
+			rgb_t(0xef808000U), rgb_t(0xef101030U), rgb_t(0x70404000U), rgb_t(0xb0606000U),
+			rgb_t(0xff808080U), rgb_t(0xef12477bU), rgb_t(0xffffffffU), rgb_t(0x72000000U),
+			rgb_t(0xffffff00U), rgb_t(0xefcc7a28U), rgb_t(0xefb20000U), rgb_t(0xef000000U),
+			rgb_t(0xff2b2b2bU), rgb_t(0xff002782U), rgb_t(0xff00a9ffU), rgb_t(0xef0a660aU)
+		},
+	},
+	{
+		"dark", N_("Dark"),
+		{
+			N_("Near Black"), N_("Black"), N_("Transparent Dark Gray"), N_("Transparent Gray"), N_("Dim Gray"), N_("Medium Gray"), N_("Off White"), N_("Near White"),
+			N_("Light Yellow"), N_("Yellow"), N_("Light Red"), N_("Light Purple"), N_("Gray"), N_("Blue"), N_("Light Blue"), N_("Light Green")
+		},
+		{
+			rgb_t(0xef202020U), rgb_t(0xcc101010U), rgb_t(0x70404040U), rgb_t(0xb0505050U),
+			rgb_t(0xff707070U), rgb_t(0xffa0a0a0U), rgb_t(0xfff0f0f0U), rgb_t(0xfff8f8f8U),
+			rgb_t(0xeff0d060U), rgb_t(0xefedc45bU), rgb_t(0xefef6a6aU), rgb_t(0xefb05a9aU),
+			rgb_t(0xffb0b0b0U), rgb_t(0xef3f82c0U), rgb_t(0xef5aa9e6U), rgb_t(0xef64c466U)
+		}
+	},
+	{
+		"light", N_("Light"),
+		{
+			N_("Transparent Light Blue"), N_("White"), N_("Light Gray"), N_("Transparent Gray"), N_("Medium Gray"), N_("Gray"), N_("Near Black"), N_("Navy"),
+			N_("Gold"), N_("Brown"), N_("Dark Red"), N_("Purple"), N_("Dark Gray"), N_("Blue"), N_("Dark Blue"), N_("Dark Green")
+		},
+		{
+			rgb_t(0x70d8e8f8U), rgb_t(0xccffffffU), rgb_t(0xeff0f0f0U), rgb_t(0xb0d0d0d0U),
+			rgb_t(0xffa0a0a0U), rgb_t(0xff707070U), rgb_t(0xff202020U), rgb_t(0xff102040U),
+			rgb_t(0xefb87a00U), rgb_t(0xef9a6200U), rgb_t(0xef9a2020U), rgb_t(0xef6f4a8fU),
+			rgb_t(0xff404040U), rgb_t(0xef286aa0U), rgb_t(0xef12477bU), rgb_t(0xef087f3fU)
+		}
+	},
+	{
+		"solarized-dark", N_("Solarized Dark"),
+		{
+			N_("base03"), N_("base02"), N_("base01"), N_("base00"), N_("base0"), N_("base1"), N_("base2"), N_("base3"),
+			N_("yellow"), N_("orange"), N_("red"), N_("magenta"), N_("violet"), N_("blue"), N_("cyan"), N_("green")
+		},
+		{
+			rgb_t(0xff073642U), rgb_t(0xcc002b36U), rgb_t(0xff153c44U), rgb_t(0xff2a4d51U),
+			rgb_t(0xff697f7bU), rgb_t(0xff7e9088U), rgb_t(0xff93a1a1U), rgb_t(0xffeee8d5U),
+			rgb_t(0xffb58900U), rgb_t(0xffcb4b16U), rgb_t(0xffdc322fU), rgb_t(0xffd33682U),
+			rgb_t(0xff6c71c4U), rgb_t(0xff268bd2U), rgb_t(0xff2aa198U), rgb_t(0xff859900U)
+		}
+	},
+	{
+		"solarized-light", N_("Solarized Light"),
+		{
+			N_("base03"), N_("base02"), N_("base01"), N_("base00"), N_("base0"), N_("base1"), N_("base2"), N_("base3"),
+			N_("yellow"), N_("orange"), N_("red"), N_("magenta"), N_("violet"), N_("blue"), N_("cyan"), N_("green")
+		},
+		{
+			rgb_t(0xffeee8d5U), rgb_t(0xccfdf6e3U), rgb_t(0xffe5e3d3U), rgb_t(0xffcecfc4U),
+			rgb_t(0xff879594U), rgb_t(0xff708185U), rgb_t(0xff586e75U), rgb_t(0xff073642U),
+			rgb_t(0xffb58900U), rgb_t(0xffcb4b16U), rgb_t(0xffdc322fU), rgb_t(0xffd33682U),
+			rgb_t(0xff6c71c4U), rgb_t(0xff268bd2U), rgb_t(0xff2aa198U), rgb_t(0xff859900U)
+		}
+	}
+}};
+
+} // anonymous namespace
+
+
+std::array<ui_colors::theme_palette, 5> const &ui_colors::predefined_palettes()
+{
+	return s_theme_palettes;
+}
+
+
+//-------------------------------------------------
+//  transparent_colors - all-roles-transparent state
+//-------------------------------------------------
+
+ui_colors::semantic_colors ui_colors::transparent_colors()
+{
+	rgb_t const t(rgb_t::transparent());
+	color_pair const p{ t, t };
+	return { p, p, p, p, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t, t };
+}
+
+
+//-------------------------------------------------
+//  load_palette - load a predefined palette by ID
+//-------------------------------------------------
+
+bool ui_colors::load_palette(char const *palette)
+{
+	theme_palette const *definition(nullptr);
+	for (theme_palette const &candidate : predefined_palettes())
+	{
+		if (!strcmp(palette, candidate.id))
+		{
+			definition = &candidate;
+			break;
+		}
+	}
+	if (!definition)
+		return false;
+
+	m_palette_colors = make_palette_colors(*definition);
+	m_colors = expand_palette(*definition);
+
+	return true;
+}
+
+
+//-------------------------------------------------
+//  refresh - load the effective palette from the
+//  UI options
+//-------------------------------------------------
+
 void ui_colors::refresh(const ui_options &options)
 {
-	m_border_color = options.border_color();
-	m_background_color = options.background_color();
-	m_gfxviewer_bg_color = options.gfxviewer_bg_color();
-	m_unavailable_color = options.unavailable_color();
-	m_text_color = options.text_color();
-	m_text_bg_color = options.text_bg_color();
-	m_subitem_color = options.subitem_color();
-	m_clone_color = options.clone_color();
-	m_selected_color = options.selected_color();
-	m_selected_bg_color = options.selected_bg_color();
-	m_mouseover_color = options.mouseover_color();
-	m_mouseover_bg_color = options.mouseover_bg_color();
-	m_mousedown_color = options.mousedown_color();
-	m_mousedown_bg_color = options.mousedown_bg_color();
-	m_dipsw_color = options.dipsw_color();
-	m_slider_color = options.slider_color();
+	load_palette(options.palette());
+
+	m_colors.normal = { options.text_color(), options.text_bg_color() };
+	m_colors.selected = { options.selected_color(), options.selected_bg_color() };
+	m_colors.mouseover = { options.mouseover_color(), options.mouseover_bg_color() };
+	m_colors.mousedown = { options.mousedown_color(), options.mousedown_bg_color() };
+	m_colors.border = options.border_color();
+	m_colors.background = options.background_color();
+	m_colors.gfxviewer_background = options.gfxviewer_bg_color();
+	m_colors.unavailable = options.unavailable_color();
+	m_colors.subitem = options.subitem_color();
+	m_colors.clone = options.clone_color();
+	m_colors.dipsw = options.dipsw_color();
+	m_colors.slider = options.slider_color();
+	m_colors.accent = options.accent_color();
+	m_colors.status_good = options.status_good_color();
+	m_colors.status_warning = options.status_warning_color();
+	m_colors.status_error = options.status_error_color();
+	m_colors.config_deemphasized = options.config_deemphasized_color();
+	m_colors.focus_outline = options.focus_outline_color();
+	m_colors.focus_gradient_top = options.focus_gradient_top();
+	m_colors.focus_gradient_bottom = options.focus_gradient_bottom();
+	m_colors.overlay = options.overlay_color();
 }
