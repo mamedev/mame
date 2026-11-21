@@ -259,7 +259,10 @@ public:
 	virtual void dack_line_w(int line, int state);
 	virtual void eop_w(int state);
 
-	virtual void remap(int space_id, offs_t start, offs_t end) {}
+	// FIXME: convert to pure virtual
+	// clients are ought to subclass this function, not supposed to install at device_reset time
+	// (won't work on any chipset that remaps the chain at runtime such as PCI targets)
+	virtual void remap(int space_id, offs_t start, offs_t end) { }
 
 	// inline configuration
 	void set_isabus(device_t *isa_device) { m_isa_dev = isa_device; }

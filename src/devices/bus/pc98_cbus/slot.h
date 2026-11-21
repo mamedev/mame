@@ -138,6 +138,8 @@ class device_pc98_cbus_slot_interface : public device_interface
 public:
 	virtual ~device_pc98_cbus_slot_interface();
 
+	// FIXME: ought to be pure virtual
+	// akin to ISA bus version
 	virtual void remap(int space_id, offs_t start, offs_t end) {}
 	virtual u8 dack_r(int line);
 	virtual void dack_w(int line, u8 data);
