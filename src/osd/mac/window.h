@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <memory>
 #include <list>
+#include <vector>
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -58,10 +59,28 @@ public:
 
 	int xy_to_render_target(int x, int y, int *xt, int *yt);
 
-	// -video none: the window backs the render target but is never shown
+	// direct touch input from the window's gesture recognizer
+	void touch_down(uint32_t touch, int x, int y);
+	void touch_moved(uint32_t touch, int x, int y);
+	void touch_up(uint32_t touch, int x, int y);
+	void touch_cancelled(uint32_t touch);
+
+	// -video none: keep the native window hidden, or omit it if no display is available
 	bool headless() const { return m_headless; }
 
+	// the window that owns a native NSWindow, or nullptr
+	static mac_window_info *from_nswindow(void *nswindow);
+
 private:
+	struct mac_pointer_info : public pointer_info
+	{
+		static constexpr bool compare(const mac_pointer_info &info, uint32_t touch) { return info.touch < touch; }
+
+		mac_pointer_info(uint32_t t, uint32_t i, uint32_t d) : pointer_info(i, d), touch(t) { }
+
+		uint32_t touch;
+	};
+
 	// window handle and info
 	int                 m_startmaximized;
 	bool                m_headless;
@@ -97,7 +116,18 @@ private:
 	bool                               m_mouse_captured;
 	bool                               m_mouse_hidden;
 
+	// active touches; pointer 0 belongs to the mouse
+	uint64_t                           m_pointer_mask;
+	uint32_t                           m_next_pointer;
+	std::vector<pointer_dev_info>      m_ptrdev_info;
+	std::vector<mac_pointer_info>      m_active_pointers;
+
 	void measure_fps(int update);
+	int tap_distance();
+	void touch_lightgun(uint32_t touch, int x, int y, bool contact);
+	std::vector<mac_pointer_info>::iterator find_touch(uint32_t touch);
+	void remove_touch(std::vector<mac_pointer_info>::iterator info);
+	void abort_touches();
 };
 
 #endif // MAME_OSD_MAC_WINDOW_H
