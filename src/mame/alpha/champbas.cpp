@@ -1712,7 +1712,7 @@ GAME( 1983, champbb2j,  champbb2, champbb2j,  champbas, champbas_state, init_cha
 GAME( 1983, tbasebal,   champbb2, tbasebal,   champbas, champbas_state, init_champbas, ROT0,   "Alpha Denshi Co.", "Taikyoku Base Ball", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // 68705 protection instead
 
 GAME( 1983, exctsccr,   0,        exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1983, exctsccru,  exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (USA)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, exctsccru,  exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, exctsccra,  exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (World, alternate music)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, exctsccrj,  exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, exctsccrjo, exctsccr, exctsccr,   exctsccr, exctsccr_state, init_exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (Japan, older)", MACHINE_SUPPORTS_SAVE )
