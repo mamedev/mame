@@ -28,7 +28,8 @@ System's promotional flyer claims:
   and TV (video)
 
 TODO:
-- currently stops at the manufacturer logo (tight loops between two JMPs);
+- currently stops at the manufacturer logo (tight loops between two JMPs),
+  due to missing VRENDER0_SOC watchdog support;
 - transmits to SIO if above is skipped;
 
 */
@@ -58,7 +59,7 @@ public:
 
 	void hqdf(machine_config &config) ATTR_COLD;
 
-	void init_hqdf() ATTR_COLD;
+	void init_haiwei() ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -237,15 +238,15 @@ ROM_START( hqdf )
 	ROM_LOAD( "3", 0x400000, 0x200000, CRC(4edea690) SHA1(ba919577418e9f245113160adbdca9d63c54822e) )
 ROM_END
 
-ROM_START( unkhaiwei )
+ROM_START( unkhaiwei ) // probably a baccarat game, given the strings
 	ROM_REGION32_LE( 0xc00000, "maincpu", 0 )
-	ROM_LOAD( "1", 0x000000, 0x400000, CRC(89c4816b) SHA1(9c48ed79f35a598a81860c72284aeef47e30493e) BAD_DUMP ) // FIXED BITS (xxx111xx11x11x11)
+	ROM_LOAD( "1", 0x000000, 0x400000, CRC(7850ff4d) SHA1(f247965d0b79ab3cb85efef8a0ac4d788f63ff7b) )
 	ROM_LOAD( "2", 0x400000, 0x400000, CRC(d123e649) SHA1(3c6aadb61acfa7c4536dc37b1e1505bcac4db504) )
-	ROM_LOAD( "3", 0x800000, 0x400000, CRC(eeeb37bd) SHA1(00189a2ff7998f4b3d1162330f12322f5de24901) BAD_DUMP ) // FIXED BITS (xxxxxxxxxxxx1xxx)
+	ROM_LOAD( "3", 0x800000, 0x400000, CRC(6b4cad4e) SHA1(6f3fca502e954d43a9fa90fda63c2346a8f39515) )
 ROM_END
 
 
-void haiwei_state::init_hqdf() // TODO: verify if it is complete (shouldn't get this far if it weren't complete, though)
+void haiwei_state::init_haiwei()
 {
 	u8 *rom = memregion("maincpu")->base();
 	u32 length = memregion("maincpu")->bytes();
@@ -269,5 +270,5 @@ void haiwei_state::init_hqdf() // TODO: verify if it is complete (shouldn't get 
 } // anonymous namespace
 
 
-GAME( 2006, hqdf,      0, hqdf,  hqdf, haiwei_state, init_hqdf,  ROT0, "Hai Wei Technology", "Huanqiu Dafuweng",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 200?, unkhaiwei, 0, hqdf,  hqdf, haiwei_state, empty_init, ROT0, "Hai Wei Technology", "unknown Hai Wei Technology game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2006, hqdf,      0, hqdf,  hqdf, haiwei_state, init_haiwei, ROT0, "Hai Wei Technology", "Huanqiu Dafuweng",                MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 200?, unkhaiwei, 0, hqdf,  hqdf, haiwei_state, init_haiwei, ROT0, "Hai Wei Technology", "unknown Hai Wei Technology game", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
