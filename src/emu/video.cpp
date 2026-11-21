@@ -247,6 +247,9 @@ void video_manager::frame_update(bool from_debugger)
 		machine().osd().update(!from_debugger && skipped_it);
 	}
 
+	// the scheduler yields to UI service when this stamp goes stale
+	machine().scheduler().mark_ui_serviced();
+
 	// we synchronize after rendering instead of before, if low latency mode is enabled
 	if (!from_debugger && phase > machine_phase::INIT && m_low_latency && effective_throttle())
 		update_throttle(current_time);
@@ -279,6 +282,26 @@ void video_manager::frame_update(bool from_debugger)
 		if (screen && ((machine().paused() && machine().options().update_in_pause()) || from_debugger || within_instruction_hook))
 			screen->reset_partial_updates();
 	}
+}
+
+
+//-------------------------------------------------
+//  ui_yield_update - service host input and present
+//  UI updates without advancing emulation
+//-------------------------------------------------
+
+void video_manager::ui_yield_update()
+{
+	// false: relative axes accumulate until the frame boundary resets them
+	machine().osd().input_update(false);
+
+	if (machine().ui().ui_interleave_update())
+	{
+		auto profile = g_profiler.start(PROFILER_BLIT);
+		machine().osd().update(false);
+	}
+
+	machine().scheduler().mark_ui_serviced();
 }
 
 

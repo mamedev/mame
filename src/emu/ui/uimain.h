@@ -31,7 +31,12 @@ public:
 	virtual void set_startup_text(const char *text, bool force) { }
 
 	// is a menuing system active?  we want to disable certain keyboard/mouse inputs under such context
-	virtual bool is_menu_active() { return false; }
+	virtual bool is_menu_active() const { return false; }
+
+	virtual bool wants_ui_interleave() const { return false; }
+
+	// returns true if anything changed
+	virtual bool ui_interleave_update() { return false; }
 
 	virtual void popup_time_string(int seconds, std::string message) { }
 
