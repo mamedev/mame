@@ -56,6 +56,7 @@
 #include "bus/heathzenith/h89/sigmasoft_parallel_port.h"
 #include "bus/heathzenith/h89/sigmasoft_sound.h"
 #include "bus/heathzenith/h89/we_pullup.h"
+#include "bus/heathzenith/h89/wh_88_16.h"
 #include "bus/heathzenith/h89/z_89_11.h"
 #include "bus/heathzenith/h89/z37_fdc.h"
 #include "bus/heathzenith/intr_cntrl/intr_cntrl.h"
@@ -780,6 +781,7 @@ void h89_base_state::h89_left_cards(device_slot_interface &device)
 		{
 			downcast<sigmasoft_parallel_port_igc &>(*device).set_tlbc(m_tlbc);
 		});
+	device.option_add("wh_88_16",        H89BUS_WH_88_16);
 }
 
 void h89_base_state::h89_right_cards(device_slot_interface &device)
@@ -859,7 +861,10 @@ void h89_base_state::h89_base(machine_config &config)
 	m_maincpu->set_io_map(&h89_base_state::h89_base_io);
 	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
 
-	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
+	// the CPU board holds up to 48K, and a WH-88-16 card in a left slot adds the
+	// last 16K; 64K is the mod that piggybacks 16K on the CPU board and wires it
+	// to RD6, for use without the card
+	RAM(config, m_ram).set_default_size("48K").set_extra_options("16K,32K,64K").set_default_value(0x00);
 
 	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, nullptr);
 	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -893,7 +898,7 @@ void h89_base_state::h89_base(machine_config &config)
 
 	H89BUS_LEFT_SLOT(config, "p501", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
 	H89BUS_LEFT_SLOT(config, "p502", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
-	H89BUS_LEFT_SLOT(config, "p503", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
+	H89BUS_LEFT_SLOT(config, "p503", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, "wh_88_16");
 	H89BUS_RIGHT_SLOT(config, "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, nullptr);
 	H89BUS_RIGHT_SLOT(config, "p505", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "ha_88_3");
 	H89BUS_RIGHT_SLOT(config, "p506", "h89bus", [this](device_slot_interface &device) { h89_right_p506_cards(device); }, "we_pullup").set_p506_signalling(true);
@@ -911,6 +916,10 @@ void h88_state::h88(machine_config &config)
 
 	m_intr_socket->set_default_option("original");
 	m_intr_socket->set_fixed(true);
+
+	// 16K, without the WH-88-16 card
+	m_ram->set_default_size("16K").set_extra_options("32K,48K,64K");
+	subdevice<h89bus_left_slot_device>("p503")->set_default_option(nullptr);
 
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "h_88_5");
 

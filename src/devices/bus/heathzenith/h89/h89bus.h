@@ -231,6 +231,11 @@ public:
 	// construction/destruction
 	virtual ~device_h89bus_left_card_interface();
 
+	// memory the card puts on a primary memory decoder select line (h89bus::MEM_PRI_RD6 or
+	// h89bus::MEM_PRI_RD7): 16K that A13 - A0 index, or nullptr if the card doesn't answer
+	// the line; the bus asks while it builds the memory map at machine start
+	virtual u8 *mem_select_bank(u8 select_line) ATTR_COLD;
+
 protected:
 	device_h89bus_left_card_interface(const machine_config &mconfig, device_t &device);
 };
@@ -588,7 +593,8 @@ public:
 
 	// map the CPU board memory into the program space, as selected by the
 	// memory decoder PROMs; call from machine_start
-	// - ram: RAM banks in 16K steps (RAS0 - RAS2, then the 16K expansion on RD6)
+	// - ram: RAM banks in 16K steps (RAS0 - RAS2, then RD6 for a 64K board, which has the
+	//   16K expansion piggybacked on it); cards in the left slots can also answer RD6/RD7
 	// - rom: the lower 8K, with the system ROM at 0x0000 and the floppy ROM at 0x1800
 	// - floppy_ram: the 1K floppy RAM
 	void install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *floppy_ram) ATTR_COLD;
@@ -625,8 +631,9 @@ protected:
 	required_device<heath_mem_decoder_socket> m_sec_mem_decoder;
 
 private:
-	u8 *ram_bank(u8 select_line) const ATTR_COLD;
-	void install_mem_view_entry(memory_view::memory_view_entry &entry, bool org0, bool fmwe) ATTR_COLD;
+	u8 *cpu_ram_bank(u8 select_line) const ATTR_COLD;
+	std::vector<u8 *> select_line_banks(u8 select_line) const ATTR_COLD;
+	void install_mem_view_entry(memory_view::memory_view_entry &entry, bool org0, bool fmwe, u8 jumpers) ATTR_COLD;
 	void update_mem_view();
 
 	devcb_write_line m_out_int3_cb, m_out_int4_cb, m_out_int5_cb;

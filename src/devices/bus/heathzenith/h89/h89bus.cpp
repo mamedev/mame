@@ -42,6 +42,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <string>
 
 #define LOG_SETUP (1U << 1)
 
@@ -712,24 +713,68 @@ void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *flopp
 	m_rom = rom;
 	m_floppy_ram = floppy_ram;
 
+	// warn when more than one device answers a left slot select line
+	bool rd6_card = false;
+
+	for (u8 const line : { h89bus::MEM_PRI_RD6, h89bus::MEM_PRI_RD7 })
+	{
+		std::vector<std::string> names;
+
+		for (device_h89bus_left_card_interface &card : m_left_device_list)
+		{
+			if (card.mem_select_bank(line))
+				names.emplace_back(card.device().tag());
+		}
+
+		if (line == h89bus::MEM_PRI_RD6)
+			rd6_card = !names.empty();
+
+		if (cpu_ram_bank(line))
+			names.emplace_back("CPU board");
+
+		if (names.size() > 1)
+		{
+			std::string list;
+			for (std::string const &name : names)
+				list += (list.empty() ? "" : ", ") + name;
+
+			osd_printf_warning("%s: more than one device answers %s (%s); writes go to all of them, reads come from %s\n",
+					tag(), (line == h89bus::MEM_PRI_RD6) ? "RD6" : "RD7", list, names.front());
+		}
+	}
+
+	// memory size jumpers JJ501/JJ502 match the installed RAM: 16K, 32K, 48K or 64K;
+	// a 16K expansion card on RD6 makes a 48K board into a 64K system
+	u32 const cpu_banks = m_ram_size / 0x4000;
+	u8 jumpers = cpu_banks - 1;
+
+	if (rd6_card)
+	{
+		if (cpu_banks == 3)
+			jumpers = 3;
+		else if (cpu_banks < 3)
+			osd_printf_warning("%s: the 16K expansion memory (RD6) needs 48K on the CPU board, it will not be selected\n", tag());
+	}
+
 	m_program_space->install_view(0x0000, 0xffff, m_mem_view);
 
 	for (int org0 = 0; org0 < 2; org0++)
 	{
 		for (int fmwe = 0; fmwe < 2; fmwe++)
 		{
-			install_mem_view_entry(m_mem_view[(org0 << 1) | fmwe], org0, fmwe);
+			install_mem_view_entry(m_mem_view[(org0 << 1) | fmwe], org0, fmwe, jumpers);
 		}
 	}
 
 	m_mem_installed = true;
 }
 
-// 16K RAM bank for a primary memory decoder select line, null if it is not installed
-u8 *h89bus_device::ram_bank(u8 select_line) const
+// CPU board 16K RAM bank for a primary memory decoder select line, null if it is not installed
+u8 *h89bus_device::cpu_ram_bank(u8 select_line) const
 {
-	// the CPU board has three banks (RAS0 - RAS2), a 64K system also has the
-	// 16K expansion (RD6), and they are filled in that order
+	// the CPU board has three banks (RAS0 - RAS2), and a 64K board also has the
+	// 16K expansion piggybacked on one of them and wired to RD6; they are filled
+	// in that order
 	u32 bank;
 
 	switch (select_line)
@@ -749,11 +794,31 @@ u8 *h89bus_device::ram_bank(u8 select_line) const
 	return m_ram + (bank * 0x4000);
 }
 
-void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry, bool org0, bool fmwe)
+// 16K banks that answer a primary memory decoder select line: cards in the
+// left slots first, so reads come from them, then the CPU board
+std::vector<u8 *> h89bus_device::select_line_banks(u8 select_line) const
 {
-	// memory size jumpers JJ501/JJ502 match the installed RAM: 16K, 32K, 48K or 64K
-	u8 const jumpers = (m_ram_size / 0x4000) - 1;
+	std::vector<u8 *> banks;
 
+	if (select_line & (h89bus::MEM_PRI_RD6 | h89bus::MEM_PRI_RD7))
+	{
+		for (device_h89bus_left_card_interface &card : m_left_device_list)
+		{
+			u8 *const bank = card.mem_select_bank(select_line);
+			if (bank)
+				banks.push_back(bank);
+		}
+	}
+
+	u8 *const bank = cpu_ram_bank(select_line);
+	if (bank)
+		banks.push_back(bank);
+
+	return banks;
+}
+
+void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry, bool org0, bool fmwe, u8 jumpers)
+{
 	// what each 1K page of the address space reads from and writes to
 	constexpr u32 PAGES = 0x10000 / 0x400;
 	std::array<u8 *, PAGES> read_src{};
@@ -796,8 +861,15 @@ void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry
 					{
 						if (pri & line)
 						{
-							u8 *const bank = ram_bank(line);
-							add(bank ? bank + (addr & 0x3fff) : nullptr);
+							// writes go to every bank on the line, reads come from the first
+							std::vector<u8 *> const banks = select_line_banks(line);
+
+							for (u8 *const bank : banks)
+							{
+								add(bank + (addr & 0x3fff));
+								if (!write)
+									break;
+							}
 						}
 					}
 				}
@@ -972,6 +1044,11 @@ device_h89bus_left_card_interface::device_h89bus_left_card_interface(const machi
 
 device_h89bus_left_card_interface::~device_h89bus_left_card_interface()
 {
+}
+
+u8 *device_h89bus_left_card_interface::mem_select_bank(u8 select_line)
+{
+	return nullptr;
 }
 
 device_h89bus_right_card_interface::device_h89bus_right_card_interface(const machine_config &mconfig, device_t &device) :
