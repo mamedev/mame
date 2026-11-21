@@ -373,6 +373,7 @@ private:
 	void alu_lst_lwp();
 	void alu_mov();
 	void alu_multiply();
+	void mpy_next_word_cycle();
 	void alu_rtwp();
 	void alu_sbo_sbz();
 	void alu_shift();

@@ -95,6 +95,12 @@
 
 #define NOPRG -1
 
+// MPY reads the next word as data on the original Pyuuta tested.
+// Set to 0 for TMS9995 parts that use an internal cycle in its place.
+#ifndef TMS9995_MPY_READ_NEXT_WORD
+#define TMS9995_MPY_READ_NEXT_WORD 1
+#endif
+
 /* tms9995 ST register bits. */
 enum
 {
@@ -257,6 +263,7 @@ void tms9995_device::device_start()
 	save_item(NAME(m_auto_wait));
 	save_item(NAME(m_icount));
 	save_item(NAME(m_mem_phase));
+	save_item(NAME(m_iaq));
 	save_item(NAME(m_check_ready));
 	save_item(NAME(m_check_hold));
 	save_item(NAME(m_pass));
@@ -514,6 +521,7 @@ enum
 	ALU_LSTWP,
 	ALU_MOV,
 	ALU_MPY,
+	MPY_NEXT_WORD,
 	ALU_RTWP,
 	ALU_SBO_SBZ,
 	ALU_SHIFT,
@@ -780,10 +788,11 @@ MICROPROGRAM(mov_mp)
 MICROPROGRAM(multiply_mp)
 {
 	OPERAND_ADDR,           // x
-	MEMORY_READ,            // 1 (1)
-	ALU_MPY,                // 1
-	MEMORY_READ,            // 1 (1)
-	ALU_MPY,                // 17
+	MEMORY_READ,            // Source operand
+	ALU_MPY,                // MPY: 0, MPYS: 1
+	MEMORY_READ,            // Destination register (MPYS uses R0)
+	MPY_NEXT_WORD,          // MPY: internal clock or ordinary word read at PC
+	ALU_MPY,                // MPY: 17, MPYS: 19
 	MEMORY_WRITE,           // 1 (1)
 	ALU_MPY,                // 0
 	PREFETCH,               // 1 (1)
@@ -990,6 +999,7 @@ const tms9995_device::ophandler tms9995_device::s_microoperation[] =
 	&tms9995_device::alu_lst_lwp,
 	&tms9995_device::alu_mov,
 	&tms9995_device::alu_multiply,
+	&tms9995_device::mpy_next_word_cycle,
 	&tms9995_device::alu_rtwp,
 	&tms9995_device::alu_sbo_sbz,
 	&tms9995_device::alu_shift,
@@ -2984,6 +2994,33 @@ void tms9995_device::alu_mov()
 	// No clock pulse, as next instruction is prefetch
 }
 
+// This slot follows the destination register read. On parts that issue a
+// non-IAQ read here, external bytes take the usual READY and wait states.
+void tms9995_device::mpy_next_word_cycle()
+{
+	if (m_command != MPY)
+		return;
+
+	if (!TMS9995_MPY_READ_NEXT_WORD || m_mp9537)
+	{
+		pulse_clock(1);
+		return;
+	}
+
+	if (m_mem_phase == 1)
+	{
+		m_address_copy = m_address;
+		m_value_copy = m_current_value;
+		m_address = PC;
+	}
+	word_read();
+	if (m_mem_phase == 1)
+	{
+		m_address = m_address_copy;
+		m_current_value = m_value_copy;
+	}
+}
+
 /*
     Unsigned and signed multiplication
 */
@@ -3002,11 +3039,10 @@ void tms9995_device::alu_multiply()
 			m_source_value = m_current_value;
 			// m_address is the second multiplier (in a register)
 			m_address = ((IR >> 5) & 0x001e) + WP;
-			n = 1;
 			break;
 		case 1:
 			// m_current_value <- register content
-			result = (m_source_value & 0x0000ffff) * (m_current_value & 0x0000ffff);
+			result = uint32_t(m_source_value) * m_current_value;
 			m_current_value = (result >> 16) & 0xffff;
 			m_value_copy = result & 0xffff;
 			// m_address is still the register
@@ -3035,10 +3071,15 @@ void tms9995_device::alu_multiply()
 		case 1:
 			// m_current_value <- register content
 			results = ((int16_t)m_source_value) * ((int16_t)m_current_value);
+			// MPYS sets the comparison flags from the entire signed product.
+			ST &= ~(ST_LH | ST_AGT | ST_EQ);
+			ST |= (results == 0) ? ST_EQ : ST_LH;
+			if (results > 0)
+				ST |= ST_AGT;
 			m_current_value = (results >> 16) & 0xffff;
 			m_value_copy = results & 0xffff;
 			// m_address is still the register
-			n = 16;
+			n = 19;
 			break;
 		case 2:
 			m_address += 2;
