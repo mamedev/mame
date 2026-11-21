@@ -1578,12 +1578,14 @@ void konamigx_esc_state::daiskiss(machine_config &config)
 void konamigx_esc_state::gokuparo(machine_config &config)
 {
 	konamigx(config);
+	m_k054539_level = 1.25f; // +1.9 dB
 	add_esc(config, 0x8d8c, 0x3, 0x2c3ea1c4, { 15, 11, 13, 14, 9, 3, 0, 7, 6, 1, 8, 5, 12, 10, 4, 2 });
 }
 
 void konamigx_esc_state::puzldama(machine_config &config)
 {
 	konamigx(config);
+	m_k054539_level = 1.15f; // +1.2 dB
 	add_esc(config, 0x5d32, 0x3, 0x91c2c6fb, { 11, 8, 12, 9, 4, 2, 5, 6, 10, 3, 7, 13, 14, 0, 1, 15 });
 }
 
@@ -1599,6 +1601,7 @@ void konamigx_esc_state::sexyparo(machine_config &config)
 void konamigx_esc_state::tbyahhoo(machine_config &config)
 {
 	konamigx(config);
+	m_k054539_level = 1.55f; // +3.8 dB
 
 	m_k056832->set_config(K056832_BPP_5, 0, 0);
 
@@ -1608,6 +1611,7 @@ void konamigx_esc_state::tbyahhoo(machine_config &config)
 void konamigx_esc_state::dragoonj(machine_config &config)
 {
 	konamigx(config);
+	m_k054539_level = 1.6f; // +4.1 dB
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, dragoonj)
 
 	m_k053252->set_offsets(24+16, 16);
@@ -1649,6 +1653,7 @@ void konamigx_esc_state::salmndr2(machine_config &config)
 void konamigx_state::le2(machine_config &config)
 {
 	konamigx(config);
+	m_k054539_level = 2.25f; // +7.0 dB
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, le2)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(konamigx_state::konamigx_type2_scanline), "screen", 0, 1);
@@ -1669,6 +1674,7 @@ void konamigx_state::konamigx_6bpp(machine_config &config)
 void konamigx_state::opengolf(machine_config &config)
 {
 	konamigx(config);
+	m_k054539_level = 2.6f; // +8.3 dB
 	K053936(config, m_type1_roz).set_wrap(1);
 	m_screen->screen_vblank().set(FUNC(konamigx_state::type1_vblank_w));
 
@@ -1692,6 +1698,7 @@ void konamigx_state::opengolf(machine_config &config)
 void konamigx_state::racinfrc(machine_config &config)
 {
 	konamigx(config);
+	m_k054539_level = 2.0f; // +6.0 dB
 	K053936(config, m_type1_roz).set_wrap(1);
 	m_screen->screen_vblank().set(FUNC(konamigx_state::type1_vblank_w));
 
@@ -1714,6 +1721,7 @@ void konamigx_state::racinfrc(machine_config &config)
 void konamigx_state::gxtype3(machine_config &config)
 {
 	konamigx(config);
+	m_k054539_level = 1.95f; // +5.8 dB
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type3_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konamigx_state::konamigx_type4_scanline), "screen", 0, 1);
@@ -1751,6 +1759,7 @@ void konamigx_state::gxtype3(machine_config &config)
 void konamigx_state::gxtype4(machine_config &config)
 {
 	konamigx(config);
+	m_k054539_level = 1.35f; // +2.6 dB
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &konamigx_state::gx_type4_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(konamigx_state::konamigx_type4_scanline), "screen", 0, 1);
@@ -1787,6 +1796,7 @@ void konamigx_state::gxtype4(machine_config &config)
 void konamigx_state::gxtype4_vsn(machine_config &config)
 {
 	gxtype4(config);
+	m_k054539_level = 1.2f; // +1.6 dB
 	config.set_default_layout(layout_dualhsxs);
 
 	//m_screen->set_size(128*8, 32*8);
@@ -1807,6 +1817,7 @@ void konamigx_state::gxtype4_vsn(machine_config &config)
 void konamigx_state::gxtype4sd2(machine_config &config)
 {
 	gxtype4(config);
+	m_k054539_level = 1.2f; // +1.6 dB
 	MCFG_VIDEO_START_OVERRIDE(konamigx_state, konamigx_type4_sd2)
 
 	m_k055673->set_config(K055673_LAYOUT_GX6, -81, -23);
@@ -1815,6 +1826,7 @@ void konamigx_state::gxtype4sd2(machine_config &config)
 void konamigx_state::winspike(machine_config &config)
 {
 	konamigx(config);
+	m_k054539_level = 1.6f; // +4.1 dB
 	//m_screen->set_visible_area(38, 38+384-1, 16, 16+224-1);
 
 	m_k053252->set_offsets(24+15, 16);
@@ -3751,6 +3763,11 @@ ROM_END
 
 MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
+	if (m_k054539_1.found())
+		m_k054539_1->set_output_gain(ALL_OUTPUTS, m_k054539_level);
+	if (m_k054539_2.found())
+		m_k054539_2->set_output_gain(ALL_OUTPUTS, m_k054539_level);
+
 	save_item(NAME(m_sound_ctrl));
 	save_item(NAME(m_sound_intck));
 

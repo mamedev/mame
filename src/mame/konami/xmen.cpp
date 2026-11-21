@@ -67,6 +67,7 @@ public:
 		m_k053251(*this, "k053251"),
 		m_screen(*this, "screen"),
 		m_eeprom(*this, "eeprom"),
+		m_ymsnd(*this, "ymsnd"),
 		m_z80bank(*this, "z80bank"),
 		m_okibank(*this, "okibank")
 	{ }
@@ -98,9 +99,11 @@ protected:
 	required_device<k053251_device> m_k053251;
 	required_device<screen_device> m_screen;
 	required_device<eeprom_serial_er5911_device> m_eeprom;
+	optional_device<ym2151_device> m_ymsnd;
 
 private:
 	void sound_bankswitch_w(uint8_t data);
+	K054539_AUX_GAIN_CB_MEMBER(ym_aux_gain);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
@@ -640,6 +643,14 @@ void xmen_state::base(machine_config &config)
 	K053251(config, m_k053251);
 }
 
+// The YM2151 feeds the 054539's auxiliary input (SO, SH1 and SH2 into the 054539 on the board), so it follows the
+// global volume that input selects. As on Xexex, its right output is taken as input 0; the game selects the same
+// global volume for both inputs.
+K054539_AUX_GAIN_CB_MEMBER(xmen_state::ym_aux_gain)
+{
+	m_ymsnd->set_output_gain(input ^ 1, gain);
+}
+
 void xmen_state::xmen(machine_config &config)
 {
 	base(config);
@@ -653,12 +664,14 @@ void xmen_state::xmen(machine_config &config)
 	K054321(config, "k054321", "speaker");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 16_MHz_XTAL / 4)); // verified on PCB
-	ymsnd.add_route(0, "speaker", 0.20, 1);
-	ymsnd.add_route(1, "speaker", 0.20, 0);
+	// the gains include +8 dB for the 054539 global volumes the game sets, which the YM2151 also follows
+	ymsnd.add_route(0, "speaker", 0.50, 1);
+	ymsnd.add_route(1, "speaker", 0.50, 0);
 
 	k054539_device &k054539(K054539(config, "k054539", 18.432_MHz_XTAL));
-	k054539.add_route(0, "speaker", 1.00, 1);
-	k054539.add_route(1, "speaker", 1.00, 0);
+	k054539.set_aux_gain_callback(FUNC(xmen_state::ym_aux_gain));
+	k054539.add_route(0, "speaker", 2.50, 1);
+	k054539.add_route(1, "speaker", 2.50, 0);
 }
 
 void xmen_state::xmenabl(machine_config &config)

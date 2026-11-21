@@ -1085,8 +1085,10 @@ void polygonet_state::plygonet(machine_config &config)
 
 	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
 	k054539.timer_handler().set(FUNC(polygonet_state::k054539_nmi_gen));
-	k054539.add_route(0, "speaker", 0.75, 0);
-	k054539.add_route(1, "speaker", 0.75, 1);
+	// the gains include +2.9 dB for the 054539 global volumes the games set (Polygonet Commanders
+	// about 6 dB below its old level, Poly-Net Warriors 0 dB, so this splits the difference)
+	k054539.add_route(0, "speaker", 1.05, 0);
+	k054539.add_route(1, "speaker", 1.05, 1);
 }
 
 

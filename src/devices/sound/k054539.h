@@ -14,6 +14,7 @@
 #include "dirom.h"
 
 #define K054539_CB_MEMBER(_name) void _name(double left, double right)
+#define K054539_AUX_GAIN_CB_MEMBER(_name) void _name(int input, double gain)
 
 class k054539_device : public device_t,
 					   public device_sound_interface,
@@ -31,6 +32,7 @@ public:
 	};
 
 	using apan_delegate = device_delegate<void (double left, double right)>;
+	using again_delegate = device_delegate<void (int input, double gain)>;
 
 	// construction/destruction
 	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -39,6 +41,8 @@ public:
 	auto timer_handler() { return m_timer_handler.bind(); }
 
 	template <typename... T> void set_analog_callback(T &&... args) { m_apan_cb.set(std::forward<T>(args)...); }
+	// gain of each analog input from the global volume it selects (0x210/0x211, 0x228-0x22b)
+	template <typename... T> void set_aux_gain_callback(T &&... args) { m_again_cb.set(std::forward<T>(args)...); }
 
 	void write(offs_t offset, u8 data);
 	u8 read(offs_t offset);
@@ -102,7 +106,10 @@ private:
 	uint32_t m_timer_state;
 	devcb_write_line m_timer_handler;
 	apan_delegate m_apan_cb;
+	again_delegate m_again_cb;
 
+	double global_volume(int sel) const;
+	void update_aux_gain();
 	bool regupdate();
 	void keyon(int channel);
 	void keyoff(int channel);
