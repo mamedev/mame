@@ -203,6 +203,7 @@ public:
 	{
 	}
 
+	void pyuuta(machine_config &config);
 	void pyuutajr(machine_config &config);
 	void tutor(machine_config &config);
 
@@ -227,6 +228,7 @@ private:
 
 	int m_bank1_switching;
 	int m_centronics_busy;
+	double m_cassette_polarity = +1.0;
 
 	uint8_t key_r(offs_t offset);
 	uint8_t tutor_mapper_r(offs_t offset);
@@ -394,15 +396,11 @@ uint8_t tutor_state::tutor_highmem_r(offs_t offset)
 
     The cassette interface uses several ports in the >e000 range.
 
-    Writing to *CPU* address @>ee00 will set the tape output to 0.  Writing to
-    *CPU* address @>ee20 will set the tape output to 1.
-
-    Tape input level can be read from *CRU* logical address >ed00 (CRU physical
-    address >7680).
-
-    Writing to @>ee40 enables tape interrupts; writing to @>ee60 disables tape
-    interrupts.  Tape interrupts are level-4 interrupt that occur when the tape
-    input level is high(?).
+    On the original Japanese Pyuuta, the two input gates at B3 preserve polarity.
+    The final CRUIN NAND reads a negative half-wave as 1 at CRU address >ed00.
+    The same half-wave drives /INT4 low when enabled by a write to >ee40.
+    Writing to >ee60 disables tape interrupts. On the recording side the C6 latch
+    drives the tape output high on a write to >ee00, low on a write to >ee20.
 
     There are other output ports: @>ee80, @>eea0, @>eec0 & @>eee0.  I don't
     know their exact meaning.
@@ -410,14 +408,13 @@ uint8_t tutor_state::tutor_highmem_r(offs_t offset)
 
 TIMER_CALLBACK_MEMBER(tutor_state::tape_interrupt_handler)
 {
-	//assert(m_tape_interrupt_enable);
-	m_maincpu->set_input_line(INT_9995_INT4, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INT_9995_INT4, tutor_cassette_r() ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* CRU handler */
 uint8_t tutor_state::tutor_cassette_r()
 {
-	return (m_cass->input() > 0.0) ? 1 : 0;
+	return (m_cass->input() * m_cassette_polarity > 0.0) ? 1 : 0;
 }
 
 /* memory handler */
@@ -434,7 +431,7 @@ void tutor_state::tutor_cassette_w(offs_t offset, uint8_t data)
 		{
 		case 0:
 			/* data out */
-			m_cass->output((data) ? +1.0 : -1.0);
+			m_cass->output(data ? m_cassette_polarity : -m_cassette_polarity);
 			break;
 		case 1:
 			/* interrupt control??? */
@@ -783,6 +780,12 @@ void tutor_state::tutor(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("tutor");
 }
 
+void tutor_state::pyuuta(machine_config &config)
+{
+	tutor(config);
+	m_cassette_polarity = -1.0;
+}
+
 void tutor_state::pyuutajr(machine_config &config)
 {
 	tutor(config);
@@ -816,5 +819,5 @@ ROM_END
 
 //    YEAR   NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS        INIT        COMPANY   FULLNAME           FLAGS
 COMP( 1983?, tutor,    0,      0,      tutor,    tutor,    tutor_state, empty_init, "Tomy",   "Tomy Tutor" ,     0)
-COMP( 1982,  pyuuta,   tutor,  0,      tutor,    tutor,    tutor_state, empty_init, "Tomy",   "Tomy Pyuuta" ,    0)
+COMP( 1982,  pyuuta,   tutor,  0,      pyuuta,   tutor,    tutor_state, empty_init, "Tomy",   "Tomy Pyuuta" ,    0)
 COMP( 1983,  pyuutajr, tutor,  0,      pyuutajr, pyuutajr, tutor_state, empty_init, "Tomy",   "Tomy Pyuuta Jr.", 0)
