@@ -112,6 +112,9 @@ March 2013 NPW:
 #include "m6809inl.h"
 #include "6x09dasm.h"
 
+#include <algorithm>
+#include <iterator>
+
 
 //**************************************************************************
 //  PARAMETERS
@@ -206,6 +209,11 @@ void m6809_base_device::device_start()
 	m_firq_line = false;
 	m_irq_line = false;
 	m_lds_encountered = false;
+	std::fill(std::begin(m_firq_change_cycle), std::end(m_firq_change_cycle), 0);
+	std::fill(std::begin(m_irq_change_cycle), std::end(m_irq_change_cycle), 0);
+	m_nmi_assert_cycle = 0;
+	m_interrupt_settling = false;
+	m_interrupt_settle_cycle = 0;
 
 	m_state = 0;
 	m_cond = false;
@@ -228,6 +236,11 @@ void m6809_base_device::device_start()
 	save_item(NAME(m_nmi_line));
 	save_item(NAME(m_firq_line));
 	save_item(NAME(m_irq_line));
+	save_item(NAME(m_firq_change_cycle));
+	save_item(NAME(m_irq_change_cycle));
+	save_item(NAME(m_nmi_assert_cycle));
+	save_item(NAME(m_interrupt_settling));
+	save_item(NAME(m_interrupt_settle_cycle));
 	save_item(NAME(m_lds_encountered));
 	save_item(NAME(m_state));
 	save_item(NAME(m_ea.w));
@@ -252,6 +265,14 @@ void m6809_base_device::device_reset()
 	m_nmi_asserted = false;
 	m_lds_encountered = false;
 	m_free_run = false;
+
+	// the cycle counter restarts from zero on reset, so the line change
+	// history is cleared; lines still asserted are seen immediately
+	std::fill(std::begin(m_firq_change_cycle), std::end(m_firq_change_cycle), 0);
+	std::fill(std::begin(m_irq_change_cycle), std::end(m_irq_change_cycle), 0);
+	m_nmi_assert_cycle = 0;
+	m_interrupt_settling = false;
+	m_interrupt_settle_cycle = 0;
 
 	m_dp = 0x00;        // reset direct page register
 
@@ -462,20 +483,76 @@ void m6809_base_device::execute_set_input(int inputnum, int state)
 	{
 		case INPUT_LINE_NMI:
 			// NMI is edge triggered
-			m_nmi_asserted = m_nmi_asserted || ((state != CLEAR_LINE) && !m_nmi_line && m_lds_encountered);
+			if (!m_nmi_asserted && (state != CLEAR_LINE) && !m_nmi_line && m_lds_encountered)
+			{
+				m_nmi_asserted = true;
+				m_nmi_assert_cycle = total_cycles();
+				interrupt_line_changed();
+			}
 			m_nmi_line = (state != CLEAR_LINE);
 			break;
 
 		case M6809_FIRQ_LINE:
 			// FIRQ is line triggered
-			m_firq_line = (state != CLEAR_LINE);
+			if (m_firq_line != (state != CLEAR_LINE))
+			{
+				m_firq_change_cycle[1] = m_firq_change_cycle[0];
+				m_firq_change_cycle[0] = total_cycles();
+				m_firq_line = (state != CLEAR_LINE);
+				interrupt_line_changed();
+			}
 			break;
 
 		case M6809_IRQ_LINE:
 			// IRQ is line triggered
-			m_irq_line = (state != CLEAR_LINE);
+			if (m_irq_line != (state != CLEAR_LINE))
+			{
+				m_irq_change_cycle[1] = m_irq_change_cycle[0];
+				m_irq_change_cycle[0] = total_cycles();
+				m_irq_line = (state != CLEAR_LINE);
+				interrupt_line_changed();
+			}
 			break;
 	}
+}
+
+
+//-------------------------------------------------
+//  interrupt_line_changed - note that an input
+//  changed and is not yet visible to the core
+//-------------------------------------------------
+
+void m6809_base_device::interrupt_line_changed()
+{
+	// get_pending_interrupt() looks back through the change history until
+	// the longest latency has passed the newest change
+	m_interrupt_settling = true;
+	m_interrupt_settle_cycle = total_cycles() + CWAI_INTERRUPT_LATENCY_CYCLES;
+}
+
+
+//-------------------------------------------------
+//  sync_wake_cycles - number of cycles SYNC still
+//  takes once an interrupt line is seen asserted
+//-------------------------------------------------
+
+int m6809_base_device::sync_wake_cycles() const
+{
+	// SYNC finishes four cycles after the earliest asserted interrupt line
+	// was seen, but no sooner than two cycles after the SYNC opcode read
+	// its dummy byte (or the opcode itself in HD6309 native mode).
+	uint64_t seen = ~uint64_t(0);
+	if (m_nmi_asserted)
+		seen = std::min(seen, m_nmi_assert_cycle);
+	if (m_firq_line)
+		seen = std::min(seen, m_firq_change_cycle[0]);
+	if (m_irq_line)
+		seen = std::min(seen, m_irq_change_cycle[0]);
+
+	uint64_t const cycles = total_cycles();
+	if (seen + 4 <= cycles + 2)
+		return 2;
+	return int(std::min<uint64_t>(seen + 4 - cycles, 4));
 }
 
 

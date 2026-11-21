@@ -265,13 +265,35 @@ inline bool m6809_base_device::is_register_addressing_mode()
 //  get_pending_interrupt
 //-------------------------------------------------
 
-inline uint16_t m6809_base_device::get_pending_interrupt()
+inline uint16_t m6809_base_device::get_pending_interrupt(uint64_t latency)
 {
-	if (m_nmi_asserted)
+	// inputs are seen as they were `latency` cycles ago
+	bool nmi = m_nmi_asserted;
+	bool firq = m_firq_line;
+	bool irq = m_irq_line;
+	if (m_interrupt_settling)
+	{
+		uint64_t const cycles = total_cycles();
+		if (cycles >= m_interrupt_settle_cycle)
+		{
+			m_interrupt_settling = false;
+		}
+		else
+		{
+			// changes alternate, so a line differed from its current level
+			// only between its two most recent changes
+			uint64_t const when = (cycles >= latency) ? (cycles - latency) : 0;
+			nmi = nmi && (when >= m_nmi_assert_cycle);
+			firq ^= (when >= m_firq_change_cycle[1]) && (when < m_firq_change_cycle[0]);
+			irq ^= (when >= m_irq_change_cycle[1]) && (when < m_irq_change_cycle[0]);
+		}
+	}
+
+	if (nmi)
 		return VECTOR_NMI;
-	else if (!(m_cc & CC_F) && m_firq_line)
+	else if (!(m_cc & CC_F) && firq)
 		return VECTOR_FIRQ;
-	else if (!(m_cc & CC_I) && m_irq_line)
+	else if (!(m_cc & CC_I) && irq)
 		return VECTOR_IRQ;
 	else
 		return 0;

@@ -139,6 +139,13 @@ protected:
 		EXCEPTION_XRES  = 5
 	};
 
+	// Interrupt inputs are latched at the start of each bus cycle, and the
+	// decision to take an interrupt uses the latch from the start of the
+	// last cycle of the instruction.  While CWAI waits, the latch is copied
+	// one cycle before it is tested, so it sees changes one cycle later.
+	static constexpr uint64_t INTERRUPT_LATENCY_CYCLES = 2;
+	static constexpr uint64_t CWAI_INTERRUPT_LATENCY_CYCLES = 3;
+
 	union M6809Q
 	{
 		#ifdef LSB_FIRST
@@ -182,6 +189,11 @@ protected:
 	bool                        m_firq_line;
 	bool                        m_irq_line;
 	bool                        m_lds_encountered;
+	uint64_t                    m_firq_change_cycle[2]; // cycles of the two most recent FIRQ line changes
+	uint64_t                    m_irq_change_cycle[2];  // cycles of the two most recent IRQ line changes
+	uint64_t                    m_nmi_assert_cycle;     // cycle the pending NMI edge arrived
+	bool                        m_interrupt_settling;   // an input changed too recently to be seen yet
+	uint64_t                    m_interrupt_settle_cycle;
 	int                         m_icount;
 	int                         m_addressing_mode;
 	PAIR16                      m_ea;                 // effective address
@@ -284,7 +296,10 @@ protected:
 	inline void write_exgtfr_register(uint8_t reg, uint16_t value);
 	bool is_register_addressing_mode();
 	bool is_ea_addressing_mode() { return m_addressing_mode == ADDRESSING_MODE_EA; }
-	uint16_t get_pending_interrupt();
+	uint16_t get_pending_interrupt(uint64_t latency = INTERRUPT_LATENCY_CYCLES);
+	bool interrupt_line_waiting() const { return m_nmi_asserted || m_firq_line || m_irq_line; }
+	int sync_wake_cycles() const;
+	void interrupt_line_changed();
 	void log_illegal();
 
 private:
