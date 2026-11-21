@@ -6141,7 +6141,7 @@ Looks too dark, needs bumped brightness (verify)
 
 	<!-- TODO: return errno 1 under DOS and MSCDEX -->
 	<software name="rayman" supported="partial">
-		<description>Rayman (US v1.21)</description>
+		<description>Rayman (USA v1.21)</description>
 		<year>1995</year>
 		<publisher>Ubi Soft</publisher>
 		<info name="required_os" value="DOS 5.0 / Windows 95" />
