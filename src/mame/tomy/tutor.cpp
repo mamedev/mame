@@ -199,6 +199,7 @@ public:
 		m_bank2(*this, "bank2"),
 		m_io_line(*this, "LINE%u", 0U),
 		m_io_line_alt(*this, "LINE%u_alt", 4U),
+		m_tape_polarity(*this, "TAPE_POLARITY"),
 		m_bank1_switching(0)
 	{
 	}
@@ -221,6 +222,7 @@ private:
 	required_memory_bank m_bank2;
 	optional_ioport_array<8> m_io_line;
 	optional_ioport_array<2> m_io_line_alt;
+	optional_ioport m_tape_polarity;
 	memory_region *m_cart_rom;
 
 	int m_tape_interrupt_enable;
@@ -414,7 +416,9 @@ TIMER_CALLBACK_MEMBER(tutor_state::tape_interrupt_handler)
 /* CRU handler */
 uint8_t tutor_state::tutor_cassette_r()
 {
-	return (m_cass->input() * m_cassette_polarity > 0.0) ? 1 : 0;
+	double const level = m_cass->input() * m_cassette_polarity;
+	// A recorder's phase switch reverses the playback waveform, including for /INT4.
+	return BIT(m_tape_polarity.read_safe(0), 0) ? (level < 0.0) : (level > 0.0);
 }
 
 /* memory handler */
@@ -711,6 +715,11 @@ static INPUT_PORTS_START(tutor)
 
 		/* Unused? */
 		PORT_BIT(0xf0, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("TAPE_POLARITY")
+		PORT_CONFNAME(0x01, 0x00, "Cassette Playback Polarity")
+		PORT_CONFSETTING(0x00, DEF_STR(Normal))
+		PORT_CONFSETTING(0x01, "Inverted")
 INPUT_PORTS_END
 
 // Unit only has 12 buttons. LINE0 & 3 are scanned with the others, but have nothing connected?
