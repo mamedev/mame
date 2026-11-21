@@ -126,8 +126,12 @@ Crown Melbourne uses regular ASP software.
 #include "cpu/sh/sh4.h"
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
+#include "sound/cs4341.h"
 #include "emupal.h"
 #include "screen.h"
+#include "speaker.h"
+
+#include <algorithm>
 
 namespace {
 
@@ -140,6 +144,7 @@ public:
 		m_uart0(*this, "uart0"),
 		m_uart1(*this, "uart1"),
 		m_eeprom0(*this, "eeprom0"),
+		m_dac(*this, "dac"),
 		m_palette(*this, "palette"),
 		m_vram(*this, "vram")
 	{ }
@@ -147,6 +152,8 @@ public:
 	void aristmk6(machine_config &config);
 
 private:
+	static constexpr u32 AUDIO_FIFO_DEPTH = 12; // DMA units
+
 	void testIrq();
 
 	uint8_t irqpend_r(offs_t offset);
@@ -154,6 +161,9 @@ private:
 	uint8_t test_r(offs_t offset);
 	void eeprom_w(uint64_t data);
 	uint64_t hwver_r();
+	u8 codec_r();
+	void codec_w(u8 data);
+	TIMER_CALLBACK_MEMBER(audio_dma);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual void video_start() override ATTR_COLD;
@@ -172,16 +182,28 @@ private:
 	required_device<ns16550_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom0;
+	required_device<cs4341_device> m_dac;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint64_t> m_vram;
+
+	emu_timer *m_audio_timer = nullptr;
+	u8 m_codec_out = 3; // lines the CPU drives: bit 0 SDA, bit 1 SCL
+	u8 m_codec_sda = 1; // SDA as the DAC drives it
+	u8 m_audio_channel = 1; // DMA channel the FPGA takes samples from
+	u64 m_audio_fifo[AUDIO_FIFO_DEPTH]{}; // DMA units read ahead of the DAC
+	u8 m_audio_fifo_count = 0;
+	u8 m_audio_holdoff = 0; // audio timer periods to stay off the DMA after a channel completes
 };
 
 
 void aristmk6_state::video_start()
 {
 }
+
 void aristmk6_state::machine_start()
 {
+	m_audio_timer = timer_alloc(FUNC(aristmk6_state::audio_dma), this);
+
 	save_item(NAME(irl0pend));
 	save_item(NAME(irl0en));
 	save_item(NAME(irl1pend));
@@ -192,11 +214,25 @@ void aristmk6_state::machine_start()
 	save_item(NAME(irl3en0));
 	save_item(NAME(irl3pend1));
 	save_item(NAME(irl3en1));
+	save_item(NAME(m_codec_out));
+	save_item(NAME(m_codec_sda));
+	save_item(NAME(m_audio_channel));
+	save_item(NAME(m_audio_fifo));
+	save_item(NAME(m_audio_fifo_count));
+	save_item(NAME(m_audio_holdoff));
 }
 
 void aristmk6_state::machine_reset()
 {
 	irl0pend = irl0en = irl1pend = irl1en = irl2pend = irl2en = irl3pend0 = irl3en0 = irl3pend1 = irl3en1 = 0;
+
+	// the FPGA takes one 64-bit DMA unit (four samples) every four LRCK periods; the DAC's own rate keeps
+	// the DMA in step with its sound stream
+	m_audio_channel = 1;
+	m_audio_fifo_count = 0;
+	m_audio_holdoff = 0;
+	const attotime period = attotime::from_hz(m_dac->sample_rate()) * 4;
+	m_audio_timer->adjust(period, 0, period);
 }
 
 uint32_t aristmk6_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -416,6 +452,79 @@ uint64_t aristmk6_state::hwver_r()
 	return 0;
 }
 
+/*
+    Audio: the BIOS mixer writes 1024 mono 16-bit samples per buffer to main RAM, four to each 64-bit
+    word.  The BIOS sets up DMA channels 1 and 3 (on-demand data transfer mode, external request) for
+    the FPGA, which sends the samples to the CS4341 DAC; the games tested re-arm only channel 1, from its
+    end-of-transfer interrupt.  With a 5.5 MHz MCLK and LRCK = MCLK / 256 the output is 21484 Hz, the
+    rate of the WAV files in the game ROMs, which the mixer plays one stored sample per output sample.
+    Only AOUTA is wired to the amplifier; each sample is assumed to go to both DAC channels.
+
+    The BIOS finishes writing the first samples of the next buffer only after it has re-armed the
+    channel, so the FPGA reads ahead into a FIFO and stays off the DMA for a while after a channel
+    completes, playing from the FIFO meanwhile.  The real FIFO depth is not known: 12 units is enough
+    for the BIOS, and taking the first unit sooner plays stale samples (clicks on loud sounds).
+*/
+
+u8 aristmk6_state::codec_r()
+{
+	return m_codec_out & (m_codec_sda | 2);
+}
+
+void aristmk6_state::codec_w(u8 data)
+{
+	// SDA changes while SCL is low: lower SCL first, raise it last
+	m_codec_out = data & 3;
+	if (!BIT(data, 1))
+		m_dac->scl_write(0);
+	m_dac->sda_write(BIT(data, 0));
+	m_dac->scl_write(BIT(data, 1));
+}
+
+TIMER_CALLBACK_MEMBER(aristmk6_state::audio_dma)
+{
+	// the DAC takes the oldest unit
+	if (m_audio_fifo_count)
+	{
+		const u64 data = m_audio_fifo[0];
+		std::copy(m_audio_fifo + 1, m_audio_fifo + m_audio_fifo_count, m_audio_fifo);
+		m_audio_fifo_count--;
+		for (int i = 0; i < 4; i++)
+		{
+			const s16 sample = s16(data >> (i * 16));
+			m_dac->write(0, sample);
+			m_dac->write(1, sample);
+		}
+	}
+
+	if (m_audio_holdoff)
+	{
+		m_audio_holdoff--;
+		return;
+	}
+
+	// refill up to two units; stay on one channel until it has no more data, then try the other
+	for (int n = 0; (n < 2) && (m_audio_fifo_count < AUDIO_FIFO_DEPTH); n++)
+	{
+		u64 data;
+		bool done;
+		if (!m_maincpu->sh4_dma_external_read(m_audio_channel, &data, 1, done))
+		{
+			m_audio_channel ^= 2;
+			if (!m_maincpu->sh4_dma_external_read(m_audio_channel, &data, 1, done))
+				return;
+		}
+		m_audio_fifo[m_audio_fifo_count++] = data;
+
+		// give the BIOS time to set up the next buffer while the FIFO drains
+		if (done)
+		{
+			m_audio_holdoff = AUDIO_FIFO_DEPTH - 1;
+			return;
+		}
+	}
+}
+
 void aristmk6_state::aristmk6_map(address_map &map)
 {
 	map(0x00000000, 0x003fffff).rom().region("maincpu", 0);
@@ -433,6 +542,7 @@ void aristmk6_state::aristmk6_map(address_map &map)
 	map(0x120000e0, 0x120000e7).r(FUNC(aristmk6_state::hwver_r));
 	map(0x120000e8, 0x12000107).r(FUNC(aristmk6_state::irqpend_r));
 	map(0x12000108, 0x12000127).w(FUNC(aristmk6_state::irqen_w));
+	map(0x12000138, 0x1200013f).umask64(0x00000000'000000ff).rw(FUNC(aristmk6_state::codec_r), FUNC(aristmk6_state::codec_w));
 	map(0x12400010, 0x12400017).rw(m_uart1, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x12400018, 0x1240001f).rw(m_uart0, FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 //  map(0x13000000 MMIO space for PLX9054?
@@ -483,6 +593,13 @@ void aristmk6_state::aristmk6(machine_config &config)
 	screen.set_screen_update(FUNC(aristmk6_state::screen_update));
 
 	PALETTE(config, m_palette).set_entries(0x1000);
+
+	SPEAKER(config, "mono").front_center();
+
+	CS4341(config, m_dac, 33_MHz_XTAL / 6); // MCLK from the FPGA, assumed to be the 66 MHz bus clock / 12
+	m_dac->set_mclk_ratio(256);
+	m_dac->sda_callback().set([this] (int state) { m_codec_sda = state; });
+	m_dac->add_route(0, "mono", 1.0);
 }
 
 #define ROM_LOAD32_WORD_BIOS(bios, name, offset, length, hash) \
