@@ -5,6 +5,8 @@
 
  NES/Famicom cartridge emulation for IREM PCBs
 
+ iNES mappers: 32, 65, 77, 78, 97
+
 
  Here we emulate the following PCBs
 
@@ -114,8 +116,6 @@ void nes_g101_device::pcb_reset()
 void nes_h3001_device::device_start()
 {
 	nes_g101_device::device_start();
-	irq_timer = timer_alloc(FUNC(nes_h3001_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
@@ -140,6 +140,9 @@ void nes_h3001_device::pcb_reset()
  Irem LROG017 - Discrete board emulation (74*161/161/21/138)
 
  Games: Napoleon Senki
+
+ The register is CCCC PPPP at 0x8000-0xffff (2K CHR bank at 0x0000, 32K PRG bank)
+ and the board is subject to bus conflict.
 
  iNES: mapper 77
 
@@ -186,6 +189,10 @@ void nes_holydivr_device::write_h(offs_t offset, u8 data)
 
  Games: Kaiketsu Yanchamaru
 
+ The register at 0x8000-0xbfff is M..P PPPP: bit 7 selects the mirroring (0 horizontal,
+ 1 vertical) and the low bits the 16K PRG bank at 0xc000, while 0x8000-0xbfff is fixed
+ to the last bank. There are no bus conflicts.
+
  iNES: mapper 97
 
  In MAME: Supported.
@@ -208,6 +215,10 @@ void nes_tam_s1_device::write_h(offs_t offset, u8 data)
  Irem G-101 board emulation
 
  Major League has hardwired mirroring and PRG mode latch
+
+ The registers are only decoded at 0x8000-0xbfff, by address bits A15-A12 and
+ A2-A0. NES 2.0 submapper 1 is Major League, where the 0x9000 register is
+ disabled and mirroring is hardwired to one screen.
 
  iNES: mapper 32
 

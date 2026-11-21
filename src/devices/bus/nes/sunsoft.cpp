@@ -5,6 +5,8 @@
 
  NES/Famicom cartridge emulation for Sunsoft PCBs
 
+ iNES mappers: 67, 68, 69, 89, 93, 184
+
 
  Here we emulate the following PCBs
 
@@ -60,7 +62,7 @@ nes_sunsoft_2_device::nes_sunsoft_2_device(const machine_config &mconfig, const 
 }
 
 nes_sunsoft_3_device::nes_sunsoft_3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_SUNSOFT_3, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_irq_toggle(0), irq_timer(nullptr)
+	: nes_nrom_device(mconfig, NES_SUNSOFT_3, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_irq_toggle(0)
 {
 }
 
@@ -75,7 +77,7 @@ nes_sunsoft_4_device::nes_sunsoft_4_device(const machine_config &mconfig, const 
 }
 
 nes_sunsoft_fme7_device::nes_sunsoft_fme7_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr), m_latch(0), m_wram_bank(0)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_latch(0), m_wram_bank(0)
 {
 }
 
@@ -110,8 +112,6 @@ void nes_sunsoft_2_device::pcb_reset()
 void nes_sunsoft_3_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_sunsoft_3_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_toggle));
@@ -149,8 +149,6 @@ void nes_sunsoft_4_device::pcb_reset()
 void nes_sunsoft_fme7_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_sunsoft_fme7_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_wram_bank));
 	save_item(NAME(m_latch));
@@ -184,6 +182,10 @@ void nes_sunsoft_fme7_device::pcb_reset()
  Games: Atlantis no Nazo, Kanshakudama Nage Kantarou no
  Toukaidou Gojuusan Tsugi, Wing of Madoola, Fantasy Zone
 
+ The register at 0x6000-0x7fff is .HHH .LLL: L selects the 4K CHR bank at 0x0000
+ and H the one at 0x1000. The most significant bit of H is always set in hardware,
+ so the upper CHR bank can only be 4-7.
+
  iNES: mapper 184 (Fantasy Zone uses this board with no
  CHRROM, and the register switches PRG banks)
 
@@ -195,8 +197,8 @@ void nes_sunsoft_1_device::write_m(offs_t offset, uint8_t data)
 
 	if (m_vrom_chunks)
 	{
-		chr4_0(data & 0x0f, CHRROM);
-		chr4_4(data >> 4, CHRROM);
+		chr4_0(data & 0x07, CHRROM);
+		chr4_4(4 | BIT(data, 4, 2), CHRROM);
 	}
 	else
 		prg16_89ab(data & 0x0f);
@@ -209,6 +211,10 @@ void nes_sunsoft_1_device::write_m(offs_t offset, uint8_t data)
  The two games using this board have incompatible mirroring
  wiring, making necessary two distinct mappers
 
+ Mapper 89 is [CPPP MCCC] (C = 8K CHR bank, P = 16K PRG bank, M = one-screen
+ mirroring page) and mapper 93 is [.PPP ...E] (E enables the CHR-RAM, which we
+ do not emulate). Both are subject to bus conflict, which affects every bit.
+
  iNES: mapper 89 & 93
 
  -------------------------------------------------*/
@@ -217,11 +223,12 @@ void nes_sunsoft_1_device::write_m(offs_t offset, uint8_t data)
 
 void nes_sunsoft_2_device::write_h(offs_t offset, uint8_t data)
 {
-	uint8_t helper = (data & 0x07) | ((data & 0x80) ? 0x08 : 0x00);
 	LOG("Sunsoft 2 write_h, offset: %04x, data: %02x\n", offset, data);
 
 	// this pcb is subject to bus conflict
 	data = account_bus_conflict(offset, data);
+
+	uint8_t helper = (data & 0x07) | ((data & 0x80) ? 0x08 : 0x00);
 
 	if (m_pcb_ctrl_mirror)
 		set_nt_mirroring(BIT(data, 3) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
@@ -242,7 +249,7 @@ void nes_sunsoft_2_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER(nes_sunsoft_3_device::irq_timer_tick)
+void nes_sunsoft_3_device::irq_clock()
 {
 	if (m_irq_enable && --m_irq_count == 0xffff)
 	{
@@ -379,7 +386,7 @@ u8 nes_sunsoft_4_device::read_m(offs_t offset)
 
  -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER(nes_sunsoft_fme7_device::irq_timer_tick)
+void nes_sunsoft_fme7_device::irq_clock()
 {
 	if (BIT(m_irq_enable, 7)) // counter decrement enabled
 	{
@@ -526,10 +533,9 @@ void nes_sunsoft_5_device::write_h(offs_t offset, uint8_t data)
 
 void nes_sunsoft_5_device::device_add_mconfig(machine_config &config)
 {
-	// additional sound hardware
-	SPEAKER(config, "addon").front_center();
+	// additional sound hardware, mixed into the console audio through the cartridge connector
 
-	// TODO: this is not how Sunsoft 5B clock signaling works!
-	// The board uses the CLK pin in reality, not hardcoded NTSC values!
-	SUNSOFT_5B_SOUND(config, m_ym2149, XTAL(21'477'272)/12).add_route(ALL_OUTPUTS, "addon", 0.50);
+	// clocked from the cartridge's CPU clock (M2), so it follows the console: NTSC, PAL or Dendy
+	// level measured with nes-audio-tests db_5b against the hardware survey (volume-12 5B square -1.3 dB vs a full-volume APU square)
+	SUNSOFT_5B_SOUND(config, m_ym2149, DERIVED_CLOCK(1, 1)).add_route(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.257);
 }

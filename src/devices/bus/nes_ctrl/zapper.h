@@ -43,6 +43,7 @@ private:
 	required_device<nes_zapper_sensor_device> m_sensor;
 	required_ioport m_lightx;
 	required_ioport m_lighty;
+	required_ioport m_offscreen;
 	emu_timer *m_trigger;
 };
 

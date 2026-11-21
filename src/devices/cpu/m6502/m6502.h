@@ -138,8 +138,14 @@ protected:
 	int m_inst_state, m_inst_substate;
 	int m_icount, m_bcount, m_count_before_instruction_step;
 	bool m_nmi_state, m_irq_state, m_apu_irq_state, m_v_state, m_rdy_state;
+
+	// called by the generated code for every cycle spent halted on RDY, with the address of the read being repeated
+	virtual void dma_halt_cycle(uint16_t adr) { }
 	bool m_nmi_pending, m_irq_taken, m_sync, m_inhibit_interrupts;
 	bool m_irq_sampled, m_nmi_sampled;
+	bool m_irq_at_phi2 = false, m_irq_phi2_level = false;   // IRQ level detector sampled at each phi2 fall (2A03)
+	// Start of the unstable store's indexed dummy cycle; retained across execution slices.
+	u64 m_store_dummy_cycle = 0;
 	bool m_uses_custom_memory_interface;
 
 	uint8_t read(uint16_t adr) { return m_mintf->read(adr); }
@@ -156,7 +162,18 @@ protected:
 	void prefetch_end_noirq();
 	void set_nz(uint8_t v);
 
-	void sample_interrupt() { m_irq_sampled = m_irq_state || m_apu_irq_state; m_nmi_sampled = m_nmi_pending; }
+	// NESdev/AccuracyCoin "Interrupt Flag Latency": a branch instruction that crosses a page boundary polls
+	// interrupts on both of its extra cycles. A successful poll must stick even if a later poll in the same
+	// instruction sees the line cleared, so this latches (ORs) rather than overwriting; prefetch_end() clears
+	// the latch once it has consumed it, ready for the next instruction's polls.
+	void sample_interrupt()
+	{
+		// a CPU that samples IRQ on the falling edge of phi2 (the 2A03) polls the level of the last sample instead
+		if (m_irq_at_phi2 ? m_irq_phi2_level : (m_irq_state || m_apu_irq_state))
+			m_irq_sampled = true;
+		if (m_nmi_pending)
+			m_nmi_sampled = true;
+	}
 
 	u32 m_XPC;
 	virtual offs_t pc_to_external(u16 pc); // For paged PCs

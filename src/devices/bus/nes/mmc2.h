@@ -20,6 +20,10 @@ public:
 	virtual void write_h(offs_t offset, uint8_t data) override { pxrom_write(offset, data); }
 
 	virtual void ppu_latch(offs_t offset) override;
+	virtual bool wants_read_latch() override { return true; }
+	virtual void ppu_read_latch(offs_t offset) override;
+	// MMC2: latch 0 responds only to $0FD8/$0FE8; MMC4: to the ranges $0FD8-$0FDF/$0FE8-$0FEF
+	virtual bool latch0_is_range() const { return false; }
 	virtual void pcb_reset() override;
 
 protected:
@@ -42,6 +46,7 @@ public:
 	nes_fxrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual bool latch0_is_range() const override { return true; }
 
 	virtual void pcb_reset() override;
 };

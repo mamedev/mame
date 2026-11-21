@@ -24,9 +24,15 @@ public:
 	virtual void chr_cb(int start, int bank, int source);
 
 	virtual void hblank_irq(int scanline, bool vblank, bool blanked) override;
+	virtual bool wants_a12() override { return true; }
+	virtual void ppu_a12_rise() override;
+	virtual bool wants_a12_filter() override { return true; }
+	virtual bool a12_rise_accepted(const attotime &low_since, const attotime &when) override;
 	virtual void pcb_reset() override;
 
 protected:
+	void mmc3_soft_reset();
+	bool nintendo_mmc3() const;
 	nes_txrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
@@ -52,6 +58,11 @@ protected:
 	uint16_t m_irq_count, m_irq_count_latch;
 	uint8_t m_irq_clear;
 	int m_irq_enable;
+
+	uint8_t m_c001_or;          // what $C001 ORs into the counter (0: the counter is cleared, as clone chips are emulated)
+	bool m_reload_locked;       // the clock that used the reload flag was the last one: $C001 cannot set it again yet
+	uint8_t m_acc_prescaler;    // MC-ACC: falling edges of A12 counted toward the next clock
+	bool m_powered;             // power-on initialization done; the MMC3 has no reset input
 };
 
 
@@ -90,12 +101,22 @@ public:
 	nes_txsrom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	virtual void write_h(offs_t offset, u8 data) override;
+	virtual u8 nt_r(offs_t offset) override;
+	virtual void nt_w(offs_t offset, u8 data) override;
+	virtual bool wants_a12_level() override { return true; }
+	virtual void ppu_a12_level(int state) override { m_a12_level = state; }
 
 protected:
 	// construction/destruction
 	nes_txsrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
+	virtual void device_start() override ATTR_COLD;
 	virtual void set_chr(u8 chr, int chr_base, int chr_mask) override;
+
+	int ciram_a10(int slot) const;
+	int nt_page(offs_t offset) const;
+
+	int m_a12_level = 0;    // PPU A12 on the bus, reported by the PPU before each access that changes it
 };
 
 

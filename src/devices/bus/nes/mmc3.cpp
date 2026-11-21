@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Nintendo MMC-3 & MMC-6 PCBs
+
+ iNES mappers: 4, 37, 47, 118, 119
 
 
  Here we emulate the following PCBs
@@ -16,10 +18,20 @@
  * Nintendo PAL-ZZ [mapper 37]
 
 
- Known issues on specific mappers:
+ Source: NESdev "MMC3" (revision of 14 October 2026), "MMC3 pinout", "MMC6", "INES Mapper 037".
 
- * 004 Mendel Palace has never worked properly
- * 004 Ninja Gaiden 2 has flashing bg graphics in the second level
+ The MMC3 has no reset input (MMC3 pinout): a console reset keeps its registers and IRQ counter on the Nintendo boards.
+
+ NOT DOCUMENTED (the choice made here):
+  - Power-on values of R0-R7, $8000, $A000 and $A001 (NESdev: R6, R7 and $8000 unspecified): as set in
+    mmc3_common_initialize().
+  - Which chip a submapper 4 image has (Sharp MMC3A ORs $80 into the counter on a $C001 write, NEC MMC3A $F0,
+    NEC MMC3B/C $FF): $80, the Sharp value, as for submapper 0.
+  - Whether a register write resets the MC-ACC's divide-by-8 prescaler: it is not reset.
+  - Whether a console reset clears the MMC6's registers (its pinout was not checked): they are reinitialized.
+
+ Older notes: Ninja Gaiden 2 was reported with flashing background graphics in its second level; not checked on this
+ code (stage 1-1 is clean). Mendel Palace, once reported as never working, plays.
 
  ***********************************************************************************************************/
 
@@ -54,6 +66,7 @@ DEFINE_DEVICE_TYPE(NES_ZZ_PCB, nes_zz_device,     "nes_zz",     "NES Cart PAL-ZZ
 nes_txrom_device::nes_txrom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, type, tag, owner, clock), m_mmc_mirror(0), m_prg_base(0), m_prg_mask(0), m_chr_base(0), m_chr_mask(0)
 	, m_latch(0), m_wram_protect(0), m_alt_irq(0), m_irq_count(0), m_irq_count_latch(0), m_irq_clear(0), m_irq_enable(0)
+	, m_c001_or(0), m_reload_locked(false), m_acc_prescaler(0), m_powered(false)
 {
 }
 
@@ -116,6 +129,10 @@ void nes_txrom_device::mmc3_start()
 	save_item(NAME(m_irq_count));
 	save_item(NAME(m_irq_count_latch));
 	save_item(NAME(m_irq_clear));
+	save_item(NAME(m_c001_or));
+	save_item(NAME(m_reload_locked));
+	save_item(NAME(m_acc_prescaler));
+	save_item(NAME(m_powered));
 }
 
 void nes_txrom_device::mmc3_common_initialize( int prg_mask, int chr_mask, int irq_type )
@@ -135,6 +152,12 @@ void nes_txrom_device::mmc3_common_initialize( int prg_mask, int chr_mask, int i
 	m_mmc_vrom_bank[7] = 0;  // extension reg used by clone boards
 
 	m_mmc_mirror = 0;
+	// The mirroring register powers up as 0, which is vertical, and the iNES header's mirroring flag does not apply to the
+	// MMC3 or its clones (it only matters on four-screen boards). Without this a game that never writes $A000 kept the
+	// header's setting, which disagreed with the register: Super Angry Birds is flagged horizontal, scrolls sideways across
+	// two nametables, and drew its right-hand screen over its left. Boards that set their own mirroring do it after this.
+	if (m_mirroring != PPU_MIRROR_4SCREEN)
+		set_nt_mirroring(PPU_MIRROR_VERT);
 	m_latch = 0;
 	m_wram_protect = 0x80;
 
@@ -142,20 +165,41 @@ void nes_txrom_device::mmc3_common_initialize( int prg_mask, int chr_mask, int i
 	m_prg_mask = prg_mask;
 	m_chr_mask = chr_mask;
 
-	m_alt_irq = irq_type;       // later MMC3 boards seem to use MMC6-type IRQ... more investigations are in progress at NESDev...
+	m_alt_irq = irq_type || (m_mmc3_irq_variant == 4);       // MMC6 and NEC MMC3 use the "old" IRQ behaviour
 	m_irq_enable = 0;
 	m_irq_count = m_irq_count_latch = 0;
 	m_irq_clear = 0;
+	m_c001_or = nintendo_mmc3() ? 0x80 : 0x00;
+	m_reload_locked = false;
+	m_acc_prescaler = 0;
 
 	set_prg(m_prg_base, m_prg_mask);
 	set_chr(m_chr_source, m_chr_base, m_chr_mask);
 }
 
+// the Nintendo boards with a Nintendo MMC3 (clone boards keep the behaviour this file always had)
+bool nes_txrom_device::nintendo_mmc3() const
+{
+	return type() == NES_TXROM || type() == NES_TXSROM || type() == NES_TQROM || type() == NES_QJ_PCB || type() == NES_ZZ_PCB;
+}
+
+// the MMC3 has no reset input (NESdev MMC3 pinout): a console reset leaves its registers and its IRQ counter as they were
+void nes_txrom_device::mmc3_soft_reset()
+{
+	set_prg(m_prg_base, m_prg_mask);
+	set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	if (m_mirroring != PPU_MIRROR_4SCREEN)
+		set_nt_mirroring(BIT(m_mmc_mirror, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
 
 void nes_txrom_device::pcb_reset()
 {
 	// 4-screen mirroring is taken care in pcb_start, if needed...
-	mmc3_common_initialize(0xff, 0xff, 0);
+	if (m_powered && nintendo_mmc3())
+		mmc3_soft_reset();
+	else
+		mmc3_common_initialize(0xff, 0xff, 0);
+	m_powered = true;
 }
 
 
@@ -174,7 +218,7 @@ void nes_hkrom_device::device_start()
 void nes_hkrom_device::pcb_reset()
 {
 	mmc3_common_initialize(0xff, 0xff, 1);
-	m_mmc6_reg = 0xf0;
+	m_mmc6_reg = 0x00;   // the PRG RAM starts disabled, which holds $A001 at $00
 	m_wram_enable = 0;
 }
 
@@ -187,7 +231,16 @@ void nes_qj_device::pcb_reset()
 
 void nes_zz_device::pcb_reset()
 {
-	mmc3_common_initialize(0x07, 0x7f, 0);
+	// the CIC reset line clears the outer bank latch (NESdev INES Mapper 037); the MMC3 itself has no reset input
+	if (m_powered)
+	{
+		m_prg_base = m_chr_base = 0;
+		m_prg_mask = 0x07;
+		mmc3_soft_reset();
+	}
+	else
+		mmc3_common_initialize(0x07, 0x7f, 0);
+	m_powered = true;
 }
 
 
@@ -201,13 +254,58 @@ void nes_zz_device::pcb_reset()
 
  iNES: mapper 4
 
+ In MAME: Supported.
+
+ Tested: blargg's mmc3_test, mmc3_test_2 and mmc3_irq_tests (18 of 18 pass); Mendel Palace (USA), Ninja Gaiden
+ II - The Dark Sword of Chaos (USA), Super Mario Bros. 3 (USA) and Alien 3 (USA) (MC-ACC, submapper 3) play.
+
  -------------------------------------------------*/
+
+/* Here, IRQ counter decrements every scanline. */
+// NESdev MMC3: on each filtered A12 rise the counter is reloaded when it is 0 or a reload was requested, otherwise
+// decremented; when it is 0 afterwards and IRQs are enabled, the IRQ is asserted (the "new" Sharp behaviour, which
+// blargg's mmc3_test expects; the older behaviour, which only fires on a decrement to 0, is kept for m_alt_irq boards)
+void nes_txrom_device::ppu_a12_rise()
+{
+	// Acclaim MC-ACC: a divide-by-8 prescaler on the falling edges of A12, with no filter (NESdev MMC3, "IRQ Specifics");
+	// the PPU reports each fall here (set_a12_on_fall). NESdev does not say whether a register write resets the prescaler
+	if (m_mmc3_irq_variant == 3)
+	{
+		m_acc_prescaler = (m_acc_prescaler + 1) & 7;
+		if (m_acc_prescaler)
+			return;
+	}
+
+	const int prior_count = m_irq_count;
+	const bool reload = m_irq_clear;
+	if ((m_irq_count == 0) || reload)
+		m_irq_count = m_irq_count_latch;
+	else
+		m_irq_count--;
+
+	if (m_irq_enable && (m_irq_count == 0) && (prior_count || reload || !m_alt_irq))
+		set_irq_line(ASSERT_LINE);
+	m_irq_clear = 0;
+	// the "$C001 reload glitch": after the clock that used the reload flag, $C001 cannot set it again until the next clock
+	m_reload_locked = reload;
+}
+
+// NESdev MMC3: the counter is clocked by a rising edge of A12 after A12 has stayed low for three falling edges of M2,
+// and M2 falls once per CPU cycle. During rendering A12 is never low that long between two pattern fetches of the same
+// table: the fetches are 4 PPU clocks apart, also across the end of a line, where the idle dot carries the next
+// background pattern address (NESdev PPU rendering, cycle 0).
+bool nes_txrom_device::a12_rise_accepted(const attotime &low_since, const attotime &when)
+{
+	if (m_mmc3_irq_variant == 3)
+		return true;    // MC-ACC: every pulse counts toward the prescaler
+	return (when > low_since) && ((cpu_cycles_at(when) - cpu_cycles_at(low_since)) >= 3);
+}
 
 void nes_txrom_device::hblank_irq(int scanline, bool vblank, bool blanked)
 {
-	// The IRQ counter decrements on visible lines *and* on the pre-render line
-	// but only while rendering is enabled.
-	if (!vblank && !blanked)
+	if (m_a12_driven)
+		return;
+	if (scanline < ppu2c0x_device::BOTTOM_VISIBLE_SCANLINE)
 	{
 		int prior_count = m_irq_count;
 		if ((m_irq_count == 0) || m_irq_clear)
@@ -215,13 +313,13 @@ void nes_txrom_device::hblank_irq(int scanline, bool vblank, bool blanked)
 		else
 			m_irq_count--;
 
-		if (m_irq_enable && (m_irq_count == 0) && (prior_count || m_irq_clear /*|| !m_mmc3_alt_irq*/)) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
+		if (m_irq_enable && !blanked && (m_irq_count == 0) && (prior_count || m_irq_clear)) // once-per-line fallback for a PPU that reports no A12 edges
 		{
 			LOG("irq fired, scanline: %d\n", scanline);
 			set_irq_line(ASSERT_LINE);
 		}
-		m_irq_clear = 0;
 	}
+	m_irq_clear = 0;
 }
 
 // base MMC3 simply calls prg8_x
@@ -314,7 +412,19 @@ void nes_txrom_device::txrom_write(offs_t offset, uint8_t data)
 			break;
 
 		case 0x4001:
-			m_irq_count = 0;
+			// NESdev MMC3: the counter is set above 127 at once (Sharp MMC3: OR $80) and the reload flag is set for the next
+			// clock, unless the last clock used it ("$C001 reload glitch"). Clone boards: the counter is cleared, no glitch
+			if (m_c001_or)
+			{
+				m_irq_count |= m_c001_or;
+				if (!m_reload_locked)
+					m_irq_clear = 1;
+			}
+			else
+			{
+				m_irq_count = 0;
+				m_irq_clear = 1;
+			}
 			break;
 
 		case 0x6000:
@@ -366,6 +476,10 @@ uint8_t nes_txrom_device::read_m(offs_t offset)
  HKROM (MMC6 based) board emulation
 
  iNES: mapper 4
+
+ In MAME: Supported.
+
+ Tested: blargg's mmc3_test 6-MMC6 passes. No MMC6 game was run.
 
  -------------------------------------------------*/
 
@@ -419,8 +533,11 @@ void nes_hkrom_device::write_h(offs_t offset, uint8_t data)
 			mmc6_helper = m_latch ^ data;
 			m_latch = data;
 
-			if (!m_wram_enable && BIT(data, 5))  // if WRAM is disabled and has to be enabled, write
-				m_wram_enable = BIT(data, 5);    // (once WRAM has been enabled, it cannot be disabled without resetting the game)
+			// NESdev MMC6: bit 5 enables the internal PRG RAM; while it is clear the mapper continuously sets $A001 to $00,
+			// so the RAM area is open bus and $A001 writes are ignored
+			m_wram_enable = BIT(data, 5);
+			if (!m_wram_enable)
+				m_mmc6_reg = 0;
 
 			// Has PRG Mode changed?
 			if (BIT(mmc6_helper, 6))
@@ -456,20 +573,54 @@ void nes_hkrom_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 118
 
- In MAME: Supported. It also uses mmc3_irq.
+ In MAME: Supported.
+
+ It also uses mmc3_irq.
+
+ Tested: Goal! Two (USA) shows its title, menus and password screen.
 
  -------------------------------------------------*/
 
+void nes_txsrom_device::device_start()
+{
+	mmc3_start();
+	save_item(NAME(m_a12_level));
+}
+
+// the MMC3's CHR A17 pin drives CIRAM A10 on these boards (NESdev MMC3 pinout, TKSROM and TLSROM), so the CHR ROM sees bank
+// bits 0-6 only
 void nes_txsrom_device::set_chr(u8 chr, int chr_base, int chr_mask)
 {
-	nes_txrom_device::set_chr(chr, chr_base, chr_mask);
+	nes_txrom_device::set_chr(chr, chr_base, chr_mask & 0x7f);
 
-	// do nametables
-	static constexpr u8 bank[8] = { 0, 0, 1, 1, 2, 3, 4, 5 };
-	int start = (m_latch & 0x80) >> 5;
-
+	// the page pointers, for PPU A12 low; nt_r and nt_w below decide every access
 	for (int i = 0; i < 4; i++)
-		set_nt_page(i, CIRAM, BIT(m_mmc_vrom_bank[bank[start + i]], 7), 1);
+		set_nt_page(i, CIRAM, ciram_a10(i), 1);
+}
+
+// CIRAM A10: bit 7 of the bank register for 1 KiB slot 0-7 of the PPU pattern space, after the CHR A12 inversion
+int nes_txsrom_device::ciram_a10(int slot) const
+{
+	static constexpr u8 bank[8] = { 0, 0, 1, 1, 2, 3, 4, 5 };
+	return BIT(m_mmc_vrom_bank[bank[slot ^ ((m_latch & 0x80) >> 5)]], 7);
+}
+
+// offset is PPU address - $2000. Rendering fetches nametables with PPU A12 low; a PPUDATA access to $3000-$3EFF, and the
+// nametable read under a PPUDATA palette read ($3F00-$3FFF, passed here as $2F00-$2FFF), have it high
+int nes_txsrom_device::nt_page(offs_t offset) const
+{
+	const int a12 = (BIT(offset, 12) || m_a12_level) ? 4 : 0;
+	return ciram_a10(a12 | BIT(offset, 10, 2));
+}
+
+u8 nes_txsrom_device::nt_r(offs_t offset)
+{
+	return get_ciram_base()[(nt_page(offset) << 10) | (offset & 0x3ff)];
+}
+
+void nes_txsrom_device::nt_w(offs_t offset, u8 data)
+{
+	get_ciram_base()[(nt_page(offset) << 10) | (offset & 0x3ff)] = data;
 }
 
 void nes_txsrom_device::write_h(offs_t offset, u8 data)
@@ -494,7 +645,11 @@ void nes_txsrom_device::write_h(offs_t offset, u8 data)
 
  iNES: mapper 119
 
- In MAME: Supported. It also uses mmc3_irq.
+ In MAME: Supported.
+
+ It also uses mmc3_irq.
+
+ Tested: Pin Bot (USA) plays.
 
  -------------------------------------------------*/
 
@@ -512,6 +667,10 @@ void nes_tqrom_device::chr_cb(int start, int bank, int source)
  Super Spike V'Ball + Nintendo World Cup)
 
  iNES: mapper 47
+
+ In MAME: Supported.
+
+ Tested: both games of Super Spike V'Ball + Nintendo World Cup (USA) play.
 
  -------------------------------------------------*/
 
@@ -539,6 +698,10 @@ void nes_qj_device::write_m(offs_t offset, u8 data)
  screen on systems with a CIC (the outer PRG lines
  are somehow tied to the CIC's reset line).
 
+ In MAME: Supported.
+
+ Tested: all three games of Super Mario Bros. + Tetris + Nintendo World Cup (Europe) play.
+
  -------------------------------------------------*/
 
 void nes_zz_device::write_m(offs_t offset, u8 data)
@@ -547,8 +710,10 @@ void nes_zz_device::write_m(offs_t offset, u8 data)
 
 	if (BIT(m_wram_protect, 7) && !BIT(m_wram_protect, 6))
 	{
+		// NESdev INES Mapper 037: Q2 is PRG A17 and CHR A17; Q0 and Q1 both set force PRG A16 high, otherwise the MMC3's
+		// PRG A16 passes only when Q2 is set: 0-2 = 64K at $00000, 3 = $10000, 4-6 = 128K at $20000, 7 = 64K at $30000
 		m_prg_base = ((data & 0x04) | (data & (data << 1) & 0x02)) << 2;
-		m_prg_mask = (m_prg_mask == 0x10) ? 0x0f : 0x07;
+		m_prg_mask = (BIT(data, 2) && ((data & 0x03) != 0x03)) ? 0x0f : 0x07;
 		m_chr_base = BIT(data, 2) << 7;
 		set_prg(m_prg_base, m_prg_mask);
 		set_chr(m_chr_source, m_chr_base, m_chr_mask);

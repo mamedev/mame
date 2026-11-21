@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 #ifndef MAME_BUS_NES_NES_SLOT_H
 #define MAME_BUS_NES_NES_SLOT_H
 
@@ -31,7 +31,7 @@ enum
 	STD_NROM368,//homebrew extension of NROM!
 	// Discrete components boards (by various manufacturer)
 	DIS_74X161X138, DIS_74X139X74,
-	DIS_74X377, DIS_74X161X161X32,
+	DIS_74X377, DIS_74X161X161X32, DIS_GTROM,
 	// Active Enterprises
 	ACTENT_ACT52,
 	// AGCI
@@ -42,6 +42,8 @@ enum
 	BANDAI_FJUMP2, BANDAI_PT554,
 	BANDAI_DATACH, BANDAI_KARAOKE, BANDAI_OEKAKIDS,
 	BANDAI_FCG, BANDAI_LZ93, BANDAI_LZ93EX1, BANDAI_LZ93EX2,
+	// Broke Studio
+	BROKE_RAINBOW,
 	// Caltron
 	CALTRON_6IN1, CALTRON_9IN1,
 	// Camerica
@@ -49,6 +51,10 @@ enum
 	CAMERICA_ALADDIN, CAMERICA_GOLDENFIVE, GG_NROM,
 	// Dreamtech
 	DREAMTECH_BOARD,
+	// Family Noraebang
+	NORAEBANG_BOARD,
+	KKACHI_BOARD,
+	AVE_NINA08, AVE_MAXI30P, UNL_BJ56, RINCO_FSG2, WAIXING_FS306, JY_YY840820C, UNL_TMNT2_563, UNL_SANGO2_559, UNL_AKUMAJO_272, UNL_82112C, BMC_HPXX, BMC_620, BMC_N49C300, BMC_REALTEC432, JNCOTA_FS005, BMC_BITCORP4602, BMC_GX121, BMC_SB5013, BMC_BITCORP3150,
 	// Irem
 	IREM_G101, IREM_H3001, IREM_LROG017,
 	IREM_TAM_S1, IREM_HOLYDIVR,
@@ -59,7 +65,7 @@ enum
 	JALECO_JF24, JALECO_JF29, JALECO_JF33,
 	// Konami
 	KONAMI_VRC1, KONAMI_VRC2, KONAMI_VRC3,
-	KONAMI_VRC4, KONAMI_VRC6, KONAMI_VRC7,
+	KONAMI_VRC4, KONAMI_VRC5, KONAMI_VRC6, KONAMI_VRC7,
 	// Namcot
 	NAMCOT_163, NAMCOT_175, NAMCOT_340,
 	NAMCOT_3425, NAMCOT_34X3, NAMCOT_3446,
@@ -82,7 +88,7 @@ enum
 	// Tengen
 	TENGEN_800032, TENGEN_800037,
 	// TXC
-	TXC_22110, TXC_22211, TXC_COMMANDOS, TXC_DUMARACING,
+	TXC_22110, TXC_22211, TXC_MXMDHTWO, TXC_DUMARACING,
 	TXC_MJBLOCK, TXC_STRIKEW, TXC_TW,
 	// Multigame Carts
 	BMC_64IN1NR, BMC_190IN1, BMC_A65AS, BMC_A88S1, BMC_F15, BMC_F600, BMC_L6IN1,
@@ -95,13 +101,13 @@ enum
 	BMC_72IN1, BMC_SUPER_42IN1, BMC_76IN1,
 	BMC_31IN1, BMC_22GAMES, BMC_20IN1, BMC_5IN1_1993,
 	BMC_70IN1, BMC_500IN1, BMC_800IN1, BMC_1200IN1,
-	BMC_DS927, BMC_GKA, BMC_GKB, BMC_GKCXIN1, BMC_GN91B, BMC_GOLD260,
+	BMC_DS927, BMC_ET113, BMC_GKA, BMC_GKB, BMC_GKCXIN1, BMC_GN91B, BMC_GOLD260,
 	BMC_HP898F, BMC_VT5201, BMC_BENSHIENG,
-	BMC_CTC09, BMC_CTC_12IN1, BMC_60311C, BMC_80013B, BMC_810544C, BMC_82AB,
-	BMC_830425C, BMC_830506C, BMC_830928C, BMC_850437C, BMC_891227, BMC_970630C,
+	BMC_CTC09, BMC_CTC_12IN1, BMC_60311C, BMC_80013B, BMC_576, BMC_564, BMC_582, BMC_585, BMC_810544C, BMC_82AB,
+	BMC_631601, BMC_830425C, BMC_830506C, BMC_830928C, BMC_850437C, BMC_891227, BMC_970630C,
 	BMC_N32_4IN1, BMC_NC20MB, BMC_NT639, BMC_NTD_03, BMC_SRPG_5IN1,
 	BMC_EL860947C, BMC_EL861121C, BMC_FAM250, BMC_FK23C, BMC_FK23CA,
-	BMC_JY012005, BMC_JY820845C, BMC_PJOY84,
+	BMC_JY012005, BMC_621, BMC_JY820845C, BMC_PJOY84, BMC_BS300, BMC_ING022, BMC_8025, BMC_HSK007,
 	BMC_S009, BMC_TH22913, BMC_TH2348, BMC_11160, BMC_G146,
 	BMC_2751, BMC_8157, BMC_00202650,
 	BMC_411120C, BMC_810305C, BMC_820720C, BMC_830118C,
@@ -111,16 +117,16 @@ enum
 	BMC_TF2740, BMC_TJ03, BMC_RESETSXROM, BMC_RESETTXROM, BMC_TECHLINE9IN1,
 	// Unlicensed
 	UNL_8237, UNL_8237A, UNL_CC21, UNL_AX40G, UNL_AX5705, UNL_KN42,
-	UNL_KOF97, UNL_N625092, UNL_SC127, UNL_SMB2J, UNL_T230, UNL_MMALEE,
+	UNL_KOF97, UNL_N625092, UNL_SMB2J, UNL_T230, UNL_MMALEE,
 	UNL_JY830623C, UNL_XIAOZY, UNL_KOF96, UNL_FS6,
 	UNL_SF3, UNL_RACERMATE, UNL_EDU2K,
 	UNL_STUDYNGAME, UNL_603_5052, UNL_H2288, UNL_158B, UNL_2708,
-	UNL_MALISB, UNL_AC08, UNL_A9746, UNL_43272, UNL_TF1201, UNL_TH21311,
+	UNL_INX007T, UNL_MALISB, UNL_AC08, UNL_A9746, UNL_43272, UNL_TF1201, UNL_TH21311,
 	UNL_BMW8544, UNL_CITYFIGHT, UNL_NINJARYU, UNL_EH8813A, UNL_RT01,
 	// Bootleg boards
 	BTL_0353, BTL_09034A, BTL_2YUDB, BTL_900218, BTL_AISENSHINICOL,
-	BTL_BATMANFS, BTL_CONTRAJ, BTL_DRAGONNINJA, BTL_L001, BTL_MARIOBABY,
-	BTL_PALTHENA, BTL_PIKACHUY2K, BTL_SBROS11, BTL_SHUIGUAN,
+	BTL_BATMANFS, BTL_ROBOCOPFS, BTL_CONTRAJ, BTL_DDRAGON, BTL_DRAGONNINJA, BTL_L001, BTL_MARIOBABY,
+	BTL_PALTHENA, BTL_60106416L, BTL_CTC15, BTL_PIKACHUY2K, BTL_SBROS11, BTL_SHUIGUAN,
 	BTL_SMB2JA, BTL_SMB2JB, BTL_SMB3, BTL_TOBIDASE, BTL_YUNG08,
 	// Shenzhen Jncota
 	JNCOTA_KT1001,
@@ -128,30 +134,32 @@ enum
 	KAISER_KS106C,  KAISER_KS202,  KAISER_KS7010,  KAISER_KS7012,
 	KAISER_KS7013B, KAISER_KS7016, KAISER_KS7016B, KAISER_KS7017,
 	KAISER_KS7021A, KAISER_KS7022, KAISER_KS7030,  KAISER_KS7031,
-	KAISER_KS7032,  KAISER_KS7037, KAISER_KS7057,  KAISER_KS7058,
+	KAISER_KS7032,  KAISER_KS7037, KAISER_KS7057,  KAISER_KS7058,  UNL_JY043,
 	// Whirlwind Manu
 	UNL_DH08, UNL_LE05, UNL_LG25, UNL_LH10, UNL_LH28_LH54,
 	UNL_LH31, UNL_LH32, UNL_LH42, UNL_LH51, UNL_LH53,
 	// Misc: these are needed to convert mappers to boards, I will sort them later
 	OPENCORP_DAOU306, HES_BOARD, SVISION16_BOARD, RUMBLESTATION_BOARD, JYCOMPANY_A, JYCOMPANY_B, JYCOMPANY_C,
-	MAGICSERIES_MD, KASING_BOARD, FUTUREMEDIA_BOARD, FUKUTAKE_BOARD, SOMARI_SL12, SOMARI_HUANG2,
-	HENGG_SRICH, HENGG_XHZS, HENGG_SHJY3, SUBOR_TYPE0, SUBOR_TYPE1, SUBOR_TYPE2,
-	CNE_DECATHLON, CNE_FSB, CNE_SHLZ, COCOMA_BOARD, CONY_BOARD, CONY1K_BOARD, SMD133_BOARD, YOKO_BOARD,
+	JYCOMPANY_281, JYCOMPANY_282, JYCOMPANY_295, JYCOMPANY_358, JYCOMPANY_386, JYCOMPANY_387, JYCOMPANY_388, JYCOMPANY_397,
+	MAGICSERIES_MD, KASING_BOARD, FUTUREMEDIA_BOARD, FUJIYA_BOARD, FUKUTAKE_BOARD, SOMARI_SL12, SOMARI_SL12_MC, SOMARI_HUANG2,
+	HENGG_SRICH, HENGG_XHZS, HENGG_SHJY3, HENGG_412, SUBOR_TYPE0, SUBOR_TYPE1, SUBOR_TYPE2, SUBOR_KARAOKE,
+	CNE_DECATHLON, CNE_FSB, CNE_SHLZ, COCOMA_BOARD, CONY_BOARD, CONY1K_BOARD, SMD133_BOARD, SMD172B_BOARD, YOKO_BOARD,
 	RCM_GS2015, RCM_GS2004, RCM_GS2013, RCM_TF9IN1, RCM_3DBLOCK,
-	WAIXING_TYPE_A, WAIXING_TYPE_A1, WAIXING_TYPE_B, WAIXING_TYPE_C, WAIXING_TYPE_D,
+	WAIXING_TYPE_A, WAIXING_TYPE_B, WAIXING_TYPE_C, WAIXING_TYPE_D,
 	WAIXING_TYPE_E, WAIXING_TYPE_F, WAIXING_TYPE_F1, WAIXING_TYPE_G, WAIXING_TYPE_H, WAIXING_TYPE_H1,
 	WAIXING_TYPE_I, WAIXING_TYPE_J, WAIXING_FS304,
 	WAIXING_SGZLZ, WAIXING_SGZ, WAIXING_WXZS, WAIXING_SECURITY, WAIXING_SH2,
-	WAIXING_DQ8, WAIXING_FFV, WAIXING_WXZS2, SUPERGAME_LIONKING, SUPERGAME_BOOGERMAN,
+	WAIXING_DQ8, WAIXING_FFV, WAIXING_YC030309, WAIXING_WXZS2, SUPERGAME_LIONKING, SUPERGAME_BOOGERMAN,
 	KAY_BOARD, NITRA_TDA, GOUDER_37017, NANJING_BOARD, ZEMINA_BOARD,
 	// homebrew PCBs
 	NOCASH_NOCHR,   // homebrew PCB design which uses NTRAM for CHRRAM
 	UNL_ACTION53,   // homebrew PCB for homebrew multicarts
+	UNL_DRIPGAME,   // Quietust's FPGA mapper for the Drip port
 	UNL_2A03PURITANS, FARID_SLROM8IN1, FARID_UNROM8IN1,
 	// Batlab Electronics
 	BATMAP_000, BATMAP_SRRX,
 	// Sealie
-	SEALIE_8BITXMAS, SEALIE_CUFROM, SEALIE_DPCMCART, SEALIE_UNROM512,
+	SEALIE_8BITXMAS, SEALIE_8BITXMAS17, SEALIE_CUFROM, SEALIE_DPCMCART, SEALIE_UNROM512,
 	// FFE boards, for mappers 6, 8, 17
 	FFE3_BOARD, FFE4_BOARD, FFE8_BOARD, TEST_BOARD,
 	// Unsupported (for place-holder boards, with no working emulation) & no-board (at init)
@@ -168,6 +176,7 @@ enum
 #define EXRAM 2
 #define MMC5FILL 3
 #define CART_NTRAM 4
+#define VRAM_NT 5    // nametable in the cartridge's CHR-RAM (UNROM 512 four-screen)
 
 
 #define PPU_MIRROR_VERT     1
@@ -178,6 +187,8 @@ enum
 
 
 // ======================> device_nes_cart_interface
+
+class nes_cart_slot_device;
 
 class device_nes_cart_interface : public device_interface
 {
@@ -202,9 +213,6 @@ public:
 	virtual uint8_t nt_r(offs_t offset);
 	virtual void nt_w(offs_t offset, uint8_t data);
 
-	// hack until disk system is made modern!
-	virtual void disk_flip_side() { }
-
 	void prg_alloc(size_t size);
 	void vrom_alloc(size_t size);
 	void misc_rom_alloc(size_t size);
@@ -223,14 +231,87 @@ public:
 
 	void set_ce(int mask, int state) {  m_ce_mask = mask; m_ce_state = state; }
 	void set_mmc1_type(mmc1_type val) {  m_mmc1_type = val; }
+	void set_mmc1_fixed_prg(bool val) { m_mmc1_fixed_prg = val; }   // NES 2.0 mapper 1 submapper 5 (SEROM/SHROM/SH1ROM)
+	void set_mmc1_ks203(bool val) { m_mmc1_ks203 = val; }   // NES 2.0 mapper 1 submapper 7 (Kaiser KS-7058, KS 203 clone)
+	// CPU cycle count, for mappers that react to writes on consecutive CPU cycles (MMC1)
+	u64 cpu_total_cycles() const { return m_maincpu->total_cycles(); }
+	// the CPU's address space, for boards that watch CPU bus traffic outside their own ranges (Rainbow's OAM copy)
+	address_space &cpu_space() const { return m_maincpu->space(AS_PROGRAM); }
 	void set_vrc_lines(int PRG_A, int PRG_B, int CHR) { m_vrc_ls_prg_a = PRG_A; m_vrc_ls_prg_b = PRG_B; m_vrc_ls_chr = CHR; }
 	void set_n163_vol(int vol) { m_n163_vol = vol; }
 	void set_outer_prg_size(unsigned val) { m_outer_prg_size = val; }
 	void set_outer_chr_size(unsigned val) { m_outer_chr_size = val; }
 	void set_smd133_addr(int val) {  m_smd133_addr = val; }
+
+	// NES 2.0 submapper selectors for boards that implement several incompatible variants (see nes_ines.hxx)
+	virtual void set_pjoy_submapper(u8 val) { }     // mappers 126, 422, 534
+	virtual void set_flashable(bool val) { }            // mapper 111 (GTROM): battery flag = self-flashable board
+	virtual void set_unrom512_flashable(bool val) { }   // mapper 30: battery flag = self-flashable board
+	virtual void set_unrom512_submapper(u8 val) { }     // mapper 30: NES 2.0 submapper
+	virtual void set_bandai_submapper(u8 val) { }   // mapper 16 submapper 5 / mapper 159: LZ93D50 registers at $8000 only
+	virtual void set_smd133_submapper(u8 val) { }   // mapper 268
+	virtual void set_smd172b_submapper(u8 val) { }  // mapper 446
+	virtual void set_m91_submapper(u8 val) { }      // mapper 91
+	virtual void set_sf3_submapper(u8 val) { }      // mapper 197
+	virtual void set_resettxrom_submapper(u8 val) { }   // mapper 313
+	virtual void set_gouder_submapper(u8 val) { }   // mapper 208
+	virtual void set_a88s1_submapper(u8 val) { }    // mapper 411
+	virtual void set_8025_submapper(u8 val) { }     // mapper 176 (submappers 0-5)
+	virtual void set_fs6_submapper(u8 val) { }      // mapper 196 (submappers 1 and 3)
+	virtual void set_hsk007_submapper(u8 val) { }   // mapper 394 (submappers 0-1)
+	virtual void set_waixing_b_submapper(u8 val) { } // mapper 191 (submappers 0-1)
+	virtual void set_fam250_submapper(u8 val) { }   // mapper 354 (submappers 0-1)
+	virtual void set_realtec432_submapper(u8 val) { } // mapper 432 (submappers 0-4)
+	virtual void set_sgzlz_submapper(u8 val) { }    // mapper 178 (submappers 0-3)
+	virtual void set_1200in1_submapper(u8 val) { }  // mapper 227 (submappers 0-2)
+	virtual void set_x1_017_old_order(bool val) { }  // mapper 82: Taito X1-017 with the pre-2020 PRG bank order
+
+	// data bus snoop: boards that watch every CPU write (BMW8544, mapper 292) receive the written data here
+	virtual void cpu_write_latch(u8 data) { }
 	void set_x1_005_alt(bool val) { m_x1_005_alt_mirroring = val; }
 	void set_bus_conflict(bool val) { m_bus_conflict = val; }
-	uint8_t get_open_bus() { return m_open_bus; }
+	// MMC3-style scanline counters: when the PPU reports filtered rising edges of A12, they count those instead of
+	// the hblank callback
+	virtual bool wants_a12() { return false; }
+	virtual void ppu_a12_rise() { }
+	// A board that filters A12 itself (MMC3: A12 has to stay low across three falling edges of M2) returns true from
+	// wants_a12_filter().  The PPU then asks a12_rise_accepted() about every raw rising edge of A12, giving the time A12
+	// went low and the time it rose, and only reports the edges the board accepts; any other board gets the PPU's own
+	// filter (A12 low for 10 PPU clocks).  cpu_cycles_at() counts the CPU cycles, i.e. the M2 periods, started by a time.
+	virtual bool wants_a12_filter() { return false; }
+	virtual bool a12_rise_accepted(const attotime &low_since, const attotime &when) { return true; }
+	u64 cpu_cycles_at(const attotime &when) const { return m_maincpu->attotime_to_cycles(when); }
+	// unfiltered PPU A12 level (MMC1 4K CHR mode); called whenever it changes, as of the PPU's last catch-up
+	virtual bool wants_a12_level() { return false; }
+	virtual void ppu_a12_level(int state) { }
+	// PPU address bus whenever A13/A12 change, $2006 writes included (Oeka Kids)
+	virtual bool wants_ppu_addr_bus() { return false; }
+	virtual void ppu_addr_bus(u16 addr) { }
+	// PPU bus strobes from the dot renderer, at the dot each happens and before the access: ALE latching an address, /RD
+	// reading (rendering fetches, PPUDATA reads), /WR writing VRAM (PPUDATA writes)
+	virtual bool wants_ppu_strobes() { return false; }
+	virtual void ppu_ale(offs_t addr) { }
+	virtual void ppu_rd(offs_t addr) { }
+	virtual void ppu_wr(offs_t addr, u8 data) { }
+	// External M2 pin at the cartridge connector: a board that returns true from wants_m2() gets m2_w(1) at every M2 rise,
+	// before the CPU's access of that cycle, and m2_w(0) at every M2 fall after it (each at its true emulated time; DMA
+	// cycles included).  address and write are the address and R/W on the bus, driven before M2 rises and held until
+	// it falls.  The access itself is made at the M2 rise.
+	virtual bool wants_m2() { return false; }
+	virtual void m2_w(int state, offs_t address, bool write) { }
+	// virtual so that a pass-through cartridge (Game Genie) can hand them to the cartridge plugged into it
+	virtual void set_a12_driven(bool driven) { m_a12_driven = driven; }
+	bool m_a12_driven = false;
+	// MMC3 IRQ variant from the NES 2.0 submapper: 0 = Sharp MMC3, 3 = Acclaim MC-ACC (clocked on the A12 fall), 4 = NEC MMC3 (old IRQ)
+	void set_mmc3_irq_variant(int variant) { m_mmc3_irq_variant = variant; }
+	virtual int mmc3_irq_variant() const { return m_mmc3_irq_variant; }
+	int m_mmc3_irq_variant = 0;
+	// T9552 (Waixing mapper 249): $5000 value whose bank order the ROM image uses, 0 = iNES mapper 249, 2 = mapper 4 submapper 5
+	void set_t9552_file_order(u8 val) { m_t9552_file_order = val; }
+	u8 m_t9552_file_order = 0;
+
+	// with a 2A03 the CPU tracks the real data bus; otherwise fall back to the high-byte approximation
+	uint8_t get_open_bus();
 	void set_open_bus(uint8_t val) { m_open_bus = val; }
 
 	uint8_t *get_prg_base() { return m_prg; }
@@ -248,9 +329,13 @@ public:
 	uint32_t get_vram_size() const { return m_vram.size(); }
 	uint32_t get_battery_size() const { return m_battery.size(); }
 	uint32_t get_mapper_sram_size() const { return m_mapper_sram_size; }
+	void set_mapper_sram_size(uint32_t size) { m_mapper_sram_size = size; }   // loaders: 0 when the board has no battery
 	uint32_t get_misc_rom_size() const { return m_misc_rom_size; }
 
 	virtual void ppu_latch(offs_t offset) {}
+	// PPU pattern reads, reported after the read with the exact address (MMC2/MMC4 latches)
+	virtual bool wants_read_latch() { return false; }
+	virtual void ppu_read_latch(offs_t offset) {}
 	virtual void hblank_irq(int scanline, bool vblank, bool blanked) {}
 	virtual void scanline_irq(int scanline, bool vblank, bool blanked) {}
 
@@ -277,10 +362,23 @@ protected:
 	uint32_t m_prg_size;
 	uint32_t m_vrom_size;
 
+public:
+	// a cartridge built into the console rather than plugged into a slot (the disk system of the fds and famitwin
+	// machines) gets its CPU and its IRQ connection from the machine configuration, as a slot does
+	template <typename T> void set_cpu(T &&tag) { m_builtin_cpu.set_tag(std::forward<T>(tag)); }
+	auto irq_callback() { return m_builtin_irq.bind(); }
+
+protected:
+	// device_interface implementation
+	virtual void interface_pre_start() override;
+
 private:
-	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
-	// main NES CPU here, even if it does not belong to this device.
-	required_device<cpu_device> m_maincpu;
+	// the slot the cartridge is plugged into, and the CPU configured on it (or on the slot that a pass-through
+	// cartridge, such as the Game Genie, is plugged into)
+	nes_cart_slot_device *m_slot;
+	cpu_device *m_maincpu;
+	optional_device<cpu_device> m_builtin_cpu;
+	devcb_write_line m_builtin_irq;
 
 protected:
 	// these are specific of some boards but must be accessible from the driver
@@ -294,6 +392,8 @@ protected:
 	int m_ce_mask;
 	int m_ce_state;
 	mmc1_type m_mmc1_type;
+	bool m_mmc1_fixed_prg = false;
+	bool m_mmc1_ks203 = false;      // hard-wired nametable arrangement, and the clone has a RESET input
 	int m_vrc_ls_prg_a;
 	int m_vrc_ls_prg_b;
 	int m_vrc_ls_chr;
@@ -304,7 +404,7 @@ protected:
 
 	int32_t m_mirroring;
 	bool m_pcb_ctrl_mirror, m_four_screen_vram, m_has_trainer;
-	bool m_x1_005_alt_mirroring;    // temp hack for two kind of mirroring in Taito X1-005 boards (to be replaced with pin checking)
+	bool m_x1_005_alt_mirroring;    // Taito X1-005 with pin 17 wired to CIRAM A10 and pin 31 not connected (software list pin features, iNES mapper 207)
 	bool m_bus_conflict;
 private:
 	uint8_t m_open_bus;
@@ -382,7 +482,8 @@ public:
 
 class nes_cart_slot_device : public device_t,
 								public device_cartrom_image_interface,
-								public device_single_card_slot_interface<device_nes_cart_interface>
+								public device_single_card_slot_interface<device_nes_cart_interface>,
+								public device_mixer_interface   // cartridge audio, mixed into the console audio
 {
 public:
 	// construction/destruction
@@ -417,18 +518,18 @@ public:
 	virtual void write_h(offs_t offset, uint8_t data);
 	virtual void write_ex(offs_t offset, uint8_t data);
 
-	// hack until disk system is made modern!
-	virtual void disk_flip_side() { if (m_cart) m_cart->disk_flip_side(); }
-
 	int get_pcb_id() { return m_pcb_id; }
 
 	void pcb_start(uint8_t *ciram_ptr);
 	void pcb_reset();
+	bool console_reset_reaches_board() const;
+	bool register_loads_at_m2_fall() const;
 
-	// temporarily here
-	int m_crc_hack;
-
-	int get_crc_hack() { return m_crc_hack; }
+	// the CPU of the cartridge bus, and its IRQ input: cartridges assert their IRQ through the slot
+	template <typename T> void set_cpu(T &&tag) { m_cpu.set_tag(std::forward<T>(tag)); }
+	auto irq_callback() { return m_irq_handler.bind(); }
+	cpu_device *cpu() const;
+	void irq_w(int state) { m_irq_handler(state); }
 
 //private:
 	device_nes_cart_interface*      m_cart;
@@ -446,6 +547,10 @@ protected:
 	void call_load_ines();
 	void call_load_unif();
 	void call_load_pcb();
+
+private:
+	optional_device<cpu_device> m_cpu;
+	devcb_write_line m_irq_handler;
 };
 
 // device type declaration

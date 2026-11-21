@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 #ifndef MAME_BUS_NES_SOMARI_H
 #define MAME_BUS_NES_SOMARI_H
 
@@ -29,6 +29,17 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
+	// outer bank of the reset-based multicart (NES 2.0 submapper 3); with m_outer_on clear nothing is changed.
+	// PRG in 8 KiB banks, CHR in 1 KiB banks: bank = (bank & and) | or
+	bool m_outer_on = false;
+	u16 m_prg_and = 0xff, m_prg_or = 0;
+	u16 m_chr_and = 0x3ff, m_chr_or = 0;
+
+	virtual void prg_cb(int start, int bank) override;
+	virtual void chr_cb(int start, int bank, int source) override;
+
+	void update_all_banks();
+
 private:
 	void mmc1_reset_latch();
 	void mmc1_w(offs_t offset, u8 data);
@@ -36,7 +47,6 @@ private:
 	void update_prg();
 	void update_chr();
 	void update_mirror();
-	void update_all_banks();
 
 	u8 m_board_mode;
 
@@ -63,8 +73,27 @@ public:
 };
 
 
+// ======================> nes_somari_mc_device
+
+class nes_somari_mc_device : public nes_somari_device
+{
+public:
+	// construction/destruction
+	nes_somari_mc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void pcb_reset() override;
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	u8 m_game;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(NES_SOMARI, nes_somari_device)
+DECLARE_DEVICE_TYPE(NES_SOMARI_MC, nes_somari_mc_device)
 DECLARE_DEVICE_TYPE(NES_HUANG2, nes_huang2_device)
 
 #endif // MAME_BUS_NES_SOMARI_H

@@ -1933,12 +1933,15 @@ sha_aby
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
+	m_store_dummy_cycle = total_cycles();
 	read(set_l(m_TMP, m_TMP+m_Y));
 	m_TMP2 = m_A & m_X & ((m_TMP >> 8)+1);
 	if(page_changing(m_TMP, m_Y))
 		m_TMP = set_h(m_TMP+m_Y, m_TMP2);
 	else
 		m_TMP += m_Y;
+	if (total_cycles() - m_store_dummy_cycle > 1)
+		m_TMP2 = m_A & m_X;
 	write(m_TMP, m_TMP2);
 	prefetch();
 
@@ -1947,12 +1950,15 @@ sha_idy
 	m_PC++;
 	m_TMP = read(m_TMP2);
 	m_TMP = set_h(m_TMP, read((m_TMP2+1) & 0xff));
+	m_store_dummy_cycle = total_cycles();
 	read(set_l(m_TMP, m_TMP+m_Y));
 	m_TMP2 = m_A & m_X & ((m_TMP >> 8)+1);
 	if(page_changing(m_TMP, m_Y))
 		m_TMP = set_h(m_TMP+m_Y, m_TMP2);
 	else
 		m_TMP += m_Y;
+	if (total_cycles() - m_store_dummy_cycle > 1)
+		m_TMP2 = m_A & m_X;
 	write(m_TMP, m_TMP2);
 	prefetch();
 
@@ -1961,6 +1967,7 @@ shs_aby
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
+	m_store_dummy_cycle = total_cycles();
 	read(set_l(m_TMP, m_TMP+m_Y));
 	m_SP = set_l(m_SP, m_A & m_X);
 	m_TMP2 = m_A & m_X & ((m_TMP >> 8)+1);
@@ -1968,6 +1975,8 @@ shs_aby
 		m_TMP = set_h(m_TMP+m_Y, m_TMP2);
 	else
 		m_TMP += m_Y;
+	if (total_cycles() - m_store_dummy_cycle > 1)
+		m_TMP2 = m_A & m_X;
 	write(m_TMP, m_TMP2);
 	prefetch();
 
@@ -1976,12 +1985,15 @@ shx_aby
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
+	m_store_dummy_cycle = total_cycles();
 	read(set_l(m_TMP, m_TMP+m_Y));
 	m_TMP2 = m_X & ((m_TMP >> 8)+1);
 	if(page_changing(m_TMP, m_Y))
 		m_TMP = set_h(m_TMP+m_Y, m_TMP2);
 	else
 		m_TMP += m_Y;
+	if (total_cycles() - m_store_dummy_cycle > 1)
+		m_TMP2 = m_X;
 	write(m_TMP, m_TMP2);
 	prefetch();
 
@@ -1990,12 +2002,15 @@ shy_abx
 	m_PC++;
 	m_TMP = set_h(m_TMP, read_pc());
 	m_PC++;
+	m_store_dummy_cycle = total_cycles();
 	read(set_l(m_TMP, m_TMP+m_X));
 	m_TMP2 = m_Y & ((m_TMP >> 8)+1);
 	if(page_changing(m_TMP, m_X))
 		m_TMP = set_h(m_TMP+m_X, m_TMP2);
 	else
 		m_TMP += m_X;
+	if (total_cycles() - m_store_dummy_cycle > 1)
+		m_TMP2 = m_Y;
 	write(m_TMP, m_TMP2);
 	prefetch();
 
@@ -2234,9 +2249,9 @@ las_aby
 		read(set_l(m_TMP, m_TMP+m_Y));
 	}
 	m_TMP2 = read(m_TMP+m_Y);
-	m_A = m_TMP2 | 0x51;
-	m_X = 0xff;
-	set_nz(m_TMP2);
+	m_A = m_X = m_TMP2 & m_SP;
+	m_SP = set_l(m_SP, m_A);
+	set_nz(m_A);
 	prefetch();
 
 lxa_imm

@@ -30,10 +30,10 @@ public:
 	uint8_t *get_cart_base() { return m_rom; }
 	void write_prg_bank(uint8_t bank) { m_bank = bank; }
 
-	optional_device<i2cmem_device> m_i2cmem;
-
 protected:
 	datach_cart_interface(const machine_config &mconfig, device_t &device);
+
+	optional_device<i2cmem_device> m_i2cmem;
 
 	// internal state
 	uint8_t *m_rom;
@@ -148,20 +148,19 @@ public:
 
 	virtual void pcb_reset() override;
 
-	required_device<i2cmem_device> m_i2cmem;
-
 protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(irq_timer_tick);
 	TIMER_CALLBACK_MEMBER(serial_tick);
 
 	uint8_t m_datach_latch;
+	required_device<i2cmem_device> m_i2cmem;
 	required_device<barcode_reader_device> m_reader;
 	required_device<nes_datach_slot_device> m_subslot;
 	uint8_t m_i2c_dir;
+	uint8_t m_i2c_in_use;
 
 	emu_timer *serial_timer;
 };

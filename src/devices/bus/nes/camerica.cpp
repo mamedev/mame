@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Camerica/Codemasters PCBs
+
+ iNES mappers: 71, 104, 232
 
 
  Here we emulate the following PCBs
@@ -15,10 +17,6 @@
  Aladdin Deck Enhancer pass-thru cart and the corresponding minicarts
  (ALGNV11 & ALGQV11 PCBs) are emulated in a separate source file.
 
-
- TODO:
- - check what causes flickering from PPU in Fire Hawk, Pogie and Big Nose Freaks Out (same PPU issue as Back to Future 2&3?)
- - mapper 232 games need properly dumped to determine if the "alt" BF9096 board really exists.
 
  ***********************************************************************************************************/
 
@@ -126,9 +124,10 @@ void nes_golden5_device::pcb_reset()
  Games: Linus Spacehead's Cosmic Crusade, Micro Machines,
  Mig-29, Stunt Kids
 
- To emulate NT mirroring for BF9097 board (missing in BF9093)
- we use crc_hack, however Fire Hawk is broken (but without
- mirroring there would be no helicopter graphics).
+ The BF9097 board (Fire Hawk only) has mapper controlled one-screen
+ mirroring, which the BF9093 lacks. It is enabled by the software list
+ (pcb_controlled mirroring), by NES 2.0 submapper 1, or for iNES 1.0
+ images by their nes.hsi variant code.
 
  iNES: mapper 71
 
@@ -148,7 +147,8 @@ void nes_bf9093_device::write_h(offs_t offset, u8 data)
 			break;
 		case 0x4000:
 		case 0x6000:
-			prg16_89ab(data);
+			// BF9093 has a 4-bit bank register (PRG A14-A17); BF9097 (Fire Hawk) has no PRG A17 pin, so only 3 bits
+			prg16_89ab(data & (m_pcb_ctrl_mirror ? 0x07 : 0x0f));
 			break;
 	}
 }
@@ -164,6 +164,10 @@ void nes_bf9093_device::write_h(offs_t offset, u8 data)
  prg are: prg16_89ab = block|page, prg_cdef = 3|page.
  For more info on the hardware to bypass the NES lockout, see
  Kevtris' Camerica Mappers documentation.
+
+ The "alt" device (NES_BF9096A) swaps the two outer block bits. According
+ to the nesdev wiki this is NES 2.0 submapper 1 of mapper 232 (the Aladdin
+ Deck Enhancer variant, also used by Pegasus 4 in 1 and Super Adventure Quests).
 
  iNES: mapper 232
 

@@ -83,6 +83,35 @@ private:
 };
 
 
+// ======================> ymf288_device
+
+DECLARE_DEVICE_TYPE(YMF288, ymf288_device);
+
+// the YMF288 (OPN3): a smaller variant of the YM2608 without most of its sample playback abilities (NESdev, Expansion
+// Port Sound Module). Its rhythm samples (ADPCM-A) are in an internal ROM that this device does not have, so the
+// rhythm channels read silence.
+class ymf288_device : public ymfm_ssg_device_base<ymfm::ymf288>
+{
+	using parent = ymfm_ssg_device_base<ymfm::ymf288>;
+
+public:
+	// constructor
+	ymf288_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// additional register reads
+	u8 data_r() { return update_streams().read_data(); }
+	u8 status_hi_r() { return update_streams().read_status_hi(); }
+
+	// additional register writes
+	void address_hi_w(u8 data) { update_streams().write_address_hi(data); }
+	void data_hi_w(u8 data) { update_streams().write_data_hi(data); }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+};
+
+
 // ======================> ym2610_device_base
 
 template<typename ChipClass>

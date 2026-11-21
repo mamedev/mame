@@ -37,6 +37,37 @@ void ym2203_device::device_start()
 
 
 //*********************************************************
+//  YMF288 DEVICE
+//*********************************************************
+
+DEFINE_DEVICE_TYPE(YMF288, ymf288_device, "ymf288", "YMF288 OPN3")
+
+//-------------------------------------------------
+//  ymf288_device - constructor
+//-------------------------------------------------
+
+ymf288_device::ymf288_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	ymfm_ssg_device_base<ymfm::ymf288>(mconfig, tag, owner, clock, YMF288)
+{
+}
+
+
+//-------------------------------------------------
+//  device_start - start of emulation
+//-------------------------------------------------
+
+void ymf288_device::device_start()
+{
+	// set our target output fidelity
+	m_chip.set_fidelity(SSG_FIDELITY);
+
+	// call our parent
+	parent::device_start();
+}
+
+
+
+//*********************************************************
 //  YM2608 DEVICE
 //*********************************************************
 

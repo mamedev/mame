@@ -181,6 +181,10 @@ public:
 
 	// time and cycle accounting
 	attotime local_time() const noexcept;
+	// transient offset added to local_time() while a bus access is in progress (the RP2A03 makes its access at M2 rise,
+	// part way into the cycle); zero at all other times
+	const attotime &bus_offset() const noexcept { return m_bus_offset; }
+	void set_bus_offset(const attotime &offset) noexcept { m_bus_offset = offset; }
 	u64 total_cycles() const noexcept;
 
 	// required operation overrides
@@ -317,6 +321,7 @@ private:
 	// clock and timing information
 	u64                     m_totalcycles;              // total device cycles executed
 	attotime                m_localtime;                // local time, relative to the timer system's global time
+	attotime                m_bus_offset;               // transient bus-phase offset, see set_bus_offset()
 	s32                     m_divisor;                  // 32-bit attoseconds_per_cycle divisor
 	u8                      m_divshift;                 // right shift amount to fit the divisor into 32 bits
 	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers

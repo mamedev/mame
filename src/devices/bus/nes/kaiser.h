@@ -39,6 +39,18 @@ public:
 };
 
 
+// ======================> nes_jy043_device
+
+class nes_jy043_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_jy043_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+};
+
+
 // ======================> nes_ks7022_device
 
 class nes_ks7022_device : public nes_nrom_device
@@ -82,6 +94,9 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+	// M2 at the cartridge connector: the IRQ counter is clocked once per CPU cycle, at the M2 rise (before that cycle's access)
+	virtual bool wants_m2() override { return true; }
+	virtual void m2_w(int state, offs_t address, bool write) override { if (state) irq_timer_tick(0); }
 
 	u8 m_reg[8];
 
@@ -92,7 +107,6 @@ private:
 	u16 m_irq_count, m_irq_count_latch;
 	u8 m_irq_enable;
 
-	emu_timer *irq_timer;
 };
 
 
@@ -164,6 +178,9 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+	// M2 at the cartridge connector: the IRQ counter is clocked once per CPU cycle, at the M2 rise (before that cycle's access)
+	virtual bool wants_m2() override { return true; }
+	virtual void m2_w(int state, offs_t address, bool write) override { if (state) irq_timer_tick(0); }
 
 private:
 	u8 m_latch;
@@ -172,7 +189,6 @@ private:
 	u8 m_irq_status;
 	u8 m_irq_enable;
 
-	emu_timer *irq_timer;
 };
 
 
@@ -352,5 +368,6 @@ DECLARE_DEVICE_TYPE(NES_KS7032,  nes_ks7032_device)
 DECLARE_DEVICE_TYPE(NES_KS7037,  nes_ks7037_device)
 DECLARE_DEVICE_TYPE(NES_KS7057,  nes_ks7057_device)
 DECLARE_DEVICE_TYPE(NES_KS7058,  nes_ks7058_device)
+DECLARE_DEVICE_TYPE(NES_JY043,   nes_jy043_device)
 
 #endif // MAME_BUS_NES_KAISER_H

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 #ifndef MAME_BUS_NES_MULTIGAME_H
 #define MAME_BUS_NES_MULTIGAME_H
 
@@ -272,6 +272,97 @@ private:
 };
 
 
+// ======================> nes_bmc_576_device
+
+class nes_bmc_576_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_576_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	void update_banks();
+	u16 m_latch;            // A9-A0 of the last $8000-$FFFF write
+};
+
+
+// ======================> nes_bmc_564_device
+
+class nes_bmc_564_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_564_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	void update_banks();
+	u8 m_latch;
+};
+
+
+// ======================> nes_bmc_582_device
+
+class nes_bmc_582_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_582_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	void update_prg();
+	u8 m_reg[4];
+};
+
+
+// ======================> nes_bmc_585_device
+
+class nes_bmc_585_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_585_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual u8 read_h(offs_t offset) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+private:
+	void update_banks();
+	required_ioport m_pad_port;
+	u16 m_latch;            // A6-A0 of the last $8000-$FFFF write
+};
+
+
 // ======================> nes_bmc_810544c_device
 
 class nes_bmc_810544c_device : public nes_nrom_device
@@ -283,6 +374,32 @@ public:
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
+};
+
+
+// ======================> nes_bmc_631601_device
+
+class nes_bmc_631601_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_631601_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void write_l(offs_t offset, u8 data) override;
+	virtual void write_m(offs_t offset, u8 data) override;
+	virtual void write_h(offs_t offset, u8 data) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	void write_outer(u8 data);
+	void update_banks();
+
+	u8 m_outer, m_inner;
 };
 
 
@@ -496,6 +613,13 @@ public:
 
 	virtual u8 read_l(offs_t offset) override;
 	virtual void write_m(offs_t offset, u8 data) override;
+
+protected:
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+private:
+	required_ioport m_pad;      // solder pad, read in bit 6 of $5000-$5FFF
 };
 
 
@@ -1059,6 +1183,35 @@ public:
 	// construction/destruction
 	nes_bmc_1200in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual uint8_t read_h(offs_t offset) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void chr_w(offs_t offset, uint8_t data) override;
+
+	virtual void pcb_reset() override;
+	virtual void set_1200in1_submapper(u8 val) override { m_submapper = val; }
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+private:
+	required_ioport m_pad;      // submapper 1: solder pads, replacing PRG A3-A0 when the m bit is set
+	uint8_t m_submapper;
+	uint8_t m_pad_mode;         // the m bit of the address latch
+	uint8_t m_vram_protect;
+};
+
+
+// ======================> nes_bmc_et113_device
+
+class nes_bmc_et113_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bmc_et113_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual uint8_t read_h(offs_t offset) override;
 	virtual void write_h(offs_t offset, uint8_t data) override;
 	virtual void chr_w(offs_t offset, uint8_t data) override;
 
@@ -1067,8 +1220,13 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
+	void update_banks(offs_t latch);
+
+	required_ioport m_pad;      // solder pads, replacing PRG A4-A0 when the m bit is set
+	uint8_t m_pad_mode;         // the m bit of the address latch
 	uint8_t m_vram_protect;
 };
 
@@ -1215,6 +1373,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	u8 m_reg[2];
+	bool m_vram_wp;
 };
 
 
@@ -1240,9 +1399,13 @@ public:
 
 	virtual void write_h(offs_t offset, u8 data) override;
 
+	virtual void pcb_reset() override;
+
 protected:
 	// construction/destruction
 	nes_bmc_k1029_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+
+	u8 m_prg_a20;           // outer PRG bits above A19: A20, and A21 in bit 1 on mapper 354 submapper 1
 };
 
 
@@ -1258,6 +1421,7 @@ public:
 	virtual void write_h(offs_t offset, u8 data) override;
 
 	virtual void pcb_reset() override;
+	virtual void set_fam250_submapper(u8 val) override { m_submapper = val; }
 
 protected:
 	// device-level overrides
@@ -1265,6 +1429,7 @@ protected:
 
 private:
 	u8 m_latch, m_reg;
+	u8 m_submapper = 0;     // NES 2.0 submapper: 1 = 810331C/SCHI-24 (latch at $E000-$FFFF, PRG A21)
 };
 
 
@@ -1320,6 +1485,25 @@ public:
 };
 
 
+// ======================> nes_bitcorp3150_device
+
+class nes_bitcorp3150_device : public nes_nrom_device
+{
+public:
+	// construction/destruction
+	nes_bitcorp3150_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+private:
+	required_ioport m_dsw;
+};
+
+
 // device type definition
 DECLARE_DEVICE_TYPE(NES_ACTION52,       nes_action52_device)
 DECLARE_DEVICE_TYPE(NES_CALTRON6IN1,    nes_caltron6in1_device)
@@ -1336,7 +1520,12 @@ DECLARE_DEVICE_TYPE(NES_SUPERGUN20IN1,  nes_sgun20in1_device)
 DECLARE_DEVICE_TYPE(NES_VT5201,         nes_vt5201_device)
 DECLARE_DEVICE_TYPE(NES_BMC_60311C,     nes_bmc_60311c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_80013B,     nes_bmc_80013b_device)
+DECLARE_DEVICE_TYPE(NES_BMC_576,        nes_bmc_576_device)
+DECLARE_DEVICE_TYPE(NES_BMC_564,        nes_bmc_564_device)
+DECLARE_DEVICE_TYPE(NES_BMC_582,        nes_bmc_582_device)
+DECLARE_DEVICE_TYPE(NES_BMC_585,        nes_bmc_585_device)
 DECLARE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device)
+DECLARE_DEVICE_TYPE(NES_BMC_631601,     nes_bmc_631601_device)
 DECLARE_DEVICE_TYPE(NES_BMC_830425C,    nes_bmc_830425c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_830928C,    nes_bmc_830928c_device)
 DECLARE_DEVICE_TYPE(NES_BMC_850437C,    nes_bmc_850437c_device)
@@ -1388,11 +1577,13 @@ DECLARE_DEVICE_TYPE(NES_BMC_500IN1,     nes_bmc_500in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_800IN1,     nes_bmc_800in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_1200IN1,    nes_bmc_1200in1_device)
 DECLARE_DEVICE_TYPE(NES_BMC_GOLD260,    nes_bmc_gold260_device)
+DECLARE_DEVICE_TYPE(NES_BMC_ET113,      nes_bmc_et113_device)
 DECLARE_DEVICE_TYPE(NES_BMC_4IN1RESET,  nes_bmc_4in1reset_device)
 DECLARE_DEVICE_TYPE(NES_BMC_42IN1RESET, nes_bmc_42in1reset_device)
 DECLARE_DEVICE_TYPE(NES_BMC_NC20MB,     nes_bmc_nc20mb_device)
 DECLARE_DEVICE_TYPE(NES_BMC_LC160,      nes_bmc_lc160_device)
 DECLARE_DEVICE_TYPE(NES_BMC_TH22913,    nes_bmc_th22913_device)
 DECLARE_DEVICE_TYPE(NES_BMC_82AB,       nes_bmc_82ab_device)
+DECLARE_DEVICE_TYPE(NES_BITCORP3150,    nes_bitcorp3150_device)
 
 #endif // MAME_BUS_NES_MULTIGAME_H

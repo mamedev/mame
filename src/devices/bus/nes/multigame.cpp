@@ -1,16 +1,19 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Multigame Carts PCBs
 
+ iNES mappers: 15, 39, 41, 46, 51, 53, 54, 57, 58, 59, 60, 62, 63, 174, 200, 201, 202, 203, 204,
+               212, 213, 214, 217, 221, 225, 226, 227, 228, 229, 230, 231, 233, 235, 236, 237, 242, 255,
+               261, 265, 274, 285, 288, 289, 290, 294, 299, 300, 301, 314, 319, 320, 324, 331, 332,
+               335, 336, 337, 338, 340, 341, 349, 350, 354, 360, 380, 381, 382, 389, 396, 428, 431,
+               433, 434, 437, 438, 452, 541
+
 
  Here we emulate several PCBs used in multigame pirate carts (not MMC-3 based)
 
- TODO: Investigate further Gunsmoke on mc_8et40, mc_2gn91, mc_8x801. All have
- the same bug where enemies/barrels don't appear until they are halfway down
- the screeen. They all seem to be a minor hack of the US release.
 
  ***********************************************************************************************************/
 
@@ -48,7 +51,12 @@ DEFINE_DEVICE_TYPE(NES_SUPERGUN20IN1,  nes_sgun20in1_device,      "nes_sgun20in1
 DEFINE_DEVICE_TYPE(NES_VT5201,         nes_vt5201_device,         "nes_vt5201",         "NES Cart VT5201 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_60311C,     nes_bmc_60311c_device,     "nes_bmc_60311c",     "NES Cart BMC 60311C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_80013B,     nes_bmc_80013b_device,     "nes_bmc_80013b",     "NES Cart BMC 80013-B PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_576,        nes_bmc_576_device,        "nes_bmc_576",        "NES Cart BMC 100-in-1 (NES 2.0 mapper 576) PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_564,        nes_bmc_564_device,        "nes_bmc_564",        "NES Cart NTDEC 22-in-1 (NES 2.0 mapper 564) PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_582,        nes_bmc_582_device,        "nes_bmc_582",        "NES Cart Super Micro Machines 1999 (NES 2.0 mapper 582) PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_585,        nes_bmc_585_device,        "nes_bmc_585",        "NES Cart Super 72-in-1 (NES 2.0 mapper 585) PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_810544C,    nes_bmc_810544c_device,    "nes_bmc_810544c",    "NES Cart BMC 810544-C-A1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_631601,     nes_bmc_631601_device,     "nes_bmc_631601",     "NES Cart BMC 63-1601 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830425C,    nes_bmc_830425c_device,    "nes_bmc_830425c",    "NES Cart BMC 830425C-4391T PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_830928C,    nes_bmc_830928c_device,    "nes_bmc_830928c",    "NES Cart BMC 830928C PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_850437C,    nes_bmc_850437c_device,    "nes_bmc_850437c",    "NES Cart BMC 850437C PCB")
@@ -100,12 +108,14 @@ DEFINE_DEVICE_TYPE(NES_BMC_500IN1,     nes_bmc_500in1_device,     "nes_bmc_500in
 DEFINE_DEVICE_TYPE(NES_BMC_800IN1,     nes_bmc_800in1_device,     "nes_bmc_800in1",     "NES Cart BMC 800 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_1200IN1,    nes_bmc_1200in1_device,    "nes_bmc_1200in1",    "NES Cart BMC 1200 in 1 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_GOLD260,    nes_bmc_gold260_device,    "nes_bmc_gold260",    "NES Cart BMC Golden Game X in 1 PCB")
+DEFINE_DEVICE_TYPE(NES_BMC_ET113,      nes_bmc_et113_device,      "nes_bmc_et113",      "NES Cart BMC ET-113 (iNES mapper 242 multicart) PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_TH22913,    nes_bmc_th22913_device,    "nes_bmc_th22913",    "NES Cart BMC TH2291-3 PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_82AB,       nes_bmc_82ab_device,       "nes_bmc_82ab",       "NES Cart BMC 82AB PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_4IN1RESET,  nes_bmc_4in1reset_device,  "nes_bmc_4in1reset",  "NES Cart BMC 4 in 1 (Reset Based) PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_42IN1RESET, nes_bmc_42in1reset_device, "nes_bmc_42in1reset", "NES Cart BMC 42 in 1 (Reset Based) PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_NC20MB,     nes_bmc_nc20mb_device,     "nes_bmc_nc20mb",     "NES Cart BMC NC-20MB PCB")
 DEFINE_DEVICE_TYPE(NES_BMC_LC160,      nes_bmc_lc160_device,      "nes_bmc_lc160",      "NES Cart BMC Little Com 160 PCB")
+DEFINE_DEVICE_TYPE(NES_BITCORP3150,    nes_bitcorp3150_device,    "nes_bitcorp3150",    "NES Cart Bit Corp 31-in-1 (ID 3150) PCB")
 
 
 INPUT_PORTS_START( bmc_8157 )
@@ -211,6 +221,11 @@ nes_bmc_810544c_device::nes_bmc_810544c_device(const machine_config &mconfig, co
 {
 }
 
+nes_bmc_631601_device::nes_bmc_631601_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_631601, tag, owner, clock), m_outer(0), m_inner(0)
+{
+}
+
 nes_bmc_830425c_device::nes_bmc_830425c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_830425C, tag, owner, clock), m_latch(0)
 {
@@ -268,6 +283,7 @@ nes_bmc_gn91b_device::nes_bmc_gn91b_device(const machine_config &mconfig, const 
 
 nes_bmc_hp898f_device::nes_bmc_hp898f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_HP898F, tag, owner, clock)
+	, m_pad(*this, "PAD")
 {
 }
 
@@ -439,12 +455,21 @@ nes_bmc_500in1_device::nes_bmc_500in1_device(const machine_config &mconfig, cons
 }
 
 nes_bmc_1200in1_device::nes_bmc_1200in1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, NES_BMC_1200IN1, tag, owner, clock), m_vram_protect(0)
+	: nes_nrom_device(mconfig, NES_BMC_1200IN1, tag, owner, clock)
+	, m_pad(*this, "PAD")
+	, m_submapper(0), m_pad_mode(0), m_vram_protect(0)
 {
 }
 
 nes_bmc_gold260_device::nes_bmc_gold260_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_BMC_GOLD260, tag, owner, clock)
+{
+}
+
+nes_bmc_et113_device::nes_bmc_et113_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_ET113, tag, owner, clock)
+	, m_pad(*this, "PAD")
+	, m_pad_mode(0), m_vram_protect(0)
 {
 }
 
@@ -484,7 +509,7 @@ nes_bmc_60311c_device::nes_bmc_60311c_device(const machine_config &mconfig, cons
 }
 
 nes_bmc_ctc12in1_device::nes_bmc_ctc12in1_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_vram_protect_device(mconfig, type, tag, owner, clock)
+	: nes_vram_protect_device(mconfig, type, tag, owner, clock), m_vram_wp(false)
 {
 }
 
@@ -499,7 +524,7 @@ nes_bmc_891227_device::nes_bmc_891227_device(const machine_config &mconfig, cons
 }
 
 nes_bmc_k1029_device::nes_bmc_k1029_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_vram_protect_device(mconfig, type, tag, owner, clock)
+	: nes_vram_protect_device(mconfig, type, tag, owner, clock), m_prg_a20(0)
 {
 }
 
@@ -686,6 +711,21 @@ void nes_bmc_810544c_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, CHRROM);
+}
+
+void nes_bmc_631601_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_outer));
+	save_item(NAME(m_inner));
+}
+
+void nes_bmc_631601_device::pcb_reset()
+{
+	m_outer = 0;
+	m_inner = 0;
+	set_nt_mirroring(PPU_MIRROR_VERT);
+	update_banks();
 }
 
 void nes_bmc_830425c_device::device_start()
@@ -1061,6 +1101,7 @@ void nes_bmc_150in1_device::pcb_reset()
 void nes_bmc_1200in1_device::device_start()
 {
 	common_start();
+	save_item(NAME(m_pad_mode));
 	save_item(NAME(m_vram_protect));
 }
 
@@ -1069,6 +1110,8 @@ void nes_bmc_1200in1_device::pcb_reset()
 	prg16_89ab(0);
 	prg16_cdef(0);
 	chr8(0, m_chr_source);
+	set_nt_mirroring(PPU_MIRROR_VERT);   // the address latch powers up as 0
+	m_pad_mode = 0;
 	m_vram_protect = 0;
 }
 
@@ -1132,6 +1175,7 @@ void nes_bmc_ctc12in1_device::device_start()
 {
 	nes_vram_protect_device::device_start();
 	save_item(NAME(m_reg));
+	save_item(NAME(m_vram_wp));
 }
 
 void nes_bmc_ctc12in1_device::pcb_reset()
@@ -1141,6 +1185,20 @@ void nes_bmc_ctc12in1_device::pcb_reset()
 	prg16_cdef(0);
 
 	m_reg[0] = m_reg[1] = 0;
+	m_vram_wp = false;
+
+	// all bits clear is NROM-128 mode with vertical mirroring, where CHR-RAM is write-protected
+	set_nt_mirroring(PPU_MIRROR_VERT);
+	m_vram_protect = true;
+}
+
+void nes_bmc_k1029_device::pcb_reset()
+{
+	nes_vram_protect_device::pcb_reset();
+
+	// power-on and reset state is all bits clear: NROM-256 mode with vertical mirroring and write-protected CHR-RAM
+	set_nt_mirroring(PPU_MIRROR_VERT);
+	m_vram_protect = true;
 }
 
 void nes_bmc_fam250_device::device_start()
@@ -1148,14 +1206,21 @@ void nes_bmc_fam250_device::device_start()
 	nes_bmc_k1029_device::device_start();
 	save_item(NAME(m_latch));
 	save_item(NAME(m_reg));
+	save_item(NAME(m_prg_a20));
 }
 
 void nes_bmc_fam250_device::pcb_reset()
 {
-	nes_bmc_k1029_device::pcb_reset();
+	nes_vram_protect_device::pcb_reset();
 
+	// NESdev: power-on and reset value all bits clear (NROM-256 bank 0, vertical mirroring, CHR-RAM writable, PRG A20
+	// and A21 clear)
+	m_prg_a20 = 0;
 	m_latch = 0;
 	m_reg = 0;
+	prg32(0);
+	set_nt_mirroring(PPU_MIRROR_VERT);
+	m_vram_protect = 0;
 }
 
 void nes_n625092_device::device_start()
@@ -1659,6 +1724,63 @@ void nes_bmc_810544c_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
+ BMC-63-1601
+
+ Games: 16-in-1 (1682), 2 MiB of UNROM games
+
+ UNROM with an outer bank register at $4100 (mask $C100, so any
+ address with A14 and A8 set and A15 clear): bits 3-0 select the
+ 128 KiB outer PRG-ROM bank (PRG A20-A17) and bit 4 the mirroring
+ (0 = vertical, 1 = horizontal). The inner bank register is the
+ usual UNROM one at $8000-$FFFF, with bank 7 of the outer bank
+ fixed at $C000.
+
+ NES 2.0: mapper 294
+
+ In MAME: Supported from the NESdev description; no mapper 294
+ cart was available to test.
+
+ -------------------------------------------------*/
+
+void nes_bmc_631601_device::update_banks()
+{
+	prg16_89ab(m_outer << 3 | m_inner);
+	prg16_cdef(m_outer << 3 | 0x07);
+}
+
+void nes_bmc_631601_device::write_outer(u8 data)
+{
+	m_outer = data & 0x0f;
+	set_nt_mirroring(BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	update_banks();
+}
+
+void nes_bmc_631601_device::write_l(offs_t offset, u8 data)
+{
+	LOG("bmc_631601 write_l, offset: %04x, data: %02x\n", offset, data);
+
+	if (BIT(offset + 0x100, 8))
+		write_outer(data);
+}
+
+void nes_bmc_631601_device::write_m(offs_t offset, u8 data)
+{
+	LOG("bmc_631601 write_m, offset: %04x, data: %02x\n", offset, data);
+
+	if (BIT(offset, 8))
+		write_outer(data);
+}
+
+void nes_bmc_631601_device::write_h(offs_t offset, u8 data)
+{
+	LOG("bmc_631601 write_h, offset: %04x, data: %02x\n", offset, data);
+
+	m_inner = data & 0x07;
+	update_banks();
+}
+
+/*-------------------------------------------------
+
  BMC-830425C-4391T
 
  Games: Super HiK 6-in-1 (A-030)
@@ -1958,12 +2080,33 @@ void nes_bmc_gka_device::write_h(offs_t offset, u8 data)
 
  In MAME: Supported.
 
- TODO: Investigate why Jewel on mc_wq55 crashes after
- its title screen. It further invokes write_h, causing
- bank switching (and these games are all NROM/CNROM so
- they should never switch PRG once the menu loads them),
- but ignoring those writes doesn't fix the problem. Is
- the game non-working on hardware? A bad dump?
+ NESdev INES Mapper 058 (and 213, a duplicate): a write to $8000-$FFFF
+ sets, from its address (A15 1... .... MSCC CPPP): PPP: PRG A16-A14;
+ CCC: CHR A15-A13; S: 0 is NROM-256 (PRG A14 is CPU A14), 1 is
+ NROM-128; M: mirroring, 0 vertical, 1 horizontal.
+
+ Jewel on mc_wq55 crashes after its title screen, and that dump is
+ flagged as a bad dump: after Start the CPU runs zero page (data, with
+ nothing on the stack) and the garbage it executes writes the address
+ latch. The writes are a result of the crash, not a bank switch made
+ by the game.
+
+ Checked: the menus of 68-in-1 (WQ2006 D), 77-in-1 (WQ1806 E), 122-in-1
+ (MC3122) and 55-in-1 (WQ2006 B), the last being mc_wq55, the dump flagged
+ as bad, launch a game with a RAM routine that writes the latch and jumps
+ to an entry address (the 55-in-1 keeps six such records). For these nine
+ records the window the page's decode maps has a valid reset target (the
+ stub at $FFF2 or startup code) in eight and real code in the ninth, and
+ five with S read the other way round; C036 in the 68-in-1 settles S: S=0
+ maps banks 6 and 7, whose vectors lead to the stub, while S=1 would
+ mirror bank 6, whose reset vector is not a ROM address. Legend of Kage
+ in the 122-in-1 writes the latch every frame, alternating CCC 2 and 3 as
+ CNROM-style CHR switching, draws correctly, and has M=1 (horizontal
+ mirroring) while scrolling vertically; no dump isolates the mirroring bit
+ further. The 55-in-1 menu writes $8038 at frame 0, so the power-on
+ mirroring and CHR bank do not matter there; the power-on PRG mapping
+ (banks 0 and 1) does, and the dump boots to its menu with it. Jewel's
+ crash is the same with S cleared.
 
  -------------------------------------------------*/
 
@@ -2039,11 +2182,43 @@ void nes_bmc_gn91b_device::write_h(offs_t offset, u8 data)
 
  In MAME: Supported.
 
- TODO: Mirroring is clearly incorrect for Ninja-kun
- on 4 in 1 (0207). Is this an error on the original
- cart or should there really be a variant device?
+ NESdev NES 2.0 Mapper 319 (HP-898F and KD-7/9-E boards): a write to
+ $6000-$7FFF with A2 set ($6004) selects the 16 KiB PRG banks (PRG A15
+ is bit 3, A16 bit 4, A14 bit 5, or CPU A14 when bit 6 is set) and the
+ mirroring (bit 7: 0 horizontal, 1 vertical); with A2 clear ($6000),
+ bits 7-4 select the 8 KiB CHR bank. A read of $5000-$5FFF returns the
+ solder pad in bit 6 and the rest of the bits as open bus (the page
+ documents only the pad). The pad picks the menu, and is a machine
+ configuration setting.
+
+ Checked: in 9999999-in-1 - 14 Giochi X-140 (Italy) (En) (Pirate).nes
+ and Olympic 2000 - 1000000-in-1 (Asia) (En) (Pirate).nes the routine
+ that reads $5FF0 keeps the pad bit ($C1 and $80), which now follows the
+ setting; the first dump's menu title is 9999999 IN 1 at pad 0 and
+ 1000000 IN 1 at pad 1.
+
+ Checked: Super Game 4-in-1 (KG-410), whose menu reads 0210, writes
+ $6004 and $6000 as C8/10 for Adventure Island, 30/60 for Ninja-kun,
+ 90/20 for Mappy and 20/40 for Road Fighter. Ninja-kun is PRG bank 5 and
+ CHR bank 6, as those values decode. The mirroring bit gives vertical for
+ Adventure Island and Mappy and horizontal for Ninja-kun and Road
+ Fighter, the same as the headers of the original games, so no variant
+ board is needed. Ninja-kun on 4 in 1 (0207) is mc_4z207, whose PRG and
+ CHR the software list flags as bad dumps; it was not available to test.
 
  -------------------------------------------------*/
+
+static INPUT_PORTS_START( hp898f )
+	PORT_START("PAD")
+	PORT_CONFNAME( 0x01, 0x00, "Solder pad (menu)" )
+	PORT_CONFSETTING(    0x00, "0" )
+	PORT_CONFSETTING(    0x01, "1" )
+INPUT_PORTS_END
+
+ioport_constructor nes_bmc_hp898f_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( hp898f );
+}
 
 u8 nes_bmc_hp898f_device::read_l(offs_t offset)
 {
@@ -2051,7 +2226,7 @@ u8 nes_bmc_hp898f_device::read_l(offs_t offset)
 
 	offset += 0x100;
 	if (offset & 0x1000)
-		return 0;    // FIXME: some carts read jumpers that change menu
+		return (get_open_bus() & ~0x40) | ((m_pad->read() & 0x01) << 6);
 
 	return get_open_bus();
 }
@@ -3098,11 +3273,57 @@ void nes_bmc_500in1_device::write_h(offs_t offset, u8 data)
  Unknown Bootleg Multigame Board
  Games: 1200 in 1, 295 in 1, 76 in 1
 
+ NESdev INES Mapper 227, an address-latch multicart with 8 KiB of
+ unbanked CHR-RAM; a write to $8000-$FFFF sets, from its address
+ (A15 1... .mLQ OQQP PpMS): S: PRG A14 is p (0) or CPU A14 (1); M:
+ mirroring, 0 vertical, 1 horizontal; PPp: inner PRG bank (A16-A14);
+ QQQ: outer bank (A19-A17); O: 1 is NROM (NROM-128 with S=0, NROM-256
+ with S=1, whose inner bank is PP), 0 is UNROM-like, with CPU A14=1
+ giving inner bank 7 if L is set and 0 if not; m: PRG A3-A0 are the
+ solder pads (submapper 1 only). On a board without battery-backed RAM
+ CHR-RAM is write-protected while O is set; the Chinese RPGs have 8 KiB
+ of it and no UNROM-like modes. Everything powers up as 0. The pads
+ are a machine configuration setting.
+
+ Checked: a synthetic image with numbered PRG banks gives the page's
+ bank for each mode (NROM-256 with p set was wrong), the pad replacing
+ A3-A0 and the CHR-RAM protection; the multicart plays a game with the
+ protection on, and three battery-backed RPG dumps draw as before.
+
+ TODO: submapper 2 (the outer bank A18-A17 is 0 when the inner bank is
+ 0) is not emulated.
+
  iNES: mapper 227
 
- In MAME: Preliminary Supported.
+ In MAME: Supported.
 
  -------------------------------------------------*/
+
+static INPUT_PORTS_START( bmc_1200in1 )
+	PORT_START("PAD")
+	PORT_CONFNAME( 0x0f, 0x00, "Solder pads (submapper 1 menu)" )
+	PORT_CONFSETTING(    0x00, "0" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "3" )
+	PORT_CONFSETTING(    0x04, "4" )
+	PORT_CONFSETTING(    0x05, "5" )
+	PORT_CONFSETTING(    0x06, "6" )
+	PORT_CONFSETTING(    0x07, "7" )
+	PORT_CONFSETTING(    0x08, "8" )
+	PORT_CONFSETTING(    0x09, "9" )
+	PORT_CONFSETTING(    0x0a, "10" )
+	PORT_CONFSETTING(    0x0b, "11" )
+	PORT_CONFSETTING(    0x0c, "12" )
+	PORT_CONFSETTING(    0x0d, "13" )
+	PORT_CONFSETTING(    0x0e, "14" )
+	PORT_CONFSETTING(    0x0f, "15" )
+INPUT_PORTS_END
+
+ioport_constructor nes_bmc_1200in1_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( bmc_1200in1 );
+}
 
 void nes_bmc_1200in1_device::chr_w(offs_t offset, uint8_t data)
 {
@@ -3112,6 +3333,13 @@ void nes_bmc_1200in1_device::chr_w(offs_t offset, uint8_t data)
 		m_chr_access[bank][offset & 0x3ff] = data;
 }
 
+uint8_t nes_bmc_1200in1_device::read_h(offs_t offset)
+{
+	// submapper 1, m bit set: PRG A3-A0 come from the solder pads instead of the CPU
+	if (m_submapper == 1 && m_pad_mode)
+		return hi_access_rom((offset & ~0x0f) | (m_pad->read() & 0x0f));
+	return hi_access_rom(offset);
+}
 
 void nes_bmc_1200in1_device::write_h(offs_t offset, uint8_t data)
 {
@@ -3119,17 +3347,18 @@ void nes_bmc_1200in1_device::write_h(offs_t offset, uint8_t data)
 
 	LOG("bmc_1200in1 write_h, offset: %04x, data: %02x\n", offset, data);
 
+	m_pad_mode = BIT(offset, 10);
+
 	if (offset & 0x80)
 	{
-//      m_vram_protect = 1;
-		prg16_89ab(bank);
-		prg16_cdef(bank + (offset & 1));
+		// NROM: S=1 takes PRG A14 from the CPU, so the inner bank is PP and p is not used
+		prg16_89ab(bank & ~(offset & 1));
+		prg16_cdef(bank | (offset & 1));
 	}
 	else
 	{
 		int low_mask = (offset & 1) ? 0x3e : 0xff;
 
-//      m_vram_protect = 0;
 		if (!BIT(offset, 9))
 		{
 			prg16_89ab(bank & low_mask);
@@ -3141,6 +3370,9 @@ void nes_bmc_1200in1_device::write_h(offs_t offset, uint8_t data)
 			prg16_cdef(bank | 0x07);
 		}
 	}
+
+	// CHR-RAM is write-protected in the NROM modes, but not on the boards with battery-backed RAM
+	m_vram_protect = BIT(offset, 7) && m_battery.empty();
 
 	set_nt_mirroring(BIT(offset, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
@@ -3155,9 +3387,18 @@ void nes_bmc_1200in1_device::write_h(offs_t offset, uint8_t data)
 
  iNES: mapper 235
 
+ A9-A8 pick one of four 1 MiB ROM sockets and the menu checks
+ each socket's checksum, so an image has to keep the empty
+ sockets in place. The software list does that with $FF
+ fill; for iNES files, which leave the empty sockets out, the
+ loader puts a 1 MiB image in socket 0, a 2 MiB one in sockets
+ 0 and 2 and a 3 MiB one in sockets 0, 2 and 3 (NESdev: only
+ sockets 0 and 2 are filled on the 2 MiB cart; the software
+ list has the 260 in 1 in sockets 0, 2 and 3).
+
  In MAME: Supported.
 
- TODO: Return open bus when ROM sockets are empty?
+ TODO: Return open bus when ROM sockets are empty? ($FF now)
 
  -------------------------------------------------*/
 
@@ -3171,6 +3412,150 @@ void nes_bmc_gold260_device::write_h(offs_t offset, u8 data)
 	prg16_cdef(bank | mode);
 
 	set_nt_mirroring(BIT(offset, 10) ? PPU_MIRROR_LOW : BIT(offset, 13) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+/*-------------------------------------------------
+
+ BMC-ET113
+
+ Games: 1992 Gaishi 190-in-1 Hua Mian Xuan Guan, 211-in-1 - 1992 Ultra
+ Power Card, 1996 Aoyunhui Jingji Ban 24-in-1
+
+ NESdev INES Mapper 242, an address-latch multicart with 8 KiB of
+ unbanked CHR-RAM; a write to $8000-$FFFF sets, from its address
+ (A15 1... .CLm OQQP PpMS): S: PRG A14 is p (0) or CPU A14 (1); M:
+ mirroring, 0 vertical, 1 horizontal; PPp: inner PRG bank (A16-A14);
+ QQ: outer bank (A18-A17); O: 1 is NROM (NROM-128 with S=0, NROM-256
+ with S=1, whose inner bank is PP), 0 is UNROM-like, with CPU A14=1
+ giving inner bank 7 if L is set and 0 if not; m: PRG A4-A0 are the
+ solder pads; C: on the ET-113 PCB, which adds a 128 KiB PRG-ROM chip
+ (the last 128 KiB of a 640 KiB image) with a replacement menu, 0
+ selects that chip and 1 the 512 KiB one. Everything powers up as 0,
+ so the 128 KiB chip is the one that boots. CHR-RAM is write-protected
+ while O is set. The pads are a machine configuration setting. The
+ Chinese RPGs from Waixing, which have 8 KiB of battery-backed RAM and
+ only the 32 KiB latch, are nes_waixing_wxzs_device.
+
+ iNES: mapper 242
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+static INPUT_PORTS_START( bmc_et113 )
+	PORT_START("PAD")
+	PORT_CONFNAME( 0x1f, 0x00, "Solder pads (menu select)" )
+	PORT_CONFSETTING(    0x00, "0" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "3" )
+	PORT_CONFSETTING(    0x04, "4" )
+	PORT_CONFSETTING(    0x05, "5" )
+	PORT_CONFSETTING(    0x06, "6" )
+	PORT_CONFSETTING(    0x07, "7" )
+	PORT_CONFSETTING(    0x08, "8" )
+	PORT_CONFSETTING(    0x09, "9" )
+	PORT_CONFSETTING(    0x0a, "10" )
+	PORT_CONFSETTING(    0x0b, "11" )
+	PORT_CONFSETTING(    0x0c, "12" )
+	PORT_CONFSETTING(    0x0d, "13" )
+	PORT_CONFSETTING(    0x0e, "14" )
+	PORT_CONFSETTING(    0x0f, "15" )
+	PORT_CONFSETTING(    0x10, "16" )
+	PORT_CONFSETTING(    0x11, "17" )
+	PORT_CONFSETTING(    0x12, "18" )
+	PORT_CONFSETTING(    0x13, "19" )
+	PORT_CONFSETTING(    0x14, "20" )
+	PORT_CONFSETTING(    0x15, "21" )
+	PORT_CONFSETTING(    0x16, "22" )
+	PORT_CONFSETTING(    0x17, "23" )
+	PORT_CONFSETTING(    0x18, "24" )
+	PORT_CONFSETTING(    0x19, "25" )
+	PORT_CONFSETTING(    0x1a, "26" )
+	PORT_CONFSETTING(    0x1b, "27" )
+	PORT_CONFSETTING(    0x1c, "28" )
+	PORT_CONFSETTING(    0x1d, "29" )
+	PORT_CONFSETTING(    0x1e, "30" )
+	PORT_CONFSETTING(    0x1f, "31" )
+INPUT_PORTS_END
+
+ioport_constructor nes_bmc_et113_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( bmc_et113 );
+}
+
+void nes_bmc_et113_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_pad_mode));
+	save_item(NAME(m_vram_protect));
+}
+
+void nes_bmc_et113_device::update_banks(offs_t latch)
+{
+	const int bank = (latch >> 2) & 0x1f;                 // PRG A18-A14
+	const int s = BIT(latch, 0);
+	int low, high;
+
+	if (BIT(latch, 7))
+	{
+		// NROM: S=1 takes PRG A14 from the CPU, so the inner bank is PP and p is not used
+		low = bank & ~s;
+		high = bank | s;
+	}
+	else
+	{
+		low = s ? (bank & 0x1e) : bank;
+		high = BIT(latch, 9) ? (bank | 0x07) : (bank & 0x18);
+	}
+
+	// C=0 selects the 128 KiB chip behind the 512 KiB one, if the image has it: its inner bank is A16-A14 only
+	if (m_prg_chunks == 40 && !BIT(latch, 10))
+	{
+		low = 32 + (low & 7);
+		high = 32 + (high & 7);
+	}
+
+	prg16_89ab(low);
+	prg16_cdef(high);
+}
+
+void nes_bmc_et113_device::pcb_reset()
+{
+	update_banks(0);
+	chr8(0, m_chr_source);
+	set_nt_mirroring(PPU_MIRROR_VERT);   // the address latch powers up as 0
+	m_pad_mode = 0;
+	m_vram_protect = 0;
+}
+
+void nes_bmc_et113_device::chr_w(offs_t offset, uint8_t data)
+{
+	int bank = offset >> 10;
+
+	if (!m_vram_protect)
+		m_chr_access[bank][offset & 0x3ff] = data;
+}
+
+uint8_t nes_bmc_et113_device::read_h(offs_t offset)
+{
+	// m set: PRG A4-A0 come from the solder pads instead of the CPU
+	if (m_pad_mode)
+		return hi_access_rom((offset & ~0x1f) | (m_pad->read() & 0x1f));
+	return hi_access_rom(offset);
+}
+
+void nes_bmc_et113_device::write_h(offs_t offset, uint8_t data)
+{
+	LOG("bmc_et113 write_h, offset: %04x, data: %02x\n", offset, data);
+
+	m_pad_mode = BIT(offset, 8);
+	update_banks(offset);
+
+	// CHR-RAM is write-protected in the NROM modes
+	m_vram_protect = BIT(offset, 7);
+
+	set_nt_mirroring(BIT(offset, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*-------------------------------------------------
@@ -3306,6 +3691,11 @@ void nes_bmc_60311c_device::write_h(offs_t offset, u8 data)
 
  Games: 12 in 1 Game Card
 
+ The register at 0x8000-0xbfff is PPMB B... (banking mode, mirroring and the 128K
+ outer bank) and the one at 0xc000-0xffff holds the 16K inner bank in its low three
+ bits. Address bit 13 of the second write is the CHR-RAM write-protect bit, which is
+ latched with it. CHR-RAM is always write-protected in the NROM modes.
+
  NES 2.0: mapper 337
 
  In MAME: Supported.
@@ -3340,7 +3730,9 @@ void nes_bmc_ctc12in1_device::write_h(offs_t offset, u8 data)
 			break;
 	}
 
-	m_vram_protect = !BIT(m_reg[0], 7) || (offset & 0x6000) == 0x6000;
+	if (BIT(offset, 14))
+		m_vram_wp = BIT(offset, 13);
+	m_vram_protect = !BIT(m_reg[0], 7) || m_vram_wp;
 	set_nt_mirroring(BIT(m_reg[0], 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
@@ -3354,7 +3746,8 @@ void nes_bmc_ctc12in1_device::write_h(offs_t offset, u8 data)
 
  This board is similar to CTC-12IN1 above but with
  the mirroring and banking mode bits moved and with
- support for Contra on a separate 128K chip.
+ support for Contra on a separate 128K chip. Unlike CTC-12IN1 it has no
+ CHR-RAM write-protect bit: CHR-RAM is write-protected in the NROM modes only.
 
  In MAME: Supported.
 
@@ -3371,6 +3764,7 @@ void nes_bmc_891227_device::write_h(offs_t offset, u8 data)
 		 data = bitswap<8>(data, 6, 5, 7, 4, 3, 2, 1, 0);
 
 	nes_bmc_ctc12in1_device::write_h(offset, data);
+	m_vram_protect = !BIT(m_reg[0], 7);
 
 	if ((m_reg[0] & 0xc0) == 0xc0)  // Contra only mode
 	{
@@ -3389,12 +3783,15 @@ void nes_bmc_891227_device::write_h(offs_t offset, u8 data)
  famous Contra 100 and 168 multicarts. It sports an
  extra mode to support a Bubble Bobble FDS bootleg.
 
+ NESdev NES 2.0 Mapper 354: the register is latched from the address and data
+ bits (mode in A2-A0, CHR-RAM write-protect in A3, PRG A20 in A4, PRG A21 in
+ A12) and is all clear at power-on and on reset. Submapper 0 (FAM250, 810139C)
+ answers only at $F000-$FFFF, where A12 is always 1; submapper 1 (810331C/
+ SCHI-24, 1992 1050-in-1) answers at $E000-$FFFF and A12 is PRG A21.
+
  NES 2.0: mapper 354
 
  In MAME: Supported.
-
- TODO: Circus Charlie's mirroring is incorrectly set
- to horizontal. Is this a BTANB?
 
  -------------------------------------------------*/
 
@@ -3403,7 +3800,7 @@ u8 nes_bmc_fam250_device::read_m(offs_t offset)
 	LOGMASKED(LOG_HIFREQ, "fam250 read_m, offset: %04x\n", offset);
 
 	if (m_latch == 5)    // only the Bubble Bobble FDS bootleg uses this
-		return m_prg[(((m_reg & 0x1f) << 1 | BIT(m_reg, 7)) * 0x2000 + offset) & (m_prg_size - 1)];
+		return m_prg[((((m_reg & 0x3f) | m_prg_a20 << 6) << 1 | BIT(m_reg, 7)) * 0x2000 + offset) & (m_prg_size - 1)];
 	else
 		return get_open_bus();
 }
@@ -3412,14 +3809,17 @@ void nes_bmc_fam250_device::write_h(offs_t offset, u8 data)
 {
 	LOG("fam250 write_h, offset: %04x, data: %02x\n", offset, data);
 
-	if (offset >= 0x7000)
+	if (offset >= ((m_submapper == 1) ? 0x6000 : 0x7000))
 	{
+		// PRG A20 is address bit 4 (NESdev: A~111B .... ...A CSSS); on submapper 1, A12 is PRG A21 (on submapper 0 it
+		// is always 1 and the chip's A21 output is not connected)
+		m_prg_a20 = BIT(offset, 4) | ((m_submapper == 1) ? (BIT(offset, 12) << 1) : 0);
 		nes_bmc_k1029_device::write_h(offset, data);
 
 		m_latch = offset & 0x07;
 		m_reg = data;
 		if (m_latch == 5)
-			prg32((m_reg & 0x18) >> 1 | 0x03);
+			prg32((m_reg & 0x38) >> 1 | 0x03 | m_prg_a20 << 5);
 
 		m_vram_protect = BIT(offset, 3);
 	}
@@ -3430,6 +3830,11 @@ void nes_bmc_fam250_device::write_h(offs_t offset, u8 data)
  BMC-K-1029
 
  Games: 100 in 1 Contra Function 16, 168 in 1
+
+ The latch holds the address bits A1-A0 (which select the banking mode) along
+ with the data bits. Its power-on and reset state is all bits clear, which is
+ NROM-256 mode with vertical mirroring and write-protected CHR-RAM. CHR-RAM is
+ writable only in the UNROM and NROM-64 modes.
 
  iNES: mapper 15
 
@@ -3445,7 +3850,7 @@ void nes_bmc_k1029_device::write_h(offs_t offset, u8 data)
 {
 	LOG("bmc_k1029 write_h, offset: %04x, data: %02x\n", offset, data);
 
-	u8 bank = data & 0x3f;
+	u8 bank = (data & 0x3f) | m_prg_a20 << 6;
 	switch (offset & 3)
 	{
 		case 0:
@@ -3520,6 +3925,9 @@ void nes_n625092_device::write_h(offs_t offset, u8 data)
 
  Games: Powerful 250 in 1, Powerful 255 in 1, 82 in 1
 
+ Submapper 1 (82AB) has one PRG bank bit less than submapper 0, with the CHR-RAM
+ write-protect bit moved into its place.
+
  iNES: mapper 63
 
  In MAME: Supported.
@@ -3530,11 +3938,355 @@ void nes_bmc_th22913_device::write_h(offs_t offset, u8 data)
 {
 	LOG("bmc_th22913 write_h, offset: %04x, data: %02x\n", offset, data);
 
-	u8 bank = offset >> 2;
+	u8 bank = (offset >> 2) & ((1 << (m_vram_prot_bit - 2)) - 1);
 	u8 mode = BIT(offset, 1);
 	prg16_89ab(bank & ~mode);
 	prg16_cdef(bank | mode);
 
 	set_nt_mirroring(BIT(offset, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	m_vram_protect = BIT(offset, m_vram_prot_bit);
+}
+
+
+/*-------------------------------------------------
+
+ Bit Corp 31-in-1 (cartridge ID 3150, PCB P3150)
+
+ NESdev NES 2.0 Mapper 360: there is no menu and no register;
+ five DIP switches on the cartridge select the outer 16 KiB
+ PRG-ROM bank, mapped at both $8000 and $C000. Only when all five
+ are off does the bank become 32 KiB (Super Mario Bros.). The
+ fifth switch (bank bit 4) also selects the mirroring: off
+ vertical, on horizontal.
+
+ The 8 KiB CHR-ROM bank is the same switch value, as in FCEUmm's
+ 360.c (NESdev does not say). The switches are a machine
+ configuration setting read at reset (default 0, Super Mario
+ Bros.). FCEUmm treats setting 1 as Super Mario Bros. too, and
+ steps the switches on every reset as a convenience, and has a
+ "submapper 1" with a register at $4100; NESdev describes none of
+ these, so they are not emulated.
+
+ NES 2.0: mapper 360
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+static INPUT_PORTS_START( bitcorp3150 )
+	PORT_START("DSW")
+	PORT_CONFNAME( 0x1f, 0x00, "DIP Switches (game)" )
+	PORT_CONFSETTING(    0x00, "0 (Super Mario Bros.)" )
+	PORT_CONFSETTING(    0x01, "1" )
+	PORT_CONFSETTING(    0x02, "2" )
+	PORT_CONFSETTING(    0x03, "3" )
+	PORT_CONFSETTING(    0x04, "4" )
+	PORT_CONFSETTING(    0x05, "5" )
+	PORT_CONFSETTING(    0x06, "6" )
+	PORT_CONFSETTING(    0x07, "7" )
+	PORT_CONFSETTING(    0x08, "8" )
+	PORT_CONFSETTING(    0x09, "9" )
+	PORT_CONFSETTING(    0x0a, "10" )
+	PORT_CONFSETTING(    0x0b, "11" )
+	PORT_CONFSETTING(    0x0c, "12" )
+	PORT_CONFSETTING(    0x0d, "13" )
+	PORT_CONFSETTING(    0x0e, "14" )
+	PORT_CONFSETTING(    0x0f, "15" )
+	PORT_CONFSETTING(    0x10, "16" )
+	PORT_CONFSETTING(    0x11, "17" )
+	PORT_CONFSETTING(    0x12, "18" )
+	PORT_CONFSETTING(    0x13, "19" )
+	PORT_CONFSETTING(    0x14, "20" )
+	PORT_CONFSETTING(    0x15, "21" )
+	PORT_CONFSETTING(    0x16, "22" )
+	PORT_CONFSETTING(    0x17, "23" )
+	PORT_CONFSETTING(    0x18, "24" )
+	PORT_CONFSETTING(    0x19, "25" )
+	PORT_CONFSETTING(    0x1a, "26" )
+	PORT_CONFSETTING(    0x1b, "27" )
+	PORT_CONFSETTING(    0x1c, "28" )
+	PORT_CONFSETTING(    0x1d, "29" )
+	PORT_CONFSETTING(    0x1e, "30" )
+	PORT_CONFSETTING(    0x1f, "31" )
+INPUT_PORTS_END
+
+ioport_constructor nes_bitcorp3150_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( bitcorp3150 );
+}
+
+nes_bitcorp3150_device::nes_bitcorp3150_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BITCORP3150, tag, owner, clock), m_dsw(*this, "DSW")
+{
+}
+
+void nes_bitcorp3150_device::pcb_reset()
+{
+	const u8 dip = m_dsw->read() & 0x1f;
+	if (!dip)
+		prg32(0);
+	else
+	{
+		prg16_89ab(dip);
+		prg16_cdef(dip);
+	}
+	chr8(dip, CHRROM);
+	set_nt_mirroring(BIT(dip, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+/*-------------------------------------------------
+
+ BMC 100-in-1 (NES 2.0 mapper 576)
+
+ Games: 100-in-1 (Asia) (En) (Pirate)
+
+ NESdev has no page for this mapper; it is taken from FCEUmm's
+ 576.c. Every write to $8000-$FFFF latches the address:
+ - A8 set: one 16 KiB PRG bank (A4 and up) at $8000 and $C000;
+   clear: one 32 KiB PRG bank (A5 and up)
+ - one 8 KiB CHR bank from the low address bits
+ - A9: mirroring, 1 horizontal, 0 vertical
+ A console reset clears the latch (FCEUmm); power-on value 0.
+
+ NES 2.0: mapper 576
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+nes_bmc_576_device::nes_bmc_576_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_576, tag, owner, clock), m_latch(0)
+{
+}
+
+void nes_bmc_576_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_bmc_576_device::pcb_reset()
+{
+	m_latch = 0;
+	update_banks();
+}
+
+void nes_bmc_576_device::update_banks()
+{
+	if (BIT(m_latch, 8))
+	{
+		prg16_89ab(m_latch >> 4);
+		prg16_cdef(m_latch >> 4);
+	}
+	else
+		prg32(m_latch >> 5);
+	chr8(m_latch, CHRROM);
+	set_nt_mirroring(BIT(m_latch, 9) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+void nes_bmc_576_device::write_h(offs_t offset, u8 data)
+{
+	LOG("bmc 576 write_h, offset: %04x, data: %02x\n", offset, data);
+
+	m_latch = offset & 0x3ff;
+	update_banks();
+}
+
+/*-------------------------------------------------
+
+ NTDEC 22-in-1 (NES 2.0 mapper 564)
+
+ Games: NTDEC 22-in-1 (Asia) (Pirate)
+
+ NESdev has no page for this mapper; it is taken from FCEUmm's
+ 564.c. Every write to $8000-$FFFF latches the data:
+ - the latch selects the 32 KiB PRG bank; CHR is one 8 KiB bank
+   (CHR-RAM on the known cart)
+ - bit 5 clear: bit 4 selects horizontal (1) or vertical (0)
+   mirroring; bit 5 set: one-screen, page from bit 4
+ - once bit 5 is set the latch is locked to the game's mode:
+   later writes keep bits 5 and 3, and also bit 2 while bit 3
+   is clear (ANROM-like), and take the other bits from the data
+   (the game's own banks and one-screen page)
+ A console reset clears the latch (FCEUmm); power-on value 0.
+
+ NES 2.0: mapper 564
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+nes_bmc_564_device::nes_bmc_564_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_564, tag, owner, clock), m_latch(0)
+{
+}
+
+void nes_bmc_564_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_bmc_564_device::pcb_reset()
+{
+	m_latch = 0;
+	update_banks();
+}
+
+void nes_bmc_564_device::update_banks()
+{
+	prg32(m_latch);
+	chr8(0, m_chr_source);
+	if (BIT(m_latch, 5))
+		set_nt_mirroring(BIT(m_latch, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	else
+		set_nt_mirroring(BIT(m_latch, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+void nes_bmc_564_device::write_h(offs_t offset, u8 data)
+{
+	LOG("bmc 564 write_h, offset: %04x, data: %02x\n", offset, data);
+
+	if (BIT(m_latch, 5))
+	{
+		const u8 keep = BIT(m_latch, 3) ? 0x28 : 0x2c;   // AOROM-like : ANROM-like
+		data = (m_latch & keep) | (data & ~keep);
+	}
+	m_latch = data;
+	update_banks();
+}
+
+/*-------------------------------------------------
+
+ Super Micro Machines 1999 (NES 2.0 mapper 582)
+
+ Games: Super Micro Machines 1999 (Asia) (En) (Pirate)
+
+ NESdev has no page for this mapper; it is taken from FCEUmm's
+ 582.c. Four registers selected by A14-A13 ($8000, $A000, $C000,
+ $E000):
+ - $8000-$BFFF: 16 KiB PRG bank (reg 1 << 3) | (reg 0 & 7)
+ - $C000-$FFFF: 16 KiB PRG bank (reg 3 << 3) | (reg 2 & 7)
+ CHR is one 8 KiB bank (CHR-RAM on the known cart); mirroring is
+ fixed by the header. Power-on and reset set all four registers
+ to $FF (FCEUmm).
+
+ NES 2.0: mapper 582
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+nes_bmc_582_device::nes_bmc_582_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_582, tag, owner, clock), m_reg{ 0xff, 0xff, 0xff, 0xff }
+{
+}
+
+void nes_bmc_582_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_reg));
+}
+
+void nes_bmc_582_device::pcb_reset()
+{
+	m_reg[0] = m_reg[1] = m_reg[2] = m_reg[3] = 0xff;
+	update_prg();
+	chr8(0, m_chr_source);
+}
+
+void nes_bmc_582_device::update_prg()
+{
+	prg16_89ab((m_reg[1] << 3) | (m_reg[0] & 0x07));
+	prg16_cdef((m_reg[3] << 3) | (m_reg[2] & 0x07));
+}
+
+void nes_bmc_582_device::write_h(offs_t offset, u8 data)
+{
+	LOG("bmc 582 write_h, offset: %04x, data: %02x\n", offset, data);
+
+	m_reg[BIT(offset, 13, 2)] = data;
+	update_prg();
+}
+
+/*-------------------------------------------------
+
+ Super 72-in-1 (NES 2.0 mapper 585)
+
+ Games: Super 72-in-1 (Asia) (En) (Pirate)
+
+ NESdev has no page for this mapper; it is taken from FCEUmm's
+ 585.c. Every write to $8000-$FFFF latches the address:
+ - A0 set: one 32 KiB PRG bank (A2 and up); clear: one 16 KiB
+   bank (A1 and up) at $8000 and $C000
+ - one 8 KiB CHR bank (A1 and up)
+ - A4: mirroring, 1 vertical, 0 horizontal
+ While (latch & pad & $60) is not 0, reads of $8000-$FFFF are
+ open bus; the solder pad (bits 6-5) is a configuration setting
+ here (FCEUmm steps it by $20 on every reset). A console reset
+ clears the latch (FCEUmm); power-on value 0.
+
+ NES 2.0: mapper 585
+
+ In MAME: Supported.
+
+ -------------------------------------------------*/
+
+static INPUT_PORTS_START( bmc_585 )
+	PORT_START("PAD")
+	PORT_CONFNAME( 0x60, 0x00, "Solder Pad" )
+	PORT_CONFSETTING(    0x00, "0" )
+	PORT_CONFSETTING(    0x20, "1" )
+	PORT_CONFSETTING(    0x40, "2" )
+	PORT_CONFSETTING(    0x60, "3" )
+INPUT_PORTS_END
+
+ioport_constructor nes_bmc_585_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( bmc_585 );
+}
+
+nes_bmc_585_device::nes_bmc_585_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_BMC_585, tag, owner, clock), m_pad_port(*this, "PAD"), m_latch(0)
+{
+}
+
+void nes_bmc_585_device::device_start()
+{
+	common_start();
+	save_item(NAME(m_latch));
+}
+
+void nes_bmc_585_device::pcb_reset()
+{
+	m_latch = 0;
+	update_banks();
+}
+
+void nes_bmc_585_device::update_banks()
+{
+	if (BIT(m_latch, 0))
+		prg32(m_latch >> 2);
+	else
+	{
+		prg16_89ab(m_latch >> 1);
+		prg16_cdef(m_latch >> 1);
+	}
+	chr8(m_latch >> 1, CHRROM);
+	set_nt_mirroring(BIT(m_latch, 4) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+}
+
+u8 nes_bmc_585_device::read_h(offs_t offset)
+{
+	if (m_latch & m_pad_port->read() & 0x60)
+		return get_open_bus();
+	return hi_access_rom(offset);
+}
+
+void nes_bmc_585_device::write_h(offs_t offset, u8 data)
+{
+	LOG("bmc 585 write_h, offset: %04x, data: %02x\n", offset, data);
+
+	m_latch = offset & 0x7f;
+	update_banks();
 }

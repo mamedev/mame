@@ -34,7 +34,13 @@ public:
 
 	// wavetable handlers
 	void wave_w(offs_t offset, u8 data) { if (m_wave_write) { m_stream->update(); m_wave[offset & 0x3f] = data & 0x3f; } }
-	u8 wave_r(offs_t offset) { return (m_wave[offset & 0x3f] & 0x3f) | 0x40; } // TODO: bit 6-7 is open bus? not allowed when wave is not halted?
+	// with writes disabled ($4089.7 = 0) a read anywhere in $4040-$407F gives the sample at the current wave position (NESdev FDS audio)
+	u8 wave_r(offs_t offset)
+	{
+		if (!m_wave_write)
+			m_stream->update();
+		return (m_wave[(m_wave_write ? offset : m_wave_addr) & 0x3f] & 0x3f) | 0x40; // TODO: bit 6-7 is open bus?
+	}
 
 protected:
 	// device-level overrides
@@ -70,6 +76,8 @@ private:
 	u32 m_mod_env_clk      = 0;     // modulator envelope clock counter
 	int m_mod_env_out      = 0;     // output result of modulator envelope
 	bool m_mod_halt        = true;  // halt modulator
+	bool m_mod_force       = false; // $4087 bit 6: a carry out of the accumulator on every tick of the unit, every 16 clocks
+	int m_mod_tick         = 0;     // clocks since the last forced tick
 	int m_mod_freq         = 0;     // modulator frequency
 	u32 m_mod_acc          = 0;     // modulator accumulator (.16 fixed point)
 	u8 m_mod_addr          = 0;     // modulator table address counter (.16 fixed point)
@@ -79,6 +87,9 @@ private:
 	bool m_wave_write      = true;  // play sound or write wavetable
 	int m_mvol             = 0;     // master volume
 	int m_output           = 0;     // output result
+	int m_vol_latch         = 0;     // the volume gain the output uses: it follows the envelope while the wave position is 0
+	float m_lp              = 0;     // the output filter's state
+	float m_lp_coeff        = 0;     // and its coefficient for the clock
 	int m_mvol_table[4];            // master volume table
 
 	const int mod_inc[8] = { 0, 1, 2, 4, -4, -4, -2, -1 };

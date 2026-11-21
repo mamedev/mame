@@ -5,6 +5,8 @@
 
  NES/Famicom cartridge emulation for Nintendo MMC-2 & MMC-4 PCBs
 
+ iNES mappers: 9, 10
+
 
  Here we emulate the Nintendo PxROM and FxROM PCBs [mapper 9 & 10]
 
@@ -122,6 +124,35 @@ void nes_pxrom_device::ppu_latch(offs_t offset)
 	else if ((offset & 0x3ff0) == 0x1fe0)
 	{
 		LOG("mmc2 vrom latch switch (bank 0 high): %02x\n", m_reg[3]);
+		m_latch2 = 0xfe;
+		chr4_4(m_reg[3], CHRROM);
+	}
+}
+
+// NESdev MMC2/MMC4: the latches are set by PPU reads of the second (high) bitplane of tiles $FD/$FE and take effect
+// for subsequent reads, so the triggering fetch still uses the old bank. MMC2 latch 0 responds to $0FD8 and $0FE8
+// only; latch 1 (and both MMC4 latches) to $xFD8-$xFDF and $xFE8-$xFEF. PPU writes do not trigger them.
+void nes_pxrom_device::ppu_read_latch(offs_t offset)
+{
+	offset &= 0x1fff;
+	const offs_t lo = latch0_is_range() ? (offset & 0x1ff8) : offset;
+	if (lo == 0x0fd8)
+	{
+		m_latch1 = 0xfd;
+		chr4_0(m_reg[0], CHRROM);
+	}
+	else if (lo == 0x0fe8)
+	{
+		m_latch1 = 0xfe;
+		chr4_0(m_reg[1], CHRROM);
+	}
+	else if ((offset & 0x1ff8) == 0x1fd8)
+	{
+		m_latch2 = 0xfd;
+		chr4_4(m_reg[2], CHRROM);
+	}
+	else if ((offset & 0x1ff8) == 0x1fe8)
+	{
 		m_latch2 = 0xfe;
 		chr4_4(m_reg[3], CHRROM);
 	}

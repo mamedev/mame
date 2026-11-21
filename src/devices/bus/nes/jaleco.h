@@ -137,6 +137,9 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+	// M2 at the cartridge connector: the IRQ counter is clocked once per CPU cycle, at the M2 rise (before that cycle's access)
+	virtual bool wants_m2() override { return true; }
+	virtual void m2_w(int state, offs_t address, bool write) override { if (state) irq_timer_tick(0); }
 
 	optional_device<samples_device> m_samples;
 
@@ -145,7 +148,6 @@ private:
 	u8 m_irq_mode;
 	u8 m_irq_enable;
 
-	emu_timer *irq_timer;
 
 	u8 m_mmc_prg_bank[3];
 	u8 m_mmc_vrom_bank[8];

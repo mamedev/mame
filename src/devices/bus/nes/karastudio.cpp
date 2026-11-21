@@ -15,15 +15,13 @@
  removed to be replaced by an expansion cart containing new songs (we emulate this by adding a -cart2 slot).
 
 
+ Register and microphone port layout follow NESdev INES Mapper 188. The main PRG stays in the
+ main unit; the expansion ROM is selected at $8000-$BFFF with R = 0, and reads open bus when no
+ expansion cartridge is present. 256 KiB iNES images hold the 128 KiB internal ROM followed by
+ the 128 KiB expansion ROM, so the expansion half is used when no -cart2 is mounted.
+
  TODO:
- - verify expansion slot emulation for the Senyou Cassettes:
-   not much documentation exists about the expansion carts (except for few paragraphs
-   at Enri's FC webpage), so I implemented it based on "common sense"
-   * expansion carts do not contain the required game data => main PRG must be in the main cart
-     so to remain connected even when an expansion is inserted (differently from Datach, where
-     the base unit contains no PRG)
-   * bankswitch writes with bit3=0 (to access expansion) when no expansion is present should do
-     nothing
+ - the polarity of the 1-bit microphone ADC input is not documented
 
  ***********************************************************************************************************/
 
@@ -183,6 +181,7 @@ DEFINE_DEVICE_TYPE(NES_KARAOKESTUDIO, nes_karaokestudio_device, "nes_karaoke", "
 nes_karaokestudio_device::nes_karaokestudio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_nrom_device(mconfig, NES_KARAOKESTUDIO, tag, owner, clock)
 	, m_exp_active(0)
+	, m_exp_bank(0)
 	, m_subslot(*this, "exp_slot")
 	, m_mic_ipt(*this, "MIC")
 {
@@ -193,14 +192,16 @@ void nes_karaokestudio_device::device_start()
 {
 	common_start();
 	save_item(NAME(m_exp_active));
+	save_item(NAME(m_exp_bank));
 }
 
 void nes_karaokestudio_device::pcb_reset()
 {
 	prg16_89ab(0);
-	prg16_cdef((m_prg_chunks - 1) ^ 0x08);
+	prg16_cdef(7);   // $C000-$FFFF: last bank of the 128 KiB internal ROM
 	chr8(0, m_chr_source);
 	m_exp_active = 0;
+	m_exp_bank = 0;
 }
 
 
@@ -215,8 +216,6 @@ void nes_karaokestudio_device::pcb_reset()
  Games: Karaoke Studio + expansion carts with
  additional songs
 
- Note: we currently do not emulate properly the
- expansion slot
 
  iNES: mapper 188
 
@@ -225,7 +224,8 @@ void nes_karaokestudio_device::pcb_reset()
 uint8_t nes_karaokestudio_device::read_m(offs_t offset)
 {
 	LOG("karaoke studio read_m, offset: %04x\n", offset);
-	return m_mic_ipt->read();
+	// [.... .MBA]: A and B buttons read 0 when pressed, M is the 1-bit microphone ADC, the rest is open bus
+	return (get_open_bus() & 0xf8) | (m_mic_ipt->read() & 0x07);
 }
 
 uint8_t nes_karaokestudio_device::read_h(offs_t offset)
@@ -238,41 +238,44 @@ uint8_t nes_karaokestudio_device::read_h(offs_t offset)
 	// * we are in $8000-$bfff range
 	// * there has been a bankswitch write to map the expansion to such range
 	// * there actually is an expansion cart mounted
-	if (offset < 0x4000 && m_exp_active && m_subslot->m_cart)
-		return m_subslot->m_cart->read(offset);
-	else
-		return hi_access_rom(offset);
+	if (offset < 0x4000 && m_exp_active)
+	{
+		if (m_subslot->m_cart)
+			return m_subslot->m_cart->read(offset);
+		// 256 KiB images are the 128 KiB internal ROM followed by the 128 KiB expansion ROM (NESdev)
+		if (m_prg_size > 0x20000)
+			return m_prg[0x20000 + ((m_exp_bank * 0x4000 + offset) % (m_prg_size - 0x20000))];
+		return get_open_bus();   // no expansion cartridge: nothing drives the bus
+	}
+	return hi_access_rom(offset);
 }
 
 void nes_karaokestudio_device::write_h(offs_t offset, uint8_t data)
 {
 	LOG("karaoke studio write_h, offset: %04x, data: %02x\n", offset, data);
-	// bit3 1 = M ROM (main unit), 0=E ROM (expansion)
-	// HACK(?): currently it is not clear how the unit acknowledges the presence of the expansion
-	// cart (when expansion is present, code keeps switching both from the expansion rom and from
-	// the main ROM)
-	// my guess is that writes with bit3=0 and no expansion just do nothing, but it shall be verified
-
-	if (offset >= 04000)
+	// [.LXR BBBB] (NESdev INES Mapper 188): B = 16 KiB bank at $8000-$BFFF, R = 1 internal / 0 external ROM,
+	// X = CIRAM A10 from PPU A10 (0, vertical mirroring) or PPU A11 (1, horizontal mirroring), L = unused latch;
+	// the board has bus conflicts
+	data = account_bus_conflict(offset, data);
+	set_nt_mirroring(BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	if (BIT(data, 4))
 	{
-		if (BIT(data, 3))
-		{
-			m_exp_active = 0;
-			prg16_89ab(data & 7);
-		}
-		else    // expansion cart
-		{
-			m_exp_active = 1;
-			m_subslot->write_prg_bank(data & 7);
-		}
+		m_exp_active = 0;
+		prg16_89ab(data & 0x0f);
+	}
+	else
+	{
+		m_exp_active = 1;
+		m_exp_bank = data & 0x0f;
+		m_subslot->write_prg_bank(m_exp_bank);
 	}
 }
 
 
 static INPUT_PORTS_START( karaoke_mic )
 	PORT_START("MIC")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("A (Mic Select)") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("B (Mic Start)") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("A (Mic Select)") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("B (Mic Start)") PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Microphone (?)") PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
