@@ -721,16 +721,15 @@ MICROPROGRAM(jump_mp)
 	END
 };
 
-MICROPROGRAM(ldcr_mp)       // TODO: Verify cycles
+MICROPROGRAM(ldcr_mp)
 {
-	ALU_LDCR,               // 1
+	ALU_LDCR,               // 0 Select byte or word before address derivation
 	OPERAND_ADDR,           // x
 	MEMORY_READ,            // 1 (1) Get source data
-	ALU_LDCR,               // 1 Save it, point to R12
+	ALU_LDCR,               // 3 Save it, point to R12
 	WORD_READ,              // 1 (1) Get R12
-	ALU_LDCR,               // 1 Prepare CRU operation
-	CRU_OUTPUT,             // c
-	ALU_NOP,                // 0
+	ALU_LDCR,               // 2 Prepare the first CRU strobe
+	CRU_OUTPUT,             // 2 per bit
 	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
 	END
@@ -809,11 +808,12 @@ MICROPROGRAM(rtwp_mp)
 MICROPROGRAM(sbo_sbz_mp)
 {
 	ALU_SBO_SBZ,            // 1 Set address = &R12
-	WORD_READ,              // 1 (1) Read R12
-	ALU_SBO_SBZ,            // 1 Add offset
-	CRU_OUTPUT,             // 1 output via CRU
-	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
+	WORD_READ,              // 1 (1) Read R12
+	ALU_SBO_SBZ,            // 1 Add signed bit displacement
+	ALU_NOP,                // 1 Set up the CRU transfer
+	CRU_OUTPUT,             // 1 Write the bit
+	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
 	END
 };
@@ -839,15 +839,15 @@ MICROPROGRAM(single_arithm_mp)
 	END
 };
 
-MICROPROGRAM(stcr_mp)       // TODO: Verify on real machine
+MICROPROGRAM(stcr_mp)
 {
-	ALU_STCR,               // 1      Check for byte operation
-	OPERAND_ADDR,           // x     Source operand
-	ALU_STCR,               // 1      Save, set R12
+	ALU_STCR,               // 0     Select byte or word before address derivation
+	OPERAND_ADDR,           // x     Destination address
+	ALU_STCR,               // 4     Save destination, set R12
 	WORD_READ,              // 1 (1) Read R12
-	ALU_STCR,               // 1
-	CRU_INPUT,              // c
-	ALU_STCR,               // 13
+	ALU_STCR,               // 2     Prepare the first CRU strobe
+	CRU_INPUT,              // 2 per bit
+	ALU_STCR,               // 2 plus the unfilled bit positions in the byte or word
 	PREFETCH,               // 1 (1)
 	MEMORY_WRITE,           // 1 (1)
 	END
@@ -864,13 +864,14 @@ MICROPROGRAM(stst_stwp_mp)
 
 MICROPROGRAM(tb_mp)
 {
-	ALU_TB,                 // 1
-	WORD_READ,              // 1 (1)
-	ALU_TB,                 // 1
-	CRU_INPUT,              // 2
-	ALU_TB,                 // 0
-	PREFETCH,               // 1 (1)
+	ALU_TB,                 // 1 Set address = &R12
 	ALU_NOP,                // 1
+	WORD_READ,              // 1 (1) Read R12
+	ALU_TB,                 // 1 Add signed bit displacement
+	ALU_NOP,                // 1 Set up the CRU transfer
+	CRU_INPUT,              // 1 Read the bit
+	ALU_TB,                 // 0 Copy it to EQ
+	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
 	END
 };
@@ -2199,7 +2200,8 @@ void tms9995_device::cru_output_operation()
 
 	// Repeat this operation
 	m_pass = (m_count > 0)? 2 : 1;
-	pulse_clock(2);
+	// SBO/SBZ prefetch one clock after the strobe. LDCR uses two clocks per bit.
+	pulse_clock(m_command == LDCR ? 2 : 1);
 }
 
 /*
@@ -2257,7 +2259,9 @@ void tms9995_device::cru_input_operation()
 		// the first bit is always m_cru_value & 0x0001.
 		m_cru_value >>= (16 - m_count);
 	}
-	pulse_clock(2);
+	// TB prefetches one clock after the strobe, including for on-chip CRU flags.
+	// STCR uses two clocks per bit even when its transfer count is one.
+	pulse_clock(m_command == STCR ? 2 : 1);
 }
 
 /*
@@ -2879,6 +2883,7 @@ void tms9995_device::alu_jump()
 */
 void tms9995_device::alu_ldcr()
 {
+	int cycles = 0;
 	switch (m_inst_state)
 	{
 	case 0:
@@ -2900,14 +2905,16 @@ void tms9995_device::alu_ldcr()
 		}
 		m_cru_value = m_current_value;
 		m_address = WP + 24;
+		cycles = 3;
 		break;
 	case 2:
 		// Prepare CRU operation
 		m_cru_address = m_current_value;
+		cycles = 2;
 		break;
 	}
 	m_inst_state++;
-	pulse_clock(1);
+	pulse_clock(cycles);
 }
 
 /*
@@ -3084,7 +3091,7 @@ void tms9995_device::alu_sbo_sbz()
 	{
 		m_cru_value = (m_command==SBO)? 1 : 0;
 		displacement = (int8_t)(IR & 0xff);
-		m_cru_address = m_current_value + (displacement<<1);
+		m_cru_address = m_current_value + 2 * displacement;
 		m_count = 1;
 	}
 	m_inst_state++;
@@ -3273,7 +3280,7 @@ void tms9995_device::alu_single_arithm()
 */
 void tms9995_device::alu_stcr()
 {
-	int n = 1;
+	int cycles = 0;
 	switch (m_inst_state)
 	{
 	case 0:
@@ -3284,29 +3291,31 @@ void tms9995_device::alu_stcr()
 	case 1:
 		m_address_saved = m_address;
 		m_address = WP + 24;
+		cycles = 4;
 		break;
 	case 2:
 		m_cru_address = m_current_value;
 		m_cru_first_read = true;
+		cycles = 2;
 		break;
 	case 3:
-		// I don't know what is happening here, but it takes quite some time.
-		// May be shift operations.
+		// After the last two-clock bit transfer, allow one clock per
+		// unfilled bit position and two more before the following fetch.
+		cycles = 2 + (m_byteop ? 8 : 16) - m_count;
 		m_current_value = m_cru_value;
 		m_address = m_address_saved;
-		compare_and_set_lae(m_current_value, 0);
-		n = 13;
 		if (m_byteop)
 		{
 			set_status_parity((uint8_t)m_current_value);
 			m_current_value <<= 8;
 		}
-		else n += 8;
+		// For a byte transfer, bit 7 is now in the word sign position.
+		compare_and_set_lae(m_current_value, 0);
 		LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
 		break;
 	}
 	m_inst_state++;
-	pulse_clock(n);
+	pulse_clock(cycles);
 }
 
 
@@ -3335,7 +3344,7 @@ void tms9995_device::alu_tb()
 		break;
 	case 1:
 		displacement = (int8_t)(IR & 0xff);
-		m_cru_address = m_current_value + (displacement<<1);
+		m_cru_address = m_current_value + 2 * displacement;
 		m_cru_first_read = true;
 		m_count = 1;
 		pulse_clock(1);
