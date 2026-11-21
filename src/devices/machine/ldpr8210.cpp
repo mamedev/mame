@@ -277,6 +277,12 @@ void pioneer_pr8210_device::device_start()
 	m_process_vbi_timer = timer_alloc(FUNC(pioneer_pr8210_device::process_vbi_data), this);
 	m_vsync_off_timer = timer_alloc(FUNC(pioneer_pr8210_device::vsync_off), this);
 
+	// the 8049 reads the PIA before anything has been written to it; the VBI decoding
+	// registers start as they are at every field before anything has been decoded
+	m_pia = pioneer_pia();
+	m_pia.vbi1 = 0xff;
+	m_pia.vbi2 = 0xff;
+
 	// pass through to the parent
 	laserdisc_device::device_start();
 }
