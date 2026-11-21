@@ -33,6 +33,7 @@
 #include "sonicvibes.h"
 #include "sw1000xg.h"
 #include "trident_4dwavedx.h"
+#include "trident_tgui.h"
 #include "trio_pci.h"
 #include "virge_pci.h"
 #include "vision.h"
@@ -155,9 +156,11 @@ void pci_cards(device_slot_interface &device)
 	// Western Digital / Paradise
 	device.option_add("wd9710",         WD9710_PCI);
 	// 3D Labs
-//	device.option_add("permedia",       PERMEDIA_PCI);
+//  device.option_add("permedia",       PERMEDIA_PCI);
 	// Tseng
 	device.option_add("et4kw32p",       ET4KW32P_PCI);
+	// Trident
+	device.option_add("tgui9680",       TGUI9680_PCI);
 
 	// 0x04 - multimedia controllers
 	// sound cards

@@ -4913,6 +4913,8 @@ if BUSES["PCI"] then
 		MAME_DIR .. "src/devices/bus/pci/sw1000xg.h",
 		MAME_DIR .. "src/devices/bus/pci/trident_4dwavedx.cpp",
 		MAME_DIR .. "src/devices/bus/pci/trident_4dwavedx.h",
+		MAME_DIR .. "src/devices/bus/pci/trident_tgui.cpp",
+		MAME_DIR .. "src/devices/bus/pci/trident_tgui.h",
 		MAME_DIR .. "src/devices/bus/pci/trio_pci.cpp",
 		MAME_DIR .. "src/devices/bus/pci/trio_pci.h",
 		MAME_DIR .. "src/devices/bus/pci/virge_pci.cpp",
