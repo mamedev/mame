@@ -87,7 +87,7 @@ private:
 		HOLD_NONE,
 		HOLD_KICK,      // until a kicker is written
 		HOLD_FEED,      // until the display feed takes another word
-		HOLD_STOPPED    // until the core is reset
+		HOLD_STOPPED    // until the device is reset, or for thread 0 also the core
 	};
 
 	// what became of the instruction a thread was given

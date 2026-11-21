@@ -599,8 +599,9 @@ pmx1core_device::outcome pmx1core_device::arithmetic(u32 thread, u32 op)
 	const bool flags = BIT(op, 27), conditional = BIT(op, 26), immediate = BIT(op, 25);
 	const bool shift = operation >= 5;
 	const u32 d = BIT(op, 19, 5), s1 = BIT(op, 14, 5), s2 = BIT(op, 9, 5);
-	const bool to_unit = conditional && immediate && BIT(op, 5);
-	if (flags && ((major == 9) || (conditional && !to_unit)))
+	// of the conditional forms, only the shift by a count and the 8-bit operation into another unit can set the flags
+	const bool flags_allowed = (major != 9) && (!conditional || (immediate && (shift || BIT(op, 5))));
+	if (flags && !flags_allowed)
 		return outcome::UNKNOWN;
 
 	if (!conditional)
@@ -940,29 +941,26 @@ pmx1core_device::outcome pmx1core_device::memory(thread_state &ts, u32 op)
 	const u32 d = BIT(op, 19, 5);
 	u32 &pointer = reg(bank, BIT(op, 14, 4));
 
-	if (!load && !(minor & 0xb))
+	if (!(minor & 0xb))
 	{
-		// store with the offset in a register of the same bank
+		// load or store with the offset in a register of the same bank; a load joins the read queue like the others
 		if (BIT(op, 13) || BIT(op, 6, 3) || !BIT(op, 5) || BIT(op, 0) || !has_register(unit, d))
 			return outcome::UNKNOWN;
 		const u32 address = pointer + reg(bank, BIT(op, 9, 4));
-		m_program.write_dword(address, reg(unit, d));
-		if (BIT(op, 26))
-			pointer = address;
-		return outcome::DONE;
-	}
-
-	if (load && !(minor & 0xb))
-	{
-		// load with the offset in a register of the same bank
-		if (BIT(op, 13) || BIT(op, 6, 3) || !BIT(op, 5) || BIT(op, 0) || !has_register(unit, d))
-			return outcome::UNKNOWN;
-		const u32 address = pointer + reg(bank, BIT(op, 9, 4));
-		if (!queue_read(ts, address))
-			return outcome::UNKNOWN;
-		if (BIT(op, 26))
-			pointer = address;
-		reg(unit, d) = u32(take_read(ts));
+		if (load)
+		{
+			if (!queue_read(ts, address))
+				return outcome::UNKNOWN;
+			if (BIT(op, 26))
+				pointer = address;
+			reg(unit, d) = u32(take_read(ts));
+		}
+		else
+		{
+			m_program.write_dword(address, reg(unit, d));
+			if (BIT(op, 26))
+				pointer = address;
+		}
 		return outcome::DONE;
 	}
 
@@ -1074,8 +1072,9 @@ pmx1core_device::outcome pmx1core_device::port(thread_state &ts, u32 op)
 			if (!BIT(op, 5))
 			{
 				// with bit 5 clear a data register goes to a port register and what the port register gives back is
-				// read as unit 8 register 0 (the MK6 code does it with 0xff and 0x51)
-				// TODO: what the port register does with the value is not known
+				// read as unit 8 register 0 (the MK6 code does it with 0xff and 0x54)
+				// TODO: what the port register does with the value is not known; it is not stored, as the MK6 code sends
+				// port register ff numbers and addresses this way, not the control that it writes there with bit 5 set
 				if (!BIT(op, 3))
 					return outcome::UNKNOWN;
 				ts.port_answer = m_port_r_cb(port);

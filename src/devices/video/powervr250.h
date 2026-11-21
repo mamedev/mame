@@ -176,10 +176,10 @@ private:
 		P2D_LINE_DIAGONAL = 0x32,   // step of a line along both axes, x << 16 | y
 		P2D_LINE_STEP = 0x33,       // step of a line along its main axis, x << 16 | y
 		P2D_DEST_POS = 0x34,        // destination x << 16 | y
-		P2D_START = 0x38,           // (width in 64-bit words - 1) << 16 | lines, or for a line pixels << 16 | error term
+		P2D_START = 0x38,           // 64-bit words of a line of a copy of source B << 16 | lines, or for a line pixels << 16 | error term
 		P2D_LINE_ERROR = 0x3b,      // what a diagonal step of a line adds to its error term
 		P2D_SRC_A = 0x3e,           // source of a copy, background of a blend
-		P2D_SRC_B = 0x3f,           // foreground of a blend
+		P2D_SRC_B = 0x3f,           // foreground of a blend, source of a 1-bit image and of a copy of source B
 		P2D_PITCH_A = 0x41,
 		P2D_PITCH_B = 0x42,
 		P2D_OPERATION = 0x4b,
@@ -190,7 +190,7 @@ private:
 		P2D_SIZE = 0x53,            // width << 16 | x
 		P2D_DEST = 0x54,
 		P2D_DEST_PITCH = 0x55,
-		P2D_ASK = 0xff              // what the MK6 code sends before each operation
+		P2D_CONTROL = 0xff          // written before each operation; the low byte looks like a raster operation
 	};
 
 	template <u16 Reg> u16 immediate_r(offs_t offset);
@@ -290,9 +290,9 @@ private:
 	dac_span m_dac_showing[MAX_SPANS];
 	u8 m_dac_feeding_count;
 	bool m_dac_after_blank;     // the span fed before was blank
+	u8 m_dac_showing_count;
 
 	u32 m_2d[256];              // 2D core registers
-	u8 m_dac_showing_count;
 };
 
 DECLARE_DEVICE_TYPE(POWERVR250, powervr250_device)

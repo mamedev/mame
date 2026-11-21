@@ -5,8 +5,8 @@
 
     VideoLogic did not publish the instruction set of the primary core, and
     no assembler syntax for it is known.  The encoding is known as far as
-    it has been worked out from the microcode of the Neon 250 drivers and the
-    Gaelco games; the syntax here is made up.
+    it has been worked out from the microcode of the Neon 250 drivers, the
+    Gaelco games and the Aristocrat MK6; the syntax here is made up.
 
     Registers
       da0-da31, db0-db31    the two banks of data registers (units 1 and 2)
@@ -39,9 +39,10 @@
       nop, frag                     nothing; frag is the word that starts each fragment of code
 
     A mnemonic ending in .f sets the flags; .eq .ne .cs .cc .mi .pl .vs .vc
-    .hi .ls .ge .lt .gt .le make the instruction conditional.  Thread 0 counts the address a jump goes to from
-    four instructions past the jump: without a processor to ask, addresses
-    are shown as threads 1 to 3 would take them.
+    .hi .ls .ge .lt .gt .le make the instruction conditional.  Thread 0
+    counts the address a jump goes to from four instructions past the jump:
+    without a processor to ask, addresses are shown as threads 1 to 3 would
+    take them.
 */
 
 #include "emu.h"
@@ -120,8 +121,9 @@ bool pmx1core_disassembler::arithmetic(std::ostream &stream, u32 op)
 	const u32 unit = ((major == 9) ? 3 : 1) + BIT(op, 24);
 	const bool flags = BIT(op, 27), conditional = BIT(op, 26), immediate = BIT(op, 25);
 	const bool shift = operation >= 5;
-	const bool to_unit = conditional && immediate && BIT(op, 5);
-	if (flags && ((major == 9) || (conditional && !to_unit)))
+	// of the conditional forms, only the shift by a count and the 8-bit operation into another unit can set the flags
+	const bool flags_allowed = (major != 9) && (!conditional || (immediate && (shift || BIT(op, 5))));
+	if (flags && !flags_allowed)
 		return false;
 
 	const std::string name = flags ? util::string_format("%s.f", OPERATIONS[operation]) : std::string(OPERATIONS[operation]);
@@ -179,7 +181,7 @@ bool pmx1core_disassembler::arithmetic(std::ostream &stream, u32 op)
 	else
 	{
 		// the conditional forms
-		const std::string cond_name = mnemonic(flags ? name.c_str() : OPERATIONS[operation], BIT(op, 1, 4));
+		const std::string cond_name = mnemonic(name.c_str(), BIT(op, 1, 4));
 		if (cond_name.empty())
 			return false;
 		if (immediate && shift)
