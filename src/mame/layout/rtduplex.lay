@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- license:CC0-1.0 -->
+<mamelayout version="2">
+	<element name="rect_black">
+		<rect>
+			<color red="0" green="0" blue="0" alpha="1"/>
+		</rect>
+	</element>
+	<element name="display_digit" defstate="63">
+		<led7seg>
+			<color red="1" green="0.3" blue="0.1" alpha="1"/>
+		</led7seg>
+	</element>
+	<element name="disk_left">
+		<disk>
+			<bounds x="0" y="0" width="224" height="216"/>
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</disk>
+	</element>
+	<element name="disk_right">
+		<disk>
+			<bounds x="0" y="0" width="224" height="216"/>
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</disk>
+	</element>
+	<element name="disk_bottom">
+		<disk>
+			<bounds x="0" y="0" width="224" height="216"/>
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</disk>
+	</element>
+	<element name="disk_top">
+		<disk>
+			<bounds x="0" y="0" width="224" height="216"/>
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</disk>
+	</element>
+	<element name="risk_rect" defstate="0">
+		<rect state="0">
+			<color red="0.878" green="0.106" blue="0.141" alpha="1"/>
+		</rect>
+		<rect state="1">
+			<color red="0.965" green="0.380" blue="0.318" alpha="1"/>
+		</rect>
+	</element>
+	<element name="risk_disk" defstate="0">
+		<disk state="0">
+			<color red="0.878" green="0.106" blue="0.141" alpha="1"/>
+		</disk>
+		<disk state="1">
+			<color red="0.965" green="0.380" blue="0.318" alpha="1"/>
+		</disk>
+	</element>
+	<element name="rect_button_payout">
+		<rect>
+			<bounds x="0" y="0" width="88" height="56"/>
+			<color red="0.878" green="0.106" blue="0.141" alpha="1"/>
+		</rect>
+	</element>
+	<element name="rect_button_risk">
+		<rect>
+			<color red="0.902" green="0.38" blue="0" alpha="1"/>
+		</rect>
+	</element>
+	<element name="rect_button_start_stop">
+		<rect>
+			<color red="0.647" green="0.114" blue="0.176" alpha="1"/>
+		</rect>
+	</element>
+	<element name="win_orange">
+		<rect>
+			<color red="1" green="0.471" blue="0" alpha="1"/>
+		</rect>
+	</element>
+	<element name="win_red">
+		<rect>
+			<color red="0.878" green="0.106" blue="0.141" alpha="1"/>
+		</rect>
+	</element>
+	<element name="win_large_red">
+		<rect>
+			<color red="0.878" green="0.106" blue="0.141" alpha="1"/>
+		</rect>
+	</element>
+	<element name="text_win_2">
+		<text string="2" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_win_3">
+		<text string="3" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_win_6">
+		<text string="6" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_win_12">
+		<text string="12" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_win_25">
+		<text string="25" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_win_50">
+		<text string="50" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_win_100">
+		<text string="100" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_rotamint_duplex">
+		<text string="rotamint duplex" align="0">
+			<color red="1" green="0.471" blue="0" alpha="1"/>
+		</text>
+	</element>
+	<element name="rect_background_left">
+		<rect>
+			<color red="1" green="0.471" blue="0" alpha="1"/>
+		</rect>
+	</element>
+	<element name="text_start_orange">
+		<text string="start" align="0">
+			<color red="1" green="0.471" blue="0" alpha="1"/>
+		</text>
+	</element>
+	<element name="rect_light_gray">
+		<rect>
+			<color red="0.800" green="0.800" blue="0.800" alpha="1"/>
+		</rect>
+	</element>
+	<element name="text_stop_orange">
+		<text string="stop" align="0">
+			<color red="1" green="0.471" blue="0" alpha="1"/>
+		</text>
+	</element>
+	<element name="rect_background_middle">
+		<rect>
+			<color red="0.388" green="0.271" blue="0.173" alpha="1"/>
+		</rect>
+	</element>
+	<element name="rect_background_right_middle">
+		<rect>
+			<color red="1" green="0.471" blue="0" alpha="1"/>
+		</rect>
+	</element>
+	<element name="rect_background">
+		<rect>
+			<color red="0.753" green="0.749" blue="0.737" alpha="1"/>
+		</rect>
+	</element>
+	<element name="rect_background_right_top">
+		<rect>
+			<color red="0.388" green="0.271" blue="0.173" alpha="1"/>
+		</rect>
+	</element>
+	<element name="rect_background_right_bottom">
+		<rect>
+			<color red="0.388" green="0.271" blue="0.173" alpha="1"/>
+		</rect>
+	</element>
+	<element name="text_risk1">
+		<text string="NICHTS" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk2">
+		<text string="-,60" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk3">
+		<text string="-,80" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk4">
+		<text string="1,20" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk5">
+		<text string="1,50" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk6">
+		<text string="2,40" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk7">
+		<text string="3,-" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk8">
+		<text string="3" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk9">
+		<text string="6" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk10">
+		<text string="12" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk11">
+		<text string="25" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk12">
+		<text string="50" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_risk13">
+		<text string="100" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_7seg_coin">
+		<text string="Münzspeicher" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_7seg_special_games">
+		<text string="Sonderspiele" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_7seg_chance">
+		<text string="CHANCEN" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="rect_light_gray_alternate">
+		<rect>
+			<color red="0.800" green="0.800" blue="0.800" alpha="1"/>
+		</rect>
+	</element>
+	<element name="text_7seg_ch_counter">
+		<text string="ZÄHLER" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_btn_risk">
+		<text string="RISIKO" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_btn_start_white">
+		<text string="START" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<element name="text_btn_stop_white">
+		<text string="STOP" align="0">
+			<color red="1" green="1" blue="1" alpha="1"/>
+		</text>
+	</element>
+	<view name="Default">
+		<element ref="rect_background">
+			<bounds x="2.32" y="13.8" width="1016" height="1368"/>
+		</element>
+		<element ref="rect_background_left">
+			<bounds x="39.5" y="168" width="136" height="1160"/>
+		</element>
+		<element ref="rect_background_middle">
+			<bounds x="200" y="64" width="608" height="1264"/>
+		</element>
+		<element ref="rect_background_right_middle">
+			<bounds x="824" y="264" width="160" height="880"/>
+		</element>
+		<element ref="rect_background_right_top">
+			<bounds x="840" y="152" width="144" height="112"/>
+		</element>
+		<element ref="rect_background_right_bottom">
+			<bounds x="824" y="1144" width="144" height="200"/>
+		</element>
+		<repeat count="4">
+			<param name="digit" start="8" increment="-1"/>
+			<param name="x" start="736" increment="-32"/>
+			<element ref="rect_black">
+				<bounds x="~x~" y="664" width="32" height="48"/>
+			</element>
+			<element name="display:digit~digit~" ref="display_digit">
+				<bounds x="~x~" y="664" width="32" height="48"/>
+			</element>
+		</repeat>
+		<repeat count="3">
+			<param name="digit" start="2" increment="-1"/>
+			<param name="x" start="336" increment="-32"/>
+			<element ref="rect_black">
+				<bounds x="~x~" y="664" width="32" height="48"/>
+			</element>
+			<element name="display:digit~digit~" ref="display_digit">
+				<bounds x="~x~" y="664" width="32" height="48"/>
+			</element>
+		</repeat>
+		<repeat count="2">
+			<param name="digit" start="3" increment="1"/>
+			<param name="x" start="96" increment="24"/>
+			<element ref="rect_black">
+				<bounds x="~x~" y="664" width="24" height="42"/>
+			</element>
+			<element name="display:digit~digit~" ref="display_digit">
+				<bounds x="~x~" y="664" width="24" height="42"/>
+			</element>
+		</repeat>
+		<element ref="disk_left">
+			<bounds x="232" y="304" width="224" height="216"/>
+		</element>
+		<element ref="disk_right">
+			<bounds x="544" y="296" width="224" height="216"/>
+		</element>
+		<element ref="disk_bottom">
+			<bounds x="392" y="464" width="224" height="216"/>
+		</element>
+		<element ref="disk_top">
+			<bounds x="384" y="136" width="224" height="216"/>
+		</element>
+		<element name="lamp_risk1" ref="risk_rect">
+			<bounds x="840" y="912" width="120" height="40"/>
+		</element>
+		<repeat count="6">
+			<param name="risk" start="8" increment="1"/>
+			<param name="y" start="664" increment="-54.4"/>
+			<element name="lamp_risk~risk~" ref="risk_rect">
+				<bounds x="840" y="~y~" width="120" height="40"/>
+			</element>
+		</repeat>
+		<repeat count="3">
+			<param name="first_risk" start="2" increment="2"/>
+			<param name="y" start="848" increment="-68"/>
+			<repeat count="2">
+				<param name="risk" start="~first_risk~" increment="1"/>
+				<param name="x" start="840" increment="64"/>
+				<element name="lamp_risk~risk~" ref="risk_disk">
+					<bounds x="~x~" y="~y~" width="56" height="56"/>
+				</element>
+			</repeat>
+		</repeat>
+		<element ref="rect_button_payout">
+			<bounds x="872" y="176" width="88" height="56"/>
+		</element>
+		<element ref="rect_button_risk">
+			<bounds x="856" y="1168" width="88" height="56"/>
+		</element>
+		<element ref="rect_button_start_stop">
+			<bounds x="856" y="1264" width="88" height="56"/>
+		</element>
+		<repeat count="4">
+			<param name="top_win" start="8" increment="-1"/>
+			<param name="bottom_win" start="4" increment="-1"/>
+			<param name="x" start="240" increment="128"/>
+			<element ref="win_orange">
+				<bounds x="~x~" y="1064" width="120" height="72"/>
+			</element>
+			<element ref="win_orange">
+				<bounds x="~x~" y="1152" width="120" height="72"/>
+			</element>
+		</repeat>
+		<repeat count="3">
+			<param name="win" start="11" increment="-1"/>
+			<param name="x" start="280" increment="152"/>
+			<element ref="win_red">
+				<bounds x="~x~" y="968" width="136" height="80"/>
+			</element>
+		</repeat>
+		<element ref="win_large_red">
+			<bounds x="384" y="848" width="224" height="112"/>
+		</element>
+		<element ref="text_win_6">
+			<bounds x="248" y="1160" width="29" height="32"/>
+		</element>
+		<element ref="text_win_3">
+			<bounds x="376" y="1160" width="29" height="32"/>
+		</element>
+		<element ref="text_win_3">
+			<bounds x="504" y="1160" width="29" height="32"/>
+		</element>
+		<element ref="text_win_2">
+			<bounds x="632" y="1160" width="29" height="32"/>
+		</element>
+		<element ref="text_win_25">
+			<bounds x="240" y="1072" width="56" height="32"/>
+		</element>
+		<element ref="text_win_25">
+			<bounds x="368" y="1072" width="56" height="32"/>
+		</element>
+		<element ref="text_win_12">
+			<bounds x="496" y="1072" width="56" height="32"/>
+		</element>
+		<element ref="text_win_6">
+			<bounds x="624" y="1072" width="56" height="32"/>
+		</element>
+		<element ref="text_win_50">
+			<bounds x="280" y="976" width="72" height="35"/>
+		</element>
+		<element ref="text_win_50">
+			<bounds x="432" y="976" width="72" height="35"/>
+		</element>
+		<element ref="text_win_50">
+			<bounds x="584" y="976" width="72" height="35"/>
+		</element>
+		<element ref="text_win_100">
+			<bounds x="400" y="880" width="120" height="49.29"/>
+		</element>
+		<element ref="text_rotamint_duplex">
+			<bounds x="304" y="800" width="376" height="32"/>
+		</element>
+		<element ref="text_start_orange">
+			<bounds x="280" y="560" width="88" height="32"/>
+		</element>
+		<element ref="text_stop_orange">
+			<bounds x="632" y="560" width="88" height="32"/>
+		</element>
+		<element ref="text_risk1">
+			<bounds x="840" y="912" width="120" height="40"/>
+		</element>
+		<repeat count="3">
+			<param name="first_risk" start="2" increment="2"/>
+			<param name="y" start="864" increment="-68"/>
+			<repeat count="2">
+				<param name="risk" start="~first_risk~" increment="1"/>
+				<param name="x" start="840" increment="64"/>
+				<element ref="text_risk~risk~">
+					<bounds x="~x~" y="~y~" width="56" height="32"/>
+				</element>
+			</repeat>
+		</repeat>
+		<repeat count="6">
+			<param name="risk" start="8" increment="1"/>
+			<param name="y" start="664" increment="-54.4"/>
+			<element ref="text_risk~risk~">
+				<bounds x="840" y="~y~" width="120" height="40"/>
+			</element>
+		</repeat>
+		<element ref="text_7seg_coin">
+			<bounds x="640" y="640" width="130" height="21.85"/>
+		</element>
+		<element ref="text_7seg_special_games">
+			<bounds x="272" y="640" width="90" height="21.75"/>
+		</element>
+		<element ref="text_7seg_chance">
+			<bounds x="98" y="645" width="50" height="10"/>
+		</element>
+		<element ref="text_7seg_ch_counter">
+			<bounds x="98" y="653" width="50" height="10"/>
+		</element>
+		<element ref="text_btn_risk">
+			<bounds x="856" y="1168" width="88" height="56"/>
+		</element>
+		<element ref="text_btn_start_white">
+			<bounds x="856" y="1264" width="88" height="28"/>
+		</element>
+		<element ref="text_btn_stop_white">
+			<bounds x="856" y="1292" width="88" height="28"/>
+		</element>
+	</view>
+</mamelayout>
