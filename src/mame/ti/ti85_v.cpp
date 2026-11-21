@@ -10,7 +10,7 @@
 #include "emu.h"
 #include "ti85.h"
 
-#define TI_VIDEO_COL_SIZE       160 / 8
+#define TI_VIDEO_COL_SIZE       20
 
 #define TI81_SCREEN_X_SIZE      12
 #define TI81_SCREEN_Y_SIZE      64

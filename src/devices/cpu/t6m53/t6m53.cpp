@@ -69,7 +69,7 @@ void t6m53_device::device_start() {
 }
 
 void t6m53_device::device_reset() {
-	m_regs[0x10F >> 1] &= 0xB0;
+	m_regs[0x10F >> 1] &= 0xb0;
 	m_pc = 0;
 	m_previous_pc = 0;
 	m_lastlow = 0;
@@ -177,7 +177,7 @@ void t6m53_device::reg_w4_raw(uint16_t index, uint8_t data) {
 			break;
 
 		case 0x10f:
-			if ((data & 1) && !(m_regs[0x10F >> 1] & 0x10) && !(m_regs[0x10D >> 1] & 0x10))
+			if ((data & 1) && !(m_regs[0x10f >> 1] & 0x10) && !(m_regs[0x10d >> 1] & 0x10))
 				m_regs[0x11a >> 1] = m_regs[0x0f4 >> 1];
 
 			if (data & 4) {

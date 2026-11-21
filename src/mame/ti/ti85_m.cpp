@@ -89,7 +89,7 @@ void ti85_state::ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *b
 
 void ti85_state::ti8x_adjust_timers(const double speeds[], uint8_t speed)
 {
-    // 0b00 = fastest speed, 0b11 = slowest
+	// 0b00 = fastest speed, 0b11 = slowest
 	m_ti82_1st_timer->adjust(attotime::from_hz(speeds[speed]), 0, attotime::from_hz(speeds[speed]));
 	m_ti82_2nd_timer->adjust(attotime::from_hz(speeds[speed] * 4.0), 0, attotime::from_hz(speeds[speed] * 2.0));
 }
@@ -103,6 +103,7 @@ void ti85_state::ti8x_update_int()
 void ti85_state::update_ti8x_memory()
 {
 	switch (m_model) {
+		case TI82:
 		case TI83:
 			update_ti82_memory();
 			break;
@@ -475,7 +476,7 @@ void ti85_state::ti82_init_common()
 
 	m_ti8x_ram = std::make_unique<uint8_t[]>(32*1024);
 	memset(m_ti8x_ram.get(), 0, sizeof(uint8_t)*32*1024);
-    
+
 	membank("bank1")->set_base(m_bios);
 	membank("bank2")->set_base(m_bios + 0x4000);
 	membank("bank3")->set_base(m_ti8x_ram.get() + 0x4000);
@@ -485,7 +486,7 @@ void ti85_state::ti82_init_common()
 
 	m_ti82_1st_timer = timer_alloc(FUNC(ti85_state::ti82_timer1_callback), this);
 	m_ti82_2nd_timer = timer_alloc(FUNC(ti85_state::ti82_timer2_callback), this);
-    ti8x_adjust_timers(m_ti82_timer_hz, 0b11);
+	ti8x_adjust_timers(m_ti82_timer_hz, 0b11);
 
 	save_pointer(NAME(m_ti8x_ram), 32*1024);
 }
@@ -503,7 +504,7 @@ void ti85_state::ti83p_init_common()
 
 	m_ti82_1st_timer = timer_alloc(FUNC(ti85_state::ti82_timer1_callback), this);
 	m_ti82_2nd_timer = timer_alloc(FUNC(ti85_state::ti82_timer2_callback), this);
-    ti8x_adjust_timers(m_ti83p_timer_hz, 0b11);
+	ti8x_adjust_timers(m_ti83p_timer_hz, 0b11);
 
 	/* save states and debugging */
 	save_item(NAME(m_booting));
@@ -535,7 +536,7 @@ void ti85_state::ti8xpse_init_common()
 
 	m_ti82_1st_timer = timer_alloc(FUNC(ti85_state::ti82_timer1_callback), this);
 	m_ti82_2nd_timer = timer_alloc(FUNC(ti85_state::ti82_timer2_callback), this);
-    ti8x_adjust_timers(m_ti83pse_timer_hz, 0b11);
+	ti8x_adjust_timers(m_ti83pse_timer_hz, 0b11);
 
 	m_crystal_timer1 = timer_alloc(FUNC(ti85_state::crystal_timer_tick), this);
 	m_crystal_timer2 = timer_alloc(FUNC(ti85_state::crystal_timer_tick), this);
@@ -564,7 +565,8 @@ void ti85_state::ti8xpse_init_common()
 	save_item(STRUCT_MEMBER(m_ctimer, max));
 	save_item(STRUCT_MEMBER(m_ctimer, count));
 
-	if (m_model == TI84P || m_model == TI84PSE || m_model == TI84PCSE) {
+	if (m_model == TI84P || m_model == TI84PSE || m_model == TI84PCSE)
+    {
 		save_item(NAME(m_ti84p_rtc_control));
 		save_item(NAME(m_ti84p_rtc_currtime));
 		save_item(NAME(m_ti84p_rtc_basetime));
@@ -801,9 +803,8 @@ uint8_t ti85_state::ti83pse_port_0002_r()
 {
 	uint8_t data = 0x83 | (m_flash_unlocked << 2);
 
-	if (m_model == TI84P || m_model == TI84PSE || m_model == TI84PCSE) {
+	if (m_model == TI84P || m_model == TI84PSE || m_model == TI84PCSE)
 		data |= 0x20;
-	}
 
 	return data;
 }
@@ -846,9 +847,9 @@ void ti85_state::ti85_port_0002_w(uint8_t data)
 
 void ti85_state::ti85_int_status_w(uint8_t data)
 {
-	m_ON_interrupt_mask = data & 0x01;
-	m_LCD_mask = data & 0x02;
-	m_LCD_status = data & 0x08;
+	m_ON_interrupt_mask = BIT(data, 0);
+	m_LCD_mask = BIT(data, 1);
+	m_LCD_status = BIT(data, 3);
 	m_LCD_interrupt_status &= m_LCD_mask;
 	m_lcd_dma_timer->enable(m_LCD_status);
 }
@@ -928,7 +929,7 @@ void ti85_state::ti82_port_0004_w(uint8_t data)
 {
 	m_port4_bit0 = data & 0x01;
 	update_ti82_memory();
-    ti8x_adjust_timers(m_ti82_timer_hz, BIT(data, 1, 2));
+	ti8x_adjust_timers(m_ti82_timer_hz, BIT(data, 1, 2));
 }
 
 void ti85_state::ti83_port_0000_w(uint8_t data)
@@ -972,7 +973,7 @@ void ti85_state::ti83pse_int_ack_w(uint8_t data)
 void ti85_state::ti83p_port_0004_w(uint8_t data)
 {
 	m_ti83p_port4 = data | 0xe0;
-    ti8x_adjust_timers(m_ti83pse_timer_hz, BIT(data, 1, 2));
+	ti8x_adjust_timers(m_ti83p_timer_hz, BIT(data, 1, 2));
 	update_ti83p_memory();
 }
 
@@ -996,7 +997,7 @@ void ti85_state::ti83p_port_0007_w(uint8_t data)
 void ti85_state::ti83pse_port_0004_w(uint8_t data)
 {
 	m_ti83p_port4 = data;
-    ti8x_adjust_timers(m_ti83pse_timer_hz, BIT(data, 1, 2));
+	ti8x_adjust_timers(m_ti83pse_timer_hz, BIT(data, 1, 2));
 	update_ti83pse_memory();
 }
 

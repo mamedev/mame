@@ -7,9 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/ez80.h"
-#include "machine/nvram.h"
 #include "machine/intelfsh.h"
+#include "machine/nvram.h"
+
 #include "screen.h"
 
 namespace {

@@ -86,7 +86,7 @@ public:
 	void ti85(machine_config &config);
 	void ti84p(machine_config &config);
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(on_btn);
+	DECLARE_INPUT_CHANGED_MEMBER(on_btn);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -143,9 +143,9 @@ private:
 	uint8_t m_frame[160 * 64 / 8]{};
 	uint8_t * m_bios = nullptr;
 
-    const double m_ti82_timer_hz[4] = {600, 257.14, 163.63, 120};
-    const double m_ti83p_timer_hz[4] = {560, 248, 170, 118};
-    const double m_ti83pse_timer_hz[4] = {512, 227.55, 146.29, 107.79};
+	static constexpr double m_ti82_timer_hz[4] = {600, 257.14, 163.63, 120};
+	static constexpr double m_ti83p_timer_hz[4] = {560, 248, 170, 118};
+	static constexpr double m_ti83pse_timer_hz[4] = {512, 227.55, 146.29, 107.79};
 
 	emu_timer *m_lcd_dma_timer = nullptr;
 	emu_timer *m_ti82_1st_timer = nullptr;
@@ -280,7 +280,7 @@ private:
 	void ti83p_membank2_w(offs_t offset, uint8_t data);
 	void ti83p_membank3_w(offs_t offset, uint8_t data);
 
-    void ti8x_adjust_timers(const double speeds[], uint8_t speed);
+	void ti8x_adjust_timers(const double speeds[], uint8_t speed);
 	void ti8x_update_int();
 	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
 	void update_ti8x_memory();
