@@ -203,7 +203,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_czram(*this, "czram"),
-		m_spriteram(*this, "spriteram"),
+		m_spriteram(*this, "spriteram", 0x8000, ENDIANNESS_BIG),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_maincpu(*this, "maincpu"),
 		m_master(*this, "master"),
@@ -223,8 +223,9 @@ public:
 		m_mixer(*this, "video_mixer"),
 		m_gamma_proms(*this, "gamma_proms"),
 		m_pointrom(*this, "pointrom"),
-		m_vics_data(*this, "vics_data"),
+		m_vics_data(*this, "vics_data", 0x10000, ENDIANNESS_BIG),
 		m_vics_control(*this, "vics_control"),
+		m_attributeram(*this, "attributeram", 0xa00, ENDIANNESS_BIG),
 		m_screen(*this, "screen"),
 		m_adc_ports(*this, "ADC.%u", 0),
 		m_inputs(*this, "INPUTS"),
@@ -275,7 +276,7 @@ public:
 
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<u32> m_czram;
-	optional_shared_ptr<u32> m_spriteram;
+	memory_share_creator<u16> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
@@ -395,7 +396,7 @@ protected:
 	void draw_direct_poly(const u16 *src);
 	void draw_polygons();
 	void draw_sprites();
-	void draw_sprite_group(const u32 *src, const u32 *attr, int num_sprites, int deltax, int deltay, bool y_lowres);
+	void vics_copy_sprite_data();
 	void namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void install_c74_speedup();
@@ -437,8 +438,9 @@ protected:
 	required_shared_ptr<u32> m_mixer;
 	optional_region_ptr<u8> m_gamma_proms;
 	required_region_ptr<s32> m_pointrom;
-	optional_shared_ptr<u32> m_vics_data;
+	memory_share_creator<u16> m_vics_data;
 	optional_shared_ptr<u32> m_vics_control;
+	memory_share_creator<u16> m_attributeram;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_adc_ports;
 	required_ioport m_inputs;
@@ -559,8 +561,14 @@ protected:
 	u16 namcos22s_czattr_r(offs_t offset);
 	void namcos22s_czram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 namcos22s_czram_r(offs_t offset);
+	u16 namcos22s_vics_data_r(offs_t offset);
+	void namcos22s_vics_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u32 namcos22s_vics_control_r(offs_t offset);
 	void namcos22s_vics_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u16 namcos22s_spriteram_r(offs_t offset);
+	void namcos22s_spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 namcos22s_attributeram_r(offs_t offset);
+	void namcos22s_attributeram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 spotram_r(offs_t offset);
 	void spotram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
