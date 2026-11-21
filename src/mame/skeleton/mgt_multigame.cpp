@@ -78,7 +78,11 @@ void mgt_multigame_state::program_map(address_map &map)
 
 void mgt_multigame_state::data_map(address_map &map)
 {
-	map(0x0200, 0x21ff).ram(); // ATMEGA2560 internal SRAM
+	// TODO: determine what, if anything, lives here.
+	// if the 2560's external memory mode is never used, then this can be removed.
+	// if something does live in this external memory range, it's either the
+	// BS62LV256SC SRAM (it's 32 KiB exactly and is right next to the CPU
+	// per the driver docs), or it's the external ROM, bankswitched.
 	map(0x8000, 0xffff).ram();
 }
 

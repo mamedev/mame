@@ -85,7 +85,6 @@ private:
 
 	// address maps
 	void main_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
 
 	// I/O handlers
 	void input_w(u8 data);
@@ -204,11 +203,6 @@ void avrmax_state::main_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 }
 
-void avrmax_state::data_map(address_map &map)
-{
-	map(0x0100, 0x04ff).ram();
-}
-
 
 
 /*******************************************************************************
@@ -248,7 +242,6 @@ void avrmax_state::base(machine_config &config)
 	// basic machine hardware
 	ATMEGA88(config, m_maincpu, 16_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &avrmax_state::main_map);
-	m_maincpu->set_addrmap(AS_DATA, &avrmax_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->gpio_in<atmega88_device::GPIOB>().set(FUNC(avrmax_state::input_r));
 	m_maincpu->gpio_out<atmega88_device::GPIOC>().set(FUNC(avrmax_state::input_w));

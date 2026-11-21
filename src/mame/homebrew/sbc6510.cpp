@@ -86,7 +86,6 @@ private:
 	u8 key_r();
 
 	void main_mem_map(address_map &map) ATTR_COLD;
-	void video_data_map(address_map &map) ATTR_COLD;
 	void video_mem_map(address_map &map) ATTR_COLD;
 
 	u8 m_key_row = 0U;
@@ -115,11 +114,6 @@ void sbc6510_state::main_mem_map(address_map &map)
 void sbc6510_state::video_mem_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-}
-
-void sbc6510_state::video_data_map(address_map &map)
-{
-	map(0x0100, 0x04ff).ram();
 }
 
 /* Input ports */
@@ -285,7 +279,6 @@ void sbc6510_state::sbc6510(machine_config &config)
 
 	ATMEGA88(config, m_videocpu, XTAL(16'000'000)); // Video CPU trips SLEEP opcode, needs to be emulated
 	m_videocpu->set_addrmap(AS_PROGRAM, &sbc6510_state::video_mem_map);
-	m_videocpu->set_addrmap(AS_DATA, &sbc6510_state::video_data_map);
 	m_videocpu->set_eeprom_tag("eeprom");
 
 	PALETTE(config, "palette", palette_device::MONOCHROME); // for F4 displayer only

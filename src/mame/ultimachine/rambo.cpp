@@ -45,7 +45,6 @@ private:
 	virtual void machine_reset() override ATTR_COLD;
 
 	void rambo_prg_map(address_map &map) ATTR_COLD;
-	void rambo_data_map(address_map &map) ATTR_COLD;
 
 	uint8_t m_port_a = 0;
 	required_device<atmega2560_device> m_maincpu;
@@ -58,11 +57,6 @@ private:
 void rambo_state::rambo_prg_map(address_map &map)
 {
 	map(0x00000, 0x3ffff).rom();
-}
-
-void rambo_state::rambo_data_map(address_map &map)
-{
-	map(0x0200, 0x21FF).ram();  /* ATMEGA2560 Internal SRAM */
 }
 
 /****************************************************\
@@ -83,7 +77,6 @@ void rambo_state::rambo(machine_config &config)
 {
 	ATMEGA2560(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &rambo_state::rambo_prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &rambo_state::rambo_data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->set_low_fuses(0xff);
 	m_maincpu->set_high_fuses(0xd1); // actually 0xd0, but stk500 bootloader uses spm opcodes
