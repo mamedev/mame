@@ -252,7 +252,6 @@
 - (IBAction)sourceDebugChanged:(id)sender {
 	if ([sender tag] == MENU_SHOW_SOURCE)
 	{
-//      m_codeDock->setWidget(m_srcdbgFrame);
 		NSWindow *window = [self window];
 		id del = [window delegate];
 		[del setDisasemblyView:true];
@@ -260,7 +259,6 @@
 	}
 	else
 	{
-//      m_codeDock->setWidget(m_dasmFrame);
 		NSWindow *window = [self window];
 		id del = [window delegate];
 		[del setDisasemblyView:false];

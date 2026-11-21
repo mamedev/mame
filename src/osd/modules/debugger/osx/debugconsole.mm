@@ -261,7 +261,7 @@
 
 
 - (BOOL)sourceFrameActive {
-	return ![dasmScroll isHidden];
+	return [dasmScroll isHidden];
 }
 
 
@@ -603,11 +603,12 @@
 
 
 - (void) setSourceButton:(int)index {
-	[sourceButton selectItemAtIndex:index];
+	[sourceButton selectItemWithTag:index];
 }
 
 
 - (void) populateSourceButton {
+	[sourceButton removeAllItems];
 	[srcdbgView insertSubviewItemsInMenu:[sourceButton menu] atIndex:0];
 }
 

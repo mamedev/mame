@@ -221,10 +221,11 @@
 
 
 - (void) setSourceButton:(int)index {
-	[sourceButton selectItemAtIndex:index];
+	[sourceButton selectItemWithTag:index];
 }
 
 - (void) populateSourceButton {
+	[sourceButton removeAllItems];
 	[srcdbgView insertSubviewItemsInMenu:[sourceButton menu] atIndex:0];
 }
 
@@ -339,9 +340,9 @@
 
 	if (num)
 	{
-		if ([dasmView cursorVisible])
+		if ([visibleView cursorVisible])
 		{
-			[dasmView source]->device()->debug()->go([num unsignedIntValue]);
+			[visibleView source]->device()->debug()->go([num unsignedIntValue]);
 		}
 	}
 }
