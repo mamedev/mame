@@ -588,26 +588,28 @@ MICROPROGRAM(bl_mp)
 	OPERAND_ADDR,           // x
 	ALU_NOP,                // 1 Don't read, just use the address
 	ALU_B,                  // 0 Re-use the alu operation from B
+	ALU_NOP,                // 1
+	ALU_NOP,                // 1
 	PREFETCH,               // 1 (1)
-	ALU_NOP,                // 1
-	MEMORY_WRITE,           // 1 (1) Write R11
-	ALU_NOP,                // 1
+	MEMORY_WRITE,           // 1 (1) Save the return PC in R11 immediately after the target fetch
 	END
 };
 
 MICROPROGRAM(blwp_mp)
 {
-	OPERAND_ADDR,           // x Determine source address
-	MEMORY_READ,            // 1 (1)
-	ALU_BLWP,               // 1 Got new WP, save it; increase address, save
-	MEMORY_WRITE,           // 1 (1) save old ST to new R15
-	ALU_BLWP,               // 1
-	MEMORY_WRITE,           // 1 (1) save old PC to new R14
-	ALU_BLWP,               // 1
-	MEMORY_WRITE,           // 1 (1) save old WP to new R13
-	ALU_BLWP,               // 1 retrieve address
-	MEMORY_READ,            // 1 (1) Read new PC
-	ALU_BLWP,               // 0 Set new PC
+	OPERAND_ADDR,           // x Determine vector address
+	MEMORY_READ,            // 1 (1) Read new WP
+	ALU_BLWP,               // 1 Advance to the second vector word
+	ALU_NOP,                // 1
+	ALU_NOP,                // 1
+	ALU_NOP,                // 1
+	MEMORY_READ,            // 1 (1) Read new PC before writing the workspace
+	ALU_BLWP,               // 0
+	MEMORY_WRITE,           // 1 (1) Save old WP in new R13
+	ALU_BLWP,               // 0
+	MEMORY_WRITE,           // 1 (1) Save return PC in new R14
+	ALU_BLWP,               // 0
+	MEMORY_WRITE,           // 1 (1) Save old ST in new R15
 	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
 	END
@@ -803,12 +805,12 @@ MICROPROGRAM(multiply_mp)
 MICROPROGRAM(rtwp_mp)
 {
 	ALU_RTWP,               // 1
-	MEMORY_READ,            // 1 (1)
+	MEMORY_READ,            // 1 (1) Old workspace R14: return PC
 	ALU_RTWP,               // 0
-	MEMORY_READ,            // 1 (1)
+	MEMORY_READ,            // 1 (1) Old workspace R15: saved ST
 	ALU_RTWP,               // 0
-	MEMORY_READ,            // 1 (1)
-	ALU_RTWP,               // 0
+	MEMORY_READ,            // 1 (1) Old workspace R13: saved WP
+	ALU_RTWP,               // 1
 	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
 	END
@@ -895,22 +897,26 @@ MICROPROGRAM(x_mp)
 
 MICROPROGRAM(xop_mp)
 {
-	OPERAND_ADDR,           // x     Determine source address
-	ALU_XOP,                // 1     Save it; determine XOP number
+	OPERAND_ADDR,           // x Determine the effective address for R11
+	ALU_XOP,                // 1 Select the XOP vector
+	ALU_NOP,                // 1
+	ALU_NOP,                // 1
+	ALU_NOP,                // 1
 	MEMORY_READ,            // 1 (1) Read new WP
 	ALU_XOP,                // 1
-	MEMORY_WRITE,           // 1 (1) save source address to new R11
-	ALU_XOP,                // 1
-	MEMORY_WRITE,           // 1 (1) save old ST to new R15
-	ALU_XOP,                // 1
-	MEMORY_WRITE,           // 1 (1) save old PC to new R14
-	ALU_XOP,                // 1
-	MEMORY_WRITE,           // 1 (1) save old WP to new R13
-	ALU_XOP,                // 1
-	MEMORY_READ,            // 1 (1) Read new PC
-	ALU_XOP,                // 0 set new PC, set X flag
-	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
+	ALU_NOP,                // 1
+	MEMORY_WRITE,           // 1 (1) Save the effective address in new R11
+	ALU_XOP,                // 0
+	MEMORY_READ,            // 1 (1) Read new PC
+	ALU_XOP,                // 0
+	MEMORY_WRITE,           // 1 (1) Save old WP in new R13
+	ALU_XOP,                // 0
+	MEMORY_WRITE,           // 1 (1) Save return PC in new R14
+	ALU_XOP,                // 0
+	MEMORY_WRITE,           // 1 (1) Save old ST in new R15
+	ALU_XOP,                // 0 Update ST for handler entry
+	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
 	END
 };
@@ -2516,36 +2522,31 @@ void tms9995_device::alu_b()
 */
 void tms9995_device::alu_blwp()
 {
-	int n = 1;
 	switch (m_inst_state)
 	{
 	case 0:
-		// new WP in m_current_value
-		m_value_copy = WP;
-		WP = m_current_value & 0xfffe;
-		m_address_saved = m_address + 2;
-		m_address = WP + 30;
-		m_current_value = ST;
+		m_value_copy = m_current_value & 0xfffe;  // new WP
+		m_address += 2;
+		pulse_clock(1);
 		break;
 	case 1:
-		m_current_value = PC;
-		m_address = m_address - 2;
+		m_source_value = PC;                      // return PC after any extension word
+		PC = m_current_value & 0xfffe;
+		m_current_value = WP;
+		WP = m_value_copy;
+		m_address = WP + 26;                      // R13
 		break;
 	case 2:
-		m_current_value = m_value_copy;     // old WP
-		m_address = m_address - 2;
+		m_current_value = m_source_value;
+		m_address = WP + 28;                      // R14
 		break;
 	case 3:
-		m_address = m_address_saved;
-		break;
-	case 4:
-		PC = m_current_value & 0xfffe;
-		n = 0;
+		m_current_value = ST;
+		m_address = WP + 30;                      // R15
 		LOGMASKED(LOG_CONTEXT, "Context switch (blwp): WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 		break;
 	}
 	m_inst_state++;
-	pulse_clock(n);
 }
 
 /*
@@ -3097,19 +3098,20 @@ void tms9995_device::alu_rtwp()
 	switch (m_inst_state)
 	{
 	case 0:
-		m_address = WP + 30;        // R15
+		m_address = WP + 28;        // R14
 		pulse_clock(1);
 		break;
 	case 1:
-		ST = m_current_value;
-		m_address -= 2;             // R14
+		PC = m_current_value & 0xfffe;
+		m_address = WP + 30;        // R15
 		break;
 	case 2:
-		PC = m_current_value & 0xfffe;
-		m_address -= 2;             // R13
+		ST = m_current_value;
+		m_address = WP + 26;        // R13
 		break;
 	case 3:
 		WP = m_current_value & 0xfffe;
+		pulse_clock(1);
 
 		// Just for debugging purposes
 		m_log_interrupt = false;
@@ -3421,41 +3423,37 @@ void tms9995_device::alu_xop()
 	switch (m_inst_state)
 	{
 	case 0:
-		// we have the source address in m_address
-		m_address_saved = m_address;
-		// Format is xxxx xxnn nnxx xxxx
-		m_address = 0x0040 + ((IR & 0x03c0)>>4);
+		m_source_value = m_address;               // effective address for R11
+		m_address = 0x0040 + ((IR & 0x03c0) >> 4);
 		pulse_clock(1);
 		break;
 	case 1:
-		// m_current_value is new WP
-		m_value_copy = WP;  // store this for later
+		m_address_saved = m_address + 2;          // handler PC word of this vector
+		m_value_copy = WP;                        // old WP for R13
 		WP = m_current_value & 0xfffe;
-		m_address = WP + 0x0016; // Address of new R11
-		m_current_value = m_address_saved;
+		m_address = WP + 22;                      // R11
+		m_current_value = m_source_value;
 		pulse_clock(1);
 		break;
 	case 2:
-		m_address = WP + 0x001e;
-		m_current_value = ST;
-		pulse_clock(1);
+		m_address = m_address_saved;
 		break;
 	case 3:
-		m_address = WP + 0x001c;
-		m_current_value = PC;
-		pulse_clock(1);
+		m_source_value = PC;                      // return PC after any extension word
+		PC = m_current_value & 0xfffe;
+		m_address = WP + 26;                      // R13
+		m_current_value = m_value_copy;
 		break;
 	case 4:
-		m_address = WP + 0x001a;
-		m_current_value = m_value_copy;
-		pulse_clock(1);
+		m_address = WP + 28;                      // R14
+		m_current_value = m_source_value;
 		break;
 	case 5:
-		m_address = 0x0042 + ((IR & 0x03c0)>>4);
-		pulse_clock(1);
+		m_address = WP + 30;                      // R15
+		m_current_value = ST;
 		break;
 	case 6:
-		PC = m_current_value & 0xfffe;
+		ST &= ~0x01f0;                            // Clear ST7-ST11 on entry, after saving the old ST in R15.
 		set_status_bit(ST_X, true);
 		LOGMASKED(LOG_CONTEXT, "Context switch (xop): WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 		break;
