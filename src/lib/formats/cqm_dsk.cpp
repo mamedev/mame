@@ -201,6 +201,8 @@ FLOPPY_CONSTRUCT( cqm_dsk_construct )
 	head = 0;
 	tag->buf = (uint8_t*)malloc(tag->sector_size*tag->sector_per_track);
 	do {
+		if ((track<<1) + head >= 84*2)
+			break;
 		tag->track_offsets[(track<<1) + head] = pos;
 		s = 0;
 		do {
