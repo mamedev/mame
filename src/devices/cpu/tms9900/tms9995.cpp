@@ -221,12 +221,16 @@ void tms9995_device::device_start()
 
 	m_reset = false;
 	m_reset_asserted = false;
+	m_idle_reset_clocks = 0;
 	m_ready_bufd = true;
 	m_ready = true;
 	m_auto_wait = false;
 	m_request_auto_wait_state = false;
 
 	m_idle_state = false;
+	m_hold_requested = false;
+	m_hold_sampled = false;
+	m_hold_state = false;
 
 	m_source_value = 0;
 
@@ -259,6 +263,7 @@ void tms9995_device::device_start()
 	save_item(NAME(m_nmi_serviced));
 	save_item(NAME(m_hold_state));
 	save_item(NAME(m_hold_requested));
+	save_item(NAME(m_hold_sampled));
 	save_item(NAME(m_ready_bufd));
 	save_item(NAME(m_ready));
 	save_item(NAME(m_request_auto_wait_state));
@@ -280,6 +285,7 @@ void tms9995_device::device_start()
 	save_item(NAME(m_int_overflow));
 	save_item(NAME(m_reset));
 	save_item(NAME(m_reset_asserted));
+	save_item(NAME(m_idle_reset_clocks));
 	save_item(NAME(m_mid_flag));
 	save_item(NAME(m_mid_active));
 	save_item(NAME(m_decrementer_clkdiv));
@@ -520,6 +526,7 @@ enum
 	ALU_DIV,
 	ALU_DIVS,
 	ALU_EXTERNAL,
+	ALU_RSET_MASK,
 	ALU_IDLE_POLL,
 	ALU_F3,
 	ALU_IMM_ARITHM,
@@ -712,8 +719,8 @@ MICROPROGRAM(external_mp)
 	ALU_NOP,                // 1
 	ALU_NOP,                // 1
 	ALU_NOP,                // 1
-	ALU_NOP,                // 1
-	ALU_EXTERNAL,           // 0
+	ALU_EXTERNAL,           // 1 Strobe the external code one clock before prefetch.
+	ALU_RSET_MASK,          // 0 RSET clears the mask before the interrupt check.
 	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
 	END
@@ -1011,6 +1018,7 @@ const tms9995_device::ophandler tms9995_device::s_microoperation[] =
 	&tms9995_device::alu_divide,
 	&tms9995_device::alu_divide_signed,
 	&tms9995_device::alu_external,
+	&tms9995_device::alu_rset_mask,
 	&tms9995_device::alu_idle_poll,
 	&tms9995_device::alu_f3,
 	&tms9995_device::alu_imm_arithm,
@@ -1279,7 +1287,11 @@ void tms9995_device::build_command_lookup_table()
 void tms9995_device::execute_run()
 {
 	while (m_reset_asserted && m_icount > 0)
+	{
+		if (m_idle_reset_clocks && --m_idle_reset_clocks == 0 && !m_external_operation.isunset())
+			m_external_operation(IDLE_OP, 1, 0xff);
 		pulse_clock(1);
+	}
 	if (m_icount <= 0)
 		return;
 	if (m_reset) service_interrupt();
@@ -1298,16 +1310,13 @@ void tms9995_device::execute_run()
 		}
 		else
 		{
-			if (m_check_hold && m_hold_requested)
+			if (m_check_hold && m_hold_sampled)
 			{
-				set_hold_state(true);
 				LOGMASKED(LOG_HOLD, "HOLD state\n");
-				pulse_clock(1);
+				pulse_clock(1, true);
 			}
 			else
 			{
-				set_hold_state(false);
-
 				m_check_ready = false;
 
 				LOGMASKED(LOG_MICRO, "main loop, operation %s, MPC = %d\n", opname[m_command], MPC);
@@ -1412,15 +1421,23 @@ void tms9995_device::reset_line(int state)
 	m_reset_asserted = asserted;
 	if (asserted)
 	{
+		// RESET allows the active two-clock IDLE sequence to issue its last
+		// strobe on its normal cadence. The HOLD check is set in the strobe
+		// phase and cleared in the intervening poll phase.
+		if (m_idle_state && !m_hold_state)
+			m_idle_reset_clocks = m_check_hold ? 2 : 1;
+		m_idle_state = false;
 		m_reset = false;
 		m_log_interrupt = false;
 		m_check_ready = false;
 		m_request_auto_wait_state = false;
 		m_hold_requested = false;
+		m_hold_sampled = false;
 		memset(m_flag, 0, sizeof(m_flag));
 	}
 	else
 	{
+		m_idle_reset_clocks = 0;
 		// A fixed reset level applies only to this latch. Bus cycles still sample the live READY input.
 		m_auto_wait = m_auto_wait_on_reset.value_or(m_ready_bufd);
 		m_reset = true;
@@ -1431,11 +1448,14 @@ void tms9995_device::reset_line(int state)
 /*
     Issue a pulse on the clock line.
 */
-void tms9995_device::pulse_clock(int count)
+void tms9995_device::pulse_clock(int count, bool hold_cycle)
 {
 	for (int i=0; i < count; i++)
 	{
 		if (!m_clock_out_line.isunset()) m_clock_out_line(ASSERT_LINE);
+		m_hold_sampled = m_hold_requested;
+		if (hold_cycle && !m_hold_state)
+			set_hold_state(true);
 		// External maskable requests reach the prefetch decision three rising edges later.
 		m_int1_samples = ((m_int1_samples << 1) | (m_int1_active || m_flag[2])) & 7;
 		m_int4_samples = ((m_int4_samples << 1) | (!m_flag[0] && (m_int4_active || m_flag[4]))) & 7;
@@ -1443,6 +1463,10 @@ void tms9995_device::pulse_clock(int count)
 		m_ec_samples = ((m_ec_samples << 1) | m_int4_active) & 7;
 		m_ready = m_ready_bufd && !m_request_auto_wait_state;                // get the latched READY state
 		if (!m_clock_out_line.isunset()) m_clock_out_line(CLEAR_LINE);
+		// Release HOLDA on this falling edge. The next bus cycle can start at
+		// the following rising edge, after the sampled HOLD request clears.
+		if (m_hold_state && !m_hold_sampled)
+			set_hold_state(false);
 		// NMI is sampled on falling edges. A held request can enter only once.
 		m_nmi_samples = ((m_nmi_samples << 1) | m_nmi_active) & 3;
 		if ((m_nmi_samples & 2) == 0)
@@ -1461,16 +1485,12 @@ void tms9995_device::pulse_clock(int count)
 }
 
 /*
-    Enter the hold state.
+    Drive the HOLD input. The clocked bus arbitration updates HOLDA.
 */
 void tms9995_device::hold_line(int state)
 {
 	m_hold_requested = (state==ASSERT_LINE);
 	LOGMASKED(LOG_HOLD, "set HOLD = %d\n", state);
-	if (!m_hold_requested)
-	{
-		if (!m_holda_line.isunset()) m_holda_line(CLEAR_LINE);
-	}
 }
 
 /*
@@ -1728,7 +1748,8 @@ void tms9995_device::service_interrupt()
 		m_nmi_serviced = false;
 		m_nmi_samples = m_int1_samples = m_int4_samples = 0;
 		m_hold_requested = false;
-		m_hold_state = false;
+		m_hold_sampled = false;
+		set_hold_state(false);
 		m_mem_phase = 1;
 		m_check_hold = true;
 		m_word_access = false;
@@ -2741,10 +2762,8 @@ void tms9995_device::alu_divide_signed()
 */
 void tms9995_device::alu_external()
 {
-	// Call some possibly attached external device
-	// A specific bit pattern is put on the data bus, and the CRUOUT line is
-	// pulsed. In our case we use a special callback function since we cannot
-	// emulate this behavior in this implementation.
+	// The /WE/CRUCLK strobe presents bits D0-D2 to the external decoder.
+	// The callback reports that three-bit code at the start of the cycle.
 
 	// Opcodes         D012 value
 	// -----------------vvv------
@@ -2754,35 +2773,31 @@ void tms9995_device::alu_external()
 	// CKOF = 0000 0011 1100 0000
 	// LREX = 0000 0011 1110 0000
 
-	// Only IDLE has a visible effect on the CPU without external support: the
-	// CPU will stop execution until an interrupt occurs. CKON, CKOF, LREX have
-	// no effect without external support. Neither has RSET, it does *not*
-	// cause a reset of the CPU or of the remaining computer system.
-	// It only clears the interrupt mask and outputs the
-	// external code on the data bus. A special line decoder could then trigger
-	// a reset from outside.
-
 	if (m_command == IDLE)
 	{
 		m_idle_state = (m_int_pending == 0);
+		m_check_hold = true;   // HOLD may start after this control strobe.
 	}
 
+	if (!m_external_operation.isunset())
+		m_external_operation((IR >> 5) & 0x07, 1, 0xff);
+	pulse_clock(1);
+}
+
+void tms9995_device::alu_rset_mask()
+{
 	if (m_command == RSET)
 	{
 		ST &= 0xfff0;
 		LOGMASKED(LOG_OP, "RSET, new ST = %04x\n", ST);
 	}
-
-	if (!m_external_operation.isunset())
-		m_external_operation((IR >> 5) & 0x07, 1, 0xff);
-	if (m_command == IDLE)
-		pulse_clock(1);
 }
 
 void tms9995_device::alu_idle_poll()
 {
 	if (!check_interrupts())
 		MPC -= 2;  // return to the preceding IDLE strobe
+	m_check_hold = false;  // Complete the two-clock IDLE cycle before yielding the bus.
 	pulse_clock(1);
 }
 
@@ -3060,6 +3075,7 @@ void tms9995_device::mpy_next_word_cycle()
 */
 void tms9995_device::alu_multiply()
 {
+	enum { GET_SOURCE, MULTIPLY, SET_LOW_WORD, MPY_INTERNAL_CLOCK };
 	int n = 0;
 	uint32_t result;
 	int32_t results;
@@ -3068,21 +3084,28 @@ void tms9995_device::alu_multiply()
 	{
 		switch (m_inst_state)
 		{
-		case 0:
+		case GET_SOURCE:
 			// m_current_value <- multiplier (source)
 			m_source_value = m_current_value;
 			// m_address is the second multiplier (in a register)
 			m_address = ((IR >> 5) & 0x001e) + WP;
 			break;
-		case 1:
+		case MULTIPLY:
 			// m_current_value <- register content
 			result = uint32_t(m_source_value) * m_current_value;
 			m_current_value = (result >> 16) & 0xffff;
 			m_value_copy = result & 0xffff;
 			// m_address is still the register
-			n = 17;
-			break;
-		case 2:
+			m_pass = 17;
+			m_inst_state = MPY_INTERNAL_CLOCK;
+			[[fallthrough]];
+		case MPY_INTERNAL_CLOCK:
+			// Each internal MPY clock can pause for HOLD without repeating the product.
+			pulse_clock(1);
+			if (m_pass == 1)
+				m_inst_state = SET_LOW_WORD;
+			return;
+		case SET_LOW_WORD:
 			m_address += 2;
 			m_current_value = m_value_copy;
 			// now write the lower 16 bit.
@@ -3095,14 +3118,14 @@ void tms9995_device::alu_multiply()
 	{
 		switch (m_inst_state)
 		{
-		case 0:
+		case GET_SOURCE:
 			// m_current_value <- multiplier (source)
 			m_source_value = m_current_value;
 			// m_address is the second multiplier (in R0)
 			m_address = WP;
 			n = 1;
 			break;
-		case 1:
+		case MULTIPLY:
 			// m_current_value <- register content
 			results = ((int16_t)m_source_value) * ((int16_t)m_current_value);
 			// MPYS sets the comparison flags from the entire signed product.
@@ -3115,7 +3138,7 @@ void tms9995_device::alu_multiply()
 			// m_address is still the register
 			n = 19;
 			break;
-		case 2:
+		case SET_LOW_WORD:
 			m_address += 2;
 			m_current_value = m_value_copy;
 			// now write the lower 16 bit.

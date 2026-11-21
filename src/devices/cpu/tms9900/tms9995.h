@@ -125,6 +125,7 @@ private:
 	bool    m_nmi_serviced;
 	bool    m_hold_state;
 	bool    m_hold_requested;
+	bool    m_hold_sampled;  // HOLD level sampled on the rising edge of CLKOUT
 
 	// READY handling. The READY line is operated before the clock
 	// pulse falls. As the ready line is only set once in this emulation we
@@ -174,6 +175,7 @@ private:
 
 	bool    m_reset;            // released, vector service pending
 	bool    m_reset_asserted;   // /RESET pin held low
+	uint8_t m_idle_reset_clocks; // remaining clocks to the final IDLE control strobe
 	bool    m_mid_flag;
 	bool    m_mid_active;
 
@@ -197,7 +199,7 @@ private:
 	void    service_interrupt();
 
 	// Issue clock pulses. The TMS9995 uses one (output) clock cycle per machine cycle.
-	inline void pulse_clock(int count);
+	inline void pulse_clock(int count, bool hold_cycle = false);
 
 	// Signal the hold state via the external line
 	void set_hold_state(bool state);
@@ -372,6 +374,7 @@ private:
 	void alu_divide();
 	void alu_divide_signed();
 	void alu_external();
+	void alu_rset_mask();
 	void alu_idle_poll();
 	void alu_f3();
 	void alu_imm_arithm();
