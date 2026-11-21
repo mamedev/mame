@@ -159,6 +159,10 @@ public:
 
 		nozoom = (scalex == 0x40 && scaley == 0x40);
 
+		// the zoom registers are the 4.6 source step per pixel (0 acts as 0.5, as above)
+		u32 stepx = scalex ? (scalex << 10) : 0x200;
+		u32 stepy = scaley ? (scaley << 10) : 0x200;
+
 		flipx = temp4 & 0x1000;
 		flipy = temp4 & 0x2000;
 
@@ -174,6 +178,7 @@ public:
 			int screenwidth = screen().width();
 
 			zoomx = zoomx>>1; // Fix sprite width to HALF size
+			stepx <<= 1;
 			ox = (ox>>1) + 1; // Fix sprite draw position
 
 			if (flipscreenx) ox += screenwidth;
@@ -244,7 +249,7 @@ public:
 				pri,
 				zcode, alpha, drawmode,
 				gx_objzbuf, gx_shdzbuf,
-				0, nullptr);
+				0, 0, 0, nullptr);
 		}
 		else // non-GX
 		{
@@ -285,7 +290,7 @@ public:
 				0,
 				0, 0, 0,
 				nullptr, nullptr,
-				primask,whichtable);
+				stepx, stepy, primask, whichtable);
 		}
 	}
 
@@ -305,6 +310,7 @@ public:
 			int zcode, int alpha, int drawmode,
 			u8* gx_objzbuf, u8* gx_shdzbuf,
 			/* non-gx specifics */
+			u32 stepx, u32 stepy, // 16.16 source step per pixel
 			int primask,
 			u8* whichtable)
 	{
@@ -396,12 +402,12 @@ public:
 					}
 					else
 					{
-						m_gfx->prio_zoom_transtable(bitmap,cliprect,
+						m_gfx->prio_zoom_subpixel_transtable(bitmap,cliprect,
 								tempcode,
 								color,
 								fx,fy,
-								sx,sy,
-								zw << 12,zh << 12,
+								ox << 16,oy << 16,x,y,
+								stepx,stepy,
 								screen().priority(),primask,
 								whichtable);
 					}
@@ -420,12 +426,12 @@ public:
 						}
 						else
 						{
-							m_gfx->prio_zoom_transtable(bitmap,cliprect,
+							m_gfx->prio_zoom_subpixel_transtable(bitmap,cliprect,
 									tempcode,
 									color,
 									fx,!fy,
-									sx,sy,
-									zw << 12,zh << 12,
+									ox << 16,oy << 16,x,y,
+									stepx,stepy,
 									screen().priority(),primask,
 									whichtable);
 						}

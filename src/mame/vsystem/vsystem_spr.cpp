@@ -169,33 +169,37 @@ void vsystem_spr_device::common_sprite_drawgfx(bitmap_ind16 &bitmap, const recta
 	int const yinc = !m_curr_sprite.flipy ? 1 : -1;
 
 	uint32_t const color = m_curr_sprite.color + m_pal_base;
-	uint32_t const zx = m_curr_sprite.zoomx << 11;
-	uint32_t const zy = m_curr_sprite.zoomy << 11;
+	uint32_t const zx = gfx_element::subpixel_zoom_step(m_curr_sprite.zoomx << 11);
+	uint32_t const zy = gfx_element::subpixel_zoom_step(m_curr_sprite.zoomy << 11);
+
+	// 16.16 sprite origin, and the same origin wrapped
+	int32_t const ox = m_curr_sprite.ox << 16;
+	int32_t const oy = m_curr_sprite.oy << 16;
+	int32_t const wx = ox - (0x200 << 16);
+	int32_t const wy = oy - (0x200 << 16);
 
 	for (int ycnt = ystart; ycnt != yend; ycnt += yinc)
 	{
 		int const xstart = !m_curr_sprite.flipx ? 0 : m_curr_sprite.xsize;
 		int const xend = !m_curr_sprite.flipx ? (m_curr_sprite.xsize + 1) : -1;
 		int const xinc = !m_curr_sprite.flipx ? 1 : -1;
-		auto const yoffs = m_curr_sprite.oy + ycnt * m_curr_sprite.zoomy/2;
 
 		for (int xcnt = xstart; xcnt != xend; xcnt += xinc)
 		{
 			uint32_t const startno = m_newtile_cb(m_curr_sprite.map++);
-			auto const xoffs = m_curr_sprite.ox + xcnt * m_curr_sprite.zoomx/2;
 			if (!m_pri_cb.isnull())
 			{
-				sprgfx.prio_zoom_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, xoffs,          yoffs,          zx, zy, priority_bitmap, priority_mask, m_transpen);
-				sprgfx.prio_zoom_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, -0x200 + xoffs, yoffs,          zx, zy, priority_bitmap, priority_mask, m_transpen);
-				sprgfx.prio_zoom_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, xoffs,          -0x200 + yoffs, zx, zy, priority_bitmap, priority_mask, m_transpen);
-				sprgfx.prio_zoom_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, -0x200 + xoffs, -0x200 + yoffs, zx, zy, priority_bitmap, priority_mask, m_transpen);
+				sprgfx.prio_zoom_subpixel_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, ox, oy, xcnt, ycnt, zx, zy, priority_bitmap, priority_mask, m_transpen);
+				sprgfx.prio_zoom_subpixel_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, wx, oy, xcnt, ycnt, zx, zy, priority_bitmap, priority_mask, m_transpen);
+				sprgfx.prio_zoom_subpixel_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, ox, wy, xcnt, ycnt, zx, zy, priority_bitmap, priority_mask, m_transpen);
+				sprgfx.prio_zoom_subpixel_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, wx, wy, xcnt, ycnt, zx, zy, priority_bitmap, priority_mask, m_transpen);
 			}
 			else
 			{
-				sprgfx.zoom_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, xoffs,          yoffs,          zx, zy, m_transpen);
-				sprgfx.zoom_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, -0x200 + xoffs, yoffs,          zx, zy, m_transpen);
-				sprgfx.zoom_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, xoffs,          -0x200 + yoffs, zx, zy, m_transpen);
-				sprgfx.zoom_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, -0x200 + xoffs, -0x200 + yoffs, zx, zy, m_transpen);
+				sprgfx.zoom_subpixel_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, ox, oy, xcnt, ycnt, zx, zy, m_transpen);
+				sprgfx.zoom_subpixel_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, wx, oy, xcnt, ycnt, zx, zy, m_transpen);
+				sprgfx.zoom_subpixel_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, ox, wy, xcnt, ycnt, zx, zy, m_transpen);
+				sprgfx.zoom_subpixel_transpen(bitmap,cliprect, startno, color, m_curr_sprite.flipx, m_curr_sprite.flipy, wx, wy, xcnt, ycnt, zx, zy, m_transpen);
 			}
 		}
 	}

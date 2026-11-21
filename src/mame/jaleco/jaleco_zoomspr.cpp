@@ -168,13 +168,8 @@ void jaleco_zoomspr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 		sy -= (ydim * ynum);
 
 		u32 code = source[6];
-		int xscale = xdim >> 4;
-		int yscale = ydim >> 4;
-
-		/* let's approximate to the nearest greater integer value
-		   to avoid holes in between tiles */
-		if (xscale & 0xffff)    xscale += (1 << 16) >> 4;
-		if (yscale & 0xffff)    yscale += (1 << 16) >> 4;
+		const u32 xstep = gfx_element::subpixel_zoom_step(xdim >> 4);
+		const u32 ystep = gfx_element::subpixel_zoom_step(ydim >> 4);
 
 		int xstart, xend, xinc;
 		if (flipx)  { xstart = xnum - 1;  xend = -1;    xinc = -1; }
@@ -190,11 +185,11 @@ void jaleco_zoomspr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &
 		{
 			for (int x = xstart; x != xend; x += xinc)
 			{
-				gfx(0)->zoom_transtable(bitmap, cliprect,
+				gfx(0)->zoom_subpixel_transtable(bitmap, cliprect,
 						code++, color,
 						flipx, flipy,
-						(sx + x * xdim) >> 16, (sy + y * ydim) >> 16,
-						xscale, yscale, m_drawmode_table);
+						sx, sy, x, y,
+						xstep, ystep, m_drawmode_table);
 			}
 		}
 	}   /* end sprite loop */
@@ -294,13 +289,8 @@ void jaleco_zoomspr_bigrun_device::draw_sprites(bitmap_ind16 &bitmap, const rect
 //      sy -= (ydim * ynum);
 
 		u32 code = source[6];
-		int xscale = xdim >> 4;
-		int yscale = ydim >> 4;
-
-		/* let's approximate to the nearest greater integer value
-		   to avoid holes in between tiles */
-		if (xscale & 0xffff)    xscale += (1 << 16) >> 4;
-		if (yscale & 0xffff)    yscale += (1 << 16) >> 4;
+		const u32 xstep = gfx_element::subpixel_zoom_step(xdim >> 4);
+		const u32 ystep = gfx_element::subpixel_zoom_step(ydim >> 4);
 
 		int xstart, xend, xinc;
 		if (flipx)  { xstart = xnum - 1;  xend = -1;    xinc = -1; }
@@ -316,11 +306,11 @@ void jaleco_zoomspr_bigrun_device::draw_sprites(bitmap_ind16 &bitmap, const rect
 		{
 			for (int x = xstart; x != xend; x += xinc)
 			{
-				gfx(0)->zoom_transtable(bitmap, cliprect,
+				gfx(0)->zoom_subpixel_transtable(bitmap, cliprect,
 						code++, color,
 						flipx, flipy,
-						(sx + x * xdim) >> 16, (sy + y * ydim) >> 16,
-						xscale, yscale, m_drawmode_table);
+						sx, sy, x, y,
+						xstep, ystep, m_drawmode_table);
 			}
 		}
 	}   /* end sprite loop */

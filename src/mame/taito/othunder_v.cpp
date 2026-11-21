@@ -67,7 +67,6 @@ spriteram is being tested, take no notice of that.]
 void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const u32 *primasks, int y_offs)
 {
 	const u32 tile_mask = (m_gfxdecode->gfx(0)->elements()) - 1;
-	int sprites_flipscreen = 0;
 
 	/* pdrawgfx() needs us to draw sprites front to back, so we have to build a list
 	   while processing sprite ram and then draw them all at the end */
@@ -126,32 +125,17 @@ void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 				continue;
 			}
 
-			int curx = x + ((k * zoomx) / 4);
-			int cury = y + ((j * zoomy) / 8);
-
-			const int zx = x + (((k + 1) * zoomx) / 4) - curx;
-			const int zy = y + (((j + 1) * zoomy) / 8) - cury;
-
-			if (sprites_flipscreen)
-			{
-				/* -zx/y is there to fix zoomed sprite coords in screenflip.
-				   drawgfxzoom does not know to draw from flip-side of sprites when
-				   screen is flipped; so we must correct the coords ourselves. */
-
-				curx = 320 - curx - zx;
-				cury = 256 - cury - zy;
-				flipx = !flipx;
-				flipy = !flipy;
-			}
-
+			// zoomx/zoomy are the sprite's width/height in pixels (64 is 1:1)
 			sprite_ptr->code = code;
 			sprite_ptr->color = color;
 			sprite_ptr->flipx = flipx;
 			sprite_ptr->flipy = flipy;
-			sprite_ptr->x = curx;
-			sprite_ptr->y = cury;
-			sprite_ptr->zoomx = zx << 12;
-			sprite_ptr->zoomy = zy << 13;
+			sprite_ptr->x = x << 16;
+			sprite_ptr->y = y << 16;
+			sprite_ptr->tilex = k;
+			sprite_ptr->tiley = j;
+			sprite_ptr->stepx = gfx_element::subpixel_zoom_step(zoomx << 10);
+			sprite_ptr->stepy = gfx_element::subpixel_zoom_step(zoomy << 10);
 
 			if (primasks)
 			{
@@ -160,12 +144,13 @@ void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 			}
 			else
 			{
-				m_gfxdecode->gfx(0)->zoom_transpen(bitmap,cliprect,
+				m_gfxdecode->gfx(0)->zoom_subpixel_transpen(bitmap,cliprect,
 						sprite_ptr->code,
 						sprite_ptr->color,
 						sprite_ptr->flipx,sprite_ptr->flipy,
 						sprite_ptr->x,sprite_ptr->y,
-						sprite_ptr->zoomx,sprite_ptr->zoomy,0);
+						sprite_ptr->tilex,sprite_ptr->tiley,
+						sprite_ptr->stepx,sprite_ptr->stepy,0);
 			}
 		}
 
@@ -178,12 +163,13 @@ void othunder_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	{
 		sprite_ptr--;
 
-		m_gfxdecode->gfx(0)->prio_zoom_transpen(bitmap,cliprect,
+		m_gfxdecode->gfx(0)->prio_zoom_subpixel_transpen(bitmap,cliprect,
 				sprite_ptr->code,
 				sprite_ptr->color,
 				sprite_ptr->flipx,sprite_ptr->flipy,
 				sprite_ptr->x,sprite_ptr->y,
-				sprite_ptr->zoomx,sprite_ptr->zoomy,
+				sprite_ptr->tilex,sprite_ptr->tiley,
+				sprite_ptr->stepx,sprite_ptr->stepy,
 				screen.priority(),sprite_ptr->primask,0);
 	}
 }
