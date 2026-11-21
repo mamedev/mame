@@ -189,7 +189,6 @@ private:
 	void palette_init(palette_device &palette) const;
 
 	void prg_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
 
 	uint8_t port_a_r();
 	uint8_t port_b_r();
@@ -608,11 +607,6 @@ void replicator_state::prg_map(address_map &map)
 	map(0x00000, 0x1ffff).rom();
 }
 
-void replicator_state::data_map(address_map &map)
-{
-	map(0x0200, 0x21ff).ram();  /* ATMEGA1280 Internal SRAM */
-}
-
 /****************************************************\
 * Input ports                                        *
 \****************************************************/
@@ -688,7 +682,6 @@ void replicator_state::replicator(machine_config &config)
 {
 	ATMEGA1280(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &replicator_state::prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &replicator_state::data_map);
 
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->set_low_fuses(0xff);

@@ -45,7 +45,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 	void prg_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
 
 	void port_b_w(uint8_t data);
 	void port_c_w(uint8_t data);
@@ -111,11 +110,6 @@ void lft_craft_state::port_d_w(uint8_t data)
 void lft_craft_state::prg_map(address_map &map)
 {
 	map(0x0000, 0x1fff).rom();
-}
-
-void lft_craft_state::data_map(address_map &map)
-{
-	map(0x0100, 0x04ff).ram();
 }
 
 //**************************************************************************
@@ -202,7 +196,6 @@ void lft_craft_state::craft(machine_config &config)
 {
 	ATMEGA88(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lft_craft_state::prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &lft_craft_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->gpio_in<atmega88_device::GPIOB>().set([this]() { return m_gpio_b; });
 	m_maincpu->gpio_in<atmega88_device::GPIOC>().set([this]() { return m_gpio_c; });

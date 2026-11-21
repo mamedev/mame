@@ -59,7 +59,6 @@ void sd2iec_device::device_add_mconfig(machine_config &config)
 {
 	ATMEGA1284(config, m_maincpu, XTAL(8'000'000));
 	m_maincpu->set_addrmap(AS_PROGRAM, &sd2iec_device::main_map);
-	m_maincpu->set_addrmap(AS_DATA, &sd2iec_device::data_map);
 	m_maincpu->set_eeprom_tag(EEPROM_TAG);
 	m_maincpu->gpio_in<atmega1284_device::GPIOA>().set(FUNC(sd2iec_device::pa_r));
 	m_maincpu->gpio_out<atmega1284_device::GPIOA>().set(FUNC(sd2iec_device::pa_w));
@@ -107,11 +106,6 @@ void sd2iec_device::cbm_iec_reset(int state)
 void sd2iec_device::main_map(address_map &map)
 {
 	map(0x00000, 0x1efff).rom();
-}
-
-void sd2iec_device::data_map(address_map &map)
-{
-	map(0x0100, 0x40ff).ram();
 }
 
 uint8_t sd2iec_device::pa_r()
