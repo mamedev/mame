@@ -3035,6 +3035,26 @@ void sh4_base_device::sh4_utlb_address_array_w(offs_t offset, uint64_t data)
 	}
 }
 
+// Operand cache RAM, H'7C00 0000 to H'7FFF FFFF (reached here after the 29-bit address mask).
+// Each RAM area is 4 KB; CCR.OIX picks the address bit that selects area 1 or 2:
+// bit 13 when OIX = 0, bit 25 when OIX = 1. Address bit 12 is ignored either way.
+offs_t sh4_base_device::ocram_index(offs_t offset) const
+{
+	// offset counts quadwords from H'1C00 0000, so address bit n is offset bit n - 3
+	int const area = BIT(m_ccr, 7) ? BIT(offset, 22) : BIT(offset, 10);
+	return (area << 9) | (offset & 0x1ff);
+}
+
+uint64_t sh4_base_device::ocram_r(offs_t offset)
+{
+	return m_ocram[ocram_index(offset)];
+}
+
+void sh4_base_device::ocram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+{
+	COMBINE_DATA(&m_ocram[ocram_index(offset)]);
+}
+
 uint64_t sh4_base_device::sh4_utlb_address_array_r(offs_t offset)
 {
 	// associative bit is ignored for reads
