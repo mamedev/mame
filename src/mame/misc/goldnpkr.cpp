@@ -6924,7 +6924,7 @@ void goldnpkr_state::goldpnew(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SN76489A(config, m_snsnd, 20_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
+//	SN76489A(config, m_snsnd, 20_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void goldnpkr_state::unkicpf40(machine_config &config)
@@ -17211,11 +17211,18 @@ void goldnpkr_state::init_jokerush()
 
 void goldnpkr_state::init_gldpnw()
 {
-	// Program ROM address lines are dynamically scrambled/banked through
-	// the KD003 GAL and mainboard CPLD ("DZ"). Needs logic analyzer traces
-	// or PLD dump to implement decryption.
-}
+	uint8_t *const rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(rom, rom + 0x8000);
 
+	for (offs_t i = 0; i < 0x8000; i++)
+	{
+		// KD003 / CHK00126 daughterboard lower address line descramble (A0-A7 bit-reversed)
+		offs_t addr = bitswap<15>(i, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
+		uint8_t val = buffer[addr];
+
+		rom[i] = val;
+	}
+}
 
 
 } // anonymous namespace
