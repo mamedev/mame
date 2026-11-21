@@ -1410,8 +1410,11 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 			min_delta = 0;
 			max_delta = 0;
 
-			// Try to go back 16 flux changes from the end of the track, or at most at the start
-			int flux_to_step = 16;
+			// Try to go back 256 flux changes from the end of the track, or at most at the start.
+			// The PLL starts at the nominal cell size, and data written by an emulated controller
+			// can be a few percent off it; 16 changes was not enough to lock before the index,
+			// which corrupted any sector written across it.
+			int flux_to_step = 256;
 			cur_entry = tbuf.size()-1;
 			while(cur_entry > 0 && flux_to_step) {
 				if((tbuf[cur_entry] & floppy_image::MG_MASK) == floppy_image::MG_F)
