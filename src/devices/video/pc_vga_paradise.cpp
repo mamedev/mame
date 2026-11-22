@@ -656,7 +656,6 @@ void wd90c11a_vga_device::sequencer_data_w(offs_t offset, u8 data)
 	const u8 seq_index = vga.sequencer.index & (m_ext_seq_unlock ? 0xff : 0x07);
 	vga.sequencer.data[seq_index] = data;
 	space(SEQ_REG).write_byte(seq_index, data);
-	recompute_params();
 }
 
 /*

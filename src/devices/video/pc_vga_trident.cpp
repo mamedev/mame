@@ -951,6 +951,7 @@ void trident_vga_device::port_43c6_w(offs_t offset, uint8_t data)
 		{
 			tri.vid_clock = (tri.vid_clock & 0xff00) | (data);
 			LOG("Trident: Video clock write %04x\n",tri.vid_clock);
+			recompute_params();
 		}
 		break;
 	case 5:
@@ -958,6 +959,7 @@ void trident_vga_device::port_43c6_w(offs_t offset, uint8_t data)
 		{
 			tri.vid_clock = (tri.vid_clock & 0x00ff) | (data << 8);
 			LOG("Trident: Video clock write %04x\n",tri.vid_clock);
+			recompute_params();
 		}
 		break;
 	}

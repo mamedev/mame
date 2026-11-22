@@ -502,7 +502,6 @@ void vga_device::sequencer_data_w(offs_t offset, u8 data)
 	// TODO: temporary cheat for read-back
 	vga.sequencer.data[vga.sequencer.index] = data;
 	space(SEQ_REG).write_byte(vga.sequencer.index, data);
-	recompute_params();
 }
 
 u8 vga_device::ramdac_mask_r(offs_t offset)
@@ -1134,6 +1133,7 @@ void vga_device::sequencer_map(address_map &map)
 	map(0x01, 0x01).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			vga.sequencer.data[1] = data;
+			recompute_params();
 		})
 	);
 	map(0x02, 0x02).lw8(
@@ -1566,9 +1566,9 @@ void vga_device::palette_update()
 	{
 		set_pen_color(
 			i,
-			pal6bit(vga.dac.color[3*(i & vga.dac.mask) + 0] & 0x3f),
-			pal6bit(vga.dac.color[3*(i & vga.dac.mask) + 1] & 0x3f),
-			pal6bit(vga.dac.color[3*(i & vga.dac.mask) + 2] & 0x3f)
+			pal6bit(vga.dac.color[3 * (i & vga.dac.mask) + 0] & 0x3f),
+			pal6bit(vga.dac.color[3 * (i & vga.dac.mask) + 1] & 0x3f),
+			pal6bit(vga.dac.color[3 * (i & vga.dac.mask) + 2] & 0x3f)
 		);
 	}
 }
@@ -1676,6 +1676,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 
 	attotime refresh  = attotime::from_ticks(hblank_period * vblank_period, pixel_clock);
 	screen().configure((hblank_period), (vblank_period), visarea, refresh );
+
 	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
 
@@ -1700,6 +1701,7 @@ uint8_t vga_device::vga_vblank()
 	vpos = screen().vpos();
 
 	/* check if we are under vblank period */
+	// TODO: should be + 2 already, probably bad on interlace
 	if(vblank_end > vga.crtc.vert_total)
 	{
 		vblank_end -= vga.crtc.vert_total;

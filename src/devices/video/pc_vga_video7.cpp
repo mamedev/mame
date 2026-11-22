@@ -79,6 +79,7 @@ void ht208_video7_vga_device::sequencer_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			LOG("ERA4: Clock Select %02x\n", data);
 			m_ext_clock_select = data;
+			recompute_params();
 		})
 	);
 	map(0xb0, 0xbf).lrw8(
