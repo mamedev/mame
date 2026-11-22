@@ -874,7 +874,7 @@ u8 tek440x_state::videocntl_r()
 		ans |= 0x20;
 	else
 		// VAD.04 from reading out 16-bit values
-		ans |= (m_screen->hpos() & (0x10*16) )? 0x10 : 0x00;
+		ans |= ((m_screen->hpos()/16) & 0x10)? 0x10 : 0x00;
 
 	if (m_screen->hblank())
 		ans |= 0x40;
