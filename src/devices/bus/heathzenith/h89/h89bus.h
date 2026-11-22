@@ -236,8 +236,17 @@ public:
 	// the line; the bus asks while it builds the memory map at machine start
 	virtual u8 *mem_select_bank(u8 select_line) ATTR_COLD;
 
+	// a 4K system ROM on the card that can stand in for the one on the CPU board (U518),
+	// or nullptr; the bus asks while it builds the memory map at machine start, and only
+	// the first card that has one gets it
+	virtual u8 *sys_rom() ATTR_COLD;
+
 protected:
 	device_h89bus_left_card_interface(const machine_config &mconfig, device_t &device);
+
+	// read the system ROM from the card (true) or from the CPU board (false); the memory map
+	// is built at machine start, so call from device_reset or later
+	void select_card_sys_rom(bool state);
 };
 
 class device_h89bus_right_card_interface : public device_h89bus_card_interface
@@ -595,7 +604,8 @@ public:
 	// memory decoder PROMs; call from machine_start
 	// - ram: RAM banks in 16K steps (RAS0 - RAS2, then RD6 for a 64K board, which has the
 	//   16K expansion piggybacked on it); cards in the left slots can also answer RD6/RD7
-	// - rom: the lower 8K, with the system ROM at 0x0000 and the floppy ROM at 0x1800
+	// - rom: the lower 8K, with the system ROM at 0x0000 and the floppy ROM at 0x1800; a
+	//   card in a left slot can put its own system ROM in place of the CPU board's
 	// - floppy_ram: the 1K floppy RAM
 	void install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *floppy_ram) ATTR_COLD;
 
@@ -623,6 +633,7 @@ protected:
 	void set_int5_line(int state);
 	void set_fmwe_line(int state);
 	void set_wait_line(int state);
+	void select_card_sys_rom(device_h89bus_left_card_interface &card, bool state);
 
 	// internal state
 	required_address_space m_program_space, m_io_space;
@@ -648,12 +659,21 @@ private:
 	u8 *m_rom;
 	u8 *m_floppy_ram;
 
+	// system ROM, entry 0 is the CPU board's and entry 1 the card's
+	memory_bank_creator m_sys_rom_bank;
+	device_h89bus_left_card_interface *m_sys_rom_card;
+
 	u8 m_gpp;
 	std::vector<std::pair<u8, write8smo_delegate>> m_gpp_handlers;
 
 	std::vector<std::reference_wrapper<device_h89bus_left_card_interface>> m_left_device_list;
 	std::vector<std::reference_wrapper<device_h89bus_right_card_interface>> m_right_device_list;
 };
+
+inline void device_h89bus_left_card_interface::select_card_sys_rom(bool state)
+{
+	h89bus().select_card_sys_rom(*this, state);
+}
 
 inline void device_h89bus_right_card_interface::set_slot_int3(int state)
 {

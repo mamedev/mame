@@ -53,6 +53,7 @@
 #include "bus/heathzenith/h89/h_88_5.h"
 #include "bus/heathzenith/h89/h17_fdc.h"
 #include "bus/heathzenith/h89/mms77316_fdc.h"
+#include "bus/heathzenith/h89/mt_win89.h"
 #include "bus/heathzenith/h89/sigmasoft_parallel_port.h"
 #include "bus/heathzenith/h89/sigmasoft_sound.h"
 #include "bus/heathzenith/h89/we_pullup.h"
@@ -775,6 +776,7 @@ static void intr_ctrl_options(device_slot_interface &device)
 
 void h89_base_state::h89_left_cards(device_slot_interface &device)
 {
+	device.option_add("mt_win89",        H89BUS_MT_WIN89);
 	device.option_add("ss_parallel",     H89BUS_SIGMASOFT_PARALLEL);
 	device.option_add("ss_parallel_igc", H89BUS_SIGMASOFT_PARALLEL_IGC).machine_config(
 		[this](device_t *device)

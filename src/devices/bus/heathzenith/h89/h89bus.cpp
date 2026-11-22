@@ -596,7 +596,9 @@ h89bus_device::h89bus_device(const machine_config &mconfig, device_type type, co
 	m_ram(nullptr),
 	m_ram_size(0),
 	m_rom(nullptr),
-	m_floppy_ram(nullptr)
+	m_floppy_ram(nullptr),
+	m_sys_rom_bank(*this, "sys_rom"),
+	m_sys_rom_card(nullptr)
 {
 }
 
@@ -713,6 +715,27 @@ void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *flopp
 	m_rom = rom;
 	m_floppy_ram = floppy_ram;
 
+	// the system ROM comes from the CPU board, or from the first card in a left slot that has one
+	m_sys_rom_bank->configure_entry(0, m_rom);
+
+	for (device_h89bus_left_card_interface &card : m_left_device_list)
+	{
+		u8 *const card_rom = card.sys_rom();
+
+		if (!card_rom)
+			continue;
+
+		if (m_sys_rom_card)
+		{
+			osd_printf_warning("%s: %s and %s both have a system ROM, only %s can select its ROM\n",
+					tag(), m_sys_rom_card->device().tag(), card.device().tag(), m_sys_rom_card->device().tag());
+			continue;
+		}
+
+		m_sys_rom_card = &card;
+		m_sys_rom_bank->configure_entry(1, card_rom);
+	}
+
 	// warn when more than one device answers a left slot select line
 	bool rd6_card = false;
 
@@ -824,6 +847,9 @@ void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry
 	std::array<u8 *, PAGES> read_src{};
 	std::array<std::vector<u8 *>, PAGES> write_dst;
 
+	// pages read from the system ROM, through the bank so a card can put its own ROM there
+	std::array<bool, PAGES> sys_rom{};
+
 	for (int write = 0; write < 2; write++)
 	{
 		for (u32 block = 0; block < 8; block++)
@@ -887,7 +913,12 @@ void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry
 					else
 					{
 						// the option ROM and option RAM sockets are not populated
-						if (sec & (h89bus::MEM_SEC_SYS_ROM | h89bus::MEM_SEC_FPY_ROM))
+						if (sec & h89bus::MEM_SEC_SYS_ROM)
+						{
+							add(m_rom + (addr & 0x1fff));
+							sys_rom[page] = (read_src[page] == (m_rom + (addr & 0x1fff)));
+						}
+						if (sec & h89bus::MEM_SEC_FPY_ROM)
 							add(m_rom + (addr & 0x1fff));
 						if (sec & h89bus::MEM_SEC_FPY_RAM)
 							add(m_floppy_ram + (addr & 0x3ff));
@@ -918,8 +949,32 @@ void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry
 	};
 
 	install_runs(
-			[&read_src] (u32 page) { return read_src[page]; },
+			[&read_src, &sys_rom] (u32 page) { return sys_rom[page] ? nullptr : read_src[page]; },
 			[&entry] (offs_t start, offs_t end, u8 *base) { entry.install_rom(start, end, base); });
+
+	// the bank is indexed from the start of the range it is installed in, and the bank entries
+	// start at address 0x0000, where every U516 PROM puts the system ROM; a card's ROM is 4K
+	install_runs(
+			[&read_src, &sys_rom] (u32 page) { return sys_rom[page] ? read_src[page] : nullptr; },
+			[this, &entry] (offs_t start, offs_t end, u8 *base)
+			{
+				if (start != 0x0000)
+				{
+					logerror("memory decoder selects the system ROM at 0x%04x, not 0x0000; a card can't replace it there\n", start);
+					entry.install_rom(start, end, base);
+					return;
+				}
+
+				offs_t const bank_end = std::min<offs_t>(end, 0x0fff);
+
+				entry.install_read_bank(start, bank_end, m_sys_rom_bank);
+
+				if (end > bank_end)
+				{
+					logerror("memory decoder selects the system ROM up to 0x%04x; a card can only replace 0x0000-0x0fff\n", end);
+					entry.install_rom(bank_end + 1, end, base + (bank_end + 1));
+				}
+			});
 
 	install_runs(
 			[&write_dst] (u32 page) { return (write_dst[page].size() == 1) ? write_dst[page][0] : nullptr; },
@@ -967,6 +1022,13 @@ void h89bus_device::update_mem_view()
 {
 	if (m_mem_installed)
 		m_mem_view.select(((m_gpp & h89bus::GPP_MEM1) ? 2 : 0) | (m_fmwe ? 1 : 0));
+}
+
+void h89bus_device::select_card_sys_rom(device_h89bus_left_card_interface &card, bool state)
+{
+	// only the card that got the bank can select it, see install_mem_map
+	if (m_mem_installed && (&card == m_sys_rom_card))
+		m_sys_rom_bank->set_entry(state ? 1 : 0);
 }
 
 void h89bus_device::set_int3_line(int state)
@@ -1047,6 +1109,11 @@ device_h89bus_left_card_interface::~device_h89bus_left_card_interface()
 }
 
 u8 *device_h89bus_left_card_interface::mem_select_bank(u8 select_line)
+{
+	return nullptr;
+}
+
+u8 *device_h89bus_left_card_interface::sys_rom()
 {
 	return nullptr;
 }
