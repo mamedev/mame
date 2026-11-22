@@ -1394,7 +1394,6 @@ void duart_channel::device_reset()
 	set_data_frame(0, 5, PARITY_EVEN, STOP_BITS_1);
 
 	tx_baud_rate = rx_baud_rate = 0;
-	CSR = 0;
 	m_tx_break = false;
 }
 
