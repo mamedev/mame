@@ -1124,7 +1124,18 @@ void vga_device::sequencer_map(address_map &map)
 		})
 	);
 //  map(0x00, 0x00) Reset Register
-//  map(0x01, 0x01) Clocking Mode Register
+
+	// $01 Clocking Mode
+	// --x- ---- SD Screen Disable
+	// ---x ---- S4 Shift Four Enable
+	// ---- x--- DCR Dot Clock Rate
+	// ---- -x-- SLR Shift/Load Rate
+	// ---- ---x 9/8DM 9/8 Dot Mode (0 = 9 dots per character, 1 = 8 dots per character)
+	map(0x01, 0x01).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			vga.sequencer.data[1] = data;
+		})
+	);
 	map(0x02, 0x02).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			vga.sequencer.map_mask = data & 0xf;
@@ -1565,56 +1576,55 @@ void vga_device::palette_update()
 
 uint8_t vga_device::pc_vga_choosevideomode()
 {
-	if (vga.crtc.sync_en)
+	if (!vga.crtc.sync_en || BIT(vga.sequencer.data[1], 5))
+		return SCREEN_OFF;
+
+	// TODO: this is the wrong place to
+	if (vga.dac.dirty)
 	{
-		if (vga.dac.dirty)
-		{
-			palette_update();
-			vga.dac.dirty = 0;
-		}
+		palette_update();
+		vga.dac.dirty = 0;
+	}
 
-		// TODO: Mode Control bit 6 unused, also cache and cleanup
-		if (vga.attribute.data[0x10] & 0x80)
+	// TODO: Mode Control bit 6 unused, also cache and cleanup
+	if (vga.attribute.data[0x10] & 0x80)
+	{
+		for (int i=0; i<16;i++)
 		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
-											|((vga.attribute.data[0x14]&0xf)<<4));
-			}
+			vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
+										|((vga.attribute.data[0x14]&0xf)<<4));
 		}
-		else
+	}
+	else
+	{
+		for (int i=0; i<16;i++)
 		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
-											|((vga.attribute.data[0x14]&0xc)<<4));
-			}
-		}
-
-		// !GRAPHIC_MODE
-		if (!vga.gc.alpha_dis)
-		{
-			return TEXT_MODE;
-		}
-		else if (vga.gc.shift256)
-		{
-			return VGA_MODE;
-		}
-		else if (vga.gc.shift_reg)
-		{
-			return CGA_MODE;
-		}
-		else if (vga.gc.memory_map_sel == 0x03)
-		{
-			return MONO_MODE;
-		}
-		else
-		{
-			return EGA_MODE;
+			vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
+										|((vga.attribute.data[0x14]&0xc)<<4));
 		}
 	}
 
-	return SCREEN_OFF;
+	// !GRAPHIC_MODE
+	if (!vga.gc.alpha_dis)
+	{
+		return TEXT_MODE;
+	}
+	else if (vga.gc.shift256)
+	{
+		return VGA_MODE;
+	}
+	else if (vga.gc.shift_reg)
+	{
+		return CGA_MODE;
+	}
+	else if (vga.gc.memory_map_sel == 0x03)
+	{
+		return MONO_MODE;
+	}
+	else
+	{
+		return EGA_MODE;
+	}
 }
 
 uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1662,7 +1672,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 	hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
 
 	// TODO: improve/complete clocking modes
-	pixel_clock = xtal / (((vga.sequencer.data[1]&8) >> 3) + 1);
+	pixel_clock = xtal >> BIT(vga.sequencer.data[1], 3);
 
 	attotime refresh  = attotime::from_ticks(hblank_period * vblank_period, pixel_clock);
 	screen().configure((hblank_period), (vblank_period), visarea, refresh );
@@ -2161,74 +2171,72 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 // TODO: inherit from base class
 uint8_t svga_device::pc_vga_choosevideomode()
 {
-	if (vga.crtc.sync_en)
+	if (!vga.crtc.sync_en || BIT(vga.sequencer.data[1], 5))
+		return SCREEN_OFF;
+
+	if (vga.dac.dirty)
 	{
-		if (vga.dac.dirty)
-		{
-			palette_update();
-			vga.dac.dirty = 0;
-		}
+		palette_update();
+		vga.dac.dirty = 0;
+	}
 
-		if (vga.attribute.data[0x10] & 0x80)
+	if (vga.attribute.data[0x10] & 0x80)
+	{
+		for (int i=0; i<16;i++)
 		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
-											|((vga.attribute.data[0x14]&0xf)<<4));
-			}
+			vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
+										|((vga.attribute.data[0x14]&0xf)<<4));
 		}
-		else
+	}
+	else
+	{
+		for (int i=0; i<16;i++)
 		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
-											|((vga.attribute.data[0x14]&0xc)<<4));
-			}
-		}
-
-		if (svga.rgb32_en)
-		{
-			return RGB32_MODE;
-		}
-		else if (svga.rgb24_en)
-		{
-			return RGB24_MODE;
-		}
-		else if (svga.rgb16_en)
-		{
-			return RGB16_MODE;
-		}
-		else if (svga.rgb15_en)
-		{
-			return RGB15_MODE;
-		}
-		else if (svga.rgb8_en)
-		{
-			return RGB8_MODE;
-		}
-		else if (!vga.gc.alpha_dis) // !GRAPHIC_MODE
-		{
-			return TEXT_MODE;
-		}
-		else if (vga.gc.shift256)
-		{
-			return VGA_MODE;
-		}
-		else if (vga.gc.shift_reg)
-		{
-			return CGA_MODE;
-		}
-		else if (vga.gc.memory_map_sel == 0x03)
-		{
-			return MONO_MODE;
-		}
-		else
-		{
-			return EGA_MODE;
+			vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
+										|((vga.attribute.data[0x14]&0xc)<<4));
 		}
 	}
 
-	return SCREEN_OFF;
+	if (svga.rgb32_en)
+	{
+		return RGB32_MODE;
+	}
+	else if (svga.rgb24_en)
+	{
+		return RGB24_MODE;
+	}
+	else if (svga.rgb16_en)
+	{
+		return RGB16_MODE;
+	}
+	else if (svga.rgb15_en)
+	{
+		return RGB15_MODE;
+	}
+	else if (svga.rgb8_en)
+	{
+		return RGB8_MODE;
+	}
+	else if (!vga.gc.alpha_dis) // !GRAPHIC_MODE
+	{
+		return TEXT_MODE;
+	}
+	else if (vga.gc.shift256)
+	{
+		return VGA_MODE;
+	}
+	else if (vga.gc.shift_reg)
+	{
+		return CGA_MODE;
+	}
+	else if (vga.gc.memory_map_sel == 0x03)
+	{
+		return MONO_MODE;
+	}
+	else
+	{
+		return EGA_MODE;
+	}
 }
 
 uint8_t svga_device::get_video_depth()
