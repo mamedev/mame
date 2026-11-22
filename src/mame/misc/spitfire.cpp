@@ -1,7 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 /*
- * Spitfire (Wizard Kings / Innovative Coin Corporation, 1976)
+ * Spitfire (Innovative Coin Corporation, 1976)
+ *
+ * The sales flyers identify Innovative Coin Corporation, 1755 Comstock
+ * Street, Santa Clara, California. They do not use the Wizard Kings name.
  *
  * Program PROM outputs are inverted. The F8 uses a 3853-compatible SMI
  * with its interrupt registers at I/O 0c-0f. Coin insertion interrupts the
@@ -9,7 +12,7 @@
  *
  * Display RAM contains object position strobes, not pixels: four vertical
  * channels at 7000 and four horizontal channels at 8000. Aircraft graphics
- * are selected by C000/D000; the other two channels are bullets.
+ * are selected by c000/d000; the other two channels are bullets.
  *
  * The tower is physical screen-overlay artwork, not generated video. Its
  * collision tests are in the program ROM. The internal layout redraws the
@@ -22,13 +25,19 @@
  */
 
 #include "emu.h"
+
+#include "nl_spitfire.h"
+
 #include "cpu/f8/f8.h"
 #include "machine/f3853.h"
 #include "machine/netlist.h"
-#include "nl_spitfire.h"
+
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include <algorithm>
+#include <iterator>
 
 #include "spitfire.lh"
 
@@ -84,7 +93,7 @@ private:
 	void y_w(offs_t offset, u8 data);
 	void x_w(offs_t offset, u8 data);
 	void clear_w(offs_t offset, u8 data);
-	template <unsigned N> void sprite_w(u8 data);
+	template <u32 N> void sprite_w(u8 data);
 	void game_off_w(u8 data);
 	void game_on_w(u8 data);
 	void sound_w(u8 data);
@@ -135,7 +144,8 @@ void spitfire_state::clear_w(offs_t offset, u8 data)
 	m_x_ram[offset] = data >> 4;
 }
 
-template <unsigned N> void spitfire_state::sprite_w(u8 data)
+template <u32 N>
+void spitfire_state::sprite_w(u8 data)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_sprite[N] = data & 0x1f;
@@ -172,7 +182,7 @@ void spitfire_state::sound_w(u8 data)
 	m_sound_fall->write_line(m_game_on && BIT(data, 1));
 	if (m_game_on)
 	{
-		for (unsigned i = 0; i < 2; ++i)
+		for (u32 i = 0; i < 2; ++i)
 		{
 			if (BIT(data, i ? 3 : 0))
 			{
@@ -198,7 +208,7 @@ void spitfire_state::sound_enable_w(int state)
 	m_sound_enable->write_line(state);
 	m_sound_engine->write_line(0);
 	m_sound_fall->write_line(0);
-	for (unsigned i = 0; i < 2; ++i)
+	for (u32 i = 0; i < 2; ++i)
 	{
 		m_sound_trigger[i]->write_line(0);
 		m_sound_pulse_timer[i]->adjust(attotime::never);
@@ -211,7 +221,7 @@ uint32_t spitfire_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// RAM bits are active-low start strobes. A plane's counters run for
 	// sixteen pixels/lines after its strobe. Bullets use the RAM bits directly.
-	for (int object = 0; object < 4; object++)
+	for (int object = 0; object < 2; object++)
 	{
 		for (int y = 0; y < 256; y++)
 		{
@@ -221,13 +231,26 @@ uint32_t spitfire_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 			{
 				if (BIT(m_x_ram[x], object))
 					continue;
-				if (object >= 2)
-				{
-					if (cliprect.contains(x, y))
-						bitmap.pix(y, x) = 1;
-					continue;
-				}
 				m_gfxdecode->gfx(0)->transpen(bitmap, cliprect, m_sprite[object], 0, 0, 0, x, y, 0);
+			}
+		}
+	}
+
+	const int left = std::max(0, cliprect.left());
+	const int right = std::min(511, cliprect.right());
+	const int top = std::max(0, cliprect.top());
+	const int bottom = std::min(255, cliprect.bottom());
+	for (int object = 2; object < 4; object++)
+	{
+		for (int y = top; y <= bottom; y++)
+		{
+			if (BIT(m_y_ram[y], object))
+				continue;
+			u16 *const dest = &bitmap.pix(y);
+			for (int x = left; x <= right; x++)
+			{
+				if (!BIT(m_x_ram[x], object))
+					dest[x] = 1;
 			}
 		}
 	}
@@ -381,5 +404,5 @@ ROM_END
 
 } // anonymous namespace
 
-GAMEL( 1976, spitfire,  0,        spitfire, spitfire,  spitfire_state, empty_init, ROT0, "Innovative Coin Corporation", "Spitfire (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_spitfire )
-GAMEL( 1976, spitfirea, spitfire, spitfire, spitfire,  spitfire_state, empty_init, ROT0, "Innovative Coin Corporation", "Spitfire (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK | MACHINE_SUPPORTS_SAVE, layout_spitfire )
+GAMEL( 1976, spitfire,  0,        spitfire, spitfire,  spitfire_state, empty_init, ROT0, "Innovative Coin Corporation", "Spitfire (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spitfire )
+GAMEL( 1976, spitfirea, spitfire, spitfire, spitfire,  spitfire_state, empty_init, ROT0, "Innovative Coin Corporation", "Spitfire (set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spitfire )

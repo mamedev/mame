@@ -1,14 +1,20 @@
 // license:CC0-1.0
 // copyright-holders:Peter Wilhelmsen
 /*
- * Spitfire sound: netlist implementation.
+ * Spitfire sound: behavioural approximation, not a traced PCB circuit.
+ *
+ * ROM writes identify the sound events. PCB photographs suggest a 4006,
+ * 9602 and 7475 near an MC1358, but do not establish their connections or
+ * component values. The CD4006/7486 noise topology, feedback taps, clocks,
+ * all component values, envelopes and gains here are unverified choices.
+ * No original cabinet recording is available for comparison. Component
+ * names describe this model; they are not PCB reference designators.
  *
  * The netlist supplies a 12 kHz / 17-stage noise source, filtered noise effects,
  * 80 Hz engine flutter, 25/160 ms shot/impact envelopes, 5/10 ms level smoothing
  * and a 20 Hz output coupling network. AFUNC blocks stand in for the unknown
  * gain-control/mixer stages, not for the MC1358 or a verified transistor circuit.
- * The falling effect crossfades two RC filters over 300 ms; this approximates
- * the former continuously varying single-pole filter.
+ * The falling effect crossfades two RC filters over 300 ms.
  *
  * SHOT and IMPACT receive a short charge pulse for each corresponding ROM
  * write. FALL and ENGINE are levels. ENABLE discharges the transient envelopes
@@ -40,6 +46,7 @@ NETLIST_START(spitfire)
 
 	// Cascade 4 + 4 + 4 + 5 stages. XNOR feedback at stages 12 and 17
 	// gives a maximal sequence and starts from the register's all-zero state.
+	// This feedback arrangement and the 12 kHz clock are model choices.
 	CLOCK(NOISE_CLOCK, 12000)
 	CD4006(NOISE_REG)
 	TTL_7486_XOR(NOISE_XOR)
@@ -56,8 +63,9 @@ NETLIST_START(spitfire)
 	AFUNC(NOISE, 1, "if(A0>2.5,1,-1)")
 	NET_C(NOISE_REG.D2P5, NOISE.A0)
 
-	// Shared 600 Hz and 4 kHz filters: impact uses the low-pass output,
-	// and gunfire uses the difference between the two filtered signals.
+	// Chosen 600 Hz and 4 kHz corners: R = 1/(2*pi*f*C), with C = 0.1 uF.
+	// Impact uses the low-pass output; gunfire uses the difference between
+	// the two filtered signals. These are not measured PCB part values.
 	RES(R_NOISE_LOW, 2650)
 	CAP(C_NOISE_LOW, CAP_U(0.1))
 	RES(R_NOISE_HIGH, 398)
@@ -98,6 +106,7 @@ NETLIST_START(spitfire)
 	AFUNC(ENGINE_CHOP, 2, "A0*if(A1<2,1,0.25)")
 	NET_C(NOISE.Q, ENGINE_CHOP.A0)
 	NET_C(FLUTTER_INV.Q, ENGINE_CHOP.A1)
+	// 4.55 kohm / 0.1 uF targets 350 Hz; the level RC targets 5 ms.
 	RES(R_ENGINE, 4550)
 	CAP(C_ENGINE, CAP_U(0.1))
 	NET_C(ENGINE_CHOP.Q, R_ENGINE.1)
@@ -124,6 +133,7 @@ NETLIST_START(spitfire)
 	PARAM(FALL_RESET.RON, 10)
 	AFUNC(FALL_BLEND, 1, "min(1,max(0,A0/5))")
 	NET_C(C_FALL_RAMP.1, FALL_BLEND.A0)
+	// 884 ohm and 3.98 kohm / 0.1 uF target 1.8 kHz and 400 Hz.
 	RES(R_FALL_HIGH, 884)
 	CAP(C_FALL_HIGH, CAP_U(0.1))
 	RES(R_FALL_LOW, 3980)
@@ -163,6 +173,7 @@ NETLIST_START(spitfire)
 	NET_C(FALL_VCA.Q, MIX.A3)
 	// Finite drive resistance keeps both capacitor terminals in the analog
 	// solver; directly coupling a changing AFUNC rail would lose its steps.
+	// The 1 uF / 7.96 kohm network targets 20 Hz; 100 ohm is a solver aid.
 	RES(R_OUT_DRIVE, 100)
 	CAP(C_OUT, CAP_U(1))
 	RES(R_OUT, RES_K(7.96))
