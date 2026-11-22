@@ -153,45 +153,41 @@ inline uint32_t powervr2_device::bilinear_filter(uint32_t c0, uint32_t c1, uint3
 	return rgbaint_t::bilinear_filter(c0, c1, c3, c2, ui, vi);
 }
 
+// 8-bit blend factor to 0-256, so that 0xff means exactly 1.0
+static constexpr uint32_t blend_factor(uint32_t f)
+{
+	return f + (f >> 7);
+}
+
 // Multiply with alpha value in bits 31-24
 inline uint32_t powervr2_device::bla(uint32_t c, uint32_t a)
 {
-	a = a >> 24;
+	a = blend_factor(a >> 24);
 	return ((((c & 0xff00ff)*a) & 0xff00ff00) >> 8) | ((((c >> 8) & 0xff00ff)*a) & 0xff00ff00);
 }
 
 // Multiply with 1-alpha value in bits 31-24
 inline uint32_t powervr2_device::blia(uint32_t c, uint32_t a)
 {
-	a = 0x100 - (a >> 24);
+	a = 0x100 - blend_factor(a >> 24);
 	return ((((c & 0xff00ff)*a) & 0xff00ff00) >> 8) | ((((c >> 8) & 0xff00ff)*a) & 0xff00ff00);
 }
 
 // Per-component multiply with color value
 inline uint32_t powervr2_device::blc(uint32_t c1, uint32_t c2)
 {
-	uint32_t cr =
-		(((c1 & 0x000000ff)*(c2 & 0x000000ff) & 0x0000ff00) >> 8)  |
-		(((c1 & 0x0000ff00)*(c2 & 0x0000ff00) & 0xff000000) >> 16);
-	c1 >>= 16;
-	c2 >>= 16;
-	cr |=
-		(((c1 & 0x000000ff)*(c2 & 0x000000ff) & 0x0000ff00) << 8)  |
-		(((c1 & 0x0000ff00)*(c2 & 0x0000ff00) & 0xff000000));
+	uint32_t cr = 0;
+	for (int shift = 0; shift < 32; shift += 8)
+		cr |= ((((c1 >> shift) & 0xff) * blend_factor((c2 >> shift) & 0xff)) >> 8) << shift;
 	return cr;
 }
 
 // Per-component multiply with 1-color value
 inline uint32_t powervr2_device::blic(uint32_t c1, uint32_t c2)
 {
-	uint32_t cr =
-		(((c1 & 0x000000ff)*(0x00100-(c2 & 0x000000ff)) & 0x0000ff00) >> 8)  |
-		(((c1 & 0x0000ff00)*(0x10000-(c2 & 0x0000ff00)) & 0xff000000) >> 16);
-	c1 >>= 16;
-	c2 >>= 16;
-	cr |=
-		(((c1 & 0x000000ff)*(0x00100-(c2 & 0x000000ff)) & 0x0000ff00) << 8)  |
-		(((c1 & 0x0000ff00)*(0x10000-(c2 & 0x0000ff00)) & 0xff000000));
+	uint32_t cr = 0;
+	for (int shift = 0; shift < 32; shift += 8)
+		cr |= ((((c1 >> shift) & 0xff) * (0x100 - blend_factor((c2 >> shift) & 0xff))) >> 8) << shift;
 	return cr;
 }
 
@@ -2591,7 +2587,7 @@ inline uint32_t powervr2_device::sample_textured(texinfo *ti, float u, float v, 
 			// modulate with alpha
 			tmp = blc(c, base_color);
 			tmp = bls24(tmp, offset_color);
-			tmp |= (((c >> 24) * (base_color >> 24)) >> 8) << 24;
+			tmp |= (((c >> 24) * blend_factor(base_color >> 24)) >> 8) << 24;
 			c = tmp;
 			break;
 	}
