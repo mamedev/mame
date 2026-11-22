@@ -17209,18 +17209,28 @@ void goldnpkr_state::init_jokerush()
 }
 
 
+
 void goldnpkr_state::init_gldpnw()
 {
 	uint8_t *const rom = memregion("maincpu")->base();
-	std::vector<uint8_t> buffer(rom, rom + 0x8000);
+	size_t const len = memregion("maincpu")->bytes();
+	std::vector<uint8_t> buffer(rom, rom + len);
 
 	for (offs_t i = 0; i < 0x8000; i++)
 	{
-		// KD003 / CHK00126 daughterboard lower address line descramble (A0-A7 bit-reversed)
 		offs_t addr = bitswap<15>(i, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
-		uint8_t val = buffer[addr];
+		rom[i] = buffer[addr];  //   +------- straight -----+  +----- inverted -----+
+	}
 
-		rom[i] = val;
+	// D6 inversion across the upper 4KB block ($7000-$7FFF / $F000-$FFFF) when (addr & 0x0a) == 0
+	for (offs_t addr = 0x7000; addr < 0x8000; addr++)
+	{
+		unsigned int offset = addr & 0x0f;
+
+		if (offset == 0x0 || offset == 0x1 || offset == 0x4 || offset == 0x5)
+		{
+			rom[addr] ^= 0x40;
+		}
 	}
 }
 
