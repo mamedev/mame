@@ -38,6 +38,8 @@ public:
 	void com1_ri_w(int state) { m_com1->ri_w(state); };
 	void com1_cts_w(int state) { m_com1->cts_w(state); };
 
+	uint8_t interrupt_acknowledge_r();
+
 	// access from other pci functions
 	void ide_irq_w(unsigned channel, int state);
 
@@ -67,7 +69,7 @@ private:
 	void misc_functions_w(uint8_t data);
 
 	uint8_t pic_slave_ack_r(offs_t offset);
-	void irq_to_pic(int irq, int state);
+	void update_pic_irq(unsigned irq);
 
 	uint8_t superio_cfg_idx_r();
 	void superio_cfg_idx_w(uint8_t data);
@@ -100,6 +102,9 @@ private:
 	uint8_t m_superio_cfg[0x10];
 	uint8_t m_superio_cfg_idx;
 	uint16_t m_baud_divisor;
+
+	bool m_com1_irq;
+	bool m_ide_irq[2];
 
 	bool m_initialized;
 };

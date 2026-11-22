@@ -63,6 +63,8 @@ public:
 	auto cpuint0_cb() { return m_cpuint0_cb.bind(); }
 	auto cpuint1_cb() { return m_cpuint1_cb.bind(); }
 
+	template <unsigned Bus> auto pci_iack_cb() { return m_pci_iack_cb[Bus].bind(); }
+
 	void mpp31_w(int state);
 
 protected:
@@ -302,6 +304,7 @@ private:
 	template <int Bus> void config_address_w(offs_t offset, uint32_t data, uint32_t mem_mask);
 	template <int Bus> uint32_t config_data_r(offs_t offset, uint32_t mem_mask);
 	template <int Bus> void config_data_w(offs_t offset, uint32_t data, uint32_t mem_mask);
+	template <int Bus> uint32_t pci_interrupt_acknowledge_r();
 
 	required_device<ppc_device> m_cpu;
 	required_device_array<pci_root_device, 2> m_pci_bus;
@@ -422,6 +425,7 @@ private:
 
 	devcb_write_line m_cpuint0_cb;
 	devcb_write_line m_cpuint1_cb;
+	devcb_read8::array<2> m_pci_iack_cb;
 
 	friend class mv64361_pci_host_device;
 	friend class mv64361_pci_function1_device;

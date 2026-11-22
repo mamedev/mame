@@ -167,8 +167,7 @@ void vt8231_ide_device::config_map(address_map &map)
 	map(0x09, 0x09).w(FUNC(vt8231_ide_device::prog_if_w));
 	map(0x10, 0x23).rw(FUNC(vt8231_ide_device::bar_r), FUNC(vt8231_ide_device::bar_w));
 	map(0x24, 0x33).noprw();
-	map(0x3c, 0x3c).rw(FUNC(vt8231_ide_device::interrupt_line_r), FUNC(vt8231_ide_device::interrupt_line_w));
-	map(0x3d, 0x3d).lw8(NAME([] (uint8_t data) { })); // interrupt pin is read-only
+	map(0x3c, 0x3f).nopw(); // intr_line, intr_pin, min_gnt, max_latency: read-only
 	map(0x40, 0x40).rw(FUNC(vt8231_ide_device::chip_enable_r), FUNC(vt8231_ide_device::chip_enable_w));
 	map(0x41, 0x41).rw(FUNC(vt8231_ide_device::ide_configuration_1_r), FUNC(vt8231_ide_device::ide_configuration_1_w));
 	map(0x42, 0x42).rw(FUNC(vt8231_ide_device::ide_configuration_2_r), FUNC(vt8231_ide_device::ide_configuration_2_w));
