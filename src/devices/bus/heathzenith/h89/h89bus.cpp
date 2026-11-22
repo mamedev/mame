@@ -42,7 +42,6 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
-#include <iterator>
 #include <string>
 
 #define LOG_SETUP (1U << 1)

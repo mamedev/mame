@@ -38,9 +38,9 @@ namespace {
 class mt_win89_device : public device_t, public device_h89bus_left_card_interface
 {
 public:
-	mt_win89_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
-
 	static constexpr feature_type unemulated_features() { return feature::DISK; }
+
+	mt_win89_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// device_h89bus_left_card_interface implementation
 	virtual u8 *sys_rom() override ATTR_COLD;
@@ -108,6 +108,7 @@ void mt_win89_device::device_add_mconfig(machine_config &config)
 
 ROM_START(mt_win89)
 	ROM_REGION(0x1000, "sys_rom", 0)
+	// board has no IC numbers
 	ROM_LOAD("2732_win89_2_3.bin", 0x0000, 0x1000, CRC(c54c0b3d) SHA1(f354d494794b0281b9cc074ce46362d3cd065350))
 ROM_END
 
@@ -118,4 +119,4 @@ const tiny_rom_entry *mt_win89_device::device_rom_region() const
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MT_WIN89, device_h89bus_left_card_interface, mt_win89_device, "h89_mt_win89", "Micronics Technology WIN89");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MT_WIN89, device_h89bus_left_card_interface, mt_win89_device, "h89_mt_win89", "Micronics Technology WIN89")

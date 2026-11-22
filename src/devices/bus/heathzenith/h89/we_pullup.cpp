@@ -48,4 +48,4 @@ void h89bus_we_pullup_device::device_reset()
 
 }   // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_WE_PULLUP, device_h89bus_right_card_interface, h89bus_we_pullup_device, "h89_we_pullup", "Pullup resistor needed when P506 slot is empty");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_WE_PULLUP, device_h89bus_right_card_interface, h89bus_we_pullup_device, "h89_we_pullup", "Pullup resistor needed when P506 slot is empty")

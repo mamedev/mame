@@ -56,4 +56,4 @@ void wh_88_16_device::device_start()
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_WH_88_16, device_h89bus_left_card_interface, wh_88_16_device, "h89_wh_88_16", "Heath WH-88-16 16K RAM");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_WH_88_16, device_h89bus_left_card_interface, wh_88_16_device, "h89_wh_88_16", "Heath WH-88-16 16K RAM")

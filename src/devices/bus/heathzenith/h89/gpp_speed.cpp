@@ -75,5 +75,5 @@ public:
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_GPP_SPEED_4MHZ, device_h89bus_cpu_board_mod_interface, h89_gpp_speed_4mhz_device, "h89_gpp_4mhz", "2 / 4 MHz Speed Upgrade (GPP MEM 0)");
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_GPP_SPEED_6MHZ, device_h89bus_cpu_board_mod_interface, h89_gpp_speed_6mhz_device, "h89_gpp_6mhz", "2 / 6 MHz Speed Upgrade (GPP MEM 0)");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_GPP_SPEED_4MHZ, device_h89bus_cpu_board_mod_interface, h89_gpp_speed_4mhz_device, "h89_gpp_4mhz", "2 / 4 MHz Speed Upgrade (GPP MEM 0)")
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_GPP_SPEED_6MHZ, device_h89bus_cpu_board_mod_interface, h89_gpp_speed_6mhz_device, "h89_gpp_6mhz", "2 / 6 MHz Speed Upgrade (GPP MEM 0)")
