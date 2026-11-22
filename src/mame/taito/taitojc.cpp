@@ -805,8 +805,8 @@ void taitojc_state::hc11_pgm_map(address_map &map)
     0x7010: Line intersection, parameter length
     0x7011: Line intersection, intersection point
     0x7012: Line intersection, line length
-    0x7013: Viewport Width / 2
-    0x7014: Viewport Height / 2
+    0x7013: Viewport Height / 2
+    0x7014: Viewport Width / 2
     0x7015: Viewport Z / 2 (?)
     0x701b: Line intersection, parameter interpolation read
     0x701d: Projected point Y read
@@ -864,7 +864,15 @@ void taitojc_state::dsp_math_intersection_w(offs_t offset, uint16_t data)
 
 uint16_t taitojc_state::dsp_math_intersection_r()
 {
-	return muldiv(m_intersection_data[0], m_intersection_data[1], m_intersection_data[2]);
+	int const length = m_intersection_data[2];
+	if (!length)
+		return 0;
+
+	// The DSP adds this signed offset to the starting vertex. Discard the
+	// fractional bits so traversing a shared edge backwards gives the same point.
+	int const product = m_intersection_data[0] * m_intersection_data[1];
+	int const remainder = product % length;
+	return (product / length) - ((remainder != 0) && ((remainder < 0) != (length < 0)));
 }
 
 uint16_t taitojc_state::dsp_math_unk_r()
