@@ -548,7 +548,7 @@ void namcos22_renderer::render_sprite(screen_device &screen, bitmap_rgb32 &bitma
 			if (node->data.sprite.linktype == 0xff)
 				code += offset;
 			else
-				code += nthword(&m_state.m_spriteram[0x800/4], offset + node->data.sprite.linktype*4);
+				code += m_state.m_spriteram[0x800/2 + offset + node->data.sprite.linktype*4];
 
 			poly3d_drawsprite(
 				screen,
@@ -1579,6 +1579,9 @@ void namcos22_state::screen_vblank(int state)
 		if (m_skipped_this_frame)
 			render_frame_active();
 		m_skipped_this_frame = machine().video().skip_this_frame();
+
+		if (m_is_ss22)
+			vics_copy_sprite_data();
 	}
 }
 
@@ -1586,87 +1589,141 @@ void namcos22_state::screen_vblank(int state)
 
 /*********************************************************************************************/
 
-void namcos22_state::draw_sprite_group(const u32 *src, const u32 *attr, int num_sprites, int deltax, int deltay, bool y_lowres)
+void namcos22_state::draw_sprites()
 {
+	/*
+	    0x980000:   00060000 00010000 02ff0000 000007ff
+	                   ^                                 misc control
+	                    ^^^^                             base
+	                         ^^^^                        base + num sprites
+	                             ^^^^     ^^^^           deltax
+	                                           ^^^^      deltay
+
+	    0x980010:   00200020 028004ff 032a0509 00000000
+	                ^^^^^^^^                             character size?
+	                         ^^^^^^^^                    window-x related?
+	                                  ^^^^^^^^           window-y related?
+
+	    0x980200-0x98023f:   window clipping registers
+	    0x980400-0x9805ff:   hzoom table
+	    0x980600-0x9807ff:   vzoom table
+	    0x980800-0x980fff:   link table
+
+	    eight words per sprite, start address at 0x984000
+	    additional sorting/color data for sprite at 0x9a0000
+	*/
+
+	/* misc control bits function:
+	    bit 0:      sprites on
+	    bit 1:      ??? (always set, except in alpinr2b. it's not x-resolution)
+	    bit 2:      y-resolution? (always set, except in cybrcycc)
+	*/
+	bool sprites_on = BIT(~m_spriteram[0], 0);
+	bool y_lowres = BIT(~m_spriteram[0], 2);
+
+	const int deltax = m_spriteram[3] + m_spriteram[5] + 0x2d;
+	const int deltay = m_spriteram[6] + (0x2a >> (y_lowres ? 1 : 0));
+
+	const int base = m_spriteram[1]; // alpines/alpinr2b
+	int num_sprites = (m_spriteram[2] - base) + 1;
+
+	if (!sprites_on || num_sprites <= 0 || num_sprites >= 0x400)
+		return;
+
+	u16 *src = &m_spriteram[0x4000/2 + base*8];
+	u16 *attr = &m_attributeram[base*4];
+
 	for (int i = 0; i < num_sprites; i++)
 	{
 		/*
 		src[0]
-		    xxxx.xxxx.xxxx.xxxx | ----.----.----.----  x pos
-		    ----.----.----.---- | xxxx.xxxx.xxxx.xxxx  y pos
+			xxxx.xxxx.xxxx.xxxx  x pos
 
 		src[1]
-		    xxxx.xxxx.xxxx.xxxx | ----.----.----.----  x size
-		    ----.----.----.---- | xxxx.xxxx.xxxx.xxxx  y size
+			xxxx.xxxx.xxxx.xxxx  y pos
 
 		src[2]
-		    xxxx.x---.----.---- | ----.----.----.----  unused
-		    ----.-xxx.----.---- | ----.----.----.----  clip target
-		    ----.----.xxxx.xxxx | ----.----.----.----  linktype
-		    ----.----.----.---- | xxxx.xx--.----.----  no function(?) - 0x400 set in airco22b(invisible sprite)
-		    ----.----.----.---- | ----.--x-.----.----  right justify
-		    ----.----.----.---- | ----.---x.----.----  bottom justify
-		    ----.----.----.---- | ----.----.x---.----  flipx
-		    ----.----.----.---- | ----.----.-xxx.----  cols
-		    ----.----.----.---- | ----.----.----.x---  flipy
-		    ----.----.----.---- | ----.----.----.-xxx  rows
+			xxxx.xxxx.xxxx.xxxx  x size
 
 		src[3]
-		    xxxx.xxxx.xxxx.xxxx | ----.----.----.----  tile number
-		    ----.----.----.---- | xxxx.xxxx.----.----  alpha
-		    ----.----.----.---- | ----.----.xxxx.xxxx  no function(?) - set in timecris when increasing alpha, it's probably not 16bit
+			xxxx.xxxx.xxxx.xxxx  y size
+
+		src[4]
+			xxxx.x---.----.----  unused
+			----.-xxx.----.----  clip target
+			----.----.xxxx.xxxx  linktype
+
+		src[5]
+			xxxx.xx--.----.----  no function(?) - 0x400 set in airco22b(invisible sprite)
+			----.--x-.----.----  right justify
+			----.---x.----.----  bottom justify
+			----.----.x---.----  flipx
+			----.----.-xxx.----  cols
+			----.----.----.x---  flipy
+			----.----.----.-xxx  rows
+
+		src[6]
+			xxxx.xxxx.xxxx.xxxx  tile number
+
+		src[7]
+			xxxx.xxxx.----.----  alpha
+			----.----.xxxx.xxxx  no function(?) - set in timecris when increasing alpha, it's probably not 16bit
 
 		attr[0]
-		    xxxx.xxxx.----.---- | ----.----.----.----  unused
-		    ----.----.xxxx.xxxx | xxxx.xxxx.xxxx.xxxx  z pos
+			xxxx.xxxx.----.----  unused
+			----.----.xxxx.xxxx  z pos (high)
 
 		attr[1]
-		    xxxx.xxxx.----.---- | ----.----.----.----  unused
-		    ----.----.x---.---- | ----.----.----.----  cz enable
-		    ----.----.-xxx.xxxx | ----.----.----.----  color
-		    ----.----.----.---- | xxxx.xxxx.----.----  unknown flags? - set in airco22b(0x7/0x1, invisible sprite), propcycl score hinge(0xff), cybrcycc at boot(0x2b)
-		    ----.----.----.---- | ----.----.xxxx.xxxx  cz factor (fog aka depth cueing)
-		*/
-		int xpos = (src[0] >> 16) - deltax;
-		int ypos = (src[0] & 0xffff) - deltay;
-		int sizex = src[1] >> 16;
-		int sizey = src[1] & 0xffff;
-		const int flipy = BIT(src[2], 3);
-		int rows = src[2] & 0x7;
-		const int linktype = src[2] >> 16 & 0xff;
-		const int flipx = BIT(src[2], 7);
-		int cols = src[2] >> 4 & 0x7;
-		const u32 code = src[3];
-		const int tile = code >> 16;
-		const int alpha = code >> 8 & 0xff;
+			xxxx.xxxx.xxxx.xxxx  z pos (low)
 
-		const u32 zcoord = attr[0] & 0x00ffffff;
-		const int color = attr[1] >> 16 & 0xff;
-		const int cz = attr[1] & 0xff;
+		attr[2]
+			xxxx.xxxx.----.----  unused
+			----.----.x---.----  cz enable
+			----.----.-xxx.xxxx  color
+
+		attr[3]
+			xxxx.xxxx.----.----  unknown flags? - set in airco22b(0x7/0x1, invisible sprite), propcycl score hinge(0xff), cybrcycc at boot(0x2b)
+			----.----.xxxx.xxxx  cz factor (fog aka depth cueing)
+		*/
+		int xpos = src[0] - deltax;
+		int ypos = (src[1]) - deltay;
+		int sizex = src[2];
+		int sizey = src[3];
+		const int flipy = BIT(src[5], 3);
+		int rows = src[5] & 0x7;
+		const int linktype = src[4] & 0xff;
+		const int flipx = BIT(src[5], 7);
+		int cols = src[5] >> 4 & 0x7;
+		const int tile = src[6];
+		const int alpha = src[7] >> 8 & 0xff;
+
+		const u32 zcoord = (attr[0] & 0xff) << 16 | attr[1];
+		const int color = attr[2] & 0xff;
+		const int cz = attr[3] & 0xff;
 
 		// one of these is to override global fade setting?
 		// eg. propcycl time over, where global fade affects score hinge, but not "TIME UP"
-		const bool fade_enabled = BIT(attr[1], 15);
+		const bool fade_enabled = BIT(attr[3], 15);
 
 		// priority over textlayer, trusted by testmode and timecris
 		const int prioverchar = (cz == 0xfe) ? 1 : 0;
 
 		// set window clipping
-		const int clip = src[2] >> 23 & 0xe;
-		const int cx_min = -deltax + (s16)(m_spriteram[0x80|clip] >> 16);
-		const int cx_max = -deltax + (s16)(m_spriteram[0x80|clip] & 0xffff);
-		const int cy_min = -deltay + (s16)(m_spriteram[0x81|clip] >> 16);
-		const int cy_max = -deltay + (s16)(m_spriteram[0x81|clip] & 0xffff);
+		const int clip = src[4] >> 6 & 0x1c;
+		const int cx_min = -deltax + (s16)(m_spriteram[0x100 | clip]);
+		const int cx_max = -deltax + (s16)(m_spriteram[0x101 | clip]);
+		const int cy_min = -deltay + (s16)(m_spriteram[0x102 | clip]);
+		const int cy_max = -deltay + (s16)(m_spriteram[0x103 | clip]);
 
 		if (rows == 0) rows = 8;
 		if (cols == 0) cols = 8;
 
 		// right justify
-		if (BIT(src[2], 9))
+		if (BIT(src[5], 9))
 			xpos -= sizex * cols - 1;
 
 		// bottom justify
-		if (BIT(src[2], 8))
+		if (BIT(src[5], 8))
 			ypos -= sizey * rows - 1;
 
 		if (flipy)
@@ -1712,163 +1769,107 @@ void namcos22_state::draw_sprite_group(const u32 *src, const u32 *attr, int num_
 			node->data.sprite.fade_enabled = fade_enabled;
 		}
 
-		src += 4;
-		attr += 2;
+		src += 8;
+		attr += 4;
 	}
 }
 
-void namcos22_state::draw_sprites()
+u16 namcos22s_state::namcos22s_vics_data_r(offs_t offset)
 {
-	const u32 *src;
-	const u32 *attr;
+	return m_vics_data[offset];
+}
 
-#if 0 // show reg contents
-	int i;
-	char msg1[0x1000]={0}, msg2[0x1000]={0};
-	// 980000-98023f (spriteram header)
-	for (i=0x00;i<0x02;i++) {
-		sprintf(msg2,"98%04X %08X %08X %08X %08X\n",i*16,m_spriteram[i*4+0],m_spriteram[i*4+1],m_spriteram[i*4+2],m_spriteram[i*4+3]);
-		strcat(msg1,msg2);
-	}
-	for (i=0x20;i<0x24;i++) {
-		sprintf(msg2,"98%04X %08X %08X %08X %08X\n",i*16,m_spriteram[i*4+0],m_spriteram[i*4+1],m_spriteram[i*4+2],m_spriteram[i*4+3]);
-		strcat(msg1,msg2);
-	}
-	strcat(msg1,"\n");
-	// 940000-94007c (vics control)
-	for (i=0x00;i<0x08;i++) {
-		sprintf(msg2,"94%04X %08X %08X %08X %08X\n",i*16,m_vics_control[i*4+0],m_vics_control[i*4+1],m_vics_control[i*4+2],m_vics_control[i*4+3]);
-		strcat(msg1,msg2);
-	}
-	if (machine().input().code_pressed(KEYCODE_S))
-		popmessage("%s",msg1);
-	else popmessage("[S] shows sprite/vics regs");
-#endif
-	/*
-	    0x980000:   00060000 00010000 02ff0000 000007ff
-	                   ^                                 misc control
-	                    ^^^^                             base
-	                         ^^^^                        base + num sprites
-	                             ^^^^     ^^^^           deltax
-	                                           ^^^^      deltay
-
-	    0x980010:   00200020 028004ff 032a0509 00000000
-	                ^^^^^^^^                             character size?
-	                         ^^^^^^^^                    window-x related?
-	                                  ^^^^^^^^           window-y related?
-
-	    0x980200-0x98023f:   window clipping registers
-	    0x980400-0x9805ff:   hzoom table
-	    0x980600-0x9807ff:   vzoom table
-	    0x980800-0x980fff:   link table
-
-	    eight words per sprite, start address at 0x984000
-	    additional sorting/color data for sprite at 0x9a0000
-	*/
-
-	/* misc control bits function:
-	    bit 0:      sprites on
-	    bit 1:      ??? (always set, except in alpinr2b. it's not x-resolution)
-	    bit 2:      y-resolution? (always set, except in cybrcycc)
-	*/
-	bool sprites_on = BIT(~m_spriteram[0], 16);
-	bool y_lowres = BIT(~m_spriteram[0], 18);
-
-	const int deltax = (m_spriteram[1] & 0xffff) + (m_spriteram[2] & 0xffff) + 0x2d;
-	const int deltay = (m_spriteram[3] >> 16) + (0x2a >> (y_lowres ? 1 : 0));
-
-	const int base = m_spriteram[0] & 0xffff; // alpines/alpinr2b
-	int num_sprites = ((m_spriteram[1] >> 16) - base) + 1;
-
-	// airco22b doesn't use spriteset #1
-	if (m_gametype == NAMCOS22_AIR_COMBAT22)
-		num_sprites = 0;
-
-	if (sprites_on && num_sprites > 0 && num_sprites < 0x400)
-	{
-		src = &m_spriteram[0x04000/4 + base*4];
-		attr = &m_spriteram[0x20000/4 + base*2];
-		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
-	}
-
-	/* VICS RAM provides two additional banks (also many unknown regs here) */
-	/*
-	0x940000 -x------       sprite chip busy?
-	0x940018 xxxx----       clr.w   $940018.l
-
-	0x940030 xxxxxxxx       0x0600000 - misc control
-	0x940034 xxxxxxxx       0x3070b0f
-
-	0x940040 xxxxxxxx       sprite attribute size             high bit means busy?
-	0x940048 xxxxxxxx       sprite attribute list baseaddr    high bit means busy?
-	0x940050 xxxxxxxx       sprite color size                 high bit means busy?
-	0x940058 xxxxxxxx       sprite color list baseaddr        high bit means busy?
-
-	0x940060..0x94007c      set#2
-	*/
-
-	sprites_on = BIT(~m_vics_control[0x30/4], 24);
-	y_lowres = BIT(~m_vics_control[0x30/4], 26);
-
-	// where do the games store the number of sprites to be processed by vics???
-	// the current default implementation (using spritelist size) is clearly wrong and causes problems in dirtdash and airco22b
-	num_sprites = m_vics_control[0x40/4] >> 4 & 0x1ff; // no +1
-
-	// dirtdash sprite list starts at xxx4, number of sprites is stored in xxx0, it doesn't use set#2
-	if (m_gametype == NAMCOS22_DIRT_DASH)
-		num_sprites = (m_vics_data[(m_vics_control[0x48/4] & 0x4000)/4] & 0xff) + 1;
-
-	if (sprites_on && num_sprites > 0)
-	{
-		src = &m_vics_data[(m_vics_control[0x48/4] & 0xffff)/4];
-		attr = &m_vics_data[(m_vics_control[0x58/4] & 0xffff)/4];
-		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
-	}
-
-	num_sprites = m_vics_control[0x60/4] >> 4 & 0x1ff; // no +1
-
-	// airco22b number of sprites for set#2 is stored in set#1 - it does not use set 1, or main set for sprites
-	if (m_gametype == NAMCOS22_AIR_COMBAT22)
-	{
-		sprites_on = BIT(~m_vics_data[(m_vics_control[0x48/4] & 0xffff)/4], 16);
-		num_sprites = (m_vics_data[(m_vics_control[0x48/4] & 0xffff)/4+1] >> 16) + 1;
-	}
-
-	if (sprites_on && num_sprites > 0)
-	{
-		src = &m_vics_data[(m_vics_control[0x68/4] & 0xffff)/4];
-		attr = &m_vics_data[(m_vics_control[0x78/4] & 0xffff)/4];
-		draw_sprite_group(src, attr, num_sprites, deltax, deltay, y_lowres);
-	}
+void namcos22s_state::namcos22s_vics_data_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_vics_data[offset]);
 }
 
 u32 namcos22s_state::namcos22s_vics_control_r(offs_t offset)
 {
-	u32 ret = m_vics_control[offset];
-
-	switch (offset*4)
-	{
-		// reg 0, status register?
-		// high byte is read in timecris and lower half is expected to be 0
-		case 0x00:
-			ret = 0;
-			break;
-
-		// sprite attr/color size regs: high bit is busy/ready?
-		// dirtdash reads these and waits for it to become 0
-		case 0x40: case 0x50: case 0x60: case 0x70:
-			ret &= 0x7fffffff;
-			break;
-
-		default:
-			break;
-	}
-	return ret;
+	if (offset == 0)  // reg 0, status register? high byte is read in timecris and lower half is expected to be 0
+		return 0;
+	else
+		return m_vics_control[offset];
 }
 
 void namcos22s_state::namcos22s_vics_control_w(offs_t offset, u32 data, u32 mem_mask)
 {
 	COMBINE_DATA(&m_vics_control[offset]);
+}
+
+u16 namcos22s_state::namcos22s_spriteram_r(offs_t offset)
+{
+	return m_spriteram[offset];
+}
+
+void namcos22s_state::namcos22s_spriteram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_spriteram[offset]);
+}
+
+u16 namcos22s_state::namcos22s_attributeram_r(offs_t offset)
+{
+	return m_attributeram[offset];
+}
+
+void namcos22s_state::namcos22s_attributeram_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	COMBINE_DATA(&m_attributeram[offset]);
+}
+
+void namcos22_state::vics_copy_sprite_data()
+{
+	/* VICS provides a 64kB buffer for the main CPU to write sprite data during active display
+	   During vblank it copies data to the sprite chip (C374); up to four blocks may be copied
+
+	0x940000 -x------       VICS/sprite chip busy? (timecris)
+	0x940018 xxxx----       cleared to 0 (timecris)
+	0x940030 xxxxxxxx       set to 0x06000000
+	0x940034 xxxxxxxx       set to 0x03070b0f
+	0x940038 xxxxxxxx       cleared to 0
+
+	0x940040-0x94007f       four sets of registers, four 32-bit words each
+	x------- -------- -------- --------  cleared when transfer complete? (dirtdash reads high bit and waits until clear)
+	-x------ -------- -------- --------  0 to copy to sprite RAM, 1 to copy to attribute RAM
+	----xxxx -------- -------- --------  size of transfer in bytes
+	-------- xxxxxxxx -------- --------  unknown; set to 0x04000000 when initialized/inactive, 0x00010000 when active
+	-------- -------- ----xxxx --------  VICS RAM source address
+	-------- -------- -------- ----xxxx  sprite/attribute RAM destination address
+	*/
+
+	for (int offset = 0x40; offset < 0x80; offset += 0x10)
+	{
+		if ((m_vics_control[offset / 4] & 0xf0000000) == 0)
+			continue;
+
+		int size = (m_vics_control[(offset + 0x0) / 4] & 0xffff) / 2;
+		const int src = (m_vics_control[(offset + 0x8) / 4] & 0xffff) / 2;
+		const int dst = (m_vics_control[(offset + 0xc) / 4] & 0xffff) / 2;
+
+		// make sure we don't read past the end of m_vics_data[]
+		size = std::min(size, (int)m_vics_data.length() - src);
+
+		if (m_vics_control[offset / 4] & 0x1000000)
+		{
+			// make sure we don't write past the end of m_attributeram[]
+			if (UNEXPECTED(dst >= (int)m_attributeram.length()))
+				continue;
+			size = std::min(size, (int)m_attributeram.length() - dst);
+
+			std::copy_n(&m_vics_data[src], size, &m_attributeram[dst]);
+		}
+		else
+		{
+			// make sure we don't write past the end of m_spriteram[]
+			if (UNEXPECTED(dst >= (int)m_spriteram.length()))
+				continue;
+			size = std::min(size, (int)m_spriteram.length() - dst);
+
+			std::copy_n(&m_vics_data[src], size, &m_spriteram[dst]);
+		}
+
+		m_vics_control[offset / 4] &= ~0xf0000000;
+	}
 }
 
 
@@ -2400,27 +2401,6 @@ void namcos22s_state::recalc_czram()
 
 void namcos22_state::update_mixer()
 {
-#if 0 // show reg contents
-	char msg1[0x1000] = {0}, msg2[0x1000] = {0};
-	int st = 0x000 / 16;
-	for (int i = st; i < (st+3); i++)
-	{
-		sprintf(msg2,"%04X %08X %08X %08X %08X\n", i*16, m_mixer[i*4+0], m_mixer[i*4+1], m_mixer[i*4+2], m_mixer[i*4+3]);
-		strcat(msg1,msg2);
-	}
-	if (1) // + other non-super regs
-	if (!m_is_ss22)
-	{
-		strcat(msg1,"\n");
-		for (int i = 8; i <= 0x20; i += 8)
-		{
-			sprintf(msg2,"%04X %08X %08X %08X %08X\n", i*16, m_mixer[i*4+0], m_mixer[i*4+1], m_mixer[i*4+2], m_mixer[i*4+3]);
-			strcat(msg1,msg2);
-		}
-	}
-	popmessage("%s",msg1);
-#endif
-
 	if (m_is_ss22)
 	{
 		/*

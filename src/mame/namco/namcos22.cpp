@@ -28,7 +28,6 @@ TODO:
 - texture u/v mapping is often 1 pixel off, resulting in many glitch lines/gaps between textures
 - global offset is wrong in non-super22 testmode video test
 - ss22 testmode video test screen#04 translucent polygon should be higher priority than sprite
-- find out how/where vics num_sprites is determined exactly, currently a workaround is needed for airco22b and dirtdash
 - there's a sprite limit per scanline, eg. timecris submarine explosion smoke partially erases sprites on real hardware
 - adillor race end should fade polygons to red, these are vics sprites with a size of 0, expected x/y size is 0x100
 - propcycl attract mode, when the altar button is pressed, global fade should affect the background sprite
@@ -1881,9 +1880,10 @@ void namcos22s_state::namcos22s_am(address_map &map)
 	map(0x880000, 0x89ffff).ram().w(FUNC(namcos22s_state::namcos22_cgram_w)).share(m_cgram);
 	map(0x89e000, 0x89ffff).ram().w(FUNC(namcos22s_state::namcos22_textram_w)).share(m_textram);
 	map(0x8a0000, 0x8a000f).rw(FUNC(namcos22s_state::namcos22_tilemapattr_r), FUNC(namcos22s_state::namcos22_tilemapattr_w));
-	map(0x900000, 0x90ffff).ram().share(m_vics_data);
+	map(0x900000, 0x90ffff).rw(FUNC(namcos22s_state::namcos22s_vics_data_r), FUNC(namcos22s_state::namcos22s_vics_data_w));
 	map(0x940000, 0x94007f).rw(FUNC(namcos22s_state::namcos22s_vics_control_r), FUNC(namcos22s_state::namcos22s_vics_control_w)).share(m_vics_control);
-	map(0x980000, 0x9affff).ram().share(m_spriteram); // C374
+	map(0x980000, 0x987fff).rw(FUNC(namcos22s_state::namcos22s_spriteram_r), FUNC(namcos22s_state::namcos22s_spriteram_w)); // C374
+	map(0x9a0000, 0x9a09ff).rw(FUNC(namcos22s_state::namcos22s_attributeram_r), FUNC(namcos22s_state::namcos22s_attributeram_w));
 	map(0xa04000, 0xa0bfff).rw(FUNC(namcos22s_state::namcos22_shared_r), FUNC(namcos22s_state::namcos22_shared_w)); // COM RAM
 	map(0xc00000, 0xc1ffff).rw(FUNC(namcos22s_state::namcos22_dspram_r), FUNC(namcos22s_state::namcos22_dspram_w)).share(m_polygonram);
 	map(0xe00000, 0xe3ffff).ram(); // workram
