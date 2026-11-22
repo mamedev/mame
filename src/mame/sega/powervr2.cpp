@@ -408,17 +408,17 @@ inline uint32_t powervr2_device::cv_yuv(uint16_t c1, uint16_t c2, int x)
 
 int powervr2_device::uv_wrap(float uv, int size)
 {
-	int iuv = (int)uv;
+	int iuv = int(std::floor(uv));
 	return iuv & (size - 1);
 }
 int powervr2_device::uv_flip(float uv, int size)
 {
-	int iuv = (int)uv;
+	int iuv = int(std::floor(uv));
 	return ((iuv & size) ? ~iuv : iuv) & (size - 1);
 }
 int powervr2_device::uv_clamp(float uv, int size)
 {
-	int iuv = (int)uv;
+	int iuv = int(std::floor(uv));
 	return (iuv > 0) ? (iuv < size) ? iuv : (size - 1) : 0;
 }
 
