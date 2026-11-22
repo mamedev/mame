@@ -183,6 +183,8 @@ private:
 	void tsconf_update_video_mode();
 	void copy_tiles_to_raw(const u8 *tiles_src, u8 *raw_target);
 	attotime copper_until_pos_r(u16 pos);
+	void copper_int_w(int state);
+	void copper_rdy_w(int state);
 
 	u8 tsconf_port_xx1f_r(offs_t offset);
 	void tsconf_port_7ffd_w(u8 data);
@@ -223,6 +225,7 @@ private:
 
 	std::map<tsconf_regs, u8> m_scanline_delayed_regs_update;
 	u8 m_regs[0x100];
+	bool m_copper_ready;
 
 	memory_view m_io_shadow_view;
 	memory_view m_bank0_rom;

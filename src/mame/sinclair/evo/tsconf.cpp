@@ -198,6 +198,9 @@ void tsconf_state::machine_start()
 	save_item(NAME(m_zctl_cs));
 	save_item(NAME(m_port_f7_ext));
 	save_item(NAME(m_gfx_y_frame_offset));
+
+	// tsconf2
+	save_item(NAME(m_copper_ready));
 }
 
 void tsconf_state::machine_reset()
@@ -252,6 +255,9 @@ void tsconf_state::machine_reset()
 	u16 const *const cram_init = &memregion("cram_init")->as_u16();
 	for (auto i = 0; i < 0x100; i++)
 		cram_write16(i << 1, cram_init[i]); // init color RAM
+
+	// tsconf2
+	m_copper_ready = false;
 }
 
 void tsconf_state::device_post_load()
@@ -380,6 +386,8 @@ void tsconf_state::tsconf2(machine_config &config)
 	tsconf(config);
 	TSCONF_COPPER(config, m_copper, 28_MHz_XTAL);
 	m_copper->out_wreg_cb().set(FUNC(tsconf_state::tsconf_port_xxaf_w));
+	m_copper->out_int_cb().set(FUNC(tsconf_state::copper_int_w));
+	m_copper->out_rdy_cb().set(FUNC(tsconf_state::copper_rdy_w));
 	m_copper->set_in_until_pos_cb(FUNC(tsconf_state::copper_until_pos_r));
 
 	m_dma->on_ready_callback().append(m_copper, FUNC(tsconf_copper_device::dma_ready_w));
