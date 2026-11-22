@@ -1575,13 +1575,25 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ssonicbr )
 	PORT_INCLUDE( systemc_generic )
 
+	// The cabinet has one button, but the game reads buttons 1-3 as Mega Drive pad A/B/C.
+	// Buttons 2 and 3 are used by the developer menu (entered with A+B+C on the title screen,
+	// a check disabled in this version) and its music test.
+	PORT_START("INPUT_TYPE")
+	PORT_CONFNAME( 0x01, 0x00, "Input Type" )
+	PORT_CONFSETTING(    0x00, "Default Control Panel" )
+	PORT_CONFSETTING(    0x01, "3 Button Control Panel (dev inputs)" )
+
 	PORT_MODIFY("P1")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                   PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                   PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)   PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)   PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
 
 	PORT_MODIFY("P2")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 2 Unused */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )     /* Button 3 Unused */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                   PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )                   PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)   PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)   PORT_CONDITION("INPUT_TYPE", 0x01, EQUALS, 0x01)
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
