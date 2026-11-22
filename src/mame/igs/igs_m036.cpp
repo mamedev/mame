@@ -1634,10 +1634,7 @@ ROM_START( lhfy )
 	ROM_REGION( 0x10000000, "gfx", 0 )
 	// 4x 64MB flash ROMs (U1, U2, U3, U4) mounted onto a custom SODIMM at CN1 with a sticker "CG V206CN"
 	ROM_LOAD( "cg_v206cn.u1", 0x0000000, 0x4000000, CRC(6abd4a31) SHA1(6c5eefc3671c4192a689cb1e82605e65fec44384) )
-	// Suspect read corruption at the starts of 0x800-byte blocks: this lane alone
-	// produces periodic dots in raw sprites, and compressed image lengths disagree.
-	// FIXME: independent redump required to confirm the suspected corruption.
-	ROM_LOAD( "cg_v206cn.u2", 0x4000000, 0x4000000, BAD_DUMP CRC(b37e94b2) SHA1(da9e8b38070412a1b4057ddaf1df65878f3e135a) )
+	ROM_LOAD( "cg_v206cn.u2", 0x4000000, 0x4000000, BAD_DUMP CRC(4029df1a) SHA1(82baca3dc306cefc72c94adb4b4105bb54b557ee) ) // taken from lhzbgqb
 	ROM_LOAD( "cg_v206cn.u3", 0x8000000, 0x4000000, CRC(b379503c) SHA1(fc7d5c4afcef6a7448cc6547fa73e51378a67b3d) )
 	ROM_LOAD( "cg_v206cn.u4", 0xc000000, 0x4000000, CRC(f96be9f1) SHA1(fe957af2e31007b570c4f4b707400a87be1b4301) )
 ROM_END
@@ -1698,10 +1695,10 @@ ROM_START( lhzbgqb )
 
 	ROM_REGION( 0x10000000, "gfx", ROMREGION_ERASE00 )
 	// 4x 64MB flash ROMs (U1, U2, U3, U4) mounted onto a custom SODIMM at CN1 with a sticker "CG V105CN"
-	ROM_LOAD( "cg_v105cn.u1", 0x0000000, 0x4000000, NO_DUMP )
-	ROM_LOAD( "cg_v105cn.u2", 0x4000000, 0x4000000, NO_DUMP )
-	ROM_LOAD( "cg_v105cn.u3", 0x8000000, 0x4000000, NO_DUMP )
-	ROM_LOAD( "cg_v105cn.u4", 0xc000000, 0x4000000, NO_DUMP )
+	ROM_LOAD( "cg_v105cn.u1", 0x0000000, 0x4000000, BAD_DUMP CRC(6abd4a31) SHA1(6c5eefc3671c4192a689cb1e82605e65fec44384) ) // wouldn't read, taken from lhfy
+	ROM_LOAD( "cg_v105cn.u2", 0x4000000, 0x4000000, CRC(4029df1a) SHA1(82baca3dc306cefc72c94adb4b4105bb54b557ee) )
+	ROM_LOAD( "cg_v105cn.u3", 0x8000000, 0x4000000, BAD_DUMP CRC(b379503c) SHA1(fc7d5c4afcef6a7448cc6547fa73e51378a67b3d) ) // wouldn't read, taken from lhfy
+	ROM_LOAD( "cg_v105cn.u4", 0xc000000, 0x4000000, CRC(f96be9f1) SHA1(fe957af2e31007b570c4f4b707400a87be1b4301) )
 ROM_END
 
 
