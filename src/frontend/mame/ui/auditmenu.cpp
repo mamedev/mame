@@ -96,7 +96,7 @@ void menu_audit::custom_render(uint32_t flags, void *selectedref, float top, flo
 					&m_prompt, &m_prompt + 1,
 					origx1, origx2, origy2 + tb_border(), origy2 + bottom,
 					text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-					ui().colors().text_color(), UI_GREEN_COLOR);
+					ui().colors().colored_text_color(), ui().colors().accent_color());
 		}
 		break;
 
@@ -132,7 +132,7 @@ void menu_audit::custom_render(uint32_t flags, void *selectedref, float top, flo
 					ui().get_general_input_setting(IPT_UI_BACK)),
 				text_layout::text_justify::CENTER,
 				0.5F, 0.5F,
-				UI_RED_COLOR);
+				ui().colors().status_error_color());
 		break;
 	}
 }

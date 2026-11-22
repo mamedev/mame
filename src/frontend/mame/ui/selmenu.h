@@ -32,6 +32,8 @@
 struct ui_system_info;
 struct ui_software_info;
 
+class ui_colors;
+
 
 namespace ui {
 
@@ -81,7 +83,7 @@ protected:
 	class system_flags
 	{
 	public:
-		system_flags(machine_static_info const &info);
+		system_flags(ui_colors const &colors, machine_static_info const &info);
 		system_flags(system_flags const &) = default;
 		system_flags(system_flags &&) = default;
 		system_flags &operator=(system_flags const &) = default;
@@ -140,6 +142,7 @@ protected:
 
 	virtual void recompute_metrics(uint32_t width, uint32_t height, float aspect) override;
 	virtual void custom_render(uint32_t flags, void *selectedref, float top, float bottom, float origx1, float origy1, float origx2, float origy2) override;
+	virtual menu_color_context color_context() const noexcept override { return menu_color_context::SELECTION; }
 	virtual void menu_activated() override;
 	virtual void menu_deactivated() override;
 

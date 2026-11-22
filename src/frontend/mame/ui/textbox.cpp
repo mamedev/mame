@@ -499,7 +499,7 @@ void menu_fixed_textbox::custom_render(uint32_t flags, void *selectedref, float 
 			std::begin(toptext), std::end(toptext),
 			origx1, origx2, origy1 - top, origy1 - tb_border(),
 			text_layout::text_justify::CENTER, text_layout::word_wrapping::NEVER, false,
-			ui().colors().text_color(), UI_GREEN_COLOR);
+			ui().colors().colored_text_color(), ui().colors().accent_color());
 }
 
 

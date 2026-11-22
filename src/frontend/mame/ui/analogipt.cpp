@@ -591,6 +591,7 @@ bool menu_analog::handle(event const *ev)
 
 			// update the menu item
 			ev->item->set_subtext(item_text(data.type, newval));
+			ev->item->set_color_state(item_color_state(data.type, newval));
 			ev->item->set_flags((data.cur <= data.min) ? FLAG_RIGHT_ARROW : (data.cur >= data.max) ? FLAG_LEFT_ARROW : FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW);
 			return true;
 		}
@@ -660,7 +661,9 @@ void menu_analog::populate()
 				std::move(text),
 				item_text(data.type, data.cur),
 				(data.cur <= data.min) ? FLAG_RIGHT_ARROW : (data.cur >= data.max) ? FLAG_LEFT_ARROW : FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW,
-				&data);
+				&data,
+				menu_item_type::UNKNOWN,
+				item_color_state(data.type, data.cur));
 	}
 
 	// display a message if there are toggle inputs enabled
@@ -808,6 +811,14 @@ std::string menu_analog::item_text(int type, int value)
 	case ANALOG_ITEM_SENSITIVITY:
 		return string_format("%d", value);
 	}
+}
+
+menu_item_color_state menu_analog::item_color_state(int type, int value)
+{
+	if (ANALOG_ITEM_REVERSE == type)
+		return value ? menu_item_color_state::ON : menu_item_color_state::OFF;
+	else
+		return menu_item_color_state::NORMAL;
 }
 
 } // namespace ui
