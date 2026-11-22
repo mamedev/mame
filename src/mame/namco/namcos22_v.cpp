@@ -1210,7 +1210,7 @@ void namcos22_state::blit_quads(int addr, int len, float m[4][4])
 				m_LitSurfaceWidth = ((point_read(addr + 1) >> 16) & 0xf) + 1;
 				m_LitSurfaceTriangles = ((point_read(addr + 1) >> 20) & 1) > 0;
 				m_LitSurfaceIntensity = ((point_read(addr + 3) & 0xffff) * m_camera_power) >> 15;
-				
+
 				register_normals(addr + 4, m);
 				break;
 
@@ -1579,17 +1579,22 @@ void namcos22_state::screen_vblank(int state)
 		if (m_skipped_this_frame)
 			render_frame_active();
 		m_skipped_this_frame = machine().video().skip_this_frame();
-
-		if (m_is_ss22)
-			vics_copy_sprite_data();
 	}
+}
+
+void namcos22s_state::screen_vblank(int state)
+{
+	namcos22_state::screen_vblank(state);
+
+	if (state)
+		vics_copy_sprite_data();
 }
 
 
 
 /*********************************************************************************************/
 
-void namcos22_state::draw_sprites()
+void namcos22s_state::draw_sprites()
 {
 	/*
 	    0x980000:   00060000 00010000 02ff0000 000007ff
@@ -1786,7 +1791,7 @@ void namcos22s_state::namcos22s_vics_data_w(offs_t offset, u16 data, u16 mem_mas
 
 u32 namcos22s_state::namcos22s_vics_control_r(offs_t offset)
 {
-	if (offset == 0)  // reg 0, status register? high byte is read in timecris and lower half is expected to be 0
+	if (offset == 0) // reg 0, status register? high byte is read in timecris and lower half is expected to be 0
 		return 0;
 	else
 		return m_vics_control[offset];
@@ -1817,7 +1822,7 @@ void namcos22s_state::namcos22s_attributeram_w(offs_t offset, u16 data, u16 mem_
 	COMBINE_DATA(&m_attributeram[offset]);
 }
 
-void namcos22_state::vics_copy_sprite_data()
+void namcos22s_state::vics_copy_sprite_data()
 {
 	/* VICS provides a 64kB buffer for the main CPU to write sprite data during active display
 	   During vblank it copies data to the sprite chip (C374); up to four blocks may be copied
