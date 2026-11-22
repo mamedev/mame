@@ -1130,10 +1130,11 @@ void vga_device::sequencer_map(address_map &map)
 			vga.sequencer.map_mask = data & 0xf;
 		})
 	);
+	// $03 Character Map Select
+	// --2- 84-- character select A
+	// ---2 --84 character select B
 	map(0x03, 0x03).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			/* --2- 84-- character select A
-			   ---2 --84 character select B */
 			vga.sequencer.char_sel.A = (((data & 0xc) >> 2) << 1) | ((data & 0x20) >> 5);
 			vga.sequencer.char_sel.B = (((data & 0x3) >> 0) << 1) | ((data & 0x10) >> 4);
 			// optimization for screen update inner loop
@@ -1275,7 +1276,8 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	// TODO: make it a subclassable function, cfr. PR2 Video Select in Paradise family
 	#define TEXT_COPY_9COLUMN(ch) (((ch & 0xe0) == 0xc0) && (vga.attribute.data[0x10] & 4))
 
-	int width = BIT(vga.sequencer.data[1], 0) ? 8 : 9, height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
+	int width = BIT(vga.sequencer.data[1], 0) ? 8 : 9;
+	int height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
 
 	const u32 frame_number = screen().frame_number();
 
@@ -1321,8 +1323,8 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					const int dest_x = column * width + w;
 					if(!screen().visible_area().contains(dest_x, line+h))
 						continue;
-					bitmapline[dest_x] = pen;
 
+					bitmapline[dest_x] = pen;
 				}
 				if (w < width)
 				{
@@ -1337,9 +1339,11 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 					if(!screen().visible_area().contains(dest_x, line+h))
 						continue;
+
 					bitmapline[dest_x] = pen;
 				}
 			}
+
 			if (vga.cursor.visible && (pos == vga.crtc.cursor_addr))
 			{
 				for (int h = vga.crtc.cursor_scan_start;
@@ -1360,9 +1364,9 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 {
 	const int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	const int pel_shift = (vga.attribute.pel_shift & 7);
 	const int LINES = (vga.crtc.vert_disp_end + 1) * (get_interlace_mode() + 1);
 	const int EGA_COLUMNS = vga.crtc.horz_disp_end + 1;
+	int pel_shift = (vga.attribute.pel_shift & 7);
 
 	for (int addr = vga.crtc.start_addr, line = 0; line < LINES; line += height, addr += offset())
 	{
@@ -1374,7 +1378,10 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 			// causing no status bar to appear. This is a known btanb in how VGA
 			// handles EGA mode, cfr. https://www.os2museum.com/wp/fantasyland-on-vga/
 			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
+			{
 				addr = 0;
+				pel_shift = 0;
+			}
 
 			for (int pos=addr, c=0, column=0; column<EGA_COLUMNS+1; column++, c+=8, pos=(pos+1)&0xffff)
 			{
@@ -1417,6 +1424,8 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  popmessage("%02x %02x",vga.attribute.pel_shift,vga.sequencer.data[4] & 0x08);
 
 	int curr_addr = 0;
+
+	// TODO: merge these two versions
 	if(!(vga.sequencer.data[4] & 0x08))
 	{
 		for (int addr = start_addr(), line=0; line < LINES; line+=height, addr+=offset(), curr_addr+=offset())
@@ -1455,7 +1464,10 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				if((line + yi) < (vga.crtc.line_compare & mask_comp))
 					curr_addr = addr;
 				if((line + yi) == (vga.crtc.line_compare & mask_comp))
+				{
 					curr_addr = 0;
+					pel_shift = 0;
+				}
 				uint32_t *const bitmapline = &bitmap.pix(line + yi);
 				//addr %= 0x80000;
 				for (int pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=0x10, pos+=0x8)

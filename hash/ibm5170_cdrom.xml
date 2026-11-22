@@ -7172,6 +7172,7 @@ Draws video without colors if run thru autorun in Win95, works if st_95.exe is m
 		<description>Supaplex (Europe)</description>
 		<year>1995</year>
 		<publisher>Action Sixteen</publisher>
+		<info name="usage" value="Sports manual copy protection"/>
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
 				<disk name="Supaplex (Europe)" sha1="24aae2c6eb6aed18550a8d86803c1e122c26bf12" />
@@ -7219,6 +7220,7 @@ Titus the Fox: To Marrakech and Back
 		<info name="language" value="English" />
 		<info name="region" value="Europe" />
 		<info name="required_os" value="DOS" />
+		<info name="usage" value="Run TITUS.BAT to run"/>
 
 		<part name="cdrom" interface="cdrom">
 			<diskarea name="cdrom">
