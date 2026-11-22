@@ -134,6 +134,9 @@ namespace h89bus
 		MEM_PRI_U516  = 0x01,
 		// no memory at this address
 		MEM_PRI_NOMEM = 0x02,
+		// the MMS 77318 control board sends D1 to its RAM board as CTL instead (see
+		// device_heath_mem_decoder_interface::card_ctl_line())
+		MEM_PRI_CTL   = 0x02,
 		// 16K RAM banks on the CPU board
 		MEM_PRI_RAS0  = 0x04,
 		MEM_PRI_RAS1  = 0x08,
@@ -231,10 +234,14 @@ public:
 	// construction/destruction
 	virtual ~device_h89bus_left_card_interface();
 
-	// memory the card puts on a primary memory decoder select line (h89bus::MEM_PRI_RD6 or
-	// h89bus::MEM_PRI_RD7): 16K that A13 - A0 index, or nullptr if the card doesn't answer
-	// the line; the bus asks while it builds the memory map at machine start
-	virtual u8 *mem_select_bank(u8 select_line) ATTR_COLD;
+	// primary memory decoder select lines the card answers (h89bus::MEM_PRI_RD6, MEM_PRI_RD7)
+	virtual u8 mem_select_lines() const ATTR_COLD;
+
+	// memory the card puts at addr when the primary memory decoder selects select_lines (RD6,
+	// RD7, and MEM_PRI_CTL when the decoder drives it): the byte at addr, which is valid for
+	// the 1K page that holds it, or nullptr; the bus asks while it builds the memory map at
+	// machine start
+	virtual u8 *mem_select(u8 select_lines, offs_t addr) ATTR_COLD;
 
 	// a 4K system ROM on the card that can stand in for the one on the CPU board (U518),
 	// or nullptr; the bus asks while it builds the memory map at machine start, and only
@@ -532,6 +539,21 @@ public:
 	// PROM output for the given inputs, inverted so a selected line reads as 1
 	virtual u8 decode(offs_t inputs) const = 0;
 
+	// primary decoders: the memory maps that can be selected while running, the PROM inputs
+	// that select each one with the CPU board's memory size jumpers (the bus adds A4 - A0:
+	// BRD L, BRFSH L and A15 - A13), and the map selected by a write to the general purpose
+	// port; the Heath PROMs have two, selected by MEM 1 (ORG-0)
+	virtual u32 map_count() const ATTR_COLD;
+	virtual offs_t map_inputs(u32 map, u8 jumpers) const ATTR_COLD;
+	virtual u32 select_map(u8 gpp);
+
+	// general purpose port lines (h89bus::gpp_lines) that select_map() uses
+	virtual u8 map_gpp_lines() const ATTR_COLD;
+
+	// a PROM output that goes to the left slot cards instead of the CPU board
+	// (h89bus::MEM_PRI_CTL), or 0
+	virtual u8 card_ctl_line() const ATTR_COLD;
+
 protected:
 	device_heath_mem_decoder_interface(const machine_config &mconfig, device_t &device);
 };
@@ -539,6 +561,7 @@ protected:
 // primary decoders (U517)
 DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_444_42, device_heath_mem_decoder_interface)
 DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_444_66, device_heath_mem_decoder_interface)
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_MMS_77318, device_heath_mem_decoder_interface)
 
 // secondary decoders (U516)
 DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_444_41, device_heath_mem_decoder_interface)
@@ -560,6 +583,12 @@ public:
 
 	// PROM output for the given inputs, nothing is selected with an empty socket
 	u8 decode(offs_t inputs) const { return m_decoder ? m_decoder->decode(inputs) : 0; }
+
+	u32 map_count() const ATTR_COLD { return m_decoder ? m_decoder->map_count() : 1; }
+	offs_t map_inputs(u32 map, u8 jumpers) const ATTR_COLD { return m_decoder ? m_decoder->map_inputs(map, jumpers) : 0; }
+	u8 map_gpp_lines() const ATTR_COLD { return m_decoder ? m_decoder->map_gpp_lines() : 0; }
+	u8 card_ctl_line() const ATTR_COLD { return m_decoder ? m_decoder->card_ctl_line() : 0; }
+	u32 select_map(u8 gpp) { return m_decoder ? m_decoder->select_map(gpp) : 0; }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -623,6 +652,7 @@ protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_reset_after_children() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
 	// bus-internal handlers
@@ -643,16 +673,17 @@ protected:
 
 private:
 	u8 *cpu_ram_bank(u8 select_line) const ATTR_COLD;
-	std::vector<u8 *> select_line_banks(u8 select_line) const ATTR_COLD;
-	void install_mem_view_entry(memory_view::memory_view_entry &entry, bool org0, bool fmwe, u8 jumpers) ATTR_COLD;
+	std::vector<u8 *> select_line_targets(u8 pri, offs_t addr) const ATTR_COLD;
+	void install_mem_view_entry(memory_view::memory_view_entry &entry, u32 map, bool fmwe, u8 jumpers) ATTR_COLD;
 	void update_mem_view();
 
 	devcb_write_line m_out_int3_cb, m_out_int4_cb, m_out_int5_cb;
 	devcb_write_line m_out_wait_cb;
 
-	// memory map, one view entry for each combination of ORG-0 (MEM 1) and FMWE
+	// memory map, one view entry for each combination of the primary decoder's map and FMWE
 	memory_view m_mem_view;
 	bool m_mem_installed;
+	u32 m_mem_map;
 	bool m_fmwe;
 	u8 *m_ram;
 	offs_t m_ram_size;

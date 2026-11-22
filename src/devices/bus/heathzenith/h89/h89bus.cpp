@@ -42,6 +42,7 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
+#include <iterator>
 #include <string>
 
 #define LOG_SETUP (1U << 1)
@@ -450,11 +451,70 @@ void heath_io_decoder_socket::device_start()
     A1 - A11                              D2 - Option RAM L
     A0 - A10                              D1 - Option ROM L
                                           D0 - System ROM L
+
+  Magnolia Microsystems 77318 bank select control board (10-77318-1)
+
+  Plugs into the U517 and U552 (general purpose port latch) sockets, with its
+  own latch, a key-lock circuit and a 512 x 8 primary decoder PROM. The PROM
+  outputs are the same as the Heath PROMs', except D1: it goes to the 128K
+  RAM board (10-77318-2) as CTL, which inverts A13 there, so there is no
+  DATA=0 output. Its inputs are
+
+    A8 - D2 of port 0xf2, NANDed with the key-lock
+    A7 - MEM 1 H  (D5 of port 0xf2)
+    A6 - D4 of port 0xf2, NANDed with the key-lock
+    A5 - JJ501    (JJ502 and JJ503 are not connected)
+    A4 - A0 as on the Heath PROMs
+
+  The key-lock is two 74LS107 J-K flip-flops with K low, cleared only by
+  reset. The first is set when D3 falls while D2 is high, the second when D2
+  falls while D3 is high, after the first. The documented sequence on D3/D2,
+  04 0c 04 08 0c 08, does that with J steady at each edge.
+
+  Until the key-lock is set, only MEM 1 selects the map (A, the power-on map,
+  or B, ORG-0). After it, D5, D4 and D2 select one of eight maps until the
+  next reset. The RAM board holds the top 16K of the standard 64K (page 0) and
+  two 56K pages, which the maps put in low memory:
+
+    map  port 0xf2  low memory
+    A    00         system ROM, the floppy RAM and ROM (power on)
+    B    20         page 0 (ORG-0)
+    C    04         0x0000 - 0x1fff from page 1
+    D    24         0x0000 - 0x1fff from page 2
+    E    10         0x0000 - 0xbfff from page 1
+    F    30         0x0000 - 0xbfff from page 2
+    G    14         0x0000 - 0xdfff from page 1
+    H    34         0x0000 - 0xdfff from page 2
 */
 
 device_heath_mem_decoder_interface::device_heath_mem_decoder_interface(const machine_config &mconfig, device_t &device) :
 	device_interface(device, "h89bus")
 {
+}
+
+u32 device_heath_mem_decoder_interface::map_count() const
+{
+	return 2;
+}
+
+offs_t device_heath_mem_decoder_interface::map_inputs(u32 map, u8 jumpers) const
+{
+	return (BIT(map, 0) << 7) | (jumpers << 5);
+}
+
+u32 device_heath_mem_decoder_interface::select_map(u8 gpp)
+{
+	return (gpp & h89bus::GPP_MEM1) ? 1 : 0;
+}
+
+u8 device_heath_mem_decoder_interface::map_gpp_lines() const
+{
+	return h89bus::GPP_MEM1;
+}
+
+u8 device_heath_mem_decoder_interface::card_ctl_line() const
+{
+	return 0;
 }
 
 namespace {
@@ -469,6 +529,12 @@ ROM_START(mem_444_66)
 	ROM_REGION(0x100, "mem_decode", 0)
 	// replacement primary decoder, adds 64K and ORG-0
 	ROM_LOAD("444-66.u517", 0x0000, 0x0100, CRC(ad94a5df) SHA1(33b478e2c19da1cfa301506866d6810e4171556d))
+ROM_END
+
+ROM_START(mem_mms_77318)
+	ROM_REGION(0x200, "mem_decode", 0)
+	// not dumped, decode() uses a table built from the documented memory maps
+	ROM_LOAD("77318.u517", 0x0000, 0x0200, NO_DUMP)
 ROM_END
 
 ROM_START(mem_444_41)
@@ -523,6 +589,173 @@ public:
 	}
 };
 
+class heath_mem_decoder_mms_77318 : public device_t, public device_heath_mem_decoder_interface
+{
+public:
+	heath_mem_decoder_mms_77318(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0) :
+		device_t(mconfig, H89BUS_MEM_DECODER_MMS_77318, tag, owner, clock),
+		device_heath_mem_decoder_interface(mconfig, *this)
+	{
+	}
+
+	virtual u8 decode(offs_t inputs) const override ATTR_COLD { return m_map_table[inputs & 0x1ff]; }
+
+	// maps A - H: bit 0 is MEM 1 (D5), bit 1 is D2 and bit 2 is D4 of port 0xf2
+	virtual u32 map_count() const override ATTR_COLD { return 8; }
+	virtual offs_t map_inputs(u32 map, u8 jumpers) const override ATTR_COLD;
+	virtual u32 select_map(u8 gpp) override;
+
+	// D2 and D3 (RSVD 0/1) for the key-lock, D2, D4 (MEM 0) and D5 (MEM 1) for the map
+	virtual u8 map_gpp_lines() const override ATTR_COLD { return h89bus::GPP_RSVD0 | h89bus::GPP_RSVD1 | h89bus::GPP_MEM0 | h89bus::GPP_MEM1; }
+
+	virtual u8 card_ctl_line() const override ATTR_COLD { return h89bus::MEM_PRI_CTL; }
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD { return ROM_NAME(mem_mms_77318); }
+
+private:
+	static u8 standard_map(bool org0, bool mem_64k, bool write, u32 block) ATTR_COLD;
+
+	// stands in for the PROM until it is dumped, with a selected line as 1
+	std::array<u8, 0x200> m_map_table;
+
+	// key-lock flip-flops, and D3/D2 in the latch
+	bool m_key_ff1;
+	bool m_key_ff2;
+	u8 m_key_bits;
+};
+
+offs_t heath_mem_decoder_mms_77318::map_inputs(u32 map, u8 jumpers) const
+{
+	return (BIT(map, 1) ? 0x000 : 0x100) | (BIT(map, 0) << 7) | (BIT(map, 2) ? 0x00 : 0x40) | (BIT(jumpers, 0) << 5);
+}
+
+u32 heath_mem_decoder_mms_77318::select_map(u8 gpp)
+{
+	// the flip-flops' J and clock both come from the latch, so J is the value from before
+	// the write; the second is held clear until the first is set
+	u8 const bits = gpp & 0x0c;
+	bool const d2_falls = BIT(m_key_bits, 2) && !BIT(bits, 2);
+	bool const d3_falls = BIT(m_key_bits, 3) && !BIT(bits, 3);
+
+	if (m_key_ff1 && d2_falls && BIT(m_key_bits, 3))
+		m_key_ff2 = true;
+
+	if (d3_falls && BIT(m_key_bits, 2))
+		m_key_ff1 = true;
+
+	m_key_bits = bits;
+
+	if (m_key_ff2)
+		return bitswap<3>(gpp, 4, 2, 5);
+
+	return BIT(gpp, 5);
+}
+
+// map A (ROM) or B (ORG-0); with JJ501 out (no RAM board) the same as a 444-66 with 48K;
+// with it, page 0's top 16K is bank A 0xc000 - 0xffff on the RAM board, so ORG-0 moves the
+// lower half of RAS2 from 0xc000 to 0x0000, as a 444-66 does with 48K
+u8 heath_mem_decoder_mms_77318::standard_map(bool org0, bool mem_64k, bool write, u32 block)
+{
+	u8 out = 0;
+
+	switch (block)
+	{
+	case 0:
+		if (org0)
+			out = h89bus::MEM_PRI_RAS2;
+		else if (write && mem_64k)
+			out = h89bus::MEM_PRI_U516 | h89bus::MEM_PRI_RAS2; // the RAM ORG-0 puts here, as on a 444-66
+		else
+			out = h89bus::MEM_PRI_U516;
+		break;
+	case 1: case 2: out = h89bus::MEM_PRI_RAS0; break;
+	case 3: case 4: out = h89bus::MEM_PRI_RAS1; break;
+	case 5:         out = h89bus::MEM_PRI_RAS2; break;
+	case 6:
+		if (mem_64k)
+			out = h89bus::MEM_PRI_RD6;
+		else if (!org0)
+			out = h89bus::MEM_PRI_RAS2;
+		break;
+	case 7:
+		if (mem_64k)
+			out = h89bus::MEM_PRI_RD6;
+		break;
+	}
+
+	// D1 is CTL, so nothing is selected where a 444-66 gives DATA=0
+	if (!out)
+		return 0;
+
+	return write ? (out | h89bus::MEM_PRI_WE) : out;
+}
+
+void heath_mem_decoder_mms_77318::device_start()
+{
+	// build the table from the documented maps and the RAM board's schematic; page 1 is
+	// bank B 0x0000 - 0xdfff (RD7), page 2 is bank A 0x0000 - 0xbfff (RD6) and, with CTL
+	// inverting A13, bank B 0xe000 - 0xffff for 0xc000 - 0xdfff
+	for (offs_t inputs = 0; inputs < 0x200; inputs++)
+	{
+		bool const d2 = !BIT(inputs, 8);
+		bool const org0 = BIT(inputs, 7);
+		bool const d4 = !BIT(inputs, 6);
+		bool const mem_64k = BIT(inputs, 5);
+		bool const write = BIT(inputs, 4);
+		bool const refresh = !BIT(inputs, 3);
+		u32 const block = inputs & 0x07;
+
+		u8 out = 0;
+
+		if (!refresh)
+		{
+			// blocks in low memory from page 1 (D5 = 0) or page 2 (D5 = 1)
+			u32 paged = 0;
+			if (mem_64k)
+			{
+				if (d4)
+					paged = d2 ? 7 : 6;
+				else
+					paged = d2 ? 1 : 0;
+			}
+
+			if (block < paged)
+			{
+				if (!org0)
+					out = h89bus::MEM_PRI_RD7;
+				else if (block < 6)
+					out = h89bus::MEM_PRI_RD6;
+				else
+					out = h89bus::MEM_PRI_RD7 | h89bus::MEM_PRI_CTL;
+
+				if (write)
+					out |= h89bus::MEM_PRI_WE;
+			}
+			else
+			{
+				out = standard_map(org0, mem_64k, write, block);
+			}
+		}
+
+		m_map_table[inputs] = out;
+	}
+
+	save_item(NAME(m_key_ff1));
+	save_item(NAME(m_key_ff2));
+	save_item(NAME(m_key_bits));
+}
+
+void heath_mem_decoder_mms_77318::device_reset()
+{
+	// reset clears the key-lock flip-flops and the latch
+	m_key_ff1 = false;
+	m_key_ff2 = false;
+	m_key_bits = 0;
+}
+
 class heath_mem_decoder_444_41 : public heath_mem_decoder_prom_device
 {
 public:
@@ -545,6 +778,7 @@ public:
 
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_42, device_heath_mem_decoder_interface, heath_mem_decoder_444_42, "h89bus_mem_decoder_444_42", "Heath H89 Primary Memory Decoder 444-42 PROM")
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_66, device_heath_mem_decoder_interface, heath_mem_decoder_444_66, "h89bus_mem_decoder_444_66", "Heath H89 Primary Memory Decoder 444-66 PROM")
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_MMS_77318, device_heath_mem_decoder_interface, heath_mem_decoder_mms_77318, "h89bus_mem_decoder_mms_77318", "Magnolia Microsystems 77318 Bank Select Control Board")
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_41, device_heath_mem_decoder_interface, heath_mem_decoder_444_41, "h89bus_mem_decoder_444_41", "Heath H89 Secondary Memory Decoder 444-41 PROM")
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_83, device_heath_mem_decoder_interface, heath_mem_decoder_444_83, "h89bus_mem_decoder_444_83", "Heath H89 Secondary Memory Decoder 444-83 PROM")
 
@@ -592,6 +826,7 @@ h89bus_device::h89bus_device(const machine_config &mconfig, device_type type, co
 	m_out_wait_cb(*this),
 	m_mem_view(*this, "mem_map"),
 	m_mem_installed(false),
+	m_mem_map(0),
 	m_fmwe(false),
 	m_ram(nullptr),
 	m_ram_size(0),
@@ -615,6 +850,7 @@ void h89bus_device::device_start()
 	m_gpp = 0;
 
 	save_item(NAME(m_gpp));
+	save_item(NAME(m_mem_map));
 	save_item(NAME(m_fmwe));
 }
 
@@ -630,7 +866,16 @@ void h89bus_device::device_reset()
 
 	for (auto &[mask, handler] : m_gpp_handlers)
 		handler(0);
+}
 
+//-------------------------------------------------
+//  device_reset_after_children - select the memory
+//  map once the primary memory decoder is reset
+//-------------------------------------------------
+
+void h89bus_device::device_reset_after_children()
+{
+	m_mem_map = m_pri_mem_decoder->select_map(0);
 	update_mem_view();
 }
 
@@ -694,8 +939,14 @@ void h89bus_device::gpp_w(u8 data)
 			handler(data);
 	}
 
-	if (changed & h89bus::GPP_MEM1)
+	// the primary memory decoder selects the memory map, from MEM 1 (ORG-0) on the Heath PROMs
+	u32 const map = m_pri_mem_decoder->select_map(data);
+
+	if (map != m_mem_map)
+	{
+		m_mem_map = map;
 		update_mem_view();
+	}
 }
 
 //-------------------------------------------------
@@ -703,9 +954,10 @@ void h89bus_device::gpp_w(u8 data)
 //  the memory decoder PROMs
 //
 //  The only PROM inputs that change while running
-//  are MEM 1 (ORG-0) and FMWE (floppy RAM write
-//  enable), so a view entry is built for each of
-//  their four combinations.
+//  are the ones that select the memory map (MEM 1,
+//  ORG-0, on the Heath PROMs) and FMWE (floppy RAM
+//  write enable), so a view entry is built for each
+//  combination of them.
 //-------------------------------------------------
 
 void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *floppy_ram)
@@ -714,6 +966,17 @@ void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *flopp
 	m_ram_size = ram_size;
 	m_rom = rom;
 	m_floppy_ram = floppy_ram;
+
+	// a device that also switches on the port lines that select the memory map changes with it,
+	// such as a speed upgrade on MEM 0 with an MMS 77318
+	u8 shared_lines = 0;
+
+	for (auto const &[mask, handler] : m_gpp_handlers)
+		shared_lines |= mask & m_pri_mem_decoder->map_gpp_lines();
+
+	if (shared_lines)
+		osd_printf_warning("%s: another device also uses port 0xf2 bits %02x, which the memory decoder uses to select the memory map\n",
+				tag(), shared_lines);
 
 	// the system ROM comes from the CPU board, or from the first card in a left slot that has one
 	m_sys_rom_bank->configure_entry(0, m_rom);
@@ -745,7 +1008,7 @@ void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *flopp
 
 		for (device_h89bus_left_card_interface &card : m_left_device_list)
 		{
-			if (card.mem_select_bank(line))
+			if (card.mem_select_lines() & line)
 				names.emplace_back(card.device().tag());
 		}
 
@@ -781,11 +1044,11 @@ void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *flopp
 
 	m_program_space->install_view(0x0000, 0xffff, m_mem_view);
 
-	for (int org0 = 0; org0 < 2; org0++)
+	for (u32 map = 0; map < m_pri_mem_decoder->map_count(); map++)
 	{
 		for (int fmwe = 0; fmwe < 2; fmwe++)
 		{
-			install_mem_view_entry(m_mem_view[(org0 << 1) | fmwe], org0, fmwe, jumpers);
+			install_mem_view_entry(m_mem_view[(map << 1) | fmwe], map, fmwe, jumpers);
 		}
 	}
 
@@ -817,30 +1080,44 @@ u8 *h89bus_device::cpu_ram_bank(u8 select_line) const
 	return m_ram + (bank * 0x4000);
 }
 
-// 16K banks that answer a primary memory decoder select line: cards in the
-// left slots first, so reads come from them, then the CPU board
-std::vector<u8 *> h89bus_device::select_line_banks(u8 select_line) const
+// RAM at addr for the primary memory decoder's select lines: cards in the left
+// slots (RD6/RD7) first, so reads come from them, then the CPU board
+std::vector<u8 *> h89bus_device::select_line_targets(u8 pri, offs_t addr) const
 {
-	std::vector<u8 *> banks;
+	std::vector<u8 *> targets;
 
-	if (select_line & (h89bus::MEM_PRI_RD6 | h89bus::MEM_PRI_RD7))
+	u8 const card_lines = pri & (h89bus::MEM_PRI_RD6 | h89bus::MEM_PRI_RD7);
+
+	if (card_lines)
 	{
+		u8 const ctl = pri & m_pri_mem_decoder->card_ctl_line();
+
 		for (device_h89bus_left_card_interface &card : m_left_device_list)
 		{
-			u8 *const bank = card.mem_select_bank(select_line);
-			if (bank)
-				banks.push_back(bank);
+			if (card.mem_select_lines() & card_lines)
+			{
+				u8 *const target = card.mem_select(card_lines | ctl, addr);
+				if (target)
+					targets.push_back(target);
+			}
 		}
 	}
 
-	u8 *const bank = cpu_ram_bank(select_line);
-	if (bank)
-		banks.push_back(bank);
+	// RAM banks are 16K, A13 selects the half
+	for (u8 const line : { h89bus::MEM_PRI_RAS0, h89bus::MEM_PRI_RAS1, h89bus::MEM_PRI_RAS2, h89bus::MEM_PRI_RD6 })
+	{
+		if (pri & line)
+		{
+			u8 *const bank = cpu_ram_bank(line);
+			if (bank)
+				targets.push_back(bank + (addr & 0x3fff));
+		}
+	}
 
-	return banks;
+	return targets;
 }
 
-void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry, bool org0, bool fmwe, u8 jumpers)
+void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry, u32 map, bool fmwe, u8 jumpers)
 {
 	// what each 1K page of the address space reads from and writes to
 	constexpr u32 PAGES = 0x10000 / 0x400;
@@ -850,14 +1127,17 @@ void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry
 	// pages read from the system ROM, through the bank so a card can put its own ROM there
 	std::array<bool, PAGES> sys_rom{};
 
+	// a decoder output that goes to the cards isn't DATA=0
+	u8 const nomem_line = h89bus::MEM_PRI_NOMEM & ~m_pri_mem_decoder->card_ctl_line();
+
 	for (int write = 0; write < 2; write++)
 	{
 		for (u32 block = 0; block < 8; block++)
 		{
 			// A3 is BRFSH L, which is never active here
-			u8 const pri = m_pri_mem_decoder->decode((org0 ? 0x80 : 0x00) | (jumpers << 5) | (write ? 0x10 : 0x00) | 0x08 | block);
+			u8 const pri = m_pri_mem_decoder->decode(m_pri_mem_decoder->map_inputs(map, jumpers) | (write ? 0x10 : 0x00) | 0x08 | block);
 
-			if (pri & h89bus::MEM_PRI_NOMEM)
+			if (pri & nomem_line)
 			{
 				continue;
 			}
@@ -880,23 +1160,14 @@ void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry
 						read_src[page] = ptr;
 				};
 
-				// RAM banks are 16K, A13 selects the half
+				// writes go to all the RAM that is selected, reads come from the first
 				if (!write || (pri & h89bus::MEM_PRI_WE))
 				{
-					for (u8 line : { h89bus::MEM_PRI_RAS0, h89bus::MEM_PRI_RAS1, h89bus::MEM_PRI_RAS2, h89bus::MEM_PRI_RD6, h89bus::MEM_PRI_RD7 })
+					for (u8 *const target : select_line_targets(pri, addr))
 					{
-						if (pri & line)
-						{
-							// writes go to every bank on the line, reads come from the first
-							std::vector<u8 *> const banks = select_line_banks(line);
-
-							for (u8 *const bank : banks)
-							{
-								add(bank + (addr & 0x3fff));
-								if (!write)
-									break;
-							}
-						}
+						add(target);
+						if (!write)
+							break;
 					}
 				}
 
@@ -1021,7 +1292,7 @@ void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry
 void h89bus_device::update_mem_view()
 {
 	if (m_mem_installed)
-		m_mem_view.select(((m_gpp & h89bus::GPP_MEM1) ? 2 : 0) | (m_fmwe ? 1 : 0));
+		m_mem_view.select((m_mem_map << 1) | (m_fmwe ? 1 : 0));
 }
 
 void h89bus_device::select_card_sys_rom(device_h89bus_left_card_interface &card, bool state)
@@ -1108,7 +1379,12 @@ device_h89bus_left_card_interface::~device_h89bus_left_card_interface()
 {
 }
 
-u8 *device_h89bus_left_card_interface::mem_select_bank(u8 select_line)
+u8 device_h89bus_left_card_interface::mem_select_lines() const
+{
+	return 0;
+}
+
+u8 *device_h89bus_left_card_interface::mem_select(u8 select_lines, offs_t addr)
 {
 	return nullptr;
 }

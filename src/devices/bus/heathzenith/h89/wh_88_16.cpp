@@ -26,7 +26,8 @@ public:
 	wh_88_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// device_h89bus_left_card_interface implementation
-	virtual u8 *mem_select_bank(u8 select_line) override ATTR_COLD;
+	virtual u8 mem_select_lines() const override ATTR_COLD { return h89bus::MEM_PRI_RD6; }
+	virtual u8 *mem_select(u8 select_lines, offs_t addr) override ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -43,9 +44,10 @@ wh_88_16_device::wh_88_16_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-u8 *wh_88_16_device::mem_select_bank(u8 select_line)
+u8 *wh_88_16_device::mem_select(u8 select_lines, offs_t addr)
 {
-	return (select_line == h89bus::MEM_PRI_RD6) ? m_ram.target() : nullptr;
+	// A13 - A0 address the 16K
+	return (select_lines & h89bus::MEM_PRI_RD6) ? &m_ram[addr & 0x3fff] : nullptr;
 }
 
 void wh_88_16_device::device_start()

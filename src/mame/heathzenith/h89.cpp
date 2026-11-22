@@ -53,6 +53,7 @@
 #include "bus/heathzenith/h89/h_88_5.h"
 #include "bus/heathzenith/h89/h17_fdc.h"
 #include "bus/heathzenith/h89/mms77316_fdc.h"
+#include "bus/heathzenith/h89/mms_77318.h"
 #include "bus/heathzenith/h89/mt_win89.h"
 #include "bus/heathzenith/h89/sigmasoft_parallel_port.h"
 #include "bus/heathzenith/h89/sigmasoft_sound.h"
@@ -224,9 +225,10 @@ public:
  * Functionality already implemented/Same as Heath options
  *  - MMS 77311 - 16k RAM
  *  - MMS 77312 - ORG-0 CP/M Mod
+ *  - MMS 77318 - 128k RAM board (mms_77318 in P503 and in the U517 socket,
+ *                h89bus:pri_mem_decoder)
  *
  * Hardware currently planned to be implemented:
- *  - MMS 77318 - 128k RAM board
  *  - MMS 77319 - Video Output
  *  - MMS 77320 - SASI board
  *  - MMS 77322 - Network Controller
@@ -776,6 +778,7 @@ static void intr_ctrl_options(device_slot_interface &device)
 
 void h89_base_state::h89_left_cards(device_slot_interface &device)
 {
+	device.option_add("mms_77318",       H89BUS_MMS_77318);
 	device.option_add("mt_win89",        H89BUS_MT_WIN89);
 	device.option_add("ss_parallel",     H89BUS_SIGMASOFT_PARALLEL);
 	device.option_add("ss_parallel_igc", H89BUS_SIGMASOFT_PARALLEL_IGC).machine_config(
@@ -842,8 +845,9 @@ static void io_decoder_options(device_slot_interface &device)
 
 static void pri_mem_decoder_options(device_slot_interface &device)
 {
-	device.option_add("444_42",  H89BUS_MEM_DECODER_444_42);
-	device.option_add("444_66",  H89BUS_MEM_DECODER_444_66);
+	device.option_add("444_42",    H89BUS_MEM_DECODER_444_42);
+	device.option_add("444_66",    H89BUS_MEM_DECODER_444_66);
+	device.option_add("mms_77318", H89BUS_MEM_DECODER_MMS_77318);
 }
 
 static void sec_mem_decoder_options(device_slot_interface &device)

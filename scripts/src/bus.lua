@@ -2778,6 +2778,8 @@ if BUSES["HEATHZENITH_H89"] then
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h_88_5.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/mms77316_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/mms77316_fdc.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/mms_77318.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/mms_77318.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/mt_win89.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/mt_win89.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_sound.cpp",
