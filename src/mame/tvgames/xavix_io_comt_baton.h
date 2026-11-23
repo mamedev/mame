@@ -13,7 +13,7 @@ class xavix_comet_baton_device : public xavix_ir_pulse_distance_device, public x
 public:
 	xavix_comet_baton_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void station_w(offs_t offset, u8 data, u8 mem_mask);
+	using xavix_ir_receiver_interface::ir_receiver_w;
 
 protected:
 	// device_t implementation

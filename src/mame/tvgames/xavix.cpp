@@ -2013,7 +2013,10 @@ void xavix_tak_comt_state::xavix_tak_comt(machine_config &config)
 
 	XAVIX_COMET_BATON(config, m_baton_controller, peripheral_clock());
 	m_baton_controller->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-	m_soc->io_output_callback<1>().append(m_baton_controller, FUNC(xavix_comet_baton_device::station_w));
+	m_soc->io_output_callback<1>().append([this] (offs_t, u8 data, u8 direction)
+	{
+		m_baton_controller->ir_receiver_w(BIT(data & direction, 1));
+	});
 	m_soc->raster_vblank_callback().append(m_baton_controller, FUNC(xavix_comet_baton_device::vblank_w));
 }
 

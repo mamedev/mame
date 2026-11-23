@@ -92,11 +92,6 @@ bool xavix_comet_baton_device::burst_length(u64 ticks, unsigned units)
 	return ticks >= 6'000 * units && ticks <= 9'500 * units;
 }
 
-void xavix_comet_baton_device::station_w(offs_t offset, u8 data, u8 mem_mask)
-{
-	ir_receiver_w(BIT(data & mem_mask, 1));
-}
-
 void xavix_comet_baton_device::ir_burst_started(u64 gap_ticks)
 {
 	if (m_receiving)
