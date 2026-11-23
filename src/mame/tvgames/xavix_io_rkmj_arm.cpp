@@ -36,8 +36,8 @@ static INPUT_PORTS_START( xavix_rockman_arm )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shot / Confirm")
 	// D02 is firmware-proven as Back, but its exact physical turned-button gesture is inferred from the single-button controller.
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Turn Controller and Press Shot / Back")
-	// Holding this high-level control generates the alternating tilt phases scored as a shake.
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shake Arm")
+	// This host shortcut alternates the same tilt reports as manual Arm Up/Down input.
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Simulate Arm Shake")
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("CONTROLLER_POWER")
