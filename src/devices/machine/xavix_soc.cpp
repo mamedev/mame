@@ -34,7 +34,6 @@
 #include "cpu/m6502/superxavix.h"
 
 #include <algorithm>
-#include <random>
 
 #define LOG_IO  (1U << 2)
 #define VERBOSE 0
@@ -298,8 +297,9 @@ void xavix_soc_device::device_start()
 	m_external_data_read_cb.resolve_safe(0xff);
 
 	// Zero-filled RAM gives rad_crdn/rad_crdnp a false Continue option.
-	// A uniform 0xff fill gives tak_hamr a fixed seed for its title background.
-	std::ranges::generate(m_mainram, [rng = std::mt19937(std::random_device{}())] () mutable { return u8(rng()); });
+	// Approximate power-on RAM with a repeatable mixed pattern for input replay.
+	// This makes tak_hamr's RAM-seeded title background repeat on identical cold boots.
+	std::ranges::generate(m_mainram, [this] () { return u8(machine().rand()); });
 
 	m_vblank_cb.resolve_safe();
 	m_watchdog_timer = timer_alloc(FUNC(xavix_soc_device::watchdog_expired), this);
