@@ -16,6 +16,7 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual u32 execute_max_cycles() const noexcept override;
 	virtual void state_import(const device_state_entry &entry) override;
 	virtual void do_exec_full() override;
 	virtual void do_exec_partial() override;

@@ -78,6 +78,14 @@ void superxavix_device::device_reset()
 	m_access_started = false;
 }
 
+u32 superxavix_device::execute_max_cycles() const noexcept
+{
+	// The longest sequence has eight steps. Each can wait for up to four
+	// outstanding burst transfers and its own access at eight clocks each.
+	// Allow four more clocks per step for arbitration, data return and execution.
+	return 8 * (5 * 8 + 4);
+}
+
 void superxavix_device::state_import(const device_state_entry &entry)
 {
 	// Debugger PC imports fetch immediately without advancing the bus.
