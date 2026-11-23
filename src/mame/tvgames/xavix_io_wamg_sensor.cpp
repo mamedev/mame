@@ -22,6 +22,7 @@ DEFINE_DEVICE_TYPE(XAVIX_WAMG_SENSOR, xavix_wamg_sensor_device, "xavix_wamg_sens
 xavix_wamg_sensor_device::xavix_wamg_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, XAVIX_WAMG_SENSOR, tag, owner, clock)
 	, m_strength(*this, "SWING")
+	, m_emitter(false)
 {
 }
 
@@ -52,7 +53,6 @@ void xavix_wamg_sensor_device::device_reset()
 	m_peak = 0;
 	m_armed = !(m_strength->read() & 0x07);
 	m_pulse_active = false;
-	m_emitter = false;
 }
 
 u8 xavix_wamg_sensor_device::adc_r()
