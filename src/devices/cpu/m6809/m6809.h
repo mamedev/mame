@@ -296,7 +296,9 @@ protected:
 	inline void write_exgtfr_register(uint8_t reg, uint16_t value);
 	bool is_register_addressing_mode();
 	bool is_ea_addressing_mode() { return m_addressing_mode == ADDRESSING_MODE_EA; }
-	uint16_t get_pending_interrupt(uint64_t latency = INTERRUPT_LATENCY_CYCLES);
+	uint16_t get_pending_interrupt(uint64_t latency = INTERRUPT_LATENCY_CYCLES) ATTR_FORCE_INLINE;
+	uint16_t get_settling_interrupt(uint64_t latency) ATTR_COLD;
+	uint16_t interrupt_vector(bool nmi, bool firq, bool irq) const;
 	bool interrupt_line_waiting() const { return m_nmi_asserted || m_firq_line || m_irq_line; }
 	int sync_wake_cycles() const;
 	void interrupt_line_changed();

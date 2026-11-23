@@ -532,6 +532,36 @@ void m6809_base_device::interrupt_line_changed()
 
 
 //-------------------------------------------------
+//  get_settling_interrupt - get_pending_interrupt
+//  while an input change may not be visible yet
+//-------------------------------------------------
+
+uint16_t m6809_base_device::get_settling_interrupt(uint64_t latency)
+{
+	// inputs are seen as they were `latency` cycles ago
+	bool nmi = m_nmi_asserted;
+	bool firq = m_firq_line;
+	bool irq = m_irq_line;
+	uint64_t const cycles = total_cycles();
+	if (cycles >= m_interrupt_settle_cycle)
+	{
+		m_interrupt_settling = false;
+	}
+	else
+	{
+		// changes alternate, so a line differed from its current level
+		// only between its two most recent changes
+		uint64_t const when = (cycles >= latency) ? (cycles - latency) : 0;
+		nmi = nmi && (when >= m_nmi_assert_cycle);
+		firq ^= (when >= m_firq_change_cycle[1]) && (when < m_firq_change_cycle[0]);
+		irq ^= (when >= m_irq_change_cycle[1]) && (when < m_irq_change_cycle[0]);
+	}
+
+	return interrupt_vector(nmi, firq, irq);
+}
+
+
+//-------------------------------------------------
 //  sync_wake_cycles - number of cycles SYNC still
 //  takes once an interrupt line is seen asserted
 //-------------------------------------------------
