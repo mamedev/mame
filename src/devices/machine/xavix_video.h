@@ -271,6 +271,35 @@ protected:
 	int m_video_hres_scale;
 
 private:
+	static constexpr int ORIGINAL_PICTURE_DELAY_CLOCKS = 24;
+	// Uncontended master clocks per byte; earlier-chip timing remains unmeasured.
+	static constexpr unsigned SPRITE_DMA_BYTE_CLOCKS = 2;
+	static const gfx_layout TILE_16X16_2BPP_LAYOUT;
+
+	static constexpr std::array<u8, TILEMAP_REGISTER_COUNT> TILEMAP_REGISTER_MASK =
+			{ 0x7f, 0x7f, 0x7f, 0xfe, 0xff, 0xff, 0xff, 0x9f };
+	static const std::array<std::array<double, 2>, 48> HUE_IQ;
+
+	struct tile_data
+	{
+		offs_t address;
+		int bpp;
+		int width;
+		int height;
+		int palette;
+		int priority;
+		pixel_layout layout;
+	};
+
+	struct sprite_data
+	{
+		tile_data tile;
+		int x;
+		int y;
+	};
+
+	enum class graphics_source { SPRITE, TILEMAP };
+
 	template <palette_plane Plane> void graphics_palram_w(offs_t offset, u8 data);
 	u8 spriteram_r(offs_t offset);
 	void spriteram_cpu_w(offs_t offset, u8 data);
@@ -309,39 +338,7 @@ private:
 	TIMER_CALLBACK_MEMBER(counter_field_start);
 	u32 video_noise_state() const;
 
-	rectangle m_raster_visible;
 	TIMER_CALLBACK_MEMBER(raster_vblank);
-	emu_timer *m_vblank_start_timer;
-	emu_timer *m_vblank_end_timer;
-	static constexpr int ORIGINAL_PICTURE_DELAY_CLOCKS = 24;
-	// Uncontended master clocks per byte; earlier-chip timing remains unmeasured.
-	static constexpr unsigned SPRITE_DMA_BYTE_CLOCKS = 2;
-	static const gfx_layout TILE_16X16_2BPP_LAYOUT;
-
-	static constexpr std::array<u8, TILEMAP_REGISTER_COUNT> TILEMAP_REGISTER_MASK =
-			{ 0x7f, 0x7f, 0x7f, 0xfe, 0xff, 0xff, 0xff, 0x9f };
-	static const std::array<std::array<double, 2>, 48> HUE_IQ;
-
-	struct tile_data
-	{
-		offs_t address;
-		int bpp;
-		int width;
-		int height;
-		int palette;
-		int priority;
-		pixel_layout layout;
-	};
-
-	struct sprite_data
-	{
-		tile_data tile;
-		int x;
-		int y;
-	};
-
-	enum class graphics_source { SPRITE, TILEMAP };
-
 	std::pair<int, int> fixed_raster_offset(int delay_clocks) const;
 	void pixel_decoder_ctrl_w(u8 data);
 	void draw_output(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -352,6 +349,9 @@ private:
 	void draw_tile_line(const rectangle &cliprect, const tile_data &tile, int xpos, int ypos, int line, int xoffset);
 
 	required_memory_region m_gfx_region;
+	rectangle m_raster_visible;
+	emu_timer *m_vblank_start_timer;
+	emu_timer *m_vblank_end_timer;
 	std::unique_ptr<pen_t[]> m_color_effect_palette;
 	bool m_color_effect_palette_valid;
 	std::array<s16, PALETTE_BANK_ENTRIES / 16> m_transparent_pens;

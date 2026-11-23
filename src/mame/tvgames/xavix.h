@@ -425,9 +425,10 @@ public:
 
 	void xavix_tak_daig(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual u8 lightgun_r(offs_t offset) override;
 
+private:
 	required_device<xavix_daigunder_robots_device> m_robots;
 };
 
@@ -466,9 +467,10 @@ public:
 
 	void xavix_has_wamg(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void io0_output_w(u8 data, u8 direction) override;
 
+private:
 	required_device<xavix_wamg_sensor_device> m_sensor;
 };
 
@@ -482,8 +484,9 @@ public:
 	void xavix_rad_hnt(machine_config &config) ATTR_COLD;
 	void xavix_rad_hnt2(machine_config &config) ATTR_COLD;
 
-private:
 	virtual void vblank_extra() override;
+
+protected:
 	virtual u8 lightgun_r(offs_t offset) override;
 };
 
@@ -496,7 +499,7 @@ public:
 
 	void xavix_gungunad(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual u8 lightgun_r(offs_t offset) override;
 	virtual u8 lightgun_event_mask() override { return m_lightgun_event_mask & (BIT(m_in0->read(), 6) ? 0xff : 0xfd); }
 };
@@ -515,12 +518,12 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-private:
 	virtual void io0_output_w(u8 data, u8 direction) override;
 	virtual void io1_output_w(u8 data, u8 direction) override;
 	virtual u8 lightgun_r(offs_t offset) override;
 	virtual u8 lightgun_event_mask() override { return m_lightgun_event_mask & (BIT(m_in1->read(), 1) ? 0xff : 0xfd); }
 
+private:
 	TIMER_CALLBACK_MEMBER(shutdown_confirmed);
 
 	output_finder<> m_gun_recoil;
@@ -541,9 +544,10 @@ protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-private:
 	virtual void io1_output_w(u8 data, u8 direction) override;
 	virtual u8 lightgun_r(offs_t offset) override;
+
+private:
 	u8 m_io1_out;
 };
 
@@ -554,8 +558,9 @@ public:
 		: xavix_lightgun_state(mconfig, type, tag)
 	{ }
 
-private:
 	virtual void vblank_extra() override;
+
+protected:
 	virtual u8 lightgun_r(offs_t offset) override;
 };
 
@@ -568,8 +573,9 @@ public:
 
 	void xavix_epo_dmon(machine_config &config) ATTR_COLD;
 
-private:
 	virtual void vblank_extra() override;
+
+protected:
 	virtual u8 lightgun_r(offs_t offset) override;
 };
 
@@ -590,10 +596,10 @@ protected:
 	virtual void device_pre_save() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 
-private:
 	virtual u8 io1_input_r(u8 direction) override;
 	virtual void io1_output_w(u8 data, u8 direction) override;
 
+private:
 	void reset_banker_bus();
 
 	required_device<xavix_croket_controllers_device> m_controllers;
@@ -699,10 +705,11 @@ public:
 
 	void xavix_ltv_tam(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void io0_output_w(u8 data, u8 direction) override;
 	virtual void io1_output_w(u8 data, u8 direction) override;
 
+private:
 	required_device<xavix_tamagotchi_ir_device> m_tamagotchi;
 };
 
@@ -719,9 +726,9 @@ public:
 protected:
 	virtual void machine_reset() override ATTR_COLD;
 
-private:
 	virtual void io0_output_w(u8 data, u8 direction) override;
 
+private:
 	output_finder<2> m_motor_drive;
 };
 
@@ -766,9 +773,11 @@ public:
 	void xavix_tvpc(machine_config &config) ATTR_COLD;
 	void xavix_tvpc_hk(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
 	virtual u8 io0_input_r(u8 direction) override;
+
+private:
 	u8 keyboard_r(offs_t offset);
 
 	required_ioport_array<8> m_keyboard;
@@ -785,9 +794,10 @@ public:
 
 	void xavix_bistro(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void io1_output_w(u8 data, u8 direction) override;
 
+private:
 	required_device<xavix_bistro_sensor_device> m_sensor;
 };
 
@@ -802,10 +812,12 @@ public:
 
 	void xavix_epo_mail(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void xavix_extbus_map(address_map &map) override ATTR_COLD;
 	virtual u8 io1_input_r(u8 direction) override;
 	virtual void io1_output_w(u8 data, u8 direction) override;
+
+private:
 	u8 keyboard_r();
 
 	required_ioport_array<9> m_keyboard;

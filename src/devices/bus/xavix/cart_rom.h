@@ -39,10 +39,12 @@ protected:
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
+	required_device<i2cmem_device> m_i2cmem;
+
+private:
 	uint8_t read_i2c(offs_t offset);
 	void write_i2c(offs_t offset, uint8_t data);
 
-	required_device<i2cmem_device> m_i2cmem;
 	uint8_t m_buscontrol[3];
 	uint8_t const m_bus_write_control_index;
 	uint8_t const m_bus_write_control_mask;

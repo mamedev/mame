@@ -130,12 +130,6 @@ protected:
 	void io1_output_cb(offs_t offset, u8 data, u8 mem_mask);
 	void io1_power_off_w(offs_t offset, u8 data, u8 mem_mask);
 
-	required_ioport m_in0;
-	required_ioport m_in1;
-	optional_ioport m_power;
-	required_device<xavix_soc_device> m_soc;
-	optional_device<nvram_device> m_nvram;
-	required_device<screen_device> m_screen;
 	virtual void xavix_extbus_map(address_map &map) ATTR_COLD;
 
 	void xavix_4mb_extbus_map(address_map &map) ATTR_COLD;
@@ -149,11 +143,16 @@ protected:
 
 	virtual u8 lightgun_r(offs_t offset);
 
-	required_region_ptr<u8> m_rom;
-
-	required_device<palette_device> m_palette;
-
 	virtual void external_bus_ctrl_changed(unsigned index, u8 data) { }
+
+	required_ioport m_in0;
+	required_ioport m_in1;
+	optional_ioport m_power;
+	required_device<xavix_soc_device> m_soc;
+	optional_device<nvram_device> m_nvram;
+	required_device<screen_device> m_screen;
+	required_region_ptr<u8> m_rom;
+	required_device<palette_device> m_palette;
 
 private:
 	xavix_baseball_ball_device &configure_baseball(machine_config &config) ATTR_COLD;

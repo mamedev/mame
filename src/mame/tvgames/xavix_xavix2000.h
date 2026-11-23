@@ -37,9 +37,10 @@ public:
 
 	void xavix2000_epo_es2j(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual u8 io0_input_r(u8 direction) override;
 
+private:
 	required_ioport_array<2> m_controllers;
 	required_device<xavix_epo_es2j_card_reader_device> m_card_reader;
 };
