@@ -152,8 +152,7 @@ void xavix_sound_device::device_post_load()
 
 void xavix_sound_device::synchronize()
 {
-	if (m_stream)
-		m_stream->update();
+	m_stream->update();
 }
 
 void xavix_sound_device::update_descriptor_tap()
@@ -824,7 +823,7 @@ void xavix_sound_device::reschedule_tempo_timers(u8 timer_mask)
 {
 	for (unsigned index = 0; index < std::size(m_tempo_timer); index++)
 	{
-		if (!BIT(timer_mask, index) || !m_tempo_timer[index])
+		if (!BIT(timer_mask, index))
 			continue;
 
 		const u16 step = u16(m_tempo_rate[index]) << 6;

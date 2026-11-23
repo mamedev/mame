@@ -206,7 +206,7 @@ void superxavix_video_device::apply_video_timing()
 			clock() * 2);
 
 	configure_raster(m_video_timing.width(), m_video_timing.height(), m_video_timing.visible_area(), period);
-	if (m_arena_irq_timer && (m_arena_ctrl & ARENA_IRQ_ENABLE))
+	if (m_arena_ctrl & ARENA_IRQ_ENABLE)
 		schedule_arena_irq();
 }
 
