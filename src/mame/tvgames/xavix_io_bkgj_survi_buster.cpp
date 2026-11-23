@@ -2,9 +2,8 @@
 // copyright-holders:MagikalUnicorn
 /***************************************************************************
 
-    Boukenger Survi Buster infrared weapon. Reads the trigger and controller
-    power setting, producing the existing 28-sample trigger sequence through
-    the shared infrared report generator.
+    Boukenger Survi Buster infrared weapon. Holding the trigger with
+    power on requests a 28-sample report.
 
     TODO:
     - Identify the red side control and measure transmitter edge timing.

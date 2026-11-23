@@ -396,8 +396,8 @@ xavix_video_device::picture_event_delays xavix_video_device::predict_picture_del
 
 void xavix_video_device::schedule_picture_irqs()
 {
-	// Earlier chips retain raster-based IRQ/NMI timing and partial updates.
-	// Only the arena has been moved to the retained picture counters here.
+	// Picture counters schedule the arena IRQ. Other video interrupts
+	// and partial updates use the raster position.
 	unsigned const arena = ((m_arena_ctrl & ARENA_IRQ_ENABLE) && !m_arena_irq_pending) ? PREDICT_ARENA : 0;
 	picture_event_delays const next = predict_picture_delays(PREDICT_FIELD | arena);
 	m_video_counter_timer->adjust(next.field);
