@@ -3198,6 +3198,7 @@ ROM_END
 ROM_START( doradraw )
 	ROM_REGION(0x800000, "bios", ROMREGION_ERASE00)
 	// Fails the internal ROM checksum (D4CB, expected D2DF).
+	// The mismatch appears in a hidden factory test. Normal play worked in testing.
 	ROM_LOAD("dmdj.u2", 0x000000, 0x800000, BAD_DUMP CRC(b3ca50ab) SHA1(9e6d28c1e170d3556e3c4ddcefb4cb51fd100df5) )
 
 	ROM_REGION(0x200000, "data", ROMREGION_ERASE00) // 16-bit writable data flash
