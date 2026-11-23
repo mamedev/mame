@@ -214,8 +214,7 @@ u8 s35390a_device::receive()
 void s35390a_device::prepare_read()
 {
 	// Consume the byte only after all eight bits have been clocked out.
-	auto const dis = machine().disable_side_effects();
-	m_shift = receive();
+	m_shift = (m_selected && m_read && m_pos < m_length) ? m_transfer[m_pos] : 0xff;
 	m_bits = 0;
 	m_state = STATE_READ;
 	m_sda_out = BIT(m_shift, 7);
