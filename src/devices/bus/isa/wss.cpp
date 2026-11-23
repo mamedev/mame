@@ -5,7 +5,6 @@
 Microsoft Windows Sound System based cards
 
 TODO:
-- How DMA selection works for 16-bit modes on original config?
 - IRQ / DMA combinations aren't extensively tested under win311 (a PITA overhead to test)
 - SoundBlaster compatibilty is untested (requires WSSXLAT.EXE and EMM386.EXE setup properly);
 
@@ -15,6 +14,11 @@ TODO:
 #include "wss.h"
 
 #include "speaker.h"
+
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
 
 DEFINE_DEVICE_TYPE(ISA16_WSS, isa16_wss_device, "wss", "Microsoft Windows Sound System (original design)")
 
@@ -106,8 +110,8 @@ void isa16_wss_device::remap(int space_id, offs_t start, offs_t end)
 
 		m_isa->install_device(0x0388, 0x038b, read8sm_delegate(*m_opl3, FUNC(ymf262_device::read)), write8sm_delegate(*m_opl3, FUNC(ymf262_device::write)));
 
-		// 0x530
-		m_isa->install_device(m_port_base, m_port_base, read8sm_delegate(*this, FUNC(isa16_wss_device::config_r)), write8sm_delegate(*this, FUNC(isa16_wss_device::config_w)));
+		// 0x530 ~ 0x533
+		m_isa->install_device(m_port_base + 0, m_port_base + 3, read8sm_delegate(*this, FUNC(isa16_wss_device::config_r)), write8sm_delegate(*this, FUNC(isa16_wss_device::config_w)));
 		// 0x534 ~ 0x537
 		m_isa->install_device(m_port_base + 4, m_port_base + 7, read8sm_delegate(*m_soundport, FUNC(ad1848_device::read)), write8sm_delegate(*m_soundport, FUNC(ad1848_device::write)));
 	}
@@ -141,12 +145,12 @@ void isa16_wss_device::config_irq_lanes(uint8_t data)
 	m_irq_line = irq_lines[irq_config];
 	m_drq_line = drq_lines[drq_config];
 
-	logerror("WSS config_irq_lanes: %02x IRQ %02x -> %d DRQ %02x -> %d\n", data, irq_config, m_irq_line, drq_config, m_drq_line);
+	LOG("WSS config_irq_lanes: %02x IRQ %02x -> %d DRQ %02x -> %d\n", data, irq_config, m_irq_line, drq_config, m_drq_line);
 	if (m_irq_line == -1)
-		logerror("Warning: unexpected IRQ combination!\n");
+		LOG("Warning: unexpected IRQ combination!\n");
 
 	if (m_drq_line == -1)
-		logerror("Warning: unexpected DRQ combination!\n");
+		LOG("Warning: unexpected DRQ combination!\n");
 	else
 	{
 		m_isa->set_dma_channel(m_drq_line, this, false);
@@ -162,7 +166,10 @@ void isa16_wss_device::host_io(address_map &map)
 
 uint8_t isa16_wss_device::config_r(offs_t offset)
 {
-	return m_config;
+	// TODO: inconclusive, carried from dosbox-x
+	// - win98se access $533 as a mirror of $530, expects bit 6 *only* to latch on writes then
+	//   reads, makes sure that bit 7 is never ever high, some crude BIST sequence?
+	return (m_config & 0x40) | 4;
 }
 
 void isa16_wss_device::config_w(offs_t offset, uint8_t data)
