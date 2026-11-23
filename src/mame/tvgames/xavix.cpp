@@ -2227,13 +2227,8 @@ static INPUT_PORTS_START( epo_crok )
 	// The enclosure button is unlabelled; this name follows its confirmed title/menu role.
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Main Unit Button")
 	// The factory gate uses contacts 1 and 2; their physical fixture is unidentified.
-	// PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 3") PORT_CODE(KEYCODE_5)
-	// PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 1") PORT_CODE(KEYCODE_9)
-	// PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 2") PORT_CODE(KEYCODE_0)
-	// PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 4") PORT_CODE(KEYCODE_6)
-	// PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Contact 5") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0xf2, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_epo_crok_state::factory_link_r))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) // Guard contacts are reported by the wireless controllers.
 
 	PORT_MODIFY("IN1")
@@ -2242,11 +2237,6 @@ static INPUT_PORTS_START( epo_crok )
 	PORT_CONFNAME( 0x02, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-
-	PORT_START("FACTORY_LINK")
-	// PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Link Test Packet") PORT_CODE(KEYCODE_8) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_epo_crok_state::factory_link_send), 0)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("BANKER")
 	PORT_CONFNAME( 0x01, 0x00, "Battle Code Banker Connection" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_epo_crok_state::banker_connection_changed), 0)
@@ -2272,20 +2262,7 @@ void xavix_epo_crok_state::xavix_epo_crok(machine_config &config)
 void xavix_epo_crok_state::machine_start()
 {
 	xavix_i2c_power_state::machine_start();
-	m_factory_link_timer = timer_alloc(FUNC(xavix_epo_crok_state::factory_link_tick), this);
 	save_item(NAME(m_saved_banker_connected));
-	save_item(NAME(m_factory_link_phase));
-	save_item(NAME(m_factory_link_bit));
-	save_item(NAME(m_factory_link_line));
-}
-
-void xavix_epo_crok_state::machine_reset()
-{
-	xavix_i2c_power_state::machine_reset();
-	m_factory_link_timer->adjust(attotime::never);
-	m_factory_link_phase = 0;
-	m_factory_link_bit = 0;
-	m_factory_link_line = 0;
 }
 
 u8 xavix_epo_crok_state::io1_input_r(u8 direction)
@@ -2330,47 +2307,6 @@ void xavix_epo_crok_state::reset_banker_bus()
 	u8 const data = m_soc->io_data_latch<1>();
 	u8 const direction = m_soc->io_direction<1>();
 	m_i2cmem->reset_bus(BIT(data | ~direction, 3), BIT(data & direction, 4));
-}
-
-INPUT_CHANGED_MEMBER(xavix_epo_crok_state::factory_link_send)
-{
-	if (machine().phase() == machine_phase::RUNNING && newval && !m_factory_link_phase)
-	{
-		m_factory_link_phase = 1;
-		m_factory_link_bit = 0;
-		m_factory_link_line = 1;
-		m_factory_link_timer->adjust(attotime::from_msec(1));
-	}
-}
-
-TIMER_CALLBACK_MEMBER(xavix_epo_crok_state::factory_link_tick)
-{
-	// The diagnostic receives 88 followed by eight zero bytes, including their checksum.
-	// Pulse intervals straddle its discriminator; the physical fixture and timing are unknown.
-	if (m_factory_link_phase == 1)
-	{
-		m_factory_link_line = 0;
-		m_factory_link_phase = 2;
-		m_factory_link_timer->adjust(attotime::from_msec(1));
-	}
-	else if (m_factory_link_phase == 2)
-	{
-		m_factory_link_line = 1;
-		m_factory_link_phase = 3;
-		m_factory_link_timer->adjust(attotime::from_msec(1));
-	}
-	else
-	{
-		m_factory_link_line = 0;
-		if (++m_factory_link_bit == 9 * 8)
-			m_factory_link_phase = 0;
-		else
-		{
-			bool const one = m_factory_link_bit < 8 && BIT(0x88, m_factory_link_bit);
-			m_factory_link_phase = 2;
-			m_factory_link_timer->adjust(attotime::from_msec(one ? 7 : 1));
-		}
-	}
 }
 
 
