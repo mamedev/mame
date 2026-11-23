@@ -1149,56 +1149,29 @@ void mc68328_base_device::update_ipr_state(u32 changed_mask)
 	const u32 irq_mask = get_irq_mask_for_level(irq_level);
 
 	if (!irq_level || !irq_mask)
-	{
 		return;
-	}
 
-	if (m_ipr & changed_mask)
-	{
-		// If a pending interrupt has changed, it's not masked, and it's not currently in service, raise the corresponding 68k IRQ line and mark it as
-		// in-service.
-		if ((~m_imr & irq_mask) && !(m_gisr & changed_mask))
-		{
-			m_gisr |= changed_mask;
-			set_input_line(irq_level, ASSERT_LINE);
-		}
-	}
-	else
-	{
-		m_gisr &= ~changed_mask;
-
-		// If there are no other pending, unmasked interrupts at this level, lower the corresponding 68k IRQ line.
-		if (!(m_ipr & ~m_imr & irq_mask))
-		{
-			set_input_line(irq_level, CLEAR_LINE);
-		}
-	}
+	// IPR records requests regardless of IMR. ISR only reports unmasked
+	// requests, rather than tracking whether the CPU has serviced them.
+	// MC68EZ328 User's Manual, sections 6.6.3-6.6.5; MC68328, 6.5.3/5/6.
+	m_gisr = (m_gisr & ~changed_mask) | (m_ipr & ~m_imr & changed_mask);
+	set_input_line(irq_level, (m_ipr & ~m_imr & irq_mask) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void mc68328_base_device::update_imr_state(u32 changed_mask)
 {
-	int irq_level = get_irq_level_for_mask(changed_mask);
-	u32 irq_mask = get_irq_mask_for_level(irq_level);
-	u32 level_mask = irq_mask & changed_mask;
-
-	while (irq_level && irq_mask)
+	while (changed_mask)
 	{
-		if (m_ipr & ~m_gisr & ~m_imr & level_mask)
-		{
-			// If a newly-unmasked interrupt is pending and not currently in-service, raise the relevant line.
-			m_gisr |= level_mask;
-			set_input_line(irq_level, ASSERT_LINE);
-		}
-		else if (m_gisr & m_imr & level_mask)
-		{
-			// If a newly-masked interrupt is in-service, lower the relevant line.
-			set_input_line(irq_level, CLEAR_LINE);
-		}
+		const int irq_level = get_irq_level_for_mask(changed_mask);
+		const u32 irq_mask = get_irq_mask_for_level(irq_level);
+		if (!irq_level || !irq_mask)
+			break;
 
+		// Reevaluate the whole CPU level: another source at the same level
+		// may still be pending when one source is masked. Unmasking a pending
+		// source must reassert the CPU line, including after sleep.
+		update_ipr_state(changed_mask & irq_mask);
 		changed_mask &= ~irq_mask;
-		irq_level = get_irq_level_for_mask(changed_mask);
-		irq_mask = get_irq_mask_for_level(irq_level);
-		level_mask = irq_mask & changed_mask;
 	}
 }
 
