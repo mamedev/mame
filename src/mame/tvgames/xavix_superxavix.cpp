@@ -671,7 +671,7 @@ void superxavix_xavtenni_state::superxavix_xavtenni(machine_config &config)
 {
 	superxavix_i2c_24c08(config);
 
-	configure_ir(config, m_controllers, xavix_ir_motion_device::controller_type::XAVIX_RACKETS);
+	configure_ir(config, m_controllers, xavix_ir_motion_device::XAVIX_RACKETS);
 }
 
 
@@ -2529,7 +2529,7 @@ void superxavix_suprtvpc_state::superxavix_suprtvpc(machine_config &config)
 		auto &cart = downcast<suprtvpc_rom_ir_device &>(*device);
 		// The cartridge receiver accepts the later Excite racket reports.
 		xavix_ir_motion_device &rackets(XAVIX_IR_MOTION(config, "rom_ir:controllers", DERIVED_CLOCK(1, 1)));
-		rackets.set_controller_type(xavix_ir_motion_device::controller_type::POWERED_PING_PONG_RACKETS);
+		rackets.set_controller(xavix_ir_motion_device::POWERED_PING_PONG_RACKETS);
 		rackets.set_event_callback(cart, FUNC(suprtvpc_rom_ir_device::ir_receive));
 		cart.ir_data_callback().set(rackets, FUNC(xavix_ir_motion_device::data_r));
 		cart.vblank_callback().set(rackets, FUNC(xavix_ir_motion_device::vblank_w));

@@ -26,35 +26,40 @@ private:
 class xavix_ir_motion_device : public xavix_ir_motion_base_device
 {
 public:
-	enum class controller_type
+	struct controller_config
 	{
-		PADDLES,
-		PING_PONG_RACKETS,
-		POWERED_PING_PONG_RACKETS,
-		KICK_SENSORS,
-		TENNIS_RACKETS,
-		SHAKERS,
-		SWORDS,
-		XAVIX_RACKETS
+		ioport_constructor ports;
+		u32 bit_ticks;
 	};
+
+	static const controller_config PADDLES;
+	static const controller_config PING_PONG_RACKETS;
+	static const controller_config POWERED_PING_PONG_RACKETS;
+	static const controller_config KICK_SENSORS;
+	static const controller_config TENNIS_RACKETS;
+	static const controller_config SHAKERS;
+	static const controller_config SWORDS;
+	static const controller_config XAVIX_RACKETS;
 
 	xavix_ir_motion_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
-	void set_controller_type(controller_type type) { m_controller_type = type; }
+	void set_controller(const controller_config &config);
 
 protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual void device_config_complete() override ATTR_COLD;
 
 	virtual u32 read_report(unsigned report) override;
 	virtual bool report_enabled(unsigned report) override;
 
 private:
+	static constexpr u32 ORIGINAL_BIT_TICKS = 0x47 * 64;
+	static constexpr u32 LATER_BIT_TICKS = 0xe5 * 32;
+
 	required_ioport_array<2> m_ir_strength;
 	required_ioport_array<2> m_ir_button;
 	optional_ioport m_ir_power;
-	controller_type m_controller_type;
+	ioport_constructor m_ports;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_IR_MOTION, xavix_ir_motion_device)

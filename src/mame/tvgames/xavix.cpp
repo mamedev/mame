@@ -530,9 +530,9 @@ void xavix_i2c_cart_state::io1_output_w(u8 data, u8 direction)
 //  IR Connection
 //-------------------------------------------------
 
-void xavix_state::configure_ir(machine_config &config, required_device<xavix_ir_motion_device> &controllers, xavix_ir_motion_device::controller_type type)
+void xavix_state::configure_ir(machine_config &config, required_device<xavix_ir_motion_device> &controllers, const xavix_ir_motion_device::controller_config &controller)
 {
-	XAVIX_IR_MOTION(config, controllers, peripheral_clock()).set_controller_type(type);
+	XAVIX_IR_MOTION(config, controllers, peripheral_clock()).set_controller(controller);
 	controllers->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_soc->raster_vblank_callback().append(controllers, FUNC(xavix_ir_motion_device::vblank_w));
 }
@@ -540,19 +540,19 @@ void xavix_state::configure_ir(machine_config &config, required_device<xavix_ir_
 void xavix_ir_state::xavix_ir(machine_config &config)
 {
 	xavix(config);
-	configure_ir(config, m_controllers, xavix_ir_motion_device::controller_type::SHAKERS);
+	configure_ir(config, m_controllers, xavix_ir_motion_device::SHAKERS);
 }
 
 void xavix_ir_state::xavix_ir_1mb(machine_config &config)
 {
 	xavix_1mb(config);
-	configure_ir(config, m_controllers, xavix_ir_motion_device::controller_type::PADDLES);
+	configure_ir(config, m_controllers, xavix_ir_motion_device::PADDLES);
 }
 
 void xavix_ir_state::xavixp_ir_1mb(machine_config &config)
 {
 	xavixp_1mb(config);
-	configure_ir(config, m_controllers, xavix_ir_motion_device::controller_type::PADDLES);
+	configure_ir(config, m_controllers, xavix_ir_motion_device::PADDLES);
 }
 
 //-------------------------------------------------
@@ -1797,13 +1797,13 @@ INPUT_PORTS_END
 void xavix_ir_state::xavix_epo_strk(machine_config &config)
 {
 	xavix(config);
-	configure_ir(config, m_controllers, xavix_ir_motion_device::controller_type::KICK_SENSORS);
+	configure_ir(config, m_controllers, xavix_ir_motion_device::KICK_SENSORS);
 }
 
 void xavix_ir_state::xavixp_epo_strk(machine_config &config)
 {
 	xavixp(config);
-	configure_ir(config, m_controllers, xavix_ir_motion_device::controller_type::KICK_SENSORS);
+	configure_ir(config, m_controllers, xavix_ir_motion_device::KICK_SENSORS);
 }
 
 
@@ -1831,7 +1831,7 @@ INPUT_PORTS_END
 void xavix_ir_state::xavix_epo_tenn(machine_config &config)
 {
 	xavix(config);
-	configure_ir(config, m_controllers, xavix_ir_motion_device::controller_type::TENNIS_RACKETS);
+	configure_ir(config, m_controllers, xavix_ir_motion_device::TENNIS_RACKETS);
 }
 
 
@@ -2105,7 +2105,7 @@ INPUT_PORTS_END
 void xavix_ir_state::xavix_epo_epp(machine_config &config)
 {
 	xavix_1mb(config);
-	configure_ir(config, m_controllers, xavix_ir_motion_device::controller_type::PING_PONG_RACKETS);
+	configure_ir(config, m_controllers, xavix_ir_motion_device::PING_PONG_RACKETS);
 }
 
 
@@ -2131,7 +2131,7 @@ INPUT_PORTS_END
 void xavix_ir_state::xavix_epo_epp2(machine_config &config)
 {
 	xavix_2mb(config);
-	configure_ir(config, m_controllers, xavix_ir_motion_device::controller_type::POWERED_PING_PONG_RACKETS);
+	configure_ir(config, m_controllers, xavix_ir_motion_device::POWERED_PING_PONG_RACKETS);
 }
 
 
@@ -2341,7 +2341,7 @@ void xavix_tak_zuba_state::xavix_tak_zuba(machine_config &config)
 {
 	xavix_i2c_24c02_4mb(config);
 
-	configure_ir(config, m_controllers, xavix_ir_motion_device::controller_type::SWORDS);
+	configure_ir(config, m_controllers, xavix_ir_motion_device::SWORDS);
 }
 
 

@@ -36,8 +36,9 @@ xavix_ir_motion_device::xavix_ir_motion_device(const machine_config &mconfig, co
 	, m_ir_strength(*this, "IR%u", 1U)
 	, m_ir_button(*this, "IR%u_BUTTON", 1U)
 	, m_ir_power(*this, "IR_POWER")
-	, m_controller_type(controller_type::PADDLES)
+	, m_ports(PADDLES.ports)
 {
+	set_bit_ticks(PADDLES.bit_ticks);
 }
 
 // Keep host bindings independent of MAME's automatic per-device player numbering.
@@ -227,37 +228,33 @@ static INPUT_PORTS_START( xavix_ir_motion_xavix_rackets )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_ir_motion_device::device_config_complete()
+// The original and later receivers sample their reports at different intervals.
+const xavix_ir_motion_device::controller_config xavix_ir_motion_device::PADDLES =
+	{ INPUT_PORTS_NAME(xavix_ir_motion_paddles), ORIGINAL_BIT_TICKS };
+const xavix_ir_motion_device::controller_config xavix_ir_motion_device::PING_PONG_RACKETS =
+	{ INPUT_PORTS_NAME(xavix_ir_motion_ping_pong_rackets), ORIGINAL_BIT_TICKS };
+const xavix_ir_motion_device::controller_config xavix_ir_motion_device::POWERED_PING_PONG_RACKETS =
+	{ INPUT_PORTS_NAME(xavix_ir_motion_powered_ping_pong_rackets), LATER_BIT_TICKS };
+const xavix_ir_motion_device::controller_config xavix_ir_motion_device::KICK_SENSORS =
+	{ INPUT_PORTS_NAME(xavix_ir_motion_kick_sensors), LATER_BIT_TICKS };
+const xavix_ir_motion_device::controller_config xavix_ir_motion_device::TENNIS_RACKETS =
+	{ INPUT_PORTS_NAME(xavix_ir_motion_tennis_rackets), LATER_BIT_TICKS };
+const xavix_ir_motion_device::controller_config xavix_ir_motion_device::SHAKERS =
+	{ INPUT_PORTS_NAME(xavix_ir_motion_shakers), ORIGINAL_BIT_TICKS };
+const xavix_ir_motion_device::controller_config xavix_ir_motion_device::SWORDS =
+	{ INPUT_PORTS_NAME(xavix_ir_motion_swords), LATER_BIT_TICKS };
+const xavix_ir_motion_device::controller_config xavix_ir_motion_device::XAVIX_RACKETS =
+	{ INPUT_PORTS_NAME(xavix_ir_motion_xavix_rackets), LATER_BIT_TICKS };
+
+void xavix_ir_motion_device::set_controller(const controller_config &config)
 {
-	bool const original = (m_controller_type == controller_type::PADDLES)
-		|| (m_controller_type == controller_type::PING_PONG_RACKETS)
-		|| (m_controller_type == controller_type::SHAKERS);
-	// Both receivers sample within the first cell, then at uniform timer intervals.
-	set_bit_ticks(original ? 0x47 * 64 : 0xe5 * 32);
+	m_ports = config.ports;
+	set_bit_ticks(config.bit_ticks);
 }
 
 ioport_constructor xavix_ir_motion_device::device_input_ports() const
 {
-	switch (m_controller_type)
-	{
-	case controller_type::PADDLES:
-		return INPUT_PORTS_NAME(xavix_ir_motion_paddles);
-	case controller_type::PING_PONG_RACKETS:
-		return INPUT_PORTS_NAME(xavix_ir_motion_ping_pong_rackets);
-	case controller_type::POWERED_PING_PONG_RACKETS:
-		return INPUT_PORTS_NAME(xavix_ir_motion_powered_ping_pong_rackets);
-	case controller_type::KICK_SENSORS:
-		return INPUT_PORTS_NAME(xavix_ir_motion_kick_sensors);
-	case controller_type::TENNIS_RACKETS:
-		return INPUT_PORTS_NAME(xavix_ir_motion_tennis_rackets);
-	case controller_type::SHAKERS:
-		return INPUT_PORTS_NAME(xavix_ir_motion_shakers);
-	case controller_type::SWORDS:
-		return INPUT_PORTS_NAME(xavix_ir_motion_swords);
-	case controller_type::XAVIX_RACKETS:
-		return INPUT_PORTS_NAME(xavix_ir_motion_xavix_rackets);
-	}
-	throw emu_fatalerror("Unsupported infrared controller type");
+	return m_ports;
 }
 
 u32 xavix_ir_motion_device::read_report(unsigned report)

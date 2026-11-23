@@ -102,7 +102,7 @@ protected:
 	void configure_microphone(machine_config &config) ATTR_COLD;
 	virtual void configure_board(machine_config &config) ATTR_COLD;
 	void configure_power_hold(machine_config &config) ATTR_COLD;
-	void configure_ir(machine_config &config, required_device<xavix_ir_motion_device> &controllers, xavix_ir_motion_device::controller_type type) ATTR_COLD;
+	void configure_ir(machine_config &config, required_device<xavix_ir_motion_device> &controllers, const xavix_ir_motion_device::controller_config &controller) ATTR_COLD;
 	void request_power_off();
 
 	virtual u8 io0_input_r(u8 direction);
