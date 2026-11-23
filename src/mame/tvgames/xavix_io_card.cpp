@@ -166,7 +166,11 @@ attotime xavix_epo_kabj_card_reader_device::interval_after_event(u8 events_emitt
 
 u8 xavix_epo_es2j_card_reader_device::begin_scan()
 {
-	u32 const stream = CARD_STREAMS[m_card->read()];
+	ioport_value const id = m_card->read();
+	if (id >= CARD_STREAMS.size())
+		return 0;
+
+	u32 const stream = CARD_STREAMS[id];
 	m_pattern = stream & 0x00ffffff;
 	return 23 + ((stream >> 24) & 0x03);
 }
