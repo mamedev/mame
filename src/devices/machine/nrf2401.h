@@ -72,11 +72,11 @@ private:
 	u16 m_rx_position[2];
 	bool m_rx_pending[2];
 	bool m_dr[2];
-	bool m_pwr_up;
-	bool m_cs;
-	bool m_ce;
-	bool m_clock[2];
-	bool m_data;
+	bool m_pwr_up = false;
+	bool m_cs = false;
+	bool m_ce = false;
+	bool m_clock[2]{};
+	bool m_data = false;
 	attotime m_power_ready;
 	attotime m_rx_ready[2];
 };

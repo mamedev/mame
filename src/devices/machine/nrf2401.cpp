@@ -83,13 +83,8 @@ void nrf2401_device::device_reset()
 		m_rx_timer[channel]->adjust(attotime::never);
 		m_rx_ready[channel] = attotime::never;
 		m_dr[channel] = false;
-		m_clock[channel] = false;
 	}
-	m_pwr_up = false;
-	m_cs = false;
-	m_ce = false;
-	m_data = false;
-	m_power_ready = attotime::never;
+	m_power_ready = m_pwr_up ? machine().time() + attotime::from_msec(3) : attotime::never;
 	m_dr_cb[0](0);
 	m_dr_cb[1](0);
 }
