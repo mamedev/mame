@@ -31,6 +31,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// device_rtc_interface implementation
+	virtual bool rtc_feature_leap_year() const override;
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override { }
 
 private:

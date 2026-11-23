@@ -305,42 +305,15 @@ TIMER_CALLBACK_MEMBER(xavix_tvpc_controller_device::event_timer)
 	m_event_out_cb();
 }
 
+bool xavix_tvpc_controller_device::rtc_feature_leap_year() const
+{
+	return true;
+}
+
 TIMER_CALLBACK_MEMBER(xavix_tvpc_controller_device::clock_timer)
 {
-	int second = get_clock_register(RTC_SECOND) + 1;
-	int minute = get_clock_register(RTC_MINUTE);
-	int hour = get_clock_register(RTC_HOUR);
-	int day = get_clock_register(RTC_DAY);
-	int month = get_clock_register(RTC_MONTH);
-	int year = get_clock_register(RTC_YEAR) & 0x3f;
-	int day_of_week = get_clock_register(RTC_DAY_OF_WEEK);
-
-	if (second >= 60)
-	{
-		second = 0;
-		if (++minute >= 60)
-		{
-			minute = 0;
-			if (++hour >= 24)
-			{
-				hour = 0;
-				day++;
-				day_of_week = day_of_week % 7 + 1;
-
-				int const days = days_in_month(year, month);
-				if (day > days)
-				{
-					day = 1;
-					if (++month > 12)
-					{
-						month = 1;
-						year = (year + 1) & 0x3f;
-					}
-				}
-			}
-		}
-	}
-
-	// The controller stores a wrapping six-bit Gregorian year.
-	set_time(true, year, month, day, day_of_week, hour, minute, second);
+	// The initial host date can carry a two-digit year.  The controller wraps at 64.
+	set_clock_register(RTC_YEAR, get_clock_register(RTC_YEAR) & 0x3f);
+	advance_seconds();
+	set_clock_register(RTC_YEAR, get_clock_register(RTC_YEAR) & 0x3f);
 }
