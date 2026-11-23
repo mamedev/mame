@@ -794,9 +794,12 @@ void aica_device::UpdateRegR(int reg)
 		case 8:
 		case 9:
 			{
-				u16 v=m_udata.data[0x8 / 2];
-				v &= 0xff00;
-				v |= m_MidiStack[m_MidiR];
+				// MIDI input byte and the status flags; nothing is sent out, so the output is always empty
+				u16 v = m_MidiStack[m_MidiR] | 0x0800;
+				if (m_MidiR == m_MidiW)
+					v |= 0x0100;
+				else if (((m_MidiW + 1) & 15) == m_MidiR)
+					v |= 0x0200;
 				m_irq_cb(0);    // cancel the IRQ
 				if (m_MidiR != m_MidiW)
 				{
