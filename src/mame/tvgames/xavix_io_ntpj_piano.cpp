@@ -53,10 +53,9 @@ void xavix_piano_controller_device::device_reset()
 	m_led_pwm->clear();
 }
 
-void xavix_piano_controller_device::host_w(u8 data, u8 direction)
+void xavix_piano_controller_device::clock_w(bool clock, bool driven)
 {
-	bool const clock = BIT(data, 5);
-	if (!BIT(direction, 5))
+	if (!driven)
 	{
 		m_event_timer->adjust(attotime::never);
 		m_bit = 0;
@@ -90,15 +89,14 @@ void xavix_piano_controller_device::host_w(u8 data, u8 direction)
 	m_clock = clock;
 }
 
-void xavix_piano_controller_device::pio1_w(offs_t offset, u8 data, u8 direction)
+void xavix_piano_controller_device::led_columns_w(u8 columns)
 {
-	// The five column lines sink current; released pins leave their LEDs off.
-	m_led_pwm->write_mx(BIT(~data & direction, 3, 5));
+	m_led_pwm->write_mx(columns);
 }
 
-void xavix_piano_controller_device::pio2_w(u8 data, u8 direction)
+void xavix_piano_controller_device::led_rows_w(u8 rows)
 {
-	m_led_pwm->write_my(data & direction & 0x07);
+	m_led_pwm->write_my(rows);
 }
 
 void xavix_piano_controller_device::light_w(offs_t offset, u8 data)

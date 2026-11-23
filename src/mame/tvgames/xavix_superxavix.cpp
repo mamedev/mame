@@ -2722,7 +2722,11 @@ void superxavix_epo_ntpj_state::superxavix_epo_ntpj(machine_config &config)
 	m_super_soc->pio_input_callback<1>().set(*this, FUNC(superxavix_epo_ntpj_state::pio1_input_r));
 	m_super_soc->pio_input_callback<2>().set(*this, FUNC(superxavix_epo_ntpj_state::pio2_input_r));
 	m_super_soc->pio_output_callback<0>().set(*this, FUNC(superxavix_epo_ntpj_state::pio0_output_w));
-	m_super_soc->pio_output_callback<1>().set(m_piano, FUNC(xavix_piano_controller_device::pio1_w));
+	m_super_soc->pio_output_callback<1>().set([this] (offs_t, u8 data, u8 direction)
+	{
+		// The five column lines sink current. Released pins leave the LEDs off.
+		m_piano->led_columns_w(BIT(~data & direction, 3, 5));
+	});
 	m_super_soc->pio_output_callback<2>().set(*this, FUNC(superxavix_epo_ntpj_state::pio2_output_w));
 
 	config.set_default_layout(layout_epo_ntpj);
@@ -2745,7 +2749,7 @@ u8 superxavix_epo_ntpj_state::pio1_input_r(offs_t offset, u8 mem_mask)
 void superxavix_epo_ntpj_state::pio0_output_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	tvpc_pio0_output_w(offset, data, mem_mask);
-	m_piano->host_w(data, mem_mask);
+	m_piano->clock_w(BIT(data, 5), BIT(mem_mask, 5));
 }
 
 u8 superxavix_epo_ntpj_state::pio2_input_r(offs_t offset, u8 mem_mask)
@@ -2755,7 +2759,7 @@ u8 superxavix_epo_ntpj_state::pio2_input_r(offs_t offset, u8 mem_mask)
 
 void superxavix_epo_ntpj_state::pio2_output_w(offs_t offset, u8 data, u8 mem_mask)
 {
-	m_piano->pio2_w(data, mem_mask);
+	m_piano->led_rows_w(data & mem_mask & 0x07);
 	// The IS24C64 shares PIO2 with the guide-light columns, using SCL4 and SDA5.
 	m_i2cmem->write_scl(BIT(data | ~mem_mask, 4));
 	m_i2cmem->write_sda(BIT(data | ~mem_mask, 5));

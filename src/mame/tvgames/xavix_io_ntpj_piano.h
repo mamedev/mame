@@ -19,9 +19,9 @@ public:
 	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 
 	u8 data_r() const { return m_data; }
-	void host_w(u8 data, u8 direction);
-	void pio1_w(offs_t offset, u8 data, u8 direction);
-	void pio2_w(u8 data, u8 direction);
+	void clock_w(bool clock, bool driven);
+	void led_columns_w(u8 columns);
+	void led_rows_w(u8 rows);
 
 protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
