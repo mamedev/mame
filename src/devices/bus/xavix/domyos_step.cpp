@@ -60,6 +60,9 @@ domyos_step_hub_device::domyos_step_hub_device(const machine_config &mconfig, co
 	, device_domyos_step_interface(mconfig, *this)
 	, m_mats(*this, "mat%u", 1U)
 	, m_event_timer(nullptr)
+	, m_request(false)
+	, m_request_output(false)
+	, m_clock(false)
 {
 }
 
@@ -137,9 +140,6 @@ void domyos_step_hub_device::device_reset()
 	m_bit = 0;
 	m_command_bits = 0;
 	m_report_bytes = 0;
-	m_request = false;
-	m_request_output = false;
-	m_clock = false;
 	m_host_transmit = true;
 	m_active = false;
 	m_transfer = false;
