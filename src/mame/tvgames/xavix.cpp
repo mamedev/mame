@@ -2631,8 +2631,10 @@ int xavix_ekara_state::matrix_column_r(unsigned column)
 	u16 const contacts = m_extra0->read() | (u16(m_extra1->read()) << 8);
 	int data = 0;
 	for (unsigned row = 0; row < 7; row++)
+	{
 		if (BIT(m_matrix_select, row))
 			data |= BIT(contacts, row * 2 + column);
+	}
 	return data;
 }
 
@@ -3691,8 +3693,10 @@ u8 xavix_tvpc_state::keyboard_r(offs_t offset)
 {
 	u8 data = 0;
 	for (unsigned row = 0; row < m_keyboard.size(); row++)
+	{
 		if (BIT(offset, row))
 			data |= m_keyboard[row]->read();
+	}
 	return data;
 }
 
@@ -3947,8 +3951,10 @@ u8 xavix_epo_mail_state::keyboard_r()
 	u8 data = 0;
 	u8 const io0_rows = m_soc->io_data_latch<0>() & m_soc->io_direction<0>();
 	for (unsigned row = 0; row != 8; row++)
+	{
 		if (BIT(io0_rows, row))
 			data |= m_keyboard[row]->read();
+	}
 
 	if (BIT(m_soc->io_data_latch<1>() & m_soc->io_direction<1>(), 0))
 		data |= m_keyboard[8]->read();

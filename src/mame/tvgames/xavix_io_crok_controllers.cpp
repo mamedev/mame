@@ -78,7 +78,9 @@ bool xavix_croket_controllers_device::reports_enabled()
 	u8 const buttons = m_motion->read() | m_guard->read();
 	u8 const power = m_controller_power->read();
 	for (unsigned player = 0; player < 2; player++)
+	{
 		if (BIT(power, player) && (BIT(buttons, player) || m_motion_strength[player]->read()))
 			return 1;
+	}
 	return 0;
 }

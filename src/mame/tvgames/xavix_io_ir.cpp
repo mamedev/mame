@@ -171,7 +171,9 @@ void xavix_ir_report_device::finish_report(bool stop_cell, u32 gap_ticks)
 		schedule_bit(gap_ticks ? gap_ticks : m_bit_ticks);
 	}
 	else
+	{
 		m_bit_timer->adjust(attotime::never);
+	}
 }
 
 TIMER_CALLBACK_MEMBER(xavix_ir_report_device::bit_tick)
@@ -186,7 +188,9 @@ TIMER_CALLBACK_MEMBER(xavix_ir_report_device::bit_tick)
 			m_bit_timer->adjust(attotime::never);
 	}
 	else
+	{
 		advance_report();
+	}
 }
 
 void xavix_ir_msb_device::begin_report()
@@ -210,7 +214,9 @@ void xavix_ir_msb_device::advance_report()
 		schedule_bit(current_bit_ticks());
 	}
 	else
+	{
 		finish_report();
+	}
 }
 
 void xavix_ir_framed_device::begin_report()
@@ -236,7 +242,9 @@ void xavix_ir_framed_device::advance_report()
 		schedule_bit(m_bit_ticks);
 	}
 	else
+	{
 		finish_report(true);
+	}
 }
 
 void xavix_ir_pulse_distance_device::set_pulse_distance_ticks(u32 one_ticks, u32 zero_ticks, u32 first_extension)
@@ -267,7 +275,9 @@ void xavix_ir_pulse_distance_device::advance_report()
 		schedule_bit(current_pulse_ticks());
 	}
 	else
+	{
 		finish_report();
+	}
 }
 
 void xavix_ir_run_length_device::begin_report()
@@ -294,7 +304,9 @@ void xavix_ir_run_length_device::advance_report()
 		schedule_bit(current_run_bits() * m_bit_ticks);
 	}
 	else
+	{
 		finish_report(false, m_report_gap_ticks);
+	}
 }
 
 xavix_ir_receiver_interface::xavix_ir_receiver_interface(device_t &device, u32 quiet_ticks, bool rising_start)
@@ -355,5 +367,7 @@ TIMER_CALLBACK_MEMBER(xavix_ir_receiver_interface::quiet_tick)
 		ir_burst_finished((m_ir_last_edge - m_ir_burst_start).as_ticks(device().clock()));
 	}
 	else
+	{
 		ir_idle_timeout();
+	}
 }

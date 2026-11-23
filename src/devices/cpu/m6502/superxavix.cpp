@@ -153,19 +153,23 @@ bool superxavix_device::advance_external_bus(u64 cycle)
 		if (m_bus_kind == access_kind::INSTRUCTION)
 		{
 			for (unsigned lane = 0; lane != 2; ++lane)
+			{
 				if (BIT(lanes, lane))
 				{
 					unsigned const index = (m_bus_address & 2) | lane;
 					m_instruction_cache[index] = m_bus_bytes[lane];
 					m_instruction_valid |= 1U << index;
 				}
+			}
 		}
 		else
 		{
 			m_data_tag = m_bus_address & ~1U;
 			for (unsigned lane = 0; lane != 2; ++lane)
+			{
 				if (BIT(lanes, lane))
 					m_data_cache[lane] = m_bus_bytes[lane];
+			}
 			m_data_valid |= lanes;
 		}
 
