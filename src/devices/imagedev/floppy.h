@@ -237,9 +237,11 @@ protected:
 	/* Current floppy zone cache */
 	attotime m_cache_start_time, m_cache_end_time, m_cache_weak_start;
 	attotime m_amplifier_freakout_time;
+	u32 m_weak_noise_period, m_weak_noise_spread; // ns
 	int m_cache_index;
 	u32 m_cache_entry;
 	u32 m_cache_weak_id;
+	u32 m_cache_revolution;
 	bool m_cache_weak;
 
 	bool m_image_dirty, m_track_dirty;
