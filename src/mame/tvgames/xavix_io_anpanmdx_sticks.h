@@ -10,7 +10,7 @@
 
 #include <array>
 
-class xavix_anpanman_sticks_device : public xavix_ir_msb_device
+class xavix_anpanman_sticks_device : public xavix_ir_msb_device_base
 {
 public:
 	xavix_anpanman_sticks_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

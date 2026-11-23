@@ -37,7 +37,7 @@ private:
 };
 
 // Controllers supply reports; encoder bases own transmission and saved state.
-class xavix_ir_report_device : public device_t
+class xavix_ir_report_device_base : public device_t
 {
 public:
 	// Ordinary all-ones payloads are transmitted; this value suppresses a report.
@@ -47,7 +47,7 @@ public:
 	void vblank_w(int state);
 
 protected:
-	xavix_ir_report_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	xavix_ir_report_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual u32 read_report(unsigned report) = 0;
@@ -87,10 +87,10 @@ private:
 };
 
 // MSB-first data, optionally with a distinct duration for each sample.
-class xavix_ir_msb_device : public xavix_ir_report_device
+class xavix_ir_msb_device_base : public xavix_ir_report_device_base
 {
 protected:
-	using xavix_ir_report_device::xavix_ir_report_device;
+	using xavix_ir_report_device_base::xavix_ir_report_device_base;
 	virtual void device_start() override ATTR_COLD;
 	virtual void begin_report() override;
 	virtual void advance_report() override;
@@ -108,10 +108,10 @@ private:
 };
 
 // Start cell, LSB-first data and one idle stop cell.
-class xavix_ir_framed_device : public xavix_ir_report_device
+class xavix_ir_framed_device_base : public xavix_ir_report_device_base
 {
 protected:
-	using xavix_ir_report_device::xavix_ir_report_device;
+	using xavix_ir_report_device_base::xavix_ir_report_device_base;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void begin_report() override;
@@ -125,10 +125,10 @@ private:
 };
 
 // Each receiver event terminates a bit encoded by its interval.
-class xavix_ir_pulse_distance_device : public xavix_ir_report_device
+class xavix_ir_pulse_distance_device_base : public xavix_ir_report_device_base
 {
 protected:
-	using xavix_ir_report_device::xavix_ir_report_device;
+	using xavix_ir_report_device_base::xavix_ir_report_device_base;
 	virtual void device_start() override ATTR_COLD;
 	virtual void begin_report() override;
 	virtual void advance_report() override;
@@ -143,10 +143,10 @@ private:
 };
 
 // Events delimit runs beginning with a one; the final zero run ends in silence.
-class xavix_ir_run_length_device : public xavix_ir_report_device
+class xavix_ir_run_length_device_base : public xavix_ir_report_device_base
 {
 protected:
-	using xavix_ir_report_device::xavix_ir_report_device;
+	using xavix_ir_report_device_base::xavix_ir_report_device_base;
 	virtual void begin_report() override;
 	virtual void advance_report() override;
 	void set_report_gap_ticks(u32 ticks) { m_report_gap_ticks = ticks; }

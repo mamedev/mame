@@ -16,7 +16,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_SURVI_BUSTER, xavix_survi_buster_device, "xavix_survi_buster", "Boukenger Survi Buster Infrared Controller")
 
 xavix_survi_buster_device::xavix_survi_buster_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device(mconfig, XAVIX_SURVI_BUSTER, tag, owner, clock)
+	: xavix_ir_msb_device_base(mconfig, XAVIX_SURVI_BUSTER, tag, owner, clock)
 	, m_survi_buster(*this, "SURVI_BUSTER")
 	, m_survi_buster_power(*this, "SURVI_BUSTER_POWER")
 {
@@ -49,5 +49,5 @@ u32 xavix_survi_buster_device::read_report(unsigned)
 {
 	return BIT(m_survi_buster_power->read(), 0) && BIT(m_survi_buster->read(), 0)
 		? SURVI_BUSTER_TRIGGER_REPORT
-		: xavix_ir_report_device::NO_SEQUENCE;
+		: xavix_ir_report_device_base::NO_SEQUENCE;
 }

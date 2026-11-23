@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_ANPANMAN_STICKS, xavix_anpanman_sticks_device, "xavix_anpanman_sticks", "Anpanman Mat DX Infrared Sticks")
 
 xavix_anpanman_sticks_device::xavix_anpanman_sticks_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device(mconfig, XAVIX_ANPANMAN_STICKS, tag, owner, clock)
+	: xavix_ir_msb_device_base(mconfig, XAVIX_ANPANMAN_STICKS, tag, owner, clock)
 	, m_motion_level(*this, "STICK%u", 1U)
 	, m_stick_batteries(*this, "STICK_BATTERIES")
 {
@@ -68,14 +68,14 @@ ioport_constructor xavix_anpanman_sticks_device::device_input_ports() const
 
 void xavix_anpanman_sticks_device::device_start()
 {
-	xavix_ir_msb_device::device_start();
+	xavix_ir_msb_device_base::device_start();
 
 	save_item(NAME(m_stick_awake));
 }
 
 void xavix_anpanman_sticks_device::device_reset()
 {
-	xavix_ir_msb_device::device_reset();
+	xavix_ir_msb_device_base::device_reset();
 
 	m_stick_awake.fill(false);
 }
@@ -103,7 +103,7 @@ bool xavix_anpanman_sticks_device::reports_enabled()
 u32 xavix_anpanman_sticks_device::read_report(unsigned report)
 {
 	if (!m_stick_awake[report] || !BIT(m_stick_batteries->read(), report))
-		return xavix_ir_report_device::NO_SEQUENCE;
+		return xavix_ir_report_device_base::NO_SEQUENCE;
 
 	// Stick-number polarity follows the decoder's two report destinations; a physical IR capture is still needed to verify it.
 	return STICK_SEQUENCES[report][m_motion_level[report]->read() & 3];

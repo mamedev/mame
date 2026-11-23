@@ -14,7 +14,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_CARDNIGHT_REMOTE, xavix_cardnight_remote_device, "xavix_cardnight_remote", "Card Night Infrared Remote")
 
 xavix_cardnight_remote_device::xavix_cardnight_remote_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_run_length_device(mconfig, XAVIX_CARDNIGHT_REMOTE, tag, owner, clock)
+	: xavix_ir_run_length_device_base(mconfig, XAVIX_CARDNIGHT_REMOTE, tag, owner, clock)
 	, m_dock_cb(*this, 0)
 	, m_directions(*this, "IN1")
 	, m_buttons(*this, "ROW0")

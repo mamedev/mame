@@ -18,7 +18,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_BASEBALL_CONTROLLERS, xavix_baseball_controllers_device, "xavix_baseball_controllers", "XaviX Infrared Baseball Controllers")
 
 xavix_baseball_controllers_device::xavix_baseball_controllers_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_framed_device(mconfig, XAVIX_BASEBALL_CONTROLLERS, tag, owner, clock)
+	: xavix_ir_framed_device_base(mconfig, XAVIX_BASEBALL_CONTROLLERS, tag, owner, clock)
 	, m_ball_throw(*this, "BALL_THROW")
 	, m_ball_buttons(*this, "BALL_BUTTONS")
 	, m_bat(*this, "BAT")

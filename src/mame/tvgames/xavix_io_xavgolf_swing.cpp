@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_GOLF_SWING, xavix_golf_swing_device, "xavix_golf_swing", "XaviX Golf Swing Sensor")
 
 xavix_golf_swing_device::xavix_golf_swing_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_framed_device(mconfig, XAVIX_GOLF_SWING, tag, owner, clock)
+	: xavix_ir_framed_device_base(mconfig, XAVIX_GOLF_SWING, tag, owner, clock)
 	, m_swing_active(*this, "SWING_ACTIVE")
 	, m_swing_axis(*this, "SWING_%c", 'X')
 	, m_swing_buttons(*this, "SWING_BUTTONS")
@@ -77,7 +77,7 @@ ioport_constructor xavix_golf_swing_device::device_input_ports() const
 
 void xavix_golf_swing_device::device_start()
 {
-	xavix_ir_framed_device::device_start();
+	xavix_ir_framed_device_base::device_start();
 
 	save_item(NAME(m_swing_phase));
 	save_item(NAME(m_swing_reverse));
@@ -85,7 +85,7 @@ void xavix_golf_swing_device::device_start()
 
 void xavix_golf_swing_device::device_reset()
 {
-	xavix_ir_framed_device::device_reset();
+	xavix_ir_framed_device_base::device_reset();
 
 	m_swing_phase = 0;
 	m_swing_reverse = false;

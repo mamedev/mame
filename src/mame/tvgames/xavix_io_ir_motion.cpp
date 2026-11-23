@@ -19,7 +19,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_IR_MOTION, xavix_ir_motion_device, "xavix_ir_motion", "XaviX Infrared Motion Controllers")
 
 xavix_ir_motion_base_device::xavix_ir_motion_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device(mconfig, type, tag, owner, clock)
+	: xavix_ir_msb_device_base(mconfig, type, tag, owner, clock)
 {
 	set_report_count(2);
 	set_bit_ticks(0xe5 * 32);

@@ -21,7 +21,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_IR_STEP_MAT, xavix_ir_step_mat_device, "xavix_ir_step_mat", "XaviX Infrared Step Mat")
 
 xavix_ir_step_mat_device::xavix_ir_step_mat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device(mconfig, XAVIX_IR_STEP_MAT, tag, owner, clock)
+	: xavix_ir_msb_device_base(mconfig, XAVIX_IR_STEP_MAT, tag, owner, clock)
 	, m_pads(*this, "STEP_SENSOR")
 	, m_power(*this, "STEP_POWER")
 	, m_protocol(protocol::JMAT)
@@ -69,7 +69,7 @@ u16 xavix_ir_step_mat_device::jmat_report(u8 pads)
 u32 xavix_ir_step_mat_device::read_report(unsigned)
 {
 	if (!BIT(m_power->read(), 0))
-		return xavix_ir_report_device::NO_SEQUENCE;
+		return xavix_ir_report_device_base::NO_SEQUENCE;
 
 	u8 const pads = m_pads->read() & 0x0f;
 	return m_protocol == protocol::JMAT ? jmat_report(pads) : (0x0100'0000 | AEROSTEP_REPORTS[pads]);

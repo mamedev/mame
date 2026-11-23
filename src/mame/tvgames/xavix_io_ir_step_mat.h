@@ -10,7 +10,7 @@
 
 #include <array>
 
-class xavix_ir_step_mat_device : public xavix_ir_msb_device
+class xavix_ir_step_mat_device : public xavix_ir_msb_device_base
 {
 public:
 	enum class protocol

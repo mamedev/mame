@@ -8,7 +8,7 @@
 
 #include "xavix_io_ir.h"
 
-class xavix_cardnight_remote_device : public xavix_ir_run_length_device
+class xavix_cardnight_remote_device : public xavix_ir_run_length_device_base
 {
 public:
 	xavix_cardnight_remote_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

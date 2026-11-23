@@ -22,7 +22,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_COMET_BATON, xavix_comet_baton_device, "xavix_comet_baton", "Comet-san Lovelin Baton Infrared Controller")
 
 xavix_comet_baton_device::xavix_comet_baton_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_pulse_distance_device(mconfig, XAVIX_COMET_BATON, tag, owner, clock)
+	: xavix_ir_pulse_distance_device_base(mconfig, XAVIX_COMET_BATON, tag, owner, clock)
 	, xavix_ir_receiver_interface(*this, 1'024, true)
 	, m_baton(*this, "BATON")
 	, m_baton_mode(*this, "BATON_MODE")
@@ -56,7 +56,7 @@ ioport_constructor xavix_comet_baton_device::device_input_ports() const
 
 void xavix_comet_baton_device::device_start()
 {
-	xavix_ir_pulse_distance_device::device_start();
+	xavix_ir_pulse_distance_device_base::device_start();
 
 	save_item(NAME(m_received_bits));
 	save_item(NAME(m_bit_count));
@@ -65,7 +65,7 @@ void xavix_comet_baton_device::device_start()
 
 void xavix_comet_baton_device::device_reset()
 {
-	xavix_ir_pulse_distance_device::device_reset();
+	xavix_ir_pulse_distance_device_base::device_reset();
 	ir_receiver_reset();
 	m_received_bits = 0;
 	m_bit_count = 0;

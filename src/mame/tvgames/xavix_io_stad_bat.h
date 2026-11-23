@@ -8,7 +8,7 @@
 
 #include "xavix_io_ir.h"
 
-class xavix_stadium_bat_device : public xavix_ir_msb_device
+class xavix_stadium_bat_device : public xavix_ir_msb_device_base
 {
 public:
 	xavix_stadium_bat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

@@ -8,7 +8,7 @@
 
 #include "xavix_io_ir.h"
 
-class xavix_comet_baton_device : public xavix_ir_pulse_distance_device, public xavix_ir_receiver_interface
+class xavix_comet_baton_device : public xavix_ir_pulse_distance_device_base, public xavix_ir_receiver_interface
 {
 public:
 	xavix_comet_baton_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

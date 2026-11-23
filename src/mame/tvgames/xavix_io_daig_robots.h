@@ -12,7 +12,7 @@
 
 #include <utility>
 
-class xavix_daigunder_robots_device : public xavix_ir_framed_device
+class xavix_daigunder_robots_device : public xavix_ir_framed_device_base
 {
 public:
 	xavix_daigunder_robots_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

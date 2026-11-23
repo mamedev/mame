@@ -8,7 +8,7 @@
 
 #include "xavix_io_ir.h"
 
-class xavix_ir_motion_base_device : public xavix_ir_msb_device
+class xavix_ir_motion_base_device : public xavix_ir_msb_device_base
 {
 protected:
 	xavix_ir_motion_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);

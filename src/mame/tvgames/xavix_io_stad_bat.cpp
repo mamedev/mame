@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_STADIUM_BAT, xavix_stadium_bat_device, "xavix_stadium_bat", "Excite Stadium Infrared Bat")
 
 xavix_stadium_bat_device::xavix_stadium_bat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device(mconfig, XAVIX_STADIUM_BAT, tag, owner, clock)
+	: xavix_ir_msb_device_base(mconfig, XAVIX_STADIUM_BAT, tag, owner, clock)
 	, m_swing(*this, "SWING")
 {
 	set_report_count(1);

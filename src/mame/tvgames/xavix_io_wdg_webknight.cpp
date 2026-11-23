@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_WEBKNIGHT, xavix_webknight_device, "xavix_webknight", "Webdiver Web Knight Infrared Controller")
 
 xavix_webknight_device::xavix_webknight_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_pulse_distance_device(mconfig, XAVIX_WEBKNIGHT, tag, owner, clock)
+	: xavix_ir_pulse_distance_device_base(mconfig, XAVIX_WEBKNIGHT, tag, owner, clock)
 	, m_identity(*this, "WEBKNIGHT_IDENTITY")
 	, m_mark_switch(*this, "WEBKNIGHT_MARK")
 {

@@ -10,14 +10,14 @@
 #include <utility>
 
 // Shared timed event-token transport; derived readers retain their distinct physical encodings.
-class xavix_card_reader_device : public device_t
+class xavix_card_reader_device_base : public device_t
 {
 public:
 	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 	void scan_card(int state);
 
 protected:
-	xavix_card_reader_device(
+	xavix_card_reader_device_base(
 			const machine_config &mconfig,
 			device_type type,
 			const char *tag,
@@ -40,7 +40,7 @@ private:
 	bool m_scanning;
 };
 
-class xavix_epo_kabj_card_reader_device : public xavix_card_reader_device
+class xavix_epo_kabj_card_reader_device : public xavix_card_reader_device_base
 {
 public:
 	xavix_epo_kabj_card_reader_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
@@ -57,7 +57,7 @@ private:
 	u16 m_pattern;
 };
 
-class xavix_epo_es2j_card_reader_device : public xavix_card_reader_device
+class xavix_epo_es2j_card_reader_device : public xavix_card_reader_device_base
 {
 public:
 	xavix_epo_es2j_card_reader_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

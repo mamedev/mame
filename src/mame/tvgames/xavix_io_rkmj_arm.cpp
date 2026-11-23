@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_ROCKMAN_ARM, xavix_rockman_arm_device, "xavix_rockman_arm", "Rockman Infrared Arm Controller")
 
 xavix_rockman_arm_device::xavix_rockman_arm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_framed_device(mconfig, XAVIX_ROCKMAN_ARM, tag, owner, clock)
+	: xavix_ir_framed_device_base(mconfig, XAVIX_ROCKMAN_ARM, tag, owner, clock)
 	, m_arm(*this, "ARM")
 	, m_controller_buttons(*this, "CONTROL")
 	, m_controller_power(*this, "CONTROLLER_POWER")
@@ -58,7 +58,7 @@ ioport_constructor xavix_rockman_arm_device::device_input_ports() const
 
 void xavix_rockman_arm_device::device_start()
 {
-	xavix_ir_framed_device::device_start();
+	xavix_ir_framed_device_base::device_start();
 
 	save_item(NAME(m_shake_frames));
 	save_item(NAME(m_shake_lowered));
@@ -66,7 +66,7 @@ void xavix_rockman_arm_device::device_start()
 
 void xavix_rockman_arm_device::device_reset()
 {
-	xavix_ir_framed_device::device_reset();
+	xavix_ir_framed_device_base::device_reset();
 
 	m_shake_frames = 0;
 	m_shake_lowered = false;

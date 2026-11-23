@@ -8,7 +8,7 @@
 
 #include "xavix_io_ir.h"
 
-class xavix_rockman_arm_device : public xavix_ir_framed_device
+class xavix_rockman_arm_device : public xavix_ir_framed_device_base
 {
 public:
 	xavix_rockman_arm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);

@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_TFIT_RACKETS, xavix_tfit_rackets_device, "xavix_tfit_rackets", "Tennis x Fitness Infrared Rackets")
 
 xavix_tfit_rackets_device::xavix_tfit_rackets_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device(mconfig, XAVIX_TFIT_RACKETS, tag, owner, clock)
+	: xavix_ir_msb_device_base(mconfig, XAVIX_TFIT_RACKETS, tag, owner, clock)
 	, m_racket_strength(*this, "RACKET%u_STRENGTH", 1U)
 	, m_racket_buttons(*this, "RACKET%u_BUTTONS", 1U)
 	, m_racket_power(*this, "RACKET_POWER")
@@ -66,7 +66,7 @@ ioport_constructor xavix_tfit_rackets_device::device_input_ports() const
 u32 xavix_tfit_rackets_device::read_report(unsigned report)
 {
 	if (!BIT(m_racket_power->read(), report))
-		return xavix_ir_report_device::NO_SEQUENCE;
+		return xavix_ir_report_device_base::NO_SEQUENCE;
 
 	u8 data = 0x80 | report | ((m_racket_strength[report]->read() & 3) << 1);
 	u8 const buttons = m_racket_buttons[report]->read();

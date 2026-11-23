@@ -8,7 +8,7 @@
 
 #include "xavix_io_ir.h"
 
-class xavix_baseball_controllers_device : public xavix_ir_framed_device
+class xavix_baseball_controllers_device : public xavix_ir_framed_device_base
 {
 public:
 	enum class controller_type

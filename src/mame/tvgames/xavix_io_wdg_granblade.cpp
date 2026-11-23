@@ -17,7 +17,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_GRANBLADE, xavix_granblade_device, "xavix_granblade", "Webdiver Granblade Infrared Controller")
 
 xavix_granblade_device::xavix_granblade_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_pulse_distance_device(mconfig, XAVIX_GRANBLADE, tag, owner, clock)
+	: xavix_ir_pulse_distance_device_base(mconfig, XAVIX_GRANBLADE, tag, owner, clock)
 	, m_granblade_action(*this, "GRANBLADE_ACTION")
 	, m_granblade_mode(*this, "GRANBLADE_MODE")
 	, m_granblade_power(*this, "GRANBLADE_POWER")
@@ -53,14 +53,14 @@ ioport_constructor xavix_granblade_device::device_input_ports() const
 
 void xavix_granblade_device::device_start()
 {
-	xavix_ir_pulse_distance_device::device_start();
+	xavix_ir_pulse_distance_device_base::device_start();
 
 	save_item(NAME(m_granblade_last_mode));
 }
 
 void xavix_granblade_device::device_reset()
 {
-	xavix_ir_pulse_distance_device::device_reset();
+	xavix_ir_pulse_distance_device_base::device_reset();
 
 	m_granblade_last_mode = BIT(m_granblade_mode->read(), 0);
 }
