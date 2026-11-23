@@ -519,6 +519,7 @@ public:
 	void xavix_gungunrv(machine_config &config) ATTR_COLD;
 
 protected:
+	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
@@ -527,7 +528,10 @@ private:
 	virtual u8 lightgun_r(offs_t offset) override;
 	virtual u8 lightgun_event_mask() override { return m_lightgun_event_mask & (BIT(m_in1->read(), 1) ? 0xff : 0xfd); }
 
+	TIMER_CALLBACK_MEMBER(shutdown_confirmed);
+
 	output_finder<> m_gun_recoil;
+	emu_timer *m_shutdown_timer = nullptr;
 };
 
 class xavix_pl1000_state : public xavix_lightgun_state<xavix_state, 2>

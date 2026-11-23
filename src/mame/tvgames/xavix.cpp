@@ -1448,9 +1448,16 @@ void xavix_gungunrv_state::xavix_gungunrv(machine_config &config)
 	configure_lightgun_scanlines(config, 0x03);
 }
 
+void xavix_gungunrv_state::machine_start()
+{
+	xavix_i2c_state::machine_start();
+	m_shutdown_timer = timer_alloc(FUNC(xavix_gungunrv_state::shutdown_confirmed), this);
+}
+
 void xavix_gungunrv_state::machine_reset()
 {
 	xavix_i2c_state::machine_reset();
+	m_shutdown_timer->adjust(attotime::never);
 	m_gun_recoil = 0;
 }
 
@@ -1463,13 +1470,20 @@ void xavix_gungunrv_state::io0_output_w(u8 data, u8 direction)
 void xavix_gungunrv_state::io1_output_w(u8 data, u8 direction)
 {
 	xavix_i2c_state::io1_output_w(data, direction);
-	if (BIT(data & direction, 7) && !machine().side_effects_disabled())
-	{
-		// TODO: Startup drives IO1.7 high for about 0.19 us with an $ff latch; shutdown holds it high.
-		// The latch exemption is provisional until the board's pulse qualification is known.
-		if (m_soc->io_data_latch<1>() != 0xff)
-			machine().schedule_exit();
-	}
+	if (machine().side_effects_disabled())
+		return;
+
+	// Startup drives IO1.7 high for about 0.19 us. Shutdown holds it high.
+	// TODO: Measure the board's pulse threshold. One microsecond is provisional.
+	bool const asserted = BIT(data & direction, 7);
+	bool const pending = !m_shutdown_timer->expire().is_never();
+	if (asserted != pending)
+		m_shutdown_timer->adjust(asserted ? attotime::from_usec(1) : attotime::never);
+}
+
+TIMER_CALLBACK_MEMBER(xavix_gungunrv_state::shutdown_confirmed)
+{
+	machine().schedule_exit();
 }
 
 u8 xavix_gungunrv_state::lightgun_r(offs_t offset)
