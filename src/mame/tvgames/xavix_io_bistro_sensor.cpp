@@ -49,6 +49,7 @@ xavix_bistro_sensor_device::xavix_bistro_sensor_device(
 	: device_t(mconfig, XAVIX_BISTRO_SENSOR, tag, owner, clock)
 	, m_food_placed(*this, "PLACED")
 	, m_ingredient(*this, "INGREDIENT")
+	, m_excite(false)
 	, m_sense(false)
 {
 }
@@ -72,7 +73,6 @@ void xavix_bistro_sensor_device::device_reset()
 {
 	m_response_timer->adjust(attotime::never);
 	m_edges_remaining = 0;
-	m_excite = false;
 	m_sense = false;
 }
 
