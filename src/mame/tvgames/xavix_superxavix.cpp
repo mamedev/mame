@@ -2879,6 +2879,7 @@ ROM_START( xavbassf )
 
 	// nRF24E1 firmware stored in the cartridge and tackle SPI EEPROMs.
 	// Each dump includes one trailing 00 byte beyond the 4 KiB EEPROM; hashes include it.
+	// The original set definition interchanged the cartridge and tackle labels.
 	// The cartridge firmware bridges the console and radio; the tackle firmware scans the controls.
 	ROM_REGION( 0x1000, "fishing_cart_eeprom", 0 )
 	ROM_LOAD( "xpbassfishingnrf24e1cart.bin", 0x0000, 0x1000, CRC(cfbb19ae) SHA1(32464e4e4be33fdbc7768311f93ce437a316c616) )
