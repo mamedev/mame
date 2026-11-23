@@ -27,9 +27,11 @@
 #include "machine/pci.h"
 #include "machine/sis85c496.h"
 #include "machine/w83787f.h"
+#include "sound/cdda.h"
 #include "video/voodoo_pci.h"
 
 #include "softlist_dev.h"
+#include "speaker.h"
 
 namespace {
 
@@ -114,6 +116,13 @@ void sis496_state::winbond_superio_config(device_t *device)
 	fdc.nrts2().set(":serport1", FUNC(rs232_port_device::write_rts));
 }
 
+// TODO: this needs to be routed as user option, and chained to sound card for audio mixing
+static void cdrom_config(device_t *device)
+{
+	device->subdevice<cdda_device>("cdda")->add_route(0, ":headphone", 0.25, 0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, ":headphone", 0.25, 1);
+}
+
 void sis496_state::sis496(machine_config &config)
 {
 	I486DX4(config, m_maincpu, 75000000); // I486DX4, 75 or 100 Mhz
@@ -122,7 +131,10 @@ void sis496_state::sis496(machine_config &config)
 	m_maincpu->set_irq_acknowledge_callback("pci:05.0:pic8259_master", FUNC(pic8259_device::inta_cb));
 
 	PCI_ROOT(config, "pci");
-	SIS85C496_HOST(config, "pci:05.0", 0, "maincpu", 32*1024*1024);
+	sis85c496_host_device &host(SIS85C496_HOST(config, "pci:05.0", 0, "maincpu", 32*1024*1024));
+
+	SPEAKER(config, "headphone", 2).front();
+	host.subdevice<bus_master_ide_controller_device>("ide2")->slot(0).set_option_machine_config("cdrom", cdrom_config);
 
 	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board4", 0, "pci:05.0:isabus", isa_internal_devices, "w83787f", true).set_option_machine_config("w83787f", winbond_superio_config);
