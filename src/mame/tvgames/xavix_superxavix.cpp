@@ -3006,6 +3006,9 @@ ROM_START( domdance )
 
 	ROM_REGION( 0x0800000, "extra", ROMREGION_ERASE00 )
 	ROM_LOAD( "u3", 0x0000000, 0x0800000, CRC(e437565c) SHA1(f6db219ea14404b698ca453f6e50c726b2e77abb) )
+
+	ROM_REGION( 0x3000, "dspic", ROMREGION_ERASE00 ) // 4096 packed 24-bit program words
+	ROM_LOAD( "dspic33fj12gp202", 0x0000, 0x3000, NO_DUMP )
 ROM_END
 
 ROM_START( domstepc )
