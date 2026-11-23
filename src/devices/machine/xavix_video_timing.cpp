@@ -534,8 +534,8 @@ void xavix_video_device::video_ctrl_w(u8 data)
 
 	update_video_irq_source();
 
-	LOGMASKED(LOG_IRQ, "[irq] display control %02x -> %02x beam=%d,%d\n",
-			old_ctrl, m_video_ctrl, screen().vpos(), screen().hpos());
+	LOGMASKED(LOG_IRQ, "%s: [irq] display control %02x -> %02x beam=%d,%d\n",
+			machine().describe_context(), old_ctrl, m_video_ctrl, screen().vpos(), screen().hpos());
 }
 
 //-------------------------------------------------

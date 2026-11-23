@@ -255,7 +255,7 @@ void xavix_sound_device::voice_command_w(offs_t offset, u8 data)
 		}
 	}
 
-	LOGMASKED(LOG_VOICE, "[voice] command offset=%u data=%02x\n", unsigned(offset), data);
+	LOGMASKED(LOG_VOICE, "%s: [voice] command offset=%02x data=%02x\n", machine().describe_context(), offset, data);
 }
 
 u8 xavix_sound_device::voice_status_r(offs_t offset)
@@ -298,7 +298,7 @@ void xavix_sound_device::tempo_rate_w(offs_t offset, u8 data)
 	synchronize();
 	m_tempo_rate[offset] = data;
 	reschedule_tempo_timers(1U << offset);
-	LOGMASKED(LOG_TEMPO, "[tempo] rate %u=%02x\n", unsigned(offset), data);
+	LOGMASKED(LOG_TEMPO, "%s: [tempo] rate %02x=%02x\n", machine().describe_context(), offset, data);
 }
 
 u8 xavix_sound_device::irq_status_r()
@@ -319,8 +319,8 @@ void xavix_sound_device::irq_status_w(u8 data)
 	reschedule_tempo_timers();
 	const u8 clear_mask = data & 0xf0;
 	m_irq_status &= ~clear_mask;
-	LOGMASKED(LOG_TEMPO, "[irq] status_w %02x old_en=%02x new_en=%02x clear=%02x pending=%02x\n",
-		data, old_enable, new_enable, clear_mask >> 4, m_irq_status >> 4);
+	LOGMASKED(LOG_TEMPO, "%s: [irq] status_w %02x old_en=%02x new_en=%02x clear=%02x pending=%02x\n",
+		machine().describe_context(), data, old_enable, new_enable, clear_mask >> 4, m_irq_status >> 4);
 	update_irq();
 }
 
@@ -343,7 +343,7 @@ void xavix_sound_device::rate_divider_w(u8 data)
 	synchronize();
 	m_rate_divider = data;
 	reschedule_tempo_timers();
-	LOGMASKED(LOG_TEMPO, "[rate] divider=%02x\n", data);
+	LOGMASKED(LOG_TEMPO, "%s: [rate] divider=%02x\n", machine().describe_context(), data);
 }
 
 u8 xavix_sound_device::master_volume_r()
