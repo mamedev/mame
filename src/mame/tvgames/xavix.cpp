@@ -4631,17 +4631,6 @@ static INPUT_PORTS_START( tomplc )
 	PORT_START("MIC_SIMULATE")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Simulate Announcement") PORT_CODE(KEYCODE_N) PORT_WRITE_LINE_DEVICE_MEMBER("microphone_tone", FUNC(beep_device::set_state))
 
-	// The factory check also tests both contacts closed, beyond the three marked settings.
-	PORT_START("LEVER_TEST")
-	// PORT_CONFNAME( 0x01, 0x00, "Power Contacts Both Closed (Test)" )
-	// PORT_CONFSETTING(    0x00, DEF_STR(Off) )
-	// PORT_CONFSETTING(    0x01, DEF_STR(On) )
-	// PORT_CONFNAME( 0x02, 0x00, "Brake Contacts Both Closed (Test)" )
-	// PORT_CONFSETTING(    0x00, DEF_STR(Off) )
-	// PORT_CONFSETTING(    0x02, DEF_STR(On) )
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 	PORT_MODIFY("AN7")
 	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
 	PORT_CONFSETTING(    0x00, "Normal" )
@@ -4657,18 +4646,6 @@ void xavix_tomplc_state::xavix_tomplc(machine_config &config)
 	xavix_i2c_24c08_4mb(config);
 	configure_microphone(config);
 	m_soc->add_adc_route(BEEP(config, "microphone_tone", 1000), 0, 0.5);
-}
-
-u8 xavix_tomplc_state::io0_input_r(u8 direction)
-{
-	u8 const data = xavix_i2c_power_state::io0_input_r(direction);
-	return BIT(m_lever_test->read(), 0) ? (data | 0x30) : data;
-}
-
-u8 xavix_tomplc_state::io1_input_r(u8 direction)
-{
-	u8 const data = xavix_i2c_power_state::io1_input_r(direction);
-	return BIT(m_lever_test->read(), 1) ? (data | 0x03) : data;
 }
 
 

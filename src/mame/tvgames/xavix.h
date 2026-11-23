@@ -100,17 +100,9 @@ class xavix_tomplc_state : public xavix_i2c_power_state
 public:
 	xavix_tomplc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix_i2c_power_state(mconfig, type, tag)
-		, m_lever_test(*this, "LEVER_TEST")
 	{ }
 
 	void xavix_tomplc(machine_config &config) ATTR_COLD;
-
-protected:
-	virtual u8 io0_input_r(u8 direction) override;
-	virtual u8 io1_input_r(u8 direction) override;
-
-private:
-	required_ioport m_lever_test;
 };
 
 class xavix_ir_state : public xavix_state
