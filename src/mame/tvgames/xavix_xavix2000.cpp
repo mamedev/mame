@@ -333,13 +333,6 @@ static INPUT_PORTS_START( drgqst )
 	PORT_CONFNAME( 0x80, 0x00, "Demo Mode" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
-
-	// The factory contacts share the EEPROM pins; their physical fixture is unidentified.
-	PORT_START("FACTORY")
-	// PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test L (EEPROM Data)") PORT_CODE(KEYCODE_9) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix2000_drgqst_state::factory_contact_changed), 0)
-	// PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test R (EEPROM Clock)") PORT_CODE(KEYCODE_0) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix2000_drgqst_state::factory_contact_changed), 0)
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 void xavix2000_drgqst_state::xavix2000_drgqst(machine_config &config)
@@ -348,53 +341,10 @@ void xavix2000_drgqst_state::xavix2000_drgqst(machine_config &config)
 	configure_camera(config, xavix_analog_image_sensor_device::target_shape::ROD);
 }
 
-void xavix2000_drgqst_state::machine_start()
-{
-	xavix2000_i2c_camera_state::machine_start();
-	save_item(NAME(m_io1_data));
-	save_item(NAME(m_io1_direction));
-}
-
 void xavix2000_drgqst_state::machine_reset()
 {
 	xavix2000_i2c_camera_state::machine_reset();
-	m_io1_data = 0;
-	m_io1_direction = 0;
-	update_eeprom_bus();
-}
-
-u8 xavix2000_drgqst_state::io1_input_r(u8 direction)
-{
-	u8 data = xavix2000_i2c_camera_state::io1_input_r(direction);
-	u8 const contacts = m_factory_contacts->read();
-	if (BIT(contacts, 0))
-		data &= ~0x08;
-	if (BIT(contacts, 1))
-		data |= 0x10;
-	return data;
-}
-
-void xavix2000_drgqst_state::io1_output_w(u8 data, u8 direction)
-{
-	m_io1_data = data;
-	m_io1_direction = direction;
-	update_eeprom_bus();
-	m_camera->control_w(data, direction);
-}
-
-void xavix2000_drgqst_state::update_eeprom_bus()
-{
-	u8 const contacts = m_factory_contacts->read();
-	bool const data = (!BIT(m_io1_direction, 3) || BIT(m_io1_data, 3)) && !BIT(contacts, 0);
-	bool const clock = BIT(m_io1_direction, 4) ? BIT(m_io1_data, 4) : BIT(contacts, 1);
-	m_i2cmem->write_sda(data);
-	m_i2cmem->write_scl(clock);
-}
-
-INPUT_CHANGED_MEMBER(xavix2000_drgqst_state::factory_contact_changed)
-{
-	if (machine().phase() == machine_phase::RUNNING)
-		update_eeprom_bus();
+	xavix_i2c_state::io1_output_w(0, 0);
 }
 
 

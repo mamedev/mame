@@ -115,24 +115,12 @@ class xavix2000_drgqst_state : public xavix2000_i2c_camera_state
 public:
 	xavix2000_drgqst_state(const machine_config &mconfig, device_type type, const char *tag)
 		: xavix2000_i2c_camera_state(mconfig, type, tag)
-		, m_factory_contacts(*this, "FACTORY")
 	{ }
 
 	void xavix2000_drgqst(machine_config &config) ATTR_COLD;
-	DECLARE_INPUT_CHANGED_MEMBER(factory_contact_changed);
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
-	virtual u8 io1_input_r(u8 direction) override;
-	virtual void io1_output_w(u8 data, u8 direction) override;
-
-private:
-	void update_eeprom_bus();
-
-	required_ioport m_factory_contacts;
-	u8 m_io1_data;
-	u8 m_io1_direction;
 };
 
 class xavix2000_ban_omt_state : public xavix2000_i2c_camera_state
