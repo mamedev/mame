@@ -43,6 +43,7 @@ xavix_rom_plain_device::xavix_rom_plain_device(const machine_config &mconfig, co
 xavix_rom_i2c_base_device::xavix_rom_i2c_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, uint8_t bus_write_control_index, uint8_t bus_write_control_mask) :
 	xavix_rom_plain_device(mconfig, type, tag, owner, clock),
 	m_i2cmem(*this, "i2cmem"),
+	m_buscontrol{},
 	m_bus_write_control_index(bus_write_control_index),
 	m_bus_write_control_mask(bus_write_control_mask)
 {
@@ -128,11 +129,6 @@ void xavix_cart_slot_device::cart_devices(device_slot_interface &device)
 void xavix_rom_i2c_base_device::device_start()
 {
 	save_item(NAME(m_buscontrol));
-}
-
-void xavix_rom_i2c_base_device::device_reset()
-{
-	m_buscontrol[0] = m_buscontrol[1] = m_buscontrol[2] = 0x00;
 }
 
 uint8_t xavix_rom_plain_device::read_cart(offs_t offset)

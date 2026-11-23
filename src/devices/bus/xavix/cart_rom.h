@@ -38,7 +38,6 @@ protected:
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 	uint8_t read_i2c(offs_t offset);
 	void write_i2c(offs_t offset, uint8_t data);
