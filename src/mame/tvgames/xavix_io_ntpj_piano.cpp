@@ -20,6 +20,7 @@ xavix_piano_controller_device::xavix_piano_controller_device(const machine_confi
 	, m_keys_cb(*this, 0)
 	, m_led_pwm(*this, "led_pwm")
 	, m_key_lights(*this, "piano_key_light%u", 0U)
+	, m_clock(false)
 {
 }
 
@@ -48,7 +49,6 @@ void xavix_piano_controller_device::device_reset()
 	m_shift = 0;
 	m_bit = 0;
 	m_data = 0;
-	m_clock = false;
 	m_scanning = false;
 	m_led_pwm->clear();
 }
