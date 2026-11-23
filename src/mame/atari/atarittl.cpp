@@ -74,6 +74,7 @@
 #include "nl_stuntcyc.h"
 #include "nl_gtrak10.h"
 #include "nl_tank.h"
+#include "nl_indy4.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 #include "screen.h"
@@ -110,6 +111,59 @@ namespace {
 #define GTRAK10_VIDCLOCK (14318181 / 2)
 #define GTRAK10_HTOTAL 451
 #define GTRAK10_VTOTAL 521
+
+#define IN4_VIDCLOCK    (14318000)
+#define IN4_HTOTAL      (908)
+#define IN4_VTOTAL      (263)
+
+class indy4_state : public driver_device
+{
+public:
+	indy4_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_video(*this, "fixfreq")
+	{
+	}
+
+	void indy4(machine_config &config);
+
+	DECLARE_INPUT_CHANGED_MEMBER(wheel1_changed) { wheel_update(0, oldval, newval); }
+	DECLARE_INPUT_CHANGED_MEMBER(wheel2_changed) { wheel_update(1, oldval, newval); }
+	DECLARE_INPUT_CHANGED_MEMBER(wheel3_changed) { wheel_update(2, oldval, newval); }
+	DECLARE_INPUT_CHANGED_MEMBER(wheel4_changed) { wheel_update(3, oldval, newval); }
+
+	DECLARE_INPUT_CHANGED_MEMBER(tvtest_changed)
+	{
+		m_maincpu->subdevice<netlist_mame_logic_input_device>("tvsel0")->write(BIT(newval, 0));
+		m_maincpu->subdevice<netlist_mame_logic_input_device>("tvsel1")->write(BIT(newval, 1));
+	}
+
+	virtual void machine_reset() override
+	{
+		// the netlist resets after machine_reset, so push the test-pattern
+		// selection into it on the first timeslice instead
+		machine().scheduler().timer_set(attotime::zero, timer_expired_delegate(FUNC(indy4_state::tvtest_init), this));
+	}
+
+	TIMER_CALLBACK_MEMBER(tvtest_init)
+	{
+		const u8 sel = ioport("SERVICE")->read();
+		m_maincpu->subdevice<netlist_mame_logic_input_device>("tvsel0")->write(BIT(sel, 0));
+		m_maincpu->subdevice<netlist_mame_logic_input_device>("tvsel1")->write(BIT(sel, 1));
+		m_maincpu->subdevice<netlist_mame_logic_input_device>("tvhigh")->write(1);
+		m_maincpu->subdevice<netlist_mame_logic_input_device>("tvlow")->write(0);
+	}
+
+
+private:
+	void wheel_update(unsigned player, u32 oldval, u32 newval);
+
+	required_device<netlist_mame_device> m_maincpu;
+	required_device<fixedfreq_device> m_video;
+	u8 m_wheel_phase[4]{};
+};
+
 
 class atarikee_state : public driver_device
 {
@@ -261,6 +315,113 @@ void tank_state::tank(machine_config &config)
 	m_video->set_horz_scale(3);
 }
 
+void indy4_state::wheel_update(unsigned player, u32 oldval, u32 newval)
+{
+	static const char *const wheela[4] = { "green_wheela", "cyan_wheela", "violet_wheela", "red_wheela" };
+	static const char *const wheelb[4] = { "green_wheelb", "cyan_wheelb", "violet_wheelb", "red_wheelb" };
+
+	m_wheel_phase[player] = u8(m_wheel_phase[player] + s8(newval - oldval));
+	const u8 phase = m_wheel_phase[player] & 3;
+	m_maincpu->subdevice<netlist_mame_logic_input_device>(wheela[player])->write(BIT(phase, 1));
+	m_maincpu->subdevice<netlist_mame_logic_input_device>(wheelb[player])->write(BIT(phase, 1) ^ BIT(phase, 0));
+}
+
+void indy4_state::indy4(machine_config &config)
+{
+	NETLIST_CPU(config, m_maincpu, netlist::config::DEFAULT_CLOCK()).set_source(NETLIST_NAME(indy4));
+
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vidr").set_params("VIDEO_R", "fixfreq", FUNC(fixedfreq_device::update_red));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vidg").set_params("VIDEO_G", "fixfreq", FUNC(fixedfreq_device::update_green));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:vidb").set_params("VIDEO_B", "fixfreq", FUNC(fixedfreq_device::update_blue));
+	NETLIST_ANALOG_OUTPUT(config, "maincpu:sync").set_params("COMPOSITE_SYNC", "fixfreq", FUNC(fixedfreq_device::update_sync));
+
+
+	NETLIST_LOGIC_INPUT(config, "maincpu:coin1",  "COIN1_HI.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coin2",  "COIN2_HI.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coin3",  "COIN3_HI.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:coin4",  "COIN4_HI.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:dollar", "DOLLAR_HI.IN", 0);
+
+	NETLIST_LOGIC_INPUT(config, "maincpu:green_wheela",   "GREEN_WHELA.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:green_wheelb",   "GREEN_WHEELB.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:cyan_wheela",    "CYAN_WHELA.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:cyan_wheelb",    "CYAN_WHEELB.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:violet_wheela",  "VIOLET_WHELA.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:violet_wheelb",  "VIOLET_WHEELB.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:red_wheela",     "RED_WHELA.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:red_wheelb",     "RED_WHEELB.IN", 0);
+
+	NETLIST_LOGIC_INPUT(config, "maincpu:green_gas",    "GREEN_GAS.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:green_brake",  "GREEN_BRAKE.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:cyan_gas",     "CYAN_GAS.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:cyan_brake",   "CYAN_BRAKE.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:violet_gas",   "VIOLET_GAS.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:violet_brake", "VIOLET_BRAKE.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:red_gas",      "RED_GAS.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:red_brake",    "RED_BRAKE.IN", 0);
+
+
+	NETLIST_LOGIC_INPUT(config, "maincpu:tvsel0", "TEST_SEL0.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:tvsel1", "TEST_SEL1.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:tvhigh", "TVTEST_HIGH.IN", 0);
+	NETLIST_LOGIC_INPUT(config, "maincpu:tvlow", "TVTEST_LOW.IN", 0);
+	/* video hardware */
+	SCREEN(config, "screen");
+	FIXFREQ(config, m_video).set_screen("screen");
+	m_video->set_monitor_clock(IN4_VIDCLOCK);
+	// Manual p.8:
+	// 63.38 us lines = 908 clocks, HSYNC 64 clocks wide: H counter runs 116..1023, HSYNC = counts 256..319.
+	// Video content = counts 320..1023 plus 116..255 (right edge); counts 320..383
+	// are the blank back porch right after HSYNC.
+	m_video->set_horz_params(IN4_HTOTAL - 128, IN4_HTOTAL - 64, IN4_HTOTAL,      IN4_HTOTAL + 64);
+	m_video->set_vert_params(IN4_VTOTAL - 23, IN4_VTOTAL - 20, IN4_VTOTAL - 13, IN4_VTOTAL);
+	m_video->set_fieldcount(1);
+	m_video->set_threshold(0.2);
+	m_video->set_vsync_threshold(0.25);
+	m_video->set_gain(1.0);
+	m_video->set_horz_scale(1);
+}
+
+static INPUT_PORTS_START( indy4 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) NETLIST_LOGIC_PORT_CHANGED("maincpu", "coin1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) NETLIST_LOGIC_PORT_CHANGED("maincpu", "coin2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) NETLIST_LOGIC_PORT_CHANGED("maincpu", "coin3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN4 ) NETLIST_LOGIC_PORT_CHANGED("maincpu", "coin4")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BILL1 ) NETLIST_LOGIC_PORT_CHANGED("maincpu", "dollar")
+
+	PORT_START("WHEEL1")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(indy4_state::wheel1_changed), 0)
+	PORT_START("WHEEL2")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(2)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(indy4_state::wheel2_changed), 0)
+	PORT_START("WHEEL3")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(3)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(indy4_state::wheel3_changed), 0)
+	PORT_START("WHEEL4")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_PLAYER(4)
+		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(indy4_state::wheel4_changed), 0)
+
+	PORT_START("PEDALS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )              NETLIST_LOGIC_PORT_CHANGED("maincpu", "green_gas")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )              NETLIST_LOGIC_PORT_CHANGED("maincpu", "green_brake")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) NETLIST_LOGIC_PORT_CHANGED("maincpu", "cyan_gas")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) NETLIST_LOGIC_PORT_CHANGED("maincpu", "cyan_brake")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3) NETLIST_LOGIC_PORT_CHANGED("maincpu", "violet_gas")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(3) NETLIST_LOGIC_PORT_CHANGED("maincpu", "violet_brake")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) NETLIST_LOGIC_PORT_CHANGED("maincpu", "red_gas")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(4) NETLIST_LOGIC_PORT_CHANGED("maincpu", "red_brake")
+
+	PORT_START("SERVICE")
+	PORT_DIPNAME( 0x03, 0x00, "Video Test Pattern" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(indy4_state::tvtest_changed), 0)
+	PORT_DIPSETTING( 0x00, "Normal" )
+	PORT_DIPSETTING( 0x01, "All White" )
+	PORT_DIPSETTING( 0x02, "Dot Pattern" )
+	PORT_DIPSETTING( 0x03, "All Black" )
+
+INPUT_PORTS_END
+
 void gtrak10_state::gtrak10(machine_config &config)
 {
 	/* basic machine hardware */
@@ -410,17 +571,17 @@ ROM_END
 ROM_START( indy4 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0200, "gfx", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0200, "maincpu:003186.p6", ROMREGION_ERASE00 )
 	ROM_LOAD( "003186.p6",     0x0000, 0x0200, CRC(b3443354) SHA1(f43b82fd5d02dad2f597f890f5845701e73476a5) ) // Car Video
 
-	ROM_REGION( 0x0020, "motion", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0020, "maincpu:003187.f7", ROMREGION_ERASE00 )
 	ROM_LOAD( "003187.f7",     0x0000, 0x0020, CRC(01dca5b9) SHA1(0e3fbefc5df993b5a6a724aee258653897954255) ) // Car Motion
 
-	ROM_REGION( 0x0020, "checkpoint", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0020, "maincpu:005502.e5", ROMREGION_ERASE00 )
 	ROM_LOAD( "005502.e5",     0x0000, 0x0020, CRC(e30ea877) SHA1(86f1f2c2e6e8472f7019f17bac723cb36faf098a) ) // Check Points
 
-	ROM_REGION( 0x0200, "racetrack", ROMREGION_ERASE00 )
-	ROM_LOAD( "005503.f4",     0x0000, 0x0200, CRC(1aafbe72) SHA1(c59829eccfe5a6014acad9682c401ca3f32fdfc9) ) // Race Track
+	ROM_REGION( 0x0200, "maincpu:005503.f4", ROMREGION_ERASE00 )
+	ROM_LOAD_NIB_LOW( "005503.f4", 0x0000, 0x0200, CRC(1aafbe72) SHA1(c59829eccfe5a6014acad9682c401ca3f32fdfc9) ) // Race Track
 ROM_END
 
 
@@ -640,7 +801,7 @@ GAME(1975,  crashnsc,  0,        atarikee,        0, atarikee_state, empty_init,
 GAME(1974,  gtrak10,   0,        gtrak10,   gtrak10,  gtrak10_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K",     MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME(1974,  gtrak10a,  gtrak10,  atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 10/Trak 10/Formula K (older)",     MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 GAME(1974,  gtrak20,   0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Gran Trak 20/Trak 20/Twin Racer",    MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-GAME(1976,  indy4,     0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari/Kee",    "Indy 4",           MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
+GAME(1976,  indy4,     0,        indy4,       indy4,    indy4_state, empty_init, ROT0,  "Atari/Kee",    "Indy 4",           MACHINE_NO_SOUND)
 GAME(1975,  indy800,   0,        atarikee,        0, atarikee_state, empty_init, ROT90, "Atari/Kee",    "Indy 800",         MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 GAME(1975,  jetfight,  0,        atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 1)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 GAME(1975,  jetfighta, jetfight, atarikee,        0, atarikee_state, empty_init, ROT0,  "Atari",        "Jet Fighter/Jet Fighter Cocktail/Launch Aircraft (set 2)",      MACHINE_NO_SOUND | MACHINE_NOT_WORKING)

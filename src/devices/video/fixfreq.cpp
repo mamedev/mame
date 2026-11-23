@@ -395,8 +395,20 @@ uint32_t fixedfreq_device::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		screen.set_video_attributes(0);
 		bitmap.fill(backcol);
 		for (auto &f : m_state.m_fragments)
-			if (f.y < bitmap.height())
-				bitmap.plot_box(f.x, f.y, f.xr - f.x, 1, f.col);
+		{
+			if (f.y >= bitmap.height() || f.xr <= f.x)
+				continue;
+			// fragments are float positioned: integer truncation drops
+			// sub-pixel fragments (black holes). Sample at pixel centers
+			// instead - a fragment lights every pixel whose center it
+			// covers, so sub-pixel fragments stay visible without smearing
+			// thin elements across partial-coverage pixels.
+			const int y(int(f.y));
+			const int xs(int(std::floor(f.x + 0.5f)));
+			const int xe(int(std::ceil(f.xr - 0.5f)));
+			for (int x = std::max(xs, 0); x < xe && x < bitmap.width(); x++)
+				bitmap.pix(y, x) = f.col;
+		}
 
 		if (test_pat)
 			draw_testpat(screen, bitmap, cliprect);

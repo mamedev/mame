@@ -46,27 +46,32 @@ namespace netlist::devices {
 		, m_CLK(*this, "CLK", NETLIB_DELEGATE(clk))
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
-		, m_nextD(*this, "m_nextD", 0)
 		, m_power_pins(*this)
 		{
 		}
 
 		NETLIB_RESETI()
 		{
-			m_CLK.set_state(logic_t::STATE_INP_LH);
-			m_nextD = 0;
+			m_CLK.set_state(logic_t::STATE_INP_ACTIVE);
 		}
 
+		// enable high: transparent (Q follows D); enable low: Q holds
 		NETLIB_HANDLERI(clk)
 		{
-			newstate(m_nextD, !m_nextD);
-			m_CLK.inactivate();
+			if (m_CLK())
+			{
+				m_D.activate();
+				newstate(m_D(), !m_D());
+			}
+			else
+			{
+				m_D.inactivate();
+			}
 		}
 
 		NETLIB_HANDLERI(inputs)
 		{
-			m_nextD = m_D();
-			m_CLK.activate_lh();
+			newstate(m_D(), !m_D());
 		}
 
 	private:
@@ -74,8 +79,6 @@ namespace netlist::devices {
 		logic_input_t m_CLK;
 		logic_output_t m_Q;
 		logic_output_t m_QQ;
-
-		state_var<netlist_sig_t> m_nextD;
 
 		nld_power_pins m_power_pins;
 
