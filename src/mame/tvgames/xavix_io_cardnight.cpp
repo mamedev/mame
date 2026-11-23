@@ -19,7 +19,6 @@ xavix_cardnight_remote_device::xavix_cardnight_remote_device(const machine_confi
 	, m_directions(*this, "IN1")
 	, m_buttons(*this, "ROW0")
 	, m_remote_reset(*this, "REMOTE_RESET")
-	, m_factory_test(*this, "FACTORY_TX")
 {
 	set_bit_ticks(0x15 * 512);
 	set_report_gap_ticks(64 * 512);
@@ -43,11 +42,6 @@ static INPUT_PORTS_START( xavix_cardnight_remote )
 
 	PORT_START("REMOTE_RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Remote Reset") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_cardnight_remote_device::reset_changed), 0)
-
-	PORT_START("FACTORY_TX")
-	// The physical control or fixture sending this additional wireless command is unidentified.
-	// PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Factory Test Transmission") PORT_CODE(KEYCODE_F1)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
 ioport_constructor xavix_cardnight_remote_device::device_input_ports() const
@@ -57,9 +51,6 @@ ioport_constructor xavix_cardnight_remote_device::device_input_ports() const
 
 u32 xavix_cardnight_remote_device::read_report(unsigned report)
 {
-	if (BIT(m_factory_test->read(), 0))
-		return 0x55;
-
 	u8 const buttons = m_buttons->read();
 	if (BIT(buttons, 5))
 		return 0xa5;

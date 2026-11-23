@@ -31,7 +31,6 @@ private:
 	required_ioport m_directions;
 	required_ioport m_buttons;
 	required_ioport m_remote_reset;
-	required_ioport m_factory_test;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_CARDNIGHT_REMOTE, xavix_cardnight_remote_device)
