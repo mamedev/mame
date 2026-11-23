@@ -281,6 +281,7 @@ private:
 	void sprite_dma_ctrl_w(u8 data);
 	TIMER_CALLBACK_MEMBER(sprite_dma_tick);
 	template <unsigned Layer> void tilemap_regs_w(offs_t offset, u8 data, u8 mem_mask);
+	void segment_regs_w(offs_t offset, u8 data);
 	void sprite_address_mode_w(u8 data);
 	u8 text_array_r(offs_t offset);
 	void text_array_w(offs_t offset, u8 data);
@@ -488,6 +489,7 @@ private:
 	int output_sample_phase_clocks() const;
 	void video_position_regs_w(offs_t offset, u8 data);
 	void extended_segment_regs_w(offs_t offset, u8 data);
+	void graphics_mode_w(u8 data);
 	template <palette_bank Bank> u8 palette_index_r();
 	template <palette_bank Bank> void palette_index_w(u8 data);
 	template <palette_bank Bank, palette_component Component> u8 palette_component_r();

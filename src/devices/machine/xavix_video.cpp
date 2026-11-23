@@ -94,7 +94,7 @@ void xavix_video_device::map(address_map &map)
 	map(0x6900, 0x69ff).ram().rw(FUNC(xavix_video_device::graphics_palram_r<palette_plane::L>), FUNC(xavix_video_device::graphics_palram_w<palette_plane::L>)).share(m_graphics_palram_l);
 
 	// Segment RAM
-	map(0x6a00, 0x6a1f).ram().share(m_segment_regs); // test mode, pass flag 0x20
+	map(0x6a00, 0x6a1f).ram().w(FUNC(xavix_video_device::segment_regs_w)).share(m_segment_regs); // test mode, pass flag 0x20
 
 	// Possible pixel-decoder resynchronisation control; enabled behaviour is unverified.
 	map(0x6fc0, 0x6fc0).w(FUNC(xavix_video_device::pixel_decoder_ctrl_w));
@@ -170,7 +170,7 @@ void superxavix_video_device::map(address_map &map)
 	map(0x6f8f, 0x6f8f).lr8(NAME([] () -> u8 { return 0; })).nopw();
 	map(0x6f91, 0x6f91).lr8(NAME([] () -> u8 { return 0; })).nopw();
 	map(0x6fa0, 0x6fa7).ram().w(FUNC(superxavix_video_device::video_position_regs_w)).share(m_video_position_regs);
-	map(0x6fa8, 0x6fa8).lrw8(NAME([this] () -> u8 { return m_graphics_mode; }), NAME([this] (u8 data) { m_graphics_mode = data; }));
+	map(0x6fa8, 0x6fa8).lr8(NAME([this] () -> u8 { return m_graphics_mode; })).w(FUNC(superxavix_video_device::graphics_mode_w));
 
 	// Bitmap layer parameters
 	map(0x6fb0, 0x6fc4).ram().w(FUNC(superxavix_video_device::bitmap_params_w)).share(m_bitmap_params);
@@ -484,6 +484,7 @@ u8 xavix_video_device::spriteram_r(offs_t offset)
 
 void xavix_video_device::spriteram_cpu_w(offs_t offset, u8 data)
 {
+	screen().update_partial(screen().vpos());
 	m_sprite_read_latch = data;
 	spriteram_w(offset, data);
 }
@@ -549,10 +550,26 @@ void superxavix_video_device::bitmap_params_w(offs_t offset, u8 data)
 	m_bitmap_params[offset] = data;
 }
 
+void xavix_video_device::segment_regs_w(offs_t offset, u8 data)
+{
+	if (m_segment_regs[offset] != data)
+		screen().update_partial(screen().vpos());
+	m_segment_regs[offset] = data;
+}
+
 void superxavix_video_device::extended_segment_regs_w(offs_t offset, u8 data)
 {
 	LOGMASKED(LOG_REGISTERS, "%s: extended_segment_regs_w %02x %02x\n", machine().describe_context(), offset, data);
+	if (m_extended_segment_regs[offset] != data)
+		screen().update_partial(screen().vpos());
 	m_extended_segment_regs[offset] = data;
+}
+
+void superxavix_video_device::graphics_mode_w(u8 data)
+{
+	if (BIT(m_graphics_mode ^ data, 0))
+		screen().update_partial(screen().vpos());
+	m_graphics_mode = data;
 }
 
 template <superxavix_video_device::palette_bank Bank>
@@ -719,8 +736,10 @@ void xavix_video_device::tilemap_regs_w(offs_t offset, u8 data, u8 mem_mask)
 
 	static_assert(Layer < 2);
 	auto &regs = Layer ? m_tilemap2_regs : m_tilemap1_regs;
-	COMBINE_DATA(&regs[offset]);
-	regs[offset] &= TILEMAP_REGISTER_MASK[offset];
+	data = ((regs[offset] & ~mem_mask) | (data & mem_mask)) & TILEMAP_REGISTER_MASK[offset];
+	if (regs[offset] != data)
+		screen().update_partial(screen().vpos());
+	regs[offset] = data;
 }
 
 
@@ -740,7 +759,10 @@ void xavix_video_device::sprite_address_mode_w(u8 data)
 	    ---- -111 (07) 24-bit 8-byte-aligned address
 	*/
 	// epo_bowl and tak_hamr write 0x84, selecting canonical mode 4.
-	m_sprite_address_mode = data & 0x07;
+	data &= 0x07;
+	if (m_sprite_address_mode != data)
+		screen().update_partial(screen().vpos());
+	m_sprite_address_mode = data;
 }
 
 // The Text Array / Memory Emulator acts as a memory area that you can point the tilemap sources at to get a fixed pattern of data
