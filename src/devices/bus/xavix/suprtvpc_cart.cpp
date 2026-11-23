@@ -158,6 +158,9 @@ void device_suprtvpc_cart_interface::rom_alloc(u32 size)
 
 std::pair<std::error_condition, std::string> suprtvpc_cart_slot_device::call_load()
 {
+	if (!m_cart)
+		return std::make_pair(image_error::UNSUPPORTED, "No cartridge device selected");
+
 	bool const softlist = loaded_through_softlist();
 	u8 const *const source = softlist ? get_software_region("prg") : nullptr;
 	if (softlist && !source)
