@@ -600,6 +600,47 @@ private:
 	bool m_saved_banker_connected = false;
 };
 
+class xavix_rad_mtrk_state : public xavix_power_state
+{
+public:
+	using xavix_power_state::xavix_power_state;
+
+	void xavix_rad_mtrk(machine_config &config) ATTR_COLD;
+	void xavix_rad_mtrkp(machine_config &config) ATTR_COLD;
+};
+
+class xavix_rad_madf_state : public xavix_power_state
+{
+public:
+	using xavix_power_state::xavix_power_state;
+
+	void xavix_rad_madf(machine_config &config) ATTR_COLD;
+};
+
+class xavix_tom_tvho_state : public xavix_state
+{
+public:
+	using xavix_state::xavix_state;
+
+	void xavix_tom_tvho(machine_config &config) ATTR_COLD;
+};
+
+class xavix_tak_beyu_state : public xavix_state
+{
+public:
+	using xavix_state::xavix_state;
+
+	void xavix_tak_beyu(machine_config &config) ATTR_COLD;
+};
+
+class xavix_tomthr_state : public xavix_power_state
+{
+public:
+	using xavix_power_state::xavix_power_state;
+
+	void xavix_tomthr(machine_config &config) ATTR_COLD;
+};
+
 class xavix_jarajal_state : public xavix_power_state
 {
 public:

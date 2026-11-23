@@ -4215,7 +4215,7 @@ static INPUT_PORTS_START( rad_mtrk )
 	PORT_INCLUDE(xavix_reset_control)
 INPUT_PORTS_END
 
-void xavix_state::xavix_rad_mtrk(machine_config &config)
+void xavix_rad_mtrk_state::xavix_rad_mtrk(machine_config &config)
 {
 	xavix_4mb(config);
 
@@ -4229,7 +4229,7 @@ static INPUT_PORTS_START( rad_mtrkp )
 	PORT_INCLUDE(rad_mtrk)
 INPUT_PORTS_END
 
-void xavix_state::xavix_rad_mtrkp(machine_config &config)
+void xavix_rad_mtrk_state::xavix_rad_mtrkp(machine_config &config)
 {
 	xavixp_4mb(config);
 
@@ -4260,7 +4260,7 @@ static INPUT_PORTS_START( rad_fb )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_state::xavix_rad_madf(machine_config &config)
+void xavix_rad_madf_state::xavix_rad_madf(machine_config &config)
 {
 	xavix_4mb(config);
 
@@ -4338,7 +4338,7 @@ static INPUT_PORTS_START( tom_tvho )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-void xavix_state::xavix_tom_tvho(machine_config &config)
+void xavix_tom_tvho_state::xavix_tom_tvho(machine_config &config)
 {
 	xavix_2mb(config);
 
@@ -4392,7 +4392,7 @@ static INPUT_PORTS_START( tak_bey )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Button")
 INPUT_PORTS_END
 
-void xavix_state::xavix_tak_beyu(machine_config &config)
+void xavix_tak_beyu_state::xavix_tak_beyu(machine_config &config)
 {
 	xavix_nv_2mb(config);
 
@@ -4681,7 +4681,7 @@ static INPUT_PORTS_START( tomthr )
 	PORT_INCLUDE(xavix_reset_control)
 INPUT_PORTS_END
 
-void xavix_state::xavix_tomthr(machine_config &config)
+void xavix_tomthr_state::xavix_tomthr(machine_config &config)
 {
 	xavix_4mb(config);
 	configure_microphone(config);
@@ -5535,8 +5535,8 @@ CONS( 2000,  rad_hnt,   0,        0, xavix_rad_hnt,       rad_hnt,   xavix_rad_h
 
 CONS( 2003,  rad_hnt2,  0,        0, xavix_rad_hnt2,      rad_hnt,   xavix_rad_hnt_state,          empty_init,  "Radica / SSD Company Ltd.", "Play TV Buckmasters Huntin' 2 (NTSC)", MACHINE_NOT_WORKING )
 
-CONS( 2003,  rad_mtrk,  0,        0, xavix_rad_mtrk,      rad_mtrk,  xavix_power_state,            empty_init,  "Radica / Sennari Interactive / SSD Company Ltd.", "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING )
-CONS( 2003,  rad_mtrkp, rad_mtrk, 0, xavix_rad_mtrkp,     rad_mtrkp, xavix_power_state,            empty_init,  "Radica / Sennari Interactive / SSD Company Ltd.", "Connectv Monster Truck (PAL)", MACHINE_NOT_WORKING )
+CONS( 2003,  rad_mtrk,  0,        0, xavix_rad_mtrk,      rad_mtrk,  xavix_rad_mtrk_state,   empty_init,  "Radica / Sennari Interactive / SSD Company Ltd.", "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING )
+CONS( 2003,  rad_mtrkp, rad_mtrk, 0, xavix_rad_mtrkp,     rad_mtrkp, xavix_rad_mtrk_state,   empty_init,  "Radica / Sennari Interactive / SSD Company Ltd.", "Connectv Monster Truck (PAL)", MACHINE_NOT_WORKING )
 
 CONS( 200?,  rad_box,   0,        0, xavix_nv_2mb,        rad_box,   xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Boxin' (NTSC)", 0 )
 CONS( 200?,  rad_boxp,  rad_box,  0, xavixp_nv_2mb,       rad_boxp,  xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Connectv Boxin' (PAL)", 0 )
@@ -5553,9 +5553,9 @@ CONS( 2001,  rad_bassp, rad_bass, 0, xavixp_1mb,          rad_bassp, xavix_rad_b
 CONS( 2001,  rad_snow,  0,        0, xavix_nv_1mb,        rad_snow,  xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Snowboarder (Blue) (NTSC)", 0 )
 CONS( 2001,  rad_snowp, rad_snow, 0, xavixp_nv_1mb,       rad_snowp, xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Connectv Snowboarder (Blue) (PAL)", 0 )
 
-CONS( 2003,  rad_madf,  0,        0, xavix_rad_madf,      rad_fb,    xavix_power_state,            empty_init,  "Radica / Electronic Arts / SSD Company Ltd.", "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING ) // no Play TV branding, USA only release?
+CONS( 2003,  rad_madf,  0,        0, xavix_rad_madf,      rad_fb,    xavix_rad_madf_state,   empty_init,  "Radica / Electronic Arts / SSD Company Ltd.", "EA Sports Madden Football (NTSC)", MACHINE_NOT_WORKING ) // no Play TV branding, USA only release?
 
-CONS( 2005,  rad_fb,    0,        0, xavix_rad_madf,      rad_fb,    xavix_power_state,            empty_init,  "Radica / FarSight Studios / SSD Company Ltd.", "Play TV Football (NTSC)", MACHINE_NOT_WORKING ) // USA only release? doesn't change logo for PAL.
+CONS( 2005,  rad_fb,    0,        0, xavix_rad_madf,      rad_fb,    xavix_rad_madf_state,   empty_init,  "Radica / FarSight Studios / SSD Company Ltd.", "Play TV Football (NTSC)", MACHINE_NOT_WORKING ) // USA only release? doesn't change logo for PAL.
 
 // fails to display any kind of XaviX logo or SSD Copyright, it is the only XaviX based game so far to not show these details anywhere in the game.
 CONS( 2003,  rad_rh,    0,        0, xavix_2mb,           rad_rh,    xavix_rad_rh_state,           empty_init,  "Radica / Fisher-Price / Pronto Games / SSD Company Ltd.", "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING )
@@ -5652,7 +5652,7 @@ CONS( 2002,  tak_geig,  0,        0, xavix_nv_4mb,        tak_geig,  xavix_state
 CONS( 2001,  tak_wdg,   0,        0, xavix_tak_wdg,       tak_wdg,   xavix_tak_wdg_state,          empty_init,  "Takara / SSD Company Ltd.", "Webdiver DX W-05 Gladion (Japan)", 0 )
 
 // ティービーホッケー
-CONS( 2001,  tom_tvho,  0,        0, xavix_tom_tvho,      tom_tvho,  xavix_state,                  empty_init,  "Tomy / SSD Company Ltd.", "TV Hockey (Japan)", 0 )
+CONS( 2001,  tom_tvho,  0,        0, xavix_tom_tvho,      tom_tvho,  xavix_tom_tvho_state,      empty_init,  "Tomy / SSD Company Ltd.", "TV Hockey (Japan)", 0 )
 
 // コメットさん☆ラブリンバトン
 CONS( 2001,  tak_comt,  0,        0, xavix_tak_comt,      tak_comt,  xavix_tak_comt_state,         empty_init,  "Takara / SSD Company Ltd.", "Comet-san Lovelin Baton (Japan)", MACHINE_NOT_WORKING )
@@ -5664,10 +5664,10 @@ CONS( 2001,  tak_gin,   0,        0, xavix_2mb,           tak_gin,   xavix_state
 CONS( 2002,  tak_hamr,  0,        0, xavix_i2c_24c02_4mb, tak_hamr,  xavix_i2c_state,              empty_init,  "Takara / SSD Company Ltd.", "Poko Poko Hammers (Japan)", 0 )
 
 // Beyblade V-Force: Arcade Challenge 5-in-1
-CONS( 2003,  tak_beyu,  0,        0, xavix_tak_beyu,      tak_bey,   xavix_state,                  empty_init,  "Takara / Hasbro / SSD Company Ltd.", "Beyblade V-Force: Arcade Challenge 5-in-1 (US)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+CONS( 2003,  tak_beyu,  0,        0, xavix_tak_beyu,      tak_bey,   xavix_tak_beyu_state,      empty_init,  "Takara / Hasbro / SSD Company Ltd.", "Beyblade V-Force: Arcade Challenge 5-in-1 (US)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 
 // 爆転シュートベイブレード2002 ベイアルティメットシューター
-CONS( 2002,  tak_beyb,  tak_beyu, 0, xavix_tak_beyu,      tak_bey,   xavix_state,                  empty_init,  "Takara / SSD Company Ltd.", "Bakuten Shoot Beyblade 2002: Bey Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
+CONS( 2002,  tak_beyb,  tak_beyu, 0, xavix_tak_beyu,      tak_bey,   xavix_tak_beyu_state,      empty_init,  "Takara / SSD Company Ltd.", "Bakuten Shoot Beyblade 2002: Bey Ultimate Shooter (Japan)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_LAN )
 
 // ジャラジャランド
 // Also distributed by Atlus as an arcade cabinet in 2005; whether it used this PlugIt! ROM is unconfirmed.
@@ -5686,7 +5686,7 @@ CONS( 2003,  tomcpin,   0,        0, xavix_i2c_24c08_4mb, tomcpin,   xavix_i2c_s
 CONS( 2004,  tomplc,    0,        0, xavix_tomplc,        tomplc,    xavix_tomplc_state,           empty_init,  "Tomy / SSD Company Ltd.", "TV de Asobitai Nihon Isshuu: Boku wa Plarail Untenshi (Japan)", 0 )
 
 // テレビで遊び隊 ハイパーレスキュー ぼくは救助隊！
-CONS( 2006,  tomthr,    0,        0, xavix_tomthr,        tomthr,    xavix_power_state,            empty_init,  "Takara Tomy / SSD Company Ltd.", "TV de Asobitai Hyper Rescue: Boku wa Kyuujotai! (Japan)", 0 )
+CONS( 2006,  tomthr,    0,        0, xavix_tomthr,        tomthr,    xavix_tomthr_state,   empty_init,  "Takara Tomy / SSD Company Ltd.", "TV de Asobitai Hyper Rescue: Boku wa Kyuujotai! (Japan)", 0 )
 
 // ガンガンアドベンチャー
 CONS( 2001,  gungunad,  0,        0, xavix_gungunad,      gungunad,  xavix_gungunad_state,         empty_init,  "Takara / SSD Company Ltd.", "Gun Gun Adventure (Japan)", 0 )

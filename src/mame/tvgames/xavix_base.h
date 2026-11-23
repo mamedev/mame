@@ -65,12 +65,6 @@ public:
 	// Original XaviX product configurations
 	void xavix_rad_bb(machine_config &config) ATTR_COLD;
 	void xavix_rad_bb2(machine_config &config) ATTR_COLD;
-	void xavix_rad_mtrk(machine_config &config) ATTR_COLD;
-	void xavix_rad_mtrkp(machine_config &config) ATTR_COLD;
-	void xavix_rad_madf(machine_config &config) ATTR_COLD;
-	void xavix_tom_tvho(machine_config &config) ATTR_COLD;
-	void xavix_tomthr(machine_config &config) ATTR_COLD;
-	void xavix_tak_beyu(machine_config &config) ATTR_COLD;
 
 	// XaviX2000 configurations (xavix_xavix2000.cpp)
 	void xavix2000(machine_config &config) ATTR_COLD;
