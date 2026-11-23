@@ -2533,19 +2533,19 @@ void superxavix_suprtvpc_state::superxavix_suprtvpc(machine_config &config)
 	m_soc->set_anport_counter_mode(2);
 	m_soc->set_anport_counter_mode(3);
 
-	SUPRTVPC_CART_SLOT(config, m_cart, [this, &config] (device_slot_interface &slot)
+	SUPRTVPC_CART_SLOT(config, m_cart, peripheral_clock());
+	m_cart->set_option_machine_config("rom_ir", [&config] (device_t *device)
 	{
-		suprtvpc_cart_slot_device::cart_devices(slot);
-		slot.option_add_internal("rom_ir", SUPRTVPC_ROM).clock(peripheral_clock()).machine_config([this, &config] (device_t *)
-		{
-			// The cartridge receiver accepts the later Excite racket reports.
-			xavix_ir_motion_device &rackets(XAVIX_IR_MOTION(config, "rom_ir:controllers", DERIVED_CLOCK(1, 1)));
-			rackets.set_controller_type(xavix_ir_motion_device::controller_type::POWERED_PING_PONG_RACKETS);
-			rackets.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
-			m_soc.lookup()->raster_vblank_callback().append(rackets, FUNC(xavix_ir_motion_device::vblank_w));
-		});
-	}, "rom");
+		auto &cart = downcast<suprtvpc_rom_ir_device &>(*device);
+		// The cartridge receiver accepts the later Excite racket reports.
+		xavix_ir_motion_device &rackets(XAVIX_IR_MOTION(config, "rom_ir:controllers", DERIVED_CLOCK(1, 1)));
+		rackets.set_controller_type(xavix_ir_motion_device::controller_type::POWERED_PING_PONG_RACKETS);
+		rackets.set_event_callback(cart, FUNC(suprtvpc_rom_ir_device::ir_receive));
+		cart.ir_data_callback().set(rackets, FUNC(xavix_ir_motion_device::data_r));
+		cart.vblank_callback().set(rackets, FUNC(xavix_ir_motion_device::vblank_w));
+	});
 	m_cart->set_ir_rx_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
+	m_soc->raster_vblank_callback().append(m_cart, FUNC(suprtvpc_cart_slot_device::vblank_w));
 
 	SOFTWARE_LIST(config, "cart_list").set_original("suprtvpc_cart");
 }
@@ -2618,8 +2618,8 @@ u8 superxavix_suprtvpc_state::pio1_input_r(offs_t offset, u8 mem_mask)
 {
 	u8 result = m_tvpc_pio[1]->read() & ~0x08;
 
-	if (m_rackets)
-		result = (result & ~0x01) | m_rackets->data_r();
+	if (m_cart->has_ir_data())
+		result = (result & ~0x01) | m_cart->ir_data_r();
 
 	if (BIT(mouse_buttons_r(), 1))
 		result |= 0x08;
@@ -2629,7 +2629,7 @@ u8 superxavix_suprtvpc_state::pio1_input_r(offs_t offset, u8 mem_mask)
 
 u8 superxavix_suprtvpc_state::pio1_input_mask_r()
 {
-	return m_pio_connected_inputs[1] | (m_rackets ? 0x01 : 0);
+	return m_pio_connected_inputs[1] | (m_cart->has_ir_data() ? 0x01 : 0);
 }
 
 void superxavix_suprtvpc_state::pio1_output_w(offs_t offset, u8 data, u8 mem_mask)

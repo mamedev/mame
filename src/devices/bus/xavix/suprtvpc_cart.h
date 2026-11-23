@@ -21,6 +21,9 @@ public:
 	virtual void scl_w(int state) { }
 	virtual int sda_r() { return 1; }
 	virtual void ir_tx_w(int state) { }
+	virtual bool has_ir_data() const { return false; }
+	virtual int ir_data_r() { return 1; }
+	virtual void vblank_w(int state) { }
 
 	void rom_alloc(u32 size);
 	u8 *rom_base() const { return m_rom; }
@@ -40,13 +43,6 @@ class suprtvpc_cart_slot_device : public device_t,
 		public device_single_card_slot_interface<device_suprtvpc_cart_interface>
 {
 public:
-	template <typename T>
-	suprtvpc_cart_slot_device(machine_config const &mconfig, char const *tag, device_t *owner, T &&opts, char const *dflt)
-		: suprtvpc_cart_slot_device(mconfig, tag, owner, 0)
-	{
-		set_options(std::forward<T>(opts), dflt, false);
-	}
-
 	suprtvpc_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	u8 *rom_base() const { return m_cart ? m_cart->rom_base() : nullptr; }
@@ -57,10 +53,11 @@ public:
 	void scl_w(int state) { if (m_cart) m_cart->scl_w(state); }
 	int sda_r() { return m_cart ? m_cart->sda_r() : 1; }
 	void ir_tx_w(int state) { if (m_cart) m_cart->ir_tx_w(state); }
+	bool has_ir_data() const { return m_cart && m_cart->has_ir_data(); }
+	int ir_data_r() { return m_cart ? m_cart->ir_data_r() : 1; }
+	void vblank_w(int state) { if (m_cart) m_cart->vblank_w(state); }
 	template <typename... T> void set_ir_rx_callback(T &&... args) { m_ir_rx_cb.set(std::forward<T>(args)...); }
 	void ir_rx_pulse() { m_ir_rx_cb(); }
-
-	static void cart_devices(device_slot_interface &device) ATTR_COLD;
 
 	// device_image_interface implementation
 	virtual std::pair<std::error_condition, std::string> call_load() override;
@@ -90,6 +87,24 @@ protected:
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD { }
+};
+
+class suprtvpc_rom_ir_device : public suprtvpc_rom_device
+{
+public:
+	suprtvpc_rom_ir_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	auto ir_data_callback() { return m_ir_data_cb.bind(); }
+	auto vblank_callback() { return m_vblank_cb.bind(); }
+	void ir_receive() { ir_rx_pulse(); }
+
+	virtual bool has_ir_data() const override { return true; }
+	virtual int ir_data_r() override { return m_ir_data_cb(); }
+	virtual void vblank_w(int state) override { m_vblank_cb(state); }
+
+private:
+	devcb_read_line m_ir_data_cb;
+	devcb_write_line m_vblank_cb;
 };
 
 class suprtvpc_rom_i2c_device : public suprtvpc_rom_device
@@ -138,6 +153,7 @@ protected:
 
 DECLARE_DEVICE_TYPE(SUPRTVPC_CART_SLOT, suprtvpc_cart_slot_device)
 DECLARE_DEVICE_TYPE(SUPRTVPC_ROM, suprtvpc_rom_device)
+DECLARE_DEVICE_TYPE(SUPRTVPC_ROM_IR, suprtvpc_rom_ir_device)
 DECLARE_DEVICE_TYPE(SUPRTVPC_ROM_24C04, suprtvpc_rom_24c04_device)
 DECLARE_DEVICE_TYPE(SUPRTVPC_ROM_24C08, suprtvpc_rom_24c08_device)
 DECLARE_DEVICE_TYPE(SUPRTVPC_ROM_24C64, suprtvpc_rom_24c64_device)

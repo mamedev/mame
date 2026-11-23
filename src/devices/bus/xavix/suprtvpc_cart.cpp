@@ -19,6 +19,7 @@
 
 DEFINE_DEVICE_TYPE(SUPRTVPC_CART_SLOT, suprtvpc_cart_slot_device, "suprtvpc_cart", "Super TV-PC Cartridge Slot")
 DEFINE_DEVICE_TYPE(SUPRTVPC_ROM, suprtvpc_rom_device, "suprtvpc_rom", "Super TV-PC Cartridge")
+DEFINE_DEVICE_TYPE(SUPRTVPC_ROM_IR, suprtvpc_rom_ir_device, "suprtvpc_rom_ir", "Super TV-PC Cartridge with Infrared Receiver")
 DEFINE_DEVICE_TYPE(SUPRTVPC_ROM_24C04, suprtvpc_rom_24c04_device, "suprtvpc_rom_24c04", "Super TV-PC Cartridge with 24C04 EEPROM")
 DEFINE_DEVICE_TYPE(SUPRTVPC_ROM_24C08, suprtvpc_rom_24c08_device, "suprtvpc_rom_24c08", "Super TV-PC Cartridge with 24C08 EEPROM")
 DEFINE_DEVICE_TYPE(SUPRTVPC_ROM_24C64, suprtvpc_rom_24c64_device, "suprtvpc_rom_24c64", "Super TV-PC Cartridge with 24C64 EEPROM")
@@ -40,6 +41,13 @@ suprtvpc_cart_slot_device::suprtvpc_cart_slot_device(const machine_config &mconf
 	, device_single_card_slot_interface<device_suprtvpc_cart_interface>(mconfig, *this)
 	, m_ir_rx_cb(*this)
 {
+	option_add_internal("rom", SUPRTVPC_ROM);
+	option_add_internal("rom_24c04", SUPRTVPC_ROM_24C04);
+	option_add_internal("rom_24c08", SUPRTVPC_ROM_24C08);
+	option_add_internal("rom_24c64", SUPRTVPC_ROM_24C64);
+	option_add_internal("rom_24c64_ir", SUPRTVPC_ROM_24C64_IR);
+	option_add_internal("rom_ir", SUPRTVPC_ROM_IR).clock(clock);
+	set_default_option("rom");
 }
 
 suprtvpc_rom_device::suprtvpc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -50,6 +58,13 @@ suprtvpc_rom_device::suprtvpc_rom_device(const machine_config &mconfig, const ch
 suprtvpc_rom_device::suprtvpc_rom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, device_suprtvpc_cart_interface(mconfig, *this)
+{
+}
+
+suprtvpc_rom_ir_device::suprtvpc_rom_ir_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: suprtvpc_rom_device(mconfig, SUPRTVPC_ROM_IR, tag, owner, clock)
+	, m_ir_data_cb(*this, 1)
+	, m_vblank_cb(*this)
 {
 }
 
@@ -107,15 +122,6 @@ void suprtvpc_rom_24c08_device::device_add_mconfig(machine_config &config)
 void suprtvpc_rom_24c64_device::device_add_mconfig(machine_config &config)
 {
 	I2C_24C64(config, m_eeprom);
-}
-
-void suprtvpc_cart_slot_device::cart_devices(device_slot_interface &device)
-{
-	device.option_add_internal("rom", SUPRTVPC_ROM);
-	device.option_add_internal("rom_24c04", SUPRTVPC_ROM_24C04);
-	device.option_add_internal("rom_24c08", SUPRTVPC_ROM_24C08);
-	device.option_add_internal("rom_24c64", SUPRTVPC_ROM_24C64);
-	device.option_add_internal("rom_24c64_ir", SUPRTVPC_ROM_24C64_IR);
 }
 
 void suprtvpc_cart_slot_device::device_start()

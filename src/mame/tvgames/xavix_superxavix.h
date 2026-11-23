@@ -579,7 +579,6 @@ public:
 		, m_exp(*this, "exp")
 		, m_mouse(*this, "mouse%u", 1U)
 		, m_cart(*this, "cartslot")
-		, m_rackets(*this, "cartslot:rom_ir:controllers")
 		, m_rombank(*this, "rombank")
 		, m_factory_loopbacks(*this, "TEST_LOOPBACKS")
 	{ }
@@ -610,7 +609,6 @@ private:
 	required_device<suprtvpc_exp_port_device> m_exp;
 	required_device_array<tvpc_mouse_port_device, 2> m_mouse;
 	required_device<suprtvpc_cart_slot_device> m_cart;
-	optional_device<xavix_ir_motion_device> m_rackets;
 	required_memory_bank m_rombank;
 	required_ioport m_factory_loopbacks;
 	u8 m_loopback_data = 0;
