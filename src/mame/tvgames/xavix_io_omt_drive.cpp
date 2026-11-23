@@ -40,12 +40,8 @@ void xavix_omt_drive_device::device_start()
 	m_timer = timer_alloc(FUNC(xavix_omt_drive_device::pulse), this);
 	m_image.fill(0);
 	m_packet.fill(0);
-	m_saved_image.fill(0);
-	m_saved_present = false;
 	stop();
 	save_item(NAME(m_packet));
-	save_item(NAME(m_saved_image));
-	save_item(NAME(m_saved_present));
 	save_item(NAME(m_phase));
 	save_item(NAME(m_bit));
 	save_item(NAME(m_data));
@@ -56,15 +52,9 @@ void xavix_omt_drive_device::device_reset()
 	stop();
 }
 
-void xavix_omt_drive_device::device_pre_save()
-{
-	m_saved_present = m_loaded;
-	m_saved_image = m_image;
-}
-
 void xavix_omt_drive_device::device_post_load()
 {
-	if (m_saved_present != m_loaded || (m_loaded && m_saved_image != m_image))
+	if (m_phase != IDLE && (!m_loaded || m_packet != m_image))
 	{
 		stop();
 		popmessage("Drive data differs from the save state. The transfer has been cancelled.");

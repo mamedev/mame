@@ -22,7 +22,6 @@ public:
 protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual void device_pre_save() override ATTR_COLD;
 	virtual void device_post_load() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
@@ -46,9 +45,7 @@ private:
 	emu_timer *m_timer;
 	std::array<u8, PACKET_BYTES> m_image;
 	std::array<u8, PACKET_BYTES> m_packet;
-	std::array<u8, PACKET_BYTES> m_saved_image;
 	bool m_loaded;
-	bool m_saved_present;
 	u8 m_phase;
 	u8 m_bit;
 	u8 m_data;
