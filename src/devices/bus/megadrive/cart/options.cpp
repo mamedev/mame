@@ -9,6 +9,7 @@
 #include "eeprom.h"
 #include "everdrive.h"
 #include "gamtec.h"
+#include "ggenie.h"
 #include "jcart.h"
 #include "mcpirate.h"
 #include "miky.h"
@@ -99,6 +100,7 @@ char const *const UNL_ROCKHEAVEN        = "rockheaven";
 char const *const HB_PSOLAR             = "rom_stm95"; // TODO: rename string
 
 char const *const ACTION_REPLAY         = "ar";
+char const *const GAME_GENIE            = "rom_ggenie";
 
 } // namespace bus::megadrive::slotoptions
 
@@ -197,6 +199,9 @@ void megadrive_cart_options(device_slot_interface &device)
 
 	// Action Replay
 	device.option_add_internal(slotoptions::ACTION_REPLAY, MEGADRIVE_ACTION_REPLAY);
+
+	// Game Genie
+	device.option_add_internal(slotoptions::GAME_GENIE, MEGADRIVE_GGENIE);
 
 	// Homebrew
 	// Super Fighter Team
