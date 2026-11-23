@@ -417,7 +417,7 @@ u8 xavix_soc_device::lightgun2_r(offs_t offset)
 
 void xavix_soc_device::vblank_w(int state)
 {
-	if (state && !m_maincpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE | SUSPEND_REASON_CLOCK))
+	if (state)
 	{
 		m_video->vblank();
 		m_vblank_cb();
