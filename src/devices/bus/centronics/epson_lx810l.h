@@ -65,7 +65,9 @@ protected:
 
 	virtual bool supports_pin35_5v() override { return true; }
 
-private:
+	int m_paper_width;
+
+protected:
 	uint8_t porta_r(offs_t offset);
 	void porta_w(offs_t offset, uint8_t data);
 	uint8_t portb_r(offs_t offset);
@@ -146,7 +148,7 @@ private:
 	emu_timer *m_cr_timer;
 };
 
-// ======================> epson_ap2000_t
+// ======================> epson_ap2000_device
 
 class epson_ap2000_device : public epson_lx810l_device
 {
@@ -159,9 +161,23 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
+// ======================> epson_lx1050plus_device
+
+class epson_lx1050plus_device : public epson_lx810l_device
+{
+public:
+	// construction/destruction
+	epson_lx1050plus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	// optional information overrides
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+};
+
 
 // device type definition
 DECLARE_DEVICE_TYPE(EPSON_LX810L, epson_lx810l_device)
 DECLARE_DEVICE_TYPE(EPSON_AP2000, epson_ap2000_device)
+DECLARE_DEVICE_TYPE(EPSON_LX1050PLUS, epson_lx1050plus_device)
 
 #endif // MAME_BUS_CENTRONICS_EPSON_LX810L_H
