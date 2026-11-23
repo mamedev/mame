@@ -15,19 +15,15 @@ class xavix_beyblade_link_port_device : public device_t, public device_single_ca
 public:
 	xavix_beyblade_link_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	auto controls_callback() { return m_controls_cb.bind(); }
-	auto host_reset_callback() { return m_host_reset_cb.bind(); }
-	u8 io_r(offs_t offset, u8 direction);
-	void io_w(offs_t offset, u8 levels, u8 direction);
+	u8 lines_r();
+	void lines_w(u8 levels, u8 direction);
+	void reset_peer();
 	void vblank_w(int state);
-	bool host_reset_r() { return m_host_reset_cb(); }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
 
 private:
-	devcb_read8 m_controls_cb;
-	devcb_read_line m_host_reset_cb;
 	device_xavix_beyblade_link_interface *m_peer;
 };
 
@@ -37,14 +33,10 @@ public:
 	virtual u8 lines_r() = 0;
 	virtual void lines_w(u8 levels, u8 direction) = 0;
 	virtual void vblank_w(int state) = 0;
+	virtual void reset_protocol() = 0;
 
 protected:
-	device_xavix_beyblade_link_interface(const machine_config &mconfig, device_t &device);
-
-	bool host_reset_r() { return m_port && m_port->host_reset_r(); }
-
-private:
-	xavix_beyblade_link_port_device *const m_port;
+	device_xavix_beyblade_link_interface(device_t &device);
 };
 
 class xavix_beyblade_peer_device : public device_t, public device_xavix_beyblade_link_interface
@@ -85,7 +77,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(transmit_timer);
 	TIMER_CALLBACK_MEMBER(idle_timer);
-	void reset_protocol();
+	virtual void reset_protocol() override;
 	void prepare_response(u8 command);
 	void begin_transmit_turnaround();
 	void advance_transmit();

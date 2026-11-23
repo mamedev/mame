@@ -62,7 +62,6 @@
 #include "xavix_io_mtrk_wheel.h"
 #include "xavix_power.h"
 
-#include "bus/xavix/beyblade_link.h"
 #include "sound/beep.h"
 
 #include "softlist_dev.h"
@@ -4399,12 +4398,14 @@ void xavix_tak_beyu_state::xavix_tak_beyu(machine_config &config)
 {
 	xavix_nv_2mb(config);
 
-	xavix_beyblade_link_port_device &link(XAVIX_BEYBLADE_LINK_PORT(config, "link"));
-	link.controls_callback().set_ioport("IN0");
-	link.host_reset_callback().set_ioport("RESET").bit(0);
-	m_soc->io_input_callback<0>().set(link, FUNC(xavix_beyblade_link_port_device::io_r));
-	m_soc->io_output_callback<0>().set(link, FUNC(xavix_beyblade_link_port_device::io_w));
-	m_soc->raster_vblank_callback().append(link, FUNC(xavix_beyblade_link_port_device::vblank_w));
+	XAVIX_BEYBLADE_LINK_PORT(config, m_link);
+	m_soc->raster_vblank_callback().append([this] (int state)
+	{
+		// Re-arm the link while the local processor is held in reset.
+		if (state && BIT(m_link_reset->read(), 0))
+			m_link->reset_peer();
+		m_link->vblank_w(state);
+	});
 
 	m_soc->anport_input_callback<0>().set_ioport("DIAL");
 	m_soc->set_anport_counter_mode(0);
@@ -4413,6 +4414,17 @@ void xavix_tak_beyu_state::xavix_tak_beyu(machine_config &config)
 	ripcord.set_screen(m_screen);
 	ripcord.set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<0>));
 	m_soc->raster_vblank_callback().append(ripcord, FUNC(xavix_beyblade_ripcord_device::vblank_w));
+}
+
+
+u8 xavix_tak_beyu_state::io0_input_r(u8 direction)
+{
+	return (xavix_state::io0_input_r(direction) & 0x3f) | (m_link->lines_r() << 6);
+}
+
+void xavix_tak_beyu_state::io0_output_w(u8 data, u8 direction)
+{
+	m_link->lines_w(BIT(data, 6, 2), BIT(direction, 6, 2));
 }
 
 

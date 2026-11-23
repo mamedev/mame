@@ -42,8 +42,6 @@ INPUT_PORTS_END
 xavix_beyblade_link_port_device::xavix_beyblade_link_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, XAVIX_BEYBLADE_LINK_PORT, tag, owner, clock)
 	, device_single_card_slot_interface<device_xavix_beyblade_link_interface>(mconfig, *this)
-	, m_controls_cb(*this, 0)
-	, m_host_reset_cb(*this, 0)
 	, m_peer(nullptr)
 {
 	set_options([] (device_slot_interface &port)
@@ -53,9 +51,8 @@ xavix_beyblade_link_port_device::xavix_beyblade_link_port_device(const machine_c
 	}, nullptr, false);
 }
 
-device_xavix_beyblade_link_interface::device_xavix_beyblade_link_interface(const machine_config &mconfig, device_t &device)
+device_xavix_beyblade_link_interface::device_xavix_beyblade_link_interface(device_t &device)
 	: device_interface(device, "xavixbeybladelink")
-	, m_port(dynamic_cast<xavix_beyblade_link_port_device *>(device.owner()))
 {
 }
 
@@ -64,15 +61,21 @@ void xavix_beyblade_link_port_device::device_start()
 	m_peer = get_card_device();
 }
 
-u8 xavix_beyblade_link_port_device::io_r(offs_t, u8)
+u8 xavix_beyblade_link_port_device::lines_r()
 {
-	return (m_controls_cb() & 0x3f) | (m_peer ? m_peer->lines_r() : 0);
+	return m_peer ? m_peer->lines_r() : 0;
 }
 
-void xavix_beyblade_link_port_device::io_w(offs_t, u8 levels, u8 direction)
+void xavix_beyblade_link_port_device::lines_w(u8 levels, u8 direction)
 {
 	if (m_peer)
 		m_peer->lines_w(levels, direction);
+}
+
+void xavix_beyblade_link_port_device::reset_peer()
+{
+	if (m_peer)
+		m_peer->reset_protocol();
 }
 
 void xavix_beyblade_link_port_device::vblank_w(int state)
@@ -89,7 +92,7 @@ xavix_beyblade_peer_device::xavix_beyblade_peer_device(
 		u32 clock,
 		model variant)
 	: device_t(mconfig, type, tag, owner, clock)
-	, device_xavix_beyblade_link_interface(mconfig, *this)
+	, device_xavix_beyblade_link_interface(static_cast<device_t &>(*this))
 	, m_model(variant)
 	, m_peer_buttons(*this, "BUTTONS")
 	, m_peer_dial(*this, "DIAL")
@@ -177,10 +180,6 @@ void xavix_beyblade_peer_device::vblank_w(int state)
 {
 	if (!state)
 		return;
-
-	// Re-arm the cable protocol while the local processor is held in physical reset.
-	if (host_reset_r())
-		reset_protocol();
 
 	u8 const buttons = m_peer_buttons->read() & 0x03;
 	u8 const dial_position = m_peer_dial->read();
@@ -273,7 +272,7 @@ TIMER_CALLBACK_MEMBER(xavix_beyblade_peer_device::transmit_timer)
 	if (m_phase == TRANSMIT_DELAY)
 	{
 		bool const bit = BIT(m_response[m_response_byte], 7 - m_response_bit);
-		m_peer_lines = bit ? 0x80 : 0x40;
+		m_peer_lines = bit ? 0x02 : 0x01;
 		m_phase = TRANSMIT_ACK;
 	}
 }
@@ -310,7 +309,7 @@ void xavix_beyblade_peer_device::advance_transmit()
 
 void xavix_beyblade_peer_device::lines_w(u8 levels, u8 direction)
 {
-	u8 const host_direction = direction & 0xc0;
+	u8 const host_direction = direction & 0x03;
 	u8 const host_lines = levels & host_direction;
 	if (host_lines == m_host_lines && host_direction == m_host_direction)
 		return;
@@ -320,9 +319,9 @@ void xavix_beyblade_peer_device::lines_w(u8 levels, u8 direction)
 	switch (m_phase)
 	{
 	case WAIT_CONNECT:
-		if (host_lines == 0x80)
+		if (host_lines == 0x02)
 		{
-			m_peer_lines = 0x40;
+			m_peer_lines = 0x01;
 			m_phase = CONNECT_RELEASE;
 		}
 		break;
@@ -336,10 +335,10 @@ void xavix_beyblade_peer_device::lines_w(u8 levels, u8 direction)
 		break;
 
 	case RECEIVE_ASSERT:
-		if (host_lines == 0x40 || host_lines == 0x80)
+		if (host_lines == 0x01 || host_lines == 0x02)
 		{
-			m_receive_byte = (m_receive_byte << 1) | BIT(host_lines, 7);
-			m_peer_lines = host_lines == 0x40 ? 0x80 : 0x40;
+			m_receive_byte = (m_receive_byte << 1) | BIT(host_lines, 1);
+			m_peer_lines = host_lines == 0x01 ? 0x02 : 0x01;
 			m_phase = RECEIVE_RELEASE;
 		}
 		break;
@@ -372,7 +371,7 @@ void xavix_beyblade_peer_device::lines_w(u8 levels, u8 direction)
 		break;
 
 	case TRANSMIT_ACK:
-		if (host_lines == (m_peer_lines == 0x40 ? 0x80 : 0x40))
+		if (host_lines == (m_peer_lines == 0x01 ? 0x02 : 0x01))
 		{
 			m_peer_lines = 0;
 			m_phase = TRANSMIT_RELEASE;

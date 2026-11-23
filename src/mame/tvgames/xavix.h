@@ -19,6 +19,7 @@
 #include "xavix_io_wdg_webknight.h"
 #include "xavix_io_xavbaseb_controllers.h"
 
+#include "bus/xavix/beyblade_link.h"
 #include "bus/xavix/mailcot_mascot.h"
 #include "bus/xavix/tvpc_mouse.h"
 #include "machine/i2chle.h"
@@ -628,9 +629,21 @@ public:
 class xavix_tak_beyu_state : public xavix_state
 {
 public:
-	using xavix_state::xavix_state;
+	xavix_tak_beyu_state(const machine_config &mconfig, device_type type, const char *tag)
+		: xavix_state(mconfig, type, tag)
+		, m_link(*this, "link")
+		, m_link_reset(*this, "RESET")
+	{ }
 
 	void xavix_tak_beyu(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual u8 io0_input_r(u8 direction) override;
+	virtual void io0_output_w(u8 data, u8 direction) override;
+
+private:
+	required_device<xavix_beyblade_link_port_device> m_link;
+	required_ioport m_link_reset;
 };
 
 class xavix_tomthr_state : public xavix_power_state
