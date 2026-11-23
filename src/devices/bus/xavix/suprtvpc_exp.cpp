@@ -16,7 +16,7 @@
 
 #include "suprtvpc_printer.h"
 
-DEFINE_DEVICE_TYPE(SUPRTVPC_EXP_PORT, suprtvpc_exp_port_device, "suprtvpc_exp", "Super TV-PC Expansion Port")
+DEFINE_DEVICE_TYPE(SUPRTVPC_EXP_PORT, suprtvpc_exp_port_device, "suprtvpc_exp_port", "Super TV-PC Expansion Port")
 
 suprtvpc_exp_port_device::suprtvpc_exp_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SUPRTVPC_EXP_PORT, tag, owner, clock)

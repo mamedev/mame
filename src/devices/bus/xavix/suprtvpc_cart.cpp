@@ -17,7 +17,7 @@
 #include <algorithm>
 #include <bit>
 
-DEFINE_DEVICE_TYPE(SUPRTVPC_CART_SLOT, suprtvpc_cart_slot_device, "suprtvpc_cart", "Super TV-PC Cartridge Slot")
+DEFINE_DEVICE_TYPE(SUPRTVPC_CART_SLOT, suprtvpc_cart_slot_device, "suprtvpc_cart_slot", "Super TV-PC Cartridge Slot")
 DEFINE_DEVICE_TYPE(SUPRTVPC_ROM, suprtvpc_rom_device, "suprtvpc_rom", "Super TV-PC Cartridge")
 DEFINE_DEVICE_TYPE(SUPRTVPC_ROM_IR, suprtvpc_rom_ir_device, "suprtvpc_rom_ir", "Super TV-PC Cartridge with Infrared Receiver")
 DEFINE_DEVICE_TYPE(SUPRTVPC_ROM_24C04, suprtvpc_rom_24c04_device, "suprtvpc_rom_24c04", "Super TV-PC Cartridge with 24C04 EEPROM")

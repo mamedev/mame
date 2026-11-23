@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "xavix_io_ntpj_piano.h"
 
-DEFINE_DEVICE_TYPE(XAVIX_PIANO_CONTROLLER, xavix_piano_controller_device, "xavix_piano", "XaviX Piano Controller")
+DEFINE_DEVICE_TYPE(XAVIX_PIANO_CONTROLLER, xavix_piano_controller_device, "xavix_piano_controller", "XaviX Piano Controller")
 
 xavix_piano_controller_device::xavix_piano_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, XAVIX_PIANO_CONTROLLER, tag, owner, clock)

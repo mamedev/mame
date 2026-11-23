@@ -19,7 +19,7 @@
 #define VERBOSE 0
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(XAVIX_TVPC_CONTROLLER, xavix_tvpc_controller_device, "xavix_tvpc", "XaviX TV-PC Controller")
+DEFINE_DEVICE_TYPE(XAVIX_TVPC_CONTROLLER, xavix_tvpc_controller_device, "xavix_tvpc_controller", "XaviX TV-PC Controller")
 
 xavix_tvpc_controller_device::xavix_tvpc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, XAVIX_TVPC_CONTROLLER, tag, owner, clock)

@@ -19,8 +19,8 @@
 
 #include <bit>
 
-DEFINE_DEVICE_TYPE(XAVIX_EPO_KABJ_CARD_READER, xavix_epo_kabj_card_reader_device, "xavix_epo_kabj_card", "XaviX Hello Kitty Barcode Card Reader")
-DEFINE_DEVICE_TYPE(XAVIX_EPO_ES2J_CARD_READER, xavix_epo_es2j_card_reader_device, "xavix_epo_es2j_card", "XaviX Excite Stage Optical Card Reader")
+DEFINE_DEVICE_TYPE(XAVIX_EPO_KABJ_CARD_READER, xavix_epo_kabj_card_reader_device, "xavix_epo_kabj_card_reader", "XaviX Hello Kitty Barcode Card Reader")
+DEFINE_DEVICE_TYPE(XAVIX_EPO_ES2J_CARD_READER, xavix_epo_es2j_card_reader_device, "xavix_epo_es2j_card_reader", "XaviX Excite Stage Optical Card Reader")
 
 static INPUT_PORTS_START( xavix_epo_kabj_card_reader )
 	// Physical card-face labels are not yet known, so expose the ROM's verified barcode number.
