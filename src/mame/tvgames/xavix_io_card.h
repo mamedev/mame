@@ -67,7 +67,8 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 private:
-	// Bits 0-23 hold the raw pattern (the decoder discards bit 0); bits 24-25 select its terminating edge count.
+	// Derived from the code and termination-class tables in the epo_es2j ROM (offsets 0x00e749 and 0x00e7c5).
+	// Bits 0-23 hold the raw pattern (the decoder discards bit 0). Bits 24-25 select the terminating edge count.
 	static constexpr std::array<u32, 0x7c> CARD_STREAMS{{
 		0x023a00a0, 0x02390050, 0x033c8000, 0x02378140, 0x02384028, 0x012f41f4, 0x0232c0f0, 0x0235c014,
 		0x023421a4, 0x02352130, 0x012ea1f4, 0x0233a098, 0x02346098, 0x012d61f4, 0x0230e154, 0x012fe1e0,
