@@ -27,10 +27,6 @@ public:
 	template <typename... T> void set_interrupt_vector_callback(T &&... args) { m_interrupt_vector_callback.set(std::forward<T>(args)...); }
 	void set_data_address_mask(u32 mask) { m_data_address_mask = mask; }
 
-	uint8_t read_banked_data(uint8_t databank, uint16_t addr);
-	uint8_t read_banked_data(uint32_t addr);
-	void write_banked_data(uint8_t databank, uint16_t adr, uint8_t val);
-	void write_banked_data(uint32_t addr, uint8_t val);
 	// Other bus masters bypass CPU buffering and wait states.
 	void write_banked_data_raw(uint32_t addr, uint8_t val);
 
@@ -54,6 +50,8 @@ protected:
 		virtual void write_banked(uint32_t adr, uint8_t val);
 	};
 
+	uint8_t read_banked_data(uint32_t addr);
+	void write_banked_data(uint32_t addr, uint8_t val);
 	uint8_t read_banked_data_raw(uint32_t addr);
 	uint8_t read_banked_data_raw(uint8_t databank, uint16_t addr);
 	void write_banked_data_raw(uint8_t databank, uint16_t addr, uint8_t val);

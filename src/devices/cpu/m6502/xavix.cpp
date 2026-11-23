@@ -180,11 +180,6 @@ uint8_t xavix_device::read_banked_data(uint32_t addr)
 	return downcast<mi_xavix &>(*m_mintf).read_banked(addr);
 }
 
-uint8_t xavix_device::read_banked_data(uint8_t databank, uint16_t adr)
-{
-	return read_banked_data((uint32_t(databank) << 16) | adr);
-}
-
 uint8_t xavix_device::read_banked_data_raw(uint32_t addr)
 {
 	return read_banked_data_raw(BIT(addr, 16, 8), addr & 0xffff);
@@ -252,11 +247,6 @@ uint8_t xavix_device::mi_xavix::read_arg(uint16_t adr)
 void xavix_device::write_banked_data(uint32_t addr, uint8_t val)
 {
 	downcast<mi_xavix &>(*m_mintf).write_banked(addr, val);
-}
-
-void xavix_device::write_banked_data(uint8_t databank, uint16_t adr, uint8_t val)
-{
-	write_banked_data((uint32_t(databank) << 16) | adr, val);
 }
 
 void xavix_device::write_banked_data_raw(uint32_t addr, uint8_t val)
