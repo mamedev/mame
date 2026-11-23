@@ -277,14 +277,12 @@ void xavix_ir_receiver_interface::interface_post_start()
 	device().save_item(NAME(m_ir_carrier));
 }
 
-void xavix_ir_receiver_interface::ir_receiver_reset(bool reset_level)
+void xavix_ir_receiver_interface::ir_receiver_reset()
 {
 	m_ir_timer->adjust(attotime::never);
 	m_ir_burst_start = attotime::zero;
 	m_ir_last_edge = attotime::zero;
 	m_ir_carrier = false;
-	if (reset_level)
-		m_ir_level = false;
 }
 
 void xavix_ir_receiver_interface::ir_receiver_wait(u32 ticks)

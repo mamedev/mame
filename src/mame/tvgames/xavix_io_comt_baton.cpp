@@ -107,7 +107,7 @@ void xavix_comet_baton_device::device_start()
 void xavix_comet_baton_device::device_reset()
 {
 	xavix_ir_pulse_distance_device::device_reset();
-	ir_receiver_reset(false);
+	ir_receiver_reset();
 	m_received_bits = 0;
 	m_bit_count = 0;
 	m_receiving = false;

@@ -72,14 +72,13 @@ void xavix_tamagotchi_ir_device::device_start()
 void xavix_tamagotchi_ir_device::device_reset()
 {
 	reset_link();
-	ir_receiver_reset(true);
 }
 
 void xavix_tamagotchi_ir_device::reset_link()
 {
 	m_poll_timer->adjust(attotime::zero);
 	m_receive_timer->adjust(attotime::never);
-	ir_receiver_reset(false);
+	ir_receiver_reset();
 	m_receive_packet.fill(0);
 	m_transmit_packet.fill(0);
 	m_stream_length = 0;

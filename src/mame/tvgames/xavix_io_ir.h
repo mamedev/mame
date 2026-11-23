@@ -137,7 +137,7 @@ protected:
 	xavix_ir_receiver_interface(device_t &device, u32 quiet_ticks, bool rising_start);
 
 	void ir_receiver_w(int state);
-	void ir_receiver_reset(bool reset_level) ATTR_COLD;
+	void ir_receiver_reset() ATTR_COLD;
 	void ir_receiver_wait(u32 ticks);
 	bool ir_receiver_active() const { return m_ir_carrier; }
 	bool ir_receiver_level() const { return m_ir_level; }
