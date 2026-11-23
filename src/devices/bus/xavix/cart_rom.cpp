@@ -128,6 +128,8 @@ void xavix_cart_slot_device::cart_devices(device_slot_interface &device)
 
 void xavix_rom_i2c_base_device::device_start()
 {
+	xavix_rom_plain_device::device_start();
+
 	save_item(NAME(m_buscontrol));
 }
 
