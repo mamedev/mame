@@ -5579,8 +5579,8 @@ CONS( 2003,  rad_hnt2,  0,        0, xavix_rad_hnt2,      rad_hnt,   xavix_rad_h
 CONS( 2003,  rad_mtrk,  0,        0, xavix_rad_mtrk,      rad_mtrk,  xavix_power_state,            empty_init,  "Radica / Sennari Interactive / SSD Company Ltd.", "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING )
 CONS( 2003,  rad_mtrkp, rad_mtrk, 0, xavix_rad_mtrkp,     rad_mtrkp, xavix_power_state,            empty_init,  "Radica / Sennari Interactive / SSD Company Ltd.", "Connectv Monster Truck (PAL)", MACHINE_NOT_WORKING )
 
-CONS( 200?,  rad_box,   0,        0, xavix_nv_2mb,        rad_box,   xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Boxin' (NTSC)", MACHINE_NOT_WORKING )
-CONS( 200?,  rad_boxp,  rad_box,  0, xavixp_nv_2mb,       rad_boxp,  xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Connectv Boxin' (PAL)", MACHINE_NOT_WORKING )
+CONS( 200?,  rad_box,   0,        0, xavix_nv_2mb,        rad_box,   xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Play TV Boxin' (NTSC)", 0 )
+CONS( 200?,  rad_boxp,  rad_box,  0, xavixp_nv_2mb,       rad_boxp,  xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Connectv Boxin' (PAL)", 0 )
 
 CONS( 200?,  rad_crdn,  0,        0, xavix_rad_crdn,      rad_crdn,  xavix_rad_crdn_state,         empty_init,  "Radica / SSD Company Ltd.", "Play TV Card Night (NTSC)", 0 )
 CONS( 200?,  rad_crdnp, rad_crdn, 0, xavix_rad_crdnp,     rad_crdnp, xavix_rad_crdn_state,         empty_init,  "Radica / SSD Company Ltd.", "Connectv Card Night (PAL)", 0 )
@@ -5652,7 +5652,7 @@ CONS( 2003,  epo_epp2,  0,        0, xavix_epo_epp2,      epo_epp2,  xavix_ir_po
 CONS( 2006,  epo_epp3,  0,        0, xavix_epo_epp2,      epo_epp3,  xavix_ir_power_state,         empty_init,  "Epoch / SSD Company Ltd.", "Ai-chan ni Chousen! Excite Ping Pong (Japan)", MACHINE_NOT_WORKING )
 
 // TV麻雀 昇段対局～4人打ち
-CONS( 2003,  epo_mj,    0,        0, xavix_epo_mj,        epo_mj,    xavix_epo_mj_state,           empty_init,  "Epoch / SSD Company Ltd.", "TV Mahjong Shoudan Taikyoku: 4-nin Uchi (Japan)", MACHINE_NOT_WORKING )
+CONS( 2003,  epo_mj,    0,        0, xavix_epo_mj,        epo_mj,    xavix_epo_mj_state,           empty_init,  "Epoch / SSD Company Ltd.", "TV Mahjong Shoudan Taikyoku: 4-nin Uchi (Japan)", 0 )
 
 // ブラックバス釣ろうぜ エキサイトフィッシング
 CONS( 2001,  epo_fish,  0,        0, xavix_2mb,           epo_fish,  xavix_epo_fish_state,         empty_init,  "Epoch / SSD Company Ltd.", "Black Bass Tsurouze: Excite Fishing (Japan)", MACHINE_NOT_WORKING )
@@ -5664,7 +5664,7 @@ CONS( 2003,  epo_efdx,  0,        0, xavix_i2c_24c08_4mb, epo_efdx,  xavix_epo_e
 CONS( 2005,  epo_guru,  0,        0, xavix_epo_guru,      epo_guru,  xavix_epo_guru_state,         empty_init,  "Epoch / SSD Company Ltd.", "Gururin World (Japan)", 0 )
 
 // ドラえもん こえでドカン！ わくわくくうきほう！！
-CONS( 2002,  epo_dmon,  0,        0, xavix_epo_dmon,      epo_dmon,  xavix_epo_dmon_state,         empty_init,  "Epoch / SSD Company Ltd.", "Doraemon-goe de Dokan! Wakuwaku Kuukihou!! (Japan)", MACHINE_NOT_WORKING )
+CONS( 2002,  epo_dmon,  0,        0, xavix_epo_dmon,      epo_dmon,  xavix_epo_dmon_state,         empty_init,  "Epoch / SSD Company Ltd.", "Doraemon-goe de Dokan! Wakuwaku Kuukihou!! (Japan)", 0 )
 
 // コロッケ！いただ禁貨！バンカーバトル!!
 CONS( 2003,  epo_crok,  0,        0, xavix_epo_crok,      epo_crok,  xavix_epo_crok_state,         empty_init,  "Epoch / SSD Company Ltd.", "Croket! Itada Kinka! Banker Battle!! (Japan)", MACHINE_NOT_WORKING )
@@ -5693,7 +5693,7 @@ CONS( 2002,  tak_geig,  0,        0, xavix_nv_4mb,        tak_geig,  xavix_state
 CONS( 2001,  tak_wdg,   0,        0, xavix_tak_wdg,       tak_wdg,   xavix_tak_wdg_state,          empty_init,  "Takara / SSD Company Ltd.", "Webdiver DX W-05 Gladion (Japan)", 0 )
 
 // ティービーホッケー
-CONS( 2001,  tom_tvho,  0,        0, xavix_tom_tvho,      tom_tvho,  xavix_state,                  empty_init,  "Tomy / SSD Company Ltd.", "TV Hockey (Japan)", MACHINE_NOT_WORKING )
+CONS( 2001,  tom_tvho,  0,        0, xavix_tom_tvho,      tom_tvho,  xavix_state,                  empty_init,  "Tomy / SSD Company Ltd.", "TV Hockey (Japan)", 0 )
 
 // コメットさん☆ラブリンバトン
 CONS( 2001,  tak_comt,  0,        0, xavix_tak_comt,      tak_comt,  xavix_tak_comt_state,         empty_init,  "Takara / SSD Company Ltd.", "Comet-san Lovelin Baton (Japan)", MACHINE_NOT_WORKING )
@@ -5715,7 +5715,7 @@ CONS( 2002,  tak_beyb,  tak_beyu, 0, xavix_tak_beyu,      tak_bey,   xavix_state
 CONS( 2003,  jarajal,   0,        0, xavix_jarajal,       jarajal,   xavix_jarajal_state,          empty_init,  "Takara / SSD Company Ltd.", "Jyarajyaland (Japan, PlugIt! version)", 0 )
 
 // テレビで遊び隊 近代撃ちまくりバラエティ 射的王(シャテキング)
-CONS( 2002,  tomshoot,  0,        0, xavix_i2c_24c02_2mb, tomshoot,  xavix_tomshoot_state,         empty_init,  "Tomy / SSD Company Ltd.", "TV de Asobitai Kindai Uchimakuri Variety Shateking (Japan)", MACHINE_NOT_WORKING )
+CONS( 2002,  tomshoot,  0,        0, xavix_i2c_24c02_2mb, tomshoot,  xavix_tomshoot_state,         empty_init,  "Tomy / SSD Company Ltd.", "TV de Asobitai Kindai Uchimakuri Variety Shateking (Japan)", 0 )
 
 // テレビで遊び隊 トミカ カーナビドライブ / トミー
 CONS( 2003,  tcarnavi,  0,        0, xavix_nv_4mb,        tcarnavi,  xavix_power_state,            empty_init,  "Tomy / SSD Company Ltd.", "TV de Asobitai Tomica Carnavi Drive (Japan)", 0 )
@@ -5739,15 +5739,15 @@ CONS( 2004,  gungunrv,  0,        0, xavix_gungunrv,      gungunrv,  xavix_gungu
 CONS( 2001,  bistro,    0,        0, xavix_bistro,        bistro,    xavix_bistro_state,           empty_init,  "Sega Toys / SSD Company Ltd.", "Bistro Kids: Boku mo Watashi mo Kok-san! (Japan)", 0 )
 
 // e-Kara Series
-CONS( 2000,  ekara,     0,        0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd. / Hasbro", "e-kara (US?, NTSC, set 1)", MACHINE_NOT_WORKING ) // shows "Please insert a cartridge before turn it on" without cart
-CONS( 2000,  ekaraa,    ekara,    0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd. / Hasbro", "e-kara (US?, NTSC, set 2)", MACHINE_NOT_WORKING ) // shows "Please insert a cartridge before turning on e-kara" without cart
-CONS( 2000,  ekaraj,    ekara,    0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd.", "e-kara (Japan)", MACHINE_NOT_WORKING ) // shows Japanese message without cart
-CONS( 2002,  ekarag,    ekara,    0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd.", "e-kara (Europe, includes 3 songs)", MACHINE_NOT_WORKING ) // found in Germany and UK, could just be a Europe-wide model, NOT a headset model, but still has 3 songs.
-CONS( 2002,  ekaras,    ekara,    0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd. / newgent", "e-kara (Spain, includes 3 songs)", MACHINE_NOT_WORKING )
+CONS( 2000,  ekara,     0,        0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd. / Hasbro", "e-kara (US?, NTSC, set 1)", 0 ) // shows "Please insert a cartridge before turn it on" without cart
+CONS( 2000,  ekaraa,    ekara,    0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd. / Hasbro", "e-kara (US?, NTSC, set 2)", 0 ) // shows "Please insert a cartridge before turning on e-kara" without cart
+CONS( 2000,  ekaraj,    ekara,    0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd.", "e-kara (Japan)", 0 ) // shows Japanese message without cart
+CONS( 2002,  ekarag,    ekara,    0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd.", "e-kara (Europe, includes 3 songs)", 0 ) // found in Germany and UK, could just be a Europe-wide model, NOT a headset model, but still has 3 songs.
+CONS( 2002,  ekaras,    ekara,    0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd. / newgent", "e-kara (Spain, includes 3 songs)", 0 )
 // the Korean i-singer release from Sonokong has a unique bios and different data resources, meaning carts are not fully compatible between it and e-kara
-CONS( 2000,  isinger,   ekara,    0, xavix_isinger,       ekara,     xavix_ekara_state,            empty_init,  "Sonokong / SSD Company Ltd. / D-Gate", "i-Singer (Korea)", MACHINE_NOT_WORKING )
+CONS( 2000,  isinger,   ekara,    0, xavix_isinger,       ekara,     xavix_ekara_state,            empty_init,  "Sonokong / SSD Company Ltd. / D-Gate", "i-Singer (Korea)", 0 )
 // the 'e-kara pro headset' has 3 songs built in for the US release.  The Japanese release of this appears to be called 'e-kara H.S.' and it is unclear if it also has built in songs.  The Canadian box says 'cartridge contains' instead of 'songs included' but is likely a printing error.
-CONS( 2002,  ekaraphs,  ekara,    0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd.", "e-kara Pro Headset (US, includes 3 songs)", MACHINE_NOT_WORKING )
+CONS( 2002,  ekaraphs,  ekara,    0, xavix_ekara,         ekara,     xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd.", "e-kara Pro Headset (US, includes 3 songs)", 0 )
 // e-pitch uses the Japanese e-kara BIOS but ties its panel-layout strap high for the reduced six-button matrix.
 CONS( 2003,  epitch,    0,        0, xavix_epitch,        epitch,    xavix_ekara_state,            empty_init,  "Takara / SSD Company Ltd.", "e-pitch (Japan)", MACHINE_NOT_WORKING ) // shows Japanese message without cart
 // e-kara mix was another unit that allowed you to connect to a PC, unlike e-kara web it also functions as a regular device
@@ -5779,7 +5779,7 @@ CONS( 2003,  evio,      0,        0, xavix_evio,          evio,      xavix_evio_
 CONS( 2002,  tak_daig,  0,        0, xavix_tak_daig,      daig,      xavix_tak_daig_state,         empty_init,  "Takara / SSD Company Ltd.", "Bakutou Sengen Daigunder DX (Japan)", MACHINE_NOT_WORKING )
 
 // ガチンコ勝負！パチスロTV
-CONS( 2002,  gcslottv,  0,        0, xavix_gcslottv,      gcslottv,  xavix_gcslottv_state,         empty_init,  "Takara / Sammy / DCT / SSD Company Ltd.", "Gachinko Shoubu! PachisloTV (Japan)", MACHINE_NOT_WORKING )
+CONS( 2002,  gcslottv,  0,        0, xavix_gcslottv,      gcslottv,  xavix_gcslottv_state,         empty_init,  "Takara / Sammy / DCT / SSD Company Ltd.", "Gachinko Shoubu! PachisloTV (Japan)", 0 )
 
 // Let’s!TVプレイ 超にんきスポット!ころがしほーだい たまごっちりぞーと   (Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort) (only on the Japanese list? http://test.shinsedai.co.jp/english/products/Applied/list.html )   This also allows you to use an IR reciever to import a Tamagotchi from compatible games
 CONS( 2006,  ltv_tam,   0,        0, xavix_ltv_tam,       ltv_tam,   xavix_ltv_tam_state,          empty_init,  "Bandai / SSD Company Ltd.", "Let's! TV Play Chou Ninki Spot! Korogashi-Houdai Tamagotchi Resort (Japan)", MACHINE_NOT_WORKING )

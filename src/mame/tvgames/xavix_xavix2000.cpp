@@ -948,4 +948,4 @@ CONS( 2004, ban_onep, 0,      0, xavix2000_ban_onep,         ban_onep, xavix2000
 CONS( 2005, ban_omt,  0,      0, xavix2000_ban_omt,          ban_omt,  xavix2000_ban_omt_state,    empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Touin Ougi Onmyou Taisenki: Mezase Saikyou Toushinshi (Japan)", MACHINE_NOT_WORKING )
 
 // テレビで遊び隊 ディズニープリンセス　キラキラ魔法のレッスン
-CONS( 2004, tom_dpgm, 0,      0, xavix2000_tom_dpgm,         tom_dpgm, xavix2000_i2c_camera_state, empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai Disney Princess: Kirakira Mahou no Lesson (Japan)", MACHINE_NOT_WORKING )
+CONS( 2004, tom_dpgm, 0,      0, xavix2000_tom_dpgm,         tom_dpgm, xavix2000_i2c_camera_state, empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai Disney Princess: Kirakira Mahou no Lesson (Japan)", 0 )

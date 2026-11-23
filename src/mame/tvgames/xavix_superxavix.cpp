@@ -2868,6 +2868,7 @@ ROM_END
 ROM_START( xavbowlj )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	// Fails the internal ROM checksum (4AD8, expected 4CF3).
+	// The mismatch appears in the factory test. No issues were observed during normal play.
 	ROM_LOAD( "bowlingcard.u1", 0x000000, 0x800000, BAD_DUMP CRC(1b83b04f) SHA1(3609d71a7d92629487c2a32003a1259e74dabf0a) )
 ROM_END
 
@@ -3069,6 +3070,7 @@ ROM_END
 ROM_START( ban_dn1j )
 	ROM_REGION( 0x800000, "bios", ROMREGION_ERASE00 )
 	// Fails the internal ROM checksum (60A9, expected 60B3).
+	// The mismatch appears in the factory test. No issues were observed during normal play.
 	ROM_LOAD( "dn1j.u2", 0x000000, 0x800000, BAD_DUMP CRC(0a0cef0f) SHA1(c83a2635a969b3c686dbc599a37f8b7496b0c6a1) )
 ROM_END
 
@@ -3243,11 +3245,11 @@ CONS( 2004, xavbaseb,   0,        0, superxavix_xavbaseb,              xavixport
 CONS( 2005, xavbasebj,  xavbaseb, 0, superxavix_xavbaseb,              xavixport_baseball,    superxavix_xavbaseb_state,   empty_init, "SSD Company Ltd.", "XaviX Baseball (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
 CONS( 2005, xavgolf,    0,        0, superxavix_xavgolf,               xavixport_golf,        superxavix_xavgolf_state,    empty_init, "SSD Company Ltd.", "XaviX Golf (XaviXPORT)", 0 )
 // ザビックス ゴルフ
-CONS( 2005, xavgolfj,   xavgolf,  0, superxavix_xavgolf,               xavixport_golf,        superxavix_xavgolf_state,    empty_init, "SSD Company Ltd.", "XaviX Golf (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
+CONS( 2005, xavgolfj,   xavgolf,  0, superxavix_xavgolf,               xavixport_golf,        superxavix_xavgolf_state,    empty_init, "SSD Company Ltd.", "XaviX Golf (XaviXPORT, Japan)", 0 )
 // Both Bowling ROMs make zero-count startup palette uploads that write to unmapped 0x6bff.
-CONS( 2004, xavbowl,    0,        0, superxavix_xavbowl,               xavix_bowl,            superxavix_i2c_camera_state, empty_init, "SSD Company Ltd.", "XaviX Bowling (XaviXPORT)", MACHINE_NOT_WORKING ) // has IR 'Camera'
+CONS( 2004, xavbowl,    0,        0, superxavix_xavbowl,               xavix_bowl,            superxavix_i2c_camera_state, empty_init, "SSD Company Ltd.", "XaviX Bowling (XaviXPORT)", 0 ) // has IR 'Camera'
 // ザビックス ボウリング
-CONS( 2005, xavbowlj,   xavbowl,  0, superxavix_xavbowl,               xavix_bowl,            superxavix_i2c_camera_state, empty_init, "SSD Company Ltd.", "XaviX Bowling (XaviXPORT, PT2-BWL-11, Japan)", MACHINE_NOT_WORKING ) // ^^
+CONS( 2005, xavbowlj,   xavbowl,  0, superxavix_xavbowl,               xavix_bowl,            superxavix_i2c_camera_state, empty_init, "SSD Company Ltd.", "XaviX Bowling (XaviXPORT, PT2-BWL-11, Japan)", 0 ) // ^^
 CONS( 2004, xavbox,     0,        0, superxavix_xavbox,                xavix_box,             superxavix_xavbox_state,     empty_init, "SSD Company Ltd.", "XaviX Boxing / Jackie Chan PowerBoxing (XaviXPORT)", MACHINE_NOT_WORKING ) // has IR 'Camera'
 // ザビックス パワーボクシング
 CONS( 2004, xavboxj,    xavbox,   0, superxavix_xavbox,                xavix_box,             superxavix_xavbox_state,     empty_init, "SSD Company Ltd.", "XaviX Boxing / Jackie Chan PowerBoxing (XaviXPORT, Japan)", MACHINE_NOT_WORKING ) // has IR 'Camera'
@@ -3255,14 +3257,14 @@ CONS( 2004, xavboxj,    xavbox,   0, superxavix_xavbox,                xavix_box
 CONS( 2004, xavbassf,   0,        0, superxavix_xavbassf,              xavixport_bassfishing, superxavix_xavbassf_state,   empty_init, "SSD Company Ltd.", "XaviX Bass Fishing (XaviXPORT)", MACHINE_NOT_WORKING )
 
 // These titles use a 24C64-compatible SEEPROM.
-CONS( 2005, xavjmat,    0,        0, superxavix_xavjmat,               xavix_jmat,            superxavix_xavjmat_state,    empty_init, "SSD Company Ltd.", "Jackie Chan J-Mat Fitness (XaviXPORT)", MACHINE_NOT_WORKING )
+CONS( 2005, xavjmat,    0,        0, superxavix_xavjmat,               xavix_jmat,            superxavix_xavjmat_state,    empty_init, "SSD Company Ltd.", "Jackie Chan J-Mat Fitness (XaviXPORT)", 0 )
 // ザビックス エアロステップ
-CONS( 2005, xavaero,    xavjmat,  0, superxavix_xavaero,               xavix_jmat,            superxavix_xavjmat_state,    empty_init, "SSD Company Ltd.", "XaviX Aerostep J-Mat (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
-CONS( 2007, xavmusic,   0,        0, superxavix_xavmusic,              xavix_step,            superxavix_xavmusic_state,   empty_init, "SSD Company Ltd.", "XaviX Music & Circuit (XaviXPORT)", MACHINE_NOT_WORKING )
+CONS( 2005, xavaero,    xavjmat,  0, superxavix_xavaero,               xavix_jmat,            superxavix_xavjmat_state,    empty_init, "SSD Company Ltd.", "XaviX Aerostep J-Mat (XaviXPORT, Japan)", 0 )
+CONS( 2007, xavmusic,   0,        0, superxavix_xavmusic,              xavix_step,            superxavix_xavmusic_state,   empty_init, "SSD Company Ltd.", "XaviX Music & Circuit (XaviXPORT)", 0 )
 // ザビックスエアロ エアロステップ ミュージック&サーキット
-CONS( 2007, xavmusicj,  xavmusic, 0, superxavix_xavmusicj,             xavix_step,            superxavix_xavmusicj_state,  empty_init, "SSD Company Ltd.", "XaviX Aerostep MC (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
+CONS( 2007, xavmusicj,  xavmusic, 0, superxavix_xavmusicj,             xavix_step,            superxavix_xavmusicj_state,  empty_init, "SSD Company Ltd.", "XaviX Aerostep MC (XaviXPORT, Japan)", 0 )
 // ザビックスエアロ チェック&バランス
-CONS( 2006, xavcheck,   0,        0, superxavix_xavcheck,              xavix_check,           superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "XaviX Aero Check & Balance (XaviXPORT, Japan)", MACHINE_NOT_WORKING )
+CONS( 2006, xavcheck,   0,        0, superxavix_xavcheck,              xavix_check,           superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "XaviX Aero Check & Balance (XaviXPORT, Japan)", 0 )
 // XaviX パワーキッズ ジュニア カラダでのばす才能開発
 CONS( 2007, xavpkjr,    0,        0, superxavix_xavpowrk,              xavix_step,            superxavix_i2c_pio1_state,   empty_init, "SSD Company Ltd.", "PowerKIDS Jr. (XaviXPORT, Japan)", 0 )
 // XaviX パワーキッズ カラダでのばす才能開発
@@ -3282,10 +3284,10 @@ CONS( 2007, xavpowrk,   0,        0, superxavix_xavpowrk,              xavix_ste
 
 // These titles use a 24C64-compatible SEEPROM and an S-35390A RTC.
 // Exercises has some leftover PC buffer stuff.  Exercises and Challenge use identical PCBs.
-CONS( 2008, domfitex,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Exercises (Domyos Interactive System)", MACHINE_NOT_WORKING )
-CONS( 2008, domfitch,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Challenge (Domyos Interactive System)", MACHINE_NOT_WORKING )
-CONS( 2007, domdance,   0,        0, superxavix_domdance,              domyos_dance,          superxavix_domdance_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-CONS( 2007, domstepc,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Step Concept (Domyos Interactive System)", MACHINE_NOT_WORKING )
+CONS( 2008, domfitex,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Exercises (Domyos Interactive System)", 0 )
+CONS( 2008, domfitch,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Challenge (Domyos Interactive System)", 0 )
+CONS( 2007, domdance,   0,        0, superxavix_domdance,              domyos_dance,          superxavix_domdance_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Dance (Domyos Interactive System)", MACHINE_IMPERFECT_SOUND )
+CONS( 2007, domstepc,   0,        0, superxavix_domfitex,              domyos_step,           superxavix_i2c_pio1_state,   empty_init, "Decathlon / SSD Company Ltd.", "Domyos Step Concept (Domyos Interactive System)", 0 )
 
 // some DIS games run on XaviX 2 instead, see xavix2.cpp for Domyos Fitness Adventure and Domyos Bike Concept
 
@@ -3299,7 +3301,7 @@ CONS( 2004, epo_tfit,   0,        0, superxavix_epo_tfit,              epo_tfit,
 CONS( 2010, epo_rgfj,   0,        0, superxavix_epo_rgfj,              epo_rgfj,              superxavix_i2c_camera_state, empty_init, "Epoch / SSD Company Ltd.", "Ryo Ishikawa Excite Golf (Japan)", 0 )
 
 // Let's!TVプレイ ふたりはプリキュアMax Heart マットでダンス Max Heartにおどっちゃおう
-CONS( 2004, maxheart,   0,        0, superxavix_i2c_24c04_4mb,         maxheart,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Futari wa PreCure Max Heart: Mat de Dance Max Heart ni Odotchaou (Japan)", MACHINE_NOT_WORKING )
+CONS( 2004, maxheart,   0,        0, superxavix_i2c_24c04_4mb,         maxheart,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Futari wa PreCure Max Heart: Mat de Dance Max Heart ni Odotchaou (Japan)", 0 )
 
 // どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！
 CONS( 2004, epo_doka,   0,        0, superxavix_nv_4mb,                epo_doka,              superxavix_state,            empty_init, "Epoch / SSD Company Ltd.", "Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! (Japan)", MACHINE_NOT_WORKING )
@@ -3326,7 +3328,7 @@ CONS( 2007, ban_gkrj,   0,        0, superxavix_ban_gkrj,              ban_gkrj,
 CONS( 2007, ban_pr2j,   0,        0, superxavix_ban_pr2j,              ban_pr2j,              superxavix_ban_pr2j_state,   empty_init, "Bandai / SSD Company Ltd.", "Yes! PreCure 5: Issho ni Henshin! Metamorphose! (Japan)", MACHINE_NOT_WORKING )
 
 // テレビで遊び隊 それいけトーマス ソドー島のなかまたち
-CONS( 2005, tmy_thom,   0,        0, superxavix_i2c_24c04,             tmy_thom,              superxavix_tmy_thom_state,   empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai Soreike Thomas: Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", MACHINE_NOT_WORKING )
+CONS( 2005, tmy_thom,   0,        0, superxavix_i2c_24c04,             tmy_thom,              superxavix_tmy_thom_state,   empty_init, "Tomy / SSD Company Ltd.", "TV de Asobitai Soreike Thomas: Sodor Tou no Nakamatachi / Thomas & Friends on the Island of Sodor (Japan)", 0 )
 
 // Ｌｅｔ’ｓ！ ＴＶプレイ 体感体得 結界師 方囲！定礎！結！滅！
 CONS( 2007, ban_kksj,   0,        0, superxavix_ban_reflective_camera, ban_reflective_camera, superxavix_i2c_camera_state, empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Taikan Taitoku Kekkaishi: Houi! Jouso! Ketsu! Metsu! (Japan)", MACHINE_NOT_WORKING )
@@ -3338,7 +3340,7 @@ CONS( 2007, tmy_rkmj,   0,        0, superxavix_tmy_rkmj,              tmy_rkmj,
 CONS( 2005, ban_ordj,   0,        0, superxavix_ban_ordj,              ban_ordj,              superxavix_ban_ordj_state,   empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Ongeki Battle! Kamen Rider Hibiki: Kimero! Ikki Kasei no Kata (Japan)", MACHINE_NOT_WORKING )
 
 // Let's!TVプレイ ディズニーキャラクターズ オト！イロ！トン・トン！ミラクルパレード
-CONS( 2007, ban_dn1j,   0,        0, superxavix_i2c_24c04,             ban_dn1j,              superxavix_i2c_power_state,  empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Disney Characters: Oto! Iro! Ton-Ton! Miracle Parade (Japan)", MACHINE_NOT_WORKING )
+CONS( 2007, ban_dn1j,   0,        0, superxavix_i2c_24c04,             ban_dn1j,              superxavix_i2c_power_state,  empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Disney Characters: Oto! Iro! Ton-Ton! Miracle Parade (Japan)", 0 )
 
 // アンパンマン かぞくで!育脳マットDX
 CONS( 2011, anpanmdx,   0,        0, superxavix_anpanmdx,              anpanmdx,              superxavix_anpanmdx_state,   empty_init, "JoyPalette / Toho / SSD Company Ltd.", "Anpanman Kazoku de! Ikunou Mat DX (Japan)", MACHINE_NOT_WORKING )
