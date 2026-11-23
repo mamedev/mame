@@ -531,6 +531,13 @@ void cdp1869_device::device_post_load()
 
 TIMER_CALLBACK_MEMBER(cdp1869_device::prd_update)
 {
+	if (!param)
+	{
+		// the CPU can't access page or character memory during the display
+		// window, so render it before the CPU regains access and changes them
+		screen().update_now();
+	}
+
 	m_write_prd(param);
 	m_prd = param;
 
@@ -1127,12 +1134,17 @@ uint32_t cdp1869_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 		for (int sy = 0; sy < rows; sy++)
 		{
+			// rows outside the clipping rectangle still advance the refresh address
+			int const top = screen_rect.top() + (sy * height);
+			bool const visible = (top <= cliprect.bottom()) && ((top + height) > cliprect.top());
+
 			for (int sx = 0; sx < cols; sx++)
 			{
 				int x = sx * width;
 				int y = sy * height;
 
-				draw_char(bitmap, screen_rect, cliprect, x, y, addr);
+				if (visible)
+					draw_char(bitmap, screen_rect, cliprect, x, y, addr);
 
 				addr++;
 
