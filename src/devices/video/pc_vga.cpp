@@ -958,6 +958,8 @@ void vga_device::crtc_map(address_map &map)
 			return res;
 		}),
 		NAME([this](offs_t offset, u8 data) {
+			if (vga.crtc.sync_en != BIT(data, 7))
+				recompute_params();
 			vga.crtc.sync_en = BIT(data, 7);
 			vga.crtc.word_mode = BIT(data, 6);
 			vga.crtc.aw = BIT(data, 5);
@@ -1579,31 +1581,6 @@ uint8_t vga_device::pc_vga_choosevideomode()
 	if (!vga.crtc.sync_en || BIT(vga.sequencer.data[1], 5))
 		return SCREEN_OFF;
 
-	// TODO: this is the wrong place to
-	if (vga.dac.dirty)
-	{
-		palette_update();
-		vga.dac.dirty = 0;
-	}
-
-	// TODO: Mode Control bit 6 unused, also cache and cleanup
-	if (vga.attribute.data[0x10] & 0x80)
-	{
-		for (int i=0; i<16;i++)
-		{
-			vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
-										|((vga.attribute.data[0x14]&0xf)<<4));
-		}
-	}
-	else
-	{
-		for (int i=0; i<16;i++)
-		{
-			vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
-										|((vga.attribute.data[0x14]&0xc)<<4));
-		}
-	}
-
 	// !GRAPHIC_MODE
 	if (!vga.gc.alpha_dis)
 	{
@@ -1654,30 +1631,29 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 {
 	assert(divisor > 0);
 	assert(xtal > 0);
-	int vblank_period, hblank_period;
-	// if not in graphic mode and not Clocking Mode bit 0 select 9 dots per charset
-	uint8_t hclock_m = !vga.gc.alpha_dis && !BIT(vga.sequencer.data[1], 0) ? 9 : 8;
-	int pixel_clock;
 
 	/* safety check */
 	if(!vga.crtc.horz_disp_end || !vga.crtc.vert_disp_end || !vga.crtc.horz_total || !vga.crtc.vert_total)
 		return;
 
+	// if not in graphic mode and not Clocking Mode bit 0 select 9 dots per charset
+	const uint8_t hclock_m = !vga.gc.alpha_dis && !BIT(vga.sequencer.data[1], 0) ? 9 : 8;
+	const float horz_clocks = (float)(hclock_m) / divisor;
+	const int htotal_period = (vga.crtc.horz_total + 5) * horz_clocks;
+
 	const u8 is_interlace_mode = get_interlace_mode() + 1;
+	const int vtotal_period = (vga.crtc.vert_total + 2) * is_interlace_mode;
 	const int display_lines = vga.crtc.vert_disp_end * is_interlace_mode;
 
-	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * ((float)(hclock_m)/divisor))-1, 0, display_lines);
-
-	vblank_period = (vga.crtc.vert_total + 2) * is_interlace_mode;
-	hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
+	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * horz_clocks) - 1, 0, display_lines);
 
 	// TODO: improve/complete clocking modes
-	pixel_clock = xtal >> BIT(vga.sequencer.data[1], 3);
+	const int pixel_clock = xtal >> BIT(vga.sequencer.data[1], 3);
+	attotime refresh  = attotime::from_ticks(htotal_period * vtotal_period, pixel_clock);
 
-	attotime refresh  = attotime::from_ticks(hblank_period * vblank_period, pixel_clock);
-	screen().configure((hblank_period), (vblank_period), visarea, refresh );
+	screen().configure(htotal_period, vtotal_period, visarea, refresh);
 
-	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+	m_vblank_timer->adjust(vga.crtc.sync_en ? screen().time_until_pos(vga.crtc.vert_blank_start) : attotime::never, 0 );
 }
 
 // TODO: rename me
@@ -1875,19 +1851,49 @@ void vga_device::mem_linear_w(offs_t offset, uint8_t data)
 	vga.memory[offset % vga.svga_intf.vram_size] = data;
 }
 
-/* VBLANK callback, start address definitely updates AT vblank, not before. */
 TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 {
-	vga.crtc.start_addr = latch_start_addr();
-	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
+	// shouldn't be here if monitor isn't synced
+	if (!vga.crtc.sync_en)
+		return;
 
-	if (vga.crtc.irq_latch == 0 && vga.crtc.irq_disable == 0)
+	int vsync = param;
+
+	if (vsync)
 	{
-		vga.crtc.irq_latch = 1;
-		m_vsync_cb(1);
-	}
+		// start address and PEL shifting happens at vsync, not before
+		vga.crtc.start_addr = latch_start_addr();
+		vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
 
-	m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+		if (vga.crtc.irq_latch == 0 && vga.crtc.irq_disable == 0)
+		{
+			vga.crtc.irq_latch = 1;
+			m_vsync_cb(1);
+		}
+
+		m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start), 0 );
+	}
+	else
+	{
+		// palette updating, done for convenience at the start of vblank
+		// TBD if colors can change midframe, if true then we need a roundtrip in drawing routines
+		// and probably is implementation specific ...
+		if (vga.dac.dirty)
+		{
+			palette_update();
+			vga.dac.dirty = 0;
+		}
+
+		// TODO: Mode Control bit 6 unused, also cache and cleanup
+		const u8 attr_p54s = BIT(vga.attribute.data[0x10], 7);
+		const u8 attr_base_mask = attr_p54s ? 0x0f : 0x3f;
+		const u8 attr_sel_mask = attr_p54s ? 0xf : 0xc;
+		const u8 attr_color_select = (vga.attribute.data[0x14] & attr_sel_mask) << 4;
+		for (int i = 0; i < 16; i++)
+			vga.pens[i] = pen((vga.attribute.data[i] & attr_base_mask) | attr_color_select);
+
+		m_vblank_timer->adjust( screen().time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end), 1 );
+	}
 }
 
 // ISA bus bindings
@@ -2175,29 +2181,6 @@ uint8_t svga_device::pc_vga_choosevideomode()
 {
 	if (!vga.crtc.sync_en || BIT(vga.sequencer.data[1], 5))
 		return SCREEN_OFF;
-
-	if (vga.dac.dirty)
-	{
-		palette_update();
-		vga.dac.dirty = 0;
-	}
-
-	if (vga.attribute.data[0x10] & 0x80)
-	{
-		for (int i=0; i<16;i++)
-		{
-			vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
-										|((vga.attribute.data[0x14]&0xf)<<4));
-		}
-	}
-	else
-	{
-		for (int i=0; i<16;i++)
-		{
-			vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
-										|((vga.attribute.data[0x14]&0xc)<<4));
-		}
-	}
 
 	if (svga.rgb32_en)
 	{

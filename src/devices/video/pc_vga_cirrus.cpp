@@ -1272,10 +1272,10 @@ uint8_t cirrus_gd5428_vga_device::offset_select(offs_t offset)
 	return gc_bank[sa15 & BIT(gc_mode_ext, 0)];
 }
 
+// TODO: don't repeat stuff present on base class, too many branches (some very sus)
 uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 {
 	uint32_t addr;
-	uint8_t cur_mode = pc_vga_choosevideomode();
 
 	const uint8_t bank = offset_select(offset);
 
@@ -1287,6 +1287,8 @@ uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 		return svga_device::mem_linear_r((offset & 0xffff) + bank * 0x10000);
 	}
 
+	// FIXME: not supposed to call this fn in a r/w handler
+	uint8_t cur_mode = pc_vga_choosevideomode();
 	if(gc_locked || offset >= 0x10000 || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
 	{
 		return vga_device::mem_r(offset & 0x1ffff);
@@ -1393,7 +1395,8 @@ uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 	}
 	else
 	{
-		// TODO: Lines up in 16-colour mode, likely different for 256-colour modes (docs say video addresses are shifted right 3 places)
+		// TODO: Lines up in 16-colour mode, likely different for 256-colour modes
+		// (docs say video addresses are shifted right 3 places)
 		//uint8_t bits = ((gc_mode_ext & 0x08) && (vga.gc.write_mode == 1)) ? 8 : 4;
 
 		uint8_t data = 0;
@@ -1423,7 +1426,6 @@ uint8_t cirrus_gd5428_vga_device::mem_r(offs_t offset)
 void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 {
 	uint32_t addr;
-	uint8_t cur_mode = pc_vga_choosevideomode();
 
 	if(m_blt_system_transfer)
 	{
@@ -1457,6 +1459,8 @@ void cirrus_gd5428_vga_device::mem_w(offs_t offset, uint8_t data)
 		return;
 	}
 
+	// FIXME: as above
+	uint8_t cur_mode = pc_vga_choosevideomode();
 	if(gc_locked || offset >= 0x10000 || cur_mode == TEXT_MODE || cur_mode == SCREEN_OFF)
 	{
 		vga_device::mem_w(offset & 0x1ffff,data);
