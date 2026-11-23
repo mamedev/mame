@@ -102,6 +102,8 @@ xavix_beyblade_peer_device::xavix_beyblade_peer_device(
 	, m_peer_buttons(*this, "BUTTONS")
 	, m_peer_dial(*this, "DIAL")
 	, m_peer_ripcord(*this, "RIPCORD")
+	, m_host_lines(0)
+	, m_host_direction(0)
 {
 }
 
@@ -171,8 +173,6 @@ void xavix_beyblade_peer_device::reset_protocol()
 	m_transmit_timer->adjust(attotime::never);
 	m_idle_timer->adjust(attotime::never);
 	m_phase = WAIT_CONNECT;
-	m_host_lines = 0;
-	m_host_direction = 0;
 	m_peer_lines = 0;
 	m_receive_byte = 0;
 	m_receive_bits = 0;
