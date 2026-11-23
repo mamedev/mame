@@ -781,34 +781,7 @@ INPUT_PORTS_END
 
 // Connectv SSX Snowboarder
 static INPUT_PORTS_START( rad_ssxp )
-	PORT_INCLUDE(xavix)
-
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("Tilt Forward") PORT_16WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Tilt Back / Enter") PORT_16WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Tilt Left") PORT_16WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Tilt Right") PORT_16WAY
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power")
-	PORT_BIT( 0xbf, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_INCLUDE(xavix_reset_control)
-
-	PORT_MODIFY("IN0")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// The base buttons duplicate the board tilt switches electrically.
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("Tilt Left / Left Button") PORT_16WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("Tilt Right / Right Button") PORT_16WAY
-
-	PORT_MODIFY("AN7")
-	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
-	PORT_CONFSETTING(    0x00, "Normal" )
-	PORT_CONFSETTING(    0x28, "Low" )
-	PORT_CONFSETTING(    0x30, "Very Low" )
+	PORT_INCLUDE(rad_ssx)
 INPUT_PORTS_END
 
 
@@ -2138,21 +2111,6 @@ void xavix_ir_state::xavix_epo_epp2(machine_config &config)
 static INPUT_PORTS_START( epo_epp3 )
 	PORT_INCLUDE(epo_epp_ir)
 
-	PORT_MODIFY("IN1")
-	// Ping Pong 2 uses IN1.1 to bypass battery auto-off; its AC-adapter sense is inferred.
-	PORT_CONFNAME( 0x02, 0x00, "Power Source" )
-	PORT_CONFSETTING(    0x00, "Batteries" )
-	PORT_CONFSETTING(    0x02, "AC Adapter" )
-
-	PORT_MODIFY("AN7")
-	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
-	PORT_CONFSETTING(    0x00, "Normal" )
-	PORT_CONFSETTING(    0x28, "Low" )
-	PORT_CONFSETTING(    0x30, "Very Low" )
-
-	PORT_INCLUDE(xavix_hard_power_control)
-	PORT_INCLUDE(xavix_reset_control)
-
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Y")
 
@@ -2162,6 +2120,15 @@ static INPUT_PORTS_START( epo_epp3 )
 	PORT_CONFNAME( 0x40, 0x00, "Power Source" )
 	PORT_CONFSETTING(    0x00, "Batteries" )
 	PORT_CONFSETTING(    0x40, "AC Adapter" )
+
+	PORT_MODIFY("AN7")
+	PORT_CONFNAME( 0xff, 0x00, "Battery Status" )
+	PORT_CONFSETTING(    0x00, "Normal" )
+	PORT_CONFSETTING(    0x28, "Low" )
+	PORT_CONFSETTING(    0x30, "Very Low" )
+
+	PORT_INCLUDE(xavix_hard_power_control)
+	PORT_INCLUDE(xavix_reset_control)
 INPUT_PORTS_END
 
 
@@ -2677,35 +2644,7 @@ void xavix_ekara_state::io1_output_w(u8 data, u8 direction)
 
 // e-pitch
 static INPUT_PORTS_START( epitch )
-	PORT_INCLUDE(xavix)
-
-	PORT_MODIFY("IN0")
-	// The BIOS reads this fixed panel-layout strap.
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_ekara_state::matrix_column_r<0>))
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_MEMBER(FUNC(xavix_ekara_state::matrix_column_r<1>))
-
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_POWER_OFF ) PORT_NAME("Power Switch") // pressing this will turn the game off.
-
-	PORT_START("EXTRA0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )       PORT_NAME("Echo Mode")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 )       PORT_NAME("Effects Mode")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("Select / Key Down")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )   PORT_NAME("Select / Key Up")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON5 )       PORT_NAME("Volume Down")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON6 )       PORT_NAME("Volume Up")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 )       PORT_NAME("Tempo Down")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON8 )       PORT_NAME("Tempo Up")
-
-	PORT_START("EXTRA1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )       PORT_NAME("Start / Apply Effects")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 )       PORT_NAME("Cancel")
-	PORT_BIT( 0x3c, IP_ACTIVE_HIGH, IPT_UNUSED )
-	// no 40/80 due to multiplexer code
-
-	PORT_INCLUDE(xavix_battery_status)
+	PORT_INCLUDE(ekara)
 
 	PORT_MODIFY("IN0")
 	// e-pitch ties the BIOS panel-layout strap high and has only six switches.
