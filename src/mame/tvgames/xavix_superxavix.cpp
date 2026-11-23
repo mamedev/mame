@@ -2467,16 +2467,6 @@ static INPUT_PORTS_START( suprtvpc )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Attack") PORT_CODE(JOYCODE_BUTTON1_INDEXED(1)) PORT_PLAYER(2)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START("TEST_LOOPBACKS")
-	// The startup test probes PIO0.0 -> PIO0.5 and PIO1.1 -> PIO0.1.
-	// PORT_CONFNAME( 0x03, 0x00, "Factory Test Loopbacks" )
-	// PORT_CONFSETTING(    0x00, "Disconnected" )
-	// PORT_CONFSETTING(    0x03, "Both Connected" )
-	// PORT_CONFSETTING(    0x01, "First Pair Only (Test)" )
-	// PORT_CONFSETTING(    0x02, "Second Pair Only (Test)" )
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
-
 	PORT_MODIFY("PIO2")
 	// PIO2.1 selects the firmware's battery or AC-adapter inactivity timeout.
 	PORT_CONFNAME( 0x02, 0x00, "Power Source" )
@@ -2514,8 +2504,7 @@ void superxavix_suprtvpc_state::superxavix_suprtvpc(machine_config &config)
 	TVPC_MOUSE_PORT(config, m_mouse[1]).set_mouse_index(1);
 	configure_tvpc_controller(config);
 
-	m_super_soc->pio_input_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::pio0_input_r));
-	m_super_soc->pio_input_mask_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::pio0_input_mask_r));
+	m_super_soc->pio_input_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::tvpc_pio0_input_r));
 	m_super_soc->pio_output_callback<0>().set(*this, FUNC(superxavix_suprtvpc_state::pio0_output_w));
 	m_super_soc->pio_input_callback<1>().set(*this, FUNC(superxavix_suprtvpc_state::pio1_input_r));
 	m_super_soc->pio_input_mask_callback<1>().set(*this, FUNC(superxavix_suprtvpc_state::pio1_input_mask_r));
@@ -2554,9 +2543,6 @@ void superxavix_suprtvpc_state::machine_start()
 {
 	superxavix_state::machine_start();
 
-	save_item(NAME(m_loopback_data));
-	save_item(NAME(m_loopback_drive));
-
 	m_rombank->configure_entries(0, 2, &m_rom[0x400000], 0x200000);
 	if (memory_region *const cart_region = m_cart->rom_region())
 		m_super_soc->decode_cartridge_graphics(*cart_region);
@@ -2567,34 +2553,12 @@ void superxavix_suprtvpc_state::machine_reset()
 	superxavix_state::machine_reset();
 
 	m_rombank->set_entry(0);
-	m_loopback_data = 0;
-	m_loopback_drive = 0;
-}
-
-u8 superxavix_suprtvpc_state::factory_loopback_mask() const
-{
-	u8 const connections = m_factory_loopbacks->read();
-	return m_loopback_drive & ((BIT(connections, 0) ? 0x20 : 0) | (BIT(connections, 1) ? 0x02 : 0));
-}
-
-u8 superxavix_suprtvpc_state::pio0_input_r(offs_t offset, u8 mem_mask)
-{
-	u8 const inputs = superxavix_tvpc_state::tvpc_pio0_input_r(offset, mem_mask);
-	u8 const loopbacks = factory_loopback_mask();
-	return (inputs & ~loopbacks) | (m_loopback_data & loopbacks);
-}
-
-u8 superxavix_suprtvpc_state::pio0_input_mask_r()
-{
-	return m_pio_connected_inputs[0] | factory_loopback_mask();
 }
 
 void superxavix_suprtvpc_state::pio0_output_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	tvpc_pio0_output_w(offset, data, mem_mask);
 	m_exp->data_w(BIT(data & mem_mask, 5));
-	m_loopback_data = (m_loopback_data & ~0x20) | (BIT(data, 0) << 5);
-	m_loopback_drive = (m_loopback_drive & ~0x20) | (BIT(mem_mask, 0) << 5);
 }
 
 u8 superxavix_suprtvpc_state::cartridge_rom_r(offs_t offset)
@@ -2636,8 +2600,6 @@ void superxavix_suprtvpc_state::pio1_output_w(offs_t offset, u8 data, u8 mem_mas
 {
 	LOGMASKED(LOG_PIO, "%s: pio1_output_w %02x\n", machine().describe_context(), data);
 	m_exp->clock_w(BIT(data & mem_mask, 1));
-	m_loopback_data = (m_loopback_data & ~0x02) | (data & 0x02);
-	m_loopback_drive = (m_loopback_drive & ~0x02) | (mem_mask & 0x02);
 }
 
 u8 superxavix_suprtvpc_state::pio2_input_r(offs_t offset, u8 mem_mask)
