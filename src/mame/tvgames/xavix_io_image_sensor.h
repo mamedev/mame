@@ -195,7 +195,7 @@ public:
 	xavix_serial_tracking_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	int data_r() const { return m_data; }
-	void clock_w(int state);
+	void clock_w(bool level, bool driven);
 
 protected:
 	// device_t implementation

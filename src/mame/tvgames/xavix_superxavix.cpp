@@ -1790,8 +1790,7 @@ u8 superxavix_udance_state::pio0_input_r(offs_t offset, u8 mem_mask)
 
 void superxavix_udance_state::pio0_output_w(offs_t offset, u8 data, u8 mem_mask)
 {
-	if (mem_mask & 0x40)
-		m_camera->clock_w(BIT(data, 6));
+	m_camera->clock_w(BIT(data, 6), BIT(mem_mask, 6));
 }
 
 void superxavix_udance_state::rom_bank_w(offs_t offset, u8 data, u8 mem_mask)

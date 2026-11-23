@@ -296,6 +296,8 @@ xavix_analog_image_sensor_device_base::xavix_analog_image_sensor_device_base(con
 	, m_frame_gap_pixel_high(false)
 	, m_event_source(event_source::NONE)
 	, m_event_cb(*this)
+	, m_setup_bus(0)
+	, m_control(0)
 {
 }
 
@@ -336,6 +338,7 @@ xavix_serial_tracking_sensor_device::xavix_serial_tracking_sensor_device(const m
 	, m_target_y(*this, { "LEFT_Y", "RIGHT_Y" })
 	, m_target_size(*this, { "LEFT_SIZE", "RIGHT_SIZE" })
 	, m_target_hidden(*this, "TAG_HIDE")
+	, m_clock(false)
 {
 }
 
@@ -421,8 +424,6 @@ void xavix_analog_image_sensor_device::device_start()
 
 void xavix_analog_image_sensor_device_base::device_reset()
 {
-	m_setup_bus = 0;
-	m_control = 0;
 	m_register_select = 0;
 	m_register_data = 0;
 	m_registers.fill(0);
@@ -469,7 +470,6 @@ void xavix_serial_tracking_sensor_device::device_reset()
 {
 	m_data = 0;
 	m_bit_count = 40;
-	m_clock = false;
 	latch_report();
 }
 
@@ -885,10 +885,10 @@ void xavix_serial_tracking_sensor_device::latch_report()
 	}
 }
 
-void xavix_serial_tracking_sensor_device::clock_w(int state)
+void xavix_serial_tracking_sensor_device::clock_w(bool level, bool driven)
 {
-	bool const clock = bool(state);
-	if (m_clock && !clock)
+	bool const clock = level && driven;
+	if (driven && m_clock && !clock)
 	{
 		// A falling edge after the complete report latches the next frame. The
 		// following 40 falling edges clock signature bits 1/0/1, six six-bit
