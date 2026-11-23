@@ -402,8 +402,6 @@ u8 xavix_soc_device::read_banked_data_bypass(u32 address)
 u8 xavix_soc_device::read_low_bus_bypass(u32 address)
 {
 	address &= 0x7fff;
-	if (m_watchdog_port_mode && (address == 0x7a00 || address == 0x7a01) && !machine().side_effects_disabled())
-		service_watchdog();
 	return address < m_mainram.length() ? m_mainram[address] : m_video->read_low_bus_bypass(address);
 }
 
@@ -428,6 +426,8 @@ void xavix_soc_device::vblank_w(int state)
 
 u32 xavix_soc_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	// Drawing can read mapped peripherals. Only emulated bus activity may change their state.
+	auto const dis = machine().disable_side_effects();
 	return m_video->screen_update(screen, bitmap, cliprect);
 }
 
