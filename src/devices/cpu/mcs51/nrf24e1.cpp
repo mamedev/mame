@@ -71,6 +71,16 @@ void nrf24e1_device::device_add_mconfig(machine_config &config)
 	m_radio->dr2_callback().set(FUNC(nrf24e1_device::radio_dr2_w));
 }
 
+ROM_START(nrf24e1)
+	ROM_REGION(0x0200, "bootstrap", 0)
+	ROM_LOAD("bootstrap.bin", 0x0000, 0x0200, NO_DUMP)
+ROM_END
+
+tiny_rom_entry const *nrf24e1_device::device_rom_region() const
+{
+	return ROM_NAME(nrf24e1);
+}
+
 void nrf24e1_device::device_start()
 {
 	dw8051_device::device_start();
