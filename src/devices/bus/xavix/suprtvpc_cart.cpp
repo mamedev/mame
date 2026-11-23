@@ -86,7 +86,7 @@ bool suprtvpc_cart_slot_device::is_reset_on_load() const noexcept
 
 const char *suprtvpc_cart_slot_device::image_interface() const noexcept
 {
-	return "super_tv_pc_cart";
+	return "suprtvpc_cart";
 }
 
 const char *suprtvpc_cart_slot_device::file_extensions() const noexcept
