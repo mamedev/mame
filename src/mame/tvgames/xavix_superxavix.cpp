@@ -603,8 +603,7 @@ INPUT_CHANGED_MEMBER(superxavix_state::xavixport_reset_button)
 	else
 	{
 		// The PORT reset line restarts the cartridge SoC while its external controls and non-volatile storage remain powered.
-		m_soc->reset();
-		m_soc->cpu_reset_w(CLEAR_LINE);
+		m_soc->reset_w(CLEAR_LINE);
 	}
 }
 
