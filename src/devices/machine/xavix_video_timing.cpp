@@ -434,11 +434,8 @@ TIMER_CALLBACK_MEMBER(superxavix_video_device::picture_nmi)
 	sync_video_counters();
 	// Finish this native field before software replaces its picture data.
 	// TODO: Align partial updates with the picture counters rather than the approximate raster origin.
+	update_bitmap_rows(screen().vpos());
 	screen().update_partial(screen().visible_area().bottom());
-	// Retain the full-raster tail of a rendered field, including after its
-	// cropped picture was published. Skipped fields advance at blanking.
-	if (m_bitmap_rendered)
-		update_bitmap_rows(screen().height() - 1);
 	xavix_video_device::vblank();
 	m_picture_nmi_timer->adjust(predict_picture_delays(PREDICT_NMI).nmi);
 }

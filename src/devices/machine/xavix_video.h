@@ -483,7 +483,7 @@ private:
 	TIMER_CALLBACK_MEMBER(video_field_start);
 	void bitmap_params_w(offs_t offset, u8 data);
 	void update_bitmap_rows(int scanline);
-	void advance_bitmap_row();
+	void advance_bitmap_row(int scanline, u16 &position, bitmap_row &row) const;
 	bool horizontal_reload_in_blanking(counter_config const &config) const;
 	int output_sample_phase_clocks() const;
 	void video_position_regs_w(offs_t offset, u8 data);
@@ -509,7 +509,6 @@ private:
 	u16 m_bitmap_position;
 	u32 m_bitmap_source_offset;
 	bool m_bitmap_vertical_gate;
-	bool m_bitmap_rendered;
 	std::array<bitmap_row, 0x200> m_bitmap_rows;
 	video_timing m_video_timing;
 	bitmap_rgb32 m_output_bitmap;

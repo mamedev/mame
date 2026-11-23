@@ -795,8 +795,6 @@ rectangle superxavix_video_device::picture_area() const
 
 u32 superxavix_video_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	m_bitmap_rendered = true;
-	update_bitmap_rows(cliprect.bottom());
 	bitmap.fill(rgb_t::black(), cliprect);
 	auto const [xoffset, yoffset] = render_offset();
 	rectangle source_clip = cliprect & picture_area();
@@ -822,29 +820,27 @@ device_delegate<u8 (u32)> &superxavix_video_device::tile_read_callback()
 	return m_graphics_read_cb;
 }
 
-void superxavix_video_device::advance_bitmap_row()
+void superxavix_video_device::advance_bitmap_row(int scanline, u16 &position, bitmap_row &row) const
 {
-	u16 const position = m_bitmap_position;
-	if (m_bitmap_scanline == m_bitmap_reference)
+	u16 const previous_position = position;
+	if (scanline == m_bitmap_reference)
 	{
-		m_bitmap_source_offset = u32(get_u16le(&m_bitmap_params[BITMAP_ADDRESS_TOP])) << 3;
-		m_bitmap_position = 0;
+		row.offset = u32(get_u16le(&m_bitmap_params[BITMAP_ADDRESS_TOP])) << 3;
+		position = 0;
 	}
 	else
 	{
-		if (m_bitmap_vertical_gate)
-			m_bitmap_source_offset = (m_bitmap_source_offset + (u32(m_bitmap_params[BITMAP_STRIDE]) << 3)) & 0x7ffff;
-		m_bitmap_position = (position + 1) & 0x01ff;
+		if (row.enabled)
+			row.offset = (row.offset + (u32(m_bitmap_params[BITMAP_STRIDE]) << 3)) & 0x7ffff;
+		position = (previous_position + 1) & 0x01ff;
 	}
 
 	// Compare the previous position, including on the source-reference row.
 	// Closing wins when the programmed endpoints coincide.
-	if (position == (get_u16le(&m_bitmap_params[BITMAP_BOTTOM]) & 0x01ff))
-		m_bitmap_vertical_gate = false;
-	else if (position == (get_u16le(&m_bitmap_params[BITMAP_TOP]) & 0x01ff))
-		m_bitmap_vertical_gate = true;
-
-	m_bitmap_rows[m_bitmap_scanline] = { m_bitmap_source_offset, m_bitmap_vertical_gate };
+	if (previous_position == (get_u16le(&m_bitmap_params[BITMAP_BOTTOM]) & 0x01ff))
+		row.enabled = false;
+	else if (previous_position == (get_u16le(&m_bitmap_params[BITMAP_TOP]) & 0x01ff))
+		row.enabled = true;
 }
 
 void superxavix_video_device::raster_end()
@@ -852,7 +848,6 @@ void superxavix_video_device::raster_end()
 	// Only the cache cursor restarts; the gate, position and source remain live.
 	update_bitmap_rows(screen().height() - 1);
 	m_bitmap_scanline = -1;
-	m_bitmap_rendered = false;
 	int const origin = (m_video_standard == video_standard::PAL) ? BITMAP_VERTICAL_ORIGIN_PAL : BITMAP_VERTICAL_ORIGIN_NTSC;
 	// The position becomes zero at this reference and compares zero on the next row.
 	m_bitmap_reference = PICTURE_FIRST_ROW - origin + render_offset().second - 1;
@@ -862,11 +857,15 @@ void superxavix_video_device::update_bitmap_rows(int scanline)
 {
 	// Advance through clipped and disabled rows as well as the rendered picture.
 	scanline = std::min(scanline, screen().height() - 1);
+	bitmap_row row{ m_bitmap_source_offset, m_bitmap_vertical_gate };
 	while (m_bitmap_scanline < scanline)
 	{
 		++m_bitmap_scanline;
-		advance_bitmap_row();
+		advance_bitmap_row(m_bitmap_scanline, m_bitmap_position, row);
+		m_bitmap_rows[m_bitmap_scanline] = row;
 	}
+	m_bitmap_source_offset = row.offset;
+	m_bitmap_vertical_gate = row.enabled;
 }
 
 void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rectangle &cliprect)
@@ -913,9 +912,17 @@ void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rect
 		return;
 
 	int const yoffset = render_offset().second;
+	// A partial update can request rows ahead of the beam. Project them
+	// from a local copy of the counters, keeping the latched rows for redraws.
+	int preview_scanline = m_bitmap_scanline;
+	u16 preview_position = m_bitmap_position;
+	bitmap_row preview{ m_bitmap_source_offset, m_bitmap_vertical_gate };
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		bitmap_row const &row = m_bitmap_rows[y + yoffset];
+		int const scanline = y + yoffset;
+		while (preview_scanline < scanline)
+			advance_bitmap_row(++preview_scanline, preview_position, preview);
+		bitmap_row const &row = (scanline <= m_bitmap_scanline) ? m_bitmap_rows[scanline] : preview;
 		if (!row.enabled)
 			continue;
 		packed_reader pixels(m_bitmap_read_cb, base + row.offset + address_left);
