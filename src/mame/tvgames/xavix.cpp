@@ -3541,8 +3541,8 @@ void xavix_gcslottv_state::io1_output_w(u8 data, u8 direction)
 
 TIMER_CALLBACK_MEMBER(xavix_gcslottv_state::payout_position_changed)
 {
-	// The firmware runs the motor until this feedback goes low and returns high.
-	// The mechanism releases a batch of medals rather than counting individual coins.
+	// The motor releases a batch of medals.  The firmware watches the mechanism
+	// leave its home position and return.  The position stays put when the motor stops.
 	m_payout_home = !m_payout_home;
 	m_payout_timer->adjust(attotime::from_msec(PAYOUT_PHASE_MS));
 }
