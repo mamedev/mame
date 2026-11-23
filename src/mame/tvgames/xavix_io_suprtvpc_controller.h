@@ -22,7 +22,7 @@ public:
 	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 
 	u8 data_r() const { return m_data; }
-	void host_w(u8 data, u8 direction);
+	void serial_w(bool clock, bool link_active, bool data, bool data_driven);
 	void vblank_w(int state);
 
 protected:

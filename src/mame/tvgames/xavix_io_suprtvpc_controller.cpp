@@ -214,11 +214,8 @@ void xavix_tvpc_controller_device::start_report()
 	schedule_event();
 }
 
-void xavix_tvpc_controller_device::host_w(u8 data, u8 direction)
+void xavix_tvpc_controller_device::serial_w(bool clock, bool link_active, bool data, bool data_driven)
 {
-	bool const clock = BIT(data, 6);
-	bool const host_data_output = BIT(direction, 7);
-	bool const link_active = BIT(direction, 6);
 	bool const link_starting = !m_link_active && link_active;
 
 	if (m_link_active && !link_active)
@@ -247,7 +244,7 @@ void xavix_tvpc_controller_device::host_w(u8 data, u8 direction)
 		return;
 	}
 
-	if (host_data_output)
+	if (data_driven)
 	{
 		if (!m_host_sending && clock)
 		{
@@ -261,7 +258,7 @@ void xavix_tvpc_controller_device::host_w(u8 data, u8 direction)
 		}
 		else if (m_host_sending && (clock != m_clock) && (m_host_bits < 32))
 		{
-			m_host_word = (m_host_word << 1) | BIT(data, 7);
+			m_host_word = (m_host_word << 1) | data;
 			m_host_bits++;
 			schedule_event();
 		}

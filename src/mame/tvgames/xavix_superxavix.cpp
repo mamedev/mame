@@ -2442,7 +2442,8 @@ u8 superxavix_tvpc_state::tvpc_pio0_input_r(offs_t offset, u8 mem_mask)
 
 void superxavix_tvpc_state::tvpc_pio0_output_w(offs_t offset, u8 data, u8 mem_mask)
 {
-	m_tvpc->host_w(data, mem_mask);
+	// Apply both pin levels and drive states together on a PIO write.
+	m_tvpc->serial_w(BIT(data, 6), BIT(mem_mask, 6), BIT(data, 7), BIT(mem_mask, 7));
 }
 
 
