@@ -247,6 +247,14 @@ void iosb_base::device_start()
 	save_item(NAME(m_hdsel));
 	save_item(NAME(m_nubus_irqs));
 	save_item(NAME(m_iosb_regs));
+	save_item(NAME(m_adb_interrupt));
+	save_item(NAME(m_drq));
+	save_item(NAME(m_scsi_irq));
+	save_item(NAME(m_asc_irq));
+	save_item(NAME(m_scsi_dma_read_cycles));
+	save_item(NAME(m_scsi_dma_write_cycles));
+	save_item(NAME(m_scsi_dma_result));
+	save_item(NAME(m_scsi_second_half));
 	save_item(NAME(m_scsi_stall_start));
 	save_item(NAME(m_scsi_stalled));
 }
@@ -262,6 +270,8 @@ void iosb_base::device_reset()
 
 	m_nubus_irqs = 0xff;
 	m_scsi_stalled = false;
+	m_scsi_second_half = false;
+	m_scsi_dma_result = 0;
 }
 
 TIMER_CALLBACK_MEMBER(iosb_base::mac_6015_tick)
@@ -352,30 +362,23 @@ void iosb_base::field_interrupts()
 		take_interrupt = 1;
 	}
 
+	// Any change of the encoded IPL is latched in Capella
+	if (m_capella)
+	{
+		m_capella->translate_ipl_state_change(take_interrupt);
+		m_last_taken_interrupt = take_interrupt;
+		return;
+	}
 
 	if (m_last_taken_interrupt > -1)
 	{
-		if (m_capella)
-		{
-			m_capella->translate_ipl_state_change(-1);
-		}
-		else
-		{
-			m_maincpu->set_input_line(m_last_taken_interrupt, CLEAR_LINE);
-		}
+		m_maincpu->set_input_line(m_last_taken_interrupt, CLEAR_LINE);
 		m_last_taken_interrupt = -1;
 	}
 
 	if (take_interrupt > -1)
 	{
-		if (m_capella)
-		{
-			m_capella->translate_ipl_state_change(take_interrupt);
-		}
-		else
-		{
-			m_maincpu->set_input_line(take_interrupt, ASSERT_LINE);
-		}
+		m_maincpu->set_input_line(take_interrupt, ASSERT_LINE);
 		m_last_taken_interrupt = take_interrupt;
 	}
 }
@@ -569,12 +572,26 @@ void iosb_base::turboscsi_w(offs_t offset, u8 data)
 
 u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 {
-	if (mem_mask != 0xffffffff && mem_mask != 0xffff0000)
+	if (mem_mask != 0xffffffff && mem_mask != 0xffff0000 && mem_mask != 0xff000000)
 	{
-		fatalerror("IOSB: turboscsi_dma_r mem_mask not handled %08x\n", mem_mask);
+		if (!machine().side_effects_disabled())
+			logerror("%s: unhandled TurboSCSI DMA read mem_mask %08x\n", machine().describe_context(), mem_mask);
+		return 0xffffffff;
 	}
 
-	if (!machine().side_effects_disabled() && BIT(offset << 1, 18))
+	if (machine().side_effects_disabled())
+	{
+		if (mem_mask == 0xff000000)
+			return u32(m_ncr->dma_r()) << 24;
+		if (mem_mask == 0xffff0000)
+			return u32(m_ncr->dma16_swap_r()) << 16;
+		if (m_scsi_second_half)
+			return (m_scsi_dma_result & 0xffff0000) | m_ncr->dma16_swap_r();
+		// The second halfword is presented at the DMA port only after the first is popped from the FIFO
+		return (u32(m_ncr->dma16_swap_r()) << 16) | 0xffff;
+	}
+
+	if (BIT(offset << 1, 18))
 	{
 		m_maincpu->adjust_icount(-m_scsi_dma_read_cycles);
 	}
@@ -614,12 +631,38 @@ u32 iosb_base::turboscsi_dma_r(offs_t offset, u32 mem_mask)
 	{
 		m_scsi_dma_result = m_ncr->dma16_swap_r()<<16;
 	}
+	else
+	{
+		m_scsi_dma_result = u32(m_ncr->dma_r()) << 24;
+	}
 	return m_scsi_dma_result;
 }
 
 void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 {
-	if (!machine().side_effects_disabled() && BIT(offset << 1, 18))
+	if (mem_mask != 0xffffffff && mem_mask != 0xffff0000 && mem_mask != 0xff000000)
+	{
+		logerror("%s: unhandled TurboSCSI DMA write mem_mask %08x\n", machine().describe_context(), mem_mask);
+		return;
+	}
+
+	if (machine().side_effects_disabled())
+	{
+		// Debugger writes are stored while DRQ is asserted, with no wait states, retries, or timeouts
+		if (mem_mask == 0xff000000)
+		{
+			if (m_drq)
+				m_ncr->dma_w(data >> 24);
+			return;
+		}
+		if (m_drq)
+			m_ncr->dma16_swap_w(data >> 16);
+		if ((mem_mask == 0xffffffff) && m_drq)
+			m_ncr->dma16_swap_w(data & 0xffff);
+		return;
+	}
+
+	if (BIT(offset << 1, 18))
 	{
 		m_maincpu->adjust_icount(-m_scsi_dma_write_cycles);
 	}
@@ -628,10 +671,10 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 
 	if (!m_drq)
 	{
-		RESTART_INSTRUCTION(m_maincpu);
-		m_maincpu->spin_until_time(attotime::from_usec(50));
+		turboscsi_stall();
 		return;
 	}
+	m_scsi_stalled = false;
 
 	if (mem_mask == 0xffffffff)
 	{
@@ -642,10 +685,10 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 		m_scsi_second_half = true;
 		if (!m_drq)
 		{
-			RESTART_INSTRUCTION(m_maincpu);
-			m_maincpu->spin_until_time(attotime::from_usec(50));
+			turboscsi_stall();
 			return;
 		}
+		m_scsi_stalled = false;
 		m_scsi_second_half = false;
 		m_ncr->dma16_swap_w(data & 0xffff);
 	}
@@ -653,13 +696,9 @@ void iosb_base::turboscsi_dma_w(offs_t offset, u32 data, u32 mem_mask)
 	{
 		m_ncr->dma16_swap_w(data >> 16);
 	}
-	else if (mem_mask == 0xff000000)
-	{
-		m_ncr->dma_w(data >> 24);
-	}
 	else
 	{
-		fatalerror("IOSB: turboscsi_dma_w unhandled mask %08x\n", mem_mask);
+		m_ncr->dma_w(data >> 24);
 	}
 }
 

@@ -237,6 +237,7 @@ void ncr53c90_device::device_start()
 	save_item(NAME(state));
 	save_item(NAME(xfr_phase));
 	save_item(NAME(dma_dir));
+	save_item(NAME(dma_command));
 	save_item(NAME(irq));
 	save_item(NAME(drq));
 	save_item(NAME(test_mode));
