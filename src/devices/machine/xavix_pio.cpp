@@ -26,6 +26,8 @@ superxavix_pio_device::superxavix_pio_device(const machine_config &mconfig, cons
 	, m_legacy_input_mask_cb(*this, 0)
 	, m_legacy_output_cb(*this)
 	, m_legacy_output_mask{ 0xff, 0xff }
+	, m_pio_direction{}
+	, m_pio_pull{ 0xff, 0xff, 0xff }
 {
 }
 
@@ -46,9 +48,15 @@ void superxavix_pio_device::device_start()
 
 void superxavix_pio_device::device_reset()
 {
+	auto const previous_direction = m_pio_direction;
+	auto const previous_pull = m_pio_pull;
 	m_pio_direction.fill(0);
 	m_pio_output.fill(0);
 	m_pio_pull.fill(0xff);
+
+	for (unsigned port = 0; port < previous_direction.size(); ++port)
+		if (previous_direction[port] || previous_pull[port] != 0xff)
+			update_output(port);
 }
 
 u8 superxavix_pio_device::pio_direction_r(offs_t offset)

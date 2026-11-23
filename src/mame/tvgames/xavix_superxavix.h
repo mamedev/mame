@@ -359,7 +359,6 @@ public:
 	}
 
 	void superxavix_xavbassf(machine_config &config) ATTR_COLD;
-	DECLARE_INPUT_CHANGED_MEMBER(fishing_reset_button);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;

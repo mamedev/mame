@@ -29,6 +29,7 @@ xavix_io_device::xavix_io_device(const machine_config &mconfig, device_type type
 	, m_input_cb(*this, 0xff)
 	, m_output_cb(*this)
 	, m_irq_cb(*this)
+	, m_direction{}
 	, m_event_enable(0)
 {
 }
@@ -61,11 +62,16 @@ void xavix_io_device::device_start()
 
 void xavix_io_device::device_reset()
 {
+	auto const previous_direction = m_direction;
 	m_direction.fill(0);
 	m_data.fill(0);
 	m_event_enable = 0;
 	m_event_pending = 0;
 	update_irq();
+
+	for (unsigned port = 0; port < previous_direction.size(); ++port)
+		if (previous_direction[port])
+			update_output(port);
 }
 
 u8 xavix_io_device::event_enable_r()

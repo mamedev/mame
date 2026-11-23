@@ -723,10 +723,6 @@ static INPUT_PORTS_START( xavixport_bassfishing )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // Radio MCU handshake.
 
 	PORT_INCLUDE(xavixport_panel)
-
-	PORT_MODIFY("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Reset") PORT_CODE(input_seq::end_code)
-		PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(superxavix_xavbassf_state::fishing_reset_button), 0)
 INPUT_PORTS_END
 
 void superxavix_xavbassf_state::superxavix_xavbassf(machine_config &config)
@@ -768,14 +764,6 @@ void superxavix_xavbassf_state::machine_reset()
 	superxavix_i2c_state::machine_reset();
 	m_fishing_host_data = 0;
 	m_fishing_host_direction = 0;
-}
-
-INPUT_CHANGED_MEMBER(superxavix_xavbassf_state::fishing_reset_button)
-{
-	superxavix_state::xavixport_reset_button(field, param, oldval, newval);
-	// Releasing the console's GPIO does not reset the separately powered radio bridge.
-	if (!newval)
-		io0_output_w(0, 0);
 }
 
 u8 superxavix_xavbassf_state::io0_input_r(u8 direction)

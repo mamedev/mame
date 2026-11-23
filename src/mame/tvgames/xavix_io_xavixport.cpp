@@ -21,6 +21,8 @@ xavixport_io_device::xavixport_io_device(const machine_config &mconfig, const ch
 	, m_panel_cb(*this, 0)
 	, m_accessory_cb(*this, 0)
 	, m_receiver_present(false)
+	, m_selected(false)
+	, m_clock(false)
 {
 }
 
@@ -36,8 +38,6 @@ void xavixport_io_device::device_reset()
 {
 	m_report.fill(0);
 	m_bit = 0;
-	m_selected = false;
-	m_clock = false;
 }
 
 void xavixport_io_device::latch_report()
