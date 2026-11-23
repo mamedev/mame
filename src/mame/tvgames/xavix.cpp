@@ -3472,7 +3472,7 @@ void xavix_tak_daig_state::xavix_tak_daig(machine_config &config)
 	m_robots->set_event_callback(m_soc, FUNC(xavix_soc_device::trigger_io_event<2>));
 	m_soc->raster_vblank_callback().append(m_robots, FUNC(xavix_daigunder_robots_device::vblank_w));
 
-	SOFTWARE_LIST(config, "cart_list_daig").set_original("daig_cart");
+	SOFTWARE_LIST(config, "cart_list_daig").set_original("daigunder_cart");
 }
 
 u8 xavix_tak_daig_state::lightgun_r(offs_t offset)
@@ -5774,7 +5774,7 @@ CONS( 2004,  jpopira,   0,        0, xavix_jpopira,       jpopira,   xavix_i2c_c
 CONS( 2003,  evio,      0,        0, xavix_evio,          evio,      xavix_evio_state,             empty_init,  "Tomy / SSD Company Ltd.", "Evio (Japan)", MACHINE_NOT_WORKING )
 
 // 爆闘宣言 ダイガンダーDX
-/* 2 ROM expansion cartridges were available for this, in the form of other robots (the heads acts as cartridges) see daig_cart.xml
+/* 2 ROM expansion cartridges were available for this, in the form of other robots (the heads acts as cartridges) see daigunder_cart.xml
    a number of other robots were also available, but those act as controllers and don't plug into the ROM slot (presumably the signal sent is used to determine the character) */
 CONS( 2002,  tak_daig,  0,        0, xavix_tak_daig,      daig,      xavix_tak_daig_state,         empty_init,  "Takara / SSD Company Ltd.", "Bakutou Sengen Daigunder DX (Japan)", MACHINE_NOT_WORKING )
 
