@@ -2235,7 +2235,7 @@ static INPUT_PORTS_START( epo_crok )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("BANKER")
-	PORT_CONFNAME( 0x01, 0x00, "Battle Code Banker Connection" )
+	PORT_CONFNAME( 0x01, 0x00, "Battle Code Banker Connection" ) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(xavix_epo_crok_state::banker_connection_changed), 0)
 	PORT_CONFSETTING(    0x00, "Disconnected" )
 	PORT_CONFSETTING(    0x01, "Connected" )
 
@@ -2246,7 +2246,8 @@ INPUT_PORTS_END
 
 void xavix_epo_crok_state::xavix_epo_crok(machine_config &config)
 {
-	// The 24C04 is retained storage in the optional Battle Code Banker accessory.
+	// The optional Battle Code Banker uses four AAA cells.
+	// Model its storage with a 24C04 accessed over the communication cable.
 	xavix_i2c_24c04_4mb(config);
 
 	XAVIX_CROKET_CONTROLLERS(config, m_controllers, peripheral_clock());
@@ -2258,6 +2259,7 @@ void xavix_epo_crok_state::machine_start()
 {
 	xavix_i2c_power_state::machine_start();
 	m_factory_link_timer = timer_alloc(FUNC(xavix_epo_crok_state::factory_link_tick), this);
+	save_item(NAME(m_saved_banker_connected));
 	save_item(NAME(m_factory_link_phase));
 	save_item(NAME(m_factory_link_bit));
 	save_item(NAME(m_factory_link_line));
@@ -2283,8 +2285,37 @@ void xavix_epo_crok_state::io1_output_w(u8 data, u8 direction)
 {
 	if (m_banker->read())
 		xavix_i2c_power_state::io1_output_w(data, direction);
-	else
-		m_i2cmem->reset_bus();
+}
+
+void xavix_epo_crok_state::device_pre_save()
+{
+	m_saved_banker_connected = bool(m_banker->read());
+}
+
+void xavix_epo_crok_state::device_post_load()
+{
+	if (m_saved_banker_connected != bool(m_banker->read()))
+		reset_banker_bus();
+}
+
+INPUT_CHANGED_MEMBER(xavix_epo_crok_state::banker_connection_changed)
+{
+	if (machine().phase() == machine_phase::RUNNING)
+		reset_banker_bus();
+}
+
+void xavix_epo_crok_state::reset_banker_bus()
+{
+	// The battery-powered Banker releases the bus when the cable is unplugged.
+	if (!m_banker->read())
+	{
+		m_i2cmem->reset_bus(1, 1);
+		return;
+	}
+
+	u8 const data = m_soc->io_data_latch<1>();
+	u8 const direction = m_soc->io_direction<1>();
+	m_i2cmem->reset_bus(BIT(data | ~direction, 3), BIT(data & direction, 4));
 }
 
 INPUT_CHANGED_MEMBER(xavix_epo_crok_state::factory_link_send)

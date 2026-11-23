@@ -586,19 +586,25 @@ public:
 	{ }
 
 	void xavix_epo_crok(machine_config &config) ATTR_COLD;
+	DECLARE_INPUT_CHANGED_MEMBER(banker_connection_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(factory_link_send);
 	int factory_link_r() { return m_factory_link_line; }
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
+	virtual void device_pre_save() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 
 private:
 	virtual u8 io1_input_r(u8 direction) override;
 	virtual void io1_output_w(u8 data, u8 direction) override;
 
+	void reset_banker_bus();
+
 	required_device<xavix_croket_controllers_device> m_controllers;
 	required_ioport m_banker;
+	bool m_saved_banker_connected = false;
 
 	TIMER_CALLBACK_MEMBER(factory_link_tick);
 	emu_timer *m_factory_link_timer;

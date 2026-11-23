@@ -36,7 +36,7 @@ public:
 	int capacity() const { return mailcot_mascot_eeprom_device::capacity(m_model); }
 	int sda_r() { return m_eeprom->read_sda(); }
 	void write(int sda, int scl);
-	void reset_bus() { m_eeprom->reset_bus(); }
+	void power_cycle(int sda, int scl) { m_eeprom->power_cycle(sda, scl); }
 	void clear() { m_eeprom->clear(); }
 	void initialize() { m_eeprom->initialize(); }
 	bool load_image(util::read_stream &file) { return m_eeprom->load_image(file); }

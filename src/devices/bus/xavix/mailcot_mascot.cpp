@@ -94,7 +94,7 @@ bool mailcot_mascot_eeprom_device::load_image(util::read_stream &file)
 void mailcot_mascot_eeprom_device::clear()
 {
 	i2cmem_device::nvram_default();
-	reset_bus();
+	power_cycle(1, 1);
 	m_initialized = false;
 }
 
@@ -233,10 +233,9 @@ void mailcot_mascot_slot_device::call_unload()
 
 void mailcot_mascot_slot_device::insert()
 {
-	m_card->reset_bus();
+	m_card->power_cycle(m_host_sda, m_host_scl);
 	m_loaded = true;
 	m_inhibited = false;
-	m_card->write(m_host_sda, m_host_scl);
 }
 
 void mailcot_mascot_slot_device::write(int sda, int scl)

@@ -319,18 +319,27 @@ void i2cmem_device::write_e2(int state)
 }
 
 
-// Discard an incomplete transaction without changing the input line levels.
-void i2cmem_device::reset_bus()
+// Abandon the transaction and sample the bus levels without generating an edge.
+void i2cmem_device::reset_bus(int sda, int scl)
 {
+	m_sdaw = BIT(sda, 0);
+	m_scl = BIT(scl, 0);
 	m_sdar = 1;
 	m_state = STATE_IDLE;
 	m_bits = 0;
 	m_shift = 0;
 	m_devsel = 0;
 	m_addresshigh = 0;
-	m_byteaddr = 0;
 	m_page_offset = 0;
 	m_page_written_size = 0;
+}
+
+
+// Power loss also clears the current address.
+void i2cmem_device::power_cycle(int sda, int scl)
+{
+	reset_bus(sda, scl);
+	m_byteaddr = 0;
 }
 
 void i2cmem_device::write_sda(int state)
