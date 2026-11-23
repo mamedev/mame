@@ -4,6 +4,10 @@
 license:CC0-1.0
 -->
 <softwarelist name="hikara_cart" description="Takara Tomy Hi-kara cartridges">
+	<!-- Song titles and credits were transcribed using OCR of cartridge song menu screenshots
+	     and checked against the screens. The Latin columns give romanisations or established
+	     Latin spellings. Tables carried over from existing metadata are marked below. -->
+
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
 
 	***********************************************************************************

@@ -5,6 +5,10 @@ license:CC0-1.0
 -->
 <softwarelist name="ekara_cart" description="Takara e-kara / Popira / Jumping Popira / Taiko de Popira / Dance Dance Revolution Family Mat cartridges">
 
+	<!-- Song titles and credits were transcribed using OCR of cartridge song menu screenshots
+	     and checked against the screens. The Latin columns give romanisations or established
+	     Latin spellings. Tables carried over from existing metadata are marked below. -->
+
 	<!-- The cartridge form factor for all these cartridges are the same, the software determines which units they work with -->
 
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit -->
@@ -3101,7 +3105,7 @@ license:CC0-1.0
 	    No.  Title                                Artist                  Title (Latin)                           Artist (Latin)
 	     1.  SAKURAドロップス                     宇多田ヒカル            SAKURA Doroppusu                        Utada Hikaru
 	     2.  Letters                              宇多田ヒカル            Letters                                 Utada Hikaru
-	     3.  Yeah！めっちゃホリディ               松浦亜弥                Yeah! Metcha Horidi                     Matsuura Aya
+	     3.  Yeah！めっちゃホリディ               松浦亜弥                Yeah! Meccha Holiday                    Matsuura Aya
 	     4.  Don’t start now                      BoA                     Don’t start now                         BoA
 	     5.  キヲク                               Every Little Thing      Kioku                                   Every Little Thing
 	     6.  Helpless Rain                        中島美嘉                Helpless Rain                           Nakashima Mika
@@ -3736,7 +3740,7 @@ license:CC0-1.0
 	<!-- Songs:
 	    No.  Title                                   Artist          Title (Latin)                          Artist (Latin)
 	     1.  ね～え？                                松浦亜弥        Nē?                                    Matsuura Aya
-	     2.  Yeah！めっちゃホリディ                  松浦亜弥        Yeah! Metcha Horidi                    Matsuura Aya
+	     2.  Yeah！めっちゃホリディ                  松浦亜弥        Yeah! Meccha Holiday                   Matsuura Aya
 	     3.  ♡桃色片想い♡                            松浦亜弥        ♡Momoiro Kataomoi♡                     Matsuura Aya
 	     4.  Go Girl～恋のヴィクトリー～             モーニング娘。  Go Girl -Koi no Vikutorī-              Morning Musume
 	     5.  愛あらば IT’S ALL RIGHT                 モーニング娘。  Ai Araba IT'S ALL RIGHT                Morning Musume
@@ -3926,7 +3930,7 @@ license:CC0-1.0
 	<!-- Songs:
 	    No.  Title                                     Artist          Programme                     Title (Latin)                                   Credit (Latin)
 	     1.  GOOD BYE 夏男                             松浦亜弥                                      GOOD BYE Natsuo                                 Matsuura Aya
-	     2.  Yeah!めっちゃホリディ                     松浦亜弥                                      Yeah! Metcha Horidi                             Matsuura Aya
+	     2.  Yeah!めっちゃホリディ                     松浦亜弥                                      Yeah! Meccha Holiday                            Matsuura Aya
 	     3.  ザ☆ピ～ス！                               モーニング娘。                                The☆Peace!                                      Morning Musume
 	     4.  明日への扉                                I WiSH                                        Asu e no Tobira                                 I WiSH
 	     5.  VALENTI                                   BoA                                           VALENTI                                         BoA
@@ -5055,9 +5059,9 @@ license:CC0-1.0
 
 
 	<!-- Songs:
-	    No.  Title                  Artist  Title (Latin)        Artist (Latin)
+	    No.  Title                  Artist  Title (Latin)         Artist (Latin)
 	     1.  The 美学                       The Bigaku
-	     2.  Yeah!めっちゃホリディ          Yeah! Metcha Horidi
+	     2.  Yeah!めっちゃホリディ          Yeah! Meccha Holiday
 	     3.  ♡桃色片想い♡                   ♡Momoiro Kataomoi♡
 	     4.  100回のKISS                    100kai no KISS
 	     5.  LOVE涙色                       LOVE Namidairo
@@ -5523,7 +5527,7 @@ license:CC0-1.0
 	    No.  Title                          Artist              Title (Latin)                      Artist (Latin)
 	     1.  Free & Easy                    浜崎あゆみ          Free & Easy                        Hamasaki Ayumi
 	     2.  Feel fine!                     倉木麻衣            Feel fine!                         Kuraki Mai
-	     3.  Yeah!めっちゃホリディ          松浦亜弥            Yeah! Metcha Horidi                Matsuura Aya
+	     3.  Yeah!めっちゃホリディ          松浦亜弥            Yeah! Meccha Holiday               Matsuura Aya
 	     4.  Every Heart－ミンナノキモチ－  BoA                 Every Heart -Minna no Kimochi-     BoA
 	     5.  ONE SURVIVE                    中島美嘉            ONE SURVIVE                        Nakashima Mika
 	     6.  シャンティ                     島谷ひとみ          Shanti                             Shimatani Hitomi

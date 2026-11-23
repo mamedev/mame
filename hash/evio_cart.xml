@@ -4,6 +4,9 @@
 license:CC0-1.0
 -->
 <softwarelist name="evio_cart" description="Tomy evio Media cartridges">
+	<!-- Song titles were transcribed using OCR of cartridge song menu screenshots
+	     and checked against the screens. -->
+
 	<!-- cartridges contain the ROM only, the XaviX CPU and BIOS are in the base unit
 
 	***********************************************************************************
