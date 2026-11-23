@@ -17,12 +17,9 @@
 DEFINE_DEVICE_TYPE(XAVIX_STADIUM_BAT, xavix_stadium_bat_device, "xavix_stadium_bat", "Excite Stadium Infrared Bat")
 
 xavix_stadium_bat_device::xavix_stadium_bat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device_base(mconfig, XAVIX_STADIUM_BAT, tag, owner, clock)
+	: xavix_ir_msb_device_base(mconfig, XAVIX_STADIUM_BAT, tag, owner, clock, { 9 }, (0x0a + 1) << (0x07 + 1))
 	, m_swing(*this, "SWING")
 {
-	set_report_count(1);
-	set_report_bits<0>(9);
-	set_bit_ticks((0x0a + 1) << (0x07 + 1));
 }
 
 static INPUT_PORTS_START( xavix_stadium_bat )

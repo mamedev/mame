@@ -18,11 +18,9 @@
 
 DEFINE_DEVICE_TYPE(XAVIX_IR_MOTION, xavix_ir_motion_device, "xavix_ir_motion", "XaviX Infrared Motion Controllers")
 
-xavix_ir_motion_base_device::xavix_ir_motion_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device_base(mconfig, type, tag, owner, clock)
+xavix_ir_motion_base_device::xavix_ir_motion_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 bit_ticks)
+	: xavix_ir_msb_device_base(mconfig, type, tag, owner, clock, { 8, 8 }, bit_ticks)
 {
-	set_report_count(2);
-	set_bit_ticks(0xe5 * 32);
 }
 
 u8 xavix_ir_motion_base_device::motion_report(unsigned player, bool button, u8 strength)
@@ -32,13 +30,12 @@ u8 xavix_ir_motion_base_device::motion_report(unsigned player, bool button, u8 s
 }
 
 xavix_ir_motion_device::xavix_ir_motion_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_motion_base_device(mconfig, XAVIX_IR_MOTION, tag, owner, clock)
+	: xavix_ir_motion_base_device(mconfig, XAVIX_IR_MOTION, tag, owner, clock, PADDLES.bit_ticks)
 	, m_ir_strength(*this, "IR%u", 1U)
 	, m_ir_button(*this, "IR%u_BUTTON", 1U)
 	, m_ir_power(*this, "IR_POWER")
 	, m_ports(PADDLES.ports)
 {
-	set_bit_ticks(PADDLES.bit_ticks);
 }
 
 // Keep host bindings independent of MAME's automatic per-device player numbering.

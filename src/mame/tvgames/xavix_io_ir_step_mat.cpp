@@ -21,12 +21,11 @@
 DEFINE_DEVICE_TYPE(XAVIX_IR_STEP_MAT, xavix_ir_step_mat_device, "xavix_ir_step_mat", "XaviX Infrared Step Mat")
 
 xavix_ir_step_mat_device::xavix_ir_step_mat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device_base(mconfig, XAVIX_IR_STEP_MAT, tag, owner, clock)
+	: xavix_ir_msb_device_base(mconfig, XAVIX_IR_STEP_MAT, tag, owner, clock, { 16 }, JMAT_SAMPLE_TICKS.back())
 	, m_pads(*this, "STEP_SENSOR")
 	, m_power(*this, "STEP_POWER")
 	, m_protocol(protocol::JMAT)
 {
-	set_report_count(1);
 }
 
 ioport_constructor xavix_ir_step_mat_device::device_input_ports() const

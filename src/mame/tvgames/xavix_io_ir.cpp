@@ -57,21 +57,24 @@ TIMER_CALLBACK_MEMBER(xavix_optical_pulse_device_base::event_timer)
 		m_event_timer->adjust(attotime::never);
 }
 
-xavix_ir_report_device_base::xavix_ir_report_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
+xavix_ir_report_device_base::xavix_ir_report_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
+		std::initializer_list<u8> report_bits, u32 bit_ticks)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_data(1)
-	, m_bit_ticks(0x47 * 64)
+	, m_bit_ticks(bit_ticks)
 	, m_event_out_cb(*this)
-	, m_report_bits{ 8, 8, 8, 8, 8, 8, 8, 8 }
-	, m_report_count(2)
+	, m_report_bits{}
+	, m_report_count(u8(report_bits.size()))
 {
+	if (!report_bits.size() || report_bits.size() > m_report_bits.size())
+		throw emu_fatalerror("%s: invalid number of infrared reports", tag);
+	std::copy(report_bits.begin(), report_bits.end(), m_report_bits.begin());
 }
 
 void xavix_ir_report_device_base::device_start()
 {
 	m_event_out_cb.resolve_safe();
 	assert(m_bit_ticks);
-	assert(m_report_count && m_report_count <= m_latched_report.size());
 	for (unsigned report = 0; report != m_report_count; ++report)
 		assert(m_report_bits[report] && m_report_bits[report] <= 32);
 

@@ -17,20 +17,16 @@
 DEFINE_DEVICE_TYPE(XAVIX_ANPANMAN_STICKS, xavix_anpanman_sticks_device, "xavix_anpanman_sticks", "Anpanman Mat DX Infrared Sticks")
 
 xavix_anpanman_sticks_device::xavix_anpanman_sticks_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device_base(mconfig, XAVIX_ANPANMAN_STICKS, tag, owner, clock)
+	: xavix_ir_msb_device_base(mconfig, XAVIX_ANPANMAN_STICKS, tag, owner, clock, { 17, 17 }, 9'084)
 	, m_motion_level(*this, "STICK%u", 1U)
 	, m_stick_batteries(*this, "STICK_BATTERIES")
 {
-	set_report_count(2);
-	set_report_bits<0>(17);
-	set_report_bits<1>(17);
 	// These transitions target the ROM's 17 sampling windows; transmitter edge timing remains unmeasured.
 	set_sample_ticks(std::array<u32, 17>
 	{
 		10'414, 7'164, 5'564, 3'804, 4'380, 8'060, 9'084, 9'084, 9'084,
 		9'084, 9'084, 9'084, 9'084, 9'084, 9'084, 9'084, 9'084
 	});
-	set_bit_ticks(9'084);
 }
 
 static INPUT_PORTS_START( xavix_anpanman_sticks )

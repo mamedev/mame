@@ -17,15 +17,11 @@
 DEFINE_DEVICE_TYPE(XAVIX_TFIT_RACKETS, xavix_tfit_rackets_device, "xavix_tfit_rackets", "Tennis x Fitness Infrared Rackets")
 
 xavix_tfit_rackets_device::xavix_tfit_rackets_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device_base(mconfig, XAVIX_TFIT_RACKETS, tag, owner, clock)
+	: xavix_ir_msb_device_base(mconfig, XAVIX_TFIT_RACKETS, tag, owner, clock, { 13, 13 }, 0x8d * 64)
 	, m_racket_strength(*this, "RACKET%u_STRENGTH", 1U)
 	, m_racket_buttons(*this, "RACKET%u_BUTTONS", 1U)
 	, m_racket_power(*this, "RACKET_POWER")
 {
-	set_report_count(2);
-	set_report_bits<0>(13);
-	set_report_bits<1>(13);
-	set_bit_ticks(0x8d * 64);
 }
 
 static INPUT_PORTS_START( xavix_tfit_rackets )

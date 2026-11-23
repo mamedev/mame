@@ -22,14 +22,12 @@
 DEFINE_DEVICE_TYPE(XAVIX_COMET_BATON, xavix_comet_baton_device, "xavix_comet_baton", "Comet-san Lovelin Baton Infrared Controller")
 
 xavix_comet_baton_device::xavix_comet_baton_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_pulse_distance_device_base(mconfig, XAVIX_COMET_BATON, tag, owner, clock)
+	: xavix_ir_pulse_distance_device_base(mconfig, XAVIX_COMET_BATON, tag, owner, clock, { 10 })
 	, xavix_ir_receiver_interface(*this, 1'024, true)
 	, m_baton(*this, "BATON")
 	, m_baton_mode(*this, "BATON_MODE")
 	, m_command(*this, "baton_command")
 {
-	set_report_count(1);
-	set_report_bits<0>(10);
 	// Representative intervals are centred within the firmware's measured short/long acceptance windows.
 	set_pulse_distance_ticks(0x40 * 256, 0x60 * 256, 0x39 * 256);
 }

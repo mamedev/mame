@@ -169,7 +169,7 @@ private:
 	required_ioport_array<2> m_glove_size;
 	required_ioport_array<2> m_glove_hidden;
 	// Mounted media is external; save states retain the separately held sensor image.
-	std::array<u8, IMAGE_WIDTH * IMAGE_HEIGHT> m_source{};
+	std::array<u8, IMAGE_WIDTH * IMAGE_HEIGHT> m_source;
 
 	std::array<u8, 4> m_setup;
 	u8 m_data;

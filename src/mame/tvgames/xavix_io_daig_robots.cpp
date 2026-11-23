@@ -18,14 +18,12 @@
 DEFINE_DEVICE_TYPE(XAVIX_DAIGUNDER_ROBOTS, xavix_daigunder_robots_device, "xavix_daigunder_robots", "Daigunder Robot Infrared Controllers")
 
 xavix_daigunder_robots_device::xavix_daigunder_robots_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_framed_device_base(mconfig, XAVIX_DAIGUNDER_ROBOTS, tag, owner, clock)
+	: xavix_ir_framed_device_base(mconfig, XAVIX_DAIGUNDER_ROBOTS, tag, owner, clock, { 8, 8, 8, 8, 8 }, 0x50 * 64)
 	, m_screen(*this, finder_base::DUMMY_TAG)
 	, m_robot_controls(*this, "P%u_ROBOT", 1U)
 	, m_robot_id(*this, "P%u_ID", 1U)
 	, m_accessory_controls(*this, "ACCESSORY")
 {
-	set_report_count(5);
-	set_bit_ticks(0x50 * 64);
 }
 
 static INPUT_PORTS_START( xavix_daigunder_robots )

@@ -16,15 +16,12 @@
 DEFINE_DEVICE_TYPE(XAVIX_SURVI_BUSTER, xavix_survi_buster_device, "xavix_survi_buster", "Boukenger Survi Buster Infrared Controller")
 
 xavix_survi_buster_device::xavix_survi_buster_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_msb_device_base(mconfig, XAVIX_SURVI_BUSTER, tag, owner, clock)
+	: xavix_ir_msb_device_base(mconfig, XAVIX_SURVI_BUSTER, tag, owner, clock, { 28 }, SURVI_BUSTER_SAMPLE_TICKS.back())
 	, m_survi_buster(*this, "SURVI_BUSTER")
 	, m_survi_buster_power(*this, "SURVI_BUSTER_POWER")
 {
-	set_report_count(1);
-	set_report_bits<0>(28);
 	// These transitions target the ROM's 28 sampling windows; physical transmitter edge timing remains unmeasured.
 	set_sample_ticks(SURVI_BUSTER_SAMPLE_TICKS);
-	set_bit_ticks(SURVI_BUSTER_SAMPLE_TICKS.back());
 }
 
 static INPUT_PORTS_START( xavix_survi_buster )

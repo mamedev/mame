@@ -18,19 +18,15 @@
 DEFINE_DEVICE_TYPE(XAVIX_BASEBALL_CONTROLLERS, xavix_baseball_controllers_device, "xavix_baseball_controllers", "XaviX Infrared Baseball Controllers")
 
 xavix_baseball_controllers_device::xavix_baseball_controllers_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_framed_device_base(mconfig, XAVIX_BASEBALL_CONTROLLERS, tag, owner, clock)
+	: xavix_ir_framed_device_base(mconfig, XAVIX_BASEBALL_CONTROLLERS, tag, owner, clock, { 15, 8 }, 0x57 * 64)
 	, m_ball_throw(*this, "BALL_THROW")
 	, m_ball_buttons(*this, "BALL_BUTTONS")
 	, m_bat(*this, "BAT")
 	, m_controller_power(*this, "CONTROLLER_POWER")
 	, m_controller_type(controller_type::BASEBALL)
 {
-	set_report_count(2);
-	set_bit_ticks(0x57 * 64);
 	// The receiver samples after 1.53 data cells, requiring the transmitter's extended start pulse.
 	set_start_ticks(0x83 * 64);
-	set_report_bits<0>(15);
-	set_report_bits<1>(8);
 }
 
 static INPUT_PORTS_START( xavix_baseball_controllers )

@@ -14,15 +14,13 @@
 DEFINE_DEVICE_TYPE(XAVIX_CARDNIGHT_REMOTE, xavix_cardnight_remote_device, "xavix_cardnight_remote", "Card Night Infrared Remote")
 
 xavix_cardnight_remote_device::xavix_cardnight_remote_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_run_length_device_base(mconfig, XAVIX_CARDNIGHT_REMOTE, tag, owner, clock)
+	: xavix_ir_run_length_device_base(mconfig, XAVIX_CARDNIGHT_REMOTE, tag, owner, clock, { 8, 8, 8 }, 0x15 * 512)
 	, m_dock_cb(*this, 0)
 	, m_directions(*this, "IN1")
 	, m_buttons(*this, "ROW0")
 	, m_remote_reset(*this, "REMOTE_RESET")
 {
-	set_bit_ticks(0x15 * 512);
 	set_report_gap_ticks(64 * 512);
-	set_report_count(3);
 }
 
 static INPUT_PORTS_START( xavix_cardnight_remote )

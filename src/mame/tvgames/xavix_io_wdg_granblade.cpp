@@ -17,13 +17,11 @@
 DEFINE_DEVICE_TYPE(XAVIX_GRANBLADE, xavix_granblade_device, "xavix_granblade", "Webdiver Granblade Infrared Controller")
 
 xavix_granblade_device::xavix_granblade_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_pulse_distance_device_base(mconfig, XAVIX_GRANBLADE, tag, owner, clock)
+	: xavix_ir_pulse_distance_device_base(mconfig, XAVIX_GRANBLADE, tag, owner, clock, { 10 })
 	, m_granblade_action(*this, "GRANBLADE_ACTION")
 	, m_granblade_mode(*this, "GRANBLADE_MODE")
 	, m_granblade_power(*this, "GRANBLADE_POWER")
 {
-	set_report_count(1);
-	set_report_bits<0>(10);
 	// Representative IR intervals are centred in the ROM's acceptance windows; no hardware capture is available.
 	set_pulse_distance_ticks(0x28 * 256, 0x48 * 256, 0x2c * 256);
 }

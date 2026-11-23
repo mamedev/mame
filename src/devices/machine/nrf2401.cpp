@@ -28,6 +28,11 @@ nrf2401_device::nrf2401_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, NRF2401, tag, owner, clock)
 	, m_peer(*this, finder_base::DUMMY_TAG)
 	, m_dr_cb(*this)
+	, m_pwr_up(false)
+	, m_cs(false)
+	, m_ce(false)
+	, m_clock{}
+	, m_data(false)
 {
 }
 

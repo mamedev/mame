@@ -17,16 +17,13 @@
 DEFINE_DEVICE_TYPE(XAVIX_ROCKMAN_ARM, xavix_rockman_arm_device, "xavix_rockman_arm", "Rockman Infrared Arm Controller")
 
 xavix_rockman_arm_device::xavix_rockman_arm_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_framed_device_base(mconfig, XAVIX_ROCKMAN_ARM, tag, owner, clock)
+	: xavix_ir_framed_device_base(mconfig, XAVIX_ROCKMAN_ARM, tag, owner, clock, { 13 }, 0x89 * 64)
 	, m_arm(*this, "ARM")
 	, m_controller_buttons(*this, "CONTROL")
 	, m_controller_power(*this, "CONTROLLER_POWER")
 {
-	set_report_count(1);
-	set_report_bits<0>(13);
 	// Timings centre transitions in the firmware sample windows; physical transmitter timing and repetition remain unmeasured.
 	set_start_ticks<0>(0x162 * 64);
-	set_bit_ticks(0x89 * 64);
 }
 
 static INPUT_PORTS_START( xavix_rockman_arm )

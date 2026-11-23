@@ -17,19 +17,15 @@
 DEFINE_DEVICE_TYPE(XAVIX_GOLF_SWING, xavix_golf_swing_device, "xavix_golf_swing", "XaviX Golf Swing Sensor")
 
 xavix_golf_swing_device::xavix_golf_swing_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_framed_device_base(mconfig, XAVIX_GOLF_SWING, tag, owner, clock)
+	: xavix_ir_framed_device_base(mconfig, XAVIX_GOLF_SWING, tag, owner, clock, { 11, 9 }, 0x80 * 64)
 	, m_swing_active(*this, "SWING_ACTIVE")
 	, m_swing_axis(*this, "SWING_%c", 'X')
 	, m_swing_buttons(*this, "SWING_BUTTONS")
 	, m_swing_power(*this, "SWING_POWER")
 	, m_swing_phase(0)
 {
-	set_report_count(2);
 	// The receiver's alternating timer phases sample each 0x80-cell twice.
-	set_bit_ticks(0x80 * 64);
 	set_start_ticks(0x80 * 64);
-	set_report_bits<0>(11);
-	set_report_bits<1>(9);
 }
 
 static INPUT_PORTS_START( xavix_golf_swing )

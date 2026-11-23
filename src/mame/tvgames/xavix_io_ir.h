@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <array>
+#include <initializer_list>
 #include <utility>
 
 // The bat and optical ripcord encode motion as a finite count of receiver events.
@@ -47,7 +48,8 @@ public:
 	void vblank_w(int state);
 
 protected:
-	xavix_ir_report_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	xavix_ir_report_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock,
+			std::initializer_list<u8> report_bits, u32 bit_ticks = 0x47 * 64);
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual u32 read_report(unsigned report) = 0;
@@ -57,7 +59,6 @@ protected:
 	virtual void advance_report() = 0;
 
 	void set_bit_ticks(u32 ticks) { m_bit_ticks = ticks; }
-	void set_report_count(u8 count) { m_report_count = count; }
 	template <unsigned N> void set_report_bits(u8 bits) { static_assert(N < 8); m_report_bits[N] = bits; }
 	void receiver_event() { m_event_out_cb(); }
 	void schedule_bit(u32 ticks) { m_bit_timer->adjust(clocks_to_attotime(ticks)); }
@@ -81,7 +82,7 @@ private:
 	emu_timer *m_bit_timer;
 	std::array<u32, 8> m_latched_report;
 	std::array<u8, 8> m_report_bits;
-	u8 m_report_count;
+	u8 const m_report_count;
 	bool m_frame_pending;
 	bool m_between_reports;
 };

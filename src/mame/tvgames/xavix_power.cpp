@@ -19,6 +19,7 @@ xavix_power_hold_device::xavix_power_hold_device(const machine_config &mconfig, 
 	: device_t(mconfig, XAVIX_POWER_HOLD, tag, owner, clock)
 	, m_power_off_cb(*this)
 	, m_timer(nullptr)
+	, m_last_level(0xff)
 {
 }
 

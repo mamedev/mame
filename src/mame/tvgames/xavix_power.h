@@ -23,7 +23,7 @@ private:
 
 	device_delegate<void ()> m_power_off_cb;
 	emu_timer *m_timer;
-	u8 m_last_level = 0xff;
+	u8 m_last_level;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_POWER_HOLD, xavix_power_hold_device)

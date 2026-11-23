@@ -17,12 +17,10 @@
 DEFINE_DEVICE_TYPE(XAVIX_WEBKNIGHT, xavix_webknight_device, "xavix_webknight", "Webdiver Web Knight Infrared Controller")
 
 xavix_webknight_device::xavix_webknight_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: xavix_ir_pulse_distance_device_base(mconfig, XAVIX_WEBKNIGHT, tag, owner, clock)
+	: xavix_ir_pulse_distance_device_base(mconfig, XAVIX_WEBKNIGHT, tag, owner, clock, { 10 })
 	, m_identity(*this, "WEBKNIGHT_IDENTITY")
 	, m_mark_switch(*this, "WEBKNIGHT_MARK")
 {
-	set_report_count(1);
-	set_report_bits<0>(10);
 	// Representative intervals lie inside Gladion's receiver windows; no physical capture is available.
 	set_pulse_distance_ticks(0x28 * 256, 0x48 * 256, 0x2c * 256);
 }

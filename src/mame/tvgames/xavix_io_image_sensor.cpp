@@ -326,6 +326,7 @@ xavix_digital_image_sensor_device::xavix_digital_image_sensor_device(const machi
 	, m_glove_y(*this, { "TARGET_Y", "TARGET2_Y" })
 	, m_glove_size(*this, { "TARGET_SIZE", "TARGET2_SIZE" })
 	, m_glove_hidden(*this, { "TARGET_HIDDEN", "TARGET2_HIDDEN" })
+	, m_source{}
 	, m_data(0)
 	, m_data_mask(0)
 	, m_strobes(WRITE_STROBE | READ_STROBE)

@@ -11,7 +11,9 @@
 class xavix_ir_motion_base_device : public xavix_ir_msb_device_base
 {
 protected:
-	xavix_ir_motion_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	static constexpr u32 LATER_BIT_TICKS = 0xe5 * 32;
+
+	xavix_ir_motion_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 bit_ticks = LATER_BIT_TICKS);
 
 	static u8 motion_report(unsigned player, bool button, u8 strength);
 
@@ -54,7 +56,6 @@ protected:
 
 private:
 	static constexpr u32 ORIGINAL_BIT_TICKS = 0x47 * 64;
-	static constexpr u32 LATER_BIT_TICKS = 0xe5 * 32;
 
 	required_ioport_array<2> m_ir_strength;
 	required_ioport_array<2> m_ir_button;
