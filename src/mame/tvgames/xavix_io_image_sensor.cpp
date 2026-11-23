@@ -728,7 +728,7 @@ std::pair<std::error_condition, std::string> xavix_digital_image_sensor_device::
 	if (!picture.valid())
 		return std::make_pair(image_error::INVALIDIMAGE, "Invalid or unsupported picture");
 	if (picture.width() != int(IMAGE_WIDTH) || picture.height() != int(IMAGE_HEIGHT))
-		return std::make_pair(image_error::INVALIDIMAGE, "Raw camera input requires a 32x32 opaque monochrome picture");
+		return std::make_pair(image_error::INVALIDLENGTH, "Raw camera input requires a 32x32 opaque monochrome picture");
 
 	std::array<u8, IMAGE_WIDTH * IMAGE_HEIGHT> source;
 	for (unsigned y = 0; y < IMAGE_HEIGHT; ++y)
