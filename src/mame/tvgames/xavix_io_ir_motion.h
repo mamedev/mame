@@ -51,8 +51,6 @@ protected:
 	virtual bool report_enabled(unsigned report) override;
 
 private:
-	static constexpr u8 SWORD_FACTORY_REPORTS[2] = { 0x11, 0x7b };
-
 	required_ioport_array<2> m_ir_strength;
 	required_ioport_array<2> m_ir_button;
 	optional_ioport m_ir_power;
