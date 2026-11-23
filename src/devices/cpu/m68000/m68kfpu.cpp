@@ -53,6 +53,11 @@ static constexpr u32 EXC_ENB_INEXACT    = 0x00000001;
 static constexpr u32 EXC_ENB_UNDFLOW    = 0x00000002;
 static constexpr u32 EXC_ENB_OVRFLOW    = 0x00000004;
 
+// 68881 FSAVE frame sizes (excluding the format longword) and BIU flags
+static constexpr u32 M6888X_IDLE_SIZE   = 0x18;
+static constexpr u32 M6888X_BUSY_SIZE   = 0xb4;
+static constexpr u32 M6888X_BIU_NO_EXCEPTION = 0x0800'0000; // clear: exception pending
+
 inline extFloat80_t m68000_musashi_device::load_extended_float80(u32 ea)
 {
 	u32 d1,d2;
@@ -500,12 +505,14 @@ void m68000_musashi_device::sync_exception_flags(extFloat80_t op1, extFloat80_t 
 	}
 
 	update_accrued_exceptions();
+	fpu_post_6888x_exception(op1);
 }
 
 // MC68040 User's Manual, sections 9.7 and 9.8.  Exceptions are posted by
 // arithmetic, not by writes to FPCR/FPSR, and reported before the next F-line
-// instruction (except FSAVE/FRESTORE).  Currently posted by FDIV/FSDIV/FDDIV;
-// other operations and the 68881/68882 exception frames remain to be implemented.
+// instruction (except FSAVE/FRESTORE).  On the 68040 they are currently posted
+// by FDIV/FSDIV/FDDIV only; on the 68881/68882 every arithmetic operation posts
+// its enabled exceptions (see fpu_post_6888x_exception).
 u8 m68000_musashi_device::fpu_exception_vector(u32 exceptions) const
 {
 	static constexpr u8 vectors[8] =
@@ -520,6 +527,51 @@ u8 m68000_musashi_device::fpu_exception_vector(u32 exceptions) const
 		}
 	}
 	return 0;
+}
+
+// MC68881/MC68882 User's Manual, section 6.  An enabled exception is
+// reported as a pre-instruction exception on the next arithmetic or
+// conditional floating-point instruction (FMOVEM, FMOVE to/from control
+// registers, FSAVE and FRESTORE don't take it), or as a mid-instruction
+// exception straight after FMOVE FPm,<ea> stores its operand.  The pending
+// state stays until FSAVE moves it into the state frame (perform_fsave), and
+// FRESTORE of that frame re-arms it (m68040_do_frestore).  This is the
+// MC68882 behaviour; the MC68881 also clears it on exception acknowledge.
+//
+// source is the source operand, which is the exceptional operand that the
+// idle state frame holds for SNAN, OPERR and DZ (sections 6.1.2, 6.1.3,
+// 6.1.6).  Callers replace it for overflow/underflow where they can.
+void m68000_musashi_device::fpu_post_6888x_exception(const extFloat80_t &source)
+{
+	if (m_cpu_type & CPU_TYPE_040)
+	{
+		return;
+	}
+
+	const u8 vector = fpu_exception_vector(m_fpsr & m_fpcr & 0xff00);
+	if (vector)
+	{
+		m_fpu_pending_exception = vector;
+		m_fpu_exc_operand = source;
+	}
+}
+
+// MC68881/MC68882 User's Manual, section 7.4.2.6.  FMOVE FPm,<ea> reports an
+// exception after storing its operand, using the coprocessor mid-instruction
+// stack frame (format $9) with the evaluated effective address at offset $10.
+// The instruction is complete, so RTE resumes after it.
+void m68000_musashi_device::fpu_take_mid_instruction_exception()
+{
+	const u32 vector = m_fpu_pending_exception;
+	const u32 sr = m68ki_init_exception(vector);
+	m68ki_push_32(m_fpu_ea);    // $10: evaluated effective address
+	m68ki_push_32(0);           // $0c: internal registers
+	m68ki_push_32(m_ppc);       // $08: instruction address
+	m68ki_push_16(0x9000 | (vector << 2));
+	m68ki_push_32(m_pc);
+	m68ki_push_16(sr);
+	m68ki_jump_vector(vector);
+	m_icount -= m_cyc_exception[vector];
 }
 
 bool m68000_musashi_device::fpu_check_pending_exception()
@@ -637,9 +689,16 @@ void m68000_musashi_device::fpu_div(u16 command, extFloat80_t source, int precis
 	sync_exception_flags(source, destination, EXC_ENB_INEXACT | EXC_ENB_OVRFLOW | EXC_ENB_UNDFLOW);
 	set_condition_codes(condition_result);
 
+	if (!(m_cpu_type & CPU_TYPE_040))
+	{
+		// 68881/68882: any enabled exception was posted by sync_exception_flags
+		m_fpr[dst] = result;
+		return;
+	}
+
 	// Overflow/underflow require FPSP intervention even when masked on 040.
 	const u32 exceptions = m_fpsr & (m_fpcr | FPES_OVERFLOW | FPES_UNDERFLOW) & 0xff00;
-	m_fpu_pending_exception = (m_cpu_type & CPU_TYPE_040) ? fpu_exception_vector(exceptions) : 0;
+	m_fpu_pending_exception = fpu_exception_vector(exceptions);
 	if (!m_fpu_pending_exception || m_fpu_pending_exception == 49)
 	{
 		m_fpr[dst] = result; // INEX commits the rounded result before trapping
@@ -1446,30 +1505,35 @@ void m68000_musashi_device::WRITE_EA_32(int ea, u32 data)
 		case 2:     // (An)
 		{
 			u32 ea = REG_A()[reg];
+			m_fpu_ea = ea;
 			m68ki_write_32(ea, data);
 			break;
 		}
 		case 3:     // (An)+
 		{
 			u32 ea = EA_AY_PI_32();
+			m_fpu_ea = ea;
 			m68ki_write_32(ea, data);
 			break;
 		}
 		case 4:     // -(An)
 		{
 			u32 ea = EA_AY_PD_32();
+			m_fpu_ea = ea;
 			m68ki_write_32(ea, data);
 			break;
 		}
 		case 5:     // (d16, An)
 		{
 			u32 ea = EA_AY_DI_32();
+			m_fpu_ea = ea;
 			m68ki_write_32(ea, data);
 			break;
 		}
 		case 6:     // (An) + (Xn) + d8
 		{
 			u32 ea = EA_AY_IX_32();
+			m_fpu_ea = ea;
 			m68ki_write_32(ea, data);
 			break;
 		}
@@ -1480,6 +1544,7 @@ void m68000_musashi_device::WRITE_EA_32(int ea, u32 data)
 				case 0:     // (xxx).W
 				{
 					u32 ea = EA_AW_32();
+					m_fpu_ea = ea;
 					m68ki_write_32(ea, data);
 					break;
 				}
@@ -1488,12 +1553,14 @@ void m68000_musashi_device::WRITE_EA_32(int ea, u32 data)
 					u32 d1 = OPER_I_16();
 					u32 d2 = OPER_I_16();
 					u32 ea = (d1 << 16) | d2;
+					m_fpu_ea = ea;
 					m68ki_write_32(ea, data);
 					break;
 				}
 				case 2:     // (d16, PC)
 				{
 					u32 ea = EA_PCDI_32();
+					m_fpu_ea = ea;
 					m68ki_write_32(ea, data);
 					break;
 				}
@@ -1515,6 +1582,7 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 		case 2:     // (An)
 		{
 			u32 ea = REG_A()[reg];
+			m_fpu_ea = ea;
 			m68ki_write_32(ea, (u32)(data >> 32));
 			m68ki_write_32(ea+4, (u32)(data));
 			break;
@@ -1523,6 +1591,7 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 		{
 			u32 ea = REG_A()[reg];
 			REG_A()[reg] += 8;
+			m_fpu_ea = ea;
 			m68ki_write_32(ea+0, (u32)(data >> 32));
 			m68ki_write_32(ea+4, (u32)(data));
 			break;
@@ -1532,6 +1601,7 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 			u32 ea;
 			REG_A()[reg] -= 8;
 			ea = REG_A()[reg];
+			m_fpu_ea = ea;
 			m68ki_write_32(ea+0, (u32)(data >> 32));
 			m68ki_write_32(ea+4, (u32)(data));
 			break;
@@ -1539,6 +1609,7 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 		case 5:     // (d16, An)
 		{
 			u32 ea = EA_AY_DI_32();
+			m_fpu_ea = ea;
 			m68ki_write_32(ea+0, (u32)(data >> 32));
 			m68ki_write_32(ea+4, (u32)(data));
 			break;
@@ -1546,6 +1617,7 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 		case 6:     // (An) + (Xn) + d8
 		{
 			u32 ea = EA_AY_IX_32();
+			m_fpu_ea = ea;
 			m68ki_write_32(ea+0, (u32)(data >> 32));
 			m68ki_write_32(ea+4, (u32)(data));
 			break;
@@ -1557,6 +1629,7 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 				case 0:     // (xxx).W
 				{
 					u32 ea = EA_AW_32();
+					m_fpu_ea = ea;
 					m68ki_write_32(ea+0, (u32)(data >> 32));
 					m68ki_write_32(ea+4, (u32)(data));
 					break;
@@ -1566,6 +1639,7 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 					u32 d1 = OPER_I_16();
 					u32 d2 = OPER_I_16();
 					u32 ea = (d1 << 16) | d2;
+					m_fpu_ea = ea;
 					m68ki_write_32(ea+0, (u32)(data >> 32));
 					m68ki_write_32(ea+4, (u32)(data));
 					break;
@@ -1573,6 +1647,7 @@ void m68000_musashi_device::WRITE_EA_64(int ea, u64 data)
 				case 2:     // (d16, PC)
 				{
 					u32 ea = EA_PCDI_32();
+					m_fpu_ea = ea;
 					m68ki_write_32(ea+0, (u32)(data >> 32));
 					m68ki_write_32(ea+4, (u32)(data));
 					break;
@@ -1675,7 +1750,71 @@ void m68000_musashi_device::WRITE_EA_PACK(int mode, int reg, int k, extFloat80_t
 	}
 }
 
+// The 68881/68882 executes concurrently with the CPU: the CPU is released as
+// soon as the operands have been transferred.  MAME executes the instruction
+// atomically and charges its whole time to the CPU, so treat it as still
+// executing for that many cycles again after it returns:
+// - A following FMOVEM or FMOVE to/from a control register waits for it and
+//   then reports its exception (the MC68882 reports it on a subsequent
+//   instruction, MC68881/MC68882 User's Manual, sections 6.1.4-6.1.7).  Once
+//   it has finished, these instructions don't take a pending exception.
+// - Most instructions go straight to their end phase, where an FSAVE waits
+//   for completion and saves an IDLE frame (section 6.4.3).  Only long
+//   operations (transcendentals, FMOD, FREM) can still be in their middle
+//   phase, in which case an FSAVE directly following them saves a BUSY frame
+//   and FRESTORE of that frame completes the instruction.  FSINCOS is
+//   excluded because it writes two registers.
 void m68000_musashi_device::fpgen_rm_reg(u16 w2)
+{
+	if (m_cpu_type & CPU_TYPE_040)
+	{
+		fpgen_execute(w2);
+		return;
+	}
+
+	// mask of long-running opmodes (see above)
+	static constexpr u64 LONG_6888X = 0x223277f744U;
+
+	const bool fmovecr = BIT(w2, 14) && (BIT(w2, 10, 3) == 7);
+	const unsigned opmode = w2 & 0x7f;
+	const int dst = BIT(w2, 7, 3);
+	const int cos_dst = w2 & 7; // FSINCOS cosine destination
+	const extFloat80_t dst_before = m_fpr[dst];
+	const extFloat80_t cos_before = m_fpr[cos_dst];
+	const u64 start = total_cycles();
+
+	fpgen_execute(w2);
+
+	m_fpu_command = w2;
+	switch (m_fpu_pending_exception)
+	{
+	case 50: // DZ
+	case 52: // OPERR
+	case 54: // SNAN
+		// trap enabled: the destination register is not modified
+		// (sections 6.1.2, 6.1.3 and 6.1.6)
+		m_fpr[dst] = dst_before;
+		if (!fmovecr && ((opmode & 0x78) == 0x30))
+		{
+			m_fpr[cos_dst] = cos_before;
+		}
+		break;
+	}
+
+	const u64 end = total_cycles();
+	m_fpu_running_until = end + (end - start);
+	if (!fmovecr && (opmode < 0x40) && BIT(LONG_6888X, opmode))
+	{
+		m_fpu_busy_pc = m_pc;
+		m_fpu_busy_reg = dst;
+	}
+	else
+	{
+		m_fpu_busy_pc = 0;
+	}
+}
+
+void m68000_musashi_device::fpgen_execute(u16 w2)
 {
 	// arithmetic instructions record their address for exception handlers
 	m_fpiar = m_ppc;
@@ -1893,7 +2032,8 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 
 	LOGMASKED(LOG_INSTRUCTIONS, "FPU: opmode %02x (PC=%08x)\n", opmode, m_ppc);
 	const extFloat80_t dstCopy = m_fpr[dst];
-	if (opmode != 0)
+	// on the 68881/68882 FMOVE to a register reports its own exceptions too
+	if ((opmode != 0) || !(m_cpu_type & CPU_TYPE_040))
 	{
 		clear_exception_flags();
 	}
@@ -1903,7 +2043,33 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 		case 0x00:      // FMOVE
 		{
 			m_fpr[dst] = source;
+			const bool snan = !(m_cpu_type & CPU_TYPE_040) && extF80_isSignalingNaN(source);
+			if (snan)
+			{
+				// 68881/68882: an SNAN operand is reported and stored as a
+				// nonsignaling NaN (section 6.1.2)
+				m_fpr[dst].signif |= u64(1) << 62;
+			}
 			set_condition_codes(m_fpr[dst]);
+			if (snan)
+			{
+				sync_exception_flags(source, source, 0);
+			}
+			// the 68881/68882 signal underflow when the result is denormalized
+			// (the 68040 takes an unimplemented data type exception instead)
+			else if (!(m_cpu_type & CPU_TYPE_040) && !(source.signExp & 0x7fff) && source.signif && !BIT(source.signif, 63))
+			{
+				m_fpsr |= FPES_UNDERFLOW;
+				update_accrued_exceptions();
+				// the exceptional operand is the normalized intermediate
+				// result with the exponent biased by an extra $6000
+				// (section 6.1.5)
+				const int shift = std::countl_zero(source.signif);
+				extFloat80_t intermediate;
+				intermediate.signif = source.signif << shift;
+				intermediate.signExp = (source.signExp & 0x8000) | ((1 - shift + 0x6000) & 0x7fff);
+				fpu_post_6888x_exception(intermediate);
+			}
 			m_icount -= 56;
 			break;
 		}
@@ -2080,7 +2246,11 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			s8 const mode = softfloat_roundingMode;
 			uint64_t quotient;
 			softfloat_roundingMode = softfloat_round_minMag;
-			extFloat80_remainder(m_fpr[dst], source, m_fpr[dst], quotient);
+			// the 68881 computes the complete remainder in one instruction;
+			// iterate past softfloat's partial (x87 FPREM style) result
+			while (extFloat80_remainder(m_fpr[dst], source, m_fpr[dst], quotient) > 0)
+			{
+			}
 			set_condition_codes(m_fpr[dst]);
 			softfloat_roundingMode = mode;
 			m_fpsr &= 0xff00ffff;
@@ -2126,9 +2296,12 @@ void m68000_musashi_device::fpgen_rm_reg(u16 w2)
 			s8 const mode = softfloat_roundingMode;
 			uint64_t quotient;
 			softfloat_roundingMode = softfloat_round_near_even;
-			extFloat80_ieee754_remainder(m_fpr[dst], source, m_fpr[dst], quotient);
+			// complete remainder, as for FMOD above
+			while (extFloat80_ieee754_remainder(m_fpr[dst], source, m_fpr[dst], quotient) > 0)
+			{
+			}
 			set_condition_codes(m_fpr[dst]);
-			sync_exception_flags(dstCopy, source, EXC_ENB_UNDFLOW);
+			sync_exception_flags(source, dstCopy, EXC_ENB_UNDFLOW);
 			softfloat_roundingMode = mode;
 			m_fpsr &= 0xff00ffff;
 			m_fpsr |= (quotient & 0x7f) << 16;
@@ -2454,6 +2627,7 @@ void m68000_musashi_device::fmove_reg_mem(u16 w2)
 	int src = (w2 >>  7) & 0x7;
 	int dst = (w2 >> 10) & 0x7;
 	int k = (w2 & 0x7f);
+	m_fpu_ea = 0; // set by memory writes; undefined for data register destinations
 
 	switch (dst)
 	{
@@ -2521,6 +2695,23 @@ void m68000_musashi_device::fmove_reg_mem(u16 w2)
 	}
 
 	m_icount -= 12;
+
+	// 68881/68882: an enabled exception is reported straight after the store
+	if (!(m_cpu_type & CPU_TYPE_040) && m_fpu_pending_exception)
+	{
+		m_fpu_command = w2;
+		if ((m_fpu_pending_exception == 51) || (m_fpu_pending_exception == 53))
+		{
+			// the exceptional operand for overflow/underflow is the value
+			// rounded to the destination precision with a normal extended
+			// exponent (sections 6.1.4 and 6.1.5)
+			const auto saved_precision = extF80_roundingPrecision;
+			extF80_roundingPrecision = (dst == 1) ? 32 : (dst == 5) ? 64 : 80;
+			m_fpu_exc_operand = extF80_add(m_fpr[src], extFloat80_t{});
+			extF80_roundingPrecision = saved_precision;
+		}
+		fpu_take_mid_instruction_exception();
+	}
 }
 
 void m68000_musashi_device::apply_fpcr_rounding()
@@ -2907,29 +3098,44 @@ int m68000_musashi_device::perform_fsave(u32 addr, int inc)
 		}
 	}
 
-	if (inc)
+	// MC68881 (version $1f) IDLE or BUSY frame (MC68881/MC68882 User's
+	// Manual, section 6.4.2).  The last longword holds the BIU flags; bit 27
+	// clear means an exception is pending, and exception handlers set it to
+	// dismiss the exception before FRESTORE.
+	const bool busy = (m_ppc == m_fpu_busy_pc) && fpu_6888x_running();
+	const u32 size = busy ? M6888X_BUSY_SIZE : M6888X_IDLE_SIZE;
+	const u32 start = inc ? addr : addr - size - 4;
+	m68ki_write_32(start, 0x1f000000 | (size << 16));
+	for (u32 offset = 4; offset < size; offset += 4)
 	{
-		// 68881 IDLE, version 0x1f
-		m68ki_write_32(addr, 0x1f180000);
-		m68ki_write_32(addr+4, 0);
-		m68ki_write_32(addr+8, 0);
-		m68ki_write_32(addr+12, 0);
-		m68ki_write_32(addr+16, 0);
-		m68ki_write_32(addr+20, 0);
-		m68ki_write_32(addr+24, 0x70000000);
-		return 7*4;
+		m68ki_write_32(start + offset, 0);
+	}
+	if (busy)
+	{
+		// The contents of a BUSY frame are internal to the FPU; MAME keeps
+		// the destination register and the result of the interrupted
+		// instruction so that FRESTORE can complete it.
+		const extFloat80_t &result = m_fpr[m_fpu_busy_reg];
+		m68ki_write_32(start + 0x04, m_fpu_busy_reg);
+		m68ki_write_32(start + 0x08, u32(result.signExp) << 16);
+		m68ki_write_32(start + 0x0c, u32(result.signif >> 32));
+		m68ki_write_32(start + 0x10, u32(result.signif));
 	}
 	else
 	{
-		m68ki_write_32(addr-4, 0x70000000);
-		m68ki_write_32(addr-8, 0);
-		m68ki_write_32(addr-12, 0);
-		m68ki_write_32(addr-16, 0);
-		m68ki_write_32(addr-20, 0);
-		m68ki_write_32(addr-24, 0);
-		m68ki_write_32(addr-28, 0x1f180000);
-		return -7*4;
+		// command/condition register image, reserved word ($ffff), exceptional
+		// operand; the operand register image stays zero
+		m68ki_write_32(start + 0x04, (u32(m_fpu_command) << 16) | 0xffff);
+		m68ki_write_32(start + 0x08, u32(m_fpu_exc_operand.signExp) << 16);
+		m68ki_write_32(start + 0x0c, u32(m_fpu_exc_operand.signif >> 32));
+		m68ki_write_32(start + 0x10, u32(m_fpu_exc_operand.signif));
 	}
+	m68ki_write_32(start + size, 0x70000000 | (m_fpu_pending_exception ? 0 : M6888X_BIU_NO_EXCEPTION));
+
+	// the exceptional state now lives in the frame
+	m_fpu_pending_exception = 0;
+	m_fpu_running_until = 0;
+	return inc ? int(size + 4) : -int(size + 4);
 }
 
 // FRESTORE on a nullptr frame reboots the FPU - all registers to NaN, the 3 status regs to 0
@@ -2939,6 +3145,9 @@ void m68000_musashi_device::do_frestore_null()
 
 	m_fpu_pending_exception = 0;
 	m_fpu_frame.fill(0);
+	m_fpu_running_until = 0;
+	m_fpu_command = 0;
+	m_fpu_exc_operand = extFloat80_t{};
 	m_fpcr = 0;
 	m_fpsr = 0;
 	m_fpiar = 0;
@@ -3010,6 +3219,29 @@ void m68000_musashi_device::m68040_do_frestore(u32 addr, int reg)
 				m_fpu_pending_exception = fpu_exception_vector(m_fpsr & (m_fpcr | FPES_OVERFLOW | FPES_UNDERFLOW) & 0xff00);
 			}
 		}
+		else if (!m40)
+		{
+			const u32 size = BIT(temp, 16, 8);
+			if ((temp >> 24) == 0x1f && size == M6888X_BUSY_SIZE)
+			{
+				// complete the instruction saved by perform_fsave
+				extFloat80_t &result = m_fpr[m68ki_read_32(addr + 0x04) & 7];
+				result.signExp = m68ki_read_32(addr + 0x08) >> 16;
+				result.signif = (u64(m68ki_read_32(addr + 0x0c)) << 32) | m68ki_read_32(addr + 0x10);
+			}
+			else if ((temp >> 24) == 0x1f && size == M6888X_IDLE_SIZE)
+			{
+				m_fpu_command = m68ki_read_32(addr + 0x04) >> 16;
+				m_fpu_exc_operand.signExp = m68ki_read_32(addr + 0x08) >> 16;
+				m_fpu_exc_operand.signif = (u64(m68ki_read_32(addr + 0x0c)) << 32) | m68ki_read_32(addr + 0x10);
+			}
+			if ((size == M6888X_IDLE_SIZE || size == M6888X_BUSY_SIZE) && !(m68ki_read_32(addr + size) & M6888X_BIU_NO_EXCEPTION))
+			{
+				// FPSR/FPCR are restored separately, before FRESTORE
+				m_fpu_pending_exception = fpu_exception_vector(m_fpsr & m_fpcr & 0xff00);
+			}
+		}
+		m_fpu_running_until = 0;
 
 		if (reg != -1)
 		{
