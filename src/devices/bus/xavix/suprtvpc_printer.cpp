@@ -34,6 +34,8 @@ DEFINE_DEVICE_TYPE(SUPRTVPC_PRINTER, suprtvpc_printer_device, "suprtvpc_printer"
 suprtvpc_printer_device::suprtvpc_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SUPRTVPC_PRINTER, tag, owner, clock)
 	, device_suprtvpc_exp_interface(mconfig, *this)
+	, m_data(false)
+	, m_clock(false)
 {
 }
 
@@ -64,8 +66,6 @@ void suprtvpc_printer_device::device_reset()
 	m_bit_count = 0;
 	m_height = 0;
 	m_row = 0;
-	m_data = false;
-	m_clock = false;
 	m_busy = false;
 }
 
