@@ -866,6 +866,9 @@ u8 tek440x_state::videocntl_r()
 {
 	u8 ans = m_videocntl;
 
+	// SoundRdy
+	ans |= m_soundrdy;
+
 	// page 2.1-92
 	if (m_screen->vblank())
 		ans |= 0x20;
@@ -875,8 +878,8 @@ u8 tek440x_state::videocntl_r()
 	if (m_screen->hblank())
 		ans |= 0x40;
 
-	// SoundRdy
-	ans |= m_soundrdy;
+	if (m_screen->hblank())
+		ans |= 0x80;
 
 	return ans;
 }
