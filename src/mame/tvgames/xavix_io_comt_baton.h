@@ -34,7 +34,6 @@ private:
 
 	required_ioport m_baton;
 	required_ioport m_baton_mode;
-	required_ioport m_factory_code;
 	output_finder<> m_command;
 
 	u16 m_received_bits;
