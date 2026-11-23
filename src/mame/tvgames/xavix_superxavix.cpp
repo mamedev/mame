@@ -194,6 +194,15 @@ void superxavix_state::write_plotter_byte(u32 address, u8 data)
 //  PIO Connections
 //-------------------------------------------------
 
+void superxavix_state::machine_start()
+{
+	xavix_state::machine_start();
+
+	for (u32 port = 0; port < m_pio_field_inputs.size(); port++)
+		m_pio_field_inputs[port] = connected_inputs(*m_pio_inputs[port]);
+	m_legacy_field_inputs = { connected_inputs(*m_in0), connected_inputs(*m_in1) };
+}
+
 template <unsigned Port>
 u8 superxavix_state::pio_input_r(offs_t offset, u8 mem_mask)
 {
@@ -203,7 +212,7 @@ u8 superxavix_state::pio_input_r(offs_t offset, u8 mem_mask)
 	return m_pio_inputs[Port]->read();
 }
 
-u8 superxavix_state::connected_inputs(ioport_port &port)
+u8 superxavix_state::connected_inputs(ioport_port const &port)
 {
 	// TODO: Describe physical connections independently of input field declarations.
 	u8 mask = 0;
@@ -216,12 +225,12 @@ u8 superxavix_state::connected_inputs(ioport_port &port)
 template <unsigned Port>
 u8 superxavix_state::pio_input_mask_r()
 {
-	return connected_inputs(*m_pio_inputs[Port]) | m_pio_connected_inputs[Port];
+	return m_pio_field_inputs[Port] | m_pio_connected_inputs[Port];
 }
 
 u8 superxavix_state::legacy_input_mask_r(offs_t port)
 {
-	return connected_inputs(port ? *m_in1 : *m_in0) | m_legacy_connected_inputs[port];
+	return m_legacy_field_inputs[port] | m_legacy_connected_inputs[port];
 }
 
 template <unsigned Port>

@@ -56,6 +56,7 @@ protected:
 	void configure_mapped_memory() ATTR_COLD;
 	xavixport_io_device &configure_xavixport_io(machine_config &config) ATTR_COLD;
 
+	virtual void machine_start() override ATTR_COLD;
 	virtual u8 read_graphics_byte(u32 address);
 	u8 read_bitmap_byte(u32 address);
 	virtual u8 read_plotter_byte(u32 address);
@@ -70,11 +71,13 @@ protected:
 	std::array<u8, 2> m_legacy_connected_inputs{};
 
 private:
-	static u8 connected_inputs(ioport_port &port);
+	static u8 connected_inputs(ioport_port const &port);
 	template <unsigned Port> u8 pio_input_mask_r();
 	u8 legacy_input_mask_r(offs_t port);
 
 	required_ioport_array<3> m_pio_inputs;
+	std::array<u8, 3> m_pio_field_inputs{};
+	std::array<u8, 2> m_legacy_field_inputs{};
 };
 
 class superxavix_i2c_state : public superxavix_state
