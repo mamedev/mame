@@ -50,8 +50,7 @@ private:
 class xavix_beyblade_peer_device : public device_t, public device_xavix_beyblade_link_interface
 {
 public:
-	enum class model : u8 { A55 = 1, A62, FACTORY };
-	void set_model(model type) { m_model = type; }
+	enum class model : u8 { A55 = 1, A62 };
 
 	virtual u8 lines_r() override { return m_peer_lines; }
 	virtual void lines_w(u8 levels, u8 direction) override;
@@ -67,8 +66,6 @@ protected:
 private:
 	enum : u8
 	{
-		TEST_CONNECT,
-		TEST_CONNECT_RELEASE,
 		WAIT_CONNECT,
 		CONNECT_RELEASE,
 		RECEIVE_ASSERT,
@@ -77,14 +74,6 @@ private:
 		TRANSMIT_DELAY,
 		TRANSMIT_ACK,
 		TRANSMIT_RELEASE
-	};
-
-	enum : u8
-	{
-		FACTORY_ENTRY,
-		FACTORY_LINK_CHECK,
-		FACTORY_REPLY,
-		FACTORY_READY
 	};
 
 	static constexpr std::array<u8, 35> RPM_FILTER =
@@ -129,7 +118,6 @@ private:
 	u8 m_peer_ripcord_history_position;
 	bool m_peer_inputs_valid;
 	bool m_expect_diagnostic_token;
-	u8 m_factory_stage;
 };
 
 class xavix_beyblade_a55_device : public xavix_beyblade_peer_device

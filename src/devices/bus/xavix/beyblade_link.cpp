@@ -7,9 +7,6 @@
     filtered ripcord speed through the two-line handshake. This is a local
     approximation of another complete console, not a link between emulators.
 
-    The diagnostic profile represents unidentified factory equipment and is
-    not available in the slot menu.
-
     TODO:
     - Measure physical link turnaround, dial detent scale/polarity and
       ripcord encoder counts.
@@ -53,11 +50,6 @@ xavix_beyblade_link_port_device::xavix_beyblade_link_port_device(const machine_c
 	{
 		port.option_add("a55", XAVIX_BEYBLADE_A55);
 		port.option_add("a62", XAVIX_BEYBLADE_A62);
-		// The factory protocol is known, but its physical test equipment is unidentified.
-		// port.option_add("factory", XAVIX_BEYBLADE_A55).machine_config([] (device_t *device)
-		// {
-		//  downcast<xavix_beyblade_peer_device &>(*device).set_model(xavix_beyblade_peer_device::model::FACTORY);
-		// });
 	}, nullptr, false);
 }
 
@@ -148,7 +140,6 @@ void xavix_beyblade_peer_device::device_start()
 	save_item(NAME(m_peer_ripcord_history_position));
 	save_item(NAME(m_peer_inputs_valid));
 	save_item(NAME(m_expect_diagnostic_token));
-	save_item(NAME(m_factory_stage));
 }
 
 void xavix_beyblade_peer_device::device_reset()
@@ -164,7 +155,6 @@ void xavix_beyblade_peer_device::device_reset()
 	m_peer_ripcord_history_position = 0;
 	m_peer_inputs_valid = false;
 	m_expect_diagnostic_token = false;
-	m_factory_stage = FACTORY_ENTRY;
 	reset_protocol();
 }
 
@@ -181,23 +171,16 @@ void xavix_beyblade_peer_device::reset_protocol()
 	m_response_byte = 0;
 	m_response_bit = 0;
 	m_expect_diagnostic_token = false;
-	if (m_model == model::FACTORY && m_factory_stage != FACTORY_READY)
-	{
-		m_phase = TEST_CONNECT;
-		m_peer_lines = 0x80;
-	}
 }
 
 void xavix_beyblade_peer_device::vblank_w(int state)
 {
 	if (!state)
 		return;
+
+	// Re-arm the cable protocol while the local processor is held in physical reset.
 	if (host_reset_r())
-	{
-		// Re-arm the cable protocol while the local processor is held in physical reset.
-		m_factory_stage = FACTORY_ENTRY;
 		reset_protocol();
-	}
 
 	u8 const buttons = m_peer_buttons->read() & 0x03;
 	u8 const dial_position = m_peer_dial->read();
@@ -252,11 +235,6 @@ void xavix_beyblade_peer_device::prepare_response(u8 command)
 	switch (command)
 	{
 	case 0x01:
-		if (m_model == model::FACTORY)
-		{
-			m_response_bytes = 0;
-			break;
-		}
 		// A fresh linked launcher exposes only its matching lead character.
 		m_response[0] = 1U << (u8(m_model) - 1);
 		m_response[4] = u8(m_model) - 1;
@@ -322,23 +300,7 @@ void xavix_beyblade_peer_device::advance_transmit()
 	if (m_response_byte == m_response_bytes)
 	{
 		m_peer_lines = 0;
-		if (m_model == model::FACTORY && m_factory_stage != FACTORY_READY)
-		{
-			if (m_factory_stage == FACTORY_ENTRY)
-			{
-				m_factory_stage = FACTORY_LINK_CHECK;
-				m_phase = WAIT_CONNECT;
-			}
-			else
-			{
-				m_factory_stage = FACTORY_REPLY;
-				m_phase = RECEIVE_ASSERT;
-			}
-		}
-		else
-		{
-			m_phase = RECEIVE_ASSERT;
-		}
+		m_phase = RECEIVE_ASSERT;
 	}
 	else
 	{
@@ -357,27 +319,6 @@ void xavix_beyblade_peer_device::lines_w(u8 levels, u8 direction)
 
 	switch (m_phase)
 	{
-	case TEST_CONNECT:
-		if (host_lines == 0x40)
-		{
-			m_peer_lines = 0;
-			m_phase = TEST_CONNECT_RELEASE;
-		}
-		break;
-
-	case TEST_CONNECT_RELEASE:
-		if (!host_lines)
-		{
-			// Request entry first, then exchange the factory link-check challenge.
-			m_response[0] = m_factory_stage == FACTORY_ENTRY ? 0xf0 : 0x0f;
-			m_response[1] = 0x5a;
-			m_response_bytes = m_factory_stage == FACTORY_ENTRY ? 1 : 2;
-			m_response_byte = 0;
-			m_response_bit = 0;
-			begin_transmit_turnaround();
-		}
-		break;
-
 	case WAIT_CONNECT:
 		if (host_lines == 0x80)
 		{
@@ -409,21 +350,10 @@ void xavix_beyblade_peer_device::lines_w(u8 levels, u8 direction)
 			m_peer_lines = 0;
 			if (++m_receive_bits == 8)
 			{
-				bool const factory_reply = m_model == model::FACTORY && m_factory_stage == FACTORY_REPLY && m_receive_byte == 0x4b;
-				if (factory_reply)
-				{
-					m_factory_stage = FACTORY_READY;
-					m_response_bytes = 0;
-				}
-				else
-				{
-					prepare_response(m_receive_byte);
-				}
+				prepare_response(m_receive_byte);
 				m_receive_byte = 0;
 				m_receive_bits = 0;
-				if (factory_reply)
-					m_phase = WAIT_CONNECT;
-				else if (m_response_bytes)
+				if (m_response_bytes)
 					begin_transmit_turnaround();
 				else
 					m_phase = RECEIVE_ASSERT;
