@@ -51,8 +51,6 @@ public:
 	// Callbacks
 	auto extop_cb() { return m_external_operation.bind(); }
 	auto clkout_cb() { return m_clock_out_line.bind(); }
-	// Address on the CRU read strobe, before the input bit is sampled.
-	auto cru_read_strobe_cb() { return m_cru_read_strobe.bind(); }
 	auto holda_cb() { return m_holda_line.bind(); }
 
 	// For debugger access
@@ -66,12 +64,15 @@ public:
 	// READY can still extend individual transfers after reset in either mode.
 	void set_auto_wait_on_reset(bool enable) { m_auto_wait_on_reset = enable; }
 
+	// Earlier TMS9995 parts issue an extra data read during MPY (TI Table 9).
+	void set_mpy_read_next_word(bool enable) { m_mpy_read_next_word = enable; }
+
 protected:
 	tms9995_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void        device_start() override;
-	virtual void        device_reset() override;
+	virtual void        device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t    execute_min_cycles() const noexcept override;
@@ -136,39 +137,20 @@ private:
 	bool    m_ready;        // sampled value
 
 	// Auto-wait state generation
-	attotime m_ready_fall = attotime::never;
-	attotime m_ready_deferred_fall = attotime::never;
-	bool    m_ready_before_late_edge = true;
-	bool    m_ready_sample_auto = false;
+	attotime m_ready_fall;
+	attotime m_ready_deferred_fall;
+	bool    m_ready_before_late_edge;
+	bool    m_ready_sample_auto;
 	bool    m_request_auto_wait_state;
 	std::optional<bool> m_auto_wait_on_reset;
 	bool    m_auto_wait;
+	bool    m_mpy_read_next_word;
 
 	// Cycle counter
 	int     m_icount;
 
 	// Phase of the memory access
 	int     m_mem_phase;
-	int     m_word_tail_delay = -1; // clocks until an in-flight external word presents its low byte
-	attotime m_word_high_start = attotime::never;
-	enum : uint8_t
-	{
-		RESET_DBIN = 1,
-		RESET_WE = 2,
-		RESET_CRU = 4
-	};
-	struct reset_cycle
-	{
-		uint16_t address;
-		uint8_t  lines;
-	};
-	uint16_t m_reset_bus_address[2]{};
-	uint8_t m_reset_bus_lines[2]{};
-	bool    m_write_pending = false;
-	uint16_t m_write_address = 0;
-	uint8_t m_write_data = 0;
-	attotime m_write_sample = attotime::never;
-
 	// Check the READY line?
 	bool    m_check_ready;
 
@@ -191,31 +173,35 @@ private:
 
 	// Interrupt handling
 	bool    m_nmi_active;
-	uint8_t m_nmi_samples = 0;
-	uint8_t m_int1_samples = 0;
-	uint8_t m_int4_samples = 0;
+	uint8_t m_nmi_samples;
+	uint8_t m_int1_samples;
+	uint8_t m_int4_samples;
 	bool    m_int1_active;
 	bool    m_int4_active;
 	bool    m_int_overflow;
 
 	bool    m_reset;            // released, vector service pending
 	bool    m_reset_asserted;   // /RESET pin held low
-	bool    m_reset_edge_pending = false;
-	bool    m_reset_edge_asserted = false;
-	bool    m_reset_edge_ready = false;
-	attotime m_reset_edge_time = attotime::never;
-	void apply_reset_edge(bool asserted, bool ready, attotime when);
-	void latch_reset_bus(bool ready, attotime when);
-	void emit_reset_bus();
+	attotime m_reset_transition;
+	uint8_t m_reset_samples;
+	uint8_t m_reset_bus_clocks;
+	bool m_reset_byte_pending;
+	uint16_t m_reset_byte_address;
+	void set_bus_address(uint16_t address, uint8_t kind);
+	uint8_t read_external(uint16_t address);
+	bool    m_reset_ready;
+	uint16_t m_reset_wp, m_reset_pc, m_reset_st;
+	void capture_reset_context();
 	void external_write_cycle(uint16_t address, uint8_t data);
-	uint8_t m_idle_reset_clocks; // remaining clocks to the final IDLE control strobe
+	bool reset_at(attotime time) const;
+	bool reset_bus_active() const;
 	bool    m_mid_flag;
 	bool    m_mid_active;
 
-	uint8_t m_decrementer_clkdiv = 0;
-	uint8_t m_decrementer_reload = 0;
-	bool    m_decrementer_enabled = false;
-	uint8_t m_ec_samples = 0;
+	uint8_t m_decrementer_clkdiv;
+	uint8_t m_decrementer_reload;
+	bool    m_decrementer_enabled;
+	uint8_t m_ec_samples;
 	bool    m_log_interrupt;
 
 	// Flag field
@@ -232,7 +218,7 @@ private:
 	void    service_interrupt();
 
 	// Issue clock pulses. The TMS9995 uses one (output) clock cycle per machine cycle.
-	inline void pulse_clock(int count, bool hold_cycle = false);
+	inline void pulse_clock(int count, bool hold_cycle = false, int write_address = -1, uint8_t write_data = 0);
 
 	// Signal the hold state via the external line
 	void set_hold_state(bool state);
@@ -283,10 +269,10 @@ private:
 	void clock_decrementer();
 
 	// Start value
-	uint16_t  m_starting_count_storage_register = 0;
+	uint16_t  m_starting_count_storage_register;
 
 	// Current decrementer value.
-	uint16_t  m_decrementer_value = 0;
+	uint16_t  m_decrementer_value;
 
 	// ============== CRU support ======================
 
@@ -360,7 +346,7 @@ private:
 	int     m_operand_address_derivation_index;
 
 	// Micro-operation program counter (as opposed to the program counter PC)
-	int     MPC = -1;
+	int     MPC;
 
 	// Calling microprogram (used when data derivation is called)
 	int     m_caller_index;
@@ -392,21 +378,10 @@ private:
 	void return_with_address();
 	void return_with_address_copy();
 	void cru_input_operation();
-	void sample_cru_input(int32_t phase);
 	void shift_cru_input(bool bit);
-	emu_timer *m_cru_timer = nullptr;
-	uint16_t m_cru_sample_address = 0;
-	bool    m_cru_sample_last = false;
-	bool    m_cru_early_high = false;
-	enum cru_sample_phase
-	{
-		STCR_SAMPLE,
-		TB_EARLY,
-		TB_LATE,
-		STCR_ACCEPT,
-		TB_ACCEPT
-	};
-	bool    m_cru_sample_bit = false;
+	uint16_t m_cru_sample_address;
+	bool    m_cru_sample_last;
+	bool    m_cru_sample_pending;
 	void cru_output_operation();
 	void command_completed();
 	void next_command();
@@ -464,7 +439,6 @@ private:
 	// is not that simple to emulate. For the sake of homogeneity between the
 	// chip emulations we use a dedicated callback.
 	devcb_write8   m_external_operation;
-	devcb_write16  m_cru_read_strobe;
 
 	// Clock output.
 	devcb_write_line   m_clock_out_line;
