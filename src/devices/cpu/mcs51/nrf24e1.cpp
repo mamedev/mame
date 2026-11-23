@@ -133,7 +133,10 @@ void nrf24e1_device::device_start()
 void nrf24e1_device::device_reset()
 {
 	reset_registers();
-	bootstrap();
+	if (m_watchdog_reset)
+		m_extra[SFR_RSTREAS] = 1;
+	else
+		bootstrap();
 }
 
 void nrf24e1_device::device_reset_after_children()
@@ -542,9 +545,9 @@ TIMER_CALLBACK_MEMBER(nrf24e1_device::low_power_tick)
 	}
 	if (m_watchdog_enabled && !--m_watchdog_counter)
 	{
-		reset_registers();
-		m_extra[SFR_RSTREAS] = 1;
-		m_radio->reset();
-		device_reset_after_children();
+		// A watchdog reset restarts the program already in RAM.
+		m_watchdog_reset = true;
+		reset();
+		m_watchdog_reset = false;
 	}
 }

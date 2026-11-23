@@ -122,6 +122,7 @@ private:
 	bool m_watchdog_enabled;
 	bool m_powered;
 	bool m_booted;
+	bool m_watchdog_reset = false;
 	attotime m_adc_remaining;
 	attotime m_spi_remaining;
 };
