@@ -27,7 +27,6 @@ DEFINE_DEVICE_TYPE(SUPRTVPC_ROM_24C64, suprtvpc_rom_24c64_device, "suprtvpc_rom_
 device_suprtvpc_cart_interface::device_suprtvpc_cart_interface(const machine_config &mconfig, device_t &device)
 	: device_interface(device, "suprtvpccart")
 	, m_rom(nullptr)
-	, m_rom_size(0)
 {
 }
 
@@ -156,10 +155,7 @@ void device_suprtvpc_cart_interface::ir_rx_pulse()
 void device_suprtvpc_cart_interface::rom_alloc(u32 size)
 {
 	if (!m_rom)
-	{
-		m_rom = device().machine().memory().region_alloc(device().subtag("^cart:rom"), size, 1, ENDIANNESS_LITTLE)->base();
-		m_rom_size = size;
-	}
+		m_rom = device().machine().memory().region_alloc(device().subtag("rom"), size, 1, ENDIANNESS_LITTLE);
 }
 
 std::pair<std::error_condition, std::string> suprtvpc_cart_slot_device::call_load()

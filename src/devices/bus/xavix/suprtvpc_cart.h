@@ -26,16 +26,16 @@ public:
 	virtual void vblank_w(int state) { }
 
 	void rom_alloc(u32 size);
-	u8 *rom_base() const { return m_rom; }
-	u32 rom_size() const { return m_rom_size; }
+	u8 *rom_base() const { return m_rom ? m_rom->base() : nullptr; }
+	u32 rom_size() const { return m_rom ? m_rom->bytes() : 0; }
+	memory_region *rom_region() const { return m_rom; }
 
 protected:
 	device_suprtvpc_cart_interface(const machine_config &mconfig, device_t &device);
 	void ir_rx_pulse();
 
 private:
-	u8 *m_rom;
-	u32 m_rom_size;
+	memory_region *m_rom;
 };
 
 class suprtvpc_cart_slot_device : public device_t,
@@ -47,7 +47,7 @@ public:
 
 	u8 *rom_base() const { return m_cart ? m_cart->rom_base() : nullptr; }
 	u32 rom_size() const { return m_cart ? m_cart->rom_size() : 0; }
-	memory_region *rom_region() const { return memregion("cart:rom"); }
+	memory_region *rom_region() const { return m_cart ? m_cart->rom_region() : nullptr; }
 
 	void sda_w(int state) { if (m_cart) m_cart->sda_w(state); }
 	void scl_w(int state) { if (m_cart) m_cart->scl_w(state); }
