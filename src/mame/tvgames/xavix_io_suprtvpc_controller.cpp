@@ -84,7 +84,7 @@ u8 xavix_tvpc_controller_device::days_in_month(u8 year, u8 month)
 
 u8 xavix_tvpc_controller_device::day_of_week(u8 year, u8 month, u8 day)
 {
-	unsigned full_year = 2000 + year;
+	u32 full_year = 2000 + year;
 	if (month < 3)
 		full_year--;
 	return (full_year + full_year / 4 - full_year / 100 + full_year / 400 + MONTH_OFFSETS[month - 1] + day) % 7 + 1;
@@ -93,7 +93,7 @@ u8 xavix_tvpc_controller_device::day_of_week(u8 year, u8 month, u8 day)
 u64 xavix_tvpc_controller_device::read_keyboard()
 {
 	u64 result = 0;
-	for (unsigned row = 0; row < m_keys_cb.size(); row++)
+	for (u32 row = 0; row < m_keys_cb.size(); row++)
 		result |= u64(m_keys_cb[row]()) << (row * 8);
 
 	// Both physical Shift keys generate the same controller key code.
@@ -112,7 +112,7 @@ void xavix_tvpc_controller_device::scan_clock()
 	if (clock != m_clock_state && QUEUE_SIZE - m_queue_count >= 4)
 	{
 		// The receiver commits the clock only after the descending type 3, 2, 1, 0 sequence.
-		for (unsigned byte = 4; byte != 0; byte--)
+		for (u32 byte = 4; byte != 0; byte--)
 			queue_report(byte - 1, clock >> ((byte - 1) * 8));
 		m_clock_state = clock;
 	}
@@ -171,14 +171,14 @@ void xavix_tvpc_controller_device::scan_inputs()
 	u64 changed = keyboard ^ m_keyboard_state;
 	while (changed)
 	{
-		unsigned const code = std::countr_zero(changed);
+		u32 const code = std::countr_zero(changed);
 		if (!queue_report(6, code | (BIT(keyboard, code) ? 0x40 : 0x00)))
 			break;
 		m_keyboard_state ^= u64(1) << code;
 		changed &= changed - 1;
 	}
 
-	for (unsigned player = 0; player < m_players_cb.size(); player++)
+	for (u32 player = 0; player < m_players_cb.size(); player++)
 	{
 		if (m_players_cb[player].isunset())
 			continue;

@@ -21,7 +21,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual u32 read_report(unsigned report) override;
+	virtual u32 read_report(u32 report) override;
 	virtual bool reports_enabled() override;
 
 private:

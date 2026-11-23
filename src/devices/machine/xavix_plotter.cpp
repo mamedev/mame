@@ -151,7 +151,7 @@ u8 superxavix_plotter_device::address_r(offs_t offset)
 
 void superxavix_plotter_device::address_w(offs_t offset, u8 data)
 {
-	unsigned const shift = offset * 8;
+	u32 const shift = offset * 8;
 	m_bit_address = ((m_bit_address & ~(u32(0xff) << shift)) | (u32(data) << shift)) & BIT_ADDRESS_MASK;
 }
 

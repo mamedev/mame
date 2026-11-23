@@ -37,7 +37,7 @@ private:
 	devcb_read8 m_card_data_cb;
 	devcb_read_line m_expanded_cards_cb;
 	std::array<double, 256> m_source_response;
-	bool capture_manual_card(unsigned card);
+	bool capture_manual_card(u32 card);
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_DUELMAST_SCANNER, xavix_duelmast_scanner_device)

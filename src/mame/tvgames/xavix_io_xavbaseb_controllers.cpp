@@ -71,7 +71,7 @@ ioport_constructor xavix_baseball_controllers_device::device_input_ports() const
 	return m_controller_type == controller_type::STADIUM_DX ? INPUT_PORTS_NAME(xavix_esdx_controllers) : INPUT_PORTS_NAME(xavix_baseball_controllers);
 }
 
-u32 xavix_baseball_controllers_device::read_report(unsigned report)
+u32 xavix_baseball_controllers_device::read_report(u32 report)
 {
 	if (report)
 	{
@@ -90,7 +90,7 @@ u32 xavix_baseball_controllers_device::read_report(unsigned report)
 	return (u16(second) << 8) | (u16(first) << 1);
 }
 
-bool xavix_baseball_controllers_device::report_enabled(unsigned report)
+bool xavix_baseball_controllers_device::report_enabled(u32 report)
 {
 	return BIT(m_controller_power.read_safe(3), report);
 }

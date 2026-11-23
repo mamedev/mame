@@ -12,8 +12,8 @@ class tvpc_mouse_port_device : public device_t, public device_mixer_interface, p
 public:
 	tvpc_mouse_port_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	void set_mouse_index(unsigned index) { m_mouse_index = index; }
-	unsigned mouse_index() const { return m_mouse_index; }
+	void set_mouse_index(u32 index) { m_mouse_index = index; }
+	u32 mouse_index() const { return m_mouse_index; }
 
 	u8 x_r();
 	u8 y_r();
@@ -25,7 +25,7 @@ protected:
 
 private:
 	device_tvpc_mouse_interface *m_mouse;
-	unsigned m_mouse_index;
+	u32 m_mouse_index;
 };
 
 // Shared motion and button abstraction: cumulative samples feed the host counters.

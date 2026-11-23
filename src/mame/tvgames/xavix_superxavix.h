@@ -62,8 +62,8 @@ protected:
 	virtual u8 read_plotter_byte(u32 address);
 	virtual void write_plotter_byte(u32 address, u8 data);
 
-	template <unsigned Port> u8 pio_input_r(offs_t offset, u8 mem_mask);
-	template <unsigned Port> void pio_output_w(offs_t offset, u8 data, u8 mem_mask);
+	template <u32 Port> u8 pio_input_r(offs_t offset, u8 mem_mask);
+	template <u32 Port> void pio_output_w(offs_t offset, u8 data, u8 mem_mask);
 
 	required_device<superxavix_soc_device> m_super_soc;
 	optional_region_ptr<u8> m_extra;
@@ -72,7 +72,7 @@ protected:
 
 private:
 	static u8 connected_inputs(ioport_port const &port);
-	template <unsigned Port> u8 pio_input_mask_r();
+	template <u32 Port> u8 pio_input_mask_r();
 	u8 legacy_input_mask_r(offs_t port);
 
 	required_ioport_array<3> m_pio_inputs;
@@ -175,7 +175,7 @@ public:
 
 protected:
 	void superxavix_i2c_24c64(machine_config &config) ATTR_COLD;
-	template <unsigned Port> void configure_rtc_pio(machine_config &config) ATTR_COLD;
+	template <u32 Port> void configure_rtc_pio(machine_config &config) ATTR_COLD;
 	microphone_device &configure_stereo_music_input(machine_config &config) ATTR_COLD;
 	microphone_device &configure_xavix_music_input(machine_config &config) ATTR_COLD;
 	void configure_xavix_step_sensor(machine_config &config) ATTR_COLD;
@@ -190,10 +190,10 @@ private:
 	xavixport_io_device &configure_xavix_step_mat(machine_config &config) ATTR_COLD;
 	void configure_pio() ATTR_COLD;
 
-	template <unsigned Port> u8 pio_input_r(offs_t offset, u8 mem_mask);
-	template <unsigned Port> void pio_output_w(offs_t offset, u8 data, u8 mem_mask);
-	template <unsigned Port> u8 pio_rtc_input_r(offs_t offset, u8 mem_mask);
-	template <unsigned Port> void pio_rtc_output_w(offs_t offset, u8 data, u8 mem_mask);
+	template <u32 Port> u8 pio_input_r(offs_t offset, u8 mem_mask);
+	template <u32 Port> void pio_output_w(offs_t offset, u8 data, u8 mem_mask);
+	template <u32 Port> u8 pio_rtc_input_r(offs_t offset, u8 mem_mask);
+	template <u32 Port> void pio_rtc_output_w(offs_t offset, u8 data, u8 mem_mask);
 
 	optional_device<s35390a_device> m_rtc;
 };

@@ -48,15 +48,15 @@ public:
 	template <typename... T> void set_external_data_read_callback(T &&... args) { m_external_data_read_cb.set(std::forward<T>(args)...); }
 	void use_mapped_code() { m_external_code_read_cb.set(*this, FUNC(xavix_soc_device::external_r)); }
 
-	template <unsigned Port> auto io_input_callback() { return m_io.lookup()->input_callback<Port>(); }
-	template <unsigned Port> auto io_output_callback() { return m_io.lookup()->output_callback<Port>(); }
-	template <unsigned Channel> auto adc_input_callback() { return m_adc.lookup()->input_callback<Channel>(); }
-	template <unsigned Port> auto anport_input_callback() { return m_anport.lookup()->input_callback<Port>(); }
+	template <u32 Port> auto io_input_callback() { return m_io.lookup()->input_callback<Port>(); }
+	template <u32 Port> auto io_output_callback() { return m_io.lookup()->output_callback<Port>(); }
+	template <u32 Channel> auto adc_input_callback() { return m_adc.lookup()->input_callback<Channel>(); }
+	template <u32 Port> auto anport_input_callback() { return m_anport.lookup()->input_callback<Port>(); }
 	void set_adc_audio_channel(u8 channel) { m_adc.lookup()->set_audio_channel(channel); }
-	void set_adc_audio_input(unsigned input, u8 channel) { m_adc.lookup()->set_audio_input(input, channel); }
+	void set_adc_audio_input(u32 input, u8 channel) { m_adc.lookup()->set_audio_input(input, channel); }
 	void add_adc_route(device_sound_interface &source, u32 output, double gain, u32 input = 0) { source.add_route(output, *m_adc.lookup(), gain, input); }
-	void set_anport_counter_mode(unsigned port) { m_anport.lookup()->set_counter_mode(port); }
-	void set_anport_counter_saturation(unsigned port) { m_anport.lookup()->set_counter_saturation(port); }
+	void set_anport_counter_mode(u32 port) { m_anport.lookup()->set_counter_mode(port); }
+	void set_anport_counter_saturation(u32 port) { m_anport.lookup()->set_counter_saturation(port); }
 
 	auto lightgun_read_callback() { return m_lightgun_read_cb.bind(); }
 	auto power_read_callback() { return m_power_read_cb.bind(); }
@@ -66,9 +66,9 @@ public:
 	template <typename... T> void set_vblank_callback(T &&... args) { m_vblank_cb.set(std::forward<T>(args)...); }
 	auto raster_vblank_callback() { return m_video.lookup()->vblank_callback(); }
 
-	template <unsigned Event> void trigger_io_event() { m_io->trigger_event<Event>(); }
-	template <unsigned Port> u8 io_direction() const { return m_io->direction<Port>(); }
-	template <unsigned Port> u8 io_data_latch() { return m_io->data_latch<Port>(); }
+	template <u32 Event> void trigger_io_event() { m_io->trigger_event<Event>(); }
+	template <u32 Port> u8 io_direction() const { return m_io->direction<Port>(); }
+	template <u32 Port> u8 io_data_latch() { return m_io->data_latch<Port>(); }
 	std::span<u8> backup_ram() { return { m_mainram.end() - BACKUP_RAM_SIZE, BACKUP_RAM_SIZE }; }
 	u8 read_banked_data_bypass(u32 address);
 	u8 read_program_byte(offs_t address) { return m_program.read_byte(address); }
@@ -102,7 +102,7 @@ protected:
 	required_device<xavix_video_device> m_video;
 
 private:
-	static constexpr unsigned BACKUP_RAM_SIZE = 0x1000;
+	static constexpr u32 BACKUP_RAM_SIZE = 0x1000;
 
 	void configure_screen() ATTR_COLD;
 	void xavix_map(address_map &map) ATTR_COLD;
@@ -190,11 +190,11 @@ class superxavix_soc_device : public xavix2000_soc_device
 {
 public:
 	superxavix_soc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	template <unsigned Port> auto pio_input_callback() { return m_pio.lookup()->input_callback<Port>(); }
-	template <unsigned Port> auto pio_input_mask_callback() { return m_pio.lookup()->input_mask_callback<Port>(); }
-	template <unsigned Port> auto pio_output_callback() { return m_pio.lookup()->output_callback<Port>(); }
+	template <u32 Port> auto pio_input_callback() { return m_pio.lookup()->input_callback<Port>(); }
+	template <u32 Port> auto pio_input_mask_callback() { return m_pio.lookup()->input_mask_callback<Port>(); }
+	template <u32 Port> auto pio_output_callback() { return m_pio.lookup()->output_callback<Port>(); }
 	auto pio_legacy_input_mask_callback() { return m_pio.lookup()->legacy_input_mask_callback(); }
-	template <unsigned Port> void set_pio_legacy_output_mask(u8 mask) { m_pio.lookup()->set_legacy_output_mask<Port>(mask); }
+	template <u32 Port> void set_pio_legacy_output_mask(u8 mask) { m_pio.lookup()->set_legacy_output_mask<Port>(mask); }
 	auto plotter_read_callback() { return m_plotter.lookup()->memory_read_callback(); }
 	auto plotter_write_callback() { return m_plotter.lookup()->memory_write_callback(); }
 	template <typename... T> void set_plotter_flush_callback(T &&... args) { m_plotter.lookup()->set_flush_callback(std::forward<T>(args)...); }
@@ -219,10 +219,10 @@ private:
 	u8 cpu_memory_control_r(offs_t offset);
 	u8 instruction_burst_ctrl_r();
 	void instruction_burst_ctrl_w(u8 data);
-	template <unsigned Region> u8 external_legacy_access_ctrl_r();
-	template <unsigned Region> void external_legacy_access_ctrl_w(u8 data);
-	template <unsigned Region> u8 external_region_access_ctrl_r();
-	template <unsigned Region> void external_region_access_ctrl_w(u8 data);
+	template <u32 Region> u8 external_legacy_access_ctrl_r();
+	template <u32 Region> void external_legacy_access_ctrl_w(u8 data);
+	template <u32 Region> u8 external_region_access_ctrl_r();
+	template <u32 Region> void external_region_access_ctrl_w(u8 data);
 	u8 output_clock_r(offs_t offset);
 	void output_clock_w(offs_t offset, u8 data);
 

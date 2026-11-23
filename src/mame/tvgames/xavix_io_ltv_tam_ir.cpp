@@ -103,7 +103,7 @@ TIMER_CALLBACK_MEMBER(xavix_tamagotchi_ir_device::poll_stream)
 		return;
 
 	// Bound work per poll, including when discarding an oversized frame.
-	for (unsigned count = 0; count < MAX_PACKET_BYTES + 2; count++)
+	for (u32 count = 0; count < MAX_PACKET_BYTES + 2; count++)
 	{
 		u8 data;
 		if (!m_stream->input(&data, 1))
@@ -285,7 +285,7 @@ void xavix_tamagotchi_ir_device::finish_transmit_packet()
 	{
 		m_stream->output(u8(m_transmit_bytes >> 8));
 		m_stream->output(u8(m_transmit_bytes));
-		for (unsigned index = 0; index < m_transmit_bytes; index++)
+		for (u32 index = 0; index < m_transmit_bytes; index++)
 			m_stream->output(m_transmit_packet[index]);
 	}
 	LOGMASKED(LOG_PROTOCOL, "%s: Tamagotchi IR frame (%u bytes, %u partial bits)\n",

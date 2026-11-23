@@ -17,8 +17,8 @@ public:
 	enum class target_shape { DISK, ROD };
 
 protected:
-	static constexpr unsigned IMAGE_WIDTH = 32;
-	static constexpr unsigned IMAGE_HEIGHT = 32;
+	static constexpr u32 IMAGE_WIDTH = 32;
+	static constexpr u32 IMAGE_HEIGHT = 32;
 
 	std::array<u8, IMAGE_WIDTH * IMAGE_HEIGHT> m_image;
 
@@ -59,7 +59,7 @@ protected:
 
 private:
 	// TODO: Measure the sensor oscillator, pixel period and exposure-time register units.
-	static constexpr unsigned FRAME_GAP_CLOCKS = 2048;
+	static constexpr u32 FRAME_GAP_CLOCKS = 2048;
 
 	u32 m_pixel_low_clocks;
 	u32 m_pixel_high_clocks;
@@ -101,7 +101,7 @@ public:
 	enum class controller_type { GLOVES, REFLECTORS, ARM_COVERS };
 
 	xavix_analog_image_sensor_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	void set_target_count(unsigned count) { m_target_count = count; }
+	void set_target_count(u32 count) { m_target_count = count; }
 	void set_controller_type(controller_type type) { m_controller_type = type; }
 	void set_target_shape(target_shape shape) { m_shape = shape; }
 	void set_target_size_small(bool small) { m_target_size_small = small; }
@@ -116,7 +116,7 @@ protected:
 	virtual void capture_image() override;
 
 private:
-	static constexpr unsigned MAX_TARGETS = 4;
+	static constexpr u32 MAX_TARGETS = 4;
 
 	required_ioport m_ambient;
 	optional_ioport_array<MAX_TARGETS> m_target_x;
@@ -124,7 +124,7 @@ private:
 	optional_ioport_array<MAX_TARGETS> m_target_size;
 	optional_ioport_array<MAX_TARGETS> m_target_hidden;
 	required_ioport m_target_angle;
-	unsigned m_target_count;
+	u32 m_target_count;
 	controller_type m_controller_type;
 	target_shape m_shape;
 	bool m_target_size_small;

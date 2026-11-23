@@ -34,18 +34,18 @@ protected:
 	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 private:
-	static constexpr unsigned VOICE_COUNT = 16;
-	static constexpr unsigned TEMPO_TIMER_COUNT = 4;
-	static constexpr unsigned OUTPUT_LANE_COUNT = 4;
-	static constexpr unsigned STREAM_TICKS_PER_SAMPLE = 16;
-	static constexpr unsigned CLOCKS_PER_DIVIDER_TICK = 8;
+	static constexpr u32 VOICE_COUNT = 16;
+	static constexpr u32 TEMPO_TIMER_COUNT = 4;
+	static constexpr u32 OUTPUT_LANE_COUNT = 4;
+	static constexpr u32 STREAM_TICKS_PER_SAMPLE = 16;
+	static constexpr u32 CLOCKS_PER_DIVIDER_TICK = 8;
 	static constexpr u8 SAMPLE_END = 0x80;
 	static constexpr u8 MULTIPLEX_VOICE_ORDER[] = { 0x0, 0xa, 0x7, 0xd, 0xc, 0x6, 0xb, 0x1, 0x4, 0xe, 0x3, 0x9, 0x8, 0x2, 0xf, 0x5 };
 	static constexpr u8 PARALLEL_VOICE_ORDER[] = { 0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf };
 	static_assert(std::size(MULTIPLEX_VOICE_ORDER) == VOICE_COUNT);
 	static_assert(std::size(PARALLEL_VOICE_ORDER) == VOICE_COUNT);
 
-	enum register_index : unsigned
+	enum register_index : u32
 	{
 		WAVE_CONTROL = 0,
 		WAVE_POSITION,
@@ -62,7 +62,7 @@ private:
 		REGISTER_COUNT
 	};
 
-	enum descriptor_offset : unsigned
+	enum descriptor_offset : u32
 	{
 		DESCRIPTOR_WAVE_CONTROL = 0x00,
 		DESCRIPTOR_WAVE_POSITION = 0x02,
@@ -74,7 +74,7 @@ private:
 		DESCRIPTOR_ENVELOPE_BANK = 0x0e
 	};
 
-	enum control_phase : unsigned
+	enum control_phase : u32
 	{
 		PRESET_VOLUME_PHASE = 0,
 		LOAD_WAVE_CONTROL_PHASE = 1,
@@ -116,7 +116,7 @@ private:
 		ENVELOPE_DECAY
 	};
 
-	enum output_channel : unsigned
+	enum output_channel : u32
 	{
 		OUTPUT_LEFT = 0,
 		OUTPUT_RIGHT,
@@ -152,9 +152,9 @@ private:
 		u8 volume[OUTPUT_CHANNEL_COUNT]{};
 		u8 sample = 0;
 
-		bool active_at(unsigned clock) const
+		bool active_at(u32 clock) const
 		{
-			return active && (last_active_clock < 0 || clock >= unsigned(last_active_clock));
+			return active && (last_active_clock < 0 || clock >= u32(last_active_clock));
 		}
 	};
 
@@ -189,9 +189,9 @@ private:
 		u8 dac_control = 0;
 
 		void reset_controls();
-		void mix_slot(unsigned voice, const voice_output &output, u8 rate_divider, std::span<const int> events, stereo_output &held, stereo_output &total);
+		void mix_slot(u32 voice, const voice_output &output, u8 rate_divider, std::span<const int> events, stereo_output &held, stereo_output &total);
 		stereo_output held_output() const;
-		unsigned voice_limit() const { return BIT(mixer_control, 5) ? 4 : BIT(mixer_control, 4) ? 8 : VOICE_COUNT; }
+		u32 voice_limit() const { return BIT(mixer_control, 5) ? 4 : BIT(mixer_control, 4) ? 8 : VOICE_COUNT; }
 		bool parallel() const { return BIT(dac_control, 7); }
 		s32 amplifier_gain() const;
 
@@ -226,15 +226,15 @@ private:
 	void update_descriptor_tap();
 	void update_irq();
 
-	u16 &voice_register(unsigned voice, unsigned index);
-	u8 descriptor_byte_r(unsigned voice, unsigned field) { return m_descriptors.read_byte((u16(m_work_page) << 8) | (voice << 4) | field); }
-	u16 descriptor_word_r(unsigned voice, unsigned field) { return u16(descriptor_byte_r(voice, field)) | (u16(descriptor_byte_r(voice, field + 1)) << 8); }
-	void descriptor_byte_w(unsigned voice, unsigned field, u8 data) { m_descriptors.write_byte((u16(m_work_page) << 8) | (voice << 4) | field, data); }
+	u16 &voice_register(u32 voice, u32 index);
+	u8 descriptor_byte_r(u32 voice, u32 field) { return m_descriptors.read_byte((u16(m_work_page) << 8) | (voice << 4) | field); }
+	u16 descriptor_word_r(u32 voice, u32 field) { return u16(descriptor_byte_r(voice, field)) | (u16(descriptor_byte_r(voice, field + 1)) << 8); }
+	void descriptor_byte_w(u32 voice, u32 field, u8 data) { m_descriptors.write_byte((u16(m_work_page) << 8) | (voice << 4) | field, data); }
 
 	void render_frame(std::span<const int> event_clocks);
-	voice_output advance_wave(unsigned voice);
-	void run_control_phase(unsigned voice, unsigned phase, envelope_update &envelope);
-	void advance_envelope(unsigned voice, output_channel channel, envelope_update &envelope, u16 decay_source);
+	voice_output advance_wave(u32 voice);
+	void run_control_phase(u32 voice, u32 phase, envelope_update &envelope);
+	void advance_envelope(u32 voice, output_channel channel, envelope_update &envelope, u16 decay_source);
 	static constexpr u16 decay_pair(u16 value);
 
 	void reschedule_tempo_timers(u8 timer_mask = 0x0f);

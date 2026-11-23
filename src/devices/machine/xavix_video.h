@@ -18,8 +18,8 @@ class xavix_video_device : public device_t, public device_video_interface, publi
 public:
 	static constexpr u32 NTSC_LINE_CLOCKS = 2730;
 	static constexpr u32 PAL_LINE_CLOCKS = 2724;
-	static constexpr unsigned NTSC_FIELD_HALF_LINES = 525;
-	static constexpr unsigned PAL_FIELD_HALF_LINES = 625;
+	static constexpr u32 NTSC_FIELD_HALF_LINES = 525;
+	static constexpr u32 PAL_FIELD_HALF_LINES = 625;
 	static constexpr int PICTURE_PIXEL_CLOCKS = 8;
 
 	// TODO: Confirm PAL-M and PAL-N selection and status encoding on applicable hardware.
@@ -52,12 +52,12 @@ protected:
 	static constexpr int TILEMAP_WRAP_HEIGHT = 0x100;
 	static constexpr u8 TRANSPARENT_HUE_MIN = 0x18;
 	static constexpr u8 INLINE_HEADER_END = 0x06;
-	static constexpr unsigned COLOR_EFFECT_NOISE_BITS = 3;
-	static constexpr unsigned COLOR_EFFECT_NOISE_LEVELS = 1U << COLOR_EFFECT_NOISE_BITS;
+	static constexpr u32 COLOR_EFFECT_NOISE_BITS = 3;
+	static constexpr u32 COLOR_EFFECT_NOISE_LEVELS = 1U << COLOR_EFFECT_NOISE_BITS;
 
 	enum class palette_plane { SH, L };
 
-	enum tilemap_register : unsigned
+	enum tilemap_register : u32
 	{
 		TILEMAP_PLANE_LOW = 0x00,
 		TILEMAP_PLANE_MIDDLE = 0x01,
@@ -77,7 +77,7 @@ protected:
 		TILEMAP_ENABLE = 0x80
 	};
 
-	enum sprite_ram_plane : unsigned
+	enum sprite_ram_plane : u32
 	{
 		SPRITE_ATTR0 = 0 * SPRITE_COUNT,
 		SPRITE_ATTR1 = 1 * SPRITE_COUNT,
@@ -147,7 +147,7 @@ protected:
 		u16 top;
 	};
 
-	enum : unsigned
+	enum : u32
 	{
 		PREDICT_FIELD = 0x01,
 		PREDICT_NMI = 0x02,
@@ -175,13 +175,13 @@ protected:
 	{
 	public:
 		packed_reader(device_delegate<u8 (u32)> &read, offs_t address) : m_read(read), m_address(address) { }
-		u8 read(unsigned bits);
+		u8 read(u32 bits);
 
 	private:
 		device_delegate<u8 (u32)> &m_read;
 		offs_t m_address;
 		u32 m_data = 0;
-		unsigned m_bits = 0;
+		u32 m_bits = 0;
 	};
 
 	xavix_video_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int video_hres_scale);
@@ -207,9 +207,9 @@ protected:
 	virtual std::pair<int, int> render_offset() const;
 	virtual auto decode_pixel_layout(u8 flags) const -> pixel_layout;
 	virtual device_delegate<u8 (u32)> &tile_read_callback();
-	u32 classic_segment_base(unsigned segment) const;
-	virtual u32 graphics_segment_base(unsigned segment) const;
-	virtual u32 extended_graphics_segment_base(unsigned segment) const;
+	u32 classic_segment_base(u32 segment) const;
+	virtual u32 graphics_segment_base(u32 segment) const;
+	virtual u32 extended_graphics_segment_base(u32 segment) const;
 	void decode_graphics(memory_region *extra_region = nullptr) ATTR_COLD;
 	virtual void mix_bitmap_layer(screen_device &screen, const rectangle &cliprect) { }
 	virtual u8 video_status_r();
@@ -223,7 +223,7 @@ protected:
 	void reset_raster_origin(int row);
 	virtual rectangle picture_area() const;
 	virtual void raster_end() { }
-	picture_event_delays predict_picture_delays(unsigned events) const;
+	picture_event_delays predict_picture_delays(u32 events) const;
 	virtual void schedule_picture_irqs();
 
 	device_delegate<u8 (u32)> m_video_read_cb;
@@ -273,7 +273,7 @@ protected:
 private:
 	static constexpr int ORIGINAL_PICTURE_DELAY_CLOCKS = 24;
 	// Uncontended master clocks per byte; earlier-chip timing remains unmeasured.
-	static constexpr unsigned SPRITE_DMA_BYTE_CLOCKS = 2;
+	static constexpr u32 SPRITE_DMA_BYTE_CLOCKS = 2;
 	static const gfx_layout TILE_16X16_2BPP_LAYOUT;
 
 	static constexpr std::array<u8, TILEMAP_REGISTER_COUNT> TILEMAP_REGISTER_MASK =
@@ -309,7 +309,7 @@ private:
 	u16 apply_color_effect(u16 data, u8 noise) const;
 	void sprite_dma_ctrl_w(u8 data);
 	TIMER_CALLBACK_MEMBER(sprite_dma_tick);
-	template <unsigned Layer> void tilemap_regs_w(offs_t offset, u8 data, u8 mem_mask);
+	template <u32 Layer> void tilemap_regs_w(offs_t offset, u8 data, u8 mem_mask);
 	void segment_regs_w(offs_t offset, u8 data);
 	void sprite_address_mode_w(u8 data);
 	u8 text_array_r(offs_t offset);
@@ -343,7 +343,7 @@ private:
 	void pixel_decoder_ctrl_w(u8 data);
 	void draw_output(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(const rectangle &cliprect, int layer);
-	u32 graphics_address(graphics_source source, u8 mode, u32 entry, unsigned tile_bytes) const;
+	u32 graphics_address(graphics_source source, u8 mode, u32 entry, u32 tile_bytes) const;
 	void decode_inline_header(tile_data &tile);
 	void draw_sprites(const rectangle &cliprect);
 	void draw_tile_line(const rectangle &cliprect, const tile_data &tile, int xpos, int ypos, int line, int xoffset);
@@ -399,8 +399,8 @@ protected:
 	virtual std::pair<int, int> picture_offset() const override;
 	virtual std::pair<int, int> render_offset() const override;
 	virtual device_delegate<u8 (u32)> &tile_read_callback() override;
-	virtual u32 graphics_segment_base(unsigned segment) const override;
-	virtual u32 extended_graphics_segment_base(unsigned segment) const override;
+	virtual u32 graphics_segment_base(u32 segment) const override;
+	virtual u32 extended_graphics_segment_base(u32 segment) const override;
 	virtual void mix_bitmap_layer(screen_device &screen, const rectangle &cliprect) override;
 	virtual u8 video_status_r() override;
 
@@ -433,7 +433,7 @@ private:
 		bool enabled = false;
 	};
 
-	enum bitmap_register : unsigned
+	enum bitmap_register : u32
 	{
 		BITMAP_TOP = 0x00,
 		BITMAP_BOTTOM = 0x02,
@@ -448,7 +448,7 @@ private:
 		BITMAP_CTRL = 0x14
 	};
 
-	enum timing_register : unsigned
+	enum timing_register : u32
 	{
 		TIMING_HORIZONTAL_TOTAL = 0x00,
 		TIMING_FIELD_LEFT = 0x0a,

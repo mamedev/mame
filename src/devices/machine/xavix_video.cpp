@@ -358,11 +358,11 @@ void xavix_video_device::decode_graphics(memory_region *extra_region)
 	if (extra_region)
 	{
 		// Decode the cartridge independently of the motherboard ROM.
-		constexpr unsigned region_entries = std::size(gfxinfo) - 1;
+		constexpr u32 region_entries = std::size(gfxinfo) - 1;
 		std::array<gfx_decode_entry, region_entries * 2 + 1> entries{};
 		std::copy_n(gfxinfo, region_entries, entries.begin());
 		std::copy_n(gfxinfo, region_entries, entries.begin() + region_entries);
-		for (unsigned index = region_entries; index < region_entries * 2; ++index)
+		for (u32 index = region_entries; index < region_entries * 2; ++index)
 			entries[index].memory_region = extra_region->name().c_str();
 		decode_gfx(entries.data());
 	}
@@ -407,7 +407,7 @@ template <xavix_video_device::palette_plane Plane>
 u8 superxavix_video_device::graphics_palram_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
-		m_palette_ports[unsigned(palette_bank::GRAPHICS)].index = offset;
+		m_palette_ports[u32(palette_bank::GRAPHICS)].index = offset;
 	return xavix_video_device::graphics_palram_r<Plane>(offset);
 }
 
@@ -418,7 +418,7 @@ u8 superxavix_video_device::bitmap_palram_r(offs_t offset)
 	if (machine().side_effects_disabled())
 		return data;
 
-	m_palette_ports[unsigned(palette_bank::BITMAP)].index = offset;
+	m_palette_ports[u32(palette_bank::BITMAP)].index = offset;
 	return std::exchange(m_bitmap_palette_read_latch, data);
 }
 
@@ -461,13 +461,13 @@ void superxavix_video_device::set_palette_data(int pen, u16 data)
 	// Direct and component writes share an address and capture the merged colour.
 	if (pen < PALETTE_BANK_ENTRIES)
 	{
-		m_palette_ports[unsigned(palette_bank::GRAPHICS)] = { u8(pen), data };
+		m_palette_ports[u32(palette_bank::GRAPHICS)] = { u8(pen), data };
 		xavix_video_device::set_palette_data(pen, data);
 	}
 	else
 	{
 		int const index = pen & (PALETTE_BANK_ENTRIES - 1);
-		m_palette_ports[unsigned(palette_bank::BITMAP)] = { u8(index), data };
+		m_palette_ports[u32(palette_bank::BITMAP)] = { u8(index), data };
 		m_bitmap_palram_sh[index] = data;
 		m_bitmap_palram_l[index] = data >> 8;
 		update_pen(pen, data);
@@ -575,21 +575,21 @@ void superxavix_video_device::graphics_mode_w(u8 data)
 template <superxavix_video_device::palette_bank Bank>
 void superxavix_video_device::palette_index_w(u8 data)
 {
-	auto &port = m_palette_ports[unsigned(Bank)];
+	auto &port = m_palette_ports[u32(Bank)];
 	port.index = data;
-	port.color_latch = palette_data(unsigned(Bank) * PALETTE_BANK_ENTRIES + data);
+	port.color_latch = palette_data(u32(Bank) * PALETTE_BANK_ENTRIES + data);
 }
 
 template <superxavix_video_device::palette_bank Bank>
 u8 superxavix_video_device::palette_index_r()
 {
-	return m_palette_ports[unsigned(Bank)].index;
+	return m_palette_ports[u32(Bank)].index;
 }
 
 template <superxavix_video_device::palette_bank Bank, superxavix_video_device::palette_component Component>
 u8 superxavix_video_device::palette_component_r()
 {
-	u16 const color = m_palette_ports[unsigned(Bank)].color_latch;
+	u16 const color = m_palette_ports[u32(Bank)].color_latch;
 	if constexpr (Component == palette_component::HUE)
 		return pen_hue(color) << 2;
 	else if constexpr (Component == palette_component::SATURATION)
@@ -605,7 +605,7 @@ void superxavix_video_device::palette_component_w(u8 data)
 
 	(Bank == palette_bank::BITMAP ? m_bitmap_palette_read_latch : m_graphics_palette_read_latch) = data;
 
-	int const pen = unsigned(Bank) * PALETTE_BANK_ENTRIES + m_palette_ports[unsigned(Bank)].index;
+	int const pen = u32(Bank) * PALETTE_BANK_ENTRIES + m_palette_ports[u32(Bank)].index;
 	u16 color = palette_data(pen);
 
 	if constexpr (Component == palette_component::HUE)
@@ -684,7 +684,7 @@ void xavix_video_device::pixel_decoder_ctrl_w(u8 data)
 		logerror("%s: unimplemented video control 6fc0 = %02x\n", machine().describe_context(), data);
 }
 
-template <unsigned Layer>
+template <u32 Layer>
 void xavix_video_device::tilemap_regs_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	/*

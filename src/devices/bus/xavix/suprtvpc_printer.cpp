@@ -156,9 +156,9 @@ void suprtvpc_printer_device::clear_rows()
 void suprtvpc_printer_device::print_page()
 {
 	bitmap_ind16 bitmap(ROW_BYTES * 8, m_height);
-	for (unsigned y = 0; y < m_height; ++y)
+	for (u32 y = 0; y < m_height; ++y)
 	{
-		for (unsigned x = 0; x < ROW_BYTES * 8; ++x)
+		for (u32 x = 0; x < ROW_BYTES * 8; ++x)
 			bitmap.pix(y, x) = BIT(m_page[y * ROW_BYTES + x / 8], x % 8);
 	}
 

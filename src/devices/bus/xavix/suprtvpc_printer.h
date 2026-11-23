@@ -27,8 +27,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	static constexpr unsigned ROW_BYTES = 48;
-	static constexpr unsigned MAX_ROWS = 0xffff;
+	static constexpr u32 ROW_BYTES = 48;
+	static constexpr u32 MAX_ROWS = 0xffff;
 	static constexpr rgb_t PALETTE[] = { rgb_t::white(), rgb_t::black() };
 
 	TIMER_CALLBACK_MEMBER(ready);

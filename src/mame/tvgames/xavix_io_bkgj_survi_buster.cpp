@@ -42,7 +42,7 @@ ioport_constructor xavix_survi_buster_device::device_input_ports() const
 	return INPUT_PORTS_NAME(xavix_survi_buster);
 }
 
-u32 xavix_survi_buster_device::read_report(unsigned)
+u32 xavix_survi_buster_device::read_report(u32)
 {
 	return BIT(m_survi_buster_power->read(), 0) && BIT(m_survi_buster->read(), 0)
 		? SURVI_BUSTER_TRIGGER_REPORT

@@ -23,7 +23,7 @@ xavix_ir_motion_base_device::xavix_ir_motion_base_device(const machine_config &m
 {
 }
 
-u8 xavix_ir_motion_base_device::motion_report(unsigned player, bool button, u8 strength)
+u8 xavix_ir_motion_base_device::motion_report(u32 player, bool button, u8 strength)
 {
 	assert(player < 2);
 	return MOTION_REPORTS[player][button][strength & 3];
@@ -254,14 +254,14 @@ ioport_constructor xavix_ir_motion_device::device_input_ports() const
 	return m_ports;
 }
 
-u32 xavix_ir_motion_device::read_report(unsigned report)
+u32 xavix_ir_motion_device::read_report(u32 report)
 {
 	u8 const level = m_ir_strength[report]->read() & 3;
 	u8 const buttons = m_ir_button[report]->read();
 	return motion_report(report, BIT(buttons, 0), level);
 }
 
-bool xavix_ir_motion_device::report_enabled(unsigned report)
+bool xavix_ir_motion_device::report_enabled(u32 report)
 {
 	return BIT(m_ir_power.read_safe(3), report);
 }

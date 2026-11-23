@@ -47,7 +47,7 @@ ioport_constructor xavix_cardnight_remote_device::device_input_ports() const
 	return INPUT_PORTS_NAME(xavix_cardnight_remote);
 }
 
-u32 xavix_cardnight_remote_device::read_report(unsigned report)
+u32 xavix_cardnight_remote_device::read_report(u32 report)
 {
 	u8 const buttons = m_buttons->read();
 	if (BIT(buttons, 5))

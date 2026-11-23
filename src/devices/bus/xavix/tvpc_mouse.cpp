@@ -25,7 +25,7 @@ namespace {
 INPUT_PORTS_START(tvpc_mouse)
 	// Device-type validation constructs the mouse without its port.
 	auto const *const port = dynamic_cast<tvpc_mouse_port_device const *>(owner.owner());
-	unsigned const index = port ? port->mouse_index() : 0;
+	u32 const index = port ? port->mouse_index() : 0;
 
 	PORT_START("X")
 	PORT_BIT(0xff, 0x00, IPT_MOUSE_X) PORT_NAME(index ? "Mouse 2 X" : "Mouse 1 X") PORT_SENSITIVITY(25) PORT_KEYDELTA(32) PORT_CODE(MOUSECODE_X_INDEXED(index)) PORT_CODE_DEC(INPUT_CODE_INVALID) PORT_CODE_INC(INPUT_CODE_INVALID)

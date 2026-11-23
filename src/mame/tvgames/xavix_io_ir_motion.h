@@ -15,7 +15,7 @@ protected:
 
 	xavix_ir_motion_base_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, u32 bit_ticks = LATER_BIT_TICKS);
 
-	static u8 motion_report(unsigned player, bool button, u8 strength);
+	static u8 motion_report(u32 player, bool button, u8 strength);
 
 private:
 	static constexpr u8 MOTION_REPORTS[2][2][4] =
@@ -51,8 +51,8 @@ protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual u32 read_report(unsigned report) override;
-	virtual bool report_enabled(unsigned report) override;
+	virtual u32 read_report(u32 report) override;
+	virtual bool report_enabled(u32 report) override;
 
 private:
 	static constexpr u32 ORIGINAL_BIT_TICKS = 0x47 * 64;

@@ -17,7 +17,7 @@ public:
 
 protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-	virtual u32 read_report(unsigned report) override;
+	virtual u32 read_report(u32 report) override;
 	virtual bool reports_enabled() override;
 
 private:

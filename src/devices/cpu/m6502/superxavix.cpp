@@ -129,8 +129,8 @@ bool superxavix_device::advance_external_bus(u64 cycle)
 			continue;
 		}
 
-		unsigned const lanes = BIT(m_bus_control, 0) ? 3 : (1U << BIT(m_bus_address, 0));
-		for (unsigned lane = 0; lane != 2; ++lane)
+		u32 const lanes = BIT(m_bus_control, 0) ? 3 : (1U << BIT(m_bus_address, 0));
+		for (u32 lane = 0; lane != 2; ++lane)
 		{
 			if (BIT(lanes, lane) && !BIT(m_bus_lanes, lane))
 			{
@@ -152,11 +152,11 @@ bool superxavix_device::advance_external_bus(u64 cycle)
 
 		if (m_bus_kind == access_kind::INSTRUCTION)
 		{
-			for (unsigned lane = 0; lane != 2; ++lane)
+			for (u32 lane = 0; lane != 2; ++lane)
 			{
 				if (BIT(lanes, lane))
 				{
-					unsigned const index = (m_bus_address & 2) | lane;
+					u32 const index = (m_bus_address & 2) | lane;
 					m_instruction_cache[index] = m_bus_bytes[lane];
 					m_instruction_valid |= 1U << index;
 				}
@@ -165,7 +165,7 @@ bool superxavix_device::advance_external_bus(u64 cycle)
 		else
 		{
 			m_data_tag = m_bus_address & ~1U;
-			for (unsigned lane = 0; lane != 2; ++lane)
+			for (u32 lane = 0; lane != 2; ++lane)
 			{
 				if (BIT(lanes, lane))
 					m_data_cache[lane] = m_bus_bytes[lane];
@@ -173,7 +173,7 @@ bool superxavix_device::advance_external_bus(u64 cycle)
 			m_data_valid |= lanes;
 		}
 
-		unsigned const count = BIT(m_bus_control, 0) ? 2 - BIT(m_bus_address, 0) : 1;
+		u32 const count = BIT(m_bus_control, 0) ? 2 - BIT(m_bus_address, 0) : 1;
 		if (m_bus_remaining <= count)
 		{
 			m_bus_kind = access_kind::NONE;
@@ -181,10 +181,10 @@ bool superxavix_device::advance_external_bus(u64 cycle)
 		}
 		else
 		{
-			unsigned const page = BIT(m_bus_control, 4, 2);
-			unsigned const mask = page ? util::make_bitmask<unsigned>(page + 1) : 0;
+			u32 const page = BIT(m_bus_control, 4, 2);
+			u32 const mask = page ? util::make_bitmask<u32>(page + 1) : 0;
 			u32 const next = m_bus_address + count;
-			unsigned const cycles = mask && !((m_bus_address ^ next) & ~mask)
+			u32 const cycles = mask && !((m_bus_address ^ next) & ~mask)
 				? page_cycles(m_bus_control) : access_cycles(m_bus_control);
 			m_bus_address = next;
 			m_bus_remaining -= count;
@@ -198,7 +198,7 @@ bool superxavix_device::advance_external_bus(u64 cycle)
 
 void superxavix_device::start_external_access()
 {
-	unsigned const region_bits = BIT(m_access_address, 21, 2);
+	u32 const region_bits = BIT(m_access_address, 21, 2);
 	m_bus_control = m_memory_control_cb(region_bits < 2 ? 0 : region_bits - 1);
 	u64 const grant = std::max(m_access_start + 1,
 		m_bus_available + (m_bus_last_kind == access_kind::INSTRUCTION && m_access_kind == access_kind::INSTRUCTION ? 1 : 0));

@@ -82,7 +82,7 @@ ioport_constructor xavix_daigunder_robots_device::device_input_ports() const
 	return INPUT_PORTS_NAME(xavix_daigunder_robots);
 }
 
-u16 xavix_daigunder_robots_device::control_report_r(unsigned player)
+u16 xavix_daigunder_robots_device::control_report_r(u32 player)
 {
 	return CONTROL_REPORTS[player][m_robot_controls[player]->read() & 7];
 }
@@ -92,14 +92,14 @@ u16 xavix_daigunder_robots_device::accessory_report_r()
 	return ACCESSORY_REPORTS[m_accessory_controls->read() & 7];
 }
 
-u16 xavix_daigunder_robots_device::identity_report_r(unsigned part)
+u16 xavix_daigunder_robots_device::identity_report_r(u32 part)
 {
-	unsigned const player = BIT(m_screen->frame_number(), 0);
+	u32 const player = BIT(m_screen->frame_number(), 0);
 	u8 const identity = m_robot_id[player]->read() & 0x0f;
 	return identity <= 10 ? IDENTITY_REPORTS[player][identity][part] : control_report_r(player);
 }
 
-u32 xavix_daigunder_robots_device::read_report(unsigned report)
+u32 xavix_daigunder_robots_device::read_report(u32 report)
 {
 	if (report < 2)
 		return control_report_r(report);

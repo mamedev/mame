@@ -286,8 +286,8 @@ void xavix_video_device::sync_video_counters()
 
 u32 xavix_video_device::arena_interval(counter_config const &config, video_counters const &counters, arena_state const &arena) const
 {
-	unsigned const x = counters.picture_x;
-	unsigned const boundary = 8 * (arena.flag ? m_arena_end : m_arena_start);
+	u32 const x = counters.picture_x;
+	u32 const boundary = 8 * (arena.flag ? m_arena_end : m_arena_start);
 	bool const active_line = counters.picture_y >= PICTURE_FIRST_ROW && counters.picture_y < PICTURE_END_ROW;
 	bool const match = active_line && !BIT(x, 11) && (x / PICTURE_PIXEL_CLOCKS == boundary / PICTURE_PIXEL_CLOCKS);
 	if (arena.compare || match)
@@ -313,7 +313,7 @@ bool xavix_video_device::advance_arena(counter_config const &config, video_count
 	{
 		u32 const elapsed = std::min<u64>(ticks, arena_interval(config, counters, arena));
 		advance_counters(config, counters, elapsed - 1);
-		unsigned const x = counters.picture_x;
+		u32 const x = counters.picture_x;
 		bool const match = (counters.picture_y >= PICTURE_FIRST_ROW) && (counters.picture_y < PICTURE_END_ROW)
 				&& !BIT(x, 11) && ((x >> 3) == (arena.flag ? m_arena_end : m_arena_start));
 		edge |= arena.compare && !match;
@@ -333,7 +333,7 @@ bool xavix_video_device::advance_arena(counter_config const &config, video_count
 	return edge;
 }
 
-xavix_video_device::picture_event_delays xavix_video_device::predict_picture_delays(unsigned events) const
+xavix_video_device::picture_event_delays xavix_video_device::predict_picture_delays(u32 events) const
 {
 	counter_config const config = counter_parameters();
 	u64 const now = std::max(m_video_counter_ticks, attotime_to_clocks(machine().time()));
@@ -348,7 +348,7 @@ xavix_video_device::picture_event_delays xavix_video_device::predict_picture_del
 	while (true)
 	{
 		u32 const interval = (events & PREDICT_ARENA) ? arena_interval(config, counters, arena) : counter_interval(config, counters);
-		auto const compare = [this, &events, &counters, interval, now, &elapsed] (unsigned event, unsigned x, unsigned y, attotime &delay)
+		auto const compare = [this, &events, &counters, interval, now, &elapsed] (u32 event, u32 x, u32 y, attotime &delay)
 		{
 			if (events & event)
 			{
@@ -398,7 +398,7 @@ void xavix_video_device::schedule_picture_irqs()
 {
 	// Picture counters schedule the arena IRQ. Other video interrupts
 	// and partial updates use the raster position.
-	unsigned const arena = ((m_arena_ctrl & ARENA_IRQ_ENABLE) && !m_arena_irq_pending) ? PREDICT_ARENA : 0;
+	u32 const arena = ((m_arena_ctrl & ARENA_IRQ_ENABLE) && !m_arena_irq_pending) ? PREDICT_ARENA : 0;
 	picture_event_delays const next = predict_picture_delays(PREDICT_FIELD | arena);
 	m_video_counter_timer->adjust(next.field);
 	if (!m_arena_irq_timer->enabled() || !m_arena_irq_timer->remaining().is_zero())
@@ -407,7 +407,7 @@ void xavix_video_device::schedule_picture_irqs()
 
 void superxavix_video_device::schedule_picture_irqs()
 {
-	unsigned const arena = ((m_arena_ctrl & ARENA_IRQ_ENABLE) && !m_arena_irq_pending) ? PREDICT_ARENA : 0;
+	u32 const arena = ((m_arena_ctrl & ARENA_IRQ_ENABLE) && !m_arena_irq_pending) ? PREDICT_ARENA : 0;
 	picture_event_delays const next = predict_picture_delays(PREDICT_FIELD | PREDICT_NMI | PREDICT_RASTER | arena);
 
 	// Reconsider unreachable comparisons at the next field boundary, without

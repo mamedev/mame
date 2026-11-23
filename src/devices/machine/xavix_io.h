@@ -17,9 +17,9 @@ public:
 	xavix_io_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	// Callback masks identify pins configured as outputs.
-	template <unsigned Port> auto input_callback() { return m_input_cb[Port].bind(); }
+	template <u32 Port> auto input_callback() { return m_input_cb[Port].bind(); }
 
-	template <unsigned Port> auto output_callback() { return m_output_cb[Port].bind(); }
+	template <u32 Port> auto output_callback() { return m_output_cb[Port].bind(); }
 	auto irq_callback() { return m_irq_cb.bind(); }
 	u8 external_input_r(offs_t port, u8 mem_mask);
 	void external_output_w(offs_t port, u8 data, u8 mem_mask);
@@ -27,7 +27,7 @@ public:
 	void map(address_map &map) ATTR_COLD;
 	void event_map(address_map &map) ATTR_COLD;
 
-	template <unsigned Event> void trigger_event()
+	template <u32 Event> void trigger_event()
 	{
 		static_assert(Event < 4);
 		if (BIT(m_event_enable, Event))
@@ -42,8 +42,8 @@ public:
 
 	virtual u8 direction_r(offs_t offset);
 	virtual u8 data_r(offs_t offset);
-	template <unsigned Port> u8 direction() const { static_assert(Port < 2); return output_mask(Port); }
-	template <unsigned Port> u8 data_latch() { static_assert(Port < 2); return output_latch(Port); }
+	template <u32 Port> u8 direction() const { static_assert(Port < 2); return output_mask(Port); }
+	template <u32 Port> u8 data_latch() { static_assert(Port < 2); return output_latch(Port); }
 
 protected:
 	xavix_io_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
@@ -52,8 +52,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	virtual u8 output_mask(unsigned port) const;
-	virtual u8 output_latch(unsigned port);
+	virtual u8 output_mask(u32 port) const;
+	virtual u8 output_latch(u32 port);
 
 private:
 	u8 event_enable_r();
@@ -61,7 +61,7 @@ private:
 	u8 event_status_r();
 	void event_ack_w(u8 data);
 	void update_irq();
-	void update_output(unsigned port);
+	void update_output(u32 port);
 
 	devcb_read8::array<2> m_input_cb;
 
@@ -91,8 +91,8 @@ public:
 
 protected:
 	// xavix_io_device implementation
-	virtual u8 output_mask(unsigned port) const override;
-	virtual u8 output_latch(unsigned port) override;
+	virtual u8 output_mask(u32 port) const override;
+	virtual u8 output_latch(u32 port) override;
 
 private:
 	required_device<superxavix_pio_device> m_pio;

@@ -37,7 +37,7 @@ protected:
 
 private:
 	enum : u8 { IDLE, HEADER_HIGH, HEADER_LOW, DATA_HIGH, DATA_LOW, TRAILER };
-	static constexpr unsigned PACKET_BYTES = 25;
+	static constexpr u32 PACKET_BYTES = 25;
 
 	void stop();
 	TIMER_CALLBACK_MEMBER(pulse);

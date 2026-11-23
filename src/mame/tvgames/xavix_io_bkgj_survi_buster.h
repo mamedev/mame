@@ -19,7 +19,7 @@ protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual u32 read_report(unsigned report) override;
+	virtual u32 read_report(u32 report) override;
 
 private:
 	static constexpr std::array<u32, 28> SURVI_BUSTER_SAMPLE_TICKS =

@@ -42,7 +42,7 @@
 #include "logmacro.h"
 
 
-u8 xavix_video_device::packed_reader::read(unsigned bits)
+u8 xavix_video_device::packed_reader::read(u32 bits)
 {
 	assert(bits >= 1 && bits <= 8);
 	// Retain unused low-first bits, fetching each mapped byte only when needed.
@@ -109,7 +109,7 @@ u8 xavix_video_device::pen_hue(u16 palette_data)
 const std::array<std::array<double, 2>, 48> xavix_video_device::HUE_IQ = []
 {
 	std::array<std::array<double, 2>, 48> result;
-	for (unsigned hue = 0; hue < result.size(); ++hue)
+	for (u32 hue = 0; hue < result.size(); ++hue)
 	{
 		double const angle = (18.0 - 7.5 * hue) * (std::numbers::pi / 180.0);
 		result[hue] = { std::cos(angle), std::sin(angle) };
@@ -211,18 +211,18 @@ void xavix_video_device::draw_output(screen_device &screen, bitmap_rgb32 &bitmap
 	};
 	pen_t const *const outside = side ? m_color_effect_palette.get() : palette;
 	pen_t const *const inside = side ? palette : m_color_effect_palette.get();
-	auto const span_palette = [&area, inside, outside] (unsigned span, int y)
+	auto const span_palette = [&area, inside, outside] (u32 span, int y)
 	{
 		return ((span == 1) && (y >= area.top()) && (y <= area.bottom())) ? inside : outside;
 	};
 
-	unsigned const entries = this->palette().entries();
+	u32 const entries = this->palette().entries();
 	if (!m_color_effect_palette_valid)
 	{
-		unsigned const noise_levels = (m_color_effect[2] >> 5) ? COLOR_EFFECT_NOISE_LEVELS : 1;
-		for (unsigned noise = 0; noise < noise_levels; ++noise)
+		u32 const noise_levels = (m_color_effect[2] >> 5) ? COLOR_EFFECT_NOISE_LEVELS : 1;
+		for (u32 noise = 0; noise < noise_levels; ++noise)
 		{
-			for (unsigned pen = 0; pen < entries; ++pen)
+			for (u32 pen = 0; pen < entries; ++pen)
 				m_color_effect_palette[noise * entries + pen] = pen_color(apply_color_effect(palette_data(pen), noise));
 		}
 		m_color_effect_palette_valid = true;
@@ -230,7 +230,7 @@ void xavix_video_device::draw_output(screen_device &screen, bitmap_rgb32 &bitmap
 
 	if (!(m_color_effect[2] >> 5))
 	{
-		for (unsigned span = 0; span < edges.size() - 1; ++span)
+		for (u32 span = 0; span < edges.size() - 1; ++span)
 		{
 			if (edges[span] == edges[span + 1])
 				continue;
@@ -250,17 +250,17 @@ void xavix_video_device::draw_output(screen_device &screen, bitmap_rgb32 &bitmap
 		u32 *const pixels = &bitmap.pix(y);
 		u16 const *const pens = &m_pen_bitmap.pix(y);
 
-		for (unsigned span = 0; span < edges.size() - 1; ++span)
+		for (u32 span = 0; span < edges.size() - 1; ++span)
 		{
 			pen_t const *const colors = span_palette(span, y);
-			unsigned const noise_stride = (colors == palette) ? 0 : entries;
+			u32 const noise_stride = (colors == palette) ? 0 : entries;
 			for (int x = edges[span]; x < edges[span + 1]; ++x)
 			{
 				u8 const noise = bitswap<COLOR_EFFECT_NOISE_BITS>(state, 11, 7, 0);
 				pixels[x] = colors[noise * noise_stride + pens[x]];
 
 				clock_phase += scaled_clocks_per_pixel;
-				unsigned const clocks = clock_phase / ATTOSECONDS_PER_SECOND;
+				u32 const clocks = clock_phase / ATTOSECONDS_PER_SECOND;
 				clock_phase %= ATTOSECONDS_PER_SECOND;
 				state = advance_video_noise_state(state, clocks);
 			}
@@ -272,17 +272,17 @@ void xavix_video_device::draw_output(screen_device &screen, bitmap_rgb32 &bitmap
 //  Graphics Addressing and Tilemaps
 //-------------------------------------------------
 
-u32 xavix_video_device::classic_segment_base(unsigned segment) const
+u32 xavix_video_device::classic_segment_base(u32 segment) const
 {
 	return u32(get_u16le(&m_segment_regs[segment * 2])) << 8;
 }
 
-u32 xavix_video_device::graphics_segment_base(unsigned segment) const
+u32 xavix_video_device::graphics_segment_base(u32 segment) const
 {
 	return classic_segment_base(segment);
 }
 
-u32 superxavix_video_device::graphics_segment_base(unsigned segment) const
+u32 superxavix_video_device::graphics_segment_base(u32 segment) const
 {
 	u32 const base = classic_segment_base(segment);
 	// domdance uses both tables concurrently, while ndpmj and ban_bkgj use the
@@ -290,18 +290,18 @@ u32 superxavix_video_device::graphics_segment_base(unsigned segment) const
 	return base ? base : get_u32le(&m_extended_segment_regs[segment * 4]);
 }
 
-u32 xavix_video_device::extended_graphics_segment_base(unsigned segment) const
+u32 xavix_video_device::extended_graphics_segment_base(u32 segment) const
 {
 	u16 const segment_data = get_u16le(&m_segment_regs[segment * 2]);
 	return (u32(segment_data & 0x07) << 24) | (u32(segment_data >> 3) << 11);
 }
 
-u32 superxavix_video_device::extended_graphics_segment_base(unsigned segment) const
+u32 superxavix_video_device::extended_graphics_segment_base(u32 segment) const
 {
 	return get_u32le(&m_extended_segment_regs[segment * 4]) & 0x07fff800;
 }
 
-u32 xavix_video_device::graphics_address(graphics_source source, u8 mode, u32 entry, unsigned tile_bytes) const
+u32 xavix_video_device::graphics_address(graphics_source source, u8 mode, u32 entry, u32 tile_bytes) const
 {
 	bool const sprite = source == graphics_source::SPRITE;
 
@@ -316,10 +316,10 @@ u32 xavix_video_device::graphics_address(graphics_source source, u8 mode, u32 en
 	case 0x02: // Segmented address in eight-byte units
 	case 0x03: // Segmented byte address; epo_stad uses this for its dialog backdrop after repeated strikes.
 	{
-		unsigned const shift = (mode == 0x02) ? 16 : 12;
+		u32 const shift = (mode == 0x02) ? 16 : 12;
 		if (mode == 0x02)
 			entry *= 8;
-		unsigned const segment = BIT(entry, shift, 4);
+		u32 const segment = BIT(entry, shift, 4);
 		// Segmented sprites use the classic table; tilemaps also allow the extended fallback.
 		return BIT(entry, 0, shift) + (sprite ? classic_segment_base(segment) : graphics_segment_base(segment));
 	}
@@ -459,7 +459,7 @@ void xavix_video_device::draw_tilemap(const rectangle &cliprect, int layer)
 				else
 				{
 					// rad_mtrk uses 16-bit segmented inline packets.
-					unsigned const segment = BIT(tile, 12, 4);
+					u32 const segment = BIT(tile, 12, 4);
 					data.address = (tile & 0x0fff)
 							+ (u32(get_u16le(&m_segment_regs[segment * 2])) << 8);
 				}
@@ -870,7 +870,7 @@ void superxavix_video_device::update_bitmap_rows(int scanline)
 
 void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rectangle &cliprect)
 {
-	auto const parameter = [this] (unsigned offset) { return get_u16le(&m_bitmap_params[offset]); };
+	auto const parameter = [this] (u32 offset) { return get_u16le(&m_bitmap_params[offset]); };
 
 	u8 const mode = m_bitmap_params[BITMAP_CTRL];
 	if (!BIT(mode, 0))
@@ -957,7 +957,7 @@ void superxavix_video_device::mix_bitmap_layer(screen_device &screen, const rect
 
 u32 xavix_video_device::advance_video_noise_state(u32 state, u64 clocks) const
 {
-	constexpr unsigned bits = sizeof(decltype(m_video_noise_feedback)) * 8;
+	constexpr u32 bits = sizeof(decltype(m_video_noise_feedback)) * 8;
 	constexpr u32 mask = make_bitmask<u32>(bits);
 	u32 const feedback = get_u24le(m_video_noise_feedback);
 	auto const clock = [feedback] (u32 value)
@@ -989,7 +989,7 @@ u32 xavix_video_device::advance_video_noise_state(u32 state, u64 clocks) const
 
 	// Exponentiate the one-clock state transition over GF(2).
 	linear_map jump;
-	for (unsigned bit = 0; bit < bits; ++bit)
+	for (u32 bit = 0; bit < bits; ++bit)
 		jump[bit] = clock(u32(1) << bit);
 
 	while (clocks)
@@ -1001,7 +1001,7 @@ u32 xavix_video_device::advance_video_noise_state(u32 state, u64 clocks) const
 		if (clocks)
 		{
 			linear_map squared;
-			for (unsigned bit = 0; bit < bits; ++bit)
+			for (u32 bit = 0; bit < bits; ++bit)
 				squared[bit] = apply(jump, jump[bit]);
 			jump = squared;
 		}

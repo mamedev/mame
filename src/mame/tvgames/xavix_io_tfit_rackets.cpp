@@ -59,7 +59,7 @@ ioport_constructor xavix_tfit_rackets_device::device_input_ports() const
 	return INPUT_PORTS_NAME(xavix_tfit_rackets);
 }
 
-u32 xavix_tfit_rackets_device::read_report(unsigned report)
+u32 xavix_tfit_rackets_device::read_report(u32 report)
 {
 	if (!BIT(m_racket_power->read(), report))
 		return xavix_ir_report_device_base::NO_SEQUENCE;

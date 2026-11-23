@@ -13,29 +13,29 @@ class xavix_anport_device : public device_t
 public:
 	xavix_anport_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	template <unsigned Channel> auto input_callback() { return m_input_cb[Channel].bind(); }
+	template <u32 Channel> auto input_callback() { return m_input_cb[Channel].bind(); }
 
 	void map(address_map &map) ATTR_COLD;
 
-	void set_counter_mode(unsigned channel)
+	void set_counter_mode(u32 channel)
 	{
 		assert(channel < m_counter_mode.size());
 		m_counter_mode[channel] = true;
 	}
 
-	void set_counter_saturation(unsigned channel)
+	void set_counter_saturation(u32 channel)
 	{
 		assert(channel < m_counter_saturation.size());
 		m_counter_saturation[channel] = true;
 	}
 
-	template <unsigned Channel> u8 data_r()
+	template <u32 Channel> u8 data_r()
 	{
 		static_assert(Channel < 4);
 		return counter_r(Channel);
 	}
 
-	template <unsigned Channel> void data_w(u8 data)
+	template <u32 Channel> void data_w(u8 data)
 	{
 		static_assert(Channel < 4);
 		counter_w(Channel, data);
@@ -47,9 +47,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	u8 input_r(unsigned channel);
-	u8 counter_r(unsigned channel);
-	void counter_w(unsigned channel, u8 data);
+	u8 input_r(u32 channel);
+	u8 counter_r(u32 channel);
+	void counter_w(u32 channel, u8 data);
 
 	devcb_read8::array<4> m_input_cb;
 

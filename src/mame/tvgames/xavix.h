@@ -166,7 +166,7 @@ protected:
 	virtual void io0_output_w(u8 data, u8 direction) override;
 
 private:
-	static constexpr unsigned IR_CARRIER_GAP_US = 60;
+	static constexpr u32 IR_CARRIER_GAP_US = 60;
 	static constexpr u8 IR_CARRIER_MIN_PULSES = 3;
 
 	void configure_controllers(machine_config &config) ATTR_COLD;
@@ -242,13 +242,13 @@ public:
 	void xavix_isinger(machine_config &config) ATTR_COLD;
 	void xavix_epitch(machine_config &config) ATTR_COLD;
 
-	template <unsigned Column> int matrix_column_r() { return matrix_column_r(Column); }
+	template <u32 Column> int matrix_column_r() { return matrix_column_r(Column); }
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
-	int matrix_column_r(unsigned column);
+	int matrix_column_r(u32 column);
 
 	required_ioport m_extra0;
 	required_ioport m_extra1;
@@ -327,10 +327,10 @@ private:
 		s16 brightness = 0;
 	};
 
-	template <unsigned Index> void ct675_i2c_sda_w(int state) { m_ct675_i2c_sda[Index] = state; }
+	template <u32 Index> void ct675_i2c_sda_w(int state) { m_ct675_i2c_sda[Index] = state; }
 	void reset_lcd_registers();
 	void lcd_serial_w(bool select, bool clock, bool data);
-	void lcd_register_w(unsigned address, u16 data);
+	void lcd_register_w(u32 address, u16 data);
 	void lcd_vblank(int state);
 	u32 screen_update_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_volume();
@@ -392,7 +392,7 @@ private:
 	output_finder<> m_digit;
 };
 
-template <typename Base, unsigned Players>
+template <typename Base, u32 Players>
 class xavix_lightgun_state : public Base
 {
 public:
@@ -404,7 +404,7 @@ public:
 
 protected:
 	void configure_lightgun_scanlines(machine_config &config, u8 event_mask) ATTR_COLD;
-	u8 lightgun_position_r(unsigned player, offs_t offset, u16 x_offset = 0, u16 y_scale = 0x100, u16 y_offset = 0, u16 x_scale = 0x100);
+	u8 lightgun_position_r(u32 player, offs_t offset, u16 x_offset = 0, u16 y_scale = 0x100, u16 y_offset = 0, u16 x_scale = 0x100);
 	virtual u8 lightgun_event_mask() { return m_lightgun_event_mask; }
 	u8 m_lightgun_event_mask = 0;
 
@@ -449,7 +449,7 @@ protected:
 	virtual void io1_output_w(u8 data, u8 direction) override;
 
 private:
-	static constexpr unsigned PAYOUT_PHASE_MS = 100; // TODO: Measure dispenser feedback timing.
+	static constexpr u32 PAYOUT_PHASE_MS = 100; // TODO: Measure dispenser feedback timing.
 	TIMER_CALLBACK_MEMBER(payout_position_changed);
 
 	emu_timer *m_payout_timer;

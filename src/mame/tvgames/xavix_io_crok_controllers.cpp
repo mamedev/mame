@@ -61,7 +61,7 @@ ioport_constructor xavix_croket_controllers_device::device_input_ports() const
 	return INPUT_PORTS_NAME(xavix_croket_controllers);
 }
 
-u32 xavix_croket_controllers_device::read_report(unsigned report)
+u32 xavix_croket_controllers_device::read_report(u32 report)
 {
 	u8 const mask = 1U << report;
 	u8 const motion = m_motion->read();
@@ -77,7 +77,7 @@ bool xavix_croket_controllers_device::reports_enabled()
 {
 	u8 const buttons = m_motion->read() | m_guard->read();
 	u8 const power = m_controller_power->read();
-	for (unsigned player = 0; player < 2; player++)
+	for (u32 player = 0; player < 2; player++)
 	{
 		if (BIT(power, player) && (BIT(buttons, player) || m_motion_strength[player]->read()))
 			return 1;

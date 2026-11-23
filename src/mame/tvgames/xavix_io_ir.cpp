@@ -75,7 +75,7 @@ void xavix_ir_report_device_base::device_start()
 {
 	m_event_out_cb.resolve_safe();
 	assert(m_bit_ticks);
-	for (unsigned report = 0; report != m_report_count; ++report)
+	for (u32 report = 0; report != m_report_count; ++report)
 		assert(m_report_bits[report] && m_report_bits[report] <= 32);
 
 	m_frame_timer = timer_alloc(FUNC(xavix_ir_report_device_base::frame_start), this);
@@ -106,7 +106,7 @@ void xavix_ir_report_device_base::device_reset()
 void xavix_ir_msb_device_base::device_start()
 {
 	xavix_ir_report_device_base::device_start();
-	for (unsigned bit = 0; bit != m_sample_tick_count; ++bit)
+	for (u32 bit = 0; bit != m_sample_tick_count; ++bit)
 		assert(m_sample_ticks[bit]);
 }
 
@@ -132,7 +132,7 @@ void xavix_ir_report_device_base::vblank_w(int state)
 {
 	if (state && reports_enabled() && !m_frame_pending && !m_bits_remaining && !m_between_reports)
 	{
-		for (unsigned report = 0; report != m_report_count; ++report)
+		for (u32 report = 0; report != m_report_count; ++report)
 			m_latched_report[report] = report_enabled(report) ? read_report(report) : NO_SEQUENCE;
 
 		// Compatibility approximation: avoid receive latency and packets the ROM rejects across its video handler.
@@ -145,12 +145,12 @@ void xavix_ir_report_device_base::vblank_w(int state)
 TIMER_CALLBACK_MEMBER(xavix_ir_report_device_base::frame_start)
 {
 	m_frame_pending = false;
-	unsigned const report = next_report(0);
+	u32 const report = next_report(0);
 	if (report < m_report_count)
 		start_report(report);
 }
 
-void xavix_ir_report_device_base::start_report(unsigned report)
+void xavix_ir_report_device_base::start_report(u32 report)
 {
 	m_report_index = report;
 	m_shift = m_latched_report[report];
@@ -158,7 +158,7 @@ void xavix_ir_report_device_base::start_report(unsigned report)
 	begin_report();
 }
 
-unsigned xavix_ir_report_device_base::next_report(unsigned report) const
+u32 xavix_ir_report_device_base::next_report(u32 report) const
 {
 	while (report < m_report_count && m_latched_report[report] == NO_SEQUENCE)
 		++report;
@@ -184,7 +184,7 @@ TIMER_CALLBACK_MEMBER(xavix_ir_report_device_base::bit_tick)
 	if (m_between_reports)
 	{
 		m_between_reports = false;
-		unsigned const report = next_report(m_report_index + 1);
+		u32 const report = next_report(m_report_index + 1);
 		if (report < m_report_count)
 			start_report(report);
 		else
@@ -205,7 +205,7 @@ void xavix_ir_msb_device_base::begin_report()
 
 u32 xavix_ir_msb_device_base::current_bit_ticks() const
 {
-	unsigned const bit = report_bits() - m_bits_remaining;
+	u32 const bit = report_bits() - m_bits_remaining;
 	return bit < m_sample_tick_count ? m_sample_ticks[bit] : m_bit_ticks;
 }
 
@@ -291,14 +291,14 @@ void xavix_ir_run_length_device_base::begin_report()
 	schedule_bit(current_run_bits() * m_bit_ticks);
 }
 
-unsigned xavix_ir_run_length_device_base::current_run_bits() const
+u32 xavix_ir_run_length_device_base::current_run_bits() const
 {
-	return std::min<unsigned>(m_bits_remaining, 1 + std::countr_zero(m_shift >> 1));
+	return std::min<u32>(m_bits_remaining, 1 + std::countr_zero(m_shift >> 1));
 }
 
 void xavix_ir_run_length_device_base::advance_report()
 {
-	unsigned const bits = current_run_bits();
+	u32 const bits = current_run_bits();
 	m_shift = bits < 32 ? m_shift >> bits : 0;
 	m_bits_remaining -= bits;
 	if (m_bits_remaining)

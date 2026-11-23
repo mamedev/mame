@@ -505,7 +505,7 @@ u8 xavix_cart_state::external_code_r(offs_t offset)
 	return (offset & 0x7fffff) < m_cart_limit ? cart_r(offset) : xavix_state::external_code_r(offset);
 }
 
-void xavix_cart_state::external_bus_ctrl_changed(unsigned index, u8 data)
+void xavix_cart_state::external_bus_ctrl_changed(u32 index, u8 data)
 {
 	if (m_cartslot->has_cart())
 		m_cartslot->write_bus_control(index, data);
@@ -1260,7 +1260,7 @@ INPUT_PORTS_END
 //  Systems Sharing Lightgun Inputs
 //-------------------------------------------------
 
-template <typename Base, unsigned Players>
+template <typename Base, u32 Players>
 void xavix_lightgun_state<Base, Players>::configure_lightgun_scanlines(machine_config &config, u8 event_mask)
 {
 	m_lightgun_event_mask = event_mask;
@@ -1274,8 +1274,8 @@ u8 xavix_state::lightgun_r(offs_t offset)
 	return 0xff;
 }
 
-template <typename Base, unsigned Players>
-u8 xavix_lightgun_state<Base, Players>::lightgun_position_r(unsigned player, offs_t offset, u16 x_offset, u16 y_scale, u16 y_offset, u16 x_scale)
+template <typename Base, u32 Players>
+u8 xavix_lightgun_state<Base, Players>::lightgun_position_r(u32 player, offs_t offset, u16 x_offset, u16 y_scale, u16 y_offset, u16 x_scale)
 {
 	if (player >= Players)
 		return 0xff;
@@ -1297,7 +1297,7 @@ u8 xavix_lightgun_state<Base, Players>::lightgun_position_r(unsigned player, off
 	}
 }
 
-template <typename Base, unsigned Players>
+template <typename Base, u32 Players>
 void xavix_lightgun_state<Base, Players>::lightgun_scanline_cb(timer_device &timer, s32 param)
 {
 	// These NTSC boards place picture row zero at raster row 13.
@@ -1551,7 +1551,7 @@ void xavix_tomshoot_state::vblank_extra()
 
 u8 xavix_tomshoot_state::lightgun_r(offs_t offset)
 {
-	unsigned const player = offset >> 2;
+	u32 const player = offset >> 2;
 	// The capture bias and 224-line Y range centre both guns on the native mode-selection targets.
 	return lightgun_position_r(player, offset, 0x1b, 0xe0, 0x10);
 }
@@ -1608,7 +1608,7 @@ void xavix_epo_dmon_state::vblank_extra()
 
 u8 xavix_epo_dmon_state::lightgun_r(offs_t offset)
 {
-	unsigned const player = offset >> 2;
+	u32 const player = offset >> 2;
 	// Exact phototransistor-to-raster calibration is unknown; the ROM treats $80 as the centre of both axes.
 	return lightgun_position_r(player, offset);
 }
@@ -2593,11 +2593,11 @@ void xavix_ekara_state::machine_reset()
 		digit = 0;
 }
 
-int xavix_ekara_state::matrix_column_r(unsigned column)
+int xavix_ekara_state::matrix_column_r(u32 column)
 {
 	u16 const contacts = m_extra0->read() | (u16(m_extra1->read()) << 8);
 	int data = 0;
-	for (unsigned row = 0; row < 7; row++)
+	for (u32 row = 0; row < 7; row++)
 	{
 		if (BIT(m_matrix_select, row))
 			data |= BIT(contacts, row * 2 + column);
@@ -2627,7 +2627,7 @@ void xavix_ekara_state::io1_output_w(u8 data, u8 direction)
 		u8 const digit_select = data & direction;
 
 		// IO1 bits 3 and 2 select the left and right digits respectively.
-		for (unsigned digit = 0; digit < m_digits.size(); digit++)
+		for (u32 digit = 0; digit < m_digits.size(); digit++)
 		{
 			u8 segments = m_digits[digit];
 			if (BIT(digit_select, 3 - digit))
@@ -2815,7 +2815,7 @@ void xavix_hikara_state::machine_reset()
 	m_volume_clock = false;
 	update_volume();
 
-	for (unsigned index = 0; index < m_microphone.size(); index++)
+	for (u32 index = 0; index < m_microphone.size(); index++)
 		m_microphone[index]->set_output_gain(ALL_OUTPUTS, float(m_microphone_volume[index]->read()) / 100.0f);
 }
 
@@ -2860,7 +2860,7 @@ void xavix_hikara_state::io1_output_w(u8 data, u8 direction)
 	xavix_ekara_state::io1_output_w(data, direction);
 
 	// The CT675A-F register banks share SCL bit 4 and SDA bit 5.
-	for (unsigned index = 0; index < m_ct675_i2c.size(); index++)
+	for (u32 index = 0; index < m_ct675_i2c.size(); index++)
 	{
 		m_ct675_i2c[index]->sda_write(BIT(direction, 5) ? BIT(data, 5) : 1);
 		m_ct675_i2c[index]->scl_write(BIT(direction, 4) ? BIT(data, 4) : 0);
@@ -2925,7 +2925,7 @@ void xavix_hikara_state::lcd_serial_w(bool select, bool clock, bool data)
 	m_lcd.clock = clock;
 }
 
-void xavix_hikara_state::lcd_register_w(unsigned address, u16 data)
+void xavix_hikara_state::lcd_register_w(u32 address, u16 data)
 {
 	if (address == 0)
 	{
@@ -3631,7 +3631,7 @@ u8 xavix_tvpc_state::io0_input_r(u8 direction)
 u8 xavix_tvpc_state::keyboard_r(offs_t offset)
 {
 	u8 data = 0;
-	for (unsigned row = 0; row < m_keyboard.size(); row++)
+	for (u32 row = 0; row < m_keyboard.size(); row++)
 	{
 		if (BIT(offset, row))
 			data |= m_keyboard[row]->read();
@@ -3889,7 +3889,7 @@ u8 xavix_epo_mail_state::keyboard_r()
 	// Patent US7555105 shows eight IO0-selected rows and a ninth selected by IO1.0 feeding one 74HC541.
 	u8 data = 0;
 	u8 const io0_rows = m_soc->io_data_latch<0>() & m_soc->io_direction<0>();
-	for (unsigned row = 0; row != 8; row++)
+	for (u32 row = 0; row != 8; row++)
 	{
 		if (BIT(io0_rows, row))
 			data |= m_keyboard[row]->read();
@@ -3977,13 +3977,13 @@ INPUT_PORTS_END
 u16 xavix_hippofr_state::panel_levels_r()
 {
 	std::array<u16, 10> contacts{};
-	auto const close_contact = [&contacts] (unsigned first, unsigned second)
+	auto const close_contact = [&contacts] (u32 first, u32 second)
 	{
 		contacts[first] |= u16(1) << second;
 		contacts[second] |= u16(1) << first;
 	};
 
-	for (unsigned key = 0; key != KEY_CONTACTS.size(); ++key)
+	for (u32 key = 0; key != KEY_CONTACTS.size(); ++key)
 	{
 		if (BIT(m_keyboard[key / 8]->read(), key % 8))
 		{
@@ -4011,7 +4011,7 @@ u8 xavix_hippofr_state::io0_input_r(u8)
 u8 xavix_hippofr_state::io1_input_r(u8 direction)
 {
 	std::array<u8, 8> contacts{};
-	auto const close_contact = [&contacts] (unsigned first, unsigned second)
+	auto const close_contact = [&contacts] (u32 first, u32 second)
 	{
 		contacts[first] |= 1U << second;
 		contacts[second] |= 1U << first;
@@ -4090,7 +4090,7 @@ void xavix_multiplt_state::machine_reset()
 u8 xavix_multiplt_state::io0_input_r(u8 direction)
 {
 	std::array<u8, 8> contacts{};
-	auto const close_contact = [&contacts] (unsigned first, unsigned second)
+	auto const close_contact = [&contacts] (u32 first, u32 second)
 	{
 		contacts[first] |= 1U << second;
 		contacts[second] |= 1U << first;
@@ -4128,7 +4128,7 @@ void xavix_multiplt_state::io1_output_w(u8 data, u8 direction)
 {
 	u8 const outputs = data & direction;
 	// IO1.2-IO1.4 drive red, yellow and green respectively.
-	for (unsigned lamp = 0; lamp < m_lamps.size(); lamp++)
+	for (u32 lamp = 0; lamp < m_lamps.size(); lamp++)
 		m_lamps[lamp] = BIT(outputs, lamp + 2);
 }
 

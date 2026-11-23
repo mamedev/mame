@@ -646,7 +646,7 @@ void superxavix_soc_device::output_clock_w(offs_t offset, u8 data)
 	// 0x7a04 selects the divider; 0x7a05 bit 0 enables clock output on GPIO23.
 	// domstepc only clears the rate during startup.
 	// TODO: Emulate the clock output when native software enables it.
-	LOGMASKED(LOG_IO, "%s: output_clock_w %u %02x\n", machine().describe_context(), unsigned(offset), data);
+	LOGMASKED(LOG_IO, "%s: output_clock_w %u %02x\n", machine().describe_context(), u32(offset), data);
 	m_output_clock_regs[offset] = data & (offset ? 0x01 : 0xff);
 }
 
@@ -665,13 +665,13 @@ void superxavix_soc_device::instruction_burst_ctrl_w(u8 data)
 	m_instruction_burst_ctrl = data & 0x01;
 }
 
-template <unsigned Region>
+template <u32 Region>
 u8 superxavix_soc_device::external_legacy_access_ctrl_r()
 {
 	return BIT(m_external_region_access_ctrl[Region], 1, 3);
 }
 
-template <unsigned Region>
+template <u32 Region>
 void superxavix_soc_device::external_legacy_access_ctrl_w(u8 data)
 {
 	// The byte-access aliases clear the bus-width and page-access settings.
@@ -680,13 +680,13 @@ void superxavix_soc_device::external_legacy_access_ctrl_w(u8 data)
 		m_external_region_access_ctrl[2] = m_external_region_access_ctrl[1];
 }
 
-template <unsigned Region>
+template <u32 Region>
 u8 superxavix_soc_device::external_region_access_ctrl_r()
 {
 	return m_external_region_access_ctrl[Region];
 }
 
-template <unsigned Region>
+template <u32 Region>
 void superxavix_soc_device::external_region_access_ctrl_w(u8 data)
 {
 	LOG("%s: external_region_access_ctrl_w (region %u) %02x\n", machine().describe_context(), Region, data);

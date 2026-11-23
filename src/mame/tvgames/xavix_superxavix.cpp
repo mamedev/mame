@@ -203,7 +203,7 @@ void superxavix_state::machine_start()
 	m_legacy_field_inputs = { connected_inputs(*m_in0), connected_inputs(*m_in1) };
 }
 
-template <unsigned Port>
+template <u32 Port>
 u8 superxavix_state::pio_input_r(offs_t offset, u8 mem_mask)
 {
 	static_assert(Port < 3);
@@ -222,7 +222,7 @@ u8 superxavix_state::connected_inputs(ioport_port const &port)
 	return mask;
 }
 
-template <unsigned Port>
+template <u32 Port>
 u8 superxavix_state::pio_input_mask_r()
 {
 	return m_pio_field_inputs[Port] | m_pio_connected_inputs[Port];
@@ -233,7 +233,7 @@ u8 superxavix_state::legacy_input_mask_r(offs_t port)
 	return m_legacy_field_inputs[port] | m_legacy_connected_inputs[port];
 }
 
-template <unsigned Port>
+template <u32 Port>
 void superxavix_state::pio_output_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	static_assert(Port < 3);
@@ -310,7 +310,7 @@ void superxavix_i2c_pio1_state::configure_pio()
 	m_super_soc->pio_output_callback<2>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_output_w<2>));
 }
 
-template <unsigned Port>
+template <u32 Port>
 u8 superxavix_i2c_pio1_state::pio_input_r(offs_t offset, u8 mem_mask)
 {
 	static_assert(Port < 3);
@@ -330,7 +330,7 @@ u8 superxavix_i2c_pio1_state::pio_input_r(offs_t offset, u8 mem_mask)
 	return ret;
 }
 
-template <unsigned Port>
+template <u32 Port>
 void superxavix_i2c_pio1_state::pio_output_w(offs_t offset, u8 data, u8 mem_mask)
 {
 	static_assert(Port < 3);
@@ -347,7 +347,7 @@ void superxavix_i2c_pio1_state::pio_output_w(offs_t offset, u8 data, u8 mem_mask
 //  RTC Connections
 //-------------------------------------------------
 
-template <unsigned Port>
+template <u32 Port>
 void superxavix_i2c_pio1_state::configure_rtc_pio(machine_config &config)
 {
 	static_assert(Port < 2);
@@ -358,10 +358,10 @@ void superxavix_i2c_pio1_state::configure_rtc_pio(machine_config &config)
 	m_super_soc->pio_output_callback<Port>().set(*this, FUNC(superxavix_i2c_pio1_state::pio_rtc_output_w<Port>));
 }
 
-template <unsigned Port>
+template <u32 Port>
 u8 superxavix_i2c_pio1_state::pio_rtc_input_r(offs_t offset, u8 mem_mask)
 {
-	constexpr unsigned SDA_BIT = Port ? 7 : 3;
+	constexpr u32 SDA_BIT = Port ? 7 : 3;
 	u8 ret = pio_input_r<Port>(offset, mem_mask);
 
 	if (!BIT(mem_mask, SDA_BIT))
@@ -370,11 +370,11 @@ u8 superxavix_i2c_pio1_state::pio_rtc_input_r(offs_t offset, u8 mem_mask)
 	return ret;
 }
 
-template <unsigned Port>
+template <u32 Port>
 void superxavix_i2c_pio1_state::pio_rtc_output_w(offs_t offset, u8 data, u8 mem_mask)
 {
-	constexpr unsigned SDA_BIT = Port ? 7 : 3;
-	constexpr unsigned SCL_BIT = Port ? 6 : 4;
+	constexpr u32 SDA_BIT = Port ? 7 : 3;
+	constexpr u32 SCL_BIT = Port ? 6 : 4;
 	if constexpr (Port == 1)
 		pio_output_w<Port>(offset, data, mem_mask);
 
@@ -2117,7 +2117,7 @@ void superxavix_epo_kabj_state::superxavix_epo_kabj(machine_config &config)
 u16 superxavix_epo_kabj_state::keyboard_levels_r()
 {
 	std::array<u16, 12> contacts{};
-	for (unsigned key = 0; key != KEY_CONTACTS.size(); ++key)
+	for (u32 key = 0; key != KEY_CONTACTS.size(); ++key)
 	{
 		if (BIT(m_keyboard[key / 8]->read(), key % 8))
 		{

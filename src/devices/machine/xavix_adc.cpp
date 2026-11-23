@@ -239,7 +239,7 @@ void xavix_adc_device::ctrl_w(u8 data)
 
 void xavix_adc_device::sound_stream_update(sound_stream &stream)
 {
-	for (unsigned input = 0; input < m_audio_input_count; ++input)
+	for (u32 input = 0; input < m_audio_input_count; ++input)
 	{
 		sound_stream::sample_t const sample = stream.get(input, stream.samples() - 1);
 		m_audio_sample[input] = std::clamp<int>(int(sample * 128.0F) + 128, 0, 255);
@@ -275,7 +275,7 @@ void xavix_adc_device::tablet_ctrl_w(u8 data)
 u8 xavix_adc_device::sample_input()
 {
 	u8 const input = (m_ctrl & 0x03) | (BIT(m_ctrl, 4) << 2);
-	for (unsigned audio_input = 0; audio_input < m_audio_input_count; ++audio_input)
+	for (u32 audio_input = 0; audio_input < m_audio_input_count; ++audio_input)
 	{
 		if (input == m_audio_channel[audio_input])
 		{

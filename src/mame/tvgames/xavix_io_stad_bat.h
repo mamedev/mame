@@ -18,7 +18,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	// The original bat sends an undifferentiated active-low envelope.
-	virtual u32 read_report(unsigned report) override { return 0; }
+	virtual u32 read_report(u32 report) override { return 0; }
 	virtual bool reports_enabled() override;
 
 private:

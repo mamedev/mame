@@ -63,9 +63,9 @@ void xavix_granblade_device::device_reset()
 	m_granblade_last_mode = BIT(m_granblade_mode->read(), 0);
 }
 
-u32 xavix_granblade_device::read_report(unsigned)
+u32 xavix_granblade_device::read_report(u32)
 {
-	unsigned const mode = BIT(m_granblade_mode->read(), 0);
+	u32 const mode = BIT(m_granblade_mode->read(), 0);
 	bool const transform = mode != m_granblade_last_mode;
 	m_granblade_last_mode = mode;
 	// Report identities follow the ROM's paired mode/action handling and mode-specific tutorial prompts.
@@ -73,9 +73,9 @@ u32 xavix_granblade_device::read_report(unsigned)
 	return complemented_report(code);
 }
 
-bool xavix_granblade_device::report_enabled(unsigned)
+bool xavix_granblade_device::report_enabled(u32)
 {
-	unsigned const mode = BIT(m_granblade_mode->read(), 0);
+	u32 const mode = BIT(m_granblade_mode->read(), 0);
 	return BIT(m_granblade_power->read(), 0)
 		&& ((mode != m_granblade_last_mode) || BIT(m_granblade_action->read(), mode));
 }

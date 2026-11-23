@@ -52,18 +52,18 @@ protected:
 			std::initializer_list<u8> report_bits, u32 bit_ticks = 0x47 * 64);
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-	virtual u32 read_report(unsigned report) = 0;
+	virtual u32 read_report(u32 report) = 0;
 	virtual bool reports_enabled() { return true; }
-	virtual bool report_enabled(unsigned report) { return true; }
+	virtual bool report_enabled(u32 report) { return true; }
 	virtual void begin_report() = 0;
 	virtual void advance_report() = 0;
 
 	void set_bit_ticks(u32 ticks) { m_bit_ticks = ticks; }
-	template <unsigned N> void set_report_bits(u8 bits) { static_assert(N < 8); m_report_bits[N] = bits; }
+	template <u32 N> void set_report_bits(u8 bits) { static_assert(N < 8); m_report_bits[N] = bits; }
 	void receiver_event() { m_event_out_cb(); }
 	void schedule_bit(u32 ticks) { m_bit_timer->adjust(clocks_to_attotime(ticks)); }
 	void finish_report(bool stop_cell = false, u32 gap_ticks = 0);
-	unsigned report_bits() const { return m_report_bits[m_report_index]; }
+	u32 report_bits() const { return m_report_bits[m_report_index]; }
 
 	u32 m_shift;
 	u8 m_report_index;
@@ -74,8 +74,8 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER(frame_start);
 	TIMER_CALLBACK_MEMBER(bit_tick);
-	void start_report(unsigned report);
-	unsigned next_report(unsigned report) const;
+	void start_report(u32 report);
+	u32 next_report(u32 report) const;
 
 	device_delegate<void ()> m_event_out_cb;
 	emu_timer *m_frame_timer;
@@ -118,7 +118,7 @@ protected:
 	virtual void begin_report() override;
 	virtual void advance_report() override;
 	void set_start_ticks(u32 ticks) { m_start_ticks.fill(ticks); }
-	template <unsigned N> void set_start_ticks(u32 ticks) { static_assert(N < 8); m_start_ticks[N] = ticks; }
+	template <u32 N> void set_start_ticks(u32 ticks) { static_assert(N < 8); m_start_ticks[N] = ticks; }
 
 private:
 	std::array<u32, 8> m_start_ticks{};
@@ -153,7 +153,7 @@ protected:
 	void set_report_gap_ticks(u32 ticks) { m_report_gap_ticks = ticks; }
 
 private:
-	unsigned current_run_bits() const;
+	u32 current_run_bits() const;
 	u32 m_report_gap_ticks = 0;
 };
 

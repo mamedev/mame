@@ -28,7 +28,7 @@ protected:
 	virtual void device_config_complete() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual u32 read_report(unsigned report) override;
+	virtual u32 read_report(u32 report) override;
 
 private:
 	static constexpr std::array<u32, 16> JMAT_SAMPLE_TICKS =

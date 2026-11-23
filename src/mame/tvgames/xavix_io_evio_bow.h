@@ -13,7 +13,7 @@ class xavix_evio_bow_device : public device_t
 public:
 	xavix_evio_bow_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	void set_player(unsigned player) { m_player = player; }
+	void set_player(u32 player) { m_player = player; }
 	u8 quadrature_r() const;
 
 protected:
@@ -28,7 +28,7 @@ private:
 	TIMER_CALLBACK_MEMBER(step_phase);
 
 	required_ioport m_motion;
-	unsigned m_player;
+	u32 m_player;
 	emu_timer *m_sample_timer;
 	emu_timer *m_phase_timer;
 

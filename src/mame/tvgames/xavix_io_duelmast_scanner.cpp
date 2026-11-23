@@ -443,7 +443,7 @@ ioport_constructor xavix_duelmast_scanner_device::device_input_ports() const
 void xavix_duelmast_scanner_device::device_start()
 {
 	xavix_analog_image_sensor_device_base::device_start();
-	for (unsigned level = 0; level < m_source_response.size(); ++level)
+	for (u32 level = 0; level < m_source_response.size(); ++level)
 		m_source_response[level] = std::pow(double(level) / 255, 2.2);
 }
 
@@ -456,7 +456,7 @@ void xavix_duelmast_scanner_device::capture_image()
 		return;
 	}
 
-	unsigned const selection = m_input->read();
+	u32 const selection = m_input->read();
 	if (selection > 1 && capture_manual_card(selection - 1))
 		return;
 
@@ -481,11 +481,11 @@ void xavix_duelmast_scanner_device::capture_image()
 	double const top = CARD_FIELD[1] * picture.height();
 	double const pixel_width = CARD_FIELD[2] * picture.width() / IMAGE_WIDTH;
 	double const pixel_height = CARD_FIELD[3] * picture.height() / IMAGE_HEIGHT;
-	for (unsigned y = 0; y < IMAGE_HEIGHT; ++y)
+	for (u32 y = 0; y < IMAGE_HEIGHT; ++y)
 	{
 		double const y0 = top + y * pixel_height;
 		double const y1 = top + (y + 1) * pixel_height;
-		for (unsigned x = 0; x < IMAGE_WIDTH; ++x)
+		for (u32 x = 0; x < IMAGE_WIDTH; ++x)
 		{
 			double const x0 = left + x * pixel_width;
 			double const x1 = left + (x + 1) * pixel_width;
@@ -505,7 +505,7 @@ void xavix_duelmast_scanner_device::capture_image()
 	}
 }
 
-bool xavix_duelmast_scanner_device::capture_manual_card(unsigned card)
+bool xavix_duelmast_scanner_device::capture_manual_card(u32 card)
 {
 	bool const expanded = m_expanded_cards_cb();
 	if (!card || card > (expanded ? 366 : 120))
@@ -514,7 +514,7 @@ bool xavix_duelmast_scanner_device::capture_manual_card(unsigned card)
 	// HACK: Reconstruct pixels from the ROM's recognition signatures for optional named-card selection.
 	// The ROM still acquires the pixels and performs recognition through the normal sensor interface.
 	std::array<int, 64> signature;
-	for (unsigned pixel = 0; pixel < signature.size(); ++pixel)
+	for (u32 pixel = 0; pixel < signature.size(); ++pixel)
 	{
 		offs_t const offset = card * 64 + pixel;
 		signature[pixel] = s8(m_card_data_cb(offset));
@@ -524,9 +524,9 @@ bool xavix_duelmast_scanner_device::capture_manual_card(unsigned card)
 	{
 		m_image.fill(48);
 		m_image[0] = 1;
-		for (unsigned y = 0; y < 24; ++y)
+		for (u32 y = 0; y < 24; ++y)
 		{
-			for (unsigned x = 0; x < 24; ++x)
+			for (u32 x = 0; x < 24; ++x)
 				m_image[(y + 3) * IMAGE_WIDTH + x + 4] = std::clamp(int(std::floor(32 + 0.5 * signature[(y / 3) * 8 + x / 3] + 0.5)), 17, 55);
 		}
 	}
@@ -545,16 +545,16 @@ bool xavix_duelmast_scanner_device::capture_manual_card(unsigned card)
 		}
 
 		m_image.fill(128);
-		for (unsigned y = 4; y < 28; ++y)
+		for (u32 y = 4; y < 28; ++y)
 		{
-			for (unsigned x = 5; x < 29; ++x)
+			for (u32 x = 5; x < 29; ++x)
 			{
 				double const xf = std::clamp((double(x) - 7.5) / 3, 0.0, 6.0);
 				double const yf = std::clamp((double(y) - 6.5) / 3, 0.0, 6.0);
-				unsigned const xa = unsigned(xf);
-				unsigned const ya = unsigned(yf);
-				unsigned const xb = std::min(6U, xa + 1);
-				unsigned const yb = std::min(6U, ya + 1);
+				u32 const xa = u32(xf);
+				u32 const ya = u32(yf);
+				u32 const xb = std::min(6U, xa + 1);
+				u32 const yb = std::min(6U, ya + 1);
 				double const dx = xf - xa;
 				double const dy = yf - ya;
 				double const value = (1 - dx) * (1 - dy) * sharpened[ya * 8 + xa] + dx * (1 - dy) * sharpened[ya * 8 + xb]

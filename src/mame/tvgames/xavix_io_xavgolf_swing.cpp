@@ -107,7 +107,7 @@ bool xavix_golf_swing_device::reports_enabled()
 	return 1;
 }
 
-u32 xavix_golf_swing_device::read_report(unsigned report)
+u32 xavix_golf_swing_device::read_report(u32 report)
 {
 	bool const generated = m_swing_phase != 0;
 	bool const sentinel = !generated && !BIT(m_swing_active->read(), 0);

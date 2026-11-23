@@ -54,7 +54,7 @@ void superxavix_pio_device::device_reset()
 	m_pio_output.fill(0);
 	m_pio_pull.fill(0xff);
 
-	for (unsigned port = 0; port < previous_direction.size(); ++port)
+	for (u32 port = 0; port < previous_direction.size(); ++port)
 		if (previous_direction[port] || previous_pull[port] != 0xff)
 			update_output(port);
 }
@@ -63,14 +63,14 @@ u8 superxavix_pio_device::pio_direction_r(offs_t offset)
 {
 	assert(offset < m_pio_direction.size());
 	if (!machine().side_effects_disabled())
-		LOG("%s: pio_direction_r (port %u)\n", machine().describe_context(), unsigned(offset));
+		LOG("%s: pio_direction_r (port %u)\n", machine().describe_context(), u32(offset));
 	return m_pio_direction[offset];
 }
 
 void superxavix_pio_device::pio_direction_w(offs_t offset, u8 data)
 {
 	assert(offset < m_pio_direction.size());
-	LOG("%s: pio_direction_w (port %u) %02x\n", machine().describe_context(), unsigned(offset), data);
+	LOG("%s: pio_direction_w (port %u) %02x\n", machine().describe_context(), u32(offset), data);
 	if (offset < m_pio_direction.size())
 	{
 		m_pio_direction[offset] = data;
@@ -82,7 +82,7 @@ u8 superxavix_pio_device::pio_output_r(offs_t offset)
 {
 	assert(offset < m_pio_output.size());
 	if (!machine().side_effects_disabled())
-		LOG("%s: pio_output_r (port %u)\n", machine().describe_context(), unsigned(offset));
+		LOG("%s: pio_output_r (port %u)\n", machine().describe_context(), u32(offset));
 	// Pin levels are read through pio_input_r; this register reads back the output latch.
 	return m_pio_output[offset];
 }
@@ -90,7 +90,7 @@ u8 superxavix_pio_device::pio_output_r(offs_t offset)
 void superxavix_pio_device::pio_output_w(offs_t offset, u8 data)
 {
 	assert(offset < m_pio_output.size());
-	LOG("%s: pio_output_w (port %u) %02x\n", machine().describe_context(), unsigned(offset), data);
+	LOG("%s: pio_output_w (port %u) %02x\n", machine().describe_context(), u32(offset), data);
 	if (offset < m_pio_output.size())
 	{
 		m_pio_output[offset] = data;
@@ -102,11 +102,11 @@ u8 superxavix_pio_device::pio_input_r(offs_t offset)
 {
 	assert(offset < m_pio_direction.size());
 	if (!machine().side_effects_disabled())
-		LOG("%s: pio_input_r (port %u)\n", machine().describe_context(), unsigned(offset));
+		LOG("%s: pio_input_r (port %u)\n", machine().describe_context(), u32(offset));
 	return input_r(offset);
 }
 
-u8 superxavix_pio_device::input_r(unsigned port)
+u8 superxavix_pio_device::input_r(u32 port)
 {
 	u8 const drive = output_mask(port);
 	u8 const input_mask = m_input_mask_cb[port]();
@@ -124,7 +124,7 @@ u8 superxavix_pio_device::input_r(unsigned port)
 	return (input & ~drive) | (m_pio_output[port] & drive);
 }
 
-void superxavix_pio_device::update_output(unsigned port)
+void superxavix_pio_device::update_output(u32 port)
 {
 	u8 const drive = output_mask(port);
 	u8 const legacy_mask = port < 2 ? m_legacy_output_mask[port] : 0;
@@ -138,14 +138,14 @@ u8 superxavix_pio_device::pio_pull_r(offs_t offset)
 {
 	assert(offset < m_pio_pull.size());
 	if (!machine().side_effects_disabled())
-		LOG("%s: pio_pull_r (port %u)\n", machine().describe_context(), unsigned(offset));
+		LOG("%s: pio_pull_r (port %u)\n", machine().describe_context(), u32(offset));
 	return m_pio_pull[offset];
 }
 
 void superxavix_pio_device::pio_pull_w(offs_t offset, u8 data)
 {
 	assert(offset < m_pio_pull.size());
-	LOG("%s: pio_pull_w (port %u) %02x\n", machine().describe_context(), unsigned(offset), data);
+	LOG("%s: pio_pull_w (port %u) %02x\n", machine().describe_context(), u32(offset), data);
 	if (offset < m_pio_pull.size())
 	{
 		m_pio_pull[offset] = data;

@@ -31,7 +31,7 @@ protected:
 private:
 	// Stream frames have a two-byte big-endian byte count, followed by the payload.
 	// This buffer limit belongs to the transport, not the optical protocol.
-	static constexpr unsigned MAX_PACKET_BYTES = 256;
+	static constexpr u32 MAX_PACKET_BYTES = 256;
 	static constexpr u32 CARRIER_HALF_TICKS = (0x8d + 1) << 1;
 	static constexpr u32 LEADER_MARK_TICKS = 0x2d6 * CARRIER_HALF_TICKS;
 	static constexpr u32 LEADER_SPACE_TICKS = (0xc8 + 1) << 8;

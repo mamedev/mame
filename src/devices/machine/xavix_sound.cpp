@@ -73,7 +73,7 @@ void xavix_sound_device::device_start()
 	// Each divider tick spans eight input clocks.  At the reset divider, the
 	// stream runs at one frame per sample (about 167.8 kHz with the NTSC clock).
 	m_stream = stream_alloc(0, OUTPUT_CHANNEL_COUNT, clock() / (STREAM_TICKS_PER_SAMPLE * CLOCKS_PER_DIVIDER_TICK));
-	for (unsigned index = 0; index < std::size(m_tempo_timer); index++)
+	for (u32 index = 0; index < std::size(m_tempo_timer); index++)
 		m_tempo_timer[index] = timer_alloc(FUNC(xavix_sound_device::tempo_timer_tick), this);
 
 	save_item(STRUCT_MEMBER(m_voice, wave_control));
@@ -163,7 +163,7 @@ void xavix_sound_device::update_descriptor_tap()
 		[this] (offs_t offset, u8 &data, u8 mem_mask) { synchronize(); });
 }
 
-u16 &xavix_sound_device::voice_register(unsigned voice, unsigned index)
+u16 &xavix_sound_device::voice_register(u32 voice, u32 index)
 {
 	voice_state &state = m_voice[voice];
 	switch (index)
@@ -188,8 +188,8 @@ u8 xavix_sound_device::voice_register_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		synchronize();
-	const unsigned index = offset >> 5;
-	const unsigned voice = offset & (VOICE_COUNT - 1);
+	const u32 index = offset >> 5;
+	const u32 voice = offset & (VOICE_COUNT - 1);
 	if (index >= REGISTER_COUNT)
 		return 0;
 
@@ -201,13 +201,13 @@ u8 xavix_sound_device::voice_register_r(offs_t offset)
 void xavix_sound_device::voice_register_w(offs_t offset, u8 data)
 {
 	synchronize();
-	const unsigned index = offset >> 5;
-	const unsigned voice = offset & (VOICE_COUNT - 1);
+	const u32 index = offset >> 5;
+	const u32 voice = offset & (VOICE_COUNT - 1);
 	if (index >= REGISTER_COUNT)
 		return;
 
 	u16 &value = voice_register(voice, index);
-	const unsigned shift = BIT(offset, 4) * 8;
+	const u32 shift = BIT(offset, 4) * 8;
 	// The shared read latch captures the byte before the write completes.
 	m_voice_read_latch = value >> shift;
 	value = (value & ~(0xff << shift)) | (u16(data) << shift);
@@ -220,9 +220,9 @@ u8 xavix_sound_device::voice_command_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		synchronize();
-	const unsigned first = BIT(offset, 0) ? 8 : 0;
+	const u32 first = BIT(offset, 0) ? 8 : 0;
 	u8 result = 0;
-	for (unsigned bit = 0; bit < 8; bit++)
+	for (u32 bit = 0; bit < 8; bit++)
 	{
 		const command_state command = command_state(m_voice[first + bit].command);
 		const bool asserted = offset < 2
@@ -236,9 +236,9 @@ u8 xavix_sound_device::voice_command_r(offs_t offset)
 void xavix_sound_device::voice_command_w(offs_t offset, u8 data)
 {
 	synchronize();
-	const unsigned first = BIT(offset, 0) ? 8 : 0;
+	const u32 first = BIT(offset, 0) ? 8 : 0;
 
-	for (unsigned bit = 0; bit < 8; bit++)
+	for (u32 bit = 0; bit < 8; bit++)
 	{
 		voice_state &voice = m_voice[first + bit];
 		if (offset < 2)
@@ -261,9 +261,9 @@ u8 xavix_sound_device::voice_status_r(offs_t offset)
 {
 	if (!machine().side_effects_disabled())
 		synchronize();
-	const unsigned first = BIT(offset, 0) ? 8 : 0;
+	const u32 first = BIT(offset, 0) ? 8 : 0;
 	u8 result = 0;
-	for (unsigned bit = 0; bit < 8; bit++)
+	for (u32 bit = 0; bit < 8; bit++)
 	{
 		const voice_state &voice = m_voice[first + bit];
 		result |= (voice.active || voice.parameters_pending) ? u8(1U << bit) : 0;
@@ -401,7 +401,7 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream)
 	for (int output_sample = 0; output_sample < stream.samples(); output_sample++)
 	{
 		m_frame_phase += STREAM_TICKS_PER_SAMPLE;
-		const unsigned divider = unsigned(m_rate_divider) + 1;
+		const u32 divider = u32(m_rate_divider) + 1;
 		while (m_frame_phase >= divider)
 		{
 			m_frame_phase -= divider;
@@ -416,16 +416,16 @@ void xavix_sound_device::sound_stream_update(sound_stream &stream)
 void xavix_sound_device::render_frame(std::span<const int> event_clocks)
 {
 	const auto &order = m_output_stage.parallel() ? PARALLEL_VOICE_ORDER : MULTIPLEX_VOICE_ORDER;
-	const unsigned control_voice = order[m_control_slot & (VOICE_COUNT - 1)];
+	const u32 control_voice = order[m_control_slot & (VOICE_COUNT - 1)];
 
 	stereo_output total;
 	stereo_output held = m_output_stage.held_output();
 	envelope_update envelope;
 
-	for (unsigned phase = 0; phase < std::size(m_voice); phase++)
+	for (u32 phase = 0; phase < std::size(m_voice); phase++)
 	{
 		// Capacity affects only output latches; every voice continues advancing.
-		const unsigned voice = order[phase];
+		const u32 voice = order[phase];
 		const voice_output output = advance_wave(voice);
 		m_output_stage.mix_slot(voice, output, m_rate_divider, event_clocks, held, total);
 		run_control_phase(control_voice, phase, envelope);
@@ -451,7 +451,7 @@ void xavix_sound_device::render_frame(std::span<const int> event_clocks)
 	m_output[OUTPUT_RIGHT] = std::clamp<s64>(total.right, -32768, 32767);
 }
 
-xavix_sound_device::voice_output xavix_sound_device::advance_wave(unsigned voice_index)
+xavix_sound_device::voice_output xavix_sound_device::advance_wave(u32 voice_index)
 {
 	voice_state &voice = m_voice[voice_index];
 	if (!voice.output_ready || !voice.active)
@@ -524,7 +524,7 @@ xavix_sound_device::voice_output xavix_sound_device::advance_wave(unsigned voice
 	return result;
 }
 
-void xavix_sound_device::run_control_phase(unsigned voice_index, unsigned phase, envelope_update &envelope)
+void xavix_sound_device::run_control_phase(u32 voice_index, u32 phase, envelope_update &envelope)
 {
 	voice_state &voice = m_voice[voice_index];
 	const bool active = voice.active;
@@ -650,7 +650,7 @@ void xavix_sound_device::run_control_phase(unsigned voice_index, unsigned phase,
 	}
 }
 
-void xavix_sound_device::advance_envelope(unsigned voice_index, output_channel channel, envelope_update &envelope, u16 decay_source)
+void xavix_sound_device::advance_envelope(u32 voice_index, output_channel channel, envelope_update &envelope, u16 decay_source)
 {
 	voice_state &voice = m_voice[voice_index];
 	u16 &address = voice.envelope_address[channel];
@@ -726,7 +726,7 @@ void xavix_sound_device::output_stage::reset_controls()
 	dac_control = 0;
 }
 
-void xavix_sound_device::output_stage::mix_slot(unsigned voice, const voice_output &output, u8 rate_divider, std::span<const int> events, stereo_output &held, stereo_output &total)
+void xavix_sound_device::output_stage::mix_slot(u32 voice, const voice_output &output, u8 rate_divider, std::span<const int> events, stereo_output &held, stereo_output &total)
 {
 	if (voice >= voice_limit())
 	{
@@ -821,7 +821,7 @@ s32 xavix_sound_device::output_stage::amplifier_gain() const
 
 void xavix_sound_device::reschedule_tempo_timers(u8 timer_mask)
 {
-	for (unsigned index = 0; index < std::size(m_tempo_timer); index++)
+	for (u32 index = 0; index < std::size(m_tempo_timer); index++)
 	{
 		if (!BIT(timer_mask, index))
 			continue;
@@ -836,7 +836,7 @@ void xavix_sound_device::reschedule_tempo_timers(u8 timer_mask)
 		// Audio is normally rendered in batches.  Wake the stream at the next
 		// counter borrow so the CPU can observe and acknowledge every timer edge.
 		const auto &order = m_output_stage.parallel() ? PARALLEL_VOICE_ORDER : MULTIPLEX_VOICE_ORDER;
-		const unsigned target_slot = std::ranges::find(order, index) - std::begin(order);
+		const u32 target_slot = std::ranges::find(order, index) - std::begin(order);
 
 		const u64 first_service = ((target_slot - m_control_slot) & (VOICE_COUNT - 1)) + 1;
 		const u64 frames = first_service + (u64(m_voice[index].tempo_counter) / step) * std::size(m_voice);

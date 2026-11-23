@@ -78,7 +78,7 @@ void xavix_anpanman_sticks_device::device_reset()
 
 INPUT_CHANGED_MEMBER(xavix_anpanman_sticks_device::stick_activate)
 {
-	unsigned const player = unsigned(param);
+	u32 const player = u32(param);
 	assert(player < m_stick_awake.size());
 	if (newval && !oldval && BIT(m_stick_batteries->read(), player))
 		m_stick_awake[player] = true;
@@ -87,7 +87,7 @@ INPUT_CHANGED_MEMBER(xavix_anpanman_sticks_device::stick_activate)
 bool xavix_anpanman_sticks_device::reports_enabled()
 {
 	u8 const batteries = m_stick_batteries->read();
-	for (unsigned player = 0; player != m_stick_awake.size(); ++player)
+	for (u32 player = 0; player != m_stick_awake.size(); ++player)
 	{
 		if (!BIT(batteries, player))
 			m_stick_awake[player] = false;
@@ -96,7 +96,7 @@ bool xavix_anpanman_sticks_device::reports_enabled()
 	return m_stick_awake[0] || m_stick_awake[1];
 }
 
-u32 xavix_anpanman_sticks_device::read_report(unsigned report)
+u32 xavix_anpanman_sticks_device::read_report(u32 report)
 {
 	if (!m_stick_awake[report] || !BIT(m_stick_batteries->read(), report))
 		return xavix_ir_report_device_base::NO_SEQUENCE;

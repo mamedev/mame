@@ -207,9 +207,9 @@ void xavix_beyblade_peer_device::vblank_w(int state)
 
 	// Match the launcher's unsigned 35-sample speed filter, including 16-bit wraparound.
 	u16 rpm = 0;
-	for (unsigned age = 0; age < RPM_FILTER.size(); age++)
+	for (u32 age = 0; age < RPM_FILTER.size(); age++)
 	{
-		unsigned const history = (m_peer_ripcord_history_position + RPM_FILTER.size() - 1 - age) % RPM_FILTER.size();
+		u32 const history = (m_peer_ripcord_history_position + RPM_FILTER.size() - 1 - age) % RPM_FILTER.size();
 		rpm += u16(m_peer_ripcord_history[history]) * RPM_FILTER[age];
 	}
 	m_peer_rpm = rpm;

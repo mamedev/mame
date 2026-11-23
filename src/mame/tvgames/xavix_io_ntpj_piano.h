@@ -15,7 +15,7 @@ class xavix_piano_controller_device : public device_t
 public:
 	xavix_piano_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	template <unsigned Row> auto key_callback() { return m_keys_cb[Row].bind(); }
+	template <u32 Row> auto key_callback() { return m_keys_cb[Row].bind(); }
 	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 
 	u8 data_r() const { return m_data; }

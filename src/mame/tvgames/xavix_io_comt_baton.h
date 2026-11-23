@@ -25,12 +25,12 @@ private:
 	// Motion 3 takes priority when the unsupported Motion 1+3 combination is requested.
 	static constexpr u8 MOTION_REPORTS[8] = { 0x0d, 0x01, 0x06, 0x03, 0x07, 0x07, 0x09, 0x09 };
 
-	virtual u32 read_report(unsigned report) override;
+	virtual u32 read_report(u32 report) override;
 	virtual bool reports_enabled() override;
 	virtual void ir_burst_started(u64 gap_ticks) override;
 	virtual void ir_burst_finished(u64 width_ticks) override;
 	virtual void ir_idle_timeout() override;
-	static bool burst_length(u64 ticks, unsigned units);
+	static bool burst_length(u64 ticks, u32 units);
 
 	required_ioport m_baton;
 	required_ioport m_baton_mode;

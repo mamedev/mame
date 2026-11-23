@@ -25,8 +25,8 @@ protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual u32 read_report(unsigned report) override;
-	virtual bool report_enabled(unsigned report) override;
+	virtual u32 read_report(u32 report) override;
+	virtual bool report_enabled(u32 report) override;
 
 private:
 	static constexpr u8 BAT_PAYLOADS[3] = { 0x43, 0x4a, 0x51 };

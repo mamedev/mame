@@ -414,7 +414,7 @@ void xavix_analog_image_sensor_device::device_start()
 {
 	if (m_target_count < 1 || m_target_count > MAX_TARGETS)
 		throw emu_fatalerror("%s: image sensor target count %u is outside 1-%u", tag(), m_target_count, MAX_TARGETS);
-	for (unsigned target = 0; target < m_target_count; ++target)
+	for (u32 target = 0; target < m_target_count; ++target)
 	{
 		if (!m_target_x[target].found() || !m_target_y[target].found()
 				|| !m_target_size[target].found() || !m_target_hidden[target].found())
@@ -596,7 +596,7 @@ void xavix_analog_image_sensor_device_base::integrate_exposure()
 	if (now <= m_exposure_last_update)
 		return;
 	double const weight = (now - m_exposure_last_update).as_double() / m_exposure_period.as_double();
-	for (unsigned pixel = 0; pixel < m_exposure_sum.size(); ++pixel)
+	for (u32 pixel = 0; pixel < m_exposure_sum.size(); ++pixel)
 		m_exposure_sum[pixel] += double(m_exposure_scene[pixel]) * weight;
 	m_exposure_last_update = now;
 }
@@ -604,7 +604,7 @@ void xavix_analog_image_sensor_device_base::integrate_exposure()
 void xavix_analog_image_sensor_device_base::finish_exposure()
 {
 	integrate_exposure();
-	for (unsigned pixel = 0; pixel < m_image.size(); ++pixel)
+	for (u32 pixel = 0; pixel < m_image.size(); ++pixel)
 		m_image[pixel] = std::clamp(int(m_exposure_sum[pixel] + 0.5), 0, 255);
 	m_exposing = false;
 }
@@ -627,7 +627,7 @@ TIMER_CALLBACK_MEMBER(xavix_analog_image_sensor_device_base::scan_tick)
 	else if (!BIT(m_status, 2))
 	{
 		// Hold each pixel across both clock phases, including the row's ADC-priming pulse.
-		m_pixel = m_image[m_row * IMAGE_WIDTH + std::min<unsigned>(m_column, IMAGE_WIDTH - 1)];
+		m_pixel = m_image[m_row * IMAGE_WIDTH + std::min<u32>(m_column, IMAGE_WIDTH - 1)];
 		m_status |= 0x04;
 	}
 	else
@@ -670,7 +670,7 @@ void xavix_analog_image_sensor_device::capture_image()
 		return;
 
 	// Each target contributes independently; the ROM assigns tracked objects from the image, including overlaps.
-	for (unsigned target = 0; target < m_target_count; ++target)
+	for (u32 target = 0; target < m_target_count; ++target)
 	{
 		if (!m_target_hidden[target]->read())
 			render_target(m_target_x[target]->read(), m_target_y[target]->read(), m_target_size[target]->read(),
@@ -689,9 +689,9 @@ void xavix_image_sensor_device_base::render_target(u8 x_position, u8 y_position,
 	double const sine = std::sin(radians);
 	double const width = shape == target_shape::ROD ? radius / 3 : radius;
 	double const length = shape == target_shape::ROD ? radius * 3 : radius;
-	for (unsigned y = 0; y < IMAGE_HEIGHT; ++y)
+	for (u32 y = 0; y < IMAGE_HEIGHT; ++y)
 	{
-		for (unsigned x = 0; x < IMAGE_WIDTH; ++x)
+		for (u32 x = 0; x < IMAGE_WIDTH; ++x)
 		{
 			double const dx = x - centre_x;
 			double const dy = y - centre_y;
@@ -732,9 +732,9 @@ std::pair<std::error_condition, std::string> xavix_digital_image_sensor_device::
 		return std::make_pair(image_error::INVALIDLENGTH, "Raw camera input requires a 32x32 opaque monochrome picture");
 
 	std::array<u8, IMAGE_WIDTH * IMAGE_HEIGHT> source;
-	for (unsigned y = 0; y < IMAGE_HEIGHT; ++y)
+	for (u32 y = 0; y < IMAGE_HEIGHT; ++y)
 	{
-		for (unsigned x = 0; x < IMAGE_WIDTH; ++x)
+		for (u32 x = 0; x < IMAGE_WIDTH; ++x)
 		{
 			rgb_t const colour(picture.pix(y, x));
 			if (colour.a() != 0xff || colour.r() != colour.g() || colour.r() != colour.b())
@@ -757,7 +757,7 @@ void xavix_digital_image_sensor_device::capture_image()
 	{
 		// Representative levels straddle the ROM's threshold; actual camera brightness is unmeasured.
 		m_image.fill(m_ambient->read());
-		for (unsigned glove = 0; glove < m_glove_x.size(); ++glove)
+		for (u32 glove = 0; glove < m_glove_x.size(); ++glove)
 		{
 			if (!m_glove_hidden[glove]->read())
 				render_target(m_glove_x[glove]->read(), m_glove_y[glove]->read(), m_glove_size[glove]->read(), 0, target_shape::DISK, 192);
@@ -874,8 +874,8 @@ void xavix_serial_tracking_sensor_device::latch_report()
 	// Visible blobs precede empty slots; the ROM's single-foot path only reads slot 0.
 	u8 const hidden = m_target_hidden->read();
 	m_report.fill(0);
-	unsigned report = 0;
-	for (unsigned target = 0; target != 2; ++target)
+	u32 report = 0;
+	for (u32 target = 0; target != 2; ++target)
 	{
 		if (!BIT(hidden, target))
 		{
@@ -901,14 +901,14 @@ void xavix_serial_tracking_sensor_device::clock_w(bool level, bool driven)
 		}
 		else
 		{
-			unsigned const bit = m_bit_count++;
+			u32 const bit = m_bit_count++;
 			if (bit < 3)
 				m_data = BIT(0x05, bit);
 			else if (bit == 39)
 				m_data = 1;
 			else
 			{
-				unsigned const data_bit = bit - 3;
+				u32 const data_bit = bit - 3;
 				m_data = BIT(m_report[data_bit / 6], data_bit % 6);
 			}
 		}

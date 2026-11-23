@@ -23,7 +23,7 @@ protected:
 	// device_t implementation
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual u32 read_report(unsigned report) override;
+	virtual u32 read_report(u32 report) override;
 
 private:
 	static constexpr u8 CONTROL_REPORTS[2][8] =
@@ -44,9 +44,9 @@ private:
 		}
 	};
 
-	u16 control_report_r(unsigned player);
+	u16 control_report_r(u32 player);
 	u16 accessory_report_r();
-	u16 identity_report_r(unsigned part);
+	u16 identity_report_r(u32 part);
 
 	required_device<screen_device> m_screen;
 	required_ioport_array<2> m_robot_controls;

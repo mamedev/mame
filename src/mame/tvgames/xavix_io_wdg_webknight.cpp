@@ -57,13 +57,13 @@ ioport_constructor xavix_webknight_device::device_input_ports() const
 	return INPUT_PORTS_NAME(xavix_webknight);
 }
 
-u32 xavix_webknight_device::read_report(unsigned)
+u32 xavix_webknight_device::read_report(u32)
 {
 	u8 const code = m_identity->read() & 0x1f;
 	return complemented_report(code);
 }
 
-bool xavix_webknight_device::report_enabled(unsigned)
+bool xavix_webknight_device::report_enabled(u32)
 {
 	return (m_identity->read() & 0x1f) != 0x1f && BIT(m_mark_switch->read(), 0);
 }

@@ -151,7 +151,7 @@ u8 xavix_epo_kabj_card_reader_device::begin_scan()
 	u8 const code = m_code->read();
 	u8 const checksum = (8 - std::popcount(code)) & 7;
 	m_pattern = u16(checksum) << 10 | 0x2000;
-	for (unsigned bit = 0; bit != 8; ++bit)
+	for (u32 bit = 0; bit != 8; ++bit)
 		m_pattern |= u16(BIT(code, 7 - bit)) << (bit + 2);
 
 	// The reader produces one extra trailing interval for codes with at most two set bits.

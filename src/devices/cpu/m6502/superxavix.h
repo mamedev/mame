@@ -107,8 +107,8 @@ private:
 	void observe_address(u32 address);
 	u8 raw_instruction(u32 address);
 	static bool internal_address(u32 address) { return !(address & 0x808000); }
-	static unsigned access_cycles(u8 control) { unsigned const cycles = BIT(control, 1, 3); return cycles ? cycles : 8; }
-	static unsigned page_cycles(u8 control) { unsigned const cycles = BIT(control, 6, 2); return cycles ? cycles : 4; }
+	static u32 access_cycles(u8 control) { u32 const cycles = BIT(control, 1, 3); return cycles ? cycles : 8; }
+	static u32 page_cycles(u8 control) { u32 const cycles = BIT(control, 6, 2); return cycles ? cycles : 4; }
 
 	devcb_read8 m_memory_control_cb;
 	u32 m_instruction_tag;

@@ -69,7 +69,7 @@ void xavix_rockman_arm_device::device_reset()
 	m_shake_lowered = false;
 }
 
-bool xavix_rockman_arm_device::report_enabled(unsigned)
+bool xavix_rockman_arm_device::report_enabled(u32)
 {
 	if (BIT(m_controller_power->read(), 0))
 		return 1;
@@ -79,12 +79,12 @@ bool xavix_rockman_arm_device::report_enabled(unsigned)
 	return 0;
 }
 
-u32 xavix_rockman_arm_device::read_report(unsigned)
+u32 xavix_rockman_arm_device::read_report(u32)
 {
 	u8 const controls = m_controller_buttons->read();
 	u8 const arm = m_arm->read() & 3;
 
-	unsigned pose = arm == 1 ? 1 : arm == 2 ? 2 : 0;
+	u32 pose = arm == 1 ? 1 : arm == 2 ? 2 : 0;
 	if (BIT(controls, 2))
 	{
 		pose = m_shake_lowered ? 2 : 1;
@@ -101,6 +101,6 @@ u32 xavix_rockman_arm_device::read_report(unsigned)
 	}
 
 	// Normal Shot takes priority if both high-level button gestures are mapped to one host control.
-	unsigned const button = BIT(controls, 0) ? 1 : BIT(controls, 1) ? 2 : 0;
+	u32 const button = BIT(controls, 0) ? 1 : BIT(controls, 1) ? 2 : 0;
 	return CONTROLLER_REPORTS[pose][button];
 }

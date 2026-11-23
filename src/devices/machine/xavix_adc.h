@@ -14,7 +14,7 @@ public:
 	xavix_adc_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	void set_audio_channel(u8 channel) { set_audio_input(0, channel); }
 	void set_legacy_control(bool enabled) { m_legacy_control = enabled; }
-	void set_audio_input(unsigned input, u8 channel)
+	void set_audio_input(u32 input, u8 channel)
 	{
 		assert(input < m_audio_channel.size() && channel < m_audio_channel.size());
 		m_audio_channel[input] = channel;
@@ -23,7 +23,7 @@ public:
 	}
 	auto irq_callback() { return m_irq_cb.bind(); }
 
-	template <unsigned Channel> auto input_callback() { return m_input_cb[Channel].bind(); }
+	template <u32 Channel> auto input_callback() { return m_input_cb[Channel].bind(); }
 
 	void map(address_map &map) ATTR_COLD;
 
@@ -77,7 +77,7 @@ private:
 	sound_stream *m_audio_stream;
 	std::array<u8, 8> m_audio_channel;
 	std::array<u8, 8> m_audio_sample;
-	unsigned m_audio_input_count;
+	u32 m_audio_input_count;
 };
 
 DECLARE_DEVICE_TYPE(XAVIX_ADC, xavix_adc_device)

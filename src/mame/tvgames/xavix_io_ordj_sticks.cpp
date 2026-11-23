@@ -73,7 +73,7 @@ void xavix_hibiki_sticks_device::device_reset()
 
 INPUT_CHANGED_MEMBER(xavix_hibiki_sticks_device::stick_swing)
 {
-	unsigned const player = unsigned(param);
+	u32 const player = u32(param);
 	assert(player < m_reports_remaining.size());
 	if (newval && !oldval && BIT(m_stick_power->read(), player))
 		m_reports_remaining[player] = 2;
@@ -83,7 +83,7 @@ bool xavix_hibiki_sticks_device::reports_enabled()
 {
 	u8 const power = m_stick_power->read();
 	int active = 0;
-	for (unsigned player = 0; player != m_reports_remaining.size(); ++player)
+	for (u32 player = 0; player != m_reports_remaining.size(); ++player)
 	{
 		if (!BIT(power, player))
 			m_reports_remaining[player] = 0;
@@ -97,7 +97,7 @@ bool xavix_hibiki_sticks_device::reports_enabled()
 	return active;
 }
 
-u32 xavix_hibiki_sticks_device::read_report(unsigned report)
+u32 xavix_hibiki_sticks_device::read_report(u32 report)
 {
 	if (!m_reports_remaining[report] || !BIT(m_stick_power->read(), report))
 		return NO_SEQUENCE;

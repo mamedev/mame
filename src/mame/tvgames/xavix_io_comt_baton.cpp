@@ -71,7 +71,7 @@ void xavix_comet_baton_device::device_reset()
 	m_command = 0xff;
 }
 
-u32 xavix_comet_baton_device::read_report(unsigned report)
+u32 xavix_comet_baton_device::read_report(u32 report)
 {
 	u8 const controls = m_baton->read();
 	// The ROM also accepts combined Shake+Big Shake and Big Shake+Twirl reports.
@@ -84,7 +84,7 @@ bool xavix_comet_baton_device::reports_enabled()
 	return BIT(m_baton_mode->read(), 0) && bool(m_baton->read() & 0x1f);
 }
 
-bool xavix_comet_baton_device::burst_length(u64 ticks, unsigned units)
+bool xavix_comet_baton_device::burst_length(u64 ticks, u32 units)
 {
 	// Representative windows surround the native transmitter's roughly 7,400-clock units.
 	return ticks >= 6'000 * units && ticks <= 9'500 * units;

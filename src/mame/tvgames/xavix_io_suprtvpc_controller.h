@@ -16,9 +16,9 @@ class xavix_tvpc_controller_device : public device_t, public device_rtc_interfac
 public:
 	xavix_tvpc_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	template <unsigned Row> auto key_callback() { return m_keys_cb[Row].bind(); }
+	template <u32 Row> auto key_callback() { return m_keys_cb[Row].bind(); }
 	auto right_shift_callback() { return m_right_shift_cb.bind(); }
-	template <unsigned Player> auto player_callback() { return m_players_cb[Player].bind(); }
+	template <u32 Player> auto player_callback() { return m_players_cb[Player].bind(); }
 	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 
 	u8 data_r() const { return m_data; }
@@ -35,7 +35,7 @@ protected:
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override { }
 
 private:
-	static constexpr unsigned QUEUE_SIZE = 128;
+	static constexpr u32 QUEUE_SIZE = 128;
 	static constexpr u8 DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	static constexpr u8 MONTH_OFFSETS[12] = { 0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4 };
 	static constexpr u8 PAYLOAD_BITS[8] = { 8, 8, 8, 8, 5, 5, 7, 8 };

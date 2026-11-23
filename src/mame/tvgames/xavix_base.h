@@ -143,7 +143,7 @@ protected:
 
 	virtual u8 lightgun_r(offs_t offset);
 
-	virtual void external_bus_ctrl_changed(unsigned index, u8 data) { }
+	virtual void external_bus_ctrl_changed(u32 index, u8 data) { }
 
 	required_ioport m_in0;
 	required_ioport m_in1;
@@ -238,7 +238,7 @@ protected:
 
 	virtual u8 external_code_r(offs_t offset) override;
 
-	virtual void external_bus_ctrl_changed(unsigned index, u8 data) override;
+	virtual void external_bus_ctrl_changed(u32 index, u8 data) override;
 
 	// The default cartridge window covers 0x000000-0x5fffff, even for 4 MiB cartridges.
 	offs_t m_cart_limit; // exclusive external-bus byte address limit

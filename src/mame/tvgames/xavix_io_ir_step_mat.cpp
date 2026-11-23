@@ -65,7 +65,7 @@ u16 xavix_ir_step_mat_device::jmat_report(u8 pads)
 	return report ^ 0xffff;
 }
 
-u32 xavix_ir_step_mat_device::read_report(unsigned)
+u32 xavix_ir_step_mat_device::read_report(u32)
 {
 	if (!BIT(m_power->read(), 0))
 		return xavix_ir_report_device_base::NO_SEQUENCE;

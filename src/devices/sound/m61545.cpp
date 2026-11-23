@@ -75,7 +75,7 @@ void m61545_device::latch_data()
 	m_stream->update();
 	m_supply = BIT(m_shift, 2, 2);
 
-	for (unsigned channel = 0; channel < 2; ++channel)
+	for (u32 channel = 0; channel < 2; ++channel)
 	{
 		u8 const attenuation = BIT(m_shift, channel ? 4 : 11, 7);
 		if (attenuation <= 95)

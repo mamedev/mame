@@ -69,7 +69,7 @@ void xavix_io_device::device_reset()
 	m_event_pending = 0;
 	update_irq();
 
-	for (unsigned port = 0; port < previous_direction.size(); ++port)
+	for (u32 port = 0; port < previous_direction.size(); ++port)
 		if (previous_direction[port])
 			update_output(port);
 }
@@ -125,7 +125,7 @@ void xavix_io_device::external_output_w(offs_t port, u8 data, u8 mem_mask)
 void xavix_io_device::direction_w(offs_t offset, u8 data)
 {
 	assert(offset < m_direction.size());
-	LOG("%s: xavix IO direction_w (port %u) %02x\n", machine().describe_context(), unsigned(offset), data);
+	LOG("%s: xavix IO direction_w (port %u) %02x\n", machine().describe_context(), u32(offset), data);
 	m_direction[offset] = data;
 	update_output(offset);
 }
@@ -133,12 +133,12 @@ void xavix_io_device::direction_w(offs_t offset, u8 data)
 void xavix_io_device::data_w(offs_t offset, u8 data)
 {
 	assert(offset < m_data.size());
-	LOG("%s: xavix IO data_w (port %u) %02x\n", machine().describe_context(), unsigned(offset), data);
+	LOG("%s: xavix IO data_w (port %u) %02x\n", machine().describe_context(), u32(offset), data);
 	m_data[offset] = data;
 	update_output(offset);
 }
 
-void xavix_io_device::update_output(unsigned port)
+void xavix_io_device::update_output(u32 port)
 {
 	u8 const input = m_input_cb[port](0, m_direction[port]);
 	u8 const levels = (input & ~m_direction[port]) | (m_data[port] & m_direction[port]);
@@ -149,7 +149,7 @@ u8 xavix_io_device::direction_r(offs_t offset)
 {
 	assert(offset < m_direction.size());
 	if (!machine().side_effects_disabled())
-		LOG("%s: xavix IO direction_r (port %u)\n", machine().describe_context(), unsigned(offset));
+		LOG("%s: xavix IO direction_r (port %u)\n", machine().describe_context(), u32(offset));
 	return m_direction[offset];
 }
 
@@ -157,17 +157,17 @@ u8 xavix_io_device::data_r(offs_t offset)
 {
 	assert(offset < m_direction.size());
 	if (!machine().side_effects_disabled())
-		LOG("%s: xavix IO data_r (port %u)\n", machine().describe_context(), unsigned(offset));
+		LOG("%s: xavix IO data_r (port %u)\n", machine().describe_context(), u32(offset));
 	u8 const input = m_input_cb[offset](0, m_direction[offset]);
 	return (input & ~m_direction[offset]) | (m_data[offset] & m_direction[offset]);
 }
 
-u8 xavix_io_device::output_mask(unsigned port) const
+u8 xavix_io_device::output_mask(u32 port) const
 {
 	return m_direction[port];
 }
 
-u8 xavix_io_device::output_latch(unsigned port)
+u8 xavix_io_device::output_latch(u32 port)
 {
 	return m_data[port];
 }
@@ -192,12 +192,12 @@ u8 superxavix_io_device::data_r(offs_t offset)
 	return m_pio->pio_input_r(offset);
 }
 
-u8 superxavix_io_device::output_mask(unsigned port) const
+u8 superxavix_io_device::output_mask(u32 port) const
 {
 	return m_pio->output_mask(port);
 }
 
-u8 superxavix_io_device::output_latch(unsigned port)
+u8 superxavix_io_device::output_latch(u32 port)
 {
 	return m_pio->pio_output_r(port);
 }

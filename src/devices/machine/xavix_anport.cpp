@@ -53,12 +53,12 @@ void xavix_anport_device::device_reset()
 	m_counter_valid.fill(false);
 }
 
-u8 xavix_anport_device::input_r(unsigned channel)
+u8 xavix_anport_device::input_r(u32 channel)
 {
 	return channel < 4 ? m_input_cb[channel]() : 0xff;
 }
 
-u8 xavix_anport_device::counter_r(unsigned channel)
+u8 xavix_anport_device::counter_r(u32 channel)
 {
 	if (!machine().side_effects_disabled())
 		LOG("%s: data_r (channel %u)\n", machine().describe_context(), channel);
@@ -88,7 +88,7 @@ u8 xavix_anport_device::counter_r(unsigned channel)
 	return value;
 }
 
-void xavix_anport_device::counter_w(unsigned channel, u8 data)
+void xavix_anport_device::counter_w(u32 channel, u8 data)
 {
 	LOG("%s: data_w (channel %u) %02x\n", machine().describe_context(), channel, data);
 	if (m_counter_mode[channel])

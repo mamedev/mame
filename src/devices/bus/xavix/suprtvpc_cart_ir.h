@@ -26,7 +26,7 @@ protected:
 	virtual void rcv_complete() override;
 
 private:
-	static constexpr unsigned BAUD = 9600;
+	static constexpr u32 BAUD = 9600;
 
 	TIMER_CALLBACK_MEMBER(poll_stream);
 	TIMER_CALLBACK_MEMBER(transmit_pulse_end);

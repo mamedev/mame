@@ -227,8 +227,8 @@ void domyos_step_hub_device::latch_report()
 	}
 
 	// Header bits 6-5 contain the population count of bit 7 and the payload modulo four.
-	unsigned ones = 1;
-	for (unsigned index = 1; index < m_report_bytes; index++)
+	u32 ones = 1;
+	for (u32 index = 1; index < m_report_bytes; index++)
 		ones += std::popcount(m_report[index]);
 	m_report[0] = 0x80 | ((ones & 3) << 5);
 	m_bit = 0;
