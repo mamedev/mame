@@ -3201,7 +3201,8 @@ void xavix_cart_state::xavix_popirak(machine_config &config)
 
 
 // Popira 2
-static INPUT_PORTS_START( popira2 ) // player 2 buttons have reported heavy latency and are sampled by the timer-driven ADC path
+// Player 2 buttons are sampled through the timer-driven ADC.
+static INPUT_PORTS_START( popira2 )
 	PORT_INCLUDE(xavix)
 
 	PORT_MODIFY("IN0")
