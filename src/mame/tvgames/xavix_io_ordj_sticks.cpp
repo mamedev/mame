@@ -100,7 +100,7 @@ bool xavix_hibiki_sticks_device::reports_enabled()
 u32 xavix_hibiki_sticks_device::read_report(unsigned report)
 {
 	if (!m_reports_remaining[report] || !BIT(m_stick_power->read(), report))
-		return 0xff;
+		return NO_SEQUENCE;
 
 	--m_reports_remaining[report];
 	// The sticks have no gameplay switch; the transmitter's alternate report-family polarity is unknown.

@@ -68,7 +68,7 @@ u32 xavix_croket_controllers_device::read_report(unsigned report)
 	u8 const guard = m_guard->read();
 	u8 const strength = (motion | guard) & mask ? 3 : m_motion_strength[report]->read();
 	if (!(m_controller_power->read() & mask) || !strength)
-		return 0xff;
+		return NO_SEQUENCE;
 
 	return motion_report(report, BIT(guard, report), strength);
 }
