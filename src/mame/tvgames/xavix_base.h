@@ -109,7 +109,7 @@ protected:
 	virtual void configure_board(machine_config &config) ATTR_COLD;
 	void configure_power_hold(machine_config &config) ATTR_COLD;
 	void configure_ir(machine_config &config, required_device<xavix_ir_motion_device> &controllers, xavix_ir_motion_device::controller_type type) ATTR_COLD;
-	void power_off_w(int state);
+	void request_power_off();
 
 	virtual u8 io0_input_r(u8 direction);
 	virtual u8 io1_input_r(u8 direction);

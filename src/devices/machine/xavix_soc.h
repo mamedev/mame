@@ -60,7 +60,7 @@ public:
 
 	auto lightgun_read_callback() { return m_lightgun_read_cb.bind(); }
 	auto power_read_callback() { return m_power_read_cb.bind(); }
-	auto power_off_callback() { return m_power_off_cb.bind(); }
+	template <typename... T> void set_power_off_callback(T &&... args) { m_power_off_cb.set(std::forward<T>(args)...); }
 	auto external_bus_ctrl_callback() { return m_external_bus_ctrl_cb.bind(); }
 	template <typename... T> void set_video_read_callback(T &&... args) { m_video.lookup()->set_video_read_callback(std::forward<T>(args)...); }
 	template <typename... T> void set_vblank_callback(T &&... args) { m_vblank_cb.set(std::forward<T>(args)...); }
@@ -146,7 +146,7 @@ private:
 	required_shared_ptr<u8> m_mainram;
 	devcb_read8 m_lightgun_read_cb;
 	devcb_read8 m_power_read_cb;
-	devcb_write_line m_power_off_cb;
+	device_delegate<void ()> m_power_off_cb;
 	devcb_write8 m_external_bus_ctrl_cb;
 	device_delegate<void ()> m_vblank_cb;
 	device_delegate<u8 (offs_t)> m_external_code_read_cb;

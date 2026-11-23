@@ -24,6 +24,7 @@ xavix_power_hold_device::xavix_power_hold_device(const machine_config &mconfig, 
 
 void xavix_power_hold_device::device_start()
 {
+	m_power_off_cb.resolve_safe();
 	m_timer = timer_alloc(FUNC(xavix_power_hold_device::power_hold_expired), this);
 	save_item(NAME(m_last_level));
 }
@@ -51,5 +52,5 @@ void xavix_power_hold_device::write(offs_t offset, u8 data, u8 mem_mask)
 
 TIMER_CALLBACK_MEMBER(xavix_power_hold_device::power_hold_expired)
 {
-	m_power_off_cb(1);
+	m_power_off_cb();
 }

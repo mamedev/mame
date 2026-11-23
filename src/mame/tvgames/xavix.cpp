@@ -118,7 +118,7 @@ void xavix_state::configure_board(machine_config &config)
 	m_soc->set_vblank_callback(*this, FUNC(xavix_state::vblank_extra));
 	m_soc->lightgun_read_callback().set(*this, FUNC(xavix_state::lightgun_r));
 	m_soc->power_read_callback().set(*this, FUNC(xavix_state::power_status_r));
-	m_soc->power_off_callback().set(*this, FUNC(xavix_state::power_off_w));
+	m_soc->set_power_off_callback(*this, FUNC(xavix_state::request_power_off));
 	m_soc->external_bus_ctrl_callback().set(*this, FUNC(xavix_state::external_bus_ctrl_changed));
 
 	m_soc->io_input_callback<0>().set(*this, FUNC(xavix_state::io0_input_cb));
@@ -155,7 +155,7 @@ void xavix_state::configure_board(machine_config &config)
 void xavix_state::configure_power_hold(machine_config &config)
 {
 	xavix_power_hold_device &power_hold(XAVIX_POWER_HOLD(config, "power_hold"));
-	power_hold.power_off_callback().set(*this, FUNC(xavix_state::power_off_w));
+	power_hold.set_power_off_callback(*this, FUNC(xavix_state::request_power_off));
 	m_soc->io_output_callback<1>().append(power_hold, FUNC(xavix_power_hold_device::write));
 }
 
@@ -313,10 +313,9 @@ INPUT_CHANGED_MEMBER(xavix_state::power_off)
 		machine().schedule_exit();
 }
 
-void xavix_state::power_off_w(int state)
+void xavix_state::request_power_off()
 {
-	if (state)
-		machine().schedule_exit();
+	machine().schedule_exit();
 }
 
 //-------------------------------------------------
@@ -4608,7 +4607,8 @@ void xavix_ltv_tam_state::io0_output_w(u8 data, u8 direction)
 {
 	xavix_i2c_state::io0_output_w(data, direction);
 	// The terminal auto-off signal is IO0.6; IO1.7 remains an input at shutdown.
-	power_off_w(BIT(data & direction, 6));
+	if (BIT(data & direction, 6))
+		request_power_off();
 	m_tamagotchi->tx_w(BIT(data & direction, 7));
 }
 

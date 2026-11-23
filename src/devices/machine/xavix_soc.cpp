@@ -301,6 +301,7 @@ void xavix_soc_device::device_start()
 	// This makes tak_hamr's RAM-seeded title background repeat on identical cold boots.
 	std::ranges::generate(m_mainram, [this] () { return u8(machine().rand()); });
 
+	m_power_off_cb.resolve_safe();
 	m_vblank_cb.resolve_safe();
 	m_watchdog_timer = timer_alloc(FUNC(xavix_soc_device::watchdog_expired), this);
 	auto const service = [this] (offs_t offset, u8 &data, u8 mem_mask)
@@ -564,7 +565,7 @@ void xavix_soc_device::power_ctrl_w(u8 data)
 	LOG("%s: power_ctrl_w %02x\n", machine().describe_context(), data);
 
 	if (BIT(data, 6) && !machine().side_effects_disabled())
-		m_power_off_cb(1);
+		m_power_off_cb();
 }
 
 u8 xavix_soc_device::version_r()

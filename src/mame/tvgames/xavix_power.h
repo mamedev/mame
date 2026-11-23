@@ -11,7 +11,7 @@ class xavix_power_hold_device : public device_t
 public:
 	xavix_power_hold_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	auto power_off_callback() { return m_power_off_cb.bind(); }
+	template <typename... T> void set_power_off_callback(T &&... args) { m_power_off_cb.set(std::forward<T>(args)...); }
 	void write(offs_t offset, u8 data, u8 mem_mask);
 
 protected:
@@ -21,7 +21,7 @@ protected:
 private:
 	TIMER_CALLBACK_MEMBER(power_hold_expired);
 
-	devcb_write_line m_power_off_cb;
+	device_delegate<void ()> m_power_off_cb;
 	emu_timer *m_timer;
 	u8 m_last_level = 0xff;
 };
