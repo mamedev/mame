@@ -335,14 +335,6 @@ void hx5102_device::board_ready(int state)
 }
 
 /*
-    Board RESET input.
-*/
-void hx5102_device::board_reset(int state)
-{
-	// MAME resets the child TMS9995. The CPU latches the wait mode set in device_add_mconfig().
-}
-
-/*
     Effect from the motor monoflop.
 */
 void hx5102_device::motor_w(int state)
@@ -603,7 +595,6 @@ void hx5102_device::device_start()
 void hx5102_device::device_reset()
 {
 	LOGMASKED(LOG_RESET, "Board reset\n");
-	board_reset(ASSERT_LINE);
 	board_ready(ASSERT_LINE);
 }
 

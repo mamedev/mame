@@ -377,8 +377,6 @@ void looping_state::machine_start()
 
 void looping_state::machine_reset()
 {
-	// The TMS9995 takes its reset wait mode from looping().
-
 	m_irq_enable = true;
 	m_cop_latch = ~0;
 	m_cop_address = ~0;

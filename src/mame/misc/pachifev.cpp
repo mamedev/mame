@@ -295,8 +295,6 @@ void pachifev_state::pf_adpcm_int(int state)
 
 void pachifev_state::machine_reset()
 {
-	// The TMS9995 takes its reset wait mode from pachifev().
-
 	m_power=0;
 	m_max_power=0;
 	m_input_power=0;

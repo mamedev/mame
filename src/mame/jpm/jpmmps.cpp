@@ -156,7 +156,6 @@ public:
 private:
 	uint8_t m_sound_buffer = 0;
 	uint8_t m_psg_latch = 0;
-	virtual void machine_reset() override ATTR_COLD;
 
 	void jpmmps_io_map(address_map &map) ATTR_COLD;
 	void jpmmps_map(address_map &map) ATTR_COLD;
@@ -243,11 +242,6 @@ void jpmmps_state::jpmmps_ic22_portc_w(uint8_t data)
 #define SOUND_CLOCK (MAIN_CLOCK / 4)
 #define DUART_CLOCK (MAIN_CLOCK / 4)
 
-
-void jpmmps_state::machine_reset()
-{
-	// The TMS9995 latches the wait mode configured in jpmmps() when reset is released.
-}
 
 void jpmmps_state::jpmmps(machine_config &config)
 {

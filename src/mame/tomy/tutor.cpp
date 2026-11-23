@@ -283,8 +283,6 @@ void tutor_state::machine_reset()
 	m_tape_interrupt_enable = 0;
 	m_centronics_busy = 0;
 
-	// The TMS9995 takes its reset wait mode from the shared tutor() configuration.
-
 	m_maincpu->hold_line(CLEAR_LINE);
 }
 

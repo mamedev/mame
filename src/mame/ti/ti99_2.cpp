@@ -254,7 +254,6 @@ void ti99_2_state::machine_start()
 
 void ti99_2_state::machine_reset()
 {
-	// MAME calls tms9995_device::device_reset() before this handler.
 	m_otherbank = false;
 }
 

@@ -86,7 +86,6 @@ public:
 	void nsmpoker(machine_config &config);
 
 protected:
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -411,11 +410,6 @@ static GFXDECODE_START( gfx_nsmpoker )
 	GFXDECODE_ENTRY( "maincpu", 0, tilelayout, 0, 16 )
 GFXDECODE_END
 
-
-void nsmpoker_state::machine_reset()
-{
-	// The TMS9995 latches the wait mode configured in nsmpoker() when reset is released.
-}
 
 /*************************
 *    Machine Drivers     *

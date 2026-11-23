@@ -52,7 +52,6 @@ public:
 	void triviaquiz(machine_config &config);
 
 protected:
-	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	required_device<tms9995_device> m_maincpu;
@@ -139,11 +138,6 @@ static INPUT_PORTS_START( triviaquiz )
 
 	// DSW2 not populated
 INPUT_PORTS_END
-
-void triviaquiz_state::machine_reset()
-{
-	// The TMS9995 latches the wait mode configured in triviaquiz() when reset is released.
-}
 
 void triviaquiz_state::triviaquiz(machine_config &config)
 {

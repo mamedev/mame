@@ -321,8 +321,6 @@ void cortex_state::machine_reset()
 	m_vdp_int = 0;
 	m_beep->set_state(0);
 	m_bank1->set_entry(1);
-
-	// The TMS9995 takes its reset wait mode from cortex().
 }
 
 void cortex_state::cortex(machine_config &config)

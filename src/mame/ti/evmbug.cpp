@@ -132,8 +132,6 @@ void evmbug_state::kbd_put(u8 data)
 void evmbug_state::machine_reset()
 {
 	m_rbrl = 0;
-
-	// The TMS9995 takes its reset wait mode from evmbug().
 }
 
 void evmbug_state::machine_start()

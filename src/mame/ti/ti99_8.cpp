@@ -605,9 +605,6 @@ void ti99_8_state::console_reset(int state)
 		m_mainboard->crus_in(true); // assert
 		m_mainboard->ptgen_in(true); // clear
 
-		// READY high at reset release enables automatic wait states
-		if (state == CLEAR_LINE)
-			m_cpu->ready_line(ASSERT_LINE);
 		m_cpu->reset_line(state);
 
 		// Send RESET to the IOPort
@@ -672,7 +669,6 @@ void ti99_8_state::machine_reset()
 	// Clear INT1 and INT2 latch
 	m_int1 = CLEAR_LINE;
 	m_int2 = CLEAR_LINE;
-	// console_reset() drives READY at /RESET release for both machine and cartridge resets.
 	console_reset(ASSERT_LINE);
 	console_reset(CLEAR_LINE);
 }
@@ -684,6 +680,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	// TMS9995-MP9537 CPU @ 10.7 MHz
 	// MP9537 mask: This variant of the TMS9995 does not contain on-chip RAM
 	TMS9995_MP9537(config, m_cpu, XTAL(10'738'635));
+	m_cpu->set_auto_wait_on_reset(true);
 	m_cpu->set_addrmap(AS_PROGRAM, &ti99_8_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &ti99_8_state::crumap);
 	m_cpu->set_addrmap(tms9995_device::AS_SETADDRESS, &ti99_8_state::memmap_setaddress);
