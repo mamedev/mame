@@ -864,7 +864,7 @@ void tek440x_state::videoaddr_w(offs_t offset, u16 data)
 
 u8 tek440x_state::videocntl_r()
 {
-	u8 ans = m_videocntl;
+	u8 ans = m_videocntl & 0x07;
 
 	// SoundRdy
 	ans |= m_soundrdy;
@@ -873,10 +873,9 @@ u8 tek440x_state::videocntl_r()
 	if (m_screen->vblank())
 		ans |= 0x20;
 	else
-		// VAD.04 from reading out 16-bit values
-		ans |= ((m_screen->hpos()/16) & 0x10);
+		ans |= BIT(m_videobase_offset - 0xffe9 + m_screen->hpos() / 16, 4) << 4;
 
-	if (m_screen->hblank())
+	if (m_screen->hblank() == 0)
 		ans |= 0x40;
 
 	// reading out from valid location
