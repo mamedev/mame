@@ -474,11 +474,12 @@ uint32_t sh4_base_device::compute_ticks_refresh_timer(emu_timer *timer, int hert
 
 void sh4_base_device::sh4_refresh_timer_recompute()
 {
+	// TODO: the memory refresh timer on the SH4 is different than the SH3 one, needs to be reimplemented correctly
 	//if rtcnt < rtcor then rtcor-rtcnt
 	//if rtcnt >= rtcor then 256-rtcnt+rtcor=256+rtcor-rtcnt
-	uint32_t ticks = m_rtcor-m_rtcnt;
+	int ticks = (int)m_rtcor - (int)m_rtcnt;
 	if (ticks <= 0)
-		ticks = 256 + ticks;
+		ticks = 256 + ticks; // both are computead as 8 bit values
 	m_refresh_timer->adjust(attotime::from_hz(m_bus_clock) * rtcnt_div[(m_rtcsr >> 3) & 7] * ticks);
 	m_refresh_timer_base = m_rtcnt;
 }
