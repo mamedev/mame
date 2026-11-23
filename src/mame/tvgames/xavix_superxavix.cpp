@@ -1501,7 +1501,7 @@ INPUT_PORTS_END
 //  Other Systems
 //-------------------------------------------------
 
-// Ishikawa Ryou Excite Golf
+// Ryo Ishikawa Excite Golf
 static INPUT_PORTS_START( epo_rgfj )
 	PORT_INCLUDE(superxavix_i2c)
 
