@@ -1321,7 +1321,7 @@ u8 xavix_lightgun_state<Base, Players>::lightgun_position_r(unsigned player, off
 	case 2:
 		return guny;
 	default:
-		return 0;
+		return guny >> 8;
 	}
 }
 
