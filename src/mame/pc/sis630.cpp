@@ -8,7 +8,6 @@ SiS 630 chipset based PC
 TODO (main):
 - Finalize Super I/O handling of ITE 8705F (I/O $2e / $2f)
 \- fan monitor, cfr. I/O $294 reads in shutms11 BIOS fan tests;
-\- FDC doesn't work, moans on first boot;
 - '900 Ethernet PXE (missing ROM dump);
 - USB controllers (OpenHCI compliant);
 - ACPI is not fully lpc-acpi compliant;
@@ -18,6 +17,9 @@ TODO (main):
 - BIOS won't recognize PCI_SLOT expansion ROMs;
 
 TODO (usability, to be moved in a SW list):
+- win98qi: boots at bare minimum, slow on non-legacy PnP detection, will hang on
+  shutdown/restart in MS-DOS mode (presumably ACPI), actual HW drivers untested and bound to fail;
+
 - windows xp sp3: tests HW then does an ACPI devtrap write ($48), will eventually BSoD with
   ACPI STOP #a5 error with param $11
 \- To bypass hold F7 while the "to install SCSI drivers [...] press F6" appears.

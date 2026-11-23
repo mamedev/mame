@@ -681,16 +681,17 @@ void pcipc_state::pcipctx(machine_config &config)
 	PCI_ROOT(config, "pci");
 	I82439TX(config, "pci:00.0", "maincpu", 256*1024*1024);
 
-	// Really 'AB
+	// TODO: Really 'AB
+	// a20m doesn't seem to work right either way
 	// IT8680F claims to have an RTC but it doesn't seem enabled, assume internal RTC used instead.
 	i82371eb_isa_device &isa(I82371EB_ISA(config, "pci:07.0", "maincpu", true));
 	isa.boot_state_hook().set(FUNC(pcipc_state::boot_state_award_w));
 //  isa.smi().set_inputline("maincpu", INPUT_LINE_SMI);
-	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
+//	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", "maincpu"));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
-	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq15_w));
 
 	I82371EB_USB (config, "pci:07.2");
 	I82371EB_ACPI(config, "pci:07.3");
@@ -745,8 +746,9 @@ void pcipc_state::pciagp(machine_config &config)
 	isa.a20m().set_inputline("maincpu", INPUT_LINE_A20);
 
 	i82371eb_ide_device &ide(I82371EB_IDE(config, "pci:07.1", "maincpu"));
+	// FIXME: verify if this uses pin mapper or not, propagate resolution in misc/savquest.cpp
 	ide.irq_pri().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq14_w));
-	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_mirq0_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371eb_isa_device::pc_irq15_w));
 
 	I82371EB_USB (config, "pci:07.2");
 	I82371EB_ACPI(config, "pci:07.3");

@@ -8,19 +8,18 @@ rewritten by Angelo Salese to use the new PCI model
 Three board system consisting of a P5TX-LA PC motherboard, a Taito main board and a rom board.
 
 TODO:
-- The Retro Web MB pic lists a Winbond w83877tf Super I/O but neither BIOSes properly init that,
-  eventually failing with p5txla later on with PnP sequence. Missing power on default?
-- p5txla: Conflicting serial/parallel ports at POST, Cute Mouse loading hangs due of it;
+- p5txla: has problems with A20 line after win98qi base install;
 - pf2012: verify ISA irq 7 source (particularly ACK, PORT_IMPULSE(1) won't work),
           pinpoint coin counters output and verify tc0510nio write 4 EEPROM style write
           on coin insertion;
-- pf2012: Should show bootscreen when Voodoo fbiInit0 bit 0 is off (vga_pass), cfr. GH #11343;
 - pf2012: boots in service mode the first time around, needs default EEPROM set;
 - pf2012: service mode RTC item always initializes to 0 for hour count;
 - pf2012: PC portion returns an EMM386 "WARNING: Unable to set page frame base address"
           during boot up, safe to ignore?
 
 Notes:
+- pf2012: The Retro Web MB pic lists a Winbond w83877tf Super I/O but this game doesn't seem to
+          access it;
 - pf2012: -isa1 svga_et4k if you need PC side logs;
 - pf2012: game responds to CTRL+ALT+DEL, which will reset the machine.
 - pf2012: according to manual hold A+B+service button for 10 seconds for entering
@@ -416,7 +415,7 @@ void isa16_p5txla_mb::device_add_mconfig(machine_config &config)
 	//m_rtc->irq().set(m_pic8259_2, FUNC(pic8259_device::ir0_w));
 	m_rtc->set_century_index(0x32);
 
-	// VT82C42, AT style
+	// TODO: VT82C42, AT style
 	// Doesn't work with ibm BIOS, award15 does. ptl untested
 	AT_KEYBOARD_CONTROLLER(config, m_keybc, XTAL(12'000'000));
 	m_keybc->set_default_bios_tag("award15");
@@ -604,7 +603,7 @@ void p5txla_state::p5txla(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &p5txla_state::p5txla_map);
 	m_maincpu->set_addrmap(AS_IO, &p5txla_state::p5txla_io);
 	m_maincpu->set_irq_acknowledge_callback("pci:07.0:pic8259_master", FUNC(pic8259_device::inta_cb));
-//  m_maincpu->smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
+	m_maincpu->smiact().set("pci:00.0", FUNC(i82439tx_host_device::smi_act_w));
 
 	// FSB 66 MHz
 	PCI_ROOT(config, "pci");
@@ -618,7 +617,7 @@ void p5txla_state::p5txla(machine_config &config)
 
 	i82371sb_ide_device &ide(I82371SB_IDE(config, "pci:07.1", m_maincpu));
 	ide.irq_pri().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq14_w));
-	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_mirq0_w));
+	ide.irq_sec().set("pci:07.0", FUNC(i82371sb_isa_device::pc_irq15_w));
 
 	// FIXME: determine ISA bus clock
 	ISA16_SLOT(config, "board1", 0, "pci:07.0:isabus", isa_internal_devices, "w83877tf", true).set_option_machine_config("w83877tf", winbond_superio_config);
