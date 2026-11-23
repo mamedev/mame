@@ -6,9 +6,35 @@
 
 #pragma once
 
+#include "screen.h"
+
 #include <algorithm>
 #include <array>
 #include <utility>
+
+// The bat and optical ripcord encode motion as a finite count of receiver events.
+class xavix_optical_pulse_device_base : public device_t
+{
+public:
+	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
+	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
+
+protected:
+	xavix_optical_pulse_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const char *timer_name);
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	void schedule_events(u8 count);
+
+private:
+	TIMER_CALLBACK_MEMBER(event_timer);
+
+	device_delegate<void ()> m_event_out_cb;
+	required_device<screen_device> m_screen;
+	const char *const m_timer_name;
+	emu_timer *m_event_timer;
+	u8 m_events_remaining;
+};
 
 // Controllers supply reports; encoder bases own transmission and saved state.
 class xavix_ir_report_device : public device_t

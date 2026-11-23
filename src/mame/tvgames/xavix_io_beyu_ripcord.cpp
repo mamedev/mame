@@ -18,9 +18,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_BEYBLADE_RIPCORD, xavix_beyblade_ripcord_device, "xavix_beyblade_ripcord", "XaviX Beyblade Ripcord")
 
 xavix_beyblade_ripcord_device::xavix_beyblade_ripcord_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_BEYBLADE_RIPCORD, tag, owner, clock)
-	, m_event_out_cb(*this)
-	, m_screen(*this, finder_base::DUMMY_TAG)
+	: xavix_optical_pulse_device_base(mconfig, XAVIX_BEYBLADE_RIPCORD, tag, owner, clock, "xavix_beyblade_ripcord_device::event_timer")
 	, m_position(*this, "RIPCORD")
 {
 }
@@ -38,20 +36,16 @@ ioport_constructor xavix_beyblade_ripcord_device::device_input_ports() const
 
 void xavix_beyblade_ripcord_device::device_start()
 {
-	m_event_out_cb.resolve_safe();
-
-	m_event_timer = timer_alloc(FUNC(xavix_beyblade_ripcord_device::event_timer), this);
+	xavix_optical_pulse_device_base::device_start();
 
 	save_item(NAME(m_last_position));
-	save_item(NAME(m_events_remaining));
 	save_item(NAME(m_position_valid));
 }
 
 void xavix_beyblade_ripcord_device::device_reset()
 {
-	m_event_timer->adjust(attotime::never);
+	xavix_optical_pulse_device_base::device_reset();
 	m_last_position = 0;
-	m_events_remaining = 0;
 	m_position_valid = false;
 }
 
@@ -70,18 +64,5 @@ void xavix_beyblade_ripcord_device::vblank_w(int state)
 
 	int const delta = s8(position - m_last_position);
 	m_last_position = position;
-	m_events_remaining = delta < 0 ? -delta : delta;
-	if (!m_events_remaining)
-		return;
-
-	// Spread the encoder events across the field so firmware measures the pull rate rather than one burst.
-	attotime const interval = m_screen->frame_period() / (m_events_remaining + 1);
-	m_event_timer->adjust(interval, 0, interval);
-}
-
-TIMER_CALLBACK_MEMBER(xavix_beyblade_ripcord_device::event_timer)
-{
-	m_event_out_cb();
-	if (!--m_events_remaining)
-		m_event_timer->adjust(attotime::never);
+	schedule_events(delta < 0 ? -delta : delta);
 }

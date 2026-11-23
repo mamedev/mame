@@ -19,9 +19,7 @@
 DEFINE_DEVICE_TYPE(XAVIX_BASEBALL_BAT, xavix_baseball_bat_device, "xavix_baseball_bat", "XaviX / Radica Baseball Infrared Bat")
 
 xavix_baseball_bat_device::xavix_baseball_bat_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: device_t(mconfig, XAVIX_BASEBALL_BAT, tag, owner, clock)
-	, m_event_out_cb(*this)
-	, m_screen(*this, finder_base::DUMMY_TAG)
+	: xavix_optical_pulse_device_base(mconfig, XAVIX_BASEBALL_BAT, tag, owner, clock, "xavix_baseball_bat_device::event_timer")
 	, m_strength(*this, "BAT")
 {
 }
@@ -37,21 +35,6 @@ ioport_constructor xavix_baseball_bat_device::device_input_ports() const
 	return INPUT_PORTS_NAME(xavix_baseball_bat);
 }
 
-void xavix_baseball_bat_device::device_start()
-{
-	m_event_out_cb.resolve_safe();
-
-	m_event_timer = timer_alloc(FUNC(xavix_baseball_bat_device::event_timer), this);
-
-	save_item(NAME(m_events_remaining));
-}
-
-void xavix_baseball_bat_device::device_reset()
-{
-	m_event_timer->adjust(attotime::never);
-	m_events_remaining = 0;
-}
-
 void xavix_baseball_bat_device::vblank_w(int state)
 {
 	if (!state)
@@ -62,14 +45,5 @@ void xavix_baseball_bat_device::vblank_w(int state)
 		return;
 
 	// The receiver's event rate selects the ROM's weak, medium or strong swing bucket.
-	m_events_remaining = EVENT_COUNTS[strength];
-	attotime const interval = m_screen->frame_period() / (m_events_remaining + 1);
-	m_event_timer->adjust(interval, 0, interval);
-}
-
-TIMER_CALLBACK_MEMBER(xavix_baseball_bat_device::event_timer)
-{
-	m_event_out_cb();
-	if (!--m_events_remaining)
-		m_event_timer->adjust(attotime::never);
+	schedule_events(EVENT_COUNTS[strength]);
 }

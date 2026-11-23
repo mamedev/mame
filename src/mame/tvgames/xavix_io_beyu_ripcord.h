@@ -6,17 +6,13 @@
 
 #pragma once
 
-#include "screen.h"
+#include "xavix_io_ir.h"
 
-#include <utility>
-
-class xavix_beyblade_ripcord_device : public device_t
+class xavix_beyblade_ripcord_device : public xavix_optical_pulse_device_base
 {
 public:
 	xavix_beyblade_ripcord_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
-	template <typename T> void set_screen(T &&tag) { m_screen.set_tag(std::forward<T>(tag)); }
-	template <typename... T> void set_event_callback(T &&... args) { m_event_out_cb.set(std::forward<T>(args)...); }
 	void vblank_w(int state);
 
 protected:
@@ -25,14 +21,8 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 private:
-	TIMER_CALLBACK_MEMBER(event_timer);
-
-	device_delegate<void ()> m_event_out_cb;
-	required_device<screen_device> m_screen;
 	required_ioport m_position;
-	emu_timer *m_event_timer;
 	u8 m_last_position;
-	u8 m_events_remaining;
 	bool m_position_valid;
 };
 

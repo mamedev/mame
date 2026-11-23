@@ -19,6 +19,44 @@
 
 #include <bit>
 
+xavix_optical_pulse_device_base::xavix_optical_pulse_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const char *timer_name)
+	: device_t(mconfig, type, tag, owner, clock)
+	, m_event_out_cb(*this)
+	, m_screen(*this, finder_base::DUMMY_TAG)
+	, m_timer_name(timer_name)
+{
+}
+
+void xavix_optical_pulse_device_base::device_start()
+{
+	m_event_out_cb.resolve_safe();
+	m_event_timer = timer_alloc(&xavix_optical_pulse_device_base::event_timer, m_timer_name, this);
+	save_item(NAME(m_events_remaining));
+}
+
+void xavix_optical_pulse_device_base::device_reset()
+{
+	m_event_timer->adjust(attotime::never);
+	m_events_remaining = 0;
+}
+
+void xavix_optical_pulse_device_base::schedule_events(u8 count)
+{
+	m_events_remaining = count;
+	if (count)
+	{
+		attotime const interval = m_screen->frame_period() / (count + 1);
+		m_event_timer->adjust(interval, 0, interval);
+	}
+}
+
+TIMER_CALLBACK_MEMBER(xavix_optical_pulse_device_base::event_timer)
+{
+	m_event_out_cb();
+	if (!--m_events_remaining)
+		m_event_timer->adjust(attotime::never);
+}
+
 xavix_ir_report_device::xavix_ir_report_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, type, tag, owner, clock)
 	, m_data(1)
