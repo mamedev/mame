@@ -154,9 +154,6 @@ void hyperstone_device::generate_set_global_register_high(drcuml_block &block, c
 		}
 		break;
 	case TCR_REGISTER:  // G22 Timer Compare Register
-		// any write re-checks the comparison, even with the value unchanged, and requests the
-		// interrupt if TR is already at or past it: the interrupt is only cleared by loading a
-		// value above TR (E1-32XS user's manual, section 5.1.3)
 		UML_MOV(block, mem(&m_core->global_regs[dst_code]), src);
 		UML_CALLC(block, &c_funcs::adjust_timer_interrupt, this);
 		break;
@@ -171,11 +168,9 @@ void hyperstone_device::generate_set_global_register_high(drcuml_block &block, c
 		break;
 	case FCR_REGISTER:  // G26 Function Control Register
 		{
-			// bit 23 only masks the timer interrupt (E1-32XS user's manual, section 5.1.3), so
-			// store the new value first and reschedule the timer using the new mask
+			// adjust timer if timer interrupt mask bit changed
 			uml::code_label const skip_adjust_timer = compiler.next_label();
-			UML_MOV(block, I6, mem(&m_core->global_regs[dst_code]));
-			UML_XOR(block, I6, I6, src);
+			UML_XOR(block, I6, mem(&m_core->global_regs[dst_code]), src);
 			UML_MOV(block, mem(&m_core->global_regs[dst_code]), src);
 			UML_TEST(block, I6, 0x00800000);
 			UML_JMPc(block, uml::COND_Z, skip_adjust_timer);
