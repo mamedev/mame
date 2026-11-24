@@ -158,7 +158,7 @@ offs_t dsp16_disassembler::do_disassemble(std::ostream &stream, offs_t pc, T &&r
 	case 0x02: case 0x03: // R = M (p3-27)
 		{
 			s16 const m(op & 0x01ffU);
-			s16 const ma((m & 0x0100) ? (-m & 0x00ff) : m);
+			s16 const ma((m & 0x0100) ? (-m & 0x01ff) : m);
 			switch ((op >> 9) & 0x0007U)
 			{
 			case 0x0: util::stream_format(stream, "set j = %s0x%03x", (m & 0x0100) ? "-" : "", ma); break;
