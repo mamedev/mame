@@ -5491,9 +5491,9 @@ CONS( 2000,  rad_opusp, rad_opus, 0, xavixp_nv_1mb,       rad_opusp, xavix_power
 // older release, or region where the Play TV / Connectv trademarks weren't used?
 CONS( 2000,  rad_opusa, rad_opus, 0, xavix_nv_1mb,        rad_opus,  xavix_power_state,            empty_init,  "Radica / SSD Company Ltd.", "Plug & Play Opus (NTSC)", 0 )
 
-CONS( 2000,  rad_hnt,   0,        0, xavix_rad_hnt,       rad_hnt,   xavix_rad_hnt_state,          empty_init,  "Radica / Human Code Presage Studios / SSD Company Ltd.", "Play TV Buckmasters Huntin' (NTSC)", MACHINE_NOT_WORKING ) // box shows "Play TV"; title screen shows "Plug & Play"
+CONS( 2000,  rad_hnt,   0,        0, xavix_rad_hnt,       rad_hnt,   xavix_rad_hnt_state,          empty_init,  "Radica / Human Code Presage Studios / SSD Company Ltd.", "Play TV Buckmasters Huntin' (NTSC)", 0 ) // box shows "Play TV"; title screen shows "Plug & Play"
 
-CONS( 2003,  rad_hnt2,  0,        0, xavix_rad_hnt2,      rad_hnt,   xavix_rad_hnt_state,          empty_init,  "Radica / SSD Company Ltd.", "Play TV Buckmasters Huntin' 2 (NTSC)", MACHINE_NOT_WORKING )
+CONS( 2003,  rad_hnt2,  0,        0, xavix_rad_hnt2,      rad_hnt,   xavix_rad_hnt_state,          empty_init,  "Radica / SSD Company Ltd.", "Play TV Buckmasters Huntin' 2 (NTSC)", 0 )
 
 CONS( 2003,  rad_mtrk,  0,        0, xavix_rad_mtrk,      rad_mtrk,  xavix_rad_mtrk_state,   empty_init,  "Radica / Sennari Interactive / SSD Company Ltd.", "Play TV Monster Truck (NTSC)", MACHINE_NOT_WORKING )
 CONS( 2003,  rad_mtrkp, rad_mtrk, 0, xavix_rad_mtrkp,     rad_mtrkp, xavix_rad_mtrk_state,   empty_init,  "Radica / Sennari Interactive / SSD Company Ltd.", "Connectv Monster Truck (PAL)", MACHINE_NOT_WORKING )
@@ -5518,7 +5518,7 @@ CONS( 2003,  rad_madf,  0,        0, xavix_rad_madf,      rad_fb,    xavix_rad_m
 CONS( 2005,  rad_fb,    0,        0, xavix_rad_madf,      rad_fb,    xavix_rad_madf_state,   empty_init,  "Radica / FarSight Studios / SSD Company Ltd.", "Play TV Football (NTSC)", MACHINE_NOT_WORKING ) // USA only release? doesn't change logo for PAL.
 
 // fails to display any kind of XaviX logo or SSD Copyright, it is the only XaviX based game so far to not show these details anywhere in the game.
-CONS( 2003,  rad_rh,    0,        0, xavix_2mb,           rad_rh,    xavix_rad_rh_state,           empty_init,  "Radica / Fisher-Price / Pronto Games / SSD Company Ltd.", "Play TV Rescue Heroes (NTSC)", MACHINE_NOT_WORKING )
+CONS( 2003,  rad_rh,    0,        0, xavix_2mb,           rad_rh,    xavix_rad_rh_state,           empty_init,  "Radica / Fisher-Price / Pronto Games / SSD Company Ltd.", "Play TV Rescue Heroes (NTSC)", 0 )
 
 CONS( 2004,  rad_ssx,   0,        0, xavix_nv_4mb,        rad_ssx,   xavix_power_state,            empty_init,  "Radica / Electronic Arts / SSD Company Ltd.", "Play TV SSX Snowboarder (NTSC)", 0 )
 CONS( 2004,  rad_ssxp,  rad_ssx,  0, xavixp_nv_4mb,       rad_ssxp,  xavix_power_state,            empty_init,  "Radica / Electronic Arts / SSD Company Ltd.", "Connectv SSX Snowboarder (PAL)", 0 )
@@ -5574,10 +5574,10 @@ CONS( 2006,  epo_epp3,  0,        0, xavix_epo_epp2,      epo_epp3,  xavix_ir_po
 CONS( 2003,  epo_mj,    0,        0, xavix_epo_mj,        epo_mj,    xavix_epo_mj_state,           empty_init,  "Epoch / SSD Company Ltd.", "TV Mahjong Shoudan Taikyoku: 4-nin Uchi (Japan)", 0 )
 
 // ブラックバス釣ろうぜ エキサイトフィッシング
-CONS( 2001,  epo_fish,  0,        0, xavix_2mb,           epo_fish,  xavix_epo_fish_state,         empty_init,  "Epoch / SSD Company Ltd.", "Black Bass Tsurouze: Excite Fishing (Japan)", MACHINE_NOT_WORKING )
+CONS( 2001,  epo_fish,  0,        0, xavix_2mb,           epo_fish,  xavix_epo_fish_state,         empty_init,  "Epoch / SSD Company Ltd.", "Black Bass Tsurouze: Excite Fishing (Japan)", 0 )
 
 // 大モノ釣ろうぜ！ エキサイトフィッシングＤＸ
-CONS( 2003,  epo_efdx,  0,        0, xavix_i2c_24c08_4mb, epo_efdx,  xavix_epo_efdx_state,         empty_init,  "Epoch / SSD Company Ltd.", "Dai Mono Tsurouze! Excite Fishing DX (Japan)", MACHINE_NOT_WORKING )
+CONS( 2003,  epo_efdx,  0,        0, xavix_i2c_24c08_4mb, epo_efdx,  xavix_epo_efdx_state,         empty_init,  "Epoch / SSD Company Ltd.", "Dai Mono Tsurouze! Excite Fishing DX (Japan)", 0 )
 
 // ぐるりんワールド
 CONS( 2005,  epo_guru,  0,        0, xavix_epo_guru,      epo_guru,  xavix_epo_guru_state,         empty_init,  "Epoch / SSD Company Ltd.", "Gururin World (Japan)", 0 )
@@ -5716,13 +5716,13 @@ CONS( 2007,  epo_tp2p,  0,        0, xavix_nv,            epo_tp2p,  xavix_power
 
 // TV-PC Series
 // きかんしゃトーマス テレビパソコン
-CONS( 2005,  tvpc_tom,  0,        0, xavix_tvpc,          tvpc,      xavix_tvpc_state,             empty_init,  "Epoch / SSD Company Ltd.", "TV-PC Thomas & Friends (Japan)", MACHINE_NOT_WORKING )
+CONS( 2005,  tvpc_tom,  0,        0, xavix_tvpc,          tvpc,      xavix_tvpc_state,             empty_init,  "Epoch / SSD Company Ltd.", "TV-PC Thomas & Friends (Japan)", 0 )
 // ドラえもん テレビパソコン
-CONS( 2003,  tvpc_dor,  0,        0, xavix_tvpc,          tvpc,      xavix_tvpc_state,             empty_init,  "Epoch / SSD Company Ltd.", "TV-PC Doraemon (Japan)", MACHINE_NOT_WORKING )
+CONS( 2003,  tvpc_dor,  0,        0, xavix_tvpc,          tvpc,      xavix_tvpc_state,             empty_init,  "Epoch / SSD Company Ltd.", "TV-PC Doraemon (Japan)", 0 )
 // とっとこハム太郎 テレビパソコン
-CONS( 2003,  tvpc_ham,  0,        0, xavix_tvpc,          tvpc,      xavix_tvpc_state,             empty_init,  "Epoch / SSD Company Ltd.", "TV-PC Tottoko Hamutaro (Japan)", MACHINE_NOT_WORKING )
+CONS( 2003,  tvpc_ham,  0,        0, xavix_tvpc,          tvpc,      xavix_tvpc_state,             empty_init,  "Epoch / SSD Company Ltd.", "TV-PC Tottoko Hamutaro (Japan)", 0 )
 // ハローキティテレビパソコン
-CONS( 2004,  tvpc_hk,   0,        0, xavix_tvpc_hk,       tvpc,      xavix_tvpc_state,             empty_init,  "Epoch / SSD Company Ltd.", "TV-PC Hello Kitty (Japan)", MACHINE_NOT_WORKING )
+CONS( 2004,  tvpc_hk,   0,        0, xavix_tvpc_hk,       tvpc,      xavix_tvpc_state,             empty_init,  "Epoch / SSD Company Ltd.", "TV-PC Hello Kitty (Japan)", 0 )
 
 // TVメールPC mail*cot メルコット
-CONS( 2004,  epo_mail,  0,        0, xavix_epo_mail,      epo_mail,  xavix_epo_mail_state,         empty_init,  "Epoch / SSD Company Ltd.", "TV Mail PC mail*cot (Japan)", MACHINE_NOT_WORKING ) // A 74HC541D buffers the keyboard matrix onto the external data bus.
+CONS( 2004,  epo_mail,  0,        0, xavix_epo_mail,      epo_mail,  xavix_epo_mail_state,         empty_init,  "Epoch / SSD Company Ltd.", "TV Mail PC mail*cot (Japan)", 0 ) // A 74HC541D buffers the keyboard matrix onto the external data bus.

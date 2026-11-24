@@ -10,7 +10,7 @@ license:CC0-1.0
 
 	-->
 
-	<software name="aladdin" supported="no">
+	<software name="aladdin">
 		<description>Aladdin TV</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
@@ -21,7 +21,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="ginginma" supported="no"> <!-- inputs do not respond on this one -->
+	<software name="ginginma">
 		<description>Ginginmaru TV</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
@@ -33,7 +33,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="salarymn" supported="no">
+	<software name="salarymn">
 		<description>Salaryman Kintarō</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
@@ -46,7 +46,7 @@ license:CC0-1.0
 	</software>
 
 	<!-- green cartridge -->
-	<software name="juojr" supported="no">
+	<software name="juojr">
 		<description>Jū-ō Junior</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
@@ -58,7 +58,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="mojuotv" supported="no">
+	<software name="mojuotv">
 		<description>Mōjū-ō TV</description>
 		<year>2002</year>
 		<publisher>Sammy</publisher>
