@@ -31,6 +31,7 @@ public:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_mfp(*this, "mfp")
+		, m_snd(*this, "snd")
 		, m_jacks(*this, "JACKS")
 		, m_volume(*this, "VOLUME")
 	{
@@ -40,6 +41,7 @@ public:
 	void vintkeys(machine_config &config);
 	void phatt(machine_config &config);
 	void proteusxr(machine_config &config);
+	void proteusxrpl(machine_config &config);
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -55,6 +57,8 @@ private:
 	void vintkeys_map(address_map &map) ATTR_COLD;
 	void phatt_map(address_map &map) ATTR_COLD;
 	void fc7_map(address_map &map) ATTR_COLD;
+	void proteusxr_waves_map(address_map &map) ATTR_COLD;
+	void proteusxrpl_waves_map(address_map &map) ATTR_COLD;
 
 	u8 jacks_r();
 	u16 volume_strobe_r();
@@ -62,6 +66,7 @@ private:
 
 	required_device<m68000_base_device> m_maincpu;
 	required_device<mc68901_device> m_mfp;
+	optional_device<proteus_snd_device> m_snd;
 	optional_ioport m_jacks;
 	optional_ioport m_volume;
 	emu_timer *m_volume_pulse = nullptr;
@@ -156,24 +161,37 @@ void emu68k_state::fc7_map(address_map &map)
 	map(0xfffff3, 0xfffff3).r(m_mfp, FUNC(mc68901_device::get_vector));
 }
 
+// Sound ROM space, 16-bit word addresses. Decoding above 0x3fffff is unverified; it mirrors here.
+void emu68k_state::proteusxr_waves_map(address_map &map)
+{
+	map(0x000000, 0x1fffff).mirror(0xc00000).rom().region("waves", 0);
+}
+
+void emu68k_state::proteusxrpl_waves_map(address_map &map)
+{
+	proteusxr_waves_map(map);
+	map(0x200000, 0x3fffff).mirror(0xc00000).rom().region("expansion", 0);
+}
+
 
 static INPUT_PORTS_START(proteus1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(proteusxr)
 	PORT_START("JACKS")
-	PORT_DIPNAME(0x03, 0x00, "Sub out 1 jack")
-	PORT_DIPSETTING(0x00, "Unplugged")
-	PORT_DIPSETTING(0x03, "Plugged")
-	PORT_DIPNAME(0x0c, 0x00, "Sub out 2 jack")
-	PORT_DIPSETTING(0x00, "Unplugged")
-	PORT_DIPSETTING(0x0c, "Plugged")
+	PORT_CONFNAME(0x03, 0x00, "Sub out 1 jack")
+	PORT_CONFSETTING(0x00, "Unplugged")
+	PORT_CONFSETTING(0x03, "Plugged")
+	PORT_CONFNAME(0x0c, 0x00, "Sub out 2 jack")
+	PORT_CONFSETTING(0x00, "Unplugged")
+	PORT_CONFSETTING(0x0c, "Plugged")
 
 	PORT_START("VOLUME")
 	PORT_ADJUSTER(100, "Volume")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(procuss)
+	PORT_INCLUDE(proteusxr)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(vintkeys)
@@ -268,14 +286,21 @@ void emu68k_state::proteusxr(machine_config &config)
 	aciaclk.signal_handler().append(acia, FUNC(acia6850_device::write_txc));
 
 	SPEAKER(config, "speaker", 2).front();
-	proteus_snd_device &snd(PROTEUS_SND(config, "snd", 40_MHz_XTAL / 4)); // clock unverified
-	snd.add_route(0, "speaker", 1.0, 0);
-	snd.add_route(1, "speaker", 1.0, 1);
+	PROTEUS_SND(config, m_snd, 40_MHz_XTAL / 2);
+	m_snd->set_addrmap(0, &emu68k_state::proteusxr_waves_map);
+	m_snd->add_route(0, "speaker", 1.0, 0);
+	m_snd->add_route(1, "speaker", 1.0, 1);
 
 	add_lcd(config);
 }
 
-// TODO: the other models have sample ROMs as well (not dumped)
+void emu68k_state::proteusxrpl(machine_config &config)
+{
+	proteusxr(config);
+	m_snd->set_addrmap(0, &emu68k_state::proteusxrpl_waves_map);
+}
+
+// TODO: the Proteus/1 has the same sound ROMs as the XR (PROTEUS1_WAVES); the other models' sound ROMs are not dumped
 
 // Proteus/1 sound set: 8x 512 KB mask ROMs (AKN62314BP), 16-bit signed samples, 4-way word
 // interleave: word n = { IP40x[n >> 2], IP38x[n >> 2] }, x = 2 + (n & 3). The per-chip checksums
@@ -300,8 +325,8 @@ ROM_END
 #define PROTEUSXR_FIRMWARE \
 	ROM_REGION16_BE(0x20000, "program", 0) \
 	ROM_SYSTEM_BIOS(0, "v230", "v2.30") \
-	ROMX_LOAD("ip486_901101.bin", 0x00000, 0x10000, CRC(036bf047) SHA1(7e8f6474545bf24e6af318db4cd573ad05c66cbb), ROM_BIOS(0) | ROM_SKIP(1)) \
-	ROMX_LOAD("ip485_901101.bin", 0x00001, 0x10000, CRC(3c1d85c6) SHA1(bcd668ac2c5ffbf43dc1c50a3bbd85a87b537845), ROM_BIOS(0) | ROM_SKIP(1)) \
+	ROMX_LOAD("ip486_901101.ic38", 0x00000, 0x10000, CRC(036bf047) SHA1(7e8f6474545bf24e6af318db4cd573ad05c66cbb), ROM_BIOS(0) | ROM_SKIP(1)) \
+	ROMX_LOAD("ip485_901101.ic37", 0x00001, 0x10000, CRC(3c1d85c6) SHA1(bcd668ac2c5ffbf43dc1c50a3bbd85a87b537845), ROM_BIOS(0) | ROM_SKIP(1)) \
 	ROM_SYSTEM_BIOS(1, "v200", "v2.00") \
 	ROMX_LOAD("ip441c_emu__5089.ic38", 0x00000, 0x10000, CRC(01f11633) SHA1(a0612007b22c8e06c803ee5a5bad98e3f2bc4421), ROM_BIOS(1) | ROM_SKIP(1)) /* NMC27C512AN */ \
 	ROMX_LOAD("ip442c_emu__5089.ic37", 0x00001, 0x10000, CRC(e8154a65) SHA1(1ec834712dc9ea4f4f01090b2fd5e558c1f08208), ROM_BIOS(1) | ROM_SKIP(1)) /* NMC27C512AN */
@@ -309,7 +334,7 @@ ROM_END
 ROM_START(proteusxr)
 	PROTEUSXR_FIRMWARE
 
-	ROM_REGION16_BE(0x800000, "snd", ROMREGION_ERASE00)
+	ROM_REGION16_BE(0x400000, "waves", 0)
 	PROTEUS1_WAVES
 ROM_END
 
@@ -319,16 +344,18 @@ ROM_START(proteusxrpl)
 
 	// Sound ROMs: 16-bit signed samples, 4-way word interleave across chip pairs:
 	// word n = { IP70x[n >> 2], IP50x[n >> 2] }, x = 5 + (n & 3)  (verified against a WAV conversion of the set)
-	ROM_REGION16_BE(0x800000, "snd", ROMREGION_ERASE00)
+	ROM_REGION16_BE(0x400000, "waves", 0)
 	PROTEUS1_WAVES
-	ROM_LOAD64_BYTE("ip705.bin", 0x400000, 0x80000, CRC(9291ac91) SHA1(35c2ee0fafa9bf99643a34a610a8ab0b32a0f42d))
-	ROM_LOAD64_BYTE("ip505.bin", 0x400001, 0x80000, CRC(26c3cbc5) SHA1(e7c587010713bd911b9805c8616e1e920c4307e1))
-	ROM_LOAD64_BYTE("ip706.bin", 0x400002, 0x80000, CRC(e23d5890) SHA1(f02a46f2bbfa928356a0c4521b021f9fa38049b1))
-	ROM_LOAD64_BYTE("ip506.bin", 0x400003, 0x80000, CRC(a316d1c7) SHA1(4eb67d722c064d66ab1604ffb9ffe02b039dfcd9))
-	ROM_LOAD64_BYTE("ip707.bin", 0x400004, 0x80000, CRC(94b926ed) SHA1(1d10905cad823d340cfa5ceec1b3ade323f2bc31))
-	ROM_LOAD64_BYTE("ip507.bin", 0x400005, 0x80000, CRC(e0fc7a84) SHA1(316df7f76b48f17b49b4397268a9c7021c84ed12))
-	ROM_LOAD64_BYTE("ip708.bin", 0x400006, 0x80000, CRC(6235247e) SHA1(18fc57153bf69e854efa0c48f4fcec0b62c73654))
-	ROM_LOAD64_BYTE("ip508.bin", 0x400007, 0x80000, CRC(5d48b113) SHA1(54571ee9b4c1992172a94557cf8e9c4b74fef0d4))
+
+	ROM_REGION16_BE(0x400000, "expansion", 0)
+	ROM_LOAD64_BYTE("ip705.bin", 0x000000, 0x80000, CRC(9291ac91) SHA1(35c2ee0fafa9bf99643a34a610a8ab0b32a0f42d))
+	ROM_LOAD64_BYTE("ip505.bin", 0x000001, 0x80000, CRC(26c3cbc5) SHA1(e7c587010713bd911b9805c8616e1e920c4307e1))
+	ROM_LOAD64_BYTE("ip706.bin", 0x000002, 0x80000, CRC(e23d5890) SHA1(f02a46f2bbfa928356a0c4521b021f9fa38049b1))
+	ROM_LOAD64_BYTE("ip506.bin", 0x000003, 0x80000, CRC(a316d1c7) SHA1(4eb67d722c064d66ab1604ffb9ffe02b039dfcd9))
+	ROM_LOAD64_BYTE("ip707.bin", 0x000004, 0x80000, CRC(94b926ed) SHA1(1d10905cad823d340cfa5ceec1b3ade323f2bc31))
+	ROM_LOAD64_BYTE("ip507.bin", 0x000005, 0x80000, CRC(e0fc7a84) SHA1(316df7f76b48f17b49b4397268a9c7021c84ed12))
+	ROM_LOAD64_BYTE("ip708.bin", 0x000006, 0x80000, CRC(6235247e) SHA1(18fc57153bf69e854efa0c48f4fcec0b62c73654))
+	ROM_LOAD64_BYTE("ip508.bin", 0x000007, 0x80000, CRC(5d48b113) SHA1(54571ee9b4c1992172a94557cf8e9c4b74fef0d4))
 ROM_END
 
 ROM_START(procuss)
@@ -336,8 +363,7 @@ ROM_START(procuss)
 	ROM_LOAD16_BYTE("ip516aemu9115.bin", 0x00000, 0x10000, CRC(8c0be608) SHA1(54d5629e4adebd72d5d5924941be3e6319d20427))
 	ROM_LOAD16_BYTE("ip517aemu9115.bin", 0x00001, 0x10000, CRC(cb2e454b) SHA1(b142285b998829ec8b3c6ce98eb94d9d4964aff6))
 
-	ROM_REGION16_BE(0x800000, "snd", ROMREGION_ERASE00)
-	ROM_LOAD("procuss_waves.bin", 0x000000, 0x400000, NO_DUMP)
+	ROM_REGION16_BE(0x400000, "waves", ROMREGION_ERASE00) // sound ROMs not dumped
 ROM_END
 
 ROM_START(vintkeys)
@@ -374,8 +400,8 @@ ROM_END
 
 
 SYST(1989, proteus1,  0, 0, proteus1,  proteus1,  emu68k_state, empty_init, "E-mu Systems", "Proteus/1 16-Bit Multi-Timbral Digital Sound Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
-SYST(1989, proteusxr, 0, 0, proteusxr, proteusxr, emu68k_state, empty_init, "E-mu Systems", "Proteus/1 XR 16-Bit Multi-Timbral Digital Sound Module", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)
-SYST(199?, proteusxrpl, proteusxr, 0, proteusxr, proteusxr, emu68k_state, empty_init, "E-mu Systems", "Proteus/1 XR 16-Bit Multi-Timbral Digital Sound Module (with ProtoLogic expansion)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING)
+SYST(1989, proteusxr, 0, 0, proteusxr, proteusxr, emu68k_state, empty_init, "E-mu Systems", "Proteus/1 XR 16-Bit Multi-Timbral Digital Sound Module", MACHINE_NOT_WORKING)
+SYST(199?, proteusxrpl, proteusxr, 0, proteusxrpl, proteusxr, emu68k_state, empty_init, "E-mu Systems", "Proteus/1 XR 16-Bit Multi-Timbral Digital Sound Module (with ProtoLogic expansion)", MACHINE_NOT_WORKING)
 SYST(1991, procuss,   0, 0, proteusxr, procuss,   emu68k_state, empty_init, "E-mu Systems", "Pro/Cussion Maximum Percussion Module", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 SYST(1993, vintkeys,  0, 0, vintkeys,  vintkeys,  emu68k_state, empty_init, "E-mu Systems", "Vintage Keys Classic Analog Keyboards", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
 SYST(1996, orbit9090, 0, 0, phatt,     orbit9090, emu68k_state, empty_init, "E-mu Systems", "Orbit 9090 - The Dance Planet", MACHINE_NO_SOUND | MACHINE_NOT_WORKING)
