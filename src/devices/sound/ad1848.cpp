@@ -123,6 +123,10 @@ void ad1848_device::ixa_w(offs_t offset, uint8_t data)
 					/ div_factor[(m_regs.dform >> 1) & 7]) : attotime::never;
 			m_timer->adjust(rate, 0 , rate);
 			m_drq_cb(m_play ? ASSERT_LINE : CLEAR_LINE);
+			// TODO: check if 1 -> 1 play transitions also reset the clock
+			// sometimes multibyte sound drifts
+			if (m_play)
+				m_sam_cnt = 0;
 			break;
 		}
 		case 14:
@@ -164,7 +168,10 @@ void ad1848_device::write(offs_t offset, uint8_t data)
 			m_irq_cb(CLEAR_LINE);
 			m_irq = false;
 			if(m_regs.iface & 1)
+			{
 				m_play = true;
+				m_sam_cnt = 0;
+			}
 			break;
 		case 3:
 			break; // playback
@@ -181,23 +188,28 @@ void ad1848_device::dack_w(uint8_t data)
 {
 	if(!m_play)
 		return;
-	m_samples = (m_samples << 8) | data;
 	m_sam_cnt++;
+	// data is little endian
+	// (lower) left ch. first -> (upper byte of 16-bit) -> (lower) right ch. -> (upper)
+	// TODO: add status live updates (bits 2 and 3, PIO only or applies here as well?)
 	switch(m_regs.dform >> 4)
 	{
-		case 0:
-		case 2:
-		case 6:
+		case MODE_DAC8_MONO:
+		case MODE_ULAW_MONO:
+		case MODE_ALAW_MONO:
+			m_samples = data;
 			m_sam_cnt = 0;
 			break;
-		case 1:
-		case 3:
-		case 4:
-		case 7:
+		case MODE_DAC8_STEREO:
+		case MODE_ULAW_STEREO:
+		case MODE_DAC16_MONO:
+		case MODE_ALAW_STEREO:
+			m_samples = (data << 8) | ((m_samples >> 8) & 0xff);
 			if(m_sam_cnt == 2)
 				m_sam_cnt = 0;
 			break;
-		case 5:
+		case MODE_DAC16_STEREO:
+			m_samples = (data << 24) | ((m_samples >> 8) & 0xffffff);
 			if(m_sam_cnt == 4)
 				m_sam_cnt = 0;
 			break;
@@ -222,24 +234,24 @@ TIMER_CALLBACK_MEMBER(ad1848_device::update_tick)
 		return;
 	switch(m_regs.dform >> 4)
 	{
-		case 0: // 8bit mono
+		case MODE_DAC8_MONO: // 8bit mono
 			m_ldac->write(m_samples << 8);
 			m_rdac->write(m_samples << 8);
 			break;
-		case 1: // 8bit stereo
+		case MODE_DAC8_STEREO: // 8bit stereo
 			m_ldac->write(m_samples << 8);
 			m_rdac->write(m_samples & 0xff00);
 			break;
-		case 2: // ulaw mono
-		case 3: // ulaw stereo
-		case 6: // alaw mono
-		case 7: // alaw stereo
+		case MODE_ULAW_MONO: // ulaw mono
+		case MODE_ULAW_STEREO: // ulaw stereo
+		case MODE_ALAW_MONO: // alaw mono
+		case MODE_ALAW_STEREO: // alaw stereo
 			break;
-		case 4: // 16bit mono
+		case MODE_DAC16_MONO: // 16bit mono
 			m_ldac->write(m_samples ^ 0x8000);
 			m_rdac->write(m_samples ^ 0x8000);
 			break;
-		case 5: // 16bit stereo
+		case MODE_DAC16_STEREO: // 16bit stereo
 			m_ldac->write(m_samples ^ 0x8000);
 			m_rdac->write((m_samples >> 16) ^ 0x8000);
 			break;

@@ -68,6 +68,17 @@ private:
 	required_device<dac_word_interface> m_rdac;
 	emu_timer *m_timer;
 
+	enum {
+		MODE_DAC8_MONO = 0,
+		MODE_DAC8_STEREO,
+		MODE_ULAW_MONO,
+		MODE_ULAW_STEREO,
+		MODE_DAC16_MONO,
+		MODE_DAC16_STEREO,
+		MODE_ALAW_MONO,
+		MODE_ALAW_STEREO,
+	};
+
 	uint8_t ixa_r(offs_t offset);
 	void ixa_w(offs_t offset, uint8_t data);
 };
