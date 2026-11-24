@@ -339,6 +339,19 @@ mps1250_device::mps1250_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
+//  device_config_complete - default the device
+//  number switch to the slot address
+//-------------------------------------------------
+
+void mps1200_device::device_config_complete()
+{
+	int const address = configured_address();
+	if (address >= 4)
+		set_switch_default("SW", device_number_mask(), BIT(address - 4, 0) ? 0 : device_number_mask());
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -654,14 +667,7 @@ void mps1200_device::p3_w(u8 data)
 	if (!m_dip_load)
 		return;
 
-	u16 sw = m_sw->read();
-	if (device_cbm_iec_interface::m_slot != nullptr)
-	{
-		if (BIT(device_cbm_iec_interface::m_slot->get_address() - 4, 0))
-			sw &= ~device_number_mask();
-		else
-			sw |= device_number_mask();
-	}
+	u16 const sw = m_sw->read();
 
 	m_dip_shift = 0;
 	for (int i = 0; i < 8; i++)

@@ -86,6 +86,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(4, 0x07); }
 	virtual void device_start() override ATTR_COLD;
 
 	// device_cbm_iec_interface overrides
@@ -99,6 +100,8 @@ private:
 	uint8_t riot0_pb_r();
 
 	void update_iec_data();
+
+	required_ioport m_address;
 
 	int m_attn_ack = 0;
 	int m_nrfd = 0;

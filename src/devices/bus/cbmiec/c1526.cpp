@@ -188,6 +188,17 @@ void c4023_device::device_add_mconfig(machine_config &config)
 static INPUT_PORTS_START( c1526 )
 	PORT_START("PAPERADV")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Paper Advance") PORT_CODE(KEYCODE_INSERT)
+
+	PORT_START("ADDRESS")
+	PORT_DIPNAME( 0x07, 0x00, "Device Address" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x03, "7" )
+	PORT_DIPSETTING(    0x04, "8" )
+	PORT_DIPSETTING(    0x05, "9" )
+	PORT_DIPSETTING(    0x06, "10" )
+	PORT_DIPSETTING(    0x07, "11" )
 INPUT_PORTS_END
 
 
@@ -250,7 +261,8 @@ c1526_device_base::c1526_device_base(const machine_config &mconfig, device_type 
 
 c1526_device::c1526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	c1526_device_base(mconfig, C1526, tag, owner, clock),
-	device_cbm_iec_interface(mconfig, *this)
+	device_cbm_iec_interface(mconfig, *this),
+	m_address(*this, "ADDRESS")
 {
 }
 
@@ -629,7 +641,7 @@ uint8_t c1526_device::riot0_pb_r()
 
 	*/
 
-	return 0xf8 | ((m_slot->get_address() - 4) & 0x07);
+	return 0xf8 | m_address->read();
 }
 
 
