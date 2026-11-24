@@ -137,7 +137,7 @@ void ct1745_mixer_device::update_gain_levels()
 	m_fm->set_output_gain(2, lmain*(m_fm_level[0]/248.0f));
 	m_fm->set_output_gain(3, rmain*(m_fm_level[1]/248.0f));
 
-	// TODO: convert to LIVE_AUDIO_VIEW
+	// TODO: convert to LIVE_MIXER_VIEW
 	//popmessage("%f %f (%02x %02x) | %02x %02x | %02x %02x", lmain, rmain, m_master_level[0], m_master_level[1], m_dac_level[0], m_dac_level[1], m_fm_level[0], m_fm_level[1]);
 }
 

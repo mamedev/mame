@@ -55,6 +55,12 @@
 
 #include "screen.h"
 
+// screen setup changes, sorta akin to how an OSSC would print one.
+// So stick to ~5 seconds, popmessage timing gymnastic not enough,
+// user positioning corner & prettier (separate) UI box TBD.
+#define LIVE_CRTC_SETUP 0
+#include "ui/uimain.h"
+
 #define LOG_WARN      (1U << 1)
 #define LOG_REGS      (1U << 2) // deprecated
 #define LOG_DSW       (1U << 3) // Input sense at $3c2
@@ -68,6 +74,7 @@
 #define LOGREGS(...)           LOGMASKED(LOG_REGS, __VA_ARGS__)
 #define LOGDSW(...)            LOGMASKED(LOG_DSW, __VA_ARGS__)
 #define LOGCRTC(...)           LOGMASKED(LOG_CRTC, __VA_ARGS__)
+
 
 /***************************************************************************
 
@@ -1652,6 +1659,19 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 	attotime refresh  = attotime::from_ticks(htotal_period * vtotal_period, pixel_clock);
 
 	screen().configure(htotal_period, vtotal_period, visarea, refresh);
+
+	if (LIVE_CRTC_SETUP)
+	{
+		// how a monitor can stand selected refresh rate wildly depends on type employed.
+		// 50 ~ 85 Hz for pure VGA, for VESA max can go up to roughly 120 to 200 Hz,
+		// assume anything beyond these ranges a bug (can tell if the UI becomes super
+		// unresponsive, check "System Information" in UI menu).
+		// NOTE: the video card itself have to stand the extra bandwidth strain thru MCLK too
+		machine().ui().popup_time(5, "%dx%d-%c %.2f kHz %.2f Hz"
+			, htotal_period, vtotal_period, get_interlace_mode() ? 'i' : 'p'
+			, attotime::from_ticks(htotal_period, pixel_clock).as_khz(), refresh.as_hz()
+		);
+	}
 
 	m_vblank_timer->adjust(vga.crtc.sync_en ? screen().time_until_pos(vga.crtc.vert_blank_start) : attotime::never, 0 );
 }
