@@ -303,12 +303,15 @@ inline void mc68901_device::timer_input(int index, int value)
 
 
 // pulse width mode: the timer counts at the prescaled rate only while its input is at the
-// active level. The period restarts when the input becomes active; on the chip the prescaler
-// runs freely, so the first count can come up to one prescaler period sooner.
+// active level. The period restarts when the input becomes active. On the chip the prescaler
+// is stopped with the counter and keeps its partial count, so there the first count after
+// the input becomes active again can come up to one prescaler period sooner.
 void mc68901_device::pulse_width_gate(int index, bool active)
 {
 	if (active)
 	{
+		// a disabled periodic timer keeps its old expiry time, so it must be restarted rather
+		// than re-enabled, or it would fire every period it missed at once
 		if (!m_timer[index]->enabled())
 		{
 			const attotime period = attotime::from_hz(m_timer_clock / PRESCALER[(index ? m_tbcr : m_tacr) & 0x07]);
@@ -317,8 +320,6 @@ void mc68901_device::pulse_width_gate(int index, bool active)
 	}
 	else
 	{
-		// a disabled periodic timer keeps its old expiry time, so it must be restarted rather
-		// than re-enabled, or it would fire every period it missed at once
 		m_timer[index]->enable(false);
 	}
 }
@@ -479,6 +480,7 @@ void mc68901_device::device_reset()
 
 	// Avoid read-before-write
 	m_ipr = m_imr = 0;
+	m_tacr = m_tbcr = 0;
 
 	m_rframe = 0x100;
 	m_next_rsr = 0;
@@ -603,12 +605,20 @@ void mc68901_device::write(offs_t offset, u8 data)
 			const u8 changed = m_aer ^ data;
 			m_aer = data;
 
-			// a timer in pulse width mode starts or stops when its active level changes
+			// a timer in pulse width mode starts or stops when its active level changes, and
+			// leaving the active level raises the timer's GPIO interrupt as an input edge would
 			for (int i = TIMER_A; i <= TIMER_B; i++)
 			{
+				const int bit = GPIO_TIMER[i];
 				const int cr = i ? m_tbcr : m_tacr;
-				if ((cr & 0x0f) >= TCR_TIMER_PULSE_4 && BIT(changed, GPIO_TIMER[i]))
-					pulse_width_gate(i, m_ti[i] == BIT(m_aer, GPIO_TIMER[i]));
+				if ((cr & 0x0f) >= TCR_TIMER_PULSE_4 && BIT(changed, bit))
+				{
+					const bool active = m_ti[i] == BIT(m_aer, bit);
+					pulse_width_gate(i, active);
+
+					if (!active && (m_ier & INT_MASK_GPIO[bit]))
+						take_interrupt(INT_MASK_GPIO[bit]);
+				}
 			}
 		}
 		break;
