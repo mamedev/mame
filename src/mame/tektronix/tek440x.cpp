@@ -1198,7 +1198,7 @@ void tek440x_state::store_w(u8 data)
 
 void tek440x_state::palette(palette_device &palette) const
 {
-	palette.set_pen_color(0, rgb_t(0xec, 0xf4, 0xff));   // 2 color framebuffer
+	palette.set_pen_color(0, rgb_t(0xba, 0xe5, 0xff));   // 2 color framebuffer  P4 phosphor
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));
 }
 
