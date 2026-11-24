@@ -227,7 +227,7 @@ void imac_state::imac(machine_config &config)
 	m_ram->set_default_size("32M");
 	m_ram->set_extra_options("32M,64M,128M");
 
-	burgundy_device &burgundy(BURGUNDY(config, "codec", 45.1584_MHz_XTAL / 2));
+	burgundy_device &burgundy(BURGUNDY(config, "codec", 45.1584_MHz_XTAL));
 	burgundy.dma_output().set(paddington, FUNC(heathrow_device::codec_dma_read));
 	burgundy.dma_input().set(paddington, FUNC(heathrow_device::codec_dma_write));
 
