@@ -36,7 +36,7 @@ class midway_shifter_device : public device_t
 public:
 	midway_shifter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	// gear selected at reset, 0 for neutral
+	// gear selected at power on, 0 for neutral
 	midway_shifter_device &set_initial_gear(uint8_t gear) { m_initial_gear = gear; return *this; }
 
 	ioport_value gears_r();
@@ -46,7 +46,6 @@ public:
 
 protected:
 	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
 
 private:
 	required_ioport m_conf;

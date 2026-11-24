@@ -28,8 +28,8 @@ The Grid         v1.2   10/18/2000
 
 #include "emu.h"
 
-#include "midzeus.h"
 #include "midway_shifter.h"
+#include "midzeus.h"
 
 #include "dcs.h"
 

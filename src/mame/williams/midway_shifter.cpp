@@ -17,7 +17,6 @@ midway_shifter_device::midway_shifter_device(const machine_config &mconfig, cons
 	: device_t(mconfig, MIDWAY_SHIFTER, tag, owner, clock)
 	, m_conf(*this, "^CONF")
 	, m_initial_gear(0)
-	, m_gear(0)
 	, m_held(0)
 {
 }
@@ -34,14 +33,11 @@ INPUT_PORTS_END
 
 void midway_shifter_device::device_start()
 {
-	save_item(NAME(m_gear));
-	save_item(NAME(m_held));
-}
-
-void midway_shifter_device::device_reset()
-{
-	// the buttons held down don't change across a reset
+	// the shifter stays where it is across a reset
 	m_gear = m_initial_gear;
+
+	// m_held follows the buttons, which aren't saved
+	save_item(NAME(m_gear));
 }
 
 
