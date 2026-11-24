@@ -269,6 +269,9 @@
 
 namespace {
 
+// Only the absent third FIFO's status bits are high at power-up.
+constexpr u8 SOUND_PIA2_PB_INITIAL = 0x44U;
+
 class sr_state : public driver_device
 {
 public:
@@ -384,7 +387,7 @@ private:
 
 	u8 m_sound_ptm_o[2] = { 0U, 0U };
 	u8 m_sound_pia2_pa_out = 0xffU;
-	u8 m_sound_pia2_pb_in = 0xffU;
+	u8 m_sound_pia2_pb_in = SOUND_PIA2_PB_INITIAL;
 };
 
 
@@ -464,8 +467,8 @@ void sr_state::starrider(machine_config &config)
 	// PA3 is the IR output from the unpopulated third FIFO (active low)
 	// PA7 is the RDY output from the unpopulated 5220 (active low)
 	// CB1-2 are unused
-	m_sound_pia1->irqb_handler().set("sound.irq", FUNC(input_merger_device::in_w<2>));
-	m_sound_pia1->irqb_handler().set("sound.irq", FUNC(input_merger_device::in_w<3>));
+	m_sound_pia2->irqa_handler().set("sound.irq", FUNC(input_merger_device::in_w<2>));
+	m_sound_pia2->irqb_handler().set("sound.irq", FUNC(input_merger_device::in_w<3>));
 
 	FIFO2812(config, m_sound_fifos[0]);
 	m_sound_fifos[0]->ir_cb().set(FUNC(sr_state::sound_fifo0_ir));
@@ -516,7 +519,8 @@ void sr_state::machine_start()
 	m_pif_irq_enable = 0U;
 	std::fill(std::begin(m_sound_ptm_o), std::end(m_sound_ptm_o), 0U);
 	m_sound_pia2_pa_out = 0xffU;
-	m_sound_pia2_pb_in = 0xffU;
+	// Populated FIFOs start empty with /IR, OR and FLAG low.  The third is absent.
+	m_sound_pia2_pb_in = SOUND_PIA2_PB_INITIAL;
 
 	for (unsigned i = 0U; 3U > i; ++i)
 	{
