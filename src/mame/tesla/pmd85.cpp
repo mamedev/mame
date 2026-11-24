@@ -29,15 +29,18 @@ Notes on emulation status and to do list:
 1.  V.24.
 2.  Flash video attribute.
 3.  External interfaces connectors (K2-K5).
-4.  C2717PMD is marked MNW, but there's nothing to say why.
+4.  C2717PMD: no disc made for its PMD 32 driver is known.  Discs in the 8" layout
+    (boot records signed "C2717 ") load CP/M from the PMD 32, but their BIOS
+    drives the DS 2717 board (c2717ds).
 5.  Verify PMD-85.2A, PMD-85.3, Didaktik Alfa and Mato monitor roms.
 6.  Verify all Basic roms.
 7.  8251 in Didaktik Alfa.
 8.  Colors (if any). Seems most versions supported 4 colours via RGB connector. But, the TV modulator only carried the G line.
     The video signals are developed in a forest of gates which may take a while to work out.
 9.  PMD-85, Didaktik Alfa 2 and Didaktik Beta (ROMs and documentation needed).
-10. FDD interface (ROMs and disk images needed).
+10. Consul 2717 classroom network.
 11. "Duch & Pampuch" Mato game displays scores with incorrect characters.
+12. PMD 32 on the PMD-85.2 and PMD-85.2A (needs the booter ROM module).
 
 
 PMD-85 technical information
@@ -220,12 +223,26 @@ Software list items: Some work, some don't, and some only work on certain machin
 
 Some software items will crash MAME, for example "bdash".
 
+Disks
+-----
+- c2717ds : the DS 2717 8" disk controller is fitted (-flop1, -flop2).  At power-on
+  the monitor boots the disc in drive A; Stop leaves the wait for a disc.
+
+The I/O board's GPIO/0 connector (slot gpio0) takes the PMD 32 floppy unit
+(pmd32) or the PMD 32-SD (pmd32sd).
+- pmd853 : the PMD 32 is fitted; at power-on the monitor boots the disk in its
+  drive A (-flop1).
+- c2717pmd : the PMD 32 is fitted (-flop1, -flop2).  Its disk driver reads 26
+  sectors per track, the 8" layout (.img images of 26 x 128-byte sectors).
+- c2717sd : the PMD 32-SD is fitted (-flop1 to -flop4) and boots DZ8 images.
+  The floppy PMD 32 boots them too when given 80-cylinder drives
+  (-gpio0 pmd32 -gpio0:pmd32:fdc:0 525qd).
+
 *******************************************************************************************************************/
 
 #include "emu.h"
 #include "pmd85.h"
 #include "cpu/i8085/i8085.h"
-#include "screen.h"
 #include "softlist_dev.h"
 #include "speaker.h"
 #include "formats/pmd_cas.h"
@@ -254,6 +271,29 @@ uint32_t pmd85_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			bitmap.pix(y, x * 6 + 5) = BIT(line[x], 5) ? pen : 0;
 		}
 
+	}
+
+	return 0;
+}
+
+// The Consul 2717 can also show all 8 bits of each byte as pixels (384x256).
+uint32_t pmd85_state::c2717_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		uint8_t const *const line = m_ram->pointer() + 0xc000 + 0x40 * y;
+		uint16_t *const dest = &bitmap.pix(y);
+
+		if (m_c2717_width384)
+		{
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				dest[x] = BIT(line[x >> 3], x & 7) ? 2 : 0;
+		}
+		else
+		{
+			for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+				dest[x] = BIT(line[x / 6], x % 6) ? (BIT(line[x / 6], 7) ? 1 : 2) : 0;
+		}
 	}
 
 	return 0;
@@ -335,8 +375,8 @@ void pmd85_state::c2717_mem(address_map &map)
 {
 	map(0x0000, 0x3fff).bankrw("bank1");
 	map(0x4000, 0x7fff).bankrw("bank2");
-	map(0x8000, 0xbfff).bankr("bank3");
-	map(0xc000, 0xffff).bankrw("bank4");
+	map(0x8000, 0xbfff).bankr(m_bank[3]);
+	map(0xc000, 0xffff).rw(FUNC(pmd85_state::c2717_hi_r), FUNC(pmd85_state::c2717_hi_w));
 }
 
 /* keyboard input */
@@ -654,7 +694,7 @@ void pmd85_state::pmd85(machine_config &config, bool with_uart)
 	m_pit->set_clk<2>(1);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen"));
+	screen_device &screen(SCREEN(config, m_screen));
 	screen.set_color(rgb_t::green());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(0);
@@ -704,13 +744,18 @@ void pmd85_state::pmd851(machine_config &config)
 	m_ppi0->out_pb_callback().set(FUNC(pmd85_state::ppi0_portb_w));
 	m_ppi0->out_pc_callback().set(FUNC(pmd85_state::ppi0_portc_w));
 
+	// GPIO/0 is port A of the I/O board 8255, used in mode 2
 	I8255(config, m_ppi1);
-	m_ppi1->in_pa_callback().set(FUNC(pmd85_state::ppi1_porta_r));
+	m_ppi1->in_pa_callback().set(m_gpio, FUNC(pmd85_gpio_slot_device::pa_r));
 	m_ppi1->in_pb_callback().set(FUNC(pmd85_state::ppi1_portb_r));
 	m_ppi1->in_pc_callback().set(FUNC(pmd85_state::ppi1_portc_r));
-	m_ppi1->out_pa_callback().set(FUNC(pmd85_state::ppi1_porta_w));
+	m_ppi1->out_pa_callback().set(m_gpio, FUNC(pmd85_gpio_slot_device::pa_w));
 	m_ppi1->out_pb_callback().set(FUNC(pmd85_state::ppi1_portb_w));
-	m_ppi1->out_pc_callback().set(FUNC(pmd85_state::ppi1_portc_w));
+	m_ppi1->out_pc_callback().set(m_gpio, FUNC(pmd85_gpio_slot_device::pc_w));
+
+	PMD85_GPIO_SLOT(config, m_gpio, pmd85_gpio_devices, nullptr);
+	m_gpio->stb_callback().set(m_ppi1, FUNC(i8255_device::pc4_w));
+	m_gpio->ack_callback().set(m_ppi1, FUNC(i8255_device::pc6_w));
 
 	I8255(config, m_ppi2);
 	m_ppi2->in_pa_callback().set(FUNC(pmd85_state::ppi2_porta_r));
@@ -739,6 +784,9 @@ void pmd85_state::pmd853(machine_config &config)
 {
 	pmd851(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmd85_state::pmd853_mem);
+
+	m_gpio->set_default_option("pmd32");
+	SOFTWARE_LIST(config, "flop_list").set_original("pmd85_flop");
 }
 
 void pmd85_state::alfa(machine_config &config)
@@ -790,6 +838,42 @@ void pmd85_state::c2717(machine_config &config)
 {
 	pmd851(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pmd85_state::c2717_mem);
+
+	// motherboard 8255 port C while undriven: the 0xc000-0xffff remapping
+	// (PC7) is on at power-up; the other lines are taken as low
+	m_ppi0->tri_pc_callback().set_constant(0x80);
+	m_ppi0->out_pc_callback().set(FUNC(pmd85_state::c2717_ppi0_portc_w));
+
+	// timer 2 counts timer 1's output instead of the 1 Hz clock
+	m_pit->set_clk<2>(0);
+	m_pit->out_handler<1>().set(m_pit, FUNC(pit8253_device::write_clk2));
+
+	m_screen->set_size(384, 256);
+	m_screen->set_screen_update(FUNC(pmd85_state::c2717_screen_update));
+}
+
+void pmd85_state::c2717ds(machine_config &config)
+{
+	c2717(config);
+
+	DS2717(config, m_ds2717, 18.432_MHz_XTAL / 9);
+	m_ds2717->int_cb().set_inputline(m_maincpu, I8085_INTR_LINE);
+
+	SOFTWARE_LIST(config, "flop_list").set_original("c2717_flop");
+}
+
+void pmd85_state::c2717pmd(machine_config &config)
+{
+	c2717(config);
+	m_gpio->set_default_option("pmd32");
+}
+
+void pmd85_state::c2717sd(machine_config &config)
+{
+	c2717(config);
+	m_gpio->set_default_option("pmd32sd");
+
+	SOFTWARE_LIST(config, "flop_list").set_original("c2717_flop");
 }
 
 
@@ -862,19 +946,32 @@ ROM_START(c2717)
 	ROM_LOAD("c2717.rom", 0x0000, 0x4000, CRC(da1703b1) SHA1(9fb93e6cae8b551064c7175bf3b4e3113429ce73))
 ROM_END
 
+ROM_START(c2717ds)
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD("c2717.rom", 0x0000, 0x4000, CRC(da1703b1) SHA1(9fb93e6cae8b551064c7175bf3b4e3113429ce73))
+ROM_END
+
 ROM_START(c2717pmd)
 	ROM_REGION(0x4000,"maincpu",0)
 	ROM_LOAD( "c2717-pmd32.rom", 0x00000, 0x4000, CRC(cbdd323c) SHA1(ee9fea11be8bd4f945c583b0ae5684269906d0ce))
 ROM_END
 
+// 603.513/32 disk driver for the PMD 32-SD; boot records are signed "C2717S"
+ROM_START(c2717sd)
+	ROM_REGION(0x4000,"maincpu",0)
+	ROM_LOAD("c2717-pmd32sd.rom", 0x0000, 0x4000, CRC(9baab764) SHA1(0276babe96a562d58835a70e065edaad67fb0779))
+ROM_END
 
-//    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  CLASS        INIT          COMPANY             FULLNAME                     FLAGS
-COMP( 1985, pmd851,   0,      0,      pmd851,  alfa,  pmd85_state, init_pmd851,  "Tesla",            "PMD-85.1",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1985, pmd852,   pmd851, 0,      pmd851,  pmd85, pmd85_state, init_pmd852,  "Tesla",            "PMD-85.2",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1985, pmd852a,  pmd851, 0,      pmd852a, pmd85, pmd85_state, init_pmd852a, "Tesla",            "PMD-85.2A",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1985, pmd852b,  pmd851, 0,      pmd852a, pmd85, pmd85_state, init_pmd852a, "Tesla",            "PMD-85.2B",                 MACHINE_SUPPORTS_SAVE )
-COMP( 1988, pmd853,   pmd851, 0,      pmd853,  pmd85, pmd85_state, init_pmd853,  "Tesla",            "PMD-85.3",                  MACHINE_SUPPORTS_SAVE )
-COMP( 1986, alfa,     pmd851, 0,      alfa,    alfa,  pmd85_state, init_alfa,    "Didaktik Skalica", "Didaktik Alfa",             MACHINE_SUPPORTS_SAVE )
-COMP( 1985, mato,     pmd851, 0,      mato,    mato,  pmd85_state, init_mato,    "Statny",           "Mato",                      MACHINE_SUPPORTS_SAVE )
-COMP( 1989, c2717,    pmd851, 0,      c2717,   pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",   "Consul 2717",               MACHINE_SUPPORTS_SAVE )
-COMP( 1989, c2717pmd, pmd851, 0,      c2717,   pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",   "Consul 2717 (with PMD-32)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+
+//    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  CLASS        INIT          COMPANY                     FULLNAME                        FLAGS
+COMP( 1985, pmd851,   0,      0,      pmd851,   alfa,  pmd85_state, init_pmd851,  "Tesla",                    "PMD-85.1",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1985, pmd852,   pmd851, 0,      pmd851,   pmd85, pmd85_state, init_pmd852,  "Tesla",                    "PMD-85.2",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1985, pmd852a,  pmd851, 0,      pmd852a,  pmd85, pmd85_state, init_pmd852a, "Tesla",                    "PMD-85.2A",                    MACHINE_SUPPORTS_SAVE )
+COMP( 1985, pmd852b,  pmd851, 0,      pmd852a,  pmd85, pmd85_state, init_pmd852a, "Tesla",                    "PMD-85.2B",                    MACHINE_SUPPORTS_SAVE )
+COMP( 1988, pmd853,   pmd851, 0,      pmd853,   pmd85, pmd85_state, init_pmd853,  "Tesla",                    "PMD-85.3",                     MACHINE_SUPPORTS_SAVE )
+COMP( 1986, alfa,     pmd851, 0,      alfa,     alfa,  pmd85_state, init_alfa,    "Didaktik Skalica",         "Didaktik Alfa",                MACHINE_SUPPORTS_SAVE )
+COMP( 1985, mato,     pmd851, 0,      mato,     mato,  pmd85_state, init_mato,    "Statny",                   "Mato",                         MACHINE_SUPPORTS_SAVE )
+COMP( 1989, c2717,    pmd851, 0,      c2717,    pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",           "Consul 2717",                  MACHINE_SUPPORTS_SAVE )
+COMP( 1989, c2717ds,  pmd851, 0,      c2717ds,  pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",           "Consul 2717 (with DS 2717)",   MACHINE_SUPPORTS_SAVE )
+COMP( 1989, c2717pmd, pmd851, 0,      c2717pmd, pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno",           "Consul 2717 (with PMD 32)",    MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+COMP( 2012, c2717sd,  pmd851, 0,      c2717sd,  pmd85, pmd85_state, init_c2717,   "Zbrojovka Brno / RM-TEAM", "Consul 2717 (with PMD 32-SD)", MACHINE_SUPPORTS_SAVE )
