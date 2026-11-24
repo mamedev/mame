@@ -875,6 +875,7 @@ u8 tek440x_state::videocntl_r()
 	else
 		ans |= BIT(m_videobase_offset - 0xffe9 + m_screen->hpos() / 16, 4) << 4;
 
+	// active low
 	if (m_screen->hblank() == 0)
 		ans |= 0x40;
 
