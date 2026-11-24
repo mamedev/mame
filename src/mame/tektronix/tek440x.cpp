@@ -878,7 +878,7 @@ u8 tek440x_state::videocntl_r()
 	if (m_screen->hblank())
 		ans |= 0x40;
 
-	if (m_screen->hblank() == 0)
+ 	if (m_screen->vblank() == 0 && m_screen->hblank() == 0)
 		ans |= 0x80;
 
 	return ans;
