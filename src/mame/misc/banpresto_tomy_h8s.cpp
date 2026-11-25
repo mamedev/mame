@@ -82,7 +82,6 @@ Banpresto CommuTouch series:
 
 namespace {
 
-
 // Elo SmartSet-compatible touchscreen used by CommuTouch.  The controller
 // model is not identified.  ROM 001666 configures SCI2 for 9600 8N1;
 // 001d52 consumes ten-byte SmartSet packets via the H8 DTC.
@@ -95,9 +94,12 @@ public:
 	void rx_w(int state) { device_serial_interface::rx_w(state); }
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	// device_serial_interface implementation
 	virtual void rcv_complete() override;
 	virtual void tra_complete() override;
 	virtual void tra_callback() override { m_tx_cb(transmit_register_get_data_bit()); }
@@ -134,7 +136,80 @@ private:
 	u16 m_release_ticks;
 };
 
+
+// CommuTouch has a reversible card transport with separate rotation and card
+// sensors. ROM 000ed0 counts rotation edges; 000f56-001024 homes, feeds,
+// retracts and advances a card, observing the card sensor independently.
+// The sensor geometry and 20 ms rotation interval below are provisional.
+class anpanman_card_device : public device_t
+{
+public:
+	anpanman_card_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	void motor_w(u8 data) { m_motor = data & 0xc0; }
+	int rotation_r() { return BIT(m_position, 0); }
+	int payout_r() { return !empty_r() && m_position >= 8 && m_position < 12; }
+	int empty_r() { return BIT(m_empty->read(), 0); }
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+private:
+	TIMER_CALLBACK_MEMBER(advance);
+
+	required_ioport m_empty;
+	emu_timer *m_timer;
+	u8 m_position;
+	u8 m_motor;
+};
+
+
+// Minimal dummy CommuTouch card code checker for the no-card game path.
+// SCI1 is 38400 8N1; optical card reading is intentionally not implemented.
+// ROM 0042b2 sends s/S for the threshold-set number, 00cf6a parses the
+// response as ASCII '1' + index. The startup presence check (0753a6)
+// requires this exchange even without a card on the reader.
+// Optical card/mark/calibration commands are outside this dummy model.
+// The controller model, factory threshold set and exact timing are unknown.
+class anpanman_reader_device : public device_t, public device_serial_interface
+{
+public:
+	anpanman_reader_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	auto tx_handler() { return m_tx_cb.bind(); }
+	void rx_w(int state) { device_serial_interface::rx_w(state); }
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+
+	// device_serial_interface implementation
+	virtual void rcv_complete() override;
+	virtual void tra_complete() override;
+	virtual void tra_callback() override { m_tx_cb(transmit_register_get_data_bit()); }
+
+private:
+	TIMER_CALLBACK_MEMBER(reply);
+	void threshold_reply();
+
+	devcb_write_line m_tx_cb;
+	emu_timer *m_reply_timer;
+	u8 m_threshold;
+	u8 m_response[2];
+	u8 m_response_pos;
+	bool m_set_pending;
+};
+
+} // anonymous namespace
+
 DEFINE_DEVICE_TYPE_PRIVATE(ANPANMAN_TOUCH, anpanman_touch_device, anpanman_touch_device, "anpanman_touch", "CommuTouch SmartSet touchscreen")
+DEFINE_DEVICE_TYPE_PRIVATE(ANPANMAN_CARD, anpanman_card_device, anpanman_card_device, "anpanman_card", "CommuTouch card dispenser")
+DEFINE_DEVICE_TYPE_PRIVATE(ANPANMAN_READER, anpanman_reader_device, anpanman_reader_device, "anpanman_reader", "CommuTouch card code checker")
+
+namespace {
 
 static INPUT_PORTS_START(anpanman_touch)
 	PORT_START("TOUCH")
@@ -379,36 +454,6 @@ TIMER_CALLBACK_MEMBER(anpanman_touch_device::sample_touch)
 }
 
 
-// CommuTouch has a reversible card transport with separate rotation and card
-// sensors. ROM 000ed0 counts rotation edges; 000f56-001024 homes, feeds,
-// retracts and advances a card, observing the card sensor independently.
-// The sensor geometry and 20 ms rotation interval below are provisional.
-class anpanman_card_device : public device_t
-{
-public:
-	anpanman_card_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-	void motor_w(u8 data) { m_motor = data & 0xc0; }
-	int rotation_r() { return BIT(m_position, 0); }
-	int payout_r() { return !empty_r() && m_position >= 8 && m_position < 12; }
-	int empty_r() { return BIT(m_empty->read(), 0); }
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
-
-private:
-	TIMER_CALLBACK_MEMBER(advance);
-
-	required_ioport m_empty;
-	emu_timer *m_timer;
-	u8 m_position;
-	u8 m_motor;
-};
-
-DEFINE_DEVICE_TYPE_PRIVATE(ANPANMAN_CARD, anpanman_card_device, anpanman_card_device, "anpanman_card", "CommuTouch card dispenser")
-
 static INPUT_PORTS_START(anpanman_card)
 	PORT_START("EMPTY")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Card Dispenser Empty") PORT_TOGGLE
@@ -451,41 +496,6 @@ TIMER_CALLBACK_MEMBER(anpanman_card_device::advance)
 		m_position = (m_position - 1) & 15;
 }
 
-
-// Minimal dummy CommuTouch card code checker for the no-card game path.
-// SCI1 is 38400 8N1; optical card reading is intentionally not implemented.
-// ROM 0042b2 sends s/S for the threshold-set number, 00cf6a parses the
-// response as ASCII '1' + index. The startup presence check (0753a6)
-// requires this exchange even without a card on the reader.
-// Optical card/mark/calibration commands are outside this dummy model.
-// The controller model, factory threshold set and exact timing are unknown.
-class anpanman_reader_device : public device_t, public device_serial_interface
-{
-public:
-	anpanman_reader_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-	auto tx_handler() { return m_tx_cb.bind(); }
-	void rx_w(int state) { device_serial_interface::rx_w(state); }
-
-protected:
-	virtual void device_start() override ATTR_COLD;
-	virtual void device_reset() override ATTR_COLD;
-	virtual void rcv_complete() override;
-	virtual void tra_complete() override;
-	virtual void tra_callback() override { m_tx_cb(transmit_register_get_data_bit()); }
-
-private:
-	TIMER_CALLBACK_MEMBER(reply);
-	void threshold_reply();
-
-	devcb_write_line m_tx_cb;
-	emu_timer *m_reply_timer;
-	u8 m_threshold;
-	u8 m_response[2];
-	u8 m_response_pos;
-	bool m_set_pending;
-};
-
-DEFINE_DEVICE_TYPE_PRIVATE(ANPANMAN_READER, anpanman_reader_device, anpanman_reader_device, "anpanman_reader", "CommuTouch card code checker")
 
 anpanman_reader_device::anpanman_reader_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, ANPANMAN_READER, tag, owner, clock),
@@ -564,7 +574,6 @@ void anpanman_reader_device::rcv_complete()
 	}
 }
 
-
 class banpresto_tomy_h8s_state : public driver_device
 {
 protected:
@@ -586,7 +595,7 @@ protected:
 	void coin_lockout_w(u8 data);
 
 	required_device<h8s2320_device> m_maincpu;
-	required_device<axell_ag2_device> m_ag2;
+	required_device<ax51201_device> m_ag2;
 	required_device<okim9810_device> m_oki;
 
 private:
@@ -685,14 +694,15 @@ static INPUT_PORTS_START( base )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_READ_LINE_DEVICE_MEMBER("hopper", FUNC(hopper_device::line_r))
 	PORT_BIT(0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN)
 
+	// The I/O test calls the four panel buttons SW1-SW4 and lights LAMP1/LAMP2 for SW1/SW2.
 	PORT_START("P4")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Start / Action")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Diagnostic SW2") PORT_CODE(KEYCODE_Z)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Diagnostic SW3") PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Diagnostic SW4") PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Service Switch")
-	PORT_SERVICE_NO_TOGGLE(0x20, IP_ACTIVE_HIGH) PORT_NAME("Test Switch")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT) PORT_NAME("Payout Switch")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_SERVICE1)
+	PORT_SERVICE_NO_TOGGLE(0x20, IP_ACTIVE_HIGH)
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_PAYOUT)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN)
 
 	// Both banks share P2. P5 bits 3/2 select DSW1/DSW2 respectively.
@@ -721,7 +731,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( banpresto )
 	PORT_INCLUDE(base)
 
-	// Shared settings decoder in all six Banpresto medal programs.
+	// Shared settings decoder in all six Banpresto medal programs.  The
+	// jackpot settings are named as on the GAME INFORMATION-2 test screen
+	// (JP PAYOUT, JP MODE with the values NC and MJ).
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME(0x03, 0x03, "JP Payout") PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(0x00, "3%")
@@ -803,10 +815,10 @@ static INPUT_PORTS_START( commutouch )
 	// ROM 0752e2/001392 sets the coin threshold to (DSW1 & 3) + 1.
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME(0x03, 0x03, DEF_STR(Coinage)) PORT_DIPLOCATION("DSW1:1,2")
-	PORT_DIPSETTING(0x00, DEF_STR(1C_1C))
-	PORT_DIPSETTING(0x01, DEF_STR(2C_1C))
-	PORT_DIPSETTING(0x02, DEF_STR(3C_1C))
 	PORT_DIPSETTING(0x03, DEF_STR(4C_1C))
+	PORT_DIPSETTING(0x02, DEF_STR(3C_1C))
+	PORT_DIPSETTING(0x01, DEF_STR(2C_1C))
+	PORT_DIPSETTING(0x00, DEF_STR(1C_1C))
 INPUT_PORTS_END
 
 
@@ -823,7 +835,7 @@ void banpresto_state::banpresto_map(address_map &map)
 {
 	program_map(map);
 	// CPU code identifies a 128 KiB host aperture, with registers at +1fc00.
-	map(0x200000, 0x21ffff).rw(m_ag2, FUNC(axell_ag2_device::host_r), FUNC(axell_ag2_device::host_w));
+	map(0x200000, 0x21ffff).m(m_ag2, FUNC(ax51201_device::map));
 	map(0xc80000, 0xc80000).w(FUNC(banpresto_state::outputs_w));
 	map(0xca0000, 0xca0000).w(FUNC(banpresto_state::motor_w));
 }
@@ -831,7 +843,7 @@ void banpresto_state::banpresto_map(address_map &map)
 void tomy_state::tomy_map(address_map &map)
 {
 	program_map(map);
-	map(0x200000, 0x21ffff).rw(m_ag2, FUNC(axell_ag2_device::host_r), FUNC(axell_ag2_device::host_w));
+	map(0x200000, 0x21ffff).m(m_ag2, FUNC(ax51201_device::map));
 	map(0xc80000, 0xc80000).w(FUNC(tomy_state::outputs_w));
 	map(0xca0000, 0xca0000).w(FUNC(tomy_state::motor_w));
 }
@@ -840,7 +852,7 @@ void anpanman_state::commutouch_map(address_map &map)
 {
 	program_map(map);
 	// Anpanman code uses 41fc00, unlike the other BPSC/TMSC programs.
-	map(0x400000, 0x41ffff).rw(m_ag2, FUNC(axell_ag2_device::host_r), FUNC(axell_ag2_device::host_w));
+	map(0x400000, 0x41ffff).m(m_ag2, FUNC(ax51201_device::map));
 	map(0xc80000, 0xc80000).w(FUNC(anpanman_state::outputs_w));
 	map(0xca0000, 0xca0000).w(FUNC(anpanman_state::motor_w));
 }
@@ -1011,14 +1023,14 @@ void banpresto_tomy_h8s_state::common(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	AXELL_AG2(config, m_ag2, 24.576_MHz_XTAL); // TODO: verify, assumed to share the CPU XTAL
+	AX51201(config, m_ag2, 24.576_MHz_XTAL); // TODO: verify, assumed to share the CPU XTAL
 	m_ag2->set_screen("screen");
 
 	screen_device &screen(SCREEN(config, "screen")); // TODO
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);
-	screen.set_screen_update(m_ag2, FUNC(axell_ag2_device::screen_update));
+	screen.set_screen_update(m_ag2, FUNC(ax51201_device::screen_update));
 
 	SPEAKER(config, "speaker", 2).front();
 
@@ -1244,7 +1256,7 @@ ROM_START( anpanmct ) // uses touch screen
 	ROM_CONTINUE(0x000000, 0x00002e)
 
 	ROM_REGION( 0x2000000, "ag2", 0 )
-	ROM_LOAD16_WORD_SWAP( "bp-cmtc1-g_ver1.0.rom3", 0x0000000, 0x2000000, CRC(7e482971) SHA1(1e5b0801515292731ac639b6e0d53b406af1138d) )
+	ROM_LOAD16_WORD_SWAP( "bp-cmtc1-g_ver1.0.rom3", 0x0000000, 0x2000000, BAD_DUMP CRC(7e482971) SHA1(1e5b0801515292731ac639b6e0d53b406af1138d) ) // flagged bad when dumped, not verified since
 
 	ROM_REGION( 0x2000000, "oki", 0 )
 	ROM_LOAD( "bp-cmtc1-s_ver1.0.rom2", 0x0000000, 0x2000000, CRC(337d688a) SHA1(276466924e6a23f531a7100d25390fdaae4fecfb) )

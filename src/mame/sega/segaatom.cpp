@@ -101,10 +101,10 @@ void atom2_state::atom2(machine_config &config)
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);
-	screen.set_screen_update("ag2", FUNC(axell_ag2_device::screen_update));
+	screen.set_screen_update("ag2", FUNC(ax51201_device::screen_update));
 
 	// TODO: map it, the CPU address is unknown without the undumped epr-24430.ic4 boot ROM
-	AXELL_AG2(config, "ag2", 25'180'000).set_screen("screen"); // clock not verified
+	AX51201(config, "ag2", 25'180'000, 0x200'0000).set_screen("screen"); // clock not verified
 
 	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
@@ -137,4 +137,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, spongbob,  0, atom2, atom2, atom2_state, empty_init, ROT0, "Sega",      "SpongeBob SquarePants Ticket Boom", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 200?, spongbob,  0, atom2, atom2, atom2_state, empty_init, ROT0, "Sega",      "SpongeBob SquarePants Ticket Boom", MACHINE_NOT_WORKING )

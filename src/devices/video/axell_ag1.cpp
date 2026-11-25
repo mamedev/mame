@@ -103,6 +103,7 @@
 #include "emu.h"
 
 #include "axell_ag1.h"
+
 #include "axell_decomp.h"
 
 #include "screen.h"
@@ -145,15 +146,15 @@ u8 cgrom_read(const u8 *rom, u32 mask, u32 x, u32 y)
 class cgrom_decompressor : public axell_decompressor
 {
 public:
-	cgrom_decompressor(const u8 *rom, u32 rom_mask, int x, int y, u8 *dest, u32 x_bits, u32 x_mask, u32 y_mask) :
-		axell_decompressor(dest, x_bits, x_mask, y_mask, false),
-		m_rom(rom),
-		m_rom_mask(rom_mask),
-		m_basex(x),
-		m_x(x),
-		m_y(y)
+	cgrom_decompressor(const u8 *rom, u32 rom_mask, int x, int y, u8 *dest, u32 x_bits, u32 x_mask, u32 y_mask)
+		: axell_decompressor(dest, x_bits, x_mask, y_mask, false)
+		, m_rom(rom)
+		, m_rom_mask(rom_mask)
+		, m_basex(x)
+		, m_x(x + 1)
+		, m_y(y)
+		, m_width(cgrom_read(rom, rom_mask, x, y) + 1)
 	{
-		m_width = cgrom_read(m_rom, m_rom_mask, m_x++, m_y) + 1;
 	}
 
 	// bits 8-10 of the width, held in the first three bits of the stream

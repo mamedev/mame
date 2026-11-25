@@ -4,6 +4,9 @@
 
     uPD4992 parallel RTC
 
+    References: NEC uPD4992 preliminary data sheet (document ID-3084) and
+    uPD4992 user's manual (document S11812EJ4V0UM00).
+
     TODO:
     - Add timers
     - Add 12 hours mode
@@ -58,7 +61,6 @@ void upd4992_device::device_validity_check(validity_checker &valid) const
 
 void upd4992_device::device_start()
 {
-	save_item(NAME(m_register));
 	save_item(NAME(m_rtc_regs));
 	save_item(NAME(m_clock_remaining));
 	save_item(NAME(m_time_initialized));
@@ -72,8 +74,10 @@ TIMER_CALLBACK_MEMBER(upd4992_device::clock_tick)
 {
 	if ((m_register[RTC_SECOND] == 59) && (m_register[RTC_MINUTE] == 59) && (m_register[RTC_HOUR] == 23))
 	{
-		// This part uses a separately programmable two-bit leap-year counter,
-		// rather than deriving leap years from the year register.
+		// This part uses a separately programmable two-bit leap-year counter
+		// rather than deriving leap years from the year register: February
+		// has 29 days when leap years are enabled and the counter is 0
+		// (data sheet, LEAP YEAR CONTROL REGISTER, p. 7).
 		if ((m_register[RTC_MONTH] == 2) && (m_register[RTC_DAY] == 28) && !(m_rtc_regs[3] & 0xb0))
 		{
 			set_time(true, m_register[RTC_YEAR], 2, 29, (m_register[RTC_DAY_OF_WEEK] % 7) + 1, 0, 0, 0);
@@ -122,7 +126,7 @@ xxxx ---- Mode register
 	m_rtc_regs[0] = convert_to_bcd(second);
 	m_rtc_regs[1] = convert_to_bcd(minute);
 	m_rtc_regs[2] = convert_to_bcd(hour);
-	m_rtc_regs[3] = (m_rtc_regs[3] & 0xf0) | (day_of_week - 1);
+	m_rtc_regs[3] = (m_rtc_regs[3] & 0xf0) | ((day_of_week - 1) & 0x07);
 	m_rtc_regs[4] = convert_to_bcd(day);
 	m_rtc_regs[5] = convert_to_bcd(month);
 	m_rtc_regs[6] = convert_to_bcd(year);
@@ -142,8 +146,12 @@ void upd4992_device::write(offs_t offset, u8 data)
 	if (offset == 7)
 	{
 		m_rtc_regs[7] = data & 0xf0;
-		// With bit 3 clear, bit 0 stops (1) or starts (0) the clock.
-		// With bit 3 set it controls the interval interrupt, not the clock.
+		// Control register (data sheet, CONTROL REGISTER, p. 8): with bit 3
+		// clear, bit 0 is CLK stop (1 stops the clock, 0 starts it), bit 1
+		// is reset and bit 2 is CLK adjust.  With bit 3 set the same bits
+		// are INT stop, INT reset and TP enable, which do not affect the
+		// time counter.  Software stops the clock before writing time data
+		// (user's manual, section 3.1).
 		if (!BIT(data, 3))
 		{
 			if (BIT(data, 0))
@@ -161,7 +169,8 @@ void upd4992_device::write(offs_t offset, u8 data)
 	else // TODO: perhaps there's a write inhibit?
 	{
 		// Bit 6 enables writes to the leap-year counter; weekday writes without
-		// it leave the counter unchanged. Bit 7 disables leap-day insertion.
+		// it leave the counter unchanged.  Bit 7 disables leap-day insertion
+		// (data sheet, LEAP YEAR CONTROL REGISTER, p. 7).
 		if ((offset == 3) && !BIT(data, 6))
 			m_rtc_regs[3] = (data & 0xcf) | (m_rtc_regs[3] & 0x30);
 		else

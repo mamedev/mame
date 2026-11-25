@@ -81,7 +81,7 @@ protected:
 
 	bool m_die_a;
 
-	sh7042_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	sh7042_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool die_a);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;

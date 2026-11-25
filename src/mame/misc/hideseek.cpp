@@ -27,8 +27,9 @@ is not established. The pictured JanJanJango! cabinet has ten buttons (six
 in a center row and two at each side). The input assignments below follow
 the program's own I/O test.
 
-Initialize blank battery-backed SRAM by holding Reset Key and Meter Key
-during a machine reset, then releasing both.
+Initialize blank battery-backed SRAM by holding the Memory Reset and Service
+Mode inputs (RESET KEY and METER KEY in the program's INPUT TEST) during a
+machine reset, then releasing both.
 
 TODO:
 - Coin passage and hopper pulse timings are inferred; electrical sequences
@@ -194,11 +195,10 @@ void hideseek_state::mem_map(address_map &map)
 	map(0x00200000, 0x0023ffff).ram().share("nvram"); // CS0, battery-backed SRAM
 	map(0x00400000, 0x005fffff).rom().region("prg", 0); // CS1
 	// CS2 - CS3
-	map(0x00800000, 0x00800002).lr8(NAME([this] (offs_t offset) { return m_in[offset]->read(); }));
-	map(0x00800100, 0x00800101).lr8(NAME([this] (offs_t offset) -> u8 {
-		// The five meter drive lines have feedback contacts, checked at 0x6390.
-		return offset ? ((m_system[1]->read() & 0x07) | (m_output_latch & 0xf8)) : m_system[0]->read();
-	}));
+	map(0x00800000, 0x00800002).lr8(NAME([this] (offs_t offset) -> u8 { return m_in[offset]->read(); }));
+	map(0x00800100, 0x00800100).lr8(NAME([this] () -> u8 { return m_system[0]->read(); }));
+	// The five meter drive lines have feedback contacts, checked at 0x6390.
+	map(0x00800101, 0x00800101).lr8(NAME([this] () -> u8 { return (m_system[1]->read() & 0x07) | (m_output_latch & 0xf8); }));
 	map(0x00800102, 0x00800102).w(FUNC(hideseek_state::outputs_w));
 
 	map(0x00840000, 0x00840007).rw("rtc", FUNC(upd4992_device::read), FUNC(upd4992_device::write));
@@ -207,7 +207,7 @@ void hideseek_state::mem_map(address_map &map)
 	map(0x00880000, 0x00880000).rw("oki", FUNC(okim9810_device::read_status), FUNC(okim9810_device::write_command));
 	map(0x00880001, 0x00880001).w("oki", FUNC(okim9810_device::write_tmp_register));
 	// Register pointers in on-chip code: 6e40, 733e, 8882, etc.
-	map(0x00c00000, 0x00c1ffff).rw("ag2", FUNC(axell_ag2_device::host_r), FUNC(axell_ag2_device::host_w));
+	map(0x00c00000, 0x00c1ffff).m("ag2", FUNC(ax51201_device::map));
 
 	map(0x01000000, 0x01ffffff).ram(); // DRAM
 }
@@ -301,9 +301,9 @@ void hideseek_state::hideseek(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(128*8, 64*8);
 	screen.set_visarea(0*8, 640-1, 0*8, 400-1);
-	screen.set_screen_update("ag2", FUNC(axell_ag2_device::screen_update));
+	screen.set_screen_update("ag2", FUNC(ax51201_device::screen_update));
 
-	axell_ag2_device &ag2(AXELL_AG2(config, "ag2", 25_MHz_XTAL, 0x2000000)); // 2x 8M x16 SDRAM
+	ax51201_device &ag2(AX51201(config, "ag2", 25_MHz_XTAL, 0x200'0000)); // 2x 8M x16 SDRAM
 	ag2.set_screen("screen");
 	ag2.event_cb<3>().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
 	ag2.event_cb<2>().set_inputline(m_maincpu, INPUT_LINE_IRQ1);
@@ -334,12 +334,9 @@ ROM_START( hideseek )
 
 	ROM_REGION( 0x1000000, "oki", 0 )
 	ROM_LOAD( "s29gl128n.u4", 0x000000, 0x1000000, CRC(b8eb7cdb) SHA1(a90c70058e50f3369a6e517e0a534b9ef1e0087c) )
-
-	ROM_REGION( 0x40000, "nvram", 0 ) // pre-initialized
-	ROM_LOAD( "nvram", 0x00000, 0x40000, CRC(3e4c1ca5) SHA1(a1ec203e25ae27e1abcfaab2de01fb4f281085b6) )
 ROM_END
 
 } // anonymous namespace
 
 
-GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, empty_init, ROT0, "Appli", "Hide & Seek", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 200?, hideseek, 0, hideseek, hideseek, hideseek_state, empty_init, ROT0, "Appli", "Hide & Seek", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

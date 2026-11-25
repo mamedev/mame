@@ -155,6 +155,9 @@ void okim9810_device::device_start()
 
 void okim9810_device::device_reset()
 {
+	// RESET initialises the LSI (data sheet FEDL9810BFULL-03 p. 7); the
+	// OPT defaults are full volume, secondary filter and direct D/A output
+	// (OPT Command List, p. 19).
 	m_stream->update();
 	for (auto &voice : m_voice)
 		voice = okim_voice();
@@ -554,8 +557,10 @@ void okim9810_device::cmd_w(int state)
 
 int okim9810_device::so_r()
 {
-	m_serial_read_latch = (m_serial_read_latch & ~(1<<m_serial_bits)) | (read_status() & (1<<m_serial_bits));
-	return (read_status() >> (7-m_serial_bits)) & 1;
+	const uint8_t status = read_status();
+	if (!machine().side_effects_disabled())
+		m_serial_read_latch = (m_serial_read_latch & ~(1 << m_serial_bits)) | (status & (1 << m_serial_bits));
+	return BIT(status, 7 - m_serial_bits);
 }
 
 int okim9810_device::sr0_r()
@@ -647,7 +652,9 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		}
 		if (m_phrase_state == SEQ_ACTIVE)
 		{
-			// LOOP repeats the complete edited phrase, including its pauses.
+			// LOOP repeats the complete phrase selected by FADR, including
+			// its pauses: data sheet FEDL9810BFULL-03, "LOOP Playback Timing
+			// (Phrase Table is Used/not Used)", p. 13.
 			if (m_phrase_count <= 0 && m_looping)
 			{
 				m_phrase_offset = m_phrase_base;
@@ -668,7 +675,8 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 				startAddr = rom.read_byte(m_phrase_offset++) << 16;
 				startAddr |= rom.read_byte(m_phrase_offset++) << 8;
 				startAddr |= rom.read_byte(m_phrase_offset++) << 0;
-				// The table entry sets CVOL.
+				// The table entry sets CVOL.  The data sheet does not give the
+				// table layout; the AG-2 games' tables carry the volume here.
 				m_channel_volume = rom.read_byte(m_phrase_offset++) & 0xf;
 				volume_scale_left = volume_scale(global_volume, m_channel_volume, m_pan_volume_left);
 				volume_scale_right = volume_scale(global_volume, m_channel_volume, m_pan_volume_right);
@@ -687,10 +695,7 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 				if (m_playbackAlgo == ADPCM_PLAYBACK || m_playbackAlgo == ADPCM2_PLAYBACK)
 					m_count *= 2;
 				if (!m_count)
-				{
-					m_phrase_state = SEQ_ACTIVE;
 					continue;
-				}
 
 				m_phrase_state = SEQ_PLAY;
 				totalInterpSamples = s_sampling_freq_div_table[m_samplingFreq];
@@ -828,9 +833,13 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		if (m_sample >= m_count)
 		{
 			if (m_phrase_state == SEQ_PLAY)
+			{
 				m_phrase_state = SEQ_ACTIVE;
+			}
 			else if (m_looping)
+			{
 				m_sample = 0;
+			}
 			else
 			{
 				m_playing = false;
@@ -851,9 +860,10 @@ sound_stream::sample_t okim9810_device::okim_voice::volume_scale(const uint8_t g
 												const uint8_t channel_volume_index,
 												const uint8_t pan_volume_index) const
 {
-	// MSM9810B datasheet p.29: CVOL and PAN contribute -2 dB per step,
-	// OPT contributes -6 dB per step. The combined attenuation is not
-	// limited to the -30 dB range of an individual register.
+	// Data sheet FEDL9810BFULL-03 p. 29: output volume = (V + L) * -2 +
+	// (O4 * 2 + O3) * -6 dB, where V is CVOL, L the PAN setting and O4/O3
+	// the OPT bits.  The combined attenuation is not limited to the -30 dB
+	// range of an individual register.
 	const u32 steps = channel_volume_index + pan_volume_index + 3 * global_volume_index;
 	return std::pow(10.0, -0.1 * steps);
 }

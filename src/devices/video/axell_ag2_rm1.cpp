@@ -19,7 +19,6 @@
 
 #include <algorithm>
 #include <numeric>
-#include <string>
 #include <utility>
 
 namespace axell_rm1
@@ -88,7 +87,7 @@ public:
 		require(count <= 32 && position <= limit && count <= limit - position, "truncated bitstream");
 		std::uint32_t result = 0;
 		for (std::uint32_t i = 0; i < count; ++i, ++position)
-			result = (result << 1) | ((m_view.data[position / 8] >> (7 - position % 8)) & 1);
+			result = (result << 1) | ((m_view.data[position / 8] >> (~position & 7)) & 1);
 		return result;
 	}
 
@@ -139,8 +138,10 @@ symbol_table alphabet(byte_view payload, std::uint32_t offset, std::uint32_t len
 		used[value] = true;
 	}
 	for (std::uint32_t value = 0; value < 256; ++value)
+	{
 		if (!used[value])
 			table[count++] = std::uint8_t(value);
+	}
 	return table;
 }
 
@@ -159,9 +160,7 @@ std::array<std::size_t, 5> offsets(byte_view payload, bool intra)
 int balanced(std::uint32_t quotient, std::uint32_t suffix, std::uint32_t width)
 {
 	require(width <= 8 && suffix < (1U << (width + bool(quotient))), "invalid balanced code");
-	int remainder = int(suffix & ((1U << width) - 1));
-	if (width && (remainder & (1 << (width - 1))))
-		remainder -= 1 << width;
+	const int remainder = width ? util::sext(suffix & util::make_bitmask<std::uint32_t>(width), width) : 0;
 	const int magnitude = int(quotient * (1U << width)) + remainder;
 	return quotient && (suffix >> width) ? -magnitude : magnitude;
 }
@@ -226,8 +225,10 @@ void decode_intra_fields(byte_view payload, picture_fields &fields, basis_nest &
 	}
 	c.finish();
 	for (std::uint32_t y = 0; y < 38; ++y)
+	{
 		for (std::uint32_t x = 0; x < 70; ++x)
 			nest[y * 70 + x] = std::uint8_t(luma[(ny + y) * 160 + nx + x] / 16);
+	}
 
 	bit_reader d(payload.slice(region[3], region[4]));
 	const auto modes = [&d, &mode_table, &runs, &fields] (std::uint32_t plane)
@@ -339,7 +340,7 @@ void decode_inter_fields(byte_view payload, picture_fields &fields)
 				const std::uint32_t q = c.symbol(motion);
 				const std::uint32_t suffix = c.read(k + bool(q));
 				const int signed_q = q && (suffix >> k) ? -int(q) : int(q);
-				const int delta = signed_q * (1 << k) + int(suffix & ((1U << k) - 1));
+				const int delta = signed_q * (1 << k) + int(suffix & util::make_bitmask<std::uint32_t>(k));
 				const int limit = 1 << (k + 3);
 				int value = (vector[axis] + delta + limit) % (2 * limit);
 				if (value < 0)
@@ -379,7 +380,9 @@ void decode_inter_fields(byte_view payload, picture_fields &fields)
 						previous = 127;
 					}
 					else
+					{
 						fields.modes[plane].push_back(0);
+					}
 					continue;
 				}
 				if (is_dc)
@@ -393,7 +396,9 @@ void decode_inter_fields(byte_view payload, picture_fields &fields)
 				{
 					std::uint32_t mode = 0;
 					if (run)
+					{
 						--run;
+					}
 					else
 					{
 						mode = d.symbol(mode_table);
@@ -478,6 +483,7 @@ picture_details decode_details(byte_view payload, bool intra, const picture_fiel
 			item.bases[i].quotient = bits.symbol(coefficients);
 		}
 		if (residual)
+		{
 			for (int &value : item.corrections)
 			{
 				// Corrections use a direct unary quotient, not the header's run
@@ -485,16 +491,19 @@ picture_details decode_details(byte_view payload, bool intra, const picture_fiel
 				const std::uint32_t q = bits.unary();
 				value = balanced(q, bits.read(2 + bool(q)), 2);
 			}
+		}
 	};
 	for (std::uint32_t row = 0; row < 60; ++row)
 	{
 		bool active = false;
 		for (std::uint32_t plane = 1; plane < 3; ++plane)
+		{
 			for (std::uint32_t x = 0; x < 80; ++x)
 			{
 				const std::uint32_t mode = fields.modes[plane][row * 80 + x];
 				active |= mode != 0 && mode != 7;
 			}
+		}
 		byte_view record{ payload.data, 0 };
 		std::size_t length = 0;
 		if (active)
@@ -519,8 +528,10 @@ picture_details decode_details(byte_view payload, bool intra, const picture_fiel
 		padding.position = length;
 		padding.finish();
 		for (std::uint32_t y = row * 2; y < row * 2 + 2; ++y)
+		{
 			for (std::uint32_t x = 0; x < 160; ++x)
 				block(luma, 0, x, y);
+		}
 	}
 	require(position == region[1], "unconsumed chroma records");
 	luma.finish();
@@ -533,10 +544,14 @@ block_pixels spatial(int center, const std::array<int, 4> &nearby)
 	constexpr std::array<int, 4> FAR_WEIGHTS{ -1, -1, 0, 2 };
 	block_pixels result;
 	for (std::uint32_t y = 0; y < 4; ++y)
+	{
 		for (std::uint32_t x = 0; x < 4; ++x)
+		{
 			result[y * 4 + x] = clip(floor_div(8 * center + NEAR_WEIGHTS[y] * (nearby[0] - center)
 					+ FAR_WEIGHTS[y] * (nearby[1] - center) + NEAR_WEIGHTS[x] * (nearby[2] - center)
 					+ FAR_WEIGHTS[x] * (nearby[3] - center) + 4, 8));
+		}
+	}
 	return result;
 }
 
@@ -575,8 +590,10 @@ block_pixels nest_basis(const basis_nest &nest, std::uint32_t descriptor)
 	const std::uint32_t sy = 1U << ((descriptor >> 12) & 1);
 	block_pixels result;
 	for (std::uint32_t yy = 0; yy < 4; ++yy)
+	{
 		for (std::uint32_t xx = 0; xx < 4; ++xx)
 			result[yy * 4 + xx] = nest[(y + yy * sy) * 70 + x + xx * sx];
+	}
 	return result;
 }
 
@@ -653,6 +670,7 @@ std::array<std::uint8_t, 64> prediction(const frame &reference, std::uint32_t pl
 	std::array<std::uint8_t, 64> result{};
 	const auto &source = reference.plane(plane);
 	for (std::uint32_t yy = 0; yy < side; ++yy)
+	{
 		for (std::uint32_t xx = 0; xx < side; ++xx)
 		{
 			const std::uint32_t p = (y + yy) * stride + x + xx;
@@ -665,6 +683,7 @@ std::array<std::uint8_t, 64> prediction(const frame &reference, std::uint32_t pl
 				value = (value + source[p + stride] + 1) / 2;
 			result[yy * side + xx] = std::uint8_t(value);
 		}
+	}
 	return result;
 }
 
@@ -677,8 +696,10 @@ block_pixels reference_basis(const frame &reference, int ox, int oy, std::uint32
 	require(x >= 0 && y >= 0 && x + 3 * sx < 640 && y + 3 * sy < 480, "reference basis outside frame");
 	block_pixels result;
 	for (std::uint32_t yy = 0; yy < 4; ++yy)
+	{
 		for (std::uint32_t xx = 0; xx < 4; ++xx)
 			result[yy * 4 + xx] = reference.y[(y + yy * sy) * 640 + x + xx * sx];
+	}
 	return result;
 }
 
@@ -721,13 +742,16 @@ frame reconstruct(byte_view payload, bool intra, std::uint32_t kind, const frame
 	const auto details = decode_details(payload, intra, fields);
 	frame output;
 	for (std::uint32_t my = 0; my < 60; ++my)
+	{
 		for (std::uint32_t mx = 0; mx < 80; ++mx)
 		{
 			const auto &control = fields.controls[my * 80 + mx];
 			if (intra || !control.reference)
 			{
 				for (std::uint32_t plane = 0; plane < 3; ++plane)
+				{
 					for (std::uint32_t by = 0; by < (plane == 0 ? 2U : 1U); ++by)
+					{
 						for (std::uint32_t bx = 0; bx < (plane == 0 ? 2U : 1U); ++bx)
 						{
 							const std::uint32_t x = plane == 0 ? mx * 2 + bx : mx;
@@ -735,6 +759,8 @@ frame reconstruct(byte_view payload, bool intra, std::uint32_t kind, const frame
 							const auto pixels = intra_block(plane, x, y, fields, details, nest, precision);
 							store(output, plane, x * 4, y * 4, 4, pixels.data());
 						}
+					}
+				}
 				continue;
 			}
 			const frame *reference = control.reference == 1 ? past : kind == 1 ? &output : future;
@@ -756,6 +782,7 @@ frame reconstruct(byte_view payload, bool intra, std::uint32_t kind, const frame
 					continue;
 				}
 				for (std::uint32_t by = 0; by < side / 4; ++by)
+				{
 					for (std::uint32_t bx = 0; bx < side / 4; ++bx)
 					{
 						const std::uint32_t x = plane == 0 ? mx * 2 + bx : mx;
@@ -763,10 +790,14 @@ frame reconstruct(byte_view payload, bool intra, std::uint32_t kind, const frame
 						const auto &item = details[plane][y * (plane == 0 ? 160 : 80) + x];
 						block_pixels pixels;
 						for (std::uint32_t yy = 0; yy < 4; ++yy)
+						{
 							for (std::uint32_t xx = 0; xx < 4; ++xx)
 								pixels[yy * 4 + xx] = predicted[plane][(by * 4 + yy) * side + bx * 4 + xx];
+						}
 						if (item.raw)
+						{
 							pixels = item.pixels;
+						}
 						else if (item.present)
 						{
 							const auto values = basis_sum(item, [reference, ox, oy] (std::uint32_t descriptor) { return reference_basis(*reference, ox, oy, descriptor); },
@@ -775,8 +806,10 @@ frame reconstruct(byte_view payload, bool intra, std::uint32_t kind, const frame
 						}
 						store(output, plane, x * 4, y * 4, 4, pixels.data());
 					}
+				}
 			}
 		}
+	}
 	return output;
 }
 
