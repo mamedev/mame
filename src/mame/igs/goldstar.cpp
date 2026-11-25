@@ -21642,11 +21642,9 @@ ROM_START( aplan )  // Has "DYNA QL-1  V1.01" string.
 ROM_END
 
 /*
+  Jin Ji Bao Xi (金雞報喜, Top-7)
   DYNA QL-1  V7.07 string, but not original.
-  Utech Top-7v8.8 05/26/1993 string.
-
-  According to pics also sports a
-  金鸡报喜 (Jin Ji Bao Xi) title screen
+  Utech Top-7 v8.8 05/26/1993 string.
 
 */
 ROM_START( top7 )
@@ -35493,6 +35491,7 @@ GAMEL( 1996, cmast97i,    cmast97,    cmast97,  cmast97i, cmast97_state,  empty_
 GAMEL( 1997, jpknight,    0,          jpknight, cmast97a, cmast97_state,  empty_init,      ROT0, "Dyna / R-Stone",     "Jackpot Knight (V1.1)",                      0,                   layout_cmast97 ) // check inputs
 
 // Dyna CM99 hardware (dynamic banking)
+// (need 3-stops layout, and check missing lamps)
 GAMEL( 1999, cmast99,    0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Dyna",              "Cherry Master '99 (QL-1 V9B.00)",                 0,                   layout_cmv4 )
 GAMEL( 1999, cmast99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, bootleg)",        0,                   layout_cmv4 )
 GAMEL( 1999, cmast99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, Cleco)",          0,                   layout_cmv4 )
@@ -35506,8 +35505,8 @@ GAMEL( 1998, texas99e,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99
 GAMEL( 1998, texas99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, Cleco, Hand Count?)",     MACHINE_NOT_WORKING, layout_cmv4 ) // different bankswitching? see the ROM load notes
 
 GAME(  1993, aplan,      0,        cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "WeaShing H.K.",      "A-Plan",                                          MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
-GAME(  1999, top7,       0,        cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "bootleg (UTech)",    "Top-7 (V8.8, set 1)",                             0 )
-GAME(  1999, top7a,      top7,     cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "bootleg (UTech)",    "Top-7 (V8.8, set 2)",                             MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
+GAMEL( 1999, top7,       0,        cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "bootleg (UTech)",    "Jin Ji Bao Xi (Top-7, V8.8, set 1)",              0,                   layout_cmv4 )
+GAME(  1999, top7a,      top7,     cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "bootleg (UTech)",    "Jin Ji Bao Xi (Top-7, V8.8, set 2)",              MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
 GAME(  1996, war3cb,     0,        cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "S.B.E.",             "War III Cherry Best",                             MACHINE_NOT_WORKING )   // different portmap?
 
 GAME(  1995, tcl,        0,        tcl,      tcl,      tcl_state,      init_tcl,       ROT0, "Uniwang",           "Qi Wang Zhengba",                                 MACHINE_NOT_WORKING )   // protection partially reconstructed
