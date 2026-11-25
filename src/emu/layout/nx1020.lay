@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+copyright-holders:Keith Monahan
+Star NX-1020 control panel
+-->
+<mamelayout version="2">
+	<element name="case"><rect><color red="0.78" green="0.77" blue="0.74" /></rect></element>
+	<element name="plate">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="1478" height="327" viewBox="0 0 1478 327">
+				<rect width="1478" height="327" rx="22" ry="22" fill="#ffffff" />
+			</svg>
+		]]></data><color red="0.21" green="0.23" blue="0.32" /></image>
+	</element>
+
+	<element name="lamp" defstate="0">
+		<rect state="0"><color red="0.50" green="0.49" blue="0.50" /></rect>
+		<rect state="1"><color red="0.30" green="1.00" blue="0.30" /></rect>
+	</element>
+	<element name="lamp_power" defstate="0">
+		<rect state="0"><color red="0.50" green="0.49" blue="0.50" /></rect>
+		<rect state="1"><color red="1.00" green="0.60" blue="0.12" /></rect>
+	</element>
+
+	<element name="button_small" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="105" height="48" viewBox="0 0 105 48"><rect x="0" y="0" width="105" height="48" rx="24" fill="#ffffff" /></svg>
+		]]></data><color red="0.43" green="0.43" blue="0.42" /></image>
+		<image state="0"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="105" height="48" viewBox="0 0 105 48"><rect x="2" y="1" width="101" height="43" rx="22" fill="#ffffff" /></svg>
+		]]></data><color red="0.82" green="0.82" blue="0.80" /></image>
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="105" height="48" viewBox="0 0 105 48"><rect x="0" y="0" width="105" height="48" rx="24" fill="#ffffff" /></svg>
+		]]></data><color red="0.35" green="0.35" blue="0.34" /></image>
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="105" height="48" viewBox="0 0 105 48"><rect x="2" y="1" width="101" height="43" rx="22" fill="#ffffff" /></svg>
+		]]></data><color red="0.61" green="0.61" blue="0.58" /></image>
+	</element>
+	<element name="button_large" defstate="0">
+		<image state="0"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="186" height="47" viewBox="0 0 186 47"><rect x="0" y="0" width="186" height="47" rx="23" fill="#ffffff" /></svg>
+		]]></data><color red="0.43" green="0.43" blue="0.42" /></image>
+		<image state="0"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="186" height="47" viewBox="0 0 186 47"><rect x="2" y="1" width="182" height="42" rx="21" fill="#ffffff" /></svg>
+		]]></data><color red="0.82" green="0.82" blue="0.80" /></image>
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="186" height="47" viewBox="0 0 186 47"><rect x="0" y="0" width="186" height="47" rx="23" fill="#ffffff" /></svg>
+		]]></data><color red="0.35" green="0.35" blue="0.34" /></image>
+		<image state="1"><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="186" height="47" viewBox="0 0 186 47"><rect x="2" y="1" width="182" height="42" rx="21" fill="#ffffff" /></svg>
+		]]></data><color red="0.61" green="0.61" blue="0.58" /></image>
+	</element>
+
+	<!-- MICRO FEED bracket and FF arrow, in panel coordinates -->
+	<element name="marks">
+		<image><data><![CDATA[
+			<svg xmlns="http://www.w3.org/2000/svg" width="560" height="235" viewBox="865 175 560 235">
+				<g fill="#ffffff" stroke="none">
+					<rect x="888" y="181" width="505" height="3" />
+					<rect x="889" y="181" width="3" height="18" />
+					<rect x="1139" y="181" width="3" height="18" />
+					<rect x="1390" y="181" width="3" height="14" />
+					<polygon points="873,198 908,198 890,216" />
+					<polygon points="1124,217 1158,217 1141,199" />
+					<circle cx="1391" cy="198" r="5" />
+					<circle cx="1144" cy="392" r="5" />
+					<rect x="1144" y="391" width="80" height="3" />
+					<rect x="1285" y="391" width="88" height="3" />
+					<polygon points="1382,398 1416,398 1399,379" />
+				</g>
+			</svg>
+		]]></data><color red="0.91" green="0.81" blue="0.23" /></image>
+	</element>
+
+	<element name="tee"><rect><color red="0.9" green="0.9" blue="0.9" /></rect></element>
+
+	<element name="t_hsdraft"><text string="HS DRAFT" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_draft"><text string="DRAFT" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_sanserif"><text string="SANSERIF" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_courier"><text string="COURIER" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_orator"><text string="ORATOR" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_script"><text string="SCRIPT" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_10cpi"><text string="10CPI" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_12cpi"><text string="12CPI" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_prop"><text string="PROP" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_cond"><text string="COND" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_font"><text string="FONT"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_pitch"><text string="PITCH"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_seteject"><text string="SET/EJECT"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_park"><text string="PARK"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_paperfeed"><text string="PAPER FEED"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_online"><text string="ON LINE" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_power"><text string="POWER" align="1"><color red="0.9" green="0.9" blue="0.9" /></text></element>
+	<element name="t_quiet"><text string="-QUIET" align="1"><color red="0.31" green="0.51" blue="0.91" /></text></element>
+	<element name="t_microfeed"><text string="MICRO FEED"><color red="0.91" green="0.81" blue="0.23" /></text></element>
+	<element name="t_ff"><text string="FF"><color red="0.91" green="0.81" blue="0.23" /></text></element>
+
+	<!-- lamps: lamp0-7 = reg1 bits 0-7, lamp8-10 = POWER, ON LINE, QUIET.
+	     Coordinates follow a photograph of the panel. -->
+	<group name="panel">
+		<element ref="case"><bounds x="0" y="50" width="1600" height="420" /></element>
+		<element ref="plate"><bounds x="67" y="105" width="1478" height="327" /></element>
+
+		<element name="lamp4" ref="lamp"><bounds x="116" y="140" width="39" height="20" /></element>
+		<element ref="t_hsdraft"><bounds x="166" y="133" width="150" height="33" /></element>
+		<element name="lamp5" ref="lamp"><bounds x="114" y="213" width="39" height="20" /></element>
+		<element ref="t_draft"><bounds x="164" y="207" width="120" height="33" /></element>
+		<element ref="tee"><bounds x="139" y="244" width="3" height="31" /></element>
+		<element ref="tee"><bounds x="139" y="258" width="13" height="3" /></element>
+		<element ref="t_sanserif"><bounds x="163" y="243" width="150" height="33" /></element>
+		<element name="lamp6" ref="lamp"><bounds x="112" y="288" width="39" height="20" /></element>
+		<element ref="t_courier"><bounds x="163" y="281" width="140" height="33" /></element>
+		<element ref="tee"><bounds x="139" y="318" width="3" height="33" /></element>
+		<element ref="tee"><bounds x="139" y="333" width="13" height="3" /></element>
+		<element ref="t_orator"><bounds x="163" y="318" width="130" height="33" /></element>
+		<element name="lamp7" ref="lamp"><bounds x="110" y="362" width="39" height="20" /></element>
+		<element ref="t_script"><bounds x="161" y="355" width="120" height="33" /></element>
+
+		<element ref="t_font"><bounds x="300" y="255" width="122" height="38" /></element>
+		<element ref="button_small" inputtag="PANEL" inputmask="0x08"><bounds x="306" y="297" width="105" height="48" /></element>
+
+		<element name="lamp0" ref="lamp"><bounds x="474" y="140" width="38" height="20" /></element>
+		<element ref="t_10cpi"><bounds x="526" y="132" width="110" height="33" /></element>
+		<element name="lamp1" ref="lamp"><bounds x="474" y="213" width="38" height="20" /></element>
+		<element ref="t_12cpi"><bounds x="526" y="205" width="110" height="33" /></element>
+		<element name="lamp2" ref="lamp"><bounds x="474" y="288" width="38" height="20" /></element>
+		<element ref="t_prop"><bounds x="526" y="281" width="110" height="33" /></element>
+		<element name="lamp3" ref="lamp"><bounds x="473" y="362" width="38" height="20" /></element>
+		<element ref="t_cond"><bounds x="524" y="355" width="110" height="33" /></element>
+
+		<element ref="t_pitch"><bounds x="610" y="255" width="124" height="38" /></element>
+		<element ref="button_small" inputtag="PANEL" inputmask="0x10"><bounds x="625" y="298" width="103" height="47" /></element>
+
+		<element ref="marks"><bounds x="865" y="175" width="560" height="235" /></element>
+		<element ref="t_microfeed"><bounds x="940" y="146" width="178" height="30" /></element>
+		<element ref="t_ff"><bounds x="1225" y="378" width="60" height="30" /></element>
+
+		<element ref="t_seteject"><bounds x="780" y="222" width="214" height="38" /></element>
+		<element ref="t_park"><bounds x="830" y="256" width="122" height="38" /></element>
+		<element ref="button_large" inputtag="PANEL" inputmask="0x20"><bounds x="801" y="298" width="181" height="46" /></element>
+
+		<element name="lamp10" ref="lamp"><bounds x="1031" y="232" width="38" height="20" /></element>
+		<element ref="t_quiet"><bounds x="1075" y="224" width="120" height="33" /></element>
+		<element ref="t_paperfeed"><bounds x="1025" y="256" width="238" height="38" /></element>
+		<element ref="button_large" inputtag="PANEL" inputmask="0x40"><bounds x="1052" y="298" width="184" height="46" /></element>
+
+		<element name="lamp8" ref="lamp_power"><bounds x="1277" y="141" width="39" height="19" /></element>
+		<element ref="t_power"><bounds x="1326" y="130" width="150" height="38" /></element>
+		<element name="lamp9" ref="lamp"><bounds x="1281" y="233" width="39" height="19" /></element>
+		<element ref="tee"><bounds x="1299" y="262" width="3" height="22" /></element>
+		<element ref="tee"><bounds x="1299" y="281" width="15" height="3" /></element>
+		<element ref="t_online"><bounds x="1318" y="256" width="170" height="38" /></element>
+		<element ref="button_large" inputtag="PANEL" inputmask="0x80"><bounds x="1303" y="298" width="188" height="46" /></element>
+	</group>
+
+	<view name="Control Panel">
+		<group ref="panel"><bounds x="0" y="0" width="1600" height="420" /></group>
+	</view>
+</mamelayout>
