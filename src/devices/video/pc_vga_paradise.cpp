@@ -14,7 +14,8 @@ Paradise / Western Digital (S)VGA chipsets
 - WD90C24A-ZZ / WD90C24A2-ZZ / WD90C26A (cfr. video/wd90c26.cpp)
 
 TODO:
-- WD9710-MZ (PCI + MPEG-1, a.k.a. Pipeline 9710 / 9712, to be added in specific sub-file as well)
+- WD9710-MZ (PCI + MPEG-1, a.k.a. Pipeline 9710 / 9712, to be added in specific sub-file as well,
+  has a wide list of incompatibilities with previous arch, cfr. page 122)
 
 - 'C31A difference compared to 'C31 (just "reserved" PR35?);
 - Emulate new features of 'C31 & 'C33;
@@ -408,18 +409,16 @@ void wd90c00_vga_device::recompute_params()
 {
 	u8 xtal_select = (vga.miscellaneous_output & 0x0c) >> 2;
 	int xtal;
-	// TODO: wd90c11a VTB disables video select bit 1 for 1024x768 mode (with interlace mode = false)
-	// Uses VCLK1, without the bump will select 26.43 Hz as refresh rate
-	const u8 multiplier = BIT(m_video_select, 1) ? 1 : 2;
+	// TODO: PR2 video select bit 1 locks internal video clock for any non-WD9710 targets
 
 	//printf("%d %d %02x\n", m_interlace_mode, xtal_select, m_video_select);
 
 	switch(xtal_select & 3)
 	{
 		// VCLK0
-		case 0: xtal = XTAL(25'174'800).value() * multiplier; break;
+		case 0: xtal = XTAL(25'174'800).value(); break;
 		// VCLK1
-		case 1: xtal = XTAL(28'636'363).value() * multiplier; break;
+		case 1: xtal = XTAL(28'636'363).value(); break;
 		// VCLK2, selected in 800x600 modes
 		case 2:
 		// TODO: wd90c30 selects this for 1024x768 interlace mode

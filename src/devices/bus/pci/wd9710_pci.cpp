@@ -64,6 +64,7 @@ void wd9710_pci_device::device_add_mconfig(machine_config &config)
 	m_vga->set_screen("screen");
 	// 2MB, 4MB
 	m_vga->set_vram_size(4*1024*1024);
+	m_vga->set_vclk2(14'318'181);
 }
 
 void wd9710_pci_device::device_start()

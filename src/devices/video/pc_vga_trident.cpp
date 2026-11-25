@@ -1603,6 +1603,7 @@ void trident_vga_device::accel_data_write(uint32_t data)
 
 // tvga9000 CRTC override
 // not extensively tested, just enough for pntnpuzl to not throw a 168 Hz refresh rate.
+// has no interlace, at least with BIOS currently hooked
 void tvga9000_vga_device::recompute_params()
 {
 	int divisor = 1;
@@ -1612,6 +1613,8 @@ void tvga9000_vga_device::recompute_params()
 	xtal_select |= (tri.sr0d_new & 0x01) << 2;
 	xtal_select |= (tri.sr0d_new & 0x40) >> 3;
 
+	// TODO: this is a single xtal really
+	// cards seen with 14.318 or 40 MHz base
 	switch(xtal_select)
 	{
 		case 0:  xtal = 25174800; break;
@@ -1643,7 +1646,8 @@ void tvga9000_vga_device::recompute_params()
 	}
 
 	if(tri.gc0f & 0x08)  // 16 pixels per character clock
-		xtal = xtal / 2;
+		divisor *= 2;
+		//xtal = xtal / 2;
 
 	if(tri.port_3db & 0x20)
 		xtal = xtal / 2;  // correct?
@@ -1654,7 +1658,21 @@ void tvga9000_vga_device::recompute_params()
 	switch((tri.pixel_depth & 0x0c) >> 2)
 	{
 	case 0:
-	default: if(!(tri.pixel_depth & 0x10) || (tri.cr1e & 0x80)) svga.rgb8_en = 1; break;
+	default:
+		if(!(tri.pixel_depth & 0x10) || (tri.cr1e & 0x80))
+		{
+			// TODO: the only mode that tvga9000 BIOS actually have vs. later variant
+			// fails assertion in core, horizontal display > htotal
+			if ((tri.dac & 0xf0) == 0xa0)
+			{
+				svga.rgb15_en = 1;
+				// divisor *= 2;
+				// xtal /= 2;
+			}
+			else
+				svga.rgb8_en = 1;
+		}
+		break;
 	case 1:  if((tri.dac & 0xf0) == 0x30) svga.rgb16_en = 1; else svga.rgb15_en = 1; break;
 	case 2:  svga.rgb32_en = 1; break;
 	}
@@ -1664,10 +1682,9 @@ void tvga9000_vga_device::recompute_params()
 	// pntnpuzl definitely needs to halve divisor and xtal otherwise it will draw in 800 x 240.
 	if(BIT(tri.cr1e, 7))
 	{
-		divisor = 2;
+		divisor *= 2;
 		xtal /= 2;
 	}
-	// TODO: tri.cr1e bit 2 for interlace
 
 	LOGCRTC("pixel depth %02x module testing %02x\n", tri.pixel_depth, tri.cr1e);
 
