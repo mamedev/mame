@@ -1849,7 +1849,7 @@ CONS( 2012, jl2350,    0,  0,  vt36x_32mb, vt369,     vt36x_state, empty_init, "
 // these sets which render as 'vertical' still have a number of games (mostly hacks) not working properly
 CONS( 2012, lxcmcysp,  0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
 CONS( 2012, lxcmcyspa, lxcmcysp,  0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2350SP, 120-in-1)", MACHINE_NOT_WORKING | ROT270)
-CONS( 2012, lxcmcybao, 0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (120-in-1)", MACHINE_IMPERFECT_GRAPHICS | ROT270)
+CONS( 2012, lxcmcybao, 0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (120-in-1)", MACHINE_NOT_WORKING | ROT270)
 
 CONS( 2012, lxcmcydp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2014, lxcmcyco,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2360DC-1, 120-in-1)", MACHINE_IMPERFECT_GRAPHICS )
