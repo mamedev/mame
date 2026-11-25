@@ -105,6 +105,8 @@ protected:
 
 	bool is_receive_register_full() const { return m_rcv_flags & RECEIVE_REGISTER_FULL; }
 	bool is_transmit_register_empty() const { return m_tra_flags & TRANSMIT_REGISTER_EMPTY; }
+	// the start, data and parity bits have all been presented: only stop bits remain
+	bool is_transmit_register_in_stop_bits() const { return (m_tra_bit_count - m_tra_bit_count_transmitted) <= m_df_stop_bit_count; }
 	bool is_receive_register_synchronized() const { return m_rcv_flags & RECEIVE_REGISTER_SYNCHRONISED; }
 	bool is_receive_register_shifting() const { return m_rcv_bit_count_received > 0; }
 	bool is_receive_framing_error() const { return m_rcv_framing_error; }
