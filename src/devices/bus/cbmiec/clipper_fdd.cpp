@@ -106,7 +106,7 @@ uint8_t clipper_fdd_device::via_pb_r()
 	uint8_t data = !m_bus->data_r() && !atn_ack();
 
 	data |= !m_bus->clk_r() << 2;
-	data |= ((m_slot->get_address() - 8) & 0x03) << 5;
+	data |= (m_address->read() & 0x03) << 5;
 	data |= !m_bus->atn_r() << 7;
 
 	return data;
@@ -241,6 +241,30 @@ void clipper_fdd_device::device_add_mconfig(machine_config &config)
 }
 
 
+//-------------------------------------------------
+//  INPUT_PORTS( clipper_fdd )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( clipper_fdd )
+	PORT_START("ADDRESS")
+	PORT_DIPNAME( 0x03, 0x00, "Device Address" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x01, "9" )
+	PORT_DIPSETTING(    0x02, "10" )
+	PORT_DIPSETTING(    0x03, "11" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor clipper_fdd_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( clipper_fdd );
+}
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -256,6 +280,7 @@ clipper_fdd_device::clipper_fdd_device(const machine_config &mconfig, const char
 	m_via(*this, M6522_TAG),
 	m_fdc(*this, UPD765_TAG),
 	m_floppy(*this, UPD765_TAG":0"),
+	m_address(*this, "ADDRESS"),
 	m_led(*this, "led0"),
 	m_iec_clk(0),
 	m_iec_data(0),

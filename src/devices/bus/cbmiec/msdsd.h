@@ -35,8 +35,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_post_load() override;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual int bus_address() = 0;
 	virtual bool iec_sample_ready();
 	virtual int iec_clk_r();
 	virtual int iec_data_r();
@@ -82,6 +82,7 @@ private:
 
 	required_device<c64h156_device> m_ga;
 	optional_device_array<floppy_connector, 2> m_floppy;
+	required_ioport m_address;
 	output_finder<3> m_leds;
 	emu_timer *m_byterq_timer;
 
@@ -109,7 +110,8 @@ protected:
 	virtual void cbm_iec_atn(int state) override;
 	virtual void cbm_iec_reset(int state) override;
 
-	virtual int bus_address() override;
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(8, 0x03); }
+
 	virtual bool iec_sample_ready() override;
 	virtual int iec_clk_r() override;
 	virtual int iec_data_r() override;
@@ -128,13 +130,17 @@ protected:
 	virtual void ieee488_atn(int state) override;
 	virtual void ieee488_ifc(int state) override;
 
-	virtual int bus_address() override;
+	virtual void device_config_complete() override ATTR_COLD;
+
 	virtual u8 ieee_dio_r() override;
 	virtual int ieee_dav_r() override;
 	virtual int ieee_eoi_r() override;
 	virtual int ieee_nrfd_r() override;
 	virtual int ieee_ndac_r() override;
 	virtual void ieee_w(u8 dio, int dav, int eoi, int nrfd, int ndac) override;
+
+private:
+	input_device_default m_address_default[2];
 };
 
 

@@ -344,7 +344,8 @@ void cbm_iec_device::device_start()
 
 	// a bus hosted by a cartridge has its host CPU outside the bus owner
 	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
-		m_execs.push_back(&exec);
+		if (drives_bus(exec.device()))
+			m_execs.push_back(&exec);
 
 	save_item(NAME(m_lines.m_time));
 	save_item(NAME(m_lines.m_state));
@@ -557,6 +558,29 @@ TIMER_CALLBACK_MEMBER(cbm_iec_device::update_tick)
 		m_update_timer->reset();
 	else
 		m_update_timer->adjust(next - now);
+}
+
+
+//-------------------------------------------------
+//  drives_bus - whether a device can change the
+//  bus lines: a bus device, a host chip, or a
+//  chip on an expansion card that reaches the host
+//-------------------------------------------------
+
+bool cbm_iec_device::drives_bus(device_t const &device)
+{
+	bool host = true;
+
+	for (device_t const *owner = device.owner(); owner && owner->owner(); owner = owner->owner())
+	{
+		if (dynamic_cast<device_cbm_iec_interface const *>(owner))
+			return true;
+
+		if (!dynamic_cast<device_slot_interface const *>(owner) && !dynamic_cast<device_slot_interface const *>(owner->owner()))
+			host = false;
+	}
+
+	return host;
 }
 
 

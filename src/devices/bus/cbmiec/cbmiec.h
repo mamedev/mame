@@ -125,6 +125,7 @@ private:
 	devcb_write_line   m_write_data;
 	devcb_write_line   m_write_reset;
 
+	static bool drives_bus(device_t const &device) ATTR_COLD;
 	void set_signal(device_t *device, int signal, int state);
 	int get_signal(int signal, const attotime &time);
 	void update_lines();

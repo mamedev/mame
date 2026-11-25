@@ -125,7 +125,7 @@ uint8_t sd2iec_device::pa_r()
 
 	*/
 
-	return ((m_slot->get_address() & 0x3) ^ 0x03) << 2;
+	return (m_address->read() ^ 0x03) << 2;
 }
 
 void sd2iec_device::pa_w(uint8_t data)
@@ -270,6 +270,30 @@ uint8_t sd2iec_device::pd_r()
 
 
 
+//-------------------------------------------------
+//  INPUT_PORTS( sd2iec )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( sd2iec )
+	PORT_START("ADDRESS")
+	PORT_DIPNAME( 0x03, 0x00, "Device Address" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x01, "9" )
+	PORT_DIPSETTING(    0x02, "10" )
+	PORT_DIPSETTING(    0x03, "11" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor sd2iec_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( sd2iec );
+}
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -285,6 +309,7 @@ sd2iec_device::sd2iec_device(const machine_config &mconfig, const char *tag, dev
 	m_maincpu(*this, ATMEGA1284P_TAG),
 	m_rtc(*this, PCF8583_TAG),
 	m_sdcard(*this, "sdcard"),
+	m_address(*this, "ADDRESS"),
 	m_leds(*this, "led%u", 0U)
 {
 }
