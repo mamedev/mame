@@ -1792,16 +1792,19 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 	for(uint32_t i=0; i<bitstream.size(); i++) {
 		shift_reg = (shift_reg << 1) | bitstream[i];
 
+		// A mark ending on the last bit is followed by the index
+		uint32_t const pos = i+1 == bitstream.size() ? 0 : i+1;
+
 		// fe
 		if(shift_reg == 0xf57e) {       // address mark
 			if(idblk_count < 100)
-				idblk[idblk_count++] = i+1;
+				idblk[idblk_count++] = pos;
 		}
 		// f8, f9, fa, fb
 		if(shift_reg == 0xf56a || shift_reg == 0xf56b ||
 			shift_reg == 0xf56e || shift_reg == 0xf56f) {       // data mark
 			if(dblk_count < 100)
-				dblk[dblk_count++] = i+1;
+				dblk[dblk_count++] = pos;
 		}
 	}
 
