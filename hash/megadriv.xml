@@ -25983,9 +25983,10 @@ Unemulated [Sega Mega Modem] features
 		<description>Ninja Burai Densetsu (Japan, prototype 19910528)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Doesn't access I2C at all, continue opens a bare chapter select on a black screen instead of loading (btanb)
+]]></notes>
 		<part name="cart" interface="megadriv_cart">
-			<!-- TODO: Doesn't access I2C, crashes in load game menu, probably has none? -->
-			<feature name="slot" value="rom_eeprom"/>
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
 				<rom name="ninja burai densetsu (may 28, 1991 prototype).bin" size="1048576" crc="49089471" sha1="5c7bf27ec6cc81b9a9888025fbfa6dcb57d3eae5" />
 			</dataarea>
