@@ -4335,10 +4335,7 @@ ROM_END
 
 ROM_START( bigboss )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
-	// the H8 on this PCB is marked "SUBSINO CP002 / 6433044A63F" and its internal ROM hasn't been
-	// dumped: the CRC-16 table at 0x100e is built with a different polynomial there, so the external ROM checksum check at
-	// 0x000344 fails and the game hangs. bp 340,1,{ER6=00080458;g} bypasses it for now.
-	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, BAD_DUMP CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "sp002_6433044a3ff.u16",     0x000000, 0x008000, CRC(6a00871f) SHA1(9d9e595baef4f9b331a2787a0e9976321ea346e7) )
 	ROM_LOAD( "big_boss_alpha_1_v108.u21", 0x080000, 0x040000, CRC(6fe041bd) SHA1(40d535978f5537e90f53bc4003fb3e7cb165b913) )
 	ROM_RELOAD(                            0x0c0000, 0x040000 )
 
@@ -4356,10 +4353,7 @@ ROM_END
 // 董事长 (Dǒngshìzhǎng)
 ROM_START( dongshiz ) // default password is all bet
 	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
-	// the H8 on this PCB is different (probably the same as bigboss)and its internal ROM hasn't been
-	// dumped:  the CRC-16 table at 0x100e is built with a different polynomial there, so the external ROM checksum check at
-	// 0x000344 fails and the game hangs. bp 340,1,{ER6=00081f78;g} bypasses it for now.
-	ROM_LOAD( "ss9689_6433044a22f.u16", 0x000000, 0x008000, BAD_DUMP CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "sp002_6433044a3ff.u16",   0x000000, 0x008000, CRC(6a00871f) SHA1(9d9e595baef4f9b331a2787a0e9976321ea346e7) )
 	ROM_LOAD( "mrboss_china_1_v212.u21", 0x080000, 0x040000, CRC(6148ea97) SHA1(7231b470b6279315e94f26ea7729340854f339a7) )
 	ROM_RELOAD(                          0x0c0000, 0x040000 )
 
@@ -4370,7 +4364,7 @@ ROM_START( dongshiz ) // default password is all bet
 	ROM_REGION( 0x100000, "ss9x04", 0 )
 	ROM_LOAD( "mrboss_china_2_v300.u9", 0x000000, 0x100000, BAD_DUMP CRC(165f31ae) SHA1(1a0e63e63ce953271e980a66ab2f31f3c830da5a) )
 
-	ROM_REGION( 0x28, "eeprom", 0 ) // bp 340,1,{ER6=00081f78;g} can be used to bypass the failing check for now
+	ROM_REGION( 0x28, "eeprom", 0 )
 	ROM_LOAD( "ds2430.u3", 0x00, 0x28, BAD_DUMP CRC(b653cf03) SHA1(6b64dbe6c58a38b63ce7971964f2f8cafd19844e) ) // the '64-bit registration number' (0x20-0x27) is all 0xff
 	ROM_FILL(              0x20, 0x01, 0x14 ) // return correct device ID for now
 	ROM_FILL(              0x27, 0x01, 0x1d ) // return expected checksum for now
