@@ -435,6 +435,19 @@ void i8251_device::start_tx()
 void i8251_device::transmit_clock()
 {
 	m_txc_count++;
+
+	// In async mode TxEMPTY rises within 20 clocks of the centre of the last
+	// data (or parity) bit when no character waits in the buffer, before the
+	// stop bits go out (data sheet, tTxEMPTY and the async transmitter
+	// timing).  At x1 the centre isn't a clock edge: take the next one.
+	if (m_sync_byte_count == 0 && !is_transmit_register_empty() && is_transmit_register_in_stop_bits() &&
+			(m_status & (I8251_STATUS_TX_READY | I8251_STATUS_TX_EMPTY)) == I8251_STATUS_TX_READY &&
+			m_txc_count == std::max(m_br_factor / 2, 1))
+	{
+		m_status |= I8251_STATUS_TX_EMPTY;
+		update_tx_empty();
+	}
+
 	if (m_txc_count != m_br_factor)
 		return;
 
