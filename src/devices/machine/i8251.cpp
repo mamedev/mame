@@ -404,7 +404,12 @@ bool i8251_device::is_tx_enabled() const
 	return BIT(m_command, 0) && !m_cts;
 }
 
-// a written character goes out as soon as the transmit register is free
+
+/*-------------------------------------------------
+    is_tx_char_pending - a written character goes
+    out as soon as the transmit register is free
+-------------------------------------------------*/
+
 bool i8251_device::is_tx_char_pending() const
 {
 	return !(m_status & I8251_STATUS_TX_READY) && (is_tx_enabled() || m_delayed_tx_en);
