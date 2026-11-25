@@ -1653,8 +1653,8 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 				// thanks to the precharging
 			} while(header == 0x4489 && pos > i);
 
-			// A mark read across the index ends the scan: the rest of
-			// the track was scanned from its start
+			// A mark that ends at or past the index ends the scan: the
+			// rest of the track was scanned from its start
 			bool const wrapped = pos <= i;
 
 			// fe, ff

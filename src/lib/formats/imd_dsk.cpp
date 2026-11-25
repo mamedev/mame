@@ -777,8 +777,8 @@ void imd_format::extract_track_rich(const std::vector<bool> &bs, bool is_mfm,
 					found = false;
 
 				if (found) {
-					// A mark read across the index ends the scan: the rest
-					// of the track was scanned from its start
+					// A mark that ends at or past the index ends the scan:
+					// the rest of the track was scanned from its start
 					if (pos <= i)
 						break;
 					i = pos - 1;
