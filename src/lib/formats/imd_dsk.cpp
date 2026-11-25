@@ -790,16 +790,18 @@ void imd_format::extract_track_rich(const std::vector<bool> &bs, bool is_mfm,
 		// byte.  See IBM 3740 SD format.
 		for (uint32_t i = 0; i < bs.size(); i++) {
 			shift_reg = uint16_t((shift_reg << 1) | bs[i]);
+			// A mark ending on the last bit is followed by the index
+			uint32_t const pos = i + 1 == bs.size() ? 0 : i + 1;
 			if (shift_reg == 0xf57e) {                                   // 0xFE
-				idam_marks.push_back({i + 1, 0xfe});
+				idam_marks.push_back({pos, 0xfe});
 			} else if (shift_reg == 0xf56a) {                            // 0xF8 deleted
-				dam_marks.push_back({i + 1, 0xf8});
+				dam_marks.push_back({pos, 0xf8});
 			} else if (shift_reg == 0xf56b) {                            // 0xF9
-				dam_marks.push_back({i + 1, 0xf9});
+				dam_marks.push_back({pos, 0xf9});
 			} else if (shift_reg == 0xf56e) {                            // 0xFA
-				dam_marks.push_back({i + 1, 0xfa});
+				dam_marks.push_back({pos, 0xfa});
 			} else if (shift_reg == 0xf56f) {                            // 0xFB
-				dam_marks.push_back({i + 1, 0xfb});
+				dam_marks.push_back({pos, 0xfb});
 			}
 		}
 	}
