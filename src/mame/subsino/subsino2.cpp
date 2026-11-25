@@ -3441,10 +3441,7 @@ ROM_END
 
 ROM_START( queenbee124a )
 	ROM_REGION( 0x100000, "maincpu", 0 ) // H8/3044
-	// the H8 on this PCB is marked "SUBSINO SS2000 / 6433044A54F" and its internal ROM hasn't been
-	// dumped: the CRC-16 table at 0x100e is built with a different polynomial there, so the external ROM checksum check at
-	// 0x000344 fails and the game hangs. bp 340,1,{ER6=00082e1e;g} bypasses it for now.
-	ROM_LOAD( "ss9689_6433044a22f.u16",        0x000000, 0x008000, BAD_DUMP CRC(ece09075) SHA1(a8bc3aa44f30a6f919f4151c6093fb52e5da2f40) )
+	ROM_LOAD( "ss2000_6433044a54f.u16",        0x000000, 0x008000, CRC(9d84197c) SHA1(5a9c1e3163861c5190ebdbd88624bc54ff329d48) )
 	ROM_LOAD( "queen_bee_c2_alpha1_v124a.u21", 0x080000, 0x040000, CRC(d771d5b0) SHA1(a5dc0b05f612e05e151ea3041440e9b53f813058) )
 	ROM_FILL(                                  0x0c0000, 0x040000, 0xff )
 
