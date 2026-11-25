@@ -94,6 +94,7 @@ public:
 		save_item(NAME(m_key_poll));
 		save_item(NAME(m_key_row));
 		save_item(NAME(m_key_shift));
+		save_item(NAME(m_key_force_format));
 		save_item(NAME(m_power));
 		save_item(NAME(m_power_on));
 
@@ -837,4 +838,4 @@ ROM_END
 
 
 /*    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT  CLASS       INIT        COMPANY                        FULLNAME           FLAGS */
-COMP( 1985, clcd, 0,      0,      clcd,    clcd,  clcd_state, empty_init, "Commodore Business Machines", "LCD (prototype)", 0 )
+COMP( 1985, clcd, 0,      0,      clcd,    clcd,  clcd_state, empty_init, "Commodore Business Machines", "LCD (prototype)", MACHINE_SUPPORTS_SAVE )
