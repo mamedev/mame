@@ -851,7 +851,8 @@ CONS( 2008, epo_ssk2,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / 
 
 CONS( 2007, epo_pabj,  0, 0, config, dabj,   xavix2_state, empty_init, "Epoch / SSD Company Ltd.",     "TV de Asobou! Manabou! Pooh-san to Issho: ABC AIUEO Zukan (Japan)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
-// These are for the 'Domyos Interactive System' other Domyos Interactive System games can be found in xavix_2002.cpp (the SoC is inside the cartridge, base acts as a 'TV adapter' only)
+// The Domyos Interactive System base is a TV adapter. The SoC is in the cartridge.
+// See xavix_superxavix.cpp for the cartridges using Super XaviX.
 
 // Has SEEPROM and an RTC.  Adventure has the string DOMYSSDCOLTD a couple of times.
 CONS( 2008, domfitad,  0, 0, config, domyos, domyos_state, empty_init, "Decathlon / SSD Company Ltd.", "Domyos Fitness Adventure (Domyos Interactive System)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

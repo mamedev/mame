@@ -2,6 +2,10 @@
 // copyright-holders:Vas Crabb
 #include "emu.h"
 #include "dsp16dis.h"
+
+#include <cassert>
+
+
 /***************************************************************************
 
     WE|AT&T DSP16 series disassembler
@@ -39,11 +43,38 @@ u32 dsp16_disassembler::opcode_alignment() const
 	return 1U;
 }
 
-offs_t dsp16_disassembler::disassemble(std::ostream &stream, offs_t pc, const data_buffer &opcodes, const data_buffer &params)
+offs_t dsp16_disassembler::disassemble(std::ostream &stream, offs_t pc, data_buffer const &opcodes, data_buffer const &params)
+{
+	return do_disassemble(stream, pc, [&opcodes] (offs_t addr) { return opcodes.r16(addr); });
+}
+
+/***********************************************************************
+    disassemble from raw buffer
+***********************************************************************/
+
+offs_t dsp16_disassembler::disassemble_one(std::ostream &stream, offs_t pc, u16 const *opptr)
+{
+	return do_disassemble(
+			stream,
+			pc,
+			[pc, opptr] (offs_t addr)
+			{
+				assert(addr >= pc);
+				assert(addr < (pc + 2));
+				return opptr[addr - pc];
+			});
+}
+
+/***********************************************************************
+    disassembly engine
+***********************************************************************/
+
+template <typename T>
+offs_t dsp16_disassembler::do_disassemble(std::ostream &stream, offs_t pc, T &&read_word)
 {
 	u8 length(1U);
 	u32 flags(0U);
-	u16 const op(opcodes.r16(pc));
+	u16 const op(read_word(pc));
 	switch (op >> 11)
 	{
 	// control group (p3-14)
@@ -67,7 +98,7 @@ offs_t dsp16_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 		else
 		{
 			result const con(dasm_con(op));
-			u16 const op2(opcodes.r16(inc_pc(pc, 1)));
+			u16 const op2(read_word(inc_pc(pc, 1)));
 			result controlled{ true, false, { } };
 			switch (op2 >> 11)
 			{
@@ -126,11 +157,12 @@ offs_t dsp16_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 	// data move instructions (p3-16)
 	case 0x02: case 0x03: // R = M (p3-27)
 		{
-			u16 const m(op & 0x01ffU);
+			s16 const m(op & 0x01ffU);
+			s16 const ma((m & 0x0100) ? (-m & 0x01ff) : m);
 			switch ((op >> 9) & 0x0007U)
 			{
-			case 0x0: util::stream_format(stream, "set j = 0x%03x", m); break;
-			case 0x1: util::stream_format(stream, "set k = 0x%03x", m); break;
+			case 0x0: util::stream_format(stream, "set j = %s0x%03x", (m & 0x0100) ? "-" : "", ma); break;
+			case 0x1: util::stream_format(stream, "set k = %s0x%03x", (m & 0x0100) ? "-" : "", ma); break;
 			case 0x2: util::stream_format(stream, "set rb = 0x%03x", m); break;
 			case 0x3: util::stream_format(stream, "set re = 0x%03x", m); break;
 			default: util::stream_format(stream, "set r%u = 0x%03x", (op >> 9) & 0x0003U, m); break;
@@ -147,7 +179,7 @@ offs_t dsp16_disassembler::disassemble(std::ostream &stream, offs_t pc, const da
 			length = 2U;
 			bool const low(!((op >> 8) & 0x0003U));
 			result const r(dasm_r(op));
-			u16 const n(opcodes.r16(inc_pc(pc, 1)));
+			u16 const n(read_word(inc_pc(pc, 1)));
 			util::stream_format(
 					stream, (low && r.ambiguous) ? "move %1$s = 0x%2$04x" : "%1$s = 0x%2$04x",
 					r.text, n);

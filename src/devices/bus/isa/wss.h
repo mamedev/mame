@@ -16,6 +16,7 @@ class isa16_wss_device : public device_t,
 public:
 	isa16_wss_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	// 16-bit stereo modes
 	static constexpr feature_type imperfect_features() { return feature::SOUND; }
 
 protected:
@@ -23,17 +24,27 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
-	// virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	virtual void remap(int space_id, offs_t start, offs_t end) override;
 	virtual uint8_t dack_r(int line) override;
 	virtual void dack_w(int line, uint8_t data) override;
 
+	virtual uint8_t config_r(offs_t offset);
+	virtual void config_w(offs_t offset, uint8_t data);
+
+	virtual void config_irq_lanes(uint8_t data);
 private:
 	required_device<ymf262_device> m_opl3;
 	required_device<ad1848_device> m_soundport;
+	required_ioport m_jp1;
 
 	void host_io(address_map &map);
+
+	uint16_t m_port_base;
+	uint8_t m_config;
+	int m_irq_line;
+	int m_drq_line;
 };
 
 

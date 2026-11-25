@@ -286,10 +286,18 @@ void m50734_device::execute_set_input(int inputnum, int state)
 		return;
 	m_int_state[n] = asserted;
 	if (!asserted)
+	{
+		if (n == 0)
+		{
+			m_p1_latch = m_port_in_cb[1]();
+			if (BIT(m_p0_function, 3) && !BIT(m_port_latch[0], 3))
+			{
+				m_port_latch[0] |= 0x08;
+				port_update<0>();
+			}
+		}
 		return;
-
-	if (n == 0)
-		m_p1_latch = m_port_in_cb[1]();
+	}
 
 	LOGMASKED(LOG_INT, "_INT%d interrupt requested at %s\n", n + 1, machine().time().to_string());
 	request_interrupt(0, 1 << (n * 2 + 1));
@@ -431,10 +439,8 @@ u8 m50734_device::p4_r()
 
 u8 m50734_device::p1_latch_r()
 {
-	// transparent except while _INT1 is held low
-	if (!m_int_state[0])
-		m_p1_latch = m_port_in_cb[1]();
-	return m_p1_latch;
+	// transparent while _INT1 is low, held from its trailing edge
+	return m_int_state[0] ? m_port_in_cb[1]() : m_p1_latch;
 }
 
 u8 m50734_device::sio_r()

@@ -70,7 +70,6 @@ private:
 	void sdcard_miso_w(int state);
 
 	void main_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
 };
 
 

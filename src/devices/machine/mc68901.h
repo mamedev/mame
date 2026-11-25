@@ -100,6 +100,7 @@ protected:
 	void rx_error();
 	TIMER_CALLBACK_MEMBER(timer_count);
 	void timer_input(int index, int value);
+	void pulse_width_gate(int index, bool active);
 	void gpio_input(int bit, int state);
 	void gpio_output();
 

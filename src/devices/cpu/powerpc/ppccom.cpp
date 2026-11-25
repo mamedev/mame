@@ -53,6 +53,16 @@ static constexpr offs_t MMU_PAGE_OFFSET_MASK = MMU_PAGE_BYTES - 1;
 
 static constexpr uint32_t SPR60X_HID0_ICFI          = 0x0000'0800;
 
+// 740/750/755/7400/7410 thermal assist unit: THRM1/THRM2 and THRM3 bits
+static constexpr uint32_t SPR7XX_THRM_TIN           = 0x8000'0000;  // threshold exceeded (read-only)
+static constexpr uint32_t SPR7XX_THRM_TIV           = 0x4000'0000;  // comparison valid (read-only)
+static constexpr uint32_t SPR7XX_THRM_THRESHOLD     = 0x3f80'0000;
+static constexpr uint32_t SPR7XX_THRM_TID           = 0x0000'0004;
+static constexpr uint32_t SPR7XX_THRM_TIE           = 0x0000'0002;
+static constexpr uint32_t SPR7XX_THRM_V             = 0x0000'0001;
+static constexpr uint32_t SPR7XX_THRM3_SITV         = 0x0000'3ffe;
+static constexpr uint32_t SPR7XX_THRM3_E            = 0x0000'0001;
+
 /***************************************************************************
     PRIVATE GLOBAL VARIABLES
 ***************************************************************************/
@@ -1320,6 +1330,12 @@ void ppc_device::device_reset()
 		m_core->spr[SPROEA_SRR1] = 0;
 		if (m_flavor != PPC_MODEL_601)
 			m_core->spr[SPR603_HID0] = 0;
+		if (has_thermal_assist())
+		{
+			m_core->spr[SPR7XX_THRM1] = 0;
+			m_core->spr[SPR7XX_THRM2] = 0;
+			m_core->spr[SPR7XX_THRM3] = 0;
+		}
 
 		// reset the decrementer
 		m_dec_zero_cycles = total_cycles();
@@ -2440,6 +2456,18 @@ void ppc_device::ppccom_execute_mfspr()
 		}
 	}
 
+	/* handle the thermal assist unit */
+	if (has_thermal_assist())
+	{
+		switch (m_core->param0)
+		{
+			case SPR7XX_THRM1:
+			case SPR7XX_THRM2:
+				m_core->param1 = get_thrm(m_core->param0);
+				return;
+		}
+	}
+
 	/* default handling */
 	osd_printf_debug("SPR %03X read\n", m_core->param0);
 	m_core->param1 = m_core->spr[m_core->param0];
@@ -2691,9 +2719,72 @@ void ppc_device::ppccom_execute_mtspr()
 		}
 	}
 
+	/* handle the thermal assist unit */
+	if (has_thermal_assist())
+	{
+		switch (m_core->param0)
+		{
+			/* TIN and TIV are set by the comparison */
+			case SPR7XX_THRM1:
+			case SPR7XX_THRM2:
+				m_core->spr[m_core->param0] = m_core->param1 & (SPR7XX_THRM_THRESHOLD | SPR7XX_THRM_TID | SPR7XX_THRM_TIE | SPR7XX_THRM_V);
+				return;
+
+			case SPR7XX_THRM3:
+				m_core->spr[m_core->param0] = m_core->param1 & (SPR7XX_THRM3_SITV | SPR7XX_THRM3_E);
+				return;
+		}
+	}
+
 	/* default handling */
 	osd_printf_debug("SPR %03X write = %08X\n", m_core->param0, m_core->param1);
 	m_core->spr[m_core->param0] = m_core->param1;
+}
+
+
+/*-------------------------------------------------
+    has_thermal_assist - whether this model has
+    the thermal assist unit (THRM1-THRM3)
+-------------------------------------------------*/
+
+bool ppc_device::has_thermal_assist() const
+{
+	switch (m_flavor)
+	{
+		case PPC_MODEL_740:
+		case PPC_MODEL_740P:
+		case PPC_MODEL_755:
+		case PPC_MODEL_7400:
+		case PPC_MODEL_7410:
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+
+/*-------------------------------------------------
+    get_thrm - read THRM1 or THRM2: with the TAU
+    enabled in THRM3 and the register's V bit set,
+    the comparison against the threshold is always
+    complete (TIV) and TIN gives its result
+-------------------------------------------------*/
+
+uint32_t ppc_device::get_thrm(uint32_t spr) const
+{
+	// TODO: the die temperature is fixed; the sample interval (THRM3 SITV) and the thermal
+	// management exception aren't emulated
+	constexpr uint32_t JUNCTION_TEMPERATURE = 40; // degrees Celsius
+
+	uint32_t data = m_core->spr[spr];
+	if ((m_core->spr[SPR7XX_THRM3] & SPR7XX_THRM3_E) && (data & SPR7XX_THRM_V))
+	{
+		const uint32_t threshold = BIT(data, 23, 7);
+		const bool exceeded = (data & SPR7XX_THRM_TID) ? (JUNCTION_TEMPERATURE < threshold) : (JUNCTION_TEMPERATURE > threshold);
+		data |= SPR7XX_THRM_TIV | (exceeded ? SPR7XX_THRM_TIN : 0);
+	}
+	return data;
 }
 
 

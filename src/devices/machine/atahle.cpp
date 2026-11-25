@@ -211,6 +211,8 @@ void device_ata_hle_interface::process_command()
 	default:
 		LOG("%s device %d process_command() unknown command (0x%02x)\n", device().machine().describe_context(), m_csel, m_command);
 		m_status |= IDE_STATUS_ERR;
+		if (is_packet_device())
+			m_status |= IDE_STATUS_DRDY;
 		m_error = IDE_ERROR_ABRT;
 		set_irq(ASSERT_LINE);
 		//machine().debug_break();

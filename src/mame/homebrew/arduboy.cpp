@@ -129,7 +129,6 @@ protected:
 	void arduboy_base(machine_config &config) ATTR_COLD;
 
 	void prg_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t port_b_r();
@@ -264,12 +263,6 @@ void arduboy_state::prg_map(address_map &map)
 	// which the AVR8 core doesn't have yet.
 }
 
-void arduboy_state::data_map(address_map &map)
-{
-	// TODO: 32u4 flash registers. the Arduboy FX needs it
-	map(0x0100, 0x0aff).ram(); // on-chip 2.5kbytes RAM
-}
-
 static INPUT_PORTS_START( arduboy )
 	PORT_START("PORTB")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON2 )
@@ -291,7 +284,6 @@ void arduboy_state::arduboy_base(machine_config &config)
 {
 	ATMEGA32U4(config, m_maincpu, 16'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &arduboy_state::prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &arduboy_state::data_map);
 
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->set_low_fuses(0xff);

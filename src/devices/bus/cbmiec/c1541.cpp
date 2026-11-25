@@ -338,7 +338,7 @@ uint8_t c1541_device_base::via0_pb_r()
 	data |= !m_bus->clk_r() << 2;
 
 	// serial bus address
-	data |= ((m_slot->get_address() - 8) & 0x03) << 5;
+	data |= (m_address->read() & 0x03) << 5;
 
 	// attention in
 	data |= !m_bus->atn_r() << 7;

@@ -47,6 +47,8 @@ public:
 	void write_scl(int state);
 	void write_wc(int state);
 	int read_sda();
+	void reset_bus(int sda, int scl);
+	void power_cycle(int sda, int scl);
 
 protected:
 	// construction/destruction

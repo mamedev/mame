@@ -1634,10 +1634,7 @@ ROM_START( lhfy )
 	ROM_REGION( 0x10000000, "gfx", 0 )
 	// 4x 64MB flash ROMs (U1, U2, U3, U4) mounted onto a custom SODIMM at CN1 with a sticker "CG V206CN"
 	ROM_LOAD( "cg_v206cn.u1", 0x0000000, 0x4000000, CRC(6abd4a31) SHA1(6c5eefc3671c4192a689cb1e82605e65fec44384) )
-	// Suspect read corruption at the starts of 0x800-byte blocks: this lane alone
-	// produces periodic dots in raw sprites, and compressed image lengths disagree.
-	// FIXME: independent redump required to confirm the suspected corruption.
-	ROM_LOAD( "cg_v206cn.u2", 0x4000000, 0x4000000, BAD_DUMP CRC(b37e94b2) SHA1(da9e8b38070412a1b4057ddaf1df65878f3e135a) )
+	ROM_LOAD( "cg_v206cn.u2", 0x4000000, 0x4000000, BAD_DUMP CRC(4029df1a) SHA1(82baca3dc306cefc72c94adb4b4105bb54b557ee) ) // taken from lhzbgqb
 	ROM_LOAD( "cg_v206cn.u3", 0x8000000, 0x4000000, CRC(b379503c) SHA1(fc7d5c4afcef6a7448cc6547fa73e51378a67b3d) )
 	ROM_LOAD( "cg_v206cn.u4", 0xc000000, 0x4000000, CRC(f96be9f1) SHA1(fe957af2e31007b570c4f4b707400a87be1b4301) )
 ROM_END
@@ -1698,10 +1695,29 @@ ROM_START( lhzbgqb )
 
 	ROM_REGION( 0x10000000, "gfx", ROMREGION_ERASE00 )
 	// 4x 64MB flash ROMs (U1, U2, U3, U4) mounted onto a custom SODIMM at CN1 with a sticker "CG V105CN"
-	ROM_LOAD( "cg_v105cn.u1", 0x0000000, 0x4000000, NO_DUMP )
-	ROM_LOAD( "cg_v105cn.u2", 0x4000000, 0x4000000, NO_DUMP )
-	ROM_LOAD( "cg_v105cn.u3", 0x8000000, 0x4000000, NO_DUMP )
-	ROM_LOAD( "cg_v105cn.u4", 0xc000000, 0x4000000, NO_DUMP )
+	ROM_LOAD( "cg_v105cn.u1", 0x0000000, 0x4000000, BAD_DUMP CRC(6abd4a31) SHA1(6c5eefc3671c4192a689cb1e82605e65fec44384) ) // wouldn't read, taken from lhfy
+	ROM_LOAD( "cg_v105cn.u2", 0x4000000, 0x4000000, CRC(4029df1a) SHA1(82baca3dc306cefc72c94adb4b4105bb54b557ee) )
+	ROM_LOAD( "cg_v105cn.u3", 0x8000000, 0x4000000, BAD_DUMP CRC(b379503c) SHA1(fc7d5c4afcef6a7448cc6547fa73e51378a67b3d) ) // wouldn't read, taken from lhfy
+	ROM_LOAD( "cg_v105cn.u4", 0xc000000, 0x4000000, CRC(f96be9f1) SHA1(fe957af2e31007b570c4f4b707400a87be1b4301) )
+ROM_END
+
+ROM_START( lhzbgqb104cn )
+	ROM_REGION( 0x04000, "maincpu", 0 )
+	// Internal ROM of IGS036 ARM based MCU
+	ROM_LOAD( "lhzbgqb_igs036.bin", 0x00000, 0x4000, CRC(f38af294) SHA1(a6f3c185ffccec48b8997357d3847c86c95da83d) )
+
+	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
+	ROM_LOAD( "v-104cn.u11", 0x000000, 0x200000, CRC(847cee20) SHA1(a258366421418c9734df97ece4cf8536038b4cd4) )
+
+	ROM_REGION( 0x800000, "tt5665", 0 ) // samples
+	ROM_LOAD( "v105cn_u19.u19", 0x000000, 0x800000, CRC(f7990ed4) SHA1(e8a72bc0926911ba5c079b02dd324ac060e8c768) ) // same as lhfy
+
+	ROM_REGION( 0x10000000, "gfx", ROMREGION_ERASE00 )
+	// 4x 64MB flash ROMs (U1, U2, U3, U4) mounted onto a custom SODIMM at CN1 with a sticker "CG V105CN"
+	ROM_LOAD( "cg_v105cn.u1", 0x0000000, 0x4000000, BAD_DUMP CRC(6abd4a31) SHA1(6c5eefc3671c4192a689cb1e82605e65fec44384) ) // wouldn't read, taken from lhfy
+	ROM_LOAD( "cg_v105cn.u2", 0x4000000, 0x4000000, CRC(4029df1a) SHA1(82baca3dc306cefc72c94adb4b4105bb54b557ee) )
+	ROM_LOAD( "cg_v105cn.u3", 0x8000000, 0x4000000, BAD_DUMP CRC(b379503c) SHA1(fc7d5c4afcef6a7448cc6547fa73e51378a67b3d) ) // wouldn't read, taken from lhfy
+	ROM_LOAD( "cg_v105cn.u4", 0xc000000, 0x4000000, CRC(f96be9f1) SHA1(fe957af2e31007b570c4f4b707400a87be1b4301) )
 ROM_END
 
 
@@ -2159,7 +2175,8 @@ GAME( 2010, lhzb3in1,     0,       m036_tt_boot,  lhtb,     m036_tt_state,      
 
 GAME( 2010, lhfy,         0,       m036_hd,       lhfy,     m036_hd_state,       empty_init,      ROT0, "IGS",           "Long Hu Feng Yun Gao Qing Ban (V206CN)", MACHINE_NOT_WORKING )
 
-GAME( 2010, lhzbgqb,         0,    m036_hd,       lhfy,     m036_hd_state,       empty_init,      ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 2010, lhzbgqb,      0,       m036_hd,       lhfy,     m036_hd_state,       empty_init,      ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V105CN)", MACHINE_NOT_WORKING )
+GAME( 2010, lhzbgqb104cn, lhzbgqb, m036_hd,       lhfy,     m036_hd_state,       empty_init,      ROT0, "IGS",           "Long Hu Zhengba Gao Qing Ban (V104CN)", MACHINE_NOT_WORKING )
 
 GAME( 2010, hlddz,        0,       m036_hd,       ddz_hd,   m036_hd_state,       empty_init,      ROT0, "IGS",           "Huanle Dou Dizhu (V104CN)", MACHINE_NOT_WORKING )
 

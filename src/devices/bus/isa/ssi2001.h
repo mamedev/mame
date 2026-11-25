@@ -30,6 +30,9 @@ protected:
 	// optional information overrides
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
+
+private:
 	required_device<pc_joy_device> m_joy;
 	required_device<mos6581_device> m_sid;
 };

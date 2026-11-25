@@ -44,6 +44,7 @@ public:
 	}
 
 	void taitojc(machine_config &config) ATTR_COLD;
+	void dangcurv(machine_config &config) ATTR_COLD;
 
 	void init_dangcurv() ATTR_COLD;
 	void init_taitojc() ATTR_COLD;
@@ -80,7 +81,10 @@ protected:
 
 	bool m_first_dsp_reset = false;
 	int16_t m_viewport_data[3]{};
-	int16_t m_projection_data[3]{};
+	int16_t m_projection_data[5]{};
+	u16 m_clip_flags = 0;
+	u16 m_clip_or = 0;
+	u16 m_clip_and = 0x3f;
 	int16_t m_intersection_data[3]{};
 
 	tilemap_t *m_tilemap = nullptr;
@@ -119,6 +123,7 @@ protected:
 
 	void dsp_math_viewport_w(offs_t offset, uint16_t data);
 	void dsp_math_projection_w(offs_t offset, uint16_t data);
+	void dsp_math_clip_reset_w(uint16_t data);
 	uint16_t dsp_math_projection_y_r();
 	uint16_t dsp_math_projection_x_r();
 	void dsp_math_intersection_w(offs_t offset, uint16_t data);

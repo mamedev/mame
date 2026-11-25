@@ -173,7 +173,7 @@ public:
 	}
 
 	void set_address(int address) { m_address = address; }
-	int get_address() { return m_address; }
+	int get_address() const { return m_address; }
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
@@ -206,8 +206,15 @@ public:
 protected:
 	device_cbm_iec_interface(const machine_config &mconfig, device_t &device);
 
+	int configured_address() const ATTR_COLD;
+	void set_switch_default(const char *tag, ioport_value mask, ioport_value value) ATTR_COLD;
+	void set_address_default(int base, ioport_value mask) ATTR_COLD;
+
 	cbm_iec_device *m_bus;
 	cbm_iec_slot_device *m_slot;
+
+private:
+	input_device_default m_switch_default[2];
 };
 
 #endif // MAME_BUS_CBMIEC_CBMIEC_H

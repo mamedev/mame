@@ -208,6 +208,19 @@ vic1515_device::vic1515_device(const machine_config &mconfig, const char *tag, d
 
 
 //-------------------------------------------------
+//  device_config_complete - default the
+//  self-diagnostic switch to the slot address
+//-------------------------------------------------
+
+void vic1515_device::device_config_complete()
+{
+	int const address = configured_address();
+	if (address == 4 || address == 5)
+		set_switch_default("SDS", 0x03, address - 4);
+}
+
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 

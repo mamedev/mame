@@ -106,7 +106,7 @@ void pcat_dyn_state::bank2_w(uint8_t data)
 void pcat_dyn_state::pcat_map(address_map &map)
 {
 	map(0x00000000, 0x0009ffff).ram();
-	map(0x000a0000, 0x000bffff).rw("vga", FUNC(tvga9000_device::mem_r), FUNC(tvga9000_device::mem_w));
+	map(0x000a0000, 0x000bffff).rw("vga", FUNC(tvga9000_vga_device::mem_r), FUNC(tvga9000_vga_device::mem_w));
 	map(0x000c0000, 0x000c7fff).rom().region("video_bios", 0);
 	map(0x000d0000, 0x000d0fff).rom().region("game_prg", 0x0000).w(FUNC(pcat_dyn_state::bank1_w));
 	map(0x000d1000, 0x000d1fff).rom().region("game_prg", 0x1000).w(FUNC(pcat_dyn_state::bank2_w));
@@ -121,7 +121,7 @@ void pcat_dyn_state::pcat_map(address_map &map)
 void pcat_dyn_state::pcat_io(address_map &map)
 {
 	pcat32_io_common(map);
-	map(0x03b0, 0x03df).m("vga", FUNC(tvga9000_device::io_map));
+	map(0x03b0, 0x03df).m("vga", FUNC(tvga9000_vga_device::io_map));
 	map(0x03f8, 0x03ff).rw("ns16550", FUNC(ns16550_device::ins8250_r), FUNC(ns16550_device::ins8250_w));
 	map(0x0530, 0x0533).r(FUNC(pcat_dyn_state::audio_r));
 	map(0x0534, 0x0537).rw("ad1848", FUNC(ad1848_device::read), FUNC(ad1848_device::write));
@@ -176,9 +176,9 @@ void pcat_dyn_state::pcat_dyn(machine_config &config)
 	// TODO: map to ISA bus
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(25.1748_MHz_XTAL, 900, 0, 640, 526, 0, 480);
-	screen.set_screen_update("vga", FUNC(tvga9000_device::screen_update));
+	screen.set_screen_update("vga", FUNC(tvga9000_vga_device::screen_update));
 
-	tvga9000_device &vga(TVGA9000_VGA(config, "vga"));
+	tvga9000_vga_device &vga(TVGA9000_VGA(config, "vga"));
 	vga.set_screen("screen");
 	vga.set_vram_size(0x200000);
 

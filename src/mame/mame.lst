@@ -17638,6 +17638,7 @@ brkthruj
 brkthrut
 brkthruu
 darwin
+evolution
 forcebrk
 
 @source:dataeast/btime.cpp
@@ -21795,6 +21796,10 @@ fl7_500_gs09
 fl7_500_gs10
 fl7_500_gs11
 fl7_500_gs12
+fl7_500_gs13
+fl7_500_gs14
+fl7_500_gs15
+fl7_500_gs16
 fl7_1000
 fl7_2000
 fl7_2k16
@@ -22195,6 +22200,7 @@ lhfy
 lhtb
 lhzb3in1
 lhzbgqb
+lhzbgqb104cn
 mghammer
 mjzhizun
 qhzb
@@ -45419,6 +45425,7 @@ ikari3
 ikari3j
 ikari3k
 ikari3u
+ikari3ua
 ikari3w
 pow
 powa
@@ -48852,7 +48859,7 @@ epo_pabj
 epo_sskj
 epo_ssk2
 
-@source:tvgames/xavix_2000.cpp
+@source:tvgames/xavix_xavix2000.cpp
 ban_omt
 ban_onep
 drgqst
@@ -48872,7 +48879,7 @@ ttv_mx
 ttv_sw
 ttv_swj
 
-@source:tvgames/xavix_2002.cpp
+@source:tvgames/xavix_superxavix.cpp
 anpanmdx
 apmj2009
 ban_bkgj
@@ -48894,6 +48901,7 @@ epo_kabj
 epo_ntpj
 epo_rgfj
 epo_tfit
+hkdraw
 maxheart
 mrangbat
 ndpbj

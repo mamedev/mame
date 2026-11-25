@@ -61,7 +61,8 @@ mv64361_device::mv64361_device(const machine_config &mconfig, const char *tag, d
 	m_cpu(*this, finder_base::DUMMY_TAG),
 	m_pci_bus(*this, finder_base::DUMMY_TAG, 0U),
 	m_pci_functions{ { *this, finder_base::DUMMY_TAG, 0U }, { *this, finder_base::DUMMY_TAG, 0U } },
-	m_cpuint0_cb(*this), m_cpuint1_cb(*this)
+	m_cpuint0_cb(*this), m_cpuint1_cb(*this),
+	m_pci_iack_cb(*this, 0xff)
 {
 }
 
@@ -290,15 +291,21 @@ void mv64361_device::cpu_register_map(address_map &map)
 	map(0x0c00, 0x0c03).rw(FUNC(mv64361_device::pci0_command_r), FUNC(mv64361_device::pci0_command_w));
 	map(0x0c08, 0x0c0b).rw(FUNC(mv64361_device::pci0_cs0_bar_size_r), FUNC(mv64361_device::pci0_cs0_bar_size_w));
 	map(0x0c0c, 0x0c0f).rw(FUNC(mv64361_device::pci0_cs2_bar_size_r), FUNC(mv64361_device::pci0_cs2_bar_size_w));
+	map(0x0c34, 0x0c37).r(FUNC(mv64361_device::pci_interrupt_acknowledge_r<0>));
 	map(0x0c3c, 0x0c3f).rw(FUNC(mv64361_device::pci0_base_address_registers_enable_r), FUNC(mv64361_device::pci0_base_address_registers_enable_w));
 	map(0x0c48, 0x0c4b).rw(FUNC(mv64361_device::pci0_cs0_base_address_remap_r), FUNC(mv64361_device::pci0_cs0_base_address_remap_w));
 	map(0x0c4c, 0x0c4f).rw(FUNC(mv64361_device::pci0_cs2_base_address_remap_r), FUNC(mv64361_device::pci0_cs2_base_address_remap_w));
+	map(0x0c78, 0x0c7b).rw(FUNC(mv64361_device::config_address_r<1>), FUNC(mv64361_device::config_address_w<1>));
+	map(0x0c7c, 0x0c7f).rw(FUNC(mv64361_device::config_data_r<1>), FUNC(mv64361_device::config_data_w<1>));
 	map(0x0c80, 0x0c83).rw(FUNC(mv64361_device::pci1_command_r), FUNC(mv64361_device::pci1_command_w));
 	map(0x0c88, 0x0c8b).rw(FUNC(mv64361_device::pci1_cs0_bar_size_r), FUNC(mv64361_device::pci1_cs0_bar_size_w));
 	map(0x0c8c, 0x0c8f).rw(FUNC(mv64361_device::pci1_cs2_bar_size_r), FUNC(mv64361_device::pci1_cs2_bar_size_w));
+	map(0x0cb4, 0x0cb7).r(FUNC(mv64361_device::pci_interrupt_acknowledge_r<1>));
 	map(0x0cbc, 0x0cbf).rw(FUNC(mv64361_device::pci1_base_address_registers_enable_r), FUNC(mv64361_device::pci1_base_address_registers_enable_w));
 	map(0x0cc8, 0x0ccb).rw(FUNC(mv64361_device::pci1_cs0_base_address_remap_r), FUNC(mv64361_device::pci1_cs0_base_address_remap_w));
 	map(0x0ccc, 0x0ccf).rw(FUNC(mv64361_device::pci1_cs2_base_address_remap_r), FUNC(mv64361_device::pci1_cs2_base_address_remap_w));
+	map(0x0cf8, 0x0cfb).rw(FUNC(mv64361_device::config_address_r<0>), FUNC(mv64361_device::config_address_w<0>));
+	map(0x0cfc, 0x0cff).rw(FUNC(mv64361_device::config_data_r<0>), FUNC(mv64361_device::config_data_w<0>));
 	map(0x0d08, 0x0d0b).rw(FUNC(mv64361_device::pci0_cs1_bar_size_r), FUNC(mv64361_device::pci0_cs1_bar_size_w));
 	map(0x0d0c, 0x0d0f).rw(FUNC(mv64361_device::pci0_cs3_bar_size_r), FUNC(mv64361_device::pci0_cs3_bar_size_w));
 	map(0x0d3c, 0x0d3f).rw(FUNC(mv64361_device::pci0_pci_address_decode_control_r), FUNC(mv64361_device::pci0_pci_address_decode_control_w));
@@ -313,10 +320,6 @@ void mv64361_device::cpu_register_map(address_map &map)
 	map(0x0dcc, 0x0dcf).rw(FUNC(mv64361_device::pci1_cs3_base_address_remap_r), FUNC(mv64361_device::pci1_cs3_base_address_remap_w));
 	map(0x0df0, 0x0df3).rw(FUNC(mv64361_device::pci1_pci_cpu_base_address_remap_low_r), FUNC(mv64361_device::pci1_pci_cpu_base_address_remap_low_w));
 	map(0x0df4, 0x0df7).rw(FUNC(mv64361_device::pci1_pci_cpu_base_address_remap_high_r), FUNC(mv64361_device::pci1_pci_cpu_base_address_remap_high_w));
-	map(0x0c78, 0x0c7b).rw(FUNC(mv64361_device::config_address_r<1>), FUNC(mv64361_device::config_address_w<1>));
-	map(0x0c7c, 0x0c7f).rw(FUNC(mv64361_device::config_data_r<1>), FUNC(mv64361_device::config_data_w<1>));
-	map(0x0cf8, 0x0cfb).rw(FUNC(mv64361_device::config_address_r<0>), FUNC(mv64361_device::config_address_w<0>));
-	map(0x0cfc, 0x0cff).rw(FUNC(mv64361_device::config_data_r<0>), FUNC(mv64361_device::config_data_w<0>));
 	// General Purpose Port interface
 	map(0xf100, 0xf103).rw(FUNC(mv64361_device::gpp_io_control_r), FUNC(mv64361_device::gpp_io_control_w));
 	map(0xf104, 0xf107).rw(FUNC(mv64361_device::gpp_value_r), FUNC(mv64361_device::gpp_value_w));
@@ -1518,6 +1521,12 @@ void mv64361_device::pci1_pci_cpu_base_address_remap_high_w(offs_t offset, uint3
 //  GENERAL PURPOSE PORT INTERFACE / INTERRUPTS
 //**************************************************************************
 
+template <int Bus>
+uint32_t mv64361_device::pci_interrupt_acknowledge_r()
+{
+	return swapendian_int32(uint32_t(m_pci_iack_cb[Bus]()));
+}
+
 uint32_t mv64361_device::gpp_io_control_r(offs_t offset, uint32_t mem_mask)
 {
 	return swapendian_int32(m_regs[REG_GPP_IO_CONTROL]);
@@ -1632,8 +1641,6 @@ void mv64361_device::gpp_value_clear_w(offs_t offset, uint32_t data, uint32_t me
 
 void mv64361_device::mpp31_w(int state)
 {
-	LOG("mpp31_w: %d\n", state);
-
 	state ^= BIT(m_regs[REG_GPP_LEVEL_CONTROL], 31);
 
 	if (BIT(m_regs[REG_GPP_IO_CONTROL], 31) == 0)

@@ -702,7 +702,11 @@ void tms320c51_device::op_sbb()
 
 void tms320c51_device::op_sbbb()
 {
-	fatalerror("TMS320C5x: unimplemented op sbbb at %08X\n", m_pc-1);
+	uint64_t const subtrahend = uint64_t(uint32_t(m_accb)) + !m_st1.c;
+	m_st1.c = uint32_t(m_acc) >= subtrahend;
+	m_acc = uint32_t(m_acc) - subtrahend;
+
+	CYCLES(1);
 }
 
 void tms320c51_device::op_sfl()
@@ -1734,7 +1738,8 @@ void tms320c51_device::op_clrc_tc()
 
 void tms320c51_device::op_clrc_carry()
 {
-	fatalerror("TMS320C5x: unimplemented op clrc carry at %08X\n", m_pc-1);
+	m_st1.c = 0;
+	CYCLES(1);
 }
 
 void tms320c51_device::op_clrc_cnf()
@@ -1874,7 +1879,8 @@ void tms320c51_device::op_setc_tc()
 
 void tms320c51_device::op_setc_carry()
 {
-	fatalerror("TMS320C5x: unimplemented op setc carry at %08X\n", m_pc-1);
+	m_st1.c = 1;
+	CYCLES(1);
 }
 
 void tms320c51_device::op_setc_xf()
