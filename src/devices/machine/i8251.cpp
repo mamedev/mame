@@ -522,9 +522,11 @@ void v5x_scu_device::update_tx_ready()
 
 void i8251_device::update_tx_empty()
 {
-	// "TxEMPTY remains low when the transmitter is disabled even if it is
-	// actually empty" (8251A data sheet, TxE pin)
-	m_txempty_handler((m_status & I8251_STATUS_TX_EMPTY) && BIT(m_command, 0));
+	// The data sheet's TxE pin text says TxEMPTY "remains low when the
+	// transmitter is disabled", but its async transmitter timing figure
+	// draws it high before TxEN is first set.  Follow the figure: the pin
+	// is the status bit.
+	m_txempty_handler((m_status & I8251_STATUS_TX_EMPTY) != 0);
 }
 
 
