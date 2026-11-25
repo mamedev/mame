@@ -482,6 +482,7 @@ public:
 	void init_cll() ATTR_COLD;
 	void init_cm() ATTR_COLD;
 	void init_cm99() ATTR_COLD;
+	void init_cm99hc() ATTR_COLD;
 	void init_cmast91() ATTR_COLD;
 	void init_cmezspina() ATTR_COLD;
 	void init_cmpacmanb() ATTR_COLD;
@@ -21210,7 +21211,7 @@ ROM_START( cmast99d )
 ROM_END
 
 /*
-  Cherry Master '99 (Cleco, Hand Count?)
+  Cherry Master '99 (Cleco, Hand Count)
   Taiwanese bootleg.
 
   Different bankswitching?
@@ -21532,7 +21533,7 @@ ROM_START( texas99e )
 ROM_END
 
 /*
-  Texas '99 (Cleco, Hand Count?)
+  Texas '99 (Cleco, Hand Count)
   Taiwanese bootleg. Same as cmast99hc.
 
   Different bankswitching?
@@ -35333,6 +35334,24 @@ void cmaster_state::init_cm99()
 	}
 }
 
+void cmaster_state::init_cm99hc()
+{
+	init_cm99();
+
+    // Bypassing the missing external Hand Count module, mapped in 9140-92FF (0xFF in original dump)
+	uint8_t *rom = memregion("maincpu")->base();
+	rom[0x9140] = 0xc9;                                                 // ret
+	rom[0x91d0] = 0x21; rom[0x91d1] = 0x23; rom[0x91d2] = 0xd0; rom[0x91d3] = 0xc9; // ld hl,$D023 ; ret
+	rom[0x9200] = 0x32; rom[0x9201] = 0x00; rom[0x9202] = 0xd7; rom[0x9203] = 0xc9; // ld ($D700),a ; ret
+	rom[0x9210] = 0x32; rom[0x9211] = 0x34; rom[0x9212] = 0xd4; rom[0x9213] = 0xc9; // ld ($D434),a ; ret
+	rom[0x9230] = 0xc9;                                                 // ret
+	rom[0x9240] = 0xc3; rom[0x9241] = 0xf8; rom[0x9242] = 0x0d;         // jp $0DF8
+	rom[0x9260] = 0xf5; rom[0x9261] = 0xe6; rom[0x9262] = 0x07;         // push af ; and $07
+	rom[0x9263] = 0xc3; rom[0x9264] = 0x99; rom[0x9265] = 0x0a;         // jp $0A99
+	rom[0x92a0] = 0xf1; rom[0x92a1] = 0xc9;                             // pop af ; ret
+	rom[0x92b0] = 0xdd; rom[0x92b1] = 0x7e; rom[0x92b2] = 0x00; rom[0x92b3] = 0xc9; // ld a,(ix+0) ; ret
+}
+
 
 } // anonymous namespace
 
@@ -35496,18 +35515,18 @@ GAMEL( 1999, cmast99,    0,        cm99,     cmast99,  cmaster_state,  init_cm99
 GAMEL( 1999, cmast99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, bootleg)",        0,                   layout_cmv4 )
 GAMEL( 1999, cmast99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, Cleco)",          0,                   layout_cmv4 )
 GAMEL( 1999, cmast99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QL-1 V9B.00, USA long PCB)",   0,                   layout_cmv4 )
-GAMEL( 1999, cmast99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QL-1 V9B.00, Cleco, Hand Count?)", MACHINE_NOT_WORKING, layout_cmv4 ) // different bankswitching? see the ROM load notes
+GAMEL( 1999, cmast99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99hc,    ROT0, "bootleg",           "Cherry Master '99 (QL-1 V9B.00, Cleco, Hand Count)", 0,                layout_cmv4 ) // lacks hand count module, injected
 GAMEL( 1998, texas99,    cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00)",                         0,                   layout_cmv4 ) // similar to cmast99
 GAMEL( 1998, texas99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, bootleg)",                0,                   layout_cmv4 ) // similar to cmast99b
 GAMEL( 1998, texas99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, Cleco)",                  0,                   layout_cmv4 )
 GAMEL( 1998, texas99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, USA long PCB)",           0,                   layout_cmv4 )
 GAMEL( 1998, texas99e,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Kolom",             "New Texas '99 (QL-1 V9B.00, Kolom V1)",           MACHINE_NOT_WORKING, layout_cmv4 ) // DB with MCU... see the ROM load notes
-GAMEL( 1998, texas99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, Cleco, Hand Count?)",     MACHINE_NOT_WORKING, layout_cmv4 ) // different bankswitching? see the ROM load notes
+GAMEL( 1998, texas99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99hc,    ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, Cleco, Hand Count)",      0,                   layout_cmv4 ) // lacks hand count module, injected
 
-GAME(  1993, aplan,      0,        cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "WeaShing H.K.",      "A-Plan",                                          MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
-GAMEL( 1999, top7,       0,        cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "bootleg (UTech)",    "Jin Ji Bao Xi (Top-7, V8.8, set 1)",              0,                   layout_cmv4 )
-GAME(  1999, top7a,      top7,     cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "bootleg (UTech)",    "Jin Ji Bao Xi (Top-7, V8.8, set 2)",              MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
-GAME(  1996, war3cb,     0,        cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "S.B.E.",             "War III Cherry Best",                             MACHINE_NOT_WORKING )   // different portmap?
+GAME(  1993, aplan,      0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "WeaShing H.K.",     "A-Plan",                                          MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
+GAMEL( 1999, top7,       0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg (UTech)",   "Jin Ji Bao Xi (Top-7, V8.8, set 1)",              0,                   layout_cmv4 )
+GAME(  1999, top7a,      top7,     cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg (UTech)",   "Jin Ji Bao Xi (Top-7, V8.8, set 2)",              MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
+GAME(  1996, war3cb,     0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "S.B.E.",            "War III Cherry Best",                             MACHINE_NOT_WORKING )   // different portmap?
 
 GAME(  1995, tcl,        0,        tcl,      tcl,      tcl_state,      init_tcl,       ROT0, "Uniwang",           "Qi Wang Zhengba",                                 MACHINE_NOT_WORKING )   // protection partially reconstructed
 
