@@ -1375,7 +1375,10 @@ void mac128_state::macse(machine_config &config)
 	m_scsihelp->scsi_write_callback().set(m_ncr5380, FUNC(ncr5380_device::write));
 	m_scsihelp->scsi_dma_read_callback().set(m_ncr5380, FUNC(ncr5380_device::dma_r));
 	m_scsihelp->scsi_dma_write_callback().set(m_ncr5380, FUNC(ncr5380_device::dma_w));
-	m_scsihelp->cpu_halt_callback().set_inputline(m_maincpu, INPUT_LINE_HALT);
+	m_scsihelp->set_maincpu(m_maincpu);
+	// the BBU's bus timeout, 265 ms (Guide to the Macintosh Family Hardware,
+	// 2nd ed., p. 126; Inside Macintosh: Devices gives 250 ms)
+	m_scsihelp->set_timeout(attotime::from_msec(265));
 	m_scsihelp->timeout_error_callback().set(FUNC(mac128_state::scsi_berr_w));
 
 	// The INT pin (23) on the NCR5380 is connected to the the GLU PAL16L8 pin 3.
@@ -1447,6 +1450,9 @@ void mac128_state::macclasc(machine_config &config)
 	NCR53C80(config.replace(), m_ncr5380);
 	m_ncr5380->irq_handler().set(DEVICE_SELF, FUNC(mac128_state::scsi_irq_w));
 	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+	// 16 us like every model since the Mac II, not the SE's 265 ms (Inside
+	// Macintosh: Devices, SCSI Manager 4.3, p. 4-18)
+	m_scsihelp->set_timeout(attotime::from_usec(16));
 
 	// serial ports as the Plus's: GPi (pin 7) is not connected
 	subdevice<rs232_port_device>("modem")->dcd_handler().set_nop();
