@@ -1410,8 +1410,9 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 			min_delta = 0;
 			max_delta = 0;
 
-			// Try to go back 16 flux changes from the end of the track, or at most at the start
-			int flux_to_step = 16;
+			// Start far enough back (or at the start of the track) for the PLL to lock, before the
+			// index, onto data written a few percent off the nominal cell
+			int flux_to_step = 256;
 			cur_entry = tbuf.size()-1;
 			while(cur_entry > 0 && flux_to_step) {
 				if((tbuf[cur_entry] & floppy_image::MG_MASK) == floppy_image::MG_F)
@@ -1520,6 +1521,9 @@ std::vector<bool> floppy_image_format_t::generate_bitstream_from_track(int track
 			break;
 		}
 	}
+	// the run-up was spent locking: keep its phase errors out of max_delta
+	cpll.min_delta = 0;
+	cpll.max_delta = 0;
 	for(;;) {
 		auto r = cpll.get();
 		if(r.second)
