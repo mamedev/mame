@@ -750,6 +750,8 @@ void imd_format::extract_track_rich(const std::vector<bool> &bs, bool is_mfm,
 			if (shift_reg == 0x4489) {        // MFM 0xA1 sync (missing clock)
 				uint16_t header_word;
 				uint32_t pos = i + 1;
+				if (pos == bs.size())
+					pos = 0;
 				do {
 					header_word = 0;
 					for (int j = 0; j < 16; j++)
@@ -757,25 +759,28 @@ void imd_format::extract_track_rich(const std::vector<bool> &bs, bool is_mfm,
 							header_word |= 0x8000 >> j;
 				} while (header_word == 0x4489 && pos > i);
 
+				bool mark = true;
 				// 0x5554 = MFM(0xFE), 0x5555 = MFM(0xFF)
-				if (header_word == 0x5554 || header_word == 0x5555) {
+				if (header_word == 0x5554 || header_word == 0x5555)
 					idam_marks.push_back({pos, uint8_t(header_word == 0x5554 ? 0xfe : 0xff)});
-					i = pos - 1;
-				}
 				// 0x554a = MFM(0xF8) deleted DAM
-				else if (header_word == 0x554a) {
+				else if (header_word == 0x554a)
 					dam_marks.push_back({pos, 0xf8});
-					i = pos - 1;
-				}
 				// 0x5549 = MFM(0xF9), 0x5544 = MFM(0xFA), 0x5545 = MFM(0xFB)
-				else if (header_word == 0x5549) {
+				else if (header_word == 0x5549)
 					dam_marks.push_back({pos, 0xf9});
-					i = pos - 1;
-				} else if (header_word == 0x5544) {
+				else if (header_word == 0x5544)
 					dam_marks.push_back({pos, 0xfa});
-					i = pos - 1;
-				} else if (header_word == 0x5545) {
+				else if (header_word == 0x5545)
 					dam_marks.push_back({pos, 0xfb});
+				else
+					mark = false;
+
+				if (mark) {
+					// A mark read across the index ends the scan: the rest
+					// of the track was scanned from its start
+					if (pos <= i)
+						break;
 					i = pos - 1;
 				}
 			}
