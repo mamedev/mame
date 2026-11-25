@@ -349,15 +349,6 @@ void mc6845_device::recompute_parameters(bool postload)
 	if (vsync_off_pos > vert_pix_total)
 		vsync_off_pos = vert_pix_total;
 
-	// The sync timing doesn't depend on Horizontal or Vertical Displayed, the counters should run
-	// (and generate HSYNC/VSYNC) even when there is nothing to display.
-	// Only do this once the totals and VSYNC position are programmed, instead of default
-	// class initialization values.
-	bool const sync_valid = (m_sync_regs_written == 0x07) &&
-			(horiz_pix_total > 0) && (vert_pix_total > 0) &&
-			(hsync_on_pos <= horiz_pix_total) && (vsync_on_pos <= vert_pix_total) &&
-			(hsync_on_pos != hsync_off_pos);
-
 	/* update only if screen parameters changed, unless we are coming here after loading the saved state */
 	if (postload ||
 		(horiz_pix_total != m_horiz_pix_total) || (vert_pix_total != m_vert_pix_total) ||
@@ -423,7 +414,13 @@ void mc6845_device::recompute_parameters(bool postload)
 		m_hsync_off_pos = hsync_off_pos;
 		m_vsync_on_pos = vsync_on_pos;
 		m_vsync_off_pos = vsync_off_pos;
-		if (m_line_timer && !m_line_timer->enabled() && (m_has_valid_parameters || sync_valid))
+		// The sync timing doesn't depend on Horizontal or Vertical Displayed, so the counters should
+		// run (and generate HSYNC/VSYNC) even when nothing is displayed, but only once the totals and
+		// VSYNC position have been programmed. The HSYNC position must fall within the line
+		// (R2 <= R0), otherwise there is no HSYNC pulse.
+		if (m_line_timer && !m_line_timer->enabled() &&
+			(m_has_valid_parameters ||
+			 ((m_sync_regs_written == 0x07) && (m_horiz_sync_pos <= m_horiz_char_total) && (vert_pix_total > 0))))
 		{
 			m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
 		}
