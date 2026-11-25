@@ -428,17 +428,11 @@ void i8251_device::start_tx()
 	LOG("start_tx %02x\n", m_tx_data);
 	transmit_register_setup(m_tx_data);
 	m_status &= ~I8251_STATUS_TX_EMPTY;
-	update_tx_empty();
 
 	if (m_txrdy_delay_timer->enabled() && !m_txrdy_delay_timer->expire().is_never())
-	{
 		m_delayed_txrdy = true;
-	}
 	else
-	{
 		m_status |= I8251_STATUS_TX_READY;
-		update_tx_ready();
-	}
 }
 
 
@@ -477,9 +471,10 @@ void i8251_device::transmit_clock()
 				// return TxD to marking state (high) if not sending break character
 				m_txd_handler(!BIT(m_command, 3));
 			}
-
-			update_tx_empty();
 		}
+
+		update_tx_ready();
+		update_tx_empty();
 	}
 
 	/* if diserial has bits to send, make them so */
@@ -660,6 +655,9 @@ void i8251_device::command_w(uint8_t data)
 		m_txd_handler(1);
 
 	check_for_tx_start();
+	update_rx_ready();
+	update_tx_ready();
+	update_tx_empty();
 }
 
 void i8251_device::mode_w(uint8_t data)
@@ -878,6 +876,10 @@ void i8251_device::data_w(uint8_t data)
 	// Store state of tx enable when writing to DB buffer
 	m_delayed_tx_en = is_tx_enabled();
 	check_for_tx_start();
+
+	/* if transmitter is active, then tx empty will be signalled */
+	update_tx_ready();
+	update_tx_empty();
 }
 
 
@@ -959,6 +961,8 @@ void i8251_device::write_cts(int state)
 	if (started())
 	{
 		check_for_tx_start();
+		update_tx_ready();
+		update_tx_empty();
 	}
 }
 
