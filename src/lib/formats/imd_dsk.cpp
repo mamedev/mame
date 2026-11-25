@@ -849,9 +849,10 @@ void imd_format::extract_track_rich(const std::vector<bool> &bs, bool is_mfm,
 		// Find first DAM after this IDAM within the IBM-spec tolerance.
 		// MFM: 704 cells nominal, allow 704-128 .. 1008+128.
 		// FM:  384 cells nominal, allow 384-128 .. 384+128.
+		// The DAM may follow the index.
 		int dam_idx = -1;
 		for (size_t d = 0; d < dam_marks.size(); d++) {
-			int delta = int(dam_marks[d].pos) - int(idam_marks[i].pos);
+			int delta = int((dam_marks[d].pos + bs.size() - idam_marks[i].pos) % bs.size());
 			if (is_mfm) {
 				if (delta >= 704 - 128 && delta <= 1008 + 128) { dam_idx = int(d); break; }
 			} else {
