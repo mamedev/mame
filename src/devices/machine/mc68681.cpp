@@ -1363,7 +1363,7 @@ void duart_channel::device_start()
 	m_uart = downcast<duart_base_device *>(owner());
 	m_ch = m_uart->get_ch(this);    // get our channel number
 
-	set_data_frame(0, 5, PARITY_EVEN, STOP_BITS_1);
+	set_data_frame(1, 5, PARITY_EVEN, STOP_BITS_1);
 
 	save_item(NAME(CR));
 	save_item(NAME(CSR));
