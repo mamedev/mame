@@ -81,6 +81,7 @@ protected:
 	void transmit_clock();
 	void receive_clock();
 	bool is_tx_enabled() const;
+	bool is_tx_char_pending() const;
 	void check_for_tx_start();
 	void start_tx();
 

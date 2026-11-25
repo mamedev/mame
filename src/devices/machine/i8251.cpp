@@ -404,6 +404,12 @@ bool i8251_device::is_tx_enabled() const
 	return BIT(m_command, 0) && !m_cts;
 }
 
+// a written character goes out as soon as the transmit register is free
+bool i8251_device::is_tx_char_pending() const
+{
+	return !(m_status & I8251_STATUS_TX_READY) && (is_tx_enabled() || m_delayed_tx_en);
+}
+
 
 /*-------------------------------------------------
     check_for_tx_start
@@ -439,14 +445,14 @@ void i8251_device::transmit_clock()
 
 	// In async mode TxEMPTY rises from the centre of the last data (or
 	// parity) bit, before the stop bits go out, when no character will
-	// follow: none waits in the buffer, or one waits but the transmitter is
-	// disabled (data sheet: tTxEMPTY is at least 20 CLK periods from that
-	// centre; the async transmitter timing figure draws the rise there,
-	// also with a character held back by CTS).  It is raised at the centre
-	// itself; at x1 the centre isn't a clock edge, so at the next one.
-	bool const next_char = !(m_status & I8251_STATUS_TX_READY) && (is_tx_enabled() || m_delayed_tx_en);
+	// follow: none waits in the buffer, or one was written while the
+	// transmitter was disabled (data sheet: tTxEMPTY is at least 20 CLK
+	// periods from that centre; the async transmitter timing figure draws
+	// the rise there, also with a character written while CTS is off).
+	// The 20 CLK delay isn't modelled: it rises at the centre itself, or
+	// at x1, where the centre isn't a clock edge, at the next one.
 	if (m_sync_byte_count == 0 && !is_transmit_register_empty() && is_transmit_register_in_stop_bits() &&
-			!(m_status & I8251_STATUS_TX_EMPTY) && !next_char &&
+			!(m_status & I8251_STATUS_TX_EMPTY) && !is_tx_char_pending() &&
 			m_txc_count == std::max(m_br_factor / 2, 1))
 	{
 		m_status |= I8251_STATUS_TX_EMPTY;
@@ -460,7 +466,7 @@ void i8251_device::transmit_clock()
 
 	if (is_transmit_register_empty())
 	{
-		if ((m_status & I8251_STATUS_TX_READY) == 0 && (is_tx_enabled() || m_delayed_tx_en))
+		if (is_tx_char_pending())
 			start_tx();
 		else
 		{
@@ -869,12 +875,14 @@ void i8251_device::data_w(uint8_t data)
 
 	/* writing clears */
 	m_status &=~I8251_STATUS_TX_READY;
-	// TxEMPTY "resets upon receiving a character from the CPU if the
-	// transmitter is enabled" (data sheet); it can already be up while the
-	// last character's stop bits go out (transmit_clock)
-	if (BIT(m_command, 0))
-		m_status &= ~I8251_STATUS_TX_EMPTY;
 	LOGSTAT("8251: status cleared TX_READY by data_w\n");
+	// TxEMPTY "resets upon receiving a character from the CPU if the
+	// transmitter is enabled" (data sheet), in sync mode too; it can
+	// already be up while the last character's stop bits go out
+	// (transmit_clock).  With CTS off it stays up while the character
+	// waits, as the async transmitter timing figure draws it.
+	if (is_tx_enabled())
+		m_status &= ~I8251_STATUS_TX_EMPTY;
 	update_tx_ready();
 
 	// Store state of tx enable when writing to DB buffer
