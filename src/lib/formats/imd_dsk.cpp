@@ -759,7 +759,7 @@ void imd_format::extract_track_rich(const std::vector<bool> &bs, bool is_mfm,
 							header_word |= 0x8000 >> j;
 				} while (header_word == 0x4489 && pos > i);
 
-				bool mark = true;
+				bool found = true;
 				// 0x5554 = MFM(0xFE), 0x5555 = MFM(0xFF)
 				if (header_word == 0x5554 || header_word == 0x5555)
 					idam_marks.push_back({pos, uint8_t(header_word == 0x5554 ? 0xfe : 0xff)});
@@ -774,9 +774,9 @@ void imd_format::extract_track_rich(const std::vector<bool> &bs, bool is_mfm,
 				else if (header_word == 0x5545)
 					dam_marks.push_back({pos, 0xfb});
 				else
-					mark = false;
+					found = false;
 
-				if (mark) {
+				if (found) {
 					// A mark read across the index ends the scan: the rest
 					// of the track was scanned from its start
 					if (pos <= i)
