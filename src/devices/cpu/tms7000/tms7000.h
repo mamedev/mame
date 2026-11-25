@@ -67,6 +67,8 @@ public:
 	void tms7040_mem(address_map &map) ATTR_COLD;
 	void tms7041_mem(address_map &map) ATTR_COLD;
 	void tms7042_mem(address_map &map) ATTR_COLD;
+	void tms70c02_mem(address_map &map) ATTR_COLD;
+	void tms70c42_mem(address_map &map) ATTR_COLD;
 protected:
 	// chip info flags
 	static constexpr uint32_t CHIP_IS_CMOS        = 0x01;
@@ -108,7 +110,7 @@ protected:
 	devcb_write8::array<5> m_port_out_cb;
 
 	const uint32_t m_info_flags;
-	unsigned m_divider;
+	uint8_t m_divider;
 
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::cache m_cache;
 	memory_access<16, 0, 0, ENDIANNESS_BIG>::specific m_program;
@@ -127,9 +129,14 @@ protected:
 	emu_timer *m_timer_handle[2];
 	uint8_t m_timer_data[2];
 	uint8_t m_timer_control[2];
-	int m_timer_decrementer[2];
-	int m_timer_prescaler[2];
+	uint16_t m_timer_decrementer[2]; // 8-bit, or 16-bit on TMS70Cx2
+	uint8_t m_timer_prescaler[2]; // 5-bit
 	uint16_t m_timer_capture_latch[2];
+	uint16_t m_timer16_data[2];
+	uint8_t m_timer16_control[2];
+	uint8_t m_timer16_readout[2];
+	uint8_t m_timer16_clocks[2];
+	uint64_t m_timer16_cycles;
 
 	uint8_t m_port_latch[4];
 	uint8_t m_port_ddr[4];
@@ -143,6 +150,17 @@ protected:
 	void timer_reload(int tmr);
 	void timer_tick_pre(int tmr);
 	void timer_tick_low(int tmr);
+	uint8_t iocnt0_r();
+	uint8_t iocnt1_r();
+	uint8_t iocnt2_r();
+	void iocnt0_w(uint8_t data);
+	void iocnt1_w(uint8_t data);
+	void iocnt2_w(uint8_t data);
+	uint8_t timer16_r(offs_t offset);
+	void timer16_w(offs_t offset, uint8_t data);
+	void timer16_update();
+	void timer16_tick(uint8_t timer);
+	uint8_t timer16_output_mask() const;
 
 	// internal read/write
 	inline uint8_t read_r8(uint8_t address) { return m_program.read_byte(address); }
@@ -375,6 +393,22 @@ public:
 };
 
 
+class tms70c02_device : public tms7000_device
+{
+public:
+	static constexpr feature_type unemulated_features() { return feature::COMMS; }
+	tms70c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
+class tms70c42_device : public tms7000_device
+{
+public:
+	static constexpr feature_type unemulated_features() { return feature::COMMS; }
+	tms70c42_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 DECLARE_DEVICE_TYPE(TMS7000,     tms7000_device)
 DECLARE_DEVICE_TYPE(TMS7020,     tms7020_device)
 DECLARE_DEVICE_TYPE(TMS7020_EXL, tms7020_exl_device)
@@ -387,5 +421,7 @@ DECLARE_DEVICE_TYPE(TMS7001,     tms7001_device)
 DECLARE_DEVICE_TYPE(TMS7041,     tms7041_device)
 DECLARE_DEVICE_TYPE(TMS7002,     tms7002_device)
 DECLARE_DEVICE_TYPE(TMS7042,     tms7042_device)
+DECLARE_DEVICE_TYPE(TMS70C02,    tms70c02_device)
+DECLARE_DEVICE_TYPE(TMS70C42,    tms70c42_device)
 
 #endif // MAME_CPU_TMS7000_TMS7000_H
