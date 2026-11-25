@@ -35402,7 +35402,6 @@ GAME(  1994, chryangla,  ncb3,     chryangla,ncb3,     cb3_state,      init_chry
 GAME(  1994, chryangl,   ncb3,     chryangl,  chryangl,  cmaster_state, init_chryangl,  ROT0, "bootleg (G.C.I.)", "Cherry Angel (set 1)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // SKY SUPERCB 1.0 string, playable, but still has protections
 GAME(  1994, chryanglb,  ncb3,     chryanglb, chryanglb, cmaster_state, init_chryanglb, ROT0, "bootleg",          "Cherry Angel (set 2)",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // ANGEL TL+YF 1.00 string, playable, but still has protections
 
-
 // cherry master hardware has a rather different mem map, but is basically the same
 GAMEL( 198?, cmv823,     0,        cm,       cmv801,   cmaster_state,  init_cmv823,    ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.23)",     0,                   layout_cmv4 )  // encrypted
 GAMEL( 198?, cmv801,     cmv823,   cm,       cmv801,   cmaster_state,  init_cm,        ROT0, "Corsica",           "Cherry Master (ED-96, Corsica CM v8.01)",     0,                   layout_cmv4 )  // says ED-96 where the manufacturer is on some games...
@@ -35465,6 +35464,9 @@ GAMEL( 199?, hamhouse,   cmaster,  cm,       cmaster,  cmaster_state,  init_hamh
 GAMEL( 199?, hamhouse9,  cmaster,  cm,       cmaster,  cmaster_state,  init_hamhouse9, ROT0, "bootleg",           "Hamburger House 9",                           0,                   layout_cmaster )
 GAMEL( 199?, alienatt,   cmaster,  cm,       cmv4,     cmaster_state,  init_alienatt,  ROT0, "bootleg",           "Allien Attack (Game FBV2, ver.T)",            0,                   layout_cmv4 )
 
+GAME(  1995, tcl,        0,        tcl,      tcl,      tcl_state,      init_tcl,       ROT0, "Uniwang",           "Qi Wang Zhengba",                                 MACHINE_NOT_WORKING )   // protection partially reconstructed
+
+
 // sets with internal settings and no use of DSW banks
 GAMEL( 1991, cmv4zg,     cmv4,     cmv4zg,   cm_nodsw, cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 1)",  0,                   layout_cmv4 ) // uses default NVRAM
 GAMEL( 1991, cmv4zga,    cmv4,     cmv4zg,   cm_nodsw, cmaster_state,  empty_init,     ROT0, "hack",              "Cherry Bonus III (Ziogas V4.1 hack, set 2)",  0,                   layout_cmv4 ) // uses default NVRAM
@@ -35474,6 +35476,7 @@ GAMEL( 1992, reelmagica, cmaster,  cm,       cm_nodsw, cmaster_state,  init_reel
 GAMEL( 1992, rm_7bonus,  cmaster,  cm,       cm_nodsw, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 1)", 0,                  layout_cmaster ) // needs layout
 GAMEL( 1992, rm_7bonusa, cmaster,  cm,       cm_nodsw, cmaster_state,  init_rm7b,      ROT0, "hack",              "Cherry Bonus III (Reel Magic 7 bonus, set 2)", 0,                  layout_cmaster ) // needs layout
 GAMEL( 1992, cb3micro,   cmv4,     cm,       cm_nodsw, cmaster_state,  empty_init,     ROT0, "Micronic",          "Cherry Bonus III (Micronic v1.2, hack)",      0,                   layout_cmv4 ) // needs layout
+
 
 // poker master type sets
 GAMEL( 1991, tonypok,    0,         cm,        tonypok,   cmaster_state, init_tonypok,   ROT0, "Corsica",            "Poker Master (Tony-Poker V3.A, hack?)",        0 ,              layout_tonypok )
@@ -35490,6 +35493,7 @@ GAME(  1997, crazybonb,  0,         crazybonb, crazybonb, cmaster_state, init_cr
 GAME(  1993, missbingoc, crazybonb, crazybonb, crazybonb, cmaster_state, init_crazybonb, ROT0, "bootleg",            "Miss Bingo (Crazy Bonus DB, dual game)",       MACHINE_UNEMULATED_PROTECTION ) // same program as crazybonb
 
 GAME(  199?, chthree,    cmaster,   cm,        cmaster,   cmaster_state, init_chthree,   ROT0, "Promat",             "Channel Three",                                0 ) // hack of cmaster, still shows DYNA CM-1 V1.01 in book-keeping
+
 
 // Dyna D9101 PCB
 GAMEL( 1991, eldoraddoa,  0         , animalhs, eldoradoa, cmaster_state, init_eldoraddoa, ROT0, "Dyna",               "El Dorado (Dyna D9101 HW, V1.4D)",                 0,             layout_animalhs )
@@ -35508,6 +35512,7 @@ GAMEL( 1997, cmast97a,    cmast97,    cmast97,  cmast97a, cmast97_state,  empty_
 GAMEL( 1996, cmast97b,    cmast97,    cmast97,  cmast97a, cmast97_state,  empty_init,      ROT0, "Dyna",               "Cherry Master '97 (V1.7, set 3, no girls)",  0,                   layout_cmast97 )
 GAMEL( 1996, cmast97i,    cmast97,    cmast97,  cmast97i, cmast97_state,  empty_init,      ROT0, "Dyna",               "Cheri Mondo '97 (V1.4I)",                    0,                   layout_cmast97 )
 GAMEL( 1997, jpknight,    0,          jpknight, cmast97a, cmast97_state,  empty_init,      ROT0, "Dyna / R-Stone",     "Jackpot Knight (V1.1)",                      0,                   layout_cmast97 ) // check inputs
+
 
 // Dyna CM99 hardware (dynamic banking)
 // (need 3-stops layout, and check missing lamps)
@@ -35528,7 +35533,6 @@ GAMEL( 1999, top7,       0,        cm99,     cmast99,  cmaster_state,  init_cm99
 GAME(  1999, top7a,      top7,     cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg (UTech)",   "Jin Ji Bao Xi (Top-7, V8.8, set 2)",              MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
 GAME(  1996, war3cb,     0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "S.B.E.",            "War III Cherry Best",                             MACHINE_NOT_WORKING )   // different portmap?
 
-GAME(  1995, tcl,        0,        tcl,      tcl,      tcl_state,      init_tcl,       ROT0, "Uniwang",           "Qi Wang Zhengba",                                 MACHINE_NOT_WORKING )   // protection partially reconstructed
 
 // --- Wing W-4 hardware ---
 GAMEL( 1989, lucky8,     0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",       "New Lucky 8 Lines (set 1, W-4)",                           0,                      layout_lucky8 )    // 2 control sets...
@@ -35594,6 +35598,34 @@ GAMEL( 1993, bingowng,   0,        bingowng, bingowng, wingco_state,   empty_ini
 GAMEL( 1993, bingownga,  bingowng, bingownga,bingownga,wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",       "Bingo (set 2)",                                            0,                     layout_bingowng )
 
 GAME(  2002, mbs2euro,   0,        mbstar,   mbstar,   wingco_state,   init_mbs2,      ROT0, "Auto-Data Graz",       "Mega Bonus Star II (Euro, Millennium Edition)",            MACHINE_NOT_WORKING )  // need more work in memory map, inputs, and reels alignment.
+
+// --- Wing W-6 hardware ---
+GAMEL( 1986, feverch,    0,        feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         0,          layout_lucky8 )
+GAMEL( 1986, fevercha,   feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         0,          layout_lucky8 )
+GAMEL( 1986, feverchb,   feverch,  feverchb, feverch,  wingco_state,   init_feverchb,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123)",                       0,          layout_lucky8 )
+GAMEL( 1986, feverchc,   feverch,  feverchb, feverch,  wingco_state,   init_feverchc,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123, New Lucky 8 Lines title)", 0,       layout_lucky8 )
+GAMEL( 1986, feverchtw,  feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               0,          layout_lucky8 )
+GAMEL( 1986, feverchw4,  feverch,  fevchw4,  lucky8b,  wingco_state,   empty_init,     ROT0, "bootleg",           "Fever Chance (W-6, cross-system for W-4)",                 0,          layout_lucky8p1 )
+
+// --- Wing W-7 hardware ---
+GAMEL( 1991, megaline,   0,        megaline, megaline, wingco_state,   init_mgln,      ROT0, "Fun World",         "Mega Lines (Wing W-7 System)",                             0,          layout_megaline )
+GAMEL( 1986, skillch,    0,        megaline, megaline, wingco_state,   init_skch,      ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 1, 62-98 main)",                    0,          layout_skillch )
+GAMEL( 1986, skillcha,   skillch,  megaline, skillcha, wingco_state,   init_skcha,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 2, 53-98 main)",                    0,          layout_skillcha )
+GAMEL( 1986, skillchb,   skillch,  megaline, megaline, wingco_state,   init_skchb,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 3, 62-98 main)",                    0,          layout_skillcha )
+
+// --- Wing W-8 hardware ---
+GAMEL( 1990, bonusch,    0,        bonusch,  bonusch,  unkch_state,    init_bonch,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 1)",                                0,          layout_bonusch )  // M80C51F MCU
+GAMEL( 1990, bonuscha,   bonusch,  bonusch,  bonusch,  unkch_state,    init_boncha,    ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 2)",                                0,          layout_bonusch )  // M80C51F MCU
+
+
+// --- Magical Odds hardware ---
+GAME(  1992, magodds,    0,        magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",                             0 )
+GAME(  1992, magoddsa,   magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",                             0 )
+GAME(  1992, magoddsb,   magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             0 )
+GAME(  1991, magoddsc,   magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(  1991, magoddsd,   magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(  199?, mtonic,     0,        magodds,  magodds,  wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Tonic",                                    MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME(  199?, mtonic2,    0,        mtonic2,  magodds,  wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Tonic Part 2 (ver 007)",                   MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 
 
 // --- Flaming 7's hardware (W-4 custom derivative) ---
@@ -35673,35 +35705,6 @@ GAME(  199?, special7a,  special7, flam7_tw, flaming7, wingco_state,   init_spec
 GAME(  199?, special7b,  special7, flam7_tw, flaming7, wingco_state,   init_special7,  ROT0, "unknown",           "Special 7 (Taiwanese Hardware, encrypted, set 3)",         0 )
 
 
-// --- Wing W-6 hardware ---
-GAMEL( 1986, feverch,    0,        feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 1)",                         0,          layout_lucky8 )
-GAMEL( 1986, fevercha,   feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, set 2)",                         0,          layout_lucky8 )
-GAMEL( 1986, feverchb,   feverch,  feverchb, feverch,  wingco_state,   init_feverchb,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123)",                       0,          layout_lucky8 )
-GAMEL( 1986, feverchc,   feverch,  feverchb, feverch,  wingco_state,   init_feverchc,  ROT0, "Wing Co., Ltd.",    "Fever Chance (W-6, Japan, MC-8123, New Lucky 8 Lines title)", 0,       layout_lucky8 )
-GAMEL( 1986, feverchtw,  feverch,  feverch,  feverch,  wingco_state,   empty_init,     ROT0, "Yamate",            "Fever Chance (W-6, Taiwan)",                               0,          layout_lucky8 )
-GAMEL( 1986, feverchw4,  feverch,  fevchw4,  lucky8b,  wingco_state,   empty_init,     ROT0, "bootleg",           "Fever Chance (W-6, cross-system for W-4)",                 0,          layout_lucky8p1 )
-
-// --- Wing W-7 hardware ---
-GAMEL( 1991, megaline,   0,        megaline, megaline, wingco_state,   init_mgln,      ROT0, "Fun World",         "Mega Lines (Wing W-7 System)",                             0,          layout_megaline )
-GAMEL( 1986, skillch,    0,        megaline, megaline, wingco_state,   init_skch,      ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 1, 62-98 main)",                    0,          layout_skillch )
-GAMEL( 1986, skillcha,   skillch,  megaline, skillcha, wingco_state,   init_skcha,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 2, 53-98 main)",                    0,          layout_skillcha )
-GAMEL( 1986, skillchb,   skillch,  megaline, megaline, wingco_state,   init_skchb,     ROT0, "Wing Co., Ltd.",    "Skill Chance (W-7, set 3, 62-98 main)",                    0,          layout_skillcha )
-
-// --- Wing W-8 hardware ---
-GAMEL( 1990, bonusch,    0,        bonusch,  bonusch,  unkch_state,    init_bonch,     ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 1)",                                0,          layout_bonusch )  // M80C51F MCU
-GAMEL( 1990, bonuscha,   bonusch,  bonusch,  bonusch,  unkch_state,    init_boncha,    ROT0, "Wing Co., Ltd.",    "Bonus Chance (W-8, set 2)",                                0,          layout_bonusch )  // M80C51F MCU
-
-
-// --- Magical Odds hardware ---
-GAME(  1992, magodds,    0,        magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 1)",                             0 )
-GAME(  1992, magoddsa,   magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 2)",                             0 )
-GAME(  1992, magoddsb,   magodds,  magodds,  magodds,  wingco_state,   empty_init,     ROT0, "Pal Company / Micro Manufacturing Inc.", "Magical Odds (set 3)",                             0 )
-GAME(  1991, magoddsc,   magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 4, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(  1991, magoddsd,   magodds,  magodds,  magoddsc, wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Odds (set 5, custom encrypted CPU block)", MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(  199?, mtonic,     0,        magodds,  magodds,  wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Tonic",                                    MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-GAME(  199?, mtonic2,    0,        mtonic2,  magodds,  wingco_state,   init_magoddsc,  ROT0, "Pal Company",                            "Magical Tonic Part 2 (ver 007)",                   MACHINE_WRONG_COLORS | MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
-
-
 // --- Amcoe games ---
 
 //     YEAR  NAME        PARENT    MACHINE   INPUT      STATE           INIT            ROT    COMPANY    FULLNAME                                                       FLAGS              LAYOUT
@@ -35710,7 +35713,6 @@ GAMEL( 1997, schery97a,  schery97, amcoe1,   schery97,  cmaster_state,  init_sch
 GAMEL( 1998, skill98,    0,        amcoe1,   schery97,  cmaster_state,  init_skill98,   ROT0, "Amcoe",   "Skill '98 (Talking ver. s98-1.33)",                            0,                 layout_skill98 )
 GAMEL( 1997, pokonl97,   0,        amcoe1,   pokonl97,  cmaster_state,  init_po33,      ROT0, "Amcoe",   "Poker Only '97 (Talking ver. 3.3)",                            0,                 layout_pokonl97 )
 GAME(  1998, match98,    0,        amcoe1a,  match98,   cmaster_state,  init_match133,  ROT0, "Amcoe",   "Match '98 (ver. 1.33)",                                        0 )
-
 
 // The Sub-PCB has a printed sticker denoting C1, C2, D or DK for the type of FPGA decryption chip used.
 // There is known to be a special IOWA version running on the Texas C2 hardware with roms FB96P IA,
@@ -35753,7 +35755,6 @@ GAMEL( 1996, roypok96,   0,        amcoe2,   roypok96,  cmaster_state,  init_rp3
 GAMEL( 1996, roypok96a,  roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp36,       ROT0, "Amcoe",   "Royal Poker '96 (set 2, v98-3.6)",                             0,                 layout_roypok96 )
 GAMEL( 1996, roypok96b,  roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp36c3,     ROT0, "Amcoe",   "Royal Poker '96 (set 3, v98-3.6?)",                            0,                 layout_roypok96 )
 GAME(  1996, roypok96c,  roypok96, amcoe2,   roypok96a, cmaster_state,  init_rp96sub,    ROT0, "Amcoe",   "Royal Poker '96 (set 4, C3 board)",                            MACHINE_NOT_WORKING )
-
 
 // These all appear to be graphic hacks of 'New Fruit Bonus '96', they can run with the same program ROM
 // some sets are messy and appear to have mismatched graphic roms, they need to be sorted out properly.
