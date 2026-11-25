@@ -1645,14 +1645,16 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 
 	// if not in graphic mode and not Clocking Mode bit 0 select 9 dots per charset
 	const uint8_t hclock_m = !vga.gc.alpha_dis && !BIT(vga.sequencer.data[1], 0) ? 9 : 8;
+	// TODO: we are ought to bump the display bitmap rather than do this
 	const float horz_clocks = (float)(hclock_m) / divisor;
 	const int htotal_period = (vga.crtc.horz_total + 5) * horz_clocks;
 
 	const u8 is_interlace_mode = get_interlace_mode() + 1;
 	const int vtotal_period = (vga.crtc.vert_total + 2) * is_interlace_mode;
+	const int display_pixels = ((vga.crtc.horz_disp_end + 1) * horz_clocks);
 	const int display_lines = vga.crtc.vert_disp_end * is_interlace_mode;
 
-	rectangle visarea(0, ((vga.crtc.horz_disp_end + 1) * horz_clocks) - 1, 0, display_lines);
+	rectangle visarea(0, display_pixels - 1, 0, display_lines);
 
 	// TODO: improve/complete clocking modes
 	const int pixel_clock = xtal >> BIT(vga.sequencer.data[1], 3);
@@ -1660,16 +1662,22 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 
 	screen().configure(htotal_period, vtotal_period, visarea, refresh);
 
+	// TODO: the significant other has to learn that this is an ugly short-circuit
+	// fails in tvga9000 15bpp test
+	assert(htotal_period > display_pixels);
+	assert(vtotal_period > display_lines);
+
 	if (LIVE_CRTC_SETUP)
 	{
 		// how a monitor can stand selected refresh rate wildly depends on type employed.
 		// 50 ~ 85 Hz for pure VGA, for VESA max can go up to roughly 120 to 200 Hz,
 		// assume anything beyond these ranges a bug (can tell if the UI becomes super
 		// unresponsive, check "System Information" in UI menu).
-		// NOTE: the video card itself have to stand the extra bandwidth strain thru MCLK too
-		machine().ui().popup_time(5, "%dx%d-%c %.2f kHz %.2f Hz"
+		// NOTE: the adapter itself has to stand the extra bandwidth strain thru MCLK too
+		machine().ui().popup_time(5, "%dx%d-%c %.2f kHz %.2f Hz\n%dx%d%-22s"
 			, htotal_period, vtotal_period, get_interlace_mode() ? 'i' : 'p'
 			, attotime::from_ticks(htotal_period, pixel_clock).as_khz(), refresh.as_hz()
+			, display_pixels, display_lines + 1, "\u00A0"
 		);
 	}
 
