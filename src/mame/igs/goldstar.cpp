@@ -558,6 +558,12 @@ private:
 	void pkm_reel_reg_w(uint8_t data);
 	void anhs_reel_reg_w(uint8_t data);
 	void bank_set_w(offs_t offset, uint8_t data);
+	void cm99_outport0_w(uint8_t data);
+	void cm99_vblank_irq(int state);
+	uint8_t m_cm99_irq_enable = 1U;
+	uint8_t m_cm99_bank_seq_idx = 0U;
+	uint8_t m_cm99_bank_seq1 = 0U;
+	uint8_t m_cm99_bank_seq5 = 0U;
 
 	uint32_t screen_update_amaztsk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -579,6 +585,7 @@ private:
 	void clb_map(address_map &map) ATTR_COLD;
 	void cm_portmap(address_map &map) ATTR_COLD;
 	void cm99_map(address_map &map) ATTR_COLD;
+	void cm99_portmap(address_map &map) ATTR_COLD;
 	void cmast91_portmap(address_map &map) ATTR_COLD;
 	void cmtetrisb_portmap(address_map &map) ATTR_COLD;
 	void cmtetriskr_portmap(address_map &map) ATTR_COLD;
@@ -1109,9 +1116,27 @@ MACHINE_START_MEMBER(cmaster_state, cm99)
 	cmaster_state::machine_start();
 
 	uint8_t *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entry(0, &ROM[0x04000]);
-	membank("bank1")->configure_entry(1, &ROM[0x08000]);
-	membank("bank1")->set_entry(0);
+	for (int i = 0; i < 32; i++)
+	{
+		membank("bank1")->configure_entry(i, &ROM[i * 0x800]);
+		membank("bank2")->configure_entry(i, &ROM[i * 0x800]);
+		membank("bank3")->configure_entry(i, &ROM[i * 0x800]);
+		membank("bank4")->configure_entry(i, &ROM[i * 0x800]);
+	}
+	membank("bank1")->set_entry(0x4000 / 0x800);
+	membank("bank2")->set_entry(0x4800 / 0x800);
+	membank("bank3")->set_entry(0x5000 / 0x800);
+	membank("bank4")->set_entry(0x5800 / 0x800);
+
+	m_cm99_irq_enable = 1U;
+	m_cm99_bank_seq_idx = 0U;
+	m_cm99_bank_seq1 = 0U;
+	m_cm99_bank_seq5 = 0U;
+
+	save_item(NAME(m_cm99_irq_enable));
+	save_item(NAME(m_cm99_bank_seq_idx));
+	save_item(NAME(m_cm99_bank_seq1));
+	save_item(NAME(m_cm99_bank_seq5));
 }
 
 
@@ -1669,7 +1694,8 @@ uint32_t goldstar_state::screen_update_goldstar(screen_device &screen, bitmap_rg
 	if (!(m_enable_reg & 0x01))
 		return 0;
 
-	if (m_enable_reg & 0x10)
+//	if (m_enable_reg & 0x10)
+	if (m_bg_tilemap && (m_enable_reg & 0x10))
 	{
 		for (int i = 0; i < 64; i++)
 			m_bg_tilemap->set_scrolly(i, m_bg_scroll[i]);
@@ -2648,6 +2674,13 @@ void cmaster_state::outport0_w(uint8_t data)
 	m_enable_reg = data;
 }
 
+void cmaster_state::cm99_outport0_w(uint8_t data)
+{
+	// Bit 0 masks VBLANK IRQs (cleared on ISR entry, set on exit) rather than blanking video
+	m_cm99_irq_enable = BIT(data, 0);
+	m_enable_reg = data | 0x01;
+}
+
 void cmaster_state::chyangb_outport0_w(uint8_t data)
 {
 //  popmessage("outport %02x",data);
@@ -3571,33 +3604,81 @@ void cmaster_state::anhs_reel_reg_w(uint8_t data)
 
 void cmaster_state::bank_set_w(offs_t offset, uint8_t data)
 {
-	uint8_t sw = offset >> 8;
+	uint16_t pc = m_maincpu->pc();
 
-	// need to check a nvram value
-	uint8_t *nvram_ptr = (uint8_t*)memshare("nvram")->ptr();
-	uint8_t val = nvram_ptr[0x700];
-	logerror("bank_set_w: offs:%04x - sw:%02x - 0xd700:%02x\n", offset, sw, val);  // nvram $d700
-
-	uint8_t *rom = memregion("maincpu")->base();
-	uint8_t var = rom[0xd700];
-	logerror("bank_set_w: offs:%04x - sw:%02x - 0xd700:%02x\n", offset, sw, var);
-
-	switch(sw)
+	if (offset >= 0x4000 && offset <= 0x4003)
 	{
-		case 0x00 :
-		case 0x07 :
-		case 0x41 :
-		case 0x43 :
-		case 0x44 :
-		case 0x47 : logerror("no bank yet\n"); break;
-		case 0x40 : membank("bank1")->set_entry(0); break;
-		case 0x81 : membank("bank1")->set_entry(1); break;
-		case 0x82 : membank("bank1")->set_entry(0); break;
-		case 0x84 : membank("bank1")->set_entry(1); break;
-		case 0x87 : membank("bank1")->set_entry(0); break;
-		case 0x89 : membank("bank1")->set_entry(1); break;
+		membank("bank1")->set_entry(0x4000 / 0x800);
+		membank("bank2")->set_entry(0x4800 / 0x800);
+		membank("bank3")->set_entry(0x5000 / 0x800);
+		membank("bank4")->set_entry(0x5800 / 0x800);
+		m_cm99_bank_seq_idx = 0;
+		return;
 	}
-	//8100 8230 8902, 8700 4100, 4432, 708, 38, 0, 4780, 843a, 4300, 843a
+
+	if (pc != 0x0320 && pc != 0x0326)
+		return;
+
+	if (m_cm99_bank_seq_idx == 0)
+	{
+		if (data != 0x05)
+			return;
+	}
+	else if (m_cm99_bank_seq_idx == 1)
+	{
+		m_cm99_bank_seq1 = data;
+	}
+	else if (m_cm99_bank_seq_idx == 5)
+	{
+		m_cm99_bank_seq5 = data;
+	}
+
+	m_cm99_bank_seq_idx++;
+	if (m_cm99_bank_seq_idx == 16)
+	{
+		int b1 = 0x4000 / 0x800;
+		int b2 = 0x4800 / 0x800;
+		int b3 = 0x5000 / 0x800;
+		int b4 = 0x5800 / 0x800;
+
+		switch (m_cm99_bank_seq1)
+		{
+			case 0x20: // Mode A = 0x01 (Attract / Reset)
+				b1 = 0x8000 / 0x800;
+				break;
+			case 0x02: // Mode A = 0x02 (Play Mode & IRQ handlers)
+				b3 = 0x9000 / 0x800;
+				b4 = 0x9800 / 0x800;
+				break;
+			case 0x01:
+				if (m_cm99_bank_seq5 == 0x22) // Mode A = 0x03 (After Reel Spin / Win Check)
+				{
+					b3 = 0xc000 / 0x800;
+				}
+				// else seq5 == 0x24: Mode A = 0x12 (Default 0x4000..0x5FFF)
+				break;
+			case 0x23: // Mode A = 0x04 (Double-Up)
+				b1 = 0xb000 / 0x800;
+				break;
+			case 0x22: // Mode A = 0x05 (Double-Up Exit)
+				b1 = 0xa000 / 0x800;
+				break;
+			case 0x04: // Mode A = 0x11 (Bet / Start Idle Loop)
+				b1 = 0x1000 / 0x800;
+				b3 = 0x1000 / 0x800;
+				break;
+			case 0x27: // Mode A = 0x10 (Default 0x4000..0x5FFF)
+			default:
+				break;
+		}
+
+		membank("bank1")->set_entry(b1);
+		membank("bank2")->set_entry(b2);
+		membank("bank3")->set_entry(b3);
+		membank("bank4")->set_entry(b4);
+
+		m_cm99_bank_seq_idx = 0;
+	}
 }
 
 
@@ -4178,7 +4259,10 @@ void cmaster_state::cm99_map(address_map &map)
 	//cm_map(map);
 	map(0x0000, 0xcfff).w(FUNC(cmaster_state::bank_set_w));
 	map(0x0000, 0x3fff).rom();
-	map(0x4000, 0x5fff).bankr("bank1");
+	map(0x4000, 0x47ff).bankr("bank1");
+	map(0x4800, 0x4fff).bankr("bank2");
+	map(0x5000, 0x57ff).bankr("bank3");
+	map(0x5800, 0x5fff).bankr("bank4");
 	map(0x6000, 0xcfff).rom();
 
 	map(0xd000, 0xd7ff).ram().share("nvram");
@@ -4414,6 +4498,11 @@ void cmaster_state::cm_portmap(address_map &map)
 	map(0x14, 0x14).w(FUNC(cmaster_state::girl_scroll_w));
 }
 
+void cmaster_state::cm99_portmap(address_map &map)
+{
+	cm_portmap(map);
+	map(0x10, 0x10).w(FUNC(cmaster_state::cm99_outport0_w));
+}
 
 void cmaster_state::reelm_portmap(address_map &map)
 {
@@ -7433,40 +7522,20 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( cmast99 )
-/*
-    PORT_START("IN0")  // called "PLAYER" in input test
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_A) PORT_NAME("Player: 1")
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_S) PORT_NAME("Player: 2")
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_D) PORT_NAME("Player: 3")
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_F) PORT_NAME("Player: 4")
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_G) PORT_NAME("Player: 5")
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_H) PORT_NAME("Player: 6")
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_J) PORT_NAME("Player: 7")
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("Player: 8")
-
-    PORT_START("IN1")  // called "COIN" in input test
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1) PORT_NAME("Coin: 1")
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2) PORT_NAME("Coin: 2")
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3) PORT_NAME("Coin: 3")
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4) PORT_NAME("Coin: 4")
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2) PORT_NAME("Coin A")
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_NAME("Coin B")
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_IMPULSE(2) PORT_NAME("Coin C")
-
-    PORT_START("IN2")  // called "TEST" in input test
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Test: 1-Pad")
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Test: 2-Pad")
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Test: 3-Pad")
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Test: 4-Pad")
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Test: 5-Pad")
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Test: 6-Pad")
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )       PORT_NAME("Settings / Port Test")
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )    PORT_NAME("Stats / Palette Test")
-*/
 	PORT_INCLUDE( cmv4_player )
 
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH ) PORT_CODE(KEYCODE_B) PORT_NAME("Big")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP ) PORT_CODE(KEYCODE_C) PORT_NAME("D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE ) PORT_CODE(KEYCODE_X) PORT_NAME("Take")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )  PORT_CODE(KEYCODE_V) PORT_NAME("Small / Info")
+
 	PORT_INCLUDE( cmv4_coins )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SLOT_STOP2 ) PORT_CODE(KEYCODE_K) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Stop 2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SLOT_STOP1 ) PORT_CODE(KEYCODE_J) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Stop 1")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP3 ) PORT_CODE(KEYCODE_L) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Stop 3")
 
 	PORT_INCLUDE( cmv4_service )
 
@@ -16434,13 +16503,23 @@ void cmaster_state::cmfb55(machine_config &config)
 	m_gfxdecode->set_info(gfx_cmfb55);
 }
 
+
+void cmaster_state::cm99_vblank_irq(int state)
+{
+	if (state && m_cm99_irq_enable)
+		m_maincpu->set_input_line(0, HOLD_LINE);
+}
+
 void cmaster_state::cm99(machine_config &config)
 {
 	cm(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm99_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::cm99_portmap);
+	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(cmaster_state::cm99_vblank_irq));
 
 	MCFG_MACHINE_START_OVERRIDE(cmaster_state, cm99)
 }
+
 
 void cmaster_state::reelmg(machine_config &config)
 {
@@ -21594,7 +21673,7 @@ ROM_START( top7 )
 	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(12f9071f) SHA1(92f13ba8dffce56934b110da73c41f8aa7151e81) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_FILL( 0x0000, 0x10000, 0xff )  // U53 (girl bitmaps) not populated
+	ROM_FILL( 0x0000, 0x10000, 0x00 )  // U53 (girl bitmaps) not populated (filled with 00 to get a black square)
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
@@ -35242,7 +35321,18 @@ void cmaster_state::init_cm99()
 {
 	init_cmv4();
 
-	// intended, for specific game init.
+//  840d:  lda  a, ($d4b6)
+//  8410:  or   a
+//  8411:  jp   nz, $0000
+
+//  Jumping to the D-UP attract instead of reset
+
+	uint8_t *rom = memregion("maincpu")->base();
+	if (rom[0x8411] == 0xc2 && rom[0x8412] == 0x00 && rom[0x8413] == 0x00)
+	{
+		rom[0x8412] = 0x09;
+		rom[0x8413] = 0x04;
+	}
 }
 
 
@@ -35403,23 +35493,24 @@ GAMEL( 1996, cmast97i,    cmast97,    cmast97,  cmast97i, cmast97_state,  empty_
 GAMEL( 1997, jpknight,    0,          jpknight, cmast97a, cmast97_state,  empty_init,      ROT0, "Dyna / R-Stone",     "Jackpot Knight (V1.1)",                      0,                   layout_cmast97 ) // check inputs
 
 // Dyna CM99 hardware (dynamic banking)
-GAMEL( 1999, cmast99,    0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Dyna",              "Cherry Master '99 (QL-1 V9B.00)",             MACHINE_NOT_WORKING,   layout_cmv4 )
-GAMEL( 1999, cmast99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, bootleg)",    MACHINE_NOT_WORKING,   layout_cmv4 )
-GAMEL( 1999, cmast99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, Cleco)",      MACHINE_NOT_WORKING,   layout_cmv4 )
-GAMEL( 1999, cmast99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QL-1 V9B.00, USA long PCB)", MACHINE_NOT_WORKING, layout_cmv4 )
+GAMEL( 1999, cmast99,    0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Dyna",              "Cherry Master '99 (QL-1 V9B.00)",                 0,                   layout_cmv4 )
+GAMEL( 1999, cmast99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, bootleg)",        0,                   layout_cmv4 )
+GAMEL( 1999, cmast99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QQ-1 V9B.00, Cleco)",          0,                   layout_cmv4 )
+GAMEL( 1999, cmast99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QL-1 V9B.00, USA long PCB)",   0,                   layout_cmv4 )
 GAMEL( 1999, cmast99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Cherry Master '99 (QL-1 V9B.00, Cleco, Hand Count?)", MACHINE_NOT_WORKING, layout_cmv4 ) // different bankswitching? see the ROM load notes
-GAMEL( 1998, texas99,    cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00)",                     MACHINE_NOT_WORKING,   layout_cmv4 ) // similar to cmast99
-GAMEL( 1998, texas99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, bootleg)",            MACHINE_NOT_WORKING,   layout_cmv4 ) // similar to cmast99b
-GAMEL( 1998, texas99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, Cleco)",              MACHINE_NOT_WORKING,   layout_cmv4 )
-GAMEL( 1998, texas99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, USA long PCB)",       MACHINE_NOT_WORKING,   layout_cmv4 )
-GAMEL( 1998, texas99e,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Kolom",             "New Texas '99 (QL-1 V9B.00, Kolom V1)",       MACHINE_NOT_WORKING,   layout_cmv4 ) // DB with MCU... see the ROM load notes
-GAMEL( 1998, texas99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, Cleco, Hand Count?)", MACHINE_NOT_WORKING,   layout_cmv4 ) // different bankswitching? see the ROM load notes
-GAME(  1993, aplan,      0,        cm,       cmast99,  cmaster_state,  init_cmv4,      ROT0, "WeaShing H.K.",     "A-Plan",                                      MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
-GAME(  1999, top7,       0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 1)",                         MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
-GAME(  1999, top7a,      top7,     cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "bootleg (UTech)",   "Top-7 (V8.8, set 2)",                         MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
-GAME(  1996, war3cb,     0,        cm,       cmast99,  cmaster_state,  empty_init,     ROT0, "S.B.E.",            "War III Cherry Best",                         MACHINE_NOT_WORKING )   // different portmap?
+GAMEL( 1998, texas99,    cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00)",                         0,                   layout_cmv4 ) // similar to cmast99
+GAMEL( 1998, texas99b,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, bootleg)",                0,                   layout_cmv4 ) // similar to cmast99b
+GAMEL( 1998, texas99c,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QQ-1 V9B.00, Cleco)",                  0,                   layout_cmv4 )
+GAMEL( 1998, texas99d,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, USA long PCB)",           0,                   layout_cmv4 )
+GAMEL( 1998, texas99e,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "Kolom",             "New Texas '99 (QL-1 V9B.00, Kolom V1)",           MACHINE_NOT_WORKING, layout_cmv4 ) // DB with MCU... see the ROM load notes
+GAMEL( 1998, texas99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, Cleco, Hand Count?)",     MACHINE_NOT_WORKING, layout_cmv4 ) // different bankswitching? see the ROM load notes
 
-GAME(  1995, tcl,        0,        tcl,      tcl,      tcl_state,      init_tcl,       ROT0, "Uniwang",           "Qi Wang Zhengba",                             MACHINE_NOT_WORKING )   // protection partially reconstructed
+GAME(  1993, aplan,      0,        cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "WeaShing H.K.",      "A-Plan",                                          MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
+GAME(  1999, top7,       0,        cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "bootleg (UTech)",    "Top-7 (V8.8, set 1)",                             0 )
+GAME(  1999, top7a,      top7,     cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "bootleg (UTech)",    "Top-7 (V8.8, set 2)",                             MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
+GAME(  1996, war3cb,     0,        cm99,     cmast99,  cmaster_state,  init_cm99,     ROT0, "S.B.E.",             "War III Cherry Best",                             MACHINE_NOT_WORKING )   // different portmap?
+
+GAME(  1995, tcl,        0,        tcl,      tcl,      tcl_state,      init_tcl,       ROT0, "Uniwang",           "Qi Wang Zhengba",                                 MACHINE_NOT_WORKING )   // protection partially reconstructed
 
 // --- Wing W-4 hardware ---
 GAMEL( 1989, lucky8,     0,        lucky8,   lucky8,   wingco_state,   empty_init,     ROT0, "Wing Co., Ltd.",       "New Lucky 8 Lines (set 1, W-4)",                           0,                      layout_lucky8 )    // 2 control sets...
