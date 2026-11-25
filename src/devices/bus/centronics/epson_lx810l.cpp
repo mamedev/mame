@@ -28,7 +28,19 @@
  *  The NLQ character | CHR$(124) seems shifted leftward, draft is normal.
  *
  * EEPROM notes:
- *  The firmware seems to erase the EEPROM to FF on printer startup.
+ *  The firmware erases the EEPROM to FF on printer startup in preparation
+ *   for writing the EEPROM cells during loss of power.
+ *  This printer has EEPROM, it memorizes SelecType settings, position of
+ *   continuous paper, and bi-directional printing adjustment value.
+ *  EEPROM reset operations are only required after the main board replacement,
+ *   EEPROM replacement, or printer mechanism replacement.
+ *  The EEPROM is cleared when the printer power on while FF and LOAD/EJECT
+ *   switches are pressed.
+ *  The "Low Power" switch can be used as a power switch to reset the printer,
+ *   it will maintain the EEPROM settings while also resetting the printer.
+ *  The printer will hold until the low power condition is resolved.
+ *
+ *  The Epson LX810 printer (without the l) has the exact same rom as the AP2000.
  */
 
 #include "emu.h"
@@ -196,15 +208,17 @@ static INPUT_PORTS_START( epson_lx810 )
 	PORT_START("ONLINE")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(epson_lx810l_device::online_sw), 0)
 	PORT_START("FORMFEED")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_3_PAD)
 	PORT_START("LINEFEED")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CODE(KEYCODE_1_PAD)
 	PORT_START("LOADEJECT")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load/Eject") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load/Eject") PORT_CODE(KEYCODE_2_PAD)
 	PORT_START("PAPEREND")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Paper End Sensor") PORT_CODE(KEYCODE_6_PAD)
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Printer") PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(epson_lx810l_device::reset_printer), 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Printer") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(epson_lx810l_device::reset_printer), 0)
+	PORT_START("LOWVOLT")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Low Voltage") PORT_CODE(KEYCODE_9_PAD)
 
 	PORT_START("DIPSW1")
 	PORT_DIPNAME(0x01, 0x00, "Character spacing")             PORT_DIPLOCATION("SW 1:!1")
@@ -321,6 +335,7 @@ epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_t
 	m_linefeed_ioport(*this, "LINEFEED"),
 	m_loadeject_ioport(*this, "LOADEJECT"),
 	m_paperend_ioport(*this, "PAPEREND"),
+	m_lowvoltage_ioport(*this, "LOWVOLT"),
 	m_dipsw1_ioport(*this, "DIPSW1"),
 	m_dipsw2_ioport(*this, "DIPSW2"),
 	m_93c06_clk(0),
@@ -616,7 +631,7 @@ uint8_t epson_lx810l_device::an4_r()
 
 uint8_t epson_lx810l_device::an5_r()
 {
-	return 0xCB; /* motor voltage, 0xcb = 24V */
+	return m_lowvoltage_ioport->read() ? 0xcb : 0xb8;  /* motor voltage, 0xcb = 24V */
 }
 
 uint8_t epson_lx810l_device::an6_r()

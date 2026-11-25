@@ -130,6 +130,7 @@ protected:
 	required_ioport m_linefeed_ioport;
 	required_ioport m_loadeject_ioport;
 	required_ioport m_paperend_ioport;
+	required_ioport m_lowvoltage_ioport;
 	required_ioport m_dipsw1_ioport;
 	required_ioport m_dipsw2_ioport;
 
