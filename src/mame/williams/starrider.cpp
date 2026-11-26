@@ -259,9 +259,9 @@
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
-
 #include "sound/dac.h"
 #include "sound/flt_vol.h"
+
 #include "emupal.h"
 #include "speaker.h"
 
@@ -284,21 +284,17 @@ constexpr double MIX_BRANCH_OHMS[] = {20'000, 10'000, 4'700, 2'200, 1'000, 470};
 constexpr auto MIX_GAINS = []
 {
 	std::array<double, 64> gains{};
-	for (unsigned data = 0; data < gains.size(); ++data)
+	for (u32 data = 0; data < gains.size(); ++data)
 	{
 		double conductance = 1.0 / MIX_SHUNT_OHMS + 2.0 / MIX_BIAS_OHMS;
-		for (unsigned bit = 0; bit < std::size(MIX_BRANCH_OHMS); ++bit)
-			if (!(data & (1U << bit)))
+		for (u32 bit = 0; bit < std::size(MIX_BRANCH_OHMS); ++bit)
+			if (!BIT(data, bit))
 				conductance += 2.0 / MIX_BRANCH_OHMS[bit];
 		// All shunts enabled gives maximum attenuation, with a nonzero gain.
 		gains[data] = 1.0 / (1.0 + MIX_SERIES_OHMS * conductance);
 	}
 	return gains;
 }();
-
-// Nominal host mix gains. Cabinet amplifiers and volume pots are not
-// calibrated.
-constexpr double GAME_AUDIO_GAIN = 0.175;
 
 class sr_state : public driver_device
 {
@@ -334,7 +330,6 @@ protected:
 	void machine_start() override ATTR_COLD;
 
 private:
-	void sound_mix_w(unsigned index, u8 data);
 	u8 cpu_page_r(address_space &space);
 	void cpu_page_w(u8 data);
 	u8 cpu_led_r(address_space &space);
@@ -371,6 +366,7 @@ private:
 	void sound_ef2_w(u8 data);
 	u8 sound_er2_r(address_space &space);
 	void sound_er2_w(u8 data);
+	void sound_mix_w(u32 index, u8 data);
 
 	void sound_pia2_pa(u8 data);
 	void sound_fifo0_ir(int state);
@@ -513,24 +509,24 @@ void sr_state::starrider(machine_config &config)
 	m_sound_fifos[1]->or_cb().set(FUNC(sr_state::sound_fifo_or<1>));
 	m_sound_fifos[1]->flag_cb().set(FUNC(sr_state::sound_fifo_flag<1>));
 
-	SPEAKER(config, "front_left").front_left();
-	SPEAKER(config, "front_right").front_right();
-	SPEAKER(config, "rear_left").rear_left();
-	SPEAKER(config, "rear_right").rear_right();
+	// Nominal host mix gain; cabinet loudness is not calibrated.
+	constexpr double GAME_AUDIO_GAIN = 0.175;
+	SPEAKER(config, "speaker", 4).corners();
 
 	// Two populated MC1408s, each feeding independent front and rear attenuators.
-	for (unsigned channel = 0; channel != 2; ++channel)
+	for (u32 channel = 0; channel != 2; ++channel)
 	{
 		char const *const dac_tag = channel ? "sound.u40" : "sound.u41";
 		auto &dac = MC1408(config, dac_tag, 0);
 		m_sound_fifos[channel]->q_cb().set(dac, FUNC(mc1408_device::write));
-		for (unsigned pair = 0; pair != 2; ++pair)
+		for (u32 pair = 0; pair != 2; ++pair)
 		{
-			unsigned const index = 2 * channel + pair;
-			FILTER_VOLUME(config, m_sound_mix[index]);
+			u32 const index = 2 * channel + pair;
+			// The mix latches have no reset input; choose zero only at power-up.
+			FILTER_VOLUME(config, m_sound_mix[index]).set_gain(MIX_GAINS[0]);
 			dac.add_route(ALL_OUTPUTS, m_sound_mix[index], 1.0);
-			m_sound_mix[index]->add_route(ALL_OUTPUTS, pair ? "rear_left" : "front_left", GAME_AUDIO_GAIN);
-			m_sound_mix[index]->add_route(ALL_OUTPUTS, pair ? "rear_right" : "front_right", GAME_AUDIO_GAIN);
+			m_sound_mix[index]->add_route(ALL_OUTPUTS, "speaker", GAME_AUDIO_GAIN, pair ? 2 : 0);
+			m_sound_mix[index]->add_route(ALL_OUTPUTS, "speaker", GAME_AUDIO_GAIN, pair ? 3 : 1);
 		}
 	}
 
@@ -547,10 +543,6 @@ INPUT_CHANGED_MEMBER(sr_state::sound_sw1_changed)
 
 void sr_state::machine_start()
 {
-	// The mix latches have no reset input; choose zero only at power-up.
-	for (unsigned index = 0; index != 4; ++index)
-		sound_mix_w(index, 0);
-
 	m_vgg_drams = std::make_unique<u8 []>(16'384 * 4 / 8 * 6);
 
 	save_item(NAME(m_main_page));
@@ -765,7 +757,7 @@ u8 sr_state::sound_ef1_r(address_space &space)
 
 void sr_state::sound_ef1_w(u8 data)
 {
-	sound_mix_w(0, data); // U19
+	sound_mix_w(0, data); // DAC 1 -> front mix level (6 bits latched by U19)
 }
 
 u8 sr_state::sound_er1_r(address_space &space)
@@ -778,7 +770,7 @@ u8 sr_state::sound_er1_r(address_space &space)
 
 void sr_state::sound_er1_w(u8 data)
 {
-	sound_mix_w(1, data); // U2
+	sound_mix_w(1, data); // DAC 1 -> rear mix level (6 bits latched by U2)
 }
 
 u8 sr_state::sound_ef2_r(address_space &space)
@@ -791,7 +783,7 @@ u8 sr_state::sound_ef2_r(address_space &space)
 
 void sr_state::sound_ef2_w(u8 data)
 {
-	sound_mix_w(2, data); // U17
+	sound_mix_w(2, data); // DAC 2 -> front mix level (6 bits latched by U17)
 }
 
 u8 sr_state::sound_er2_r(address_space &space)
@@ -804,11 +796,11 @@ u8 sr_state::sound_er2_r(address_space &space)
 
 void sr_state::sound_er2_w(u8 data)
 {
-	sound_mix_w(3, data); // U36
+	sound_mix_w(3, data); // DAC 2 -> rear mix level (6 bits latched by U36)
 }
 
 
-void sr_state::sound_mix_w(unsigned index, u8 data)
+void sr_state::sound_mix_w(u32 index, u8 data)
 {
 	m_sound_mix[index]->set_gain(MIX_GAINS[data & 0x3f]);
 }
@@ -1174,5 +1166,5 @@ ROM_END
 /***********************************************************************
     Machine definitions
 ***********************************************************************/
-GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
