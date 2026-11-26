@@ -171,13 +171,13 @@ private:
 void duodock_device::duodock_map(address_map &map)
 {
 	map(0x0010'0000, 0x001f'ffff).rw(FUNC(duodock_device::vram_r), FUNC(duodock_device::vram_w));
-	map(0x0000'0000, 0x0000'1fff).rw(m_pvia, FUNC(pseudovia_device::read), FUNC(pseudovia_device::write)).mirror(0x00e00000);
-	map(0x0000'2000, 0x0000'207f).rw(FUNC(duodock_device::scsi_r), FUNC(duodock_device::scsi_w)).mirror(0x00e00000);
-	map(0x0000'4000, 0x0000'5fff).rw(FUNC(duodock_device::handshake_r), FUNC(duodock_device::handshake_w)).mirror(0x00e00000);
-	map(0x0000'6000, 0x0000'7fff).rw(FUNC(duodock_device::handshake_r), FUNC(duodock_device::handshake_w)).mirror(0x00e00000);
-	map(0x0000'8000, 0x0000'9fff).rw(FUNC(duodock_device::scc_r), FUNC(duodock_device::scc_w)).mirror(0x00e00000);
-	map(0x0000'e000, 0x0000'e00f).w(FUNC(duodock_device::vdac_w)).mirror(0x00e00000);
-	map(0x000f'e000, 0x000f'e1ff).rw(FUNC(duodock_device::vidregs_r), FUNC(duodock_device::vidregs_w)).umask32(0xffff0000).mirror(0x00e00000);
+	map(0x0000'0000, 0x0000'1fff).mirror(0x00e0'0000).rw(m_pvia, FUNC(pseudovia_device::read), FUNC(pseudovia_device::write));
+	map(0x0000'2000, 0x0000'207f).mirror(0x00e0'0000).rw(FUNC(duodock_device::scsi_r), FUNC(duodock_device::scsi_w));
+	map(0x0000'4000, 0x0000'5fff).mirror(0x00e0'0000).rw(FUNC(duodock_device::handshake_r), FUNC(duodock_device::handshake_w));
+	map(0x0000'6000, 0x0000'7fff).mirror(0x00e0'0000).rw(FUNC(duodock_device::handshake_r), FUNC(duodock_device::handshake_w));
+	map(0x0000'8000, 0x0000'9fff).mirror(0x00e0'0000).rw(FUNC(duodock_device::scc_r), FUNC(duodock_device::scc_w));
+	map(0x0000'e000, 0x0000'e00f).mirror(0x00e0'0000).w(FUNC(duodock_device::vdac_w));
+	map(0x000f'e000, 0x000f'e1ff).mirror(0x00e0'0000).umask32(0xffff'0000).rw(FUNC(duodock_device::vidregs_r), FUNC(duodock_device::vidregs_w));
 }
 
 ROM_START( duodock )
@@ -808,4 +808,3 @@ void duodock_device::scsi_drq_w(int state)
 } // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(DUODOCK_DUODOCK, device_nubus_card_interface, duodock_device, "duodock", "Duo Dock")
-

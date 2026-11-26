@@ -84,6 +84,10 @@ Error codes (TODO: RE them all)
 #include "machine/upd765.h"
 #include "video/mc6845.h"
 
+#include "emupal.h"
+#include "screen.h"
+#include "softlist_dev.h"
+
 #include "formats/pc98_dsk.h"
 #include "formats/pc98fdi_dsk.h"
 #include "formats/dcp_dsk.h"
@@ -91,9 +95,6 @@ Error codes (TODO: RE them all)
 #include "formats/fdd_dsk.h"
 #include "formats/nfd_dsk.h"
 
-#include "emupal.h"
-#include "screen.h"
-#include "softlist_dev.h"
 
 namespace {
 
@@ -120,8 +121,8 @@ public:
 		, m_floppy(*this, "fdc:%u", 0U)
 	{ }
 
-	void b16(machine_config &config);
-	void b16ex2(machine_config &config);
+	void b16(machine_config &config) ATTR_COLD;
+	void b16ex2(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
@@ -209,8 +210,7 @@ protected:
 // Text and bitmap colours use BGR components. Intensity levels are provisional.
 void b16_state::palette_init(palette_device &palette) const
 {
-	int i;
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		palette.set_pen_color(i, pal1bit(BIT(i, 2)), pal1bit(BIT(i, 1)), pal1bit(BIT(i, 0)));
 		palette.set_pen_color(i + 8, BIT(i, 2) * 0xaa + 0x55, BIT(i, 1) * 0xaa + 0x55, BIT(i, 0) * 0xaa + 0x55);
@@ -254,6 +254,7 @@ MC6845_UPDATE_ROW(b16_state::crtc_update_row)
 	// Raster rows within each plane are 0800h bytes apart. CC/DC uses
 	// 16 KiB units; the BIOS selects value 2 for the second 640x400 page.
 	const u32 graphics_row = (u32(m_graphics_display_page) << 14) + (u32(ra) << 11) + ma;
+	auto *const dest = &bitmap.pix(y);
 	for (unsigned x = 0; x < x_count; x++)
 	{
 		const u32 tile_offset = (ma + x) & 0x1fff;
@@ -286,20 +287,20 @@ MC6845_UPDATE_ROW(b16_state::crtc_update_row)
 		for (unsigned xi = 0; xi < 8; xi++)
 		{
 			const int res_x = x * 8 + xi;
-			if (!cliprect.contains(res_x, y))
+			if (!cliprect.containsx(res_x))
 				continue;
 
 			u8 graphics_color = 0;
 			for (unsigned plane = 0; plane < m_graphics_planes; plane++)
 				graphics_color |= BIT(m_gvram[plane * 0x10000 + address], 7 - xi) << plane;
-			bitmap.pix(y, res_x) = palette[16 + graphics_color];
+			dest[res_x] = palette[16 + graphics_color];
 			if (cursor)
-				bitmap.pix(y, res_x) = palette[7];
+				dest[res_x] = palette[7];
 			else if (BIT(gfx_data, 7 - xi))
-				bitmap.pix(y, res_x) = palette[fg_color];
+				dest[res_x] = palette[fg_color];
 			else if (bg_color)
 				// Background zero is transparent; coloured key labels are opaque.
-				bitmap.pix(y, res_x) = palette[bg_color];
+				dest[res_x] = palette[bg_color];
 		}
 	}
 }
@@ -422,10 +423,10 @@ void b16_state::b16_map(address_map &map)
 	map.unmap_value_high();
 	// TODO: amount of work RAM depends on model type
 	map(0x00000, 0x9ffff).ram();
-	map(0xa0000, 0xaffff).rw(FUNC(b16_state::graphics_r), FUNC(b16_state::graphics_w)).umask16(0xffff);
+	map(0xa0000, 0xaffff).umask16(0xffff).rw(FUNC(b16_state::graphics_r), FUNC(b16_state::graphics_w));
 	map(0xb0000, 0xb7fff).ram().rw(FUNC(b16_state::tvram_r), FUNC(b16_state::tvram_w)).share("vram");
-	map(0xb8000, 0xbbfff).rw(FUNC(b16_state::ig_ram_r), FUNC(b16_state::ig_ram_w)).umask16(0x00ff);
-	map(0xc0000, 0xdffff).r(FUNC(b16_state::kanji_r)).umask16(0x00ff);
+	map(0xb8000, 0xbbfff).umask16(0x00ff).rw(FUNC(b16_state::ig_ram_r), FUNC(b16_state::ig_ram_w));
+	map(0xc0000, 0xdffff).umask16(0x00ff).r(FUNC(b16_state::kanji_r));
 	map(0xfc000, 0xfffff).rom().region("ipl", 0);
 }
 
@@ -441,9 +442,9 @@ void b16_state::b16_io(address_map &map)
 {
 	map.unmap_value_high();
 //  map(0x00, 0x07).umask16(0x00ff); // PIT mirror?
-	map(0x08, 0x0f).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
-	map(0x10, 0x13).rw(m_intm, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
-	map(0x18, 0x1b).rw(m_ints, FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask16(0x00ff);
+	map(0x08, 0x0f).umask16(0x00ff).rw(m_pit, FUNC(pit8253_device::read), FUNC(pit8253_device::write));
+	map(0x10, 0x13).umask16(0x00ff).rw(m_intm, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
+	map(0x18, 0x1b).umask16(0x00ff).rw(m_ints, FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x20, 0x20).rw(m_crtc, FUNC(mc6845_device::status_r), FUNC(mc6845_device::address_w));
 	map(0x22, 0x22).rw(m_crtc, FUNC(mc6845_device::register_r), FUNC(mc6845_device::register_w));
 //  map(0x28, 0x2b) keyboard, likely thru USART
@@ -459,8 +460,8 @@ void b16_state::b16_io(address_map &map)
 		NAME([this] () { return m_dma->read(8); }),
 		NAME([this] (u8 data) { m_dma->write(8, data); })
 	);
-	map(0x60, 0x6f).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write)).umask16(0x00ff);
-	map(0x70, 0x73).m(m_fdc, FUNC(upd765a_device::map)).umask16(0x00ff);
+	map(0x60, 0x6f).umask16(0x00ff).rw(m_dma, FUNC(i8257_device::read), FUNC(i8257_device::write));
+	map(0x70, 0x73).umask16(0x00ff).m(m_fdc, FUNC(upd765a_device::map));
 	map(0x74, 0x74).lw8(NAME([this] (u8 data) { m_dma_page = data & 0x0f; }));
 	map(0x78, 0x78).lrw8(
 		NAME([this] () {
@@ -499,8 +500,8 @@ void b16_state::b16_io(address_map &map)
 		NAME([this] (u8 data) { m_port80 = data; })
 	);
 	map(0x84, 0x84).lw8(NAME([this] (u8 data) { m_port84 = data & 3; }));
-	map(0xa0, 0xbf).rw(FUNC(b16_state::graphics_palette_r), FUNC(b16_state::graphics_palette_w)).umask16(0x00ff);
-	map(0xc0, 0xdf).w(FUNC(b16_state::graphics_ctrl_w)).umask16(0x00ff);
+	map(0xa0, 0xbf).umask16(0x00ff).rw(FUNC(b16_state::graphics_palette_r), FUNC(b16_state::graphics_palette_w));
+	map(0xc0, 0xdf).umask16(0x00ff).w(FUNC(b16_state::graphics_ctrl_w));
 //  map(0x8020, 0x8023) external FDC? Can branch at FDC irq
 }
 

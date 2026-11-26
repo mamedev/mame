@@ -185,7 +185,7 @@ protected:
 
 	devcb_write_line m_linear_config_changed_cb;
 
-	virtual void s3_define_video_mode(void) override;
+	virtual void recompute_params() override;
 
 private:
 	emu_timer *m_op_timer;

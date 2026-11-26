@@ -309,15 +309,24 @@ void macvail_state::maclc3_base(machine_config &config)
 	SCC85C30(config, m_scc, C7M);
 	m_scc->configure_channels(3'686'400, 3'686'400, 3'686'400, 3'686'400);
 	m_scc->out_int_callback().set(m_sonora, FUNC(sonora_device::scc_irq_w));
-	m_scc->out_txda_callback().set("printer", FUNC(rs232_port_device::write_txd));
-	m_scc->out_txdb_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	// channel A is the modem port, B the printer port (LC 520 Developer Note;
+	// Guide to the Macintosh Family Hardware, 2nd ed., p. 361).  HSKo (pin 1)
+	// is driven from /DTR as on the LC-family schematics; the LC III note's
+	// block diagram shows 26LS30 line drivers on both ports.  GPi (pin 7)
+	// reaches /DCD on the LC 520 (its developer note).
+	// TODO: GPi on the LC III is unverified: its note lists pin 7 as GPi, but
+	// the LC 520 note says the 520's ports add GPi to the LC III's
+	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtra_callback().set("modem", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
+	m_scc->out_dtrb_callback().set("printer", FUNC(rs232_port_device::write_dtr));
 
-	rs232_port_device &rs232a(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
+	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
 	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
-	rs232_port_device &rs232b(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
+	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
 	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));

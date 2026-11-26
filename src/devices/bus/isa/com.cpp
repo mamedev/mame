@@ -57,6 +57,7 @@ protected:
 	// device_t implementation
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
+	virtual void remap(int space_id, offs_t start, offs_t end) override;
 };
 
 
@@ -127,6 +128,13 @@ void isa8_com_device::device_add_mconfig(machine_config &config)
 void isa8_com_device::device_start()
 {
 	set_isa_device();
+	remap(AS_IO, 0, 0xffff);
+}
+
+void isa8_com_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id != AS_IO)
+		return;
 	m_isa->install_device(0x03f8, 0x03ff, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_0"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_0"), FUNC(ins8250_device::ins8250_w)));
 	m_isa->install_device(0x02f8, 0x02ff, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_1"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_1"), FUNC(ins8250_device::ins8250_w)));
 //  m_isa->install_device(0x03e8, 0x03ef, read8sm_delegate(*subdevice<ins8250_uart_device>("uart_2"), FUNC(ins8250_device::ins8250_r)), write8sm_delegate(*subdevice<ins8250_uart_device>("uart_2"), FUNC(ins8250_device::ins8250_w)));

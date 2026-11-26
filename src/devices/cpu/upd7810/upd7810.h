@@ -84,6 +84,7 @@ public:
 	void pf_w(uint8_t data, uint8_t mem_mask = ~0);
 
 	void sck_w(int state);
+	void ci_w(int state);
 
 protected:
 	void upd_internal_128_ram_map(address_map &map) ATTR_COLD;
@@ -168,6 +169,7 @@ protected:
 	void upd7810_to_output_change(int state);
 	void upd7810_co0_output_change();
 	void upd7810_co1_output_change();
+	void etimer_count();
 
 	devcb_write_line  m_to_func;
 	devcb_write_line  m_co0_func;

@@ -283,9 +283,6 @@ void tutor_state::machine_reset()
 	m_tape_interrupt_enable = 0;
 	m_centronics_busy = 0;
 
-	// Disable auto wait states; with enabled wait states, cassette loading fails
-	m_maincpu->ready_line(ASSERT_LINE);
-	m_maincpu->reset_line(ASSERT_LINE);
 	m_maincpu->hold_line(CLEAR_LINE);
 }
 
@@ -754,6 +751,9 @@ void tutor_state::tutor(machine_config &config)
 	// TMS9995 CPU @ 10.7 MHz
 	// No lines connected yet
 	TMS9995(config, m_maincpu, XTAL(10'738'635));
+	// On an original Pyuuta, the two byte reads of each reset-vector word start two CLKOUT cycles apart.
+	// The Jr. schematic shows IC13 (74LS74) presetting READY high. Use one automatic wait on all three models.
+	m_maincpu->set_auto_wait_on_reset(true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &tutor_state::tutor_memmap);
 	m_maincpu->set_addrmap(AS_IO, &tutor_state::tutor_io);
 

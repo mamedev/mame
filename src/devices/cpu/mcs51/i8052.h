@@ -45,7 +45,7 @@ protected:
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 
 	virtual void handle_8bit_uart_clock(int source) override;
-	virtual void irqs_complete_and_mask(u8 &ints, u8 int_mask) override;
+	virtual void irqs_complete_and_mask(u16 &ints, u16 int_mask) override;
 	virtual void handle_irq(int irqline, int state, u32 new_state, u32 tr_state) override;
 	virtual void sfr_map(address_map &map) override ATTR_COLD;
 	virtual void update_timer_t2(int cycles) override;
@@ -59,6 +59,8 @@ protected:
 	void rcap2_w(offs_t offset, u8 data);
 	u8 t2_r(offs_t offset);
 	void t2_w(offs_t offset, u8 data);
+
+	void increment_timer_t2(u32 delta);
 };
 
 class i8032_device : public i8052_device

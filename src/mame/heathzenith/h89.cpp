@@ -43,16 +43,22 @@
 
 #include "emu.h"
 
+#include "bus/heathzenith/h19/cards.h"
 #include "bus/heathzenith/h19/tlb.h"
 #include "bus/heathzenith/h89/h89bus.h"
 #include "bus/heathzenith/h89/cdr_fdc_880h.h"
+#include "bus/heathzenith/h89/dsm240.h"
+#include "bus/heathzenith/h89/gpp_speed.h"
 #include "bus/heathzenith/h89/h_88_3.h"
 #include "bus/heathzenith/h89/h_88_5.h"
 #include "bus/heathzenith/h89/h17_fdc.h"
 #include "bus/heathzenith/h89/mms77316_fdc.h"
+#include "bus/heathzenith/h89/mms_77318.h"
+#include "bus/heathzenith/h89/mt_win89.h"
 #include "bus/heathzenith/h89/sigmasoft_parallel_port.h"
 #include "bus/heathzenith/h89/sigmasoft_sound.h"
 #include "bus/heathzenith/h89/we_pullup.h"
+#include "bus/heathzenith/h89/wh_88_16.h"
 #include "bus/heathzenith/h89/z_89_11.h"
 #include "bus/heathzenith/h89/z37_fdc.h"
 #include "bus/heathzenith/intr_cntrl/intr_cntrl.h"
@@ -96,14 +102,12 @@ protected:
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
 		, m_maincpu_region(*this, "maincpu")
-		, m_mem_view(*this, "rom_bank")
 		, m_ram(*this, RAM_TAG)
-		, m_floppy_ram(*this, "floppyram")
+		, m_floppy_ram(*this, "floppyram", 0x400, ENDIANNESS_LITTLE)
 		, m_tlbc(*this, "tlbc")
 		, m_intr_socket(*this, "intr_socket")
 		, m_h89bus(*this, "h89bus")
 		, m_console(*this, "console")
-		, m_config(*this, "CONFIG")
 		, m_sw501(*this, "SW501")
 	{
 	}
@@ -112,30 +116,22 @@ protected:
 
 	required_device<z80_device>                          m_maincpu;
 	required_memory_region                               m_maincpu_region;
-	memory_view                                          m_mem_view;
 	required_device<ram_device>                          m_ram;
-	required_shared_ptr<u8>                              m_floppy_ram;
+	memory_share_creator<u8>                             m_floppy_ram;
 	required_device<heath_tlb_connector>                 m_tlbc;
 	required_device<heath_intr_socket>                   m_intr_socket;
 	required_device<h89bus_device>                       m_h89bus;
 	required_device<ins8250_device>                      m_console;
-	required_ioport                                      m_config, m_sw501;
+	required_ioport                                      m_sw501;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
 
-	// General Purpose Port (GPP)
-	u8   m_gpp;
-
-	bool m_rom_enabled;
 	bool m_timer_intr_enabled;
 	bool m_single_step_enabled;
-	bool m_floppy_ram_we;
 
 	// single step flags
 	bool m_555a_latch;
 	bool m_555b_latch;
 	bool m_556b_latch;
-
-	u32  m_cpu_speed_multiplier;
 
 	bool m_installed;
 
@@ -143,16 +139,8 @@ protected:
 	static constexpr XTAL H89_CLOCK                      = XTAL(12'288'000) / 6;
 	static constexpr XTAL INS8250_CLOCK                  = XTAL(1'843'200);
 
-	static constexpr u8 GPP_SINGLE_STEP_BIT             = 0;
-	static constexpr u8 GPP_ENABLE_TIMER_INTERRUPT_BIT  = 1;
-	static constexpr u8 GPP_MEM0_BIT                    = 4;
-	static constexpr u8 GPP_MEM1_BIT                    = 5;
-	static constexpr u8 GPP_IO0_BIT                     = 6;
-	static constexpr u8 GPP_IO1_BIT                     = 7;
-
-	void update_mem_view();
-
-	void update_gpp(u8 gpp);
+	void gpp_single_step_w(u8 data);
+	void gpp_timer_intr_w(u8 data);
 	void port_f2_w(u8 data);
 	u8 read_sw();
 
@@ -168,8 +156,6 @@ protected:
 
 	void set_wait_state(int data);
 
-	void set_fmwe(int data);
-
 	u8 raise_NMI_r();
 	void raise_NMI_w(u8 data);
 	void console_intr(int data);
@@ -182,6 +168,9 @@ protected:
 	void h89_right_cards(device_slot_interface &device);
 	void h89_right_cards_mms(device_slot_interface &device);
 	void h89_right_p506_cards(device_slot_interface &device);
+	void h89_cpu_upgrades(device_slot_interface &device);
+
+	void cpu_clock_w(u32 clock);
 };
 
 /**
@@ -236,9 +225,10 @@ public:
  * Functionality already implemented/Same as Heath options
  *  - MMS 77311 - 16k RAM
  *  - MMS 77312 - ORG-0 CP/M Mod
+ *  - MMS 77318 - 128k RAM board (mms_77318 in P503 and in the U517 socket,
+ *                h89bus:pri_mem_decoder)
  *
  * Hardware currently planned to be implemented:
- *  - MMS 77318 - 128k RAM board
  *  - MMS 77319 - Video Output
  *  - MMS 77320 - SASI board
  *  - MMS 77322 - Network Controller
@@ -297,26 +287,13 @@ public:
   |    ROM    |        +------>  |    RAM    |
   -------------  0k              -------------  0k
 
+  The memory map is set by the primary (U517) and secondary (U516) memory
+  decoder PROMs, see h89bus_device::install_mem_map().
+
 */
 void h89_base_state::h89_mem(address_map &map)
 {
 	map.unmap_value_high();
-
-	map(0x0000, 0xffff).view(m_mem_view);
-
-	// View 0 - ROM / Floppy RAM R/O
-	// View 1 - ROM / Floppy RAM R/W
-	// monitor ROM
-	m_mem_view[0](0x0000, 0x0fff).rom().region(m_maincpu_region, 0).unmapw();
-	m_mem_view[1](0x0000, 0x0fff).rom().region(m_maincpu_region, 0).unmapw();
-
-	// Floppy RAM
-	m_mem_view[0](0x1400, 0x17ff).readonly().share(m_floppy_ram);
-	m_mem_view[1](0x1400, 0x17ff).ram().share(m_floppy_ram);
-
-	// Floppy ROM
-	m_mem_view[0](0x1800, 0x1fff).rom().region(m_maincpu_region, 0x1800).unmapw();
-	m_mem_view[1](0x1800, 0x1fff).rom().region(m_maincpu_region, 0x1800).unmapw();
 }
 
 void h89_base_state::map_fetch(address_map &map)
@@ -379,12 +356,6 @@ static INPUT_PORTS_START( h88 )
 	PORT_DIPSETTING(    0x40, "19200" )
 	PORT_DIPSETTING(    0x80, "38400" )
 	PORT_DIPSETTING(    0xc0, "57600" )
-
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x03, 0x00, "CPU Clock Speed Upgrade")
-	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-	PORT_CONFSETTING(    0x01, "2 / 4 MHz")
-	PORT_CONFSETTING(    0x02, "2 / 6 MHz")
 
 INPUT_PORTS_END
 
@@ -622,10 +593,6 @@ static INPUT_PORTS_START( h89 )
 
 
 	PORT_START("CONFIG")
-	PORT_CONFNAME(0x03, 0x00, "CPU Clock Speed Upgrade")
-	PORT_CONFSETTING(   0x00, DEF_STR( None ) )
-	PORT_CONFSETTING(   0x01, "2 / 4 MHz")
-	PORT_CONFSETTING(   0x02, "2 / 6 MHz")
 	PORT_CONFNAME(0x3c, 0x04, "Switch SW501 Definitions")
 	PORT_CONFSETTING(   0x00, "Generic" )
 	PORT_CONFSETTING(   0x04, "Heath MTR-90")
@@ -642,12 +609,13 @@ INPUT_PORTS_END
 
 void h89_base_state::machine_start()
 {
-	save_item(NAME(m_gpp));
-	save_item(NAME(m_rom_enabled));
+	m_h89bus->add_gpp_handler(h89bus::GPP_SINGLE_STEP,
+		write8smo_delegate(*this, FUNC(h89_base_state::gpp_single_step_w)));
+	m_h89bus->add_gpp_handler(h89bus::GPP_TIMER_INTR,
+		write8smo_delegate(*this, FUNC(h89_base_state::gpp_timer_intr_w)));
+
 	save_item(NAME(m_timer_intr_enabled));
 	save_item(NAME(m_single_step_enabled));
-	save_item(NAME(m_floppy_ram_we));
-	save_item(NAME(m_cpu_speed_multiplier));
 	save_item(NAME(m_555a_latch));
 	save_item(NAME(m_555b_latch));
 	save_item(NAME(m_556b_latch));
@@ -657,47 +625,7 @@ void h89_base_state::machine_start()
 
 	m_maincpu->space(AS_PROGRAM).specific(m_program);
 
-	// update RAM mappings based on RAM size
-	u8 *ram_ptr  = m_ram->pointer();
-	u32 ram_size = m_ram->size();
-
-	if (ram_size == 0x10000)
-	{
-		// system has a full 64k
-		m_maincpu->space(AS_PROGRAM).install_ram(0x2000, 0xffff, ram_ptr);
-
-		// install shadow writing to RAM when in ROM mode and Floppy RAM is write-protected.
-		m_mem_view[0].install_writeonly(0x0000, 0x1fff, ram_ptr + 0xe000);
-		// when Floppy RAM is in write enable mode, must use write_tap so writes occur to both RAMs
-		// NOTE: the H89 had space reserved for additional RAM (without write protection) in the ROM space, but not aware
-		// it was ever used. If that was added to this emulation, m_mem_view[0] would also need to be a write_tap.
-		m_mem_view[1].install_write_tap(0x0000, 0x1fff, "shadow_w", [ram_ptr](offs_t offset, u8 &data, u8 mem_mask)
-		{
-			ram_ptr[0xe000 + offset] = data;
-		});
-
-		// The Org-0 (often used for CP/M) view has RAM at the lower 8k
-		m_mem_view[2].install_ram(0x0000, 0x1fff, ram_ptr + 0xe000);
-	}
-	else
-	{
-		// less than 64k
-
-		// for views with ROM visible, the top of memory is 8k higher than
-		// the memory size, since the base starts at 8k.
-		u32 ram_top = ram_size + 0x1fff;
-
-		m_mem_view[0].install_ram(0x2000, ram_top, ram_ptr);
-		m_mem_view[1].install_ram(0x2000, ram_top, ram_ptr);
-
-		// when ROM is not active, memory still starts at 8k, but is 8k smaller so the last 8k can be mapped to addr 0.
-		m_mem_view[2].install_ram(0x2000, ram_size - 1, ram_ptr);
-
-		// remap the top 8k down to addr 0
-		m_mem_view[2].install_ram(0x0000, 0x1fff, ram_ptr + ram_size - 0x2000);
-	}
-
-	m_floppy_ram_we       = false;
+	m_h89bus->install_mem_map(m_ram->pointer(), m_ram->size(), m_maincpu_region->base(), m_floppy_ram.target());
 }
 
 u8 h89_base_state::read_sw()
@@ -749,36 +677,7 @@ void h89_base_state::machine_reset()
 		m_installed = true;
 	}
 
-	m_rom_enabled         = true;
-	m_timer_intr_enabled  = true;
-	m_single_step_enabled = false;
-	reset_single_step_state();
-
-	ioport_value const cfg(m_config->read());
-
-	// CPU clock speed
-	const u8 selected_clock_upgrade = cfg & 0x3;
-
-	switch (selected_clock_upgrade)
-	{
-	case 0x01:
-		// 4 MHz was offered by several companies including Kres, ANAPRO, and an article
-		// in REMark magazine.
-		m_cpu_speed_multiplier = 2;
-		break;
-	case 0x02:
-		// 6 MHz was offered by at least ANAPRO, and a how to article in CHUG newsletter
-		m_cpu_speed_multiplier = 3;
-		break;
-	case 0x00:
-	default:
-		// No speed upgrade installed - Standard Clock
-		m_cpu_speed_multiplier = 1;
-		break;
-	}
-
-	update_gpp(0);
-	update_mem_view();
+	// the general purpose port line state is set by the bus reset calling the gpp handlers
 }
 
 void h89_base_state::set_wait_state(int data)
@@ -789,13 +688,6 @@ void h89_base_state::set_wait_state(int data)
 		machine().scheduler().synchronize();
 		m_maincpu->defer_access();
 	}
-}
-
-void h89_base_state::set_fmwe(int data)
-{
-	m_floppy_ram_we = bool(data);
-
-	update_mem_view();
 }
 
 u8 h89_base_state::raise_NMI_r()
@@ -841,11 +733,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(h89_base_state::h89_irq_timer)
 	}
 }
 
-void h89_base_state::update_mem_view()
-{
-	m_mem_view.select(m_rom_enabled ? (m_floppy_ram_we ? 1 : 0) : 2);
-}
-
 void h89_base_state::reset_single_step_state()
 {
 	LOGSS("reset_single_step_state\n");
@@ -855,78 +742,30 @@ void h89_base_state::reset_single_step_state()
 	m_intr_socket->set_irq_level(2, CLEAR_LINE);
 }
 
-// General Purpose Port
-//
-// Bit     OUTPUT
-// ---------------------
-//  0    Single-step enable
-//  1    2 mSec interrupt enable
-//  2    Not used (on original Heath CPU Board)
-//  3    Not used (on original Heath CPU Board)
-//  4    Latched bit MEM 0 H on memory expansion connector (Commonly used for Speed upgrades)
-//  5    Latched bit MEM 1 H on memory expansion connector - ORG-0 (CP/M map)
-//  6    Latched bit I/O 0 on I/O exp connector
-//  7    Latched bit I/O 1 on I/O exp connector
-//
-void h89_base_state::update_gpp(u8 gpp)
+// General Purpose Port lines used by the CPU board, see h89bus::gpp_lines
+void h89_base_state::gpp_single_step_w(u8 data)
 {
-	u8 changed_gpp = gpp ^ m_gpp;
+	m_single_step_enabled = bool(data & h89bus::GPP_SINGLE_STEP);
 
-	m_gpp = gpp;
+	LOGSS("single step enable: %d\n", m_single_step_enabled);
 
-	m_timer_intr_enabled = bool(BIT(m_gpp, GPP_ENABLE_TIMER_INTERRUPT_BIT));
-
-	m_h89bus->set_mem0(BIT(m_gpp, GPP_MEM0_BIT));
-	m_h89bus->set_mem1(BIT(m_gpp, GPP_MEM1_BIT));
-	m_h89bus->set_io0(BIT(m_gpp, GPP_IO0_BIT));
-	m_h89bus->set_io1(BIT(m_gpp, GPP_IO1_BIT));
-
-	if (BIT(changed_gpp, GPP_SINGLE_STEP_BIT))
+	if (!m_single_step_enabled)
 	{
-		LOGSS("single step enable: %d\n", BIT(m_gpp, GPP_SINGLE_STEP_BIT));
-		m_single_step_enabled = bool(BIT(m_gpp, GPP_SINGLE_STEP_BIT));
-
-		if (!m_single_step_enabled)
-		{
-			reset_single_step_state();
-		}
-	}
-
-	if (BIT(changed_gpp, GPP_MEM1_BIT))
-	{
-		m_rom_enabled = BIT(m_gpp, GPP_MEM1_BIT) == 0;
-
-		update_mem_view();
-	}
-
-	if (BIT(changed_gpp, GPP_MEM0_BIT))
-	{
-		m_maincpu->set_clock(BIT(m_gpp, GPP_MEM0_BIT) ?
-			H89_CLOCK * m_cpu_speed_multiplier : H89_CLOCK);
+		reset_single_step_state();
 	}
 }
 
-// General Purpose Port
+void h89_base_state::gpp_timer_intr_w(u8 data)
+{
+	m_timer_intr_enabled = bool(data & h89bus::GPP_TIMER_INTR);
+}
+
+// General Purpose Port, latched by the bus
 void h89_base_state::port_f2_w(u8 data)
 {
-	update_gpp(data);
+	m_h89bus->gpp_w(data);
 
 	m_intr_socket->set_irq_level(1, CLEAR_LINE);
-}
-
-static void tlb_options(device_slot_interface &device)
-{
-	device.option_add("heath",        HEATH_TLB);
-	device.option_add("gp19",         HEATH_GP19);
-	device.option_add("imaginator",   HEATH_IMAGINATOR);
-	device.option_add("super19",      HEATH_SUPER19);
-	device.option_add("superset",     HEATH_SUPERSET);
-	device.option_add("ultrarom",     HEATH_ULTRA);
-	device.option_add("watzman",      HEATH_WATZ);
-	device.option_add("igc",          HEATH_IGC);
-	device.option_add("igc_super19",  HEATH_IGC_SUPER19);
-	device.option_add("igc_ultrarom", HEATH_IGC_ULTRA);
-	device.option_add("igc_watzman",  HEATH_IGC_WATZ);
 }
 
 static void intr_ctrl_options(device_slot_interface &device)
@@ -939,12 +778,15 @@ static void intr_ctrl_options(device_slot_interface &device)
 
 void h89_base_state::h89_left_cards(device_slot_interface &device)
 {
+	device.option_add("mms_77318",       H89BUS_MMS_77318);
+	device.option_add("mt_win89",        H89BUS_MT_WIN89);
 	device.option_add("ss_parallel",     H89BUS_SIGMASOFT_PARALLEL);
 	device.option_add("ss_parallel_igc", H89BUS_SIGMASOFT_PARALLEL_IGC).machine_config(
 		[this](device_t *device)
 		{
 			downcast<sigmasoft_parallel_port_igc &>(*device).set_tlbc(m_tlbc);
 		});
+	device.option_add("wh_88_16",        H89BUS_WH_88_16);
 }
 
 void h89_base_state::h89_right_cards(device_slot_interface &device)
@@ -981,12 +823,37 @@ void h89_base_state::h89_right_p506_cards(device_slot_interface &device)
 	device.option_add("we_pullup", H89BUS_WE_PULLUP);
 }
 
+void h89_base_state::h89_cpu_upgrades(device_slot_interface &device)
+{
+	device.option_add("dsm240",   H89BUS_DSM240).clock(H89_CLOCK);
+	device.option_add("gpp_4mhz", H89BUS_GPP_SPEED_4MHZ).clock(H89_CLOCK);
+	device.option_add("gpp_6mhz", H89BUS_GPP_SPEED_6MHZ).clock(H89_CLOCK);
+}
+
+void h89_base_state::cpu_clock_w(u32 clock)
+{
+	m_maincpu->set_clock(clock);
+}
+
 static void io_decoder_options(device_slot_interface &device)
 {
 	device.option_add("444_43",  H89BUS_IO_DECODER_444_43);
 	device.option_add("444_61",  H89BUS_IO_DECODER_444_61);
 	device.option_add("mms_61c", H89BUS_IO_DECODER_MMS_61C);
 	device.option_add("cdr86",   H89BUS_IO_DECODER_CDR_86);
+}
+
+static void pri_mem_decoder_options(device_slot_interface &device)
+{
+	device.option_add("444_42",    H89BUS_MEM_DECODER_444_42);
+	device.option_add("444_66",    H89BUS_MEM_DECODER_444_66);
+	device.option_add("mms_77318", H89BUS_MEM_DECODER_MMS_77318);
+}
+
+static void sec_mem_decoder_options(device_slot_interface &device)
+{
+	device.option_add("444_41",  H89BUS_MEM_DECODER_444_41);
+	device.option_add("444_83",  H89BUS_MEM_DECODER_444_83);
 }
 
 void h89_base_state::h89_base(machine_config &config)
@@ -1000,7 +867,10 @@ void h89_base_state::h89_base(machine_config &config)
 	m_maincpu->set_io_map(&h89_base_state::h89_base_io);
 	m_maincpu->set_irq_acknowledge_callback("intr_socket", FUNC(heath_intr_socket::irq_callback));
 
-	RAM(config, m_ram).set_default_size("64K").set_extra_options("16K,32K,48K").set_default_value(0x00);
+	// the CPU board holds up to 48K, and a WH-88-16 card in a left slot adds the
+	// last 16K; 64K is the mod that piggybacks 16K on the CPU board and wires it
+	// to RD6, for use without the card
+	RAM(config, m_ram).set_default_size("48K").set_extra_options("16K,32K,64K").set_default_value(0x00);
 
 	HEATH_INTR_SOCKET(config, m_intr_socket, intr_ctrl_options, nullptr);
 	m_intr_socket->irq_line_cb().set_inputline(m_maincpu, INPUT_LINE_IRQ0);
@@ -1008,7 +878,7 @@ void h89_base_state::h89_base(machine_config &config)
 	INS8250(config, m_console, INS8250_CLOCK);
 	m_console->out_int_callback().set(FUNC(h89_base_state::console_intr));
 
-	HEATH_TLB_CONNECTOR(config, m_tlbc, tlb_options, "heath");
+	HEATH_TLB_CONNECTOR(config, m_tlbc, h89_tlb_options, "heath");
 
 	// Connect the console port on CPU board to TLB connector
 	m_console->out_tx_callback().set(m_tlbc, FUNC(heath_tlb_connector::serial_in_w));
@@ -1020,20 +890,27 @@ void h89_base_state::h89_base(machine_config &config)
 
 	m_tlbc->reset_cb().set(FUNC(h89_base_state::reset_line));
 
-	H89BUS(config, m_h89bus);
+	H89BUS(config, m_h89bus, H89_CLOCK);
 	m_h89bus->set_program_space(m_maincpu, AS_PROGRAM);
 	m_h89bus->set_io_space(m_maincpu, AS_IO);
 	m_h89bus->out_int3_callback().set(FUNC(h89_base_state::slot_irq<3>));
 	m_h89bus->out_int4_callback().set(FUNC(h89_base_state::slot_irq<4>));
 	m_h89bus->out_int5_callback().set(FUNC(h89_base_state::slot_irq<5>));
 	m_h89bus->out_wait_callback().set(FUNC(h89_base_state::set_wait_state));
-	m_h89bus->out_fmwe_callback().set(FUNC(h89_base_state::set_fmwe));
+	// Heath recommended the 444-66 for all systems, it replaced the 444-42.
+	// The 444-83 is for 4K system ROMs, the 444-41 for 2K ROMs.
+	H89BUS_MEM_DECODER_SOCKET(config, "h89bus:pri_mem_decoder", pri_mem_decoder_options, "444_66");
+	H89BUS_MEM_DECODER_SOCKET(config, "h89bus:sec_mem_decoder", sec_mem_decoder_options, "444_83");
+
 	H89BUS_LEFT_SLOT(config, "p501", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
 	H89BUS_LEFT_SLOT(config, "p502", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
-	H89BUS_LEFT_SLOT(config, "p503", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, nullptr);
+	H89BUS_LEFT_SLOT(config, "p503", "h89bus", [this](device_slot_interface &device) { h89_left_cards(device); }, "wh_88_16");
 	H89BUS_RIGHT_SLOT(config, "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, nullptr);
 	H89BUS_RIGHT_SLOT(config, "p505", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "ha_88_3");
 	H89BUS_RIGHT_SLOT(config, "p506", "h89bus", [this](device_slot_interface &device) { h89_right_p506_cards(device); }, "we_pullup").set_p506_signalling(true);
+
+	H89BUS_CPU_BOARD_MOD_SLOT(config, "cpu_upgrade", "h89bus", [this](device_slot_interface &device) { h89_cpu_upgrades(device); }, nullptr)
+		.out_cpu_clock_callback().set(FUNC(h89_base_state::cpu_clock_w));
 
 	// H89 interrupt interval is 2mSec
 	TIMER(config, "irq_timer").configure_periodic(FUNC(h89_base_state::h89_irq_timer), attotime::from_msec(2));
@@ -1046,7 +923,14 @@ void h88_state::h88(machine_config &config)
 	m_intr_socket->set_default_option("original");
 	m_intr_socket->set_fixed(true);
 
+	// 16K, without the WH-88-16 card
+	m_ram->set_default_size("16K").set_extra_options("32K,48K,64K");
+	subdevice<h89bus_left_slot_device>("p503")->set_default_option(nullptr);
+
 	H89BUS_RIGHT_SLOT(config.replace(), "p504", "h89bus", [this](device_slot_interface &device) { h89_right_cards(device); }, "h_88_5");
+
+	// MTR-88 is a 2K ROM
+	H89BUS_MEM_DECODER_SOCKET(config.replace(), "h89bus:sec_mem_decoder", sec_mem_decoder_options, "444_41");
 
 	LOGSETUP("%s: about to call set_io_prom_tag\n", FUNCNAME);
 	H89BUS_IO_DECODER_SOCKET(config, "h89bus:io_decoder", io_decoder_options, "444_43");

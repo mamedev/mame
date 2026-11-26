@@ -83,7 +83,6 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load);
 
-	void data_map(address_map &map) ATTR_COLD;
 	void prg_map(address_map &map) ATTR_COLD;
 };
 
@@ -249,11 +248,6 @@ void uzebox_state::prg_map(address_map &map)
 	map(0x0000, 0xffff).r(m_cart, FUNC(generic_slot_device::read_rom));
 }
 
-void uzebox_state::data_map(address_map &map)
-{
-	map(0x0100, 0x10ff).ram(); // 4KB RAM
-}
-
 
 /****************************************************\
 * Input ports                                        *
@@ -304,7 +298,6 @@ void uzebox_state::uzebox(machine_config &config)
 	// basic machine hardware
 	ATMEGA644(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &uzebox_state::prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &uzebox_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->gpio_in<atmega644_device::GPIOA>().set(FUNC(uzebox_state::port_a_r));
 	m_maincpu->gpio_in<atmega644_device::GPIOB>().set(FUNC(uzebox_state::port_b_r));

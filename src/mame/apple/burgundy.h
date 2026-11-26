@@ -43,6 +43,11 @@ protected:
 
 	virtual void sound_stream_update(sound_stream &stream) override;
 
+	u32 calc_sample_rate() const;
+
+	int output_subframes() const;
+	int input_subframes() const;
+
 	devcb_read32 m_output_cb;
 	devcb_write32 m_input_cb;
 
@@ -54,6 +59,7 @@ protected:
 	u16 m_reg_addr, m_cur_byte, m_last_byte;
 	u32 m_codec_status, m_last_codec_control;
 	u8 m_counter;
+	u32 m_audio_control;
 };
 
 // device type definition

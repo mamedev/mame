@@ -3,6 +3,8 @@
 #include "emu.h"
 #include "i82439hx.h"
 
+#include <algorithm>
+
 DEFINE_DEVICE_TYPE(I82439HX, i82439hx_host_device, "i82439hx", "Intel 82439HX northbridge")
 
 void i82439hx_host_device::config_map(address_map &map)
@@ -17,8 +19,8 @@ void i82439hx_host_device::config_map(address_map &map)
 	map(0x52, 0x52).rw(FUNC(i82439hx_host_device::cc_r), FUNC(i82439hx_host_device::cc_w));
 	map(0x56, 0x56).rw(FUNC(i82439hx_host_device::dramec_r), FUNC(i82439hx_host_device::dramec_w));
 	map(0x57, 0x57).rw(FUNC(i82439hx_host_device::dramc_r), FUNC(i82439hx_host_device::dramc_w));
-	map(0x58, 0x5f).rw(FUNC(i82439hx_host_device::pam_r), FUNC(i82439hx_host_device::pam_w));
 	map(0x58, 0x58).rw(FUNC(i82439hx_host_device::dramt_r), FUNC(i82439hx_host_device::dramt_w));
+	map(0x59, 0x5f).rw(FUNC(i82439hx_host_device::pam_r), FUNC(i82439hx_host_device::pam_w));
 	map(0x60, 0x67).rw(FUNC(i82439hx_host_device::drb_r), FUNC(i82439hx_host_device::drb_w));
 	map(0x68, 0x68).rw(FUNC(i82439hx_host_device::drt_r), FUNC(i82439hx_host_device::drt_w));
 	map(0x69, 0x69).rw(FUNC(i82439hx_host_device::drat_r), FUNC(i82439hx_host_device::drat_w));
@@ -31,6 +33,8 @@ void i82439hx_host_device::config_map(address_map &map)
 i82439hx_host_device::i82439hx_host_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: pci_host_device(mconfig, type, tag, owner, clock)
 	, cpu(*this, finder_base::DUMMY_TAG)
+	, m_ram_dev(*this, finder_base::DUMMY_TAG)
+	, m_ram(nullptr)
 {
 }
 
@@ -60,7 +64,16 @@ void i82439hx_host_device::device_start()
 	command_mask = 0x0102;
 	status = 0x0200;
 
-	ram.resize(ram_size/4);
+	if (m_ram_dev)
+	{
+		ram_size = m_ram_dev->size();
+		m_ram = reinterpret_cast<uint32_t *>(m_ram_dev->pointer());
+	}
+	else
+	{
+		ram.resize(ram_size/4);
+		m_ram = ram.data();
+	}
 }
 
 void i82439hx_host_device::reset_all_mappings()
@@ -107,87 +120,86 @@ void i82439hx_host_device::map_extra(uint64_t memory_window_start, uint64_t memo
 
 	// memory hole at 512-640 kbytes
 	if(memory_hole_lower)
-		memory_space->install_ram      (0x00000000, 0x0007ffff, &ram[0x00000000/4]);
+		memory_space->install_ram      (0x00000000, 0x0007ffff, &m_ram[0x00000000/4]);
 	else
-		memory_space->install_ram      (0x00000000, 0x0009ffff, &ram[0x00000000/4]);
+		memory_space->install_ram      (0x00000000, 0x0009ffff, &m_ram[0x00000000/4]);
 
 	// assume that map_extra of the northbridge is called after the video card has mapped its memory here
 	if (smram & 0x08)
 	{
 		if (smiact_n == 0)
-			memory_space->install_ram(0x000a0000, 0x000bffff, &ram[0x000a0000 / 4]);
+			memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000 / 4]);
 		else
 			if (smram & 0x40)
-				memory_space->install_ram(0x000a0000, 0x000bffff, &ram[0x000a0000 / 4]);
+				memory_space->install_ram(0x000a0000, 0x000bffff, &m_ram[0x000a0000 / 4]);
 	}
 
 	// assume that map_extra of the northbridge is called after the one of the southbridge
 	if(pam[1] & 0x01)
-		memory_space->install_rom      (0x000c0000, 0x000c3fff, &ram[0x000c0000/4]);
+		memory_space->install_rom      (0x000c0000, 0x000c3fff, &m_ram[0x000c0000/4]);
 	if(pam[1] & 0x02)
-		memory_space->install_writeonly(0x000c0000, 0x000c3fff, &ram[0x000c0000/4]);
+		memory_space->install_writeonly(0x000c0000, 0x000c3fff, &m_ram[0x000c0000/4]);
 	if(pam[1] & 0x10)
-		memory_space->install_rom      (0x000c4000, 0x000c7fff, &ram[0x000c4000/4]);
+		memory_space->install_rom      (0x000c4000, 0x000c7fff, &m_ram[0x000c4000/4]);
 	if(pam[1] & 0x20)
-		memory_space->install_writeonly(0x000c4000, 0x000c7fff, &ram[0x000c4000/4]);
+		memory_space->install_writeonly(0x000c4000, 0x000c7fff, &m_ram[0x000c4000/4]);
 	if(pam[2] & 0x01)
-		memory_space->install_rom      (0x000c8000, 0x000cbfff, &ram[0x000c8000/4]);
+		memory_space->install_rom      (0x000c8000, 0x000cbfff, &m_ram[0x000c8000/4]);
 	if(pam[2] & 0x02)
-		memory_space->install_writeonly(0x000c8000, 0x000cbfff, &ram[0x000c8000/4]);
+		memory_space->install_writeonly(0x000c8000, 0x000cbfff, &m_ram[0x000c8000/4]);
 	if(pam[2] & 0x10)
-		memory_space->install_rom      (0x000cc000, 0x000cffff, &ram[0x000cc000/4]);
+		memory_space->install_rom      (0x000cc000, 0x000cffff, &m_ram[0x000cc000/4]);
 	if(pam[2] & 0x20)
-		memory_space->install_writeonly(0x000cc000, 0x000cffff, &ram[0x000cc000/4]);
+		memory_space->install_writeonly(0x000cc000, 0x000cffff, &m_ram[0x000cc000/4]);
 	if(pam[3] & 0x01)
-		memory_space->install_rom      (0x000d0000, 0x000d3fff, &ram[0x000d0000/4]);
+		memory_space->install_rom      (0x000d0000, 0x000d3fff, &m_ram[0x000d0000/4]);
 	if(pam[3] & 0x02)
-		memory_space->install_writeonly(0x000d0000, 0x000d3fff, &ram[0x000d0000/4]);
+		memory_space->install_writeonly(0x000d0000, 0x000d3fff, &m_ram[0x000d0000/4]);
 	if(pam[3] & 0x10)
-		memory_space->install_rom      (0x000d4000, 0x000d7fff, &ram[0x000d4000/4]);
+		memory_space->install_rom      (0x000d4000, 0x000d7fff, &m_ram[0x000d4000/4]);
 	if(pam[3] & 0x20)
-		memory_space->install_writeonly(0x000d4000, 0x000d7fff, &ram[0x000d4000/4]);
+		memory_space->install_writeonly(0x000d4000, 0x000d7fff, &m_ram[0x000d4000/4]);
 	if(pam[4] & 0x01)
-		memory_space->install_rom      (0x000d8000, 0x000dbfff, &ram[0x000d8000/4]);
+		memory_space->install_rom      (0x000d8000, 0x000dbfff, &m_ram[0x000d8000/4]);
 	if(pam[4] & 0x02)
-		memory_space->install_writeonly(0x000d8000, 0x000dbfff, &ram[0x000d8000/4]);
+		memory_space->install_writeonly(0x000d8000, 0x000dbfff, &m_ram[0x000d8000/4]);
 	if(pam[4] & 0x10)
-		memory_space->install_rom      (0x000dc000, 0x000dffff, &ram[0x000dc000/4]);
+		memory_space->install_rom      (0x000dc000, 0x000dffff, &m_ram[0x000dc000/4]);
 	if(pam[4] & 0x20)
-		memory_space->install_writeonly(0x000dc000, 0x000dffff, &ram[0x000dc000/4]);
+		memory_space->install_writeonly(0x000dc000, 0x000dffff, &m_ram[0x000dc000/4]);
 	if(pam[5] & 0x01)
-		memory_space->install_rom      (0x000e0000, 0x000e3fff, &ram[0x000e0000/4]);
+		memory_space->install_rom      (0x000e0000, 0x000e3fff, &m_ram[0x000e0000/4]);
 	if(pam[5] & 0x02)
-		memory_space->install_writeonly(0x000e0000, 0x000e3fff, &ram[0x000e0000/4]);
+		memory_space->install_writeonly(0x000e0000, 0x000e3fff, &m_ram[0x000e0000/4]);
 	if(pam[5] & 0x10)
-		memory_space->install_rom      (0x000e4000, 0x000e7fff, &ram[0x000e4000/4]);
+		memory_space->install_rom      (0x000e4000, 0x000e7fff, &m_ram[0x000e4000/4]);
 	if(pam[5] & 0x20)
-		memory_space->install_writeonly(0x000e4000, 0x000e7fff, &ram[0x000e4000/4]);
+		memory_space->install_writeonly(0x000e4000, 0x000e7fff, &m_ram[0x000e4000/4]);
 	if(pam[6] & 0x01)
-		memory_space->install_rom      (0x000e8000, 0x000ebfff, &ram[0x000e8000/4]);
+		memory_space->install_rom      (0x000e8000, 0x000ebfff, &m_ram[0x000e8000/4]);
 	if(pam[6] & 0x02)
-		memory_space->install_writeonly(0x000e8000, 0x000ebfff, &ram[0x000e8000/4]);
+		memory_space->install_writeonly(0x000e8000, 0x000ebfff, &m_ram[0x000e8000/4]);
 	if(pam[6] & 0x10)
-		memory_space->install_rom      (0x000ec000, 0x000effff, &ram[0x000ec000/4]);
+		memory_space->install_rom      (0x000ec000, 0x000effff, &m_ram[0x000ec000/4]);
 	if(pam[6] & 0x20)
-		memory_space->install_writeonly(0x000ec000, 0x000effff, &ram[0x000ec000/4]);
+		memory_space->install_writeonly(0x000ec000, 0x000effff, &m_ram[0x000ec000/4]);
 	if(pam[0] & 0x10)
-		memory_space->install_rom      (0x000f0000, 0x000fffff, &ram[0x000f0000/4]);
+		memory_space->install_rom      (0x000f0000, 0x000fffff, &m_ram[0x000f0000/4]);
 	if(pam[0] & 0x20)
-		memory_space->install_writeonly(0x000f0000, 0x000fffff, &ram[0x000f0000/4]);
+		memory_space->install_writeonly(0x000f0000, 0x000fffff, &m_ram[0x000f0000/4]);
 
-	memory_space->install_ram          (0x00100000, 0x00efffff, &ram[0x00100000/4]);
+	// extended memory, only as far as there is RAM
+	const offs_t ram_top = ram_size;
+	if(ram_top > 0x00100000)
+		memory_space->install_ram      (0x00100000, std::min<offs_t>(ram_top, 0x00f00000) - 1, &m_ram[0x00100000/4]);
 	// memory hole at 15-16 mbytes
-	if(memory_hole_upper)
-		memory_space->install_ram      (0x00f00000, 0x00ffffff, &ram[0x00f00000/4]);
+	if(ram_top > 0x00f00000 && memory_hole_upper)
+		memory_space->install_ram      (0x00f00000, std::min<offs_t>(ram_top, 0x01000000) - 1, &m_ram[0x00f00000/4]);
 
-	memory_space->install_ram          (0x01000000, ram_size-1, &ram[0x01000000/4]);
+	if(ram_top > 0x01000000)
+		memory_space->install_ram      (0x01000000, ram_top - 1, &m_ram[0x01000000/4]);
 }
 
-
-uint8_t i82439hx_host_device::header_type_r()
-{
-	return 0x00; // from datasheet
-}
 
 void i82439hx_host_device::status_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
@@ -286,14 +298,14 @@ void i82439hx_host_device::dramt_w(uint8_t data)
 
 uint8_t i82439hx_host_device::pam_r(offs_t offset)
 {
-	return pam[offset - 1];
+	return pam[offset];
 }
 
 void i82439hx_host_device::pam_w(offs_t offset, uint8_t data)
 {
-	pam[offset - 1] = data;
-	logerror("pam[%d] = %02x\n", offset - 1, pam[offset - 1]);
-	switch (offset - 1)
+	pam[offset] = data;
+	logerror("pam[%d] = %02x\n", offset, pam[offset]);
+	switch (offset)
 	{
 	case 0:
 		logerror("  F0000-FFFFF BIOS Area RE:%d WE:%d CE:%d R:%d\n", (data >> 4) & 1, (data >> 5) & 1, (data >> 6) & 1, (data >> 7) & 1);

@@ -31,7 +31,7 @@ protected:
 	i80c51_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, int program_width, int io_width);
 
 	virtual void sfr_map(address_map &map) override ATTR_COLD;
-	virtual bool manage_idle_on_interrupt(u8 ints) override;
+	virtual bool manage_idle_on_interrupt(u16 ints) override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void device_start() override ATTR_COLD;
 

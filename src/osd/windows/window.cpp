@@ -109,7 +109,8 @@ static DWORD main_threadid;
 static int ui_temp_pause;
 static int ui_temp_was_paused;
 
-[[maybe_unused]] static DWORD window_threadid;
+[[maybe_unused]] static HANDLE window_thread; // to be able to get it in a debugger when debugging COM issues
+[[maybe_unused]] static DWORD window_threadid; // debug builds only
 
 static DWORD last_update_time;
 
@@ -144,6 +145,7 @@ bool windows_osd_interface::window_init()
 	if (!ui_pause_event)
 		fatalerror("Failed to create pause event\n");
 
+	window_thread = GetCurrentThread();
 	window_threadid = main_threadid;
 
 	return true;

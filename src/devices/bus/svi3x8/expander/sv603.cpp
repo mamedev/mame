@@ -10,6 +10,8 @@
 #include "sv603.h"
 #include "softlist_dev.h"
 
+#include <algorithm>
+
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -42,9 +44,11 @@ void sv603_device::device_add_mconfig(machine_config &config)
 
 	// controller ports
 	COLECOVISION_CONTROL_PORT(config, m_joy[0], colecovision_control_port_devices, "hand");
-	m_joy[0]->irq().set(FUNC(sv603_device::joy_irq_w<0>));
+	m_joy[0]->irq().set(FUNC(sv603_device::spinner_w<0>));
 	COLECOVISION_CONTROL_PORT(config, m_joy[1], colecovision_control_port_devices, nullptr);
-	m_joy[1]->irq().set(FUNC(sv603_device::joy_irq_w<1>));
+	m_joy[1]->irq().set(FUNC(sv603_device::spinner_w<1>));
+
+	INPUT_MERGER_ANY_HIGH(config, m_irqs).output_handler().set([this] (int state) { m_expander->int_w(state); });
 
 	// cartridge slot
 	COLECOVISION_CARTRIDGE_SLOT(config, m_cart, colecovision_cartridges, nullptr);
@@ -67,7 +71,8 @@ sv603_device::sv603_device(const machine_config &mconfig, const char *tag, devic
 	m_bios(*this, "bios"),
 	m_snd(*this, "snd"),
 	m_joy{ {*this, "joy1"}, {*this, "joy2"} },
-	m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG)
+	m_cart(*this, COLECOVISION_CARTRIDGE_SLOT_TAG),
+	m_irqs(*this, "irqs")
 {
 }
 
@@ -77,6 +82,16 @@ sv603_device::sv603_device(const machine_config &mconfig, const char *tag, devic
 
 void sv603_device::device_start()
 {
+	m_spinner_timer[0] = timer_alloc(FUNC(sv603_device::spinner_one_shot<0>), this);
+	m_spinner_timer[1] = timer_alloc(FUNC(sv603_device::spinner_one_shot<1>), this);
+	m_spinner_int_timer[0] = timer_alloc(FUNC(sv603_device::spinner_int_off<0>), this);
+	m_spinner_int_timer[1] = timer_alloc(FUNC(sv603_device::spinner_int_off<1>), this);
+
+	std::fill(std::begin(m_spinner_a), std::end(m_spinner_a), 0);
+	std::fill(std::begin(m_spinner_q), std::end(m_spinner_q), 0);
+
+	save_item(NAME(m_spinner_a));
+	save_item(NAME(m_spinner_q));
 }
 
 //-------------------------------------------------
@@ -93,10 +108,36 @@ void sv603_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-template<int N>
-void sv603_device::joy_irq_w(int state)
+template <unsigned N>
+void sv603_device::spinner_w(int state)
 {
-	m_expander->int_w(state);
+	if (state && !m_spinner_a[N] && !m_spinner_q[N])
+	{
+		m_spinner_q[N] = 1;
+		m_spinner_timer[N]->adjust(attotime::from_usec(470));
+
+		m_irqs->in_w<N>(1);
+		m_spinner_int_timer[N]->adjust(attotime::from_usec(5));
+	}
+	else if (!state && !m_spinner_timer[N]->enabled())
+	{
+		m_spinner_q[N] = 0;
+	}
+
+	m_spinner_a[N] = state;
+}
+
+template <unsigned N>
+TIMER_CALLBACK_MEMBER(sv603_device::spinner_one_shot)
+{
+	if (!m_spinner_a[N])
+		m_spinner_q[N] = 0;
+}
+
+template <unsigned N>
+TIMER_CALLBACK_MEMBER(sv603_device::spinner_int_off)
+{
+	m_irqs->in_w<N>(0);
 }
 
 uint8_t sv603_device::mreq_r(offs_t offset)
@@ -147,7 +188,7 @@ uint8_t sv603_device::iorq_r(offs_t offset)
 		break;
 
 	case 0xe0:
-		data = m_joy[BIT(offset, 1)]->read();
+		data = (m_joy[BIT(offset, 1)]->read() & 0x7f) | (m_spinner_q[BIT(offset, 1)] << 7);
 		break;
 	}
 

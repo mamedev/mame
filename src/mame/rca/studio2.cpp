@@ -682,13 +682,15 @@ void studio2_state::studio2(machine_config &config)
 	m_maincpu->ef4_cb().set(FUNC(studio2_state::ef4_r));
 	m_maincpu->q_cb().set("sound_nl:q", FUNC(netlist_mame_logic_input_device::write));
 	m_maincpu->dma_wr_cb().set(m_vdc, FUNC(cdp1861_device::dma_w));
+	m_maincpu->sc_cb().set(m_vdc, FUNC(cdp1861_device::sc_w));
+	m_maincpu->tpa_cb().set(m_vdc, FUNC(cdp1861_device::tpa_w));
+	m_maincpu->int_cb().set(m_vdc, FUNC(cdp1861_device::int_r));
+	m_maincpu->dma_out_cb().set(m_vdc, FUNC(cdp1861_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_vdc, FUNC(cdp1861_device::efx_r));
 
 	/* video hardware */
 	SCREEN(config, m_screen);
 	CDP1861(config, m_vdc, 1760000).set_screen(m_screen);
-	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -713,15 +715,17 @@ void visicom_state::visicom(machine_config &config)
 	m_maincpu->ef4_cb().set(FUNC(visicom_state::ef4_r));
 	m_maincpu->q_cb().set(m_beeper, FUNC(beep_device::set_state));
 	m_maincpu->dma_wr_cb().set(FUNC(visicom_state::dma_w));
+	m_maincpu->sc_cb().set(m_vdc, FUNC(cdp1861_device::sc_w));
+	m_maincpu->tpa_cb().set(m_vdc, FUNC(cdp1861_device::tpa_w));
+	m_maincpu->int_cb().set(m_vdc, FUNC(cdp1861_device::int_r));
+	m_maincpu->dma_out_cb().set(m_vdc, FUNC(cdp1861_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_vdc, FUNC(cdp1861_device::efx_r));
 
 	/* video hardware */
 	SCREEN(config, m_screen);
 	m_screen->set_screen_update(FUNC(visicom_state::screen_update));
 
 	CDP1861(config, m_vdc, XTAL(3'579'545)/2).set_screen(m_screen);
-	m_vdc->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_vdc->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_vdc->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 
 	/* sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -745,6 +749,11 @@ void mpt02_state::mpt02(machine_config &config)
 	m_maincpu->ef4_cb().set(FUNC(mpt02_state::ef4_r));
 	m_maincpu->q_cb().set(m_beeper, FUNC(beep_device::set_state));
 	m_maincpu->dma_wr_cb().set(FUNC(mpt02_state::dma_w));
+	m_maincpu->sc_cb().set(m_cti, FUNC(cdp1864_device::sc_w));
+	m_maincpu->tpa_cb().set(m_cti, FUNC(cdp1864_device::tpa_w));
+	m_maincpu->int_cb().set(m_cti, FUNC(cdp1864_device::int_r));
+	m_maincpu->dma_out_cb().set(m_cti, FUNC(cdp1864_device::dma_out_r));
+	m_maincpu->ef1_cb().set(m_cti, FUNC(cdp1864_device::efx_r));
 
 	/* video/sound hardware */
 	SPEAKER(config, "mono").front_center();
@@ -753,9 +762,6 @@ void mpt02_state::mpt02(machine_config &config)
 	SCREEN(config, m_screen);
 	CDP1864(config, m_cti, 1.75_MHz_XTAL).set_screen(m_screen);
 	m_cti->inlace_cb().set_constant(0);
-	m_cti->int_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_INT);
-	m_cti->dma_out_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_DMAOUT);
-	m_cti->efx_cb().set_inputline(m_maincpu, COSMAC_INPUT_LINE_EF1);
 	m_cti->rdata_cb().set(FUNC(mpt02_state::rdata_r));
 	m_cti->bdata_cb().set(FUNC(mpt02_state::bdata_r));
 	m_cti->gdata_cb().set(FUNC(mpt02_state::gdata_r));

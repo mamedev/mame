@@ -68,6 +68,26 @@ tekram_dc820b_device::tekram_dc820b_device(const machine_config &mconfig, const 
 
 void tekram_eisa_scsi_device::device_start()
 {
+	set_isa_device();
+}
+
+void tekram_eisa_scsi_device::device_reset()
+{
+	remap(AS_PROGRAM, 0, 0xfffff);
+	remap(AS_IO, 0, 0xffff);
+}
+
+void tekram_eisa_scsi_device::remap(int space_id, offs_t start, offs_t end)
+{
+	// TODO: host mapping not known
+	if (space_id == AS_PROGRAM)
+	{
+		m_isa->install_rom(this, 0xdc000, 0xdffff, "bios");
+	}
+	else if (space_id == AS_IO)
+	{
+		//m_isa->install_device(????, ????, *this, &tekram_eisa_scsi_device::host_io);
+	}
 }
 
 u8 tekram_eisa_scsi_device::latch_status_r()

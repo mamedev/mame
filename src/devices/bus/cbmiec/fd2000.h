@@ -48,6 +48,7 @@ protected:
 	fd2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(8, 0x07); }
 	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides
@@ -70,6 +71,7 @@ protected:
 	required_device<upd765_family_device> m_fdc;
 	output_finder<3> m_leds;
 	required_ioport m_pb;
+	required_ioport m_address;
 
 private:
 	enum

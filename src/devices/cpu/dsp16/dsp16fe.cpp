@@ -11,6 +11,92 @@
 
 #include "cpu/drcfe.ipp"
 
+#include <iostream>
+#include <utility>
+
+
+/***********************************************************************
+    logging helpers
+***********************************************************************/
+
+void dsp16_device_base::opcode_desc::log_flags(std::ostream &stream) const
+{
+	// branches and branch targets
+	stream << (is_unconditional_branch() ? 'U' : is_conditional_branch() ? 'C' : '.');
+	stream << (intrablock_branch() ? 'i' : '.');
+	stream << (is_branch_target() ? 'B' : '.');
+
+	// modes
+	stream << (can_change_modes() ? 'M' : '.');
+
+	// memory access
+	stream << (reads_memory() ? (writes_memory() ? '+' : 'R') : writes_memory() ? 'W' : '.');
+
+	// TLB validation
+	stream << (validate_tlb() ? 'V' : '.');
+
+	// re-dispatch
+	stream << (redispatch() ? 'R' : '.');
+}
+
+void dsp16_device_base::opcode_desc::log_registers_used(std::ostream &stream) const
+{
+	stream << "[use:";
+	log_register_list(stream, regin, nullptr);
+	stream << ']';
+}
+
+void dsp16_device_base::opcode_desc::log_registers_modified(std::ostream &stream) const
+{
+	stream << "[mod:";
+	log_register_list(stream, regout, &regreq);
+	stream << ']';
+}
+
+void dsp16_device_base::opcode_desc::log_register_list(std::ostream &stream, regmask const &regs, regmask const *nostar)
+{
+	static constexpr std::pair<u8, char const *> REG_MAP[] = {
+			{ frontend::REG_BIT_XAAU_PT,  "pt"   },
+			{ frontend::REG_BIT_XAAU_PR,  "pr"   },
+			{ frontend::REG_BIT_XAAU_PI,  "pi"   },
+			{ frontend::REG_BIT_XAAU_I,   "i"    },
+			{ frontend::REG_BIT_YAAU_R0,  "r0"   },
+			{ frontend::REG_BIT_YAAU_R1,  "r1"   },
+			{ frontend::REG_BIT_YAAU_R2,  "r2"   },
+			{ frontend::REG_BIT_YAAU_R3,  "r3"   },
+			{ frontend::REG_BIT_YAAU_RB,  "rb"   },
+			{ frontend::REG_BIT_YAAU_RE,  "re"   },
+			{ frontend::REG_BIT_YAAU_J,   "j"    },
+			{ frontend::REG_BIT_YAAU_K,   "k"    },
+			{ frontend::REG_BIT_DAU_X,    "x"    },
+			{ frontend::REG_BIT_DAU_Y,    "y"    },
+			{ frontend::REG_BIT_DAU_P,    "p"    },
+			{ frontend::REG_BIT_DAU_A0,   "a0"   },
+			{ frontend::REG_BIT_DAU_A1,   "a1"   },
+			{ frontend::REG_BIT_DAU_C0,   "c0"   },
+			{ frontend::REG_BIT_DAU_C1,   "c1"   },
+			{ frontend::REG_BIT_DAU_C2,   "c2"   },
+			{ frontend::REG_BIT_DAU_AUC,  "auc"  },
+			{ frontend::REG_BIT_DAU_PSW,  "psw"  },
+			{ frontend::REG_BIT_SIO_SIOC, "sioc" },
+			{ frontend::REG_BIT_SIO_SRTA, "srta" },
+			{ frontend::REG_BIT_SIO_SDX,  "sdx"  },
+			{ frontend::REG_BIT_SIO_TDMS, "tdms" } };
+
+	bool first(true);
+	for (auto [bit, name] : REG_MAP)
+	{
+		if (regs[bit])
+		{
+			if (!first)
+				stream << ' ';
+			first = false;
+			stream << name;
+			if (nostar && !(*nostar)[bit])
+				stream << '*';
+		}
+	}
+}
 
 /***********************************************************************
     construction/destruction
@@ -44,6 +130,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 	desc.cycles = 1U;
 
 	u16 const op(m_host.m_pcache.read_word(desc.pc));
+	desc.opcode[0] = op;
 	switch (op >> 11)
 	{
 	case 0x00: // goto JA
@@ -110,6 +197,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 	case 0x0a: // R = N
 		desc.length = 2U;
 		desc.cycles = 2U;
+		desc.opcode[1] = read_imm(desc);
 		if (op & 0x000fU) // reserved field?
 			desc.set_invalid_opcode();
 		describe_r(desc, op, false, true);
@@ -130,6 +218,7 @@ bool dsp16_device_base::frontend::describe(opcode_desc &desc, opcode_desc const 
 		return true;
 
 	case 0x0e: // do K { instre1...instrNI } # redo K
+		desc.set_end_sequence();
 		if (op_ni(op))
 			return describe_do(desc, op);
 		else
@@ -288,6 +377,7 @@ bool dsp16_device_base::frontend::describe_if_con(opcode_desc &desc, u16 op)
 	case 0x11:
 		desc.cycles = 3U;
 		desc.length = 2U;
+		desc.opcode[1] = next;
 		switch (op_con(op))
 		{
 		case 0xe: // true
@@ -310,6 +400,7 @@ bool dsp16_device_base::frontend::describe_if_con(opcode_desc &desc, u16 op)
 	case 0x18: // goto B
 		desc.cycles = 3U;
 		desc.length = 2U;
+		desc.opcode[1] = next;
 		if (op_b(next) == 0x1)
 		switch (op_b(next))
 		{
@@ -419,6 +510,7 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 	for (u16 i = 0; i < ni; ++i)
 	{
 		u16 const next(read_op(desc, i + 1));
+		desc.cache[i] = next;
 		switch (next >> 11)
 		{
 		case 0x02: // R = M
@@ -430,142 +522,142 @@ bool dsp16_device_base::frontend::describe_do(opcode_desc &desc, u16 op)
 		case 0x04: // F1 ; Y = a1[l]
 		case 0x1c: // F1 ; Y = a0[l]
 			romcycles = cachecycles = 2U;
-			flag_input_reg(desc, BIT(op, 14) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_AUC);
-			describe_f1(desc, op);
-			describe_y(desc, op, false, true);
+			flag_input_reg(desc, BIT(next, 14) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_AUC);
+			describe_f1(desc, next);
+			describe_y(desc, next, false, true);
 			break;
 
 		case 0x05: // F1 ; Z : aT[l]
 			romcycles = cachecycles = 2U;
-			flag_input_reg(desc, op_d(op) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_AUC);
-			flag_output_reg(desc, op_d(op) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_PSW);
-			describe_f1(desc, op);
-			describe_z(desc, op);
+			flag_input_reg(desc, op_d(next) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_AUC);
+			flag_output_reg(desc, op_d(next) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_PSW);
+			describe_f1(desc, next);
+			describe_z(desc, next);
 			break;
 
 		case 0x06: // F1 ; Y
 			romcycles = cachecycles = 1U;
-			describe_f1(desc, op);
-			describe_y(desc, op, bool(m_host.machine().debug_flags & DEBUG_FLAG_ENABLED), false); // only read memory for watchpoints
+			describe_f1(desc, next);
+			describe_y(desc, next, bool(m_host.machine().debug_flags & DEBUG_FLAG_ENABLED), false); // only read memory for watchpoints
 			break;
 
 		case 0x07: // F1 ; aT[l] = Y
 			romcycles = cachecycles = 1U;
-			flag_output_reg(desc, op_d(op) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_PSW);
-			describe_f1(desc, op);
-			describe_y(desc, op, true, false);
+			flag_output_reg(desc, op_d(next) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_PSW);
+			describe_f1(desc, next);
+			describe_y(desc, next, true, false);
 			break;
 
 		case 0x08: // aT = R
 			romcycles = cachecycles = 2U;
-			if (op & 0x000fU) // reserved field?
+			if (next & 0x000fU) // reserved field?
 				desc.set_invalid_opcode();
-			flag_output_reg(desc, op_d(op) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_PSW);
-			describe_r(desc, op, true, false);
+			flag_output_reg(desc, op_d(next) ? REG_BIT_DAU_A0 : REG_BIT_DAU_A1, REG_BIT_DAU_PSW);
+			describe_r(desc, next, true, false);
 			break;
 
 		case 0x09: // R = a0
 		case 0x0b: // R = a1
 			romcycles = cachecycles = 2U;
-			if (op & 0x000fU) // reserved field?
+			if (next & 0x000fU) // reserved field?
 				desc.set_invalid_opcode();
-			flag_input_reg(desc, BIT(op, 12) ? REG_BIT_DAU_A1 : REG_BIT_DAU_A0, REG_BIT_DAU_AUC);
-			describe_r(desc, op, false, true);
+			flag_input_reg(desc, BIT(next, 12) ? REG_BIT_DAU_A1 : REG_BIT_DAU_A0, REG_BIT_DAU_AUC);
+			describe_r(desc, next, false, true);
 			break;
 
 		case 0x0c: // Y = R
 			romcycles = cachecycles = 2U;
-			if (op & 0x0400U) // reserved field?
+			if (next & 0x0400U) // reserved field?
 				desc.set_invalid_opcode();
-			describe_r(desc, op, true, false);
-			describe_y(desc, op, false, true);
+			describe_r(desc, next, true, false);
+			describe_y(desc, next, false, true);
 			break;
 
 		case 0x0d: // Z : R
 			romcycles = cachecycles = 2U;
-			describe_r(desc, op, true, true);
-			describe_z(desc, op);
+			describe_r(desc, next, true, true);
+			describe_z(desc, next);
 			break;
 
 		case 0x0f: // R = Y
 			romcycles = cachecycles = 2U;
-			if (op & 0x0400U) // reserved field?
+			if (next & 0x0400U) // reserved field?
 				desc.set_invalid_opcode();
-			describe_r(desc, op, false, true);
-			describe_y(desc, op, true, false);
+			describe_r(desc, next, false, true);
+			describe_y(desc, next, true, false);
 			break;
 
 		case 0x12: // ifc CON F2
 			romcycles = cachecycles = 1U;
 			flag_input_reg(desc, REG_BIT_DAU_C1);
 			flag_output_reg(desc, REG_BIT_DAU_C1, REG_BIT_DAU_C2);
-			describe_con(desc, op, false);
-			describe_f2(desc, op);
+			describe_con(desc, next, false);
+			describe_f2(desc, next);
 			break;
 
 		case 0x13: // if CON F2
 			romcycles = cachecycles = 1U;
-			describe_con(desc, op, true);
-			describe_f2(desc, op);
+			describe_con(desc, next, true);
+			describe_f2(desc, next);
 			break;
 
 		case 0x14: // F1 ; Y = y[l]
 			romcycles = cachecycles = 2U;
 			flag_input_reg(desc, REG_BIT_DAU_Y);
-			describe_f1(desc, op);
-			describe_y(desc, op, false, true);
+			describe_f1(desc, next);
+			describe_y(desc, next, false, true);
 			break;
 
 		case 0x15: // F1 ; Z : y[l]
 			romcycles = cachecycles = 2U;
 			flag_input_reg(desc, REG_BIT_DAU_Y);
 			flag_output_reg(desc, REG_BIT_DAU_Y);
-			describe_f1(desc, op);
-			describe_z(desc, op);
+			describe_f1(desc, next);
+			describe_z(desc, next);
 			break;
 
 		case 0x16: // F1 ; x = Y
 			romcycles = cachecycles = 1U;
 			flag_output_reg(desc, REG_BIT_DAU_X);
-			describe_f1(desc, op);
-			describe_y(desc, op, true, false);
+			describe_f1(desc, next);
+			describe_y(desc, next, true, false);
 			break;
 
 		case 0x17: // F1 ; y[l] = Y
 			romcycles = cachecycles = 1U;
 			flag_output_reg(desc, REG_BIT_DAU_Y);
-			describe_f1(desc, op);
-			describe_y(desc, op, true, false);
+			describe_f1(desc, next);
+			describe_y(desc, next, true, false);
 			break;
 
 		case 0x19: // F1 ; y = a0 ; x = *pt++[i]
 		case 0x1b: // F1 ; y = a1 ; x = *pt++[i]
 			romcycles = 2U;
 			cachecycles = 1U;
-			if (op & 0x000fU)
+			if (next & 0x000fU)
 				desc.set_invalid_opcode();
-			flag_input_reg(desc, BIT(op, 12) ? REG_BIT_DAU_A1 : REG_BIT_DAU_A0, REG_BIT_DAU_AUC);
+			flag_input_reg(desc, BIT(next, 12) ? REG_BIT_DAU_A1 : REG_BIT_DAU_A0, REG_BIT_DAU_AUC);
 			flag_output_reg(desc, REG_BIT_DAU_Y);
-			describe_f1(desc, op);
-			describe_x(desc, op);
+			describe_f1(desc, next);
+			describe_x(desc, next);
 			break;
 
 		case 0x1d: // F1 ; Z : y ; x = *pt++[i]
 			romcycles = cachecycles = 2U;
 			flag_input_reg(desc, REG_BIT_DAU_Y);
 			flag_output_reg(desc, REG_BIT_DAU_Y);
-			describe_f1(desc, op);
-			describe_x(desc, op);
-			describe_z(desc, op);
+			describe_f1(desc, next);
+			describe_x(desc, next);
+			describe_z(desc, next);
 			break;
 
 		case 0x1f: // F1 ; y = Y ; x = *pt++[i]
 			romcycles = 2U;
 			cachecycles = 1U;
 			flag_output_reg(desc, REG_BIT_DAU_Y);
-			describe_f1(desc, op);
-			describe_x(desc, op);
-			describe_y(desc, op, true, false);
+			describe_f1(desc, next);
+			describe_x(desc, next);
+			describe_y(desc, next, true, false);
 			break;
 
 		case 0x00: // goto JA

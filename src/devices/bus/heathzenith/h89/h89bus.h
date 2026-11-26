@@ -84,7 +84,6 @@
 
 #pragma once
 
-#include "emu.h"
 #include <functional>
 #include <utility>
 #include <vector>
@@ -95,8 +94,8 @@
 
 namespace h89bus
 {
-	typedef std::pair<u8, u8> addr_range;
-	typedef std::vector<addr_range> addr_ranges;
+	using addr_range = std::pair<u8, u8>;
+	using addr_ranges = std::vector<addr_range>;
 
 	enum io_select_lines : u8
 	{
@@ -126,27 +125,83 @@ namespace h89bus
 		MEM_RD6 = 0x02,
 		MEM_RD7 = 0x04,
 	};
+
+	// outputs of the primary memory decoder PROM (U517), as returned by
+	// heath_mem_decoder_socket::decode() (a selected line reads as 1)
+	enum mem_pri_lines : u8
+	{
+		// select the secondary decoder (U516) for the devices in the lower 8K
+		MEM_PRI_U516  = 0x01,
+		// no memory at this address
+		MEM_PRI_NOMEM = 0x02,
+		// the MMS 77318 control board sends D1 to its RAM board as CTL instead (see
+		// device_heath_mem_decoder_interface::card_ctl_line())
+		MEM_PRI_CTL   = 0x02,
+		// 16K RAM banks on the CPU board
+		MEM_PRI_RAS0  = 0x04,
+		MEM_PRI_RAS1  = 0x08,
+		MEM_PRI_RAS2  = 0x10,
+		// select lines on the left slots, RD6 is the 16K expansion memory
+		MEM_PRI_RD6   = 0x20,
+		MEM_PRI_RD7   = 0x40,
+		// write enable
+		MEM_PRI_WE    = 0x80,
+	};
+
+	// outputs of the secondary memory decoder PROM (U516), as returned by
+	// heath_mem_decoder_socket::decode() (a selected line reads as 1)
+	enum mem_sec_lines : u8
+	{
+		// system ROM socket (U518)
+		MEM_SEC_SYS_ROM = 0x01,
+		// option ROM socket (U519)
+		MEM_SEC_OPT_ROM = 0x02,
+		// option RAM sockets
+		MEM_SEC_OPT_RAM = 0x04,
+		// 1K floppy RAM
+		MEM_SEC_FPY_RAM = 0x08,
+		// floppy ROM socket (U520)
+		MEM_SEC_FPY_ROM = 0x10,
+		// write enable for the floppy RAM
+		MEM_SEC_WE      = 0x80,
+	};
+
+	// lines latched by the general purpose port (port 0xf2), as bit masks
+	enum gpp_lines : u8
+	{
+		// single-step interrupt enable, used on the CPU board
+		GPP_SINGLE_STEP = 0x01,
+		// 2 mSec interrupt enable, used on the CPU board
+		GPP_TIMER_INTR  = 0x02,
+		// RSVD0/1: not used on the original Heath CPU board and not on the bus connectors, reach a
+		// card only through a CPU board modification
+		GPP_RSVD0       = 0x04,
+		GPP_RSVD1       = 0x08,
+		// MEM0/1: memory expansion connector (left slots)
+		GPP_MEM0        = 0x10,
+		// selects the ORG-0 (CP/M) memory map on the CPU board
+		GPP_MEM1        = 0x20,
+		// IO0/1: I/O expansion connector (right slots)
+		GPP_IO0         = 0x40,
+		GPP_IO1         = 0x80,
+	};
 }
 
 
 class h89bus_device;
+class h89bus_cpu_board_mod_slot_device;
 
-// ======================> device_h89bus_card_interface
+// ======================> device_h89bus_interface
 
-// class representing interface-specific live H-89/Z-89 bus card
-class device_h89bus_card_interface : public device_interface
+// base class for devices attached to the H-89/Z-89 bus
+class device_h89bus_interface : public device_interface
 {
-	friend class h89bus_device;
-
 public:
-	// construction/destruction
-	virtual ~device_h89bus_card_interface();
-
 	// inline configuration
 	void set_h89bus_tag(h89bus_device *h89bus, const char *slottag) { m_h89bus = h89bus; m_h89bus_slottag = slottag; }
 
 protected:
-	device_h89bus_card_interface(const machine_config &mconfig, device_t &device);
+	device_h89bus_interface(const machine_config &mconfig, device_t &device);
 	virtual void interface_pre_start() override;
 
 	h89bus_device &h89bus() { assert(m_h89bus); return *m_h89bus; }
@@ -157,17 +212,48 @@ private:
 	h89bus_device *m_h89bus;
 };
 
+// ======================> device_h89bus_card_interface
+
+// class representing interface-specific live H-89/Z-89 bus card
+class device_h89bus_card_interface : public device_h89bus_interface
+{
+public:
+	// construction/destruction
+	virtual ~device_h89bus_card_interface();
+
+	// called when the bus clock changes, such as by a CPU speed board
+	virtual void bus_clock_changed(u32 clock);
+
+protected:
+	device_h89bus_card_interface(const machine_config &mconfig, device_t &device);
+};
+
 class device_h89bus_left_card_interface : public device_h89bus_card_interface
 {
 public:
 	// construction/destruction
 	virtual ~device_h89bus_left_card_interface();
 
-	int get_mem0();
-	int get_mem1();
+	// primary memory decoder select lines the card answers (h89bus::MEM_PRI_RD6, MEM_PRI_RD7)
+	virtual u8 mem_select_lines() const ATTR_COLD;
+
+	// memory the card puts at addr when the primary memory decoder selects select_lines (RD6,
+	// RD7, and MEM_PRI_CTL when the decoder drives it): the byte at addr, which is valid for
+	// the 1K page that holds it, or nullptr; the bus asks while it builds the memory map at
+	// machine start
+	virtual u8 *mem_select(u8 select_lines, offs_t addr) ATTR_COLD;
+
+	// a 4K system ROM on the card that can stand in for the one on the CPU board (U518),
+	// or nullptr; the bus asks while it builds the memory map at machine start, and only
+	// the first card that has one gets it
+	virtual u8 *sys_rom() ATTR_COLD;
 
 protected:
 	device_h89bus_left_card_interface(const machine_config &mconfig, device_t &device);
+
+	// read the system ROM from the card (true) or from the CPU board (false); the memory map
+	// is built at machine start, so call from device_reset or later
+	void select_card_sys_rom(bool state);
 };
 
 class device_h89bus_right_card_interface : public device_h89bus_card_interface
@@ -183,8 +269,6 @@ public:
 	void set_slot_int5(int state);
 	void set_slot_fmwe(int state);
 	void set_slot_wait(int state);
-	int get_io0();
-	int get_io1();
 
 	void set_p506_signalling(bool val)
 	{
@@ -194,6 +278,28 @@ public:
 protected:
 	device_h89bus_right_card_interface(const machine_config &mconfig, device_t &device);
 	bool m_p506_signals;
+};
+
+// ======================> device_h89bus_cpu_board_mod_interface
+
+// class representing a modification to the CPU board, such as a speed upgrade
+class device_h89bus_cpu_board_mod_interface : public device_h89bus_interface
+{
+	friend class h89bus_cpu_board_mod_slot_device;
+
+public:
+	// construction/destruction
+	virtual ~device_h89bus_cpu_board_mod_interface();
+
+protected:
+	device_h89bus_cpu_board_mod_interface(const machine_config &mconfig, device_t &device);
+
+	// frequencies, in Hz, for the CPU and for the 2 MHz clock line on the bus
+	void set_cpu_clock(u32 clock);
+	void set_bus_clock(u32 clock);
+
+private:
+	h89bus_cpu_board_mod_slot_device *m_slot;
 };
 
 class h89bus_left_slot_device : public device_t, public device_single_card_slot_interface<device_h89bus_left_card_interface>
@@ -276,6 +382,53 @@ protected:
 // device type declaration
 DECLARE_DEVICE_TYPE(H89BUS_RIGHT_SLOT, h89bus_right_slot_device)
 
+class h89bus_cpu_board_mod_slot_device : public device_t, public device_single_card_slot_interface<device_h89bus_cpu_board_mod_interface>
+{
+	// only the modification installed in this slot can change the CPU clock
+	friend class device_h89bus_cpu_board_mod_interface;
+
+public:
+	// construction/destruction
+	template <typename T, typename U>
+	h89bus_cpu_board_mod_slot_device(const machine_config &mconfig, T &&tag, device_t *owner, const char *sltag, U &&opts, const char *dflt)
+		: h89bus_cpu_board_mod_slot_device(mconfig, tag, owner, u32(0))
+	{
+		set_options(std::forward<U>(opts), dflt, false);
+		set_h89bus_slot(std::forward<T>(sltag), tag);
+	}
+
+	h89bus_cpu_board_mod_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// inline configuration
+	template <typename T>
+	void set_h89bus_slot(T &&tag, const char *slottag)
+	{
+		m_h89bus.set_tag(std::forward<T>(tag));
+		m_h89bus_slottag = slottag;
+	}
+
+	// CPU clock frequency in Hz, set by the installed modification
+	auto out_cpu_clock_callback() { return m_out_cpu_clock_cb.bind(); }
+
+protected:
+	h89bus_cpu_board_mod_slot_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
+	// device_t implementation
+	virtual void device_resolve_objects() override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+
+	// configuration
+	required_device<h89bus_device> m_h89bus;
+	const char *m_h89bus_slottag;
+
+private:
+	void set_cpu_clock(u32 clock) { m_out_cpu_clock_cb(clock); }
+
+	devcb_write32 m_out_cpu_clock_cb;
+};
+
+// device type declaration
+DECLARE_DEVICE_TYPE(H89BUS_CPU_BOARD_MOD_SLOT, h89bus_cpu_board_mod_slot_device)
 
 class device_heath_io_decoder_interface : public device_interface
 {
@@ -377,6 +530,78 @@ protected:
 DECLARE_DEVICE_TYPE(H89BUS_IO_DECODER_SOCKET,  heath_io_decoder_socket)
 
 
+// ======================> memory decoder PROMs on the CPU board
+
+// primary (U517) or secondary (U516) memory decoder PROM
+class device_heath_mem_decoder_interface : public device_interface
+{
+public:
+	// PROM output for the given inputs, inverted so a selected line reads as 1
+	virtual u8 decode(offs_t inputs) const ATTR_COLD = 0;
+
+	// primary decoders: the memory maps that can be selected while running, the PROM inputs
+	// that select each one with the CPU board's memory size jumpers (the bus adds A4 - A0:
+	// BRD L, BRFSH L and A15 - A13), and the map selected by a write to the general purpose
+	// port; the Heath PROMs have two, selected by MEM 1 (ORG-0)
+	virtual u32 map_count() const ATTR_COLD;
+	virtual offs_t map_inputs(u32 map, u8 jumpers) const ATTR_COLD;
+	virtual u32 select_map(u8 gpp);
+
+	// general purpose port lines (h89bus::gpp_lines) that select_map() uses
+	virtual u8 map_gpp_lines() const ATTR_COLD;
+
+	// a PROM output that goes to the left slot cards instead of the CPU board
+	// (h89bus::MEM_PRI_CTL), or 0
+	virtual u8 card_ctl_line() const ATTR_COLD;
+
+protected:
+	device_heath_mem_decoder_interface(const machine_config &mconfig, device_t &device);
+};
+
+// primary decoders (U517)
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_444_42, device_heath_mem_decoder_interface)
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_444_66, device_heath_mem_decoder_interface)
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_MMS_77318, device_heath_mem_decoder_interface)
+
+// secondary decoders (U516)
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_444_41, device_heath_mem_decoder_interface)
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_444_83, device_heath_mem_decoder_interface)
+
+
+class heath_mem_decoder_socket : public device_t,
+								public device_single_card_slot_interface<device_heath_mem_decoder_interface>
+{
+public:
+	template <typename T>
+	heath_mem_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false) :
+		heath_mem_decoder_socket(mconfig, tag, owner, 0)
+	{
+		set_options(std::forward<T>(opts), dflt, fixed);
+	}
+
+	heath_mem_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+	// PROM output for the given inputs, nothing is selected with an empty socket
+	u8 decode(offs_t inputs) const ATTR_COLD { return m_decoder ? m_decoder->decode(inputs) : 0; }
+
+	u32 map_count() const ATTR_COLD { return m_decoder ? m_decoder->map_count() : 1; }
+	offs_t map_inputs(u32 map, u8 jumpers) const ATTR_COLD { return m_decoder ? m_decoder->map_inputs(map, jumpers) : 0; }
+	u8 map_gpp_lines() const ATTR_COLD { return m_decoder ? m_decoder->map_gpp_lines() : 0; }
+	u8 card_ctl_line() const ATTR_COLD { return m_decoder ? m_decoder->card_ctl_line() : 0; }
+	u32 select_map(u8 gpp) { return m_decoder ? m_decoder->select_map(gpp) : 0; }
+
+protected:
+	// device_t implementation
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	device_heath_mem_decoder_interface *m_decoder;
+};
+
+// device type declaration
+DECLARE_DEVICE_TYPE(H89BUS_MEM_DECODER_SOCKET, heath_mem_decoder_socket)
+
+
 // ======================> h89bus_device
 class h89bus_device : public device_t
 {
@@ -387,21 +612,32 @@ class h89bus_device : public device_t
 
 public:
 	// construction/destruction
-	h89bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	h89bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~h89bus_device();
 
 	void install_io_device(offs_t start, offs_t end, read8sm_delegate rhandler, write8sm_delegate whandler) ATTR_COLD;
 	void install_io_device(offs_t start, offs_t end, read8smo_delegate rhandler, write8smo_delegate whandler) ATTR_COLD;
+	void install_io_device(offs_t start, offs_t end, write8smo_delegate whandler) ATTR_COLD;
 	h89bus::addr_ranges get_address_ranges(u8 select_bits, bool p506_signals = false) ATTR_COLD;
 
-	void set_io0(int state);
-	void set_io1(int state);
-	void set_mem0(int state);
-	void set_mem1(int state);
-	int get_io0();
-	int get_io1();
-	int get_mem0();
-	int get_mem1();
+	// general purpose port (port 0xf2) latch; its lines (h89bus::gpp_lines) are pushed only to
+	// the devices that add a handler for them
+	// - add handlers before the first reset; each call adds another handler
+	// - a handler is called once per port write in which any line in its mask changed, with
+	//   the whole port value, so lines that change together are seen together
+	// - the latch is cleared on reset and every handler is called with 0, so devices can take
+	//   their reset state for these lines from their handlers
+	void gpp_w(u8 data);
+	void add_gpp_handler(u8 mask, write8smo_delegate handler) ATTR_COLD { m_gpp_handlers.emplace_back(mask, std::move(handler)); }
+
+	// map the CPU board memory into the program space, as selected by the
+	// memory decoder PROMs; call from machine_start
+	// - ram: RAM banks in 16K steps (RAS0 - RAS2, then RD6 for a 64K board, which has the
+	//   16K expansion piggybacked on it); cards in the left slots can also answer RD6/RD7
+	// - rom: the lower 8K, with the system ROM at 0x0000 and the floppy ROM at 0x1800; a
+	//   card in a left slot can put its own system ROM in place of the CPU board's
+	// - floppy_ram: the 1K floppy RAM
+	void install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *floppy_ram) ATTR_COLD;
 
 	// inline configuration
 	template <typename T> void set_program_space(T &&tag, int spacenum) { m_program_space.set_tag(std::forward<T>(tag), spacenum); }
@@ -409,7 +645,6 @@ public:
 	auto out_int3_callback() { return m_out_int3_cb.bind(); }
 	auto out_int4_callback() { return m_out_int4_cb.bind(); }
 	auto out_int5_callback() { return m_out_int5_cb.bind(); }
-	auto out_fmwe_callback() { return m_out_fmwe_cb.bind(); }
 	auto out_wait_callback() { return m_out_wait_cb.bind(); }
 
 protected:
@@ -417,6 +652,9 @@ protected:
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_reset_after_children() override ATTR_COLD;
+	virtual void device_clock_changed() override;
 
 	// bus-internal handlers
 	void add_h89bus_left_card(device_h89bus_left_card_interface &card);
@@ -426,39 +664,52 @@ protected:
 	void set_int5_line(int state);
 	void set_fmwe_line(int state);
 	void set_wait_line(int state);
+	void select_card_sys_rom(device_h89bus_left_card_interface &card, bool state);
 
 	// internal state
 	required_address_space m_program_space, m_io_space;
 	required_device<heath_io_decoder_socket> m_io_decoder_socket;
-
-	int m_io0, m_io1, m_mem0, m_mem1;
+	required_device<heath_mem_decoder_socket> m_pri_mem_decoder;
+	required_device<heath_mem_decoder_socket> m_sec_mem_decoder;
 
 private:
+	// CPU board memory passed to install_mem_map(), only used while the memory map is built
+	struct cpu_board_mem
+	{
+		u8 *ram;
+		offs_t ram_size;
+		u8 *rom;
+		u8 *floppy_ram;
+	};
+
+	static u8 *cpu_ram_bank(cpu_board_mem const &mem, u8 select_line) ATTR_COLD;
+	std::vector<u8 *> select_line_targets(cpu_board_mem const &mem, u8 pri, offs_t addr) const ATTR_COLD;
+	void install_mem_view_entry(cpu_board_mem const &mem, memory_view::memory_view_entry &entry, u32 map, bool fmwe, u8 jumpers) ATTR_COLD;
+	void update_mem_view();
+
 	devcb_write_line m_out_int3_cb, m_out_int4_cb, m_out_int5_cb;
-	devcb_write_line m_out_fmwe_cb, m_out_wait_cb;
+	devcb_write_line m_out_wait_cb;
+
+	// memory map, one view entry for each combination of the primary decoder's map and FMWE
+	memory_view m_mem_view;
+	bool m_mem_installed;
+	u32 m_mem_map;
+	bool m_fmwe;
+
+	// system ROM, entry 0 is the CPU board's and entry 1 the card's
+	memory_bank_creator m_sys_rom_bank;
+	device_h89bus_left_card_interface *m_sys_rom_card;
+
+	u8 m_gpp;
+	std::vector<std::pair<u8, write8smo_delegate>> m_gpp_handlers;
 
 	std::vector<std::reference_wrapper<device_h89bus_left_card_interface>> m_left_device_list;
 	std::vector<std::reference_wrapper<device_h89bus_right_card_interface>> m_right_device_list;
 };
 
-inline int device_h89bus_left_card_interface::get_mem0()
+inline void device_h89bus_left_card_interface::select_card_sys_rom(bool state)
 {
-	return h89bus().get_mem0();
-}
-
-inline int device_h89bus_left_card_interface::get_mem1()
-{
-	return h89bus().get_mem1();
-}
-
-inline int device_h89bus_right_card_interface::get_io0()
-{
-	return h89bus().get_io0();
-}
-
-inline int device_h89bus_right_card_interface::get_io1()
-{
-	return h89bus().get_io1();
+	h89bus().select_card_sys_rom(*this, state);
 }
 
 inline void device_h89bus_right_card_interface::set_slot_int3(int state)
@@ -487,6 +738,17 @@ inline void device_h89bus_right_card_interface::set_slot_fmwe(int state)
 inline void device_h89bus_right_card_interface::set_slot_wait(int state)
 {
 	h89bus().set_wait_line(state);
+}
+
+inline void device_h89bus_cpu_board_mod_interface::set_cpu_clock(u32 clock)
+{
+	assert(m_slot);
+	m_slot->set_cpu_clock(clock);
+}
+
+inline void device_h89bus_cpu_board_mod_interface::set_bus_clock(u32 clock)
+{
+	h89bus().set_clock(clock);
 }
 
 // device type declaration

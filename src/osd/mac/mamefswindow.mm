@@ -10,6 +10,11 @@
 
 #import "mamefswindow.h"
 
+// in the macOS 27 runtime, but not yet in the SDK headers
+@interface NSWindow (MAMEDirectTouch)
+- (void)setDisablesDirectTouchSystemGestures:(BOOL)disables;
+@end
+
 @implementation MAMEFSWindow
 
 -(instancetype)initWithScreen:(NSScreen *)screen
@@ -32,6 +37,12 @@
 	[self setHidesOnDeactivate:YES];
 	[self setReleasedWhenClosed:NO];
 	[self setCollectionBehavior:NSWindowCollectionBehaviorCanJoinAllSpaces | NSWindowCollectionBehaviorFullScreenAuxiliary];
+
+	// touch layouts fill the screen, so keep system gestures from taking their touches
+	if ([self respondsToSelector:@selector(setDisablesDirectTouchSystemGestures:)])
+	{
+		[self setDisablesDirectTouchSystemGestures:YES];
+	}
 
 	return self;
 }

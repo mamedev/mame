@@ -154,15 +154,8 @@ void hyperstone_device::generate_set_global_register_high(drcuml_block &block, c
 		}
 		break;
 	case TCR_REGISTER:  // G22 Timer Compare Register
-		{
-			uml::code_label const done = compiler.next_label();
-			UML_MOV(block, I6, mem(&m_core->global_regs[dst_code]));
-			UML_CMP(block, I6, src);
-			UML_JMPc(block, uml::COND_E, done);
-			UML_MOV(block, mem(&m_core->global_regs[dst_code]), src);
-			UML_CALLC(block, &c_funcs::adjust_timer_interrupt, this);
-			UML_LABEL(block, done);
-		}
+		UML_MOV(block, mem(&m_core->global_regs[dst_code]), src);
+		UML_CALLC(block, &c_funcs::adjust_timer_interrupt, this);
 		break;
 	case TR_REGISTER:   // G23 Timer Register
 		UML_MOV(block, mem(&m_core->global_regs[dst_code]), src);
@@ -175,14 +168,14 @@ void hyperstone_device::generate_set_global_register_high(drcuml_block &block, c
 		break;
 	case FCR_REGISTER:  // G26 Function Control Register
 		{
+			// adjust timer if timer interrupt mask bit changed
 			uml::code_label const skip_adjust_timer = compiler.next_label();
-			UML_MOV(block, I6, mem(&m_core->global_regs[dst_code]));
-			UML_XOR(block, I6, I6, src);
-			UML_TEST(block, I6, 0x80000000);
+			UML_XOR(block, I6, mem(&m_core->global_regs[dst_code]), src);
+			UML_MOV(block, mem(&m_core->global_regs[dst_code]), src);
+			UML_TEST(block, I6, 0x00800000);
 			UML_JMPc(block, uml::COND_Z, skip_adjust_timer);
 			UML_CALLC(block, &c_funcs::adjust_timer_interrupt, this);
 			UML_LABEL(block, skip_adjust_timer);
-			UML_MOV(block, mem(&m_core->global_regs[dst_code]), src);
 		}
 		break;
 	case MCR_REGISTER:  // G27 Memory Control Register

@@ -9,11 +9,18 @@
 
 #include "speaker.h"
 
+#define VERBOSE (LOG_GENERAL)
+//#define LOG_OUTPUT_FUNC osd_printf_info
+
+#include "logmacro.h"
+
 
 DEFINE_DEVICE_TYPE(AD1848, ad1848_device, "ad1848", "AD1848 16-bit SoundPort Stereo Codec")
 
 ad1848_device::ad1848_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, AD1848, tag, owner, clock),
+	device_memory_interface( mconfig, *this ),
+	m_space_io_config("indirect_io", ENDIANNESS_LITTLE, 8, 4, 0, address_map_constructor(FUNC(ad1848_device::io_map), this)),
 	m_irq_cb(*this),
 	m_drq_cb(*this),
 	m_ldac(*this, "ldac"),
@@ -58,6 +65,73 @@ void ad1848_device::device_reset()
 	m_irq = false;
 }
 
+device_memory_interface::space_config_vector ad1848_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(0, &m_space_io_config)
+	};
+}
+
+void ad1848_device::io_map(address_map &map)
+{
+	// TODO: split up into individual handlers
+	map(0x00, 0x0f).rw(FUNC(ad1848_device::ixa_r), FUNC(ad1848_device::ixa_w));
+}
+
+uint8_t ad1848_device::ixa_r(offs_t offset)
+{
+	if (!machine().side_effects_disabled())
+		LOG("IXA%d: read\n", offset);
+	// WSSXLAT fails if it doesn't find a suitable identifer
+	if (offset == 12)
+		return 0x0a;
+	return m_regs.idx[offset];
+}
+
+void ad1848_device::ixa_w(offs_t offset, uint8_t data)
+{
+	// TODO: register #12 is r/o on regular AD1848K, but actually r/w on spinoffs
+	if (offset == 12)
+	{
+		LOG("Warning: IXA12 misc register write %02x\n", data);
+		return;
+	}
+	LOG("IXA%d: %02x\n", offset, data);
+	m_regs.idx[m_addr] = data;
+	switch(m_addr)
+	{
+		case 8:
+			if(!m_mce)
+				return;
+			m_regs.dform &= 0x7f;
+			break;
+		case 9:
+		{
+			static constexpr int div_factor[] = {3072, 1536, 896, 768, 448, 384, 512, 2560};
+
+			// auto-calibration
+			if (m_mce && BIT(data, 3))
+			{
+				logerror("set auto-calibration\n");
+				m_regs.init |= 0x20;
+				m_calibration_cycles = 384;
+			}
+
+			m_play = (data & 1) ? true : false;
+			// FIXME: provide external configuration for XTAL1 (24.576 MHz) and XTAL2 (16.9344 MHz) inputs
+			attotime rate = (m_play || BIT(m_regs.init, 5)) ? attotime::from_hz(((m_regs.dform & 1) ? 16.9344_MHz_XTAL : 24.576_MHz_XTAL)
+					/ div_factor[(m_regs.dform >> 1) & 7]) : attotime::never;
+			m_timer->adjust(rate, 0 , rate);
+			m_drq_cb(m_play ? ASSERT_LINE : CLEAR_LINE);
+			break;
+		}
+		case 14:
+		case 15:
+			m_count = (m_regs.ubase << 8) | m_regs.lbase;
+			break;
+	}
+}
+
 uint8_t ad1848_device::read(offs_t offset)
 {
 	switch(offset)
@@ -65,7 +139,7 @@ uint8_t ad1848_device::read(offs_t offset)
 		case 0:
 			return m_addr | (m_mce ? 0x40 : 0) | (m_trd ? 0x20 : 0);
 		case 1:
-			return m_regs.idx[m_addr];
+			return space(0).read_byte(m_addr);
 		case 2:
 			return m_stat | (m_irq ? 1 : 0);
 		case 3:
@@ -76,7 +150,6 @@ uint8_t ad1848_device::read(offs_t offset)
 
 void ad1848_device::write(offs_t offset, uint8_t data)
 {
-	static constexpr int div_factor[] = {3072, 1536, 896, 768, 448, 384, 512, 2560};
 	switch(offset)
 	{
 		case 0:
@@ -85,38 +158,7 @@ void ad1848_device::write(offs_t offset, uint8_t data)
 			m_trd = data & 0x20 ? true : false;
 			break;
 		case 1:
-			if(m_addr == 12)
-				return;
-			m_regs.idx[m_addr] = data;
-			switch(m_addr)
-			{
-				case 8:
-					if(!m_mce)
-						return;
-					m_regs.dform &= 0x7f;
-					break;
-				case 9:
-				{
-					// auto-calibration
-					if (m_mce && BIT(data, 3))
-					{
-						logerror("set auto-calibration\n");
-						m_regs.init |= 0x20;
-						m_calibration_cycles = 384;
-					}
-
-					m_play = (data & 1) ? true : false;
-					// FIXME: provide external configuration for XTAL1 (24.576 MHz) and XTAL2 (16.9344 MHz) inputs
-					attotime rate = (m_play || BIT(m_regs.init, 5)) ? attotime::from_hz(((m_regs.dform & 1) ? 16.9344_MHz_XTAL : 24.576_MHz_XTAL)
-							/ div_factor[(m_regs.dform >> 1) & 7]) : attotime::never;
-					m_timer->adjust(rate, 0 , rate);
-					m_drq_cb(m_play ? ASSERT_LINE : CLEAR_LINE);
-					break;
-				}
-				case 14:
-					m_count = (m_regs.ubase << 8) | m_regs.lbase;
-					break;
-			}
+			space(0).write_byte(m_addr, data);
 			break;
 		case 2:
 			m_irq_cb(CLEAR_LINE);

@@ -911,7 +911,7 @@ ROM_START( vgoalsoc )
 	ROM_LOAD( "c16_u65.u65",  0x000000, 0x040000, CRC(2f7bf23c) SHA1(1a1a06f57bbac59807679e3762cb2f23ab1ad35e) )
 
 	ROM_REGION( 0x20000, "mcu", 0 )
-	ROM_LOAD( "vgoalsoc_hd6473258p10", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD( "vgoalsoc_hd6473258p10", 0x00000, 0x20000, NO_DUMP ) // read-protected
 
 	ROM_REGION( 0x20000, "fix_tiles", 0 ) // score
 	ROM_LOAD( "c16_u48.u48",  0x000000, 0x020000, CRC(ca059e7f) SHA1(2fa48b0fec1210575f3a1ecee7d2aec0af3fa9c4) )
@@ -976,7 +976,7 @@ ROM_START( twcup94 )
 	ROM_LOAD( "12.u65", 0x000000, 0x040000, CRC(f316e7fc) SHA1(a2215605518e7293774735371c65abcead99bd88) )
 
 	ROM_REGION( 0x20000, "mcu", 0 )
-	ROM_LOAD( "twcup94_hd6473258p10", 0x00000, 0x20000, NO_DUMP )
+	ROM_LOAD( "twcup94_hd6473258p10", 0x00000, 0x20000, NO_DUMP ) // read-protected
 
 	ROM_REGION( 0x20000, "fix_tiles", 0 )
 	ROM_LOAD( "11.u48", 0x000000, 0x020000, CRC(37d6dcb6) SHA1(679dd8b615497fff23c4638d413b5d4a724d3f2a) )

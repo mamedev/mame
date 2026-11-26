@@ -5,8 +5,7 @@ license:CC0-1.0
 -->
 <softwarelist name="vis" description="Tandy/Memorex Video Information System CD-ROM images">
 
-	<!-- Some images only fill half the screen -->
-	<software name="amherit" supported="partial">
+	<software name="amherit">
 		<!--
 		Origin: redump.org
 		<rom name="American Heritage - Illustrated Encyclopedic Dictionary (USA).bin" size="437163888" crc="4f245ee3" sha1="4b12b3686c109a82d86f76394f8f6c4513ce4911"/>
@@ -141,8 +140,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- Some images only fill half the screen -->
-	<software name="columbus" supported="partial">
+	<software name="columbus">
 		<!--
 		Origin: redump.org
 		<rom name="Sail with Columbus (USA).bin" size="392929824" crc="2521d521" sha1="109b605bf3614e8a4cb8334645b758d533afab3e"/>
@@ -1008,8 +1006,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<!-- FMV playback only fills half the screen -->
-	<software name="sampler" supported="partial">
+	<software name="sampler">
 		<!--
 		Origin: redump.org
 		<rom name="Title Sampler (USA).bin" size="64122576" crc="36b14611" sha1="8f55bc5b71ce9634e3114daff9b4c26f1a720540"/>

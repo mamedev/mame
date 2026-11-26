@@ -14,16 +14,22 @@
 
 #include "cpu/drcfe.h"
 
+#include <algorithm>
+#include <iosfwd>
+
 
 class dsp16_device_base::opcode_desc : public opcode_desc_base<opcode_desc, 32>
 {
 public:
 	u32 cycles;
+	u16 opcode[2];
+	u16 cache[15];
 
 	void set_can_change_modes() { m_can_change_modes = true; }
 	void set_reads_memory() { m_reads_memory = true; }
 	void set_writes_memory() { m_writes_memory = true; }
 
+	u16 next_pc() const { return (pc & XAAU_I_EXT) | ((pc + length) & XAAU_I_MASK); }
 	bool can_change_modes() const { return m_can_change_modes; }
 	bool reads_memory() const { return m_reads_memory; }
 	bool writes_memory() const { return m_writes_memory; }
@@ -32,13 +38,22 @@ public:
 	{
 		opcode_desc_base::reset(curpc, in_delay_slot);
 
-		cycles = 0;
+		cycles = 0U;
+		std::fill(std::begin(opcode), std::end(opcode), 0U);
+		std::fill(std::begin(cache), std::end(cache), 0U);
 		m_can_change_modes = false;
 		m_reads_memory = false;
 		m_writes_memory = false;
 	}
 
+	// logging helpers
+	void log_flags(std::ostream &stream) const;
+	void log_registers_used(std::ostream &stream) const;
+	void log_registers_modified(std::ostream &stream) const;
+
 private:
+	static void log_register_list(std::ostream &stream, regmask const &regs, regmask const *nostar);
+
 	bool m_can_change_modes;
 	bool m_reads_memory;
 	bool m_writes_memory;

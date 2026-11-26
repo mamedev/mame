@@ -339,7 +339,8 @@ void vga_device::io_3bx_3dx_map(address_map &map)
 void vga_device::io_3cx_map(address_map &map)
 {
 	map(0x00, 0x00).rw(FUNC(vga_device::atc_address_r), FUNC(vga_device::atc_address_data_w));
-	map(0x01, 0x01).r(FUNC(vga_device::atc_data_r));
+	// NOTE: netbsd VESAFindIsaDevice test ask for write to 0x3c1 to act as write to 0x3c0
+	map(0x01, 0x01).rw(FUNC(vga_device::atc_data_r), FUNC(vga_device::atc_address_data_w));
 	map(0x02, 0x02).rw(FUNC(vga_device::input_status_0_r), FUNC(vga_device::miscellaneous_output_w));
 //  map(0x03, 0x03).w(FUNC(vga_device::wakeup_w));
 	map(0x04, 0x04).rw(FUNC(vga_device::sequencer_address_r), FUNC(vga_device::sequencer_address_w));
@@ -1123,16 +1124,28 @@ void vga_device::sequencer_map(address_map &map)
 		})
 	);
 //  map(0x00, 0x00) Reset Register
-//  map(0x01, 0x01) Clocking Mode Register
+
+	// $01 Clocking Mode
+	// --x- ---- SD Screen Disable
+	// ---x ---- S4 Shift Four Enable
+	// ---- x--- DCR Dot Clock Rate
+	// ---- -x-- SLR Shift/Load Rate
+	// ---- ---x 9/8DM 9/8 Dot Mode (0 = 9 dots per character, 1 = 8 dots per character)
+	map(0x01, 0x01).lw8(
+		NAME([this] (offs_t offset, u8 data) {
+			vga.sequencer.data[1] = data;
+		})
+	);
 	map(0x02, 0x02).lw8(
 		NAME([this] (offs_t offset, u8 data) {
 			vga.sequencer.map_mask = data & 0xf;
 		})
 	);
+	// $03 Character Map Select
+	// --2- 84-- character select A
+	// ---2 --84 character select B
 	map(0x03, 0x03).lw8(
 		NAME([this] (offs_t offset, u8 data) {
-			/* --2- 84-- character select A
-			   ---2 --84 character select B */
 			vga.sequencer.char_sel.A = (((data & 0xc) >> 2) << 1) | ((data & 0x20) >> 5);
 			vga.sequencer.char_sel.B = (((data & 0x3) >> 0) << 1) | ((data & 0x10) >> 4);
 			// optimization for screen update inner loop
@@ -1168,34 +1181,48 @@ void vga_device::attribute_map(address_map &map)
 	map.global_mask(0x3f);
 	map.unmap_value_high();
 	map(0x00, 0x0f).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ offset & 0x1f]; }),
+		NAME([this] (offs_t offset) { return vga.attribute.data[offset & 0x1f]; }),
 		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[offset & 0x1f] = data & 0x3f; })
 	);
 	map(0x20, 0x2f).noprw();
-	// Mode Control
+	// $10 Mode Control
+	// x--- ---- P54S Palette Bits 5-4 Select
+	// -x-- ---- 8BIT 8-bit Color Enable
+	// --x- ---- PPM Pixel Panning Mode
+	// ---x ---- <reserved>
+	// ---- x--- BLINK Blink Enable
+	// ---- -x-- LGE Line Graphics Mode
+	// ---- --x- MONO Monochrome Emulation (strapping bit in most implementations)
+	// ---- ---x ATGE Attribute Controller Graphics Enable
 	map(0x10, 0x10).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x10 ]; }),
-		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[ 0x10 ] = data & 0x3f; })
+		NAME([this] (offs_t offset) { return vga.attribute.data[0x10]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[0x10] = data & 0xff; })
 	);
-	// Overscan Color
+	// $11 Overscan Color
+	// xxxx xxxx Overscan Palette Index
 	map(0x11, 0x11).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x11 ]; }),
-		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[ 0x11 ] = data & 0x3f; })
+		NAME([this] (offs_t offset) { return vga.attribute.data[0x11]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[0x11] = data & 0xff; })
 	);
-	// Color Plane Enable
+	// $12 Color Plane Enable
+	// ---- xxxx Color Plane Enable
+	// TODO: verify following three if they acts as strapping on reserved bits
 	map(0x12, 0x12).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x12 ]; }),
-		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[ 0x12 ] = data & 0x3f; })
+		NAME([this] (offs_t offset) { return vga.attribute.data[0x12]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.data[0x12] = data & 0xff; })
 	);
-	// Horizontal PEL shift
+	// $13 Horizontal PEL shift
+	// ---- xxxx Pixel Shift Count
 	map(0x13, 0x13).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x13 ]; }),
-		NAME([this] (offs_t offset, u8 data) { vga.attribute.pel_shift_latch = vga.attribute.data[ 0x13 ] = data & 0xf; })
+		NAME([this] (offs_t offset) { return vga.attribute.data[0x13]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.pel_shift_latch = vga.attribute.data[0x13] = data & 0xf; })
 	);
-	// Color Select
+	// $14 Color Select
+	// ---- xx-- Color Select 7-6
+	// ---- --xx Color Select 5-4
 	map(0x14, 0x14).mirror(0x20).lrw8(
-		NAME([this] (offs_t offset) { return vga.attribute.data[ 0x14 ]; }),
-		NAME([this] (offs_t offset, u8 data) { vga.attribute.pel_shift_latch = vga.attribute.data[ 0x14 ] = data & 0xf; })
+		NAME([this] (offs_t offset) { return vga.attribute.data[0x14]; }),
+		NAME([this] (offs_t offset, u8 data) { vga.attribute.pel_shift_latch = vga.attribute.data[0x14] = data & 0xf; })
 	);
 }
 
@@ -1216,6 +1243,7 @@ uint16_t vga_device::offset()
 		return vga.crtc.offset << 2;
 }
 
+// TODO: move this (VGA mode 13h) logic when latching not at display time
 uint32_t vga_device::start_addr()
 {
 //  popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
@@ -1259,7 +1287,8 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	// TODO: make it a subclassable function, cfr. PR2 Video Select in Paradise family
 	#define TEXT_COPY_9COLUMN(ch) (((ch & 0xe0) == 0xc0) && (vga.attribute.data[0x10] & 4))
 
-	int width = BIT(vga.sequencer.data[1], 0) ? 8 : 9, height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
+	int width = BIT(vga.sequencer.data[1], 0) ? 8 : 9;
+	int height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
 
 	const u32 frame_number = screen().frame_number();
 
@@ -1270,6 +1299,10 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	bool blink_rate = frame_number & 0x20;
 	const int TEXT_LINES = vga.crtc.vert_disp_end + 1;
+	const bool blink_sel = !!BIT(vga.attribute.data[0x10], 3);
+	// blink disabled translates MSB of attribute as extra intensity for background color
+	// - win95+ scandisk uses this (yellow fill bar)
+	const uint8_t back_color_mask = (!blink_sel << 7) | 0x70;
 
 	for (int addr = vga.crtc.start_addr, line = -vga.crtc.preset_row_scan; line < TEXT_LINES;
 			line += height, addr += (offset() >> 1))
@@ -1279,13 +1312,10 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			const uint8_t ch   = vga.memory[(pos << 1) + 0];
 			const uint8_t attr = vga.memory[(pos << 1) + 1];
 			const uint32_t font_base = vga.sequencer.char_sel.base[BIT(attr, 3)] + (ch << 5);
-			const bool blink_sel = !!BIT(vga.attribute.data[0x10], 3);
 			const uint8_t blink_en = (blink_sel && blink_rate) ? BIT(attr, 7) : 0;
 
-			uint8_t fore_col = attr & 0xf;
-			uint8_t back_col = (attr & 0x70) >> 4;
-			// blink disabled translates MSB of attribute as extra intensity for background color
-			back_col |= (blink_sel) ? 0 : (BIT(attr, 7) >> 4);
+			uint8_t fore_col = attr & 0x0f;
+			uint8_t back_col = (attr & back_color_mask) >> 4;
 
 			for (int h = std::max(-line, 0); (h < height) && (line + h < std::min(TEXT_LINES, bitmap.height())); h++)
 			{
@@ -1304,8 +1334,8 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 					const int dest_x = column * width + w;
 					if(!screen().visible_area().contains(dest_x, line+h))
 						continue;
-					bitmapline[dest_x] = pen;
 
+					bitmapline[dest_x] = pen;
 				}
 				if (w < width)
 				{
@@ -1320,9 +1350,11 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 					if(!screen().visible_area().contains(dest_x, line+h))
 						continue;
+
 					bitmapline[dest_x] = pen;
 				}
 			}
+
 			if (vga.cursor.visible && (pos == vga.crtc.cursor_addr))
 			{
 				for (int h = vga.crtc.cursor_scan_start;
@@ -1343,9 +1375,9 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 {
 	const int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	const int pel_shift = (vga.attribute.pel_shift & 7);
 	const int LINES = (vga.crtc.vert_disp_end + 1) * (get_interlace_mode() + 1);
 	const int EGA_COLUMNS = vga.crtc.horz_disp_end + 1;
+	int pel_shift = (vga.attribute.pel_shift & 7);
 
 	for (int addr = vga.crtc.start_addr, line = 0; line < LINES; line += height, addr += offset())
 	{
@@ -1357,7 +1389,10 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 			// causing no status bar to appear. This is a known btanb in how VGA
 			// handles EGA mode, cfr. https://www.os2museum.com/wp/fantasyland-on-vga/
 			if((line + yi) == (vga.crtc.line_compare & 0x3ff))
+			{
 				addr = 0;
+				pel_shift = 0;
+			}
 
 			for (int pos=addr, c=0, column=0; column<EGA_COLUMNS+1; column++, c+=8, pos=(pos+1)&0xffff)
 			{
@@ -1400,6 +1435,8 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 //  popmessage("%02x %02x",vga.attribute.pel_shift,vga.sequencer.data[4] & 0x08);
 
 	int curr_addr = 0;
+
+	// TODO: merge these two versions
 	if(!(vga.sequencer.data[4] & 0x08))
 	{
 		for (int addr = start_addr(), line=0; line < LINES; line+=height, addr+=offset(), curr_addr+=offset())
@@ -1438,7 +1475,10 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 				if((line + yi) < (vga.crtc.line_compare & mask_comp))
 					curr_addr = addr;
 				if((line + yi) == (vga.crtc.line_compare & mask_comp))
+				{
 					curr_addr = 0;
+					pel_shift = 0;
+				}
 				uint32_t *const bitmapline = &bitmap.pix(line + yi);
 				//addr %= 0x80000;
 				for (int pos=curr_addr, c=0, column=0; column<VGA_COLUMNS+1; column++, c+=0x10, pos+=0x8)
@@ -1536,55 +1576,55 @@ void vga_device::palette_update()
 
 uint8_t vga_device::pc_vga_choosevideomode()
 {
-	if (vga.crtc.sync_en)
+	if (!vga.crtc.sync_en || BIT(vga.sequencer.data[1], 5))
+		return SCREEN_OFF;
+
+	// TODO: this is the wrong place to
+	if (vga.dac.dirty)
 	{
-		if (vga.dac.dirty)
-		{
-			palette_update();
-			vga.dac.dirty = 0;
-		}
+		palette_update();
+		vga.dac.dirty = 0;
+	}
 
-		if (vga.attribute.data[0x10] & 0x80)
+	// TODO: Mode Control bit 6 unused, also cache and cleanup
+	if (vga.attribute.data[0x10] & 0x80)
+	{
+		for (int i=0; i<16;i++)
 		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
-											|((vga.attribute.data[0x14]&0xf)<<4));
-			}
+			vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
+										|((vga.attribute.data[0x14]&0xf)<<4));
 		}
-		else
+	}
+	else
+	{
+		for (int i=0; i<16;i++)
 		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
-											|((vga.attribute.data[0x14]&0xc)<<4));
-			}
-		}
-
-		// !GRAPHIC_MODE
-		if (!vga.gc.alpha_dis)
-		{
-			return TEXT_MODE;
-		}
-		else if (vga.gc.shift256)
-		{
-			return VGA_MODE;
-		}
-		else if (vga.gc.shift_reg)
-		{
-			return CGA_MODE;
-		}
-		else if (vga.gc.memory_map_sel == 0x03)
-		{
-			return MONO_MODE;
-		}
-		else
-		{
-			return EGA_MODE;
+			vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
+										|((vga.attribute.data[0x14]&0xc)<<4));
 		}
 	}
 
-	return SCREEN_OFF;
+	// !GRAPHIC_MODE
+	if (!vga.gc.alpha_dis)
+	{
+		return TEXT_MODE;
+	}
+	else if (vga.gc.shift256)
+	{
+		return VGA_MODE;
+	}
+	else if (vga.gc.shift_reg)
+	{
+		return CGA_MODE;
+	}
+	else if (vga.gc.memory_map_sel == 0x03)
+	{
+		return MONO_MODE;
+	}
+	else
+	{
+		return EGA_MODE;
+	}
 }
 
 uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
@@ -1612,6 +1652,8 @@ uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 
 void vga_device::recompute_params_clock(int divisor, int xtal)
 {
+	assert(divisor > 0);
+	assert(xtal > 0);
 	int vblank_period, hblank_period;
 	// if not in graphic mode and not Clocking Mode bit 0 select 9 dots per charset
 	uint8_t hclock_m = !vga.gc.alpha_dis && !BIT(vga.sequencer.data[1], 0) ? 9 : 8;
@@ -1630,7 +1672,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 	hblank_period = ((vga.crtc.horz_total + 5) * ((float)(hclock_m)/divisor));
 
 	// TODO: improve/complete clocking modes
-	pixel_clock = xtal / (((vga.sequencer.data[1]&8) >> 3) + 1);
+	pixel_clock = xtal >> BIT(vga.sequencer.data[1], 3);
 
 	attotime refresh  = attotime::from_ticks(hblank_period * vblank_period, pixel_clock);
 	screen().configure((hblank_period), (vblank_period), visarea, refresh );
@@ -1931,8 +1973,7 @@ void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	const int VGA_COLUMNS = vga.crtc.horz_disp_end + 1;
 	const int LINES = (vga.crtc.vert_disp_end + 1) * (get_interlace_mode() + 1);
 
-	uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08) || svga.ignore_chain4) ? 2 : 0;
-	for (int addr = vga.crtc.start_addr << start_shift, line=0; line < LINES; line+=height, addr += offset(), curr_addr+=offset())
+	for (int addr = vga.crtc.start_addr, line=0; line < LINES; line+=height, addr += offset(), curr_addr+=offset())
 	{
 		for (int yi = 0;yi < height; yi++)
 		{
@@ -1975,7 +2016,7 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	bitmap.fill(0, cliprect);
 
-	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line+=height, addr+=offset(), curr_addr+=offset())
+	for (int addr = vga.crtc.start_addr, line = 0; line < TLINES; line+=height, addr+=offset(), curr_addr+=offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2018,7 +2059,7 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	bitmap.fill(0, cliprect);
 
-	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line += height, addr += offset(), curr_addr += offset())
+	for (int addr = vga.crtc.start_addr, line = 0; line < TLINES; line += height, addr += offset(), curr_addr += offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2061,7 +2102,7 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	bitmap.fill(0, cliprect);
 
-	for (int addr = vga.crtc.start_addr << 3, line=0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
+	for (int addr = vga.crtc.start_addr, line=0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2104,7 +2145,7 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 	bitmap.fill(0, cliprect);
 
-	for (int addr = vga.crtc.start_addr << 2, line = 0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
+	for (int addr = vga.crtc.start_addr, line = 0; line < TLINES; line+=height, addr += offset(), curr_addr += offset())
 	{
 		uint32_t *const bitmapline = &bitmap.pix(line);
 		addr %= vga.svga_intf.vram_size;
@@ -2130,74 +2171,72 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 // TODO: inherit from base class
 uint8_t svga_device::pc_vga_choosevideomode()
 {
-	if (vga.crtc.sync_en)
+	if (!vga.crtc.sync_en || BIT(vga.sequencer.data[1], 5))
+		return SCREEN_OFF;
+
+	if (vga.dac.dirty)
 	{
-		if (vga.dac.dirty)
-		{
-			palette_update();
-			vga.dac.dirty = 0;
-		}
+		palette_update();
+		vga.dac.dirty = 0;
+	}
 
-		if (vga.attribute.data[0x10] & 0x80)
+	if (vga.attribute.data[0x10] & 0x80)
+	{
+		for (int i=0; i<16;i++)
 		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
-											|((vga.attribute.data[0x14]&0xf)<<4));
-			}
+			vga.pens[i] = pen((vga.attribute.data[i]&0x0f)
+										|((vga.attribute.data[0x14]&0xf)<<4));
 		}
-		else
+	}
+	else
+	{
+		for (int i=0; i<16;i++)
 		{
-			for (int i=0; i<16;i++)
-			{
-				vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
-											|((vga.attribute.data[0x14]&0xc)<<4));
-			}
-		}
-
-		if (svga.rgb32_en)
-		{
-			return RGB32_MODE;
-		}
-		else if (svga.rgb24_en)
-		{
-			return RGB24_MODE;
-		}
-		else if (svga.rgb16_en)
-		{
-			return RGB16_MODE;
-		}
-		else if (svga.rgb15_en)
-		{
-			return RGB15_MODE;
-		}
-		else if (svga.rgb8_en)
-		{
-			return RGB8_MODE;
-		}
-		else if (!vga.gc.alpha_dis) // !GRAPHIC_MODE
-		{
-			return TEXT_MODE;
-		}
-		else if (vga.gc.shift256)
-		{
-			return VGA_MODE;
-		}
-		else if (vga.gc.shift_reg)
-		{
-			return CGA_MODE;
-		}
-		else if (vga.gc.memory_map_sel == 0x03)
-		{
-			return MONO_MODE;
-		}
-		else
-		{
-			return EGA_MODE;
+			vga.pens[i] = pen((vga.attribute.data[i]&0x3f)
+										|((vga.attribute.data[0x14]&0xc)<<4));
 		}
 	}
 
-	return SCREEN_OFF;
+	if (svga.rgb32_en)
+	{
+		return RGB32_MODE;
+	}
+	else if (svga.rgb24_en)
+	{
+		return RGB24_MODE;
+	}
+	else if (svga.rgb16_en)
+	{
+		return RGB16_MODE;
+	}
+	else if (svga.rgb15_en)
+	{
+		return RGB15_MODE;
+	}
+	else if (svga.rgb8_en)
+	{
+		return RGB8_MODE;
+	}
+	else if (!vga.gc.alpha_dis) // !GRAPHIC_MODE
+	{
+		return TEXT_MODE;
+	}
+	else if (vga.gc.shift256)
+	{
+		return VGA_MODE;
+	}
+	else if (vga.gc.shift_reg)
+	{
+		return CGA_MODE;
+	}
+	else if (vga.gc.memory_map_sel == 0x03)
+	{
+		return MONO_MODE;
+	}
+	else
+	{
+		return EGA_MODE;
+	}
 }
 
 uint8_t svga_device::get_video_depth()
@@ -2215,6 +2254,28 @@ uint8_t svga_device::get_video_depth()
 			return 32;
 	}
 	return 0;
+}
+
+// TODO: fallback logic, probably wrong most of the time
+uint32_t svga_device::latch_start_addr()
+{
+	if (svga.rgb32_en)
+		return vga.crtc.start_addr_latch << 2;
+
+	if (svga.rgb24_en)
+		return vga.crtc.start_addr_latch << 3;
+
+	if (svga.rgb15_en || svga.rgb16_en)
+		return vga.crtc.start_addr_latch << 2;
+
+	if (svga.rgb8_en)
+	{
+		// TODO: this logic should be in clients not here
+		uint8_t start_shift = (!(vga.sequencer.data[4] & 0x08) || svga.ignore_chain4) ? 2 : 0;
+		return vga.crtc.start_addr_latch << start_shift;
+	}
+
+	return vga_device::latch_start_addr();
 }
 
 // TODO: inherit from base class

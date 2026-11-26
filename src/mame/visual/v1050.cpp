@@ -141,9 +141,10 @@ Notes:
 #include "emu.h"
 #include "v1050.h"
 
+#include "bus/nscsi/s1410.h"
 #include "bus/rs232/rs232.h"
 
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "speaker.h"
 
 #include "utf8.h"
@@ -363,36 +364,61 @@ void v1050_state::sasi_data_w(uint8_t data)
 {
 	m_sasi_data = data;
 
-	if (m_sasi_data_enable)
+	if (!m_sasi->io_r())
 	{
-		m_sasi_data_out->write(m_sasi_data);
+		m_sasi->write(m_sasi_data);
 	}
 }
 
-void v1050_state::write_sasi_io(int state)
+void v1050_state::sasi_io_w(int state)
 {
-	m_sasi_ctrl_in->write_bit4(state);
-
-	m_sasi_data_enable = state;
-
-	if (m_sasi_data_enable)
+	// the data latch only drives the bus while the target is receiving
+	if (state)
 	{
-		m_sasi_data_out->write(m_sasi_data);
+		m_sasi->write(0);
 	}
 	else
 	{
-		m_sasi_data_out->write(0);
+		m_sasi->write(m_sasi_data);
 	}
+}
+
+uint8_t v1050_state::sasi_status_r()
+{
+	/*
+
+	    bit     description
+
+	    0       /REQ
+	    1       BSY
+	    2       MSG
+	    3       C/D
+	    4       /I/O
+	    5
+	    6
+	    7
+
+	*/
+
+	uint8_t data = 0;
+
+	data |= m_sasi->req_r() ? 0x00 : 0x01;
+	data |= m_sasi->bsy_r() << 1;
+	data |= m_sasi->msg_r() << 2;
+	data |= m_sasi->cd_r() << 3;
+	data |= m_sasi->io_r() ? 0x00 : 0x10;
+
+	return data;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sasi_ack_tick)
 {
-	m_sasibus->write_ack(0);
+	m_sasi->ack_w(0);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(v1050_state::sasi_rst_tick)
 {
-	m_sasibus->write_rst(0);
+	m_sasi->rst_w(0);
 }
 
 void v1050_state::sasi_ctrl_w(uint8_t data)
@@ -412,12 +438,12 @@ void v1050_state::sasi_ctrl_w(uint8_t data)
 
 	*/
 
-	m_sasibus->write_sel(BIT(data, 0));
+	m_sasi->sel_w(BIT(data, 0));
 
 	if (BIT(data, 1))
 	{
 		// send acknowledge pulse
-		m_sasibus->write_ack(1);
+		m_sasi->ack_w(1);
 
 		m_timer_ack->adjust(attotime::from_nsec(100));
 	}
@@ -425,7 +451,7 @@ void v1050_state::sasi_ctrl_w(uint8_t data)
 	if (BIT(data, 7))
 	{
 		// send reset pulse
-		m_sasibus->write_rst(1);
+		m_sasi->rst_w(1);
 
 		m_timer_rst->adjust(attotime::from_nsec(100));
 	}
@@ -458,8 +484,8 @@ void v1050_state::v1050_io(address_map &map)
 	map(0xb0, 0xb0).rw(FUNC(v1050_state::dint_clr_r), FUNC(v1050_state::dint_clr_w));
 	map(0xc0, 0xc0).w(FUNC(v1050_state::v1050_i8214_w));
 	map(0xd0, 0xd0).w(FUNC(v1050_state::bank_w));
-	map(0xe0, 0xe0).w(FUNC(v1050_state::sasi_data_w)).r(m_sasi_data_in, FUNC(input_buffer_device::read));
-	map(0xe1, 0xe1).r(m_sasi_ctrl_in, FUNC(input_buffer_device::read)).w(FUNC(v1050_state::sasi_ctrl_w));
+	map(0xe0, 0xe0).r(m_sasi, FUNC(nscsi_callback_device::read)).w(FUNC(v1050_state::sasi_data_w));
+	map(0xe1, 0xe1).rw(FUNC(v1050_state::sasi_status_r), FUNC(v1050_state::sasi_ctrl_w));
 }
 
 void v1050_state::v1050_crt_mem(address_map &map)
@@ -985,8 +1011,15 @@ void v1050_state::machine_start()
 	save_item(NAME(m_txrdy));
 	save_item(NAME(m_baud_sel));
 	save_item(NAME(m_bank));
+	save_item(NAME(m_sasi_data));
 	save_item(NAME(m_centronics_busy));
 	save_item(NAME(m_centronics_perror));
+
+	// ST-412 class drive: 3 ms track-to-track, 85 ms average, 205 ms full stroke, 3600 RPM
+	if (auto *const s1410 = dynamic_cast<nscsi_s1410_device *>(subdevice(SASIBUS_TAG ":0:s1410")))
+	{
+		s1410->set_seek_timing(3000, 85000, 205000, 3600, 1);
+	}
 }
 
 void v1050_state::machine_reset()
@@ -1084,19 +1117,14 @@ void v1050_state::v1050(machine_config &config)
 	FLOPPY_CONNECTOR(config, MB8877_TAG":3", v1050_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
 
 	// SASI bus
-	SCSI_PORT(config, m_sasibus);
-	m_sasibus->set_data_input_buffer(m_sasi_data_in);
-	m_sasibus->req_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit0)).exor(1);
-	m_sasibus->bsy_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit1));
-	m_sasibus->msg_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit2));
-	m_sasibus->cd_handler().set(m_sasi_ctrl_in, FUNC(input_buffer_device::write_bit3));
-	m_sasibus->io_handler().set(FUNC(v1050_state::write_sasi_io)).exor(1); // bit4
-	m_sasibus->set_slot_device(1, "harddisk", S1410, DEVICE_INPUT_DEFAULTS_NAME(SCSI_ID_0));
-
-	OUTPUT_LATCH(config, m_sasi_data_out);
-	m_sasibus->set_output_latch(*m_sasi_data_out);
-	INPUT_BUFFER(config, m_sasi_data_in);
-	INPUT_BUFFER(config, m_sasi_ctrl_in);
+	NSCSI_BUS(config, SASIBUS_TAG);
+	NSCSI_CONNECTOR(config, SASIBUS_TAG ":0", default_scsi_devices, "s1410");
+	NSCSI_CONNECTOR(config, SASIBUS_TAG ":7", default_scsi_devices, "scsicb", true)
+		.option_add_internal("scsicb", NSCSI_CB)
+		.machine_config([this] (device_t *device)
+		{
+			downcast<nscsi_callback_device &>(*device).io_callback().set(*this, FUNC(v1050_state::sasi_io_w));
+		});
 
 	TIMER(config, m_timer_ack).configure_generic(FUNC(v1050_state::sasi_ack_tick));
 	TIMER(config, m_timer_rst).configure_generic(FUNC(v1050_state::sasi_rst_tick));

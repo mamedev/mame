@@ -28,8 +28,15 @@ INPUT_PORTS_END
 quadencoder_device::quadencoder_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, QUADENCODER, tag, owner, clock),
 	m_mn_cb(*this),
-	m_pl_cb(*this)
+	m_pl_cb(*this),
+	m_events_per_change(1)
 {
+}
+
+quadencoder_device &quadencoder_device::configure_clustered()
+{
+	m_events_per_change = 4;
+	return *this;
 }
 
 void quadencoder_device::device_start()
@@ -54,6 +61,8 @@ DECLARE_INPUT_CHANGED_MEMBER(quadencoder_device::changed)
 {
 	assert(field.minval() == 0);
 
+	constexpr attotime MAX_STEP = attotime::from_msec(10);
+
 	// Given the old and new values, compute the magnitude of change for both
 	// scenarios: an increase and a decrease, taking into account wrapping.
 	s32 delta_inc, delta_dec;  // Magnitudes. Always positive.
@@ -70,12 +79,18 @@ DECLARE_INPUT_CHANGED_MEMBER(quadencoder_device::changed)
 
 	attotime ctime = machine().time();
 	attotime tdelta = ctime - m_time;
-	m_delta += ldelta;
+	m_delta += ldelta * m_events_per_change;
 	m_time = ctime;
 
 	if(m_delta) {
 		int steps = m_delta > 0 ? m_delta : -m_delta;
 		attotime step = tdelta / (steps+1);
+
+		// Ensure quadrature pulses will be published in a timely manner, even
+		// after very slow encoder changes.
+		if(step > MAX_STEP)
+			step = MAX_STEP;
+
 		m_timer->adjust(step/2, 0, step);
 	} else
 		m_timer->adjust(attotime::never);

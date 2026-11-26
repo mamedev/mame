@@ -148,7 +148,7 @@ public:
 						);
 
 
-	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer, u8 pri);
+	void gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, u8 layer, u8 pri, u8 part);
 	void gx_draw_tilemap_category(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, u8 layer, u8 category, u32 flags, int level, u8 topmost);
 	void gx_draw_deferred_shadows(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, const std::vector<GX_OBJ> &shadows, u8 shdprisel);
 	void gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
@@ -303,6 +303,7 @@ protected:
 
 	u8 m_type3_psac2_bank = 0;
 	u8 m_type3_spriteram_bank = 0;
+	bool m_type2_spritebank_enable = false;
 	//int m_konamigx_type3_psac2_actual_last_bank = 0;
 	s32 m_use_68020_post_clock_hack = 0;
 	output_finder<> m_lamp;

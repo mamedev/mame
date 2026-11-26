@@ -13,6 +13,8 @@
 
 #include "cbmiec.h"
 
+#include "bus/centronics/ctronics.h"
+
 
 
 //**************************************************************************
@@ -21,7 +23,7 @@
 
 // ======================> mps1270a_device
 
-class mps1270a_device : public device_t, public device_cbm_iec_interface
+class mps1270a_device : public device_t, public device_cbm_iec_interface, public device_centronics_peripheral_interface
 {
 public:
 	// construction/destruction

@@ -15,6 +15,8 @@
 #include "drccache.h"
 
 #include <algorithm>
+#include <string>
+#include <string_view>
 
 
 //**************************************************************************
@@ -245,12 +247,12 @@ namespace uml {
 	{
 	public:
 		// construction/destruction
-		code_handle(drcuml_state &drcuml, const char *name);
+		code_handle(drcuml_state &drcuml, std::string_view name);
 
 		// getters
 		drccodeptr codeptr() const { return *m_code; }
 		drccodeptr *codeptr_addr() { return m_code; }
-		char const *string() const { return m_string.c_str(); }
+		std::string const &string() const { return m_string; }
 
 		// setters
 		void set_codeptr(drccodeptr code);

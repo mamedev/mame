@@ -231,8 +231,13 @@ uint32_t igrosoft_gamble_state::screen_update(screen_device &screen, bitmap_ind1
 
 	if (!m_disp_enable) return 0;
 
+	// Crazy Monkey 2 only uses the low priority static tiles with bit 1 of the display enable register set,
+	// with it clear the whole static layer goes above the reels (e.g. the top bar of the main game screen)
+	bool const lowpri = !m_cm2_priority || BIT(m_disp_enable, 1);
+
 	// Draw lower part of static tilemap (low pri tiles)
-	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
+	if (lowpri)
+		m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(1), 0);
 
 	// Setup the column scroll and draw the reels
 	for (int i = 0; i < 64; i++)
@@ -243,7 +248,7 @@ uint32_t igrosoft_gamble_state::screen_update(screen_device &screen, bitmap_ind1
 	m_reel_tilemap->draw(screen, bitmap, cliprect, 0,0);
 
 	// Draw upper part of static tilemap (high pri tiles)
-	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_CATEGORY(0), 0);
+	m_tilemap->draw(screen, bitmap, cliprect, lowpri ? TILEMAP_DRAW_CATEGORY(0) : TILEMAP_DRAW_ALL_CATEGORIES, 0);
 
 	return 0;
 }
@@ -265,6 +270,7 @@ void igrosoft_gamble_state::vid_w(offs_t offset, uint8_t data)
 	else if (offset < 0x6000)
 	{
 		uint16_t coldat = m_vid[offset & ~1] | (m_vid[offset | 1] << 8);
+		uint16_t pen = (offset - 0x4000) / 2;
 
 		// xor and bitswap palette
 		switch (m_xor_paltype) {
@@ -279,9 +285,23 @@ void igrosoft_gamble_state::vid_w(offs_t offset, uint8_t data)
 				coldat = bitswap<16>(coldat,4,10,13,14,8,11,15,12,2,6,5,0,7,3,1,9);
 				break;
 			case 3:
-				// WRONG
+			case 4:
+			case 5:
+				// Roll Fruit (3), Crazy Monkey 2 World and Lottery (4), Crazy Monkey 2 Entertainment (5): only the final bitswap differs
 				coldat ^= m_xor_palette;
-				//if (offset&1) printf("col %04x, %04x\n", (offset-0x4000), coldat);
+				coldat ^= ((coldat & 0x0001) << 1) ^ ((coldat & 0x0010) << 1) ^ ((coldat & 0x0010) << 2) ^ ((coldat & 0x0020) << 1) ^ ((coldat & 0x0080) >> 1) ^ ((coldat & 0x0400) >> 3) ^ ((coldat & 0x0800) >> 3);
+				if (m_xor_paltype == 3)
+					coldat = bitswap<16>(coldat, 2,1,9,0,8,11,15,10,7,6,5,3,13,4,14,12);
+				else if (m_xor_paltype == 4)
+					coldat = bitswap<16>(coldat, 2,1,13,0,8,11,15,10,7,6,5,3,9,4,14,12);
+				else
+					coldat = bitswap<16>(coldat, 2,1,9,0,8,11,15,10,7,6,5,3,13,4,12,14);
+				// the colour index inside each 256 colour palette is xored (per game) and scrambled too, differently for the upper half of palette RAM
+				pen ^= m_xor_palindex;
+				if (pen & 0x800)
+					pen = (pen & 0xf00) | bitswap<8>(pen ^ (((pen & 0x40) >> 6) | ((pen & 0x08) >> 2) | ((pen & 0x10) << 1)), 6,0,3,5,1,2,4,7);
+				else
+					pen = (pen & 0xf00) | bitswap<8>(pen ^ (((pen & 0x04) >> 2) | ((pen & 0x08) >> 2) | ((pen & 0x40) >> 1)), 4,7,1,3,6,0,2,5);
 				break;
 		}
 
@@ -290,7 +310,7 @@ void igrosoft_gamble_state::vid_w(offs_t offset, uint8_t data)
 		uint8_t const b = ((coldat & 0x00e0) >> (5))
 						| ((coldat & 0xe000) >> (8+5-3));
 
-		m_palette->set_pen_color((offset - 0x4000) / 2, r << 3, g << 3, b << 2);
+		m_palette->set_pen_color(pen, r << 3, g << 3, b << 2);
 	}
 	else
 	{
@@ -662,32 +682,113 @@ void igrosoft_gamble_state::init_pirateent()
 	ent_decode(0x99, 0x22, 0xee, 0x66, 0x54d40);
 }
 
+void igrosoft_gamble_state::newer_gfx_decode(uint8_t *gfx, uint32_t const (&addr_xor_plain)[2], uint8_t const (&pen_xor)[2])
+{
+	/*
+	The four ROMs of each half (offset 0x000000 and 0x080000 of each quarter of the region)
+	are encrypted together: a 32-bit word is formed from the bytes at the same address
+	(MSB = 0x000000 quarter, LSB = 0x300000 quarter), so data bits are mixed across ROMs.
+
+	encrypted address bit n = parity((plain address ^ addr_xor_plain) & addr_mask[n]) ^ bit n of addr_xor
+	plain data bit n        = parity(encrypted word & data_mask[n]) ^ bit n of data_xor
+
+	The second half also has two non-linear terms on the (xored) plain address:
+	A11 & A16 is xored into encrypted A10, A11 and A18, A8 & A11 into encrypted A10.
+
+	The per game keys are an xor on the plain address and an xor on the 8-bit pen value
+	(the same for the four pixels of a word).
+	*/
+	static const uint32_t addr_mask[2][19] = {
+		{ 0x00001, 0x00002, 0x00004, 0x00008, 0x00020, 0x00010, 0x00040, 0x00240, 0x00400, 0x00480,
+		  0x10000, 0x00800, 0x02000, 0x03000, 0x04000, 0x24000, 0x40000, 0x48000, 0x00900 },
+		{ 0x00001, 0x00002, 0x01008, 0x02000, 0x00020, 0x00030, 0x04000, 0x20040, 0x40000, 0x08400,
+		  0x00900, 0x10100, 0x00008, 0x02004, 0x04200, 0x00040, 0x40080, 0x00400, 0x10900 } };
+	static const uint32_t addr_xor[2] = { 0x7f7cc, 0x573f4 };
+
+
+	static const uint32_t data_mask[2][32] = {
+		{ 0x02000000, 0x03400000, 0x00000200, 0x00000020, 0x08200000, 0x08300000, 0x00000820, 0x00000400,
+		  0x00030000, 0x00930000, 0x00000003, 0x00000408, 0x20000000, 0x60000000, 0x00002000, 0x00008000,
+		  0x00000040, 0x01000000, 0x01200000, 0x00000100, 0x00000011, 0x00010000, 0x04010000, 0x00000001,
+		  0x00000294, 0x02040000, 0x060c0000, 0x00000204, 0x00005000, 0x10000000, 0x90000000, 0x00001000 },
+		{ 0x00000160, 0x00400000, 0x00040100, 0x00000100, 0x00000410, 0x00080000, 0x00020001, 0x00000001,
+		  0x00000498, 0x02800000, 0x00200204, 0x00000204, 0x0000c000, 0x10000000, 0x40001000, 0x00001000,
+		  0x00000200, 0x00000020, 0x00800000, 0x04000000, 0x00000820, 0x00000400, 0x00120000, 0x010c0000,
+		  0x00000003, 0x00000408, 0x00090000, 0x0aa00000, 0x00002000, 0x00008000, 0x80000000, 0x30000000 } };
+	static const uint32_t data_xor[2] = { 0x22224444, 0xbbbb2222 };
+
+	std::vector<uint8_t> temprom(ROM_SIZE * 4);
+
+	for (int h = 0; h < 2; h++)
+	{
+		uint8_t *const base = &gfx[h * ROM_SIZE];
+
+		// pen bits 3-0 come from the 0x000000/0x100000 quarters, bits 7-4 from the 0x200000/0x300000 ones
+		uint32_t const pen_lo = (pen_xor[h] & 0x0f) * 0x1111, pen_hi = (pen_xor[h] >> 4) * 0x1111;
+		uint32_t const dxor = data_xor[h] ^ (pen_lo << 16) ^ pen_hi;
+
+		for (uint32_t i = 0; i < ROM_SIZE; i++)
+		{
+			uint32_t const p = i ^ addr_xor_plain[h];
+			uint32_t a = addr_xor[h];
+			for (int b = 0; b < 19; b++)
+				a ^= (std::popcount(p & addr_mask[h][b]) & 1) << b;
+			if (h && (p & 0x10800) == 0x10800)
+				a ^= 0x40c00;
+			if (h && (p & 0x00900) == 0x00900)
+				a ^= 0x00400;
+
+			uint32_t const enc = (uint32_t(base[a]) << 24) | (base[0x100000 + a] << 16) | (base[0x200000 + a] << 8) | base[0x300000 + a];
+
+			uint32_t dec = dxor;
+			for (int b = 0; b < 32; b++)
+				dec ^= (std::popcount(enc & data_mask[h][b]) & 1) << b;
+
+			for (int r = 0; r < 4; r++)
+				temprom[r * ROM_SIZE + i] = dec >> (24 - r * 8);
+		}
+
+		for (int r = 0; r < 4; r++)
+			memcpy(&base[r * 0x100000], &temprom[r * ROM_SIZE], ROM_SIZE);
+	}
+}
+
 void igrosoft_gamble_state::init_rollfruit()
 {
-	// m_xor_palette = 0xbff7;
-	// needs gfx and palette descrambles
-	// encryption looks similar to Crazy Monkey 2
+	m_xor_palette = 0xbff7;
+	m_xor_paltype = 3;
+
+	newer_gfx_decode(memregion("gfx")->base(), { 0x00000, 0x00000 }, { 0x00, 0x00 });
 }
 
 void igrosoft_gamble_state::init_crzmon2()
 {
-	m_xor_paltype = 3;
+	m_xor_paltype = 4;
 	m_xor_palette = 0xaff7;
-	// needs gfx (and palette) descrambles
+	m_xor_palindex = 0x76;
+	m_cm2_priority = true;
+
+	newer_gfx_decode(memregion("gfx")->base(), { 0x27240, 0x2727c }, { 0x88, 0x6d });
 }
 
 void igrosoft_gamble_state::init_crzmon2lot()
 {
-	m_xor_paltype = 3;
+	m_xor_paltype = 4;
 	m_xor_palette = 0xddf7;
-	// needs gfx (and palette) descrambles
+	m_xor_palindex = 0xb9;
+	m_cm2_priority = true;
+
+	newer_gfx_decode(memregion("gfx")->base(), { 0x1b180, 0x1b1bc }, { 0x66, 0x4e });
 }
 
 void igrosoft_gamble_state::init_crzmon2ent()
 {
-	m_xor_paltype = 3;
+	m_xor_paltype = 5;
 	m_xor_palette = 0x4df7;
-	// needs gfx (and palette) descrambles
+	m_xor_palindex = 0x37;
+	m_cm2_priority = true;
+
+	newer_gfx_decode(memregion("gfx")->base(), { 0x58d80, 0x58d80 }, { 0xeb, 0x58 });
 }
 
 void igrosoft_gamble_state::base_prgmap(address_map &map)
@@ -5193,7 +5294,7 @@ ROM_START( crzmon2_4 ) // 100618
 	ROM_LOAD( "crazymonkey2.008", 0x380000, 0x80000, CRC(f7c8e613) SHA1(6dec3f6f27773cd0af83ca914d8481c8f17f1d3f) )
 
 	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
-	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(9849f5ec) SHA1(9d9bd0a85fe0214e254cb2f5817696b39cffe4a4) )
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(7ca7526d) SHA1(d969f2c50569906ebc5571c511782ed394cace11) )
 ROM_END
 
 ROM_START( crzmon2_5 ) // 100413 entertainment x
@@ -5210,7 +5311,8 @@ ROM_START( crzmon2_5 ) // 100413 entertainment x
 	ROM_LOAD( "crazymonkey2_ent_m.007", 0x280000, 0x80000, CRC(e3b9497f) SHA1(248043656796ef8bc827cf8ee4ae6f4a22720156) )
 	ROM_LOAD( "crazymonkey2_ent_m.008", 0x380000, 0x80000, CRC(776808b6) SHA1(d7d6cf42eab6088d740532820ce5cd761b96d000) )
 
-	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(d0dc0f5e) SHA1(911b880ac1941a6d1d8ea0bfe5328d8e2ca0cd9d) )
 ROM_END
 
 ROM_START( crzmon2_6 ) // 101220 entertainment x
@@ -5227,7 +5329,8 @@ ROM_START( crzmon2_6 ) // 101220 entertainment x
 	ROM_LOAD( "crazymonkey2_ent_m.007", 0x280000, 0x80000, CRC(e3b9497f) SHA1(248043656796ef8bc827cf8ee4ae6f4a22720156) )
 	ROM_LOAD( "crazymonkey2_ent_m.008", 0x380000, 0x80000, CRC(776808b6) SHA1(d7d6cf42eab6088d740532820ce5cd761b96d000) )
 
-	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(df557d25) SHA1(80642c7172ba3d76b1fcc01806418d26b8922963) )
 ROM_END
 
 ROM_START( crzmon2_7 ) // 101208 entertainment n
@@ -5244,7 +5347,8 @@ ROM_START( crzmon2_7 ) // 101208 entertainment n
 	ROM_LOAD( "crazymonkey2_ent_n.007", 0x280000, 0x80000, CRC(45bb7fd4) SHA1(6dc4e01bea4aacb24285547c4148c4a63f69a943) )
 	ROM_LOAD( "crazymonkey2_ent_n.008", 0x380000, 0x80000, CRC(ca2c45f2) SHA1(752b4a8503d186aff5b517ea59cad344f656392e) )
 
-	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(49bf7ba6) SHA1(33d69a5a2ab7d90c330cce56cfb7dbbe09f56280) )
 ROM_END
 
 ROM_START( crzmon2_8 ) // 101220 entertainment n
@@ -5261,7 +5365,8 @@ ROM_START( crzmon2_8 ) // 101220 entertainment n
 	ROM_LOAD( "crazymonkey2_ent_n.007", 0x280000, 0x80000, CRC(45bb7fd4) SHA1(6dc4e01bea4aacb24285547c4148c4a63f69a943) )
 	ROM_LOAD( "crazymonkey2_ent_n.008", 0x380000, 0x80000, CRC(ca2c45f2) SHA1(752b4a8503d186aff5b517ea59cad344f656392e) )
 
-	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(a76d0c8a) SHA1(80e2b4e00669bd8801dcc0b1579d352320a5807e) )
 ROM_END
 
 ROM_START( crzmon2_9 ) // 110111 entertainment a
@@ -5278,7 +5383,8 @@ ROM_START( crzmon2_9 ) // 110111 entertainment a
 	ROM_LOAD( "crazymonkey2_ent_a.007", 0x280000, 0x80000, CRC(f62c4f9d) SHA1(44cc6c0239484937631f6fe1e9208a8707c4f2d0) )
 	ROM_LOAD( "crazymonkey2_ent_a.008", 0x380000, 0x80000, CRC(e791aa04) SHA1(de2dee2bae01634a04cfe1dc084e939b71f96d90) )
 
-	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(f236f214) SHA1(da69535958bab9e569cf62d1d5203077be6c0308) )
 ROM_END
 
 ROM_START( crzmon2_10 ) // 110124 entertainment a
@@ -5295,7 +5401,8 @@ ROM_START( crzmon2_10 ) // 110124 entertainment a
 	ROM_LOAD( "crazymonkey2_ent_a.007", 0x280000, 0x80000, CRC(f62c4f9d) SHA1(44cc6c0239484937631f6fe1e9208a8707c4f2d0) )
 	ROM_LOAD( "crazymonkey2_ent_a.008", 0x380000, 0x80000, CRC(e791aa04) SHA1(de2dee2bae01634a04cfe1dc084e939b71f96d90) )
 
-	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(a485b308) SHA1(734d509c2e8a80927d518e71d1c18cfe0ab9dac0) )
 ROM_END
 
 ROM_START( crzmon2_11 ) // 110204 entertainment a
@@ -5312,7 +5419,8 @@ ROM_START( crzmon2_11 ) // 110204 entertainment a
 	ROM_LOAD( "crazymonkey2_ent_a.007", 0x280000, 0x80000, CRC(f62c4f9d) SHA1(44cc6c0239484937631f6fe1e9208a8707c4f2d0) )
 	ROM_LOAD( "crazymonkey2_ent_a.008", 0x380000, 0x80000, CRC(e791aa04) SHA1(de2dee2bae01634a04cfe1dc084e939b71f96d90) )
 
-	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(d7b33ba1) SHA1(111c667fc1c6dfa8a9ab9d578128a21e6cb68022) )
 ROM_END
 
 ROM_START( crzmon2_12 ) // 110311 entertainment b
@@ -5329,7 +5437,8 @@ ROM_START( crzmon2_12 ) // 110311 entertainment b
 	ROM_LOAD( "crazymonkey2_ent_b.007", 0x280000, 0x80000, CRC(5a9b2a2e) SHA1(48c3e29fc597d12069a21307e9d64860879a0443) )
 	ROM_LOAD( "crazymonkey2_ent_b.008", 0x380000, 0x80000, CRC(0cbad181) SHA1(ec17bfe1d9c1f05698ab4ad7336d163082079855) )
 
-	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(42c6cbe1) SHA1(8db2c896bbf21ec51a9f84599a21c306f36cc622) )
 ROM_END
 
 ROM_START( crzmon2_13 ) // 140526 entertainment b
@@ -5346,7 +5455,8 @@ ROM_START( crzmon2_13 ) // 140526 entertainment b
 	ROM_LOAD( "crazymonkey2_ent_ba.007", 0x280000, 0x80000, CRC(e3260b29) SHA1(84b98a45a02353441e8480a4563368a5213dc3d3) )
 	ROM_LOAD( "crazymonkey2_ent_ba.008", 0x380000, 0x80000, CRC(797fe9ff) SHA1(0f8cf49c8b8e0c1c558d4fcae14581818882dd3d) )
 
-	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(af942bd2) SHA1(da4d90acce84ed4f7ecc387e890193e47ba303fc) )
 ROM_END
 
 ROM_START( crzmon2_14 ) // 110411 entertainment c
@@ -5363,7 +5473,8 @@ ROM_START( crzmon2_14 ) // 110411 entertainment c
 	ROM_LOAD( "crazymonkey2_ent_c.007", 0x280000, 0x80000, CRC(f62c4f9d) SHA1(44cc6c0239484937631f6fe1e9208a8707c4f2d0) )
 	ROM_LOAD( "crazymonkey2_ent_c.008", 0x380000, 0x80000, CRC(e791aa04) SHA1(de2dee2bae01634a04cfe1dc084e939b71f96d90) )
 
-	ROM_REGION( 0x8000, "m48t35", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "m48t35", 0 ) // factory initialized defaults
+	ROM_LOAD( "m48t35", 0x0000, 0x8000, CRC(b033c22a) SHA1(6e6152c105e5b333be3bdb598dd476ac98de8486) )
 ROM_END
 
 

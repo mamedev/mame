@@ -42,10 +42,29 @@
 #include "osdfile.h"
 
 #include <algorithm>
+#include <array>
 #include <locale>
 
 
 using namespace rapidjson;
+
+namespace {
+
+// identity brightness/contrast/gamma table, same layout as render_container's 256-entry lookup table
+constexpr std::array<rgb_t, 0x400> s_identity_bcg = [] ()
+{
+	std::array<rgb_t, 0x400> table;
+	for (u32 i = 0; i < 0x100; i++)
+	{
+		table[i + 0x000] = rgb_t(i << 0);
+		table[i + 0x100] = rgb_t(i << 8);
+		table[i + 0x200] = rgb_t(i << 16);
+		table[i + 0x300] = rgb_t(i << 24);
+	}
+	return table;
+} ();
+
+} // anonymous namespace
 
 chain_manager::screen_prim::screen_prim(render_primitive *prim)
 {
@@ -536,10 +555,22 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 
 		bgfx_texture* texture = screen < m_screen_textures.size() ? m_screen_textures[screen] : nullptr;
 		bgfx_texture* palette = screen < m_screen_palettes.size() ? m_screen_palettes[screen] : nullptr;
+		bgfx_chain* chain = screen_chain(screen);
 
 		const uint32_t src_format = (prim.m_flags & PRIMFLAG_TEXFORMAT_MASK) >> PRIMFLAG_TEXFORMAT_SHIFT;
 		const bool needs_conversion = m_converters[src_format] != nullptr;
 		const bool needs_adjust = prim.m_prim->texture.palette != nullptr && src_format != TEXFORMAT_PALETTE16;
+
+		// non-palettized screens only get a BCG table while an adjustment is set, but
+		// once the adjuster is in the chain it must be fed one or it keeps the last table
+		const rgb_t *palette_data = prim.m_prim->texture.palette;
+		uint32_t palette_length = prim.m_palette_length;
+		if (!palette_data && chain && chain->has_adjuster())
+		{
+			palette_data = s_identity_bcg.data();
+			palette_length = s_identity_bcg.size();
+		}
+
 		const std::string screen_index = std::to_string(screen);
 		const std::string source_name = "source" + screen_index;
 		const std::string screen_name = "screen" + screen_index;
@@ -570,12 +601,12 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 			texture = newtex.get();
 			m_textures.add_provider(full_name, std::move(newtex));
 
-			if (prim.m_prim->texture.palette)
+			if (palette_data)
 			{
-				uint16_t palette_width = uint16_t(std::min(prim.m_palette_length, 256U));
-				uint16_t palette_height = uint16_t(std::max((prim.m_palette_length + 255) / 256, 1U));
+				uint16_t palette_width = uint16_t(std::min(palette_length, 256U));
+				uint16_t palette_height = uint16_t(std::max((palette_length + 255) / 256, 1U));
 				m_palette_temp.resize(palette_width * palette_height * 4);
-				memcpy(&m_palette_temp[0], prim.m_prim->texture.palette, prim.m_palette_length * 4);
+				memcpy(&m_palette_temp[0], palette_data, palette_length * 4);
 				const bgfx::Memory *palmem = bgfx::copy(&m_palette_temp[0], palette_width * palette_height * 4);
 				auto newpal = std::make_unique<bgfx_texture>(palette_name, bgfx::TextureFormat::BGRA8, palette_width, 0, palette_height, palmem, BGFX_SAMPLER_U_CLAMP | BGFX_SAMPLER_V_CLAMP | BGFX_SAMPLER_MIN_POINT | BGFX_SAMPLER_MAG_POINT | BGFX_SAMPLER_MIP_POINT, palette_width * 4);
 				palette = newpal.get();
@@ -592,22 +623,20 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 			{
 				m_screen_palettes.emplace_back(nullptr);
 			}
-			if (palette)
-			{
-				m_screen_palettes[screen] = palette;
-			}
+			// may be null if the old palette texture was just removed
+			m_screen_palettes[screen] = palette;
 		}
 		else
 		{
 			texture->update(mem, pitch, prim.m_prim->texture.width_margin);
 
-			if (prim.m_prim->texture.palette)
+			if (palette_data)
 			{
-				uint16_t palette_width = uint16_t(std::min(prim.m_palette_length, 256U));
-				uint16_t palette_height = uint16_t(std::max((prim.m_palette_length + 255) / 256, 1U));
+				uint16_t palette_width = uint16_t(std::min(palette_length, 256U));
+				uint16_t palette_height = uint16_t(std::max((palette_length + 255) / 256, 1U));
 				const uint32_t palette_size = palette_width * palette_height * 4;
 				m_palette_temp.resize(palette_size);
-				memcpy(&m_palette_temp[0], prim.m_prim->texture.palette, prim.m_palette_length * 4);
+				memcpy(&m_palette_temp[0], palette_data, palette_length * 4);
 				const bgfx::Memory *palmem = bgfx::copy(&m_palette_temp[0], palette_size);
 
 				if (palette)
@@ -629,7 +658,6 @@ uint32_t chain_manager::update_screen_textures(uint32_t view, render_primitive *
 		}
 
 		const bool has_tint = (prim.m_prim->color.a != 1.0f) || (prim.m_prim->color.r != 1.0f) || (prim.m_prim->color.g != 1.0f) || (prim.m_prim->color.b != 1.0f);
-		bgfx_chain* chain = screen_chain(screen);
 		if (chain && needs_adjust && !chain->has_adjuster())
 		{
 			const bool apply_tint = !needs_conversion && has_tint;

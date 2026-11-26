@@ -3,8 +3,13 @@
 /***********************************************************************
  PGM ASIC3 PGM protection emulation
 
- this seems similar to the IGS025? Is the physical chip ASIC3, or is
- that just what the game calls it?
+ The game calls it ASIC3, the protocol and the protection are the same
+ as the IGS003 on other IGS boards.
+
+ The cartridge (NO-0134-2) shorts some IGS003 outputs to the adjacent
+ inputs on the solder side (the game tests them) and supplies the region
+ on two inputs (probably from JP6 and JP7, with the 10K resistors R2 and
+ R3 next to the chip).
 
  Used by:
 
@@ -16,147 +21,56 @@
 #include "pgm.h"
 #include "pgmprot_orlegend.h"
 
-void pgm_asic3_state::asic3_compute_hold(int y, int z)
+u16 pgm_asic3_state::igs003_r()
 {
-	const u16 old = m_asic3_hold;
+	return m_igs003->data_r();
+}
 
-	m_asic3_hold = ((old << 1) | (old >> 15));
+void pgm_asic3_state::igs003_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	const u8 val = ACCESSING_BITS_0_7 ? (data & 0xff) : (data >> 8);
 
-	m_asic3_hold ^= 0x2bad;
-	m_asic3_hold ^= BIT(z, y);
-	m_asic3_hold ^= BIT(m_asic3_x, 2) << 10;
-	m_asic3_hold ^= BIT(old, 5);
+	if (offset == 0)
+		m_igs003->index_w(val);
+	else
+		m_igs003->data_w(val);
+}
 
-	switch (m_region->read()) // The mode is dependent on the region
+void pgm_asic3_state::machine_start()
+{
+	pgm_state::machine_start();
+
+	save_item(NAME(m_igs003_out));
+}
+
+void pgm_asic3_state::machine_reset()
+{
+	pgm_state::machine_reset();
+
+	// the IGS003 protection parameters differ between the regions' chips (World and Taiwan
+	// supply the same levels on the known region inputs, so they can't select them)
+	switch (m_region->read())
 	{
 		case 0:
 		case 1:
-			m_asic3_hold ^= BIT(old, 10) ^ BIT(old, 8) ^ (BIT(m_asic3_x, 0) << 1) ^ (BIT(m_asic3_x, 1) << 6) ^ (BIT(m_asic3_x, 3) << 14);
-		break;
+			m_igs003->set_hold_taps(igs003_device::hold_taps::A);
+			m_igs003->set_hold_xpos(1, 6, 10, 14);
+			break;
 
 		case 2:
-			m_asic3_hold ^= BIT(old, 10) ^ BIT(old, 8) ^ (BIT(m_asic3_x, 0) << 4) ^ (BIT(m_asic3_x, 1) << 6) ^ (BIT(m_asic3_x, 3) << 12);
-		break;
+			m_igs003->set_hold_taps(igs003_device::hold_taps::A);
+			m_igs003->set_hold_xpos(4, 6, 10, 12);
+			break;
 
 		case 3:
-			m_asic3_hold ^= BIT(old,  7) ^ BIT(old, 6) ^ (BIT(m_asic3_x, 0) << 4) ^ (BIT(m_asic3_x, 1) << 6) ^ (BIT(m_asic3_x, 3) << 12);
-		break;
+			m_igs003->set_hold_taps(igs003_device::hold_taps::B);
+			m_igs003->set_hold_xpos(4, 6, 10, 12);
+			break;
 
 		case 4: // orlegend111t
-			m_asic3_hold ^= BIT(old,  7) ^ BIT(old, 6) ^ (BIT(m_asic3_x, 0) << 3) ^ (BIT(m_asic3_x, 1) << 8) ^ (BIT(m_asic3_x, 3) << 14);
-		break;
-	}
-}
-u16 pgm_asic3_state::pgm_asic3_r()
-{
-	switch (m_asic3_reg)
-	{
-		case 0x00: // region is supplied by the protection device
-			return (m_asic3_latch[0] & 0xf7) | ((m_region->read() << 3) & 0x08);
-
-		case 0x01:
-			return m_asic3_latch[1];
-
-		case 0x02: // region is supplied by the protection device
-			return (m_asic3_latch[2] & 0x7f) | ((m_region->read() << 6) & 0x80);
-
-		case 0x03:
-			return bitswap<8>(m_asic3_hold, 5,2,9,7,10,13,12,15);
-
-		// case $157674, expected return $157686
-		case 0x20: return 0x49; // "IGS"
-		case 0x21: return 0x47;
-		case 0x22: return 0x53;
-
-		case 0x24: return 0x41;
-		case 0x25: return 0x41;
-		case 0x26: return 0x7f;
-		case 0x27: return 0x41;
-		case 0x28: return 0x41;
-
-		case 0x2a: return 0x3e;
-		case 0x2b: return 0x41;
-		case 0x2c: return 0x49;
-		case 0x2d: return 0xf9;
-		case 0x2e: return 0x0a;
-
-		case 0x30: return 0x26;
-		case 0x31: return 0x49;
-		case 0x32: return 0x49;
-		case 0x33: return 0x49;
-		case 0x34: return 0x32;
-
-	//  default:
-	//       logerror("ASIC3 R: CMD %2.2X %s\n", m_asic3_reg, machine().describe_context());
-	}
-
-	return 0;
-}
-
-void pgm_asic3_state::pgm_asic3_w(offs_t offset, u16 data)
-{
-	if (offset == 0)
-	{
-		m_asic3_reg = data;
-		return;
-	}
-
-	switch (m_asic3_reg)
-	{
-		case 0x00:
-		case 0x01:
-		case 0x02:
-			m_asic3_latch[m_asic3_reg] = data << 1;
-		break;
-
-	//  case 0x03: // move.w  #$88, $c0400e.l
-	//  case 0x04: // move.w  #$84, $c0400e.l
-	//  case 0x05: // move.w  #$A0, $c0400e.l
-	//  break;
-
-		case 0x40:
-			m_asic3_hilo = (m_asic3_hilo << 8) | data;
-		break;
-
-		case 0x41: // Same as CMD 40. What is the purpose of writing data here again??
-		case 0x42:
-		case 0x43:
-		case 0x44:
-		case 0x45:
-		case 0x46:
-		case 0x47:
-		break;
-
-		case 0x48:
-		{
-			m_asic3_x = 0;
-			if ((m_asic3_hilo & 0x0090) == 0) m_asic3_x |= 0x01;
-			if ((m_asic3_hilo & 0x0006) == 0) m_asic3_x |= 0x02;
-			if ((m_asic3_hilo & 0x9000) == 0) m_asic3_x |= 0x04;
-			if ((m_asic3_hilo & 0x0a00) == 0) m_asic3_x |= 0x08;
-		}
-		break;
-
-	//  case 0x50: // move.w  #$50, $c0400e.l
-	//  break;
-
-		case 0x80:
-		case 0x81:
-		case 0x82:
-		case 0x83:
-		case 0x84:
-		case 0x85:
-		case 0x86:
-		case 0x87:
-			asic3_compute_hold(m_asic3_reg & 0x07, data);
-		break;
-
-		case 0xa0:
-			m_asic3_hold = 0;
-		break;
-
-		default:
-			logerror("ASIC3 W: CMD %2.2X DATA: %4.4x %s\n", m_asic3_reg, data, machine().describe_context());
+			m_igs003->set_hold_taps(igs003_device::hold_taps::B);
+			m_igs003->set_hold_xpos(3, 8, 10, 14);
+			break;
 	}
 }
 
@@ -166,22 +80,8 @@ void pgm_asic3_state::init_orlegend()
 {
 	pgm_basic_init();
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc04000, 0xc0400f, read16smo_delegate(*this, FUNC(pgm_asic3_state::pgm_asic3_r)));
-	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc04000, 0xc0400f, write16sm_delegate(*this, FUNC(pgm_asic3_state::pgm_asic3_w)));
-
-	m_asic3_reg = 0;
-	m_asic3_latch[0] = 0;
-	m_asic3_latch[1] = 0;
-	m_asic3_latch[2] = 0;
-	m_asic3_x = 0;
-	m_asic3_hilo = 0;
-	m_asic3_hold = 0;
-
-	save_item(NAME(m_asic3_reg));
-	save_item(NAME(m_asic3_latch));
-	save_item(NAME(m_asic3_x));
-	save_item(NAME(m_asic3_hilo));
-	save_item(NAME(m_asic3_hold));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc04000, 0xc0400f, read16smo_delegate(*this, FUNC(pgm_asic3_state::igs003_r)));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc04000, 0xc0400f, write16s_delegate(*this, FUNC(pgm_asic3_state::igs003_w)));
 }
 
 
@@ -228,4 +128,13 @@ INPUT_PORTS_END
 void pgm_asic3_state::pgm_asic3(machine_config &config)
 {
 	pgmbase(config);
+
+	IGS003(config, m_igs003);
+	m_igs003->out_pa_callback().set([this] (u8 data) { m_igs003_out[0] = data; });
+	m_igs003->out_pb_callback().set([this] (u8 data) { m_igs003_out[1] = data; });
+	m_igs003->out_pc_callback().set([this] (u8 data) { m_igs003_out[2] = data; });
+	// outputs looped back: A6 -> A7, B1 -> B2, B6 -> B7, C4 -> C5, region on A3 and C7
+	m_igs003->in_pa_callback().set([this] () -> u8 { return ((m_igs003_out[0] << 1) & 0x80) | ((m_region->read() << 3) & 0x08); });
+	m_igs003->in_pb_callback().set([this] () -> u8 { return (m_igs003_out[1] << 1) & 0x84; });
+	m_igs003->in_pc_callback().set([this] () -> u8 { return ((m_igs003_out[2] << 1) & 0x20) | ((m_region->read() << 6) & 0x80); });
 }

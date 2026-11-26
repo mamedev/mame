@@ -20,16 +20,27 @@
 
 DEFINE_DEVICE_TYPE(SIS85C496_HOST, sis85c496_host_device, "sis85c496_host", "SiS 85C496/497 chipset")
 
+// TODO: finalize monkey typing
 void sis85c496_host_device::config_map(address_map &map)
 {
 	pci_host_device::config_map(map);
+	map(0x10, 0x3f).noprw();
 	map(0x40, 0x40).rw(FUNC(sis85c496_host_device::dram_config_r), FUNC(sis85c496_host_device::dram_config_w));
 	map(0x44, 0x45).rw(FUNC(sis85c496_host_device::shadow_config_r), FUNC(sis85c496_host_device::shadow_config_w));
 	map(0x48, 0x4f).lrw8(
 		NAME([this] (offs_t offset) { return m_dram_boundary[offset]; }),
-		NAME([this] (offs_t offset, u8 data) {
+		NAME([this] (offs_t offset, uint8_t data) {
 			logerror("SiS496: DRAM boundary [%02x] set %02x\n", offset, data);
 			m_dram_boundary[offset] = data;
+		})
+	);
+	map(0x56, 0x56).lrw8(
+		NAME([this] () {
+			return m_pci_keyb_ctrl;
+		}),
+		NAME([this] (offs_t offset, uint8_t data) {
+			logerror("SiS496: PCI / Keyboard Configure %02x\n", data);
+			m_pci_keyb_ctrl = data;
 		})
 	);
 	map(0x58, 0x59).rw(FUNC(sis85c496_host_device::ide_vesa_config_r), FUNC(sis85c496_host_device::ide_vesa_config_w));
@@ -51,11 +62,12 @@ void sis85c496_host_device::internal_io_map(address_map &map)
 	map(0x0064, 0x0067).rw("keybc", FUNC(at_keyboard_controller_device::status_r), FUNC(at_keyboard_controller_device::command_w));
 	map(0x0070, 0x0070).lr8(NAME([this] () { return m_ds12885->get_address(); })).w(FUNC(sis85c496_host_device::rtc_address_nmi_w));
 	map(0x0071, 0x0071).rw("rtc", FUNC(ds12885_device::data_r), FUNC(ds12885_device::data_w));
-	map(0x0080, 0x009f).rw(FUNC(sis85c496_host_device::at_page8_r), FUNC(sis85c496_host_device::at_page8_w));
+	map(0x0080, 0x008f).rw(FUNC(sis85c496_host_device::at_page8_r), FUNC(sis85c496_host_device::at_page8_w));
+	map(0x0092, 0x0092).rw(FUNC(sis85c496_host_device::port92_r), FUNC(sis85c496_host_device::port92_w));
 	map(0x00a0, 0x00a1).rw("pic8259_slave", FUNC(pic8259_device::read), FUNC(pic8259_device::write));
 	map(0x00c0, 0x00df).rw(FUNC(sis85c496_host_device::at_dma8237_2_r), FUNC(sis85c496_host_device::at_dma8237_2_w));
 	// map(0x00e0, 0x00ef) MCA bus (cfr. Bochs) or PnP
-	map(0x00eb, 0x00eb).lw8(NAME([] (offs_t offset, u8 data) { }));
+	map(0x00eb, 0x00eb).lw8(NAME([] (offs_t offset, uint8_t data) { }));
 }
 
 void sis85c496_host_device::device_add_mconfig(machine_config &config)
@@ -205,7 +217,12 @@ void sis85c496_host_device::device_start()
 	io_window_start = 0;
 	io_window_end   = 0xffff;
 	io_offset       = 0;
-	status = 0x0010;
+	// spaces and bus master hardwired to 1
+	command = 0x0007;
+	// Parity Error, SERR#, Fast Back-to-Back Control
+	command_mask = 0x0340;
+	// Medium DEVSEL#, Fast Back-to-Back
+	status = 0x0280;
 
 	m_bios_config = 0x78;
 	m_dram_config = 0;
@@ -215,7 +232,10 @@ void sis85c496_host_device::device_start()
 
 	ram.resize(ram_size/4);
 
+	save_item(NAME(m_port92));
+
 	save_item(NAME(m_shadctrl));
+	save_item(NAME(m_pci_keyb_ctrl));
 }
 
 void sis85c496_host_device::reset_all_mappings()
@@ -233,6 +253,7 @@ void sis85c496_host_device::device_reset()
 	m_cur_eop = false;
 	m_nmi_enabled = 0;
 	m_refresh = false;
+	m_port92 = 0;
 
 	m_bios_config = 0x78;
 	m_dram_config = 0;
@@ -240,6 +261,7 @@ void sis85c496_host_device::device_reset()
 	m_shadctrl = 0;
 	m_smramctrl = 0;
 	m_ide_vesa_ctrl = 0;
+	m_pci_keyb_ctrl = 0;
 
 	memset(m_pirqrc, 0x80, sizeof(m_pirqrc));
 }
@@ -391,19 +413,24 @@ void sis85c496_host_device::map_extra(uint64_t memory_window_start, uint64_t mem
 	{
 		// TODO: doesn't seem to work right for anything after IDE[0] primary
 		// bit 9: swaps IDE channels
-		io_space->install_readwrite_handler(0x170, 0x177, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_w)));
 
-		io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_w)));
+		if (!BIT(m_ide_vesa_ctrl, 7))
+		{
+			io_space->install_readwrite_handler(0x1f0, 0x1f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs0_w)));
 
-		//if (!BIT(m_ide_vesa_ctrl, 6))
-		io_space->install_readwrite_handler(0x370, 0x377, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs1_w)));
+			io_space->install_readwrite_handler(0x3f6, 0x3f6, read8sm_delegate(*this, FUNC(sis85c496_host_device::ide1_read_cs1_r)), write8sm_delegate(*this, FUNC(sis85c496_host_device::ide1_write_cs1_w)));
+		}
 
-		//if (!BIT(m_ide_vesa_ctrl, 7))
-		io_space->install_readwrite_handler(0x3f0, 0x3f7, read32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs1_r)), write32s_delegate(*m_ide[0], FUNC(ide_controller_32_device::cs1_w)));
+		if (!BIT(m_ide_vesa_ctrl, 6))
+		{
+			io_space->install_readwrite_handler(0x170, 0x177, read32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_r)), write32s_delegate(*m_ide[1], FUNC(ide_controller_32_device::cs0_w)));
+
+			io_space->install_readwrite_handler(0x376, 0x376, read8sm_delegate(*this, FUNC(sis85c496_host_device::ide2_read_cs1_r)), write8sm_delegate(*this, FUNC(sis85c496_host_device::ide2_write_cs1_w)));
+		}
 	}
 
-	// 32 megs of RAM (todo: don't hardcode)
-	memory_space->install_ram(0x00100000, 0x01ffffff, &ram[0x00100000/4]);
+	// TODO: memory hole
+	memory_space->install_ram(0x00100000, ram_size - 1, &ram[0x00100000/4]);
 }
 
 // Southbridge
@@ -539,43 +566,45 @@ void sis85c496_host_device::pc_dma_write_word(offs_t offset, uint8_t data)
 }
 
 
-uint8_t sis85c496_host_device::pc_dma8237_0_dack_r() { return 0; } //m_isabus->dack_r(0); }
-uint8_t sis85c496_host_device::pc_dma8237_1_dack_r() { return 0; } //m_isabus->dack_r(1); }
-uint8_t sis85c496_host_device::pc_dma8237_2_dack_r() { return 0; } //m_isabus->dack_r(2); }
-uint8_t sis85c496_host_device::pc_dma8237_3_dack_r() { return 0; } //m_isabus->dack_r(3); }
-uint8_t sis85c496_host_device::pc_dma8237_5_dack_r() { return 0; } //m_isabus->dack_r(5); }
-uint8_t sis85c496_host_device::pc_dma8237_6_dack_r() { return 0; } //m_isabus->dack_r(6); }
-uint8_t sis85c496_host_device::pc_dma8237_7_dack_r() { return 0; } //m_isabus->dack_r(7); }
+uint8_t sis85c496_host_device::pc_dma8237_0_dack_r() { return m_isabus->dack_r(0); }
+uint8_t sis85c496_host_device::pc_dma8237_1_dack_r() { return m_isabus->dack_r(1); }
+uint8_t sis85c496_host_device::pc_dma8237_2_dack_r() { return m_isabus->dack_r(2); }
+uint8_t sis85c496_host_device::pc_dma8237_3_dack_r() { return m_isabus->dack_r(3); }
+uint8_t sis85c496_host_device::pc_dma8237_5_dack_r() { uint16_t ret = m_isabus->dack16_r(5); m_dma_high_byte = ret & 0xff00; return ret; }
+uint8_t sis85c496_host_device::pc_dma8237_6_dack_r() { uint16_t ret = m_isabus->dack16_r(6); m_dma_high_byte = ret & 0xff00; return ret; }
+uint8_t sis85c496_host_device::pc_dma8237_7_dack_r() { uint16_t ret = m_isabus->dack16_r(7); m_dma_high_byte = ret & 0xff00; return ret; }
 
+void sis85c496_host_device::pc_dma8237_0_dack_w(uint8_t data) { m_isabus->dack_w(0, data); }
+void sis85c496_host_device::pc_dma8237_1_dack_w(uint8_t data) { m_isabus->dack_w(1, data); }
+void sis85c496_host_device::pc_dma8237_2_dack_w(uint8_t data) { m_isabus->dack_w(2, data); }
+void sis85c496_host_device::pc_dma8237_3_dack_w(uint8_t data) { m_isabus->dack_w(3, data); }
+void sis85c496_host_device::pc_dma8237_5_dack_w(uint8_t data) { m_isabus->dack16_w(5, m_dma_high_byte | data); }
+void sis85c496_host_device::pc_dma8237_6_dack_w(uint8_t data) { m_isabus->dack16_w(6, m_dma_high_byte | data); }
+void sis85c496_host_device::pc_dma8237_7_dack_w(uint8_t data) { m_isabus->dack16_w(7, m_dma_high_byte | data); }
 
-void sis85c496_host_device::pc_dma8237_0_dack_w(uint8_t data) { } //m_isabus->dack_w(0, data); }
-void sis85c496_host_device::pc_dma8237_1_dack_w(uint8_t data) { } //m_isabus->dack_w(1, data); }
-void sis85c496_host_device::pc_dma8237_2_dack_w(uint8_t data) { } //m_isabus->dack_w(2, data); }
-void sis85c496_host_device::pc_dma8237_3_dack_w(uint8_t data) { } //m_isabus->dack_w(3, data); }
-void sis85c496_host_device::pc_dma8237_5_dack_w(uint8_t data) { } //m_isabus->dack_w(5, data); }
-void sis85c496_host_device::pc_dma8237_6_dack_w(uint8_t data) { } //m_isabus->dack_w(6, data); }
-void sis85c496_host_device::pc_dma8237_7_dack_w(uint8_t data) { } //m_isabus->dack_w(7, data); }
 
 void sis85c496_host_device::at_dma8237_out_eop(int state)
 {
 	m_cur_eop = state == ASSERT_LINE;
-	//if(m_dma_channel != -1)
-//      m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
+	if(m_dma_channel != -1)
+		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
 }
 
 void sis85c496_host_device::pc_select_dma_channel(int channel, bool state)
 {
-	//m_isabus->dack_line_w(channel, state);
+	m_isabus->dack_line_w(channel, state);
 
-	if(!state) {
+	if(!state)
+	{
 		m_dma_channel = channel;
-		//if(m_cur_eop)
-//          m_isabus->eop_w(channel, ASSERT_LINE );
-
-	} else if(m_dma_channel == channel) {
+		if(m_cur_eop)
+			m_isabus->eop_w(channel, ASSERT_LINE );
+	}
+	else if(m_dma_channel == channel)
+	{
 		m_dma_channel = -1;
-		//if(m_cur_eop)
-//          m_isabus->eop_w(channel, CLEAR_LINE );
+		if(m_cur_eop)
+			m_isabus->eop_w(channel, CLEAR_LINE );
 	}
 }
 
@@ -791,38 +820,45 @@ void sis85c496_host_device::cpu_reset_w(int state)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
-/*
+// TODO: seems fast A20 compatible, but sis85c496 never enables it
+// also requires bit 1 of m_pci_keyb_ctrl to be high
+u8 sis85c496_host_device::port92_r(offs_t offset)
+{
+	return m_port92;
+}
 
-after decompress to shadow RAM:
-
-config_write 00:05.0:40 00000004 @ 000000ff
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28058 = 00120000 & 00FF0000 SMRAM: e0000 to SMRAM, enable
-config_write 00:05.0:58 00120000 @ 00ff0000
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28058 = 00040000 & 00FF0000 SMRAM: always enable
-config_write 00:05.0:58 00040000 @ 00ff0000
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28058 = 00000000 & 00FF0000 SMRAM: disable
-config_write 00:05.0:58 00000000 @ 00ff0000
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 280A0 = 0000FF00 & 0000FF00 SMI: clear all requests
-config_write 00:05.0:a0 0000ff00 @ 0000ff00
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 280A0 = 000000FF & 000000FF SMI: clear all requests
-config_write 00:05.0:a0 000000ff @ 000000ff
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 2808C = 00000500 & 0000FF00 SMI: timer count
-config_write 00:05.0:8c 00000500 @ 0000ff00
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 2809C = 00020000 & 00FF0000 SMI: start countdown timer
-config_write 00:05.0:9c 00020000 @ 00ff0000
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28084 = 00000006 & 000000FF clear deturbo and break switch blocks
-config_write 00:05.0:84 00000006 @ 000000ff
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28080 = 00000004 & 000000FF enable soft-SMI
-config_write 00:05.0:80 00000004 @ 000000ff
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 280A0 = 00100000 & 00FF0000 select software SMI request
-config_write 00:05.0:a0 00100000 @ 00ff0000
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 2809C = 00010000 & 00FF0000 assert SMI
-config_write 00:05.0:9c 00010000 @ 00ff0000
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 280C4 = 00080000 & 00FF0000 IRQ routing: undocumented value
-config_write 00:05.0:c4 00080000 @ 00ff0000
-[:pci:05.0] ':maincpu' (000FF6D8): unmapped configuration_space memory write to 28080 = 00000000 & 000000FF clear all SMI
-config_write 00:05.0:80 00000000 @ 000000ff
+void sis85c496_host_device::port92_w(offs_t offset, u8 data)
+{
+	logerror("port92_w %02x\n", data);
+	m_port92 = data;
+}
 
 
+// NOTE: command branch is commented out because this host cannot disable I/O space access anyway
+uint8_t sis85c496_host_device::ide1_read_cs1_r(offs_t offset)
+{
+//	if (!(command & 1))
+//		return 0xff;
+	return m_ide[0]->read_cs1(1, 0xff0000) >> 16;
+}
 
-*/
+void sis85c496_host_device::ide1_write_cs1_w(offs_t offset, uint8_t data)
+{
+//	if (!(command & 1))
+//		return;
+	m_ide[0]->write_cs1(1, data << 16, 0xff0000);
+}
+
+uint8_t sis85c496_host_device::ide2_read_cs1_r(offs_t offset)
+{
+//	if (!(command & 1))
+//		return 0xff;
+	return m_ide[1]->read_cs1(1, 0xff0000) >> 16;
+}
+
+void sis85c496_host_device::ide2_write_cs1_w(offs_t offset, uint8_t data)
+{
+//	if (!(command & 1))
+//		return;
+	m_ide[1]->write_cs1(1, data << 16, 0xff0000);
+}

@@ -577,6 +577,7 @@ private:
 	void update_pf_out();
 	bool sport_enabled(int port) const;
 	void sport_start(int port);
+	bool sport_autobuffer_tx(int port);
 	TIMER_CALLBACK_MEMBER(sport_tick);
 
 	// address spaces

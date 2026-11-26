@@ -335,7 +335,10 @@ void sn76496_base_device::write(u8 data)
 		r = (data & 0x70) >> 4;
 		m_last_register = r;
 		if ((m_ncr_style_psg && (r == 6)) && ((data & 0x04) != (m_register[6] & 0x04)))
+		{
 			m_RNG = m_feedback_mask; // NCR-style PSG resets the LFSR only on a mode write which actually changes the state of bit 2 of register 6
+			m_output[3] = m_RNG & 1;
+		}
 		m_register[r] = (m_register[r] & 0x3f0) | (data & 0x0f);
 	}
 	else
@@ -383,7 +386,10 @@ void sn76496_base_device::write(u8 data)
 				// N/512,N/1024,N/2048,Tone #3 output
 				m_period[3] = ((n & 3) == 3) ? (m_period[2] << 1) : (1 << (5 + (n & 3)));
 				if (!m_ncr_style_psg)
+				{
 					m_RNG = m_feedback_mask;
+					m_output[3] = m_RNG & 1;
+				}
 			}
 			break;
 	}

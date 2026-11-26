@@ -312,10 +312,12 @@ void h8gen_dma_channel_device::start(int submodule)
 		if(m_state[submodule].m_bcount > 1)
 			m_state[submodule].m_flags |= h8_dma_state::BLOCK;
 
-	} else if(m_state[submodule].m_flags & h8_dma_state::REPEAT)
-		m_state[submodule].m_count = m_etcr[0] & 0xff ? m_etcr[0] & 0xff : 0x100;
-	else
+	} else if(mode == FAE_NORMAL)
 		m_state[submodule].m_count = m_etcr[0] ? m_etcr[0] : 0x10000;
+	else if(m_state[submodule].m_flags & h8_dma_state::REPEAT)
+		m_state[submodule].m_count = m_etcr[submodule] & 0xff ? m_etcr[submodule] & 0xff : 0x100;
+	else
+		m_state[submodule].m_count = m_etcr[submodule] ? m_etcr[submodule] : 0x10000;
 
 	if(!(vector == AUTOREQ_CS || vector == AUTOREQ_B || (vector == DREQ_LEVEL && m_dreq)))
 		m_state[submodule].m_flags |= h8_dma_state::SUSPENDED;
@@ -716,12 +718,12 @@ u16 h8s_dma_channel_device::channel_flags(int submodule) const
 			res |= h8_dma_state::MODE_16;
 		if(!BIT(m_dmacr, 13))
 			res |= h8_dma_state::SOURCE_IDLE;
-		else if(!BIT(m_dmacr, 14))
+		else if(BIT(m_dmacr, 14))
 			res |= h8_dma_state::SOURCE_DECREMENT;
 
 		if(!BIT(m_dmacr, 5))
 			res |= h8_dma_state::DEST_IDLE;
-		else if(!BIT(m_dmacr, 6))
+		else if(BIT(m_dmacr, 6))
 			res |= h8_dma_state::DEST_DECREMENT;
 
 		if(!BIT(m_dmacr, 12))

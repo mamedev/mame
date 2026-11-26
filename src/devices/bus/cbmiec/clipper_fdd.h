@@ -41,6 +41,8 @@ protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(8, 0x03); }
 
 	// device_cbm_iec_interface overrides
 	virtual void cbm_iec_atn(int state) override;
@@ -51,6 +53,7 @@ private:
 	required_device<via6522_device> m_via;
 	required_device<upd765a_device> m_fdc;
 	required_device<floppy_connector> m_floppy;
+	required_ioport m_address;
 	output_finder<> m_led;
 
 	void mem_map(address_map &map) ATTR_COLD;

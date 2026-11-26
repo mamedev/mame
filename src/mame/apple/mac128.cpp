@@ -121,10 +121,14 @@ Scanline 0 is the start of vblank.
 #include "softlist.h"
 #include "speaker.h"
 
+//#define VERBOSE 1
+#include "logmacro.h"
+
 namespace {
 
 static constexpr auto C7M   = (15.6672_MHz_XTAL / 2);
-static constexpr auto C3_7M = (15.6672_MHz_XTAL / 4).value();
+// C3.7M, 3.672 MHz (IM III-25): the Plus TSG PAL divides C16M by 4 but skips one toggle per 32 C16M clocks
+static constexpr auto C3_7M = (15.6672_MHz_XTAL * 15 / 64);
 
 // video parameters
 static constexpr s32 MAC_H_VIS   = 512;
@@ -267,6 +271,7 @@ private:
 	void mac_via_out_b(u8 data);
 	void mac_via_out_a_se(u8 data);
 	void mac_via_out_b_se(u8 data);
+	void cpu_reset_w(int state);
 	void mac_via_irq(int state);
 	void update_volume();
 
@@ -358,6 +363,40 @@ void mac128_state::machine_reset()
 	m_scsi_drq = false;
 
 	m_via->write_pb6(0);
+}
+
+// The RESET instruction drives the 68000's RESET pin.  On the SE that is the
+// board's /RESET, which goes to the VIA, the SWIM, the 5380 and the BBU (Guide
+// to the Macintosh Family Hardware, 2nd ed., table 14-2, p. 451); the other
+// models are taken to match.  The table also lists the SCC, but the Z8530 has
+// no reset input.  None of these devices has a reset line here, so the
+// handler resets them directly.
+//
+// The ADB modem (the 342S0440-B PIC) is reset too.  The SE and Classic
+// schematics don't show its reset pin; on the Mac II, IIcx and SE/30 it is on
+// /RESET (see macii.cpp), and the SE and Classic are taken to match.  Without
+// this, a restart while the mouse is moving apparently leaves the PIC part
+// way through a transaction: it never sends the ADB reset pulse, and the
+// mouse and keyboard are dead after the restart.
+void mac128_state::cpu_reset_w(int state)
+{
+	if (!state)
+		return;
+
+	LOG("RESET from CPU\n");
+
+	// the SE's BBU comes out of reset with the ROM overlaid at 0 (p. 242),
+	// and the Classic is taken to do the same; on earlier models the VIA
+	// reset below does it, as PA4 goes high (p. 242)
+	m_overlay = true;
+	m_via->reset();
+	m_iwm->reset();
+	if (m_ncr5380)
+		m_ncr5380->reset();
+	if (m_scsihelp)
+		m_scsihelp->reset();
+	if (m_adbmodem)
+		m_adbmodem->reset();
 }
 
 u16 mac128_state::ram_r(offs_t offset)
@@ -1151,6 +1190,7 @@ void mac128_state::mac512ke(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::mac512ke_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
 	m_maincpu->set_tas_write_callback(NAME([] (offs_t offset, u8 data) { })); // TAS read-modify-write cycles are not supported on pre-SE Macs
+	m_maincpu->reset_cb().set(FUNC(mac128_state::cpu_reset_w));
 	config.set_maximum_quantum(attotime::from_hz(60));
 
 	/* video hardware */
@@ -1187,20 +1227,21 @@ void mac128_state::mac512ke(machine_config &config)
 	applefdintf_device::add_35(config, m_floppy[0]);
 	applefdintf_device::add_35(config, m_floppy[1]);
 
-	SCC85C30(config, m_scc, C7M);
-	m_scc->configure_channels(C3_7M, 0, C3_7M, 0);
+	SCC85C30(config, m_scc, C3_7M);
+	m_scc->configure_channels(C3_7M.value(), 0, C3_7M.value(), 0);
 	m_scc->out_int_callback().set(FUNC(mac128_state::set_scc_interrupt));
 	m_scc->out_txda_callback().set("modem", FUNC(rs232_port_device::write_txd));
 	m_scc->out_txdb_callback().set("printer", FUNC(rs232_port_device::write_txd));
 
+	// DE-9 serial ports: the only handshake line is an input (pin 7) to /CTS;
+	// there is no handshake output.  /DCDA and /DCDB are the mouse's X1 and Y1
+	// interrupts, not connected to the ports.
 	rs232_port_device &rs232a(RS232_PORT(config, "modem", default_rs232_devices, nullptr));
 	rs232a.rxd_handler().set(m_scc, FUNC(z80scc_device::rxa_w));
-	rs232a.dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
 	rs232a.cts_handler().set(m_scc, FUNC(z80scc_device::ctsa_w));
 
 	rs232_port_device &rs232b(RS232_PORT(config, "printer", default_rs232_devices, nullptr));
 	rs232b.rxd_handler().set(m_scc, FUNC(z80scc_device::rxb_w));
-	rs232b.dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 	rs232b.cts_handler().set(m_scc, FUNC(z80scc_device::ctsb_w));
 
 	MOS6522(config, m_via, C7M/10);
@@ -1294,6 +1335,12 @@ void mac128_state::macplus(machine_config &config)
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd").set_filter("MC68000,macplus");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom").set_filter("MC68000,macplus");
 
+	// mini-DIN-8 serial ports add a handshake output, HSKo (pin 1), driven from
+	// the SCC's /DTR through a line driver.  GPi (pin 7) is not connected here:
+	// /DCDA and /DCDB are the mouse's X1 and Y1.
+	m_scc->out_dtra_callback().set("modem", FUNC(rs232_port_device::write_dtr));
+	m_scc->out_dtrb_callback().set("printer", FUNC(rs232_port_device::write_dtr));
+
 	/* internal ram */
 	m_ram->set_default_size("4M");
 	m_ram->set_extra_options("1M,2M,2560K,4M");
@@ -1311,6 +1358,7 @@ void mac128_state::macse(machine_config &config)
 	M68000(config.replace(), m_maincpu, C7M);
 	m_maincpu->set_addrmap(AS_PROGRAM, &mac128_state::macse_map);
 	m_maincpu->set_dasm_override(std::function(&mac68k_dasm_override), "mac68k_dasm_override");
+	m_maincpu->reset_cb().set(FUNC(mac128_state::cpu_reset_w));
 
 	config.device_remove("kbd");
 	config.device_remove("pds");
@@ -1347,6 +1395,11 @@ void mac128_state::macse(machine_config &config)
 	m_adbbus->out_adb_callback().set(m_adbmodem, FUNC(adbmodem_device::set_adb_line));
 	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
 	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
+
+	// each serial port's GPi (pin 7) reaches the SCC's /DCD input; the mouse
+	// is on ADB here
+	subdevice<rs232_port_device>("modem")->dcd_handler().set(m_scc, FUNC(z80scc_device::dcda_w));
+	subdevice<rs232_port_device>("printer")->dcd_handler().set(m_scc, FUNC(z80scc_device::dcdb_w));
 
 	R65NC22(config.replace(), m_via, C7M/10);
 	m_via->readpa_handler().set(FUNC(mac128_state::mac_via_in_a));
@@ -1394,6 +1447,10 @@ void mac128_state::macclasc(machine_config &config)
 	NCR53C80(config.replace(), m_ncr5380);
 	m_ncr5380->irq_handler().set(DEVICE_SELF, FUNC(mac128_state::scsi_irq_w));
 	m_ncr5380->drq_handler().set(m_scsihelp, FUNC(mac_scsi_helper_device::drq_w));
+
+	// serial ports as the Plus's: GPi (pin 7) is not connected
+	subdevice<rs232_port_device>("modem")->dcd_handler().set_nop();
+	subdevice<rs232_port_device>("printer")->dcd_handler().set_nop();
 
 	subdevice<software_list_device>("flop_mac35_orig")->set_filter("MC68000,macclasc");
 	subdevice<software_list_device>("flop_mac35_clean")->set_filter("MC68000,macclasc");

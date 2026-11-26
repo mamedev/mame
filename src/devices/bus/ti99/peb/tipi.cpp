@@ -116,7 +116,7 @@
 
 
     Michael Zapf
-    March 20222
+    March 2022
 
     References
 
@@ -138,14 +138,15 @@
 #define LOG_PROT       (1U << 8)
 
 #define VERBOSE (LOG_GENERAL | LOG_WARN)
-#define RASPI "rpi"
-
-#define PAUSEBASE 1000
-
 #include "logmacro.h"
 
+const int PAUSEBASE = 1000;  // milliseconds
+const int MAXATTEMPTS = 8;
+
+#define RASPI "rpi"
+
 DEFINE_DEVICE_TYPE(TI99_TIPI, bus::ti99::peb::tipi_card_device, "ti99_tipi", "TIPI card")
-DEFINE_DEVICE_TYPE(TI99_TIPI_RPI, bus::ti99::peb::tipi_attached_device, "ti99_tipi_atttached", "Connection to external device")
+DEFINE_DEVICE_TYPE(TI99_TIPI_RPI, bus::ti99::peb::tipi_attached_device, "ti99_tipi_attached", "Connection to external device")
 
 namespace bus::ti99::peb {
 
@@ -158,8 +159,10 @@ tipi_card_device::tipi_card_device(const machine_config &mconfig, const char *ta
 	m_portaccess(false),
 	m_waitinit(false),
 	m_syncmode(true),
+	m_listener(nullptr),
 	m_connected(false),
 	m_rpiconn(false),
+	m_client_started(false),
 	m_pausetime(PAUSEBASE),
 	m_pending_read(false),
 	m_tc(0),
@@ -450,50 +453,15 @@ void tipi_card_device::set_tc(u8 command)
 */
 TIMER_CALLBACK_MEMBER(tipi_card_device::open_websocket)
 {
-	if (m_rpiconn)
+	if (m_wsclient)
 	{
-		// We are just interested in the file name
-		// Cannot call it "socket.xxx" because this will make sdlsocket open
-		// the connection
-		std::string sconn(m_rpi->filename());
-		int pos = sconn.find("rpi.");
-
-		if (pos != -1)
-		{
-			std::string shost(sconn.substr(pos + 4));
-			if (shost.find(":")==-1)
-				shost += ":9901";
-
-			shost += "/tipi";
-
-			LOG("Trying to connect to Raspberry Pi at %s\n", shost.c_str());
-
-			m_wsclient = std::make_unique<webpp::ws_client>(shost);
-			webpp::ws_client* wsc = m_wsclient.get();
-			wsc->on_open =
-				[this]()
-				{ websocket_opened(); };
-
-			wsc->on_message =
-				[this](std::shared_ptr<webpp::ws_client::Message> message)
-				{  websocket_incoming(message); };
-
-			wsc->on_close =
-				[this](int i, const std::string& msg)
-				{  websocket_closed(i, msg); };
-
-			wsc->on_error =
-				[this](const std::error_code& code)
-				{  websocket_error(code); };
-
-			m_send_stream = std::make_shared<webpp::ws_client::SendStream>();
-
-			asio::thread listener([this]()
-				{   m_wsclient->start(); });
-		}
-		else
-			fatalerror("Invalid TIPI connection address. Syntax: -conn rpi.<host>[:<port>]\n");
+		LOG("Open websocket in new thread\n");
+		m_client_started = true;
+		m_listener = std::make_unique<asio::thread>([this]() {
+				m_wsclient->start();
+		});
 	}
+	// The thread will be caught in the error handler (join)
 }
 
 void tipi_card_device::websocket_opened()
@@ -591,27 +559,32 @@ void tipi_card_device::websocket_error(const std::error_code& code)
 		else
 		{
 			// End-of-file (2) occurs when the Pi is rebooted
-			LOGMASKED(LOG_WARN, "Got error: %s (%d); retrying after %d secs\n", code.message().c_str(), code.value(), m_pausetime/1000);
+			LOGMASKED(LOG_WARN, "Got error: %s (%d); retrying after %d seconds\n", code.message().c_str(), code.value(), m_pausetime/1000);
 			// Reconnection is not implemented on the Pi side for emulations,
 			// so this may cause the config program to wait forever
 			// Needs to be documented
 		}
+		// Catch the thread
+		m_listener->join();
 		m_restart_timer->adjust(attotime::from_msec(m_pausetime));
 	}
 	else
 	{
-		LOGMASKED(LOG_WARN, "Unable to re-establish connection to TIPI; giving up\n");
+		LOGMASKED(LOG_WARN, "Unable to establish connection to TIPI; giving up\n");
 		m_connected = false;
 	}
 }
 
 void tipi_card_device::websocket_closed(int i, const std::string& msg)
 {
-	LOG("Closing connection; retrying after %d secs\n", m_pausetime/1000);
+	LOG("Closing connection; retrying to open after %d seconds\n", m_pausetime/1000);
 	if (m_waitinit) m_slot->set_ready(CLEAR_LINE);
+	// Catch the thread
+	m_listener->join();
+
 	// Open it again
 	m_restart_timer->adjust(attotime::from_msec(m_pausetime));
-	m_attempts = 8;
+	m_attempts = MAXATTEMPTS;
 }
 
 void tipi_card_device::device_start()
@@ -632,6 +605,49 @@ void tipi_card_device::device_start()
 	m_restart_timer = timer_alloc(FUNC(tipi_card_device::open_websocket), this);
 	m_rpiconn = (m_rpi->exists());
 	m_connected = false;
+
+	if (m_rpiconn)
+	{
+		// We are just interested in the file name
+		// Cannot call it "socket.xxx" because this will make sdlsocket open
+		// the connection
+		std::string sconn(m_rpi->filename());
+		int pos = sconn.find("rpi.");
+
+		if (pos != -1)
+		{
+			std::string shost(sconn.substr(pos + 4));
+			if (shost.find(":")==-1)
+				shost += ":9901";
+
+			shost += "/tipi";
+
+			LOG("Connection to Raspberry Pi set as %s\n", shost.c_str());
+
+			m_wsclient = std::make_unique<webpp::ws_client>(shost);
+			webpp::ws_client* wsc = m_wsclient.get();
+
+			wsc->on_open =
+				[this]()
+				{ websocket_opened(); };
+
+			wsc->on_message =
+				[this](std::shared_ptr<webpp::ws_client::Message> message)
+				{  websocket_incoming(message); };
+
+			wsc->on_close =
+				[this](int i, const std::string& msg)
+				{  websocket_closed(i, msg); };
+
+			wsc->on_error =
+				[this](const std::error_code& code)
+				{  websocket_error(code); };
+
+			m_send_stream = std::make_shared<webpp::ws_client::SendStream>();
+		}
+		else
+			fatalerror("Invalid TIPI connection address. Syntax: -conn rpi.<host>[:<port>]\n");
+	}
 }
 
 void tipi_card_device::device_reset()
@@ -647,16 +663,20 @@ void tipi_card_device::device_reset()
 
 	// READY=0 is ignored at this point because the CPU is being reset at this time
 	m_lasttc = 0;
-	m_attempts = 8;
+	m_attempts = MAXATTEMPTS;
 	if (!m_connected) m_restart_timer->adjust(attotime::from_msec(m_pausetime));
 }
 
 void tipi_card_device::device_stop()
 {
-	// MZ: Without this I'm getting segfaults/list corruption
-	// when leaving the emulation
-	if (m_wsclient != nullptr)
+	if (m_client_started)
 		m_wsclient->stop();
+
+	// Need to explicitly join, or the posix_thread implementation will
+	// forcefully terminate.
+	if (m_listener != nullptr)
+		m_listener->join();
+
 	LOG("Stopping TIPI\n");
 }
 

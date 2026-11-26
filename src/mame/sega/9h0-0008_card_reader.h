@@ -12,8 +12,6 @@
 
 #pragma once
 
-#include "softlist_dev.h"
-
 #include "9h0-0008_iox.h"
 
  /*
@@ -41,11 +39,9 @@ protected:
 	sega_beena_card_reader_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool is_sync_cycle, u8 num_bits, u8 num_hold);
 
 	// device_t implementation
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
-
-	// optional information overrides
-	virtual ioport_constructor device_input_ports() const override;
 
 	required_ioport m_io;
 

@@ -1,10 +1,12 @@
 // license:BSD-3-Clause
 // copyright-holders:Devin Acker, Melissa Goad
 
-// ARM PrimeCell PL910/PL192 VIC emulation
+// ARM PrimeCell PL190/PL192 VIC emulation
 
 #ifndef MAME_MACHINE_VIC_PL192_H
 #define MAME_MACHINE_VIC_PL192_H
+
+#pragma once
 
 class vic_pl190_device : public device_t, public device_memory_interface
 {
@@ -37,7 +39,7 @@ public:
 	u8 protection_r();
 	void protection_w(u8 data);
 
-	u32 cur_vect_addr_r();
+	virtual u32 cur_vect_addr_r();
 	void cur_vect_addr_w(u32 data);
 
 	u32 def_vect_addr_r();
@@ -59,6 +61,8 @@ protected:
 	virtual space_config_vector memory_space_config() const override;
 
 	virtual void update_vector();
+	virtual void update_interrupts();
+	void set_interrupt_outputs(bool irq, bool fiq);
 
 	TIMER_CALLBACK_MEMBER(irq_sync_tick);
 
@@ -81,6 +85,8 @@ private:
 
 	devcb_write_line m_out_irq_func;
 	devcb_write_line m_out_fiq_func;
+	bool m_irq_state;
+	bool m_fiq_state;
 };
 
 class vic_upd800468_device : public vic_pl190_device
@@ -106,17 +112,31 @@ public:
 	u8 daisy_priority_r();
 	void daisy_priority_w(u8 data);
 
+	auto daisy_vector_callback() { return m_daisy_vector.bind(); }
+	void daisy_irq_w(int state);
+	void daisy_fiq_w(int state);
+	u32 vector_r();
+	virtual u32 cur_vect_addr_r() override;
+
 protected:
-
 	virtual void update_vector() override;
+	virtual void update_interrupts() override;
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
 private:
+	static constexpr u8 DAISY_IRQ = 32;
+	static constexpr u8 NO_IRQ = 0xff;
+
+	u8 pending_interrupt() const;
+
+	devcb_read32 m_daisy_vector;
 	u16 sw_priority_mask;
 	u8 daisy_priority;
+	bool m_daisy_irq;
+	bool m_daisy_fiq;
 };
 
 DECLARE_DEVICE_TYPE(PL190_VIC, vic_pl190_device)

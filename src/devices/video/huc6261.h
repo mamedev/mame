@@ -17,14 +17,18 @@
 
 #include "screen.h"
 
+#include <utility>
+
 
 class huc6261_device :  public device_t,
 						public device_video_interface
 {
 public:
 	// Screen timing stuff
-	static constexpr unsigned WPF = 1365;   // width of a line in frame including blanking areas
-	static constexpr unsigned LPF = 263;    // max number of lines in a single frame
+	static constexpr u32 WPF = 1365;   // width of a line in frame including blanking areas
+	static constexpr u32 LPF = 263;    // max number of lines in a single frame
+	// the screen runs at twice the line rate and height, so interlaced fields can be woven into one picture
+	static constexpr u32 SCREEN_LPF = LPF * 2;
 
 	// construction/destruction
 	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
@@ -68,18 +72,24 @@ private:
 	void update_layer_ranks();
 	u32 mix_pixel(u16 vdc0, u16 vdc1, u32 king, u32 rainbow) const;
 	void start_line(int v);
+	std::pair<int, int> beam_position() const;
+	attotime time_until_beam(int v, int h) const;
+	void start_frame();
 
 	required_device_array<huc6270_device, 2> m_huc6270;
 	required_device<huc6272_device> m_huc6272;
 	s32  m_last_h;
 	s32  m_last_v;
 	s32  m_height;
+	bool m_interlace;
+	bool m_odd_field;
 
 	u16  m_palette[512];
 	u16  m_address;
 	u16  m_palette_latch;
 	u16  m_register;
-	u16  m_control;
+	u16  m_control;         // R00 as currently applied
+	u16  m_control_reg;     // R00 as written
 	u8   m_priority[7];
 
 	u8   m_pixels_per_clock; // Number of pixels to output per colour clock

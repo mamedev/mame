@@ -32,6 +32,7 @@ Led display PCB named Namco ST-M4
 #include "cpu/m6809/m6809.h"
 #include "cpu/mc68hc11/mc68hc11.h"
 #include "cpu/z80/z80.h"
+#include "machine/z80sio.h"
 #include "sound/c140.h"
 #include "speaker.h"
 
@@ -119,6 +120,8 @@ void dangbar_state::ledcpu_map(address_map &map)
 void dangbar_state::ledcpu_io(address_map &map)
 {
 	map.global_mask(0xff);
+	map(0x0c, 0x0f).rw("ledsio", FUNC(z80sio_device::ba_cd_r), FUNC(z80sio_device::ba_cd_w));
+	//map(0x20, 0x2f).m("lcdc", FUNC(sed1351_device::register_map));
 }
 
 static INPUT_PORTS_START( dangbar )
@@ -185,6 +188,8 @@ void dangbar_state::dangbar(machine_config &config)
 	m_ledcpu->set_addrmap(AS_IO, &dangbar_state::ledcpu_io);
 	m_ledcpu->set_periodic_int(FUNC(dangbar_state::led_timer_irq), attotime::from_hz(60));
 	m_ledcpu->set_irq_acknowledge_callback(FUNC(dangbar_state::led_vector_r));
+
+	Z80SIO(config, "ledsio", 12'000'000 / 2);
 
 	// video hardware
 	// TODO: LED screen

@@ -98,6 +98,12 @@
 
 namespace {
 
+// 0b00 = both speaker bits inactive
+// 0b01 = speaker positive active
+// 0b10 = speaker negative active
+// 0b11 = both speaker bits active, cancelling each other out
+constexpr double SPEAKER_LEVELS[4] = { 0.0, 1.0, -1.0, 0.0 };
+
 class arduboy_state : public driver_device
 {
 public:
@@ -123,7 +129,6 @@ protected:
 	void arduboy_base(machine_config &config) ATTR_COLD;
 
 	void prg_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
 
 private:
 	uint8_t port_b_r();
@@ -215,9 +220,8 @@ uint8_t arduboy_state::port_c_r()
 
 void arduboy_state::port_c_w(uint8_t data)
 {
-	int speaker_positive = BIT(data, 6);
-	int speaker_negative = BIT(data, 7);
-	m_speaker->level_w(speaker_positive ^ speaker_negative);
+	// bit 6 = speaker positive, bit 7 = speaker negative
+	m_speaker->level_w(BIT(data, 6, 2));
 }
 
 uint8_t arduboy_state::port_d_r()
@@ -259,12 +263,6 @@ void arduboy_state::prg_map(address_map &map)
 	// which the AVR8 core doesn't have yet.
 }
 
-void arduboy_state::data_map(address_map &map)
-{
-	// TODO: 32u4 flash registers. the Arduboy FX needs it
-	map(0x0100, 0x0aff).ram(); // on-chip 2.5kbytes RAM
-}
-
 static INPUT_PORTS_START( arduboy )
 	PORT_START("PORTB")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_BUTTON2 )
@@ -286,7 +284,6 @@ void arduboy_state::arduboy_base(machine_config &config)
 {
 	ATMEGA32U4(config, m_maincpu, 16'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &arduboy_state::prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &arduboy_state::data_map);
 
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->set_low_fuses(0xff);
@@ -308,7 +305,9 @@ void arduboy_state::arduboy_base(machine_config &config)
 	NVRAM(config, "intflash", nvram_device::DEFAULT_ALL_1);
 
 	SPEAKER(config, "mono").front_center();
-	SPEAKER_SOUND(config, m_speaker).add_route(0, "mono", 1.00);
+	SPEAKER_SOUND(config, m_speaker);
+	m_speaker->set_levels(4, SPEAKER_LEVELS);
+	m_speaker->add_route(ALL_OUTPUTS, "mono", 1.00);
 
 	SSD1306(config, m_ssd1306, 0);
 	m_ssd1306->set_screen("screen");

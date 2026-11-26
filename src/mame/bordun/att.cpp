@@ -18,6 +18,7 @@ BTANB:
 
 #include "emu.h"
 
+#include "cpu/z180/hd647180x.h"
 #include "cpu/z80/z80.h"
 #include "machine/gen_latch.h"
 #include "machine/nvram.h"
@@ -44,14 +45,19 @@ public:
 		m_colorram(*this, "colorram")
 	{ }
 
-	void att(machine_config &config) ATTR_COLD;
 	void att3(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
 
-private:
 	required_device<cpu_device> m_maincpu;
+
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void program_map(address_map &map) ATTR_COLD;
+	void ramdac_map(address_map &map) ATTR_COLD;
+
+private:
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -62,14 +68,28 @@ private:
 	void videoram_w(offs_t offset, uint8_t data);
 	void colorram_w(offs_t offset, uint8_t data);
 	TILE_GET_INFO_MEMBER(get_tile_info);
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	void program_map(address_map &map) ATTR_COLD;
-	void att_io_map(address_map &map) ATTR_COLD;
 	void att3_io_map(address_map &map) ATTR_COLD;
+};
+
+class att_audiocpu_state : public att_state
+{
+public:
+	att_audiocpu_state(const machine_config &mconfig, device_type type, const char *tag) :
+		att_state(mconfig, type, tag),
+		m_soundlatch2(*this, "soundlatch2")
+	{ }
+
+	void att(machine_config &config) ATTR_COLD;
+	void attz180(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<generic_latch_8_device> m_soundlatch2;
+
+	void att_io_map(address_map &map) ATTR_COLD;
 	void att_audio_program_map(address_map &map) ATTR_COLD;
-	void att_audio_io_map(address_map &map) ATTR_COLD;
-	void ramdac_map(address_map &map) ATTR_COLD;
+	void att_z80_audio_io_map(address_map &map) ATTR_COLD;
+	void att_z180_audio_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -116,26 +136,6 @@ void att_state::program_map(address_map &map)
 	map(0x9000, 0x97ff).ram().w(FUNC(att_state::colorram_w)).share(m_colorram);
 }
 
-void att_state::att_io_map(address_map &map)
-{
-	map.global_mask(0xff);
-	map.unmap_value_high();
-
-	map(0x00, 0x00).portr("IN0");
-	map(0x01, 0x01).portr("IN1");
-	map(0x02, 0x02).portr("DSW3");
-	map(0x03, 0x03).portr("DSW2");
-	map(0x10, 0x10).portr("DSW4");
-	map(0x11, 0x11).portr("IN2");
-	map(0x12, 0x12).portr("DSW1");
-	// map(0x20, 0x20) // TODO: coin counter / outputs?
-	map(0x40, 0x40).w("ramdac", FUNC(ramdac_device::index_w));
-	map(0x41, 0x41).w("ramdac", FUNC(ramdac_device::pal_w));
-	map(0x42, 0x42).w("ramdac", FUNC(ramdac_device::mask_w));
-	map(0x70, 0x70).nopw();  // TODO: NMI clear? NOPed for now as it spams the log
-	map(0xd0, 0xd0).w("soundlatch", FUNC(generic_latch_8_device::write));
-}
-
 void att_state::att3_io_map(address_map &map)
 {
 	map.global_mask(0xff);
@@ -157,26 +157,54 @@ void att_state::att3_io_map(address_map &map)
 	map(0xf7, 0xf7).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 }
 
-void att_state::att_audio_program_map(address_map &map)
+void att_state::ramdac_map(address_map &map)
+{
+	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+}
+
+void att_audiocpu_state::att_io_map(address_map &map)
+{
+	map.global_mask(0xff);
+	map.unmap_value_high();
+
+	map(0x00, 0x00).portr("IN0");
+	map(0x01, 0x01).portr("IN1");
+	map(0x02, 0x02).portr("DSW3");
+	map(0x03, 0x03).portr("DSW2");
+	map(0x10, 0x10).portr("DSW4");
+	map(0x11, 0x11).portr("IN2");
+	map(0x12, 0x12).portr("DSW1");
+	// map(0x20, 0x20) // TODO: coin counter / outputs?
+	map(0x40, 0x40).w("ramdac", FUNC(ramdac_device::index_w));
+	map(0x41, 0x41).w("ramdac", FUNC(ramdac_device::pal_w));
+	map(0x42, 0x42).w("ramdac", FUNC(ramdac_device::mask_w));
+	map(0x70, 0x70).nopw();  // TODO: NMI clear? NOPed for now as it spams the log
+	map(0xc0, 0xc0).r(m_soundlatch2, FUNC(generic_latch_8_device::read));
+	map(0xd0, 0xd0).w("soundlatch", FUNC(generic_latch_8_device::write));
+}
+
+void att_audiocpu_state::att_audio_program_map(address_map &map)
 {
 	map(0x0000, 0x3fff).rom();
 	map(0x4000, 0x41ff).ram();
 	map(0xf800, 0xffff).ram();
 }
 
-void att_state::att_audio_io_map(address_map &map)
+void att_audiocpu_state::att_z180_audio_io_map(address_map &map)
 {
 	// TODO: lots of reads / writes
 	map.global_mask(0xff);
 
+	map(0x80, 0x80).w(m_soundlatch2, FUNC(generic_latch_8_device::write));
 	map(0x84, 0x84).r("soundlatch", FUNC(generic_latch_8_device::read));
 	map(0x90, 0x91).w("ym2413", FUNC(ym2413_device::write));
 }
 
-
-void att_state::ramdac_map(address_map &map)
+void att_audiocpu_state::att_z80_audio_io_map(address_map &map)
 {
-	map(0x000, 0x3ff).rw("ramdac", FUNC(ramdac_device::ramdac_pal_r), FUNC(ramdac_device::ramdac_rgb666_w));
+	att_z180_audio_io_map(map);
+
+	map(0x66, 0x66).lr8(NAME([this] () -> uint8_t { return m_soundlatch2->pending_r(); })); // on the HD647180X this is internal port G
 }
 
 
@@ -188,7 +216,7 @@ static INPUT_PORTS_START( lianhp2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // active high or it stops after RAM check
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("soundlatch2", FUNC(generic_latch_8_device::pending_r))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
 
 	PORT_START("IN1")
@@ -473,17 +501,17 @@ static GFXDECODE_START( gfx_att3 )
 GFXDECODE_END
 
 
-void att_state::att(machine_config &config)
+void att_audiocpu_state::att(machine_config &config)
 {
 	Z80(config, m_maincpu, 12_MHz_XTAL / 4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &att_state::program_map);
-	m_maincpu->set_addrmap(AS_IO, &att_state::att_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(att_state::nmi_line_pulse));
+	m_maincpu->set_addrmap(AS_PROGRAM, &att_audiocpu_state::program_map);
+	m_maincpu->set_addrmap(AS_IO, &att_audiocpu_state::att_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(att_audiocpu_state::nmi_line_pulse));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 12_MHz_XTAL / 4));
-	audiocpu.set_addrmap(AS_PROGRAM, &att_state::att_audio_program_map);
-	audiocpu.set_addrmap(AS_IO, &att_state::att_audio_io_map);
-	audiocpu.set_periodic_int(FUNC(att_state::irq0_line_hold), attotime::from_hz(4 * 60)); // TODO: find IRQ source
+	audiocpu.set_addrmap(AS_PROGRAM, &att_audiocpu_state::att_audio_program_map);
+	audiocpu.set_addrmap(AS_IO, &att_audiocpu_state::att_z80_audio_io_map);
+	audiocpu.set_periodic_int(FUNC(att_audiocpu_state::irq0_line_hold), attotime::from_hz(4 * 60)); // TODO: find IRQ source
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
@@ -492,20 +520,32 @@ void att_state::att(machine_config &config)
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(512, 256);
 	screen.set_visarea(0, 512-1, 0, 256-1);
-	screen.set_screen_update(FUNC(att_state::screen_update));
+	screen.set_screen_update(FUNC(att_audiocpu_state::screen_update));
 
 	GFXDECODE(config, "gfxdecode", "palette", gfx_att);
 
 	PALETTE(config, "palette").set_entries(0x100);
 
 	ramdac_device &ramdac(RAMDAC(config, "ramdac", "palette"));
-	ramdac.set_addrmap(0, &att_state::ramdac_map);
+	ramdac.set_addrmap(0, &att_audiocpu_state::ramdac_map);
 
 	GENERIC_LATCH_8(config, "soundlatch").data_pending_callback().set_inputline("audiocpu", INPUT_LINE_NMI);
+
+	GENERIC_LATCH_8(config, m_soundlatch2);
 
 	SPEAKER(config, "mono").front_center();
 
 	YM2413(config, "ym2413", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 1.0);
+}
+
+void att_audiocpu_state::attz180(machine_config &config)
+{
+	att(config);
+
+	hd647180x_device &audiocpu(HD647180X(config.replace(), "audiocpu", 12'000'000)); // TODO: model and clock not verified
+	audiocpu.set_addrmap(AS_PROGRAM, &att_audiocpu_state::att_audio_program_map);
+	audiocpu.set_addrmap(AS_IO, &att_audiocpu_state::att_z180_audio_io_map);
+	audiocpu.in_pg_callback().set(m_soundlatch2, FUNC(generic_latch_8_device::pending_r));
 }
 
 void att_state::att3(machine_config &config)
@@ -601,6 +641,30 @@ ROM_START( lianhp2 )
 	ROM_IGNORE(                             0x20000 )
 ROM_END
 
+// no PCB pics, audio ROM has Z180 specific opcodes
+ROM_START( lianhp2a )
+	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_LOAD( "u32", 0x0000, 0x8000, CRC(a42a02bb) SHA1(9767e008dd3350b27f4507e5d62eefda4b1271f4) )
+
+	ROM_REGION( 0x8000, "audiocpu", 0 )
+	ROM_LOAD( "u30", 0x0000, 0x8000, CRC(ff0032e9) SHA1(c4247e32f7aa805d77021b4aaeebce75eb180dbb) ) // 1xxxxxxxxxxxxxx = 0xFF
+
+	ROM_REGION( 0x80000, "tiles", 0 ) // same as lianhp2, without second empty half
+	ROM_LOAD16_BYTE( "u6", 0x00000, 0x20000, CRC(1d5b6a20) SHA1(2d43e54096ca9429a8939d51753eb001c6516796) )
+	ROM_LOAD16_BYTE( "u5", 0x00001, 0x20000, CRC(07d1346b) SHA1(4cfa070453b83ad415fbbd2f33446f67db714584) )
+	ROM_LOAD16_BYTE( "u4", 0x40000, 0x20000, CRC(380039c1) SHA1(6f7ca19864bac9d7dee9d8ccda5c155d2f8b1829) )
+	ROM_LOAD16_BYTE( "u3", 0x40001, 0x20000, CRC(4a77a22f) SHA1(4d24a92299015bc6f686fc9c0b2650c020f0971e) )
+
+	ROM_REGION( 0x400, "plds", ROMREGION_ERASE00 )
+	ROM_LOAD( "16v8.u9",  0x000, 0x117, CRC(b8447b40) SHA1(afe7b122fc3b0daedf8a4bcb80864384c50f4034) )
+	ROM_LOAD( "16v8.u26", 0x200, 0x117, CRC(c3eb781b) SHA1(8b854a542d288b29b145f46e386945d69110a0e6) )
+ROM_END
+
+/*
+U2616V8                                         [0xa5c] CRC(d19faeb7) SHA1(bdd84168b78f6c54c1d7a626ee2c5eb664fab646) SUM(f59a)
+U916V8                                          [0xa5c] CRC(862e769d) SHA1(d77053de0ca680140d832654c6f53548d03d718d) SUM(f566)
+*/
+
 /*
 Lian Huan Pao 3, Bordun, 2003?
 Hardware Info By Guru
@@ -665,5 +729,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, lianhp2, 0, att,  lianhp2, att_state, empty_init, ROT0, "Bordun", "Lian Huan Pao - ATT II",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // audio IRQ timing
-GAME( 2003, lianhp3, 0, att3, lianhp3, att_state, empty_init, ROT0, "Bordun", "Lian Huan Pao - ATT III", MACHINE_SUPPORTS_SAVE )
+GAME( 200?, lianhp2,  0,       att,     lianhp2, att_audiocpu_state, empty_init, ROT0, "Bordun", "Lian Huan Pao - ATT II (Z80 audio CPU)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // audio IRQ timing
+GAME( 200?, lianhp2a, lianhp2, attz180, lianhp2, att_audiocpu_state, empty_init, ROT0, "Bordun", "Lian Huan Pao - ATT II (Z180 audio CPU)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // audio IRQ timing
+GAME( 2003, lianhp3,  0,       att3,    lianhp3, att_state,          empty_init, ROT0, "Bordun", "Lian Huan Pao - ATT III",                 MACHINE_SUPPORTS_SAVE )

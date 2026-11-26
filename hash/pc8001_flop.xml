@@ -1119,7 +1119,7 @@ Prompts for a [COMMUNICATER], RS-232C connection?
 	<software name="galaxyfi">
 		<description>Galaxy Fighter</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>ポニカ (PonyCa)</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="galaxy fighter.d88" size="31424" crc="efdd7cc9" sha1="967592f9c0757cb5905ce0676934c5732724f67c"/>
@@ -1701,10 +1701,11 @@ Prompts for a [COMMUNICATER], RS-232C connection?
 		</part>
 	</software>
 
+	<!-- Boots as Adventure #1, probably released as tape not floppy (hence the question mark for year) -->
 	<software name="omotesan">
 		<description>Omotesando Adventure</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1982?</year>
+		<publisher>ASCII Publishing</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="31424">
 				<rom name="omotesando adventure.d88" size="31424" crc="1e7badc8" sha1="dee558102a80b5ba869df71096bb279b9f26f96b"/>

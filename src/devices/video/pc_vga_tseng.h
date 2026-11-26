@@ -79,6 +79,8 @@ public:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 protected:
+	et4kw32i_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void crtc_map(address_map &map) override ATTR_COLD;
 	virtual void io_3cx_map(address_map &map) override ATTR_COLD;
 
@@ -115,9 +117,18 @@ private:
 	}m_mmu;
 };
 
+class et4kw32p_vga_device :  public et4kw32i_vga_device
+{
+public:
+	et4kw32p_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+
+protected:
+	virtual void recompute_params() override;
+};
 
 // device type definition
 DECLARE_DEVICE_TYPE(TSENG_VGA, tseng_vga_device)
 DECLARE_DEVICE_TYPE(ET4KW32I_VGA, et4kw32i_vga_device)
+DECLARE_DEVICE_TYPE(ET4KW32P_VGA, et4kw32p_vga_device)
 
 #endif // MAME_VIDEO_PC_VGA_TSENG_H

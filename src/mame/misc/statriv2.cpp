@@ -916,6 +916,21 @@ ROM_START( bigcsino ) // 5 in 1 of: Joker Poker, Blackjack, Baccarat, Craps and 
 	ROM_LOAD( "82s123.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) // Soldered in
 ROM_END
 
+ROM_START( drvkrazy )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "dek1.u7",  0x0000, 0x1000, CRC(d6ea1b16) SHA1(148e7a59f54ca452c4b4bbee1619ab74e02a74ec) )
+	ROM_LOAD( "dek2.u8",  0x1000, 0x1000, CRC(16a370b1) SHA1(42d04ddc22ad2e923d32fde24185cb26d21bce12) )
+	ROM_LOAD( "dek3.u9",  0x2000, 0x1000, CRC(382893c1) SHA1(357cf243507af99833d64f5567cc18065db9ef89) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "dekvid.u36", 0x0000, 0x1000, CRC(6f8cfcc6) SHA1(f68e48e3848da0f356b980fb2ea03e2a67b9c347) )
+
+	ROM_REGION( 0x0140, "proms", 0 ) // not dumped from this PCB yet
+	ROM_LOAD( "82s123.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) )
+	ROM_LOAD( "82s123.u21", 0x0020, 0x0020, BAD_DUMP CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) )
+	ROM_LOAD( "82s123.u22", 0x0040, 0x0100, BAD_DUMP CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) )
+ROM_END
+
 ROM_START( ppatrol )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp.u7",  0x0000, 0x0800, CRC(0a6a8082) SHA1(8ce2212bdbeacef919cb8051ca965a8809246829) )
@@ -1827,6 +1842,7 @@ GAME( 1984, bigcsino,   0,        statusbj,  bigcsino, casino_state, empty_init,
 
 // regular games
 GAME( 1982, ppatrol,    0,        funcsino,  ppatrol,  casino_state, empty_init,     ROT0,  "Status Games",       "Planet Patrol",                         MACHINE_SUPPORTS_SAVE ) // Flyer has 1981, but was released in Jan 1982
+GAME( 1982, drvkrazy,   0,        funcsino,  ppatrol,  casino_state, empty_init,     ROT0,  "Status Games",       "Drive Em Krazy",                        MACHINE_SUPPORTS_SAVE )
 
 // trivia
 GAME( 1984, hangman,    0,        statriv2,  hangman,  trivia_state, init_addr_lmh,  ROT0,  "Status Games",       "Hangman",                               MACHINE_SUPPORTS_SAVE )

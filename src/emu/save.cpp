@@ -164,6 +164,27 @@ void save_manager::register_presave(save_prepost_delegate func)
 
 
 //-------------------------------------------------
+//  register_preload - register a pre-load
+//  function callback
+//-------------------------------------------------
+
+void save_manager::register_preload(save_prepost_delegate func)
+{
+	// check for invalid timing
+	if (!m_reg_allowed)
+		fatalerror("Attempt to register callback function after state registration is closed!\n");
+
+	// scan for duplicates and push through to the end
+	for (auto &cb : m_preload_list)
+		if (cb->m_func == func)
+			fatalerror("Duplicate save state function (%s/%s)\n", cb->m_func.name(), func.name());
+
+	// allocate a new entry
+	m_preload_list.push_back(std::make_unique<state_callback>(func));
+}
+
+
+//-------------------------------------------------
 //  state_save_register_postload -
 //  register a post-load function callback
 //-------------------------------------------------
@@ -256,6 +277,19 @@ void save_manager::dispatch_postload()
 void save_manager::dispatch_presave()
 {
 	for (auto &func : m_presave_list)
+		func->m_func();
+}
+
+
+//-------------------------------------------------
+//  dispatch_preload - invoke all registered
+//  preload callbacks, so nothing still running
+//  writes over the state being loaded
+//-------------------------------------------------
+
+void save_manager::dispatch_preload()
+{
+	for (auto &func : m_preload_list)
 		func->m_func();
 }
 
@@ -472,6 +506,9 @@ inline save_error save_manager::do_read(T check_length, U read_block, V start_he
 
 	// determine whether or not to flip the data when done
 	const bool flip = NATIVE_ENDIAN_VALUE_LE_BE((header[9] & SS_MSB_FIRST) != 0, (header[9] & SS_MSB_FIRST) == 0);
+
+	// call the pre-load functions
+	dispatch_preload();
 
 	// read all the data, flipping if necessary
 	for (auto &entry : m_entry_list)

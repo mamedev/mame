@@ -188,6 +188,17 @@ void c4023_device::device_add_mconfig(machine_config &config)
 static INPUT_PORTS_START( c1526 )
 	PORT_START("PAPERADV")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Paper Advance") PORT_CODE(KEYCODE_INSERT)
+
+	PORT_START("ADDRESS")
+	PORT_DIPNAME( 0x07, 0x00, "Device Address" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x03, "7" )
+	PORT_DIPSETTING(    0x04, "8" )
+	PORT_DIPSETTING(    0x05, "9" )
+	PORT_DIPSETTING(    0x06, "10" )
+	PORT_DIPSETTING(    0x07, "11" )
 INPUT_PORTS_END
 
 
@@ -202,22 +213,12 @@ ioport_constructor c1526_device::device_input_ports() const
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( c4023 )
-//-------------------------------------------------
-
-static INPUT_PORTS_START( c4023 )
-	PORT_START("PAPERADV")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Paper Advance") PORT_CODE(KEYCODE_INSERT)
-INPUT_PORTS_END
-
-
-//-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
 ioport_constructor c4023_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( c4023 );
+	return INPUT_PORTS_NAME( c1526 );
 }
 
 
@@ -239,7 +240,8 @@ c1526_device_base::c1526_device_base(const machine_config &mconfig, device_type 
 	m_irqs(*this, "irqs"),
 	m_bitmap_printer(*this, BITMAP_PRINTER_TAG),
 	m_pf_stepper(*this, BITMAP_PRINTER_TAG":pf_stepper"),
-	m_paper_adv(*this, "PAPERADV")
+	m_paper_adv(*this, "PAPERADV"),
+	m_address(*this, "ADDRESS")
 {
 }
 
@@ -629,7 +631,7 @@ uint8_t c1526_device::riot0_pb_r()
 
 	*/
 
-	return 0xf8 | ((m_slot->get_address() - 4) & 0x07);
+	return 0xf8 | m_address->read();
 }
 
 
@@ -708,14 +710,10 @@ uint8_t c4023_device::riot0_pa_r()
 
 	*/
 
-	int const addr = m_slot->get_address() - 4;
-
 	uint8_t data = 0;
 
 	data |= m_bus->eoi_r();
-	data |= BIT(addr, 0) << 3;
-	data |= BIT(addr, 1) << 4;
-	data |= BIT(addr, 2) << 5;
+	data |= m_address->read() << 3;
 	data |= m_bus->dav_r() << 6;
 	data |= m_bus->atn_r() << 7;
 

@@ -189,7 +189,6 @@ private:
 	void palette_init(palette_device &palette) const;
 
 	void prg_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
 
 	uint8_t port_a_r();
 	uint8_t port_b_r();
@@ -608,22 +607,17 @@ void replicator_state::prg_map(address_map &map)
 	map(0x00000, 0x1ffff).rom();
 }
 
-void replicator_state::data_map(address_map &map)
-{
-	map(0x0200, 0x21ff).ram();  /* ATMEGA1280 Internal SRAM */
-}
-
 /****************************************************\
 * Input ports                                        *
 \****************************************************/
 
 static INPUT_PORTS_START( replicator )
 	PORT_START("keypad")
-	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CENTER") PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LEFT") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DOWN") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("UP") PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x00000001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CENTER") PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("RIGHT") PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x00000004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LEFT") PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("DOWN") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x00000010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("UP") PORT_CODE(KEYCODE_W)
 INPUT_PORTS_END
 
 /****************************************************\
@@ -688,7 +682,6 @@ void replicator_state::replicator(machine_config &config)
 {
 	ATMEGA1280(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &replicator_state::prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &replicator_state::data_map);
 
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->set_low_fuses(0xff);

@@ -421,7 +421,7 @@ void acpi_piix4_device::map(address_map &map)
 		NAME([this] () { return m_glben; }),
 		NAME([this] (offs_t offset, u16 data, u16 mem_mask) {
 			COMBINE_DATA(&m_glben);
-			LOGACPI("GLBEN %04x & %04x\n");
+			LOGACPI("GLBEN %04x & %04x\n", data, mem_mask);
 			LOGACPIEX("\tBATLOW_EN %d IRQ_RSM_EN %d EXTSMI_EN %d GSTBY_EN %d P4MA_EN %d BM_TRP_EN %d BIOS_EN %d LEGACY_USB_EN %d\n"
 				, BIT(data, 15)
 				, BIT(data, 11)

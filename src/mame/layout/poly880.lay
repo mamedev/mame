@@ -9,31 +9,238 @@ license:CC0-1.0
 		</led7seg>
 	</element>
 
+	<element name="led" defstate="0">
+		<disk state="0">
+			<color red="0.15" green="0.01" blue="0.01" />
+		</disk>
+		<disk state="1">
+			<color red="0.40" green="0.04" blue="0.04" />
+		</disk>
+		<disk state="2">
+			<color red="0.70" green="0.07" blue="0.07" />
+		</disk>
+		<disk state="3">
+			<color red="1.00" green="0.10" blue="0.10" />
+		</disk>
+	</element>
+
+	<element name="label_a0">
+		<text string="A0">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a1">
+		<text string="A1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a2">
+		<text string="A2">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a3">
+		<text string="A3">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a4">
+		<text string="A4">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a5">
+		<text string="A5">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a6">
+		<text string="A6">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a7">
+		<text string="A7">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a8">
+		<text string="A8">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a9">
+		<text string="A9">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a10">
+		<text string="A10">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a11">
+		<text string="A11">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a12">
+		<text string="A12">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a13">
+		<text string="A13">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a14">
+		<text string="A14">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_a15">
+		<text string="A15">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_d0">
+		<text string="D0">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_d1">
+		<text string="D1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_d2">
+		<text string="D2">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_d3">
+		<text string="D3">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_d4">
+		<text string="D4">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_d5">
+		<text string="D5">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_d6">
+		<text string="D6">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_d7">
+		<text string="D7">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_c0">
+		<text string="M1">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_c1">
+		<text string="MREQ">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_c2">
+		<text string="IORQ">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_c3">
+		<text string="RD">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_c4">
+		<text string="WR">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_c5">
+		<text string="HALT">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_c6">
+		<text string="INT">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_c7">
+		<text string="NMI">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_c8">
+		<text string="WAIT">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+	<element name="label_c9">
+		<text string="MCYCL">
+			<color red="0.8" green="0.8" blue="0.8" />
+		</text>
+	</element>
+
 	<view name="Internal Layout">
+		<!-- Bus analyzer -->
+		<repeat count="16">
+			<param name="n" start="15" increment="-1" />
+			<param name="x" start="1" increment="10" />
+			<element name="a~n~" ref="led">
+				<bounds xc="~x~" y="0" width="6" height="6" />
+			</element>
+			<element ref="label_a~n~">
+				<bounds xc="~x~" y="8" width="10" height="4" />
+			</element>
+		</repeat>
+		<repeat count="8">
+			<param name="n" start="7" increment="-1" />
+			<param name="x" start="1" increment="10" />
+			<element name="d~n~" ref="led">
+				<bounds xc="~x~" y="22" width="6" height="6" />
+			</element>
+			<element ref="label_d~n~">
+				<bounds xc="~x~" y="30" width="10" height="4" />
+			</element>
+		</repeat>
+		<repeat count="9">
+			<param name="n" start="0" increment="1" />
+			<param name="x" start="91" increment="10" />
+			<element name="c~n~" ref="led">
+				<bounds xc="~x~" y="22" width="6" height="6" />
+			</element>
+			<element ref="label_c~n~">
+				<bounds xc="~x~" y="30" width="10" height="4" />
+			</element>
+		</repeat>
+		<element name="c9" ref="led">
+			<bounds xc="194" y="22" width="6" height="6" />
+		</element>
+		<element ref="label_c9">
+			<bounds xc="194" y="30" width="10" height="4" />
+		</element>
+
 		<!-- Led address display -->
-		<element name="digit7" ref="digit">
-			<bounds x="0" y="0" width="18" height="26" />
-		</element>
-		<element name="digit6" ref="digit">
-			<bounds x="18" y="0" width="18" height="26" />
-		</element>
-		<element name="digit5" ref="digit">
-			<bounds x="36" y="0" width="18" height="26" />
-		</element>
-		<element name="digit4" ref="digit">
-			<bounds x="54" y="0" width="18" height="26" />
-		</element>
-		<element name="digit3" ref="digit">
-			<bounds x="72" y="0" width="18" height="26" />
-		</element>
-		<element name="digit2" ref="digit">
-			<bounds x="90" y="0" width="18" height="26" />
-		</element>
-		<element name="digit1" ref="digit">
-			<bounds x="108" y="0" width="18" height="26" />
-		</element>
-		<element name="digit0" ref="digit">
-			<bounds x="126" y="0" width="18" height="26" />
-		</element>
+		<repeat count="8">
+			<param name="n" start="7" increment="-1" />
+			<param name="x" start="215" increment="18" />
+			<element name="digit~n~" ref="digit">
+				<bounds x="~x~" y="0" width="18" height="26" />
+			</element>
+		</repeat>
 	</view>
 </mamelayout>

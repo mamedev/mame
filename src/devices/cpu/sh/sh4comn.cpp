@@ -474,11 +474,12 @@ uint32_t sh4_base_device::compute_ticks_refresh_timer(emu_timer *timer, int hert
 
 void sh4_base_device::sh4_refresh_timer_recompute()
 {
+	// TODO: the memory refresh timer on the SH4 is different than the SH3 one, needs to be reimplemented correctly
 	//if rtcnt < rtcor then rtcor-rtcnt
 	//if rtcnt >= rtcor then 256-rtcnt+rtcor=256+rtcor-rtcnt
-	uint32_t ticks = m_rtcor-m_rtcnt;
+	int ticks = (int)m_rtcor - (int)m_rtcnt;
 	if (ticks <= 0)
-		ticks = 256 + ticks;
+		ticks = 256 + ticks; // both are computead as 8 bit values
 	m_refresh_timer->adjust(attotime::from_hz(m_bus_clock) * rtcnt_div[(m_rtcsr >> 3) & 7] * ticks);
 	m_refresh_timer_base = m_rtcnt;
 }
@@ -1937,8 +1938,9 @@ uint8_t sh4_base_device::scssr1_r(offs_t offset, uint8_t mem_mask)
 
 void sh4_base_device::scssr1_w(offs_t offset, uint8_t data, uint8_t mem_mask)
 {
-	COMBINE_DATA(&m_scssr1);
-	logerror("scssr1_w: Unmapped write %02x @ %02x\n", data, mem_mask);
+	// the flags in bits 7-3 can only be cleared, TEND and MPB are read only
+	// TODO: the transmitter is not emulated: a character counts as sent when TDRE is cleared, so that TDRE and TEND read as set again at once
+	m_scssr1 = (m_scssr1 & (data | 0x06) & 0xfe) | (data & 0x01) | 0x84;
 }
 
 uint8_t sh4_base_device::scrdr1_r(offs_t offset, uint8_t mem_mask)
@@ -2020,10 +2022,9 @@ uint16_t sh4_base_device::scfsr2_r(offs_t offset, uint16_t mem_mask)
 
 void sh4_base_device::scfsr2_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
-	// ignore writes for now - this prevents software from clearing TDFE
-	// avoids issues with software that waits for TDFE to be set (MT09399)
-	// m_scfsr2 &= data | 0xff0c;
-	logerror("scfsr2_w: Unmapped write %04x @ %04x\n", data, mem_mask);
+	// ER, TEND, TDFE, BRK, RDF and DR can only be cleared, the other bits are read only
+	// TODO: the transmitter is not emulated: a character counts as sent at once, so that TEND and TDFE read as set again (MT09399)
+	m_scfsr2 = (m_scfsr2 & (data | ~mem_mask | 0xff0c)) | 0x0060;
 }
 
 uint8_t sh4_base_device::scfrdr2_r(offs_t offset, uint8_t mem_mask)
@@ -3033,6 +3034,26 @@ void sh4_base_device::sh4_utlb_address_array_w(offs_t offset, uint64_t data)
 		// associative mode
 		fatalerror("SH4MMU: associative mode writes unsupported\n");
 	}
+}
+
+// Operand cache RAM, H'7C00 0000 to H'7FFF FFFF (reached here after the 29-bit address mask).
+// Each RAM area is 4 KB; CCR.OIX picks the address bit that selects area 1 or 2:
+// bit 13 when OIX = 0, bit 25 when OIX = 1. Address bit 12 is ignored either way.
+offs_t sh4_base_device::ocram_index(offs_t offset) const
+{
+	// offset counts quadwords from H'1C00 0000, so address bit n is offset bit n - 3
+	int const area = BIT(m_ccr, 7) ? BIT(offset, 22) : BIT(offset, 10);
+	return (area << 9) | (offset & 0x1ff);
+}
+
+uint64_t sh4_base_device::ocram_r(offs_t offset)
+{
+	return m_ocram[ocram_index(offset)];
+}
+
+void sh4_base_device::ocram_w(offs_t offset, uint64_t data, uint64_t mem_mask)
+{
+	COMBINE_DATA(&m_ocram[ocram_index(offset)]);
 }
 
 uint64_t sh4_base_device::sh4_utlb_address_array_r(offs_t offset)

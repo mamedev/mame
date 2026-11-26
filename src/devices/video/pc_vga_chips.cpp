@@ -196,6 +196,7 @@ void f65535_vga_device::ext_map(address_map &map)
 		NAME([this] (offs_t offset, u8 data) {
 			LOG("XR0C: Start Address Top %02x\n", data);
 			m_start_address_top = data & 3;
+			// TODO: assume latching in start_addr_latch
 		})
 	);
 //  map(0x0d, 0x0d) Auxiliary Offset
@@ -415,6 +416,7 @@ void f65535_vga_device::flush_true_color_mode()
 	switch(display_mode)
 	{
 		case 1: LOG("\tSierra mode 5-5-5\n"); svga.rgb15_en = 1; break;
+		// TODO: untested, should probably be rgb32_en
 		case 2: LOG("\tTrue Color\n"); svga.rgb24_en = 1; break;
 		case 3: LOG("\tXGA mode 5-6-5\n"); svga.rgb16_en = 1; break;
 	}

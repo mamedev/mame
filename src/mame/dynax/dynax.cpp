@@ -6802,6 +6802,23 @@ ROM_START( mjreachbl )
 	ROM_RELOAD(          0x180000, 0x80000 )
 ROM_END
 
+ROM_START( mjreachbl2 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
+	ROM_LOAD( "a.u11", 0x00000, 0x40000, CRC(6e1f6010) SHA1(9022bc9cd0f57bb6a2b51a9c2a035d1e225e49ad) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_IGNORE(                 0x40000 )
+	ROM_RELOAD(        0x10000, 0x40000 )
+
+	ROM_REGION( 0x200000, "blitter", 0 )   // blitter data
+	ROM_LOAD( "c.u18", 0x000000, 0x80000, CRC(90f6036f) SHA1(f92aafd0316dc235e58d615825f3110806bc2cf9) )
+	ROM_RELOAD(        0x100000, 0x80000 )
+	ROM_RELOAD(        0x180000, 0x80000 )
+	ROM_LOAD( "b.u6",  0x080000, 0x40000, CRC(87f47db6) SHA1(e9e9aae2b7b8dcb7d873a1b715ad4c9629c8936b) )
+	ROM_RELOAD(        0x0c0000, 0x40000 )
+
+	ROM_REGION( 0x2000, "nvram", 0 ) // default NVRAM with data expected to avoid freeze
+	ROM_LOAD( "mjreachbl2_nvram.bin", 0x0000, 0x2000, CRC(0f7312cd) SHA1(da2a413a06e6040b510ed2405dcff9823a772bf5) )
+ROM_END
+
 ROM_START( mjreachp2 ) // BTANB: typo on title screen shows 'Mahjong Reach Rart II' (verified with reference pics)
 	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "8801.2c",         0x00000, 0x40000, CRC(a92954bc) SHA1(473778eabd0ecc7b66c7e66ab7eb3d8b40554434) )
@@ -7541,7 +7558,8 @@ GAME( 1991, ougonhaib3, ougonhai, ougonhaib1, ougonhai, dynax_state,       empty
 GAME( 1991, mjtkp2,     0,        mjtkp2,     mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Tokkyu Kaiten-ban Part 2 (Japan)",                      MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // inputs / DSW
 GAME( 1994, mjreach,    0,        mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 1)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreacha,   mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach (Ver. 1.00, set 2)",                              MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg)",                            MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mjreachbl,  mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg set 1)",                      MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mjreachbl2, mjreach,  mjreach,    mjreach,  dynax_state,       empty_init,    ROT0,   "bootleg",                   "Mahjong Reach (Ver. 1.00, bootleg set 2)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1994, mjreachp2,  mjreach,  mjreachp2,  mjreach,  dynax_state,       empty_init,    ROT0,   "Dynax",                     "Mahjong Reach Part II (Ver. D88)",                              MACHINE_SUPPORTS_SAVE )
 GAME( 1994, cdracula,   0,        cdracula,   cdracula, cdracula_state,    empty_init,    ROT0,   "Yun Sung (Escape license)", "Castle Of Dracula",                                             MACHINE_SUPPORTS_SAVE ) // not a Dynax board
 GAME( 1995, shpeng,     0,        sprtmtch,   drgpunch, dynax_state,       empty_init,    ROT0,   "WSAC Systems?",             "Sea Hunter Penguin",                                            MACHINE_NO_COCKTAIL | MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // not a Dynax board. PROMs?

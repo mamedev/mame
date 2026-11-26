@@ -52,6 +52,9 @@ protected:
 	bool                     m_sector_is_16k;
 	bool                     m_top_boot_sector;
 	bool                     m_bot_boot_sector;
+	bool                     m_sector_erase_selection; // multi-sector erase with eight 8 KiB top sectors
+	uint32_t                 m_erase_bank_boundary; // byte offset; zero for a single bank
+	bool                     m_erase_time_per_sector;
 	uint16_t                 m_page_size;
 	uint32_t                 m_page_timeout_usec;
 
@@ -76,6 +79,14 @@ protected:
 	std::unique_ptr<uint8_t[]> m_page_buffer;
 
 	bool                     m_fast_mode;
+
+private:
+	static constexpr uint32_t ERASE_BLOCK_SIZE = 8 * 1024;
+
+	void select_erase_sector(uint32_t address);
+
+	std::unique_ptr<bool[]>    m_erase_selected;
+	uint8_t                  m_erase_banks;
 };
 
 
@@ -330,10 +341,22 @@ public:
 	fujitsu_29f160te_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class fujitsu_29dl161te_16bit_device : public intelfsh16_device
+{
+public:
+	fujitsu_29dl161te_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class sharp_lh28f400_device : public intelfsh16_device
 {
 public:
 	sharp_lh28f400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
+class sharp_lh28f800sg_device : public intelfsh16_device
+{
+public:
+	sharp_lh28f800sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 class intel_te28f160_device : public intelfsh16_device
@@ -426,6 +449,12 @@ public:
 	amd_29f800b_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
+class amd_29lv160db_16bit_device : public intelfsh16_device
+{
+public:
+	amd_29lv160db_16bit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+};
+
 class sharp_lh28f016s_16bit_device : public intelfsh16_device
 {
 public:
@@ -459,10 +488,12 @@ DECLARE_DEVICE_TYPE(AMD_29F032,              amd_29f032_device)
 DECLARE_DEVICE_TYPE(AMD_29F400T,             amd_29f400t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800T,             amd_29f800t_device)
 DECLARE_DEVICE_TYPE(AMD_29F800B_16BIT,       amd_29f800b_16bit_device)
+DECLARE_DEVICE_TYPE(AMD_29LV160DB_16BIT,     amd_29lv160db_16bit_device)
 DECLARE_DEVICE_TYPE(AMD_29LV160DT,           amd_29lv160dt_device)
 DECLARE_DEVICE_TYPE(AMD_29LV200T,            amd_29lv200t_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F160TE,        fujitsu_29f160te_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F160TE_16BIT,  fujitsu_29f160te_16bit_device)
+DECLARE_DEVICE_TYPE(FUJITSU_29DL161TE_16BIT, fujitsu_29dl161te_16bit_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29F016A,         fujitsu_29f016a_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29DL164BD,       fujitsu_29dl164bd_device)
 DECLARE_DEVICE_TYPE(FUJITSU_29LV002TC,       fujitsu_29lv002tc_device)
@@ -489,6 +520,7 @@ DECLARE_DEVICE_TYPE(SST_39VF020,             sst_39vf020_device)
 DECLARE_DEVICE_TYPE(SST_49LF020,             sst_49lf020_device)
 
 DECLARE_DEVICE_TYPE(SHARP_LH28F400,          sharp_lh28f400_device)
+DECLARE_DEVICE_TYPE(SHARP_LH28F800SG,        sharp_lh28f800sg_device)
 DECLARE_DEVICE_TYPE(INTEL_E28F008SA,         intel_e28f008sa_device)
 DECLARE_DEVICE_TYPE(INTEL_TE28F160,          intel_te28f160_device)
 DECLARE_DEVICE_TYPE(SHARP_LH28F160S3,        sharp_lh28f160s3_device)

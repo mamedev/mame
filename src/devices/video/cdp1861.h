@@ -68,7 +68,13 @@ public:
 	auto dma_out_cb() { return m_write_dma_out.bind(); }
 	auto efx_cb() { return m_write_efx.bind(); }
 
+	int int_r() { return m_int; }
+	int dma_out_r() { return m_dmaout; }
+	int efx_r() { return m_efx; }
+
 	void dma_w(uint8_t data);
+	void tpa_w(int state);
+	void sc_w(uint8_t data);
 	void disp_on_w(int state);
 	void disp_off_w(int state);
 
@@ -82,11 +88,15 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(int_tick);
-	TIMER_CALLBACK_MEMBER(efx_tick);
-	TIMER_CALLBACK_MEMBER(dma_tick);
-
 private:
+	static constexpr unsigned CYCLES_PER_LINE   = 14;
+	static constexpr unsigned CYCLE_DMA_START   = 2;
+	static constexpr unsigned CYCLE_DMA_END     = 10;
+
+	void set_int(int state);
+	void set_dma_out(int state);
+	void set_efx(int state);
+
 	devcb_write_line m_write_int;
 	devcb_write_line m_write_dma_out;
 	devcb_write_line m_write_efx;
@@ -95,11 +105,15 @@ private:
 	int m_dispon;                   // display on latch
 	int m_dispoff;                  // display off latch
 	int m_dmaout;                   // DMA request active
+	int m_int;
+	int m_efx;
 
-	// timers
-	emu_timer *m_int_timer;         // interrupt timer
-	emu_timer *m_efx_timer;         // EFx timer
-	emu_timer *m_dma_timer;         // DMA timer
+	int m_tpa;
+	uint8_t m_sc;
+	uint16_t m_line;
+	uint8_t m_cycle;
+	uint16_t m_next_line;
+	uint8_t m_next_cycle;
 };
 
 

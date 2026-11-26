@@ -1,6 +1,12 @@
 // license:GPL-2.0+
 // copyright-holders: BALATON Zoltan
 
+/*
+    Yamaha QY70 Music Sequencer
+
+    Test mode: hold Song + Pattern + Forward while powering on.
+*/
+
 #include "emu.h"
 
 #include "bus/midi/midiinport.h"
@@ -105,11 +111,13 @@ private:
 
 	required_ioport_array<7> m_switches;
 
-	u8 sw_sel;
+	u8 m_sw_sel;
 
-	void pa_w(u8 data) { if (data) sw_sel = data; }
+	void pa_w(offs_t offset, u8 data, u8 mem_mask);
 	u8 sw_in();
+	u16 adc_battery_r() { return 0x1cc; } // About 9 V; the firmware warns below 0x14c
 	u16 adc_bkupbat_r() { return 0x2a0; }
+	u8 pb_r() { return 0x00; } // Sub CPU not emulated: SBSY low (ready), status lines low
 	void mem_map(address_map &map) ATTR_COLD;
 	void lcd_map(address_map &map) ATTR_COLD;
 	void lcd_palette(palette_device &palette) const;
@@ -118,17 +126,24 @@ private:
 
 void qy70_state::machine_start()
 {
-	sw_sel = 0xff;
+	m_sw_sel = 0;
+	save_item(NAME(m_sw_sel));
+}
+
+// The firmware selects a switch row by driving its port A line low and
+// leaving the other lines as inputs.
+void qy70_state::pa_w(offs_t offset, u8 data, u8 mem_mask)
+{
+	m_sw_sel = ~data & mem_mask & 0x7f;
 }
 
 u8 qy70_state::sw_in()
 {
-	if (sw_sel == 0xff)
-		return 0x1f; // Start in test mode for now. TODO: This should be an option.
-	int idx = 6;
-	while (idx && sw_sel != (1 << idx))
-		idx--;
-	return m_switches[idx]->read();
+	u8 res = 0xff;
+	for (int i = 0; i < 7; i++)
+		if (BIT(m_sw_sel, i))
+			res &= m_switches[i]->read();
+	return res;
 }
 
 void qy70_state::mem_map(address_map &map)
@@ -156,10 +171,13 @@ void qy70_state::qy70(machine_config &config)
 {
 	H83002(config, m_maincpu, 10_MHz_XTAL);
 	m_maincpu->set_addrmap(AS_PROGRAM, &qy70_state::mem_map);
-	// ADC_0  Power battery voltage
+	// ADC_0  Power battery voltage, 20 V full scale (per the test mode's display)
 	// ADC_2  Host type select: 5V Mac, 3.33V PC-1, 1.66V PC-2, 0V MIDI
+	// ADC_4  Backup battery voltage, 5 V full scale (per the test mode's display)
+	m_maincpu->read_adc<0>().set(FUNC(qy70_state::adc_battery_r));
 	m_maincpu->read_adc<4>().set(FUNC(qy70_state::adc_bkupbat_r));
 	m_maincpu->write_porta().set(FUNC(qy70_state::pa_w));
+	m_maincpu->read_portb().set(FUNC(qy70_state::pb_r));
 	// PORT_B bit 0 1MHz output for Mac serial, bit 1 Rec LED, bit 2 Play LED,
 	//        bit 3 lcdc reset, bit 4 GND, bit 5 subcpu SBSY, bit 6-7 subcpu
 

@@ -15,8 +15,18 @@ DEFINE_DEVICE_TYPE(AM9519, am9519_device, "am9519", "AMD AM9519 Universal Interr
 am9519_device::am9519_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, AM9519, tag, owner, clock)
 	, m_out_int_func(*this)
+	, m_isr(0)
 	, m_irr(0)
+	, m_prio(0)
+	, m_imr(0xff)
 	, m_irq_lines(0)
+	, m_irq_driven(0)
+	, m_curcnt(0)
+	, m_mode(0)
+	, m_cmd(0)
+	, m_aclear(0)
+	, m_count{}
+	, m_resp{}
 	, m_irq_check_timer(nullptr)
 {
 }
@@ -34,11 +44,13 @@ void am9519_device::device_start()
 	save_item(NAME(m_prio));
 	save_item(NAME(m_imr));
 	save_item(NAME(m_irq_lines));
+	save_item(NAME(m_irq_driven));
 	save_item(NAME(m_mode));
 	save_item(NAME(m_count));
 	save_item(NAME(m_resp));
 	save_item(NAME(m_aclear));
 	save_item(NAME(m_cmd));
+	save_item(NAME(m_curcnt));
 
 	m_irq_check_timer = timer_alloc(FUNC(am9519_device::check_irqs), this);
 	m_irq_check_timer->adjust(attotime::never);
@@ -53,7 +65,6 @@ void am9519_device::device_reset()
 {
 	m_isr = 0;
 	m_irr = 0;
-	m_irq_lines = 0;
 	m_prio = 0;
 	m_imr = 0xff;
 	m_mode = 0;
@@ -104,24 +115,30 @@ TIMER_CALLBACK_MEMBER(am9519_device::check_irqs)
 void am9519_device::set_irq_line(int irq, int state)
 {
 	u8 mask = (1 << irq);
-	bool active = !((state == ASSERT_LINE ? 1 : 0) ^ BIT(m_mode, 4));
+	bool const level = state == ASSERT_LINE;
+	bool const was_active = BIT(m_irq_driven, irq) && (BIT(m_irq_lines, irq) == BIT(m_mode, 4));
+	bool const active = level == BIT(m_mode, 4);
 
 	if(active)
 	{
 		/* setting IRQ line */
 		LOG("am9519_set_irq_line(): UIC set IRQ line #%d\n", irq);
 
-		if(!(m_irq_lines & mask)) // edge trig only
+		if(!was_active) // edge trig only
 			m_irr |= mask;
-		m_irq_lines |= mask;
 	}
 	else
 	{
 		/* clearing IRQ line */
 		LOG("am9519_device::set_irq_line(): UIC cleared IRQ line #%d\n", irq);
-
-		m_irq_lines &= ~mask;
 	}
+
+	if(level)
+		m_irq_lines |= mask;
+	else
+		m_irq_lines &= ~mask;
+	m_irq_driven |= mask;
+
 	m_irq_check_timer->adjust(attotime::zero);
 }
 

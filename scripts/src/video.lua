@@ -127,6 +127,32 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/axell_ag2.h,VIDEOS["AXELL_AG2"] = true
+--------------------------------------------------
+
+if VIDEOS["AXELL_AG2"] then
+	files {
+		MAME_DIR .. "src/devices/video/axell_ag2.cpp",
+		MAME_DIR .. "src/devices/video/axell_ag2.h",
+		MAME_DIR .. "src/devices/video/axell_ag2_rm1.cpp",
+		MAME_DIR .. "src/devices/video/axell_ag2_rm1.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/axell_decomp.h,VIDEOS["AXELL_DECOMP"] = true
+--------------------------------------------------
+
+if VIDEOS["AXELL_DECOMP"] then
+	files {
+		MAME_DIR .. "src/devices/video/axell_decomp.cpp",
+		MAME_DIR .. "src/devices/video/axell_decomp.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/bt431.h,VIDEOS["BT431"] = true
 --------------------------------------------------
 
@@ -206,6 +232,18 @@ if VIDEOS["BUFSPRITE"] then
 	files {
 		MAME_DIR .. "src/devices/video/bufsprite.cpp",
 		MAME_DIR .. "src/devices/video/bufsprite.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/cat6613.h,VIDEOS["CAT6613"] = true
+--------------------------------------------------
+
+if VIDEOS["CAT6613"] then
+	files {
+		MAME_DIR .. "src/devices/video/cat6613.cpp",
+		MAME_DIR .. "src/devices/video/cat6613.h",
 	}
 end
 
@@ -482,6 +520,18 @@ if VIDEOS["GF7600GS"] then
 	files {
 		MAME_DIR .. "src/devices/video/gf7600gs.cpp",
 		MAME_DIR .. "src/devices/video/gf7600gs.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/hantro_g1.h,VIDEOS["HANTRO_G1"] = true
+--------------------------------------------------
+
+if VIDEOS["HANTRO_G1"] then
+	files {
+		MAME_DIR .. "src/devices/video/hantro_g1.cpp",
+		MAME_DIR .. "src/devices/video/hantro_g1.h",
 	}
 end
 
@@ -878,6 +928,23 @@ if VIDEOS["M50458"] then
 	files {
 		MAME_DIR .. "src/devices/video/m50458.cpp",
 		MAME_DIR .. "src/devices/video/m50458.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/mali200.h,VIDEOS["MALI200"] = true
+--------------------------------------------------
+
+if VIDEOS["MALI200"] then
+	files {
+		MAME_DIR .. "src/devices/video/mali200.cpp",
+		MAME_DIR .. "src/devices/video/mali200_gp.hxx",
+		MAME_DIR .. "src/devices/video/mali200_plb.hxx",
+		MAME_DIR .. "src/devices/video/mali200_pp.hxx",
+		MAME_DIR .. "src/devices/video/mali200_texture.hxx",
+		MAME_DIR .. "src/devices/video/mali200_render.hxx",
+		MAME_DIR .. "src/devices/video/mali200.h",
 	}
 end
 
@@ -1372,6 +1439,18 @@ if VIDEOS["PCF2100"] then
 	files {
 		MAME_DIR .. "src/devices/video/pcf2100.cpp",
 		MAME_DIR .. "src/devices/video/pcf2100.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/powervr250.h,VIDEOS["POWERVR250"] = true
+--------------------------------------------------
+
+if VIDEOS["POWERVR250"] then
+	files {
+		MAME_DIR .. "src/devices/video/powervr250.cpp",
+		MAME_DIR .. "src/devices/video/powervr250.h",
 	}
 end
 
@@ -1981,6 +2060,18 @@ if VIDEOS["ZEUS2"] then
 	files {
 		MAME_DIR .. "src/devices/video/zeus2.cpp",
 		MAME_DIR .. "src/devices/video/zeus2.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/zr36050.h,VIDEOS["ZR36050"] = true
+--------------------------------------------------
+
+if VIDEOS["ZR36050"] then
+	files {
+		MAME_DIR .. "src/devices/video/zr36050.cpp",
+		MAME_DIR .. "src/devices/video/zr36050.h",
 	}
 end
 

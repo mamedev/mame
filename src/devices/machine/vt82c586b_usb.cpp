@@ -19,13 +19,15 @@ TODO:
 
 #include "logmacro.h"
 
-DEFINE_DEVICE_TYPE(VT82C586B_USB, vt82c586b_usb_device, "vt82c586b_usb", "VT82C586B \"PIPC\" USB Host Controller")
+DEFINE_DEVICE_TYPE(VT82C586B_USB, vt82c586b_usb_device, "vt82c586b_usb", "VIA VT82C586B \"PIPC\" USB Host Controller")
 
 vt82c586b_usb_device::vt82c586b_usb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: usb_uhci_device(mconfig, VT82C586B_USB, tag, owner, clock)
 {
-	// TODO: revision is a laconic "Silicon Revision Code", no value given
-	set_ids(0x11063038, 0x41, 0x0c0300, 0x00000000);
+	// revision is a laconic "Silicon Revision Code", no value given
+	// 0x02 from https://lkml.iu.edu/0109.2/0288.html
+	// 0x0e on Compaq IA-1 https://web.archive.org/web/20080212001605/http://www.ia1hacking.com/ia1_viewarticle.php?idx=9
+	set_ids(0x11063038, 0x02, 0x0c0300, 0x00000000);
 	intr_pin = 0x04;
 }
 

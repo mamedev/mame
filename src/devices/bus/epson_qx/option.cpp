@@ -101,6 +101,11 @@ void option_bus_device::add_slot(option_slot_device &slot)
 //-------------------------------------------------
 void option_bus_device::device_start()
 {
+	save_item(NAME(m_inth1));
+	save_item(NAME(m_inth2));
+	save_item(NAME(m_drqf));
+	save_item(NAME(m_rdyf));
+	save_item(NAME(m_rdys));
 }
 
 //-------------------------------------------------

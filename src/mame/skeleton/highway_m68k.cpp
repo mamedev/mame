@@ -206,6 +206,18 @@ ROM_START( tzfx )
 	ROM_LOAD16_WORD_SWAP( "prog1_2_f0b6.bin", 0x000000, 0x080000, CRC(cf704aa3) SHA1(31368ad5bd82e0502b77efb8b29be230cc8bfad1) ) // ROMBANK serigraphed under it. Possibly overlay for program updates?
 ROM_END
 
+// 大家来找碴 (Dàjiā Lái Zhǎo Chá)
+// this is a bootleg of photoy2k (igs/pgm.cpp)
+// same PCB, but with all 6 DIP switch banks populated. CY1013-R3 is marked 6868A-10121 9953M FC4FS
+ROM_START( dlzc )
+	ROM_REGION( 0x800000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "rom1.u25",         0x000000, 0x200000, CRC(74e2d65b) SHA1(404a994ad055d97de35e8848347443fe7c49a06f) ) // the first 0x80000 contain a different program revision than the "ROMBANK" below
+	ROM_LOAD16_WORD_SWAP( "rom2.u26",         0x200000, 0x200000, CRC(fc49941b) SHA1(64469b94e6dc2ca13e1624ba74ac0f962a86f2e1) )
+	ROM_LOAD16_WORD_SWAP( "rom3.u27",         0x400000, 0x200000, CRC(17d709cd) SHA1(cb5814561d3e7a8c65c55d141fc84bfce9ef5347) )
+	ROM_LOAD16_WORD_SWAP( "rom4.u28",         0x600000, 0x200000, CRC(d920a201) SHA1(aa13bcf2fcb1d6eab1a05f5e6b5ef99b96599588) )
+	ROM_LOAD16_WORD_SWAP( "am27c400.rombank", 0x000000, 0x080000, CRC(fdff6909) SHA1(94a851f851e4200859e9358e89e71414c2e367f4) ) // ROMBANK serigraphed under it. Possibly overlay for program updates?
+ROM_END
+
 
 void highway_m68k_state::init_tzfx()
 {
@@ -232,3 +244,4 @@ void highway_m68k_state::init_tzfx()
 
 
 GAME( 199?, tzfx, 0, highway_m68k, tzfx, highway_m68k_state, init_tzfx, ROT0, "Xin Yun", "Tianwang Zhi Fenghua Xueyue (v. 1.2)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, dlzc, 0, highway_m68k, tzfx, highway_m68k_state, init_tzfx, ROT0, "ASI",     "Dajia Lai Zhao Cha",                   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

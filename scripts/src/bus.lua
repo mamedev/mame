@@ -254,6 +254,8 @@ if BUSES["A2KBD"] then
 		MAME_DIR .. "src/devices/bus/a2kbd/kb200.h",
 		MAME_DIR .. "src/devices/bus/a2kbd/nkbd.cpp",
 		MAME_DIR .. "src/devices/bus/a2kbd/nkbd.h",
+		MAME_DIR .. "src/devices/bus/a2kbd/okbd.cpp",
+		MAME_DIR .. "src/devices/bus/a2kbd/okbd.h",
 		MAME_DIR .. "src/devices/bus/a2kbd/tk10.cpp",
 		MAME_DIR .. "src/devices/bus/a2kbd/tk10.h",
 		MAME_DIR .. "src/devices/bus/a2kbd/videnh2.cpp",
@@ -1520,6 +1522,8 @@ if BUSES["C64"] then
 		MAME_DIR .. "src/devices/bus/c64/pagefox.h",
 		MAME_DIR .. "src/devices/bus/c64/partner.cpp",
 		MAME_DIR .. "src/devices/bus/c64/partner.h",
+		MAME_DIR .. "src/devices/bus/c64/prologicdos.cpp",
+		MAME_DIR .. "src/devices/bus/c64/prologicdos.h",
 		MAME_DIR .. "src/devices/bus/c64/prophet64.cpp",
 		MAME_DIR .. "src/devices/bus/c64/prophet64.h",
 		MAME_DIR .. "src/devices/bus/c64/ps64.cpp",
@@ -1568,6 +1572,8 @@ if BUSES["C64"] then
 		MAME_DIR .. "src/devices/bus/c64/tdos.h",
 		MAME_DIR .. "src/devices/bus/c64/turbo232.cpp",
 		MAME_DIR .. "src/devices/bus/c64/turbo232.h",
+		MAME_DIR .. "src/devices/bus/c64/turbotrans.cpp",
+		MAME_DIR .. "src/devices/bus/c64/turbotrans.h",
 		MAME_DIR .. "src/devices/bus/c64/vizastar.cpp",
 		MAME_DIR .. "src/devices/bus/c64/vizastar.h",
 		MAME_DIR .. "src/devices/bus/c64/vw64.cpp",
@@ -1718,6 +1724,8 @@ if BUSES["CBMIEC"] then
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1200.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1224.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1224.h",
+		MAME_DIR .. "src/devices/bus/cbmiec/mps1230.cpp",
+		MAME_DIR .. "src/devices/bus/cbmiec/mps1230.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1270a.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/mps1270a.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/prodos.cpp",
@@ -1730,6 +1738,8 @@ if BUSES["CBMIEC"] then
 		MAME_DIR .. "src/devices/bus/cbmiec/sd2iec.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/serialbox.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/serialbox.h",
+		MAME_DIR .. "src/devices/bus/cbmiec/speeddos.cpp",
+		MAME_DIR .. "src/devices/bus/cbmiec/speeddos.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/turbotrans.cpp",
 		MAME_DIR .. "src/devices/bus/cbmiec/turbotrans.h",
 		MAME_DIR .. "src/devices/bus/cbmiec/vic1515.cpp",
@@ -1781,6 +1791,7 @@ end
 ---------------------------------------------------
 --
 --@src/devices/bus/centronics/ctronics.h,BUSES["CENTRONICS"] = true
+--@src/devices/bus/centronics/hardlock.h,BUSES["CENTRONICS"] = true
 ---------------------------------------------------
 
 if BUSES["CENTRONICS"] then
@@ -1789,6 +1800,8 @@ if BUSES["CENTRONICS"] then
 		MAME_DIR .. "src/devices/bus/centronics/adaptator.h",
 		MAME_DIR .. "src/devices/bus/centronics/ctronics.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/ctronics.h",
+		MAME_DIR .. "src/devices/bus/centronics/cgp220.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/cgp220.h",
 		MAME_DIR .. "src/devices/bus/centronics/chessmec.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/chessmec.h",
 		MAME_DIR .. "src/devices/bus/centronics/comxpl80.cpp",
@@ -1799,6 +1812,8 @@ if BUSES["CENTRONICS"] then
 		MAME_DIR .. "src/devices/bus/centronics/digiblst.h",
 		MAME_DIR .. "src/devices/bus/centronics/dsjoy.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/dsjoy.h",
+		MAME_DIR .. "src/devices/bus/centronics/eeprom_dongle.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/eeprom_dongle.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_ex800.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/epson_ex800.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_fx80.cpp",
@@ -1809,6 +1824,8 @@ if BUSES["CENTRONICS"] then
 		MAME_DIR .. "src/devices/bus/centronics/epson_lx810l.h",
 		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/epson_rx80.h",
+		MAME_DIR .. "src/devices/bus/centronics/hardlock.cpp",
+		MAME_DIR .. "src/devices/bus/centronics/hardlock.h",
 		MAME_DIR .. "src/devices/bus/centronics/hasp_savquest.cpp",
 		MAME_DIR .. "src/devices/bus/centronics/hasp_savquest.h",
 		MAME_DIR .. "src/devices/bus/centronics/neomania_adapter.cpp",
@@ -2151,6 +2168,35 @@ end
 
 
 ---------------------------------------------------
+-- digiBLAST cartridges
+--@src/devices/bus/digiblast/slot.h,BUSES["DIGIBLAST"] = true
+---------------------------------------------------
+
+if BUSES["DIGIBLAST"] then
+	files {
+		MAME_DIR .. "src/devices/bus/digiblast/slot.cpp",
+		MAME_DIR .. "src/devices/bus/digiblast/slot.h",
+		MAME_DIR .. "src/devices/bus/digiblast/nand.cpp",
+		MAME_DIR .. "src/devices/bus/digiblast/nand.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/dimm/dimm.h,BUSES["DIMM"] = true
+---------------------------------------------------
+
+if BUSES["DIMM"] then
+	files {
+		MAME_DIR .. "src/devices/bus/dimm/dimm.cpp",
+		MAME_DIR .. "src/devices/bus/dimm/dimm.h",
+		MAME_DIR .. "src/devices/bus/dimm/modules.cpp",
+		MAME_DIR .. "src/devices/bus/dimm/modules.h",
+	}
+end
+
+
+---------------------------------------------------
 --
 --@src/devices/bus/dmv/dmvbus.h,BUSES["DMV"] = true
 ---------------------------------------------------
@@ -2248,20 +2294,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/ekara/slot.h,BUSES["EKARA"] = true
----------------------------------------------------
-
-if BUSES["EKARA"] then
-	files {
-		MAME_DIR .. "src/devices/bus/ekara/slot.cpp",
-		MAME_DIR .. "src/devices/bus/ekara/slot.h",
-		MAME_DIR .. "src/devices/bus/ekara/rom.cpp",
-		MAME_DIR .. "src/devices/bus/ekara/rom.h",
-	}
-end
-
----------------------------------------------------
---
 --@src/devices/bus/electron/exp.h,BUSES["ELECTRON"] = true
 ---------------------------------------------------
 
@@ -2351,6 +2383,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/elf2/exp.h,BUSES["ELF2"] = true
+---------------------------------------------------
+
+if BUSES["ELF2"] then
+	files {
+		MAME_DIR .. "src/devices/bus/elf2/exp.cpp",
+		MAME_DIR .. "src/devices/bus/elf2/exp.h",
+		MAME_DIR .. "src/devices/bus/elf2/giant.cpp",
+		MAME_DIR .. "src/devices/bus/elf2/giant.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/ep64/exp.h,BUSES["EP64"] = true
 ---------------------------------------------------
 
@@ -2407,6 +2454,20 @@ if BUSES["EPSON_QX_KEYBOARD"] then
 	custombuildtask {
 		layoutbuildtask("emu/layout", "qx10ascii"),
 		layoutbuildtask("emu/layout", "qx10hasci"),
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/epson_qx/video/video.h,BUSES["EPSON_QX_VIDEO"] = true
+---------------------------------------------------
+
+if BUSES["EPSON_QX_VIDEO"] then
+	files {
+		MAME_DIR .. "src/devices/bus/epson_qx/video/qx_gdc_cards.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/video/qx_gdc_cards.h",
+		MAME_DIR .. "src/devices/bus/epson_qx/video/video.cpp",
+		MAME_DIR .. "src/devices/bus/epson_qx/video/video.h",
 	}
 end
 
@@ -2625,8 +2686,26 @@ end
 
 if BUSES["HEATHZENITH_H19"] then
 	files {
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/cards.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/cards.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/gp19.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/gp19.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/igc.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/igc.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/imaginator.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/imaginator.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/super19.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/super19.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/superset.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/superset.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlb.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlb.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlbbase.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/tlbbase.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/ultra.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/ultra.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/watz.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h19/watz.h",
 	}
 end
 
@@ -2677,6 +2756,10 @@ if BUSES["HEATHZENITH_H89"] then
 	files {
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/cdr_fdc_880h.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/cdr_fdc_880h.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/dsm240.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/dsm240.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/gpp_speed.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/gpp_speed.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h89bus.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h89bus.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h17_fdc.cpp",
@@ -2687,12 +2770,18 @@ if BUSES["HEATHZENITH_H89"] then
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/h_88_5.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/mms77316_fdc.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/mms77316_fdc.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/mms_77318.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/mms_77318.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/mt_win89.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/mt_win89.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_sound.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_sound.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_parallel_port.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/sigmasoft_parallel_port.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/we_pullup.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/we_pullup.h",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/wh_88_16.cpp",
+		MAME_DIR .. "src/devices/bus/heathzenith/h89/wh_88_16.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z_89_11.cpp",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z_89_11.h",
 		MAME_DIR .. "src/devices/bus/heathzenith/h89/z37_fdc.cpp",
@@ -2903,6 +2992,8 @@ if BUSES["IEEE488"] then
 		MAME_DIR .. "src/devices/bus/ieee488/hp9122c.h",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9133.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9133.h",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9133xv.cpp",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9133xv.h",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/hp9895.h",
 		MAME_DIR .. "src/devices/bus/ieee488/remote488.cpp",
@@ -3285,6 +3376,8 @@ if BUSES["ISBX"] then
 		MAME_DIR .. "src/devices/bus/isbx/compis_fdc.h",
 		MAME_DIR .. "src/devices/bus/isbx/compis_hdc.cpp",
 		MAME_DIR .. "src/devices/bus/isbx/compis_hdc.h",
+		MAME_DIR .. "src/devices/bus/isbx/compis_sasi.cpp",
+		MAME_DIR .. "src/devices/bus/isbx/compis_sasi.h",
 		MAME_DIR .. "src/devices/bus/isbx/isbc_218a.cpp",
 		MAME_DIR .. "src/devices/bus/isbx/isbc_218a.h",
 	}
@@ -3406,35 +3499,6 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/lpci/pci.h,BUSES["LPCI"] = true
----------------------------------------------------
-
-if BUSES["LPCI"] then
-	files {
-		MAME_DIR .. "src/devices/bus/lpci/pci.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/pci.h",
-		MAME_DIR .. "src/devices/bus/lpci/cirrus.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/cirrus.h",
-		MAME_DIR .. "src/devices/bus/lpci/i82371ab.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/i82371ab.h",
-		MAME_DIR .. "src/devices/bus/lpci/i82371sb.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/i82371sb.h",
-		MAME_DIR .. "src/devices/bus/lpci/i82439tx.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/i82439tx.h",
-		MAME_DIR .. "src/devices/bus/lpci/northbridge.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/northbridge.h",
-		MAME_DIR .. "src/devices/bus/lpci/southbridge.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/southbridge.h",
-		MAME_DIR .. "src/devices/bus/lpci/mpc105.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/mpc105.h",
-		MAME_DIR .. "src/devices/bus/lpci/vt82c505.cpp",
-		MAME_DIR .. "src/devices/bus/lpci/vt82c505.h",
-	}
-end
-
-
----------------------------------------------------
---
 --@src/devices/bus/m5/slot.h,BUSES["M5"] = true
 ---------------------------------------------------
 if BUSES["M5"] then
@@ -3443,6 +3507,23 @@ if BUSES["M5"] then
 		MAME_DIR .. "src/devices/bus/m5/slot.h",
 		MAME_DIR .. "src/devices/bus/m5/rom.cpp",
 		MAME_DIR .. "src/devices/bus/m5/rom.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/maccomm/maccomm.h,BUSES["MACCOMM"] = true
+---------------------------------------------------
+
+if BUSES["MACCOMM"] then
+	files {
+		MAME_DIR .. "src/devices/bus/maccomm/cards.cpp",
+		MAME_DIR .. "src/devices/bus/maccomm/cards.h",
+		MAME_DIR .. "src/devices/bus/maccomm/maccomm.cpp",
+		MAME_DIR .. "src/devices/bus/maccomm/maccomm.h",
+		MAME_DIR .. "src/devices/bus/maccomm/sonicsmc.cpp",
+		MAME_DIR .. "src/devices/bus/maccomm/sonicsmc.h",
 	}
 end
 
@@ -4323,6 +4404,8 @@ end
 
 if BUSES["NSCSI"] then
 	files {
+		MAME_DIR .. "src/devices/bus/nscsi/acb4070.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/acb4070.h",
 		MAME_DIR .. "src/devices/bus/nscsi/applecd.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/applecd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cd.cpp",
@@ -4335,16 +4418,22 @@ if BUSES["NSCSI"] then
 		MAME_DIR .. "src/devices/bus/nscsi/cdrn820s.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cdu75s.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/cdu75s.h",
+		MAME_DIR .. "src/devices/bus/nscsi/cdu76s.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/cdu76s.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cdu415.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/cdu415.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cdu561.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/cdu561.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cfp1080s.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/cfp1080s.h",
+		MAME_DIR .. "src/devices/bus/nscsi/cr504.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/cr504.h",
 		MAME_DIR .. "src/devices/bus/nscsi/crd254sh.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/crd254sh.h",
 		MAME_DIR .. "src/devices/bus/nscsi/cw7501.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/cw7501.h",
+		MAME_DIR .. "src/devices/bus/nscsi/d9060hd.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/d9060hd.h",
 		MAME_DIR .. "src/devices/bus/nscsi/devices.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/devices.h",
 		MAME_DIR .. "src/devices/bus/nscsi/dtc510.cpp",
@@ -4355,6 +4444,8 @@ if BUSES["NSCSI"] then
 		MAME_DIR .. "src/devices/bus/nscsi/et532.h",
 		MAME_DIR .. "src/devices/bus/nscsi/hd.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/hd.h",
+		MAME_DIR .. "src/devices/bus/nscsi/omti5100.cpp",
+		MAME_DIR .. "src/devices/bus/nscsi/omti5100.h",
 		MAME_DIR .. "src/devices/bus/nscsi/pc8801_30.cpp",
 		MAME_DIR .. "src/devices/bus/nscsi/pc8801_30.h",
 		MAME_DIR .. "src/devices/bus/nscsi/pc98_hd.cpp",
@@ -4509,12 +4600,14 @@ end
 
 if BUSES["PC_JOY"] then
 	files {
+		MAME_DIR .. "src/devices/bus/pc_joy/basic_joy.cpp",
+		MAME_DIR .. "src/devices/bus/pc_joy/basic_joy.h",
+		MAME_DIR .. "src/devices/bus/pc_joy/mssw.cpp",
+		MAME_DIR .. "src/devices/bus/pc_joy/mssw.h",
+		MAME_DIR .. "src/devices/bus/pc_joy/options.cpp",
+		MAME_DIR .. "src/devices/bus/pc_joy/options.h",
 		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy.cpp",
 		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy.h",
-		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_magnum6.cpp",
-		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_magnum6.h",
-		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_sw.cpp",
-		MAME_DIR .. "src/devices/bus/pc_joy/pc_joy_sw.h",
 	}
 end
 
@@ -4774,10 +4867,14 @@ if BUSES["PCI"] then
 		MAME_DIR .. "src/devices/bus/pci/ds2416.h",
 		MAME_DIR .. "src/devices/bus/pci/ess_maestro.cpp",
 		MAME_DIR .. "src/devices/bus/pci/ess_maestro.h",
+		MAME_DIR .. "src/devices/bus/pci/et4kw32p.cpp",
+		MAME_DIR .. "src/devices/bus/pci/et4kw32p.h",
 		MAME_DIR .. "src/devices/bus/pci/geforce.cpp",
 		MAME_DIR .. "src/devices/bus/pci/geforce.h",
 		MAME_DIR .. "src/devices/bus/pci/mga2064w.cpp",
 		MAME_DIR .. "src/devices/bus/pci/mga2064w.h",
+		MAME_DIR .. "src/devices/bus/pci/ncr53c810.cpp",
+		MAME_DIR .. "src/devices/bus/pci/ncr53c810.h",
 		MAME_DIR .. "src/devices/bus/pci/ncr53c825.cpp",
 		MAME_DIR .. "src/devices/bus/pci/ncr53c825.h",
 		MAME_DIR .. "src/devices/bus/pci/neon250.cpp",
@@ -4808,6 +4905,8 @@ if BUSES["PCI"] then
 		MAME_DIR .. "src/devices/bus/pci/sw1000xg.h",
 		MAME_DIR .. "src/devices/bus/pci/trident_4dwavedx.cpp",
 		MAME_DIR .. "src/devices/bus/pci/trident_4dwavedx.h",
+		MAME_DIR .. "src/devices/bus/pci/trident_tgui.cpp",
+		MAME_DIR .. "src/devices/bus/pci/trident_tgui.h",
 		MAME_DIR .. "src/devices/bus/pci/trio_pci.cpp",
 		MAME_DIR .. "src/devices/bus/pci/trio_pci.h",
 		MAME_DIR .. "src/devices/bus/pci/virge_pci.cpp",
@@ -5221,6 +5320,8 @@ if BUSES["RS232"] then
 		MAME_DIR .. "src/devices/bus/rs232/adsp2181ekl.h",
 		MAME_DIR .. "src/devices/bus/rs232/auto3a.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/auto3a.h",
+		MAME_DIR .. "src/devices/bus/rs232/cgp220.cpp",
+		MAME_DIR .. "src/devices/bus/rs232/cgp220.h",
 		MAME_DIR .. "src/devices/bus/rs232/exorterm.cpp",
 		MAME_DIR .. "src/devices/bus/rs232/exorterm.h",
 		MAME_DIR .. "src/devices/bus/rs232/heath_h19.cpp",
@@ -5476,38 +5577,6 @@ if BUSES["SBUS"] then
 		MAME_DIR .. "src/devices/bus/sbus/sunpc.h",
 		MAME_DIR .. "src/devices/bus/sbus/sbus.cpp",
 		MAME_DIR .. "src/devices/bus/sbus/sbus.h",
-	}
-end
-
-
----------------------------------------------------
---
---@src/devices/bus/scsi/scsi.h,BUSES["SCSI"] = true
----------------------------------------------------
-if BUSES["SCSI"] then
-	files {
-		MAME_DIR .. "src/devices/bus/scsi/scsi.cpp",
-		MAME_DIR .. "src/devices/bus/scsi/scsi.h",
-		MAME_DIR .. "src/devices/bus/scsi/scsicd.cpp",
-		MAME_DIR .. "src/devices/bus/scsi/scsicd.h",
-		MAME_DIR .. "src/devices/bus/scsi/scsihd.cpp",
-		MAME_DIR .. "src/devices/bus/scsi/scsihd.h",
-		MAME_DIR .. "src/devices/bus/scsi/scsihle.cpp",
-		MAME_DIR .. "src/devices/bus/scsi/scsihle.h",
-		MAME_DIR .. "src/devices/bus/scsi/cdu76s.cpp",
-		MAME_DIR .. "src/devices/bus/scsi/cdu76s.h",
-		MAME_DIR .. "src/devices/bus/scsi/scsicd512.cpp",
-		MAME_DIR .. "src/devices/bus/scsi/scsicd512.h",
-		MAME_DIR .. "src/devices/bus/scsi/acb4070.cpp",
-		MAME_DIR .. "src/devices/bus/scsi/acb4070.h",
-		MAME_DIR .. "src/devices/bus/scsi/d9060hd.cpp",
-		MAME_DIR .. "src/devices/bus/scsi/d9060hd.h",
-		MAME_DIR .. "src/devices/bus/scsi/sa1403d.cpp",
-		MAME_DIR .. "src/devices/bus/scsi/sa1403d.h",
-		MAME_DIR .. "src/devices/bus/scsi/s1410.cpp",
-		MAME_DIR .. "src/devices/bus/scsi/s1410.h",
-		MAME_DIR .. "src/devices/bus/scsi/omti5100.cpp",
-		MAME_DIR .. "src/devices/bus/scsi/omti5100.h",
 	}
 end
 
@@ -6072,6 +6141,21 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/technics/kn6000/kn6000_expansion.h,BUSES["TECHNICS_KN6000"] = true
+---------------------------------------------------
+
+if BUSES["TECHNICS_KN6000"] then
+	files {
+		MAME_DIR .. "src/devices/bus/technics/kn6000/kn6000_expansion.cpp",
+		MAME_DIR .. "src/devices/bus/technics/kn6000/kn6000_expansion.h",
+		MAME_DIR .. "src/devices/bus/technics/kn6000/hdsx6.cpp",
+		MAME_DIR .. "src/devices/bus/technics/kn6000/hdsx6.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/thomson/extension.h,BUSES["THOMSON"] = true
 ---------------------------------------------------
 
@@ -6289,6 +6373,52 @@ if BUSES["TMC600"] then
 		MAME_DIR .. "src/devices/bus/tmc600/euro.h",
 		MAME_DIR .. "src/devices/bus/tmc600/ram.cpp",
 		MAME_DIR .. "src/devices/bus/tmc600/ram.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/trs80m2/slot.h,BUSES["TRS80M2"] = true
+---------------------------------------------------
+
+if BUSES["TRS80M2"] then
+	files {
+		MAME_DIR .. "src/devices/bus/trs80m2/cage.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/cage.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/fdc.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/hdc.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/hdc.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/hdi.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/hdi.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/m68k.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/m68k.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/mem68k.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/mem68k.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/ram.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/ram.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/slot.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/slot.h",
+		MAME_DIR .. "src/devices/bus/trs80m2/vidkb.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2/vidkb.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/trs80m2kbd/kbd.h,BUSES["TRS80M2KBD"] = true
+---------------------------------------------------
+
+if BUSES["TRS80M2KBD"] then
+	files {
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/kbd.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/kbd.h",
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/tandy6k_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/tandy6k_kbd.h",
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/trs80m2_kbd.cpp",
+		MAME_DIR .. "src/devices/bus/trs80m2kbd/trs80m2_kbd.h",
 	}
 end
 
@@ -6545,6 +6675,8 @@ if BUSES["VIP"] then
 		MAME_DIR .. "src/devices/bus/vip/vp590.h",
 		MAME_DIR .. "src/devices/bus/vip/vp595.cpp",
 		MAME_DIR .. "src/devices/bus/vip/vp595.h",
+	    MAME_DIR .. "src/devices/bus/vip/vp601.cpp",
+    	MAME_DIR .. "src/devices/bus/vip/vp601.h",
 		MAME_DIR .. "src/devices/bus/vip/vp700.cpp",
 		MAME_DIR .. "src/devices/bus/vip/vp700.h",
 	}
@@ -6776,6 +6908,43 @@ if BUSES["X68K"] then
 		MAME_DIR .. "src/devices/bus/x68k/x68k_scsiext.h",
 		MAME_DIR .. "src/devices/bus/x68k/x68k_midi.cpp",
 		MAME_DIR .. "src/devices/bus/x68k/x68k_midi.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/xavix/cart.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/beyblade_link.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/mailcot_mascot.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/domyos_step.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/tvpc_mouse.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/suprtvpc_cart.h,BUSES["XAVIX"] = true
+--@src/devices/bus/xavix/suprtvpc_exp.h,BUSES["XAVIX"] = true
+---------------------------------------------------
+
+if BUSES["XAVIX"] then
+	files {
+		MAME_DIR .. "src/devices/bus/xavix/beyblade_link.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/beyblade_link.h",
+		MAME_DIR .. "src/devices/bus/xavix/cart.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/cart.h",
+		MAME_DIR .. "src/devices/bus/xavix/cart_rom.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/cart_rom.h",
+		MAME_DIR .. "src/devices/bus/xavix/domyos_step.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/domyos_step.h",
+		MAME_DIR .. "src/devices/bus/xavix/mailcot_mascot.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/mailcot_mascot.h",
+		MAME_DIR .. "src/devices/bus/xavix/tvpc_mouse.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/tvpc_mouse.h",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_cart.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_cart.h",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_cart_ir.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_cart_ir.h",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_exp.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_exp.h",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_printer.cpp",
+		MAME_DIR .. "src/devices/bus/xavix/suprtvpc_printer.h",
 	}
 end
 

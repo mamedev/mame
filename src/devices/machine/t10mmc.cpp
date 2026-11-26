@@ -122,6 +122,9 @@ void t10mmc::ExecCommand()
 {
 	int trk;
 
+//	if (command[0] != 0x00)
+//		printf("%02x %02x %02x\n", command[0], m_sense_key, m_audio_sense);
+
 	// keep updating the sense data while playing audio.
 	if (command[0] == T10SPC_CMD_REQUEST_SENSE && m_audio_sense != SCSI_SENSE_ASC_ASCQ_NO_SENSE && m_sense_key == SCSI_SENSE_KEY_NO_SENSE && m_sense_asc == 0 && m_sense_ascq == 0)
 	{
@@ -828,6 +831,9 @@ void t10mmc::ExecCommand()
 		m_lba = get_u32be(&command[2]);
 
 		m_device->logerror("T10SBC: SEEK EXTENDED to LBA %x\n", m_lba);
+
+		// a seek implictly stops a pending audio (win98se with CD players)
+		abort_audio();
 
 		m_phase = SCSI_PHASE_STATUS;
 		m_status_code = SCSI_STATUS_CODE_GOOD;

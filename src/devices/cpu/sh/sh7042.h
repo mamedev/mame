@@ -81,7 +81,7 @@ protected:
 
 	bool m_die_a;
 
-	sh7042_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
+	sh7042_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, bool die_a);
 
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -181,10 +181,17 @@ public:
 	sh7043a_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 };
 
+class sh7045f_device : public sh7042_device
+{
+public:
+	sh7045f_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 
 DECLARE_DEVICE_TYPE(SH7042,  sh7042_device)
 DECLARE_DEVICE_TYPE(SH7042A, sh7042a_device)
 DECLARE_DEVICE_TYPE(SH7043,  sh7043_device)
 DECLARE_DEVICE_TYPE(SH7043A, sh7043a_device)
+DECLARE_DEVICE_TYPE(SH7045F, sh7045f_device)
 
 #endif // MAME_CPU_SH_SH7042_H

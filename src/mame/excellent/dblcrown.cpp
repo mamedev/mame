@@ -9,6 +9,7 @@ TODO:
 - Pinpoint optional hopper line_r hookup, via dip4:8.
 - Lots of unmapped I/Os (game doesn't make much use of the HW);
 - video / irq timings;
+- dblcrown095: it's hardcoded to 8-liner controls, which aren't supported yet
 
 Notes:
 - at POST the SW tries to write to the palette RAM in a banking fashion. HW left-over?
@@ -38,11 +39,8 @@ and for nvram functions.
 **************************************************************************************************/
 
 
-#define MAIN_CLOCK          XTAL(28'636'363)
-#define CPU_CLOCK           MAIN_CLOCK / 6
-#define SND_CLOCK           MAIN_CLOCK / 12
-
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/bankdev.h"
 #include "machine/i8255.h"
@@ -70,47 +68,62 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_watchdog(*this, "watchdog")
 		, m_hopper(*this, "hopper")
-		, m_vram(*this, "vram")
 		, m_vram_bank(*this, "vram_bank%u", 0U)
 		, m_gfxdecode(*this, "gfxdecode")
 		, m_palette(*this, "palette")
+		, m_vram(*this, "vram")
+		, m_pal_ram(*this, "pal_ram", 0x200 * 2, ENDIANNESS_LITTLE)
+		, m_rombank(*this, "rombank")
 		, m_inputs(*this, "IN%u", 0U)
 		, m_lamps(*this, "lamp%u", 0U)
 	{ }
 
-	void dblcrown(machine_config &config);
+	void dblcrown(machine_config &config) ATTR_COLD;
 
-private:
+protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	virtual void video_start() override ATTR_COLD;
 
+private:
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<ticket_dispenser_device> m_hopper;
-	required_shared_ptr<u8> m_vram;
 	required_device_array<address_map_bank_device, 2> m_vram_bank;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+
+	required_shared_ptr<u8> m_vram;
+	memory_share_creator<u8> m_pal_ram;
+	required_memory_bank m_rombank;
+
 	required_ioport_array<4> m_inputs;
 	output_finder<8> m_lamps;
 
-	void bank_w(uint8_t data);
-	uint8_t irq_source_r();
-	void irq_source_w(uint8_t data);
-	uint8_t palette_r(offs_t offset);
-	void palette_w(offs_t offset, uint8_t data);
-	uint8_t vram_r(offs_t offset);
-	void vram_w(offs_t offset, uint8_t data);
-	uint8_t vram_bank_r(offs_t offset);
-	void vram_bank_w(offs_t offset, uint8_t data);
-	void key_select_w(uint8_t data);
-	uint8_t key_matrix_r();
-	uint8_t key_pending_r();
-	void output_w(uint8_t data);
-	void lamps_w(uint8_t data);
-	void watchdog_w(uint8_t data);
+	u8 m_bank = 0;
+	u8 m_irq_src = 0;
+	u8 m_key_select = 0;
+
+	u8 m_vram_bank_entry[2]{};
+	tilemap_t *m_bg_tilemap = nullptr;
+	tilemap_t *m_fg_tilemap = nullptr;
+
+	void bank_w(u8 data);
+	u8 irq_source_r();
+	void irq_source_w(u8 data);
+	u8 palette_r(offs_t offset);
+	void palette_w(offs_t offset, u8 data);
+	u8 vram_r(offs_t offset);
+	void vram_w(offs_t offset, u8 data);
+	u8 vram_bank_r(offs_t offset);
+	void vram_bank_w(offs_t offset, u8 data);
+	void key_select_w(u8 data);
+	u8 key_matrix_r();
+	u8 key_pending_r();
+	void output_w(u8 data);
+	void lamps_w(u8 data);
+	void watchdog_w(u8 data);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 
@@ -118,18 +131,10 @@ private:
 	void main_io(address_map &map) ATTR_COLD;
 	void vram_map(address_map &map) ATTR_COLD;
 
-	uint8_t m_bank = 0;
-	uint8_t m_irq_src = 0;
-	uint8_t m_key_select = 0;
-
-	std::unique_ptr<uint8_t[]> m_pal_ram;
-	uint8_t m_vram_bank_entry[2]{};
-	tilemap_t *m_bg_tilemap = nullptr;
-	tilemap_t *m_fg_tilemap = nullptr;
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 TILE_GET_INFO_MEMBER(dblcrown_state::get_bg_tile_info)
@@ -160,64 +165,59 @@ void dblcrown_state::video_start()
 
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_pal_ram = std::make_unique<uint8_t[]>(0x200 * 2);
 	// NOTE: set_source alone will crash with 0-length gfxdecoding
-	// need to explicitly use a fn otherwise unused by the rest of
-	// the MAME ecosystem at the time of this writing.
 	m_gfxdecode->gfx(1)->set_source_and_total(m_vram, m_vram.length() / 32);
 }
 
-uint32_t dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+u32 dblcrown_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
 }
 
-void dblcrown_state::bank_w(uint8_t data)
+void dblcrown_state::bank_w(u8 data)
 {
 	m_bank = data;
-	membank("rom_bank")->set_entry(m_bank & 0x1f);
+	m_rombank->set_entry(m_bank & 0x1f);
 }
 
-uint8_t dblcrown_state::irq_source_r()
+u8 dblcrown_state::irq_source_r()
 {
 	return m_irq_src;
 }
 
-void dblcrown_state::irq_source_w(uint8_t data)
+void dblcrown_state::irq_source_w(u8 data)
 {
 	m_irq_src = data; // this effectively acks the irq, by writing 0
 }
 
-uint8_t dblcrown_state::palette_r(offs_t offset)
+u8 dblcrown_state::palette_r(offs_t offset)
 {
-	//if(m_bank & 8) /* TODO: verify this */
-	//  offset+=0x200;
+	// if(BIT(m_bank, 3)) // TODO: verify this
+	//   offset += 0x200;
 
 	return m_pal_ram[offset];
 }
 
-void dblcrown_state::palette_w(offs_t offset, uint8_t data)
+void dblcrown_state::palette_w(offs_t offset, u8 data)
 {
-	int r,g,b,datax;
-
-	//if(m_bank & 8) /* TODO: verify this */
-	//  offset+=0x200;
+	// if(BIT(m_bank, 3)) // TODO: verify this
+	//   offset += 0x200;
 
 	m_pal_ram[offset] = data;
 	offset >>= 1;
-	datax = m_pal_ram[offset * 2] + 256 * m_pal_ram[offset * 2 + 1];
+	int const datax = m_pal_ram[offset * 2] + 256 * m_pal_ram[offset * 2 + 1];
 
-	r = ((datax) & 0x000f) >> 0;
-	g = ((datax) & 0x00f0) >> 4;
-	b = ((datax) & 0x0f00) >> 8;
-	/* TODO: remaining bits */
+	int const r = ((datax) & 0x000f) >> 0;
+	int const g = ((datax) & 0x00f0) >> 4;
+	int const b = ((datax) & 0x0f00) >> 8;
+	// TODO: remaining bits
 
 	m_palette->set_pen_color(offset, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
-void dblcrown_state::vram_w(offs_t offset, uint8_t data)
+void dblcrown_state::vram_w(offs_t offset, u8 data)
 {
 	m_vram[offset] = data;
 
@@ -230,28 +230,28 @@ void dblcrown_state::vram_w(offs_t offset, uint8_t data)
 	m_gfxdecode->gfx(1)->mark_dirty(offset / 32);
 }
 
-uint8_t dblcrown_state::vram_bank_r(offs_t offset)
+u8 dblcrown_state::vram_bank_r(offs_t offset)
 {
 	return m_vram_bank_entry[offset];
 }
 
-void dblcrown_state::vram_bank_w(offs_t offset, uint8_t data)
+void dblcrown_state::vram_bank_w(offs_t offset, u8 data)
 {
 	m_vram_bank_entry[offset] = data & 0xf;
 	m_vram_bank[offset]->set_bank(m_vram_bank_entry[offset]);
 
-	if(data & 0xf0)
+	if (data & 0xf0)
 		logerror("Upper vram bank write = %02x\n",data);
 }
 
-void dblcrown_state::key_select_w(uint8_t data)
+void dblcrown_state::key_select_w(u8 data)
 {
 	m_key_select = data;
 }
 
-uint8_t dblcrown_state::key_matrix_r()
+u8 dblcrown_state::key_matrix_r()
 {
-	uint8_t res = 0;
+	u8 res = 0;
 
 	for(int i = 0; i < 4; i++)
 	{
@@ -262,9 +262,9 @@ uint8_t dblcrown_state::key_matrix_r()
 	return res;
 }
 
-uint8_t dblcrown_state::key_pending_r()
+u8 dblcrown_state::key_pending_r()
 {
-	uint8_t res = 0xff;
+	u8 res = 0xff;
 
 	for(int i = 0; i < 4; i++)
 	{
@@ -283,7 +283,7 @@ uint8_t dblcrown_state::key_pending_r()
  * -x-- ----  unknown (active after deal)
  * x-x- --xx  unknown
  */
-void dblcrown_state::output_w(uint8_t data)
+void dblcrown_state::output_w(u8 data)
 {
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 4));
 	m_hopper->motor_w(BIT(data, 3));
@@ -301,17 +301,17 @@ void dblcrown_state::output_w(uint8_t data)
  * -x-- ----  Hold 2
  * x--- ----  Hold 1
  */
-void dblcrown_state::lamps_w(uint8_t data)
+void dblcrown_state::lamps_w(u8 data)
 {
 	for (int n = 0; n < 8; n++)
 		m_lamps[n] = BIT(data, n);
 }
 
 // MAX693A
-void dblcrown_state::watchdog_w(uint8_t data)
+void dblcrown_state::watchdog_w(u8 data)
 {
 	// check for refresh value (0x01)
-	if (data & 0x01)
+	if (BIT(data, 0))
 	{
 		m_watchdog->watchdog_reset();
 	}
@@ -326,8 +326,8 @@ void dblcrown_state::main_map(address_map &map)
 {
 	map.unmap_value_high();
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).bankr("rom_bank");
-	map(0xa000, 0xb7ff).ram(); // work ram
+	map(0x8000, 0x9fff).bankr(m_rombank);
+	map(0xa000, 0xb7ff).ram(); // work RAM
 	map(0xb800, 0xbfff).ram().share("nvram");
 	map(0xc000, 0xcfff).m(m_vram_bank[0], FUNC(address_map_bank_device::amap8));
 	map(0xd000, 0xdfff).m(m_vram_bank[1], FUNC(address_map_bank_device::amap8));
@@ -356,7 +356,7 @@ void dblcrown_state::main_io(address_map &map)
 
 void dblcrown_state::vram_map(address_map &map)
 {
-	map(0x0000, 0xffff).ram().w(FUNC(dblcrown_state::vram_w)).share("vram");
+	map(0x0000, 0xffff).ram().w(FUNC(dblcrown_state::vram_w)).share(m_vram);
 }
 
 static INPUT_PORTS_START( dblcrown )
@@ -503,7 +503,7 @@ INPUT_PORTS_END
 
 
 static GFXDECODE_START( gfx_dblcrown )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_16x16x4_packed_lsb, 0, 0x10 )
+	GFXDECODE_ENTRY( "tiles", 0, gfx_16x16x4_packed_lsb, 0, 0x10 )
 	GFXDECODE_RAM( nullptr, 0, gfx_8x8x4_packed_lsb, 0, 0x10 )
 GFXDECODE_END
 
@@ -511,8 +511,12 @@ GFXDECODE_END
 
 void dblcrown_state::machine_start()
 {
-	uint8_t *ROM = memregion("maincpu")->base();
-	membank("rom_bank")->configure_entries(0, 0x20, &ROM[0], 0x2000);
+	m_rombank->configure_entries(0, 0x20, memregion("maincpu")->base(), 0x2000);
+
+	save_item(NAME(m_bank));
+	save_item(NAME(m_irq_src));
+	save_item(NAME(m_key_select));
+	save_item(NAME(m_vram_bank_entry));
 }
 
 void dblcrown_state::machine_reset()
@@ -524,14 +528,14 @@ void dblcrown_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_state::scanline_cb)
 {
-	int scanline = param;
+	int const scanline = param;
 
 	if (scanline == 256)
 	{
 		m_maincpu->set_input_line(0, HOLD_LINE);
 		m_irq_src = 2;
 	}
-	else if ((scanline % 4) == 0) /* TODO: proper timing of this ... */
+	else if ((scanline % 4) == 0) // TODO: proper timing of this ...
 	{
 /*
 This is the main loop of this irq source. They hooked a timer irq then polled inputs via this wacky routine.
@@ -567,9 +571,10 @@ It needs at least 64 instances because 0xa05b will be eventually nuked by the vb
 
 void dblcrown_state::dblcrown(machine_config &config)
 {
-	Z80(config, m_maincpu, CPU_CLOCK);
+	Z80(config, m_maincpu, 28.636363_MHz_XTAL / 6);
 	m_maincpu->set_addrmap(AS_PROGRAM, &dblcrown_state::main_map);
 	m_maincpu->set_addrmap(AS_IO, &dblcrown_state::main_io);
+
 	TIMER(config, "scantimer").configure_scanline(FUNC(dblcrown_state::scanline_cb), "screen", 0, 1);
 
 	// 1000 ms. (minimal of MAX693A watchdog long timeout period with internal oscillator)
@@ -600,7 +605,7 @@ void dblcrown_state::dblcrown(machine_config &config)
 	PALETTE(config, m_palette).set_entries(0x100);
 
 	SPEAKER(config, "mono").front_center();
-	YMZ284(config, "ymz", SND_CLOCK).add_route(ALL_OUTPUTS, "mono", 0.75);
+	YMZ284(config, "ymz", 28.636363_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 
@@ -611,18 +616,30 @@ void dblcrown_state::dblcrown(machine_config &config)
 ***************************************************************************/
 
 ROM_START( dblcrown )
-	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_LOAD("1.u33", 0x00000, 0x40000, CRC(5df95a9c) SHA1(799333206089989c25ff9f167363073d4cf64bd2) )
 //  ROM_FILL( 0x0030, 4, 0xff )
 
-	ROM_REGION( 0x80000, "gfx1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80000, "tiles", 0 )
 	ROM_LOAD("2.u43", 0x00000, 0x80000, CRC(58200bd4) SHA1(2795cfc41056111f66bfb82916343d1c733baa83) )
 
-	ROM_REGION( 0x0bf1, "plds", 0 )
+	ROM_REGION( 0x0117, "plds", 0 )
+	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0117, CRC(c74231ee) SHA1(f1b9e98f1fde53eee64d5da38fb8a6c22b6333e2) )
+ROM_END
+
+ROM_START( dblcrown095 )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD("d2c_095_8l.hx.u33", 0x00000, 0x40000, CRC(7771f759) SHA1(153facf9d35932fc280934c448834c289390dc74) ) // handwritten label
+
+	ROM_REGION( 0x80000, "tiles", 0 )
+	ROM_LOAD("1.u43", 0x00000, 0x80000, CRC(04f653ad) SHA1(4e98965a3d489d68bf10b6bde5b51eaf9af7e4b4) )
+
+	ROM_REGION( 0x0117, "plds", 0 )
 	ROM_LOAD("palce16v8h.u39", 0x0000, 0x0117, CRC(c74231ee) SHA1(f1b9e98f1fde53eee64d5da38fb8a6c22b6333e2) )
 ROM_END
 
 } // anonymous namespace
 
 
-GAMEL( 1997, dblcrown, 0,      dblcrown, dblcrown, dblcrown_state, empty_init, ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX
+GAMEL( 1997, dblcrown,    0,        dblcrown, dblcrown, dblcrown_state, empty_init, ROT0, "Cadence Technology",  "Double Crown (v1.0.3)", MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // 1997 DYNA copyright in tile GFX
+GAMEL( 1997, dblcrown095, dblcrown, dblcrown, dblcrown, dblcrown_state, empty_init, ROT0, "Cadence Technology",  "Double Crown (v0.9.5)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS, layout_dblcrown ) // no 1997 DYNA copyright in tile GFX

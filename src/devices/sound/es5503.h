@@ -26,6 +26,10 @@ public:
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
 
+	// for hosts that time their own bus cycles
+	void run_to(u64 clock);
+	u8 bus_r() const { return m_bus; }
+
 	uint8_t get_channel_strobe() { return m_channel_strobe; }
 
 protected:
@@ -40,14 +44,12 @@ protected:
 	// device_rom_interface overrides
 	virtual void rom_bank_pre_change() override;
 
-	TIMER_CALLBACK_MEMBER(delayed_stream_update);
+	TIMER_CALLBACK_MEMBER(scan_tick);
 
 	sound_stream *m_stream;
 
 	devcb_write_line   m_irq_func;
 	devcb_read8        m_adc_func;
-
-	emu_timer *m_sync_timer;
 
 private:
 	enum
@@ -61,7 +63,6 @@ private:
 	struct ES5503Osc
 	{
 		uint16_t freq;
-		uint16_t wtsize;
 		uint8_t  control;
 		uint8_t  vol;
 		uint8_t  data;
@@ -71,23 +72,47 @@ private:
 
 		uint32_t accumulator;
 		uint8_t  irqpend;
+		uint8_t  prevhalt;      // halt bit at the previous visit
+		uint64_t refresh;       // slot in which the registers were last refreshed
 	};
+
+	static constexpr int FIFO_FRAMES = 8192;
+	static constexpr int IDLE_SCAN = 21;    // the scan counter sits here and at the next value in the refresh slots
 
 	ES5503Osc m_oscillators[32];
 
 	int8_t  m_oscsenabled;      // # of oscillators enabled
-	int m_rege0;            // contents of register 0xe0
+	uint8_t m_rege0;            // oscillator named in register 0xe0
+	bool m_irq_active;          // an interrupt is being presented
+	uint64_t m_present_slot;    // slot in which it was presented
+
+	uint64_t m_slot;            // next slot to run
+	uint8_t m_scan;             // where the scan counter is
+	uint8_t m_idle;             // nonzero in the 2 refresh slots after the last oscillator
+	bool m_scan_off;            // no oscillators are serviced after a reset
+	uint64_t m_drift_slots;     // unrefreshed registers are lost after this long
+	uint8_t m_bus;              // last byte fetched from wave memory
 
 	uint8_t m_channel_strobe;
 
 	int m_output_channels;
 	uint32_t m_output_rate;
+	int32_t m_volume[256];      // output level for each volume register value
 
 	emu_timer *m_timer;
 
-	std::vector<int32_t> m_mix_buffer;
+	int32_t m_mix[16];
+	int32_t m_last[16];
+	std::vector<int32_t> m_fifo;
+	int m_fifo_head, m_fifo_count;
 
-	void halt_osc(int onum, int type, uint32_t *accumulator, int resshift, uint8_t newCtrl);
+	u64 now_clock() const { return attotime_to_clocks(machine().time()); }
+	void update_rate();
+	void run_slot();
+	void end_round();
+	void visit(int onum);
+	void drift(ES5503Osc &osc);
+	void check_drift(int onum);
 };
 
 

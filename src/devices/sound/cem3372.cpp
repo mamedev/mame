@@ -30,6 +30,7 @@ cem3372_vcf_device::cem3372_vcf_device(const machine_config &mconfig, const char
 	: device_t(mconfig, CEM3372_VCF, tag, owner, 0)
 	, device_sound_interface(mconfig, *this)
 	, m_inputs(inputs)
+	, m_ext_res_gain(1.0F)
 	, m_stream(nullptr)
 	, m_input_a_vca(*this, "input_a_vca")
 	, m_input_b_vca(*this, "input_b_vca")
@@ -49,6 +50,19 @@ cem3372_vcf_device::cem3372_vcf_device(const machine_config &mconfig, const char
 {
 }
 
+cem3372_vcf_device &cem3372_vcf_device::configure_res_in_divider(float r_in, float r_gnd)
+{
+	// Recommended voltage divider at the resonance input (pin 11).
+	constexpr float RECOMMENDED_GAIN = RES_VOLTAGE_DIVIDER(RES_K(22), RES_K(1));
+
+	// Presumably, the "resonance CV required for oscillation" spec depends on
+	// the gain above. Adjust accordingly if a different gain is configured.
+	// Used in compute_res().
+	m_ext_res_gain = RES_VOLTAGE_DIVIDER(r_in, r_gnd) / RECOMMENDED_GAIN;
+
+	return *this;
+}
+
 void cem3372_vcf_device::device_add_mconfig(machine_config &config)
 {
 	// Route audio inputs.
@@ -64,7 +78,7 @@ void cem3372_vcf_device::device_add_mconfig(machine_config &config)
 	}
 	if (m_inputs.channel_b)
 	{
-		m_inputs.channel_b->add_route(0, m_input_b_vca, 1.0);
+		m_inputs.channel_b->add_route(0, m_input_b_vca, 1.0, va_vca_device::INPUT_AUDIO);
 	}
 	else
 	{
@@ -255,7 +269,7 @@ float cem3372_vcf_device::compute_res(float cv)
 
 	// TODO: response curve is unknown. Treating it as linear for now.
 	// Typical voltage required for self-oscillation: 2.8
-	m_res = 4.0F * std::clamp(cv, 0.0F, 5.0F) / 2.8F;
+	m_res = m_ext_res_gain * 4.0F * std::clamp(cv, 0.0F, 5.0F) / 2.8F;
 	m_res_cv = cv;
 
 	LOGMASKED(LOG_RES, "%s: Res - cv: %f, gain: %f\n", tag(), m_res_cv, m_res);
@@ -283,7 +297,7 @@ void cem3372_vcf_device::update_freq_scale()
 	}
 
 	// Force a recomputation of the frequency. Must happen after the calls to
-	// set_freq_scale() above
+	// set_freq_scale() above.
 	const float prev_cv = m_freq_cv;
 	m_freq_cv = std::numeric_limits<double>::quiet_NaN();
 	compute_freq(prev_cv);

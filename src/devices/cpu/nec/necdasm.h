@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <optional>
+
 class nec_disassembler : public util::disasm_interface
 {
 public:
@@ -15,6 +17,8 @@ public:
 	public:
 		virtual ~config() = default;
 		virtual int get_mode() const = 0;
+		virtual bool get_decryption_mode() const;
+		virtual std::optional<u32> get_cs_base() const;
 	};
 
 	nec_disassembler(config *conf, const u8 *decryption_table = nullptr);
@@ -123,6 +127,9 @@ private:
 
 	inline u8 FETCH(offs_t pc_base, offs_t &pc, const data_buffer &opcodes);
 	inline u16 FETCH16(offs_t pc_base, offs_t &pc, const data_buffer &opcodes);
+	u8 decrypt_opcode(u8 opcode);
+	offs_t code_address(offs_t pc_base, offs_t pc) const;
+	offs_t relative_address(offs_t pc_base, offs_t pc, s32 displacement, bool word) const;
 	std::string hexstring(uint32_t value, int digits);
 	std::string shexstring(uint32_t value, int digits, bool always);
 	void handle_modrm(offs_t pc_base, offs_t &pc, const data_buffer &params);

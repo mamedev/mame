@@ -9,10 +9,10 @@
 
 #include "emu.h"
 
+#include "class200_lcdc.h"
+
 #include "cpu/m6502/st2205u.h"
 #include "video/st7735_lcdc.h"
-
-#include "class200_lcdc.h"
 
 #include "screen.h"
 #include "speaker.h"
@@ -43,6 +43,23 @@ protected:
 	u8 m_portb;
 };
 
+class st22xx_cutepet_state : public st22xx_rom_handheld_state
+{
+public:
+	st22xx_cutepet_state(const machine_config &mconfig, device_type type, const char *tag)
+		: st22xx_rom_handheld_state(mconfig, type, tag)
+		, m_lcdc(*this, "lcdc")
+	{
+	}
+
+	void st22xx_cutepet(machine_config &config) ATTR_COLD;
+
+private:
+	void st22xx_cutepet_map(address_map &map) ATTR_COLD;
+
+	required_device<st7735_lcdc_device> m_lcdc;
+};
+
 class st22xx_dphh8213_state : public st22xx_rom_handheld_state
 {
 public:
@@ -54,11 +71,9 @@ public:
 	}
 
 	void st22xx_dphh8213(machine_config &config) ATTR_COLD;
-	void st22xx_cutepet(machine_config &config) ATTR_COLD;
 
 private:
 	void st22xx_dphh8213_map(address_map &map) ATTR_COLD;
-	void st22xx_cutepet_map(address_map &map) ATTR_COLD;
 
 	u8 porta_r();
 
@@ -273,7 +288,7 @@ void st22xx_dphh8213_state::st22xx_dphh8213_map(address_map &map)
 	map(0x0604000, 0x0604000).rw(m_lcdc, FUNC(st7735_lcdc_device::lcdc_data_r), FUNC(st7735_lcdc_device::lcdc_data_w));
 }
 
-void st22xx_dphh8213_state::st22xx_cutepet_map(address_map &map)
+void st22xx_cutepet_state::st22xx_cutepet_map(address_map &map)
 {
 	map(0x0000000, 0x03fffff).rom().region("maincpu", 0);
 
@@ -390,25 +405,20 @@ static INPUT_PORTS_START(class200)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START(cutepet)
-	PORT_START("MATRIX1")
+	PORT_START("IN1")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("MATRIX2")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // needed to power-up, inputs might be multiplexed here?
+	PORT_BIT(0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("MATRIX3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("MATRIX4")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("PORTC")
+	PORT_START("IN3")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 void st22xx_dphh8213_state::st22xx_dphh8213(machine_config &config)
 {
-	ST2302U(config, m_maincpu, 24000000);
+	ST2302U(config, m_maincpu, 24'000'000);
 	m_maincpu->set_addrmap(AS_DATA, &st22xx_dphh8213_state::st22xx_dphh8213_map);
 	m_maincpu->in_pa_callback().set(FUNC(st22xx_dphh8213_state::porta_r));
 	m_maincpu->out_pa_callback().set(FUNC(st22xx_dphh8213_state::porta_w));
@@ -428,12 +438,29 @@ void st22xx_dphh8213_state::st22xx_dphh8213(machine_config &config)
 	ST7735(config, m_lcdc);
 }
 
-void st22xx_dphh8213_state::st22xx_cutepet(machine_config &config)
+void st22xx_cutepet_state::st22xx_cutepet(machine_config &config)
 {
-	st22xx_dphh8213(config);
-	m_maincpu->set_addrmap(AS_DATA, &st22xx_dphh8213_state::st22xx_cutepet_map);
-}
+	ST2302U(config, m_maincpu, 24'000'000);
+	m_maincpu->set_addrmap(AS_DATA, &st22xx_cutepet_state::st22xx_cutepet_map);
+	m_maincpu->in_pa_callback().set_ioport("IN1");
+	m_maincpu->in_pb_callback().set_ioport("IN2");
+	m_maincpu->in_pc_callback().set_ioport("IN3");
 
+	SPEAKER(config, "mono").front_center();
+	m_maincpu->add_route(st2205u_base_device::PSG_OUTPUT_PWM, "mono", 1.00);
+
+	// resolution seems to be correct, based on registers programmed
+	// but this might not be a ST7735, just something with a compatible
+	// set of commands - the output isn't currently correct
+	SCREEN(config, m_screen).set_lcd();
+	m_screen->set_refresh_hz(60);
+	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
+	m_screen->set_size(160, 128);
+	m_screen->set_visarea(0, 160 - 1, 0, 128 - 1);
+	m_screen->set_screen_update(m_lcdc, FUNC(st7735_lcdc_device::render_to_bitmap));
+
+	ST7735(config, m_lcdc);
+}
 
 void st22xx_class200_state::st22xx_class200(machine_config &config)
 {
@@ -488,7 +515,7 @@ ROM_START( dphh8213 )
 ROM_END
 
 ROM_START( cutepet )
-	// internal area not used?
+	// internal area not used
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD( "m29w320dt.u2", 0x00000, 0x400000, CRC(157e208f) SHA1(78069c524f214d763c0b216aa3de487b65a84034) )
@@ -499,7 +526,7 @@ ROM_END
 
 // this is uses a higher resolution display than the common units, but not as high as the SunPlus based ones
 COMP( 201?, class200, 0,      0,      st22xx_class200, class200,  st22xx_class200_state,   empty_init, "<unknown>", "Color LCD Classic Game 200-in-1", 0 ) // no manufacturer name or product code anywhere
-// also uses the higher resolution display
+// also uses the higher resolution display, appears to need different internal ROM to class200 though
 COMP( 201?, bbl338,   0,      0,      st22xx_bbl338,   class200,  st22xx_bbl338_sim_state, empty_init, "BaoBaoLong", "Portable Game Player BBL-338 (BaoBaoLong, 48-in-1)", MACHINE_NOT_WORKING )
 
 // Language controlled by port bit, set at factory, low resolution
@@ -507,4 +534,4 @@ COMP( 201?, bbl338,   0,      0,      st22xx_bbl338,   class200,  st22xx_bbl338_
 COMP( 201?, dphh8213, 0,      0,      st22xx_dphh8213, dphh8213, st22xx_dphh8213_state, empty_init, "<unknown>", "Digital Pocket Hand Held System 20-in-1 - Model 8213", MACHINE_NOT_WORKING )
 
 // seems to be this hardware type, but different LCDC?
-COMP( 201?, cutepet,  0,      0,      st22xx_cutepet, cutepet,   st22xx_dphh8213_state, empty_init, "Dream Cube", "Cute Pet Park", MACHINE_NOT_WORKING )
+COMP( 201?, cutepet,  0,      0,      st22xx_cutepet, cutepet,   st22xx_cutepet_state, empty_init, "Dream Cube", "Cute Pet Park", MACHINE_NOT_WORKING )

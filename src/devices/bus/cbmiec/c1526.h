@@ -60,6 +60,7 @@ protected:
 	required_device<bitmap_printer_device> m_bitmap_printer;
 	required_device<stepper_device> m_pf_stepper;
 	required_ioport m_paper_adv;
+	required_ioport m_address;
 
 	emu_timer *m_cr_sensor_timer = nullptr;
 	attotime m_last_cr_step = attotime::zero;
@@ -86,6 +87,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(4, 0x07); }
 	virtual void device_start() override ATTR_COLD;
 
 	// device_cbm_iec_interface overrides
@@ -118,6 +120,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(4, 0x07); }
 	virtual void device_start() override ATTR_COLD;
 
 	// device_ieee488_interface overrides

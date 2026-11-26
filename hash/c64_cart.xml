@@ -5853,6 +5853,13 @@ Fails [MOS6526], [SID] and [cassette] checks
 				<rom name="action_replay_v6.0_6.0_1989_pal.bin" size="0x8000" crc="44a30413" sha1="fca6f0c4c164c67a01abc4a58fc83814a9b15e96"/>
 			</dataarea>
 		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Graphic Support Disk"/>
+			<dataarea name="flop" size="174848">
+				<rom name="action_replay_graphic_support_disk_1988_dosoft.d64" size="174848" crc="b79cb6fa" sha1="baefa6490642c5a2c8d6a0ad14dbc3aece3312bc"/>
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="frzframe" supported="no">

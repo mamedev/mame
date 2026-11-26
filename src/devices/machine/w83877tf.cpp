@@ -2,7 +2,13 @@
 // copyright-holders: Angelo Salese
 /**************************************************************************************************
 
-Winbond W83877TF
+Winbond W83877TF PC97 compatible Super I/O
+
+akin to SMSC FDC37C669, with ACPI and ISA bus IRQ sharing as extras
+
+TODO:
+- HEFRAS = 0 config is untested;
+- W83877F pin compatible;
 
 **************************************************************************************************/
 
@@ -96,8 +102,7 @@ void w83877tf_device::device_start()
 	save_item(NAME(m_submidi));
 	save_item(NAME(m_uratri));
 	save_item(NAME(m_urbtri));
-	save_item(NAME(m_urapwd));
-	save_item(NAME(m_urbpwd));
+	save_item(NAME(m_uart_pwd));
 	save_item(NAME(m_rxw4c));
 	save_item(NAME(m_txw4c));
 	save_item(NAME(m_urirsel));
@@ -124,8 +129,8 @@ void w83877tf_device::device_reset()
 	m_pm1_ad = 0;
 	m_gpe_ad = 0;
 	m_uart_ad[0] = m_uart_ad[1] = 0;
-	// TODO: can be POR strapped
-	m_pnpcvs = 1;
+	// POR strapped
+	// m_pnpcvs = 0;
 	pnp_init();
 
 	m_fdc->set_mode(upd765_family_device::mode_t::AT);
@@ -202,12 +207,12 @@ void w83877tf_device::remap(int space_id, offs_t start, offs_t end)
 	if (space_id == AS_IO)
 	{
 		// every single device here won't map if bit 7-6 are 0
-		if (m_fdc_ad & 0x300)
+		if (m_fdc_ad & 0x300 && !m_fdcpwd)
 		{
 			m_isa->install_device(m_fdc_ad, m_fdc_ad + 7, *m_fdc, &n82077aa_device::map);
 		}
 
-		if (m_prt_ad & 0x300)
+		if (m_prt_ad & 0x300 && !m_prtpwd)
 		{
 			m_isa->install_device(m_prt_ad, m_prt_ad + 3, *m_lpt, &pc_lpt_device::isa_map);
 		}
@@ -215,7 +220,10 @@ void w83877tf_device::remap(int space_id, offs_t start, offs_t end)
 		for (int i = 0; i < 2; i++)
 		{
 			const u16 uart_address = m_uart_ad[i];
-			m_isa->install_device(uart_address, uart_address + 7, read8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_r)), write8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_w)));
+			if (uart_address & 0x300 && !m_uart_pwd[i])
+			{
+				m_isa->install_device(uart_address, uart_address + 7, read8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_r)), write8sm_delegate(*m_com[i], FUNC(ns16450_device::ins8250_w)));
+			}
 		}
 
 		// needs to be done after FDC
@@ -267,6 +275,8 @@ void w83877tf_device::write(offs_t offset, u8 data)
 
 }
 
+// TODO: check if writing to reserved bits are actually readable
+// - p5txla does plenty of reserved high writes ...
 void w83877tf_device::config_map(address_map &map)
 {
 	map(0x00, 0x00).lrw8(
@@ -321,7 +331,7 @@ void w83877tf_device::config_map(address_map &map)
 	);
 	map(0x04, 0x04).lrw8(
 		NAME([this] (offs_t offset) {
-			return (m_prtpwd << 7) | (m_urapwd << 5) | (m_urbpwd << 4) | (m_prttri << 3) | (m_uratri << 1) | (m_urbtri);
+			return (m_prtpwd << 7) | (m_uart_pwd[0] << 5) | (m_uart_pwd[1] << 4) | (m_prttri << 3) | (m_uratri << 1) | (m_urbtri);
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			// tristate outputs
@@ -329,17 +339,20 @@ void w83877tf_device::config_map(address_map &map)
 			m_uratri = BIT(data, 1);
 			m_prttri = BIT(data, 3);
 			// power-down mode
-			m_urbpwd = BIT(data, 4);
-			m_urapwd = BIT(data, 5);
+			//m_urbpwd = BIT(data, 4);
+			//m_urapwd = BIT(data, 5);
+			m_uart_pwd[1] = BIT(data, 4);
+			m_uart_pwd[0] = BIT(data, 5);
 			m_prtpwd = BIT(data, 7);
 			LOG("CR4: %02x (URBTRI %d URATRI %d PRTTRI %d URBPWD %d URAPWD %d PRTPWD %d)\n", data
 				, m_urbtri
 				, m_uratri
 				, m_prttri
-				, m_urbpwd
-				, m_urapwd
+				, m_uart_pwd[1]
+				, m_uart_pwd[0]
 				, m_prtpwd
 			);
+			remap(AS_IO, 0, 0x400);
 		})
 	);
 	map(0x05, 0x05).lrw8(
@@ -372,6 +385,7 @@ void w83877tf_device::config_map(address_map &map)
 				, m_fipurdwm
 				, m_sel4fdd
 			);
+			remap(AS_IO, 0, 0x400);
 		})
 	);
 	map(0x07, 0x07).lrw8(
@@ -472,7 +486,7 @@ void w83877tf_device::config_map(address_map &map)
 			// UARTA/B clock source (0) 24 MHz / 13 (1) 24 Mhz
 			m_turb = BIT(data, 6);
 			m_tura = BIT(data, 7);
-			LOG("CR0C: %02x ()\n"
+			LOG("CR0C: %02x (TX2INV %d RX2INV %d URIRSEL %d HEFERE %d TURB %d TURA %d)\n"
 				, data
 				, m_tx2inv
 				, m_rx2inv
@@ -730,14 +744,14 @@ void w83877tf_device::request_dma(int dreq, int state)
 
 void w83877tf_device::irq_floppy_w(int state)
 {
-	if ((m_fdc_ad & 0x300) == 0)
+	if ((m_fdc_ad & 0x300) == 0 || m_fdcpwd)
 		return;
 	request_irq(m_fdc_iqs, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void w83877tf_device::drq_floppy_w(int state)
 {
-	if ((m_fdc_ad & 0x300) == 0)
+	if ((m_fdc_ad & 0x300) == 0 || m_fdcpwd)
 		return;
 	request_dma(m_fdc_dqs, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -748,7 +762,7 @@ void w83877tf_device::drq_floppy_w(int state)
 
 void w83877tf_device::irq_parallel_w(int state)
 {
-	if ((m_prt_ad & 0x300) == 0)
+	if ((m_prt_ad & 0x300) == 0 || m_prtpwd)
 		return;
 	request_irq(m_prt_iqs, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -759,56 +773,56 @@ void w83877tf_device::irq_parallel_w(int state)
 
 void w83877tf_device::irq_serial1_w(int state)
 {
-	if ((m_uart_ad[0] & 0x300) == 0)
+	if ((m_uart_ad[0] & 0x300) == 0 || m_uart_pwd[0])
 		return;
 	request_irq(m_uart_iqs[0], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void w83877tf_device::irq_serial2_w(int state)
 {
-	if ((m_uart_ad[1] & 0x300) == 0)
+	if ((m_uart_ad[1] & 0x300) == 0 || m_uart_pwd[1])
 		return;
 	request_irq(m_uart_iqs[1], state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 void w83877tf_device::txd_serial1_w(int state)
 {
-	if ((m_uart_ad[0] & 0x300) == 0)
+	if ((m_uart_ad[0] & 0x300) == 0 || m_uart_pwd[0])
 		return;
 	m_txd1_callback(state);
 }
 
 void w83877tf_device::txd_serial2_w(int state)
 {
-	if ((m_uart_ad[1] & 0x300) == 0)
+	if ((m_uart_ad[1] & 0x300) == 0 || m_uart_pwd[1])
 		return;
 	m_txd2_callback(state);
 }
 
 void w83877tf_device::dtr_serial1_w(int state)
 {
-	if ((m_uart_ad[0] & 0x300) == 0)
+	if ((m_uart_ad[0] & 0x300) == 0 || m_uart_pwd[0])
 		return;
 	m_ndtr1_callback(state);
 }
 
 void w83877tf_device::dtr_serial2_w(int state)
 {
-	if ((m_uart_ad[1] & 0x300) == 0)
+	if ((m_uart_ad[1] & 0x300) == 0 || m_uart_pwd[1])
 		return;
 	m_ndtr2_callback(state);
 }
 
 void w83877tf_device::rts_serial1_w(int state)
 {
-	if ((m_uart_ad[0] & 0x300) == 0)
+	if ((m_uart_ad[0] & 0x300) == 0 || m_uart_pwd[0])
 		return;
 	m_nrts1_callback(state);
 }
 
 void w83877tf_device::rts_serial2_w(int state)
 {
-	if ((m_uart_ad[1] & 0x300) == 0)
+	if ((m_uart_ad[1] & 0x300) == 0 || m_uart_pwd[1])
 		return;
 	m_nrts2_callback(state);
 }
@@ -924,5 +938,3 @@ void w83877tf_device::dack_w(int line, uint8_t data)
 		break;
 	}
 }
-
-

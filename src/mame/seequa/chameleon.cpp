@@ -3,20 +3,22 @@
 
 #include "emu.h"
 
-#include "cpu/z80/z80.h"
-#include "cpu/i86/i86.h"
-#include "machine/z80sio.h"
-#include "machine/genpc.h"
-#include "machine/x2212.h"
-#include "machine/pc_lpt.h"
-#include "video/cgapal.h"
 #include "bus/isa/cga.h"
 #include "bus/isa/fdc.h"
 #include "bus/isa/isa.h"
-#include "bus/rs232/rs232.h"
 #include "bus/pc_kbd/keyboards.h"
 #include "bus/pc_kbd/pc_kbdc.h"
+#include "bus/rs232/rs232.h"
+#include "cpu/i86/i86.h"
+#include "cpu/z80/z80.h"
+#include "machine/genpc.h"
+#include "machine/pc_lpt.h"
+#include "machine/x2212.h"
+#include "machine/z80sio.h"
+#include "video/cgapal.h"
+
 #include "softlist_dev.h"
+
 
 DECLARE_DEVICE_TYPE(ISA8_FDC_CHAMELEON, isa8_fdc_chameleon_device)
 
@@ -76,8 +78,8 @@ public:
 	{
 	}
 
-	void chameleon(machine_config &config);
-	void champroto(machine_config &config);
+	void chameleon(machine_config &config) ATTR_COLD;
+	void champroto(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -156,7 +158,7 @@ void chameleon_state::i8088_proto_io(address_map &map)
 void chameleon_state::i8088_map(address_map &map)
 {
 	map.unmap_value_high();
-	map(0xf3000, 0xf303f).rw(m_x2210a, FUNC(x2210_device::read), FUNC(x2210_device::write)).mirror(0x1c0);
+	map(0xf3000, 0xf303f).mirror(0x1c0).rw(m_x2210a, FUNC(x2210_device::read), FUNC(x2210_device::write));
 	map(0xf3200, 0xf3200).lr8(NAME([this](){ m_x2210a->recall(1); m_x2210a->recall(0); return 0; }));
 	map(0xf3200, 0xf3200).lw8(NAME([this](uint8_t d){ m_x2210a->store(1); m_x2210a->store(0); }));
 	map(0xfa000, 0xfbfff).rom().region("slotd", 0);
@@ -234,18 +236,22 @@ ROM_START(chameleon)
 	ROM_SYSTEM_BIOS(0, "216", "2.16")
 	ROM_SYSTEM_BIOS(1, "214", "2.14")
 	ROM_SYSTEM_BIOS(2, "220", "2.20")
+
 	ROM_REGION(0x2000, "slotf", 0)
 	ROMX_LOAD("seequabios-2-16.bin", 0, 0x2000, CRC(b0516c0c) SHA1(c9c83d8b6649d8262e609967cbedb1b89ea1667a), ROM_BIOS(0))
 	ROMX_LOAD("seequa2.14-bios.bin", 0, 0x2000, CRC(ddec9f17) SHA1(8ccb2c3abce550740594bff2e3d0a86c34748465), ROM_BIOS(1))
 	ROMX_LOAD("chameleonbios-16.bin", 0, 0x2000, CRC(a28b042d) SHA1(e8b4ef47e08f5734f852b3a43baf0f52dac28257), ROM_BIOS(2))
+
 	ROM_REGION(0x2000, "slote", 0)
 	ROMX_LOAD("seequafont-2-16.bin", 0, 0x2000, CRC(6cbefe69) SHA1(ee94959050f371d4dd433a5f2e750f25b6f1a238), ROM_BIOS(0))
 	ROMX_LOAD("seequa2.14-font.bin", 0, 0x2000, CRC(05a08abb) SHA1(c30a11be3e3527acaeb932388dc46ebd1ac9056e), ROM_BIOS(1))
 	ROMX_LOAD("seequabios-2.20.bin", 0, 0x2000, CRC(f34e79c4) SHA1(cea7083513030e01d1f6c9e56df4e72ea5902523), ROM_BIOS(2))
+
 	ROM_REGION(0x2000, "slotd", 0)
 	ROMX_FILL(0x0000, 0x2000, 0xff, ROM_BIOS(0))
 	ROMX_FILL(0x0000, 0x2000, 0xff, ROM_BIOS(1))
 	ROMX_FILL(0x0000, 0x2000, 0xff, ROM_BIOS(2))
+
 	ROM_REGION(0x40, "x2210a", 0)  // configured for 256k ram
 	ROM_LOAD("nvram", 0, 0x40, CRC(ed73313b) SHA1(fa643bf008b937ea9bc2c3e99523d9ed0f92acc4))
 ROM_END
@@ -253,17 +259,22 @@ ROM_END
 ROM_START(champroto)
 	ROM_DEFAULT_BIOS("0w")
 	ROM_SYSTEM_BIOS(0, "0w", "0.w")
+
 	ROM_REGION(0x2000, "slotf", 0)
 	ROMX_LOAD("rom-0.w-2.bin", 0x1000, 0x1000, CRC(19367509) SHA1(01c82a43feb43cb125afb3e462b7d8a05866092f), ROM_BIOS(0))
 	ROMX_LOAD("rom-0.w-1.bin", 0, 0x1000, CRC(a5ea12b4) SHA1(0e15fdb30dcff6f3041bc9963e7dd61ce434fa82), ROM_BIOS(0)) // this is in slote but there's a rom size jumper
+																													 //
 	ROM_REGION(0x2000, "slote", 0)
 	ROMX_FILL(0x0000, 0x2000, 0xff, ROM_BIOS(0))
+
 	ROM_REGION(0x2000, "slotd", 0)
 	ROMX_FILL(0x0000, 0x2000, 0xff, ROM_BIOS(0))
+
 	ROM_REGION(0x40, "x2210a", 0)  // configured for 256k ram
 	ROM_LOAD("nvram", 0, 0x40, CRC(ed73313b) SHA1(fa643bf008b937ea9bc2c3e99523d9ed0f92acc4))
 ROM_END
-}
 
-COMP(1983, chameleon, 0, 0, chameleon, 0, chameleon_state, empty_init, "Seequa", "Chameleon (Seequa PC)", MACHINE_NOT_WORKING)
+} // anonymous namespace
+
+COMP(1983, chameleon, 0,         0, chameleon, 0, chameleon_state, empty_init, "Seequa", "Chameleon (Seequa PC)", MACHINE_NOT_WORKING)
 COMP(1983, champroto, chameleon, 0, champroto, 0, chameleon_state, empty_init, "Seequa", "Chameleon (Seequa PC, prototype)", MACHINE_NOT_WORKING)

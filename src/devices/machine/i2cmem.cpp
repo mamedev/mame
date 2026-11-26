@@ -44,6 +44,7 @@ constexpr int DEVSEL_ADDRESS(0xfe);
 #define LOG_STATE     (1U << 1)
 #define LOG_READLINE  (1U << 2)
 #define LOG_WRITELINE (1U << 3)
+#define LOG_SELECT    (1U << 4)
 
 #define VERBOSE       (0)
 #include "logmacro.h"
@@ -317,6 +318,29 @@ void i2cmem_device::write_e2(int state)
 	}
 }
 
+
+// Abandon the transaction and sample the bus levels without generating an edge.
+void i2cmem_device::reset_bus(int sda, int scl)
+{
+	m_sdaw = BIT(sda, 0);
+	m_scl = BIT(scl, 0);
+	m_sdar = 1;
+	m_state = STATE_IDLE;
+	m_bits = 0;
+	m_shift = 0;
+	m_devsel = 0;
+	m_addresshigh = 0;
+	m_page_offset = 0;
+	m_page_written_size = 0;
+}
+
+
+// Power loss also clears the current address.
+void i2cmem_device::power_cycle(int sda, int scl)
+{
+	reset_bus(sda, scl);
+	m_byteaddr = 0;
+}
 
 void i2cmem_device::write_sda(int state)
 {
@@ -607,9 +631,11 @@ int i2cmem_device::select_device()
 
 	if( ( m_devsel & mask ) == ( device & mask ) )
 	{
+		LOGMASKED( LOG_SELECT, "i2c: device selected, %02x & %08x matches our address %02x & %08x\n", m_devsel, mask, device, mask);
 		return 1;
 	}
 
+	LOGMASKED( LOG_SELECT, "i2c: not selected, device address %02x does not match our address %02x\n", m_devsel & mask, device & mask);
 	return 0;
 }
 

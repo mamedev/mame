@@ -2233,7 +2233,10 @@ TIMER_CALLBACK_MEMBER(saturn_state::vdp1_draw_end )
 	#if 0
 	if(!(m_scu.ism & IRQ_VDP1_END))
 	{
-		m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d); // SH2
+		// NOTE: Rework to remove the version of set_input_line that also sets the vector.
+		// If this code is uncommented, there'll need to be an IRQ_CALLBACK_MEMBER set up for it.
+		m_irq_vector = 0x4d;
+		m_maincpu->set_input_line(0x2, HOLD_LINE); // SH2
 		scu_do_transfer(6);
 	}
 	else

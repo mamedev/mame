@@ -86,7 +86,12 @@ protected:
 	void vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual uint8_t pc_vga_choosevideomode();
+	// divisor is the base value in pixel units over the horizontal scan when drawing.
+	// Normally 1, bump if the geometry mismatch.
 	void recompute_params_clock(int divisor, int xtal);
+	// clients has to call this over *any* change in CRTC setup, and finalize with recompute_params_clock.
+	// Most often screen setup depends on stuff that is declared in the base regs such as
+	// miscellaneous output.
 	virtual void recompute_params();
 	uint8_t vga_vblank();
 	virtual void enter_setup_mode();
@@ -136,6 +141,7 @@ protected:
 	// NOTE: do not use the subclassed result when determining pitch in SVGA modes.
 	// dw & word mode should apply to normal VGA modes only.
 	virtual uint16_t offset();
+	// As above: internally SVGA modes have no start shifting, it's up to the user subclassing this
 	virtual uint32_t latch_start_addr() { return vga.crtc.start_addr_latch; }
 	virtual uint8_t vga_latch_write(int offs, uint8_t data);
 	inline uint8_t rotate_right(uint8_t val) { return (val >> vga.gc.rotate_count) | (val << (8 - vga.gc.rotate_count)); }
@@ -161,6 +167,8 @@ protected:
 
 		return res;
 	}
+	// TODO: may need an extra parameter or fn for some targets expecting line compare to be << 1
+	// cfr. S3 targets at 1600x1200x8 where SDD value is 0x2ff and feature needs to be knocked out.
 	virtual bool get_interlace_mode() { return false; }
 	virtual void palette_update();
 
@@ -219,6 +227,8 @@ protected:
 			uint8_t cursor_scan_start;
 	/**/    uint8_t cursor_skew;
 			uint8_t cursor_scan_end;
+			// FIXME: start_addr should be private not protected
+			// clients should use start_addr_latch *only*
 			uint32_t start_addr;
 			uint32_t start_addr_latch;
 			uint8_t protect_enable;
@@ -338,6 +348,8 @@ protected:
 	void svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual uint8_t pc_vga_choosevideomode() override;
+	virtual uint32_t latch_start_addr() override;
+
 	virtual void device_start() override ATTR_COLD;
 	virtual u16 line_compare_mask();
 	struct

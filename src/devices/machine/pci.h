@@ -59,7 +59,7 @@ public:
 	virtual uint8_t header_type_r();
 	virtual uint8_t bist_r();
 	uint32_t address_base_r(offs_t offset);
-	void address_base_w(offs_t offset, uint32_t data);
+	void address_base_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 	uint16_t subvendor_r();
 	uint16_t subsystem_r();
 	uint32_t expansion_base_r();
@@ -119,6 +119,8 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 
+	void map_bars(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+				  uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space);
 	void skip_map_regs(int count);
 	void add_map(uint64_t size, int flags, const address_map_constructor &map, device_t *relative_to = nullptr);
 	template <typename T> void add_map(uint64_t size, int flags, void (T::*map)(address_map &map), const char *name) {
@@ -138,6 +140,7 @@ protected:
 	void set_map_flags(int id, int flags);
 
 	inline address_space *get_pci_busmaster_space() const;
+	inline address_space *get_pci_busmaster_io_space() const;
 };
 
 class agp_device : public pci_device {
@@ -265,6 +268,9 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void interface_post_reset() override;
 
+	// host bridges use a type 0 header
+	virtual uint8_t header_type_r() override;
+
 	virtual device_t *bus_root() override;
 
 	uint32_t root_config_read(uint8_t bus, uint8_t device, uint16_t reg, uint32_t mem_mask);
@@ -284,7 +290,7 @@ private:
 using pci_pin_mapper = device_delegate<int (int)>;
 using pci_irq_handler = device_delegate<void (int, int)>;
 
-class pci_root_device : public device_t {
+class pci_root_device : public device_t, public device_memory_interface {
 public:
 	pci_root_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
@@ -294,23 +300,60 @@ public:
 	void set_pin_mapper(pci_pin_mapper &&mapper) { m_pin_mapper = std::move(mapper); }
 	void set_irq_handler(pci_irq_handler &&handler) { m_irq_handler = std::move(handler); }
 
+	// Bus with no host bridge: the root enumerates bus 0 and owns its memory, I/O and configuration
+	// spaces, and a device on the bus (e.g. a local bus bridge in direct-master mode) masters it
+	// through the functions below
+	void set_hostless() { m_hostless = true; }
+
 	address_space *get_pci_busmaster_space() const { return m_pci_busmaster_space; }
+	address_space *get_pci_busmaster_io_space() const { return m_pci_busmaster_io_space; }
 
 	void set_pci_busmaster_space(address_space *space) { m_pci_busmaster_space = space; }
 
+	// configuration cycles on a hostless bus; a cycle no device claims is a master abort
+	bool config_claimed(uint8_t bus, uint8_t device) const;
+	uint32_t config_read(uint8_t bus, uint8_t device, uint16_t reg, uint32_t mem_mask);
+	void config_write(uint8_t bus, uint8_t device, uint16_t reg, uint32_t data, uint32_t mem_mask);
+
 protected:
+	enum
+	{
+		AS_PCI_CONFIG = 0,
+		AS_PCI_MEMORY = 1,
+		AS_PCI_IO = 2
+	};
+
+	virtual void device_validity_check(validity_checker &valid) const override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void interface_post_reset() override;
+	virtual space_config_vector memory_space_config() const override ATTR_COLD;
 
 private:
+	void regenerate_config_mapping();
+	void regenerate_mapping();
+
 	pci_pin_mapper m_pin_mapper;
 	pci_irq_handler m_irq_handler;
 	address_space *m_pci_busmaster_space;
+	address_space *m_pci_busmaster_io_space;
+
+	bool m_hostless;
+	address_space_config m_config_config;
+	address_space_config m_memory_config;
+	address_space_config m_io_config;
+	pci_device *m_sub_devices[32*8];
+	std::vector<pci_device *> m_all_devices;
 };
 
 address_space *pci_device::get_pci_busmaster_space() const
 {
 	return m_pci_root->get_pci_busmaster_space();
+}
+
+address_space *pci_device::get_pci_busmaster_io_space() const
+{
+	return m_pci_root->get_pci_busmaster_io_space();
 }
 
 DECLARE_DEVICE_TYPE(PCI_ROOT,   pci_root_device)

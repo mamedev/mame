@@ -280,15 +280,10 @@ Lemon64 claims Joystick in port 2 but that's unresponsive, works in port 1 (veri
 	</software>
 
 	<!-- origin: archive.org -->
-	<software name="usagiyoj" supported="no">
+	<software name="usagiyoj">
 		<description>Samurai Warrior: The Battles of... Usagi Yojimbo</description>
 		<year>1988</year>
 		<publisher>Firebird Software</publisher>
-		<notes><![CDATA[
-LOAD "LOADER",8,1 then strike B
-Fails loading with "disk turbo" enabled
-All sprites are cutoff
-]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="samurai_warrior_the_battles_of_usagi_yojimbo_1988_firebird.d64" size="174848" crc="4f744c0a" sha1="da54e72053c52ef681fabb32726865f667e0161b" offset="0" />
@@ -297,15 +292,10 @@ All sprites are cutoff
 	</software>
 
 	<!-- origin: archive.org -->
-	<software name="spacetax" supported="no">
+	<software name="spacetax">
 		<description>Space Taxi (cracked by Exodus)</description>
 		<year>1984</year>
 		<publisher>Muse Software</publisher>
-		<notes><![CDATA[
-LOAD "SPACE TAXI",8
-No [SID] sample voices
-Hi-score table is corrupt (dump really?)
-]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="space_taxi_1984_muse_software.d64" size="174848" crc="d7fcf1e9" sha1="9204ddb22ad961f19c795c19eb60d34bec966514" offset="0" />
@@ -356,7 +346,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="creature2" supported="no">
+	<software name="creature2">
 		<description>Creatures 2: Torture Trouble</description>
 		<year>1992</year>
 		<publisher>Thalamus</publisher>
@@ -428,6 +418,31 @@ Hi-score table is corrupt (dump really?)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="dolphin_dos_3.0_original_tooldisk_1990.d64" size="174848" crc="dc48f29d" sha1="05a1b386ff91255c95d02ea9491340c6c6f80fe1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fcopy3">
+		<description>FCOPY III (for 2 parallel drives)</description>
+		<year>19??</year>
+		<publisher>The Whiz-zards Association</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="fcopy3.d64" size="174848" crc="8cfc7a45" sha1="2c1d9807d59704d3dd376ed0f9e8889a2f9740a1"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tttools">
+		<description>TurboTrans Tools</description>
+		<year>1986</year>
+		<publisher>Rossmöller</publisher>
+		<sharedfeat name="iec8_default" value="c1541tt"/>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="tt-tools.d64" size="174848" crc="fcf210de" sha1="1420b617d8d462d4347633c4e75106e6bd389897"/>
 			</dataarea>
 		</part>
 	</software>
@@ -772,7 +787,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="prodosdm" supported="no">
+	<software name="prodosdm">
 		<description>Professional-DOS - VTS Release Demo</description>
 		<year>1987</year>
 		<publisher>VTS Data</publisher>
@@ -785,7 +800,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="ictutil" supported="no">
+	<software name="ictutil">
 		<description>ICT Hard-Disk Utilities v2</description>
 		<year>1987</year>
 		<publisher>InConTrol</publisher>
@@ -980,7 +995,7 @@ Hi-score table is corrupt (dump really?)
 		</part>
 	</software>
 
-	<software name="prologic" supported="no">
+	<software name="prologic">
 		<description>Prologic-DOS</description>
 		<year>1987</year>
 		<publisher>REX Data Technology</publisher>
@@ -1131,7 +1146,7 @@ Hi-score table is corrupt (dump really?)
 	</software>
 
 	<!-- requires an MSD SD-1/SD-2 disk drive -->
-	<software name="msddcan" supported="no">
+	<software name="msddcan">
 		<description>MSD Dual Cannon</description>
 		<year>198?</year>
 		<publisher>Kracker Jax</publisher>
@@ -1144,7 +1159,7 @@ Hi-score table is corrupt (dump really?)
 	</software>
 
 	<!-- requires an MSD SD-1/SD-2 disk drive -->
-	<software name="msdprg" supported="no">
+	<software name="msdprg">
 		<description>MSD Programs</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1165,7 +1180,7 @@ Hi-score table is corrupt (dump really?)
 	</software>
 
 	<!-- requires an MSD SD-1/SD-2 disk drive -->
-	<software name="msdutil" supported="no">
+	<software name="msdutil">
 		<description>MSD Utilities</description>
 		<year>198?</year>
 		<publisher>&lt;unknown&gt;</publisher>

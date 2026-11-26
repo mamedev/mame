@@ -176,7 +176,7 @@ public:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_device<tvga9000_device> m_svga;
+	required_device<tvga9000_vga_device> m_svga;
 	required_device<via6522_device> m_via;
 	required_device<screen_device> m_screen;
 	required_ioport m_in0;
@@ -326,11 +326,11 @@ void pntnpuzl_state::pntnpuzl_map(address_map &map)
 	map(0x280018, 0x280019).w(FUNC(pntnpuzl_state::pntnpuzl_280018_w));
 	map(0x28001a, 0x28001b).r(FUNC(pntnpuzl_state::pntnpuzl_28001a_r));
 
-	map(0x3a0000, 0x3bffff).rw(m_svga, FUNC(tvga9000_device::mem_r), FUNC(tvga9000_device::mem_w));
-	map(0x3c03b0, 0x3c03df).m(m_svga, FUNC(tvga9000_device::io_map));
+	map(0x3a0000, 0x3bffff).rw(m_svga, FUNC(tvga9000_vga_device::mem_r), FUNC(tvga9000_vga_device::mem_w));
+	map(0x3c03b0, 0x3c03df).m(m_svga, FUNC(tvga9000_vga_device::io_map));
 	// TODO: accesses $46e8 & 4ae8 at POST
-	map(0x3c43c4, 0x3c43cb).rw(m_svga, FUNC(tvga9000_device::port_43c6_r), FUNC(tvga9000_device::port_43c6_w));
-	map(0x3c83c4, 0x3c83cb).rw(m_svga, FUNC(tvga9000_device::port_83c6_r), FUNC(tvga9000_device::port_83c6_w));
+	map(0x3c43c4, 0x3c43cb).rw(m_svga, FUNC(tvga9000_vga_device::port_43c6_r), FUNC(tvga9000_vga_device::port_43c6_w));
+	map(0x3c83c4, 0x3c83cb).rw(m_svga, FUNC(tvga9000_vga_device::port_83c6_r), FUNC(tvga9000_vga_device::port_83c6_w));
 
 	map(0x400000, 0x407fff).ram();
 }
@@ -415,7 +415,7 @@ void pntnpuzl_state::pntnpuzl(machine_config &config)
 	// TODO: XTAL is not right and likely not the source,
 	// selects xtal mode 3 (36 MHz) / 2 plus another / 2 for module testing bit 7
 	m_screen->set_raw(XTAL(40'000'000) / 2, 1080, 0, 400, 265, 0, 240);
-	m_screen->set_screen_update(m_svga, FUNC(tvga9000_device::screen_update));
+	m_screen->set_screen_update(m_svga, FUNC(tvga9000_vga_device::screen_update));
 }
 
 ROM_START( pntnpuzl )

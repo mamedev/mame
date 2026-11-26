@@ -124,4 +124,3 @@ void floppydock_device::hdsel_w(uint8_t hdsel)
 } // anonymous namespace
 
 DEFINE_DEVICE_TYPE_PRIVATE(DUODOCK_FLOPPYDOCK, device_nubus_card_interface, floppydock_device, "floppydock", "Floppy Dock")
-

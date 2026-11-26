@@ -2,7 +2,7 @@
 // copyright-holders:Curt Coder
 /**********************************************************************
 
-    Motorola MCCS1850 Serial Real-Time Clock emulation
+    Motorola MCCS1850 / MC68HC68T1 Serial Real-Time Clock emulation
 
 *********************************************************************/
 
@@ -12,6 +12,7 @@
 
     - auto restart
     - test mode
+    - MC68HC68T1 alarm and periodic interrupts
 
 */
 
@@ -96,6 +97,36 @@ enum
 #define TEST2_DV_MASK   0x07    // divider bits select
 
 
+namespace {
+
+// MC68HC68T1 registers
+enum : offs_t
+{
+	T1_RAM_END = 0x1f,
+	T1_SECONDS = 0x20,
+	T1_MINUTES = 0x21,
+	T1_HOURS = 0x22,
+	T1_DAY_OF_WEEK = 0x23,
+	T1_DATE = 0x24,
+	T1_MONTH = 0x25,
+	T1_YEAR = 0x26,
+	T1_STATUS = 0x30,
+	T1_CLOCK_CONTROL = 0x31,
+	T1_INTERRUPT_CONTROL = 0x32
+};
+
+// MC68HC68T1 register bits
+enum : uint8_t
+{
+	T1_HOURS_12 = 0x80,         // hours: 12-hour mode
+	T1_HOURS_PM = 0x20,         // hours: PM in 12-hour mode
+	T1_CLOCK_START = 0x80,      // clock control: start
+	T1_POWER_DOWN = 0x40        // interrupt control: power down
+};
+
+} // anonymous namespace
+
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -103,6 +134,7 @@ enum
 
 // device type definition
 DEFINE_DEVICE_TYPE(MCCS1850, mccs1850_device, "mccs1850", "MCCS1850 RTC")
+DEFINE_DEVICE_TYPE(MC68HC68T1, mc68hc68t1_device, "mc68hc68t1", "MC68HC68T1 RTC")
 
 
 
@@ -141,7 +173,7 @@ inline void mccs1850_device::check_interrupt()
 //  set_pse_line -
 //-------------------------------------------------
 
-inline void mccs1850_device::set_pse_line(bool state)
+inline void motorola_serial_rtc_device_base::set_pse_line(bool state)
 {
 	m_pse = state;
 
@@ -150,10 +182,20 @@ inline void mccs1850_device::set_pse_line(bool state)
 
 
 //-------------------------------------------------
+//  next_address - address after a burst byte
+//-------------------------------------------------
+
+offs_t motorola_serial_rtc_device_base::next_address(offs_t offset) const
+{
+	return (offset + 1) & 0x7f;
+}
+
+
+//-------------------------------------------------
 //  read_register -
 //-------------------------------------------------
 
-inline uint8_t mccs1850_device::read_register(offs_t offset)
+uint8_t mccs1850_device::read_register(offs_t offset)
 {
 	switch (offset)
 	{
@@ -180,7 +222,7 @@ inline uint8_t mccs1850_device::read_register(offs_t offset)
 //  write_register -
 //-------------------------------------------------
 
-inline void mccs1850_device::write_register(offs_t offset, uint8_t data)
+void mccs1850_device::write_register(offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -268,30 +310,143 @@ TIMER_CALLBACK_MEMBER(mccs1850_device::advance_seconds)
 }
 
 
+//-------------------------------------------------
+//  decode_calendar - copy one MC68HC68T1
+//  calendar register into the RTC
+//-------------------------------------------------
+
+inline void mc68hc68t1_device::decode_calendar(offs_t offset)
+{
+	static constexpr int REGISTERS[] = { RTC_SECOND, RTC_MINUTE, RTC_HOUR, RTC_DAY_OF_WEEK, RTC_DAY, RTC_MONTH, RTC_YEAR };
+
+	const uint8_t data = m_ram[offset];
+	int value = bcd_to_integer(data);
+	if ((offset == T1_HOURS) && (data & T1_HOURS_12))
+		value = (bcd_to_integer(data & 0x1f) % 12) + ((data & T1_HOURS_PM) ? 12 : 0);
+	set_clock_register(REGISTERS[offset - T1_SECONDS], value);
+}
+
+
+//-------------------------------------------------
+//  registers_updated - set the RTC from the
+//  MC68HC68T1 calendar registers
+//-------------------------------------------------
+
+void mc68hc68t1_device::registers_updated()
+{
+	for (offs_t offset = T1_SECONDS; offset <= T1_YEAR; offset++)
+		decode_calendar(offset);
+}
+
+
+//-------------------------------------------------
+//  read_register -
+//-------------------------------------------------
+
+uint8_t mc68hc68t1_device::read_register(offs_t offset)
+{
+	return m_ram[offset];
+}
+
+
+//-------------------------------------------------
+//  write_register -
+//-------------------------------------------------
+
+void mc68hc68t1_device::write_register(offs_t offset, uint8_t data)
+{
+	if (offset == T1_STATUS)
+		return;
+
+	m_ram[offset] = data;
+	if ((offset >= T1_SECONDS) && (offset <= T1_YEAR))
+		decode_calendar(offset);
+	else if (offset == T1_CLOCK_CONTROL)
+		m_clock_timer->enable(data & T1_CLOCK_START);
+	else if ((offset == T1_INTERRUPT_CONTROL) && (data & T1_POWER_DOWN))
+		set_pse_line(false);
+}
+
+
+//-------------------------------------------------
+//  next_address - bursts wrap within the RAM
+//  and within the clock registers
+//-------------------------------------------------
+
+offs_t mc68hc68t1_device::next_address(offs_t offset) const
+{
+	switch (offset)
+	{
+	case T1_RAM_END:
+		return 0x00;
+
+	case T1_INTERRUPT_CONTROL:
+		return T1_SECONDS;
+
+	default:
+		return motorola_serial_rtc_device_base::next_address(offset);
+	}
+}
+
+
+//-------------------------------------------------
+//  advance_seconds -
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(mc68hc68t1_device::advance_seconds)
+{
+	device_rtc_interface::advance_seconds();
+}
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
-//  mccs1850_device - constructor
+//  motorola_serial_rtc_device_base - constructor
 //-------------------------------------------------
 
-mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MCCS1850, tag, owner, clock),
+motorola_serial_rtc_device_base::motorola_serial_rtc_device_base(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, type, tag, owner, clock),
 	device_rtc_interface(mconfig, *this),
 	device_nvram_interface(mconfig, *this),
 	int_cb(*this),
 	pse_cb(*this),
-	nuc_cb(*this),
+	m_ram{},
 	m_pse(1),
-	m_counter(0),
+	m_clock_timer(nullptr),
 	m_ce(0),
 	m_sck(0),
 	m_sdo(1),
 	m_sdi(0),
 	m_state(STATE_ADDRESS),
-	m_bits(0)
+	m_address(0),
+	m_bits(0),
+	m_shift(0)
+{
+}
+
+
+//-------------------------------------------------
+//  mccs1850_device - constructor
+//-------------------------------------------------
+
+mccs1850_device::mccs1850_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	motorola_serial_rtc_device_base(mconfig, MCCS1850, tag, owner, clock),
+	nuc_cb(*this),
+	m_counter(0)
+{
+}
+
+
+//-------------------------------------------------
+//  mc68hc68t1_device - constructor
+//-------------------------------------------------
+
+mc68hc68t1_device::mc68hc68t1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	motorola_serial_rtc_device_base(mconfig, MC68HC68T1, tag, owner, clock)
 {
 }
 
@@ -308,20 +463,34 @@ void mccs1850_device::rtc_clock_updated(int year, int month, int day, int day_of
 	m_counter = systime.time;
 }
 
+void mc68hc68t1_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+{
+	m_ram[T1_SECONDS] = convert_to_bcd(second);
+	m_ram[T1_MINUTES] = convert_to_bcd(minute);
+	if (m_ram[T1_HOURS] & T1_HOURS_12)
+		m_ram[T1_HOURS] = T1_HOURS_12 | ((hour >= 12) ? T1_HOURS_PM : 0) | convert_to_bcd((hour % 12) ? (hour % 12) : 12);
+	else
+		m_ram[T1_HOURS] = convert_to_bcd(hour);
+	m_ram[T1_DAY_OF_WEEK] = convert_to_bcd(day_of_week);
+	m_ram[T1_DATE] = convert_to_bcd(day);
+	m_ram[T1_MONTH] = convert_to_bcd(month);
+	m_ram[T1_YEAR] = convert_to_bcd(year % 100);
+}
+
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void mccs1850_device::device_start()
+void motorola_serial_rtc_device_base::device_start()
 {
 	// allocate timers
-	m_clock_timer = timer_alloc(FUNC(mccs1850_device::advance_seconds), this);
+	m_clock_timer = timer_alloc(FUNC(motorola_serial_rtc_device_base::advance_seconds), this);
 	m_clock_timer->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
 
 	// state saving
+	save_item(NAME(m_ram));
 	save_item(NAME(m_pse));
-	save_item(NAME(m_counter));
 	save_item(NAME(m_ce));
 	save_item(NAME(m_sck));
 	save_item(NAME(m_sdo));
@@ -330,6 +499,13 @@ void mccs1850_device::device_start()
 	save_item(NAME(m_address));
 	save_item(NAME(m_bits));
 	save_item(NAME(m_shift));
+}
+
+void mccs1850_device::device_start()
+{
+	motorola_serial_rtc_device_base::device_start();
+
+	save_item(NAME(m_counter));
 }
 
 
@@ -346,13 +522,29 @@ void mccs1850_device::device_reset()
 	m_ram[REGISTER_CONTROL] = 0x00;
 }
 
+void mc68hc68t1_device::device_reset()
+{
+	m_ram[T1_STATUS] = 0;
+	m_ram[T1_INTERRUPT_CONTROL] = 0;
+}
+
+
+//-------------------------------------------------
+//  device_post_load - device-specific post-load
+//-------------------------------------------------
+
+void mc68hc68t1_device::device_post_load()
+{
+	registers_updated();
+}
+
 
 //-------------------------------------------------
 //  nvram_default - called to initialize NVRAM to
 //  its default state
 //-------------------------------------------------
 
-void mccs1850_device::nvram_default()
+void motorola_serial_rtc_device_base::nvram_default()
 {
 	memset(m_ram, 0xff, RAM_SIZE);
 
@@ -365,16 +557,33 @@ void mccs1850_device::nvram_default()
 	}
 }
 
+void mc68hc68t1_device::nvram_default()
+{
+	motorola_serial_rtc_device_base::nvram_default();
+
+	m_ram[T1_HOURS] = 0; // 24-hour mode
+	registers_updated();
+}
+
 
 //-------------------------------------------------
 //  nvram_read - called to read NVRAM from the
 //  .nv file
 //-------------------------------------------------
 
-bool mccs1850_device::nvram_read(util::read_stream &file)
+bool motorola_serial_rtc_device_base::nvram_read(util::read_stream &file)
 {
 	auto const [err, actual] = read(file, m_ram, RAM_SIZE);
 	return !err && (actual == RAM_SIZE);
+}
+
+bool mc68hc68t1_device::nvram_read(util::read_stream &file)
+{
+	if (!motorola_serial_rtc_device_base::nvram_read(file))
+		return false;
+
+	registers_updated();
+	return true;
 }
 
 
@@ -383,7 +592,7 @@ bool mccs1850_device::nvram_read(util::read_stream &file)
 //  .nv file
 //-------------------------------------------------
 
-bool mccs1850_device::nvram_write(util::write_stream &file)
+bool motorola_serial_rtc_device_base::nvram_write(util::write_stream &file)
 {
 	auto const [err, actual] = write(file, m_ram, RAM_SIZE);
 	return !err;
@@ -394,7 +603,7 @@ bool mccs1850_device::nvram_write(util::write_stream &file)
 //  ce_w - chip enable write
 //-------------------------------------------------
 
-void mccs1850_device::ce_w(int state)
+void motorola_serial_rtc_device_base::ce_w(int state)
 {
 	m_ce = state;
 
@@ -410,7 +619,7 @@ void mccs1850_device::ce_w(int state)
 //  sck_w - serial clock write
 //-------------------------------------------------
 
-void mccs1850_device::sck_w(int state)
+void motorola_serial_rtc_device_base::sck_w(int state)
 {
 	if (!m_ce) return;
 
@@ -457,8 +666,7 @@ void mccs1850_device::sck_w(int state)
 				m_bits = 0;
 
 				// increment address counter
-				m_address++;
-				m_address |= 0x80;
+				m_address = next_address(m_address & 0x7f) | 0x80;
 			}
 		}
 		else if (!BIT(m_address, 7) && !m_sck && state)
@@ -473,9 +681,8 @@ void mccs1850_device::sck_w(int state)
 				m_bits = 0;
 
 				// increment address counter
-				m_address++;
-				m_address &= 0x7f;
-				m_shift = read_register(m_address & 0x7f);
+				m_address = next_address(m_address & 0x7f);
+				m_shift = read_register(m_address);
 				LOG("MCCS1850 Data Out %02x\n", m_shift);
 			}
 		}
@@ -490,7 +697,7 @@ void mccs1850_device::sck_w(int state)
 //  sdo_r - serial data out read
 //-------------------------------------------------
 
-int mccs1850_device::sdo_r()
+int motorola_serial_rtc_device_base::sdo_r()
 {
 	if (!m_ce || BIT(m_address, 7))
 	{
@@ -508,7 +715,7 @@ int mccs1850_device::sdo_r()
 //  sdi_w - serial data in write
 //-------------------------------------------------
 
-void mccs1850_device::sdi_w(int state)
+void motorola_serial_rtc_device_base::sdi_w(int state)
 {
 	m_sdi = state;
 }

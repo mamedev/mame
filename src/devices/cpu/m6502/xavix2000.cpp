@@ -1,28 +1,14 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood, MagikalUnicorn
 /***************************************************************************
 
-    xavix2000.cpp (Super XaviX)
+    XaviX2000 6502-derived CPU core, extending the original XaviX instruction
+    set with additional registers and opcodes. SuperXaviX shares this extended
+    instruction set, with its own timing and memory interface in superxavix.cpp.
+    See xavix.cpp for the original banking and bus-access conventions.
 
-    The dies for these are marked
-
+    Known Die Markings:
     SSD 2000 NEC 85605-621
-
-    SSD 2002 NEC 85054-611
-
-    6502 with custom opcodes
-    integrated gfx / sound
-
-    special notes
-
-    see xavix.cpp for basic notes
-
-    the 2000 chip has more opcodes than the 97/98 chips in xavix.cpp, and
-    is a similar die structure to the 2002 chip, but doesn't seem to have any
-    additional capabilities.
-
-    the 2002 chip seems to be the one that was officially dubbed 'SuperXaviX'
-    and has additional video capabilities on top of the extended opcodes.
 
 ***************************************************************************/
 
@@ -31,14 +17,10 @@
 #include "xavix2000d.h"
 
 DEFINE_DEVICE_TYPE(XAVIX2000, xavix2000_device, "xavix2000", "XaviX (SSD 2000)")
-DEFINE_DEVICE_TYPE(XAVIX2002, xavix2002_device, "xavix2002", "XaviX (SSD 2002) (SuperXaviX)")
-
-
 
 xavix2000_device::xavix2000_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
-	xavix_device(mconfig, type, tag, owner, clock)
+	xavix_device(mconfig, type, tag, owner, clock, true, false)
 {
-	m_use_private_stack_for_extra_callf_byte = false;
 }
 
 xavix2000_device::xavix2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
@@ -46,22 +28,39 @@ xavix2000_device::xavix2000_device(const machine_config &mconfig, const char *ta
 {
 }
 
-xavix2002_device::xavix2002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	xavix2000_device(mconfig, XAVIX2002, tag, owner, clock)
-{
-}
-
 
 void xavix2000_device::device_start()
 {
 	xavix_device::device_start();
+	m_P &= ~F_B;
 
-	state_add(SXAVIX_J, "J", m_j).callimport().formatstr("%8s");
-	state_add(SXAVIX_K, "K", m_k).callimport().formatstr("%8s");
-	state_add(SXAVIX_L, "L", m_l).callimport().formatstr("%8s");
-	state_add(SXAVIX_M, "M", m_m).callimport().formatstr("%8s");
-	state_add(SXAVIX_PA, "PA", m_pa).callimport().formatstr("%8s");
-	state_add(SXAVIX_PB, "PB", m_pb).callimport().formatstr("%8s");
+	state_add(XAVIX2000_J, "J", m_j).formatstr("%8s");
+	state_add(XAVIX2000_K, "K", m_k).formatstr("%8s");
+	state_add(XAVIX2000_L, "L", m_l).formatstr("%8s");
+	state_add(XAVIX2000_M, "M", m_m).formatstr("%8s");
+	state_add(XAVIX2000_PA, "PA", m_pa).formatstr("%8s");
+	state_add(XAVIX2000_PB, "PB", m_pb).formatstr("%8s");
+
+	save_item(NAME(m_j));
+	save_item(NAME(m_k));
+	save_item(NAME(m_l));
+	save_item(NAME(m_m));
+	save_item(NAME(m_pa));
+	save_item(NAME(m_pb));
+	save_item(NAME(m_interrupt_is_nmi));
+}
+
+void xavix2000_device::device_reset()
+{
+	xavix_device::device_reset();
+	m_interrupt_is_nmi = false;
+
+	m_j = 0;
+	m_k = 0;
+	m_l = 0;
+	m_m = 0;
+	m_pa = 0;
+	m_pb = 0;
 }
 
 std::unique_ptr<util::disasm_interface> xavix2000_device::create_disassembler()
@@ -69,27 +68,14 @@ std::unique_ptr<util::disasm_interface> xavix2000_device::create_disassembler()
 	return std::make_unique<xavix2000_disassembler>();
 }
 
-
 void xavix2000_device::state_import(const device_state_entry &entry)
 {
-	xavix_device::state_import(entry);
-
-	switch(entry.index())
-	{
-	case SXAVIX_J:
-		break;
-	case SXAVIX_K:
-		break;
-	case SXAVIX_L:
-		break;
-	case SXAVIX_M:
-		break;
-	case SXAVIX_PA:
-		break;
-	case SXAVIX_PB:
-		break;
-	}
+	if (entry.index() == STATE_GENFLAGS || entry.index() == M6502_P)
+		m_P |= F_E;
+	else
+		xavix_device::state_import(entry);
 }
+
 
 void xavix2000_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
@@ -97,26 +83,25 @@ void xavix2000_device::state_string_export(const device_state_entry &entry, std:
 
 	switch(entry.index())
 	{
-	case SXAVIX_J:
+	case XAVIX2000_J:
 		str = string_format("%02x", m_j);
 		break;
-	case SXAVIX_K:
+	case XAVIX2000_K:
 		str = string_format("%02x", m_k);
 		break;
-	case SXAVIX_L:
+	case XAVIX2000_L:
 		str = string_format("%02x", m_l);
 		break;
-	case SXAVIX_M:
+	case XAVIX2000_M:
 		str = string_format("%02x", m_m);
 		break;
-	case SXAVIX_PA:
+	case XAVIX2000_PA:
 		str = string_format("%08x", m_pa);
 		break;
-	case SXAVIX_PB:
+	case XAVIX2000_PB:
 		str = string_format("%08x", m_pb);
 		break;
 	}
 }
-
 
 #include "cpu/m6502/xavix2000.hxx"

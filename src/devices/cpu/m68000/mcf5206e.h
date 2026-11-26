@@ -420,61 +420,61 @@ private:
 
 	/* chip select module */
 	u16 csar_x_r(offs_t offset);
-	u8 cscr_x_r(offs_t offset);
+	u16 cscr_x_r(offs_t offset);
 	u32 csmr_x_r(offs_t offset);
 	inline u16 csar0_r(){ return csar_x_r(0); }
 	inline u32 csmr0_r(){ return csmr_x_r(0); }
-	inline u8 cscr0_r(){ return cscr_x_r(0); }
+	inline u16 cscr0_r(){ return cscr_x_r(0); }
 	inline u16 csar1_r(){ return csar_x_r(1); }
 	inline u32 csmr1_r(){ return csmr_x_r(1); }
-	inline u8 cscr1_r(){ return cscr_x_r(1); }
+	inline u16 cscr1_r(){ return cscr_x_r(1); }
 	inline u16 csar2_r(){ return csar_x_r(2); }
 	inline u32 csmr2_r(){ return csmr_x_r(2); }
-	inline u8 cscr2_r(){ return cscr_x_r(2); }
+	inline u16 cscr2_r(){ return cscr_x_r(2); }
 	inline u16 csar3_r(){ return csar_x_r(3); }
 	inline u32 csmr3_r(){ return csmr_x_r(3); }
-	inline u8 cscr3_r(){ return cscr_x_r(3); }
+	inline u16 cscr3_r(){ return cscr_x_r(3); }
 	inline u16 csar4_r(){ return csar_x_r(4); }
 	inline u32 csmr4_r(){ return csmr_x_r(4); }
-	inline u8 cscr4_r(){ return cscr_x_r(4); }
+	inline u16 cscr4_r(){ return cscr_x_r(4); }
 	inline u16 csar5_r(){ return csar_x_r(5); }
 	inline u32 csmr5_r(){ return csmr_x_r(5); }
-	inline u8 cscr5_r(){ return cscr_x_r(5); }
+	inline u16 cscr5_r(){ return cscr_x_r(5); }
 	inline u16 csar6_r(){ return csar_x_r(6); }
 	inline u32 csmr6_r(){ return csmr_x_r(6); }
-	inline u8 cscr6_r(){ return cscr_x_r(6); }
+	inline u16 cscr6_r(){ return cscr_x_r(6); }
 	inline u16 csar7_r(){ return csar_x_r(7); }
 	inline u32 csmr7_r(){ return csmr_x_r(7); }
-	inline u8 cscr7_r(){ return cscr_x_r(7); }
+	inline u16 cscr7_r(){ return cscr_x_r(7); }
 	inline u16 dmcr_r(){ return m_dmcr; }
 
 	void csar_x_w(offs_t offset, u16 data);
 	void csmr_x_w(offs_t offset, u32 data);
-	void cscr_x_w(offs_t offset, u8 data);
+	void cscr_x_w(offs_t offset, u16 data, u16 mem_mask);
 	inline void csar0_w(u16 data){ csar_x_w(0, data); }
 	inline void csmr0_w(u32 data){ csmr_x_w(0, data); }
-	inline void cscr0_w(u8 data){ cscr_x_w(0, data); }
+	inline void cscr0_w(offs_t offset, u16 data, u16 mem_mask){ cscr_x_w(0, data, mem_mask); }
 	inline void csar1_w(u16 data){ csar_x_w(1, data); }
 	inline void csmr1_w(u32 data){ csmr_x_w(1, data); }
-	inline void cscr1_w(u8 data){ cscr_x_w(1, data); }
+	inline void cscr1_w(offs_t offset, u16 data, u16 mem_mask){ cscr_x_w(1, data, mem_mask); }
 	inline void csar2_w(u16 data){ csar_x_w(2, data); }
 	inline void csmr2_w(u32 data){ csmr_x_w(2, data); }
-	inline void cscr2_w(u8 data){ cscr_x_w(2, data); }
+	inline void cscr2_w(offs_t offset, u16 data, u16 mem_mask){ cscr_x_w(2, data, mem_mask); }
 	inline void csar3_w(u16 data){ csar_x_w(3, data); }
 	inline void csmr3_w(u32 data){ csmr_x_w(3, data); }
-	inline void cscr3_w(u8 data){ cscr_x_w(3, data); }
+	inline void cscr3_w(offs_t offset, u16 data, u16 mem_mask){ cscr_x_w(3, data, mem_mask); }
 	inline void csar4_w(u16 data){ csar_x_w(4, data); }
 	inline void csmr4_w(u32 data){ csmr_x_w(4, data); }
-	inline void cscr4_w(u8 data){ cscr_x_w(4, data); }
+	inline void cscr4_w(offs_t offset, u16 data, u16 mem_mask){ cscr_x_w(4, data, mem_mask); }
 	inline void csar5_w(u16 data){ csar_x_w(5, data); }
 	inline void csmr5_w(u32 data){ csmr_x_w(5, data); }
-	inline void cscr5_w(u8 data){ cscr_x_w(5, data); }
+	inline void cscr5_w(offs_t offset, u16 data, u16 mem_mask){ cscr_x_w(5, data, mem_mask); }
 	inline void csar6_w(u16 data){ csar_x_w(6, data); }
 	inline void csmr6_w(u32 data){ csmr_x_w(6, data); }
-	inline void cscr6_w(u8 data){ cscr_x_w(6, data); }
+	inline void cscr6_w(offs_t offset, u16 data, u16 mem_mask){ cscr_x_w(6, data, mem_mask); }
 	inline void csar7_w(u16 data){ csar_x_w(7, data); }
 	inline void csmr7_w(u32 data){ csmr_x_w(7, data); }
-	inline void cscr7_w(u8 data){ cscr_x_w(7, data); }
+	inline void cscr7_w(offs_t offset, u16 data, u16 mem_mask){ cscr_x_w(7, data, mem_mask); }
 	void dmcr_w(u16 data);
 
 	u16 m_csar[8];

@@ -61,4 +61,18 @@ license:CC0-1.0
 		</part>
 	</software>
 
+	<software name="shark">
+		<description>Mator SHARK</description>
+		<year>1981</year>
+		<publisher>Mator Systems</publisher>
+		<sharedfeat name="ieee9_default" value="shark"/>
+
+		<!-- Priam DISKOS 3450 -->
+		<part name="hdd" interface="mator_shark_hdd">
+			<diskarea name="harddriv">
+				<disk name="priam3450" sha1="922c194223a40837dabcbb5bba154d732ea81dba" writeable="yes" />
+			</diskarea>
+		</part>
+	</software>
+
 </softwarelist>

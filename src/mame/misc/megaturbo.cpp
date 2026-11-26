@@ -67,15 +67,15 @@ public:
 		m_mcu(*this, "mcu")
 	{ }
 
-	void megaturbo2(machine_config &config);
+	void megaturbo2(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
 private:
 	void main_map(address_map &map) ATTR_COLD;
 	void main_io_map(address_map &map) ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	required_device<cpu_device> m_maincpu;
-	required_device<cpu_device> m_mcu;
 
 	void mem_data(address_map &map) ATTR_COLD;
 	void mem_prg(address_map &map) ATTR_COLD;
@@ -84,11 +84,15 @@ private:
 	uint8_t main_io_r(offs_t offset);
 	void main_io_w(offs_t offset, uint8_t data);
 	uint8_t unk1_r();
-	uint8_t m_unk1 = 0;
 
 	// i8031
 	uint8_t unk_port_r();
 	void unk_port_w(uint8_t data);
+
+	required_device<cpu_device> m_maincpu;
+	required_device<cpu_device> m_mcu;
+
+	uint8_t m_unk1 = 0;
 };
 
 

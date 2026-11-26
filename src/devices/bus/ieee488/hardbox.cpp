@@ -81,6 +81,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_config_complete() override ATTR_COLD;
 
 	// device_ieee488_interface implementation
 	virtual void ieee488_ifc(int state) override;
@@ -113,6 +114,7 @@ private:
 	required_region_ptr<uint8_t> m_rom;
 	memory_view m_boot_mem;
 	memory_view m_boot_m1;
+	required_ioport m_sw1;
 	output_finder<3> m_leds;
 
 	int m_ifc;  // Tracks previous state of IEEE-488 IFC line
@@ -238,13 +240,7 @@ void hardbox_device::ppi0_pb_w(uint8_t data)
 
 uint8_t hardbox_device::ppi0_pc_r()
 {
-	uint8_t data = ioport("SW1")->read();
-
-	/* DIP switches on PC1,PC2,PC3 configure the IEEE-488 primary address.
-	   We get the address from the slot instead. */
-	data |= ((m_slot->get_address() - 8) << 1) ^ 0xff;
-
-	return data;
+	return m_sw1->read();
 }
 
 //-------------------------------------------------
@@ -428,6 +424,19 @@ ioport_constructor hardbox_device::device_input_ports() const
 }
 
 
+//-------------------------------------------------
+//  device_config_complete - default the address
+//  switches to the slot address
+//-------------------------------------------------
+
+void hardbox_device::device_config_complete()
+{
+	int const address = configured_address();
+	if (address >= 8)
+		set_switch_default("SW1", 0x0e, ~(address - 8) << 1);
+}
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -445,6 +454,7 @@ hardbox_device::hardbox_device(const machine_config &mconfig, const char *tag, d
 	, m_rom(*this, Z80_TAG)
 	, m_boot_mem(*this, "bootmem")
 	, m_boot_m1(*this, "bootm1")
+	, m_sw1(*this, "SW1")
 	, m_leds(*this, "led%u", 0U)
 	, m_ifc(0)
 	, m_boot_cnt(false)

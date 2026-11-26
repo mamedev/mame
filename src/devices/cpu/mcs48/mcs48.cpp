@@ -1441,12 +1441,12 @@ u8 upi41_cpu_device::p2_output(u8 data) const
 u8 upi41_cpu_device::port_r(offs_t a)
 {
 	const u8 data = mcs48_cpu_device::port_r(a);
-	return a == 2 ? p2_output(data) : data;
+	return (a == 2) ? p2_output(data) : data;
 }
 
 void upi41_cpu_device::port_w(offs_t a, u8 v)
 {
-	mcs48_cpu_device::port_w(a, a == 2 ? p2_output(v) : v);
+	mcs48_cpu_device::port_w(a, (a == 2) ? p2_output(v) : v);
 }
 
 

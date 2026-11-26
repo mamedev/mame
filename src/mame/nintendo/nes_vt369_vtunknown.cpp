@@ -1019,6 +1019,13 @@ ROM_START( lxccatv ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( jl2350 ) // all games selectable
+	ROM_REGION( 0x2000000, "mainrom", 0 )
+	ROM_LOAD( "jl2350.u6", 0x00000, 0x2000000, CRC(5bddb2ea) SHA1(41ab4881e1907ea25b8cd153de4aa02d8310b9c1) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmcy ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "lxcmcy.bin", 0x00000, 0x4000000, CRC(3f3af72c) SHA1(76127054291568fcce1431d21af71f775cfb05a6) )
@@ -1110,6 +1117,13 @@ ROM_END
 ROM_START( lxcmcyba ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "barbie.bin", 0x00000, 0x4000000, CRC(e38af9d0) SHA1(a978a4da61f007c152c70233e9628dbebb427743) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
+ROM_START( lxcmcybao ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "barbie.bin", 0x00000, 0x4000000, CRC(e8ea0ade) SHA1(781f70e4dad9bc4a1178e6831292edbe00463a7c) )
 
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
@@ -1673,7 +1687,8 @@ ROM_END
 
 ROM_START( dgun2572 )
 	ROM_REGION( 0x2000000, "mainrom", 0 ) // extra pins on subboard not marked
-	ROM_LOAD( "dreamgearwgun.bin", 0x00000, 0x2000000, CRC(92b55c75) SHA1(c7b2319e304a4bf480b5dcd4f24af2e6ba834d0d) )
+	// should be 128MBytes, not 32
+	ROM_LOAD( "dreamgearwgun.bin", 0x00000, 0x2000000, BAD_DUMP CRC(92b55c75) SHA1(c7b2319e304a4bf480b5dcd4f24af2e6ba834d0d) )
 ROM_END
 
 
@@ -1827,11 +1842,14 @@ CONS( 2012, jl1810gr,  0,  0,  vt36x_16mb, vt369_rot, vt36x_state, empty_init, "
 
 CONS( 2012, lxccatv,   0,  0,  vt36x_32mb, vt369,     vt36x_state, empty_init, "Lexibook", "Compact Cyber Arcade TV - 120 in 1 (JL2370)", MACHINE_IMPERFECT_GRAPHICS ) // 32MByte ROM, 2011 on case, 2012 on PCB
 
+CONS( 2012, jl2350,    0,  0,  vt36x_32mb, vt369,     vt36x_state, empty_init, "Lexibook", "Compact Cyber Arcade - 120 in 1 (JL2350)", MACHINE_IMPERFECT_GRAPHICS ) 
+
 // All Lexibook units below have 64Mbyte ROMs, must be externally banked, or different addressing scheme
 
 // these sets which render as 'vertical' still have a number of games (mostly hacks) not working properly
 CONS( 2012, lxcmcysp,  0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
 CONS( 2012, lxcmcyspa, lxcmcysp,  0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2350SP, 120-in-1)", MACHINE_NOT_WORKING | ROT270)
+CONS( 2012, lxcmcybao, 0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (120-in-1)", MACHINE_NOT_WORKING | ROT270)
 
 CONS( 2012, lxcmcydp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2014, lxcmcyco,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2360DC-1, 120-in-1)", MACHINE_IMPERFECT_GRAPHICS )
@@ -2082,4 +2100,5 @@ CONS( 2018, goretropu12,goretrop, 0,  vt4ffx_32mb_goretrop, vt369, vt4ffx_goretr
 
 // possibly VT269; contains high-resolution versions of classic NES games
 // sub-CPU hangs on unemulated $2117 register and later uses vtsetdbk to switch opcode encryption
+// also a bad dump (1/4 correct size)
 CONS( 201?, dgun2572, 0,  0,  vt36x_32mb, vt369, vt36x_state, init_dgun2572, "dreamGEAR", "My Arcade Wireless Video Game Station 200-in-1 (DGUN-2572)", MACHINE_NOT_WORKING )

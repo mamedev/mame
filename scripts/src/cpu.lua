@@ -13,7 +13,7 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-DRC_CPUS = { "ADSP21062", "DSP16", "DSPP", "E1", "MB86235", "MIPS3", "POWERPC", "SH", "SWP30", "UNSP" }
+DRC_CPUS = { "ADSP21062", "ARM7", "DSP16", "DSPP", "E1", "MB86235", "MIPS3", "POWERPC", "SH", "SWP30", "UNSP" }
 CPU_INCLUDE_DRC = false
 for i, v in ipairs(DRC_CPUS) do
 	if (CPUS[v]~=null) then
@@ -182,9 +182,11 @@ if CPUS["ARM7"] then
 		MAME_DIR .. "src/devices/cpu/arm7/upd800468.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7core.hxx",
-		MAME_DIR .. "src/devices/cpu/arm7/arm7drc.hxx",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7drc.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7drcops.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7fe.cpp",
+		MAME_DIR .. "src/devices/cpu/arm7/arm7fe.h",
 		MAME_DIR .. "src/devices/cpu/arm7/arm7help.h",
-		MAME_DIR .. "src/devices/cpu/arm7/arm7tdrc.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/cecalls.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/arm1176.hxx",
 		MAME_DIR .. "src/devices/cpu/arm7/arm1176vfp.hxx",
@@ -1265,6 +1267,8 @@ if CPUS["MCS51"] then
 		MAME_DIR .. "src/devices/cpu/mcs51/mcs51ops.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/i8052.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/i8052.h",
+		MAME_DIR .. "src/devices/cpu/mcs51/dw8051.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/dw8051.h",
 		MAME_DIR .. "src/devices/cpu/mcs51/i80c51.cpp",
 		MAME_DIR .. "src/devices/cpu/mcs51/i80c51.h",
 		MAME_DIR .. "src/devices/cpu/mcs51/i80c52.cpp",
@@ -1279,6 +1283,18 @@ end
 if opt_tool(CPUS, "MCS51") then
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/mcs51dasm.cpp")
 	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mcs51/mcs51dasm.h")
+end
+
+--------------------------------------------------
+-- Nordic nRF24E1 (8051 with integrated radio)
+--@src/devices/cpu/mcs51/nrf24e1.h,CPUS["NRF24E1"] = true
+--------------------------------------------------
+
+if CPUS["NRF24E1"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mcs51/nrf24e1.cpp",
+		MAME_DIR .. "src/devices/cpu/mcs51/nrf24e1.h",
+	}
 end
 
 --------------------------------------------------
@@ -1404,6 +1420,8 @@ if CPUS["I386"] then
 		MAME_DIR .. "src/devices/cpu/i386/pentops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87ops.hxx",
 		MAME_DIR .. "src/devices/cpu/i386/x87priv.h",
+		MAME_DIR .. "src/devices/cpu/i386/x87slot.cpp",
+		MAME_DIR .. "src/devices/cpu/i386/x87slot.h",
 		MAME_DIR .. "src/devices/cpu/i386/cpuidmsrs.hxx",
 	}
 end
@@ -1677,6 +1695,23 @@ if opt_tool(CPUS, "PIC17") then
 end
 
 --------------------------------------------------
+-- VideoLogic PMX1 (PowerVR 250) primary core
+--@src/devices/cpu/pmx1/pmx1core.h,CPUS["PMX1CORE"] = true
+--------------------------------------------------
+
+if CPUS["PMX1CORE"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/pmx1/pmx1core.cpp",
+		MAME_DIR .. "src/devices/cpu/pmx1/pmx1core.h",
+	}
+end
+
+if opt_tool(CPUS, "PMX1CORE") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pmx1/pmx1dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/pmx1/pmx1dasm.h")
+end
+
+--------------------------------------------------
 -- MIPS R3000 (MIPS I/II) series
 --@src/devices/cpu/mips/mips1.h,CPUS["MIPS1"] = true
 --------------------------------------------------
@@ -1872,6 +1907,7 @@ end
 --@src/devices/cpu/m6502/w65c02s.h,CPUS["M6502"] = true
 --@src/devices/cpu/m6502/xavix.h,CPUS["XAVIX"] = true
 --@src/devices/cpu/m6502/xavix.h,CPUS["XAVIX2000"] = true
+--@src/devices/cpu/m6502/superxavix.h,CPUS["XAVIX2000"] = true
 
 --------------------------------------------------
 
@@ -2017,14 +2053,18 @@ if CPUS["XAVIX2000"] then
 	files {
 		MAME_DIR .. "src/devices/cpu/m6502/xavix2000.cpp",
 		MAME_DIR .. "src/devices/cpu/m6502/xavix2000.h",
+		MAME_DIR .. "src/devices/cpu/m6502/superxavix.cpp",
+		MAME_DIR .. "src/devices/cpu/m6502/superxavix.h",
 	}
 
 	custombuildtask {
 		{ MAME_DIR .. "src/devices/cpu/m6502/oxavix2000.lst",   GEN_DIR .. "emu/cpu/m6502/xavix2000.hxx",   { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dxavix2000.lst"   }, {"@echo Generating xavix2000 instruction source file...", PYTHON .. " $(1) s xavix2000 $(<) $(2) $(@)" }},
+		{ MAME_DIR .. "src/devices/cpu/m6502/osuperxavix.lst",  GEN_DIR .. "emu/cpu/m6502/superxavix.hxx",  { MAME_DIR .. "src/devices/cpu/m6502/m6502make.py",   MAME_DIR  .. "src/devices/cpu/m6502/dxavix2000.lst"   }, {"@echo Generating superxavix instruction source file...", PYTHON .. " $(1) s superxavix $(<) $(2) $(@)" }},
 	}
 
 	dependency {
 		{ MAME_DIR .. "src/devices/cpu/m6502/xavix2000.cpp",    GEN_DIR .. "emu/cpu/m6502/xavix2000.hxx" },
+		{ MAME_DIR .. "src/devices/cpu/m6502/superxavix.cpp",   GEN_DIR .. "emu/cpu/m6502/superxavix.hxx" },
 	}
 end
 
@@ -2151,6 +2191,10 @@ if CPUS["M6805"] then
 		MAME_DIR .. "src/devices/cpu/m6805/m68705.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_sci.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_sci.h",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_spi.cpp",
+		MAME_DIR .. "src/devices/cpu/m6805/m68hc05_spi.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.cpp",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05e1.h",
 		MAME_DIR .. "src/devices/cpu/m6805/m68hc05pge.cpp",
@@ -2858,15 +2902,15 @@ end
 --------------------------------------------------
 
 if CPUS["T6M53"] then
-    files {
-        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.cpp",
-        MAME_DIR .. "src/devices/cpu/t6m53/t6m53.h",
-    }
+	files {
+		MAME_DIR .. "src/devices/cpu/t6m53/t6m53.cpp",
+		MAME_DIR .. "src/devices/cpu/t6m53/t6m53.h",
+	}
 end
 
 if opt_tool(CPUS, "T6M53") then
-    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.cpp")
-    table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.h")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/t6m53/t6m53_dasm.h")
 end
 
 --------------------------------------------------
@@ -3066,6 +3110,7 @@ if CPUS["TMS320C82"] then
 		MAME_DIR .. "src/devices/cpu/tms320c82/tms320c82.cpp",
 		MAME_DIR .. "src/devices/cpu/tms320c82/tms320c82.h",
 		MAME_DIR .. "src/devices/cpu/tms320c82/mp_ops.cpp",
+		MAME_DIR .. "src/devices/cpu/tms320c82/pp_ops.cpp",
 	}
 end
 

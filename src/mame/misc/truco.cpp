@@ -223,7 +223,7 @@
       GND <------- [GND]--|04    13|--[/CE IN] ---> GND
           <--- [BATT ON]--|05    12|--[/CE OUT] -->
           <-- [/LOWLINE]--|06    11|--[WDI] ------> PIA CA2
-  (*) N/C <---- [OSC IN]--|07    10|--[/PFO] -----> CPU M6809 /NMI (2) --> decoupling --> pullup (**)
+  (*) N/C <---- [OSC IN]--|07    10|--[/PFO] -----> CPU M6809 /NMI (2) --> decoupling --> pullup (**)
   (*) N/C <--- [OSC SEL]--|08    09|--[PFI] ------> R12 pot legs 2 & 3
                           '--------'
 
@@ -465,7 +465,7 @@ void truco_state::portb_w(uint8_t data)
 	m_dac->write(BIT(data, 7)); // Isolated the bit for Delta-Sigma DAC
 
 	machine().bookkeeping().coin_counter_w(0, BIT(data, 3));  // coin in
-	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));  // coin out
+	machine().bookkeeping().coin_counter_w(1, BIT(data, 2));  // coin out
 }
 
 

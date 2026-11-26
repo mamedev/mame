@@ -180,8 +180,6 @@ void tek4107a_state::vpac_wben_w(int state)
 	if (state && !m_wben)
 	{
 		m_row_column = 0;
-		if (m_vpac->screen().vpos() == 0)
-			m_row_count = 0;
 	}
 	else if (!state && m_wben)
 	{
@@ -210,6 +208,7 @@ void tek4107a_state::vpac_vlt_w(int state)
 		std::fill(std::begin(m_line_row), std::end(m_line_row), 0xff);
 		m_drb_count = 0;
 		m_cur_row = 0xff;
+		m_row_count = 0;
 	}
 
 	if (!m_drb)

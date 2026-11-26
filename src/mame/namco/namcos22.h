@@ -203,7 +203,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_palette(*this, "palette"),
 		m_czram(*this, "czram"),
-		m_spriteram(*this, "spriteram"),
+		m_spriteram(*this, "spriteram", 0x8000, ENDIANNESS_BIG),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_maincpu(*this, "maincpu"),
 		m_master(*this, "master"),
@@ -222,8 +222,7 @@ public:
 		m_polygonram(*this, "polygonram"),
 		m_mixer(*this, "video_mixer"),
 		m_gamma_proms(*this, "gamma_proms"),
-		m_vics_data(*this, "vics_data"),
-		m_vics_control(*this, "vics_control"),
+		m_pointrom(*this, "pointrom"),
 		m_screen(*this, "screen"),
 		m_adc_ports(*this, "ADC.%u", 0),
 		m_inputs(*this, "INPUTS"),
@@ -274,7 +273,7 @@ public:
 
 	required_device<palette_device> m_palette;
 	optional_shared_ptr<u32> m_czram;
-	optional_shared_ptr<u32> m_spriteram;
+	memory_share_creator<u16> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 protected:
@@ -355,7 +354,7 @@ protected:
 	inline void pdp_polygonram_write(offs_t offs, u32 data) { m_polygonram[offs & 0x7fff] = data; }
 	void point_write(offs_t offs, u32 data);
 	s32 pointram_read(offs_t offs);
-	inline s32 point_read(offs_t offs) { offs &= 0x00ffffff; return (offs < m_pointrom_size) ? m_pointrom[offs] : pointram_read(offs); }
+	inline s32 point_read(offs_t offs) { offs &= 0x00ffffff; return (offs < m_pointrom.length()) ? m_pointrom[offs] : pointram_read(offs); }
 	void master_enable(bool enable);
 	void slave_enable(bool enable);
 
@@ -393,8 +392,6 @@ protected:
 	void update_palette();
 	void draw_direct_poly(const u16 *src);
 	void draw_polygons();
-	void draw_sprites();
-	void draw_sprite_group(const u32 *src, const u32 *attr, int num_sprites, int deltax, int deltay, bool y_lowres);
 	void namcos22_mix_text_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void install_c74_speedup();
@@ -404,6 +401,8 @@ protected:
 	void update_text_rowscroll();
 	void apply_text_scroll();
 	u32 screen_update_namcos22(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void render_frame_active();
+	virtual void screen_vblank(int state);
 	INTERRUPT_GEN_MEMBER(namcos22_interrupt);
 	INTERRUPT_GEN_MEMBER(dsp_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(dsp_serial_pulse);
@@ -435,8 +434,7 @@ protected:
 	required_shared_ptr<u32> m_polygonram;
 	required_shared_ptr<u32> m_mixer;
 	optional_region_ptr<u8> m_gamma_proms;
-	optional_shared_ptr<u32> m_vics_data;
-	optional_shared_ptr<u32> m_vics_control;
+	required_region_ptr<s32> m_pointrom;
 	required_device<screen_device> m_screen;
 	optional_ioport_array<8> m_adc_ports;
 	required_ioport m_inputs;
@@ -486,8 +484,7 @@ protected:
 	int m_LitSurfaceIntensity = 0;
 	bool m_LitSurfaceGouraud = false;
 	bool m_LitSurfaceTriangles = false;
-	int m_pointrom_size = 0;
-	std::unique_ptr<s32[]> m_pointrom;
+
 	std::unique_ptr<u8[]> m_dirtypal;
 	std::unique_ptr<bitmap_ind16> m_mix_bitmap;
 
@@ -514,8 +511,6 @@ protected:
 	int m_camera_power = 0;   // 0.0..1.0
 
 	bool m_skipped_this_frame = false;
-	void render_frame_active();
-	void screen_vblank(int state);
 	bool m_pdp_render_done = false;
 	bool m_render_refresh = false;
 	u64 m_pdp_frame = 0;
@@ -526,7 +521,10 @@ class namcos22s_state : public namcos22_state
 {
 public:
 	namcos22s_state(const machine_config &mconfig, device_type type, const char *tag) :
-		namcos22_state(mconfig, type, tag)
+		namcos22_state(mconfig, type, tag),
+		m_attributeram(*this, "attributeram", 0xa00, ENDIANNESS_BIG),
+		m_vics_data(*this, "vics_data", 0x10000, ENDIANNESS_BIG),
+		m_vics_control(*this, "vics_control")
 	{ }
 
 	void namcos22s(machine_config &config);
@@ -558,8 +556,14 @@ protected:
 	u16 namcos22s_czattr_r(offs_t offset);
 	void namcos22s_czram_w(offs_t offset, u32 data, u32 mem_mask = ~0);
 	u32 namcos22s_czram_r(offs_t offset);
+	u16 namcos22s_vics_data_r(offs_t offset);
+	void namcos22s_vics_data_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u32 namcos22s_vics_control_r(offs_t offset);
 	void namcos22s_vics_control_w(offs_t offset, u32 data, u32 mem_mask = ~0);
+	u16 namcos22s_spriteram_r(offs_t offset);
+	void namcos22s_spriteram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
+	u16 namcos22s_attributeram_r(offs_t offset);
+	void namcos22s_attributeram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 	u16 spotram_r(offs_t offset);
 	void spotram_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
@@ -576,11 +580,18 @@ protected:
 	u16 mcu130_speedup_r();
 	u16 mcu141_speedup_r();
 
+	void draw_sprites();
+	void vics_copy_sprite_data();
+	virtual void screen_vblank(int state) override;
 	INTERRUPT_GEN_MEMBER(namcos22s_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq);
 
 	void mcu_program(address_map &map) ATTR_COLD;
 	void namcos22s_am(address_map &map) ATTR_COLD;
+
+	memory_share_creator<u16> m_attributeram;
+	memory_share_creator<u16> m_vics_data;
+	required_shared_ptr<u32> m_vics_control;
 
 	int m_spotram_enable = 0;
 	int m_spotram_address = 0;

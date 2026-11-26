@@ -408,17 +408,17 @@ inline uint32_t powervr2_device::cv_yuv(uint16_t c1, uint16_t c2, int x)
 
 int powervr2_device::uv_wrap(float uv, int size)
 {
-	int iuv = (int)uv;
+	int iuv = int(std::floor(uv));
 	return iuv & (size - 1);
 }
 int powervr2_device::uv_flip(float uv, int size)
 {
-	int iuv = (int)uv;
+	int iuv = int(std::floor(uv));
 	return ((iuv & size) ? ~iuv : iuv) & (size - 1);
 }
 int powervr2_device::uv_clamp(float uv, int size)
 {
-	int iuv = (int)uv;
+	int iuv = int(std::floor(uv));
 	return (iuv > 0) ? (iuv < size) ? iuv : (size - 1) : 0;
 }
 
@@ -2327,8 +2327,17 @@ void powervr2_device::process_ta_fifo()
 					tv->x = u2f(tafifo_buff[1]);
 					tv->y = u2f(tafifo_buff[2]);
 					tv->w = u2f(tafifo_buff[3]);
-					tv->u = u2f(tafifo_buff[4]);
-					tv->v = u2f(tafifo_buff[5]);
+					if (uv16bit)
+					{
+						// 16-bit UV: u in the upper and v in the lower half of word 4 (upper halves of floats)
+						tv->u = u2f(tafifo_buff[4] & 0xffff0000);
+						tv->v = u2f(tafifo_buff[4] << 16);
+					}
+					else
+					{
+						tv->u = u2f(tafifo_buff[4]);
+						tv->v = u2f(tafifo_buff[5]);
+					}
 					memcpy(tv->b, vert_base_color, sizeof(tv->b));
 					memcpy(tv->o, vert_offset_color, sizeof(tv->o));
 
@@ -2553,13 +2562,21 @@ template <int tsinst, bool bilinear>
 inline uint32_t powervr2_device::sample_textured(texinfo *ti, float u, float v, uint32_t offset_color, uint32_t base_color)
 {
 	uint32_t tmp;
-	uint32_t c = (this->*(ti->r))(ti, u, v);
+	uint32_t c;
 	if (bilinear)
 	{
-		uint32_t c1 = (this->*(ti->r))(ti, u + 1.0f, v);
-		uint32_t c2 = (this->*(ti->r))(ti, u + 1.0f, v + 1.0f);
-		uint32_t c3 = (this->*(ti->r))(ti, u,        v + 1.0f);
-		c = bilinear_filter(c, c1, c2, c3, u, v);
+		// texel centres are at +0.5: blend the texel pair around (u - 0.5, v - 0.5)
+		const float fu = u - 0.5f, fv = v - 0.5f;
+		const float iu = floorf(fu), iv = floorf(fv);
+		c = (this->*(ti->r))(ti, iu, iv);
+		const uint32_t c1 = (this->*(ti->r))(ti, iu + 1.0f, iv);
+		const uint32_t c2 = (this->*(ti->r))(ti, iu + 1.0f, iv + 1.0f);
+		const uint32_t c3 = (this->*(ti->r))(ti, iu,        iv + 1.0f);
+		c = bilinear_filter(c, c1, c2, c3, fu - iu, fv - iv);
+	}
+	else
+	{
+		c = (this->*(ti->r))(ti, u, v);
 	}
 
 	switch (tsinst) {

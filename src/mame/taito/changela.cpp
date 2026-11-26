@@ -119,40 +119,41 @@ private:
 	u8 m_tree_collision_reset = 0;
 	u8 m_prev_value_31 = 0;
 	u8 m_dir_31 = 0;
+	u8 m_irq_vector = 0;
 
 	// handlers
 	u8 mcu_r();
 	void mcu_w(u8 data);
-	void changela_68705_port_a_w(u8 data);
-	void changela_68705_port_c_w(u8 data);
-	u8 changela_24_r();
-	u8 changela_25_r();
-	u8 changela_30_r();
-	u8 changela_31_r();
-	u8 changela_2d_r();
+	void mcu_port_a_w(u8 data);
+	void mcu_port_c_w(u8 data);
+	u8 _24_r();
+	u8 _25_r();
+	u8 _30_r();
+	u8 _31_r();
+	u8 _2d_r();
 	void mcu_pc_0_w(int state);
 	void collision_reset_0_w(int state);
 	void collision_reset_1_w(int state);
 	void coin_counter_1_w(int state);
 	void coin_counter_2_w(int state);
-	void changela_colors_w(offs_t offset, u8 data);
-	void changela_mem_device_select_w(u8 data);
-	void changela_mem_device_w(offs_t offset, u8 data);
-	u8 changela_mem_device_r(offs_t offset);
-	void changela_slope_rom_addr_hi_w(u8 data);
-	void changela_slope_rom_addr_lo_w(u8 data);
+	void colors_w(offs_t offset, u8 data);
+	void mem_device_select_w(u8 data);
+	void mem_device_w(offs_t offset, u8 data);
+	u8 mem_device_r(offs_t offset);
+	void slope_rom_addr_hi_w(u8 data);
+	void slope_rom_addr_lo_w(u8 data);
 
-	INTERRUPT_GEN_MEMBER(chl_mcu_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(changela_scanline);
-	TIMER_CALLBACK_MEMBER(changela_scanline_callback);
+	INTERRUPT_GEN_MEMBER(mcu_irq);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	IRQ_CALLBACK_MEMBER(cpu_acknowledge_irq);
 
-	u32 screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_obj0(bitmap_ind16 &bitmap, int sy);
 	void draw_obj1(bitmap_ind16 &bitmap);
 	void draw_river(bitmap_ind16 &bitmap, int sy);
 	void draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num);
 
-	void changela_map(address_map &map) ATTR_COLD;
+	void cpu_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -190,6 +191,7 @@ void changela_state::machine_start()
 	save_item(NAME(m_tree_collision_reset));
 	save_item(NAME(m_prev_value_31));
 	save_item(NAME(m_dir_31));
+	save_item(NAME(m_irq_vector));
 }
 
 void changela_state::machine_reset()
@@ -214,6 +216,7 @@ void changela_state::machine_reset()
 	m_tree_collision_reset = 0;
 	m_prev_value_31 = 0;
 	m_dir_31 = 0;
+	m_irq_vector = 0;
 }
 
 void changela_state::video_start()
@@ -235,7 +238,7 @@ void changela_state::video_start()
     Screen Update
 *********************************/
 
-u32 changela_state::screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+u32 changela_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_river_bitmap, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, m_obj0_bitmap, 0, 0, 0, 0, cliprect, 0);
@@ -296,52 +299,58 @@ e:|7 6 5 4 3 2 1 0 Hex|/RAMw /RAMr /ROM  /AdderOutput  AdderInput TrainInputs|
                  written back to RAM
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
+TIMER_DEVICE_CALLBACK_MEMBER(changela_state::scanline)
 {
-	int sy = param;
-
 	// vblank irq
-	if (sy == 256)
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xdf); // Z80
+	if (param == 256)
+	{
+		m_irq_vector = 0xdf;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
+	else if (((param % 64) == 0))
+	{
+		// timer irq, 3 times per given vblank field
+		m_irq_vector = 0xcf;
+		m_maincpu->set_input_line(0, HOLD_LINE);
+	}
 
-	// timer irq, 3 times per given vblank field
-	else if (((sy % 64) == 0))
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); // Z80
-
-	if (sy < 256)
+	if (param < 256)
 	{
 		// clear the current scanline first
-		const rectangle rect(0, 255, sy, sy);
+		const rectangle rect(0, 255, param, param);
 		m_river_bitmap.fill(0x00, rect);
 		m_obj0_bitmap.fill(0x00, rect);
 		m_tree_bitmap[0].fill(0x00, rect);
 		m_tree_bitmap[1].fill(0x00, rect);
 
-		draw_river(m_river_bitmap, sy);
-		draw_obj0(m_obj0_bitmap, sy);
-		draw_tree(m_tree_bitmap[0], sy, 0);
-		draw_tree(m_tree_bitmap[1], sy, 1);
+		draw_river(m_river_bitmap, param);
+		draw_obj0(m_obj0_bitmap, param);
+		draw_tree(m_tree_bitmap[0], param, 0);
+		draw_tree(m_tree_bitmap[1], param, 1);
 	}
 
-	if (sy >= 32 && sy < 256)
+	if (param >= 32 && param < 256)
 	{
 		// Collision Detection
+		u16 const *river = &m_river_bitmap.pix(param);
+		u16 const *obj0 = &m_obj0_bitmap.pix(param);
+		u16 const *tree[2] = { &m_tree_bitmap[0].pix(param), &m_tree_bitmap[1].pix(param) };
 		for (int sx = 1; sx < 256; sx++)
 		{
-			u16 pix = m_river_bitmap.pix(sy, sx);
+			u16 pix = river[sx];
 			const bool riv_col = (pix == 0x08 || pix == 0x09 || pix == 0x0a);
 
-			pix = m_river_bitmap.pix(sy, sx-1);
+			pix = river[sx - 1];
 			const bool prev_col = (pix == 0x08 || pix == 0x09 || pix == 0x0a);
 
-			if (m_obj0_bitmap.pix(sy, sx) == 0x14) // Car Outline Color
+			if (obj0[sx] == 0x14) // Car Outline Color
 			{
 				// Tree 0 Collision
-				if (m_tree_bitmap[0].pix(sy, sx) != 0)
+				if (tree[0][sx] != 0)
 					m_tree0_col = 1;
 
 				// Tree 1 Collision
-				if (m_tree_bitmap[1].pix(sy, sx) != 0)
+				if (tree[1][sx] != 0)
 					m_tree1_col = 1;
 
 				// Hit Right Bank
@@ -369,6 +378,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
 			m_boat_shore_col = 0;
 		}
 	}
+}
+
+IRQ_CALLBACK_MEMBER(changela_state::cpu_acknowledge_irq)
+{
+	return m_irq_vector;
 }
 
 
@@ -468,6 +482,7 @@ void changela_state::draw_river(bitmap_ind16 &bitmap, int sy)
 		int tile_v = ((math_train[3] & 0x0c) >> 2) | ((math_train[2] & 0x0f) << 2) | ((math_train[1] & 0x07) << 6);
 		int tile_h = ((math_train[7] & 0x0f) | ((math_train[6] & 0x0f) << 4) | ((math_train[5] & 0x01) << 8)) + 4;
 
+		u16 *row = &bitmap.pix(sy);
 		for (int sx = 0; sx < 256; sx++)
 		{
 			for (int i = 0; i < ((sx < 16) ? 1 : 4); i++)
@@ -494,7 +509,7 @@ void changela_state::draw_river(bitmap_ind16 &bitmap, int sy)
 			else
 				col = (TILE_ROM[rom_addr] & 0xf0) >> 4;
 
-			bitmap.pix(sy, sx) = col;
+			row[sx] = col;
 		}
 	}
 
@@ -662,6 +677,7 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 	tile_h = ((math_train[7] & 0x0f) | ((math_train[6] & 0x0f) << 4) | ((math_train[5] & 0x01) << 8)) + 4;
 	all_ff = 1;
 
+	u16 *row = &bitmap.pix(sy);
 	for (int sx = 0; sx < 256; sx++)
 	{
 		for (int i = 0; i < ((sx < 16) ? 1 : 4); i++)
@@ -697,7 +713,7 @@ void changela_state::draw_tree(bitmap_ind16 &bitmap, int sy, int tree_num)
 				all_ff = 0;
 
 			if (col != 0x0f && col != 0x00)
-				bitmap.pix(sy, sx) = col | 0x30;
+				row[sx] = col | 0x30;
 		}
 	}
 
@@ -715,6 +731,7 @@ void changela_state::draw_obj0(bitmap_ind16 &bitmap, int sy)
 {
 	u8 const *const ROM = m_obj0rom;
 	u8 const *const RAM = m_spriteram;
+	u16 *row = &bitmap.pix(sy);
 
 	for (int sx = 0; sx < 256; sx++)
 	{
@@ -747,7 +764,7 @@ void changela_state::draw_obj0(bitmap_ind16 &bitmap, int sy)
 					data = (ROM[rom_addr] & 0xf0) >> 4;
 
 				if ((data != 0x0f) && (data != 0) && (xpos + i) < 256)
-					bitmap.pix(sy, xpos + i) = data | 0x10;
+					row[xpos + i] = data | 0x10;
 
 				if (hs)
 				{
@@ -757,7 +774,7 @@ void changela_state::draw_obj0(bitmap_ind16 &bitmap, int sy)
 						data = (ROM[rom_addr ^ 0x100] & 0xf0) >> 4;
 
 					if ((data != 0x0f) && (data != 0) && (xpos + i + 16) < 256)
-						bitmap.pix(sy, xpos + i + 16) = data | 0x10;
+						row[xpos + i + 16] = data | 0x10;
 				}
 			}
 		}
@@ -780,6 +797,7 @@ void changela_state::draw_obj1(bitmap_ind16 &bitmap)
 
 	for (int sy = 0; sy < 256; sy++)
 	{
+		u16 *row = &bitmap.pix(sy);
 		for (int sx = 0; sx < 256; sx++)
 		{
 			// 11 Bits: H1, H3, H4, H5, H6, H7, V3, V4, V5, V6, V7
@@ -818,7 +836,7 @@ void changela_state::draw_obj1(bitmap_ind16 &bitmap)
 
 			int col = c0 | (c1 << 1) | ((attrib & 0xc0) >> 4);
 			if ((col & 0x07) != 0x07)
-				bitmap.pix(sy, sx) = col | 0x20;
+				row[sx] = col | 0x20;
 		}
 	}
 }
@@ -828,7 +846,7 @@ void changela_state::draw_obj1(bitmap_ind16 &bitmap)
     Video I/O
 *********************************/
 
-void changela_state::changela_colors_w(offs_t offset, u8 data)
+void changela_state::colors_w(offs_t offset, u8 data)
 {
 	/* Each color is combined from 3 bits from open-collector outputs of ram.
 	Each of the bits is connected to a 220, 470, or 1000 Ohm resistor.
@@ -863,7 +881,7 @@ void changela_state::changela_colors_w(offs_t offset, u8 data)
 	m_palette->set_pen_color(color_index,r,g,b);
 }
 
-void changela_state::changela_mem_device_select_w(u8 data)
+void changela_state::mem_device_select_w(u8 data)
 {
 	/*
 	(data & 0x07) possible settings:
@@ -878,7 +896,7 @@ void changela_state::changela_mem_device_select_w(u8 data)
 	m_tree_en = (data & 0x30) >> 4;
 }
 
-void changela_state::changela_mem_device_w(offs_t offset, u8 data)
+void changela_state::mem_device_w(offs_t offset, u8 data)
 {
 	switch (m_mem_dev_selected)
 	{
@@ -900,7 +918,7 @@ void changela_state::changela_mem_device_w(offs_t offset, u8 data)
 	}
 }
 
-u8 changela_state::changela_mem_device_r(offs_t offset)
+u8 changela_state::mem_device_r(offs_t offset)
 {
 	switch (m_mem_dev_selected)
 	{
@@ -917,17 +935,17 @@ u8 changela_state::changela_mem_device_r(offs_t offset)
 	return 0;
 }
 
-void changela_state::changela_slope_rom_addr_hi_w(u8 data)
+void changela_state::slope_rom_addr_hi_w(u8 data)
 {
 	m_sloperom_bank = (data & 0x03) << 9;
 }
 
-void changela_state::changela_slope_rom_addr_lo_w(u8 data)
+void changela_state::slope_rom_addr_lo_w(u8 data)
 {
 	m_horizon = data;
 }
 
-u8 changela_state::changela_25_r()
+u8 changela_state::_25_r()
 {
 	// collisions on bits 3,2, bits 1,0-N/C inputs
 	return (m_tree1_col << 3) | (m_tree0_col << 2) | 0x03;
@@ -948,12 +966,12 @@ void changela_state::collision_reset_1_w(int state)
     MCU I/O
 *********************************/
 
-void changela_state::changela_68705_port_a_w(u8 data)
+void changela_state::mcu_port_a_w(u8 data)
 {
 	m_port_a_out = data;
 }
 
-void changela_state::changela_68705_port_c_w(u8 data)
+void changela_state::mcu_port_c_w(u8 data)
 {
 	// PC3 is connected to the CLOCK input of the LS374, so we latch the data on rising edge
 	if (BIT(data, 3) && !BIT(m_port_c_out, 3))
@@ -981,7 +999,7 @@ void changela_state::mcu_w(u8 data)
 }
 
 // U30
-u8 changela_state::changela_24_r()
+u8 changela_state::_24_r()
 {
 	return (BIT(m_port_c_out, 1) << 3) | 0x07; // bits 2,1,0-N/C inputs
 }
@@ -991,7 +1009,7 @@ void changela_state::mcu_pc_0_w(int state)
 	m_mcu->pc_w(0xfe | state);
 }
 
-INTERRUPT_GEN_MEMBER(changela_state::chl_mcu_irq)
+INTERRUPT_GEN_MEMBER(changela_state::mcu_irq)
 {
 	m_mcu->pulse_input_line(0, m_mcu->minimum_quantum_time());
 }
@@ -1001,12 +1019,12 @@ INTERRUPT_GEN_MEMBER(changela_state::chl_mcu_irq)
     Other I/O
 *********************************/
 
-u8 changela_state::changela_30_r()
+u8 changela_state::_30_r()
 {
 	return m_wheel->read() & 0x0f; // wheel control (clocked input) signal on bits 3,2,1,0
 }
 
-u8 changela_state::changela_31_r()
+u8 changela_state::_31_r()
 {
 	/* If the new value is less than the old value, and it did not wrap around,
 	   or if the new value is greater than the old value, and it did wrap around,
@@ -1025,7 +1043,7 @@ u8 changela_state::changela_31_r()
 	return (m_dir_31 << 3) | (m_left_bank_col << 2) | (m_right_bank_col << 1) | m_boat_shore_col;
 }
 
-u8 changela_state::changela_2d_r()
+u8 changela_state::_2d_r()
 {
 	// Gas pedal is made up of 2 switches, 1 active low, 1 active high
 	const u8 lut_gas[3] = { 1, 0, 2 };
@@ -1051,21 +1069,21 @@ void changela_state::coin_counter_2_w(int state)
     Address Map
 *********************************/
 
-void changela_state::changela_map(address_map &map)
+void changela_state::cpu_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
 	map(0x8000, 0x83ff).ram().share("spriteram"); // OBJ0 RAM
 	map(0x9000, 0x97ff).ram().share("videoram"); // OBJ1 RAM
-	map(0xa000, 0xa07f).w(FUNC(changela_state::changela_colors_w)).share("colorram"); // Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8th bit data input (d0-d7->normal, a0->d8)
+	map(0xa000, 0xa07f).w(FUNC(changela_state::colors_w)).share("colorram"); // Color 93419 RAM 64x9(nine!!!) bits A0-used as the 8th bit data input (d0-d7->normal, a0->d8)
 	map(0xb000, 0xbfff).rom();
 
-	map(0xc000, 0xc7ff).rw(FUNC(changela_state::changela_mem_device_r), FUNC(changela_state::changela_mem_device_w)); // RAM4 (River Bed RAM); RAM5 (Tree RAM)
+	map(0xc000, 0xc7ff).rw(FUNC(changela_state::mem_device_r), FUNC(changela_state::mem_device_w)); // RAM4 (River Bed RAM); RAM5 (Tree RAM)
 
 	// LS138 - U16
 	map(0xc800, 0xc800).nopw(); // not connected
-	map(0xc900, 0xc900).w(FUNC(changela_state::changela_mem_device_select_w)); // selects the memory device to be accessible at 0xc000-0xc7ff
-	map(0xca00, 0xca00).w(FUNC(changela_state::changela_slope_rom_addr_hi_w));
-	map(0xcb00, 0xcb00).w(FUNC(changela_state::changela_slope_rom_addr_lo_w));
+	map(0xc900, 0xc900).w(FUNC(changela_state::mem_device_select_w)); // selects the memory device to be accessible at 0xc000-0xc7ff
+	map(0xca00, 0xca00).w(FUNC(changela_state::slope_rom_addr_hi_w));
+	map(0xcb00, 0xcb00).w(FUNC(changela_state::slope_rom_addr_lo_w));
 
 	map(0xd000, 0xd001).rw("ay1", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
 	map(0xd010, 0xd011).rw("ay2", FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_data_w));
@@ -1074,14 +1092,14 @@ void changela_state::changela_map(address_map &map)
 	map(0xd020, 0xd027).w("outlatch", FUNC(ls259_device::write_d0));
 
 	// LS139 - U24
-	map(0xd024, 0xd024).r(FUNC(changela_state::changela_24_r));
-	map(0xd025, 0xd025).r(FUNC(changela_state::changela_25_r));
+	map(0xd024, 0xd024).r(FUNC(changela_state::_24_r));
+	map(0xd025, 0xd025).r(FUNC(changela_state::_25_r));
 	map(0xd028, 0xd028).r(FUNC(changela_state::mcu_r));
 	map(0xd02c, 0xd02c).portr("IN0");
-	map(0xd02d, 0xd02d).r(FUNC(changela_state::changela_2d_r));
+	map(0xd02d, 0xd02d).r(FUNC(changela_state::_2d_r));
 
-	map(0xd030, 0xd030).rw(FUNC(changela_state::changela_30_r), FUNC(changela_state::mcu_w));
-	map(0xd031, 0xd031).r(FUNC(changela_state::changela_31_r));
+	map(0xd030, 0xd030).rw(FUNC(changela_state::_30_r), FUNC(changela_state::mcu_w));
+	map(0xd031, 0xd031).r(FUNC(changela_state::_31_r));
 
 	map(0xe000, 0xe000).w("watchdog", FUNC(watchdog_timer_device::reset_w));
 
@@ -1240,14 +1258,15 @@ INPUT_PORTS_END
 void changela_state::changela(machine_config &config)
 {
 	Z80(config, m_maincpu, 20_MHz_XTAL/4);
-	m_maincpu->set_addrmap(AS_PROGRAM, &changela_state::changela_map);
-	TIMER(config, "scantimer").configure_scanline(FUNC(changela_state::changela_scanline), "screen", 0, 1);
+	m_maincpu->set_addrmap(AS_PROGRAM, &changela_state::cpu_map);
+	TIMER(config, "scantimer").configure_scanline(FUNC(changela_state::scanline), "screen", 0, 1);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(changela_state::cpu_acknowledge_irq));
 
 	M68705P3(config, m_mcu, 20_MHz_XTAL/8);
 	m_mcu->portb_r().set_ioport("MCU");
-	m_mcu->porta_w().set(FUNC(changela_state::changela_68705_port_a_w));
-	m_mcu->portc_w().set(FUNC(changela_state::changela_68705_port_c_w));
-	m_mcu->set_vblank_int("screen", FUNC(changela_state::chl_mcu_irq));
+	m_mcu->porta_w().set(FUNC(changela_state::mcu_port_a_w));
+	m_mcu->portc_w().set(FUNC(changela_state::mcu_port_c_w));
+	m_mcu->set_vblank_int("screen", FUNC(changela_state::mcu_irq));
 
 	ls259_device &outlatch(LS259(config, "outlatch")); // U44 on Sound I/O Board
 	outlatch.q_out_cb<0>().set(FUNC(changela_state::collision_reset_0_w));
@@ -1260,7 +1279,7 @@ void changela_state::changela(machine_config &config)
 
 	SCREEN(config, m_screen);
 	m_screen->set_raw(20_MHz_XTAL/4, 318, 8, 256, 262, 32, 256);
-	m_screen->set_screen_update(FUNC(changela_state::screen_update_changela));
+	m_screen->set_screen_update(FUNC(changela_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	PALETTE(config, m_palette).set_entries(0x40);

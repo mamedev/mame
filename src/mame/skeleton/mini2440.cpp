@@ -9,13 +9,17 @@
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "machine/nandflash.h"
-#include "machine/s3c2440.h"
+#include "machine/s3c24xx.h"
 #include "sound/dac.h"
 #include "screen.h"
 #include "speaker.h"
 
 #include <cstdarg>
 
+#define LOG_LED		(1U << 1)
+#define LOG_ADC		(1U << 2)
+#define VERBOSE		( 0 )
+#include "logmacro.h"
 
 namespace {
 
@@ -36,11 +40,18 @@ public:
 
 	void mini2440(machine_config &config);
 
-	void init_mini2440();
-
-	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(pen_changed);
 
 private:
+	virtual void machine_reset() override ATTR_COLD;
+
+	void main_map(address_map &map) ATTR_COLD;
+
+	uint32_t gpio_port_r(offs_t offset);
+	void gpio_port_w(offs_t offset, uint32_t data);
+	void i2s_data_w(offs_t offset, uint16_t data);
+	uint32_t adc_data_r(offs_t offset);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2440_device> m_s3c2440;
 	required_device<samsung_k9f1g08u0b_device> m_nand;
@@ -50,59 +61,36 @@ private:
 	required_ioport m_peny;
 
 	uint32_t m_port[9] = { };
-	virtual void machine_start() override ATTR_COLD;
-	virtual void machine_reset() override ATTR_COLD;
-	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
-	uint32_t s3c2440_gpio_port_r(offs_t offset);
-	void s3c2440_gpio_port_w(offs_t offset, uint32_t data);
-	uint32_t s3c2440_core_pin_r(offs_t offset);
-	void s3c2440_nand_command_w(uint8_t data);
-	void s3c2440_nand_address_w(uint8_t data);
-	uint8_t s3c2440_nand_data_r();
-	void s3c2440_nand_data_w(uint8_t data);
-	void s3c2440_i2s_data_w(offs_t offset, uint16_t data);
-	uint32_t s3c2440_adc_data_r(offs_t offset);
-
-	void mini2440_map(address_map &map) ATTR_COLD;
 };
 
-inline void mini2440_state::verboselog(int n_level, const char *s_fmt, ...)
-{
-	if (VERBOSE_LEVEL >= n_level)
-	{
-		va_list v;
-		char buf[32768];
-		va_start( v, s_fmt);
-		vsprintf( buf, s_fmt, v);
-		va_end( v);
-		logerror( "%s: %s", machine().describe_context(), buf);
-	}
-}
 
 /***************************************************************************
     MACHINE HARDWARE
 ***************************************************************************/
 
+void mini2440_state::machine_reset()
+{
+	memset(m_port, 0, sizeof(m_port));
+}
+
 // GPIO
 
-uint32_t mini2440_state::s3c2440_gpio_port_r(offs_t offset)
+uint32_t mini2440_state::gpio_port_r(offs_t offset)
 {
 	uint32_t data = m_port[offset];
 	switch (offset)
 	{
-		case S3C2440_GPIO_PORT_G :
-		{
-			data = (data & ~(1 << 13)) | (1 << 13); // [nand] 1 = 2048 byte page  (if ncon = 1)
-			data = (data & ~(1 << 14)) | (1 << 14); // [nand] 1 = 5 address cycle (if ncon = 1)
-			data = (data & ~(1 << 15)) | (0 << 15); // [nand] 0 = 8-bit bus width (if ncon = 1)
-			data = data | 0x8E9; // for "load Image of Linux..."
-		}
-		break;
+	case s3c24xx_device::GPIO_PORT_G:
+		data = (data & ~(1 << 13)) | (1 << 13); // [nand] 1 = 2048 byte page  (if ncon = 1)
+		data = (data & ~(1 << 14)) | (1 << 14); // [nand] 1 = 5 address cycle (if ncon = 1)
+		data = (data & ~(1 << 15)) | (0 << 15); // [nand] 0 = 8-bit bus width (if ncon = 1)
+		data |= 0x8e9; // for "load Image of Linux..."
+ 		break;
 	}
 	return data;
 }
 
-void mini2440_state::s3c2440_gpio_port_w(offs_t offset, uint32_t data)
+void mini2440_state::gpio_port_w(offs_t offset, uint32_t data)
 {
 	// tout2/gb2 -> uda1341ts l3mode
 	// tout3/gb3 -> uda1341ts l3data
@@ -111,65 +99,17 @@ void mini2440_state::s3c2440_gpio_port_w(offs_t offset, uint32_t data)
 	m_port[offset] = data;
 	switch (offset)
 	{
-		case S3C2440_GPIO_PORT_B :
-		{
-			verboselog(5,  "LED %d %d %d %d\n", BIT( data, 5), BIT( data, 6), BIT( data, 7), BIT( data, 8));
-		}
+	case s3c2440_device::GPIO_PORT_B:
+		LOGMASKED(LOG_LED, "LED %d %d %d %d\n", BIT(data, 5), BIT(data, 6), BIT(data, 7), BIT(data, 8));
 		break;
 	}
 }
 
-// CORE
-
-/*
-
-OM[1:0] = 00: Enable NAND flash memory boot
-
-NCON: NAND flash memory selection (Normal / Advance)
-0: Normal NAND flash (256Words/512Bytes page size, 3/4 address cycle)
-1: Advance NAND flash (1KWords/2KBytes page size, 4/5 address cycle)
-
-*/
-
-uint32_t mini2440_state::s3c2440_core_pin_r(offs_t offset)
-{
-	int data = 0;
-	switch (offset)
-	{
-		case S3C2440_CORE_PIN_NCON : data = 1; break;
-		case S3C2440_CORE_PIN_OM0  : data = 0; break;
-		case S3C2440_CORE_PIN_OM1  : data = 0; break;
-	}
-	return data;
-}
-
-// NAND
-
-void mini2440_state::s3c2440_nand_command_w(uint8_t data)
-{
-	m_nand->command_w(data);
-}
-
-void mini2440_state::s3c2440_nand_address_w(uint8_t data)
-{
-	m_nand->address_w(data);
-}
-
-uint8_t mini2440_state::s3c2440_nand_data_r()
-{
-	return m_nand->data_r();
-}
-
-void mini2440_state::s3c2440_nand_data_w(uint8_t data)
-{
-	m_nand->data_w(data);
-}
-
 // I2S
 
-void mini2440_state::s3c2440_i2s_data_w(offs_t offset, uint16_t data)
+void mini2440_state::i2s_data_w(offs_t offset, uint16_t data)
 {
-	if ( offset )
+	if (offset)
 		m_ldac->write(data);
 	else
 		m_rdac->write(data);
@@ -177,60 +117,48 @@ void mini2440_state::s3c2440_i2s_data_w(offs_t offset, uint16_t data)
 
 // ADC
 
-uint32_t mini2440_state::s3c2440_adc_data_r(offs_t offset)
+uint32_t mini2440_state::adc_data_r(offs_t offset)
 {
 	uint32_t data = 0;
 	switch (offset)
 	{
-		case 2 + 0 : data = m_penx->read(); break;
-		case 2 + 1 : data = 915 - m_peny->read() + 90; break;
+	case 0:
+		data = m_penx->read();
+		break;
+	case 1:
+		data = 915 - m_peny->read() + 90;
+		break;
 	}
-	verboselog(5,  "s3c2440_adc_data_r %08X\n", data);
+	LOGMASKED(LOG_ADC,  "adc_data_r %08X\n", data);
 	return data;
 }
 
 // TOUCH
 
-INPUT_CHANGED_MEMBER(mini2440_state::mini2440_input_changed)
+INPUT_CHANGED_MEMBER(mini2440_state::pen_changed)
 {
-	m_s3c2440->s3c2440_touch_screen( (newval & 0x01) ? 1 : 0);
-}
-
-// ...
-
-void mini2440_state::machine_start()
-{
-}
-
-void mini2440_state::machine_reset()
-{
-	m_maincpu->reset();
-	memset( m_port, 0, sizeof( m_port));
+	m_s3c2440->touch_screen(BIT(newval, 0));
 }
 
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
 
-void mini2440_state::mini2440_map(address_map &map)
+void mini2440_state::main_map(address_map &map)
 {
 //  map(0x00000000, 0x001fffff).rom();
 	map(0x30000000, 0x37ffffff).ram();
+	map(0x40000000, 0x5fffffff).m(m_s3c2440, FUNC(s3c2440_device::map));
 }
 
 /***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
-void mini2440_state::init_mini2440()
-{
-	// do nothing
-}
-
 void mini2440_state::mini2440(machine_config &config)
 {
 	ARM920T(config, m_maincpu, 400000000);
-	m_maincpu->set_addrmap(AS_PROGRAM, &mini2440_state::mini2440_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &mini2440_state::main_map);
 
 	PALETTE(config, "palette").set_entries(32768);
 
@@ -248,15 +176,18 @@ void mini2440_state::mini2440(machine_config &config)
 	S3C2440(config, m_s3c2440, 12000000);
 	m_s3c2440->set_palette_tag("palette");
 	m_s3c2440->set_screen_tag("screen");
-	m_s3c2440->core_pin_r_callback().set(FUNC(mini2440_state::s3c2440_core_pin_r));
-	m_s3c2440->gpio_port_r_callback().set(FUNC(mini2440_state::s3c2440_gpio_port_r));
-	m_s3c2440->gpio_port_w_callback().set(FUNC(mini2440_state::s3c2440_gpio_port_w));
-	m_s3c2440->adc_data_r_callback().set(FUNC(mini2440_state::s3c2440_adc_data_r));
-	m_s3c2440->i2s_data_w_callback().set(FUNC(mini2440_state::s3c2440_i2s_data_w));
-	m_s3c2440->nand_command_w_callback().set(FUNC(mini2440_state::s3c2440_nand_command_w));
-	m_s3c2440->nand_address_w_callback().set(FUNC(mini2440_state::s3c2440_nand_address_w));
-	m_s3c2440->nand_data_r_callback().set(FUNC(mini2440_state::s3c2440_nand_data_r));
-	m_s3c2440->nand_data_w_callback().set(FUNC(mini2440_state::s3c2440_nand_data_w));
+	m_s3c2440->om0_r_callback().set_constant(0); // OM[1:0] = 00: Enable NAND flash memory boot
+	m_s3c2440->om1_r_callback().set_constant(0);
+	m_s3c2440->ncon_r_callback().set_constant(1); // NCON = 1: Advance NAND flash (1KWords/2KBytes page size, 4/5 address cycle)
+	m_s3c2440->gpio_port_r_callback().set(FUNC(mini2440_state::gpio_port_r));
+	m_s3c2440->gpio_port_w_callback().set(FUNC(mini2440_state::gpio_port_w));
+	m_s3c2440->adc_data_r_callback().set(FUNC(mini2440_state::adc_data_r));
+	m_s3c2440->i2s_data_w_callback().set(FUNC(mini2440_state::i2s_data_w));
+	m_s3c2440->nand_command_w_callback().set(m_nand, FUNC(samsung_k9f1g08u0b_device::command_w));
+	m_s3c2440->nand_address_w_callback().set(m_nand, FUNC(samsung_k9f1g08u0b_device::address_w));
+	m_s3c2440->nand_data_r_callback().set(m_nand, FUNC(samsung_k9f1g08u0b_device::data_r));
+	m_s3c2440->nand_data_w_callback().set(m_nand, FUNC(samsung_k9f1g08u0b_device::data_w));
+	m_s3c2440->nand_update_ecc_r_callback().set_constant(1);
 
 	SAMSUNG_K9F1G08U0B(config, m_nand);
 	m_nand->rnb_wr_callback().set(m_s3c2440, FUNC(s3c2440_device::frnb_w));
@@ -264,7 +195,7 @@ void mini2440_state::mini2440(machine_config &config)
 
 static INPUT_PORTS_START( mini2440 )
 	PORT_START( "PENB" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mini2440_state::mini2440_input_changed), 0) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(mini2440_state::pen_changed), 0) PORT_PLAYER(1)
 	PORT_START( "PENX" )
 	PORT_BIT( 0x3ff, 0x200, IPT_LIGHTGUN_X ) PORT_NAME("Pen X") PORT_MINMAX(80, 950) PORT_SENSITIVITY(50) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_KEYDELTA(30) PORT_PLAYER(1)
 	PORT_START( "PENY" )
@@ -288,4 +219,4 @@ ROM_END
 } // anonymous namespace
 
 
-COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, init_mini2440, "FriendlyARM", "Mini2440", 0)
+COMP(2009, mini2440, 0, 0, mini2440, mini2440, mini2440_state, empty_init, "FriendlyARM", "Mini2440", 0)

@@ -153,8 +153,8 @@ INPUT_CHANGED_MEMBER(hh_rw5000_state::power_button)
   handheld game overall. Hardware design (even the MCU) and programming
   was done at Rockwell.
 
-  A European version was released as "Ski Slalom" (model 8290), except it's
-  upside-down.
+  A European version was released in 1980 as "Ski Slalom" (model 8290, MCU label
+  B6000EA), except it's upside-down.
 
 *******************************************************************************/
 

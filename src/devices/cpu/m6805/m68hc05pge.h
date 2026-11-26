@@ -7,6 +7,7 @@
 
 #include "emu.h"
 #include "m6805.h"
+#include "m68hc05_spi.h"
 
 #include "machine/adbhost.h"
 #include "machine/macseconds.h"
@@ -46,8 +47,8 @@ public:
 
 	template <std::size_t pwm> auto pwm_out() { return m_pwm_out[pwm].bind(); }
 
-	auto spi_mosi_callback() { return write_spi_mosi.bind(); }
-	auto spi_clock_callback() { return write_spi_clock.bind(); }
+	auto spi_mosi_callback() { return m_spi.lookup()->mosi_cb(); }
+	auto spi_clock_callback() { return m_spi.lookup()->sck_cb(); }
 	void spi_miso_w(int state) { m_spi_miso = state; }
 	auto adb_linechange_callback()
 	{
@@ -62,6 +63,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual space_config_vector memory_space_config() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 
@@ -86,8 +88,6 @@ protected:
 	void send_port(u8 offset, u8 data);
 	u8 pll_r();
 	void pll_w(u8 data);
-	u8 spi_r(offs_t offset);
-	void spi_w(offs_t offset, u8 data);
 	u8 cpicsr_r();
 	void cpicsr_w(u8 data);
 	u8 cscr_r();
@@ -115,7 +115,6 @@ protected:
 
 	TIMER_CALLBACK_MEMBER(seconds_tick);
 	TIMER_CALLBACK_MEMBER(cpi_tick);
-	TIMER_CALLBACK_MEMBER(spi_tick);
 	TIMER_CALLBACK_MEMBER(keyscan_tick);
 
 	void adb_update_irq();
@@ -134,6 +133,7 @@ protected:
 	required_shared_ptr<u8> m_internal_ram;
 
 	memory_view m_introm;
+	required_device<m68hc05_spi_device> m_spi;
 
 	devcb_read8 m_read_tbX, m_read_tbY;
 	devcb_read_line m_read_tbB;
@@ -144,7 +144,6 @@ protected:
 
 	devcb_write8::array<4> m_pwm_out;
 
-	devcb_write_line write_spi_mosi, write_spi_clock;
 	devcb_write_line m_adb_linechange;
 
 	u8 m_ports[11], m_ddrs[11], m_pullups[11];
@@ -152,9 +151,7 @@ protected:
 	u8 m_timer_ctrl;
 	u8 m_onesec;
 	u8 m_option, m_cscr;
-	u8 m_spi_in, m_spi_out;
-	int m_spi_bit, m_spi_clock, m_spi_miso;
-	u8 m_spcr, m_spsr;
+	int m_spi_miso;
 	u8 m_cpicsr;
 	u8 m_adcsr;
 	u8 m_adbcr, m_adbsr, m_adbdr;
@@ -163,7 +160,7 @@ protected:
 	u8 m_pwmbcr, m_pwmb0, m_pwmb1;
 	u8 m_plmcr, m_plmt1, m_plmt2;
 	u8 m_kcsr;
-	emu_timer *m_seconds_timer, *m_cpi_timer, *m_spi_timer, *m_keyscan_timer;
+	emu_timer *m_seconds_timer, *m_cpi_timer, *m_keyscan_timer;
 	u32 m_rtc;
 	u8 m_sram[0x8000];
 };

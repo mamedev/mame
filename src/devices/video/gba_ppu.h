@@ -43,6 +43,14 @@ public:
 	uint32_t regs_r(offs_t offset);
 	void regs_w(offs_t offset, uint32_t data, uint32_t mem_mask = ~0);
 
+	// CPU accesses to GBA-layout palette RAM, VRAM (offsets in the 128K window)
+	// and OAM: a byte store fills both halves of its halfword in palette RAM and
+	// BG VRAM, and is ignored by OBJ VRAM and OAM
+	uint32_t gba_vram_load(const uint32_t *vram, offs_t offset) const;
+	static void gba_pram_store(uint32_t *pram, offs_t offset, uint32_t data, uint32_t mem_mask);
+	void gba_vram_store(uint32_t *vram, offs_t offset, uint32_t data, uint32_t mem_mask) const;
+	static void gba_oam_store(uint32_t *oam, offs_t offset, uint32_t data, uint32_t mem_mask);
+
 	// render one line as BGR555: 240 pixels for the GBA, 256 for the DS
 	int width() const { return m_width; }
 	void draw_scanline(int line, uint16_t *dest);

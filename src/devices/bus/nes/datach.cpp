@@ -24,10 +24,6 @@
 #endif
 #include "logmacro.h"
 
-#define EEPROM_INTERNAL 0
-#define EEPROM_EXTERNAL 1
-
-#define TEST_EEPROM 0
 
 //--------------------------------
 //
@@ -202,7 +198,7 @@ uint8_t *nes_datach_rom_device::get_cart_base()
 
 void nes_datach_24c01_device::device_add_mconfig(machine_config &config)
 {
-	I2C_24C01(config, m_i2cmem);
+	I2C_X24C01(config, m_i2cmem);
 }
 
 
@@ -217,11 +213,11 @@ DEFINE_DEVICE_TYPE(NES_DATACH, nes_datach_device, "nes_datach", "NES Cart Bandai
 
 nes_datach_device::nes_datach_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: nes_lz93d50_device(mconfig, NES_DATACH, tag, owner, clock)
-	, m_datach_latch(0)
 	, m_i2cmem(*this, "i2cmem")
+	, m_datach_latch(0)
 	, m_reader(*this, "datach")
 	, m_subslot(*this, "datach_slot")
-	, m_i2c_dir(0), m_i2c_in_use(0)
+	, m_i2c_dir(0)
 	, serial_timer(nullptr)
 {
 }
@@ -249,7 +245,6 @@ void nes_datach_device::pcb_reset()
 	m_irq_enable = 0;
 	m_irq_count = 0;
 	m_datach_latch = 0;
-	m_i2c_in_use = EEPROM_INTERNAL;
 }
 
 
@@ -286,17 +281,16 @@ uint8_t nes_datach_device::read_m(offs_t offset)
 {
 	LOG("Datach read_m, offset: %04x\n", offset);
 	uint8_t i2c_val = 0;
-#if TEST_EEPROM
 	if (m_i2c_dir)
 	{
-		if (m_i2c_in_use == EEPROM_INTERNAL)
-			i2c_val = (m_i2cmem->read_sda() & 1) << 4;
-		if (m_i2c_in_use == EEPROM_EXTERNAL && m_subslot->m_cart && m_subslot->m_cart->m_i2cmem)
-			i2c_val = (m_subslot->m_cart->m_i2cmem->read_sda() & 1) << 4;
+		int sda = m_i2cmem->read_sda();
+		if (m_subslot->m_cart && m_subslot->m_cart->m_i2cmem)
+			sda &= m_subslot->m_cart->m_i2cmem->read_sda();
+		i2c_val = (sda & 1) << 4;
 	}
-#endif
 	return m_datach_latch | i2c_val;
 }
+
 
 
 uint8_t nes_datach_device::read_h(offs_t offset)
@@ -318,37 +312,27 @@ void nes_datach_device::write_h(offs_t offset, uint8_t data)
 	switch (offset & 0x0f)
 	{
 		case 0: case 1: case 2: case 3:
-		case 4: case 5: case 6: case 7:
-			// these don't switch CHR bank (if you try this, both Battle Rush and SD Gundam Wars will have glitches!)
-			// bit3 goes to SCL of the external EEPROM (and we use write=1 to enable reading from this EEPROM)
+			// writes here and below don't switch CHR bank (if you try this, both Battle Rush and SD Gundam Wars will have glitches!)
+			// in $8000-$8003, bit3 goes to SCL of the external EEPROM (and we use write=1 to enable reading from this EEPROM)
 			// docs from naruko don't specify the bit, our choice comes from observation of writes performed by Battle Rush
-#if TEST_EEPROM
 			if (m_subslot->m_cart && m_subslot->m_cart->m_i2cmem)
-			{
-				if (BIT(data, 3))
-					m_i2c_in_use = EEPROM_EXTERNAL;
 				m_subslot->m_cart->m_i2cmem->write_scl(BIT(data, 3));
-			}
-#endif
+		case 4: case 5: case 6: case 7:
 			break;
 		case 0x08:
 			m_subslot->write_prg_bank(data & 0x0f);
 			break;
 		case 0x0d:
-#if TEST_EEPROM
 			// bit7, select SDA direction LZ93D50P -> EEPROM or EEPROM -> LZ93D50P
 			m_i2c_dir = BIT(data, 7);
 
 			// bit6 goes to SDA line, which is in common with the 2nd EEPROM, if present
-			m_i2cmem->write_sda(BIT(data, 6));
+			m_i2cmem->write_sda(m_i2c_dir ? 1 : BIT(data, 6));
 			if (m_subslot->m_cart && m_subslot->m_cart->m_i2cmem)
-				m_subslot->m_cart->m_i2cmem->write_sda(BIT(data, 6));
+				m_subslot->m_cart->m_i2cmem->write_sda(m_i2c_dir ? 1 : BIT(data, 6));
 
-			// bit5 goes to SCL of the internal EEPROM (and we use write=1 to enable reading from this EEPROM)
-			if (BIT(data, 5))
-				m_i2c_in_use = EEPROM_INTERNAL;
+			// bit5 goes to SCL of the internal EEPROM
 			m_i2cmem->write_scl(BIT(data, 5));
-#endif
 			break;
 		default:
 			fcg_write(offset & 0x0f, data);

@@ -236,6 +236,18 @@ if SOUNDS["CEM3320"] then
 end
 
 ---------------------------------------------------
+-- CEM 3328 voltage-controlled filter chip
+--@src/devices/sound/cem3328.h,SOUNDS["CEM3328"] = true
+---------------------------------------------------
+
+if SOUNDS["CEM3328"] then
+	files {
+		MAME_DIR .. "src/devices/sound/cem3328.cpp",
+		MAME_DIR .. "src/devices/sound/cem3328.h",
+	}
+end
+
+---------------------------------------------------
 -- CEM 3340 voltage-controlled oscillator chip
 --@src/devices/sound/cem3340.h,SOUNDS["CEM3340"] = true
 ---------------------------------------------------
@@ -280,6 +292,20 @@ if SOUNDS["CEM3394"] then
 	files {
 		MAME_DIR .. "src/devices/sound/cem3394.cpp",
 		MAME_DIR .. "src/devices/sound/cem3394.h",
+	}
+end
+
+
+
+---------------------------------------------------
+-- Cirrus Logic CS43L43 I2S Stereo DAC
+--@src/devices/sound/cs43l43.h,SOUNDS["CS43L43"] = true
+---------------------------------------------------
+
+if (SOUNDS["CS43L43"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/cs43l43.cpp",
+		MAME_DIR .. "src/devices/sound/cs43l43.h",
 	}
 end
 
@@ -870,6 +896,19 @@ if SOUNDS["IMAADPCM"] then
 	}
 end
 
+
+
+---------------------------------------------------
+-- Novatek NT3570F sound generator
+--@src/devices/sound/nt3570.h,SOUNDS["NT3570"] = true
+---------------------------------------------------
+
+if SOUNDS["NT3570"] then
+	files {
+		MAME_DIR .. "src/devices/sound/nt3570.cpp",
+		MAME_DIR .. "src/devices/sound/nt3570.h",
+	}
+end
 
 
 ---------------------------------------------------
@@ -1717,6 +1756,30 @@ if SOUNDS["TDA7433"] then
 	files {
 		MAME_DIR .. "src/devices/sound/tda7433.cpp",
 		MAME_DIR .. "src/devices/sound/tda7433.h",
+	}
+end
+
+---------------------------------------------------
+-- Mitsubishi M61545AFP dual electronic volume
+--@src/devices/sound/m61545.h,SOUNDS["M61545"] = true
+---------------------------------------------------
+
+if SOUNDS["M61545"] then
+	files {
+		MAME_DIR .. "src/devices/sound/m61545.cpp",
+		MAME_DIR .. "src/devices/sound/m61545.h",
+	}
+end
+
+---------------------------------------------------
+-- Mitsubishi M62429P/FP dual electronic volume
+--@src/devices/sound/m62429.h,SOUNDS["M62429"] = true
+---------------------------------------------------
+
+if SOUNDS["M62429"] then
+	files {
+		MAME_DIR .. "src/devices/sound/m62429.cpp",
+		MAME_DIR .. "src/devices/sound/m62429.h",
 	}
 end
 

@@ -102,7 +102,7 @@ protected:
 	u32 palette_entries() const noexcept override;
 
 	// memory map
-	void card_map(address_map &map);
+	void card_map(address_map &map) ATTR_COLD;
 
 private:
 	static constexpr offs_t VRAM_MAX = 0x10'0000 / 4; // chip supports 2M but card can only use 1M

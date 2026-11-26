@@ -37,12 +37,7 @@
 
 void coco12_state::coco_mem(address_map &map)
 {
-	map(0x0000, 0xffff).rw(m_sam, FUNC(sam6883_device::read), FUNC(sam6883_device::write));
-}
-
-void coco12_state::coco_ram(address_map &map)
-{
-	// mapped by configure_sam
+	map(0x0000, 0xffff).m(m_sam, FUNC(sam6883_device::amap));
 }
 
 void coco12_state::coco_rom0(address_map &map)
@@ -66,10 +61,14 @@ void coco12_state::coco_rom2(address_map &map)
 void deluxecoco_state::deluxecoco_rom2(address_map &map)
 {
 	// $C000-$FEFF
-	map(0x0000, 0x3eff).view(m_rom_view);
-
-	m_rom_view[0](0x0000, 0x3eff).rw(m_cococart, FUNC(cococart_slot_device::cts_read), FUNC(cococart_slot_device::cts_write));
-	m_rom_view[1](0x0000, 0x3eff).rom().region(MAINCPU_TAG, 0x4000).nopw();
+	// the SAM installs this map at $C000, so it can't use a view
+	map(0x0000, 0x3eff).lrw8(
+			NAME([this] (offs_t offset) -> uint8_t { return m_rom_select ? m_rom[0x4000 + offset] : m_cococart->cts_read(offset); }),
+			NAME([this] (offs_t offset, uint8_t data)
+			{
+				if (!m_rom_select)
+					m_cococart->cts_write(offset, data);
+			}));
 }
 
 void coco12_state::coco_io0(address_map &map)
@@ -478,10 +477,13 @@ void coco_state::coco_sound(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 
 	// 6-bit D/A: R10-15 = 10K, 20K, 40.2K, 80.6K, 162K, 324K (according to parts list); output also controls joysticks
-	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).add_route(ALL_OUTPUTS, m_mux, 0.125, mc14529_device::y_sound_input(0));
+	// Use a unipolar output so DAC code zero matches the disabled sound path.
+	// Doubling the route gain preserves the peak-to-peak amplitude.
+	DAC_6BIT_BINARY_WEIGHTED(config, m_dac, 0).set_output_range(0, 1).add_route(ALL_OUTPUTS, m_mux, 0.25, mc14529_device::y_sound_input(0));
 
-	// Single-bit sound: R22 = 10K
-	DAC_1BIT(config, "sbs", 0).set_output_range(-1, 1).add_route(ALL_OUTPUTS, "speaker", 0.125);
+	// Single-bit sound: R22 = 10K.  Keep the low state at zero to avoid a
+	// startup DC step; the route gain preserves the peak-to-peak amplitude.
+	DAC_1BIT(config, "sbs", 0).add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 
@@ -565,7 +567,7 @@ void coco12_state::coco(machine_config &config)
 	m_pia_1->irqb_handler().set(m_firqs, FUNC(input_merger_device::in_w<1>));
 
 	SAM6883(config, m_sam, XTAL(14'318'181), m_maincpu);
-	m_sam->set_addrmap(0, &coco12_state::coco_ram);
+	m_sam->set_ram(m_ram);
 	m_sam->set_addrmap(1, &coco12_state::coco_rom0);
 	m_sam->set_addrmap(2, &coco12_state::coco_rom1);
 	m_sam->set_addrmap(3, &coco12_state::coco_rom2);
@@ -605,10 +607,16 @@ void coco12_state::coco(machine_config &config)
 	m_screen->set_screen_update(m_vdg, FUNC(mc6847_base_device::screen_update));
 
 	MC6847(config, m_vdg, XTAL(14'318'181) / 4); // VClk output from MC6883
+	// Hardware captures show two extra DA0 transitions on a CoCo 1 with a
+	// '783 SAM, but not on a CoCo 2B with a 6847T1 and '785 SAM.  A PAL
+	// CoCo report agrees with the CoCo 1; Dragon reports do not show it.
+	// TODO: The cause and exact timing remain uncertain: VDG, SAM or board.
+	m_vdg->set_field_sync_extra_transitions(true);
 	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(coco12_state::field_sync));
 	m_vdg->input_callback().set(FUNC(coco12_state::sam_read));
+	m_sam->video_flush_callback().set(FUNC(coco12_state::vdg_flush));
 
 	// internal ram
 	RAM(config, m_ram).set_default_size("64K").set_extra_options("4K,16K,32K");
@@ -632,9 +640,37 @@ void coco12_state::coco(machine_config &config)
 	COCO_VHD(config, m_vhd_1, m_maincpu);
 }
 
-void coco12_state::cocoh(machine_config &config)
+// On the discrete CoCo 1 circuit, PB1 drives the sound common through
+// R22 (10 kohm). With cassette sound selected, the MC14529 conducts back
+// into CIN and switches the inverting cassette comparator. SALT isolates
+// these signals on the CoCo 2/3. Model the logic levels here; the resistor
+// network's loading of an external cassette signal is not simulated.
+uint8_t coco12_state::coco1_pia1_pa_r()
+{
+	if (m_mux->channel_connected(mc14529_device::SEL_Y, 1))
+		return 0xfe | !BIT(m_pia_1->b_output(), 1);
+
+	return pia1_pa_r();
+}
+
+void coco12_state::coco1(machine_config &config)
 {
 	coco(config);
+	m_pia_1->readpa_handler().set(FUNC(coco12_state::coco1_pia1_pa_r));
+}
+
+void coco12_state::coco2(machine_config &config)
+{
+	coco(config);
+	m_ram->set_default_size("64K").set_extra_options("16K");
+
+	// The CoCo 1's extra DA0 transitions offset DMA-mode video on the CoCo 2.
+	m_vdg->set_field_sync_extra_transitions(false);
+}
+
+void coco12_state::cocoh(machine_config &config)
+{
+	coco1(config);
 
 	HD6309E(config.replace(), m_maincpu, DERIVED_CLOCK(1, 1));
 	m_maincpu->set_addrmap(AS_PROGRAM, &coco12_state::coco_mem);
@@ -677,8 +713,10 @@ void deluxecoco_state::deluxecoco(machine_config &config)
 void coco12_state::coco2b(machine_config &config)
 {
 	coco(config);
+	m_ram->set_default_size("64K").set_extra_options("16K");
 
 	MC6847T1(config.replace(), m_vdg, XTAL(14'318'181) / 4);
+	m_vdg->set_field_sync_extra_transitions(false);
 	m_vdg->set_screen(m_screen);
 	m_vdg->hsync_wr_callback().set(FUNC(coco12_state::horizontal_sync));
 	m_vdg->fsync_wr_callback().set(FUNC(coco12_state::field_sync));
@@ -762,6 +800,9 @@ ROM_START(deluxecoco)
 	ROM_LOAD("adv073-2_u24.rom", 0x6000, 0x2000, CRC(61411227) SHA1(c3aba0eb359f7f40d40d7947f72c9ecae6e0525d))
 ROM_END
 
+// The original CoCo 2 supports the same BASIC ROM revisions as the CoCo 1.
+#define rom_coco2 rom_coco
+
 ROM_START(coco2b)
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
 	ROM_LOAD("bas13.rom",    0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
@@ -822,8 +863,9 @@ ROM_END
 //**************************************************************************
 
 //    YEAR   NAME        PARENT  COMPAT  MACHINE     INPUT       CLASS             INIT        COMPANY                         FULLNAME                               FLAGS
-COMP( 1980,  coco,       0,      0,      coco,       coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2",                  MACHINE_SUPPORTS_SAVE )
-COMP( 19??,  cocoh,      coco,   0,      cocoh,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1/2 (HD6309)",         MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1980,  coco,       0,      0,      coco1,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1",                    MACHINE_SUPPORTS_SAVE )
+COMP( 19??,  cocoh,      coco,   0,      cocoh,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 1 (HD6309)",           MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )
+COMP( 1983,  coco2,      coco,   0,      coco2,      coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2",                    MACHINE_SUPPORTS_SAVE )
 COMP( 1983,  deluxecoco, coco,   0,      deluxecoco, deluxecoco, deluxecoco_state, empty_init, "Tandy Radio Shack",            "Deluxe Color Computer",               MACHINE_SUPPORTS_SAVE )
 COMP( 1985?, coco2b,     coco,   0,      coco2b,     coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B",                   MACHINE_SUPPORTS_SAVE )
 COMP( 19??,  coco2bh,    coco,   0,      coco2bh,    coco,       coco12_state,     empty_init, "Tandy Radio Shack",            "Color Computer 2B (HD6309)",          MACHINE_SUPPORTS_SAVE | MACHINE_UNOFFICIAL )

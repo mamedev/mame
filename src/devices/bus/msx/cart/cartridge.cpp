@@ -41,8 +41,8 @@
 #include "softcard.h"
 #include "super_swangi.h"
 #include "superloderunner.h"
-#include "yamaha_ucn01.h"
 #include "video80.h"
+#include "yamaha_ucn01.h"
 
 #include "bus/msx/slot/cartridge.h"
 

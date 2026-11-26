@@ -343,7 +343,7 @@ uint32_t v60_device::v60_update_psw_for_exception(int is_interrupt, int target_l
 }
 
 
-#define GETINTVECT(nint)                    m_program->read_dword((SBR & ~0xfff) + (nint) * 4)
+#define GETINTVECT(nint) m_program->read_dword((SBR & ~0xfff) + (nint) * 4)
 #define EXCEPTION_CODE_AND_SIZE(code, size) (((code) << 16) | (size))
 
 
@@ -561,9 +561,9 @@ void v60_device::stall()
 }
 
 
-void v60_device::v60_do_irq(int vector)
+void v60_device::v60_do_irq(int line, int vector)
 {
-	standard_irq_callback(vector, PC);
+	standard_irq_callback(line, PC);
 	uint32_t oldPSW = v60_update_psw_for_exception(1, 0);
 
 	// Push PC and PSW onto the stack
@@ -587,7 +587,7 @@ void v60_device::v60_try_irq()
 
 		vector = m_irq_cycle();
 
-		v60_do_irq(vector + 0x40);
+		v60_do_irq(0, vector + 0x40);
 	}
 }
 
@@ -598,7 +598,7 @@ void v60_device::execute_set_input(int irqline, int state)
 		case ASSERT_LINE:
 			if(m_nmi_line == CLEAR_LINE) {
 				m_nmi_line = ASSERT_LINE;
-				v60_do_irq(2);
+				v60_do_irq(INPUT_LINE_NMI, 2);
 			}
 			break;
 		case CLEAR_LINE:

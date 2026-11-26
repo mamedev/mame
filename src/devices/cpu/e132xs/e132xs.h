@@ -440,7 +440,6 @@ private:
 #endif
 
 	hyperstone_disassembler m_disassembler;
-	drc_cache m_cache;
 	std::unique_ptr<drcuml_state> m_drcuml;
 	std::unique_ptr<frontend> m_drcfe;
 	uint32_t m_drcoptions;
