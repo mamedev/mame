@@ -12,7 +12,6 @@ public:
 
 	// configurations
 	template <typename T> void set_host_space(T &&tag, int index) { m_host_space.set_tag(std::forward<T>(tag), index); }
-	auto restore_space_callback() { return m_restore_space_cb.bind(); }
 
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -89,7 +88,7 @@ private:
 
 	required_address_space m_host_space;
 
-	devcb_write32 m_restore_space_cb;
+	memory_passthrough_handler m_prot_tap;
 };
 
 DECLARE_DEVICE_TYPE(IGS011, igs011_device)

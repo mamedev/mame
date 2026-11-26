@@ -11,12 +11,19 @@ class igs012_device : public device_t
 public:
 	igs012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
-	void prot_reset_w(u16 data);
+	// ROM overlay: the host supplies the ROM and the RAM pages, and maps overlay_r over the ROM while the overlay is active
+	auto rom_read_callback() { return m_rom_read_cb.bind(); }
+	auto ram_read_callback() { return m_ram_read_cb.bind(); }
+	auto overlay_callback() { return m_overlay_cb.bind(); }
+
+	void regs_w(offs_t offset, u8 data);
+	u16 overlay_r(offs_t offset);
 
 	void map(address_map &map) ATTR_COLD;
 
 protected:
 	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
 
 private:
 	void prot_mode_w(offs_t offset, u8 data);
@@ -27,9 +34,16 @@ private:
 	void prot_swap_w(offs_t offset, u8 data);
 	u16 prot_r();
 
+	devcb_read16 m_rom_read_cb;
+	devcb_read16 m_ram_read_cb;
+	devcb_write_line m_overlay_cb;
+
 	u8 m_prot = 0;
 	u8 m_prot_swap = 0;
 	u8 m_prot_mode = 0;
+
+	u8 m_overlay_page[8];
+	u8 m_overlay_enable;
 };
 
 

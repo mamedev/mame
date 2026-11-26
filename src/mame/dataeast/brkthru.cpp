@@ -1104,7 +1104,7 @@ ROM_END
 
 ROM_START( darwin ) // Japan release
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "darwin4078_df01-.e2",  0x04000, 0x4000, CRC(0eabf21c) SHA1(ccad6b30fe9361e8a21b8aaf8116aa85f9e6bb19) ) // labeled as  DARWIN4078   DF02-
+	ROM_LOAD( "darwin4078_df01-.e2",  0x04000, 0x4000, CRC(0eabf21c) SHA1(ccad6b30fe9361e8a21b8aaf8116aa85f9e6bb19) ) // labeled as  DARWIN4078   DF01-
 	ROM_LOAD( "darwin4078_df02-.e3",  0x08000, 0x8000, CRC(e771f864) SHA1(8ba9f97c6abf035ceaf9f5505495708506f1b0c5) )
 	ROM_LOAD( "darwin4078_df04-.e5",  0x10000, 0x8000, CRC(97ac052c) SHA1(8baa117472d46b99e5946f095b869de9b5c48f9a) )
 	ROM_LOAD( "darwin4078_df03-.e4",  0x18000, 0x8000, CRC(2a9fb208) SHA1(f04a5502600e49e2494a87ec65a44a2843441d37) )
