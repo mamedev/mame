@@ -463,7 +463,8 @@ void i8251_device::transmit_clock()
 	// follow: none waits in the buffer, or one was written while the
 	// transmitter was disabled (data sheet: tTxEMPTY is at least 20 CLK
 	// periods from that centre; the async transmitter timing figure draws
-	// the rise there, also with a character written while CTS is off).
+	// the rise before the stop bits, also with a character written while
+	// CTS is off).
 	// The 20 CLK delay isn't modelled: it rises at the centre itself, or
 	// at x1, where the centre isn't a clock edge, at the next one.
 	if (m_sync_byte_count == 0 && !is_transmit_register_empty() && is_transmit_register_in_stop_bits() &&
