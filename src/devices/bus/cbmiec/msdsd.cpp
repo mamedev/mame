@@ -648,20 +648,6 @@ void msd_sd_iec_device_base::iec_w(int clk, int data)
 //  IEEE-488 bus
 //-------------------------------------------------
 
-void msd_sd_ieee488_device_base::device_config_complete()
-{
-	if (input_ports_defaults())
-		return;
-
-	ieee488_slot_device *const slot = dynamic_cast<ieee488_slot_device *>(owner());
-	if (slot && slot->get_address() >= 8)
-	{
-		m_address_default[0] = { "ADDRESS", 0x03, ioport_value((slot->get_address() - 8) & 0x03) };
-		m_address_default[1] = { nullptr, 0, 0 };
-		set_input_default(m_address_default);
-	}
-}
-
 u8 msd_sd_ieee488_device_base::ieee_dio_r() { return m_bus->dio_r(); }
 int msd_sd_ieee488_device_base::ieee_dav_r() { return m_bus->dav_r(); }
 int msd_sd_ieee488_device_base::ieee_eoi_r() { return m_bus->eoi_r(); }

@@ -130,7 +130,7 @@ protected:
 	virtual void ieee488_atn(int state) override;
 	virtual void ieee488_ifc(int state) override;
 
-	virtual void device_config_complete() override ATTR_COLD;
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(8, 0x03); }
 
 	virtual u8 ieee_dio_r() override;
 	virtual int ieee_dav_r() override;
@@ -138,9 +138,6 @@ protected:
 	virtual int ieee_nrfd_r() override;
 	virtual int ieee_ndac_r() override;
 	virtual void ieee_w(u8 dio, int dav, int eoi, int nrfd, int ndac) override;
-
-private:
-	input_device_default m_address_default[2];
 };
 
 

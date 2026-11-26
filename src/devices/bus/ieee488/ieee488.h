@@ -219,7 +219,7 @@ public:
 	}
 
 	void set_address(int address) { m_address = address; }
-	int get_address() { return m_address; }
+	int get_address() const { return m_address; }
 
 	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
@@ -255,11 +255,16 @@ public:
 protected:
 	device_ieee488_interface(const machine_config &mconfig, device_t &device);
 
+	int configured_address() const ATTR_COLD;
+	void set_switch_default(const char *tag, ioport_value mask, ioport_value value) ATTR_COLD;
+	void set_address_default(int base, ioport_value mask) ATTR_COLD;
+
 	ieee488_device *m_bus;
 	ieee488_slot_device *m_slot;
 
 private:
 	device_ieee488_interface *m_next;
+	input_device_default m_switch_default[2];
 };
 
 #endif // MAME_BUS_IEEE488_IEEE488_H
