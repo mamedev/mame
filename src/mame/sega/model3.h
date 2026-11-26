@@ -228,8 +228,6 @@ private:
 	tilemap_t *m_layer4[4]{};
 	tilemap_t *m_layer8[4]{};
 
-	int m_sound_irq_enable = 0;
-	emu_timer *m_sound_timer = nullptr;
 	emu_timer *m_scan_timer = nullptr;
 	uint8_t m_irq_enable = 0;
 	uint8_t m_irq_state = 0;
@@ -318,7 +316,6 @@ private:
 	void model3_rtc_w(offs_t offset, uint64_t data, uint64_t mem_mask = ~0);
 	uint32_t real3d_status_r(offs_t offset);
 	uint32_t real3d_dma_status_r();
-	void model3_sound_w(offs_t offset, uint8_t data);
 
 	void daytona2_rombank_w(u8 bank);
 	void sound_control_w(uint8_t data);
@@ -336,13 +333,13 @@ private:
 	DECLARE_MACHINE_RESET(model3_15);
 	DECLARE_MACHINE_RESET(model3_20);
 	DECLARE_MACHINE_RESET(model3_21);
-	TIMER_CALLBACK_MEMBER(model3_sound_timer_tick);
 	TIMER_CALLBACK_MEMBER(scan_timer_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
 	void model3_exit();
 	void scsp_irq(offs_t offset, uint8_t data);
 	void update_irq_state();
 	void set_irq_line(uint8_t bit, int line);
+	void sound_ready_w(int state);
 	void model3_init(int step);
 	// video
 	uint32_t screen_update_model3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
