@@ -61,6 +61,124 @@ E I1     Vectored interrupt error
 #include "formats/m20_dsk.h"
 
 
+
+// Logical colour-upgrade slot: U57 module MI204, colour RAM and motherboard jumpers.
+// Keep the original -ram storage, monochrome mappings and APB access.
+class m20_colour_upgrade_interface : public device_interface
+{
+public:
+    virtual unsigned colours() const = 0;
+    virtual void palette_w(offs_t offset, u8 data) = 0;
+    virtual rgb_t pixel(bool green, bool blue, bool red) const = 0;
+
+protected:
+    m20_colour_upgrade_interface(const machine_config &, device_t &device)
+        : device_interface(device, "m20colour") { }
+};
+
+class m20_colour_upgrade_device : public device_t, public m20_colour_upgrade_interface
+{
+public:
+    unsigned colours() const override { return m_colours; }
+
+    void palette_w(offs_t offset, u8 data) override
+    {
+        // U88 is a motherboard 74LS670, not part of the U57 module.
+        // Preserve VTin (bit 3); its BRIGHT/monitor effect is unverified.
+        if (m_colours == 4 && offset < 4)
+            m_colour_palette[offset] = data & 0x0f;
+    }
+
+    rgb_t pixel(bool green, bool blue, bool red) const override
+    {
+        // Video planes are green (motherboard), blue and optionally red (RAM).
+        // PCOS G/B/R codes differ from the palette register's R/G/B order.
+        u8 const colour = (m_colours == 4)
+            ? bitswap<3>(m_colour_palette[(unsigned(green) << 1) | unsigned(blue)], 0, 2, 1)
+            : (unsigned(red) << 2) | (unsigned(blue) << 1) | unsigned(green);
+        return rgb_t(BIT(colour, 2) * 255, BIT(colour, 0) * 255, BIT(colour, 1) * 255);
+    }
+
+protected:
+    m20_colour_upgrade_device(const machine_config &mconfig, device_type type,
+        const char *tag, device_t *owner, u32 clock, unsigned colours)
+        : device_t(mconfig, type, tag, owner, clock),
+          m20_colour_upgrade_interface(mconfig, *this), m_colours(colours) { }
+
+    void device_start() override ATTR_COLD
+    {
+        save_item(NAME(m_colour_palette));
+    }
+
+private:
+    const unsigned m_colours;
+    u8 m_colour_palette[4] = {};
+};
+
+class m20_colour_4c_device : public m20_colour_upgrade_device
+{
+public:
+    m20_colour_4c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+class m20_colour_8c_device : public m20_colour_upgrade_device
+{
+public:
+    m20_colour_8c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
+DECLARE_DEVICE_TYPE(M20_COLOUR_4C, m20_colour_4c_device)
+DECLARE_DEVICE_TYPE(M20_COLOUR_8C, m20_colour_8c_device)
+
+DEFINE_DEVICE_TYPE(M20_COLOUR_4C, m20_colour_4c_device,
+    "m20colour4c", "Olivetti M20 colour upgrade (4 colours)")
+DEFINE_DEVICE_TYPE(M20_COLOUR_8C, m20_colour_8c_device,
+    "m20colour8c", "Olivetti M20 colour upgrade (8 colours)")
+
+m20_colour_4c_device::m20_colour_4c_device(const machine_config &mconfig,
+    const char *tag, device_t *owner, u32 clock)
+    : m20_colour_upgrade_device(mconfig, M20_COLOUR_4C, tag, owner, clock, 4) { }
+
+m20_colour_8c_device::m20_colour_8c_device(const machine_config &mconfig,
+    const char *tag, device_t *owner, u32 clock)
+    : m20_colour_upgrade_device(mconfig, M20_COLOUR_8C, tag, owner, clock, 8) { }
+
+class m20_colour_slot_device : public device_t,
+    public device_single_card_slot_interface<m20_colour_upgrade_interface>
+{
+public:
+    template <typename T>
+    m20_colour_slot_device(const machine_config &mconfig, const char *tag,
+        device_t *owner, u32 clock, T &&opts, const char *dflt)
+        : m20_colour_slot_device(mconfig, tag, owner, clock)
+    {
+        set_options(std::forward<T>(opts), dflt, false);
+    }
+
+    m20_colour_slot_device(const machine_config &mconfig,
+        const char *tag, device_t *owner, u32 clock);
+
+    m20_colour_upgrade_interface *card() const { return get_card_device(); }
+
+protected:
+    void device_start() override ATTR_COLD { }
+};
+
+DECLARE_DEVICE_TYPE(M20_COLOUR_SLOT, m20_colour_slot_device)
+DEFINE_DEVICE_TYPE(M20_COLOUR_SLOT, m20_colour_slot_device,
+    "m20colourslot", "Olivetti M20 colour-system upgrade (logical slot)")
+
+m20_colour_slot_device::m20_colour_slot_device(const machine_config &mconfig,
+    const char *tag, device_t *owner, u32 clock)
+    : device_t(mconfig, M20_COLOUR_SLOT, tag, owner, clock),
+      device_single_card_slot_interface<m20_colour_upgrade_interface>(mconfig, *this) { }
+
+static void m20_colour_options(device_slot_interface &device)
+{
+    device.option_add("4c", M20_COLOUR_4C);
+    device.option_add("8c", M20_COLOUR_8C);
+}
+
 namespace {
 
 class m20_state : public driver_device
@@ -79,7 +197,8 @@ public:
 		m_floppy1(*this, "fd1797:1:5dd"),
 		m_apb(*this, "apb"),
 		m_hdc(*this, "hdc"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_colour_slot(*this, "m20colour")
 	{
 	}
 
@@ -99,6 +218,8 @@ private:
 	optional_device<wd1000_device> m_hdc;
 
 	required_device<palette_device> m_palette;
+	required_device<m20_colour_slot_device> m_colour_slot;
+	m20_colour_upgrade_interface *m_colour_upgrade = nullptr;
 
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
@@ -107,6 +228,7 @@ private:
 	void i8259_w(offs_t offset, uint16_t data);
 	uint16_t port21_r();
 	void port21_w(uint16_t data);
+	void color_palette_w(offs_t offset, uint8_t data);
 	void tty_clock_tick_w(int state);
 	void kbd_clock_tick_w(int state);
 	void timer_tick_w(int state);
@@ -119,7 +241,11 @@ private:
 
 	offs_t m_memsize = 0;
 	uint8_t m_port21 = 0;
+	enum : uint8_t { MONOCHROME, EIGHT_COLOR, FOUR_COLOR };
+	uint8_t m_display = MONOCHROME;
 	void install_memory();
+	void install_color_memory();
+	void remap_memory();
 
 	static void floppy_formats(format_registration &fr);
 	uint16_t segment_r();
@@ -140,6 +266,28 @@ MC6845_UPDATE_ROW( m20_state::update_row )
 	uint16_t *vram = (uint16_t *)m_ram->pointer();
 	uint16_t offset = ((ma | (ra << 1)) << 4);
 
+	if (m_display != MONOCHROME)
+	{
+		// Extra planes occupy the first 16K of DRAM1 (and DRAM2 for eight colours).
+		// PCOS colour codes use bit 0 for green, bit 1 for blue and bit 2 for red.
+		uint32_t const plane1 = 0x20000 / 2;
+		uint32_t const plane2 = (0x20000 + ((m_memsize < 0x40000) ? 0x8000 : 0x20000)) / 2;
+		for (int i = 0; i < x_count; i++)
+		{
+			uint16_t const address = (offset + i) & 0x1fff;
+			uint16_t const green = vram[address];
+			uint16_t const blue = vram[plane1 + address];
+			uint16_t const red = (m_display == EIGHT_COLOR) ? vram[plane2 + address] : 0;
+			for (int j = 15; j >= 0; j--)
+			{
+				// The register file's read address has the motherboard plane on bit 1.
+				// Its RGB data bits are ordered R,G,B, unlike PCOS's G,B,R colour codes.
+				*p++ = de ? m_colour_upgrade->pixel(BIT(green, j), BIT(blue, j), BIT(red, j)) : rgb_t::black();
+			}
+		}
+		return;
+	}
+
 	for ( int i = 0; i < x_count; i++ )
 	{
 		uint16_t data = vram[ offset + i ];
@@ -150,6 +298,13 @@ MC6845_UPDATE_ROW( m20_state::update_row )
 			p++;
 		}
 	}
+}
+
+void m20_state::color_palette_w(offs_t offset, uint8_t data)
+{
+	// U88 palette writes: four registers at odd ports 0x181..0x187.
+	if (m_colour_upgrade)
+		m_colour_upgrade->palette_w(offset, data);
 }
 
 /*
@@ -165,14 +320,15 @@ port21      =   0x21        !TTL latch
 !   B3  0 selects double density    0 => Skip basic tests
 !       1 selects single density    1 => Perform basic tests
 !                                   Latched copy when B7 is written to Port21
-!   B4  Uncommitted output          0 => 128K card(s) present
-!                                   1 => 32K card(s) present
-!                                   Cannot mix types!
-!   B5  Uncommitted output          0 => 8-colour card present
-!                                   1 => 4-colour card present
-!   B6  Uncommitted output          0 => RAM
-!                                   1 => ROM (???)
+!   B4  Uncommitted output          Configuration jumper
+!   B5  Uncommitted output          Mapping PROM configuration (see below)
+!   B6  Uncommitted output          Mapping PROM configuration (see below)
 !   B7  See B3 input                0 => colour card present
+
+The BIOS 2.0 memory-test tables decode input bits 7..5 as:
+000: 8 colours, 128K boards; 001: 4 colours, 128K boards;
+010: 8 colours, 32K boards;  011: 4 colours, 32K boards;
+101: no expansion; 110: monochrome, 128K boards; 111: monochrome, 32K boards.
 */
 
 uint16_t m20_state::port21_r()
@@ -349,6 +505,12 @@ void m20_state::install_memory()
 	uint8_t *memptr = m_ram->pointer();
 	address_space& pspace = m_maincpu->space(AS_PROGRAM);
 	address_space& dspace = m_maincpu->space(AS_DATA);
+
+	if (m_display != MONOCHROME)
+	{
+		install_color_memory();
+		return;
+	}
 
 	/* install mainboard memory (aka DRAM0) */
 
@@ -665,6 +827,124 @@ void m20_state::install_memory()
 	}
 }
 
+void m20_state::remap_memory()
+{
+	for (int const space : { AS_PROGRAM, AS_DATA })
+	{
+		address_space &memory = m_maincpu->space(space);
+		memory.unmap_readwrite(0x00000, 0xfffff);
+		memory.install_rom(0x40000, 0x41fff, memregion("maincpu")->base());
+	}
+	install_memory();
+}
+
+void m20_state::install_color_memory()
+{
+	// Colour maps from Dwight Elvey's mapping-PROM tables:
+	// https://www.z80ne.com/m20/index.php?argument=sections/hack/ramtable/ramtable.inc
+	// Each pair is { instruction, data } for a 16K logical block.  The value
+	// encodes DRAM board * 8 + 16K block within the board; -1 means no RAM.
+	static constexpr int8_t ram_map[4][64][2] =
+	{
+		{ // 32K expansion boards; four pairs per segment
+			{  1,  1 }, {  2, 16 }, {  3, 17 }, {  4, 24 }, // 0
+			{  2,  5 }, {  3,  6 }, {  4,  7 }, { -1,  9 }, // 1
+			{  5,  5 }, {  6,  6 }, {  7,  7 }, {  9,  9 }, // 2
+			{  0,  0 }, {  8,  8 }, { 16, 16 }, { 24, 24 }, // 3
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // 4
+			{ -1,  2 }, { -1,  3 }, { -1,  4 }, { -1, -1 }, // 5
+			{  2,  2 }, {  3,  3 }, {  4,  4 }, { -1, -1 }, // 6
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { 25, 25 }, // 7
+			{  2,  6 }, {  3,  7 }, { 17, 25 }, { 24, -1 }, // 8
+			{  6,  6 }, {  7,  7 }, { 25, 25 }, { -1, -1 }, // 9
+			{  2,  2 }, {  3,  3 }, { 17, 17 }, { 24, 24 }, // A
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // B
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // C
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // D
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // E
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // F
+		},
+		{ // 128K expansion boards
+			{  1,  1 }, {  2, 16 }, {  3, 17 }, {  4, 24 }, // 0
+			{  2,  5 }, {  3,  6 }, {  4,  7 }, { -1,  9 }, // 1
+			{  5,  5 }, {  6,  6 }, {  7,  7 }, {  9,  9 }, // 2
+			{  0,  0 }, {  8,  8 }, { 16, 16 }, { 24, 24 }, // 3
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // 4
+			{ -1,  2 }, { -1,  3 }, { -1,  4 }, { -1, -1 }, // 5
+			{  2,  2 }, {  3,  3 }, {  4,  4 }, { -1, -1 }, // 6
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { 25, 25 }, // 7
+			{  2,  6 }, {  3,  7 }, { 10, 12 }, { 11, 13 }, // 8
+			{  6,  6 }, {  7,  7 }, { 12, 12 }, { 13, 13 }, // 9
+			{  2,  2 }, {  3,  3 }, { 10, 10 }, { 11, 11 }, // A
+			{ 14, 14 }, { 15, 15 }, { 17, 17 }, { 18, 18 }, // B
+			{ 19, 19 }, { 20, 20 }, { 21, 21 }, { 22, 22 }, // C
+			{ 23, 23 }, { 24, 24 }, { 25, 25 }, { 26, 26 }, // D
+			{ 27, 27 }, { 28, 28 }, { 29, 29 }, { 30, 30 }, // E
+			{ 31, 31 }, { 24, 24 }, { 25, 25 }, { 26, 26 }, // F
+		},
+		{ // Four colours, 32K expansion boards
+			{  1,  1 }, {  2, 16 }, {  3, 17 }, {  4, 24 }, // 0
+			{  2,  5 }, {  3,  6 }, {  4,  7 }, { -1,  9 }, // 1
+			{  5,  5 }, {  6,  6 }, {  7,  7 }, {  9,  9 }, // 2
+			{  0,  0 }, {  8,  8 }, { -1, -1 }, { -1, -1 }, // 3
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // 4
+			{ -1,  2 }, { -1,  3 }, { -1,  4 }, { -1, -1 }, // 5
+			{  2,  2 }, {  3,  3 }, {  4,  4 }, { -1, -1 }, // 6
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // 7
+			{  2,  6 }, {  3,  7 }, { 16, 24 }, { 17, 25 }, // 8
+			{  6,  6 }, {  7,  7 }, { 24, 24 }, { 25, 25 }, // 9
+			{  2,  2 }, {  3,  3 }, { 16, 16 }, { 17, 17 }, // A
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // B
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // C
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // D
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // E
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // F
+		},
+		{ // Four colours, 128K expansion boards
+			{  1,  1 }, {  2, 16 }, {  3, 17 }, {  4, 24 }, // 0
+			{  2,  5 }, {  3,  6 }, {  4,  7 }, { -1,  9 }, // 1
+			{  5,  5 }, {  6,  6 }, {  7,  7 }, {  9,  9 }, // 2
+			{  0,  0 }, {  8,  8 }, { -1, -1 }, { -1, -1 }, // 3
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, -1 }, // 4
+			{ -1,  2 }, { -1,  3 }, { -1,  4 }, { -1, -1 }, // 5
+			{  2,  2 }, {  3,  3 }, {  4,  4 }, { -1, -1 }, // 6
+			{ -1, -1 }, { -1, -1 }, { -1, -1 }, { -1, 25 }, // 7
+			{  2,  6 }, {  3,  7 }, { 10, 12 }, { 11, 13 }, // 8
+			{  6,  6 }, {  7,  7 }, { 12, 12 }, { 13, 13 }, // 9
+			{  2,  2 }, {  3,  3 }, { 10, 10 }, { 11, 11 }, // A
+			{ 14, 14 }, { 15, 15 }, { 16, 16 }, { 17, 17 }, // B
+			{ 18, 18 }, { 19, 19 }, { 20, 20 }, { 21, 21 }, // C
+			{ 22, 22 }, { 23, 23 }, { 24, 24 }, { 25, 25 }, // D
+			{ 26, 26 }, { 27, 27 }, { 28, 28 }, { 29, 29 }, // E
+			{ 30, 30 }, { 31, 31 }, { 24, 24 }, { 25, 25 }, // F
+		}
+	};
+
+	bool const large = m_memsize >= 0x40000;
+	uint32_t const board_size = large ? 0x20000 : 0x8000;
+	if (m_display == FOUR_COLOR && m_memsize < 0x20000 + board_size)
+		throw emu_fatalerror("M20 four-colour video requires at least one expansion board (160K, 192K, 224K, 256K, 384K or 512K RAM)");
+	if (m_display == EIGHT_COLOR && m_memsize < 0x20000 + 2 * board_size)
+		throw emu_fatalerror("M20 eight-colour video requires two expansion boards (192K, 224K, 384K or 512K RAM)");
+	unsigned const map = ((m_display == FOUR_COLOR) ? 2 : 0) + large;
+
+	for (unsigned space = 0; space < 2; space++)
+	{
+		address_space &memory = m_maincpu->space(space ? AS_DATA : AS_PROGRAM);
+		for (unsigned block = 0; block < 64; block++)
+		{
+			int const entry = ram_map[map][block][space];
+			if (entry < 0)
+				continue;
+			unsigned const board = entry / 8;
+			uint32_t const physical = (board ? 0x20000 + (board - 1) * board_size : 0) + (entry % 8) * 0x4000;
+			if (physical + 0x4000 <= m_memsize)
+				memory.install_ram(block * 0x4000, block * 0x4000 + 0x3fff, m_ram->pointer() + physical);
+		}
+		memory.install_rom(0x70000, 0x71fff, memregion("maincpu")->base());
+	}
+}
+
 void m20_state::m20_io(address_map &map)
 {
 	map.unmap_value_high();
@@ -725,6 +1005,9 @@ void m20_state::int_w(int state)
 
 void m20_state::machine_start()
 {
+	// Installed colour hardware is fixed at machine configuration time.
+	m_colour_upgrade = m_colour_slot->card();
+	m_display = m_colour_upgrade ? ((m_colour_upgrade->colours() == 4) ? FOUR_COLOR : EIGHT_COLOR) : MONOCHROME;
 	install_memory();
 
 	// Only install WD1000 HD controller I/O if a hard disk image is mounted
@@ -740,6 +1023,12 @@ void m20_state::machine_start()
 
 	save_item(NAME(m_memsize));
 	save_item(NAME(m_port21));
+	save_item(NAME(m_display));  // Palette state is saved by the slot device.
+	if (m_display != MONOCHROME)
+	{
+		m_maincpu->space(AS_IO).install_write_handler(0x180, 0x187, write8sm_delegate(*this, FUNC(m20_state::color_palette_w)), 0x00ff);
+		machine().save().register_postload(save_prepost_delegate(FUNC(m20_state::remap_memory), this));
+	}
 }
 
 void m20_state::machine_reset()
@@ -747,7 +1036,9 @@ void m20_state::machine_reset()
 	uint8_t *ROM = memregion("maincpu")->base();
 	uint8_t *RAM = (uint8_t *)(m_ram->pointer() + 0x4000);
 
-	if (m_memsize >= 256 * 1024)
+	if (m_display != MONOCHROME)
+		m_port21 = ((m_memsize >= 256 * 1024) ? 0x1f : 0x5f) | ((m_display == FOUR_COLOR) ? 0x20 : 0);
+	else if (m_memsize >= 256 * 1024)
 		m_port21 = 0xdf;
 	else
 		m_port21 = 0xff;
@@ -793,6 +1084,9 @@ void m20_state::m20(machine_config &config)
 	m_maincpu->nviack().set(FUNC(m20_state::nviack_r));
 
 	RAM(config, RAM_TAG).set_default_size("160K").set_default_value(0).set_extra_options("128K,192K,224K,256K,384K,512K");
+
+	// 4c/8c options represent complete upgrades, not separate U57 boards.
+	M20_COLOUR_SLOT(config, "m20colour", 0, m20_colour_options, nullptr);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen"));
