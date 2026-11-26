@@ -605,9 +605,7 @@ void ti99_8_state::console_reset(int state)
 		m_mainboard->crus_in(true); // assert
 		m_mainboard->ptgen_in(true); // clear
 
-		// Setting ready to false so that automatic wait states are enabled
-		m_cpu->ready_line(CLEAR_LINE);
-		m_cpu->reset_line(ASSERT_LINE);
+		m_cpu->reset_line(state);
 
 		// Send RESET to the IOPort
 		m_ioport->reset_in(state);
@@ -664,10 +662,6 @@ void ti99_8_state::machine_reset()
 {
 	m_cpu->hold_line(CLEAR_LINE);
 
-	// Pulling down the line on RESET configures the CPU to insert one wait
-	// state on external memory accesses
-	//  m_cpu->ready_line(ASSERT_LINE);
-
 	// m_gromport->set_grom_base(0x9800, 0xfff1);
 
 	m_keyboard_column = 0;
@@ -686,6 +680,7 @@ void ti99_8_state::ti99_8(machine_config& config)
 	// TMS9995-MP9537 CPU @ 10.7 MHz
 	// MP9537 mask: This variant of the TMS9995 does not contain on-chip RAM
 	TMS9995_MP9537(config, m_cpu, XTAL(10'738'635));
+	m_cpu->set_auto_wait_on_reset(true);
 	m_cpu->set_addrmap(AS_PROGRAM, &ti99_8_state::memmap);
 	m_cpu->set_addrmap(AS_IO, &ti99_8_state::crumap);
 	m_cpu->set_addrmap(tms9995_device::AS_SETADDRESS, &ti99_8_state::memmap_setaddress);

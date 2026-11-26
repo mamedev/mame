@@ -14,6 +14,8 @@
 
 #include "tms99com.h"
 
+#include <optional>
+
 // device type definition
 DECLARE_DEVICE_TYPE(TMS9995, tms9995_device)
 DECLARE_DEVICE_TYPE(TMS9995_MP9537, tms9995_mp9537_device)
@@ -43,8 +45,7 @@ public:
 	// is acknowledged by the HOLDA output line.
 	void hold_line(int state);
 
-	// RESET input line. Unlike the standard set_input_line, this input method
-	// is synchronous and will immediately lead to a reset of the CPU.
+	// Active-low /RESET: ASSERT_LINE holds reset; CLEAR_LINE latches the wait mode.
 	void reset_line(int state);
 
 	// Callbacks
@@ -58,12 +59,20 @@ public:
 	bool is_onchip(offs_t addrb) { return (((addrb & 0xff00)==0xf000 && (addrb < 0xf0fc)) || ((addrb & 0xfffc)==0xfffc)) && !m_mp9537; }
 
 	void set_overflow_interrupt( int enable ) { m_check_overflow = (enable!=0); }
+	// For fixed wiring, true models READY high at /RESET release (one automatic wait state per
+	// external memory byte) and false models READY low (zero). If unset, the CPU samples READY.
+	// READY can still extend individual transfers after reset in either mode.
+	void set_auto_wait_on_reset(bool enable) { m_auto_wait_on_reset = enable; }
+
+	// Earlier TMS9995 parts issue an extra data read during MPY (TI Table 9).
+	void set_mpy_read_next_word(bool enable) { m_mpy_read_next_word = enable; }
 
 protected:
 	tms9995_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void        device_start() override;
+	virtual void        device_reset() override ATTR_COLD;
 
 	// device_execute_interface overrides
 	virtual uint32_t    execute_min_cycles() const noexcept override;
@@ -116,9 +125,10 @@ private:
 
 	// Processor states
 	bool    m_idle_state;
-	bool    m_nmi_state;
+	bool    m_nmi_serviced;
 	bool    m_hold_state;
 	bool    m_hold_requested;
+	bool    m_hold_sampled;  // HOLD level sampled on the rising edge of CLKOUT
 
 	// READY handling. The READY line is operated before the clock
 	// pulse falls. As the ready line is only set once in this emulation we
@@ -127,15 +137,20 @@ private:
 	bool    m_ready;        // sampled value
 
 	// Auto-wait state generation
+	attotime m_ready_fall;
+	attotime m_ready_deferred_fall;
+	bool    m_ready_before_late_edge;
+	bool    m_ready_sample_auto;
 	bool    m_request_auto_wait_state;
+	std::optional<bool> m_auto_wait_on_reset;
 	bool    m_auto_wait;
+	bool    m_mpy_read_next_word;
 
 	// Cycle counter
 	int     m_icount;
 
 	// Phase of the memory access
 	int     m_mem_phase;
-
 	// Check the READY line?
 	bool    m_check_ready;
 
@@ -158,16 +173,35 @@ private:
 
 	// Interrupt handling
 	bool    m_nmi_active;
+	uint8_t m_nmi_samples;
+	uint8_t m_int1_samples;
+	uint8_t m_int4_samples;
 	bool    m_int1_active;
 	bool    m_int4_active;
 	bool    m_int_overflow;
 
-	bool    m_reset;
-	bool    m_from_reset;
+	bool    m_reset;            // released, vector service pending
+	bool    m_reset_asserted;   // /RESET pin held low
+	attotime m_reset_transition;
+	uint8_t m_reset_samples;
+	uint8_t m_reset_bus_clocks;
+	bool m_reset_byte_pending;
+	uint16_t m_reset_byte_address;
+	void set_bus_address(uint16_t address, uint8_t kind);
+	uint8_t read_external(uint16_t address);
+	bool    m_reset_ready;
+	uint16_t m_reset_wp, m_reset_pc, m_reset_st;
+	void capture_reset_context();
+	void external_write_cycle(uint16_t address, uint8_t data);
+	bool reset_at(attotime time) const;
+	bool reset_bus_active() const;
 	bool    m_mid_flag;
 	bool    m_mid_active;
 
-	int     m_decrementer_clkdiv;
+	uint8_t m_decrementer_clkdiv;
+	uint8_t m_decrementer_reload;
+	bool    m_decrementer_enabled;
+	uint8_t m_ec_samples;
 	bool    m_log_interrupt;
 
 	// Flag field
@@ -184,7 +218,7 @@ private:
 	void    service_interrupt();
 
 	// Issue clock pulses. The TMS9995 uses one (output) clock cycle per machine cycle.
-	inline void pulse_clock(int count);
+	inline void pulse_clock(int count, bool hold_cycle = false, int write_address = -1, uint8_t write_data = 0);
 
 	// Signal the hold state via the external line
 	void set_hold_state(bool state);
@@ -232,7 +266,7 @@ private:
 	int     m_count;
 
 	// ============== Decrementer =======================
-	void trigger_decrementer();
+	void clock_decrementer();
 
 	// Start value
 	uint16_t  m_starting_count_storage_register;
@@ -305,6 +339,8 @@ private:
 
 	// Index of the interrupt program
 	int     m_interrupt_mp_index;
+	int     m_reset_mp_index;
+	int     m_mid_mp_index;
 
 	// Index of the operand address derivation subprogram
 	int     m_operand_address_derivation_index;
@@ -328,6 +364,7 @@ private:
 	void set_status_parity(uint8_t value);
 
 	// Micro-operation declarations
+	bool check_interrupts();
 	void int_prefetch_and_decode();
 	void prefetch_and_decode();
 	void mem_read();
@@ -341,6 +378,10 @@ private:
 	void return_with_address();
 	void return_with_address_copy();
 	void cru_input_operation();
+	void shift_cru_input(bool bit);
+	uint16_t m_cru_sample_address;
+	bool    m_cru_sample_last;
+	bool    m_cru_sample_pending;
 	void cru_output_operation();
 	void command_completed();
 	void next_command();
@@ -349,22 +390,26 @@ private:
 	void alu_nop();
 	void alu_add_s_sxc();
 	void alu_b();
-	void alu_blwp();
+	void alu_context();
 	void alu_c();
 	void alu_ci();
 	void alu_clr_seto();
 	void alu_divide();
 	void alu_divide_signed();
 	void alu_external();
+	void alu_rset_mask();
+	void alu_idle_poll();
 	void alu_f3();
 	void alu_imm_arithm();
 	void alu_jump();
+	uint16_t jump_destination(uint16_t command, uint16_t opcode, uint16_t base) const;
 	void alu_ldcr();
 	void alu_li();
 	void alu_limi_lwpi();
 	void alu_lst_lwp();
 	void alu_mov();
 	void alu_multiply();
+	void mpy_next_word_cycle();
 	void alu_rtwp();
 	void alu_sbo_sbz();
 	void alu_shift();
@@ -374,7 +419,7 @@ private:
 	void alu_tb();
 	void alu_x();
 	void alu_xop();
-	void alu_int();
+	void alu_reset();
 
 	// ================ Connections ====================
 
