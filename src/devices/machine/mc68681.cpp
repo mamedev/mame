@@ -1458,7 +1458,8 @@ void duart_channel::tra_complete()
 	// per the datasheet the THR->shift transfer is where the TxRDY conditions
 	// are re-asserted, providing "one full character time of buffering".  If the
 	// THR is empty the transmitter is now idle, so set TxEMT (TxRDY is already
-	// set from the previous transfer).
+	// set from the previous transfer) -- unless the transmitter has been disabled,
+	// which resets TxRDY and TxEMT and keeps them reset.
 	//
 	// Asserting TxRDY here, at the transfer -- rather than in the idle branch --
 	// both prevents the transmitter from deadlocking when TxRDY would otherwise
@@ -1473,7 +1474,7 @@ void duart_channel::tra_complete()
 		SR |= STATUS_TRANSMITTER_READY;
 		update_interrupts();
 	}
-	else
+	else if (m_tx_enabled)
 	{
 		SR |= STATUS_TRANSMITTER_EMPTY;
 		update_interrupts();
