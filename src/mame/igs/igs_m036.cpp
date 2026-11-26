@@ -2376,7 +2376,7 @@ GAME( 2009, hyleyuan,     0,       m036_hyleyuan, hyleyuan, m036_hyleyuan_state,
 
 // sets with a TT5665 for sound and 640x480 display
 
-GAME( 2014, hlqqq,        0,       m036_hlqqq,    hlqqq,    m036_hlqqq_state,    empty_init,      ROT0, "IGS",           "Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NOT_WORKING )
+GAME( 2014, hlqqq,        0,       m036_hlqqq,    hlqqq,    m036_hlqqq_state,    empty_init,      ROT0, "IGS",           "Qiaoji Da Maoxian 3: Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NOT_WORKING )
 
 // sets with an unidentified sound chip and 640x480 display
 
