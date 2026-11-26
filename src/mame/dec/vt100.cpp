@@ -48,6 +48,7 @@
 #include "machine/input_merger.h"
 #include "machine/ins8250.h"
 #include "machine/rstbuf.h"
+#include "vt100_avo.h"
 #include "vt100_kbd.h"
 #include "vtvideo.h"
 #include "screen.h"
@@ -73,7 +74,8 @@ public:
 		m_printer_uart(*this, "printuart"),
 		m_p_ram(*this, "p_ram"),
 		m_attr_ram(*this, "attr_ram"),
-		m_phosphor(*this, "phosphor")
+		m_phosphor(*this, "phosphor"),
+		m_avo(*this, "avo")
 	{
 	}
 
@@ -87,7 +89,7 @@ public:
 private:
 	// Options fitted to this model, reported to the firmware through the
 	// flag buffer (E42).  flags_r() turns them into the bus bits.
-	static constexpr u8 OPT_AVO = 0x01; // Advanced Video Option
+	static constexpr u8 OPT_AVO = 0x01; // AVO built onto the VT102/VT131 board; the VT100's is the slot
 	static constexpr u8 OPT_GRAPHICS = 0x02; // VT105 waveform graphics board
 	static constexpr u8 OPT_STP = 0x04; // option on the Standard Terminal Port
 
@@ -104,6 +106,7 @@ private:
 	optional_shared_ptr<u8> m_attr_ram; // VT102/VT131 only
 
 	required_ioport m_phosphor;
+	optional_device<vt100_avo_slot_device> m_avo; // VT100 board AVO connector (J1)
 	u8 m_options = 0; // set by each model's machine config
 	bool m_even_field_high = false; // VT101/VT102 board wires EVEN FIELD L to +5 V
 
@@ -134,16 +137,15 @@ private:
 
 
 
+// VT100 terminal controller: E31 decodes A10-A13 only, so ROM and RAM repeat
+// every 16K; 2C00-3FFF is the AVO's (open bus without it), and so is
+// 8000-BFFF when it is fitted (it asserts MEM DISABLE there)
 void vt100_state::vt100_mem(address_map &map)
 {
 	map.unmap_value_high();
-	map(0x0000, 0x1fff).rom();  // ROM ( 4 * 2K)
-	map(0x2000, 0x3fff).ram().share("p_ram"); // Screen and scratch RAM
-	//map(0x3000, 0x3fff).ram();  // AVO Attribute RAM (4 bits wide)
-	// 0x4000, 0x7fff is unassigned
-	map(0x8000, 0x9fff).rom();  // Program memory expansion ROM (4 * 2K)
-	map(0xa000, 0xbfff).rom();  // Program memory expansion ROM (1 * 8K)
-	// 0xc000, 0xffff is unassigned
+	map(0x0000, 0x1fff).mirror(0xc000).rom();  // ROM ( 4 * 2K)
+	map(0x2000, 0x2bff).mirror(0xc000).ram().share(m_p_ram); // Screen and scratch RAM
+	map(0x2c00, 0x3fff).mirror(0xc000).noprw(); // AVO connector; the card installs over it
 }
 
 void vt100_state::vt180_mem(address_map &map)
@@ -217,7 +219,10 @@ u8 vt100_state::flags_r()
 
 	ret |= m_pusart->txrdy_r();
 	// ADVANCED VIDEO L and GRAPHICS FLAG L read high when nothing drives them
-	ret |= (m_options & OPT_AVO) ? 0 : 0x02;
+	// on the VT100 board the AVO is a card on J1; the VT101/VT102 boards
+	// say whether theirs is built in
+	bool const avo = m_avo ? m_avo->present() : bool(m_options & OPT_AVO);
+	ret |= avo ? 0 : 0x02;
 	ret |= (m_options & OPT_GRAPHICS) ? 0 : 0x04;
 	ret |= (m_options & OPT_STP) ? 0x08 : 0;
 	ret |= m_even_field_high ? 0x10 : 0;
@@ -365,10 +370,13 @@ void vt100_state::machine_reset()
 u8 vt100_state::video_ram_r(offs_t offset)
 {
 	// The video fetches from 2000 up: characters below 3000 and their
-	// attributes 1000 above them.  On the VT102/VT131 the attributes are in
-	// their own RAM.  Past the end of the RAM a model has fitted, return all
-	// ones as for an empty bus (an assumption, see vt101_mem); the attribute
-	// bits are active low, so that means no attributes.
+	// attributes 1000 above them.  On the VT100 board, 2C00-3FFF is on the
+	// AVO connector; on the VT102/VT131 the attributes are in their own RAM.
+	// Past the end of the RAM a model has fitted, return all ones as for an
+	// empty bus (an assumption, see vt101_mem); the attribute bits are active
+	// low, so that means no attributes.
+	if (m_avo && (offset >= m_p_ram.bytes()))
+		return m_avo->video_r(offset);
 	if (m_attr_ram && (offset >= 0x1000))
 		return attr_ram_r(offset & 0x0fff);
 	return (offset < m_p_ram.bytes()) ? m_p_ram[offset] : 0xff;
@@ -412,13 +420,14 @@ GFXDECODE_END
 
 void vt100_state::vt100(machine_config &config)
 {
-	m_options = OPT_AVO;
-
 	/* basic machine hardware */
 	I8080(config, m_maincpu, XTAL(24'883'200) / 9);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt100_mem);
 	m_maincpu->set_addrmap(AS_IO, &vt100_state::vt100_io);
 	m_maincpu->set_irq_acknowledge_callback("rstbuf", FUNC(rst_pos_buffer_device::inta_cb));
+
+	VT100_AVO_SLOT(config, m_avo, vt100_avo_options, "avo");
+	m_avo->set_space(m_maincpu, AS_PROGRAM);
 
 	/* video hardware */
 	screen_device &screen(SCREEN(config, "screen").set_color(rgb_t::green()));
@@ -487,6 +496,7 @@ void vt100_state::vt100ac(machine_config &config)
 	vt100(config);
 
 	m_options |= OPT_STP;
+	m_avo->set_default_option("avo_ac");
 
 	i8085a_cpu_device &stpcpu(I8085A(config, "stpcpu", 4915200));
 	stpcpu.set_addrmap(AS_PROGRAM, &vt100_state::stp_mem);
@@ -545,8 +555,9 @@ void vt100_state::vt101(machine_config &config)
 	// EVEN FIELD L high.  The VT102 and VT131 always have the AVO built onto
 	// the board, and jumper W5 grounds ADVANCED VIDEO L to report it.  The
 	// VT101 has no AVO and leaves W5 out, so R8 pulls the line high.
-	m_options = 0;
 	m_even_field_high = true;
+
+	config.device_remove("avo"); // no AVO connector; the VT102's is on the board
 
 	I8085A(config.replace(), m_maincpu, XTAL(24'073'400) / 4);
 	m_maincpu->set_addrmap(AS_PROGRAM, &vt100_state::vt101_mem);
@@ -686,16 +697,17 @@ void vt100_state::vt102(machine_config &config)
 
  * The AVO itself can hold up to four ROMs on it (see http://www.bitsavers.org/pdf/dec/terminal/vt100/MP00633_VT100_Mar80.pdf
    and http://vt100.net/dec/ek-vt1ac-ug-002.pdf )
-   and these ROMs can depending on jumpers be mapped at 0x8000, OR overlay the main code ROMs at 0x0000-0x1fff!
-   They may even allow banking between the main code ROMs and the overlay ROMs, I haven't traced the schematic.
+   Jumpers place them at 8000-BFFF or over the main code ROMs at 0000-1FFF; there is no banking
+   (see vt100_avo.cpp).  Sockets E21, E17, E13, E8 (2K each; E8 also takes an 8K ROM).
    At least sixteen of these AVO ROMs were made, and are used as such:
    (based on EK-VT100-TM-003_VT100_Technical_Manual_Jul82.pdf)
  * No ROMs - normal vt100 system with AVO installed
  * 23-069E2 (location e21) - meant for vt100-wa and -wb 'LA120' 'word processing' systems (the mapping of the ROM for this system is different than for the ones below)
  * 23-099E2 (location e21) and 23-100E2 (location e17) - meant for vt132 but only with the OLD vt132 main ROMset of 095,096,097,098E2
  * 23-093E2 (location e21) - meant for vt100 wc through wz 'foreign language' word processing systems
- * 23-184E2 and 23-185E2 - meant for vt100 with STP printer option board installed, version 1, comes with vt1xx-ac kit
- * 23-186E2 and 23-187E2 - meant for vt100 with STP printer option board installed, version 2, comes with vt1xx-ac kit
+   (TM table 5-9 lists 23-152E2 for wc-wk; the AVO schematic legend lists 23-093E2)
+ * 23-184E2 and 23-185E2 - listed with the vt100-wx set below (vt100wp); TM table 5-9 also gives 23-185E2 as vt1xx-ac ROM B
+ * 23-284E2 or 23-186E2 (e21), 23-185E2 or 23-187E2 (e17) - vt100 with the STP printer option, vt1xx-ac kit (TM table 5-9)
  * 23-224E2, 23-225E2, 23-226E2, 23-227E2 - meant for vt132 but only with the NEW vt132 main ROMset of 180,181,182,183E2
  * 23-236E2, 23-237E2, 23-238E2, 23-239E2 - meant for vt132 but only with the NEW vt132 main ROMset of 180,181,182,183E2, unknown difference to above (PROM vs. mask ROM? same contents?)
  */
@@ -766,13 +778,13 @@ ROM_START( vt132 ) // This is from anecdotal evidence and vt100.net, as the vt13
 	// AVO ROMs for NEWER ROMset only
 	ROM_LOAD( "23-224e2-00.e21", 0x0000, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-225e2-00.e17", 0x0800, 0x0800, NO_DUMP)
-	ROM_LOAD( "23-226e2-00.e15", 0x1000, 0x0800, NO_DUMP) // loc is a guess
-	ROM_LOAD( "23-227e2-00.e13", 0x1800, 0x0800, NO_DUMP) // loc is a guess
+	ROM_LOAD( "23-226e2-00.e13", 0x1000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-227e2-00.e8", 0x1800, 0x0800, NO_DUMP)
 	// alt rev of newer avo ROMs, tech manual implies above are PROMs below are mask ROMS? same data?
 	ROM_LOAD( "23-236e2-00.e21", 0x0000, 0x0800, NO_DUMP)
 	ROM_LOAD( "23-237e2-00.e17", 0x0800, 0x0800, NO_DUMP)
-	ROM_LOAD( "23-238e2-00.e15", 0x1000, 0x0800, NO_DUMP) // loc is a guess
-	ROM_LOAD( "23-239e2-00.e13", 0x1800, 0x0800, NO_DUMP) // loc is a guess
+	ROM_LOAD( "23-238e2-00.e13", 0x1000, 0x0800, NO_DUMP)
+	ROM_LOAD( "23-239e2-00.e8", 0x1800, 0x0800, NO_DUMP)
 
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53))
@@ -792,12 +804,7 @@ ROM_START( vt100ac ) // This is from the VT180 technical manual at http://www.bi
 	ROM_LOAD( "23-139e2.e52", 0x1000, 0x0800, CRC(c3302ce5) SHA1(a2ab3b9b48b5e850b2d7b22e6f8ef6099599e4b6)) // Label: "AMD // 37108 8232DKP // 23-139E2 // AM9218CPC // (C)DEC_1979" @E52;  // revision 2?; revision 1 is 23-097e2 MAYBE
 	ROM_LOAD( "23-140e2.e56", 0x1800, 0x0800, CRC(4bf1ce4e) SHA1(279f47ec9a68c801c3c05005dd782202ac9e51a4)) // Label: "AMD // 37109 8230DHP // 23-140E2 // AM9218CPC // (C)DEC 1979" @E56  // revision 2?; revision 1 is 23-098e2 MAYBE
 
-	ROM_REGION(0x1000, "avo", 0) // all switches on "54-13097-00 // PN2280402L" AVO are open EXCEPT S2-3; does this map at 0xa000-0xcfff (mirrored) in maincpu space?
-	// This same set of ROMs also appears on the "PN1030385J-F" AVO, which has no dipswitches; instead a single jumper? resistor installed in the NDIP20 footprint between E16 and E22, between pins 6 and 15 of the footprint
-	//NOTE: for both of these two avo ROMs, Pin 18 is positive enable CE, Pin 20 is negative enable /CE1, Pin 21 is negative enable /CE2,
-	ROM_LOAD( "23-186e2.avo.e21", 0x0000, 0x0800, CRC(1592dec1) SHA1(c4b8fc9fc0514e0cd46ad2de03abe72271ce460b)) // Label: "S 8218 // C69063 // 23186E2" @E21
-	ROM_LOAD( "23-187e2.avo.e17", 0x0800, 0x0800, CRC(c6d72a41) SHA1(956f9eb945a250fd05c76100b38c0ba381ab8fde)) // Label: "S 8228 // C69062 // 23187E2" @E17
-	// are 184 and 185 an older version of the VT100-AC AVO firmware?
+	// AVO ROMs 23-186e2/23-187e2: see vt100_avo.cpp
 
 	ROM_REGION(0x2000, "stp", 0) // stp switches 1 and 5 are closed, 2,3,4 open
 	ROM_LOAD( "23-029e4.stp.e14", 0x0000, 0x2000, CRC(da55c62b) SHA1(261b02b774d57253d1dedecab8ca0e368c2a96cd)) // Label: "S 8218 // C43020 // 23029E4 (C) DEC // TP02" @E14
