@@ -248,8 +248,8 @@ void laserdisc_device::device_start()
 	machine().save().register_preload(save_prepost_delegate(FUNC(laserdisc_device::wait_for_read), this));
 	machine().save().register_postload(save_prepost_delegate(FUNC(laserdisc_device::clear_read_result), this));
 	save_item(NAME(m_read_error));
-	save_item(NAME(m_audio_decode[0]));
-	save_item(NAME(m_audio_decode[1]));
+	save_pointer(NAME(m_audio_decode[0]), m_audiomaxsamples);
+	save_pointer(NAME(m_audio_decode[1]), m_audiomaxsamples);
 
 	// register state
 	save_item(NAME(m_player_state.m_state));
@@ -866,8 +866,8 @@ void laserdisc_device::init_audio()
 	// allocate audio buffers
 	m_audiomaxsamples = ((uint64_t)m_samplerate * 1000000 + m_fps_times_1million - 1) / m_fps_times_1million;
 	m_audiobufsize = m_audiomaxsamples * 4;
-	m_audio_decode[0].resize(m_audiomaxsamples);
-	m_audio_decode[1].resize(m_audiomaxsamples);
+	for (auto &channel : m_audio_decode)
+		channel = make_unique_clear<int16_t []>(m_audiomaxsamples);
 	m_audiobuffer[0].resize(m_audiobufsize);
 	m_audiobuffer[1].resize(m_audiobufsize);
 }
@@ -1025,8 +1025,8 @@ void laserdisc_device::read_track_data()
 	// Keep decoder writes separate from samples owned by the stream consumer.
 	for (int chnum = 0; chnum < 2; chnum++)
 	{
-		std::fill(m_audio_decode[chnum].begin(), m_audio_decode[chnum].end(), 0);
-		m_avhuff_config.audio[chnum] = m_audio_decode[chnum].data();
+		std::fill_n(m_audio_decode[chnum].get(), m_audiomaxsamples, 0);
+		m_avhuff_config.audio[chnum] = m_audio_decode[chnum].get();
 	}
 
 	// override if we're not decoding
@@ -1130,8 +1130,8 @@ void laserdisc_device::process_track_data()
 		uint32_t const first = std::min(m_audiocursamples, m_audiobufsize - m_audiobufin);
 		for (int chnum = 0; chnum < 2; chnum++)
 		{
-			std::copy_n(m_audio_decode[chnum].data(), first, &m_audiobuffer[chnum][m_audiobufin]);
-			std::copy_n(m_audio_decode[chnum].data() + first, m_audiocursamples - first, m_audiobuffer[chnum].data());
+			std::copy_n(m_audio_decode[chnum].get(), first, &m_audiobuffer[chnum][m_audiobufin]);
+			std::copy_n(m_audio_decode[chnum].get() + first, m_audiocursamples - first, m_audiobuffer[chnum].data());
 		}
 	}
 

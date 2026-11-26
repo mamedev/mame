@@ -18,6 +18,7 @@
 #include "vbiparse.h"
 
 #include <algorithm>
+#include <memory>
 #include <system_error>
 #include <utility>
 #include <vector>
@@ -306,7 +307,7 @@ private:
 
 	// audio data
 	sound_stream *      m_stream;
-	std::vector<int16_t> m_audio_decode[2];     // pending field, owned by the decoder
+	std::unique_ptr<int16_t []> m_audio_decode[2];     // pending field, owned by the decoder
 	std::vector<int16_t> m_audiobuffer[2];      // buffer for audio samples
 	uint32_t            m_audiobufsize;         // size of buffer
 	uint32_t            m_audiobufin;           // input index
