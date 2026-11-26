@@ -69,8 +69,8 @@ private:
 };
 
 // ======================> coco_pak_rmulticart_device
-// Ramoth Dragon/CoCo Multicart.
 
+// Ramoth Dragon/CoCo Multicart
 class coco_pak_rmulticart_device : public coco_pak_device
 {
 public:
@@ -81,23 +81,28 @@ protected:
 	coco_pak_rmulticart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
 	// device-level overrides
-	virtual const tiny_rom_entry *device_rom_region() const override;
-	virtual void device_start() override;
-	virtual void device_reset() override;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override;
 	virtual u8 *get_cart_base() override;
 	virtual u32 get_cart_size() override;
 	virtual u8 cts_read(offs_t offset) override;
 	virtual u8 scs_read(offs_t offset) override;
 	virtual void scs_write(offs_t offset, u8 data) override;
 
-	void SetCART();
 private:
-	u8 Page;		// Page register, at $FF50
-	u8 CTRL;		// Control register, at $FF52
-	u16 PageSize;	// Page size in bytes
-	u8 PageMask;	// Page mask
-};
+	u32 page_size() const;
+	u32 page_base() const;
+	void update_cart_line();
 
+	required_ioport m_jumpers;
+
+	u8 m_page;      // page register, $FF50
+	u8 m_ctrl;      // control register, $FF52
+	u32 m_rom_mask; // address mask set by ROM size jumpers
+};
 
 // device type definitions
 DECLARE_DEVICE_TYPE(COCO_PAK, coco_pak_device)

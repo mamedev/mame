@@ -34,6 +34,7 @@ ROM_START( coco_pak_rmulticart )
 	// this region is filled by cococart_slot_device::call_load()
 ROM_END
 
+
 //-------------------------------------------------
 //  INPUT_PORTS( coco_cart_autostart )
 //-------------------------------------------------
@@ -263,51 +264,56 @@ void coco_pak_banked_device::scs_write(offs_t offset, u8 data)
 }
 
 /***************************************************************************
-    Ramoth Multicart 
+    RAMOTH MULTICART
 ***************************************************************************/
 
 /*
-	The Ramoth Multicart, is a banked ROM cartridge of up to 1MB of ROM.
-	
-	The cartridge may contain 1 or 2 32PIN Flash roms, these do not need to be the 
-	same size but the Larger must be the first. All cartridges so far produced
-	use 39SF040, but any compatible pinout chips can be used.
-	
-	The ROM size is configured by two jumpers on the board :
-	RS[1:0]		Rom size
-		00		2x39010, 128K
-		01		2x39020, 256K
-		10		2x39040, 512K
-		11		None, disable?
+    The Ramoth Multicart is a banked ROM cartridge holding up to 1MB of ROM.
 
-	These are returned as bits 5 and 4 of the CTRL register.
-	
-	The onboard CPLD implements 2 registers :
-	$FF50		Page register (8 bits).
-	$FF52		CTRL register (4 bits).
-	
-	The bits of the CTRL register are :
-	Bit			Read		Write
-	0			Enable autostart if 1
-	1			Page size 0=8K, 1=16K
-	2			Cart reset, resets CPLD when written to 0
-	3			Unused.
-	4			RS[0]		n/a
-	5			RS[1]		n/a
-	6			0			n/a
-	7			0			n/a
-	
+    The cartridge may contain one or two 32-pin flash ROMs.  These do not
+    need to be the same size, but the larger must be the first.  All
+    cartridges produced so far use 39SF040s, but any chip with a compatible
+    pinout can be used.
+
+    The ROM size is configured by two jumpers on the board:
+    RS[1:0]     ROM chips
+        00      2x 39SF010 (256K total)
+        01      2x 39SF020 (512K total)
+        10      2x 39SF040 (1M total)
+        11      none (disable?) - not emulated
+
+    The onboard CPLD implements two registers:
+    $FF50       Page register (8 bits)
+    $FF52       Control register (4 bits)
+
+    The bits of the control register are:
+    Bit         Read            Write
+    0           Enable autostart if 1
+    1           Page size 0=8K, 1=16K
+    2           Cart reset, resets CPLD when written to 0 - not emulated
+    3           Unused
+    4           RS[0]           n/a
+    5           RS[1]           n/a
+    6           0               n/a
+    7           0               n/a
 */
 
-#define RMULTI_AUTO		0x01
-#define RMULTI_SIZE		0x02
-#define RMULTI_RESET	0x04
+namespace {
 
-#define RMULTI_PAGE_MASK8	0x00
-#define RMULTI_PAGE_MASK16	0x01
+constexpr u8 RMULTI_CTRL_AUTO = 0x01;
+constexpr u8 RMULTI_CTRL_PAGE16K = 0x02;
 
-#define RMULTI_RS		0b10
+} // anonymous namespace
 
+static INPUT_PORTS_START( coco_pak_rmulticart )
+	PORT_INCLUDE( coco_cart_autostart )
+
+	PORT_START("jumpers")
+	PORT_CONFNAME( 0x03, 0x02, "ROM Size (RS jumpers)" )
+	PORT_CONFSETTING(    0x00, "2x 39SF010 (256K)" )
+	PORT_CONFSETTING(    0x01, "2x 39SF020 (512K)" )
+	PORT_CONFSETTING(    0x02, "2x 39SF040 (1M)" )
+INPUT_PORTS_END
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -320,14 +326,18 @@ DEFINE_DEVICE_TYPE(COCO_PAK_RMULTICART, coco_pak_rmulticart_device, "cocopak_rmu
 //**************************************************************************
 
 //-------------------------------------------------
-//  coco_pak_device - constructor
+//  coco_pak_rmulticart_device - constructor
 //-------------------------------------------------
 
 coco_pak_rmulticart_device::coco_pak_rmulticart_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
 	: coco_pak_device(mconfig, type, tag, owner, clock)
-	//, m_pos(0)
+	, m_jumpers(*this, "jumpers")
+	, m_page(0)
+	, m_ctrl(0)
+	, m_rom_mask(0)
 {
 }
+
 coco_pak_rmulticart_device::coco_pak_rmulticart_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: coco_pak_rmulticart_device(mconfig, COCO_PAK_RMULTICART, tag, owner, clock)
 {
@@ -343,6 +353,15 @@ const tiny_rom_entry *coco_pak_rmulticart_device::device_rom_region() const
 }
 
 //-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor coco_pak_rmulticart_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( coco_pak_rmulticart );
+}
+
+//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -350,24 +369,51 @@ void coco_pak_rmulticart_device::device_start()
 {
 	coco_pak_device::device_start();
 
-	save_item(NAME(Page));
-	save_item(NAME(CTRL));
-	save_item(NAME(PageSize));
-	save_item(NAME(PageMask));
+	save_item(NAME(m_page));
+	save_item(NAME(m_ctrl));
+	save_item(NAME(m_rom_mask));
 }
 
 //-------------------------------------------------
-//  device_reset - device-specific startup
+//  device_reset - device-specific reset
 //-------------------------------------------------
 
 void coco_pak_rmulticart_device::device_reset()
 {
-	Page = 0;
-	CTRL = RMULTI_AUTO;
-	PageSize = 0x2000;
-	PageMask = RMULTI_PAGE_MASK8;
+	// ROM size jumpers, from 256K (2x 39SF010) up to 1M (2x 39SF040)
+	m_rom_mask = (0x40000 << (m_jumpers->read() & 0x03)) - 1;
+	m_page = 0;
+	m_ctrl = RMULTI_CTRL_AUTO;
 
-	SetCART();
+	cart_base_changed();
+	update_cart_line();
+}
+
+//-------------------------------------------------
+//  device_post_load - device-specific post load
+//-------------------------------------------------
+
+void coco_pak_rmulticart_device::device_post_load()
+{
+	cart_base_changed();
+}
+
+//-------------------------------------------------
+//  page_size
+//-------------------------------------------------
+
+u32 coco_pak_rmulticart_device::page_size() const
+{
+	return (m_ctrl & RMULTI_CTRL_PAGE16K) ? 0x4000 : 0x2000;
+}
+
+//-------------------------------------------------
+//  page_base - ROM offset of the selected page
+//-------------------------------------------------
+
+u32 coco_pak_rmulticart_device::page_base() const
+{
+	return (m_page * page_size()) & m_rom_mask & (m_eprom->bytes() - 1);
 }
 
 //-------------------------------------------------
@@ -376,7 +422,7 @@ void coco_pak_rmulticart_device::device_reset()
 
 u8 *coco_pak_rmulticart_device::get_cart_base()
 {
-	return m_eprom->base() + (Page * PageSize);
+	return m_eprom->base() + page_base();
 }
 
 //-------------------------------------------------
@@ -385,7 +431,7 @@ u8 *coco_pak_rmulticart_device::get_cart_base()
 
 u32 coco_pak_rmulticart_device::get_cart_size()
 {
-	return PageSize;
+	return page_size();
 }
 
 //-------------------------------------------------
@@ -394,15 +440,19 @@ u32 coco_pak_rmulticart_device::get_cart_size()
 
 u8 coco_pak_rmulticart_device::cts_read(offs_t offset)
 {
-	return m_eprom->base()[(Page * PageSize) + (offset % PageSize)];
+	return m_eprom->base()[page_base() | (offset & (page_size() - 1))];
 }
 
-// Set CART line dependent on CTRL reg & Autostart input.
-void coco_pak_rmulticart_device::SetCART()
+//-------------------------------------------------
+//  update_cart_line - set CART line from the
+//  control register and auto-start setting
+//-------------------------------------------------
+
+void coco_pak_rmulticart_device::update_cart_line()
 {
 	if (m_cart->exists())
 	{
-		auto cart_line = (m_autostart.read_safe(0x01) && (CTRL & RMULTI_AUTO))
+		auto cart_line = (m_autostart.read_safe(0x01) && (m_ctrl & RMULTI_CTRL_AUTO))
 			? line_value::Q
 			: line_value::CLEAR;
 
@@ -417,24 +467,16 @@ void coco_pak_rmulticart_device::SetCART()
 
 u8 coco_pak_rmulticart_device::scs_read(offs_t offset)
 {
-	switch(offset)
+	switch (offset)
 	{
-		// $FF50
-		case 0x10:
-			logerror("Read Page: %02X\n",Page);
-			return Page;
-			break;
-		
-		// $FF52
-		case 0x12:
-			logerror("Read CTRL: %02X\n",CTRL);
-			return (RMULTI_RS << 4) | (CTRL & 0x0F);
-			break;
-			
-		default:
-			return 0xFF;
-			break;
+		case 0x10: // $FF50
+			return m_page;
+
+		case 0x12: // $FF52
+			return ((m_jumpers->read() & 0x03) << 4) | (m_ctrl & 0x0f);
 	}
+
+	return 0xff;
 }
 
 //-------------------------------------------------
@@ -443,29 +485,23 @@ u8 coco_pak_rmulticart_device::scs_read(offs_t offset)
 
 void coco_pak_rmulticart_device::scs_write(offs_t offset, u8 data)
 {
-	switch(offset)
+	switch (offset)
 	{
-		// $FF50
-		case 0x10:
-			logerror("Write Page: %02X\n",data);
-			// set the bank
-			if (Page != data)
+		case 0x10: // $FF50
+			if (m_page != data)
 			{
-				Page = data;
+				m_page = data;
 				cart_base_changed();
 			}
 			break;
-		
-		// $FF52
-		case 0x12:
-			logerror("Write CTRL: %02X\n",data);
-			if (CTRL != data)
+
+		case 0x12: // $FF52
+			data &= 0x0f;
+			if (m_ctrl != data)
 			{
-				CTRL = data;
-				PageSize = (CTRL & RMULTI_SIZE) ? 0x4000 : 0x2000;
-				PageMask = (CTRL & RMULTI_SIZE) ? RMULTI_PAGE_MASK16 : RMULTI_PAGE_MASK8;
+				m_ctrl = data;
 				cart_base_changed();
-				SetCART();
+				update_cart_line();
 			}
 			break;
 	}
