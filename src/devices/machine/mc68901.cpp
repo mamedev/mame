@@ -382,7 +382,9 @@ mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, d
 	//m_out_rr_cb(*this),
 	//m_out_tr_cb(*this),
 	m_iack_chain_cb(*this, 0x18), // Spurious IRQ
+	m_gpip(0),
 	m_aer(0),
+	m_ddr(0),
 	m_ier(0),
 	m_scr(0),
 	m_scr_parity(false),
@@ -390,6 +392,7 @@ mc68901_device::mc68901_device(const machine_config &mconfig, const char *tag, d
 	m_receive_buffer(0),
 	m_gpio_input(0),
 	m_gpio_output(0xff),
+	m_ti{ 0, 0, 0, 0 },
 	m_rframe(0),
 	m_rclk(0),
 	m_rbits(0),
@@ -486,7 +489,6 @@ void mc68901_device::device_reset()
 	m_next_rsr = 0;
 
 	memset(m_tmc, 0, sizeof(m_tmc));
-	memset(m_ti, 0, sizeof(m_ti));
 	memset(m_to, 0, sizeof(m_to));
 
 	write(REGISTER_GPIP, 0);
@@ -790,7 +792,7 @@ void mc68901_device::write(offs_t offset, u8 data)
 			break;
 		}
 
-		if (m_tacr & TCR_TIMER_RESET)
+		if (m_tbcr & TCR_TIMER_RESET)
 		{
 			LOG("MC68901 Timer B Reset\n");
 

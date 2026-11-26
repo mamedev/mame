@@ -1640,6 +1640,8 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 		if(shift_reg == 0x4489) {
 			uint16_t header;
 			uint32_t pos = i+1;
+			if(pos == bitstream.size())
+				pos = 0;
 			do {
 				header = 0;
 				for(int j=0; j<16; j++)
@@ -1651,16 +1653,24 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 				// thanks to the precharging
 			} while(header == 0x4489 && pos > i);
 
+			// A mark that ends at or past the index ends the scan: the
+			// rest of the track was scanned from its start
+			bool const wrapped = pos <= i;
+
 			// fe, ff
 			if(header == 0x5554 || header == 0x5555) {
 				if(idblk_count < 100)
 					idblk[idblk_count++] = pos;
+				if(wrapped)
+					break;
 				i = pos-1;
 			}
 			// f8, f9, fa, fb
 			if(header == 0x554a || header == 0x5549 || header == 0x5544 || header == 0x5545) {
 				if(dblk_count < 100)
 					dblk[dblk_count++] = pos;
+				if(wrapped)
+					break;
 				i = pos-1;
 			}
 		}

@@ -18818,6 +18818,7 @@ phatt
 procuss
 proteus1
 proteusxr
+proteusxrpl
 vintkeys
 
 @source:ensoniq/enmirage.cpp
@@ -30625,6 +30626,22 @@ fun4a
 csdaruma
 lnumbers
 
+@source:misc/banpresto_tomy_h8s.cpp
+anpanmct
+cmcwa
+cscaoysd
+dbzbgck
+dbzbgck10
+dchopper
+gkitarou
+gyakyu
+kghmytda
+pmsgk
+satoyama
+youkai
+yujogs
+zoids
+
 @source:misc/beaminv.cpp
 beaminv
 ctainv
@@ -36193,6 +36210,7 @@ lxccplan
 lxcmc250
 lxcmcy
 lxcmcyba
+lxcmcybao
 lxcmcybt
 lxcmcyco
 lxcmcycr
@@ -43992,22 +44010,6 @@ aws220
 @source:skeleton/ax20.cpp
 ax20
 
-@source:skeleton/banpresto_tomy_h8s.cpp
-anpanmct
-cmcwa
-cscaoysd
-dbzbgck
-dbzbgck10
-dchopper
-gkitarou
-gyakyu
-kghmytda
-pmsgk
-satoyama
-youkai
-yujogs
-zoids
-
 @source:skeleton/basf7100.cpp
 basf7120
 
@@ -48617,6 +48619,7 @@ discpal
 disppal
 lexiseal
 lexizeus
+maxicybr
 pokermor
 pokmax20
 vgcaplet

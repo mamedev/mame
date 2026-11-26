@@ -873,9 +873,11 @@ ROM_START( pvwwcas )
 ROM_END
 
 ROM_START( bratzra )
-	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 )
-	// this does not seem to contain the game code, is it internal, or is this badly dumped somehow (all lines going to glob were used)
-	ROM_LOAD( "bratzrockangels.u1", 0x000000, 0x100000, BAD_DUMP CRC(078fa134) SHA1(e9ad3e2f0f39b2544821b9c8f71be976726aec3b) )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "bratzrockangels.internal", 0x000000, 0x100000, CRC(c4983d10) SHA1(e43080c61b1463e250552df3d0ab05667635d816) ) // dumped via trojan from CPU glob	
+	ROM_LOAD( "bratzrockangels.u1", 0x100000, 0x100000, CRC(078fa134) SHA1(e9ad3e2f0f39b2544821b9c8f71be976726aec3b) )
+
+	// there's another glob, which acts as a black-box music player with all song data embedded, unknown MCU type
 ROM_END
 
 // EU3A13 sets
@@ -972,12 +974,6 @@ CONS( 2004, buzztime, 0, 0, elan_buzztime, sudoku, elan_eu3a05_buzztime_state, e
 
 CONS( 2005, pvwwcas, 0, 0, pvwwcas, sudoku, elan_eu3a05_pvwwcas_state, init_pvwwcas, "Play Vision / Taikee / V-TAC", "Worldwide Casino Tour 12-in-1", MACHINE_NOT_WORKING )
 
-// unknown, might be EU3A05, but bad dump
-// CE and OE are on the other side of the CPU die compared to EU3A05, ROM seems half sized, or maybe internal area missing?
-// TODO: Could possibly be titled "Bratz: Rock Angelz Guitar Game". Change once it's able to boot up.
-CONS( 200?, bratzra, 0, 0, elan_eu3a05_1mb, rad_sinv, elan_eu3a05_state, empty_init, "MGA", "Bratz: Rock Angelz", MACHINE_NOT_WORKING )
-
-
 // Below seem to be EU3A13, as that was confirmed for the Family Tetris die.  They're like EU3A05, but with a different memory map
 
 CONS( 2006, sudelan3, 0, 0, elan_eu3a13_1mb,     sudoku, elan_eu3a13_state, init_sudelan3, "All in 1 Products Ltd / Senario",      "Ultimate Sudoku TV Edition 3-in-1 (All in 1 / Senario)", MACHINE_NOT_WORKING )
@@ -997,3 +993,5 @@ CONS( 2005, pvmil8,   0,      0, elan_eu3a13_pal_2mb, sudoku, elan_eu3a13_state,
 // see https://millionaire.fandom.com/wiki/Haluatko_miljon%C3%A4%C3%A4riksi%3F_(Play_Vision_game)
 CONS( 2005, pvmilfin, pvmil8, 0, elan_eu3a13_pal_2mb, sudoku, elan_eu3a13_state, empty_init, "Play Vision", u8"Haluatko miljonääriksi? (Finland)", MACHINE_NOT_WORKING )
 
+// CE and OE are on the other side of the CPU die compared to EU3A05, has internal ROM
+CONS( 2005, bratzra, 0, 0, elan_eu3a13_pal_2mb, rad_sinv, elan_eu3a13_state, empty_init, "MGA", "Bratz: Rock Angelz Guitar Game", MACHINE_NOT_WORKING )

@@ -16,6 +16,8 @@
 #include "emu.h"
 #include "okim9810.h"
 
+#include <cmath>
+
 #define VERBOSE 0
 #include "logmacro.h"
 
@@ -26,28 +28,6 @@
 
 // device type definition
 DEFINE_DEVICE_TYPE(OKIM9810, okim9810_device, "okim9810", "OKI MSM9810 ADPCM")
-
-// volume lookup table. The manual lists a full 16 steps, 2dB per step.
-// Given the dB values, that seems to map to a 7-bit volume control.
-const uint8_t okim9810_device::okim_voice::s_volume_table[16] =
-{
-	0x80,   //  0 dB
-	0x65,   // -2 dB
-	0x50,   // -4 dB
-	0x40,   // -6 dB
-	0x32,   // -8.0 dB
-	0x28,   // -10.5 dB
-	0x20,   // -12.0 dB
-	0x19,   // -14.5 dB
-	0x14,   // -16.0 dB
-	0x10,   // -18.0 dB
-	0x0c,   // -20.0 dB
-	0x0a,   // -22.0 dB
-	0x08,   // -24.0 dB
-	0x06,   // -26.0 dB
-	0x05,   // -28.0 dB
-	0x04,   // -30.0 dB
-};
 
 // sampling frequency divider lookup table.
 const uint32_t okim9810_device::s_sampling_freq_div_table[16] =
@@ -156,6 +136,8 @@ void okim9810_device::device_start()
 	save_item(STRUCT_MEMBER(m_voice, m_sample));
 	save_item(STRUCT_MEMBER(m_voice, m_phrase_offset));
 	save_item(STRUCT_MEMBER(m_voice, m_phrase_count));
+	save_item(STRUCT_MEMBER(m_voice, m_phrase_base));
+	save_item(STRUCT_MEMBER(m_voice, m_phrase_length));
 	save_item(STRUCT_MEMBER(m_voice, m_phrase_wait_cnt));
 	save_item(STRUCT_MEMBER(m_voice, m_phrase_state));
 	save_item(STRUCT_MEMBER(m_voice, m_channel_volume));
@@ -173,11 +155,21 @@ void okim9810_device::device_start()
 
 void okim9810_device::device_reset()
 {
+	// RESET initialises the LSI (data sheet FEDL9810BFULL-03 p. 7); the
+	// OPT defaults are full volume, secondary filter and direct D/A output
+	// (OPT Command List, p. 19).
 	m_stream->update();
-	for (auto & elem : m_voice)
-		elem.m_playing = false;
+	for (auto &voice : m_voice)
+		voice = okim_voice();
 
-	m_serial_bits = 0;
+	m_TMP_register = 0;
+	m_global_volume = 0;
+	m_filter_type = SECONDARY_FILTER;
+	m_output_level = OUTPUT_TO_DIRECT_DAC;
+	m_dadr = 0;
+	m_dadr_start_offset = m_dadr_end_offset = 0;
+	m_dadr_flags = 0;
+	m_serial_read_latch = m_serial_write_latch = m_serial_bits = 0;
 }
 
 
@@ -233,6 +225,8 @@ void okim9810_device::sound_stream_update(sound_stream &stream)
 
 uint8_t okim9810_device::read_status()
 {
+	m_stream->update();
+
 	uint8_t result = 0x00;
 	uint8_t channelMask = 0x01;
 	for (int i = 0; i < OKIM9810_VOICES; i++, channelMask <<= 1)
@@ -262,6 +256,8 @@ uint8_t okim9810_device::read()
 // The command is written when the CMD pin is low
 void okim9810_device::write_command(uint8_t data)
 {
+	m_stream->update();
+
 	const uint8_t cmd = (data & 0xf8) >> 3;
 	const uint8_t channel = (data & 0x07);
 
@@ -275,8 +271,10 @@ void okim9810_device::write_command(uint8_t data)
 			{
 				if (channelMask & m_TMP_register)
 				{
-					m_voice[i].m_playing = true;
-					LOG("\t\tPlaying channel %d: encoder type %d @ %dhz (volume = %d %d).  From %08x for %d samples (looping=%d).\n",
+					m_voice[i].m_playing = (m_voice[i].m_phrase_state == SEQ_ACTIVE)
+							? (m_voice[i].m_phrase_count > 0)
+							: (m_voice[i].m_count > 0);
+					LOG("\t\tPlaying channel %d: encoder type %d @ %dhz (volume = %f %f).  From %08x for %d samples (looping=%d).\n",
 										i,
 										m_voice[i].m_playbackAlgo,
 										m_voice[i].m_samplingFreq,
@@ -360,7 +358,9 @@ void okim9810_device::write_command(uint8_t data)
 			{
 				// use "Phrase Control Table" mode
 				m_voice[channel].m_phrase_offset = startAddr;
-				m_voice[channel].m_phrase_count = endAddr - startAddr + 1;
+				m_voice[channel].m_phrase_count = endAddr >= startAddr ? endAddr - startAddr + 1 : 0;
+				m_voice[channel].m_phrase_base = startAddr;
+				m_voice[channel].m_phrase_length = m_voice[channel].m_phrase_count;
 				if (m_voice[channel].m_phrase_count == 0)
 					LOG("MSM9810: Empty phrase subtable\n");
 				m_voice[channel].m_phrase_state = SEQ_ACTIVE;
@@ -374,7 +374,8 @@ void okim9810_device::write_command(uint8_t data)
 				m_voice[channel].m_startFlags = startFlags;
 				m_voice[channel].m_base_offset = startAddr;
 				m_voice[channel].m_endFlags = endFlags;
-				m_voice[channel].m_count = endAddr - startAddr + 1;
+				// Some ROMs use an end address below the start for unused phrases.
+				m_voice[channel].m_count = endAddr >= startAddr ? endAddr - startAddr + 1 : 0;
 
 				m_voice[channel].m_playbackAlgo = (startFlags & 0x30) >> 4; // Not verified
 				m_voice[channel].m_samplingFreq = startFlags & 0x0f;
@@ -404,7 +405,7 @@ void okim9810_device::write_command(uint8_t data)
 				m_voice[channel].m_startFlags = startFlags;
 				m_voice[channel].m_base_offset = startAddr;
 				m_voice[channel].m_endFlags = 0;
-				m_voice[channel].m_count = (endAddr-startAddr) + 1;     // Is there yet another extra byte at the end?
+				m_voice[channel].m_count = endAddr >= startAddr ? endAddr - startAddr + 1 : 0;
 
 				m_voice[channel].m_playbackAlgo = (startFlags & 0x0c) >> 2;
 				m_voice[channel].m_samplingFreq = (startFlags & 0xf0) >> 4;
@@ -556,8 +557,10 @@ void okim9810_device::cmd_w(int state)
 
 int okim9810_device::so_r()
 {
-	m_serial_read_latch = (m_serial_read_latch & ~(1<<m_serial_bits)) | (read_status() & (1<<m_serial_bits));
-	return (read_status() >> (7-m_serial_bits)) & 1;
+	const uint8_t status = read_status();
+	if (!machine().side_effects_disabled())
+		m_serial_read_latch = (m_serial_read_latch & ~(1 << m_serial_bits)) | (status & (1 << m_serial_bits));
+	return BIT(status, 7 - m_serial_bits);
 }
 
 int okim9810_device::sr0_r()
@@ -600,6 +603,8 @@ okim9810_device::okim_voice::okim_voice()
 		m_sample(0),
 		m_phrase_offset(0),
 		m_phrase_count(0),
+		m_phrase_base(0),
+		m_phrase_length(0),
 		m_phrase_wait_cnt(0),
 		m_phrase_state(SEQ_STOP),
 		m_channel_volume(0x00),
@@ -626,8 +631,8 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		return;
 
 	// get left and right volumes
-	uint8_t volume_scale_left = volume_scale(global_volume, m_channel_volume, m_pan_volume_left);
-	uint8_t volume_scale_right = volume_scale(global_volume, m_channel_volume, m_pan_volume_right);
+	sound_stream::sample_t volume_scale_left = volume_scale(global_volume, m_channel_volume, m_pan_volume_left);
+	sound_stream::sample_t volume_scale_right = volume_scale(global_volume, m_channel_volume, m_pan_volume_right);
 
 	// total samples per byte
 	uint32_t totalInterpSamples = s_sampling_freq_div_table[m_samplingFreq];
@@ -647,6 +652,14 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		}
 		if (m_phrase_state == SEQ_ACTIVE)
 		{
+			// LOOP repeats the complete phrase selected by FADR, including
+			// its pauses: data sheet FEDL9810BFULL-03, "LOOP Playback Timing
+			// (Phrase Table is Used/not Used)", p. 13.
+			if (m_phrase_count <= 0 && m_looping)
+			{
+				m_phrase_offset = m_phrase_base;
+				m_phrase_count = m_phrase_length;
+			}
 			if (m_phrase_count > 0)
 			{
 				offs_t startAddr, endAddr;
@@ -662,7 +675,11 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 				startAddr = rom.read_byte(m_phrase_offset++) << 16;
 				startAddr |= rom.read_byte(m_phrase_offset++) << 8;
 				startAddr |= rom.read_byte(m_phrase_offset++) << 0;
-				m_channel_volume = rom.read_byte(m_phrase_offset++) & 0xf; // not verified
+				// The table entry sets CVOL.  The data sheet does not give the
+				// table layout; the AG-2 games' tables carry the volume here.
+				m_channel_volume = rom.read_byte(m_phrase_offset++) & 0xf;
+				volume_scale_left = volume_scale(global_volume, m_channel_volume, m_pan_volume_left);
+				volume_scale_right = volume_scale(global_volume, m_channel_volume, m_pan_volume_right);
 				endAddr = rom.read_byte(m_phrase_offset++) << 16;
 				endAddr |= rom.read_byte(m_phrase_offset++) << 8;
 				endAddr |= rom.read_byte(m_phrase_offset++) << 0;
@@ -672,11 +689,13 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 				m_interpSampleNum = 0;
 				m_startFlags = startFlags;
 				m_base_offset = startAddr;
-				m_count = endAddr - startAddr + 1;
+				m_count = endAddr >= startAddr ? endAddr - startAddr + 1 : 0;
 				m_playbackAlgo = (startFlags & 0x30) >> 4; // Not verified
 				m_samplingFreq = startFlags & 0x0f;
 				if (m_playbackAlgo == ADPCM_PLAYBACK || m_playbackAlgo == ADPCM2_PLAYBACK)
 					m_count *= 2;
+				if (!m_count)
+					continue;
 
 				m_phrase_state = SEQ_PLAY;
 				totalInterpSamples = s_sampling_freq_div_table[m_samplingFreq];
@@ -703,12 +722,12 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 					{
 						case STRAIGHT8_PLAYBACK:
 						{
-							m_startSample = ((int8_t)rom.read_byte(m_base_offset + m_sample)) << 4; // shift to 12bit
+							m_startSample = s8(rom.read_byte(m_base_offset + m_sample)) * 16; // shift to 12bit
 							break;
 						}
 						case NONLINEAR8_PLAYBACK: // TODO : Algorithm Unimplemented
 						{
-							m_startSample = ((int8_t)rom.read_byte(m_base_offset + m_sample)) << 4; // shift to 12bit
+							m_startSample = s8(rom.read_byte(m_base_offset + m_sample)) * 16; // shift to 12bit
 							break;
 						}
 						default:
@@ -726,12 +745,12 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 				{
 					case STRAIGHT8_PLAYBACK:
 					{
-						m_endSample = ((int8_t)rom.read_byte(m_base_offset + m_sample + 1)) << 4; // shift to 12bit
+						m_endSample = s8(rom.read_byte(m_base_offset + m_sample + 1)) * 16; // shift to 12bit
 						break;
 					}
 					case NONLINEAR8_PLAYBACK: // TODO : Algorithm Unimplemented
 					{
-						m_endSample = ((int8_t)rom.read_byte(m_base_offset + m_sample + 1)) << 4; // shift to 12bit
+						m_endSample = s8(rom.read_byte(m_base_offset + m_sample + 1)) * 16; // shift to 12bit
 						break;
 					}
 					default:
@@ -798,12 +817,9 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 			interpValue = m_startSample;
 
 		// output to the stereo buffers, scaling by the volume
-		// signal in range -2048..2047, volume in range 2..128 => signal * volume / 8 in range -32768..32767
-		int32_t interpValueL = (interpValue * (int32_t)volume_scale_left);
-		stream.add_int(0, sampindex, interpValueL, 32768 * 8);
-
-		int32_t interpValueR = (interpValue * (int32_t)volume_scale_right);
-		stream.add_int(1, sampindex, interpValueR, 32768 * 8);
+		// The decoder produces a signed 12-bit sample.
+		stream.add(0, sampindex, interpValue * (volume_scale_left / 2048.0));
+		stream.add(1, sampindex, interpValue * (volume_scale_right / 2048.0));
 
 		// if the interpsample has reached its end, move on to the next sample
 		m_interpSampleNum++;
@@ -816,19 +832,18 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 		// the end of the stream has been reached
 		if (m_sample >= m_count)
 		{
-			if (!m_looping)
+			if (m_phrase_state == SEQ_PLAY)
 			{
-				if (m_phrase_state == SEQ_STOP)
-				{
-					m_playing = false;
-					break;
-				}
-				else
-					m_phrase_state = SEQ_ACTIVE;
+				m_phrase_state = SEQ_ACTIVE;
+			}
+			else if (m_looping)
+			{
+				m_sample = 0;
 			}
 			else
 			{
-				m_sample = 0;
+				m_playing = false;
+				break;
 			}
 		}
 	}
@@ -838,20 +853,17 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 //-------------------------------------------------
 //  volume_scale - computes the volume equation as
 //                 seen on page 29 of the docs.
-//  Returns a value from the volume lookup table.
+//  Returns the combined linear amplitude scale.
 //-------------------------------------------------
 
-uint8_t okim9810_device::okim_voice::volume_scale(const uint8_t global_volume_index,
+sound_stream::sample_t okim9810_device::okim_voice::volume_scale(const uint8_t global_volume_index,
 												const uint8_t channel_volume_index,
 												const uint8_t pan_volume_index) const
 {
-	const uint8_t& V = channel_volume_index;
-	const uint8_t& L = pan_volume_index;
-	const uint8_t& O = global_volume_index;
-	uint32_t index = (V+L) + (O*3);
-
-	if (index > 15)
-		index = 15;
-
-	return s_volume_table[index];
+	// Data sheet FEDL9810BFULL-03 p. 29: output volume = (V + L) * -2 +
+	// (O4 * 2 + O3) * -6 dB, where V is CVOL, L the PAN setting and O4/O3
+	// the OPT bits.  The combined attenuation is not limited to the -30 dB
+	// range of an individual register.
+	const u32 steps = channel_volume_index + pan_volume_index + 3 * global_volume_index;
+	return std::pow(10.0, -0.1 * steps);
 }

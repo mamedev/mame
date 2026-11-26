@@ -438,6 +438,11 @@ ROM_START( lexiseal )
 	ROM_LOAD16_WORD_SWAP( "lexibook_seal.bin", 0x0000, 0x1000000, CRC(3529f154) SHA1(f5f142600c6b2d037b97e007364ea2fa228e0163) )
 ROM_END
 
+ROM_START( maxicybr )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP( "maxicyberarcade.u2", 0x0000, 0x1000000, CRC(a4af75a1) SHA1(958fc46123063f08230e7f19965ca64fb1afdd13) )
+ROM_END
+
 ROM_START( discpal )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_WORD_SWAP( "disneyhh.bin", 0x0000, 0x400000, CRC(5fb7f32e) SHA1(795c992826ad4ac66d5438207f1c9b48f9fadc44) )
@@ -551,7 +556,8 @@ CONS( 2010, cybrtvfe, 0, 0, lexiseal, lexiseal, spg2xx_cybrtvfe_game_state, init
 CONS( 2010, cybrtvbb, 0, 0, cybrtvbb, cybrtvbb, spg2xx_cybrtvbb_game_state, init_cybrtvfe, "Lexibook", "Cyber Arcade TV - Barbie 75-in-1 (JL2500BB)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 200?, lexiseal, 0, 0, lexiseal, lexiseal, spg2xx_lexiseal_game_state, init_zeus,     "Lexibook / Sit Up Limited / JungleTac", "Seal 50-in-1", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS ) // also has bad sound in Tiger Rescue, but no corrupt tilemap
-// There are versions of the Seal 50-in-1 that actually show Lexibook on the boot screen rather than it just being on the unit.  The Seal name was also used for some VT systems
+
+CONS( 2009, maxicybr, 0, 0, lexiseal, lexiseal, spg2xx_lexiseal_game_state, init_zeus,     "Lexibook / JungleTac", "MAXI Cyber Arcade 50-in-1", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 
 CONS( 2006, discpal,  0, 0, lexizeus, lexiseal, spg2xx_lexizeus_game_state, init_zeus,     "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Classic Pals", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2006, disppal,  0, 0, lexizeus, lexiseal, spg2xx_lexizeus_game_state, init_zeus,     "Performance Designed Products / Disney / Jungle Soft", "Disney Game It! Princess Pals", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
