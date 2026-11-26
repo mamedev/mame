@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Vas Crabb
+// copyright-holders:Vas Crabb, Andrew Silverman
 /*
  Williams Star Rider
 
@@ -252,8 +252,6 @@
 
 #include "emu.h"
 
-#include "sr_controls.h"
-
 #include "cpu/m6809/m6809.h"
 #include "machine/2812fifo.h"
 #include "machine/6821pia.h"
@@ -271,6 +269,44 @@
 
 namespace {
 
+// Host positions to the settled digital levels presented at the CPU PIA.
+// Optical transition times and contact/occlusion faults are outside this model.
+namespace sr_controls {
+
+// Usable bit masks from the respective cabinet encoder boards.
+constexpr u32 STEERING_MASK = 0x3f;
+constexpr u32 THROTTLE_MASK = 0x0f;
+constexpr u32 BRAKE_MASK = 0x03;
+
+constexpr u32 bounded(u32 value, u32 maximum)
+{
+	return value < maximum ? value : maximum;
+}
+
+// Steering and throttle use reflected binary (Gray) code.
+constexpr u8 gray_position(u32 position, u32 maximum)
+{
+	u32 const value = bounded(position, maximum);
+	return u8(value ^ (value >> 1));
+}
+
+constexpr u8 steering(u32 position)
+{
+	return gray_position(position, STEERING_MASK);
+}
+
+constexpr u8 throttle(u32 position)
+{
+	return gray_position(position, THROTTLE_MASK);
+}
+
+constexpr u8 brake(u32 position)
+{
+	return u8(bounded(position, BRAKE_MASK) ^ BRAKE_MASK);
+}
+
+} // namespace sr_controls
+
 class sr_state : public driver_device
 {
 public:
@@ -282,6 +318,9 @@ public:
 		, m_main_banks(*this, "cpu.page")
 		, m_main_nvram(*this, "cpu.u9")
 		, m_main_mem_prot(*this, "MEMPROT")
+		, m_steering(*this, "STEERING")
+		, m_throttle(*this, "THROTTLE")
+		, m_brake(*this, "BRAKE")
 		, m_main_led(*this, "cpu.u3")
 		, m_vgg_pia(*this, "vgg.u7")
 		, m_vgg_palette(*this, "vgg.color")
@@ -300,9 +339,9 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(sound_sw1_changed);
 
-	ioport_value steering_r() { return sr_controls::steering(ioport("STEERING")->read()); }
-	ioport_value throttle_r() { return sr_controls::throttle(ioport("THROTTLE")->read()); }
-	ioport_value brake_r() { return sr_controls::brake(ioport("BRAKE")->read()); }
+	ioport_value steering_r() { return sr_controls::steering(m_steering->read()); }
+	ioport_value throttle_r() { return sr_controls::throttle(m_throttle->read()); }
+	ioport_value brake_r() { return sr_controls::brake(m_brake->read()); }
 
 protected:
 	void machine_start() override ATTR_COLD;
@@ -362,6 +401,9 @@ private:
 	required_device<address_map_bank_device> m_main_banks;
 	required_shared_ptr<u8> m_main_nvram;
 	required_ioport m_main_mem_prot;
+	required_ioport m_steering;
+	required_ioport m_throttle;
+	required_ioport m_brake;
 	output_finder<> m_main_led;
 
 	required_device<pia6821_device> m_vgg_pia;
