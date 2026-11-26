@@ -42,6 +42,7 @@ protected:
 	c1581_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(8, 0x03); }
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 

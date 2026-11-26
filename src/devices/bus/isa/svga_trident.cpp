@@ -5,9 +5,6 @@
  *
  *  Created on: 6/09/2014
  *
- * TODO:
- * - tgui9680 is a PCI card, not ISA!
- * \- the only client is pc/calchase.cpp, which at the time of this writing uses legacy PCI bus;
  *
  */
 
@@ -69,7 +66,7 @@ void isa16_svga_tvga9000_device::remap(int space_id, offs_t start, offs_t end)
 {
 	if (space_id == AS_PROGRAM)
 	{
-		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(tvga9000_device::mem_r)), write8sm_delegate(*m_vga, FUNC(tvga9000_device::mem_w)));
+		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(tvga9000_vga_device::mem_r)), write8sm_delegate(*m_vga, FUNC(tvga9000_vga_device::mem_w)));
 		m_isa->install_rom(this, 0xc0000, 0xc7fff, "bios");
 	}
 	else if (space_id == AS_IO)
@@ -78,107 +75,7 @@ void isa16_svga_tvga9000_device::remap(int space_id, offs_t start, offs_t end)
 
 void isa16_svga_tvga9000_device::io_isa_map(address_map &map)
 {
-	map(0x03b0, 0x03df).m(m_vga, FUNC(tvga9000_device::io_map));
-	map(0x43c4, 0x43cb).rw(m_vga, FUNC(tvga9000_device::port_43c6_r), FUNC(tvga9000_device::port_43c6_w));
-	map(0x83c4, 0x83cb).rw(m_vga, FUNC(tvga9000_device::port_83c6_r), FUNC(tvga9000_device::port_83c6_w));
-}
-
-
-
-/*
- * TGUI9680
- */
-
-ROM_START( tgui9680 )
-	ROM_REGION( 0x8000, "bios", 0 )
-	ROM_LOAD16_BYTE( "trident_tgui9680_bios.bin", 0x0000, 0x4000, CRC(1eebde64) SHA1(67896a854d43a575037613b3506aea6dae5d6a19) )
-	ROM_CONTINUE(                                 0x0001, 0x4000 )
-ROM_END
-
-
-DEFINE_DEVICE_TYPE(ISA16_SVGA_TGUI9680, isa16_svga_tgui9680_device, "tgui9680", "Trident TGUI9680 Graphics Card (BIOS X5.5 (02) 02/13/96)")
-
-
-//-------------------------------------------------
-//  device_add_mconfig - add device configuration
-//-------------------------------------------------
-
-void isa16_svga_tgui9680_device::device_add_mconfig(machine_config &config)
-{
-	screen_device &screen(SCREEN(config, "screen"));
-	screen.set_raw(25.175_MHz_XTAL, 800, 0, 640, 524, 0, 480);
-	screen.set_screen_update(m_vga, FUNC(trident_vga_device::screen_update));
-
-	TGUI9680_VGA(config, m_vga);
-	m_vga->set_screen("screen");
-	m_vga->set_vram_size(0x200000);
-}
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
-const tiny_rom_entry *isa16_svga_tgui9680_device::device_rom_region() const
-{
-	return ROM_NAME( tgui9680 );
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  isa8_vga_device - constructor
-//-------------------------------------------------
-
-isa16_svga_tgui9680_device::isa16_svga_tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, ISA16_SVGA_TGUI9680, tag, owner, clock)
-	, device_isa16_card_interface(mconfig, *this)
-	, m_vga(*this, "vga")
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-uint8_t isa16_svga_tgui9680_device::input_port_0_r() { return 0xff; } //return machine().root_device().ioport("IN0")->read(); }
-
-void isa16_svga_tgui9680_device::device_start()
-{
-	set_isa_device();
-}
-
-void isa16_svga_tgui9680_device::device_reset()
-{
-	remap(AS_PROGRAM, 0, 0xfffff);
-	remap(AS_IO, 0, 0xffff);
-}
-
-void isa16_svga_tgui9680_device::remap(int space_id, offs_t start, offs_t end)
-{
-	if (space_id == AS_PROGRAM)
-	{
-		// TODO: stuff that really maps thru PCI BAR ...
-		// uncomment to test Windows 3.1 TGUI9440AGi driver
-		// m_isa->install_memory(0x4400000, 0x45fffff, read8sm_delegate(*m_vga, FUNC(trident_vga_device::vram_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::vram_w)));
-
-		// win95 drivers
-		// m_isa->install_memory(0x4000000, 0x41fffff, read8sm_delegate(*m_vga, FUNC(trident_vga_device::vram_r)), write8sm_delegate(*m_vga, FUNC(trident_vga_device::vram_w)));
-
-		m_isa->install_memory(0xa0000, 0xbffff, read8sm_delegate(*m_vga, FUNC(tgui9680_device::mem_r)), write8sm_delegate(*m_vga, FUNC(tgui9680_device::mem_w)));
-		m_isa->install_rom(this, 0xc0000, 0xc7fff, "bios");
-	}
-	else if (space_id == AS_IO)
-		m_isa->install_device(0x0000, 0xffff, *this, &isa16_svga_tgui9680_device::io_isa_map);
-}
-
-void isa16_svga_tgui9680_device::io_isa_map(address_map &map)
-{
-	map(0x03b0, 0x03df).m(m_vga, FUNC(tgui9680_device::io_map));
-
-	map(0x43c4, 0x43cb).rw(m_vga, FUNC(tgui9680_device::port_43c6_r), FUNC(tgui9680_device::port_43c6_w));
-	map(0x83c4, 0x83cb).rw(m_vga, FUNC(tgui9680_device::port_83c6_r), FUNC(tgui9680_device::port_83c6_w));
-
-	// acceleration ports
-	map(0x2120, 0x21ff).rw(m_vga, FUNC(tgui9680_device::accel_r), FUNC(tgui9680_device::accel_w));
+	map(0x03b0, 0x03df).m(m_vga, FUNC(tvga9000_vga_device::io_map));
+	map(0x43c4, 0x43cb).rw(m_vga, FUNC(tvga9000_vga_device::port_43c6_r), FUNC(tvga9000_vga_device::port_43c6_w));
+	map(0x83c4, 0x83cb).rw(m_vga, FUNC(tvga9000_vga_device::port_83c6_r), FUNC(tvga9000_vga_device::port_83c6_w));
 }

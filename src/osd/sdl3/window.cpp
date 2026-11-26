@@ -566,6 +566,7 @@ void sdl_window_info::finger_moved(SDL_FingerID finger, unsigned device, int x, 
 {
 	auto info(std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), finger, &sdl_pointer_info::compare));
 	if ((m_active_pointers.end() == info) || (info->finger != finger))
+		return;
 
 	assert(1 == info->buttons);
 

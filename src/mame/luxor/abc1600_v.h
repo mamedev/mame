@@ -54,6 +54,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
+	virtual void device_post_load() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
@@ -81,7 +82,12 @@ private:
 	inline void compare_mta_x();
 	inline void compare_mta_y();
 	inline void load_xy_reg();
-	void mover();
+	void start_move(u64 tick);
+	void mover_step();
+	void mover_catch_up(u64 tick, bool display);
+	void mover_sync() { mover_catch_up(now_tick(), false); }
+	void render_rows(int end);
+	TIMER_CALLBACK_MEMBER(render_frame);
 
 	uint8_t video_ram_r(offs_t offset);
 	void video_ram_w(offs_t offset, uint8_t data);
@@ -115,14 +121,22 @@ private:
 	inline uint16_t read_videoram(offs_t offset);
 	inline void write_videoram(offs_t offset, uint16_t data, uint16_t mask);
 	inline uint16_t get_crtca(uint16_t ma, uint8_t ra, uint8_t column);
-	attotime wclk(int cycles) const { return attotime::from_hz(XTAL(64'000'000)/16) * cycles; }
-	bool dtack_clk(u64 slot) const;
+	u64 now_tick() const { return machine().time().as_ticks(clock()); }
+	attotime tick_time(u64 tick) const;
+	bool window_ds(u64 window) const;
+	bool seq_bit(u64 slot, int bit) const;
+	void update_seq_edges();
+	u64 next_edge(u64 tick) const;
+	u64 count_edges(u64 from, u64 to) const;
+	u64 advance_edges(u64 tick, u64 count) const;
+	bool edge_parity(u64 tick) const;
 	void select_screenpos_view();
 
 	const address_space_config m_space_config;
 
 	devcb_write_line m_write_amm;
 
+	required_device<screen_device> m_screen;
 	required_device<mc6845_device> m_crtc;
 	required_device<palette_device> m_palette;
 	required_device<timer_device> m_timer_amm;
@@ -158,6 +172,23 @@ private:
 	int m_rmc = 0;                  // row match count
 	int m_cmc = 0;                  // column match count
 	int m_amm = 0;                  // active mover mask
+	bool m_ammclk_phase = false;
+	bool m_ldfy_pending = false;
+	bool m_move_active = false;
+	bool m_line_start = false;
+	u64 m_amm_start = 0;
+	u64 m_amm_end = 0;
+	u64 m_busy_end = 0;
+	u64 m_step_tick = 0;
+
+	bitmap_rgb32 m_bitmap;
+	emu_timer *m_render_timer = nullptr;
+	u64 m_render_frame = 0;
+	int m_render_line = 0;
+
+	u16 m_cyk_mask[4];
+	u64 m_line_edges[2];
+	u64 m_frame_edges = 0;
 };
 
 

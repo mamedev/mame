@@ -259,10 +259,14 @@
 #include "machine/bankdev.h"
 #include "machine/input_merger.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/flt_vol.h"
 
 #include "emupal.h"
+#include "speaker.h"
 
 #include <algorithm>
+#include <array>
 #include <iterator>
 #include <memory>
 
@@ -307,6 +311,31 @@ constexpr u8 brake(u32 position)
 
 } // namespace sr_controls
 
+// Nominal resistor values used only to calculate the six-bit latch gain.
+// The branch table follows the latch bits, low bit first.
+constexpr double MIX_SERIES_OHMS = 4'700;
+constexpr double MIX_SHUNT_OHMS = 4'700;
+constexpr double MIX_BIAS_OHMS = 39'000;
+constexpr double MIX_BRANCH_OHMS[] = {20'000, 10'000, 4'700, 2'200, 1'000, 470};
+
+// Precompute the nominal gain for each setting of the six-bit attenuator.
+constexpr auto MIX_GAINS = []
+{
+	std::array<double, 64> gains{};
+	for (u32 data = 0; data < gains.size(); ++data)
+	{
+		double conductance = 1.0 / MIX_SHUNT_OHMS + 2.0 / MIX_BIAS_OHMS;
+		for (u32 bit = 0; bit < std::size(MIX_BRANCH_OHMS); ++bit)
+		{
+			if (!BIT(data, bit))
+				conductance += 2.0 / MIX_BRANCH_OHMS[bit];
+		}
+		// All shunts enabled gives maximum attenuation, with a nonzero gain.
+		gains[data] = 1.0 / (1.0 + MIX_SERIES_OHMS * conductance);
+	}
+	return gains;
+}();
+
 class sr_state : public driver_device
 {
 public:
@@ -332,6 +361,7 @@ public:
 		, m_sound_pia1(*this, "sound.u34")
 		, m_sound_pia2(*this, "sound.u15")
 		, m_sound_fifos(*this, { "sound.u23", "sound.u22" })
+		, m_sound_mix(*this, "sound.mix%u", 0U)
 	{
 	}
 
@@ -375,14 +405,8 @@ private:
 	template <unsigned N> void sound_fifo_pl_w(u8 data);
 	template <unsigned N> u8 sound_fifo_pd_r(address_space &space);
 	template <unsigned N> void sound_fifo_pd_w(u8 data);
-	u8 sound_ef1_r(address_space &space);
-	void sound_ef1_w(u8 data);
-	u8 sound_er1_r(address_space &space);
-	void sound_er1_w(u8 data);
-	u8 sound_ef2_r(address_space &space);
-	void sound_ef2_w(u8 data);
-	u8 sound_er2_r(address_space &space);
-	void sound_er2_w(u8 data);
+	template <u32 Index> u8 sound_mix_r(address_space &space);
+	template <u32 Index> void sound_mix_w(u8 data);
 
 	void sound_pia2_pa(u8 data);
 	void sound_fifo0_ir(int state);
@@ -418,6 +442,7 @@ private:
 	required_device<pia6821_device> m_sound_pia1;
 	required_device<pia6821_device> m_sound_pia2;
 	required_device_array<fifo2812_device, 2> m_sound_fifos;
+	required_device_array<filter_volume_device, 4> m_sound_mix;
 
 	u8 m_main_page = 0U;
 
@@ -526,6 +551,28 @@ void sr_state::starrider(machine_config &config)
 	//m_sound_fifos[1]->ir_cb().append(...) IR is input to a clock-stretching circuit
 	m_sound_fifos[1]->or_cb().set(FUNC(sr_state::sound_fifo_or<1>));
 	m_sound_fifos[1]->flag_cb().set(FUNC(sr_state::sound_fifo_flag<1>));
+
+	// Nominal host mix gain; cabinet loudness is not calibrated.
+	constexpr double GAME_AUDIO_GAIN = 0.175;
+	SPEAKER(config, "speaker", 4).corners();
+
+	// Two MC1408s, each with independent front and rear attenuators.
+	// W4 fitted and W3 open: DAC 1 feeds right, DAC 2 feeds left.
+	for (u32 channel = 0; channel != 2; ++channel)
+	{
+		char const *const dac_tag = channel ? "sound.u40" : "sound.u41";
+		auto &dac = MC1408(config, dac_tag, 0);
+		m_sound_fifos[channel]->q_cb().set(dac, FUNC(mc1408_device::write));
+		for (u32 pair = 0; pair != 2; ++pair)
+		{
+			u32 const index = 2 * channel + pair;
+			// The mix latches have no reset input; choose zero only at power-up.
+			FILTER_VOLUME(config, m_sound_mix[index]).set_gain(MIX_GAINS[0]);
+			dac.add_route(ALL_OUTPUTS, m_sound_mix[index], 1.0);
+			u32 const speaker_channel = 2 * pair + (channel ? 0 : 1);
+			m_sound_mix[index]->add_route(ALL_OUTPUTS, "speaker", GAME_AUDIO_GAIN, speaker_channel);
+		}
+	}
 
 	INPUT_MERGER_ANY_HIGH(config, "sound.irq").output_handler().set_inputline(m_sound_cpu, M6809_IRQ_LINE);
 }
@@ -744,56 +791,17 @@ template <unsigned N> void sr_state::sound_fifo_pd_w(u8 data)
 	m_sound_fifos[N]->pd_w(m_sound_ptm_o[N] ? 1 : 0);
 }
 
-u8 sr_state::sound_ef1_r(address_space &space)
+template <u32 Index> u8 sr_state::sound_mix_r(address_space &space)
 {
 	u8 const data(space.unmap());
 	if (!machine().side_effects_disabled())
-		sound_ef1_w(data);
+		sound_mix_w<Index>(data);
 	return data;
 }
 
-void sr_state::sound_ef1_w(u8 data)
+template <u32 Index> void sr_state::sound_mix_w(u8 data)
 {
-	data &= 0x3f; // DAC 1 -> front mix level (6 bits latched by U19)
-}
-
-u8 sr_state::sound_er1_r(address_space &space)
-{
-	u8 const data(space.unmap());
-	if (!machine().side_effects_disabled())
-		sound_er1_w(data);
-	return data;
-}
-
-void sr_state::sound_er1_w(u8 data)
-{
-	data &= 0x3f; // DAC 1 -> rear mix level (6 bits latched by U2)
-}
-
-u8 sr_state::sound_ef2_r(address_space &space)
-{
-	u8 const data(space.unmap());
-	if (!machine().side_effects_disabled())
-		sound_ef2_w(data);
-	return data;
-}
-
-void sr_state::sound_ef2_w(u8 data)
-{
-	data &= 0x3f; // DAC 2 -> front mix level (6 bits latched by U17)
-}
-
-u8 sr_state::sound_er2_r(address_space &space)
-{
-	u8 const data(space.unmap());
-	if (!machine().side_effects_disabled())
-		sound_er2_w(data);
-	return data;
-}
-
-void sr_state::sound_er2_w(u8 data)
-{
-	data &= 0x3f; // DAC 2 -> rear mix level (6 bits latched by U36)
+	m_sound_mix[Index]->set_gain(MIX_GAINS[data & 0x3f]);
 }
 
 
@@ -918,10 +926,10 @@ void sr_state::sound_memory(address_map &map)
 	map(0xc200, 0xc200).mirror(0x007f).rw(FUNC(sr_state::sound_fifo_pd_r<0>), FUNC(sr_state::sound_fifo_pd_w<0>));
 	map(0xc280, 0xc280).mirror(0x007f).rw(FUNC(sr_state::sound_fifo_pd_r<1>), FUNC(sr_state::sound_fifo_pd_w<1>));
 	//map(0xc300, 0xc37f) U21 (2821) unpopulated
-	map(0xc380, 0xc380).mirror(0x007f).rw(FUNC(sr_state::sound_ef1_r), FUNC(sr_state::sound_ef1_w));
-	map(0xc400, 0xc400).mirror(0x007f).rw(FUNC(sr_state::sound_er1_r), FUNC(sr_state::sound_er1_w));
-	map(0xc480, 0xc480).mirror(0x007f).rw(FUNC(sr_state::sound_ef2_r), FUNC(sr_state::sound_ef2_w));
-	map(0xc500, 0xc500).mirror(0x007f).rw(FUNC(sr_state::sound_er2_r), FUNC(sr_state::sound_er2_w));
+	map(0xc380, 0xc380).mirror(0x007f).rw(FUNC(sr_state::sound_mix_r<0>), FUNC(sr_state::sound_mix_w<0>)); // U19: DAC 1 front right
+	map(0xc400, 0xc400).mirror(0x007f).rw(FUNC(sr_state::sound_mix_r<1>), FUNC(sr_state::sound_mix_w<1>)); // U2: DAC 1 rear right
+	map(0xc480, 0xc480).mirror(0x007f).rw(FUNC(sr_state::sound_mix_r<2>), FUNC(sr_state::sound_mix_w<2>)); // U17: DAC 2 front left
+	map(0xc500, 0xc500).mirror(0x007f).rw(FUNC(sr_state::sound_mix_r<3>), FUNC(sr_state::sound_mix_w<3>)); // U36: DAC 2 rear left
 	map(0xc580, 0xc583).mirror(0x007c).rw(m_sound_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	// nothing in 0xc600-0xc67f
 	//map(0xc680, 0xc6ff) U21 (2812) unpopulated
@@ -1166,5 +1174,5 @@ ROM_END
 /***********************************************************************
     Machine definitions
 ***********************************************************************/
-GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
-GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, starridr,   0,        starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (REV 1)",   MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1984, starridrp3, starridr, starrider, starrider, sr_state, empty_init, ROT0, "Williams", "Star Rider (PROTO 3)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )

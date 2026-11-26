@@ -83,6 +83,7 @@ protected:
 	bool is_tx_enabled() const;
 	void check_for_tx_start();
 	void start_tx();
+	TIMER_CALLBACK_MEMBER(txrdy_delayed_assert);
 
 	enum
 	{
@@ -115,6 +116,7 @@ private:
 	uint8_t m_command;
 	uint8_t m_mode_byte;       // mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous
 	bool m_delayed_tx_en;
+	bool m_delayed_txrdy;
 	bool m_rxrdy;              // level last driven on RxRDY
 
 	int32_t m_cts;
@@ -137,6 +139,8 @@ private:
 	bool m_ext_syn_set;        // 1 = ext syndet pin has been set high; 0 = hunt mode activated
 	uint8_t m_rxd_bits;        // count of rxd bits
 	uint8_t m_data_bits_count;
+
+	emu_timer *m_txrdy_delay_timer;
 };
 
 class v5x_scu_device : public i8251_device

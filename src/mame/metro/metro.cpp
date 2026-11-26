@@ -235,9 +235,9 @@ int metro_upd7810_state::rxd_r()
 
 	// TODO: shift on SCK falling edges
 	if (!machine().side_effects_disabled())
-		m_sound_data >>= 1;
+		m_sound_data <<= 1;
 
-	return data & 1;
+	return BIT(data, 7);
 }
 
 void metro_upd7810_state::sound_data_w(u8 data)

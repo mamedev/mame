@@ -11,6 +11,9 @@
 #include "emu.h"
 #include "burgundy.h"
 
+#include <algorithm>
+#include <bit>
+
 #define LOG_REGISTERS (1U << 1)
 
 #define VERBOSE (0)
@@ -44,6 +47,7 @@ burgundy_device::burgundy_device(const machine_config &mconfig, const char *tag,
 	, m_codec_status(0)
 	, m_last_codec_control(0)
 	, m_counter(0)
+	, m_audio_control(0)
 {
 	std::fill(std::begin(m_registers), std::end(m_registers), 0);
 }
@@ -55,13 +59,14 @@ burgundy_device::burgundy_device(const machine_config &mconfig, const char *tag,
 void burgundy_device::device_start()
 {
 	// create the stream
-	m_stream = stream_alloc(0, 2, clock() / 512, STREAM_SYNCHRONOUS);
+	m_stream = stream_alloc(0, 2, calc_sample_rate(), STREAM_SYNCHRONOUS);
 
 	save_item(NAME(m_phase));
 	save_item(NAME(m_active));
 	save_item(NAME(m_registers));
 	save_item(NAME(m_codec_status));
 	save_item(NAME(m_counter));
+	save_item(NAME(m_audio_control));
 }
 
 
@@ -75,8 +80,9 @@ void burgundy_device::device_reset()
 	m_codec_status = 0;
 	m_counter = 0;
 	m_active = 0;
+	m_audio_control = 0;
 	std::fill(std::begin(m_registers), std::end(m_registers), 0);
-	m_stream->set_sample_rate(clock() / 512);
+	m_stream->set_sample_rate(calc_sample_rate());
 }
 
 
@@ -98,6 +104,10 @@ void burgundy_device::sound_stream_update(sound_stream &stream)
 	// DMA is always consumed at the sample rate, even with all outputs disabled.
 	const u32 data = swapendian_int32(m_output_cb(m_phase));
 
+	// Discard any other outputs since we're just dumping to the speakers for now
+	for (int i = 1; i < output_subframes(); i++)
+		m_output_cb(m_phase);
+
 	if (m_active & ACTIVE_OUT)
 	{
 		const s16 left = data >> 16;
@@ -111,7 +121,8 @@ void burgundy_device::sound_stream_update(sound_stream &stream)
 		stream.put_int(1, 0, 0, 32768);
 	}
 
-	m_input_cb(m_phase, 0);
+	for (int i = 0; i < input_subframes(); i++)
+		m_input_cb(m_phase, 0);
 
 	m_phase = (m_phase + 1) & 0xfff;
 }
@@ -121,7 +132,7 @@ uint32_t burgundy_device::read_macrisc(offs_t offset)
 	switch (offset)
 	{
 	case 0: // Audio Control
-		return 0;
+		return m_audio_control;
 
 	case 4: // Audio CODEC Control
 		return m_last_codec_control;
@@ -138,6 +149,9 @@ void burgundy_device::write_macrisc(offs_t offset, uint32_t data)
 	switch (offset)
 	{
 		case 0: // Audio Control
+			m_stream->update();
+			m_audio_control = data;
+			m_stream->set_sample_rate(calc_sample_rate());
 			break;
 
 		case 4: // Audio CODEC Control
@@ -180,4 +194,21 @@ void burgundy_device::write_macrisc(offs_t offset, uint32_t data)
 		case 8: // Audio CODEC Status
 			break;
 	}
+}
+
+inline u32 burgundy_device::calc_sample_rate() const
+{
+	constexpr u8 PRESCALER_DIVS[8] = { 2, 3, 4, 5, 6, 8, 10, 12 }; // double their actual values
+	const u8 rate_div = BIT(m_audio_control, 8, 3);
+	return (clock() / 2) / (PRESCALER_DIVS[rate_div] * 256); // 256 bit clocks per frame
+}
+
+inline int burgundy_device::output_subframes() const
+{
+	return std::max(std::popcount(BIT(m_audio_control, 4, 4)), 1);
+}
+
+inline int burgundy_device::input_subframes() const
+{
+	return std::max(std::popcount(BIT(m_audio_control, 0, 4)), 1);
 }

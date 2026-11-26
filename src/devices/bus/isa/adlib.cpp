@@ -52,7 +52,6 @@ isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *
 void isa8_adlib_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0388, 0x0389, read8sm_delegate(*m_ym3812, FUNC(ym3812_device::read)), write8sm_delegate(*m_ym3812, FUNC(ym3812_device::write)));
 }
 
 //-------------------------------------------------
@@ -61,4 +60,13 @@ void isa8_adlib_device::device_start()
 
 void isa8_adlib_device::device_reset()
 {
+	remap(AS_IO, 0, 0x03ff);
+}
+
+void isa8_adlib_device::remap(int space_id, offs_t start, offs_t end)
+{
+	if (space_id == AS_IO)
+	{
+		m_isa->install_device(0x0388, 0x0389, read8sm_delegate(*m_ym3812, FUNC(ym3812_device::read)), write8sm_delegate(*m_ym3812, FUNC(ym3812_device::write)));
+	}
 }

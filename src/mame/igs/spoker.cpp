@@ -38,6 +38,8 @@
 
 #include "emu.h"
 
+#include "igs003.h"
+
 #include "cpu/z180/z180.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -50,16 +52,6 @@
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
-
-
-// configurable logging
-#define LOG_IGS003 (1U << 1)
-
-// #define VERBOSE (LOG_GENERAL | LOG_IGS003)
-
-#include "logmacro.h"
-
-#define LOGIGS003(...) LOGMASKED(LOG_IGS003, __VA_ARGS__)
 
 
 namespace {
@@ -171,14 +163,15 @@ class spokeru_igs003_state : public spokeru_state
 protected:
 	spokeru_igs003_state(const machine_config &mconfig, device_type type, const char *tag) :
 		spokeru_state(mconfig, type, tag),
+		m_igs003(*this, "igs003"),
 		m_service(*this, "SERVICE")
 	{ }
 
 	virtual void machine_start() override ATTR_COLD;
 
+	required_device<igs003_device> m_igs003;
 	required_ioport m_service;
 
-	uint8_t m_protection_res = 0;
 	uint8_t m_input_sel = 0;
 };
 
@@ -200,9 +193,6 @@ protected:
 
 private:
 	required_device<ym2413_device> m_ymsnd;
-
-	uint8_t igs003e_r();
-	void igs003e_w(uint8_t data);
 
 	void decrypt_gfx() ATTR_COLD;
 
@@ -240,8 +230,6 @@ private:
 	required_device<ym2149_device> m_ymsnd;
 
 	void nmi_w(uint8_t data);
-	uint8_t igs003c_r();
-	void igs003c_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 
@@ -558,62 +546,6 @@ uint8_t spoker_state::magic_r()
 	return 0;
 }
 
-uint8_t jinhulu2_state::igs003c_r()
-{
-	if (!machine().side_effects_disabled())
-		LOGIGS003("%s: Protection read %02x\n", machine().describe_context(), m_protection_res);
-
-	return m_protection_res;
-}
-
-void jinhulu2_state::igs003c_w(uint8_t data)
-{
-	switch (data)
-	{
-		// case 0x01: break; // TODO: what does this do?
-		case 0x02: m_protection_res = m_io_in[0]->read(); break;
-		case 0x20: m_protection_res = 0x49; break;
-		case 0x21: m_protection_res = 0x47; break;
-		case 0x22: m_protection_res = 0x53; break;
-		case 0x24: m_protection_res = 0x41; break;
-		case 0x25: m_protection_res = 0x41; break;
-		case 0x26: m_protection_res = 0x7f; break;
-		case 0x27: m_protection_res = 0x41; break;
-		case 0x28: m_protection_res = 0x41; break;
-		case 0x2a: m_protection_res = 0x3e; break;
-		case 0x2b: m_protection_res = 0x41; break;
-		default: LOGIGS003("%s: Protection write %02x\n", machine().describe_context(), data); m_protection_res = data;
-	}
-}
-
-uint8_t xjinhuang_state::igs003e_r()
-{
-	if (!machine().side_effects_disabled())
-		LOGIGS003("%s: Protection read %02x\n", machine().describe_context(), m_protection_res);
-
-	return m_protection_res;
-}
-
-void xjinhuang_state::igs003e_w(uint8_t data) // TODO: IGS003E is usually more complex than this. Verify if it needs more.
-{
-	switch (data)
-	{
-		// case 0x01: break; // TODO: what does this do?
-		case 0x02: m_protection_res = m_io_in[0]->read(); break;
-		case 0x20: m_protection_res = 0x49; break;
-		case 0x21: m_protection_res = 0x47; break;
-		case 0x22: m_protection_res = 0x53; break;
-		case 0x24: m_protection_res = 0x41; break;
-		case 0x25: m_protection_res = 0x41; break;
-		case 0x26: m_protection_res = 0x7f; break;
-		case 0x27: m_protection_res = 0x41; break;
-		case 0x28: m_protection_res = 0x41; break;
-		case 0x2a: m_protection_res = 0x3e; break;
-		case 0x2b: m_protection_res = 0x41; break;
-		default: LOGIGS003("%s: Protection write %02x\n", machine().describe_context(), data); m_protection_res = data;
-	}
-}
-
 /***************************************************************************
                                 Memory Maps
 ***************************************************************************/
@@ -682,7 +614,9 @@ void xjinhuang_state::portmap(address_map &map)
 	map(0x2000, 0x23ff).ram().w(m_palette, FUNC(palette_device::write8)).share("palette");
 	map(0x2400, 0x27ff).ram().w(m_palette, FUNC(palette_device::write8_ext)).share("palette_ext");
 	map(0x5000, 0x5fff).ram().w(FUNC(xjinhuang_state::fg_tile_w)).share(m_fg_tile_ram);
-	map(0x6480, 0x6480).r(FUNC(xjinhuang_state::igs003e_r)).w(FUNC(xjinhuang_state::igs003e_w));
+	// TODO: jinhuang2 writes the index here and the data at 0x6481, xjinhuang only reads here
+	map(0x6480, 0x6480).r(m_igs003, FUNC(igs003_device::data_r)).w(m_igs003, FUNC(igs003_device::index_w));
+	map(0x6481, 0x6481).w(m_igs003, FUNC(igs003_device::data_w));
 	map(0x6482, 0x6482).w(FUNC(xjinhuang_state::nmi_video_leds_w));
 	map(0x64a1, 0x64a1).lr8(NAME([this] () -> uint8_t { return m_input_sel ? m_service->read() : m_io_in[1]->read(); }));
 	map(0x64a2, 0x64a2).w(m_ymsnd, FUNC(ym2413_device::data_w));
@@ -704,8 +638,8 @@ void jinhulu2_state::portmap(address_map &map)
 	map(0x5002, 0x5002).w(m_ymsnd, FUNC(ym2149_device::data_w));
 	map(0x5003, 0x5003).lw8(NAME([this] (uint8_t data) { m_input_sel = BIT(data, 0); m_ymsnd->address_w(data); }));
 	map(0x5010, 0x5010).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
-	map(0x5030, 0x5030).w(FUNC(jinhulu2_state::igs003c_w));
-	map(0x5031, 0x5031).r(FUNC(jinhulu2_state::igs003c_r)).w(FUNC(jinhulu2_state::nmi_w));
+	map(0x5030, 0x5030).w(m_igs003, FUNC(igs003_device::index_w));
+	map(0x5031, 0x5031).rw(m_igs003, FUNC(igs003_device::data_r), FUNC(igs003_device::data_w));
 	map(0x7000, 0x77ff).ram().w(FUNC(jinhulu2_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x7800, 0x7fff).ram().w(FUNC(jinhulu2_state::fg_color_w)).share(m_fg_color_ram);
 }
@@ -714,8 +648,9 @@ void jinhulu2_state::jinhuang_portmap(address_map &map)
 {
 	portmap(map);
 
+	// these games use a standard 8255 here (control word 0x81 written at 0x5033), the IGS003e is not used
 	map(0x5030, 0x5030).unmapw();
-	map(0x5031, 0x5031).unmapr();
+	map(0x5031, 0x5031).unmapr().w(FUNC(jinhulu2_state::nmi_w));
 	map(0x5032, 0x5032).portr("IN0");
 }
 
@@ -1823,7 +1758,6 @@ void spokeru_igs003_state::machine_start()
 {
 	spoker_state::machine_start();
 
-	save_item(NAME(m_protection_res));
 	save_item(NAME(m_input_sel));
 }
 
@@ -1905,6 +1839,9 @@ void xjinhuang_state::xjinhuang(machine_config &config)
 
 	config.device_remove("ppi8255_0");
 	config.device_remove("ppi8255_1");
+
+	IGS003(config, m_igs003); // IGS003E
+	m_igs003->in_pa_callback().set_ioport("IN0");
 }
 
 
@@ -1916,6 +1853,11 @@ void jinhulu2_state::jinhulu2(machine_config &config)
 	m_maincpu->set_clock(12_MHz_XTAL);
 
 	m_gfxdecode->set_info(gfx_jinhulu2);
+
+	IGS003(config, m_igs003); // IGS003C
+	// TODO: port A is set as output, port C bits 4-7 are outputs too, purpose unknown
+	m_igs003->in_pc_callback().set_ioport("IN0");
+	m_igs003->out_pb_callback().set(FUNC(jinhulu2_state::nmi_w));
 
 	YM2149(config.replace(), m_ymsnd, 12_MHz_XTAL / 12).add_route(ALL_OUTPUTS, "mono", 1.0);
 }

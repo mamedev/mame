@@ -40,6 +40,8 @@ protected:
 
 private:
 	emu_timer *m_timer_clock;
+	attotime m_clock_remaining;
+	bool m_time_initialized;
 	u8 m_rtc_regs[8];
 };
 

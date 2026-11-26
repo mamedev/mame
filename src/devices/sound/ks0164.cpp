@@ -529,8 +529,9 @@ void ks0164_device::sound_stream_update(sound_stream &stream)
 				regs[2] = current >> 16;
 				regs[3] = current;
 
-				suml += (s64(samp) * regs[0x12] * regs[0x16]) >> 32;
-				sumr += (s64(samp) * regs[0x10] * regs[0x14]) >> 32;
+				// 0x10/0x12 are the left/right gains, 0x14/0x16 are not output gains on the known boards
+				suml += (s32(samp) * regs[0x10]) >> 16;
+				sumr += (s32(samp) * regs[0x12]) >> 16;
 
 				if(regs[0xc]) {
 					regs[0x10] += regs[0x11];
@@ -541,7 +542,8 @@ void ks0164_device::sound_stream_update(sound_stream &stream)
 				}
 			}
 		}
-		stream.put_int(0, sample, suml, 32768 * 32);
-		stream.put_int(1, sample, sumr, 32768 * 32);
+		// accumulator headroom unknown, four full-scale voices keep the loudest known program in range
+		stream.put_int_clamp(0, sample, suml, 32768 * 4);
+		stream.put_int_clamp(1, sample, sumr, 32768 * 4);
 	}
 }

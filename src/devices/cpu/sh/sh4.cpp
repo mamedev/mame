@@ -107,23 +107,9 @@ DEFINE_DEVICE_TYPE(SH7751, sh7751_device, "sh7751", "Hitachi SH7751")
 DEFINE_DEVICE_TYPE(SH7751R, sh7751r_device, "sh7751r", "Hitachi SH7751R")
 
 
-#if 0
-/*When OC index mode is off (CCR.OIX = 0)*/
 void sh4_base_device::sh4_internal_map(address_map &map)
 {
-	map(0x1C000000, 0x1C000FFF).ram().mirror(0x03FFD000);
-	map(0x1C002000, 0x1C002FFF).ram().mirror(0x03FFD000);
-	map(0xE0000000, 0xE000003F).ram().mirror(0x03FFFFC0);
-
-	sh4_register_map(map);
-}
-#endif
-
-/*When OC index mode is on (CCR.OIX = 1)*/
-void sh4_base_device::sh4_internal_map(address_map &map)
-{
-	map(0x1C000000, 0x1C000FFF).ram().mirror(0x01FFF000);
-	map(0x1E000000, 0x1E000FFF).ram().mirror(0x01FFF000);
+	map(0x1C000000, 0x1FFFFFFF).rw(FUNC(sh4_base_device::ocram_r), FUNC(sh4_base_device::ocram_w));
 	map(0xE0000000, 0xE000003F).ram().mirror(0x03FFFFC0); // todo: store queues should be write only on DC's SH4, executing PREFM shouldn't cause an actual memory read access!
 
 	map(0xF6000000, 0xF6FFFFFF).rw(FUNC(sh4_base_device::sh4_utlb_address_array_r), FUNC(sh4_base_device::sh4_utlb_address_array_w));
@@ -3537,6 +3523,8 @@ void sh4_base_device::device_start()
 	m_sddr = 0;
 	m_sdint = 0;
 
+	std::fill(std::begin(m_ocram), std::end(m_ocram), 0);
+	save_item(NAME(m_ocram));
 	save_item(NAME(m_refresh_timer_base));
 
 	for (i = 0;i < 64;i++)

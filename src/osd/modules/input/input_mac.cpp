@@ -19,6 +19,8 @@
 #include <mutex>
 #include <memory>
 #include <algorithm>
+#include <optional>
+#include <variant>
 
 // MAME headers
 #include "emu.h"
@@ -62,6 +64,14 @@ struct mac_mouse_event
 	int         button;     // BUTTON: 0 = left, 1 = right, 2 = middle, ...
 	bool        down;       // BUTTON only
 	float       dx, dy;     // MOTION: relative pixels; WHEEL: vertical/horizontal detents
+};
+
+struct mac_touch_event
+{
+	uint32_t    touch;          // serial number, never reused
+	int         x, y;           // backing pixels relative to the content view
+	int         width, height;  // content view size in backing pixels
+	bool        contact;        // false once lifted or taken by the system
 };
 
 
@@ -362,7 +372,7 @@ private:
 //  mac_lightgun_device_base
 //============================================================
 
-class mac_lightgun_device_base : public event_based_device<mac_mouse_event>
+class mac_lightgun_device_base : public event_based_device<std::variant<mac_mouse_event, mac_touch_event> >
 {
 public:
 	virtual void reset() override
@@ -457,7 +467,11 @@ public:
 	{
 		mac_lightgun_device_base::poll(relative_reset);
 
-		update_position();
+		// a touch keeps its position until the system pointer is used again
+		if (!m_touch)
+		{
+			update_position();
+		}
 
 		if (relative_reset)
 		{
@@ -470,6 +484,7 @@ public:
 	{
 		mac_lightgun_device_base::reset();
 		m_v = m_h = 0;
+		m_touch.reset();
 	}
 
 	virtual void configure(input_device &device) override
@@ -492,8 +507,24 @@ public:
 	}
 
 protected:
-	virtual void process_event(const mac_mouse_event &event) override
+	virtual void process_event(const std::variant<mac_mouse_event, mac_touch_event> &event) override
 	{
+		std::visit([this] (const auto &e) { process(e); }, event);
+	}
+
+private:
+	void process(const mac_mouse_event &event)
+	{
+		// the system pointer takes the gun back from a touch once it lifts
+		if (m_touch)
+		{
+			if (any_pressed())
+			{
+				return;
+			}
+			m_touch.reset();
+		}
+
 		switch (event.type)
 		{
 		case mac_mouse_event::kind::BUTTON:
@@ -515,8 +546,34 @@ protected:
 		}
 	}
 
-private:
+	// as on Windows, the first touch down owns the gun and contact is button 1
+	void process(const mac_touch_event &event)
+	{
+		if (m_touch != event.touch)
+		{
+			// only take over while nothing else is pressed
+			if (!event.contact || any_pressed())
+			{
+				return;
+			}
+			m_touch = event.touch;
+		}
+
+		if ((event.width > 0) && (event.height > 0))
+		{
+			m_gun.lX = normalize_absolute_axis(event.x, 0, event.width - 1);
+			m_gun.lY = normalize_absolute_axis(event.y, 0, event.height - 1);
+		}
+		m_gun.buttons[0] = event.contact ? 0x80 : 0x00;
+	}
+
+	bool any_pressed() const
+	{
+		return std::any_of(std::begin(m_gun.buttons), std::end(m_gun.buttons), [] (uint8_t b) { return b != 0; });
+	}
+
 	int32_t m_v, m_h;
+	std::optional<uint32_t> m_touch;    // the touch that owns the gun, if any
 };
 
 
@@ -577,6 +634,11 @@ public:
 	virtual void exit() override;
 
 	void queue_mouse_event(const mac_mouse_event &event)
+	{
+		devicelist().for_each_device([&event] (auto &device) { device.queue_event(event); });
+	}
+
+	void queue_touch_event(const mac_touch_event &event)
 	{
 		devicelist().for_each_device([&event] (auto &device) { device.queue_event(event); });
 	}
@@ -646,9 +708,6 @@ void lightgun_input_mac::exit()
 //  event intake from the Cocoa side (windowcontroller.mm)
 //============================================================
 
-extern void *GetOSWindow(void *wincontroller);
-extern void *GetOSStandardWindow(void *wincontroller);
-
 static render_target *mac_ui_target()
 {
 	if (osd_common_t::window_list().empty())
@@ -662,24 +721,8 @@ static render_target *mac_ui_target()
 // find the render target belonging to a native window
 static render_target *mac_target_for_window(void *nswindow)
 {
-	if (nswindow == nullptr)
-	{
-		return nullptr;
-	}
-
-	for (const auto &w : osd_common_t::window_list())
-	{
-		auto &win = static_cast<mac_window_info &>(*w);
-		if (win.platform_window() != nullptr)
-		{
-			// match either the current (possibly fullscreen) or the standard window
-			if ((GetOSWindow(win.platform_window()) == nswindow) || (GetOSStandardWindow(win.platform_window()) == nswindow))
-			{
-				return win.target();
-			}
-		}
-	}
-	return nullptr;
+	mac_window_info *const window = mac_window_info::from_nswindow(nswindow);
+	return (window != nullptr) ? window->target() : nullptr;
 }
 
 extern "C" void MacKeyboardEvent(int vk, int down)
@@ -709,13 +752,27 @@ extern "C" void MacMouseButtonEvent(int button, int down)
 
 extern "C" void MacMouseMotionEvent(float dx, float dy)
 {
+	osd::mac_mouse_event event{};
+	event.type = osd::mac_mouse_event::kind::MOTION;
+	event.dx = dx;
+	event.dy = dy;
+
 	if (osd::g_mouse_input != nullptr)
 	{
-		osd::mac_mouse_event event{};
-		event.type = osd::mac_mouse_event::kind::MOTION;
-		event.dx = dx;
-		event.dy = dy;
 		osd::g_mouse_input->queue_mouse_event(event);
+	}
+	if (osd::g_lightgun_input != nullptr)
+	{
+		osd::g_lightgun_input->queue_mouse_event(event);
+	}
+}
+
+// called from mac_window_info's touch handlers
+void MacLightgunTouchEvent(uint32_t touch, int x, int y, int width, int height, bool contact)
+{
+	if (osd::g_lightgun_input != nullptr)
+	{
+		osd::g_lightgun_input->queue_touch_event(osd::mac_touch_event{ touch, x, y, width, height, contact });
 	}
 }
 

@@ -58,6 +58,46 @@ device_ieee488_interface::~device_ieee488_interface()
 }
 
 
+//-------------------------------------------------
+//  configured_address - slot address during
+//  configuration, or -1 outside an IEEE-488 slot
+//-------------------------------------------------
+
+int device_ieee488_interface::configured_address() const
+{
+	ieee488_slot_device const *const slot = dynamic_cast<ieee488_slot_device const *>(device().owner());
+	return slot ? slot->get_address() : -1;
+}
+
+
+//-------------------------------------------------
+//  set_switch_default - default an address switch
+//-------------------------------------------------
+
+void device_ieee488_interface::set_switch_default(const char *tag, ioport_value mask, ioport_value value)
+{
+	if (device().input_ports_defaults())
+		return;
+
+	m_switch_default[0] = { tag, mask, value & mask };
+	m_switch_default[1] = { nullptr, 0, 0 };
+	device().set_input_default(m_switch_default);
+}
+
+
+//-------------------------------------------------
+//  set_address_default - default a binary
+//  address switch to the slot address
+//-------------------------------------------------
+
+void device_ieee488_interface::set_address_default(int base, ioport_value mask)
+{
+	int const address = configured_address();
+	if (address >= base)
+		set_switch_default("ADDRESS", mask, address - base);
+}
+
+
 
 //**************************************************************************
 //  LIVE DEVICE

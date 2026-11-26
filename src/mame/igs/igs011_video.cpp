@@ -51,7 +51,6 @@ igs011_device::igs011_device(const machine_config &mconfig, const char *tag, dev
 	, m_gfx(*this, DEVICE_SELF)
 	, m_gfx_hi(*this, "gfx_hi")
 	, m_host_space(*this, finder_base::DUMMY_TAG, -1, 16)
-	, m_restore_space_cb(*this)
 {
 }
 
@@ -477,8 +476,7 @@ u16 igs011_device::prot_r()
 
 void igs011_device::prot_addr_change_w(s32 data)
 {
-	if (m_prev_prot_addr != -1)
-		m_restore_space_cb(m_prot_addr);
+	m_prot_tap.remove();
 	if (data != -1)
 	{
 		m_prot_addr = (data << 4) ^ 0x8340;
@@ -497,18 +495,21 @@ void igs011_device::prot_addr_w(u16 data)
 
 void igs011_device::prot_mem_range_set()
 {
-	// Add protection memory range
-	m_host_space->install_write_handler(m_prot_addr + 0, m_prot_addr + 7, write8sm_delegate(*this, FUNC(igs011_device::prot_w)), 0xff00);
-	m_host_space->install_read_handler (m_prot_addr + 8, m_prot_addr + 9, read16smo_delegate(*this, FUNC(igs011_device::prot_r)));
+	// the protection takes over the bus at the programmed address, whatever is mapped there
+	m_prot_tap = m_host_space->install_write_tap(
+			m_prot_addr + 0, m_prot_addr + 7,
+			"igs011_prot_w",
+			[this] (offs_t offset, u16 &data, u16 mem_mask)
+			{
+				if (ACCESSING_BITS_8_15)
+					prot_w((offset - m_prot_addr) >> 1, data >> 8);
+			});
+	m_host_space->install_read_tap(
+			m_prot_addr + 8, m_prot_addr + 9,
+			"igs011_prot_r",
+			[this] (offs_t offset, u16 &data, u16 mem_mask)
+			{
+				data = prot_r();
+			},
+			&m_prot_tap);
 }
-/*
-u16 igs011_device::prot_fake_r(offs_t offset)
-{
-    switch (offset)
-    {
-        case 0: return m_prot;
-        case 1: return m_prot_swap;
-    }
-    return 0;
-}
-*/

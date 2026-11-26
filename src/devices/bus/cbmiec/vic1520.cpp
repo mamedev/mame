@@ -232,7 +232,7 @@ uint8_t vic1520_device::pb_r()
 
 	u8 data = 0;
 
-	data |= ((m_slot->get_address() - 4) & 0x07);
+	data |= 0x02;
 	data |= m_pb->read() << 5;
 
 	return data;

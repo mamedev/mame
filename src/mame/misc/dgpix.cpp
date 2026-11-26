@@ -318,7 +318,6 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_sound(*this, "ks0164"),
 		m_flash(*this, "flash%u", 0),
-		m_secmod(*this, "secmod"),
 		m_vblank(*this, "VBLANK")
 	{ }
 
@@ -327,7 +326,7 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-	void dgpix_base(machine_config &config);
+	void dgpix_base(machine_config &config) ATTR_COLD;
 
 	void base_map(address_map &map) ATTR_COLD;
 	void secmod_io_map(address_map &map) ATTR_COLD;
@@ -338,7 +337,6 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<ks0164_device> m_sound;
 	optional_device_array<intel_28f320j5_device, 8> m_flash; // up to 8 but not all populated
-	optional_device<dgpix_pr1_device> m_secmod; // U100, not fitted on every board
 
 private:
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -357,7 +355,7 @@ private:
 
 	required_ioport m_vblank;
 
-	std::unique_ptr<u16[]> m_vram;
+	std::unique_ptr<u16 []> m_vram;
 	int m_vbuffer;
 	int m_old_vbuf;
 };
@@ -370,8 +368,8 @@ public:
 		dgpix_state(mconfig, type, tag)
 	{ }
 
-	void dgpix(machine_config &config);
-	void dgpix_kdynastg(machine_config &config);
+	void dgpix(machine_config &config) ATTR_COLD;
+	void dgpix_kdynastg(machine_config &config) ATTR_COLD;
 	void dgpix_secmod(machine_config &config) ATTR_COLD;
 
 private:
@@ -387,7 +385,7 @@ public:
 		m_ks0164_bank(*this, "ks0164_bank")
 	{ }
 
-	void dgpix(machine_config &config);
+	void dgpix(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_reset() override ATTR_COLD;
@@ -515,11 +513,11 @@ void dgpix_state::secmod_io_map(address_map &map)
 {
 	io_map(map);
 
-	map(0x0080, 0x0080).umask32(0x000000ff).r(m_secmod, FUNC(dgpix_pr1_device::status_r));
-	map(0x0180, 0x0180).umask32(0x000000ff).r(m_secmod, FUNC(dgpix_pr1_device::data_lo_r));
-	map(0x0200, 0x0200).umask32(0x000000ff).r(m_secmod, FUNC(dgpix_pr1_device::data_hi_r));
-	map(0x0280, 0x0280).umask32(0x000000ff).w(m_secmod, FUNC(dgpix_pr1_device::dir_w));
-	map(0x0300, 0x0300).umask32(0x000000ff).w(m_secmod, FUNC(dgpix_pr1_device::reset_w));
+	map(0x0080, 0x0080).umask32(0x000000ff).r("secmod", FUNC(dgpix_pr1_device::status_r));
+	map(0x0180, 0x0180).umask32(0x000000ff).r("secmod", FUNC(dgpix_pr1_device::data_lo_r));
+	map(0x0200, 0x0200).umask32(0x000000ff).r("secmod", FUNC(dgpix_pr1_device::data_hi_r));
+	map(0x0280, 0x0280).umask32(0x000000ff).w("secmod", FUNC(dgpix_pr1_device::dir_w));
+	map(0x0300, 0x0300).umask32(0x000000ff).w("secmod", FUNC(dgpix_pr1_device::reset_w));
 }
 
 static INPUT_PORTS_START( dgpix )
@@ -665,15 +663,17 @@ void dgpix_state::dgpix_base(machine_config &config)
 void dgpix_typea_state::dgpix(machine_config &config)
 {
 	dgpix_base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &dgpix_typea_state::mem_map);
 }
 
 void dgpix_typea_state::dgpix_secmod(machine_config &config)
 {
 	dgpix(config);
+
 	m_maincpu->set_addrmap(AS_IO, &dgpix_typea_state::secmod_io_map);
 
-	DGPIX_PR1(config, m_secmod);
+	DGPIX_PR1(config, "secmod");
 }
 
 void dgpix_typea_state::dgpix_kdynastg(machine_config &config)
@@ -687,10 +687,11 @@ void dgpix_typea_state::dgpix_kdynastg(machine_config &config)
 void dgpix_bmkey_state::dgpix(machine_config &config)
 {
 	dgpix_base(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &dgpix_bmkey_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &dgpix_bmkey_state::secmod_io_map);
 
-	DGPIX_PR1(config, m_secmod);
+	DGPIX_PR1(config, "secmod");
 }
 
 

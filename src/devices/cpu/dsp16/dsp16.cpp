@@ -1418,10 +1418,10 @@ inline void dsp16_device_base::yaau_short_immediate_load(u16 op)
 	switch (r)
 	{
 	case 0x0: // j
-		m_core->yaau_j = m | ((m & m_core->yaau_sign) ? ~m_core->yaau_mask : 0);
+		m_core->yaau_j = util::sext(m, 9);
 		break;
 	case 0x1: // k
-		m_core->yaau_k = m | ((m & m_core->yaau_sign) ? ~m_core->yaau_mask : 0);
+		m_core->yaau_k = util::sext(m, 9);
 		break;
 	case 0x2: // rb
 		m_core->yaau_rb = m;

@@ -335,21 +335,6 @@ void hx5102_device::board_ready(int state)
 }
 
 /*
-    Trigger RESET.
-*/
-void hx5102_device::board_reset(int state)
-{
-	LOGMASKED(LOG_RESET, "Incoming RESET line = %d\n", state);
-
-	if (machine().phase() != machine_phase::INIT)
-	{
-		// Setting ready to true so that automatic wait states are disabled
-		m_flopcpu->ready_line(ASSERT_LINE);
-		m_flopcpu->reset_line(ASSERT_LINE);
-	}
-}
-
-/*
     Effect from the motor monoflop.
 */
 void hx5102_device::motor_w(int state)
@@ -609,7 +594,7 @@ void hx5102_device::device_start()
 */
 void hx5102_device::device_reset()
 {
-	board_reset(ASSERT_LINE);
+	LOGMASKED(LOG_RESET, "Board reset\n");
 	board_ready(ASSERT_LINE);
 }
 
@@ -687,6 +672,8 @@ void hx5102_device::device_add_mconfig(machine_config& config)
 
 	// TMS9995 CPU @ 12.0 MHz
 	TMS9995(config, m_flopcpu, 12_MHz_XTAL);
+	// Model READY low at reset release. The READY flip-flop can still stall the floppy CPU for DMA.
+	m_flopcpu->set_auto_wait_on_reset(false);
 	m_flopcpu->set_addrmap(AS_PROGRAM, &hx5102_device::memmap);
 	m_flopcpu->set_addrmap(AS_IO, &hx5102_device::crumap);
 	m_flopcpu->extop_cb().set(FUNC(hx5102_device::external_operation));

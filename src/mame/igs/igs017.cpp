@@ -93,6 +93,7 @@ Notes:
 
 #include "emu.h"
 
+#include "igs003.h"
 #include "igs017_igs031.h"
 #include "igs022.h"
 #include "igsmahjong.h"
@@ -754,6 +755,7 @@ public:
 		, m_decrypted_opcodes(*this, "decrypted_opcodes")
 		// Optional devices
 		, m_hopper(*this, "hopper")
+		, m_igs003(*this, "igs003")
 		, m_igs_bitswap(*this, "igs_bitswap")
 		, m_igs_string(*this, "igs_string")
 		, m_igs_incdec(*this, "igs_incdec")
@@ -844,6 +846,7 @@ private:
 
 	// Optional devices
 	optional_device<hopper_device> m_hopper;
+	optional_device<igs003_device> m_igs003;
 	optional_device<igs_bitswap_device> m_igs_bitswap;
 	optional_device<igs_string_device> m_igs_string;
 	optional_device<igs_incdec_device> m_igs_incdec;
@@ -1031,7 +1034,6 @@ private:
 	void decrypted_opcodes_map(address_map &map) ATTR_COLD;
 
 	void igs_bitswap_mux_map(address_map &map) ATTR_COLD;
-	void igs_fixed_data_mux_map(address_map &map) ATTR_COLD;
 	void igs_string_mux_map(address_map &map) ATTR_COLD;
 
 	void cpoker2_io(address_map &map) ATTR_COLD;
@@ -1043,8 +1045,6 @@ private:
 	void hjdmg_map(address_map &map) ATTR_COLD;
 	void iqblocka_io(address_map &map) ATTR_COLD;
 	void iqblocka_map(address_map &map) ATTR_COLD;
-	void iqblocka_mux_map(address_map &map) ATTR_COLD;
-	void iqblockf_mux_map(address_map &map) ATTR_COLD;
 	void jking302us_map(address_map &map) ATTR_COLD;
 	void jking302us_mux_map(address_map &map) ATTR_COLD;
 	void lhzb2_map(address_map &map) ATTR_COLD;
@@ -2758,15 +2758,6 @@ void igs017_state::igs_string_mux_map(address_map &map)
 	map(0x40, 0x40).r(m_igs_string, FUNC(igs_string_device::advance_string_offs_r));
 }
 
-// 0x20 - 0x34: read fixed data
-void igs017_state::igs_fixed_data_mux_map(address_map &map)
-{
-	map(0x20, 0x34).rom().region("igs_fixed_data", 0);
-	map(0x23, 0x23).unmapr();
-	map(0x29, 0x29).unmapr();
-	map(0x2f, 0x2f).unmapr();
-}
-
 
 // iqblocka, iqblockf, genius6
 
@@ -2823,32 +2814,14 @@ void igs017_state::iqblocka_io(address_map &map)
 
 	map(0x2010, 0x2011).w(FUNC(igs017_state::incdec_remap_addr_w));
 
-	map(0x8000, 0x8000).w (m_igs_mux, FUNC(igs_mux_device::address_w));
-	map(0x8001, 0x8001).rw(m_igs_mux, FUNC(igs_mux_device::data_r), FUNC(igs_mux_device::data_w));
+	map(0x8000, 0x8000).w (m_igs003, FUNC(igs003_device::index_w));
+	map(0x8001, 0x8001).rw(m_igs003, FUNC(igs003_device::data_r), FUNC(igs003_device::data_w));
 
 	map(0x9000, 0x9000).rw(m_oki, FUNC(okim6295_device::read), FUNC(okim6295_device::write));
 
 	map(0xa000, 0xa000).portr("BUTTONS");
 
 	map(0xb000, 0xb001).w("ymsnd", FUNC(ym2413_device::write));
-}
-
-void igs017_state::iqblocka_mux_map(address_map &map)
-{
-	map(0x00, 0x00).portr("PLAYER1").w(NAME((&igs017_state::counter_w<7, 0x7f, 0>))); // coin in
-	map(0x01, 0x01).portr("PLAYER2");
-	map(0x02, 0x02).portr("COINS");
-
-	igs_bitswap_mux_map(map); // 0x03 r, 0x40 - 0x47 w, 0x48 w, 0x50 w, 0x80 - 0x87 w, 0xa0 w
-
-	igs_fixed_data_mux_map(map); // 0x20 - 0x34: read fixed data
-}
-
-void igs017_state::iqblockf_mux_map(address_map &map)
-{
-	iqblocka_mux_map(map);
-
-	map(0x01, 0x01).w(NAME((&igs017_state::counter_w<7, 0x7f, 1>))); // coin out (in gambling mode, only iqblockf/genius6)
 }
 
 // starzan
@@ -5521,21 +5494,18 @@ void igs017_state::iqblocka(machine_config &config)
 	// NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// i/o
-	m_igs_mux->set_addrmap(0, &igs017_state::iqblocka_mux_map);
+	IGS003(config, m_igs003); // 8255 in the iqblocka PCB layout, IGS003c on genius6
+	m_igs003->in_pa_callback().set_ioport("PLAYER1");
+	m_igs003->in_pb_callback().set_ioport("PLAYER2");
+	m_igs003->in_pc_callback().set_ioport("COINS");
+	m_igs003->out_pa_callback().set(NAME((&igs017_state::counter_w<7, 0x7f, 0>))); // coin in
+	// TODO: port C bits 2 and 4 are outputs, purpose unknown
 
 	m_igs017_igs031->in_pa_callback().set_ioport("DSW1");
 	m_igs017_igs031->in_pb_callback().set_ioport("DSW2");
 	m_igs017_igs031->in_pc_callback().set_ioport("DSW3");
 
 	// protection
-	IGS_BITSWAP(config, m_igs_bitswap);
-	m_igs_bitswap->set_val_xor(0x15d6);
-	m_igs_bitswap->set_mf_bits(3, 5, 9, 11);
-	m_igs_bitswap->set_m3_bits<0>(~5,  8, ~10, ~15);
-	m_igs_bitswap->set_m3_bits<1>( 3, ~8, ~12, ~15);
-	m_igs_bitswap->set_m3_bits<2>( 2, ~6, ~11, ~15);
-	m_igs_bitswap->set_m3_bits<3>( 0, ~1, ~3,  ~15);
-
 	IGS_INCDEC(config, m_igs_incdec);
 
 	// sound
@@ -5546,22 +5516,16 @@ void igs017_state::iqblockf(machine_config &config)
 {
 	iqblocka(config);
 
-	m_igs_mux->set_addrmap(0, &igs017_state::iqblockf_mux_map);
-
-	// tweaked protection bitswap
-	m_igs_bitswap->set_mf_bits(0, 5, 9, 13);
+	m_igs003->out_pb_callback().set(NAME((&igs017_state::counter_w<7, 0x7f, 1>))); // coin out (in gambling mode)
+	m_igs003->set_hold_xpos(1, 6, 10, 14);
 }
 
 void igs017_state::genius6(machine_config &config)
 {
 	iqblockf(config);
 
-	// tweaked protection bitswap
-	m_igs_bitswap->set_mf_bits(2, 7, 9, 13);
-	m_igs_bitswap->set_m3_bits<0>(~5,  6,  ~7, ~15);
-	m_igs_bitswap->set_m3_bits<1>( 1, ~6,  ~9, ~15);
-	m_igs_bitswap->set_m3_bits<2>( 4, ~8, ~12, ~15);
-	m_igs_bitswap->set_m3_bits<3>( 3, ~5,  ~6, ~15);
+	m_igs003->set_hold_taps(igs003_device::hold_taps::B);
+	m_igs003->set_hold_xpos(3, 8, 10, 14);
 }
 
 
@@ -6181,9 +6145,6 @@ ROM_START( iqblocka )
 
 	ROM_REGION( 0x2dd, "pld", ROMREGION_ERASE )
 	ROM_LOAD( "cq.u24", 0x000, 0x2dd, NO_DUMP ) // PAL22CV10
-
-	ROM_REGION( 0x15, "igs_fixed_data", 0 )
-	ROM_LOAD( "igs_fixed_data.key", 0x00, 0x15, CRC(9159ecbf) SHA1(b6bdb1f327944dfc7f6f71565a24e89517607490) )
 ROM_END
 
 // English title (IQ Block) and year 1997:
@@ -6204,9 +6165,6 @@ ROM_START( iqblockf )
 
 	ROM_REGION( 0x2dd, "pld", ROMREGION_ERASE )
 	ROM_LOAD( "cq.u24", 0x000, 0x2dd, NO_DUMP ) // PAL22CV10
-
-	ROM_REGION( 0x15, "igs_fixed_data", 0 )
-	ROM_LOAD( "igs_fixed_data.key", 0x00, 0x15, CRC(9159ecbf) SHA1(b6bdb1f327944dfc7f6f71565a24e89517607490) )
 ROM_END
 
 // IQ Block V110F also exists (undumped) with IGS003e (not 8255)
@@ -6258,9 +6216,6 @@ ROM_START( genius6 )
 
 	ROM_REGION( 0x2dd, "pld", ROMREGION_ERASE )
 	ROM_LOAD( "cq.u24", 0x000, 0x2dd, NO_DUMP ) // PAL22CV10
-
-	ROM_REGION( 0x15, "igs_fixed_data", 0 )
-	ROM_LOAD( "igs_fixed_data.key", 0x00, 0x15, CRC(9159ecbf) SHA1(b6bdb1f327944dfc7f6f71565a24e89517607490) )
 ROM_END
 
 // strangely identifies as V133F and has 1997 copyright, while the parent is V110F but with 1998 copyright
@@ -6279,9 +6234,6 @@ ROM_START( genius6a )
 
 	ROM_REGION( 0x2dd, "pld", ROMREGION_ERASE )
 	ROM_LOAD( "cq.u24", 0x000, 0x2dd, NO_DUMP ) // PAL22CV10
-
-	ROM_REGION( 0x15, "igs_fixed_data", 0 )
-	ROM_LOAD( "igs_fixed_data.key", 0x00, 0x15, CRC(9159ecbf) SHA1(b6bdb1f327944dfc7f6f71565a24e89517607490) )
 ROM_END
 
 ROM_START( genius6b ) // PCB NO-0132, identical to V133F but for the main CPU ROM
@@ -6299,9 +6251,6 @@ ROM_START( genius6b ) // PCB NO-0132, identical to V133F but for the main CPU RO
 
 	ROM_REGION( 0x2dd, "pld", ROMREGION_ERASE )
 	ROM_LOAD( "cq.u24", 0x000, 0x2dd, NO_DUMP ) // PAL22CV10
-
-	ROM_REGION( 0x15, "igs_fixed_data", 0 )
-	ROM_LOAD( "igs_fixed_data.key", 0x00, 0x15, CRC(9159ecbf) SHA1(b6bdb1f327944dfc7f6f71565a24e89517607490) )
 ROM_END
 
 /***************************************************************************

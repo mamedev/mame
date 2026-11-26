@@ -66,6 +66,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(0, 0x0f); }
 
 	// device_ieee488_interface implementation
 	virtual void ieee488_atn(int state) override;
@@ -83,6 +84,7 @@ private:
 	required_device<i8255_device> m_ieee_ppi;
 	required_device<harddisk_image_device> m_harddisk;
 	required_region_ptr<uint8_t> m_micro;
+	required_ioport m_address;
 	emu_timer *m_drive_timer;
 	emu_timer *m_sector_timer;
 
@@ -202,6 +204,24 @@ void mshark_device::device_add_mconfig(machine_config &config)
 //-------------------------------------------------
 
 INPUT_PORTS_START( mshark )
+	PORT_START("ADDRESS")
+	PORT_DIPNAME( 0x0f, 0x08, "Device Address" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x09, "9" )
+	PORT_DIPSETTING(    0x0a, "10" )
+	PORT_DIPSETTING(    0x0b, "11" )
+	PORT_DIPSETTING(    0x0c, "12" )
+	PORT_DIPSETTING(    0x0d, "13" )
+	PORT_DIPSETTING(    0x0e, "14" )
+	PORT_DIPSETTING(    0x0f, "15" )
 INPUT_PORTS_END
 
 
@@ -233,6 +253,7 @@ mshark_device::mshark_device(const machine_config &mconfig, const char *tag, dev
 	, m_ieee_ppi(*this, "ieee_ppi")
 	, m_harddisk(*this, "harddisk1")
 	, m_micro(*this, "micro")
+	, m_address(*this, "ADDRESS")
 	, m_ieee_pc(0xff)
 	, m_disk_pc(0xff)
 	, m_atn(true)
@@ -560,7 +581,7 @@ void mshark_device::ieee_pc_w(uint8_t data)
 
 uint8_t mshark_device::switches_r()
 {
-	return (~m_slot->get_address() & 0x0f) | (m_bus->ifc_r() << 4) | (m_bus->atn_r() << 5) | (m_bus->ren_r() << 6) | 0x80;
+	return (~m_address->read() & 0x0f) | (m_bus->ifc_r() << 4) | (m_bus->atn_r() << 5) | (m_bus->ren_r() << 6) | 0x80;
 }
 
 void mshark_device::update_interrupt()

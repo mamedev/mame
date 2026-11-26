@@ -206,7 +206,12 @@ enum
 	SPR603_HID0         = 0x3f0,    // R/W 603 Hardware Implementation Register 0
 	SPR603_HID1         = 0x3f1,    // R/W 603 Hardware Implementation Register 1
 	SPR603_IABR         = 0x3f2,    // R/W 603 Instruction Address Breakpoint Register
-	SPR603_HID2         = 0x3f3     // R/W 603
+	SPR603_HID2         = 0x3f3,    // R/W 603
+
+	// PowerPC 740/750/755/7400/7410 thermal assist unit
+	SPR7XX_THRM1        = 0x3fc,    // R/W 7xx Thermal Management Register 1
+	SPR7XX_THRM2        = 0x3fd,    // R/W 7xx Thermal Management Register 2
+	SPR7XX_THRM3        = 0x3fe     // R/W 7xx Thermal Management Register 3
 };
 
 // PowerPC 4XX DCR register indexes

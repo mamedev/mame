@@ -129,7 +129,6 @@ public:
 
 private:
 	void prg_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
 
 	uint8_t port_b_r();
 	void port_b_w(uint8_t data);
@@ -222,12 +221,6 @@ void pensebem2017_state::prg_map(address_map &map)
 	map(0x0000, 0x3fff).rom().region("maincpu", 0); /* 16 kbytes of Flash ROM */
 }
 
-void pensebem2017_state::data_map(address_map &map)
-{
-	map(0x0000, 0x03ff).ram(); /* ATMEGA168PB Internal 1024 bytes of SRAM */
-	map(0x0400, 0xffff).ram(); /* Some additional SRAM ? This is likely an exagerated amount ! */
-}
-
 static INPUT_PORTS_START( pensebem2017 )
 	PORT_START("ROW0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
@@ -275,7 +268,6 @@ void pensebem2017_state::pensebem2017(machine_config &config)
 	/* CPU */
 	ATMEGA168(config, m_maincpu, 16_MHz_XTAL); /* Actual chip is an Atmel ATMEGA168PB */
 	m_maincpu->set_addrmap(AS_PROGRAM, &pensebem2017_state::prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &pensebem2017_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->set_low_fuses(0xf7);
 	m_maincpu->set_high_fuses(0xdd);

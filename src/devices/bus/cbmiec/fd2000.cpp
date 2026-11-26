@@ -89,7 +89,7 @@ static INPUT_PORTS_START( fd2000 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Swap") PORT_WRITE_LINE_DEVICE_MEMBER(G65SC22P2_TAG, FUNC(via6522_device::write_ca1))
 
 	PORT_START("ADDRESS")
-	PORT_DIPNAME( 0x0f, 0x00, "Device Address" )
+	PORT_DIPNAME( 0x07, 0x00, "Device Address" )
 	PORT_DIPSETTING(    0x00, "8" )
 	PORT_DIPSETTING(    0x01, "9" )
 	PORT_DIPSETTING(    0x02, "10" )
@@ -210,7 +210,7 @@ uint8_t fd2000_device::via_pb_r()
 
 	*/
 
-	int addr = m_slot->get_address() - 8;
+	int addr = m_address->read();
 
 	uint8_t data = 0;
 	data |= BIT(addr, 2) << 2;
@@ -385,7 +385,8 @@ fd2000_device::fd2000_device(const machine_config &mconfig, device_type type, co
 	m_rom(*this, G65SC02PI2_TAG),
 	m_fdc(*this, DP8473V_TAG),
 	m_leds(*this, "led%u", 0U),
-	m_pb(*this, "PB")
+	m_pb(*this, "PB"),
+	m_address(*this, "ADDRESS")
 {
 }
 

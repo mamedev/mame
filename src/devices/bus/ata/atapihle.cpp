@@ -82,6 +82,7 @@ void atapi_hle_device::process_buffer()
 			m_cylinder_low = 0;
 			m_cylinder_high = 0;
 			m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
+			m_status |= IDE_STATUS_DRDY;
 			set_irq(ASSERT_LINE);
 			break;
 		}
@@ -144,6 +145,7 @@ void atapi_hle_device::fill_buffer()
 		else
 		{
 			m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
+			m_status |= IDE_STATUS_DRDY;
 			set_irq(ASSERT_LINE);
 		}
 		break;
@@ -154,7 +156,7 @@ void atapi_hle_device::fill_buffer()
 		// it here also is wrong per the spec and screws up the Mac OS ATA driver.
 		m_cylinder_low = 0;
 		m_cylinder_high = 0;
-
+		m_status |= IDE_STATUS_DRDY;
 		m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
 		break;
 	}
@@ -191,6 +193,7 @@ void atapi_hle_device::wait_buffer()
 	else
 	{
 		m_sector_count = ATAPI_INTERRUPT_REASON_IO | ATAPI_INTERRUPT_REASON_CD;
+		m_status |= IDE_STATUS_DRDY;
 		set_irq(ASSERT_LINE);
 	}
 }
@@ -218,6 +221,7 @@ void atapi_hle_device::process_command()
 		break;
 
 	case IDE_COMMAND_RECALIBRATE:
+		m_status |= IDE_STATUS_DRDY;
 		set_irq(ASSERT_LINE);
 		break;
 
@@ -256,16 +260,19 @@ void atapi_hle_device::process_command()
 	case IDE_COMMAND_IDENTIFY_DEVICE:
 		/// TODO: busy
 		signature();
+		m_status |= IDE_STATUS_DRDY;
 		m_status |= IDE_STATUS_ERR;
 		m_error = IDE_ERROR_ABRT;
 		set_irq(ASSERT_LINE);
 		break;
 
 	case IDE_COMMAND_IDLE_IMMEDIATE:
+		m_status |= IDE_STATUS_DRDY;
 		set_irq(ASSERT_LINE);
 		break;
 
 	case IDE_COMMAND_CHECK_POWER_MODE:
+		m_status |= IDE_STATUS_DRDY;
 		m_sector_count = 0xff;      // Power mode: 0x00 = Standby, 0x80 = Idle mode, 0xff = Active mode or Idle mode
 		set_irq(ASSERT_LINE);
 		break;
@@ -280,6 +287,10 @@ void atapi_hle_device::finished_command()
 {
 	switch (m_command)
 	{
+	case IDE_COMMAND_SET_FEATURES:
+	case IDE_COMMAND_CACHE_FLUSH:
+		m_status |= IDE_STATUS_DRDY;
+		[[fallthrough]];
 	default:
 		device_ata_hle_interface::finished_command();
 		break;
