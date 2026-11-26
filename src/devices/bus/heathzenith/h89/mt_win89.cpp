@@ -46,6 +46,7 @@ public:
 	virtual u8 *sys_rom() override ATTR_COLD;
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;

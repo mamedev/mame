@@ -2,7 +2,7 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-  Magnolia Microsystems 77316 DD soft-sectored floppy controller
+  Magnolia MicroSystems 77316 DD soft-sectored floppy controller
 
     Supported upto 8 floppy drives
     - 4 8" drives

@@ -2,7 +2,7 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-  Magnolia Microsystems 77318 128K RAM board (10-77318-2)
+  Magnolia MicroSystems 77318 128K RAM board (10-77318-2)
 
   Two banks of 64K, selected by RD6 (bank A) and RD7 (bank B). It plugs into
   P503 and takes the place of the 16K expansion, with the 48K on the CPU
@@ -38,6 +38,7 @@ public:
 	virtual u8 *mem_select(u8 select_lines, offs_t addr) override ATTR_COLD;
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -74,4 +75,4 @@ void mms_77318_device::device_start()
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MMS_77318, device_h89bus_left_card_interface, mms_77318_device, "h89_mms_77318", "Magnolia Microsystems 77318 128K RAM")
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MMS_77318, device_h89bus_left_card_interface, mms_77318_device, "h89_mms_77318", "Magnolia MicroSystems 77318 128K RAM")

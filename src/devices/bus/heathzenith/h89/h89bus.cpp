@@ -451,7 +451,7 @@ void heath_io_decoder_socket::device_start()
     A0 - A10                              D1 - Option ROM L
                                           D0 - System ROM L
 
-  Magnolia Microsystems 77318 bank select control board (10-77318-1)
+  Magnolia MicroSystems 77318 bank select control board (10-77318-1)
 
   Plugs into the U517 and U552 (general purpose port latch) sockets, with its
   own latch, a key-lock circuit and a 512 x 8 primary decoder PROM. The PROM
@@ -551,7 +551,8 @@ ROM_END
 class heath_mem_decoder_prom_device : public device_t, public device_heath_mem_decoder_interface
 {
 public:
-	virtual u8 decode(offs_t inputs) const override { return m_prom[inputs & (m_prom.length() - 1)] ^ 0xff; }
+	// device_heath_mem_decoder_interface implementation
+	virtual u8 decode(offs_t inputs) const override ATTR_COLD { return m_prom[inputs & (m_prom.length() - 1)] ^ 0xff; }
 
 protected:
 	heath_mem_decoder_prom_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock, const tiny_rom_entry *rom) :
@@ -562,6 +563,7 @@ protected:
 	{
 	}
 
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD { }
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD { return m_rom; }
 
@@ -597,6 +599,7 @@ public:
 	{
 	}
 
+	// device_heath_mem_decoder_interface implementation
 	virtual u8 decode(offs_t inputs) const override ATTR_COLD { return m_map_table[inputs & 0x1ff]; }
 
 	// maps A - H: bit 0 is MEM 1 (D5), bit 1 is D2 and bit 2 is D4 of port 0xf2
@@ -610,6 +613,7 @@ public:
 	virtual u8 card_ctl_line() const override ATTR_COLD { return h89bus::MEM_PRI_CTL; }
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD { return ROM_NAME(mem_mms_77318); }
@@ -777,7 +781,7 @@ public:
 
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_42, device_heath_mem_decoder_interface, heath_mem_decoder_444_42, "h89bus_mem_decoder_444_42", "Heath H89 Primary Memory Decoder 444-42 PROM")
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_66, device_heath_mem_decoder_interface, heath_mem_decoder_444_66, "h89bus_mem_decoder_444_66", "Heath H89 Primary Memory Decoder 444-66 PROM")
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_MMS_77318, device_heath_mem_decoder_interface, heath_mem_decoder_mms_77318, "h89bus_mem_decoder_mms_77318", "Magnolia Microsystems 77318 Bank Select Control Board")
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_MMS_77318, device_heath_mem_decoder_interface, heath_mem_decoder_mms_77318, "h89bus_mem_decoder_mms_77318", "Magnolia MicroSystems 77318 Bank Select Control Board")
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_41, device_heath_mem_decoder_interface, heath_mem_decoder_444_41, "h89bus_mem_decoder_444_41", "Heath H89 Secondary Memory Decoder 444-41 PROM")
 DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MEM_DECODER_444_83, device_heath_mem_decoder_interface, heath_mem_decoder_444_83, "h89bus_mem_decoder_444_83", "Heath H89 Secondary Memory Decoder 444-83 PROM")
 
@@ -825,12 +829,7 @@ h89bus_device::h89bus_device(const machine_config &mconfig, device_type type, co
 	m_out_wait_cb(*this),
 	m_mem_view(*this, "mem_map"),
 	m_mem_installed(false),
-	m_mem_map(0),
 	m_fmwe(false),
-	m_ram(nullptr),
-	m_ram_size(0),
-	m_rom(nullptr),
-	m_floppy_ram(nullptr),
 	m_sys_rom_bank(*this, "sys_rom"),
 	m_sys_rom_card(nullptr)
 {
@@ -961,10 +960,7 @@ void h89bus_device::gpp_w(u8 data)
 
 void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *floppy_ram)
 {
-	m_ram = ram;
-	m_ram_size = ram_size;
-	m_rom = rom;
-	m_floppy_ram = floppy_ram;
+	cpu_board_mem const mem{ ram, ram_size, rom, floppy_ram };
 
 	// a device that also switches on the port lines that select the memory map changes with it,
 	// such as a speed upgrade on MEM 0 with an MMS 77318
@@ -978,7 +974,7 @@ void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *flopp
 				tag(), shared_lines);
 
 	// the system ROM comes from the CPU board, or from the first card in a left slot that has one
-	m_sys_rom_bank->configure_entry(0, m_rom);
+	m_sys_rom_bank->configure_entry(0, rom);
 
 	for (device_h89bus_left_card_interface &card : m_left_device_list)
 	{
@@ -1014,7 +1010,7 @@ void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *flopp
 		if (line == h89bus::MEM_PRI_RD6)
 			rd6_card = !names.empty();
 
-		if (cpu_ram_bank(line))
+		if (cpu_ram_bank(mem, line))
 			names.emplace_back("CPU board");
 
 		if (names.size() > 1)
@@ -1030,7 +1026,7 @@ void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *flopp
 
 	// memory size jumpers JJ501/JJ502 match the installed RAM: 16K, 32K, 48K or 64K;
 	// a 16K expansion card on RD6 makes a 48K board into a 64K system
-	u32 const cpu_banks = m_ram_size / 0x4000;
+	u32 const cpu_banks = ram_size / 0x4000;
 	u8 jumpers = cpu_banks - 1;
 
 	if (rd6_card)
@@ -1045,9 +1041,9 @@ void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *flopp
 
 	for (u32 map = 0; map < m_pri_mem_decoder->map_count(); map++)
 	{
-		for (int fmwe = 0; fmwe < 2; fmwe++)
+		for (bool const fmwe : { false, true })
 		{
-			install_mem_view_entry(m_mem_view[(map << 1) | fmwe], map, fmwe, jumpers);
+			install_mem_view_entry(mem, m_mem_view[(map << 1) | (fmwe ? 1 : 0)], map, fmwe, jumpers);
 		}
 	}
 
@@ -1055,7 +1051,7 @@ void h89bus_device::install_mem_map(u8 *ram, offs_t ram_size, u8 *rom, u8 *flopp
 }
 
 // CPU board 16K RAM bank for a primary memory decoder select line, null if it is not installed
-u8 *h89bus_device::cpu_ram_bank(u8 select_line) const
+u8 *h89bus_device::cpu_ram_bank(cpu_board_mem const &mem, u8 select_line)
 {
 	// the CPU board has three banks (RAS0 - RAS2), and a 64K board also has the
 	// 16K expansion piggybacked on one of them and wired to RD6; they are filled
@@ -1071,17 +1067,17 @@ u8 *h89bus_device::cpu_ram_bank(u8 select_line) const
 	default: return nullptr;
 	}
 
-	if (((bank + 1) * 0x4000) > m_ram_size)
+	if (((bank + 1) * 0x4000) > mem.ram_size)
 	{
 		return nullptr;
 	}
 
-	return m_ram + (bank * 0x4000);
+	return mem.ram + (bank * 0x4000);
 }
 
 // RAM at addr for the primary memory decoder's select lines: cards in the left
 // slots (RD6/RD7) first, so reads come from them, then the CPU board
-std::vector<u8 *> h89bus_device::select_line_targets(u8 pri, offs_t addr) const
+std::vector<u8 *> h89bus_device::select_line_targets(cpu_board_mem const &mem, u8 pri, offs_t addr) const
 {
 	std::vector<u8 *> targets;
 
@@ -1107,7 +1103,7 @@ std::vector<u8 *> h89bus_device::select_line_targets(u8 pri, offs_t addr) const
 	{
 		if (pri & line)
 		{
-			u8 *const bank = cpu_ram_bank(line);
+			u8 *const bank = cpu_ram_bank(mem, line);
 			if (bank)
 				targets.push_back(bank + (addr & 0x3fff));
 		}
@@ -1116,7 +1112,7 @@ std::vector<u8 *> h89bus_device::select_line_targets(u8 pri, offs_t addr) const
 	return targets;
 }
 
-void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry, u32 map, bool fmwe, u8 jumpers)
+void h89bus_device::install_mem_view_entry(cpu_board_mem const &mem, memory_view::memory_view_entry &entry, u32 map, bool fmwe, u8 jumpers)
 {
 	// what each 1K page of the address space reads from and writes to
 	constexpr u32 PAGES = 0x10000 / 0x400;
@@ -1129,7 +1125,7 @@ void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry
 	// a decoder output that goes to the cards isn't DATA=0
 	u8 const nomem_line = h89bus::MEM_PRI_NOMEM & ~m_pri_mem_decoder->card_ctl_line();
 
-	for (int write = 0; write < 2; write++)
+	for (bool const write : { false, true })
 	{
 		for (u32 block = 0; block < 8; block++)
 		{
@@ -1162,7 +1158,7 @@ void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry
 				// writes go to all the RAM that is selected, reads come from the first
 				if (!write || (pri & h89bus::MEM_PRI_WE))
 				{
-					for (u8 *const target : select_line_targets(pri, addr))
+					for (u8 *const target : select_line_targets(mem, pri, addr))
 					{
 						add(target);
 						if (!write)
@@ -1178,20 +1174,20 @@ void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry
 					if (write)
 					{
 						if ((sec & h89bus::MEM_SEC_FPY_RAM) && (sec & h89bus::MEM_SEC_WE))
-							add(m_floppy_ram + (addr & 0x3ff));
+							add(mem.floppy_ram + (addr & 0x3ff));
 					}
 					else
 					{
 						// the option ROM and option RAM sockets are not populated
 						if (sec & h89bus::MEM_SEC_SYS_ROM)
 						{
-							add(m_rom + (addr & 0x1fff));
-							sys_rom[page] = (read_src[page] == (m_rom + (addr & 0x1fff)));
+							add(mem.rom + (addr & 0x1fff));
+							sys_rom[page] = (read_src[page] == (mem.rom + (addr & 0x1fff)));
 						}
 						if (sec & h89bus::MEM_SEC_FPY_ROM)
-							add(m_rom + (addr & 0x1fff));
+							add(mem.rom + (addr & 0x1fff));
 						if (sec & h89bus::MEM_SEC_FPY_RAM)
-							add(m_floppy_ram + (addr & 0x3ff));
+							add(mem.floppy_ram + (addr & 0x3ff));
 					}
 				}
 			}
@@ -1281,7 +1277,11 @@ void h89bus_device::install_mem_view_entry(memory_view::memory_view_entry &entry
 				end++;
 
 			entry.install_write_handler(page << 10, (end << 10) - 1,
-					write8sm_delegate(*this, NAME([targets] (offs_t offset, u8 data) { for (u8 *const target : targets) target[offset] = data; })));
+					write8sm_delegate(*this, NAME([targets] (offs_t offset, u8 data)
+					{
+						for (u8 *const target : targets)
+							target[offset] = data;
+					})));
 		}
 
 		page = end;

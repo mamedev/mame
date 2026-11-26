@@ -30,6 +30,7 @@ public:
 	virtual u8 *mem_select(u8 select_lines, offs_t addr) override ATTR_COLD;
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:

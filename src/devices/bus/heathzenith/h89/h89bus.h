@@ -537,7 +537,7 @@ class device_heath_mem_decoder_interface : public device_interface
 {
 public:
 	// PROM output for the given inputs, inverted so a selected line reads as 1
-	virtual u8 decode(offs_t inputs) const = 0;
+	virtual u8 decode(offs_t inputs) const ATTR_COLD = 0;
 
 	// primary decoders: the memory maps that can be selected while running, the PROM inputs
 	// that select each one with the CPU board's memory size jumpers (the bus adds A4 - A0:
@@ -582,7 +582,7 @@ public:
 	heath_mem_decoder_socket(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// PROM output for the given inputs, nothing is selected with an empty socket
-	u8 decode(offs_t inputs) const { return m_decoder ? m_decoder->decode(inputs) : 0; }
+	u8 decode(offs_t inputs) const ATTR_COLD { return m_decoder ? m_decoder->decode(inputs) : 0; }
 
 	u32 map_count() const ATTR_COLD { return m_decoder ? m_decoder->map_count() : 1; }
 	offs_t map_inputs(u32 map, u8 jumpers) const ATTR_COLD { return m_decoder ? m_decoder->map_inputs(map, jumpers) : 0; }
@@ -591,6 +591,7 @@ public:
 	u32 select_map(u8 gpp) { return m_decoder ? m_decoder->select_map(gpp) : 0; }
 
 protected:
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 private:
@@ -672,9 +673,18 @@ protected:
 	required_device<heath_mem_decoder_socket> m_sec_mem_decoder;
 
 private:
-	u8 *cpu_ram_bank(u8 select_line) const ATTR_COLD;
-	std::vector<u8 *> select_line_targets(u8 pri, offs_t addr) const ATTR_COLD;
-	void install_mem_view_entry(memory_view::memory_view_entry &entry, u32 map, bool fmwe, u8 jumpers) ATTR_COLD;
+	// CPU board memory passed to install_mem_map(), only used while the memory map is built
+	struct cpu_board_mem
+	{
+		u8 *ram;
+		offs_t ram_size;
+		u8 *rom;
+		u8 *floppy_ram;
+	};
+
+	static u8 *cpu_ram_bank(cpu_board_mem const &mem, u8 select_line) ATTR_COLD;
+	std::vector<u8 *> select_line_targets(cpu_board_mem const &mem, u8 pri, offs_t addr) const ATTR_COLD;
+	void install_mem_view_entry(cpu_board_mem const &mem, memory_view::memory_view_entry &entry, u32 map, bool fmwe, u8 jumpers) ATTR_COLD;
 	void update_mem_view();
 
 	devcb_write_line m_out_int3_cb, m_out_int4_cb, m_out_int5_cb;
@@ -685,10 +695,6 @@ private:
 	bool m_mem_installed;
 	u32 m_mem_map;
 	bool m_fmwe;
-	u8 *m_ram;
-	offs_t m_ram_size;
-	u8 *m_rom;
-	u8 *m_floppy_ram;
 
 	// system ROM, entry 0 is the CPU board's and entry 1 the card's
 	memory_bank_creator m_sys_rom_bank;
