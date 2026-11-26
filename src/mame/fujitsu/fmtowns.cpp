@@ -1932,7 +1932,7 @@ void towns_state::towns_serial_w(offs_t offset, uint8_t data)
 			break;
 		case 4:
 			m_serial_irq_enable = data;
-			// TODO: should this trigger a previously masked serial IRQ, or drop a newly masked one?
+			towns_serial_irq_update();
 			break;
 		default:
 			logerror("Invalid or unimplemented serial port write [offset=%02x, data=%02x]\n",offset,data);
@@ -1954,47 +1954,31 @@ uint8_t towns_state::towns_serial_r(offs_t offset)
 	}
 }
 
-void towns_state::towns_serial_irq(int state)
+// The RS-232C interrupt (RSINT, 0xA06 bit 0) is the OR of the 8251's TxRDY,
+// RxRDY and SYNDET pins, each gated by its bit in the interrupt control
+// register (0xA08); software reads the 8251 status to see which one fired
+// (FM TOWNS Technical Databook pp.275-276).  The databook describes no
+// acknowledge at 0xA06 or 0xA08: a source drops when the 8251 drops its pin
+// (a data read clears RxRDY, a data write or CTS going high drops TxRDY, a
+// status read clears SYNDET: p.273) or when its enable bit is cleared.
+void towns_state::towns_serial_irq_update()
 {
-	if((state ? 0x01 : 0x00) != m_serial_irq_source)
+	uint8_t const irq = (m_serial_irq_enable & m_serial_irq_state) ? 1 : 0;
+	if(irq != m_serial_irq_source)
 	{
-		m_serial_irq_source = state ? 0x01 : 0x00;
-		m_pic_master->ir2_w(state);
-		popmessage("Serial IRQ state: %i\n",state);
+		m_serial_irq_source = irq;
+		m_pic_master->ir2_w(irq);
+		LOGMASKED(LOG_IRQ,"PIC: IRQ2 (RS-232C) set to %i\n",irq);
 	}
 }
 
-void towns_state::towns_rxrdy_irq(int state)
+template <uint8_t Source> void towns_state::towns_serial_source_w(int state)
 {
 	if(state)
-		m_serial_irq_state |= RXRDY_IRQ_ENABLE;
+		m_serial_irq_state |= Source;
 	else
-		m_serial_irq_enable &= ~RXRDY_IRQ_ENABLE;
-
-	if(m_serial_irq_enable & RXRDY_IRQ_ENABLE)
-		towns_serial_irq((m_serial_irq_enable & m_serial_irq_state) ? 1 : 0);
-}
-
-void towns_state::towns_txrdy_irq(int state)
-{
-	if(state)
-		m_serial_irq_state |= TXRDY_IRQ_ENABLE;
-	else
-		m_serial_irq_enable &= ~TXRDY_IRQ_ENABLE;
-
-	if(m_serial_irq_enable & TXRDY_IRQ_ENABLE)
-		towns_serial_irq((m_serial_irq_enable & m_serial_irq_state) ? 1 : 0);
-}
-
-void towns_state::towns_syndet_irq(int state)
-{
-	if(state)
-		m_serial_irq_state |= SYNDET_IRQ_ENABLE;
-	else
-		m_serial_irq_enable &= ~SYNDET_IRQ_ENABLE;
-
-	if(m_serial_irq_enable & SYNDET_IRQ_ENABLE)
-		towns_serial_irq((m_serial_irq_enable & m_serial_irq_state) ? 1 : 0);
+		m_serial_irq_state &= ~Source;
+	towns_serial_irq_update();
 }
 
 
@@ -2519,9 +2503,6 @@ void towns_state::machine_start()
 
 	m_timer0 = 0;
 	m_timer1 = 0;
-	m_serial_irq_source = 0;
-	m_serial_irq_enable = 0;
-	m_serial_irq_state = 0;
 }
 
 void marty_state::machine_start()
@@ -2561,6 +2542,12 @@ void towns_state::machine_reset()
 	m_towns_pcm_irq_flag = 0;
 	m_towns_fm_irq_flag = 0;
 	m_dma_msb[0] = m_dma_msb[1] = 0;
+	// The PIC and 8251 reset before this: RxRDY and TxRDY go low, but the
+	// 8251 only clears its SYNDET status bit and doesn't drive the line, so
+	// start the serial IRQ from scratch.
+	m_serial_irq_state = 0;
+	m_serial_irq_enable = 0;
+	m_serial_irq_source = 0;
 }
 
 uint8_t towns_state::get_slave_ack(offs_t offset)
@@ -2716,9 +2703,9 @@ void towns_state::towns_base(machine_config &config)
 	m_dma[0]->out_dack_callback<3>().set(FUNC(towns_state::towns_cdrom_dack_w));
 
 	I8251(config, m_i8251);
-	m_i8251->rxrdy_handler().set(FUNC(towns_state::towns_rxrdy_irq));
-	m_i8251->txrdy_handler().set(FUNC(towns_state::towns_txrdy_irq));
-	m_i8251->syndet_handler().set(FUNC(towns_state::towns_syndet_irq));
+	m_i8251->rxrdy_handler().set(FUNC(towns_state::towns_serial_source_w<RXRDY_IRQ_ENABLE>));
+	m_i8251->txrdy_handler().set(FUNC(towns_state::towns_serial_source_w<TXRDY_IRQ_ENABLE>));
+	m_i8251->syndet_handler().set(FUNC(towns_state::towns_serial_source_w<SYNDET_IRQ_ENABLE>));
 	m_i8251->dtr_handler().set("rs232c", FUNC(rs232_port_device::write_dtr));
 	m_i8251->rts_handler().set("rs232c", FUNC(rs232_port_device::write_rts));
 	m_i8251->txd_handler().set("rs232c", FUNC(rs232_port_device::write_txd));
