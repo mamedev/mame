@@ -14,7 +14,7 @@
 
 #include "emu.h"
 
-#include "cpu/m6502/w65c02.h"
+#include "cpu/m6502/st2204.h"
 
 #include "emupal.h"
 #include "screen.h"
@@ -40,24 +40,24 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	void prg_map(address_map &map) ATTR_COLD;
+	void data_map(address_map &map) ATTR_COLD;
 	void palette(palette_device &palette) const ATTR_COLD { }
 	u32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; }
 };
 
-void ts_aquarium_state::prg_map(address_map &map)
+void ts_aquarium_state::data_map(address_map &map)
 {
-	// TODO: Memory banking
-	map(0x0000, 0x0fff).ram();
-	map(0x4000, 0xbfff).rom().region("maincpu", 0x4000);
-	map(0xffe0, 0xffff).rom().region("maincpu", 0x7fe0);
+	map(0x000000, 0x7fffff).rom().region("maincpu", 0);
 }
 
 void ts_aquarium_state::ts_aquarium(machine_config &config)
 {
-	// FIXME: Guessed clock and CPU (ROM offset 0x4656 contains opcode 0xCB surrounded by NOPs)
-	W65C02(config, m_maincpu, 8_MHz_XTAL);
-	m_maincpu->set_addrmap(AS_PROGRAM, &ts_aquarium_state::prg_map);
+	// FIXME: Guessed clock and MCU:
+	// - ROM offset 0x42DF has SMB instruction;
+	// - ROM offset 0x4656 has WAI instruction surrounded by NOPs;
+	// - Interrupt vector table has exactly 13 entries at same offsets as ST2204, but MCU has LCD controller with RGB support;
+	ST2204(config, m_maincpu, 4_MHz_XTAL);
+	m_maincpu->set_addrmap(AS_DATA, &ts_aquarium_state::data_map);
 
 	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
