@@ -59,7 +59,8 @@ const tiny_rom_entry *mps1224_device::device_rom_region() const
 
 mps1224_device::mps1224_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, MPS1224, tag, owner, clock),
-	device_cbm_iec_interface(mconfig, *this)
+	device_cbm_iec_interface(mconfig, *this),
+	device_centronics_peripheral_interface(mconfig, *this)
 {
 }
 

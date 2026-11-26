@@ -139,8 +139,11 @@ device_centronics_peripheral_interface::~device_centronics_peripheral_interface(
 #include "printer.h"
 #include "samdac.h"
 #include "smartboard.h"
+#include "bus/cbmiec/mps1000.h"
 #include "bus/cbmiec/mps1200.h"
+#include "bus/cbmiec/mps1224.h"
 #include "bus/cbmiec/mps1230.h"
+#include "bus/cbmiec/mps1270a.h"
 
 void centronics_devices(device_slot_interface &device)
 {
@@ -166,8 +169,11 @@ void centronics_devices(device_slot_interface &device)
 	device.option_add("nlq401", NLQ401);
 	device.option_add("mz1p16", MZ1P16);
 	device.option_add("pc6022", PC6022);
-	device.option_add("mps1250", MPS1250);
+	device.option_add("mps1000", MPS1000);
+	device.option_add("mps1224", MPS1224);
 	device.option_add("mps1230", MPS1230);
+	device.option_add("mps1250", MPS1250);
+	device.option_add("mps1270a", MPS1270A);
 
 	device.option_add_internal("hardlock", HARDLOCK);
 	device.option_add_internal("hasp_savquest", HASP_SAVQUEST);
