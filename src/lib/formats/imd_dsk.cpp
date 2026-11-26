@@ -791,7 +791,9 @@ void imd_format::extract_track_rich(const std::vector<bool> &bs, bool is_mfm,
 		for (uint32_t i = 0; i < bs.size(); i++) {
 			shift_reg = uint16_t((shift_reg << 1) | bs[i]);
 			// A mark ending on the last bit is followed by the index
-			uint32_t const pos = i + 1 == bs.size() ? 0 : i + 1;
+			uint32_t pos = i + 1;
+			if (pos == bs.size())
+				pos = 0;
 			if (shift_reg == 0xf57e) {                                   // 0xFE
 				idam_marks.push_back({pos, 0xfe});
 			} else if (shift_reg == 0xf56a) {                            // 0xF8 deleted
