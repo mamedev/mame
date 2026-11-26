@@ -428,7 +428,7 @@ bool i8251_device::is_tx_char_pending() const
 
 void i8251_device::check_for_tx_start()
 {
-	if (is_tx_enabled() && is_transmit_register_empty() && (m_status & (I8251_STATUS_TX_READY)) == 0)
+	if (is_tx_enabled() && is_transmit_register_empty() && (m_status & (I8251_STATUS_TX_READY)) == 0 && !m_delayed_txrdy)
 		start_tx();
 }
 
