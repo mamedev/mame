@@ -416,7 +416,9 @@ bool i8251_device::is_tx_enabled() const
 
 bool i8251_device::is_tx_char_pending() const
 {
-	return !(m_status & I8251_STATUS_TX_READY) && (is_tx_enabled() || m_delayed_tx_en);
+	// m_delayed_txrdy: the character already went to the transmit
+	// register, and TxRDY waits out the write recovery time
+	return !(m_status & I8251_STATUS_TX_READY) && !m_delayed_txrdy && (is_tx_enabled() || m_delayed_tx_en);
 }
 
 
