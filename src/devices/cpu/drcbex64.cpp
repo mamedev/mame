@@ -1296,11 +1296,6 @@ size_t drcbe_x64::emit(CodeHolder &ch, bool invariant)
 
 	osd::invalidate_instruction_cache(drccodeptr(ch.base_address()), code_size);
 
-	// set targets for handles defined in this block
-	for (auto const &handle : m_block_handles)
-		handle.first.get().set_codeptr(handle.second);
-	m_block_handles.clear();
-
 	return code_size;
 }
 
@@ -1387,9 +1382,9 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 n
 		a.add_diagnostic_options(DiagnosticOptions::kValidateIntermediate);
 
 	// generate code
-	std::string blockname;
 	try
 	{
+		std::string blockname;
 		for (int inum = 0; inum < numinst; inum++)
 		{
 			const instruction &inst = instlist[inum];
@@ -1433,6 +1428,14 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 n
 			block.abort();
 
 		m_block_handles.clear();
+
+		// log it
+		if (m_log)
+			m_log->disasm_code_range(blockname.empty() ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
+
+		// tell all of our utility objects that the block is finished
+		m_hash.block_end(block);
+		m_map.block_end(block);
 	}
 	catch (...)
 	{
@@ -1442,14 +1445,6 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 n
 		m_block_handles.clear();
 		throw;
 	}
-
-	// log it
-	if (m_log)
-		m_log->disasm_code_range(blockname.empty() ? "Unknown block" : blockname.c_str(), dst, dst + bytes);
-
-	// tell all of our utility objects that the block is finished
-	m_hash.block_end(block);
-	m_map.block_end(block);
 }
 
 
@@ -1987,7 +1982,7 @@ void drcbe_x64::op_handle(Assembler &a, const instruction &inst)
 	a.align(AlignMode::kCode, 16);
 
 	// register the current pointer for the handle
-	inst.param(0).handle().set_code_ptr(drccodeptr(a.code()->base_address() + a.offset()));
+	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->base_address() + a.offset()));
 	m_block_handles.emplace_back(inst.param(0).handle());
 
 	// by default, the handle points to prologue code that moves the stack pointer
