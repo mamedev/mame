@@ -13,13 +13,26 @@
   an Everex EV-390 hard drive controller.
 
   I/O ports
-    0x10 - 0x13  8255 parallel port
+    0x10 - 0x17  8255 printer port (A2 is not decoded, so 0x14 - 0x17 mirror 0x10 - 0x13)
     0x20 - 0x27  hard drive controller
       0x20  data
       0x21  status/command
       0x22  configuration
       0x24  controller reset
       0x25  system ROM select (write only), bit 0: 0 = card ROM, 1 = original ROM
+
+  The manual says a write to 0x14 - 0x17 resets the 8255, but the schematic
+  has its RESET pin tied to ground.
+
+  The 8255 drives a Centronics printer through a 34 pin header, with no
+  buffers between them
+    PA0 - PA7  data
+    PC0        data strobe
+    PC1        input prime
+    PC4        paper empty (the manual lists it as not used)
+    PC5        busy, the only status the supplied BIOS code reads
+    PC6        not connected to the printer
+    PC7        fault
 
   TODO
     - hard drive controller
@@ -30,7 +43,10 @@
 
 #include "mt_win89.h"
 
+#include "bus/centronics/ctronics.h"
+#include "machine/buffer.h"
 #include "machine/i8255.h"
+#include "machine/output_latch.h"
 
 
 namespace {
@@ -57,6 +73,9 @@ private:
 
 	required_region_ptr<u8> m_sys_rom;
 	required_device<i8255_device> m_par;
+	required_device<centronics_device> m_centronics;
+	required_device<output_latch_device> m_cent_data_out;
+	required_device<input_buffer_device> m_cent_status_in;
 
 	bool m_original_rom;
 };
@@ -66,7 +85,10 @@ mt_win89_device::mt_win89_device(const machine_config &mconfig, const char *tag,
 	device_t(mconfig, H89BUS_MT_WIN89, tag, owner, clock),
 	device_h89bus_left_card_interface(mconfig, *this),
 	m_sys_rom(*this, "sys_rom"),
-	m_par(*this, "parallel_port")
+	m_par(*this, "parallel_port"),
+	m_centronics(*this, "centronics"),
+	m_cent_data_out(*this, "cent_data_out"),
+	m_cent_status_in(*this, "cent_status_in")
 {
 }
 
@@ -89,7 +111,7 @@ void mt_win89_device::device_start()
 
 	save_item(NAME(m_original_rom));
 
-	h89bus().install_io_device(0x10, 0x13,
+	h89bus().install_io_device(0x10, 0x17,
 			read8sm_delegate(*m_par, FUNC(i8255_device::read)),
 			write8sm_delegate(*m_par, FUNC(i8255_device::write)));
 	h89bus().install_io_device(0x25, 0x25,
@@ -105,6 +127,19 @@ void mt_win89_device::device_reset()
 void mt_win89_device::device_add_mconfig(machine_config &config)
 {
 	I8255(config, m_par);
+	m_par->out_pa_callback().set(m_cent_data_out, FUNC(output_latch_device::write));
+	m_par->out_pc_callback().set(m_centronics, FUNC(centronics_device::write_strobe)).bit(0);
+	m_par->out_pc_callback().append(m_centronics, FUNC(centronics_device::write_init)).bit(1);
+	m_par->in_pc_callback().set(m_cent_status_in, FUNC(input_buffer_device::read));
+
+	OUTPUT_LATCH(config, m_cent_data_out);
+	INPUT_BUFFER(config, m_cent_status_in);
+
+	CENTRONICS(config, m_centronics, centronics_devices, "printer");
+	m_centronics->set_output_latch(*m_cent_data_out);
+	m_centronics->perror_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit4));
+	m_centronics->busy_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit5));
+	m_centronics->fault_handler().set(m_cent_status_in, FUNC(input_buffer_device::write_bit7));
 }
 
 ROM_START(mt_win89)
