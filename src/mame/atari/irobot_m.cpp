@@ -7,8 +7,9 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
 #include "irobot.h"
+
+#include "cpu/m6809/m6809.h"
 
 #include "endianness.h"
 

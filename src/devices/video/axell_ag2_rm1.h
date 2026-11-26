@@ -13,8 +13,7 @@
 #include <stdexcept>
 #include <vector>
 
-namespace axell_rm1
-{
+namespace axell_rm1 {
 
 class decode_error : public std::runtime_error
 {

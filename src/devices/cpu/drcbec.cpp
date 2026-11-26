@@ -489,18 +489,17 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 {
 	// Calculate the max possible number of register clears required
 	uint32_t regclears = 0;
-
 	for (int inum = 0; inum < numinst; inum++)
 	{
 		const instruction &inst = instlist[inum];
 
-		if (inst.size() != 4)
-			continue;
-
-		for (int pnum = 0; pnum < inst.numparams(); pnum++)
+		if (inst.size() == 4)
 		{
-			if (inst.is_param_out(pnum) && inst.param(pnum).is_int_register())
-				regclears++;
+			for (int pnum = 0; pnum < inst.numparams(); pnum++)
+			{
+				if (inst.is_param_out(pnum) && inst.param(pnum).is_int_register())
+					regclears++;
+			}
 		}
 	}
 
@@ -510,6 +509,7 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 	m_map.block_begin(block);
 
 	// begin codegen; fail if we can't
+	// FIXME: this is usually sufficient, but doesn't account for the size of immediates or instructions with four parameters
 	drccodeptr *cachetop = block.invariant()
 			? m_cache.begin_codegen_invariant((numinst + regclears) * sizeof(drcbec_instruction) * 4)
 			: m_cache.begin_codegen((numinst + regclears) * sizeof(drcbec_instruction) * 4);
@@ -575,45 +575,45 @@ void drcbe_c::generate(drcuml_block &block, const instruction *instlist, uint32_
 					psize[pnum] = inst.size();
 				if (opcode == OP_LOAD || opcode == OP_FLOAD)
 					psize[2] = 4;
-				if (opcode == OP_STORE || opcode == OP_FSTORE)
+				else if (opcode == OP_STORE || opcode == OP_FSTORE)
 					psize[1] = 4;
-				if (opcode == OP_READ || opcode == OP_FREAD)
+				else if (opcode == OP_READ || opcode == OP_FREAD)
 					psize[1] = psize[2] = 4;
-				if (opcode == OP_WRITE || opcode == OP_FWRITE)
+				else if (opcode == OP_WRITE || opcode == OP_FWRITE)
 					psize[0] = psize[2] = 4;
-				if (opcode == OP_READM)
+				else if (opcode == OP_READM)
 					psize[1] = psize[3] = 4;
-				if (opcode == OP_WRITEM)
+				else if (opcode == OP_WRITEM)
 					psize[0] = psize[3] = 4;
-				if (opcode == OP_SEXT && inst.param(2).size() != SIZE_QWORD)
+				else if (opcode == OP_SEXT && inst.param(2).size() != SIZE_QWORD)
 					psize[1] = 4;
-				if (opcode == OP_FTOINT)
+				else if (opcode == OP_FTOINT)
 					psize[0] = 1 << inst.param(2).size();
-				if (opcode == OP_FFRINT || opcode == OP_FFRFLT)
+				else if (opcode == OP_FFRINT || opcode == OP_FFRFLT)
 					psize[1] = 1 << inst.param(2).size();
 
 				// pre-expand opcodes that encode size/scale in them
 				if (opcode == OP_LOAD)
 					opcode = opcode_t(OP_LOAD1 + unsigned(inst.param(3).size() * 4 + inst.param(3).scale()));
-				if (opcode == OP_LOADS)
+				else if (opcode == OP_LOADS)
 					opcode = opcode_t(OP_LOADS1 + unsigned(inst.param(3).size() * 4 + inst.param(3).scale()));
-				if (opcode == OP_STORE)
+				else if (opcode == OP_STORE)
 					opcode = opcode_t(OP_STORE1 + unsigned(inst.param(3).size() * 4 + inst.param(3).scale()));
-				if (opcode == OP_READ)
+				else if (opcode == OP_READ)
 					opcode = opcode_t(OP_READ1 + unsigned(inst.param(2).size()));
-				if (opcode == OP_READM)
+				else if (opcode == OP_READM)
 					opcode = opcode_t(OP_READM1 + unsigned(inst.param(3).size()));
-				if (opcode == OP_WRITE)
+				else if (opcode == OP_WRITE)
 					opcode = opcode_t(OP_WRITE1 + unsigned(inst.param(2).size()));
-				if (opcode == OP_WRITEM)
+				else if (opcode == OP_WRITEM)
 					opcode = opcode_t(OP_WRITEM1 + unsigned(inst.param(3).size()));
-				if (opcode == OP_SEXT)
+				else if (opcode == OP_SEXT)
 					opcode = opcode_t(OP_SEXT1 + unsigned(inst.param(2).size()));
-				if (opcode == OP_FTOINT)
+				else if (opcode == OP_FTOINT)
 					opcode = opcode_t(OP_FTOI4T + unsigned(5 * (inst.param(2).size() - 2) + inst.param(3).rounding()));
-				if (opcode == OP_FFRINT)
+				else if (opcode == OP_FFRINT)
 					opcode = opcode_t(OP_FFRI4 + unsigned(inst.param(2).size() - 2));
-				if (opcode == OP_FFRFLT)
+				else if (opcode == OP_FFRFLT)
 					opcode = opcode_t(OP_FFRFS + unsigned(inst.param(2).size() - 2));
 
 				// count how many bytes of immediates we need

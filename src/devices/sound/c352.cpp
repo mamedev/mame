@@ -18,6 +18,7 @@
 
 #include "emu.h"
 #include "c352.h"
+
 #include "wavwrite.h"
 
 //#define VERBOSE 1
@@ -65,23 +66,20 @@ void c352_device::fetch_sample(c352_voice_t& v)
 	}
 	else
 	{
-		s8 s = (s8)read_byte(v.pos);
-
+		u8 const s = read_byte(v.pos);
 		if (v.flags & C352_FLG_MULAW)
-			v.sample = m_mulawtab[s & 0xff];
+			v.sample = m_mulawtab[s];
 		else
-			v.sample = s << 8;
+			v.sample = s16(s8(s)) << 8;
 
-		u16 pos = v.pos & 0xffff;
+		u16 const pos = v.pos & 0xffff;
 
-		if ((v.flags & C352_FLG_LOOP) && v.flags & C352_FLG_REVERSE)
+		if ((v.flags & C352_FLG_LOOP) && (v.flags & C352_FLG_REVERSE))
 		{
-			// backwards>forwards
 			if ((v.flags & C352_FLG_LDIR) && pos == v.wave_loop)
-				v.flags &= ~C352_FLG_LDIR;
-			// forwards>backwards
-			else if (!(v.flags & C352_FLG_LDIR) && pos == v.wave_end)
-				v.flags |= C352_FLG_LDIR;
+				v.flags &= ~C352_FLG_LDIR; // backwards>forwards
+			else if (!(v.flags & C352_FLG_LDIR) && (pos == v.wave_end))
+				v.flags |= C352_FLG_LDIR; // forwards>backwards
 
 			v.pos += (v.flags & C352_FLG_LDIR) ? -1 : 1;
 		}
@@ -131,7 +129,7 @@ void c352_device::sound_stream_update(sound_stream &stream)
 
 			if (v.flags & C352_FLG_BUSY)
 			{
-				s32 next_counter = v.counter + v.freq;
+				s32 const next_counter = v.counter + v.freq;
 
 				if (next_counter & 0x10000)
 				{
@@ -259,89 +257,81 @@ void c352_device::write(offs_t offset, u16 data, u16 mem_mask)
 
 void c352_device::log_pcm(int voice)
 {
-	if (!(m_c352_v[voice].flags & C352_FLG_NOISE))
+	if (m_c352_v[voice].flags & C352_FLG_NOISE)
+		return;
+	if (!m_found_pcm.emplace(m_c352_v[voice].pos).second)
+		return;
+
+	char filebuf[256];
+	snprintf(filebuf, 256, "c352_%08x.wav", m_c352_v[voice].pos);
+	util::wav_file_ptr file = util::wav_open(filebuf, m_stream->sample_rate(), 1);
+	if (!file)
+		return;
+
+	c352_voice_t &v = m_c352_v[voice];
+	u32 pos = v.pos;
+	u32 flags = v.flags;
+	u32 counter = v.counter;
+	s16 sample = 0;
+
+	while ((pos != v.wave_end) && !(flags & C352_FLG_KEYOFF))
 	{
-		std::map<u32, bool>::iterator iter = m_found_pcm.find(m_c352_v[voice].pos);
-		if (iter != m_found_pcm.end())
+		s32 const next_counter = counter + v.freq;
+
+		if (next_counter & 0x10000)
 		{
-			return;
-		}
+			counter = next_counter & 0xffff;
 
-		m_found_pcm[m_c352_v[voice].pos] = true;
+			u8 const s = read_byte(pos);
 
-		char filebuf[256];
-		snprintf(filebuf, 256, "c352_%08x.wav", m_c352_v[voice].pos);
-		util::wav_file_ptr file = util::wav_open(filebuf, m_stream->sample_rate(), 1);
-		if (file != nullptr)
-		{
-			c352_voice_t &v = m_c352_v[voice];
-			u32 pos = v.pos;
-			u32 flags = v.flags;
-			u32 counter = v.counter;
-			s16 sample = 0;
+			if (v.flags & C352_FLG_MULAW)
+				sample = m_mulawtab[s];
+			else
+				sample = s16(s8(s)) << 8;
 
-			while (pos != v.wave_end && !(flags & C352_FLG_KEYOFF))
+			u16 const subpos = pos & 0xffff;
+
+			if ((flags & C352_FLG_LOOP) && (flags & C352_FLG_REVERSE))
 			{
-				s32 next_counter = counter + v.freq;
+				if ((flags & C352_FLG_LDIR) && (subpos == v.wave_loop))
+					flags &= ~C352_FLG_LDIR; // backwards>forwards
+				else if (!(flags & C352_FLG_LDIR) && (subpos == v.wave_end))
+					flags |= C352_FLG_LDIR; // forwards>backwards
 
-				if (next_counter & 0x10000)
+				pos += (flags & C352_FLG_LDIR) ? -1 : 1;
+			}
+			else if (subpos == v.wave_end)
+			{
+				if ((flags & C352_FLG_LINK) && (flags & C352_FLG_LOOP))
 				{
-					counter = next_counter & 0xffff;
-
-					s8 s = (s8)read_byte(pos);
-
-					if (v.flags & C352_FLG_MULAW)
-						sample = m_mulawtab[s & 0xff];
-					else
-						sample = s << 8;
-
-					u16 subpos = pos & 0xffff;
-
-					if ((flags & C352_FLG_LOOP) && flags & C352_FLG_REVERSE)
-					{
-						// backwards>forwards
-						if ((flags & C352_FLG_LDIR) && subpos == v.wave_loop)
-							flags &= ~C352_FLG_LDIR;
-						// forwards>backwards
-						else if (!(flags & C352_FLG_LDIR) && subpos == v.wave_end)
-							flags |= C352_FLG_LDIR;
-
-						pos += (flags & C352_FLG_LDIR) ? -1 : 1;
-					}
-					else if (subpos == v.wave_end)
-					{
-						if ((flags & C352_FLG_LINK) && (flags & C352_FLG_LOOP))
-						{
-							pos = (v.wave_start << 16) | v.wave_loop;
-							flags |= C352_FLG_LOOPHIST;
-						}
-						else if (flags & C352_FLG_LOOP)
-						{
-							pos = (pos & 0xff0000) | v.wave_loop;
-							if (flags & C352_FLG_LOOPHIST)
-							{
-								flags |= C352_FLG_KEYOFF;
-							}
-							flags |= C352_FLG_LOOPHIST;
-						}
-						else
-						{
-							flags |= C352_FLG_KEYOFF;
-							flags &= ~C352_FLG_BUSY;
-							sample = 0;
-						}
-					}
-					else
-					{
-						pos += (flags & C352_FLG_REVERSE) ? -1 : 1;
-					}
+					pos = (v.wave_start << 16) | v.wave_loop;
+					flags |= C352_FLG_LOOPHIST;
 				}
-
-				counter = next_counter & 0xffff;
-
-				util::wav_add_data_16(*file.get(), &sample, 1);
+				else if (flags & C352_FLG_LOOP)
+				{
+					pos = (pos & 0xff0000) | v.wave_loop;
+					if (flags & C352_FLG_LOOPHIST)
+					{
+						flags |= C352_FLG_KEYOFF;
+					}
+					flags |= C352_FLG_LOOPHIST;
+				}
+				else
+				{
+					flags |= C352_FLG_KEYOFF;
+					flags &= ~C352_FLG_BUSY;
+					sample = 0;
+				}
+			}
+			else
+			{
+				pos += (flags & C352_FLG_REVERSE) ? -1 : 1;
 			}
 		}
+
+		counter = next_counter & 0xffff;
+
+		util::wav_add_data_16(*file.get(), &sample, 1);
 	}
 }
 

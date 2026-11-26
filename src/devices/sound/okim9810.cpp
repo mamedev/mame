@@ -358,7 +358,7 @@ void okim9810_device::write_command(uint8_t data)
 			{
 				// use "Phrase Control Table" mode
 				m_voice[channel].m_phrase_offset = startAddr;
-				m_voice[channel].m_phrase_count = endAddr >= startAddr ? endAddr - startAddr + 1 : 0;
+				m_voice[channel].m_phrase_count = (endAddr >= startAddr) ? (endAddr - startAddr + 1) : 0;
 				m_voice[channel].m_phrase_base = startAddr;
 				m_voice[channel].m_phrase_length = m_voice[channel].m_phrase_count;
 				if (m_voice[channel].m_phrase_count == 0)
@@ -375,7 +375,7 @@ void okim9810_device::write_command(uint8_t data)
 				m_voice[channel].m_base_offset = startAddr;
 				m_voice[channel].m_endFlags = endFlags;
 				// Some ROMs use an end address below the start for unused phrases.
-				m_voice[channel].m_count = endAddr >= startAddr ? endAddr - startAddr + 1 : 0;
+				m_voice[channel].m_count = (endAddr >= startAddr) ? (endAddr - startAddr + 1) : 0;
 
 				m_voice[channel].m_playbackAlgo = (startFlags & 0x30) >> 4; // Not verified
 				m_voice[channel].m_samplingFreq = startFlags & 0x0f;
@@ -405,7 +405,7 @@ void okim9810_device::write_command(uint8_t data)
 				m_voice[channel].m_startFlags = startFlags;
 				m_voice[channel].m_base_offset = startAddr;
 				m_voice[channel].m_endFlags = 0;
-				m_voice[channel].m_count = endAddr >= startAddr ? endAddr - startAddr + 1 : 0;
+				m_voice[channel].m_count = (endAddr >= startAddr) ? (endAddr - startAddr + 1) : 0;
 
 				m_voice[channel].m_playbackAlgo = (startFlags & 0x0c) >> 2;
 				m_voice[channel].m_samplingFreq = (startFlags & 0xf0) >> 4;
@@ -565,22 +565,22 @@ int okim9810_device::so_r()
 
 int okim9810_device::sr0_r()
 {
-	return (m_serial_read_latch >> ((m_ud) ? 4 : 0)) & 1;
+	return BIT(m_serial_read_latch, m_ud ? 4 : 0);
 }
 
 int okim9810_device::sr1_r()
 {
-	return (m_serial_read_latch >> ((m_ud) ? 5 : 1)) & 1;
+	return BIT(m_serial_read_latch, m_ud ? 5 : 1);
 }
 
 int okim9810_device::sr2_r()
 {
-	return (m_serial_read_latch >> ((m_ud) ? 6 : 2)) & 1;
+	return BIT(m_serial_read_latch, m_ud ? 6 : 2);
 }
 
 int okim9810_device::sr3_r()
 {
-	return (m_serial_read_latch >> ((m_ud) ? 7 : 3)) & 1;
+	return BIT(m_serial_read_latch, m_ud ? 7 : 3);
 }
 
 //**************************************************************************
@@ -591,28 +591,28 @@ int okim9810_device::sr3_r()
 //  okim_voice - constructor
 //-------------------------------------------------
 
-okim9810_device::okim_voice::okim_voice()
-	: m_playbackAlgo(ADPCM2_PLAYBACK),
-		m_looping(false),
-		m_startFlags(0),
-		m_endFlags(0),
-		m_base_offset(0),
-		m_count(0),
-		m_samplingFreq(2),
-		m_playing(false),
-		m_sample(0),
-		m_phrase_offset(0),
-		m_phrase_count(0),
-		m_phrase_base(0),
-		m_phrase_length(0),
-		m_phrase_wait_cnt(0),
-		m_phrase_state(SEQ_STOP),
-		m_channel_volume(0x00),
-		m_pan_volume_left(0x00),
-		m_pan_volume_right(0x00),
-		m_startSample(0),
-		m_endSample(0),
-		m_interpSampleNum(0)
+okim9810_device::okim_voice::okim_voice() :
+	m_playbackAlgo(ADPCM2_PLAYBACK),
+	m_looping(false),
+	m_startFlags(0),
+	m_endFlags(0),
+	m_base_offset(0),
+	m_count(0),
+	m_samplingFreq(2),
+	m_playing(false),
+	m_sample(0),
+	m_phrase_offset(0),
+	m_phrase_count(0),
+	m_phrase_base(0),
+	m_phrase_length(0),
+	m_phrase_wait_cnt(0),
+	m_phrase_state(SEQ_STOP),
+	m_channel_volume(0x00),
+	m_pan_volume_left(0x00),
+	m_pan_volume_right(0x00),
+	m_startSample(0),
+	m_endSample(0),
+	m_interpSampleNum(0)
 {
 }
 
@@ -689,7 +689,7 @@ void okim9810_device::okim_voice::generate_audio(device_rom_interface &rom,
 				m_interpSampleNum = 0;
 				m_startFlags = startFlags;
 				m_base_offset = startAddr;
-				m_count = endAddr >= startAddr ? endAddr - startAddr + 1 : 0;
+				m_count = (endAddr >= startAddr) ? (endAddr - startAddr + 1) : 0;
 				m_playbackAlgo = (startFlags & 0x30) >> 4; // Not verified
 				m_samplingFreq = startFlags & 0x0f;
 				if (m_playbackAlgo == ADPCM_PLAYBACK || m_playbackAlgo == ADPCM2_PLAYBACK)

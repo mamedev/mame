@@ -443,7 +443,7 @@ void namcos21_c67_state::mix_layer0_sprites(screen_device &screen, bitmap_ind16 
 	// create priority table, this is not accurate
 	u16 pri[0x10];
 	for (int i = 0; i < 0x10; i++)
-		pri[i] = (i == 0) ? 0x7fc0 : pri[i - 1] / 1.24;
+		pri[i] = (i == 0) ? 0x7fc0 : (pri[i - 1] / 1.24);
 
 	// mix layer 0 sprites with polygons
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)

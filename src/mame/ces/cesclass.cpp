@@ -55,20 +55,22 @@ public:
 		, m_led_matrix(*this, "ledmatrix%u", 0U)
 	{ }
 
-	void ccclass(machine_config &config);
-	void tsclass(machine_config &config);
+	void ccclass(machine_config &config) ATTR_COLD;
+	void hrclass(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void video_start() override ATTR_COLD;
 	virtual void video_reset() override ATTR_COLD;
 
-	void cesclassic(machine_config &config);
+	void cesclassic(machine_config &config) ATTR_COLD;
 
-	virtual void lamps_w(u16 data);
+	void lamps_w(u16 data);
+	void hrclass_lamps_w(u16 data);
 	void led_update(u32 src_offset, u16 dst_offset);
 
-	void palette_init(palette_device &palette) const;
+	void palette_init(palette_device &palette) const ATTR_COLD;
 	void main_map(address_map &map) ATTR_COLD;
+	void hrclass_main_map(address_map &map) ATTR_COLD;
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -79,29 +81,16 @@ private:
 	required_device_array<screen_device, 2> m_screen;
 	output_finder<25 * 8 * 2> m_led_matrix;
 
-	bitmap_rgb32 m_lcd_bitmap[2]{};
+	bitmap_rgb32 m_lcd_bitmap[2];
 	bool m_lcd_display = false;
 
 	void irq2_ack_w(u16 data);
 	void irq3_ack_w(u16 data);
 	void outputs_w(u16 data);
 
-	void dma_trigger_w(offs_t offset, u16 data, u16 mem_mask=~0);
+	void dma_trigger_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 
 	template <unsigned N> uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-};
-
-class hrclass_state : public cesclassic_state
-{
-public:
-	hrclass_state(const machine_config &mconfig, device_type type, const char *tag)
-		: cesclassic_state(mconfig, type, tag)
-	{ }
-
-	void hrclass(machine_config &config);
-
-private:
-	virtual void lamps_w(u16 data) override;
 };
 
 
@@ -209,7 +198,7 @@ void cesclassic_state::lamps_w(u16 data)
 }
 
 // TODO: how hrclass manages to configure a different format?
-void hrclass_state::lamps_w(u16 data)
+void cesclassic_state::hrclass_lamps_w(u16 data)
 {
 	led_update(0xce9a / 2, 0);
 	led_update(0xcec4 / 2, 25 * 8);
@@ -249,6 +238,13 @@ void cesclassic_state::main_map(address_map &map)
 	map(0x900001, 0x900001).r(m_oki, FUNC(okim6295_device::read)); // unsure about this ...
 	map(0x900101, 0x900101).w(m_oki, FUNC(okim6295_device::write));
 //  map(0x904000, 0x904001).nopw(); //some kind of serial
+}
+
+void cesclassic_state::hrclass_main_map(address_map &map)
+{
+	main_map(map);
+
+	map(0x640040, 0x640041).w(FUNC(cesclassic_state::hrclass_lamps_w));
 }
 
 static INPUT_PORTS_START( cesclassic )
@@ -393,19 +389,12 @@ void cesclassic_state::cesclassic(machine_config &config)
 void cesclassic_state::ccclass(machine_config &config)
 {
 	cesclassic(config);
-	config.set_default_layout(layout_ces_ccclass);
 }
 
-void hrclass_state::hrclass(machine_config &config)
+void cesclassic_state::hrclass(machine_config &config)
 {
 	cesclassic(config);
-	config.set_default_layout(layout_ces_hrclass);
-}
-
-void cesclassic_state::tsclass(machine_config &config)
-{
-	cesclassic(config);
-	config.set_default_layout(layout_ces_tsclass);
+	m_maincpu->set_addrmap(AS_PROGRAM, &cesclassic_state::hrclass_main_map);
 }
 
 ROM_START(hrclass)
@@ -437,6 +426,6 @@ ROM_END
 } // anonymous namespace
 
 
-GAME(1997, hrclass, 0, hrclass, cesclassic, hrclass_state,    empty_init, ROT0, "Creative Electronics and Software", "Home Run Classic (v1.21 12-feb-1997)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
-GAME(1997, ccclass, 0, ccclass, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics and Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
-GAME(1997, tsclass, 0, tsclass, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics and Software", "Trap Shoot Classic (v1.0 21-mar-1997)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK )
+GAMEL(1997, hrclass, 0, hrclass, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics and Software", "Home Run Classic (v1.21 12-feb-1997)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK, layout_ces_hrclass )
+GAMEL(1997, ccclass, 0, ccclass, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics and Software", "Country Club Classic (v1.10 03-apr-1997)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK, layout_ces_ccclass )
+GAMEL(1997, tsclass, 0, ccclass, cesclassic, cesclassic_state, empty_init, ROT0, "Creative Electronics and Software", "Trap Shoot Classic (v1.0 21-mar-1997)",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_REQUIRES_ARTWORK, layout_ces_tsclass )

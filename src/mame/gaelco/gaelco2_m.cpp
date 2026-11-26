@@ -262,70 +262,30 @@ void snowboar_state::machine_start()
 	save_item(NAME(m_snowboard_latch));
 }
 
-static u16 get_lo(u32 x)
+constexpr u16 get_lo(u32 x)
 {
-	return ((x & 0x00000010) <<  1) |
-			((x & 0x00000800) <<  3) |
-			((x & 0x40000000) >> 27) |
-			((x & 0x00000005) <<  6) |
-			((x & 0x00000008) <<  8) |
-			std::rotl<u32>(x & 0x00800040, 9) |
-			((x & 0x04000000) >> 16) |
-			((x & 0x00008000) >> 14) |
-			((x & 0x00002000) >> 11) |
-			((x & 0x00020000) >> 10) |
-			((x & 0x00100000) >>  8) |
-			((x & 0x00044000) >>  5) |
-			((x & 0x00000020) >>  1);
+	return bitswap<16>(x, 6, 11, 18, 20, 3, 26, 14, 2, 17, 0, 4, 5, 30, 13, 15, 23);
 }
 
-static u16 get_hi(u32 x)
+constexpr u16 get_hi(u32 x)
 {
-	return ((x & 0x00001400) >>  0) |
-			((x & 0x10000000) >> 26) |
-			((x & 0x02000000) >> 24) |
-			((x & 0x08000000) >> 21) |
-			((x & 0x00000002) << 12) |
-			((x & 0x01000000) >> 19) |
-			((x & 0x20000000) >> 18) |
-			((x & 0x80000000) >> 16) |
-			((x & 0x00200000) >> 13) |
-			((x & 0x00010000) >> 12) |
-			((x & 0x00080000) >> 10) |
-			((x & 0x00000200) >>  9) |
-			((x & 0x00400000) >>  8) |
-			((x & 0x00000080) >>  4) |
-			((x & 0x00000100) >>  1);
+	return bitswap<16>(x, 31, 22, 1, 12, 29, 10, 19, 21, 8, 27, 24, 16, 7, 28, 25, 9);
 }
 
-static u16 get_out(u16 x)
+constexpr u16 get_out(u16 x)
 {
-	return ((x & 0xc840) <<  0) |
-			((x & 0x0080) <<  2) |
-			((x & 0x0004) <<  3) |
-			((x & 0x0008) <<  5) |
-			((x & 0x0010) <<  8) |
-			((x & 0x0002) <<  9) |
-			((x & 0x0001) << 13) |
-			((x & 0x0200) >>  9) |
-			((x & 0x1400) >>  8) |
-			((x & 0x0100) >>  7) |
-			((x & 0x2000) >>  6) |
-			((x & 0x0020) >>  2);
+	return bitswap<16>(x, 15, 14, 0, 4, 11, 1, 7, 3, 13, 6, 2, 12, 5, 10, 8, 9);
 }
 
-u16 mangle(u32 x)
+constexpr u16 mangle(u32 x)
 {
-	u16 a = get_lo(x);
-	u16 b = get_hi(x);
-	return get_out(((a ^ 0x0010) - (b ^ 0x0024)) ^ 0x5496);
+	return get_out(((get_lo(x) ^ 0x0010) - (get_hi(x) ^ 0x0024)) ^ 0x5496);
 }
 
 u16 snowboar_state::snowboar_protection_r()
 {
-	u16 ret = mangle(m_snowboard_latch);
-	ret = ((ret & 0xff00) >> 8) | ((ret & 0x00ff) << 8);
-	return ret;
+	u16 const ret = mangle(m_snowboard_latch);
+	return ((ret & 0xff00) >> 8) | ((ret & 0x00ff) << 8);
 }
 
 void snowboar_state::snowboar_protection_w(offs_t offset, u16 data, u16 mem_mask)

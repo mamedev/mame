@@ -46,7 +46,6 @@
       See axell_ag2_rm1.cpp for reconstruction-specific limitations.
 */
 #include "emu.h"
-
 #include "axell_ag2.h"
 
 #include "axell_decomp.h"
@@ -306,7 +305,7 @@ TIMER_CALLBACK_MEMBER(ax51201_device::complete)
 		m_host[REG_BASE + 0x98] = m_rm1_ready_slot;
 		// Clearing bit3 at EOF also permits the firmware's command80 helper
 		// to initialize another movie. The last valid output slot stays visible.
-		m_host[REG_BASE + 0x9f] = m_rm1_next_display == m_rm1_packet_count ? 0x02 : 0x09;
+		m_host[REG_BASE + 0x9f] = (m_rm1_next_display == m_rm1_packet_count) ? 0x02 : 0x09;
 	}
 	m_pending |= u8(param);
 	update_events();
@@ -422,7 +421,7 @@ u32 ax51201_device::rm1_decode_next()
 	u32 presentation;
 	if (kind < 2)
 	{
-		presentation = m_rm1_have_anchor ? m_rm1_anchor_display + m_rm1_anchor_advance : 0;
+		presentation = m_rm1_have_anchor ? (m_rm1_anchor_display + m_rm1_anchor_advance) : 0;
 		if (m_rm1_have_anchor && !m_rm1_anchor_advance)
 			throw axell_rm1::decode_error("nonadvancing RM1 anchor");
 	}
@@ -542,7 +541,7 @@ void ax51201_device::transfer()
 			for (u32 x = 0; x < width; x++)
 			{
 				const u32 a = source + y * width + x;
-				m_vram[vram_addr(dx + x, dy + y)] = mode == 1 ? rom8(a) : list8(a);
+				m_vram[vram_addr(dx + x, dy + y)] = (mode == 1) ? rom8(a) : list8(a);
 			}
 		}
 	}
@@ -647,7 +646,7 @@ u32 ax51201_device::draw_sheet(u16 sheet)
 			break;
 		// yujogs 01ccc-01cf4 walks these three record sizes.
 		const u32 mode = BIT(flags, 5, 2);
-		cell += mode == 0 ? 16 : mode == 1 ? 18 : 28;
+		cell += (mode == 0) ? 16 : (mode == 1) ? 18 : 28;
 	}
 	return pixels;
 }
@@ -676,7 +675,7 @@ bool ax51201_device::sample_pixel(const cell_context &context, int u, int v, u16
 	}
 	else
 	{
-		u8 index = m_vram[vram_addr(context.format == 0 ? u >> 1 : u, v)];
+		u8 index = m_vram[vram_addr((context.format == 0) ? (u >> 1) : u, v)];
 		if (context.format == 0)
 			index = BIT(index, (u & 1) * 4, 4);
 		else if (context.format == 1)
@@ -717,7 +716,7 @@ void ax51201_device::draw_pixel(const cell_context &context, int x, int y, u16 c
 			case 5: // additive (yujogs sparkles, cscaoysd fades)
 				return std::min(maximum, d + s);
 			case 6: // subtractive (yujogs actor shadows, cscaoysd fades)
-				return d > s ? d - s : 0;
+				return (d > s) ? (d - s) : 0;
 			default:
 				return s; // TODO: modulation modes 3, 4 and 7
 			}
@@ -747,7 +746,7 @@ u32 ax51201_device::draw_cell(u16 cell, u16 sheet)
 	const int scale_y = list8(sheet + 5);
 	const bool flip_x = BIT(list8(sheet), 1);
 	const bool flip_y = BIT(list8(sheet), 2);
-	const int bits = format == 0 ? 4 : format <= 2 ? 8 : 16;
+	const int bits = (format == 0) ? 4 : (format <= 2) ? 8 : 16;
 	const int source_x = list16(cell + 4);
 	const int source_y = list16(cell + 6);
 	if (!scale_x || !scale_y)
@@ -765,8 +764,8 @@ u32 ax51201_device::draw_cell(u16 cell, u16 sheet)
 	const u8 palette = BIT(flags, 3) ? list8(cell + 1) : list8(sheet + 1);
 	cell_context context;
 	context.format = format;
-	context.rgb565 = format == 3 ? BIT(list8(cell + 3), 0) : BIT(list8(sheet), 5);
-	context.palette_base = u32(palette) << (format == 0 ? 4 : format == 1 ? 6 : 8);
+	context.rgb565 = (format == 3) ? BIT(list8(cell + 3), 0) : BIT(list8(sheet), 5);
+	context.palette_base = u32(palette) << ((format == 0) ? 4 : (format == 1) ? 6 : 8);
 	context.blend_mode = modulation >> 5;
 	context.blend_level = modulation & 31;
 	context.dest_x = u32(int(reg16(0x16)) - wx0);
@@ -873,7 +872,7 @@ u32 ax51201_device::draw_cell(u16 cell, u16 sheet)
 		return pixels;
 	}
 
-	const u32 size_offset = mode == 1 ? 16 : 14;
+	const u32 size_offset = (mode == 1) ? 16 : 14;
 	int dw = list8(cell + size_offset) | (BIT(flags, 2) ? ((px >> 6) & 0x300) : 0);
 	int dh = list8(cell + size_offset + 1) | (BIT(flags, 1) ? ((py >> 6) & 0x300) : 0);
 	if (!mode)
@@ -915,15 +914,15 @@ u32 ax51201_device::draw_cell(u16 cell, u16 sheet)
 	{
 		for (int col = left; col <= right; col++)
 		{
-			const s64 sx = flip_x ? dw - 1 - (col - x) : col - x;
-			const s64 sy = flip_y ? dh - 1 - (row - y) : row - y;
+			const s64 sx = flip_x ? (dw - 1 - (col - x)) : (col - x);
+			const s64 sy = flip_y ? (dh - 1 - (row - y)) : (row - y);
 			int u;
 			int v;
 			if (mode == 1)
 			{
 				// 18-byte source-vector form, also used by the AX51102.
-				const int csign = quadrant == 1 || quadrant == 2 ? -1 : 1;
-				const int ssign = quadrant >= 2 ? -1 : 1;
+				const int csign = (quadrant == 1 || quadrant == 2) ? -1 : 1;
+				const int ssign = (quadrant >= 2) ? -1 : 1;
 				// TODO: hardware step precision
 				const s64 area = s64(dw) * dh;
 				const auto floor_div = [] (s64 value, s64 divisor) { return value / divisor - (value % divisor < 0); };

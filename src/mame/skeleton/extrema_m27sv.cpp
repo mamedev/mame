@@ -77,7 +77,7 @@ private:
 	required_shared_ptr<u8> m_work_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	std::unique_ptr<u8[]> m_palette_ram;
+	std::unique_ptr<u8 []> m_palette_ram;
 	required_shared_ptr<u8> m_vram;
 	required_shared_ptr<u8> m_aram;
 	memory_view m_aram_view;
@@ -85,6 +85,12 @@ private:
 	// TODO: temporary
 	required_device<nvram_device> m_nvram;
 	std::unique_ptr<u8[]> m_nvram_ptr;
+
+	tilemap_t *m_tilemap;
+
+	u8 m_unk_fe20 = 0;
+	u8 m_unk_fe2a = 0;
+	u16 m_pal_bank = 0;
 
 	u8 palette_r(offs_t offset);
 	void palette_w(offs_t offset, u8 data);
@@ -94,21 +100,15 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	tilemap_t *m_tilemap;
-
 	void program_map(address_map &map) ATTR_COLD;
 	void io_map(address_map &map) ATTR_COLD;
 	void mmio_map(address_map &map) ATTR_COLD;
-
-	u8 m_unk_fe20 = 0;
-	u8 m_unk_fe2a = 0;
-	u16 m_pal_bank = 0;
 };
 
 void extrema_m27sv_state::machine_start()
 {
 	m_bank->configure_entries(0, 8, m_program_rom->base(), 0x8000);
-	m_nvram_ptr = make_unique_clear<u8[]>(0x2000);
+	m_nvram_ptr = make_unique_clear<u8 []>(0x2000);
 	m_nvram->set_base(&m_nvram_ptr[0], 0x2000);
 
 	save_item(NAME(m_unk_fe20));

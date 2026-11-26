@@ -32,6 +32,7 @@ NOTES:
 ***************************************************************************/
 
 #include "emu.h"
+
 #include "cpu/z80/z80.h"
 #include "taitosnd.h"
 #include "machine/te7750.h"
@@ -58,13 +59,19 @@ public:
 		m_palette(*this, "palette")
 	{ }
 
-	void cpzodiac(machine_config &config);
+	void cpzodiac(machine_config &config) ATTR_COLD;
 
 protected:
-	void palette_init(palette_device &palette) const;
+	virtual void machine_start() override ATTR_COLD;
+
+	void palette_init(palette_device &palette) const ATTR_COLD;
 
 private:
-	virtual void machine_start() override ATTR_COLD;
+	void main_map(address_map &map) ATTR_COLD;
+	void main_io_map(address_map &map) ATTR_COLD;
+	void sound_map(address_map &map) ATTR_COLD;
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<z80_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -72,12 +79,6 @@ private:
 	required_shared_ptr<uint8_t> m_vram;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
-	void main_map(address_map &map) ATTR_COLD;
-	void main_io_map(address_map &map) ATTR_COLD;
-	void sound_map(address_map &map) ATTR_COLD;
-
-	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -96,17 +97,18 @@ void cpzodiac_state::palette_init(palette_device &palette) const
 // NOTE: "speed test" has two lines cutoff at bottom
 uint32_t cpzodiac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	for(int y = cliprect.top(); y <= cliprect.bottom(); y++)
+	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
 		const u32 base_address = y * 152;
-		for(int x = cliprect.left(); x <= cliprect.right(); x+= 4)
+		auto *const row = &bitmap.pix(y);
+		for (int x = cliprect.left(); x <= cliprect.right(); x+= 4)
 		{
 			const u32 x_address = base_address + (x >> 2);
-			for(int xi = 0; xi < 4; xi++)
+			for (int xi = 0; xi < 4; xi++)
 			{
 				int pen = (m_vram[x_address & 0x1fff] >> ((3 - xi) * 2)) & 3;
 
-				bitmap.pix(y, x + xi) = m_palette->pen(pen);
+				row[x + xi] = m_palette->pen(pen);
 			}
 		}
 	}
@@ -130,9 +132,9 @@ void cpzodiac_state::machine_start()
 void cpzodiac_state::main_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom();
-	map(0x8000, 0x9fff).bankr("databank");
+	map(0x8000, 0x9fff).bankr(m_bank);
 	map(0xa000, 0xbfff).ram();
-	map(0xc000, 0xdfff).ram().share("vram"); // video?
+	map(0xc000, 0xdfff).ram().share(m_vram); // video?
 	map(0xe000, 0xe00f).rw("io", FUNC(te7750_device::read), FUNC(te7750_device::write));
 //  map(0xe016, 0xe017).ram(); SED1351F data/address lines, r/w?
 	map(0xe020, 0xe020).w("syt", FUNC(tc0140syt_device::master_port_w));
@@ -166,29 +168,29 @@ void cpzodiac_state::sound_map(address_map &map)
 static INPUT_PORTS_START( cpzodiac )
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:!1,!2,!3,!4")
+	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 4C_5C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 3C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 3C_4C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_5C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW:!5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	// TODO: what this really does?
 	PORT_DIPNAME( 0x20, 0x20, "Skeleton Error Detection" ) PORT_DIPLOCATION("SW:!6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW:!7,!8")
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) ) // -5 Kg
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )

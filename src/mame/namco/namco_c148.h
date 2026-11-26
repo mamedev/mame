@@ -15,8 +15,6 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> namco_c148_device
-
 class namco_c148_device : public device_t
 {
 public:
@@ -56,7 +54,7 @@ public:
 	void sci_irq_trigger();
 
 protected:
-	// device-level overrides
+	// device_t implementation
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
@@ -70,7 +68,7 @@ private:
 	optional_device<namco_c148_device> m_linked_c148;   // reference to linked master/slave c148
 	bool m_hostcpu_master;                              // define if host cpu is master
 
-	struct{
+	struct {
 		uint8_t cpu = 0;
 		uint8_t ex = 0;
 		uint8_t sci = 0;
@@ -115,8 +113,7 @@ private:
 };
 
 
-// device type definition
+// device type declaration
 DECLARE_DEVICE_TYPE(NAMCO_C148, namco_c148_device)
-
 
 #endif // MAME_NAMCO_NAMCO_C148_H

@@ -14,21 +14,19 @@
     and engine timing belong to axell_ag2.cpp and remain provisional there.
 */
 #include "emu.h"
-
 #include "axell_ag2_rm1.h"
 
 #include <algorithm>
 #include <numeric>
 #include <utility>
 
-namespace axell_rm1
-{
+namespace axell_rm1 {
 
-namespace
-{
+namespace {
 
 constexpr std::uint32_t WIDTH = frame::WIDTH;
 constexpr std::uint32_t HEIGHT = frame::HEIGHT;
+
 using symbol_table = std::array<std::uint8_t, 256>;
 using block_pixels = std::array<std::uint8_t, 16>;
 using basis_sums = std::array<std::int64_t, 16>;
@@ -44,7 +42,7 @@ void require(bool condition, const char *message)
 // residuals and motion coordinates.
 std::int64_t floor_div(std::int64_t value, std::int64_t divisor)
 {
-	return value >= 0 ? value / divisor : -1 - ((-1 - value) / divisor);
+	return (value >= 0) ? (value / divisor) : (-1 - ((-1 - value) / divisor));
 }
 
 std::uint8_t clip(std::int64_t value)
@@ -87,7 +85,7 @@ public:
 		require(count <= 32 && position <= limit && count <= limit - position, "truncated bitstream");
 		std::uint32_t result = 0;
 		for (std::uint32_t i = 0; i < count; ++i, ++position)
-			result = (result << 1) | ((m_view.data[position / 8] >> (~position & 7)) & 1);
+			result = (result << 1) | BIT(m_view.data[position / 8], ~position & 7);
 		return result;
 	}
 
@@ -217,10 +215,10 @@ void decode_intra_fields(byte_view payload, picture_fields &fields, basis_nest &
 				--run;
 			const std::uint32_t suffix = c.read(k + bool(q));
 			const int top = (y && (y != ny)) ? luma[(y - 1) * 160 + x] : 127;
-			const int predicted = x ? (luma.back() + top + 1) / 2 : top;
+			const int predicted = x ? ((luma.back() + top + 1) / 2) : top;
 			const int value = predicted + dc_delta(q, suffix, k);
 			require(value >= 0 && value <= 255, "luma DC outside byte range");
-			luma.push_back(std::int16_t(value));
+			luma.emplace_back(std::int16_t(value));
 		}
 	}
 	c.finish();
@@ -233,13 +231,13 @@ void decode_intra_fields(byte_view payload, picture_fields &fields, basis_nest &
 	bit_reader d(payload.slice(region[3], region[4]));
 	const auto modes = [&d, &mode_table, &runs, &fields] (std::uint32_t plane)
 	{
-		const std::uint32_t columns = plane == 0 ? 160 : 80;
+		const std::uint32_t columns = (plane == 0) ? 160 : 80;
 		std::uint32_t x = 0;
 		while (x < columns)
 		{
 			const std::uint32_t mode = d.symbol(mode_table);
 			require(mode <= 7, "invalid intra block mode");
-			const std::uint32_t count = mode ? 1 : run_value(d, runs, 4) + 1;
+			const std::uint32_t count = mode ? 1 : (run_value(d, runs, 4) + 1);
 			require(count <= columns - x, "intra mode run exceeds row");
 			fields.modes[plane].insert(fields.modes[plane].end(), count, std::uint8_t(mode));
 			x += count;
@@ -261,10 +259,10 @@ void decode_intra_fields(byte_view payload, picture_fields &fields, basis_nest &
 				--run;
 			const int delta = dc_delta(q, d.read(k + bool(q)), k);
 			const int top = y ? output[(y - 1) * 80 + x] : 127;
-			const int predicted = x ? (output.back() + top + 1) / 2 : top;
+			const int predicted = x ? ((output.back() + top + 1) / 2) : top;
 			const int value = predicted + delta;
 			require(value >= 0 && value <= 255, "chroma DC outside byte range");
-			output.push_back(std::int16_t(value));
+			output.emplace_back(std::int16_t(value));
 		}
 	};
 	for (std::uint32_t y = 0; y < 60; ++y)
@@ -335,7 +333,7 @@ void decode_inter_fields(byte_view payload, picture_fields &fields)
 			previous_reference = block.reference;
 			for (std::uint32_t axis = 0; axis < 2; ++axis)
 			{
-				const std::uint32_t k = payload.read_uint(4 + axis + (block.reference == 2 ? 2 : 0), 1);
+				const std::uint32_t k = payload.read_uint(4 + axis + ((block.reference == 2) ? 2 : 0), 1);
 				require(k <= 8, "unsupported motion width");
 				const std::uint32_t q = c.symbol(motion);
 				const std::uint32_t suffix = c.read(k + bool(q));
@@ -362,8 +360,8 @@ void decode_inter_fields(byte_view payload, picture_fields &fields)
 	require(k == 0 || k == 2, "unsupported inter DC precision");
 	const auto field = [&fields, &d, &values, &mode_table, &runs, k] (std::uint32_t plane, std::uint32_t y, bool is_dc)
 	{
-		const std::uint32_t row = plane == 0 ? y / 2 : y;
-		const std::uint32_t count = plane == 0 ? 2 : 1;
+		const std::uint32_t row = (plane == 0) ? (y / 2) : y;
+		const std::uint32_t count = (plane == 0) ? 2 : 1;
 		std::uint32_t run = 0;
 		int previous = 127;
 		for (std::uint32_t x = 0; x < 80; ++x)
@@ -376,12 +374,12 @@ void decode_inter_fields(byte_view payload, picture_fields &fields)
 				{
 					if (is_dc)
 					{
-						fields.means[plane].push_back(-1);
+						fields.means[plane].emplace_back(-1);
 						previous = 127;
 					}
 					else
 					{
-						fields.modes[plane].push_back(0);
+						fields.modes[plane].emplace_back(0);
 					}
 					continue;
 				}
@@ -390,7 +388,7 @@ void decode_inter_fields(byte_view payload, picture_fields &fields)
 					const std::uint32_t q = d.symbol(values);
 					previous += dc_delta(q, d.read(k + bool(q)), k);
 					require(previous >= 0 && previous <= 255, "inter DC outside byte range");
-					fields.means[plane].push_back(std::int16_t(previous));
+					fields.means[plane].emplace_back(std::int16_t(previous));
 				}
 				else
 				{
@@ -406,7 +404,7 @@ void decode_inter_fields(byte_view payload, picture_fields &fields)
 						if (!mode)
 							run = run_value(d, runs, 4);
 					}
-					fields.modes[plane].push_back(std::uint8_t(mode));
+					fields.modes[plane].emplace_back(std::uint8_t(mode));
 				}
 			}
 		}
@@ -457,10 +455,10 @@ picture_details decode_details(byte_view payload, bool intra, const picture_fiel
 	const auto coefficients = alphabet(payload, 24, 8);
 	picture_details details;
 	for (std::uint32_t p = 0; p < 3; ++p)
-		details[p].resize(p == 0 ? 160 * 120 : 80 * 60);
+		details[p].resize((p == 0) ? (160 * 120) : (80 * 60));
 	const auto block = [&fields, &details, &coefficients, intra] (bit_reader &bits, std::uint32_t plane, std::uint32_t x, std::uint32_t y)
 	{
-		const std::uint32_t index = y * (plane == 0 ? 160 : 80) + x;
+		const std::uint32_t index = y * ((plane == 0) ? 160 : 80) + x;
 		const std::uint32_t mode = fields.modes[plane][index];
 		if (mode == 0 || mode == 7)
 			return;
@@ -474,7 +472,7 @@ picture_details decode_details(byte_view payload, bool intra, const picture_fiel
 			return;
 		}
 		require(mode <= 5, "invalid detail mode");
-		const std::uint32_t mb = plane == 0 ? (y / 2) * 80 + x / 2 : index;
+		const std::uint32_t mb = (plane == 0) ? ((y / 2) * 80 + x / 2) : index;
 		const bool residual = !intra && fields.controls[mb].reference != 0;
 		item.count = mode - std::uint32_t(residual);
 		for (std::uint32_t i = 0; i < item.count; ++i)
@@ -573,8 +571,8 @@ basis_sums basis_sum(const block_detail &detail, Provider samples, basis_source 
 		// Intra selects four-bit DC samples and uses a sixteen-aligned
 		// reciprocal. Inter selects full-byte reference pixels and retains
 		// all twelve reciprocal bits.
-		const int reciprocal = !span ? 0 : source == basis_source::INTRA_DC_NIBBLES
-				? (256 / span) * 16 : 4096 / span;
+		const int reciprocal = !span ? 0 : (source == basis_source::INTRA_DC_NIBBLES)
+				? ((256 / span) * 16) : (4096 / span);
 		const std::int64_t factor = coefficient * reciprocal;
 		for (std::uint32_t j = 0; j < 16; ++j)
 			result[j] += factor * basis[j];
@@ -586,8 +584,8 @@ block_pixels nest_basis(const basis_nest &nest, std::uint32_t descriptor)
 {
 	const std::uint32_t x = descriptor & 63;
 	const std::uint32_t y = (descriptor >> 6) & 31;
-	const std::uint32_t sx = 1U << ((descriptor >> 11) & 1);
-	const std::uint32_t sy = 1U << ((descriptor >> 12) & 1);
+	const std::uint32_t sx = 1U << BIT(descriptor, 11);
+	const std::uint32_t sy = 1U << BIT(descriptor, 12);
 	block_pixels result;
 	for (std::uint32_t yy = 0; yy < 4; ++yy)
 	{
@@ -600,8 +598,8 @@ block_pixels nest_basis(const basis_nest &nest, std::uint32_t descriptor)
 block_pixels intra_block(std::uint32_t plane, std::uint32_t x, std::uint32_t y, const picture_fields &fields,
 		const picture_details &details, const basis_nest &nest, std::uint32_t precision)
 {
-	const int columns = plane == 0 ? 160 : 80;
-	const int rows = plane == 0 ? 120 : 60;
+	const int columns = (plane == 0) ? 160 : 80;
+	const int rows = (plane == 0) ? 120 : 60;
 	const std::uint32_t index = y * columns + x;
 	const auto &item = details[plane][index];
 	const std::uint32_t mode = fields.modes[plane][index];
@@ -648,8 +646,8 @@ block_pixels intra_block(std::uint32_t plane, std::uint32_t x, std::uint32_t y, 
 
 void store(frame &picture, std::uint32_t plane, std::uint32_t x, std::uint32_t y, std::uint32_t side, const std::uint8_t *pixels)
 {
-	const std::uint32_t stride = plane == 0 ? WIDTH : WIDTH / 2;
-	const std::uint32_t height = plane == 0 ? HEIGHT : HEIGHT / 2;
+	const std::uint32_t stride = (plane == 0) ? WIDTH : (WIDTH / 2);
+	const std::uint32_t height = (plane == 0) ? HEIGHT : (HEIGHT / 2);
 	require(x <= stride && side <= stride - x && y <= height && side <= height - y, "destination block outside frame");
 	auto &output = picture.plane(plane);
 	for (std::uint32_t row = 0; row < side; ++row)
@@ -659,8 +657,8 @@ void store(frame &picture, std::uint32_t plane, std::uint32_t x, std::uint32_t y
 std::array<std::uint8_t, 64> prediction(const frame &reference, std::uint32_t plane,
 		int x_half, int y_half, std::uint32_t side)
 {
-	const int stride = plane == 0 ? 640 : 320;
-	const int height = plane == 0 ? 480 : 240;
+	const int stride = (plane == 0) ? 640 : 320;
+	const int height = (plane == 0) ? 480 : 240;
 	const int x = int(floor_div(x_half, 2));
 	const int y = int(floor_div(y_half, 2));
 	const std::uint32_t fx = std::uint32_t(x_half - x * 2);
@@ -691,8 +689,8 @@ block_pixels reference_basis(const frame &reference, int ox, int oy, std::uint32
 {
 	const int x = ox + int(descriptor & 63);
 	const int y = oy + int((descriptor >> 6) & 31);
-	const int sx = 1 << ((descriptor >> 11) & 1);
-	const int sy = 1 << ((descriptor >> 12) & 1);
+	const int sx = 1 << BIT(descriptor, 11);
+	const int sy = 1 << BIT(descriptor, 12);
 	require(x >= 0 && y >= 0 && x + 3 * sx < 640 && y + 3 * sy < 480, "reference basis outside frame");
 	block_pixels result;
 	for (std::uint32_t yy = 0; yy < 4; ++yy)
@@ -708,7 +706,7 @@ block_pixels residual(const block_pixels &reference, const basis_sums &values, c
 	const int mean = (std::accumulate(reference.begin(), reference.end(), 0) + 8) / 16;
 	const auto limits = std::minmax_element(reference.begin(), reference.end());
 	const int span = *limits.second - *limits.first;
-	const std::int64_t factor = std::int64_t(corrections[1]) * (span ? 4096 / span : 0);
+	const std::int64_t factor = std::int64_t(corrections[1]) * (span ? (4096 / span) : 0);
 	const std::int64_t scale = std::int64_t(1) << precision;
 	const std::int64_t offset = corrections[0] * scale - floor_div(std::accumulate(values.begin(), values.end(), std::int64_t(0)), 16);
 	block_pixels result;
@@ -736,7 +734,7 @@ frame reconstruct(byte_view payload, bool intra, std::uint32_t kind, const frame
 	}
 	for (std::uint32_t plane = 0; plane < 3; ++plane)
 	{
-		const std::uint32_t expected = plane == 0 ? 160 * 120 : 80 * 60;
+		const std::uint32_t expected = (plane == 0) ? (160 * 120) : (80 * 60);
 		require(fields.modes[plane].size() == expected && fields.means[plane].size() == expected, "invalid metadata geometry");
 	}
 	const auto details = decode_details(payload, intra, fields);
@@ -750,12 +748,12 @@ frame reconstruct(byte_view payload, bool intra, std::uint32_t kind, const frame
 			{
 				for (std::uint32_t plane = 0; plane < 3; ++plane)
 				{
-					for (std::uint32_t by = 0; by < (plane == 0 ? 2U : 1U); ++by)
+					for (std::uint32_t by = 0; by < ((plane == 0) ? 2U : 1U); ++by)
 					{
-						for (std::uint32_t bx = 0; bx < (plane == 0 ? 2U : 1U); ++bx)
+						for (std::uint32_t bx = 0; bx < ((plane == 0) ? 2U : 1U); ++bx)
 						{
-							const std::uint32_t x = plane == 0 ? mx * 2 + bx : mx;
-							const std::uint32_t y = plane == 0 ? my * 2 + by : my;
+							const std::uint32_t x = (plane == 0) ? (mx * 2 + bx) : mx;
+							const std::uint32_t y = (plane == 0) ? (my * 2 + by) : my;
 							const auto pixels = intra_block(plane, x, y, fields, details, nest, precision);
 							store(output, plane, x * 4, y * 4, 4, pixels.data());
 						}
@@ -763,7 +761,7 @@ frame reconstruct(byte_view payload, bool intra, std::uint32_t kind, const frame
 				}
 				continue;
 			}
-			const frame *reference = control.reference == 1 ? past : kind == 1 ? &output : future;
+			const frame *reference = (control.reference == 1) ? past : (kind == 1) ? &output : future;
 			require(reference, "missing selected reference frame");
 			const int sx = int(mx * 16) + control.dx;
 			const int sy = int(my * 16) + control.dy;
@@ -775,7 +773,7 @@ frame reconstruct(byte_view payload, bool intra, std::uint32_t kind, const frame
 			const int oy = int(floor_div(sy, 2)) - 16;
 			for (std::uint32_t plane = 0; plane < 3; ++plane)
 			{
-				const std::uint32_t side = plane == 0 ? 8 : 4;
+				const std::uint32_t side = (plane == 0) ? 8 : 4;
 				if (control.processing)
 				{
 					store(output, plane, mx * side, my * side, side, predicted[plane].data());
@@ -785,9 +783,9 @@ frame reconstruct(byte_view payload, bool intra, std::uint32_t kind, const frame
 				{
 					for (std::uint32_t bx = 0; bx < side / 4; ++bx)
 					{
-						const std::uint32_t x = plane == 0 ? mx * 2 + bx : mx;
-						const std::uint32_t y = plane == 0 ? my * 2 + by : my;
-						const auto &item = details[plane][y * (plane == 0 ? 160 : 80) + x];
+						const std::uint32_t x = (plane == 0) ? (mx * 2 + bx) : mx;
+						const std::uint32_t y = (plane == 0) ? (my * 2 + by) : my;
+						const auto &item = details[plane][y * ((plane == 0) ? 160 : 80) + x];
 						block_pixels pixels;
 						for (std::uint32_t yy = 0; yy < 4; ++yy)
 						{
@@ -825,13 +823,13 @@ frame::frame() :
 std::vector<std::uint8_t> &frame::plane(std::uint32_t index)
 {
 	require(index < 3, "invalid plane index");
-	return index == 0 ? y : index == 1 ? cr : cb;
+	return (index == 0) ? y : (index == 1) ? cr : cb;
 }
 
 const std::vector<std::uint8_t> &frame::plane(std::uint32_t index) const
 {
 	require(index < 3, "invalid plane index");
-	return index == 0 ? y : index == 1 ? cr : cb;
+	return (index == 0) ? y : (index == 1) ? cr : cb;
 }
 
 void decoder::reset()
@@ -846,13 +844,13 @@ void decoder::reset()
 const frame &decoder::decode_packet(std::uint32_t kind, const std::uint8_t *payload, std::size_t size)
 {
 	require(kind <= 2, "unsupported picture kind");
-	require(payload && size >= (kind == 0 ? 0x34U : 0x60U) && size <= 64 * 1024 * 1024,
+	require(payload && size >= ((kind == 0) ? 0x34U : 0x60U) && size <= 64 * 1024 * 1024,
 			"invalid picture payload extent");
 	if (kind != 0)
 		require(m_future && m_have_nest && (kind != 2 || m_past), "missing reference picture or intra nest");
 	basis_nest nest = m_nest;
 	auto picture = std::make_shared<frame>(reconstruct({ payload, size }, kind == 0, kind,
-			kind == 1 ? m_future.get() : m_past.get(), m_future.get(), nest));
+			(kind == 1) ? m_future.get() : m_past.get(), m_future.get(), nest));
 	if (kind != 2)
 	{
 		m_past = m_future;

@@ -211,6 +211,7 @@
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
+#include <functional>
 #include <locale>
 #include <string>
 #include <sstream>
@@ -494,6 +495,8 @@ private:
 		bool mask_high_bits;
 	};
 
+	using handle_ref_vector = std::vector<std::reference_wrapper<code_handle> >;
+
 	// helpers
 	Mem MABS(const void *ptr, const u32 size = 0) const { return Mem(rbp, offset_from_rbp(ptr), size); }
 	bool short_immediate(s64 immediate) const { return s32(immediate) == immediate; }
@@ -640,6 +643,7 @@ private:
 
 	near_state &            m_near;
 
+	handle_ref_vector       m_block_handles;        // handles defined in the current block
 	bool                    m_invariant_block;      // are we generating an invariant block?
 
 	resolved_member_function m_debug_cpu_instruction_hook;
@@ -1292,6 +1296,11 @@ size_t drcbe_x64::emit(CodeHolder &ch, bool invariant)
 
 	osd::invalidate_instruction_cache(drccodeptr(ch.base_address()), code_size);
 
+	// set targets for handles defined in this block
+	for (auto const &handle : m_block_handles)
+		handle.first.get().set_codeptr(handle.second);
+	m_block_handles.clear();
+
 	return code_size;
 }
 
@@ -1340,6 +1349,7 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 n
 	// tell all of our utility objects that a block is beginning
 	m_hash.block_begin(block, instlist, numinst);
 	m_map.block_begin(block);
+	m_block_handles.clear();
 	m_invariant_block = block.invariant();
 
 	// compute the base by aligning the cache top to a cache line
@@ -1378,47 +1388,60 @@ void drcbe_x64::generate(drcuml_block &block, const instruction *instlist, u32 n
 
 	// generate code
 	std::string blockname;
-	for (int inum = 0; inum < numinst; inum++)
+	try
 	{
-		const instruction &inst = instlist[inum];
+		for (int inum = 0; inum < numinst; inum++)
+		{
+			const instruction &inst = instlist[inum];
 
-		// must remain in scope until output
-		std::string dasm;
+			// must remain in scope until output
+			std::string dasm;
 
-		// add a comment
+			// add a comment
+			if (m_log)
+			{
+				dasm = inst.disasm(&m_drcuml);
+
+				m_log->add_comment(dst + a.offset(), "%s", dasm.c_str());
+				a.set_inline_comment(dasm.c_str());
+			}
+
+			// extract a blockname
+			if (blockname.empty())
+			{
+				if (inst.opcode() == OP_HANDLE)
+					blockname = inst.param(0).handle().string();
+				else if (inst.opcode() == OP_HASH)
+					blockname = string_format("Code: mode=%d PC=%08X", (u32)inst.param(0).immediate(), (offs_t)inst.param(1).immediate());
+			}
+
+			// generate code
+			generate_one(a, inst);
+		}
+
+		// catch falling off the end of a block
 		if (m_log)
 		{
-			dasm = inst.disasm(&m_drcuml);
-
-			m_log->add_comment(dst + a.offset(), "%s", dasm.c_str());
-			a.set_inline_comment(dasm.c_str());
+			m_log->add_comment(dst + a.offset(), "%s", "end of block");
+			a.set_inline_comment("end of block");
 		}
+		a.jmp(imm(m_endofblock));
 
-		// extract a blockname
-		if (blockname.empty())
-		{
-			if (inst.opcode() == OP_HANDLE)
-				blockname = inst.param(0).handle().string();
-			else if (inst.opcode() == OP_HASH)
-				blockname = string_format("Code: mode=%d PC=%08X", (u32)inst.param(0).immediate(), (offs_t)inst.param(1).immediate());
-		}
+		// emit the generated code
+		size_t const bytes = emit(ch, block.invariant());
+		if (!bytes)
+			block.abort();
 
-		// generate code
-		generate_one(a, inst);
+		m_block_handles.clear();
 	}
-
-	// catch falling off the end of a block
-	if (m_log)
+	catch (...)
 	{
-		m_log->add_comment(dst + a.offset(), "%s", "end of block");
-		a.set_inline_comment("end of block");
+		// don't leave dangling handles to the aborted block
+		for (code_handle &handle : m_block_handles)
+			*handle.codeptr_addr() = nullptr;
+		m_block_handles.clear();
+		throw;
 	}
-	a.jmp(imm(m_endofblock));
-
-	// emit the generated code
-	size_t const bytes = emit(ch, block.invariant());
-	if (!bytes)
-		block.abort();
 
 	// log it
 	if (m_log)
@@ -1964,7 +1987,8 @@ void drcbe_x64::op_handle(Assembler &a, const instruction &inst)
 	a.align(AlignMode::kCode, 16);
 
 	// register the current pointer for the handle
-	inst.param(0).handle().set_codeptr(drccodeptr(a.code()->base_address() + a.offset()));
+	inst.param(0).handle().set_code_ptr(drccodeptr(a.code()->base_address() + a.offset()));
+	m_block_handles.emplace_back(inst.param(0).handle());
 
 	// by default, the handle points to prologue code that moves the stack pointer
 	a.lea(rsp, ptr(rsp, -40));
