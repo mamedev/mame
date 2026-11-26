@@ -79,6 +79,7 @@ To Do / Status:
 #include "trs80.h"
 #include "trs80_quik.h"
 #include "machine/input_merger.h"
+#include "formats/dmk_dsk.h"
 #include "formats/td0_dsk.h"
 #include "softlist_dev.h"
 #include "utf8.h"
@@ -572,6 +573,7 @@ GFXDECODE_END
 
 void lnw80_state::floppy_formats(format_registration &fr)
 {
+	fr.add(FLOPPY_DMK_FORMAT);
 	fr.add(FLOPPY_JV1_FORMAT);
 	fr.add(FLOPPY_TD0_FORMAT);
 }

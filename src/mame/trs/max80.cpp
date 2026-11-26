@@ -78,7 +78,7 @@ Status: Beeps every so often. Unable to read the disk.
 
 #include "formats/imd_dsk.h"
 //#include "formats/trs80_dsk.h"
-//#include "formats/dmk_dsk.h"
+#include "formats/dmk_dsk.h"
 
 #include "utf8.h"
 
@@ -432,7 +432,7 @@ void max80_state::floppy_formats(format_registration &fr)
 {
 	fr.add(FLOPPY_IMD_FORMAT);
 	//fr.add(FLOPPY_JV3_FORMAT);
-	//fr.add(FLOPPY_DMK_FORMAT);
+	fr.add(FLOPPY_DMK_FORMAT);
 	//fr.add(FLOPPY_JV1_FORMAT);
 }
 

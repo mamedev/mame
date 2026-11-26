@@ -32,6 +32,8 @@
 #include "machine/z80sio.h"
 #include "sound/beep.h"
 
+#include "formats/dmk_dsk.h"
+
 #include "softlist_dev.h"
 #include "speaker.h"
 
@@ -512,6 +514,12 @@ INPUT_PORTS_END
 //  MACHINE DRIVERS
 //**************************************************************************
 
+static void trs80m2_floppy_formats(format_registration &fr)
+{
+	fr.add_mfm_containers();
+	fr.add(FLOPPY_DMK_FORMAT);
+}
+
 void trs80m2_floppies(device_slot_interface &device)
 {
 	device.option_add("8ssdd", FLOPPY_8_SSDD); // Shugart SA-800
@@ -638,10 +646,10 @@ void trs80m12_state::main_board(machine_config &config)
 	WD2793(config, m_fdc, 8_MHz_XTAL / 4);
 	m_fdc->intrq_wr_callback().set(m_pio, FUNC(z80pio_device::pa0_w));
 	m_fdc->drq_wr_callback().set(m_dmarq, FUNC(input_merger_device::in_w<0>));
-	FLOPPY_CONNECTOR(config, m_floppies[0], trs80m2_floppies, "8dsdd", floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppies[1], trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppies[2], trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
-	FLOPPY_CONNECTOR(config, m_floppies[3], trs80m2_floppies, nullptr, floppy_image_device::default_mfm_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[0], trs80m2_floppies, "8dsdd", trs80m2_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[1], trs80m2_floppies, nullptr, trs80m2_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[2], trs80m2_floppies, nullptr, trs80m2_floppy_formats);
+	FLOPPY_CONNECTOR(config, m_floppies[3], trs80m2_floppies, nullptr, trs80m2_floppy_formats);
 
 	CENTRONICS(config, m_centronics, centronics_devices, "printer");
 	m_centronics->ack_handler().set(m_pio, FUNC(z80pio_device::strobe_b));

@@ -116,6 +116,8 @@ To Do / Status:
 #include "machine/i8251.h"
 #include "machine/i8255.h"
 
+#include "formats/dmk_dsk.h"
+
 #include "softlist_dev.h"
 #include "utf8.h"
 
@@ -471,6 +473,7 @@ u8 radionic_state::ppi_pc_r(offs_t offset)
 
 void radionic_state::floppy_formats(format_registration &fr)
 {
+	fr.add(FLOPPY_DMK_FORMAT);
 	fr.add(FLOPPY_JV1_FORMAT);
 }
 
