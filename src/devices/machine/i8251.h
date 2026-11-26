@@ -127,6 +127,7 @@ private:
 	int32_t m_txc;
 	int m_rxc_count;
 	int m_txc_count;
+	u8 m_tx_bits_sent;       // bits of the current character presented on TxD so far
 	int m_br_factor;
 	bool m_rx_start_check;     // async: start bit seen, check it again at mid-bit
 

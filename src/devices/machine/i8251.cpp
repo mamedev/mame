@@ -105,6 +105,7 @@ void i8251_device::device_start()
 
 	m_rxc_count = 0;
 	m_txc_count = 0;
+	m_tx_bits_sent = 0;
 	m_br_factor = 0;
 	m_rx_start_check = false;
 
@@ -140,6 +141,7 @@ void i8251_device::device_start()
 	save_item(NAME(m_txc));
 	save_item(NAME(m_rxc_count));
 	save_item(NAME(m_txc_count));
+	save_item(NAME(m_tx_bits_sent));
 	save_item(NAME(m_br_factor));
 	save_item(NAME(m_rx_start_check));
 
@@ -441,6 +443,7 @@ void i8251_device::start_tx()
 {
 	LOG("start_tx %02x\n", m_tx_data);
 	transmit_register_setup(m_tx_data);
+	m_tx_bits_sent = 0;
 	m_status &= ~I8251_STATUS_TX_EMPTY;
 
 	if (m_txrdy_delay_timer->enabled() && !m_txrdy_delay_timer->expire().is_never())
@@ -467,7 +470,10 @@ void i8251_device::transmit_clock()
 	// CTS is off).
 	// The 20 CLK delay isn't modelled: it rises at the centre itself, or
 	// at x1, where the centre isn't a clock edge, at the next one.
-	if (m_sync_byte_count == 0 && !is_transmit_register_empty() && is_transmit_register_in_stop_bits() &&
+	// The bit on TxD is the last one before the stop bits once the start,
+	// data and parity bits have all been presented.
+	if (m_sync_byte_count == 0 && !is_transmit_register_empty() &&
+			m_tx_bits_sent == 1 + m_data_bits_count + BIT(m_mode_byte, 4) &&
 			!(m_status & I8251_STATUS_TX_EMPTY) && !is_tx_char_pending() &&
 			m_txc_count == std::max(m_br_factor / 2, 1))
 	{
@@ -515,6 +521,7 @@ void i8251_device::transmit_clock()
 		uint8_t data = transmit_register_get_data_bit();
 		LOGBITS("8251: Tx Present a %d\n", data);
 		m_txd_handler(data);
+		m_tx_bits_sent++;
 	}
 }
 
