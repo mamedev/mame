@@ -8,7 +8,7 @@
    - The original ARM boot code uploads the key and checks the program ROM.
      The cipher hardware uses igs036_decryptor, as on PGM2; no boot checks are patched.
    - Atmel-style AIC and timer counters; vblank uses IRQ2, TC0-2 use IRQ6-8.
-   - Packed 7bpp sprites, provisional RLE, RGB555 palette, 512x240 / 800x600 video.
+   - Packed 7bpp sprites, provisional RLE, RGB555 palette, 512x240 / 640x480 / 800x600 video.
    - Several external bus layouts, GPIO input matrices, TT5665 / banked M6295.
    - Battery-backed SRAM, coin hoppers and Hou Ye Leyuan's ticket dispenser.
 
@@ -16,6 +16,10 @@
    display control, verify CPU/peripheral clocks, complete timer modes, serial
    links, real-time timer, lamps/counters and remaining DIP settings. Mechanical
    payout timing is provisional; alternate control modes still need checking.
+
+   TODO: hlqqq uses a separate I/O board over the SOC UART (RS232) for coins,
+   inputs and payout, like mghammer; it is not emulated, so the game stops at
+   the "I/O card connection failed" screen.
 
    The 20 MHz oscillator is documented on several boards; the CPU's internal
    PLL/multiplier has not been established. PGM2's 100 MHz is also marked unknown.
@@ -219,6 +223,7 @@ protected:
 	virtual void device_post_load() override ATTR_COLD;
 
 	void base_config(machine_config &config) ATTR_COLD;
+	void wide_video(machine_config &config, u16 width, u16 height) ATTR_COLD;
 	void m036_boot_map(address_map &map) ATTR_COLD;
 
 	template <bool Wide> u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -408,6 +413,21 @@ private:
 	required_device<i8255_device> m_ppi;
 
 	void qiaojidm_map(address_map &map) ATTR_COLD;
+};
+
+class m036_hlqqq_state : public m036_base_state
+{
+public:
+	m036_hlqqq_state(const machine_config &mconfig, device_type type, const char *tag)
+		: m036_base_state(mconfig, type, tag),
+		m_tt5665(*this, "tt5665") { }
+
+	void m036_hlqqq(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<tt5665_device> m_tt5665;
+
+	void hlqqq_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -827,6 +847,17 @@ void m036_qiaojidm_state::qiaojidm_map(address_map &map)
 	map(0x6000'0000, 0x6000'0007).umask32(0x00ff'00ff).rw(m_ppi, FUNC(i8255_device::read), FUNC(i8255_device::write));
 }
 
+void m036_hlqqq_state::hlqqq_map(address_map &map)
+{
+	m036_boot_map(map);
+	map(0x3000'0000, 0x3000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csl_r), FUNC(tt5665_device::csl_w));
+	map(0x4000'0000, 0x4000'0003).umask32(0x0000'00ff).rw(m_tt5665, FUNC(tt5665_device::csr_r), FUNC(tt5665_device::csr_w));
+
+	// The internal ROM's port tables list 0x50000000 and 16-bit ports at 0x60000000-c,
+	// but the game program reaches coins, inputs and payout only through the I/O board.
+	map(0x6000'0000, 0x6000'0003).nopw(); // cleared by the internal ROM at boot
+}
+
 void m036_mj_state::mjzhizun_map(address_map &map)
 {
 	m036_boot_map(map);
@@ -1123,6 +1154,32 @@ static INPUT_PORTS_START( qiaojidm )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( hlqqq )
+	// Not used by this board, but required by m036_base_state
+	// TODO: coins, buttons and settings come from the I/O board over the UART
+	PORT_START("SERVICE")
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+	PORT_START("DIRECT")
+	PORT_BIT(0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("KEY0")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("KEY1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("KEY2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("KEY3")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("KEY4")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("DSW1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("DSW2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_START("DSW3")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+INPUT_PORTS_END
+
+
 // DIP functions read from the games' own test screens. Unidentified switches
 // use their physical locations; link and accounting settings need further tests.
 static INPUT_PORTS_START( ddz )
@@ -1289,6 +1346,15 @@ void m036_base_state::base_config(machine_config &config)
 	SPEAKER(config, "speaker").front_center();
 }
 
+void m036_base_state::wide_video(machine_config &config, u16 width, u16 height)
+{
+	// The 800x600 and 640x480 boards share the packed 7bpp "Wide" sprite path.
+	m_maincpu->set_clock(100'000'000); // provisional PLL clock, as in PGM2
+	m_screen->set_size(width, height);
+	m_screen->set_visarea(0, width - 1, 0, height - 1);
+	m_screen->set_screen_update(FUNC(m036_base_state::screen_update<true>));
+}
+
 void hopper_state::hopper_config(machine_config &config)
 {
 	base_config(config);
@@ -1363,10 +1429,7 @@ void m036_mj_state::m036_mjzhizun(machine_config &config)
 void m036_hd_base_state::hd_config(machine_config &config)
 {
 	base_config(config);
-	m_maincpu->set_clock(100'000'000); // provisional PLL clock, as in PGM2
-	m_screen->set_size(800, 600);
-	m_screen->set_visarea(0, 799, 0, 599);
-	m_screen->set_screen_update(FUNC(m036_hd_base_state::screen_update<true>));
+	wide_video(config, 800, 600);
 	TT5665(config, m_tt5665, 4.952_MHz_XTAL, tt5665_device::ss_state::SS_HIGH, 0);
 	m_tt5665->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
@@ -1394,13 +1457,10 @@ void m036_qiaojidm_state::m036_qiaojidm(machine_config &config)
 	base_config(config);
 	m_maincpu->set_addrmap(AS_PROGRAM, &m036_qiaojidm_state::qiaojidm_map);
 	// TODO: the game selects 0x19 at 0xfffffa0c (HD boards 0x1b, 512x240 boards 0x18)
-	m_maincpu->set_clock(100'000'000);
 
 	// Full-screen backgrounds in the sprite table are 80 addresses (640 pixels) by 480 lines.
 	// TODO: pixel clock and blanking intervals are not known.
-	m_screen->set_size(640, 480);
-	m_screen->set_visarea(0, 639, 0, 479);
-	m_screen->set_screen_update(FUNC(m036_qiaojidm_state::screen_update<true>));
+	wide_video(config, 640, 480);
 
 	I8255(config, m_ppi);
 	m_ppi->in_pa_callback().set_ioport("PPIA");
@@ -1408,6 +1468,19 @@ void m036_qiaojidm_state::m036_qiaojidm(machine_config &config)
 	m_ppi->in_pc_callback().set_ioport("PPIC");
 
 	// TODO: sound chip at 0x40000000, ticket dispenser, lamps/counters
+}
+
+void m036_hlqqq_state::m036_hlqqq(machine_config &config)
+{
+	base_config(config);
+	m_maincpu->set_addrmap(AS_PROGRAM, &m036_hlqqq_state::hlqqq_map);
+
+	// Full-screen backgrounds in the sprite table are 80 addresses (640 pixels) by 480 lines.
+	// TODO: pixel clock and blanking intervals are not known.
+	wide_video(config, 640, 480);
+
+	TT5665(config, m_tt5665, 4.952_MHz_XTAL, tt5665_device::ss_state::SS_HIGH, 0);
+	m_tt5665->add_route(ALL_OUTPUTS, "speaker", 0.5);
 }
 
 
@@ -2127,16 +2200,16 @@ ROM_END
 ROM_START( hlqqq )
 	ROM_REGION( 0x4000, "maincpu", 0 )
 	// Internal ROM of IGS036 ARM based MCU
-	ROM_LOAD( "hlqqq_igs036.bin", 0x0000, 0x4000, NO_DUMP )
+	ROM_LOAD( "hlqqq_igs036.bin", 0x0000, 0x4000, CRC(ffcc9742) SHA1(b94e236b39affb6329a5a966fe892e56fdd40834) )
 
 	ROM_REGION32_LE( 0x200000, "user1", 0 ) // external ARM data / prg
 	ROM_LOAD( "hlqqq_v100cn.u26", 0x000000, 0x200000, CRC(39fb6a4c) SHA1(fc391b74910c26c6b46c218dc387ca539fc4949f) )
 
-	ROM_REGION( 0x1000000, "oki", 0 ) // samples
+	ROM_REGION( 0x1000000, "tt5665", 0 ) // samples
 	ROM_LOAD( "hlqqq_sp.u17", 0x000000, 0x800000, CRC(55d24d28) SHA1(b467fcc485e6748300a59928f6689439952b70b4) )
-	ROM_LOAD( "hlqqq_sp.u18", 0x000000, 0x800000, CRC(69addcf2) SHA1(216e8a14dae32a8cd8547215132b183dc0d12fe1) )
+	ROM_LOAD( "hlqqq_sp.u18", 0x800000, 0x800000, CRC(69addcf2) SHA1(216e8a14dae32a8cd8547215132b183dc0d12fe1) )
 
-	ROM_REGION( 0x8000000, "gfx", 0 )
+	ROM_REGION( 0x4000000, "gfx", 0 )
 	ROM_LOAD( "hlqqq_cg_v100cn.u1", 0x0000000, 0x1000000, CRC(25d78457) SHA1(5444d9fd698ff61af4e0060d0a274c40c0827a43) )
 	ROM_LOAD( "hlqqq_cg_v100cn.u2", 0x1000000, 0x1000000, CRC(cfeaad81) SHA1(f7330094ffb7a59f976dc0e9ed9966322c0b7569) )
 	ROM_LOAD( "hlqqq_cg_v100cn.u3", 0x2000000, 0x1000000, CRC(182a2a93) SHA1(fddf168aadc8486e786c6ebccf811fe200378e77) )
@@ -2301,13 +2374,15 @@ GAME( 2010, zjddz,        0,       m036_hd,       ddz_hd,   m036_hd_state,      
 
 GAME( 2009, hyleyuan,     0,       m036_hyleyuan, hyleyuan, m036_hyleyuan_state, empty_init,      ROT90, "IGS",          "Hou Ye Leyuan (S103CN)", MACHINE_NOT_WORKING )
 
+// sets with a TT5665 for sound and 640x480 display
+
+GAME( 2014, hlqqq,        0,       m036_hlqqq,    hlqqq,    m036_hlqqq_state,    empty_init,      ROT0, "IGS",           "Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NOT_WORKING )
+
 // sets with an unidentified sound chip and 640x480 display
 
 GAME( 2007, qiaojidm,     0,       m036_qiaojidm, qiaojidm, m036_qiaojidm_state, empty_init,      ROT0, "IGS",           "Qiaoji Da Maoxian (V101CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 // sets with no IGS036 ROM dump
-
-GAME( 201?, hlqqq,        0,       m036_tt, m036, m036_state, init_m036,              ROT0, "IGS",           "Huanle Qiao Qiao Qiao (V100CN)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
 GAME( 200?, super70s,     0,       m036_tt, m036, m036_state, init_m036,              ROT0, "IGS",           "Super 70's (V100US)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
 
