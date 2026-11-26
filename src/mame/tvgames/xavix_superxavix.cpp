@@ -541,14 +541,14 @@ static INPUT_PORTS_START( epo_doka )
 
 	PORT_MODIFY("IN0")
 	// The four numbered pads double as Player 1-4 buttons in multiplayer minigames.
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Pad 2 / Roulette")
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Pad 1 / Secret Gadget")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Back")
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Confirm")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Pad 3 / Check Map")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Pad 4 / Check Hint")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Orange: 2 / Roulette")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Red: 1 / Secret Gadget")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Red: Left")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Orange: Right")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Green: Back")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Blue: Confirm")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Blue: 3 / Check Map")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Green: 4 / Check Hint")
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -3271,7 +3271,7 @@ CONS( 2010, epo_rgfj,   0,        0, superxavix_epo_rgfj,              epo_rgfj,
 CONS( 2004, maxheart,   0,        0, superxavix_i2c_24c04_4mb,         maxheart,              superxavix_i2c_state,        empty_init, "Bandai / SSD Company Ltd.", "Let's! TV Play Futari wa PreCure Max Heart: Mat de Dance Max Heart ni Odotchaou (Japan)", 0 )
 
 // どこでもドラえもん 日本旅行ゲームDX体感！どこドラグランプリ！
-CONS( 2004, epo_doka,   0,        0, superxavix_nv_4mb,                epo_doka,              superxavix_state,            empty_init, "Epoch / SSD Company Ltd.", "Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! (Japan)", MACHINE_NOT_WORKING )
+CONS( 2004, epo_doka,   0,        0, superxavix_nv_4mb,                epo_doka,              superxavix_state,            empty_init, "Epoch / SSD Company Ltd.", "Doko Demo Doraemon Nihon Ryokou Game DX Taikan! Doko Dora Grand Prix! (Japan)", 0 )
 
 // Hello Kitty テレビであそぼう!まなぼう! カードでおままごと あいうえお図鑑
 CONS( 2006, epo_kabj,   0,        0, superxavix_epo_kabj,              epo_kabj,              superxavix_epo_kabj_state,   empty_init, "Epoch / SSD Company Ltd.", "Hello Kitty: TV de Asobou! Manabou! Card de Omamagoto AIUEO Zukan (Japan)", MACHINE_NOT_WORKING )
@@ -3313,7 +3313,7 @@ CONS( 2007, ban_dn1j,   0,        0, superxavix_i2c_24c04,             ban_dn1j,
 CONS( 2011, anpanmdx,   0,        0, superxavix_anpanmdx,              anpanmdx,              superxavix_anpanmdx_state,   empty_init, "JoyPalette / Toho / SSD Company Ltd.", "Anpanman Kazoku de! Ikunou Mat DX (Japan)", MACHINE_NOT_WORKING )
 
 // アンパンマン ぴょんぴょん育脳マット
-CONS( 2009, apmj2009,   0,        0, superxavix_i2c_24c16,             apmj2009,              superxavix_i2c_power_state,  empty_init, "Toho / SSD Company Ltd.", "Anpanman Pyon-Pyon Ikunou Mat (Japan)", MACHINE_NOT_WORKING )
+CONS( 2009, apmj2009,   0,        0, superxavix_i2c_24c16,             apmj2009,              superxavix_i2c_power_state,  empty_init, "Toho / SSD Company Ltd.", "Anpanman Pyon-Pyon Ikunou Mat (Japan)", 0 )
 
 // has HT24LC16
 CONS( 2008, udance,     0,        0, superxavix_udance,                udance,                superxavix_udance_state,     empty_init, "Hasbro / Tiger Electronics / Creativity / Medialink Technology / SSD Company Ltd.", "U-Dance", 0 )
