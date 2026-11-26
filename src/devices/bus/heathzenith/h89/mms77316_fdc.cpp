@@ -2,7 +2,7 @@
 // copyright-holders:Mark Garlanger
 /***************************************************************************
 
-  Magnolia Microsystems 77316 DD soft-sectored floppy controller
+  Magnolia MicroSystems 77316 DD soft-sectored floppy controller
 
     Supported upto 8 floppy drives
     - 4 8" drives
@@ -352,4 +352,4 @@ void mms77316_fdc_device::set_drq(int state)
 	}
 }
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MMS77316, device_h89bus_right_card_interface, mms77316_fdc_device, "mms77316_fdc", "Magnolia MicroSystems 77316 Soft-sectored Controller");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_MMS77316, device_h89bus_right_card_interface, mms77316_fdc_device, "mms77316_fdc", "Magnolia MicroSystems 77316 Soft-sectored Controller")
