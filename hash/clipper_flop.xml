@@ -4,7 +4,8 @@
 license:CC0-1.0
 -->
 <softwarelist name="clipper_flop" description="PDC Clipper disks">
-	<software name="system" supported="no">
+
+	<software name="system">
 		<description>System</description>
 		<year>1984</year>
 		<publisher>Professional Data Computer</publisher>
@@ -29,4 +30,5 @@ license:CC0-1.0
 			</dataarea>
 		</part>
 	</software>
+
 </softwarelist>

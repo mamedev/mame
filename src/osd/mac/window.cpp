@@ -13,6 +13,7 @@
 #ifndef _MSC_VER
 #include <unistd.h>
 #endif
+#include <algorithm>
 #include <list>
 #include <memory>
 
@@ -35,6 +36,7 @@
 
 extern void *CreateMAMEWindow(const char *title, int x, int y, int w, int h, bool isFullscreen, uint32_t displayID, bool headless);
 extern void *GetOSWindow(void *wincontroller);
+extern void *GetOSStandardWindow(void *wincontroller);
 extern void MacWindowGetSize(void *wincontroller, int *width, int *height);
 extern void MacWindowGetSizePixels(void *wincontroller, int *width, int *height);
 extern void MacSetFullscreen(void *wincontroller, bool fullscreen, uint32_t displayID);
@@ -47,6 +49,9 @@ extern bool MacAppHasFocus();
 extern int MacPointerInWindow();
 extern void MacShowPointer(bool show);
 extern void MacCapturePointer(void *wincontroller, bool capture);
+
+// implemented in input_mac.cpp
+extern void MacLightgunTouchEvent(uint32_t touch, int x, int y, int width, int height, bool contact);
 
 //============================================================
 //  PARAMETERS
@@ -298,6 +303,7 @@ void mac_window_info::toggle_full_screen()
 	renderer_reset();
 
 	downcast<mac_osd_interface &>(machine().osd()).release_keys();
+	abort_touches();
 
 	// toggle the window mode; complete_create switches the existing window
 	// pair and recreates the renderer on the new drawable
@@ -433,6 +439,7 @@ void mac_window_info::complete_destroy()
 	// Release pointer grab and hide if needed
 	show_pointer();
 	release_pointer();
+	abort_touches();
 
 	if (platform_window() != nullptr)
 	{
@@ -571,6 +578,17 @@ void mac_window_info::update()
 
 int mac_window_info::complete_create()
 {
+	// A synthetic monitor has no display handle.  Keep the render target for
+	// UI/Lua use, but only create the usual hidden Cocoa window on a real display.
+	if (m_headless && !monitor()->oshandle())
+	{
+		if (!has_renderer())
+		{
+			renderer_create();
+		}
+		return renderer().create();
+	}
+
 	osd_dim temp(0,0);
 
 	// clear out original mode. Needed on OSX
@@ -954,6 +972,15 @@ osd_dim mac_window_info::get_min_bounds(int constrain)
 
 osd_dim mac_window_info::get_size()
 {
+	if (m_headless && !platform_window())
+	{
+		int width, height;
+		target()->compute_minimum_size(width, height);
+		return osd_dim(
+				(m_win_config.width > 0) ? m_win_config.width : std::max(width, 1),
+				(m_win_config.height > 0) ? m_win_config.height : std::max(height, 1));
+	}
+
 	int w=0; int h=0;
 	if (platform_window() != nullptr)
 	{
@@ -964,6 +991,11 @@ osd_dim mac_window_info::get_size()
 
 osd_dim mac_window_info::get_size_pixels()
 {
+	if (m_headless && !platform_window())
+	{
+		return get_size();
+	}
+
 	int w=0; int h=0;
 	if (platform_window() != nullptr)
 	{
@@ -1021,6 +1053,222 @@ osd_dim mac_window_info::get_max_bounds(int constrain)
 }
 
 //============================================================
+//  touch input
+//============================================================
+
+// TAP_DISTANCE is in window points, but touches arrive in backing pixels
+int mac_window_info::tap_distance()
+{
+	const int points = get_size().width();
+	if (points <= 0)
+	{
+		return TAP_DISTANCE;
+	}
+
+	const int scale = (get_size_pixels().width() + (points / 2)) / points;
+	return TAP_DISTANCE * scale * scale;
+}
+
+// touches drive the lightgun too, like WM_POINTER on Windows
+void mac_window_info::touch_lightgun(uint32_t touch, int x, int y, bool contact)
+{
+	const osd_dim size = get_size_pixels();
+	MacLightgunTouchEvent(touch, x, y, size.width(), size.height(), contact);
+}
+
+std::vector<mac_window_info::mac_pointer_info>::iterator mac_window_info::find_touch(uint32_t touch)
+{
+	const auto found = std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), touch, &mac_pointer_info::compare);
+	if ((m_active_pointers.end() != found) && (found->touch == touch))
+	{
+		return found;
+	}
+
+	return m_active_pointers.end();
+}
+
+void mac_window_info::remove_touch(std::vector<mac_pointer_info>::iterator info)
+{
+	m_pointer_mask &= ~(uint64_t(1) << info->index);
+	if (info->index < m_next_pointer)
+	{
+		m_next_pointer = info->index;
+	}
+	m_active_pointers.erase(info);
+}
+
+void mac_window_info::touch_down(uint32_t touch, int x, int y)
+{
+	auto info = std::lower_bound(m_active_pointers.begin(), m_active_pointers.end(), touch, &mac_pointer_info::compare);
+	if ((m_active_pointers.end() != info) && (info->touch == touch))
+	{
+		return;
+	}
+
+	// render targets track at most 64 pointers
+	if (m_next_pointer >= 64)
+	{
+		osd_printf_warning("mac_window_info: exceeded maximum number of active pointers\n");
+		return;
+	}
+
+	info = m_active_pointers.emplace(info, touch, m_next_pointer, 0);
+	m_pointer_mask |= uint64_t(1) << m_next_pointer;
+	while ((m_next_pointer < 64) && BIT(m_pointer_mask, m_next_pointer))
+	{
+		m_next_pointer++;
+	}
+
+	info->primary_down(x, y, std::chrono::milliseconds(250), tap_distance(), true, m_ptrdev_info);
+	info->x = x;
+	info->y = y;
+	info->buttons = 1;
+	target()->push_pointer_update(osd::ui_event_handler::pointer::TOUCH, info->index, info->device, x, y, 1, 1, 0, info->clickcnt);
+	touch_lightgun(touch, x, y, true);
+}
+
+void mac_window_info::touch_moved(uint32_t touch, int x, int y)
+{
+	const auto info = find_touch(touch);
+	if ((m_active_pointers.end() == info) || ((x == info->x) && (y == info->y)))
+	{
+		return;
+	}
+
+	info->check_primary_hold_drag(x, y, std::chrono::milliseconds(250), tap_distance());
+	info->x = x;
+	info->y = y;
+	target()->push_pointer_update(osd::ui_event_handler::pointer::TOUCH, info->index, info->device, x, y, 1, 0, 0, info->clickcnt);
+	touch_lightgun(touch, x, y, true);
+}
+
+void mac_window_info::touch_up(uint32_t touch, int x, int y)
+{
+	const auto info = find_touch(touch);
+	if (m_active_pointers.end() == info)
+	{
+		return;
+	}
+
+	info->check_primary_hold_drag(x, y, std::chrono::milliseconds(250), tap_distance());
+
+	// remember quick taps so the next touch nearby can count as a multi-tap
+	if (0 < info->clickcnt)
+	{
+		const auto now = std::chrono::steady_clock::now();
+		const auto time = std::chrono::milliseconds(250);
+		if ((time + info->pressed) >= now)
+		{
+			if (m_ptrdev_info.size() <= info->device)
+			{
+				m_ptrdev_info.resize(info->device + 1);
+			}
+
+			pointer_dev_info &devinfo = m_ptrdev_info[info->device];
+			const uint32_t i = devinfo.clear_expired_touches(now, time);
+			if (std::size(devinfo.touches) > i)
+			{
+				devinfo.touches[i].when = info->pressed;
+				devinfo.touches[i].x = info->pressedx;
+				devinfo.touches[i].y = info->pressedy;
+				devinfo.touches[i].cnt = info->clickcnt;
+			}
+		}
+	}
+
+	target()->push_pointer_update(osd::ui_event_handler::pointer::TOUCH, info->index, info->device, x, y, 0, 0, 1, info->clickcnt);
+	target()->push_pointer_leave(osd::ui_event_handler::pointer::TOUCH, info->index, info->device, x, y, 0, info->clickcnt);
+	touch_lightgun(touch, x, y, false);
+	remove_touch(info);
+}
+
+void mac_window_info::touch_cancelled(uint32_t touch)
+{
+	const auto info = find_touch(touch);
+	if (m_active_pointers.end() == info)
+	{
+		return;
+	}
+
+	// the system took the touch, so fail any tap in progress
+	if (0 < info->clickcnt)
+	{
+		info->clickcnt = -info->clickcnt;
+	}
+	target()->push_pointer_abort(osd::ui_event_handler::pointer::TOUCH, info->index, info->device, info->x, info->y, info->buttons, info->clickcnt);
+	touch_lightgun(touch, info->x, info->y, false);
+	remove_touch(info);
+}
+
+void mac_window_info::abort_touches()
+{
+	while (!m_active_pointers.empty())
+	{
+		touch_cancelled(m_active_pointers.back().touch);
+	}
+}
+
+
+//============================================================
+//  touch events from the gesture recognizer
+//============================================================
+
+// match either the current (possibly fullscreen) or the standard window
+mac_window_info *mac_window_info::from_nswindow(void *nswindow)
+{
+	for (const auto &w : osd_common_t::window_list())
+	{
+		auto &win = static_cast<mac_window_info &>(*w);
+		if ((win.platform_window() != nullptr) && (win.target() != nullptr))
+		{
+			if ((GetOSWindow(win.platform_window()) == nswindow) || (GetOSStandardWindow(win.platform_window()) == nswindow))
+			{
+				return &win;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+extern "C" void MacTouchDown(void *nswindow, uint32_t touch, int x, int y)
+{
+	mac_window_info *const window = mac_window_info::from_nswindow(nswindow);
+	if (window != nullptr)
+	{
+		window->touch_down(touch, x, y);
+	}
+}
+
+extern "C" void MacTouchMoved(void *nswindow, uint32_t touch, int x, int y)
+{
+	mac_window_info *const window = mac_window_info::from_nswindow(nswindow);
+	if (window != nullptr)
+	{
+		window->touch_moved(touch, x, y);
+	}
+}
+
+extern "C" void MacTouchUp(void *nswindow, uint32_t touch, int x, int y)
+{
+	mac_window_info *const window = mac_window_info::from_nswindow(nswindow);
+	if (window != nullptr)
+	{
+		window->touch_up(touch, x, y);
+	}
+}
+
+extern "C" void MacTouchCancelled(void *nswindow, uint32_t touch)
+{
+	mac_window_info *const window = mac_window_info::from_nswindow(nswindow);
+	if (window != nullptr)
+	{
+		window->touch_cancelled(touch);
+	}
+}
+
+
+//============================================================
 //  construction and destruction
 //============================================================
 
@@ -1041,6 +1289,8 @@ mac_window_info::mac_window_info(
 	, m_rendered_event(0, 1)
 	, m_mouse_captured(false)
 	, m_mouse_hidden(false)
+	, m_pointer_mask(1)
+	, m_next_pointer(1)
 {
 	//FIXME: these should be per_window in config-> or even better a bit set
 	m_fullscreen = !video_config.windowed;

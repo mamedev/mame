@@ -131,8 +131,8 @@ u8 matrox_vga_device::crtcext0_address_gen_r()
 void matrox_vga_device::crtcext0_address_gen_w(offs_t offset, u8 data)
 {
 	m_interlace_mode = bool(BIT(data, 7));
-	vga.crtc.offset     = (vga.crtc.offset & 0xff)       | ((data & 0x30) << 4);
-	vga.crtc.start_addr = (vga.crtc.start_addr & 0xffff) | ((data & 0xf) << 16);
+	vga.crtc.offset           = (vga.crtc.offset & 0xff)       | ((data & 0x30) << 4);
+	vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xffff) | ((data & 0xf) << 16);
 	if (m_interlace_mode)
 		popmessage("MGA2064W: interlace mode enable");
 //  recompute_params();
@@ -549,6 +549,7 @@ void matrox_vga_device::flush_true_color_mode()
 		case 0x5e:
 			if (m_multiplex_ctrl == 0x5b || m_multiplex_ctrl == 0x5c)
 			{
+				// TODO: mga2064w BIOS don't have support for this, verify
 				logerror("\tRGB 8-8-8 mode\n");
 				svga.rgb24_en = 1;
 			}
@@ -676,11 +677,8 @@ uint16_t matrox_vga_device::offset()
 
 uint32_t matrox_vga_device::latch_start_addr()
 {
-	// TODO: fails SDD scrolling tests
-	// Looks like it can latch per byte in SVGA modes, which contradicts what's in pc_vga
-	// drawing functions.
-	//if (m_mgamode)
-	//  return (vga.crtc.start_addr << 4);
+	if (m_mgamode)
+		return (vga.crtc.start_addr_latch << 3);
 
 	return vga.crtc.start_addr_latch;
 }

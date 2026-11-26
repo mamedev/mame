@@ -3006,6 +3006,7 @@ s32 voodoo_1_device::triangle()
 	poly.color0 = m_reg.color0().argb();
 	poly.color1 = m_reg.color1().argb();
 	poly.chromakey = m_reg.chroma_key().argb();
+	poly.chromarange = m_reg.chroma_range().raw();
 	poly.fogcolor = m_reg.fog_color().argb();
 	poly.zacolor = m_reg.za_color();
 	poly.stipple = m_reg.stipple();

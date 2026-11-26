@@ -700,6 +700,8 @@ protected:
 	};
 	std::unordered_map<uint32_t, code_page_snapshot> m_code_snapshots;    // keyed by physical page number
 	bool has_icache_flash_invalidate() const;
+	bool has_thermal_assist() const;
+	uint32_t get_thrm(uint32_t spr) const;
 	const uint8_t *code_page_memory(offs_t physbase) const;
 	bool code_snapshot_matches(uint32_t physpage, const code_page_snapshot &snap) const;
 	void snapshot_code_page(uint32_t page, offs_t physbase);

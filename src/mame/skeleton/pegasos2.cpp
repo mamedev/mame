@@ -53,6 +53,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_syscon(*this, "syscon"),
+		m_isa(*this, "pci1:0c.0"),
 		m_smbus_data(*this, "smbus_data"),
 		m_dimm(*this, "dimm%u", 0U)
 	{
@@ -67,6 +68,7 @@ protected:
 private:
 	required_device<ppc_device> m_maincpu;
 	required_device<mv64361_device> m_syscon;
+	required_device<vt8231_isa_device> m_isa;
 	required_device<input_merger_all_high_device> m_smbus_data;
 	required_device_array<ddr_sdram_slot_device, 2> m_dimm;
 
@@ -139,6 +141,7 @@ void pegasos2_state::pegasos2(machine_config &config)
 	m_syscon->set_cs_tag(3, "^dimm0:rank1");
 	m_syscon->cpuint0_cb().set("cpuint", FUNC(input_merger_any_high_device::in_w<0>));
 	m_syscon->cpuint1_cb().set("cpuint", FUNC(input_merger_any_high_device::in_w<1>));
+	m_syscon->pci_iack_cb<1>().set(m_isa, FUNC(vt8231_isa_device::interrupt_acknowledge_r));
 
 	PCI_ROOT(config, "pci0", 66'666'666);
 	MV64361_PCI_HOST(config, "pci0:00.0");
@@ -154,11 +157,11 @@ void pegasos2_state::pegasos2(machine_config &config)
 	PCI_SLOT(config, "pci1:3", pci_cards, 6, 2, 3, 0, 1, nullptr);
 	PCI_SLOT(config, "pci1:4", pci_cards, 5, 3, 0, 1, 2, nullptr);
 
-	vt8231_isa_device &isa(VT8231_ISA(config, "pci1:0c.0"));
-	isa.intr_cb().set(m_syscon, FUNC(mv64361_device::mpp31_w));
-	isa.com1_txd_cb().set("com1", FUNC(rs232_port_device::write_txd));
-	isa.com1_dtr_cb().set("com1", FUNC(rs232_port_device::write_dtr));
-	isa.com1_rts_cb().set("com1", FUNC(rs232_port_device::write_rts));
+	VT8231_ISA(config, m_isa);
+	m_isa->intr_cb().set(m_syscon, FUNC(mv64361_device::mpp31_w));
+	m_isa->com1_txd_cb().set("com1", FUNC(rs232_port_device::write_txd));
+	m_isa->com1_dtr_cb().set("com1", FUNC(rs232_port_device::write_dtr));
+	m_isa->com1_rts_cb().set("com1", FUNC(rs232_port_device::write_rts));
 
 	vt8231_ide_device &ide(VT8231_IDE(config, "pci1:0c.1", 0, "pci1:00.0", mv64361_pci_host_device::AS_PCI_BUSMASTER_MEM));
 	ide.subdevice<bus_master_ide_controller_device>("ide0")->default_data(0xff7f); // DD7 is pulled down

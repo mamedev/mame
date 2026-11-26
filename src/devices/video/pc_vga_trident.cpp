@@ -41,8 +41,8 @@
 #define LOGTODO(...)      LOGMASKED(LOG_TODO,   __VA_ARGS__)
 #define LOGCRTC(...)      LOGMASKED(LOG_CRTC,   __VA_ARGS__)
 
-DEFINE_DEVICE_TYPE(TGUI9680_VGA, tgui9680_device, "tgui9680_vga", "Trident TGUI9860 VGA i/f")
-DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device, "tvga9000_vga", "Trident TVGA9000 VGA i/f")
+DEFINE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_vga_device, "tvga9000_vga", "Trident TVGA9000 VGA i/f")
+DEFINE_DEVICE_TYPE(TGUI9680_VGA, tgui9680_vga_device, "tgui9680_vga", "Trident TGUI9680 VGA i/f")
 
 trident_vga_device::trident_vga_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, type, tag, owner, clock)
@@ -53,13 +53,13 @@ trident_vga_device::trident_vga_device(const machine_config &mconfig, device_typ
 	m_seq_space_config = address_space_config("sequencer_regs", ENDIANNESS_LITTLE, 8, 8, 0, address_map_constructor(FUNC(trident_vga_device::sequencer_map), this));
 }
 
-tgui9680_device::tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tgui9680_vga_device::tgui9680_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: trident_vga_device(mconfig, TGUI9680_VGA, tag, owner, clock)
 {
 	m_version = 0xd3;   // 0xd3 identifies at TGUI9660XGi (set to 0xe3 to identify at TGUI9440AGi)
 }
 
-tvga9000_device::tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tvga9000_vga_device::tvga9000_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: trident_vga_device(mconfig, TVGA9000_VGA, tag, owner, clock)
 {
 	m_version = 0x43;
@@ -211,7 +211,7 @@ void trident_vga_device::crtc_map(address_map &map)
 		}),
 		NAME([this] (offs_t offset, u8 data) {
 			tri.cr1e = data;
-			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfffeffff) | ((data & 0x20)<<11);
+			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xfffeffff) | (BIT(data, 5) << 16);
 			recompute_params();
 		})
 	);
@@ -248,10 +248,13 @@ void trident_vga_device::crtc_map(address_map &map)
 	);
 	map(0x27, 0x27).lrw8(
 		NAME([this] (offs_t offset) {
-			return (vga.crtc.start_addr & 0x60000) >> 17;
+			return (vga.crtc.start_addr_latch & 0x60000) >> 17;
 		}),
 		NAME([this] (offs_t offset, u8 data) {
-			vga.crtc.start_addr = (vga.crtc.start_addr & 0xfff9ffff) | ((data & 0x03)<<17);
+			// TODO: this logic doesn't seem correct for later variants
+			vga.crtc.start_addr_latch &= ~0x60000;
+			vga.crtc.start_addr_latch |= (BIT(data, 1) << 18);
+			vga.crtc.start_addr_latch |= (BIT(data, 0) << 17);
 		})
 	);
 	map(0x29, 0x29).lrw8(
@@ -1598,7 +1601,7 @@ void trident_vga_device::accel_data_write(uint32_t data)
 
 // tvga9000 CRTC override
 // not extensively tested, just enough for pntnpuzl to not throw a 168 Hz refresh rate.
-void tvga9000_device::recompute_params()
+void tvga9000_vga_device::recompute_params()
 {
 	int divisor = 1;
 	int xtal;

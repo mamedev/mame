@@ -211,7 +211,6 @@ void pc_isa16_cards(device_slot_interface &device)
 	device.option_add("gfxultra", ISA16_VGA_GFXULTRA);
 	device.option_add("gfxultrap", ISA16_SVGA_GFXULTRAPRO);
 	device.option_add("tvga9000", ISA16_SVGA_TVGA9000);
-//  device.option_add("tgui9680",ISA16_SVGA_TGUI9680);
 	device.option_add("pvga1a", ISA16_PVGA1A);
 	device.option_add("pvga1a_jk", ISA16_PVGA1A_JK);
 	device.option_add("svga_et4k", ISA16_SVGA_ET4K);

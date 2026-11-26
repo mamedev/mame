@@ -1046,24 +1046,35 @@ ROM_START( forcebrk )
 	ROM_LOAD( "brkthru.5",    0x8000, 0x8000, CRC(c309435f) SHA1(82914004c2b169a7c31aa49af83a699ebbc7b33f) )
 ROM_END
 
-ROM_START( darwin )
+/*
+For Evolution, there is known to exist a version with a (C) DATA EAST CORPORATION 1986
+This is likely a Euro version and it has two subtitles, the title screen shows:
+
+  EVOLUTION
+ DARWIN 4088
+  ORIGINAL
+    VERSION
+
+Yes, it's "4088" and not 4078.  Pictures from a running PCB have been shown, but it's currently undumped
+*/
+ROM_START( evolution ) // US release - limited release
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "darw_04.rom",  0x04000, 0x4000, CRC(0eabf21c) SHA1(ccad6b30fe9361e8a21b8aaf8116aa85f9e6bb19) )
-	ROM_LOAD( "darw_05.rom",  0x08000, 0x8000, CRC(e771f864) SHA1(8ba9f97c6abf035ceaf9f5505495708506f1b0c5) )
-	ROM_LOAD( "darw_07.rom",  0x10000, 0x8000, CRC(97ac052c) SHA1(8baa117472d46b99e5946f095b869de9b5c48f9a) )
-	ROM_LOAD( "darw_06.rom",  0x18000, 0x8000, CRC(2a9fb208) SHA1(f04a5502600e49e2494a87ec65a44a2843441d37) )
+	ROM_LOAD( "dg01-a.e2",            0x04000, 0x4000, CRC(9aa61c81) SHA1(67c34d72d4185c5af98834cc4c0f44c81ad9a9ac) ) // handwritten designation on genuine DATA EAST label
+	ROM_LOAD( "dg02-a.e3",            0x08000, 0x8000, CRC(9ba37fcd) SHA1(57317a98e6e9584e65f6e5bbd05fd31b9b76ca85) ) // handwritten designation on genuine DATA EAST label
+	ROM_LOAD( "darwin4078_df04-.e5",  0x10000, 0x8000, CRC(97ac052c) SHA1(8baa117472d46b99e5946f095b869de9b5c48f9a) )
+	ROM_LOAD( "darwin4078_df03-.e4",  0x18000, 0x8000, CRC(2a9fb208) SHA1(f04a5502600e49e2494a87ec65a44a2843441d37) )
 
 	ROM_REGION( 0x02000, "chars", 0 )
-	ROM_LOAD( "darw_09.rom",  0x00000, 0x2000, CRC(067b4cf5) SHA1(fc752bb72e4850b71565afd1df0cbb4f732f131c) )
+	ROM_LOAD( "darwin4078_df11.c7",  0x00000, 0x2000, CRC(067b4cf5) SHA1(fc752bb72e4850b71565afd1df0cbb4f732f131c) )
 
 	ROM_REGION( 0x20000, "tiles", 0 )
 	// background
 	// we do a lot of scatter loading here, to place the data in a format which can be decoded by MAME's standard functions
-	ROM_LOAD( "darw_03.rom",  0x00000, 0x4000, CRC(57d0350d) SHA1(6f904047485e669afb5f4b590818743111f010c6) )   // bitplanes 1,2 for bank 1,2
+	ROM_LOAD( "darwin4078_df07-.b9",  0x00000, 0x4000, CRC(57d0350d) SHA1(6f904047485e669afb5f4b590818743111f010c6) )   // bitplanes 1,2 for bank 1,2
 	ROM_CONTINUE(             0x08000, 0x4000 )             // bitplanes 1,2 for bank 3,4
-	ROM_LOAD( "darw_02.rom",  0x10000, 0x4000, CRC(559a71ab) SHA1(a28de25e89e0d68332f4095b988827a9cb72c675) )   // bitplanes 1,2 for bank 5,6
+	ROM_LOAD( "darwin4078_df06-.b8",  0x10000, 0x4000, CRC(559a71ab) SHA1(a28de25e89e0d68332f4095b988827a9cb72c675) )   // bitplanes 1,2 for bank 5,6
 	ROM_CONTINUE(             0x18000, 0x4000 )             // bitplanes 1,2 for bank 7,8
-	ROM_LOAD( "darw_01.rom",  0x04000, 0x1000, CRC(15a16973) SHA1(5eb978a32be88176936e5d37b6ec18820d9720d8) )   // bitplane 3 for bank 1,2
+	ROM_LOAD( "darwin4078_df05-.b6",  0x04000, 0x1000, CRC(15a16973) SHA1(5eb978a32be88176936e5d37b6ec18820d9720d8) )   // bitplane 3 for bank 1,2
 	ROM_CONTINUE(             0x06000, 0x1000 )
 	ROM_CONTINUE(             0x0c000, 0x1000 )             // bitplane 3 for bank 3,4
 	ROM_CONTINUE(             0x0e000, 0x1000 )
@@ -1073,17 +1084,62 @@ ROM_START( darwin )
 	ROM_CONTINUE(             0x1e000, 0x1000 )
 
 	ROM_REGION( 0x18000, "sprites", 0 )
-	ROM_LOAD( "darw_10.rom",  0x00000, 0x8000, CRC(487a014c) SHA1(c9543df8115088b02019e76a6473ecc5f645a836) )
-	ROM_LOAD( "darw_11.rom",  0x08000, 0x8000, CRC(548ce2d1) SHA1(3b1757c70346ab4ee19ec85e7ae5137f8ccf446f) )
-	ROM_LOAD( "darw_12.rom",  0x10000, 0x8000, CRC(faba5fef) SHA1(848da4d4888f0218b737f1dc9b62944f68349a43) )
+	ROM_LOAD( "darwin4078_df08-.h2",  0x00000, 0x8000, CRC(487a014c) SHA1(c9543df8115088b02019e76a6473ecc5f645a836) )
+	ROM_LOAD( "darwin4078_df09-.h3",  0x08000, 0x8000, CRC(548ce2d1) SHA1(3b1757c70346ab4ee19ec85e7ae5137f8ccf446f) )
+	ROM_LOAD( "darwin4078_df10-.h5",  0x10000, 0x8000, CRC(faba5fef) SHA1(848da4d4888f0218b737f1dc9b62944f68349a43) )
 
 	// A PCB has been found with the first PROM substituted with a TBP28S42, see brkthrut ROM loading for how they did it.
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "df.12",   0x0000, 0x0100, CRC(89b952ef) SHA1(77dc4020a2e25f81fae1182d58993cf09d13af00) ) // red and green component
-	ROM_LOAD( "df.13",   0x0100, 0x0100, CRC(d595e91d) SHA1(5e9793f6602455c79afdc855cd13183a7f48ab1e) ) // blue component
+	ROM_LOAD( "df-12.j1",   0x0000, 0x0100, CRC(89b952ef) SHA1(77dc4020a2e25f81fae1182d58993cf09d13af00) ) // red and green component
+	ROM_LOAD( "df-13.j3",   0x0100, 0x0100, CRC(d595e91d) SHA1(5e9793f6602455c79afdc855cd13183a7f48ab1e) ) // blue component
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "darw_08.rom",  0x8000, 0x8000, CRC(6b580d58) SHA1(a70aebc6b4a291b4adddbb41d092b2682fc2d421) )
+	ROM_LOAD( "darwin4078_df00-.h9",  0x8000, 0x8000, CRC(6b580d58) SHA1(a70aebc6b4a291b4adddbb41d092b2682fc2d421) )
+
+	ROM_REGION( 0x600, "plds", ROMREGION_ERASEFF )
+	ROM_LOAD( "1-pal16r4pc.bin",  0x000, 0x104, CRC(c859298c) SHA1(7db617fec6eecaf3f6043d7446bc1786bbc2b08c) )
+	ROM_LOAD( "2-pal16r4pc.bin",  0x200, 0x104, CRC(226629c3) SHA1(fd5704dfbb91a46665050b27b15bd22527a46a6e) )
+	ROM_LOAD( "3-pal16r4pc.bin",  0x400, 0x104, CRC(b3e980a0) SHA1(b1dbf01621d1053e641570fcac6618562d0721b4) )
+ROM_END
+
+ROM_START( darwin ) // Japan release
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "darwin4078_df01-.e2",  0x04000, 0x4000, CRC(0eabf21c) SHA1(ccad6b30fe9361e8a21b8aaf8116aa85f9e6bb19) ) // labeled as  DARWIN4078   DF01-
+	ROM_LOAD( "darwin4078_df02-.e3",  0x08000, 0x8000, CRC(e771f864) SHA1(8ba9f97c6abf035ceaf9f5505495708506f1b0c5) )
+	ROM_LOAD( "darwin4078_df04-.e5",  0x10000, 0x8000, CRC(97ac052c) SHA1(8baa117472d46b99e5946f095b869de9b5c48f9a) )
+	ROM_LOAD( "darwin4078_df03-.e4",  0x18000, 0x8000, CRC(2a9fb208) SHA1(f04a5502600e49e2494a87ec65a44a2843441d37) )
+
+	ROM_REGION( 0x02000, "chars", 0 )
+	ROM_LOAD( "darwin4078_df11.c7",  0x00000, 0x2000, CRC(067b4cf5) SHA1(fc752bb72e4850b71565afd1df0cbb4f732f131c) )
+
+	ROM_REGION( 0x20000, "tiles", 0 )
+	// background
+	// we do a lot of scatter loading here, to place the data in a format which can be decoded by MAME's standard functions
+	ROM_LOAD( "darwin4078_df07-.b9",  0x00000, 0x4000, CRC(57d0350d) SHA1(6f904047485e669afb5f4b590818743111f010c6) )   // bitplanes 1,2 for bank 1,2
+	ROM_CONTINUE(             0x08000, 0x4000 )             // bitplanes 1,2 for bank 3,4
+	ROM_LOAD( "darwin4078_df06-.b8",  0x10000, 0x4000, CRC(559a71ab) SHA1(a28de25e89e0d68332f4095b988827a9cb72c675) )   // bitplanes 1,2 for bank 5,6
+	ROM_CONTINUE(             0x18000, 0x4000 )             // bitplanes 1,2 for bank 7,8
+	ROM_LOAD( "darwin4078_df05-.b6",  0x04000, 0x1000, CRC(15a16973) SHA1(5eb978a32be88176936e5d37b6ec18820d9720d8) )   // bitplane 3 for bank 1,2
+	ROM_CONTINUE(             0x06000, 0x1000 )
+	ROM_CONTINUE(             0x0c000, 0x1000 )             // bitplane 3 for bank 3,4
+	ROM_CONTINUE(             0x0e000, 0x1000 )
+	ROM_CONTINUE(             0x14000, 0x1000 )             // bitplane 3 for bank 5,6
+	ROM_CONTINUE(             0x16000, 0x1000 )
+	ROM_CONTINUE(             0x1c000, 0x1000 )             // bitplane 3 for bank 7,8
+	ROM_CONTINUE(             0x1e000, 0x1000 )
+
+	ROM_REGION( 0x18000, "sprites", 0 )
+	ROM_LOAD( "darwin4078_df08-.h2",  0x00000, 0x8000, CRC(487a014c) SHA1(c9543df8115088b02019e76a6473ecc5f645a836) )
+	ROM_LOAD( "darwin4078_df09-.h3",  0x08000, 0x8000, CRC(548ce2d1) SHA1(3b1757c70346ab4ee19ec85e7ae5137f8ccf446f) )
+	ROM_LOAD( "darwin4078_df10-.h5",  0x10000, 0x8000, CRC(faba5fef) SHA1(848da4d4888f0218b737f1dc9b62944f68349a43) )
+
+	// A PCB has been found with the first PROM substituted with a TBP28S42, see brkthrut ROM loading for how they did it.
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "df-12.j1",   0x0000, 0x0100, CRC(89b952ef) SHA1(77dc4020a2e25f81fae1182d58993cf09d13af00) ) // red and green component
+	ROM_LOAD( "df-13.j3",   0x0100, 0x0100, CRC(d595e91d) SHA1(5e9793f6602455c79afdc855cd13183a7f48ab1e) ) // blue component
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "darwin4078_df00-.h9",  0x8000, 0x8000, CRC(6b580d58) SHA1(a70aebc6b4a291b4adddbb41d092b2682fc2d421) )
 
 	ROM_REGION( 0x600, "plds", ROMREGION_ERASEFF )
 	ROM_LOAD( "1-pal16r4pc.bin",  0x000, 0x104, CRC(c859298c) SHA1(7db617fec6eecaf3f6043d7446bc1786bbc2b08c) )
@@ -1100,10 +1156,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1986, brkthru,   0,       brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Break Thru (World)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthruu,  brkthru, brkthru, brkthruu, brkthru_state, empty_init, ROT0,   "Data East USA",                          "Break Thru (US)",             MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthruj,  brkthru, brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Kyoukou Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
-GAME( 1986, brkthrut,  brkthru, brkthru, brkthrut, brkthru_state, empty_init, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, forcebrk,  brkthru, brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthru,   0,         brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Break Thru (World)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthruu,  brkthru,   brkthru, brkthruu, brkthru_state, empty_init, ROT0,   "Data East USA",                          "Break Thru (US)",             MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthruj,  brkthru,   brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "Data East Corporation",                  "Kyoukou Toppa (Japan)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1986, brkthrut,  brkthru,   brkthru, brkthrut, brkthru_state, empty_init, ROT0,   "Data East Corporation (Tecfri license)", "Break Thru (Tecfri license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, forcebrk,  brkthru,   brkthru, brkthru,  brkthru_state, empty_init, ROT0,   "bootleg",                                "Force Break (bootleg)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1986, darwin,    0,       darwin,  darwin,   brkthru_state, empty_init, ROT270, "Data East Corporation",                  "Darwin 4078 (Japan)",         MACHINE_SUPPORTS_SAVE )
+GAME( 1986, evolution, 0,         darwin,  darwin,   brkthru_state, empty_init, ROT270, "Data East USA",                          "Evolution (US)",              MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darwin,    evolution, darwin,  darwin,   brkthru_state, empty_init, ROT270, "Data East Corporation",                  "Darwin 4078 (Japan)",         MACHINE_SUPPORTS_SAVE )

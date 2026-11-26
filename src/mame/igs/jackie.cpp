@@ -54,6 +54,8 @@ Note
 
 #include "emu.h"
 
+#include "igs003.h"
+
 #include "cpu/z180/z180.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
@@ -65,16 +67,6 @@ Note
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
-
-
-// configurable logging
-#define LOG_IGS003 (1U << 1)
-
-// #define VERBOSE (LOG_GENERAL | LOG_IGS003)
-
-#include "logmacro.h"
-
-#define LOGIGS003(...) LOGMASKED(LOG_IGS003, __VA_ARGS__)
 
 
 namespace {
@@ -93,14 +85,12 @@ public:
 		, m_fg_tile_ram(*this, "fg_tile_ram")
 		, m_fg_color_ram(*this, "fg_color_ram")
 		, m_exprom_bank(*this, "exprom_bank")
-		, m_buttons1(*this, "BUTTONS1")
 		, m_led(*this, "led")
 		, m_lamps(*this, "lamp%u", 1U)
 	{ }
 
 	void jackie(machine_config &config) ATTR_COLD;
 	void kungfu(machine_config &config) ATTR_COLD;
-	void spec8way(machine_config &config) ATTR_COLD;
 
 	void init_jackie() ATTR_COLD;
 	void init_jackiea() ATTR_COLD;
@@ -114,7 +104,6 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
-private:
 	void fg_tile_w(offs_t offset, uint8_t data);
 	void fg_color_w(offs_t offset, uint8_t data);
 	template<uint8_t Which> void reel_ram_w(offs_t offset, uint8_t data);
@@ -140,7 +129,6 @@ private:
 	uint8_t spec8way_prot_r(offs_t offset);
 
 	void io_map(address_map &map) ATTR_COLD;
-	void spec8way_io_map(address_map &map) ATTR_COLD;
 	void prg_map(address_map &map) ATTR_COLD;
 	void jackie_prg_map(address_map &map) ATTR_COLD;
 	void kungfu_prg_map(address_map &map) ATTR_COLD;
@@ -156,7 +144,6 @@ private:
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 	required_memory_bank m_exprom_bank;
-	required_ioport m_buttons1;
 	output_finder<> m_led;
 	output_finder<6> m_lamps;
 
@@ -168,11 +155,23 @@ private:
 	uint8_t m_hopper = 0;
 	uint8_t m_out[3]{};
 	uint16_t m_unk_reg[3][5]{};
-	uint8_t m_igs003_reg = 0;
 	uint8_t m_prot_counter = 0;
+};
 
-	void igs003_w(uint8_t data);
-	uint8_t igs003_r();
+class spec8way_state : public jackie_state
+{
+public:
+	spec8way_state(const machine_config &mconfig, device_type type, const char *tag)
+		: jackie_state(mconfig, type, tag)
+		, m_igs003(*this, "igs003")
+	{ }
+
+	void spec8way(machine_config &config) ATTR_COLD;
+
+private:
+	required_device<igs003_device> m_igs003;
+
+	void spec8way_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -281,7 +280,6 @@ void jackie_state::machine_start()
 	save_item(NAME(m_hopper));
 	save_item(NAME(m_out));
 	save_item(NAME(m_unk_reg));
-	save_item(NAME(m_igs003_reg));
 	save_item(NAME(m_prot_counter));
 }
 
@@ -395,33 +393,6 @@ void jackie_state::irqack_w(uint8_t data)
 //  m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_out[2] = data;
 	show_out();
-}
-
-void jackie_state::igs003_w(uint8_t data)
-{
-	m_igs003_reg = data;
-	LOGIGS003("%s: igs003 reg = %02x\n", machine().describe_context(), data);
-}
-
-uint8_t jackie_state::igs003_r()
-{
-	switch (m_igs003_reg)
-	{
-		case 0x00: return m_buttons1->read();
-		case 0x20: return 0x49;
-		case 0x21: return 0x47;
-		case 0x22: return 0x53;
-		case 0x24: return 0x41;
-		case 0x25: return 0x41;
-		case 0x26: return 0x7f;
-		case 0x27: return 0x41;
-		case 0x28: return 0x41;
-		case 0x2a: return 0x3e;
-		case 0x2b: return 0x41;
-		default:
-			LOGIGS003("%s: igs003 read with reg %02x\n", machine().describe_context(), m_igs003_reg);
-			return 0xff;
-	}
 }
 
 /*
@@ -541,7 +512,7 @@ void jackie_state::io_map(address_map &map)
 	map(0x8000, 0xffff).bankr(m_exprom_bank);
 }
 
-void jackie_state::spec8way_io_map(address_map &map)
+void spec8way_state::spec8way_io_map(address_map &map)
 {
 	map(0x0000, 0x003f).ram(); // Z180 internal regs
 	map(0x1000, 0x1107).ram().share(m_bg_scroll[1]);
@@ -553,17 +524,17 @@ void jackie_state::spec8way_io_map(address_map &map)
 	map(0x4003, 0x4003).portr("DSW4");
 	map(0x4004, 0x4004).portr("DSW5");
 	map(0x5080, 0x5083).rw("ppi1", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x5090, 0x5090).w(FUNC(jackie_state::igs003_w));
-	map(0x5091, 0x5091).r(FUNC(jackie_state::igs003_r)).nopw(); // TODO: writes here a lot
+	map(0x5090, 0x5090).w(m_igs003, FUNC(igs003_device::index_w));
+	map(0x5091, 0x5091).rw(m_igs003, FUNC(igs003_device::data_r), FUNC(igs003_device::data_w));
 	map(0x50a0, 0x50a0).portr("BUTTONS2");
 	map(0x50c0, 0x50c1).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x6000, 0x60ff).ram().share(m_bg_scroll[0]);
-	map(0x6800, 0x69ff).ram().w(FUNC(jackie_state::reel_ram_w<0>)).share(m_reel_ram[0]);
-	map(0x6a00, 0x6bff).ram().w(FUNC(jackie_state::reel_ram_w<1>)).share(m_reel_ram[1]);
-	map(0x6c00, 0x6dff).ram().w(FUNC(jackie_state::reel_ram_w<2>)).share(m_reel_ram[2]);
+	map(0x6800, 0x69ff).ram().w(FUNC(spec8way_state::reel_ram_w<0>)).share(m_reel_ram[0]);
+	map(0x6a00, 0x6bff).ram().w(FUNC(spec8way_state::reel_ram_w<1>)).share(m_reel_ram[1]);
+	map(0x6c00, 0x6dff).ram().w(FUNC(spec8way_state::reel_ram_w<2>)).share(m_reel_ram[2]);
 	map(0x6e00, 0x6fff).ram();
-	map(0x7000, 0x77ff).ram().w(FUNC(jackie_state::fg_tile_w)).share(m_fg_tile_ram);
-	map(0x7800, 0x7fff).ram().w(FUNC(jackie_state::fg_color_w)).share(m_fg_color_ram);
+	map(0x7000, 0x77ff).ram().w(FUNC(spec8way_state::fg_tile_w)).share(m_fg_tile_ram);
+	map(0x7800, 0x7fff).ram().w(FUNC(spec8way_state::fg_color_w)).share(m_fg_color_ram);
 	map(0x8000, 0xffff).bankr(m_exprom_bank);
 }
 
@@ -1065,18 +1036,26 @@ void jackie_state::kungfu(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &jackie_state::kungfu_prg_map);
 }
 
-void jackie_state::spec8way(machine_config &config)
+void spec8way_state::spec8way(machine_config &config)
 {
 	// basic machine hardware
 	HD64180RP(config, m_maincpu, 12_MHz_XTAL * 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &jackie_state::spec8way_prg_map);
-	m_maincpu->set_addrmap(AS_IO, &jackie_state::spec8way_io_map);
-	m_maincpu->set_vblank_int("screen", FUNC(jackie_state::nmi_line_assert));
+	m_maincpu->set_addrmap(AS_PROGRAM, &spec8way_state::spec8way_prg_map);
+	m_maincpu->set_addrmap(AS_IO, &spec8way_state::spec8way_io_map);
+	m_maincpu->set_vblank_int("screen", FUNC(spec8way_state::nmi_line_assert));
 
 	i8255_device &ppi1(I8255A(config, "ppi1")); // D8255AC
-	ppi1.out_pa_callback().set(FUNC(jackie_state::spec8way_nmi_and_coins_w));
+	ppi1.out_pa_callback().set(FUNC(spec8way_state::spec8way_nmi_and_coins_w));
 	ppi1.in_pb_callback().set_ioport("SERVICE");
 	ppi1.in_pc_callback().set_ioport("COINS");
+
+	IGS003(config, m_igs003); // IGS003 (no letter)
+	m_igs003->in_pa_callback().set_ioport("BUTTONS1");
+	// TODO: ports B and C are set as outputs and written to, purpose unknown
+	// TODO: the protection interface of this IGS003 revision is different (deduced from the game's
+	// software model at 0x2327): writes to 0x40-0x47 also step the value, each of these indices is its
+	// own word register, x is latched by selecting index 0x48, and the stepped bits 0x4e2d reset the value.
+	// Not emulated: the game counts only the first mismatch after boot and locks up after two (0x4f1a)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
@@ -1086,7 +1065,7 @@ void jackie_state::spec8way(machine_config &config)
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
 	m_screen->set_visarea(0*8, 64*8-1, 0, 32*8-1);
-	m_screen->set_screen_update(FUNC(jackie_state::screen_update));
+	m_screen->set_screen_update(FUNC(spec8way_state::screen_update));
 	m_screen->set_palette(m_palette);
 
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_jackie);
@@ -1203,7 +1182,7 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 1993, jackie,   0,      jackie,   jackie,   jackie_state, init_jackie,   ROT0, "IGS", "Happy Jackie (v119U)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1993, jackiea,  jackie, jackie,   jackie,   jackie_state, init_jackiea,  ROT0, "IGS", "Happy Jackie (v110U)",          MACHINE_SUPPORTS_SAVE )
-GAME( 1992, kungfu,   0,      kungfu,   kungfu,   jackie_state, init_kungfu,   ROT0, "IGS", "Kung Fu Fighters (IGS, v202N)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // inputs for the fighting part
-GAME( 1994, spec8way, 0,      spec8way, spec8way, jackie_state, init_spec8way, ROT0, "IGS", "Special 8 Way (v122F)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1993, jackie,   0,      jackie,   jackie,   jackie_state,   init_jackie,   ROT0, "IGS", "Happy Jackie (v119U)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1993, jackiea,  jackie, jackie,   jackie,   jackie_state,   init_jackiea,  ROT0, "IGS", "Happy Jackie (v110U)",          MACHINE_SUPPORTS_SAVE )
+GAME( 1992, kungfu,   0,      kungfu,   kungfu,   jackie_state,   init_kungfu,   ROT0, "IGS", "Kung Fu Fighters (IGS, v202N)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // inputs for the fighting part
+GAME( 1994, spec8way, 0,      spec8way, spec8way, spec8way_state, init_spec8way, ROT0, "IGS", "Special 8 Way (v122F)",         MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

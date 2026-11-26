@@ -159,4 +159,4 @@ void dsm240_device::update_speeds()
 
 } // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_DSM240, device_h89bus_cpu_board_mod_interface, dsm240_device, "h89_dsm240", "Kres DSM-240 Dual Speed Module");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_DSM240, device_h89bus_cpu_board_mod_interface, dsm240_device, "h89_dsm240", "Kres DSM-240 Dual Speed Module")

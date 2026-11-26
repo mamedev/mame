@@ -12,6 +12,7 @@
 #include "render.h"
 
 #include <algorithm>
+#include <bit>
 
 //#define VERBOSE 1
 #include "logmacro.h"
@@ -167,7 +168,7 @@ inline uint16_t abc1600_mover_device::get_crtca(uint16_t ma, uint8_t ra, uint8_t
 
 MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 {
-	if ((vbp + y) > cliprect.max_y)
+	if (((vbp + y) > cliprect.max_y) || ((vbp + y) < m_render_line))
 		return;
 
 	const pen_t *pen = m_palette->pens();
@@ -186,10 +187,21 @@ MC6845_UPDATE_ROW(abc1600_mover_device::crtc_update_row)
 
 	const uint16_t pol = PIX_POL ? 0xffff : 0;
 	int x = 0;
+	s64 now = 0;
+	s64 row_tick = 0;
+
+	if (m_move_active)
+	{
+		now = now_tick();
+		row_tick = now + (s64(vbp + y) - m_screen->vpos()) * m_screen->width() + (hbp - m_screen->hpos());
+	}
 
 	for (int column = 0; x < width; column += 2)
 	{
 		uint16_t dma = get_crtca(ma, ra, column);
+
+		if (m_move_active)
+			mover_catch_up(std::clamp<s64>(row_tick + x, 0, now), true);
 
 		// data is read out of video RAM in nibble mode by strobing CAS 4 times
 		for (int cas = 0; cas < 4 && x < width; cas++)
@@ -277,6 +289,7 @@ abc1600_mover_device::abc1600_mover_device(const machine_config &mconfig, const 
 	device_memory_interface(mconfig, *this),
 	m_space_config("vram", ENDIANNESS_BIG, 16, 18, -1, address_map_constructor(FUNC(abc1600_mover_device::mover_map), this)),
 	m_write_amm(*this),
+	m_screen(*this, SCREEN_TAG),
 	m_crtc(*this, "sy6845e"),
 	m_palette(*this, "palette"),
 	m_timer_amm(*this, "amm"),
@@ -320,6 +333,19 @@ void abc1600_mover_device::device_start()
 	save_item(NAME(m_rmc));
 	save_item(NAME(m_cmc));
 	save_item(NAME(m_amm));
+	save_item(NAME(m_ammclk_phase));
+	save_item(NAME(m_ldfy_pending));
+	save_item(NAME(m_move_active));
+	save_item(NAME(m_line_start));
+	save_item(NAME(m_amm_start));
+	save_item(NAME(m_amm_end));
+	save_item(NAME(m_busy_end));
+	save_item(NAME(m_step_tick));
+
+	update_seq_edges();
+
+	m_bitmap.allocate(HTOTAL, VTOTAL);
+	m_render_timer = timer_alloc(FUNC(abc1600_mover_device::render_frame), this);
 }
 
 
@@ -336,8 +362,29 @@ void abc1600_mover_device::device_reset()
 	m_endisp = 0;
 
 	// busy flag
+	m_timer_amm->adjust(attotime::never);
+	m_ldfy_pending = false;
+	m_move_active = false;
+	m_amm_start = m_amm_end = m_busy_end = 0;
 	m_amm = 0;
 	m_write_amm(!m_amm);
+
+	m_render_frame = m_screen->frame_number();
+	m_render_line = 0;
+	m_render_timer->adjust(m_screen->time_until_pos(m_screen->visible_area().bottom()));
+}
+
+
+//-------------------------------------------------
+//  device_post_load - device-specific post load
+//-------------------------------------------------
+
+void abc1600_mover_device::device_post_load()
+{
+	update_seq_edges();
+
+	m_render_frame = m_screen->frame_number();
+	m_render_line = 0;
 }
 
 
@@ -382,6 +429,9 @@ inline void abc1600_mover_device::write_videoram(offs_t offset, uint16_t data, u
 
 uint8_t abc1600_mover_device::video_ram_r(offs_t offset)
 {
+	if (m_move_active && !machine().side_effects_disabled())
+		mover_catch_up(~u64(0), false);
+
 	offs_t addr = (offset & VIDEORAM8_MASK) >> 1;
 	uint8_t data = 0;
 
@@ -404,6 +454,9 @@ uint8_t abc1600_mover_device::video_ram_r(offs_t offset)
 
 void abc1600_mover_device::video_ram_w(offs_t offset, uint8_t data)
 {
+	if (m_move_active)
+		mover_catch_up(~u64(0), false);
+
 	offs_t addr = (offset & VIDEORAM8_MASK) >> 1;
 
 	if (offset & 0x01)
@@ -477,7 +530,9 @@ uint8_t abc1600_mover_device::iord0_r()
 	data |= m_crtc->vsync_r() << 6;
 
 	// busy
-	data |= m_amm << 7;
+	u64 const now = now_tick();
+	if (now >= m_amm_start && now < m_busy_end)
+		data |= 0x80;
 
 	return data;
 }
@@ -503,6 +558,8 @@ void abc1600_mover_device::ldsx_hb_w(uint8_t data)
 	    7
 
 	*/
+
+	mover_sync();
 
 	LOG("%s LDSX HB: %02x\n", machine().describe_context(), data);
 
@@ -533,6 +590,8 @@ void abc1600_mover_device::ldsx_lb_w(uint8_t data)
 
 	*/
 
+	mover_sync();
+
 	LOG("%s LDSX LB: %02x\n", machine().describe_context(), data);
 
 	m_xsize = (m_xsize & 0x300) | data;
@@ -559,6 +618,8 @@ void abc1600_mover_device::ldsy_hb_w(uint8_t data)
 	    7
 
 	*/
+
+	mover_sync();
 
 	LOG("%s LDSY HB: %02x\n", machine().describe_context(), data);
 
@@ -587,6 +648,8 @@ void abc1600_mover_device::ldsy_lb_w(uint8_t data)
 
 	*/
 
+	mover_sync();
+
 	LOG("%s LDSY LB: %02x\n", machine().describe_context(), data);
 
 	m_ysize = (m_ysize & 0xf00) | data;
@@ -613,6 +676,8 @@ void abc1600_mover_device::ldtx_hb_w(uint8_t data)
 	    7
 
 	*/
+
+	mover_sync();
 
 	LOG("%s LDTX HB: %02x\n", machine().describe_context(), data);
 
@@ -642,6 +707,8 @@ void abc1600_mover_device::ldtx_lb_w(uint8_t data)
 
 	*/
 
+	mover_sync();
+
 	LOG("%s LDTX LB: %02x\n", machine().describe_context(), data);
 
 	m_xto = (m_xto & 0x300) | data;
@@ -669,6 +736,8 @@ void abc1600_mover_device::ldty_hb_w(uint8_t data)
 	    7
 
 	*/
+
+	mover_sync();
 
 	LOG("%s LDTY HB: %02x\n", machine().describe_context(), data);
 
@@ -698,6 +767,8 @@ void abc1600_mover_device::ldty_lb_w(uint8_t data)
 
 	*/
 
+	mover_sync();
+
 	LOG("%s LDTY LB: %02x\n", machine().describe_context(), data);
 
 	m_ty = (m_ty & 0xf00) | data;
@@ -725,6 +796,8 @@ void abc1600_mover_device::ldfx_hb_w(uint8_t data)
 	    7
 
 	*/
+
+	mover_sync();
 
 	LOG("%s LDFX HB: %02x\n", machine().describe_context(), data);
 
@@ -754,6 +827,8 @@ void abc1600_mover_device::ldfx_lb_w(uint8_t data)
 
 	*/
 
+	mover_sync();
+
 	LOG("%s LDFX LB: %02x\n", machine().describe_context(), data);
 
 	m_xfrom = (m_xfrom & 0x300) | data;
@@ -782,6 +857,8 @@ void abc1600_mover_device::ldfy_hb_w(uint8_t data)
 
 	*/
 
+	mover_sync();
+
 	LOG("%s LDFY HB: %02x\n", machine().describe_context(), data);
 
 	m_mfa = ((data & 0x0f) << 14) | (m_mfa & 0x3fff);
@@ -809,11 +886,18 @@ void abc1600_mover_device::ldfy_lb_w(uint8_t data)
 
 	*/
 
+	mover_sync();
+
 	LOG("%s LDFY LB: %02x\n", machine().describe_context(), data);
 
 	m_mfa = (m_mfa & 0x3c03f) | (data << 6);
 
-	m_timer_amm->adjust(wclk(6));
+	u64 const now = now_tick();
+
+	if (m_move_active || (now < m_amm_end))
+		m_ldfy_pending = true;
+	else
+		start_move(now);
 }
 
 
@@ -926,7 +1010,18 @@ void abc1600_mover_device::wrmask_strobe_lb_w(uint8_t data)
 void abc1600_mover_device::enable_clocks_w(uint8_t data)
 {
 	LOG("ENABLE CLOCKS\n");
+
+	if (!m_clocks_disabled)
+		return;
+
 	m_clocks_disabled = 0;
+	update_seq_edges();
+
+	u64 const now = now_tick();
+	m_ammclk_phase = edge_parity(now);
+
+	if (m_ldfy_pending)
+		start_move(now);
 }
 
 
@@ -950,6 +1045,8 @@ void abc1600_mover_device::flag_strobe_w(uint8_t data)
 	    7       REPLACE/SET & RESET
 
 	*/
+
+	mover_sync();
 
 	m_flag = data;
 	LOG("FLAG %02x\n", m_flag);
@@ -1097,7 +1194,7 @@ inline void abc1600_mover_device::compare_mta_x()
 		m_cmc = 0;
 	}
 
-	m_wrms1 = m_cmc & m_amm;
+	m_wrms1 = m_cmc;
 }
 
 
@@ -1240,17 +1337,183 @@ inline uint16_t abc1600_mover_device::word_mixer(uint16_t rot)
 
 
 //-------------------------------------------------
-//  dtack_clk - sequencer DTACK CLK level
+//  tick_time - delay until a 64 MHz tick
 //-------------------------------------------------
 
-bool abc1600_mover_device::dtack_clk(u64 slot) const
+attotime abc1600_mover_device::tick_time(u64 tick) const
 {
-	u64 const pos = ((slot >> 4) * 32) % (HTOTAL * VTOTAL);
-	u64 const x = pos % HTOTAL;
-	bool const de = (pos / HTOTAL < VDISP) && (x < HDISP);
-	bool const ds = de && !BIT(x, 5);
+	attotime const when = attotime::from_ticks(tick, clock());
+	attotime const now = machine().time();
 
-	return !BIT(ds ? m_ds[~slot & 0x0f] : m_ms[~slot & 0x0f], 5);
+	return (when > now) ? (when - now) : attotime::zero;
+}
+
+
+//-------------------------------------------------
+//  window_ds - display sequence table selected
+//-------------------------------------------------
+
+bool abc1600_mover_device::window_ds(u64 window) const
+{
+	u64 const pos = (window * 32) % (HTOTAL * VTOTAL);
+	u64 const x = pos % HTOTAL;
+
+	return (pos / HTOTAL < VDISP) && (x < HDISP) && !BIT(x, 5);
+}
+
+
+//-------------------------------------------------
+//  seq_bit - sequencer output level
+//-------------------------------------------------
+
+bool abc1600_mover_device::seq_bit(u64 slot, int bit) const
+{
+	return !BIT(window_ds(slot >> 4) ? m_ds[~slot & 0x0f] : m_ms[~slot & 0x0f], bit);
+}
+
+
+//-------------------------------------------------
+//  update_seq_edges - MOVE CYK CLK edge tables
+//-------------------------------------------------
+
+void abc1600_mover_device::update_seq_edges()
+{
+	for (int prev_ds = 0; prev_ds < 2; prev_ds++)
+	{
+		for (int ds = 0; ds < 2; ds++)
+		{
+			uint8_t const *const prev = prev_ds ? m_ds : m_ms;
+			uint8_t const *const cur = ds ? m_ds : m_ms;
+			u16 mask = 0;
+
+			for (int slot = 0; slot < 16; slot++)
+			{
+				bool const level = !BIT(cur[~slot & 0x0f], 0);
+				bool const last = slot ? !BIT(cur[~(slot - 1) & 0x0f], 0) : !BIT(prev[0], 0);
+
+				if (level && !last)
+					mask |= 1 << slot;
+			}
+
+			m_cyk_mask[(prev_ds << 1) | ds] = mask;
+		}
+	}
+
+	m_frame_edges = 0;
+	m_line_edges[0] = m_line_edges[1] = 0;
+
+	if (!m_cyk_mask[0] && !m_cyk_mask[1] && !m_cyk_mask[2] && !m_cyk_mask[3])
+		return;
+
+	m_line_edges[1] = count_edges(0, HTOTAL);
+	m_line_edges[0] = count_edges(VDISP * HTOTAL, (VDISP + 1) * HTOTAL);
+	m_frame_edges = VDISP * m_line_edges[1] + (VTOTAL - VDISP) * m_line_edges[0];
+}
+
+
+//-------------------------------------------------
+//  next_edge - first MOVE CYK CLK edge after tick
+//-------------------------------------------------
+
+u64 abc1600_mover_device::next_edge(u64 tick) const
+{
+	u64 window = tick >> 5;
+
+	if (window)
+		window--;
+
+	bool prev_ds = window ? window_ds(window - 1) : false;
+
+	for (u64 end = window + (HTOTAL * VTOTAL / 32) + 2; window < end; window++)
+	{
+		bool const ds = window_ds(window);
+		u16 mask = m_cyk_mask[(prev_ds ? 2 : 0) | (ds ? 1 : 0)];
+
+		while (mask)
+		{
+			int const slot = std::countr_zero(mask);
+			u64 const edge = (window << 5) + (slot << 1) + 2;
+
+			if (edge > tick)
+				return edge;
+
+			mask &= mask - 1;
+		}
+
+		prev_ds = ds;
+	}
+
+	return ~u64(0);
+}
+
+
+//-------------------------------------------------
+//  count_edges - MOVE CYK CLK edges in (from, to]
+//-------------------------------------------------
+
+u64 abc1600_mover_device::count_edges(u64 from, u64 to) const
+{
+	u64 count = 0;
+
+	for (u64 edge = next_edge(from); edge <= to; edge = next_edge(edge))
+		count++;
+
+	return count;
+}
+
+
+//-------------------------------------------------
+//  advance_edges - tick of the nth edge after tick
+//-------------------------------------------------
+
+u64 abc1600_mover_device::advance_edges(u64 tick, u64 count) const
+{
+	if (!m_frame_edges)
+		return ~u64(0);
+
+	u64 const line_end = (tick / HTOTAL + 1) * HTOTAL;
+	u64 const partial = count_edges(tick, line_end);
+
+	if (partial < count)
+	{
+		count -= partial;
+		tick = line_end;
+
+		for (;;)
+		{
+			u64 const line_edges = m_line_edges[(tick / HTOTAL) % VTOTAL < VDISP];
+
+			if (line_edges >= count)
+				break;
+
+			count -= line_edges;
+			tick += HTOTAL;
+		}
+	}
+
+	while (count--)
+		tick = next_edge(tick);
+
+	return tick;
+}
+
+
+//-------------------------------------------------
+//  edge_parity - MOVE CYK CLK edges up to tick
+//-------------------------------------------------
+
+bool abc1600_mover_device::edge_parity(u64 tick) const
+{
+	u64 const frame = HTOTAL * VTOTAL;
+	u64 const pos = tick % frame;
+	u64 const line = pos / HTOTAL;
+	u64 count = (tick / frame) * m_frame_edges;
+
+	count += std::min<u64>(line, VDISP) * m_line_edges[1];
+	count += ((line > VDISP) ? (line - VDISP) : 0) * m_line_edges[0];
+	count += count_edges(tick - (pos % HTOTAL), tick);
+
+	return BIT(count, 0);
 }
 
 
@@ -1260,20 +1523,24 @@ bool abc1600_mover_device::dtack_clk(u64 slot) const
 
 u64 abc1600_mover_device::cpu_pack_tick(u64 das, bool write) const
 {
-	if (m_amm)
-		das = std::max(das, m_timer_amm->expire().as_ticks(XTAL(64'000'000).value()));
-
 	int edges = write ? 1 : 2;
+	u64 pack = das;
 
 	for (u64 slot = das >> 1; slot < (das >> 1) + 64; slot++)
 	{
 		u64 const edge = (slot << 1) + 2;
 
-		if (edge > das && dtack_clk(slot) && !dtack_clk(slot - 1) && !--edges)
-			return edge;
+		if (edge > das && seq_bit(slot, 5) && !seq_bit(slot - 1, 5) && !--edges)
+		{
+			pack = edge;
+			break;
+		}
 	}
 
-	return das;
+	if (pack >= m_amm_start && pack < m_amm_end)
+		pack = m_amm_end;
+
+	return pack;
 }
 
 
@@ -1283,34 +1550,84 @@ u64 abc1600_mover_device::cpu_pack_tick(u64 das, bool write) const
 
 TIMER_DEVICE_CALLBACK_MEMBER( abc1600_mover_device::amm )
 {
-	m_amm = !m_amm;
-	m_write_amm(!m_amm);
+	if (param)
+	{
+		m_amm = 1;
+		m_write_amm(!m_amm);
+		m_timer_amm->adjust(tick_time(m_amm_end));
+	}
+	else
+	{
+		mover_catch_up(~u64(0), false);
+		load_xy_reg();
+
+		m_amm = 0;
+		m_write_amm(!m_amm);
+
+		if (m_ldfy_pending)
+			start_move(now_tick());
+	}
 
 	LOG("%s AMM %u\n", machine().time().as_string(), m_amm);
-
-	if (m_amm) {
-		mover();
-
-		m_timer_amm->adjust(wclk(6 * m_ysize));
-	}
 }
 
 
 //-------------------------------------------------
-//  mover -
+//  start_move - LDFY LB sets the AMM request
 //-------------------------------------------------
 
-void abc1600_mover_device::mover()
+void abc1600_mover_device::start_move(u64 tick)
 {
+	if (m_clocks_disabled || !m_frame_edges)
+	{
+		m_ldfy_pending = true;
+		return;
+	}
+
+	m_ldfy_pending = false;
+
 	LOG("XFROM %u XSIZE %u YSIZE %u XTO %u YTO %u MFA %05x MTA %05x U/D*X %u U/D*Y %u\n", m_xfrom, m_xsize, m_ysize, m_xto, m_yto, m_mfa, m_mta, m_udx, m_udy);
 
-	m_rmc = 1;
 	get_shinf();
 
+	m_rmc = 1;
 	m_yto = m_mta >> 6;
+	m_line_start = true;
+	m_move_active = true;
 
-	do
+	uint8_t const x0 = (m_xto >> 4) & 0x3f;
+	uint8_t const x1 = ((m_xto + m_xsize) >> 4) & 0x3f;
+	uint16_t const y0 = m_yto;
+	uint16_t const y1 = (m_yto + m_ysize) & 0xfff;
+	u64 const words = ((m_udx ? (x1 - x0) : (x0 - x1)) & 0x3f) + 1;
+	u64 const lines = ((m_udy ? (y1 - y0) : (y0 - y1)) & 0xfff) + 1;
+	u64 const periods = lines * (words + m_hold_1w_cyk);
+
+	// AMM rises on the first AMMCLK rising edge, every word takes one AMMCLK period
+	u64 start = next_edge(tick);
+
+	if (edge_parity(start) == m_ammclk_phase)
+		start = next_edge(start);
+
+	m_amm_start = start;
+	m_step_tick = next_edge(start);
+	m_amm_end = advance_edges(start, periods * 2);
+	m_busy_end = advance_edges(m_amm_end, 2);
+
+	m_timer_amm->adjust(tick_time(m_amm_start), 1);
+}
+
+
+//-------------------------------------------------
+//  mover_step - one AMMCLK period
+//-------------------------------------------------
+
+void abc1600_mover_device::mover_step()
+{
+	if (m_line_start)
 	{
+		m_line_start = false;
+
 		compare_mta_y();
 
 		load_mfa_x();
@@ -1326,45 +1643,109 @@ void abc1600_mover_device::mover()
 			word_mixer(rot);
 
 			clock_mfa_x();
+			return;
 		}
+	}
 
-		do
-		{
-			compare_mta_x();
+	compare_mta_x();
 
-			uint16_t gmdr = read_videoram(m_mfa);
-			uint16_t rot = barrel_shift(gmdr);
-			uint16_t gmdi = word_mixer(rot);
-			uint16_t mask = get_wrmsk();
+	uint16_t gmdr = read_videoram(m_mfa);
+	uint16_t rot = barrel_shift(gmdr);
+	uint16_t gmdi = word_mixer(rot);
+	uint16_t mask = get_wrmsk();
 
-			write_videoram(m_mta, gmdi, mask);
+	write_videoram(m_mta, gmdi, mask);
 
-			clock_mfa_x();
-			clock_mta_x();
+	clock_mfa_x();
+	clock_mta_x();
 
-			m_wrms0 = 1;
-		}
-		while (m_cmc);
+	m_wrms0 = 1;
 
+	if (!m_cmc)
+	{
 		clock_mfa_y();
 		clock_mta_y();
-	}
-	while (m_rmc);
 
-	load_xy_reg();
+		if (m_rmc)
+			m_line_start = true;
+		else
+			m_move_active = false;
+	}
 }
 
-uint32_t abc1600_mover_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+
+//-------------------------------------------------
+//  mover_catch_up - run the mover up to tick
+//-------------------------------------------------
+
+void abc1600_mover_device::mover_catch_up(u64 tick, bool display)
 {
+	if (!m_move_active || (m_step_tick > tick))
+		return;
+
+	if (!display)
+		render_rows(m_screen->vpos());
+
+	while (m_move_active && (m_step_tick <= tick))
+	{
+		mover_step();
+
+		m_step_tick = next_edge(next_edge(m_step_tick));
+	}
+}
+
+//-------------------------------------------------
+//  render_rows - draw the frame up to a scanline
+//-------------------------------------------------
+
+void abc1600_mover_device::render_rows(int end)
+{
+	if (m_screen->frame_number() != m_render_frame)
+	{
+		m_render_frame = m_screen->frame_number();
+		m_render_line = 0;
+	}
+
+	rectangle const clip = m_screen->visible_area() & m_bitmap.cliprect();
+	end = std::min(end, clip.bottom() + 1);
+
+	if (end <= m_render_line)
+		return;
+
+	rectangle const rows(clip.left(), clip.right(), m_render_line, end - 1);
+	rectangle const frame(clip.left(), clip.right(), 0, end - 1);
+
 	if (m_endisp)
 	{
-		bitmap.fill(m_palette->pen(FRAME_POL), cliprect);
-		m_crtc->screen_update(screen, bitmap, cliprect);
+		m_bitmap.fill(m_palette->pen(FRAME_POL), rows);
+		m_crtc->screen_update(*m_screen, m_bitmap, frame);
 	}
 	else
 	{
-		bitmap.fill(rgb_t::black(), cliprect);
+		m_bitmap.fill(rgb_t::black(), rows);
 	}
+
+	m_render_line = end;
+}
+
+
+//-------------------------------------------------
+//  render_frame - draw the rest of the frame
+//-------------------------------------------------
+
+TIMER_CALLBACK_MEMBER(abc1600_mover_device::render_frame)
+{
+	int const bottom = m_screen->visible_area().bottom();
+
+	render_rows(bottom + 1);
+
+	m_render_timer->adjust(m_screen->time_until_pos(bottom));
+}
+
+
+uint32_t abc1600_mover_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 
 	return 0;
 }

@@ -17638,6 +17638,7 @@ brkthruj
 brkthrut
 brkthruu
 darwin
+evolution
 forcebrk
 
 @source:dataeast/btime.cpp
@@ -18817,6 +18818,7 @@ phatt
 procuss
 proteus1
 proteusxr
+proteusxrpl
 vintkeys
 
 @source:ensoniq/enmirage.cpp
@@ -21031,6 +21033,12 @@ z22
 @source:heathzenith/z29.cpp
 z29
 
+@source:heathzenith/z39.cpp
+z39
+
+@source:heathzenith/z49.cpp
+z49
+
 @source:heathzenith/z100.cpp
 z100
 
@@ -21787,6 +21795,12 @@ fl7_500_gs07
 fl7_500_gs08
 fl7_500_gs09
 fl7_500_gs10
+fl7_500_gs11
+fl7_500_gs12
+fl7_500_gs13
+fl7_500_gs14
+fl7_500_gs15
+fl7_500_gs16
 fl7_1000
 fl7_2000
 fl7_2k16
@@ -22187,6 +22201,7 @@ lhfy
 lhtb
 lhzb3in1
 lhzbgqb
+lhzbgqb104cn
 mghammer
 mjzhizun
 qhzb
@@ -30611,6 +30626,22 @@ fun4a
 csdaruma
 lnumbers
 
+@source:misc/banpresto_tomy_h8s.cpp
+anpanmct
+cmcwa
+cscaoysd
+dbzbgck
+dbzbgck10
+dchopper
+gkitarou
+gyakyu
+kghmytda
+pmsgk
+satoyama
+youkai
+yujogs
+zoids
+
 @source:misc/beaminv.cpp
 beaminv
 ctainv
@@ -36179,6 +36210,7 @@ lxccplan
 lxcmc250
 lxcmcy
 lxcmcyba
+lxcmcybao
 lxcmcybt
 lxcmcyco
 lxcmcycr
@@ -43978,22 +44010,6 @@ aws220
 @source:skeleton/ax20.cpp
 ax20
 
-@source:skeleton/banpresto_tomy_h8s.cpp
-anpanmct
-cmcwa
-cscaoysd
-dbzbgck
-dbzbgck10
-dchopper
-gkitarou
-gyakyu
-kghmytda
-pmsgk
-satoyama
-youkai
-yujogs
-zoids
-
 @source:skeleton/basf7100.cpp
 basf7120
 
@@ -44261,6 +44277,9 @@ fs3216
 
 @source:skeleton/ft68m.cpp
 ft68m
+
+@source:skeleton/futsala.cpp
+futsala
 
 @source:skeleton/galpro.cpp
 galpro
@@ -45408,6 +45427,7 @@ ikari3
 ikari3j
 ikari3k
 ikari3u
+ikari3ua
 ikari3w
 pow
 powa
@@ -48599,6 +48619,7 @@ discpal
 disppal
 lexiseal
 lexizeus
+maxicybr
 pokermor
 pokmax20
 vgcaplet
@@ -48841,7 +48862,7 @@ epo_pabj
 epo_sskj
 epo_ssk2
 
-@source:tvgames/xavix_2000.cpp
+@source:tvgames/xavix_xavix2000.cpp
 ban_omt
 ban_onep
 drgqst
@@ -48861,7 +48882,7 @@ ttv_mx
 ttv_sw
 ttv_swj
 
-@source:tvgames/xavix_2002.cpp
+@source:tvgames/xavix_superxavix.cpp
 anpanmdx
 apmj2009
 ban_bkgj
@@ -48883,6 +48904,7 @@ epo_kabj
 epo_ntpj
 epo_rgfj
 epo_tfit
+hkdraw
 maxheart
 mrangbat
 ndpbj

@@ -60,8 +60,8 @@ public:
 	bool should_hide_mouse();
 	void process_events_buf();
 
-	// -video none runs behind a window that is never shown, so the menu bar
-	// and the Dock can still quit MAME without it ever taking focus
+	// -video none uses a hidden Cocoa window when a display is available, keeping
+	// menu bar and Dock Quit working.  Without a display, only render targets remain.
 	bool headless() const { return strcmp(m_options.video(), OSDOPTVAL_NONE) == 0; }
 
 	virtual mac_options &options() override { return m_options; }

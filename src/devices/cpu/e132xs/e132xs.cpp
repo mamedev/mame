@@ -1051,7 +1051,7 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			return;
 		case TPR_REGISTER:
 			m_core->global_regs[code] = val;
-			if (!(val & 0x80000000)) /* change immediately */
+			if (!BIT(val, 31)) // change immediately
 			{
 				compute_tr();
 				update_timer_prescale();
@@ -1059,11 +1059,8 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 			adjust_timer_interrupt();
 			return;
 		case TCR_REGISTER:
-			if (m_core->global_regs[code] != val)
-			{
-				m_core->global_regs[code] = val;
-				adjust_timer_interrupt();
-			}
+			m_core->global_regs[code] = val;
+			adjust_timer_interrupt();
 			return;
 		case TR_REGISTER:
 			m_core->global_regs[code] = val;
@@ -1077,9 +1074,12 @@ void hyperstone_device::set_global_register(uint8_t code, uint32_t val)
 		case ISR_REGISTER:
 			return;
 		case FCR_REGISTER:
-			if ((m_core->global_regs[code] ^ val) & 0x00800000)
-				adjust_timer_interrupt();
-			m_core->global_regs[code] = val;
+			{
+				const uint32_t changed = m_core->global_regs[code] ^ val;
+				m_core->global_regs[code] = val;
+				if (BIT(changed, 23)) // adjust timer if timer interrupt mask bit changed
+					adjust_timer_interrupt();
+			}
 			return;
 		case MCR_REGISTER:
 			m_core->global_regs[code] = val;

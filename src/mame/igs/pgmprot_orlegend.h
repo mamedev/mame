@@ -6,28 +6,31 @@
 
 #pragma once
 
+#include "igs003.h"
+
 class pgm_asic3_state : public pgm_state
 {
 public:
 	pgm_asic3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pgm_state(mconfig, type, tag)
+		, m_igs003(*this, "igs003")
 	{
 	}
 
 	void init_orlegend() ATTR_COLD;
 	void pgm_asic3(machine_config &config) ATTR_COLD;
 
-private:
-	// ASIC 3 (oriental legends protection)
-	u8         m_asic3_reg = 0;
-	u8         m_asic3_latch[3]{};
-	u8         m_asic3_x = 0;
-	u16        m_asic3_hilo = 0;
-	u16        m_asic3_hold = 0;
+protected:
+	virtual void machine_start() override ATTR_COLD;
+	virtual void machine_reset() override ATTR_COLD;
 
-	void asic3_compute_hold(int y, int z);
-	u16 pgm_asic3_r();
-	void pgm_asic3_w(offs_t offset, u16 data);
+private:
+	required_device<igs003_device> m_igs003;
+
+	u8 m_igs003_out[3]{};
+
+	u16 igs003_r();
+	void igs003_w(offs_t offset, u16 data, u16 mem_mask = ~0);
 };
 
 INPUT_PORTS_EXTERN( orlegend );

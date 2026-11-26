@@ -97,7 +97,6 @@ there is a CD-ROM drive.
 #include "emu.h"
 
 #include "bus/isa/isa_cards.h"
-#include "bus/isa/svga_trident.h"
 #include "bus/pci/pci_slot.h"
 #include "bus/rs232/hlemouse.h"
 #include "bus/rs232/null_modem.h"
@@ -116,9 +115,7 @@ there is a CD-ROM drive.
 #include "machine/vt82c586b_isa.h"
 #include "machine/vt82c586b_usb.h"
 #include "sound/dac.h"
-#include "video/pc_vga.h"
 
-#include "screen.h"
 #include "speaker.h"
 
 
@@ -261,6 +258,7 @@ static INPUT_PORTS_START( calchase_jamma )
 
 	PORT_START("IOCARD2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 ) // guess
+	// TODO: this is more likely a test button, where dump just black screens
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Reset SW")
 	PORT_DIPNAME( 0x0004, 0x0004, "2" )
 	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
@@ -424,7 +422,6 @@ void calchase_state::calchase_io(address_map &map)
 void calchase_isa16_cards(device_slot_interface &device)
 {
 	device.option_add("calchase_jamma_if", ISA16_CALCHASE_JAMMA_IF);
-	device.option_add("tgui9680", ISA16_SVGA_TGUI9680);
 	device.option_add_internal("superio", FDC37C669);
 }
 
@@ -448,13 +445,13 @@ void calchase_state::superio_config(device_t *device)
 	// CR27: 65 (FDC IRQ 6 LPT IRQ 5) IRQ_F / IRQ_E
 	// CR28: 43 (COM1 IRQ 4 COM2 IRQ 3) IRQ_D / IRQ_C
 	// CR29: 30 (IRQIN f) <disabled>
-//	fdc.irq_a().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq1_w));
-//	fdc.irq_b().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq2_w));
+//  fdc.irq_a().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq1_w));
+//  fdc.irq_b().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq2_w));
 	fdc.irq_c().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq3_w));
 	fdc.irq_d().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq4_w));
 	fdc.irq_e().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq7_w));
 	fdc.irq_f().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq6_w));
-//	fdc.irq_h().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq8n_w));
+//  fdc.irq_h().set(":pci:07.0", FUNC(vt82c586b_isa_device::pc_irq8n_w));
 
 	fdc.txd1().set(":serport0", FUNC(rs232_port_device::write_txd));
 	fdc.ndtr1().set(":serport0", FUNC(rs232_port_device::write_dtr));
@@ -500,11 +497,10 @@ void calchase_state::calchase(machine_config &config)
 
 	PCI_SLOT(config, "pci:1", pci_cards,  8, 0, 1, 2, 3, nullptr);
 	PCI_SLOT(config, "pci:2", pci_cards,  9, 1, 2, 3, 0, nullptr);
-	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, nullptr);
+	PCI_SLOT(config, "pci:3", pci_cards, 10, 2, 3, 0, 1, "tgui9680");
 
 	ISA16_SLOT(config, "board4", 0, "pci:07.0:isabus", calchase_isa16_cards, "superio", true).set_option_machine_config("superio", superio_config);
-	// TODO: temp, to be converted to PCI slot
-	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", calchase_isa16_cards, "tgui9680", true);
+	ISA16_SLOT(config, "isa1",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa2",   0, "pci:07.0:isabus", calchase_isa16_cards, "calchase_jamma_if", true);
 	ISA16_SLOT(config, "isa3",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);
 	ISA16_SLOT(config, "isa4",   0, "pci:07.0:isabus", pc_isa16_cards, nullptr, false);

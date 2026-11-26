@@ -222,4 +222,4 @@ void h89bus_sigmasoft_snd_device::device_add_mconfig(machine_config &config)
 
 }   // anonymous namespace
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_SND, device_h89bus_right_card_interface, h89bus_sigmasoft_snd_device, "h89_sigma_snd", "SigmaSoft Sound Effects Board");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_SIGMASOFT_SND, device_h89bus_right_card_interface, h89bus_sigmasoft_snd_device, "h89_sigma_snd", "SigmaSoft Sound Effects Board")

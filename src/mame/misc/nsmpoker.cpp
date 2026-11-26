@@ -86,7 +86,6 @@ public:
 	void nsmpoker(machine_config &config);
 
 protected:
-	virtual void machine_reset() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 private:
 	required_shared_ptr<uint8_t> m_videoram;
@@ -412,13 +411,6 @@ static GFXDECODE_START( gfx_nsmpoker )
 GFXDECODE_END
 
 
-void nsmpoker_state::machine_reset()
-{
-	// Disable auto wait state generation by raising the READY line on reset
-	m_maincpu->ready_line(ASSERT_LINE);
-	m_maincpu->reset_line(ASSERT_LINE);
-}
-
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -427,6 +419,8 @@ void nsmpoker_state::nsmpoker(machine_config &config)
 {
 	// CPU TMS9995, standard variant; no line connections
 	TMS9995(config, m_maincpu, MASTER_CLOCK/2);
+	// Model READY low at /RESET release for zero automatic wait states.
+	m_maincpu->set_auto_wait_on_reset(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &nsmpoker_state::nsmpoker_map);
 	m_maincpu->set_addrmap(AS_IO, &nsmpoker_state::nsmpoker_portmap);
 	m_maincpu->set_vblank_int("screen", FUNC(nsmpoker_state::nsmpoker_interrupt));

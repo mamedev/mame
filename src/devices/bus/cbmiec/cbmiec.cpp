@@ -236,6 +236,46 @@ device_cbm_iec_interface::~device_cbm_iec_interface()
 }
 
 
+//-------------------------------------------------
+//  configured_address - slot address during
+//  configuration, or -1 outside an IEC slot
+//-------------------------------------------------
+
+int device_cbm_iec_interface::configured_address() const
+{
+	cbm_iec_slot_device const *const slot = dynamic_cast<cbm_iec_slot_device const *>(device().owner());
+	return slot ? slot->get_address() : -1;
+}
+
+
+//-------------------------------------------------
+//  set_switch_default - default an address switch
+//-------------------------------------------------
+
+void device_cbm_iec_interface::set_switch_default(const char *tag, ioport_value mask, ioport_value value)
+{
+	if (device().input_ports_defaults())
+		return;
+
+	m_switch_default[0] = { tag, mask, value & mask };
+	m_switch_default[1] = { nullptr, 0, 0 };
+	device().set_input_default(m_switch_default);
+}
+
+
+//-------------------------------------------------
+//  set_address_default - default a binary
+//  address switch to the slot address
+//-------------------------------------------------
+
+void device_cbm_iec_interface::set_address_default(int base, ioport_value mask)
+{
+	int const address = configured_address();
+	if (address >= base)
+		set_switch_default("ADDRESS", mask, address - base);
+}
+
+
 
 //**************************************************************************
 //  LIVE DEVICE
@@ -304,7 +344,8 @@ void cbm_iec_device::device_start()
 
 	// a bus hosted by a cartridge has its host CPU outside the bus owner
 	for (device_execute_interface &exec : execute_interface_enumerator(machine().root_device()))
-		m_execs.push_back(&exec);
+		if (drives_bus(exec.device()))
+			m_execs.push_back(&exec);
 
 	save_item(NAME(m_lines.m_time));
 	save_item(NAME(m_lines.m_state));
@@ -517,6 +558,29 @@ TIMER_CALLBACK_MEMBER(cbm_iec_device::update_tick)
 		m_update_timer->reset();
 	else
 		m_update_timer->adjust(next - now);
+}
+
+
+//-------------------------------------------------
+//  drives_bus - whether a device can change the
+//  bus lines: a bus device, a host chip, or a
+//  chip on an expansion card that reaches the host
+//-------------------------------------------------
+
+bool cbm_iec_device::drives_bus(device_t const &device)
+{
+	bool host = true;
+
+	for (device_t const *owner = device.owner(); owner && owner->owner(); owner = owner->owner())
+	{
+		if (dynamic_cast<device_cbm_iec_interface const *>(owner))
+			return true;
+
+		if (!dynamic_cast<device_slot_interface const *>(owner) && !dynamic_cast<device_slot_interface const *>(owner->owner()))
+			host = false;
+	}
+
+	return host;
 }
 
 

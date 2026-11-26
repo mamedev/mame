@@ -88,7 +88,8 @@ void isa16_pvga1a_device::device_add_mconfig(machine_config &config)
 
 	PVGA1A(config, m_vga);
 	m_vga->set_screen("screen");
-	m_vga->set_vram_size(0x100000);
+	// 256 KB, max 1MB
+	m_vga->set_vram_size(1*1024*1024);
 }
 
 void isa16_pvga1a_device::io_isa_map(address_map &map)
@@ -179,8 +180,8 @@ void isa16_pvga1a_jk_device::device_add_mconfig(machine_config &config)
 	// TODO: is there any real difference between PVGA1A and PVGA1A-JK VGA controller wise?
 	PVGA1A(config, m_vga);
 	m_vga->set_screen("screen");
-	// 256kB to 1MB
-	m_vga->set_vram_size(0x100000);
+	// 256 KB, max 1MB
+	m_vga->set_vram_size(1*1024*1024);
 }
 
 void isa16_pvga1a_jk_device::io_isa_map(address_map &map)
@@ -244,8 +245,8 @@ void isa8_wd90c90_jk_device::device_add_mconfig(machine_config &config)
 
 	PVGA1A(config, m_vga);
 	m_vga->set_screen("screen");
-	// 256kB to 1MB
-	m_vga->set_vram_size(0x100000);
+	// 256 KB, max 1MB
+	m_vga->set_vram_size(1*1024*1024);
 }
 
 void isa8_wd90c90_jk_device::io_isa_map(address_map &map)
@@ -315,8 +316,8 @@ void isa16_wd90c00_jk_device::device_add_mconfig(machine_config &config)
 
 	WD90C00(config, m_vga, 0);
 	m_vga->set_screen("screen");
-	// 256kB, 512kB, 1MB
-	m_vga->set_vram_size(0x100000);
+	// 256KB, 512KB, 1MB
+	m_vga->set_vram_size(1*1024*1024);
 }
 
 void isa16_wd90c00_jk_device::io_isa_map(address_map &map)
@@ -387,7 +388,7 @@ void isa16_wd90c11_lr_device::device_add_mconfig(machine_config &config)
 	WD90C11A(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	// 512KB (+ option for 1MB? Verify with interlace)
-	m_vga->set_vram_size(0x100000);
+	m_vga->set_vram_size(1*1024*1024);
 	// required by megapc and teradrive for color
 	m_vga->read_cnf15_callback().set_constant(1);
 	m_vga->cnf_write_ddr_callback().set_constant(0x7f);
@@ -463,7 +464,7 @@ void isa16_wd90c30_lr_device::device_add_mconfig(machine_config &config)
 	WD90C30(config, m_vga, 0);
 	m_vga->set_screen("screen");
 	// 512KB, 1MB
-	m_vga->set_vram_size(0x100000);
+	m_vga->set_vram_size(1*1024*1024);
 }
 
 void isa16_wd90c30_lr_device::io_isa_map(address_map &map)
@@ -528,7 +529,7 @@ void isa16_wd90c31_lr_device::device_add_mconfig(machine_config &config)
 	WD90C31(config, m_vga);
 	m_vga->set_screen("screen");
 	// 512KB, 1MB
-	m_vga->set_vram_size(0x100000);
+	m_vga->set_vram_size(1*1024*1024);
 }
 
 void isa16_wd90c31_lr_device::io_isa_map(address_map &map)
@@ -599,7 +600,7 @@ void isa16_wd90c31a_lr_device::device_add_mconfig(machine_config &config)
 	WD90C31(config, m_vga); // WD90C31A
 	m_vga->set_screen("screen");
 	// 512KB, 1MB
-	m_vga->set_vram_size(0x100000);
+	m_vga->set_vram_size(1*1024*1024);
 }
 
 void isa16_wd90c31a_lr_device::io_isa_map(address_map &map)
@@ -667,7 +668,7 @@ void isa16_wd90c31a_zs_device::device_add_mconfig(machine_config &config)
 	WD90C31(config, m_vga); // WD90C31A
 	m_vga->set_screen("screen");
 	// 512KB, 1MB
-	m_vga->set_vram_size(0x100000);
+	m_vga->set_vram_size(1*1024*1024);
 }
 
 void isa16_wd90c31a_zs_device::io_isa_map(address_map &map)
@@ -736,7 +737,7 @@ void isa16_wd90c33_zz_device::device_add_mconfig(machine_config &config)
 	WD90C33(config, m_vga);
 	m_vga->set_screen("screen");
 	// 1MB, 2MB
-	m_vga->set_vram_size(0x100000);
+	m_vga->set_vram_size(2*1024*1024);
 }
 
 void isa16_wd90c33_zz_device::io_isa_map(address_map &map)

@@ -443,6 +443,7 @@ struct poly_data
 
 	rgb_t color0, color1;       // colors consumed by the rasterizer
 	rgb_t chromakey;            // chromakey
+	u32 chromarange;            // chroma range limits, modes and enable
 	rgb_t fogcolor;             // fogcolor
 	u32 zacolor;                // depth/alpha value consumed by the rasterizer
 	u32 stipple;                // stipple pattern
@@ -579,7 +580,7 @@ private:
 	bool combine_color(rgbaint_t &color, thread_stats_block &threadstats, const voodoo::poly_data &extradata, voodoo::reg_fbz_colorpath const fbzcp, voodoo::reg_fbz_mode const fbzmode, rgbaint_t texel, s32 iterz, s64 iterw, rgb_t chromakey);
 	bool alpha_mask_test(thread_stats_block &stats, u32 alpha);
 	bool alpha_test(thread_stats_block &stats, voodoo::reg_alpha_mode const alphamode, u32 alpha, u32 alpharef);
-	bool chroma_key_test(thread_stats_block &stats, rgbaint_t const &colorin, rgb_t chromakey);
+	bool chroma_key_test(thread_stats_block &stats, rgbaint_t const &colorin, rgb_t chromakey, voodoo::reg_chroma_range const chromarange);
 	void apply_fogging(rgbaint_t &color, rgb_t fogcolor, u32 depthbias, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_fog_mode const fogmode, voodoo::reg_fbz_colorpath const fbzcp, s32 x, voodoo::dither_helper const &dither, s32 wfloat, s32 iterz, s64 iterw, const rgbaint_t &iterargb);
 	void alpha_blend(rgbaint_t &color, voodoo::reg_fbz_mode const fbzmode, voodoo::reg_alpha_mode const alphamode, s32 x, voodoo::dither_helper const &dither, int dpix, u16 *depth, rgbaint_t const &prefog);
 	void write_pixel(thread_stats_block &threadstats, voodoo::reg_fbz_mode const fbzmode, voodoo::dither_helper const &dither, u16 *destbase, u16 *depthbase, s32 x, rgbaint_t const &color, s32 depthval);

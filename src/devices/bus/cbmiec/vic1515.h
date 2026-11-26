@@ -32,6 +32,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete() override ATTR_COLD;
 	virtual void device_start() override ATTR_COLD;
 
 	// optional information overrides

@@ -17,6 +17,10 @@
 
 // implemented in window.cpp
 extern "C" int MacRequestMachineExit();
+extern "C" void MacTouchDown(void *nswindow, uint32_t touch, int x, int y);
+extern "C" void MacTouchMoved(void *nswindow, uint32_t touch, int x, int y);
+extern "C" void MacTouchUp(void *nswindow, uint32_t touch, int x, int y);
+extern "C" void MacTouchCancelled(void *nswindow, uint32_t touch);
 
 // implemented in modules/input/input_mac.cpp
 extern "C" void MacKeyboardEvent(int vk, int down);
@@ -84,6 +88,17 @@ extern "C" void MacMouseWheelUI(void *nswindow, int x, int y, int delta);
 
 	[self setWindow:_fullscreenWindow];
 	[_fullscreenWindow makeKeyAndOrderFront:self];
+
+	// no Dock, menu bar or screen corner gestures while fullscreen
+	NSApplicationPresentationOptions options = NSApplicationPresentationHideDock | NSApplicationPresentationHideMenuBar;
+#if defined(MAC_OS_VERSION_27_0)
+	// only declared by the macOS 27 SDK
+	if (@available(macOS 27.0, *))
+	{
+		options |= NSApplicationPresentationDisableScreenCornerInteractions;
+	}
+#endif
+	[NSApp setPresentationOptions:options];
 }
 
 - (void) goWindow
@@ -92,6 +107,8 @@ extern "C" void MacMouseWheelUI(void *nswindow, int x, int y, int delta);
 	{
 		return;
 	}
+
+	[NSApp setPresentationOptions:NSApplicationPresentationDefault];
 
 	// migrate the content view back to the standard window
 	NSView *content = [_fullscreenWindow contentView];
@@ -182,6 +199,164 @@ bool MacGetPointerPosition(void *wincontroller, int *outx, int *outy)
 
 	return WindowPointToView(window, [window mouseLocationOutsideOfEventStream], outx, outy);
 }
+
+//============================================================
+//  direct touch input
+//  touches on a touch screen never reach the event pump;
+//  AppKit only hands them to gesture recognizers
+//============================================================
+
+static uint32_t s_next_touch = 0;
+
+@interface MAMETouchRecognizer : NSGestureRecognizer <NSGestureRecognizerDelegate>
+{
+	NSMutableDictionary *_touches;  // touch identity -> serial number
+	NSPoint _location;
+}
+@end
+
+@implementation MAMETouchRecognizer
+
+- (instancetype)init
+{
+	self = [super initWithTarget:nil action:nil];
+
+	if (self)
+	{
+		_touches = [[NSMutableDictionary alloc] init];
+		_location = NSZeroPoint;
+		[self setDelegate:self];
+		[self setAllowedTouchTypes:NSTouchTypeMaskDirect];
+		[self setDelaysPrimaryMouseButtonEvents:NO];
+		[self setDelaysSecondaryMouseButtonEvents:NO];
+		[self setDelaysOtherMouseButtonEvents:NO];
+		[self setDelaysKeyEvents:NO];
+		[self setDelaysMagnificationEvents:NO];
+		[self setDelaysRotationEvents:NO];
+	}
+
+	return self;
+}
+
+- (void)dealloc
+{
+	[_touches release];
+	[super dealloc];
+}
+
+// the base class returns NSZeroPoint and logs an error unless overridden
+- (NSPoint)locationInView:(NSView *)view
+{
+	return [view convertPoint:_location fromView:[self view]];
+}
+
+- (BOOL)gestureRecognizer:(NSGestureRecognizer *)recognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(NSGestureRecognizer *)other
+{
+	return YES;
+}
+
+// AppKit can pass the same event to more than one of the touches
+// callbacks, so go by each touch's phase and identity rather than by
+// which callback this is
+- (void)handleTouches:(NSEvent *)event cancelled:(BOOL)cancelled
+{
+	NSView *view = [self view];
+	NSWindow *window = [view window];
+
+	for (NSTouch *touch in [event touchesMatchingPhase:NSTouchPhaseAny inView:view])
+	{
+		if ([touch type] != NSTouchTypeDirect)
+		{
+			continue;
+		}
+
+		const NSPoint location = [touch locationInView:view];
+		int x, y;
+		WindowPointToView(window, [view convertPoint:location toView:nil], &x, &y);
+		_location = location;
+
+		id identity = [touch identity];
+		NSNumber *serial = [_touches objectForKey:identity];
+		const NSTouchPhase phase = [touch phase];
+
+		if (phase & NSTouchPhaseBegan)
+		{
+			if (serial == nil)
+			{
+				serial = [NSNumber numberWithUnsignedInt:++s_next_touch];
+				[_touches setObject:serial forKey:identity];
+				MacTouchDown(window, [serial unsignedIntValue], x, y);
+			}
+		}
+		else if (serial != nil)
+		{
+			if (phase & NSTouchPhaseMoved)
+			{
+				MacTouchMoved(window, [serial unsignedIntValue], x, y);
+			}
+			else if (phase & NSTouchPhaseEnded)
+			{
+				MacTouchUp(window, [serial unsignedIntValue], x, y);
+				[_touches removeObjectForKey:identity];
+			}
+			else if (phase & NSTouchPhaseCancelled)
+			{
+				MacTouchCancelled(window, [serial unsignedIntValue]);
+				[_touches removeObjectForKey:identity];
+			}
+		}
+	}
+
+	// stay recognised while any finger is down so every touch keeps coming here
+	const NSGestureRecognizerState state = [self state];
+	if ([_touches count] != 0)
+	{
+		[self setState:(state == NSGestureRecognizerStatePossible) ? NSGestureRecognizerStateBegan : NSGestureRecognizerStateChanged];
+	}
+	else if ((state == NSGestureRecognizerStateBegan) || (state == NSGestureRecognizerStateChanged))
+	{
+		[self setState:cancelled ? NSGestureRecognizerStateCancelled : NSGestureRecognizerStateEnded];
+	}
+}
+
+- (void)touchesBeganWithEvent:(NSEvent *)event
+{
+	[super touchesBeganWithEvent:event];
+	[self handleTouches:event cancelled:NO];
+}
+
+- (void)touchesMovedWithEvent:(NSEvent *)event
+{
+	[super touchesMovedWithEvent:event];
+	[self handleTouches:event cancelled:NO];
+}
+
+- (void)touchesEndedWithEvent:(NSEvent *)event
+{
+	[super touchesEndedWithEvent:event];
+	[self handleTouches:event cancelled:NO];
+}
+
+- (void)touchesCancelledWithEvent:(NSEvent *)event
+{
+	[super touchesCancelledWithEvent:event];
+	[self handleTouches:event cancelled:YES];
+}
+
+// touches still held here get no more updates after a reset
+- (void)reset
+{
+	NSWindow *window = [[self view] window];
+	for (NSNumber *serial in [_touches allValues])
+	{
+		MacTouchCancelled(window, [serial unsignedIntValue]);
+	}
+	[_touches removeAllObjects];
+
+	[super reset];
+}
+
+@end
 
 static void HandleMouseButton(NSEvent *event, int button, bool down)
 {
@@ -294,7 +469,7 @@ static void HandleFlagsChanged(NSEvent *event)
 	MacKeyboardEvent([event keyCode], down);
 }
 
-void MacPollInputs()
+static void PumpEvents()
 {
 	NSEvent *event;
 
@@ -396,6 +571,16 @@ void MacPollInputs()
 	}
 
 	[NSApp updateWindows];
+}
+
+void MacPollInputs()
+{
+	// we pump events ourselves rather than via -[NSApplication run], so drain
+	// what AppKit (including the touch recognizer) autoreleases along the way
+	@autoreleasepool
+	{
+		PumpEvents();
+	}
 }
 
 void *GetOSWindow(void *wincontroller)
@@ -700,6 +885,11 @@ void *CreateMAMEWindow(const char *title, int x, int y, int w, int h, bool isFul
 	[controller setHeadless:headless];
 	if (!headless)
 	{
+		// it moves with the content view between the standard and fullscreen windows
+		MAMETouchRecognizer *touch = [[MAMETouchRecognizer alloc] init];
+		[[window contentView] addGestureRecognizer:touch];
+		[touch release];
+
 		if (isFullscreen)
 		{
 			[controller goFullscreen:displayID];

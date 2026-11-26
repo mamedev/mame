@@ -1069,7 +1069,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="aliensus"> <!-- all data on one side -->
-		<description>Aliens (US Version)</description>
+		<description>Aliens (USA)</description>
 		<year>1987</year>
 		<publisher>Electric Dreams Software</publisher>
 		<part name="cass" interface="spectrum_cass">
@@ -1080,7 +1080,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="aliensuse" cloneof="aliensus">
-		<description>Aliens (US Version) (EDOS)</description>
+		<description>Aliens (USA, EDOS)</description>
 		<year>1987</year>
 		<publisher>EDOS</publisher>
 		<part name="cass1" interface="spectrum_cass">
@@ -1096,7 +1096,7 @@ license:CC0-1.0
 	</software>
 
 	<software name="aliensusa" cloneof="aliensus">
-		<description>Aliens (US Version) (Alternative)</description>
+		<description>Aliens (USA, Alternative)</description>
 		<year>1990</year>
 		<publisher>Alternative</publisher>
 		<part name="cass1" interface="spectrum_cass">

@@ -142,7 +142,7 @@ uint8_t c1581_device::cia_pa_r()
 	data |= m_floppy->ready_r() << 1;
 
 	// device number
-	data |= ((m_slot->get_address() - 8) & 0x03) << 3;
+	data |= (m_address->read() & 0x03) << 3;
 
 	// disk change
 	data |= m_floppy->dskchg_r() << 7;

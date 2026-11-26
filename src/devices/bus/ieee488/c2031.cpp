@@ -56,20 +56,20 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(8, 0x03); }
 
 	// device_ieee488_interface implementation
 	virtual void ieee488_atn(int state) override;
 	virtual void ieee488_ifc(int state) override;
 
 private:
-	inline int get_device_number();
-
 	void via0_irq_w(int state);
 	uint8_t via0_r(offs_t offset);
 	uint8_t via0_pa_r();
 	void via0_pa_w(uint8_t data);
 	uint8_t via0_pb_r();
 	void via0_pb_w(uint8_t data);
+	void via0_ca2_w(int state);
 	void via1_irq_w(int state);
 	uint8_t via1_pb_r();
 	void via1_pb_w(uint8_t data);
@@ -92,6 +92,7 @@ private:
 	int m_ndac_out;             // not data accepted
 	int m_atna;                 // attention acknowledge
 	int m_ifc;
+	int m_ca2;                  // device number switch enable
 
 	// interrupts
 	int m_via0_irq;             // VIA #0 interrupt request
@@ -222,6 +223,10 @@ uint8_t c2031_device::via0_pb_r()
 	// attention
 	data |= !m_bus->atn_r() << 7;
 
+	// device number selection
+	if (!m_ca2)
+		data = (data & 0xfc) | m_address->read();
+
 	return data;
 }
 
@@ -268,8 +273,11 @@ void c2031_device::via0_pb_w(uint8_t data)
 
 	m_bus->nrfd_w(this, nrfd);
 	m_bus->ndac_w(this, ndac);
+}
 
-	m_via0->write_ca2(get_device_number());
+void c2031_device::via0_ca2_w(int state)
+{
+	m_ca2 = state;
 }
 
 
@@ -376,6 +384,7 @@ void c2031_device::device_add_mconfig(machine_config &config)
 	m_via0->readpb_handler().set(FUNC(c2031_device::via0_pb_r));
 	m_via0->writepa_handler().set(FUNC(c2031_device::via0_pa_w));
 	m_via0->writepb_handler().set(FUNC(c2031_device::via0_pb_w));
+	m_via0->ca2_handler().set(FUNC(c2031_device::via0_ca2_w));
 	m_via0->irq_handler().set(FUNC(c2031_device::via0_irq_w));
 
 	MOS6522(config, m_via1, XTAL(16'000'000)/16);
@@ -425,31 +434,6 @@ ioport_constructor c2031_device::device_input_ports() const
 
 
 //**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  get_device_number -
-//-------------------------------------------------
-
-inline int c2031_device::get_device_number()
-{
-	int state = 1;
-
-	switch ((m_slot->get_address() - 8) & 0x03)
-	{
-	case 0: state = (m_atna && m_nrfd_out); break;
-	case 1: state = m_nrfd_out;             break;
-	case 2: state = m_atna;                 break;
-	case 3: state = 1;                      break;
-	}
-
-	return state;
-}
-
-
-
-//**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
@@ -471,6 +455,7 @@ c2031_device::c2031_device(const machine_config &mconfig, const char *tag, devic
 	, m_ndac_out(1)
 	, m_atna(1)
 	, m_ifc(0)
+	, m_ca2(1)
 	, m_via0_irq(0)
 	, m_via1_irq(0)
 {
@@ -493,6 +478,7 @@ void c2031_device::device_start()
 	save_item(NAME(m_via0_irq));
 	save_item(NAME(m_via1_irq));
 	save_item(NAME(m_ifc));
+	save_item(NAME(m_ca2));
 }
 
 

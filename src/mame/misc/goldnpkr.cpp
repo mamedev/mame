@@ -6924,7 +6924,7 @@ void goldnpkr_state::goldpnew(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-	SN76489A(config, m_snsnd, 20_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
+//	SN76489A(config, m_snsnd, 20_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void goldnpkr_state::unkicpf40(machine_config &config)
@@ -17209,13 +17209,30 @@ void goldnpkr_state::init_jokerush()
 }
 
 
+
 void goldnpkr_state::init_gldpnw()
 {
-	// Program ROM address lines are dynamically scrambled/banked through
-	// the KD003 GAL and mainboard CPLD ("DZ"). Needs logic analyzer traces
-	// or PLD dump to implement decryption.
-}
+	uint8_t *const rom = memregion("maincpu")->base();
+	size_t const len = memregion("maincpu")->bytes();
+	std::vector<uint8_t> buffer(rom, rom + len);
 
+	for (offs_t i = 0; i < 0x8000; i++)
+	{
+		offs_t addr = bitswap<15>(i, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7);
+		rom[i] = buffer[addr];  //   +------- straight -----+  +----- inverted -----+
+	}
+
+	// D6 inversion across the upper 4KB block ($7000-$7FFF / $F000-$FFFF) when (addr & 0x0a) == 0
+	for (offs_t addr = 0x7000; addr < 0x8000; addr++)
+	{
+		unsigned int offset = addr & 0x0f;
+
+		if (offset == 0x0 || offset == 0x1 || offset == 0x4 || offset == 0x5)
+		{
+			rom[addr] ^= 0x40;
+		}
+	}
+}
 
 
 } // anonymous namespace

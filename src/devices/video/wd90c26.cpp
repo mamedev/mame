@@ -5,8 +5,8 @@
 Paradise / Western Digital SVGA LCD chipsets variants
 
 TODO:
-- WD90C24;
-
+- WD90C20/'C20A, WD90C22 & WD90C24;
+...
 - Locking for extra GC addresses;
 
 **************************************************************************************************/

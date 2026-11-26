@@ -62,6 +62,8 @@ void vt8231_isa_device::device_start()
 	save_item(NAME(m_superio_cfg));
 	save_item(NAME(m_superio_cfg_idx));
 	save_item(NAME(m_baud_divisor));
+	save_item(NAME(m_com1_irq));
+	save_item(NAME(m_ide_irq));
 	save_item(NAME(m_initialized));
 }
 
@@ -86,6 +88,10 @@ void vt8231_isa_device::device_reset()
 	m_superio_cfg[0x07] = 0xfc; // floppy controller base address (3f0)
 
 	m_baud_divisor = 0x01; // 115200 baud
+
+	m_com1_irq = false;
+	m_ide_irq[0] = false;
+	m_ide_irq[1] = false;
 
 	m_initialized = true;
 	remap_cb();
@@ -136,7 +142,13 @@ uint8_t vt8231_isa_device::isa_pnp_routing_2_r()
 void vt8231_isa_device::isa_pnp_routing_2_w(uint8_t data)
 {
 	LOGMASKED(LOG_REG, "isa_pnp_routing_2_w: %02x\n", data);
+	uint8_t const old_irq = m_isa_pnp_routing_2;
 	m_isa_pnp_routing_2 = data & 0x0f;
+	if (old_irq != m_isa_pnp_routing_2)
+	{
+		update_pic_irq(old_irq);
+		update_pic_irq(m_isa_pnp_routing_2);
+	}
 }
 
 uint8_t vt8231_isa_device::isa_pnp_routing_3_r()
@@ -194,8 +206,9 @@ void vt8231_isa_device::io_map(address_map &map)
 
 void vt8231_isa_device::ide_irq_w(unsigned channel, int state)
 {
-	LOG("ide_irq_w: channel %d -> %d\n", channel, state);
-	irq_to_pic(channel == 0 ? 14 : 15, state);
+	m_ide_irq[channel] = bool(state);
+	// primary and secondary channel are always sent to IRQ14 and IRQ15
+	update_pic_irq(14 + channel);
 }
 
 
@@ -214,6 +227,11 @@ void vt8231_isa_device::misc_functions_w(uint8_t data)
 	m_misc_functions = data & 0xf8;
 }
 
+uint8_t vt8231_isa_device::interrupt_acknowledge_r()
+{
+	return m_pic[0]->acknowledge();
+}
+
 uint8_t vt8231_isa_device::pic_slave_ack_r(offs_t offset)
 {
 	if (offset == 2) // IRQ2
@@ -222,19 +240,16 @@ uint8_t vt8231_isa_device::pic_slave_ack_r(offs_t offset)
 	return 0x00;
 }
 
-void vt8231_isa_device::irq_to_pic(int irq, int state)
+void vt8231_isa_device::update_pic_irq(unsigned irq)
 {
-	switch (irq)
-	{
-	case 14:
-		m_pic[1]->ir6_w(state);
-		break;
-	case 15:
-		m_pic[1]->ir7_w(state);
-		break;
-	default:
-		LOG("Unhandled IRQ %d\n", irq);
-	}
+	// disabled or reserved
+	if (irq == 0 || irq == 2 || irq == 8 || irq == 13)
+		return;
+
+	bool const uart = (irq == m_isa_pnp_routing_2) && m_com1_irq && BIT(m_superio_cfg[0x02], 2);
+	bool const ide = (irq >= 14) && m_ide_irq[irq - 14];
+
+	m_pic[irq >> 3]->set_irq_line(irq & 7, uart || ide);
 }
 
 
@@ -278,6 +293,7 @@ void vt8231_isa_device::superio_cfg_data_w(uint8_t data)
 		// -----2--  serial port enable
 		// ------10  parellel port enable/mode
 		LOGMASKED(LOG_SUPERIO, "SuperIO function select\n");
+		update_pic_irq(m_isa_pnp_routing_2);
 		break;
 
 	case 0x03:
@@ -354,6 +370,7 @@ void vt8231_isa_device::com1_baud_w(uint16_t data)
 
 void vt8231_isa_device::com1_int_w(int state)
 {
-	if (state)
-		LOG("com1_int_w: %d\n", state);
+	m_com1_irq = bool(state);
+	if (m_initialized)
+		update_pic_irq(m_isa_pnp_routing_2);
 }

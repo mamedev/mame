@@ -128,7 +128,7 @@ void msd_sd_device_base::latch_w(u8 data)
 
 u8 msd_sd_device_base::status_r()
 {
-	u8 data = ~(bus_address() - 8) & 0x03;
+	u8 data = ~m_address->read() & 0x03;
 	int trk00 = 1;
 	int wpt = 1;
 
@@ -476,6 +476,25 @@ void msd_sd2_ieee488_device::device_add_mconfig(machine_config &config)
 }
 
 
+//-------------------------------------------------
+//  INPUT_PORTS( msdsd )
+//-------------------------------------------------
+
+static INPUT_PORTS_START( msdsd )
+	PORT_START("ADDRESS")
+	PORT_DIPNAME( 0x03, 0x00, "Device Address" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x01, "9" )
+	PORT_DIPSETTING(    0x02, "10" )
+	PORT_DIPSETTING(    0x03, "11" )
+INPUT_PORTS_END
+
+ioport_constructor msd_sd_device_base::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( msdsd );
+}
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -489,6 +508,7 @@ msd_sd_device_base::msd_sd_device_base(const machine_config &mconfig, device_typ
 	, m_maincpu(*this, "u7")
 	, m_ga(*this, "ga")
 	, m_floppy(*this, "%u", 0U)
+	, m_address(*this, "ADDRESS")
 	, m_leds(*this, "led%u", 0U)
 	, m_byterq_timer(nullptr)
 	, m_pa(0xff)
@@ -603,7 +623,6 @@ void msd_sd_device_base::ieee_w(u8 dio, int dav, int eoi, int nrfd, int ndac) { 
 //  serial bus
 //-------------------------------------------------
 
-int msd_sd_iec_device_base::bus_address() { return m_slot->get_address(); }
 bool msd_sd_iec_device_base::iec_sample_ready() { return m_bus->sample_ready(*m_maincpu); }
 int msd_sd_iec_device_base::iec_clk_r() { return m_bus->clk_r(); }
 int msd_sd_iec_device_base::iec_data_r() { return m_bus->data_r(); }
@@ -629,7 +648,6 @@ void msd_sd_iec_device_base::iec_w(int clk, int data)
 //  IEEE-488 bus
 //-------------------------------------------------
 
-int msd_sd_ieee488_device_base::bus_address() { return m_slot->get_address(); }
 u8 msd_sd_ieee488_device_base::ieee_dio_r() { return m_bus->dio_r(); }
 int msd_sd_ieee488_device_base::ieee_dav_r() { return m_bus->dav_r(); }
 int msd_sd_ieee488_device_base::ieee_eoi_r() { return m_bus->eoi_r(); }

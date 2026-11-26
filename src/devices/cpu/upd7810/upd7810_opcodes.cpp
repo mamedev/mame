@@ -5691,7 +5691,7 @@ void upd7810_device::ONAX_Hm()
 void upd7810_device::ADCX_B()
 {
 	uint8_t tmp = A + RM( BC ) + (PSW & CY);
-	ZHC_ADD( tmp, A, 0 );
+	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
 
@@ -5699,7 +5699,7 @@ void upd7810_device::ADCX_B()
 void upd7810_device::ADCX_D()
 {
 	uint8_t tmp = A + RM( DE ) + (PSW & CY);
-	ZHC_ADD( tmp, A, 0 );
+	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
 
@@ -5707,7 +5707,7 @@ void upd7810_device::ADCX_D()
 void upd7810_device::ADCX_H()
 {
 	uint8_t tmp = A + RM( HL ) + (PSW & CY);
-	ZHC_ADD( tmp, A, 0 );
+	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
 
@@ -5716,7 +5716,7 @@ void upd7810_device::ADCX_Dp()
 {
 	uint8_t tmp = A + RM( DE ) + (PSW & CY);
 	DE++;
-	ZHC_ADD( tmp, A, 0 );
+	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
 
@@ -5725,7 +5725,7 @@ void upd7810_device::ADCX_Hp()
 {
 	uint8_t tmp = A + RM( HL ) + (PSW & CY);
 	HL++;
-	ZHC_ADD( tmp, A, 0 );
+	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
 
@@ -5734,7 +5734,7 @@ void upd7810_device::ADCX_Dm()
 {
 	uint8_t tmp = A + RM( DE ) + (PSW & CY);
 	DE--;
-	ZHC_ADD( tmp, A, 0 );
+	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
 
@@ -5743,7 +5743,7 @@ void upd7810_device::ADCX_Hm()
 {
 	uint8_t tmp = A + RM( HL ) + (PSW & CY);
 	HL--;
-	ZHC_ADD( tmp, A, 0 );
+	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
 

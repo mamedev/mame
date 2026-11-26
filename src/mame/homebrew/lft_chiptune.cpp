@@ -30,7 +30,6 @@ public:
 
 protected:
 	void prg_map(address_map &map) ATTR_COLD;
-	void data_map(address_map &map) ATTR_COLD;
 
 	required_device<atmega88_device> m_maincpu;
 	required_device<dac_byte_interface> m_dac;
@@ -45,11 +44,6 @@ void lft_chiptune_state::prg_map(address_map &map)
 	map(0x0000, 0x1fff).rom();
 }
 
-void lft_chiptune_state::data_map(address_map &map)
-{
-	map(0x0100, 0x04ff).ram();
-}
-
 //**************************************************************************
 //  MACHINE
 //**************************************************************************
@@ -62,7 +56,6 @@ void lft_chiptune_state::chiptune(machine_config &config)
 	/* basic machine hardware */
 	ATMEGA88(config, m_maincpu, MASTER_CLOCK);
 	m_maincpu->set_addrmap(AS_PROGRAM, &lft_chiptune_state::prg_map);
-	m_maincpu->set_addrmap(AS_DATA, &lft_chiptune_state::data_map);
 	m_maincpu->set_eeprom_tag("eeprom");
 	m_maincpu->gpio_out<atmega88_device::GPIOD>().set(m_dac, FUNC(dac_8bit_r2r_device::write));
 

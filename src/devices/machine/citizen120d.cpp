@@ -14,8 +14,11 @@ namespace {
 
 constexpr int PAPER_HDPI   = 240;
 constexpr int PAPER_VDPI   = 72;
-constexpr int PAPER_WIDTH  = 8 * PAPER_HDPI;
+constexpr int PAPER_WIDTH  = 827 * PAPER_HDPI / 100;
 constexpr int PAPER_HEIGHT = 12 * PAPER_VDPI;
+constexpr int PAPER_LEFT   = 16;
+
+constexpr int CR_RATIO = 2;
 
 // 1/240" columns the carriage rotor trails the phase the firmware has latched
 constexpr int CR_STEP_LAG = 2;
@@ -58,7 +61,7 @@ void citizen_120d_device::device_add_mconfig(machine_config &config)
 	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, PAPER_HDPI, PAPER_VDPI);
 	m_bitmap_printer->set_continuous_feed(true);
 
-	m_bitmap_printer->set_cr_stepper_ratio(2, 1);
+	m_bitmap_printer->set_cr_stepper_ratio(CR_RATIO, 1);
 	m_bitmap_printer->set_pf_stepper_ratio(1, 6);
 }
 
@@ -80,6 +83,13 @@ void citizen_120d_device::device_reset()
 	m_cr_delta = 0;
 	m_fire_slot = 0;
 	m_head_en = false;
+}
+
+
+void citizen_120d_device::device_reset_after_children()
+{
+	m_cr_stepper->set_absolute_position(PAPER_LEFT / CR_RATIO);
+	m_bitmap_printer->m_xpos = PAPER_LEFT;
 }
 
 
@@ -134,7 +144,7 @@ void citizen_120d_device::head_en_w(int state)
 
 	m_bitmap_printer->check_new_page();
 
-	if (x < 0)
+	if (x < PAPER_LEFT)
 		return;
 
 	// pin pitch not traced, assumed 1/72"
@@ -147,7 +157,7 @@ void citizen_120d_device::head_en_w(int state)
 
 bool citizen_120d_device::at_home() const
 {
-	return m_bitmap_printer->m_xpos >= 0;
+	return m_bitmap_printer->m_xpos >= PAPER_LEFT;
 }
 
 

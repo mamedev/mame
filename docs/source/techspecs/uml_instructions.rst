@@ -509,7 +509,7 @@ with a subroutine entry point before the code calling it is generated.
 | .. code-block::             | .. code-block:: C++                     |
 |                             |                                         |
 |     exh     handle,arg      |     UML_EXH(block, handle, arg);        |
-|     exh     handle,arg,cond |     UML_EXHc(block, handle, arg, cond); |
+|     exh     handle,arg,cond |     UML_EXHc(block, cond, handle, arg); |
 +-----------------------------+-----------------------------------------+
 
 Operands
@@ -669,7 +669,7 @@ code.
 | .. code-block::       | .. code-block:: C++              |
 |                       |                                  |
 |     exit    arg,      |     UML_EXIT(block, arg);        |
-|     exit    arg,cond  |     UML_EXITc(block, arg, cond); |
+|     exit    arg,cond  |     UML_EXITc(block, cond, arg); |
 +-----------------------+----------------------------------+
 
 Operands
@@ -716,7 +716,7 @@ parameter that does not return a value).
 | .. code-block::           | .. code-block:: C++                     |
 |                           |                                         |
 |     callc   func,arg      |     UML_CALLC(block, func, arg);        |
-|     callc   func,arg,cond |     UML_CALLCc(block, func, arg, cond); |
+|     callc   func,arg,cond |     UML_CALLCc(block, cond, func, arg); |
 +---------------------------+-----------------------------------------+
 
 Operands
@@ -847,7 +847,7 @@ Conditionally set integer to zero or one depending on flags.
 +======================+==================================+
 | .. code-block::      | .. code-block:: C++              |
 |                      |                                  |
-|     set     dst,cond |     UML_SETc(block, dst);        |
+|     set     dst,cond |     UML_SETc(block, cond, dst);  |
 |     dset    dst,cond |     UML_DSETc(block, cond, dst); |
 +----------------------+----------------------------------+
 

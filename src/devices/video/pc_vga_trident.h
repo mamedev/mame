@@ -56,13 +56,12 @@ protected:
 	u8 svga_bank_read_r(offs_t offset);
 	void svga_bank_read_w(offs_t offset, u8 data);
 
-
 	virtual void crtc_map(address_map &map) override ATTR_COLD;
 	virtual void sequencer_map(address_map &map) override ATTR_COLD;
 	virtual void gc_map(address_map &map) override ATTR_COLD;
 
 	virtual void recompute_params() override;
-
+	//virtual uint32_t latch_start_addr() override;
 
 	// TODO: remove this leaky abstraction
 	struct
@@ -164,23 +163,23 @@ private:
 	uint32_t handle_rop(uint32_t src, uint32_t dst);
 };
 
-class tgui9680_device : public trident_vga_device
+class tgui9680_vga_device : public trident_vga_device
 {
 public:
-	tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tgui9680_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
-class tvga9000_device : public trident_vga_device
+class tvga9000_vga_device : public trident_vga_device
 {
 public:
-	tvga9000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
+	tvga9000_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 protected:
 	virtual void recompute_params() override;
 };
 
 // device type definition
-DECLARE_DEVICE_TYPE(TGUI9680_VGA, tgui9680_device)
-DECLARE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_device)
+DECLARE_DEVICE_TYPE(TGUI9680_VGA, tgui9680_vga_device)
+DECLARE_DEVICE_TYPE(TVGA9000_VGA, tvga9000_vga_device)
 
 #endif // MAME_VIDEO_PC_VGA_TRIDENT_H

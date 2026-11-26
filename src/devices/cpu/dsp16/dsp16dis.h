@@ -39,8 +39,14 @@ public:
 	virtual u32 opcode_alignment() const override;
 	virtual offs_t disassemble(std::ostream &stream, offs_t pc, data_buffer const &opcodes, data_buffer const &params) override;
 
+	// disassemble from raw buffer
+	offs_t disassemble_one(std::ostream &stream, offs_t pc, u16 const *opptr);
+
 private:
 	struct result { bool nop; bool ambiguous; std::string text; };
+
+	// disassembly engine
+	template <typename T> offs_t do_disassemble(std::ostream &stream, offs_t pc, T &&read_word);
 
 	// sub-instruction helpers
 	static result dasm_int(u16 op);

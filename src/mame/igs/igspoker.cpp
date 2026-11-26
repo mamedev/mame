@@ -73,6 +73,8 @@ TODO:
 
 #include "emu.h"
 
+#include "igs003.h"
+
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
@@ -89,15 +91,13 @@ TODO:
 
 
 // configurable logging
-#define LOG_IGS003 (1U << 1)
-#define LOG_NMI (1U << 2)
-#define LOG_OUTPUTS (1U << 3)
+#define LOG_NMI (1U << 1)
+#define LOG_OUTPUTS (1U << 2)
 
-// #define VERBOSE (LOG_GENERAL | LOG_IGS003 | LOG_NMI | LOG_OUTPUTS)
+// #define VERBOSE (LOG_GENERAL | LOG_NMI | LOG_OUTPUTS)
 
 #include "logmacro.h"
 
-#define LOGIGS003(...) LOGMASKED(LOG_IGS003, __VA_ARGS__)
 #define LOGNMI(...) LOGMASKED(LOG_NMI, __VA_ARGS__)
 #define LOGOUTPUTS(...) LOGMASKED(LOG_OUTPUTS, __VA_ARGS__)
 
@@ -115,7 +115,7 @@ public:
 		, m_palette(*this, "palette")
 		, m_fg_tile_ram(*this, "fg_tile_ram")
 		, m_fg_color_ram(*this, "fg_color_ram")
-		, m_buttons1(*this, "BUTTONS1")
+		, m_igs003(*this, "igs003")
 		, m_led(*this, "led0")
 		, m_lamps(*this, "lamp%u", 1U)
 	{ }
@@ -141,7 +141,7 @@ protected:
 	required_shared_ptr<uint8_t> m_fg_tile_ram;
 	required_shared_ptr<uint8_t> m_fg_color_ram;
 
-	required_ioport m_buttons1;
+	required_device<igs003_device> m_igs003;
 
 	output_finder<> m_led;
 	output_finder<6> m_lamps;
@@ -150,7 +150,6 @@ protected:
 	uint8_t m_hopper = 0;
 	tilemap_t *m_fg_tilemap = nullptr;
 	uint8_t m_out[3]{};
-	uint8_t m_protection_res = 0;
 
 	uint8_t irqack_r();
 	void irqack_w(uint8_t data);
@@ -158,8 +157,6 @@ protected:
 	void fg_color_w(offs_t offset, uint8_t data);
 	void nmi_and_coins_w(uint8_t data);
 	void lamps_w(uint8_t data);
-	uint8_t custom_io_r();
-	void custom_io_w(uint8_t data);
 	void show_out();
 
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
@@ -184,6 +181,7 @@ public:
 
 	void igspoker(machine_config &config) ATTR_COLD;
 	void cpoker(machine_config &config) ATTR_COLD;
+	void chleague(machine_config &config) ATTR_COLD;
 	void pktet346(machine_config &config) ATTR_COLD;
 
 	void init_igs_ncs() ATTR_COLD;
@@ -219,6 +217,7 @@ private:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void io_map(address_map &map) ATTR_COLD;
+	void chleague_io_map(address_map &map) ATTR_COLD;
 };
 
 
@@ -391,56 +390,6 @@ void _1layer_state::lamps_w(uint8_t data)
 
 
 
-uint8_t _1layer_state::custom_io_r()
-{
-	LOGIGS003("PC %06X: Protection read %02x\n", m_maincpu->pc(), m_protection_res);
-
-	return m_protection_res;
-}
-
-void _1layer_state::custom_io_w(uint8_t data)
-{
-	LOGIGS003("PC %06X: Protection write %02x\n", m_maincpu->pc(), data);
-
-	switch (data)
-	{
-		case 0x00: m_protection_res = m_buttons1->read(); break;
-		// CSK227
-		case 0x20: m_protection_res = 0x49; break;
-		case 0x21: m_protection_res = 0x47; break;
-		case 0x22: m_protection_res = 0x53; break;
-		case 0x24: m_protection_res = 0x41; break;
-		case 0x25: m_protection_res = 0x41; break;
-		case 0x26: m_protection_res = 0x7f; break;
-		case 0x27: m_protection_res = 0x41; break;
-		case 0x28: m_protection_res = 0x41; break;
-		case 0x2a: m_protection_res = 0x3e; break;
-		case 0x2b: m_protection_res = 0x41; break;
-		// CSK227 and NUMBER10
-		case 0x2c: m_protection_res = 0x49; break;
-		case 0x2d: m_protection_res = 0xf9; break;
-		case 0x2e: m_protection_res = 0x0a; break;
-		case 0x30: m_protection_res = 0x26; break;
-		case 0x31: m_protection_res = 0x49; break;
-		case 0x32: m_protection_res = 0x49; break;
-		case 0x33: m_protection_res = 0x49; break;
-		case 0x34: m_protection_res = 0x32; break;
-		// NUMBER10
-		case 0x60: m_protection_res = 0x30; break;
-		case 0x61: m_protection_res = 0x31; break;
-		case 0x62: m_protection_res = 0x3e; break;
-		case 0x64: m_protection_res = 0x3c; break;
-		case 0x65: m_protection_res = 0x31; break;
-		case 0x66: m_protection_res = 0x39; break;
-		case 0x67: m_protection_res = 0x33; break;
-		case 0x68: m_protection_res = 0x35; break;
-		case 0x6a: m_protection_res = 0x40; break;
-		case 0x6b: m_protection_res = 0x43; break;
-		default:
-			m_protection_res = data;
-	}
-}
-
 int _1layer_state::hopper_r()
 {
 	// FIXME: use a hopper device
@@ -524,14 +473,22 @@ void _2layers_state::io_map(address_map &map)
 	map(0x4003, 0x4003).portr("DSW4");
 	map(0x4004, 0x4004).portr("DSW5");
 	map(0x5080, 0x5083).rw("ppi", FUNC(i8255_device::read), FUNC(i8255_device::write));
-	map(0x5090, 0x5090).w(FUNC(_2layers_state::custom_io_w));
-	map(0x5091, 0x5091).r(FUNC(_2layers_state::custom_io_r)).w(FUNC(_2layers_state::lamps_w)); // Keyboard
+	map(0x5090, 0x5090).w(m_igs003, FUNC(igs003_device::index_w));
+	map(0x5091, 0x5091).rw(m_igs003, FUNC(igs003_device::data_r), FUNC(igs003_device::data_w));
 	map(0x50a0, 0x50a0).portr("BUTTONS2"); // Not connected
 	map(0x50b0, 0x50b1).w("ymsnd", FUNC(ym2413_device::write));
 	map(0x50c0, 0x50c0).r(FUNC(_2layers_state::irqack_r)).w(FUNC(_2layers_state::irqack_w));
 	map(0x6800, 0x6fff).ram().w(FUNC(_2layers_state::bg_tile_w)).share(m_bg_tile_ram);
 	map(0x7000, 0x77ff).ram().w(FUNC(_2layers_state::fg_tile_w)).share(m_fg_tile_ram);
 	map(0x7800, 0x7fff).ram().w(FUNC(_2layers_state::fg_color_w)).share(m_fg_color_ram);
+}
+
+void _2layers_state::chleague_io_map(address_map &map)
+{
+	io_map(map);
+
+	// these games don't select the IGS003 port before writing the lamps
+	map(0x5091, 0x5091).w(FUNC(_2layers_state::lamps_w));
 }
 
 
@@ -1288,8 +1245,8 @@ void _1layer_state::number10_io_map(address_map &map)
 	map(0x4007, 0x4007).portr("DSW7");
 	map(0x50f0, 0x50f0).w(FUNC(_1layer_state::nmi_and_coins_w));
 	map(0x5080, 0x5080).portr("SERVICE");
-	map(0x5090, 0x5090).w(FUNC(_1layer_state::custom_io_w));
-	map(0x5091, 0x5091).r(FUNC(_1layer_state::custom_io_r)).w(FUNC(_1layer_state::lamps_w)); // Keyboard
+	map(0x5090, 0x5090).w(m_igs003, FUNC(igs003_device::index_w));
+	map(0x5091, 0x5091).r(m_igs003, FUNC(igs003_device::data_r)).w(FUNC(_1layer_state::lamps_w)); // these games don't use the IGS003 port for the lamps
 	map(0x50a0, 0x50a0).portr("BUTTONS2");
 	// Sound synthesis has been patched out, replaced by ADPCM samples
 	map(0x50b0, 0x50b0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -1311,8 +1268,8 @@ void _1layer_state::cpokerpk_io_map(address_map &map)
 	map(0x50f0, 0x50f0).w(FUNC(_1layer_state::nmi_and_coins_w));
 	map(0x5081, 0x5081).portr("SERVICE");
 	map(0x5082, 0x5082).portr("COINS");
-	map(0x5090, 0x5090).w(FUNC(_1layer_state::custom_io_w));
-	map(0x5091, 0x5091).r(FUNC(_1layer_state::custom_io_r)).w(FUNC(_1layer_state::lamps_w)); // Keyboard
+	map(0x5090, 0x5090).w(m_igs003, FUNC(igs003_device::index_w));
+	map(0x5091, 0x5091).r(m_igs003, FUNC(igs003_device::data_r)).w(FUNC(_1layer_state::lamps_w)); // these games don't use the IGS003 port for the lamps
 	map(0x50a0, 0x50a0).portr("BUTTONS2");
 	// Sound synthesis has been patched out, replaced by ADPCM samples
 	map(0x50b0, 0x50b0).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -2051,6 +2008,11 @@ void _1layer_state::base(machine_config &config)
 
 	TIMER(config, "scantimer").configure_scanline(FUNC(_1layer_state::interrupt), "screen", 0, 1);
 
+	IGS003(config, m_igs003);
+	m_igs003->in_pa_callback().set_ioport("BUTTONS1");
+	m_igs003->out_pb_callback().set(FUNC(_1layer_state::lamps_w));
+	// TODO: port C is written by the same lamp routines as port B (cpoker at 0x4cd7), outputs unknown
+
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
 	// video hardware
@@ -2110,6 +2072,13 @@ void _2layers_state::cpoker(machine_config &config)
 	igspoker(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &_2layers_state::cpoker_program_map);
+}
+
+void _2layers_state::chleague(machine_config &config)
+{
+	cpoker(config);
+
+	m_maincpu->set_addrmap(AS_IO, &_2layers_state::chleague_io_map);
 }
 
 void _2layers_state::pktet346(machine_config &config)
@@ -3006,10 +2975,10 @@ GAMEL( 1993, cpoker201f,  cpoker,   cpoker,   cpoker,    _2layers_state, init_cp
 GAMEL( 1993, cpoker210ks, cpoker,   cpoker,   cpokerx,   _2layers_state, init_cpoker101,   ROT0, "IGS",                  "Champion Poker (v210KS)",                      MACHINE_NOT_WORKING, layout_igspoker ) // need to verify protection handling and inputs/outputs
 GAMEL( 1993, cpoker300us, cpoker,   igspoker, cpoker,    _2layers_state, init_cpoker300us, ROT0, "IGS",                  "Champion Poker (v300US)",                      MACHINE_NOT_WORKING, layout_igspoker ) // need to verify protection handling and inputs/outputs
 
-GAMEL( 2000, chleague,    0,        cpoker,   chleague,  _2layers_state, init_chleague,    ROT0, "IGS",                  "Champion League (v220I, Poker)",               0, layout_igspoker )
-GAMEL( 2000, chleaguel,   chleague, cpoker,   chleague,  _2layers_state, init_chleague,    ROT0, "IGS",                  "Champion League (v220I, Lattine)",             0, layout_igspoker )
-GAMEL( 1998, chleaguexa,  chleague, cpoker,   chleague,  _2layers_state, init_chleague,    ROT0, "Playmark",             "Champion League (v220I, dual program, set 1)", 0, layout_igspoker )
-GAMEL( 1998, chleaguexb,  chleague, cpoker,   chleague,  _2layers_state, init_chleague,    ROT0, "Playmark",             "Champion League (v220I, dual program, set 2)", 0, layout_igspoker )
+GAMEL( 2000, chleague,    0,        chleague, chleague,  _2layers_state, init_chleague,    ROT0, "IGS",                  "Champion League (v220I, Poker)",               0, layout_igspoker )
+GAMEL( 2000, chleaguel,   chleague, chleague, chleague,  _2layers_state, init_chleague,    ROT0, "IGS",                  "Champion League (v220I, Lattine)",             0, layout_igspoker )
+GAMEL( 1998, chleaguexa,  chleague, chleague, chleague,  _2layers_state, init_chleague,    ROT0, "Playmark",             "Champion League (v220I, dual program, set 1)", 0, layout_igspoker )
+GAMEL( 1998, chleaguexb,  chleague, chleague, chleague,  _2layers_state, init_chleague,    ROT0, "Playmark",             "Champion League (v220I, dual program, set 2)", 0, layout_igspoker )
 
 GAMEL( 198?, csk227it,    0,        igspoker, csk227,    _2layers_state, init_cska,        ROT0, "IGS",                  "Champion Skill (with Ability)",                0, layout_igspoker ) // SU 062
 GAMEL( 198?, csk234it,    csk227it, igspoker, csk234,    _2layers_state, init_cska,        ROT0, "IGS",                  "Champion Skill (Ability, Poker & Symbols)",    0, layout_igspoker ) // SU 062

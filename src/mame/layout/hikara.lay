@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+license:CC0-1.0
+authors:MagikalUnicorn
+-->
+<mamelayout version="2">
+	<view name="Hi-kara built-in LCD">
+		<!-- Bounds follow the visible screens so hiding TV Output leaves the LCD filling the view. -->
+		<screen tag="lcd">
+			<!-- built-in 2.4 inch colour LCD, 5:4 aspect ratio -->
+			<bounds x="0" y="0" width="4" height="3.2" />
+		</screen>
+		<collection name="TV Output" visible="no">
+			<screen tag="screen">
+				<!-- optional TV output -->
+				<bounds x="4.2" y="0" width="4" height="3" />
+			</screen>
+		</collection>
+	</view>
+	<view name="Hi-kara LCD and TV Output">
+		<bounds x="0" y="0" width="8.2" height="3.2" />
+		<screen tag="lcd">
+			<bounds x="0" y="0" width="4" height="3.2" />
+		</screen>
+		<screen tag="screen">
+			<!-- optional TV output -->
+			<bounds x="4.2" y="0" width="4" height="3" />
+		</screen>
+	</view>
+</mamelayout>

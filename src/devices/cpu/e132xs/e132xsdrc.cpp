@@ -262,8 +262,6 @@ void hyperstone_device::generate_get_trap_addr(drcuml_block &block, uml::code_la
 
 void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 {
-	compiler_state compiler(mode);
-
 	auto profile = g_profiler.start(PROFILER_DRC_COMPILE);
 
 	// describe a sequence of instructions
@@ -278,6 +276,7 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 		try
 		{
 			/* start the block */
+			compiler_state compiler(mode);
 			drcuml_block &block(m_drcuml->begin_block(8192));
 
 			/* loop until we get through all instruction sequences */
@@ -289,9 +288,9 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 					block.append_comment("-------------------------");
 
 				/* determine the last instruction in this sequence */
-				for (seqlast = seqhead; seqlast; seqlast = seqlast->next())
-					if (seqlast->end_sequence())
-						break;
+				seqlast = seqhead;
+				while (seqlast && !seqlast->end_sequence())
+					seqlast = seqlast->next();
 				assert(seqlast != nullptr);
 
 				if (override || !m_drcuml->hash_exists(mode, seqhead->pc))
@@ -339,7 +338,15 @@ void hyperstone_device::code_compile_block(uint8_t mode, offs_t pc)
 					nextpc = seqlast->pc + seqlast->length;
 
 				/* if the last instruction can change modes, use a variable mode; otherwise, assume the same mode */
-				if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
+				if (seqlast->can_change_modes())
+				{
+					UML_MOV(block, I0, DRC_SR);
+					UML_ROLAND(block, I1, I0, 32 - T_SHIFT + 1, 0x2);
+					UML_ROLAND(block, I0, I0, 32 - S_SHIFT, 0x1);
+					UML_OR(block, I0, I0, I1);
+					UML_HASHJMP(block, I0, nextpc, *m_nocode);
+				}
+				else if (!seqlast->next() || (seqlast->next()->pc != nextpc))
 				{
 					UML_HASHJMP(block, mode, nextpc, *m_nocode);
 				}

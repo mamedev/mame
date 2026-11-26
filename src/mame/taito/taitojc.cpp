@@ -23,8 +23,8 @@ TODO:
 - landgear has some weird crashes (after playing one round, after a couple of
   loops in attract mode) (needs testing -AS)
 - landgear has huge 3d problems on gameplay (CPU comms?)
-- dangcurv DSP program crashes very soon, so no 3d is currently shown. Is it
-  due to undumped rom? maybe not?
+- Dump the E07-11 internal DSP ROM. Dangerous Curves currently uses equivalent
+  routines in the uploaded DSP program (see init_dangcurv).
 - verify screen raw params, current params match vsync measurement, I suspect
   hsync measurement (see PCB notes) was inaccurate
 - add idle skips if possible
@@ -797,13 +797,16 @@ void taitojc_state::hc11_pgm_map(address_map &map)
     0x7000: Projection point Y
     0x7001: Projection point X
     0x7002: Projection point Z
-    0x7003: Frustum Min Z(?)
-    0x7004: Frustum Max Z(?)
+    0x7003: Frustum Min Z
+    0x7004: Frustum Max Z
+    0x7005: Point clip flags
+    0x7006: OR of clip flags (write to start a new group)
+    0x7007: AND of clip flags
     0x7010: Line intersection, parameter length
     0x7011: Line intersection, intersection point
     0x7012: Line intersection, line length
-    0x7013: Viewport Width / 2
-    0x7014: Viewport Height / 2
+    0x7013: Viewport Height / 2
+    0x7014: Viewport Width / 2
     0x7015: Viewport Z / 2 (?)
     0x701b: Line intersection, parameter interpolation read
     0x701d: Projected point Y read
@@ -816,6 +819,22 @@ void taitojc_state::hc11_pgm_map(address_map &map)
 void taitojc_state::dsp_math_projection_w(offs_t offset, uint16_t data)
 {
 	m_projection_data[offset] = data;
+
+	if (offset == 2)
+	{
+		int const y = m_projection_data[0], x = m_projection_data[1], z = m_projection_data[2];
+		m_clip_flags = (y > z ? 0x01 : 0) | (y < -z ? 0x02 : 0)
+				| (x > z ? 0x04 : 0) | (x < -z ? 0x08 : 0)
+				| (z > m_projection_data[4] ? 0x10 : 0) | (z < m_projection_data[3] ? 0x20 : 0);
+		m_clip_or |= m_clip_flags;
+		m_clip_and &= m_clip_flags;
+	}
+}
+
+void taitojc_state::dsp_math_clip_reset_w(uint16_t data)
+{
+	m_clip_or = 0;
+	m_clip_and = 0x3f;
 }
 
 void taitojc_state::dsp_math_viewport_w(offs_t offset, uint16_t data)
@@ -845,7 +864,15 @@ void taitojc_state::dsp_math_intersection_w(offs_t offset, uint16_t data)
 
 uint16_t taitojc_state::dsp_math_intersection_r()
 {
-	return muldiv(m_intersection_data[0], m_intersection_data[1], m_intersection_data[2]);
+	int const length = m_intersection_data[2];
+	if (!length)
+		return 0;
+
+	// The DSP adds this signed offset to the starting vertex. Discard the
+	// fractional bits so traversing a shared edge backwards gives the same point.
+	int const product = m_intersection_data[0] * m_intersection_data[1];
+	int const remainder = product % length;
+	return (product / length) - ((remainder != 0) && ((remainder < 0) != (length < 0)));
 }
 
 uint16_t taitojc_state::dsp_math_unk_r()
@@ -890,7 +917,10 @@ void taitojc_state::tms_data_map(address_map &map)
 	map(0x6b22, 0x6b22).w(m_tc0780fpa, FUNC(tc0780fpa_device::tex_w));
 	map(0x6b23, 0x6b23).rw(m_tc0780fpa, FUNC(tc0780fpa_device::tex_addr_r), FUNC(tc0780fpa_device::tex_addr_w));
 	map(0x6c00, 0x6c01).rw(FUNC(taitojc_state::dsp_rom_r), FUNC(taitojc_state::dsp_rom_w));
-	map(0x7000, 0x7002).w(FUNC(taitojc_state::dsp_math_projection_w));
+	map(0x7000, 0x7004).w(FUNC(taitojc_state::dsp_math_projection_w));
+	map(0x7005, 0x7005).lr16(NAME([this] { return m_clip_flags; }));
+	map(0x7006, 0x7006).lr16(NAME([this] { return m_clip_or; })).w(FUNC(taitojc_state::dsp_math_clip_reset_w));
+	map(0x7007, 0x7007).lr16(NAME([this] { return m_clip_and; }));
 	map(0x7010, 0x7012).w(FUNC(taitojc_state::dsp_math_intersection_w));
 	map(0x7013, 0x7015).w(FUNC(taitojc_state::dsp_math_viewport_w));
 	map(0x701b, 0x701b).r(FUNC(taitojc_state::dsp_math_intersection_r));
@@ -1078,6 +1108,9 @@ void taitojc_state::machine_reset()
 
 	memset(m_viewport_data, 0, sizeof(m_viewport_data));
 	memset(m_projection_data, 0, sizeof(m_projection_data));
+	m_clip_flags = 0;
+	m_clip_or = 0;
+	m_clip_and = 0x3f;
 	memset(m_intersection_data, 0, sizeof(m_intersection_data));
 
 	// hold the TMS in reset until we have code
@@ -1091,6 +1124,9 @@ void taitojc_state::machine_start()
 	save_item(NAME(m_first_dsp_reset));
 	save_item(NAME(m_viewport_data));
 	save_item(NAME(m_projection_data));
+	save_item(NAME(m_clip_flags));
+	save_item(NAME(m_clip_or));
+	save_item(NAME(m_clip_and));
 	save_item(NAME(m_intersection_data));
 
 	save_item(NAME(m_mcu_comm_main));
@@ -1161,6 +1197,15 @@ void taitojc_state::taitojc(machine_config &config)
 	taito_en.add_route(1, "speaker", 1.0, 1);
 }
 
+void taitojc_state::dangcurv(machine_config &config)
+{
+	taitojc(config);
+
+	// The monitor test draws a 496 x 384 crosshatch starting at (0, 8).
+	// The 3D view is also centred on line 200 with a half-height of 192.
+	m_screen->set_visarea(0, 495, 8, 391);
+}
+
 void dendego_state::dendego(machine_config &config)
 {
 	taitojc(config);
@@ -1221,11 +1266,77 @@ void dendego_state::init_dendego2()
 		m_dsp->space(AS_DATA).install_read_handler(0x7ff0, 0x7ff0, read16smo_delegate(*this, FUNC(dendego_state::dendego2_dsp_idle_skip_r)));
 }
 
+// The 68040 uploads the game's geometry overlay at 0x2000 and a library marked
+// "Ver 1.0 Rev C Mar.6" at 0x4000. The overlay also calls the undumped E07-11.
+// Matching its dispatch table (0x2025 in Ver 2.9 O, 0x201b in Ver 2.2 J) with
+// the one at 0x41e1 gives the mask ROM entry points for the display list commands.
+static void dangcurv_reconstruct_dsp(memory_region &rom, address_space &main)
+{
+	auto emit = [&rom] (u16 address, std::initializer_list<u16> words)
+	{
+		std::copy(words.begin(), words.end(), &rom.as_u16(address));
+	};
+
+	struct entry_point { u16 entry, target; };
+	static constexpr entry_point redirects[] =
+	{
+		// Display list commands
+		{ 0x0204, 0x4224 }, { 0x0207, 0x4227 }, { 0x020a, 0x422a }, { 0x020f, 0x422f },
+		{ 0x0214, 0x4234 }, { 0x0218, 0x4238 }, { 0x023c, 0x425c }, { 0x0246, 0x4266 },
+		{ 0x0268, 0x4298 }, { 0x0278, 0x42a8 }, { 0x027a, 0x42aa }, { 0x0285, 0x42b5 },
+		{ 0x0294, 0x42c4 }, { 0x0298, 0x42c8 }, { 0x029e, 0x42ce }, { 0x02a3, 0x42d3 },
+		// Geometry helpers called directly by the overlay
+		{ 0x02b6, 0x42e8 }, { 0x03b7, 0x43e9 }, { 0x0534, 0x4567 }, { 0x06d9, 0x0f8e },
+		{ 0x0707, 0x0fbc }, { 0x073a, 0x472a }, { 0x0769, 0x4759 }
+	};
+	emit(0x0203, { 0xef00 }); // RET, adjacent to the next entry
+	for (auto const &[entry, target] : redirects)
+		emit(entry, { 0x7980, target }); // B target, *
+
+	// The overlay passes the destination vertex in AR0. Rev C also expects
+	// a copy in data word 0x0363 when it projects the interpolated vertex.
+	static constexpr entry_point intersections[] =
+	{
+		{ 0x062b, 0x467f }, { 0x062f, 0x4683 }, { 0x0661, 0x46b5 },
+		{ 0x0675, 0x46c9 }, { 0x0688, 0x46dc }, { 0x069f, 0x46f3 }
+	};
+	for (auto const &[entry, target] : intersections)
+		emit(entry, { 0x8063, 0x7980, target }); // SAR AR0,63h / B target, *
+
+	// The two versions keep the start and end of the clip list in opposite
+	// order at 0x036a/b. Exchange them around each clipping pass and before
+	// sending the finished list to the renderer.
+	emit(0x05a9, {
+			0x696b, 0xa86b, 0x036a, 0x906a, // LACL 6bh / BLDD #036ah,6bh / SACL 6ah
+			0x7a80, 0x45ea,                 // CALL clip against one plane
+			0x696b, 0xa86b, 0x036a, 0x906a,
+			0xef00 });                      // RET
+	emit(0x0789, { 0x696b, 0xa86b, 0x036a, 0x906a, 0x7980, 0x4779 });
+
+	// Rev C builds a polygon packet at 0x03d6. This overlaps the overlay's
+	// clipped vertices at 0x03d8 and 0x03e0. The main ROM also contains Rev C
+	// linked for 0x0800. Take its two packet builders at their linked addresses
+	// and build the packet in the overlay's idle list buffer on this path.
+	for (u16 pc = 0x0f8e; pc <= 0x0fee; pc++)
+		rom.as_u16(pc) = main.read_word(0x8c31a + 2 * (pc - 0x0800));
+	rom.as_u16(0x0f92) = 0x0400; // LAR AR1,#packet
+	rom.as_u16(0x0fc0) = 0x0400;
+	emit(0x0d51, { 0xbf08, 0x0400, 0x7980, 0x4553 }); // LAR AR0,#packet / B send packet
+}
+
 void taitojc_state::init_dangcurv()
 {
 	init_taitojc();
 
 	m_has_dsp_hack = false;
+
+	memory_region &rom = *memregion("dsp");
+	if (std::all_of(rom.base(), rom.base() + rom.bytes(), [] (u8 data) { return !data; }))
+		dangcurv_reconstruct_dsp(rom, m_maincpu->space(AS_PROGRAM));
+
+	address_space &program = m_dsp->space(AS_PROGRAM);
+	program.install_rom(0x0000, 0x1fff, rom.base());
+	program.unmap_write(0x0000, 0x1fff);
 }
 
 
@@ -2235,8 +2346,8 @@ ROM_END
 
 
 //    YEAR  NAME       PARENT    MACHINE  INPUT     CLASS          INIT           ROT   COMPANY  FULLNAME                                                FLAGS
-GAME( 1995, dangcurv,  0,        taitojc, dangcurv, taitojc_state, init_dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.9 O)",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN ) // DANGEROUS CURVES       VER 2.9 O   1995.08.24   17:45
-GAME( 1995, dangcurvj, dangcurv, taitojc, dangcurv, taitojc_state, init_dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.2 J)",                         MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN ) // DANGEROUS CURVES       VER 2.2 J   1995.07.20   17:45
+GAME( 1995, dangcurv,  0,        dangcurv, dangcurv, taitojc_state, init_dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.9 O)",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN ) // DANGEROUS CURVES       VER 2.9 O   1995.08.24   17:45
+GAME( 1995, dangcurvj, dangcurv, dangcurv, dangcurv, taitojc_state, init_dangcurv, ROT0, "Taito", "Dangerous Curves (Ver 2.2 J)",                        MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING | MACHINE_NODEVICE_LAN ) // DANGEROUS CURVES       VER 2.2 J   1995.07.20   17:45
 
 GAME( 1995, landgear,  0,        taitojc, landgear, taitojc_state, init_taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 O)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                                              // LANDING GEAR           VER 4.2 O   Feb  8 1996  09:46:22
 GAME( 1995, landgearj, landgear, taitojc, landgear, taitojc_state, init_taitojc,  ROT0, "Taito", "Landing Gear (Ver 4.2 J)",                             MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_TIMING )                                              // LANDING GEAR           VER 4.2 J   Feb  8 1996  09:46:22

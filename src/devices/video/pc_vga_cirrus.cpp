@@ -7,8 +7,10 @@
  * TODO:
  * - Original Acumos AVGA1/2 chipsets (Cirrus Logic eventually bought Acumos and rebranded);
  * - Fix or implement hidden DAC modes (15bpp + mixed, true color, others);
+ * \- laguna3d doesn't program a valid SVGA mode, moved around?
  * - zorro/picasso2: many blitting errors, verify HW cursor;
  * - Merge with trs/vis.cpp implementation (CL-GD5200 RAMDAC with custom VGA controller)
+ * - gd5446 RAM detection in win95 is 2MB even if we have 4 hooked up (cfr. Rocket Jockey install);
  *
  */
 
@@ -16,7 +18,6 @@
 #include "pc_vga_cirrus.h"
 
 #include "screen.h"
-
 
 #define LOG_REGS (1U << 1)
 #define LOG_BLIT (1U << 2)
@@ -246,9 +247,10 @@ void cirrus_gd5428_vga_device::crtc_map(address_map &map)
 			LOGMASKED(LOG_REGS, "CR1B: Extended Display Controls %02x\n", data);
 			m_cr1b = data;
 			vga.crtc.start_addr_latch &= ~0x070000;
-			vga.crtc.start_addr_latch |= ((data & 0x01) << 16);
-			vga.crtc.start_addr_latch |= ((data & 0x0c) << 15);
-			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | ((data & 0x10) << 4);
+			vga.crtc.start_addr_latch |= (BIT(data, 3) << 18);
+			vga.crtc.start_addr_latch |= (BIT(data, 2) << 17);
+			vga.crtc.start_addr_latch |= (BIT(data, 0) << 16);
+			vga.crtc.offset = (vga.crtc.offset & 0x00ff) | (BIT(data, 4) << 8);
 			recompute_params();
 		})
 	);
@@ -845,6 +847,7 @@ void cirrus_gd5428_vga_device::recompute_params()
 		clock = ((vga.miscellaneous_output & 0xc) ? xtal*2: xtal*1.75).dvalue();
 	else
 	{
+		// TODO: goes out of tolerance in True Color for gd5446 (~20 Hz)
 		int numerator = m_vclk_num[clocksel] & 0x7f;
 		int denominator = (m_vclk_denom[clocksel] & 0x3e) >> 1;
 		int mul = (m_vclk_denom[clocksel] & 0x01) ? 2 : 1;
@@ -927,15 +930,13 @@ uint16_t cirrus_gd5428_vga_device::offset()
 
 uint32_t cirrus_gd5428_vga_device::latch_start_addr()
 {
-	if (svga.rgb24_en || svga.rgb32_en)
-		return vga.crtc.start_addr_latch >> 1;
-
-	// FIXME: need to explicitly return earlier because rgb8_en is '1' in tandem with these
-	if (svga.rgb15_en || svga.rgb16_en)
-		return vga.crtc.start_addr_latch;
-
-	if (svga.rgb8_en)
+	// all modes wants dword parallelism
+	// TODO: gd5434[_pci] doesn't program a start address on High/True Color modes, flickers at 8bpp
+	// TODO: rgb32 is untested
+	if (svga.rgb8_en || svga.rgb15_en || svga.rgb16_en || svga.rgb24_en || svga.rgb32_en)
+	{
 		return vga.crtc.start_addr_latch << 2;
+	}
 	return vga.crtc.start_addr_latch;
 }
 
@@ -1690,7 +1691,7 @@ void cirrus_gd5430_vga_device::crtc_map(address_map &map)
 			LOGMASKED(LOG_REGS, "CR1D: Overlay Extended Control %02x\n", data);
 			m_cr1d = data;
 			// TODO: '34/'36 onward
-			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & 0xf7ffff) | (BIT(data, 7) << 19);
+			vga.crtc.start_addr_latch = (vga.crtc.start_addr_latch & ~0x080000) | (BIT(data, 7) << 19);
 		})
 	);
 }

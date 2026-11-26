@@ -377,10 +377,6 @@ void looping_state::machine_start()
 
 void looping_state::machine_reset()
 {
-	// Disable auto wait state generation by raising the READY line on reset
-	m_maincpu->ready_line(ASSERT_LINE);
-	m_maincpu->reset_line(ASSERT_LINE);
-
 	m_irq_enable = true;
 	m_cop_latch = ~0;
 	m_cop_address = ~0;
@@ -652,6 +648,8 @@ void looping_state::looping(machine_config &config)
 {
 	// CPU TMS9995, standard variant; no line connections
 	TMS9995(config, m_maincpu, 12_MHz_XTAL);
+	// Model READY low at /RESET release for zero automatic wait states.
+	m_maincpu->set_auto_wait_on_reset(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &looping_state::map);
 	m_maincpu->set_addrmap(AS_IO, &looping_state::io_map);
 	m_maincpu->set_vblank_int("screen", FUNC(looping_state::interrupt));

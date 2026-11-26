@@ -265,4 +265,4 @@ void h89bus_z37_device::set_drq(int state)
 	m_intr_cntrl->set_drq(m_drq_allowed ? state : CLEAR_LINE);
 }
 
-DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_Z37, device_h89bus_right_card_interface, h89bus_z37_device, "h89_z37", "Heathkit Z-37 Floppy Disk Controller");
+DEFINE_DEVICE_TYPE_PRIVATE(H89BUS_Z37, device_h89bus_right_card_interface, h89bus_z37_device, "h89_z37", "Heathkit Z-37 Floppy Disk Controller")

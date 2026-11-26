@@ -1193,6 +1193,10 @@ protected:
 	void hudi_7750r_map(address_map& map) ATTR_COLD;
 	void pci_7751_map(address_map& map) ATTR_COLD;
 
+	offs_t ocram_index(offs_t offset) const;
+	uint64_t ocram_r(offs_t offset);
+	void ocram_w(offs_t offset, uint64_t data, uint64_t mem_mask);
+
 	uint64_t sh4_utlb_address_array_r(offs_t offset);
 	void sh4_utlb_address_array_w(offs_t offset, uint64_t data);
 	uint64_t sh4_utlb_data_array1_r(offs_t offset);
@@ -1600,6 +1604,7 @@ protected:
 	emu_timer* m_refresh_timer;
 	uint32_t  m_refresh_timer_base;
 	sh4_utlb m_utlb[64];
+	uint64_t m_ocram[0x2000 / 8]; // operand cache RAM (CCR.ORA): areas 1 and 2, 4 KB each
 
 	// UBC
 	uint32_t m_bara;

@@ -10,27 +10,28 @@
 
  ----
 
- IGS012 provides ROM overlay???
+ IGS012 maps pages of main RAM over the game ROM (deduced from the code):
+ the game writes 0x200 bytes of code to $804000 + n * $200, sets the ROM
+ page of RAM page n in the IGS012 and enables it, then calls that page of
+ the ROM. The game doesn't use the IGS012 protection commands.
 
  IGS025 is some kind of state machine / logic device which the game
  uses for various security checks bitswap checks.
 
- TODO:
- - Hook up IGS012 protection device
-
  ***********************************************************************/
 
 #include "emu.h"
+
 #include "pgm.h"
 #include "pgmprot_igs025_igs012.h"
 
-/* Dragon World 2 */
+// Dragon World 2
 
 void pgm_012_025_state::pgm_drgw2_decrypt()
 {
 	u16 *src = (u16 *) (memregion("maincpu")->base() + 0x100000);
 
-	int rom_size = 0x80000;
+	const int rom_size = 0x80000;
 
 	for (int i = 0; i < rom_size / 2; i++)
 	{
@@ -120,11 +121,25 @@ void pgm_012_025_state::drgw2_common_init()
 	pgm_drgw2_decrypt();
 }
 
+void pgm_012_025_state::machine_start()
+{
+	pgm_state::machine_start();
+
+	m_rom = (u16 *)memregion("maincpu")->base() + 0x100000 / 2;
+}
+
+void pgm_012_025_state::igs012_regs_w(offs_t offset, u16 data, u16 mem_mask)
+{
+	m_igs012->regs_w(offset, ACCESSING_BITS_0_7 ? (data & 0xff) : (data >> 8));
+}
+
 void pgm_012_025_state::drgw2_mem(address_map &map)
 {
 	pgm_mem(map);
-	map(0x100000, 0x1fffff).bankr("bank1"); /* Game ROM */
-	map(0xd00000, 0xd00fff).noprw(); // Written, but never read back? Related to the protection device? - IGS012?
+	map(0x100000, 0x1fffff).view(m_rom_view);
+	m_rom_view[0](0x100000, 0x1fffff).bankr("bank1"); // Game ROM
+	m_rom_view[1](0x100000, 0x1fffff).r(m_igs012, FUNC(igs012_device::overlay_r));
+	map(0xd00000, 0xd00fff).nopr().w(FUNC(pgm_012_025_state::igs012_regs_w));
 }
 
 void pgm_012_025_state::pgm_012_025_drgw2(machine_config &config)
@@ -136,97 +151,64 @@ void pgm_012_025_state::pgm_012_025_drgw2(machine_config &config)
 	IGS025(config, m_igs025);
 	m_igs025->set_source_cb(FUNC(pgm_012_025_state::source_data_r));
 
-	//IGS012(config, m_igs012);
+	IGS012(config, m_igs012);
+	m_igs012->rom_read_callback().set([this] (offs_t offset) -> u16 { return m_rom[offset]; });
+	m_igs012->ram_read_callback().set([this] (offs_t offset) -> u16 { return m_mainram[0x4000 / 2 + offset]; }); // RAM pages at $804000
+	m_igs012->overlay_callback().set([this] (int state) { m_rom_view.select(state); });
 }
 
 
 void pgm_012_025_state::init_drgw2()
 {
-	/* incomplete? */
-	u16 *mem16 = (u16 *)memregion("maincpu")->base();
-
 	drgw2_common_init();
 
 	const int region = 0x06;
 	m_igs025->set_region(region);
 	m_igs025->set_game_id(region | (region << 8) | (region << 16) | (region << 24));
-
-	mem16[0x131098 / 2] = 0x4e93;
-	mem16[0x13113e / 2] = 0x4e93;
-	mem16[0x1311ce / 2] = 0x4e93;
 }
 
 void pgm_012_025_state::init_dw2v100x()
 {
-	u16 *mem16 = (u16 *)memregion("maincpu")->base();
-
 	drgw2_common_init();
 
 	const int region = 0x06;
 	m_igs025->set_region(region);
 	m_igs025->set_game_id(region | (region << 8) | (region << 16) | (region << 24));
-
-	mem16[0x131084 / 2] = 0x4e93;
-	mem16[0x13112a / 2] = 0x4e93;
-	mem16[0x1311ba / 2] = 0x4e93;
 }
 
 void pgm_012_025_state::init_drgw2c()
 {
-	u16 *mem16 = (u16 *)memregion("maincpu")->base();
-
 	drgw2_common_init();
 
 	const int region = 0x05;
 	m_igs025->set_region(region);
 	m_igs025->set_game_id(region | (region << 8) | (region << 16) | (region << 24));
-
-	mem16[0x1303bc / 2] = 0x4e93;
-	mem16[0x130462 / 2] = 0x4e93;
-	mem16[0x1304f2 / 2] = 0x4e93;
 }
 
 void pgm_012_025_state::init_drgw2c101()
 {
-	u16 *mem16 = (u16 *)memregion("maincpu")->base();
-
 	drgw2_common_init();
 
 	const int region = 0x05;
 	m_igs025->set_region(region);
 	m_igs025->set_game_id(region | (region << 8) | (region << 16) | (region << 24));
-
-	mem16[0x1306e4 / 2] = 0x4e93;
-	mem16[0x13078a / 2] = 0x4e93;
-	mem16[0x13081a / 2] = 0x4e93;
 }
 
 void pgm_012_025_state::init_drgw2j()
 {
-	u16 *mem16 = (u16 *)memregion("maincpu")->base();
-
 	drgw2_common_init();
 
 	const int region = 0x01;
 	m_igs025->set_region(region);
 	m_igs025->set_game_id(region | (region << 8) | (region << 16) | (region << 24));
-
-	mem16[0x1302c0 / 2] = 0x4e93;
-	mem16[0x130366 / 2] = 0x4e93;
-	mem16[0x1303f6 / 2] = 0x4e93;
 }
 
 void pgm_012_025_state::init_drgw2hk()
 {
 	drgw2_common_init();
 
-	// todo, correct protection sequence for this region?
+	// TODO: correct protection sequence for this region?
 	const int region = 0x01;
 	m_igs025->set_region(region);
 	m_igs025->set_game_id(region | (region << 8) | (region << 16) | (region << 24));
-
-	u16 *mem16 = (u16 *)memregion("maincpu")->base();
-	mem16[0x12f520 / 2] = 0x4e93;
-	mem16[0x12f5c6 / 2] = 0x4e93;
-	mem16[0x12f656 / 2] = 0x4e93;
 }

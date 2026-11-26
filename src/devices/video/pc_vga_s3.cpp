@@ -47,11 +47,10 @@ uint32_t s3vision864_vga_device::latch_start_addr()
 {
 	if(s3.memory_config & 0x08)
 	{
-		// - SDD scrolling test expects a << 2 for 8bpp and no shift for anything else
-		// - Slackware 3.x XF86_S3 expect a << 2 shift (to be confirmed)
-		// - przonegd expect no shift (RGB16)
-		return vga.crtc.start_addr_latch << (svga.rgb8_en ? 2 : 0);
+		// Trusted thru SDD scrolling test and przonegd (High Color)
+		return vga.crtc.start_addr_latch << 2;
 	}
+	// TODO: fails at SVGA 4bpp (a staple with pc_vga)
 	return vga.crtc.start_addr_latch;
 }
 

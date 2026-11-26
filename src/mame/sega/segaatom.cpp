@@ -33,9 +33,11 @@
 
 
 #include "emu.h"
+
 #include "cpu/h8/h8s2357.h"
 #include "sound/ymz770.h"
-#include "emupal.h"
+#include "video/axell_ag2.h"
+
 #include "screen.h"
 #include "speaker.h"
 
@@ -51,7 +53,7 @@ public:
 	{
 	}
 
-	void atom2(machine_config &config);
+	void atom2(machine_config &config) ATTR_COLD;
 
 protected:
 	// driver_device overrides
@@ -61,9 +63,6 @@ protected:
 	virtual void video_start() override ATTR_COLD;
 
 private:
-	// screen updates
-	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	void atom2_map(address_map &map) ATTR_COLD;
 
 	// devices
@@ -72,11 +71,6 @@ private:
 
 void atom2_state::video_start()
 {
-}
-
-uint32_t atom2_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
-{
-	return 0;
 }
 
 void atom2_state::machine_start()
@@ -98,20 +92,21 @@ void atom2_state::atom2_map(address_map &map)
 
 void atom2_state::atom2(machine_config &config)
 {
-	/* basic machine hardware */
+	// basic machine hardware
 	H8S2394(config, m_maincpu, 25_MHz_XTAL);  // wrong type, should be H8S/2378 family group
 	m_maincpu->set_addrmap(AS_PROGRAM, &atom2_state::atom2_map);
 
-	/* video hardware dummy */
+	// video hardware dummy
 	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(640, 480);
 	screen.set_visarea(0, 639, 0, 479);
-	screen.set_screen_update(FUNC(atom2_state::screen_update));
+	screen.set_screen_update("ag2", FUNC(ax51201_device::screen_update));
 
-	PALETTE(config, "palette").set_entries(65536);
+	// TODO: map it, the CPU address is unknown without the undumped epr-24430.ic4 boot ROM
+	AX51201(config, "ag2", 25'180'000, 0x200'0000).set_screen("screen"); // clock not verified
 
-	/* sound hardware */
+	// sound hardware
 	SPEAKER(config, "speaker", 2).front();
 
 	ymz770_device &ymz770(YMZ770(config, "ymz770", 16.384_MHz_XTAL));
@@ -142,4 +137,4 @@ ROM_END
 } // anonymous namespace
 
 
-GAME( 200?, spongbob,  0, atom2, atom2, atom2_state, empty_init, ROT0, "Sega",      "SpongeBob SquarePants Ticket Boom", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 200?, spongbob,  0, atom2, atom2, atom2_state, empty_init, ROT0, "Sega",      "SpongeBob SquarePants Ticket Boom", MACHINE_NOT_WORKING )

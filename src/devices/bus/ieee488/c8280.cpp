@@ -58,6 +58,7 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(8, 0x07); }
 
 	// device_ieee488_interface implementation
 	void ieee488_atn(int state) override;
@@ -311,7 +312,7 @@ uint8_t c8280_device::riot1_pb_r()
 	uint8_t data = 0;
 
 	// device number selection
-	data |= m_slot->get_address() - 8;
+	data |= m_address->read();
 
 	// data accepted in
 	data |= m_bus->ndac_r() << 6;

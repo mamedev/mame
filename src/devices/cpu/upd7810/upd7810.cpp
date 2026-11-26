@@ -443,6 +443,7 @@ upd7810_device::upd7810_device(const machine_config &mconfig, device_type type, 
 	, m_pc_pullups(0xff)
 	, m_pd_pullups(0xff)
 	, m_pf_pullups(0xff)
+	, m_ci(0)
 {
 }
 
@@ -622,10 +623,25 @@ void upd7810_device::pf_w(uint8_t data, uint8_t mem_mask)
 	COMBINE_DATA(&m_pf_in);
 }
 
+void upd7810_device::ci_w(int state)
+{
+	if (m_ci && !state && (ETMM & 0x0c) && ((ETMM & 0x03) == 0x02 || ((ETMM & 0x03) == 0x03 && TO)))
+		etimer_count();
+
+	m_ci = state;
+}
+
 void upd7810_device::sck_w(int state)
 {
 	if ((SMH & 0x03) == 0x03 && state != SCK)
-		update_sio(1);
+	{
+		if (SML & 0x03)
+			update_sio(1);
+		else if (state)
+			upd7810_sio_input();
+		else
+			upd7810_sio_output();
+	}
 	SCK = state;
 }
 
@@ -1097,11 +1113,19 @@ void upd7810_device::upd7810_sio_output()
 	/* shift out more bits? */
 	if (m_txcnt > 0)
 	{
-		TXD = m_txs & 1;
+		if (!(SML & 0x03) && (SMH & 0x20))
+		{
+			TXD = BIT(m_txs, 7);
+			m_txs <<= 1;
+		}
+		else
+		{
+			TXD = m_txs & 1;
+			m_txs >>= 1;
+		}
 		m_txd_func(TXD);
 		if (m_mcc & 0x01)
 			WP(UPD7810_PORTC, m_pc_out);
-		m_txs >>= 1;
 		m_txcnt--;
 		if (0 == m_txcnt)
 			IRR |= INTFST;      /* serial transfer completed */
@@ -1195,11 +1219,17 @@ void upd7810_device::upd7810_sio_output()
 
 void upd7810_device::upd7810_sio_input()
 {
+	if (0 == m_rxcnt && (SMH & 0x48) == 0x48 && !(SML & 0x03))
+		m_rxcnt = 8;
+
 	/* sample next bit? */
 	if (m_rxcnt > 0)
 	{
 		RXD = m_rxd_func();
-		m_rxs = (m_rxs >> 1) | ((uint16_t)RXD << 15);
+		if (!(SML & 0x03) && (SMH & 0x20))
+			m_rxs = (m_rxs << 1) | RXD;
+		else
+			m_rxs = (m_rxs >> 1) | ((uint16_t)RXD << 15);
 		m_rxcnt--;
 		if (0 == m_rxcnt)
 		{
@@ -1322,12 +1352,13 @@ void upd7810_device::upd7810_sio_input()
 					break;
 				}
 			}
+			else if (SMH & 0x20)
+			{
+				RXB = m_rxs & 0xff;
+			}
 			else
 			{
-				m_rxs >>= 16 - 8;
-				m_rxs |= ~0U << 8;
-				RXB = m_rxs;
-//              m_rxcnt = 8;
+				RXB = m_rxs >> 8;
 			}
 		}
 	}
@@ -1387,12 +1418,6 @@ void upd7810_device::upd7810_sio_input()
 			}
 
 			m_rxcnt--; // reduce by one since we already received the start bit at this point
-		}
-		else
-		/* TSK bit set ? */
-		if (SMH & 0x40)
-		{
-			m_rxcnt = 8;
 		}
 	}
 }
@@ -1471,6 +1496,48 @@ void upd7810_device::update_sio(int cycles)
 	}
 }
 
+void upd7810_device::etimer_count()
+{
+	ECNT++;
+	/* Interrupt Control Circuit */
+	if (ETM0 == ECNT)
+		IRR |= INTFE0;
+	if (ETM1 == ECNT)
+		IRR |= INTFE1;
+	/* Conditions When ECNT Causes a CO0 Output Change */
+	if (((0x00 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 */
+		/* ((0x10 == (ETMM & 0x30)) prohibited */
+		((0x20 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 or at falling CI input */
+		((0x30 == (ETMM & 0x30)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO0 if ECNT == ETM0 or ECNT == ETM1 */
+	{
+		upd7810_co0_output_change();
+	}
+	/* Conditions When ECNT Causes a CO1 Output Change */
+	if (((0x00 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 */
+		/* ((0x40 == (ETMM & 0xc0)) prohibited */
+		((0x80 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 or at falling CI input */
+		((0xc0 == (ETMM & 0xc0)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO1 if ECNT == ETM0 or ECNT == ETM1 */
+	{
+		upd7810_co1_output_change();
+	}
+	/* How and When ECNT is Cleared */
+	switch (ETMM & 0x0c)
+	{
+	case 0x00:              /* clear ECNT */
+		break;
+	case 0x04:              /* free running */
+		if (0 == ECNT)
+			ITF |= INTOV;   /* set overflow flag if counter wrapped */
+		break;
+	case 0x08:              /* reset at falling edge of CI or TO */
+		break;
+	case 0x0c:              /* reset if ECNT == ETM1 */
+		if (ETM1 == ECNT)
+			ECNT = 0;
+		break;
+	}
+}
+
 void upd7810_device::handle_timers(int cycles)
 {
 	/**** TIMER 0 ****/
@@ -1537,44 +1604,7 @@ void upd7810_device::handle_timers(int cycles)
 		while (OVCE >= 12/3)
 		{
 			OVCE -= 12/3;
-			ECNT++;
-			/* Interrupt Control Circuit */
-			if (ETM0 == ECNT)
-				IRR |= INTFE0;
-			if (ETM1 == ECNT)
-				IRR |= INTFE1;
-			/* Conditions When ECNT Causes a CO0 Output Change */
-			if (((0x00 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 */
-				/* ((0x10 == (ETMM & 0x30)) prohibited */
-				((0x20 == (ETMM & 0x30)) && (ETM0 == ECNT)) || /* set CO0 if ECNT == ETM0 or at falling CI input */
-				((0x30 == (ETMM & 0x30)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO0 if ECNT == ETM0 or ECNT == ETM1 */
-			{
-				upd7810_co0_output_change();
-			}
-			/* Conditions When ECNT Causes a CO1 Output Change */
-			if (((0x00 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 */
-				/* ((0x40 == (ETMM & 0xc0)) prohibited */
-				((0x80 == (ETMM & 0xc0)) && (ETM1 == ECNT)) || /* set CO1 if ECNT == ETM1 or at falling CI input */
-				((0xc0 == (ETMM & 0xc0)) && (ETM0 == ECNT || ETM1 == ECNT))) /* latch CO1 if ECNT == ETM0 or ECNT == ETM1 */
-			{
-				upd7810_co1_output_change();
-			}
-			/* How and When ECNT is Cleared */
-			switch (ETMM & 0x0c)
-			{
-			case 0x00:              /* clear ECNT */
-				break;
-			case 0x04:              /* free running */
-				if (0 == ECNT)
-					ITF |= INTOV;   /* set overflow flag if counter wrapped */
-				break;
-			case 0x08:              /* reset at falling edge of CI or TO */
-				break;
-			case 0x0c:              /* reset if ECNT == ETM1 */
-				if (ETM1 == ECNT)
-					ECNT = 0;
-				break;
-			}
+			etimer_count();
 		}
 	}
 
@@ -1994,7 +2024,6 @@ void upd7810_device::device_reset()
 	m_sck = 0;
 	m_ti = 0;
 	m_to = 0;
-	m_ci = 0;
 	m_lv0 = 0;
 	m_lv1 = 0;
 	m_co0 = 0;

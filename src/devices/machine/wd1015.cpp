@@ -238,15 +238,6 @@ void wd1015_device::hdc_intrq_w(int state)
 
 	uint8_t const status = m_hdc->read(7);
 
-	// wd1010_device fires an early completion interrupt as soon as a sector lands in
-	// its internal buffer (status bit 1, CIP, is still set at that point) -- real
-	// hardware would only see this once the buffer manager (unimplemented here, see
-	// device_reset()) asserts BRDY, so wd1010 raises the *real* completion later, on
-	// its own timer, once CIP finally clears. Reading status here (which clears wd1010's
-	// own intrq) sets up a fresh edge for that later interrupt, so just ignore this one.
-	if (BIT(status, 1))
-		return;
-
 	m_error = BIT(status, 0);
 	if (m_error)
 	{
@@ -550,7 +541,7 @@ void wd1015_device::begin_command()
 		// stopping after one sector, so the whole burst arrives as a single uninterrupted
 		// DRQ-asserted DMA transfer rather than us re-triggering it sector by sector (which
 		// left DRQ's status bits stale between sectors and stalled the host's DMA mid-burst)
-		issue_hdc_command(m_chunk_sectors > 1 ? 0x24 : 0x20);
+		issue_hdc_command(m_chunk_sectors > 1 ? 0x2c : 0x28);
 		break;
 	}
 
@@ -666,7 +657,7 @@ void wd1015_device::advance_or_finish()
 			// entire WAIT_HDC gap and lets a stray DMA cycle land in ram_r() before this
 			// burst's own start_data_in() re-arms it
 			m_host->cd_w(1);
-			issue_hdc_command(m_chunk_sectors > 1 ? 0x24 : 0x20);
+			issue_hdc_command(m_chunk_sectors > 1 ? 0x2c : 0x28);
 		}
 	}
 	else
