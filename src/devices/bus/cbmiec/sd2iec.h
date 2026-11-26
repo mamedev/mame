@@ -39,6 +39,9 @@ protected:
 	// optional information overrides
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
+
+	virtual void device_config_complete() override ATTR_COLD { set_address_default(8, 0x03); }
 
 	// device_cbm_iec_interface overrides
 	virtual void cbm_iec_atn(int state) override;
@@ -55,6 +58,7 @@ private:
 	required_device<atmega1284_device> m_maincpu;
 	required_device<pcf8583_device> m_rtc;
 	required_device<spi_sdcard_device> m_sdcard;
+	required_ioport m_address;
 	output_finder<3> m_leds;
 	uint8_t *m_eeprom = nullptr;
 

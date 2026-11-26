@@ -13,6 +13,7 @@
 
 #include "cbmiec.h"
 
+#include "bus/centronics/ctronics.h"
 #include "cpu/upd7810/upd7810.h"
 
 
@@ -23,7 +24,7 @@
 
 // ======================> mps1000_device
 
-class mps1000_device : public device_t, public device_cbm_iec_interface
+class mps1000_device : public device_t, public device_cbm_iec_interface, public device_centronics_peripheral_interface
 {
 public:
 	static constexpr flags_type emulation_flags() { return flags::NOT_WORKING; }

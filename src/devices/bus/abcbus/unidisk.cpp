@@ -76,6 +76,7 @@ void abc_unidisk_device::unidisk_io(address_map &map)
 void abc_unidisk_device::device_add_mconfig(machine_config &config)
 {
 	TMS9995(config, m_maincpu, 12000000);
+	// TODO: Verify READY at reset release on this board.
 	m_maincpu->set_addrmap(AS_PROGRAM, &abc_unidisk_device::unidisk_mem);
 	m_maincpu->set_addrmap(AS_IO, &abc_unidisk_device::unidisk_io);
 }

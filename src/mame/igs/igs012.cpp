@@ -7,11 +7,29 @@ IGS012 protection device
 implementation based on igs/igs011.cpp, by Luca Elia/Olivier Galibert.
 
 Used by:
-- igs/igs011.cpp
-- igs/pgmprot_igs025_igs012.cpp used this chip, but not (or incorrectly) implemented
+- igs/igs011.cpp (protection)
+- igs/pgmprot_igs025_igs012.cpp (ROM overlay)
+
+Registers (deduced from the code, offsets in 16-bit words, the host passes
+the byte lane that is written): each write is preceded by eb, 4f, a6 and
+followed by c8, written at random offsets in 400-7ff.
+
+000-07f   written with 0 (igs011.cpp games) or 1 (Dragon World II)
+100-17f   written with 1 (igs011.cpp games)
+200-27f   written with 1 (igs011.cpp games)
+300-307   ROM page for each of the 8 RAM pages of the overlay
+310       overlay enable, one bit per page
+311       written with 0 (igs011.cpp games)
+
+The ROM overlay maps 0x200 byte RAM pages over the ROM pages set in the
+registers. The igs011.cpp games write 0 to the enable register.
+On Dragon World II the game writes the pages to main RAM and the cartridge
+(NO-0162) has no RAM, so the pages are read from the host: whether the
+chip copies the writes or reads the RAM is unknown.
 */
 
 #include "emu.h"
+
 #include "igs012.h"
 
 DEFINE_DEVICE_TYPE(IGS012, igs012_device, "igs012", "IGS012 Protection Device")
@@ -30,9 +48,14 @@ void igs012_device::map(address_map &map)
 
 igs012_device::igs012_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IGS012, tag, owner, clock)
+	, m_rom_read_cb(*this, 0xffff)
+	, m_ram_read_cb(*this, 0xffff)
+	, m_overlay_cb(*this)
 	, m_prot(0)
 	, m_prot_swap(0)
 	, m_prot_mode(0)
+	, m_overlay_page{ 0 }
+	, m_overlay_enable(0)
 {
 }
 
@@ -41,6 +64,53 @@ void igs012_device::device_start()
 	save_item(NAME(m_prot));
 	save_item(NAME(m_prot_swap));
 	save_item(NAME(m_prot_mode));
+	save_item(NAME(m_overlay_page));
+	save_item(NAME(m_overlay_enable));
+}
+
+void igs012_device::device_reset()
+{
+	m_overlay_enable = 0;
+	m_overlay_cb(0);
+}
+
+
+/***************************************************************************
+
+    Registers and ROM overlay
+
+***************************************************************************/
+
+void igs012_device::regs_w(offs_t offset, u8 data)
+{
+	// TODO: which write resets the protection is unknown, any write does it for now
+	m_prot = 0x00;
+	m_prot_swap = 0x00;
+	m_prot_mode = 0;
+
+	switch (offset & 0x7f8)
+	{
+		case 0x300: // ROM page of each RAM page
+			m_overlay_page[offset & 7] = data;
+			break;
+
+		case 0x310:
+			if ((offset & 7) == 0)
+			{
+				m_overlay_enable = data;
+				m_overlay_cb(m_overlay_enable ? 1 : 0);
+			}
+			break;
+	}
+}
+
+u16 igs012_device::overlay_r(offs_t offset)
+{
+	for (int i = 0; i < 8; i++)
+		if (BIT(m_overlay_enable, i) && (m_overlay_page[i] == (offset >> 8)))
+			return m_ram_read_cb((i << 8) | (offset & 0xff));
+
+	return m_rom_read_cb(offset);
 }
 
 /***************************************************************************
@@ -64,27 +134,6 @@ void igs012_device::device_start()
 
 ***************************************************************************/
 
-
-void igs012_device::prot_reset_w(u16 data)
-{
-	m_prot = 0x00;
-	m_prot_swap = 0x00;
-
-	m_prot_mode = 0;
-}
-
-#if 0
-u16 igs012_device::prot_fake_r(offs_t offset)
-{
-	switch (offset)
-	{
-		case 0: return m_prot;
-		case 1: return m_prot_swap;
-		case 2: return m_prot_mode;
-	}
-	return 0;
-}
-#endif
 
 // Macro that checks whether the current mode and data byte written match the arguments
 #define MODE_AND_DATA(MODE, DATA)  ((m_prot_mode == (MODE)) && ((data & 0xff) == (DATA)))

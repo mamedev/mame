@@ -1121,6 +1121,13 @@ ROM_START( lxcmcyba ) // all games selectable
 	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
 ROM_END
 
+ROM_START( lxcmcybao ) // all games selectable
+	ROM_REGION( 0x4000000, "mainrom", 0 )
+	ROM_LOAD( "barbie.bin", 0x00000, 0x4000000, CRC(e8ea0ade) SHA1(781f70e4dad9bc4a1178e6831292edbe00463a7c) )
+
+	VT3XX_INTERNAL_NO_SWAP // not verified for this set, used for testing
+ROM_END
+
 ROM_START( lxcmcybt ) // all games selectable
 	ROM_REGION( 0x4000000, "mainrom", 0 )
 	ROM_LOAD( "batman.bin", 0x00000, 0x4000000, CRC(9f8f15ce) SHA1(396122ce68008e9c8f35b98f5246e8dc7725df17) )
@@ -1842,6 +1849,7 @@ CONS( 2012, jl2350,    0,  0,  vt36x_32mb, vt369,     vt36x_state, empty_init, "
 // these sets which render as 'vertical' still have a number of games (mostly hacks) not working properly
 CONS( 2012, lxcmcysp,  0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (120-in-1)", MACHINE_NOT_WORKING | ROT270) // renders vertically, but screen stretches it to horizontal
 CONS( 2012, lxcmcyspa, lxcmcysp,  0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Spider-Man (JL2350SP, 120-in-1)", MACHINE_NOT_WORKING | ROT270)
+CONS( 2012, lxcmcybao, 0,         0,  vt36x_32mb_2banks_lexi, vt369_rot, vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Barbie (120-in-1)", MACHINE_NOT_WORKING | ROT270)
 
 CONS( 2012, lxcmcydp,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Disney Princess (120-in-1)", MACHINE_IMPERFECT_GRAPHICS )
 CONS( 2014, lxcmcyco,  0,         0,  vt36x_32mb_2banks_lexi, vt369,     vt36x_state, empty_init,    "Lexibook", "Compact Cyber Arcade - Cars (JL2360DC-1, 120-in-1)", MACHINE_IMPERFECT_GRAPHICS )

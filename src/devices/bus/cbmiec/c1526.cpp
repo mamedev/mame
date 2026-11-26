@@ -213,22 +213,12 @@ ioport_constructor c1526_device::device_input_ports() const
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( c4023 )
-//-------------------------------------------------
-
-static INPUT_PORTS_START( c4023 )
-	PORT_START("PAPERADV")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Paper Advance") PORT_CODE(KEYCODE_INSERT)
-INPUT_PORTS_END
-
-
-//-------------------------------------------------
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
 ioport_constructor c4023_device::device_input_ports() const
 {
-	return INPUT_PORTS_NAME( c4023 );
+	return INPUT_PORTS_NAME( c1526 );
 }
 
 
@@ -250,7 +240,8 @@ c1526_device_base::c1526_device_base(const machine_config &mconfig, device_type 
 	m_irqs(*this, "irqs"),
 	m_bitmap_printer(*this, BITMAP_PRINTER_TAG),
 	m_pf_stepper(*this, BITMAP_PRINTER_TAG":pf_stepper"),
-	m_paper_adv(*this, "PAPERADV")
+	m_paper_adv(*this, "PAPERADV"),
+	m_address(*this, "ADDRESS")
 {
 }
 
@@ -261,8 +252,7 @@ c1526_device_base::c1526_device_base(const machine_config &mconfig, device_type 
 
 c1526_device::c1526_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	c1526_device_base(mconfig, C1526, tag, owner, clock),
-	device_cbm_iec_interface(mconfig, *this),
-	m_address(*this, "ADDRESS")
+	device_cbm_iec_interface(mconfig, *this)
 {
 }
 
@@ -720,14 +710,10 @@ uint8_t c4023_device::riot0_pa_r()
 
 	*/
 
-	int const addr = m_slot->get_address() - 4;
-
 	uint8_t data = 0;
 
 	data |= m_bus->eoi_r();
-	data |= BIT(addr, 0) << 3;
-	data |= BIT(addr, 1) << 4;
-	data |= BIT(addr, 2) << 5;
+	data |= m_address->read() << 3;
 	data |= m_bus->dav_r() << 6;
 	data |= m_bus->atn_r() << 7;
 
