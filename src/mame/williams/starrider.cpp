@@ -288,8 +288,10 @@ constexpr auto MIX_GAINS = []
 	{
 		double conductance = 1.0 / MIX_SHUNT_OHMS + 2.0 / MIX_BIAS_OHMS;
 		for (u32 bit = 0; bit < std::size(MIX_BRANCH_OHMS); ++bit)
+		{
 			if (!BIT(data, bit))
 				conductance += 2.0 / MIX_BRANCH_OHMS[bit];
+		}
 		// All shunts enabled gives maximum attenuation, with a nonzero gain.
 		gains[data] = 1.0 / (1.0 + MIX_SERIES_OHMS * conductance);
 	}
@@ -358,15 +360,8 @@ private:
 	template <unsigned N> void sound_fifo_pl_w(u8 data);
 	template <unsigned N> u8 sound_fifo_pd_r(address_space &space);
 	template <unsigned N> void sound_fifo_pd_w(u8 data);
-	u8 sound_ef1_r(address_space &space);
-	void sound_ef1_w(u8 data);
-	u8 sound_er1_r(address_space &space);
-	void sound_er1_w(u8 data);
-	u8 sound_ef2_r(address_space &space);
-	void sound_ef2_w(u8 data);
-	u8 sound_er2_r(address_space &space);
-	void sound_er2_w(u8 data);
-	void sound_mix_w(u32 index, u8 data);
+	template <u32 Index> u8 sound_mix_r(address_space &space);
+	template <u32 Index> void sound_mix_w(u8 data);
 
 	void sound_pia2_pa(u8 data);
 	void sound_fifo0_ir(int state);
@@ -513,7 +508,8 @@ void sr_state::starrider(machine_config &config)
 	constexpr double GAME_AUDIO_GAIN = 0.175;
 	SPEAKER(config, "speaker", 4).corners();
 
-	// Two populated MC1408s, each feeding independent front and rear attenuators.
+	// Two MC1408s, each with independent front and rear attenuators.
+	// W4 fitted and W3 open: DAC 1 feeds right, DAC 2 feeds left.
 	for (u32 channel = 0; channel != 2; ++channel)
 	{
 		char const *const dac_tag = channel ? "sound.u40" : "sound.u41";
@@ -525,8 +521,8 @@ void sr_state::starrider(machine_config &config)
 			// The mix latches have no reset input; choose zero only at power-up.
 			FILTER_VOLUME(config, m_sound_mix[index]).set_gain(MIX_GAINS[0]);
 			dac.add_route(ALL_OUTPUTS, m_sound_mix[index], 1.0);
-			m_sound_mix[index]->add_route(ALL_OUTPUTS, "speaker", GAME_AUDIO_GAIN, pair ? 2 : 0);
-			m_sound_mix[index]->add_route(ALL_OUTPUTS, "speaker", GAME_AUDIO_GAIN, pair ? 3 : 1);
+			u32 const speaker_channel = 2 * pair + (channel ? 0 : 1);
+			m_sound_mix[index]->add_route(ALL_OUTPUTS, "speaker", GAME_AUDIO_GAIN, speaker_channel);
 		}
 	}
 
@@ -747,62 +743,17 @@ template <unsigned N> void sr_state::sound_fifo_pd_w(u8 data)
 	m_sound_fifos[N]->pd_w(m_sound_ptm_o[N] ? 1 : 0);
 }
 
-u8 sr_state::sound_ef1_r(address_space &space)
+template <u32 Index> u8 sr_state::sound_mix_r(address_space &space)
 {
 	u8 const data(space.unmap());
 	if (!machine().side_effects_disabled())
-		sound_ef1_w(data);
+		sound_mix_w<Index>(data);
 	return data;
 }
 
-void sr_state::sound_ef1_w(u8 data)
+template <u32 Index> void sr_state::sound_mix_w(u8 data)
 {
-	sound_mix_w(0, data); // DAC 1 -> front mix level (6 bits latched by U19)
-}
-
-u8 sr_state::sound_er1_r(address_space &space)
-{
-	u8 const data(space.unmap());
-	if (!machine().side_effects_disabled())
-		sound_er1_w(data);
-	return data;
-}
-
-void sr_state::sound_er1_w(u8 data)
-{
-	sound_mix_w(1, data); // DAC 1 -> rear mix level (6 bits latched by U2)
-}
-
-u8 sr_state::sound_ef2_r(address_space &space)
-{
-	u8 const data(space.unmap());
-	if (!machine().side_effects_disabled())
-		sound_ef2_w(data);
-	return data;
-}
-
-void sr_state::sound_ef2_w(u8 data)
-{
-	sound_mix_w(2, data); // DAC 2 -> front mix level (6 bits latched by U17)
-}
-
-u8 sr_state::sound_er2_r(address_space &space)
-{
-	u8 const data(space.unmap());
-	if (!machine().side_effects_disabled())
-		sound_er2_w(data);
-	return data;
-}
-
-void sr_state::sound_er2_w(u8 data)
-{
-	sound_mix_w(3, data); // DAC 2 -> rear mix level (6 bits latched by U36)
-}
-
-
-void sr_state::sound_mix_w(u32 index, u8 data)
-{
-	m_sound_mix[index]->set_gain(MIX_GAINS[data & 0x3f]);
+	m_sound_mix[Index]->set_gain(MIX_GAINS[data & 0x3f]);
 }
 
 
@@ -927,10 +878,10 @@ void sr_state::sound_memory(address_map &map)
 	map(0xc200, 0xc200).mirror(0x007f).rw(FUNC(sr_state::sound_fifo_pd_r<0>), FUNC(sr_state::sound_fifo_pd_w<0>));
 	map(0xc280, 0xc280).mirror(0x007f).rw(FUNC(sr_state::sound_fifo_pd_r<1>), FUNC(sr_state::sound_fifo_pd_w<1>));
 	//map(0xc300, 0xc37f) U21 (2821) unpopulated
-	map(0xc380, 0xc380).mirror(0x007f).rw(FUNC(sr_state::sound_ef1_r), FUNC(sr_state::sound_ef1_w));
-	map(0xc400, 0xc400).mirror(0x007f).rw(FUNC(sr_state::sound_er1_r), FUNC(sr_state::sound_er1_w));
-	map(0xc480, 0xc480).mirror(0x007f).rw(FUNC(sr_state::sound_ef2_r), FUNC(sr_state::sound_ef2_w));
-	map(0xc500, 0xc500).mirror(0x007f).rw(FUNC(sr_state::sound_er2_r), FUNC(sr_state::sound_er2_w));
+	map(0xc380, 0xc380).mirror(0x007f).rw(FUNC(sr_state::sound_mix_r<0>), FUNC(sr_state::sound_mix_w<0>)); // U19: DAC 1 front right
+	map(0xc400, 0xc400).mirror(0x007f).rw(FUNC(sr_state::sound_mix_r<1>), FUNC(sr_state::sound_mix_w<1>)); // U2: DAC 1 rear right
+	map(0xc480, 0xc480).mirror(0x007f).rw(FUNC(sr_state::sound_mix_r<2>), FUNC(sr_state::sound_mix_w<2>)); // U17: DAC 2 front left
+	map(0xc500, 0xc500).mirror(0x007f).rw(FUNC(sr_state::sound_mix_r<3>), FUNC(sr_state::sound_mix_w<3>)); // U36: DAC 2 rear left
 	map(0xc580, 0xc583).mirror(0x007c).rw(m_sound_pia2, FUNC(pia6821_device::read), FUNC(pia6821_device::write));
 	// nothing in 0xc600-0xc67f
 	//map(0xc680, 0xc6ff) U21 (2812) unpopulated
