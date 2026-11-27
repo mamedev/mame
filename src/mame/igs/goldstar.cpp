@@ -4588,7 +4588,9 @@ void cmaster_state::cm_portmap(address_map &map)
 void cmaster_state::cm99_portmap(address_map &map)
 {
 	cm_portmap(map);
+
 	map(0x10, 0x10).w(FUNC(cmaster_state::cm99_outport0_w));
+	map(0x38, 0x38).lr8(NAME([]() -> uint8_t { return 0x06; }));  // top7a protection check at $8f9a
 }
 
 void cmaster_state::reelm_portmap(address_map &map)
@@ -21838,7 +21840,7 @@ ROM_START( top7a )
 	ROM_LOAD( "1.u9",  0x6000, 0x2000, CRC(12f9071f) SHA1(92f13ba8dffce56934b110da73c41f8aa7151e81) )
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_FILL( 0x0000, 0x10000, 0xff )  // U53 (girl bitmaps) not populated
+	ROM_FILL( 0x0000, 0x10000, 0x00 )  // U53 (girl bitmaps) not populated (filled with 00 to get a black square)
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
@@ -35722,7 +35724,7 @@ GAMEL( 1998, texas99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99
 
 GAME(  1993, aplan,      0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "WeaShing H.K.",     "A-Plan",                                          MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
 GAMEL( 1999, top7,       0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg (UTech)",   "Jin Ji Bao Xi (Top-7, V8.8, set 1)",              0,                   layout_cmv4 ) // Jin Ji Bao Xi (金雞報喜, Top-7)
-GAME(  1999, top7a,      top7,     cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg (UTech)",   "Jin Ji Bao Xi (Top-7, V8.8, set 2)",              MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
+GAMEL( 1999, top7a,      top7,     cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg (UTech)",   "Jin Ji Bao Xi (Top-7, V8.8, set 2)",              0,                   layout_cmv4 ) // Jin Ji Bao Xi (金雞報喜, Top-7)
 GAME(  1996, war3cb,     0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "S.B.E.",            "War III Cherry Best",                             MACHINE_NOT_WORKING )   // different portmap?
 
 
