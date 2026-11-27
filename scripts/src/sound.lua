@@ -1977,6 +1977,18 @@ if SOUNDS["ROLANDRPP324"] then
 end
 
 ---------------------------------------------------
+-- Roland RF5C36/SA-16 sample players
+--@src/devices/sound/roland_sa16.h,SOUNDS["ROLANDSA16"] = true
+---------------------------------------------------
+
+if SOUNDS["ROLANDSA16"] then
+	files {
+		MAME_DIR .. "src/devices/sound/roland_sa16.cpp",
+		MAME_DIR .. "src/devices/sound/roland_sa16.h",
+	}
+end
+
+---------------------------------------------------
 --
 --@src/devices/sound/vgm_visualizer.h,SOUNDS["VGMVIZ"] = true
 ---------------------------------------------------

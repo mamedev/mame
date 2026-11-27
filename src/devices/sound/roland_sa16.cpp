@@ -64,7 +64,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "sa16.h"
+#include "roland_sa16.h"
 
 #include <algorithm>
 #include <cstdlib>

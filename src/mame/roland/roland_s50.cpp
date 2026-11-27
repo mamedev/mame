@@ -13,7 +13,6 @@
 
 #include "emu.h"
 #include "bu3905.h"
-#include "sa16.h"
 #include "mb63h149.h"
 #include "mb654419u.h"
 
@@ -29,6 +28,7 @@
 #include "machine/nscsi_bus.h"
 #include "machine/timer.h"
 #include "machine/wd_fdc.h"
+#include "sound/roland_sa16.h"
 #include "video/hd44780.h"
 #include "video/tms3556.h"
 #include "video/t6963c.h"

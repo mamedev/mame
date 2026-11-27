@@ -12,7 +12,7 @@
 
 #include "emu.h"
 #include "bu3905.h"
-#include "sa16.h"
+#include "sound/roland_sa16.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs51/i8052.h"
 #include "machine/i8251.h"
