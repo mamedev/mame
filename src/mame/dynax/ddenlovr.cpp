@@ -819,7 +819,7 @@ public:
 	void hnrose(machine_config &config) ATTR_COLD;
 	void mjswacads(machine_config &config) ATTR_COLD;
 	void mjtktrdx(machine_config &config) ATTR_COLD;
-
+    void mjrking(machine_config &config) ATTR_COLD;
 private:
 	DECLARE_MACHINE_START(hanakanz);
 	DECLARE_VIDEO_START(hanakanz);
@@ -853,6 +853,7 @@ private:
 	void daimyojn_blitter_data_palette_w(uint8_t data);
 	uint8_t daimyojn_year_hack_r(offs_t offset);
 	void hanakanz_oki_bank_w(uint8_t data);
+	void mjrking_okibank_w(uint8_t data);
 	void mjchuuka_oki_bank_w(uint8_t data);
 	void jongtei_okibank_w(uint8_t data);
 	void daimyojn_okibank_w(uint8_t data);
@@ -3121,7 +3122,12 @@ void hanakanz_state::hanakanz_palette_w(uint8_t data)
 
 void hanakanz_state::hanakanz_oki_bank_w(uint8_t data)
 {
-	m_oki->set_rom_bank((data >> 6) & 1);
+m_oki->set_rom_bank((data >> 6) & 3);
+}
+
+void hanakanz_state::mjrking_okibank_w(uint8_t data)
+{
+	m_oki->set_rom_bank((data >> 4) & 0x03);
 }
 
 uint8_t ddenlovr_state::hanakanz_rand_r()
@@ -10936,7 +10942,14 @@ void hanakanz_state::hnrose(machine_config &config)
 	m_key_matrix[0]->set_options(mahjong_panel_connector_device::standard_panels, "hf", false);
 	m_key_matrix[1]->set_options(mahjong_panel_connector_device::standard_panels, "hf", false);
 }
+void hanakanz_state::mjrking(machine_config &config)
+{
+	momotaro(config);
 
+	// 1MB ADPCM ROM = 4 banks of 256KB, bank select on P0 bits 4-5
+	kl5c80a12_device &maincpu(*subdevice<kl5c80a12_device>("maincpu"));
+	maincpu.out_p0_callback().set(FUNC(hanakanz_state::mjrking_okibank_w));
+}
 /***************************************************************************
 
 Monkey Mole Panic
@@ -13914,6 +13927,6 @@ GAME( 2008, mjkokryu,    0,        momotaro,  mjkokryu,   hanakanz_state, empty_
 
 GAME( 2009, mjstama,     0,        momotaro,  mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Sengoku Tamashii (Japan, T042-RB-04)",                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
-GAME( 2011, mjrking,     0,        momotaro,  mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Renchan King (Japan, T045-RB-01)",                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2011, mjrking,     0,        mjrking,   mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Renchan King (Japan, T045-RB-01)",                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
-GAME( 2012, mjrkingl,    0,        momotaro,  mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Renchan King Light Version (Japan, T046-RB-01)",         MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2012, mjrkingl,    0,        mjrking,   mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Renchan King Light Version (Japan, T046-RB-01)",         MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
