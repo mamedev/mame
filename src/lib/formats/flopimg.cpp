@@ -1691,11 +1691,11 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 		// Start of IDAM and DAM are supposed to be exactly 704 cells
 		// apart in normal format or 1008 cells apart in perpendicular
 		// format.  Of course the hardware is tolerant.  Accept +/-
-		// 128 cells of shift.
+		// 128 cells of shift.  The DAM may follow the index.
 
 		int d_index;
 		for(d_index = 0; d_index < dblk_count; d_index++) {
-			int delta = dblk[d_index] - idblk[i];
+			int delta = int((dblk[d_index] + bitstream.size() - idblk[i]) % bitstream.size());
 			if(delta >= 704-128 && delta <= 1008+128)
 				break;
 		}
@@ -1792,16 +1792,21 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 	for(uint32_t i=0; i<bitstream.size(); i++) {
 		shift_reg = (shift_reg << 1) | bitstream[i];
 
+		// A mark ending on the last bit is followed by the index
+		uint32_t pos = i+1;
+		if(pos == bitstream.size())
+			pos = 0;
+
 		// fe
 		if(shift_reg == 0xf57e) {       // address mark
 			if(idblk_count < 100)
-				idblk[idblk_count++] = i+1;
+				idblk[idblk_count++] = pos;
 		}
 		// f8, f9, fa, fb
 		if(shift_reg == 0xf56a || shift_reg == 0xf56b ||
 			shift_reg == 0xf56e || shift_reg == 0xf56f) {       // data mark
 			if(dblk_count < 100)
-				dblk[dblk_count++] = i+1;
+				dblk[dblk_count++] = pos;
 		}
 	}
 
@@ -1818,11 +1823,11 @@ std::vector<std::vector<uint8_t>> floppy_image_format_t::extract_sectors_from_bi
 
 		// Start of IDAM and DAM are supposed to be exactly 384 cells
 		// apart.  Of course the hardware is tolerant.  Accept +/- 128
-		// cells of shift.
+		// cells of shift.  The DAM may follow the index.
 
 		int d_index;
 		for(d_index = 0; d_index < dblk_count; d_index++) {
-			int delta = dblk[d_index] - idblk[i];
+			int delta = int((dblk[d_index] + bitstream.size() - idblk[i]) % bitstream.size());
 			if(delta >= 384-128 && delta <= 384+128)
 				break;
 		}
