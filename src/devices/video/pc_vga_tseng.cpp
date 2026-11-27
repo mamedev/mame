@@ -721,6 +721,7 @@ void et4kw32p_vga_device::recompute_params()
 	svga.rgb15_en = 0;
 	svga.rgb16_en = 0;
 	svga.rgb24_en = 0;
+	// TODO: should be a single PLL (integrated?)
 	switch(((et4k.aux_ctrl << 1) & 4)|(vga.miscellaneous_output & 0xc)>>2)
 	{
 		case 0:

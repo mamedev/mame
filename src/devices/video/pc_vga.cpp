@@ -10,21 +10,12 @@
     ega/vga
     64k (early ega 16k) words of 32 bit memory
 
-    TODO:
-    - modernize (in progress);
-    - Make RAMDAC a subclassable entity;
-    \- Clients needs to be able to swap that to SVGA extensions of the original 6bpp;
-    - Attribute from graphics to text mode in DOS doesn't restore properly, particularly if you
-      have a custom background color defined (verify);
-    - Improve debugging;
-    - Make a VGA bus slot option, already needed by 3dfx Voodoo and other similar cards;
-    - Verify how CAD ISA cards needs to r/w the VRAM space (uPD7220, HD63484, others);
+	TODO:
+	- https://github.com/mamedev/mame/issues/12068
 
     per-game issues (very outdated, to be moved to SW list/to device files if necessary):
-    - The Incredible Machine: fix partial updates
     - MAME 0.01: fix 92 Hz refresh rate bug (uses VESA register?).
     - Virtual Pool: ET4k unrecognized;
-    - California Chase (calchase): various gfx bugs, CPU related?
     - Jazz Jackrabbit: status bar is very jerky, but main screen scrolling is fine?
     - Catacombs: weird resolution (untested)
 
@@ -1381,12 +1372,19 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
+// Modes 0Dh, 0Eh, 10h, 12h
+// fn is a misnomer, essentially handles 16 colors modes
+// i.e. what turbocpp has support of in graphics.h
 void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 {
 	const int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	const int LINES = (vga.crtc.vert_disp_end + 1) * (get_interlace_mode() + 1);
+	// - tim has a V display end of 479 but a V blank start of 399
+	const int LINES = std::min<uint16_t>(vga.crtc.vert_disp_end + 1, vga.crtc.vert_blank_start) * (get_interlace_mode() + 1);
 	const int EGA_COLUMNS = vga.crtc.horz_disp_end + 1;
 	int pel_shift = (vga.attribute.pel_shift & 7);
+
+	// TODO: figure out color it takes (attribute [0] or [0x11]?)
+	bitmap.fill(0, cliprect);
 
 	for (int addr = vga.crtc.start_addr, line = 0; line < LINES; line += height, addr += offset())
 	{
@@ -1429,7 +1427,7 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 	}
 }
 
-// In mode 13h (256 colors) every pixel actually double height/width
+// Mode 13h (256 colors) every pixel actually double height/width
 // i.e. a 320x200 is really 640x400
 void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
@@ -1507,6 +1505,7 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
+// Modes 04h and 05h
 void vga_device::vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const int LINES = (vga.crtc.vert_disp_end + 1) * (get_interlace_mode() + 1);
@@ -1538,6 +1537,7 @@ void vga_device::vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
+// Modes 06h and 11h
 void vga_device::vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const int LINES = (vga.crtc.vert_disp_end + 1) * (get_interlace_mode() + 1);

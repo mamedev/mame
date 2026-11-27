@@ -7,6 +7,7 @@ MediaGX VGA virtual interface
 TODO:
 - Currently cheat around software VGA, MediaGX notoriously triggers SMI for every access to
   VGA legacy ranges, which is horrible both for emulation purposes and for performance.
+  Doable somehow with read/write taps?
 - A good benchmark about fixing pc_vga infrastructure:
   it connects thru a VGA connector anyway & it has VGA features (DDC, HW cursor, BitBLT)
 
