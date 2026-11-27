@@ -74,9 +74,9 @@
 
      Auto wait state:
 
-     READY high at the release of /RESET selects one automatic wait state
-     per external memory byte. READY low selects zero. After release,
-     READY controls ordinary bus waits independently of that selection.
+     In order to enable automatic wait state creation, the READY line must be
+     cleared on reset time. A good position to do this is MACHINE_RESET in
+     the driver.
 
 
      References (see comments below)
@@ -92,8 +92,6 @@
 #include "emu.h"
 #include "tms9995.h"
 #include "9900dasm.h"
-
-#include <algorithm>
 
 #define NOPRG -1
 
@@ -114,6 +112,7 @@ enum
 enum
 {
 	PENDING_NMI = 1,
+	PENDING_MID = 2,
 	PENDING_LEVEL1 = 4,
 	PENDING_OVERFLOW = 8,
 	PENDING_DECR = 16,
@@ -167,9 +166,7 @@ tms9995_device::tms9995_device(const machine_config &mconfig, const char *tag, d
 tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, type, tag, owner, clock),
 		m_state_any(0),
-		WP(0),
 		PC(0),
-		ST(0),
 		PC_debug(0),
 		m_iaq(false),
 		m_program_config("program", ENDIANNESS_BIG, 8, 16),
@@ -178,7 +175,6 @@ tms9995_device::tms9995_device(const machine_config &mconfig, device_type type, 
 		m_prgspace(nullptr),
 		m_setaddr(nullptr),
 		m_cru(nullptr),
-		m_mpy_read_next_word(true),
 		m_external_operation(*this),
 		m_clock_out_line(*this),
 		m_holda_line(*this)
@@ -211,40 +207,11 @@ void tms9995_device::device_start()
 	m_mid_flag = false;
 	m_mid_active = false;
 	m_nmi_active = false;
-	m_nmi_serviced = false;
-	m_int1_active = false;
-	m_int4_active = false;
 	m_int_overflow = false;
 
 	m_reset = false;
-	m_reset_asserted = false;
-	m_reset_transition = attotime::never;
-	m_reset_samples = 0;
-	m_reset_bus_clocks = 0;
-	m_reset_byte_pending = false;
-	m_reset_byte_address = 0;
-	m_reset_ready = true;
-	m_reset_wp = m_reset_pc = m_reset_st = 0;
-	m_cru_sample_pending = false;
-	m_cru_sample_last = false;
-	m_cru_sample_address = 0;
-	m_ready_fall = m_ready_deferred_fall = attotime::never;
-	m_ready_before_late_edge = true;
-	m_ready_sample_auto = false;
-	m_nmi_samples = m_int1_samples = m_int4_samples = m_ec_samples = 0;
-	m_decrementer_clkdiv = m_decrementer_reload = 0;
-	m_decrementer_enabled = false;
-	m_starting_count_storage_register = m_decrementer_value = 0;
-	MPC = -1;
-	m_ready_bufd = true;
-	m_ready = true;
-	m_auto_wait = false;
-	m_request_auto_wait_state = false;
 
 	m_idle_state = false;
-	m_hold_requested = false;
-	m_hold_sampled = false;
-	m_hold_state = false;
 
 	m_source_value = 0;
 
@@ -274,53 +241,29 @@ void tms9995_device::device_start()
 	// save_item(NAME(PC_debug)); // only for debugger output
 	save_item(NAME(m_onchip_memory));
 	save_item(NAME(m_idle_state));
-	save_item(NAME(m_nmi_serviced));
+	save_item(NAME(m_nmi_state));
 	save_item(NAME(m_hold_state));
 	save_item(NAME(m_hold_requested));
-	save_item(NAME(m_hold_sampled));
 	save_item(NAME(m_ready_bufd));
 	save_item(NAME(m_ready));
 	save_item(NAME(m_request_auto_wait_state));
 	save_item(NAME(m_auto_wait));
 	save_item(NAME(m_icount));
 	save_item(NAME(m_mem_phase));
-	save_item(NAME(m_reset_transition));
-	save_item(NAME(m_reset_samples));
-	save_item(NAME(m_reset_bus_clocks));
-	save_item(NAME(m_reset_byte_pending));
-	save_item(NAME(m_reset_byte_address));
-	save_item(NAME(m_reset_ready));
-	save_item(NAME(m_reset_wp));
-	save_item(NAME(m_reset_pc));
-	save_item(NAME(m_reset_st));
-	save_item(NAME(m_ready_fall));
-	save_item(NAME(m_ready_deferred_fall));
-	save_item(NAME(m_ready_before_late_edge));
-	save_item(NAME(m_ready_sample_auto));
-	save_item(NAME(m_cru_sample_address));
-	save_item(NAME(m_cru_sample_last));
-	save_item(NAME(m_cru_sample_pending));
-	save_item(NAME(m_iaq));
 	save_item(NAME(m_check_ready));
 	save_item(NAME(m_check_hold));
 	save_item(NAME(m_pass));
 	save_item(NAME(m_get_destination));
 	save_item(NAME(m_word_access));
 	save_item(NAME(m_nmi_active));
-	save_item(NAME(m_nmi_samples));
-	save_item(NAME(m_int1_samples));
-	save_item(NAME(m_int4_samples));
 	save_item(NAME(m_int1_active));
 	save_item(NAME(m_int4_active));
 	save_item(NAME(m_int_overflow));
 	save_item(NAME(m_reset));
-	save_item(NAME(m_reset_asserted));
+	save_item(NAME(m_from_reset));
 	save_item(NAME(m_mid_flag));
 	save_item(NAME(m_mid_active));
 	save_item(NAME(m_decrementer_clkdiv));
-	save_item(NAME(m_decrementer_reload));
-	save_item(NAME(m_decrementer_enabled));
-	save_item(NAME(m_ec_samples));
 	save_item(NAME(m_log_interrupt));
 	save_item(NAME(m_int_pending));
 	save_item(NAME(m_check_overflow));
@@ -548,15 +491,13 @@ enum
 	ALU_NOP,
 	ALU_ADD_S_SXC,
 	ALU_B,
-	ALU_CONTEXT,
+	ALU_BLWP,
 	ALU_C,
 	ALU_CI,
 	ALU_CLR_SETO,
 	ALU_DIV,
 	ALU_DIVS,
 	ALU_EXTERNAL,
-	ALU_RSET_MASK,
-	ALU_IDLE_POLL,
 	ALU_F3,
 	ALU_IMM_ARITHM,
 	ALU_JUMP,
@@ -566,7 +507,6 @@ enum
 	ALU_LSTWP,
 	ALU_MOV,
 	ALU_MPY,
-	MPY_NEXT_WORD,
 	ALU_RTWP,
 	ALU_SBO_SBZ,
 	ALU_SHIFT,
@@ -576,7 +516,7 @@ enum
 	ALU_TB,
 	ALU_X,
 	ALU_XOP,
-	ALU_RESET
+	ALU_INT
 };
 
 #define MICROPROGRAM(_MP) \
@@ -602,7 +542,7 @@ MICROPROGRAM(operand_address_derivation)
 	WORD_READ, RETADDR, 0, 0,                   // Register indirect                1 (1)
 	WORD_READ, RETADDR, 0, 0,                   // Symbolic                         1 (1)
 	WORD_READ, INCREG, WORD_WRITE, RETADDR1,    // Reg indirect auto-increment      3 (1) (1)
-	WORD_READ, INDX, WORD_READ, ALU_NOP, RETADDR // Indexed                         3 (1) (1)
+	WORD_READ, INDX, WORD_READ, RETADDR         // Indexed                          3 (1) (1)
 };
 
 MICROPROGRAM(add_s_sxc_mp)
@@ -632,28 +572,26 @@ MICROPROGRAM(bl_mp)
 	OPERAND_ADDR,           // x
 	ALU_NOP,                // 1 Don't read, just use the address
 	ALU_B,                  // 0 Re-use the alu operation from B
-	ALU_NOP,                // 1
-	ALU_NOP,                // 1
 	PREFETCH,               // 1 (1)
-	MEMORY_WRITE,           // 1 (1) Save the return PC in R11 immediately after the target fetch
+	ALU_NOP,                // 1
+	MEMORY_WRITE,           // 1 (1) Write R11
+	ALU_NOP,                // 1
 	END
 };
 
 MICROPROGRAM(blwp_mp)
 {
-	OPERAND_ADDR,           // x Determine vector address
-	MEMORY_READ,            // 1 (1) Read new WP
-	ALU_CONTEXT,            // 1 Advance to the second vector word
-	ALU_NOP,                // 1
-	ALU_NOP,                // 1
-	ALU_NOP,                // 1
-	MEMORY_READ,            // 1 (1) Read new PC before writing the workspace
-	ALU_CONTEXT,            // 0
-	MEMORY_WRITE,           // 1 (1) Save old WP in new R13
-	ALU_CONTEXT,            // 0
-	MEMORY_WRITE,           // 1 (1) Save return PC in new R14
-	ALU_CONTEXT,            // 0
-	MEMORY_WRITE,           // 1 (1) Save old ST in new R15
+	OPERAND_ADDR,           // x Determine source address
+	MEMORY_READ,            // 1 (1)
+	ALU_BLWP,               // 1 Got new WP, save it; increase address, save
+	MEMORY_WRITE,           // 1 (1) save old ST to new R15
+	ALU_BLWP,               // 1
+	MEMORY_WRITE,           // 1 (1) save old PC to new R14
+	ALU_BLWP,               // 1
+	MEMORY_WRITE,           // 1 (1) save old WP to new R13
+	ALU_BLWP,               // 1 retrieve address
+	MEMORY_READ,            // 1 (1) Read new PC
+	ALU_BLWP,               // 0 Set new PC
 	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
 	END
@@ -704,18 +642,16 @@ MICROPROGRAM(clr_seto_mp)
 	END
 };
 
-MICROPROGRAM(divide_mp)
+MICROPROGRAM(divide_mp)     // TODO: Verify cycles on the real machine
 {
 	OPERAND_ADDR,           // x Address of divisor S in Q=W1W2/S
 	MEMORY_READ,            // 1 (1) Get S
 	ALU_DIV,                // 1
 	MEMORY_READ,            // 1 (1) Get W1
-	ALU_DIV,                // 0 Set up W2 immediately after reading W1
-	MEMORY_READ,            // 1 (1) Get W2 even on overflow
-	ALU_DIV,                // Internal division clocks, one pass per clock
-	PREFETCH,               // Overflow: fetch the next instruction
-	ALU_NOP,                // 1
-	END,
+	ALU_DIV,                // 1 Check for overflow; skip next instruction if not
+	ABORT,                  // 1
+	MEMORY_READ,            // 1 (1) Get W2
+	ALU_DIV,                // d Calculate quotient
 	MEMORY_WRITE,           // 1 (1) Write quotient to &W1
 	ALU_DIV,                // 0
 	PREFETCH,               // 1 (1)
@@ -723,22 +659,21 @@ MICROPROGRAM(divide_mp)
 	END
 };
 
-MICROPROGRAM(divide_signed_mp)
+MICROPROGRAM(divide_signed_mp)  // TODO: Verify cycles on the real machine
 {
-	OPERAND_ADDR,
-	MEMORY_READ,            // Read divisor
+	OPERAND_ADDR,           // x Address of divisor S in Q=W1W2/S
+	MEMORY_READ,            // 1 (1) Get S
 	ALU_DIVS,               // 1
-	MEMORY_READ,            // Read R1 (low dividend word)
+	MEMORY_READ,            // 1 (1) Get W1
 	ALU_DIVS,               // 1
-	MEMORY_READ,            // Read R0 (high dividend word)
-	ALU_DIVS,               // 3, 6 or 25 clocks after the read
-	PREFETCH,               // Overflow path
-	ALU_NOP,                // 1
-	END,
-	MEMORY_WRITE,           // Write quotient to R0
+	MEMORY_READ,            // 1 (1) Get W2
+	ALU_DIVS,               // 1 Check for overflow, skip next instruction if not
+	ABORT,                  // 1
+	ALU_DIVS,               // d Calculate quotient
+	MEMORY_WRITE,           // 1 (1) Write quotient to &W1
 	ALU_DIVS,               // 0
-	PREFETCH,
-	MEMORY_WRITE,           // Write remainder to R1 after the fetch
+	PREFETCH,               // 1
+	MEMORY_WRITE,           // 1 (1) Write remainder to &W2
 	END
 };
 
@@ -748,20 +683,10 @@ MICROPROGRAM(external_mp)
 	ALU_NOP,                // 1
 	ALU_NOP,                // 1
 	ALU_NOP,                // 1
-	ALU_EXTERNAL,           // 1 Strobe the external code one clock before prefetch.
-	ALU_RSET_MASK,          // 0 RSET clears the mask before the interrupt check.
+	ALU_NOP,                // 1
+	ALU_EXTERNAL,           // 0
 	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
-	END
-};
-
-MICROPROGRAM(idle_mp)
-{
-	ALU_NOP, ALU_NOP, ALU_NOP, ALU_NOP,
-	ALU_EXTERNAL,           // Strobe the IDLE control code
-	ALU_IDLE_POLL,          // Repeat the two-clock control cycle until interrupted
-	ALU_EXTERNAL,           // Finish the final strobe before entering the vector
-	ALU_NOP, ALU_NOP,
 	END
 };
 
@@ -785,15 +710,16 @@ MICROPROGRAM(jump_mp)
 	END
 };
 
-MICROPROGRAM(ldcr_mp)
+MICROPROGRAM(ldcr_mp)       // TODO: Verify cycles
 {
-	ALU_LDCR,               // 0 Select byte or word before address derivation
+	ALU_LDCR,               // 1
 	OPERAND_ADDR,           // x
 	MEMORY_READ,            // 1 (1) Get source data
-	ALU_LDCR,               // 3 Save it, point to R12
+	ALU_LDCR,               // 1 Save it, point to R12
 	WORD_READ,              // 1 (1) Get R12
-	ALU_LDCR,               // 2 Prepare the first CRU strobe
-	CRU_OUTPUT,             // 2 per bit
+	ALU_LDCR,               // 1 Prepare CRU operation
+	CRU_OUTPUT,             // c
+	ALU_NOP,                // 0
 	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
 	END
@@ -844,11 +770,10 @@ MICROPROGRAM(mov_mp)
 MICROPROGRAM(multiply_mp)
 {
 	OPERAND_ADDR,           // x
-	MEMORY_READ,            // Source operand
-	ALU_MPY,                // MPY: 0, MPYS: 1
-	MEMORY_READ,            // Destination register (MPYS uses R0)
-	MPY_NEXT_WORD,          // MPY: internal clock or ordinary word read at PC
-	ALU_MPY,                // MPY: 17, MPYS: 19
+	MEMORY_READ,            // 1 (1)
+	ALU_MPY,                // 1
+	MEMORY_READ,            // 1 (1)
+	ALU_MPY,                // 17
 	MEMORY_WRITE,           // 1 (1)
 	ALU_MPY,                // 0
 	PREFETCH,               // 1 (1)
@@ -859,12 +784,12 @@ MICROPROGRAM(multiply_mp)
 MICROPROGRAM(rtwp_mp)
 {
 	ALU_RTWP,               // 1
-	MEMORY_READ,            // 1 (1) Old workspace R14: return PC
+	MEMORY_READ,            // 1 (1)
 	ALU_RTWP,               // 0
-	MEMORY_READ,            // 1 (1) Old workspace R15: saved ST
+	MEMORY_READ,            // 1 (1)
 	ALU_RTWP,               // 0
-	MEMORY_READ,            // 1 (1) Old workspace R13: saved WP
-	ALU_RTWP,               // 1
+	MEMORY_READ,            // 1 (1)
+	ALU_RTWP,               // 0
 	PREFETCH,               // 1 (1)
 	ALU_NOP,                // 1
 	END
@@ -873,12 +798,11 @@ MICROPROGRAM(rtwp_mp)
 MICROPROGRAM(sbo_sbz_mp)
 {
 	ALU_SBO_SBZ,            // 1 Set address = &R12
-	ALU_NOP,                // 1
 	WORD_READ,              // 1 (1) Read R12
-	ALU_SBO_SBZ,            // 1 Add signed bit displacement
-	ALU_NOP,                // 1 Set up the CRU transfer
-	CRU_OUTPUT,             // 1 Write the bit
+	ALU_SBO_SBZ,            // 1 Add offset
+	CRU_OUTPUT,             // 1 output via CRU
 	PREFETCH,               // 1 (1)
+	ALU_NOP,                // 1
 	ALU_NOP,                // 1
 	END
 };
@@ -886,9 +810,9 @@ MICROPROGRAM(sbo_sbz_mp)
 MICROPROGRAM(shift_mp)
 {
 	MEMORY_READ,            // 1 (1)
-	ALU_SHIFT,              // 2 for an encoded count, 1 before reading R0
-	MEMORY_READ,            // 1 (1) read R0 if the instruction count is zero
-	ALU_SHIFT,              // c shifts, plus 2 internal clocks if R0 supplied the count
+	ALU_SHIFT,              // 2 skip next operation if count != 0
+	MEMORY_READ,            // 1 (1) if count=0 we must read R0
+	ALU_SHIFT,              // c  do the shift
 	PREFETCH,               // 1 (1)
 	MEMORY_WRITE,           // 1 (1)
 	END
@@ -904,15 +828,15 @@ MICROPROGRAM(single_arithm_mp)
 	END
 };
 
-MICROPROGRAM(stcr_mp)
+MICROPROGRAM(stcr_mp)       // TODO: Verify on real machine
 {
-	ALU_STCR,               // 0     Select byte or word before address derivation
-	OPERAND_ADDR,           // x     Destination address
-	ALU_STCR,               // 4     Save destination, set R12
+	ALU_STCR,               // 1      Check for byte operation
+	OPERAND_ADDR,           // x     Source operand
+	ALU_STCR,               // 1      Save, set R12
 	WORD_READ,              // 1 (1) Read R12
-	ALU_STCR,               // 2     Prepare the first CRU strobe
-	CRU_INPUT,              // 2 per bit
-	ALU_STCR,               // 2 plus the unfilled bit positions in the byte or word
+	ALU_STCR,               // 1
+	CRU_INPUT,              // c
+	ALU_STCR,               // 13
 	PREFETCH,               // 1 (1)
 	MEMORY_WRITE,           // 1 (1)
 	END
@@ -929,14 +853,13 @@ MICROPROGRAM(stst_stwp_mp)
 
 MICROPROGRAM(tb_mp)
 {
-	ALU_TB,                 // 1 Set address = &R12
-	ALU_NOP,                // 1
-	WORD_READ,              // 1 (1) Read R12
-	ALU_TB,                 // 1 Add signed bit displacement
-	ALU_NOP,                // 1 Set up the CRU transfer
-	CRU_INPUT,              // 1 Read the bit
-	ALU_TB,                 // 0 Copy it to EQ
+	ALU_TB,                 // 1
+	WORD_READ,              // 1 (1)
+	ALU_TB,                 // 1
+	CRU_INPUT,              // 2
+	ALU_TB,                 // 0
 	PREFETCH,               // 1 (1)
+	ALU_NOP,                // 1
 	ALU_NOP,                // 1
 	END
 };
@@ -951,26 +874,22 @@ MICROPROGRAM(x_mp)
 
 MICROPROGRAM(xop_mp)
 {
-	OPERAND_ADDR,           // x Determine the effective address for R11
-	ALU_XOP,                // 1 Select the XOP vector
-	ALU_NOP,                // 1
-	ALU_NOP,                // 1
-	ALU_NOP,                // 1
+	OPERAND_ADDR,           // x     Determine source address
+	ALU_XOP,                // 1     Save it; determine XOP number
 	MEMORY_READ,            // 1 (1) Read new WP
 	ALU_XOP,                // 1
-	ALU_NOP,                // 1
-	ALU_NOP,                // 1
-	MEMORY_WRITE,           // 1 (1) Save the effective address in new R11
-	ALU_XOP,                // 0
+	MEMORY_WRITE,           // 1 (1) save source address to new R11
+	ALU_XOP,                // 1
+	MEMORY_WRITE,           // 1 (1) save old ST to new R15
+	ALU_XOP,                // 1
+	MEMORY_WRITE,           // 1 (1) save old PC to new R14
+	ALU_XOP,                // 1
+	MEMORY_WRITE,           // 1 (1) save old WP to new R13
+	ALU_XOP,                // 1
 	MEMORY_READ,            // 1 (1) Read new PC
-	ALU_XOP,                // 0
-	MEMORY_WRITE,           // 1 (1) Save old WP in new R13
-	ALU_XOP,                // 0
-	MEMORY_WRITE,           // 1 (1) Save return PC in new R14
-	ALU_XOP,                // 0
-	MEMORY_WRITE,           // 1 (1) Save old ST in new R15
-	ALU_XOP,                // 0 Update ST for handler entry
+	ALU_XOP,                // 0 set new PC, set X flag
 	PREFETCH,               // 1 (1)
+	ALU_NOP,                // 1
 	ALU_NOP,                // 1
 	END
 };
@@ -987,34 +906,22 @@ MICROPROGRAM(xor_mp)
 	END
 };
 
-MICROPROGRAM(reset_mp)
-{
-	ALU_NOP, ALU_NOP, ALU_NOP,          // sampled release to first vector read
-	WORD_READ,                          // >0000: new WP
-	ALU_RESET,
-	ALU_NOP, ALU_NOP, ALU_NOP, ALU_NOP, // four internal cycles between words
-	WORD_READ,                          // >0002: new PC
-	ALU_RESET, WORD_WRITE,              // R13: interrupted WP
-	ALU_RESET, WORD_WRITE,              // R14: interrupted PC
-	ALU_RESET, WORD_WRITE,              // R15: interrupted ST
-	PREFETCH_NO_INT,
-	ALU_NOP,                            // one clock from the completed fetch to the first instruction
-	END
-};
-
 MICROPROGRAM(int_mp)
 {
-	ALU_NOP, ALU_NOP, ALU_NOP,
-	WORD_READ,                          // Vector word 1: new WP
-	ALU_CONTEXT,                        // Advance to the second word (one clock)
-	ALU_NOP, ALU_NOP, ALU_NOP,          // Four clocks between the vector words
-	WORD_READ,                          // Vector word 2: handler PC
-	ALU_CONTEXT, WORD_WRITE,            // R13: old WP
-	ALU_CONTEXT, WORD_WRITE,            // R14: return PC
-	ALU_CONTEXT, WORD_WRITE,            // R15: old ST
-	ALU_CONTEXT,                        // Apply the entry mask after saving ST
-	PREFETCH_NO_INT,
-	ALU_NOP,
+	ALU_INT,                // 1
+	MEMORY_READ,            // 1 (1)
+	ALU_INT,                // 2
+	MEMORY_WRITE,           // 1 (1)
+	ALU_INT,                // 1
+	MEMORY_WRITE,           // 1 (1)
+	ALU_INT,                // 1
+	MEMORY_WRITE,           // 1 (1)
+	ALU_INT,                // 1
+	MEMORY_READ,            // 1 (1)
+	ALU_INT,                // 0
+	PREFETCH_NO_INT,        // 1 (1)  (prefetch happens in parallel to the previous operation)
+	ALU_NOP,                // 1 (+decode in parallel; actually performed right after prefetch)
+	ALU_NOP,                // 1
 	END
 };
 
@@ -1040,15 +947,13 @@ const tms9995_device::ophandler tms9995_device::s_microoperation[] =
 	&tms9995_device::alu_nop,
 	&tms9995_device::alu_add_s_sxc,
 	&tms9995_device::alu_b,
-	&tms9995_device::alu_context,
+	&tms9995_device::alu_blwp,
 	&tms9995_device::alu_c,
 	&tms9995_device::alu_ci,
 	&tms9995_device::alu_clr_seto,
 	&tms9995_device::alu_divide,
 	&tms9995_device::alu_divide_signed,
 	&tms9995_device::alu_external,
-	&tms9995_device::alu_rset_mask,
-	&tms9995_device::alu_idle_poll,
 	&tms9995_device::alu_f3,
 	&tms9995_device::alu_imm_arithm,
 	&tms9995_device::alu_jump,
@@ -1058,7 +963,6 @@ const tms9995_device::ophandler tms9995_device::s_microoperation[] =
 	&tms9995_device::alu_lst_lwp,
 	&tms9995_device::alu_mov,
 	&tms9995_device::alu_multiply,
-	&tms9995_device::mpy_next_word_cycle,
 	&tms9995_device::alu_rtwp,
 	&tms9995_device::alu_sbo_sbz,
 	&tms9995_device::alu_shift,
@@ -1068,7 +972,7 @@ const tms9995_device::ophandler tms9995_device::s_microoperation[] =
 	&tms9995_device::alu_tb,
 	&tms9995_device::alu_x,
 	&tms9995_device::alu_xop,
-	&tms9995_device::alu_reset
+	&tms9995_device::alu_int
 };
 
 /*****************************************************************************
@@ -1090,7 +994,7 @@ enum
 	LIMI, LREX, LST, LWP, LWPI, MOV, MOVB, MPY, MPYS, NEG,
 	ORI, RSET, RTWP, S, SB, SBO, SBZ, SETO, SLA, SOC,
 	SOCB, SRA, SRC, SRL, STCR, STST, STWP, SWPB, SZC, SZCB,
-	TB, X, XOP, XOR, INTR, OPAD, RESET_ENTRY
+	TB, X, XOP, XOR, INTR, OPAD
 };
 
 static const char opname[][5] =
@@ -1101,7 +1005,7 @@ static const char opname[][5] =
 	"LIMI", "LREX", "LST ", "LWP ", "LWPI", "MOV ", "MOVB", "MPY ", "MPYS", "NEG ",
 	"ORI ", "RSET", "RTWP", "S   ", "SB  ", "SBO ", "SBZ ", "SETO", "SLA ", "SOC ",
 	"SOCB", "SRA ", "SRC ", "SRL ", "STCR", "STST", "STWP", "SWPB", "SZC ", "SZCB",
-	"TB  ", "X   ", "XOP ", "XOR ", "*int", "*oad", "*rst"
+	"TB  ", "X   ", "XOP ", "XOR ", "*int", "*oad"
 };
 
 /*
@@ -1159,7 +1063,7 @@ const tms9995_device::tms_instruction tms9995_device::s_command[] =
 	{ 0x02c0, STST, 8, stst_stwp_mp },
 	{ 0x02e0, LWPI, 8, limi_lwpi_mp },
 	{ 0x0300, LIMI, 8, limi_lwpi_mp },
-	{ 0x0340, IDLE, 7, idle_mp },
+	{ 0x0340, IDLE, 7, external_mp },
 	{ 0x0360, RSET, 7, external_mp },
 	{ 0x0380, RTWP, 7, rtwp_mp },
 	{ 0x03a0, CKON, 7, external_mp },
@@ -1220,11 +1124,9 @@ const tms9995_device::tms_instruction tms9995_device::s_command[] =
 	{ 0xe000, SOC, 1, add_s_sxc_mp },
 	{ 0xf000, SOCB, 1, add_s_sxc_mp },
 
-	// Special microprograms, excluded from the opcode lookup table.
+// Special entries for interrupt and the address derivation subprogram; not in lookup table
 	{ 0x0000, INTR, 1, int_mp},
-	{ 0x0000, OPAD, 1, operand_address_derivation },
-	{ 0x0000, RESET_ENTRY, 1, reset_mp },
-	{ 0x0000, MID, 1, int_mp }
+	{ 0x0000, OPAD, 1, operand_address_derivation }
 };
 
 /*
@@ -1299,10 +1201,9 @@ void tms9995_device::build_command_lookup_table()
 		i++;
 	} while (inst->opcode != 0xf000);
 
+	// Save the index to these two special microprograms
 	m_interrupt_mp_index = i++;
-	m_operand_address_derivation_index = i++;
-	m_reset_mp_index = i++;
-	m_mid_mp_index = i;
+	m_operand_address_derivation_index = i;
 }
 
 /*
@@ -1320,32 +1221,9 @@ void tms9995_device::execute_run()
 	LOGMASKED(LOG_EMU, "calling execute_run for %d cycles\n", m_icount);
 	do
 	{
-		// TI figure 15 guarantees reset with four falling edges. The A11
-		// captures also show restart after three sampled edges at 8 MHz.
-		if (m_reset_samples >= 3 && !reset_bus_active())
+		// Normal operation
+		if (m_check_ready && m_ready == false)
 		{
-			m_auto_wait = m_auto_wait_on_reset.value_or(m_reset_ready);
-			m_reset_samples = 0;
-			m_reset_bus_clocks = 0;
-			m_reset_byte_pending = false;
-			m_reset = true;
-			service_interrupt();
-		}
-		// The address and strobe outputs settle before reset is qualified on
-		// the fourth falling edge (TI figure 15). Until then an in-flight
-		// microprogram can still issue transfers on the first two bus clocks.
-		if ((m_reset_bus_clocks >= 2 && reset_bus_active()) || (MPC < 0 && m_reset_asserted))
-			pulse_clock(1);
-		else if (m_check_ready && !m_ready)
-		{
-			if (m_mem_phase == 2 && m_pass == 3 && reset_bus_active())
-			{
-				// During the automatic wait on the first byte, reset ends the
-				// data phase but the address sequencer still advances to A15=1.
-				m_reset_byte_pending = true;
-				m_reset_byte_address = m_address | 1;
-				m_pass = 1;
-			}
 			// We are in a wait state
 			LOGMASKED(LOG_WAIT, "wait\n");
 			// The clock output should be used to change the state of an outer
@@ -1354,13 +1232,16 @@ void tms9995_device::execute_run()
 		}
 		else
 		{
-			if (m_check_hold && m_hold_sampled)
+			if (m_check_hold && m_hold_requested)
 			{
+				set_hold_state(true);
 				LOGMASKED(LOG_HOLD, "HOLD state\n");
-				pulse_clock(1, true);
+				pulse_clock(1);
 			}
 			else
 			{
+				set_hold_state(false);
+
 				m_check_ready = false;
 
 				LOGMASKED(LOG_MICRO, "main loop, operation %s, MPC = %d\n", opname[m_command], MPC);
@@ -1387,7 +1268,7 @@ void tms9995_device::execute_run()
 /*
     Interrupt input
     output
-        m_nmi_serviced
+        m_nmi_state
         m_irq_level
         flag[2], flag[4]
 */
@@ -1395,7 +1276,11 @@ void tms9995_device::execute_set_input(int irqline, int state)
 {
 	if (irqline == INT_9995_RESET)
 	{
-		reset_line(state);
+		if (state == ASSERT_LINE)
+		{
+			logerror("RESET interrupt line; READY=%d\n", m_ready_bufd);
+			reset_line(ASSERT_LINE);
+		}
 	}
 	else
 	{
@@ -1424,9 +1309,9 @@ void tms9995_device::execute_set_input(int irqline, int state)
 				if (irqline == INT_9995_INT4)
 				{
 					LOGMASKED(LOG_INT, "Line INT4/EC state=%d\n", state);
-					m_int4_active = (state==ASSERT_LINE);
 					if (m_flag[0]==false)
 					{
+						m_int4_active = (state==ASSERT_LINE);
 						LOGMASKED(LOG_INT, "set as interrupt\n");
 						// Latch the INT
 						if (state==ASSERT_LINE)
@@ -1434,6 +1319,11 @@ void tms9995_device::execute_set_input(int irqline, int state)
 							LOGMASKED(LOG_INT, "Latch INT4\n");
 							m_flag[4] = true;
 						}
+					}
+					else
+					{
+						LOGMASKED(LOG_INT, "set as event count\n");
+						trigger_decrementer();
 					}
 				}
 				else
@@ -1445,113 +1335,31 @@ void tms9995_device::execute_set_input(int irqline, int state)
 	}
 }
 
-// Device resets have no pin duration. Board-driven resets are sampled in pulse_clock().
-void tms9995_device::device_reset()
-{
-	if (!m_reset_asserted && !m_reset)
-	{
-		capture_reset_context();
-		m_auto_wait = m_auto_wait_on_reset.value_or(m_ready_bufd);
-		m_reset = true;
-	}
-}
-
-void tms9995_device::capture_reset_context()
-{
-	m_reset_wp = WP;
-	m_reset_pc = m_iaq ? PC : (PC - 2) & 0xfffe;
-	m_reset_st = ST;
-}
-
+/*
+    Triggers a RESET.
+*/
 void tms9995_device::reset_line(int state)
 {
-	const bool asserted = state == ASSERT_LINE;
-	if (asserted == m_reset_asserted)
-		return;
-	const attotime now = machine().time();
-	if (asserted)
-		capture_reset_context();
-	else
+	if (state==ASSERT_LINE)
 	{
-		m_reset_ready = m_ready_bufd;
-		// Some boards deliver a whole machine reset at one scheduler timestamp.
-		if (now == m_reset_transition)
-		{
-			capture_reset_context();
-			m_auto_wait = m_auto_wait_on_reset.value_or(m_reset_ready);
-			m_reset = true;
-			m_reset_samples = 0;
-		}
+		m_reset = true;     // for the main loop
+		m_log_interrupt = false;   // only for debugging
+		m_request_auto_wait_state = false;
+		m_hold_requested = false;
+		memset(m_flag, 0, sizeof(m_flag));
 	}
-	m_reset_asserted = asserted;
-	m_reset_transition = now;
-}
-
-bool tms9995_device::reset_bus_active() const
-{
-	return (m_reset_asserted || m_reset_samples) && reset_at(local_time());
-}
-
-bool tms9995_device::reset_at(attotime time) const
-{
-	return m_reset_transition != attotime::never && ((time >= m_reset_transition) == m_reset_asserted);
 }
 
 /*
     Issue a pulse on the clock line.
 */
-void tms9995_device::pulse_clock(int count, bool hold_cycle, int write_address, uint8_t write_data)
+void tms9995_device::pulse_clock(int count)
 {
 	for (int i=0; i < count; i++)
 	{
 		if (!m_clock_out_line.isunset()) m_clock_out_line(ASSERT_LINE);
-		m_hold_sampled = m_hold_requested;
-		if (hold_cycle && !m_hold_state)
-			set_hold_state(true);
-		// External maskable requests reach the prefetch decision three rising edges later.
-		m_int1_samples = ((m_int1_samples << 1) | (m_int1_active || m_flag[2])) & 7;
-		m_int4_samples = ((m_int4_samples << 1) | (!m_flag[0] && (m_int4_active || m_flag[4]))) & 7;
-		// Keep the physical pin history even while this input is routed to INT4.
-		m_ec_samples = ((m_ec_samples << 1) | m_int4_active) & 7;
+		m_ready = m_ready_bufd && !m_request_auto_wait_state;                // get the latched READY state
 		if (!m_clock_out_line.isunset()) m_clock_out_line(CLEAR_LINE);
-		m_ready_fall = local_time() + clocks_to_attotime(2);
-		if (write_address >= 0 && !reset_at(m_ready_fall))
-			m_prgspace->write_byte(write_address, write_data);
-		if (m_reset_asserted || m_reset_samples || m_reset_bus_clocks)
-		{
-			if (reset_at(m_ready_fall))
-			{
-				if (m_reset_samples < 4)
-					++m_reset_samples;
-			}
-			else if (m_reset_samples < 3)
-				m_reset_samples = 0;
-			if (reset_bus_active())
-			{
-				if (m_reset_bus_clocks < 2)
-					++m_reset_bus_clocks;
-			}
-			else
-			{
-				m_reset_bus_clocks = 0;
-				m_reset_byte_pending = false;
-			}
-		}
-		m_ready_sample_auto = m_request_auto_wait_state;
-		m_ready = !m_ready_sample_auto && (m_ready_fall == m_ready_deferred_fall ? m_ready_before_late_edge : m_ready_bufd);
-		if (m_cru_sample_pending && m_ready)
-		{
-			shift_cru_input(BIT(m_cru->read_byte(m_cru_sample_address), 0));
-			m_cru_sample_pending = false;
-		}
-		// Release HOLDA on this falling edge. The next bus cycle can start at
-		// the following rising edge, after the sampled HOLD request clears.
-		if (m_hold_state && !m_hold_sampled)
-			set_hold_state(false);
-		// NMI is sampled on falling edges. A held request can enter only once.
-		m_nmi_samples = ((m_nmi_samples << 1) | m_nmi_active) & 3;
-		if ((m_nmi_samples & 2) == 0)
-			m_nmi_serviced = false;
 		m_icount--;                         // This is the only location where we count down the cycles.
 
 		if (m_check_ready)
@@ -1560,18 +1368,27 @@ void tms9995_device::pulse_clock(int count, bool hold_cycle, int write_address, 
 			LOGMASKED(LOG_CLOCK, "pulse_clock\n");
 
 		m_request_auto_wait_state = false;
-		if (!m_mp9537)
-			clock_decrementer();
+		if (m_flag[0] == false && m_flag[1] == true)
+		{
+			// Section 2.3.1.2.2: "by decreasing the count in the Decrementing
+			// Register by one for each fourth CLKOUT cycle"
+			m_decrementer_clkdiv = (m_decrementer_clkdiv+1)%4;
+			if (m_decrementer_clkdiv==0) trigger_decrementer();
+		}
 	}
 }
 
 /*
-    Drive the HOLD input. The clocked bus arbitration updates HOLDA.
+    Enter the hold state.
 */
 void tms9995_device::hold_line(int state)
 {
 	m_hold_requested = (state==ASSERT_LINE);
 	LOGMASKED(LOG_HOLD, "set HOLD = %d\n", state);
+	if (!m_hold_requested)
+	{
+		if (!m_holda_line.isunset()) m_holda_line(CLEAR_LINE);
+	}
 }
 
 /*
@@ -1580,22 +1397,19 @@ void tms9995_device::hold_line(int state)
 */
 void tms9995_device::ready_line(int state)
 {
-	const bool newready = state == ASSERT_LINE;
+	bool newready = (state==ASSERT_LINE);
+
 	if (newready != m_ready_bufd)
 	{
-		// A scheduler callback can be on either side of the CPU's current
-		// whole CLKOUT cycle. Preserve the pin at the falling edge in both cases.
-		const attotime now = machine().time();
-		const attotime fall = local_time() + clocks_to_attotime(2);
-		if (now > fall && m_ready_deferred_fall != fall)
+		if (m_reset)
 		{
-			m_ready_before_late_edge = m_ready_bufd;
-			m_ready_deferred_fall = fall;
+			LOGMASKED(LOG_WARN, "Ignoring READY=%d change due to pending RESET\n", state);
 		}
-		if (m_ready_fall != attotime::never && now <= m_ready_fall && now > m_ready_fall - clocks_to_attotime(4))
-			m_ready = newready && !m_ready_sample_auto;
-		m_ready_bufd = newready;
-		LOGMASKED(LOG_READY, "set READY = %d\n", m_ready_bufd);
+		else
+		{
+			m_ready_bufd = newready;
+			LOGMASKED(LOG_READY, "set READY = %d\n", m_ready_bufd? 1 : 0);
+		}
 	}
 }
 
@@ -1668,44 +1482,68 @@ void tms9995_device::decode(uint16_t inst)
 }
 
 /*
-    Choose one request at the prefetch decision. Lower priority requests stay
-    in their source latches and are tested again against the new interrupt mask.
+    Fetch the next instruction and check pending interrupts before.
+    Getting an instruction is a normal memory access (plus an asserted IAQ line),
+    so this is subject to wait state handling. We have to allow for a two-pass
+    handling.
 */
-bool tms9995_device::check_interrupts()
-{
-	if ((m_nmi_samples & 2) && !m_nmi_serviced)
-	{
-		m_int_pending = PENDING_NMI;
-		m_nmi_serviced = true;
-	}
-	else
-	{
-		m_int_pending = 0;
-		if (m_command != XOP && m_command != BLWP)
-		{
-			const int mask = ST & 0x000f;
-			if ((m_int1_samples & 4) && mask >= 1)
-				m_int_pending = PENDING_LEVEL1;
-			else if (m_int_overflow && mask >= 2)
-				m_int_pending = PENDING_OVERFLOW;
-			else if (m_flag[3] && mask >= 3)
-				m_int_pending = PENDING_DECR;
-			else if ((m_int4_samples & 4) && mask >= 4)
-				m_int_pending = PENDING_LEVEL4;
-		}
-	}
-	return m_int_pending != 0;
-}
-
 void tms9995_device::int_prefetch_and_decode()
 {
-	if (m_mem_phase == 1 && check_interrupts())
+	int intmask = ST & 0x000f;
+
+	if (m_mem_phase == 1)
 	{
-		// A suppressed prefetch occupies one internal clock, even for an
-		// external PC. Complete any pending result write in its normal slot.
-		pulse_clock(1);
-		return;
+		// Check interrupt lines
+		if (m_nmi_active)
+		{
+			LOGMASKED(LOG_INT, "Checking interrupts ... NMI active\n");
+			m_int_pending |= PENDING_NMI;
+			m_idle_state = false;
+			PC = (PC + 2) & 0xfffe;     // we have not prefetched the next instruction
+			return;
+		}
+		else
+		{
+			m_int_pending = 0;
+			// If the current command is XOP or BLWP, ignore the interrupt
+			if (m_command != XOP && m_command != BLWP)
+			{
+				// The actual interrupt trigger is an OR of the latch and of
+				// the interrupt line (for INT1 and INT4); see [1],
+				// section 2.3.2.1.3
+				if ((m_int1_active || m_flag[2]) && intmask >= 1) m_int_pending |= PENDING_LEVEL1;
+				if (m_int_overflow && intmask >= 2) m_int_pending |= PENDING_OVERFLOW;
+				if (m_flag[3] && intmask >= 3) m_int_pending |= PENDING_DECR;
+				if ((m_int4_active || m_flag[4]) && intmask >= 4) m_int_pending |= PENDING_LEVEL4;
+			}
+
+			if (m_int_pending!=0)
+			{
+				if (m_idle_state)
+				{
+					m_idle_state = false;
+					LOGMASKED(LOG_INT, "Interrupt occurred, terminate IDLE state\n");
+				}
+				PC = PC + 2;        // PC must be advanced (see flow chart), but no prefetch
+				LOGMASKED(LOG_INT, "Interrupts pending; no prefetch; advance PC to %04x\n", PC);
+				return;
+			}
+			else
+			{
+				// No pending interrupts
+				if (m_idle_state)
+				{
+					LOGMASKED(LOG_IDLE, "IDLE state\n");
+					// We are IDLE, stay in the loop and do not advance the PC
+					m_pass = 2;
+					pulse_clock(1);
+					return;
+				}
+			}
+		}
 	}
+
+	// We reach this point in phase 1 if there is no interrupt and in all other phases
 	prefetch_and_decode();
 }
 
@@ -1719,14 +1557,6 @@ void tms9995_device::prefetch_and_decode()
 {
 	if (m_mem_phase==1)
 	{
-		// NMI may single-step a MID macro before the first handler opcode is fetched.
-		if (m_command == MID && (m_nmi_samples & 2) && !m_nmi_serviced)
-		{
-			m_nmi_serviced = true;
-			m_int_pending = PENDING_NMI;
-			service_interrupt();
-			return;
-		}
 		// Fetch next instruction
 		// Save these values; they have been computed during the current instruction execution
 		m_address_copy = m_address;
@@ -1813,12 +1643,7 @@ void tms9995_device::command_completed()
 	else
 	{
 		if ((ST & ST_OE)!=0 && (ST & ST_OV)!=0 && (ST & 0x000f)>2)
-		{
-			// This path did fetch an opcode before discovering the overflow.
-			PC = (PC - 2) & 0xfffe;
-			m_int_pending = PENDING_OVERFLOW;
 			service_interrupt();
-		}
 		else
 			next_command();
 	}
@@ -1830,54 +1655,42 @@ void tms9995_device::command_completed()
 void tms9995_device::service_interrupt()
 {
 	int vectorpos;
-	int entry = m_interrupt_mp_index;
 
 	if (m_reset)
 	{
-		entry = m_reset_mp_index;
 		vectorpos = 0;
-		// These latches survive both vector reads and the three context writes.
-		m_source_value = m_reset_wp;
-		m_address_saved = m_reset_pc;
-		m_value_copy = m_reset_st;
-		m_cru_sample_pending = false;
-		m_request_auto_wait_state = false;
 		m_intmask = 0;  // clear interrupt mask
-		m_iaq = false;  // a reset can interrupt an instruction fetch
-		m_idle_state = false;
 
-		m_nmi_serviced = false;
-		m_nmi_samples = m_int1_samples = m_int4_samples = 0;
+		m_nmi_state = false;
 		m_hold_requested = false;
-		m_hold_sampled = false;
-		set_hold_state(false);
+		m_hold_state = false;
 		m_mem_phase = 1;
 		m_check_hold = true;
 		m_word_access = false;
 		m_int1_active = false;
 		m_int4_active = false;
 		m_decrementer_clkdiv = 0;
-		m_decrementer_reload = 0;
-		m_decrementer_enabled = false;
-		m_ec_samples = 0;
 
-		m_mid_flag = false;
-		m_mid_active = false;
-		m_int_pending = 0;
-		m_int_overflow = false;
+		m_pass = 0;
 
 		memset(m_flag, 0, sizeof(m_flag));
 
 		ST = 0;
+
+		// The auto-wait state generation is turned on when the READY line is cleared
+		// on RESET.
+		m_auto_wait = !m_ready_bufd;
+		logerror("RESET; automatic wait state creation is %s\n", m_auto_wait? "enabled":"disabled");
+		// We reset the READY flag, or the CPU will not start
+		m_ready_bufd = true;
 	}
 	else
 	{
 		if (m_mid_active)
 		{
-			entry = m_mid_mp_index;
 			vectorpos = 0x0008;
 			m_intmask = 0x0001;
-			// Prefetch has already advanced PC to the return address for R14.
+			PC = (PC + 2) & 0xfffe;
 			LOGMASKED(LOG_INT, "** MID pending\n");
 			m_mid_active = false;
 		}
@@ -1945,12 +1758,13 @@ void tms9995_device::service_interrupt()
 	// The microinstructions will do the context switch
 	m_address = vectorpos;
 
-	m_index = entry;
+	m_index = m_interrupt_mp_index;
 	m_inst_state = 0;
 	m_byteop = false;
-	m_command = s_command[entry].id;
+	m_command = INTR;
 
 	m_pass = m_reset? 1 : 2;
+	m_from_reset = m_reset;
 
 	if (m_reset)
 	{
@@ -1978,33 +1792,6 @@ void tms9995_device::service_interrupt()
 
     Make sure that m_lowbyte is false on the first call.
 */
-void tms9995_device::set_bus_address(uint16_t address, uint8_t kind)
-{
-	if (reset_bus_active())
-	{
-		kind &= ~TMS99xx_BUS_IAQ;
-		if (m_reset_byte_pending)
-			address = m_reset_byte_address;
-		else if (!is_onchip(address) && ((address & 0xfffe) != 0xfffa || m_mp9537) && (m_mem_phase == 1 || (m_auto_wait && m_mem_phase == 3)))
-		{
-			m_reset_byte_pending = true;
-			m_reset_byte_address = m_auto_wait ? address : (address | 1);
-		}
-	}
-	if (m_setaddr)
-		m_setaddr->write_byte(address, kind);
-}
-
-uint8_t tms9995_device::read_external(uint16_t address)
-{
-	if (reset_bus_active())
-	{
-		auto guard = machine().disable_side_effects();
-		return m_prgspace->read_byte(address);
-	}
-	return m_prgspace->read_byte(address);
-}
-
 void tms9995_device::mem_read()
 {
 	// First determine whether the memory is inside the CPU
@@ -2016,13 +1803,9 @@ void tms9995_device::mem_read()
 	if ((m_address & 0xfffe)==0xfffa && !m_mp9537)
 	{
 		LOGMASKED(LOG_DEC, "read dec=%04x\n", m_decrementer_value);
-		const bool byte_access = m_byteop && !m_word_access;
-		m_check_ready = false;
-		set_bus_address(byte_access ? m_address : m_address & 0xfffe,
-					TMS99xx_BUS_DBIN | (m_iaq ? TMS99xx_BUS_IAQ : 0));
 		// Decrementer mapped into the address space
 		m_current_value = m_decrementer_value;
-		if (byte_access)
+		if (m_byteop)
 		{
 			// When reading FFFB, return the lower byte
 			if ((m_address & 1)==1) m_current_value <<= 8;
@@ -2047,8 +1830,10 @@ void tms9995_device::mem_read()
 		// We put fffc-ffff back into the f000-f0ff area
 		offs_t intaddr = m_address & 0x00fe;
 
-		// The bus shows the addressed byte even though the RAM supplies a full word.
-		set_bus_address(m_address, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
+		// An on-chip memory access is also visible to the outside world ([1], 2.3.1.2)
+		// but only on word boundary, as only full words are read.
+		if (m_setaddr)
+			m_setaddr->write_byte(m_address & 0xfffe, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
 
 		// Always read a word from internal memory
 		m_current_value = (m_onchip_memory[intaddr] << 8) | m_onchip_memory[intaddr + 1];
@@ -2063,19 +1848,6 @@ void tms9995_device::mem_read()
 	else
 	{
 		// This is an off-chip access
-		if (m_mem_phase == 1 && reset_bus_active())
-		{
-			// Once reset is sampled, the control sequencer no longer waits for
-			// an external word. The byte sequencer can still drive its low address.
-			const bool word = m_word_access || !m_byteop;
-			const uint16_t address = word ? m_address & 0xfffe : m_address;
-			set_bus_address(address, TMS99xx_BUS_DBIN);
-			m_current_value = read_external(address) << 8;
-			if (word)
-				m_current_value |= read_external(address | 1);
-			pulse_clock(1);
-			return;
-		}
 		m_check_ready = true;
 		uint8_t value;
 		uint16_t address = m_address;
@@ -2095,29 +1867,29 @@ void tms9995_device::mem_read()
 
 			m_check_hold = false;
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address & 0xfffe);
-			set_bus_address(address, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
-			m_request_auto_wait_state = m_auto_wait && !reset_bus_active();
+			if (m_setaddr)
+				m_setaddr->write_byte(address, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
+			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
 		case 2:
 			// Sample the value on the data bus (high byte)
 			if (m_word_access || !m_byteop) address &= 0xfffe;
-			value = read_external(address);
+			value = m_prgspace->read_byte(address);
 			LOGMASKED(LOG_MEM, "memory read byte %04x -> %02x\n", m_address & 0xfffe, value);
 			m_current_value = (value << 8) & 0xff00;
-			if (m_pass == 1 && (m_word_access || !m_byteop) && reset_bus_active())
-				m_current_value |= read_external(address | 1);
 			break;
 		case 3:
 			// Set address + 1 (unless byte command)
 			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
-			set_bus_address(m_address | 1, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
-			m_request_auto_wait_state = m_auto_wait && !reset_bus_active();
+			if (m_setaddr)
+				m_setaddr->write_byte(m_address | 1, (TMS99xx_BUS_DBIN | (m_iaq? TMS99xx_BUS_IAQ : 0)));
+			m_request_auto_wait_state = m_auto_wait;
 			pulse_clock(1);
 			break;
 		case 4:
 			// Read low byte
-			value = read_external(m_address | 1);
+			value = m_prgspace->read_byte(m_address | 1);
 			m_current_value |= value;
 			LOGMASKED(LOG_MEM, "memory read byte %04x -> %02x, complete word = %04x\n", m_address | 1, value, m_current_value);
 			m_check_hold = true;
@@ -2165,23 +1937,11 @@ inline void tms9995_device::word_read()
 
     Make sure that m_lowbyte is false on the first call.
 */
-// A board can see /WE before the data byte is accepted. Preserve that
-// distinction if RESET reaches the CPU before the falling CLKOUT edge.
-void tms9995_device::external_write_cycle(uint16_t address, uint8_t data)
-{
-	set_bus_address(address, TMS99xx_BUS_WRITE);
-	m_request_auto_wait_state = m_auto_wait && !reset_bus_active();
-	pulse_clock(1, false, address, data);
-}
-
 void tms9995_device::mem_write()
 {
 	if ((m_address & 0xfffe)==0xfffa && !m_mp9537)
 	{
-		const bool byte_access = m_byteop && !m_word_access;
-		m_check_ready = false;
-		set_bus_address(byte_access ? m_address : m_address & 0xfffe, TMS99xx_BUS_WRITE);
-		if (byte_access)
+		if (m_byteop)
 		{
 			// According to [1], section 2.3.1.2.2:
 			// "The decrementer should always be accessed as a full word. [...]
@@ -2193,10 +1953,14 @@ void tms9995_device::mem_write()
 			// after a byte operation
 			u16 decbyte = m_current_value & 0xff00;
 			m_current_value = decbyte | (decbyte >> 8);
+
+			// dito: "This also loads the Decrementing Register with the same count."
+			m_starting_count_storage_register = m_decrementer_value = m_current_value;
 		}
-		m_starting_count_storage_register = m_decrementer_value = m_current_value;
-		m_decrementer_clkdiv = 0;
-		m_decrementer_reload = 0;
+		else
+		{
+			m_starting_count_storage_register = m_decrementer_value = m_current_value;
+		}
 		LOGMASKED(LOG_DEC, "Setting dec=%04x [PC=%04x]\n", m_current_value, PC);
 		pulse_clock(1);
 		return;
@@ -2213,14 +1977,10 @@ void tms9995_device::mem_write()
 
 		// An on-chip memory access is also visible to the outside world ([1], 2.3.1.2)
 		// but only on word boundary
-		set_bus_address(m_address & 0xfffe, TMS99xx_BUS_WRITE);
+		if (m_setaddr)
+				m_setaddr->write_byte(m_address & 0xfffe, TMS99xx_BUS_WRITE);
 
 		m_check_ready = false;
-		if (reset_bus_active())
-		{
-			pulse_clock(1);
-			return;
-		}
 		m_onchip_memory[m_address & 0x00ff] = (m_current_value >> 8) & 0xff;
 		if (m_word_access || !m_byteop)
 		{
@@ -2231,12 +1991,6 @@ void tms9995_device::mem_write()
 	else
 	{
 		// This is an off-chip access
-		if (m_mem_phase == 1 && reset_bus_active())
-		{
-			set_bus_address(m_word_access || !m_byteop ? m_address & 0xfffe : m_address, TMS99xx_BUS_WRITE);
-			pulse_clock(1);
-			return;
-		}
 		m_check_ready = true;
 		uint16_t address = m_address;
 		switch (m_mem_phase)
@@ -2252,7 +2006,13 @@ void tms9995_device::mem_write()
 			else m_pass = 2;
 
 			m_check_hold = false;
-			external_write_cycle(address, m_current_value >> 8);
+			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", address);
+			if (m_setaddr)
+				m_setaddr->write_byte(address, TMS99xx_BUS_WRITE);
+			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", address, (m_current_value >> 8)&0xff);
+			m_prgspace->write_byte(address, (m_current_value >> 8)&0xff);
+			m_request_auto_wait_state = m_auto_wait;
+			pulse_clock(1);
 			break;
 
 		case 2:
@@ -2260,7 +2020,13 @@ void tms9995_device::mem_write()
 			break;
 		case 3:
 			// Set address + 1 (unless byte command)
-			external_write_cycle(m_address | 1, m_current_value & 0xff);
+			LOGMASKED(LOG_ADDRESSBUS, "set address bus %04x\n", m_address | 1);
+			if (m_setaddr)
+				m_setaddr->write_byte(m_address | 1, TMS99xx_BUS_WRITE);
+			LOGMASKED(LOG_MEM, "memory write byte %04x <- %02x\n", m_address | 1, m_current_value & 0xff);
+			m_prgspace->write_byte(m_address | 1, m_current_value & 0xff);
+			m_request_auto_wait_state = m_auto_wait;
+			pulse_clock(1);
 			break;
 		case 4:
 			// no action here, just wait for READY
@@ -2370,9 +2136,6 @@ void tms9995_device::cru_output_operation()
 			LOGMASKED(LOG_CRU, "set CRU address %04x to %d\n", m_cru_address, m_cru_value&1);
 			if ((m_cru_address != 0x1ee4) && (m_cru_address != 0x1ee6) && (m_cru_address != 0x1ee8))
 				m_flag[(m_cru_address>>1)&0x000f] = (m_cru_value & 0x01);
-			// Disabling the decrementer also clears the level-3 request latch.
-			if (m_cru_address == 0x1ee2 && !m_flag[1])
-				m_flag[3] = false;
 		}
 		else
 		{
@@ -2387,27 +2150,14 @@ void tms9995_device::cru_output_operation()
 	// of the CPU. However, no wait states are generated for internal
 	// accesses. ([1], section 2.3.3.2)
 
-	if (m_reset_bus_clocks && reset_bus_active())
-	{
-		// /WE shares its pin with CRUCLK. Once the memory controls take
-		// over, CRUOUT remains on A15 without a qualified CRU transfer.
-		if (m_setaddr)
-		{
-			const uint16_t address = (m_cru_address & CRUWRITEMASK) | (m_cru_value & 1);
-			m_setaddr->write_byte(address, TMS99xx_BUS_DBIN);
-			m_setaddr->write_byte(address, TMS99xx_BUS_WRITE);
-		}
-	}
-	else
-		m_cru->write_byte(m_cru_address & CRUWRITEMASK, m_cru_value & 1);
+	m_cru->write_byte(m_cru_address & CRUWRITEMASK, (m_cru_value & 0x01));
 	m_cru_value >>= 1;
 	m_cru_address = (m_cru_address + 2) & 0xfffe;
 	m_count--;
 
 	// Repeat this operation
 	m_pass = (m_count > 0)? 2 : 1;
-	// SBO/SBZ prefetch one clock after the strobe. LDCR uses two clocks per bit.
-	pulse_clock(m_command == LDCR ? 2 : 1);
+	pulse_clock(2);
 }
 
 /*
@@ -2428,60 +2178,65 @@ void tms9995_device::cru_input_operation()
 		m_pass = m_count;
 	}
 
-	m_cru_sample_address = m_cru_address & CRUREADMASK;
-	m_cru_sample_last = m_pass == 1;
-	const bool mid = m_cru_address == 0x1fda;
-	const bool internal = mid || (m_cru_address & 0xffe0) == 0x1ee0;
-	m_check_ready = !internal;
-	if (internal)
+	// Read a single CRU bit
+	bool crubit = BIT(m_cru->read_byte(m_cru_address & CRUREADMASK), 0);
+	m_cru_value = (m_cru_value >> 1) & 0x7fff;
+
+	// During internal reading, the CRUIN line will be ignored. We emulate this
+	// by overwriting the bit which we got from outside. Also, READY is ignored.
+	if (m_cru_address == 0x1fda)
 	{
-		m_cru->read_byte(m_cru_sample_address);
-		shift_cru_input(mid ? m_mid_flag : m_flag[(m_cru_address >> 1) & 15]);
+		crubit = m_mid_flag;
+		m_check_ready = false;
 	}
 	else
 	{
-		m_cru_sample_pending = true;
+		if ((m_cru_address & 0xffe0)==0x1ee0)
+		{
+			crubit = m_flag[(m_cru_address>>1)&0x000f];
+			m_check_ready = false;
+		}
+		else
+		{
+			m_check_ready = true;
+		}
 	}
-	m_cru_address = (m_cru_address + 2) & 0xfffe;
-	pulse_clock(m_command == STCR ? 2 : 1);
-}
 
-void tms9995_device::shift_cru_input(bool bit)
-{
-	m_cru_value = (m_cru_value >> 1) | (bit ? 0x8000 : 0);
-	if (m_cru_sample_last)
-		m_cru_value >>= 16 - m_count;
+	LOGMASKED(LOG_CRU, "CRU input operation, address %04x, value %d\n", m_cru_address, crubit ? 1 : 0);
+
+	if (crubit)
+		m_cru_value |= 0x8000;
+
+	m_cru_address = (m_cru_address + 2) & 0xfffe;
+
+	if (m_pass == 1)
+	{
+		// This is the final shift. For both byte and word length transfers,
+		// the first bit is always m_cru_value & 0x0001.
+		m_cru_value >>= (16 - m_count);
+	}
+	pulse_clock(2);
 }
 
 /*
     Decrementer.
 */
-void tms9995_device::clock_decrementer()
+void tms9995_device::trigger_decrementer()
 {
-	// A count write sets the divide-by-four phase. It advances while counting
-	// is disabled; the CRU enable reaches the counter one clock after its write.
-	m_decrementer_clkdiv = (m_decrementer_clkdiv + 1) & 3;
-	const bool enabled = m_decrementer_enabled;
-	m_decrementer_enabled = m_flag[1];
-
-	// CPU reads can see zero for two clocks before the starting count returns.
-	if (m_decrementer_reload && --m_decrementer_reload == 0)
+	if (m_starting_count_storage_register>0) // null will turn off the decrementer
 	{
-		m_decrementer_value = m_starting_count_storage_register;
-		if (m_flag[1])
-			m_flag[3] = true;
+		m_decrementer_value--;
+		LOGMASKED(LOG_DEC, "dec=%04x\n", m_decrementer_value);
+		if (m_decrementer_value==0)
+		{
+			m_decrementer_value = m_starting_count_storage_register;
+			if (m_flag[1]==true)
+			{
+				LOGMASKED(LOG_DEC, "decrementer flags interrupt\n");
+				m_flag[3] = true;
+			}
+		}
 	}
-
-	// The external event is a sampled high-to-low transition (active high
-	// in execute_set_input). A held input and its release produce no new tick.
-	const bool tick = m_flag[0] ? (m_ec_samples & 6) == 2 : m_decrementer_clkdiv == 1;
-	if (!enabled || !tick || !m_starting_count_storage_register || m_decrementer_reload)
-		return;
-
-	--m_decrementer_value;
-	LOGMASKED(LOG_DEC, "dec=%04x\n", m_decrementer_value);
-	if (m_decrementer_value == 0)
-		m_decrementer_reload = 2;
 }
 
 /*
@@ -2559,9 +2314,7 @@ void tms9995_device::increment_register()
 /*
     Used for indexed addressing. We store the contents of the index register
     in m_address_add which is set to 0 by default. Then we set the address
-    pointer to the PC location and advance it. The displacement read follows
-    the register read immediately; the address calculation takes one clock
-    after the complete displacement word has been read.
+    pointer to the PC location and advance it.
 */
 void tms9995_device::indexed_addressing()
 {
@@ -2569,6 +2322,7 @@ void tms9995_device::indexed_addressing()
 	m_address = PC;
 	PC = (PC + 2) & 0xfffe;
 	m_mem_phase = 1;
+	pulse_clock(1);
 }
 
 void tms9995_device::set_immediate()
@@ -2700,39 +2454,41 @@ void tms9995_device::alu_b()
 }
 
 /*
-    BLWP and interrupts read both vector words before writing the new workspace.
+    Branch and load workspace pointer. This is a branch to a subprogram with
+    context switch.
 */
-void tms9995_device::alu_context()
+void tms9995_device::alu_blwp()
 {
+	int n = 1;
 	switch (m_inst_state)
 	{
 	case 0:
-		m_value_copy = m_current_value & 0xfffe;  // new WP
-		m_address += 2;
-		pulse_clock(1);
+		// new WP in m_current_value
+		m_value_copy = WP;
+		WP = m_current_value & 0xfffe;
+		m_address_saved = m_address + 2;
+		m_address = WP + 30;
+		m_current_value = ST;
 		break;
 	case 1:
-		m_source_value = PC;                      // return PC after any extension word
-		PC = m_current_value & 0xfffe;
-		m_current_value = WP;
-		WP = m_value_copy;
-		m_address = WP + 26;                      // R13
+		m_current_value = PC;
+		m_address = m_address - 2;
 		break;
 	case 2:
-		m_current_value = m_source_value;
-		m_address = WP + 28;                      // R14
+		m_current_value = m_value_copy;     // old WP
+		m_address = m_address - 2;
 		break;
 	case 3:
-		m_current_value = ST;
-		m_address = WP + 30;                      // R15
-		LOGMASKED(LOG_CONTEXT, "Context switch (%s): WP=%04x, PC=%04x, saved ST=%04x\n", opname[m_command], WP, PC, ST);
+		m_address = m_address_saved;
 		break;
 	case 4:
-		// Interrupt entry installs its mask after R15 has received the original ST.
-		ST = (ST & 0xfe00) | m_intmask;
+		PC = m_current_value & 0xfffe;
+		n = 0;
+		LOGMASKED(LOG_CONTEXT, "Context switch (blwp): WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 		break;
 	}
 	m_inst_state++;
+	pulse_clock(n);
 }
 
 /*
@@ -2783,122 +2539,167 @@ void tms9995_device::alu_clr_seto()
 */
 void tms9995_device::alu_divide()
 {
-	enum { GET_DIVISOR, GET_HIGH_WORD, START_DIVISION, SET_REMAINDER, DIVIDING };
-	switch (m_inst_state)
-	{
-	case GET_DIVISOR:
-		m_source_value = m_current_value;
-		// Set address of register
-		m_address = WP + ((IR >> 5) & 0x001e);
-		m_address_copy = m_address;
-		pulse_clock(1);
-		break;
-	case GET_HIGH_WORD:
-		m_value_copy = m_current_value; // High word of the dividend
-		m_address += 2;
-		set_status_bit(ST_OV, m_value_copy >= m_source_value); // Includes a zero divisor
-		break;
-	case START_DIVISION:
-		if (m_source_value == 0)
-			break;
-		// With code and WP on chip, >00010000 / >0001 measured 10 CLKOUTs
-		// from IAQ to IAQ; a zero divisor measured 6 (both wait settings).
-		// Clocks from the low-word read to the overflow prefetch or quotient write.
-		m_pass = (m_value_copy >= m_source_value) ? 4 : 21;
-		m_inst_state = DIVIDING;
-		[[fallthrough]];
-	case DIVIDING:
-		// Return to execute_run every clock for RESET and scheduler deadlines.
-		// Keep the existing HOLD boundary at the end of this internal operation.
-		m_check_hold = (m_pass == 1);
-		pulse_clock(1);
-		if (m_pass > 1)
-			return;
-		if (m_value_copy < m_source_value)
-		{
-			const uint32_t dividend = (uint32_t(m_value_copy) << 16) | m_current_value;
-			m_current_value = dividend / m_source_value;
-			m_value_copy = dividend % m_source_value;
-			m_address = m_address_copy;
-			MPC += 3; // Skip PREFETCH, ALU_NOP, END on success.
-		}
-		m_inst_state = SET_REMAINDER;
-		return;
-	case SET_REMAINDER:
-		// The next instruction is fetched between the quotient and remainder writes.
-		m_current_value = m_value_copy;
-		m_address = m_address + 2;
-		break;
-	}
-	m_inst_state++;
-}
+	int n=1;
+	uint32_t uval32;
 
-/*
-    Signed division. The full dividend is needed for signed overflow detection.
-*/
-void tms9995_device::alu_divide_signed()
-{
-	int cycles = 0;
+	bool overflow = true;
+	uint16_t value1;
 
 	switch (m_inst_state)
 	{
 	case 0:
 		m_source_value = m_current_value;
-		m_address = WP + 2;
-		cycles = 1;
+		// Set address of register
+		m_address = WP + ((IR >> 5) & 0x001e);
+		m_address_copy = m_address;
 		break;
 	case 1:
-		m_value_copy = m_current_value; // R1, low word of the dividend
-		m_address = WP;
-		cycles = 1;
+		// Value of register is in m_current_value
+		// We have an overflow when the quotient cannot be stored in 16 bits
+		// This is the case when the dividend / divisor >= 0x10000,
+		// or equivalently, dividend / 0x10000 >= divisor
+
+		// Check overflow for unsigned DIV
+		if (m_current_value < m_source_value)   // also if source=0
+		{
+			MPC++;  // skip the abort
+			overflow = false;
+		}
+		set_status_bit(ST_OV, overflow);
+		m_value_copy = m_current_value;         // Save the high word
+		m_address = m_address + 2;
 		break;
 	case 2:
-	{
-		// On-chip IAQ intervals on a TMS9995, with either external wait setting:
-		// divisor zero: 10; >00008000 / 1: 32; >00010000 / 1: 13 CLKOUTs.
-		const int16_t divisor = int16_t(m_source_value);
-		if (divisor == 0)
+		// W2 is in m_current_value
+		uval32 = (m_value_copy << 16) | m_current_value;
+		// Calculate
+		// The number of ALU cycles depends on the number of steps in
+		// the division algorithm. The number of cycles is between 1 and 16
+		// As in TMS9900, this is a guess; it depends on the actual algorithm
+		// used in the chip.
+
+		m_current_value = uval32 / m_source_value;
+		m_value_copy = uval32 % m_source_value;
+		m_address = m_address_copy;
+
+		value1 = m_value_copy & 0xffff;
+		while (value1 != 0)
 		{
-			set_status_bit(ST_OV, true);
-			cycles = 3;
-			break;
+			value1 = (value1 >> 1) & 0xffff;
+			n++;
 		}
 
-		// Widen the signed high word before combining the halves so even
-		// the most negative dividend can be divided safely.
-		const int64_t dividend = int64_t(int16_t(m_current_value)) * 0x10000 + m_value_copy;
-		const int64_t quotient = dividend / divisor;
-
-		if (quotient <= -0x10000 || quotient >= 0x10000)
-		{
-			// The early overflow path preserves LGT/AGT/EQ.
-			set_status_bit(ST_OV, true);
-			cycles = 6;
-			break;
-		}
-
-		// Measured from the end of the R0 read to the quotient write
-		// (success) or the following fetch (signed-range overflow).
-		cycles = 25;
-		compare_and_set_lae(uint16_t(quotient), 0);
-		const bool overflow = quotient < -0x8000 || quotient > 0x7fff;
-		set_status_bit(ST_OV, overflow);
-		if (!overflow)
-		{
-			m_current_value = uint16_t(quotient);
-			m_value_copy = uint16_t(dividend % divisor);
-			m_address = WP;
-			MPC += 3; // Skip the overflow path (PREFETCH, ALU_NOP, END).
-		}
 		break;
-	}
 	case 3:
+		// now write the remainder
 		m_current_value = m_value_copy;
-		m_address = WP + 2;
+		m_address = m_address + 2;
 		break;
 	}
 	m_inst_state++;
-	pulse_clock(cycles);
+	pulse_clock(n);
+}
+
+/*
+    Signed Division
+    We cannot handle this by the same ALU operation because we can NOT decide
+    whether there is an overflow before we have retrieved the whole 32 bit
+    word. Also, the overflow detection is pretty complicated for signed
+    division when done before the actual calculation.
+*/
+void tms9995_device::alu_divide_signed()
+{
+	int n=1;
+	bool overflow;
+	uint16_t w1, w2, dwait;
+	int16_t divisor;
+	int32_t dividend;
+
+	switch (m_inst_state)
+	{
+	case 0:
+		// Got the source value (divisor)
+		m_source_value = m_current_value;
+		m_address = WP;  // DIVS always uses R0,R1
+		break;
+	case 1:
+		// Value of register is in m_current_value
+		m_value_copy = m_current_value;
+		m_address += 2;
+		break;
+	case 2:
+		// Now we have the dividend low word in m_current_value,
+		// the dividend high word in m_value_copy, and
+		// the divisor in m_source_value.
+
+		w1 = m_value_copy;
+		w2 = m_current_value;
+		divisor = m_source_value;
+		dividend = w1 << 16 | w2;
+
+		// Now check for overflow
+		// We need to go for four cases
+		// if the divisor is not 0 anyway
+		if (divisor != 0)
+		{
+			if (dividend >= 0)
+			{
+				if (divisor > 0)
+				{
+					overflow = (dividend > ((divisor<<15) - 1));
+				}
+				else
+				{
+					overflow = (dividend > (((-divisor)<<15) + (-divisor) - 1));
+				}
+			}
+			else
+			{
+				if (divisor > 0)
+				{
+					overflow = ((-dividend) > ((divisor<<15) + divisor - 1));
+				}
+				else
+				{
+					overflow = ((-dividend) > (((-divisor)<<15) - 1));
+				}
+			}
+		}
+		else
+		{
+			overflow = true; // divisor is 0
+		}
+		set_status_bit(ST_OV, overflow);
+		if (!overflow) MPC++;       // Skip the next microinstruction when there is no overflow
+		break;
+	case 3:
+		// We are here because there was no overflow
+		dividend = m_value_copy << 16 | m_current_value;
+		// Do the calculation
+		m_current_value =  (uint16_t)(dividend / (int16_t)m_source_value);
+		m_value_copy = (uint16_t)(dividend % (int16_t)m_source_value);
+		m_address = WP;
+
+		// As we have not implemented the real division algorithm we must
+		// simulate the number of steps required for calculating the result.
+		// This is just a guess.
+		dwait = m_value_copy;
+		while (dwait != 0)
+		{
+			dwait = (dwait >> 1) & 0xffff;
+			n++;
+		}
+		// go write the quotient into R0
+		break;
+	case 4:
+		// Now write the remainder
+		m_current_value = m_value_copy;
+		m_address += 2;
+		n = 0;
+		break;
+	}
+	m_inst_state++;
+	pulse_clock(n);
 }
 
 /*
@@ -2906,8 +2707,10 @@ void tms9995_device::alu_divide_signed()
 */
 void tms9995_device::alu_external()
 {
-	// The /WE/CRUCLK strobe presents bits D0-D2 to the external decoder.
-	// The callback reports that three-bit code at the start of the cycle.
+	// Call some possibly attached external device
+	// A specific bit pattern is put on the data bus, and the CRUOUT line is
+	// pulsed. In our case we use a special callback function since we cannot
+	// emulate this behavior in this implementation.
 
 	// Opcodes         D012 value
 	// -----------------vvv------
@@ -2917,32 +2720,28 @@ void tms9995_device::alu_external()
 	// CKOF = 0000 0011 1100 0000
 	// LREX = 0000 0011 1110 0000
 
+	// Only IDLE has a visible effect on the CPU without external support: the
+	// CPU will stop execution until an interrupt occurs. CKON, CKOF, LREX have
+	// no effect without external support. Neither has RSET, it does *not*
+	// cause a reset of the CPU or of the remaining computer system.
+	// It only clears the interrupt mask and outputs the
+	// external code on the data bus. A special line decoder could then trigger
+	// a reset from outside.
+
 	if (m_command == IDLE)
 	{
-		m_idle_state = (m_int_pending == 0);
-		m_check_hold = true;   // HOLD may start after this control strobe.
+		LOGMASKED(LOG_OP, "Entering IDLE state\n");
+		m_idle_state = true;
 	}
 
-	if (!m_external_operation.isunset())
-		m_external_operation((IR >> 5) & 0x07, 1, 0xff);
-	pulse_clock(1);
-}
-
-void tms9995_device::alu_rset_mask()
-{
 	if (m_command == RSET)
 	{
 		ST &= 0xfff0;
 		LOGMASKED(LOG_OP, "RSET, new ST = %04x\n", ST);
 	}
-}
 
-void tms9995_device::alu_idle_poll()
-{
-	if (!check_interrupts())
-		MPC -= 2;  // return to the preceding IDLE strobe
-	m_check_hold = false;  // Complete the two-clock IDLE cycle before yielding the bus.
-	pulse_clock(1);
+	if (!m_external_operation.isunset())
+		m_external_operation((IR >> 5) & 0x07, 1, 0xff);
 }
 
 /*
@@ -3024,13 +2823,10 @@ void tms9995_device::alu_imm_arithm()
 */
 void tms9995_device::alu_jump()
 {
-	PC = jump_destination(m_command, IR, PC);
-}
-
-uint16_t tms9995_device::jump_destination(uint16_t command, uint16_t opcode, uint16_t base) const
-{
 	bool cond = false;
-	switch (command)
+	int8_t displacement = (IR & 0xff);
+
+	switch (m_command)
 	{
 	case JMP:
 		cond = true;
@@ -3073,7 +2869,15 @@ uint16_t tms9995_device::jump_destination(uint16_t command, uint16_t opcode, uin
 		break;
 	}
 
-	return cond ? (base + 2 * int8_t(opcode)) & 0xfffe : base;
+	if (!cond)
+	{
+		LOGMASKED(LOG_DETAIL, "Jump condition false\n");
+	}
+	else
+	{
+		LOGMASKED(LOG_DETAIL, "Jump condition true\n");
+		PC = (PC + (displacement<<1)) & 0xfffe;
+	}
 }
 
 /*
@@ -3081,7 +2885,6 @@ uint16_t tms9995_device::jump_destination(uint16_t command, uint16_t opcode, uin
 */
 void tms9995_device::alu_ldcr()
 {
-	int cycles = 0;
 	switch (m_inst_state)
 	{
 	case 0:
@@ -3103,16 +2906,14 @@ void tms9995_device::alu_ldcr()
 		}
 		m_cru_value = m_current_value;
 		m_address = WP + 24;
-		cycles = 3;
 		break;
 	case 2:
 		// Prepare CRU operation
 		m_cru_address = m_current_value;
-		cycles = 2;
 		break;
 	}
 	m_inst_state++;
-	pulse_clock(cycles);
+	pulse_clock(1);
 }
 
 /*
@@ -3182,39 +2983,11 @@ void tms9995_device::alu_mov()
 	// No clock pulse, as next instruction is prefetch
 }
 
-// This slot follows the destination register read. On parts that issue a
-// non-IAQ read here, external bytes take the usual READY and wait states.
-void tms9995_device::mpy_next_word_cycle()
-{
-	if (m_command != MPY)
-		return;
-
-	if (!m_mpy_read_next_word || m_mp9537)
-	{
-		pulse_clock(1);
-		return;
-	}
-
-	if (m_mem_phase == 1)
-	{
-		m_address_copy = m_address;
-		m_value_copy = m_current_value;
-		m_address = PC;
-	}
-	word_read();
-	if (m_mem_phase == 1)
-	{
-		m_address = m_address_copy;
-		m_current_value = m_value_copy;
-	}
-}
-
 /*
     Unsigned and signed multiplication
 */
 void tms9995_device::alu_multiply()
 {
-	enum { GET_SOURCE, MULTIPLY, SET_LOW_WORD, MPY_INTERNAL_CLOCK };
 	int n = 0;
 	uint32_t result;
 	int32_t results;
@@ -3223,28 +2996,22 @@ void tms9995_device::alu_multiply()
 	{
 		switch (m_inst_state)
 		{
-		case GET_SOURCE:
+		case 0:
 			// m_current_value <- multiplier (source)
 			m_source_value = m_current_value;
 			// m_address is the second multiplier (in a register)
 			m_address = ((IR >> 5) & 0x001e) + WP;
+			n = 1;
 			break;
-		case MULTIPLY:
+		case 1:
 			// m_current_value <- register content
-			result = uint32_t(m_source_value) * m_current_value;
+			result = (m_source_value & 0x0000ffff) * (m_current_value & 0x0000ffff);
 			m_current_value = (result >> 16) & 0xffff;
 			m_value_copy = result & 0xffff;
 			// m_address is still the register
-			m_pass = 17;
-			m_inst_state = MPY_INTERNAL_CLOCK;
-			[[fallthrough]];
-		case MPY_INTERNAL_CLOCK:
-			// Each internal MPY clock can pause for HOLD without repeating the product.
-			pulse_clock(1);
-			if (m_pass == 1)
-				m_inst_state = SET_LOW_WORD;
-			return;
-		case SET_LOW_WORD:
+			n = 17;
+			break;
+		case 2:
 			m_address += 2;
 			m_current_value = m_value_copy;
 			// now write the lower 16 bit.
@@ -3257,27 +3024,22 @@ void tms9995_device::alu_multiply()
 	{
 		switch (m_inst_state)
 		{
-		case GET_SOURCE:
+		case 0:
 			// m_current_value <- multiplier (source)
 			m_source_value = m_current_value;
 			// m_address is the second multiplier (in R0)
 			m_address = WP;
 			n = 1;
 			break;
-		case MULTIPLY:
+		case 1:
 			// m_current_value <- register content
 			results = ((int16_t)m_source_value) * ((int16_t)m_current_value);
-			// MPYS sets the comparison flags from the entire signed product.
-			ST &= ~(ST_LH | ST_AGT | ST_EQ);
-			ST |= (results == 0) ? ST_EQ : ST_LH;
-			if (results > 0)
-				ST |= ST_AGT;
 			m_current_value = (results >> 16) & 0xffff;
 			m_value_copy = results & 0xffff;
 			// m_address is still the register
-			n = 19;
+			n = 16;
 			break;
-		case SET_LOW_WORD:
+		case 2:
 			m_address += 2;
 			m_current_value = m_value_copy;
 			// now write the lower 16 bit.
@@ -3293,20 +3055,19 @@ void tms9995_device::alu_rtwp()
 	switch (m_inst_state)
 	{
 	case 0:
-		m_address = WP + 28;        // R14
+		m_address = WP + 30;        // R15
 		pulse_clock(1);
 		break;
 	case 1:
-		PC = m_current_value & 0xfffe;
-		m_address = WP + 30;        // R15
+		ST = m_current_value;
+		m_address -= 2;             // R14
 		break;
 	case 2:
-		ST = m_current_value;
-		m_address = WP + 26;        // R13
+		PC = m_current_value & 0xfffe;
+		m_address -= 2;             // R13
 		break;
 	case 3:
 		WP = m_current_value & 0xfffe;
-		pulse_clock(1);
 
 		// Just for debugging purposes
 		m_log_interrupt = false;
@@ -3329,7 +3090,7 @@ void tms9995_device::alu_sbo_sbz()
 	{
 		m_cru_value = (m_command==SBO)? 1 : 0;
 		displacement = (int8_t)(IR & 0xff);
-		m_cru_address = m_current_value + 2 * displacement;
+		m_cru_address = m_current_value + (displacement<<1);
 		m_count = 1;
 	}
 	m_inst_state++;
@@ -3341,7 +3102,6 @@ void tms9995_device::alu_sbo_sbz()
 */
 void tms9995_device::alu_shift()
 {
-	const int instruction_count = (IR >> 4) & 0x000f;
 	bool carry = false;
 	bool overflow = false;
 	uint16_t sign = 0;
@@ -3358,22 +3118,21 @@ void tms9995_device::alu_shift()
 		m_address_saved = m_address;
 		m_address = WP;
 		// store this in m_current_value where the R0 value will be put
-		m_current_value = instruction_count;
-		if (instruction_count != 0)
+		m_current_value = (IR >> 4)& 0x000f;
+		if (m_current_value != 0)
 		{
-			MPC++;          // skip the R0 read
-			pulse_clock(2);
+			// skip the next read operation
+			MPC++;
 		}
 		else
 		{
 			LOGMASKED(LOG_DETAIL, "Shift operation gets count from R0\n");
-			pulse_clock(1);
 		}
+		pulse_clock(1);
+		pulse_clock(1);
 		break;
 
 	case 1:
-		if (instruction_count == 0)
-			pulse_clock(2); // internal clocks after the R0 read, before shifting
 		count = m_current_value & 0x000f; // from the instruction or from R0
 		if (count==0) count = 16;
 
@@ -3520,7 +3279,7 @@ void tms9995_device::alu_single_arithm()
 */
 void tms9995_device::alu_stcr()
 {
-	int cycles = 0;
+	int n = 1;
 	switch (m_inst_state)
 	{
 	case 0:
@@ -3531,31 +3290,29 @@ void tms9995_device::alu_stcr()
 	case 1:
 		m_address_saved = m_address;
 		m_address = WP + 24;
-		cycles = 4;
 		break;
 	case 2:
 		m_cru_address = m_current_value;
 		m_cru_first_read = true;
-		cycles = 2;
 		break;
 	case 3:
-		// After the last two-clock bit transfer, allow one clock per
-		// unfilled bit position and two more before the following fetch.
-		cycles = 2 + (m_byteop ? 8 : 16) - m_count;
+		// I don't know what is happening here, but it takes quite some time.
+		// May be shift operations.
 		m_current_value = m_cru_value;
 		m_address = m_address_saved;
+		compare_and_set_lae(m_current_value, 0);
+		n = 13;
 		if (m_byteop)
 		{
 			set_status_parity((uint8_t)m_current_value);
 			m_current_value <<= 8;
 		}
-		// For a byte transfer, bit 7 is now in the word sign position.
-		compare_and_set_lae(m_current_value, 0);
+		else n += 8;
 		LOGMASKED(LOG_STATUS, "ST = %04x (val=%04x)\n", ST, m_current_value);
 		break;
 	}
 	m_inst_state++;
-	pulse_clock(cycles);
+	pulse_clock(n);
 }
 
 
@@ -3584,7 +3341,7 @@ void tms9995_device::alu_tb()
 		break;
 	case 1:
 		displacement = (int8_t)(IR & 0xff);
-		m_cru_address = m_current_value + 2 * displacement;
+		m_cru_address = m_current_value + (displacement<<1);
 		m_cru_first_read = true;
 		m_count = 1;
 		pulse_clock(1);
@@ -3620,37 +3377,41 @@ void tms9995_device::alu_xop()
 	switch (m_inst_state)
 	{
 	case 0:
-		m_source_value = m_address;               // effective address for R11
-		m_address = 0x0040 + ((IR & 0x03c0) >> 4);
+		// we have the source address in m_address
+		m_address_saved = m_address;
+		// Format is xxxx xxnn nnxx xxxx
+		m_address = 0x0040 + ((IR & 0x03c0)>>4);
 		pulse_clock(1);
 		break;
 	case 1:
-		m_address_saved = m_address + 2;          // handler PC word of this vector
-		m_value_copy = WP;                        // old WP for R13
+		// m_current_value is new WP
+		m_value_copy = WP;  // store this for later
 		WP = m_current_value & 0xfffe;
-		m_address = WP + 22;                      // R11
-		m_current_value = m_source_value;
+		m_address = WP + 0x0016; // Address of new R11
+		m_current_value = m_address_saved;
 		pulse_clock(1);
 		break;
 	case 2:
-		m_address = m_address_saved;
+		m_address = WP + 0x001e;
+		m_current_value = ST;
+		pulse_clock(1);
 		break;
 	case 3:
-		m_source_value = PC;                      // return PC after any extension word
-		PC = m_current_value & 0xfffe;
-		m_address = WP + 26;                      // R13
-		m_current_value = m_value_copy;
+		m_address = WP + 0x001c;
+		m_current_value = PC;
+		pulse_clock(1);
 		break;
 	case 4:
-		m_address = WP + 28;                      // R14
-		m_current_value = m_source_value;
+		m_address = WP + 0x001a;
+		m_current_value = m_value_copy;
+		pulse_clock(1);
 		break;
 	case 5:
-		m_address = WP + 30;                      // R15
-		m_current_value = ST;
+		m_address = 0x0042 + ((IR & 0x03c0)>>4);
+		pulse_clock(1);
 		break;
 	case 6:
-		ST &= ~0x01f0;                            // Clear ST7-ST11 on entry, after saving the old ST in R15.
+		PC = m_current_value & 0xfffe;
 		set_status_bit(ST_X, true);
 		LOGMASKED(LOG_CONTEXT, "Context switch (xop): WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
 		break;
@@ -3658,28 +3419,78 @@ void tms9995_device::alu_xop()
 	m_inst_state++;
 }
 
-void tms9995_device::alu_reset()
+/*
+    Handle an interrupt. The behavior as implemented here follows
+    exactly the flowchart in [1]
+*/
+void tms9995_device::alu_int()
 {
-	switch (m_inst_state++)
+	int pulse = 1;
+
+	switch (m_inst_state)
 	{
 	case 0:
-		WP = m_current_value & 0xfffe;
-		m_address = 0x0002;
+		PC = (PC - 2) & 0xfffe;
+		m_address_saved = m_address;
+		LOGMASKED(LOG_INTD, "interrupt service (0): Prepare to read vector\n");
 		break;
 	case 1:
-		PC = m_current_value & 0xfffe;
-		m_address = WP + 26;
-		m_current_value = m_source_value;
+		pulse = 2;                  // two cycles (with the one at the end)
+		m_source_value = WP;        // old WP
+		WP = m_current_value & 0xfffe;       // new WP
+		m_current_value = ST;
+		m_address = (WP + 30)&0xfffe;
+		LOGMASKED(LOG_INTD, "interrupt service (1): Read new WP = %04x, save ST to %04x\n", WP, m_address);
 		break;
 	case 2:
-		m_address = WP + 28;
-		m_current_value = m_address_saved;
+		m_address = (WP + 28)&0xfffe;
+		m_current_value = PC;
+		LOGMASKED(LOG_INTD, "interrupt service (2): Save PC to %04x\n", m_address);
 		break;
 	case 3:
-		m_address = WP + 30;
-		m_current_value = m_value_copy;
+		m_address = (WP + 26)&0xfffe;
+		m_current_value = m_source_value;   // old WP
+		LOGMASKED(LOG_INTD, "interrupt service (3): Save WP to %04x\n", m_address);
 		break;
+	case 4:
+		m_address = (m_address_saved + 2) & 0xfffe;
+		LOGMASKED(LOG_INTD, "interrupt service (4): Read PC from %04x\n", m_address);
+		break;
+	case 5:
+		PC = m_current_value & 0xfffe;
+		ST = (ST & 0xfe00) | m_intmask;
+		LOGMASKED(LOG_CONTEXT, "Context switch (int): WP=%04x, PC=%04x, ST=%04x\n", WP, PC, ST);
+
+		if (((m_int_pending & PENDING_MID)!=0) && m_nmi_active)
+		{
+			LOGMASKED(LOG_INTD, "interrupt service (6): NMI active after context switch\n");
+			m_int_pending &= ~PENDING_MID;
+			m_address = 0xfffc;
+			m_intmask = 0;
+			MPC = 0;    // redo the interrupt service for the NMI
+		}
+		else
+		{
+			if (m_from_reset)
+			{
+				LOGMASKED(LOG_INTD, "interrupt service (6): RESET completed\n");
+				// We came from the RESET interrupt
+				m_from_reset = false;
+				ST &= 0x01ff;
+				m_mid_flag = false;
+				m_mid_active = false;
+				// FLAG0 and FLAG1 are also set to zero after RESET ([1], sect. 2.3.1.2.2)
+				for (int i=0; i < 5; i++) m_flag[i] = false;
+				m_check_hold = true;
+			}
+		}
+		pulse = 0;
+		break;
+
+		// If next instruction is MID opcode we will detect this in command_completed
 	}
+	m_inst_state++;
+	pulse_clock(pulse);
 }
 
 /**************************************************************************/

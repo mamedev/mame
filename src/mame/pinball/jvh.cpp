@@ -182,7 +182,6 @@ void jvh_state::jvh2(machine_config &config)
 void jvh_state::jvh3(machine_config &config)
 {
 	TMS9995(config, m_maincpu, 12000000);
-	// TODO: Verify READY at reset release on this board.
 
 	M6809(config, "audiocpu", 2000000);
 

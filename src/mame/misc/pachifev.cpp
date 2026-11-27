@@ -295,6 +295,11 @@ void pachifev_state::pf_adpcm_int(int state)
 
 void pachifev_state::machine_reset()
 {
+	// Pulling down the line on RESET configures the CPU to insert one wait
+	// state on external memory accesses
+	m_maincpu->ready_line(CLEAR_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
+
 	m_power=0;
 	m_max_power=0;
 	m_input_power=0;
@@ -352,8 +357,6 @@ void pachifev_state::pachifev(machine_config &config)
 {
 	// CPU TMS9995, standard variant; no line connections
 	TMS9995(config, m_maincpu, XTAL(12'000'000));
-	// Model READY high at /RESET release for one automatic wait per external memory byte.
-	m_maincpu->set_auto_wait_on_reset(true);
 	m_maincpu->set_addrmap(AS_PROGRAM, &pachifev_state::pachifev_map);
 	m_maincpu->set_addrmap(AS_IO, &pachifev_state::pachifev_cru);
 

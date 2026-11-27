@@ -45,6 +45,7 @@ protected:
 	void external_operation(offs_t offset, uint8_t data);
 	void clock_out(int state);
 	void board_ready(int state);
+	void board_reset(int state);
 	static void floppy_formats(format_registration &fr);
 
 	virtual void device_start() override ATTR_COLD;

@@ -132,6 +132,9 @@ void evmbug_state::kbd_put(u8 data)
 void evmbug_state::machine_reset()
 {
 	m_rbrl = 0;
+	// Disable auto wait state generation by raising the READY line on reset
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 void evmbug_state::machine_start()
@@ -148,8 +151,6 @@ void evmbug_state::evmbug(machine_config &config)
 	// TMS9995 CPU @ 12.0 MHz
 	// We have no lines connected yet
 	TMS9995(config, m_maincpu, XTAL(12'000'000));
-	// Model READY low at /RESET release for zero automatic wait states.
-	m_maincpu->set_auto_wait_on_reset(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &evmbug_state::evmbug_mem);
 	m_maincpu->set_addrmap(AS_IO, &evmbug_state::io_map);
 

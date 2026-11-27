@@ -321,6 +321,8 @@ void cortex_state::machine_reset()
 	m_vdp_int = 0;
 	m_beep->set_state(0);
 	m_bank1->set_entry(1);
+	m_maincpu->ready_line(ASSERT_LINE);
+	m_maincpu->reset_line(ASSERT_LINE);
 }
 
 void cortex_state::cortex(machine_config &config)
@@ -330,8 +332,6 @@ void cortex_state::cortex(machine_config &config)
 	// Standard variant, no overflow int
 	// No lines connected yet
 	TMS9995(config, m_maincpu, 12_MHz_XTAL);
-	// Model READY low at /RESET release for zero automatic wait states.
-	m_maincpu->set_auto_wait_on_reset(false);
 	m_maincpu->set_addrmap(AS_PROGRAM, &cortex_state::mem_map);
 	m_maincpu->set_addrmap(AS_IO, &cortex_state::io_map);
 
