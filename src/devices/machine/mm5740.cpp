@@ -76,18 +76,6 @@ mm5740aae_device::mm5740aae_device(const machine_config &mconfig, const char *ta
 {
 }
 
-u32 mm5740_device::calc_effective_clock_key_debounce(u32 capacitance)
-{
-	// calculate key debounce based on capacitance in pF
-	u32 key_debounce_msec = capacitance / 125;
-	if (key_debounce_msec == 0)
-	{
-		key_debounce_msec = 1;
-	}
-
-	return 1000 / key_debounce_msec;
-}
-
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------

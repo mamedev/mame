@@ -79,30 +79,33 @@ Vgg                  18          -12V
 class mm5740_device : public device_t
 {
 public:
-	// public interface
-	u16  b_r();
-
-	template <unsigned N> auto x_cb() { return m_read_x[N - 1].bind(); }
+	template <u32 N> auto x_cb() { return m_read_x[N - 1].bind(); }
 	auto shift_cb() { return m_read_shift.bind(); }
 	auto control_cb() { return m_read_control.bind(); }
 	auto data_ready_cb() { return m_write_data_ready.bind(); }
 
-	void repeat_line_w(int state);
+	// calculate key debounce clock based on capacitance in pF
+	static constexpr u32 calc_effective_clock_key_debounce(u32 capacitance)
+	{
+		u32 const key_debounce_msec = capacitance / 125;
+		return 1000 / (key_debounce_msec ? key_debounce_msec : 1);
+	}
 
-	static u32 calc_effective_clock_key_debounce(u32 capacitance);
+	u16 b_r();
+	void repeat_line_w(int state);
 
 protected:
 	mm5740_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock);
 
-	// device-level overrides
+	// device_t implementation
 	virtual void device_start() override ATTR_COLD;
 
 	// each mask version supplies its internal ROM
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD = 0;
 
+private:
 	TIMER_CALLBACK_MEMBER(perform_scan);
 
-private:
 	devcb_read16::array<9> m_read_x;
 	devcb_read_line        m_read_shift;
 	devcb_read_line        m_read_control;
@@ -143,8 +146,5 @@ protected:
 // device type definition
 DECLARE_DEVICE_TYPE(MM5740AAC, mm5740aac_device)
 DECLARE_DEVICE_TYPE(MM5740AAE, mm5740aae_device)
-
-// MM5740 is an alias for MM5740AAC until the H19 switches over
-inline constexpr auto &MM5740 = MM5740AAC;
 
 #endif // MAME_MACHINE_MM5740_H
