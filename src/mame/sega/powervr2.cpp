@@ -273,7 +273,7 @@ uint32_t powervr2_device::bl07(uint32_t s, uint32_t d) { return blia(d, d); }
 uint32_t powervr2_device::bl10(uint32_t s, uint32_t d) { return s; }
 uint32_t powervr2_device::bl11(uint32_t s, uint32_t d) { return bls(s, d); }
 uint32_t powervr2_device::bl12(uint32_t s, uint32_t d) { return bls(s, blc(s, d)); }
-uint32_t powervr2_device::bl13(uint32_t s, uint32_t d) { return bls(s, blic(s, d)); }
+uint32_t powervr2_device::bl13(uint32_t s, uint32_t d) { return bls(s, blic(d, s)); }
 uint32_t powervr2_device::bl14(uint32_t s, uint32_t d) { return bls(s, bla(d, s)); }
 uint32_t powervr2_device::bl15(uint32_t s, uint32_t d) { return bls(s, blia(d, s)); }
 uint32_t powervr2_device::bl16(uint32_t s, uint32_t d) { return bls(s, bla(d, d)); }
@@ -281,23 +281,23 @@ uint32_t powervr2_device::bl17(uint32_t s, uint32_t d) { return bls(s, blia(d, d
 uint32_t powervr2_device::bl20(uint32_t s, uint32_t d) { return blc(d, s); }
 uint32_t powervr2_device::bl21(uint32_t s, uint32_t d) { return bls(blc(d, s), d); }
 uint32_t powervr2_device::bl22(uint32_t s, uint32_t d) { return bls(blc(d, s), blc(s, d)); }
-uint32_t powervr2_device::bl23(uint32_t s, uint32_t d) { return bls(blc(d, s), blic(s, d)); }
+uint32_t powervr2_device::bl23(uint32_t s, uint32_t d) { return bls(blc(d, s), blic(d, s)); }
 uint32_t powervr2_device::bl24(uint32_t s, uint32_t d) { return bls(blc(d, s), bla(d, s)); }
 uint32_t powervr2_device::bl25(uint32_t s, uint32_t d) { return bls(blc(d, s), blia(d, s)); }
 uint32_t powervr2_device::bl26(uint32_t s, uint32_t d) { return bls(blc(d, s), bla(d, d)); }
 uint32_t powervr2_device::bl27(uint32_t s, uint32_t d) { return bls(blc(d, s), blia(d, d)); }
-uint32_t powervr2_device::bl30(uint32_t s, uint32_t d) { return blic(d, s); }
-uint32_t powervr2_device::bl31(uint32_t s, uint32_t d) { return bls(blic(d, s), d); }
-uint32_t powervr2_device::bl32(uint32_t s, uint32_t d) { return bls(blic(d, s), blc(s, d)); }
-uint32_t powervr2_device::bl33(uint32_t s, uint32_t d) { return bls(blic(d, s), blic(s, d)); }
-uint32_t powervr2_device::bl34(uint32_t s, uint32_t d) { return bls(blic(d, s), bla(d, s)); }
-uint32_t powervr2_device::bl35(uint32_t s, uint32_t d) { return bls(blic(d, s), blia(d, s)); }
-uint32_t powervr2_device::bl36(uint32_t s, uint32_t d) { return bls(blic(d, s), bla(d, d)); }
-uint32_t powervr2_device::bl37(uint32_t s, uint32_t d) { return bls(blic(d, s), blia(d, d)); }
+uint32_t powervr2_device::bl30(uint32_t s, uint32_t d) { return blic(s, d); }
+uint32_t powervr2_device::bl31(uint32_t s, uint32_t d) { return bls(blic(s, d), d); }
+uint32_t powervr2_device::bl32(uint32_t s, uint32_t d) { return bls(blic(s, d), blc(s, d)); }
+uint32_t powervr2_device::bl33(uint32_t s, uint32_t d) { return bls(blic(s, d), blic(d, s)); }
+uint32_t powervr2_device::bl34(uint32_t s, uint32_t d) { return bls(blic(s, d), bla(d, s)); }
+uint32_t powervr2_device::bl35(uint32_t s, uint32_t d) { return bls(blic(s, d), blia(d, s)); }
+uint32_t powervr2_device::bl36(uint32_t s, uint32_t d) { return bls(blic(s, d), bla(d, d)); }
+uint32_t powervr2_device::bl37(uint32_t s, uint32_t d) { return bls(blic(s, d), blia(d, d)); }
 uint32_t powervr2_device::bl40(uint32_t s, uint32_t d) { return bla(s, s); }
 uint32_t powervr2_device::bl41(uint32_t s, uint32_t d) { return bls(bla(s, s), d); }
 uint32_t powervr2_device::bl42(uint32_t s, uint32_t d) { return bls(bla(s, s), blc(s, d)); }
-uint32_t powervr2_device::bl43(uint32_t s, uint32_t d) { return bls(bla(s, s), blic(s, d)); }
+uint32_t powervr2_device::bl43(uint32_t s, uint32_t d) { return bls(bla(s, s), blic(d, s)); }
 uint32_t powervr2_device::bl44(uint32_t s, uint32_t d) { return bls(bla(s, s), bla(d, s)); }
 uint32_t powervr2_device::bl45(uint32_t s, uint32_t d) { return bls(bla(s, s), blia(d, s)); }
 uint32_t powervr2_device::bl46(uint32_t s, uint32_t d) { return bls(bla(s, s), bla(d, d)); }
@@ -305,7 +305,7 @@ uint32_t powervr2_device::bl47(uint32_t s, uint32_t d) { return bls(bla(s, s), b
 uint32_t powervr2_device::bl50(uint32_t s, uint32_t d) { return blia(s, s); }
 uint32_t powervr2_device::bl51(uint32_t s, uint32_t d) { return bls(blia(s, s), d); }
 uint32_t powervr2_device::bl52(uint32_t s, uint32_t d) { return bls(blia(s, s), blc(s, d)); }
-uint32_t powervr2_device::bl53(uint32_t s, uint32_t d) { return bls(blia(s, s), blic(s, d)); }
+uint32_t powervr2_device::bl53(uint32_t s, uint32_t d) { return bls(blia(s, s), blic(d, s)); }
 uint32_t powervr2_device::bl54(uint32_t s, uint32_t d) { return bls(blia(s, s), bla(d, s)); }
 uint32_t powervr2_device::bl55(uint32_t s, uint32_t d) { return bls(blia(s, s), blia(d, s)); }
 uint32_t powervr2_device::bl56(uint32_t s, uint32_t d) { return bls(blia(s, s), bla(d, d)); }
@@ -313,7 +313,7 @@ uint32_t powervr2_device::bl57(uint32_t s, uint32_t d) { return bls(blia(s, s), 
 uint32_t powervr2_device::bl60(uint32_t s, uint32_t d) { return bla(s, d); }
 uint32_t powervr2_device::bl61(uint32_t s, uint32_t d) { return bls(bla(s, d), d); }
 uint32_t powervr2_device::bl62(uint32_t s, uint32_t d) { return bls(bla(s, d), blc(s, d)); }
-uint32_t powervr2_device::bl63(uint32_t s, uint32_t d) { return bls(bla(s, d), blic(s, d)); }
+uint32_t powervr2_device::bl63(uint32_t s, uint32_t d) { return bls(bla(s, d), blic(d, s)); }
 uint32_t powervr2_device::bl64(uint32_t s, uint32_t d) { return bls(bla(s, d), bla(d, s)); }
 uint32_t powervr2_device::bl65(uint32_t s, uint32_t d) { return bls(bla(s, d), blia(d, s)); }
 uint32_t powervr2_device::bl66(uint32_t s, uint32_t d) { return bls(bla(s, d), bla(d, d)); }
@@ -321,7 +321,7 @@ uint32_t powervr2_device::bl67(uint32_t s, uint32_t d) { return bls(bla(s, d), b
 uint32_t powervr2_device::bl70(uint32_t s, uint32_t d) { return blia(s, d); }
 uint32_t powervr2_device::bl71(uint32_t s, uint32_t d) { return bls(blia(s, d), d); }
 uint32_t powervr2_device::bl72(uint32_t s, uint32_t d) { return bls(blia(s, d), blc(s, d)); }
-uint32_t powervr2_device::bl73(uint32_t s, uint32_t d) { return bls(blia(s, d), blic(s, d)); }
+uint32_t powervr2_device::bl73(uint32_t s, uint32_t d) { return bls(blia(s, d), blic(d, s)); }
 uint32_t powervr2_device::bl74(uint32_t s, uint32_t d) { return bls(blia(s, d), bla(d, s)); }
 uint32_t powervr2_device::bl75(uint32_t s, uint32_t d) { return bls(blia(s, d), blia(d, s)); }
 uint32_t powervr2_device::bl76(uint32_t s, uint32_t d) { return bls(blia(s, d), bla(d, d)); }
@@ -743,7 +743,8 @@ void powervr2_device::tex_get_info(texinfo *t)
 	t->cd = dilatechose[t->sizes];
 	t->palbase = 0;
 	t->vqbase = t->address;
-	t->blend = ignoretexalpha ? bl10 : blend_functions[t->blend_mode];
+	t->blend = blend_functions[t->blend_mode];
+	t->texalpha_set = ignoretexalpha ? 0xff000000 : 0; // the texel's alpha reads as 1.0, the blend mode still applies
 
 	t->coltype = coltype;
 	t->tsinstruction = tsinstruction;
@@ -2302,12 +2303,13 @@ void powervr2_device::process_ta_fifo()
 						*/
 						memcpy(&base_intensity, tafifo_buff + 6, sizeof(base_intensity));
 						memcpy(&offs_intensity, tafifo_buff + 7, sizeof(offs_intensity));
-						vert_base_color[0] = poly_base_color[0] * base_intensity;
+						// the intensity scales the colour, not the alpha
+						vert_base_color[0] = poly_base_color[0];
 						vert_base_color[1] = poly_base_color[1] * base_intensity;
 						vert_base_color[2] = poly_base_color[2] * base_intensity;
 						vert_base_color[3] = poly_base_color[3] * base_intensity;
 						if (offset_color_enable) {
-							vert_offset_color[0] = poly_offs_color[0] * offs_intensity;
+							vert_offset_color[0] = poly_offs_color[0];
 							vert_offset_color[1] = poly_offs_color[1] * offs_intensity;
 							vert_offset_color[2] = poly_offs_color[2] * offs_intensity;
 							vert_offset_color[3] = poly_offs_color[3] * offs_intensity;
@@ -2578,6 +2580,7 @@ inline uint32_t powervr2_device::sample_textured(texinfo *ti, float u, float v, 
 	{
 		c = (this->*(ti->r))(ti, u, v);
 	}
+	c |= ti->texalpha_set;
 
 	switch (tsinst) {
 		case 0:
