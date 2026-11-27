@@ -34,7 +34,7 @@
 
  XT1 = 16.000 MHz
  XT2 = S873
- DP1 = Bank of8 DIP switches
+ DP1 = Bank of 8 DIP switches
  CN4 = Speaker
  CN9 = RS232
  CN8 = Power Out
