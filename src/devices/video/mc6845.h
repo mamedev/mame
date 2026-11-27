@@ -224,7 +224,13 @@ protected:
 	bool    m_has_valid_parameters;
 	bool    m_display_off;         /* valid timing, but nothing displayed (R1 or R6 is 0) */
 	uint8_t m_display_off_columns; /* columns in the screen configuration kept while the display is off */
+	uint8_t m_sync_regs_written;   /* which of R0, R4 and R7 have been written (SYNC_REG_* bits) */
 	bool    m_display_disabled_msg_shown;
+
+	static constexpr uint8_t SYNC_REG_R0 = 0x01;
+	static constexpr uint8_t SYNC_REG_R4 = 0x02;
+	static constexpr uint8_t SYNC_REG_R7 = 0x04;
+	static constexpr uint8_t SYNC_REGS_ALL = SYNC_REG_R0 | SYNC_REG_R4 | SYNC_REG_R7;
 
 	uint16_t   m_current_disp_addr;   /* the display address currently drawn (used only in mc6845_update) */
 
@@ -235,6 +241,7 @@ protected:
 	void call_on_update_address(int strobe);
 	void transparent_update();
 	void recompute_parameters(bool postload);
+	bool can_start_line_timer() const;
 	void update_counters();
 	void set_de(int state);
 	void set_hsync(int state);

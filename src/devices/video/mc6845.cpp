@@ -233,14 +233,14 @@ void mc6845_device::register_w(uint8_t data)
 
 	switch (m_register_address_latch)
 	{
-		case 0x00:  m_horiz_char_total =   data & 0xff; break;
+		case 0x00:  m_horiz_char_total =   data & 0xff; m_sync_regs_written |= SYNC_REG_R0; break;
 		case 0x01:  m_horiz_disp       =   data & 0xff; break;
 		case 0x02:  m_horiz_sync_pos   =   data & 0xff; break;
 		case 0x03:  m_sync_width       =   data & 0xff; break;
-		case 0x04:  m_vert_char_total  =   data & 0x7f; break;
+		case 0x04:  m_vert_char_total  =   data & 0x7f; m_sync_regs_written |= SYNC_REG_R4; break;
 		case 0x05:  m_vert_total_adj   =   data & 0x1f; break;
 		case 0x06:  m_vert_disp        =   data & 0x7f; break;
-		case 0x07:  m_vert_sync_pos    =   data & 0x7f; break;
+		case 0x07:  m_vert_sync_pos    =   data & 0x7f; m_sync_regs_written |= SYNC_REG_R7; break;
 		case 0x08:  m_mode_control     =   data & 0xff; break;
 		case 0x09:  m_max_ras_addr     =   data & 0x1f; break;
 		case 0x0a:  m_cursor_start_ras =   data & 0x7f; break;
@@ -414,11 +414,20 @@ void mc6845_device::recompute_parameters(bool postload)
 		m_hsync_off_pos = hsync_off_pos;
 		m_vsync_on_pos = vsync_on_pos;
 		m_vsync_off_pos = vsync_off_pos;
-		if (m_line_timer && !m_line_timer->enabled() && m_has_valid_parameters)
+		if (m_line_timer && !m_line_timer->enabled() && can_start_line_timer())
 		{
 			m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
 		}
 	}
+}
+
+
+bool mc6845_device::can_start_line_timer() const
+{
+	// The sync timing doesn't depend on Horizontal or Vertical Displayed, so the counters should
+	// run (and generate HSYNC/VSYNC) even when nothing is displayed, but only once the totals and
+	// VSYNC position have been programmed.
+	return m_has_valid_parameters || ((m_sync_regs_written == SYNC_REGS_ALL) && (m_vert_pix_total > 0));
 }
 
 
@@ -998,6 +1007,7 @@ void mc6845_device::device_start()
 	m_has_valid_parameters = false;
 	m_display_off = false;
 	m_display_off_columns = 0;
+	m_sync_regs_written = 0;
 	m_display_disabled_msg_shown = false;
 	m_line_enable_ff = false;
 	m_vsync_ff = 0;
@@ -1076,6 +1086,7 @@ void mc6845_device::device_start()
 	save_item(NAME(m_has_valid_parameters));
 	save_item(NAME(m_display_off));
 	save_item(NAME(m_display_off_columns));
+	save_item(NAME(m_sync_regs_written));
 }
 
 
@@ -1088,7 +1099,7 @@ void mc6845_device::device_reset()
 
 	m_out_vsync_cb(false);
 
-	if (!m_line_timer->enabled() && m_has_valid_parameters)
+	if (!m_line_timer->enabled() && can_start_line_timer())
 	{
 		m_line_timer->adjust(cclks_to_attotime(m_horiz_char_total + 1));
 	}
@@ -1400,14 +1411,14 @@ void hd6345_device::register_w(uint8_t data)
 
 	switch (m_register_address_latch)
 	{
-		case 0x00:  m_horiz_char_total =   data & 0xff; break;
+		case 0x00:  m_horiz_char_total =   data & 0xff; m_sync_regs_written |= SYNC_REG_R0; break;
 		case 0x01:  m_horiz_disp       =   data & 0xff; break;
 		case 0x02:  m_horiz_sync_pos   =   data & 0xff; break;
 		case 0x03:  m_sync_width       =   data & 0xff; break;
-		case 0x04:  m_vert_char_total  =   data & 0xff; break;
+		case 0x04:  m_vert_char_total  =   data & 0xff; m_sync_regs_written |= SYNC_REG_R4; break;
 		case 0x05:  m_vert_total_adj   =   data & 0x1f; break;
 		case 0x06:  m_vert_disp        =   data & 0xff; break;
-		case 0x07:  m_vert_sync_pos    =   data & 0xff; break;
+		case 0x07:  m_vert_sync_pos    =   data & 0xff; m_sync_regs_written |= SYNC_REG_R7; break;
 		case 0x08:  m_mode_control     =   data & 0xf3; break;
 		case 0x09:  m_max_ras_addr     =   data & 0x1f; break;
 		case 0x0a:  m_cursor_start_ras =   data & 0x7f; break;
