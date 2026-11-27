@@ -5,14 +5,16 @@
 
  NES/Famicom cartridge emulation for Rex Soft PCBs
 
+ iNES mappers: 12, 14
+
 
  Here we emulate the following PCBs
 
  * Rex Soft Dragon Ball Z V [mapper 12]
  * Rex Soft SL-1632 [mapper 14]
 
- TODO:
- - fix 0x6000-0x7fff accesses, write_m/read_m
+ The GAL on the Dragon Ball Z V board only decodes (A & 0xe100) == 0x4100,
+ so 0x6000-0x7fff is plain MMC3 territory.
 
  ***********************************************************************************************************/
 
@@ -59,7 +61,7 @@ void nes_rex_dbz5_device::device_start()
 void nes_rex_dbz5_device::pcb_reset()
 {
 	m_extra = 0;
-	mmc3_common_initialize(0xff, 0xff, 0);
+	mmc3_common_initialize(0xff, 0xff, 1);    // MMC3A IRQ behaviour, required by Dragon Ball Z 5
 }
 
 void nes_rex_sl1632_device::device_start()
@@ -76,7 +78,7 @@ void nes_rex_sl1632_device::pcb_reset()
 	m_mode = 0;
 	m_mirror[0] = m_mirror[1] = 0;
 	m_vrc2_prg_bank[0] = m_vrc2_prg_bank[1] = 0;
-	std::fill(std::begin(m_vrc2_vrom_bank), std::end(m_vrc2_vrom_bank), 0x00);
+	std::fill(std::begin(m_vrc2_vrom_bank), std::end(m_vrc2_vrom_bank), 0xff);    // Huang-1 power-on value
 	mmc3_common_initialize(0xff, 0xff, 0);
 }
 
@@ -94,11 +96,13 @@ void nes_rex_sl1632_device::pcb_reset()
 
  Games: Dragon Ball Z 5, Dragon Ball Z Super
 
- MMC3 clone. Writes to 0x4100-0x5fff (or from 0x4020?)
- possibly select higher VROM pages (to allow up to
- 512 banks instead of 256 only): bit0 selects the
- higher pages for PPU banks 0-3 (0x0000-0x0fff), while
- bit4 selects the higher pages for PPU banks 4-7 (0x1000-0x1fff)
+ Gouder SL-5020B PCB: Huang-1 ASIC in MMC3A mode, plus a GAL16V8
+ providing an outer CHR bank register, decoded at (A & 0xe100) == 0x4100.
+ Write: bit0 = CHR A18 when PPU A12=0, bit4 = CHR A18 when PPU A12=1.
+ The register lives outside the ASIC, so it is not affected by MMC3
+ $8000 bit 7 and takes effect immediately (FCEUX instead latches it
+ until the next MMC3 CHR bank write; that is not hardware behaviour).
+ Read: bit0 = language select (hard-wired in all known copies).
 
  iNES: mapper 12
 
@@ -110,15 +114,21 @@ void nes_rex_dbz5_device::write_l(offs_t offset, uint8_t data)
 {
 	LOG("rex_dbz write_l, offset: %04x, data: %02x\n", offset, data);
 
-	m_extra = data;
-	set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	if (BIT(offset + 0x4100, 8))    // GAL decodes (A & 0xe100) == 0x4100
+	{
+		m_extra = data;
+		set_chr(m_chr_source, m_chr_base, m_chr_mask);
+	}
 }
 
-/* we would need to use this read handler in 0x6000-0x7fff as well */
+// the game reads the language bit from the same GAL-decoded address it writes the CHR register to
 uint8_t nes_rex_dbz5_device::read_l(offs_t offset)
 {
 	LOG("rex_dbz read_l, offset: %04x\n", offset);
-	return 0x01;
+
+	if (BIT(offset + 0x4100, 8))    // only D0 (language) is driven
+		return (get_open_bus() & 0xfe) | 0x01;
+	return get_open_bus();
 }
 
 void nes_rex_dbz5_device::chr_cb(int start, int bank, int source)
@@ -138,6 +148,8 @@ void nes_rex_dbz5_device::chr_cb(int start, int bank, int source)
  This board uses a Huang-1 chip, which can simulate the
  behavior of MMC1, MMC3, and VRC2. A PAL controls which
  mode is active and limits it to the latter two here.
+ The MMC3 scanline IRQ only exists in MMC3 mode; VRC2 has
+ no IRQ, so the counter is not clocked while in VRC2 mode.
 
  iNES: mapper 14
 
@@ -165,6 +177,18 @@ void nes_rex_sl1632_device::chr_cb(int start, int bank, int source)
 		chr1_x(start, hi | bank, source);
 	else                   // VRC2 mode
 		chr1_x(start, hi | m_vrc2_vrom_bank[start], source);
+}
+
+void nes_rex_sl1632_device::ppu_a12_rise()
+{
+	if (BIT(m_mode, 1))    // MMC3 mode only
+		nes_txrom_device::ppu_a12_rise();
+}
+
+void nes_rex_sl1632_device::hblank_irq(int scanline, bool vblank, bool blanked)
+{
+	if (BIT(m_mode, 1))    // MMC3 mode only
+		nes_txrom_device::hblank_irq(scanline, vblank, blanked);
 }
 
 void nes_rex_sl1632_device::write_h(offs_t offset, u8 data)

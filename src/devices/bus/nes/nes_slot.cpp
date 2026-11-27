@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 /***********************************************************************************************************
 
 
@@ -60,21 +60,23 @@
 
 /*****************************************************************************************
 
- A few Mappers suffer of hardware conflict: original dumpers have used the same mapper number for more than
- a kind of boards. In these cases (and only in these cases) we exploit nes.hsi to set up accordingly
- emulation. Games which requires this hack are the following:
+ A few mapper numbers were used by the original dumpers for more than one kind of board. For iNES 1.0 images,
+ which have no submapper, nes.hsi gives these images a variant code that the loader uses to set up the right
+ board:
  * 032 - Major League needs hardwired mirroring (missing windows and glitched field in top view, otherwise)
  * 034 - Impossible Mission II is not like BxROM games (it writes to 0x7ffd-0x7fff, instead of 0x8000). It is still
  unplayable though (see above)
- * 071 - Fire Hawk is different from other Camerica games (no hardwired mirroring). Without crc_hack no helicopter graphics
+ * 071 - Fire Hawk has mapper controlled mirroring, unlike the other Camerica games: without its variant code the
+ helicopter graphics are missing
  * 078 - Cosmo Carrier needs a different mirroring than Holy Diver
  * 113 - HES 6-in-1 requires mirroring (check Bookyman playfield), while other games break with this (check AV Soccer)
  * 153 - Famicom Jump II uses a different board (or the same in a very different way)
  * 242 - DQ8 has no mirroring (missing graphics is due to other reasons though)
 
- crc_hacks have been added also to handle a few wiring settings which would require submappers:
+ Variant codes also select a few wirings that NES 2.0 gives as submappers:
  * CHR protection pins for mapper 185
  * VRC-2, VRC-4 and VRC-6 line wiring
+ * MMC6 (HKROM) and the MMC3A style IRQ for mapper 4
 
  Remember that the MMC # does not equal the mapper #. In particular, Mapper 4 is
  in fact MMC3, Mapper 9 is MMC2 and Mapper 10 is MMC4. Makes perfect sense, right?
@@ -85,6 +87,7 @@
 #include "emu.h"
 #include "hashfile.h"
 #include "nes_slot.h"
+#include "cpu/m6502/rp2a03.h"
 
 #include "cpu/m6502/m6502.h"
 
@@ -113,9 +116,10 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 	, m_ciram(nullptr)
 	, m_prg_size(0)
 	, m_vrom_size(0)
-	// HACK: to reduce tagmap lookups for PPU-related IRQs, we add a hook to the
-	// main NES CPU here, even if it does not belong to this device.
-	, m_maincpu(*this, ":maincpu")
+	, m_slot(nullptr)
+	, m_maincpu(nullptr)
+	, m_builtin_cpu(device, finder_base::DUMMY_TAG)
+	, m_builtin_irq(device)
 	, m_mapper_sram(nullptr)
 	, m_misc_rom(nullptr)
 	, m_mapper_sram_size(0)
@@ -352,6 +356,15 @@ void device_nes_cart_interface::bank_chr(int shift, int start, int bank, int sou
 	uint8_t *base_ptr;
 	uint32_t chr_chunks;
 
+	if (source == CHRROM && m_vrom == nullptr)
+	{
+		// the board asked for CHR-ROM that this cart does not have (a software list entry without a CHR data area):
+		// map CHR-RAM instead of a null pointer that the PPU would read through
+		if (m_vram.empty())
+			vram_alloc(0x2000);
+		source = CHRRAM;
+	}
+
 	if (source == CHRRAM)
 	{
 		assert(!m_vram.empty());
@@ -367,7 +380,23 @@ void device_nes_cart_interface::bank_chr(int shift, int start, int bank, int sou
 		chr_chunks = m_vrom_chunks;
 	}
 
-	bank &= (chr_chunks << (3 - shift)) - 1;
+	if (source == CHRRAM && m_vram.size() < 0x2000)
+	{
+		// CHR-RAM smaller than 8 KiB (e.g. the 2 KiB on Waixing mapper 74 boards): m_vram_chunks is 0, which made the mask
+		// -1 and let bank numbers point past the end of the RAM - mask by the RAM's real size in 1 KiB pages instead
+		const uint32_t windows = (m_vram.size() / 0x400) >> shift;
+		bank = windows ? (bank & (windows - 1)) : 0;
+	}
+	else
+	{
+		// a CHR-ROM whose size is not a power of two (the 1.5 MiB of the Maxivision 30-in-1, NES 2.0 mapper 487) cannot be
+		// wrapped with a mask: bank numbers inside the image are kept, the ones past its end wrap around it
+		const uint32_t windows = chr_chunks << (3 - shift);
+		if (windows & (windows - 1))
+			bank = windows ? (uint32_t(bank) % windows) : 0;
+		else
+			bank &= windows - 1;
+	}
 	int size = 0x400 << shift;
 	int bank_start = bank * size;
 	int kbyte = 1 << shift;
@@ -392,6 +421,9 @@ void device_nes_cart_interface::set_nt_page(int page, int source, int bank, int 
 	{
 		case CART_NTRAM:
 			base_ptr = &m_ext_ntram[0];
+			break;
+		case VRAM_NT:
+			base_ptr = &m_vram[0];
 			break;
 		case VROM:
 			bank &= (m_vrom_chunks << 3) - 1;
@@ -471,7 +503,22 @@ void device_nes_cart_interface::set_irq_line(int state)
 {
 	assert(state == ASSERT_LINE || state == CLEAR_LINE);
 
-	m_maincpu->set_input_line(m6502_device::IRQ_LINE, state);
+	if (m_slot)
+		m_slot->irq_w(state);
+	else
+		m_builtin_irq(state);
+}
+
+//-------------------------------------------------
+//  interface_pre_start - find the slot and the CPU
+//-------------------------------------------------
+
+void device_nes_cart_interface::interface_pre_start()
+{
+	m_slot = dynamic_cast<nes_cart_slot_device *>(device().owner());
+	m_maincpu = m_slot ? m_slot->cpu() : m_builtin_cpu.target();
+	if (!m_maincpu)
+		throw emu_fatalerror("%s: no CPU configured for the NES cartridge (on its slot, or on the cartridge if it is built in)\n", device().tag());
 }
 
 //-------------------------------------------------
@@ -545,6 +592,13 @@ uint8_t device_nes_cart_interface::nt_r(offs_t offset)
 //  source)
 //-------------------------------------------------
 
+uint8_t device_nes_cart_interface::get_open_bus()
+{
+	if (auto *const cpu = dynamic_cast<rp2a03_core_device *>(m_maincpu))
+		return cpu->open_bus();
+	return m_open_bus;
+}
+
 uint8_t device_nes_cart_interface::read_l(offs_t offset)
 {
 	return get_open_bus();
@@ -590,9 +644,12 @@ void device_nes_cart_interface::pcb_start(running_machine &machine, uint8_t *cir
 		{
 			if (m_prg_bank_mem[i])
 			{
-				m_prg_bank_mem[i]->configure_entries(0, m_prg_size / 0x2000, m_prg, 0x2000);
-				m_prg_bank_mem[i]->set_entry(i);
-				m_prg_bank[i] = i;
+				// images smaller than 32 KiB (e.g. 8 KiB NROM such as Galaxian) mirror their banks across $8000-$FFFF;
+				// selecting entry i directly failed for entries that do not exist
+				const int entries = std::max<int>(1, m_prg_size / 0x2000);
+				m_prg_bank_mem[i]->configure_entries(0, entries, m_prg, 0x2000);
+				m_prg_bank_mem[i]->set_entry(i % entries);
+				m_prg_bank[i] = i % entries;
 			}
 		}
 	}
@@ -654,9 +711,11 @@ nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const 
 	: device_t(mconfig, NES_CART_SLOT, tag, owner, clock)
 	, device_cartrom_image_interface(mconfig, *this)
 	, device_single_card_slot_interface<device_nes_cart_interface>(mconfig, *this)
-	, m_crc_hack(0)
+	, device_mixer_interface(mconfig, *this)
 	, m_cart(nullptr)
 	, m_pcb_id(NO_BOARD)
+	, m_cpu(*this, finder_base::DUMMY_TAG)
+	, m_irq_handler(*this)
 {
 }
 
@@ -666,6 +725,22 @@ nes_cart_slot_device::nes_cart_slot_device(const machine_config &mconfig, const 
 
 nes_cart_slot_device::~nes_cart_slot_device()
 {
+}
+
+//-------------------------------------------------
+//  cpu - the CPU configured on this slot, or on the
+//  slot a pass-through cartridge (Game Genie) is in
+//-------------------------------------------------
+
+cpu_device *nes_cart_slot_device::cpu() const
+{
+	for (const device_t *dev = this; dev; dev = dev->owner())
+	{
+		auto const *const slot = dynamic_cast<const nes_cart_slot_device *>(dev);
+		if (slot && slot->m_cpu.target())
+			return slot->m_cpu.target();
+	}
+	return nullptr;
 }
 
 //-------------------------------------------------
@@ -682,6 +757,164 @@ void nes_cart_slot_device::pcb_start(uint8_t *ciram_ptr)
 {
 	if (m_cart)
 		m_cart->pcb_start(machine(), ciram_ptr, exists());
+}
+
+// NESdev "Cartridge connector": the Famicom's 60-pin connector has no reset line and no CIC lines at all, and the only
+// reset on the NES's 72 pins is the CIC's (CIC +RST). The console's reset button therefore only reaches a board that
+// takes the CIC's reset or has a circuit of its own to notice a reset. The boards below are set up at power-on only and
+// keep their registers through a reset:
+// - Nintendo's discrete logic boards (a latch for the bank and nothing that watches for a reset);
+// - MMC2: no reset input (NESdev "MMC2 pinout"). MMC4: only on Famicom boards; three of its pins are of unknown
+//   function (NESdev "MMC4 pinout"). MMC6: its inputs of unknown function are tied to supply levels on the HKROM board
+//   (NESdev "MMC6 pinout");
+// - Konami VRC2, VRC4, VRC6, VRC7: no reset input (NESdev "VRC2 pinout", "VRC6 pinout", "VRC7 pinout"; the VRC7's /IC
+//   only exists in its debug mode);
+// - Namcot 129/163/175/340: a /RESET pin, fed from the board's supply, through the battery switch where there is one,
+//   and not from the console (NESdev "Namcot 163 family pinout", pins 19, 32, 43);
+// - Sunsoft FME-7/5A/5B and Jaleco SS 88006: no reset input (NESdev "Sunsoft 5 pinout", "Jaleco SS 88006 pinout");
+// - Namcot 108/109/118/119 and Konami VRC1: no reset input, every pin is accounted for (NESdev "Namcot 108 family
+//   pinout", "VRC1 pinout");
+// - Konami VRC3: no reset input among its 18 pins (NESdev "VRC3 pinout"). Sunsoft 4: no reset input; its one pin of
+//   uncertain function, 10, is tied to ground (NESdev "Sunsoft 4 pinout"). The same chip with the connector for the
+//   Nantettatte!! Baseball sub-cartridge: that connector carries M2, the address and data lines and four of the
+//   chip's outputs, and no reset (NESdev "Nantettatte!! Baseball pinout").
+// - Sunsoft 1, 2 and 3, Irem H3001 and TAM-S1, Taito TC0190 (with or without its PAL), TC0690, X1-005 and X1-017: no
+//   reset input, every pin is accounted for and the unused ones are marked not connected (NESdev "Sunsoft 1 pinout",
+//   "Sunsoft 2 pinout", "Sunsoft 3 pinout", "Irem H3001 pinout", "Irem TAM-S1 pinout", "Taito TC0190 pinout",
+//   "Taito TC0690 pinout", "Taito X1-005 pinout", "Taito X1-017 pinout").
+// - NTDEC TC-112: no reset input, every pin is accounted for (NESdev "NTDEC TC-112 pinout"). The NTDEC8801 has a /RESET
+//   input whose wiring is not documented (NESdev "NTDEC8801 pinout"); the Konami VRC5 and the Sachen SA8259A each have
+//   pins of unknown function (NESdev "VRC5 pinout", "Sachen SA8259A pinout"), so they stay on the default.
+// - Kaiser KS-201 (mappers 312 and 554): no reset input; its one input of unknown function, pin 18, is tied to the supply
+//   (NESdev "KS-201 pinout"). Sachen's "74LS374N" (mappers 150 and 243) and the SMD133/AA6023 (mappers 224 and 268): no
+//   reset input, every pin is accounted for (NESdev "Sachen 74LS374N pinout", "SMD133 (AA6023) pinout", which shows
+//   both its QFP and DIP packages). The Yoko PT8154 has no reset input either, but NESdev says it was used on one version
+//   of mapper 189 only, so it is not matched to the board for 189 here.
+// - The mapper 208 chip (Gouder) and the TXC 05-00002-010 (mappers 36, 132 and 173): no reset input, every pin is accounted
+//   for (NESdev "Mapper 208 pinout", "TXC 05-00002-010 pinout"). The Bandai M60001-0115P of the Karaoke Studio (mapper 188)
+//   has a pin of unknown function (19) and stays on the default (NESdev "Bandai M60001-0115P pinout").
+// - The non-Nintendo discrete-logic boards whose registers are 74xx latches (the boards of the M2-fall list above that were
+//   not excluded yet: Color Dreams' 74377, the 74161 and 74138 of mapper 38, the 74139 and 7474 of mappers 87 and 101,
+//   Irem's mapper 78 and Jaleco's JF-11 and JF-16): a latch holds the bank and nothing watches for a reset, as on
+//   Nintendo's discrete boards. Jaleco's JF-23, JF-24, JF-29 and JF-33 are boards of the SS 88006 above.
+// - Jaleco's JF-13, JF-17 and JF-19 (with or without the ADPCM) and the 74161/161/32 board of mappers 70 and 152: discrete
+//   logic with a 74161 on the data bus, as in Nintendo's discrete boards (NESdev "INES Mapper 072", "INES Mapper 086",
+//   "INES Mapper 070"); the reset of the uPD7756 on the Jaleco boards comes from the board's own latch, not the console.
+// The MMC1 and MMC3 boards do the same in their own pcb_reset(). Every other board is still re-initialized by a reset.
+// That is right for the multicarts that detect one; the MMC5 detects a system reset (NESdev "MMC5") and the RAMBO-1
+// takes the CIC's reset on pin 17 (NESdev "Tengen RAMBO-1 pinout"), with no documented effect on their registers; the
+// Bandai LZ93D50 has seven pins of unknown function and the Bandai FCG-1/2 has an input of unknown function on pin 1
+// (NESdev "Bandai FCG pinout"); Camerica's BF9093 and BF9096 have no pinout page; the rest have not been checked.
+bool nes_cart_slot_device::console_reset_reaches_board() const
+{
+	switch (m_pcb_id)
+	{
+		case STD_NROM:
+		case STD_NROM368:
+		case STD_AXROM:
+		case STD_AMROM:
+		case STD_BXROM:
+		case STD_CNROM:
+		case STD_CPROM:
+		case STD_GXROM:
+		case STD_UXROM:
+		case STD_UN1ROM:
+		case UXROM_CC:
+		case STD_PXROM:
+		case STD_FXROM:
+		case STD_HKROM:
+		case KONAMI_VRC2:
+		case KONAMI_VRC4:
+		case KONAMI_VRC6:
+		case KONAMI_VRC7:
+		case SUNSOFT_FME7:
+		case SUNSOFT_5:
+		case JALECO_SS88006:
+		case NAMCOT_163:
+		case NAMCOT_175:
+		case NAMCOT_340:
+		case NAMCOT_34X3:
+		case NAMCOT_3425:
+		case NAMCOT_3446:
+		case KONAMI_VRC1:
+		case KONAMI_VRC3:
+		case SUNSOFT_4:
+		case SUNSOFT_DCS:
+		case SUNSOFT_1:
+		case SUNSOFT_2:
+		case SUNSOFT_3:
+		case IREM_H3001:
+		case IREM_TAM_S1:
+		case TAITO_TC0190FMC:
+		case TAITO_TC0190FMCP:
+		case TAITO_X1_005:
+		case TAITO_X1_017:
+		case NTDEC_FIGHTINGHERO:
+		case KAISER_KS7010:
+		case KAISER_KS7013B:
+		case SACHEN_74LS374:
+		case SACHEN_74LS374_ALT:
+		case SMD133_BOARD:
+		case GOUDER_37017:
+		case TXC_STRIKEW:
+		case TXC_22211:
+		case TXC_MJBLOCK:
+		case DIS_74X377:
+		case DIS_74X139X74:
+		case DIS_74X161X138:
+		case IREM_HOLYDIVR:
+		case JALECO_JF11:
+		case JALECO_JF16:
+		case JALECO_JF23:
+		case JALECO_JF24:
+		case JALECO_JF29:
+		case JALECO_JF33:
+		case JALECO_JF13:
+		case JALECO_JF17:
+		case JALECO_JF17_ADPCM:
+		case JALECO_JF19:
+		case JALECO_JF19_ADPCM:
+		case DIS_74X161X161X32:
+			return false;
+		default:
+			return true;
+	}
+}
+
+// Boards whose register is a 74161 used as a latch: NESdev "74161": "/Load causes Q to be set to the value of D on a
+// low-to-high transition of Clock", wired "Clock -- /ROMSEL, /Load -- CPU R/W". /ROMSEL is the NAND of M2 and CPU A15
+// (NESdev "Cartridge connector"), so it rises when M2 falls: the register takes the written value at the end of the
+// write cycle, not when the write begins. NESdev names the 74HC161 on the UxROM, CNROM, GxROM, CPROM and AxROM boards.
+// The same holds for the other boards whose register is an edge-triggered part: the written value is only on the data
+// bus from phi2 until M2 falls (NESdev "CPU pinout", "Cartridge connector"), so the one clock edge that can catch it is
+// the end of the cycle. Color Dreams (mapper 11): a 74377, "D0-7 are copied to Q0-7 when CLK rises while /WE is low"
+// (NESdev "74377"). Mapper 78 (Holy Diver, Cosmo Carrier): two 74HC161 (NESdev "INES Mapper 078"). Mapper 140: the
+// GNROM register moved to $6000-$7FFF (NESdev "GxROM"). Mapper 87/101: a 74139 decoder and a 7474 dual D flip-flop.
+// BNROM: "a 74HC161 binary counter used as a quad D latch" (NESdev "BNROM"). Mapper 38: a 74161 loaded through a
+// 74138 (NESdev "INES Mapper 038").
+bool nes_cart_slot_device::register_loads_at_m2_fall() const
+{
+	switch (m_pcb_id)
+	{
+		case STD_AXROM:
+		case STD_AMROM:
+		case STD_CNROM:
+		case STD_CPROM:
+		case STD_GXROM:
+		case STD_UXROM:
+		case STD_UN1ROM:
+		case UXROM_CC:
+		case DIS_74X377:
+		case DIS_74X139X74:
+		case IREM_HOLYDIVR:
+		case JALECO_JF16:
+		case JALECO_JF11:
+		case STD_BXROM:
+		case DIS_74X161X138:
+			return true;
+		default:
+			return false;
+	}
 }
 
 void nes_cart_slot_device::pcb_reset()
@@ -795,11 +1028,17 @@ std::string nes_cart_slot_device::get_default_card_software(get_default_card_sof
 {
 	if (hook.image_file())
 	{
+		// the largest NES 2.0 image in use is a few MiB: anything that cannot be read in full, or is larger than
+		// any image could sensibly be, gets the default slot (and its load reports the problem)
+		static constexpr uint64_t MAX_IMAGE_SIZE = 64 * 1024 * 1024;
 		uint64_t len;
-		hook.image_file()->length(len); // FIXME: check error return, guard against excessively large files
+		if (hook.image_file()->length(len) || (len < 4) || (len > MAX_IMAGE_SIZE))
+			return software_get_default_slot("nrom");
 		std::vector<uint8_t> rom(len);
 
-		read(*hook.image_file(), &rom[0], len); // FIXME: check error return or read returning short
+		auto const [err, actual] = read(*hook.image_file(), &rom[0], len);
+		if (err || (actual != len))
+			return software_get_default_slot("nrom");
 
 		const char *slot_string = "nrom";
 		if ((rom[0] == 'N') && (rom[1] == 'E') && (rom[2] == 'S'))

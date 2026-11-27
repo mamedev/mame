@@ -182,6 +182,10 @@ void nes_batmap_srrx_device::hblank_irq(int scanline, bool vblank, bool blanked)
 
 u8 nes_batmap_srrx_device::read_dpcm()
 {
+	// the sample data is the cart's NES 2.0 miscellaneous ROM; without it there is nothing to read
+	if (!m_misc_rom_size)
+		return get_open_bus();
+
 	m_dpcm_addr &= m_misc_rom_size - 1;
 	return m_misc_rom[m_dpcm_addr++];
 }

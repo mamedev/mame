@@ -5,8 +5,10 @@
 
  NES/Famicom cartridge emulation for Kaiser PCBs
 
+ iNES mappers: 56, 122, 142, 171, 175, 302, 303, 305, 306, 307, 312, 346, 347, 352, 525, 549, 554
 
- Here we emulate the following Kaiser bootleg PCBs
+
+ Here we emulate the following Kaiser bootleg PCBs (and the JY043, a simpler bootleg variant of the KS7058)
 
  * Kaiser KS106C
  * Kaiser KS202
@@ -24,6 +26,7 @@
  * Kaiser KS7037
  * Kaiser KS7057
  * Kaiser KS7058
+ * JY043
 
  ***********************************************************************************************************/
 
@@ -61,6 +64,7 @@ DEFINE_DEVICE_TYPE(NES_KS7032,  nes_ks7032_device,  "nes_ks7032",  "NES Cart Kai
 DEFINE_DEVICE_TYPE(NES_KS7037,  nes_ks7037_device,  "nes_ks7037",  "NES Cart Kaiser KS-7037 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7057,  nes_ks7057_device,  "nes_ks7057",  "NES Cart Kaiser KS-7057 PCB")
 DEFINE_DEVICE_TYPE(NES_KS7058,  nes_ks7058_device,  "nes_ks7058",  "NES Cart Kaiser KS-7058 PCB")
+DEFINE_DEVICE_TYPE(NES_JY043,   nes_jy043_device,   "nes_jy043",   "NES Cart JY043 PCB")
 
 
 nes_ks106c_device::nes_ks106c_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
@@ -73,13 +77,18 @@ nes_ks7058_device::nes_ks7058_device(const machine_config &mconfig, const char *
 {
 }
 
+nes_jy043_device::nes_jy043_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: nes_nrom_device(mconfig, NES_JY043, tag, owner, clock)
+{
+}
+
 nes_ks7022_device::nes_ks7022_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: nes_nrom_device(mconfig, NES_KS7022, tag, owner, clock), m_latch(0)
 {
 }
 
 nes_ks7032_device::nes_ks7032_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0), irq_timer(nullptr)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_count_latch(0), m_irq_enable(0)
 {
 }
 
@@ -109,7 +118,7 @@ nes_ks7016b_device::nes_ks7016b_device(const machine_config &mconfig, const char
 }
 
 nes_ks7017_device::nes_ks7017_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
-	: nes_nrom_device(mconfig, NES_KS7017, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_status(0), m_irq_enable(0), irq_timer(nullptr)
+	: nes_nrom_device(mconfig, NES_KS7017, tag, owner, clock), m_latch(0), m_irq_count(0), m_irq_status(0), m_irq_enable(0)
 {
 }
 
@@ -188,8 +197,6 @@ void nes_ks7022_device::pcb_reset()
 void nes_ks7032_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_ks7032_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_latch));
 	save_item(NAME(m_irq_enable));
@@ -230,8 +237,6 @@ void nes_ks7016_device::pcb_reset()
 void nes_ks7017_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_ks7017_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_latch));
 	save_item(NAME(m_irq_enable));
@@ -393,13 +398,48 @@ void nes_ks7058_device::write_h(offs_t offset, u8 data)
 
 /*-------------------------------------------------
 
+ JY043 board, a simpler bootleg variant of the Kaiser KS7058
+
+ Games: Tuidaohu Mahjong (the J.Y. Company dump)
+
+ 32K of unbanked PRG and two 4K CHR windows into 32K of CHR-ROM. Writes anywhere in $8000-$FFFF set the CHR bank
+ (CHR A14-A12, three bits): even addresses for PPU $0000-$0FFF, odd addresses for PPU $1000-$1FFF. The nametable
+ arrangement is a solder pad, which the header's mirroring flag stands for.
+ The KS7058 decodes its registers differently, only in $F000-$FFFF and by address bit 7.
+
+ NESdev wiki: INES Mapper 122
+
+ iNES: mapper 122
+
+ In MAME: Supported.
+
+ Tested: Tuidaohu Mahjong (Asia) (J.Y. Company) (Pirate) shows its title and difficulty menu and plays at the table.
+
+ -------------------------------------------------*/
+
+void nes_jy043_device::write_h(offs_t offset, u8 data)
+{
+	LOG("jy043 write_h, offset: %04x, data: %02x\n", offset, data);
+
+	if (BIT(offset, 0))
+		chr4_4(data & 7, CHRROM);
+	else
+		chr4_0(data & 7, CHRROM);
+}
+
+/*-------------------------------------------------
+
  Kaiser Board KS7022
 
  Games: 15 in 1
 
  iNES: mapper 175
 
- In MAME: Supported?
+ In MAME: Supported.
+
+ Tested: 15-in-1 (Taiwan) (En) (Kaiser) (Pirate), all 15 games started from the menu and played: Battle City,
+ Pin Ball, Exerion, Galaga, Excitebike, Kung-Fu, F-16 Star Force, Popeye, Sky Destroyer, Pac-Man, Circus, Macross,
+ Ice Climber, Base Ball, Tennis.
 
  -------------------------------------------------*/
 
@@ -734,7 +774,10 @@ u8 nes_ks7010_device::read_m(offs_t offset)
 
 u8 nes_ks7010_device::read_h(offs_t offset)
 {
-	if ((offset >= 0x4ab6 && offset <= 0x4ad6) || offset == 0x6be2 || offset == 0x6be3 || offset == 0x6e32 || offset == 0x7ffc) // HACK! FIXME
+	// NESdev NES 2.0 Mapper 554: reads switch the banks, to A5-A2 of the address read. The exact address mask is not
+	// known; NESdev lists the addresses verified to switch, and used by the game: $CAB6-$CAD6, $EBE2, $EE32, $FFFC.
+	// $EBE3 is read by the game as well and selects the same bank as $EBE2
+	if ((offset >= 0x4ab6 && offset <= 0x4ad6) || offset == 0x6be2 || offset == 0x6be3 || offset == 0x6e32 || offset == 0x7ffc)
 	{
 		m_latch = BIT(offset, 2, 4);
 		chr8(m_latch, CHRROM);

@@ -140,6 +140,7 @@ protected:
 
 private:
 	int m_exp_active;
+	uint8_t m_exp_bank;   // external ROM bank, also used for the expansion half of a combined 256 KiB image
 	required_device<nes_kstudio_slot_device> m_subslot;
 	required_ioport m_mic_ipt;
 };

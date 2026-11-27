@@ -38,6 +38,7 @@ public:
 
 	u8 read(offs_t offset);
 	void write(offs_t offset, u8 data);
+	void dac_assign(u8 data);
 	void pcm_w(u8 data);
 
 protected:

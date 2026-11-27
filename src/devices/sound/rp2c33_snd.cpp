@@ -9,15 +9,19 @@
     - Information from NESDev wiki
       (https://www.nesdev.org/wiki/FDS_audio)
 
+    The output goes through a 1-pole lowpass with a cutoff of about 2000 Hz, which is how NESdev's FDS audio page
+    approximates the filter the real output has.
+
     TODO:
     - verify register behaviors
     - verify unknown read, writes
-    - Lowpass filter?
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "rp2c33_snd.h"
+
+#include <cmath>
 
 
 //**************************************************************************
@@ -52,11 +56,13 @@ rp2c33_sound_device::rp2c33_sound_device(const machine_config &mconfig, const ch
 
 void rp2c33_sound_device::device_start()
 {
+	constexpr double pi = 3.14159265358979323846;
 	// normalize output to 16 bit
 	for (int i = 0; i < 4; i++)
 		m_mvol_table[i] = int((65536.0 / (32.0 * 64.0)) * 2.0 / double(i + 2));
 
 	m_stream = stream_alloc(0, 1, clock());
+	m_lp_coeff = 1.0f - std::exp(-2.0f * float(pi) * 2000.0f / float(clock()));
 
 	// save states
 	save_item(NAME(m_regs));
@@ -83,6 +89,10 @@ void rp2c33_sound_device::device_start()
 	save_item(NAME(m_mod_acc));
 	save_item(NAME(m_mod_addr));
 	save_item(NAME(m_mod_pos));
+	save_item(NAME(m_mod_force));
+	save_item(NAME(m_mod_tick));
+	save_item(NAME(m_vol_latch));
+	save_item(NAME(m_lp));
 
 	save_item(NAME(m_env_spd));
 	save_item(NAME(m_wave_write));
@@ -107,7 +117,9 @@ void rp2c33_sound_device::device_reset()
 
 void rp2c33_sound_device::device_clock_changed()
 {
+	constexpr double pi = 3.14159265358979323846;
 	m_stream->set_sample_rate(clock());
+	m_lp_coeff = 1.0f - std::exp(-2.0f * float(pi) * 2000.0f / float(clock()));
 }
 
 //**************************************************************************
@@ -195,7 +207,9 @@ void rp2c33_sound_device::write(offs_t offset, u8 data)
 			break;
 		case 0x4087: // modulator frequency high
 			m_mod_halt = BIT(data, 7);
-			// TODO: bit 6?
+			// bit 6: a carry out of the accumulator on every tick of the unit (NESdev FDS audio)
+			m_mod_force = BIT(data, 6);
+			m_mod_tick = 0;
 			m_mod_freq = (m_mod_freq & 0x0ff) | ((data & 0xf) << 8);
 			if (m_mod_halt)
 				m_mod_acc = 0;
@@ -225,7 +239,6 @@ void rp2c33_sound_device::sound_stream_update(sound_stream &stream)
 {
 	for (int i = 0; i < stream.samples(); i++)
 	{
-		m_output = 0;
 		if (!m_env_halt && !m_wave_halt)
 		{
 			exec_vol_env();
@@ -233,8 +246,9 @@ void rp2c33_sound_device::sound_stream_update(sound_stream &stream)
 		}
 		exec_mod();
 		exec_wave();
-		/* Update the buffers */
-		stream.put_int(0, i, m_output * m_mvol_table[m_mvol], 32768);
+		/* Update the buffers, through the output filter */
+		m_lp += m_lp_coeff * (float(m_output * m_mvol_table[m_mvol]) / 32768.0f - m_lp);
+		stream.put(0, i, m_lp);
 	}
 }
 
@@ -296,11 +310,28 @@ inline void rp2c33_sound_device::exec_mod()
 {
 	if (!m_mod_halt)
 	{
-		m_mod_acc += m_mod_freq; // input clock * frequency / 65536
-		while (m_mod_acc > 0xffff)
+		int steps = 0;
+		if (m_mod_force)
+		{
+			// the unit ticks every 16 clocks, and each tick is a carry
+			if (++m_mod_tick >= 16)
+			{
+				m_mod_tick = 0;
+				steps = 1;
+			}
+		}
+		else
+		{
+			m_mod_acc += m_mod_freq; // input clock * frequency / 65536
+			while (m_mod_acc > 0xffff)
+			{
+				m_mod_acc -= (1 << 16);
+				steps++;
+			}
+		}
+		while (steps-- > 0)
 		{
 			const int val = m_mod_table[((m_mod_addr++) >> 1) & 0x1f] & 7;
-			m_mod_acc -= (1 << 16);
 			if (val == 4)
 				m_mod_pos = 0;
 			else
@@ -354,8 +385,12 @@ inline void rp2c33_sound_device::exec_wave()
 		m_wave_acc &= 0xffff;
 	}
 
+	// volume changes only take effect while the wave position is 0 (the PWM unit's latch), but a gain of 0 mutes at once (NESdev FDS audio)
+	if (!(m_wave_addr & 0x3f) || (m_vol_env_out == 0))
+		m_vol_latch = m_vol_env_out;
+
 	// calculate output
 	if (!m_wave_write)
-		m_output = (m_wave[m_wave_addr & 0x3f] - 0x20) * std::min<int>(32, m_vol_env_out);
+		m_output = (m_wave[m_wave_addr & 0x3f] - 0x20) * std::min<int>(32, m_vol_latch);
 
 }

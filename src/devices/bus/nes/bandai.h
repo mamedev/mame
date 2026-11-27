@@ -18,12 +18,10 @@ public:
 	nes_oekakids_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_h(offs_t offset, uint8_t data) override;
-	virtual uint8_t nt_r(offs_t offset) override;
-	virtual void nt_w(offs_t offset, uint8_t data) override;
+	virtual bool wants_ppu_addr_bus() override { return true; }
+	virtual void ppu_addr_bus(u16 addr) override;
 
 	virtual void pcb_reset() override;
-
-	virtual void ppu_latch(offs_t offset) override;
 
 	// TODO: add oeka kids controller emulation
 
@@ -45,23 +43,28 @@ public:
 	// construction/destruction
 	nes_fcg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void fcg_write(offs_t offset, uint8_t data);
+	// latched: LZ93D50 ($8000-$FFFF) shadows the counter value in a latch; the FCG-1/2 ($6000-$7FFF) writes the counter itself
+	void fcg_write(offs_t offset, uint8_t data, bool latched = true);
+	virtual void set_bandai_submapper(u8 val) override { m_regs_at_6000 = (val != 5); }
 	virtual void write_m(offs_t offset, uint8_t data) override;
 
 	virtual void pcb_reset() override;
 
 protected:
+	bool m_regs_at_6000 = true;    // FCG-1/2 registers at $6000-$7FFF (not on LZ93D50-only boards)
 	nes_fcg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+	// the IRQ counter is clocked by M2: it is counted at the M2 rise, before that cycle's CPU access
+	virtual bool wants_m2() override { return true; }
+	virtual void m2_w(int state, offs_t address, bool write) override { if (state) irq_clock(); }
+	void irq_clock();
 
 	uint16_t   m_irq_count;
 	int        m_irq_enable;
-
-	emu_timer *irq_timer;
+	uint16_t   m_irq_latch;
 };
 
 
@@ -101,7 +104,6 @@ protected:
 
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
-	// TODO: fix EEPROM I/O emulation
 	required_device<i2cmem_device> m_i2cmem;
 	uint8_t m_i2c_dir;
 };
@@ -141,6 +143,7 @@ protected:
 
 	void set_prg();
 	uint8_t m_reg[5];
+	uint8_t m_wram_enable;   // $800D bit 5: PRG-RAM chip enable (NESdev INES Mapper 153)
 };
 
 

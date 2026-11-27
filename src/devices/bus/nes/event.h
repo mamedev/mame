@@ -26,8 +26,14 @@ protected:
 
 	virtual void set_prg() override;
 	virtual void set_chr() override;
+	// $A000 is repurposed (PRG select and timer control), so its bits are not SNROM/SOROM-style PRG/RAM lines
+	virtual bool chr_bits_drive_prg() const override { return false; }
 
 	TIMER_CALLBACK_MEMBER(event_tick);
+	// M2 at the cartridge connector: while the timer runs it counts M2 rises (one per CPU cycle)
+	virtual bool wants_m2() override { return true; }
+	virtual void m2_w(int state, offs_t address, bool write) override { if (state && m_m2_running) event_tick(0); }
+	bool m_m2_running = false;
 
 	required_ioport m_dsw;
 
@@ -61,6 +67,9 @@ protected:
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
 	TIMER_CALLBACK_MEMBER(event_tick);
+	// M2 at the cartridge connector: the counter advances once per CPU cycle, at the M2 rise
+	virtual bool wants_m2() override { return true; }
+	virtual void m2_w(int state, offs_t address, bool write) override { if (state) event_tick(0); }
 
 	required_ioport m_dsw;
 

@@ -1399,7 +1399,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="alien3u" cloneof="alien3" supported="partial">
+	<software name="alien3u" cloneof="alien3">
 		<description>Alien³ (USA)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
@@ -1417,7 +1417,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="alien3" supported="partial">
+	<software name="alien3">
 		<description>Alien³ (Europe)</description>
 		<year>1993</year>
 		<publisher>LJN</publisher>
@@ -3688,8 +3688,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- Same issue as US release -->
-	<software name="btoadsj" cloneof="btoads" supported="no">
+	<software name="btoadsj" cloneof="btoads">
 		<description>Battletoads (Japan)</description>
 		<year>1991</year>
 		<publisher>Masaya</publisher>
@@ -3708,8 +3707,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- Game hangs at start of level 3 (turbo tunnel). Sprite 0 hit issue? -->
-	<software name="btoadsu" cloneof="btoads" supported="no">
+	<software name="btoadsu" cloneof="btoads">
 		<description>Battletoads (USA)</description>
 		<year>1991</year>
 		<publisher>Tradewest</publisher>
@@ -3733,9 +3731,8 @@ license:CC0-1.0
 		</part>
 	</software>
 
-<!-- Same issue as US release -->
 <!-- glitches on NTSC -->
-	<software name="btoads" supported="no">
+	<software name="btoads">
 		<description>Battletoads (Europe)</description>
 		<year>1993</year>
 		<publisher>Tradewest</publisher>
@@ -3812,7 +3809,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bee52" supported="no">
+	<software name="bee52">
 		<description>Bee 52 (USA)</description>
 		<year>1992</year>
 		<publisher>Camerica</publisher>
@@ -4156,7 +4153,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="bignfo" supported="no">
+	<software name="bignfo">
 		<description>Big Nose Freaks Out (USA)</description>
 		<year>1992</year>
 		<publisher>Camerica</publisher>
@@ -11037,7 +11034,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="elite" supported="no">
+	<software name="elite">
 		<description>Elite (Europe)</description>
 		<year>1992</year>
 		<publisher>Imagineering</publisher>
@@ -13126,7 +13123,7 @@ license:CC0-1.0
 		</part>
 	</software>
 
-	<software name="firehawk" supported="no">
+	<software name="firehawk">
 		<description>Fire Hawk (USA)</description>
 		<year>1992</year>
 		<publisher>Camerica</publisher>
@@ -15626,7 +15623,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
+<!-- Minor flicker between the status bar and the playfield. -->
 	<software name="guardlgnu" cloneof="guardlgn" supported="partial">
 		<description>The Guardian Legend (USA)</description>
 		<year>1989</year>
@@ -16173,6 +16170,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 			</dataarea>
 		</part>
 	</software>
+
 
 	<software name="hbarrel">
 		<description>Heavy Barrel (USA)</description>
@@ -21403,7 +21401,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="emperorj" cloneof="emperor" supported="partial">
+	<software name="emperorj" cloneof="emperor">
 		<description>L'Empereur (Japan)</description>
 		<year>1991</year>
 		<publisher>Koei</publisher>
@@ -21553,7 +21551,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="laststar" supported="no">
+	<software name="laststar">
 		<description>The Last Starfighter (USA)</description>
 		<year>1990</year>
 		<publisher>Mindscape</publisher>
@@ -26122,7 +26120,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="mother" cloneof="earthbnd" supported="partial">
+	<software name="mother" cloneof="earthbnd">
 		<description>Mother (Japan)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
@@ -26370,8 +26368,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-<!-- The in-game board graphics are completely corrupt making it unnavigable -->
-	<software name="mylife" supported="no">
+	<software name="mylife">
 		<description>My Life My Love - Boku no Yume - Watashi no Negai (Japan)</description>
 		<year>1991</year>
 		<publisher>Banpresto</publisher>
@@ -27883,7 +27880,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="opwolfj" cloneof="opwolf" supported="partial">
+	<software name="opwolfj" cloneof="opwolf">
 		<description>Operation Wolf (Japan)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
@@ -27903,7 +27900,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="opwolfu" cloneof="opwolf" supported="partial">
+	<software name="opwolfu" cloneof="opwolf">
 		<description>Operation Wolf - Take no Prisoners (USA, rev. 0A)</description>
 		<year>1989</year>
 		<publisher>Taito</publisher>
@@ -27923,7 +27920,7 @@ The graphics for the recreated CHR ROM were mostly sourced from HAL's port of St
 		</part>
 	</software>
 
-	<software name="opwolf" supported="partial">
+	<software name="opwolf">
 		<description>Operation Wolf - Take no Prisoners (Europe)</description>
 		<year>1992</year>
 		<publisher>Taito</publisher>
@@ -30721,6 +30718,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		</part>
 	</software>
 
+<!-- Flicker between the dashboard and the road. -->
 	<software name="radraceru" cloneof="radracer" supported="partial">
 		<description>Rad Racer (USA)</description>
 		<year>1987</year>
@@ -30740,7 +30738,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		</part>
 	</software>
 
-	<software name="radracer" supported="partial">
+	<software name="radracer">
 		<description>Rad Racer (Europe)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -32204,8 +32202,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		</part>
 	</software>
 
-<!-- severe status bar flickering (DMC IRQ timing issue?) -->
-	<software name="romancia" supported="no">
+	<software name="romancia">
 		<description>Romancia (Japan)</description>
 		<year>1987</year>
 		<publisher>Tokyo Shoseki</publisher>
@@ -34127,9 +34124,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		</part>
 	</software>
 
-<!-- Game crashes due to incorrect emulation of MMC1 reset writes. This happens when you select みる in the in-game command menu. -->
-<!-- Not reproducible in 2026-10?!? -->
-	<software name="shinsend" supported="no">
+	<software name="shinsend">
 		<description>Shinsenden (Japan)</description>
 		<year>1989</year>
 		<publisher>Irem</publisher>
@@ -37656,7 +37651,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		</part>
 	</software>
 
-	<software name="supermanj" cloneof="superman" supported="partial">
+	<software name="supermanj" cloneof="superman">
 		<description>Superman (Japan)</description>
 		<year>1987</year>
 		<publisher>Kemco</publisher>
@@ -37676,7 +37671,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		</part>
 	</software>
 
-	<software name="superman" supported="partial">
+	<software name="superman">
 		<description>Superman (USA)</description>
 		<year>1988</year>
 		<publisher>Kemco</publisher>
@@ -39765,8 +39760,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		</part>
 	</software>
 
-<!-- intermittent major status bar flickering (DMC IRQ timing issue?) -->
-	<software name="timelordu" cloneof="timelord" supported="partial">
+	<software name="timelordu" cloneof="timelord">
 		<description>Time Lord (USA)</description>
 		<year>1990</year>
 		<publisher>Milton Bradley</publisher>
@@ -40075,7 +40069,7 @@ This mod inserts recreations of the music tracks and sound effects into the prot
 		</part>
 	</software>
 
-	<software name="toearth" supported="partial">
+	<software name="toearth">
 		<description>To The Earth (Europe)</description>
 		<year>1990</year>
 		<publisher>Nintendo</publisher>
@@ -46687,7 +46681,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="pogie" supported="no">
+	<software name="pogie">
 		<!-- This has been compiled from the source code -->
 		<description>Dreamworld Pogie (prototype)</description>
 		<year>198?</year>
@@ -48936,8 +48930,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-<!-- Besides graphics issues when vertically scrolling the game can soft reset randomly! -->
-	<software name="megaman2u30" cloneof="megaman2" supported="no">
+	<software name="megaman2u30" cloneof="megaman2">
 		<description>Mega Man 2 - 30th Anniversary Classic Cartridge</description>
 		<year>2018</year>
 		<publisher>Capcom / iam8bit</publisher>
@@ -52481,7 +52474,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="wlddizzy" supported="no">
+	<software name="wlddizzy">
 		<description>Wonderland Dizzy (Europe, prototype)</description>
 		<year>1991</year>
 		<publisher>Camerica</publisher>
@@ -55620,6 +55613,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ntdec_fh" />
 			<feature name="pcb" value="NTDEC-193" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="262144">
 				<rom name="fighting hero (asia) (unl).chr" size="262144" crc="37c002c8" sha1="07d54a089486cda56114314d7940b5189d449fb4" offset="00000" status="baddump" />
 			</dataarea>
@@ -56041,10 +56035,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="262144">
 				<rom name="fighting hero iii (asia) (unl).prg" size="262144" crc="0831b170" sha1="40ef386e14c39cad0fa19454bc0892f097b7866d" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
+			<!-- 8k WRAM on cartridge, not battery backed: the games rewrite it on every boot and the NES 2.0 headers list it as volatile -->
+			<dataarea name="wram" size="8192" />
 		</part>
 	</software>
 
@@ -56063,10 +56055,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="131072">
 				<rom name="chik bik ji jin - saam gwok ji (asia) (unl).prg" size="131072" crc="2d0f0b27" sha1="ae0b625f035fa0ec9e3b6a44752a5b64559dbbd5" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
+			<!-- 8k WRAM on cartridge, not battery backed: the games rewrite it on every boot and the NES 2.0 headers list it as volatile -->
+			<dataarea name="wram" size="8192" />
 		</part>
 	</software>
 
@@ -56085,15 +56075,13 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="131072">
 				<rom name="san guo zhi - qun xiong zheng ba (asia) (unl).prg" size="131072" crc="81e8992c" sha1="36280662bda3cf9f737d2fd8144a4683f2b49bdc" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
+			<!-- 8k WRAM on cartridge, not battery backed: the games rewrite it on every boot and the NES 2.0 headers list it as volatile -->
+			<dataarea name="wram" size="8192" />
 		</part>
 	</software>
 
-<!-- Works now except there's no way to reload your shots since the zapper can't point off screen -->
-	<software name="mstrshot" supported="no">
+<!-- Reload by firing with the zapper's Lightgun Offscreen input held (the game wants no light from the gun) -->
+	<software name="mstrshot">
 		<description>Master Shooter (Asia)</description>
 		<year>1993</year>
 		<publisher>NTDEC</publisher>
@@ -56109,10 +56097,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="32768">
 				<rom name="master shooter (asia) (unl).prg" size="32768" crc="0f5ca99c" sha1="89d8a6170b065ed17fa3fe2e2db505bebc34764c" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
+			<!-- 8k WRAM on cartridge, not battery backed: the games rewrite it on every boot and the NES 2.0 headers list it as volatile -->
+			<dataarea name="wram" size="8192" />
 		</part>
 	</software>
 
@@ -56125,16 +56111,15 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="ntdec_asder" />
 			<feature name="pcb" value="NTDEC-112" />
+			<feature name="peripheral" value="zapper" />
 			<dataarea name="chr" size="65536">
 				<rom name="cobra mission (asia) (unl).chr" size="65536" crc="d55340d1" sha1="420f0912dbbd16a9c9528ec61f6dd9938a62c657" offset="00000" status="baddump" />
 			</dataarea>
 			<dataarea name="prg" size="65536">
 				<rom name="cobra mission (asia) (unl).prg" size="65536" crc="0bfb7b54" sha1="495f5b3ff54e99de3479bd3e7ec2a534a8e2e3fc" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
+			<!-- 8k WRAM on cartridge, not battery backed: the games rewrite it on every boot and the NES 2.0 headers list it as volatile -->
+			<dataarea name="wram" size="8192" />
 		</part>
 	</software>
 
@@ -56153,10 +56138,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="131072">
 				<rom name="zhen ben xi you ji (asia) (unl).prg" size="131072" crc="6c523731" sha1="98476ed2b00ea977824174748e2fd4ec986b1884" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
+			<!-- 8k WRAM on cartridge, not battery backed: the games rewrite it on every boot and the NES 2.0 headers list it as volatile -->
+			<dataarea name="wram" size="8192" />
 		</part>
 	</software>
 
@@ -56175,10 +56158,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			<dataarea name="prg" size="131072">
 				<rom name="huang di (asia) (unl).prg" size="131072" crc="bc19f17e" sha1="e26ef0fcb1c7b8f51b880a0fcb16004a5c052fce" offset="00000" status="baddump" />
 			</dataarea>
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
+			<!-- 8k WRAM on cartridge, not battery backed: the games rewrite it on every boot and the NES 2.0 headers list it as volatile -->
+			<dataarea name="wram" size="8192" />
 		</part>
 	</software>
 
@@ -56281,7 +56262,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Micro Genius</publisher>
 		<info name="serial" value="MGC-008"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_mjblock" />
+			<feature name="slot" value="txc_22211" />
 			<feature name="pcb" value="UNL-22211-C" />
 			<dataarea name="chr" size="32768">
 				<rom name="mahjong block (unknown) (unl).chr" size="32768" crc="97641e00" sha1="26e77abb2bbbb09bee985b69766c18594f6c85aa" offset="00000" status="baddump" />
@@ -56347,7 +56328,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<!-- From GoodNES -->
-	<software name="strikwlf" supported="no"> <!-- crashes right before first boss -->
+	<software name="strikwlf" supported="partial"> <!-- crashes right before first boss -->
 		<description>Strike Wolf (Spain, Taiwan)</description>
 		<year>1992</year>
 		<publisher>Gluk Video / TXC Corp</publisher>
@@ -57178,7 +57159,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="ES-1045"/>
 		<info name="alt_title" value="甲A"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a1" />
+			<feature name="slot" value="waixing_a" />
 			<feature name="pcb" value="WAIXING-A" />
 			<dataarea name="chr" size="262144">
 				<rom name="jia a fung yun (ch).chr" size="262144" crc="38e14fa2" sha1="b45087973ba8c07018b855062882134d25e71f4f" offset="00000" status="baddump" />
@@ -57202,8 +57183,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="ES-1046"/>
 		<info name="alt_title" value="风云"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a" />
-			<feature name="pcb" value="WAIXING-A" />
+			<feature name="slot" value="fk23ca" />
+			<feature name="submapper" value="2" />
+			<feature name="pcb" value="WAIXING-FS005" />
+			<!-- NESdev (mapper 195 page): this PRG (a9b36a7d) is a 2005/2006 re-release, which uses mapper 176; the original 1997 release is mapper 74 -->
 			<dataarea name="chr" size="262144">
 				<rom name="[es-1046] fengyun (c).chr" size="262144" crc="f618a544" sha1="047547b137f334634e55b71a81bf9c62884ca243" offset="00000" status="baddump" />
 			</dataarea>
@@ -57574,7 +57557,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- ES-1067? Shen Guo Hui Zhang II Dai - Chinese translation of Fire Emblem: Ankoku Ryu to Hikari no Ken - same as firembc?? -->
 
-	<software name="babaoqiz" supported="no">
+	<software name="babaoqiz">
 		<description>Ba Bao Qi Zhu - Li Jian Ba Quan Zhuan (China)</description>
 		<year>199?</year>
 		<publisher>Waixing</publisher>
@@ -57972,7 +57955,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="ES-1092"/>
 		<info name="alt_title" value="盟军赶死队 ?"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="524288">
 				<rom name="commandos (ch).prg" size="524288" crc="081caaff" sha1="ad350f001db2e3c640b2bd9107b86a8f29b68ac0" offset="00000" status="baddump" />
@@ -57993,7 +57976,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="ES-1092"/>
 		<info name="alt_title" value="盟军赶死队"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="524288">
 				<rom name="[es-1092] commandos (c).prg" size="524288" crc="f35a3848" sha1="036dd241e716d49b4dae97d1bcf1083460e13ef8" offset="00000" status="baddump" />
@@ -58036,7 +58019,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="ES-1093"/>
 		<info name="alt_title" value="宠物·翡翠"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="1048576">
 				<rom name="chongwu - feicui ban (unl) (waixing).prg" size="1048576" crc="1b87a24b" sha1="b3fc979d5aac18026e931c346c892e059e62c3fe" offset="00000" status="baddump" />
@@ -58064,8 +58047,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192" />
-			<!-- 8k WRAM on cartridge -->
-			<dataarea name="wram" size="8192" />
+			<!-- 8k BWRAM on cartridge -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -58083,6 +58068,10 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192" />
+			<!-- 8k BWRAM on cartridge -->
+			<dataarea name="bwram" size="8192">
+				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -58117,7 +58106,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 				<rom name="[es-1100] huo yan wen zhang - sheng zhan de xi pu (c).prg" size="1048576" crc="cf4adaad" sha1="24af90c5df097240ca4e0ad8e4ec69e360e13f34" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="16384" />
+			<dataarea name="vram" size="8192" />
 			<!-- 8k BWRAM on cartridge -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
@@ -58150,7 +58139,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- Game has no sound. Does this freeze up? -->
-	<software name="dquest5" cloneof="dwarr2" supported="no">
+	<software name="dquest5" cloneof="dwarr2">
 		<description>Yǒngzhě Dòu Èlóng V (China, decrypted)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -58184,7 +58173,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 				<rom name="[es-1107] sheng huo hui zhang iii (c).prg" size="1048576" crc="b2045e9c" sha1="ae0b687ee2335521a745dbe2f6ef5633d1845ee2" offset="00000" status="baddump" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
-			<dataarea name="vram" size="16384" />
+			<dataarea name="vram" size="8192" />
 			<!-- 8k BWRAM on cartridge -->
 			<dataarea name="bwram" size="8192">
 				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
@@ -58254,7 +58243,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="mummy" supported="partial">
+	<software name="mummy">
 		<description>Mummy - Shen Gui Chuan Qi (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -58537,7 +58526,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>CoolBoy</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="1048576">
 				<rom name="shu ma bao bei (coolboy) (ch).prg" size="1048576" crc="aa23a44f" sha1="28c96e0fc60b7d1acd91cd83d6024fa8536c15a5" offset="00000" status="baddump" />
@@ -59055,7 +59044,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="kdbsyin" supported="partial">
+	<software name="kdbsyin">
 		<description>Kou Dai Bao Shi - Yin (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
@@ -59808,7 +59797,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sanguows" supported="partial">
+	<software name="sanguows">
 		<description>San Guo Wu Shuang - Meng Jiang Zhuan (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
@@ -60060,7 +60049,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="NJ060"/>
 		<info name="alt_title" value="绝代双骄"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
@@ -60100,25 +60089,20 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="sudoku" supported="no">
+	<software name="sudoku">
 		<description>Shu Du (China)</description>
 		<year>19??</year>
 		<publisher>Nanjing</publisher>
 		<info name="serial" value="NJ064"/>
 		<info name="alt_title" value="数独"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_h" />   <!-- Not exactly -->
-			<feature name="pcb" value="WAIXING-H" />
-			<feature name="mirroring" value="vertical" />
+			<feature name="slot" value="ing022" />
+			<feature name="pcb" value="ing022" />
 			<dataarea name="prg" size="262144">
 				<rom name="[nj064] sudoku (c).prg" size="262144" crc="2779bb41" sha1="7c3be2e58853f9cb3201ec7a3719a43b8d47e71c" offset="00000" />
 			</dataarea>
 			<!-- 8k VRAM on cartridge -->
 			<dataarea name="vram" size="8192" />
-			<!-- 8k WRAM on cartridge, battery backed up -->
-			<dataarea name="bwram" size="8192">
-				<rom value="0x00" size="8192" offset="0" loadflag="fill" />
-			</dataarea>
 		</part>
 	</software>
 
@@ -60167,7 +60151,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="NJ068"/>
 		<info name="alt_title" value="寻秦记"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="horizontal" />
 			<dataarea name="prg" size="524288">
@@ -60189,7 +60173,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="serial" value="NJ069"/>
 		<info name="alt_title" value="唐伯虎点秋香"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
@@ -61620,6 +61604,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<part name="cart" interface="nes_cart">
 			<feature name="slot" value="waixing_a" />
 			<feature name="pcb" value="WAIXING-A" />
+			<!-- NESdev (mapper 195 page): this PRG (bff2e9ec) is a 2006 re-release, which uses mapper 176 -->
 			<dataarea name="chr" size="262144">
 				<rom name="columbus - ougon no yoake (ch).chr" size="262144" crc="240229ca" sha1="4d7600397522ccd2064b11da4215256755a9424e" offset="00000" status="baddump" />
 			</dataarea>
@@ -61635,7 +61620,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="columbusca" cloneof="columbus" supported="no">
+	<software name="columbusca" cloneof="columbus">
 		<description>Columbus Chuán (China, alt)</description>
 		<year>2005</year>
 		<publisher>Waixing</publisher>
@@ -62428,7 +62413,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- Game has no sound. Does this freeze up? -->
-	<software name="dquest2c" cloneof="dwarr2" supported="no">
+	<software name="dquest2c" cloneof="dwarr2">
 		<description>Yǒngzhě Dòu Èlóng II (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -62532,7 +62517,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="zqxj" cloneof="ctsuba2" supported="no">
+	<software name="zqxj" cloneof="ctsuba2">
 		<description>Zu Qiu Xiao Jiang (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -62599,7 +62584,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- REVIEW -->
 
-	<software name="yateluzj" supported="no">
+	<software name="yateluzj">
 		<description>Ya Te Lu Zhan Ji (China)</description>
 		<year>19??</year>
 		<publisher>Waixing</publisher>
@@ -62976,7 +62961,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>XianFeng Katong</publisher>
 		<info name="alt_title" value="机甲战士"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a1" />
+			<feature name="slot" value="waixing_a" />
 			<feature name="pcb" value="WAIXING-A-1" />
 			<dataarea name="chr" size="262144">
 				<rom name="ji jia zhan shi (ch) [a1].chr" size="262144" crc="dd000df8" sha1="ad58484866caefbbfe5f58a19e0d656b8963eef4" offset="00000" status="baddump" />
@@ -62999,7 +62984,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>XianFeng Katong</publisher>
 		<info name="alt_title" value="机甲战士"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a1" />
+			<feature name="slot" value="waixing_a" />
 			<feature name="pcb" value="WAIXING-A-1" />
 			<dataarea name="chr" size="262144">
 				<rom name="ji jia zhan shi (ch) [a2].chr" size="262144" crc="869ca61f" sha1="adb04c1f8267ba7a04a5093bee348c2f18d0cf99" offset="00000" status="baddump" />
@@ -63022,7 +63007,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>XianFeng Katong</publisher>
 		<info name="alt_title" value="机甲战士"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a1" />
+			<feature name="slot" value="waixing_a" />
 			<feature name="pcb" value="WAIXING-A-1" />
 			<dataarea name="chr" size="262144">
 				<rom name="ji jia zhan shi (ch) [a3].chr" size="262144" crc="ba2bf825" sha1="a35cac695bf9f5beaf50f45ec1534024697fadbd" offset="00000" status="baddump" />
@@ -63045,7 +63030,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>XianFeng Katong</publisher>
 		<info name="alt_title" value="机甲战士"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a1" />
+			<feature name="slot" value="waixing_a" />
 			<feature name="pcb" value="WAIXING-A-1" />
 			<dataarea name="chr" size="262144">
 				<rom name="ji jia zhan shi (ch) [a4].chr" size="262144" crc="869ca61f" sha1="adb04c1f8267ba7a04a5093bee348c2f18d0cf99" offset="00000" status="baddump" />
@@ -63069,7 +63054,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>XianFeng Katong</publisher>
 		<info name="alt_title" value="机甲战士"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a1" />
+			<feature name="slot" value="waixing_a" />
 			<feature name="pcb" value="WAIXING-A-1" />
 			<dataarea name="chr" size="262144">
 				<rom name="ji jia zhan shi (ch) [a5].chr" size="262144" crc="5bd657a5" sha1="49133fe84205171e0eff3af3d403e7568c9ab851" offset="00000" status="baddump" />
@@ -63092,7 +63077,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>XianFeng Katong</publisher>
 		<info name="alt_title" value="机甲战士"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a1" />
+			<feature name="slot" value="waixing_a" />
 			<feature name="pcb" value="WAIXING-A-1" />
 			<dataarea name="chr" size="262144">
 				<rom name="ji jia zhan shi (ch) [a6].chr" size="262144" crc="869ca61f" sha1="adb04c1f8267ba7a04a5093bee348c2f18d0cf99" offset="00000" status="baddump" />
@@ -63115,7 +63100,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>XianFeng Katong</publisher>
 		<info name="alt_title" value="重装机兵"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a1" />
+			<feature name="slot" value="waixing_a" />
 			<feature name="pcb" value="WAIXING-A-1" />
 			<dataarea name="chr" size="262144">
 				<rom name="ji jia zhan shi (ch).chr" size="262144" crc="f29b2e0f" sha1="7df6d22143678794545beb944592cc8da7c77539" offset="00000" status="baddump" />
@@ -63704,7 +63689,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="2dkjb" supported="partial">
+	<software name="2dkjb">
 		<description>2 in 1 - Donkey Kong &amp; Jungle Book</description>
 		<year>1997</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -64030,7 +64015,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="aladdinc" cloneof="aladdin" supported="partial">
+	<software name="aladdinc" cloneof="aladdin">
 		<description>Aladdin (Asia, alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -64299,9 +64284,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 
 <!-- Cart dumped with Chris Covell's TapeDump, needs to be redumped for verification. -->
 <!-- Header from original dump has been stripped. Board info is unknown, and has been copied from parent US set. -->
-<!-- The game crashes upon reaching Stage 3, like all other versions in MAME due to emulation problems, but works fine in other emulators. -->
 <!-- The game is NTSC, is hacked to skip Stage 2 so it works on clone consoles, and has been partially translated to Brazilian Portuguese. -->
-	<software name="btoadsbrc" cloneof="btoads" supported="no">
+	<software name="btoadsbrc" cloneof="btoads">
 		<description>Battletoads (Brazil, Conector pirate)</description>
 		<year>1991</year>
 		<publisher>Conector</publisher>
@@ -64614,7 +64598,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>2000?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="524288">
 				<rom name="dance 2000 12-in-1 (unl).prg" size="524288" crc="dc3087e7" sha1="2f27d9bc75773c0c69f1749ae54298210d051609" offset="00000" status="baddump" />
@@ -64662,7 +64646,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="dkongc4" supported="partial">
+	<software name="dkongc4">
 		<description>Donkey Kong Country 4 ~ The Jungle Book 2 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -64915,7 +64899,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="二战之经典战役"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[hengge] er zhan zhi jing dian zhan yi (c).prg" size="1048576" crc="55aad650" sha1="e63cfa9540e70d04ae8817b2ea3ad7c3ed9f908f" offset="00000" status="baddump" />
@@ -64936,7 +64920,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="反恐精英"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="1048576">
 				<rom name="fan kong jing ying (china) (unl).prg" size="1048576" crc="fb2b6b10" sha1="bfa31777e077e64af0e274b5a22b57c6765d36e1" offset="00000" status="baddump" />
@@ -65039,7 +65023,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>FengLi</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="524288">
 				<rom name="fengli dance 12 in 1 &amp; 24 in 1(c).prg" size="524288" crc="b018ec9c" sha1="25a35c3b53763e2f3419bbec1e31aee77b7d7ac3" offset="00000" status="baddump" />
@@ -65053,7 +65037,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="ffight3" supported="partial">
+	<software name="ffight3">
 		<description>Final Fight 3 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -65120,7 +65104,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="gameinpp" supported="no">
+	<software name="gameinpp">
 		<description>Gameinis - PingPong (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -65208,7 +65192,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="highwayk" cloneof="radracer" supported="partial">
+	<software name="highwayk" cloneof="radracer">
 		<description>Highway Star (Kaiser bootleg)</description>
 		<year>19??</year>
 		<publisher>Kaiser</publisher>
@@ -65295,7 +65279,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="524288">
 				<rom name="super 2in1 (unl)[f] {for mapper 241}.prg" size="524288" crc="ade7d881" sha1="a3961c5762883e38663297dba6e6bc41a4dd4216" offset="00000" status="baddump" />
@@ -65464,7 +65448,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>Micro Genius</publisher>
 		<info name="alt_title" value="西天取经"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
@@ -65773,7 +65757,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="mmania7" supported="partial">
+	<software name="mmania7">
 		<description>Mickey Mania 7</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -65796,7 +65780,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="魔力战士"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="524288">
 				<rom name="[hengge] mo li zhan shi (c).prg" size="524288" crc="7d8447ea" sha1="e9d8ee59a50c780eccad4583d36b81cf5fd1948a" offset="00000" status="baddump" />
@@ -66149,7 +66133,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="三国志II"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[hengge] san guo zhi ii (c).prg" size="1048576" crc="d97b804a" sha1="b353d50150e47a8504784df25ffa125c09397ca4" offset="00000" status="baddump" />
@@ -66553,7 +66537,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="smwa" cloneof="smw" supported="partial">
+	<software name="smwa" cloneof="smw">
 		<description>Super Mario World (Asia, alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -66636,7 +66620,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		</part>
 	</software>
 
-	<software name="ttoons6" supported="partial">
+	<software name="ttoons6">
 		<description>Tiny Toon Adventures 6 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -66855,7 +66839,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="无极魔界"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[hengge] wu ji mo jie (c).prg" size="1048576" crc="38dc5970" sha1="9ee8c2b93cdd28482008bc8afba3070762d08c7c" offset="00000" status="baddump" />
@@ -66875,7 +66859,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="无间道风云"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[hengge] wu jian dao feng yun (c).prg" size="1048576" crc="750dbc48" sha1="38614b87865967ab00fcc1886a5e87904a0dd216" offset="00000" status="baddump" />
@@ -67043,8 +67027,8 @@ We don't include these hacks because they were not burned into real carts nor so
 	</software>
 
 <!-- nointro -->
-<!-- For some reason this won't run from a cold boot and needs to be soft reset once. Once running game has no sound (probably same issue as dquest, which it appears to be derived from). -->
-	<software name="yingxion" cloneof="dwarr" supported="no">
+<!-- A first launch with blank save RAM hangs and needs one soft reset (or a second launch): the game maps the PRG bank it saved at WRAM $6033 before it initializes it, so with blank RAM it runs data and the CPU halts. Once running game has no sound (probably same issue as dquest, which it appears to be derived from). -->
+	<software name="yingxion" cloneof="dwarr">
 		<description>Yīngxióng Yuán Yìjīng Chuánqí (China)</description>
 		<year>19??</year>
 		<publisher>HengGedianzi</publisher>
@@ -67114,7 +67098,7 @@ We don't include these hacks because they were not burned into real carts nor so
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="卓越之剑"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[hengge] zhuo yue zhi jian (c).prg" size="1048576" crc="dcb9d7c1" sha1="cd147eb251b341f393ec3df94bf95fd7cf5e6756" offset="00000" status="baddump" />
@@ -67275,7 +67259,7 @@ from the NEStopia source, hence they would require confirmation. -->
 		<year>2003?</year>
 		<publisher>HengGedianzi</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[hengge] jing wei tian hai (c).prg" size="1048576" crc="92b3e5a0" sha1="34f58f7def3a92140001682e6a8ee96573b38b53" offset="00000" status="baddump" />
@@ -68040,7 +68024,7 @@ All musics were removed in this game.
 		<year>19??</year>
 		<publisher>Subor</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="262144">
 				<rom name="ma bu mi zhen &amp; qu wei cheng yu wu (ch).prg" size="262144" crc="669a32f2" sha1="1ca8b723ee20921108a2d257a51d5bbd899b5e6a" offset="00000" status="baddump" />
@@ -68605,7 +68589,7 @@ All musics were removed in this game.
 		<publisher>HengGedianzi</publisher>
 		<info name="alt_title" value="丝路传奇"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="1048576">
 				<rom name="si lu chuan qi (ch).prg" size="1048576" crc="aeb16c8d" sha1="9e111140f42fa14f548aa7ddf1705c4c80d605e7" offset="00000" status="baddump" />
@@ -68717,7 +68701,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="sangrybr" supported="no">
+	<software name="sangrybr">
 		<description>Super Angry Birds (unlicensed)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -68991,7 +68975,7 @@ All musics were removed in this game.
 		<year>19??</year>
 		<publisher>Nei-Hu</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_mjblock" />
+			<feature name="slot" value="txc_22211" />
 			<feature name="pcb" value="UNL-22211-C" />
 			<dataarea name="chr" size="8192">
 				<rom name="xiao ma li (ch).chr" size="8192" crc="f6410ccd" sha1="b2e921c28b58a3d2f0242033a1a90cbe509771de" offset="00000" status="baddump" />
@@ -69019,7 +69003,7 @@ All musics were removed in this game.
 		</part>
 	</software>
 
-	<software name="zgws" supported="no">
+	<software name="zgws">
 		<description>Zhan Guo Wu Shuang (China)</description>
 		<year>19??</year>
 		<publisher>BenSheng</publisher>
@@ -72621,7 +72605,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<publisher>Bu Bu Gao Electronics Co.</publisher>
 		<info name="alt_title" value="LIKO Обучающий Картридж"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="131072">
@@ -72639,7 +72623,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" /> <!-- but you can also navigate menu with pad -->
 			<dataarea name="prg" size="524288">
@@ -72659,7 +72643,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>Game Star</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" /> <!-- but you can also navigate menu with pad -->
 			<dataarea name="prg" size="1048576">
@@ -72852,7 +72836,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="524288">
@@ -72872,7 +72856,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="524288">
@@ -72892,7 +72876,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="1048576">
@@ -72912,7 +72896,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="524288">
@@ -72932,7 +72916,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="524288">
@@ -72970,7 +72954,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -72989,7 +72973,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>1995?</year>
 		<publisher>ABM</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -73008,7 +72992,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>1995?</year>
 		<publisher>Asder</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -73058,7 +73042,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>Dong Sheng</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -73095,7 +73079,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
@@ -73113,7 +73097,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="1048576">
@@ -73132,7 +73116,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="262144">
@@ -73150,7 +73134,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
@@ -73168,7 +73152,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>1995?</year>
 		<publisher>Hong Da</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="1048576">
@@ -73186,7 +73170,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>Game Star</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -73206,7 +73190,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="262144">
@@ -73224,7 +73208,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -73243,7 +73227,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -73262,7 +73246,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="524288">
@@ -73280,7 +73264,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>Subor</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -73301,7 +73285,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		<year>19??</year>
 		<publisher>Subor</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -73440,7 +73424,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		<publisher>Subor</publisher>
 		<info name="alt_title" value="小霸王中英文电脑学习卡(V6.0)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -73522,7 +73506,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		<publisher>Subor</publisher>
 		<info name="alt_title" value="小霸王中英文电脑学习卡(V3.0)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -73580,7 +73564,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		<publisher>New Game</publisher>
 		<info name="alt_title" value="Магистр Обучающий Картридж"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="131072">
@@ -73599,7 +73583,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		<publisher>Simba's</publisher>
 		<info name="alt_title" value="Simba's Обучающий Картридж (V1.0)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="peripheral" value="subor_keyboard" />
 			<dataarea name="prg" size="131072">
@@ -73618,7 +73602,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		<publisher>Subor</publisher>
 		<info name="alt_title" value="小霸王中英文电脑学习卡(V1.1)"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<feature name="peripheral" value="subor_keyboard" />
@@ -73658,7 +73642,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		<year>1994</year>
 		<publisher>Subor</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="524288">
 				<rom name="subor figure ratiocination &amp; iq puzzle (ch).prg" size="524288" crc="40139ee3" sha1="3b7e2672b389f070268bef7fb49f0d217f58a27e" offset="00000" status="baddump" />
@@ -73679,7 +73663,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		<info name="alt_title" value="小霸王卡拉OK"/>
 		<part name="cart" interface="nes_cart">
 			<!-- Subor Type 2 variant that has yet to be emulated -->
-			<feature name="slot" value="unknown" />
+			<feature name="slot" value="subor_karaoke" />
 			<feature name="pcb" value="UNKNOWN" />
 			<dataarea name="prg" size="1048576">
 				<rom name="[subor] karaoke (c).prg" size="1048576" crc="0a9808ae" sha1="57086cc965ba6828082a7c8c4617093ea6c1434a" offset="00000" status="baddump" />
@@ -73717,7 +73701,7 @@ Subor v15.0 (this shows Windows 2002 on the title screen)
 		<publisher>Subor</publisher>
 		<info name="serial" value="SB-918"/>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<dataarea name="prg" size="524288">
 				<rom name="[sb-918] xue sheng dian nao (c).prg" size="524288" crc="dd150a3c" sha1="7f245df8ce08d006676f4f5cc014763f151a944d" offset="00000" status="baddump" />
@@ -75788,7 +75772,7 @@ Other
 		</part>
 	</software>
 
-	<software name="tysonpoh" cloneof="tysonpo" supported="partial">
+	<software name="tysonpoh" cloneof="tysonpo">
 		<description>Mike Tyson's Punch-Out!! (pirate)</description>
 		<year>19??</year>
 		<publisher>J. Y. Company</publisher>
@@ -77231,7 +77215,7 @@ Other
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="sc127" />
+			<feature name="slot" value="jyc_c" />
 			<feature name="pcb" value="UNL-SC-127" />
 			<dataarea name="chr" size="262144">
 				<rom name="warioland ii (unl).chr" size="262144" crc="67819faa" sha1="b082dd14504c163252fb54e951822a3853c5203d" offset="00000" status="baddump" />
@@ -78062,7 +78046,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="waixing_a1" />
+			<feature name="slot" value="waixing_a" />
 			<feature name="pcb" value="WAIXING-A-1" />
 			<dataarea name="chr" size="262144">
 				<rom name="ji jia zhan shi (as) [decrypted].chr" size="262144" crc="194d0f79" sha1="879868d93636d49b886409b37d6ee053a7d2eb87" offset="00000" status="baddump" />
@@ -78805,7 +78789,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mk3sp" supported="partial">
+	<software name="mk3sp">
 		<description>Mortal Kombat III Special (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -78886,7 +78870,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="pr3" supported="partial">
+	<software name="pr3">
 		<description>Power Rangers III (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -78902,7 +78886,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="pr4" supported="partial">
+	<software name="pr4">
 		<description>Power Rangers IV (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -78935,7 +78919,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="ssamsho2" supported="partial">
+	<software name="ssamsho2">
 		<description>Shin Samurai Spirits 2 - Haoumaru Jigoku Hen (China)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -79303,7 +79287,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="tekken2" supported="partial">
+	<software name="tekken2">
 		<description>Tekken 2 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -79545,7 +79529,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="umk3" supported="partial">
+	<software name="umk3">
 		<description>Ultimate Mortal Kombat 3 (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -79853,7 +79837,7 @@ be better to redump them properly. -->
 	</software>
 
 <!-- 8-bit Xmas 2008-2011 are not really NROM, but an NROM-like board with flashing LEDs -->
-	<software name="xmas08" supported="partial">
+	<software name="xmas08">
 		<description>8-bit Xmas 2008</description>
 		<year>2008</year>
 		<publisher>RetroZone</publisher>
@@ -79869,7 +79853,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas09" supported="partial">
+	<software name="xmas09">
 		<description>8-bit Xmas 2009</description>
 		<year>2009</year>
 		<publisher>RetroZone</publisher>
@@ -79885,7 +79869,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas10" supported="partial">
+	<software name="xmas10">
 		<description>8-bit Xmas 2010</description>
 		<year>2010</year>
 		<publisher>RetroZone</publisher>
@@ -79901,7 +79885,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas11" supported="partial">
+	<software name="xmas11">
 		<description>8-bit Xmas 2011</description>
 		<year>2011</year>
 		<publisher>RetroZone</publisher>
@@ -79917,8 +79901,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-<!-- This will crash if left on the title screen. The mini-game seems fine, however. -->
-	<software name="xmas12" supported="partial">
+	<software name="xmas12">
 		<description>8-bit Xmas 2012</description>
 		<year>2012</year>
 		<publisher>RetroZone</publisher>
@@ -79933,7 +79916,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas13" supported="partial">
+	<software name="xmas13">
 		<description>8-bit Xmas 2013</description>
 		<year>2013</year>
 		<publisher>RetroZone</publisher>
@@ -79948,7 +79931,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas14" supported="partial">
+	<software name="xmas14">
 		<description>8-bit Xmas 2014</description>
 		<year>2014</year>
 		<publisher>retroUSB</publisher>
@@ -79963,7 +79946,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas15" supported="partial">
+	<software name="xmas15">
 		<description>8-bit Xmas 2015</description>
 		<year>2015</year>
 		<publisher>retroUSB</publisher>
@@ -79978,7 +79961,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas16" supported="no">
+	<software name="xmas16">
 		<description>8-bit Xmas 2016</description>
 		<year>2016</year>
 		<publisher>retroUSB</publisher>
@@ -79993,7 +79976,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas18" supported="partial">
+	<software name="xmas18">
 		<description>8-bit Xmas 2018</description>
 		<year>2018</year>
 		<publisher>retroUSB</publisher>
@@ -80009,7 +79992,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas19" supported="partial">
+	<software name="xmas19">
 		<description>8-bit Xmas 2019</description>
 		<year>2019</year>
 		<publisher>retroUSB</publisher>
@@ -80024,7 +80007,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas20" supported="partial">
+	<software name="xmas20">
 		<description>8-bit Xmas 2020</description>
 		<year>2020</year>
 		<publisher>retroUSB</publisher>
@@ -80039,7 +80022,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas21" supported="partial">
+	<software name="xmas21">
 		<description>8-bit Xmas 2021</description>
 		<year>2021</year>
 		<publisher>retroUSB</publisher>
@@ -80055,7 +80038,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas22" supported="partial">
+	<software name="xmas22">
 		<description>8-bit Xmas 2022</description>
 		<year>2022</year>
 		<publisher>retroUSB</publisher>
@@ -80071,7 +80054,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="xmas23" supported="no">
+	<software name="xmas23">
 		<description>8-bit Xmas 2023</description>
 		<year>2023</year>
 		<publisher>retroUSB</publisher>
@@ -81236,7 +81219,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
@@ -81518,7 +81501,8 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="fk23ca" /> <!-- FIXME: really is unsupported mapper 176, submapper 2 -->
+			<feature name="slot" value="fk23ca" />
+			<feature name="submapper" value="2" />
 			<feature name="pcb" value="BMC-FK23CA" />
 			<dataarea name="prg" size="16777216">
 				<rom name="he jin zhuang bei 150-in-1 real game (unl)[u].prg" size="16777216" crc="d14617d7" sha1="5052b5566d2dc7840464bcf6668b1905669e2aec" offset="00000" status="baddump" />
@@ -82097,7 +82081,8 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="fk23ca" /> <!-- FIXME: really is unsupported mapper 176, submapper 2 -->
+			<feature name="slot" value="fk23ca" />
+			<feature name="submapper" value="2" />
 			<feature name="pcb" value="BMC-FK23CA" />
 			<dataarea name="prg" size="16777216">
 				<rom name="23 plus 222-in-1 (unl)[u].prg" size="16777216" crc="e79f157e" sha1="63b37851ee0716472d20e2f27b3f708dfc16a8af" offset="00000" status="baddump" />
@@ -83464,7 +83449,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_400rg" supported="no">
+	<software name="mc_400rg">
 		<description>400 in 1 Real Game</description>
 		<year>201?</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -85333,7 +85318,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mc_marif" supported="partial">
+	<software name="mc_marif">
 		<description>Super Mario Family 10 in 1</description>
 		<year>1992?</year>
 		<publisher>&lt;pirate&gt;</publisher>
@@ -86370,7 +86355,7 @@ be better to redump them properly. -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
-			<feature name="slot" value="txc_commandos" />
+			<feature name="slot" value="txc_mxmdhtwo" />
 			<feature name="pcb" value="TXC-MXMDHTWO" />
 			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="524288">
@@ -86723,7 +86708,7 @@ that the real dumps might surface -->
 		</part>
 	</software>
 
-	<software name="mc_g500a" supported="no">
+	<software name="mc_g500a">
 		<description>Game 500 in 1 (alt)</description>
 		<year>201?</year>
 		<publisher>&lt;pirate&gt;</publisher>

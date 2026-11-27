@@ -10,6 +10,10 @@ class namco_163_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
+	// the chip's 128 bytes of internal RAM, which N163 boards with a battery use as save RAM (NESdev INES Mapper 019)
+	u8 *internal_ram() { return m_ram; }
+	static constexpr u32 INTERNAL_RAM_SIZE = 0x80;
+
 	namco_163_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	void disable_w(int state);

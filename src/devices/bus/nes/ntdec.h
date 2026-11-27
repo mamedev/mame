@@ -25,7 +25,10 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 private:
+	void update_chr_1k(int slot);
+
 	u8 m_latch, m_chr_outer;
+	u8 m_chr_1k[4];
 };
 
 

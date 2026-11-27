@@ -79,9 +79,9 @@ static const unif unif_list[] =
 	{ "UNL-AX5705",                 0,    0, CHRRAM_0,  UNL_AX5705},
 	{ "UNL-SMB2J",                  8,    8, CHRRAM_0,  UNL_SMB2J},
 	{ "UNL-8237",                   0,    0, CHRRAM_0,  UNL_8237},
+	{ "UNL-8237A",                  0,    0, CHRRAM_0,  UNL_8237A},
 	{ "UNL-SL1632",                 0,    0, CHRRAM_0,  REXSOFT_SL1632},
-	{ "UNL-SACHEN-74LS374N",        0,    0, CHRRAM_0,  SACHEN_74LS374},
-	// mapper 243 variant exists! how to distinguish?!?  mapper243_l_w, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr (also uses NT_VERT!)
+	{ "UNL-SACHEN-74LS374N",        0,    0, CHRRAM_0,  SACHEN_74LS374}, // Sachen SA-015 / SA-630; SA-020A has no distinct UNIF MAPR
 	{ "UNL-TC-U01-1.5M",            0,    0, CHRRAM_0,  SACHEN_TCU01},
 	{ "UNL-SACHEN-8259C",           0,    0, CHRRAM_0,  SACHEN_8259C},
 	{ "UNL-SA-016-1M",              0,    0, CHRRAM_0,  AVE_NINA06},    // actually this is Mapper 146, but works like 79!
@@ -99,6 +99,8 @@ static const unif unif_list[] =
 	{ "BMC-GS-2004",                0,    0, CHRRAM_8,  RCM_GS2004},
 	{ "BMC-GS-2013",                0,    0, CHRRAM_8,  RCM_GS2013},
 	{ "BMC-NOVELDIAMOND9999999IN1", 0,    0, CHRRAM_0,  BMC_21IN1},
+	{ "BMC-BS-400R",                0,    1, CHRRAM_0,  BMC_BS300}, // BS-300 family (NES 2.0 mapper 422)
+	{ "BMC-BS-4040R",               0,    1, CHRRAM_0,  BMC_BS300}, // BS-300 family (NES 2.0 mapper 422)
 	{ "BMC-SUPER24IN1SC03",         8,    0, CHRRAM_8,  BMC_S24IN1SC03},
 	{ "BMC-SUPERHIK8IN1",           8,    0, CHRRAM_0,  BMC_HIK8IN1},
 	{ "BMC-T-262",                  0,    0, CHRRAM_8,  BMC_T262},
@@ -143,16 +145,17 @@ static const unif unif_list[] =
 	{ "BMC-42IN1RESETSWITCH",       0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // mapper 60?
 	{ "BMC-F-15",                   0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // 150-in-1 Unchained Melody
 	{ "BMC-HP898F",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // Primasoft 9999999-in-1
-	{ "BMC-8-IN-1",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // Super 8-in-1 (Incl. Rockin' Kats)
+	{ "BMC-8-IN-1",                 0,    0, CHRRAM_0,  BMC_8IN1},          // New Star Super 8-in-1 (NES 2.0 mapper 333; NESdev lists both names)
+	{ "BMC-NEWSTAR-GRM070-8IN1",     0,    0, CHRRAM_0,  BMC_8IN1},          // New Star Super 8-in-1 (NES 2.0 mapper 333)
 	{ "UNL-EH8813A",                0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // Dr. Mario II
-	{ "UNL-158B",                   0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // Blood of Jurassic
-	{ "UNL-DRAGONFIGHTER",          0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // Dragon Fighter by Flying Star
+	{ "UNL-158B",                   0,    0, CHRRAM_0,  UNL_158B}, // Blood of Jurassic (NES 2.0 mapper 258)
+	{ "UNL-DRAGONFIGHTER",          0,    0, CHRRAM_0,  UNL_BMW8544}, // Dragon Fighter by Flying Star (NES 2.0 mapper 292)
 	{ "UNL-KS7016",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // Exciting Basketball FDS
 	{ "UNL-KS7037",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // Metroid FDS Chinese
 	{ "UNL-RT-01",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // Russian Test Cart
 	{ "PEC-586",                    0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "UNL-DANCE",                  0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
-	{ "UNL-DRIPGAME",               0,    0, CHRRAM_0,  UNSUPPORTED_BOARD}, // [by Quietust - we need more info]
+	{ "UNL-DRIPGAME",               0,    0, CHRRAM_0,  UNL_DRIPGAME},
 	{ "UNL-CITYFIGHT",              0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "COOLBOY",                    0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
 	{ "UNL-OneBus",                 0,    0, CHRRAM_0,  UNSUPPORTED_BOARD},
@@ -435,6 +438,8 @@ void nes_cart_slot_device::call_load_unif()
 
 	// SETUP step 3: storing the info needed for emulation
 	m_pcb_id = pcb_id;
+	if (pcb_id == BMC_FK23C || pcb_id == BMC_FK23CA)
+		m_cart->set_8025_submapper(1);      // the FK-xxx/BS-xxx boards are the 8025 chipset's submapper 1
 	if (battery)
 		battery_size = NES_BATTERY_SIZE; // we should allow for smaller battery!
 	prgram_size = prgram * 0x2000;

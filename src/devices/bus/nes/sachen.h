@@ -65,6 +65,15 @@ public:
 	nes_sachen_sa72008_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_l(offs_t offset, uint8_t data) override;
+	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void pcb_reset() override;
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	uint8_t m_3009_latch;
+	uint8_t m_3009_reg[8];
 };
 
 
@@ -90,9 +99,16 @@ public:
 	// construction/destruction
 	nes_sachen_tcu01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	virtual uint8_t read_l(offs_t offset) override;
 	virtual void write_l(offs_t offset, uint8_t data) override;
-	virtual void write_m(offs_t offset, uint8_t data) override { write_l((offset + 0x100) & 0xfff, data); }
-	virtual void write_h(offs_t offset, uint8_t data) override { write_l((offset + 0x100) & 0xfff, data); }
+	virtual void write_h(offs_t offset, uint8_t data) override;
+	virtual void pcb_reset() override;
+
+protected:
+	virtual void device_start() override ATTR_COLD;
+
+private:
+	uint8_t m_input, m_reg, m_output, m_mode, m_invert;
 };
 
 
@@ -170,9 +186,12 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override;
 
-	void set_mirror(uint8_t nt);
-	uint8_t m_latch, m_mmc_vrom_bank;
+	virtual void set_mirror(uint8_t nt);
+	bool d2_vcc();
+	optional_ioport m_config;
+	uint8_t m_latch, m_mmc_vrom_bank, m_reg[8];
 };
 
 
@@ -184,8 +203,10 @@ public:
 	// construction/destruction
 	nes_sachen_74x374_alt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual uint8_t read_l(offs_t offset) override { return 0xff; }   // no read_l here
 	virtual void write_l(offs_t offset, uint8_t data) override;
+
+protected:
+	virtual ioport_constructor device_input_ports() const override;
 };
 
 
@@ -207,7 +228,9 @@ protected:
 
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
+	virtual ioport_constructor device_input_ports() const override;
 
+	virtual void set_mirror(uint8_t nt) override;
 	virtual void chr_update();
 	uint8_t m_reg[8];
 };
@@ -250,6 +273,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
+	virtual void set_mirror(uint8_t nt) override;
 	virtual void chr_update() override;
 };
 

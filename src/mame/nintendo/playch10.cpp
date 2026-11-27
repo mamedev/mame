@@ -889,6 +889,9 @@ void playch10_state::pc10_chr_w(offs_t offset, u8 data)
 u8 playch10_state::pc10_chr_r(offs_t offset)
 {
 	int bank = BIT(offset, 10, 3);
+	// with no game board (the BIOS alone) no CHR bank is ever set up; the dot renderer still fetches pattern data
+	if (!m_chr_page[bank].chr)
+		return 0;
 	return m_chr_page[bank].chr[offset & 0x3ff];
 }
 

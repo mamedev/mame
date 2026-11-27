@@ -6,6 +6,7 @@
 #pragma once
 
 #include "nxrom.h"
+#include "cpu/pic16c5x/pic16c5x.h"
 
 
 // ======================> nes_gs2015_device
@@ -71,6 +72,27 @@ class nes_3dblock_device : public nes_nrom_device
 public:
 	// construction/destruction
 	nes_3dblock_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	// the PIC16C54 watches the CPU address bus
+	virtual bool wants_m2() override { return true; }
+	virtual void m2_w(int state, offs_t address, bool write) override;
+
+	virtual void pcb_reset() override;
+
+protected:
+	// device-level overrides
+	virtual void device_start() override ATTR_COLD;
+	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
+
+private:
+	u8 pic_porta_r();
+	u8 pic_portb_r();
+	void pic_porta_w(offs_t offset, u8 data, u8 mem_mask);
+
+	required_device<pic16c54_device> m_pic;
+	offs_t m_addr;      // the CPU address of the latest cycle
+	bool m_irq;
 };
 
 

@@ -28,7 +28,6 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(resync_callback);
 
 	virtual void update_regs(int reg);
 	void set_prg(int prg_base, int prg_mask);
@@ -40,8 +39,21 @@ protected:
 
 	u8 m_reg[4];
 
+	// CPU cycle of the last $8000-$FFFF write, for the consecutive-write filter
+	u64 m_last_write_cycle;
+
 private:
-	u8 m_reg_write_enable;
+	bool m_powered = false;   // power-on initialization done (the MMC1 has no reset input)
+public:
+	virtual bool wants_a12_level() override { return true; }
+	virtual void ppu_a12_level(int state) override;
+protected:
+	bool m_ppu_a12 = false;
+	// CHR bank register driving the board's upper outputs: $A000 in 8K CHR mode; in 4K CHR mode the one PPU A12 selects
+	u8 chr_hi_reg() const { return (BIT(m_reg[0], 4) && m_ppu_a12) ? m_reg[2] : m_reg[1]; }
+	// boards that reuse the CHR register bits for PRG-ROM/PRG-RAM (SNROM/SOROM/SUROM/SXROM); NES-EVENT repurposes them
+	virtual bool chr_bits_drive_prg() const { return true; }
+	u32 prgram_bank_offset(bool &enabled) const;
 	u8 m_latch;
 	u8 m_count;
 };

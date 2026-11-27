@@ -4188,6 +4188,7 @@ end
 --
 --@src/devices/bus/nes/nes_slot.h,BUSES["NES"] = true
 ---------------------------------------------------
+-- mmc3_clones.cpp (NES 2.0 mapper 594, Rinco Talkman FSG2) uses the OKI MSM6585 from sound/msm5205
 
 if BUSES["NES"] then
 	files {
@@ -4214,6 +4215,8 @@ if BUSES["NES"] then
 		MAME_DIR .. "src/devices/bus/nes/benshieng.h",
 		MAME_DIR .. "src/devices/bus/nes/bootleg.cpp",
 		MAME_DIR .. "src/devices/bus/nes/bootleg.h",
+		MAME_DIR .. "src/devices/bus/nes/brokestudio.cpp",
+		MAME_DIR .. "src/devices/bus/nes/brokestudio.h",
 		MAME_DIR .. "src/devices/bus/nes/camerica.cpp",
 		MAME_DIR .. "src/devices/bus/nes/camerica.h",
 		MAME_DIR .. "src/devices/bus/nes/cne.cpp",
@@ -4226,6 +4229,8 @@ if BUSES["NES"] then
 		MAME_DIR .. "src/devices/bus/nes/discrete.h",
 		MAME_DIR .. "src/devices/bus/nes/disksys.cpp",
 		MAME_DIR .. "src/devices/bus/nes/disksys.h",
+		MAME_DIR .. "src/devices/bus/nes/drip.cpp",
+		MAME_DIR .. "src/devices/bus/nes/drip.h",
 		MAME_DIR .. "src/devices/bus/nes/event.cpp",
 		MAME_DIR .. "src/devices/bus/nes/event.h",
 		MAME_DIR .. "src/devices/bus/nes/ggenie.cpp",
@@ -4248,8 +4253,8 @@ if BUSES["NES"] then
 		MAME_DIR .. "src/devices/bus/nes/karastudio.h",
 		MAME_DIR .. "src/devices/bus/nes/konami.cpp",
 		MAME_DIR .. "src/devices/bus/nes/konami.h",
-		MAME_DIR .. "src/devices/bus/nes/legacy.cpp",
-		MAME_DIR .. "src/devices/bus/nes/legacy.h",
+		MAME_DIR .. "src/devices/bus/nes/ffe.cpp",
+		MAME_DIR .. "src/devices/bus/nes/ffe.h",
 		MAME_DIR .. "src/devices/bus/nes/mmc1.cpp",
 		MAME_DIR .. "src/devices/bus/nes/mmc1.h",
 		MAME_DIR .. "src/devices/bus/nes/mmc1_clones.cpp",
@@ -4260,6 +4265,8 @@ if BUSES["NES"] then
 		MAME_DIR .. "src/devices/bus/nes/mmc3.h",
 		MAME_DIR .. "src/devices/bus/nes/mmc3_clones.cpp",
 		MAME_DIR .. "src/devices/bus/nes/mmc3_clones.h",
+		MAME_DIR .. "src/devices/bus/nes/mindkids.cpp",
+		MAME_DIR .. "src/devices/bus/nes/mindkids.h",
 		MAME_DIR .. "src/devices/bus/nes/mmc5.cpp",
 		MAME_DIR .. "src/devices/bus/nes/mmc5.h",
 		MAME_DIR .. "src/devices/bus/nes/multigame.cpp",
@@ -4278,6 +4285,8 @@ if BUSES["NES"] then
 		MAME_DIR .. "src/devices/bus/nes/pt554.h",
 		MAME_DIR .. "src/devices/bus/nes/racermate.cpp",
 		MAME_DIR .. "src/devices/bus/nes/racermate.h",
+		-- rcm.cpp uses the PIC16C5x core (3D-BLOCK), which is linked through the include of its header
+		-- the nes driver (src/mame/nintendo/nes.cpp) uses the YMF288 of ymopn.h for the EPSM, likewise linked through the include
 		MAME_DIR .. "src/devices/bus/nes/rcm.cpp",
 		MAME_DIR .. "src/devices/bus/nes/rcm.h",
 		MAME_DIR .. "src/devices/bus/nes/rexsoft.cpp",

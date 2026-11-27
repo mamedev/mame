@@ -73,6 +73,7 @@ protected:
 	void scanline_irq(int scanline, bool vblank, bool blanked);
 	void hblank_irq(int scanline, bool vblank, bool blanked);
 	void video_irq(bool hblank, int scanline, bool vblank, bool blanked);
+	void a12_irq();
 	u8 nt_r(offs_t offset);
 	void nt_w(offs_t offset, u8 data);
 	int calculate_va17_va10(int addr);

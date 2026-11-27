@@ -6,6 +6,8 @@ from __future__ import print_function
 
 import io
 import logging
+import os
+import re
 import sys
 
 USAGE = """
@@ -80,19 +82,75 @@ def samples_interrupt(ins, single_cycle):
     return (single_cycle or "read_sync" not in ins) and "_noirq" not in ins
 
 
-RDY_GATED_DEVICES = {"m6502", "m6510"}
+# CPUs polled where NESdev "CPU interrupts" documents it: once, in the final cycle of an instruction (before its last
+# access); a branch before its operand fetch and, when taken across a page, before the PCH fixup, but not before its
+# third cycle; never during the interrupt sequence itself (an NMI there either takes over the vector or is taken after
+# the handler's first instruction). The other NMOS cores poll before every access of an instruction.
+DOCUMENTED_POLL_DEVICES = {"rp2a03_core"}
+
+
+def poll_lines(device, name, instructions, single_cycle):
+    """indices of the instruction lines that poll interrupts before their access"""
+    cands = [i for i, ins in enumerate(instructions)
+             if identify_line_type(ins) in ("MEMORY_READ", "MEMORY_WRITE") and samples_interrupt(ins, single_cycle)]
+    if device not in DOCUMENTED_POLL_DEVICES:
+        return set(cands)
+    if name.startswith("brk"):
+        return set()
+    if re.match(r"b(cc|cs|eq|mi|ne|pl|vc|vs)_rel$", name):
+        # the operand fetch, and the PCH fixup read of a taken branch across a page; not the cycle in between
+        return {i for i in cands if "m_TMP = read_pc()" in instructions[i] or "read_arg(" in instructions[i]}
+    return {cands[-1]} if cands else set()
+
+
+RDY_GATED_DEVICES = {"m6502", "m6510", "rp2a03_core"}
+# every cycle spent halted on RDY is reported to dma_halt_cycle() with the address of the read being repeated
+# (a no-op except on CPUs with a DMA unit that needs it, like the 2A03)
+RDY_HALT_HOOK_DEVICES = RDY_GATED_DEVICES
+
+
+# NESdev forum "PAL DMA behavior" (Fiskbit, lidnariq, Apr 2025; bus traces of an RP2A07 doing DMC DMA): the 2A07's DMA
+# only halts the CPU on the first cycle of an instruction: it uses the 6502 core's SYNC output instead of R/W, so every
+# cycle after the opcode fetch is treated the way the 2A03 treats a write cycle, and the DMA waits for the next opcode
+# fetch. SYNC is also asserted on the first cycle of an interrupt sequence (an opcode fetch) and stays asserted while
+# the CPU is halted there, so OAM DMA and DMC DMA during OAM DMA behave as on the 2A03.
+def rdy_halt_condition(device, ins):
+    if device == "rp2a03_core" and "read_sync" not in ins:
+        return "!m_rdy_state && !m_dma_2a07"
+    return "!m_rdy_state"
+
+
+def read_address(ins):
+    """address expression of the memory read performed by an instruction line"""
+    for fn in ("read_sync", "read_arg_noirq", "read_arg", "read_pc_noirq", "read_pc", "read"):
+        m = re.search(r"\b" + fn + r"\(", ins)
+        if not m:
+            continue
+        if fn in ("read_pc", "read_pc_noirq"):
+            return "m_PC"
+        depth, start = 1, m.end()
+        for i in range(start, len(ins)):
+            if ins[i] == "(":
+                depth += 1
+            elif ins[i] == ")":
+                depth -= 1
+                if depth == 0:
+                    return ins[start:i]
+    raise ValueError("no read address in: " + ins)
 CMOS_DEVICES = {"w65c02", "r65c02", "r65c19", "w65c02s", "m65ce02", "m4510", "w65816"}
 
 
 def save_opcodes(f, device, opcodes):
     rdy_gated = device in RDY_GATED_DEVICES
+    halt_hook = device in RDY_HALT_HOOK_DEVICES
     interrupt_sampled = device not in CMOS_DEVICES
     for name, instructions in opcodes:
         single_cycle = sum(identify_line_type(ins) in ("MEMORY_READ", "MEMORY_WRITE") for ins in instructions) == 1
+        polls = poll_lines(device, name, instructions, single_cycle)
         emit(f, "void %s_device::%s_full()" % (device, name))
         emit(f, "{")
         substate = 1
-        for ins in instructions:
+        for idx, ins in enumerate(instructions):
             line_type = identify_line_type(ins)
             if line_type == "EAT":
                 emit(f, "\tdebugger_wait_hook();")
@@ -102,14 +160,16 @@ def save_opcodes(f, device, opcodes):
                 substate += 1
             elif line_type in ("MEMORY_READ", "MEMORY_WRITE"):
                 if rdy_gated and line_type == "MEMORY_READ":
-                    emit(f, "\twhile(!m_rdy_state) {")
+                    emit(f, "\twhile(%s) {" % rdy_halt_condition(device, ins))
+                    if halt_hook:
+                        emit(f, "\t\tdma_halt_cycle(%s);" % read_address(ins))
                     emit(f, "\t\tm_icount--;")
                     emit(f, "\t\tif(m_icount <= 0) {")
                     emit(f, "\t\t\tm_inst_substate = %d;" % substate)
                     emit(f, "\t\t\treturn;")
                     emit(f, "\t\t}")
                     emit(f, "\t}")
-                if interrupt_sampled and samples_interrupt(ins, single_cycle):
+                if interrupt_sampled and idx in polls:
                     emit(f, "\tsample_interrupt();")
                 emit(f, ins)
                 emit(f, "\tm_icount--;")
@@ -132,7 +192,7 @@ def save_opcodes(f, device, opcodes):
         emit(f, "\tswitch(m_inst_substate) {")
         emit(f, "case 0:")
         substate = 1
-        for ins in instructions:
+        for idx, ins in enumerate(instructions):
             line_type = identify_line_type(ins)
             if line_type == "EAT":
                 emit(f, "\tdebugger_wait_hook();")
@@ -145,14 +205,16 @@ def save_opcodes(f, device, opcodes):
                 emit(f, "\t[[fallthrough]];")
                 emit(f, "case %d:" % substate)
                 if rdy_gated and line_type == "MEMORY_READ":
-                    emit(f, "\twhile(!m_rdy_state) {")
+                    emit(f, "\twhile(%s) {" % rdy_halt_condition(device, ins))
+                    if halt_hook:
+                        emit(f, "\t\tdma_halt_cycle(%s);" % read_address(ins))
                     emit(f, "\t\tm_icount--;")
                     emit(f, "\t\tif(m_icount <= 0) {")
                     emit(f, "\t\t\tm_inst_substate = %d;" % substate)
                     emit(f, "\t\t\treturn;")
                     emit(f, "\t\t}")
                     emit(f, "\t}")
-                if interrupt_sampled and samples_interrupt(ins, single_cycle):
+                if interrupt_sampled and idx in polls:
                     emit(f, "\tsample_interrupt();")
                 emit(f, "\t[[fallthrough]];")
                 emit(f, "case %d:" % (substate+1))
@@ -313,6 +375,15 @@ def main(argv):
 
     states = load_disp(argv[4])
     logging.info("loaded %s states", len(states))
+
+    # A CPU polled at the documented points gets its own copy of every instruction its dispatch uses, generated with that
+    # rule, taking the ones its own list does not override from the base NMOS list beside it
+    if device_name in DOCUMENTED_POLL_DEVICES and argv[3] != "-":
+        own = {name for name, _ in opcodes}
+        used = set(states)
+        for name, instructions in load_opcodes(os.path.join(os.path.dirname(argv[3]), "om6502.lst")):
+            if name in used and name not in own:
+                opcodes.append((name, instructions))
 
     assert (len(states) & 0xff) == 1
     if mode == 's':

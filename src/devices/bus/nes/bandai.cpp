@@ -1,9 +1,11 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli
+// copyright-holders:Fabio Priuli,Brian H. Gilbert
 /***********************************************************************************************************
 
 
  NES/Famicom cartridge emulation for Bandai PCBs
+
+ iNES mappers: 16, 96, 153, 159
 
 
  Here we emulate the following PCBs
@@ -23,10 +25,9 @@
    to implement also the subslot and the mic inputs
 
 
- TODO:
- - investigate why EEPROM does not work
- - add support to the PPU for the code necessary to Oeka Kids games (also needed by UNL-DANCE2000 PCB)
- - check the cause for the flickering in Famicom Jump 2
+ The 24C02 (mapper 16 submapper 5) and X24C01 (mapper 159) EEPROMs were verified by writing a byte through
+ the $800D/$6000 registers, restarting and reading it back.
+
 
  ***********************************************************************************************************/
 
@@ -63,7 +64,7 @@ nes_oekakids_device::nes_oekakids_device(const machine_config &mconfig, const ch
 }
 
 nes_fcg_device::nes_fcg_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock)
-	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), irq_timer(nullptr)
+	: nes_nrom_device(mconfig, type, tag, owner, clock), m_irq_count(0), m_irq_enable(0), m_irq_latch(0)
 {
 }
 
@@ -123,11 +124,10 @@ void nes_oekakids_device::pcb_reset()
 void nes_fcg_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_fcg_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
+	save_item(NAME(m_irq_latch));
 }
 
 void nes_fcg_device::pcb_reset()
@@ -138,16 +138,16 @@ void nes_fcg_device::pcb_reset()
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
+	m_irq_latch = 0;
 }
 
 void nes_lz93d50_24c01_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_lz93d50_24c01_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_count));
+	save_item(NAME(m_irq_latch));
 	save_item(NAME(m_i2c_dir));
 }
 
@@ -159,20 +159,24 @@ void nes_lz93d50_24c01_device::pcb_reset()
 
 	m_irq_enable = 0;
 	m_irq_count = 0;
+	m_irq_latch = 0;
 	m_i2c_dir = 0;
 }
 
 void nes_fjump2_device::device_start()
 {
 	common_start();
-	irq_timer = timer_alloc(FUNC(nes_fjump2_device::irq_timer_tick), this);
-	irq_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
+	save_item(NAME(m_irq_enable));
+	save_item(NAME(m_irq_count));
+	save_item(NAME(m_irq_latch));
 	save_item(NAME(m_reg));
+	save_item(NAME(m_wram_enable));
 }
 
 void nes_fjump2_device::pcb_reset()
 {
+	m_wram_enable = 0;
 	chr8(0, CHRRAM);
 	memset(m_reg, 0, sizeof(m_reg));
 	set_prg();
@@ -193,8 +197,8 @@ void nes_fjump2_device::pcb_reset()
  Games: Oeka Kids - Anpanman no Hiragana Daisuki, Oeka
  Kids - Anpanman to Oekaki Shiyou!!
 
- This board can swap CHR whenever a PPU address line is
- changed and we still do not emulate this.
+ CHR RAM banking follows the PPU address bus (see
+ ppu_addr_bus() below); the Oeka Kids tablet is not emulated.
 
  iNES: mapper 96
 
@@ -203,48 +207,23 @@ void nes_fjump2_device::pcb_reset()
  -------------------------------------------------*/
 
 
-void nes_oekakids_device::nt_w(offs_t offset, uint8_t data)
+// NESdev INES Mapper 096: PPU A8-A9 are latched as the inner 4 KiB CHR RAM bank for $0000-$0FFF whenever PPU A13/A12
+// change from anything else to 1/0. This follows the address bus itself, not the read or write strobes, so $2006 writes
+// outside rendering also latch (the games select the CHR page they upload to that way); during rendering it is the
+// nametable fetch that latches, and the attribute fetch right after it keeps A13/A12 at 1/0
+void nes_oekakids_device::ppu_addr_bus(u16 addr)
 {
-#if 0
-	if (!(offset & 0x1000) && (offset & 0x3ff) < 0x3c0)
+	if ((addr & 0x3000) == 0x2000)
 	{
-		m_latch = BIT(offset, 8, 2);
-		chr4_0(m_reg | m_latch, CHRRAM);
+		m_latch = BIT(addr, 8, 2);
+		update_chr();
 	}
-#endif
-
-	device_nes_cart_interface::nt_w(offset, data);
-}
-
-uint8_t nes_oekakids_device::nt_r(offs_t offset)
-{
-#if 0
-	if (!(offset & 0x1000) && (offset & 0x3ff) < 0x3c0)
-	{
-		m_latch = BIT(offset, 8, 2);
-		chr4_0(m_reg | m_latch, CHRRAM);
-	}
-#endif
-
-	return device_nes_cart_interface::nt_r(offset);
 }
 
 void nes_oekakids_device::update_chr()
 {
 	chr4_0(m_reg | m_latch, CHRRAM);
 	chr4_4(m_reg | 0x03, CHRRAM);
-}
-
-// this only monitors accesses to $2007 while we would need to monitor accesses to $2006...
-void nes_oekakids_device::ppu_latch(offs_t offset)
-{
-#if 0
-	if ((offset & 0x3000) == 0x2000)
-	{
-		m_latch = BIT(offset, 8, 2);
-		update_chr();
-	}
-#endif
 }
 
 void nes_oekakids_device::write_h(offs_t offset, uint8_t data)
@@ -262,8 +241,7 @@ void nes_oekakids_device::write_h(offs_t offset, uint8_t data)
 
  There are several variants: plain board with or without SRAM,
  board + 24C01 EEPROM, board + 24C02 EEPROM, board + Barcode
- Reader (DATACH).
- We currently only emulate the base hardware.
+ Reader (DATACH, see datach.cpp).
 
  Games: Crayon Shin-Chan - Ora to Poi Poi, Dragon Ball Z Gaiden,
  Dragon Ball Z II & III, Rokudenashi Blues, SD Gundam
@@ -279,7 +257,9 @@ void nes_oekakids_device::write_h(offs_t offset, uint8_t data)
 
  -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER(nes_fcg_device::irq_timer_tick)
+// 16bit counter clocked by M2 (m2_w calls this).  Which M2 edge clocks it is not documented in anything we found: the rise,
+// i.e. before the CPU access of the same cycle, is used
+void nes_fcg_device::irq_clock()
 {
 	if (m_irq_enable)
 	{
@@ -291,15 +271,14 @@ TIMER_CALLBACK_MEMBER(nes_fcg_device::irq_timer_tick)
 		else
 			m_irq_count--;
 
+		// NESdev Bandai FCG: there is no reload and the counter does not stop - after 0 it wraps to $FFFF and keeps
+		// counting; the IRQ stays asserted until a write to the IRQ control register acknowledges it
 		if (!m_irq_count)
-		{
 			set_irq_line(ASSERT_LINE);
-			m_irq_enable = 0;
-		}
 	}
 }
 
-void nes_fcg_device::fcg_write(offs_t offset, uint8_t data)
+void nes_fcg_device::fcg_write(offs_t offset, uint8_t data, bool latched)
 {
 	LOG("lz93d50_write, offset: %04x, data: %02x\n", offset, data);
 
@@ -322,14 +301,28 @@ void nes_fcg_device::fcg_write(offs_t offset, uint8_t data)
 			}
 			break;
 		case 0x0a:
+			// NESdev INES Mapper 016: the LZ93D50 counter is latched, the FCG-1/2 one is not.  Famicom Jump II (mapper 153) glitches its
+			// title screen split and corrupts CHR RAM otherwise (NESdev forum, "Famicom Jump II (Mapper 153) IRQ"): $800B/$800C write a
+			// shadow value that this write loads into the counter
+			if (latched)
+				m_irq_count = m_irq_latch;
 			m_irq_enable = data & 0x01;
 			set_irq_line(CLEAR_LINE);
+			// NESdev INES Mapper 016: enabling counting while the counter holds zero generates an IRQ immediately
+			if (m_irq_enable && !m_irq_count)
+				set_irq_line(ASSERT_LINE);
 			break;
 		case 0x0b:
-			m_irq_count = (m_irq_count & 0xff00) | data;
+			if (latched)
+				m_irq_latch = (m_irq_latch & 0xff00) | data;
+			else
+				m_irq_count = (m_irq_count & 0xff00) | data;
 			break;
 		case 0x0c:
-			m_irq_count = (m_irq_count & 0x00ff) | (data << 8);
+			if (latched)
+				m_irq_latch = (m_irq_latch & 0x00ff) | (data << 8);
+			else
+				m_irq_count = (m_irq_count & 0x00ff) | (data << 8);
 			break;
 		default:
 			LOGMASKED(LOG_UNHANDLED, "lz93d50_write uncaught write, offset: %04x, data: %02x\n", offset, data);
@@ -342,11 +335,14 @@ void nes_fcg_device::write_m(offs_t offset, uint8_t data)
 	LOG("lz93d50 write_m, offset: %04x, data: %02x\n", offset, data);
 
 	if (m_battery.empty() && m_prgram.empty())
-		fcg_write(offset & 0x0f, data);
+	{
+		if (m_regs_at_6000)
+			fcg_write(offset & 0x0f, data, false);  // FCG-1/2 registers: $6000-$7FFF, counter not latched
+	}
 	else if (!m_battery.empty())
-		m_battery[offset] = data;
+		m_battery[offset & (m_battery.size() - 1)] = data;
 	else
-		m_prgram[offset] = data;
+		m_prgram[offset & (m_prgram.size() - 1)] = data;
 }
 
 // FCG board does not access regs in 0x8000-0xffff space!
@@ -359,9 +355,9 @@ void nes_lz93d50_24c01_device::write_h(offs_t offset, uint8_t data)
 	switch (offset & 0x0f)
 	{
 		case 0x0d:
-			m_i2c_dir = BIT(data, 7);
-			m_i2cmem->write_sda(m_i2c_dir ? 1 : BIT(data, 6));
 			m_i2cmem->write_scl(BIT(data, 5));
+			m_i2cmem->write_sda(BIT(data, 6));
+			m_i2c_dir = BIT(data, 7);
 			break;
 		default:
 			fcg_write(offset & 0x0f, data);
@@ -423,14 +419,24 @@ void nes_fjump2_device::set_prg()
 
 uint8_t nes_fjump2_device::read_m(offs_t offset)
 {
+	if (!m_wram_enable)
+		return get_open_bus();
 	LOG("fjump2 read_m, offset: %04x\n", offset);
-	return m_battery[offset & (m_battery.size() - 1)];
+	// the WRAM is battery-backed on Famicom Jump II; an image without the battery flag gets it as plain PRG-RAM
+	std::vector<u8> &ram = m_battery.empty() ? m_prgram : m_battery;
+	if (ram.empty())
+		return get_open_bus();
+	return ram[offset & (ram.size() - 1)];
 }
 
 void nes_fjump2_device::write_m(offs_t offset, uint8_t data)
 {
+	if (!m_wram_enable)
+		return;
 	LOG("fjump2 write_m, offset: %04x, data: %02x\n", offset, data);
-	m_battery[offset & (m_battery.size() - 1)] = data;
+	std::vector<u8> &ram = m_battery.empty() ? m_prgram : m_battery;
+	if (!ram.empty())
+		ram[offset & (ram.size() - 1)] = data;
 }
 
 void nes_fjump2_device::write_h(offs_t offset, uint8_t data)
@@ -449,6 +455,9 @@ void nes_fjump2_device::write_h(offs_t offset, uint8_t data)
 		case 8:
 			m_reg[4] = data & 0x0f;
 			set_prg();
+			break;
+		case 0x0d:
+			m_wram_enable = BIT(data, 5);
 			break;
 		default:
 			fcg_write(offset & 0x0f, data);

@@ -5,6 +5,8 @@
 
  NES/Famicom cartridge emulation for Nintendo NES-EVENT PCBs
 
+ iNES mappers: 105, 555
+
 
  Here we emulate the following PCBs
 
@@ -61,13 +63,13 @@ void nes_event_device::device_start()
 {
 	nes_sxrom_device::device_start();
 
-	event_timer = timer_alloc(FUNC(nes_event_device::event_tick), this);
-	event_timer->adjust(attotime::never);
+	m_m2_running = false;
 
 	save_item(NAME(m_nwc_init));
 
 	save_item(NAME(m_timer_count));
 	save_item(NAME(m_timer_on));
+	save_item(NAME(m_m2_running));
 	save_item(NAME(m_timer_enabled));
 }
 
@@ -81,14 +83,13 @@ void nes_event_device::pcb_reset()
 	m_timer_count = 0;
 	m_timer_enabled = 0;
 	m_timer_on = 0;
+	m_m2_running = false;
 }
 
 void nes_event2_device::device_start()
 {
 	mmc3_start();
 
-	event_timer = timer_alloc(FUNC(nes_event2_device::event_tick), this);
-	event_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
 
 	save_item(NAME(m_tqrom_mode));
 
@@ -158,13 +159,17 @@ void nes_event_device::set_prg()
 	// we need the additional m_timer_enabled variable, to avoid starting the timer before its time...
 	if (BIT(m_reg[1], 4))
 	{
+		// NESdev NES-EVENT: bit 4 = 1 holds the timer in reset (it does not count), and acknowledges the IRQ;
+		// clearing it runs the timer again, also after it has expired
 		m_timer_count = 0;
 		m_timer_enabled = 1;
+		m_timer_on = 0;
+		m_m2_running = false;
 		set_irq_line(CLEAR_LINE);
 	}
 	else if (!m_timer_on && m_timer_enabled)
 	{
-		event_timer->adjust(attotime::zero, 0, clocks_to_attotime(1));
+		m_m2_running = true;
 		m_timer_on = 1;
 	}
 }
@@ -306,7 +311,7 @@ TIMER_CALLBACK_MEMBER(nes_event_device::event_tick)
 		if (++m_timer_count >= (0x10 | m_dsw->read()) << 25)
 		{
 			set_irq_line(ASSERT_LINE);
-			event_timer->reset();
+			m_m2_running = false;
 		}
 	}
 }

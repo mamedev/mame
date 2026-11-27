@@ -71,8 +71,10 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 private:
+	void update_nt();
+
 	uint8_t m_latch;
-	uint8_t m_reg[4];
+	uint8_t m_reg[2];   // CIRAM A10 for $2000-$27FF (R0) and $2800-$2FFF (R1)
 };
 
 
@@ -87,8 +89,6 @@ public:
 	uint8_t n340_loread(offs_t offset);
 	void n340_lowrite(offs_t offset, uint8_t data);
 	void n340_hiwrite(offs_t offset, uint8_t data);
-	virtual uint8_t read_l(offs_t offset) override { return n340_loread(offset); }
-	virtual void write_l(offs_t offset, uint8_t data) override { n340_lowrite(offset, data); }
 	virtual void write_h(offs_t offset, uint8_t data) override { n340_hiwrite(offset, data); }
 
 	virtual void pcb_reset() override;
@@ -99,16 +99,12 @@ protected:
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
-	TIMER_CALLBACK_MEMBER(irq_timer_tick);
+	// IRQ counter shared with the Namco 163, which is the only one of the three chips that has it (NESdev INES Mapper
+	// 210: the 175 and 340 have no IRQ counter, no ROM nametables, no audio and no ASIC-internal RAM)
+	void irq_clock();
 
 	uint16_t m_irq_count;
 	int m_irq_enable;
-
-	emu_timer *irq_timer;
-
-	// Namcot-163 chip contains 8K of internal ram, possibly battery backed up (not emulated yet)
-	// was it also present in 175 & 340 chips?
-	uint8_t m_n163_ram[0x2000];
 };
 
 
@@ -129,7 +125,7 @@ public:
 	virtual void pcb_reset() override;
 
 private:
-	uint8_t m_wram_protect;
+	uint8_t m_wram_enable;   // $C000 bit 0: 1 enables the external PRG RAM (NESdev INES Mapper 210)
 };
 
 
@@ -154,6 +150,11 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
+	uint8_t *chr_ciram_ptr(offs_t offset);
+
+	// the IRQ counter is clocked by M2: it is counted at the M2 rise, before that cycle's CPU access
+	virtual bool wants_m2() override { return true; }
+	virtual void m2_w(int state, offs_t address, bool write) override { if (state) irq_clock(); }
 	// device-level overrides
 	virtual void device_start() override ATTR_COLD;
 
@@ -162,7 +163,8 @@ protected:
 private:
 	void set_mirror(uint8_t page, uint8_t data);
 
-	uint8_t m_wram_protect, m_latch, m_chr_bank;
+	uint8_t m_wram_protect, m_latch;
+	uint8_t m_chr_regs[8];   // $8000-$BFFF CHR registers, kept per bank ($E0-$FF can select CIRAM)
 	required_device<namco_163_sound_device> m_namco163snd;
 };
 
