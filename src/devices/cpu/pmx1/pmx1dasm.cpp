@@ -5,8 +5,8 @@
 
     VideoLogic did not publish the instruction set of the primary core, and
     no assembler syntax for it is known.  The encoding is known as far as
-    it has been worked out from the microcode of the Neon 250 drivers and the
-    Gaelco games; the syntax here is made up.
+    it has been worked out from the microcode of the Neon 250 drivers, the
+    Gaelco games and the Aristocrat MK6; the syntax here is made up.
 
     Registers
       da0-da31, db0-db31    the two banks of data registers (units 1 and 2)
@@ -15,12 +15,14 @@
       rq                    the executing thread's queue of memory reads (unit 6):
                             written with an address to queue a read, read to take the oldest
       ans                   what the last read of an implicit register gave (unit 8)
+      pans                  what the last ask of a port register gave (unit 8)
       kick0-kick3           taking a kick from a thread's kicker, or waiting for one (unit 10)
       kick                  the executing thread's own kicker, left as it is
       cycles                the cycle counter (unit 11)
 
     Instructions
       add sub and or xor shl shr    destination, source, source; or destination, 16-bit immediate
+      sar                           the same, shifting in copies of the sign bit
       mov, movn                     load a register with a register, an immediate or minus an immediate
       cmp, tst                      subtract or AND for the flags only
       b                             jump relative to the instruction
@@ -31,13 +33,16 @@
       fill                          repeated store, moving the pointer before each
       tacmd                         a 64-bit instruction for the tile accelerator
       out                           write a port register
-      feed                          give the oldest read to the display feed and queue another
+      ask                           send a data register to a port register, and have pans answered
+      feed                          give the oldest read to the display feed and queue another;
+                                    [pointer += offset] repeats, moving the pointer before each
       nop, frag                     nothing; frag is the word that starts each fragment of code
 
-    A mnemonic ending in .f sets the flags; .eq .ne .hi .ge .lt .gt make the
-    instruction conditional.  Thread 0 counts the address a jump goes to from
-    four instructions past the jump: without a processor to ask, addresses
-    are shown as threads 1 to 3 would take them.
+    A mnemonic ending in .f sets the flags; .eq .ne .cs .cc .mi .pl .vs .vc
+    .hi .ls .ge .lt .gt .le make the instruction conditional.  Thread 0
+    counts the address a jump goes to from four instructions past the jump:
+    without a processor to ask, addresses are shown as threads 1 to 3 would
+    take them.
 */
 
 #include "emu.h"
@@ -46,14 +51,14 @@
 
 namespace {
 
-constexpr char const *const OPERATIONS[7] = { "add", "sub", "and", "or", "xor", "shl", "shr" };
+constexpr char const *const OPERATIONS[8] = { "add", "sub", "and", "or", "xor", "shl", "shr", "sar" };
 
 constexpr char const *const BANKS[5] = { nullptr, "da", "db", "aa", "ab" };
 
-// condition codes: only those with a name are known
+// condition codes, those of the ARM plus one: only those with a name are known
 constexpr char const *const CONDITIONS[16] = {
-		"", "eq", "ne", nullptr, nullptr, nullptr, nullptr, nullptr,
-		nullptr, "hi", nullptr, "ge", "lt", "gt", nullptr, nullptr };
+		"", "eq", "ne", "cs", "cc", "mi", "pl", "vs",
+		"vc", "hi", "ls", "ge", "lt", "gt", "le", nullptr };
 
 } // anonymous namespace
 
@@ -110,13 +115,15 @@ std::string pmx1core_disassembler::mnemonic(const char *name, u32 condition)
 
 bool pmx1core_disassembler::arithmetic(std::ostream &stream, u32 op)
 {
-	// majors 0 to 6 are the operations on data registers, major 9 adds address registers
+	// majors 0 to 7 are the operations on data registers, major 9 adds address registers
 	const u32 major = BIT(op, 28, 4);
 	const u32 operation = (major == 9) ? 0 : major;
 	const u32 unit = ((major == 9) ? 3 : 1) + BIT(op, 24);
 	const bool flags = BIT(op, 27), conditional = BIT(op, 26), immediate = BIT(op, 25);
 	const bool shift = operation >= 5;
-	if (flags && ((major == 9) || conditional))
+	// of the conditional forms, only the shift by a count and the 8-bit operation into another unit can set the flags
+	const bool flags_allowed = (major != 9) && (!conditional || (immediate && (shift || BIT(op, 5))));
+	if (flags && !flags_allowed)
 		return false;
 
 	const std::string name = flags ? util::string_format("%s.f", OPERATIONS[operation]) : std::string(OPERATIONS[operation]);
@@ -144,8 +151,8 @@ bool pmx1core_disassembler::arithmetic(std::ostream &stream, u32 op)
 	{
 		if (shift)
 		{
-			// the count is in the instruction
-			if (BIT(op, 0, 9))
+			// the count is in the instruction; what bit 0 does is not known
+			if (BIT(op, 1, 8))
 				return false;
 			util::stream_format(stream, "%-8s%s, %s, %u", name, d, s1, BIT(op, 9, 5));
 		}
@@ -174,7 +181,7 @@ bool pmx1core_disassembler::arithmetic(std::ostream &stream, u32 op)
 	else
 	{
 		// the conditional forms
-		const std::string cond_name = mnemonic(OPERATIONS[operation], BIT(op, 1, 4));
+		const std::string cond_name = mnemonic(name.c_str(), BIT(op, 1, 4));
 		if (cond_name.empty())
 			return false;
 		if (immediate && shift)
@@ -186,14 +193,15 @@ bool pmx1core_disassembler::arithmetic(std::ostream &stream, u32 op)
 		}
 		else if (immediate)
 		{
-			if (BIT(op, 0) || d.empty() || s1.empty())
+			// what bit 0 does is not known
+			if (d.empty() || s1.empty())
 				return false;
 			util::stream_format(stream, "%-8s%s, %s, 0x%x", cond_name, d, s1, BIT(op, 6, 8));
 		}
 		else
 		{
 			const std::string to = target(BIT(op, 5, 4), BIT(op, 19, 5));
-			if (shift || BIT(op, 0) || to.empty() || s1.empty() || s2.empty())
+			if (shift || to.empty() || s1.empty() || s2.empty())
 				return false;
 			util::stream_format(stream, "%-8s%s, %s, %s", cond_name, to, s1, s2);
 		}
@@ -264,6 +272,8 @@ bool pmx1core_disassembler::move(std::ostream &stream, u32 op, u32 &flags) const
 				case 8:
 					if (s1 == 2)
 						source = "ans";
+					else if (!s1)
+						source = "pans";
 					break;
 				case 10:
 					if (s1 < 4)
@@ -330,12 +340,16 @@ bool pmx1core_disassembler::memory(std::ostream &stream, u32 op)
 		util::stream_format(stream, "%-8s[%s += %s], db%u", "fill", base, index, d);
 		return true;
 	}
-	if (!load && !(minor & 0xb))
+	if (!(minor & 0xb))
 	{
-		const std::string source = reg(unit, d);
-		if (BIT(op, 13) || BIT(op, 6, 3) || !BIT(op, 5) || BIT(op, 0) || source.empty())
+		// the offset is in a register of the same bank
+		const std::string data = reg(unit, d);
+		if (BIT(op, 13) || BIT(op, 6, 3) || !BIT(op, 5) || BIT(op, 0) || data.empty())
 			return false;
-		util::stream_format(stream, "%-8s[%s %s %s], %s", "st", base, plus, index, source);
+		if (load)
+			util::stream_format(stream, "%-8s%s, [%s %s %s]", "ld", data, base, plus, index);
+		else
+			util::stream_format(stream, "%-8s[%s %s %s], %s", "st", base, plus, index, data);
 		return true;
 	}
 
@@ -363,8 +377,10 @@ bool pmx1core_disassembler::port(std::ostream &stream, u32 op)
 	case 2:
 		if (BIT(op, 0, 14) == 0x0004)
 			util::stream_format(stream, "%-8saa%u, ab%u", "tacmd", d & 15, s1 & 15);
-		else if (!BIT(op, 0, 3) && BIT(op, 5) && BIT(op, 4) && ((BIT(op, 6, 8) == 0x64) || (BIT(op, 6, 8) == 0x65)))
+		else if (!BIT(op, 0, 3) && BIT(op, 5) && BIT(op, 4))
 			util::stream_format(stream, "%-8s0x%02x, %s", "out", BIT(op, 6, 8), BIT(op, 3) ? reg(1, d) : reg(3, d & 15));
+		else if (!BIT(op, 0, 3) && !BIT(op, 5) && BIT(op, 4) && BIT(op, 3))
+			util::stream_format(stream, "%-8s0x%02x, %s", "ask", BIT(op, 6, 8), reg(1, d));
 		else
 			return false;
 		return true;
@@ -373,6 +389,12 @@ bool pmx1core_disassembler::port(std::ostream &stream, u32 op)
 		if (BIT(op, 0, 14) != 0x000b)
 			return false;
 		util::stream_format(stream, "%-8s[%s]", "feed", pointer(d));
+		return true;
+
+	case 13:
+		if (BIT(op, 0, 14) != 0x1c03)
+			return false;
+		util::stream_format(stream, "%-8s[%s += %s]", "feed", pointer(d), reg(3 + BIT(d, 4), s1 & 15));
 		return true;
 
 	default:
@@ -411,7 +433,7 @@ offs_t pmx1core_disassembler::disassemble(std::ostream &stream, offs_t pc, const
 	bool known;
 	switch (BIT(op, 28, 4))
 	{
-	case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 9:
+	case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 9:
 		known = arithmetic(stream, op);
 		break;
 

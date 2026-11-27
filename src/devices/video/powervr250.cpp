@@ -30,7 +30,12 @@
     - 3D core: modifier volumes, dither, color keys, YUV and bump map
       textures, supersampling, filtering in two passes, the scaler; how
       long a render takes
-    - 2D core, video in, VGA, ROM and GPIO port, IIC
+    - 2D core: only the copy, blend, fill, line, 1-bit image and copy of
+      source B that the Aristocrat MK6 uses, worked out from what its code
+      writes to the port registers; the registers that it writes and
+      nothing here reads, the raster operation (perhaps port register 4c)
+      and what port register ff gives back are not known
+    - video in, VGA, ROM and GPIO port, IIC
     - bus mastering: only the chip's own memory is reached
     - DAC feed: scaler, colour space conversion, lookup table, slave
       stream, cursor, line compare interrupt, sync polarities
@@ -317,6 +322,7 @@ powervr250_device::powervr250_device(const machine_config &mconfig, const char *
 	, m_dac_line(0)
 	, m_dac_htotal(0)
 	, m_dac_feeding_count(0)
+	, m_dac_after_blank(true)
 	, m_dac_showing_count(0)
 {
 }
@@ -334,6 +340,8 @@ void powervr250_device::device_add_mconfig(machine_config &config)
 	m_core->ta_status().set(FUNC(powervr250_device::ta_status_r));
 	m_core->dac_feed().set(FUNC(powervr250_device::dac_feed_w));
 	m_core->dac_busy().set(FUNC(powervr250_device::dac_busy_r));
+	m_core->port_read().set(FUNC(powervr250_device::port_r));
+	m_core->port_write().set(FUNC(powervr250_device::port_w));
 }
 
 void powervr250_device::device_start()
@@ -411,7 +419,9 @@ void powervr250_device::device_start()
 	save_item(STRUCT_MEMBER(m_dac_showing, format));
 	save_item(STRUCT_MEMBER(m_dac_showing, blank));
 	save_item(NAME(m_dac_feeding_count));
+	save_item(NAME(m_dac_after_blank));
 	save_item(NAME(m_dac_showing_count));
+	save_item(NAME(m_2d));
 
 	map_frame_buffer();
 }
@@ -489,7 +499,9 @@ void powervr250_device::device_reset()
 	m_dac_line = 0;
 	m_dac_htotal = 0;
 	m_dac_feeding_count = 0;
+	m_dac_after_blank = true;
 	m_dac_showing_count = 0;
+	std::fill(std::begin(m_2d), std::end(m_2d), 0);
 	m_dac_timer->adjust(attotime::never);
 }
 
@@ -2510,7 +2522,11 @@ void powervr250_device::dac_feed_w(u64 data)
 	if (hsync)
 		clocks += BIT(m_implicit[REG_DAC_HS_FRONT], 0, 11) + BIT(m_implicit[REG_DAC_HS_BACK], 0, 11) + BIT(m_implicit[REG_DAC_HS_WIDTH], 0, 11) + 3;
 
-	if (BIT(data, 61))
+	// a frame is taken to start with a span that has bit 61 after a blank one: the Aristocrat MK6 shows its picture as a
+	// span of 472 lines and eight of one line, all with bit 61
+	const bool frame_start = BIT(data, 61) && m_dac_after_blank;
+	m_dac_after_blank = BIT(data, 25) || BIT(dlw, 38);
+	if (frame_start)
 	{
 		// start of frame: what was fed is what is shown
 		std::copy_n(m_dac_feeding, m_dac_feeding_count, m_dac_showing);
@@ -2567,6 +2583,178 @@ void powervr250_device::dac_feed_w(u64 data)
 	m_dac_timer->adjust(attotime::from_ticks(u64(clocks) * lines, pixel_frequency()));
 }
 
+//**************************************************************************
+//  2D core
+//**************************************************************************
+
+u32 powervr250_device::port_r(offs_t offset)
+{
+	// TODO: the MK6 code asks port register ff, with a number or an address, after it writes the control of an operation
+	// there, and port register 54 now and then
+	return 0;
+}
+
+void powervr250_device::port_w(offs_t offset, u32 data)
+{
+	m_2d[offset & 0xff] = data;
+	if ((offset & 0xff) == P2D_START)
+		draw_2d();
+}
+
+void powervr250_device::draw_2d()
+{
+	// the operation is done at once, as soon as it is started
+	const u32 mask = m_vram_size - 1;
+	const u32 lines = m_2d[P2D_START] & 0xffff;
+	const u32 width = m_2d[P2D_SIZE] >> 16;
+	const u32 x = m_2d[P2D_DEST_POS] >> 16, y = m_2d[P2D_DEST_POS] & 0xffff;
+	const u32 sx = m_2d[P2D_SRC_POS] >> 16, sy = m_2d[P2D_SRC_POS] & 0xffff;
+	// bit 16 of a pitch register is set by the MK6 code for some operations and is not part of the pitch
+	// FIXME: what bit 16 of a pitch means is not known
+	const u32 dest_pitch = m_2d[P2D_DEST_PITCH] & 0xffff, pitch_a = m_2d[P2D_PITCH_A] & 0xffff, pitch_b = m_2d[P2D_PITCH_B] & 0xffff;
+	const u32 operation = m_2d[P2D_OPERATION];
+	switch (operation >> 28)
+	{
+	case 2:
+		// copy, with the positions and the width in bytes
+		for (u32 line = 0; line < lines; line++)
+		{
+			const u32 to = m_2d[P2D_DEST] + (y + line) * dest_pitch + x;
+			const u32 from = m_2d[P2D_SRC_A] + (sy + line) * pitch_a + sx;
+			settle(to & mask, width);
+			for (u32 i = 0; i < width; i++)
+			{
+				const u32 s = (from + i) & mask, d = (to + i) & mask;
+				const u32 shift = (d & 3) * 8;
+				m_vram[d >> 2] = (m_vram[d >> 2] & ~(0xffU << shift)) | (BIT(m_vram[s >> 2], (s & 3) * 8, 8) << shift);
+			}
+			written(to & mask, width);
+		}
+		break;
+
+	case 1:
+		// source B over source A with the alpha of source B, in pixels of 32 bits; source A is at the destination position
+		// FIXME: the rounding of the blend is not known
+		for (u32 line = 0; line < lines; line++)
+		{
+			const u32 to = m_2d[P2D_DEST] + (y + line) * dest_pitch + x * 4;
+			const u32 back = m_2d[P2D_SRC_A] + (y + line) * pitch_a + x * 4;
+			const u32 front = m_2d[P2D_SRC_B] + (sy + line) * pitch_b + sx * 4;
+			settle(to & mask, width * 4);
+			for (u32 i = 0; i < width; i++)
+			{
+				const u32 f = m_vram[((front + i * 4) & mask) >> 2];
+				const u32 b = m_vram[((back + i * 4) & mask) >> 2];
+				const u32 alpha = f >> 24;
+				u32 result = f;
+				if (alpha != 0xff)
+				{
+					result = f & 0xff00'0000;
+					for (int shift = 0; shift < 24; shift += 8)
+						result |= ((BIT(f, shift, 8) * alpha + BIT(b, shift, 8) * (255 - alpha) + 127) / 255) << shift;
+				}
+				m_vram[((to + i * 4) & mask) >> 2] = result;
+			}
+			written(to & mask, width * 4);
+		}
+		break;
+
+	case 0:
+		if ((operation & 0xff) == 0x16)
+		{
+			// a 1-bit image, the leftmost pixel in the top bit of each byte and each row in whole bytes, with set bits drawn
+			// in the fill colour and clear bits left alone; only the destination clip of a line limits it
+			// FIXME: bit 11 of the control is taken to draw the clear bits in the background colour; the MK6 code sets it
+			// for its text (000208cc), and the known games look the same with the clear bits left alone
+			// FIXME: the bits start two bytes past the address in source B, which the MK6 code points at the last two bytes
+			// of the header of its glyphs; how the chip is told to pass over them is not known (the source position is 0)
+			const u32 bits = m_2d[P2D_SRC_B] + 2;
+			const u32 row_bytes = ((m_2d[P2D_MONO_WIDTH] & 0xffff) + 7) / 8;
+			const bool opaque = BIT(m_2d[P2D_CONTROL], 11);
+			const u32 clip_width = m_2d[P2D_CLIP] & 0xffff, clip_height = m_2d[P2D_CLIP] >> 16;
+			for (u32 line = 0; line < lines; line++)
+			{
+				if (y + line >= clip_height)
+					break;
+				const u32 to = m_2d[P2D_DEST] + (y + line) * dest_pitch + x * 4;
+				settle(to & mask, width * 4);
+				for (u32 i = 0; (i < width) && (x + i < clip_width); i++)
+				{
+					const u32 s = (bits + line * row_bytes + i / 8) & mask;
+					if (BIT(m_vram[s >> 2], (s & 3) * 8 + (~i & 7)))
+						m_vram[((to + i * 4) & mask) >> 2] = m_2d[P2D_FILL_COLOR];
+					else if (opaque)
+						m_vram[((to + i * 4) & mask) >> 2] = m_2d[P2D_BACK_COLOR];
+				}
+				written(to & mask, width * 4);
+			}
+			break;
+		}
+		if ((operation & 0xfff) == 0x190)
+		{
+			// copy of source B, the high half of the start register the number of 64-bit words of each line; the MK6
+			// code moves frames of symbol animations with it
+			const u32 words = m_2d[P2D_START] >> 16;
+			for (u32 line = 0; line < lines; line++)
+			{
+				const u32 to = m_2d[P2D_DEST] + (y + line) * dest_pitch + x * 4;
+				const u32 from = m_2d[P2D_SRC_B] + (sy + line) * pitch_b + sx * 4;
+				settle(to & mask, words * 8);
+				for (u32 i = 0; i < words * 2; i++)
+					m_vram[((to + i * 4) & mask) >> 2] = m_vram[((from + i * 4) & mask) >> 2];
+				written(to & mask, words * 8);
+			}
+			break;
+		}
+		if ((operation & 0xfff) != 0x090)
+		{
+			logerror("2D operation %08x is not known\n", operation);
+			break;
+		}
+		// fill, in pixels of 32 bits
+		for (u32 line = 0; line < lines; line++)
+		{
+			const u32 to = m_2d[P2D_DEST] + (y + line) * dest_pitch + x * 4;
+			settle(to & mask, width * 4);
+			for (u32 i = 0; i < width; i++)
+				m_vram[((to + i * 4) & mask) >> 2] = m_2d[P2D_FILL_COLOR];
+			written(to & mask, width * 4);
+		}
+		break;
+
+	case 7:
+		{
+			// line, a pixel of 32 bits at a time, moving along the main axis while the error term is negative and
+			// diagonally otherwise
+			const u32 count = m_2d[P2D_START] >> 16;
+			const s64 diagonal_add = s16(m_2d[P2D_LINE_ERROR]);
+			const s64 step_add = diagonal_add + 2 * (s64(count) - 1);
+			s64 error = s16(m_2d[P2D_START]);
+			s32 px = s16(m_2d[P2D_LINE_START] >> 16), py = s16(m_2d[P2D_LINE_START]);
+			const s32 clip_width = m_2d[P2D_CLIP] & 0xffff, clip_height = m_2d[P2D_CLIP] >> 16;
+			for (u32 i = 0; i < count; i++)
+			{
+				if ((px >= 0) && (py >= 0) && (px < clip_width) && (py < clip_height))
+				{
+					const u32 to = (m_2d[P2D_DEST] + py * dest_pitch + px * 4) & mask;
+					settle(to, 4);
+					m_vram[to >> 2] = m_2d[P2D_LINE_COLOR];
+					written(to, 4);
+				}
+				const u32 step = (error >= 0) ? m_2d[P2D_LINE_DIAGONAL] : m_2d[P2D_LINE_STEP];
+				px += s16(step >> 16);
+				py += s16(step);
+				error += (error >= 0) ? diagonal_add : step_add;
+			}
+		}
+		break;
+
+	default:
+		logerror("2D operation %08x is not known\n", operation);
+		break;
+	}
+}
+
 TIMER_CALLBACK_MEMBER(powervr250_device::dac_span_done)
 {
 	m_dac_busy = false;
@@ -2580,11 +2768,16 @@ u32 powervr250_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	const u32 stride = BIT(m_dac_reg[3], 7, 15);
 	const u32 mask = m_vram_size - 1;
 
+	// the display shows a span in the frame it is fed in: the spans fed so far in this frame, then the rest of the frame
+	// before
+	const u32 count = std::max(m_dac_showing_count, m_dac_feeding_count);
+	const auto shown = [this] (u32 i) -> const dac_span & { return (i < m_dac_feeding_count) ? m_dac_feeding[i] : m_dac_showing[i]; };
+
 	// a render that is still being drawn has to be done first when what is shown is where its pixels go
 	bool in_use = false;
-	for (u32 i = 0; !in_use && i < m_dac_showing_count; i++)
+	for (u32 i = 0; !in_use && i < count; i++)
 	{
-		const dac_span &span = m_dac_showing[i];
+		const dac_span &span = shown(i);
 		if (!span.blank && span.lines)
 		{
 			const u32 last = ((span.address + (span.lines - 1) * stride + span.pixels * 4) & mask) >> PAGE_SHIFT;
@@ -2601,9 +2794,9 @@ u32 powervr250_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	const auto byte = [this, mask] (u32 address) -> u8 { return m_vram[(address & mask) >> 2] >> (8 * (address & 3)); };
 	const auto word = [this, mask] (u32 address) -> u16 { return m_vram[(address & mask) >> 2] >> (8 * (address & 2)); };
 
-	for (u32 i = 0; i < m_dac_showing_count; i++)
+	for (u32 i = 0; i < count; i++)
 	{
-		const dac_span &span = m_dac_showing[i];
+		const dac_span &span = shown(i);
 		if (span.blank)
 			continue;
 
