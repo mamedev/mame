@@ -2510,8 +2510,6 @@ void goldnpkr_state::jokerush_map(address_map &map)
 
 void goldnpkr_state::goldpnew_map(address_map &map)
 {
-	map.global_mask(0x7fff);
-
 	map(0x0000, 0x07ff).ram().share("nvram");  // Atmel AT28C16-25PC 2KB Parallel EEPROM
 
 	// CRTC & PIAs are simulated inside the CPLD/FPGA (under "DZ" sticker)
@@ -2523,7 +2521,10 @@ void goldnpkr_state::goldpnew_map(address_map &map)
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 
-	map(0x2000, 0x7fff).rom();
+// TODO: $2000 read, $2400/$2800 written (I/O inside CPLD?)
+
+	map(0x4000, 0x7fff).rom().region("maincpu", 0x0000);
+	map(0xc000, 0xffff).rom().region("maincpu", 0x4000);
 }
 
 
