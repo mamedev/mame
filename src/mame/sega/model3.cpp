@@ -780,12 +780,9 @@ void model3_state::configure_cpu()
 	// RAM is decoded by the MPC10x, so no DRC fast RAM
 }
 
-TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)
+void model3_state::sound_ready_w(int state)
 {
-	if (m_sound_irq_enable)
-	{
-		set_irq_line(0x40, ASSERT_LINE);
-	}
+	set_irq_line(0x40, state);
 }
 
 
@@ -849,7 +846,6 @@ void model3_state::machine_start()
 	}
 	m_bank_crom->configure_entries(0, 16, crom->base() + 0x800000, 0x800000);
 
-	m_sound_timer = timer_alloc(FUNC(model3_state::model3_sound_timer_tick), this);
 	m_scan_timer = timer_alloc(FUNC(model3_state::scan_timer_tick), this);
 	save_item(NAME(m_irq_enable));
 	save_item(NAME(m_irq_state));
@@ -863,9 +859,6 @@ void model3_state::model3_init(int step)
 	m_step = step;
 
 	m_uart->write_cts(0);
-
-	m_sound_irq_enable = 0;
-	m_sound_timer->adjust(attotime::never);
 
 	m_irq_enable = 0;
 	m_irq_state = 0;
@@ -1099,39 +1092,6 @@ u32 model3_state::real3d_dma_status_r()
 	return m_dma_status;
 }
 
-/* SCSP interface */
-void model3_state::model3_sound_w(offs_t offset, uint8_t data)
-{
-	switch (offset)
-	{
-		case 0:
-			// clear the interrupt
-			set_irq_line(0x40, CLEAR_LINE);
-
-			// send to the sound board
-			m_uart->data_w(data);
-
-			break;
-
-		case 4:
-			m_uart->control_w(data);
-
-			// HACK: MIDI comms thru SCSP MCIEB?
-			if (data & 0x20)
-			{
-				m_sound_irq_enable = 1;
-				m_sound_timer->adjust(attotime::from_msec(1), 0, attotime::from_msec(1));
-			}
-			else
-			{
-				m_sound_irq_enable = 0;
-				set_irq_line(0x40, CLEAR_LINE);
-			}
-
-			break;
-	}
-}
-
 void model3_state::daytona2_rombank_w(u8 bank)
 {
 	m_bank_crom->set_entry(bank);
@@ -1146,7 +1106,7 @@ void model3_state::model3_10_mem(address_map &map)
 void model3_state::model3_board_mem(address_map &map)
 {
 	map(0xf0040000, 0xf004003f).mirror(0x0e000000).rw("io", FUNC(sega_315_5649_device::read), FUNC(sega_315_5649_device::write)).umask64(0xff000000ff000000);
-	map(0xf0080000, 0xf008ffff).mirror(0x0e000000).r(m_uart, FUNC(i8251_device::read)).w(FUNC(model3_state::model3_sound_w));
+	map(0xf0080000, 0xf008ffff).mirror(0x0e000000).rw(m_uart, FUNC(i8251_device::read), FUNC(i8251_device::write));
 	map(0xf00c0000, 0xf00dffff).mirror(0x0e000000).ram().share("backup");    /* backup SRAM */
 	map(0xf0100000, 0xf010003f).mirror(0x0e000000).rw(FUNC(model3_state::model3_sys_r), FUNC(model3_state::model3_sys_w));
 	map(0xf0140000, 0xf014003f).mirror(0x0e000000).rw(FUNC(model3_state::model3_rtc_r), FUNC(model3_state::model3_rtc_w));
@@ -5867,6 +5827,7 @@ void model3_state::add_base_devices(machine_config &config)
 
 	I8251(config, m_uart, 8000000); // uPD71051
 	m_uart->txd_handler().set(m_scsp1, FUNC(scsp_device::midi_in));
+	m_uart->txrdy_handler().set(FUNC(model3_state::sound_ready_w));
 
 	clock_device &uart_clock(CLOCK(config, "uart_clock", 500000)); // 16 times 31.25kHz (standard Sega/MIDI sound data rate)
 	uart_clock.signal_handler().set(m_uart, FUNC(i8251_device::write_txc));
