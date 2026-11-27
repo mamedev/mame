@@ -446,7 +446,8 @@ class cmaster_state : public goldstar_state
 {
 public:
 	cmaster_state(const machine_config &mconfig, device_type type, const char *tag) :
-		goldstar_state(mconfig, type, tag)
+		goldstar_state(mconfig, type, tag),
+		m_cmtetbank(*this, "cmtetbank")
 	{ }
 
 	void amaztsk(machine_config &config) ATTR_COLD;
@@ -487,6 +488,7 @@ public:
 	void init_cmezspina() ATTR_COLD;
 	void init_cmpacmanb() ATTR_COLD;
 	void init_cmpap() ATTR_COLD;
+	void init_cmtetrisb() ATTR_COLD;
 	void init_cmtetrisc() ATTR_COLD;
 	void init_cmtetrisd() ATTR_COLD;
 	void init_cmtetriskr() ATTR_COLD;
@@ -532,11 +534,14 @@ public:
 	void init_wcat3a() ATTR_COLD;
 	template <uint8_t Xor_value> void init_tsk() ATTR_COLD;
 	void coincount_w(uint8_t data);
+	DECLARE_INPUT_CHANGED_MEMBER(cmtetrisb_switch_tetris);
 
 protected:
 	virtual void video_start() override ATTR_COLD;
 
 	DECLARE_MACHINE_START(cm99);
+	DECLARE_MACHINE_START(cmtetrisb);
+	DECLARE_MACHINE_RESET(cmtetrisb);
 
 	void cm_map(address_map &map) ATTR_COLD;
 
@@ -565,6 +570,8 @@ private:
 	uint8_t m_cm99_bank_seq_idx = 0U;
 	uint8_t m_cm99_bank_seq1 = 0U;
 	uint8_t m_cm99_bank_seq5 = 0U;
+	void set_cmtetrisb_mode(uint8_t mode);
+	void cmtetrisb_f8_w(uint8_t data);
 
 	uint32_t screen_update_amaztsk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amcoe1a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -588,6 +595,7 @@ private:
 	void cm99_map(address_map &map) ATTR_COLD;
 	void cm99_portmap(address_map &map) ATTR_COLD;
 	void cmast91_portmap(address_map &map) ATTR_COLD;
+	void cmtetrisb_map(address_map &map) ATTR_COLD;
 	void cmtetrisb_portmap(address_map &map) ATTR_COLD;
 	void cmtetriskr_portmap(address_map &map) ATTR_COLD;
 	void cmv4zg_portmap(address_map &map) ATTR_COLD;
@@ -607,6 +615,10 @@ private:
 	void ramdac_map(address_map &map) ATTR_COLD;
 	void wcat3a_map(address_map &map) ATTR_COLD;
 	void wcat3a_portmap(address_map &map) ATTR_COLD;
+
+	optional_memory_bank m_cmtetbank;
+	uint8_t m_cmtetrisb_mode = 0;
+	uint8_t m_cmtetrisb_f2 = 0;
 
 	// installed by various driver init handlers to get stuff to work
 	template <uint8_t V> uint8_t fixedval_r() { return V; }
@@ -1138,6 +1150,46 @@ MACHINE_START_MEMBER(cmaster_state, cm99)
 	save_item(NAME(m_cm99_bank_seq_idx));
 	save_item(NAME(m_cm99_bank_seq1));
 	save_item(NAME(m_cm99_bank_seq5));
+}
+
+
+void cmaster_state::set_cmtetrisb_mode(uint8_t mode)
+{
+	m_cmtetrisb_mode = mode & 1;
+	m_cmtetbank->set_entry(m_cmtetrisb_mode);
+	m_tile_bank = m_cmtetrisb_mode;
+	if (m_fg_tilemap)
+		m_fg_tilemap->mark_all_dirty();
+}
+
+MACHINE_START_MEMBER(cmaster_state, cmtetrisb)
+{
+	m_cmtetbank->configure_entries(0, 2, memregion("maincpu")->base(), 0x8000);
+	save_item(NAME(m_cmtetrisb_mode));
+	save_item(NAME(m_cmtetrisb_f2));
+}
+
+MACHINE_RESET_MEMBER(cmaster_state, cmtetrisb)
+{
+	set_cmtetrisb_mode(0);
+}
+
+void cmaster_state::cmtetrisb_f8_w(uint8_t data)
+{
+	if (!m_cmtetrisb_mode)
+	{
+		set_cmtetrisb_mode(1);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	}
+}
+
+INPUT_CHANGED_MEMBER(cmaster_state::cmtetrisb_switch_tetris)
+{
+	if (!newval && m_cmtetrisb_mode)
+	{
+		set_cmtetrisb_mode(0);
+		m_maincpu->pulse_input_line(INPUT_LINE_RESET, attotime::zero);
+	}
 }
 
 
@@ -4435,6 +4487,35 @@ void cmast97_state::cmast97_map(address_map &map)
 	m_gfx_view[1](0xfc00, 0xfc7f).ram().share(m_reel_scroll[2]);
 	m_gfx_view[1](0xfc80, 0xffff).ram();
 	m_gfx_view[1](0xfe00, 0xfe7f).ram().share(m_reel_scroll[0]);  // girl action
+}
+
+void cmaster_state::cmtetrisb_map(address_map &map)
+{
+	cm_map(map);
+	map(0x0000, 0x7fff).bankr(m_cmtetbank).nopw();
+	map(0x8000, 0xcfff).noprw();
+}
+
+void cmaster_state::cmtetrisb_portmap(address_map &map)
+{
+	cm_portmap(map);
+
+	// AMUS89 REV.0 daughterboard uses discrete input buffers
+	// instead of programmable 8255 PPIs
+	map(0x04, 0x04).portr("IN0");
+	map(0x05, 0x05).portr("IN1");
+	map(0x06, 0x06).portr("IN2");
+	map(0x07, 0x07).nopw();
+	map(0x08, 0x08).portr("DSW1");
+	map(0x09, 0x09).portr("DSW2");
+	map(0x0a, 0x0a).portr("DSW3");
+	map(0x0b, 0x0b).nopw();
+
+	map(0x10, 0x10).lw8(NAME([this](uint8_t data) { outport0_w(m_cmtetrisb_mode ? data : (data & ~0x0c)); }));  // if tetris mode, then disable girls 
+
+	map(0x80, 0x81).w("ym2413", FUNC(ym2413_device::write));
+	map(0xf2, 0xf2).lr8(NAME([this]() -> uint8_t { return (m_cmtetrisb_f2 & 0x0f) << 4; })).lw8(NAME([this](uint8_t data) { m_cmtetrisb_f2 = data; }));
+	map(0xf8, 0xf8).w(FUNC(cmaster_state::cmtetrisb_f8_w));
 }
 
 void cmaster_state::nfm_map(address_map &map)
@@ -15020,11 +15101,11 @@ static INPUT_PORTS_START( cmtetris )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )    PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Stop 2 / Big / Right")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )    PORT_CODE(KEYCODE_X)                         PORT_NAME("Stop 1 / D-UP")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_UP)   PORT_NAME("Stop All / Take / Up")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )    PORT_CODE(KEYCODE_X)                          PORT_NAME("Stop 1 / D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_CODE(KEYCODE_Z) PORT_CODE(KEYCODE_UP)    PORT_NAME("Stop All / Take / Up")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )    PORT_CODE(KEYCODE_V) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Stop 3 / Small / Info / Left")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )        PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Start / Down")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )    PORT_CODE(KEYCODE_V) PORT_CODE(KEYCODE_LEFT)  PORT_NAME("Stop 3 / Small / Info / Left")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )        PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_DOWN)  PORT_NAME("Start / Down")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER )         PORT_CODE(KEYCODE_K) PORT_NAME("Hidden switch for Cherry Master")
@@ -15100,6 +15181,24 @@ static INPUT_PORTS_START( cmtetris )
 	// Display Of Doll At All Fr. Bonus not checked
 	// DSW5-7 listed as unused
 	// Test Mode For Disp. Of Doll not working
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cmtetrisb )
+	PORT_INCLUDE( cmtetris )
+
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SLOT_STOP2 )    PORT_CODE(KEYCODE_C) PORT_CODE(KEYCODE_LEFT)  PORT_NAME("Stop 2 / Big / Right")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SLOT_STOP1 )    PORT_CODE(KEYCODE_X) PORT_CODE(KEYCODE_DOWN)  PORT_NAME("Stop 1 / D-UP")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SLOT_STOP_ALL ) PORT_CODE(KEYCODE_Z)                          PORT_NAME("Stop All / Take / Up")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_GAMBLE_BET )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SLOT_STOP3 )    PORT_CODE(KEYCODE_V) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Stop 3 / Small / Info / Left")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )        PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_UP)    PORT_NAME("Start / Down")
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_K) PORT_NAME("Hidden switch for Tetris") PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(cmaster_state::cmtetrisb_switch_tetris), 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_L) PORT_NAME("Hidden switch for Cherry Master")
 INPUT_PORTS_END
 
 
@@ -16514,11 +16613,28 @@ void cmaster_state::cm99_vblank_irq(int state)
 void cmaster_state::cm99(machine_config &config)
 {
 	cm(config);
+
 	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cm99_map);
 	m_maincpu->set_addrmap(AS_IO, &cmaster_state::cm99_portmap);
 	subdevice<screen_device>("screen")->screen_vblank().set(FUNC(cmaster_state::cm99_vblank_irq));
 
 	MCFG_MACHINE_START_OVERRIDE(cmaster_state, cm99)
+}
+
+
+void cmaster_state::cmtetrisb(machine_config &config)
+{
+	cm(config);
+
+	m_maincpu->set_clock(12_MHz_XTAL / 2); // AMUS89 REV.0 daughterboard: Z0840006PSC + 12 MHz XTAL
+	m_maincpu->set_addrmap(AS_PROGRAM, &cmaster_state::cmtetrisb_map);
+	m_maincpu->set_addrmap(AS_IO, &cmaster_state::cmtetrisb_portmap);
+
+	MCFG_MACHINE_START_OVERRIDE(cmaster_state, cmtetrisb)
+	MCFG_MACHINE_RESET_OVERRIDE(cmaster_state, cmtetrisb)
+
+	// 3567 HX881(1) (YM2413 clone) + 3.579545 MHz XTAL on daughterboard
+	YM2413(config, "ym2413", 3.579545_MHz_XTAL).add_route(ALL_OUTPUTS, "mono", 0.75);
 }
 
 
@@ -29627,9 +29743,6 @@ ROM_END
   The game runs in the blue old cherry master hardware,
   with a daughterboard placed in the Z80 socket.
 
-  The program is partially decrypted and needs more work.
-
-
   Daughterboard specs:
 
   Silkscreened: AMUS89 REV.0
@@ -29644,14 +29757,10 @@ ROM_END
   1x 12.000 MHz. crystal.
   1x 3.579545 MHz. crystal.
 
-
   About the unknown IC....
-
   HX881 is known as U3567, U3567 is a YM2413 clone.
-  YM2413 is 18 pins, but the SOP package is 24 pins.
-  Because of the dual amp, this might support it being a sound chip.
-  Probably tracing pin connections to the HX881 will confirm it.
 
+  --------------------------------------------------
 
   Hidden Switch:
 
@@ -29665,8 +29774,6 @@ ROM_END
 
   The other button, adds GND to the edge connector 7 (solder side):
   PPI pin 19 (PB1), to switch to Cherry Master game.
-
-  Need proper implementation.
 
 */
 ROM_START( cmtetrisb )
@@ -29690,17 +29797,9 @@ ROM_START( cmtetrisb )
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "rom8.u53",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
-	// dumper said that proms are common cmv4.
-	// with the following scheme, colors are close to the original.
-	// degradee on tetris title is not green.
-	// the circles screen is color perfect.
 	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "82s129.u84", 0x0020, 0x0060, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
-	ROM_CONTINUE(           0x0000, 0x0020 )
-	ROM_CONTINUE(           0x0080, 0x0080 )
-	ROM_LOAD( "82s129.u79", 0x0120, 0x0060, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
-	ROM_CONTINUE(           0x0100, 0x0020 )
-	ROM_CONTINUE(           0x0180, 0x0080 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u79", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
 
 	ROM_REGION( 0x100, "proms2", 0 )
 	ROM_LOAD( "82s129.u43", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
@@ -35381,6 +35480,36 @@ void cmaster_state::init_cm99hc()
 	rom[0x92b0] = 0xdd; rom[0x92b1] = 0x7e; rom[0x92b2] = 0x00; rom[0x92b3] = 0xc9; // ld a,(ix+0) ; ret
 }
 
+void cmaster_state::init_cmtetrisb()
+{
+	// 0x0000-0x7fff: Tetris (unencrypted)
+	// 0x8000-0xffff: Cherry Master (encrypted)
+
+	static constexpr uint8_t blk_map[8] = { 0, 4, 3, 7, 1, 6, 2, 5 };
+
+	uint8_t *const ROM = memregion("maincpu")->base() + 0x8000;
+	std::vector<uint8_t> dec(0x8000);
+
+	for (offs_t i = 0; i < 0x8000; i++)
+	{
+		uint8_t val = ROM[i];
+		offs_t dst = (blk_map[i >> 12] << 12) | (i & 0x0fff);
+
+		if (!BIT(i, 12))
+		{
+			// 0x0000-0x3fff of CM: swap A6/A5/A4 and apply non-linear data bitswap/XOR
+			dst = (dst & 0x7000) | (bitswap<12>(i, 11, 10, 9, 8, 7, 5, 4, 6, 3, 2, 1, 0) ^ 0x030);
+			val = BIT(val, 1)
+				? (bitswap<8>(val, 5, 4, 6, 7, 3, 0, 1, 2) ^ 0x9c)
+				: (bitswap<8>(val, 2, 0, 4, 6, 7, 3, 1, 5) ^ 0xac);
+		}
+
+		dec[dst] = val;
+	}
+
+	std::copy_n(dec.begin(), 0x8000, ROM);
+}
+
 
 } // anonymous namespace
 
@@ -35558,7 +35687,7 @@ GAMEL( 1998, texas99e,   cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99
 GAMEL( 1998, texas99hc,  cmast99,  cm99,     cmast99,  cmaster_state,  init_cm99hc,    ROT0, "bootleg",           "Texas '99 (QL-1 V9B.00, Cleco, Hand Count)",      0,                   layout_cmv4 ) // lacks hand count module, injected
 
 GAME(  1993, aplan,      0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "WeaShing H.K.",     "A-Plan",                                          MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
-GAMEL( 1999, top7,       0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg (UTech)",   "Jin Ji Bao Xi (Top-7, V8.8, set 1)",              0,                   layout_cmv4 )
+GAMEL( 1999, top7,       0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg (UTech)",   "Jin Ji Bao Xi (Top-7, V8.8, set 1)",              0,                   layout_cmv4 ) // Jin Ji Bao Xi (金雞報喜, Top-7)
 GAME(  1999, top7a,      top7,     cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "bootleg (UTech)",   "Jin Ji Bao Xi (Top-7, V8.8, set 2)",              MACHINE_NOT_WORKING )   // doesn't boot, not investigated yet
 GAME(  1996, war3cb,     0,        cm99,     cmast99,  cmaster_state,  init_cm99,      ROT0, "S.B.E.",            "War III Cherry Best",                             MACHINE_NOT_WORKING )   // different portmap?
 
@@ -35845,7 +35974,7 @@ GAMEL( 198?, cmpacmana,  cmpacman, cm,        cmpacman, cmaster_state,  init_cm,
 GAMEL( 198?, cmpacmanb,  cmpacman, cm,        cmpacman, cmaster_state,  init_cmpacmanb, ROT0, "<unknown>",               "Super Pacman (v1.2) + Cherry Master (Corsica, v8.31, encrypted)",          0,                                              layout_cmpacman ) // need to press K to switch between games...
 GAMEL( 198?, cmtetris,   0,        cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, unencrypted, set 1)",              0,                                              layout_cmpacman ) // need to press K/L to switch between games...
 GAMEL( 198?, cmtetrisa,  cmtetris, cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, unencrypted, set 2)",              0,                                              layout_cmpacman )
-GAMEL( 198?, cmtetrisb,  cmtetris, cm,        cmtetris, cmaster_state,  init_cm,        ROT0, "<unknown>",               "Tetris + Cherry Master (+K, Canada Version, encrypted)",                   MACHINE_NOT_WORKING,                            layout_cmpacman ) // different Tetris game. incomplete program decryption. press insert to throttle and see the attract running.
+GAMEL( 198?, cmtetrisb,  cmtetris, cmtetrisb, cmtetrisb, cmaster_state, init_cmtetrisb, ROT0, "<unknown>",               "Tetris + Cherry Master (+K, Canada Version, encrypted)",                   0,                                              layout_cmpacman ) // need to press K/L to switch between games...
 GAMEL( 198?, cmtetrisc,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisc, ROT0, "<unknown>",               "Tetris + Cherry Master (Corsica, v8.01, encrypted)",                       0,                                              layout_cmpacman )
 GAMEL( 198?, cmtetrisd,  cmtetris, cm,        cmtetris, cmaster_state,  init_cmtetrisd, ROT0, "bootleg (Aidonis Games)", "Tetris + Cherry Master (Aidonis Games bootleg)",                           0,                                              layout_cmpacman ) // seems to have been hacked to run the slot game as default, see 0x8ba8
 GAMEL( 198?, cmtetrise,  cmtetris, cm,        cmtetris, cmaster_state,  empty_init,     ROT0, "bootleg",                 "Tetris + Cherry Master (unencrypted bootleg, set 1)",                      0,                                              layout_cmpacman ) // seems to have been hacked to run the slot game as default, see 0x8ba8
