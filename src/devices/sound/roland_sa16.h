@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:AJR, Carl Lom
+// copyright-holders:AJR, Carl Lom, giulioz, superctr
 /***************************************************************************
 
     Roland RF5C36 (15229840) & SA-16 (15229874) Sampler Custom ICs
@@ -55,6 +55,8 @@ protected:
 
 private:
 	static constexpr int NUM_VOICES = 16;
+	static constexpr int ROWS_PER_BLOCK = 9;
+	static constexpr int RECORD_VOICE = 12;
 	static constexpr int CLOCK_DIVIDER = 896; // 26.88 MHz / 896 = 30 kHz
 	static constexpr int ENV_RATE_SHIFT = 16; // ARBITRARY: scale of the logarithmic envelope rate (real value unknown)
 
@@ -73,6 +75,7 @@ private:
 
 	TIMER_CALLBACK_MEMBER(update_tick);
 
+	s32 wave_sample(u32 word) { return s16(m_wram_cache.read_word(word << 1) << 4) >> 4; }
 	u16 wram_r16(offs_t offset) { return space(AS_WRAM).read_word(offset); }
 	void wram_w16(offs_t offset, u16 data) { space(AS_WRAM).write_word(offset, data); }
 
@@ -80,11 +83,12 @@ private:
 	offs_t block_base() const { return offs_t(m_block) << 13; }
 
 	// voice register helpers (see the register description in sa16.cpp)
-	static int voice_reg(int voice, int reg) { return voice * 0x10 + reg; }
-	static int env_reg(int voice, int reg) { return (voice + 1) * 0x10 + reg; }
+	static int row(offs_t address);
+	static int voice_reg(int voice, int reg) { return voice * ROWS_PER_BLOCK + reg; }
+	static int env_reg(int voice, int reg) { return ((voice + 1) & (NUM_VOICES - 1)) * ROWS_PER_BLOCK + reg; }
+	u16 reg_r(offs_t address) const;
 	u32 voice_counter(int voice) const;
 	void set_voice_counter(int voice, u32 counter);
-	void env_level_write(int voice, u8 level);
 	void raise_env_event(int voice);
 
 	// address space configurations
@@ -112,10 +116,16 @@ private:
 	u16 m_reg800_woffset;  // voice register selected for writes (d000+ writes)
 	u16 m_reg800_roffset;  // voice register selected for reads (d000+ reads)
 	u16 m_blockoffset;     // byte offset within the wave RAM block (e000+ access)
-	u32 m_smpcounter;      // sample port word counter
+	u16 m_smpcounter;      // sample port word within the block
 	u16 m_port_smp16;      // sample port value (16-bit)
 	u8 m_block;            // wave RAM block (c011)
-	u16 m_regs800[2048];   // voice registers
+	u16 m_regs[NUM_VOICES * ROWS_PER_BLOCK]; // voice registers, 16 blocks of 9 rows
+
+	// sampling
+	u8 m_sampling;         // port 6: bit 0 input on, bit 1 record
+	u8 m_port7;
+	u16 m_input_latch;     // the A/D sample, 12 bits
+	bool m_input_ready;    // a new sample is waiting
 };
 
 // ======================> rf5c36_device
@@ -134,9 +144,6 @@ class sa16_device : public sa16_base_device
 public:
 	// device type constructor
 	sa16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
-
-protected:
-	virtual void device_reset() override ATTR_COLD;
 };
 
 // device type declarations
