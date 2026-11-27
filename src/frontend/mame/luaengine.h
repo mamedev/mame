@@ -29,6 +29,7 @@
 #define SOL_SAFE_USERTYPE 1
 #define SOL_SAFE_NUMERICS 1
 #endif
+#define SOL_ALL_INTEGER_VALUES_FIT 1
 #include "sol/sol.hpp"
 
 struct lua_State;
