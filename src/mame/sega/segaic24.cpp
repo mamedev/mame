@@ -226,9 +226,9 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 }
 
 
-// The rgb version is used by model 1 & 2 which do not need to care
-// about sprite priority hence the lack of support for the
-// priority_bitmap
+// The rgb version is used by model 1 & 2. Like the ind16 version it sets
+// lpri in the priority bitmap where it draws: model 2 uses it to find the
+// topmost tile layer of each pixel.
 
 void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_rgb32 &dm, const uint16_t *mask,
 								uint16_t tpri, uint8_t lpri, int flags, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2)
@@ -236,6 +236,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 	const uint16_t *source = &bm.pix(sy, sx);
 	const uint8_t  *trans = &tm.pix(sy, sx);
 	uint32_t       *dest = &dm.pix(yy1, xx1);
+	uint8_t        *prib = &screen.priority().pix(yy1, xx1);
 	const pen_t *const pens = palette().pens();
 
 	tpri |= TILEMAP_PIXEL_LAYER0;
@@ -253,6 +254,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 		const uint16_t *src   = source;
 		const uint8_t  *srct  = trans;
 		uint32_t *dst         = dest;
+		uint8_t *pr           = prib;
 		const uint16_t *mask1 = mask;
 		int llx = xx2;
 		int cur_x = xx1;
@@ -270,9 +272,13 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 					// 1- 128 pixels from this layer
 					for(int x=0; x<128; x++) {
 						if(*srct++ == tpri || flags & TILEMAP_DRAW_OPAQUE)
+						{
 							*dst = pens[*src];
+							*pr |= lpri;
+						}
 						src++;
 						dst++;
+						pr++;
 					}
 
 				} else if(m == 0xffff) {
@@ -280,6 +286,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 					src += 128;
 					srct += 128;
 					dst += 128;
+					pr += 128;
 
 				} else {
 					// 3- 128 pixels from both layers
@@ -287,11 +294,15 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 						if(!(m & 0x8000)) {
 							for(int xx=0; xx<8; xx++)
 								if(srct[xx] == tpri || flags & TILEMAP_DRAW_OPAQUE)
+								{
 									dst[xx] = pens[src[xx]];
+									pr[xx] |= lpri;
+								}
 						}
 						src += 8;
 						srct += 8;
 						dst += 8;
+						pr += 8;
 						m <<= 1;
 					}
 				}
@@ -303,9 +314,13 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 					// 1- 128 pixels from this layer
 					for(int x = cur_x; x<llx1; x++) {
 						if(*srct++ == tpri || flags & TILEMAP_DRAW_OPAQUE)
+						{
 							*dst = pens[*src];
+							*pr |= lpri;
+						}
 						src++;
 						dst++;
+						pr++;
 					}
 
 				} else if(m == 0xffff) {
@@ -313,16 +328,21 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 					src += 128 - cur_x;
 					srct += 128 - cur_x;
 					dst += 128 - cur_x;
+					pr += 128 - cur_x;
 
 				} else {
 					// 3- 128 pixels from both layers
 					int x;
 					for(x=cur_x; x<llx1; x++) {
 						if((*srct++ == tpri || flags & TILEMAP_DRAW_OPAQUE) && !(m & (0x8000 >> (x >> 3))))
+						{
 							*dst = pens[*src];
+							*pr |= lpri;
+						}
 
 						src++;
 						dst++;
+						pr++;
 					}
 				}
 			}
@@ -332,6 +352,7 @@ void segas24_tile_device::draw_rect(screen_device &screen, bitmap_ind16 &bm, bit
 		source += bm.rowpixels();
 		trans  += tm.rowpixels();
 		dest   += dm.rowpixels();
+		prib   += screen.priority().rowpixels();
 		mask   += 4;
 	}
 }

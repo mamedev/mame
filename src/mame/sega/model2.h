@@ -229,6 +229,7 @@ protected:
 	void push_geo_data(u32 data);
 	void reset_model2_scsp();
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void copy_sys24_tiles(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, bool front);
 	void screen_vblank(int state);
 	void sound_ready_w(int state);
 	template <int TNum> TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
