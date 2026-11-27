@@ -225,17 +225,24 @@ void namcos21_3d_device::blit_single_quad(int sx[4], int sy[4], int zcode[4], u1
 
 	if (cross1 >= 0LL && cross2 >= 0LL)
 		return;
-
+		
 	const u8 code = color >> 8;
 
 	// polygon colors start at 0x2000
 	const u16 palbase = 0x2000 | (m_depth_reverse ? 0 : m_penmask);
-	color = palbase | (color & 0xff);
+	if (m_num_palettes == 0x8)
+	{
+		color = palbase | (color & 0x3ff); // Galaxian^3
+	}
+	else
+	{
+		color = palbase | (color & 0xff);
+		// if it has 0x10 palettes (each is 0x200 size), high bit comes from color bit 9
+		if (m_num_palettes == 0x10 && !BIT(code, 1))
+			color |= 0x100;
+	}
 
-	// if it has 0x10 palettes (each is 0x200 size), high bit comes from color bit 9
-	if (m_num_palettes == 0x10 && !BIT(code, 1))
-		color |= 0x100;
-
+	
 	// add depth cue
 	int zsort = 0;
 
@@ -245,8 +252,12 @@ void namcos21_3d_device::blit_single_quad(int sx[4], int sy[4], int zcode[4], u1
 	zsort /= 4;
 	zsort = std::max(zsort, 0);
 
-	const int depth = zsort >> 2 & m_penmask;
-	color += m_depth_reverse ? depth : -depth;
+	// Depth shading (where supported)
+	if (m_num_palettes != 0x8)
+	{
+		const int depth = zsort >> 2 & m_penmask;
+		color += m_depth_reverse ? depth : -depth;
+	}
 
 	n21_vertex v[4];
 
