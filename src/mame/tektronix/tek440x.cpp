@@ -879,13 +879,20 @@ u8 tek440x_state::videocntl_r()
 		ans |= 0x40;
 
 	// reading out from valid location that fits into VRAM
-	if (m_videobase_offset <= (1023 - 480) * 64 - (1024 - 640) / 16 + 23 )
+	if (m_videobase_offset + 23 >= 0)	// && m_videobase_offset + 23 <= (1024 - 480) * 64 - (1024 - 640) / 16 )
 	{
 		// all the selftests indicate VideoData is expected to toggle fast; presumably at BC/4 as shown on p2.1-85 ??
-		if ((m_screen->vblank() == 0) && (((m_screen->hpos()/4) & 3) ^ 3) )
+		if ((m_screen->vblank() == 0) && (m_screen->hblank() == 0))
+		{
+			// ok fetch actual data.. ish
+			u16 inverted = BIT(m_videocntl, 4) ? 0xffff : 0x0000;
+
+			u16 woffset = m_videobase_offset + 23 + (m_screen->hpos() - m_screen->visible_area().left()) / 16;
+			if (m_vram[(m_screen->vpos() - m_screen->visible_area().top()) * 64 + woffset] ^ inverted)
 				ans |= 0x80;
+		}
 	}
-	
+
 	return ans;
 }
 
