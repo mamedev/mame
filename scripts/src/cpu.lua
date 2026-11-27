@@ -1622,6 +1622,23 @@ if opt_tool(CPUS, "MB86235") then
 end
 
 --------------------------------------------------
+-- Fujitsu MB8764
+--@src/devices/cpu/mb8764/mb8764.h,CPUS["MB8764"] = true
+--------------------------------------------------
+
+if CPUS["MB8764"] then
+	files {
+		MAME_DIR .. "src/devices/cpu/mb8764/mb8764.cpp",
+		MAME_DIR .. "src/devices/cpu/mb8764/mb8764.h",
+	}
+end
+
+if opt_tool(CPUS, "MB8764") then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mb8764/mb8764d.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/mb8764/mb8764d.h")
+end
+
+--------------------------------------------------
 -- Microchip PIC16C5x
 --@src/devices/cpu/pic16c5x/pic16c5x.h,CPUS["PIC16C5X"] = true
 --------------------------------------------------
