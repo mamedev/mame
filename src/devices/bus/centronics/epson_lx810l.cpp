@@ -7,7 +7,7 @@
  *   uPD7810HG (cpu)
  *   E05A30 (gate array)
  *   2064C (8k RAM)
- *   ER59256 (EEP-ROM - serial nvram)
+ *   ER59256 (EEPROM - serial nvram)
  *   SLA7020M (step motor driver)
  *   uPC494C (pulse width modulation control)
  *
@@ -15,14 +15,32 @@
  * centronics bus and printed as expected in a separate screen.
  *
  * It is possible to run the printers' self test with this procedure:
- * - Turn on device;
- * - Toggle Line Feed button (press 'L');
- * - Reset device;
- * - Toggle Line Feed button again;
- * - Press Online button (press 'O');
+ * - Hold down Line Feed button as it boots or while resetting.
  *
  * The printer's carriage will seek home and it will start printing
  * some test data. The Online LED will blink at each line.
+ *
+ * LX-1050+ notes:
+ *  Like the LX-810, the LX-1050+ uses TAMA main board and TAPNL-W control panel.
+ *  Has a 14" wide platen.
+ *  Self test will not print the dip switch settings.
+ *  To print dip switch settings, the Load/Eject button must be pressed.
+ *  The NLQ character | CHR$(124) seems shifted leftward, draft is normal.
+ *
+ * EEPROM notes:
+ *  The firmware erases the EEPROM to FF on printer startup in preparation
+ *   for writing the EEPROM cells during loss of power.
+ *  This printer has EEPROM, it memorizes SelecType settings, position of
+ *   continuous paper, and bi-directional printing adjustment value.
+ *  EEPROM reset operations are only required after the main board replacement,
+ *   EEPROM replacement, or printer mechanism replacement.
+ *  The EEPROM is cleared when the printer power on while FF and LOAD/EJECT
+ *   switches are pressed.
+ *  The "Low Power" switch can be used as a power switch to reset the printer,
+ *   it will maintain the EEPROM settings while also resetting the printer.
+ *  The printer will hold until the low power condition is resolved.
+ *
+ *  The Epson LX810 printer (without the l) has the exact same rom as the AP2000.
  */
 
 #include "emu.h"
@@ -43,8 +61,9 @@
  */
 #define CR_OFFSET    (-14)
 
-#define PAPER_WIDTH  1024    // 120 dpi * 8.5333 inches
-#define PAPER_HEIGHT (11*72) // 72 dpi * 11 inches
+#define PAPER_WIDTH      (8.53 * 120) // 120 dpi * 8.5333 inches
+#define PAPER_WIDTH_WIDE (14.0 * 120) // 120 dpi * 14.0 inches
+#define PAPER_HEIGHT     (11 * 72) // 72 dpi * 11 inches
 
 
 
@@ -54,7 +73,7 @@
 
 DEFINE_DEVICE_TYPE(EPSON_LX810L, epson_lx810l_device, "lx810l", "Epson LX-810L")
 DEFINE_DEVICE_TYPE(EPSON_AP2000, epson_ap2000_device, "ap2000", "Epson ActionPrinter 2000")
-
+DEFINE_DEVICE_TYPE(EPSON_LX1050PLUS, epson_lx1050plus_device, "lx1050p", "Epson LX-1050+")
 
 //-------------------------------------------------
 //  ROM( lx810l )
@@ -79,6 +98,17 @@ ROM_START( ap2000 )
 	ROM_LOAD( "at93c06", 0x00, 0x20, NO_DUMP )
 ROM_END
 
+//-------------------------------------------------
+//  ROM( lx1050plus )
+//-------------------------------------------------
+
+ROM_START( lx1050plus )
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("lx1050p_ic3c_s22246.bin", 0x0000, 0x8000, CRC(6908f655) SHA1(c5b7d10638e5d37bba7f73deb4cd767937eaded8))
+	ROM_REGION16_BE(0x20, "eeprom", 0)
+	ROM_LOAD( "at93c06", 0x00, 0x20, NO_DUMP )
+ROM_END
+
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
@@ -89,14 +119,14 @@ const tiny_rom_entry *epson_lx810l_device::device_rom_region() const
 	return ROM_NAME( lx810l );
 }
 
-
-//-------------------------------------------------
-//  rom_region - device-specific ROM region
-//-------------------------------------------------
-
 const tiny_rom_entry *epson_ap2000_device::device_rom_region() const
 {
 	return ROM_NAME( ap2000 );
+}
+
+const tiny_rom_entry *epson_lx1050plus_device::device_rom_region() const
+{
+	return ROM_NAME( lx1050plus );
 }
 
 
@@ -163,30 +193,32 @@ void epson_lx810l_device::device_add_mconfig(machine_config &config)
 	/* 256-bit eeprom */
 	EEPROM_93C06_16BIT(config, "eeprom");
 
-	BITMAP_PRINTER(config, m_bitmap_printer, PAPER_WIDTH, PAPER_HEIGHT, 120, 72);  // do 72 dpi
-	m_bitmap_printer->set_pf_stepper_ratio(1,6);  // pf stepper moves at 216 dpi so at 72dpi half steps
-	m_bitmap_printer->set_cr_stepper_ratio(1,1);
+	BITMAP_PRINTER(config, m_bitmap_printer, m_paper_width, PAPER_HEIGHT, 120, 72);  // do 72 dpi
+	m_bitmap_printer->set_pf_stepper_ratio(1, 6);  // pf stepper moves at 216 dpi so at 72dpi half steps
+	m_bitmap_printer->set_cr_stepper_ratio(1, 1);
 }
+
 
 /***************************************************************************
     INPUT PORTS
 ***************************************************************************/
-
 
 static INPUT_PORTS_START( epson_lx810 )
 	/* Buttons on printer */
 	PORT_START("ONLINE")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("On Line") PORT_CODE(KEYCODE_0_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(epson_lx810l_device::online_sw), 0)
 	PORT_START("FORMFEED")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Form Feed") PORT_CODE(KEYCODE_3_PAD)
 	PORT_START("LINEFEED")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Line Feed") PORT_CODE(KEYCODE_1_PAD)
 	PORT_START("LOADEJECT")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load/Eject") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Load/Eject") PORT_CODE(KEYCODE_2_PAD)
 	PORT_START("PAPEREND")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Paper End Sensor") PORT_CODE(KEYCODE_6_PAD)
 	PORT_START("RESET")
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Printer") PORT_CODE(KEYCODE_2_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(epson_lx810l_device::reset_printer), 0)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Reset Printer") PORT_CODE(KEYCODE_7_PAD) PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(epson_lx810l_device::reset_printer), 0)
+	PORT_START("LOWVOLT")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Low Voltage") PORT_CODE(KEYCODE_9_PAD)
 
 	PORT_START("DIPSW1")
 	PORT_DIPNAME(0x01, 0x00, "Character spacing")             PORT_DIPLOCATION("SW 1:!1")
@@ -303,6 +335,7 @@ epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_t
 	m_linefeed_ioport(*this, "LINEFEED"),
 	m_loadeject_ioport(*this, "LOADEJECT"),
 	m_paperend_ioport(*this, "PAPEREND"),
+	m_lowvoltage_ioport(*this, "LOWVOLT"),
 	m_dipsw1_ioport(*this, "DIPSW1"),
 	m_dipsw2_ioport(*this, "DIPSW2"),
 	m_93c06_clk(0),
@@ -313,11 +346,18 @@ epson_lx810l_device::epson_lx810l_device(const machine_config &mconfig, device_t
 	m_in_between_offset(0),
 	m_rightward_offset(-3)
 {
+	m_paper_width = PAPER_WIDTH;
 }
 
 epson_ap2000_device::epson_ap2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: epson_lx810l_device(mconfig, EPSON_AP2000, tag, owner, clock)
 { }
+
+epson_lx1050plus_device::epson_lx1050plus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: epson_lx810l_device(mconfig, EPSON_LX1050PLUS, tag, owner, clock)
+{
+	m_paper_width = PAPER_WIDTH_WIDE;
+}
 
 
 //-------------------------------------------------
@@ -480,7 +520,7 @@ void epson_lx810l_device::portc_w(offs_t offset, uint8_t data)
 	/* ioport("serial")->write(BIT(data, 0)); */
 
 	m_93c06_clk =  BIT(data, 4);
-	m_93c06_cs  = !BIT(data, 5);
+	m_93c06_cs  = BIT(data, 5);
 
 	LOG("%s: PC_w(%02x): %02x 93c06 clk: %d cs: %d\n", machine().describe_context(), offset, data, m_93c06_clk, m_93c06_cs);
 
@@ -591,7 +631,7 @@ uint8_t epson_lx810l_device::an4_r()
 
 uint8_t epson_lx810l_device::an5_r()
 {
-	return 0xCB; /* motor voltage, 0xcb = 24V */
+	return m_lowvoltage_ioport->read() ? 0xcb : 0xb8;  /* motor voltage, 0xcb = 24V */
 }
 
 uint8_t epson_lx810l_device::an6_r()
