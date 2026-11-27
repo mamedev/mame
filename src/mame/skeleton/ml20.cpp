@@ -484,8 +484,8 @@ ROM_START( ml20nb )
 
 	ROM_REGION(0x400500, "fingerprint", 0)
 	ROM_LOAD("39vf3201b.u4",                                  0x000000, 0x400000, CRC(c4bdadab) SHA1(016c6ef2ab0bf412503ddf94ee8ad0ffb9ce2405))
-	ROM_LOAD("at88sc153.u7",                                  0x000000, 0x000100, NO_DUMP)
-	ROM_LOAD("sfm3050-tc_v21f_16022200_nov-17_adsp-bf531.u6", 0x000000, 0x000400, NO_DUMP) // internal boot ROM
+	ROM_LOAD("at88sc153.u7",                                  0x400000, 0x000100, CRC(5a131a78) SHA1(f386e8a8cef56b5d9f36c831e700d7cb42749c71))
+	ROM_LOAD("sfm3050-tc_v21f_16022200_nov-17_adsp-bf531.u6", 0x400100, 0x000400, NO_DUMP) // internal boot ROM
 
 	ROM_REGION(0x4000, "smartcard", 0)
 	ROM_LOAD("gc144gh-ul.ic2", 0x0000, 0x4000, NO_DUMP) // AT83C21GC (GemCore Serial Lite PRO on an AT83C5121), firmware version 144
