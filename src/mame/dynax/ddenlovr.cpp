@@ -13927,6 +13927,6 @@ GAME( 2008, mjkokryu,    0,        momotaro,  mjkokryu,   hanakanz_state, empty_
 
 GAME( 2009, mjstama,     0,        momotaro,  mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Sengoku Tamashii (Japan, T042-RB-04)",                   MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
-GAME( 2011, mjrking,     0,        mjrking,   mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Renchan King (Japan, T045-RB-01)",                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2011, mjrking,     0,        mjrking,   mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Renchan King (Japan, T045-RB-01)",                       MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING )
 
-GAME( 2012, mjrkingl,    0,        mjrking,   mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Renchan King Light Version (Japan, T046-RB-01)",         MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 2012, mjrkingl,    0,        mjrking,   mjkokryu,   hanakanz_state, empty_init,    ROT0, "Techno-Top",                                  "Mahjong Renchan King Light Version (Japan, T046-RB-01)",         MACHINE_NO_COCKTAIL  | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_TIMING  )
