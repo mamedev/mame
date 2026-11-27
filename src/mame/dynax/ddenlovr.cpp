@@ -3122,7 +3122,7 @@ void hanakanz_state::hanakanz_palette_w(uint8_t data)
 
 void hanakanz_state::hanakanz_oki_bank_w(uint8_t data)
 {
-m_oki->set_rom_bank((data >> 6) & 3);
+	m_oki->set_rom_bank((data >> 6) & 1);
 }
 
 void hanakanz_state::mjrking_okibank_w(uint8_t data)
