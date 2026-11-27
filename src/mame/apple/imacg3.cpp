@@ -3,14 +3,48 @@
 /****************************************************************************
 
     imacg3.cpp
-    iMac G3 (original hardware)
+    iMac G3 trayloader Gossamer-based hardware
     Preliminary driver by R. Belmont
 
-    This is a "New World" PCI-based machine.
+    The original iMac, codenamed Columbus, was the first of the New World Macs,
+    and was built to be a consumer product in the spirit of the original 128k Macintosh.
+    It inherits its basic hardware design from the Gossamer (G3 Beige); however,
+    with the New World ROM paradigm, its firmware, read off a 1 MiB flash chip,
+    leaves out the bloated Macintosh Toolbox and forces the Classic Mac OS to load
+    the Toolbox itself. This was in preparation for Mac OS X, which did not need
+    a Toolbox ROM.
 
-    CPU: PowerPC 750 "G3" @ 233 MHz
+    With the New World paradigm came USB and the end of legacy devices, as the
+    iMac does not have an ADB port, and, more famously, lacked a floppy drive
+    at a time when floppies were still very popular. However, the design still
+    keeps these around vestigially. The Cuda can still handle ADB commands
+    and the Paddington retains an integrated SWIM3 floppy controller, though
+    on the Columbus design, the SWIM3 connections just go to an unpopulated
+    20-pin connector that, if populated, would only support Apple-style
+    GCR drives. The unpopulated connector is J12, labeled in the schematics
+    as "GCR FLOPPY CONNECTOR".
+
+    The mezzanine connector:
+    ======================================================================
+
+    The Bondi Blue (rev A and rev B) machines have a mezzanine expansion slot
+    that was officially only used by Apple for internal testing.
+
+    The mezzanine slot, had Apple embraced it, would have allowed the trayloading iMacs
+    to be greatly expanded. It would have allowed for up to three PCI devices
+    (on addresses 0d, 0e, 0f), Rage video expansions like TV tuners, and external sound cards.
+
+    The mezzanine slot was ultimately left unpopulated on the multicolored Lifesavers (rev C) revision,
+    but that wasn't before third parties reverse engineered the slot's pinout and released
+    expansion cards like Voodoo graphic accelerators.
+
+    Basic hardware:
+    ======================================================================
+
+    CPU: PowerPC 750 "G3" @ 233 MHz (rev A/B), 266 MHz (rev C), 333 MHz (rev D)
     Memory controller/PCI bridge: Motorola MPC106 "Grackle"
-    Video: ATI Rage IIc w/2MB VRAM, ATI Rage Pro Turbo w/6MB VRAM on revised model
+    Video: ATI Rage IIc w/2MB VRAM with memory expansion slot (rev A),
+           ATI Rage Pro Turbo w/6MB VRAM (rev B onward)
     USB: OPTi 82C861 PCI/USB controller
     I/O: Paddington PCI I/O ASIC (see heathrow.cpp for details)
     RAM: 2 PC66 DIMM slots, max 128 MB
@@ -48,8 +82,10 @@ public:
 	imac_state(const machine_config &mconfig, device_type type, const char *tag);
 
 	required_device<ppc_device> m_maincpu;
+	required_device<pci_root_device> m_pci_root;
 	required_device<mpc106_host_device> m_mpc106;
 	required_device<cuda_device> m_cuda;
+	required_device<burgundy_device> m_codec;
 	required_device<adb_bus_device> m_adbbus;
 	required_device<dimm_spd_device> m_dimm0, m_dimm1;
 	required_device<i2c_24c01_device> m_edid;
@@ -65,8 +101,21 @@ private:
 
 	void cuda_reset_w(int state)
 	{
+		// The Cuda, on the trayloading iMacs and G3 Yosemite, controls reset for *all* devices
+		if (state == ASSERT_LINE)
+		{
+			// On real hardware, the Paddington (PADD_RST3V_L), the onboard
+			// PCI devices like the Rage, Ethernet PHY and USB (MLB_RST5V_L),
+			// and the mezzanine connector (PCI_RST3V_L, PCI_RST5V_L) all have
+			// separate reset signals. In MAME land we can just reset all devices
+			// on the PCI bus.
+			m_pci_root->reset();
+
+			m_codec->reset(); // BURG_RST5VL
+		}
+
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, state);
+		m_maincpu->set_input_line(INPUT_LINE_RESET, state); // MODRST_L signal
 	}
 
 	void irq_w(int state)
@@ -81,8 +130,10 @@ private:
 imac_state::imac_state(const machine_config &mconfig, device_type type, const char *tag) :
 	driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
+	m_pci_root(*this, "pci"),
 	m_mpc106(*this, "pci:00.0"),
 	m_cuda(*this, "cuda"),
+	m_codec(*this, "codec"),
 	m_adbbus(*this, "adb"),
 	m_dimm0(*this, "dimm0"),
 	m_dimm1(*this, "dimm1"),
@@ -103,9 +154,11 @@ void imac_state::machine_start()
 	m_dimm0->set_dimm_size(dimm_spd_device::SIZE_SLOT_EMPTY);
 	m_dimm1->set_dimm_size(dimm_spd_device::SIZE_SLOT_EMPTY);
 
-	// The iMac probes DIMM0 through two Grackle bank numbers.  Report half the
-	// selected aggregate size so the duplicated probe does not create two full-
-	// sized banks that alias the same RAM backing store.
+	// The iMac probes DIMM0 through two Grackle bank numbers.
+	// In the Columbus schematic the I2C bus goes through a 74FST3125 switch
+	// which the Paddington controls from its MBINUSE pin. Until that's implemented,
+	// we hack around it by reporting half the actual RAM size so that the bootrom
+	// probes read the same DIMM values twice.
 	switch (m_ram->size())
 	{
 		case 32 * 1024 * 1024:
@@ -162,8 +215,11 @@ void imac_state::imac(machine_config &config)
 	m_maincpu->set_tb_divisor(14);
 	m_maincpu->set_addrmap(AS_PROGRAM, &imac_state::imac_map);
 
-	PCI_ROOT(config, "pci");
+	PCI_ROOT(config, m_pci_root);
 	MPC106(config, m_mpc106, mpc106_host_device::MAP_TYPE_B, "maincpu", "bootrom");
+
+	// TODO: mezzanine slot.
+	// PCI devices 0d,0e,0f, audio signal routing to the Burgundy, etc.
 
 	paddington_device &paddington(PADDINGTON(config, "pci:10.0"));
 	paddington.set_maincpu_tag("maincpu");
@@ -187,11 +243,16 @@ void imac_state::imac(machine_config &config)
 	I2C_24C01(config, m_edid);
 
 	OPTI_82C861(config, "pci:14.0", 0);
+	// TODO: USB controller IRQ goes to Paddington IRQ 8 (= PCI IRQ 28)
 
+	// HACK: until USB is implemented we just attach ADB devices to the system.
+	// Real hardware has no ADB port, but the Cuda still has ADB support internally.
 	ADB_BUS(config, m_adbbus);
 	ADB_CONNECTOR(config, "adb:0", adb_devices, "hle_keyboard");
 	ADB_CONNECTOR(config, "adb:1", adb_devices, "hle_mouse");
 
+	// TODO: Cuda is marked "CUDA 3.01" in the schematic.
+	// The machine still boots with a Cuda 2 in its place.
 	CUDA_V2XX(config, m_cuda, XTAL(32'768));
 	m_cuda->set_default_bios_tag("341s0060");
 	m_cuda->reset_callback().set(FUNC(imac_state::cuda_reset_w));
@@ -227,16 +288,16 @@ void imac_state::imac(machine_config &config)
 	m_ram->set_default_size("32M");
 	m_ram->set_extra_options("32M,64M,128M");
 
-	burgundy_device &burgundy(BURGUNDY(config, "codec", 45.1584_MHz_XTAL));
-	burgundy.dma_output().set(paddington, FUNC(heathrow_device::codec_dma_read));
-	burgundy.dma_input().set(paddington, FUNC(heathrow_device::codec_dma_write));
+	BURGUNDY(config, m_codec, 45.1584_MHz_XTAL);
+	m_codec->dma_output().set(paddington, FUNC(heathrow_device::codec_dma_read));
+	m_codec->dma_input().set(paddington, FUNC(heathrow_device::codec_dma_write));
 
-	paddington.codec_r_callback().set(burgundy, FUNC(burgundy_device::read_macrisc));
-	paddington.codec_w_callback().set(burgundy, FUNC(burgundy_device::write_macrisc));
+	paddington.codec_r_callback().set(m_codec, FUNC(burgundy_device::read_macrisc));
+	paddington.codec_w_callback().set(m_codec, FUNC(burgundy_device::write_macrisc));
 
 	SPEAKER(config, "speaker", 2).front();
-	burgundy.add_route(0, "speaker", 1.0, 0);
-	burgundy.add_route(1, "speaker", 1.0, 1);
+	m_codec->add_route(0, "speaker", 1.0, 0);
+	m_codec->add_route(1, "speaker", 1.0, 1);
 
 	SOFTWARE_LIST(config, "hdd_list").set_original("mac_hdd");
 	SOFTWARE_LIST(config, "cd_list").set_original("mac_cdrom");
