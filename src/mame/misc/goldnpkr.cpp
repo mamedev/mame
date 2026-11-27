@@ -2521,7 +2521,10 @@ void goldnpkr_state::goldpnew_map(address_map &map)
 	map(0x1000, 0x13ff).ram().w(FUNC(goldnpkr_state::goldnpkr_videoram_w)).share(m_videoram);
 	map(0x1800, 0x1bff).ram().w(FUNC(goldnpkr_state::goldnpkr_colorram_w)).share(m_colorram);
 
-// TODO: $2000 read, $2400/$2800 written (I/O inside CPLD?)
+//  TODO: $2000 reads
+
+	map(0x2400, 0x2400).w(m_snsnd, FUNC(sn76489_device::write));
+	map(0x2800, 0x2800).nopw();  // Leftover: initializes a non-existent second SN76489
 
 	map(0x4000, 0x7fff).rom().region("maincpu", 0x0000);
 	map(0xc000, 0xffff).rom().region("maincpu", 0x4000);
@@ -6190,6 +6193,15 @@ static INPUT_PORTS_START( pk5_07sb )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( goldpnew )
+	PORT_INCLUDE( goldnpkr )
+
+	PORT_MODIFY("SW1")
+	// SN76489 ready line connected to PIA1 port A, bit7
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_READ_LINE_DEVICE_MEMBER("snsnd", FUNC(sn76489a_device::ready_r))
+INPUT_PORTS_END
+
+
 /*********************************************
 *              Graphics Layouts              *
 *********************************************/
@@ -6925,7 +6937,7 @@ void goldnpkr_state::goldpnew(machine_config &config)
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
-//	SN76489A(config, m_snsnd, 20_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
+	SN76489A(config, m_snsnd, 20_MHz_XTAL / 8).add_route(ALL_OUTPUTS, "mono", 0.50);
 }
 
 void goldnpkr_state::unkicpf40(machine_config &config)
@@ -17529,4 +17541,4 @@ GAMEL( 1986, touksysp,  0,        touksysp, touksysp, goldnpkr_state, init_touk,
 GAMEL( 198?, pk5_07sb,  goldnpkr, pk5_07sb, pk5_07sb, goldnpkr_state, init_pk5sb,    ROT0,   "<unknown>",                "Fever Poker (pk5-07sb, encrypted)",       0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
 GAMEL( 198?, jokerush,  0,        jokerush, goldnpkr, goldnpkr_state, init_jokerush, ROT0,   "<unknown>",                "Joker Rush!! (SMH-803-J)",                0,                layout_goldnpkr )  // no lamps. layout for clickable controls only.
 
-GAME(  2012, goldpnew,  goldnpkr, goldpnew, goldnpkr, goldnpkr_state, init_gldpnw,   ROT0,   "PAN Electronics",          "Golden Poker Double Up (PAN Electronics)",  MACHINE_NOT_WORKING )
+GAME(  2012, goldpnew,  goldnpkr, goldpnew, goldpnew, goldnpkr_state, init_gldpnw,   ROT0,   "PAN Electronics",          "Golden Poker Double Up (PAN Electronics)",  MACHINE_NOT_WORKING )
