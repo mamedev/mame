@@ -4,7 +4,7 @@
 
   TI-85 driver by Krzysztof Strzecha
   TI-83 Plus, TI-84 Plus, and Silver Edition support by Jon Sturm
-  TI-83 and TI-84 Plus C Silver Edition support by grubbyplaya
+  TI-82/83 and TI-84 Plus C Silver Edition support by grubbyplaya
 
   Functions to emulate general aspects of the machine (RAM, ROM, interrupts,
   I/O ports)
@@ -19,55 +19,30 @@
 #define TI85_SNAPSHOT_SIZE   32976
 #define TI86_SNAPSHOT_SIZE  131284
 
-TIMER_CALLBACK_MEMBER(ti85_state::ti85_timer_callback)
+INPUT_CHANGED_MEMBER(ti85_state::on_btn)
 {
-	if (ioport("ON")->read() & 0x01)
-	{
-		if (m_ON_interrupt_mask && !m_ON_pressed)
-		{
-			m_maincpu->set_input_line(0, HOLD_LINE);
-			m_ON_interrupt_status = 1;
-			if (!m_timer_interrupt_mask) m_timer_interrupt_mask = 2;
-		}
-		m_ON_pressed = 1;
-		return;
-	}
-	else
-		m_ON_pressed = 0;
-	if (m_timer_interrupt_mask)
+	if ((newval & 0x01) && m_ON_interrupt_mask && !m_ON_pressed)
 	{
 		m_maincpu->set_input_line(0, HOLD_LINE);
-		m_timer_interrupt_status = m_timer_interrupt_mask;
+		m_ON_interrupt_status = 1;
 	}
+
+	m_ON_pressed = newval & 0x01;
 }
 
-TIMER_CALLBACK_MEMBER(ti85_state::ti83_timer1_callback)
+TIMER_CALLBACK_MEMBER(ti85_state::ti82_timer1_callback)
 {
-	if (ioport("ON")->read() & 0x01)
-	{
-		if (m_ON_interrupt_mask && !m_ON_pressed)
-		{
-			m_maincpu->set_input_line(0, HOLD_LINE);
-			m_ON_interrupt_status = 1;
-		}
-		m_ON_pressed = 1;
-		return;
-	}
-	else
-	{
-		m_ON_pressed = 0;
-	}
 	if (m_timer_interrupt_mask & 2)
 	{
 		m_maincpu->set_input_line(0, HOLD_LINE);
 		m_timer_interrupt_status |= 2;
 	}
 
-    if (m_ON_interrupt_status)
+	if (m_ON_interrupt_status)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(ti85_state::ti83_timer2_callback)
+TIMER_CALLBACK_MEMBER(ti85_state::ti82_timer2_callback)
 {
 	if (m_timer_interrupt_mask & 4)
 	{
@@ -79,9 +54,9 @@ TIMER_CALLBACK_MEMBER(ti85_state::ti83_timer2_callback)
 TIMER_CALLBACK_MEMBER(ti85_state::crystal_timer_tick)
 {
 	int id = param;
-    if (!m_ctimer[id].count || --m_ctimer[id].count || m_ctimer[id].loop & 4) {
-        return;
-    } else if (m_ctimer[id].loop & 1) {
+	if (!m_ctimer[id].count || --m_ctimer[id].count || m_ctimer[id].loop & 4) {
+		return;
+	} else if (m_ctimer[id].loop & 1) {
 		ti83pse_count(id, m_ctimer[id].max);
 	} else {
 		m_ctimer[id].active = false;
@@ -97,7 +72,7 @@ TIMER_CALLBACK_MEMBER(ti85_state::crystal_timer_tick)
 
 TIMER_CALLBACK_MEMBER(ti85_state::rtc_tick)
 {
-    m_ti84p_rtc_currtime++;
+	m_ti84p_rtc_currtime++;
 }
 
 void ti85_state::ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram)
@@ -112,40 +87,80 @@ void ti85_state::ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *b
 		space.nop_write(bank * 0x4000, bank * 0x4000 + 0x3fff);
 }
 
-void ti85_state::ti8x_update_int()
-{ 
-    if (!m_ctimer_interrupt_status && !m_timer_interrupt_status && !m_ON_interrupt_status)
-        m_maincpu->set_input_line(0, CLEAR_LINE);
+void ti85_state::ti8x_adjust_timers(const double speeds[], uint8_t speed)
+{
+	// 0b00 = fastest speed, 0b11 = slowest
+	m_ti82_1st_timer->adjust(attotime::from_hz(speeds[speed]), 0, attotime::from_hz(speeds[speed]));
+	m_ti82_2nd_timer->adjust(attotime::from_hz(speeds[speed] * 4.0), 0, attotime::from_hz(speeds[speed] * 2.0));
 }
 
-void ti85_state::update_ti85_memory ()
+void ti85_state::ti8x_update_int()
+{
+	if (!m_ctimer_interrupt_status && !m_timer_interrupt_status && !m_ON_interrupt_status)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+void ti85_state::update_ti8x_memory()
+{
+	switch (m_model) {
+		case TI82:
+		case TI83:
+			update_ti82_memory();
+			break;
+
+		case TI83P:
+		case TI73:
+			update_ti83p_memory();
+			break;
+
+		case TI83PSE:
+		case TI84P:
+		case TI84PSE:
+			update_ti83pse_memory();
+			break;
+
+		case TI84PCSE:
+			update_ti84pcse_memory();
+			break;
+
+		case TI86:
+			update_ti86_memory();
+			break;
+
+		default:
+			update_ti85_memory();
+			break;
+	}
+}
+
+void ti85_state::update_ti85_memory()
 {
 	membank("bank2")->set_base(m_bios + 0x004000*m_ti8x_memory_page_1);
 }
 
-void ti85_state::update_ti83_memory()
+void ti85_state::update_ti82_memory()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-    if (!(m_port4_bit0)) {
-        ti8x_update_bank(space, 1, m_bios, m_ti8x_memory_page_1, false);
-        ti8x_update_bank(space, 3, m_ti8x_ram.get(), 0, true);
-    } else if (m_ti8x_port2 & 0x40) {
-        ti8x_update_bank(space, 1, m_ti8x_ram.get(), 0, true);
-        ti8x_update_bank(space, 2, m_ti8x_ram.get(), 1, true);
-    } else {
-        ti8x_update_bank(space, 1, m_bios, m_ti8x_memory_page_1 & 0x08, false);
-        ti8x_update_bank(space, 2, m_bios, m_ti8x_memory_page_1, false);
-    }  
-    
-    uint8_t bankXY = !!(m_ti8x_port2 & 0x08);
-    uint8_t slotXY = 2 + m_port4_bit0;
+	if (!(m_port4_bit0)) {
+		ti8x_update_bank(space, 1, m_bios, m_ti8x_memory_page_1, false);
+		ti8x_update_bank(space, 3, m_ti8x_ram.get(), 0, true);
+	} else if (m_ti8x_port2 & 0x40) {
+		ti8x_update_bank(space, 1, m_ti8x_ram.get(), 0, true);
+		ti8x_update_bank(space, 2, m_ti8x_ram.get(), 1, true);
+	} else {
+		ti8x_update_bank(space, 1, m_bios, m_ti8x_memory_page_1 & 0x08, false);
+		ti8x_update_bank(space, 2, m_bios, m_ti8x_memory_page_1, false);
+	}
 
-    if (m_ti8x_port2 & 0x80) {
-        ti8x_update_bank(space, slotXY, m_ti8x_ram.get(), bankXY, true);
-    } else {
-        ti8x_update_bank(space, slotXY, m_bios, (m_ti8x_memory_page_1 & 0x08) | bankXY, false);
-    }
+	uint8_t bankXY = !!(m_ti8x_port2 & 0x08);
+	uint8_t slotXY = 2 + m_port4_bit0;
+
+	if (m_ti8x_port2 & 0x80) {
+		ti8x_update_bank(space, slotXY, m_ti8x_ram.get(), bankXY, true);
+	} else {
+		ti8x_update_bank(space, slotXY, m_bios, (m_ti8x_memory_page_1 & 0x08) | bankXY, false);
+	}
 }
 
 
@@ -177,7 +192,7 @@ void ti85_state::update_ti83pse_memory ()
 		update_ti84pcse_memory();
 		return;
 	}
-	
+
 	m_membank[0]->set_bank(m_booting ? (m_model==TI84P ? 0x3f : 0x7f) : 0);
 
 	if (m_ti83p_port4 & 1)
@@ -267,30 +282,14 @@ void ti85_state::machine_start()
 {
 	m_model = TI85;
 
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_bios = memregion("bios")->base();
 
-	m_timer_interrupt_mask = 0;
-	m_timer_interrupt_status = 0;
-	m_ON_interrupt_mask = 0;
-	m_ON_interrupt_status = 0;
-	m_ON_pressed = 0;
-	m_power_mode = 0;
-	m_keypad_mask = 0;
-	m_ti8x_memory_page_1 = 0;
-	m_LCD_memory_base = 0;
-	m_LCD_status = 0;
-	m_LCD_mask = 0;
-	m_video_buffer_width = 0;
-	m_interrupt_speed = 0;
-	m_port4_bit0 = 0;
-	m_ti81_port_7_data = 0;
+	ti8x_init_common();
 
-	m_ti85_timer = timer_alloc(FUNC(ti85_state::ti85_timer_callback), this);
-	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	const attotime dma_cycles = attotime::from_ticks(1024, m_maincpu->clock());
+	m_lcd_dma_timer = timer_alloc(FUNC(ti85_state::lcd_dma_callback), this);
+	m_lcd_dma_timer->adjust(dma_cycles, 0, dma_cycles);
 
-	space.unmap_write(0x0000, 0x3fff);
-	space.unmap_write(0x4000, 0x7fff);
 	membank("bank1")->set_base(m_bios);
 	membank("bank2")->set_base(m_bios + 0x04000);
 }
@@ -302,8 +301,8 @@ MACHINE_RESET_MEMBER(ti85_state,ti85)
 
 void ti85_state::ti8x_flash_write(offs_t offset, uint8_t data)
 {
-    if (m_flash_unlocked)
-        m_flash->write(offset, data);
+	if (m_flash_unlocked)
+		m_flash->write(offset, data);
 }
 
 uint8_t ti85_state::ti83p_membank1_r(offs_t offset)
@@ -346,45 +345,45 @@ uint8_t ti85_state::ti83p_membank2_r(offs_t offset)
 		}
 	}
 
-    if (!m_booting && m_ti83pse_port28 && (offset < (m_ti83pse_port28 * 64)))
-        return m_nvram[offset + 0x4000];
-    else
-	    return m_membank[2]->read8(offset);
+	if (!m_booting && m_ti83pse_port28 && (offset < (m_ti83pse_port28 * 64)))
+		return m_nvram[offset + 0x4000];
+	else
+		return m_membank[2]->read8(offset);
 }
 
 void ti85_state::ti83p_membank2_w(offs_t offset, uint8_t data)
 {
-    if (!m_booting && m_ti83pse_port28 && (offset < (m_ti83pse_port28 * 64)))
-        m_nvram[offset + 0x4000] = data;
-    else
-        m_membank[2]->write8(offset, data);
+	if (!m_booting && m_ti83pse_port28 && (offset < (m_ti83pse_port28 * 64)))
+		m_nvram[offset + 0x4000] = data;
+	else
+		m_membank[2]->write8(offset, data);
 }
 
 uint8_t ti85_state::ti83p_membank3_r(offs_t offset)
 {
-    if (!m_booting && m_ti83pse_port27 && (offset >= 0x4000 - (m_ti83pse_port27 * 64)))
-        return m_nvram[offset];
-    else
-	    return m_membank[3]->read8(offset);
+	if (!m_booting && m_ti83pse_port27 && (offset >= 0x4000 - (m_ti83pse_port27 * 64)))
+		return m_nvram[offset];
+	else
+		return m_membank[3]->read8(offset);
 }
 
 void ti85_state::ti83p_membank3_w(offs_t offset, uint8_t data)
 {
-    if (!m_booting && m_ti83pse_port27 && (offset >= 0x4000 - (m_ti83pse_port27 * 64)))
-        m_nvram[offset] = data;
-    else
-        m_membank[3]->write8(offset, data);
+	if (!m_booting && m_ti83pse_port27 && (offset >= 0x4000 - (m_ti83pse_port27 * 64)))
+		m_nvram[offset] = data;
+	else
+		m_membank[3]->write8(offset, data);
 }
 
 MACHINE_RESET_MEMBER(ti85_state,ti83p)
 {
 	m_PCR = 0x00;
-
 	m_ti8x_memory_page_1 = 0;
 	m_ti8x_memory_page_2 = 0;
 	m_ti8x_memory_page_3 = 0;
 	m_ti83p_port4 = 1;
 	m_booting = true;
+
 	if ((m_model == TI83P) || (m_model == TI73))
 	{
 		update_ti83p_memory();
@@ -395,215 +394,235 @@ MACHINE_RESET_MEMBER(ti85_state,ti83p)
 	}
 }
 
+MACHINE_START_MEMBER(ti85_state,ti82)
+{
+	m_model = TI82;
+	ti82_init_common();
+}
+
 MACHINE_START_MEMBER(ti85_state,ti83)
 {
-    m_model = TI83;
-
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	m_bios = memregion("bios")->base();
-
-	m_timer_interrupt_mask = 0;
-	m_timer_interrupt_status = 0;
-	m_ON_interrupt_mask = 0;
-	m_ON_interrupt_status = 0;
-	m_ON_pressed = 0;
-	m_ti8x_memory_page_1 = 0;
-	m_ti8x_memory_page_2 = 0;
-	m_LCD_memory_base = 0;
-	m_LCD_status = 0;
-	m_LCD_mask = 0;
-	m_power_mode = 0;
-	m_keypad_mask = 0;
-	m_video_buffer_width = 0;
-	m_interrupt_speed = 0;
-	m_port4_bit0 = 0;
-
-	m_ti8x_ram = std::make_unique<uint8_t[]>(32*1024);
-	memset(m_ti8x_ram.get(), 0, sizeof(uint8_t)*32*1024);
-
-	space.unmap_write(0x0000, 0x3fff);
-
-	membank("bank1")->set_base(m_bios);
-	membank("bank2")->set_base(m_bios + 0x4000);
-	membank("bank3")->set_base(m_ti8x_ram.get() + 0x4000);
-	membank("bank4")->set_base(m_ti8x_ram.get());
-	subdevice<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(uint8_t)*32*1024);
-
-	m_ti83_1st_timer = timer_alloc(FUNC(ti85_state::ti83_timer1_callback), this);
-	m_ti83_1st_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
-	m_ti83_2nd_timer = timer_alloc(FUNC(ti85_state::ti83_timer2_callback), this);
-	m_ti83_2nd_timer->adjust(attotime::from_hz(512), 0, attotime::from_hz(512));
+	m_model = TI83;
+	ti82_init_common();
 }
 
 MACHINE_START_MEMBER(ti85_state,ti83p)
 {
 	m_model = TI83P;
-    ti83p_init_common();
+	ti83p_init_common();
 }
 
 MACHINE_START_MEMBER(ti85_state,ti73)
 {
 	m_model = TI73;
-    ti83p_init_common();
+	ti83p_init_common();
 }
 
-void ti85_state::ti83p_init_common()
+void ti85_state::ti8x_init_common()
 {
 	m_timer_interrupt_mask = 0;
 	m_timer_interrupt_status = 0;
 	m_ON_interrupt_mask = 0;
 	m_ON_interrupt_status = 0;
 	m_ON_pressed = 0;
+	m_PCR = 0;
+	m_ti8x_port2 = 0;
 	m_ti8x_memory_page_1 = 0;
 	m_ti8x_memory_page_2 = 0;
 	m_ti8x_memory_page_3 = 0;
+	m_lcdrow = 0;
+	m_lcd_last_row = 0;
 	m_LCD_memory_base = 0;
+	m_LCD_contrast = 0;
 	m_LCD_status = 0;
 	m_LCD_mask = 0;
 	m_power_mode = 0;
 	m_keypad_mask = 0;
 	m_video_buffer_width = 0;
-	m_interrupt_speed = 0;
-	m_ti83p_port4 = 1;
-	m_flash_unlocked = 0;
+	m_video_buffer_rows = 0;
+	m_port4_bit0 = 0;
 
+	save_item(NAME(m_timer_interrupt_mask));
+	save_item(NAME(m_timer_interrupt_status));
+	save_item(NAME(m_ON_interrupt_mask));
+	save_item(NAME(m_ON_interrupt_status));
+	save_item(NAME(m_ON_pressed));
+	save_item(NAME(m_PCR));
+	save_item(NAME(m_ti8x_port2));
+	save_item(NAME(m_ti8x_memory_page_1));
+	save_item(NAME(m_ti8x_memory_page_2));
+	save_item(NAME(m_ti8x_memory_page_3));
+	save_item(NAME(m_lcdrow));
+	save_item(NAME(m_lcd_last_row));
+	save_item(NAME(m_LCD_interrupt_status));
+	save_item(NAME(m_LCD_dma_speed));
+	save_item(NAME(m_LCD_memory_base));
+	save_item(NAME(m_LCD_contrast));
+	save_item(NAME(m_LCD_status));
+	save_item(NAME(m_LCD_mask));
+	save_item(NAME(m_frame));
+	save_item(NAME(m_power_mode));
+	save_item(NAME(m_keypad_mask));
+	save_item(NAME(m_video_buffer_width));
+	save_item(NAME(m_video_buffer_rows));
+	save_item(NAME(m_port4_bit0));
+}
+
+void ti85_state::ti82_init_common()
+{
+	m_bios = memregion("bios")->base();
+
+	ti8x_init_common();
+
+	m_ti8x_ram = std::make_unique<uint8_t[]>(32*1024);
+	memset(m_ti8x_ram.get(), 0, sizeof(uint8_t)*32*1024);
+
+	membank("bank1")->set_base(m_bios);
+	membank("bank2")->set_base(m_bios + 0x4000);
+	membank("bank3")->set_base(m_ti8x_ram.get() + 0x4000);
+	membank("bank4")->set_base(m_ti8x_ram.get());
+
+	subdevice<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(uint8_t)*32*1024);
+
+	m_ti82_1st_timer = timer_alloc(FUNC(ti85_state::ti82_timer1_callback), this);
+	m_ti82_2nd_timer = timer_alloc(FUNC(ti85_state::ti82_timer2_callback), this);
+	ti8x_adjust_timers(m_ti82_timer_hz, 0b11);
+
+	save_pointer(NAME(m_ti8x_ram), 32*1024);
+}
+
+void ti85_state::ti83p_init_common()
+{
+	ti8x_init_common();
+
+	m_ti83p_port4 = 1;
+	m_ti83p_port5 = 0;
+	m_flash_unlocked = 0;
 	m_booting = true;
 
 	ti85_state::update_ti83p_memory();
 
-	m_ti83_1st_timer = timer_alloc(FUNC(ti85_state::ti83_timer1_callback), this);
-	m_ti83_1st_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
-	m_ti83_2nd_timer = timer_alloc(FUNC(ti85_state::ti83_timer2_callback), this);
-	m_ti83_2nd_timer->adjust(attotime::from_hz(512), 0, attotime::from_hz(512));
+	m_ti82_1st_timer = timer_alloc(FUNC(ti85_state::ti82_timer1_callback), this);
+	m_ti82_2nd_timer = timer_alloc(FUNC(ti85_state::ti82_timer2_callback), this);
+	ti8x_adjust_timers(m_ti83p_timer_hz, 0b11);
 
 	/* save states and debugging */
-	save_item(NAME(m_timer_interrupt_status));
-	save_item(NAME(m_timer_interrupt_mask));
-    save_item(NAME(m_flash_unlocked));
-	save_item(NAME(m_ti8x_memory_page_1));
-	save_item(NAME(m_ti8x_memory_page_2));
-	save_item(NAME(m_ti8x_memory_page_3));
-	save_item(NAME(m_ti83p_port4));
 	save_item(NAME(m_booting));
+	save_item(NAME(m_flash_unlocked));
+	save_item(NAME(m_ti83p_port4));
+	save_item(NAME(m_ti83p_port5));
 }
 
 void ti85_state::ti8xpse_init_common()
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	m_timer_interrupt_mask = 0;
-	m_timer_interrupt_status = 0;
-	m_ctimer_interrupt_status = 0;
-	m_ON_interrupt_mask = 0;
-	m_ON_interrupt_status = 0;
-	m_ON_pressed = 0;
-	m_ti8x_memory_page_1 = 0;
-	m_ti8x_memory_page_2 = 0;
-	m_ti8x_memory_page_3 = 0;
-	m_LCD_memory_base = 0;
-	m_LCD_status = 0;
-	m_LCD_mask = 0;
-	m_power_mode = 0;
-	m_keypad_mask = 0;
-	m_video_buffer_width = 0;
-	m_interrupt_speed = 0;
+	ti8x_init_common();
+
 	m_ti83p_port4 = 1;
 	m_flash_unlocked = 0;
+	m_ctimer_interrupt_status = 0;
+	m_ti83pse_port21 = 0;
+	m_ti83pse_port27 = 0;
+	m_ti83pse_port28 = 0;
+	m_ti84pcse_portE = 0;
+	m_ti84pcse_portF = 0;
+	m_ti84p_rtc_control = 0;
+	m_ti84p_rtc_currtime = 0;
+	m_ti84p_rtc_basetime = 0;
+	m_booting = true;
 
 	ti85_state::update_ti83pse_memory();
 
-	m_ti83_1st_timer = timer_alloc(FUNC(ti85_state::ti83_timer1_callback), this);
-	m_ti83_1st_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
-	m_ti83_2nd_timer = timer_alloc(FUNC(ti85_state::ti83_timer2_callback), this);
-	m_ti83_2nd_timer->adjust(attotime::from_hz(512), 0, attotime::from_hz(512));
+	m_ti82_1st_timer = timer_alloc(FUNC(ti85_state::ti82_timer1_callback), this);
+	m_ti82_2nd_timer = timer_alloc(FUNC(ti85_state::ti82_timer2_callback), this);
+	ti8x_adjust_timers(m_ti83pse_timer_hz, 0b11);
 
 	m_crystal_timer1 = timer_alloc(FUNC(ti85_state::crystal_timer_tick), this);
 	m_crystal_timer2 = timer_alloc(FUNC(ti85_state::crystal_timer_tick), this);
 	m_crystal_timer3 = timer_alloc(FUNC(ti85_state::crystal_timer_tick), this);
 
-    m_ti84p_rtc = timer_alloc(FUNC(ti85_state::rtc_tick), this);
-    m_ti84p_rtc->adjust(attotime(1, 0), 0, attotime(1, 0));
+	m_ti84p_rtc = timer_alloc(FUNC(ti85_state::rtc_tick), this);
+	m_ti84p_rtc->adjust(attotime(1, 0), 0, attotime(1, 0));
 
-		/* save states and debugging */
+	/* save states and debugging */
+	save_item(NAME(m_booting));
 	save_item(NAME(m_ctimer_interrupt_status));
-	save_item(NAME(m_timer_interrupt_status));
-	save_item(NAME(m_timer_interrupt_mask));
-    save_item(NAME(m_flash_unlocked));
-	save_item(NAME(m_ti8x_memory_page_1));
-	save_item(NAME(m_ti8x_memory_page_2));
-	save_item(NAME(m_ti8x_memory_page_3));
+	save_item(NAME(m_cpu_speed));
+	save_item(NAME(m_flash_unlocked));
 	save_item(NAME(m_ti83p_port4));
 	save_item(NAME(m_ti84pcse_portE));
 	save_item(NAME(m_ti84pcse_portF));
-}
+	save_item(NAME(m_ti83pse_port21));
+	save_item(NAME(m_ti83pse_port27));
+	save_item(NAME(m_ti83pse_port28));
 
+	save_item(STRUCT_MEMBER(m_ctimer, loop));
+	save_item(STRUCT_MEMBER(m_ctimer, setup));
+	save_item(STRUCT_MEMBER(m_ctimer, divsor));
+	save_item(STRUCT_MEMBER(m_ctimer, interrupt));
+	save_item(STRUCT_MEMBER(m_ctimer, active));
+	save_item(STRUCT_MEMBER(m_ctimer, max));
+	save_item(STRUCT_MEMBER(m_ctimer, count));
+
+	if (m_model == TI84P || m_model == TI84PSE || m_model == TI84PCSE)
+    {
+		save_item(NAME(m_ti84p_rtc_control));
+		save_item(NAME(m_ti84p_rtc_currtime));
+		save_item(NAME(m_ti84p_rtc_basetime));
+	}
+}
 
 MACHINE_START_MEMBER(ti85_state,ti83pse)
 {
-	m_model = TI84PSE;
+	m_model = TI83PSE;
+	ti8xpse_init_common();
+}
 
+MACHINE_START_MEMBER(ti85_state,ti84p)
+{
+	m_model = TI84P;
 	ti8xpse_init_common();
 }
 
 MACHINE_START_MEMBER(ti85_state,ti84pse)
 {
-	m_model = TI83PSE;
-
+	m_model = TI84PSE;
 	ti8xpse_init_common();
 }
-
 
 MACHINE_START_MEMBER(ti85_state,ti84pcse)
 {
 	m_model = TI84PCSE;
-
-	ti8xpse_init_common();
-}
-
-
-MACHINE_START_MEMBER(ti85_state,ti84p)
-{
-	m_model = TI84P;
-
 	ti8xpse_init_common();
 }
 
 MACHINE_START_MEMBER(ti85_state,ti86)
 {
-	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_bios = memregion("bios")->base();
+	m_model = TI86;
 
-	m_timer_interrupt_mask = 0;
-	m_timer_interrupt_status = 0;
-	m_ON_interrupt_mask = 0;
-	m_ON_interrupt_status = 0;
-	m_ON_pressed = 0;
-	m_ti8x_memory_page_1 = 0;
-	m_ti8x_memory_page_2 = 0;
-	m_LCD_memory_base = 0;
-	m_LCD_status = 0;
-	m_LCD_mask = 0;
-	m_power_mode = 0;
-	m_keypad_mask = 0;
-	m_video_buffer_width = 0;
-	m_interrupt_speed = 0;
-	m_port4_bit0 = 0;
+	ti8x_init_common();
 
 	m_ti8x_ram = std::make_unique<uint8_t[]>(128*1024);
 	memset(m_ti8x_ram.get(), 0, sizeof(uint8_t)*128*1024);
 
-	space.unmap_write(0x0000, 0x3fff);
-
 	membank("bank1")->set_base(m_bios);
 	membank("bank2")->set_base(m_bios + 0x04000);
-
 	membank("bank4")->set_base(m_ti8x_ram.get());
 	subdevice<nvram_device>("nvram")->set_base(m_ti8x_ram.get(), sizeof(uint8_t)*128*1024);
 
-	m_ti85_timer = timer_alloc(FUNC(ti85_state::ti85_timer_callback), this);
-	m_ti85_timer->adjust(attotime::from_hz(256), 0, attotime::from_hz(256));
+	const attotime dma_cycles = attotime::from_ticks(1024, m_maincpu->clock());
+	m_lcd_dma_timer = timer_alloc(FUNC(ti85_state::lcd_dma_callback), this);
+	m_lcd_dma_timer->adjust(dma_cycles, 0, dma_cycles);
+
+	save_pointer(NAME(m_ti8x_ram), 128*1024);
 }
 
+void ti85_state::device_post_load()
+{
+	update_ti8x_memory();
+}
 
 /* I/O ports handlers */
 
@@ -636,20 +655,20 @@ uint8_t ti85_state::ti85_port_0002_r()
 	return 0xff;
 }
 
-uint8_t ti85_state::ti85_port_0003_r()
+uint8_t ti85_state::ti85_int_status_r()
 {
 	uint8_t data = 0;
 
-	if (m_LCD_status)
-		data |= m_LCD_mask;
 	if (m_ON_interrupt_status)
 		data |= 0x01;
-	if (m_timer_interrupt_status)
-		data |= 0x04;
+	if (m_LCD_interrupt_status)
+		data |= 0x02;
 	if (!m_ON_pressed)
 		data |= 0x08;
-	m_ON_interrupt_status = 0;
-	m_timer_interrupt_status = 0;
+
+	if (!machine().side_effects_disabled())
+		m_ON_interrupt_status = 0;
+
 	return data;
 }
 
@@ -706,25 +725,20 @@ uint8_t ti85_state::ti83pse_port_0005_r()
 }
 
 uint8_t ti85_state::ti83_port_0000_r()
-{   
+{
 	uint8_t const tip_in((!m_link_port || m_link_port->tip_r()) ? 0x0C : 0x08);
 	uint8_t const ring_in((!m_link_port || m_link_port->ring_r()) ? 0x0C : 0x04);
 	return ((m_ti8x_memory_page_1 & 0x08) << 1) | (tip_in & ring_in) | m_PCR;
 }
 
-uint8_t ti85_state::ti83_port_0002_r()
-{
-	return m_ti8x_port2;
-}
-
-uint8_t ti85_state::ti83_port_0003_r()
+uint8_t ti85_state::ti82_port_0003_r()
 {
 	uint8_t data = 0;
 
 	if (m_ON_interrupt_status)
 		data |= 0x01;
 
-    if (!m_ON_pressed)
+	if (!m_ON_pressed)
 		data |= 0x08;
 
 	data |= m_timer_interrupt_status;
@@ -772,7 +786,7 @@ uint8_t ti85_state::ti83p_port_0004_r()
 
 uint8_t ti85_state::ti83p_port_0005_r()
 {
-    return m_ti83p_port5;
+	return m_ti83p_port5;
 }
 
 //------------------------
@@ -787,11 +801,10 @@ uint8_t ti85_state::ti83p_port_0005_r()
 
 uint8_t ti85_state::ti83pse_port_0002_r()
 {
-    uint8_t data = 0x83 | (m_flash_unlocked << 2);
+	uint8_t data = 0x83 | (m_flash_unlocked << 2);
 
-    if (m_model == TI84P || m_model == TI84PSE || m_model == TI84PCSE) {
-        data |= 0x20;
-    }
+	if (m_model == TI84P || m_model == TI84PSE || m_model == TI84PCSE)
+		data |= 0x20;
 
 	return data;
 }
@@ -803,12 +816,12 @@ uint8_t ti85_state::ti83pse_port_0009_r()
 
 uint8_t ti85_state::ti83pse_port_0015_r()
 {
-    if (m_model == TI83PSE)
-        return 0x33;
-    else if (m_model == TI84PCSE)
-        return 0x45;
-    else
-        return 0x44;
+	if (m_model == TI83PSE)
+		return 0x33;
+	else if (m_model == TI84PCSE)
+		return 0x45;
+	else
+		return 0x44;
 }
 
 
@@ -832,25 +845,21 @@ void ti85_state::ti85_port_0002_w(uint8_t data)
 	m_LCD_contrast = data & 0x1f;
 }
 
-void ti85_state::ti85_port_0003_w(uint8_t data)
+void ti85_state::ti85_int_status_w(uint8_t data)
 {
-	if (m_LCD_status && !(data & 0x08))
-		m_timer_interrupt_mask = 0;
-	m_ON_interrupt_mask = data & 0x01;
-//  m_timer_interrupt_mask = data & 0x04;
-	m_LCD_mask = data & 0x02;
-	m_LCD_status = data & 0x08;
+	m_ON_interrupt_mask = BIT(data, 0);
+	m_LCD_mask = BIT(data, 1);
+	m_LCD_status = BIT(data, 3);
+	m_LCD_interrupt_status &= m_LCD_mask;
+	m_lcd_dma_timer->enable(m_LCD_status);
 }
 
 void ti85_state::ti85_port_0004_w(uint8_t data)
 {
 	m_port4_bit0 = data & 0x01;
-    if (m_model == TI83) {
-        update_ti83_memory();
-    } else {
-        m_video_buffer_width = (data >> 3) & 0x03;
-        m_interrupt_speed = (data >> 1) & 0x03;
-    }
+	m_LCD_dma_speed = BIT(data, 5);
+	m_video_buffer_width = BIT(data, 3, 2);
+	m_video_buffer_rows = BIT(data, 1, 2);
 }
 
 void ti85_state::ti85_port_0005_w(uint8_t data)
@@ -899,40 +908,40 @@ void ti85_state::ti86_port_0006_w(uint8_t data)
 
 void ti85_state::ti82_port_0002_w(uint8_t data)
 {
-	m_ti8x_memory_page_1 = data & 0x07;
-	update_ti85_memory();
-	m_ti8x_port2 = data;
-}
-
-void ti85_state::ti83_port_0000_w(uint8_t data)
-{
-    if (m_link_port) {
-		m_link_port->tip_w(BIT(~data, 0));
-		m_link_port->ring_w(BIT(~data, 1));
-    }
-
-    m_PCR = ~data & 0x03;
-	m_ti8x_memory_page_1 = (m_ti8x_memory_page_1 & 7) | ((data & 16) >> 1);
-	update_ti83_memory();
-}
-
-void ti85_state::ti83_port_0002_w(uint8_t data)
-{
 	m_ti8x_memory_page_1 = (m_ti8x_memory_page_1 & 8) | (data & 7);
 	m_ti8x_port2 = data;
-	update_ti83_memory();
+	update_ti82_memory();
 }
 
-void ti85_state::ti83_int_mask_w(uint8_t data)
+void ti85_state::ti82_int_mask_w(uint8_t data)
 {
 	m_ON_interrupt_mask = data & 0x01;
 	m_ON_interrupt_status &= m_ON_interrupt_mask;
 
 	m_timer_interrupt_mask = data & 0x06;
 	m_timer_interrupt_status &= m_timer_interrupt_mask;
-    
-    if (!m_ctimer_interrupt_status && !m_timer_interrupt_mask && !m_ON_interrupt_mask)
-        m_maincpu->set_input_line(0, CLEAR_LINE);
+
+	if (!m_ctimer_interrupt_status && !m_timer_interrupt_mask && !m_ON_interrupt_mask)
+		m_maincpu->set_input_line(0, CLEAR_LINE);
+}
+
+void ti85_state::ti82_port_0004_w(uint8_t data)
+{
+	m_port4_bit0 = data & 0x01;
+	update_ti82_memory();
+	ti8x_adjust_timers(m_ti82_timer_hz, BIT(data, 1, 2));
+}
+
+void ti85_state::ti83_port_0000_w(uint8_t data)
+{
+	if (m_link_port) {
+		m_link_port->tip_w(BIT(~data, 0));
+		m_link_port->ring_w(BIT(~data, 1));
+	}
+
+	m_PCR = ~data & 0x03;
+	m_ti8x_memory_page_1 = (m_ti8x_memory_page_1 & 7) | ((data & 16) >> 1);
+	update_ti82_memory();
 }
 
 void ti85_state::ti8x_plus_serial_w(uint8_t data)
@@ -964,12 +973,13 @@ void ti85_state::ti83pse_int_ack_w(uint8_t data)
 void ti85_state::ti83p_port_0004_w(uint8_t data)
 {
 	m_ti83p_port4 = data | 0xe0;
+	ti8x_adjust_timers(m_ti83p_timer_hz, BIT(data, 1, 2));
 	update_ti83p_memory();
 }
 
 void ti85_state::ti83p_port_0005_w(uint8_t data)
 {
-    m_ti83p_port5 = data;
+	m_ti83p_port5 = data;
 }
 
 void ti85_state::ti83p_port_0006_w(uint8_t data)
@@ -987,6 +997,7 @@ void ti85_state::ti83p_port_0007_w(uint8_t data)
 void ti85_state::ti83pse_port_0004_w(uint8_t data)
 {
 	m_ti83p_port4 = data;
+	ti8x_adjust_timers(m_ti83pse_timer_hz, BIT(data, 1, 2));
 	update_ti83pse_memory();
 }
 
@@ -1049,10 +1060,10 @@ void ti85_state::ti83p_port_0014_w(uint8_t data)
 {
 	m_flash_unlocked = data & 0x01;
 
-    if ((m_model == TI83P) || (m_model == TI73))
-        update_ti83p_memory();
+	if ((m_model == TI83P) || (m_model == TI73))
+		update_ti83p_memory();
 	else
-        update_ti83pse_memory();
+		update_ti83pse_memory();
 }
 
 void ti85_state::ti83pse_port_0020_w(uint8_t data)
@@ -1081,11 +1092,11 @@ void ti85_state::ti83pse_port_0021_w(uint8_t data)
 uint8_t ti85_state::ti83pse_port_0021_r()
 {
 	return m_ti83pse_port21;
-}  
+}
 
 void ti85_state::ti83pse_port_0027_w(uint8_t data)
 {
-    m_ti83pse_port27 = data;
+	m_ti83pse_port27 = data;
 }
 
 uint8_t ti85_state::ti83pse_port_0027_r()
@@ -1095,7 +1106,7 @@ uint8_t ti85_state::ti83pse_port_0027_r()
 
 void ti85_state::ti83pse_port_0028_w(uint8_t data)
 {
-    m_ti83pse_port28 = data;
+	m_ti83pse_port28 = data;
 }
 
 uint8_t ti85_state::ti83pse_port_0028_r()
@@ -1105,49 +1116,49 @@ uint8_t ti85_state::ti83pse_port_0028_r()
 
 inline uint8_t ti85_state::ti84p_rtc_r(uint32_t timer, uint8_t offset)
 {
-    return (uint8_t)(timer >> offset);
+	return (uint8_t)(timer >> offset);
 }
 
 inline void ti85_state::ti84p_rtc_w(uint32_t &timer, uint8_t offset, uint8_t data)
 {
-    timer = (timer & ~(0xFF << offset)) | (data << offset);
+	timer = (timer & ~(0xFF << offset)) | (data << offset);
 }
 
 uint8_t ti85_state::ti84p_rtc_control_r()
 {
-    return m_ti84p_rtc_control;
+	return m_ti84p_rtc_control;
 }
 
 void ti85_state::ti84p_rtc_control_w(uint8_t data)
 {
-    if ((data & 0b10) && !(m_ti84p_rtc_control & 0b10))
-        m_ti84p_rtc_currtime = m_ti84p_rtc_basetime;
+	if ((data & 0b10) && !(m_ti84p_rtc_control & 0b10))
+		m_ti84p_rtc_currtime = m_ti84p_rtc_basetime;
 
-    m_ti84p_rtc->enable((data & 0b01) == 0b01);
-    m_ti84p_rtc_control = data & 0b11;
+	m_ti84p_rtc->enable((data & 0b01) == 0b01);
+	m_ti84p_rtc_control = data & 0b11;
 }
 
 uint8_t ti85_state::ti84p_rtc_basetime_r(offs_t offset)
 {
-    return ti84p_rtc_r(m_ti84p_rtc_basetime, offset * 8);
+	return ti84p_rtc_r(m_ti84p_rtc_basetime, offset * 8);
 }
 
 void ti85_state::ti84p_rtc_basetime_w(offs_t offset, uint8_t data)
 {
-    ti84p_rtc_w(m_ti84p_rtc_basetime, offset * 8, data);
+	ti84p_rtc_w(m_ti84p_rtc_basetime, offset * 8, data);
 }
 
 uint8_t ti85_state::ti84p_rtc_currtime_r(offs_t offset)
 {
-    if (!(m_ti84p_rtc_control & 0b01))
-        return 0;
+	if (!(m_ti84p_rtc_control & 0b01))
+		return 0;
 
-    return ti84p_rtc_r(m_ti84p_rtc_currtime, offset * 8);
+	return ti84p_rtc_r(m_ti84p_rtc_currtime, offset * 8);
 }
 
 void ti85_state::ti84p_rtc_currtime_w(offs_t offset, uint8_t data)
 {
-    ti84p_rtc_w(m_ti84p_rtc_currtime, offset * 8, data);
+	ti84p_rtc_w(m_ti84p_rtc_currtime, offset * 8, data);
 }
 
 
@@ -1167,11 +1178,11 @@ void ti85_state::ti83pse_count( uint8_t timer, uint8_t data)
 {
 	m_ctimer[timer].max = m_ctimer[timer].count = data;
 
-    if (m_ctimer[timer].setup & 0xC0) {
-        m_ctimer[timer].active = true;
-    }
+	if (m_ctimer[timer].setup & 0xC0) {
+		m_ctimer[timer].active = true;
+	}
 
-    float dividend = 32768.0;
+	float dividend = 32768.0;
 
 	if (m_ctimer[timer].active)
 	{
@@ -1203,10 +1214,10 @@ void ti85_state::ti83pse_count( uint8_t timer, uint8_t data)
 			break;
 		}
 
-        if (m_ctimer[timer].setup & 0x80) {
-            dividend = m_maincpu->clock();
-            m_ctimer[timer].divsor = (m_ctimer[timer].setup & 0x1F) * 2.0;
-        }
+		if (m_ctimer[timer].setup & 0x80) {
+			dividend = m_maincpu->clock();
+			m_ctimer[timer].divsor = (m_ctimer[timer].setup & 0x1F) * 2.0;
+		}
 
 		switch (timer)
 		{
@@ -1248,7 +1259,7 @@ void ti85_state::ti83pse_ctimer1_loop_w(uint8_t data)
 {
 	m_ctimer[CRYSTAL_TIMER1].loop = data & 0x03;
 	m_ctimer_interrupt_status &= 0b11000000;
-    ti8x_update_int();
+	ti8x_update_int();
 }
 
 uint8_t ti85_state::ti83pse_ctimer1_count_r()
@@ -1281,7 +1292,7 @@ void ti85_state::ti83pse_ctimer2_loop_w(uint8_t data)
 {
 	m_ctimer[CRYSTAL_TIMER2].loop = data & 0x03;
 	m_ctimer_interrupt_status &= 0b10100000;
-    ti8x_update_int();
+	ti8x_update_int();
 }
 
 uint8_t ti85_state::ti83pse_ctimer2_count_r()
@@ -1314,7 +1325,7 @@ void ti85_state::ti83pse_ctimer3_loop_w(uint8_t data)
 {
 	m_ctimer[CRYSTAL_TIMER3].loop = data & 0x03;
 	m_ctimer_interrupt_status &= 0b01100000;
-    ti8x_update_int();
+	ti8x_update_int();
 }
 
 uint8_t ti85_state::ti83pse_ctimer3_count_r()
@@ -1424,7 +1435,7 @@ void ti85_state::ti85_setup_snapshot(uint8_t *data)
 	m_ON_pressed = 0;
 
 	m_video_buffer_width = 0x02;
-	m_interrupt_speed = 0x03;
+	m_video_buffer_rows = 0x03;
 }
 
 void ti85_state::ti86_setup_snapshot(uint8_t *data)
@@ -1464,7 +1475,7 @@ void ti85_state::ti86_setup_snapshot(uint8_t *data)
 	m_ON_pressed = 0;
 
 	m_video_buffer_width = 0x02;
-	m_interrupt_speed = 0x03;
+	m_video_buffer_rows = 0x03;
 }
 
 SNAPSHOT_LOAD_MEMBER(ti85_state::snapshot_cb)
