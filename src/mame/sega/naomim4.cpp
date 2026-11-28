@@ -132,7 +132,8 @@ void naomi_m4_board::board_setup_address(uint32_t address, bool is_dma)
 
 void naomi_m4_board::board_get_buffer(uint8_t *&base, uint32_t &limit)
 {
-	static uint8_t retzero[2] = { 0, 0 };
+	// no flash ROM behind the address: the data bus would float high
+	static uint8_t unpopulated[2] = { 0xff, 0xff };
 
 	if (cfi_mode) {
 		int fpr_num = m4id & 0x7f;
@@ -155,7 +156,7 @@ void naomi_m4_board::board_get_buffer(uint8_t *&base, uint32_t &limit)
 			base = m_region->base() + rom_cur_address;
 			limit = size - rom_cur_address;
 		} else {
-			base = retzero;
+			base = unpopulated;
 			limit = 2;
 		}
 	}
