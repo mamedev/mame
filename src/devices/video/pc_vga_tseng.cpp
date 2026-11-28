@@ -16,6 +16,7 @@
  * \- Has CRTC display issues at higher color depths (i.e. 640x480x24 sets 524)
  * - ET4000/W32p (PCI version of above)
  * - ET6000/ET6100
+ * - Virtual Pool: non-functional display when specific driver is used;
  *
  * Notes:
  * - Regular et4k BIOS isn't VBE compliant, fails SDD/VBETEST setups and (at very least) has issues

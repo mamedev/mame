@@ -4,6 +4,9 @@
 
 Sega Lindbergh
 
+NEC G7HQD/BG7HQD (shadow vendored) motherboard,
+on Intel 875P "Canterwood" chipset
+
 TODO:
 - tests area 0xd0000 - 0xd000f, wants an undumped ROM in there?
 - Update: assigning intr_pin to UHCI causes the script below to not work anymore.

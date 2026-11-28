@@ -16,6 +16,7 @@ Paradise / Western Digital (S)VGA chipsets
 TODO:
 - WD9710-MZ (PCI + MPEG-1, a.k.a. Pipeline 9710 / 9712, to be added in specific sub-file as well,
   has a wide list of incompatibilities with previous arch, cfr. page 122)
+- Virtual Pool: wrong graphics if own driver is used (likely lack of a coprocessor)
 
 - 'C31A difference compared to 'C31 (just "reserved" PR35?);
 - Emulate new features of 'C31 & 'C33;

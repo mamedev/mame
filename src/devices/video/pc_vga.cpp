@@ -2,42 +2,33 @@
 // copyright-holders:Nathan Woods, Peter Trauner, Angelo Salese
 /**************************************************************************************************
 
-    Video Graphics Adapter (VGA) section
+Video Graphics Adapter (VGA) section
 
-    Nathan Woods    npwoods@mess.org
-    Peter Trauner   PeT mess@utanet.at
+TODO:
+- https://github.com/mamedev/mame/issues/12068
+- MAME 0.01: fix -novesa 92 Hz refresh rate bug. Sets mode 13h thru Allegro then overlays with
+  a peculiar setup to obtain either 224x288 or 256x256 modes, regardless of -scanlines being set
+  or not.
 
-    ega/vga
-    64k (early ega 16k) words of 32 bit memory
+Notes:
+- The VGA standard is compatible with MDA, CGA, Hercules, EGA
+  (MDA, EGA, Hercules not real register compatible)
+- several vga cards drive also MDA, CGA, EGA monitors, some vga cards have register compatible
+  MDA, CGA, Hercules modes;
+- SVGA is not a real interface but more like an overlay of the VGA standard that individual
+  manufacturers put together and which eventually became the VESA consortium.
+  It has incidentally a couple points in common across families but it's otherwise mostly a
+  commercial naming rather than a real physical change over the bus slot.
+  In the end we may not even need this extra device but rather move "SVGA mode"
+  responsibility to RAMDACs.
 
-	TODO:
-	- https://github.com/mamedev/mame/issues/12068
+References:
+- http://www.osdever.net/FreeVGA/vga/vga.htm
 
-    per-game issues (very outdated, to be moved to SW list/to device files if necessary):
-    - MAME 0.01: fix 92 Hz refresh rate bug (uses VESA register?).
-    - Virtual Pool: ET4k unrecognized;
-    - Jazz Jackrabbit: status bar is very jerky, but main screen scrolling is fine?
-    - Catacombs: weird resolution (untested)
+ROM declarations (move to pc_vga_oak):
 
-    Notes:
-    - The VGA standard is compatible with MDA, CGA, Hercules, EGA
-      (MDA, EGA, Hercules not real register compatible)
-    - several vga cards drive also MDA, CGA, EGA monitors, some vga cards have register compatible
-      MDA, CGA, Hercules modes;
-    - SVGA is not a real interface but more like an overlay of the VGA standard that individual
-      manufacturers put together and which eventually became the VESA consortium.
-      It has incidentally a couple points in common across families but it's otherwise mostly a
-      commercial naming rather than a real physical change over the bus slot.
-      In the end we may not even need this extra device but rather move "SVGA mode"
-      responsibility to RAMDACs.
-
-    References:
-    - http://www.osdever.net/FreeVGA/vga/vga.htm
-
-    ROM declarations (move to pc_vga_oak):
-
-    (oti 037 chip)
-    ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, CRC(318c5f43) SHA1(2aeb6cf737fd87dfd08c9f5b5bc421fcdbab4ce9) )
+(oti 037 chip)
+ROM_LOAD("oakvga.bin", 0xc0000, 0x8000, CRC(318c5f43) SHA1(2aeb6cf737fd87dfd08c9f5b5bc421fcdbab4ce9) )
 
 ***************************************************************************************************/
 

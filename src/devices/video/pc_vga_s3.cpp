@@ -1,5 +1,11 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
+/*
+ * TODO:
+ * - coprocessor not entirely ibm8514/a compatible, warrants rewrite;
+ * - Virtual Pool: hangs with wrong colors if vision864 Accel driver is used;
+ *
+ */
 
 #include "emu.h"
 #include "pc_vga_s3.h"

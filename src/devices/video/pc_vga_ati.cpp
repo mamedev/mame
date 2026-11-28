@@ -1,5 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Barry Rodewald
+/*
+ * TODO:
+ * - Virtual Pool: non-functional display when specific driver is used, fails detection with mach64;
+ *
+ */
 
 #include "emu.h"
 #include "pc_vga_ati.h"
