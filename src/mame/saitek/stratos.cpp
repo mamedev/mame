@@ -545,7 +545,7 @@ ROM_START( stratosa )
 ROM_END
 
 
-ROM_START( tking ) // PCB rev. 10
+ROM_START( tking ) // PCB rev. 9 or 10
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("yo1f_713d_u3.u3", 0x0000, 0x8000, CRC(b8c6d853) SHA1(98923f44bbbd2ea17c269850971d3df229e6057e) )
 	ROM_LOAD("yo1f_712a_u4.u4", 0x8000, 0x8000, CRC(7d3f8f7b) SHA1(8be5d8d988ff0577ccfec0a773bfd94599f2534f) )
@@ -557,7 +557,7 @@ ROM_START( tkinga ) // PCB rev. 7
 	ROM_LOAD("yo1f-b_819o_u4.u4", 0x8000, 0x8000, CRC(336040d4) SHA1(aca662b8cc4d6bafd61ca158c768ba8896117169) )
 ROM_END
 
-ROM_START( tkingb ) // PCB rev. 3, also PCB rev. 5
+ROM_START( tkingb ) // PCB rev. 3 or 5
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("w1yo1f_728l_u3.u3", 0x0000, 0x8000, CRC(19a22058) SHA1(a5ca54d870c70b7ce9c7be2951800bf49cc57527) )
 	ROM_LOAD("yo1f-b_819o_u4.u4", 0x8000, 0x8000, CRC(336040d4) SHA1(aca662b8cc4d6bafd61ca158c768ba8896117169) )
