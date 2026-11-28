@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+license:CC0-1.0
+-->
+<softwarelist name="hp150_flop" description="HP 150 diskettes">
+
+	<software name="sysmasta">
+		<description>HP 150 System Master Disc</description>
+		<year>1983</year>
+		<publisher>Hewlett-Packard</publisher>
+		<info name="version" value="A.01.04"/>
+		<info name="usage" value="Requires an hp9133xv on an HP-IB slot, with the HPIB address of its floppy board set to 0 and of its Winchester board to 2"/>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="143663">
+				<rom name="sysmasta.td0" size="143663" crc="edcb8f0a" sha1="9d47cc5dd72c74ce88d8e53b2384cc3c0c413188"/>
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
