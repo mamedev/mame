@@ -104,7 +104,7 @@
                 VSync         : 58kHz
 
     TODO:
-        nitrobal : blending, priority function wrong
+        nitrobal : verify priority PROM mixing and blending against real PCB
         wizdfire : Wizard Fire and Dark Seal 2 use the same mask ROM for
     ADPCM speech samples. Sample banks 0/1 are used for the Japanese
     version and 2/3 are used for the English version, whose ROM loading
@@ -152,7 +152,8 @@ public:
 		m_spriteram(*this, "spriteram%u", 1),
 		m_sprgen(*this, "spritegen%u", 1),
 		m_paletteram(*this, "paletteram"),
-		m_rowscroll(*this, "rowscroll_%u", 1)
+		m_rowscroll(*this, "rowscroll_%u", 1),
+		m_proms(*this, "proms")
 	{ }
 
 	void wizdfire(machine_config &config) ATTR_COLD;
@@ -183,6 +184,7 @@ private:
 
 	required_shared_ptr<u16> m_paletteram;
 	optional_shared_ptr_array<u16, 4> m_rowscroll;
+	required_region_ptr<u8> m_proms;
 
 	std::unique_ptr<u8[]> m_dirty_palette{};
 	u16 m_priority = 0;
@@ -415,17 +417,37 @@ u32 rohga_state::screen_update_wizdfire(screen_device &screen, bitmap_rgb32 &bit
 
 void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const pen_t *paldata = &m_palette->pen(0);
+	/*
+	 * Priority PROM jn-00.17l (Fujitsu MB7116, 1024 x 4-bit):
+	 *   A9    = BIT(m_priority, 5)   (0: SPR2 over PF2; 1: PF2 over SPR2)
+	 *   A8    = BIT(pix2, 8)         (alpha enable: SPR2 50% alpha bit)
+	 *   A7    = 0                    (alpha target: 0 = SPR2 alpha; 1 = PF3 alpha, unused in combined 8bpp PF3+PF4 mode)
+	 *   A6    = (srcpriline[x] == 0) (/PF2_opaque: 0 = opaque, 1 = transparent)
+	 *   A5    = 0                    (/PF3_opaque: combined 8bpp PF3+PF4 background on bank 2 is opaque)
+	 *   A4    = ((pix2 & 0xf) == 0)  (/SPR2_opaque: 0 = opaque, 1 = transparent)
+	 *   A3    = ((pix1 & 0xf) == 0)  (/SPR1_opaque: 0 = opaque, 1 = transparent)
+	 *   A2:A1 = (pix1 >> 9) & 3      (SPR1 2-bit priority 0..3: 0 = highest .. 3 = lowest)
+	 *   A0    = BIT(pix1, 8)         (SPR1 palette bank: 0 -> 0x400..0x4ff, 1 -> 0x500..0x5ff)
+	 *
+	 * Output D2..D0 selects the base layer (1 = PF2, 2 = PF3+PF4, 4/5 = SPR1, 6 = SPR2 solid);
+	 * D3 (bit 3) blends SPR2 at 50% (0x80) over the selected base layer.
+	 * Because PF2 is always above PF3+PF4 in the PROM (A6=0 never selects 2/3, A6=1 never selects 1),
+	 * dstline[x] already holds the winning playfield pixel (PF2 when bgpri != 0, PF3+PF4 otherwise).
+	 */
+	const pen_t *const paldata = &m_palette->pen(0);
+	const u8 *const prom = &m_proms[0];
 
-	bitmap_ind16 *sprite_bitmap1 = &m_sprgen[0]->get_sprite_temp_bitmap();
-	bitmap_ind16 *sprite_bitmap2 = &m_sprgen[1]->get_sprite_temp_bitmap();
-	bitmap_ind8 *priority_bitmap = &screen.priority();
+	bitmap_ind16 &sprite_bitmap1 = m_sprgen[0]->get_sprite_temp_bitmap();
+	bitmap_ind16 &sprite_bitmap2 = m_sprgen[1]->get_sprite_temp_bitmap();
+	bitmap_ind8 &priority_bitmap = screen.priority();
+
+	const offs_t a9 = BIT(m_priority, 5) ? 0x200 : 0;
 
 	for (int y = cliprect.top(); y <= cliprect.bottom(); y++)
 	{
-		u16 const *const srcline1 = &sprite_bitmap1->pix(y, 0);
-		u16 const *const srcline2 = &sprite_bitmap2->pix(y, 0);
-		u8 const *const srcpriline = &priority_bitmap->pix(y, 0);
+		u16 const *const srcline1 = &sprite_bitmap1.pix(y, 0);
+		u16 const *const srcline2 = &sprite_bitmap2.pix(y, 0);
+		u8 const *const srcpriline = &priority_bitmap.pix(y, 0);
 
 		u32 *const dstline = &bitmap.pix(y, 0);
 
@@ -434,135 +456,33 @@ void rohga_state::mixnitroballlayer(screen_device &screen, bitmap_rgb32 &bitmap,
 			const u16 pix1 = srcline1[x];
 			const u16 pix2 = srcline2[x];
 
-			/* Here we have
-			 pix1 - raw pixel / colour / priority data from first 1st chip
-			 pix2 - raw pixel / colour / priority data from first 2nd chip
-			*/
+			const offs_t addr = a9
+				| (BIT(pix2, 8) ? 0x100 : 0)
+				| (srcpriline[x] ? 0 : 0x040)
+				| ((pix2 & 0xf) ? 0 : 0x010)
+				| ((pix1 & 0xf) ? 0 : 0x008)
+				| ((pix1 >> 8) & 7);
 
-			int pri1, pri2;
-
-			// pix1 sprite vs playfield
-			switch (m_priority) // TODO : Verify this from real PCB
+			const u8 sel = prom[addr] & 0xf;
+			u32 col = dstline[x];
+			switch (sel & 7)
 			{
-				case 0x00:
+				case 4:
+				case 5:
+					col = paldata[(pix1 & 0x1ff) + 0x400];
+					break;
+				case 6:
+					col = paldata[(pix2 & 0x0ff) + 0x600];
+					break;
 				default:
-					{
-						switch (pix1 & 0xe00)
-						{
-							case 0x000:
-							default:
-								pri1 = 0x200;
-								break;
-							case 0x200:
-								pri1 = 0x020;
-								break;
-							case 0x400:
-								pri1 = 0x008;
-								break;
-							case 0x600:
-								pri1 = 0x002;
-								break;
-							case 0x800:
-								pri1 = 0x100;
-								break;
-							case 0xa00:
-								pri1 = 0x040;
-								break;
-							case 0xc00:
-								pri1 = 0x004;
-								break;
-							case 0xe00:
-								pri1 = 0x001;
-								break;
-						}
-					}
-					break;
-				case 0x20:
-					{
-						switch (pix1 & 0xe00)
-						{
-							case 0x000:
-							default:
-								pri1 = 0x080;
-								break;
-							case 0x200:
-								pri1 = 0x004;
-								break;
-							case 0x400:
-								pri1 = 0x002;
-								break;
-							case 0x600:
-								pri1 = 0x001;
-								break;
-							case 0x800:
-								pri1 = 0x100;
-								break;
-							case 0xa00:
-								pri1 = 0x020;
-								break;
-							case 0xc00:
-								pri1 = 0x008;
-								break;
-							case 0xe00:
-								pri1 = 0x200;
-								break;
-						}
-					}
+					// 1 = PF2 (when srcpriline[x] != 0), 2/3 = PF3+PF4 (already in dstline[x])
 					break;
 			}
 
-			// pix2 sprite vs pix1 sprite
-			pri2 = 0x080;
-			switch (m_priority)
-			{
-				case 0x00:
-				default:
-					pri2 = 0x080;
-					break;
-				case 0x20:
-					pri2 = 0x010;
-					break;
-			}
+			if (BIT(sel, 3))
+				col = alpha_blend_r32(col, paldata[(pix2 & 0x0ff) + 0x600], 0x80);
 
-			const u8 bgpri = srcpriline[x];
-			/* once we get here we have
-
-			pri1 - 0x001/0x002/0x004/0x008/0x010/0x020/0x040/0x080/0x100/0x200 (sprite chip 1 pixel priority relative to bg)
-			pri2 - 0x080/0x010 (sprite chip 2 pixel priority relative to bg)
-
-			bgpri - 0x008/0x040 (from drawing tilemaps earlier, to compare above pri1/pri2 priorities against)
-			pix1 - same as before (ready to extract just colour data from)
-			pix2 - same as before  ^^
-			*/
-
-			bool drawnpixe1 = false;
-			if (pix1 & 0xf)
-			{
-				if (pri1 > bgpri)
-				{
-					dstline[x] = paldata[(pix1 & 0x1ff) + 0x400];
-					drawnpixe1 = true;
-				}
-			}
-
-			if (pix2 & 0xf)
-			{
-				if (pri2 > bgpri)
-				{
-					if ((!drawnpixe1) || (pri2 > pri1))
-					{
-						if (pix2 & 0x100)
-						{
-							const u32 base = dstline[x];
-							dstline[x] = alpha_blend_r32(base, paldata[(pix2 & 0xff) + 0x600], 0x80);
-						}
-						else
-						{
-							dstline[x] = paldata[(pix2 & 0xff) + 0x600];
-						}
-					}
-				}
-			}
+			dstline[x] = col;
 		}
 	}
 }
@@ -590,18 +510,8 @@ u32 rohga_state::screen_update_nitrobal(screen_device &screen, bitmap_rgb32 &bit
 	// pf3 and pf4 are combined into a single 8bpp bitmap
 	m_tilegen[1]->tilemap_12_combine_draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 
-	switch (m_priority)
-	{
-		case 0:
-		default:
-			m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0x008);
-			break;
-		case 0x20:
-			m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 0x040);
-			break;
-	}
+	m_tilegen[0]->tilemap_2_draw(screen, bitmap, cliprect, 0, 1);
 
-	// TODO verify priorities + mixing / alpha
 	mixnitroballlayer(screen, bitmap, cliprect);
 
 	m_tilegen[0]->tilemap_1_draw(screen, bitmap, cliprect, 0, 0);
@@ -2013,7 +1923,7 @@ ROM_START( nitrobal )
 	ROM_LOAD( "mav11.r19",  0x00000,  0x80000,  CRC(ef513908) SHA1(72db6c704071d7a784b3768c256fc51087e9e93c) )
 
 	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) // Priority (unused)
+	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) // Priority
 ROM_END
 
 ROM_START( nitrobala )
@@ -2058,7 +1968,7 @@ ROM_START( nitrobala )
 	ROM_LOAD( "mav11.r19",  0x00000,  0x80000,  CRC(ef513908) SHA1(72db6c704071d7a784b3768c256fc51087e9e93c) )
 
 	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) // Priority (unused)
+	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) // Priority
 ROM_END
 
 ROM_START( nitrobalb )
@@ -2103,7 +2013,7 @@ ROM_START( nitrobalb )
 	ROM_LOAD( "mav11.r19",  0x00000,  0x80000,  CRC(ef513908) SHA1(72db6c704071d7a784b3768c256fc51087e9e93c) )
 
 	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) // Priority (unused)
+	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) // Priority
 ROM_END
 
 ROM_START( gunball )
@@ -2148,7 +2058,7 @@ ROM_START( gunball )
 	ROM_LOAD( "mav11.r19",  0x00000,  0x80000,  CRC(ef513908) SHA1(72db6c704071d7a784b3768c256fc51087e9e93c) )
 
 	ROM_REGION( 0x400, "proms", 0 )
-	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) // Priority (unused)
+	ROM_LOAD( "jn-00.17l", 0x00000,  0x400,  CRC(6ac77b84) SHA1(9e1e2cabdb20b819e592a0f07d15658062227fa4) ) // Priority
 ROM_END
 
 
