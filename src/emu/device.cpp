@@ -502,6 +502,11 @@ void device_t::resolve_pre_map()
 	// prepare the logerror buffer
 	if (m_machine->allow_logging())
 		m_string_buffer.reserve(1024);
+
+	// resolve share creators so shares exist at declared size before memory maps are prepared
+	for (auto *autodev = m_auto_finder_list; autodev; autodev = autodev->next())
+		if (autodev->is_share_creator())
+			autodev->findit(nullptr);
 }
 
 
