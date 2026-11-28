@@ -179,7 +179,7 @@ uint16_t sega_315_5881_crypt_device::do_decrypt(uint8_t *&base)
 	if(!enc_ready)
 		enc_start();
 	if(dec_header & FLAG_COMPRESSED) {
-		if (line_buffer_pos == line_buffer_size) // if there's no data left to read..
+		if (line_buffer_pos >= line_buffer_size) // if there's no data left to read..
 		{
 			if (done_compression == 1)
 				enc_start();
@@ -953,7 +953,7 @@ int sega_315_5881_crypt_device::get_compressed_bit()
 }
 void sega_315_5881_crypt_device::line_fill()
 {
-	assert(line_buffer_pos == line_buffer_size);
+	assert(line_buffer_pos >= line_buffer_size);
 	uint8_t *lp = line_buffer.get();
 	uint8_t *lc = line_buffer_prev.get();
 
@@ -961,6 +961,7 @@ void sega_315_5881_crypt_device::line_fill()
 
 	line_buffer_pos = 0;
 
+	// a game can read on past the end of its stream, and what follows isn't a valid one: don't write past the line
 	for(int i=0; i != line_buffer_size;) {
 		// vlc 0: start of line
 		// vlc 1: interior of line
@@ -982,7 +983,7 @@ void sega_315_5881_crypt_device::line_fill()
 
 				static int offsets[4] = {0, 1, 0, -1};
 				int offset = offsets[(tmp & 0x18) >> 3];
-				for(int j=0; j != count; j++) {
+				for(int j=0; j != count && i != line_buffer_size; j++) {
 					lc[i^1] = lp[((i+offset) % line_buffer_size)^1];
 					i++;
 				}
@@ -998,7 +999,7 @@ void sega_315_5881_crypt_device::line_fill()
 				byte = (byte | get_compressed_bit()) << 1;
 				byte = (byte | get_compressed_bit()) << 1;
 				byte =  byte | get_compressed_bit();
-				for(int j=0; j != count; j++)
+				for(int j=0; j != count && i != line_buffer_size; j++)
 					lc[(i++)^1] = byte;
 
 			}
