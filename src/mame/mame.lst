@@ -18825,13 +18825,15 @@ vintkeys
 enmirage
 enmirdms
 
+@source:ensoniq/eps.cpp
+eps
+
 @source:ensoniq/esq1.cpp
 esq1
 esqm
 sq80
 
 @source:ensoniq/esq5505.cpp
-eps
 eps16p
 sd1
 sd132

@@ -4,7 +4,7 @@
 
     esq5505.cpp - Ensoniq ES5505 + ES5510 based synthesizers and samplers
 
-    Ensoniq VFX, VFX-SD, EPS, EPS-16 Plus, SD-1, SD-1 32, SQ-1 and SQ-R (SQ-1 Plus,
+    Ensoniq VFX, VFX-SD, EPS-16 Plus, SD-1, SD-1 32, SQ-1 and SQ-R (SQ-1 Plus,
     SQ-2, and KS-32 are known to also be this architecture).
 
     The Taito sound system in taito_en.cpp is directly derived from the 32-voice version
@@ -16,14 +16,14 @@
 
     0x000000-0x007fff   work RAM low (64k for SQ-1 and later)
     0x200000-0x20001f   OTIS (5505) regs
-    0x240000-0x2400ff   DMAC (68450) regs (EPS/EPS-16)
+    0x240000-0x2400ff   DMAC (68450) regs (EPS-16 Plus)
     0x260000-0x2601ff   ESP (5510) regs
     0x280000-0x28001f   DUART (68681) regs
-    0x2C0000-0x2C0003   Floppy (WD1772) regs (VFX-SD, SD-1, and EPS/EPS-16)
+    0x2C0000-0x2C0003   Floppy (WD1772) regs (VFX-SD, SD-1, and EPS-16 Plus)
     0x2e0000-0x2fffff   Expansion cartridge (VFX, VFX-SD, SD-1, SD-1 32 voice)
-    0x300000-0x300003   EPS/EPS-16 SCSI (WD33C93, register at 300001, data at 300003)
+    0x300000-0x300003   EPS-16 Plus SCSI (WD33C93, register at 300001, data at 300003)
     0x330000-0x37ffff   VFX-SD / SD-1 sequencer RAM
-    0x340000-0x3bffff   EPS/EPS-16 sample RAM
+    0x340000-0x3bffff   EPS-16 Plus sample RAM
     0xc00000-0xc3ffff   OS ROM
     0xff8000-0xffffff   work RAM hi (64k for SQ-1 and later)
 
@@ -33,7 +33,7 @@
 
     Interrupts:
     5505 interrupts are on normal autovector IRQ 1
-    DMAC interrupts (EPS only) are on autovector IRQ 2
+    DMAC interrupts (EPS-16 Plus only) are on autovector IRQ 2
     68681 uses custom vector 0x40 (address 0x100) level 3
 
     VFX / VFX-SD / SD-1 / SD-1 32 panel button codes:
@@ -207,7 +207,7 @@ namespace {
 
 enum esq5505_system_type : int {
 	GENERIC = 0,
-	EPS,
+	EPS16P,
 	SQ1,
 	VFX
 };
@@ -244,11 +244,11 @@ public:
 	void vfxsd(machine_config &config) ATTR_COLD;
 	void sd1(machine_config &config) ATTR_COLD;
 	void sd132(machine_config &config) ATTR_COLD;
-	void eps(machine_config &config) ATTR_COLD;
+	void eps16p(machine_config &config) ATTR_COLD;
 	void sq1(machine_config &config) ATTR_COLD;
 	void ks32(machine_config &config) ATTR_COLD;
 
-	void init_eps() ATTR_COLD;
+	void init_eps16p() ATTR_COLD;
 	void init_sq1() ATTR_COLD;
 	void init_denib() ATTR_COLD;
 
@@ -306,13 +306,13 @@ private:
 	static void floppy_drives(device_slot_interface &device);
 	static void floppy_formats(format_registration &fr);
 
-	void eps_map(address_map &map) ATTR_COLD;
+	void eps16p_map(address_map &map) ATTR_COLD;
 	void sq1_map(address_map &map) ATTR_COLD;
 	void vfx_map(address_map &map) ATTR_COLD;
 	void vfxsd_map(address_map &map) ATTR_COLD;
 
 	void cpu_space_map(address_map &map) ATTR_COLD;
-	void eps_cpu_space_map(address_map &map) ATTR_COLD;
+	void eps16p_cpu_space_map(address_map &map) ATTR_COLD;
 
 	void update_floppy_inputs();
 	void floppy_loaded(bool loaded);
@@ -457,7 +457,7 @@ void esq5505_state::cpu_space_map(address_map &map)
 	map(0xfffff7, 0xfffff7).r(m_duart, FUNC(mc68681_device::get_irq_vector));
 }
 
-void esq5505_state::eps_cpu_space_map(address_map &map)
+void esq5505_state::eps16p_cpu_space_map(address_map &map)
 {
 	cpu_space_map(map);
 	map(0xfffff5, 0xfffff5).r(m_dmac, FUNC(hd63450_device::iack));
@@ -593,7 +593,7 @@ void esq5505_state::vfxsd_map(address_map &map)
 	map(0xff0000, 0xffffff).ram().share("osram");
 }
 
-void esq5505_state::eps_map(address_map &map)
+void esq5505_state::eps16p_map(address_map &map)
 {
 	map(0x000000, 0x007fff).rw(FUNC(esq5505_state::lower_r), FUNC(esq5505_state::lower_w));
 	map(0x200000, 0x20001f).rw("otis", FUNC(es5505_device::read), FUNC(es5505_device::write));
@@ -639,8 +639,8 @@ void esq5505_state::duart_output(uint8_t data)
 	m_duart_io = data;
 
 	/*
-	    EPS:
-	    bit 2 = SSEL
+	    EPS-16 Plus:
+	    bit 1 = SSEL
 
 	    VFX:
 	    bits 0/1/2 = analog sel
@@ -674,7 +674,7 @@ void esq5505_state::duart_output(uint8_t data)
 
 	if (floppy)
 	{
-		if (m_system_type == EPS)
+		if (m_system_type == EPS16P)
 		{
 			floppy->ss_w((data & 2)>>1);
 		}
@@ -818,11 +818,11 @@ void esq5505_state::vfx(machine_config &config)
 	config.set_default_layout(layout_vfx);
 }
 
-void esq5505_state::eps(machine_config &config)
+void esq5505_state::eps16p(machine_config &config)
 {
 	common(config);
-	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::eps_map);
-	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::eps_cpu_space_map);
+	m_maincpu->set_addrmap(AS_PROGRAM, &esq5505_state::eps16p_map);
+	m_maincpu->set_addrmap(m68000_base_device::AS_CPU_SPACE, &esq5505_state::eps16p_cpu_space_map);
 
 	m_duart->set_clock(10_MHz_XTAL / 2);
 
@@ -972,7 +972,7 @@ void esq5505_state::ks32(machine_config &config)
 static INPUT_PORTS_START( vfx )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( eps )
+static INPUT_PORTS_START( eps16p )
 #if KEYBOARD_HACK
 	PORT_START("KEY0")
 	PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A') PORT_CHANGED_MEMBER(DEVICE_SELF, FUNC(esq5505_state::key_stroke), 0x80)
@@ -1184,16 +1184,6 @@ ROM_START( sq2 )
 	ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
 ROM_END
 
-ROM_START( eps )
-	ROM_REGION16_BE(0x20000, "osrom", 0)
-	ROM_LOAD16_BYTE( "eps-l.bin",    0x000001, 0x008000, CRC(382beac1) SHA1(110e31edb03fcf7bbde3e17423b21929e5b32db2) )
-	ROM_LOAD16_BYTE( "eps-h.bin",    0x000000, 0x008000, CRC(d8747420) SHA1(460597751386eb5f08465699b61381c4acd78065) )
-
-	ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // EPS-16 has no ROM sounds
-
-	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00)
-ROM_END
-
 ROM_START( eps16p )
 	ROM_REGION16_BE(0x20000, "osrom", 0)
 	ROM_LOAD16_BYTE( "eps16plus-100f-lower.u27", 0x000001, 0x010000, CRC(78568d3f) SHA1(ac737e093f422e109e8f06d44548629a12d6418c) )
@@ -1238,10 +1228,10 @@ void esq5505_state::init_common()
 	}
 }
 
-void esq5505_state::init_eps()
+void esq5505_state::init_eps16p()
 {
 	init_common();
-	m_system_type = EPS;
+	m_system_type = EPS16P;
 }
 
 void esq5505_state::init_sq1()
@@ -1276,10 +1266,9 @@ void esq5505_state::init_denib()
 } // Anonymous namespace
 
 
-CONS( 1988, eps,    0,     0, eps,   eps, esq5505_state, init_eps,    "Ensoniq", "EPS",             MACHINE_NOT_WORKING )       // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 CONS( 1989, vfx,    0,     0, vfx,   vfx, esq5505_state, init_denib,  "Ensoniq", "VFX",             MACHINE_IMPERFECT_SOUND )  // 2x40 VFD
 CONS( 1989, vfxsd,  0,     0, vfxsd, vfx, esq5505_state, init_denib,  "Ensoniq", "VFX-SD",          MACHINE_IMPERFECT_SOUND )  // 2x40 VFD
-CONS( 1990, eps16p, eps,   0, eps,   eps, esq5505_state, init_eps,    "Ensoniq", "EPS-16 Plus",     MACHINE_NOT_WORKING )       // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1990, eps16p, eps,   0, eps16p, eps16p, esq5505_state, init_eps16p, "Ensoniq", "EPS-16 Plus", MACHINE_NOT_WORKING )       // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
 CONS( 1990, sd1,    sd132, 0, sd1,   vfx, esq5505_state, init_denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_IMPERFECT_SOUND )  // 2x40 VFD
 CONS( 1990, sq1,    0,     0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-1",            MACHINE_NOT_WORKING )       // 2x16 LCD
 CONS( 1990, sqrack, sq1,   0, sq1,   sq1, esq5505_state, init_sq1,    "Ensoniq", "SQ-Rack",         MACHINE_NOT_WORKING )       // 2x16 LCD

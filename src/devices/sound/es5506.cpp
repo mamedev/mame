@@ -2,8 +2,10 @@
 // copyright-holders:Aaron Giles
 /**********************************************************************************************
 
-     Ensoniq ES5505/6 driver
+     Ensoniq ES5504/5505/5506 driver
      by Aaron Giles
+
+Ensoniq DOC II - ES5504
 
 Ensoniq OTIS - ES5505                                            Ensoniq OTTO - ES5506
 
@@ -746,8 +748,8 @@ inline void es5506_device::check_for_end_reverse(es550x_voice *voice, u64 &accum
 	}
 }
 
-// ES5505 : BLE is ignored when LPE = 0
-inline void es5505_device::check_for_end_forward(es550x_voice *voice, u64 &accum)
+// ES5504/ES5505: BLE is ignored when LPE = 0
+inline void es550x_device::check_for_end_forward(es550x_voice *voice, u64 &accum)
 {
 	// are we past the end?
 	if (accum > voice->end)
@@ -779,7 +781,7 @@ inline void es5505_device::check_for_end_forward(es550x_voice *voice, u64 &accum
 	}
 }
 
-inline void es5505_device::check_for_end_reverse(es550x_voice *voice, u64 &accum)
+inline void es550x_device::check_for_end_reverse(es550x_voice *voice, u64 &accum)
 {
 	// are we past the end?
 	if (accum < voice->start)
@@ -1106,7 +1108,7 @@ inline void es5506_device::reg_write_low(es550x_voice *voice, offs_t offset, u32
 
 		case 0x08/8:    // FC
 			voice->freqcount = get_address_acc_shifted_val(data & 0x1ffff);
-			LOG("voice %d, freq count=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->freqcount));
+			LOG("voice %d, freq count=%08x\n", m_current_page & 0x1f, u32(get_address_acc_res(voice->freqcount)));
 			break;
 
 		case 0x10/8:    // LVOL
@@ -1195,17 +1197,17 @@ inline void es5506_device::reg_write_high(es550x_voice *voice, offs_t offset, u3
 
 		case 0x08/8:    // START
 			voice->start = get_address_acc_shifted_val(data & 0xfffff800);
-			LOG("voice %d, loop start=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->start));
+			LOG("voice %d, loop start=%08x\n", m_current_page & 0x1f, u32(get_address_acc_res(voice->start)));
 			break;
 
 		case 0x10/8:    // END
 			voice->end = get_address_acc_shifted_val(data & 0xffffff80);
-			LOG("voice %d, loop end=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->end));
+			LOG("voice %d, loop end=%08x\n", m_current_page & 0x1f, u32(get_address_acc_res(voice->end)));
 			break;
 
 		case 0x18/8:    // ACCUM
 			voice->accum = get_address_acc_shifted_val(data);
-			LOG("voice %d, accum=%08x\n", m_current_page & 0x1f, get_address_acc_res(voice->accum));
+			LOG("voice %d, accum=%08x\n", m_current_page & 0x1f, u32(get_address_acc_res(voice->accum)));
 			break;
 
 		case 0x20/8:    // O4(n-1); TODO: 16.1 signed fixed point according to datasheet
@@ -1599,7 +1601,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 				voice->freqcount = (voice->freqcount & ~get_address_acc_shifted_val(0x00fe, 1)) | (get_address_acc_shifted_val((data & 0x00fe), 1));
 			if (ACCESSING_BITS_8_15)
 				voice->freqcount = (voice->freqcount & ~get_address_acc_shifted_val(0xff00, 1)) | (get_address_acc_shifted_val((data & 0xff00), 1));
-			LOG("%s:voice %d, freq count=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->freqcount, 1));
+			LOG("%s:voice %d, freq count=%08x\n", machine().describe_context(), m_current_page & 0x1f, u32(get_address_acc_res(voice->freqcount, 1)));
 			break;
 
 		case 0x02:  // STRT (hi)
@@ -1607,7 +1609,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 				voice->start = (voice->start & ~get_address_acc_shifted_val(0x00ff0000)) | (get_address_acc_shifted_val((data & 0x00ff) << 16));
 			if (ACCESSING_BITS_8_15)
 				voice->start = (voice->start & ~get_address_acc_shifted_val(0x1f000000)) | (get_address_acc_shifted_val((data & 0x1f00) << 16));
-			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->start));
+			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, u32(get_address_acc_res(voice->start)));
 			break;
 
 		case 0x03:  // STRT (lo)
@@ -1615,7 +1617,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 				voice->start = (voice->start & ~get_address_acc_shifted_val(0x000000e0)) | (get_address_acc_shifted_val(data & 0x00e0));
 			if (ACCESSING_BITS_8_15)
 				voice->start = (voice->start & ~get_address_acc_shifted_val(0x0000ff00)) | (get_address_acc_shifted_val(data & 0xff00));
-			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->start));
+			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), m_current_page & 0x1f, u32(get_address_acc_res(voice->start)));
 			break;
 
 		case 0x04:  // END (hi)
@@ -1626,7 +1628,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 #if RAINE_CHECK
 			voice->control |= CONTROL_STOP0;
 #endif
-			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->end));
+			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, u32(get_address_acc_res(voice->end)));
 			break;
 
 		case 0x05:  // END (lo)
@@ -1637,7 +1639,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 #if RAINE_CHECK
 			voice->control |= CONTROL_STOP0;
 #endif
-			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->end));
+			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), m_current_page & 0x1f, u32(get_address_acc_res(voice->end)));
 			break;
 
 		case 0x06:  // K2
@@ -1673,7 +1675,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x00ff0000)) | (get_address_acc_shifted_val((data & 0x00ff) << 16));
 			if (ACCESSING_BITS_8_15)
 				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x1f000000)) | (get_address_acc_shifted_val((data & 0x1f00) << 16));
-			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->accum));
+			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, u32(get_address_acc_res(voice->accum)));
 			break;
 
 		case 0x0b:  // ACC (lo)
@@ -1681,7 +1683,7 @@ inline void es5505_device::reg_write_low(es550x_voice *voice, offs_t offset, u16
 				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x000000ff)) | (get_address_acc_shifted_val(data & 0x00ff));
 			if (ACCESSING_BITS_8_15)
 				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x0000ff00)) | (get_address_acc_shifted_val(data & 0xff00));
-			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, get_address_acc_res(voice->accum));
+			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), m_current_page & 0x1f, u32(get_address_acc_res(voice->accum)));
 			break;
 
 		case 0x0c:  // unused
@@ -1769,7 +1771,7 @@ inline void es5505_device::reg_write_high(es550x_voice *voice, offs_t offset, u1
 				voice->o1n1 = (voice->o1n1 & ~0x00ff) | (data & 0x00ff);
 			if (ACCESSING_BITS_8_15)
 				voice->o1n1 = (s16)((voice->o1n1 & ~0xff00) | (data & 0xff00));
-			LOG("%s:voice %d, O1(n-1)=%04x (accum=%08x)\n", machine().describe_context(), m_current_page & 0x1f, voice->o1n1 & 0xffff, get_address_acc_res(voice->accum));
+			LOG("%s:voice %d, O1(n-1)=%04x (accum=%08x)\n", machine().describe_context(), m_current_page & 0x1f, u32(voice->o1n1 & 0xffff), u32(get_address_acc_res(voice->accum)));
 			break;
 
 		case 0x07:
@@ -2135,4 +2137,501 @@ void es550x_device::sound_stream_update(sound_stream &stream)
 		wav_add_data_32lr(m_wavraw, lsrc, rsrc, length, 4);
 	}
 #endif
+}
+
+
+/**********************************************************************************************
+
+     Ensoniq ES5504 (DOC II)
+
+***********************************************************************************************/
+
+DEFINE_DEVICE_TYPE(ES5504, es5504_device, "es5504", "Ensoniq ES5504 DOC II")
+
+es5504_device::es5504_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
+	: es550x_device(mconfig, ES5504, tag, owner, clock)
+	, m_bank0_config("bank0", ENDIANNESS_BIG, 16, 20, -1) // 20 bit address bus, word addressing only
+	, m_vol{ }
+	, m_ad_test(0)
+{
+}
+
+u32 es5504_device::get_lp(u32 control)
+{
+	return (control >> 12) & LP_MASK;
+}
+
+u32 es5504_device::get_ca(u32 control)
+{
+	return (control >> 8) & 0xf;
+}
+
+u8 es5504_device::filter_shift()
+{
+	return 0;
+}
+
+inline u16 es5504_device::read_sample(es550x_voice *voice, offs_t addr)
+{
+	update_index(voice);
+	return m_cache.read_word(addr);
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void es5504_device::device_start()
+{
+	es550x_device::device_start();
+
+	m_stream = stream_alloc(0, 2, clock() / (16 * 25));
+
+	if (m_region0 && !has_configured_map(0))
+		space(0).install_rom(0, std::min<offs_t>((1 << 20) - 1, (m_region0->bytes() / 2) - 1), m_region0->base());
+
+	space(0).cache(m_cache);
+
+	compute_tables(12, 4, 8);
+
+	// 12-bit linear volume DAC, not the exponential 5505/5506 table
+	m_volume_shift = 0;
+	for (u32 i = 0; i < m_volume_lookup.size(); i++)
+		m_volume_lookup[i] = i;
+	m_volume_acc_shift = 8; // normalize to the ES5505/ES5506 output range
+
+	m_channels = 1;          // one stereo pair; CA is a pan code on the EPS
+	m_active_voices = 24;    // 25 voices
+	m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
+	m_stream->set_sample_rate(m_sample_rate);
+
+	// 20 bit integer and 9 bit fraction
+	get_accum_mask(20, 9);
+
+	for (int v = 0; v < 32; v++)
+	{
+		m_vol[v] = 0;
+		update_pan(v);
+	}
+
+	save_item(NAME(m_vol));
+	save_item(NAME(m_ad_test));
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void es5504_device::device_reset()
+{
+	es550x_device::device_reset();
+
+	m_current_page = 0;
+	m_irqv = 0x80;
+	m_active_voices = 24;
+	m_ad_test = 0;
+
+	for (int v = 0; v < 32; v++)
+	{
+		m_voice[v].control = CONTROL_STOPMASK;
+		m_vol[v] = 0;
+		update_pan(v);
+	}
+
+	notify_clock_changed();
+}
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+device_memory_interface::space_config_vector es5504_device::memory_space_config() const
+{
+	return space_config_vector{
+		std::make_pair(0, &m_bank0_config)
+	};
+}
+
+//-------------------------------------------------
+//  update_pan - update the left/right volumes from
+//  the volume register and the 4 bit CA pan code
+//-------------------------------------------------
+
+void es5504_device::update_pan(int v)
+{
+	const u32 vol = m_vol[v];
+	const u32 pan = get_ca(m_voice[v].control); // 0..15
+
+	m_voice[v].lvol = (vol * (15 - pan)) / 15;
+	m_voice[v].rvol = (vol * pan) / 15;
+}
+
+//-------------------------------------------------
+//  write_voice - write to a voice register
+//-------------------------------------------------
+
+inline void es5504_device::write_voice(int v, offs_t offset, u16 data, u16 mem_mask)
+{
+	es550x_voice *voice = &m_voice[v];
+
+	switch (offset)
+	{
+		case 0x00:  // CR
+			if (ACCESSING_BITS_0_7)
+				voice->control = (voice->control & ~0x00ff) | (data & 0x00ff);
+			LOG("%s:voice %d, control=%04x (raw=%04x & %04x)\n", machine().describe_context(), v, u32(voice->control), u32(data), u32(mem_mask ^ 0xffff));
+			break;
+
+		case 0x01:  // FC
+			if (ACCESSING_BITS_0_7)
+				voice->freqcount = (voice->freqcount & ~get_address_acc_shifted_val(0x00fe, 1)) | (get_address_acc_shifted_val((data & 0x00fe), 1));
+			if (ACCESSING_BITS_8_15)
+				voice->freqcount = (voice->freqcount & ~get_address_acc_shifted_val(0xff00, 1)) | (get_address_acc_shifted_val((data & 0xff00), 1));
+			LOG("%s:voice %d, freq count=%08x\n", machine().describe_context(), v, u32(get_address_acc_res(voice->freqcount, 1)));
+			break;
+
+		case 0x02:  // STRT (hi)
+			if (ACCESSING_BITS_0_7)
+				voice->start = (voice->start & ~get_address_acc_shifted_val(0x00ff0000)) | (get_address_acc_shifted_val((data & 0x00ff) << 16));
+			if (ACCESSING_BITS_8_15)
+				voice->start = (voice->start & ~get_address_acc_shifted_val(0x1f000000)) | (get_address_acc_shifted_val((data & 0x1f00) << 16));
+			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), v, u32(get_address_acc_res(voice->start)));
+			break;
+
+		case 0x03:  // STRT (lo)
+			if (ACCESSING_BITS_0_7)
+				voice->start = (voice->start & ~get_address_acc_shifted_val(0x000000e0)) | (get_address_acc_shifted_val(data & 0x00e0));
+			if (ACCESSING_BITS_8_15)
+				voice->start = (voice->start & ~get_address_acc_shifted_val(0x0000ff00)) | (get_address_acc_shifted_val(data & 0xff00));
+			LOG("%s:voice %d, loop start=%08x\n", machine().describe_context(), v, u32(get_address_acc_res(voice->start)));
+			break;
+
+		case 0x04:  // END (hi)
+			if (ACCESSING_BITS_0_7)
+				voice->end = (voice->end & ~get_address_acc_shifted_val(0x00ff0000)) | (get_address_acc_shifted_val((data & 0x00ff) << 16));
+			if (ACCESSING_BITS_8_15)
+				voice->end = (voice->end & ~get_address_acc_shifted_val(0x1f000000)) | (get_address_acc_shifted_val((data & 0x1f00) << 16));
+			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), v, u32(get_address_acc_res(voice->end)));
+			break;
+
+		case 0x05:  // END (lo)
+			if (ACCESSING_BITS_0_7)
+				voice->end = (voice->end & ~get_address_acc_shifted_val(0x000000e0)) | (get_address_acc_shifted_val(data & 0x00e0));
+			if (ACCESSING_BITS_8_15)
+				voice->end = (voice->end & ~get_address_acc_shifted_val(0x0000ff00)) | (get_address_acc_shifted_val(data & 0xff00));
+			LOG("%s:voice %d, loop end=%08x\n", machine().describe_context(), v, u32(get_address_acc_res(voice->end)));
+			break;
+
+		case 0x06:  // K2
+			if (ACCESSING_BITS_0_7)
+				voice->k2 = (voice->k2 & ~0x00f0) | (data & 0x00f0);
+			if (ACCESSING_BITS_8_15)
+				voice->k2 = (voice->k2 & ~0xff00) | (data & 0xff00);
+			LOG("%s:voice %d, K2=%03x\n", machine().describe_context(), v, u32(voice->k2 >> FILTER_SHIFT));
+			break;
+
+		case 0x07:  // K1
+			if (ACCESSING_BITS_0_7)
+				voice->k1 = (voice->k1 & ~0x00f0) | (data & 0x00f0);
+			if (ACCESSING_BITS_8_15)
+				voice->k1 = (voice->k1 & ~0xff00) | (data & 0xff00);
+			LOG("%s:voice %d, K1=%03x\n", machine().describe_context(), v, u32(voice->k1 >> FILTER_SHIFT));
+			break;
+
+		case 0x08:  // VOL
+			if (ACCESSING_BITS_0_7)
+				m_vol[v] = (m_vol[v] & ~0x00f) | ((data >> 4) & 0x00f);
+			if (ACCESSING_BITS_8_15)
+				m_vol[v] = (m_vol[v] & ~0xff0) | ((data >> 4) & 0xff0);
+			update_pan(v);
+			LOG("%s:voice %d, volume=%03x\n", machine().describe_context(), v, u32(m_vol[v]));
+			break;
+
+		case 0x09:  // CA
+			if (ACCESSING_BITS_0_7)
+			{
+				voice->control = (voice->control & ~0x3f00) | ((data & 0x3f) << 8);
+				update_pan(v);
+			}
+			LOG("%s:voice %d, CA/LP=%02x\n", machine().describe_context(), v, u32((voice->control >> 8) & 0x3f));
+			break;
+
+		case 0x0a:  // ACC (hi)
+			if (ACCESSING_BITS_0_7)
+				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x00ff0000)) | (get_address_acc_shifted_val((data & 0x00ff) << 16));
+			if (ACCESSING_BITS_8_15)
+				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x1f000000)) | (get_address_acc_shifted_val((data & 0x1f00) << 16));
+			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), v, u32(get_address_acc_res(voice->accum)));
+			break;
+
+		case 0x0b:  // ACC (lo)
+			if (ACCESSING_BITS_0_7)
+				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x000000ff)) | (get_address_acc_shifted_val(data & 0x00ff));
+			if (ACCESSING_BITS_8_15)
+				voice->accum = (voice->accum & ~get_address_acc_shifted_val(0x0000ff00)) | (get_address_acc_shifted_val(data & 0xff00));
+			LOG("%s:voice %d, accum=%08x\n", machine().describe_context(), v, u32(get_address_acc_res(voice->accum)));
+			break;
+	}
+}
+
+//-------------------------------------------------
+//  read_voice - read from a voice register
+//-------------------------------------------------
+
+inline u16 es5504_device::read_voice(int v, offs_t offset)
+{
+	es550x_voice *voice = &m_voice[v];
+	u16 result = 0xffff;
+
+	switch (offset)
+	{
+		case 0x00:  // CR
+			result = (voice->control & 0x00ff) | 0xff00;
+			break;
+
+		case 0x01:  // FC
+			result = get_address_acc_res(voice->freqcount, 1) | 0x0001;
+			break;
+
+		case 0x02:  // STRT (hi)
+			result = ((get_address_acc_res(voice->start) >> 16) & 0x1fff) | 0xe000;
+			break;
+
+		case 0x03:  // STRT (lo)
+			result = (get_address_acc_res(voice->start) & 0xffe0) | 0x001f;
+			break;
+
+		case 0x04:  // END (hi)
+			result = ((get_address_acc_res(voice->end) >> 16) & 0x1fff) | 0xe000;
+			break;
+
+		case 0x05:  // END (lo)
+			result = (get_address_acc_res(voice->end) & 0xffe0) | 0x001f;
+			break;
+
+		case 0x06:  // K2
+			result = (voice->k2 & 0xfff0) | 0x000f;
+			break;
+
+		case 0x07:  // K1
+			result = (voice->k1 & 0xfff0) | 0x000f;
+			break;
+
+		case 0x08:  // VOL
+			result = (m_vol[v] << 4) | 0x000f;
+			break;
+
+		case 0x09:  // CA
+			result = ((voice->control >> 8) & 0x003f) | 0xffc0;
+			break;
+
+		case 0x0a:  // ACC (hi)
+			result = ((get_address_acc_res(voice->accum) >> 16) & 0x1fff) | 0xe000;
+			break;
+
+		case 0x0b:  // ACC (lo)
+			result = get_address_acc_res(voice->accum) & 0xffff;
+			break;
+	}
+	return result;
+}
+
+//-------------------------------------------------
+//  write_filter - write to a filter storage register
+//-------------------------------------------------
+
+inline void es5504_device::write_filter(int v, offs_t offset, u16 data, u16 mem_mask)
+{
+	es550x_voice *voice = &m_voice[v];
+
+	auto write16 = [data, mem_mask](s32 &dest)
+	{
+		if (ACCESSING_BITS_0_7)
+			dest = (dest & ~0x00ff) | (data & 0x00ff);
+		if (ACCESSING_BITS_8_15)
+			dest = s16((dest & ~0xff00) | (data & 0xff00));
+	};
+
+	switch (offset)
+	{
+		case 0x01:  // O4(n-1)
+			write16(voice->o4n1);
+			break;
+
+		case 0x02:  // O3(n-2)
+			write16(voice->o3n2);
+			break;
+
+		case 0x03:  // O3(n-1)
+			write16(voice->o3n1);
+			break;
+
+		case 0x04:  // O2(n-2)
+			write16(voice->o2n2);
+			break;
+
+		case 0x05:  // O2(n-1)
+			write16(voice->o2n1);
+			break;
+
+		case 0x06:  // O1(n-1)
+			write16(voice->o1n1);
+			break;
+	}
+}
+
+//-------------------------------------------------
+//  read_filter - read from a filter storage register
+//-------------------------------------------------
+
+inline u16 es5504_device::read_filter(int v, offs_t offset)
+{
+	es550x_voice *voice = &m_voice[v];
+
+	switch (offset)
+	{
+		case 0x01:  // O4(n-1)
+			return voice->o4n1 & 0xffff;
+
+		case 0x02:  // O3(n-2)
+			return voice->o3n2 & 0xffff;
+
+		case 0x03:  // O3(n-1)
+			return voice->o3n1 & 0xffff;
+
+		case 0x04:  // O2(n-2)
+			return voice->o2n2 & 0xffff;
+
+		case 0x05:  // O2(n-1)
+			return voice->o2n1 & 0xffff;
+
+		case 0x06:  // O1(n-1)
+			return voice->o1n1 & 0xffff;
+	}
+	return 0xffff;
+}
+
+//-------------------------------------------------
+//  update_envelopes - the ES5504 has no envelopes
+//-------------------------------------------------
+
+inline void es5504_device::update_envelopes(es550x_voice *voice)
+{
+	voice->ecount = 0;
+}
+
+//-------------------------------------------------
+//  generate_samples - tell each voice to generate samples
+//-------------------------------------------------
+
+void es5504_device::generate_samples(sound_stream &stream)
+{
+	// loop while we still have samples to generate
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
+	{
+		// loop over voices
+		s32 cursample[2] = { 0 };
+		for (int v = 0; v <= m_active_voices; v++)
+		{
+			es550x_voice *voice = &m_voice[v];
+
+			// no compressed sample support
+			generate_pcm(voice, cursample);
+
+			// does this voice have its IRQ bit raised?
+			generate_irq(voice, v);
+		}
+
+		for (int c = 0; c < stream.output_count(); c++)
+			// generated samples are 20-bit signed, range is [-2^19 .. 2^19-1]
+			stream.put_int_clamp(c, sampindex, cursample[c], (1 << 19));
+	}
+}
+
+//-------------------------------------------------
+//  write - handle a write to the current page
+//-------------------------------------------------
+
+void es5504_device::write(offs_t offset, u16 data, u16 mem_mask)
+{
+	// force an update
+	m_stream->update();
+
+	// global registers are available from every page
+	switch (offset)
+	{
+		case 0x0c:  // A/D convert/test
+			if (ACCESSING_BITS_0_7)
+				m_ad_test = data & 0x0003;
+			return;
+
+		case 0x0d:  // ACT
+			if (ACCESSING_BITS_0_7)
+			{
+				m_active_voices = data & 0x1f;
+				m_sample_rate = m_master_clock / (16 * (m_active_voices + 1));
+				m_stream->set_sample_rate(m_sample_rate);
+				m_sample_rate_changed_cb(m_sample_rate);
+
+				LOG("active voices=%d, sample rate=%d\n", m_active_voices, m_sample_rate);
+			}
+			return;
+
+		case 0x0e:  // IRQV - read only
+			return;
+
+		case 0x0f:  // PAGE
+			if (ACCESSING_BITS_0_7)
+				m_current_page = data & 0x3f;
+			return;
+	}
+
+	// pages 0-24 are voice registers
+	if (m_current_page < 0x19)
+		write_voice(m_current_page, offset, data, mem_mask);
+	// pages 32-56 are filter storage registers
+	else if (m_current_page >= 0x20 && m_current_page < 0x39)
+		write_filter(m_current_page - 0x20, offset, data, mem_mask);
+}
+
+//-------------------------------------------------
+//  read - handle a read from the current page
+//-------------------------------------------------
+
+u16 es5504_device::read(offs_t offset)
+{
+	// force an update
+	if (!machine().side_effects_disabled())
+		m_stream->update();
+
+	// global registers are available from every page
+	switch (offset)
+	{
+		case 0x0c:  // A/D: 13 bit result in bits 15:3
+			return (m_read_port_cb.isunset() ? 0xfff8 : (m_read_port_cb(0) & 0xfff8)) | 0x0004 | (m_ad_test & 0x0003);
+
+		case 0x0d:  // ACT
+			return 0xffe0 | (m_active_voices & 0x1f);
+
+		case 0x0e:  // IRQV
+		{
+			u16 result = 0xff60 | (m_irqv & 0x009f);
+			if (!machine().side_effects_disabled())
+				update_internal_irq_state();
+			return result;
+		}
+
+		case 0x0f:  // PAGE
+			return 0xffc0 | (m_current_page & 0x3f);
+	}
+
+	// pages 0-24 are voice registers
+	if (m_current_page < 0x19)
+		return read_voice(m_current_page, offset);
+	// pages 32-56 are filter storage registers
+	if (m_current_page >= 0x20 && m_current_page < 0x39)
+		return read_filter(m_current_page - 0x20, offset);
+
+	return 0xffff;
 }
