@@ -13,6 +13,7 @@
 #include "screen_svg.h"
 
 DECLARE_DEVICE_TYPE(MULCD, mulcd_device)
+DECLARE_DEVICE_TYPE(FS1RLCD, fs1rlcd_device)
 
 class mulcd_device : public hd44780_base_device
 {
@@ -23,6 +24,8 @@ public:
 	void set_leds(u16 leds);
 
 protected:
+	mulcd_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock);
+
 	virtual void device_start() override ATTR_COLD;
 	virtual void device_reset() override ATTR_COLD;
 	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
@@ -34,6 +37,17 @@ private:
 	output_finder<10> m_led_outputs;
 
 	void mu_screen_update(screen_svg_device &screen);
+};
+
+class fs1rlcd_device : public mulcd_device
+{
+public:
+	fs1rlcd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 270000);
+
+	static auto parent_rom_device_type() { return &MULCD; }
+
+protected:
+	virtual const tiny_rom_entry *device_rom_region() const override ATTR_COLD;
 };
 
 #endif // MAME_YAMAHA_MULCD_H
