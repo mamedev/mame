@@ -18,7 +18,7 @@
     Interpolation: each output sample sums six words around the read
     position, weighted by a windowed sinc. The mask ROM holds half of it,
     3 x 128 phases of 12-bit sign-magnitude words, read from a die shot;
-    72 words not legible there are fitted. Guessed, not measured: the six
+    72 words not legible there are computed. Guessed, not measured: the six
     words are consecutive addresses (a loop point does not wrap them),
     reverse mode puts the fraction on the other side of the read word, and
     the sum is truncated to the sample's scale, the output saturating.
@@ -111,7 +111,7 @@
 
 namespace {
 
-// h(b + (p + 0.5) / 128) for b = 0-2, p = 0-127, unity 2048
+// round(2047 * sinc(x) * (0.5336 + 0.46 * cos(pi * x / 3))), x = b + (p + 0.5) / 128, b = 0-2, p = 0-127
 constexpr s16 INTERP_KERNEL[3][128] =
 {
 	{
@@ -132,7 +132,7 @@ constexpr s16 INTERP_KERNEL[3][128] =
 		-230, -227, -224, -221, -218, -215, -211, -208, -204, -201, -197, -193, -189, -185, -181, -177,
 		-173, -169, -165, -161, -157, -153, -149, -145, -140, -136, -132, -128, -124, -120, -115, -111,
 		-107, -103, -99, -95, -91, -87, -83, -79, -75, -71, -67, -64, -60, -56, -53, -49,
-		-46, -42, -39, -36, -33, -29, -26, -23, -20, -17, -14, -12, -9, -6, -4, -1,
+		-46, -42, -39, -36, -32, -29, -26, -23, -20, -17, -14, -12, -9, -6, -4, -1,
 	},
 	{
 		1, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 23, 25, 26, 28, 29,
