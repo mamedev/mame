@@ -43,6 +43,7 @@ public:
 	void set_external_oscillator(bool use_external_oscillator);
 	void set_intf_mode(uint8_t mode);
 	void set_base_rowscan_invert(bool base_rowscan_invert);
+	void set_base_colscan_invert(bool base_colscan_invert);
 
 	void spi_cs_w(int state);
 	void spi_si_w(int state);
@@ -197,6 +198,7 @@ private:
 	int m_spi_bits_left;
 
 	bool m_base_rowscan_invert;
+	bool m_base_colscan_invert;
 
 	// display memory: one "page" is 8 pixels tall, one line is 128 pixels long
 	std::unique_ptr<uint8_t []> m_gddram;
