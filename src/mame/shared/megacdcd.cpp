@@ -10,6 +10,11 @@
 #include "emu.h"
 #include "megacdcd.h"
 
+#include <algorithm>
+#include <cmath>
+#include <cstdlib>
+#include <iterator>
+
 #define LOG_WARN           (1U << 1)
 #define LOG_COMMAND        (1U << 2)
 
@@ -128,6 +133,7 @@
 	(segacd.toc->tracks[SCD_CURTRK - 1].trktype != cdrom_file::CD_TRACK_AUDIO)
 
 #define CDD_PLAYINGCDDA 0x0100
+#define CDD_SEEKING     0x0200
 #define CDD_READY       0x0400
 #define CDD_STOPPED     0x0900
 
@@ -169,6 +175,14 @@ lc89510_temp_device::lc89510_temp_device(const machine_config &mconfig, const ch
 	CDC_REG0 = 0;
 
 	segacd_irq_mask = 0;
+
+	m_seek_ticks = 0;
+	m_seek_status = 0;
+	m_seek_audio_blocks = 0;
+	m_seek_track = 0;
+	m_seek_from = 0;
+	m_seek_target = 0;
+	m_seek_total = 0;
 }
 
 void lc89510_temp_device::dummy_interrupt_callback()
@@ -187,6 +201,14 @@ void lc89510_temp_device::device_start()
 	m_type1_interrupt_callback.resolve();
 	m_type2_interrupt_callback.resolve();
 	m_type3_interrupt_callback.resolve();
+
+	save_item(NAME(m_seek_ticks));
+	save_item(NAME(m_seek_status));
+	save_item(NAME(m_seek_audio_blocks));
+	save_item(NAME(m_seek_track));
+	save_item(NAME(m_seek_from));
+	save_item(NAME(m_seek_target));
+	save_item(NAME(m_seek_total));
 }
 
 void lc89510_temp_device::device_reset()
@@ -307,6 +329,7 @@ void lc89510_temp_device::CDD_Stop()
 {
 	LOGCOMMAND("$01: CDD_Stop\n");
 	CLEAR_CDD_RESULT
+	m_seek_ticks = 0;
 	STOP_CDC_READ
 	SCD_STATUS = CDD_STOPPED;
 	CDD_STATUS = 0x0000;
@@ -482,11 +505,53 @@ uint32_t lc89510_temp_device::getmsf_from_regs(void)
 	return msf;
 }
 
+// Access times measured on a Mega-CD (JP Model 1, Sub BIOS 1.00 and 2.00c, pressed disc), in 75 Hz
+// CDD ticks from the read command to the first decoded block, by the distance moved in blocks.
+// Long moves reach the 1.5 s maximum the Mega-CD Outline (1991-12-13) gives as the drive's access time.
+void lc89510_temp_device::start_seek(int32_t from, int32_t target, uint32_t status)
+{
+	struct seek_point { double blocks, ticks; };
+	static constexpr seek_point SEEK_TIMES[] = {
+		{ 16, 8 }, { 128, 35 }, { 2048, 55 }, { 24000, 60 }, { 55000, 115 } };
+
+	int32_t const distance = target - from;
+	int32_t const blocks = std::abs(distance);
+	double ticks;
+	if (distance >= 0 && blocks <= 16)
+		ticks = 8;      // short forward move: the pickup waits for the block to come round
+	else if (distance < 0 && blocks <= 32)
+		ticks = 20;     // short backward move: one track jump back
+	else if (blocks >= SEEK_TIMES[std::size(SEEK_TIMES) - 1].blocks)
+		ticks = SEEK_TIMES[std::size(SEEK_TIMES) - 1].ticks;
+	else
+	{
+		// interpolate on the logarithm of the distance
+		int i = 0;
+		while (blocks > SEEK_TIMES[i + 1].blocks)
+			i++;
+		double const f = std::log(double(std::max(blocks, 16)) / SEEK_TIMES[i].blocks) / std::log(SEEK_TIMES[i + 1].blocks / SEEK_TIMES[i].blocks);
+		ticks = SEEK_TIMES[i].ticks + f * (SEEK_TIMES[i + 1].ticks - SEEK_TIMES[i].ticks);
+	}
+
+	// the pickup is moving, so any audio stops; the callers have set SCD_CURTRK to the target track
+	m_cdda->stop_audio();
+	m_seek_ticks = std::max(1, int(std::lround(ticks)));
+	m_seek_status = status;
+	m_seek_track = SCD_CURTRK;
+	m_seek_from = from;
+	m_seek_target = target;
+	m_seek_total = m_seek_ticks;
+	SCD_CURLBA = from;
+	SCD_STATUS = CDD_SEEKING;
+	CDD_STATUS = (CDD_STATUS & 0x00ff) | CDD_SEEKING;
+}
+
 void lc89510_temp_device::CDD_Play()
 {
 	LOGCOMMAND("$03: CDD_Play\n");
 	CLEAR_CDD_RESULT
 	uint32_t msf = getmsf_from_regs();
+	int32_t const from = SCD_CURLBA;
 	SCD_CURLBA = cdrom_file::msf_to_lba(msf)-150;
 	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
@@ -500,8 +565,19 @@ void lc89510_temp_device::CDD_Play()
 	set_data_audio_mode();
 	LOG("%d Track played\n",SCD_CURTRK);
 	CDD_MIN = to_bcd(SCD_CURTRK, false);
-	if(!(CURRENT_TRACK_IS_DATA))
+	if (!is_neoCD)
+	{
+		// no data or audio until the pickup has reached the target
+		m_seek_audio_blocks = SCD_CURLBA + track_length;
+
+		// on a data track the drive lands about six blocks before the requested one and plays
+		// up to it (measured on a Mega-CD Model 1)
+		start_seek(from, SCD_CURLBA - (CURRENT_TRACK_IS_DATA ? 6 : 0), CDD_PLAYINGCDDA);
+	}
+	else if (!(CURRENT_TRACK_IS_DATA))
+	{
 		m_cdda->start_audio(SCD_CURLBA, SCD_CURLBA + track_length);
+	}
 	SET_CDC_READ
 
 
@@ -514,6 +590,7 @@ void lc89510_temp_device::CDD_Seek(void)
 	LOGCOMMAND("$04: CDD_Seek\n");
 	CLEAR_CDD_RESULT
 	uint32_t msf = getmsf_from_regs();
+	int32_t const from = SCD_CURLBA;
 	SCD_CURLBA = cdrom_file::msf_to_lba(msf)-150;
 	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
@@ -523,6 +600,8 @@ void lc89510_temp_device::CDD_Seek(void)
 	SCD_STATUS = CDD_READY;
 	CDD_STATUS = 0x0200;
 	set_data_audio_mode();
+	if (!is_neoCD)
+		start_seek(from, SCD_CURLBA, CDD_READY);
 }
 
 
@@ -530,6 +609,7 @@ void lc89510_temp_device::CDD_Pause()
 {
 	LOGCOMMAND("$06: CDD_Pause\n");
 	CLEAR_CDD_RESULT
+	m_seek_ticks = 0;
 	STOP_CDC_READ
 	SCD_STATUS = CDD_READY;
 	CDD_STATUS = SCD_STATUS;
@@ -550,6 +630,17 @@ void lc89510_temp_device::CDD_Resume()
 	STOP_CDC_READ
 	if(!m_cdrom->exists()) // no CD is there, bail out
 		return;
+	if (m_seek_ticks)
+	{
+		// still seeking: play from the target once the pickup arrives
+		m_seek_status = CDD_PLAYINGCDDA;
+		m_seek_audio_blocks = m_seek_target + segacd.toc->tracks[m_seek_track - 1].logframes;
+		SCD_CURTRK = m_seek_track;
+		CDD_STATUS = (CDD_STATUS & 0x00ff) | CDD_SEEKING;
+		CDD_MIN = to_bcd(SCD_CURTRK, false);
+		SET_CDC_READ
+		return;
+	}
 	SCD_CURTRK = m_cdrom->get_track(SCD_CURLBA)+1;
 	SCD_STATUS = CDD_PLAYINGCDDA;
 	CDD_STATUS = 0x0102;
@@ -580,6 +671,7 @@ void lc89510_temp_device::CDD_Init(void)
 {
 	LOGCOMMAND("$0a: CDD_Init\n");
 	CLEAR_CDD_RESULT
+	m_seek_ticks = 0;
 	STOP_CDC_READ
 	SCD_STATUS = CDD_READY;
 	CDD_STATUS = SCD_STATUS;
@@ -625,6 +717,7 @@ void lc89510_temp_device::CDD_Reset(void)
 
 	SCD_CURTRK = SCD_CURLBA = 0;
 	SCD_STATUS = CDD_READY;
+	m_seek_ticks = 0;
 }
 
 void lc89510_temp_device::CDC_Reset(void)
@@ -725,7 +818,7 @@ uint16_t lc89510_temp_device::CDC_Host_r(uint16_t type)
 
 			uint16_t dma_addrc = LC8951RegistersW[REG_W_DACL] | (LC8951RegistersW[REG_W_DACH]<<8);
 
-			uint16_t data = (CDC_BUFFER[dma_addrc]<<8) | CDC_BUFFER[dma_addrc+1];
+			uint16_t data = (CDC_BUFFER[dma_addrc & buffer_mask()] << 8) | CDC_BUFFER[(dma_addrc + 1) & buffer_mask()];
 			dma_addrc += 2;
 
 			LC8951RegistersW[REG_W_DACL] = dma_addrc & 0xff; LC8951RegistersW[REG_W_DACH] = (dma_addrc >> 8) & 0xff;
@@ -1121,7 +1214,21 @@ TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback 
 		if (CDD_DONE)
 		{
 			CDD_DONE = 0;
-			CDD_Export();
+			// during a long seek the drive answers every sixth report with "not ready" (format $F,
+			// no time); the BIOS relies on it to settle its seek state
+			if (m_seek_ticks && (m_seek_total > 8) && !((m_seek_total - m_seek_ticks) % 6))
+			{
+				// built in CDD_RX only: the drive state must stay as it is for the next report
+				std::fill(std::begin(CDD_RX), std::end(CDD_RX), 0);
+				CDD_RX[0] = CDD_SEEKING >> 8;
+				CDD_RX[1] = 0x0f;
+				CDD_DoChecksum();
+				CDD_CONTROL &= ~4; // Clear HOCK bit
+			}
+			else
+			{
+				CDD_Export();
+			}
 			CHECK_SCD_LV4_INTERRUPT_A
 		}
 	}
@@ -1131,6 +1238,22 @@ TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback 
 		{
 			m_type2_interrupt_callback();
 		}
+	}
+
+	if (m_seek_ticks)
+	{
+		// the drive reports seeking and delivers nothing until the pickup arrives
+		if (--m_seek_ticks)
+		{
+			SCD_CURLBA = m_seek_target - int64_t(m_seek_target - m_seek_from) * m_seek_ticks / m_seek_total;
+			return;
+		}
+
+		SCD_CURLBA = m_seek_target;
+		SCD_CURTRK = m_seek_track;
+		SCD_STATUS = m_seek_status;
+		if ((SCD_STATUS == CDD_PLAYINGCDDA) && !(CURRENT_TRACK_IS_DATA))
+			m_cdda->start_audio(SCD_CURLBA, m_seek_audio_blocks);
 	}
 
 	if (SCD_READ_ENABLED) // if (nff0002 & 0x0050) if (nff0002 & 0x0500);
@@ -1311,8 +1434,8 @@ void lc89510_temp_device::scd_advance_current_readpos(void)
 	wa += SECTOR_SIZE;
 	pt += SECTOR_SIZE;
 
-	wa &= 0x7fff;
-	pt &= 0x7fff;
+	wa &= is_neoCD ? 0x7fff : buffer_mask();
+	pt &= is_neoCD ? 0x7fff : buffer_mask();
 
 	LC8951RegistersW[REG_W_PTL] = pt & 0xff; LC8951RegistersW[REG_W_PTH] = (pt >> 8) &0xff;
 	LC8951RegistersW[REG_W_WAL] = wa & 0xff; LC8951RegistersW[REG_W_WAH] = (wa >> 8) &0xff;
@@ -1324,7 +1447,8 @@ int lc89510_temp_device::Read_LBA_To_Buffer()
 	bool data_track = false;
 	if (CDD_CONTROL & 0x0100) data_track = true;
 
-	if (data_track)
+	// blocks before LBA 0 (the landing pre-roll ahead of the first track) are not in the image
+	if (data_track && SCD_CURLBA >= 0)
 		m_cdrom->read_data(SCD_CURLBA, SCD_BUFFER, cdrom_file::CD_TRACK_MODE1);
 
 	LC8951UpdateHeader();
@@ -1333,6 +1457,10 @@ int lc89510_temp_device::Read_LBA_To_Buffer()
 	{
 		scd_advance_current_readpos();
 	}
+
+	// the disc keeps turning when the decoder is not writing to the buffer (DECEN or WRRQ clear)
+	if (data_track && !is_neoCD && (LC8951RegistersW[REG_W_CTRL0] & 0x84) != 0x84)
+		SCD_CURLBA++;
 
 	if (LC8951RegistersW[REG_W_CTRL0] & 0x80)
 	{
@@ -1344,11 +1472,12 @@ int lc89510_temp_device::Read_LBA_To_Buffer()
 
 				int pt = LC8951RegistersW[REG_W_PTL] | (LC8951RegistersW[REG_W_PTH] << 8);
 
-				memcpy(&CDC_BUFFER[pt + 4], SCD_BUFFER, 2048);
-				CDC_BUFFER[pt+0] = LC8951RegistersR[REG_R_HEAD0];
-				CDC_BUFFER[pt+1] = LC8951RegistersR[REG_R_HEAD1];
-				CDC_BUFFER[pt+2] = LC8951RegistersR[REG_R_HEAD2];
-				CDC_BUFFER[pt+3] = LC8951RegistersR[REG_R_HEAD3];
+				for (int i = 0; i < 2048; i++)
+					CDC_BUFFER[(pt + 4 + i) & buffer_mask()] = SCD_BUFFER[i];
+				CDC_BUFFER[(pt + 0) & buffer_mask()] = LC8951RegistersR[REG_R_HEAD0];
+				CDC_BUFFER[(pt + 1) & buffer_mask()] = LC8951RegistersR[REG_R_HEAD1];
+				CDC_BUFFER[(pt + 2) & buffer_mask()] = LC8951RegistersR[REG_R_HEAD2];
+				CDC_BUFFER[(pt + 3) & buffer_mask()] = LC8951RegistersR[REG_R_HEAD3];
 
 
 				if (is_neoCD)
@@ -1368,7 +1497,8 @@ int lc89510_temp_device::Read_LBA_To_Buffer()
 			{
 				int pt = LC8951RegistersW[REG_W_PTL] | (LC8951RegistersW[REG_W_PTH] << 8);
 
-				memcpy(&CDC_BUFFER[pt], SCD_BUFFER, SECTOR_SIZE);
+				for (int i = 0; i < SECTOR_SIZE; i++)
+					CDC_BUFFER[(pt + i) & buffer_mask()] = SCD_BUFFER[i];
 			}
 		}
 

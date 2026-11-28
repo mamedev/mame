@@ -1785,15 +1785,6 @@ void sega_segacd_device::device_reset()
 
 	m_total_scanlines = 262;
 
-	// HACK!!!! timegal, anettfut, roadaven/rbfx end up with the SubCPU waiting in a loop for *something*
-	// overclocking the CPU, even at the point where the game is hung, allows them to continue and boot
-	// I'm not sure what the source of this timing problem is, it's not using IRQ3 or StopWatch at the
-	// time.  Changing the CDHock timer to 50hz from 75hz also stops the hang, but then the video is
-	// too slow and has bad sound.  -- Investigate!
-	// Update: removed, otherwise megacdj and megacd2j will black screen with no cdrom inserted.
-	//m_scdcpu->set_clock_scale(1.5);
-
-
 	// initialize some stuff on reset
 
 	segacd_ram_writeprotect_bits = 0;
@@ -1861,7 +1852,8 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, uint8_t *CDC_BUFFER, u
 
 	while (dmacount--)
 	{
-		uint16_t data = (CDC_BUFFER[dma_addrc+srcoffset]<<8) | CDC_BUFFER[dma_addrc+srcoffset+1];
+		uint16_t const src = dma_addrc + srcoffset;
+		uint16_t data = (CDC_BUFFER[src & m_lc89510_temp->buffer_mask()] << 8) | CDC_BUFFER[(src + 1) & m_lc89510_temp->buffer_mask()];
 
 		if (destination==DMA_PRG)
 		{

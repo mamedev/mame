@@ -3339,7 +3339,7 @@ Optional [SRAM cart] for saving, select 2 at startup.
 		</part>
 	</software>
 
-	<software name="devastat" supported="no">
+	<software name="devastat">
 		<!-- https://redump.info/disc/3158/
 		<rom name="Devastator (Japan).cue" size="1225" crc="40c82789" />
 		<rom name="Devastator (Japan) (Track 01).bin" size="189074928" crc="55438f4a" />
@@ -3357,9 +3357,6 @@ Optional [SRAM cart] for saving, select 2 at startup.
 		<description>Devastator (Japan)</description>
 		<year>1993</year>
 		<publisher>Wolf Team</publisher>
-		<notes><![CDATA[
-Black screen, requires sub CPU to be overclocked by 1.5x
-]]></notes>
 		<info name="serial" value="T-32074"/>
 		<info name="release" value="19930528"/>
 		<info name="alt_title" value="デバステイター"/>
@@ -3840,7 +3837,7 @@ Requires [disc swap]
 		</part>
 	</software>
 
-	<software name="earnest" supported="no">
+	<software name="earnest">
 		<!-- https://redump.info/disc/1737/
 		<rom name="Earnest Evans (Japan).cue" size="2882" crc="688b4a76" />
 		<rom name="Earnest Evans (Japan) (Track 01).bin" size="5207328" crc="8438f16a" />
@@ -3872,9 +3869,6 @@ Requires [disc swap]
 		<description>Earnest Evans (Japan)</description>
 		<year>1991</year>
 		<publisher>Wolf Team</publisher>
-		<notes><![CDATA[
-Hangs on BIOS logo
-]]></notes>
 		<info name="serial" value="T-32014"/>
 		<info name="release" value="19911220"/>
 		<info name="alt_title" value="アーネストエバンス"/>
@@ -7444,7 +7438,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="kamenrzoj" cloneof="kamenrzo" supported="no">
+	<software name="kamenrzoj" cloneof="kamenrzo">
 		<!-- https://redump.info/disc/1996/
 		<rom name="Kamen Rider ZO (Japan).cue" size="562" crc="664ab999" />
 		<rom name="Kamen Rider ZO (Japan) (Track 1).bin" size="449996400" crc="a21571de" />
@@ -7456,9 +7450,6 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Kamen Rider ZO (Japan)</description>
 		<year>1994</year>
 		<publisher>Toei Animation</publisher>
-		<notes><![CDATA[
-Black screen, requires sub CPU to be overclocked by 1.5x
-]]></notes>
 		<info name="serial" value="T-141013"/>
 		<info name="release" value="19940513"/>
 		<info name="alt_title" value="仮面ライダーZO"/>
@@ -10881,6 +10872,7 @@ Requires [disc swap]
 		<publisher>Working Designs</publisher>
 		<info name="serial" value="T-127035"/>
 		<info name="release" value="19950223" />
+		<info name="usage" value="Crashes after the publisher logo if the system backup RAM is not formatted."/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
 			<feature name="cd_matrix" value="SEGAT127035RE R1J MFD BY JVC"/>
@@ -10900,6 +10892,9 @@ Requires [disc swap]
 		<description>Popful Mail (Japan)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
+		<notes><![CDATA[
+Hangs after the BIOS logo on rare occasions on actual hardware (hardware testing shows a failure around 1 in 400 boots) due to a race in the game's initial handshake between the Main and Sub CPUs
+]]></notes>
 		<info name="serial" value="G-6029"/>
 		<info name="release" value="19940401"/>
 		<info name="alt_title" value="ぽっぷるメイル"/>
@@ -11882,7 +11877,7 @@ Plays back bogus [redbook] with hiccups during briefing FMVs
 		</part>
 	</software>
 
-	<software name="revninja" supported="no">
+	<software name="revninja">
 		<!-- https://redump.info/disc/17202/
 		<rom name="Revenge of the Ninja (USA).cue" size="582" crc="fd8526de" />
 		<rom name="Revenge of the Ninja (USA) (Track 1).bin" size="325801392" crc="33c4b555" />
@@ -11894,9 +11889,6 @@ Plays back bogus [redbook] with hiccups during briefing FMVs
 		<description>Revenge of the Ninja (USA)</description>
 		<year>1993</year>
 		<publisher>Renovation</publisher>
-		<notes><![CDATA[
-Black screen, requires sub CPU to be overclocked by 1.5x
-]]></notes>
 		<info name="serial" value="T-49035"/>
 		<sharedfeat name="compatibility" value="NTSC-U"/>
 		<part name="cdrom" interface="cdrom">
@@ -14090,7 +14082,7 @@ Will black screen on FMV anyway
 		</part>
 	</software>
 
-	<software name="solfeacej" cloneof="solfeace" supported="no">
+	<software name="solfeacej" cloneof="solfeace">
 		<!-- https://redump.info/disc/3113/
 		<rom name="Sol-Feace (Japan).cue" size="2446" crc="e3bf68e3" />
 		<rom name="Sol-Feace (Japan) (Track 01).bin" size="4097184" crc="03c0bd53" />
@@ -14119,9 +14111,6 @@ Will black screen on FMV anyway
 		<description>Sol-Feace (Japan)</description>
 		<year>1991</year>
 		<publisher>Wolf Team</publisher>
-		<notes><![CDATA[
-Hangs on BIOS logo
-]]></notes>
 		<info name="serial" value="T-32024"/>
 		<info name="release" value="19911212"/>
 		<info name="alt_title" value="ソル・フィース"/>
@@ -16197,7 +16186,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="timegalj" cloneof="timegal" supported="no">
+	<software name="timegalj" cloneof="timegal">
 		<!-- https://redump.info/disc/4103/
 		<rom name="Time Gal (Japan).cue" size="202" crc="a50da29e" />
 		<rom name="Time Gal (Japan) (Track 1).bin" size="304652208" crc="1a756c12" />
@@ -16206,9 +16195,6 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Time Gal (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
-		<notes><![CDATA[
-Black screen, requires sub CPU to be overclocked by 1.5x
-]]></notes>
 		<info name="serial" value="T-32114"/>
 		<info name="release" value="19921113"/>
 		<info name="alt_title" value="タイムギャル"/>
@@ -16263,7 +16249,7 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		</part>
 	</software>
 
-	<software name="tstormfx" cloneof="cobracom" supported="no">
+	<software name="tstormfx" cloneof="cobracom">
 		<!-- https://redump.info/disc/1995/
 		<rom name="Thunder Storm FX (Japan).cue" size="218" crc="aa9ff0ed" />
 		<rom name="Thunder Storm FX (Japan) (Track 1).bin" size="259446768" crc="5512fd9c" />
@@ -16272,10 +16258,6 @@ Black screen, requires sub CPU to be overclocked by 1.5x
 		<description>Thunder Storm FX (Japan)</description>
 		<year>1992</year>
 		<publisher>Wolf Team</publisher>
-		<notes><![CDATA[
-Hangs on BIOS logo
-Black screen, requires sub CPU to be overclocked by 1.5x (likely)
-]]></notes>
 		<info name="serial" value="T-32064"/>
 		<info name="release" value="19920828"/>
 		<info name="alt_title" value="サンダーストームFX"/>

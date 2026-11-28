@@ -16,6 +16,9 @@ public:
 
 	void set_is_neoCD(bool new_is_neoCD) { is_neoCD = new_is_neoCD; }
 
+	// the CDC buffer RAM is 16 KB on the Mega-CD; the Neo Geo CD keeps its unwrapped window
+	uint16_t buffer_mask() const { return is_neoCD ? 0xffff : 0x3fff; }
+
 	template <typename... T> void set_type1_interrupt_callback(T &&... args) { m_type1_interrupt_callback.set(std::forward<T>(args)...); }
 	template <typename... T> void set_type2_interrupt_callback(T &&... args) { m_type2_interrupt_callback.set(std::forward<T>(args)...); }
 	template <typename... T> void set_type3_interrupt_callback(T &&... args) { m_type3_interrupt_callback.set(std::forward<T>(args)...); }
@@ -124,6 +127,14 @@ protected:
 
 	uint16_t CDD_CONTROL;
 
+	int32_t m_seek_ticks;
+	uint32_t m_seek_status;
+	int32_t m_seek_audio_blocks;
+	uint32_t m_seek_track;
+	int32_t m_seek_from;
+	int32_t m_seek_target;
+	int32_t m_seek_total;
+
 	int16_t  CDD_DONE;
 
 	inline int to_bcd(int val, bool byte);
@@ -144,6 +155,7 @@ protected:
 	void CDD_GetTrackAdr(void);
 	void CDD_GetTrackType(void);
 	uint32_t getmsf_from_regs(void);
+	void start_seek(int32_t from, int32_t target, uint32_t status);
 	void CDD_Play();
 	void CDD_Seek(void);
 	void CDD_Pause();
