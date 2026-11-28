@@ -265,13 +265,27 @@ inline bool m6809_base_device::is_register_addressing_mode()
 //  get_pending_interrupt
 //-------------------------------------------------
 
-inline uint16_t m6809_base_device::get_pending_interrupt()
+inline uint16_t m6809_base_device::get_pending_interrupt(uint64_t latency)
 {
-	if (m_nmi_asserted)
+	// an input that changed recently may not be visible to the core yet
+	if (m_interrupt_settling)
+		return get_settling_interrupt(latency);
+
+	return interrupt_vector(m_nmi_asserted, m_firq_line, m_irq_line);
+}
+
+
+//-------------------------------------------------
+//  interrupt_vector
+//-------------------------------------------------
+
+inline uint16_t m6809_base_device::interrupt_vector(bool nmi, bool firq, bool irq) const
+{
+	if (nmi)
 		return VECTOR_NMI;
-	else if (!(m_cc & CC_F) && m_firq_line)
+	else if (!(m_cc & CC_F) && firq)
 		return VECTOR_FIRQ;
-	else if (!(m_cc & CC_I) && m_irq_line)
+	else if (!(m_cc & CC_I) && irq)
 		return VECTOR_IRQ;
 	else
 		return 0;
