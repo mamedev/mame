@@ -20,9 +20,7 @@ For 512, 256 or 128KB ROMs, just a simple split is needed.
     Games with unknown ID (the V4 BIOS doesn't know how to start them)
 
 Armed-F
-Dragon Spirit
 Power League IV
-Violent Soldier
 Xevious
 
     Undumped games:
@@ -495,13 +493,13 @@ Parasol Stars
 		</part>
 	</software>
 
-	<software name="dspirit" supported="no">
+	<software name="dspirit">
 		<description>Dragon Spirit (TourVisión PCE bootleg)</description>
 		<year>1988</year>
 		<publisher>bootleg (TourVisión) / Namcot</publisher>
 		<info name="alt_title" value="ドラゴンスピリット"/>
 		<part name="cart" interface="tourvision_cart">
-			<feature name="id" value="0xff"/> <!-- Possible IDs: 4,5,15,18,24,31,40,61,75,76,77,78,101,111,114,120,127,136 (long final delay short initial one) -->
+			<feature name="id" value="0x0f"/>
 			<dataarea name="rom" size="262144">
 				<rom name="dragon spirit (japan).pce" size="262144" crc="01a76935" sha1="09b037fde801b71d1ff343c40ff5a58372b9a514" />
 			</dataarea>
@@ -534,14 +532,13 @@ Parasol Stars
 		</part>
 	</software>
 
-	<!-- Confirmed to exist, but not dumped from actual TourVisión cart -->
 	<software name="f1tb">
 		<description>F1 Triple Battle (TourVisión PCE bootleg)</description>
 		<year>1989</year>
 		<publisher>bootleg (TourVisión) / Human</publisher>
 		<info name="alt_title" value="F1トリプルバトル"/>
 		<part name="cart" interface="tourvision_cart">
-			<feature name="id" value="0x64"/> <!-- ID = 100d. It was not actually read from the cart, but reversed-engineered -->
+			<feature name="id" value="0x64"/>
 			<dataarea name="rom" size="393216">
 				<rom name="f1 triple battle (japan).pce" size="393216" crc="13bf0409" sha1="0a219b433529b3214f42734c2a144d238cb3c99c" />
 			</dataarea>
@@ -1116,7 +1113,6 @@ Parasol Stars
 		</part>
 	</software>
 
-	<!-- Confirmed to exist, but not dumped from actual TourVisión cart -->
 	<!-- Racing Spirit -->
 	<software name="racindam">
 		<description>Racing Damashii (TourVisión PCE bootleg)</description>
@@ -1124,7 +1120,7 @@ Parasol Stars
 		<publisher>bootleg (TourVisión) / Irem</publisher>
 		<info name="alt_title" value="レーシング魂"/>
 		<part name="cart" interface="tourvision_cart">
-			<feature name="id" value="0x5b"/> <!-- ID = 91d. It was not actually read from the cart, but reversed-engineered -->
+			<feature name="id" value="0x5b"/>
 			<dataarea name="rom" size="524288">
 				<rom name="racing damashii (japan).pce" size="524288" offset="000000" sha1="8e558b47599a36d78d319e0dcd2e5136564df074" crc="3e79734c"/>
 			</dataarea>
@@ -1522,13 +1518,13 @@ Parasol Stars
 		</part>
 	</software>
 
-	<software name="violents" supported="no">
+	<software name="violents">
 		<description>Violent Soldier (TourVisión PCE bootleg)</description>
 		<year>1990</year>
 		<publisher>bootleg (TourVisión) / IGS</publisher>
 		<info name="alt_title" value="バイオレント・ソルジャー"/>
 		<part name="cart" interface="tourvision_cart">
-			<feature name="id" value="0xff"/>
+			<feature name="id" value="0x23"/>
 			<dataarea name="rom" size="393216">
 				<rom name="violent soldier (japan).pce" size="393216" crc="1bc36b36" sha1="76581fe7acb707b1e5bab2ac27cd27e3ed06078a" />
 			</dataarea>
