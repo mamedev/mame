@@ -82,7 +82,6 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, device
 	m_read_spritelist(*this, DEVICE_SELF, FUNC(namco_c355spr_device::read_spritelist)),
 	m_buffer(0),
 	m_external_prifill(false),
-	m_alt_precision(false),
 	m_transpen(255),
 	m_colbase(0),
 	m_colors(16),
@@ -101,101 +100,6 @@ namco_c355spr_device::namco_c355spr_device(const machine_config &mconfig, const 
 }
 
 /**************************************************************************************/
-
-void namco_c355spr_device::zdrawgfxzoom(
-	bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-	u32 code, u32 color, bool flipx, bool flipy, int hpos, int vpos,
-	int hsize, int vsize, u8 prival,
-	int sprite_screen_width, int sprite_screen_height)
-{
-	if (!hsize || !vsize) return;
-	if (!gfx) return;
-
-	if (sprite_screen_width && sprite_screen_height)
-	{
-		const u32 pal = gfx->colorbase() + gfx->granularity() * (color % gfx->colors());
-
-		const u8 *source_base = gfx->get_data(code % gfx->elements());
-
-		// compute sprite increment per screen pixel
-		int dx = (gfx->width() << 16) / sprite_screen_width;
-		int dy = (gfx->height() << 16) / sprite_screen_height;
-
-		int ex = hpos + sprite_screen_width;
-		int ey = vpos + sprite_screen_height;
-
-		int x_index_base;
-		int y_index;
-
-		if (flipx)
-		{
-			x_index_base = (sprite_screen_width - 1) * dx;
-			dx = -dx;
-		}
-		else
-		{
-			x_index_base = 0;
-		}
-
-		if (flipy)
-		{
-			y_index = (sprite_screen_height - 1) * dy;
-			dy = -dy;
-		}
-		else
-		{
-			y_index = 0;
-		}
-
-		if (hpos < clip.left())
-		{
-			// clip left
-			int pixels = clip.left() - hpos;
-			hpos += pixels;
-			x_index_base += pixels * dx;
-		}
-		if (vpos < clip.top())
-		{
-			// clip top
-			int pixels = clip.top() - vpos;
-			vpos += pixels;
-			y_index += pixels * dy;
-		}
-		if (ex > clip.right() + 1)
-		{
-			// clip right
-			int pixels = ex - clip.right() - 1;
-			ex -= pixels;
-		}
-		if (ey > clip.bottom() + 1)
-		{
-			// clip bottom
-			int pixels = ey - clip.bottom() - 1;
-			ey -= pixels;
-		}
-
-		// skip if inner loop doesn't draw anything
-		if (ex > hpos)
-		{
-			for (int y = vpos; y < ey; y++)
-			{
-				u8 const *const source = source_base + (y_index >> 16) * gfx->rowbytes();
-				u16 *const dest = &dest_bmp.pix(y);
-				int x_index = x_index_base;
-				for (int x = hpos; x < ex; x++)
-				{
-					const u8 c = source[x_index >> 16];
-					if (c != m_transpen)
-					{
-						dest[x] = ((prival & 0xf) << 12) | ((pal + c) & 0xfff);
-					}
-					x_index += dx;
-				}
-				y_index += dy;
-			}
-		}
-	}
-}
 
 bool namco_c355spr_device::default_mix(u16 &dest, u8 &destpri, u16 colbase, u16 src, int srcpri, int pri)
 {
@@ -427,6 +331,7 @@ void namco_c355spr_device::build_sprite_list_and_render_sprites(const rectangle 
 void namco_c355spr_device::render_sprites(const rectangle cliprect)
 {
 	m_renderbitmap.fill(0xffff, cliprect);
+	gfx_element *const gfxelem = gfx(0);
 	c355_sprite *sprite_ptr = m_spritelist.get();
 
 	while (sprite_ptr != m_sprite_end)
@@ -435,38 +340,36 @@ void namco_c355spr_device::render_sprites(const rectangle cliprect)
 		{
 			rectangle clip = sprite_ptr->clip;
 			clip &= cliprect;
-			for (int ind = 0; ind < sprite_ptr->size; ind++)
+
+			// the render bitmap holds the priority in the top 4 bits and the pen in
+			// the low 12; pal is a multiple of the granularity so adding the pen
+			// cannot carry into the priority
+			const u32 pal = gfxelem->colorbase() + gfxelem->granularity() * (sprite_ptr->color % gfxelem->colors());
+			const u32 color = ((sprite_ptr->pri & 0xf) << 12) | (pal & 0xfff);
+
+			for (int ind = 0; ind < sprite_ptr->cols * sprite_ptr->rows; ind++)
 			{
 				if ((sprite_ptr->tile[ind] & 0x8000) == 0)
 				{
-					int sprite_screen_height;
-					int sprite_screen_width;
-
-					if (m_alt_precision)
-					{
-						sprite_screen_width = ((sprite_ptr->x[ind] + (sprite_ptr->zoomx[ind] << 4)) >> 16) - (sprite_ptr->x[ind] >> 16);
-						sprite_screen_height = ((sprite_ptr->y[ind] + (sprite_ptr->zoomy[ind] << 4)) >> 16) - (sprite_ptr->y[ind] >> 16);
-					}
-					else
-					{
-						sprite_screen_height = (sprite_ptr->zoomy[ind] * 16 + 0x8000) >> 16;
-						sprite_screen_width = (sprite_ptr->zoomx[ind] * 16 + 0x8000) >> 16;
-					}
-
 					// TODO: offset is also affected?
 					int tile = sprite_ptr->tile[ind];
 					if (!m_code2tile.isnull())
 						tile = m_code2tile(tile);
-					zdrawgfxzoom(
+
+					// tiles are stored left to right, top to bottom before flipping
+					const int col = ind % sprite_ptr->cols;
+					const int row = ind / sprite_ptr->cols;
+					gfxelem->zoom_subpixel_transpen_raw(
 						m_renderbitmap,
 						clip,
-						gfx(0),
 						tile + sprite_ptr->offset,
-						sprite_ptr->color,
+						color,
 						sprite_ptr->flipx, sprite_ptr->flipy,
-						sprite_ptr->x[ind] >> 16, sprite_ptr->y[ind] >> 16,
-						sprite_ptr->zoomx[ind], sprite_ptr->zoomy[ind], sprite_ptr->pri,
-						sprite_screen_width, sprite_screen_height);
+						sprite_ptr->x, sprite_ptr->y,
+						sprite_ptr->flipx ? (sprite_ptr->cols - 1 - col) : col,
+						sprite_ptr->flipy ? (sprite_ptr->rows - 1 - row) : row,
+						sprite_ptr->stepx, sprite_ptr->stepy,
+						m_transpen);
 				}
 			}
 		}
@@ -537,17 +440,19 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 		sprite_ptr->disable = true;
 		return;
 	}
-	u32 zoomx = (hsize << 16) / (num_cols * 16);
-	s32 dx_zoomed = ((dx & 0xff) * zoomx + 0x8000) >> 16;
+	// 16.16 position offset by dx source pixels; when flipped, hpos is the right edge
+	const u32 zoomx = (hsize << 16) / (num_cols * 16);
+	s32 dx_zoomed = (dx & 0xff) * zoomx;
 	if (dx & 0x100) dx_zoomed = -dx_zoomed;
 
+	s32 x;
 	if (!flipx)
 	{
-		hpos -= dx_zoomed;
+		x = (hpos << 16) - dx_zoomed;
 	}
 	else
 	{
-		hpos += dx_zoomed;
+		x = (hpos << 16) + dx_zoomed - (hsize << 16);
 	}
 
 	if (num_rows == 0) num_rows = 0x10;
@@ -558,69 +463,32 @@ void namco_c355spr_device::get_single_sprite(u16 which, c355_sprite *sprite_ptr)
 		sprite_ptr->disable = true;
 		return;
 	}
-	u32 zoomy = (vsize << 16) / (num_rows * 16);
-	s32 dy_zoomed = ((dy & 0xff) * zoomy + 0x8000) >> 16;
+	// 16.16 position offset by dy source pixels; when flipped, vpos is the bottom edge
+	const u32 zoomy = (vsize << 16) / (num_rows * 16);
+	s32 dy_zoomed = (dy & 0xff) * zoomy;
 	if (dy & 0x100) dy_zoomed = -dy_zoomed;
 
+	s32 y;
 	if (!flipy)
 	{
-		vpos -= dy_zoomed;
+		y = (vpos << 16) - dy_zoomed;
 	}
 	else
 	{
-		vpos += dy_zoomed;
+		y = (vpos << 16) + dy_zoomed - (vsize << 16);
 	}
 
 	sprite_ptr->flipx = flipx;
 	sprite_ptr->flipy = flipy;
-	sprite_ptr->size = num_rows * num_cols;
+	sprite_ptr->cols = num_cols;
+	sprite_ptr->rows = num_rows;
 	sprite_ptr->color = palette & (m_colors - 1);
+	sprite_ptr->x = x;
+	sprite_ptr->y = y;
+	// HSIZE/VSIZE are the sprite size on screen
+	sprite_ptr->stepx = (((num_cols * 16) << 16) + hsize - 1) / hsize;
+	sprite_ptr->stepy = (((num_rows * 16) << 16) + vsize - 1) / vsize;
 
-	u32 source_height_remaining = num_rows * 16;
-	u32 screen_height_remaining = vsize;
-	int y = vpos;
-	int ind = 0;
-	for (int row = 0; row < num_rows; row++)
-	{
-		int tile_screen_height = 16 * screen_height_remaining / source_height_remaining;
-		zoomy = (screen_height_remaining << 16) / source_height_remaining;
-		if (flipy)
-		{
-			y -= tile_screen_height;
-		}
-		u32 source_width_remaining = num_cols * 16;
-		u32 screen_width_remaining = hsize;
-		int x = hpos;
-		for (int col = 0; col < num_cols; col++)
-		{
-			int tile_screen_width = 16 * screen_width_remaining / source_width_remaining;
-			zoomx = (screen_width_remaining << 16) / source_width_remaining;
-			if (flipx)
-			{
-				x -= tile_screen_width;
-			}
-			const u16 tile = m_read_spritetile(tile_index++);
-			sprite_ptr->tile[ind] = tile;
-			if ((tile & 0x8000) == 0)
-			{
-				sprite_ptr->x[ind] = x << 16;
-				sprite_ptr->y[ind] = y << 16;
-				sprite_ptr->zoomx[ind] = zoomx;
-				sprite_ptr->zoomy[ind] = zoomy;
-			}
-			if (!flipx)
-			{
-				x += tile_screen_width;
-			}
-			screen_width_remaining -= tile_screen_width;
-			source_width_remaining -= 16;
-			ind++;
-		} /* next col */
-		if (!flipy)
-		{
-			y += tile_screen_height;
-		}
-		screen_height_remaining -= tile_screen_height;
-		source_height_remaining -= 16;
-	} /* next row */
+	for (int ind = 0; ind < num_rows * num_cols; ind++)
+		sprite_ptr->tile[ind] = m_read_spritetile(tile_index++);
 }

@@ -1155,7 +1155,6 @@ void dragngun_state::namco_sprites(machine_config &config)
 	m_sprgen->set_priority_callback(FUNC(dragngun_state::sprite_priority_callback));
 	m_sprgen->set_mix_callback(FUNC(dragngun_state::sprite_mix_callback));
 	m_sprgen->set_device_allocates_spriteram(false);
-	m_sprgen->set_alt_precision(true);
 }
 
 // DE-0359-2 + Bottom board DE-0360-4
