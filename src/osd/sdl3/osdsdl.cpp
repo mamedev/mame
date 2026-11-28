@@ -7,6 +7,10 @@
 #include "modules/lib/osdlib.h"
 #include "window.h"
 
+#ifdef SDLMAME_MACOSX
+#include "sdlmacos.h"
+#endif
+
 #include "util/language.h"
 #include "util/unicode.h"
 
@@ -185,6 +189,10 @@ sdl_osd_interface::sdl_osd_interface(sdl_options &options) :
 	m_last_click_x(0),
 	m_last_click_y(0),
 	m_enable_touch(false),
+#ifdef SDLMAME_MACOSX
+	m_activation_state(activation_state::IDLE),
+	m_activation_time(std::chrono::steady_clock::time_point::min()),
+#endif
 	m_next_ptrdev(0)
 {
 }
@@ -706,7 +714,72 @@ void sdl_osd_interface::process_events()
 		// let input modules do their thing
 		dispatch_event(event.type, event);
 	}
+
+#ifdef SDLMAME_MACOSX
+	check_app_activation();
+#endif
 }
+
+
+#ifdef SDLMAME_MACOSX
+//============================================================
+//  start_app_activation_check
+//  check_app_activation
+//
+//  When started from a shell, macOS sometimes makes the
+//  application frontmost without AppKit ever becoming
+//  active.  No window becomes key and no keyboard events
+//  arrive for the life of the process.  Asking the
+//  application to activate itself again has no effect, but
+//  activating the Dock and then this application recovers.
+//============================================================
+
+void sdl_osd_interface::start_app_activation_check()
+{
+	m_activation_state = activation_state::WAIT;
+	m_activation_time = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+}
+
+
+void sdl_osd_interface::check_app_activation()
+{
+	if ((activation_state::IDLE == m_activation_state) || (std::chrono::steady_clock::now() < m_activation_time))
+		return;
+
+	if (sdl_macos_app_active())
+	{
+		m_activation_state = activation_state::IDLE;
+		return;
+	}
+
+	switch (m_activation_state)
+	{
+	case activation_state::WAIT:
+		// leave things alone if the user has switched to another application
+		if (!sdl_macos_app_frontmost())
+		{
+			osd_printf_verbose("Application is not active or frontmost, not forcing activation\n");
+			m_activation_state = activation_state::IDLE;
+			break;
+		}
+		osd_printf_verbose("Application is frontmost but not active, activating Dock to recover\n");
+		sdl_macos_activate_dock();
+		m_activation_state = activation_state::DOCK;
+		m_activation_time = std::chrono::steady_clock::now() + std::chrono::seconds(1);
+		break;
+
+	case activation_state::DOCK:
+		osd_printf_verbose("Reactivating application\n");
+		sdl_macos_activate_self();
+		m_activation_state = activation_state::IDLE;
+		break;
+
+	default:
+		m_activation_state = activation_state::IDLE;
+		break;
+	}
+}
+#endif
 
 
 void sdl_osd_interface::osd_exit()
