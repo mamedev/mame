@@ -742,6 +742,18 @@ FLOPPY_CONSTRUCT( td0_dsk_construct )
 		number_of_sectors = header[0];
 		if (number_of_sectors!=0xff){
 			position+=4;
+			if ((track<<1) + (header[2] & 1) >= 84*2){
+				for(i=0;i<number_of_sectors;i++) {
+					header = tag->data + position;
+					position+=6;
+					if ((header[4] & 0x30)==0) {
+						header = tag->data + position;
+						position+=2;
+						position+= get_u16le(&header[0]);
+					}
+				}
+				continue;
+			}
 			tag->track_offsets[(track<<1) + (header[2] & 1)] = position;
 			for(i=0;i<number_of_sectors;i++) {
 				// read sector header
