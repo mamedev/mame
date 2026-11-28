@@ -48,6 +48,7 @@ burgundy_device::burgundy_device(const machine_config &mconfig, const char *tag,
 	, m_last_codec_control(0)
 	, m_counter(0)
 	, m_audio_control(0)
+	, m_frame_count(0)
 {
 	std::fill(std::begin(m_registers), std::end(m_registers), 0);
 }
@@ -67,6 +68,11 @@ void burgundy_device::device_start()
 	save_item(NAME(m_codec_status));
 	save_item(NAME(m_counter));
 	save_item(NAME(m_audio_control));
+	save_item(NAME(m_frame_count));
+	save_item(NAME(m_last_codec_control));
+	save_item(NAME(m_reg_addr));
+	save_item(NAME(m_cur_byte));
+	save_item(NAME(m_last_byte));
 }
 
 
@@ -81,6 +87,11 @@ void burgundy_device::device_reset()
 	m_counter = 0;
 	m_active = 0;
 	m_audio_control = 0;
+	m_frame_count = 0;
+	m_last_codec_control = 0;
+	m_reg_addr = 0;
+	m_cur_byte = 0;
+	m_last_byte = 0;
 	std::fill(std::begin(m_registers), std::end(m_registers), 0);
 	m_stream->set_sample_rate(calc_sample_rate());
 }
@@ -93,12 +104,7 @@ void burgundy_device::device_reset()
 
 void burgundy_device::sound_stream_update(sound_stream &stream)
 {
-	if (m_codec_status & CODEC_BUSY)
-	{
-		m_codec_status &= ~CODEC_BUSY;   // clear busy
-		m_counter++;
-		m_counter &= 3;
-	}
+	m_codec_status &= ~CODEC_BUSY;
 
 	// The serial link between the MacIO chip and the codec always runs, so output
 	// DMA is always consumed at the sample rate, even with all outputs disabled.
@@ -125,6 +131,7 @@ void burgundy_device::sound_stream_update(sound_stream &stream)
 		m_input_cb(m_phase, 0);
 
 	m_phase = (m_phase + 1) & 0xfff;
+	m_frame_count++;
 }
 
 uint32_t burgundy_device::read_macrisc(offs_t offset)
@@ -139,6 +146,10 @@ uint32_t burgundy_device::read_macrisc(offs_t offset)
 
 	case 8: // Audio CODEC Status
 		return m_codec_status;
+
+	case 0x14: // Audio Frame Count
+		m_stream->update();
+		return m_frame_count;
 	}
 
 	return 0;
@@ -186,12 +197,20 @@ void burgundy_device::write_macrisc(offs_t offset, uint32_t data)
 			}
 			else
 			{
+				// Each completed read bumps the status counter; drivers latch it before the
+				// request and spin until it advances by one, then take the data byte.
+				m_counter = (m_counter + 1) & 3;
 				u8 reg_data = (m_registers[m_reg_addr] >> (m_cur_byte << 3)) & 0xff;
 				m_codec_status = CODEC_BUSY | CODEC_PRESENT | (m_counter << 14) | (m_cur_byte << 12) | (reg_data << 4);
 			}
 			break;
 
 		case 8: // Audio CODEC Status
+			break;
+
+		case 0x14: // Audio Frame Count
+			m_stream->update();
+			m_frame_count = data;
 			break;
 	}
 }
