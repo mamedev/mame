@@ -126,12 +126,11 @@ private:
 	void execute_statesave(const std::vector<std::string_view> &params);
 	void execute_stateload(const std::vector<std::string_view> &params);
 	void execute_rewind(const std::vector<std::string_view> &params);
+	bool parse_load_save_memory(const std::vector<std::string_view> &params, u64 &offset, memory_region *&region, memory_share *&share);
 	void execute_save(int spacenum, const std::vector<std::string_view> &params);
 	bool execute_save_try_memory(const std::vector<std::string_view> &params);
-	void execute_saveregion(const std::vector<std::string_view> &params);
 	void execute_load(int spacenum, const std::vector<std::string_view> &params);
 	bool execute_load_try_memory(const std::vector<std::string_view> &params);
-	void execute_loadregion(const std::vector<std::string_view> &params);
 	void execute_dump(int spacenum, const std::vector<std::string_view> &params);
 	bool execute_dump_try_memory(const std::vector<std::string_view> &params);
 	void execute_strdump(int spacenum, const std::vector<std::string_view> &params);

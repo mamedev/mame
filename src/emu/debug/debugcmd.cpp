@@ -278,13 +278,13 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("saved",     CMDFLAG_NONE, 3, 3, std::bind(&debugger_commands::execute_save, this, AS_DATA, _1));
 	m_console.register_command("savei",     CMDFLAG_NONE, 3, 3, std::bind(&debugger_commands::execute_save, this, AS_IO, _1));
 	m_console.register_command("saveo",     CMDFLAG_NONE, 3, 3, std::bind(&debugger_commands::execute_save, this, AS_OPCODES, _1));
-	m_console.register_command("saver",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_saveregion, this, _1));
+	m_console.register_command("saver",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_save, this, -1, _1));
 
 	m_console.register_command("load",      CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, -1, _1));
 	m_console.register_command("loadd",     CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, AS_DATA, _1));
 	m_console.register_command("loadi",     CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, AS_IO, _1));
 	m_console.register_command("loado",     CMDFLAG_NONE, 2, 3, std::bind(&debugger_commands::execute_load, this, AS_OPCODES, _1));
-	m_console.register_command("loadr",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_loadregion, this, _1));
+	m_console.register_command("loadr",     CMDFLAG_NONE, 4, 4, std::bind(&debugger_commands::execute_load, this, -1, _1));
 
 	m_console.register_command("dump",      CMDFLAG_NONE, 3, 6, std::bind(&debugger_commands::execute_dump, this, -1, _1));
 	m_console.register_command("dumpd",     CMDFLAG_NONE, 3, 6, std::bind(&debugger_commands::execute_dump, this, AS_DATA, _1));
@@ -2044,6 +2044,18 @@ void debugger_commands::execute_rewind(const std::vector<std::string_view> &para
 }
 
 
+bool debugger_commands::parse_load_save_memory(const std::vector<std::string_view> &params, u64 &offset, memory_region *&region, memory_share *&share)
+{
+	if (params.size() != 4)
+		return m_console.validate_address_with_memory_parameter(params[1], offset, region, share);
+
+	// loadr and saver take a separate region tag.  Consume the command even if validation fails.
+	if (m_console.validate_memory_region_parameter(params[3], region))
+		m_console.validate_number_parameter(params[1], offset);
+	return true;
+}
+
+
 /*-------------------------------------------------
     execute_save - execute the save command
 -------------------------------------------------*/
@@ -2149,7 +2161,7 @@ bool debugger_commands::execute_save_try_memory(const std::vector<std::string_vi
 	u64 offset = u64(-1);
 	memory_region *region = nullptr;
 	memory_share *share = nullptr;
-	if (!m_console.validate_address_with_memory_parameter(params[1], offset, region, share))
+	if (!parse_load_save_memory(params, offset, region, share))
 		return false; // not memory case
 
 	u64 length;
@@ -2191,16 +2203,6 @@ bool debugger_commands::execute_save_try_memory(const std::vector<std::string_vi
 	m_console.printf("Data saved successfully\n");
 
 	return true;
-}
-
-
-/*-------------------------------------------------
-    execute_saveregion - execute the save command on region memory
--------------------------------------------------*/
-
-void debugger_commands::execute_saveregion(const std::vector<std::string_view> &params)
-{
-	execute_save(-1, std::vector<std::string_view>{ params[0], std::string(params[1]) + std::string(params[3]) + ".m", params[2] });
 }
 
 
@@ -2331,7 +2333,7 @@ bool debugger_commands::execute_load_try_memory(const std::vector<std::string_vi
 	u64 offset = u64(-1);
 	memory_region *region = nullptr;
 	memory_share *share = nullptr;
-	if (!m_console.validate_address_with_memory_parameter(params[1], offset, region, share))
+	if (!parse_load_save_memory(params, offset, region, share))
 		return false; // not memory case
 
 	u64 length;
@@ -2383,16 +2385,6 @@ bool debugger_commands::execute_load_try_memory(const std::vector<std::string_vi
 	m_console.printf("Data loaded successfully to memory : 0x%X to 0x%X\n", offset, offset + length - 1);
 
 	return true;
-}
-
-
-/*-------------------------------------------------
-    execute_loadregion - execute the load command on region memory
--------------------------------------------------*/
-
-void debugger_commands::execute_loadregion(const std::vector<std::string_view> &params)
-{
-	execute_load(-1, std::vector<std::string_view>{ params[0], std::string(params[1]) + std::string(params[3]) + ".m", params[2] });
 }
 
 
