@@ -29,7 +29,9 @@ Sets a new execution breakpoint at the specified **<address>**.  The
 **<address>** may optionally be followed by a colon and a tag or
 debugger CPU number to set a breakpoint for a specific CPU.  If no CPU
 is specified, the breakpoint will be set for the CPU currently visible
-in the debugger.
+in the debugger.  When :ref:`source-level debugging <srcdbg>` is
+enabled, :ref:`alternatives <srcdbg_bp>` to specifying **<address>**
+are allowed.
 
 The optional **<condition>** parameter lets you specify an expression
 that will be evaluated each time the breakpoint address is hit.  If the

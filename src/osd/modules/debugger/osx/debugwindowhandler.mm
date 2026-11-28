@@ -224,12 +224,12 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 
 
 - (IBAction)debugStepInto:(id)sender {
-	machine->debugger().console().get_visible_cpu()->debug()->single_step();
+	machine->debugger().console().get_visible_cpu()->debug()->single_step(1, [self sourceFrameActive]);
 }
 
 
 - (IBAction)debugStepOver:(id)sender {
-	machine->debugger().console().get_visible_cpu()->debug()->single_step_over();
+	machine->debugger().console().get_visible_cpu()->debug()->single_step_over(1, [self sourceFrameActive]);
 }
 
 
@@ -253,6 +253,10 @@ NSString *const MAMESaveDebuggerConfigurationNotification = @"MAMESaveDebuggerCo
 	machine->schedule_exit();
 }
 
+- (BOOL)sourceFrameActive
+{
+	return NO;
+}
 
 - (void)showDebugger:(NSNotification *)notification {
 	running_machine *m = (running_machine *)[[[notification userInfo] objectForKey:@"MAMEDebugMachine"] pointerValue];
