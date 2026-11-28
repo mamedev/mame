@@ -12,7 +12,6 @@
 
 #include "emu.h"
 #include "bu3905.h"
-#include "sa16.h"
 //#include "bus/midi/midi.h"
 #include "cpu/mcs51/i8052.h"
 #include "machine/i8251.h"
@@ -22,6 +21,7 @@
 #include "machine/nvram.h"
 #include "machine/rescap.h"
 #include "machine/upd7001.h"
+#include "sound/roland_sa16.h"
 #include "video/hd44780.h"
 #include "emupal.h"
 #include "screen.h"
@@ -246,7 +246,7 @@ void roland_s10_state::s10(machine_config &config)
 	UPD7001(config, "adc", RES_K(27), CAP_P(47));
 
 	RF5C36(config, m_sampler, 26.88_MHz_XTAL);
-	m_sampler->int_callback().set_inputline(m_maincpu, MCS51_INT1_LINE);
+	m_sampler->int_callback().set_inputline(m_maincpu, MCS51_INT1_LINE).invert();
 }
 
 void roland_s10_state::mks100(machine_config &config)

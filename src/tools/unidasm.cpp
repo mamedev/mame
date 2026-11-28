@@ -120,6 +120,7 @@ using util::BIT;
 #include "cpu/m88000/m88000d.h"
 #include "cpu/mb86233/mb86233d.h"
 #include "cpu/mb86235/mb86235d.h"
+#include "cpu/mb8764/mb8764d.h"
 #include "cpu/mb88xx/mb88dasm.h"
 #include "cpu/mb88xxx/mb88xxxdasm.h"
 #include "cpu/mc68hc11/hc11dasm.h"
@@ -572,6 +573,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "m740",            le,  0, []() -> util::disasm_interface * { return new m740_disassembler(&m740_unidasm); } },
 	{ "mb86233",         le, -2, []() -> util::disasm_interface * { return new mb86233_disassembler; } },
 	{ "mb86235",         le, -3, []() -> util::disasm_interface * { return new mb86235_disassembler; } },
+	{ "mb8764",          be, -2, []() -> util::disasm_interface * { return new mb8764_disassembler; } },
 	{ "mb88xx",          le,  0, []() -> util::disasm_interface * { return new mb88_disassembler; } },
 	{ "mb88xxx",         le,  0, []() -> util::disasm_interface * { return new mb88xxx_disassembler; } },
 	{ "mc88100",         be,  0, []() -> util::disasm_interface * { return new mc88100_disassembler; } },
