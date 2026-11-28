@@ -112,27 +112,42 @@ protected:
 	u8 m_floppy_select;
 };
 
-class roland_s50_state : public roland_s50_base_state
+class roland_s50_s550_state : public roland_s50_base_state
 {
-public:
-	roland_s50_state(const machine_config &mconfig, device_type type, const char *tag)
+protected:
+	roland_s50_s550_state(const machine_config &mconfig, device_type type, const char *tag)
 		: roland_s50_base_state(mconfig, type, tag)
 		, m_sram_bank(*this, "sram")
 		, m_sram(*this, "sram", 0x10000U, ENDIANNESS_LITTLE)
 		, m_io_view(*this, "io")
-		, m_panel(*this, "PANEL%u", 0U)
 		, m_leds(*this, "LED%u", 0U)
 	{
 	}
 
-	void s50(machine_config &config);
-
-protected:
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
 	void p2_w(u8 data);
 	void floppy_select_w(u8 data);
+
+	void s50_common(machine_config &config) ATTR_COLD;
+
+	required_memory_bank m_sram_bank;
+	memory_share_creator<u16> m_sram;
+	memory_view m_io_view;
+	output_finder<16> m_leds;
+};
+
+class roland_s50_state : public roland_s50_s550_state
+{
+public:
+	roland_s50_state(const machine_config &mconfig, device_type type, const char *tag)
+		: roland_s50_s550_state(mconfig, type, tag)
+		, m_panel(*this, "PANEL%u", 0U)
+	{
+	}
+
+	void s50(machine_config &config);
 
 private:
 	void ioga_out_w(u8 data);
@@ -141,19 +156,14 @@ private:
 
 	void mem_map(address_map &map) ATTR_COLD;
 
-protected:
-	required_memory_bank m_sram_bank;
-	memory_share_creator<u16> m_sram;
-	memory_view m_io_view;
-	optional_ioport_array<5> m_panel;
-	output_finder<16> m_leds;
+	required_ioport_array<5> m_panel;
 };
 
-class roland_s550_state : public roland_s50_state
+class roland_s550_state : public roland_s50_s550_state
 {
 public:
 	roland_s550_state(const machine_config &mconfig, device_type type, const char *tag)
-		: roland_s50_state(mconfig, type, tag)
+		: roland_s50_s550_state(mconfig, type, tag)
 		, m_lowram_bank(*this, "lowram")
 		, m_lowmem_view(*this, "lowmem")
 		, m_lowram(*this, "lowram", 0x10000U, ENDIANNESS_LITTLE)
@@ -320,7 +330,7 @@ void roland_s50_base_state::machine_start()
 	save_item(NAME(m_floppy_select));
 }
 
-void roland_s50_state::machine_start()
+void roland_s50_s550_state::machine_start()
 {
 	roland_s50_base_state::machine_start();
 
@@ -334,7 +344,7 @@ void roland_s50_state::machine_start()
 
 void roland_s550_state::machine_start()
 {
-	roland_s50_state::machine_start();
+	roland_s50_s550_state::machine_start();
 
 	m_lowram_bank->configure_entries(0, 8, &m_lowram[0], 0x2000);
 	m_lowram_bank->set_entry(0);
@@ -350,13 +360,13 @@ void roland_s550_state::machine_start()
 
 void roland_s550_state::machine_reset()
 {
-	roland_s50_state::machine_reset();
+	roland_s50_s550_state::machine_reset();
 
 	m_keyrow = 0;
 	m_boot_inject_done = false;
 }
 
-void roland_s50_state::machine_reset()
+void roland_s50_s550_state::machine_reset()
 {
 	floppy_select_w(0);
 }
@@ -426,7 +436,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(roland_s50_base_state::vdp_timer)
 	m_vdp->interrupt();
 }
 
-void roland_s50_state::p2_w(u8 data)
+void roland_s50_s550_state::p2_w(u8 data)
 {
 	m_io_view.select(BIT(data, 5));
 }
@@ -434,7 +444,7 @@ void roland_s50_state::p2_w(u8 data)
 // Reading D800 + 2n drives SW SCAN n and returns the switch bus
 u8 roland_s50_state::panel_r(offs_t offset)
 {
-	return m_panel[offset].read_safe(0xff);
+	return m_panel[offset]->read();
 }
 
 // LED bus 0-7, active low: Patch, Disk, Edit, Func, MIDI, Rec, Aux, Shift
@@ -538,7 +548,7 @@ u8 roland_s50_base_state::floppy_status_r()
 	return status;
 }
 
-void roland_s50_state::floppy_select_w(u8 data)
+void roland_s50_s550_state::floppy_select_w(u8 data)
 {
 	floppy_image_device *floppy = nullptr;
 	if (BIT(data, 6))
@@ -1170,27 +1180,20 @@ void roland_s50_base_state::add_midi(machine_config &config)
 	m_maincpu->txd_cb().set("mdout", FUNC(midi_port_device::write_txd));
 }
 
-void roland_s50_state::s50(machine_config &config)
+void roland_s50_s550_state::s50_common(machine_config &config)
 {
 	C8095_90(config, m_maincpu, 24_MHz_XTAL / 2);
-	m_maincpu->set_addrmap(AS_PROGRAM, &roland_s50_state::mem_map);
-	m_maincpu->out_p2_cb().set(FUNC(roland_s50_state::p2_w));
-
-	MB63H149(config, m_keyscan, 24_MHz_XTAL / 2);
-	m_keyscan->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
+	m_maincpu->out_p2_cb().set(FUNC(roland_s50_s550_state::p2_w));
 
 	WD1772(config, m_fdc, 8_MHz_XTAL); // WD1770-00 or WD1772-02
 	m_fdc->drq_wr_callback().set_inputline(m_maincpu, i8x9x_device::HSI2_LINE);
-	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, i8x9x_device::HSI3_LINE);
 
 	// Floppy unit: FDD4261A0K or FDD4251G0K
 	FLOPPY_CONNECTOR(config, m_floppy[0], s50_floppies, "35dd", &floppy_formats).enable_sound(true);
 	FLOPPY_CONNECTOR(config, m_floppy[1], s50_floppies, nullptr, &floppy_formats).enable_sound(true);
 
-	//UPD7538A(config, "fipcpu", 600_kHz_XTAL);
-
 	TMS3556(config, m_vdp, 14.3496_MHz_XTAL); // TMS3556NL
-	m_vdp->set_addrmap(0, &roland_s50_state::vram_map);
+	m_vdp->set_addrmap(0, &roland_s50_s550_state::vram_map);
 	//m_vdp->vsync_callback().set_inputline(m_maincpu, i8x9x_device::HSI1_LINE).invert();
 	m_vdp->set_screen("screen");
 
@@ -1205,35 +1208,48 @@ void roland_s50_state::s50(machine_config &config)
 
 	PALETTE(config, "palette", palette_device::RGB_3BIT);
 
-	TIMER(config, "vdp_timer").configure_scanline(FUNC(roland_s50_state::vdp_timer), "screen", 0, 1);
+	TIMER(config, "vdp_timer").configure_scanline(FUNC(roland_s50_s550_state::vdp_timer), "screen", 0, 1);
 
 	RF5C36(config, m_wave, 26.88_MHz_XTAL);
 	m_wave->int_callback().set_inputline(m_maincpu, i8x9x_device::HSI0_LINE);
-	m_wave->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
 	SPEAKER(config, "speaker").front_center();
 	MICROPHONE(config, "mic").add_route(0, m_wave, 1.0, 0);
 
+	add_midi(config);
+}
+
+void roland_s50_state::s50(machine_config &config)
+{
+	s50_common(config);
+
+	m_maincpu->set_addrmap(AS_PROGRAM, &roland_s50_state::mem_map);
 	m_maincpu->ach4_cb().set(FUNC(roland_s50_state::analog_r<4>)); // bender
 	m_maincpu->ach5_cb().set(FUNC(roland_s50_state::adjuster_r<5>)); // volume
 	m_maincpu->ach6_cb().set(FUNC(roland_s50_state::analog_r<6>)); // aftertouch
 	m_maincpu->ach7_cb().set(FUNC(roland_s50_state::adjuster_r<7>)); // controller bend range
 
-	add_midi(config);
+	MB63H149(config, m_keyscan, 24_MHz_XTAL / 2);
+	m_keyscan->int_callback().set_inputline(m_maincpu, i8x9x_device::EXTINT_LINE);
+
+	m_fdc->intrq_wr_callback().set_inputline(m_maincpu, i8x9x_device::HSI3_LINE);
+
+	//UPD7538A(config, "fipcpu", 600_kHz_XTAL);
+
+	m_wave->add_route(ALL_OUTPUTS, "speaker", 1.0);
 }
 
 void roland_s550_state::s550(machine_config &config)
 {
-	s50(config);
+	s50_common(config);
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &roland_s550_state::mem_map);
 	m_maincpu->ach4_cb().set(FUNC(roland_s550_state::adjuster_r<4>)); // volume
+	m_maincpu->ach5_cb().set_constant(0); // grounded
 	m_maincpu->ach6_cb().set(FUNC(roland_s550_state::analog_dac_value)); // A/D compare level
-	m_fdc->intrq_wr_callback().set_nop();
+	m_maincpu->ach7_cb().set_constant(0); // grounded
 
-	//UPD7537(config.device_replace(), "fipcpu", 400_kHz_XTAL);
-
-	config.device_remove("keyscan");
+	//UPD7537(config, "fipcpu", 400_kHz_XTAL);
 
 	// SCSI controller on Option Board
 	auto &scsi(NSCSI_BUS(config, "scsi"));
@@ -1250,7 +1266,6 @@ void roland_s550_state::s550(machine_config &config)
 
 	BU3905(config, "outas");
 
-	m_wave->reset_routes();
 	add_tvf(config, m_tvf, m_tvf16);
 	m_tvf->add_route(ALL_OUTPUTS, "speaker", 1.0);
 
