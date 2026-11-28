@@ -39,9 +39,12 @@
     Reference: HP's 5 1/4-Inch Winchester Disc Drive Service Documentation
     (HP Greeley Division), HP 9133V/XV & 9134XV Disc Memory User's Manual,
     HP 9133/34 V/XV/D/H (5957-6568) and HP's 3 1/2-Inch Flexible Disc Drive
-    Service Documentation; board schematics by Tony Duell. The Winchester
-    board carries a WD1010AL-00: the WD1010-00/01 data sheet (WD 1984
-    databook) agrees with the WD1010-05 pages cited below.
+    Service Documentation; board schematics by Tony Duell; all available
+    from the HP Computer Museum (hpmuseum.net). The Winchester board
+    carries a WD1010AL-00: the WD1010-00/01 data sheet (WD 1984 databook)
+    agrees with the WD1010-05 pages cited below.
+
+    ROMs dumped by Martin Hepperle and by SomeGuy (forum.vcfed.org).
 
 *********************************************************************/
 
