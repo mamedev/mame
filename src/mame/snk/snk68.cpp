@@ -1,45 +1,47 @@
 // license:BSD-3-Clause
 // copyright-holders: Bryan McPhail, Acho A. Tang, Nicola Salmoria
-
 /***************************************************************************
 
-    POW - Prisoners Of War (US version 1)    A7008   SNK 1988
-    POW - Prisoners Of War (Japan)           A7008   SNK 1988
-    SAR - Search And Rescue (World)          A8007   SNK 1989
-    SAR - Search And Rescue (US)             A8007   SNK 1989
-    SAR - Search And Rescue (Japan)          A8007   SNK 1989
-    Street Smart (US version 1)              A8007   SNK 1989
-    Street Smart (US version 2)              A7008   SNK 1989
-    Street Smart (World version 1)           A8007   SNK 1989
-    Street Smart (Japan version 1)           A8007   SNK 1989
-    Ikari III - The Rescue (US)              A7007   SNK 1989
+POW - Prisoners Of War (US version 1)    A7008   SNK 1988
+POW - Prisoners Of War (Japan)           A7008   SNK 1988
+SAR - Search And Rescue (World)          A8007   SNK 1989
+SAR - Search And Rescue (US)             A8007   SNK 1989
+SAR - Search And Rescue (Japan)          A8007   SNK 1989
+Street Smart (US version 1)              A8007   SNK 1989
+Street Smart (US version 2)              A7008   SNK 1989
+Street Smart (World version 1)           A8007   SNK 1989
+Street Smart (Japan version 1)           A8007   SNK 1989
+Ikari III - The Rescue (US)              A7007   SNK 1989
 
-    For some strange reason version 2 of Street Smart runs on POW hardware!
+For some strange reason version 2 of Street Smart runs on POW hardware!
 
-    Driver by Bryan McPhail, Acho A. Tang, Nicola Salmoria
+Driver by Bryan McPhail, Acho A. Tang, Nicola Salmoria
 
 
 Notes:
 ------
-- All evidence suggests that the sprite hardware doesn't have a frame buffer
-  but just a raster line buffer, like NeoGeo (unsurprisingly). The maths
-  confirm this:
-  384 pixels per raster line at 4 clocks per pixel = 1536 clocks per line
-  96 sprites * 16 pixels per sprite  = 1536 clocks to draw the sprites
+All evidence suggests that the sprite hardware doesn't have a frame buffer
+but just a raster line buffer, like NeoGeo (unsurprisingly). The maths
+confirm this:
+384 pixels per raster line at 4 clocks per pixel = 1536 clocks per line
+96 sprites * 16 pixels per sprite = 1536 clocks to draw the sprites
 
-  While this board doesn't have a raster interrupt capability, the way how
-  sprites are drawn needs to be kept in consideration because at least in one
-  case the program modifies the sprite list in the middle of the frame:
-  bug 00871: pow: At 3/4 of the 1st level, there is a large pillar, which pops up too late.
-  The problem in this case is that the sprite list is built by the IRQ handler,
-  however there is code in the main loop that clears some portions of sprite
-  RAM under certain conditions. Usually, this isn't a problem, but in that
-  specific point the sprites added by the IRQ handler are erased during the
-  frame.
-  To avoid glitches in that case, we force a partial screen update every time
-  sprite RAM changes. It's possible that there are other unknown small glitches
-  fixed by this (earlier notes in this driver talked about "sprite flickerings
-  and pop-ups" but I don't know where they happened).
+While this board doesn't have a raster interrupt capability, the way how
+sprites are drawn needs to be kept in consideration because at least in one
+case the program modifies the sprite list in the middle of the frame: bug 00871:
+pow: At 3/4 of the 1st level, there is a large pillar, which pops up too late.
+The problem in this case is that the sprite list is built by the IRQ handler,
+however there is code in the main loop that clears some portions of sprite
+RAM under certain conditions. Usually, this isn't a problem, but in that
+specific point the sprites added by the IRQ handler are erased during the frame.
+
+To avoid glitches in that case, we force a partial screen update every time
+sprite RAM changes. It's possible that there are other unknown small glitches
+fixed by this (earlier notes in this driver talked about "sprite flickerings
+and pop-ups" but I don't know where they happened).
+
+Screen timing was verified on ikari3/streetsm1(A7007 PCB), pow(A7008 PCB).
+V=59.185Hz, H=15.62kHz, 264 scanlines. Also, a SAR board was measured 59.16Hz.
 
 ***************************************************************************/
 
@@ -857,9 +859,6 @@ void snk68_state::pow(machine_config &config)
 
 	// video hardware
 	SCREEN(config, m_screen);
-	// the screen parameters are guessed but should be accurate. They
-	// give a theoretical refresh rate of 59.1856Hz while the measured
-	// rate on a SAR board is 59.16Hz.
 	m_screen->set_raw(XTAL(24'000'000) / 4, 384, 0, 256, 264, 16, 240);
 	m_screen->set_screen_update(FUNC(snk68_state::screen_update));
 	m_screen->set_palette(m_palette);
@@ -1605,17 +1604,20 @@ GAME( 1988, pow,         0,        pow,      pow,      snk68_state,    empty_ini
 GAME( 1988, powa,        pow,      pow,      pow,      snk68_state,    empty_init, ROT0,  "SNK",     "P.O.W. - Prisoners of War (US version 1, mask ROM sprites)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, powj,        pow,      pow,      powj,     snk68_state,    empty_init, ROT0,  "SNK",     "Datsugoku - Prisoners of War (Japan)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1988, powbl,       pow,      powbl,    pow,      snk68_state,    init_powbl, ROT0,  "bootleg", "P.O.W. - Prisoners of War (bootleg of US version 1)",        MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // MSM5205 not hooked up
+
 GAME( 1989, streetsm,    0,        streetsm, streetsm, snk68_state,    empty_init, ROT0,  "SNK",     "Street Smart (US version 2)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1989, streetsm1,   streetsm, searchar, streetsm, searchar_state, empty_init, ROT0,  "SNK",     "Street Smart (US version 1)",                                MACHINE_SUPPORTS_SAVE )
 GAME( 1989, streetsmw,   streetsm, searchar, streetsj, searchar_state, empty_init, ROT0,  "SNK",     "Street Smart (World version 1)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1989, streetsmj,   streetsm, searchar, streetsj, searchar_state, empty_init, ROT0,  "SNK",     "Street Smart (Japan version 1)",                             MACHINE_SUPPORTS_SAVE )
 GAME( 1989, streetsmwbl, streetsm, searchar, streetsj, searchar_state, empty_init, ROT0,  "bootleg", "Street Smart (bootleg of World version 1)",                  MACHINE_SUPPORTS_SAVE )
+
 GAME( 1989, ikari3,      0,        searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK",     "Ikari III - The Rescue (World version 1, 8-Way Joystick)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ikari3w,     ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK",     "Ikari III - The Rescue (World, Rotary Joystick)",            MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ikari3u,     ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK",     "Ikari III - The Rescue (US, Rotary Joystick, set 1)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ikari3ua,    ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK",     "Ikari III - The Rescue (US, Rotary Joystick, set 2)",        MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ikari3j,     ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK",     "Ikari Three (Japan, Rotary Joystick)",                       MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ikari3k,     ikari3,   searchar, ikari3,   searchar_state, empty_init, ROT0,  "SNK",     "Ikari Three (Korea, 8-Way Joystick)",                        MACHINE_SUPPORTS_SAVE )
+
 GAME( 1989, searchar,    0,        searchar, searchar, searchar_state, empty_init, ROT90, "SNK",     "SAR - Search And Rescue (World)",                            MACHINE_SUPPORTS_SAVE )
 GAME( 1989, searcharu,   searchar, searchar, searchar, searchar_state, empty_init, ROT90, "SNK",     "SAR - Search And Rescue (US)",                               MACHINE_SUPPORTS_SAVE )
 GAME( 1989, searcharj,   searchar, searchar, searchar, searchar_state, empty_init, ROT90, "SNK",     "SAR - Search And Rescue (Japan version 3)",                  MACHINE_SUPPORTS_SAVE )
