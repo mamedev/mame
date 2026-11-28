@@ -3854,6 +3854,18 @@ Notes:
 
 ROM_START( ryukobou )
 	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "maj_v034j.u30", 0x000000, 0x80000, CRC(2ead9803) SHA1(159cc95df6cf409bd4c137de7ac876e5bc967c62) )
+
+	ROM_REGION( 0x280000, "igs011", 0 )
+	ROM_LOAD( "igs_m0201.u15", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
+	ROM_LOAD( "maj-j_cg.u8",   0x200000, 0x080000, CRC(3c8de5d1) SHA1(51e43bfe7b5157112ded9a34b7032f73b7ffad11) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "maj-j_sp.u39", 0x000000, 0x80000, CRC(82f670f3) SHA1(d10dd67e40aee0e1c4f4b2c1217ce0935cb86406) )
+ROM_END
+
+ROM_START( ryukobouv30 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "maj_v030j.u30", 0x000000, 0x80000, CRC(186f2b4e) SHA1(380a3d94722d9f5fa5ec206ed0af6dbb8dd81715) )
 
 	ROM_REGION( 0x280000, "igs011", 0 )
@@ -4215,7 +4227,8 @@ GAME( 1995, drgnwrldv10c,  drgnwrld, drgnwrld,        drgnwrldc, igs011_oki_stat
 GAME( 1995, lhb,           0,        lhb,             lhb,       igs011_oki_state, init_lhb,          ROT0, "IGS",                     "Long Hu Bang (China, V035C)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1995, lhbv33c,       lhb,      lhb,             lhb,       igs011_oki_state, init_lhbv33c,      ROT0, "IGS",                     "Long Hu Bang (China, V033C)",                      MACHINE_SUPPORTS_SAVE )
 GAME( 1995, dbc,           lhb,      lhb,             lhb,       igs011_oki_state, init_dbc,          ROT0, "IGS",                     "Daai Baan Sing (Hong Kong, V027H)",                MACHINE_SUPPORTS_SAVE )
-GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_oki_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ryukobou,      lhb,      lhb,             lhb,       igs011_oki_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V034J)",                  MACHINE_SUPPORTS_SAVE )
+GAME( 1995, ryukobouv30,   lhb,      lhb,             lhb,       igs011_oki_state, init_ryukobou,     ROT0, "IGS / Alta",              "Mahjong Ryukobou (Japan, V030J)",                  MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2,          0,        lhb2,            lhb2,      igs011_oki_state, init_lhb2,         ROT0, "IGS",                     "Lung Fu Bong II (Hong Kong, V185H)",               MACHINE_SUPPORTS_SAVE )
 GAME( 1996, lhb2cpgs,      lhb2,     lhb2cpgs,        lhb2cpgs,  igs011_oki_state, init_lhb2cpgs,     ROT0, "IGS",                     "Long Hu Bang II: Cuo Pai Gaoshou (China, V127C)",  MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
 GAME( 1996, tygn,          lhb2,     tygn,            tygn,      igs011_serial_state, init_tygn,      ROT0, "IGS",                     "Te Yi Gong Neng (China, V632C)",                   MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
