@@ -971,14 +971,25 @@ void netmerc_state::machine_reset()
 {
 	model1_state::machine_reset();
 
-	// Initial HMD (VR glasses) pose: camera orientation vector
-	// 12868 ≈ 90°, 25736 ≈ 180° — points the camera forward
+	// Fixed position and neutral orientation while the Polhemus board is unemulated.
 	constexpr int16_t pose[6] = {0, 0, 0, 12868, 25736, 12868};
 	for (int i = 0; i < 6; i++)
 	{
 		m_dpram->left_w(0x80 + i * 2, pose[i] & 0xff);
 		m_dpram->left_w(0x81 + i * 2, (pose[i] >> 8) & 0xff);
 	}
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(netmerc_state::update_hmd)
+{
+	// The game converts 25736 units to 180 degrees.  Limit each axis to
+	// approximately 35 degrees around the neutral orientation.
+	const int yaw = 12868 + (int(m_hmd_yaw->read()) - 0x80) * 5000 / 128;
+	const int pitch = 12868 + (int(m_hmd_pitch->read()) - 0x80) * 5000 / 128;
+	m_dpram->left_w(0x86, yaw & 0xff);
+	m_dpram->left_w(0x87, (yaw >> 8) & 0xff);
+	m_dpram->left_w(0x8a, pitch & 0xff);
+	m_dpram->left_w(0x8b, (pitch >> 8) & 0xff);
 }
 
 
@@ -1255,6 +1266,12 @@ static INPUT_PORTS_START( netmerc )
 
 	PORT_START("STICKY")
 	PORT_BIT( 0xff, 0x7f, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
+
+	PORT_START("HMD_YAW")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_NAME("HMD Look Left/Right") PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_CENTERDELTA(4) PORT_CODE(JOYCODE_Z) PORT_CODE_DEC(KEYCODE_J) PORT_CODE_INC(KEYCODE_L)
+
+	PORT_START("HMD_PITCH")
+	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_NAME("HMD Look Up/Down") PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_CENTERDELTA(4) PORT_CODE(JOYCODE_W) PORT_CODE_DEC(KEYCODE_I) PORT_CODE_INC(KEYCODE_K)
 
 	PORT_INCLUDE(ioboard_dipswitches)
 INPUT_PORTS_END
@@ -1782,7 +1799,8 @@ ROM_START( netmerc )
 	ROM_RELOAD( 0x80000, 0x20000) // ?
 
 	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
-	ROM_LOAD( "mpr-18134.ic32", 0x000000, 0x200000, BAD_DUMP CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) )
+	
+	ROM_LOAD( "mpr-18134.ic32", 0x000000, 0x200000, BAD_DUMP CRC(9a4109e5) SHA1(ba59caac5f5a80fc52c507d8a47f322a380aa9a1) ) /* IC32 is zeroed out. Bad dump? */
 	ROM_LOAD( "mpr-18135.ic33", 0x200000, 0x200000, CRC(291d17e4) SHA1(7465d5bde9ece5112932efa58b3c1c07f2b11543) )
 
 	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
@@ -1974,6 +1992,8 @@ void model1_state::polhemus_map(address_map &map)
 void netmerc_state::netmerc(machine_config &config)
 {
 	model1(config);
+	TIMER(config, "hmd_timer").configure_scanline(FUNC(netmerc_state::update_hmd), "screen", 0, 0);
+
 	i386sx_device &polhemus(I386SX(config, "polhemus", 16000000));
 	polhemus.set_addrmap(AS_PROGRAM, &netmerc_state::polhemus_map);
 
@@ -2006,4 +2026,4 @@ GAME( 1994, wingwar,    0,       wingwar,    wingwar,    model1_state,  empty_in
 GAME( 1994, wingwaru,   wingwar, wingwar,    wingwar,    model1_state,  empty_init, ROT0,     "Sega",  "Wing War (US)",            0 )
 GAME( 1994, wingwarj,   wingwar, wingwar,    wingwar,    model1_state,  empty_init, ROT0,     "Sega",  "Wing War (Japan)",         0 )
 GAME( 1994, wingwar360, wingwar, wingwar360, wingwar360, model1_state,  empty_init, ROT0,     "Sega",  "Wing War R360 (US)",       0 )
-GAME( 1993, netmerc,    0,       netmerc,    netmerc,    netmerc_state, empty_init, ROT0,     "Sega",  "Sega NetMerc",             MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       netmerc,    netmerc,    netmerc_state, empty_init, ROT0,     "Sega/Virtuality",  "Sega NetMerc",  MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_CONTROLS )
