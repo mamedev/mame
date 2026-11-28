@@ -9,6 +9,8 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "ui/uimain.h"
+
 #include "debugger.h"
 
 //**************************************************************************
@@ -290,6 +292,8 @@ device_scheduler::device_scheduler(running_machine &machine) :
 	m_callback_timer_modified(false),
 	m_callback_timer_expire_time(attotime::zero),
 	m_suspend_changes_pending(true),
+	m_ui_yield(false),
+	m_ui_last_service_ticks(osd_ticks()),
 	m_quantum_minimum(ATTOSECONDS_IN_NSEC(1) / 1000)
 {
 	// append a single never-expiring timer so there is always one in the list
@@ -402,11 +406,30 @@ void device_scheduler::timeslice()
 	while (m_basetime >= m_quantum_list.first()->m_expire)
 		m_quantum_allocator.reclaim(m_quantum_list.detach_head());
 
+	// yield to host-rate UI service when a frame runs behind real time; the
+	// quantum cap keeps a CPU from executing a whole frame between wall-clock
+	// checks, and 1/60 keeps pump presents from outrunning vsync
+	bool const ui_interleave(machine().ui().wants_ui_interleave());
+	attotime const ui_quantum(attotime(0, ATTOSECONDS_IN_MSEC(1)));
+	osd_ticks_t const yield_ticks(osd_ticks_per_second() / 60);
+	m_ui_yield = false;
+
 	// loop until we hit the next timer
 	while (m_basetime < m_timer_list->m_expire)
 	{
+		// the stamp is renewed by frame updates and pumps, not per call, since
+		// timer-dense machines slice one frame across many timeslice() calls
+		if (ui_interleave && (osd_ticks() - m_ui_last_service_ticks >= yield_ticks))
+		{
+			m_ui_yield = true;
+			return;
+		}
+
 		// by default, assume our target is the end of the next quantum
 		attotime target(m_basetime + attotime(0, m_quantum_list.first()->m_actual));
+
+		if (ui_interleave && (target - m_basetime > ui_quantum))
+			target = m_basetime + ui_quantum;
 
 		// however, if the next timer is going to fire before then, override
 		if (m_timer_list->m_expire < target)

@@ -374,6 +374,18 @@ void mame_ui_manager::update_target_font_height()
 
 void mame_ui_manager::frame_update()
 {
+	update_ui_input();
+	m_last_frame_update = osd_ticks();
+}
+
+
+//-------------------------------------------------
+//  update_ui_input - process queued UI input events
+//  and refresh pointer state
+//-------------------------------------------------
+
+void mame_ui_manager::update_ui_input()
+{
 	// this hackery is needed to ensure natural keyboard and clickable artwork input is in sync with I/O ports
 	if (ui_callback_type::GENERAL == m_handler_callback_type)
 	{
@@ -384,8 +396,6 @@ void mame_ui_manager::frame_update()
 				target->update_pointer_fields();
 		}
 	}
-
-	m_last_frame_update = osd_ticks();
 }
 
 
@@ -1406,9 +1416,33 @@ void mame_ui_manager::activate_menu()
 //  UI handler is active
 //-------------------------------------------------
 
-bool mame_ui_manager::is_menu_active()
+bool mame_ui_manager::is_menu_active() const
 {
 	return m_handler_callback_type == ui_callback_type::MENU;
+}
+
+
+//-------------------------------------------------
+//  wants_ui_interleave - return true if the UI
+//  should be serviced between emulated frames
+//-------------------------------------------------
+
+bool mame_ui_manager::wants_ui_interleave() const
+{
+	return is_menu_active() || (machine().ui_input().peek_event_type() != ui_event::type::NONE);
+}
+
+
+//-------------------------------------------------
+//  ui_interleave_update - service UI input and
+//  redraw while emulation is running behind real
+//  time; returns true if anything changed
+//-------------------------------------------------
+
+bool mame_ui_manager::ui_interleave_update()
+{
+	update_ui_input();
+	return update_and_render(machine().render().ui_target());
 }
 
 

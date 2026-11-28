@@ -437,7 +437,12 @@ int running_machine::run(bool quiet)
 
 			// execute CPUs if not paused
 			if (!m_paused)
+			{
 				m_scheduler.timeslice();
+
+				if (m_scheduler.ui_yield_pending())
+					m_video->ui_yield_update();
+			}
 			// otherwise, just pump video updates and sound mapping updates through
 			else
 			{

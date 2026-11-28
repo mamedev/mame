@@ -114,6 +114,8 @@ public:
 
 	// execution
 	void timeslice();
+	bool ui_yield_pending() const noexcept { return m_ui_yield; }
+	void mark_ui_serviced() noexcept { m_ui_last_service_ticks = osd_ticks(); }
 	void abort_timeslice() noexcept;
 	void trigger(int trigid, const attotime &after = attotime::zero);
 	void add_quantum(const attotime &quantum, const attotime &duration);
@@ -164,6 +166,8 @@ private:
 	bool                        m_callback_timer_modified;  // true if the current callback timer was modified
 	attotime                    m_callback_timer_expire_time; // the original expiration time
 	bool                        m_suspend_changes_pending;  // suspend/resume changes are pending
+	bool                        m_ui_yield;                 // yielded the current timeslice to UI service
+	osd_ticks_t                 m_ui_last_service_ticks;    // wall time the UI was last serviced
 
 	// scheduling quanta
 	class quantum_slot

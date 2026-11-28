@@ -67,6 +67,9 @@ public:
 	// render a frame
 	void frame_update(bool from_debugger = false);
 
+	// service host input and present UI updates between emulated frames
+	void ui_yield_update();
+
 	// current speed helpers
 	std::string speed_text();
 	double speed_percent() const { return m_speed_percent; }
