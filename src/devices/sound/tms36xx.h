@@ -20,30 +20,14 @@ public:
 	enum class subtype
 	{
 		MM6221AA    = 21,     // Phoenix (fixed melodies)
+		MN6221AB    = 22,     // Phoenix (alternate fixed melodies)
 		TMS3615     = 15,     // Naughty Boy, Pleiads (13 notes, one output)
 		TMS3617     = 17      // Monster Bash (13 notes, six outputs)
 	};
 
 	tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_subtype(subtype type)
-	{
-		switch (type)
-		{
-		case subtype::MM6221AA:
-			m_subtype = "MM6221AA";
-			break;
-		case subtype::TMS3615:
-			m_subtype = "TMS3615";
-			break;
-		case subtype::TMS3617:
-			m_subtype = "TMS3617";
-			break;
-		default:
-			fatalerror("Invalid TMS36XX type: %d\n", int(type));
-			break;
-		}
-	}
+	void set_subtype(subtype type);
 	void set_tune_speed(double speed) { m_speed = (speed > 0) ? TMS36XX_VMAX / speed : TMS36XX_VMAX; }
 	void set_decays(double decay_0, double decay_1, double decay_2, double decay_3, double decay_4, double decay_5)
 	{
@@ -66,7 +50,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream) override;
 
 public:
-	// MM6221AA interface functions
+	// MN6221 melody selection (legacy handler name)
 	void mm6221aa_tune_w(int tune);
 
 	// TMS3615/17 interface functions
@@ -76,12 +60,14 @@ public:
 	void tms3617_enable_w(int enable);
 
 private:
+	void advance_tune(const int *notes);
 	void tms36xx_reset_counters();
 	void tms3617_enable(int enable);
 
 	double m_decay_time[6];  // decay times for the six harmonic notes
 
-	const char *m_subtype;      // subtype name MM6221AA, TMS3615 or TMS3617
+	subtype m_subtype;
+	const char *m_subtype_name;
 	sound_stream *m_channel; // returned by stream_create()
 
 	int m_samplerate;     // output sample rate
