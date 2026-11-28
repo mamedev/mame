@@ -273,6 +273,7 @@
 
 #include "emu.h"
 
+#include "midway_shifter.h"
 #include "midwayic.h"
 
 #include "dcs.h"
@@ -330,6 +331,7 @@ public:
 		m_ethernet(*this, "ethernet"),
 		m_dcs(*this, "dcs"),
 		m_ioasic(*this, "ioasic"),
+		m_shifter(*this, "shifter"),
 		m_uart1(*this, "uart1"),
 		m_uart2(*this, "uart2"),
 		m_io_analog(*this, "AN.%u", 0U),
@@ -337,7 +339,6 @@ public:
 		m_io_49way_x(*this, "49WAYX_P%u", 1U),
 		m_io_49way_y(*this, "49WAYY_P%u", 1U),
 		m_io_keypad(*this, "KEYPAD"),
-		m_io_gearshift(*this, "GEAR"),
 		m_io_system(*this, "SYSTEM"),
 		m_io_dips(*this, "DIPS"),
 		m_system_led(*this, "system_led"),
@@ -375,7 +376,6 @@ public:
 	ioport_value gauntleg_p12_r();
 	ioport_value gauntleg_p34_r();
 	ioport_value keypad_r();
-	ioport_value gearshift_r();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -398,6 +398,7 @@ private:
 	required_device<smc91c94_device> m_ethernet;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
+	optional_device<midway_shifter_device> m_shifter;
 	optional_device<ns16550_device> m_uart1;
 	optional_device<ns16550_device> m_uart2;
 
@@ -408,7 +409,6 @@ private:
 	optional_ioport_array<4> m_io_49way_y;
 
 	optional_ioport m_io_keypad;
-	optional_ioport m_io_gearshift;
 	optional_ioport m_io_system;
 	optional_ioport m_io_dips;
 	output_finder<> m_system_led;
@@ -433,7 +433,6 @@ private:
 	uint8_t m_dcs_idma_cs = 0;
 	uint32_t m_i40_data = 0;
 	uint32_t m_keypad_select = 0;
-	uint32_t m_gear = 0;
 
 	void duart_irq_cb(int state);
 	void vblank_assert(int state);
@@ -504,7 +503,6 @@ void vegas_state::machine_start()
 	save_item(NAME(m_cmos_unlocked));
 	save_item(NAME(m_i40_data));
 	save_item(NAME(m_keypad_select));
-	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
 
 	/* identify our sound board */
@@ -538,7 +536,6 @@ void vegas_state::machine_reset()
 	m_duart_irq_state = 0;
 	m_i40_data = 0;
 	m_keypad_select = 0;
-	m_gear = 1;
 	m_wheel_force = 0;
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
@@ -1190,22 +1187,6 @@ ioport_value vegas_state::keypad_r()
 }
 
 /*************************************
-*
-*  Gearshift
-*
-*************************************/
-ioport_value vegas_state::gearshift_r()
-{
-	// Check for gear change and save gear selection
-	uint32_t gear = m_io_gearshift->read();
-	for (int i = 0; i < 4; i++) {
-		if (gear & (1 << i))
-			m_gear = 1 << i;
-	}
-	return m_gear;
-}
-
-/*************************************
  *
  * Common Input ports
  *
@@ -1685,14 +1666,19 @@ static INPUT_PORTS_START( sf2049 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("View 3")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Music")
 	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(vegas_state::keypad_r))
-	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(vegas_state::gearshift_r))
+	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_DEVICE_MEMBER("shifter", FUNC(midway_shifter_device::gears_r))
 	PORT_BIT( 0xf080, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_INCLUDE( midway_shifter )
+
 	PORT_START("GEAR")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear")
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2nd Gear")
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("3rd Gear")
-	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("4th Gear")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2nd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("3rd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("4th Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 4)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Neutral Gear") PORT_CONDITION("CONF", 0x07, EQUALS, 0x01) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Shift Down") PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Shift Up") PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 1)
 
 	PORT_START("KEYPAD")
 	PORT_BIT(0x0200, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CHAR(UCHAR_MAMEKEY(1_PAD)) PORT_CODE(KEYCODE_1_PAD)
@@ -1781,14 +1767,19 @@ static INPUT_PORTS_START( cartfury )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("View 2")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("View 3")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Boost")
-	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(vegas_state::gearshift_r))
+	PORT_BIT( 0x0f00, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_DEVICE_MEMBER("shifter", FUNC(midway_shifter_device::gears_r))
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED)
 
+	PORT_INCLUDE( midway_shifter )
+
 	PORT_START("GEAR")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear")
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2nd Gear")
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("3rd Gear")
-	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("4th Gear")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2nd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("3rd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("4th Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 4)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("Neutral Gear") PORT_CONDITION("CONF", 0x07, EQUALS, 0x01) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Shift Down") PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Shift Up") PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 1)
 
 	PORT_MODIFY("AN.0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering") PORT_MINMAX(0x10, 0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
@@ -2237,6 +2228,8 @@ void vegas_state::sf2049(machine_config &config)
 {
 	denver(config);
 
+	MIDWAY_SHIFTER(config, m_shifter).set_initial_gear(1);
+
 	SPEAKER(config, "speaker", 5).front().headrest_left(2).headrest_right(3).backrest(4);
 
 	DCS2_AUDIO_DENVER_5CH(config, m_dcs);
@@ -2266,6 +2259,8 @@ void vegas_state::sf2049(machine_config &config)
 void vegas_state::sf2049se(machine_config &config)
 {
 	denver(config);
+
+	MIDWAY_SHIFTER(config, m_shifter).set_initial_gear(1);
 
 	SPEAKER(config, "speaker", 5).front().headrest_left(2).headrest_right(3).backrest(4);
 
@@ -2297,6 +2292,8 @@ void vegas_state::sf2049te(machine_config &config)
 {
 	denver(config);
 
+	MIDWAY_SHIFTER(config, m_shifter).set_initial_gear(1);
+
 	SPEAKER(config, "speaker", 5).front().headrest_left(2).headrest_right(3).backrest(4);
 
 	DCS2_AUDIO_DENVER_5CH(config, m_dcs);
@@ -2326,6 +2323,8 @@ void vegas_state::sf2049te(machine_config &config)
 void vegas_state::cartfury(machine_config &config)
 {
 	vegasv3(config);
+
+	MIDWAY_SHIFTER(config, m_shifter).set_initial_gear(1);
 
 	SPEAKER(config, "speaker", 2).front();
 

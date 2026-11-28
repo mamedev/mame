@@ -186,6 +186,7 @@
 
 #include "emu.h"
 
+#include "midway_shifter.h"
 #include "midwayic.h"
 
 #include "cage.h"
@@ -279,6 +280,7 @@ public:
 		m_screen(*this, "screen"),
 		m_ethernet(*this, "ethernet"),
 		m_ioasic(*this, "ioasic"),
+		m_shifter(*this, "shifter"),
 		m_io_analog(*this, "AN%u", 0U),
 		m_io_p4_8way(*this, "8WAY_P4"),
 		m_io_49way_x(*this, "49WAYX_P%u", 1U),
@@ -286,7 +288,6 @@ public:
 		m_io_gun_x(*this, "LIGHT%u_X", 0U),
 		m_io_gun_y(*this, "LIGHT%u_Y", 0U),
 		m_io_fake(*this, "FAKE"),
-		m_io_gearshift(*this, "GEAR"),
 		m_io_system(*this, "SYSTEM"),
 		m_io_dips(*this, "DIPS"),
 		m_wheel_driver(*this, "wheel"),
@@ -325,7 +326,6 @@ public:
 
 	ioport_value blitz_49way_r();
 	ioport_value i40_r();
-	ioport_value gearshift_r();
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
@@ -349,6 +349,7 @@ private:
 	required_device<screen_device> m_screen;
 	optional_device<smc91c94_device> m_ethernet;
 	required_device<midway_ioasic_device> m_ioasic;
+	optional_device<midway_shifter_device> m_shifter;
 	optional_ioport_array<8> m_io_analog;
 	optional_ioport m_io_p4_8way;
 	optional_ioport_array<4> m_io_49way_x;
@@ -356,7 +357,6 @@ private:
 	optional_ioport_array<2> m_io_gun_x;
 	optional_ioport_array<2> m_io_gun_y;
 	optional_ioport m_io_fake;
-	optional_ioport m_io_gearshift;
 	optional_ioport m_io_system;
 	optional_ioport m_io_dips;
 	output_finder<> m_wheel_driver;
@@ -392,7 +392,6 @@ private:
 	uint16_t m_output_last = 0;
 	uint8_t m_output_mode = 0;
 	uint32_t m_i40_data = 0;
-	uint32_t m_gear = 0;
 	int8_t m_wheel_force = 0;
 	int m_wheel_offset = 0;
 	bool m_wheel_calibrated = false;
@@ -482,7 +481,6 @@ void seattle_state::machine_start()
 	save_item(NAME(m_output_last));
 	save_item(NAME(m_output_mode));
 	save_item(NAME(m_i40_data));
-	save_item(NAME(m_gear));
 	save_item(NAME(m_wheel_calibrated));
 }
 
@@ -493,7 +491,6 @@ void seattle_state::machine_reset()
 	m_vblank_irq_num = 0;
 	m_interrupt_config = 0;
 	m_interrupt_enable = 0;
-	m_gear = 1;
 	m_wheel_force = 0;
 	m_wheel_offset = 0;
 	m_wheel_calibrated = false;
@@ -826,23 +823,6 @@ ioport_value seattle_state::i40_r()
 		//m_i40_data &= ~0x1000;
 		return data;
 	}
-}
-
-/*************************************
-*
-*  Gearshift (calspeed)
-*
-*************************************/
-ioport_value seattle_state::gearshift_r()
-{
-	// Check for gear change and save gear selection
-	uint32_t gear = m_io_gearshift->read();
-	for (int i = 0; i < 4; i++)
-	{
-		if (gear & (1 << i))
-			m_gear = 1 << i;
-	}
-	return m_gear;
 }
 
 /*************************************
@@ -1492,16 +1472,20 @@ static INPUT_PORTS_START( sfrush )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Track 2")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("Track 3")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_NAME("Track 4")
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(seattle_state::gearshift_r))
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_CUSTOM) PORT_CUSTOM_DEVICE_MEMBER("shifter", FUNC(midway_shifter_device::gears_r))
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_VOLUME_UP )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_INCLUDE( midway_shifter )
+
 	PORT_START("GEAR")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear")
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2nd Gear")
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("3rd Gear")
-	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("4th Gear")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1st Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2nd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("3rd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("4th Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 4)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Shift Down") PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Shift Up") PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 1)
 
 	PORT_MODIFY("AN4")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_NAME("Accel") PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
@@ -1554,13 +1538,18 @@ static INPUT_PORTS_START( calspeed )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("View 2") // tailgate cam
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("View 3") // sky cam
 	PORT_BIT( 0x0f80, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_MEMBER(FUNC(seattle_state::gearshift_r))
+	PORT_BIT( 0xf000, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_CUSTOM_DEVICE_MEMBER("shifter", FUNC(midway_shifter_device::gears_r))
+
+	PORT_INCLUDE( midway_shifter )
 
 	PORT_START("GEAR")
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1st Gear")
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2nd Gear")
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("3rd Gear")
-	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("4th Gear")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1st Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2nd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("3rd Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("4th Gear") PORT_CONDITION("CONF", 0x04, EQUALS, 0x00) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 4)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Neutral Gear") PORT_CONDITION("CONF", 0x07, EQUALS, 0x01) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::gear_button), 0)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Shift Down") PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Shift Up") PORT_CONDITION("CONF", 0x04, EQUALS, 0x04) PORT_CHANGED_MEMBER("shifter", FUNC(midway_shifter_device::shift_button), 1)
 
 	PORT_MODIFY("AN0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_NAME("Steering") PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
@@ -2166,6 +2155,8 @@ void seattle_state::sfrush(machine_config &config)
 {
 	flagstaff(config);
 
+	MIDWAY_SHIFTER(config, m_shifter).set_initial_gear(1);
+
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
 	SPEAKER(config, "speaker", 4).corners();
 	//SPEAKER(config, "subwoofer").lfe(); Not implemented, Quad Amp PCB output;
@@ -2195,6 +2186,8 @@ void seattle_state::sfrush(machine_config &config)
 void seattle_state::sfrushrk(machine_config &config)
 {
 	flagstaff(config);
+
+	MIDWAY_SHIFTER(config, m_shifter).set_initial_gear(1);
 
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
 	SPEAKER(config, "speaker", 4).corners();
@@ -2231,6 +2224,8 @@ void seattle_state::sfrushrkw(machine_config &config)
 void seattle_state::calspeed(machine_config &config)
 {
 	seattle150_widget(config);
+
+	MIDWAY_SHIFTER(config, m_shifter).set_initial_gear(1);
 
 	SPEAKER(config, "speaker", 2).front();
 
