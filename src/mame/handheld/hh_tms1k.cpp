@@ -240,6 +240,7 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "cpu/tms1000/tms2400.h"
 #include "cpu/tms1000/tms0970.h"
 #include "cpu/tms1000/tms0980.h"
+#include "imagedev/snapquik.h"
 #include "machine/clock.h"
 #include "machine/netlist.h"
 #include "machine/nvram.h"
@@ -261,6 +262,8 @@ on Joerg Woerner's datamath.org: http://www.datamath.org/IC_List.htm
 #include "screen.h"
 #include "screen_svg.h"
 #include "speaker.h"
+
+#include "corestr.h"
 
 #include <bit>
 
@@ -1502,6 +1505,12 @@ ROM_END
   to Custom, it'll then read from IN.9. Outputs are sent to output tag "7.x" where
   x = 0-3, no matter how the output port is configured.
 
+  Programs can be quickloaded as .MIC files, the text format of the Busch 2090
+  software archive (github.com/lambdamikel/Busch-2090/tree/master/software):
+  '#' or ';' starts a comment that runs to the end of the line, "@ hh" sets the
+  address, and every 3-digit hex word is one instruction. Start the program as
+  usual, eg. with HALT, NEXT, 0, 0, RUN.
+
 *******************************************************************************/
 
 class mt2090_state : public hh_tms1k_state
@@ -1531,6 +1540,8 @@ private:
 	void write_o(u16 data);
 	u8 input_port();
 	u8 read_k();
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER(quickload_cb);
 };
 
 void mt2090_state::machine_start()
@@ -1651,6 +1662,104 @@ u8 mt2090_state::read_k()
 	// read buttons
 	else
 		return read_inputs(6);
+}
+
+QUICKLOAD_LOAD_MEMBER(mt2090_state::quickload_cb)
+{
+	if (image.length() > 0x10000)
+		return std::make_pair(image_error::INVALIDLENGTH, std::string());
+
+	std::string text(image.length(), '\0');
+	if (image.fread(text.data(), text.size()) != text.size())
+		return std::make_pair(image_error::UNSPECIFIED, std::string());
+
+	auto hex_digit = [] (char c) -> int
+	{
+		if (c >= '0' && c <= '9') return c - '0';
+		if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+		if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+		return -1;
+	};
+	auto hex_value = [&hex_digit] (std::string_view s) -> int
+	{
+		int value = 0;
+		for (char c : s)
+		{
+			const int digit = hex_digit(c);
+			if (digit < 0)
+				return -1;
+			value = value << 4 | digit;
+		}
+		return value;
+	};
+	auto is_space = [] (char c) { return c == ' ' || c == '\t' || c == '\r' || c == '\v' || c == '\f'; };
+
+	std::vector<std::pair<u8, u16> > program;
+	int address = 0;
+	std::string_view rest(text);
+
+	while (!rest.empty())
+	{
+		// one line, without its comment
+		const size_t eol = rest.find('\n');
+		std::string_view line = rest.substr(0, eol);
+		rest = (eol == std::string_view::npos) ? std::string_view() : rest.substr(eol + 1);
+		line = strtrimspace(line.substr(0, line.find_first_of("#;")));
+		if (line.empty())
+			continue;
+
+		// "@ hh" sets the address
+		if (line[0] == '@')
+		{
+			const std::string_view arg = strtrimspace(line.substr(1));
+			const int value = (arg.size() >= 1 && arg.size() <= 2) ? hex_value(arg) : -1;
+			if (value < 0)
+				return std::make_pair(image_error::INVALIDIMAGE, util::string_format("Cannot read \"%s\" as an address", line));
+			address = value;
+			continue;
+		}
+
+		// 3-digit words, separated by spaces or commas
+		while (!line.empty())
+		{
+			size_t start = 0;
+			while (start < line.size() && (is_space(line[start]) || line[start] == ','))
+				start++;
+			size_t end = start;
+			while (end < line.size() && !is_space(line[end]) && line[end] != ',')
+				end++;
+
+			const std::string_view token = line.substr(start, end - start);
+			line = line.substr(end);
+			if (token.empty())
+				continue;
+
+			const int word = (token.size() == 3) ? hex_value(token) : -1;
+			if (word < 0)
+				return std::make_pair(image_error::INVALIDIMAGE, util::string_format("Cannot read \"%s\" as an instruction", token));
+			if (address > 0xff)
+				return std::make_pair(image_error::INVALIDIMAGE, "Program is longer than 256 instructions");
+			program.emplace_back(address++, word);
+		}
+	}
+
+	if (program.empty())
+		return std::make_pair(image_error::INVALIDIMAGE, "No instructions found");
+
+	// write to the 2114: the 3 nibbles of a step go to R5,R4 = 0,0 / 1,0 / 0,1, the data is inverted
+	auto write_word = [this] (u8 step, u16 word)
+	{
+		m_ram[0x000 | step] = ~word >> 8 & 0xf;
+		m_ram[0x200 | step] = ~word >> 4 & 0xf;
+		m_ram[0x100 | step] = ~word & 0xf;
+	};
+
+	for (int step = 0; step < 0x100; step++)
+		write_word(step, 0);
+	for (const auto &[step, word] : program)
+		write_word(step, word);
+
+	return std::make_pair(std::error_condition(), std::string());
 }
 
 // inputs
@@ -1781,7 +1890,7 @@ static const u16 mt2090_output_pla[0x20] =
 	0x0, 0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf,
 
 	// 7segs (digit b has DP segment)
-	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x77, 0xfc, 0x39, 0x5e, 0x79, 0x71
+	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0x77, 0xfc, 0x39, 0x5e, 0x79, 0x71
 };
 
 void mt2090_state::mt2090(machine_config &config)
@@ -1795,6 +1904,8 @@ void mt2090_state::mt2090(machine_config &config)
 
 	CLOCK(config, m_1hz, 32.768_kHz_XTAL / 0x8000);
 	m_1hz->signal_handler().set([this] (int state) { update_display(); });
+
+	QUICKLOAD(config, "quickload", "mic").set_load_callback(FUNC(mt2090_state::quickload_cb));
 
 	// video hardware
 	PWM_DISPLAY(config, m_display).set_size(8, 8);
