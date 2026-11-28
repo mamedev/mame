@@ -60,6 +60,7 @@ protected:
 	u32 m_codec_status, m_last_codec_control;
 	u8 m_counter;
 	u32 m_audio_control;
+	u32 m_frame_count;
 };
 
 // device type definition
