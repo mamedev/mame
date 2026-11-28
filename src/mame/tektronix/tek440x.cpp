@@ -496,14 +496,14 @@ u16 tek440x_state::memory_r(offs_t offset, u16 mem_mask)
 
 	if ((m_maincpu->get_fc() & 4) == 0)             // User mode access updates map_control from write latch
 	{
-			if ((m_latched_map_control & 0x1f) != (m_map_control & 0x1f))
+			if ((m_latched_map_control & 0x3f) != (m_map_control & 0x3f))
 			{
 				LOGMASKED(LOG_MMU,"memory_r: m_map_control updated 0x%04x\n", m_latched_map_control);
 			}
 			if (!machine().side_effects_disabled())
 			{
-				m_map_control &= ~0x1f;
-				m_map_control |= (m_latched_map_control & 0x1f);
+				m_map_control &= ~0x3f;
+				m_map_control |= (m_latched_map_control & 0x3f);
 			}
 	}
 
@@ -739,7 +739,7 @@ void tek440x_state::mapcntl_w(u8 data)
 	// copied on user mode read/write
 	m_latched_map_control = data & 0x3f;
 
-	if ((m_map_control  & 0x1f) != (m_latched_map_control & 0x1f))
+	if ((m_map_control & 0x1f) != (m_latched_map_control & 0x1f))
 	{
 		LOGMASKED(LOG_MMU, "mapcntl_w(%02x) ", m_latched_map_control);
 		if (BIT(m_latched_map_control, MAP_SYS_WR_ENABLE) != BIT(m_map_control, MAP_SYS_WR_ENABLE))
