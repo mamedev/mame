@@ -12,5 +12,6 @@
 #pragma once
 
 void kim1_cards(device_slot_interface &device) ATTR_COLD;
+void aim65_cards(device_slot_interface &device) ATTR_COLD;
 
 #endif // MAME_BUS_KIM1_CARDS_H
