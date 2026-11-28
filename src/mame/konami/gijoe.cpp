@@ -543,8 +543,9 @@ void gijoe_state::gijoe(machine_config &config)
 
 	k054539_device &k054539(K054539(config, "k054539", 18.432_MHz_XTAL));
 	k054539.timer_handler().set_inputline("audiocpu", INPUT_LINE_NMI);
-	k054539.add_route(0, "speaker", 1.0, 1);
-	k054539.add_route(1, "speaker", 1.0, 0);
+	// the gains include +8.6 dB for the 054539 global volumes the game sets
+	k054539.add_route(0, "speaker", 2.7, 1);
+	k054539.add_route(1, "speaker", 2.7, 0);
 }
 
 

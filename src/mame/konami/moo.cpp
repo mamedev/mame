@@ -213,6 +213,7 @@ public:
 		moo_base_state(mconfig, type, tag),
 		m_soundcpu(*this, "soundcpu"),
 		m_k054539(*this, "k054539"),
+		m_ymsnd(*this, "ymsnd"),
 		m_k053252(*this, "k053252"),
 		m_k054321(*this, "k054321"),
 		m_soundbank(*this, "soundbank"),
@@ -230,6 +231,7 @@ private:
 	/* devices */
 	required_device<cpu_device> m_soundcpu;
 	required_device<k054539_device> m_k054539;
+	required_device<ym2151_device> m_ymsnd;
 	required_device<k053252_device> m_k053252;
 	required_device<k054321_device> m_k054321;
 
@@ -240,6 +242,7 @@ private:
 
 	void sound_irq_w(uint16_t data);
 	void sound_bankswitch_w(uint8_t data);
+	K054539_AUX_GAIN_CB_MEMBER(ym_aux_gain);
 	void moo_prot_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	DECLARE_VIDEO_START(bucky);
 	INTERRUPT_GEN_MEMBER(moo_interrupt);
@@ -766,6 +769,14 @@ void moo_prot_state::machine_reset()
 		m_protram[i] = 0;
 }
 
+// The YM2151 feeds the 054539's auxiliary input (SO, SH1 and SH2 into the 054539 on the board), so it follows the
+// global volume that input selects. As on Xexex, its right output is taken as input 0; the game selects the same
+// global volume for both inputs.
+K054539_AUX_GAIN_CB_MEMBER(moo_prot_state::ym_aux_gain)
+{
+	m_ymsnd->set_output_gain(input ^ 1, gain);
+}
+
 void moo_prot_state::moo(machine_config &config)
 {
 	/* basic machine hardware */
@@ -816,12 +827,14 @@ void moo_prot_state::moo(machine_config &config)
 	K054321(config, m_k054321, "speaker");
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", 32_MHz_XTAL / 8)); // 4MHz verified
-	ymsnd.add_route(0, "speaker", 0.30, 0);
-	ymsnd.add_route(1, "speaker", 0.30, 1);
+	// the gains include +8.3 dB for the 054539 global volumes the games set, which the YM2151 also follows
+	ymsnd.add_route(0, "speaker", 0.78, 0);
+	ymsnd.add_route(1, "speaker", 0.78, 1);
 
 	K054539(config, m_k054539, XTAL(18'432'000));
-	m_k054539->add_route(0, "speaker", 0.50, 1);
-	m_k054539->add_route(1, "speaker", 0.50, 0);
+	m_k054539->set_aux_gain_callback(FUNC(moo_prot_state::ym_aux_gain));
+	m_k054539->add_route(0, "speaker", 1.30, 1);
+	m_k054539->add_route(1, "speaker", 1.30, 0);
 }
 
 void moobl_state::moobl(machine_config &config)

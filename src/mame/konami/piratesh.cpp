@@ -644,8 +644,9 @@ void piratesh_state::piratesh(machine_config &config)
 
 	K054539(config, m_k054539, XTAL(18'432'000));
 	m_k054539->timer_handler().set(FUNC(piratesh_state::k054539_nmi_gen));
-	m_k054539->add_route(0, "speaker", 0.2, 0);
-	m_k054539->add_route(1, "speaker", 0.2, 1);
+	// the gains include +3.8 dB for the 054539 global volumes the game sets
+	m_k054539->add_route(0, "speaker", 0.31, 0);
+	m_k054539->add_route(1, "speaker", 0.31, 1);
 }
 
 
