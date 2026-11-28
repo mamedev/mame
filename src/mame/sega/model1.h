@@ -388,6 +388,8 @@ class netmerc_state : public model1_state
 public:
 	netmerc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: model1_state(mconfig, type, tag)
+		, m_hmd_yaw(*this, "HMD_YAW")
+		, m_hmd_pitch(*this, "HMD_PITCH")
 	{
 	}
 
@@ -397,6 +399,10 @@ protected:
 	virtual void machine_reset() override ATTR_COLD;
 
 private:
+	required_ioport m_hmd_yaw;
+	required_ioport m_hmd_pitch;
+
+	TIMER_DEVICE_CALLBACK_MEMBER(update_hmd);
 	void netmerc_outputs_w(uint8_t data);
 };
 
