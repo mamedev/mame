@@ -17,6 +17,7 @@
 #include "rom.h"
 #include "segach.h"
 #include "sfteam.h"
+#include "sk.h"
 #include "sram.h"
 #include "smb.h"
 #include "smw64.h"
@@ -36,6 +37,7 @@ char const *const HB_SSF_EX             = "ssf_ex";
 char const *const HB_EVERDRIVE          = "everdrive";
 char const *const MD_SRAM               = "rom_sram";
 char const *const MD_SONIC3             = "rom_fram"; // TODO: change string
+char const *const MD_SK                 = "rom_sk";
 char const *const MD_TPLAY96            = "rom_tplay96";
 char const *const MD_HARDBALL95         = "rom_hardbl95";
 char const *const MD_BARKLEY2           = "barkley2";
@@ -110,6 +112,9 @@ void megadrive_cart_options(device_slot_interface &device)
 	// normal
 	device.option_add_internal(slotoptions::MD_STD,  MEGADRIVE_ROM);
 	device.option_add_internal(slotoptions::MD_SSF2, MEGADRIVE_ROM_SSF2);
+
+	// lock-on
+	device.option_add_internal(slotoptions::MD_SK, MEGADRIVE_ROM_SK);
 
 	// SRAM
 	device.option_add_internal(slotoptions::MD_SRAM,       MEGADRIVE_ROM_SRAM);
