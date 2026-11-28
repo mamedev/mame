@@ -168,6 +168,11 @@ static inline void apply_focus(model2_state::geo_state &geo, poly_vertex *p0)
 	p0->y *= geo.focus.y;
 }
 
+static inline float *select_geo_matrix(model2_state::geo_state &geo, const poly_vertex &p, bool palette_mode)
+{
+	return (palette_mode && (f2u(p.x) & 1)) ? geo.matrix2 : geo.matrix;
+}
+
 /* 1.8.23 float to 4.12 float converter, courtesy of Aaron Giles */
 inline u16 model2_state::float_to_zval(float floatval, s32 z_adjust)
 {
@@ -979,6 +984,7 @@ void model2_state::geo_init(memory_region &polygon_rom)
 
 	save_item(NAME(m_geo->mode));
 	save_item(NAME(m_geo->matrix));
+	save_item(NAME(m_geo->matrix2));
 	save_item(NAME(m_geo->mesh_begin));
 	save_item(NAME(m_geo->mesh_current));
 	save_item(NAME(m_geo->mesh_texture_start));
@@ -1303,7 +1309,7 @@ void model2_state::geo_parse_np_s(geo_state &geo, const u32 *input, u32 count)
 }
 
 /* Parse Polygons: No Normals, No Specular case */
-void model2_state::geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count)
+void model2_state::geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count, bool palette_mode)
 {
 	raster_state *raster = geo.raster;
 	poly_vertex point, normal, p0, p1, p2, p3;
@@ -1315,7 +1321,7 @@ void model2_state::geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo.matrix);
+	transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 	/* save for normal calculation */
 	p0.x = point.x; p0.y = point.y; p0.pz = point.pz;
@@ -1334,7 +1340,7 @@ void model2_state::geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo.matrix);
+	transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 	/* save for normal calculation */
 	p1.x = point.x; p1.y = point.y; p1.pz = point.pz;
@@ -1364,7 +1370,8 @@ void model2_state::geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count)
 			texture_parameter * texparam;
 
 			/* Skip normal */
-			input += 3;
+			if (!palette_mode)
+				input += 3;
 
 			/* read in the next point */
 			point.x = u2f(*input++);
@@ -1372,7 +1379,7 @@ void model2_state::geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count)
 			point.pz = u2f(*input++);
 
 			/* transform with the current matrix */
-			transform_point(&point, geo.matrix);
+			transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 			/* save for normal calculation */
 			p2.x = point.x; p2.y = point.y; p2.pz = point.pz;
@@ -1406,6 +1413,16 @@ void model2_state::geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count)
 			luminance = (luminance * texparam->diffuse) + texparam->ambient;
 			luminance = std::clamp(luminance, 0.0f, 255.0f);
 
+			// The palette firmware skips shading culled backfaces and treats
+			// the reverse side of double-sided polygons as a front face.
+			if (palette_mode && face)
+			{
+				if (attr & 0x20000)
+					face = 0;
+				else
+					luminance = 0;
+			}
+
 			luma = (int32_t)luminance;
 
 			/* add the face bit to the luma */
@@ -1433,7 +1450,7 @@ void model2_state::geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count)
 				point.pz = u2f(*input++);
 
 				/* transform with the current matrix */
-				transform_point(&point, geo.matrix);
+				transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 				/* save for normal calculation */
 				p3.x = point.x; p3.y = point.y; p3.pz = point.pz;
@@ -1449,7 +1466,8 @@ void model2_state::geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count)
 			else
 			{
 				/* skip the next 3 points */
-				input += 3;
+				if (!palette_mode)
+					input += 3;
 
 				/* for triangles, the rope of P1(n) is achieved by P0(n-1) (linktype 3) */
 				p3.x = p2.x; p3.y = p2.y; p3.pz = p2.pz;
@@ -1493,7 +1511,7 @@ void model2_state::geo_parse_nn_ns(geo_state &geo, const u32 *input, u32 count)
 }
 
 /* Parse Polygons: No Normals, Specular case */
-void model2_state::geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count)
+void model2_state::geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count, bool palette_mode)
 {
 	raster_state *raster = geo.raster;
 	poly_vertex point, normal, p0, p1, p2, p3;
@@ -1505,7 +1523,7 @@ void model2_state::geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo.matrix);
+	transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 	/* save for normal calculation */
 	p0.x = point.x; p0.y = point.y; p0.pz = point.pz;
@@ -1524,7 +1542,7 @@ void model2_state::geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count)
 	point.pz = u2f(*input++);
 
 	/* transform with the current matrix */
-	transform_point(&point, geo.matrix);
+	transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 	/* save for normal calculation */
 	p1.x = point.x; p1.y = point.y; p1.pz = point.pz;
@@ -1554,7 +1572,8 @@ void model2_state::geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count)
 			texture_parameter * texparam;
 
 			/* Skip normal */
-			input += 3;
+			if (!palette_mode)
+				input += 3;
 
 			/* read in the next point */
 			point.x = u2f(*input++);
@@ -1562,7 +1581,7 @@ void model2_state::geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count)
 			point.pz = u2f(*input++);
 
 			/* transform with the current matrix */
-			transform_point(&point, geo.matrix);
+			transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 			/* save for normal calculation */
 			p2.x = point.x; p2.y = point.y; p2.pz = point.pz;
@@ -1593,7 +1612,10 @@ void model2_state::geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count)
 			if ((dotl * dotp) < 0) luminance = 0;
 			else luminance = fabs(dotl);
 
-			specular = ((2*dotl) * normal.pz) - geo.light.pz;
+			// The reverse-face firmware negates the light dot product before
+			// calling its shared specular routine; the normal is unchanged.
+			float const specular_dot = (palette_mode && face) ? -dotl : dotl;
+			specular = ((2*specular_dot) * normal.pz) - geo.light.pz;
 			if (specular < 0) specular = 0;
 			if (texparam->specular_control == 0) specular = 0;
 			if ((texparam->specular_control >> 1) != 0) specular *= specular;
@@ -1604,6 +1626,16 @@ void model2_state::geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count)
 
 			luminance = (luminance * texparam->diffuse) + texparam->ambient + specular;
 			luminance = std::clamp(luminance, 0.0f, 255.0f);
+
+			// The palette firmware skips shading culled backfaces and treats
+			// the reverse side of double-sided polygons as a front face.
+			if (palette_mode && face)
+			{
+				if (attr & 0x20000)
+					face = 0;
+				else
+					luminance = 0;
+			}
 
 			luma = (int32_t)luminance;
 
@@ -1632,7 +1664,7 @@ void model2_state::geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count)
 				point.pz = u2f(*input++);
 
 				/* transform with the current matrix */
-				transform_point(&point, geo.matrix);
+				transform_point(&point, select_geo_matrix(geo, point, palette_mode));
 
 				/* save for normal calculation */
 				p3.x = point.x; p3.y = point.y; p3.pz = point.pz;
@@ -1648,7 +1680,8 @@ void model2_state::geo_parse_nn_s(geo_state &geo, const u32 *input, u32 count)
 			else
 			{
 				/* skip the next 3 points */
-				input += 3;
+				if (!palette_mode)
+					input += 3;
 
 				/* for triangles, the rope of P1(n) is achieved by P0(n-1) (linktype 3) */
 				p3.x = p2.x; p3.y = p2.y; p3.pz = p2.pz;
@@ -1745,6 +1778,17 @@ const u32 *model2_state::geo_object_data(geo_state &geo, u32 opcode, const u32 *
 	// Virtual On & Gunblade NY
 	if (obc == 0)
 		obc = 0xfffff;
+
+	// The uploaded dual-matrix command calculates normals from transformed
+	// vertices, independently of the normal-present mode bit (firmware 0x379).
+	if (m_geo_dual_matrix && ((opcode >> 23) & 0x1f) == 0x11)
+	{
+		if (geo.mode & 1)
+			geo_parse_nn_s(geo, obp, obc, true);
+		else
+			geo_parse_nn_ns(geo, obp, obc, true);
+		return input;
+	}
 
 	switch (geo.mode & 3)
 	{
@@ -1997,6 +2041,27 @@ const u32 *model2_state::geo_matrix_write(geo_state &geo, u32 opcode, const u32 
 	for (u32 i = 0; i < 12; i++)
 		geo.matrix[i] = u2f(*input++);
 
+	return input;
+}
+
+/* Secondary matrix upload: nine coefficients followed by three translations. */
+const u32 *model2_state::geo_matrix2_write(geo_state &geo, u32 opcode, const u32 *input)
+{
+	(void)opcode;
+
+	/* read in the secondary transformation matrix */
+	for (int i = 0; i < 12; i++)
+		geo.matrix2[i] = u2f(*input++);
+
+	return input;
+}
+
+// The uploaded command at 0x488 copies nine parameter-bank coefficients,
+// followed by the three translation values. It consumes no input words.
+const u32 *model2_state::geo_matrix2_copy(geo_state &geo, u32 opcode, const u32 *input)
+{
+	(void)opcode;
+	std::copy(std::begin(geo.matrix), std::end(geo.matrix), std::begin(geo.matrix2));
 	return input;
 }
 
@@ -2403,10 +2468,20 @@ const u32 *model2_state::geo_process_command(geo_state &geo, u32 opcode, const u
 			input = m_geo_mesh ? geo_mesh_mode(geo, opcode, input) : geo_light_source(geo, opcode, input);
 			break;
 		case 0x1b:
-			input = m_geo_mesh ? geo_mesh_draw(geo, opcode, input) : geo_matrix_write(geo, opcode, input);
+			if (m_geo_mesh)
+				input = geo_mesh_draw(geo, opcode, input);
+			else if (m_geo_dual_matrix)
+				input = geo_matrix2_write(geo, opcode, input);
+			else
+				input = geo_matrix_write(geo, opcode, input);
 			break;
 		case 0x1c:
-			input = m_geo_mesh ? geo_mesh_flush(geo, opcode, input) : geo_translate_write(geo, opcode, input);
+			if (m_geo_mesh)
+				input = geo_mesh_flush(geo, opcode, input);
+			else if (m_geo_dual_matrix)
+				input = geo_matrix2_copy(geo, opcode, input);
+			else
+				input = geo_translate_write(geo, opcode, input);
 			break;
 		case 0x1d: input = geo_code_upload(geo, opcode, input);           break;
 		case 0x1e: input = geo_code_jump(geo, opcode, input);             break;
