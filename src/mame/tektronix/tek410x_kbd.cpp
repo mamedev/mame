@@ -210,7 +210,8 @@ void tek410x_keyboard_device::p2_w(u8 data)
 		m_mcu->set_input_line(MCS48_INPUT_IRQ, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
-	if (m_kdo && BIT(data, 5) != BIT(m_p2_out, 5))
+   // FIXME: restore commented expression when mc68681 is fixed
+	if (m_kdo) // && BIT(data, 5) != BIT(m_p2_out, 5))
 		m_rdata_callback(BIT(data, 5));
 
 	m_p2_out = data;
