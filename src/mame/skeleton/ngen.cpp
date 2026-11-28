@@ -10,7 +10,20 @@
     level 1 - SIO
     level 3 - timer (from PIT, presumably channel 0? Patent says "channel 3")
     level 4 - "interrupt detector" - keyboard, printer, RTC
-    level 7 - floppy/hard disk
+    level 7 - floppy/hard disk (original patent-based assignment)
+
+    CP-001/B26 disk module connections:
+    - WD1010 INTRQ (XINTR2) -> external PIC IR3
+    - WD2797 INTRQ and byte-count/CRC timeout (XINTR5) -> 80186 INT3
+    X-Bus priority numbers are not the external PIC input numbers.
+
+    Disk module reference: Convergent Floppy/Hard Disk Manual,
+    A-09-00328-01-A (January 1984), Figs. 2-5 and 3-9.
+    PAL 13E supplies an active-low byte-clock pulse to the 8253.  The NGEN
+    driver phases the channel 0 input low when BTOS loads a mode 0 count, so
+    the first subsequent byte access supplies its rising edge and the next
+    falling edge loads the count.  This accounts for the documented N-2 byte
+    count without changing shared PIT behavior.
 
     DMA channels:
     channel 0 - communications (RS-232)
@@ -62,6 +75,9 @@
 */
 
 #include "emu.h"
+
+#include "ngen_kb.h"
+
 #include "bus/rs232/rs232.h"
 #include "cpu/i386/i386.h"
 #include "cpu/i86/i186.h"
@@ -70,26 +86,36 @@
 #include "machine/am9517a.h"
 #include "machine/clock.h"
 #include "machine/i8251.h"
-#include "ngen_kb.h"
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
-#include "machine/wd2010.h"
+#include "machine/wd1010.h"
 #include "machine/wd_fdc.h"
 #include "machine/z80sio.h"
 #include "video/mc6845.h"
+
 #include "memarray.h"
 #include "screen.h"
+
+#define LOG_DISK     (1U << 1)
+#define LOG_KEYBOARD (1U << 2)
+#define LOG_TIMER    (1U << 3)
+// Enable individual channels here when investigating disk completion,
+// keyboard initialization or the CPU timer interrupt bridge.
+#define VERBOSE (0)
+#include "logmacro.h"
 
 
 namespace {
 
-class ngen_state : public driver_device
+// Board devices and X-Bus/module support shared by the NGEN CPU variants.
+// CPU register blocks, address maps, and interrupt/DMA connections belong to
+// the concrete machine state below, so a 386 model cannot accidentally use
+// the CP-001's integrated 80186 peripherals.
+class ngen_base_state : public driver_device
 {
 public:
-	ngen_state(const machine_config &mconfig, device_type type, const char *tag) :
+	ngen_base_state(const machine_config &mconfig, device_type type, const char *tag) :
 		driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu"),
-		m_i386cpu(*this,"i386cpu"),
 		m_crtc(*this,"crtc"),
 		m_viduart(*this,"videouart"),
 		m_iouart(*this,"iouart"),
@@ -102,17 +128,26 @@ public:
 		m_hdc_timer(*this,"hdc_timer"),
 		m_disk_rom(*this,"disk"),
 		m_fd0(*this,"fdc:0"),
+		m_hdd(*this,"hdc:0"),
 		m_hd_buffer(*this,"hd_buffer_ram", 1024*8, ENDIANNESS_LITTLE)
 	{
 	}
 
-	void ngen(machine_config &config);
-
 protected:
-	uint8_t hd_buffer_r(offs_t offset);
-	void hd_buffer_w(offs_t offset, uint8_t data);
+	virtual cpu_device &main_cpu() = 0;
+	virtual void fdc_irq_line(int state) = 0;
+	virtual void fdc_drq_line(int state) = 0;
+	virtual bool has_80186_timer() const = 0;
+
+	uint8_t hdc_data_r();
+	void hdc_data_w(uint8_t data);
+	void hdc_bcr_w(int state);
+	void hdc_bdrq_w(int state);
+	void hdc_dma_finish();
 
 	void pit_out0_w(int state);
+	void kbd_rxrdy_w(int state);
+	void kbd_txrdy_w(int state);
 	void pit_out1_w(int state);
 	void pit_out2_w(int state);
 
@@ -124,6 +159,7 @@ protected:
 	void dack3_w(int state);
 	uint8_t dma_read_word(offs_t offset);
 	void dma_write_word(offs_t offset, uint8_t data);
+	offs_t dma_byte_address(offs_t offset) const;
 	// TODO: sort out what devices use which channels
 	uint8_t dma_0_dack_r() { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
 	uint8_t dma_1_dack_r() { uint16_t ret = 0xffff; m_dma_high_byte = ret & 0xff00; return ret; }
@@ -132,45 +168,37 @@ protected:
 	void dma_0_dack_w(uint8_t data) { popmessage("IOW0: data %02x",data); }
 	void dma_1_dack_w(uint8_t data) { }
 	void dma_2_dack_w(uint8_t data) { }
-	void dma_3_dack_w(uint8_t data) { popmessage("IOW3: data %02x",data); }
+	void dma_3_dack_w(uint8_t data);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	void timer_clk_out(int state);
 
 	void fdc_irq_w(int state);
+	void fdc_byte_clock();
+	void fdc_timer0_w(int state);
+	void fdc_timer1_w(int state);
+	void update_fdc_irq();
 
-	void ngen386_io(address_map &map) ATTR_COLD;
-	void ngen386_mem(address_map &map) ATTR_COLD;
-	void ngen386i_mem(address_map &map) ATTR_COLD;
-
-	optional_device<i80186_cpu_device> m_maincpu;
-	optional_device<i386_device> m_i386cpu;
 	required_device<mc6845_device> m_crtc;
 	required_device<i8251_device> m_viduart;
 	required_device<upd7201_device> m_iouart;
 	required_device<am9517a_device> m_dmac;
 	required_device<pic8259_device> m_pic;
 	required_device<pit8254_device> m_pit;
-	optional_device<wd2010_device> m_hdc;
+	optional_device<wd1010_device> m_hdc;
 	optional_device<wd2797_device> m_fdc;
 	optional_device<pit8253_device> m_fdc_timer;
 	optional_device<pit8253_device> m_hdc_timer;
 
-private:
-	void cpu_peripheral_cb(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	void peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
-	uint16_t peripheral_r(offs_t offset, uint16_t mem_mask = ~0);
+protected:
 	void xbus_w(uint16_t data);
 	uint16_t xbus_r();
 
-	void cpu_timer_w(int state);
-
 	void hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
 	uint16_t hfd_r(offs_t offset, uint16_t mem_mask = ~0);
-	[[maybe_unused]] void fdc_drq_w(int state);
+	void fdc_drq_w(int state);
 	void fdc_control_w(uint8_t data);
-	uint8_t irq_cb();
 	void hdc_control_w(uint8_t data);
 	void disk_addr_ext(uint8_t data);
 
@@ -182,16 +210,15 @@ private:
 	uint16_t periph141_r(offs_t offset, uint16_t mem_mask);
 	void dma_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask);
 	uint16_t dma_bank_r(offs_t offset, uint16_t mem_mask);
-	void ngen_io(address_map &map) ATTR_COLD;
-	void ngen_mem(address_map &map) ATTR_COLD;
-
 	virtual void machine_reset() override ATTR_COLD;
 	virtual void machine_start() override ATTR_COLD;
 
+	// State shared by board-level devices and their common transfers.
 	optional_memory_region m_disk_rom;
 	memory_array m_vram;
 	memory_array m_fontram;
 	optional_device<floppy_connector> m_fd0;
+	required_device<harddisk_image_device> m_hdd;
 	memory_share_creator<uint8_t> m_hd_buffer;
 
 	void set_dma_channel(int channel, int state);
@@ -201,7 +228,6 @@ private:
 	uint16_t m_upper;
 	uint16_t m_middle;
 	uint16_t m_port00;
-	uint16_t m_periph141;
 	uint8_t m_dma_offset[4];
 	int8_t m_dma_channel;
 	uint16_t m_dma_high_byte;
@@ -209,33 +235,112 @@ private:
 	uint16_t m_disk_rom_ptr;
 	uint8_t m_hdc_control;
 	uint8_t m_disk_page;
+	uint16_t m_hdc_buffer_offset = 0;
+	uint16_t m_hd_buffer_offset = 0;
+	bool m_hdc_bdrq = false;
+	bool m_hdc_dma_sector_ready = false;
+	emu_timer *m_cpu_timer_irq_timer = nullptr;
+	bool m_fdc_irq = false;
+	bool m_fdc_timer0 = false;
+	bool m_fdc_timer1 = false;
+	uint8_t m_fdc_timer0_mode = 0xff;
+	uint8_t m_fdc_timer0_access = 0;
+	bool m_fdc_timer0_write_high = false;
+	bool m_kbd_rxrdy = false;
+	bool m_kbd_txrdy = false;
 };
 
-class ngen386_state : public ngen_state
+class ngen_state : public ngen_base_state
+{
+public:
+	ngen_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ngen_base_state(mconfig, type, tag), m_maincpu(*this, "maincpu")
+	{
+	}
+
+	void ngen(machine_config &config);
+
+protected:
+	virtual cpu_device &main_cpu() override { return *m_maincpu; }
+	virtual void fdc_irq_line(int state) override { m_maincpu->int3_w(state); }
+	virtual void fdc_drq_line(int state) override { m_maincpu->drq1_w(state); }
+	virtual bool has_80186_timer() const override { return true; }
+
+private:
+	void cpu_peripheral_cb(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t peripheral_r(offs_t offset, uint16_t mem_mask = ~0);
+	void cpu_timer_w(int state);
+	TIMER_CALLBACK_MEMBER(cpu_timer_irq_clear);
+	void cpu_timer_clk_out(int state);
+	uint8_t irq_cb();
+	void ngen_io(address_map &map) ATTR_COLD;
+	void ngen_mem(address_map &map) ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
+	required_device<i80186_cpu_device> m_maincpu;
+	uint16_t m_periph141 = 0;
+};
+
+class ngen386_state : public ngen_base_state
 {
 public:
 	ngen386_state(const machine_config &mconfig, device_type type, const char *tag)
-		: ngen_state(mconfig, type, tag)
-		{}
-		void ngen386(machine_config &config);
-		void _386i(machine_config &config);
+		: ngen_base_state(mconfig, type, tag), m_i386cpu(*this, "i386cpu")
+	{
+	}
+
+	void ngen386(machine_config &config);
+	void _386i(machine_config &config);
+
+protected:
+	virtual cpu_device &main_cpu() override { return *m_i386cpu; }
+	virtual void fdc_irq_line(int state) override { m_pic->ir7_w(state); }
+	virtual void fdc_drq_line(int) override { }
+	virtual bool has_80186_timer() const override { return false; }
+
 private:
+	uint16_t b38_keyboard_r(offs_t offset, uint16_t mem_mask = ~0);
+	void b38_keyboard_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	uint16_t b38_crtc_r(offs_t offset, uint16_t mem_mask = ~0);
+	void b38_crtc_w(offs_t offset, uint16_t data, uint16_t mem_mask = ~0);
+	void periph141_w(offs_t offset, uint16_t data, uint16_t mem_mask);
+	uint16_t periph141_r(offs_t offset, uint16_t mem_mask);
+	void ngen386_io(address_map &map) ATTR_COLD;
+	void ngen386_mem(address_map &map) ATTR_COLD;
+	void ngen386i_mem(address_map &map) ATTR_COLD;
+	required_device<i386_device> m_i386cpu;
+	uint16_t m_periph141 = 0;
 };
 
-void ngen_state::pit_out0_w(int state)
+void ngen_base_state::pit_out0_w(int state)
 {
 	m_pic->ir3_w(state);  // Timer interrupt
 	popmessage("PIT Timer 0 state %i\n",state);
 }
 
-void ngen_state::pit_out1_w(int state)
+void ngen_base_state::kbd_rxrdy_w(int state)
+{
+	// Track the keyboard UART receive-ready transitions to distinguish serial reception from guest reads.
+	if (bool(state) != m_kbd_rxrdy)
+		LOGMASKED(LOG_KEYBOARD, "Keyboard UART RXRDY %d\n", state);
+	m_kbd_rxrdy = bool(state);
+	m_pic->ir6_w(m_kbd_rxrdy || m_kbd_txrdy);
+}
+
+void ngen_base_state::kbd_txrdy_w(int state)
+{
+	m_kbd_txrdy = bool(state);
+	m_pic->ir6_w(m_kbd_rxrdy || m_kbd_txrdy);
+}
+
+void ngen_base_state::pit_out1_w(int state)
 {
 	popmessage("PIT Timer 1 state %i\n",state);
 	m_iouart->rxcb_w(state);
 	m_iouart->txcb_w(state);  // channels in the correct order?
 }
 
-void ngen_state::pit_out2_w(int state)
+void ngen_base_state::pit_out2_w(int state)
 {
 	m_iouart->rxca_w(state);
 	m_iouart->txca_w(state);
@@ -246,19 +351,28 @@ void ngen_state::cpu_timer_w(int state)
 {
 	if(state != 0)
 		popmessage("80186 Timer 0 state %i\n",state);
-	m_pic->ir5_w(state);
+	if (!state)
+	{
+		// Timer output is active low; release the PIC edge after it can be sampled.
+		m_pic->ir5_w(1);
+		m_cpu_timer_irq_timer->adjust(attotime::from_usec(10));
+	}
 }
 
-void ngen_state::timer_clk_out(int state)
+TIMER_CALLBACK_MEMBER(ngen_state::cpu_timer_irq_clear)
+{
+	m_pic->ir5_w(0);
+}
+
+void ngen_base_state::timer_clk_out(int state)
 {
 	m_viduart->write_rxc(state);  // Keyboard UART Rx/Tx clocks
 	m_viduart->write_txc(state);
-	// 80186 timer pins also?  EXT bit is enabled for BTOS PIT test.
-	if(m_maincpu)
-	{
-		m_maincpu->tmrin0_w(state);
-		//m_maincpu->tmrin1_w(state);
-	}
+}
+
+void ngen_state::cpu_timer_clk_out(int state)
+{
+	m_maincpu->tmrin0_w(state);
 }
 
 void ngen_state::cpu_peripheral_cb(offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -275,13 +389,13 @@ void ngen_state::cpu_peripheral_cb(offs_t offset, uint16_t data, uint16_t mem_ma
 		addr = (m_peripheral & 0xffc0) << 4;
 		if(m_middle & 0x0040)
 		{
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(addr, addr + 0x3ff, read16s_delegate(*this, FUNC(ngen_state::peripheral_r)), write16s_delegate(*this, FUNC(ngen_state::peripheral_w)));
+			main_cpu().space(AS_PROGRAM).install_readwrite_handler(addr, addr + 0x3ff, read16s_delegate(*this, FUNC(ngen_state::peripheral_r)), write16s_delegate(*this, FUNC(ngen_state::peripheral_w)));
 			logerror("Mapped peripherals to memory 0x%08x\n",addr);
 		}
 		else
 		{
 			addr &= 0xffff;
-			m_maincpu->space(AS_IO).install_readwrite_handler(addr, addr + 0x3ff, read16s_delegate(*this, FUNC(ngen_state::peripheral_r)), write16s_delegate(*this, FUNC(ngen_state::peripheral_w)));
+			main_cpu().space(AS_IO).install_readwrite_handler(addr, addr + 0x3ff, read16s_delegate(*this, FUNC(ngen_state::peripheral_r)), write16s_delegate(*this, FUNC(ngen_state::peripheral_w)));
 			logerror("Mapped peripherals to I/O 0x%04x\n",addr);
 		}
 		break;
@@ -316,7 +430,10 @@ void ngen_state::peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x0e:
 	case 0x0f:
 		if(ACCESSING_BITS_0_7)
+		{
+			LOGMASKED(LOG_DISK, "DMA controller register %02x write %02x\n", offset, data & 0xff);
 			m_dmac->write(offset,data & 0xff);
+		}
 		break;
 	case 0x80: // DMA page offset?
 	case 0x81:
@@ -340,7 +457,10 @@ void ngen_state::peripheral_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	case 0x112:
 	case 0x113:
 		if(ACCESSING_BITS_0_7)
+		{
+			LOGMASKED(LOG_TIMER, "PIT register %u write %02x\n", unsigned(offset - 0x110), data & 0xff);
 			m_pit->write(offset-0x110,data & 0xff);
+		}
 		break;
 	case 0x141:
 		// bit 1 enables speaker?
@@ -390,7 +510,7 @@ uint16_t ngen_state::peripheral_r(offs_t offset, uint16_t mem_mask)
 	case 0x0f:
 		if(ACCESSING_BITS_0_7)
 			ret = m_dmac->read(offset);
-		logerror("DMA read offset %04x mask %04x returning %04x\n",offset,mem_mask,ret);
+		LOGMASKED(LOG_DISK, "DMA read offset %04x mask %04x returning %04x\n", offset, mem_mask, ret);
 		break;
 	case 0x80: // DMA page offset?
 	case 0x81:
@@ -426,7 +546,6 @@ uint16_t ngen_state::peripheral_r(offs_t offset, uint16_t mem_mask)
 		break;
 	case 0x146:
 	case 0x147:  // keyboard UART
-		// status expects bit 0 to be set (UART transmit ready)
 		if(ACCESSING_BITS_0_7)
 			ret = m_viduart->read(offset & 1);
 		break;
@@ -444,26 +563,18 @@ uint16_t ngen_state::peripheral_r(offs_t offset, uint16_t mem_mask)
 // expansion module.  The base I/O address for the currently selected module is set by writing to
 // this register (bits 0-7 are ignored)
 // TODO: make expansion modules slot devices
-void ngen_state::xbus_w(uint16_t data)
+void ngen_base_state::xbus_w(uint16_t data)
 {
 	uint16_t addr = (data & 0x00ff) << 8;
-	cpu_device* cpu;
-
-	if(m_maincpu)
-		cpu = m_maincpu;
-	else
-		cpu = m_i386cpu;
-	address_space& io = cpu->space(AS_IO);
+	cpu_device &cpu = main_cpu();
+	address_space &io = cpu.space(AS_IO);
 	switch(m_xbus_current)
 	{
-		case 0x00:  // Floppy/Hard disk module - only works with the 80186 NGEN
-			if(m_maincpu)
-				io.install_readwrite_handler(addr,addr+0xff, read16s_delegate(*this, FUNC(ngen_state::hfd_r)), write16s_delegate(*this, FUNC(ngen_state::hfd_w)), 0xffffffff);
-			else
-				cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached end of the modules
+		case 0x00:
+			io.install_readwrite_handler(addr,addr+0xff, read16s_delegate(*this, FUNC(ngen_base_state::hfd_r)), write16s_delegate(*this, FUNC(ngen_base_state::hfd_w)), 0xffffffff);
 			break;
 		default:
-			cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached end of the modules
+			cpu.pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			break;
 	}
 	if(addr != 0)
@@ -491,26 +602,20 @@ void ngen_state::xbus_w(uint16_t data)
 //  0xc8xx - ISDN
 //  0xc9xx - SuperGen Ethernet
 
-uint16_t ngen_state::xbus_r()
+uint16_t ngen_base_state::xbus_r()
 {
 	uint16_t ret = 0xffff;
 
 	switch(m_xbus_current)
 	{
 		case 0x00:
-			if(m_maincpu)
-				ret = 0x1070;  // Floppy/Hard disk module - 80186 NGEN only
-			else
-			{
-				m_i386cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
-				ret = 0x0080;
-			}
+			// The modeled CP-003 configurations include the NGEN disk module;
+			// Convergent Standard Software 11.3/11.4, p. 30, lists CP-003
+			// with the HD-002, HD-003 and HD-0A3 storage modules.
+			ret = 0x1070;
 			break;
 		default:
-			if(m_maincpu)
-				m_maincpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);  // reached the end of the modules
-			else
-				m_i386cpu->pulse_input_line(INPUT_LINE_NMI, attotime::zero);
+			main_cpu().pulse_input_line(INPUT_LINE_NMI, attotime::zero);
 			ret = 0x0080;
 			break;
 	}
@@ -519,7 +624,7 @@ uint16_t ngen_state::xbus_r()
 
 
 // Floppy/Hard disk module
-void ngen_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void ngen_base_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -527,14 +632,15 @@ void ngen_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		case 0x01:
 		case 0x02:
 			if(ACCESSING_BITS_0_7)
+			{
 				m_fdc->write(offset,data & 0xff);
+			}
 			break;
 		case 0x03:
 			if(ACCESSING_BITS_0_7)
 			{
 				m_fdc->write(offset,data & 0xff);
-				m_fdc_timer->write_clk0(1);
-				m_fdc_timer->write_clk0(0);  // Data register access clocks the FDC's PIT channel 0
+				fdc_byte_clock();
 			}
 			break;
 		case 0x04:
@@ -554,7 +660,37 @@ void ngen_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		case 0x0a:
 		case 0x0b:
 			if(ACCESSING_BITS_0_7)
+			{
+				if (offset == 0x0b)
+				{
+					// Keep the external-clock mode 0 load-edge handling local to the
+					// NGEN disk module. Its /DM clock idles high, but the standard
+					// PIT model expects a rising edge before the load's falling edge.
+					if ((data >> 6) == 0)
+					{
+						uint8_t const access = (data >> 4) & 0x03;
+						if (access)
+						{
+							m_fdc_timer0_access = access;
+							m_fdc_timer0_mode = (data >> 1) & ((data & 0x04) ? 0x03 : 0x07);
+							m_fdc_timer0_write_high = false;
+						}
+					}
+				}
+				else if (offset == 0x08 && (m_fdc_timer0_mode == 0))
+				{
+					bool count_complete = (m_fdc_timer0_access != 3);
+					if (m_fdc_timer0_access == 3)
+					{
+						count_complete = m_fdc_timer0_write_high;
+						m_fdc_timer0_write_high = !m_fdc_timer0_write_high;
+					}
+
+					if (count_complete)
+						m_fdc_timer->write_clk0(0);
+				}
 				m_fdc_timer->write(offset-0x08,data & 0xff);
+			}
 			break;
 		case 0x10:
 		case 0x11:
@@ -565,8 +701,12 @@ void ngen_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 		case 0x16:
 		case 0x17:
 			if(ACCESSING_BITS_0_7)
+			{
+				if (offset == 0x16)
+					m_hdc->head_w(data & 0x07);
 				m_hdc->write(offset-0x10,data & 0xff);
-			logerror("WD1010 register %i write %02x mask %04x\n",offset-0x10,data & 0xff,mem_mask);
+			}
+			LOGMASKED(LOG_DISK, "WD1010 register %i write %02x mask %04x\n",offset-0x10,data & 0xff,mem_mask);
 			break;
 		case 0x18:
 		case 0x19:
@@ -578,7 +718,7 @@ void ngen_state::hfd_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-uint16_t ngen_state::hfd_r(offs_t offset, uint16_t mem_mask)
+uint16_t ngen_base_state::hfd_r(offs_t offset, uint16_t mem_mask)
 {
 	uint16_t ret = 0xffff;
 
@@ -594,8 +734,8 @@ uint16_t ngen_state::hfd_r(offs_t offset, uint16_t mem_mask)
 			if(ACCESSING_BITS_0_7)
 			{
 				ret = m_fdc->read(offset);
-				m_fdc_timer->write_clk0(1);
-				m_fdc_timer->write_clk0(0);  // Data register access clocks the FDC's PIT channel 0
+				if (!machine().side_effects_disabled())
+					fdc_byte_clock();
 			}
 			break;
 		case 0x08:
@@ -615,7 +755,6 @@ uint16_t ngen_state::hfd_r(offs_t offset, uint16_t mem_mask)
 		case 0x17:
 			if(ACCESSING_BITS_0_7)
 				ret = m_hdc->read(offset-0x10);
-			logerror("WD1010 register %i read, mask %04x\n",offset-0x10,mem_mask);
 			break;
 		case 0x18:
 		case 0x19:
@@ -629,14 +768,49 @@ uint16_t ngen_state::hfd_r(offs_t offset, uint16_t mem_mask)
 	return ret;
 }
 
-void ngen_state::fdc_irq_w(int state)
+void ngen_base_state::fdc_byte_clock()
 {
-	m_pic->ir7_w(state);
+	// Floppy/Hard Disk Manual A-09-00328-01-A, Fig. 2-5: PAL 13E's /DM
+	// output pulses low for a WD2797 data-register access and idles high.
+	// Preserve this polarity: a mode 0 count written while CLK is high needs
+	// the following rising edge before it can load on the next falling edge.
+	m_fdc_timer->write_clk0(0);
+	m_fdc_timer->write_clk0(1);
 }
 
-void ngen_state::fdc_drq_w(int state)
+void ngen_base_state::fdc_irq_w(int state)
 {
-	m_dmac->dreq3_w(state);
+	LOGMASKED(LOG_DISK, "FDC INTRQ %d\n", state);
+	m_fdc_irq = bool(state);
+	update_fdc_irq();
+}
+
+void ngen_base_state::fdc_timer0_w(int state)
+{
+	LOGMASKED(LOG_DISK, "FDC byte counter OUT0 %d\n", state);
+	m_fdc_timer0 = bool(state);
+	m_fdc_timer->write_gate1(state);
+	update_fdc_irq();
+}
+
+void ngen_base_state::fdc_timer1_w(int state)
+{
+	LOGMASKED(LOG_DISK, "FDC CRC delay OUT1 %d\n", state);
+	m_fdc_timer1 = bool(state);
+	update_fdc_irq();
+}
+
+void ngen_base_state::update_fdc_irq()
+{
+	// Floppy/Hard Disk Manual A-09-00328-01-A, pp. 3-74/3-75:
+	// OUT0 gates the CRC delay counter; OUT0 AND OUT1 joins INTRQ on XINTR5.
+	const int state = m_fdc_irq || (m_fdc_timer0 && m_fdc_timer1);
+	fdc_irq_line(state);
+}
+
+void ngen_base_state::fdc_drq_w(int state)
+{
+	fdc_drq_line(state);
 }
 
 // Floppy disk control register
@@ -645,7 +819,7 @@ void ngen_state::fdc_drq_w(int state)
 // Bit 5 - side select
 // Bit 6 - 1 = 2Mhz for seek, 0 = 1MHz for read/write
 // Bit 7 - FDC reset
-void ngen_state::fdc_control_w(uint8_t data)
+void ngen_base_state::fdc_control_w(uint8_t data)
 {
 	m_fdc->set_floppy(m_fd0->get_device());
 	m_fd0->get_device()->mon_w(!BIT(data, 2));
@@ -660,9 +834,12 @@ void ngen_state::fdc_control_w(uint8_t data)
 // bits 3-5 - select head / expansion module head
 // bit 6 - write enable, must be set to write to a hard disk
 // bit 7 - HDC reset
-void ngen_state::hdc_control_w(uint8_t data)
+void ngen_base_state::hdc_control_w(uint8_t data)
 {
+	LOGMASKED(LOG_DISK, "HDC control write %02x\n", data);
 	m_hdc_control = data;
+	m_hdc->drdy_w(BIT(data, 0) && m_hdd->exists());
+	m_hdc->sc_w(1);
 	if(m_hdc_control & 0x04)
 	{
 		m_disk_rom_ptr = 0;
@@ -672,32 +849,74 @@ void ngen_state::hdc_control_w(uint8_t data)
 	}
 }
 
-// page of system RAM to access
-// bit 7 = disables read/write signals to the WD1010
-void ngen_state::disk_addr_ext(uint8_t data)
+void ngen_base_state::hdc_bdrq_w(int state)
 {
-	m_disk_page = data & 0x7f;
+	LOGMASKED(LOG_DISK, "WD1010 BDRQ %d\n", state);
+	m_hdc_bdrq = state;
+	if (state)
+		m_hdc_dma_sector_ready = false;
+	if (!(m_hdc_control & 0x04))
+		m_dmac->dreq3_w(state && BIT(m_disk_page, 7));
 }
 
-uint8_t ngen_state::hd_buffer_r(offs_t offset)
+uint8_t ngen_base_state::hdc_data_r()
 {
-	return m_hd_buffer[offset];
+	// WD1010-side access to the module's sector buffer.  Keep this cursor
+	// separate from the X-Bus DMA cursor, as the controller fills/empties one
+	// sector before the host starts or finishes its DMA transfer.
+	return m_hd_buffer[m_hdc_buffer_offset++];
 }
 
-void ngen_state::hd_buffer_w(offs_t offset, uint8_t data)
+void ngen_base_state::hdc_data_w(uint8_t data)
 {
-	m_hd_buffer[offset] = data;
+	m_hd_buffer[m_hdc_buffer_offset++] = data;
 }
 
-void ngen_state::dma_hrq_changed(int state)
+void ngen_base_state::hdc_dma_finish()
 {
-	if(m_maincpu)
-		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
-	else
-		m_i386cpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	// The HFD module's buffer-ready handshake releases one 512-byte sector
+	// at a time.  BTOS may keep the channel-3 DMA request active across sectors.
+	if (!m_hdc_dma_sector_ready && (m_hd_buffer_offset >= 512))
+	{
+		m_hdc_dma_sector_ready = true;
+		m_dmac->dreq3_w(0);
+		LOGMASKED(LOG_DISK, "HDC DMA sector ready: %u buffer bytes\n", m_hd_buffer_offset);
+		m_hdc->brdy_w(1);
+	}
 }
 
-void ngen_state::dma_eop_changed(int state)
+void ngen_base_state::hdc_bcr_w(int state)
+{
+	if (state)
+	{
+		m_hdc_buffer_offset = 0;
+		m_hd_buffer_offset = 0;
+		m_hdc_dma_sector_ready = false;
+		m_hdc->brdy_w(0);
+	}
+}
+
+// The HFD module's X-Bus Extended Address register (port XX0Eh) drives
+// XADR11-XADR17 with bits 0-6.  Bit 7 disables the X-Bus master I/O read/write
+// signals to the WD1010 so it can access the RAM data buffer directly.  BTOS
+// sets bit 7 while requesting a hard disk DMA transfer.  The low bits extend
+// the channel 3 DMA word address; the host DMA page registers used by the
+// other channels are handled separately by dma_bank_w().
+void ngen_base_state::disk_addr_ext(uint8_t data)
+{
+	LOGMASKED(LOG_DISK, "HDC address extension write %02x\n", data);
+	m_disk_page = data;
+	if (!(m_hdc_control & 0x04))
+		m_dmac->dreq3_w(m_hdc_bdrq && BIT(data, 7));
+}
+
+void ngen_base_state::dma_hrq_changed(int state)
+{
+	main_cpu().set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
+	m_dmac->hack_w(state);
+}
+
+void ngen_base_state::dma_eop_changed(int state)
 {
 	if(m_dma_channel == 0)
 	{
@@ -712,11 +931,16 @@ void ngen_state::dma_eop_changed(int state)
 		{
 			if(m_hdc_control & 0x04) // ROM transfer
 				m_hdc_control &= ~0x04;  // switch it off when done
+			else if (m_hdc_bdrq)
+			{
+				m_dmac->dreq3_w(0);
+				hdc_dma_finish();
+			}
 		}
 	}
 }
 
-void ngen_state::set_dma_channel(int channel, int state)
+void ngen_base_state::set_dma_channel(int channel, int state)
 {
 	if(!state)
 		m_dma_channel = channel;
@@ -724,80 +948,104 @@ void ngen_state::set_dma_channel(int channel, int state)
 		m_dma_channel = -1;
 }
 
-void ngen_state::dack0_w(int state) { set_dma_channel(0, state); }
-void ngen_state::dack1_w(int state) { set_dma_channel(1, state); }
-void ngen_state::dack2_w(int state) { set_dma_channel(2, state); }
-void ngen_state::dack3_w(int state) { set_dma_channel(3, state); }
+void ngen_base_state::dack0_w(int state) { set_dma_channel(0, state); }
+void ngen_base_state::dack1_w(int state) { set_dma_channel(1, state); }
+void ngen_base_state::dack2_w(int state) { set_dma_channel(2, state); }
+void ngen_base_state::dack3_w(int state) { set_dma_channel(3, state); }
 
-uint8_t ngen_state::dma_3_dack_r()
+uint8_t ngen_base_state::dma_3_dack_r()
 {
 	uint16_t ret = 0xffff;
 
 	if((m_hdc_control & 0x04) && m_disk_rom)
 	{
-		ret = m_disk_rom->base()[m_disk_rom_ptr++] << 8;
-		printf("DMA3 DACK: returning %02x\n",ret);
+		// The module ROM supplies one byte per channel-3 DMA word.  The
+		// bootstrap firmware reads these bytes from the low byte of each
+		// word before packing the ROM into consecutive memory addresses.
+		ret = m_disk_rom->base()[m_disk_rom_ptr++];
 		if(m_disk_rom_ptr < 0x1000)
 		{
 			m_dmac->dreq3_w(1);
 			//m_dmac->dreq3_w(0);
 		}
 	}
+	else if (m_hd_buffer_offset + 1 < m_hd_buffer.length())
+	{
+		ret = m_hd_buffer[m_hd_buffer_offset] | (m_hd_buffer[m_hd_buffer_offset + 1] << 8);
+		m_hd_buffer_offset += 2;
+	}
 	m_dma_high_byte = ret & 0xff00;
 	return ret;
 }
 
-uint8_t ngen_state::dma_read_word(offs_t offset)
+void ngen_base_state::dma_3_dack_w(uint8_t data)
 {
-	cpu_device* cpu;
-	uint16_t result;
+	if (m_hd_buffer_offset + 1 < m_hd_buffer.length())
+	{
+		m_hd_buffer[m_hd_buffer_offset++] = data;
+		m_hd_buffer[m_hd_buffer_offset++] = m_dma_high_byte >> 8;
+		hdc_dma_finish();
+	}
+}
 
-	if(m_maincpu)
-		cpu = m_maincpu;
-	else
-		cpu = m_i386cpu;
-	address_space& prog_space = cpu->space(AS_PROGRAM); // get the right address space
+offs_t ngen_base_state::dma_byte_address(offs_t offset) const
+{
+	// Channel 3 belongs to the HFD module.  Its extended address register
+	// supplies address bits above the 16-bit word address from the DMA chip.
+	// For example, BTOS writes 07h here and A535h to channel 3 to address
+	// physical byte F4A6Ah while constructing the volume header.
+	offs_t const page_offset = (m_dma_channel == 3)
+		? (offs_t(m_disk_page & 0x7f) << 17)
+		: ((offs_t(m_dma_offset[m_dma_channel]) << 16) & 0xfe0000);
+	return page_offset | (offset << 1);
+}
+
+uint8_t ngen_base_state::dma_read_word(offs_t offset)
+{
+	uint16_t result;
+	address_space &prog_space = main_cpu().space(AS_PROGRAM);
 
 	if(m_dma_channel == -1)
 		return 0xff;
-	offs_t page_offset = ((offs_t) m_dma_offset[m_dma_channel]) << 16;
+	offs_t const address = dma_byte_address(offset);
 
-	result = prog_space.read_word((page_offset & 0xfe0000) | (offset << 1));
+	result = prog_space.read_word(address);
 	m_dma_high_byte = result & 0xFF00;
-	popmessage("DMA byte address %06x read %04x\n", (page_offset & 0xfe0000) | (offset << 1),result);
+	LOGMASKED(LOG_DISK, "DMA byte address %06x read %04x\n", address, result);
 	return result & 0xff;
 }
 
 
-void ngen_state::dma_write_word(offs_t offset, uint8_t data)
+void ngen_base_state::dma_write_word(offs_t offset, uint8_t data)
 {
-	cpu_device* cpu;
-
-	if(m_maincpu)
-		cpu = m_maincpu;
-	else
-		cpu = m_i386cpu;
-	address_space& prog_space = cpu->space(AS_PROGRAM); // get the right address space
+	address_space &prog_space = main_cpu().space(AS_PROGRAM);
 
 	if(m_dma_channel == -1)
 		return;
-	offs_t page_offset = ((offs_t) m_dma_offset[m_dma_channel]) << 16;
+	offs_t const address = dma_byte_address(offset);
 
-	prog_space.write_word((page_offset & 0xfe0000) | (offset << 1), data);
-	popmessage("DMA byte address %06x write %04x\n", (page_offset & 0xfe0000) | (offset << 1), m_dma_high_byte | data);
+	prog_space.write_word(address, m_dma_high_byte | data);
+	if ((m_dma_channel == 3) && m_hdc_bdrq)
+		hdc_dma_finish();
+	LOGMASKED(LOG_DISK, "DMA byte address %06x write %04x\n", address, m_dma_high_byte | data);
 }
 
 
-MC6845_UPDATE_ROW( ngen_state::crtc_update_row )
+MC6845_UPDATE_ROW( ngen_base_state::crtc_update_row )
 {
 	uint16_t addr = ma;
 
-	for(int x=0;x<bitmap.width();x+=9)
+	for (int x = 0; x < bitmap.width(); x += 9)
 	{
 		uint8_t ch = m_vram.read16(addr++) & 0xff;
-		for(int z=0;z<9;z++)
+		uint16_t const glyph = m_fontram.read16(ch * 16 + ra);
+		bool const cursor = (x / 9) == cursor_x;
+		for (int z = 0; z < 9; z++)
 		{
-			if(BIT(m_fontram.read16(ch*16+ra),8-z))
+			// The MC6845 supplies -1 when its cursor is blanked and the
+			// character column when it is visible.  Invert the glyph cell to
+			// give the operator feedback about the active text field.
+			if(BIT(glyph,8-z) != cursor)
 				bitmap.pix(y,x+z) = rgb_t(0,0xff,0);
 			else
 				bitmap.pix(y,x+z) = rgb_t(0,0,0);
@@ -810,20 +1058,23 @@ uint8_t ngen_state::irq_cb()
 	return m_pic->acknowledge();
 }
 
-void ngen_state::dma_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void ngen_base_state::dma_bank_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
+	{
 		m_dma_offset[offset] = data & 0xff;
+		LOGMASKED(LOG_DISK, "DMA host page register channel %u = %02x\n", offset, m_dma_offset[offset]);
+	}
 }
 
-uint16_t ngen_state::dma_bank_r(offs_t offset, uint16_t mem_mask)
+uint16_t ngen_base_state::dma_bank_r(offs_t offset, uint16_t mem_mask)
 {
 	if(ACCESSING_BITS_0_7)
 		return m_dma_offset[offset] & 0xff;
 	return 0xff;
 }
 
-uint16_t ngen_state::b38_keyboard_r(offs_t offset, uint16_t mem_mask)
+uint16_t ngen386_state::b38_keyboard_r(offs_t offset, uint16_t mem_mask)
 {
 	uint8_t ret = 0;
 	switch(offset)
@@ -838,7 +1089,7 @@ uint16_t ngen_state::b38_keyboard_r(offs_t offset, uint16_t mem_mask)
 	return ret;
 }
 
-void ngen_state::b38_keyboard_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void ngen386_state::b38_keyboard_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -850,7 +1101,7 @@ void ngen_state::b38_keyboard_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-uint16_t ngen_state::b38_crtc_r(offs_t offset, uint16_t mem_mask)
+uint16_t ngen386_state::b38_crtc_r(offs_t offset, uint16_t mem_mask)
 {
 	uint8_t ret = 0;
 	switch(offset)
@@ -867,7 +1118,7 @@ uint16_t ngen_state::b38_crtc_r(offs_t offset, uint16_t mem_mask)
 	return ret;
 }
 
-void ngen_state::b38_crtc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void ngen386_state::b38_crtc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	switch(offset)
 	{
@@ -882,19 +1133,29 @@ void ngen_state::b38_crtc_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 	}
 }
 
-void ngen_state::periph141_w(offs_t offset, uint16_t data, uint16_t mem_mask)
+void ngen386_state::periph141_w(offs_t offset, uint16_t data, uint16_t mem_mask)
 {
 	// bit 1 enables speaker?
 	COMBINE_DATA(&m_periph141);
 }
 
-uint16_t ngen_state::periph141_r(offs_t offset, uint16_t mem_mask)
+uint16_t ngen386_state::periph141_r(offs_t offset, uint16_t mem_mask)
 {
 	return m_periph141;
 }
 
-void ngen_state::machine_start()
+void ngen_base_state::machine_start()
 {
+	save_item(NAME(m_hd_buffer_offset));
+	save_item(NAME(m_hdc_buffer_offset));
+	save_item(NAME(m_hdc_bdrq));
+	save_item(NAME(m_hdc_dma_sector_ready));
+	save_item(NAME(m_fdc_irq));
+	save_item(NAME(m_fdc_timer0));
+	save_item(NAME(m_fdc_timer1));
+	save_item(NAME(m_fdc_timer0_mode));
+	save_item(NAME(m_fdc_timer0_access));
+	save_item(NAME(m_fdc_timer0_write_high));
 	memory_share* vidshare = memshare("vram");
 	memory_share* fontshare = memshare("fontram");
 	if(vidshare == nullptr || fontshare == nullptr)
@@ -903,11 +1164,39 @@ void ngen_state::machine_start()
 	m_fontram.set(*fontshare,2);
 }
 
-void ngen_state::machine_reset()
+void ngen_state::machine_start()
+{
+	ngen_base_state::machine_start();
+	m_cpu_timer_irq_timer = timer_alloc(FUNC(ngen_state::cpu_timer_irq_clear), this);
+}
+
+void ngen_base_state::machine_reset()
 {
 	m_port00 = 0;
 	m_control = 0;
 	m_xbus_current = 0;
+	if (has_80186_timer())
+		m_cpu_timer_irq_timer->adjust(attotime::never);
+	m_fdc_irq = false;
+	m_fdc_timer0 = false;
+	m_fdc_timer1 = false;
+	m_fdc_timer0_mode = 0xff;
+	m_fdc_timer0_access = 0;
+	m_fdc_timer0_write_high = false;
+	m_fdc_timer->write_clk0(1);
+	if (has_80186_timer())
+		m_fdc_timer->write_gate1(0);
+	update_fdc_irq();
+	m_kbd_rxrdy = false;
+	m_kbd_txrdy = false;
+	m_hdc_control = 0;
+	m_hdc->drdy_w(0);
+	m_hdc->sc_w(1);
+	m_disk_page = 0;
+	m_hdc_buffer_offset = 0;
+	m_hd_buffer_offset = 0;
+	m_hdc_bdrq = false;
+	m_hdc_dma_sector_ready = false;
 	m_viduart->write_dsr(0);
 	m_viduart->write_cts(0);
 	m_fd0->get_device()->set_rpm(300);
@@ -929,16 +1218,16 @@ void ngen_state::ngen_io(address_map &map)
 
 	// Floppy/Hard disk module
 //  map(0x0100, 0x0107).rw("fdc", FUNC(wd2797_t::read), FUNC(wd2797_t::write)).umask16(0x00ff);  // a guess for now
-//  map(0x0108, 0x0108).w(FUNC(ngen_state::fdc_control_w));
-//  map(0x010a, 0x010a).w(FUNC(ngen_state::hdc_control_w));
-//  map(0x010e, 0x010e).w(FUNC(ngen_state::disk_addr_ext));  // X-Bus extended address register
+//  map(0x0108, 0x0108).w(FUNC(ngen_base_state::fdc_control_w));
+//  map(0x010a, 0x010a).w(FUNC(ngen_base_state::hdc_control_w));
+//  map(0x010e, 0x010e).w(FUNC(ngen_base_state::disk_addr_ext));  // X-Bus extended address register
 //  map(0x0110, 0x0117).rw("fdc_timer", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 	// 0x0120-0x012f - WD1010 Winchester disk controller (unemulated)
 //  map(0x0130, 0x0137).rw("hdc_timer", FUNC(pit8253_device::read), FUNC(pit8253_device::write)).umask16(0x00ff);
 
 }
 
-void ngen_state::ngen386_mem(address_map &map)
+void ngen386_state::ngen386_mem(address_map &map)
 {
 	map(0x00000000, 0x000f7fff).ram();
 	map(0x000f8000, 0x000f9fff).ram().share("vram");
@@ -949,7 +1238,7 @@ void ngen_state::ngen386_mem(address_map &map)
 	map(0xffffe000, 0xffffffff).rom().region("bios", 0);
 }
 
-void ngen_state::ngen386i_mem(address_map &map)
+void ngen386_state::ngen386i_mem(address_map &map)
 {
 	map(0x00000000, 0x000f7fff).ram();
 	map(0x000f8000, 0x000f9fff).ram().share("vram");
@@ -959,18 +1248,18 @@ void ngen_state::ngen386i_mem(address_map &map)
 	map(0xffffc000, 0xffffffff).rom().region("bios", 0);
 }
 
-void ngen_state::ngen386_io(address_map &map)
+void ngen386_state::ngen386_io(address_map &map)
 {
-	map(0x0000, 0x0001).rw(FUNC(ngen_state::xbus_r), FUNC(ngen_state::xbus_w));
-//  map(0xf800, 0xfeff).rw(FUNC(ngen_state::peripheral_r), FUNC(ngen_state::peripheral_w)).umask16(0x00ff);
+	map(0x0000, 0x0001).rw(FUNC(ngen386_state::xbus_r), FUNC(ngen386_state::xbus_w));
+//  map(0xf800, 0xfeff).rw(FUNC(ngen386_state::peripheral_r), FUNC(ngen386_state::peripheral_w)).umask16(0x00ff);
 //  map(0xf904, 0xf907).rw("pit",FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask32(0x00ff00ff);
 	map(0xf800, 0xf81f).rw("dmac",FUNC(am9517a_device::read), FUNC(am9517a_device::write)).umask32(0x00ff00ff);
-	map(0xf828, 0xf83f).rw(FUNC(ngen_state::dma_bank_r), FUNC(ngen_state::dma_bank_w)).umask32(0x0000ffff);
+	map(0xf828, 0xf83f).rw(FUNC(ngen386_state::dma_bank_r), FUNC(ngen386_state::dma_bank_w)).umask32(0x0000ffff);
 	map(0xfc24, 0xfc27).rw("pic",FUNC(pic8259_device::read), FUNC(pic8259_device::write)).umask32(0x00ff00ff);
 	map(0xfc34, 0xfc3f).rw("pit",FUNC(pit8254_device::read), FUNC(pit8254_device::write)).umask32(0x00ff00ff);
-	map(0xfd02, 0xfd03).rw(FUNC(ngen_state::periph141_r), FUNC(ngen_state::periph141_w));
-	map(0xfd08, 0xfd0b).rw(FUNC(ngen_state::b38_crtc_r), FUNC(ngen_state::b38_crtc_w));
-	map(0xfd0c, 0xfd0f).rw(FUNC(ngen_state::b38_keyboard_r), FUNC(ngen_state::b38_keyboard_w));
+	map(0xfd02, 0xfd03).rw(FUNC(ngen386_state::periph141_r), FUNC(ngen386_state::periph141_w));
+	map(0xfd08, 0xfd0b).rw(FUNC(ngen386_state::b38_crtc_r), FUNC(ngen386_state::b38_crtc_w));
+	map(0xfd0c, 0xfd0f).rw(FUNC(ngen386_state::b38_keyboard_r), FUNC(ngen386_state::b38_keyboard_w));
 	//map(0xfe40, 0xfe4f).rw("videouart", FUNC(i8251_device::read), FUNC(i8251_device::write)).umask32(0x00ff00ff);
 }
 
@@ -1064,43 +1353,42 @@ void ngen_state::ngen(machine_config &config)
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart);  // main clock unknown, Rx/Tx clocks are 19.53kHz
-//  m_viduart->txempty_handler().set(m_pic, FUNC(pic8259_device::ir4_w));
+	m_viduart->rxrdy_handler().set(FUNC(ngen_state::kbd_rxrdy_w));
+	m_viduart->txrdy_handler().set(FUNC(ngen_state::kbd_txrdy_w));
 	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
 	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
 	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
-	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen_state::timer_clk_out)); // should be 19530Hz
+	CLOCK(config, "refresh_clock", 78120/4).signal_handler().set(FUNC(ngen_state::timer_clk_out)); // 8251 x16 clock, approximately 1200 baud
+	CLOCK(config, "cpu_timer_clock", 78120).signal_handler().set(FUNC(ngen_state::cpu_timer_clk_out));
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
 	m_fdc->intrq_wr_callback().set(FUNC(ngen_state::fdc_irq_w));
-	m_fdc->drq_wr_callback().set(m_maincpu, FUNC(i80186_cpu_device::drq1_w));
-	m_fdc->set_force_ready(true);
+	m_fdc->drq_wr_callback().set(FUNC(ngen_state::fdc_drq_w));
+	// The manual shows the floppy drive's ready signal feeding the WD2797; leave its ready input enabled.
 
 	PIT8253(config, m_fdc_timer);
 	m_fdc_timer->set_clk<0>(0);
-	m_fdc_timer->out_handler<0>().set(m_pic, FUNC(pic8259_device::ir5_w));  // clocked on FDC data register access
+	m_fdc_timer->out_handler<0>().set(FUNC(ngen_state::fdc_timer0_w));
 	m_fdc_timer->set_clk<1>(20_MHz_XTAL / 20);
-//  m_fdc_timer->out_handler<1>().set(m_pic, FUNC(pic8259_device::ir5_w));  // 1MHz
+	m_fdc_timer->out_handler<1>().set(FUNC(ngen_state::fdc_timer1_w));
 	m_fdc_timer->set_clk<2>(20_MHz_XTAL / 20);
 //  m_fdc_timer->out_handler<2>().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	// TODO: WD1010 HDC (not implemented), use WD2010 for now
-	WD2010(config, m_hdc, 20_MHz_XTAL / 4);
-	m_hdc->out_intrq_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
-	m_hdc->in_bcs_callback().set(FUNC(ngen_state::hd_buffer_r));
-	m_hdc->out_bcs_callback().set(FUNC(ngen_state::hd_buffer_w));
-	m_hdc->in_drdy_callback().set_constant(1);
-	m_hdc->in_index_callback().set_constant(1);
-	m_hdc->in_wf_callback().set_constant(1);
-	m_hdc->in_tk000_callback().set_constant(1);
-	m_hdc->in_sc_callback().set_constant(1);
+	WD1010(config, m_hdc, 20_MHz_XTAL / 4);
+	// XINTR2 reaches PIC IR3 on the CP-001; BTOS unmasks bit 3 for HDC I/O.
+	m_hdc->out_intrq_callback().set(m_pic, FUNC(pic8259_device::ir3_w));
+	m_hdc->out_bdrq_callback().set(FUNC(ngen_state::hdc_bdrq_w));
+	m_hdc->out_bcr_callback().set(FUNC(ngen_state::hdc_bcr_w));
+	m_hdc->in_data_callback().set(FUNC(ngen_state::hdc_data_r));
+	m_hdc->out_data_callback().set(FUNC(ngen_state::hdc_data_w));
 
 	PIT8253(config, m_hdc_timer);
 	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
 
 	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
-	HARDDISK(config, "hard0", 0);
+	HARDDISK(config, "hdc:0", 0);
 }
 
 void ngen386_state::ngen386(machine_config &config)
@@ -1177,12 +1465,13 @@ void ngen386_state::ngen386(machine_config &config)
 
 	// keyboard UART (patent says i8251 is used for keyboard communications, it is located on the video board)
 	I8251(config, m_viduart);  // main clock unknown, Rx/Tx clocks are 19.53kHz
-//  m_viduart->txempty_handler().set("pic", FUNC(pic8259_device::ir4_w));
+	m_viduart->rxrdy_handler().set(FUNC(ngen386_state::kbd_rxrdy_w));
+	m_viduart->txrdy_handler().set(FUNC(ngen386_state::kbd_txrdy_w));
 	m_viduart->txd_handler().set("keyboard", FUNC(rs232_port_device::write_txd));
 	rs232_port_device &kbd(RS232_PORT(config, "keyboard", keyboard, "ngen"));
 	kbd.rxd_handler().set(m_viduart, FUNC(i8251_device::write_rxd));
 
-	CLOCK(config, "refresh_clock", 19200*16).signal_handler().set(FUNC(ngen386_state::timer_clk_out)); // should be 19530Hz
+	CLOCK(config, "refresh_clock", 78120/4).signal_handler().set(FUNC(ngen386_state::timer_clk_out)); // 8251 x16 clock, approximately 1200 baud
 
 	// floppy disk / hard disk module (WD2797 FDC, WD1010 HDC, plus an 8253 timer for each)
 	WD2797(config, m_fdc, 20_MHz_XTAL / 20);
@@ -1198,22 +1487,18 @@ void ngen386_state::ngen386(machine_config &config)
 	m_fdc_timer->set_clk<2>(20_MHz_XTAL / 20);
 //  m_fdc_timer->out_handler<2>().set(m_pic, FUNC(pic8259_device::ir5_w));
 
-	// TODO: WD1010 HDC (not implemented), use WD2010 for now
-	WD2010(config, m_hdc, 20_MHz_XTAL / 4);
+	WD1010(config, m_hdc, 20_MHz_XTAL / 4);
 	m_hdc->out_intrq_callback().set(m_pic, FUNC(pic8259_device::ir2_w));
-	m_hdc->in_bcs_callback().set(FUNC(ngen386_state::hd_buffer_r));
-	m_hdc->out_bcs_callback().set(FUNC(ngen386_state::hd_buffer_w));
-	m_hdc->in_drdy_callback().set_constant(1);
-	m_hdc->in_index_callback().set_constant(1);
-	m_hdc->in_wf_callback().set_constant(1);
-	m_hdc->in_tk000_callback().set_constant(1);
-	m_hdc->in_sc_callback().set_constant(1);
+	m_hdc->out_bdrq_callback().set(FUNC(ngen386_state::hdc_bdrq_w));
+	m_hdc->out_bcr_callback().set(FUNC(ngen386_state::hdc_bcr_w));
+	m_hdc->in_data_callback().set(FUNC(ngen386_state::hdc_data_r));
+	m_hdc->out_data_callback().set(FUNC(ngen386_state::hdc_data_w));
 
 	PIT8253(config, m_hdc_timer);
 	m_hdc_timer->set_clk<2>(20_MHz_XTAL / 10);  // 2MHz
 
 	FLOPPY_CONNECTOR(config, "fdc:0", ngen_floppies, "525qd", floppy_image_device::default_mfm_floppy_formats);
-	HARDDISK(config, "hard0", 0);
+	HARDDISK(config, "hdc:0", 0);
 }
 
 void ngen386_state::_386i(machine_config &config)
