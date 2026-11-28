@@ -82,7 +82,7 @@ private:
 	// byte address in wave RAM of the 4K-word block selected by c011
 	offs_t block_base() const { return offs_t(m_block) << 13; }
 
-	// voice register helpers (see the register description in sa16.cpp)
+	// voice register helpers (see the register description in roland_sa16.cpp)
 	static int row(offs_t address);
 	static int voice_reg(int voice, int reg) { return voice * ROWS_PER_BLOCK + reg; }
 	static int env_reg(int voice, int reg) { return ((voice + 1) & (NUM_VOICES - 1)) * ROWS_PER_BLOCK + reg; }

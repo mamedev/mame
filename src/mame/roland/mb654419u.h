@@ -49,7 +49,6 @@ private:
 	template <u32 Base> void setup_w(offs_t offset, u8 data);
 
 	required_device<tvf16_device> m_dsp;
-	sound_stream *m_stream;
 
 	u16 m_address;
 	u16 m_data;

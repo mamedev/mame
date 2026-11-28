@@ -11,7 +11,8 @@
     - one instruction every two clocks
 
     Roland TVF16 (S-550, S-330, W-30): the MB87064's pinout, with 64 words
-    of program RAM loaded over the data bus in place of the mask ROM.
+    of program RAM loaded over the data bus in place of the mask ROM.  As
+    on the MB87064 there is no EA register: MOV #d,EA is the output alone.
 
     TODO:
     - encodings not known: MAB, MBA, LIB, LIV, LVP, ADY, GXY, SXY,
@@ -19,6 +20,7 @@
     - ABS, AND, ORA and DIV are placed by the data sheet's table alone;
       DIV isn't implemented
     - expansion RAM, P mode input, PCT
+    - output handshake: an output completes at once, so OF is never set
 
 ***************************************************************************/
 
@@ -29,9 +31,6 @@
 #include <algorithm>
 #include <cstdlib>
 #include <iterator>
-
-#define VERBOSE (0)
-#include "logmacro.h"
 
 
 DEFINE_DEVICE_TYPE(TVF16, tvf16_device, "tvf16", "Roland TVF16 DSP")

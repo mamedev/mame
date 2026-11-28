@@ -19,6 +19,8 @@
     the TVF16's eight outputs go to the DAC.
 
     TODO:
+    - the odd places' negation is inferred: the firmware's output path
+      check fails when a pair cancels
     - set-up registers f008-f012, f010 commands
     - timing within the SA-16's frame, 15 kHz mode, sampling (REC) mode
 
@@ -45,7 +47,7 @@ mb654419u_device::mb654419u_device(const machine_config &mconfig, const char *ta
 
 void mb654419u_device::device_start()
 {
-	m_stream = stream_alloc(NUM_VOICES, NUM_OUTPUTS, clock() / 224, STREAM_SYNCHRONOUS);
+	stream_alloc(NUM_VOICES, NUM_OUTPUTS, clock() / 224, STREAM_SYNCHRONOUS);
 
 	m_address = 0;
 	m_data = 0;

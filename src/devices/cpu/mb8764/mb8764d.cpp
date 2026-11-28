@@ -168,7 +168,7 @@ offs_t mb8764_disassembler::disassemble(std::ostream &stream, offs_t pc, const d
 			switch (BIT(op, 17, 3))
 			{
 			case 0: util::stream_format(stream, "MOV #$%04X,EO", op & 0xffff); break;
-			case 1: util::stream_format(stream, "MOV #$%03X,EA", op & 0xffff); break;
+			case 1: util::stream_format(stream, "MOV #$%04X,EA", op & 0xffff); break;
 			case 2: util::stream_format(stream, "MOV #$%04X,D", op & 0xffff); break;
 			case 3: util::stream_format(stream, "MOV #$%04X,B", op & 0xffff); break;
 			case 5: util::stream_format(stream, "MOV #$%03X,EXA", op & 0x3ff); break;
