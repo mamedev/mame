@@ -203,6 +203,7 @@ public:
 	slot_option_map const &option_list() const { return m_options; }
 	slot_option const *option(std::string_view name) const;
 	virtual std::string get_default_card_software(get_default_card_software_hook &hook) const { return std::string(); }
+	virtual bool accepts_argument() const { return false; }
 	device_t *get_card_device() const { return m_card_device; }
 	void set_card_device(device_t *dev) { m_card_device = dev; }
 	std::string_view slot_name() const { return device().tag() + 1; }

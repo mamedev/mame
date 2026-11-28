@@ -73,6 +73,8 @@ machine_config::machine_config(const game_driver &gamedrv, emu_options &options)
 			const slot_option &opt = options.slot_option(slot_option_name);
 			selval = opt.value().c_str();
 			is_default = !opt.specified();
+			if (!opt.argument().empty() && !slot.accepts_argument())
+				throw emu_fatalerror("Slot '%s' does not accept argument '%s'", owner.tag()+1, opt.argument());
 		}
 
 		if (selval && *selval)

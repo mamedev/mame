@@ -221,6 +221,7 @@ public:
 	const std::string &value() const;
 	std::string specified_value() const;
 	const std::string &bios() const { return m_specified_bios; }
+	const std::string &argument() const { return m_specified_argument; }
 	const std::string &default_card_software() const { return m_default_card_software; }
 	bool specified() const { return m_specified; }
 	core_options::entry::shared_ptr option_entry() const { return m_entry.lock(); }
@@ -236,11 +237,13 @@ public:
 	core_options::entry::shared_ptr setup_option_entry(std::string &&name);
 
 private:
+	void parse_specified(std::string_view text);
 	void possibly_changed(const std::string &old_value);
 
 	emu_options &                   m_host;
 	bool                            m_specified;
 	std::string                     m_specified_value;
+	std::string                     m_specified_argument;
 	std::string                     m_specified_bios;
 	std::string                     m_default_card_software;
 	std::string                     m_default_value;

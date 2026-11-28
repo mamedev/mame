@@ -458,7 +458,7 @@ void coco3_state::coco3(machine_config &config)
 	m_screen->set_screen_update(FUNC(coco3_state::screen_update));
 
 	// internal ram
-	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K,2M,8M");
+	RAM(config, RAM_TAG).set_default_size("512K").set_extra_options("128K,2M,8M").set_default_fill(ram_device::fill_pattern::ALT_FF00, 16);
 
 	// floating space
 	coco_floating(config);

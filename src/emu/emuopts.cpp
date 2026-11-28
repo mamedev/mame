@@ -1186,11 +1186,49 @@ std::string slot_option::specified_value() const
 	std::string result;
 	if (m_specified)
 	{
-		result = m_specified_bios.empty()
-			? m_specified_value
-			: util::string_format("%s,bios=%s", m_specified_value, m_specified_bios);
+		result = m_specified_value;
+		if (!m_specified_argument.empty())
+			result += util::string_format(",%s", m_specified_argument);
+		if (!m_specified_bios.empty())
+			result += util::string_format(",bios=%s", m_specified_bios);
 	}
 	return result;
+}
+
+
+//-------------------------------------------------
+//  slot_option::parse_specified - split text of
+//  the form card[,argument][,bios=name]
+//-------------------------------------------------
+
+void slot_option::parse_specified(std::string_view text)
+{
+	// we need to do some elementary parsing here
+	const char *bios_arg = ",bios=";
+	const std::string_view::size_type bios_pos = text.find(bios_arg);
+	if (bios_pos != std::string_view::npos)
+	{
+		m_specified_bios = text.substr(bios_pos + strlen(bios_arg));
+		text = text.substr(0, bios_pos);
+	}
+	else
+	{
+		m_specified_bios = "";
+	}
+
+	const std::string_view::size_type arg_pos = text.find(',');
+	if (arg_pos != std::string_view::npos)
+	{
+		m_specified_argument = text.substr(arg_pos + 1);
+		text = text.substr(0, arg_pos);
+	}
+	else
+	{
+		m_specified_argument = "";
+	}
+
+	m_specified = true;
+	m_specified_value = text;
 }
 
 
@@ -1203,21 +1241,7 @@ void slot_option::specify(std::string &&text, bool peg_priority)
 	// record the old value; we may need to trigger an update
 	const std::string old_value = value();
 
-	// we need to do some elementary parsing here
-	const char *bios_arg = ",bios=";
-	const std::string::size_type pos = text.find(bios_arg);
-	if (pos != std::string::npos)
-	{
-		m_specified = true;
-		m_specified_value = text.substr(0, pos);
-		m_specified_bios = text.substr(pos + strlen(bios_arg));
-	}
-	else
-	{
-		m_specified = true;
-		m_specified_value = std::move(text);
-		m_specified_bios = "";
-	}
+	parse_specified(text);
 
 	conditionally_peg_priority(m_entry, peg_priority);
 
@@ -1235,21 +1259,7 @@ void slot_option::specify(std::string_view text, bool peg_priority)
 	// record the old value; we may need to trigger an update
 	const std::string old_value = value();
 
-	// we need to do some elementary parsing here
-	const char *bios_arg = ",bios=";
-	const std::string_view::size_type pos = text.find(bios_arg);
-	if (pos != std::string_view::npos)
-	{
-		m_specified = true;
-		m_specified_value = text.substr(0, pos);
-		m_specified_bios = text.substr(pos + strlen(bios_arg));
-	}
-	else
-	{
-		m_specified = true;
-		m_specified_value = text;
-		m_specified_bios = "";
-	}
+	parse_specified(text);
 
 	conditionally_peg_priority(m_entry, peg_priority);
 
