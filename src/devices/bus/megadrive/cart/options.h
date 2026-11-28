@@ -11,6 +11,7 @@ void megadrive_cart_options(device_slot_interface &device);
 namespace bus::megadrive::slotoptions {
 
 	extern char const *const ACTION_REPLAY;
+	extern char const *const GAME_GENIE;
 
 	extern char const *const HB_BEGGARP;
 	extern char const *const HB_BEGGARP1;
