@@ -108,6 +108,7 @@ private:
 	memory_access<21, 1, 0, ENDIANNESS_LITTLE>::cache m_wram_cache;
 
 	voice_t m_voice[NUM_VOICES];
+	s16 m_interp_kernel[3][128];
 
 	// internal state
 	u16 m_active_channels; // key-on mask

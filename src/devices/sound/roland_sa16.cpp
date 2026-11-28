@@ -17,11 +17,12 @@
 
     Interpolation: each output sample sums six words around the read
     position, weighted by a windowed sinc. The mask ROM holds half of it,
-    3 x 128 phases of 12-bit sign-magnitude words, read from a die shot;
-    72 words not legible there are computed. Guessed, not measured: the six
-    words are consecutive addresses (a loop point does not wrap them),
-    reverse mode puts the fraction on the other side of the read word, and
-    the sum is truncated to the sample's scale, the output saturating.
+    3 x 128 phases of 12-bit sign-magnitude words; the 312 words legible
+    on a die shot all follow the formula the table is computed from.
+    Guessed, not measured: the six words are consecutive addresses (a
+    loop point does not wrap them), reverse mode puts the fraction on the
+    other side of the read word, and the sum is truncated to the sample's
+    scale, the output saturating.
 
     Voice registers (regs800, selected through the d001+2n window, data
     through ports 2/3). Derived from the register usage of the W-30 system
@@ -95,6 +96,7 @@
 #include "roland_sa16.h"
 
 #include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <iterator>
 
@@ -104,49 +106,6 @@
 
 #define VERBOSE (0)
 #include "logmacro.h"
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-namespace {
-
-// round(2047 * sinc(x) * (0.5336 + 0.46 * cos(pi * x / 3))), x = b + (p + 0.5) / 128, b = 0-2, p = 0-127
-constexpr s16 INTERP_KERNEL[3][128] =
-{
-	{
-		2034, 2033, 2032, 2031, 2029, 2027, 2024, 2021, 2017, 2013, 2008, 2003, 1997, 1991, 1985, 1978,
-		1970, 1963, 1954, 1946, 1937, 1927, 1917, 1907, 1896, 1885, 1873, 1861, 1849, 1836, 1823, 1809,
-		1795, 1781, 1766, 1752, 1736, 1721, 1705, 1688, 1672, 1655, 1638, 1621, 1603, 1585, 1567, 1548,
-		1529, 1510, 1491, 1472, 1452, 1432, 1412, 1392, 1372, 1351, 1331, 1310, 1289, 1268, 1247, 1225,
-		1204, 1182, 1161, 1139, 1117, 1095, 1074, 1052, 1030, 1008, 986, 964, 942, 920, 898, 876,
-		855, 833, 811, 789, 768, 746, 725, 704, 682, 661, 640, 620, 599, 578, 558, 538,
-		518, 498, 478, 458, 439, 420, 401, 382, 364, 345, 327, 309, 292, 274, 257, 240,
-		224, 207, 191, 175, 160, 144, 129, 114, 100, 86, 72, 58, 45, 31, 19, 6,
-	},
-	{
-		-6, -18, -30, -41, -52, -63, -73, -83, -93, -103, -112, -121, -129, -138, -146, -154,
-		-161, -168, -175, -182, -188, -194, -200, -205, -210, -215, -220, -224, -228, -232, -236, -239,
-		-242, -245, -247, -250, -252, -254, -255, -257, -258, -259, -260, -260, -260, -260, -260, -260,
-		-260, -259, -258, -257, -256, -255, -253, -251, -250, -248, -246, -243, -241, -239, -236, -233,
-		-230, -227, -224, -221, -218, -215, -211, -208, -204, -201, -197, -193, -189, -185, -181, -177,
-		-173, -169, -165, -161, -157, -153, -149, -145, -140, -136, -132, -128, -124, -120, -115, -111,
-		-107, -103, -99, -95, -91, -87, -83, -79, -75, -71, -67, -64, -60, -56, -53, -49,
-		-46, -42, -39, -36, -32, -29, -26, -23, -20, -17, -14, -12, -9, -6, -4, -1,
-	},
-	{
-		1, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 23, 25, 26, 28, 29,
-		30, 32, 33, 34, 35, 36, 37, 38, 39, 39, 40, 41, 41, 42, 42, 42,
-		43, 43, 43, 44, 44, 44, 44, 44, 44, 44, 44, 44, 44, 43, 43, 43,
-		43, 42, 42, 42, 41, 41, 40, 40, 39, 39, 38, 38, 37, 37, 36, 36,
-		35, 34, 34, 33, 32, 32, 31, 31, 30, 29, 29, 28, 27, 27, 26, 25,
-		25, 24, 23, 23, 22, 21, 21, 20, 19, 19, 18, 18, 17, 16, 16, 15,
-		15, 14, 14, 13, 12, 12, 11, 11, 10, 10, 9, 9, 8, 8, 7, 7,
-		6, 6, 6, 5, 5, 4, 4, 3, 3, 3, 2, 2, 1, 1, 1, 0,
-	},
-};
-
-} // anonymous namespace
 
 // device type definitions
 DEFINE_DEVICE_TYPE(RF5C36, rf5c36_device, "rf5c36", "Roland RF5C36 Sampler")
@@ -275,6 +234,16 @@ void sa16_base_device::chanregs_map(address_map &map)
 
 void sa16_base_device::device_start()
 {
+	for (int b = 0; b < 3; b++)
+	{
+		for (int p = 0; p < 128; p++)
+		{
+			const double x = b + (p + 0.5) / 128.0;
+			const double sinc = std::sin(M_PI * x) / (M_PI * x);
+			m_interp_kernel[b][p] = s16(std::lround(2047.0 * sinc * (0.5336 + 0.46 * std::cos(M_PI * x / 3.0))));
+		}
+	}
+
 	// Set up wave RAM cache for sound_stream_update
 	space(AS_WRAM).cache(m_wram_cache);
 
@@ -481,8 +450,8 @@ void sa16_base_device::sound_stream_update(sound_stream &stream)
 				s32 sum = 0;
 				for (int t = 0; t < 3; t++)
 				{
-					sum += wave_sample(bank | ((addr + ahead * t) & 0x3ffff)) * INTERP_KERNEL[t][phase];
-					sum += wave_sample(bank | ((addr - ahead * (t + 1)) & 0x3ffff)) * INTERP_KERNEL[t][phase ^ 0x7f];
+					sum += wave_sample(bank | ((addr + ahead * t) & 0x3ffff)) * m_interp_kernel[t][phase];
+					sum += wave_sample(bank | ((addr - ahead * (t + 1)) & 0x3ffff)) * m_interp_kernel[t][phase ^ 0x7f];
 				}
 				const s32 sample = sum >> 11;
 				// 12-bit sample x 8-bit level -> 16 bits per voice
